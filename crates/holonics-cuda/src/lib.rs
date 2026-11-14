@@ -9,8 +9,7 @@
 //! execution-port plan: what of `holonics::hnn::ExecutionPort` runs resident, what stays on the
 //! host, and what crosses the bus per epoch, together with the port records for #76.
 
-pub mod cuda;
-pub mod ffi;
+pub use holonics_engine_cuda::{cuda, ffi};
 pub mod hnn;
 pub mod number;
 

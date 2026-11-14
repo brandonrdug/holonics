@@ -599,7 +599,7 @@ impl Drop for Card {
 impl Card {
     /// Derive a resident cooperative grid for a flat work surface. A kernel must grid-stride
     /// that surface and keep every thread at every grid barrier, including idle lanes.
-    pub(crate) fn cooperative_layout(
+    pub fn cooperative_layout(
         &self,
         name: &'static str,
         work_items: usize,
@@ -645,7 +645,7 @@ impl Card {
 
     /// Launch only the exact geometry re-admitted against this function's current driver
     /// occupancy. Like `launch`, the caller admits argument buffers and their kernel-wire shape.
-    pub(crate) fn launch_cooperative(
+    pub fn launch_cooperative(
         &self,
         name: &'static str,
         layout: &Layout,
@@ -723,13 +723,13 @@ impl Card {
         &self.census
     }
 
-    pub(crate) fn current(&self) -> Result<(), CardError> {
+    pub fn current(&self) -> Result<(), CardError> {
         Ok(self.context.make_current()?)
     }
 
     /// The card's ordered stream, for an owner that launches its own image's entries in the
     /// card's order (so [`Card::write`] and [`Card::fetch`] wait for them).
-    pub(crate) fn stream(&self) -> &Stream {
+    pub fn stream(&self) -> &Stream {
         &self.stream
     }
 
@@ -747,7 +747,7 @@ impl Card {
     }
 
     /// Refuse a buffer of another card.
-    pub(crate) fn owns<T>(&self, buffer: &CardBuffer<'_, T>) -> Result<(), CardError> {
+    pub fn owns<T>(&self, buffer: &CardBuffer<'_, T>) -> Result<(), CardError> {
         if core::ptr::eq(buffer.card, self) {
             Ok(())
         } else {
@@ -809,7 +809,7 @@ impl Card {
 
     /// Zero `octets` octets of a buffer from the octet `offset`, ordered on the card's stream (no
     /// transfer); both are multiples of four, the memset's word.
-    pub(crate) fn zero_octets<T: Copy>(
+    pub fn zero_octets<T: Copy>(
         &self,
         buffer: &CardBuffer<'_, T>,
         offset: usize,
@@ -837,7 +837,7 @@ impl Card {
 
     /// **Copy `len` elements of one resident buffer into another**, from `from` to `to`, ordered on
     /// the card's stream: nothing crosses the bus.
-    pub(crate) fn copy_within<T: Copy>(
+    pub fn copy_within<T: Copy>(
         &self,
         source: &CardBuffer<'_, T>,
         from: usize,
@@ -901,7 +901,7 @@ impl Card {
 
     /// Launch an entry on the card's stream at a derived layout. `params` point at each argument
     /// in declared order; the caller has checked every buffer with [`Card::owns`].
-    pub(crate) fn launch(
+    pub fn launch(
         &self,
         entry: &'static str,
         layout: &Layout,
@@ -948,7 +948,7 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
     }
 
     /// The card that owns it.
-    pub(crate) fn card(&self) -> &'c Card {
+    pub fn card(&self) -> &'c Card {
         self.card
     }
 
@@ -956,7 +956,7 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
         self.len == 0
     }
 
-    pub(crate) fn device_ptr(&self) -> CUdeviceptr {
+    pub fn device_ptr(&self) -> CUdeviceptr {
         self.buffer.device_ptr()
     }
 }
@@ -966,12 +966,12 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
 /// in a buffer of one card. It borrows the buffer, so the operand outlives every read of it.
 #[derive(Clone, Copy)]
 pub struct Operand<'a> {
-    pub(crate) card: &'a Card,
-    pub(crate) pointer: CUdeviceptr,
-    pub(crate) vectors: usize,
-    pub(crate) width: usize,
-    pub(crate) exponent: u32,
-    pub(crate) _borrow: PhantomData<&'a ()>,
+    pub card: &'a Card,
+    pub pointer: CUdeviceptr,
+    pub vectors: usize,
+    pub width: usize,
+    pub exponent: u32,
+    pub _borrow: PhantomData<&'a ()>,
 }
 
 impl Operand<'_> {

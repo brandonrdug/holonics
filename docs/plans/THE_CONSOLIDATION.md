@@ -419,6 +419,15 @@ laboratory's archive note. No code.
   2. the card's refusals become their own type, into which the October's error converts;
   3. the move.
 
+  A third fact surfaced when the card moved: five October files added methods to the card (`impl
+  Card` in `lattice.rs` twice, `execute_exact.rs`, `inverse_exact.rs` and `epoch.rs`). An inherent
+  impl cannot stand outside the type's crate, so those blocks became extension traits in one more
+  alteration, before the move.
+
+  The guard lints run on `crates/engine` from the host part. On `crates/engine-cuda` they find 25
+  uses of floats, all in the card's yardsticks (`CardField::yardsticks` and `Yardsticks`, a ruler of
+  its rates). They join gate 1 when C5 cuts the yardsticks into `profile.rs` as a named ruler.
+
 **C4. The codec, the region and the passage come in** (the PC; moves only). From `field_train.rs`,
 `store_train.rs` and `hnn/units.rs` into `codec.rs`, `region.rs` and `passage.rs`, bit for bit.
 `codec.rs` says in its first lines that the table of classes stands until the symbol's word

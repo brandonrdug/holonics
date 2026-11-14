@@ -131,12 +131,12 @@
 
 #![deny(clippy::float_arithmetic)]
 
-pub mod card;
+pub use holonics_engine_cuda::hnn::card;
 mod carry;
 mod dyadic;
 pub mod epoch;
 mod execute;
-pub mod field;
+pub use holonics_engine_cuda::hnn::field;
 mod execute_exact;
 mod inverse_exact;
 pub mod lattice;

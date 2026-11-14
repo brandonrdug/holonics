@@ -5,7 +5,7 @@
 //!
 //! [definition; agent-inferred, November 1] `CardField` implements [`FieldRealization`]: a section's
 //! regions read forward through the `K` ticks of the one constitution and returned exactly, and the
-//! certificate's rereads, bit for bit the host's [`holonics::hnn::tower::field::HostField`]
+//! certificate's rereads, bit for bit the host's [`holonics_engine::field::HostField`]
 //! (`kernels/field.cu`). The work is laid out as the field is: a site is its global index in a
 //! batch of regions, each region keeping its own length (no region is padded to another's), a
 //! contact row is a head and a receiving site (one warp a row, its lanes over the site's support:
@@ -30,9 +30,9 @@
 use core::ffi::c_void;
 use std::time::Instant;
 
-use holonics::hnn::tower::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
-use holonics::hnn::tower::field::{level_cut, level_section, PACE_BITS};
-use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{level_cut, level_section, PACE_BITS};
+use holonics_engine::inherited::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer, CardError};
@@ -301,7 +301,7 @@ struct MomentWords {
 }
 
 /// A kernel argument: the address of a value the launch copies.
-/// The moment's chart into the face (§16.22, [`holonics::hnn::tower::field::FieldLayout::moment_face`]): its offset in
+/// The moment's chart into the face (§16.22, [`holonics_engine::field::FieldLayout::moment_face`]): its offset in
 /// the material, its bias's, and its reach `max |C|` (the affine's carrier bound).
 fn moment_face(field: &Field) -> (u64, u64, u64) {
     let (l, d) = (field.layout(), field.declaration);
@@ -2800,7 +2800,7 @@ impl<'c> CardField<'c> {
                     // [§16.47] A place the port does not hear is read and not compared, as one past the stop.
                     let heard = |t: usize| t < stop && port.heard.is_none_or(|h| h[t - first]);
                     let at: Vec<(&[u128], u128)> = wide.iter().zip(first + port.start..).map(|(m, t)| if unresolved[t] != 0 && heard(t) { (m.as_slice(), ts[t] as u128) } else { (&[][..], 0) }).collect();
-                    let (rows, _) = holonics::hnn::tower::field::port_reading(&at, &port)?;
+                    let (rows, _) = holonics_engine::field::port_reading(&at, &port)?;
                     for (k, row) in rows.into_iter().enumerate() {
                         let t = first + port.start + k;
                         if !row.is_empty() {
@@ -3081,7 +3081,7 @@ impl<'c> CardField<'c> {
     }
 
     /// [definition; agent-inferred, November 1] **The site moments of a batch** (§15.1; the host's
-    /// `Field::moments_of`, [`holonics::hnn::tower::field::moment`]), every moment mode (a turned head that
+    /// `Field::moments_of`, [`holonics_engine::field::moment`]), every moment mode (a turned head that
     /// is turned, each of its modes) in the same launches: the strands' encodings of each mode's ring
     /// slot gathered at every site (`field_moment_strands_all`), admitted by the l1 certificate, scanned to
     /// the prefix sums and read at every site (`kernels/field_moment.cuh` through its `_all` entries, a mode
@@ -4135,7 +4135,7 @@ impl FieldRealization for CardField<'_> {
     fn read_and_return_at_class(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
         if regions.iter().any(|r| r.port.is_some()) {
             let (faces, g) = self.read_and_return(field, regions)?;
-            return Ok((holonics::hnn::tower::field::faces_at_class(&faces, regions), g));
+            return Ok((holonics_engine::field::faces_at_class(&faces, regions), g));
         }
         self.narrow_out.borrow_mut().clear();
         self.narrow.set(true);
@@ -4318,7 +4318,7 @@ mod tests {
         let base = FieldDeclaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false };
         let describe = |name: &str, d: FieldDeclaration| {
             let draws = 4 * d.founding_draws();
-            let field = holonics::hnn::tower::field::Field::found(d, &vec![7u8; draws]).expect("founded");
+            let field = holonics_engine::field::Field::found(d, &vec![7u8; draws]).expect("founded");
             let (m2, dw, f) = (2 * d.complex(), d.width, d.contacts);
             // [P61] Every map takes the tile form, whatever its shape.
             let tiled: Vec<String> = [(m2, dw), (dw, m2), (f, dw), (dw, f), (dw, dw)].iter().map(|&(r, c)| format!("{r}x{c}:tile")).collect();
@@ -4452,7 +4452,7 @@ mod tests {
     }
 
     /// [measurement; theory, November 12; the triad record §4] **The triads on the card read the host's bits** (needs the card): a field of
-    /// `declaration(32, 4, 32)` grown by two carry circles and sixteen triads ([`holonics::hnn::tower::field::FieldLearner::with_triads`]), its
+    /// `declaration(32, 4, 32)` grown by two carry circles and sixteen triads ([`holonics_engine::field::FieldLearner::with_triads`]), its
     /// readout, current and pair returns, `W_T` and the triads' chart biases moved off zero from a keyed stream's tail (so the faces have a
     /// covector and every triad term, forward and reverse, is read), read and returned on regions of 2, 3, 5, 64 and 257 sites through the host and
     /// through the card: every face and every covector entry equal, and the covector nonzero on `W_T`, the triads' chart and their biases. The
@@ -4461,7 +4461,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_triads_on_the_card_read_the_hosts_bits() {
-        use holonics::hnn::tower::field::FieldLearner;
+        use holonics_engine::field::FieldLearner;
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
         let triads = 16usize;
@@ -4496,11 +4496,11 @@ mod tests {
         assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (triad at {}, triad_bias at {}, w_triad at {})", unequal.len(), unequal.first(), l.triad, l.triad_bias, l.w_triad);
         // [P58 item 3] The faces at their classes gathered on the card are the whole faces' at their classes, beside the same covector.
         let (at_class, narrow_g) = card_field.read_and_return_at_class(&field, &regions).unwrap();
-        assert_eq!(at_class, holonics::hnn::tower::field::faces_at_class(&host_faces, &regions));
+        assert_eq!(at_class, holonics_engine::field::faces_at_class(&host_faces, &regions));
         assert!(narrow_g == card_g, "the narrow read's covector differs from the whole read's");
         // [P57 item 2] The open sites' charts by stage on the card are the host's, beside the same faces.
         let (charts_faces, card_charts) = card_field.read_tick_charts(&field, &regions).unwrap();
-        let (host_charts_faces, host_charts) = holonics::hnn::tower::field::HostField.read_tick_charts(&field, &regions).unwrap();
+        let (host_charts_faces, host_charts) = holonics_engine::field::HostField.read_tick_charts(&field, &regions).unwrap();
         assert_eq!(charts_faces, host_charts_faces);
         assert_eq!(card_charts.len(), regions.len());
         assert!(card_charts == host_charts, "the charts by stage differ between the card and the host");
@@ -4688,7 +4688,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_opening_comparison_on_the_card_reads_the_hosts_bits() {
-        use holonics::hnn::tower::field::{FieldLearner, HostField};
+        use holonics_engine::field::{FieldLearner, HostField};
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
         let mut learner = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().with_opening().unwrap();
@@ -4746,7 +4746,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_level_on_the_card_reads_the_hosts_bits() {
-        use holonics::hnn::tower::field::{level_declaration, level_split, FieldLearner, FieldRealization, HostField, LEVEL_HARMONICS};
+        use holonics_engine::field::{level_declaration, level_split, FieldLearner, FieldRealization, HostField, LEVEL_HARMONICS};
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
         let mut learner = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().with_opening().unwrap();
@@ -4777,7 +4777,7 @@ mod tests {
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
         let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
-        let cuts: Vec<usize> = regions.iter().map(|r| holonics::hnn::tower::field::level_anchors(&field.level_news(r).unwrap(), holonics::hnn::tower::field::level_section(d.alphabet)).len()).collect();
+        let cuts: Vec<usize> = regions.iter().map(|r| holonics_engine::field::level_anchors(&field.level_news(r).unwrap(), holonics_engine::field::level_section(d.alphabet)).len()).collect();
         assert!(cuts.iter().zip(&lengths).any(|(&e, &n)| e > 1 && e < n), "the fixture's news cuts some region into epochs: {cuts:?} of {lengths:?}");
         let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
@@ -4795,8 +4795,8 @@ mod tests {
 
     /// The lettered learner's case ([`a_lettered_learners_section_on_the_card_reads_the_hosts_bits`]): the learner, its layout and width, the
     /// fresh letters' count, and the stretches' classes, open sites and domains.
-    fn lettered_case() -> (holonics::hnn::tower::field::FieldLearner, holonics::hnn::tower::field::FieldLayout, usize, usize, Vec<Vec<usize>>, Vec<Vec<bool>>, Vec<Option<usize>>) {
-        use holonics::hnn::tower::field::FieldLearner;
+    fn lettered_case() -> (holonics_engine::field::FieldLearner, holonics_engine::field::FieldLayout, usize, usize, Vec<Vec<usize>>, Vec<Vec<bool>>, Vec<Option<usize>>) {
+        use holonics_engine::field::FieldLearner;
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let founded = Field::found(FieldDeclaration { alphabet: 100, ..declaration(32, 4, 32) }, &keys).unwrap();
         let fresh = 5usize;
@@ -4843,7 +4843,7 @@ mod tests {
 
     /// [measurement; theory, November 12 (the record of the opening's room, §4 items 2 and 4)] **A lettered learner's section on the card
     /// reads the host's bits** (needs the card): a learner of 100 classes with two carry circles grown by five fresh letters
-    /// ([`holonics::hnn::tower::field::FieldLearner::lettered`]), its readout, current and pair returns moved off zero from a keyed stream's tail, takes
+    /// ([`holonics_engine::field::FieldLearner::lettered`]), its readout, current and pair returns moved off zero from a keyed stream's tail, takes
     /// one section of stretches as the store's trainer forms them (mask states over a whole stretch and past its context with their weighed
     /// domains, and writer's states with the first of their run resolved, a true end's near tail of voids, plain regions with no port) whose
     /// classes hold the void and fresh letters, through the host and through the card: the receipt, the material and the moments after the
@@ -4852,7 +4852,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn a_lettered_learners_section_on_the_card_reads_the_hosts_bits() {
-        use holonics::hnn::tower::field::HostField;
+        use holonics_engine::field::HostField;
         let (learner, l, dw, fresh, classes, open, domains) = lettered_case();
         let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
@@ -4916,8 +4916,8 @@ mod tests {
     /// [the ring record §4] The learners a field that reads twice is grown onto on the card, before the growth: plain (its read, out and contact
     /// blocks drawn off zero from a keyed stream's tail), with two carry circles, with the circles and the opening's lift (the lift and the paces
     /// drawn too, so the paced heads' clocks are not plain), and that learner grown by a level (its prolongation drawn).
-    fn mark_cases() -> Vec<(&'static str, holonics::hnn::tower::field::FieldLearner)> {
-        use holonics::hnn::tower::field::{level_declaration, level_split, FieldLearner, LEVEL_HARMONICS};
+    fn mark_cases() -> Vec<(&'static str, holonics_engine::field::FieldLearner)> {
+        use holonics_engine::field::{level_declaration, level_split, FieldLearner, LEVEL_HARMONICS};
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
         let drawn = |mut learner: FieldLearner, paces: bool| -> (FieldLearner, usize) {
@@ -4957,11 +4957,11 @@ mod tests {
     /// crowds reached), written and open places, and in the two longest a carried face at some open places (unresolved and not silent, so no mark
     /// there, each neighbour of a marked one), the 257 weighed by a domain.
     #[allow(clippy::type_complexity)]
-    fn mark_regions() -> (Vec<Vec<usize>>, Vec<Vec<bool>>, Vec<Vec<Option<holonics::hnn::tower::field::Shares>>>, Vec<Option<usize>>) {
+    fn mark_regions() -> (Vec<Vec<usize>>, Vec<Vec<bool>>, Vec<Vec<Option<holonics_engine::field::Shares>>>, Vec<Option<usize>>) {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n || (n > 5 && t % 7 == 2)).collect()).collect();
-        let carried: Vec<Vec<Option<holonics::hnn::tower::field::Shares>>> = lengths
+        let carried: Vec<Vec<Option<holonics_engine::field::Shares>>> = lengths
             .iter()
             .zip(&open)
             .map(|(&n, u)| if n < 64 { Vec::new() } else { (0..n).map(|t| (u[t] && t % 9 == 4).then(|| vec![((t * 13 % 120) as u32, 40_000u32), ((t * 29 % 120 + 1) as u32, 25_536u32)])).collect() })
@@ -4971,7 +4971,7 @@ mod tests {
     }
 
     /// [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice on the card reads the host's bits** (needs the
-    /// card): grown onto each of [`mark_cases`] ([`holonics::hnn::tower::field::FieldLearner::with_mark`]) with its strengths at their founding
+    /// card): grown onto each of [`mark_cases`] ([`holonics_engine::field::FieldLearner::with_mark`]) with its strengths at their founding
     /// and at [`MARK_STRENGTHS`], read and returned on [`mark_regions`] through the host and through the card: every face, every covector entry
     /// (the strengths' among them, nonzero), the faces of a read that does not return, the training path's words with the opening's codes, the
     /// charts by stage and the logits with their echoes equal; at the founding every face is the field's before the growth on the card too, and
@@ -4980,7 +4980,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_field_that_reads_twice_on_the_card_reads_the_hosts_bits() {
-        use holonics::hnn::tower::field::{FieldRealization, HostField, MARK_BASES};
+        use holonics_engine::field::{FieldRealization, HostField, MARK_BASES};
         let (classes, open, carried, domains) = mark_regions();
         let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
@@ -5023,13 +5023,13 @@ mod tests {
 
     /// [definition; agent-inferred, November 14, the ring record §4] **A marked learner's sections on the card read the host's bits** (needs the
     /// card): each of [`mark_cases`] and the lettered learner grown to read twice, its strengths at [`MARK_STRENGTHS`], takes two sections on
-    /// [`mark_regions`] (the lettered one on its own stretches) through the host ([`holonics::hnn::tower::field::HostField`]) and through the card:
+    /// [`mark_regions`] (the lettered one on its own stretches) through the host ([`holonics_engine::field::HostField`]) and through the card:
     /// the receipts and the learner's whole state (the material, the strengths among it, and the moments) equal after each. [G180] Each section
     /// compares both reads and deposits their mean.
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn a_marked_learners_sections_on_the_card_read_the_hosts_bits() {
-        use holonics::hnn::tower::field::{HostField, MARK_BASES};
+        use holonics_engine::field::{HostField, MARK_BASES};
         let (classes, open, carried, domains) = mark_regions();
         let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None }).collect();
         let (lettered, _, _, _, lclasses, lopen, ldomains) = lettered_case();
@@ -5062,7 +5062,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_field_that_reads_twice_times_its_two_reads_on_the_card() {
-        use holonics::hnn::tower::field::MARK_BASES;
+        use holonics_engine::field::MARK_BASES;
         let (classes, open, _, _) = mark_regions();
         let regions: Vec<Region> = (0..32).map(|_| Region { classes: &classes[4], unresolved: &open[4], faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
         let (_, learner) = mark_cases().into_iter().find(|(n, _)| *n == "opened").unwrap();

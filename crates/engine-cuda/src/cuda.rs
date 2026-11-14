@@ -1054,7 +1054,7 @@ impl Dim3 {
 impl Function<'_> {
     /// The driver's active blocks per multiprocessor for this lowered function and the exact
     /// block/shared surface offered to its cooperative launch. Zero means no resident block.
-    pub(crate) fn active_blocks_per_multiprocessor(
+    pub fn active_blocks_per_multiprocessor(
         &self,
         threads: u32,
         shared_bytes: u32,
@@ -1089,7 +1089,7 @@ impl Function<'_> {
     }
 
     /// Launch a grid whose capability and simultaneous residency have been admitted by Card.
-    pub(crate) fn launch_cooperative_on_shared(
+    pub fn launch_cooperative_on_shared(
         &self,
         stream: &Stream,
         grid: Dim3,
@@ -1752,7 +1752,7 @@ impl<T> Drop for VirtualDeviceBuffer<T> {
     }
 }
 
-pub(crate) fn device_dword_count<T: DeviceZeroable>(len: usize) -> usize {
+pub fn device_dword_count<T: DeviceZeroable>(len: usize) -> usize {
     let bytes = len
         .checked_mul(core::mem::size_of::<T>())
         .expect("byte size overflow");
