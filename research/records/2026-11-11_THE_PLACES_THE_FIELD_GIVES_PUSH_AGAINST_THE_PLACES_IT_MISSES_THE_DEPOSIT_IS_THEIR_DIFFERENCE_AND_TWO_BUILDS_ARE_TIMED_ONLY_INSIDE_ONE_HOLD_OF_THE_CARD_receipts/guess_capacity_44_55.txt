@@ -4548,3 +4548,13 @@ held read was the three-lane line's byte for byte), trained 2,886 sections in la
   about 0.025 nats a place a nat of cells at whole masks and 0.019 at one-place masks, against the third lane's 0.040 and 0.027 at the same
   stage, still well above its cost of 1.04 times a section. The rule's first branch: the face goes on growing by a lane read this way; the
   line takes its fourth lane on its newest state (the three-lane line's lap 5 end), so the laps since lap 2 are kept.
+
+G192 fixed 2026-11-14T17:55Z (the Opus PC thread), before its build is timed: the deposit's per-entry loops split across the host's
+cores (the engine audit's finding 1, its deposit part: the external step, the grain, the moments and the step, 13.9 ms of a profiled section's
+15.3 on one thread; the prices' checked sums kept sequential, so an overflow refuses in the same order). Timed inside one hold on 24 sections
+of the three-lane line's training from its lap-2 end state: a declared warm-up run of the line's binary (engine1), then engine1, deposit,
+engine1, deposit, engine1, deposit.
+  (a) every run's section lines, timings aside, equal engine1's on all 24 sections;
+  (b) deposit takes a section at least 6 ms under engine1, on the mean of its three runs against the mean of engine1's three after the
+      warm-up, outside engine1's own spread.
+  Rule: (a) and (b) held: the split enters the line's binary. (a) missed: a defect, read before anything else.
