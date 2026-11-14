@@ -4329,3 +4329,14 @@ marks at refine 0 as well.
   (c) no write's share reaches 0.5 at refine 0 (the slash lock was the drifted read 1's).
   Rule: (a) held: the revision is lawful on the both-reads line, and the writes are shown with 2 refine passes. (a) missed: the draft's
   self-hearing under revision is the next loop's subject, read on the writes' order parameters before any change of law.
+
+G182 scored 2026-11-14T08:30Z (receipt g182_writes.txt), the writes' commonest byte's share of their written bytes:
+  (a) the mean share went 0.149, 0.148 and 0.150 at 0, 1 and 2 refine passes, a rise of 0.0005 a pass (0.0105 at lap 3): held;
+  (b) the mean share at refine 0 is 0.149: missed by 0.001, under the band;
+  (c) the largest share at refine 0 is 0.289 (web_01), no write near 0.5: held.
+  Of 3 parts 2 held. A control read after the guess tests (c)'s reason: the unmarked line's third-pass fifth-lap end state, never
+  marked, writes at 0.151 and 0.156 (max 0.238 and 0.266) at 0 and 1 refine passes, with no lock, so the slash lock of lap 3 was
+  the drifted read 1's. There revision rises 0.005 a pass (the draft heard as written text, G169's self-hearing); on the line
+  comparing both reads it is level. Writes holding a byte that is not a whole character: 6, 5 and 4 of 20 on the both-reads state
+  as refine passes are added, 6 and 6 on the unmarked one. The rule's first branch: the revision is lawful on the both-reads line,
+  and the writes are shown with 2 refine passes.

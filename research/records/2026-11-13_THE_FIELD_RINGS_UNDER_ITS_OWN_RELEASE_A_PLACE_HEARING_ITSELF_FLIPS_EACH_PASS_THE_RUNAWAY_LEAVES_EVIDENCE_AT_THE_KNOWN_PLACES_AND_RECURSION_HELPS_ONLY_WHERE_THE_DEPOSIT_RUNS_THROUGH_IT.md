@@ -168,8 +168,13 @@ line's sections, 1.9 times the unmarked line's: the gain is next read at equal c
 
 **Writes under revision drift toward filler on a drifted read 1.** From the lap-3 end state (one read compared), writes with 0, 1 and 2
 refine passes put 0.176, 0.186 and 0.197 of their bytes on their commonest byte, one code write running to slashes (0.72 to 0.83;
-`writes_filler_ruler.txt`): hearing its own draft drove the field toward its own filler, the self-hearing of G169 in the writes. The
-writes are read again on the line comparing both reads.
+`writes_filler_ruler.txt`): hearing its own draft drove the field toward its own filler, the self-hearing of G169 in the writes. Read again on the line comparing
+both reads (G182), revision is level: 0.149, 0.148 and 0.150 at 0, 1 and 2 refine passes, no write locked (the largest 0.289), and
+writes holding a byte that is not a whole character fall from 6 to 4 of 20 as passes are added. The never-marked line writes at 0.151
+and rises 0.005 a pass, the draft heard as written text, so the lock was the drifted read 1's, and comparing both reads leaves the
+revision of a draft neutral where hearing it as written text pulls toward filler. The writes are still made of letters at the level of
+a few known neighbours (whole masks 2.33 nats a place, the fourth pass's third lap): words of the passage's topics appear among strings
+that are not words.
 
 ## 6. Owed
 
