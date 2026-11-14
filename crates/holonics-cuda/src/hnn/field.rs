@@ -1454,6 +1454,10 @@ impl<'c> CardField<'c> {
         if field.mirror_strength.is_some() {
             return Err(TowerError::Refused("the read's mirror at uniform strength is a host reading, with no card realization"));
         }
+        // [measurement; G176] The release's mark at a strength is a host ruler only.
+        if field.mark.is_some() {
+            return Err(TowerError::Refused("the release's mark at a strength is a host ruler, with no card realization"));
+        }
         let slots = crowd_slots(d.reach);
         if slots > MAX_CROWD_SLOTS {
             return Err(TowerError::Refused("the declaration's reach holds more crowds than a warp keeps (32)"));

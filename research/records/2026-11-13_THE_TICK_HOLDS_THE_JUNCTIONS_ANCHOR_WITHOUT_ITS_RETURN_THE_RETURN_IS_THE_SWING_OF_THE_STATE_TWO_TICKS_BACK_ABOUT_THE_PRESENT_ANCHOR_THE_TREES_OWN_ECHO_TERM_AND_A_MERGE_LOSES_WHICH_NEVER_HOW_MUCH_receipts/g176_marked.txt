@@ -1,0 +1,9 @@
+# G176, read-marked on the cut's masks of held text at the second pass's sixth lap mean (pass2/lap6/MEAN.3000), 4,000 places a slice: each region's built read, then its open places' openings marked by the faces that read gave them at strength α (Field::mark, a ruler), the places silent otherwise; host, RAYON 8 threads, 135.1 s. Ruler marked_ruler.py; numbers only.
+alpha=0.00000 places=5634 code=3.0428 expected=3.0530 change=+0.00000 | code=+0.0000 web=+0.0000 science=+0.0000 books=+0.0000 wikidata=+0.0000
+alpha=0.01562 places=5634 code=3.0417 expected=3.0480 change=-0.00108 slope=-0.0694 | code=-0.0022 web=-0.0001 science=-0.0003 books=-0.0023 wikidata=-0.0003
+alpha=0.06250 places=5634 code=3.0402 expected=3.0342 change=-0.00258 slope=-0.0412 | code=-0.0029 web=-0.0020 science=-0.0027 books=-0.0093 wikidata=+0.0047
+alpha=0.12500 places=5634 code=3.0399 expected=3.0155 change=-0.00287 slope=-0.0230 | code=-0.0077 web=+0.0016 science=-0.0050 books=-0.0143 wikidata=+0.0129
+alpha=0.25000 places=5634 code=3.0450 expected=2.9753 change=+0.00224 slope=+0.0090 | code=-0.0096 web=+0.0164 science=-0.0101 books=-0.0116 wikidata=+0.0294
+alpha=0.50000 places=5634 code=3.0887 expected=2.8926 change=+0.04587 slope=+0.0917 | code=+0.0277 web=+0.0594 science=+0.0190 books=+0.0147 wikidata=+0.1160
+alpha=1.00000 places=5634 code=3.2649 expected=2.7534 change=+0.22211 slope=+0.2221 | code=+0.2745 web=+0.1744 science=+0.1609 books=+0.1575 wikidata=+0.3533
+alpha=2.00000 places=5634 code=4.2258 expected=1.9035 change=+1.18302 slope=+0.5915 | code=+1.4115 web=+0.9822 science=+1.2136 books=+0.9591 wikidata=+1.3548

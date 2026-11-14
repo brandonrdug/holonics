@@ -4187,3 +4187,25 @@ G175 scored 2026-11-13T23:42Z (receipt g175_carried.txt; read-carried, host, 8 t
   read being calibrated, the gain is not the place sharpening its own face: it reaches the place through its neighbours' openings as
   much as its own (agent-inferred). The rule's second branch: the mark alone pays at first order, and §4's build starts from it, with
   the finite-strength curve read before the card (at α = 1 with the voice the second pass coded worse, G168).
+
+G176 fixed 2026-11-13T23:55Z (the Opus PC thread), before its read: the carried release's opening part along its strength (read-marked, a ruler:
+Field::mark at α = 0, 2^-6, 2^-4, 2^-3, 2^-2, 2^-1, 1 and 2, the marked places silent otherwise), G175's regions and state. Read first:
+G175's slope −0.0455 nats a place a unit of α, 5.9 times its floor.
+  (a) at α = 0 the code is the built read's to the last bit, and the difference at 2^-6 over 2^-6 stands within 25% of −0.0455;
+  (b) the code is lowest at a strength between 2^-3 and 2^-1, 0.005 to 0.020 nats a place under the built read;
+  (c) at α = 1 the mark alone codes the open places worse than the built read.
+  Rule: (b) held: the strength's best point is inside the founding's reach, the strength is built as a part founded at zero and
+  deposited, and the line trains it on the card. (b) missed with the best at 1 or beyond: the mark is wanted whole, and the voice is read
+  next before the part is built. (b) missed with no strength under the built read: the first order does not carry, and the part waits.
+
+G176 scored 2026-11-13T23:58Z (receipt g176_marked.txt; read-marked, host, 8 threads, 135.1 s):
+  (a) at α = 0 the mark adds release(0, 16) = 0, the built read by construction; the difference at 2^-6 over 2^-6 is −0.0694 nats a place,
+      1.53 times G175's −0.0455 (at 2^-4 −0.0412, at 2^-3 −0.0230): missed;
+  (b) the code is lowest at α = 2^-3, 0.0029 nats a place under the built read (2^-4: 0.0026): missed, by its size;
+  (c) at α = 1 the mark alone codes the open places 0.222 worse (at 2: 1.183 worse): held.
+  Of 3 parts 1 held. The mark pays at small strength and turns by α = 1/4: the pooled best is 0.003 nats a place, about one late lap of
+  the second pass; by slice code, science and books gain 0.008 to 0.014 at 1/8 to 1/4 while web and wikidata turn worse from 1/16. The
+  faces sharpen faster than the code falls (expected code 3.053, 3.016 at 1/8, 2.753 at 1), the echo chamber setting in as the mark
+  grows. (a)'s miss leaves the slope's calibration or its quantization at 2^-6 unread; the sign and the turn stand at every strength read.
+  No branch of the rule names a best point inside the reach whose gain is under 0.005: read as the third, the first order carries too
+  little alone, so the strength as a part waits on the field trained through the mark (the ring record's §4 with its return).

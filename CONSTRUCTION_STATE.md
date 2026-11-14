@@ -546,7 +546,8 @@ repository was reset on September 24; the pre-reset tree is
     release carried as a face, a part the field deposits through, founded at zero, and its first
     reading pays: a faint mark of the field's own release in the opening lowers the open places'
     code at first order, −0.046 nats a place a unit of strength, 5.9 times its random-sign floor
-    (G175), so the build starts from the mark (the record's §5; Brandon's correction of the same day: a temperature is a store's
+    (G175); along its strength with the constitution fixed it buys 0.003 at 1/8 and turns by 1/4
+    (G176), so the build is the field trained through the mark (the record's §5; Brandon's correction of the same day: a temperature is a store's
     state, never a reading's dial; [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
     The line's first pass over the 1 GB of training documents ended at lap 6 (1.0743 one-place,
     2.4057 whole masks); the second pass's laps read 1.0630, 1.0542, 1.0464, 1.0383 and 1.0320
