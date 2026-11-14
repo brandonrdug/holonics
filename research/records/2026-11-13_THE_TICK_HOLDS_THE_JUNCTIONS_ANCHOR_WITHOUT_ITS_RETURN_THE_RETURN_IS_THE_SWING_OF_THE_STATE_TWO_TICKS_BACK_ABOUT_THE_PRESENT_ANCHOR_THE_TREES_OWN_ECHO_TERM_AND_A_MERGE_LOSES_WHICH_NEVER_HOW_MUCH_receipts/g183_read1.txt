@@ -1,0 +1,13 @@
+# G183: read 1 (strengths zeroed in a copy) against read 2 on the fourth pass's third-lap mean (MEAN.3000, both reads compared for 9,888 sections), and read 1 against the unmarked line's third-pass fifth-lap mean. Strengths on the mean: 2582298 11113344 10166662 on 2^24 (enc, before, after). Numbers only.
+CAVITY_DONE ms=263776
+MEASURE lap=R43 rc=0 wall_s=264.2 peak_rss_kib=518616
+## read 1 (F3) against read 2 (C3)
+LAST_TICK F3 one_place pooled=0.9792 places=100508 | code=0.6674(20124) web=1.0576(20043) science=0.9313(20088) books=1.0176(20028) wikidata=1.2211(20225)
+LAST_TICK C3 one_place pooled=0.9806 places=100508 | code=0.6706(20124) web=1.0609(20043) science=0.9292(20088) books=1.0211(20028) wikidata=1.2202(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0014 | code=-0.0033 web=-0.0033 science=+0.0021 books=-0.0034 wikidata=+0.0009
+LAST_TICK F3 whole_open pooled=2.3699 places=3717 | code=2.2275(730) web=2.5395(758) science=2.2926(776) books=2.2024(776) wikidata=2.6144(677)
+LAST_TICK C3 whole_open pooled=2.3326 places=3717 | code=2.1789(730) web=2.5061(758) science=2.2452(776) books=2.1899(776) wikidata=2.5676(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0374 | code=+0.0486 web=+0.0334 science=+0.0475 books=+0.0125 wikidata=+0.0468
+## read 1 against the unmarked third pass's fifth lap
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0187 | code=-0.0240 web=-0.0163 science=-0.0144 books=-0.0129 wikidata=-0.0259
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0053 | code=+0.0136 web=-0.0014 science=+0.0066 books=+0.0036 wikidata=+0.0044

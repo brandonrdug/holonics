@@ -4330,7 +4330,7 @@ marks at refine 0 as well.
   Rule: (a) held: the revision is lawful on the both-reads line, and the writes are shown with 2 refine passes. (a) missed: the draft's
   self-hearing under revision is the next loop's subject, read on the writes' order parameters before any change of law.
 
-G182 scored 2026-11-14T08:30Z (receipt g182_writes.txt), the writes' commonest byte's share of their written bytes:
+G182 scored 2026-11-14T08:28Z (receipt g182_writes.txt), the writes' commonest byte's share of their written bytes:
   (a) the mean share went 0.149, 0.148 and 0.150 at 0, 1 and 2 refine passes, a rise of 0.0005 a pass (0.0105 at lap 3): held;
   (b) the mean share at refine 0 is 0.149: missed by 0.001, under the band;
   (c) the largest share at refine 0 is 0.289 (web_01), no write near 0.5: held.
@@ -4352,3 +4352,21 @@ whole masks; the strengths have fallen since to 0.154, 0.662 and 0.606 of a whol
   time; a gap at whole masks over 0.02 is not. Both held: the mark's worth is at whole masks, and an unmarked continuation from this
   state is read at equal card time before more laps of two reads. (b) missed: the mark holds its level at whole masks, and the line
   keeps reading twice.
+
+G183 scored 2026-11-14T09:02Z (receipt g183_read1.txt), read 1 against read 2 on the fourth pass's third-lap mean:
+  (a) read 1's one-place code is 0.9792, 0.0014 under read 2's 0.9806: held (it stands under, not over);
+  (b) read 1's whole masks are 2.3699, 0.0374 over read 2's 2.3326: held.
+  Both held. The mark now pays only where a stretch is open whole (every slice, 0.013 to 0.049), and at a lone open place it costs
+  (code, web and books 0.003 each, science and wikidata a little the other way). At a one-place mask the open place's neighbours are
+  written and carry no mark, so the only mark there is the place's own first face read back into its own opening at the enc strength,
+  which has fallen from 0.390 to 0.154 under the comparison of both reads while the neighbours' strengths stand at 0.66 and 0.61.
+
+G184 fixed 2026-11-14T09:01Z (the Opus PC thread), before its read: the self-mark is the place's echo. A site's own release
+read back into its own opening is the reaction term the cavity leaves out (atlas tower.field-echo: a read leaves its own echo out; TAP's
+Onsager term); the neighbours' releases are the mutual contact. On the same mean, a copy with only the enc strength zeroed (the
+neighbours' kept), read with the cavity.
+  (a) its one-place code stands within 0.0005 of read 1's 0.9792 (the self-mark's cost removed);
+  (b) its whole masks stand within 0.010 of read 2's 2.3326 (the neighbours' marks keep the mark's worth).
+  Rule: both held: the law's mark is the neighbours' placements only (before and after), the site's own left out as its echo, built
+  as a change of the law entering the line by reproducing its lap with the enc strength at zero. (b) missed: the self-mark carries part
+  of the whole masks' worth, and it is kept.
