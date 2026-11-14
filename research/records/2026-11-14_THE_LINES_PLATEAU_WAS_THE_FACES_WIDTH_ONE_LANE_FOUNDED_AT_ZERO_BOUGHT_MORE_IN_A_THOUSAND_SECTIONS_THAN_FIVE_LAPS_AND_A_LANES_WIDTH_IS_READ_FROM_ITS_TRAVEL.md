@@ -42,6 +42,12 @@ instrument, to test the premise of November 12 (§4: the level is set by the con
 
 So the plateau was the face's width, and width costs the card little (the pairs of sites, not the width, hold the card's time and memory).
 
+*Amended 13:45Z, before G190's read.* The lane's next thousand sections (the fourth pass's last 1,004, read at their mean) stood 0.0040 under
+the two-lane line's lap 9 at one-place masks and 0.0058 over it at whole masks; the lane's three means ran 0.9677, 0.9631, 0.9671 and 2.3284,
+2.3202, 2.3397. So "the plateau was the face's width" is not settled: part or all of G188's gain may be the founding's transient (a lane of
+drawn letter rows read by readers that open at their own first covectors). G190 reads the two-lane line beside the three-lane line lap for lap
+through the fifth pass on the same documents, and the lane's worth stands only on a lead that lasts a lap past its founding.
+
 ## 4. What follows: a lane's width read from its travel (design, agent-inferred)
 
 The width a reading names (atlas `tower.face-lane-composition`) is now asked of the deposit itself. A lane is a register of the face read
