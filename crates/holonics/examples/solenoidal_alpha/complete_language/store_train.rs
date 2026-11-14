@@ -772,6 +772,78 @@ pub(super) fn found_opening(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 14, the ring record §4] **`found-mark STATE STATE_SHA OUT`**: the learner `STATE` grown to read twice,
+/// its mark's strengths founded at zero ([`FieldLearner::with_mark`]), written to the file `OUT`. Before it writes, every line of the state is
+/// printed for the source and the founded state (`FOUND_MARK_LINE`) and judged: a line is equal; or it is the declaration's line (its head
+/// `hnn-field-v14m`, the source's thirteen counts and its carry, triads and opening words kept, then the junction's word and `1`); or the fine
+/// field's material line (the source's words kept and the three strengths appended at `0`); or one of the two moment lines (the fine field's
+/// words, the three strengths at `0`, then the level's and the glue's words as they stood, since the strengths follow the fine field's
+/// material); or the parts line (the source's octaves and the mark's at `0`). Any other changed line, an empty line, or a different count of
+/// lines is refused and nothing is written (November 11: a state tool that left a line behind). Reads no realization.
+pub(super) fn found_mark(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-mark STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.with_mark().map_err(|e| e.to_string())?;
+    let fine = learner.field.layout().len;
+    if founded.field.layout().mark != fine || founded.field.material_len() != learner.field.material_len() + holonics::hnn::tower::field::MARK_BASES {
+        return Err("a founding whose strengths do not follow the fine field's material".into());
+    }
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let material = learner.field.material_len();
+    let junction = if learner.field.declaration.junction { "1" } else { "0" };
+    let mut judged = (0usize, 0usize, 0usize, 0usize, 0usize);
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        if x.is_empty() || y.is_empty() {
+            return Err(format!("line {k} is empty in the source or the founded state").into());
+        }
+        let head = |w: &[&str]| w[0].chars().take(24).collect::<String>();
+        let zeros = |w: &[&str]| w.iter().all(|&v| v == "0");
+        let verdict = if x == y {
+            judged.0 += 1;
+            "equal".to_string()
+        } else if k == 1 && wy[0] == "hnn-field-v14m" && wy.len() == 17 && wx.len() >= 12 && wy[1..12] == wx[1..12] && wy[15] == junction && wy[16] == "1" {
+            judged.1 += 1;
+            format!("declaration source={x} founded={y}")
+        } else if wx.len() == fine && wy.len() == fine + 3 && wy[..fine] == wx[..] && zeros(&wy[fine..]) {
+            judged.2 += 1;
+            "fine material appended=3 zero=3".to_string()
+        } else if wx.len() == material && wy.len() == material + 3 && wy[..fine] == wx[..fine] && zeros(&wy[fine..fine + 3]) && wy[fine + 3..] == wx[fine..] {
+            judged.3 += 1;
+            format!("moments inserted=3 at={fine} zero=3 kept_after={}", material - fine)
+        } else if wx[0] == "parts" && wy.len() == wx.len() + 1 && wy[..wx.len()] == wx[..] && wy.last() == Some(&"0") {
+            judged.4 += 1;
+            "parts appended=0".to_string()
+        } else {
+            return Err(format!("line {k} ({}) changed beyond the mark's strengths: {} words for {}", head(&wx), wy.len(), wx.len()).into());
+        };
+        println!("FOUND_MARK_LINE line={k} head={} words_source={} words_founded={} {verdict}", head(&wx), wx.len(), wy.len());
+    }
+    // Where the field has no level the fine material is the whole, and its line is judged as the fine one.
+    let materials = judged.2 + judged.3;
+    if judged.1 != 1 || materials != 3 || (learner.rate_parts.is_some() && judged.4 != 1) {
+        return Err(format!("a founding whose changed lines are {} declaration, {} material, {} moment and {} parts lines", judged.1, judged.2, judged.3, judged.4).into());
+    }
+    write_new(out, b.as_bytes())?;
+    println!("FOUND_MARK lines={} equal={} declaration={} fine_material={} moments={} parts={} material={} founded_material={} ms={}", la.len(), judged.0, judged.1, judged.2, judged.3, judged.4, material, founded.field.material_len(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; theory, November 13, the design record §4.9; G145] **`found-level STATE STATE_SHA KEYS KEYS_SHA OUT`**: the learner `STATE` (with
 /// the opening's block, whose news the level reads) grown by a level above ([`FieldLearner::scaled_up`] at [`LEVEL_HARMONICS`], after
 /// [`level_split`] of its ticks, its field declared by [`level_declaration`]), its founding drawn from the key file past the learner's draws,
