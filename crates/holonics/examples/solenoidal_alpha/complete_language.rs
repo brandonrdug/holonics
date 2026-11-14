@@ -6,8 +6,8 @@ use holonics::hnn::reference::observed::{HostObservedEpochExecution, ObservedEpo
 use std::collections::BTreeMap;
 
 pub(super) use holonics_engine::codec::count;
-pub(super) use athena::exterior::{STATE_BUDGET, held_text, positive, step_transfer, units_of};
-use athena::exterior::{READ_BUDGET, micro_bits, pinned_read, write_new};
+pub(super) use athena::exterior::{STATE_BUDGET, positive};
+use athena::exterior::{READ_BUDGET, pinned_read, write_new};
 
 #[path = "complete_language/continuation.rs"]
 mod continuation;
@@ -31,10 +31,6 @@ mod duplex_train;
 mod tower_body;
 #[path = "complete_language/written_coupling.rs"]
 mod written_coupling;
-#[path = "complete_language/field_train.rs"]
-mod field_train;
-#[path = "complete_language/field_parity.rs"]
-mod field_parity;
 
 #[cfg(test)]
 #[path = "complete_language/code_parallel_controls.rs"]
@@ -776,27 +772,6 @@ pub(super) fn run_with_execution(
         Some("train-pair-linear-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, true, true, false, holonics::hnn::tower::ContactLaw::PairLinear),
         Some("train-credited-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train(args, true, false, false, true, holonics::hnn::tower::ContactLaw::Rectifying),
         Some("found-units") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::found_units(args),
-        Some("train-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::train(args, &mut field_train::host()),
-        Some("grow-contacts-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_contacts_field(args, &mut field_train::host()),
-        Some("grow-carry-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_carry_field(args, &mut field_train::host()),
-        Some("grow-triad-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::grow_triad_field(args, &mut field_train::host()),
-        Some("sample-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::sample(args, &mut field_train::host()),
-        Some("split-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::split_field(args, &mut field_train::host()),
-        Some("joint-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::joint_field(args, &mut field_train::host()),
-        Some("order-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::order_field(args, &mut field_train::host()),
-        Some("settle-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::settle_field(args, &mut field_train::host()),
-        Some("gamma-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::gamma_field(args, &mut field_train::host()),
-        Some("leak-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::leak_field(args, &mut field_train::host()),
-        Some("square-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::square_field(args, &mut field_train::host()),
-        Some("residual-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::residual_field(args, &mut field_train::host()),
-        Some("expansion-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::expansion_field(args, &mut field_train::host()),
-        Some("rows-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::rows_field(args),
-        Some("ring-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::ring_field(args),
-        Some("depth-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::depth_field(args),
-        Some("restate-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::restate_field(args, &mut field_train::host()),
-        Some("reach-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::reach_field(args, &mut field_train::host()),
-        Some("opening-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::opening_field(args, &mut field_train::host()),
-        Some("length-field") if backend == CompleteLanguageTrainingBackend::HostReference => field_train::length_field(args, &mut field_train::host()),
         Some("train-unit-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, false, false, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Rectifying, &mut holonics::hnn::tower::realization::HostPass::default()),
         Some("train-unit-pair-pumped-tower") if backend == CompleteLanguageTrainingBackend::HostReference => tower_train::train_units(args, true, true, holonics::hnn::tower::ContactLaw::Pair, &mut holonics::hnn::tower::realization::HostPass::default()),
@@ -873,48 +848,6 @@ pub(super) fn run_with_execution(
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") if backend == CompleteLanguageTrainingBackend::HostReference => sample(args),
         Some("sample" | "sample-prepared-retained-fibre-v1" | "sample-prepared-retained-512-v1" | "sample-prepared-retained-full-question-v1") => Err("complete-language continuation remains explicitly host-owned; no CUDA fallback".into()),
         _ => Err("complete-language requires train, explicit train-retained-fibre-v1 (reference), train-local-retained-fibre-v1 (R/tree/population only), train-prepared-local-retained-fibre-v1 (host prepared input + local R), train-prepared-local-retained-held-v1 (explicit held-map continuation), train-source-framing-retained-held-v1 (explicit known byte-position context), sample, or sample-prepared-retained-fibre-v1; no default backend/model action".into()),
-    }
-}
-/// The field's commands (`hnn::tower::field`) with every read and return through a declared
-/// realization (`holonics-cuda` passes the card's).
-pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
-    match args.first().map(String::as_str) {
-        Some("train-field") => field_train::train(args, realization),
-        Some("grow-contacts-field") => field_train::grow_contacts_field(args, realization),
-        Some("grow-carry-field") => field_train::grow_carry_field(args, realization),
-        Some("grow-triad-field") => field_train::grow_triad_field(args, realization),
-        Some("joint-field") => field_train::joint_field(args, realization),
-        Some("transmission-field") => field_train::transmission_field(args, realization),
-        Some("settle-field") => field_train::settle_field(args, realization),
-        Some("charge-field") => field_train::charge_field(args, realization),
-        Some("square-field") => field_train::square_field(args, realization),
-        Some("residual-field") => field_train::residual_field(args, realization),
-        Some("redraw-field") => field_train::redraw_field(args, realization),
-        Some("sample-field") => field_train::sample(args, realization),
-        Some("currents-field") => field_train::currents_field(args, realization),
-        Some("expansion-field") => field_train::expansion_field(args, realization),
-        Some("restate-field") => field_train::restate_field(args, realization),
-        Some("reach-field") => field_train::reach_field(args, realization),
-        Some("opening-field") => field_train::opening_field(args, realization),
-        Some("stretch-field") => field_train::stretch_field(args, realization),
-        Some("length-field") => field_train::length_field(args, realization),
-        Some("order-field") => field_train::order_field(args, realization),
-        Some("gamma-field") => field_train::gamma_field(args, realization),
-        Some("leak-field") => field_train::leak_field(args, realization),
-        Some("masks-field") => field_train::masks_field(args, realization),
-        Some("ring-field") => field_train::ring_field(args),
-        Some("depth-field") => field_train::depth_field(args),
-        _ => Err("a realized field command is train-field, sample-field, currents-field, expansion-field, restate-field, reach-field, opening-field, length-field or order-field".into()),
-    }
-}
-/// The field's card parity and timing (`field_parity`): `parity-field` reads the host's field
-/// against `card` on `train-field`'s sections, `time-field` reads the card alone and projects, and
-/// `parity-store` holds every read of `train-store`'s sections on the card against the host's (`store_parity`).
-pub(super) fn run_field_parity(args: &[String], card: &mut dyn holonics::hnn::tower::field::FieldRealization) -> Result<()> {
-    match args.first().map(String::as_str) {
-        Some("parity-field") => field_parity::parity(args, card),
-        Some("time-field") => field_parity::time(args, card),
-        _ => Err("a field parity command is parity-field or time-field".into()),
     }
 }
 /// The tower commands with each section's forward and reverse through a declared realization
