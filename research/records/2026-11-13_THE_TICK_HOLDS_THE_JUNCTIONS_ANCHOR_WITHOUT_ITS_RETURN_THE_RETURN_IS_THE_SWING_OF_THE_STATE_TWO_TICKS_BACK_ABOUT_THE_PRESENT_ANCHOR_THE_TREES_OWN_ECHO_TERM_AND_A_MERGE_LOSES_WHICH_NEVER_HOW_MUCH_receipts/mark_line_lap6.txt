@@ -1,0 +1,12 @@
+# The line reading twice (one read compared), its sixth and last lap under that law (3,000 sections from lap5/STATE.3000), read at its MEAN.3000 against its fifth lap's mean. Numbers only.
+STORE_PASS role=prefix sections=3000 stretches_read=14190359 ended=false code_pieces=90068 web_pieces=49700 science_pieces=31342 books_pieces=2842 wikidata_pieces=11924 ms=1365511
+MEASURE lap=lap6 rc=0 wall_s=1366.0 peak_rss_kib=272868
+STRENGTHS lap6/STATE.3000 6546317 15026315 14528978
+CAVITY_DONE ms=301828
+MEASURE lap=P6 rc=0 wall_s=302.4 peak_rss_kib=441412
+LAST_TICK F3 one_place pooled=0.9842 places=100508 | code=0.6792(20124) web=1.0636(20043) science=0.9380(20088) books=1.0275(20028) wikidata=1.2118(20225)
+LAST_TICK C3 one_place pooled=0.9877 places=100508 | code=0.6806(20124) web=1.0695(20043) science=0.9424(20088) books=1.0294(20028) wikidata=1.2161(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0036 | code=-0.0014 web=-0.0058 science=-0.0044 books=-0.0019 wikidata=-0.0043
+LAST_TICK F3 whole_open pooled=2.3374 places=3717 | code=2.1868(730) web=2.5267(758) science=2.2585(776) books=2.1878(776) wikidata=2.5500(677)
+LAST_TICK C3 whole_open pooled=2.3367 places=3717 | code=2.1789(730) web=2.5287(758) science=2.2519(776) books=2.1912(776) wikidata=2.5559(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0007 | code=+0.0079 web=-0.0020 science=+0.0067 books=-0.0034 wikidata=-0.0059

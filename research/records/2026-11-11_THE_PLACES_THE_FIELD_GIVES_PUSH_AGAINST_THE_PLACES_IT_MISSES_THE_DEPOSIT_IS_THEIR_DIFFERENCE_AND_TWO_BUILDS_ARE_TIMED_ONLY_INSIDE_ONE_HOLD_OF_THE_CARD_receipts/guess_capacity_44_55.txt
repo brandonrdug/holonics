@@ -4303,3 +4303,16 @@ at its mean; read 1 had drifted to 0.012 and 0.060 over the unmarked line at lap
   (d) the strengths at the lap's end stand under their lap-6 values (read 1's own comparison makes its marks worth leaning on less).
   Rule: (a) to (c) held: the line keeps comparing both reads. (a) held and (b) or (c) missed: read 1 is honest again but the second read
   pays its cost in level, and the cost per gain is read against the card before the next lap.
+
+G181 scored 2026-11-14T06:41Z on partial evidence (receipt g181_both_reads.txt): the lap ended with the third pass after 991 of 3,000 sections,
+read at its MEAN.991, a mean across the change of law.
+  (a) read 1's one-place code is 0.9934, 0.0042 over read 2's 0.9892 (0.0137 apart at lap 2): missed by 0.0002; read 1 has recovered 0.0209
+      at one-place masks and 0.0363 at whole masks since lap 2, and at one-place masks it now stands 0.0045 under the unmarked line's fifth
+      lap (0.9979), at whole masks still 0.031 over it and 0.054 over read 2;
+  (b) read 2's one-place code rose 0.0050 from lap 6's (0.9842 to 0.9892): missed;
+  (c) read 2's whole masks rose 0.0049 (2.3374 to 2.3423): missed;
+  (d) the strengths at the lap's end are 0.252, 0.754 and 0.707 against lap 6's 0.390, 0.896 and 0.866: held.
+  Of 4 parts 1 held. In its first 991 sections the comparison of both reads brought read 1 most of the way back to honest agreement, its
+  one-place code better than the unmarked line's, and the field leans on its marks less; read 2 paid 0.005 at both masks while the
+  constitution moved. The rule's second branch, read on partial evidence: the cost per gain is read against the card before more laps are
+  judged, and the fourth pass's full laps (the both-reads law from its start) carry the verdict.
