@@ -1,0 +1,22 @@
+# The live set's inventory (C1 of #603): every command line the training line's run, read and write scripts call, private paths named.
+# Binary: field_pass (crates/holonics-cuda/examples/field_pass.rs), its words `train complete-language <command> ...`.
+
+## the four-lane line: training, reads, growth and the pass boundary (lane/line/chain7.sh)
+field_pass train complete-language read-cavity <UNITS0> <sha> <STORE> <sha> <KEYS8> <sha> <CODEC(g115r1)> <sha> 20000 <lap4/MEAN.3000> <sha> <out_R4e>
+field_pass train complete-language read-cavity <UNITS0> <sha> <STORE> <sha> <KEYS8> <sha> <CODEC(g115r1)> <sha> 20000 <lap5/MEAN.3000> <sha> <out_P5>
+field_pass train complete-language found-lane <lap5/STATE.3000|MEAN.3000> <sha> <KEYS8> <sha> <lap5_STATE.3000|MEAN.3000.four>
+field_pass train complete-language read-cavity <UNITS0> <sha> <STORE> <sha> <KEYS8> <sha> <CODEC(g115r1)> <sha> 20000 <lap5_MEAN.3000.four> <sha> <out_F5>
+field_pass train complete-language next-pass <STATE> <sha> <STATE.nextn>
+field_pass train complete-language train-store <UNITS0> <sha> <STORE> <sha> prefix <KEYS8> <sha> <CODEC(g115r2)> <sha> <HELD128> <sha> 3000 1000 2100000 <lapn> <STATE> <sha>
+field_pass train complete-language read-cavity <UNITS0> <sha> <STORE> <sha> <KEYS8> <sha> <CODEC(g115r1)> <sha> 20000 <MEAN> <sha> <out_Pn>
+
+## the line's writes (lane/write_laned.sh)
+field_pass train complete-language write-store <UNITS0> <sha> <STORE> <sha> <KEYS8> <sha> <CODEC(g115r1)> <sha> 4 256 256 <OUT> <STATE> <sha> <R>
+
+## tools the scripts call
+cmp
+flock
+measure.py
+sha256sum
+timeout
+measure.py is a run's wall time and peak resident set (.local/wt/field-card/.local/run/dispersing/measure.py, not tracked)

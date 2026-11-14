@@ -1,0 +1,7 @@
+LIVE_SET_SCORE executed=16 predicted_and_executed=16 executed_outside_prediction=0 predicted_not_executed=6
+IDLE crates/holonics/src/receiver/coupling.rs
+IDLE crates/holonics/src/compression/landmark/context.rs
+IDLE crates/holonics/src/compression/landmark/context/
+IDLE crates/holonics-cuda/src/ffi.rs
+IDLE crates/*/lib.rs
+IDLE crates/*/mod.rs

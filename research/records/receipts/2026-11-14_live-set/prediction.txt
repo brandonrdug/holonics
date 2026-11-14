@@ -1,0 +1,25 @@
+# The plan's prediction for C1 (docs/plans/THE_CONSOLIDATION.md §9, C1), fixed before the run: the files with an executed line are the
+# live chain's of §1 (with field/moment.rs and field/scale.rs), hnn/tower.rs, hnn/keyed_modes.rs, hnn/units.rs, receiver/coupling.rs,
+# compression/landmark/context, number/census.rs, the card's cuda.rs, ffi.rs and hnn/card.rs, and the crates' lib.rs and mod.rs files.
+crates/holonics-cuda/examples/field_pass.rs
+crates/holonics/examples/solenoidal_alpha.rs
+crates/holonics/examples/solenoidal_alpha/complete_language.rs
+crates/holonics/examples/solenoidal_alpha/complete_language/store_train.rs
+crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs
+crates/holonics/examples/solenoidal_alpha/complete_language/tower_train.rs
+crates/holonics/src/hnn/tower/field.rs
+crates/holonics/src/hnn/tower/field/moment.rs
+crates/holonics/src/hnn/tower/field/scale.rs
+crates/holonics-cuda/src/hnn/field.rs        # CardField, the chain's card realization
+crates/holonics/src/hnn/tower.rs
+crates/holonics/src/hnn/keyed_modes.rs
+crates/holonics/src/hnn/units.rs
+crates/holonics/src/receiver/coupling.rs
+crates/holonics/src/compression/landmark/context.rs
+crates/holonics/src/compression/landmark/context/
+crates/holonics/src/number/census.rs
+crates/holonics-cuda/src/cuda.rs
+crates/holonics-cuda/src/ffi.rs
+crates/holonics-cuda/src/hnn/card.rs
+crates/*/lib.rs
+crates/*/mod.rs

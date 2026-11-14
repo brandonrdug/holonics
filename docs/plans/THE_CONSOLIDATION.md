@@ -353,6 +353,16 @@ laboratory's archive note. No code.
   declaration does not take is still the law of a state founded another way, and the campaign moves
   the engine whole.
 - Done when the receipt is merged and the prediction is scored, a miss included.
+- Read November 14 ([the receipt](../../research/records/receipts/2026-11-14_live-set/README.md)). 16 of the tree's 335
+  compiled files executed, and all 16 were predicted. No executed file stands outside the list, so the plan missed no dependency
+  of the run. Six predicted entries ran no line:
+  - `receiver/coupling.rs` and `compression/landmark/context`, which the engine reaches only through its host reference
+    (`port_reading`, `one_end_length`); C3 still carries them;
+  - `ffi.rs`;
+  - the declaration-only `lib.rs` and `mod.rs` files.
+
+  The line launched 86 of the 163 declared kernels. None of the 48 kernels outside the three field sources was launched. The
+  reading also found that every script calls a tool that stands outside the tree (`measure.py`, below in C2).
 
 **C2. Gates for the live line** (the PC).
 - Gate 1 runs the engine's host tests (`tower::field` and its moment's), or the part of them that
@@ -360,6 +370,9 @@ laboratory's archive note. No code.
 - `parity-store`: parity as §8 states it, on the store line's sections, with the line's whole
   declaration (lanes, carry, triads, opening, junction, mark, levels).
 - Gate 3 for the engine is `parity-store` and the reproduction.
+- `tools/measure.py` (the run's wall time and peak resident set, 6 lines) comes into the tree with a test in gate 1. Today every
+  run and read script of the line calls it from another worktree's untracked `.local/`. The next launch of each script calls it
+  from `tools/` (C1's reading, November 14).
 - Done when a deliberately altered constant in the engine fails gate 1 or gate 3, and the unaltered
   tree passes both. The alteration is not committed.
 

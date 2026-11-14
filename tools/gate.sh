@@ -28,6 +28,7 @@ run residual-block-controls python3 tools/test_residual_blocks.py
 run seen-passage-controls python3 tools/test_seen_passage.py
 run run-watch-controls python3 tools/test_runs.py
 run reproduction-controls python3 tools/test_reproduction.py
+run live-set-controls python3 tools/test_live_set.py
 run listener-continuation-controls cargo test -p holonics --example listener continuing::tests::
 run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
 run native-class-advance-controls cargo test -p holonics --lib class_advance_tests
