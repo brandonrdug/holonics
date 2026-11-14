@@ -1,0 +1,14 @@
+# The line reading twice, its second lap (from lap1/STATE.stopped; it stopped at its projection, 1,431,000 ms, after 2,892 sections at 473 to 509 ms a section), read at its MEAN.2000 (sections 3,749 to 4,748 after the fork) against the unmarked third pass's fourth lap mean (MEAN.3000, sections 3,001 to 6,000 after the fork), the nearest read at like training. Numbers only.
+STORE_STOPPED sections=2892/3000 stretches=11855631 reads=0 returns=2892 pairs=262741255956 batches=5784 peak_store=8533203936 ms=1431289
+MEASURE lap=lap2 rc=0 wall_s=1431.9 peak_rss_kib=274444
+STRENGTHS lap2/STATE.1000 4803387 10246331 9655375
+STRENGTHS lap2/STATE.2000 5163367 11627461 10881138
+STRENGTHS lap2/STATE.stopped 5410640 12257351 11469282
+CAVITY_DONE ms=364976
+MEASURE lap=P2 rc=0 wall_s=365.6 peak_rss_kib=442452
+LAST_TICK F3 one_place pooled=1.0005 places=100508 | code=0.6923(20124) web=1.0743(20043) science=0.9533(20088) books=1.0385(20028) wikidata=1.2432(20225)
+LAST_TICK C3 one_place pooled=1.0020 places=100508 | code=0.6946(20124) web=1.0740(20043) science=0.9524(20088) books=1.0371(20028) wikidata=1.2513(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0015 | code=-0.0023 web=+0.0003 science=+0.0010 books=+0.0014 wikidata=-0.0081
+LAST_TICK F3 whole_open pooled=2.3490 places=3717 | code=2.1816(730) web=2.5352(758) science=2.2675(776) books=2.1921(776) wikidata=2.5944(677)
+LAST_TICK C3 whole_open pooled=2.3727 places=3717 | code=2.2071(730) web=2.5499(758) science=2.3112(776) books=2.1955(776) wikidata=2.6265(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0237 | code=-0.0255 web=-0.0148 science=-0.0437 books=-0.0033 wikidata=-0.0322

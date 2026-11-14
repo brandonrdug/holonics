@@ -908,6 +908,12 @@ machine. The contract, each clause with its reason:
     Reason: the check refused every branch deletion there, so the habit waited on him. A run with
     `--push-local` still asks him, because it publishes commits that never left the PC. No agent
     adds a permission rule of its own; a new one is his to grant.
+- **A worktree's build output goes with its task.** A worktree's `target/` (and any `target-*` under its `.local/`) is
+  build output: it is deleted once the binary a run uses is copied into that run's own directory, and the trunk's
+  census is read with the disk's free space beside it. Reason: on November 14 the disk stood at 45 MB free, with
+  33 worktrees each holding a `target/` of 15 to 32 GB and 11 more build caches under their `.local/`; deleting them
+  brought it to 195 GB, nothing a run read being touched (binaries are run from copies in `.local/run/.../bin`).
+  Run data that cannot be rebuilt (states, logs, archives) is deleted only on Brandon's word.
 - **Housekeeping runs on the host.** Never run `git worktree prune`, a checkout or a branch
   deletion through a mount, a container or a VM in which the worktrees' paths do not resolve.
   Reason: there every worktree reads "prunable" (all 89 did on November 10), and pruning would cut
