@@ -60,6 +60,19 @@ owed to training.
 - **The snap within it.** With the deposit through the loop, the lens's snap is the step at a place whose release was confident and wrong:
   the comparison's covector there is the largest the loop carries, and the deposit acts where it lands.
 
+- **The build, as §5's readings leave it** (agent-inferred, November 14 00:05Z). The field reads a region twice. The first read is the
+  built read. The second opens each open, silent place on `E(∗) + release(α_b (release(Σ_c w_c E_b(c), 16) − E_b(∗)), 16)` in each
+  encoding `b` its row enters (its own, and its neighbours' before and after), `w` the shares of the face the first read gave it, the
+  place silent otherwise (no voice, no moment, no clock of its own). The comparison is the second read's. `α_b`, one strength an
+  encoding, is a part founded at zero (`mark`, head line `hnn-field-v14m`), so at the founding the second read is the first bit for
+  bit and the line is reproduced. The return runs through the second read, into every part and into `α_b` (`⟨λ⁰, Δ_b⟩`, the
+  covector G175 read); the first read's faces are data to the second, its return not taken in the first build (agent-inferred: it
+  doubles the return's cost, and the marks' own Jacobian is read once the strength stands). The mark uses the text's own rows, mixed
+  toward the open row, and no table of rows of its own: a table of free rows indexed by a class is the cache the guides refuse (a
+  symbol is a word, November 12), and a mark between the open row and the face's rows is already one the field can tell from text.
+  The voice (a marked place as a source) waits on its own reading. The card realizes the second read's opening and the strength's
+  return before the line trains it.
+
 ## 5. Heard as written text the loop runs off at any temperature it holds; what bites it is a warmer field, and the evidence waits on training
 
 [measurement; agent-inferred, November 13 22:00Z to 23:30Z; G169 to G173] Brandon, 21:57Z: the snap and the jerk are words for a

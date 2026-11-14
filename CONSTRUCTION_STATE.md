@@ -547,12 +547,15 @@ repository was reset on September 24; the pre-reset tree is
     reading pays: a faint mark of the field's own release in the opening lowers the open places'
     code at first order, −0.046 nats a place a unit of strength, 5.9 times its random-sign floor
     (G175); along its strength with the constitution fixed it buys 0.003 at 1/8 and turns by 1/4
-    (G176), so the build is the field trained through the mark (the record's §5; Brandon's correction of the same day: a temperature is a store's
+    (G176), so the build is the field trained through the mark, now a host law: the field reads
+    twice, its second read marked by the first at strengths founded at zero (`hnn-field-v14m`,
+    part `mark`), the card refusing it until its realization passes parity (the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
     state, never a reading's dial; [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
     The line's first pass over the 1 GB of training documents ended at lap 6 (1.0743 one-place,
     2.4057 whole masks); the second pass's laps read 1.0630, 1.0542, 1.0464, 1.0383 and 1.0320
-    one-place and 2.4029 to 2.3835 whole masks at their means, every slice falling at one-place
-    masks each lap (G165; receipts `line_pass2_lap1.txt` to `line_pass2_lap5.txt`).
+    one-place and 2.4029 to 2.3835 whole masks at their means, then 1.0295, 1.0240 and 1.0194
+    at laps 6 to 8, ending at lap 9 after 636 sections (G165, G174; receipts `line_pass2_lap1.txt`
+    to `line_pass2_lap8.txt`); the third pass runs beside the mark's card build (G178).
     Corrected the same day (the return's record, §13): the tick adds its current to a site's
     state, so the site term first derived is the site's own rate and takes no echo out; a head's
     read changes the reader and not its source, which on the pair is free fall; and the
