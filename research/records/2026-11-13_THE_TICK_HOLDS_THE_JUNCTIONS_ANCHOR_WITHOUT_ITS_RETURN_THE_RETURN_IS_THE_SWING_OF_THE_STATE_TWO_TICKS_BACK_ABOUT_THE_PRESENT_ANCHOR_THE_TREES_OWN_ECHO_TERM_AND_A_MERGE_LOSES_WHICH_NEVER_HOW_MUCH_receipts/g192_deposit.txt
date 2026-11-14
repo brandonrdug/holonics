@@ -1,0 +1,8 @@
+# G192: the deposit's per-entry loops across the host's cores against the line's binary (engine1), one hold on 24 sections of the three-lane line's training, g1 a declared warm-up. Numbers only.
+ENGINE_RUN g1-engine1 sections=24 equal_to_base=24 mean_ms=686.2
+ENGINE_RUN g2-engine1 sections=24 equal_to_base=24 mean_ms=679.1
+ENGINE_RUN g3-deposit sections=24 equal_to_base=24 mean_ms=674.1
+ENGINE_RUN g4-engine1 sections=24 equal_to_base=24 mean_ms=709.1
+ENGINE_RUN g5-deposit sections=24 equal_to_base=24 mean_ms=674.2
+ENGINE_RUN g6-engine1 sections=24 equal_to_base=24 mean_ms=656.5
+ENGINE_RUN g7-deposit sections=24 equal_to_base=24 mean_ms=648.0
