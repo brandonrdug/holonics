@@ -2259,8 +2259,21 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
 /// (numbers only): the regions, the open places, and over the sites the sum of `r_t`, of `|r_t|`, of `(|r_t| >> 32)²` (the random-sign
 /// floor's square), split into open and written sites. The output directory is private.
 pub(super) fn read_carried(args: &[String]) -> Result<()> {
+    carried_with(args, false)
+}
+
+/// [measurement; agent-inferred, November 13; G176] `read-marked` (the arguments of `read-carried`): **the carried release's opening part along
+/// its strength**, a ruler: each region's built read, then the same region read with every open place's opening marked by the face that read
+/// gave it at strength `α` ([`holonics::hnn::tower::field::Field::mark`]: `α` 0, `2^(−6)`, `2^(−4)`, `2^(−3)`, `2^(−2)`, `2^(−1)`, 1 and 2), the
+/// places silent otherwise. `OUT/marked.tsv` holds a line a slice and strength: the open places, their code and expected code on `2^(−20)`
+/// bits summed. The output directory is private.
+pub(super) fn read_marked(args: &[String]) -> Result<()> {
+    carried_with(args, true)
+}
+
+fn carried_with(args: &[String], marked: bool) -> Result<()> {
     if args.len() != 14 {
-        return Err("read-carried UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
+        return Err("read-carried (or read-marked) UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-carried")?;
@@ -2290,8 +2303,13 @@ pub(super) fn read_carried(args: &[String]) -> Result<()> {
     std::fs::create_dir_all(out)?;
     use rayon::prelude::*;
     use std::io::Write as _;
-    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join("carried.tsv"))?);
-    writeln!(tsv, "slice\tregions\topen\tsum_open\tabs_open\tsq_open\tsum_written\tabs_written\tsq_written")?;
+    let mut tsv = std::io::BufWriter::new(std::fs::File::create(out.join(if marked { "marked.tsv" } else { "carried.tsv" }))?);
+    if marked {
+        writeln!(tsv, "slice\talpha\tplaces\tcode\texpected")?;
+    } else {
+        writeln!(tsv, "slice\tregions\topen\tsum_open\tabs_open\tsq_open\tsum_written\tabs_written\tsq_written")?;
+    }
+    const STRENGTHS: [i64; 8] = [0, 1 << 10, 1 << 12, 1 << 13, 1 << 14, 1 << 15, 1 << 16, 1 << 17];
     println!("CARRIED_LAW role={role} places={places} ms={}", started.elapsed().as_millis());
     for (si, &name) in role_names(&counts, role).iter().enumerate() {
         let slice = open_slice(store, role, name, &counts)?;
@@ -2306,6 +2324,45 @@ pub(super) fn read_carried(args: &[String]) -> Result<()> {
             regions.push(TrainRegion::plain(stretch.region.classes.clone(), stretch.region.unresolved.clone()));
         }
         let slice_start = std::time::Instant::now();
+        if marked {
+            let reads: Vec<std::result::Result<Vec<[i128; 3]>, String>> = regions
+                .par_iter()
+                .map(|region| {
+                    let views = views_of(std::slice::from_ref(region));
+                    let built = learner.field.faces(&views[0]).map_err(|e| e.to_string())?;
+                    let marks: Vec<Option<holonics::hnn::tower::field::Shares>> = built.iter().enumerate().map(|(t, f)| f.as_ref().filter(|_| region.unresolved[t]).map(holonics::hnn::tower::field::shares)).collect();
+                    let mut field = learner.field.clone();
+                    let mut rows = Vec::with_capacity(STRENGTHS.len());
+                    for &alpha in &STRENGTHS {
+                        field.mark = Some((alpha, marks.clone()));
+                        let faces = field.faces(&views[0]).map_err(|e| e.to_string())?;
+                        let mut st = [0i128; 3];
+                        for t in (0..region.classes.len()).filter(|&t| region.unresolved[t]) {
+                            let face = faces[t].as_ref().ok_or("an open place with no face")?;
+                            st[0] += 1;
+                            st[1] += i128::from(face.code(region.classes[t]));
+                            let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
+                            st[2] += sum / (face.total as i128).max(1);
+                        }
+                        rows.push(st);
+                    }
+                    Ok(rows)
+                })
+                .collect();
+            let mut tot = vec![[0i128; 3]; STRENGTHS.len()];
+            for read in reads {
+                for (x, y) in tot.iter_mut().zip(read?) {
+                    for (a, b) in x.iter_mut().zip(y) {
+                        *a += b;
+                    }
+                }
+            }
+            for (alpha, st) in STRENGTHS.iter().zip(&tot) {
+                writeln!(tsv, "{si}\t{alpha}\t{}\t{}\t{}", st[0], st[1], st[2])?;
+            }
+            println!("MARKED_SLICE slice={name} regions={} host_ms={} ms={}", regions.len(), slice_start.elapsed().as_millis(), started.elapsed().as_millis());
+            continue;
+        }
         let reads: Vec<std::result::Result<[i128; 7], String>> = regions
             .par_iter()
             .map(|region| {

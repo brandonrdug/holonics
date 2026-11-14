@@ -1014,6 +1014,12 @@ pub struct Field {
     /// each tick but the last, `x_j ← x_j − release(s_h μ_j, 16)` summed over the heads ([`Field::mirror_route`], every head's mirror read from
     /// the state the tick left), a reading at finite strength before the stage is a law; not part of the state, and no reverse reads it.
     pub mirror_strength: Option<Vec<i64>>,
+    /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
+    /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
+    /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Field::opening_term`]), and stays silent
+    /// everywhere else (no voice, no moment, no clock of its own): the opening's part of the carried release, a ruler of the law's
+    /// response along its strength before the strength is a part. Not part of the state, and no reverse reads it.
+    pub mark: Option<(i64, Vec<Option<Shares>>)>,
 }
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -2334,7 +2340,7 @@ impl Field {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, mark: None }
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
@@ -2665,6 +2671,16 @@ impl Field {
                 let start = base + self.row(region, s) * dw;
                 for (slot, &e) in x.iter_mut().zip(&self.theta[start..start + dw]) {
                     *slot += e as i64;
+                }
+                // [G176] A silent site's mark at its strength, a ruler of the carried release's opening part.
+                if let Some((alpha, marks)) = self.mark.as_ref().filter(|_| region.unresolved[s]) {
+                    if let Some(face) = marks.get(s).and_then(Option::as_ref) {
+                        for (i, slot) in x.iter_mut().enumerate() {
+                            let sum: i128 = face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize * dw + i] as i128).sum();
+                            let delta = release(sum, STATE_BITS) as i128 - self.theta[start + i] as i128;
+                            *slot += release(i128::from(*alpha) * delta, STATE_BITS) as i64;
+                        }
+                    }
                 }
             }
             Some(face) => {

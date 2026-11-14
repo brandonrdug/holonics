@@ -121,6 +121,16 @@ hearing, faintly and marked as its own, what it guessed beside a place (agent-in
 build, at first order only: at full strength with the voice the second pass coded worse (G168). So §4's build starts from the mark: the
 strength a part of the constitution founded at zero, its finite-strength curve read before the card.
 
+**Its curve: the mark pays a little and turns by a quarter (G176, `read-marked`, `Field::mark` as a ruler).** Along the strength the
+open places code 3.0428 nats a place at the built read, 3.0399 at `α = 1/8` (the lowest, 0.003 under), 3.0450 at 1/4, 3.0887 at 1/2,
+3.2649 at 1 and 4.2258 at 2, while the expected code falls throughout (3.053, 3.016, 2.975, 2.893, 2.753, 1.904): the faces sharpen
+faster than the code falls, the echo chamber setting in as the mark grows. By slice, code, science and books gain 0.008 to 0.014 at 1/8
+to 1/4 and web and wikidata turn worse from 1/16. The difference at `2^(−6)` reads a slope of −0.069, 1.5 times G175's, which leaves the
+slope's calibration or the release's quantization at that strength unread; the sign and the turn stand at every strength. So the mark
+alone carries about one late lap of the second pass. What it lacks is the field trained through it: a field that has met its own marked
+release in training reads it with a law of its own, which this ruler, holding the constitution fixed, cannot show, and that is §4's
+build with its return, the next step.
+
 ## 6. Owed
 
 The Lean statements of the two-cycle of a synchronously iterated symmetric map at a place hearing its own release, and of the parametron's

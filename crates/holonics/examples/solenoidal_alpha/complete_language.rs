@@ -922,6 +922,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("read-redraw") => store_train::read_redraw(args),
         Some("read-breakdown") => store_train::read_breakdown(args),
         Some("read-carried") => store_train::read_carried(args),
+        Some("read-marked") => store_train::read_marked(args),
         Some("read-coherence") => store_train::read_coherence(args),
         Some("next-pass") => store_train::next_pass(args),
         Some("read-ticks") => store_train::read_ticks(args, realization),
