@@ -4392,3 +4392,13 @@ one-place masks in its third pass; a section reading once took 332 ms on the lin
   Rule: the writer meets an open stretch at its frontier, so whole masks are the product's reading. (b) held: the mark earns its card time
   where the product reads, and the line keeps reading twice, its one-place cost the next subject. (b) missed: the mark does not earn its
   card time, the line reads once from the stripped state, and the mark returns only with a realization near one read's cost.
+
+G185 scored 2026-11-14T09:57Z (receipt g185_equal_card.txt). Reading once from the stripped state for the marked lap's card time
+(1,748,853 ms) trained 5,343 sections (327 ms a section) to the marked lap's 3,000 (583 ms). Read at its MEAN.5000 (sections 4,001 to
+5,000, its card-time window's middle within 1% of the marked MEAN.3000's):
+  (a) one-place 0.9770 against the marked lap's 0.9774, 0.0004 under: missed (MEAN.4000 reads 0.0007 over);
+  (b) whole masks 2.3617 against 2.3371, 0.0246 over, every slice over (books 0.010 to wikidata 0.033): held.
+  Of 2 parts 1 held. At equal card time, reading once ties at a lone open place and loses 0.025 nats a place where a stretch is open
+  whole, so the mark earns its card time where the writer reads. The rule's first branch: the line keeps reading twice (the fourth pass
+  goes on from lap 4's end state), and its one-place cost is the next subject. Reading once from the stripped state fell 0.0021 and 0.0083
+  from its start (read 1 on the third lap's mean) in that time.

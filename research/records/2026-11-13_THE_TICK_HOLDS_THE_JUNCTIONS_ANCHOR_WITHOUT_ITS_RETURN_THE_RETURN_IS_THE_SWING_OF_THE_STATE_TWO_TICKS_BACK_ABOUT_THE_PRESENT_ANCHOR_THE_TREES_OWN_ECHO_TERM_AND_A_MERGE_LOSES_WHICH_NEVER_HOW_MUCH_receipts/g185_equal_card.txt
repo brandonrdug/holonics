@@ -1,0 +1,26 @@
+# G185: the line reading once from the fourth pass's third-lap end state with its mark stripped, trained for the marked fourth lap's card time (projection 1,748,661 ms), against the marked fourth lap's MEAN.3000 from the same state. Numbers only.
+STORE_STOPPED sections=5343/6000 stretches=17153397 reads=0 returns=5343 pairs=242896704768 batches=10686 peak_store=8603021740 ms=1748853
+MEASURE lap=once rc=0 wall_s=1749.3 peak_rss_kib=302276
+STORE_PASS role=prefix sections=3000 stretches_read=16698734 ended=false code_pieces=45764 web_pieces=25112 science_pieces=15154 books_pieces=1429 wikidata_pieces=6022 ms=1748661
+MEASURE lap=lap4 rc=0 wall_s=1749.1 peak_rss_kib=302204
+## once MEAN.5000 (F3) against twice lap 4 MEAN.3000 (C3)
+CAVITY_DONE ms=307366
+MEASURE lap=R_MEAN.5000 rc=0 wall_s=307.8 peak_rss_kib=519836
+LAST_TICK F3 one_place pooled=0.9770 places=100508 | code=0.6708(20124) web=1.0522(20043) science=0.9298(20088) books=1.0153(20028) wikidata=1.2162(20225)
+LAST_TICK C3 one_place pooled=0.9774 places=100508 | code=0.6694(20124) web=1.0548(20043) science=0.9320(20088) books=1.0201(20028) wikidata=1.2097(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0004 | code=+0.0014 web=-0.0026 science=-0.0023 books=-0.0048 wikidata=+0.0065
+LAST_TICK F3 whole_open pooled=2.3617 places=3717 | code=2.2210(730) web=2.5286(758) science=2.2835(776) books=2.1961(776) wikidata=2.6058(677)
+LAST_TICK C3 whole_open pooled=2.3371 places=3717 | code=2.1915(730) web=2.5022(758) science=2.2585(776) books=2.1861(776) wikidata=2.5724(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0246 | code=+0.0295 web=+0.0264 science=+0.0250 books=+0.0099 wikidata=+0.0334
+## once MEAN.4000 (F3) against twice lap 4 MEAN.3000 (C3)
+CAVITY_DONE ms=309983
+MEASURE lap=R_MEAN.4000 rc=0 wall_s=310.4 peak_rss_kib=524104
+LAST_TICK F3 one_place pooled=0.9781 places=100508 | code=0.6695(20124) web=1.0506(20043) science=0.9321(20088) books=1.0162(20028) wikidata=1.2210(20225)
+LAST_TICK C3 one_place pooled=0.9774 places=100508 | code=0.6694(20124) web=1.0548(20043) science=0.9320(20088) books=1.0201(20028) wikidata=1.2097(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0007 | code=+0.0001 web=-0.0042 science=+0.0001 books=-0.0039 wikidata=+0.0113
+LAST_TICK F3 whole_open pooled=2.3637 places=3717 | code=2.2274(730) web=2.5229(758) science=2.2890(776) books=2.1991(776) wikidata=2.6065(677)
+LAST_TICK C3 whole_open pooled=2.3371 places=3717 | code=2.1915(730) web=2.5022(758) science=2.2585(776) books=2.1861(776) wikidata=2.5724(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0266 | code=+0.0359 web=+0.0207 science=+0.0305 books=+0.0130 wikidata=+0.0341
+## once MEAN.5000 against its start (read 1 on the third lap's mean)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0021 | code=+0.0034 web=-0.0054 science=-0.0016 books=-0.0023 wikidata=-0.0048
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0083 | code=-0.0065 web=-0.0109 science=-0.0091 books=-0.0063 wikidata=-0.0086
