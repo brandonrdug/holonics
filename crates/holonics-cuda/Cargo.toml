@@ -11,6 +11,7 @@ path = "src/lib.rs"
 
 [dependencies]
 holonics = { path = "../holonics" }
+holonics-engine-cuda = { path = "../engine-cuda" }
 num-bigint = { workspace = true }
 num-rational = { workspace = true }
 num-traits = { workspace = true }
@@ -20,10 +21,10 @@ thiserror = { workspace = true }
 # [measurement; theory, November 12, P53 item 1 (G120)] A ruler build of the profile example: the contact's rows with their memory and without
 # their arithmetic (`field_yard_rows`), immediately before the entry, its stores into scratch. No learner's build enables it.
 [features]
-ruler-rows-reads = []
+ruler-rows-reads = ["holonics-engine-cuda/ruler-rows-reads"]
 # [measurement; theory, November 12, P54 item 1] A ruler build of the profile example: the words' occupied bits by array and clock
 # (`field_yard_bits_*`). No learner's build enables it.
-ruler-bits = []
+ruler-bits = ["holonics-engine-cuda/ruler-bits"]
 
 [[bin]]
 name = "mount-smoke"

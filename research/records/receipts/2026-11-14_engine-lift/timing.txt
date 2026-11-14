@@ -1,0 +1,17 @@
+# C3's timing: one hold, a declared warm-up then control (main before C3, the binary of C2), C3, control, C3, control, C3, on 24 of the line's sections from lap 5's end. Mean milliseconds a section; every run's section lines equal to the first's. Numbers only.
+# hold: lock taken 21:23:21
+# run1 c2 exit 0 ms=17498
+# run2 c2 exit 0 ms=17438
+# run3 c3 exit 0 ms=17444
+# run4 c2 exit 0 ms=17412
+# run5 c3 exit 0 ms=17418
+# run6 c2 exit 0 ms=17375
+# run7 c3 exit 0 ms=17400
+# hold: released 21:25:27
+C3_TIMING t1-c2 sections=24 equal_to_first=24 mean_ms=716.7
+C3_TIMING t2-c2 sections=24 equal_to_first=24 mean_ms=713.4
+C3_TIMING t3-c3 sections=24 equal_to_first=24 mean_ms=714.3
+C3_TIMING t4-c2 sections=24 equal_to_first=24 mean_ms=713.2
+C3_TIMING t5-c3 sections=24 equal_to_first=24 mean_ms=713.7
+C3_TIMING t6-c2 sections=24 equal_to_first=24 mean_ms=711.8
+C3_TIMING t7-c3 sections=24 equal_to_first=24 mean_ms=712.3

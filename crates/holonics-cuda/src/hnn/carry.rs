@@ -53,7 +53,8 @@ use crate::hnn::execute::{CarryPlan, HeldRow, ResidentWord, WordPlan};
 use crate::hnn::publication::Loci;
 use crate::hnn::readout;
 
-fn device(error: DeviceError) -> HnnError {
+fn device(error: impl Into<DeviceError>) -> HnnError {
+    let error: DeviceError = error.into();
     error.into_hnn()
 }
 

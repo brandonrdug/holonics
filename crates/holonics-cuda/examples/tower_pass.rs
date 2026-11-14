@@ -302,7 +302,7 @@ fn lockstep(host: &mut TowerLearner, carded: &mut TowerLearner, classes: &[usize
     if streams == 0 || section == 0 || sections == 0 || (chunk - 1) / section < sections {
         return Err("the passage must hold the declared sections in every stream".into());
     }
-    let opened = Card::open(0)?;
+    let opened = holonics_cuda::hnn::open_hnn(0)?;
     let mut card = TowerCard::open(&opened)?;
     if std::env::var_os("TOWER_PROFILE").is_some() {
         card.profile();
@@ -480,7 +480,7 @@ fn train(args: &[String]) -> Result<()> {
     }
     // The command as run, so a host parity reference can name the card run it checks.
     println!("TOWER_COMMAND {}", args[1..].join(" "));
-    let opened = Card::open(0)?;
+    let opened = holonics_cuda::hnn::open_hnn(0)?;
     let mut card = TowerCard::open(&opened)?;
     // [agent-inferred, October 31] A declared reading (`TOWER_PROFILE`): every launch timed alone,
     // the card synchronized around it, and each entry's launches and summed time printed at the

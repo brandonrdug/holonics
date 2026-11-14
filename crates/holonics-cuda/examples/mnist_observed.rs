@@ -49,7 +49,7 @@ fn run() -> Result<()> {
             })
         }
         Backend::Cuda => {
-            let card = Card::open(0)?;
+            let card = holonics_cuda::hnn::open_hnn(0)?;
             let port = CudaResident::new(&card, 4, shared::BUDGET);
             let memory_at_open = card.census().memory;
             println!("execution_backend=cuda card_ordinal=0 gpu_used=true");

@@ -107,7 +107,8 @@ use crate::hnn::tree::{CardTree, TreeTimes};
 mod observed;
 pub use observed::ObservedEpochDevice;
 
-fn device(error: DeviceError) -> HnnError {
+fn device(error: impl Into<DeviceError>) -> HnnError {
+    let error: DeviceError = error.into();
     error.into_hnn()
 }
 

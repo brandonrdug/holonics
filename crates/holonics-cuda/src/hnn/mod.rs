@@ -131,12 +131,12 @@
 
 #![deny(clippy::float_arithmetic)]
 
-pub mod card;
+pub use holonics_engine_cuda::hnn::card;
 mod carry;
 mod dyadic;
 pub mod epoch;
 mod execute;
-pub mod field;
+pub use holonics_engine_cuda::hnn::field;
 mod execute_exact;
 mod inverse_exact;
 pub mod lattice;
@@ -159,14 +159,14 @@ mod tests;
 mod word_tests;
 
 pub use card::{
-    Card, CardBuffer, DeviceCensus, EntryCensus, KERNELS, Layout, Operand, Realization,
+    Card, CardBuffer, CardError, DeviceCensus, EntryCensus, Layout, Operand, Realization,
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
-pub use epoch::EpochFlowExecution;
+pub use epoch::{CardEpochFlow, EpochFlowExecution};
 pub use field::{CardField, FieldTimes, Yardsticks};
-pub use execute_exact::{ExactWordCarry, ExactWordMatrix, ExactWordStage};
-pub use inverse_exact::{ExactInverseExecution, ExactInverseOperator};
-pub use lattice::{Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
+pub use execute_exact::{CardExactWord, ExactWordCarry, ExactWordMatrix, ExactWordStage};
+pub use inverse_exact::{CardInverseExact, ExactInverseExecution, ExactInverseOperator};
+pub use lattice::{CardLatticeRead, CardOuterUpdate, Gather, LatticeCoordinates, LatticeRead, ResidentLattice, ResidentRead};
 pub use moment::{MomentCounts, MomentSnapshot, ResidentMoment};
 pub use port::{Mounted, ObservedEpochDevice, Resident, Traffic};
 pub use tower::{TowerCard, TowerCardTimes};
@@ -177,6 +177,19 @@ use holonics::hnn::{Field, HnnError, RingAdvance};
 use thiserror::Error;
 
 use crate::cuda::CudaError;
+
+/// The PTX image of `kernels/hnn.cu`, compiled by `build.rs`; empty when no `nvcc` answered.
+const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/hnn.ptx"));
+
+/// The architecture the image was built for, or the reason it is absent (`build.rs`).
+pub const KERNELS: &str = env!("HOLONICS_CUDA_KERNELS");
+
+/// **Open the card with the October image** (`kernels/hnn.cu`), for the owners that launch from the
+/// card ([`Card::launch`]): the HNN's words, epochs, lattices, inverses and towers. The field opens
+/// it with no image ([`Card::open`]) and loads its own.
+pub fn open_hnn(ordinal: i32) -> Result<Card, DeviceError> {
+    Ok(Card::open_with_image(ordinal, IMAGE, KERNELS)?)
+}
 
 /// Every refusal of the resident HNN: a typed return, never a panic and never a rounded value.
 #[derive(Debug, Error)]
@@ -248,6 +261,26 @@ pub enum DeviceError {
     },
     #[error(transparent)]
     Hnn(#[from] HnnError),
+}
+
+/// The card's refusals, case for case ([`CardError`]).
+impl From<CardError> for DeviceError {
+    fn from(error: CardError) -> Self {
+        match error {
+            CardError::Driver(error) => DeviceError::Driver(error),
+            CardError::NoKernels { reason } => DeviceError::NoKernels { reason },
+            CardError::Census { what, value } => DeviceError::Census { what, value },
+            CardError::ForeignBuffer => DeviceError::ForeignBuffer,
+            CardError::Launch { entry, clause } => DeviceError::Launch { entry, clause },
+            CardError::Shape { what, expected, found } => DeviceError::Shape { what, expected, found },
+        }
+    }
+}
+
+impl From<CudaError> for DeviceError {
+    fn from(error: CudaError) -> Self {
+        DeviceError::Driver(Box::new(error))
+    }
 }
 
 /// [definition] The card carries `Lock` rings only: a founded `Own` ring's word, phase and moment

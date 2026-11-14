@@ -4,7 +4,7 @@
 //! [definition] **Common context ownership (#15).** A [`Card`] owns one driver context and, inside
 //! it, the HNN's loaded image and one ordered stream. Every buffer is a [`CardBuffer`] that borrows
 //! its card, so it cannot outlive the context that allocated it, and every launch and transfer
-//! refuses a buffer of another card ([`DeviceError::ForeignBuffer`]): a cross-context use is
+//! refuses a buffer of another card ([`CardError::ForeignBuffer`]): a cross-context use is
 //! unrepresentable past the card's life and refused within it. The card makes its context current
 //! before each driver call and before its buffers and module are released, so an owner on another
 //! context in the same thread never receives this card's work.
@@ -14,7 +14,7 @@
 //! the grid, shared memory and registers per block and per multiprocessor, memory), and each
 //! entry's lowered limits (its thread ceiling, registers, static shared and local octets). **No
 //! bound is authored:** every layout below is derived from these readings and the shape it
-//! covers, and a shape the census cannot carry is refused ([`DeviceError::Launch`]).
+//! covers, and a shape the census cannot carry is refused ([`CardError::Launch`]).
 //!
 //! [definition] **The partition is certified before the launch** (CLAUDE.md, hardware law):
 //! co-present blocks and threads commute when their reads and writes do.
@@ -41,13 +41,32 @@ use crate::cuda::{
     MemoryInfo, Module, Stream,
 };
 use crate::ffi::CUdeviceptr;
-use crate::hnn::DeviceError;
 
-/// The PTX image of `kernels/hnn.cu`, compiled by `build.rs`; empty when no `nvcc` answered.
-const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/hnn.ptx"));
-
-/// The architecture the image was built for, or the reason it is absent (`build.rs`).
-pub const KERNELS: &str = env!("HOLONICS_CUDA_KERNELS");
+/// [definition; November 14, C3 of #603] **The card's refusals**: the driver's, an absent image, the census, a foreign buffer, a launch
+/// the census cannot carry and a shape. They were cases of the October `DeviceError`, which converts from them case for case
+/// (`crate::hnn::DeviceError`); the card and the field's realization return only these.
+#[derive(Debug, thiserror::Error)]
+pub enum CardError {
+    #[error("the CUDA driver refused: {0}")]
+    Driver(Box<CudaError>),
+    #[error("the HNN kernels are not built ({reason})")]
+    NoKernels { reason: &'static str },
+    #[error("the driver reported {what} = {value}; a census extent is positive")]
+    Census { what: &'static str, value: i32 },
+    #[error("a buffer of another card was offered; a card's launches read only its own buffers")]
+    ForeignBuffer,
+    #[error("{entry}: the census cannot carry the launch: {clause}")]
+    Launch {
+        entry: &'static str,
+        clause: &'static str,
+    },
+    #[error("{what}: expected {expected}, found {found}")]
+    Shape {
+        what: &'static str,
+        expected: usize,
+        found: usize,
+    },
+}
 
 // -------------------------------------------------------------------------------------------
 // the census
@@ -79,13 +98,13 @@ pub struct DeviceCensus {
 
 impl DeviceCensus {
     /// Read the census off a device, in a context current on this thread.
-    pub fn read(device: &Device, memory: MemoryInfo) -> Result<Self, DeviceError> {
-        let read = |attribute: DeviceAttribute, what: &'static str| -> Result<u32, DeviceError> {
+    pub fn read(device: &Device, memory: MemoryInfo) -> Result<Self, CardError> {
+        let read = |attribute: DeviceAttribute, what: &'static str| -> Result<u32, CardError> {
             let value = device.attribute(attribute)?;
             u32::try_from(value)
                 .ok()
                 .filter(|value| *value > 0)
-                .ok_or(DeviceError::Census { what, value })
+                .ok_or(CardError::Census { what, value })
         };
         let census = device.launch_census()?;
         let minor = device.attribute(DeviceAttribute::COMPUTE_CAPABILITY_MINOR)?;
@@ -94,7 +113,7 @@ impl DeviceCensus {
             0 => false,
             1 => true,
             value => {
-                return Err(DeviceError::Census {
+                return Err(CardError::Census {
                     what: "cooperative launch boolean",
                     value,
                 });
@@ -104,7 +123,7 @@ impl DeviceCensus {
             name: device.name.clone(),
             compute_capability: (
                 read(DeviceAttribute::COMPUTE_CAPABILITY_MAJOR, "compute major")?,
-                u32::try_from(minor).map_err(|_| DeviceError::Census {
+                u32::try_from(minor).map_err(|_| CardError::Census {
                     what: "compute minor",
                     value: minor,
                 })?,
@@ -234,9 +253,9 @@ fn cooperative_grid(
     shared: u32,
     resident_blocks: u64,
     max_grid_x: u32,
-) -> Result<Layout, DeviceError> {
+) -> Result<Layout, CardError> {
     if work_items == 0 || threads == 0 || resident_blocks == 0 || max_grid_x == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: name,
             clause: "a cooperative grid has positive work, threads and resident block capacity",
         });
@@ -291,9 +310,9 @@ pub fn read_layout(
     rows: usize,
     columns: usize,
     vectors: usize,
-) -> Result<Layout, DeviceError> {
+) -> Result<Layout, CardError> {
     if rows == 0 || columns == 0 || vectors == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "a read covers at least one row, column and vector",
         });
@@ -303,13 +322,13 @@ pub fn read_layout(
         u32::try_from(columns),
         u32::try_from(vectors),
     ) else {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "a read's extents fit the kernel's 32-bit wire",
         });
     };
     if rows > census.max_grid.x || vectors > census.max_grid.y {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the rows fit the grid's X extent and the vectors its Y extent",
         });
@@ -317,7 +336,7 @@ pub fn read_layout(
     let shared_threads = shared_ceiling(census, entry) / READ_SHARED_PER_THREAD;
     let ceiling = thread_ceiling(census, entry).min(shared_threads);
     if ceiling == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the block carries at least one thread and its shared words",
         });
@@ -358,21 +377,21 @@ pub fn certificate_layout(
     entry: &EntryCensus,
     charts: usize,
     width: usize,
-) -> Result<Layout, DeviceError> {
+) -> Result<Layout, CardError> {
     if charts == 0 || width == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "a certificate covers at least one chart of at least one row",
         });
     }
     let (Ok(charts), Ok(width)) = (u32::try_from(charts), u32::try_from(width)) else {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the charts and their rows fit the kernel's 32-bit wire",
         });
     };
     if charts > census.max_grid.x {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the charts fit the grid's X extent",
         });
@@ -380,7 +399,7 @@ pub fn certificate_layout(
     let shared_threads = shared_ceiling(census, entry) / CERTIFICATE_SHARED_PER_THREAD;
     let ceiling = thread_ceiling(census, entry).min(shared_threads);
     if ceiling == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the block carries at least one thread and its shared word",
         });
@@ -411,16 +430,16 @@ pub fn word_layout(
     census: &DeviceCensus,
     entry: &EntryCensus,
     rows: usize,
-) -> Result<Layout, DeviceError> {
+) -> Result<Layout, CardError> {
     let Ok(rows) = u32::try_from(rows.max(1)) else {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "a word's rows fit the kernel's 32-bit wire",
         });
     };
     let ceiling = thread_ceiling(census, entry);
     if ceiling == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the block carries at least one thread",
         });
@@ -449,22 +468,22 @@ pub fn copy_layout(
     entry: &EntryCensus,
     copies: usize,
     words: usize,
-) -> Result<Layout, DeviceError> {
+) -> Result<Layout, CardError> {
     let (Ok(copies), Ok(words)) = (u32::try_from(copies), u32::try_from(words.max(1))) else {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the copies fit the kernel's 32-bit wire",
         });
     };
     if copies == 0 || copies > census.max_grid.x {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "at least one copy, within the grid's X extent",
         });
     }
     let ceiling = thread_ceiling(census, entry);
     if ceiling == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the block carries at least one thread",
         });
@@ -503,25 +522,25 @@ pub fn ingest_layout(
     rings: usize,
     cells: usize,
     lanes: Option<u32>,
-) -> Result<Layout, DeviceError> {
+) -> Result<Layout, CardError> {
     let Ok(rings) = u32::try_from(rings) else {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the rings fit the kernel's 32-bit wire",
         });
     };
     if rings == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "an ingest steps at least one ring",
         });
     }
     let available = shared_ceiling(census, entry);
-    let fixed = rings.checked_mul(12).ok_or(DeviceError::Launch {
+    let fixed = rings.checked_mul(12).ok_or(CardError::Launch {
         entry: entry.name,
         clause: "the ingest's fixed shared octets fit a 32-bit extent",
     })?;
-    let per_thread = rings.checked_mul(8).ok_or(DeviceError::Launch {
+    let per_thread = rings.checked_mul(8).ok_or(CardError::Launch {
         entry: entry.name,
         clause: "the ingest's per-thread shared octets fit a 32-bit extent",
     })?;
@@ -531,13 +550,13 @@ pub fn ingest_layout(
         ceiling = ceiling.min(lanes);
     }
     if ceiling == 0 {
-        return Err(DeviceError::Launch {
+        return Err(CardError::Launch {
             entry: entry.name,
             clause: "the block carries at least one cell and its rings' scans",
         });
     }
     let threads = floor_power_of_two(ceiling);
-    let shared = ingest_shared(rings, threads).ok_or(DeviceError::Launch {
+    let shared = ingest_shared(rings, threads).ok_or(CardError::Launch {
         entry: entry.name,
         clause: "the ingest's shared octets fit a 32-bit extent",
     })?;
@@ -555,11 +574,16 @@ pub fn ingest_layout(
 // -------------------------------------------------------------------------------------------
 // the card
 
-/// [definition] **The card**: one context, the HNN's loaded image and one ordered stream in it,
-/// and its census. See the module header.
+/// [definition] **The card**: one context, one ordered stream in it and its census, and the image
+/// its opener gave it, if any. See the module header.
+///
+/// [realization; November 14, C3 of #603] A card opens with no image ([`Card::open`]): an owner that
+/// launches from its own image loads it (the field's, `CardField::open`), and the owners that launch
+/// from the card's open it with theirs ([`Card::open_with_image`]; the October owners' is
+/// `crate::hnn::open_hnn`). Before, every open loaded `hnn.ptx`, which the field never launches.
 pub struct Card {
     // Fields drop in declaration order: the image and the stream before the context.
-    module: Module,
+    module: Option<Module>,
     stream: Stream,
     census: DeviceCensus,
     context: Context,
@@ -575,15 +599,15 @@ impl Drop for Card {
 impl Card {
     /// Derive a resident cooperative grid for a flat work surface. A kernel must grid-stride
     /// that surface and keep every thread at every grid barrier, including idle lanes.
-    pub(crate) fn cooperative_layout(
+    pub fn cooperative_layout(
         &self,
         name: &'static str,
         work_items: usize,
         threads: Option<u32>,
         shared: u32,
-    ) -> Result<Layout, DeviceError> {
+    ) -> Result<Layout, CardError> {
         if !self.census.cooperative_launch {
-            return Err(DeviceError::Launch {
+            return Err(CardError::Launch {
                 entry: name,
                 clause: "the device supports cooperative launch",
             });
@@ -599,16 +623,16 @@ impl Card {
                 .checked_add(shared)
                 .is_none_or(|total| total > self.census.shared_per_block)
         {
-            return Err(DeviceError::Launch {
+            return Err(CardError::Launch {
                 entry: name,
                 clause: "the function and device carry the block and its static plus dynamic shared surface",
             });
         }
-        let function = self.module.function(name)?;
+        let function = self.module()?.function(name)?;
         let active = function.active_blocks_per_multiprocessor(threads, shared)?;
         cooperative_grid(
             name,
-            u64::try_from(work_items).map_err(|_| DeviceError::Launch {
+            u64::try_from(work_items).map_err(|_| CardError::Launch {
                 entry: name,
                 clause: "the cooperative work extent fits its 64-bit wire",
             })?,
@@ -621,35 +645,35 @@ impl Card {
 
     /// Launch only the exact geometry re-admitted against this function's current driver
     /// occupancy. Like `launch`, the caller admits argument buffers and their kernel-wire shape.
-    pub(crate) fn launch_cooperative(
+    pub fn launch_cooperative(
         &self,
         name: &'static str,
         layout: &Layout,
         params: &mut [*mut c_void],
-    ) -> Result<(), DeviceError> {
+    ) -> Result<(), CardError> {
         let Realization::CooperativeGrid {
             work_items,
             threads,
             ..
         } = layout.realization
         else {
-            return Err(DeviceError::Launch {
+            return Err(CardError::Launch {
                 entry: name,
                 clause: "a cooperative launch carries a cooperative realization",
             });
         };
-        let work_items = usize::try_from(work_items).map_err(|_| DeviceError::Launch {
+        let work_items = usize::try_from(work_items).map_err(|_| CardError::Launch {
             entry: name,
             clause: "the cooperative work extent fits this host",
         })?;
         let admitted = self.cooperative_layout(name, work_items, Some(threads), layout.shared)?;
         if &admitted != layout {
-            return Err(DeviceError::Launch {
+            return Err(CardError::Launch {
                 entry: name,
                 clause: "the cooperative geometry and report equal the function's admitted resident grid",
             });
         }
-        self.module.function(name)?.launch_cooperative_on_shared(
+        self.module()?.function(name)?.launch_cooperative_on_shared(
             &self.stream,
             layout.grid,
             layout.block,
@@ -659,18 +683,28 @@ impl Card {
         Ok(())
     }
 
-    /// **Open the card at a device ordinal**: a context, the census, the image and a stream.
-    /// Refused with [`DeviceError::NoKernels`] when the build had no `nvcc`.
-    pub fn open(ordinal: i32) -> Result<Self, DeviceError> {
-        if IMAGE.is_empty() {
-            return Err(DeviceError::NoKernels { reason: KERNELS });
+    /// **Open the card at a device ordinal**: a context, the census and a stream, with no image.
+    pub fn open(ordinal: i32) -> Result<Self, CardError> {
+        Self::opened(ordinal, None)
+    }
+
+    /// **Open the card with an image** for the entries launched from the card itself
+    /// ([`Card::launch`], [`Card::entry`]). Refused with [`CardError::NoKernels`], naming
+    /// `kernels`, when the build had no `nvcc` and the image is empty.
+    pub fn open_with_image(ordinal: i32, image: &'static [u8], kernels: &'static str) -> Result<Self, CardError> {
+        if image.is_empty() {
+            return Err(CardError::NoKernels { reason: kernels });
         }
+        Self::opened(ordinal, Some(image))
+    }
+
+    fn opened(ordinal: i32, image: Option<&'static [u8]>) -> Result<Self, CardError> {
         cuda::init()?;
         let device = Device::get(ordinal)?;
         let context = Context::create(&device)?;
         context.make_current()?;
         let census = DeviceCensus::read(&device, context.memory_info()?)?;
-        let module = Module::load_ptx(IMAGE)?;
+        let module = image.map(Module::load_ptx).transpose()?;
         let stream = Stream::create()?;
         Ok(Self {
             module,
@@ -680,24 +714,29 @@ impl Card {
         })
     }
 
+    /// The image the card was opened with.
+    fn module(&self) -> Result<&Module, CardError> {
+        self.module.as_ref().ok_or(CardError::NoKernels { reason: "a card opened with no image launches no entry of its own" })
+    }
+
     pub fn census(&self) -> &DeviceCensus {
         &self.census
     }
 
-    pub(crate) fn current(&self) -> Result<(), DeviceError> {
+    pub fn current(&self) -> Result<(), CardError> {
         Ok(self.context.make_current()?)
     }
 
     /// The card's ordered stream, for an owner that launches its own image's entries in the
     /// card's order (so [`Card::write`] and [`Card::fetch`] wait for them).
-    pub(crate) fn stream(&self) -> &Stream {
+    pub fn stream(&self) -> &Stream {
         &self.stream
     }
 
     /// An entry's lowered limits.
-    pub fn entry(&self, name: &'static str) -> Result<EntryCensus, DeviceError> {
+    pub fn entry(&self, name: &'static str) -> Result<EntryCensus, CardError> {
         self.current()?;
-        let function = self.module.function(name)?;
+        let function = self.module()?.function(name)?;
         Ok(EntryCensus {
             name,
             max_threads_per_block: function.max_threads_per_block()?,
@@ -708,16 +747,16 @@ impl Card {
     }
 
     /// Refuse a buffer of another card.
-    pub(crate) fn owns<T>(&self, buffer: &CardBuffer<'_, T>) -> Result<(), DeviceError> {
+    pub fn owns<T>(&self, buffer: &CardBuffer<'_, T>) -> Result<(), CardError> {
         if core::ptr::eq(buffer.card, self) {
             Ok(())
         } else {
-            Err(DeviceError::ForeignBuffer)
+            Err(CardError::ForeignBuffer)
         }
     }
 
     /// An uninitialized buffer of `len` elements (one element is reserved for an empty one).
-    pub fn alloc<T: Copy>(&self, len: usize) -> Result<CardBuffer<'_, T>, DeviceError> {
+    pub fn alloc<T: Copy>(&self, len: usize) -> Result<CardBuffer<'_, T>, CardError> {
         self.current()?;
         Ok(CardBuffer {
             card: self,
@@ -727,7 +766,7 @@ impl Card {
     }
 
     /// A buffer of `len` zeros, zeroed on the card's stream.
-    pub fn zeroed<T: DeviceZeroable>(&self, len: usize) -> Result<CardBuffer<'_, T>, DeviceError> {
+    pub fn zeroed<T: DeviceZeroable>(&self, len: usize) -> Result<CardBuffer<'_, T>, CardError> {
         let buffer = self.alloc::<T>(len)?;
         self.stream.memset_u32_async(
             buffer.device_ptr(),
@@ -738,7 +777,7 @@ impl Card {
     }
 
     /// A buffer holding `values` (a synchronous transfer: complete when this returns).
-    pub fn upload<T: Copy>(&self, values: &[T]) -> Result<CardBuffer<'_, T>, DeviceError> {
+    pub fn upload<T: Copy>(&self, values: &[T]) -> Result<CardBuffer<'_, T>, CardError> {
         let buffer = self.alloc::<T>(values.len())?;
         self.write(&buffer, 0, values)?;
         Ok(buffer)
@@ -751,10 +790,10 @@ impl Card {
         buffer: &CardBuffer<'_, T>,
         offset: usize,
         values: &[T],
-    ) -> Result<(), DeviceError> {
+    ) -> Result<(), CardError> {
         self.owns(buffer)?;
         if offset + values.len() > buffer.len {
-            return Err(DeviceError::Shape {
+            return Err(CardError::Shape {
                 what: "a write within its buffer",
                 expected: buffer.len,
                 found: offset + values.len(),
@@ -770,16 +809,16 @@ impl Card {
 
     /// Zero `octets` octets of a buffer from the octet `offset`, ordered on the card's stream (no
     /// transfer); both are multiples of four, the memset's word.
-    pub(crate) fn zero_octets<T: Copy>(
+    pub fn zero_octets<T: Copy>(
         &self,
         buffer: &CardBuffer<'_, T>,
         offset: usize,
         octets: usize,
-    ) -> Result<(), DeviceError> {
+    ) -> Result<(), CardError> {
         self.owns(buffer)?;
         let extent = buffer.len * core::mem::size_of::<T>();
         if !offset.is_multiple_of(4) || !octets.is_multiple_of(4) || offset + octets > extent {
-            return Err(DeviceError::Shape {
+            return Err(CardError::Shape {
                 what: "a zeroed range of whole 4-octet words within its buffer",
                 expected: extent,
                 found: offset + octets,
@@ -798,18 +837,18 @@ impl Card {
 
     /// **Copy `len` elements of one resident buffer into another**, from `from` to `to`, ordered on
     /// the card's stream: nothing crosses the bus.
-    pub(crate) fn copy_within<T: Copy>(
+    pub fn copy_within<T: Copy>(
         &self,
         source: &CardBuffer<'_, T>,
         from: usize,
         target: &CardBuffer<'_, T>,
         to: usize,
         len: usize,
-    ) -> Result<(), DeviceError> {
+    ) -> Result<(), CardError> {
         self.owns(source)?;
         self.owns(target)?;
         if from + len > source.len || to + len > target.len {
-            return Err(DeviceError::Shape {
+            return Err(CardError::Shape {
                 what: "a resident copy within its buffers",
                 expected: source.len.min(target.len),
                 found: (from + len).max(to + len),
@@ -831,7 +870,7 @@ impl Card {
     pub fn fetch<T: Copy + Default>(
         &self,
         buffer: &CardBuffer<'_, T>,
-    ) -> Result<Vec<T>, DeviceError> {
+    ) -> Result<Vec<T>, CardError> {
         self.fetch_range(buffer, 0, buffer.len)
     }
 
@@ -841,10 +880,10 @@ impl Card {
         buffer: &CardBuffer<'_, T>,
         offset: usize,
         len: usize,
-    ) -> Result<Vec<T>, DeviceError> {
+    ) -> Result<Vec<T>, CardError> {
         self.owns(buffer)?;
         if offset + len > buffer.len {
-            return Err(DeviceError::Shape {
+            return Err(CardError::Shape {
                 what: "a fetch within its buffer",
                 expected: buffer.len,
                 found: offset + len,
@@ -862,14 +901,14 @@ impl Card {
 
     /// Launch an entry on the card's stream at a derived layout. `params` point at each argument
     /// in declared order; the caller has checked every buffer with [`Card::owns`].
-    pub(crate) fn launch(
+    pub fn launch(
         &self,
         entry: &'static str,
         layout: &Layout,
         params: &mut [*mut c_void],
-    ) -> Result<(), DeviceError> {
+    ) -> Result<(), CardError> {
         self.current()?;
-        let function = self.module.function(entry)?;
+        let function = self.module()?.function(entry)?;
         function.launch_on_shared(
             &self.stream,
             layout.grid,
@@ -881,7 +920,7 @@ impl Card {
     }
 
     /// Wait until every launch on the card's stream has completed.
-    pub fn synchronize(&self) -> Result<(), DeviceError> {
+    pub fn synchronize(&self) -> Result<(), CardError> {
         Ok(self.stream.synchronize()?)
     }
 }
@@ -909,7 +948,7 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
     }
 
     /// The card that owns it.
-    pub(crate) fn card(&self) -> &'c Card {
+    pub fn card(&self) -> &'c Card {
         self.card
     }
 
@@ -917,7 +956,7 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
         self.len == 0
     }
 
-    pub(crate) fn device_ptr(&self) -> CUdeviceptr {
+    pub fn device_ptr(&self) -> CUdeviceptr {
         self.buffer.device_ptr()
     }
 }
@@ -927,12 +966,12 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
 /// in a buffer of one card. It borrows the buffer, so the operand outlives every read of it.
 #[derive(Clone, Copy)]
 pub struct Operand<'a> {
-    pub(crate) card: &'a Card,
-    pub(crate) pointer: CUdeviceptr,
-    pub(crate) vectors: usize,
-    pub(crate) width: usize,
-    pub(crate) exponent: u32,
-    pub(crate) _borrow: PhantomData<&'a ()>,
+    pub card: &'a Card,
+    pub pointer: CUdeviceptr,
+    pub vectors: usize,
+    pub width: usize,
+    pub exponent: u32,
+    pub _borrow: PhantomData<&'a ()>,
 }
 
 impl Operand<'_> {
@@ -949,9 +988,9 @@ impl Operand<'_> {
     }
 }
 
-impl From<CudaError> for DeviceError {
+impl From<CudaError> for CardError {
     fn from(error: CudaError) -> Self {
-        DeviceError::Driver(Box::new(error))
+        CardError::Driver(Box::new(error))
     }
 }
 

@@ -157,7 +157,7 @@ fn main() -> Result<()> {
     }
     let chosen: Vec<usize> = (0..handful).map(|j| j * streams / handful).collect();
     let part = |s: usize, from: usize, to: usize| &classes[s * chunk + from * section..s * chunk + to * section + 1];
-    let opened = Card::open(0)?;
+    let opened = holonics_cuda::hnn::open_hnn(0)?;
     let mut card = TowerCard::open(&opened)?;
     card.admit(tower)?;
     // The credit's carry runs on a realization of its own, which holds it resident.

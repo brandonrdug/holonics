@@ -43,6 +43,7 @@ use num_bigint::BigInt;
 use num_traits::{One, Zero};
 
 use super::lattice::{LatticeCoordinates, OuterSamples, ResidentLattice, SplitRecord};
+use crate::hnn::{CardLatticeRead, CardOuterUpdate};
 
 /// A dyadic value `p / 2^e`, `p ∈ [−range, range]`.
 fn dyadic(draw: &mut Draw, range: i64, exponent: u32) -> Rat {

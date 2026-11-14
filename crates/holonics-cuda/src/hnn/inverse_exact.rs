@@ -557,11 +557,28 @@ impl<'c> ExactInverseWorkspace<'c> {
     }
 }
 
-impl Card {
+/// The card's CardInverseExact methods (C3 of #603: an `impl Card` outside the card's crate is an extension trait).
+pub trait CardInverseExact {
     /// Realize one exact residual/certificate and optionally the native rounded
     /// refinement. This control surface returns intermediates; the chart store's
     /// resident workspace reads only its certificate between refinement launches.
-    pub fn inverse_exact(
+    fn inverse_exact(
+        &self,
+        operator: &ExactInverseOperator,
+        chart: &ChartWords,
+        refine: bool,
+    ) -> Result<ExactInverseExecution, DeviceError>;
+    fn inverse_exact_at_capacity(
+        &self,
+        operator: &ExactInverseOperator,
+        chart: &ChartWords,
+        refine: bool,
+        capacity: Option<usize>,
+    ) -> Result<ExactInverseExecution, DeviceError>;
+}
+
+impl CardInverseExact for Card {
+    fn inverse_exact(
         &self,
         operator: &ExactInverseOperator,
         chart: &ChartWords,
@@ -774,7 +791,7 @@ mod tests {
     #[test]
     #[ignore = "needs the exclusive CUDA card; root launches bounded controls"]
     fn actual_s131_contact_matches_native_refinement_and_store_cold_then_warm() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let matrix = contact();
         let op = ExactInverseOperator::of(&matrix).unwrap();
         let old = chart(2, 30, &[1 << 29, 0, 0, 1 << 29]);
@@ -843,7 +860,7 @@ mod tests {
     #[test]
     #[ignore = "needs the exclusive CUDA card; root launches bounded controls"]
     fn seven_limb_cancellation_and_signed_ties_keep_exact_bounds_and_remainders() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let big: BigInt = (BigInt::one() << 384usize) + 17;
         let matrix = ExactRatMatrix::shaped(
             2,
@@ -889,7 +906,7 @@ mod tests {
     #[test]
     #[ignore = "needs the exclusive CUDA card; root launches bounded controls"]
     fn capacity_upstream_and_chart_word_refusals_leave_the_destination_unchanged() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         for (matrix, old, upstream, capacity, want) in [
             (
                 ExactRatMatrix::shaped(

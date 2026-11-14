@@ -104,7 +104,8 @@ const OUTER_COLS: u32 = 64;
 
 type Result<T> = std::result::Result<T, TowerError>;
 
-fn device(error: DeviceError) -> TowerError {
+fn device(error: impl Into<DeviceError>) -> TowerError {
+    let error: DeviceError = error.into();
     TowerError::Realization(format!("the card: {error}"))
 }
 

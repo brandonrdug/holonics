@@ -390,7 +390,7 @@ fn join_pair(learner: &mut TowerLearner, forms: usize) {
 /// Host against card in lockstep: the opening read and its covector on the same material, then
 /// both learners take the section; `compared` holds every other place out of the comparison.
 fn lockstep(alphabet: usize, streams: usize, section: usize, sections: usize, holding: bool, faces: Faces) {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let (mut host, mut carded) = learners(alphabet, faces);
     let classes = passage(alphabet, streams * (sections * section + 1));
@@ -477,7 +477,7 @@ fn the_cards_turned_stranded_participating_pass_is_the_hosts_for_eight_sections(
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_participation_reads_a_section_on_across_calls_and_closes_it_within_one_as_the_host_does() {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let (host, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
     let classes = passage(11, 40);
@@ -591,7 +591,7 @@ fn lockstep_credited(alphabet: usize, streams: usize, section: usize, sections: 
 /// [`lockstep_credited`] with the credit carried from level `from` (the tower's clocked levels when
 /// `None`; `Tower::rest_with_credit_from`).
 fn lockstep_credited_from(alphabet: usize, streams: usize, section: usize, sections: usize, faces: Faces, from: Option<usize>) {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let mut direct = TowerCard::open(&card).expect("the tower's image");
     let (mut host, mut carded) = learners(alphabet, faces);
@@ -663,7 +663,7 @@ fn the_cards_every_level_credit_is_the_hosts_for_thirty_two_sections() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_reread_on_the_opening_ticks_is_the_hosts() {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let clocked = [
         Faces { news: Some(NewsClock::above(2, 2, 2).expect("a clock")), levels: 3, passage: true, packets: true, heading: true, ..Faces::default() },
         Faces { news: Some(NewsClock::above(2, 2, 4).expect("a clock")), levels: 6, passage: true, packets: true, heading: true, ..Faces::default() },
@@ -725,7 +725,7 @@ fn the_cards_clocked_participating_passage_on_the_pair_contact_holds_an_uncompar
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_body_hears_asks_and_answers_as_the_hosts_and_resumes_cold() {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let (learner, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
     let k = keys(1 << 14);
     let (first, second) = (passage(11, 300), passage(11, 511)[300..].to_vec());
@@ -774,7 +774,7 @@ fn the_cards_body_hears_asks_and_answers_as_the_hosts_and_resumes_cold() {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_cards_grown_body_continues_as_the_hosts() {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let (learner, _) = learners(11, Faces { participation: Some(12), ..Faces::default() });
     let k = keys(1 << 14);
     let founding = keys(learner.tower.growth_draws(2) * 4);
@@ -1020,7 +1020,7 @@ fn the_cards_clocked_participating_advance_is_the_hosts_class_by_class() {
 }
 
 fn advance_class_by_class(faces: Faces) {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let alphabet = 13;
     let (host, _) = learners(alphabet, faces);
@@ -1050,7 +1050,7 @@ fn advance_class_by_class(faces: Faces) {
 #[test]
 #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
 fn the_card_refuses_a_declaration_it_does_not_carry() {
-    let card = Card::open(0).expect("the card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("the card");
     let mut realized = TowerCard::open(&card).expect("the tower's image");
     let ungated = Tower::found_on(declaration(11, false, false, false), &keys(1 << 16), TurnLadder::Both).expect("founded");
     let classes = passage(11, 10);

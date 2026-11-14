@@ -48,7 +48,8 @@ pub const FORWARD_ENTRY: &str = "hnn_word_forward";
 pub const REVERSE_ENTRY: &str = "hnn_word_reverse";
 pub const PAIR_ENTRY: &str = "hnn_pair_weights";
 
-fn device(error: DeviceError) -> HnnError {
+fn device(error: impl Into<DeviceError>) -> HnnError {
+    let error: DeviceError = error.into();
     error.into_hnn()
 }
 

@@ -139,11 +139,36 @@ fn ceil_log2(value: usize) -> u64 {
     }
 }
 
-impl Card {
+/// The card's CardEpochFlow methods (C3 of #603: an `impl Card` outside the card's crate is an extension trait).
+pub trait CardEpochFlow {
     /// Compute the existing native record-to-flow law with actual card products and sums.
     /// Records may outnumber heard cells; they do not add a receiver partition.
+    fn aggregate_epoch_records(
+        &self,
+        rows: usize,
+        columns: usize,
+        receiver_grain: u32,
+        epoch_cells: u64,
+        epoch: u64,
+        heard_cells: u64,
+        records: &[EpochProducerRecordReading],
+    ) -> Result<EpochFlowExecution, DeviceError>;
+    fn aggregate_epoch_records_at_capacity(
+        &self,
+        rows: usize,
+        columns: usize,
+        receiver_grain: u32,
+        epoch_cells: u64,
+        epoch: u64,
+        heard_cells: u64,
+        records: &[EpochProducerRecordReading],
+        test_capacity: Option<usize>,
+    ) -> Result<EpochFlowExecution, DeviceError>;
+}
+
+impl CardEpochFlow for Card {
     #[allow(clippy::too_many_arguments)]
-    pub fn aggregate_epoch_records(
+    fn aggregate_epoch_records(
         &self,
         rows: usize,
         columns: usize,
@@ -453,7 +478,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn actual_grouped_epoch_records_match_native_flow_without_host_fallback() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let records = fixture();
         for heard in [1, 2] {
             let expected = epoch_record_flow_reference(2, 3, 6, 2, 4, heard, &records).unwrap();
@@ -504,7 +529,7 @@ mod tests {
         forged.grid.x += 1;
         assert!(matches!(
             card.launch_cooperative(FLOW_ENTRY, &forged, &mut []),
-            Err(DeviceError::Launch { .. })
+            Err(crate::hnn::CardError::Launch { .. })
         ));
         assert!(matches!(
             card.aggregate_epoch_records_at_capacity(2, 3, 6, 2, 4, 1, &records, Some(1)),

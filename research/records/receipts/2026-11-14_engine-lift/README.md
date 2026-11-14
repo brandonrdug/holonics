@@ -22,6 +22,53 @@ The plan's step is [THE_CONSOLIDATION](../../../../docs/plans/THE_CONSOLIDATION.
   - 24 of 24 sections reproduced;
   - the lap's read equal byte for byte.
 
-## The card part
+## The card part (branch `claude/card-image`)
 
-The card part follows in its own pull request, and its receipt joins this one.
+The plan named the card, the driver and the card realization as moves. Reading them showed three facts that stood in the way, so
+three alterations came first, and the move last.
+
+**The three alterations.**
+1. **The card opens with no image.** `Card::open` had loaded the October image (`hnn.ptx`) on every open, and the field never
+   launches from it, because it loads its own. `Card::open_with_image` serves the owners that launch from the card's image, and the
+   October owners open through `hnn::open_hnn`. The line's binary no longer embeds the October image: it is 14.2 MB, against 15.5 MB
+   for the binary of C2.
+2. **The card's refusals become `CardError`.** These are `Driver`, `NoKernels`, `Census`, `ForeignBuffer`, `Launch` and `Shape`,
+   each with its message unchanged. The October `DeviceError` converts from it case for case, and the October adapters take either
+   error.
+3. **The October card methods become extension traits.** Five `impl Card` blocks in October files became `CardLatticeRead`,
+   `CardOuterUpdate`, `CardExactWord`, `CardInverseExact` and `CardEpochFlow`, because an inherent impl cannot stand outside the
+   type's crate.
+
+**The move.**
+- `cuda.rs`, `ffi.rs`, `hnn/card.rs` and `hnn/field.rs` move to `crates/engine-cuda`. They differ from their originals only in
+  visibility (`pub(crate)` becomes `pub`) and paths.
+- The three field kernel sources move byte for byte.
+- The field image's part of the build script moves with them, with the same `nvcc` arguments.
+- The engine card crate depends on the engine and on nothing in `crates/holonics` or `crates/holonics-cuda`.
+
+**Gates.**
+- **Gate 1** passed (exit 0).
+- **Gate 3** (`gate3_card.txt`) printed `GATE_ENGINE EQUAL`:
+  - parity on 3 sections;
+  - 24 of 24 sections reproduced;
+  - the lap's read equal byte for byte.
+- **The GPU suites** of both card crates passed: 144 tests in one hold, ending at 21:45 UTC.
+  - `holonics-cuda`: 69 library tests, and 51 in its integration files.
+  - `holonics-engine-cuda`: 24 library tests.
+
+  This covers the October owners that now open the card through `open_hnn` and reach it through the traits.
+
+**Timing** (`timing.txt`). One hold ran a declared warm-up, then control, C3, control, C3, control, C3, on 24 of the line's
+sections. The control is main before C3, the binary of C2.
+
+| Build | Run | Run | Run | Mean |
+|---|---|---|---|---|
+| Control (C2) | 713.4 ms | 713.2 ms | 711.8 ms | 712.8 ms |
+| C3 | 714.3 ms | 713.7 ms | 712.3 ms | 713.4 ms |
+
+The difference is 0.6 ms a section (0.08%), inside the controls' own spread of 1.6 ms, so it is no difference. The plan's guess
+(§8: within the spread) held. Every run's section lines equal the first's.
+
+**A finding for the line.** Laps 7 and 8 of the four-lane line stopped at 2,899 and 2,864 sections, at their projection (2,100 s).
+They ran beside this step's builds, which share the host's cores with the deposit's per-entry loops (#812). Lap 9, with no build
+beside it, ran its 3,000.

@@ -119,7 +119,7 @@ fn occurrence_placement_keeps_repeated_intensity_sites_slices_and_winding_on_cud
         .encode_placed(&vec![0; positions.len()], &placement)
         .unwrap();
     assert_ne!(encoded.advance(1), encoded.advance(2));
-    let card = Card::open(0).expect("a CUDA card with the occurrence-major kernel");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("a CUDA card with the occurrence-major kernel");
     let mut baseline = None;
     for lanes in [Some(1), Some(2), Some(32), None] {
         for chunk in [encoded.len(), 41] {

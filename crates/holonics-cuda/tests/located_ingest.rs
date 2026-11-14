@@ -101,7 +101,7 @@ fn located_ingest_keeps_the_actual_phase_winding_and_offset_counts_across_tiles(
         }),
         "the fixture must exercise a located digit beyond the identity lock fit"
     );
-    let card = Card::open(0).expect("a CUDA card with the HNN kernels built");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("a CUDA card with the HNN kernels built");
     for lanes in [Some(1), Some(2), Some(32), None] {
         // The nonzero high winding is invisible to the phase wire and must survive every
         // receipt. This is an exact interior clock read, not a reset-state surrogate.

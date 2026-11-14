@@ -513,7 +513,10 @@ impl<'c> Publication<'c> {
         loci: Loci,
         previous: Option<&Publication<'c>>,
     ) -> Result<Self, HnnError> {
-        let device = |error: DeviceError| error.into_hnn();
+        fn device(error: impl Into<DeviceError>) -> HnnError {
+            let error: DeviceError = error.into();
+            error.into_hnn()
+        }
         let words = card.alloc::<i64>(loci.words.len()).map_err(device)?;
         let octets = match previous.filter(|previous| previous.loci.layout == loci.layout) {
             Some(previous) => {
