@@ -13,10 +13,10 @@
 //! `FIELD_PROFILE` set, each kernel's launches and time and the run's copies and allocations.
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
-#[path = "../../holonics/examples/solenoidal_alpha.rs"]
-mod exterior;
 
-use holonics_cuda::hnn::{Card, CardField};
+use holonics_engine::field::FieldRealization;
+use holonics_engine_cuda::hnn::card::Card;
+use holonics_engine_cuda::hnn::field::CardField;
 use std::error::Error;
 use std::time::Instant;
 
@@ -63,8 +63,8 @@ fn run(args: &[String]) -> Result<()> {
     println!("FIELD_CARD_OPEN card={} free={} total={} batch_budget={}", opened.census().name, memory.free_bytes, memory.total_bytes, card.budget());
     let started = Instant::now();
     let result = match mode.as_str() {
-        "parity" | "time" => exterior::run_field_parity(&rest[1..], &mut card),
-        "train" => exterior::run_field_with_realization(&rest[1..], &mut card),
+        "parity" => parity_command(&rest[1..], &mut card),
+        "train" => train_command(&rest[1..], &mut card),
         _ => Err("field_pass parity|time|train complete-language COMMAND ARGS…".into()),
     };
     let t = card.times();
@@ -92,7 +92,7 @@ fn run(args: &[String]) -> Result<()> {
     // magnitude's bits and the 0.999 quantile's.
     #[cfg(feature = "ruler-bits")]
     if let Some(h) = card.bits_histograms() {
-        use holonics_cuda::hnn::field::{BITS_BINS, BITS_NAMES, BITS_TICKS};
+        use holonics_engine_cuda::hnn::field::{BITS_BINS, BITS_NAMES, BITS_TICKS};
         for (a, name) in BITS_NAMES.iter().enumerate() {
             for k in 0..BITS_TICKS {
                 let bins = &h[(a * BITS_TICKS + k) * BITS_BINS..(a * BITS_TICKS + k + 1) * BITS_BINS];
@@ -243,11 +243,11 @@ fn yardstick(args: &[String]) -> Result<()> {
 
 /// [measurement; theory, November 12, P51] `field_pass reserve KEY=VALUE…` (a STORE_DECLARATION line's fields: alphabet, lanes, lane_width, heads,
 /// still, modes, contacts, carry, triads, ticks, frames, reach): the reservation of a training region (a return) as its coefficients, a region of `S`
-/// sites, `D` definite, needing `pair S² + site S + region + entry S (near_slots + D) + crowd_site S` octets ([`holonics_cuda::hnn::field::read_octets`],
-/// [`holonics_cuda::hnn::field::skin_octets`]). Host arithmetic, no card.
+/// sites, `D` definite, needing `pair S² + site S + region + entry S (near_slots + D) + crowd_site S` octets ([`holonics_engine_cuda::hnn::field::read_octets`],
+/// [`holonics_engine_cuda::hnn::field::skin_octets`]). Host arithmetic, no card.
 fn reserve(args: &[String]) -> Result<()> {
-    use holonics::hnn::tower::field::FieldDeclaration;
-    use holonics_cuda::hnn::field::{read_octets, skin_octets};
+    use holonics_engine::field::FieldDeclaration;
+    use holonics_engine_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
     let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false };
@@ -258,8 +258,50 @@ fn reserve(args: &[String]) -> Result<()> {
     let region = f1 - pair - site;
     assert_eq!(f(1000), pair * 1_000_000 + site * 1000 + region, "the reservation is quadratic in a region's sites");
     let (_, entry, crowd_site, clock_site) = skin_octets(&d, 0, 0);
-    println!("RESERVE pair={pair} site={site} region={region} entry={entry} crowd_site={crowd_site} clock_site={clock_site} near_slots={}", 2 * (holonics::hnn::tower::field::NEAR - 1));
+    println!("RESERVE pair={pair} site={site} region={region} entry={entry} crowd_site={crowd_site} clock_site={clock_site} near_slots={}", 2 * (holonics_engine::field::NEAR - 1));
     Ok(())
+}
+
+/// The store line's commands through a realization (moved from the store line's dispatch, `complete_language.rs`, by C6 of #603).
+fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+    match args.first().map(String::as_str) {
+        Some("train-store") => athena::store::train(args, realization),
+        Some("read-store") => athena::store::read(args, realization),
+        Some("read-cavity") => athena::store::read_cavity(args, realization),
+        Some("found-opening") => athena::store::found_opening(args),
+        Some("found-mark") => athena::store::found_mark(args),
+        Some("found-lane") => athena::store::found_lane(args),
+        Some("found-level") => athena::store::found_level(args),
+        Some("read-news") => athena::store::read_news(args),
+        Some("read-influence") => athena::store::read_influence(args, realization),
+        Some("read-depth") => athena::store::read_depth(args, realization),
+        Some("read-echo") => athena::store::read_echo(args),
+        Some("read-junction") => athena::store::read_junction(args),
+        Some("read-reach") => athena::store::read_reach(args),
+        Some("read-reaction") => athena::store::read_reaction(args),
+        Some("read-reaction-forms") => athena::store::read_reaction_forms(args),
+        Some("read-mirror") => athena::store::read_mirror(args),
+        Some("read-mirror-strength") => athena::store::read_mirror_strength(args),
+        Some("read-ring") => athena::store::read_ring(args),
+        Some("read-release") => athena::store::read_release(args),
+        Some("read-redraw") => athena::store::read_redraw(args),
+        Some("read-breakdown") => athena::store::read_breakdown(args),
+        Some("read-carried") => athena::store::read_carried(args),
+        Some("read-marked") => athena::store::read_marked(args),
+        Some("read-coherence") => athena::store::read_coherence(args),
+        Some("next-pass") => athena::store::next_pass(args),
+        Some("read-ticks") => athena::store::read_ticks(args, realization),
+        Some("write-store") => athena::store::write(args, realization),
+        _ => Err("a store command is train-store, read-cavity, write-store, found-lane, next-pass or one of the store's readings".into()),
+    }
+}
+
+/// The store line's parity: every read of `train-store`'s sections on the card held against the host's.
+fn parity_command(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
+    match args.first().map(String::as_str) {
+        Some("parity-store") => athena::parity::parity(args, card),
+        _ => Err("the parity command is parity-store".into()),
+    }
 }
 
 fn main() {

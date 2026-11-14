@@ -51,9 +51,9 @@ use std::{
     error::Error,
     io::{Read, Write},
     path::Path,
-    process::{Command, Stdio},
     time::Instant,
 };
+use athena::exterior::sha256;
 
 #[path = "solenoidal_alpha/complete_language.rs"]
 mod complete_language;
@@ -178,30 +178,6 @@ fn interval(value: &ExactInterval) -> String {
         ("lower", rational(&value.lower)),
         ("upper", rational(&value.upper)),
     ])
-}
-fn sha256(bytes: &[u8]) -> Result<String> {
-    // SHA belongs to exterior artifact provenance. No checksum enters a native relation.
-    let mut process = Command::new("sha256sum")
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .spawn()?;
-    let mut input = process.stdin.take().ok_or("sha256sum stdin unavailable")?;
-    std::thread::scope(|scope| -> Result<String> {
-        let writer = scope.spawn(move || input.write_all(bytes));
-        let output = process.wait_with_output()?;
-        writer.join().map_err(|_| "sha256 writer failed")??;
-        if !output.status.success() {
-            return Err("sha256sum failed".into());
-        }
-        let digest = std::str::from_utf8(&output.stdout)?
-            .split_whitespace()
-            .next()
-            .ok_or("missing SHA256")?;
-        if digest.len() != 64 || !digest.bytes().all(|c| c.is_ascii_hexdigit()) {
-            return Err("invalid SHA256 output".into());
-        }
-        Ok(digest.to_owned())
-    })
 }
 fn digits(bytes: &[u8]) -> Vec<usize> {
     Base4Bytes::encode(bytes)

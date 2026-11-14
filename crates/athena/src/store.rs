@@ -10,14 +10,17 @@
 //! lap's sites for 0.018 of its compared places. Why one state a stretch (§4 item 2): a pass over fresh text meets a new stretch at every draw,
 //! and a second state of the same bytes buys less than the next stretch does. Why a declared section (§4 item 3): a section is the unit a
 //! deposit consumes, so its extent is law and is carried in the state; a section read from the device's free memory would let the bits follow
-//! the schedule. Why the letters at a crossing (§4 item 4, [`holonics::hnn::tower::field::Field::lettered`]): the codec held only the code
+//! the schedule. Why the letters at a crossing (§4 item 4, [`holonics_engine::field::Field::lettered`]): the codec held only the code
 //! passage's bytes and refused every other.
 
 use holonics_engine::codec::FieldCodec;
 use holonics_engine::passage::{held_out, mix};
 use holonics_engine::region::{views_of, TrainRegion};
-use super::*;
-use holonics::hnn::tower::field::{level_declaration, level_split, octave_of, FieldLearner, FieldRealization, MaterialMean, PassSlice, StorePass, LEVEL_HARMONICS, NEAR};
+use crate::exterior::*;
+use holonics_engine::codec::count;
+use std::io::Read;
+use std::path::Path;
+use holonics_engine::field::{level_declaration, level_split, octave_of, FieldLearner, FieldRealization, MaterialMean, PassSlice, StorePass, LEVEL_HARMONICS, NEAR};
 use std::collections::HashMap;
 use std::io::{BufRead, Seek, SeekFrom};
 use holonics_engine::passage::{Cut, Kind, Piece, PieceBytes, Slice, Stretch, held_set};
@@ -179,7 +182,7 @@ fn counters_text(realization: &dyn FieldRealization) -> String {
 /// codec extended by the fresh ones in byte order (`field-codec-v3`, written as `OUT/CODEC`), the learner grown by as many letters
 /// ([`FieldLearner::lettered`]), the yardstick read again (`at=after`), the pass set at the store's start with its law (the octaves of a
 /// stretch's draws, the section's bounds) and `OUT/STATE.0` saved. A continued learner (with its pass) reads on from its place.
-pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 18 {
         return Err("train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA".into());
     }
@@ -405,9 +408,9 @@ pub(super) fn train(args: &[String], realization: &mut dyn FieldRealization) -> 
             format!("{}.{}", tenths / 10, tenths % 10)
         };
         // [measurement; theory, November 13, P58 item 4] The deposit's parts (`SECTION_PARTS`).
-        let parts: Vec<String> = holonics::hnn::tower::field::SECTION_PARTS
+        let parts: Vec<String> = holonics_engine::field::SECTION_PARTS
             .iter()
-            .zip(holonics::hnn::tower::field::SECTION_PART_NAMES)
+            .zip(holonics_engine::field::SECTION_PART_NAMES)
             .map(|(p, name)| format!("{name}_ms={}", ms(u128::from(p.load(std::sync::atomic::Ordering::Relaxed)))))
             .collect();
         println!("STORE_DEPOSIT_PARTS sections={done} {}", parts.join(" "));
@@ -455,7 +458,7 @@ fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<(String, St
 
 /// A region's code over its unresolved places on the codes' own grain (`2^(−20)` bits), beside the count of those places: the sum of
 /// `face.code(class)`, as [`held_out`] reads a face.
-fn region_code(faces: &[Option<holonics::hnn::tower::TowerFace>], region: &TrainRegion) -> Result<(i64, usize)> {
+fn region_code(faces: &[Option<holonics_engine::inherited::tower::TowerFace>], region: &TrainRegion) -> Result<(i64, usize)> {
     let (mut code, mut places) = (0i64, 0usize);
     for (t, &open) in region.unresolved.iter().enumerate() {
         if open {
@@ -494,7 +497,7 @@ const READ_OCTAVES: usize = 10;
 /// 0), or one of the material's three lines (the source's words kept, the block's `D × D + D` words appended: the material and the first moments
 /// at 0, the second at the means the growth opens them at). Any other changed line, an empty line, or a different count of lines is refused and
 /// nothing is written: a state tool that leaves a line behind trains every part at a rate the law never set (November 11). Reads no realization.
-pub(super) fn found_opening(args: &[String]) -> Result<()> {
+pub fn found_opening(args: &[String]) -> Result<()> {
     if args.len() != 4 {
         return Err("found-opening STATE STATE_SHA OUT".into());
     }
@@ -565,7 +568,7 @@ pub(super) fn found_opening(args: &[String]) -> Result<()> {
 /// line's lane words at zero in the first and at their family's mean in the second); every other line (the level's line, its field's
 /// declaration and material, the parts, the pass) is equal. Anything else is refused and nothing is written (November 11: a state tool that
 /// left a line behind). Reads no realization: that every face is kept is read on the card by the line's own held read of the founded state.
-pub(super) fn found_lane(args: &[String]) -> Result<()> {
+pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());
     }
@@ -649,7 +652,7 @@ pub(super) fn found_lane(args: &[String]) -> Result<()> {
 /// words, the three strengths at `0`, then the level's and the glue's words as they stood, since the strengths follow the fine field's
 /// material); or the parts line (the source's octaves and the mark's at `0`). Any other changed line, an empty line, or a different count of
 /// lines is refused and nothing is written (November 11: a state tool that left a line behind). Reads no realization.
-pub(super) fn found_mark(args: &[String]) -> Result<()> {
+pub fn found_mark(args: &[String]) -> Result<()> {
     if args.len() != 4 {
         return Err("found-mark STATE STATE_SHA OUT".into());
     }
@@ -665,7 +668,7 @@ pub(super) fn found_mark(args: &[String]) -> Result<()> {
     }
     let founded = learner.with_mark().map_err(|e| e.to_string())?;
     let fine = learner.field.layout().len;
-    if founded.field.layout().mark != fine || founded.field.material_len() != learner.field.material_len() + holonics::hnn::tower::field::MARK_BASES {
+    if founded.field.layout().mark != fine || founded.field.material_len() != learner.field.material_len() + holonics_engine::field::MARK_BASES {
         return Err("a founding whose strengths do not follow the fine field's material".into());
     }
     let (a, b) = (learner.to_text(), founded.to_text());
@@ -721,7 +724,7 @@ pub(super) fn found_mark(args: &[String]) -> Result<()> {
 /// material, the glue); the two moment lines keep the source's words and append the level's entries at zero; every other line (the parts,
 /// the rates, the pass) is equal. Anything else is refused and nothing is written (November 11: a state tool that left a line behind).
 /// Reads no realization.
-pub(super) fn found_level(args: &[String]) -> Result<()> {
+pub fn found_level(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-level STATE STATE_SHA KEYS KEYS_SHA OUT".into());
     }
@@ -790,7 +793,7 @@ pub(super) fn found_level(args: &[String]) -> Result<()> {
 /// a place (numbers only): the slice, the place's class, and for every stage the code of its class and the face's expected code, both on
 /// `2^(−20)` bits; `OUT/charts.bin` its charts by stage (`TICKS + 1` rows of `D` little-endian 32-bit words a place, in the rows' order). The
 /// output directory is private.
-pub(super) fn read_depth(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read_depth(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 14 {
         return Err("read-depth UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES TICKS STATE STATE_SHA OUT".into());
     }
@@ -828,8 +831,8 @@ pub(super) fn read_depth(args: &[String], realization: &mut dyn FieldRealization
     let stages = ticks + 1;
     writeln!(tsv, "slice\tclass{}", (0..stages).map(|k| format!("\tcode{k}\tentropy{k}")).collect::<String>())?;
     println!("DEPTH_LAW role=held places={places} ticks={ticks} declared_ticks={} level={} ms={}", learner.field.declaration.ticks, field.scale.is_some(), started.elapsed().as_millis());
-    let expected = |f: &holonics::hnn::tower::TowerFace| -> i64 {
-        let sum: i128 = f.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, f.total) as i128).sum();
+    let expected = |f: &holonics_engine::inherited::tower::TowerFace| -> i64 {
+        let sum: i128 = f.masses.iter().map(|&m| m as i128 * holonics_engine::inherited::tower::face_code(m, f.total) as i128).sum();
         let total = (f.total as i128).max(1);
         ((2 * sum + total) / (2 * total)) as i64
     };
@@ -894,10 +897,10 @@ pub(super) fn read_depth(args: &[String], realization: &mut dyn FieldRealization
 /// constitution names (`Γ* = B/(1 − B)`, `ℓ* = −log₂(1 − 2B)`). Each slice of the held role is cut as `read-depth` cuts it, whole stretches until
 /// `PLACES` places, and each stretch is read twice on the host from the saved state: with the mask the cut drew (`mask 0`) and with its middle
 /// place alone open (`mask 1`). `OUT/echo.tsv` holds a line a row (numbers only): the slice's index, the mask, the read kind, the head, whether
-/// the row is written, and its `B` on `2^(−63)` ([`holonics::hnn::tower::field::Field::echo_by_head`]); `OUT/heads.tsv` a line a row with its
-/// round trips across heads, `B[h][h′]` in order ([`holonics::hnn::tower::field::Field::echo_across_heads`], the theory thread's item (c) after
+/// the row is written, and its `B` on `2^(−63)` ([`holonics_engine::field::Field::echo_by_head`]); `OUT/heads.tsv` a line a row with its
+/// round trips across heads, `B[h][h′]` in order ([`holonics_engine::field::Field::echo_across_heads`], the theory thread's item (c) after
 /// G151), whose diagonal is `echo.tsv`'s. The output directory is private.
-pub(super) fn read_echo(args: &[String]) -> Result<()> {
+pub fn read_echo(args: &[String]) -> Result<()> {
     if args.len() != 13 {
         return Err("read-echo UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT".into());
     }
@@ -994,14 +997,14 @@ pub(super) fn read_echo(args: &[String]) -> Result<()> {
 /// [measurement; theory, November 13, the junction record §9 and the theory thread's order after G151, item (a); G152] `read-junction UNITS
 /// UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]`: **the return's founding covector**, a reading of what a
 /// first deposit of the junction's return would see. The state's field is grown by the return at its founding in memory
-/// ([`holonics::hnn::tower::field::Field::with_junction`]; `Γ = 0`, so every face and the reverse are the state's own), and each slice of `ROLE`
+/// ([`holonics_engine::field::Field::with_junction`]; `Γ = 0`, so every face and the reverse are the state's own), and each slice of `ROLE`
 /// (`held` where it is not given; `prefix`, the training documents from each slice's first piece, reads seen material: the theory thread's first
 /// caution after G152, G155) is cut as `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open).
 /// `OUT/junction.tsv` holds a line a row and tick with a return (numbers only): the slice's index, the mask, the read kind, the tick, whether the
 /// row is written, the region's open places and the row's `δℓ` (`Field::junction_covectors`). `OUT/coords.tsv` holds, for each slice, mask, tick,
 /// kind of row and coordinate `i` of the tick's opening chart, `Σ δℓ r̂_i` and `Σ |δℓ r̂_i|` (the chart `L`'s covector and its magnitude). The output
 /// directory is private.
-pub(super) fn read_junction(args: &[String]) -> Result<()> {
+pub fn read_junction(args: &[String]) -> Result<()> {
     if args.len() != 13 && args.len() != 14 {
         return Err("read-junction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
     }
@@ -1113,11 +1116,11 @@ pub(super) fn read_junction(args: &[String]) -> Result<()> {
 
 /// [measurement; theory, November 13, the junction record §13.9; G157] `read-reach UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA
 /// PLACES STATE STATE_SHA OUT ROLE`: **a turned head's reach on its own clock, read at its founding** from the state's own passes
-/// ([`holonics::hnn::tower::field::Field::reach_covectors`]): each slice of `ROLE` (`held`, or `prefix` for the training documents) cut as
+/// ([`holonics_engine::field::Field::reach_covectors`]): each slice of `ROLE` (`held`, or `prefix` for the training documents) cut as
 /// `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open). `OUT/reach.tsv` holds
-/// a line a slice, mask, tick, head and kind of receiver (numbers only): the rows and the [`holonics::hnn::tower::field::ReachSums`] words. The
+/// a line a slice, mask, tick, head and kind of receiver (numbers only): the rows and the [`holonics_engine::field::ReachSums`] words. The
 /// output directory is private.
-pub(super) fn read_reach(args: &[String]) -> Result<()> {
+pub fn read_reach(args: &[String]) -> Result<()> {
     if args.len() != 14 {
         return Err("read-reach UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
     }
@@ -1166,7 +1169,7 @@ pub(super) fn read_reach(args: &[String]) -> Result<()> {
             stretches.push(stretch.region);
         }
         let slice_start = std::time::Instant::now();
-        type Read = Vec<(usize, Vec<Vec<[holonics::hnn::tower::field::ReachSums; 2]>>)>;
+        type Read = Vec<(usize, Vec<Vec<[holonics_engine::field::ReachSums; 2]>>)>;
         let reads: Vec<std::result::Result<Read, String>> = stretches
             .par_iter()
             .map(|region| {
@@ -1184,7 +1187,7 @@ pub(super) fn read_reach(args: &[String]) -> Result<()> {
                     .collect()
             })
             .collect();
-        let mut sums = vec![vec![vec![[holonics::hnn::tower::field::ReachSums::default(); 2]; d.heads]; d.ticks]; 2];
+        let mut sums = vec![vec![vec![[holonics_engine::field::ReachSums::default(); 2]; d.heads]; d.ticks]; 2];
         for read in reads {
             for (mask, by_tick) in read? {
                 for (k, by_head) in by_tick.iter().enumerate() {
@@ -1216,11 +1219,11 @@ pub(super) fn read_reach(args: &[String]) -> Result<()> {
 
 /// [measurement; theory, November 13, the junction record §13.8; G158] `read-reaction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA
 /// PLACES STATE STATE_SHA OUT ROLE`: **the reader's reaction on its source, read at its founding** from the state's own passes
-/// ([`holonics::hnn::tower::field::Field::reaction_covectors`]): each slice of `ROLE` (`held`, or `prefix` for the training documents) cut as
+/// ([`holonics_engine::field::Field::reaction_covectors`]): each slice of `ROLE` (`held`, or `prefix` for the training documents) cut as
 /// `read-echo` cuts it, every stretch read on the host twice (`mask 0` the cut's own, `mask 1` its middle place alone open). `OUT/reaction.tsv`
-/// holds a line a slice, mask, tick, head and kind of reader (numbers only): the [`holonics::hnn::tower::field::ReactionSums`] words. The
+/// holds a line a slice, mask, tick, head and kind of reader (numbers only): the [`holonics_engine::field::ReactionSums`] words. The
 /// output directory is private.
-pub(super) fn read_reaction(args: &[String]) -> Result<()> {
+pub fn read_reaction(args: &[String]) -> Result<()> {
     if args.len() != 14 {
         return Err("read-reaction UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
     }
@@ -1269,7 +1272,7 @@ pub(super) fn read_reaction(args: &[String]) -> Result<()> {
             stretches.push(stretch.region);
         }
         let slice_start = std::time::Instant::now();
-        type Read = Vec<(usize, Vec<Vec<[holonics::hnn::tower::field::ReactionSums; 2]>>)>;
+        type Read = Vec<(usize, Vec<Vec<[holonics_engine::field::ReactionSums; 2]>>)>;
         let reads: Vec<std::result::Result<Read, String>> = stretches
             .par_iter()
             .map(|region| {
@@ -1287,7 +1290,7 @@ pub(super) fn read_reaction(args: &[String]) -> Result<()> {
                     .collect()
             })
             .collect();
-        let mut sums = vec![vec![vec![[holonics::hnn::tower::field::ReactionSums::default(); 2]; d.heads]; d.ticks]; 2];
+        let mut sums = vec![vec![vec![[holonics_engine::field::ReactionSums::default(); 2]; d.heads]; d.ticks]; 2];
         for read in reads {
             for (mask, by_tick) in read? {
                 for (k, by_head) in by_tick.iter().enumerate() {
@@ -1319,11 +1322,11 @@ pub(super) fn read_reaction(args: &[String]) -> Result<()> {
 
 /// [measurement; theory, November 13, the theory thread's answers of 20:20Z; G159] `read-reaction-forms UNITS UNITS_SHA STORE STORE_SHA KEYS
 /// KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE`: **the reader's reaction's forms at its founding**
-/// ([`holonics::hnn::tower::field::Field::reaction_forms`]), each slice of `ROLE` cut as `read-reaction` cuts it, both masks. `OUT/forms.tsv`
+/// ([`holonics_engine::field::Field::reaction_forms`]), each slice of `ROLE` cut as `read-reaction` cuts it, both masks. `OUT/forms.tsv`
 /// holds a line a slice, mask, tick and head (numbers only): the sources, the readers, the route's and the pair decomposition's sums, the
 /// sources agreeing in sign, and the metric-raised strength's sum, magnitude and squares; `OUT/charts.tsv` a line a slice, mask, tick, head,
 /// chart (0 the source's, 1 the reader's) and coordinate with its sum and magnitude. The output directory is private.
-pub(super) fn read_reaction_forms(args: &[String]) -> Result<()> {
+pub fn read_reaction_forms(args: &[String]) -> Result<()> {
     if args.len() != 14 {
         return Err("read-reaction-forms UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
     }
@@ -1374,7 +1377,7 @@ pub(super) fn read_reaction_forms(args: &[String]) -> Result<()> {
             stretches.push(stretch.region);
         }
         let slice_start = std::time::Instant::now();
-        type Read = Vec<(usize, Vec<Vec<holonics::hnn::tower::field::ReactionForms>>)>;
+        type Read = Vec<(usize, Vec<Vec<holonics_engine::field::ReactionForms>>)>;
         let reads: Vec<std::result::Result<Read, String>> = stretches
             .par_iter()
             .map(|region| {
@@ -1393,8 +1396,8 @@ pub(super) fn read_reaction_forms(args: &[String]) -> Result<()> {
             })
             .collect();
         let dw = d.width;
-        let blank = || holonics::hnn::tower::field::ReactionForms { src: vec![(0, 0); dw], rdr: vec![(0, 0); dw], ..Default::default() };
-        let mut sums: Vec<Vec<Vec<holonics::hnn::tower::field::ReactionForms>>> = (0..2).map(|_| (0..d.ticks).map(|_| (0..d.heads).map(|_| blank()).collect()).collect()).collect();
+        let blank = || holonics_engine::field::ReactionForms { src: vec![(0, 0); dw], rdr: vec![(0, 0); dw], ..Default::default() };
+        let mut sums: Vec<Vec<Vec<holonics_engine::field::ReactionForms>>> = (0..2).map(|_| (0..d.ticks).map(|_| (0..d.heads).map(|_| blank()).collect()).collect()).collect();
         for read in reads {
             for (mask, by_tick) in read? {
                 for (k, by_head) in by_tick.iter().enumerate() {
@@ -1433,11 +1436,11 @@ pub(super) fn read_reaction_forms(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; agent-inferred, November 13; G160] `read-mirror UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT
-/// ROLE`: **the read's mirror at its founding** ([`holonics::hnn::tower::field::Field::mirror_covectors`]), each slice of `ROLE` cut as `read-reaction`
+/// ROLE`: **the read's mirror at its founding** ([`holonics_engine::field::Field::mirror_covectors`]), each slice of `ROLE` cut as `read-reaction`
 /// cuts it, both masks. `OUT/mirror.tsv` holds a line a slice, mask, tick, head and kind of reader (0 open, 1 written, 2 both; numbers only): the
 /// region's open places summed, the sources, the sums of `a_j`, in magnitude and squared, the audience and the lanes' powers; `OUT/chart.tsv` a line
 /// a slice, mask, tick, head and coordinate of the source's ray with its sum and magnitude. The output directory is private.
-pub(super) fn read_mirror(args: &[String]) -> Result<()> {
+pub fn read_mirror(args: &[String]) -> Result<()> {
     if args.len() != 14 {
         return Err("read-mirror UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
     }
@@ -1488,7 +1491,7 @@ pub(super) fn read_mirror(args: &[String]) -> Result<()> {
             stretches.push(stretch.region);
         }
         let slice_start = std::time::Instant::now();
-        type Read = Vec<(usize, usize, Vec<Vec<[holonics::hnn::tower::field::MirrorSums; 3]>>)>;
+        type Read = Vec<(usize, usize, Vec<Vec<[holonics_engine::field::MirrorSums; 3]>>)>;
         let reads: Vec<std::result::Result<Read, String>> = stretches
             .par_iter()
             .map(|region| {
@@ -1508,7 +1511,7 @@ pub(super) fn read_mirror(args: &[String]) -> Result<()> {
             })
             .collect();
         let dw = d.width;
-        let mut sums: Vec<Vec<Vec<[holonics::hnn::tower::field::MirrorSums; 3]>>> = (0..2).map(|_| (0..d.ticks).map(|_| (0..d.heads).map(|_| Default::default()).collect()).collect()).collect();
+        let mut sums: Vec<Vec<Vec<[holonics_engine::field::MirrorSums; 3]>>> = (0..2).map(|_| (0..d.ticks).map(|_| (0..d.heads).map(|_| Default::default()).collect()).collect()).collect();
         let mut open_places = [0usize; 2];
         for read in reads {
             for (mask, open, by_tick) in read? {
@@ -1556,10 +1559,10 @@ pub(super) fn read_mirror(args: &[String]) -> Result<()> {
 /// [measurement; agent-inferred, November 13; G161] `read-mirror-strength UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE
 /// STATE_SHA OUT ROLE`: **the read's mirror at finite strength**, a reading of the state: each slice of `ROLE` cut as `read-mirror` cuts it, both
 /// masks, each region coded on the host with the mirror off and with it at one head's uniform strength `s ∈ {−0.2, −0.1, −0.05, +0.05, +0.1}`
-/// ([`holonics::hnn::tower::field::Field::mirror_strength`], the forward only). `OUT/strength.tsv` holds a line a slice, mask, head and strength
+/// ([`holonics_engine::field::Field::mirror_strength`], the forward only). `OUT/strength.tsv` holds a line a slice, mask, head and strength
 /// (`s` on `2^(−16)`; head and strength zero for the mirror off): the regions' open places and their code on `2^(−20)` bits summed. The output
 /// directory is private.
-pub(super) fn read_mirror_strength(args: &[String]) -> Result<()> {
+pub fn read_mirror_strength(args: &[String]) -> Result<()> {
     if args.len() != 14 {
         return Err("read-mirror-strength UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE".into());
     }
@@ -1596,7 +1599,7 @@ pub(super) fn read_mirror_strength(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     // The strengths on `2^(−16)`: −0.2, −0.1, −0.05, +0.05 and +0.1 to the nearest.
     let strengths: [i64; 5] = [-13107, -6554, -3277, 3277, 6554];
-    let mut fields: Vec<(usize, i64, holonics::hnn::tower::field::Field)> = vec![(0, 0, learner.field.clone())];
+    let mut fields: Vec<(usize, i64, holonics_engine::field::Field)> = vec![(0, 0, learner.field.clone())];
     for h in 0..heads {
         for &st in &strengths {
             let mut f = learner.field.clone();
@@ -1657,11 +1660,11 @@ pub(super) fn read_mirror_strength(args: &[String]) -> Result<()> {
 
 /// [measurement; agent-inferred, November 13; G162] `read-ring UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT
 /// ROLE TICKS STRENGTH`: **the free ring on the host, with the read's mirror at a uniform strength in every head** (`STRENGTH` a signed count on
-/// `2^(−16)`, zero for the built tick; [`holonics::hnn::tower::field::Field::free_ring`]), the field run to `TICKS` ticks. Each slice of `ROLE`
+/// `2^(−16)`, zero for the built tick; [`holonics_engine::field::Field::free_ring`]), the field run to `TICKS` ticks. Each slice of `ROLE`
 /// cut as `read-mirror` cuts it, eight places of each stretch, spread evenly, each opened alone. `OUT/ring.tsv` holds a line a slice and stage
 /// (numbers only): the places, the code and expected code on `2^(−20)` bits, and the charts' change norm and successive pairing. The output
 /// directory is private.
-pub(super) fn read_ring(args: &[String]) -> Result<()> {
+pub fn read_ring(args: &[String]) -> Result<()> {
     if args.len() != 16 {
         return Err("read-ring UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE TICKS STRENGTH".into());
     }
@@ -1724,14 +1727,14 @@ pub(super) fn read_ring(args: &[String]) -> Result<()> {
             }
         }
         let slice_start = std::time::Instant::now();
-        let reads: Vec<std::result::Result<Vec<holonics::hnn::tower::field::RingStage>, String>> = regions
+        let reads: Vec<std::result::Result<Vec<holonics_engine::field::RingStage>, String>> = regions
             .par_iter()
             .map(|r| {
                 let views = views_of(std::slice::from_ref(r));
                 field.free_ring(&views[0]).map_err(|e| e.to_string())
             })
             .collect();
-        let mut sums = vec![holonics::hnn::tower::field::RingStage::default(); ticks];
+        let mut sums = vec![holonics_engine::field::RingStage::default(); ticks];
         for read in reads {
             for (a, st) in sums.iter_mut().zip(read?) {
                 (a.places, a.code, a.expected, a.norm, a.inner) = (a.places + st.places, a.code + st.code, a.expected + st.expected, a.norm + st.norm, a.inner + st.inner);
@@ -1750,13 +1753,13 @@ pub(super) fn read_ring(args: &[String]) -> Result<()> {
 /// [measurement; agent-inferred, November 13; G163] `read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA
 /// OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE [SNAP]]]`: **the field's own release returned at a lag**, a reading of the reafference loop the junction record's §8
 /// item 3 names: a region read `PASSES` times, each pass after the first opening every open place on its face from the pass before (a carried
-/// face, [`holonics::hnn::tower::field::shares`]), with `LOCKED` 1 also making those places sources at their faces (a lock, so the open places
+/// face, [`holonics_engine::field::shares`]), with `LOCKED` 1 also making those places sources at their faces (a lock, so the open places
 /// hear one another's releases), 0 leaving them silent. `MASK` 0 reads the cut's own masks, 1 a stretch's middle place alone. `DAMP` 1 (G164)
 /// carries the mean of the face before and the face the pass gave, each class's share on `2^(−16)` to the nearest, in place of the face alone. Each slice of
 /// `ROLE` cut as `read-mirror` cuts it. `OUT/release.tsv` holds a line a slice and pass (numbers only): the open places, their code and expected
 /// code on `2^(−20)` bits summed, and the faces' change from the pass before (`Σ |Δw|²` over classes on `2^(−32)`) with its pairing with the change
 /// before that. The output directory is private.
-pub(super) fn read_release(args: &[String]) -> Result<()> {
+pub fn read_release(args: &[String]) -> Result<()> {
     if !(17..=20).contains(&args.len()) {
         return Err("read-release UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT ROLE PASSES LOCKED MASK [DAMP [EVIDENCE [SNAP]]]".into());
     }
@@ -1865,13 +1868,13 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
                     let written_places = if evidence { (0..n).filter(|&t| !base.unresolved[t]).count() as u64 } else { 0 };
                     let (mut code, mut expected) = (0i128, 0i128);
                     let mut dense = vec![0i64; open.len() * a];
-                    let mut carried: Vec<Option<holonics::hnn::tower::field::Shares>> = vec![None; n];
+                    let mut carried: Vec<Option<holonics_engine::field::Shares>> = vec![None; n];
                     for (k, &t) in open.iter().enumerate() {
                         let face = faces[t].as_ref().ok_or("an open place with no face")?;
                         code += i128::from(face.code(base.classes[t]));
-                        let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
+                        let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics_engine::inherited::tower::face_code(m, face.total) as i128).sum();
                         expected += sum / (face.total as i128).max(1);
-                        let sh = holonics::hnn::tower::field::shares(face);
+                        let sh = holonics_engine::field::shares(face);
                         for &(c, w) in &sh {
                             dense[k * a + c as usize] = i64::from(w);
                         }
@@ -1941,7 +1944,7 @@ pub(super) fn read_release(args: &[String]) -> Result<()> {
 /// the passage's class's code on each place's faces averaged over the sweeps so far (its draws' average, the field's recursion read as a mean of its own
 /// reads); the field's code of each place's last draw on its new face (its surprise at its own release); and the places whose face gives one
 /// class at least half and that class is not the passage's (confident against the passage; Brandon, November 14: nothing a release does is wrong). The output directory is private.
-pub(super) fn read_redraw(args: &[String]) -> Result<()> {
+pub fn read_redraw(args: &[String]) -> Result<()> {
     redraw_with(args, false)
 }
 
@@ -1955,7 +1958,7 @@ pub(super) fn read_redraw(args: &[String]) -> Result<()> {
 /// release contradicts what the passage holds (Brandon, November 13 22:33Z). The copy is dropped with the region; the state's bytes are
 /// unchanged. `OUT/redraw.tsv` adds, a slice and sweep, the opened written places, their code before the step (the section's own, on
 /// `2^(−20)` bits) and the sections that deposited.
-pub(super) fn read_breakdown(args: &[String]) -> Result<()> {
+pub fn read_breakdown(args: &[String]) -> Result<()> {
     redraw_with(args, true)
 }
 
@@ -2013,7 +2016,7 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
     // confident_against, evidence_places, evidence_code, deposited).
     type Stage = [i128; 15];
     // A face's class drawn by `key`: against its masses (the face the field forms), or its top (the ruler).
-    let draw = |face: &holonics::hnn::tower::TowerFace, key: u128| -> usize {
+    let draw = |face: &holonics_engine::inherited::tower::TowerFace, key: u128| -> usize {
         if !drawn_at_one {
             let top = face.masses.iter().copied().max().unwrap_or(0);
             return face.masses.iter().position(|&m| m == top).unwrap_or(0);
@@ -2100,7 +2103,7 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
                             let face = faces[t].as_ref().ok_or("an open place with no face")?;
                             let held = base.classes[t];
                             st[1] += i128::from(face.code(held));
-                            let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
+                            let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics_engine::inherited::tower::face_code(m, face.total) as i128).sum();
                             st[2] += sum / (face.total as i128).max(1);
                             let top = face.masses.iter().copied().max().unwrap_or(0);
                             if 2 * top >= face.total && face.masses[held] != top {
@@ -2122,7 +2125,7 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
                         st[4] += i128::from(changed[t]);
                         if sweep > 0 {
                             let total: u128 = sums[t].iter().sum();
-                            st[9] += i128::from(holonics::hnn::tower::face_code(sums[t][base.classes[t]].max(1), total.max(1)));
+                            st[9] += i128::from(holonics_engine::inherited::tower::face_code(sums[t][base.classes[t]].max(1), total.max(1)));
                         }
                     }
                     if sweep == 0 {
@@ -2194,21 +2197,21 @@ fn redraw_with(args: &[String], deposit: bool) -> Result<()> {
 
 /// [measurement; agent-inferred, November 13; G175] `read-carried UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE
 /// STATE_SHA OUT ROLE`: **the release carried as a face, at its founding** (the ring record's §4 first reading). Each region of the cut's masks
-/// is read once (the built read), and [`holonics::hnn::tower::field::Field::carried_slopes`] reads, at every site, the region's comparison's
+/// is read once (the built read), and [`holonics_engine::field::Field::carried_slopes`] reads, at every site, the region's comparison's
 /// covector at the opening against the change the opening would take were each open place's row to move toward the face that read gave it, at
 /// strength `α`: `d(code)/dα` at `α = 0`, the opening's part (the carried place's voice is not read). `OUT/carried.tsv` holds a line a slice
 /// (numbers only): the regions, the open places, and over the sites the sum of `r_t`, of `|r_t|`, of `(|r_t| >> 32)²` (the random-sign
 /// floor's square), split into open and written sites. The output directory is private.
-pub(super) fn read_carried(args: &[String]) -> Result<()> {
+pub fn read_carried(args: &[String]) -> Result<()> {
     carried_with(args, false)
 }
 
 /// [measurement; agent-inferred, November 13; G176] `read-marked` (the arguments of `read-carried`): **the carried release's opening part along
 /// its strength**, a ruler: each region's built read, then the same region read with every open place's opening marked by the face that read
-/// gave it at strength `α` ([`holonics::hnn::tower::field::Field::mark`]: `α` 0, `2^(−6)`, `2^(−4)`, `2^(−3)`, `2^(−2)`, `2^(−1)`, 1 and 2), the
+/// gave it at strength `α` ([`holonics_engine::field::Field::mark`]: `α` 0, `2^(−6)`, `2^(−4)`, `2^(−3)`, `2^(−2)`, `2^(−1)`, 1 and 2), the
 /// places silent otherwise. `OUT/marked.tsv` holds a line a slice and strength: the open places, their code and expected code on `2^(−20)`
 /// bits summed. The output directory is private.
-pub(super) fn read_marked(args: &[String]) -> Result<()> {
+pub fn read_marked(args: &[String]) -> Result<()> {
     carried_with(args, true)
 }
 
@@ -2271,7 +2274,7 @@ fn carried_with(args: &[String], marked: bool) -> Result<()> {
                 .map(|region| {
                     let views = views_of(std::slice::from_ref(region));
                     let built = learner.field.faces(&views[0]).map_err(|e| e.to_string())?;
-                    let marks: Vec<Option<holonics::hnn::tower::field::Shares>> = built.iter().enumerate().map(|(t, f)| f.as_ref().filter(|_| region.unresolved[t]).map(holonics::hnn::tower::field::shares)).collect();
+                    let marks: Vec<Option<holonics_engine::field::Shares>> = built.iter().enumerate().map(|(t, f)| f.as_ref().filter(|_| region.unresolved[t]).map(holonics_engine::field::shares)).collect();
                     let mut field = learner.field.clone();
                     let mut rows = Vec::with_capacity(STRENGTHS.len());
                     for &alpha in &STRENGTHS {
@@ -2282,7 +2285,7 @@ fn carried_with(args: &[String], marked: bool) -> Result<()> {
                             let face = faces[t].as_ref().ok_or("an open place with no face")?;
                             st[0] += 1;
                             st[1] += i128::from(face.code(region.classes[t]));
-                            let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics::hnn::tower::face_code(m, face.total) as i128).sum();
+                            let sum: i128 = face.masses.iter().map(|&m| m as i128 * holonics_engine::inherited::tower::face_code(m, face.total) as i128).sum();
                             st[2] += sum / (face.total as i128).max(1);
                         }
                         rows.push(st);
@@ -2342,7 +2345,7 @@ fn carried_with(args: &[String], marked: bool) -> Result<()> {
 /// every other line of the state byte for byte. Refused where the state's pass has not ended (a slice short of its last piece). The written state
 /// is read back and checked: its every line but the pass line equal to the source's. Why: the line's first pass over the store's training
 /// documents ended at lap 6 (November 13), and a second pass is the same law over the same passage at new states.
-pub(super) fn next_pass(args: &[String]) -> Result<()> {
+pub fn next_pass(args: &[String]) -> Result<()> {
     if args.len() != 4 {
         return Err("next-pass STATE STATE_SHA OUT".into());
     }
@@ -2378,11 +2381,11 @@ pub(super) fn next_pass(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; agent-inferred, November 13; G165] `read-coherence STATE STATE_SHA`: **each family's step coherence in a saved state**
-/// ([`holonics::hnn::tower::field::FieldLearner::step_coherence`]: `Σ |m| / Σ √v` of the deposit's two moments over the family, near one where
+/// ([`holonics_engine::field::FieldLearner::step_coherence`]: `Σ |m| / Σ √v` of the deposit's two moments over the family, near one where
 /// its step keeps its sign from section to section and near zero where its signs cancel), a line a family over the whole material (the fine
 /// field's families named by the layout, a level's coarse and glue families after them by index), with its length. A reading of which parts'
 /// steps are still driven, the parts a growth would be sized from (atlas `radix.register-composition`).
-pub(super) fn read_coherence(args: &[String]) -> Result<()> {
+pub fn read_coherence(args: &[String]) -> Result<()> {
     if args.len() != 3 {
         return Err("read-coherence STATE STATE_SHA".into());
     }
@@ -2413,7 +2416,7 @@ pub(super) fn read_coherence(args: &[String]) -> Result<()> {
 /// the slice, unequal to `a`'s. Each pair is read twice by the realization at the last tick with `b` alone open: as the stretch holds it, and
 /// with `a`'s class replaced. `OUT/influence.tsv` holds a line a pair (numbers only): the slice, `d`, the news strictly between `a` and `b`
 /// (the opening's codes, the level's news law at a written place, on `2^(−20)` bits), `b`'s code both ways. The output directory is private.
-pub(super) fn read_influence(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read_influence(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 13 {
         return Err("read-influence UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PAIRS STATE STATE_SHA OUT".into());
     }
@@ -2556,7 +2559,7 @@ pub(super) fn read_influence(args: &[String], realization: &mut dyn FieldRealiza
 /// over it is the share of a block's news the single places carry), the share of places dark at their cavity (`c1` under a bit) that carry
 /// four bits or more in a pair, and the level's cut on `c1` and on `c2` (offset 0) at the flat face's section: the sites' share, the mean
 /// epoch, the strides of three sections or more with their share of the news, and the sites the two cuts share. Numbers only.
-pub(super) fn read_news(args: &[String]) -> Result<()> {
+pub fn read_news(args: &[String]) -> Result<()> {
     if args.len() != 12 {
         return Err("read-news UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA".into());
     }
@@ -2577,7 +2580,7 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
     if learner.field.declaration.alphabet != codec.alphabet() || !learner.field.declaration.opening {
         return Err("a state whose alphabet is not its codec's, or without the opening's block".into());
     }
-    let section = holonics::hnn::tower::field::level_section(codec.alphabet());
+    let section = holonics_engine::field::level_section(codec.alphabet());
     let bit = 1i64 << 20;
     println!("NEWS_LAW role=held places={places} section={section} ms={}", started.elapsed().as_millis());
     use rayon::prelude::*;
@@ -2592,7 +2595,7 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
     };
     // The cut's readings on one stretch's news: (sites, strides of three sections or more, their news, the news).
     let cut_of = |news: &[i64]| -> (Vec<usize>, usize, i128, i128) {
-        let anchors = holonics::hnn::tower::field::level_anchors(news, section);
+        let anchors = holonics_engine::field::level_anchors(news, section);
         let mut sum = vec![0i128; news.len() + 1];
         for (t, &c) in news.iter().enumerate() {
             sum[t + 1] = sum[t] + c as i128;
@@ -2695,7 +2698,7 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
 /// same reading on the documents the line trains on, G187). Each slice of the held role, alone and in the
 /// store's order, is cut afresh from stretch 1 with the key file's seed (as `read-store` cuts it), whole stretches until at least `PLACES` places.
 /// For each place `t` of a stretch: the stretch as a region with every place written but `t`; `c0`, the face at the built opening with no tick
-/// ([`holonics::hnn::tower::field::Field::opening_face`], on the host) at `t`'s written class; `cK`, the face after the declared ticks by the
+/// ([`holonics_engine::field::Field::opening_face`], on the host) at `t`'s written class; `cK`, the face after the declared ticks by the
 /// realization's read (`read_faces`, the regions batched under the pass's two bounds) at the same class. On the code slice each stretch is also
 /// read with the leading spaces of each line that begins inside it doubled (the copy cut at the stretch's bound of 1,022 places), `c0` at every
 /// place of the copy. Codes are on `2^(−20)` bits. One line a place to `OUT/cavity.tsv` (numbers only); a line a slice with the devices' times.
@@ -2706,7 +2709,7 @@ pub(super) fn read_news(args: &[String]) -> Result<()> {
 /// opening face, `cK` against the realization's face). The charts go to `OUT/words.bin` (the place rows' order, five stages of 64 little-endian
 /// 32-bit words a place). The same is read at the open places of each slice's whole masks, as `read-store` cuts them (rows `W`,
 /// `OUT/words_whole.bin`). The output directory is private: it holds no text, but it is the held passage's places.
-pub(super) fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 13 && args.len() != 14 {
         return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
     }
@@ -3016,7 +3019,7 @@ fn share4(n: u128, d: u128) -> String {
 /// `m_k` the largest magnitude of the site's chart at tick `k`'s opening, `d_k` the largest magnitude of its difference from tick `k − 1`'s; the
 /// histogram of `bit_length(m_k) − bit_length(d_k)` (`d_k = 0` in its own bin) by tick and by the site's kind (open, definite), for the chart and
 /// for the pair contact's chart.
-pub(super) fn read_ticks(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read_ticks(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 13 {
         return Err("read-ticks UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA".into());
     }
@@ -3141,7 +3144,7 @@ pub(super) fn read_ticks(args: &[String], realization: &mut dyn FieldRealization
 /// an open place's distance from the context, and over every writer's state the code at its front place (the first open place of its
 /// order, the place the release draws next) and the count, by that place's octave. Last, once, the code line's yardstick on `HELD`
 /// (`STORE_YARDSTICK at=read`). A reading: the state's bytes are not touched.
-pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 15 {
         return Err("read-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS STATE STATE_SHA".into());
     }
@@ -3300,14 +3303,14 @@ pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> R
 /// [measurement; theory, November 12, P49 item 4] `write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN
 /// OUT STATE STATE_SHA`: **the release from held prompts**. On the store's held role, for each slice in the store's order, its first
 /// `DOCUMENTS` pieces that open their document and hold at least `PROMPT + RUN` places; a problem is the piece's first `PROMPT` places and
-/// `RUN` open places. The release is the tower's as it stands, its law fixed here: [`holonics::hnn::tower::field::Field::sample_runs`] over
+/// `RUN` open places. The release is the tower's as it stands, its law fixed here: [`holonics_engine::field::Field::sample_runs`] over
 /// every problem at once with `sweeps = RUN` (one place a read), `refine = REFINE` (0 where none is given), the codec's void, the key file's seed, `run_bound = 0`, the
 /// near tail, the keyed order within an octave, no given lengths, no one-end draw, a sweep that always goes on and no observer: the store's
 /// writer state run from `k = 0` upward, by octaves of distance from the prompt. `OUT` is created new; each problem writes three files of
 /// raw bytes (`SLICE_NN.prompt`, `SLICE_NN.written`, the codec's decode up to the first void, and `SLICE_NN.reference`, the piece's next
 /// `RUN` places), and one line (`STORE_WRITE`: its slice, its document, the places written before a void and the release's reads); a closing
 /// line holds the card's counters and the time. A reading: the state is not touched.
-pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     if args.len() != 15 && args.len() != 16 {
         return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA [REFINE]".into());
     }
@@ -3388,6 +3391,7 @@ pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use holonics_engine::passage::{cut_of, lengths_of, state_of};
 
     /// [definition; the record §4 item 1] **A stretch's draws and cut are the port's**: the draws stand on the octaves `[4, 8)` to `[256, 512)`,
     /// a stretch that would leave fewer than the least context takes the rest with its context under the rest, a true end follows only a piece
@@ -3445,12 +3449,12 @@ mod tests {
 
     /// [measurement; theory, November 12, P49 item 3g] **A region's code from the read's sum is the field's code**: on a small store written to a
     /// scratch directory (pieces that open with a title and close, and one that opens with none), the cut's stretches read through the host
-    /// realization give, region by region, the same code and count from [`region_code`] as [`holonics::hnn::tower::field::Field::code`] reads
+    /// realization give, region by region, the same code and count from [`region_code`] as [`holonics_engine::field::Field::code`] reads
     /// for the same plain region, and both kinds of state are met.
     #[test]
     fn a_regions_code_from_the_reads_sum_is_the_fields_code() {
-        use holonics::hnn::tower::field::{Field, FieldDeclaration, HostField};
-        use holonics::hnn::units::Units;
+        use holonics_engine::field::{Field, FieldDeclaration, HostField};
+        use holonics_engine::units::Units;
         let dir = std::env::temp_dir().join(format!("store_read_test_{}_{}", std::process::id(), line!()));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
@@ -3469,7 +3473,7 @@ mod tests {
         let slice = open_slice(&dir, "prefix", "code", &counts).unwrap();
         let every: Vec<u8> = docs.iter().flat_map(|(a, b)| a.iter().chain(b).copied()).collect();
         let codec = FieldCodec::found(Units::bytes(), &[(b"q".to_vec(), every)]).unwrap();
-        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 160, lanes: 1, depth: 0, carry: 0, triads: 0 };
+        let d = FieldDeclaration { alphabet: codec.alphabet(), width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 160, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false };
         let keys: Vec<u8> = (0..1u64 << 14).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let field = Field::found(d, &keys).unwrap();
         let pass = StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, slices: vec![PassSlice { name: "code".into(), piece: 0, cursor: 0, taken: 0 }] };

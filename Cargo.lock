@@ -3,6 +3,15 @@
 version = 4
 
 [[package]]
+name = "athena"
+version = "0.1.0"
+dependencies = [
+ "holonics-engine",
+ "holonics-engine-cuda",
+ "rayon",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -43,6 +52,7 @@ checksum = "252afb9ae5eaa683babdc6a068b3f5726eb19e05070c731f9b2a23a7c3e8ed34"
 name = "holonics"
 version = "0.1.0"
 dependencies = [
+ "athena",
  "holonics-engine",
  "num-bigint",
  "num-integer",
@@ -56,6 +66,7 @@ dependencies = [
 name = "holonics-cuda"
 version = "0.1.0"
 dependencies = [
+ "athena",
  "holonics",
  "holonics-engine",
  "holonics-engine-cuda",
