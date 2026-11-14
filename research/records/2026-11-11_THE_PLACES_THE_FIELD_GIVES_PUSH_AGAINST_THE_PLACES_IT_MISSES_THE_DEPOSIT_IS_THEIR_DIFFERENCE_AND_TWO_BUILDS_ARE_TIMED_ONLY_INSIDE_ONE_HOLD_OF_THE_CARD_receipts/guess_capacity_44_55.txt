@@ -4292,3 +4292,14 @@ G180 scored 2026-11-14T04:13Z (receipt g180_read1.txt; read-cavity on a copy of 
   specialized to hearing its marks while the marks it makes grow worse. The rule's second branch: the next build gives read 1 the
   passage's comparison too, so the field's own placement stays its honest placement (agent-inferred: each read is the field's placement
   and each is compared at the receiver; a return through the marks alone would train read 1 to serve read 2 rather than to agree).
+
+G181 fixed 2026-11-14T06:07Z (the Opus PC thread), before its read: the line comparing both reads (G180's second branch, PR #791, the card's
+covector the host's bit for bit at 584.7 ms a section), from the marked line's lap-6 end state, one lap of 3,000 sections, read at its lap mean
+(read 2) and with its strengths zeroed in a copy (read 1). Read first: lap 5 (one read compared) coded 0.9877 one-place and 2.3367 whole masks
+at its mean; read 1 had drifted to 0.012 and 0.060 over the unmarked line at lap 2 (G180); the strengths stood at 0.38, 0.88 and 0.84.
+  (a) read 1's one-place code on the lap's mean comes back within 0.004 of read 2's (against 0.0137 apart at lap 2);
+  (b) read 2's one-place code falls at least 0.002 from the lap before's;
+  (c) read 2's whole masks fall at least 0.003 from the lap before's;
+  (d) the strengths at the lap's end stand under their lap-6 values (read 1's own comparison makes its marks worth leaning on less).
+  Rule: (a) to (c) held: the line keeps comparing both reads. (a) held and (b) or (c) missed: read 1 is honest again but the second read
+  pays its cost in level, and the cost per gain is read against the card before the next lap.
