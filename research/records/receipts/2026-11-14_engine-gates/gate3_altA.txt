@@ -1,0 +1,13 @@
+# Gate 3 on alteration A: the deposit's divisor floor(sqrt v) + 2 for + 1 (crates/holonics/src/hnn/tower.rs, deposit_root), built and reverted. Numbers only.
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=2197 host_ms=192010
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=10 DIFFERS
+GATE_REPRO first_differing_section=10 fields=before,transfer,external
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=195.4 peak_rss_kib=6244044
+MEASURE lap=read rc=0 wall_s=282.3 peak_rss_kib=556468
+MEASURE lap=repro rc=0 wall_s=18.4 peak_rss_kib=348716
+GATE_ENGINE DIFFERS

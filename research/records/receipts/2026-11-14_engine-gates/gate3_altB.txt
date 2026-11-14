@@ -1,0 +1,14 @@
+# Gate 3 on alteration B: LN2_FACE_BITS 29 for 30 in crates/holonics-cuda/kernels/field.cu (the card's temper and carry lifts), built and reverted. Numbers only.
+STORE_PARITY method=read_and_return_opening calls=3 unequal=3 card_ms=2185 host_ms=189568
+STORE_PARITY_DONE calls=3 unequal=3 unequal_sites=0 unequal_entries=1001297 first=read_and_return_opening_call_1:_covector_entry_0_(family_0)_card_-590019556_host_-590820343 DIFFERS
+GATE_REPRO sections=3 line_lines=3 equal=0 DIFFERS
+GATE_REPRO first_differing_section=0 fields=external
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=0 DIFFERS
+GATE_REPRO first_differing_section=0 fields=external
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=1 wall_s=205.5 peak_rss_kib=6204804
+MEASURE lap=read rc=0 wall_s=284.2 peak_rss_kib=558212
+MEASURE lap=repro rc=0 wall_s=19.7 peak_rss_kib=351756
+GATE_ENGINE DIFFERS

@@ -9,7 +9,11 @@ bytes are compared by the caller (`cmp` of STATE.k and MEAN.k).
 Prints `GATE_REPRO` (sections, the line's lines, equal, EQUAL or DIFFERS), the first differing section and its fields where one differs, and
 `GATE_SAVE` with the schedule fields of both. Exit 0 when every line is equal, 1 otherwise. Numbers only: the lines carry no text of a passage.
 
-usage: python3 tools/reproduction.py BUILD_LOG LINE_LOG SECTIONS
+usage: python3 tools/reproduction.py BUILD_LOG LINE_LOG SECTIONS [--no-save]
+
+`--no-save` is for a run of fewer sections than the line's first save (gate 3's, tools/gate_engine.sh). The build's last save then falls
+where the line has none, and its state is not the line's to compare, so the save is set aside and printed `GATE_SAVE aside`. The section
+lines are compared as always.
 """
 import sys
 
@@ -32,7 +36,7 @@ def differing(a, b, aside=()):
     return [k for k in list(fb) + [k for k in fa if k not in fb] if fa.get(k) != fb.get(k)]
 
 
-def compare(build_log, line_log, sections):
+def compare(build_log, line_log, sections, no_save=False):
     a = lines(build_log, "STORE_SECTION ")
     b = lines(line_log, "STORE_SECTION ")[:sections]
     eq = sum(1 for x, y in zip(a, b) if fields(x) == fields(y))
@@ -42,7 +46,9 @@ def compare(build_log, line_log, sections):
     if first is not None:
         out.append(f"GATE_REPRO first_differing_section={first} fields={','.join(differing(a[first], b[first]))}")
     saves = lines(build_log, "STORE_SAVE ")
-    if saves:
+    if saves and no_save:
+        out.append("GATE_SAVE aside (a run shorter than the line's first save)")
+    elif saves:
         x = saves[-1]
         k = dict(w.split("=", 1) for w in x.split()[1:] if "=" in w).get("k")
         match = [y for y in lines(line_log, "STORE_SAVE ") if f" k={k} " in f" {y} "]
@@ -63,10 +69,10 @@ def compare(build_log, line_log, sections):
 
 
 def main(argv):
-    if len(argv) != 4:
-        print("usage: python3 tools/reproduction.py BUILD_LOG LINE_LOG SECTIONS")
+    if len(argv) not in (4, 5) or (len(argv) == 5 and argv[4] != "--no-save"):
+        print("usage: python3 tools/reproduction.py BUILD_LOG LINE_LOG SECTIONS [--no-save]")
         return 2
-    ok, out = compare(argv[1], argv[2], int(argv[3]))
+    ok, out = compare(argv[1], argv[2], int(argv[3]), len(argv) == 5)
     print("\n".join(out))
     return 0 if ok else 1
 

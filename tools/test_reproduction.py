@@ -18,12 +18,12 @@ def save(k, moved, batches, peak, ms):
 
 
 class Reproduction(unittest.TestCase):
-    def run_tool(self, build, line, sections):
+    def run_tool(self, build, line, sections, *flags):
         with tempfile.TemporaryDirectory() as d:
             a, b = os.path.join(d, "build.log"), os.path.join(d, "line.log")
             open(a, "w").write(build)
             open(b, "w").write(line)
-            p = subprocess.run([sys.executable, "-I", TOOL, a, b, str(sections)], capture_output=True, text=True)
+            p = subprocess.run([sys.executable, "-I", TOOL, a, b, str(sections), *flags], capture_output=True, text=True)
             return p.returncode, p.stdout
 
     def test_equal_with_timings_and_schedule_aside(self):
@@ -48,6 +48,19 @@ class Reproduction(unittest.TestCase):
         code, out = self.run_tool(build, line, 1)
         self.assertEqual(code, 1, out)
         self.assertIn("GATE_SAVE differing_fields=moved", out)
+
+    def test_a_save_the_line_lacks_differs_unless_set_aside(self):
+        line = "".join(section(k, k, 1) for k in range(30)) + save(1000, 7, 1, 5, 1)
+        build = "".join(section(k, k, 2) for k in range(24)) + save(24, 3, 1, 5, 2)
+        code, out = self.run_tool(build, line, 24)
+        self.assertEqual(code, 1, out)
+        self.assertIn("GATE_SAVE k=24 line_save=absent DIFFERS", out)
+        code, out = self.run_tool(build, line, 24, "--no-save")
+        self.assertEqual(code, 0, out)
+        self.assertIn("equal=24 EQUAL", out)
+        self.assertIn("GATE_SAVE aside", out)
+        code, out = self.run_tool(section(0, 0, 1) + section(1, 9, 1), line, 2, "--no-save")
+        self.assertEqual(code, 1, out)
 
     def test_short_build_differs(self):
         line = "".join(section(k, k, 1) for k in range(3))

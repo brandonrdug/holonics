@@ -13,6 +13,10 @@ run() { local name=$1; shift; local start; start=$(date +%s%3N)
   if "$@"; then printf 'gate %s: ok (%s ms)\n' "$name" "$(( $(date +%s%3N) - start ))"
   else printf 'gate %s: FAILED (%s ms)\n' "$name" "$(( $(date +%s%3N) - start ))"; status=1; fi; }
 run check cargo check --workspace --all-targets
+# The engine's host tests (`hnn::tower::field` and its moment's and scale's; C2 of the consolidation, #603). Gate 1 had run none of them
+# until November 14. One takes about 150 s in debug against 49 s for the other 122 together (measured November 14), so it runs in gate 2,
+# with the tests of a step that changes the engine: `cargo test -p holonics --lib the_covector_matches_the_code_across_the_far_support`.
+run engine-host-tests cargo test -p holonics --lib hnn::tower::field -- --skip the_covector_matches_the_code_across_the_far_support
 run guard-lints cargo clippy -p holonics --all-targets -- -D clippy::disallowed_types \
   -D clippy::disallowed_methods -D clippy::float_arithmetic
 run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc
@@ -29,6 +33,7 @@ run seen-passage-controls python3 tools/test_seen_passage.py
 run run-watch-controls python3 tools/test_runs.py
 run reproduction-controls python3 tools/test_reproduction.py
 run live-set-controls python3 tools/test_live_set.py
+run measure-controls python3 tools/test_measure.py
 run listener-continuation-controls cargo test -p holonics --example listener continuing::tests::
 run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
 run native-class-advance-controls cargo test -p holonics --lib class_advance_tests

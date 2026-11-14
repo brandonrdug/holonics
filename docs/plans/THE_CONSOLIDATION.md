@@ -375,6 +375,13 @@ laboratory's archive note. No code.
   from `tools/` (C1's reading, November 14).
 - Done when a deliberately altered constant in the engine fails gate 1 or gate 3, and the unaltered
   tree passes both. The alteration is not committed.
+- Read November 14 ([the receipt](../../research/records/receipts/2026-11-14_engine-gates/README.md)).
+  - Gate 1 runs 122 of the engine's 123 host tests (42 s). The 150 s one goes to gate 2.
+  - Gate 3 is `tools/gate_engine.sh`: `parity-store` on 3 of the line's sections, 24 reproduced, and the lap's read.
+  - The unaltered tree passed both gates. Two alterations failed gate 3, each by a different arm:
+    - the deposit's divisor, by the reproduction, first at section 10;
+    - a kernel's `ln 2` grain, by the parity's covector.
+  - Parity alone, or 3 reproduced sections alone, would have passed the first.
 
 **C3. The lift** (the PC; moves only).
 - Tag the tree first: `archive/tree-before-consolidation` at `main`, pushed from the PC.
