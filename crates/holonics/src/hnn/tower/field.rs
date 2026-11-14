@@ -6556,9 +6556,6 @@ impl Field {
     ///
     /// Returns the laned field and, for each entry, the old entry it carries (`None` for the lane's own).
     pub fn laned(&self, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.scale.is_some() {
-            return refuse("a tower's levels grow their lanes level by level, not through the fine field alone");
-        }
         if self.declaration.triads > 0 {
             // [theory, November 12, the triad record §4] The triads are founded last; the lane's columns of their charts are not built.
             return refuse("a growth in lanes of a field with triads (the triads are founded last; a growth after them is not built)");
@@ -6612,6 +6609,20 @@ impl Field {
             place(ol.carry, layout.carry, 2 * d.carry, dw, dw2);
             place(ol.carry_bias, layout.carry_bias, 1, 2 * d.carry, 2 * d.carry);
         }
+        // [agent-inferred, November 14] The opening's lift reads the charted face as the read block does (`R⁰ r̂ + b⁰`, its rows the lift's
+        // coordinates, its columns the face's): the lane's rows and columns at zero, its bias's lane at zero. The junction's row reads the charted
+        // read (its columns the face's): the lane's columns at zero. The mark's strengths read no coordinate: as they were.
+        if d.opening {
+            place(ol.opening, layout.opening, dw, dw, dw2);
+            place(ol.opening_bias, layout.opening_bias, 1, dw, dw);
+        }
+        if d.junction {
+            place(ol.junction, layout.junction, 1, dw, dw2);
+            place(ol.junction_bias, layout.junction_bias, 1, 1, 1);
+        }
+        if d.mark {
+            place(ol.mark, layout.mark, 1, MARK_BASES, MARK_BASES);
+        }
         // The lane's founding draws.
         let mut cursor = 0usize;
         let mut draw = |num: u128, den: u128, bits: u32| -> Result<i32> {
@@ -6640,7 +6651,49 @@ impl Field {
             }
         }
         debug_assert_eq!(cursor, 4 * old.lane_draws());
-        Ok((Self::with_theta(d, new), from))
+        let mut out = Self::with_theta(d, new);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        // [agent-inferred, November 14] A tower grows the fine level's lanes alone: the level's field is kept, and the glue's reads and writes of
+        // the fine face (`A`'s columns of each harmonic, `B`'s rows and `b_B` of each harmonic) take the lane at zero, so the restriction reads no
+        // lane coordinate and the prolongation writes none, and every face is kept. Each block is harmonic-major (`k D₀ + c`, [`charted`]).
+        if let Some(sc) = &self.scale {
+            let (h, d1) = (sc.harmonics, sc.coarse.declaration.width);
+            let (a0, ab0, b0, bb0, len0) = sc.glue_offsets(dw);
+            let (a1, ab1, b1, bb1, len1) = sc.glue_offsets(dw2);
+            let (old_fine, new_fine, coarse) = (self.theta.len(), layout.len, sc.coarse.theta.len());
+            let mut glue = vec![0i32; len1];
+            from.resize(new_fine, None);
+            from.extend((0..coarse).map(|k| Some(old_fine + k)));
+            let mut gfrom: Vec<Option<usize>> = vec![None; len1];
+            let (og, ng) = (old_fine + coarse, new_fine + coarse);
+            let mut copy = |o: usize, n: usize| {
+                glue[n] = sc.glue[o];
+                gfrom[n] = Some(og + o);
+            };
+            for r in 0..d1 {
+                for k in 0..h {
+                    for c in 0..dw {
+                        copy(a0 + r * h * dw + k * dw + c, a1 + r * h * dw2 + k * dw2 + c);
+                    }
+                }
+            }
+            for r in 0..d1 {
+                copy(ab0 + r, ab1 + r);
+            }
+            for k in 0..h {
+                for c in 0..dw {
+                    for col in 0..d1 {
+                        copy(b0 + (k * dw + c) * d1 + col, b1 + (k * dw2 + c) * d1 + col);
+                    }
+                    copy(bb0 + k * dw + c, bb1 + k * dw2 + c);
+                }
+            }
+            debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, len1));
+            debug_assert_eq!(ng, from.len());
+            from.extend(gfrom);
+            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue }));
+        }
+        Ok((out, from))
     }
 }
 
@@ -8210,7 +8263,10 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
+        // [agent-inferred, November 14] The founded parts' rates are kept (the lane's entries join the lane parts, [`Field::founded_parts`]), and
+        // where the learner carries each entry's own rate every standing entry keeps it and a lane entry takes `rate_bits`.
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Field::with_carry`]), the circles' draws read from

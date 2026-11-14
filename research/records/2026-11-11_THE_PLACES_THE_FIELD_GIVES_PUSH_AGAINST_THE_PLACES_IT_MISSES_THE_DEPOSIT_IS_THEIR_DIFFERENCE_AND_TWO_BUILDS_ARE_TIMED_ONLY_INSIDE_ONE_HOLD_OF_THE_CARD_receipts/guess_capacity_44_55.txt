@@ -4452,3 +4452,16 @@ G187 scored 2026-11-14T11:56Z (receipt g187_roles.txt), the sixth-lap mean read 
   would leave, but the rule cannot be applied on this read. A fair one is owed: the same population on both sides (the documents either
   side of the prefix's end, met four times and never met), sampled over many documents. The build's held read reproduces the line's lap-6
   read byte for byte (ROLE_REPRODUCES identical), so the role argument enters with its default unchanged.
+G188 fixed 2026-11-14T12:04Z (the Opus PC thread), before its read: does the face's width bind the line's level. The fourth pass's
+whole masks have stood between 2.3321 and 2.3371 at lap means for five laps (one-place 0.9806 to 0.9725), and the count ruler of known
+neighbours places them at three known neighbours a side. From the fourth pass's lap-7 end state a third lane of 32 is founded beside the
+two (found-lane; every read from it and every write into it at zero, the level's glue's reads and writes of it at zero, so every face is
+kept; the constitution 221,881 entries to 305,145, the lane's 83,264). This is a copy of a lane's width, which the guides bar as a law; it is
+built here as an instrument, to test the premise that the constitution's size binds the level at the face, before a lane's width is sized
+from a reading. It trains for the card time the line's own lap 8 takes from the same state, and is read at the mean whose card-time window
+stands nearest the line's lap-8 MEAN.3000 window.
+  (a) its one-place code stands under the line's lap 8 by at least 0.002;
+  (b) its whole masks stand under the line's lap 8 by at least 0.005.
+  Rule: (a) and (b) held: the face's width binds, and the next build is the face as a composition of lanes with a lane's width sized from
+  its readers' need, tier B waiting on it. (b) missed: at this size the face's width does not bind the whole masks within a lap, and growth
+  is looked for at another part (the contacts, the heads, the level above); the copied lane stays out of the line.

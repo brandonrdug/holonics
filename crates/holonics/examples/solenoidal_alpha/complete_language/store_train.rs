@@ -772,6 +772,90 @@ pub(super) fn found_opening(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 14] **`found-lane STATE STATE_SHA KEYS KEYS_SHA OUT`**: the learner `STATE` with one more lane on its
+/// fine field ([`FieldLearner::laned`]: every read from the lane and every write into it at zero, a tower's level kept and the glue's reads and
+/// writes of the lane at zero), its draws read from `KEYS` past the learner's count, written to `OUT`. Before it writes, every line is judged
+/// (`FOUND_LANE_LINE`): the learner's head may change only its count of key draws; the fine field's declaration only its width and its lanes;
+/// the fine field's material, the glue and the two moment lines keep every standing word at the place the founding's map gives it (a moment
+/// line's lane words at zero in the first and at their family's mean in the second); every other line (the level's line, its field's
+/// declaration and material, the parts, the pass) is equal. Anything else is refused and nothing is written (November 11: a state tool that
+/// left a line behind). Reads no realization: that every face is kept is read on the card by the line's own held read of the founded state.
+pub(super) fn found_lane(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let keys = pinned_read(&args[3], &args[4], STATE_BUDGET)?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.laned(&keys).map_err(|e| e.to_string())?;
+    let rest = keys.get(learner.drawn..).ok_or("fewer key bytes than the learner has drawn")?;
+    let (field, from) = learner.field.laned(rest).map_err(|e| e.to_string())?;
+    if field != founded.field {
+        return Err("the learner's founding and the field's differ".into());
+    }
+    let (old_d, new_d) = (learner.field.declaration, founded.field.declaration);
+    let (old_m, new_m) = (learner.field.material_len(), founded.field.material_len());
+    let (old_fine, new_fine) = (learner.field.theta.len(), founded.field.theta.len());
+    let glue_lens = (learner.field.scale.as_ref().map(|s| s.glue.len()), founded.field.scale.as_ref().map(|s| s.glue.len()));
+    let glue_at = (old_m - glue_lens.0.unwrap_or(0), new_m - glue_lens.1.unwrap_or(0));
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    // A line of words over the material's indices `[lo, hi)` (old) and `[nlo, nhi)` (new): every standing word at its mapped place.
+    let mapped = |wx: &[&str], wy: &[&str], lo: usize, nlo: usize| -> bool {
+        wy.iter().enumerate().all(|(n, w)| match from[nlo + n] {
+            Some(o) if (lo..lo + wx.len()).contains(&o) => *w == wx[o - lo],
+            Some(_) => false,
+            None => true,
+        })
+    };
+    let mut judged = [0usize; 6];
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        if x.is_empty() || y.is_empty() {
+            return Err(format!("line {k} is empty in the source or the founded state").into());
+        }
+        let verdict = if x == y {
+            judged[0] += 1;
+            "equal".to_string()
+        } else if k == 0 && wx.len() == wy.len() && wx.iter().zip(&wy).enumerate().all(|(i, (p, q))| i == 2 || p == q) {
+            judged[1] += 1;
+            format!("head draws {} to {}", wx[2], wy[2])
+        } else if k == 1 && wx.len() == wy.len() && wx.iter().zip(&wy).enumerate().all(|(i, (p, q))| i == 2 || i == 10 || p == q) && wy[2] == new_d.width.to_string() && wy[10] == new_d.lanes.to_string() {
+            judged[2] += 1;
+            format!("declaration width {} to {} lanes {} to {}", old_d.width, new_d.width, old_d.lanes, new_d.lanes)
+        } else if wx.len() == old_fine && wy.len() == new_fine && mapped(&wx, &wy, 0, 0) {
+            judged[3] += 1;
+            format!("fine material {} words to {}", old_fine, new_fine)
+        } else if Some(wx.len()) == glue_lens.0 && Some(wy.len()) == glue_lens.1 && mapped(&wx, &wy, glue_at.0, glue_at.1) {
+            judged[4] += 1;
+            format!("glue {} words to {}", wx.len(), wy.len())
+        } else if wx.len() == old_m && wy.len() == new_m && mapped(&wx, &wy, 0, 0) {
+            judged[5] += 1;
+            format!("moments {} words to {}", old_m, new_m)
+        } else {
+            return Err(format!("line {k}: a change the founding of a lane does not make").into());
+        };
+        println!("FOUND_LANE_LINE k={k} {verdict}");
+    }
+    if judged[2] != 1 || judged[3] != 1 || judged[5] != 2 || (glue_lens.0.is_some() && judged[4] != 1) {
+        return Err(format!("a founding whose lines were judged {judged:?}").into());
+    }
+    std::fs::write(out, b.as_bytes())?;
+    println!("FOUND_LANE lines={} equal={} width={} lanes={} material={} founded_material={} lane_entries={} ms={}", la.len(), judged[0], new_d.width, new_d.lanes, old_m, new_m, from.iter().filter(|o| o.is_none()).count(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 14, the ring record §4] **`found-mark STATE STATE_SHA OUT`**: the learner `STATE` grown to read twice,
 /// its mark's strengths founded at zero ([`FieldLearner::with_mark`]), written to the file `OUT`. Before it writes, every line of the state is
 /// printed for the source and the founded state (`FOUND_MARK_LINE`) and judged: a line is equal; or it is the declaration's line (its head

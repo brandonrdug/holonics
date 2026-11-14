@@ -4091,3 +4091,45 @@ fn the_marks_founding_covector_is_the_carried_slope() {
 }
 
 
+
+/// [definition; agent-inferred, November 14] **A lane founded beside a tower keeps every face**: on a field with the opening's block, on its
+/// tower (the level's prolongation drawn, so every path carries a covector), on that tower reading twice with the mark off its founding, and
+/// on a field whose tick has the junction's return, the laned field reads every face the field read; its map covers the whole material and
+/// its families tile it; its text restores it; every standing entry's covector is the one it had, the level's and the glue's included; and the
+/// key chart's reads from the lane carry a covector at once.
+#[test]
+fn a_lane_founded_beside_a_tower_keeps_every_face() {
+    for still in [0usize, 1, 2] {
+        let marked = {
+            let (mut f, _) = towered_live(still).with_mark().unwrap();
+            let l = f.layout.clone();
+            f.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&[1 << 22, 1 << 21, 3 << 20]);
+            f
+        };
+        let fields: [(&str, Field); 4] = [("opened", opened(still)), ("tower", towered_live(still)), ("marked tower", marked), ("joined", four_ticks(still).with_junction().unwrap().0)];
+        for (name, field) in fields {
+            let r = region();
+            let draws = field.declaration.lane_draws();
+            let (laned, from) = field.laned(&keys(draws)).unwrap();
+            assert_eq!(laned.declaration.lanes, field.declaration.lanes + 1, "{name}");
+            assert_eq!(from.len(), laned.material_len(), "{name}: the map covers the material");
+            assert_eq!(from.iter().flatten().count(), field.material_len(), "{name}: every standing entry kept");
+            assert_eq!(laned.faces(&r).unwrap(), field.faces(&r).unwrap(), "still {still} {name}: every face kept");
+            let mut at = 0;
+            for (start, len, _) in laned.families_all() {
+                assert_eq!(start, at, "{name}");
+                at += len;
+            }
+            assert_eq!(at, laned.material_len(), "{name}");
+            assert_eq!(Field::from_text(&laned.to_text()).unwrap(), laned, "{name}: its text restores it");
+            let (g, h) = (tower_covector(&laned, &r), tower_covector(&field, &r));
+            for (n, o) in from.iter().enumerate() {
+                if let Some(o) = o {
+                    assert_eq!(g[n], h[*o], "still {still} {name}: the covector of standing entry {o}");
+                }
+            }
+            let (l, dw, old, m2) = (laned.layout.clone(), laned.declaration.width, field.declaration.width, 2 * laned.declaration.complex());
+            assert!((0..m2).any(|row| (old..dw).any(|j| g[l.q + row * dw + j] != 0)), "still {still} {name}: the key chart's reads from the lane carry a covector");
+        }
+    }
+}

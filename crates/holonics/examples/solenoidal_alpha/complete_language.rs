@@ -907,6 +907,7 @@ pub(super) fn run_field_realized(args: &[String], realization: &mut dyn holonics
         Some("read-cavity") => store_train::read_cavity(args, realization),
         Some("found-opening") => store_train::found_opening(args),
         Some("found-mark") => store_train::found_mark(args),
+        Some("found-lane") => store_train::found_lane(args),
         Some("found-level") => store_train::found_level(args),
         Some("read-news") => store_train::read_news(args),
         Some("read-influence") => store_train::read_influence(args, realization),
