@@ -4465,3 +4465,14 @@ stands nearest the line's lap-8 MEAN.3000 window.
   Rule: (a) and (b) held: the face's width binds, and the next build is the face as a composition of lanes with a lane's width sized from
   its readers' need, tier B waiting on it. (b) missed: at this size the face's width does not bind the whole masks within a lap, and growth
   is looked for at another part (the contacts, the heads, the level above); the copied lane stays out of the line.
+
+G188 scored 2026-11-14T13:27Z (receipt g188_lane.txt). The laned line trained 2,732 sections in 1,749,825 ms (640 ms a section against
+lap 8's 587 on the same sections, 1.09 times; lap 8 took 3,000 in 1,754,046 ms), read at its MEAN.2000 (sections 1,001 to 2,000):
+  (a) one-place 0.9631 against lap 8's MEAN.3000 0.9701, 0.0071 under: held (every slice, 0.0042 to 0.0125);
+  (b) whole masks 2.3202 against 2.3320, 0.0118 under: held (four slices 0.007 to 0.020 under, wikidata 0.0055 over).
+  Both held. Against lap 8's MEAN.2000, the window of equal card time (the guess named the later window, which favours lap 8), the lane
+  stands 0.0086 under at one-place masks and 0.0129 under at whole masks, every slice under at both. Its MEAN.1000 already stood 0.0040 and
+  0.0047 under. One lane of 32 in about a thousand sections bought more at whole masks than the fourth pass's last five laps together (2.3326
+  to 2.3320), so the line's plateau was the face's width. The rule's first branch: the face's width binds, and the next build is the face as
+  a composition of lanes with a lane's width sized from its readers' need, the broader passage (tier B) waiting on it. The founding also
+  passed its receipts: the build reproduces lap 8's first 24 sections, and the laned mean's held read is the line's own byte for byte.
