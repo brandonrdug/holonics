@@ -1,0 +1,27 @@
+# G187: read-cavity on the fourth pass's sixth-lap mean, the prefix role (the documents the line trains on, each slice's front) against the held role; and the same binary's held read against the line's own lap-6 read. Numbers only.
+CAVITY_LAW role=prefix places=20000 least=4 octaves=7 pairs_bound=15606223 sites_bound=41490 ticks=4 alphabet=244 ms=43
+CAVITY_DONE ms=236921
+MEASURE lap=R47 rc=0 wall_s=237.4 peak_rss_kib=518284
+## prefix (F3) against held (C3)
+LAST_TICK F3 one_place pooled=1.0017 places=100535 | code=0.9289(20171) web=0.9192(20055) science=1.1341(20033) books=1.0036(20028) wikidata=1.0230(20248)
+LAST_TICK C3 one_place pooled=0.9742 places=100508 | code=0.6692(20124) web=1.0489(20043) science=0.9274(20088) books=1.0162(20028) wikidata=1.2086(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0275 | code=+0.2597 web=-0.1297 science=+0.2067 books=-0.0126 wikidata=-0.1856
+LAST_TICK F3 whole_open pooled=2.4178 places=3867 | code=2.5126(763) web=2.3066(776) science=2.5644(776) books=2.3139(776) wikidata=2.3928(776)
+LAST_TICK C3 whole_open pooled=2.3321 places=3717 | code=2.1963(730) web=2.4871(758) science=2.2501(776) books=2.1881(776) wikidata=2.5642(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0856 | code=+0.3164 web=-0.1804 science=+0.3143 books=+0.1258 wikidata=-0.1714
+ROLE_REPRODUCES identical
+## the fourth pass's laps at their means (one-place, whole masks)
+lap1 one_place pooled=0.9861
+lap1 whole_open pooled=2.3389
+lap2 one_place pooled=0.9820
+lap2 whole_open pooled=2.3368
+lap3 one_place pooled=0.9806
+lap3 whole_open pooled=2.3326
+lap4 one_place pooled=0.9774
+lap4 whole_open pooled=2.3371
+lap5 one_place pooled=0.9741
+lap5 whole_open pooled=2.3350
+lap6 one_place pooled=0.9742
+lap6 whole_open pooled=2.3321
+lap7 one_place pooled=0.9725
+lap7 whole_open pooled=2.3344
