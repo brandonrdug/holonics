@@ -1479,7 +1479,7 @@ fn a_port_is_read_through_its_coupling() {
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
-    let coupled = crate::receiver::coupling::coupling_code(&at, 0, &target, None).unwrap().code;
+    let coupled = crate::inherited::coupling::coupling_code(&at, 0, &target, None).unwrap().code;
     assert_eq!(field.code(&r).unwrap(), (place + coupled, 1 + 3));
     let unported = Region { port: None, ..r };
     assert_ne!(field.code(&unported).unwrap().0, field.code(&r).unwrap().0, "the place-wise code differs from the coupling's");
@@ -1491,7 +1491,7 @@ fn a_port_is_read_through_its_coupling() {
 /// codes the void; the region's code is its place-wise code before the port and that boundary code over the port.
 #[test]
 fn a_port_at_its_boundary_codes_only_the_end() {
-    use crate::hnn::tower::face_code;
+    use crate::inherited::tower::face_code;
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
@@ -1501,9 +1501,9 @@ fn a_port_at_its_boundary_codes_only_the_end() {
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
     let (rows, code) = port_reading(&at, &port).unwrap();
     let mut expected = 0i64;
-    let one = 1i64 << crate::hnn::tower::COVECTOR_BITS;
+    let one = 1i64 << crate::inherited::tower::COVECTOR_BITS;
     for (i, ((masses, total), row)) in at.iter().zip(&rows).enumerate() {
-        let share = |a: usize| (((masses[a] << crate::hnn::tower::COVECTOR_BITS) + total / 2) / total) as i64;
+        let share = |a: usize| (((masses[a] << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64;
         if i < target.len() {
             expected += face_code(total - masses[0], *total);
             assert_eq!(row[0], share(0), "the void's entry is its share, place {i}");

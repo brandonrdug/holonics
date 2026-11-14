@@ -15,11 +15,12 @@ run() { local name=$1; shift; local start; start=$(date +%s%3N)
 run check cargo check --workspace --all-targets
 # The engine's host tests (`hnn::tower::field` and its moment's and scale's; C2 of the consolidation, #603). Gate 1 had run none of them
 # until November 14. One takes about 150 s in debug against 49 s for the other 122 together (measured November 14), so it runs in gate 2,
-# with the tests of a step that changes the engine: `cargo test -p holonics --lib the_covector_matches_the_code_across_the_far_support`.
-run engine-host-tests cargo test -p holonics --lib hnn::tower::field -- --skip the_covector_matches_the_code_across_the_far_support
-run guard-lints cargo clippy -p holonics --all-targets -- -D clippy::disallowed_types \
+# with the tests of a step that changes the engine: `cargo test -p holonics-engine --lib the_covector_matches_the_code_across_the_far_support`.
+# Since C3 the engine is its own crate (`crates/engine`), and the guard lints and doctests run on it too.
+run engine-host-tests cargo test -p holonics-engine --lib field -- --skip the_covector_matches_the_code_across_the_far_support
+run guard-lints cargo clippy -p holonics-engine -p holonics --all-targets -- -D clippy::disallowed_types \
   -D clippy::disallowed_methods -D clippy::float_arithmetic
-run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics --doc
+run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics-engine -p holonics --doc
 run diagnostic-timing-controls cargo test -p holonics --example listener continuing::diagnostic::
 run diagnostic-supervisor-controls python3 tools/test_listener_diagnostic_stage.py
 run diagnostic-receipt-controls python3 tools/test_listener_diagnostic_receipts.py

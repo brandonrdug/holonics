@@ -1,6 +1,6 @@
 use super::*;
-use crate::hnn::tower::field::{ring_phasor, Field, FieldDeclaration};
-use crate::hnn::tower::{half_turn, TowerError};
+use crate::field::{ring_phasor, Field, FieldDeclaration};
+use crate::inherited::tower::{half_turn, TowerError};
 use num_bigint::BigInt;
 
 type G = (i128, i128);
@@ -726,7 +726,7 @@ struct Paced {
     ring: Vec<(i64, i64)>,
     decay: Vec<i64>,
     pi: i128,
-    exponential: crate::hnn::keyed_modes::Exponential,
+    exponential: crate::inherited::keyed_modes::Exponential,
 }
 
 fn paced_slots(reach: usize, modes: usize) -> Vec<Paced> {
@@ -758,10 +758,10 @@ fn a_strand_paced_at_its_own_places_is_the_byte_moment() {
     let mut next = mixer(29);
     for slot in paced_slots(16, 4).into_iter().chain(paced_slots(300, 6)) {
         let reach = slot.decay.len();
-        let turn = |r: i128| crate::hnn::tower::field::turn_phasor(r, slot.n, slot.pi);
-        let skin = |s: i128| crate::hnn::tower::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
+        let turn = |r: i128| crate::field::turn_phasor(r, slot.n, slot.pi);
+        let skin = |s: i128| crate::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
         for &sites in LENGTHS.iter().filter(|&&s| s <= reach) {
-            let places: Vec<i64> = (0..sites as i64).map(|t| t << crate::hnn::tower::field::PACE_BITS).collect();
+            let places: Vec<i64> = (0..sites as i64).map(|t| t << crate::field::PACE_BITS).collect();
             let pace = Pace { tau: &places, sigma: &places, turn: &turn, skin: &skin };
             let (before, after, ds) = (strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 16), strand(&mut next, sites, 1 << 24));
             assert_eq!(moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, Some(&pace)).unwrap(), moment_exact(&before, &after, &slot.ring, slot.n, &slot.decay, None).unwrap(), "n {} S {sites}", slot.n);
@@ -778,12 +778,12 @@ fn a_strand_paced_at_its_own_places_is_the_byte_moment() {
 #[test]
 fn a_paced_strand_equals_its_definition_bit_for_bit() {
     let mut next = mixer(31);
-    let one = 1i64 << crate::hnn::tower::field::PACE_BITS;
+    let one = 1i64 << crate::field::PACE_BITS;
     let rates = [0, one, one, 2 * one, -one / 2, one / 3, 5 * one / 7];
     let mut checked = 0usize;
     for slot in paced_slots(300, 6) {
-        let turn = |r: i128| crate::hnn::tower::field::turn_phasor(r, slot.n, slot.pi);
-        let skin = |s: i128| crate::hnn::tower::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
+        let turn = |r: i128| crate::field::turn_phasor(r, slot.n, slot.pi);
+        let skin = |s: i128| crate::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
         for &sites in LENGTHS.iter().filter(|&&s| s <= 100) {
             let (tau, sigma) = clock_of(&mut next, sites, &rates);
             let pace = Pace { tau: &tau, sigma: &sigma, turn: &turn, skin: &skin };
@@ -846,12 +846,12 @@ fn a_paced_strand_equals_its_definition_bit_for_bit() {
 #[test]
 fn a_place_s_own_stride_takes_only_its_cavity_moments_release_remainder() {
     let mut next = mixer(43);
-    let one = 1i64 << crate::hnn::tower::field::PACE_BITS;
+    let one = 1i64 << crate::field::PACE_BITS;
     let rates = [0, one, one, 2 * one, -one / 2, one / 3, 5 * one / 7];
     let (mut checked, mut worst, mut nearest) = (0usize, 0i128, (0i128, 1i128));
     for slot in paced_slots(16, 4).into_iter().chain(paced_slots(300, 6)) {
-        let turn = |r: i128| crate::hnn::tower::field::turn_phasor(r, slot.n, slot.pi);
-        let skin = |s: i128| crate::hnn::tower::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
+        let turn = |r: i128| crate::field::turn_phasor(r, slot.n, slot.pi);
+        let skin = |s: i128| crate::field::skin_of(s, slot.n, slot.pi, &slot.exponential);
         let b = release(2 * slot.pi / slot.n as i128, FACE_BITS);
         for &sites in LENGTHS.iter().filter(|&&s| (2..=100.min(slot.decay.len())).contains(&s)) {
             let (tau, sigma) = clock_of(&mut next, sites, &rates);

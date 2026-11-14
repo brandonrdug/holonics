@@ -80,7 +80,7 @@
 //!
 //! [definition; agent-inferred, November 3, §16.24] **An answer port is compared through its coupling.** Where a region
 //! declares its port ([`Region::port`]), every site from its start is compared with the answer's cells by the coupling at
-//! temperature one ([`crate::receiver::coupling::coupling_code`]): an unused place writes the void, and the covector is
+//! temperature one ([`crate::inherited::coupling::coupling_code`]): an unused place writes the void, and the covector is
 //! the face less the target the coupling places there ([`port_reading`]).
 //!
 //! [definition; agent-inferred, November 2, §16.22] **A site opens on its moment.** The source enters as phase-carried
@@ -175,8 +175,8 @@
 //! the release's sweeps); the **cell holonomy** (the release's circulation receipt) and the **tower
 //! thread** (the octave falloff) stay attached.
 
-use super::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-use crate::hnn::keyed_modes::{ln2_face, log2_face, Exponential};
+use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
+use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 use rayon::prelude::*;
 
 /// [agent-inferred, November 1] **A term's share of its row's mass** on `2^(−63)` (§14.11): formed
@@ -1078,7 +1078,7 @@ pub struct Region<'a> {
     pub domain: Option<usize>,
     /// [definition; agent-inferred, November 3, §16.24] **The answer port**, where one is compared through its coupling:
     /// every site from `start` to the region's end is open, and their faces are compared with `target` (the answer's
-    /// cells, never the void) by the coupling at temperature one ([`crate::receiver::coupling::coupling_code`]), an
+    /// cells, never the void) by the coupling at temperature one ([`crate::inherited::coupling::coupling_code`]), an
     /// unused place writing `void`. `None` where every open site is compared at its own place.
     pub port: Option<Port<'a>>,
 }
@@ -1118,14 +1118,14 @@ pub struct Port<'a> {
 /// places there), from the faces at its places (each `(masses, total)`). The host's return and the card's read the same
 /// rows from the same faces.
 pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-    use crate::receiver::coupling::TemperatureRefusal as Why;
+    use crate::inherited::coupling::TemperatureRefusal as Why;
     if port.boundary {
         return boundary_reading(faces, port);
     }
     if port.letters {
         return letters_reading(faces, port);
     }
-    let read = crate::receiver::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
+    let read = crate::inherited::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
         TowerError::Refused(match why {
             Why::Short { .. } => "a port with more target cells than places",
             Why::VoidCell => "a port whose target holds the void",
@@ -1135,7 +1135,7 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
     })?;
     let mut rows = Vec::with_capacity(faces.len());
     for ((masses, total), placed) in faces.iter().zip(&read.placed) {
-        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64).collect();
         for &(c, share) in placed {
             row[c] -= share as i64;
         }
@@ -1159,7 +1159,7 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
 /// resolved place (an empty face) is not compared.
 fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-    let one = 1i64 << super::COVECTOR_BITS;
+    let one = 1i64 << crate::inherited::tower::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
     let mut code = 0i64;
     for (i, &(masses, total)) in faces.iter().enumerate() {
@@ -1171,17 +1171,17 @@ fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i6
             return refuse("a port's face that is empty, misses a class or holds no letter");
         }
         let rest = total - masses[port.void];
-        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
         row[port.void] = 0;
         row[port.target[i]] -= one;
-        code += crate::hnn::tower::face_code(masses[port.target[i]], rest);
+        code += crate::inherited::tower::face_code(masses[port.target[i]], rest);
         rows.push(row);
     }
     Ok((rows, code))
 }
 
 fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-    let one = 1i128 << super::COVECTOR_BITS;
+    let one = 1i128 << crate::inherited::tower::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
     let mut code = 0i64;
     for (i, &(masses, total)) in faces.iter().enumerate() {
@@ -1193,7 +1193,7 @@ fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
         if total == 0 || port.void >= masses.len() {
             return refuse("a port's face that is empty or misses a class");
         }
-        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << super::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64).collect();
         let void = row[port.void] as i128;
         if i < port.target.len() {
             let rest = one - void;
@@ -1202,10 +1202,10 @@ fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
                     *slot = if rest == 0 { 0 } else { fit64(-div_nearest(*slot as i128 * void, rest))? };
                 }
             }
-            code += crate::hnn::tower::face_code(total - masses[port.void], total);
+            code += crate::inherited::tower::face_code(total - masses[port.void], total);
         } else {
             row[port.void] -= one as i64;
-            code += crate::hnn::tower::face_code(masses[port.void], total);
+            code += crate::inherited::tower::face_code(masses[port.void], total);
         }
         rows.push(row);
     }
@@ -4891,7 +4891,7 @@ impl Field {
             let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
             // A receiver's probe word (§16.19).
             let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
-            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - super::COVECTOR_BITS;
+            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - crate::inherited::tower::COVECTOR_BITS;
             // [measurement; G157] A turned head's reach on its own clock: its founding covector by receiver row, where read.
             let mut reach_rows = [ReachSums::default(); 2];
             let reach_clock = reach.as_ref().and(paces.row[h]).filter(|_| d.carries_moment(h) && !d.is_depth(h)).map(|p| &paces.sigma[p]);
@@ -5580,7 +5580,7 @@ impl Field {
         }
         #[allow(clippy::too_many_arguments)]
         fn report<'a>(rounds: usize, active: &[bool], records: &[CertifiedRecord], faces: &[Vec<TowerFace>], answers: &'a [Vec<usize>], kept: usize, undone: usize, outside: i128, changed: i128) -> SettlePass<'a> {
-            let ln2 = crate::hnn::keyed_modes::ln2_face();
+            let ln2 = crate::inherited::keyed_modes::ln2_face();
             let past = |nats: i128| -> usize { faces.iter().zip(answers).map(|(f, x)| f.iter().zip(x).filter(|&(face, &a)| ((face.code(a) as i128 - entropy(face)) * ln2) >> 30 > nats << 20).count()).sum() };
             let (over, over2) = (past(1), past(2));
             SettlePass {
@@ -7581,7 +7581,7 @@ fn spans_of(regions: &[Region]) -> Vec<(usize, u64, u64)> {
     regions.iter().map(|r| { let (m, k) = r.weight(); (r.unresolved[..r.port.map_or(r.unresolved.len(), |p| p.start)].iter().filter(|&&u| u).count(), m, k) }).collect()
 }
 
-/// The regions' code on `2^(−20)` bits: the weighed code of the sites before the ports (§16.23, [`super::weighed_code`])
+/// The regions' code on `2^(−20)` bits: the weighed code of the sites before the ports (§16.23, [`crate::inherited::tower::weighed_code`])
 /// and the ports' coupling codes (§16.24).
 fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
     weighed_code(&c.pairs, spans) + c.coupled
@@ -8920,7 +8920,7 @@ pub fn exchange_proposals(x: &[usize], f: &[TowerFace], h: i128) -> Vec<(Vec<(us
 /// place already claimed; each its place and its letter, with its bare gain `c_t(x_t) − c_t(top)` on the codes' bits.
 pub fn redraw_proposals(x: &[usize], f: &[TowerFace], void: usize) -> Vec<(Vec<(usize, usize)>, i128)> {
     let (len, reach) = (x.len(), NEAR - 1);
-    let ln2 = crate::hnn::keyed_modes::ln2_face();
+    let ln2 = crate::inherited::keyed_modes::ln2_face();
     let nats = |bits: i128| (bits * ln2) >> 30;
     let v: Vec<i128> = (0..len).map(|t| f[t].code(x[t]) as i128 - entropy(&f[t])).collect();
     let mut order: Vec<usize> = (0..len).filter(|&t| nats(v[t]) > 1 << 20).collect();
@@ -8987,8 +8987,8 @@ pub struct ExchangeMove {
 }
 
 /// [definition; theory, November 10 03:25 and 03:55] **An answer's root charge** `Σ_a N(a) log₂(N(a)/F(a))` on the codes'
-/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`super::code_of`], its smaller side over its larger, both
-/// scaled down together to the width its quotient reads: a count on `2^72` passes the `2^66` [`super::face_code`] can shift by
+/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`crate::inherited::tower::code_of`], its smaller side over its larger, both
+/// scaled down together to the width its quotient reads: a count on `2^72` passes the `2^66` [`crate::inherited::tower::face_code`] can shift by
 /// its unit, which wrapped and read the November 10 128-problem run's root as −636,886 nats).
 pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
     let (n, f) = letter_balance(x, faces);
@@ -8996,7 +8996,7 @@ pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
         .filter(|&c| n[c] > 0 && f[c] > 0)
         .map(|c| {
             let (num, den) = (n[c] as u128, f[c] as u128);
-            let ratio = if num >= den { super::code_of(den, num) as i128 } else { -(super::code_of(num, den) as i128) };
+            let ratio = if num >= den { crate::inherited::tower::code_of(den, num) as i128 } else { -(crate::inherited::tower::code_of(num, den) as i128) };
             (n[c] >> 72) * ratio
         })
         .sum()
@@ -9045,7 +9045,7 @@ mod tests;
 /// running maximum's last value), read exactly as `m_∅(t) T_R 2^32 > u m_R T_t` on 256-bit products; the room's extent where
 /// none passes (none where no place carries void mass).
 pub fn one_end_length(room: &[Option<&TowerFace>], void: usize, u: u128) -> usize {
-    let wide = crate::compression::landmark::context::wide_mul;
+    let wide = crate::inherited::context::wide_mul;
     let Some(top) = room.iter().flatten().copied().reduce(|a, b| if wide(b.masses[void], a.total) > wide(a.masses[void], b.total) { b } else { a }) else { return room.len() };
     room.iter().position(|f| f.is_some_and(|f| wide(f.masses[void] << 32, top.total) > wide(u * top.masses[void], f.total))).unwrap_or(room.len())
 }
