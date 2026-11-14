@@ -4062,3 +4062,22 @@ fn the_marks_covector_matches_its_codes_difference() {
     eprintln!("MARK_COVECTOR_PROBES read={read} on_a_seam={seams} strengths={strengths_read}");
     assert!(read > 0 && 16 * seams <= read && strengths_read > 0, "read {read} probes, {seams} on a seam, {strengths_read} of the strengths");
 }
+
+/// [definition; agent-inferred, November 14, the ring record §4 and §5] **The mark's founding covector is the carried slope G175 read**: on a field
+/// reading twice at its founding, the strengths' covectors sum to `Σ_t ⟨λ⁰_t, D_t⟩` of [`Field::carried_slopes`] on the field before the growth,
+/// faced by its own first read; so the reading that sized the strength is the law's own first-order direction.
+#[test]
+fn the_marks_founding_covector_is_the_carried_slope() {
+    for still in [0usize, 1, 2] {
+        for plain in [four_ticks(still), circled_shaped(still), opened(still)] {
+            let (grown, _) = plain.with_mark().unwrap();
+            let l = grown.layout.clone();
+            let r = region();
+            let g = covector_of(&grown, &r);
+            let faces = plain.faces(&r).unwrap();
+            let slopes: i128 = plain.carried_slopes(&r, &faces).unwrap().iter().sum();
+            assert_eq!(g[l.mark..l.mark + MARK_BASES].iter().sum::<i128>(), slopes, "still {still}: the strengths' covector is the carried slope");
+        }
+    }
+}
+
