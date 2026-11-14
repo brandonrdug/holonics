@@ -1254,3 +1254,5 @@ import HolonicsResearch.Mathematics.RotorPlanes
 import HolonicsResearch.Mathematics.UncoupledBank
 import HolonicsResearch.Mathematics.RingSpectrum
 import HolonicsResearch.HNN.EffectiveTension
+import HolonicsResearch.HNN.ReadsTwice
+import HolonicsResearch.HNN.SynchronousTwoCycle
