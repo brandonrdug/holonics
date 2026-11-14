@@ -4316,3 +4316,16 @@ read at its MEAN.991, a mean across the change of law.
   one-place code better than the unmarked line's, and the field leans on its marks less; read 2 paid 0.005 at both masks while the
   constitution moved. The rule's second branch, read on partial evidence: the cost per gain is read against the card before more laps are
   judged, and the fourth pass's full laps (the both-reads law from its start) carry the verdict.
+
+G182 fixed 2026-11-14T07:46Z (the Opus PC thread), before its read: writes from the fourth pass's first-lap end state (both reads
+compared from the pass's start; pass4/lap1/STATE.stopped), write-store, 4 documents a slice, 256 places of prompt, 256 written, with 0, 1 and
+2 refine passes; the ruler is each write's commonest byte's share of its written bytes. Read first: from the marked line's lap-3 end state
+(one read compared, read 1 drifting), the mean share rose 0.176, 0.186 and 0.197 with the refine passes and one code write locked onto
+slashes (0.723, 0.824, 0.828; writes_filler_ruler.txt). The writer reads twice at every place, so its draft is heard through read 1's
+marks at refine 0 as well.
+  (a) the mean share rises at most 0.004 a refine pass, (r2 - r0)/2 (0.0105 at lap 3): a draft heard through an honest read 1 and weaker
+      marks no longer pulls the writes toward their own filler;
+  (b) the mean share at refine 0 stands between 0.15 and 0.19;
+  (c) no write's share reaches 0.5 at refine 0 (the slash lock was the drifted read 1's).
+  Rule: (a) held: the revision is lawful on the both-reads line, and the writes are shown with 2 refine passes. (a) missed: the draft's
+  self-hearing under revision is the next loop's subject, read on the writes' order parameters before any change of law.
