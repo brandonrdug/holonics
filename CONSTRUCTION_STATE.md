@@ -535,7 +535,7 @@ repository was reset on September 24; the pre-reset tree is
     rings for the first time: alone, a place flips between two faces each pass (a two-cycle, the
     successive changes pairing at −0.99 by pass 8, G163); damped, it settles onto a point worse
     than its first read (G164), since the readout was never trained through a carried opening.
-    Run on undamped (Brandon's lens: let a runaway run until it is wrong), the mutual loop runs
+    Run on undamped (Brandon's lens: let a runaway run until the passage disagrees), the mutual loop runs
     off and locks into a two-cycle with no snap (G166); the known places worsen in step with it,
     evidence inside the field (G167); a snap on that evidence limits the harm and buys nothing
     (G168). Drawn from its own face and heard as written text, the loop runs off as well: noise

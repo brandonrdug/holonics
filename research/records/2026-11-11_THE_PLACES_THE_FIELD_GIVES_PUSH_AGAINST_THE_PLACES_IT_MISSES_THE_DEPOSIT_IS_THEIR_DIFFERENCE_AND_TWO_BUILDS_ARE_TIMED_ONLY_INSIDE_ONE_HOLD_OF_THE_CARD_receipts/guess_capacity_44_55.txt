@@ -4236,3 +4236,24 @@ card build (the card would stand idle). Its first lap trains 3,000 sections from
   (c) whole masks stand within 0.006 of the second pass's last mean.
   Rule: (a) held: the third pass goes on beside the build; (a) under 0.003: the documents are spent at this size, and the card goes to the
   mark's lap as soon as its parity passes.
+
+G178 scored 2026-11-14T00:56Z (receipt line_pass3_lap1.txt; the third pass's first lap, 3,000 sections, read-cavity on its mean against
+lap9/MEAN.636):
+  (a) one-place masks fall 0.0083 nats a place, 1.0204 to 1.0121: held;
+  (b) every slice falls (code −0.0043, web −0.0111, science −0.0022, books −0.0101, wikidata −0.0138): held;
+  (c) whole masks fall 0.0026, to 2.3766: held.
+  Of 3 parts 3 held. A third pass over the same documents at fresh cuts buys what the second pass's first lap bought: the third pass
+  goes on beside the build.
+
+G179 fixed 2026-11-14T01:24Z (the Opus PC thread), before its read: the mark enters the line. The new binary (main at 5d049f34a, the card
+reading twice) first reproduces, with the mark off, 50 sections of the third pass's first lap and that lap's read; then found-mark on the
+third pass's lap-2 end state and a lap of 3,000 sections reading twice from it, read by read-cavity at its lap mean. The control is the
+line's own third lap of the third pass from the same state, read at its mean. Read first: G175's founding slope −0.0455 nats a place a
+unit of strength (the strengths' covector, by test); G176's best 0.003 at 1/8 with the constitution fixed; a strength steps at most about
+2^-12 of a unit a section at the base rate, so 3,000 sections can carry it past G176's best.
+  (a) the reproduction's 50 sections equal the line's, timings aside, and its read's rows equal the line's;
+  (b) the marked lap's one-place masks stand at least 0.001 nats a place under the control lap's at lap means;
+  (c) its whole masks stand at least 0.003 under the control's;
+  (d) every strength at the lap's end stands between 2^-7 and 1/2 of a unit.
+  Rule: (b) and (c) held: the line reads twice from here. (c) held and (b) missed: the mark buys in the span masks, the release's regime,
+  and the line reads twice. Both missed: the mark waits, and its strengths' and rows' covectors are read by part on the marked lap.

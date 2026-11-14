@@ -414,7 +414,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 13; the last five are from his corrections of November 12 and 13, and the
+October 29 and November 14; the last six are from his corrections of November 12 to 14, and the
 three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
@@ -604,6 +604,18 @@ that day. They are written here with their reasons so that no agent holds them a
   release, reading, guess and design; a reading of the field's own face is its face at the temperature the
   field holds, and a limit read beside it is named a ruler
   ([the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md) §5).
+- **A comparison is an agreement at a receiver; nothing a release does is wrong** (Brandon, November 14 02:04Z).
+  No reading, guess, record, brief or message calls a release, a face, a write or a draw right, wrong, correct or
+  incorrect. A comparison measures agreement with a named passage at a named receiver, and its descent is a deposit
+  toward agreement; reward and agreement are one quantity. Equivalent forms that a receiver reads the same way are not
+  ranked by the comparison, and the receiver is what fixes which forms are equivalent. Reason: he named the framing
+  the same day ("you can't say it's wrong, and you also don't know when and if it will be right"). Correctness is bound
+  to the receiver that reads an output (a compiler, an interpreter, a listener), symbols are agreements settled by
+  least action over configuration states, and a field trained toward one specimen's correctness learns to recite that
+  specimen. The rule of November 9 (a reference answer is one specimen) held the same direction for answers; the readings
+  of November 13 still counted places "confidently wrong". The wording is `agent-inferred`. Scope: every reading,
+  guess, record, brief and message; guesses keep the words they were fixed in
+  ([the record](research/records/2026-11-14_THE_MARK_IS_THE_FIELD_KNOWING_ITS_OWN_PLACEMENTS_A_COMPARISON_IS_AN_AGREEMENT_AT_A_RECEIVER_AND_NOTHING_A_RELEASE_DOES_IS_WRONG.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

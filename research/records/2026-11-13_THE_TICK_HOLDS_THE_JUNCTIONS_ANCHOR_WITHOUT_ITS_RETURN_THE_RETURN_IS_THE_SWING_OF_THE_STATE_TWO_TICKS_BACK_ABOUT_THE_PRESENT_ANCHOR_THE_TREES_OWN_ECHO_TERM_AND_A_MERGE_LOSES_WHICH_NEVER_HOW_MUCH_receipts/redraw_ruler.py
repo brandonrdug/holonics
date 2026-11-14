@@ -24,11 +24,11 @@ for r in rows:
 for w in sorted(by):
     width = len(next(iter(by[w].values())))
     tot = [sum(v[i] for v in by[w].values()) for i in range(width)]
-    places, code, expected, agree, flips, pair_flips, pairs, snaps, snap_places, average, own, wrong = tot[:12]
+    places, code, expected, agree, flips, pair_flips, pairs, snaps, snap_places, average, own, against = tot[:12]
     evidence = f" evidence={nats(tot[13], tot[12]):.4f}({tot[12]}) deposited={tot[14]}" if width >= 15 else ""
     rate = flips / max(places, 1)
     ratio = (pair_flips / max(pairs, 1)) / rate ** 2 if rate > 0 else 0.0
     slices = " ".join(f"{SLICES[s]}={nats(v[1], v[0]):.4f}/{nats(v[9], v[0]):.4f}" for s, v in sorted(by[w].items()))
     print(f"sweep={w} places={places} code={nats(code, places):.4f} expected={nats(expected, places):.4f} average={nats(average, places):.4f}"
           f" own={nats(own, places):.4f} agree={agree / places:.4f} flips={rate:.4f} pair_ratio={ratio:.3f} snaps={snaps}/{snap_places}"
-          f" confident_wrong={wrong / places:.4f}{evidence} | code/average {slices}")
+          f" confident_against={against / places:.4f}{evidence} | code/average {slices}")
