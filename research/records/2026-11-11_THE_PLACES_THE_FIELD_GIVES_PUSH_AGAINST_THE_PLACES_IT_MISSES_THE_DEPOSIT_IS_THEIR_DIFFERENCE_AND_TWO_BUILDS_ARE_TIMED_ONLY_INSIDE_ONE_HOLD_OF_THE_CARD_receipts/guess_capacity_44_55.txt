@@ -4537,3 +4537,14 @@ G191 scored 2026-11-14T16:20Z (receipt g191_engine.txt), three holds of the card
   section, 0.5%, where the audit's forecast from a synchronized profile was 20 to 35 ms. The pair keeps every bit and enters the line's binary.
   The protocol's correction: a hold opens with a declared warm-up run, and a forecast from a profile that times each launch alone overstates
   latency-bound kernels.
+
+G189 scored 2026-11-14T17:47Z (receipt g189_fourth_lane.txt). A fourth lane of 32 founded at zero on the three-lane line's lap-2 end state
+(found-lane; 305,145 entries to 392,505, ln r = 0.252), with its receipts (its build reproduced lap 3's first 24 sections; its lap-2 mean's
+held read was the three-lane line's byte for byte), trained 2,886 sections in lap 3's card time (2,023,730 ms; 701 ms a section against
+675, 1.04 times), read at equal card-time windows against lap 3:
+  (a) whole masks at MEAN.2000: 2.2976 against 2.3040, 0.0064 under: held (four slices under, books 0.0006 over);
+  (b) one-place at MEAN.2000: 0.9290 against 0.9339, 0.0049 under: held (every slice, 0.0043 to 0.0057).
+  Both held (at MEAN.1000, the lane opening: 0.0011 and 0.0018 under). The face's price at a fourth lane in its first two thousand sections:
+  about 0.025 nats a place a nat of cells at whole masks and 0.019 at one-place masks, against the third lane's 0.040 and 0.027 at the same
+  stage, still well above its cost of 1.04 times a section. The rule's first branch: the face goes on growing by a lane read this way; the
+  line takes its fourth lane on its newest state (the three-lane line's lap 5 end), so the laps since lap 2 are kept.

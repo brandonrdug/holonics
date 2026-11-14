@@ -1,0 +1,25 @@
+# G189: a fourth lane founded on the three-lane line's lap-2 end state, trained for lap 3's card time, against lap 3 at equal card-time windows. Numbers only.
+FOUND_LANE lines=11 equal=5 width=128 lanes=4 material=305145 founded_material=392505 lane_entries=87360 ms=194
+LANE_REPRO sections=24 equal=24
+LANE_FACES identical
+STORE_STOPPED sections=2886/6000 stretches=20325250 reads=0 returns=2886 pairs=263320569288 batches=5772 peak_store=8553007256 ms=2024099
+MEASURE lap=four rc=0 wall_s=2024.6 peak_rss_kib=304980
+STORE_PASS role=prefix sections=3000 stretches_read=20347784 ended=false code_pieces=23058 web_pieces=12802 science_pieces=7755 books_pieces=719 wikidata_pieces=2953 ms=2023730
+## four lanes MEAN.1000 (F3) against three lanes lap 3 MEAN.1000 (C3)
+LAST_TICK F3 one_place pooled=0.9344 places=100508 | code=0.6254(20124) web=1.0077(20043) science=0.8827(20088) books=0.9786(20028) wikidata=1.1769(20225)
+LAST_TICK C3 one_place pooled=0.9362 places=100508 | code=0.6286(20124) web=1.0098(20043) science=0.8829(20088) books=0.9805(20028) wikidata=1.1785(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0018 | code=-0.0032 web=-0.0021 science=-0.0003 books=-0.0019 wikidata=-0.0016
+LAST_TICK F3 whole_open pooled=2.3018 places=3717 | code=2.1660(730) web=2.4771(758) science=2.2108(776) books=2.1492(776) wikidata=2.5311(677)
+LAST_TICK C3 whole_open pooled=2.3029 places=3717 | code=2.1706(730) web=2.4784(758) science=2.2113(776) books=2.1539(776) wikidata=2.5249(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0011 | code=-0.0046 web=-0.0013 science=-0.0005 books=-0.0047 wikidata=+0.0062
+## four lanes MEAN.2000 (F3) against three lanes lap 3 MEAN.2000 (C3)
+LAST_TICK F3 one_place pooled=0.9290 places=100508 | code=0.6222(20124) web=1.0014(20043) science=0.8733(20088) books=0.9735(20028) wikidata=1.1737(20225)
+LAST_TICK C3 one_place pooled=0.9339 places=100508 | code=0.6278(20124) web=1.0057(20043) science=0.8779(20088) books=0.9781(20028) wikidata=1.1793(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0049 | code=-0.0057 web=-0.0043 science=-0.0045 books=-0.0046 wikidata=-0.0056
+LAST_TICK F3 whole_open pooled=2.2976 places=3717 | code=2.1732(730) web=2.4649(758) science=2.2011(776) books=2.1551(776) wikidata=2.5183(677)
+LAST_TICK C3 whole_open pooled=2.3040 places=3717 | code=2.1838(730) web=2.4732(758) science=2.2057(776) books=2.1545(776) wikidata=2.5281(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0064 | code=-0.0106 web=-0.0083 science=-0.0046 books=+0.0006 wikidata=-0.0098
+## the three-lane line's fifth-pass laps at their means (one-place, whole)
+lap2 pooled=0.9405 lap2 pooled=2.3041 
+lap3 pooled=0.9326 lap3 pooled=2.3071 
+lap4 pooled=0.9254 lap4 pooled=2.3006 
