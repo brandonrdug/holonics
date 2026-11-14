@@ -504,7 +504,7 @@ mod tests {
         forged.grid.x += 1;
         assert!(matches!(
             card.launch_cooperative(FLOW_ENTRY, &forged, &mut []),
-            Err(DeviceError::Launch { .. })
+            Err(crate::hnn::CardError::Launch { .. })
         ));
         assert!(matches!(
             card.aggregate_epoch_records_at_capacity(2, 3, 6, 2, 4, 1, &records, Some(1)),

@@ -159,7 +159,7 @@ mod tests;
 mod word_tests;
 
 pub use card::{
-    Card, CardBuffer, DeviceCensus, EntryCensus, Layout, Operand, Realization,
+    Card, CardBuffer, CardError, DeviceCensus, EntryCensus, Layout, Operand, Realization,
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
 pub use epoch::EpochFlowExecution;
@@ -188,7 +188,7 @@ pub const KERNELS: &str = env!("HOLONICS_CUDA_KERNELS");
 /// card ([`Card::launch`]): the HNN's words, epochs, lattices, inverses and towers. The field opens
 /// it with no image ([`Card::open`]) and loads its own.
 pub fn open_hnn(ordinal: i32) -> Result<Card, DeviceError> {
-    Card::open_with_image(ordinal, IMAGE, KERNELS)
+    Ok(Card::open_with_image(ordinal, IMAGE, KERNELS)?)
 }
 
 /// Every refusal of the resident HNN: a typed return, never a panic and never a rounded value.
@@ -261,6 +261,26 @@ pub enum DeviceError {
     },
     #[error(transparent)]
     Hnn(#[from] HnnError),
+}
+
+/// The card's refusals, case for case ([`CardError`]).
+impl From<CardError> for DeviceError {
+    fn from(error: CardError) -> Self {
+        match error {
+            CardError::Driver(error) => DeviceError::Driver(error),
+            CardError::NoKernels { reason } => DeviceError::NoKernels { reason },
+            CardError::Census { what, value } => DeviceError::Census { what, value },
+            CardError::ForeignBuffer => DeviceError::ForeignBuffer,
+            CardError::Launch { entry, clause } => DeviceError::Launch { entry, clause },
+            CardError::Shape { what, expected, found } => DeviceError::Shape { what, expected, found },
+        }
+    }
+}
+
+impl From<CudaError> for DeviceError {
+    fn from(error: CudaError) -> Self {
+        DeviceError::Driver(Box::new(error))
+    }
 }
 
 /// [definition] The card carries `Lock` rings only: a founded `Own` ring's word, phase and moment

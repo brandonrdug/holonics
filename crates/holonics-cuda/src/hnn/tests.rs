@@ -331,11 +331,11 @@ fn read_layout_is_derived_from_the_census() {
     assert_eq!(lowered.block, Dim3::x(256));
     assert!(matches!(
         read_layout(&census, &read, 4, 4, 65_536),
-        Err(DeviceError::Launch { .. })
+        Err(crate::hnn::CardError::Launch { .. })
     ));
     assert!(matches!(
         read_layout(&census, &read, 0, 4, 1),
-        Err(DeviceError::Launch { .. })
+        Err(crate::hnn::CardError::Launch { .. })
     ));
 }
 
@@ -375,7 +375,7 @@ fn ingest_layout_is_derived_from_the_census() {
     );
     assert!(matches!(
         ingest_layout(&census, &ingest, 0, 1, None),
-        Err(DeviceError::Launch { .. })
+        Err(crate::hnn::CardError::Launch { .. })
     ));
 }
 

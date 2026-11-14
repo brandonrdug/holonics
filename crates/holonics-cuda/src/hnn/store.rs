@@ -171,7 +171,8 @@ pub(crate) struct ChartState {
     mirror: BTreeMap<ChartKey, ChartWords>,
 }
 
-fn device(error: DeviceError) -> HnnError {
+fn device(error: impl Into<DeviceError>) -> HnnError {
+    let error: DeviceError = error.into();
     error.into_hnn()
 }
 

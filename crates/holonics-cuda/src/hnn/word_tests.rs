@@ -50,7 +50,7 @@ fn the_inverse_layouts_are_derived_from_the_census() {
     );
     assert!(matches!(
         certificate_layout(&census, &certificate, 0, 4),
-        Err(DeviceError::Launch { .. })
+        Err(crate::hnn::CardError::Launch { .. })
     ));
 }
 

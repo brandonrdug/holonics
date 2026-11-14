@@ -544,7 +544,7 @@ impl<'c> ResidentMoment<'c> {
     /// **The rings' phase classes on the card** (a transfer).
     pub fn phases(&self) -> Result<Vec<u32>, DeviceError> {
         self.ensure_valid()?;
-        self.card.fetch(&self.phases)
+        Ok(self.card.fetch(&self.phases)?)
     }
 
     /// **The counts read back** (a transfer).

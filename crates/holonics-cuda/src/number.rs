@@ -115,7 +115,7 @@ pub fn cut_add(card: &Card, cases: &[(u32, u32, u32)]) -> Result<Vec<u32>, Devic
         (&mut po as *mut CUdeviceptr).cast(),
     ];
     launch(&module, &stream, "hn_parity_cut", 128, (cases.len() as u32).div_ceil(128).max(1), &mut params)?;
-    card.fetch(&out)
+    Ok(card.fetch(&out)?)
 }
 
 /// **The warp's add** of 1,024-place words (32 limbs each): each case's sum limbs and its winding.

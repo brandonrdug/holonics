@@ -35,8 +35,7 @@ use holonics::hnn::tower::field::{level_cut, level_section, PACE_BITS};
 use holonics::hnn::tower::{TowerError, TowerFace, MATERIAL_BITS};
 
 use crate::cuda::{Dim3, Module};
-use crate::hnn::card::{Card, CardBuffer};
-use crate::hnn::DeviceError;
+use crate::hnn::card::{Card, CardBuffer, CardError};
 
 const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 const THREADS: u32 = 256;
@@ -82,7 +81,7 @@ const MARGIN: u64 = 1 << 30;
 
 type Result<T> = std::result::Result<T, TowerError>;
 
-fn device(error: DeviceError) -> TowerError {
+fn device(error: CardError) -> TowerError {
     TowerError::Realization(format!("the card: {error}"))
 }
 
@@ -1075,7 +1074,7 @@ pub struct CardField<'c> {
 impl<'c> CardField<'c> {
     /// Load the field's image; a batch's stores take the card's free memory at its open less the
     /// margin, kept under the 12 GB the runs keep the board to.
-    pub fn open(card: &'c Card) -> std::result::Result<Self, DeviceError> {
+    pub fn open(card: &'c Card) -> std::result::Result<Self, CardError> {
         card.current()?;
         let module = Module::load_ptx(IMAGE)?;
         let memory = card.census().memory;
@@ -1096,12 +1095,12 @@ impl<'c> CardField<'c> {
 
     /// A buffer of at least `len` elements, contents undefined (`Pooled`).
     #[track_caller]
-    fn take<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+    fn take<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, CardError> {
         self.take_with(len, true, std::panic::Location::caller().line())
     }
 
     /// [`take`](Self::take), `wide` where a kept buffer longer than twice the class may serve it.
-    fn take_with<T: Poolable>(&self, len: usize, wide: bool, line: u32) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+    fn take_with<T: Poolable>(&self, len: usize, wide: bool, line: u32) -> std::result::Result<Pooled<'c, T>, CardError> {
         let cap = size_class(len.max(1));
         let size = core::mem::size_of::<T>();
         let mut pools = self.pools.borrow_mut();
@@ -1191,7 +1190,7 @@ impl<'c> CardField<'c> {
 
     /// [`take`](Self::take) with every element zero.
     #[track_caller]
-    fn take_zeroed<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+    fn take_zeroed<T: Poolable>(&self, len: usize) -> std::result::Result<Pooled<'c, T>, CardError> {
         let line = std::panic::Location::caller().line();
         let buffer = self.take_with::<T>(len, false, line)?;
         let octets = buffer.len() * core::mem::size_of::<T>();
@@ -1212,7 +1211,7 @@ impl<'c> CardField<'c> {
     }
 
     /// [`take`](Self::take) holding `values` (a synchronous transfer: complete when this returns).
-    fn take_up<T: Poolable>(&self, values: &[T]) -> std::result::Result<Pooled<'c, T>, DeviceError> {
+    fn take_up<T: Poolable>(&self, values: &[T]) -> std::result::Result<Pooled<'c, T>, CardError> {
         let buffer = self.take::<T>(values.len())?;
         self.card.write(&*buffer, 0, values)?;
         Ok(buffer)
@@ -1268,11 +1267,11 @@ impl<'c> CardField<'c> {
     /// four sites), and octets a second on a store of 2^28 words of 32 bits read in order, written in order, and gathered eight
     /// words at a random entry of a random row of `entries` entries. Each reading is timed alone, after a calibrating launch,
     /// to at least `seconds` of the card's time. No law and no state: the field's buffers are not touched.
-    pub fn yardsticks(&self, entries: u32, seconds: f64) -> std::result::Result<Yardsticks, DeviceError> {
+    pub fn yardsticks(&self, entries: u32, seconds: f64) -> std::result::Result<Yardsticks, CardError> {
         let card = self.card;
         card.current()?;
         let sms = card.census().multiprocessors.max(1);
-        let timed = |entry: &'static str, grid: u32, params: &mut [*mut c_void], launches: u32| -> std::result::Result<f64, DeviceError> {
+        let timed = |entry: &'static str, grid: u32, params: &mut [*mut c_void], launches: u32| -> std::result::Result<f64, CardError> {
             let function = self.module.function(entry)?;
             card.synchronize()?;
             let started = Instant::now();
@@ -1290,7 +1289,7 @@ impl<'c> CardField<'c> {
         let blocks = sms * 64;
         let out = card.alloc::<u64>(blocks as usize * 256)?;
         let (mut tp, mut ip, mut op) = (table.device_ptr(), input.device_ptr(), out.device_ptr());
-        let mut products = |entry: &'static str, per_pass: u64| -> std::result::Result<(f64, u64, f64), DeviceError> {
+        let mut products = |entry: &'static str, per_pass: u64| -> std::result::Result<(f64, u64, f64), CardError> {
             let mut passes = 64u32;
             let took = timed(entry, blocks, &mut [arg(&mut tp), arg(&mut ip), arg(&mut op), arg(&mut passes)], 1)?;
             let mut passes = scaled(passes, took);
@@ -1308,7 +1307,7 @@ impl<'c> CardField<'c> {
         let sums = card.alloc::<u64>(stride_blocks as usize * 256)?;
         let mut sum_p = sums.device_ptr();
         let octets = (words * 4) as u64;
-        let streamed = |entry: &'static str, params: &mut [*mut c_void]| -> std::result::Result<(f64, u64, f64), DeviceError> {
+        let streamed = |entry: &'static str, params: &mut [*mut c_void]| -> std::result::Result<(f64, u64, f64), CardError> {
             let took = timed(entry, stride_blocks, params, 4)?;
             let launches = scaled(4, took);
             let took = timed(entry, stride_blocks, params, launches)?;
