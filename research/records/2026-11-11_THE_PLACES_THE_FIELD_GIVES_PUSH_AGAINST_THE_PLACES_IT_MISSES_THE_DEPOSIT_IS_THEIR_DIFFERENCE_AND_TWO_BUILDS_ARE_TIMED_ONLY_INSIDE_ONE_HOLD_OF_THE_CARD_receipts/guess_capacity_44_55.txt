@@ -4441,3 +4441,14 @@ an entry a pass of its 221,881 entries, four passes.
   Rule: (a) held: the level is bound by what the constitution can hold, not by what it has met, so growth of the constitution by part is
   the next design and the broader passage (tier B) waits on it. (a) missed with the prefix well under the held: the field holds what it
   met, so the broader passage is the lever. Slice by slice beside the pooled reading, since the slices' documents differ in length and kind.
+
+G187 scored 2026-11-14T11:56Z (receipt g187_roles.txt), the sixth-lap mean read on the prefix role beside the held:
+  (a) the prefix role codes 1.0017 one-place against the held role's 0.9742, 0.0275 over: missed;
+  (b) whole masks 2.4178 against 2.3321, 0.0856 over: missed.
+  Of 2 parts 0 held, and the read does not answer its question. By slice the prefix stands 0.26 and 0.21 over the held on code and
+  science and 0.13 and 0.19 under on web and wikidata (books 0.013 under): document populations, not what was met. The store keeps its
+  documents in the shards' order (tools/corpus_passage.py), the prefix from the front and the held from the far end, and a read of 20,000
+  places takes each slice's first few documents (about five on code, under one on science). No slice shows the uniform lead four meetings
+  would leave, but the rule cannot be applied on this read. A fair one is owed: the same population on both sides (the documents either
+  side of the prefix's end, met four times and never met), sampled over many documents. The build's held read reproduces the line's lap-6
+  read byte for byte (ROLE_REPRODUCES identical), so the role argument enters with its default unchanged.
