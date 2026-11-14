@@ -549,14 +549,19 @@ repository was reset on September 24; the pre-reset tree is
     (G175); along its strength with the constitution fixed it buys 0.003 at 1/8 and turns by 1/4
     (G176), so the build is the field trained through the mark, now a host law: the field reads
     twice, its second read marked by the first at strengths founded at zero (`hnn-field-v14m`,
-    part `mark`), and its card realization reads the host's bits: each batch read twice, the first
-    read's silent faces' shares kept on the card for the second read's marks and return, faces,
-    covector and a learner's sections equal on plain, carry, opening and tower fields at the
+    part `mark`), and its card realization reads the host's bits: each batch read twice on one
+    base, the first read's silent faces' shares kept on the card for the second read's marks,
+    faces, covector and a learner's sections equal on plain, carry, opening and tower fields at the
     founding and off it (atlas `tower.field-mark`; a marked field with the junction's return is
     refused with the junction). Trained through it on the line, the field agrees with the passage
     more than the line at equal training, 0.0022 nats a place at one-place masks and 0.0144 at
     whole masks, every slice gaining, its strengths rising to 0.26 to 0.49 (G179), and the line
-    reads twice from here, at 1.33 times a section's cost (the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
+    reads twice from here. Both reads are compared: the first read, which no comparison reached,
+    drifted off its agreement with the passage, 0.012 nats a place at one-place masks and 0.060 at
+    whole masks (G180), so each read returns into the one covector and a section's sum is released
+    by one bit once, at the founding the one read's comparison bit for bit, on the host and on the
+    card alike, at 585 ms a section on the card against 412 ms for the second read's comparison
+    alone (receipt `mark_both_time.txt`; the record's §4 and §5; Brandon's correction of the same day: a temperature is a store's
     state, never a reading's dial; [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md)).
     The line's first pass over the 1 GB of training documents ended at lap 6 (1.0743 one-place,
     2.4057 whole masks); the second pass's laps read 1.0630, 1.0542, 1.0464, 1.0383 and 1.0320

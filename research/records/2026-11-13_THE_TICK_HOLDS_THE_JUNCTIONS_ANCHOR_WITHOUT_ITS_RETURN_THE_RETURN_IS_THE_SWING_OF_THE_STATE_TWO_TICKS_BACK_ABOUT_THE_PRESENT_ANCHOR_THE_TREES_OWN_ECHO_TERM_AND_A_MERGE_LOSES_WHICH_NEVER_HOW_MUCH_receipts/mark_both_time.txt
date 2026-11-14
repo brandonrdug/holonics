@@ -1,0 +1,48 @@
+# G180 on the card: both reads compared, the run's sum halved once (branch claude/mark-both). Main's binary (control m, built from c59d58382, whose tree is
+# main e0d4c3400's) against this build (n), in one hold of the card lock, interleaved m1 n1 m2 n2 m3, each the store trainer's 100 sections (train-store,
+# the line's own arguments) from the copy of the line's lap-2 STATE.2000; then 50 sections from a copy of the unmarked pass3 lap-2 STATE.3000
+# (sha256 609ead5d...) through both, the unmarked bits' reproduction. RTX 4080 SUPER; no build on the host. The law changed, so this build's
+# marked sections deposit differently from the first section on; its own repeat (n2) equals n1.
+# Projection 100 x 650 ms + 3 s = 68 s a run (5 runs) and 2 x 25 s; deadline 600 s a run. Measured 42 to 59 s a run (the hold's lines), 0.62 to 0.87.
+# hold: lock taken 05:48:28 load 2.92 3.61 2.94
+# m1: exit 0 05:49:10
+# n1: exit 0 05:50:09
+# m2: exit 0 05:50:51
+# n2: exit 0 05:51:50
+# m3: exit 0 05:52:32
+# u_main: exit 0 05:52:51
+# u_new: exit 0 05:53:10
+# hold: released 05:53:10 load 1.18 2.04 2.43
+SECTION_MS log=m1.log sections=100 mean=410.8 median=409.0 mean_from_10=410.3 min=392 max=453
+SECTION_MS log=n1.log sections=100 mean=584.6 median=585.0 mean_from_10=584.7 min=552 max=627
+SECTION_MS log=m2.log sections=100 mean=409.2 median=409.0 mean_from_10=409.1 min=390 max=451
+SECTION_MS log=n2.log sections=100 mean=584.7 median=584.5 mean_from_10=584.6 min=554 max=632
+SECTION_MS log=m3.log sections=100 mean=416.0 median=412.0 mean_from_10=416.7 min=387 max=468
+SECTION_MS log=u_main.log sections=50 mean=353.2 median=353.5 mean_from_10=353.5 min=320 max=381
+SECTION_MS log=u_new.log sections=50 mean=363.2 median=363.5 mean_from_10=360.4 min=333 max=401
+# main's controls against m1, then n2 against n1 (this build's own repeat), then this build's unmarked sections against main's:
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+SAME_SECTIONS read=100 line=100 compared=100 equal=100
+SAME_SECTIONS read=50 line=50 compared=50 equal=50
+STATE_EQUAL n2 n1
+STATE_EQUAL u_new u_main
+MEAN_EQUAL u_new u_main
+# this build against main on the marked sections (the law changed, so the deposits differ from the first section on):
+SAME_SECTIONS read=100 line=100 compared=100 equal=0
+FIRST_DIFF repro=STORE_SECTION n=0 regions=179 sites=41318 domain=22423 squared=15048626 open=12869 code=72 web=36 science=32 books=20 wikidata=19 stretches=11682529 before=3547572 after=- deposited=true transfer=- external=-4578 rate=12 opening=3364684 opening_places=41318
+FIRST_DIFF line =STORE_SECTION n=0 regions=179 sites=41318 domain=22423 squared=15048626 open=12869 code=72 web=36 science=32 books=20 wikidata=19 stretches=11682529 before=3547572 after=- deposited=true transfer=- external=-4091 rate=12 opening=3364684 opening_places=41318
+m1 returns=100 return_ms=39130 pairs=9110083455 batches=200
+n1 returns=100 return_ms=56542 pairs=9111517966 batches=200
+m2 returns=100 return_ms=39013 pairs=9110083455 batches=200
+n2 returns=100 return_ms=56552 pairs=9111517966 batches=200
+m3 returns=100 return_ms=39717 pairs=9110083455 batches=200
+u_main returns=50 return_ms=16684 pairs=2271689301 batches=100
+u_new returns=50 return_ms=17217 pairs=2271689301 batches=100
+# Read 1's return: 584.65 against 412.0 ms a section (+172.6 ms, 1.42 times); the card's run alone (return_ms / 100) 565.4 against 391.3 to 397.2 ms.
+# The unmarked pair (u_main, u_new) is one run each, read for its bits, not a timing read.
+# The card suite on this build (debug, the unfilled sentinels written): test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 76 filtered out; finished in 578.29s
+MARK_SECTION field=tower section=0 code_before=1856644017 strengths=[4190209, 2101247, 3149823] state_equal=1
+MARK_SECTION field=tower section=1 code_before=1852901747 strengths=[4186104, 2105300, 3154017] state_equal=1
+MARK_PARITY field=tower strengths=[0, 0, 0] open_sites=144 covector_entries=64479 strengths_covector=[4828641615, -1458837988, -741374249] faces_equal=1 covector_equal=1
+MARK_PARITY field=tower strengths=[4194304, 2097152, 3145728] open_sites=144 covector_entries=64479 strengths_covector=[4923425705, -1196157238, -745252623] faces_equal=1 covector_equal=1

@@ -634,9 +634,11 @@ struct Opening<'c> {
 /// no site on a mark (`cavity_forward` passes none), and the level's news from that comparison (`level_news`); only `open` takes the marks. So a
 /// field that reads twice ([`FieldDeclaration::mark`]) stages its regions, forms the base clock and its moments, reads the opening's comparison,
 /// fetches the news and cuts its level once a batch, and both reads stand on them: the first read's opening is the built one, the second's carries
-/// the marks, and from the opening on each read is its own. The opening's comparison is kept here until the read that compares it (the last)
-/// returns through it. The clock's stores (the skins, the near phases) are each clock's: a read after the first forms the base clock's again
-/// before its first tick (`reads`).
+/// the marks, and from the opening on each read is its own. The opening's comparison is kept here until the first read that returns returns
+/// through it. [G180] Where the field reads twice both reads are compared, and the opening's comparison returns the same bits in each (it reads
+/// the base clock and the cavity openings, no read's state): the first read takes it twice into the covector and leaves the base clock's
+/// covectors it gave (`early`) for the second read's reverse. The clock's stores (the skins, the near phases) are each clock's: a read after
+/// the first forms the base clock's again before its first tick (`reads`).
 struct BatchBase<'c> {
     st: Staged<'c>,
     /// The base clock (§16): its rates, clocks, variations, skin addresses, plainness and frames, and the site moments on it (§15.1).
@@ -651,6 +653,8 @@ struct BatchBase<'c> {
     _skins: Option<(Pooled<'c, u32>, Pooled<'c, u32>)>,
     _clock_store: Option<(Pooled<'c, u32>, Pooled<'c, u32>)>,
     opening: Option<Opening<'c>>,
+    /// [G180] The base clock's covectors the opening's comparison gave (`τ`, `σ`), left by the first read for the second's reverse.
+    early: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>,
     tb: Option<TowerBatch<'c>>,
     /// The reads taken on this base so far.
     reads: usize,
@@ -1713,14 +1717,15 @@ impl<'c> CardField<'c> {
             self.times.batches += 1;
             self.mark("run_setup");
             // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Field::pass`): the batch's
-            // first read is the built read, no readings and no return, and leaves each silent site's shares of its face on the card
-            // (`field_mark_shares`); the second read opens each silent site on its mark and is the batch's read, its faces, readings and return
-            // the field's. A region's marks are its own first read's, so the two reads run batch by batch. [realization; agent-inferred, November 14]
-            // Both stand on one base (`batch_base`): what comes before the opening is formed once a batch.
+            // first read is the built read with no readings, and leaves each silent site's shares of its face on the card (`field_mark_shares`);
+            // the second read opens each silent site on its mark and is the batch's read, its faces and readings the field's. [G180] Where the run
+            // returns, both reads return into the one covector (the host's `Field::returned` with `FieldPass::first`), halved once below. A region's
+            // marks are its own first read's, so the two reads run batch by batch. [realization; agent-inferred, November 14] Both stand on one base
+            // (`batch_base`): what comes before the opening is formed once a batch.
             let mut base = self.batch_base(field, &regions[batch.clone()], &mut words, tower.as_mut(), returning)?;
             let (f, z, r, e) = if d.mark {
                 let mut shares = None;
-                self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, None, false, None, tower.as_mut(), Some(&mut shares))?;
+                self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, g.as_deref(), false, None, tower.as_mut(), Some(&mut shares))?;
                 let shares = shares.ok_or(TowerError::Refused("a field's first read that left no shares for its marks"))?;
                 self.mark("mark_first_read");
                 words.mark_share = shares.device_ptr();
@@ -1751,6 +1756,10 @@ impl<'c> CardField<'c> {
                 g.extend(self.timed(Kind::Copy, || card.fetch_range(gg, 0, s.glue.len())).map_err(device)?);
             }
         }
+        // [definition; agent-inferred, November 14, G180] Where the field reads twice, the run's covector is both reads' over every batch, released
+        // by one bit once, the host's own law (`Field::both_reads_mean`), so it is the two reads' mean on any partition; unchanged for a field that
+        // reads once.
+        let g = field.both_reads_mean(g);
         let met_by_head = self.timed(Kind::Copy, || card.fetch_range(met, 0, heads)).map_err(device)?;
         let met = met_by_head.iter().map(|&m| u128::from(m)).sum::<u128>();
         if keep.is_some() {
@@ -2411,24 +2420,26 @@ impl<'c> CardField<'c> {
             None => None,
         };
         self.mark("batch_base");
-        Ok(BatchBase { st, kappa, tau, sigma, saddr, plain, pframe, moment, _skins: skins, _clock_store: clock_store, opening, tb, reads: 0 })
+        Ok(BatchBase { st, kappa, tau, sigma, saddr, plain, pframe, moment, _skins: skins, _clock_store: clock_store, opening, early: None, tb, reads: 0 })
     }
 
     /// One read of a batch of regions on its base ([`CardField::batch_base`]): the opening and the forward, each unresolved site's face (and its
     /// logits when `logits`), when `g` is given the reverse added into it, and with `keep` the still heads' last-tick weight rows of those sites
     /// (the batch's one region). With `first` (a field that reads twice, [`FieldDeclaration::mark`]) it is the batch's first read: the forward to
-    /// the faces with no reading, and each silent site's shares of its face left on the card in `first`, nothing fetched.
+    /// the faces with no reading, its return added into `g` where given ([G180] both reads are compared), and each silent site's shares of its
+    /// face left on the card in `first`, nothing fetched.
     #[allow(clippy::type_complexity)]
     #[allow(clippy::too_many_arguments)]
     fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, base: &mut BatchBase<'c>, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>, first: Option<&mut Option<Pooled<'c, u32>>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
         if field.scale.is_some() != tower.is_some() || field.scale.is_some() != base.tb.is_some() {
             return Err(TowerError::Refused("a tower is read with its packets' level"));
         }
-        // [the ring record §4] A first read is the built read alone: no return, no logits, no kept rows, no mark of its own, and none of the
-        // readings below (they read the second read, the field's).
+        // [the ring record §4] A first read is the built read: no logits, no kept rows, no mark of its own, and none of the readings below (they
+        // read the second read, the field's). [definition; agent-inferred, November 14, G180] Where the pass returns, the first read returns too,
+        // into the same covector: both reads are compared (the host's `Field::returned` with `FieldPass::first`), and the run halves the sum once.
         let reading = first.is_none();
-        if !reading && (g.is_some() || logits || keep.is_some() || words.mark_share != 0) {
-            return Err(TowerError::Refused("a field's first read with a return, a reading or a mark"));
+        if !reading && (logits || keep.is_some() || words.mark_share != 0) {
+            return Err(TowerError::Refused("a field's first read with a reading or a mark"));
         }
         let card = self.card;
         let d = field.declaration;
@@ -2484,8 +2495,11 @@ impl<'c> CardField<'c> {
         // zeroed and handed to the reverse as its own, every one an integer sum, so the order is the realization's. Its forward's buffers end here,
         // so none stands beside the ticks, the face or the reverse: held across them they added a buffer to each class they share, and the card's pool
         // passed its budget by about a tenth of a gigabyte, freeing and allocating again at three take sites every section (G143's profiled logs).
-        // [realization; agent-inferred, November 14] The forward is the base's (formed once a batch); the read that returns takes it, and a field that
-        // reads twice holds it across its first read, whose one tick's carriers stand under the second's every tick's.
+        // [realization; agent-inferred, November 14] The forward is the base's (formed once a batch), and the first read that returns takes it.
+        // [G180] Where the field reads twice both reads return, and the opening's comparison gives each the same bits (it reads the base clock and
+        // the cavity openings, no read's own state, as the host's `opening_compare_return` reads `pass.paces`): the first read returns it once into
+        // its own buffer, takes that twice into `g` (`field_wide_add`), and leaves a copy of the base clock's covectors it gave for the second
+        // read (`BatchBase::early`), so the forward still ends before the first read's ticks.
         let early_clocks = match base.opening.take() {
             Some(op) if !returning => {
                 // A read that does not return leaves the forward to the read that does.
@@ -2513,11 +2527,27 @@ impl<'c> CardField<'c> {
                 let gtau = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
                 let gsig = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((paced * sites).max(1))).map_err(device)?;
                 (words.gtau, words.gsig) = (gtau.device_ptr(), gsig.device_ptr());
-                self.opening_back(field, words, &op, g, (classes, unresolved, site_pos, mix_off, mix_class, mix_share), sites)?;
+                let tables = (classes.as_slice(), unresolved.as_slice(), site_pos.as_slice(), mix_off.as_slice(), mix_class.as_slice(), mix_share.as_slice());
+                if reading {
+                    self.opening_back(field, words, &op, g, tables, sites)?;
+                } else {
+                    let len = field.layout().len;
+                    let once = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(len)).map_err(device)?;
+                    self.opening_back(field, words, &op, &once, tables, sites)?;
+                    let (mut gp, mut op1, mut count, mut times) = (g.device_ptr(), once.device_ptr(), len as u64, 2u32);
+                    self.launch("field_wide_add", Self::cells(len as u64), THREADS, &mut [arg(&mut gp), arg(&mut op1), arg(&mut count), arg(&mut times)])?;
+                    let words128 = (paced * sites).max(1);
+                    let (tau2, sig2) = (self.timed(Kind::Alloc, || self.take::<i128>(words128)).map_err(device)?, self.timed(Kind::Alloc, || self.take::<i128>(words128)).map_err(device)?);
+                    let stream = card.stream();
+                    stream.copy_device_to_device_async(tau2.device_ptr(), gtau.device_ptr(), 16 * words128).map_err(|e| device(e.into()))?;
+                    stream.copy_device_to_device_async(sig2.device_ptr(), gsig.device_ptr(), 16 * words128).map_err(|e| device(e.into()))?;
+                    base.early = Some((tau2, sig2));
+                }
                 drop(op);
                 Some((gtau, gsig))
             }
-            None => None,
+            // [G180] The second read's base clock covectors from the opening's comparison, as the first read's gave them.
+            None => base.early.take(),
         };
         // The level's ticks, the read's own.
         if let Some(tb) = base.tb.as_mut() {
@@ -2732,25 +2762,26 @@ impl<'c> CardField<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(t64), THREADS, &mut [arg(words), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         self.mark("face_launch");
-        // [the ring record §4] A first read ends at its faces: each silent site's shares of its face (the host's `shares`) stay on the card for the
-        // second read's marks, and nothing is fetched.
-        if let Some(out) = first {
-            let shares = self.timed(Kind::Alloc, || self.take::<u32>((sites * a).max(1))).map_err(device)?;
-            let mut sp = shares.device_ptr();
-            self.launch("field_mark_shares", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut sp)])?;
-            self.status(&status)?;
-            *out = Some(shares);
-            return Ok((Vec::new(), Vec::new(), Rows::new(), Vec::new()));
-        }
+        // [the ring record §4] A first read's faces give each silent site's shares (the host's `shares`), which stay on the card for the second
+        // read's marks; nothing is fetched. [G180] Where the pass returns, the first read then returns from those faces (below), its readings off.
+        let marks = match first.as_ref() {
+            Some(_) => {
+                let shares = self.timed(Kind::Alloc, || self.take::<u32>((sites * a).max(1))).map_err(device)?;
+                let mut sp = shares.device_ptr();
+                self.launch("field_mark_shares", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut sp)])?;
+                Some(shares)
+            }
+            None => None,
+        };
         if let Some(g) = g {
             // The covector's magnitude near and far, where read (§16.20).
-            let shares = match self.covector_shares.borrow().is_some() {
+            let shares = match reading && self.covector_shares.borrow().is_some() {
                 true => Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(2 * heads)).map_err(device)?),
                 false => None,
             };
             words.dsshare = shares.as_ref().map_or(0, |b| b.device_ptr());
             // The held rows' current covectors, where read (§16.21).
-            if self.row_questions.borrow().is_some() {
+            if reading && self.row_questions.borrow().is_some() {
                 *self.row_cov.borrow_mut() = Some(vec![Vec::new(); ticks.len()]);
             }
             // The ports' covectors (§16.24, the host's `port_reading`): their places' faces fetched, each port's coupling read on
@@ -2808,6 +2839,10 @@ impl<'c> CardField<'c> {
         self.mark("reverse_launch");
         self.status(&status)?;
         self.mark("status_wait");
+        if let Some(out) = first {
+            *out = marks;
+            return Ok((Vec::new(), Vec::new(), Rows::new(), Vec::new()));
+        }
         // [realization; theory, November 13, P58 item 3] The training path's faces (`narrow`, no port, no logits, no kept rows): each open site's
         // mass at its class and its total, `(m_c, T)`, the words the learner's comparison reads of a face, gathered on the card and fetched alone
         // (8 and 16 octets a site, where the whole faces are 8 octets a site and class). The same pairs as the whole faces give.
@@ -4013,8 +4048,10 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
     // moments' return, and the crowds' two difference arrays.
     let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     // [the ring record §4] A field that reads twice holds its first read's shares `[t][A]` through the second read, and its return the marked
-    // sites' list and `release(α_b dx, 24)` in each of the three encodings (`[3][t][D]` at most).
-    let mark_site = if d.mark { 4 * a + if returning { 4 + 3 * 8 * dw } else { 0 } } else { 0 };
+    // sites' list and `release(α_b dx, 24)` in each of the three encodings (`[3][t][D]` at most). [G180] Where both reads return, the first
+    // leaves the base clock's two covectors from the opening's comparison (`[p][t]` on 128 bits each) for the second; the reads' own carriers
+    // are each read's, one read at a time.
+    let mark_site = if d.mark { 4 * a + if returning { 4 + 3 * 8 * dw + 2 * 16 * d.paced_heads() as u64 } else { 0 } } else { 0 };
     let (s, pairs) = (sites as u64, (sites * sites) as u64);
     // The shares are kept for a return and an echo; the reverse holds one head's covector a pair on 64 bits.
     let weights = h * 8 * pairs * if returning { 2 } else { 1 };
@@ -4939,7 +4976,8 @@ mod tests {
     /// and at [`MARK_STRENGTHS`], read and returned on [`mark_regions`] through the host and through the card: every face, every covector entry
     /// (the strengths' among them, nonzero), the faces of a read that does not return, the training path's words with the opening's codes, the
     /// charts by stage and the logits with their echoes equal; at the founding every face is the field's before the growth on the card too, and
-    /// off it some face moves.
+    /// off it some face moves. [G180] Both reads are compared and the sum halved once, so at the founding every covector entry but the strengths'
+    /// is the field's before the growth: the comparison is the one read's, bit for bit.
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_field_that_reads_twice_on_the_card_reads_the_hosts_bits() {
@@ -4964,6 +5002,7 @@ mod tests {
                 assert!(host_g[l.mark..l.mark + MARK_BASES].iter().all(|&v| v != 0), "{name} at {strengths:?}: every strength takes a covector");
                 if strengths == [0; MARK_BASES] {
                     assert_eq!(card_faces, before.0, "{name}: founded at zero, every face is the field's before the growth");
+                    assert!(card_g[..l.mark] == before.1[..l.mark] && card_g[l.mark + MARK_BASES..] == before.1[l.mark..], "{name}: founded at zero, both reads' mean is the one read's covector");
                 } else {
                     assert_ne!(card_faces, before.0, "{name}: off the founding some face moves");
                 }
@@ -4986,7 +5025,8 @@ mod tests {
     /// [definition; agent-inferred, November 14, the ring record §4] **A marked learner's sections on the card read the host's bits** (needs the
     /// card): each of [`mark_cases`] and the lettered learner grown to read twice, its strengths at [`MARK_STRENGTHS`], takes two sections on
     /// [`mark_regions`] (the lettered one on its own stretches) through the host ([`holonics::hnn::tower::field::HostField`]) and through the card:
-    /// the receipts and the learner's whole state (the material, the strengths among it, and the moments) equal after each.
+    /// the receipts and the learner's whole state (the material, the strengths among it, and the moments) equal after each. [G180] Each section
+    /// compares both reads and deposits their mean.
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn a_marked_learners_sections_on_the_card_read_the_hosts_bits() {
@@ -5017,7 +5057,7 @@ mod tests {
     }
 
     /// [measurement; the ring record §4] **The two reads' time on the card against one read** (needs the card): the opened learner's field before
-    /// the growth and grown to read twice at [`MARK_STRENGTHS`], each read and returned (a training read) and read without a return on one batch of 32 regions of 257
+    /// the growth and grown to read twice at [`MARK_STRENGTHS`], each read and returned (a training read; [G180] both reads return) and read without a return on one batch of 32 regions of 257
     /// sites (the open places of [`mark_regions`]'s longest), timed inside one hold as control, marked, control, marked, control after a warm read
     /// of each; the control's spread is the read's resolution.
     #[test]
