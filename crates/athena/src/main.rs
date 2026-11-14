@@ -22,6 +22,7 @@ use std::time::Instant;
 
 type Result<T> = std::result::Result<T, Box<dyn Error>>;
 
+#[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed milliseconds and rates (the precision law governs what the machinery stores and computes, not how a reading is written; October 18)")]
 fn run(args: &[String]) -> Result<()> {
     let (mode, rest) = args.split_first().ok_or("field_pass parity|time|train complete-language COMMAND ARGS…")?;
     if mode == "yardstick" {
@@ -223,6 +224,7 @@ fn run(args: &[String]) -> Result<()> {
 /// [measurement; theory, November 12, P50 step 0b] `field_pass yardstick [ENTRIES] [SECONDS]`: the card's yardsticks
 /// ([`CardField::yardsticks`]), narrow products a second and octets a second, each timed alone to at least SECONDS (default 1.5)
 /// of the card's time; ENTRIES (default 209) is a gathered row's count of entries of eight words.
+#[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed milliseconds and rates (the precision law governs what the machinery stores and computes, not how a reading is written; October 18)")]
 fn yardstick(args: &[String]) -> Result<()> {
     let entries: u32 = args.first().map(|a| a.parse()).transpose()?.unwrap_or(209);
     let seconds: f64 = args.get(1).map(|a| a.parse()).transpose()?.unwrap_or(1.5);

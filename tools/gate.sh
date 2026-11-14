@@ -21,6 +21,12 @@ run engine-host-tests cargo test -p holonics-engine --lib field -- --skip the_co
 run guard-lints cargo clippy -p holonics-engine -p holonics --all-targets -- -D clippy::disallowed_types \
   -D clippy::disallowed_methods -D clippy::float_arithmetic
 run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics-engine -p holonics --doc
+# The commands (`crates/athena`, C6 of #603): the exterior, so files and processes are lawful there by the crate's own allow,
+# and the float guard runs (a reading's printed floats are allowed where they are written). `--no-deps`, because the card
+# crate's yardsticks still owe their float lints (THE_CONSOLIDATION, C3).
+run athena-guard-lints cargo clippy -p athena --all-targets --no-deps -- -D clippy::disallowed_types -D clippy::disallowed_methods \
+  -D clippy::float_arithmetic
+run athena-tests cargo test -p athena
 run diagnostic-timing-controls cargo test -p holonics --example listener continuing::diagnostic::
 run diagnostic-supervisor-controls python3 tools/test_listener_diagnostic_stage.py
 run diagnostic-receipt-controls python3 tools/test_listener_diagnostic_receipts.py
