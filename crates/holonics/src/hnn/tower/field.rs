@@ -8636,22 +8636,26 @@ impl FieldLearner {
         // priced on this section: the external price, a step this section never shaped.
         let rates = self.entry_rates();
         mark(4);
-        let mut external_step = vec![0i128; g.len()];
-        for &(start, len, grain) in &self.field.families_all() {
-            for i in start..start + len {
-                external_step[i] = deposit_step(self.first[i], self.second[i], grain, rates[i]);
+        // [realization; November 14, the engine audit's finding 1] Each entry's step reads only its own moments and rate, so the families' entries
+        // are split across the host's cores, every bit kept.
+        let families = self.field.families_all();
+        let (first, second) = (&self.first, &self.second);
+        let step_into = |out: &mut [i128]| {
+            for &(start, len, grain) in &families {
+                out[start..start + len].par_iter_mut().enumerate().for_each(|(k, slot)| *slot = deposit_step(first[start + k], second[start + k], grain, rates[start + k]));
             }
-        }
+        };
+        let mut external_step = vec![0i128; g.len()];
+        step_into(&mut external_step);
         mark(5);
         let external = predicted_change(&self.field, &raw, &external_step, 0);
         mark(6);
-        for &(start, len, grain) in &self.field.families_all() {
-            for v in &mut g[start..start + len] {
-                *v = on_step_grain(grain, *v);
-            }
+        for &(start, len, grain) in &families {
+            g[start..start + len].par_iter_mut().for_each(|v| *v = on_step_grain(grain, *v));
         }
         mark(7);
-        for ((m, v), gv) in self.first.iter_mut().zip(self.second.iter_mut()).zip(&g) {
+        // Each entry's moments read only its own covector; a square past its carrier refuses the section wherever it stands.
+        self.first.par_iter_mut().zip(self.second.par_iter_mut()).zip(g.par_iter()).try_for_each(|((m, v), gv)| -> Result<()> {
             let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
             if *m == 0 && *v == 0 {
                 // A coordinate opens at its own first nonzero covector.
@@ -8660,13 +8664,13 @@ impl FieldLearner {
                 *m = toward(*m, *gv, FIRST_RATE);
                 *v = toward(*v, square, SECOND_RATE);
             }
-        }
+            Ok(())
+        })?;
         mark(8);
+        let (first, second) = (&self.first, &self.second);
         let mut step = vec![0i128; g.len()];
-        for &(start, len, grain) in &self.field.families_all() {
-            for i in start..start + len {
-                step[i] = deposit_step(self.first[i], self.second[i], grain, rates[i]);
-            }
+        for &(start, len, grain) in &families {
+            step[start..start + len].par_iter_mut().enumerate().for_each(|(k, slot)| *slot = deposit_step(first[start + k], second[start + k], grain, rates[start + k]));
         }
         mark(9);
         let predicted = predicted_change(&self.field, &raw, &step, 0);
