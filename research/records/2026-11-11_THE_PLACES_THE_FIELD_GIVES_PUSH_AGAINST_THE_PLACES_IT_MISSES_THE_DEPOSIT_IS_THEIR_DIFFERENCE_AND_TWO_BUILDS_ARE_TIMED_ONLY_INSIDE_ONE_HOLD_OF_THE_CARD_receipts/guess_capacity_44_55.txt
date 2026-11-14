@@ -4272,3 +4272,23 @@ control the line's own third lap's MEAN.2000.
   Of 4 parts 4 held, on partial evidence at a shared mean. The field trained through its own marked release agrees with the passage more
   than the line at equal training, most where its neighbours are open too (whole masks, five times the one-place gain), the strengths
   running past G176's fixed-constitution best of 1/8. The rule's first branch: the line reads twice from here.
+
+G180 fixed 2026-11-14T03:52Z (the Opus PC thread), before its read: whether read 1 keeps its calibration on the line that reads twice (a review
+Brandon relayed at 03:51Z: read 1 takes no gradient, so the shared constitution may drift off read 1's own agreement). The marked line's
+lap-2 mean (MEAN.2000) with its three strengths set to zero in a copy, so read 2 is read 1 bit for bit, read by read-cavity; against the
+unmarked third pass's fourth lap mean (one-place 1.0020, whole masks 2.3727), the nearest read at like training. Read first: the marked
+lap-2 mean with its strengths codes 1.0005 and 2.3490.
+  (a) read 1's one-place masks stand within 0.003 of 1.0020;
+  (b) read 1's whole masks stand within 0.006 of 2.3727.
+  Rule: (a) and (b) held: read 1 keeps its calibration, and the return through read 1 waits behind the realization's repair. Either
+  missed upward: read 1 drifts, and the return through read 1 is the next build.
+
+G180 scored 2026-11-14T04:13Z (receipt g180_read1.txt; read-cavity on a copy of the marked line's lap-2 mean with its strengths at zero):
+  (a) read 1's one-place masks code 1.0142, 0.0122 over the unmarked line's 1.0020 (science +0.025, books +0.018, wikidata +0.000): missed,
+      upward;
+  (b) read 1's whole masks code 2.4322, 0.0595 over 2.3727 (every slice over, code +0.100): missed, upward.
+  Of 2 parts none held. The review's point holds: with no comparison of its own, read 1 has drifted off its agreement with the passage, and
+  the field codes well only through its second read (1.0005 and 2.3490 there, 0.0137 and 0.0831 under its own read 1). The constitution has
+  specialized to hearing its marks while the marks it makes grow worse. The rule's second branch: the next build gives read 1 the
+  passage's comparison too, so the field's own placement stays its honest placement (agent-inferred: each read is the field's placement
+  and each is compared at the receiver; a return through the marks alone would train read 1 to serve read 2 rather than to agree).

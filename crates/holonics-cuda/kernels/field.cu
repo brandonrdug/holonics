@@ -4783,6 +4783,19 @@ extern "C" __global__ void field_mark_rows(FieldWords w, wide *g, const uint32_t
     }
 }
 
+// [realization; agent-inferred, November 14, G180] **One return's covector taken `times` times into the covector**: `g_i += src_i` repeated, the
+// host's integer sum of that many equal returns (the opening's comparison, which each of a field's two reads returns with the same bits, formed
+// once on the card). One thread an entry; the stream orders it after every kernel that wrote `src` or `g`.
+extern "C" __global__ void field_wide_add(wide *g, const wide *src, uint64_t count, uint32_t times) {
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < count; c += (uint64_t)gridDim.x * blockDim.x) {
+        wide v = g[c];
+        for (uint32_t k = 0; k < times; k++) {
+            v += src[c];
+        }
+        g[c] = v;
+    }
+}
+
 // -------------------------------------------------------------------------------------------
 // the turned heads' own clocks (§16, Law 1)
 

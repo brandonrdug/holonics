@@ -1,0 +1,17 @@
+# G180, read 1's own code on the line that reads twice: lap2/MEAN.2000 with its strengths (5013054, 10978077, 10288129) set to zero in a copy, so read 2 is read 1 bit for bit, read by read-cavity (336.5 s), against the unmarked third pass's fourth lap mean (C3), then against the same state's read with its strengths (C3 = out_P2). Numbers only.
+CAVITY_DONE ms=336461
+MEASURE lap=R1 rc=0 wall_s=337.0 peak_rss_kib=439316
+## against the unmarked line at like training
+LAST_TICK F3 one_place pooled=1.0142 places=100508 | code=0.7021(20124) web=1.0843(20043) science=0.9771(20088) books=1.0552(20028) wikidata=1.2516(20225)
+LAST_TICK C3 one_place pooled=1.0020 places=100508 | code=0.6946(20124) web=1.0740(20043) science=0.9524(20088) books=1.0371(20028) wikidata=1.2513(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0122 | code=+0.0075 web=+0.0103 science=+0.0248 books=+0.0181 wikidata=+0.0003
+LAST_TICK F3 whole_open pooled=2.4322 places=3717 | code=2.3070(730) web=2.5893(758) science=2.3726(776) books=2.2532(776) wikidata=2.6646(677)
+LAST_TICK C3 whole_open pooled=2.3727 places=3717 | code=2.2071(730) web=2.5499(758) science=2.3112(776) books=2.1955(776) wikidata=2.6265(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0595 | code=+0.0999 web=+0.0394 science=+0.0614 books=+0.0577 wikidata=+0.0380
+## against the same state reading twice
+LAST_TICK F3 one_place pooled=1.0142 places=100508 | code=0.7021(20124) web=1.0843(20043) science=0.9771(20088) books=1.0552(20028) wikidata=1.2516(20225)
+LAST_TICK C3 one_place pooled=1.0005 places=100508 | code=0.6923(20124) web=1.0743(20043) science=0.9533(20088) books=1.0385(20028) wikidata=1.2432(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=+0.0137 | code=+0.0099 web=+0.0100 science=+0.0238 books=+0.0167 wikidata=+0.0084
+LAST_TICK F3 whole_open pooled=2.4322 places=3717 | code=2.3070(730) web=2.5893(758) science=2.3726(776) books=2.2532(776) wikidata=2.6646(677)
+LAST_TICK C3 whole_open pooled=2.3490 places=3717 | code=2.1816(730) web=2.5352(758) science=2.2675(776) books=2.1921(776) wikidata=2.5944(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=+0.0831 | code=+0.1254 web=+0.0541 science=+0.1051 books=+0.0611 wikidata=+0.0702

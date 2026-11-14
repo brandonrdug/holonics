@@ -1853,6 +1853,9 @@ struct FieldPass {
     /// [definition; agent-inferred, November 14, the ring record §4] The marks this read opened its silent sites on ([`FieldDeclaration::mark`]):
     /// the shares of the faces the field's first read gave them, `None` at every other site; none on a read that is the first.
     marks: Option<Vec<Option<Shares>>>,
+    /// [definition; agent-inferred, November 14, G180] The first read's forward, kept for its own return where the field reads twice and the
+    /// read keeps its temporaries: both reads are compared ([`Field::read_and_return`]).
+    first: Option<Box<FieldPass>>,
 }
 
 /// [measurement; theory, November 13, the junction record §13.9; G157] **A turned head's reach on its own clock, its founding covector by
@@ -3688,10 +3691,13 @@ impl Field {
         if !self.declaration.mark {
             return self.pass_with(region, keep, None);
         }
-        let first = self.pass_with(region, false, None)?;
+        let first = self.pass_with(region, keep, None)?;
         let marks: Vec<Option<Shares>> = (0..region.classes.len()).map(|t| if Self::silent(region, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
         let mut out = self.pass_with(region, keep, Some(&marks))?;
         out.marks = Some(marks);
+        if keep {
+            out.first = Some(Box::new(first));
+        }
         Ok(out)
     }
 
@@ -4136,7 +4142,16 @@ impl Field {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
-        self.returned_with(region, pass, g, None, None, None, None, None, None)
+        self.returned_with(region, pass, g, None, None, None, None, None, None)?;
+        // [definition; agent-inferred, November 14, G180] Where the field reads twice both reads are compared: the first read's own return is
+        // added beside the second's, and the consumer halves the section's sum once ([`Field::read_and_return`]), so the comparison is the two
+        // reads' mean and at the founding (the reads equal) it is the one read's, bit for bit. Why: G180 read the first read, which no
+        // comparison reached, drifting off its agreement with the passage (0.012 nats a place at one-place masks, 0.060 at whole masks) while
+        // the field leaned on its marks; the field's own placement is kept its honest placement by the passage's comparison.
+        if let Some(first) = pass.first.as_deref() {
+            self.returned_with(region, first, g, None, None, None, None, None, None)?;
+        }
+        Ok(())
     }
 
     /// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction's route**: for tick `k` and head `h`, each
@@ -5449,7 +5464,19 @@ impl Field {
                 },
             )?;
         faces.sort_by_key(|(n, _)| *n);
-        Ok((faces.into_iter().map(|(_, f)| f).collect(), g))
+        Ok((faces.into_iter().map(|(_, f)| f).collect(), self.both_reads_mean(g)))
+    }
+
+    /// [definition; agent-inferred, November 14, G180] **The two reads' mean**: where the field reads twice, the section's summed covector of
+    /// both reads ([`Field::returned`]) released by one bit, once, after every region is summed, so the bits are the partition's sum on any
+    /// partition; at the founding the two reads' covectors are equal and the mean is either. Unchanged where the field reads once.
+    pub fn both_reads_mean(&self, mut g: Vec<i128>) -> Vec<i128> {
+        if self.declaration.mark {
+            for x in g.iter_mut() {
+                *x = release(*x, 1);
+            }
+        }
+        g
     }
 
     /// Each region's faces, read in parallel.
@@ -7024,7 +7051,7 @@ impl Field {
     /// the regions are not changed.
     pub fn read_and_return_split(&self, regions: &[Region], bits: u32) -> Result<SplitReturn> {
         let len = self.material_len();
-        regions
+        let mut out = regions
             .par_iter()
             .try_fold(
                 || SplitReturn { total: vec![0i128; len], quiet: vec![0i128; len], ..Default::default() },
@@ -7067,7 +7094,11 @@ impl Field {
                     (a.forward_ns, a.return_ns, a.quiet_return_ns) = (a.forward_ns + b.forward_ns, a.return_ns + b.return_ns, a.quiet_return_ns + b.quiet_return_ns);
                     Ok(a)
                 },
-            )
+            )?;
+        // [G180] Where the field reads twice, both sums are the two reads' mean ([`Field::both_reads_mean`]).
+        out.total = self.both_reads_mean(out.total);
+        out.quiet = self.both_reads_mean(out.quiet);
+        Ok(out)
     }
 
     /// [measurement; theory, November 11 17:25] **The carry circles' gates over a read pair chart** (`TickRead::pair_read`, `[t][D]`): at every site

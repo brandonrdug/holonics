@@ -1,0 +1,20 @@
+# The line reading twice, its third lap (3,000 sections from lap2/STATE.stopped, 492.0 ms a section, 1,495.5 s), read at its MEAN.3000 against its second lap's MEAN.2000, then against the unmarked third pass's fifth lap mean (sections 6,001 to 9,000 after the fork, against the marked lap's 5,641 to 8,640). Numbers only.
+STORE_PASS role=prefix sections=3000 stretches_read=12438413 ended=false code_pieces=56403 web_pieces=30729 science_pieces=18901 books_pieces=1756 wikidata_pieces=7545 ms=1494933
+MEASURE lap=lap3 rc=0 wall_s=1495.5 peak_rss_kib=269096
+STRENGTHS lap3/STATE.3000 5876201 13591063 12856069
+CAVITY_DONE ms=347318
+MEASURE lap=P3 rc=0 wall_s=347.9 peak_rss_kib=438568
+## against the marked lap 2
+LAST_TICK F3 one_place pooled=0.9949 places=100508 | code=0.6886(20124) web=1.0748(20043) science=0.9462(20088) books=1.0346(20028) wikidata=1.2295(20225)
+LAST_TICK C3 one_place pooled=1.0005 places=100508 | code=0.6923(20124) web=1.0743(20043) science=0.9533(20088) books=1.0385(20028) wikidata=1.2432(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0056 | code=-0.0037 web=+0.0005 science=-0.0071 books=-0.0039 wikidata=-0.0137
+LAST_TICK F3 whole_open pooled=2.3406 places=3717 | code=2.1908(730) web=2.5264(758) science=2.2507(776) books=2.1940(776) wikidata=2.5652(677)
+LAST_TICK C3 whole_open pooled=2.3490 places=3717 | code=2.1816(730) web=2.5352(758) science=2.2675(776) books=2.1921(776) wikidata=2.5944(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0084 | code=+0.0092 web=-0.0088 science=-0.0168 books=+0.0018 wikidata=-0.0292
+## against the unmarked pass's lap 5
+LAST_TICK F3 one_place pooled=0.9949 places=100508 | code=0.6886(20124) web=1.0748(20043) science=0.9462(20088) books=1.0346(20028) wikidata=1.2295(20225)
+LAST_TICK C3 one_place pooled=0.9979 places=100508 | code=0.6913(20124) web=1.0739(20043) science=0.9457(20088) books=1.0306(20028) wikidata=1.2470(20225)
+LAST_TICK_DIFF one_place founded_minus_control pooled=-0.0030 | code=-0.0027 web=+0.0009 science=+0.0005 books=+0.0040 wikidata=-0.0175
+LAST_TICK F3 whole_open pooled=2.3406 places=3717 | code=2.1908(730) web=2.5264(758) science=2.2507(776) books=2.1940(776) wikidata=2.5652(677)
+LAST_TICK C3 whole_open pooled=2.3646 places=3717 | code=2.2139(730) web=2.5409(758) science=2.2860(776) books=2.1988(776) wikidata=2.6100(677)
+LAST_TICK_DIFF whole_open founded_minus_control pooled=-0.0240 | code=-0.0231 web=-0.0145 science=-0.0353 books=-0.0048 wikidata=-0.0448

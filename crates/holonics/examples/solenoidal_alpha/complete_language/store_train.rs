@@ -3425,15 +3425,15 @@ pub(super) fn read(args: &[String], realization: &mut dyn FieldRealization) -> R
 /// OUT STATE STATE_SHA`: **the release from held prompts**. On the store's held role, for each slice in the store's order, its first
 /// `DOCUMENTS` pieces that open their document and hold at least `PROMPT + RUN` places; a problem is the piece's first `PROMPT` places and
 /// `RUN` open places. The release is the tower's as it stands, its law fixed here: [`holonics::hnn::tower::field::Field::sample_runs`] over
-/// every problem at once with `sweeps = RUN` (one place a read), `refine = 0`, the codec's void, the key file's seed, `run_bound = 0`, the
+/// every problem at once with `sweeps = RUN` (one place a read), `refine = REFINE` (0 where none is given), the codec's void, the key file's seed, `run_bound = 0`, the
 /// near tail, the keyed order within an octave, no given lengths, no one-end draw, a sweep that always goes on and no observer: the store's
 /// writer state run from `k = 0` upward, by octaves of distance from the prompt. `OUT` is created new; each problem writes three files of
 /// raw bytes (`SLICE_NN.prompt`, `SLICE_NN.written`, the codec's decode up to the first void, and `SLICE_NN.reference`, the piece's next
 /// `RUN` places), and one line (`STORE_WRITE`: its slice, its document, the places written before a void and the release's reads); a closing
 /// line holds the card's counters and the time. A reading: the state is not touched.
 pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
-    if args.len() != 15 {
-        return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA".into());
+    if args.len() != 15 && args.len() != 16 {
+        return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA [REFINE]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("write-store")?;
@@ -3447,6 +3447,10 @@ pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> 
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
     let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
     let (documents, prompt, run) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?);
+    // [agent-inferred, November 14, the mark's record §3] `REFINE` reads after the sweeps, each reopening the next place of the order and
+    // drawing it again on the region as it stands (a place reopened is silent, so on a field that reads twice its first read marks it):
+    // the draft reheard as the field's own. Zero, the default, is the writer as it stood.
+    let refine = match args.get(15) { Some(r) => r.parse::<usize>().map_err(|_| "REFINE is a count")?, None => 0 };
     let out = Path::new(&args[12]);
     let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     if learner.field.declaration.alphabet != codec.alphabet() {
@@ -3472,14 +3476,14 @@ pub(super) fn write(args: &[String], realization: &mut dyn FieldRealization) -> 
         return Err("no held piece holds the prompt and the run".into());
     }
     std::fs::create_dir(out)?;
-    println!("STORE_WRITE_LAW problems={} documents={documents} prompt={prompt} run={run} sweeps={run} refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet={} void={} ms={}", problems.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
+    println!("STORE_WRITE_LAW problems={} documents={documents} prompt={prompt} run={run} sweeps={run} refine={refine} run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet={} void={} ms={}", problems.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
     let release: Vec<(&[usize], usize)> = problems.iter().map(|p| (p.2.as_slice(), run)).collect();
     // The release's reads, from the realization's own count (the sweep is not asked on the release's last read, so its calls fall one short).
     let reads_before = realization.counters().map(|c| c.reads);
     let mut asked = 0usize;
     let written = learner
         .field
-        .sample_runs(&release, run, 0, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| {
+        .sample_runs(&release, run, refine, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| {
             asked += 1;
             true
         }, &mut |_| {})
