@@ -199,7 +199,7 @@ fn chain() -> Field {
 }
 
 pub(super) fn card() -> Card {
-    Card::open(0).expect("a CUDA card at ordinal 0 with the HNN kernels built")
+    crate::hnn::open_hnn(0).expect("a CUDA card at ordinal 0 with the HNN kernels built")
 }
 
 fn as_rats(counts: &[u64]) -> Vec<Rat> {

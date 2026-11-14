@@ -61,7 +61,7 @@ fn draw(next: &mut impl FnMut() -> u64, limbs: usize) -> Vec<u32> {
 #[test]
 #[ignore = "needs the card"]
 fn the_number_header_on_the_card_is_the_host_owners() {
-    let card = Card::open(0).expect("a card");
+    let card = holonics_cuda::hnn::open_hnn(0).expect("a card");
     let mut next = mixer(0x6E75_6D62);
     for limbs in [1usize, 2, 4, 8] {
         let n = 32 * limbs;

@@ -586,7 +586,7 @@ fn prepare_observed_mount<'c>(
 
 fn actor(ordinal: i32, receiver: mpsc::Receiver<Request>, ready: Reply<()>, realization:Arc<Mutex<ObservedDeviceReading>>) {
     // No context, module, stream or device pointer crosses this thread boundary.
-    let card = match Card::open(ordinal) {
+    let card = match crate::hnn::open_hnn(ordinal) {
         Ok(card) => card,
         Err(error) => {
             let _ = ready.send(Err(device(error)));
@@ -940,7 +940,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn actual_scoped_mount_reuses_publication_reconciles_charts_and_refuses_rebinding() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let (_, resident, _, _) = opening();
         let (field, constitution, current, phases) = (
             resident.field(),
@@ -1110,7 +1110,7 @@ mod tests {
         use holonics::hnn::port::ExecutionPort;
         use holonics::hnn::reference::observed::HostObservedEpochExecution;
         use holonics::hnn::ring::{PumpDeclaration, PumpStep, ResonatorMaterial, TubeCentre};
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let (reference, mut resident, _, pairing) = opening();
         let field = resident.field().clone();
         let boundary = holonics::hnn::encoding::observed::PairedObservation::admit(

@@ -159,7 +159,7 @@ mod tests;
 mod word_tests;
 
 pub use card::{
-    Card, CardBuffer, DeviceCensus, EntryCensus, KERNELS, Layout, Operand, Realization,
+    Card, CardBuffer, DeviceCensus, EntryCensus, Layout, Operand, Realization,
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
 pub use epoch::EpochFlowExecution;
@@ -177,6 +177,19 @@ use holonics::hnn::{Field, HnnError, RingAdvance};
 use thiserror::Error;
 
 use crate::cuda::CudaError;
+
+/// The PTX image of `kernels/hnn.cu`, compiled by `build.rs`; empty when no `nvcc` answered.
+const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/hnn.ptx"));
+
+/// The architecture the image was built for, or the reason it is absent (`build.rs`).
+pub const KERNELS: &str = env!("HOLONICS_CUDA_KERNELS");
+
+/// **Open the card with the October image** (`kernels/hnn.cu`), for the owners that launch from the
+/// card ([`Card::launch`]): the HNN's words, epochs, lattices, inverses and towers. The field opens
+/// it with no image ([`Card::open`]) and loads its own.
+pub fn open_hnn(ordinal: i32) -> Result<Card, DeviceError> {
+    Card::open_with_image(ordinal, IMAGE, KERNELS)
+}
 
 /// Every refusal of the resident HNN: a typed return, never a panic and never a rounded value.
 #[derive(Debug, Error)]

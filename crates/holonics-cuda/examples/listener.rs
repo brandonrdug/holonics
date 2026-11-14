@@ -94,7 +94,7 @@ fn run() -> Result<()> {
         }
         Backend::Cuda => {
             // An unavailable card is a visible error. There is no silent fallback to host.
-            let card = Card::open(0)?;
+            let card = holonics_cuda::hnn::open_hnn(0)?;
             let port = if reception_rest {
                 CudaResident::new(&card, 4, octets::BUDGET).with_reception(Reception::Rest)
             } else {

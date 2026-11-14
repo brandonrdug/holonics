@@ -555,7 +555,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn exact_producing_maps_and_reverse_carries_match_native_odd_and_wide_oracles() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let matrix = ExactWordMatrix {
             rows: 3,
             columns: 2,

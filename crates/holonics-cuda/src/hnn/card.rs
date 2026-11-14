@@ -43,12 +43,6 @@ use crate::cuda::{
 use crate::ffi::CUdeviceptr;
 use crate::hnn::DeviceError;
 
-/// The PTX image of `kernels/hnn.cu`, compiled by `build.rs`; empty when no `nvcc` answered.
-const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/hnn.ptx"));
-
-/// The architecture the image was built for, or the reason it is absent (`build.rs`).
-pub const KERNELS: &str = env!("HOLONICS_CUDA_KERNELS");
-
 // -------------------------------------------------------------------------------------------
 // the census
 
@@ -555,11 +549,16 @@ pub fn ingest_layout(
 // -------------------------------------------------------------------------------------------
 // the card
 
-/// [definition] **The card**: one context, the HNN's loaded image and one ordered stream in it,
-/// and its census. See the module header.
+/// [definition] **The card**: one context, one ordered stream in it and its census, and the image
+/// its opener gave it, if any. See the module header.
+///
+/// [realization; November 14, C3 of #603] A card opens with no image ([`Card::open`]): an owner that
+/// launches from its own image loads it (the field's, `CardField::open`), and the owners that launch
+/// from the card's open it with theirs ([`Card::open_with_image`]; the October owners' is
+/// `crate::hnn::open_hnn`). Before, every open loaded `hnn.ptx`, which the field never launches.
 pub struct Card {
     // Fields drop in declaration order: the image and the stream before the context.
-    module: Module,
+    module: Option<Module>,
     stream: Stream,
     census: DeviceCensus,
     context: Context,
@@ -604,7 +603,7 @@ impl Card {
                 clause: "the function and device carry the block and its static plus dynamic shared surface",
             });
         }
-        let function = self.module.function(name)?;
+        let function = self.module()?.function(name)?;
         let active = function.active_blocks_per_multiprocessor(threads, shared)?;
         cooperative_grid(
             name,
@@ -649,7 +648,7 @@ impl Card {
                 clause: "the cooperative geometry and report equal the function's admitted resident grid",
             });
         }
-        self.module.function(name)?.launch_cooperative_on_shared(
+        self.module()?.function(name)?.launch_cooperative_on_shared(
             &self.stream,
             layout.grid,
             layout.block,
@@ -659,18 +658,28 @@ impl Card {
         Ok(())
     }
 
-    /// **Open the card at a device ordinal**: a context, the census, the image and a stream.
-    /// Refused with [`DeviceError::NoKernels`] when the build had no `nvcc`.
+    /// **Open the card at a device ordinal**: a context, the census and a stream, with no image.
     pub fn open(ordinal: i32) -> Result<Self, DeviceError> {
-        if IMAGE.is_empty() {
-            return Err(DeviceError::NoKernels { reason: KERNELS });
+        Self::opened(ordinal, None)
+    }
+
+    /// **Open the card with an image** for the entries launched from the card itself
+    /// ([`Card::launch`], [`Card::entry`]). Refused with [`DeviceError::NoKernels`], naming
+    /// `kernels`, when the build had no `nvcc` and the image is empty.
+    pub fn open_with_image(ordinal: i32, image: &'static [u8], kernels: &'static str) -> Result<Self, DeviceError> {
+        if image.is_empty() {
+            return Err(DeviceError::NoKernels { reason: kernels });
         }
+        Self::opened(ordinal, Some(image))
+    }
+
+    fn opened(ordinal: i32, image: Option<&'static [u8]>) -> Result<Self, DeviceError> {
         cuda::init()?;
         let device = Device::get(ordinal)?;
         let context = Context::create(&device)?;
         context.make_current()?;
         let census = DeviceCensus::read(&device, context.memory_info()?)?;
-        let module = Module::load_ptx(IMAGE)?;
+        let module = image.map(Module::load_ptx).transpose()?;
         let stream = Stream::create()?;
         Ok(Self {
             module,
@@ -678,6 +687,11 @@ impl Card {
             census,
             context,
         })
+    }
+
+    /// The image the card was opened with.
+    fn module(&self) -> Result<&Module, DeviceError> {
+        self.module.as_ref().ok_or(DeviceError::NoKernels { reason: "a card opened with no image launches no entry of its own" })
     }
 
     pub fn census(&self) -> &DeviceCensus {
@@ -697,7 +711,7 @@ impl Card {
     /// An entry's lowered limits.
     pub fn entry(&self, name: &'static str) -> Result<EntryCensus, DeviceError> {
         self.current()?;
-        let function = self.module.function(name)?;
+        let function = self.module()?.function(name)?;
         Ok(EntryCensus {
             name,
             max_threads_per_block: function.max_threads_per_block()?,
@@ -869,7 +883,7 @@ impl Card {
         params: &mut [*mut c_void],
     ) -> Result<(), DeviceError> {
         self.current()?;
-        let function = self.module.function(entry)?;
+        let function = self.module()?.function(entry)?;
         function.launch_on_shared(
             &self.stream,
             layout.grid,

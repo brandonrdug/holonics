@@ -573,7 +573,7 @@ fn loaded_constitution(field: &Field) -> Constitution {
 #[cfg(holonics_card)]
 fn card_realization() -> String {
     let card =
-        holonics_cuda::hnn::Card::open(0).expect("a CUDA card at ordinal 0 with its kernels");
+        holonics_cuda::hnn::open_hnn(0).expect("a CUDA card at ordinal 0 with its kernels");
     let census = card.census();
     format!(
         "the device port resident on the card (holonics_cuda::hnn::Resident) on {} (compute {}.{}, {} multiprocessors)",
@@ -601,7 +601,7 @@ fn card_exposure(
     constitution: Option<Constitution>,
 ) -> (Exposure, Option<String>) {
     let card =
-        holonics_cuda::hnn::Card::open(0).expect("a CUDA card at ordinal 0 with its kernels");
+        holonics_cuda::hnn::open_hnn(0).expect("a CUDA card at ordinal 0 with its kernels");
     let port = holonics_cuda::hnn::Resident::campaign_one(&card);
     let port = match deadline {
         Some(windows) => port.with_deadline(windows),

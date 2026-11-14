@@ -453,7 +453,7 @@ mod tests {
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn actual_grouped_epoch_records_match_native_flow_without_host_fallback() {
-        let card = Card::open(0).unwrap();
+        let card = crate::hnn::open_hnn(0).unwrap();
         let records = fixture();
         for heard in [1, 2] {
             let expected = epoch_record_flow_reference(2, 3, 6, 2, 4, heard, &records).unwrap();
