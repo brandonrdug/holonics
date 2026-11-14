@@ -4416,3 +4416,15 @@ written place hears none). Read on the third-lap mean of the fourth pass, as G18
   Rule: (a) and (b) held: the law is built as the line's (host and card, parity on record), and the line goes on from its latest end state
   under it. (b) missed: the written neighbours carried part of the mark's worth at the stretch's edges, and the law keeps them, the
   one-place cost then answered at the readout (the reaction subtracted) rather than by gating.
+
+G186 scored 2026-11-14T11:10Z (receipt g186_open_place.txt). The law built on host and card (card parity: both mark tests pass on the card;
+the host's new test that a lone open place reads as the field reading once), read zero-shot on the third-lap mean, a constitution trained
+under the old law:
+  (a) the one-place code is 0.9787, under read 1's 0.9792 and read 2's 0.9806, but not read 1's row for row: missed as written. The self-mark
+      still marks a lone open place's own opening, which the guess's wording forgot. The structural check on the copy with the self-mark
+      zeroed: all 100,508 one-place rows equal read 1's byte for byte, so the law gates exactly what it states;
+  (b) whole masks are 2.3547, 0.0221 over read 2's 2.3326: missed. Read zero-shot, the written neighbours at a stretch's two edges carried
+      0.022 of the mark's 0.037 there, every slice.
+  Of 2 parts 0 held. The rule's second branch: the law keeps the written neighbours' marks (the open-place law is parked, tag
+  archive/claude/mark-silent-law), and the one-place cost of 0.0014 is answered, when it is next taken up, at the readout by subtracting the
+  reaction rather than by gating. Zero-shot is not trained: a constitution that trained hearing edge marks reads its edges through them.
