@@ -224,8 +224,10 @@ Failures are published with the same care as results.
 **Plans and position**
 - [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order of work and the forward plan.
 - [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md) gives the current position.
-- The [issues](https://github.com/brandonrdug/holonics/issues) carry each open step. #63 is the
-  parent, and #62 lists every owed formal statement.
+- The [issues](https://github.com/brandonrdug/holonics/issues) carry each open step (THE_REBUILD's
+  table names them). #410 lists every owed formal statement.
+- [THE_CONSOLIDATION](docs/plans/THE_CONSOLIDATION.md) (#603) is the plan that reduces the
+  repository to the machine that runs and gives the engine one owner.
 
 **Formal mathematics.** [`lean/`](lean/README.md) is one Lake package with two libraries:
 - `Holonics`, the foundation, is the import closure of `Holonics.Framework`;
@@ -233,6 +235,16 @@ Failures are published with the same care as results.
   gauge work.
 
 **Code**
+- **The engine**, the machine that trains, is today a chain through both crates; start here to
+  read it. Its law is [`crates/holonics/src/hnn/tower/field.rs`](crates/holonics/src/hnn/tower/field.rs),
+  whose opening text states its equations. Its card realization is
+  [`crates/holonics-cuda/src/hnn/field.rs`](crates/holonics-cuda/src/hnn/field.rs) with
+  [`kernels/field.cu`](crates/holonics-cuda/kernels/field.cu). Its commands (`train-store`,
+  `read-store`, `write-store`) are in
+  [`store_train.rs`](crates/holonics/examples/solenoidal_alpha/complete_language/store_train.rs),
+  run through [`field_pass.rs`](crates/holonics-cuda/examples/field_pass.rs). The consolidation
+  moves this chain to `crates/engine`, `crates/engine-cuda` and `crates/athena`; each move updates
+  this entry.
 - [`crates/holonics`](crates/holonics) is the host library. Its modules are `holon`, `ratio`,
   `geometry`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `physics` and `hnn`.
 - [`crates/holonics-cuda`](crates/holonics-cuda) is the CUDA driver and the resident HNN.
@@ -294,8 +306,8 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
 - **Direction and decisions.** Brandon sets the direction and acts as a lens on the research. The
   agents make the technical and mathematical decisions and record each, with its reason, where its
   law lives: in its owner, its guide or a dated record.
-- **Practice.** The working practice is written for the agents in [CLAUDE.md](CLAUDE.md) and
-  [AGENTS.md](AGENTS.md). It covers precision as bit widths, "recover before implementing", deletion as
+- **Practice.** The working practice is written for the agents in [CLAUDE.md](CLAUDE.md);
+  [AGENTS.md](AGENTS.md) holds Codex's role and binds it to that guide. It covers precision as bit widths, "recover before implementing", deletion as
   consolidation, and privacy.
 - **Checks.** A change passes the gate (`bash tools/gate.sh`: the workspace check, the guard lints
   and the guards' doctests), then the tests of the laws it touched. A kernel change also runs the

@@ -10,3 +10,8 @@ evidence/observations/** -whitespace
 archive/reference/** -whitespace
 formal/** -whitespace
 research/papers/source/** -whitespace
+
+# The host's language statistics count the code tree. Research is data and the canon is history
+# (docs/plans/THE_CONSOLIDATION.md, decision D7).
+research/** linguist-documentation
+docs/canon/** linguist-documentation

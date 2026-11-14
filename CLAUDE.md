@@ -1,6 +1,8 @@
 # Holonics — Claude operating guide
 
-This is Claude's guide. Codex uses [AGENTS.md](AGENTS.md), which states the same laws and practice with its own delegation rule.
+This is Claude's guide, and the one statement of the repository's laws and practice. Codex's
+[AGENTS.md](AGENTS.md) holds its role and binds it to this guide (November 14: the two files had
+been the same 85.7 KB but for about forty lines, edited in step for every rule).
 
 Holonics is Brandon's mathematical, physical and computational framework. **HNN** is the
 machinery, **Athena** its first intended product, and **Eros** the collective formative
@@ -56,6 +58,12 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 | `lean/` | The Lean package `holonics`: library `Holonics` (the `Framework` closure, the default target) and `HolonicsResearch` (the rest), namespace `Holonics`. |
 | `docs/` | The object and mathematics guides and the canon. The canon is historical doctrine; the elementary objects govern its wording. |
 | `research/` | Dated records (derivations, measurements, lessons), papers, design, notebook. |
+
+The engine, the machine that trains, is `hnn::tower::field` with its card realization
+`holonics-cuda`'s `hnn::field` and the store line's commands. From November 14 the
+[consolidation](docs/plans/THE_CONSOLIDATION.md) (#603) moves it to `crates/engine`,
+`crates/engine-cuda` and `crates/athena`, cut by object, and retires what no path from it reaches;
+each of its steps updates this table.
 
 ## The line: compression is intelligence is navigation
 
