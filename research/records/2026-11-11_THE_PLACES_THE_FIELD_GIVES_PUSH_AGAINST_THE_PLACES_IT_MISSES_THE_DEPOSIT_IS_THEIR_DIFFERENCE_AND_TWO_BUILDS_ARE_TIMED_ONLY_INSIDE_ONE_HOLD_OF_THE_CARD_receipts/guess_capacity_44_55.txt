@@ -4402,3 +4402,17 @@ G185 scored 2026-11-14T09:57Z (receipt g185_equal_card.txt). Reading once from t
   whole, so the mark earns its card time where the writer reads. The rule's first branch: the line keeps reading twice (the fourth pass
   goes on from lap 4's end state), and its one-place cost is the next subject. Reading once from the stripped state fell 0.0021 and 0.0083
   from its start (read 1 on the third lap's mean) in that time.
+
+G186 fixed 2026-11-14T09:58Z (the Opus PC thread), before its build and read: a mark is heard only by an open place. The held read's
+one-place rows open each place alone among written places (read-cavity: the stretch with every place written but t), so there the only
+marks are t's own: its self-mark (inert, G184) and its first face written into its written neighbours' openings, which t then hears back
+through them, its own placement returned as if it were the passage's (the reaction term the cavity leaves out; the self-hearing of G169 at
+one contact). A written place's class is the passage's, and a neighbour's guess written into its opening only carries that guess onward. The
+law: a silent site's mark enters a neighbour's opening only where that neighbour is itself silent (open places share their placements; a
+written place hears none). Read on the third-lap mean of the fourth pass, as G183 and G184 were.
+  (a) every one-place row's code equals read 1's (R43) bit for bit, so the pooled one-place code is 0.9792;
+  (b) whole masks stand within 0.008 of read 2's 2.3326 (the marks inside an open stretch carry its worth; at its two edges a written
+      neighbour's mark was in part the edge place's echo).
+  Rule: (a) and (b) held: the law is built as the line's (host and card, parity on record), and the line goes on from its latest end state
+  under it. (b) missed: the written neighbours carried part of the mark's worth at the stretch's edges, and the law keeps them, the
+  one-place cost then answered at the readout (the reaction subtracted) rather than by gating.
