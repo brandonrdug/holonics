@@ -13,6 +13,8 @@ use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS};
 #[allow(unused_imports)]
+use holonics_engine::contact::WEIGHT_BITS;
+#[allow(unused_imports)]
 use crate::cuda::{Dim3, Module};
 #[allow(unused_imports)]
 use crate::hnn::card::{Card, CardBuffer, CardError};
@@ -33,9 +35,10 @@ pub(crate) fn affine_two_tiling(rows: usize, cols: usize, cols2: usize) -> Optio
 /// The widest span the contact's lanes carry (a lane an entry of the span).
 pub(crate) const CONTACT_SPAN: u32 = 32;
 
-/// The series row's carrier, in limbs of 64 bits: at least five (a term's product with a wide value), at
-/// most twenty (`field_contact_l5` … `field_contact_l20`, 1,280 bits).
-pub(crate) const MIN_LIMBS: usize = 5;
+/// The series row's carrier, in limbs of 64 bits: at least three (a face, a wide value and its sign, which the
+/// declaration's bound less the host's multiplier always passes), at most twenty (`field_contact_l3` …
+/// `field_contact_l20`, 1,280 bits).
+pub(crate) const MIN_LIMBS: usize = 3;
 
 pub(crate) const MAX_LIMBS: usize = 20;
 
@@ -68,13 +71,18 @@ pub fn crowd_slots(sites: usize) -> usize {
 
 /// [definition; agent-inferred, November 1] **The limbs a launch's rows need** (§14.11, §15.2: width is
 /// dynamic, never arbitrary): a row's carrier is as wide as the exponents its rows hold, `62` bits of face,
-/// `WEIGHT_BITS` of weight, `⌈log₂ reach⌉` of a crowd's count, the spread of whole bits `a − a₀` the widest
+/// `⌈log₂ reach⌉` of a crowd's count, the spread of whole bits `a − a₀` the widest
 /// row of the launch holds, the bits of the terms a row sums, `64 + ⌈log₂ reach⌉` of a value summed over the
 /// reach and the sign: [`Constitution::row_bits`] (its gain read from the largest temperature's octave the material
 /// holds, [`Constitution::row_gain`], §15.10, §16.12) with its spread bound (`4n 2^c + 1 + ⌊log₂ reach⌋ + 2`) replaced by
 /// the spread read. A spread
 /// past that bound is refused (the bound is where a row ends), and so is a carrier past the twenty limbs the
 /// card keeps.
+///
+/// [realization; agent-inferred, November 15] The host's row weighs a source by `2^62` ([`WEIGHT_BITS`]) and the card
+/// by one, which leaves every quotient of the row the same (`kernels/field.cu`, beside `CONTACT_MIN_BLOCKS`), so the card's
+/// carrier is the host's need less those bits, every term's total still within it. The refusals stay the host's: a
+/// spread past the bound, or a host need past the twenty limbs, so the card refuses exactly where the host does.
 pub fn row_limbs(field: &Constitution, spread: u64) -> Result<usize> {
     let d = &field.declaration;
     let bound = field.row_gain()? + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
@@ -82,11 +90,10 @@ pub fn row_limbs(field: &Constitution, spread: u64) -> Result<usize> {
         return Err(TowerError::Refused("a contact row holds exponents past the declaration's bound (`row_bits`)"));
     }
     let need = field.row_bits()? as u64 - bound + spread;
-    let limbs = (need.div_ceil(64) as usize).max(MIN_LIMBS);
-    if limbs > MAX_LIMBS {
+    if need.div_ceil(64) as usize > MAX_LIMBS {
         return Err(TowerError::Refused("a contact row needs a carrier past the card's twenty limbs (1,280 bits)"));
     }
-    Ok(limbs)
+    Ok(((need - WEIGHT_BITS as u64).div_ceil(64) as usize).max(MIN_LIMBS))
 }
 
 pub(crate) struct Tick<'c> {
@@ -291,7 +298,7 @@ impl<'c> Resident<'c> {
         }
         self.mark("tick_exposure_wait");
         let limbs = row_limbs(field, spread)?;
-        let contact: &'static str = ["field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
+        let contact: &'static str = ["field_contact_l3", "field_contact_l4", "field_contact_l5", "field_contact_l6", "field_contact_l7", "field_contact_l8", "field_contact_l9", "field_contact_l10", "field_contact_l11", "field_contact_l12", "field_contact_l13", "field_contact_l14", "field_contact_l15", "field_contact_l16", "field_contact_l17", "field_contact_l18", "field_contact_l19", "field_contact_l20"][limbs - MIN_LIMBS];
         self.launch(contact, Self::rows_grid((heads * sites) as u64, rows_per_block), (rows_per_block * 32) as u32, &mut [arg(words), arg(&mut store)])?;
         #[cfg(feature = "ruler-bits")]
         if store != 0 {

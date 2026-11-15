@@ -295,3 +295,25 @@ impl Exponential {
         shifted.max(1)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::div_nearest;
+
+    /// [measurement; theory, November 15] **The nearest quotient keeps its value under an even factor**: `⌊(|x| + ⌊m/2⌋)/m⌋`
+    /// and `⌊(|x|K + ⌊mK/2⌋)/(mK)⌋` with `K` even differ only where `2|x| + m` is a multiple of `2m` with `m` odd, and an odd
+    /// number never is. The card's series row weighs a source by one where the host weighs it by `2^62` and leans on this
+    /// (`row_limbs`); read here over odd and even divisors, both signs and the multiplier itself.
+    #[test]
+    fn the_nearest_quotient_keeps_its_value_under_an_even_factor() {
+        for m in 1i128..=97 {
+            for x in -700i128..=700 {
+                let q = div_nearest(x, m);
+                for k in [1u32, 2, 3, 7, 62] {
+                    assert_eq!(div_nearest(x << k, m << k), q, "x={x} m={m} k={k}");
+                }
+                assert_eq!(div_nearest(6 * x, 6 * m), q, "x={x} m={m} k=6");
+            }
+        }
+    }
+}
