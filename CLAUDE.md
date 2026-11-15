@@ -441,7 +441,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 15; the last eight are from his corrections of November 12 to 15, and the
+October 29 and November 15; the last nine are from his corrections of November 12 to 15, and the
 three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
@@ -668,6 +668,18 @@ that day. They are written here with their reasons so that no agent holds them a
   thing over a base. The wording is `agent-inferred`. Scope: every message, record and brief on such a statement.
   The grade's name stays in the atlas, and a short list of statements for Lean (#410) stays a work list
   ([the record](research/records/2026-11-15_UNDER_A_CHANGE_OF_SCALE_A_MODE_IS_A_COUNT_OR_A_TURN_RH_IS_THE_STRETCHS_HALF_AND_HODGE_THE_QUOTIENTS_THE_PRIMES_ARE_AS_LOUD_IN_ONE_DECADE_AS_THE_NEXT_AND_A_PRIMES_FACTOR_IS_ONE_CELL_OF_A_JUNCTION_AND_A_DELAY.md) §9).
+- **A face's top is no law's quantity** (Brandon, November 15 20:51Z). No law, guess or acceptance takes a face's
+  argmax, its top pick or a symbol's rank in it as a quantity. A place holds a density over its symbols at the field's own
+  temperature; what crosses its section is the written symbol's news under that density, and what a law decides there it
+  decides by density and the clock of news. Reason: that evening a level's rule read a place as dark where the written
+  symbol was the composite's top, and its guess was fixed against one less the rank-1 share; he named it statistics in
+  place of physics within the hour (no physical law picks the top; density and thermodynamics decide). A maximum keeps one
+  symbol and discards every other share, so a law built on it forgets what the density carries. It repeats his correction
+  of November 1 (a most-certain-first order) and the digit read by an argmax in v17. The wording is `agent-inferred`.
+  Scope: every law, guess, acceptance, record and brief; a face's top or a rank read beside a law is a ruler and is named
+  one. The landmark law's order (`code.site-isolation-landmark`) compares places' news, not a face's symbols, and is
+  outside the rule (`agent-inferred`)
+  ([the record](research/records/2026-11-15_THE_RETURN_RUNS_ON_THE_CLOCK_OF_NEWS_A_HELD_TICK_COSTS_NOTHING_EITHER_WAY_AND_A_BASIN_IS_AS_LOUD_AS_ITS_PRESENT_DRIVE.md) §9).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
