@@ -22,7 +22,7 @@
 //! ```
 //!
 //! - **The frame.** The field's contact turns a source at `k` seen from `t` by `ζ^(k−t)`: the
-//!   framed word is `w̃_t = ζ^t w_t` (`Field::frame`), so `Re(conj(w̃_t) w̃_k) = Re(conj(w_t) w_k ζ^(k−t))`.
+//!   framed word is `w̃_t = ζ^t w_t` (`Constitution::frame`), so `Re(conj(w̃_t) w̃_k) = Re(conj(w_t) w_k ζ^(k−t))`.
 //!   The moment carries `ζ^(k−t)`, the conjugate of the record's `ζ^(t−k)` notation. In the far
 //!   part it is `conj(ζ^t) ζ^k` through the absolute places `t` and `k`, which are residues of a
 //!   resident ring (`t, k < S ≤ reach`); only the near part reads a difference.
@@ -267,7 +267,7 @@ impl<'a> Law<'a> {
             return refuse("a ring of period zero turns nothing");
         }
         // The far part reads the absolute places `k < S` as `ring[k mod n]`, which is resident when
-        // the ring holds `min(n, S)` phasors (`Field::rings`: `min(n, reach)`, `S ≤ reach`).
+        // the ring holds `min(n, S)` phasors (`Constitution::rings`: `min(n, reach)`, `S ≤ reach`).
         if ring.len() < n.min(sites) {
             return refuse("a strand's places outrun the resident ring");
         }

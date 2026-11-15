@@ -20,7 +20,7 @@ use rayon::prelude::*;
 /// (§16.40, the tower record's D2: each lane of `D/lanes` coordinates a ratio to its own power,
 /// [`lane_chart`]; one lane is the chart over the whole width).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct FieldDeclaration {
+pub struct Declaration {
     pub alphabet: usize,
     pub width: usize,
     pub heads: usize,
@@ -48,9 +48,9 @@ pub struct FieldDeclaration {
     /// friction charted apart ([`carry_gate`]): `γ = γ̂(q)/(1 + d)`, `γ̂(q) = ((4 − q²) + 4iq)/(4 + q²)` the Cayley step of `iq/2` on one circle
     /// (`carryTurn_eq_cayley`: it keeps the circle, so a site's turn does no work), and `d = d₀ 2^ℓ` the friction on the leak's log chart
     /// ([`carry_friction`], `leak`), `d₀ = 1/(NEAR − 2)` ([`CARRY_LEAK_FOUNDING`]), a pure dissipation's implicit step (monotone, never past a sign
-    /// change), with `q = Q r̂ + q_b` and `ℓ = L r̂ + ℓ_b` read from the site's own pair chart ([`FieldLayout::carry`]). So `|γ|² = 1/(1 + d)² < 1` at
+    /// change), with `q = Q r̂ + q_b` and `ℓ = L r̂ + ℓ_b` read from the site's own pair chart ([`Loci::carry`]). So `|γ|² = 1/(1 + d)² < 1` at
     /// every site (`carryGate_leak_normSq_lt_one`: the move is strictly passive by its form, and a circle's quality is finite). Founded
-    /// ([`Field::with_carry`]) a circle is a turn with the near field's friction: `q`'s rows drawn, `q_b = 0`, `L = 0` and `ℓ_b = 0`, so `d = d₀ =
+    /// ([`Constitution::with_carry`]) a circle is a turn with the near field's friction: `q`'s rows drawn, `q_b = 0`, `L = 0` and `ℓ_b = 0`, so `d = d₀ =
     /// 1/4` at every site (`leak_zero`) and `|γ| = 4/5`, a group of `N = (1 + d)/d = NEAR − 1 = 5` places (atlas `contact.carried-product-group-size`).
     ///
     /// Why (the follow-up record §8.5 and §9 item 4): the built gate `g/√(1 + |g|²)` founded at `g = 0` was total friction, so every letter past the
@@ -76,8 +76,8 @@ pub struct FieldDeclaration {
     /// it leaks), the move is the implicit step of a dissipation relaxing the turned charge toward `N₀ b`, so the charge is a turned mean of `N₀ b`
     /// and stays within `N₀ max |b|` at every friction (`charge_le`); `Q`, `p = a Q`, `δa`, `δb` and `δℓ` then stand at a plain contact's scale,
     /// and `δq` and `δd` grow only with the group ahead. At the founding `κ = 1` (`coupling_leak_zero`), so a grown state reads every face of its
-    /// source bit for bit. A field with carry circles keeps every room whole ([`FieldDeclaration::room_window`]). The circles are the last contacts, grown with
-    /// `W`'s columns at zero ([`Field::with_carry`]), so a trained field continues bit for bit. `C` is even (a carry circle's side is its contact's
+    /// source bit for bit. A field with carry circles keeps every room whole ([`Declaration::room_window`]). The circles are the last contacts, grown with
+    /// `W`'s columns at zero ([`Constitution::with_carry`]), so a trained field continues bit for bit. `C` is even (a carry circle's side is its contact's
     /// parity, so as many scan from each side) and at most `f/2`; `C = 0` is the `hnn-field-v14` line exactly, and `C > 0` writes `hnn-field-v14e`
     /// with `C` its thirteenth word (the log chart and the coupling, together from the head's first state). The retired carries are refused, their
     /// states receipts only: `hnn-field-v14k` (founded at zero friction) and `hnn-field-v14t` (the leak's linear chart, its drive summed).
@@ -86,35 +86,35 @@ pub struct FieldDeclaration {
     /// `2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT_A_TRIAD_IS_A_CHARACTER_OF_A_LAW_OF_COMPOSITION_AND_ITS_THREE_LEGS_EXCHANGE_EQUAL_QUANTA`,
     /// §3 and §4)] **The triads**: `J` complex triads, each the plain pair contact with one operand more, the word of two contacts through a place.
     /// At a site `t` with both strand mates in the region, triad `k` reads `α = A r̂ + α_b`, `β = B r̂ + β_b` and `γ = G r̂ + γ_b` from the site's pair
-    /// chart ([`FieldLayout::triad`]) and forms `p_k(t) = α_k(t) β_k(t − 1)` and `c^T_k(t) = p_k(t) γ_k(t + 1)`, each released at the face's grain as
-    /// the plain contact's product is ([`triad_products`]); `c^T = 0` at the region's two ends; the return `W_T` ([`FieldLayout::w_triad`]) joins
+    /// chart ([`Loci::triad`]) and forms `p_k(t) = α_k(t) β_k(t − 1)` and `c^T_k(t) = p_k(t) γ_k(t + 1)`, each released at the face's grain as
+    /// the plain contact's product is ([`triad_products`]); `c^T = 0` at the region's two ends; the return `W_T` ([`Loci::w_triad`]) joins
     /// the pair's `W` in one sum released once ([`affine_joint`]). One object read three ways (§3): a word of two contacts through the place (its
     /// phase the sum of its three legs'), the mates' contact pumped by the place's own read (the parametron's reading: the mates' relative phase is
     /// even under the half-turn and enters only through the pump), and the junction's three beside its pairs. Why (§1 to §3): nothing else in the
     /// field reads a place with both of its strand mates in one product (the carry's terms of three sites lie on one side of the place), and an
     /// abelian law of composition across a place, `x = L + R`, is held by characters, each a complex triad, where every pair term reads nothing of
-    /// it. The triads are grown onto a field as its last families, the charts drawn and `W_T` and the biases at zero ([`Field::with_triads`]), so
+    /// it. The triads are grown onto a field as its last families, the charts drawn and `W_T` and the biases at zero ([`Constitution::with_triads`]), so
     /// every face is kept bit for bit. A triad reads its two strand mates, one place on each side a tick, as far as the plain pair contact reads,
-    /// so it keeps a cut room wherever the plain contacts keep it ([`FieldDeclaration::room_window`]). `J = 0` writes `hnn-field-v14` or
+    /// so it keeps a cut room wherever the plain contacts keep it ([`Declaration::room_window`]). `J = 0` writes `hnn-field-v14` or
     /// `hnn-field-v14e` exactly as before and every path is the one before it; `J > 0` writes `hnn-field-v14f`, the thirteen words of `v14e` with
     /// `C` written even where it is zero, then `J`.
     pub triads: usize,
     /// [definition; theory, November 13, the design record of that day §4.4a (G132, G139)] **The opening is compared**: the cavity opening of every
     /// place of a region (§4.4: the unresolved row in place of the place's own, its two neighbours' strand rows, and the moment's chart on the moment
-    /// the others bring at their standing phases, the place's own term absent and its own stride bare, [`Field::cavity_openings`]) is read through a
+    /// the others bring at their standing phases, the place's own term absent and its own stride bare, [`Constitution::cavity_openings`]) is read through a
     /// lift of its own onto the one tied face, `p̃_t = face(tied(R⁰ chart(x^cav_t) + b⁰))` at temperature one, and compared at the class the passage
-    /// holds there at unit gain ([`FieldLayout::opening`]). Why (§4.4a): the opening's chart holds 2.502 nats of news of its place where the class
+    /// holds there at unit gain ([`Loci::opening`]). Why (§4.4a): the opening's chart holds 2.502 nats of news of its place where the class
     /// frequencies code 3.435, and the trained readout reads the same words at 8.260: what it misses is the opening's frame, so the opening takes a
-    /// transport of its own, and a written place's surprise is as physical as an open one's. The block is founded at zero ([`Field::with_opening`])
+    /// transport of its own, and a written place's surprise is as physical as an open one's. The block is founded at zero ([`Constitution::with_opening`])
     /// as the last families. `false` writes every head line exactly as before; `true` writes `hnn-field-v14g`, the fourteen words of `v14f` with `C`
     /// and `J` written even at zero, then `1`. The declaration carries it; no variable, flag or argument decides it.
     pub opening: bool,
     /// [definition; theory, November 13, the junction record §7 (atlas `tower.field-tick-return`, `junction.restitution-family`)] **The junction's
     /// return**: after each tick past the first, a site's state of two ticks before returns, half-turned about the tick's output and shortened by
     /// the reflection of the site's own load, `x^(k+1) = v^k + Γ^k (v^k − x^(k−1))` with `v^k` the built tick's output, `Γ = (ρ − 1)/(ρ + 1)`,
-    /// `ρ = 2^ℓ` and `ℓ = L r̂(x^k) + ℓ_b` read from the site's own chart at the tick's opening ([`FieldLayout::junction`], [`junction_gamma`]);
+    /// `ρ = 2^ℓ` and `ℓ = L r̂(x^k) + ℓ_b` read from the site's own chart at the tick's opening ([`Loci::junction`], [`junction_gamma`]);
     /// `x^(k−1)` is the state the tick before began from. The first tick is the built one (the reflection of time about the opening,
-    /// `x^(−1) := x^1`, gives `x^1 = v^0` at every `Γ`). Founded ([`Field::with_junction`]) at the matched load, `L = 0` and `ℓ_b = 0`, so `Γ = 0`
+    /// `x^(−1) := x^1`, gives `x^1 = v^0` at every `Γ`). Founded ([`Constitution::with_junction`]) at the matched load, `L = 0` and `ℓ_b = 0`, so `Γ = 0`
     /// in integers and every face is the built tick's bit for bit; the covector of `ℓ` stands there, `(ln 2/2)(1 − Γ²) ⟨λ^(k+1), v^k − x^(k−1)⟩`.
     ///
     /// Why (the junction record §6 and §7): the built tick keeps the junction's anchor (the mean its contacts meet at) and drops its return, so a
@@ -130,7 +130,7 @@ pub struct FieldDeclaration {
     /// twice. The first read is the built read; the second opens each open, silent site `s` on `E_b(∗) + release(α_b (release(Σ_c w_(s,c)
     /// E_b(c), 16) − E_b(∗)), 24)` in each encoding `b` its row enters (its own `enc`, its neighbours' `before` and `after`), `w` the shares
     /// of the face the first read gave it, the site silent otherwise; the faces are the second read's. `α_b`, one strength an encoding on the
-    /// material's grain ([`FieldLayout::mark`]), is founded at zero ([`Field::with_mark`]), so at the founding the second read is the first
+    /// material's grain ([`Loci::mark`]), is founded at zero ([`Constitution::with_mark`]), so at the founding the second read is the first
     /// bit for bit. The return runs through the second read into every part and into `α_b`; the first read's faces are data to it.
     ///
     /// Why (the ring record §5, G169 to G176): a field that hears its own release as written text takes its own news for the passage's and
@@ -144,7 +144,7 @@ pub struct FieldDeclaration {
     /// reads a site's loudness as its own sharpness**: at each open site the face is `z(a) = release(β v_a, 16) + c_a`, `v_a =
     /// release(⟨E(a), y⟩, 16)` the plain face, with `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b` on `2^(−16)`, `λ_ℓ` the logarithm on the face's
     /// grain of lane `ℓ`'s power (the scale the chart divides that lane by, [`lane_chart`]) at the stage the face reads. `κ_ℓ` and `b`
-    /// ([`FieldLayout::loud`]) are deposited material, founded at zero ([`Field::with_loud`]), so at the founding every face is the source's bit
+    /// ([`Loci::loud`]) are deposited material, founded at zero ([`Constitution::with_loud`]), so at the founding every face is the source's bit
     /// for bit. The return runs through `β` into `κ`, `b` and, radially, into the state's lane powers, the part the unit chart sets aside.
     ///
     /// Why (the loudness reading of lap 13, G193): no forward term read a site's power (atlas `tower.field-site-power-unread`), so a site's
@@ -155,8 +155,8 @@ pub struct FieldDeclaration {
     pub loud: bool,
 }
 
-impl FieldDeclaration {
-    /// Whether head `h` is a depth ring ([`FieldDeclaration::depth`]).
+impl Declaration {
+    /// Whether head `h` is a depth ring ([`Declaration::depth`]).
     pub fn is_depth(&self, h: usize) -> bool {
         h % self.frames + self.depth >= self.frames && self.carries_moment(h)
     }
@@ -213,7 +213,7 @@ impl FieldDeclaration {
     /// not drown the near field, and the spread bounds the mean, not the maximum: at `g = 2` the founding's far
     /// mass at GSM8K's answer sites stood on 5.7 random sources of about 220 (Rényi-2 count, §16.20). Why not the
     /// class receiver's `−2`: that guarantee is for a support of class-mates, where an equal word is expected;
-    /// a listener hears every definite site. The temperature is deposited from there ([`Field::temper`]).
+    /// a listener hears every definite site. The temperature is deposited from there ([`Constitution::temper`]).
     pub fn listen_shift(&self) -> i32 {
         let span = (usize::BITS - 1 - self.reach.leading_zeros()).saturating_sub(1).max(1) as u128;
         // `g² · 2n · 2 ln N` with `ln N ≤ ⌈log₂ N⌉ ln 2`, on `2^(−30)`, against `span²` on `2^(−30)`.
@@ -289,7 +289,7 @@ impl FieldDeclaration {
         3 * self.alphabet * self.width + 3 * m2 * self.width + 2 * self.contacts * self.width + 2 * self.moment_modes() * self.width
     }
 
-    /// The key draws a growth by `factor` reads ([`Field::growth_draws`]): `f − 1` parts of each chart entry and of
+    /// The key draws a growth by `factor` reads ([`Constitution::growth_draws`]): `f − 1` parts of each chart entry and of
     /// each copied pair drive's entry.
     pub fn growth_draws(&self, factor: usize) -> usize {
         factor.saturating_sub(1) * self.width * (3 * 2 * self.complex() + 2 * self.contacts * factor)
@@ -306,21 +306,21 @@ impl FieldDeclaration {
         Ok(Self { width: grow(self.width)?, contacts: grow(self.contacts)?, lanes: grow(self.lanes)?, ..*self })
     }
 
-    /// [definition; agent-inferred, November 4, §16.40] The declaration with one more lane ([`Field::laned`]): the width
+    /// [definition; agent-inferred, November 4, §16.40] The declaration with one more lane ([`Constitution::laned`]): the width
     /// grows by a lane's coordinates; the heads, contacts and reach are kept.
     pub fn laned(&self) -> Result<Self> {
         let width = self.width.checked_add(self.lane_width()).ok_or(TowerError::Refused("a laned width outgrew its carrier"))?;
         Ok(Self { width, lanes: self.lanes + 1, ..*self })
     }
 
-    /// The key draws a lane's founding reads ([`Field::laned`]): the encoding's and the strand contacts' rows of every
+    /// The key draws a lane's founding reads ([`Constitution::laned`]): the encoding's and the strand contacts' rows of every
     /// class over the lane, and the moment's chart into the lane at the modes that carry a moment.
     pub fn lane_draws(&self) -> usize {
         let w = self.lane_width();
         3 * self.alphabet * w + 2 * self.moment_modes() * w
     }
 
-    /// [definition; theory, November 10 09:55] The declaration with `added` more pair contacts ([`Field::contacted`]): the
+    /// [definition; theory, November 10 09:55] The declaration with `added` more pair contacts ([`Constitution::contacted`]): the
     /// merge's contact count grows and nothing else (the width, heads, modes, lanes, ticks and reach are kept). The new contacts
     /// come in complex pairs even at each strand side, as the founding's do.
     pub fn contacted(&self, added: usize) -> Result<Self> {
@@ -340,7 +340,7 @@ impl FieldDeclaration {
     }
 
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] The declaration with `fresh` more letters
-    /// ([`Field::lettered`]): the alphabet grows and nothing else. No key is read.
+    /// ([`Constitution::lettered`]): the alphabet grows and nothing else. No key is read.
     pub fn lettered(&self, fresh: usize) -> Result<Self> {
         let alphabet = self.alphabet.checked_add(fresh).ok_or(TowerError::Refused("an alphabet outgrew its carrier"))?;
         let d = Self { alphabet, ..*self };
@@ -348,25 +348,25 @@ impl FieldDeclaration {
         Ok(d)
     }
 
-    /// The key draws a growth in contacts by `added` reads ([`Field::contacted`]): the new contacts' rows of both pair drives
+    /// The key draws a growth in contacts by `added` reads ([`Constitution::contacted`]): the new contacts' rows of both pair drives
     /// over the whole width, as the founding draws them (`a` then `b`).
     pub fn contact_draws(&self, added: usize) -> usize {
         2 * added * self.width
     }
 
-    /// The key draws a growth by `circles` carry circles reads ([`Field::with_carry`]): the circles' contacts (`2 circles` pair contacts, as a growth
+    /// The key draws a growth by `circles` carry circles reads ([`Constitution::with_carry`]): the circles' contacts (`2 circles` pair contacts, as a growth
     /// in contacts draws them), then the turn chart's rows `Q`, one row of `D` a circle.
     pub fn carry_draws(&self, circles: usize) -> usize {
         self.contact_draws(2 * circles) + circles * self.width
     }
 
-    /// The key draws a growth by `triads` triads reads ([`Field::with_triads`]): the triads' charts, `6 J` rows of `D` (`A`, then `B`, then `G`),
+    /// The key draws a growth by `triads` triads reads ([`Constitution::with_triads`]): the triads' charts, `6 J` rows of `D` (`A`, then `B`, then `G`),
     /// as a growth in contacts draws its drives' rows.
     pub fn triad_draws(&self, triads: usize) -> usize {
         6 * triads * self.width
     }
 
-    /// The first complex contact that is a carry circle, `f/2 − C` ([`FieldDeclaration::carry`]).
+    /// The first complex contact that is a carry circle, `f/2 − C` ([`Declaration::carry`]).
     pub fn carry_first(&self) -> usize {
         self.contacts / 2 - self.carry
     }
@@ -376,7 +376,7 @@ impl FieldDeclaration {
     /// it has. Why: the cut reads the whole room's bits only because the near field and the strand's pair contact carry a place's state at
     /// most `NEAR − 1` places a tick; a carry circle's scan carries it the whole strand inside one tick, over every site, computed or not, so
     /// from the second tick a cut room's heard faces would read, through the circles, receivers that met no source. A triad
-    /// ([`FieldDeclaration::triads`]) reads its two strand mates, one place on each side a tick, as far as the plain pair contact reads, so triads
+    /// ([`Declaration::triads`]) reads its two strand mates, one place on each side a tick, as far as the plain pair contact reads, so triads
     /// keep the cut wherever the plain contacts keep it.
     pub fn room_window(&self, region: &Region) -> Option<Vec<bool>> {
         if self.carry > 0 {
@@ -531,7 +531,7 @@ impl FieldDeclaration {
 /// The material's families in order: each family's first entry, the material's length, and
 /// each family as `(start, len, grain)`. A realization reads the material through it.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FieldLayout {
+pub struct Loci {
     pub enc: usize,
     pub before: usize,
     pub after: usize,
@@ -552,7 +552,7 @@ pub struct FieldLayout {
     pub read: usize,
     pub read_bias: usize,
     /// The strands' moment encodings (§15.1), `(A + 1) × 2T` each over the turned modes that carry a
-    /// moment ([`FieldDeclaration::moment_modes`]), real parts then imaginary; founded at zero.
+    /// moment ([`Declaration::moment_modes`]), real parts then imaginary; founded at zero.
     pub moment_before: usize,
     pub moment_after: usize,
     /// The locks' temperatures (§15.10), one a head and receiver kind, `[h][kind]` (kind 0 a class
@@ -573,7 +573,7 @@ pub struct FieldLayout {
     pub moment_face_bias: usize,
     /// The lift's bias `b_R` (`D`, §16.26).
     pub lift_bias: usize,
-    /// [definition; theory, November 11 17:25] **The carry circles' charts** ([`FieldDeclaration::carry`]), after every other family and present only
+    /// [definition; theory, November 11 17:25] **The carry circles' charts** ([`Declaration::carry`]), after every other family and present only
     /// where `C > 0` (else at the end, zero long, and in no family): `carry`, `2C` rows of `D` on the material's grain, rows `0..C` the turn chart `Q`
     /// and rows `C..2C` the leak chart `L`, row `k` (and `C + k`) carry circle `k`, complex contact `e = f/2 − C + k`; `carry_bias`, `2C` on the
     /// face's grain, `q_b` then `ℓ_b`. A site reads `q = Q r̂ + q_b` and `ℓ = L r̂ + ℓ_b` from its pair chart `r̂`, at the grains `a` and `b` read
@@ -581,7 +581,7 @@ pub struct FieldLayout {
     /// and its chart a logarithm.
     pub carry: usize,
     pub carry_bias: usize,
-    /// [definition; theory, November 12, the triad record §4] **The triads' families** ([`FieldDeclaration::triads`]), after the carry circles' and
+    /// [definition; theory, November 12, the triad record §4] **The triads' families** ([`Declaration::triads`]), after the carry circles' and
     /// present only where `J > 0` (else each at the end, zero long, and in no family, as the circles' are; every other offset is unchanged):
     /// `triad`, `6J` rows of `D` on the material's grain, rows `0..2J` the chart `A`, `2J..4J` the chart `B` and `4J..6J` the chart `G`, within each
     /// row `k` the real part and row `J + k` the imaginary part of triad `k`; `triad_bias`, `6J` on the face's grain, in the rows' order; `w_triad`,
@@ -590,32 +590,32 @@ pub struct FieldLayout {
     pub triad: usize,
     pub triad_bias: usize,
     pub w_triad: usize,
-    /// [definition; theory, November 13, §4.4a] **The opening's lift** ([`FieldDeclaration::opening`]): `R⁰`, `D` rows of `D` columns on the
+    /// [definition; theory, November 13, §4.4a] **The opening's lift** ([`Declaration::opening`]): `R⁰`, `D` rows of `D` columns on the
     /// material's grain, entry `(o, i)` at `opening + o·D + i` as the readout's lift `read` is laid, and its bias `b⁰`, `D` on the face's grain at
     /// `opening_bias`; the last families, zero long where the opening is not compared.
     pub opening: usize,
     pub opening_bias: usize,
-    /// [definition; theory, November 13, the junction record §7] **The junction's chart** ([`FieldDeclaration::junction`]): `L`, one row of `D` on
+    /// [definition; theory, November 13, the junction record §7] **The junction's chart** ([`Declaration::junction`]): `L`, one row of `D` on
     /// the material's grain at `junction`, and `ℓ_b`, one entry on the face's grain at `junction_bias`, so `ℓ = L r̂ + ℓ_b` on `2^(−16)` as the carry's
     /// leak is read; the last families, zero long where the tick has no return.
     pub junction: usize,
     pub junction_bias: usize,
-    /// [definition; agent-inferred, November 14, the ring record §4] **The mark's strengths** ([`FieldDeclaration::mark`]): `α_b`, one entry an
+    /// [definition; agent-inferred, November 14, the ring record §4] **The mark's strengths** ([`Declaration::mark`]): `α_b`, one entry an
     /// encoding (`enc`, `before`, `after`, in that order) on the material's grain, so `α_b = 2^24` marks a site's row at its whole face; the last
     /// family, zero long where the field reads once.
     pub mark: usize,
-    /// [definition; Brandon, November 15 02:06Z] **The face's loudness** ([`FieldDeclaration::loud`]): `κ_ℓ`, one entry a lane, then `b`, on the
+    /// [definition; Brandon, November 15 02:06Z] **The face's loudness** ([`Declaration::loud`]): `κ_ℓ`, one entry a lane, then `b`, on the
     /// face's grain, so `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b`; the last family, zero long where the face does not read its sites' loudness.
     pub loud: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
 
-/// The encodings a mark's strengths are read in, in [`FieldLayout::mark`]'s order.
+/// The encodings a mark's strengths are read in, in [`Loci::mark`]'s order.
 pub const MARK_BASES: usize = 3;
 
-impl FieldLayout {
-    pub(crate) fn new(d: &FieldDeclaration) -> Self {
+impl Loci {
+    pub(crate) fn new(d: &Declaration) -> Self {
         let (dw, m2, f, a) = (d.width, 2 * d.complex(), d.contacts, d.alphabet);
         let mut families = Vec::new();
         let mut at = 0usize;

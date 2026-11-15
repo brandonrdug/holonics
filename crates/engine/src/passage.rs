@@ -4,9 +4,9 @@
 //! `store_train.rs`) by C4 of #603, each item's text as it stood but for its visibility. A slice reads its bytes through [`PieceBytes`]; the
 //! store's file is the harness's source.
 
-use crate::codec::{question_text, FieldCodec, RECORD, UNIT};
-use crate::field::{octave_of, Field, FieldRealization, Region, StorePass, NEAR};
-use crate::region::{region_classes, TrainRegion};
+use crate::codec::{question_text, Codec, RECORD, UNIT};
+use crate::field::{octave_of, Constitution, Realization, Region, StorePass, NEAR};
+use crate::region::{region_classes, OwnedRegion};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
@@ -15,7 +15,7 @@ pub type Problems = Vec<(Vec<usize>, Vec<usize>, usize)>;
 
 /// [definition; agent-inferred, November 3, §16.27] **A region's shape**: a keyed completion mask over the whole region
 /// (`Masked`), or over the answer and its void tail with the question known (`Answer`), the state the writer meets
-/// ([`Field::sample_realized`]: the question known, a uniform state of a random reading order of the answer's places).
+/// ([`Constitution::sample_realized`]: the question known, a uniform state of a random reading order of the answer's places).
 pub enum Shape {
     Masked(Vec<bool>),
     Answer(Vec<bool>),
@@ -104,7 +104,7 @@ pub fn weighed_domain(m: usize, mask: &[bool]) -> usize {
 /// context, foil]`. A reading of completion only (§16.23): no decision of the run reads it.
 /// [retired, November 2, §16.19] The split of each into its digits and its text: a class sorted by
 /// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
-pub fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realization: &mut dyn FieldRealization) -> Result<[(i64, usize); 3]> {
+pub fn held_out(field: &Constitution, codec: &Codec, problems: &Problems, realization: &mut dyn Realization) -> Result<[(i64, usize); 3]> {
     let regions = held_regions(codec, problems);
     let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
     let mut out = [(0i64, 0usize); 3];
@@ -148,7 +148,7 @@ pub fn held_out(field: &Field, codec: &FieldCodec, problems: &Problems, realizat
 /// same answer read beside another problem's question codes no more bits than beside its own
 /// unless the field reads its own question: the difference, foil minus context, is what the
 /// question tells the answer beyond its neighbours.
-pub fn held_regions(codec: &FieldCodec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>, usize)> {
+pub fn held_regions(codec: &Codec, problems: &Problems) -> Vec<(Vec<usize>, Vec<bool>, usize)> {
     let mut regions: Vec<(Vec<usize>, Vec<bool>, usize)> = problems
         .iter()
         .map(|(q, a, _)| {
@@ -336,14 +336,14 @@ pub fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> S
         for &t in &order[..k] {
             unresolved[t] = false;
         }
-        return Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q };
+        return Stretch { region: OwnedRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q };
     }
     let (mask, kind, from) = match shape(seed, d, q, n) {
         Shape::Masked(mask) => (mask, Kind::MaskWhole, 0),
         Shape::Answer(mask) => (mask, Kind::MaskRun, q),
     };
     let domain = weighed_domain(n - from, &mask);
-    Stretch { region: TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, counted: domain, q }
+    Stretch { region: OwnedRegion { domain: Some(domain), ..OwnedRegion::plain(classes, mask) }, kind, counted: domain, q }
 }
 
 /// [definition; agent-inferred, November 15, the record of the states a field trains on, §3 and §5 item 2] **A stretch's own state**: the
@@ -351,7 +351,7 @@ pub fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> S
 /// context resolved (its first `o` octaves whole, `k = 2^o − 1`), every farther place open, and a true end's voids given; weighed as one
 /// link of the release's chain, its code a code of its open places (no importance weight). The crossing is the passage's own clock, the
 /// stretch's count `d` in the pass modulo the run's crossings `⌊log₂ a⌋ + 1` (the `o` with `2^o ≤ a`): no key is drawn. Why these states:
-/// the writer releases places by octaves of distance from its prompt ([`crate::field::Field::sample_runs`]), so at each crossing of an
+/// the writer releases places by octaves of distance from its prompt ([`crate::field::Constitution::sample_runs`]), so at each crossing of an
 /// octave every place nearer stands resolved and every farther place open, whatever order it keeps within an octave; these are the states
 /// the field meets when it writes, read at octaves of `k`, so no scale of `k` is privileged. The record's step 2 ordered the run's places by
 /// the field's news, one extra read a stretch; at a crossing the order within an octave does not reach the state, so no read is needed.
@@ -360,12 +360,12 @@ pub fn own_state_of(d: u64, classes: Vec<usize>, q: usize, a: usize) -> Stretch 
     let o = (d % crossings) as u32;
     let unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q && t < q + a && octave_of(t + 1 - q) >= o).collect();
     let k = (1usize << o) - 1;
-    Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q }
+    Stretch { region: OwnedRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q }
 }
 
 /// A stretch's one state ([`state_of`], [`own_state_of`]): its region, its kind, the sites its code is a code of and its context.
 pub struct Stretch {
-    pub region: TrainRegion,
+    pub region: OwnedRegion,
     pub kind: Kind,
     pub counted: usize,
     pub q: usize,
@@ -399,7 +399,7 @@ impl Cut {
     }
 
     /// The drawn stretch taken: its region read from its slice's file, and the pass moved past it.
-    pub fn take(&mut self, drawn: Drawn, codec: &FieldCodec) -> Result<Stretch> {
+    pub fn take(&mut self, drawn: Drawn, codec: &Codec) -> Result<Stretch> {
         let at = self.pass.slices[drawn.slice].clone();
         let bytes = self.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
         let mut classes = codec.encode(&bytes)?;
@@ -425,7 +425,7 @@ impl Cut {
 
 /// The code line's held passage (te7's lap script's `DEV`) as `train-field` reads it: its problems at the codec, those whose answer stands
 /// within the codec's extent.
-pub fn held_set(codec: &FieldCodec, text: &[u8]) -> Result<Problems> {
+pub fn held_set(codec: &Codec, text: &[u8]) -> Result<Problems> {
     let mut out = Vec::new();
     for (q, a) in problems_of(text) {
         let (qc, ac) = (codec.encode(&question_text(&q))?, codec.encode(&a)?);

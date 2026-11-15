@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]

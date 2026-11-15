@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -178,15 +178,15 @@ pub(crate) struct Words {
     pub(crate) blank_rate: u64,
     pub(crate) blank_masses: u64,
     pub(crate) blank_totals: u64,
-    // [measurement] Every silent place runs its own rate past the last arrival too (the host's `Field::per_blank_clock`).
+    // [measurement] Every silent place runs its own rate past the last arrival too (the host's `Constitution::per_blank_clock`).
     pub(crate) per_blank: u64,
-    // The depth rings' count (`FieldDeclaration::depth`).
+    // The depth rings' count (`Declaration::depth`).
     pub(crate) depth: u64,
     // [the unified-theory reading of November 6, 10:31] Past the last arrival a silent place runs at the bare rate (the host's
-    // `Field::bare_stretch`).
+    // `Constitution::bare_stretch`).
     pub(crate) bare_stretch: u64,
-    // [definition; theory, November 11 17:25 and November 12 (G98)] The carry circles (`FieldDeclaration::carry`): their count `C`, their charts' and
-    // biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `ℓ` `[t][2C]`,
+    // [definition; theory, November 11 17:25 and November 12 (G98)] The carry circles (`Declaration::carry`): their count `C`, their charts' and
+    // biases' offsets in the material (`Loci::carry`, `carry_bias`) and the charts' reach, and (set per tick) the charts' reads `q`, `ℓ` `[t][2C]`,
     // the gate `γ` `[t][2C]`, the scan's operand `[t][2C]` and the drive coupled through the leak `[t][2C]`.
     pub(crate) carry: u64,
     pub(crate) wg: u64,
@@ -199,8 +199,8 @@ pub(crate) struct Words {
     // [theory, November 11 04:14, step S] The skin's site addresses `[p][l][t]` three words each (`FieldWords::saddr`), the clock's own beside `sigma`.
     pub(crate) saddr: u64,
     // [definition; theory, November 12; the triad record (`2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT…`) §3 and §4] The triads
-    // (`FieldDeclaration::triads`): their count `J`, the chart's and its biases' offsets in the material (`FieldLayout::triad`, `triad_bias`) and the
-    // chart's reach, the return's offset (`FieldLayout::w_triad`) and reach, and (set per tick) the chart's read `abg` `[t][6J]` and the products `p`
+    // (`Declaration::triads`): their count `J`, the chart's and its biases' offsets in the material (`Loci::triad`, `triad_bias`) and the
+    // chart's reach, the return's offset (`Loci::w_triad`) and reach, and (set per tick) the chart's read `abg` `[t][6J]` and the products `p`
     // and `c^T` `[t][2J]`. Zero where `J = 0`, where no kernel reads them.
     pub(crate) triads: u64,
     pub(crate) wt: u64,
@@ -235,14 +235,14 @@ pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
 }
 
 /// One tick's carriers on the card.
-/// A field's uploaded run buffers ([`CardField::upload`]), held while its words are read.
+/// A field's uploaded run buffers ([`Resident::upload`]), held while its words are read.
 pub(crate) struct Upload<'c> {
     pub(crate) _pack: Pooled<'c, u8>,
     pub(crate) _face: Option<Pooled<'c, u64>>,
     pub(crate) met: Pooled<'c, u64>,
 }
 
-/// A batch's staged tables ([`CardField::stage`]).
+/// A batch's staged tables ([`Resident::stage`]).
 pub(crate) struct Staged<'c> {
     pub(crate) site_region: Vec<u32>,
     pub(crate) site_pos: Vec<u32>,
@@ -264,11 +264,11 @@ pub(crate) struct Staged<'c> {
     pub(crate) x: Pooled<'c, i64>,
 }
 
-/// [realization; agent-inferred, November 14, the ring record §4] **What a batch's reads stand on** ([`CardField::batch_base`]): everything a
-/// read does before its opening `x⁰`, none of which the opening's state reaches. The host's `Field::pass_with` reads the region's clocks
+/// [realization; agent-inferred, November 14, the ring record §4] **What a batch's reads stand on** ([`Resident::batch_base`]): everything a
+/// read does before its opening `x⁰`, none of which the opening's state reaches. The host's `Constitution::pass_with` reads the region's clocks
 /// (`paces`) and moments (`moments_of`) from the region and the constitution alone, the opening's comparison from the cavity openings, which open
 /// no site on a mark (`cavity_forward` passes none), and the level's news from that comparison (`level_news`); only `open` takes the marks. So a
-/// field that reads twice ([`FieldDeclaration::mark`]) stages its regions, forms the base clock and its moments, reads the opening's comparison,
+/// field that reads twice ([`Declaration::mark`]) stages its regions, forms the base clock and its moments, reads the opening's comparison,
 /// fetches the news and cuts its level once a batch, and both reads stand on them: the first read's opening is the built one, the second's carries
 /// the marks, and from the opening on each read is its own. The opening's comparison is kept here until the first read that returns returns
 /// through it. [G180] Where the field reads twice both reads are compared, and the opening's comparison returns the same bits in each (it reads
@@ -317,7 +317,7 @@ pub(crate) enum Kind {
 /// (a class is a multiple of an eighth of the power of two above, so a buffer is at most a quarter too long).
 /// What the kept buffers cannot supply (a class up to twice the request's) is allocated; when the live buffers, the kept
 /// ones and the new one pass the batch budget, a plain take is first served by the least kept buffer of its type at least
-/// its class (P58 item 1, at [`CardField::take`]), and otherwise the largest kept ones are freed first, one at a time. The contents of a taken buffer are undefined, zeroed where
+/// its class (P58 item 1, at [`Resident::take`]), and otherwise the largest kept ones are freed first, one at a time. The contents of a taken buffer are undefined, zeroed where
 /// the call says so; the work of the stream is ordered, so a buffer a queued kernel still reads is never
 /// overwritten before it has.
 pub(crate) trait Poolable: Copy + Sized + 'static {
@@ -441,7 +441,7 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
 }
 
 /// **The field on the card**: its image, the card it runs on and the octets a batch may take.
-pub struct CardField<'c> {
+pub struct Resident<'c> {
     pub(crate) card: &'c Card,
     pub(crate) module: Module,
     pub(crate) budget: u64,
@@ -451,7 +451,7 @@ pub struct CardField<'c> {
     pub(crate) head: std::cell::Cell<Option<u32>>,
     /// [measurement; P61 item 3] The last launch's timed ns, under the profile.
     pub(crate) last_ns: std::cell::Cell<u128>,
-    /// [realization; P61 item 4f] The outer passes' slots for their largest words and the next slot ([`CardField::outer_slot`]).
+    /// [realization; P61 item 4f] The outer passes' slots for their largest words and the next slot ([`Resident::outer_slot`]).
     pub(crate) outer_maxima: std::cell::RefCell<Option<(Pooled<'c, u64>, usize)>>,
     /// [theory, November 12, P50 step 1] The test build's negative control: the clock's fill withheld, its store left at `SKIN_UNFILLED`.
     #[cfg(test)]
@@ -490,24 +490,24 @@ pub struct CardField<'c> {
     /// profile's running total at the last mark.
     pub(crate) phase_card: std::cell::RefCell<(u128, std::collections::BTreeMap<&'static str, u128>)>,
     /// [realization; theory, November 13, P58 item 3] While the training path reads its faces at their classes
-    /// ([`FieldRealization::read_and_return_at_class`]): set, and each region's open sites' `(m_c, T)` gathered on the card.
+    /// ([`Realization::read_and_return_at_class`]): set, and each region's open sites' `(m_c, T)` gathered on the card.
     pub(crate) narrow: std::cell::Cell<bool>,
     pub(crate) narrow_out: std::cell::RefCell<Vec<Vec<Option<(u128, u128)>>>>,
     /// [measurement; theory, November 13, P57 item 2 (G132)] While the charts are read by stage
-    /// ([`FieldRealization::read_tick_charts`]): each region's open sites' chart rows at each tick's opening and after the last tick.
+    /// ([`Realization::read_tick_charts`]): each region's open sites' chart rows at each tick's opening and after the last tick.
     pub(crate) tick_charts: std::cell::RefCell<Option<Vec<Vec<Vec<i32>>>>>,
-    /// [measurement; Brandon, November 15 00:58Z] While the lane powers are read by stage ([`FieldRealization::read_tick_scales`]): each
+    /// [measurement; Brandon, November 15 00:58Z] While the lane powers are read by stage ([`Realization::read_tick_scales`]): each
     /// region's open sites' lane scales at each tick's opening and after the last tick.
     pub(crate) tick_scales: std::cell::RefCell<Option<Vec<Vec<Vec<i128>>>>>,
     /// [measurement; P57 item 1] The last phase marked, which a trace's launches are read under.
     pub(crate) last_mark: std::cell::Cell<&'static str>,
     /// [realization; theory, November 13, P60 items 1d and 2] While the training path reads the opening's codes
-    /// ([`FieldRealization::read_and_return_opening`]): set, and each region's opening code at every compared place.
+    /// ([`Realization::read_and_return_opening`]): set, and each region's opening code at every compared place.
     pub(crate) opening_wanted: std::cell::Cell<bool>,
     pub(crate) opening_out: std::cell::RefCell<Vec<Vec<Option<i64>>>>,
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
     /// Load the field's image; a batch's stores take the card's free memory at its open less the
     /// margin, kept under the 12 GB the runs keep the board to.
     pub fn open(card: &'c Card) -> std::result::Result<Self, CardError> {
@@ -721,7 +721,7 @@ impl<'c> CardField<'c> {
     /// A field's material, rings, skins and exponential uploaded once a run, and the words that read them; a tower's packets'
     /// field reads the fine field's resident exponential (`shared_face`). Returns the words, the buffers they point into and
     /// the octets of the resident face this upload holds.
-    pub(crate) fn upload(&self, field: &Field, shared_face: Option<u64>) -> Result<(Words, Upload<'c>, u64)> {
+    pub(crate) fn upload(&self, field: &Constitution, shared_face: Option<u64>) -> Result<(Words, Upload<'c>, u64)> {
         let d = field.declaration;
         let l = field.layout();
         let mut ring_off = Vec::new();
@@ -914,9 +914,9 @@ impl<'c> CardField<'c> {
 
     /// Each region's faces (and their logits when `logits`) and, when `returning`, the covector
     /// over the regions; with `keep`, the still heads' last-tick weight rows of those sites of the one
-    /// region read ([`FieldRealization::read_landmarks`]).
+    /// region read ([`Realization::read_landmarks`]).
     #[allow(clippy::type_complexity)]
-    pub(crate) fn run(&mut self, field: &Field, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
+    pub(crate) fn run(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
         let d = field.declaration;
         for region in regions {
             if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
@@ -1013,10 +1013,10 @@ impl<'c> CardField<'c> {
             }
             self.times.batches += 1;
             self.mark("run_setup");
-            // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Field::pass`): the batch's
+            // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Constitution::pass`): the batch's
             // first read is the built read with no readings, and leaves each silent site's shares of its face on the card (`field_mark_shares`);
             // the second read opens each silent site on its mark and is the batch's read, its faces and readings the field's. [G180] Where the run
-            // returns, both reads return into the one covector (the host's `Field::returned` with `FieldPass::first`), halved once below. A region's
+            // returns, both reads return into the one covector (the host's `Constitution::returned` with `Forward::first`), halved once below. A region's
             // marks are its own first read's, so the two reads run batch by batch. [realization; agent-inferred, November 14] Both stand on one base
             // (`batch_base`): what comes before the opening is formed once a batch.
             let mut base = self.batch_base(field, &regions[batch.clone()], &mut words, tower.as_mut(), returning)?;
@@ -1054,7 +1054,7 @@ impl<'c> CardField<'c> {
             }
         }
         // [definition; agent-inferred, November 14, G180] Where the field reads twice, the run's covector is both reads' over every batch, released
-        // by one bit once, the host's own law (`Field::both_reads_mean`), so it is the two reads' mean on any partition; unchanged for a field that
+        // by one bit once, the host's own law (`Constitution::both_reads_mean`), so it is the two reads' mean on any partition; unchanged for a field that
         // reads once.
         let g = field.both_reads_mean(g);
         let met_by_head = self.timed(Kind::Copy, || card.fetch_range(met, 0, heads)).map_err(device)?;
@@ -1089,7 +1089,7 @@ impl<'c> CardField<'c> {
 
     /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
     /// that read them (the host's tables kept beside them for the reverse and the readings).
-    pub(crate) fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &FieldDeclaration, words: &mut Words) -> Result<Staged<'c>> {
+    pub(crate) fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &Declaration, words: &mut Words) -> Result<Staged<'c>> {
         let ticks = declaration.ticks;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         let mut site_region = Vec::new();
@@ -1108,7 +1108,7 @@ impl<'c> CardField<'c> {
         let mut pairs = 0usize;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
         // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
-        // circles (the host's `FieldDeclaration::room_window`, the one owner of the cut's admission).
+        // circles (the host's `Declaration::room_window`, the one owner of the cut's admission).
         let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| declaration.room_window(r)).collect();
         let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
         let blank_read: Vec<u8> = regions
@@ -1148,7 +1148,7 @@ impl<'c> CardField<'c> {
                 if is_definite {
                     dlist.push(t as u32);
                 } else if windows[r].as_ref().is_none_or(|w| w[t]) {
-                    // [E] A definite source is heard by every open receiver its region computes (the host's `Field::tick`
+                    // [E] A definite source is heard by every open receiver its region computes (the host's `Constitution::tick`
                     // skips the rest), so the receivers its return walks are those alone.
                     olist.push(t as u32);
                 }
@@ -1256,7 +1256,7 @@ impl<'c> CardField<'c> {
     /// (its paces, skin addresses and frames), the site moments on it, the opening's comparison's forward wherever a read of the batch reads it
     /// (`returning`: the batch's last read returns; a level reads its news in every read), the level's news fetched and its cut staged. The
     /// opening's forward is kept only where the last read compares it (it returns through it before its ticks), and dropped here otherwise.
-    pub(crate) fn batch_base(&self, field: &Field, regions: &[Region], words: &mut Words, tower: Option<&mut TowerRun<'c>>, returning: bool) -> Result<BatchBase<'c>> {
+    pub(crate) fn batch_base(&self, field: &Constitution, regions: &[Region], words: &mut Words, tower: Option<&mut TowerRun<'c>>, returning: bool) -> Result<BatchBase<'c>> {
         if field.scale.is_some() != tower.is_some() {
             return Err(TowerError::Refused("a tower is read with its packets' level"));
         }
@@ -1317,7 +1317,7 @@ impl<'c> CardField<'c> {
         let opened = d.opening && (returning || field.scale.is_some());
         let kept_moments = self.moments(field, words, regions.len(), sites, opened)?;
         let opening = if opened { Some(self.opening_forward(field, words, regions, &st, kept_moments)?) } else { None };
-        // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Field::level_news`), read to the
+        // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Constitution::level_news`), read to the
         // host, which cuts each region's epochs (`level_cut`, a kind of work placed on the host; its bits are the host's own function's).
         let news = match (opening.as_ref(), field.scale.is_some()) {
             (Some(op), true) => {
@@ -1338,20 +1338,20 @@ impl<'c> CardField<'c> {
         Ok(BatchBase { st, kappa, tau, sigma, saddr, plain, pframe, moment, _skins: skins, _clock_store: clock_store, opening, early: None, tb, reads: 0 })
     }
 
-    /// One read of a batch of regions on its base ([`CardField::batch_base`]): the opening and the forward, each unresolved site's face (and its
+    /// One read of a batch of regions on its base ([`Resident::batch_base`]): the opening and the forward, each unresolved site's face (and its
     /// logits when `logits`), when `g` is given the reverse added into it, and with `keep` the still heads' last-tick weight rows of those sites
-    /// (the batch's one region). With `first` (a field that reads twice, [`FieldDeclaration::mark`]) it is the batch's first read: the forward to
+    /// (the batch's one region). With `first` (a field that reads twice, [`Declaration::mark`]) it is the batch's first read: the forward to
     /// the faces with no reading, its return added into `g` where given ([G180] both reads are compared), and each silent site's shares of its
     /// face left on the card in `first`, nothing fetched.
     #[allow(clippy::type_complexity)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn batch(&self, field: &Field, regions: &[Region], at_region: usize, words: &mut Words, base: &mut BatchBase<'c>, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>, first: Option<&mut Option<Pooled<'c, u32>>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
+    pub(crate) fn batch(&self, field: &Constitution, regions: &[Region], at_region: usize, words: &mut Words, base: &mut BatchBase<'c>, g: Option<&CardBuffer<'c, i128>>, logits: bool, keep: Option<&[usize]>, mut tower: Option<&mut TowerRun<'c>>, first: Option<&mut Option<Pooled<'c, u32>>>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Rows, Vec<Vec<u64>>)> {
         if field.scale.is_some() != tower.is_some() || field.scale.is_some() != base.tb.is_some() {
             return Err(TowerError::Refused("a tower is read with its packets' level"));
         }
         // [the ring record §4] A first read is the built read: no logits, no kept rows, no mark of its own, and none of the readings below (they
         // read the second read, the field's). [definition; agent-inferred, November 14, G180] Where the pass returns, the first read returns too,
-        // into the same covector: both reads are compared (the host's `Field::returned` with `FieldPass::first`), and the run halves the sum once.
+        // into the same covector: both reads are compared (the host's `Constitution::returned` with `Forward::first`), and the run halves the sum once.
         let reading = first.is_none();
         if !reading && (logits || keep.is_some() || words.mark_share != 0) {
             return Err(TowerError::Refused("a field's first read with a reading or a mark"));
@@ -1401,7 +1401,7 @@ impl<'c> CardField<'c> {
             self.clock_fill(field, words, sites)?;
         }
         base.reads += 1;
-        // The moment's chart into the face (§16.22, the host's `Field::open`): `x⁰ += release(C s + b, 24)`.
+        // The moment's chart into the face (§16.22, the host's `Constitution::open`): `x⁰ += release(C s + b, 24)`.
         let (mface, mface_bias, rmface) = moment_face(field);
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
         // [realization; theory, November 13, G144] **The opening's return runs at the end of its own forward, before the ticks.** It reads only its
@@ -1673,13 +1673,13 @@ impl<'c> CardField<'c> {
         if let (Some(stages), Some(at)) = (stage_rows.as_mut(), open_buf.as_ref()) {
             stages.push(gather(fread.device_ptr(), at)?);
         }
-        // The face read through the encoding (§16.26, the host's `Field::tied`): the lift `y = R r̂ + b_R`, then
+        // The face read through the encoding (§16.26, the host's `Constitution::tied`): the lift `y = R r̂ + b_R`, then
         // `z(a) = rel(⟨E(a), y⟩, 16) + c_a`. [P58 item 2] The lift unzeroed: `affine` writes an open site's every output, and its readers,
         // `field_tied_face` and the reverse's `field_tied_back_e`, read it at open sites alone.
         let lift = self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)).map_err(device)?;
         let lift_bias = field.layout().lift_bias as u64;
         self.affine("field_affine_x32", words, words.read, lift_bias, words.rread, dw, dw, fread.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
-        // [Brandon, November 15 02:06Z] Where the face reads its sites' loudness (the host's `Field::loud_beta` and `Field::tied_sharp`): each open
+        // [Brandon, November 15 02:06Z] Where the face reads its sites' loudness (the host's `Constitution::loud_beta` and `Constitution::tied_sharp`): each open
         // site's sharpness from the face's lanes' powers, then the face at it, the plain face kept for the return.
         let loud = if field.declaration.loud {
             let lanes = field.declaration.lanes;
@@ -1880,7 +1880,7 @@ impl<'c> CardField<'c> {
 }
 
 /// [agent-inferred, November 1] **Everything a region of `sites` sites allocates in a batch**
-/// ([`CardField::batch`], `tick`, `reverse`): each kept tick's carriers (the chart's read and scale,
+/// ([`Resident::batch`], `tick`, `reverse`): each kept tick's carriers (the chart's read and scale,
 /// the word and the value and their framed copies, the word's powers, the classes and members, the
 /// masses, the current, the pair contact's read, scale and drives), its class offsets and its weights
 /// `H·S²` (their dense reservation), the opening's carried mixtures at most one share a class, the
@@ -1888,13 +1888,13 @@ impl<'c> CardField<'c> {
 /// (`S²` on 128 bits). Measured November 1: sized by the weights and the contact's return alone, a
 /// batched release's per-site carriers took the board to 13,372 MiB; sized by its carriers too, the
 /// same release peaked at 11,256 MiB.
-pub fn region_octets(d: &FieldDeclaration, returning: bool, sites: usize, definite: usize) -> u64 {
+pub fn region_octets(d: &Declaration, returning: bool, sites: usize, definite: usize) -> u64 {
     read_octets(d, returning, false, sites) + skin_octets(d, sites, definite).0
 }
 
 /// [`region_octets`] for a read of `logits` too: a logits read keeps every tick and its shares (the echo's
 /// round trips of consecutive ticks, §15.3), as a return does.
-pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usize) -> u64 {
+pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -> u64 {
     let (dw, m2, f, a, h, span) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64, d.alphabet as u64, d.heads as u64, 2 * d.modes as u64);
     let kept = returning || echo;
     let ticks_kept = if kept { d.ticks as u64 } else { 1 };
@@ -1939,7 +1939,7 @@ pub fn read_octets(d: &FieldDeclaration, returning: bool, echo: bool, sites: usi
 /// A kept tick's octets a region beside its sites': the carrier's width (one word), the class
 /// offsets `H (2·3^b + 1)` words (each class's definite members and the rest) and the prefix sums'
 /// extra row (a region's `S + 1` rows, §14.10), which the reverse's difference arrays share.
-pub(crate) fn tick_fixed_octets(d: &FieldDeclaration) -> u64 {
+pub(crate) fn tick_fixed_octets(d: &Declaration) -> u64 {
     4 + 4 * d.heads as u64 * (2 * d.classes() as u64 + 1) + 4 * d.heads as u64 * (d.classes() as u64 + 1) + (2 * 16 * 2 * d.modes as u64 + 8) * d.heads as u64 + 2 * 16 * 2 * d.modes as u64
 }
 
@@ -2003,15 +2003,15 @@ pub fn batches_of(lengths: &[usize], needs: &[u64], budget: u64) -> Result<Vec<s
     Ok(out)
 }
 
-impl FieldRealization for CardField<'_> {
-    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+impl Realization for Resident<'_> {
+    fn read_and_return(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         let (faces, _, g, _, _) = self.run(field, regions, true, false, None)?;
         Ok((faces, g))
     }
 
     /// [realization; theory, November 13, P58 item 3] The faces' masses at their classes and their totals gathered on the card (`narrow`, read
     /// at the batch's end), the whole faces where a region has a port (its coupling reads every class of its places).
-    fn read_and_return_at_class(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
+    fn read_and_return_at_class(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
         if regions.iter().any(|r| r.port.is_some()) {
             let (faces, g) = self.read_and_return(field, regions)?;
             return Ok((holonics_engine::field::faces_at_class(&faces, regions), g));
@@ -2030,7 +2030,7 @@ impl FieldRealization for CardField<'_> {
 
     /// [realization; theory, November 13, P60 items 1d and 2] The training path with the opening compared in the card's own forward: its codes at
     /// every compared place gathered beside the faces' words and the covector of the same read and return.
-    fn read_and_return_opening(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
+    fn read_and_return_opening(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
         self.opening_out.borrow_mut().clear();
         self.opening_wanted.set(field.declaration.opening);
         let read = self.read_and_return_at_class(field, regions);
@@ -2043,12 +2043,12 @@ impl FieldRealization for CardField<'_> {
         Ok((at_class, g, codes))
     }
 
-    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+    fn read_faces(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         Ok(self.run(field, regions, false, false, None)?.0)
     }
 
     /// [measurement; theory, November 13, P57 item 2 (G132)] The faces and the open sites' charts by stage, from one forward that keeps every tick.
-    fn read_tick_charts(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
+    fn read_tick_charts(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
         *self.tick_charts.borrow_mut() = Some(Vec::new());
         let read = self.run(field, regions, false, true, None);
         let charts = self.tick_charts.borrow_mut().take().unwrap_or_default();
@@ -2060,7 +2060,7 @@ impl FieldRealization for CardField<'_> {
     }
 
     /// [measurement; Brandon, November 15 00:58Z] The faces and the open sites' lane scales by stage, from one forward that keeps every tick.
-    fn read_tick_scales(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
+    fn read_tick_scales(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
         *self.tick_scales.borrow_mut() = Some(Vec::new());
         let read = self.run(field, regions, false, true, None);
         let scales = self.tick_scales.borrow_mut().take().unwrap_or_default();
@@ -2073,7 +2073,7 @@ impl FieldRealization for CardField<'_> {
 
     /// [measurement; part P2] The faces and the carry circles' gates from the same pass: every tick's gate and leak reads are summed on the card
     /// over the open sites (`field_carry_gates_read`), so no face and no other read changes.
-    fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
+    fn read_faces_gated(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
         let c = field.declaration.carry;
         *self.carry_gates.borrow_mut() = (c > 0).then(|| vec![0u128; 2 * c + 1]);
         let read = self.run(field, regions, false, false, None);
@@ -2088,12 +2088,12 @@ impl FieldRealization for CardField<'_> {
         Ok((faces, gates))
     }
 
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+    fn read_logits(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<ReadLogits>> {
         let (_, logits, _, _, echo) = self.run(field, regions, false, true, None)?;
-        Ok(logits.into_iter().zip(echo).map(|(logits, echo)| FieldRead { logits, echo }).collect())
+        Ok(logits.into_iter().zip(echo).map(|(logits, echo)| ReadLogits { logits, echo }).collect())
     }
 
-    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+    fn read_landmarks(&mut self, field: &Constitution, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
         if question > region.classes.len() {
             return Err(TowerError::Refused("a landmark site outside its region"));
         }
@@ -2110,7 +2110,7 @@ impl FieldRealization for CardField<'_> {
         Some(RealizationCounters { reads: t.reads, returns: t.returns, pairs: t.pairs, batches: t.batches, peak_store: t.peak_store })
     }
 
-    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+    fn read_row_currents(&mut self, field: &Constitution, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
         if regions.len() != questions.len() {
             return Err(TowerError::Refused("a held read's answer starts that are not one a region"));
         }
@@ -2123,7 +2123,7 @@ impl FieldRealization for CardField<'_> {
         Ok(std::mem::take(&mut *self.row_out.borrow_mut()))
     }
 
-    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+    fn read_covector_shares(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
         *self.covector_shares.borrow_mut() = Some(vec![0i128; 2 * field.declaration.heads]);
         let read = self.run(field, regions, true, false, None);
         let total = self.covector_shares.borrow_mut().take().unwrap_or_default();
@@ -2131,7 +2131,7 @@ impl FieldRealization for CardField<'_> {
         Ok(total.chunks_exact(2).map(|c| [c[0] as u128, c[1] as u128]).collect())
     }
 
-    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+    fn read_ticks(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         // Every tick is kept where a logits read keeps them; its reads are fetched after the forward.
         *self.tick_reads.borrow_mut() = Some(Vec::new());
         let read = self.run(field, regions, false, true, None);
@@ -2140,7 +2140,7 @@ impl FieldRealization for CardField<'_> {
         Ok(out)
     }
 
-    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+    fn read_blank_clocks(&mut self, field: &Constitution, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
         *self.clock_sites.borrow_mut() = Some(sites.to_vec());
         self.clock_out.borrow_mut().clear();
         let read = self.run(field, std::slice::from_ref(region), false, true, None);
@@ -2149,7 +2149,7 @@ impl FieldRealization for CardField<'_> {
         Ok(std::mem::take(&mut *self.clock_out.borrow_mut()))
     }
 
-    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+    fn read_near_offsets(&mut self, field: &Constitution, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
         // Every tick is kept where a logits read keeps them, and the named rows are fetched after the forward.
         *self.near_sites.borrow_mut() = Some(sites.to_vec());
         self.near_out.borrow_mut().clear();
@@ -2163,7 +2163,7 @@ impl FieldRealization for CardField<'_> {
         Ok(out)
     }
 
-    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+    fn read_row_shares(&mut self, field: &Constitution, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         if regions.len() != questions.len() {
             return Err(TowerError::Refused("a held read's answer starts that are not one a region"));
         }

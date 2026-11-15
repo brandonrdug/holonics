@@ -3,15 +3,15 @@
 
 use crate::exterior::*;
 use crate::store::{open_slice, refuse_variables, role_names, store_counts};
-use holonics_engine::codec::FieldCodec;
-use holonics_engine::field::{FieldLearner, FieldRealization, PassSlice, StorePass, NEAR};
+use holonics_engine::codec::Codec;
+use holonics_engine::field::{Learner, Realization, PassSlice, StorePass, NEAR};
 use holonics_engine::passage::{Cut, Kind};
-use holonics_engine::region::{views_of, TrainRegion};
+use holonics_engine::region::{views_of, OwnedRegion};
 use std::path::Path;
 
 /// One stretch of a slice as the store's cut draws it for a read: its region, its bytes, whether it ends a piece, and its kind.
 pub(crate) struct HeldStretch {
-    pub(crate) region: TrainRegion,
+    pub(crate) region: OwnedRegion,
     pub(crate) bytes: Vec<u8>,
     pub(crate) ends: bool,
     pub(crate) kind: Kind,
@@ -20,7 +20,7 @@ pub(crate) struct HeldStretch {
 /// A slice of `role` cut afresh from stretch 1 with the key file's seed, whole stretches until at least `places` places (the cut every
 /// reading of the line's held places shares: [`read_cavity`] and the loudness ruler).
 #[allow(clippy::too_many_arguments, reason = "the cut's declared inputs, each a pinned file's reading or the pass's law")]
-pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &FieldCodec, places: usize) -> Result<Vec<HeldStretch>> {
+pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &Codec, places: usize) -> Result<Vec<HeldStretch>> {
     let slice = open_slice(store, role, name, counts)?;
     let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
     let mut cut = Cut { seed, slices: vec![slice], pass };
@@ -43,18 +43,18 @@ pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std:
 /// same reading on the documents the line trains on, G187). Each slice of the held role, alone and in the
 /// store's order, is cut afresh from stretch 1 with the key file's seed (as `read-store`, retired by C6 of #603, cut it), whole stretches until at least `PLACES` places.
 /// For each place `t` of a stretch: the stretch as a region with every place written but `t`; `c0`, the face at the built opening with no tick
-/// ([`holonics_engine::field::Field::opening_face`], on the host) at `t`'s written class; `cK`, the face after the declared ticks by the
+/// ([`holonics_engine::field::Constitution::opening_face`], on the host) at `t`'s written class; `cK`, the face after the declared ticks by the
 /// realization's read (`read_faces`, the regions batched under the pass's two bounds) at the same class. On the code slice each stretch is also
 /// read with the leading spaces of each line that begins inside it doubled (the copy cut at the stretch's bound of 1,022 places), `c0` at every
 /// place of the copy. Codes are on `2^(−20)` bits. One line a place to `OUT/cavity.tsv` (numbers only); a line a slice with the devices' times.
 ///
 /// [measurement; theory, November 13, P57 item 2 (G132)] With the faces, the realization reads each open place's chart `r̂` (64 words on
-/// `2^(−16)`) at the opening, after ticks 1, 2 and 3 (each tick's opening) and after the last tick ([`FieldRealization::read_tick_charts`]); the
+/// `2^(−16)`) at the opening, after ticks 1, 2 and 3 (each tick's opening) and after the last tick ([`Realization::read_tick_charts`]); the
 /// trained readout's code at each stage, `c0` to `c3` and `cK`, is the face of that chart at the written class (`c0` checked against the host's
 /// opening face, `cK` against the realization's face). The charts go to `OUT/words.bin` (the place rows' order, five stages of 64 little-endian
 /// 32-bit words a place). The same is read at the open places of each slice's whole masks, as `read-store` cut them (rows `W`,
 /// `OUT/words_whole.bin`). The output directory is private: it holds no text, but it is the held passage's places.
-pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if args.len() != 13 && args.len() != 14 {
         return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
     }
@@ -68,9 +68,9 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
     let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
     let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
-    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
     let places = positive(&args[9])?;
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let law = learner.pass.clone().ok_or("a state with no pass line: read-cavity reads a state of the store's line")?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
@@ -95,7 +95,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
         if !opened {
             return Ok(vec![None; classes.len()]);
         }
-        let region = [TrainRegion::plain(classes.to_vec(), unresolved.to_vec())];
+        let region = [OwnedRegion::plain(classes.to_vec(), unresolved.to_vec())];
         let views = views_of(&region);
         learner.field.opening_codes(&views[0]).map_err(|e| e.to_string())
     };
@@ -105,7 +105,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
     let loud = learner.field.declaration.loud;
     let lanes = learner.field.declaration.lanes;
     let code_of_read = |r: &[i32], s: &[i128], class: usize| -> std::result::Result<i64, String> { Ok(learner.field.face_of_chart(r, s).map_err(|e| e.to_string())?.code(class)) };
-    let powers = |realization: &mut dyn FieldRealization, regions: &[TrainRegion]| -> std::result::Result<Vec<Vec<Vec<i128>>>, String> {
+    let powers = |realization: &mut dyn Realization, regions: &[OwnedRegion]| -> std::result::Result<Vec<Vec<Vec<i128>>>, String> {
         if loud { Ok(realization.read_tick_scales(&learner.field, &views_of(regions)).map_err(|e| e.to_string())?.1) } else { Ok(vec![Vec::new(); regions.len()]) }
     };
     let put_words = |w: &mut std::io::BufWriter<std::fs::File>, rows: &[Vec<i32>], at: usize| -> std::io::Result<()> {
@@ -130,7 +130,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
         let cut = held_stretches(store, role, name, &counts, &args[4], seed, &law, &codec, places as usize)?;
         let taken: usize = cut.iter().map(|s| s.region.classes.len()).sum();
         let mut stretches: Vec<(Vec<usize>, Vec<u8>, bool)> = Vec::new();
-        let mut wholes: Vec<(usize, TrainRegion)> = Vec::new();
+        let mut wholes: Vec<(usize, OwnedRegion)> = Vec::new();
         for s in cut {
             if s.kind == Kind::MaskWhole {
                 wholes.push((stretches.len(), s.region.clone()));
@@ -152,7 +152,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
                 .map(|t| {
                     let mut mask = vec![false; classes.len()];
                     mask[t] = true;
-                    let region = [TrainRegion::plain(classes.clone(), mask)];
+                    let region = [OwnedRegion::plain(classes.clone(), mask)];
                     let views = views_of(&region);
                     let face = learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?;
                     if k == 0 {
@@ -186,13 +186,13 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
                 }
                 (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
             }
-            let regions: Vec<TrainRegion> = jobs[at..end]
+            let regions: Vec<OwnedRegion> = jobs[at..end]
                 .iter()
                 .map(|&(k, t)| {
                     let classes = &stretches[k].0;
                     let mut mask = vec![false; classes.len()];
                     mask[t] = true;
-                    TrainRegion::plain(classes.clone(), mask)
+                    OwnedRegion::plain(classes.clone(), mask)
                 })
                 .collect();
             let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
@@ -246,7 +246,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
                 }
                 (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
             }
-            let regions: Vec<TrainRegion> = wholes[w_at..end].iter().map(|(_, r)| r.clone()).collect();
+            let regions: Vec<OwnedRegion> = wholes[w_at..end].iter().map(|(_, r)| r.clone()).collect();
             let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
             let scales = powers(&mut *realization, &regions)?;
             for (((k, region), (f, st)), sc) in wholes[w_at..end].iter().zip(faces.iter().zip(&stages)).zip(&scales) {
@@ -304,7 +304,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
                     .map(|t| {
                         let mut mask = vec![false; classes.len()];
                         mask[t] = true;
-                        let region = [TrainRegion::plain(classes.clone(), mask)];
+                        let region = [OwnedRegion::plain(classes.clone(), mask)];
                         let views = views_of(&region);
                         Ok(learner.field.opening_face(&views[0], t).map_err(|e| e.to_string())?.code(classes[t]))
                     })

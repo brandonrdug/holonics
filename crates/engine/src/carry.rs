@@ -25,7 +25,7 @@ pub(crate) const CARRY_FRICTION_BOUND: i128 = 1 << 47;
 /// [definition; theory, November 11 19:56, G85, and November 12, G96's third branch] **A circle's founded friction** `d₀ = 1/(NEAR − 2)` on the
 /// face's grain (`2^14` on `2^(−16)`): the leak's log chart reads `d = d₀ 2^ℓ` ([`carry_friction`]), so a circle founded at `ℓ = 0` has `d = 1/4`
 /// and `|γ| = 4/5` at every site, the group `N = (1 + d)/d` founded at `NEAR − 1` places, the near field's reach a tick on one side
-/// ([`FieldDeclaration::carry`]).
+/// ([`Declaration::carry`]).
 pub const CARRY_LEAK_FOUNDING: i32 = ((1usize << FACE_BITS) / (NEAR - 2)) as i32;
 
 // The leak's return forms `δd ln 2 · d₀ · v` with `v` released to 47 bits: under `2^65 · 2^14 · 2^47 = 2^126` while `d₀` stays within `2^14`.
@@ -59,7 +59,7 @@ pub(crate) fn carry_drive(kappa: i128, b: i64) -> Result<i64> {
 
 /// [definition; theory, November 12, G96's third branch; `CarryGate.lean`, `leak`] **The leak's log chart**: from `ℓ` on `2^(−16)` (a site's leak
 /// read), the friction `d = d₀ 2^ℓ` on `2^(−16)`, `d₀` the founded friction ([`CARRY_LEAK_FOUNDING`]). `2^ℓ` is read through the field's exponential
-/// navigator as [`Field::face`] reads a score's term, `2^ℓ = v 2^(a − 61)` with `a = ⌊ℓ⌋` and `v` in `[2^61, 2^62)`, and the friction is that face
+/// navigator as [`Constitution::face`] reads a score's term, `2^ℓ = v 2^(a − 61)` with `a = ⌊ℓ⌋` and `v` in `[2^61, 2^62)`, and the friction is that face
 /// released to the face's grain, at least one grain: `d = max(1, release(d₀ v, 61 − a))`. A friction is never released to zero by its chart, as a
 /// class is never released to zero mass by its exponent ([`Exponential::below_one`]): a circle's quality is finite (atlas `store.finite-quality`),
 /// at most `2^16 + 1` places. Refused, typed, where `d` reaches `2^47` (the friction's carrier). Returns `d` and the chart's face `(a, v)`, at which
@@ -82,7 +82,7 @@ pub(crate) fn carry_friction(exponential: &Exponential, l: i128) -> Result<(i128
     Ok((d, whole, v))
 }
 
-/// [definition; theory, November 13, the junction record §7] **The return's reflection on its log chart** ([`FieldDeclaration::junction`]): from
+/// [definition; theory, November 13, the junction record §7] **The return's reflection on its log chart** ([`Declaration::junction`]): from
 /// `ℓ` on `2^(−16)` (a site's junction read), `ρ = 2^ℓ` read through the field's exponential navigator as the carry's leak reads it
 /// ([`carry_friction`]: `a = ⌊ℓ⌋` and `v` in `[2^61, 2^62)`, so `ρ = v 2^(a − 61)`), and `Γ = (ρ − 1)/(ρ + 1)` on `2^(−30)` by one division to the
 /// nearest: `(v 2^a − 2^61)/(v 2^a + 2^61)` for `a ≥ 0`, `(v − 2^(61 − a))/(v + 2^(61 − a))` below. At `ℓ = 0`, `v = 2^61` and `Γ = 0`: the matched
@@ -129,7 +129,7 @@ pub(crate) fn junction_return(lambda: &[i64], diff: &[i64], gamma: i64) -> Resul
 pub(crate) const JUNCTION_RETURN: &str = "a junction's return covector past its 128-bit carrier";
 
 /// [definition; theory, November 11 17:25 and November 12 (G96's third branch); `lean/Holonics/HNN/CarryGate.lean`] **The carry's gate, a turn and a
-/// friction charted apart** ([`FieldDeclaration::carry`]): from `q` and `ℓ` on `2^(−16)` (a site's turn and leak charts), the friction `d` on the
+/// friction charted apart** ([`Declaration::carry`]): from `q` and `ℓ` on `2^(−16)` (a site's turn and leak charts), the friction `d` on the
 /// leak's log chart ([`carry_friction`]), and on `2^(−30)`, each part by one division to the nearest ([`div_nearest`], the card's own rounding),
 ///
 /// ```text
@@ -191,7 +191,7 @@ pub(crate) fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dg
     Ok(((fit64(dq)?, fit64(dl)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?)))
 }
 
-/// [definition; theory, November 12, the triad record §3 and §4] **The triads' products** ([`FieldDeclaration::triads`]): from the charts' reads
+/// [definition; theory, November 12, the triad record §3 and §4] **The triads' products** ([`Declaration::triads`]): from the charts' reads
 /// `abg` (`[t][6J]` on `2^(−16)`: `α`'s real parts, then imaginary, then `β`'s, then `γ`'s), at each site with both strand mates in the region
 /// (`1 ≤ t ≤ sites − 2`) and each triad `k`,
 ///
@@ -286,10 +286,10 @@ pub(crate) fn affine_joint(w: &[i32], wmax: u64, cols: usize, x: &[i64], wt: &[i
     Ok(())
 }
 
-impl Field {
+impl Constitution {
 
     /// Site `s`'s row of a family at `base` of `width` a class (its class's row, or its carried face's mixture
-    /// `release(Σ_a w_a E(a), 16)`; zero at a silent site, [`Field::silent`]).
+    /// `release(Σ_a w_a E(a), 16)`; zero at a silent site, [`Constitution::silent`]).
     pub(crate) fn strand_row(&self, region: &Region, base: usize, width: usize, s: usize) -> Vec<i64> {
         if Self::silent(region, s) {
             return vec![0; width];
@@ -323,7 +323,7 @@ impl Field {
         }
     }
 
-    /// [definition; theory, November 13, the junction record §7] **The tick's return** ([`FieldDeclaration::junction`]), after a tick past the
+    /// [definition; theory, November 13, the junction record §7] **The tick's return** ([`Declaration::junction`]), after a tick past the
     /// first: at each site the chart `ℓ = L r̂(x^k) + ℓ_b` (one affine of the tick's opening chart, at the grains the carry's leak is read at), the
     /// reflection `Γ` ([`junction_gamma`]) and `x^(k+1) = v^k + release(Γ (v^k − x^(k−1)), 30)` an entry, with `x` holding `v^k` and `prev` the
     /// state the tick before began from. The reads are kept in the cell for the reverse.
@@ -395,7 +395,7 @@ pub fn strand_mate(t: usize, e: usize, sites: usize) -> Option<usize> {
     }
 }
 
-impl Field {
+impl Constitution {
 
     /// [measurement; theory, November 11 17:25] **The carry circles' gates over a read pair chart** (`TickRead::pair_read`, `[t][D]`): at every site
     /// and carry circle the gate `γ` of `q = Q r̂ + q_b`, `ℓ = L r̂ + ℓ_b` ([`carry_gate`]), `[t][C]` on `2^(−30)`, a reading (the forward's own
@@ -421,7 +421,7 @@ impl Field {
     /// [measurement; theory, November 12, G90's first branch] **The carry circles' leaks and charges over a read pair chart**
     /// (`TickRead::pair_read`, `[t][D]`), from the forward's own arithmetic on the chart the realization read: at every site and carry circle
     /// the leak read `ℓ = L r̂ + ℓ_b` on `2^(−16)` (the `ℓ` of [`carry_gate`]), and the circle's charge after the site, `|Q(t)|` on `2^(−16)`
-    /// (the floor of the square root of `Q_re² + Q_im²`), the scan run as the forward runs it ([`FieldDeclaration::carry`]): `Q(t) = κ(t) b(t) +
+    /// (the floor of the square root of `Q_re² + Q_im²`), the scan run as the forward runs it ([`Declaration::carry`]): `Q(t) = κ(t) b(t) +
     /// release(γ(t) Q(t ∓ 1), 30)` with the drive coupled through the leak ([`carry_coupling`]), `Q` zero before the region's first site, even
     /// contacts from the left and odd from the right. Each `[t][C]`. Where `ℓ < 0` the friction stands below its founding (`d = d₀ 2^ℓ < d₀`), so
     /// a run of such sites along the strand carries the charge further than the near field, and its drive is admitted by as much less (the
@@ -495,8 +495,8 @@ impl Field {
     }
 }
 
-/// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates over a read's open sites** ([`Field::carry_gates_of`],
-/// [`FieldRealization::read_faces_gated`]): `reads` the (open site, tick) pairs read, and for each carry circle `k` the sum of `|γ|` on `2^(−30)`
+/// [measurement; theory, November 11 18:33, part P2] **The carry circles' gates over a read's open sites** ([`Constitution::carry_gates_of`],
+/// [`Realization::read_faces_gated`]): `reads` the (open site, tick) pairs read, and for each carry circle `k` the sum of `|γ|` on `2^(−30)`
 /// over them and the count of them whose leak read `ℓ` stands at `0` or above (the friction at its founding or above, a reach of at most the near
 /// field's). Integers; a mean is `modulus[k] / reads`.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

@@ -17,38 +17,38 @@ use rayon::prelude::*;
 /// read's currents are their shares' averages, the material's gains at the founding's identity): the
 /// share of a site's own signal the contacts return to it within one read.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct FieldRead {
+pub struct ReadLogits {
     pub logits: Vec<Option<Vec<i64>>>,
     pub echo: Vec<u64>,
 }
 
 /// [definition; agent-inferred, November 1] **A realization of the field's read and return**: a
 /// region's faces and the covector over a section's regions, bit for bit the host's
-/// ([`HostField`]). The card's realization is one such; a realization that cannot read a region
+/// ([`Host`]). The card's realization is one such; a realization that cannot read a region
 /// refuses, never substitutes.
-pub trait FieldRealization {
-    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
+pub trait Realization {
+    fn read_and_return(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)>;
     /// [realization; theory, November 13, P58 item 3] **The training path's faces**: each region's open sites' masses at their classes with
     /// their totals, `(m_c, T)` (what [`compared`] reads of a face before a port, [`faces_at_class`]), and the covector, from one read and
     /// return. By default read off the whole faces; a realization that gathers them fetches those words alone. The same pairs either way.
-    fn read_and_return_at_class(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
+    fn read_and_return_at_class(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
         let (faces, g) = self.read_and_return(field, regions)?;
         Ok((faces_at_class(&faces, regions), g))
     }
-    /// [realization; theory, November 13, P60 items 1d and 2] **The training path with the opening's codes**: [`FieldRealization::read_and_return_at_class`]
-    /// and, where the field has the opening's lift, each region's opening code at every compared place ([`Field::opening_codes`]; empty without it).
+    /// [realization; theory, November 13, P60 items 1d and 2] **The training path with the opening's codes**: [`Realization::read_and_return_at_class`]
+    /// and, where the field has the opening's lift, each region's opening code at every compared place ([`Constitution::opening_codes`]; empty without it).
     /// By default the codes are the host's; a realization that compares the opening in its own forward returns its own, the same words.
     #[allow(clippy::type_complexity)]
-    fn read_and_return_opening(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
+    fn read_and_return_opening(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
         let (at_class, g) = self.read_and_return_at_class(field, regions)?;
         let codes = if field.declaration.opening { regions.par_iter().map(|r| field.opening_codes(r)).collect::<Result<_>>()? } else { Vec::new() };
         Ok((at_class, g, codes))
     }
-    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
-    /// Each unresolved site's readout logits on `2^(−16)` bits ([`Field::logits`]), the release's read.
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>>;
-    /// The landmarks of `sites` in `region` ([`Field::landmarks`]), a reading of its last tick.
-    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>>;
+    fn read_faces(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>>;
+    /// Each unresolved site's readout logits on `2^(−16)` bits ([`Constitution::logits`]), the release's read.
+    fn read_logits(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<ReadLogits>>;
+    /// The landmarks of `sites` in `region` ([`Constitution::landmarks`]), a reading of its last tick.
+    fn read_landmarks(&mut self, field: &Constitution, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>>;
     /// The site pairs the realization's contact has met so far, where it counts them.
     fn met_pairs(&self) -> Option<u128> {
         None
@@ -58,39 +58,39 @@ pub trait FieldRealization {
     fn counters(&self) -> Option<RealizationCounters> {
         None
     }
-    /// A held read's rows by where their mass lies, summed over `regions` ([`Field::held_rows_all`]; each region's
+    /// A held read's rows by where their mass lies, summed over `regions` ([`Constitution::held_rows_all`]; each region's
     /// answer start in `questions`), a reading for the receipts.
-    fn read_row_shares(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
+    fn read_row_shares(&mut self, _field: &Constitution, _regions: &[Region], _questions: &[usize]) -> Result<Vec<HeldRows>> {
         refuse("a realization that cannot read its rows' shares")
     }
-    /// The contact covector by where its pairs lie over `regions` ([`Field::covector_shares`]), a reading.
-    fn read_covector_shares(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+    /// The contact covector by where its pairs lie over `regions` ([`Constitution::covector_shares`]), a reading.
+    fn read_covector_shares(&mut self, _field: &Constitution, _regions: &[Region]) -> Result<Vec<[u128; 2]>> {
         refuse("a realization that cannot read its covector's shares")
     }
-    /// The held answer rows' currents by where they come from, region by region ([`Field::row_currents`]; each region's
+    /// The held answer rows' currents by where they come from, region by region ([`Constitution::row_currents`]; each region's
     /// answer start in `questions`), a reading.
-    fn read_row_currents(&mut self, _field: &Field, _regions: &[Region], _questions: &[usize], _returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+    fn read_row_currents(&mut self, _field: &Constitution, _regions: &[Region], _questions: &[usize], _returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
         refuse("a realization that cannot read its rows' currents")
     }
-    /// Each region's tick reads ([`Field::tick_reads`]), a reading.
-    fn read_ticks(&mut self, _field: &Field, _regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+    /// Each region's tick reads ([`Constitution::tick_reads`]), a reading.
+    fn read_ticks(&mut self, _field: &Constitution, _regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         refuse("a realization that cannot read its ticks")
     }
-    /// [measurement; theory, November 13, P57 item 2 (G132)] Each region's faces and, by stage ([`Field::tick_charts`]: each tick's opening,
+    /// [measurement; theory, November 13, P57 item 2 (G132)] Each region's faces and, by stage ([`Constitution::tick_charts`]: each tick's opening,
     /// then after the last tick), the open sites' chart rows in site order (`D` words each), a reading.
-    fn read_tick_charts(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
+    fn read_tick_charts(&mut self, _field: &Constitution, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
         refuse("a realization that cannot read its charts by stage")
     }
     /// [measurement; Brandon, November 15 00:58Z; the record of November 13 on loudness beside surprise, test 1] Each region's faces and, by
-    /// stage ([`Field::tick_scales`]: each tick's opening, then after the last tick), the open sites' lane scales in site order (`L` each, the
+    /// stage ([`Constitution::tick_scales`]: each tick's opening, then after the last tick), the open sites' lane scales in site order (`L` each, the
     /// lanes' powers), a reading.
-    fn read_tick_scales(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
+    fn read_tick_scales(&mut self, _field: &Constitution, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
         refuse("a realization that cannot read its lane powers by stage")
     }
-    /// [measurement; theory, November 11 18:33, part P2] The faces of `regions` ([`FieldRealization::read_faces`]) and the carry circles' gates
+    /// [measurement; theory, November 11 18:33, part P2] The faces of `regions` ([`Realization::read_faces`]) and the carry circles' gates
     /// over their open sites ([`CarryGates`]), a reading. By default the faces are the realization's own read and the gates the host's
-    /// ([`Field::carry_gates_of`]); a realization that holds the gates in its forward reads them from the same pass.
-    fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
+    /// ([`Constitution::carry_gates_of`]); a realization that holds the gates in its forward reads them from the same pass.
+    fn read_faces_gated(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {
         let faces = self.read_faces(field, regions)?;
         let mut gates = CarryGates::new(field.declaration.carry);
         for region in regions {
@@ -98,17 +98,17 @@ pub trait FieldRealization {
         }
         Ok((faces, gates))
     }
-    /// Each of `sites`' near field by offset in `region` ([`Field::near_offsets`]), a reading.
-    fn read_near_offsets(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<NearOffsets>> {
+    /// Each of `sites`' near field by offset in `region` ([`Constitution::near_offsets`]), a reading.
+    fn read_near_offsets(&mut self, _field: &Constitution, _region: &Region, _sites: &[usize]) -> Result<Vec<NearOffsets>> {
         refuse("a realization that cannot read its near fields")
     }
-    /// Each of `sites`' clocks by tick in `region` ([`Field::blank_clocks`]), a reading.
-    fn read_blank_clocks(&mut self, _field: &Field, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
+    /// Each of `sites`' clocks by tick in `region` ([`Constitution::blank_clocks`]), a reading.
+    fn read_blank_clocks(&mut self, _field: &Constitution, _region: &Region, _sites: &[usize]) -> Result<Vec<BlankClocks>> {
         refuse("a realization that cannot read its blanks' clocks")
     }
 }
 
-/// [measurement; theory, November 12] **A realization's counters** ([`FieldRealization::counters`]): its forward reads and returns, the site
+/// [measurement; theory, November 12] **A realization's counters** ([`Realization::counters`]): its forward reads and returns, the site
 /// pairs its contact met, the batches it split its reads into, and its largest batch's store in octets. A reading only.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct RealizationCounters {
@@ -122,35 +122,35 @@ pub struct RealizationCounters {
 /// The host's realization: the regions on the host's cores, each region's forward and reverse on
 /// one core.
 #[derive(Clone, Copy, Debug, Default)]
-pub struct HostField;
+pub struct Host;
 
-impl FieldRealization for HostField {
-    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+impl Realization for Host {
+    fn read_and_return(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         field.read_and_return(regions)
     }
-    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+    fn read_faces(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         field.read_faces(regions)
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+    fn read_logits(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<ReadLogits>> {
         field.read_logits(regions)
     }
-    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+    fn read_landmarks(&mut self, field: &Constitution, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
         field.landmarks(region, question, sites, count)
     }
-    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
+    fn read_row_shares(&mut self, field: &Constitution, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         field.held_rows_all(regions, questions)
     }
-    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
+    fn read_covector_shares(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<[u128; 2]>> {
         field.covector_shares(regions)
     }
-    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
+    fn read_row_currents(&mut self, field: &Constitution, regions: &[Region], questions: &[usize], returning: bool) -> Result<Vec<Vec<RowCurrent>>> {
         regions.iter().zip(questions).map(|(r, &q)| field.row_currents(r, q, returning)).collect()
     }
-    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
+    fn read_ticks(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<TickRead>>> {
         regions.par_iter().map(|r| field.tick_reads(r)).collect()
     }
 
-    fn read_tick_charts(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
+    fn read_tick_charts(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
         let dw = field.declaration.width;
         let faces = field.read_faces(regions)?;
         let charts = regions
@@ -163,7 +163,7 @@ impl FieldRealization for HostField {
         Ok((faces, charts))
     }
 
-    fn read_tick_scales(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
+    fn read_tick_scales(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
         let lanes = field.declaration.lanes;
         let faces = field.read_faces(regions)?;
         let scales = regions
@@ -176,23 +176,23 @@ impl FieldRealization for HostField {
         Ok((faces, scales))
     }
 
-    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
+    fn read_near_offsets(&mut self, field: &Constitution, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {
         field.near_offsets(region, sites)
     }
 
-    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
+    fn read_blank_clocks(&mut self, field: &Constitution, region: &Region, sites: &[usize]) -> Result<Vec<BlankClocks>> {
         field.blank_clocks(region, sites)
     }
 }
 
 /// [agent-inferred, November 1] A held step read on regions it was not fit on
-/// ([`FieldLearner::read_step_on`]): its change to those regions' code (the stepped material's
+/// ([`Learner::read_step_on`]): its change to those regions' code (the stepped material's
 /// code less the material's before the step, on `2^(−20)` bits), the further halvings of the last
-/// size read ([`FieldLearner::next_scale`]: the step stands at them unless refused), and whether
-/// it refused the step. Read only under [`FieldLearner::read_held`], `false` since November 3: a
+/// size read ([`Learner::next_scale`]: the step stands at them unless refused), and whether
+/// it refused the step. Read only under [`Learner::read_held`], `false` since November 3: a
 /// declared comparison, never the law.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct FieldNext {
+pub struct Next {
     pub change: i64,
     pub halvings: u32,
     pub refused: bool,
@@ -201,9 +201,9 @@ pub struct FieldNext {
 /// A section's receipt: its unresolved sites, its code before and after (on `2^(−20)` bits), its
 /// halvings (`0` since the step fluxes, November 5, and still printed), whether a step was deposited,
 /// and the held read of the step the section before deposited on this section's regions (only under
-/// [`FieldLearner::read_held`]).
+/// [`Learner::read_held`]).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct FieldReceipt {
+pub struct Receipt {
     /// The sites the codes are of: each region's domain where it read an open site (§16.23).
     pub sites: usize,
     pub code_before: i64,
@@ -211,7 +211,7 @@ pub struct FieldReceipt {
     pub code_after: Option<i64>,
     pub halvings: u32,
     pub deposited: bool,
-    pub next: Option<FieldNext>,
+    pub next: Option<Next>,
     /// [measurement; §16.41] The step's first-order change of the section's code at its full size, `Σ_i g_i Δθ_i` on the
     /// codes' grain ([`predicted_change`]; `None` past its carrier), and the change a reread measured there (none since
     /// the step fluxes): the section's own parabola `e(μ) = aμ + bμ²` with `a` the first and `a + b` the second.

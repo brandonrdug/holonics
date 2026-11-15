@@ -9,7 +9,7 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 #[allow(unused_imports)]
 use rayon::prelude::*;
 
-impl Field {
+impl Constitution {
 
     /// [measurement] A region's opening faces `x⁰` (`[t][D]` on `2^(−16)`), a reading for the receipts.
     pub fn opening(&self, region: &Region) -> Result<Vec<i64>> {
@@ -206,7 +206,7 @@ impl Field {
     /// [definition; theory, November 13, the design record of that day §4.4 and §4.4a] **Each place's cavity opening** `[t][D]` on the opening's
     /// grain: `x^cav_t = E(∗) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s^cav_t + b_s, 24)`, the unresolved row in place of the place's own, its two
     /// neighbours' strand rows as the region holds them (a carried neighbour by its mixture), and the moment's chart on the cavity moment
-    /// ([`Field::cavity_moments_of`]). At an open, silent place it is the built opening. Formed from the region's sums once, never by rebuilding
+    /// ([`Constitution::cavity_moments_of`]). At an open, silent place it is the built opening. Formed from the region's sums once, never by rebuilding
     /// the region once a place. A reading and the opening's comparison's operand: no state changes.
     pub fn cavity_openings(&self, region: &Region) -> Result<Vec<i64>> {
         self.admit_region(region)?;
@@ -214,7 +214,7 @@ impl Field {
         Ok(self.cavity_forward(region, &paces)?.0)
     }
 
-    /// The cavity openings ([`Field::cavity_openings`]) and the cavity moments they read, on the region's clocks `paces`.
+    /// The cavity openings ([`Constitution::cavity_openings`]) and the cavity moments they read, on the region's clocks `paces`.
     pub(crate) fn cavity_forward(&self, region: &Region, paces: &Paces) -> Result<(Vec<i64>, Vec<i64>)> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
@@ -250,7 +250,7 @@ impl Field {
     }
 
     /// [definition; theory, November 13, P60 item 1d] **The opening's read of a cavity opening** `x` (`D` words): the lane chart `r̂`, the opening's
-    /// lift `y⁰ = R⁰ r̂ + b⁰` (its own block, founded at zero), the face through the encoding (`tied`) at temperature one: the forms [`Field::face_of`]
+    /// lift `y⁰ = R⁰ r̂ + b⁰` (its own block, founded at zero), the face through the encoding (`tied`) at temperature one: the forms [`Constitution::face_of`]
     /// uses with the opening's block in place of the read block. `reach_o` is the opening block's reach.
     pub(crate) fn opening_read(&self, x: &[i64], reach_o: u64) -> Result<BlankRead> {
         let (d, l) = (&self.declaration, &self.layout);
@@ -265,14 +265,14 @@ impl Field {
     }
 
     /// [measurement; theory, November 13, G150's premise] **Each turned head's clock over a region**: its variation `σ_h(t)` on the pace grain
-    /// (`2^(−24)`), the clock its skins read, one row a paced head in the order of [`FieldDeclaration::paced_heads`]. A reading: no state changes.
+    /// (`2^(−24)`), the clock its skins read, one row a paced head in the order of [`Declaration::paced_heads`]. A reading: no state changes.
     pub fn head_variations(&self, region: &Region) -> Result<Vec<Vec<i64>>> {
         self.admit_region(region)?;
         Ok(self.paces(region)?.sigma)
     }
 
     /// [measurement; theory, November 13, P60 items 1d and 7] **The opening's faces at every place** of a region: each place's cavity opening read
-    /// through the opening's lift ([`Field::opening_read`]), written or open. Refused on a field without the opening's block. A reading: no state
+    /// through the opening's lift ([`Constitution::opening_read`]), written or open. Refused on a field without the opening's block. A reading: no state
     /// changes; in a release it is read and compared with nothing.
     pub fn opening_faces(&self, region: &Region) -> Result<Vec<TowerFace>> {
         if !self.declaration.opening {
@@ -289,7 +289,7 @@ impl Field {
         x.chunks_exact(dw).map(|xt| Ok(self.opening_read(xt, reach_o)?.face)).collect()
     }
 
-    /// [definition; theory, November 13, P60 item 1d] **The opening's code at every compared place** ([`Field::opening_end`]): `−log₂ p̂⁰_t(u_t)` on
+    /// [definition; theory, November 13, P60 item 1d] **The opening's code at every compared place** ([`Constitution::opening_end`]): `−log₂ p̂⁰_t(u_t)` on
     /// `2^(−20)` bits, the class the passage holds at the place (at a masked place the class the last tick is compared with), `None` past the
     /// region's port. Empty on a field without the opening's block.
     pub fn opening_codes(&self, region: &Region) -> Result<Vec<Option<i64>>> {
@@ -304,7 +304,7 @@ impl Field {
     /// place, the covector face minus the class's indicator at unit gain (`covector`, no domain weight) through the encoding's bias and rows
     /// (`tied`), the opening's lift and bias, the chart and its lanes; then the cavity opening's covector into the unresolved row, the two
     /// neighbours' strand rows, the moment's chart and bias, and through the chart into the cavity moments' covector, which returns to the other
-    /// places' moment terms ([`Field::cavity_moments_return`]) and their clocks (added into `gtau`, `gsig`, the region's own clock's covectors,
+    /// places' moment terms ([`Constitution::cavity_moments_return`]) and their clocks (added into `gtau`, `gsig`, the region's own clock's covectors,
     /// folded into the strides with the pass's own). No place's own row, own moment term or own stride is an operand of its comparison, so none is
     /// returned to.
     ///
@@ -432,7 +432,7 @@ impl Field {
 
     /// [measurement; theory, November 13, §4.4a's check] **The cavity openings against the region masked at each place**: for each place `t`, the
     /// built opening of the region with `t` unresolved and silent (`opening`), and the largest difference by word between it and `t`'s cavity
-    /// opening ([`Field::cavity_openings`]), in units of the opening's last place, over every place, with the place it stood at. A reading.
+    /// opening ([`Constitution::cavity_openings`]), in units of the opening's last place, over every place, with the place it stood at. A reading.
     pub fn cavity_check(&self, region: &Region) -> Result<(u64, usize, usize)> {
         let dw = self.declaration.width;
         let cav = self.cavity_openings(region)?;
@@ -503,7 +503,7 @@ impl Field {
     /// The region's opening faces `x⁰`: each site's row of the encoding with its strand
     /// neighbours' rows of their own encodings and its moment read through its chart,
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b, 24)` (§16.22; a region's first site has no
-    /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Field::moments_of`]).
+    /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Constitution::moments_of`]).
     pub(crate) fn open(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());

@@ -1,5 +1,5 @@
 use super::*;
-use crate::field::{ring_phasor, Field, FieldDeclaration};
+use crate::field::{ring_phasor, Constitution, Declaration};
 use crate::inherited::tower::{half_turn, TowerError};
 use num_bigint::BigInt;
 
@@ -54,10 +54,10 @@ impl Slot {
 }
 
 fn slots(reach: usize, modes: usize) -> Vec<Slot> {
-    let declaration = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let declaration = Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
     let mut next = mixer(7);
     let keys: Vec<u8> = (0..1usize << 14).flat_map(|_| next().to_be_bytes()).collect();
-    let field = Field::found(declaration, &keys).unwrap();
+    let field = Constitution::found(declaration, &keys).unwrap();
     let pi = half_turn(MOVE_BITS + 16);
     field
         .rings()
@@ -730,10 +730,10 @@ struct Paced {
 }
 
 fn paced_slots(reach: usize, modes: usize) -> Vec<Paced> {
-    let declaration = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let declaration = Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
     let mut next = mixer(7);
     let keys: Vec<u8> = (0..1usize << 14).flat_map(|_| next().to_be_bytes()).collect();
-    let field = Field::found(declaration, &keys).unwrap();
+    let field = Constitution::found(declaration, &keys).unwrap();
     let pi = half_turn(MOVE_BITS + 16);
     field.rings().iter().zip(field.decays()).map(|((n, ring), decay)| Paced { n: *n, ring: ring.clone(), decay: decay.clone(), pi, exponential: field.exponential().clone() }).collect()
 }

@@ -1,6 +1,6 @@
 // [definition; theory, November 13, the design record of that day §4.4a; P60 item 2] **The opening's comparison at every place, on the card**: bit
-// for bit the host's `moment::cavity_moment_parts_exact`, `Field::cavity_forward` (the cavity openings), `moment::cavity_moment_return_exact`,
-// `moment::cavity_pace_return` and their consumers in `Field::opening_compare_return`. The opening's read (the lane chart, the lift `R⁰`, `tied`, the
+// for bit the host's `moment::cavity_moment_parts_exact`, `Constitution::cavity_forward` (the cavity openings), `moment::cavity_moment_return_exact`,
+// `moment::cavity_pace_return` and their consumers in `Constitution::opening_compare_return`. The opening's read (the lane chart, the lift `R⁰`, `tied`, the
 // face, its covector and their returns) runs through the field's own entries with the batch's words' open-site mask set to the compared places, so
 // only the cavity's own operands are here: the cavity moments, the cavity openings, the cavity's far prefixes, its return and its clocks' covector.
 //
@@ -11,7 +11,7 @@
 // the sources before it are read from its cavity clock `τ_c = τ_(t−1) + 1`, `σ_c = σ_(t−1) + 1` (zero at a region's first place), and those after it
 // at their standing phases relative to its standing clock (both move together past `t`). A plain region (every rate one) reads the resident ring at
 // the byte place, where the cavity clock is the standing one. Faces are formed directly from the clocks (`turn_dev`, `skin_dev`: the integers the
-// host's `Field::turn` and `Field::skin` form), never from a store a fill left for another clock.
+// host's `Constitution::turn` and `Constitution::skin` form), never from a store a fill left for another clock.
 
 #pragma once
 
@@ -19,7 +19,7 @@
 #error "field_cavity.cuh is included after field_moment.cuh"
 #endif
 
-// `ζ^ρ` of turned slot `slot` at a clock `ρ` on `2^(−24)` (`Field::turn`).
+// `ζ^ρ` of turned slot `slot` at a clock `ρ` on `2^(−24)` (`Constitution::turn`).
 __device__ __forceinline__ MomentGauss cavity_turn(const FieldWords &w, uint32_t slot, wide rho) {
     wide re, im;
     turn_dev(w, slot, rho, &re, &im);
@@ -131,7 +131,7 @@ extern "C" __global__ void field_cavity_moment_all(const MomentWords *ws, const 
     }
 }
 
-// [definition; theory, November 13, §4.4] **Each place's cavity opening's rows** (the host's `Field::cavity_forward` before the moment's chart):
+// [definition; theory, November 13, §4.4] **Each place's cavity opening's rows** (the host's `Constitution::cavity_forward` before the moment's chart):
 // `E(∗) + E₋(u_(t−1)) + E₊(u_(t+1))`, the unresolved row in place of the place's own, a neighbour only within the site's own region, a carried
 // neighbour by its mixture (`opening_term`). The moment's chart on the cavity moment is added after it by `affine`. One thread a word.
 extern "C" __global__ void field_cavity_open(FieldWords w, int64_t *cx) {

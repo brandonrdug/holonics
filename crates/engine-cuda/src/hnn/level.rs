@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -17,7 +17,7 @@ use crate::cuda::{Dim3, Module};
 #[allow(unused_imports)]
 use crate::hnn::card::{Card, CardBuffer, CardError};
 
-/// A level above for a run ([`CardField::tower_run`]): the level's field's words and buffers, the glue's material (read by the
+/// A level above for a run ([`Resident::tower_run`]): the level's field's words and buffers, the glue's material (read by the
 /// level's words pointed at it), each level's covector, and the cut's section and half turn.
 pub(crate) struct TowerRun<'c> {
     pub(crate) cwords: Words,
@@ -35,7 +35,7 @@ pub(crate) struct TowerRun<'c> {
     pub(crate) reach_b: u64,
 }
 
-/// A level's epochs for one batch ([`CardField::tower_batch`]): the epochs staged as the level's regions, each fine place's epoch, its
+/// A level's epochs for one batch ([`Resident::tower_batch`]): the epochs staged as the level's regions, each fine place's epoch, its
 /// harmonics, the epochs' fine offsets, and the per-pass buffers.
 pub(crate) struct TowerBatch<'c> {
     pub(crate) st: Staged<'c>,
@@ -59,12 +59,12 @@ pub(crate) struct TowerBatch<'c> {
     pub(crate) _stores: Vec<Pooled<'c, u32>>,
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
 
     /// [definition; agent-inferred, November 3] **A tower's packets' level on the card** (the host's `field::scale`): the
     /// packets' field uploaded beside the fine one (reading its resident exponential), the glue uploaded, and each level's
     /// covector where the run returns one.
-    pub(crate) fn tower_run(&self, field: &Field, s: &Scale, face: u64, returning: bool) -> Result<TowerRun<'c>> {
+    pub(crate) fn tower_run(&self, field: &Constitution, s: &Scale, face: u64, returning: bool) -> Result<TowerRun<'c>> {
         let (mut cwords, cup, _) = self.upload(&s.coarse, Some(face))?;
         let glue = self.timed(Kind::Copy, || self.take_up(&s.glue)).map_err(device)?;
         let offsets = s.glue_offsets(field.declaration.width);
@@ -80,10 +80,10 @@ impl<'c> CardField<'c> {
     /// A batch's epochs staged as the level's field's regions (an epoch definite where its every place is, keyed where any is: unresolved
     /// and carrying class 0 where keyed and not definite), each region cut from its places' `news` by the host's `level_cut`; each fine
     /// place's epoch and harmonics, the epochs' fine offsets, the level's clocks uploaded as the cut gives them and its per-pass buffers.
-    /// [realization; agent-inferred, November 14, the ring record §4] The level's ticks are each read's own ([`CardField::level_ticks`]): the
-    /// news is the opening's comparison's face, which no mark enters (the host's `Field::level_news` reads `cavity_forward`), so a field that reads
+    /// [realization; agent-inferred, November 14, the ring record §4] The level's ticks are each read's own ([`Resident::level_ticks`]): the
+    /// news is the opening's comparison's face, which no mark enters (the host's `Constitution::level_news` reads `cavity_forward`), so a field that reads
     /// twice cuts its level once a batch and both reads stand on the cut.
-    pub(crate) fn tower_batch(&self, field: &Field, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, news: &[i64]) -> Result<TowerBatch<'c>> {
+    pub(crate) fn tower_batch(&self, field: &Constitution, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, news: &[i64]) -> Result<TowerBatch<'c>> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's batch of a field without a level"))?;
         let coarse = &s.coarse;
         let cd = coarse.declaration;
@@ -182,9 +182,9 @@ impl<'c> CardField<'c> {
         Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores })
     }
 
-    /// A read's own ticks on a batch's level ([`CardField::tower_batch`]): every tick kept where the read keeps the fine field's, and the shares
-    /// stored where it stores them, taken as [`CardField::tick`] takes the fine field's.
-    pub(crate) fn level_ticks(&self, field: &Field, tb: &TowerBatch<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<Vec<Tick<'c>>> {
+    /// A read's own ticks on a batch's level ([`Resident::tower_batch`]): every tick kept where the read keeps the fine field's, and the shares
+    /// stored where it stores them, taken as [`Resident::tick`] takes the fine field's.
+    pub(crate) fn level_ticks(&self, field: &Constitution, tb: &TowerBatch<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<Vec<Tick<'c>>> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's ticks of a field without a level"))?;
         (0..if kept { s.coarse.declaration.ticks } else { 1 }).map(|_| self.tick(tb.st.sites, tb.st.pairs, regions, &s.coarse, stored, returning, true)).collect()
     }
@@ -193,7 +193,7 @@ impl<'c> CardField<'c> {
     /// restricted through `A`, the level's ticks, and the prolongation, each place reading its epoch's harmonic blocks at its own phase,
     /// added back into the fine faces.
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn tower_forward(&self, field: &Field, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<()> {
+    pub(crate) fn tower_forward(&self, field: &Constitution, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, regions: usize, stored: bool, returning: bool, kept: bool) -> Result<()> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's forward of a field without a level"))?;
         let (d0, d1, h) = (field.declaration.width, s.coarse.declaration.width, tr.harmonics);
         let (a, ab, b, bb, _) = tr.offsets;
@@ -219,7 +219,7 @@ impl<'c> CardField<'c> {
     /// The level's reverse at the split (the host's `scale_return`): `back.dx`, the covector of the fine faces after the prolongation,
     /// carried through the prolongation, the level's ticks and the restriction into the covector of the fine faces before it; the
     /// level's and the glue's covectors added into their own buffers. The cut is data and takes nothing.
-    pub(crate) fn tower_back(&self, field: &Field, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, back: &Back<'c>, cb: &Back<'c>) -> Result<()> {
+    pub(crate) fn tower_back(&self, field: &Constitution, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, back: &Back<'c>, cb: &Back<'c>) -> Result<()> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's reverse of a field without a level"))?;
         let (d0, d1, h) = (field.declaration.width, s.coarse.declaration.width, tr.harmonics);
         let (a, ab, b, bb, _) = tr.offsets;

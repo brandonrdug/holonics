@@ -10,7 +10,7 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 use rayon::prelude::*;
 
 /// [measurement; theory, November 13, P58 item 4] **The deposit's parts on the host**, summed over every section a process realizes (ns; a
-/// reading, no state changes), in the order [`FieldLearner::section_realized`] runs them ([`SECTION_PART_NAMES`]).
+/// reading, no state changes), in the order [`Learner::section_realized`] runs them ([`SECTION_PART_NAMES`]).
 pub static SECTION_PARTS: [std::sync::atomic::AtomicU64; 15] = [const { std::sync::atomic::AtomicU64::new(0) }; 15];
 
 /// [measurement; P58 item 4] The names of [`SECTION_PARTS`], with the whole-layout passes each makes over the constitution's entries.
@@ -99,8 +99,8 @@ pub(crate) fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)])
 /// faces' (the covector's grains, as `covector_matches_the_codes_difference` reads them); `None` where a product or the sum
 /// passes its carrier. At the full step it is the first coefficient `a` of the section's own parabola `e(μ) = aμ + bμ²`; no
 /// reread reads the second since the step fluxes (November 5), so `b` is unread on the section itself. With the next
-/// section's covector and the step at the halvings it stood at, it is the step's transfer ([`FieldReceipt::transfer`]).
-pub(crate) fn predicted_change(field: &Field, g: &[i128], step: &[i128], halvings: u32) -> Option<i64> {
+/// section's covector and the step at the halvings it stood at, it is the step's transfer ([`Receipt::transfer`]).
+pub(crate) fn predicted_change(field: &Constitution, g: &[i128], step: &[i128], halvings: u32) -> Option<i64> {
     let mut total = 0i128;
     for &(start, len, grain) in &field.families_all() {
         let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
@@ -114,14 +114,14 @@ pub(crate) fn predicted_change(field: &Field, g: &[i128], step: &[i128], halving
 }
 
 /// [measurement; theory, November 12, G96's third branch] **A step's first-order change by founded part**: [`predicted_change`]'s
-/// sum with each family's terms gathered by the part each entry belongs to (`parts`, [`Field::founded_parts`]; index [`PARTS`] the
+/// sum with each family's terms gathered by the part each entry belongs to (`parts`, [`Constitution::founded_parts`]; index [`PARTS`] the
 /// old entries, which no part holds), each gathered family sum released onto the codes' `2^(−20)` bits as the total releases it.
 /// So the parts sum to the total less the releases' floors, at most one unit a family and part, which a reader keeps as the
 /// total's rest. `None` where a product or a sum passes its carrier. A reading: the step is not changed. Why: a section's
 /// predicted price is a total over every part, and a reading names its partition beside its total (the guide's rule of November
 /// 11); on tp5 that price burst a hundredfold before the card refused a sum, and which part's covector burst is the question
 /// G96's rule asks before eight times returns.
-pub(crate) fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings: u32, parts: &[u8]) -> Option<[i64; PARTS + 1]> {
+pub(crate) fn predicted_parts(field: &Constitution, g: &[i128], step: &[i128], halvings: u32, parts: &[u8]) -> Option<[i64; PARTS + 1]> {
     let mut by = [0i128; PARTS + 1];
     for &(start, len, grain) in &field.families_all() {
         let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
@@ -153,7 +153,7 @@ pub(crate) fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings
 /// `2^(−rate)`, at most about 4.2 times its rate by Cauchy–Schwarz over the moments' rates
 /// (agent-inferred), and no reread decides it. What it does is priced as the learner passes:
 /// predicted on its own section, transferred onto the next section's covector, and external before
-/// the covector moves the moments ([`FieldReceipt`]); the moments carry every covector, a
+/// the covector moves the moments ([`Receipt`]); the moments carry every covector, a
 /// contraction's and an expansion's alike.
 ///
 /// History, kept as history. *November 1*: **a step was held and read on the next regions** (the
@@ -165,13 +165,13 @@ pub(crate) fn predicted_parts(field: &Field, g: &[i128], step: &[i128], halvings
 /// November 1): the certificate read only its own section, and the held-out answer code rose at the
 /// second lap and the third (5.38, 5.49, 6.18 bits a class) while the passage's own code fell every
 /// section; the tower had recorded this failure and its repair, and the field had been built without
-/// it. *November 3*: the held read was set aside ([`FieldLearner::read_held`], `false`, with its
+/// it. *November 3*: the held read was set aside ([`Learner::read_held`], `false`, with its
 /// reason there) and stands since as a declared comparison only. *November 5*: the certificate
 /// itself was retired, because it kept a step only where its own section reread lower, a selection
-/// on the code that discarded what an expansion measures ([`FieldLearner::section_realized`]).
+/// on the code that discarded what an expansion measures ([`Learner::section_realized`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct FieldLearner {
-    pub field: Field,
+pub struct Learner {
+    pub field: Constitution,
     pub(crate) first: Vec<i128>,
     pub(crate) second: Vec<i128>,
     pub rate_bits: u32,
@@ -198,12 +198,12 @@ pub struct FieldLearner {
     /// [definition; theory, November 12 00:20, the Einstein record's U2] **Each entry's own deposit rate**, in bits (the entry steps at
     /// `2^(−rate)`), set between laps by the host law (`tools/part_rates.py blocks`: every block of the material a part of its own, its
     /// rate following its polarization, under the base word where that stands under the floor's) and carried in the learner's text as a
-    /// trailing `rates` line, one count an entry. Where it stands it is every entry's rate ([`FieldLearner::entry_rates`]); the parts'
+    /// trailing `rates` line, one count an entry. Where it stands it is every entry's rate ([`Learner::entry_rates`]); the parts'
     /// line is kept beside it for its contacts count. None in a state without the line, and after every growth (the law sets it again) but the
-    /// triads' ([`FieldLearner::with_triads`]), which keeps each old entry's own rate and opens the triads' entries at the base rate.
+    /// triads' ([`Learner::with_triads`]), which keeps each old entry's own rate and opens the triads' entries at the base rate.
     pub own_rates: Option<Vec<u32>>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
-    /// [`FieldReceipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
+    /// [`Receipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
     pub(crate) last: Option<HeldStep>,
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 5)] **The pass's place** over a store of documents
@@ -280,10 +280,10 @@ impl StorePass {
     }
 }
 
-impl FieldLearner {
+impl Learner {
     /// The learner of a field founded on its declared key stream (the founding read
-    /// [`FieldDeclaration::founding_draws`] draws).
-    pub fn new(field: Field, rate_bits: u32) -> Self {
+    /// [`Declaration::founding_draws`] draws).
+    pub fn new(field: Constitution, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
         Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, last: None, pass: None }
@@ -296,16 +296,16 @@ impl FieldLearner {
 
     /// The held step read on `regions` without a deposit: the faces of `regions` under the
     /// material that stands after the read, and the read (`None` when no step was held).
-    pub fn read_step_on(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<FieldNext>)> {
+    pub fn read_step_on(&mut self, regions: &[Region], realization: &mut dyn Realization) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Next>)> {
         let (faces, _, next) = self.open(regions, realization, false)?;
         Ok((faces, next))
     }
 
     /// The opening read of `regions` (with the covector when `returning`), after the held step,
-    /// if any, is read on them ([`FieldLearner::next_scale`]): the material before it and the
+    /// if any, is read on them ([`Learner::next_scale`]): the material before it and the
     /// stepped material read first, the material that stands decided, and the opening read read
     /// on it (a read already made is not made again).
-    pub(crate) fn open(&mut self, regions: &[Region], realization: &mut dyn FieldRealization, returning: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>, Option<FieldNext>)> {
+    pub(crate) fn open(&mut self, regions: &[Region], realization: &mut dyn Realization, returning: bool) -> Result<(Vec<Vec<Option<TowerFace>>>, Option<Vec<i128>>, Option<Next>)> {
         let Some(held) = self.held.take() else {
             return if returning {
                 let (faces, g) = realization.read_and_return(&self.field, regions)?;
@@ -336,11 +336,11 @@ impl FieldLearner {
     ///
     /// Returns the material that stands, its faces, and the read.
     #[allow(clippy::type_complexity)]
-    pub(crate) fn next_scale(before: &Field, held: &HeldStep, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<(Field, Vec<Vec<Option<TowerFace>>>, FieldNext)> {
+    pub(crate) fn next_scale(before: &Constitution, held: &HeldStep, regions: &[Region], realization: &mut dyn Realization) -> Result<(Constitution, Vec<Vec<Option<TowerFace>>>, Next)> {
         let before_faces = realization.read_faces(before, regions)?;
         let old = compared(&before_faces, regions)?;
         let scale = scaled(before, &held.step, held.halvings, &old, false, regions, realization)?;
-        let next = FieldNext { change: scale.change, halvings: scale.halvings, refused: scale.standing.is_none() };
+        let next = Next { change: scale.change, halvings: scale.halvings, refused: scale.standing.is_none() };
         Ok(match scale.standing {
             Some((field, faces)) => (field, faces, next),
             None => (before.clone(), before_faces, next),
@@ -348,24 +348,24 @@ impl FieldLearner {
     }
 
     /// One section: the step the section before deposited read on its regions (only under
-    /// [`FieldLearner::read_held`]), then its regions read and returned on the material that stands,
+    /// [`Learner::read_held`]), then its regions read and returned on the material that stands,
     /// the moments moved, and the step deposited at its size (the step fluxes, November 5; a step that
     /// moves no entry deposits nothing), priced by its prediction, transfer and external price
-    /// ([`FieldReceipt`]) and kept for the next section's transfer.
-    pub fn section(&mut self, regions: &[Region]) -> Result<FieldReceipt> {
-        self.section_realized(regions, &mut HostField)
+    /// ([`Receipt`]) and kept for the next section's transfer.
+    pub fn section(&mut self, regions: &[Region]) -> Result<Receipt> {
+        self.section_realized(regions, &mut Host)
     }
 
-    /// [`FieldLearner::section`] on a declared realization of the field's read and return; the step
+    /// [`Learner::section`] on a declared realization of the field's read and return; the step
     /// is deposited at its size, and the moments and the step stay on the host.
-    pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<FieldReceipt> {
+    pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn Realization) -> Result<Receipt> {
         let mut part = std::time::Instant::now();
         let mut mark = |k: usize| {
             SECTION_PARTS[k].fetch_add(part.elapsed().as_nanos() as u64, std::sync::atomic::Ordering::Relaxed);
             part = std::time::Instant::now();
         };
         // [realization; theory, November 13, P58 item 3] With no held step and no port the comparison reads each open site's face at its
-        // class alone, so the realization is asked for those words ([`FieldRealization::read_and_return_at_class`]); the same pairs.
+        // class alone, so the realization is asked for those words ([`Realization::read_and_return_at_class`]); the same pairs.
         // [theory, November 13, P60 item 1d] Where the field has the opening's lift the call returns its codes beside the faces and the covector.
         let (faces_old, g, next, codes) = if self.held.is_none() && regions.iter().all(|r| r.port.is_none()) {
             let (at_class, g, codes) = realization.read_and_return_opening(&self.field, regions)?;
@@ -444,12 +444,12 @@ impl FieldLearner {
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure
         // or mistakes, knowing what causes contraction in contrast to expansion is equally important") and cost a full read
         // of the section (27% of path75's second segment). What the step does is read by the passes the field makes anyway:
-        // the next section's own covector prices it at first order ([`FieldReceipt::transfer`]), contraction and expansion
+        // the next section's own covector prices it at first order ([`Receipt::transfer`]), contraction and expansion
         // alike, and the moments carry every covector.
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         mark(13);
         if !moved {
-            return Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts, opening });
+            return Ok(Receipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts, opening });
         }
         self.field = candidate;
         if self.read_held {
@@ -458,7 +458,7 @@ impl FieldLearner {
             self.last = Some(HeldStep { step, halvings: 0 });
         }
         mark(14);
-        Ok(FieldReceipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts, opening })
+        Ok(Receipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts, opening })
     }
 
     /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
@@ -493,7 +493,7 @@ impl FieldLearner {
         let drawn = head[2].parse::<usize>().map_err(|_| TowerError::Refused("a learner's drawn keys that are not a count"))?;
         let laps = head[3].parse::<u64>().map_err(|_| TowerError::Refused("a learner's laps that are not a count"))?;
         let mut lines = lines.peekable();
-        let field = Field::from_lines(&mut lines)?;
+        let field = Constitution::from_lines(&mut lines)?;
         let first = read_numbers::<i128>(lines.next())?;
         let second = read_numbers::<i128>(lines.next())?;
         if first.len() != field.material_len() || second.len() != field.material_len() {

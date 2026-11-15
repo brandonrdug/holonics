@@ -1,13 +1,13 @@
-//! **A region the trainer owns** (`TrainRegion`): its classes, its open places, its domain and its port, and the views the field reads of it.
+//! **A region the trainer owns** (`OwnedRegion`): its classes, its open places, its domain and its port, and the views the field reads of it.
 //! Moved from the store line's harness (`complete_language/field_train.rs`) by C4 of #603, each item's text as it stood but for its visibility.
 
-use crate::codec::FieldCodec;
+use crate::codec::Codec;
 use crate::field::Shares;
 
 /// A training region: its classes, its unresolved sites, its carried faces and its locks (each
 /// empty where none).
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct TrainRegion {
+pub struct OwnedRegion {
     pub classes: Vec<usize>,
     pub unresolved: Vec<bool>,
     pub faces: Vec<Option<Shares>>,
@@ -25,7 +25,7 @@ pub struct TrainRegion {
     pub letters: bool,
 }
 
-impl TrainRegion {
+impl OwnedRegion {
     /// A region carrying no face and no lock.
     pub fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
         Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false }
@@ -33,17 +33,17 @@ impl TrainRegion {
 }
 
 /// A region as the field reads it.
-pub fn view_of(region: &TrainRegion) -> Region<'_> {
+pub fn view_of(region: &OwnedRegion) -> Region<'_> {
     Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }) }
 }
 
 /// The regions as the field reads them.
-pub fn views_of(regions: &[TrainRegion]) -> Vec<Region<'_>> {
+pub fn views_of(regions: &[OwnedRegion]) -> Vec<Region<'_>> {
     regions.iter().map(view_of).collect()
 }
 
 /// A problem's region classes: the question and its line, the answer, then `void` to `length`.
-pub fn region_classes(codec: &FieldCodec, q: &[usize], a: &[usize], length: usize) -> Vec<usize> {
+pub fn region_classes(codec: &Codec, q: &[usize], a: &[usize], length: usize) -> Vec<usize> {
     let mut out: Vec<usize> = q.iter().chain(a).copied().collect();
     out.resize(length, codec.void());
     out
@@ -108,7 +108,7 @@ pub struct Port<'a> {
     /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The room is cut to its windows**
     /// ([`Region::window`]): where set, a receiver's row is met only at the question's sites, the silent stretch's first
     /// place and the places within `(NEAR − 1)·ticks` of a heard one; every other receiver meets no source that tick. A field with carry
-    /// circles keeps the room whole ([`FieldDeclaration::room_window`]): a circle carries a place's state the whole strand inside one tick.
+    /// circles keeps the room whole ([`Declaration::room_window`]): a circle carries a place's state the whole strand inside one tick.
     pub window: bool,
     /// [definition; agent-inferred, November 6, the unified-theory reading of 11:49] **Compared on its letters off the void**: each
     /// open place of the port on its target's class within the letters, `−log₂(m_a/(T − m_∅))`, the release's own draw where the
@@ -218,7 +218,7 @@ pub(crate) fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result
 
 impl Region<'_> {
     /// [definition; agent-inferred, November 6, the unified-theory reading of 06:50, E] **The windows a cut room computes**
-    /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Field::silent_stretch`]) and each
+    /// ([`Port::window`]): every site before the port, the silent stretch's first place ([`Constitution::silent_stretch`]) and each
     /// heard open place, each with the `(NEAR − 1)·ticks` places on either side; none where the port does not cut its room.
     /// Why exact (the unified-theory reading of 06:50): a silent place is no one's far source, so in one tick a receiver hears
     /// past its near field only definite sources (the question, whole) and its crowds of them, and the near field and the
@@ -229,14 +229,14 @@ impl Region<'_> {
     /// reaches at most `(NEAR − 1)` places a tick, so it meets no receiver outside its window, and the clock's return reaches
     /// the stretch's first place, whose window is computed. Not exact where blanks sit between arrivals (masks, writer
     /// states), whose clocks read each blank's own face: those regions keep their room whole. Nor where the field has carry circles,
-    /// whose scan carries a place's state the whole strand in one tick: the forward asks [`FieldDeclaration::room_window`], which keeps
+    /// whose scan carries a place's state the whole strand in one tick: the forward asks [`Declaration::room_window`], which keeps
     /// those rooms whole.
     pub fn window(&self, ticks: usize) -> Option<Vec<bool>> {
         let port = self.port.filter(|p| p.window)?;
         let sites = self.classes.len();
         let reach = (NEAR - 1) * ticks;
         let mut out: Vec<bool> = (0..sites).map(|t| t < port.start).collect();
-        let stretch = Field::silent_stretch(self);
+        let stretch = Constitution::silent_stretch(self);
         let centres = std::iter::once(stretch).chain((port.start..port.stop.unwrap_or(sites).min(sites)).filter(|&t| self.unresolved[t] && port.heard.is_none_or(|h| h[t])));
         for c in centres.filter(|&c| c < sites) {
             for slot in &mut out[c.saturating_sub(reach)..(c + reach + 1).min(sites)] {
@@ -264,14 +264,14 @@ impl Region<'_> {
 /// §15.3): a site carried as a face is read through contacts both ways, so its face returns to it a
 /// round trip later; the read it meets is its cavity field, `z ← z − B ℓ`, with `ℓ` the logits its
 /// carried face was formed from and `B` its echo on `2^(−63)`, the round trip's share read on the read
-/// that formed `ℓ` ([`FieldRead::echo`]). Both are data: no covector passes through them.
+/// that formed `ℓ` ([`ReadLogits::echo`]). Both are data: no covector passes through them.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Echo {
     pub b: u64,
     pub logits: Vec<i64>,
 }
 
-impl Field {
+impl Constitution {
 
     pub(crate) fn admit_region(&self, region: &Region) -> Result<()> {
         if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
@@ -346,7 +346,7 @@ impl Field {
     }
 
     /// A pass's port reading ([`port_reading`]) from the faces at the port's places.
-    pub(crate) fn port_of(&self, pass: &FieldPass, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
+    pub(crate) fn port_of(&self, pass: &Forward, port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
         port_reading(&port_faces(&pass.faces, port)?, port)
     }
 }

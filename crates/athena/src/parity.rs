@@ -1,5 +1,5 @@
 //! `parity-store`: the card's realization of the store line held against the host's (C2 of the consolidation, #603; the plan's §8,
-//! "Parity"). The command is `train-store` itself, run through a realization that asks both the card and the host ([`HostField`]) for
+//! "Parity"). The command is `train-store` itself, run through a realization that asks both the card and the host ([`Host`]) for
 //! every read and compares their results whole. The learner is given the card's, so the run trains as the line trains and its
 //! `STORE_SECTION` lines are the line's own (a reproduction of the sections it runs, read by `tools/reproduction.py`).
 //!
@@ -11,7 +11,7 @@
 //! forwarded to its override.
 
 use crate::exterior::*;
-use holonics_engine::field::{BlankClocks, CarryGates, Field, FieldRead, FieldRealization, HeldRows, HostField, NearOffsets, RealizationCounters, Region, RowCurrent, TickRead};
+use holonics_engine::field::{BlankClocks, CarryGates, Constitution, ReadLogits, Realization, HeldRows, Host, NearOffsets, RealizationCounters, Region, RowCurrent, TickRead};
 use holonics_engine::inherited::tower::{TowerError, TowerFace};
 use std::collections::BTreeMap;
 use std::time::Instant;
@@ -21,8 +21,8 @@ type Reads<T> = std::result::Result<T, TowerError>;
 
 /// The card beside the host: each call asked of both, the card's result returned, every pair compared.
 struct Paired<'a> {
-    card: &'a mut dyn FieldRealization,
-    host: HostField,
+    card: &'a mut dyn Realization,
+    host: Host,
     /// By method: calls, unequal calls, the card's and the host's nanoseconds.
     calls: BTreeMap<&'static str, (u64, u64, u128, u128)>,
     /// The training path's unequal sites and covector entries, summed over its calls.
@@ -32,11 +32,11 @@ struct Paired<'a> {
 }
 
 impl<'a> Paired<'a> {
-    fn new(card: &'a mut dyn FieldRealization) -> Self {
-        Paired { card, host: HostField, calls: BTreeMap::new(), sites: 0, entries: 0, first: None }
+    fn new(card: &'a mut dyn Realization) -> Self {
+        Paired { card, host: Host, calls: BTreeMap::new(), sites: 0, entries: 0, first: None }
     }
 
-    fn both<T: PartialEq>(&mut self, method: &'static str, card: impl FnOnce(&mut dyn FieldRealization) -> Reads<T>, host: impl FnOnce(&mut HostField) -> Reads<T>) -> Reads<T> {
+    fn both<T: PartialEq>(&mut self, method: &'static str, card: impl FnOnce(&mut dyn Realization) -> Reads<T>, host: impl FnOnce(&mut Host) -> Reads<T>) -> Reads<T> {
         let t = Instant::now();
         let c = card(&mut *self.card);
         let card_ns = t.elapsed().as_nanos();
@@ -72,7 +72,7 @@ impl<'a> Paired<'a> {
 
     /// The training path's two results compared by site and by covector entry, so a difference is named where it stands.
     #[allow(clippy::type_complexity)]
-    fn locate(&mut self, field: &Field, call: u64, card: &(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>), host: &(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)) {
+    fn locate(&mut self, field: &Constitution, call: u64, card: &(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>), host: &(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)) {
         for (r, (c, h)) in card.0.iter().zip(&host.0).enumerate() {
             for (t, (a, b)) in c.iter().zip(h).enumerate() {
                 if a != b {
@@ -101,15 +101,15 @@ impl<'a> Paired<'a> {
     }
 }
 
-impl FieldRealization for Paired<'_> {
-    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, Vec<i128>)> {
+impl Realization for Paired<'_> {
+    fn read_and_return(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, Vec<i128>)> {
         self.both("read_and_return", |c| c.read_and_return(field, regions), |h| h.read_and_return(field, regions))
     }
-    fn read_and_return_at_class(&mut self, field: &Field, regions: &[Region]) -> Reads<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
+    fn read_and_return_at_class(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>)> {
         self.both("read_and_return_at_class", |c| c.read_and_return_at_class(field, regions), |h| h.read_and_return_at_class(field, regions))
     }
     #[allow(clippy::type_complexity)]
-    fn read_and_return_opening(&mut self, field: &Field, regions: &[Region]) -> Reads<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
+    fn read_and_return_opening(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Vec<Vec<Option<(u128, u128)>>>, Vec<i128>, Vec<Vec<Option<i64>>>)> {
         // The training path keeps both results to name a difference by site and entry.
         let t = Instant::now();
         let c = self.card.read_and_return_opening(field, regions);
@@ -143,13 +143,13 @@ impl FieldRealization for Paired<'_> {
             }
         }
     }
-    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Reads<Faces> {
+    fn read_faces(&mut self, field: &Constitution, regions: &[Region]) -> Reads<Faces> {
         self.both("read_faces", |c| c.read_faces(field, regions), |h| h.read_faces(field, regions))
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Reads<Vec<FieldRead>> {
+    fn read_logits(&mut self, field: &Constitution, regions: &[Region]) -> Reads<Vec<ReadLogits>> {
         self.both("read_logits", |c| c.read_logits(field, regions), |h| h.read_logits(field, regions))
     }
-    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Reads<Vec<Vec<(usize, u64)>>> {
+    fn read_landmarks(&mut self, field: &Constitution, region: &Region, question: usize, sites: &[usize], count: usize) -> Reads<Vec<Vec<(usize, u64)>>> {
         self.both("read_landmarks", |c| c.read_landmarks(field, region, question, sites, count), |h| h.read_landmarks(field, region, question, sites, count))
     }
     fn met_pairs(&self) -> Option<u128> {
@@ -158,31 +158,31 @@ impl FieldRealization for Paired<'_> {
     fn counters(&self) -> Option<RealizationCounters> {
         self.card.counters()
     }
-    fn read_row_shares(&mut self, field: &Field, regions: &[Region], questions: &[usize]) -> Reads<Vec<HeldRows>> {
+    fn read_row_shares(&mut self, field: &Constitution, regions: &[Region], questions: &[usize]) -> Reads<Vec<HeldRows>> {
         self.both("read_row_shares", |c| c.read_row_shares(field, regions, questions), |h| h.read_row_shares(field, regions, questions))
     }
-    fn read_covector_shares(&mut self, field: &Field, regions: &[Region]) -> Reads<Vec<[u128; 2]>> {
+    fn read_covector_shares(&mut self, field: &Constitution, regions: &[Region]) -> Reads<Vec<[u128; 2]>> {
         self.both("read_covector_shares", |c| c.read_covector_shares(field, regions), |h| h.read_covector_shares(field, regions))
     }
-    fn read_row_currents(&mut self, field: &Field, regions: &[Region], questions: &[usize], returning: bool) -> Reads<Vec<Vec<RowCurrent>>> {
+    fn read_row_currents(&mut self, field: &Constitution, regions: &[Region], questions: &[usize], returning: bool) -> Reads<Vec<Vec<RowCurrent>>> {
         self.both("read_row_currents", |c| c.read_row_currents(field, regions, questions, returning), |h| h.read_row_currents(field, regions, questions, returning))
     }
-    fn read_ticks(&mut self, field: &Field, regions: &[Region]) -> Reads<Vec<Vec<TickRead>>> {
+    fn read_ticks(&mut self, field: &Constitution, regions: &[Region]) -> Reads<Vec<Vec<TickRead>>> {
         self.both("read_ticks", |c| c.read_ticks(field, regions), |h| h.read_ticks(field, regions))
     }
-    fn read_tick_charts(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i32>>>)> {
+    fn read_tick_charts(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i32>>>)> {
         self.both("read_tick_charts", |c| c.read_tick_charts(field, regions), |h| h.read_tick_charts(field, regions))
     }
-    fn read_tick_scales(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i128>>>)> {
+    fn read_tick_scales(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i128>>>)> {
         self.both("read_tick_scales", |c| c.read_tick_scales(field, regions), |h| h.read_tick_scales(field, regions))
     }
-    fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, CarryGates)> {
+    fn read_faces_gated(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, CarryGates)> {
         self.both("read_faces_gated", |c| c.read_faces_gated(field, regions), |h| h.read_faces_gated(field, regions))
     }
-    fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Reads<Vec<NearOffsets>> {
+    fn read_near_offsets(&mut self, field: &Constitution, region: &Region, sites: &[usize]) -> Reads<Vec<NearOffsets>> {
         self.both("read_near_offsets", |c| c.read_near_offsets(field, region, sites), |h| h.read_near_offsets(field, region, sites))
     }
-    fn read_blank_clocks(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Reads<Vec<BlankClocks>> {
+    fn read_blank_clocks(&mut self, field: &Constitution, region: &Region, sites: &[usize]) -> Reads<Vec<BlankClocks>> {
         self.both("read_blank_clocks", |c| c.read_blank_clocks(field, region, sites), |h| h.read_blank_clocks(field, region, sites))
     }
 }
@@ -191,7 +191,7 @@ impl FieldRealization for Paired<'_> {
 /// compared whole (above). Prints `STORE_PARITY` a method (calls, unequal calls, the card's and the host's milliseconds), the training
 /// path's unequal sites and covector entries, the first difference, and `STORE_PARITY_DONE` with `EQUAL` or `DIFFERS`. A difference
 /// is an error, so the command's exit is the gate's.
-pub fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
+pub fn parity(args: &[String], card: &mut dyn Realization) -> Result<()> {
     let mut paired = Paired::new(card);
     let trained = crate::store::train(args, &mut paired);
     for (method, (calls, unequal, card_ns, host_ns)) in &paired.calls {

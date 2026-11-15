@@ -10,11 +10,11 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 use rayon::prelude::*;
 
 /// [definition; agent-inferred, November 1] **A contact row as a series** (the dispersing field's
-/// §14.11; one row a head, §15.2): each term `2^z · μ` (its face and whole bits from [`Field::face`], `μ`
+/// §14.11; one row a head, §15.2): each term `2^z · μ` (its face and whole bits from [`Constitution::face`], `μ`
 /// its multiplier on `2^(−62)`: `2^62` in the near field, a far source's weight, a crowd's count `· 2^62`
 /// in the mass with `2^62` against its value sum) keeps its own exponent; the terms are summed whole,
 /// shifted from the row's least exponent, in a carrier as wide as the row's own exponents need (never
-/// past [`FieldDeclaration::row_bits`]); the current `ỹ = Σ e v / Σ e` is released once, to the nearest
+/// past [`Declaration::row_bits`]); the current `ỹ = Σ e v / Σ e` is released once, to the nearest
 /// numerator on the value's grain; and each term's share of the mass is formed once on `2^(−63)`. No
 /// peak is subtracted and no term is released before the current: a source outscored by any number of
 /// bits still enters the sums. Integer sums, so any order gives the same bits.

@@ -31,7 +31,7 @@ pub(crate) fn tower(p: usize, reach: usize) -> Vec<usize> {
 /// every scale, and its top ring turns less than once across any region (a distance, not only a
 /// residue). The slots take `⌈S/2⌉` rings of the dyadic tower and `⌊S/2⌋` of the triadic, each
 /// spread evenly from the finest to the top (a lone slot takes the top; more slots than closures
-/// cycle the tower), merged in ascending period. Slot `s` of [`FieldDeclaration::turned_slots`]
+/// cycle the tower), merged in ascending period. Slot `s` of [`Declaration::turned_slots`]
 /// is turned ring set `still + s mod (frames − still)`'s local mode `s / (frames − still)`, so every
 /// turned set spans fine to coarse. Two sites that agree modulo every ring are at least the top dyadic closure apart,
 /// beyond the reach: no two sites of an admitted region share every frame.
@@ -145,7 +145,7 @@ pub(crate) fn skin_back(b: i128, decay: i128, e: i128) -> Result<i128> {
 pub const PACE_BITS: u32 = MATERIAL_BITS;
 
 /// [definition; agent-inferred, November 2] **A turned head's own clock over a region** (§16, Law 1): for each head
-/// that reads a pace ([`FieldDeclaration::paced_heads`], its index `row[h]`), the rate `κ_h(t) = 1 + ⟨c_h, x⁰_t⟩`,
+/// that reads a pace ([`Declaration::paced_heads`], its index `row[h]`), the rate `κ_h(t) = 1 + ⟨c_h, x⁰_t⟩`,
 /// the clock `τ_h(t) = Σ_(0<k≤t) κ_h(k)` (an exact prefix sum: `τ_h(0) = 0`, each step into a site ticked by that
 /// site's face) and the turn's variation `σ_h(t) = Σ_(0<k≤t) |κ_h(k)|`, on `2^(−24)`; `plain[p]` where every rate
 /// is `1` exactly (the founding), so the clock is the byte place and the field reads its resident faces.
@@ -206,7 +206,7 @@ pub(crate) struct BlankRead {
     pub(crate) face: TowerFace,
 }
 
-/// [measurement; agent-inferred, November 5, §16.44] **A blank's clocks by tick** ([`Field::blank_clocks`]): at each tick
+/// [measurement; agent-inferred, November 5, §16.44] **A blank's clocks by tick** ([`Constitution::blank_clocks`]): at each tick
 /// whose clocks the blanks set (`None` at a tick that reads the pass's), each paced head's rate `κ` at the site on
 /// `2^(−24)` and the face the clock read there.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -214,7 +214,7 @@ pub struct BlankClocks {
     pub ticks: Vec<Option<(Vec<i64>, TowerFace)>>,
 }
 
-impl Field {
+impl Constitution {
 
     /// The skin of turned slot `slot` across a variation `s` on `2^(−24)`: the resident decay at a whole distance
     /// within the reach, [`skin_of`] otherwise (the same bits).
@@ -251,9 +251,9 @@ impl Field {
     }
 
     /// [definition; agent-inferred, November 4, §16.44] **A blank place runs at its expected duration**: the clocks
-    /// ([`Field::paces`]) with each silent open site `t` that `blank` gives a face `p_t` running at
+    /// ([`Constitution::paces`]) with each silent open site `t` that `blank` gives a face `p_t` running at
     /// `κ_h(t) = 1 + Σ_a p_t(a) c_h[a]`, the duration a written byte there would take in expectation, `release(Σ_a w_a c_h[a],
-    /// 24)` as a carried face's mixture; every other site as in [`Field::paces`]. Why (the unified-theory reading of
+    /// 24)` as a carried face's mixture; every other site as in [`Constitution::paces`]. Why (the unified-theory reading of
     /// November 4, `a_blank_place_is_a_potential` §4, and §16.42): a turned head reads a source across `τ_t − τ_s = Σ_(u∈(s,t])
     /// κ_u`, and a blank at the bare rate makes a gap read `1/1.62` and `1/1.91` of its written length on the two clocks, so a
     /// restated result drawn into a blank surround lands one place off; at its expected duration the gap's clock has the
@@ -283,7 +283,7 @@ impl Field {
                     Some(face) => release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS),
                     None => self.strand_row(region, base, 1, at)[0] as i128,
                 };
-                // A depth ring's rate is its located increment alone (base zero, [`FieldDeclaration::depth`]).
+                // A depth ring's rate is its located increment alone (base zero, [`Declaration::depth`]).
                 let k = if d.is_depth(h) { rate } else { one + rate };
                 if t > 0 {
                     clock += k;

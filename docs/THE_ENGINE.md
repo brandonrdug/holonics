@@ -24,7 +24,7 @@ Everything is integer. Faces, charts and currents stand on `2^(−16)`, material
 `2^(−30)`, a series row's exponential faces on `2^(−62)` with its shares on `2^(−63)`, covectors on `2^(−24)` and
 the contact's on `2^(−40)` ([`width.rs`](../crates/engine/src/width.rs)). Every product's remainder below its grain
 is released to the nearest numerator and every sum is an integer sum, so the host and any partition of the card
-give the same bits (CLAUDE.md, the precision law). The host realization (`HostField`) is the reference the card's
+give the same bits (CLAUDE.md, the precision law). The host realization (`Host`) is the reference the card's
 bits are checked against. Learning runs on the card.
 
 ## 2. The one move
@@ -81,7 +81,7 @@ The card module is under [`crates/engine-cuda/src/hnn/`](../crates/engine-cuda/s
 | release | the writer: every answer place opened beside the known prompt, resolved by octaves of distance from it, each drawn from its face on the read of the region as it stands | [`release.rs`](../crates/engine/src/release.rs) | the forward's kernels, one read a place | chain over the reads |
 
 The card's resident realization ([`resident.rs`](../crates/engine-cuda/src/hnn/resident.rs)) opens a region batch,
-uploads it, holds the pools and implements `FieldRealization`; [`card.rs`](../crates/engine-cuda/src/hnn/card.rs)
+uploads it, holds the pools and implements `Realization`; [`card.rs`](../crates/engine-cuda/src/hnn/card.rs)
 owns the context, the module, the stream and the census; [`profile.rs`](../crates/engine-cuda/src/hnn/profile.rs)
 holds the launch records and the yardsticks (`field_yard_*`). A ruler ([`ruler.rs`](../crates/engine/src/ruler.rs))
 reads the machine without changing what the state carries or the deposit consumes.
@@ -124,8 +124,8 @@ and where the tree already holds it.
 
 ## 5. The learner's state
 
-A saved state is text, written and read by `FieldLearner::to_text` and `from_text`
-([`learner.rs`](../crates/engine/src/learner.rs)) and `Field::to_text`
+A saved state is text, written and read by `Learner::to_text` and `from_text`
+([`learner.rs`](../crates/engine/src/learner.rs)) and `Constitution::to_text`
 ([`constitution.rs`](../crates/engine/src/constitution.rs)). Lap 17's end state reads, line by line:
 
 1. the learner's line: `hnn-field-learner-v3`, the rate bits, the count of key draws, the laps and the held step;
@@ -214,8 +214,9 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 
 ## 10. What is owed
 
-- **The cut's second part** (C5): the kernels' headers (one header a phase), the `inherited` items distributed into
-  their modules, and the renames of §5 (`Field` → `Constitution` and the rest), chosen around the names that stand.
+- **The cut's second part** (C5): the kernels' headers (one header a phase) and the `inherited` items distributed into
+  their modules. The renames stand (`Constitution`, `Declaration`, `Loci`, `Learner`, `Realization`, `Host`, `Resident`,
+  `Codec`, `Forward`, `ReadLogits`, `Next`, `Receipt`, `OwnedRegion`); the module paths `field` and `hnn::field` stay.
 - **The headers** (C7): every module and kernel header in §5's form (object, equations, kind and index, kernels, Lean,
   atlas, records), its dated reasoning moved to the records. Most of the cut modules still open with a line naming
   the cut; this guide's §3 is their map until then.

@@ -2,11 +2,11 @@
 """state_travel.py G L2 L4: the travel of a grown field's entries, read on the host from three saved learner states (no card, no
 learning; arithmetic on the states' material lines).
 
-G is the state a growth in contacts wrote (Field::contacted: 32 pair contacts added, f 32 -> 64), L2 and L4 later states of the
+G is the state a growth in contacts wrote (Constitution::contacted: 32 pair contacts added, f 32 -> 64), L2 and L4 later states of the
 same line (hnn-field-learner-v3 text: line 3 is the field's material, one integer an entry). Each family's entries are split into
-  new   the new contacts' entries: the a and b rows, W's columns, the contacts' biases of the contacts Field::contacted founded
+  new   the new contacts' entries: the a and b rows, W's columns, the contacts' biases of the contacts Constitution::contacted founded
         (real parts at 16..31, imaginary parts at 48..63 of 64);
-  lane  the entries the lane growth founded (Field::laned: the face coordinates past the first lane, `width/lanes ..`), where not new:
+  lane  the entries the lane growth founded (Constitution::laned: the face coordinates past the first lane, `width/lanes ..`), where not new:
         the columns of the key, value, probe, pair-drive charts and the encodings, the rows of the current's return, W,
         the moment's chart, and the readout's lift's rows and columns, and the face biases' entries;
   old   the rest.
@@ -184,7 +184,7 @@ def masks(name, shape, d, old_f, new_f):
     lane_from = dw // lanes if lanes > 1 else dw
     f = d["contacts"]
     new_contact = np.zeros(f, dtype=bool)
-    # Field::contacted: old real parts keep 0..old_f/2, the new real parts follow (old_f/2 .. new_f/2), the old imaginary parts then
+    # Constitution::contacted: old real parts keep 0..old_f/2, the new real parts follow (old_f/2 .. new_f/2), the old imaginary parts then
     # the new ones in the second half.
     half_old, half_new = old_f // 2, new_f // 2
     new_contact[half_old:half_new] = True
@@ -440,7 +440,7 @@ def learner(path):
 
 
 def entry_rates(d, total, rate_bits, parts, own=None):
-    """Each entry's deposit rate in bits (FieldLearner::entry_rates): where the state carries each entry's own rate (its `rates` line,
+    """Each entry's deposit rate in bits (Learner::entry_rates): where the state carries each entry's own rate (its `rates` line,
     the block law's; theory, November 12), that rate; otherwise the base rate, less its founded part's octaves, never under one."""
     if own is not None:
         assert len(own) == total, "a learner's own rates, one an entry"

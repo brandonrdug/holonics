@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -40,9 +40,9 @@ pub(crate) struct MomentWords {
 }
 
 /// A kernel argument: the address of a value the launch copies.
-/// The moment's chart into the face (§16.22, [`holonics_engine::field::FieldLayout::moment_face`]): its offset in
+/// The moment's chart into the face (§16.22, [`holonics_engine::field::Loci::moment_face`]): its offset in
 /// the material, its bias's, and its reach `max |C|` (the affine's carrier bound).
-pub(crate) fn moment_face(field: &Field) -> (u64, u64, u64) {
+pub(crate) fn moment_face(field: &Constitution) -> (u64, u64, u64) {
     let (l, d) = (field.layout(), field.declaration);
     let len = d.width * 2 * d.complex();
     let reach = field.theta[l.moment_face..l.moment_face + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
@@ -62,8 +62,8 @@ pub(crate) struct MomentKeep<'c> {
     pub(crate) cmap: Pooled<'c, u32>,
 }
 
-/// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward on the card** (the host's `Field::cavity_forward` and
-/// `Field::opening_read` at every compared place), kept for its return and its codes: the compared places (`mask`, the words' open-site mask while
+/// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward on the card** (the host's `Constitution::cavity_forward` and
+/// `Constitution::opening_read` at every compared place), kept for its return and its codes: the compared places (`mask`, the words' open-site mask while
 /// the opening is read), the cavity moments `[t][2M]` and their two sides `[u][t]`, the cavity openings, their charts, lifts and faces.
 pub(crate) struct Opening<'c> {
     pub(crate) mask: Pooled<'c, u8>,
@@ -78,15 +78,15 @@ pub(crate) struct Opening<'c> {
     pub(crate) totals: Pooled<'c, i128>,
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
 
-    /// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward** (the host's `Field::cavity_forward` and
-    /// `Field::opening_read`): the cavity moments from the standing moments' kept operands (`field_cavity_moment_all`), the cavity openings
+    /// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward** (the host's `Constitution::cavity_forward` and
+    /// `Constitution::opening_read`): the cavity moments from the standing moments' kept operands (`field_cavity_moment_all`), the cavity openings
     /// (`field_cavity_open`, then the moment's chart on the cavity moment), and at every compared place the lane chart, the opening's lift `R⁰ r̂ + b⁰`,
     /// the face through the encoding and its masses, by the field's own entries with the words' open-site mask set to the compared places. Every
     /// word a later kernel reads is written first: the cavity moment is zeroed (its still modes stay zero), the chart, the lift and the face are read
     /// at the compared places alone. Launches a batch: one, two and the moment's chart's, then the chart, the lift, `tied` and the face.
-    pub(crate) fn opening_forward(&self, field: &Field, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>) -> Result<Opening<'c>> {
+    pub(crate) fn opening_forward(&self, field: &Constitution, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>) -> Result<Opening<'c>> {
         let d = field.declaration;
         let (dw, m2, a, sites, tm, lanes) = (d.width, 2 * d.complex(), d.alphabet, st.sites, d.moment_modes(), d.lanes);
         let l = field.layout();
@@ -133,14 +133,14 @@ impl<'c> CardField<'c> {
         Ok(Opening { mask, keep, cmoment, sb, sa, read, scale, lift, masses, totals })
     }
 
-    /// [realization; theory, November 13, P60 item 2] **The opening's comparison's return** (the host's `Field::opening_compare_return`): at every
+    /// [realization; theory, November 13, P60 item 2] **The opening's comparison's return** (the host's `Constitution::opening_compare_return`): at every
     /// compared place the face covector at unit gain, through the class biases, the encoding (`tied`), the opening's lift and bias, the chart and its
     /// lanes, by the field's own entries under the compared places' mask; the cavity opening's covector into the unresolved row and the neighbours'
     /// strand rows (`field_encoding`), the moment's chart and bias, and the cavity moments' covector through their return and their clocks
     /// (`field_cavity_terms_all` and `field_cavity_scan_all`, `field_cavity_return_paced_all`, `field_cavity_pace_back_all`), added into `g` and into the pass's clock covectors
     /// the words name.
     #[allow(clippy::type_complexity)]
-    pub(crate) fn opening_back(&self, field: &Field, words: &mut Words, op: &Opening<'c>, g: &CardBuffer<'c, i128>, (classes, unresolved, site_pos, mix_off, mix_class, mix_share): (&[u32], &[u8], &[u32], &[u32], &[u32], &[u32]), sites: usize) -> Result<()> {
+    pub(crate) fn opening_back(&self, field: &Constitution, words: &mut Words, op: &Opening<'c>, g: &CardBuffer<'c, i128>, (classes, unresolved, site_pos, mix_off, mix_class, mix_share): (&[u32], &[u8], &[u32], &[u32], &[u32], &[u32]), sites: usize) -> Result<()> {
         let d = field.declaration;
         let (dw, m2, a, tm) = (d.width, 2 * d.complex(), d.alphabet, d.moment_modes());
         let l = field.layout();
@@ -249,12 +249,12 @@ impl<'c> CardField<'c> {
     }
 
     /// [definition; agent-inferred, November 1] **The site moments of a batch** (§15.1; the host's
-    /// `Field::moments_of`, [`holonics_engine::field::moment`]), every moment mode (a turned head that
+    /// `Constitution::moments_of`, [`holonics_engine::field::moment`]), every moment mode (a turned head that
     /// is turned, each of its modes) in the same launches: the strands' encodings of each mode's ring
     /// slot gathered at every site (`field_moment_strands_all`), admitted by the l1 certificate, scanned to
     /// the prefix sums and read at every site (`kernels/field_moment.cuh` through its `_all` entries, a mode
     /// to a grid row), and placed at the unframed value's modes.
-    pub(crate) fn moments(&self, field: &Field, words: &Words, regions: usize, sites: usize, keep: bool) -> Result<Option<MomentKeep<'c>>> {
+    pub(crate) fn moments(&self, field: &Constitution, words: &Words, regions: usize, sites: usize, keep: bool) -> Result<Option<MomentKeep<'c>>> {
         let d = field.declaration;
         let tm = d.moment_modes();
         if tm == 0 {
@@ -292,7 +292,7 @@ impl<'c> CardField<'c> {
     /// The moment kernels' words for every moment mode, in the order of the moment index (`MomentWords` in
     /// `kernels/field_moment.cuh`, an array of them), each mode's ring slot's resident phasors and skin and
     /// its admission flags `ok[u][r]`; and the map from a moment mode to the unframed value's mode `h n + l`.
-    pub(crate) fn moment_modes(&self, field: &Field, words: &Words, regions: usize, sites: usize, ok: &CardBuffer<'c, u8>) -> Result<(Pooled<'c, u64>, Pooled<'c, u32>)> {
+    pub(crate) fn moment_modes(&self, field: &Constitution, words: &Words, regions: usize, sites: usize, ok: &CardBuffer<'c, u8>) -> Result<(Pooled<'c, u64>, Pooled<'c, u32>)> {
         let d = field.declaration;
         let (mut packed, mut cmap) = (Vec::new(), Vec::new());
         for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
@@ -323,17 +323,17 @@ impl<'c> CardField<'c> {
         Ok((self.timed(Kind::Copy, || self.take_up(&packed)).map_err(device)?, self.timed(Kind::Copy, || self.take_up(&cmap)).map_err(device)?))
     }
 
-    /// [definition; agent-inferred, November 1] **The moments' return** (the host's `Field::moments_return`,
+    /// [definition; agent-inferred, November 1] **The moments' return** (the host's `Constitution::moments_return`,
     /// the released law of §15.1): every moment mode's covector `dm` at its value (fit to 64 bits), admitted by
     /// the return's certificate, the prefix of the covector turned and released once a term, the return at
     /// every site, and the strands' encodings' rows (or a carried site's classes by their shares) added into
     /// `g`; all modes in the same launches.
-    pub(crate) fn moments_return(&self, field: &Field, words: &Words, g: &CardBuffer<'c, i128>, dm: &CardBuffer<'c, i128>, regions: usize, sites: usize) -> Result<()> {
+    pub(crate) fn moments_return(&self, field: &Constitution, words: &Words, g: &CardBuffer<'c, i128>, dm: &CardBuffer<'c, i128>, regions: usize, sites: usize) -> Result<()> {
         self.moments_return_at(field, words, g, dm.device_ptr(), regions, sites)
     }
 
-    /// [`CardField::moments_return`] of the moments' covector at `dm` (§16.44: one a clock).
-    pub(crate) fn moments_return_at(&self, field: &Field, words: &Words, g: &CardBuffer<'c, i128>, dm: u64, regions: usize, sites: usize) -> Result<()> {
+    /// [`Resident::moments_return`] of the moments' covector at `dm` (§16.44: one a clock).
+    pub(crate) fn moments_return_at(&self, field: &Constitution, words: &Words, g: &CardBuffer<'c, i128>, dm: u64, regions: usize, sites: usize) -> Result<()> {
         let d = field.declaration;
         let tm = d.moment_modes();
         if tm == 0 {

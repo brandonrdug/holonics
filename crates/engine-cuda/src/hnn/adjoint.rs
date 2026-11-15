@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -17,7 +17,7 @@ use crate::cuda::{Dim3, Module};
 #[allow(unused_imports)]
 use crate::hnn::card::{Card, CardBuffer, CardError};
 
-/// A level's reverse buffers ([`CardField::back_buffers`]).
+/// A level's reverse buffers ([`Resident::back_buffers`]).
 pub(crate) struct Back<'c> {
     pub(crate) dx: Pooled<'c, i64>,
     pub(crate) dr: Pooled<'c, i64>,
@@ -50,18 +50,18 @@ pub(crate) struct Back<'c> {
     pub(crate) pr_back: Pooled<'c, i64>,
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
 
     pub(crate) fn ratio_adjoint(&self, words: &mut Words, read: u64, scale: u64, cov: u64, base: u64, dst: u64, only_unresolved: bool) -> Result<()> {
         let (mut read, mut scale, mut cov, mut base, mut dst, mut u) = (read, scale, cov, base, dst, u32::from(only_unresolved));
         self.launch("field_ratio_adjoint", Self::warps(words.t as u64), THREADS, &mut [arg(words), arg(&mut read), arg(&mut scale), arg(&mut cov), arg(&mut base), arg(&mut dst), arg(&mut u)])
     }
 
-    /// One tick's reverse on the card (the host's `Field::tick_return`): `b.dx`, the covector of the tick's output faces,
+    /// One tick's reverse on the card (the host's `Constitution::tick_return`): `b.dx`, the covector of the tick's output faces,
     /// carried back to the covector of its input faces, the level's material covector added into `g`.
     #[allow(clippy::too_many_arguments)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn tick_back(&self, field: &Field, words: &mut Words, tick: &Tick<'c>, at: usize, g: &CardBuffer<'c, i128>, b: &Back<'c>, dm: u64, sites: usize, readings: bool) -> Result<()> {
+    pub(crate) fn tick_back(&self, field: &Constitution, words: &mut Words, tick: &Tick<'c>, at: usize, g: &CardBuffer<'c, i128>, b: &Back<'c>, dm: u64, sites: usize, readings: bool) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
@@ -255,7 +255,7 @@ impl<'c> CardField<'c> {
     }
 
     /// The reverse's per-site and per-pair buffers of one level, the words pointed at those the kernels read.
-    pub(crate) fn back_buffers(&self, field: &Field, words: &mut Words, sites: usize, pairs: usize, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>) -> Result<Back<'c>> {
+    pub(crate) fn back_buffers(&self, field: &Constitution, words: &mut Words, sites: usize, pairs: usize, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>) -> Result<Back<'c>> {
         let d = field.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let (m2, span) = (2 * m, 2 * n);
@@ -312,7 +312,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>, loud: Option<(&CardBuffer<'c, i128>, &CardBuffer<'c, i64>, &CardBuffer<'c, i64>)>) -> Result<()> {
+    pub(crate) fn reverse(&self, field: &Constitution, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>, loud: Option<(&CardBuffer<'c, i128>, &CardBuffer<'c, i64>, &CardBuffer<'c, i64>)>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -343,7 +343,7 @@ impl<'c> CardField<'c> {
             self.launch("field_face_set", Self::cells(count * a as u64), THREADS, &mut [arg(words), arg(&mut atp), arg(&mut rp), arg(&mut count), arg(&mut dzp)])?;
         }
         self.outer(words, g, words.read_bias, a, 0, dz.device_ptr(), a, 0, 0, false, true)?;
-        // [Brandon, November 15 02:06Z] Through a loud face's sharpness (the host's `Field::loud_return`): `δv = rel(β δz, 16)` takes `δz`'s place
+        // [Brandon, November 15 02:06Z] Through a loud face's sharpness (the host's `Constitution::loud_return`): `δv = rel(β δz, 16)` takes `δz`'s place
         // in the encoding's and the lift's covectors, `κ` and `b` take theirs, and the radial part is the base the chart's adjoint adds to.
         let (sharp_dz, radial) = match loud {
             Some((beta, lambda, plain)) => {
@@ -470,7 +470,7 @@ impl<'c> CardField<'c> {
             let (mut gp, mut dxp, mut rsp, mut rwp, mut sgp, mut count, mut base) = (g.device_ptr(), dx.device_ptr(), rows_sites_c.device_ptr(), rows_shares_c.device_ptr(), segments_c.device_ptr(), count, base);
             self.launch("field_encoding", Self::cells(count as u64 * dw as u64), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut dxp), arg(&mut rsp), arg(&mut rwp), arg(&mut sgp), arg(&mut count), arg(&mut base)])?;
         }
-        // [definition; agent-inferred, November 14, the ring record §4] **The mark's return** (the host's `Field::opening_return` at a marked site):
+        // [definition; agent-inferred, November 14, the ring record §4] **The mark's return** (the host's `Constitution::opening_return` at a marked site):
         // on a field's second read each silent site's rows above gave its open row `dx`; its mark adds `−release(α_b dx, 24)` there, each class's
         // `release(w_c release(α_b dx, 24), 16)` and the strength's `Σ_i dx_i Δ_i`, in every encoding its row enters (`field_mark_back`, then
         // `field_mark_rows` over the kept `release(α_b dx, 24)`).

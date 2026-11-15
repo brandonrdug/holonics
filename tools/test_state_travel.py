@@ -33,7 +33,7 @@ head's, one state under another head is its own material, and a file that stands
 Controls of its graft: the named families' entries are the donor's and every other entry and line the head's; grafts of two parts
 that partition the layout's families move, between them, every entry the two states differ in, once; every family grafted gives the
 donor's material under the head's other lines; an unknown family, a family named twice and a standing file are refused.
-A graft by rate part: `part:NAME` takes the entries Field::founded_parts gives that part and `FAMILY/old` a family's entries of
+A graft by rate part: `part:NAME` takes the entries Constitution::founded_parts gives that part and `FAMILY/old` a family's entries of
 no part; the fifteen parts and every family's old entries, each grafted alone, move every entry once between them (a partition of
 the material); the count before the growth is the head's `parts` line's, or `contacts:N` on a head that carries none, and the two
 give one file; an entry named twice (a family beside one of its parts), a part of another law, a count that is not the head's, and

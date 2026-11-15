@@ -1,4 +1,4 @@
-//! **The boundary chart** (`FieldCodec`): a passage's units read as the classes a region's sites carry, and back. Moved from the store line's
+//! **The boundary chart** (`Codec`): a passage's units read as the classes a region's sites carry, and back. Moved from the store line's
 //! harness (`complete_language/field_train.rs`) by C4 of the consolidation (#603), each item's text as it stood but for its visibility.
 //!
 //! [definition; Brandon, November 12] The table of classes stands until the symbol's word replaces it: a symbol is its key on a few coprime
@@ -19,10 +19,10 @@ pub fn count(s: &str) -> Result<usize> {
 ///
 /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The void at a kept index**
 /// (`field-codec-v3`): a codec founded on one passage holds the void as its last class (`field-codec-v2`, read and written
-/// as before); extended at a crossing to a store ([`FieldCodec::extended`]) it keeps every class where it stood, the void
+/// as before); extended at a crossing to a store ([`Codec::extended`]) it keeps every class where it stood, the void
 /// among them, and takes the fresh units after them, so `used` lists the units in class order with the void's index
 /// skipped. Decoding stops at the void by equality.
-pub struct FieldCodec {
+pub struct Codec {
     units: Units,
     used: Vec<u32>,
     class_of_unit: HashMap<u32, usize>,
@@ -34,7 +34,7 @@ pub struct FieldCodec {
     kept_void: bool,
 }
 
-impl FieldCodec {
+impl Codec {
     /// The codec of a training passage's problems.
     pub fn found(units: Units, problems: &[(Vec<u8>, Vec<u8>)]) -> Result<Self> {
         let mut used: Vec<u32> = Vec::new();

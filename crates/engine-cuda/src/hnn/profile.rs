@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -31,7 +31,7 @@ pub struct FieldTimes {
     /// The largest batch's counted allocations (weights, contact return and per-site carriers), in
     /// octets.
     pub peak_store: u64,
-    /// The landmark reads ([`FieldRealization::read_landmarks`]) and their wall time, apart from the
+    /// The landmark reads ([`Realization::read_landmarks`]) and their wall time, apart from the
     /// reads and pairs above.
     pub landmarks: u64,
     pub landmark_ns: u128,
@@ -131,7 +131,7 @@ pub fn tile_proves(k: u128, a: u128, b: u128, bits: u32) -> bool {
 /// [measurement; P57 item 1] The launches a trace keeps: a section's are about 510, so four sections and the run's opening.
 pub const TRACE_LAUNCHES: usize = 2600;
 
-/// [agent-inferred, November 1] A declared reading (`CardField::profile`): every launch timed alone,
+/// [agent-inferred, November 1] A declared reading (`Resident::profile`): every launch timed alone,
 /// the card synchronized before and after it, by entry; every transfer and allocation timed after the
 /// card's stream has drained, so a run's wall time splits into kernels, copies, allocations and the
 /// host's own work. It moves nothing the field computes.
@@ -186,7 +186,7 @@ pub struct FieldProfile {
     pub timed_ns: u128,
 }
 
-/// [measurement; theory, November 12, P50 step 0b] The card's yardsticks ([`CardField::yardsticks`]): each reading as (rate a
+/// [measurement; theory, November 12, P50 step 0b] The card's yardsticks ([`Resident::yardsticks`]): each reading as (rate a
 /// second, count, seconds).
 #[derive(Clone, Debug)]
 pub struct Yardsticks {
@@ -206,7 +206,7 @@ pub struct Yardsticks {
     pub gather: (f64, u64, f64),
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
 
     pub fn times(&self) -> FieldTimes {
         self.times

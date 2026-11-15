@@ -2,7 +2,7 @@
 // `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`,
 // §7, and `2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP`,
 // §6, §12 and §14): one constitution iterated over every site of every region of a batch at once, and
-// its exact reverse, bit for bit the host's `Field::pass` and `Field::reverse`.
+// its exact reverse, bit for bit the host's `Constitution::pass` and `Constitution::reverse`.
 //
 // [definition; agent-inferred, November 1] **The field disperses; only the plates radiate far.** Each
 // head reads a key and a probe a site (§16.19: each its own chart, founded apart); a site meets its near
@@ -17,7 +17,7 @@
 // [definition; agent-inferred, November 1] **The row is a series** (§14.11). A contact row is read in
 // two passes over its terms (the least exponent `a_0`; then each term `face * mult * 2^(a - a_0)` summed
 // whole into the mass and, times each value entry, into the numerators), in a carrier of
-// `FieldDeclaration::row_bits()` bits (`LIMBS` limbs of 64, signed by two's complement), divided once
+// `Declaration::row_bits()` bits (`LIMBS` limbs of 64, signed by two's complement), divided once
 // by the mass (the exact long division, to the nearest numerator), and each term's share of the mass
 // formed once by the same division on `2^-63`. Integer sums: the host's bits in any order, whatever
 // the partition of the support over the warp's lanes.
@@ -288,11 +288,11 @@ struct FieldWords {
     uint32_t D, H, n, still, f, A, frames;
     // The lanes the face is charted in (§16.40), `D / lanes` coordinates each.
     uint32_t lanes;
-    // The gain's shift, negative where it amplifies (`FieldDeclaration::score_shift`), the classes'
+    // The gain's shift, negative where it amplifies (`Declaration::score_shift`), the classes'
     // shells `b` (`class_trits`) and their count `3^b`.
     int32_t beta;
     uint32_t ctrits, nclasses;
-    // The contact covector's carrier: `|δs| < 2^dsbits` (`FieldDeclaration::contact_return_bits`).
+    // The contact covector's carrier: `|δs| < 2^dsbits` (`Declaration::contact_return_bits`).
     uint32_t dsbits;
     uint32_t M, M2, span, digits;
     uint32_t T, R;
@@ -308,7 +308,7 @@ struct FieldWords {
     const uint64_t *ring_off;
     const uint64_t *ring_n;
     // Each turned slot's skin decay on `2^(−30)` at every distance within the reach, `[slot][d]`
-    // with stride `dreach` (`Field::decays`).
+    // with stride `dreach` (`Constitution::decays`).
     const int64_t *decay;
     uint64_t dreach;
     const uint64_t *roots;
@@ -395,7 +395,7 @@ struct FieldWords {
     // class receiver, 1 a listener, on `2^(−24)`), the covector buffer the reverse adds their covectors to, and,
     // on a return, the pairs' locks at unit gain `S` (`sb`, at the dense address, a tick's).
     uint64_t temper_at;
-    // The temperatures' fine roots (§16.12): the exponential's roots 17 to 24 on `2^(−62)` (`Field::fine_exponential`).
+    // The temperatures' fine roots (§16.12): the exponential's roots 17 to 24 on `2^(−62)` (`Constitution::fine_exponential`).
     const uint64_t *fine_roots;
     wide *gcov;
     int64_t *sb;
@@ -426,24 +426,24 @@ struct FieldWords {
     int64_t *cds;
     // [measurement, §16.20] Where set, the contact covector's magnitude by where its pairs lie, `[h][2]`: `Σ |δs|` over
     // the near pairs (`|i − j| < NEAR`) and over the far ones (the far pairs and the crowds), the host's
-    // `Field::covector_shares`.
+    // `Constitution::covector_shares`.
     wide *dsshare;
     // [§16.44] Where set, a tick's blanks' rates `[p][t]` (`field_blank_rates`), which its clocks run each silent open
     // site at, and the face they were read from (masses `[t][A]` and totals), whose shares the clocks' return reads.
     const int64_t *blank_rate;
     const uint64_t *blank_masses;
     const uwide *blank_totals;
-    // [measurement] Where set, every silent place runs its own rate past the last arrival too (`Field::per_blank_clock`).
+    // [measurement] Where set, every silent place runs its own rate past the last arrival too (`Constitution::per_blank_clock`).
     uint64_t per_blank;
-    // The depth rings' count (`FieldDeclaration::depth`): the last `depth` turned ring sets.
+    // The depth rings' count (`Declaration::depth`): the last `depth` turned ring sets.
     uint64_t depth;
     // [the unified-theory reading of November 6, 10:31] Where set, past the last arrival a silent place runs at the bare rate
-    // (`Field::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
+    // (`Constitution::bare_stretch`): no clamp to the stretch's first place, and no fold of its covector there.
     uint64_t bare_stretch;
-    // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles** (`FieldDeclaration::carry`): the last `carry` (`C`) of the
+    // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles** (`Declaration::carry`): the last `carry` (`C`) of the
     // `f/2` complex contacts carry the scan `Q(t) = κ(t) b(t) + γ(t) Q(t∓1)`, `p(t) = a(t) Q(t∓1)` with the gate `γ = γ̂(q)/(1 + d₀ 2^ℓ)` (`carry_gate`,
     // the leak on its log chart) and the drive charged through the same leak, `κ = N₀ d/(1 + d)` (`carry_coupling`). `wg` and `wgb` are the circles'
-    // charts' and biases' offsets in the material (`FieldLayout::carry`, `carry_bias`) and `rg` the charts' reach; `pg` the charts' reads `q`, `ℓ`
+    // charts' and biases' offsets in the material (`Loci::carry`, `carry_bias`) and `rg` the charts' reach; `pg` the charts' reads `q`, `ℓ`
     // `[t][2C]` (`2^(−16)`), `pgam` the gate `[t][2C]` (real parts then imaginary, `2^(−30)`), `pqm` the scan's operand `Q(t∓1)` `[t][2C]`, which the
     // reverse reads, and `pkb` the coupled drive `κ b` `[t][2C]` (real parts then imaginary, `2^(−16)`), which the scan reads.
     uint64_t carry;
@@ -459,10 +459,10 @@ struct FieldWords {
     // from the start: `k` passes `INT64_MAX` at `n ≥ 739` and 64 unsigned bits at `n ≥ 1478`, and the pair's compare is made on 128 bits from `k` itself).
     int64_t *saddr;
     // [definition; theory, November 12; the triad record (`2026-11-12_THE_LAW_ACROSS_A_PLACE_IS_HELD_BY_A_PUMPED_CONTACT…`) §3 and §4] **The triads**
-    // (`FieldDeclaration::triads`): `triads` (`J`) complex triads, each the plain pair contact with one operand more, the word of two contacts through a
+    // (`Declaration::triads`): `triads` (`J`) complex triads, each the plain pair contact with one operand more, the word of two contacts through a
     // place: `p_k(t) = α_k(t) β_k(t − 1)`, `c^T_k(t) = p_k(t) γ_k(t + 1)`, and the return `W c + W_T c^T` summed whole with the bias before its one release.
-    // `wt` and `wtb` are the chart's and its biases' offsets in the material (`FieldLayout::triad`, `triad_bias`: `6J` rows of `D`, `A` then `B` then `G`,
-    // row `k` the real part and row `J + k` the imaginary part within each) and `rt` the chart's reach; `wtr` the return's offset (`FieldLayout::w_triad`,
+    // `wt` and `wtb` are the chart's and its biases' offsets in the material (`Loci::triad`, `triad_bias`: `6J` rows of `D`, `A` then `B` then `G`,
+    // row `k` the real part and row `J + k` the imaginary part within each) and `rt` the chart's reach; `wtr` the return's offset (`Loci::w_triad`,
     // `D` rows of `2J` columns, no bias of its own) and `rwt` its reach; `pabg` the chart's read `[t][6J]` (`2^(−16)`), `ptp` the products `p` and `pct`
     // the products `c^T` `[t][2J]` (real parts then imaginary, `2^(−16)`), which the reverse reads. Zero (and no kernel reads them) where `J = 0`.
     uint64_t triads;
@@ -491,15 +491,15 @@ struct FieldWords {
     uint32_t *mskin;
     const uint32_t *mcmap;
     uint64_t tm;
-    // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (`FieldDeclaration::mark`): the strengths'
-    // offset in the material (`FieldLayout::mark`, `α_b` for `enc`, `before`, `after` on `2^(−24)`), and on the second read each silent site's
+    // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (`Declaration::mark`): the strengths'
+    // offset in the material (`Loci::mark`, `α_b` for `enc`, `before`, `after` on `2^(−24)`), and on the second read each silent site's
     // shares of the face the first read gave it, `[t][A]` on `2^(−16)` (the host's `shares`, zero at a class whose share releases to zero and at
     // every site that is not silent; `field_mark_shares`). Null on a first read and on a field that reads once, where no kernel reads a mark.
     uint64_t mark_at;
     const uint32_t *mark_share;
 };
 
-// [definition; agent-inferred, November 2] **A head's pace index** (§16, `Field::paces`): the heads that carry a moment
+// [definition; agent-inferred, November 2] **A head's pace index** (§16, `Constitution::paces`): the heads that carry a moment
 // (a turned ring set) in order, `−1` for the rest.
 __device__ __forceinline__ int32_t paced_index(const FieldWords &w, uint32_t h) {
     const uint32_t set = h % w.frames;
@@ -509,7 +509,7 @@ __device__ __forceinline__ int32_t paced_index(const FieldWords &w, uint32_t h) 
     return (int32_t)((h / w.frames) * (w.frames - w.still) + set - w.still);
 }
 
-// [definition; agent-inferred, November 6] A depth ring (`FieldDeclaration::is_depth`): a turned ring set among the last
+// [definition; agent-inferred, November 6] A depth ring (`Declaration::is_depth`): a turned ring set among the last
 // `depth`, turning by its located increments alone, with no skin and no moment.
 __device__ __forceinline__ bool depth_head(const FieldWords &w, uint32_t h) {
     const uint32_t set = h % w.frames;
@@ -542,7 +542,7 @@ __device__ __forceinline__ void frame_of(const FieldWords &w, uint64_t g, uint32
 }
 
 // [definition; agent-inferred, November 1] **The skin decay of local mode `l` of head `h` across `d`
-// sites** (`Field::decay`): `e^(−2π d/n)` on `2^(−30)` in a turned head; a still head's is the exact
+// sites** (`Constitution::decay`): `e^(−2π d/n)` on `2^(−30)` in a turned head; a still head's is the exact
 // `1`, read by the callers as no decay at all.
 __device__ __forceinline__ wide decay_of(const FieldWords &w, uint32_t h, uint32_t l, uint32_t d) {
     const uint32_t set = h % w.frames;
@@ -558,7 +558,7 @@ __device__ __forceinline__ bool known_site(const FieldWords &w, uint64_t g) {
 // A definite site (§14.1): known, or locked (a foil). Only definite sources are heard past the near
 // field, and each class lists its definite members first.
 // [E] A receiver outside every window of a cut room meets no source: its row is not met, its current is zero and it returns
-// nothing (the host's `Field::tick`).
+// nothing (the host's `Constitution::tick`).
 __device__ __forceinline__ bool skipped_row(const FieldWords &w, uint64_t g) {
     return w.computed != nullptr && w.computed[g] == 0;
 }
@@ -567,13 +567,13 @@ __device__ __forceinline__ bool definite_site(const FieldWords &w, uint64_t g) {
     return w.definite[g] != 0;
 }
 
-// A head of a still ring set (its modes unframed): carrying no skin (`Field::decay` is `(1, 0)`).
+// A head of a still ring set (its modes unframed): carrying no skin (`Constitution::decay` is `(1, 0)`).
 __device__ __forceinline__ bool still_head(const FieldWords &w, uint32_t h) {
     return h % w.frames < w.still;
 }
 
 
-// A head carrying no skin (`Field::decay` is `(1, 0)`): a still ring set's, or a depth ring's.
+// A head carrying no skin (`Constitution::decay` is `(1, 0)`): a still ring set's, or a depth ring's.
 __device__ __forceinline__ bool skinless(const FieldWords &w, uint32_t h) {
     return still_head(w, h) || depth_head(w, h);
 }
@@ -727,7 +727,7 @@ __device__ void turn_phasor_dev(const FieldWords &w, wide rho, uint64_t n, wide 
     turn_series_dev((int64_t)rel(theta, 16), re, im);
 }
 
-// The face of turned slot `slot` at a clock `ρ` (the host's `Field::turn`): the resident ring at a whole place it
+// The face of turned slot `slot` at a clock `ρ` (the host's `Constitution::turn`): the resident ring at a whole place it
 // holds, the series otherwise (the same bits).
 __device__ void turn_dev(const FieldWords &w, uint32_t slot, wide rho, wide *re, wide *im) {
     const uint64_t n = w.ring_n[slot];
@@ -748,7 +748,7 @@ __device__ void turn_dev(const FieldWords &w, uint32_t slot, wide rho, wide *re,
 }
 
 // [definition; agent-inferred, November 2] **The skin across a variation** `s` on `2^(−24)` of turned slot `slot`
-// (the host's `Field::skin`, `skin_of`): the resident decay at a whole distance within the reach, otherwise
+// (the host's `Constitution::skin`, `skin_of`): the resident decay at a whole distance within the reach, otherwise
 // `e^(−2π|s|/n)` read through the exponential's face, `release(below_one(−bits), 32)` with `bits = div_nearest(2π |s|,
 // (n ln 2) 2^24)` on `2^(−16)`.
 __device__ __forceinline__ wide skin_k(const FieldWords &w, uint32_t slot) {
@@ -969,7 +969,7 @@ __device__ __forceinline__ uint64_t row_of(const FieldWords &w, uint64_t t) {
 }
 
 // Site `s`'s opening term in the encoding at `base`, entry `i`: its row, or the mixture of its carried
-// shares' rows `release(Σ_a w_a E(a), 16)` (`Field::opening_term`).
+// shares' rows `release(Σ_a w_a E(a), 16)` (`Constitution::opening_term`).
 __device__ __forceinline__ int64_t opening_term(const FieldWords &w, uint64_t base, uint64_t s, uint64_t i) {
     const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
     if (from == to) {
@@ -983,13 +983,13 @@ __device__ __forceinline__ int64_t opening_term(const FieldWords &w, uint64_t ba
 }
 
 // [definition; agent-inferred, November 14, the ring record §4] **A silent site is marked on the second read**: unresolved, carrying no
-// mixture, and read where the first read's shares are uploaded (`mark_share`; the host's `Field::law_mark`).
+// mixture, and read where the first read's shares are uploaded (`mark_share`; the host's `Constitution::law_mark`).
 __device__ __forceinline__ bool marked_site(const FieldWords &w, uint64_t s) {
     return w.mark_share && w.unresolved[s] && w.mix_off[s] == w.mix_off[s + 1];
 }
 
 // [definition; agent-inferred, November 14, the ring record §4] **The mark's difference** `Δ_(s,b,i) = release(Σ_c w_c E_b(c)_i, 16) − E_b(∗)_i` at
-// a marked site `s` in the encoding at `base` (the host's `Field::opening_term`, its `delta`): the shares of the face the first read gave the site
+// a marked site `s` in the encoding at `base` (the host's `Constitution::opening_term`, its `delta`): the shares of the face the first read gave the site
 // mixed through the encoding's class rows, less the open row. The sum is held in 64 bits: a share is `w_c = ⌊(m_c 2^16 + T/2)/T⌋ ≤ m_c 2^16/T + 1/2`
 // with `Σ_c m_c = T` (`field_face`), so `Σ_c w_c ≤ 2^16 + A/2`, and with `|E| < 2^31` the sum is under `2^31 (2^16 + A/2) < 2^63`; each product is
 // a 32 by 32 bit word, the narrow terms the precision law asks for. Zero terms (a share released to zero) add nothing, so the dense row sums to the
@@ -1005,7 +1005,7 @@ __device__ __forceinline__ int64_t mark_delta(const FieldWords &w, uint64_t base
 
 // [definition; agent-inferred, November 14, the ring record §4] **A marked site's mark in the opening**: `release(α_b Δ_(s,b,i), 24)` with `α_b`
 // the strength of the encoding at `base` (`b` 0, 1, 2 for `enc`, `before`, `after`), added beside the site's open row `E_b(∗)_i` that
-// `opening_term` reads (the host's `Field::opening_term` at a site `Field::marked` holds); zero at a site that is not marked. The product is
+// `opening_term` reads (the host's `Constitution::opening_term` at a site `Constitution::marked` holds); zero at a site that is not marked. The product is
 // held wide (`|α| < 2^31`, `|Δ| < 2^33`) and the release cut to the 64-bit word the host's `as i64` keeps.
 __device__ __forceinline__ int64_t mark_term(const FieldWords &w, uint64_t base, uint32_t b, uint64_t s, uint64_t i) {
     if (!marked_site(w, s)) {
@@ -1035,7 +1035,7 @@ extern "C" __global__ void field_open(FieldWords w) {
 }
 
 // [definition; agent-inferred, November 14, the ring record §4] **The first read's shares at the silent sites** (the host's `shares` of each
-// silent site's face, `Field::pass`): `⌊(m_c 2^16 + T/2)/T⌋` at each class, zero where the face has no mass (the host's empty mark). A share is at
+// silent site's face, `Constitution::pass`): `⌊(m_c 2^16 + T/2)/T⌋` at each class, zero where the face has no mass (the host's empty mark). A share is at
 // most `2^16` (`m_c ≤ T`), one word. One thread a site and a class. [realization; agent-inferred, November 14] A row of a site that is not silent is
 // left unwritten: every reader reads a row only at a marked site (`marked_site`, the return's `marked` list), so its words were never read.
 extern "C" __global__ void field_mark_shares(FieldWords w, const uint64_t *masses, const uwide *totals, uint32_t *shares) {
@@ -1474,7 +1474,7 @@ extern "C" __global__ void __launch_bounds__(256) field_outer_x64(FieldWords w, 
 }
 
 // [definition; theory, November 12; the triad record §3 and §4] **The return of two blocks** (the host's `tick`, the pair's return where
-// `FieldDeclaration::triads` is set): `out[t][o] = release(Σ_i W[o][i] x[t][i] + Σ_j W₂[o][j] x₂[t][j] + bias[o] 2^24, 24)`, the plain contacts' and
+// `Declaration::triads` is set): `out[t][o] = release(Σ_i W[o][i] x[t][i] + Σ_j W₂[o][j] x₂[t][j] + bias[o] 2^24, 24)`, the plain contacts' and
 // circles' `W c` and the triads' `W_T c^T` summed whole in one wide sum with the bias before the one release, so the triads' term is never released
 // apart. The carrier bound is read over both blocks together, the sum of each block's bound as `affine` reads it,
 // `wmax · xmax · (cols + 1) + wmax₂ · x₂max · (cols₂ + 1)` (each at most `2^126`, so their sum never wraps 128 bits), refused at `2^126`; the sum in 64
@@ -1673,7 +1673,7 @@ extern "C" __global__ void field_frame_probe(FieldWords w) {
     }
 }
 
-// [agent-inferred, November 1] **The contact pairs words at unit power** (`Field::tick`): each head's
+// [agent-inferred, November 1] **The contact pairs words at unit power** (`Constitution::tick`): each head's
 // framed word read in place as a ratio to its own power over the head's `2n` reals (`ratio_to_power`,
 // on `2^(−16)`), its power kept for the return; one warp a head and a site (`[h][t]`). The binary
 // length of the largest unit word is raised into `bits[0]`.
@@ -1754,7 +1754,7 @@ extern "C" __global__ void field_unit_back_probe(FieldWords w, const wide *pscal
 // the series row's carrier
 //
 // [definition; agent-inferred, November 1] **A row is summed whole in `L` limbs of 64 bits**
-// (`FieldDeclaration::row_bits()` rounded up to limbs, §14.11): a signed sum is its two's complement
+// (`Declaration::row_bits()` rounded up to limbs, §14.11): a signed sum is its two's complement
 // modulo `2^(64 L)`, exact while the sum's magnitude is below `2^(64 L − 1)` (the declaration's bound,
 // which no row passes). A term `face · mult · 2^(a − a_0)` is built once a pair and added whole; the
 // current and a share are each one exact long division of such sums, to the nearest numerator.
@@ -1945,7 +1945,7 @@ __device__ __forceinline__ int64_t warp_min_signed(int64_t v) {
     return (int64_t)(key ^ ((uint64_t)1 << 63));
 }
 
-// A score's term (the host's `Field::face`, §14.11): its whole bits `a = ⌊z⌋` and the face of its
+// A score's term (the host's `Constitution::face`, §14.11): its whole bits `a = ⌊z⌋` and the face of its
 // fraction on `2^(−62)`, in `[2^61, 2^62)`.
 __device__ __forceinline__ void term_of(const FieldWords &w, int64_t z, int64_t *a, uint64_t *face) {
     *a = z >> FACE_BITS;
@@ -2546,7 +2546,7 @@ __device__ __forceinline__ wide temper_of(const FieldWords &w, uint32_t h, bool 
         atomicOr(w.status, REFUSED_TEMPER);
         return 0;
     }
-    // `below_one` at the material's grain (`Field::fine_exponential`): the fraction's rest, its sixteen high digits
+    // `below_one` at the material's grain (`Constitution::fine_exponential`): the fraction's rest, its sixteen high digits
     // through the resident face (the first sixteen roots, in their order), then the eight fine roots after them.
     const uint64_t frac = (uint64_t)(c * ((wide)1 << MATERIAL_BITS) - l);
     const uint64_t rest = frac == 0 ? 0 : ((uint64_t)1 << MATERIAL_BITS) - frac;
@@ -2915,7 +2915,7 @@ __device__ __forceinline__ int64_t carried_s(const FieldWords &w, uint32_t h, ui
 }
 
 // [definition; agent-inferred, November 1] **The contact, the series row and the current over each
-// site's support** (`Field::tick`, §14.10, §14.11, §15.2), one warp a head and a receiving site, the
+// site's support** (`Constitution::tick`, §14.10, §14.11, §15.2), one warp a head and a receiving site, the
 // carrier `L` limbs the exposure chose. The terms: each support entry's (a lane an entry) and each
 // crowd's (a lane a slot), `face · multiplier` shifted by `a − a_0` (the multiplier `2^62` of a source,
 // a crowd's count `2^62` in the mass and `2^62` in its value), summed whole into the row's mass (the
@@ -3287,7 +3287,7 @@ __device__ __forceinline__ int64_t moment_strand(const FieldWords &w, uint64_t b
     const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
     const uint32_t col = part == 0 ? idx : tm + idx;
     if (from == to) {
-        // A silent open site adds nothing to the strand (§16.28, the host's `Field::silent`).
+        // A silent open site adds nothing to the strand (§16.28, the host's `Constitution::silent`).
         return w.unresolved[t] ? 0 : w.theta[base + row_of(w, t) * 2 * tm + col];
     }
     wide sum = 0;
@@ -3372,7 +3372,7 @@ extern "C" __global__ void field_moment_add(FieldWords w) {
 }
 
 // [definition; §16.20] A receiver asks with what has reached its place: its probe `[t][2M]` reads its moment at the
-// turned modes, the moment its value carries (the host's `Field::tick`), `p += moment`, checked.
+// turned modes, the moment its value carries (the host's `Constitution::tick`), `p += moment`, checked.
 extern "C" __global__ void field_moment_add_probe(FieldWords w, int64_t *pr) {
     const uint64_t cells = (uint64_t)w.T * w.M2;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
@@ -3428,7 +3428,7 @@ extern "C" __global__ void field_moment_return_all(const MomentWords *ws, const 
     }
 }
 
-// The strands' return (`Field::strand_return`) of every moment mode: `d[u][t]` (a pair of 128 bits on
+// The strands' return (`Constitution::strand_return`) of every moment mode: `d[u][t]` (a pair of 128 bits on
 // `2^(−24)`) into site `t`'s row of the family at `base` (`2T` wide), or each carried class's row by its
 // share, `release(w d, 16)`; added into `g`.
 extern "C" __global__ void field_moment_strand_return_all(FieldWords w, uint64_t base_before, uint64_t base_after, uint32_t tm, const wide *d_before, const wide *d_after, wide *g) {
@@ -3705,7 +3705,7 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
     }
 }
 
-// [measurement; theory, November 11 18:33, part P2, and November 12] **The carry circles' gates, read** (the host's `Field::carry_gates_of`): at each
+// [measurement; theory, November 11 18:33, part P2, and November 12] **The carry circles' gates, read** (the host's `Constitution::carry_gates_of`): at each
 // open site and carry circle of the tick just formed, `|γ|` on `2^(−30)` (the floor of the square root of `γ_re² + γ_im²`, at most `2^60`) added into
 // `acc[k]`, the leak read `ℓ ≥ 0` (the friction at its founding or above) counted into `acc[C + k]`, and the site counted once into `acc[2C]`. A
 // reading: it writes only its accumulator.
@@ -3728,7 +3728,7 @@ extern "C" __global__ void field_carry_gates_read(FieldWords w, unsigned long lo
     }
 }
 
-// [definition; theory, November 12; the triad record §3 and §4] **The triads** (the host's `tick`, `FieldDeclaration::triads`), after the carry scan and
+// [definition; theory, November 12; the triad record §3 and §4] **The triads** (the host's `tick`, `Declaration::triads`), after the carry scan and
 // before the return: at each site `t` with both strand mates in its region (its place `i` with `0 < i < S − 1`) and triad `k`, from the chart's read
 // `abg` (`pabg` `[t][6J]` on `2^(−16)`: α's real parts then imaginary, then β's, then γ's; `field_affine_x32` over the pair chart, as `a` and `b` are
 // read), `p = release(α_k(t) β_k(t − 1), 16)` and `c^T = release(p γ_k(t + 1), 16)`, each a complex product as the plain contact forms it
@@ -3842,7 +3842,7 @@ extern "C" __global__ void field_face_weigh(FieldWords w, const uint64_t *wm, co
     }
 }
 
-// [definition; agent-inferred, November 3, §16.26] The face read through the encoding (the host's `Field::tied`): at an
+// [definition; agent-inferred, November 3, §16.26] The face read through the encoding (the host's `Constitution::tied`): at an
 // unresolved site, `z[t][a] = rel(Σ_i E[a][i] y[t][i], 16) + c[a]`, `E` the encoding's rows at `enc`, `y` the lift on
 // 2^(−16), `c` the class bias at `bias`. One thread a (site, class).
 extern "C" __global__ void field_tied_face(FieldWords w, uint64_t enc, uint64_t bias, const int64_t *y, int64_t *z) {
@@ -3903,8 +3903,8 @@ extern "C" __global__ void field_tied_back_e(FieldWords w, wide *g, uint64_t enc
     }
 }
 
-// [definition; Brandon, November 15 02:06Z] The face's loudness (the host's `FieldDeclaration::loud`, `Field::loud_beta`, `Field::tied_sharp`,
-// `Field::loud_return`). `log2` of a power on the face's grain, as the host's `log2_grain` (`log2_face` by repeated squaring, `UNIT_BITS = 62`):
+// [definition; Brandon, November 15 02:06Z] The face's loudness (the host's `Declaration::loud`, `Constitution::loud_beta`, `Constitution::tied_sharp`,
+// `Constitution::loud_return`). `log2` of a power on the face's grain, as the host's `log2_grain` (`log2_face` by repeated squaring, `UNIT_BITS = 62`):
 // a mantissa under `2^63` squares under `2^126`, inside `uwide`.
 __device__ __forceinline__ wide loud_log2_face(uwide p, unsigned digits) {
     const uint32_t width = wide_bits((wide)p);
@@ -4176,7 +4176,7 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 }
 
 // [definition; agent-inferred, November 1] **The contact's return over one head's rows**, one warp a
-// receiving site `i` (`Field::returned`, §14.2, §14.10, §14.11, §15.2). Over its support,
+// receiving site `i` (`Constitution::returned`, §14.2, §14.10, §14.11, §15.2). Over its support,
 // `δp_k = ⟨δỹ_i, D ṽ_k⟩` (a crowd's the same against its decayed mean value), the row's mean `μ =
 // release(Σ p δp, 63)`, `δz = release(ln2 release(p (δp − μ), 63), 30)` (the closure retired, §16.19),
 // `δs = gained(δz, β)` held at the region block's dense address `[i][j]` for the columns. The
@@ -4446,7 +4446,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
 }
 
 // [definition; agent-inferred, November 1] **The word's column return and the values' over one head**
-// (`Field::returned`, §15.2), one warp a source site `j` over its receivers (the support is directional:
+// (`Constitution::returned`, §15.2), one warp a source site `j` over its receivers (the support is directional:
 // `j` is heard by its near field and, where `j` is definite, by every member of its class):
 // `δw̃_j += release(Σ_i δs_ij ((D q_i) 2^g − D² q_j), 32 + 2g)` added to the rows' return in its framed
 // chart slot (the key role of the lock), and `δṽ_j = release(Σ_i p_ij D δỹ_i, 63)`, the lanes over the
@@ -4562,7 +4562,7 @@ extern "C" __global__ void field_spread(FieldWords w, uint32_t h, int64_t *dq, i
 }
 
 // [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** (the host's
-// `Field::held_rows`): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
+// `Constitution::held_rows`): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
 // the rows, the shares of the question group (a definite site before the region's answer start `qstart[r]`), of
 // the near field's sources that are not definite, and of the rest (with the crowds'), and the question group's
 // current `Σ release(p Σ_x |D ṽ_x|, 63)`; the question's far part (past the near field), and where its collision
@@ -4644,7 +4644,7 @@ extern "C" __global__ void field_held_rows(FieldWords w, const uint32_t *qstart,
 }
 
 // [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (the host's
-// `Field::row_currents`, §16.21): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
+// `Constitution::row_currents`, §16.21): one warp a head and an unresolved site, over a kept tick's shares at the dense address:
 // the framed current's part from the question past the near field (a definite site before `qstart[r]` at `|i − j| ≥
 // NEAR`) and from the near field (every source at `|i − j| < NEAR`), each entry `Σ release(p D ṽ_j, 63)` over the head's
 // `S` reals, and the row's largest share. `far[(h T + g) S + x]`, `near` alike, `top[h T + g]`.
@@ -4799,7 +4799,7 @@ extern "C" __global__ void field_outer_bound_x64(FieldWords w, uint32_t rows, ui
 
 // An encoding's covector: each row's `Σ_t release(w_t dx_t, 16)` over the sites that opened on it,
 // `w_t` the site's share of that row (`2^16` where it opened on the row itself, so the term is `dx_t`
-// exactly; a carried site's shares of its mixture, `Field::opening_return`); `E`'s by their own class,
+// exactly; a carried site's shares of its mixture, `Constitution::opening_return`); `E`'s by their own class,
 // `E₋`'s by the site before them, `E₊`'s by the site after; one launch each, `base` the encoding's
 // offset), the entries sorted by row (`rows_sites`, `rows_shares`) and cut into segments of at most
 // `OUTER_TILE` of one row (`segments`, each its row, first and end in `rows_sites`), one thread a
@@ -4819,8 +4819,8 @@ extern "C" __global__ void field_encoding(FieldWords w, wide *g, const int64_t *
     }
 }
 
-// [definition; agent-inferred, November 14, the ring record §4] **The mark's return at its sites** (the host's `Field::opening_return` at a site
-// `Field::law_mark` holds), one thread a marked site `marked[k]` and a coordinate `i`. For each encoding `b` the site's row enters (its own opening
+// [definition; agent-inferred, November 14, the ring record §4] **The mark's return at its sites** (the host's `Constitution::opening_return` at a site
+// `Constitution::law_mark` holds), one thread a marked site `marked[k]` and a coordinate `i`. For each encoding `b` the site's row enters (its own opening
 // at `t = s`; `before` at the next site's, `t = s + 1`, and `after` at the site's before it, `t = s − 1`, each within the site's region), with
 // `dx_i` the covector at that opening: `a = release(α_b dx_i, 24)` is kept for the rows' return (`adx[b][k][i]`, `field_mark_rows`; zero where the
 // row enters no opening), and the strength takes `dx_i Δ_(s,b,i)`, the raw product the outer sum accumulates. `a` is held in one 64-bit word and
@@ -4912,7 +4912,7 @@ __device__ __forceinline__ uint32_t paced_head(const FieldWords &w, uint32_t p) 
     return (p / per) * w.frames + w.still + p % per;
 }
 
-// A turned slot's rate of turn `b = 2π/n` on `2^(−30)` (the host's `Field::turn_rate`).
+// A turned slot's rate of turn `b = 2π/n` on `2^(−30)` (the host's `Constitution::turn_rate`).
 __device__ __forceinline__ wide turn_rate_dev(const FieldWords &w, uint32_t slot) {
     const wide pi = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
     return rel(div_nearest(2 * pi, (wide)w.ring_n[slot]), FACE_BITS);
@@ -4952,7 +4952,7 @@ __device__ __forceinline__ wide skin_back_proved(wide b, wide decay, wide e) {
     return rel(rel(rel(e * decay, MOVE_BITS) * b, MOVE_BITS), 16);
 }
 
-// A site's rate on paced head `p`'s class sheet (§16.16, the host's `Field::paces`): its own class's entry (zero at a
+// A site's rate on paced head `p`'s class sheet (§16.16, the host's `Constitution::paces`): its own class's entry (zero at a
 // silent open site, §16.28), or its carried shares' mixture `release(Σ_a w_a c_p[a], 16)`.
 __device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint64_t s) {
     const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
@@ -4979,7 +4979,7 @@ __device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, ui
 }
 
 // [definition; agent-inferred, November 5, §16.44] **A blank's clock returns through its face** (the host's
-// `Field::blank_return`), one thread a site and a class: at a silent open site `δz_b 2^30 = Σ_p rel(δκ_p · u_{p,b} · ln 2,
+// `Constitution::blank_return`), one thread a site and a class: at a silent open site `δz_b 2^30 = Σ_p rel(δκ_p · u_{p,b} · ln 2,
 // 24)` with `u_{p,b} = ⌊m_b (c_p[b] − ⌊Σ_a m_a c_p[a] / T⌉) / T⌉`, the face's masses `m` and total `T` its clock read;
 // zero elsewhere.
 extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, wide *dz) {
@@ -5097,7 +5097,7 @@ extern "C" __global__ void field_blank_dx(FieldWords w, const int64_t *back, int
     }
 }
 
-// [definition; agent-inferred, November 4, §16.44] **A blank place's expected duration** (the host's `Field::paces_with`),
+// [definition; agent-inferred, November 4, §16.44] **A blank place's expected duration** (the host's `Constitution::paces_with`),
 // one thread a paced head and a site: at a silent open site (unresolved, no carried mixture) `rel(Σ_a w_a c_p[a], 16)` with
 // `w_a` the shares of the face the tick before read there, the rate its clock runs it at less one; zero elsewhere.
 extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
@@ -5118,12 +5118,12 @@ extern "C" __global__ void field_blank_rates(FieldWords w, int64_t *rates) {
     }
 }
 
-// A silent open site (§16.28, the host's `Field::silent`): unresolved, with no carried mixture.
+// A silent open site (§16.28, the host's `Constitution::silent`): unresolved, with no carried mixture.
 __device__ __forceinline__ bool silent_at(const FieldWords &w, uint64_t s) {
     return w.unresolved[s] && w.mix_off[s] == w.mix_off[s + 1];
 }
 
-// [§16.47] A region's silent stretch past its last arrival (the host's `Field::silent_stretch`): the first silent place
+// [§16.47] A region's silent stretch past its last arrival (the host's `Constitution::silent_stretch`): the first silent place
 // past its last site that is not silent, zero where every site is silent, the region's length where the last is not.
 __device__ __forceinline__ uint32_t silent_stretch(const FieldWords &w, uint64_t first, uint32_t sites) {
     for (uint32_t t = sites; t-- > 0;) {
@@ -5134,7 +5134,7 @@ __device__ __forceinline__ uint32_t silent_stretch(const FieldWords &w, uint64_t
     return 0;
 }
 
-// [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Field::paces`),
+// [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Constitution::paces`),
 // one thread a paced head and a region over its sites in order: on the class sheet `κ = 2^24 + c_p[u_t]` (§16.16),
 // `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`). Past the
 // region's last arrival every place runs at the first silent place's rate (§16.47, one passage).
@@ -5988,7 +5988,7 @@ __device__ int64_t level_face_code(uint64_t mass, uwide total) {
     return -(whole * ((int64_t)1 << 20) + fraction);
 }
 
-// [definition; theory, November 13, the design record §4.9] **Each place's news** (the host's `Field::level_news`) from the opening's
+// [definition; theory, November 13, the design record §4.9] **Each place's news** (the host's `Constitution::level_news`) from the opening's
 // face `masses[t][a]` and `totals[t]`: at a definite place the code of its class, elsewhere the face's expected code
 // `div_nearest(Σ_a mass_a code_a, total)`. One warp a place; the class sum is an integer sum, so any order gives the host's bits.
 extern "C" __global__ void field_level_news(FieldWords w, const uint64_t *masses, const wide *totals, int64_t *news) {
