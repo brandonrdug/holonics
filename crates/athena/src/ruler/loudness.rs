@@ -8,7 +8,7 @@ use crate::ruler::cavity::held_stretches;
 use crate::store::{refuse_variables, role_names, store_counts};
 use holonics_engine::codec::Codec;
 use holonics_engine::field::{Learner, Realization};
-use holonics_engine::inherited::tower::TowerFace;
+use holonics_engine::field::TowerFace;
 use holonics_engine::passage::Kind;
 use holonics_engine::region::{views_of, OwnedRegion};
 use std::path::Path;

@@ -1,6 +1,6 @@
 use super::*;
 use crate::field::{ring_phasor, Constitution, Declaration};
-use crate::inherited::tower::{half_turn, TowerError};
+use crate::field::{half_turn, TowerError};
 use num_bigint::BigInt;
 
 type G = (i128, i128);
@@ -726,7 +726,7 @@ struct Paced {
     ring: Vec<(i64, i64)>,
     decay: Vec<i64>,
     pi: i128,
-    exponential: crate::inherited::keyed_modes::Exponential,
+    exponential: crate::field::Exponential,
 }
 
 fn paced_slots(reach: usize, modes: usize) -> Vec<Paced> {
