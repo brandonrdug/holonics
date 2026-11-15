@@ -79,7 +79,8 @@ refined and released whole ([the one-field record](../../research/records/2026-1
   energy field's: one attempt of November 6 to 9 that left the tree on November 11
   ([the port's record](../../research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
 
-**The learner** (`FieldLearner`; the trainer is `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`).
+**The learner** (`FieldLearner`; the trainer is `train-store`, [`crates/athena/src/store.rs`](../../crates/athena/src/store.rs); the code line's
+`field_train.rs` retired with `train-field` at C6 of #603).
 - The comparison is completion read as a joint code: a region is drawn as a state of open places
   among the answer's, and its covector returns through the ticks by the operands that produced each
   carrier.

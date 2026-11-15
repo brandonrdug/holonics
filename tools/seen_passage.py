@@ -4,7 +4,8 @@ can be taken on problems the field trained on and on problems it withheld (G111)
 
 The lap (`train-field`) withholds as many training problems as the held passage holds: the first in the keyed order
 `(mix(seed, 2^61 | i), i)` of the training passage's problems, the seed the key file's last eight bytes read big-endian
-(field_train.rs, `sections_of` and `mix`). It trains every other problem once a lap. This ruler writes, under OUT_DIR, which it
+(field_train.rs's `sections_of`, retired with `train-field` by C6 of #603 and held at 7a1eb3ce7; `mix` is
+`holonics_engine::passage::mix`). It trains every other problem once a lap. This ruler writes, under OUT_DIR, which it
 creates and refuses if it stands:
 
 - WITHHELD.txt: the withheld problems, in their index order, each record as the training passage holds it;

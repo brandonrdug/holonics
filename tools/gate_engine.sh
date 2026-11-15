@@ -8,7 +8,7 @@
 #   FROM            the saved state a lap of the line trained from, and LAP_LOG that lap's log;
 #   MEAN READ_OUT   a lap's mean state and the directory its own read-cavity wrote (its cavity.tsv);
 #   PLACES          the read's places (the line's read script's count).
-# BIN is the field_pass build under test (release, the card's). OUT is a new scratch directory.
+# BIN is the athena build under test (release, the card's). OUT is a new scratch directory.
 #
 # In one hold of the card lock:
 #   1. parity-store on 3 of the line's sections from FROM: every read asked of the card and of the host and compared whole

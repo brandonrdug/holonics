@@ -3,7 +3,7 @@
 
   mix        the mixer is the splitmix64 step: from state 0 its first four outputs, and from 1234567 its first, are the reference
              generator's published values;
-  records    the passage of field_train.rs's own records test reads as two problems with its blank lines kept, and a record without
+  records    the passage of field_train.rs's own records test (at 7a1eb3ce7) reads as two problems with its blank lines kept, and a record without
              US or with an empty side is not a problem;
   split      as sections_of: the withheld are the problems of the smallest keys, the trained the rest, disjoint and whole, the same at
              every call;

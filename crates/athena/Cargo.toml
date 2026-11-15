@@ -1,0 +1,25 @@
+[package]
+name = "athena"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+# Athena's commands (docs/plans/THE_CONSOLIDATION.md §7, C6 of #603): the store line's live commands, their parity and the card's
+# readings, on the two engine crates alone. `athena train train-store …` is `field_pass train complete-language train-store …` was.
+[lib]
+name = "athena"
+path = "src/lib.rs"
+
+[[bin]]
+name = "athena"
+path = "src/main.rs"
+
+[dependencies]
+holonics-engine = { path = "../engine" }
+holonics-engine-cuda = { path = "../engine-cuda" }
+rayon = "1.12"
+
+[features]
+ruler-rows-reads = ["holonics-engine-cuda/ruler-rows-reads"]
+ruler-bits = ["holonics-engine-cuda/ruler-bits"]

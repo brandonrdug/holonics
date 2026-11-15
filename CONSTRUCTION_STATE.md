@@ -633,8 +633,8 @@ repository was reset on September 24; the pre-reset tree is
   0.0051 under te5's in quarter 4. Form (ii)'s derivation says which of the two its legs replace.
   The field's learner steps each entry at its own divisor, so the gauge's equal gains of the legs are no
   prediction for it; its covectors keep the scale identity at every state (the record, 3.2).
-- **The learner** (`FieldLearner`; the trainer is
-  `crates/holonics/examples/solenoidal_alpha/complete_language/field_train.rs`). The comparison is
+- **The learner** (`FieldLearner`; the trainer is `train-store`, `crates/athena/src/store.rs`; the
+  code line's `field_train.rs` retired with `train-field` at C6 of #603). The comparison is
   completion read as a joint code: a region is drawn as a state of open places among the answer's,
   and its covector returns through the four ticks. A section's step is the covector's first moment
   over the root of its second. It deposits at its size with no reread of its own section (it

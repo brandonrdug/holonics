@@ -10,9 +10,9 @@
 //! would leave the store line's own path (`read_and_return_opening` on the card) unchecked. Here every method the card overrides is
 //! forwarded to its override.
 
-use super::*;
-use holonics::hnn::tower::field::{BlankClocks, CarryGates, Field, FieldRead, FieldRealization, HeldRows, HostField, NearOffsets, RealizationCounters, Region, RowCurrent, TickRead};
-use holonics::hnn::tower::{TowerError, TowerFace};
+use crate::exterior::*;
+use holonics_engine::field::{BlankClocks, CarryGates, Field, FieldRead, FieldRealization, HeldRows, HostField, NearOffsets, RealizationCounters, Region, RowCurrent, TickRead};
+use holonics_engine::inherited::tower::{TowerError, TowerFace};
 use std::collections::BTreeMap;
 use std::time::Instant;
 
@@ -188,9 +188,9 @@ impl FieldRealization for Paired<'_> {
 /// compared whole (above). Prints `STORE_PARITY` a method (calls, unequal calls, the card's and the host's milliseconds), the training
 /// path's unequal sites and covector entries, the first difference, and `STORE_PARITY_DONE` with `EQUAL` or `DIFFERS`. A difference
 /// is an error, so the command's exit is the gate's.
-pub(super) fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
+pub fn parity(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
     let mut paired = Paired::new(card);
-    let trained = super::store_train::train(args, &mut paired);
+    let trained = crate::store::train(args, &mut paired);
     for (method, (calls, unequal, card_ns, host_ns)) in &paired.calls {
         println!("STORE_PARITY method={method} calls={calls} unequal={unequal} card_ms={} host_ms={}", card_ns / 1_000_000, host_ns / 1_000_000);
     }

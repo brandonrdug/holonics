@@ -6,6 +6,7 @@
 [workspace]
 resolver = "2"
 members = [
+  "crates/athena",
   "crates/engine",
   "crates/engine-cuda",
   "crates/holonics",

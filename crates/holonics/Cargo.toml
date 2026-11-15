@@ -23,6 +23,11 @@ rayon = "1.12"
 
 # The notebook's exposure of campaign 1 on the pinned cut (`Reference::expose` and its complete
 # readout; research/notebook/hnn_design/README.md): a measurement run once in release, never a test.
+
+[dev-dependencies]
+# The exterior the store line's harness shares with Athena's commands (C6 of #603), while the harness stands.
+athena = { path = "../athena" }
+
 [[example]]
 name = "hnn_exposure"
 path = "../../research/notebook/hnn_design/hnn_exposure.rs"
