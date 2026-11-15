@@ -1,0 +1,26 @@
+# own-states state tool
+OWN_STATES stretches=27395518 slices=code:67730:286383001,web:36980:143244637,science:22585:143111740,books:2112:85841215,wikidata:9004:57360908 lines=11 differing_line=11
+# gate 3 with the word absent (lap 17)
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# the own lap (3,000 sections from lap 16's STATE.3000)
+STORE_PASS role=prefix sections=3000 stretches_read=27978549 ended=false code_pieces=78616 web_pieces=43341 science_pieces=26655 books_pieces=2464 wikidata_pieces=10449 ms=1999086
+MEASURE lap=own17 rc=0 wall_s=1999.5 peak_rss_kib=350540
+# the line's lap 17 over the same sections
+STORE_PASS role=prefix sections=3000 stretches_read=27978549 ended=false code_pieces=78616 web_pieces=43341 science_pieces=26655 books_pieces=2464 wikidata_pieces=10449 ms=2008245
+MEASURE lap=lap17 rc=0 wall_s=2008.8 peak_rss_kib=300360
+# reads at the own lap's MEAN.3000
+CAVITY_DONE ms=277741
+MEASURE lap=O17 rc=0 wall_s=278.2 peak_rss_kib=539980
+LOUDNESS_DONE ms=212974
+MEASURE lap=loudO17 rc=0 wall_s=213.4 peak_rss_kib=507548
+# writes (4 documents a slice, prompt 256, refine 2)
+write_O17_256: STORE_WRITE_DONE problems=20 reads=768 reads=768 returns=0 pairs=18905881985 batches=768 peak_store=1324128800 ms=50098
+write_O17_512: STORE_WRITE_DONE problems=20 reads=1536 reads=1536 returns=0 pairs=82143567291 batches=1536 peak_store=2489379360 ms=157
+write_P17_256: STORE_WRITE_DONE problems=20 reads=768 reads=768 returns=0 pairs=18870159031 batches=768 peak_store=1324128800 ms=50067
+write_P17_512: STORE_WRITE_DONE problems=20 reads=1536 reads=1536 returns=0 pairs=82166628370 batches=1536 peak_store=2489379360 ms=158
