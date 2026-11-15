@@ -1,0 +1,32 @@
+# gate begun 17:20:51
+# parity: exit 0 17:23:49
+# repro: exit 0 17:24:05
+# read: exit 0 17:28:30
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# hold: lock taken 17:08:36
+# card empty 17:20:51
+# run1 ctl exit 0 STORE_HOST sections=24 cut_ms=77.2 views_ms=0.1 realized_ms=15537.4 mean_ms=6.7 lines_ms=0.5 pass_ms=0.0 saves_ms=139.7 elapsed_ms=15932
+# run2 ctl exit 0 STORE_HOST sections=24 cut_ms=66.0 views_ms=0.1 realized_ms=15506.0 mean_ms=6.8 lines_ms=0.5 pass_ms=0.0 saves_ms=119.6 elapsed_ms=15867
+# run3 nw exit 0 STORE_HOST sections=24 cut_ms=66.2 views_ms=0.1 realized_ms=14222.4 mean_ms=6.8 lines_ms=0.5 pass_ms=0.0 saves_ms=115.2 elapsed_ms=14579
+# run4 nw exit 0 STORE_HOST sections=24 cut_ms=65.6 views_ms=0.1 realized_ms=14543.1 mean_ms=6.6 lines_ms=0.5 pass_ms=0.0 saves_ms=125.3 elapsed_ms=14907
+# run5 ctl exit 0 STORE_HOST sections=24 cut_ms=66.3 views_ms=0.1 realized_ms=15534.5 mean_ms=6.9 lines_ms=0.5 pass_ms=0.0 saves_ms=133.4 elapsed_ms=15907
+# run6 ctl exit 0 STORE_HOST sections=24 cut_ms=67.1 views_ms=0.1 realized_ms=15526.8 mean_ms=6.8 lines_ms=0.5 pass_ms=0.0 saves_ms=121.7 elapsed_ms=15883
+# run7 nw exit 0 STORE_HOST sections=24 cut_ms=66.1 views_ms=0.1 realized_ms=15023.0 mean_ms=6.5 lines_ms=0.6 pass_ms=0.0 saves_ms=117.1 elapsed_ms=15384
+# run8 nw exit 0 STORE_HOST sections=24 cut_ms=66.4 views_ms=0.1 realized_ms=14948.9 mean_ms=6.8 lines_ms=0.6 pass_ms=0.0 saves_ms=126.3 elapsed_ms=15318
+# run9 ctl exit 0 STORE_HOST sections=24 cut_ms=66.6 views_ms=0.4 realized_ms=15978.8 mean_ms=6.8 lines_ms=0.5 pass_ms=0.0 saves_ms=120.2 elapsed_ms=16333
+# hold: released 17:30:54
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=650.4
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=648.6
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=595.2
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=608.5
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=649.8
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=649.6
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=628.5
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=625.4
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=668.3
