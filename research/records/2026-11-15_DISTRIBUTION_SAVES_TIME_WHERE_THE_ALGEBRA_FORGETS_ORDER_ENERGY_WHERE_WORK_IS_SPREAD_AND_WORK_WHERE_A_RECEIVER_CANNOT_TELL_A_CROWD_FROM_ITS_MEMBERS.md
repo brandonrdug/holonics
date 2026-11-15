@@ -370,3 +370,16 @@ UTC); `agent-inferred` for the reading of them.
   times values) are dense products of narrow integer terms, so the precision law admits their limbs on the card's
   narrowest lanes, a tensor core's 8-bit products with 32-bit sums, every bit kept. That is measured on a copy first, and
   only where the copies say the arithmetic binds.
+- **The arithmetic's guesses, scored** (the build thread's ablations, P59's method on today's kernels, 3 of the line's
+  sections from lap 36's state, the card alone, time a launch; relayed 20:14 UTC). The forward contact at five limbs
+  without its numerators read 1,106 µs against 2,900, 0.38 of itself: the guess of 0.55 to 0.75 missed low, because a
+  limb's 9% is not the series' cost, and the numerators hold 62% of the entry. The rows without the probe role's sum read
+  0.68 of themselves: the guess of 0.85 to 0.95 missed low. The rows with a cheap compare for the wide ones read 0.96, inside
+  0.90 to 0.97. Columns, exposure and the skin's return moved within 4% under every ablation. The multiplier's removal is
+  therefore the next build. Its parity holds the host at `2^62`, so the card without the factor against the host with it
+  tests the lemma of §9 there directly: both quotients are `sign · ⌊(|x| + ⌊m/2⌋)/m⌋` (`ratio::div_nearest` and the card's
+  row division), and an even common factor changes them only where `2|x| + m` is a multiple of `2m` with `m` odd, which an
+  odd number never is. Its limbs are sized from the totals' range, since a wrap is a quotient (`|N| ≤ M · max|v|`, faces
+  being nonnegative). Guess, fixed at 20:16 UTC: the forward entry falls to 0.60 to 0.80 of its control a launch, more than
+  two limbs' worth, because a coefficient without the factor fits 64 bits and its product with a value is one wide product;
+  the returns stay within 5%.
