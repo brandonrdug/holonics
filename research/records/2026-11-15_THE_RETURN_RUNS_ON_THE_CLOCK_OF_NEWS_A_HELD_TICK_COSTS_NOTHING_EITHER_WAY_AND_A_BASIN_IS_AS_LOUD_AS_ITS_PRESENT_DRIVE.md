@@ -230,18 +230,28 @@ subject.
   at 8 bits. Guess, fixed at 20:47 UTC: 0.6 to 0.9 of that bound in each region, falling 0.3 to 1.0% from lap 33 to 38
   with code's 0.75% and in at least four of the five steps. At today's rate the dividend in units is then about 1% over
   five laps, and a lap accelerates visibly only where the code still falls fast, which is the early laps he describes.
-- **The level whose sites are those units.** A site carries its composite, the continuation the level's face predicts
-  from the landmark (the span release of `tower.span-release`). Each interior place is read through it: where the written
-  symbol is the predicted one the place is dark and held (`tower.field-held-tick`) and returned on the clock of news (§3);
-  where it departs, the place is bright and runs whole. Cost then follows units and departures, not places. In training
-  the symbol is known, so the check is a comparison and not a forward, the verify step of speculative decoding (Leviathan,
-  Kalman and Matias 2023), kept whole by the departure rule. Acceptance: every place held or whole; held code at lap mean
-  within 0.003 nats a place of the line's own lap by region; units, departures and section time beside. No guess on the
-  time is fixed until the ruler above and the tick ruler of §4 are read.
+- **The level whose sites are those units** (restated at 21:00 UTC; the first statement took the face's top, below). A
+  site carries its composite: the continuation the level's face holds from the landmark (the span release of
+  `tower.span-release`), a density `d_t` over the symbols at each interior place, at the field's own temperature. What
+  crosses the place's section is the written symbol's news under it, `ĉ_t = −ln d_t(u_t)`. Inside the unit the place
+  level runs on the clock of that news (§3): a place runs whole where `⌊Ŝ_t/σ′⌋` steps, `Ŝ` the unit's running sum of `ĉ`,
+  and is otherwise held (`tower.field-held-tick`) with its remainder carried, its code read at `d_t`. No rank and no
+  maximum enters: density and the odometer decide. `σ′` is read, never set: the largest section at which the held places'
+  excess code, `Σ_held (ĉ_t − c_t)` against the full face on a ruler that computes both, stays inside the line's standing
+  spread at lap mean. Acceptance: every place held or whole; held code at lap mean within 0.003 nats a place of the
+  line's own lap by region; units, whole places and section time beside. No guess on the time is fixed until the ruler
+  above and the tick ruler of §4 are read.
+- **The first statement, and why it was withdrawn.** It read a place as dark where the written symbol was the
+  composite's predicted one, the face's top, and it guessed the departures against one less the rank-1 share. Brandon
+  named it at 20:51 UTC: a max or a softmax read as a pick is statistics, and no physical law picks the top; density and
+  thermodynamics decide. A place holds a density, and what crosses its section is the written symbol's news under that
+  density. The top discards every other symbol's share, and a rank is a ruler's reading of a face, never a law's
+  quantity. It repeats the correction of November 1 (a most-certain-first order) and the digit read by an argmax in v17.
 - **Indifference, read downstream.** The trick he named is that a compressing field becomes indifferent to which of a
-  class's forms was written. It shows after the unit: substitute a unit by a form the field's own face at its landmark
-  ranks near it, and read the later places' faces (their summed divergence at distances 1 to 64) against a substitution of
-  unlike rank. Indifference is the first decaying faster than the second.
+  class's forms was written. It shows after the unit: substitute a unit by a form whose news under the field's density at
+  its landmark lies within `σ` of the written form's, and read the later places' faces (their summed divergence at
+  distances 1 to 64) against a substitution whose news lies farther than `σ` from it. Indifference is the first decaying
+  faster than the second.
 - **The ruler, read and scored** (the build thread, 20:47 UTC: the held passage, 100,508 places in 514 stretches each
   scanned alone, every kept lap mean from 14 to 38). Sites a place at 8 bits, lap 38 (lap 14): books 0.0822 (0.0870),
   code 0.0506 (0.0553), science 0.0708 (0.0756), web 0.0856 (0.0904), wikidata 0.1029 (0.1073), with bits a place 1.211,
@@ -255,6 +265,9 @@ subject.
   it is a site with chance about `1/k`, so a first round holds one site per `2σ` of news, in every region and lap and at
   every section many places wide, the bright tail adding the excess over one half. A level of these units then costs in
   proportion to the news, and its lap accelerates as its bits fall. The early acceleration Brandon expects lies before lap
-  14, the oldest mean kept. Guess for the level, fixed at 20:52 UTC beside the tick ruler: the places whose written symbol
-  departs from the composite's prediction stand at 1.1 to 1.6 times one less the rank-1 share by region (lap 38: code
-  0.14, science 0.20, web 0.23, books 0.25), since the composite predicts from its landmark alone.
+  14, the oldest mean kept. A guess for the level fixed at 20:52 UTC against one less the rank-1 share is withdrawn with the
+  statement it scored. Refixed at 21:00 UTC under the restated rule, from lap 38's fifths with `ĉ ≥ c` (the composite
+  holds less than the field's own face): at `σ′` = 1/16 bit the places running whole are 0.45 to 0.65 of places on code
+  and 0.65 to 0.90 on the prose regions, and they carry at least 0.98 of the unit's news; at `σ′` = 8 bits they are 0.08
+  to 0.20 of places and carry 0.4 to 0.7 of it; the held excess code stands under 0.003 nats a place at 1/16 bit in every
+  region and above it at 8 bits.
