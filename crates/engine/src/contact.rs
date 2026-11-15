@@ -793,12 +793,23 @@ impl Constitution {
     /// [measurement; theory, November 15 21:16Z] **The region's forward with chosen site-ticks held** ([`Constitution::pass`] as a reading):
     /// a site whose `hold[k][t]` is set leaves tick `k` in the state it began it from. Both reads where the field reads twice.
     pub(crate) fn pass_held(&self, region: &Region, hold: &[Vec<bool>]) -> Result<Forward> {
+        self.pass_held_as(region, hold, false)
+    }
+
+    /// [measurement; theory, November 15 22:29Z] **The forward with chosen site-ticks carried one tick**: a site whose `hold[k][t]` is set shows
+    /// its readers at tick `k + 1` the state it began tick `k` from, and its skipped move is added once tick `k + 1` has run (a carry past the
+    /// last tick reaches no reader). Both reads where the field reads twice.
+    pub(crate) fn pass_carried(&self, region: &Region, hold: &[Vec<bool>]) -> Result<Forward> {
+        self.pass_held_as(region, hold, true)
+    }
+
+    fn pass_held_as(&self, region: &Region, hold: &[Vec<bool>], carry: bool) -> Result<Forward> {
         if !self.declaration.mark {
-            return self.pass_with_held(region, false, None, Some(hold));
+            return self.pass_with_held(region, false, None, Some((hold, carry)));
         }
-        let first = self.pass_with_held(region, false, None, Some(hold))?;
+        let first = self.pass_with_held(region, false, None, Some((hold, carry)))?;
         let marks: Vec<Option<Shares>> = (0..region.classes.len()).map(|t| if Self::silent(region, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
-        self.pass_with_held(region, false, Some(&marks), Some(hold))
+        self.pass_with_held(region, false, Some(&marks), Some((hold, carry)))
     }
 
     /// One read of the region ([`Constitution::pass`]), its silent sites opened on `marks` where given.
@@ -806,8 +817,9 @@ impl Constitution {
         self.pass_with_held(region, keep, marks, None)
     }
 
+
     /// [`Constitution::pass_with`], with the site-ticks of `hold` held where given (a reading: [`Constitution::pass_held`]).
-    fn pass_with_held(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>, hold: Option<&[Vec<bool>]>) -> Result<Forward> {
+    fn pass_with_held(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>, hold: Option<(&[Vec<bool>], bool)>) -> Result<Forward> {
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
@@ -830,6 +842,8 @@ impl Constitution {
         let mut clock: Option<Box<TickClock>> = None;
         // [theory, November 13, the junction record §7] The state the tick before began from, where the tick has the return.
         let mut prior: Option<Vec<i64>> = None;
+        // [measurement] The moves carried from the tick before, added once this tick has run (`pass_carried`).
+        let mut carried: Vec<i64> = Vec::new();
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep)?);
@@ -842,14 +856,28 @@ impl Constitution {
                 cell.before = x.clone();
             }
             let held_from = hold.map(|_| x.clone());
+            if carried.is_empty() {
+                carried = vec![0i64; x.len()];
+            }
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
             }
-            if let (Some(h), Some(from)) = (hold, held_from.as_ref()) {
-                for (t, &held) in h[k].iter().enumerate().filter(|(_, held)| **held) {
-                    let _ = held;
-                    x[t * dw..(t + 1) * dw].copy_from_slice(&from[t * dw..(t + 1) * dw]);
+            if let (Some((h, carry)), Some(from)) = (hold, held_from.as_ref()) {
+                let mut next = vec![0i64; if carry { x.len() } else { 0 }];
+                for t in (0..h[k].len()).filter(|&t| h[k][t]) {
+                    for i in t * dw..(t + 1) * dw {
+                        if carry {
+                            next[i] = fit64(i128::from(x[i]) - i128::from(from[i]))?;
+                        }
+                        x[i] = from[i];
+                    }
+                }
+                if carry {
+                    for (xv, &c) in x.iter_mut().zip(&carried) {
+                        *xv = fit64(i128::from(*xv) + i128::from(c))?;
+                    }
+                    carried = next;
                 }
             }
             prior = began;

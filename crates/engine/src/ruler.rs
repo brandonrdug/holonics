@@ -1319,6 +1319,34 @@ impl Constitution {
         Ok(out)
     }
 
+    /// [measurement; theory, November 15 22:29Z] **The held set dropped and carried** ([`Constitution::held_forward`]'s oracle at each
+    /// `σ = 2^(40−e)`): the compared places' code whole, then a section's oracle set dropped at every tick and carried one tick
+    /// ([`Constitution::pass_carried`]), on `2^(−20)` bits, `[whole, dropped, carried]` a section. A reading only.
+    pub fn held_carried(&self, region: &Region, sigmas: &[u32]) -> Result<Vec<[i128; 3]>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let mut a = vec![vec![0u128; sites]; ticks];
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            for t in (0..sites).filter(|&t| Self::definite(region, t)) {
+                let span = t * dw..(t + 1) * dw;
+                a[k][t] = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum::<i128>().unsigned_abs();
+            }
+        }
+        let whole = code(&pass);
+        let mut out = Vec::with_capacity(sigmas.len());
+        for &e in sigmas {
+            let sigma = 1u128 << (40 - e);
+            let hold: Vec<Vec<bool>> = (0..ticks).map(|k| (0..sites).map(|t| Self::definite(region, t) && a[k][t] < sigma).collect()).collect();
+            out.push([whole, code(&self.pass_held(region, &hold)?), code(&self.pass_carried(region, &hold)?)]);
+        }
+        Ok(out)
+    }
+
     /// [measurement; G160] **The read's mirror at its founding** ([`Constitution::mirror_route`]): one region's forward and reverse, and for each tick
     /// (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written, `[2]` both) the written sources' [`MirrorSums`] of
     /// `a_j = ⟨λ_j^(k+1), μ_j⟩`, so for the stage `x_j ← x_j − s_h μ_j` after tick `k` the code moves by `−s_h Σ_j a_j 2^(−40)` bits (the

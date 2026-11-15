@@ -479,7 +479,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     // [measurement; theory, November 15 21:16Z] `ticks` and `held` read with OTHER's field where given (the sections stay STATE's pass's).
     let mode = args.get(13).map(String::as_str);
     let fits = match (args.len(), mode) {
-        (13, None) | (14, Some("crowds" | "ticks" | "held" | "halves" | "bytick")) => true,
+        (13, None) | (14, Some("crowds" | "ticks" | "held" | "halves" | "bytick" | "carried")) => true,
         (16, Some("jitter" | "ticks" | "held")) => true,
         _ => false,
     };
@@ -491,6 +491,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let with_held = mode == Some("held");
     let with_halves = mode == Some("halves");
     let with_bytick = mode == Some("bytick");
+    let with_carried = mode == Some("carried");
     let loaded = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
     let (other, reader) = if mode == Some("jitter") { (loaded, None) } else { (None, loaded) };
     let started = std::time::Instant::now();
@@ -528,6 +529,8 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let mut held: Vec<holonics_engine::field::HeldRead> = vec![holonics_engine::field::HeldRead::default(); names.len()];
     let mut halves: Vec<[i128; 5]> = vec![[0; 5]; names.len()];
     let mut bytick: Vec<Vec<i128>> = vec![Vec::new(); names.len()];
+    let mut carried_acc: Vec<Vec<[i128; 3]>> = vec![Vec::new(); names.len()];
+    let mut carried_compared: Vec<u64> = vec![0; names.len()];
     let (mut done, mut regions_read) = (0usize, 0usize);
     while done < sections {
         let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
@@ -548,6 +551,24 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         let owned: Vec<OwnedRegion> = regions.iter().map(|(_, r)| r.clone()).collect();
         let views = views_of(&owned);
         let field = reader.as_ref().map_or(&learner.field, |r| &r.field);
+        if with_carried {
+            // [measurement; theory, November 15 22:29Z] The held set dropped and carried one tick, at 1/64 and 1/16 bit, by slice.
+            let read: Vec<std::result::Result<Vec<[i128; 3]>, String>> = views.par_iter().map(|v| field.held_carried(v, &HELD_SIGMAS).map_err(|e| e.to_string())).collect();
+            for ((slice, r), cell) in regions.iter().zip(read) {
+                let c = cell?;
+                carried_acc[*slice].resize(c.len(), [0; 3]);
+                for (acc, row) in carried_acc[*slice].iter_mut().zip(&c) {
+                    for i in 0..3 {
+                        acc[i] += row[i];
+                    }
+                }
+                carried_compared[*slice] += r.unresolved.iter().filter(|&&u| u).count() as u64;
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("CARRIED_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
         if with_bytick {
             // [measurement; theory, November 15 22:04Z] The held set at 1/16 bit a tick at a time, by slice.
             let read: Vec<std::result::Result<Vec<i128>, String>> = views.par_iter().map(|v| field.held_by_tick(v, 4).map_err(|e| e.to_string())).collect();
@@ -638,6 +659,18 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
     }
     let kind = |h: usize| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" };
+    if with_carried {
+        let nats = std::f64::consts::LN_2 / (1u64 << 20) as f64;
+        for (s, name) in names.iter().enumerate() {
+            let n = carried_compared[s].max(1) as f64;
+            for (i, e) in HELD_SIGMAS.iter().enumerate() {
+                let Some(&[whole, dropped, carried]) = carried_acc[s].get(i) else { continue };
+                println!("CARRIED slice={name} sigma=2^-{e} compared={} rise_nats_a_compared dropped={:.5} carried={:.5} carried_over_dropped={:.3}", carried_compared[s], (dropped - whole) as f64 * nats / n, (carried - whole) as f64 * nats / n, (carried - whole) as f64 / (dropped - whole).max(1) as f64);
+            }
+        }
+        println!("CARRIED_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
     if with_bytick {
         for (s, name) in names.iter().enumerate() {
             let c = &bytick[s];
