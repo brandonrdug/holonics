@@ -1,4 +1,13 @@
-//! The engine's adjoint (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The return through the producing operands.**
+//!
+//! the covector `p̂ − q` (weighed by a state's domain) returned through the `K` ticks, each carrier's operands held from the forward;
+//! the logarithmic derivative `R⁻¹dR` of the comparison's ratio
+//!
+//! Kind: the forward's kinds, reversed. Kernels: `field_ratio_adjoint`, `field_current_back`, `field_pair_back`, `field_pair_scan_back`,
+//! `field_triad_back`, `field_unit_back*`, `field_tied_back_*`, `field_loud_back` and the moments' returns (`hnn/adjoint.rs`).
+//! Lean: `HNN/SourceReceiverReturn`.
+//! Atlas: `contact.triad-manley-rowe-gauge`, `tower.field-growth-by-lanes`, `tower.field-read-free-fall`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

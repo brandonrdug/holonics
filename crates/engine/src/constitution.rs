@@ -1,4 +1,13 @@
-//! The engine's constitution (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The constitution: the store and its loci.**
+//!
+//! the material `θ` on `2^(−24)` by block, with the level's field and the glue where a level is grown; `to_text` and `from_text`
+//! write and read it line by line (THE_ENGINE §5)
+//!
+//! Kind: the state every phase reads; no index of its own. Kernels: uploaded whole (`hnn/resident.rs`).
+//! Lean: `Foundation/Standing` (retention as a quotient).
+//! Atlas: `hnn.field-energy-opening-at-force`, `hnn.field-energy-width-law`, `tower.field-one-region`, `tower.field-pace`,
+//! `tower.field-reach-on-clock`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

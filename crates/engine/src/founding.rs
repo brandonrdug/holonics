@@ -1,4 +1,15 @@
-//! The engine's founding (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **Founding a part at zero: growth that reads every face as before.**
+//!
+//! a grown part (lanes, contacts, letters, copies, carry circles, triads, the opening, the junction, the mark, the loud face, the
+//! depth rings) is founded so that every face of the source reads bit for bit before deposition moves it
+//!
+//! Kind: once a growth, on the host. Kernels: none.
+//! Lean: `HNN/CarryGate` (the carry circle founded as a turn with friction).
+//! Atlas: `contact.carried-product`, `contact.carry-coupling-through-the-leak`, `contact.carry-gate-turn-and-friction`,
+//! `contact.triad-manley-rowe-gauge`, `tower.face-loud-sharpness`, `tower.field-growth-by-copies`, `tower.field-mark`, `tower.field-opening-lift`,
+//! `tower.field-scan-gate-once-a-site`, `tower.field-tick-return`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-11_RAISED_RATES_BUY…`. The derivations' history is in the records; the items below keep
+//! their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

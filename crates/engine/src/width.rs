@@ -1,4 +1,11 @@
-//! The engine's width (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **Precision: the declared grains every term is released to.**
+//!
+//! faces, charts and currents on `2^(−16)`; material on `2^(−24)`; frames and skins on `2^(−30)`; covectors on `2^(−24)`, the
+//! contact's on `2^(−40)`; a product's remainder below its grain released to the nearest numerator
+//!
+//! Kind: the grains every phase releases to; no index of its own. Kernels: every kernel's `release` and `fit` (`kernels/field.cu`).
+//! Lean: none (the precision law is stated in CLAUDE.md).
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

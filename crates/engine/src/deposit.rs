@@ -1,4 +1,13 @@
-//! The engine's deposit (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **Deposition: the only law that changes the constitution.**
+//!
+//! the covector's two moments at `2^(−3)` and `2^(−8)`; each entry's step `m/(⌊√v⌋ + 1)` at `2^(−rate)`, its rate its own where
+//! the parts carry rates; the lap's mean of states
+//!
+//! Kind: chain over the sections; sum over a lap. Kernels: host, beside the card.
+//! Lean: `HNN/DepositHold`, `HNN/PairedDeposit`, `HNN/LatticeDeposit`.
+//! Atlas: `deposition.lap-cosine-drift-over-noise`, `deposition.rate-temperature-standing-spread`, `tower.field-lap-mean`, `tower.field-part-rates`,
+//! `tower.field-step-price`.
+//! Records: `2026-11-11_A_DEPOSITS_RATE_IS…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

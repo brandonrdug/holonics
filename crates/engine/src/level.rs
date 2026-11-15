@@ -1,4 +1,12 @@
-//! The engine's level (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **A level on its news: landmarks of surprise.**
+//!
+//! the news `c_t` (the opening's code at a written place, the expected code elsewhere); a site where `ρ_t ≥ σ`, `σ` the flat
+//! face's code; each epoch led by a site, run on its own clock
+//!
+//! Kind: gate a site, then sum over an epoch. Kernels: `field_level_news`, `field_level_chart32`, `field_level_chart64`, `field_level_unchart`
+//! (`hnn/level.rs`).
+//! Lean: none yet.
+//! Records: `2026-11-13_A_LEVELS_SITES_ARE…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

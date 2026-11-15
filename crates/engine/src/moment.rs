@@ -1,4 +1,14 @@
-//! The engine's moment (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The source moment and the opening.**
+//!
+//! `s_t = Σ_k ζ^(k−t) D(|t−k|) E±(u_k)` at a turned mode; `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b_s`, an open site
+//! on its moment, a marked site with its mark at the second read
+//!
+//! Kind: sum over a site's strand, then a gate a site. Kernels: `field_moment*`, `field_cavity_*`, `field_open`, `field_echo_apply`
+//! (`hnn/moment.rs`, `hnn/resident.rs`).
+//! Lean: `HNN/Moment`, `HNN/RangedMoment`, `HNN/ReframedMoment`.
+//! Atlas: `code.place-news-cavity-face`, `tower.field-moment`, `tower.field-opening-lift`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-14_THE_MARK_IS…`. The derivations' history is in the records; the items below keep
+//! their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

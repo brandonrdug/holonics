@@ -1,4 +1,13 @@
-//! The engine's face (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **A receiver's face and its code.**
+//!
+//! `z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a`, `p̂_t(a) = 2^(z_a)/Σ_b 2^(z_b)` at the open sites; the loud face's sharpness
+//! `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b` where declared; a place's code `−log₂ p̂_t(u_t)` on `2^(−20)`
+//!
+//! Kind: gate, an open site. Kernels: `field_face*`, `field_tied_face*`, `field_loud_beta`, `field_gather_rows32` (`hnn/resident.rs`).
+//! Lean: `HNN/TargetFace`, `HNN/BornFace`.
+//! Atlas: `radix.log-chart-carry`, `tower.face-loud-sharpness`, `tower.field-one-end-room`, `tower.field-write-by-the-training-clock`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-15_THE_FACE_READS…`. The derivations' history is in the records; the items below keep
+//! their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

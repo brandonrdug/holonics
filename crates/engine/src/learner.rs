@@ -1,4 +1,13 @@
-//! The engine's learner (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **A section: read, return, deposit.**
+//!
+//! a section's regions read on the card, their covector returned and deposited; the learner's state is its constitution, its
+//! moments, its rates and the pass's place (`StorePass`)
+//!
+//! Kind: chain over the sections. Kernels: the realization's (above).
+//! Lean: `Foundation/Standing`.
+//! Atlas: `tower.field-completion-covector`, `tower.field-deposit`, `tower.field-own-states`, `tower.field-step-price`, `tower.store-stretch-cut`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-15_THE_OWN_STATES…`. The derivations' history is in the records; the items below keep
+//! their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

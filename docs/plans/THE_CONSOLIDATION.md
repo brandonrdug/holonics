@@ -521,6 +521,11 @@ holds with the reads' lines.
   where a section's time goes (from lap 17's own lines), the commands and their lines, a reading route, and the guards'
   table, moved from THE_MACHINE, which points to it. The headers, the operator contract's and HNN_FORMULA's owners, and the
   dated reasoning in the comments are C7's still; no kernel changed, so parity is not touched.
+- The headers, read November 15: the seventeen modules C5 cut from `field.rs` (`width` to `ruler`) open in §5's form: the object, its
+  equations, its kind of computation and index, its kernels with their card module, its Lean owners, the atlas rows whose live owners
+  stand in it alone, and its records. The items' own dated reasons stay where they stand. Rust comments only; no kernel changed. Owed:
+  the kernels' headers with the kernels' cut (C5), and `codec`, `region`, `passage`, `units` and the card's modules, which kept their
+  own first lines.
 
 **C8. The October machine retires** (the PC; several pull requests, leaf first).
 - In order: the card's October modules and kernels, then `crates/holonics-cuda` whole; the examples

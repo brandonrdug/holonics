@@ -1,4 +1,14 @@
-//! The engine's declaration (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The declared extents: the head line and the constitution's loci.**
+//!
+//! the head line `hnn-field-v14…` (alphabet, width, heads, modes, still, contacts, ticks, frames, reach, lanes, depth, carry,
+//! triads, opening, junction, mark, loud); `Loci` gives each block's offset and length in the material
+//!
+//! Kind: declarations, read once a field. Kernels: none (the card reads `Loci` at upload, `hnn/resident.rs`).
+//! Lean: none.
+//! Atlas: `code.symbol-word-located-rings`, `tower.field-growth-by-contacts`, `tower.field-growth-by-lanes`, `tower.field-moment`,
+//! `tower.field-one-region`, `tower.field-open-row-pairs`, `tower.field-room-cut`.
+//! Records: THE_CONSOLIDATION §10, `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`. The derivations' history is in the records; the items below keep their
+//! reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;
