@@ -413,3 +413,15 @@ UTC); `agent-inferred` for the reading of them.
   any word past 32 bits, so every bit is kept. Read first: the largest `|v|` and skin word on the line's sections, and
   whether the coefficient's second word is ever nonzero outside a crowd. Guess, fixed at 21:52 UTC: on the expensive
   launches the forward contact reads 0.75 to 0.90 of the limbs build a launch, the returns within 5%.
+- **The narrowed products, scored** (the build thread, relayed 22:42 UTC; the gap after lap 41, the card alone). The
+  coefficient's second word was nonzero for about 61 of 64 shifts, since the face stands in `[2^61, 2^62)`, so the build
+  staged the face and its shift and applied the shift to the product; `carry_d` took one product of 32 by 32 bits where
+  `|v|` and the skin word stood under `2^32`, the wide forms beyond, per term. Gate 3 read equal on lap 17. On lap 41's
+  24 sections the forward contact read 49.0 ms a section at four limbs against 50.2 narrowed, the rows 65.4 against
+  66.5, everything else within 0.3; a balanced hold read 1.004 and 1.000 paired within each of the card's two states.
+  The guess of 0.75 to 0.90 missed: the forward contact and the rows read 1.02 of the limbs build, and the line went
+  back to it. A product of 64 by 64 bits is not what binds the term, and the branch per term adds its test. With P59's
+  0.951 when every load read the warp's own row, neither where the words lie nor the multiplies bind; what is left in the
+  numerators' 62% is the term's instruction chain (its indices, the skin's address, the ballots that rank terms by limb
+  and the accumulate's carries), each term after the last with few warps to hide it (`agent-inferred`). No guess on this
+  kernel is fixed until its stall reasons, occupancy, registers and instructions a term are read.
