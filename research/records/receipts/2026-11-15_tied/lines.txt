@@ -1,0 +1,78 @@
+# gate begun 19:04:16
+# parity: exit 0 19:08:38
+# repro: exit 0 19:08:54
+# read: exit 0 19:13:27
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# hold: lock taken 18:55:46
+# card empty 19:04:16
+# profile ctl exit 0
+# profile nw exit 0
+# run1 ctl exit 0 elapsed_ms=15768
+# run2 ctl exit 0 elapsed_ms=15628
+# run3 nw exit 0 elapsed_ms=15736
+# run4 nw exit 0 elapsed_ms=15403
+# run5 ctl exit 0 elapsed_ms=15754
+# run6 ctl exit 0 elapsed_ms=16247
+# run7 nw exit 0 elapsed_ms=15578
+# run8 nw exit 0 elapsed_ms=15903
+# run9 ctl exit 0 elapsed_ms=16131
+# hold: released 19:16:29
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=644.5
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=637.5
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=643.0
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=629.0
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=643.4
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=664.6
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=636.2
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=649.4
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=659.2
+PROFILE_PAIR entry=field_contact_rows ctl_ms_a_section=65.6 nw_ms_a_section=65.1
+PROFILE_PAIR entry=field_contact_l5 ctl_ms_a_section=62.5 nw_ms_a_section=61.0
+PROFILE_PAIR entry=field_contact_columns ctl_ms_a_section=59.2 nw_ms_a_section=58.0
+PROFILE_PAIR entry=field_pace_skin_back ctl_ms_a_section=38.4 nw_ms_a_section=37.7
+PROFILE_PAIR entry=field_transposed ctl_ms_a_section=28.5 nw_ms_a_section=28.0
+PROFILE_PAIR entry=field_outer_x32 ctl_ms_a_section=24.6 nw_ms_a_section=23.5
+PROFILE_PAIR entry=field_affine_tiled_x32 ctl_ms_a_section=21.5 nw_ms_a_section=21.0
+PROFILE_PAIR entry=field_clock_fill ctl_ms_a_section=21.0 nw_ms_a_section=20.8
+PROFILE_PAIR entry=field_chart ctl_ms_a_section=19.6 nw_ms_a_section=19.1
+PROFILE_PAIR entry=field_skin_fill ctl_ms_a_section=18.7 nw_ms_a_section=18.0
+PROFILE_PAIR entry=field_exposure ctl_ms_a_section=18.3 nw_ms_a_section=18.1
+PROFILE_PAIR entry=field_tied_face ctl_ms_a_section=17.2 nw_ms_a_section=0.0
+PROFILE_PAIR entry=field_blank_bias_enc ctl_ms_a_section=15.7 nw_ms_a_section=15.7
+PROFILE_PAIR entry=field_blank_dy ctl_ms_a_section=12.9 nw_ms_a_section=12.6
+PROFILE_PAIR entry=field_spread ctl_ms_a_section=11.4 nw_ms_a_section=10.2
+PROFILE_PAIR entry=field_pair_scan_back ctl_ms_a_section=11.4 nw_ms_a_section=11.3
+PROFILE_PAIR entry=field_affine_tiled_x64 ctl_ms_a_section=10.0 nw_ms_a_section=9.1
+PROFILE_PAIR entry=field_tied_back_e ctl_ms_a_section=9.5 nw_ms_a_section=9.3
+PROFILE_PAIR entry=field_blank_lift_read ctl_ms_a_section=9.2 nw_ms_a_section=9.3
+PROFILE_PAIR entry=field_pair_scan ctl_ms_a_section=9.2 nw_ms_a_section=9.2
+PROFILE_PAIR entry=field_ratio_adjoint ctl_ms_a_section=8.4 nw_ms_a_section=8.2
+PROFILE_PAIR entry=field_moment_pace_back_all ctl_ms_a_section=8.1 nw_ms_a_section=7.9
+PROFILE_PAIR entry=field_moment_skinned_all ctl_ms_a_section=8.0 nw_ms_a_section=8.1
+PROFILE_PAIR entry=field_unit ctl_ms_a_section=7.4 nw_ms_a_section=7.3
+PROFILE_PAIR entry=field_unit_probe ctl_ms_a_section=7.4 nw_ms_a_section=7.3
+PROFILE_PAIR entry=field_moment_return_paced_all ctl_ms_a_section=6.4 nw_ms_a_section=6.3
+PROFILE_PAIR entry=field_outer_x64 ctl_ms_a_section=6.2 nw_ms_a_section=6.0
+PROFILE_PAIR entry=field_moment_prefix_paced_all ctl_ms_a_section=6.1 nw_ms_a_section=5.9
+PROFILE_PAIR entry=field_sums ctl_ms_a_section=5.4 nw_ms_a_section=5.2
+PROFILE_PAIR entry=field_tied_face_tiled ctl_ms_a_section=0.0 nw_ms_a_section=4.9
+PROFILE_PAIR entry=field_tied_back_y ctl_ms_a_section=4.5 nw_ms_a_section=0.0
+PROFILE_PAIR entry=field_mark_rows ctl_ms_a_section=4.3 nw_ms_a_section=4.2
+PROFILE_PAIR entry=field_cavity_return_paced_all ctl_ms_a_section=3.5 nw_ms_a_section=3.3
+PROFILE_PAIR entry=field_pace_c_back ctl_ms_a_section=3.3 nw_ms_a_section=3.2
+PROFILE_PAIR entry=field_cavity_pace_back_all ctl_ms_a_section=3.2 nw_ms_a_section=3.1
+PROFILE_PAIR entry=field_unit_back_probe ctl_ms_a_section=3.2 nw_ms_a_section=3.0
+PROFILE_PAIR entry=field_moment_strand_return_all ctl_ms_a_section=3.1 nw_ms_a_section=3.1
+PROFILE_PAIR entry=field_outer_bound_x32 ctl_ms_a_section=3.1 nw_ms_a_section=2.6
+PROFILE_PAIR entry=field_unit_back ctl_ms_a_section=3.0 nw_ms_a_section=2.8
+PROFILE_PAIR entry=field_moment_paced_all ctl_ms_a_section=2.9 nw_ms_a_section=2.9
+FIELD_BITS array=dyh clock=0 words=18271872 zero=5722 zero_ppm=313 largest_bits=31 q999_bits=27
+FIELD_BITS array=dyh clock=1 words=18271872 zero=11671 zero_ppm=638 largest_bits=29 q999_bits=26
+FIELD_BITS array=dyh clock=2 words=15556864 zero=42779 zero_ppm=2749 largest_bits=29 q999_bits=25
+FIELD_BITS array=dyh clock=3 words=15556864 zero=6052338 zero_ppm=389046 largest_bits=29 q999_bits=25
