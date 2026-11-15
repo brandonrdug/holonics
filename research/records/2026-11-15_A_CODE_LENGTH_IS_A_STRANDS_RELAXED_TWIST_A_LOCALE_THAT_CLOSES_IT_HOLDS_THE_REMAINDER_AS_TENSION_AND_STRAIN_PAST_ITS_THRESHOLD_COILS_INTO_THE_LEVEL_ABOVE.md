@@ -104,6 +104,18 @@ and no biology.
   tick, t2 dropped, a written site's t2 having no later reader) rises by at most the t2-only drop plus 0.3 of the t0-only
   and t1-only drops, in every region, since a carry turns a reader's strain into a one-tick staleness on ticks that
   contract by 0.46 to 0.6 a tick.
+- **The held set a tick at a time** (the build thread, relayed 22:29 UTC; host, lap 38's end, the six sections, 1,146
+  s; the oracle at 1/16 bit held at one tick only; compared places' code rise, bits summed). Code: t0 308.9, t1 245.3,
+  t2 29.0, t3 0 (all ticks together 1,287.9); web 111.8, 33.7, 47.1, 0 (414.9); science 95.5, 51.8, 37.6, 0 (557.9);
+  books 54.2, 27.2, 9.5, 0 (261.0); wikidata 85.3, 24.2, 17.8, 0 (220.9). The single ticks sum to 0.33 to 0.58 of the
+  whole, so 0.42 to 0.67 of the strain lies across ticks: held moves at one tick meet those held at the next at their
+  shared readers. t0 is the dearest tick to hold while it carries the least of the move, because three later ticks of
+  readers re-read a held t0 move and each holds part of its strain; a carried t0 move strains its readers for one tick.
+  The guessed bound for the carried forward reads 0.15 to 0.23 of the all-tick drop, 0.0023 to 0.0062 nats a compared
+  place (code, web, science, books, wikidata: 0.0063, 0.0051, 0.0052, 0.0033 and 0.0090 bits over 30,989, 17,900,
+  15,644, 10,349 and 5,622 compared places), over the acceptance's 0.003 in four regions. Asked at 22:31 UTC: the carried
+  forward at 1/64 and 1/16 bit. Guess, fixed then: at 1/64 bit the carried rise stands under 0.002 nats a compared place
+  in every region (the drop's 0.0017 to 0.0067 there times the bound's fraction, with room for t2's drop).
 
 ## 5. Twist, writhe and the level above
 
@@ -124,6 +136,19 @@ and no biology.
   charts, with the place faces' curvature as the twisting stiffness, the coarse level's founding cost as the bending
   stiffness and the readers' pull at the unit's landmarks as the tension. That is a reading of the cause, written for the
   level's design; nothing here sets a number for it.
+
+- **Grokking is the snap left to chance** (Brandon, 22:29 UTC, a paraphrase: part of what he describes is the level-up
+  seen as grokking in transformers, which he refuses to leave to chance). A network that has fit its data can, long
+  after, crystallize into a compressed circuit that generalizes, under a slow pressure toward small weights (Power et
+  al., 2022); on modular addition the circuit computes through the cosines and sines of a few frequencies of the ring
+  (Nanda et al., 2023), the ring's Fourier chart (the November 8 record). In §3's terms, memorized per-case corrections
+  pile up as local strain, twist, until one coarse mode is cheaper and the field snaps into it, writhe. In a transformer
+  nothing reads the strain: the pressure is a blind constant, so the snap lands after a plateau at a time the schedule
+  and the data fraction set. The machine reads it: a face is founded when the tension it removes saves more bits than
+  its description costs (`contact.tension-founds-face`), the tension stands at the shared readers (§4), and the mode
+  grokking stumbles on, a ring and its Fourier chart, is the machine's own navigator family, so it is located as a key.
+  The canon's detector for a phase change of training, a susceptibility read before the snap, belongs beside the
+  founding as its ruler.
 
 ## 6. Pairs, modulators and a structure's own code
 
