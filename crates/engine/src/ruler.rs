@@ -398,6 +398,58 @@ impl TickNews {
     }
 }
 
+/// [measurement; theory, November 15 21:16Z] **What holding the quiet written site-ticks costs** ([`Constitution::held_forward`]), one region:
+/// the compared places and written sites; the compared places' code on `2^(−20)` bits, whole and held (by `a`, the oracle, and by the
+/// chart's move at the oracle's count), a section each; and by section and tick the sites held, `Σ a` and `Σ |a|` held (`2^(−40)` bits),
+/// `Σ |a|` the chart's criterion holds, with `Σ a` and `Σ |a|` over every written site a tick.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HeldRead {
+    pub compared: u64,
+    pub written: u64,
+    pub code_full: i128,
+    pub code_oracle: Vec<i128>,
+    pub code_chart: Vec<i128>,
+    pub held: Vec<Vec<u64>>,
+    pub a_held: Vec<Vec<i128>>,
+    pub abs_held: Vec<Vec<u128>>,
+    pub abs_chart: Vec<Vec<u128>>,
+    pub a_all: Vec<i128>,
+    pub abs_all: Vec<u128>,
+}
+
+impl HeldRead {
+    pub fn add(&mut self, o: &HeldRead) {
+        self.compared += o.compared;
+        self.written += o.written;
+        self.code_full += o.code_full;
+        let grow = |v: &mut Vec<i128>, w: &[i128]| {
+            v.resize(v.len().max(w.len()), 0);
+            v.iter_mut().zip(w).for_each(|(x, y)| *x += y);
+        };
+        let grow_u = |v: &mut Vec<u128>, w: &[u128]| {
+            v.resize(v.len().max(w.len()), 0);
+            v.iter_mut().zip(w).for_each(|(x, y)| *x += y);
+        };
+        grow(&mut self.code_oracle, &o.code_oracle);
+        grow(&mut self.code_chart, &o.code_chart);
+        grow(&mut self.a_all, &o.a_all);
+        grow_u(&mut self.abs_all, &o.abs_all);
+        for (mine, theirs) in [(&mut self.a_held, &o.a_held)] {
+            mine.resize(mine.len().max(theirs.len()), Vec::new());
+            mine.iter_mut().zip(theirs).for_each(|(m, t)| grow(m, t));
+        }
+        for (mine, theirs) in [(&mut self.abs_held, &o.abs_held), (&mut self.abs_chart, &o.abs_chart)] {
+            mine.resize(mine.len().max(theirs.len()), Vec::new());
+            mine.iter_mut().zip(theirs).for_each(|(m, t)| grow_u(m, t));
+        }
+        self.held.resize(self.held.len().max(o.held.len()), Vec::new());
+        for (m, t) in self.held.iter_mut().zip(&o.held) {
+            m.resize(m.len().max(t.len()), 0);
+            m.iter_mut().zip(t).for_each(|(x, y)| *x += y);
+        }
+    }
+}
+
 fn octave_of(v: u128) -> usize {
     ((128 - v.leading_zeros()) as usize).min(TICK_OCTAVES - 1)
 }
@@ -1132,6 +1184,61 @@ impl Constitution {
                 r.covector[kind][octave_of(ll)] += 1;
             }
             out.push(r);
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 15 21:16Z] **The forward with its quiet written site-ticks held** ([`HeldRead`]): one region's forward and
+    /// reverse give each written site-tick its `a = ⟨λ^(k+1), Δx^k⟩` ([`TickNews`]); for each section `σ = 2^(40−e)` on `2^(−40)` bits (`e` in
+    /// `sigmas`) the forward is read again with every written site-tick of `|a| < σ` held (the oracle), and again with as many written sites held
+    /// at each tick by the chart's move (`Σ (r̂(x^(k+1)) − r̂(x^k))²` over the lanes' rays, least first: a criterion the forward can read), and
+    /// the compared places' code is summed for each. A reading only.
+    pub fn held_forward(&self, region: &Region, sigmas: &[u32]) -> Result<HeldRead> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let d = &self.declaration;
+        let (sites, dw, lanes, ticks) = (region.classes.len(), d.width, d.lanes, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let written: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let mut out = HeldRead { compared: pass.faces.iter().filter(|f| f.is_some()).count() as u64, written: written.iter().filter(|&&w| w).count() as u64, code_full: code(&pass), ..HeldRead::default() };
+        // Each written site-tick's `a` and its chart's move.
+        let (mut a, mut moved) = (vec![vec![0i128; sites]; ticks], vec![vec![0u128; sites]; ticks]);
+        let (mut rb, mut sb, mut ra, mut sa) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            for t in (0..sites).filter(|&t| written[t]) {
+                let span = t * dw..(t + 1) * dw;
+                a[k][t] = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum();
+                (rb.clear(), sb.clear(), ra.clear(), sa.clear());
+                lane_chart(&cell.before[span.clone()], lanes, &mut rb, &mut sb)?;
+                lane_chart(&cell.after[span.clone()], lanes, &mut ra, &mut sa)?;
+                moved[k][t] = rb.iter().zip(&ra).map(|(&p, &q)| (i128::from(q) - i128::from(p)).unsigned_abs().pow(2)).sum();
+            }
+            out.a_all.push(a[k].iter().sum());
+            out.abs_all.push(a[k].iter().map(|v| v.unsigned_abs()).sum());
+        }
+        for &e in sigmas {
+            let sigma = 1u128 << (40 - e);
+            let oracle: Vec<Vec<bool>> = (0..ticks).map(|k| (0..sites).map(|t| written[t] && a[k][t].unsigned_abs() < sigma).collect()).collect();
+            let mut by_chart = vec![vec![false; sites]; ticks];
+            let (mut held, mut a_held, mut abs_held, mut abs_chart) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+            for k in 0..ticks {
+                let n = oracle[k].iter().filter(|&&h| h).count();
+                let mut order: Vec<usize> = (0..sites).filter(|&t| written[t]).collect();
+                order.sort_by_key(|&t| (moved[k][t], t));
+                for &t in order.iter().take(n) {
+                    by_chart[k][t] = true;
+                }
+                held.push(n as u64);
+                a_held.push((0..sites).filter(|&t| oracle[k][t]).map(|t| a[k][t]).sum::<i128>());
+                abs_held.push((0..sites).filter(|&t| oracle[k][t]).map(|t| a[k][t].unsigned_abs()).sum::<u128>());
+                abs_chart.push((0..sites).filter(|&t| by_chart[k][t]).map(|t| a[k][t].unsigned_abs()).sum::<u128>());
+            }
+            out.code_oracle.push(code(&self.pass_held(region, &oracle)?));
+            out.code_chart.push(code(&self.pass_held(region, &by_chart)?));
+            (out.held.push(held), out.a_held.push(a_held), out.abs_held.push(abs_held), out.abs_chart.push(abs_chart));
         }
         Ok(out)
     }

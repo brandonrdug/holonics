@@ -790,8 +790,24 @@ impl Constitution {
         Ok(out)
     }
 
+    /// [measurement; theory, November 15 21:16Z] **The region's forward with chosen site-ticks held** ([`Constitution::pass`] as a reading):
+    /// a site whose `hold[k][t]` is set leaves tick `k` in the state it began it from. Both reads where the field reads twice.
+    pub(crate) fn pass_held(&self, region: &Region, hold: &[Vec<bool>]) -> Result<Forward> {
+        if !self.declaration.mark {
+            return self.pass_with_held(region, false, None, Some(hold));
+        }
+        let first = self.pass_with_held(region, false, None, Some(hold))?;
+        let marks: Vec<Option<Shares>> = (0..region.classes.len()).map(|t| if Self::silent(region, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
+        self.pass_with_held(region, false, Some(&marks), Some(hold))
+    }
+
     /// One read of the region ([`Constitution::pass`]), its silent sites opened on `marks` where given.
     pub(crate) fn pass_with(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>) -> Result<Forward> {
+        self.pass_with_held(region, keep, marks, None)
+    }
+
+    /// [`Constitution::pass_with`], with the site-ticks of `hold` held where given (a reading: [`Constitution::pass_held`]).
+    fn pass_with_held(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>, hold: Option<&[Vec<bool>]>) -> Result<Forward> {
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
@@ -825,9 +841,16 @@ impl Constitution {
             if keep {
                 cell.before = x.clone();
             }
+            let held_from = hold.map(|_| x.clone());
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
+            }
+            if let (Some(h), Some(from)) = (hold, held_from.as_ref()) {
+                for (t, &held) in h[k].iter().enumerate().filter(|(_, held)| **held) {
+                    let _ = held;
+                    x[t * dw..(t + 1) * dw].copy_from_slice(&from[t * dw..(t + 1) * dw]);
+                }
             }
             prior = began;
             if keep || self.mirror_strength.is_some() {
