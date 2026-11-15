@@ -3704,7 +3704,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }] });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }] });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -3752,6 +3752,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         octaves: 7,
         pairs: 15_606_223,
         sites: 41_490,
+        own: false,
         slices: ["code", "web", "science", "books", "wikidata"].iter().enumerate().map(|(k, n)| PassSlice { name: n.to_string(), piece: k as u64, cursor: 3 * k as u64, taken: 100 * k as u64 }).collect(),
     };
     learner.pass = Some(pass.clone());
@@ -3765,6 +3766,16 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     }
     let short = format!("{plain}pass prefix {} 1 4 7 1 1 code 1 2\n", "ab".repeat(32));
     assert!(FieldLearner::from_text(&short).is_err(), "a slice of three words is refused");
+    // [the record of the states a field trains on, §5 item 1] The word `own` stands ninth only where set: the line without it is the line as
+    // before, with it the slices follow it, and either reads back as itself.
+    let own = StorePass { own: true, ..pass.clone() };
+    assert_eq!(own.to_line(), pass.to_line().replacen(" 41490 ", " 41490 own ", 1));
+    assert_eq!(StorePass::from_line(&own.to_line()).unwrap(), own);
+    assert!(!pass.to_line().contains(" own"));
+    let named_own = StorePass { slices: vec![PassSlice { name: "own".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
+    assert_eq!(StorePass::from_line(&named_own.to_line()).unwrap(), named_own, "a slice named `own` is a slice");
+    let both = StorePass { own: true, ..named_own };
+    assert_eq!(StorePass::from_line(&both.to_line()).unwrap(), both);
 }
 
 /// [definition; theory, November 13, the record of the landmarks §5 and the design record §4.9] **A level's sites are the landmarks of its
