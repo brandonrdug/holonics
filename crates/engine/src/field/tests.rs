@@ -3283,7 +3283,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(FieldLayout { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(FieldLayout { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
@@ -3587,7 +3587,8 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
 /// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
 #[test]
 fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
-    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 26));
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 27));
+    assert_eq!((PART_NAMES[LOUD_PART], LOUD_PART), ("loud", 26));
     assert_eq!((PART_NAMES[OPENING_PART], OPENING_PART), ("opening", 23));
     assert_eq!((PART_NAMES[JUNCTION_PART], JUNCTION_PART), ("junction", 24));
     assert_eq!((PART_NAMES[MARK_PART], MARK_PART), ("mark", 25));
