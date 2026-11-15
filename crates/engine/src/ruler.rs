@@ -103,7 +103,124 @@ pub struct OpenCrowds {
     /// [the theory thread, 19:03Z] The floor of any grouping of a crowd's members by their own locks, `N(ε)`: the fewest intervals of width
     /// `ε` on the face's grain that cover the members' `z` (sorted, greedy), summed by octave, at a sixteenth of a bit and the three wider
     /// tolerances (`[tolerance][octave]`).
-    pub cover: [[u64; OPEN_OCTAVES]; 4],
+    pub cover: [[u64; OPEN_OCTAVES]; OPEN_GRAINS],
+    /// [the theory thread, 19:10Z] The floor of the grouping a word tree shared by every receiver gives, at the same four tolerances: the
+    /// head's definite words split by medians of their projections on the principal directions of its open rows' probes (then `|b|²`),
+    /// and a crowd's members heard as one in a tree cell where their `z` spread stands within the tolerance, else in its two children.
+    pub tree: [[u64; OPEN_OCTAVES]; OPEN_GRAINS],
+}
+
+/// The tolerances the lock cover and the word tree are read at, as shifts of the face's grain: `2^(−6)` to `2^2` bits, one an octave, so a
+/// reading can take each head's, tick's and octave's own jitter as its grain (the theory thread, 19:20Z).
+pub const OPEN_GRAINS: usize = 9;
+pub const OPEN_GRAIN_LEAST: u32 = FACE_BITS - 6;
+
+/// [measurement; the theory thread, November 15 19:10Z] **A word tree** over a head's definite sources: each cell's members split by the
+/// median of their projections on one direction (the open rows' probes' principal directions in turn, then the words' power), down to one
+/// member. A ruler: nothing in the law reads it.
+struct WordTree {
+    members: Vec<usize>,
+    children: Option<Box<(WordTree, WordTree)>>,
+}
+
+impl WordTree {
+    fn build(mut members: Vec<usize>, depth: usize, key: &dyn Fn(usize, usize) -> i128, directions: usize) -> Self {
+        if members.len() <= 1 {
+            return Self { members, children: None };
+        }
+        let dir = depth % directions;
+        members.sort_by_key(|&x| key(x, dir));
+        let half = members.len() / 2;
+        let (lo, hi) = (members[..half].to_vec(), members[half..].to_vec());
+        let left = Self::build(lo, depth + 1, key, directions);
+        let right = Self::build(hi, depth + 1, key, directions);
+        Self { members, children: Some(Box::new((left, right))) }
+    }
+
+    /// The terms a crowd's members (`inside`) leave in this cell at a tolerance: one where their `z` spread stands within it, else the
+    /// children's.
+    fn terms(&self, inside: &[bool], z: &[i128], width: i128) -> u64 {
+        let (mut count, mut lo, mut hi) = (0u64, i128::MAX, i128::MIN);
+        for &j in &self.members {
+            if inside[j] {
+                count += 1;
+                lo = lo.min(z[j]);
+                hi = hi.max(z[j]);
+            }
+        }
+        if count <= 1 || hi - lo <= width {
+            return count.min(1);
+        }
+        match &self.children {
+            Some(c) => c.0.terms(inside, z, width) + c.1.terms(inside, z, width),
+            None => count,
+        }
+    }
+}
+
+/// The principal directions of a set of integer vectors (`rows` of `dim` words), the largest first: the power iteration of `M = Σ a aᵀ`
+/// on integer vectors held near `2^20` in their largest entry, each direction deflated of the ones before it, kept while its Rayleigh
+/// quotient stands above `2^(−30)` of the first's. A ruler's directions: any basis near the principal one serves a tree's splits.
+fn principal_directions(rows: &[&[i64]], dim: usize) -> Vec<Vec<i64>> {
+    let mut m = vec![vec![0i128; dim]; dim];
+    for a in rows {
+        for x in 0..dim {
+            for y in 0..dim {
+                m[x][y] += a[x] as i128 * a[y] as i128;
+            }
+        }
+    }
+    let scale = |w: &mut Vec<i128>| {
+        let top = w.iter().map(|v| v.unsigned_abs()).max().unwrap_or(0);
+        if top == 0 {
+            return;
+        }
+        let bits = 128 - top.leading_zeros();
+        if bits > 21 {
+            for v in w.iter_mut() {
+                *v >>= bits - 21;
+            }
+        } else {
+            for v in w.iter_mut() {
+                *v <<= 21 - bits;
+            }
+        }
+    };
+    let mut dirs: Vec<Vec<i128>> = Vec::new();
+    let mut quotients: Vec<i128> = Vec::new();
+    for start in 0..dim {
+        let mut v: Vec<i128> = (0..dim).map(|x| i128::from(x == start) << 20).collect();
+        for _ in 0..40 {
+            let mut w: Vec<i128> = (0..dim).map(|x| (0..dim).map(|y| (m[x][y] >> 20) * v[y]).sum::<i128>()).collect();
+            for u in &dirs {
+                let (uw, uu) = ((0..dim).map(|x| u[x] * w[x]).sum::<i128>(), (0..dim).map(|x| u[x] * u[x]).sum::<i128>());
+                if uu > 0 {
+                    for x in 0..dim {
+                        w[x] -= uw / uu * u[x] + (uw % uu) * u[x] / uu;
+                    }
+                }
+            }
+            scale(&mut w);
+            if w.iter().all(|&x| x == 0) {
+                break;
+            }
+            v = w;
+        }
+        let vv: i128 = (0..dim).map(|x| v[x] * v[x]).sum();
+        if vv == 0 {
+            continue;
+        }
+        let mv: Vec<i128> = (0..dim).map(|x| (0..dim).map(|y| (m[x][y] >> 20) * v[y]).sum::<i128>()).collect();
+        let q = (0..dim).map(|x| v[x] * mv[x]).sum::<i128>() / vv;
+        if q <= 0 || quotients.first().is_some_and(|&first| q < first >> 30) {
+            continue;
+        }
+        dirs.push(v);
+        quotients.push(q);
+    }
+    let mut order: Vec<usize> = (0..dirs.len()).collect();
+    order.sort_by_key(|&k| std::cmp::Reverse(quotients[k]));
+    order.into_iter().map(|k| dirs[k].iter().map(|&x| x as i64).collect()).collect()
 }
 
 /// The wider tolerances an [`OpenCrowds`] reading reads beside its sixteenth of a bit, as shifts of the face's grain: a quarter of a bit,
@@ -125,8 +242,9 @@ impl OpenCrowds {
                 self.band_at[t][b] += o.band_at[t][b];
                 self.lock_at[t][b] += o.lock_at[t][b];
             }
-            for t in 0..4 {
+            for t in 0..OPEN_GRAINS {
                 self.cover[t][b] += o.cover[t][b];
+                self.tree[t][b] += o.tree[t][b];
             }
         }
     }
@@ -398,6 +516,20 @@ impl Constitution {
             let paces = pass.paces_at(cell);
             for h in 0..heads {
                 let acc = &mut out[tick * heads + h];
+                // The head's word tree this tick, shared by its open rows: the definite sources split along the open rows' probes'
+                // principal directions, then by their words' power.
+                let tree = {
+                    let probes: Vec<&[i64]> = (0..sites).filter(|&i| !Self::definite(region, i)).map(|i| &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span]).collect();
+                    let dirs = if probes.is_empty() { Vec::new() } else { principal_directions(&probes, span) };
+                    let word = |j: usize| &cell.q[(h * sites + j) * span..(h * sites + j + 1) * span];
+                    let nd = dirs.len() + 1;
+                    let key = |j: usize, dir: usize| -> i128 {
+                        let w = word(j);
+                        if dir < dirs.len() { (0..span).map(|x| dirs[dir][x] as i128 * w[x] as i128).sum() } else { w.iter().map(|&x| x as i128 * x as i128).sum() }
+                    };
+                    let definite: Vec<usize> = (0..sites).filter(|&j| Self::definite(region, j)).collect();
+                    WordTree::build(definite, 0, &key, nd)
+                };
                 for i in (0..sites).filter(|&i| !Self::definite(region, i)) {
                     acc.rows += 1;
                     let temper = self.temper(h, true)?;
@@ -473,10 +605,19 @@ impl Constitution {
                         acc.lock_whole[o] += u64::from(whole.1 || members.len() == 1);
                         acc.band_terms[o] += terms(&members, 0, &test)?;
                         acc.lock_terms[o] += terms(&members, 1, &test)?;
+                        let mut inside = vec![false; sites];
+                        let mut zfull = vec![0i128; sites];
+                        for &j in &members {
+                            inside[j] = true;
+                            zfull[j] = release(temper * base_of[j], MATERIAL_BITS);
+                        }
+                        for t in 0..OPEN_GRAINS {
+                            acc.tree[t][o] += tree.terms(&inside, &zfull, 1i128 << (OPEN_GRAIN_LEAST + t as u32));
+                        }
                         let mut zs: Vec<i128> = members.iter().map(|&j| release(temper * base_of[j], MATERIAL_BITS)).collect();
                         zs.sort_unstable();
-                        for (t, shift) in [FACE_BITS - 4].into_iter().chain(OPEN_TOLERANCES).enumerate() {
-                            let width = 1i128 << shift;
+                        for t in 0..OPEN_GRAINS {
+                            let width = 1i128 << (OPEN_GRAIN_LEAST + t as u32);
                             let (mut count, mut start) = (0u64, i128::MIN);
                             for &z in &zs {
                                 if start == i128::MIN || z > start + width {
