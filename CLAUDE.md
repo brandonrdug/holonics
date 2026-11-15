@@ -54,18 +54,17 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 | Path | Role |
 |---|---|
 | `crates/engine/` | The engine (package `holonics-engine`): `field`, the law that trains and its host reference; `codec` (the boundary chart), `region` (a region the trainer owns) and `passage` (the passage's cut and a pass's place), with `units`, brought in from the store line's harness by C4; and `inherited`, the items it took from the October machine, each in the file of the module it stood in. It depends on nothing in `crates/holonics` (C3 and C4 of #603). |
-| `crates/engine-cuda/` | The engine's card realization (package `holonics-engine-cuda`): the driver (`cuda`, `ffi`), the card (`hnn::card`, with `CardError`) and the field's resident realization (`hnn::field`), with `kernels/field.cu` and its two headers, compiled by its own build script. It depends on the engine and on nothing in `crates/holonics` or `crates/holonics-cuda` (C3 of #603). |
+| `crates/engine-cuda/` | The engine's card realization (package `holonics-engine-cuda`): the driver (`cuda`, `ffi`), the card (`hnn::card`, with `CardError`) and the field's resident realization (`hnn::field`), with `kernels/field.cu` and its two headers, compiled by its own build script. It depends on the engine and on nothing in `crates/holonics` (C3 of #603). |
 | `crates/athena/` | The commands (package `athena`, binary `athena`, whose words are the retired `field_pass`'s): the store line's trainer, writer, lane founding and pass boundary (`store`), its live reading (`ruler::cavity`), the card's parity against the host (`parity`) and the exterior's reads and writes (`exterior`). It depends on the engine crates alone (C6 of #603). |
 | `crates/holonics/` | The main library: the Holon law and its facets, ratio/ring arithmetic, geometry (frames, screws, winding), navigators, receivers, standing and release. The operator layout and HNN campaigns 1–2 are built; the active work is in THE_REBUILD. |
-| `crates/holonics-cuda/` | The October card owners (words, epochs, lattices, inverses, the tower, the tree), which open the card with their image through `hnn::open_hnn` and reach it through extension traits; it re-exports the engine card crate under its old paths. |
 | `lean/` | The Lean package `holonics`: library `Holonics` (the `Framework` closure, the default target) and `HolonicsResearch` (the rest), namespace `Holonics`. |
 | `docs/` | The object and mathematics guides and the canon. The canon is historical doctrine; the elementary objects govern its wording. |
 | `research/` | Dated records (derivations, measurements, lessons), papers, design, notebook. |
 
 The engine, the machine that trains, is `holonics_engine::field` in `crates/engine` (lifted from
 `hnn::tower::field` on November 14, and imported back under that path while `crates/holonics`
-stands) with its card realization `holonics_engine_cuda::hnn::field` in `crates/engine-cuda` (imported back as
-`holonics-cuda`'s `hnn::field`) and the store line's commands in `crates/athena`. From November 14 the
+stands) with its card realization `holonics_engine_cuda::hnn::field` in `crates/engine-cuda` and the store
+line's commands in `crates/athena`; the October card crate `crates/holonics-cuda` retired with C8 of #603. From November 14 the
 [consolidation](docs/plans/THE_CONSOLIDATION.md) (#603) moves it to `crates/engine`,
 `crates/engine-cuda` and `crates/athena`, cut by object, and retires what no path from it reaches;
 each of its steps updates this table.

@@ -1,8 +1,8 @@
 # Holonics.
 #
-# `crates/holonics` is the main library: the Holon law and its operators (ratio, geometry, holon,
-# navigator, receiver), exact over the rationals, with no float in a law. `crates/holonics-cuda`
-# is the CUDA realization, currently the device driver.
+# `crates/engine` is the engine (the field's law and host reference), `crates/engine-cuda` its card
+# realization and `crates/athena` its commands. `crates/holonics` is the library: the Holon law and its
+# operators (ratio, geometry, holon, navigator, receiver), with no float in a law.
 [workspace]
 resolver = "2"
 members = [
@@ -10,12 +10,8 @@ members = [
   "crates/engine",
   "crates/engine-cuda",
   "crates/holonics",
-  "crates/holonics-cuda",
 ]
-# The nvptx smoke kernel pins its own nightly. Its committed PTX is included by `mount-smoke`,
-# so the host workspace carries that boundary artifact without carrying the toolchain.
 exclude = [
-  "accelerators/cuda-smoke",
   "vendor/num-bigint",
 ]
 

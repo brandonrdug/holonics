@@ -517,6 +517,12 @@ holds with the reads' lines.
   without the patch; the engine uses big integers, so this is read and not assumed.
 - Done when `cargo check --workspace` builds only crates with a path from `athena` or a consumer
   named in an open issue, and gate 1 runs only checks of what stands.
+- C8a, read November 15: `crates/holonics-cuda` (37,768 lines) and `accelerators/` retired whole,
+  held at `d6bbd1644`. No file of the engine crates or of `athena` changed, so C6's gate 3 and timing
+  stand for them. Each card owner realized a law stated in `crates/holonics`, its atlas row or its
+  record. The 37 atlas rows keep their rows: two items that live in the engine's card crate name it,
+  and the rest name their files at that commit. Owed to C7: the prose of about twenty guides still
+  names `holonics_cuda` owners as current (the operator contract among them).
 
 **C9. Position, order and data** (the cloud or the PC; text only).
 - `CONSTRUCTION_STATE.md` holds the position: each line that trains, its commit, its state, its
