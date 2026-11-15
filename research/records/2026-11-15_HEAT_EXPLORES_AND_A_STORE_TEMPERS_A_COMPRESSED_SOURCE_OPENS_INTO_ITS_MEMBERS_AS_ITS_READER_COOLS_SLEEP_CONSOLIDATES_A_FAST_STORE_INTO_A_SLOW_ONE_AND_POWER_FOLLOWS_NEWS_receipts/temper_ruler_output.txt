@@ -1,0 +1,3 @@
+1. spin glass of 14 spins, mean energy above the ground over 60 runs: quench: 1.0484, 3 sweeps: 0.8863, 30 sweeps: 0.4718, 300 sweeps: 0.0713
+2. two clusters of 300 points: 2 lambda_max = 5.0051; the codeword split first at T = 4.9209 (0.983 of it), cooling by 1% a step
+3. water-filling over 300 draws: never under equal power, above it in 299 (channels unlike), tied within 4e-15 where channels are alike; reverse water-filling on a passage of 128 ticks with two bursts: level 0.2500, the 120 quiet ticks get 0 bits, the 8 burst ticks 17.75 bits
