@@ -1,0 +1,47 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index 60169dd45..5e13b62ae 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -1,3 +1,6 @@
++#ifndef ABLATE
++#define ABLATE 4
++#endif
+ // The field's card realization (`holonics::hnn::tower::field`, records
+ // `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`,
+ // §7, and `2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP`,
+@@ -3164,7 +3167,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
+         // The numerators of a staged term: the lanes of an entry add their part of it.
+         const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+         const auto numerators = [&](bool crowd, uint32_t nvalid) {
+-            if (!active) {
++            if (!active || ABLATE == 1) {
+                 return;
+             }
+             if constexpr (L <= WINDOW_LIMBS) {
+@@ -3400,7 +3403,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
+         }
+         __syncwarp();
+         // Pass three: each term's share of the row's mass, once, a lane a term.
+-        if (store) {
++        if (store && ABLATE != 2) {
+             for (uint32_t k = lane; k < K; k += 32) {
+                 const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+                 if (j != UINT32_MAX) {
+@@ -4478,7 +4481,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
+         }
+         const wide mean = rel(warp_sum(weighted), SHARE_BITS);
+         // The comparison of a term `p` (its covector `dpk`): the face's.
+-        const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS); };
++        const auto compare = [&](wide p, wide dpk) -> wide { if (ABLATE == 4) { return (wide)((int64_t)p ^ (int64_t)dpk) >> 20; } return rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS); };
+         // Pass B: δs over the pairs, in chunks of 32 into the warp's shared chunk, whose sum over the word is
+         // read with the lanes over the span's entries (the probe role: `δs D ŵ_j`).
+         wide sum = 0;
+@@ -4511,7 +4514,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
+             stj[warp][lane] = j;
+             stk[warp][lane] = k;
+             __syncwarp();
+-            if (active) {
++            if (active && ABLATE != 3) {
+                 for (uint32_t jj = part; jj < 32; jj += parts) {
+                     const uint32_t jx = stj[warp][jj];
+                     if (jx != UINT32_MAX) {

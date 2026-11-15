@@ -55,6 +55,7 @@ pub use crate::hnn::profile::*;
 #[cfg(test)]
 mod tests {
     use super::*;
+    use holonics_engine::contact::WEIGHT_BITS;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> Declaration {
         Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
@@ -125,9 +126,12 @@ mod tests {
         // The gain is read from the largest temperature the material holds (§15.10).
         let l = field.layout();
         let bound = field.row_gain().unwrap() + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
-        assert_eq!(row_limbs(&field, bound).ok(), Some((field.row_bits().unwrap() as usize).div_ceil(64).max(MIN_LIMBS)).filter(|&l| l <= MAX_LIMBS));
+        // The card weighs a source by one where the host weighs it by `2^62`, so its carrier is the bound less those bits; the
+        // refusal stays the host's, at its own need.
+        let host = field.row_bits().unwrap() as usize;
+        assert_eq!(row_limbs(&field, bound).ok(), Some((host - WEIGHT_BITS as usize).div_ceil(64).max(MIN_LIMBS)).filter(|_| host.div_ceil(64) <= MAX_LIMBS));
         assert!(row_limbs(&field, bound + 1).is_err());
-        // A narrow row needs five limbs at least, and the carrier never narrows as the spread widens.
+        // A narrow row needs three limbs at least, and the carrier never narrows as the spread widens.
         let mut last = 0;
         for spread in (0..=bound).step_by(7) {
             if let Ok(limbs) = row_limbs(&field, spread) {

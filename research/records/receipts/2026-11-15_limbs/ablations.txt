@@ -1,0 +1,19 @@
+# hold: lock taken 20:03:49
+# card empty 20:12:50
+# tied exit 0
+# ablate1 exit 1
+# ablate2 exit 1
+# ablate3 exit 0
+# ablate4 exit 0
+# hold: released 20:13:55
+ABLATE entry=field_contact_l5 tied=208 ablate1=24 ablate2=15 ablate3=201 ablate4=197
+ABLATE entry=field_contact_l6 tied=0 ablate1=14 ablate2=0 ablate3=0 ablate4=0
+ABLATE entry=field_contact_rows tied=205 ablate1=88 ablate2=22 ablate3=140 ablate4=197
+ABLATE entry=field_contact_columns tied=195 ablate1=84 ablate2=21 ablate3=187 ablate4=189
+ABLATE entry=field_pace_skin_back tied=123 ablate1=55 ablate2=14 ablate3=119 ablate4=118
+ABLATE entry=field_exposure tied=58 ablate1=26 ablate2=6 ablate3=59 ablate4=57
+ABLATE_TOTAL build=tied ms=1991
+ABLATE_TOTAL build=ablate1 ms=841
+ABLATE_TOTAL build=ablate2 ms=215
+ABLATE_TOTAL build=ablate3 ms=1829
+ABLATE_TOTAL build=ablate4 ms=1896
