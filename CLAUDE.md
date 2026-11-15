@@ -426,7 +426,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 14; the last six are from his corrections of November 12 to 14, and the
+October 29 and November 15; the last seven are from his corrections of November 12 to 15, and the
 three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
@@ -628,6 +628,16 @@ that day. They are written here with their reasons so that no agent holds them a
   of November 13 still counted places "confidently wrong". The wording is `agent-inferred`. Scope: every reading,
   guess, record, brief and message; guesses keep the words they were fixed in
   ([the record](research/records/2026-11-14_THE_MARK_IS_THE_FIELD_KNOWING_ITS_OWN_PLACEMENTS_A_COMPARISON_IS_AN_AGREEMENT_AT_A_RECEIVER_AND_NOTHING_A_RELEASE_DOES_IS_WRONG.md)).
+- **A lap is reported with its loudness beside its nats** (Brandon, November 15 00:58Z). Every report of a lap of a line
+  carries, beside the code in nats a place, the loudness reading (`athena train complete-language read-loudness` on the lap's
+  mean, read by `tools/loudness_table.py`): each region's loudness (its places' lane powers) against its surprise, by surprise
+  fifth and by the rank of the written symbol in its face, the energy a nat, the color (the lanes' spectrum, Brandon's
+  scattering lens of 01:08Z) and the commonest pieces a place ends. Reason: the code says how many nats a place costs, and
+  only the power beside it says what they cost, whether a quiet place was thinned, stretched or absorbed, and whether the loud
+  places are the ones the field codes cheaply, which is what a dense basin is (the record of November 13 on loudness beside
+  surprise, §4.2). The reading developed on November 13 lived in an owed test and a memory note, dropped between context
+  windows, and the reports narrowed to nats alone until Brandon named it. Scope: every report, record and guess on a line's
+  level.
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
