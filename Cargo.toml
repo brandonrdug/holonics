@@ -1,15 +1,14 @@
 # Holonics.
 #
 # `crates/engine` is the engine (the field's law and host reference), `crates/engine-cuda` its card
-# realization and `crates/athena` its commands. `crates/holonics` is the library: the Holon law and its
-# operators (ratio, geometry, holon, navigator, receiver), with no float in a law.
+# realization and `crates/athena` its commands. The October library `crates/holonics` retired with C8c of
+# #603; its laws stand in the guides, Lean and the atlas.
 [workspace]
 resolver = "2"
 members = [
   "crates/athena",
   "crates/engine",
   "crates/engine-cuda",
-  "crates/holonics",
 ]
 exclude = [
   "vendor/num-bigint",

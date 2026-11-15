@@ -44,7 +44,7 @@ translational components of **one** generator, the two **objects**, and the two 
 split algebra are three different decompositions. None substitutes for another.
 
 [established-bounded; source-inspected] `RatVec3`, `RatMat3` and `AffineMap3` in `holonics::geometry` own these coordinate/frame operations. The
-[`screw`](../crates/holonics/src/geometry/screw.rs) specialization uses them for a generator,
+[`screw`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs) specialization uses them for a generator,
 its orbit jets and paired quadrance; it adds no new frame system or protein codec. The formal
 companion is
 [`Geometry/ScrewGeometry.lean`](../lean/Holonics/Geometry/ScrewGeometry.lean).

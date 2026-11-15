@@ -19,7 +19,7 @@ ring's own state through its section rays, with the lift carried. The lock reade
 period, the amplitude receipt, the gauge, the render and the pump are not in it (§9).
 
 [project-postulate] The acceptance was written into
-[`tests/acoustic_wave_port.rs`](../../crates/holonics/tests/acoustic_wave_port.rs) from the replica's
+[`tests/acoustic_wave_port.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/tests/acoustic_wave_port.rs) from the replica's
 printed numbers
 ([`replica_probe_output.txt`](receipts/2026-10-09-acoustic-native/replica_probe_output.txt), read by
 [`replica_probe.py`](receipts/2026-10-09-acoustic-native/replica_probe.py) from the acoustic-locks
@@ -53,7 +53,7 @@ marked: the opposite-ray form of the polarity item (§4.5) and a probe of the st
 
 ## 3. What was built, and each choice with its reason
 
-[definition; agent-inferred] **`hnn::wave`** ([`wave.rs`](../../crates/holonics/src/hnn/wave.rs)).
+[definition; agent-inferred] **`hnn::wave`** ([`wave.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/wave.rs)).
 - `MatchedWave { admittance, hop, samples }`: private fields, built from exact amplitudes and a declared
   port and step, never from an `Encoded`, convertible neither way. The gain, origin and exact step of a
   recording are the boundary chart's and declare no meaning; the type carries only the numbers and the
@@ -70,7 +70,7 @@ marked: the opposite-ray form of the polarity item (§4.5) and a probe of the st
   the real force of a node; for an isotropic node the quadrature coordinate stays exactly zero (asserted).
 
 [definition; agent-inferred] **`hnn::dynamic_section`**
-([`dynamic_section.rs`](../../crates/holonics/src/hnn/dynamic_section.rs)).
+([`dynamic_section.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/dynamic_section.rs)).
 - `quadrant`, `chord` and `SectionReader`: the class of `(w, u)` (each of the four quarter-turn rays
   belongs to the class it starts), the signed advance of the lift along a straight chord, and a reader
   that keeps the last state and the lift (the quotient the next tick needs) and returns, per tick,
@@ -291,7 +291,7 @@ is not a code". Receipts: [`receipts/2026-10-09-acoustic-native/`](receipts/2026
 ## 12. The lock reader and the joint period
 
 [project-postulate] The coordinator's third task: the second rung's items 4 and 5, as a **consumer** of
-`SectionReader`'s stream, in [`section_lock.rs`](../../crates/holonics/src/hnn/section_lock.rs). No render, no
+`SectionReader`'s stream, in [`section_lock.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/section_lock.rs). No render, no
 strand contact and no learning.
 
 ### 12.1 The acceptance, fixed before the Rust ran

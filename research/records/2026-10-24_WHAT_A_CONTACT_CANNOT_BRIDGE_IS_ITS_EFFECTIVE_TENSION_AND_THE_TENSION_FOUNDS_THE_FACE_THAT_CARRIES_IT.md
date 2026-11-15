@@ -3,7 +3,7 @@
 Refs #404 #405 #410. Follows [faces read on cycles](2026-10-24_FACES_ARE_READ_ON_CYCLES_A_FACE_IS_A_COHOMOLOGY_CLASS_THE_CARRY_IS_ITS_BOCKSTEIN_AND_FRICTION_KEEPS_ONLY_THE_HARMONIC_PART.md)
 and [the one face law](2026-10-24_ONE_FACE_LAW_A_FACE_IS_A_CONGRUENCE_SO_LANGUAGE_ARITHMETIC_AND_ANY_OPERATION_ARE_READ_BY_ONE_CONTACT.md),
 and answers the design thread's request for the tower's learning step
-([`hnn::tower`](../../crates/holonics/src/hnn/tower.rs)). Status:
+([`hnn::tower`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs)). Status:
 - the laws are proved-standard: the normal equations, the Schur complement and its quotient
   formula, partial regression, Wirtinger calculus;
 - the checks are exact;
@@ -363,7 +363,7 @@ a committed release (`p̂` one-hot at `h`) a cell gives `|t|² = 0` where `h = u
 tr T = 2·#{k : h_k ≠ u_k} = |H| + |T| − 2·(aligned equal cells)        (soft: Σ|p̂|² + N − 2 Σ p̂(u))
 ```
 
-which is the lock's friction ([`receiver::coupling`](../../crates/holonics/src/receiver/coupling.rs),
+which is the lock's friction ([`receiver::coupling`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/receiver/coupling.rs),
 `solenoid.plural-coupling-face`) read on the aligned coupling, the placed-cell frame the lock
 replaced. The lock and the tension relieve this one friction in two ways. The lock re-times it:
 the least friction over order-consistent couplings lets the clocks slip, so `F* ≤ tr T`. The bridge
