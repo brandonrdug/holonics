@@ -400,12 +400,8 @@ impl<'c> Resident<'c> {
         // its bound open. Without a slot the bound reads every region as before.
         let mut maxima = if x != 0 { self.outer_slot()? } else { 0 };
         let entry = if x64 { "field_outer_x64" } else { "field_outer_x32" };
-        let grid = if x != 0 {
-            (rows as u64).div_ceil(64).saturating_mul((cols as u64).div_ceil(64)).saturating_mul((words.t as u64).div_ceil(OUTER_WALK)).clamp(1, 65_535) as u32
-        } else {
-            (rows as u64).div_ceil(THREADS as u64).saturating_mul((words.t as u64).div_ceil(OUTER_WALK)).clamp(1, 65_535) as u32
-        };
-        self.launch(entry, grid, THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima)])?;
+        let (grid, mut walk) = self.outer_grid(rows, cols, x != 0, words.t as usize);
+        self.launch(entry, grid, THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima), arg(&mut walk)])?;
         let ops: Vec<(u64, bool, usize, usize)> = if x != 0 { vec![(y, true, ys as usize, rows), (x, x64, xs as usize, cols)] } else { vec![(y, true, ys as usize, rows)] };
         self.map_record((entry, rows32, if x != 0 { cols32 } else { 0 }, u != 0, false), words, None, None, None, &ops)?;
         if x != 0 {
@@ -414,6 +410,21 @@ impl<'c> Resident<'c> {
             self.map_record((bound, rows32, cols32, u != 0, false), words, None, None, None, &[])?;
         }
         Ok(())
+    }
+
+    /// [realization; November 15, the maps' second loop] The outer sum's grid and walk: a block a tile of 64 by 64 entries and a walk of
+    /// sites, the walk the sites that give the tiles one wave of two blocks a multiprocessor (the kernel's launch bounds), a multiple of 32
+    /// (`MAP_KC`) from 64 to 512 (`field_outer_x32`'s comment gives the bench's reading); with no `x`, the bias's entries by `THREADS` and a
+    /// walk of `OUTER_WALK`. The walk changes no bit: the partials go in by an integer sum.
+    pub(crate) fn outer_grid(&self, rows: usize, cols: usize, has_x: bool, sites: usize) -> (u32, u32) {
+        if has_x {
+            let tiles = (rows as u64).div_ceil(64).saturating_mul((cols as u64).div_ceil(64)).max(1);
+            let wave = 2 * u64::from(self.card.census().multiprocessors.max(1));
+            let walk = ((sites as u64).saturating_mul(tiles).div_ceil(wave)).div_ceil(32).saturating_mul(32).clamp(OUTER_WALK, 512);
+            (tiles.saturating_mul((sites as u64).div_ceil(walk)).clamp(1, 65_535) as u32, walk as u32)
+        } else {
+            ((rows as u64).div_ceil(THREADS as u64).saturating_mul((sites as u64).div_ceil(OUTER_WALK)).clamp(1, 65_535) as u32, OUTER_WALK as u32)
+        }
     }
 
     /// [realization; P61 item 4f] **An outer pass's slot for its two largest words**: two 64-bit words of a card buffer of `OUTER_SLOTS` slots,

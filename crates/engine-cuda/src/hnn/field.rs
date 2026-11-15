@@ -486,6 +486,179 @@ mod tests {
         assert_eq!(checked, 3 * 2 * (5 + 4 + 7));
     }
 
+    /// [realization; November 15, the maps' second loop] **The outer sum's long walks read the definitions' integers** (needs the card): at
+    /// 20,298 sites the walk the host reads is 256 to 512 sites (`outer_grid`), so a walk holds eight to sixteen chunks whose proof is read as
+    /// they are staged. Over 64 × 128 and 128 × 128 on 32-bit inputs and 128 × 128 on 64-bit ones, with narrow words, with words past `2^31` in
+    /// a few sites (a walk that begins again in the wide form mid-walk), with a chunks' bound that passes `2^63` only after several chunks
+    /// (words of 28 and 27 bits: a chunk's bound is near `2^60`, so the eighth chunk of a walk passes it), and with a mask of open sites: every entry of `g` and the status bits equal the definition summed here on
+    /// 128 bits.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_outer_sums_long_walks_read_the_definitions_integers() {
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let cf = Resident::open(&card).unwrap();
+        let sites = 20_298usize;
+        let mut state = 0x6A09_E667_F3BC_C909u64;
+        let mut word = move |bits: u32| -> i64 {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let v = (state >> (64 - bits)) as i64;
+            if state & 1 == 1 { -v } else { v }
+        };
+        let regions: Vec<u32> = (0..=sites as u32).step_by(203).chain(std::iter::once(sites as u32)).collect::<std::collections::BTreeSet<_>>().into_iter().collect();
+        let mut checked = 0usize;
+        for &only in &[false, true] {
+            let unresolved: Vec<u8> = (0..sites).map(|t| u8::from(!only || t % 3 != 1)).collect();
+            let (unresolved_buf, region_buf) = (card.upload(&unresolved).unwrap(), card.upload(&regions).unwrap());
+            for &(rows, cols, x64) in &[(64usize, 128usize, false), (128, 128, false), (128, 128, true)] {
+                let (_, walk) = cf.outer_grid(rows, cols, true, sites);
+                assert!(walk >= 256, "the walk at {rows}x{cols} is {walk}");
+                // case 0 narrow; 1 words past 2^31 in a few sites; 2 a bound that passes 2^63 after several chunks.
+                for case in 0..3u8 {
+                    let y: Vec<i64> = (0..sites * rows).map(|c| { let t = c / rows; if case == 1 && t % 997 == 400 { word(40) } else if case == 2 { word(28) } else { word(26) } }).collect();
+                    let x: Vec<i64> = (0..sites * cols).map(|c| { let t = c / cols; if case == 1 && x64 && t % 1301 == 7 { word(36) } else if case == 2 { word(27) } else { word(22) } }).collect();
+                    let x32: Vec<i32> = x.iter().map(|&v| v as i32).collect();
+                    let entries = rows * cols;
+                    let prior: Vec<i128> = (0..entries).map(|_| (word(60) as i128) << 20).collect();
+                    let status_buf = card.zeroed::<u32>(1).unwrap();
+                    let g_buf = card.upload(&prior).unwrap();
+                    let (y_buf, x_buf, x32_buf) = (card.upload(&y).unwrap(), card.upload(&x).unwrap(), card.upload(&x32).unwrap());
+                    let mut words = Words { t: sites as u32, r: (regions.len() - 1) as u32, unresolved: unresolved_buf.device_ptr(), region_off: region_buf.device_ptr(), status: status_buf.device_ptr(), ..Default::default() };
+                    let xp = if x64 { x_buf.device_ptr() } else { x32_buf.device_ptr() };
+                    cf.outer(&mut words, &g_buf, 0, rows, cols, y_buf.device_ptr(), rows, xp, cols, x64, only).unwrap();
+                    let got = card.fetch(&g_buf).unwrap();
+                    let st = card.fetch(&status_buf).unwrap()[0];
+                    let xv = |t: usize, i: usize| -> i128 { if x64 { x[t * cols + i] as i128 } else { x32[t * cols + i] as i128 } };
+                    let mut want = prior.clone();
+                    for o in 0..rows {
+                        for i in 0..cols {
+                            let mut sum = 0i128;
+                            for t in (0..sites).filter(|&t| !(only && unresolved[t] == 0)) {
+                                sum = sum.wrapping_add((y[t * rows + o] as i128).wrapping_mul(xv(t, i)));
+                            }
+                            want[o * cols + i] = want[o * cols + i].wrapping_add(sum);
+                        }
+                    }
+                    assert_eq!(st, 0, "outer {rows}x{cols} x64={x64} case={case} only={only}: no region is refused");
+                    assert!(got == want, "outer {rows}x{cols} x64={x64} case={case} only={only} walk={walk}: {} entries differ", got.iter().zip(&want).filter(|(a, b)| a != b).count());
+                    checked += 1;
+                }
+            }
+        }
+        println!("OUTER_LONG_WALKS cases={checked}");
+        assert_eq!(checked, 2 * 3 * 3);
+    }
+
+    /// [measurement; November 15, the maps' second loop] **The site maps timed at the store line's shapes** (needs the card): the forward map,
+    /// the transposed map and the outer sum at the shapes a section of the line launches most (`FIELD_PROFILE_MAP` of lap 31's 24 sections:
+    /// 20,298 sites a launch, maps of 64 × 128, 128 × 128 and 128 × 64), on words of the widths the bits ruler read (weights 27 bits, inputs
+    /// 21, covectors 26, where the line's tiles prove their sums), each entry `FIELD_MAPS_LAUNCHES` rounds (default 40) after a warm-up, the variants of a shape in turn, as millionths of a second a launch and products a
+    /// second. `FIELD_MAPS_ENTRIES` names other entries of the same parameters to time beside the line's (`kind:entry`, comma-separated, the
+    /// kinds `forward`, `forward64`, `transposed`, `outer`, `outer64`). A timing beside other work on the card reads the share it was given.
+    #[test]
+    #[ignore = "needs the CUDA card; a timing, run alone with --include-ignored --test-threads=1 --nocapture"]
+    #[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed millionths of a second and rates")]
+    fn the_site_maps_timed_at_the_lines_shapes() {
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let cf = Resident::open(&card).unwrap();
+        let sites = 20_298usize;
+        let launches: u32 = std::env::var("FIELD_MAPS_LAUNCHES").ok().and_then(|v| v.parse().ok()).unwrap_or(40);
+        let mut state = 0x2545_F491_4F6C_DD1Du64;
+        let mut word = move |bits: u32| -> i64 {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let v = (state >> (64 - bits)) as i64;
+            if state & 1 == 1 { -v } else { v }
+        };
+        let regions: Vec<u32> = (0..=sites as u32).step_by(203).chain(std::iter::once(sites as u32)).collect::<std::collections::BTreeSet<_>>().into_iter().collect();
+        let unresolved = vec![1u8; sites];
+        let unresolved_buf = card.upload(&unresolved).unwrap();
+        let region_buf = card.upload(&regions).unwrap();
+        let theta: Vec<i32> = (0..128 * 128 + 128).map(|_| word(27) as i32).collect();
+        let wmax = theta.iter().map(|v| v.unsigned_abs() as u64).max().unwrap();
+        let theta_buf = card.upload(&theta).unwrap();
+        let status_buf = card.zeroed::<u32>(1).unwrap();
+        let x32: Vec<i32> = (0..sites * 128).map(|_| word(21) as i32).collect();
+        let x64: Vec<i64> = x32.iter().map(|&v| i64::from(v)).collect();
+        // A covector of 26 bits: the line's tiles prove their 64-bit sums (0.97 of its transposed and outer tiles), and a bench of wider words
+        // would time the wide form the line seldom takes.
+        let y: Vec<i64> = (0..sites * 128).map(|_| word(26)).collect();
+        let (x32_buf, x64_buf, y_buf) = (card.upload(&x32).unwrap(), card.upload(&x64).unwrap(), card.upload(&y).unwrap());
+        let out_buf = card.zeroed::<i64>(sites * 128).unwrap();
+        let g_buf = card.zeroed::<i128>(128 * 128 + 8).unwrap();
+        let base = Words { t: sites as u32, r: (regions.len() - 1) as u32, unresolved: unresolved_buf.device_ptr(), region_off: region_buf.device_ptr(), theta: theta_buf.device_ptr(), status: status_buf.device_ptr(), ..Default::default() };
+        // The variants of a shape are launched in turn, one launch each a round, every launch timed alone between two synchronizations,
+        // so work beside the bench on the card falls on each variant alike; the median and the least of the rounds are printed.
+        let timed = |products: u64, variants: &mut Vec<(String, Box<dyn FnMut() + '_>)>| {
+            let mut took: Vec<Vec<f64>> = vec![Vec::new(); variants.len()];
+            for round in 0..=launches {
+                for (k, (_, run)) in variants.iter_mut().enumerate() {
+                    card.synchronize().unwrap();
+                    let started = Instant::now();
+                    run();
+                    card.synchronize().unwrap();
+                    if round > 0 {
+                        took[k].push(started.elapsed().as_secs_f64() * 1e6);
+                    }
+                }
+            }
+            for ((name, _), t) in variants.iter().zip(took.iter_mut()) {
+                t.sort_by(f64::total_cmp);
+                let (median, least) = (t[t.len() / 2], t[0]);
+                println!("MAPS_TIMING entry={name} sites={sites} us_median={median:.1} us_least={least:.1} products_a_second_median={:.3e}", products as f64 / (median * 1e-6));
+            }
+        };
+        let alt: Vec<(String, String)> = std::env::var("FIELD_MAPS_ENTRIES").unwrap_or_default().split(',').filter_map(|s| s.split_once(':')).map(|(k, e)| (k.to_string(), e.to_string())).collect();
+        let leak = |e: &str| -> &'static str { Box::leak(e.to_string().into_boxed_str()) };
+        for &(rows, cols, wide_input, add) in &[(64usize, 128usize, false, false), (128, 128, false, false), (128, 128, true, true), (128, 64, true, true)] {
+            let (x, entry) = if wide_input { (x64_buf.device_ptr(), "field_affine_x64") } else { (x32_buf.device_ptr(), "field_affine_x32") };
+            let (outp, addp) = if add { (0, out_buf.device_ptr()) } else { (out_buf.device_ptr(), 0) };
+            let mut variants: Vec<(String, Box<dyn FnMut() + '_>)> = Vec::new();
+            let cfr = &cf;
+            let mut words = base;
+            variants.push((format!("{entry}:{rows}x{cols}"), Box::new(move || cfr.affine(entry, &mut words, 0, (rows * cols) as u64, wmax, rows, cols, x, cols, outp, rows, addp, false).unwrap())));
+            for (_, alt_entry) in alt.iter().filter(|(k, _)| k == if wide_input { "forward64" } else { "forward" }) {
+                let e = leak(alt_entry);
+                let grid = (rows as u64).div_ceil(64).saturating_mul((sites as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+                let (mut words, mut weight, mut bias, mut wm, mut r32, mut c32, mut xp, mut xs, mut op, mut os, mut ap, mut u) = (base, 0u64, (rows * cols) as u64, wmax, rows as u32, cols as u32, x, cols as u64, outp, rows as u64, addp, 0u32);
+                variants.push((format!("{e}:{rows}x{cols}"), Box::new(move || cfr.launch(e, grid, THREADS, &mut [arg(&mut words), arg(&mut weight), arg(&mut bias), arg(&mut wm), arg(&mut r32), arg(&mut c32), arg(&mut xp), arg(&mut xs), arg(&mut op), arg(&mut os), arg(&mut ap), arg(&mut u)]).unwrap())));
+            }
+            timed((sites * rows * cols) as u64, &mut variants);
+        }
+        for &(rows, cols, acc) in &[(128usize, 128usize, false), (64, 128, true), (128, 64, false)] {
+            let mut variants: Vec<(String, Box<dyn FnMut() + '_>)> = Vec::new();
+            let cfr = &cf;
+            let (yp, op) = (y_buf.device_ptr(), out_buf.device_ptr());
+            let mut words = base;
+            variants.push((format!("field_transposed:{rows}x{cols}"), Box::new(move || cfr.transposed(&mut words, 0, rows, cols, yp, rows, op, acc, false).unwrap())));
+            for (_, alt_entry) in alt.iter().filter(|(k, _)| k == "transposed") {
+                let e = leak(alt_entry);
+                let grid = (cols as u64).div_ceil(64).saturating_mul((sites as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+                let (mut words, mut weight, mut r32, mut c32, mut yp, mut ys, mut op, mut a, mut u) = (base, 0u64, rows as u32, cols as u32, yp, rows as u64, op, u32::from(acc), 0u32);
+                variants.push((format!("{e}:{rows}x{cols}"), Box::new(move || cfr.launch(e, grid, THREADS, &mut [arg(&mut words), arg(&mut weight), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ys), arg(&mut op), arg(&mut a), arg(&mut u)]).unwrap())));
+            }
+            timed((sites * rows * cols) as u64, &mut variants);
+        }
+        for &(rows, cols, wide_input) in &[(64usize, 128usize, false), (128, 128, false), (128, 128, true), (128, 0, false)] {
+            let x = if cols == 0 { 0 } else if wide_input { x64_buf.device_ptr() } else { x32_buf.device_ptr() };
+            let mut variants: Vec<(String, Box<dyn FnMut() + '_>)> = Vec::new();
+            let (cfr, gb) = (&cf, &g_buf);
+            let yp = y_buf.device_ptr();
+            let mut words = base;
+            variants.push((format!("field_outer_{}:{rows}x{cols}", if wide_input { "x64" } else { "x32" }), Box::new(move || cfr.outer(&mut words, gb, 0, rows, cols, yp, rows, x, cols.max(1), wide_input, false).unwrap())));
+            for (_, alt_entry) in alt.iter().filter(|(k, _)| k == if wide_input { "outer64" } else { "outer" }) {
+                let e = leak(alt_entry);
+                let (grid, walk) = cf.outer_grid(rows, cols, x != 0, sites);
+                let (mut words, mut gp, mut at, mut r32, mut c32, mut yp, mut ys, mut xp, mut xs, mut u, mut mx, mut wk) = (base, g_buf.device_ptr(), 0u64, rows as u32, cols as u32, yp, rows as u64, x, cols.max(1) as u64, 0u32, 0u64, walk);
+                variants.push((format!("{e}:{rows}x{cols}"), Box::new(move || cfr.launch(e, grid, THREADS, &mut [arg(&mut words), arg(&mut gp), arg(&mut at), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ys), arg(&mut xp), arg(&mut xs), arg(&mut u), arg(&mut mx), arg(&mut wk)]).unwrap())));
+            }
+            timed((sites * rows * cols.max(1)) as u64, &mut variants);
+        }
+        assert_eq!(card.fetch(&status_buf).unwrap()[0], 0, "no word of the bench is refused");
+    }
+
     /// [measurement; theory, November 13, P60 item 2] **The opening's comparison on the card reads the host's bits** (needs the card): a field of
     /// two carry circles with the opening's lift, its readout, current, pair return and the lift moved off zero from a keyed stream's tail and its
     /// paces moved off zero (so the paced heads' clocks are not plain and the cavity clocks differ from the standing ones), read and returned on
