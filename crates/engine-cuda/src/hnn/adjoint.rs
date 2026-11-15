@@ -368,7 +368,7 @@ impl<'c> Resident<'c> {
             let tiles = (sites as u64).div_ceil(64);
             self.launch("field_tied_back_e", Self::cells(a as u64 * dw as u64 * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut dzp), arg(&mut yp)])?;
             let mut enc = words.enc;
-            self.launch("field_tied_back_y", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+            self.launch("field_tied_back_y_tiled", Self::map_grid(dw, sites), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
         }
         let lift_bias = field.layout().lift_bias as u64;
         self.outer(words, g, lift_bias, dw, 0, dyl.device_ptr(), dw, 0, 0, false, true)?;
