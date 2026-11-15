@@ -383,3 +383,19 @@ UTC); `agent-inferred` for the reading of them.
   being nonnegative). Guess, fixed at 20:16 UTC: the forward entry falls to 0.60 to 0.80 of its control a launch, more than
   two limbs' worth, because a coefficient without the factor fits 64 bits and its product with a value is one wide product;
   the returns stay within 5%.
+- **The multiplier's removal, scored** (the build thread, relayed 21:07 UTC). Gate 3 read equal on lap 17: parity on 3
+  sections, the card without the factor against the host with it, 24 sections reproduced and the cavity byte for byte,
+  so the lemma holds on the line's sections. A balanced hold on lap 39's 24 sections, ms a section: control 632.6, 631.8;
+  build 628.3, 627.3; control 633.0, 632.5; build 643.5, 627.8; control 631.7. The control spreads 1.3 ms; three of the
+  four build runs read 627.3 to 628.3, 0.993 of control, and the fourth stands outside both (a card state). That is about
+  4.5 ms a section of the forward contact's 61, so the entry falls to about 0.93: the guess of 0.60 to 0.80 missed high.
+  The miss is the guesser's: it was fixed as if one-limb values came with the change, and the build left them out, as the
+  fourth of the checks sent with the guess had said. Without the factor a row needs 163 bits and the spread; four limbs of
+  64 then hold a spread up to 93 and three up to 29, so a launch whose spread lies between moves from five limbs to four,
+  one limb being the 9% of the entry that §9 there counts. One-limb values (131 and the spread) would move four to three where the spread is
+  at most 61; no guess on that is fixed until the profile prints the limb mix and the spreads.
+- **The lemma is wider than its use.** `div_nearest(x, m)` is the nearest integer to the ratio `x/m`, halves away from
+  zero (for `m` odd no half arises, since `x/m`'s fraction is `k/m`), so it is a function of the ratio alone and sheds any
+  common factor `K ≥ 1`, odd or even; brute force over `|x| ≤ 300`, `m < 60`, `K ≤ 12` finds no exception (atlas
+  `radix.nearest-quotient-of-the-ratio`). A carrier's factor is therefore never the law's wherever the law reads a
+  nearest quotient.
