@@ -62,7 +62,8 @@ restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 
 The engine, the machine that trains, is `holonics_engine::field` in `crates/engine` (lifted from
 `hnn::tower::field` on November 14) with its card realization `holonics_engine_cuda::hnn::field` in
-`crates/engine-cuda` and the store line's commands in `crates/athena`. The October machine retired with C8 of
+`crates/engine-cuda` and the store line's commands in `crates/athena`; [THE_ENGINE](docs/THE_ENGINE.md) is its guide, phase by
+phase, with the guards' table. The October machine retired with C8 of
 #603: the card crate `crates/holonics-cuda` (held at `d6bbd1644`) and the library `crates/holonics` (held at
 `d5ed4adc1`), whose laws stand in the guides, Lean and the atlas. From November 14 the
 [consolidation](docs/plans/THE_CONSOLIDATION.md) (#603) moves it to `crates/engine`,

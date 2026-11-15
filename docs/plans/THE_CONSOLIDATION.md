@@ -502,6 +502,12 @@ holds with the reads' lines.
   modules.
 - Done when a reader can go from the guide's pipeline to each phase's file and kernel by a link,
   and parity holds (a kernel's comment changes its digest).
+- The guide, read November 15: `docs/THE_ENGINE.md` stands, against the cut as it is: what the engine is, the one move with
+  its five index sets and three kinds, the pipeline phase by phase (object, equation, host module, card module and kernels,
+  kind; the Lean owners beside), the line's declaration word by word with the part each sizes, the saved state line by line,
+  where a section's time goes (from lap 17's own lines), the commands and their lines, a reading route, and the guards'
+  table, moved from THE_MACHINE, which points to it. The headers, the operator contract's and HNN_FORMULA's owners, and the
+  dated reasoning in the comments are C7's still; no kernel changed, so parity is not touched.
 
 **C8. The October machine retires** (the PC; several pull requests, leaf first).
 - In order: the card's October modules and kernels, then `crates/holonics-cuda` whole; the examples

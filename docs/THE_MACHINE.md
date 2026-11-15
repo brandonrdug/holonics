@@ -537,34 +537,10 @@ A timeout is an unfinished run at its deadline.
 
 **The guards after the October machine** (C8c of #603, November 15). The constructions below were built on the October
 machine in `crates/holonics` (`hnn`, the receiver's population, the notebook's exterior), which retired with C8c, held at
-[`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics). Each guard keeps one of three ends. Where it holds on the engine, gate 1 runs it. Where it holds as a
-practice rule, CLAUDE.md states it with its reason. Where its object retired, the law it guarded stands in the guide, Lean or
-the atlas row named, and the text below stays as the record of the construction. C7's engine guide carries this table.
-
-| Guard | End | Where it holds now |
-|---|---|---|
-| 1. No tape in the moment; capacity counted | retires with its object (`SourceMoment`) | CLAUDE.md, retention is a quotient; Lean `HNN/RangedMoment`, `HNN/LeakyCapacity` |
-| 2. No word outlives its return | retires with its object (`Word`) | the engine has no word: a region's read is one pass, and its temporaries end with it |
-| 3. A pending ratio holds operands only | retires with its object (the resident's pending ratio) | CLAUDE.md, retention is a quotient |
-| 4. No journal | practice rule | CLAUDE.md, retention is a quotient: the learner's state holds its constitution and moments, no list of deposits |
-| 5. Retention only by the collapse, at aeon boundaries | retires with its object (`close_aeon`) | the aeon's law in ELEMENTARY_OBJECTS and Lean |
-| 6. No clock outside the lift point and the hop clock | retires with its object; the time words stay a practice rule | CLAUDE.md: aeon, epoch and cycle, and no program counter called one |
-| 7. No Lean, no file system or process in the pipeline | holds on the engine as a lint | gate 1's guard lints on `holonics-engine` (`disallowed_types`, `disallowed_methods`); `athena` is the exterior and allows them by name |
-| 8. No templates | practice rule | CLAUDE.md, no catered machinery |
-| 9. The codec is not the architecture | practice rule, with its repair owed | CLAUDE.md, a symbol is a word and one law reads every stream; the engine's codec is the codec's sheet until the symbol's line replaces it (`codec.rs`'s first lines) |
-| 10. No scalar operand | retires with its object (`Word::pull_back`) | CLAUDE.md, loss is the logarithm of a ratio of Holons |
-| 11. Learning is locating keys and depositing covectors | practice rule | CLAUDE.md, keys and navigation; learning uses the covector of a declared comparison |
-| 12. No floats | holds on the engine as a lint | gate 1's guard lints on `holonics-engine` (`float_arithmetic`, `f32`/`f64` disallowed); a reading printed at the exterior allows it where it writes |
-| 13. No compatibility | practice rule | CLAUDE.md, ownership and retirement |
-| 14. No global solve | retires with its object (`propagation.rs`) | the atlas rows of junction-local solves, repinned to their files |
-| 15. Declared charts and residuals; no free tolerance; budgets refuse | practice rule | CLAUDE.md, the precision law |
-| 16. No change outlives its word | retires with its object (`Word`, the reception carry) | the reception carry's record of October 3 |
-| 17. No catered machinery | practice rule | CLAUDE.md, no catered machinery |
-| 18. A release reads the field, never the receiving storage | practice rule | CLAUDE.md, stores and caches |
-| 19. One release per request, shown whole | practice rule | CLAUDE.md, short loops: a product's output shown whole |
-| 20. The receiver's families are sealed | retires with its object (`receiver::population`) | CLAUDE.md, no catered machinery |
-| 21. Seen material is never graded as unseen | practice rule | CLAUDE.md, the lessons (seen material graded as unseen) |
-| 22. A run's limits are a committed pin's | practice rule | CLAUDE.md, waiting, deadlines and concurrency: never raise a limit |
+[`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics). Each guard keeps one of three ends:
+it holds on the engine as a lint gate 1 runs, it holds as a practice rule CLAUDE.md states with its reason, or it retired
+with its object and the law it guarded stands in a guide, Lean or an atlas row. The table of ends is the engine guide's
+([THE_ENGINE §9](THE_ENGINE.md#9-the-guards)); the text below stays as the record of the constructions.
 
 [definition] Each rejected form is excluded by a construction. A type construction is proved by a
 rustdoc `compile_fail` doctest, which needs no new dependency. Lints are enforced by
