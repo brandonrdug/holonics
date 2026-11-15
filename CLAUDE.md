@@ -198,7 +198,14 @@ reading "exact" in this sense, in code, guides or records.
   locales"). An integer at a declared grain is a word at its locale, and a float is a word carrying its
   locale in its exponent. A float add releases at every step to the grain of the partial sum's exponent,
   and that per-step release is what makes a float sum depend on its order; a float sum accumulated at
-  one shared grain and released once is as schedule-free. Reason for the wording: the earlier text
+  one shared grain and released once is as schedule-free. The two kinds of release differ. Dropping a
+  word's top (wrapping, any closing edge) is a quotient, a ring map: it commutes with every bracketing
+  even when partial sums leave the section, so a sum's register needs the declared range of its total,
+  never of its partials. Rounding is a section, a chosen representative: it commutes when it stands once
+  a term before the sum or once after it, never between partials. A section inside an ordered chain (a
+  scan that rounds its store at every step) makes that chain's declared order the law's and drops each
+  remainder unless it is carried ([the record](research/records/2026-11-15_A_VALUE_IS_READ_AT_A_PLACE_A_SUM_IS_ORDERED_ONLY_WHERE_A_RELEASE_IS_A_SECTION_A_CENSUS_CONFIRMS_TO_ITS_OWN_SPREAD_AND_THREADS_RECONCILE_AT_THEIR_CONDITIONAL_INFORMATION.md),
+  `radix.release-quotient-or-section`). Reason for the wording: the earlier text
   ("integer series are the condition for parallel determinism") and a message of that day ("every sum is
   integer") set the register kind where the release's place belongs, a convolution of bit registers with
   the mathematics. This is what lets many cells deposit as one flow, and it holds for any limb layout: a term split into
@@ -709,8 +716,8 @@ hundreds of CPU seconds: the run rules were kept and the architecture and data w
   on both (the same section), never across counters that share a name: the same night a host
   lane was priced at 91 times the card by dividing across two counts both printed as sites, where
   the section itself gives about 480. Reason for the scope (the direction is
-  Brandon's; the wording is `agent-inferred`): integer series give the same bits on any partition
-  of any device, so placement is a realization, and a rule that keeps a kind of work off a device
+  Brandon's; the wording is `agent-inferred`): a sum whose releases are quotients, or sections that stand
+  once, gives the same bits on any partition of any device, so placement is a realization, and a rule that keeps a kind of work off a device
   makes partials of the dynamics close in partitions the transport drew (his correction of
   October 31).
 - **The workload is not a limit's variable.** The design fixes the data, the passes and the
@@ -805,7 +812,7 @@ foreground shell time went to wait loops.
   before it times anything. A line's laps take the lock too, so a timing hold waits for a lap's end instead of splitting it.
   Gates, parity, reproductions and readings take no lock and run beside whatever the card runs, a line's laps included. Reason: on November 15 every profile, gate and timing run of the realization's repair queued
   behind the line's 35-minute laps, and each lap's reads stood between laps, about 8 minutes in every 43, while every sum of the engine
-  meets at one grain and is released once, so it gives the same bits on any schedule and each run sizes its batches from the card memory free when it opens (a lap peaks near 8.5 GB
+  meets at one grain and is released once and every chain runs in its declared order, so it gives the same bits on any schedule and each run sizes its batches from the card memory free when it opens (a lap peaks near 8.5 GB
   of the 16). Scope: every script that launches on the card; a run that shares the card states it in its projection.
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
   by sleeping.
