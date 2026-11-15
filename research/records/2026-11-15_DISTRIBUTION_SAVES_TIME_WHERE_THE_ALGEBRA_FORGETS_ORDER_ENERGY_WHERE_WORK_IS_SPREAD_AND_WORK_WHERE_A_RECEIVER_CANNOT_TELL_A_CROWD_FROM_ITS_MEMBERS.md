@@ -399,3 +399,17 @@ UTC); `agent-inferred` for the reading of them.
   common factor `K ≥ 1`, odd or even; brute force over `|x| ≤ 300`, `m < 60`, `K ≤ 12` finds no exception (atlas
   `radix.nearest-quotient-of-the-ratio`). A carrier's factor is therefore never the law's wherever the law reads a
   nearest quotient.
+- **The limbs' mix and the term's products** (the build thread, relayed 21:49 UTC; 24 of lap 39's sections, twice each
+  build, the card alone). Control: 574 launches at five limbs (2,597 to 2,772 µs each) and 2 at six. Build: 192 at three
+  (347 to 350 µs, launches of few rows), 380 at four (3,362 to 3,394 µs) and 4 at five. The forward contact over the 24
+  sections read 0.86 to 0.91 of control (1,359 to 1,372 ms against 1,497 to 1,596); the timing hold's 0.993 a section
+  included the card's other work. On the expensive launches five limbs to four bought about 13% a launch, because a
+  term's cost is its value and skin loads and its products, and only the mass's shift and add over the limbs and the
+  window's add follow the limb count. A term does three full products of 64 by 64 bits: the skin's carry
+  (`carry_d`), then the coefficient's two words times `|v|`. The precision law cuts each to its information: a framed
+  value reads 23 bits (P54's bits ruler) and a skin word stands on `2^(−30)`, so the carry is one product of 32 by 32
+  bits; and if the coefficient's two words hold the face shifted to its place in its limb, the face times `|v|` is 62 by
+  32 bits, two products of 32 by 32, with the shift applied to the product. A declared crossing keeps the wide path for
+  any word past 32 bits, so every bit is kept. Read first: the largest `|v|` and skin word on the line's sections, and
+  whether the coefficient's second word is ever nonzero outside a crowd. Guess, fixed at 21:52 UTC: on the expensive
+  launches the forward contact reads 0.75 to 0.90 of the limbs build a launch, the returns within 5%.

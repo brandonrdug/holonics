@@ -395,3 +395,12 @@ subject.
   `‖g‖` is proportional to `c`. On this line the acceleration Brandon asked for stands at the units, whose count falls
   with the bits (§9), not at ticks held at a fixed `σ`. Read through the strand lens, the context's tension grows as the
   field learns because the readers it serves are still loud.
+- **The section by tick** (the build thread, relayed 21:49 UTC; six sections of lap 38's end state, a build of `main`
+  tagged by tick, 633 ms of kernels a section). Forward 6.3%, 6.4%, 6.3% and 6.2% at t0 to t3, each led by the forward
+  contact; return 10.7%, 14.7%, 19.5% and 14.4%, each led by the rows, the columns and the skin's return; 15.4% untagged
+  (the opening, the face and its maps, the moments, the deposit). The return is 59% of the section and the forward 25%.
+  The top tick's return alone is 0.144, so `R_top` 0.15 to 0.25 is likely to hold once the face's untagged part is
+  split; the section's guess (0.87 to 0.94) is scored on a timed lap, and the profile projects 0.90 to 0.97 at the
+  returned shares of §10. The return's t0 to t2 are 45% of the section, out of the top-tick law's reach, which is what
+  the held tick, restated as a carry, is for; the last tick's unread work at written sites keeps every bit and is sized
+  by its written share of t3.
