@@ -456,6 +456,9 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
     Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) })
 }
 
+/// The sections the held forward reads at, `σ = 2^(−e)` bits.
+const HELD_SIGMAS: [u32; 2] = [6, 4];
+
 /// [definition; agent-inferred, November 14] **`found-lane STATE STATE_SHA KEYS KEYS_SHA OUT`**: the learner `STATE` with one more lane on its
 /// fine field ([`Learner::laned`]: every read from the lane and every write into it at zero, a tower's level kept and the glue's reads and
 /// writes of the lane at zero), its draws read from `KEYS` past the learner's count, written to `OUT`. Before it writes, every line is judged
@@ -470,9 +473,6 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
 /// and tick: the near field's share, the far sources' by octave of distance, split by whether the receiver probes the source's class, with
 /// each octave's Rényi-2 count and largest share. A reading on the host beside the card's runs: the state is read, never written.
 #[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed fractions and counts (the precision law governs what the machinery stores and computes, not how a reading is written; October 18)")]
-/// The sections the held forward reads at, `σ = 2^(−e)` bits.
-const HELD_SIGMAS: [u32; 2] = [6, 4];
-
 pub fn read_open_rows(args: &[String]) -> Result<()> {
     use holonics_engine::field::{OpenCrowds, OpenRows, OPEN_OCTAVES};
     use rayon::prelude::*;
