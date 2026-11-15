@@ -380,3 +380,18 @@ subject.
   step's own curvature, and brings it near a quarter if it is the readers' summed strain. Guess, fixed then: 0.25 to 0.40
   of the full set's rise in every region. Brandon's lens of 21:35 UTC reads the same law as strain held by the locale
   ([the record](2026-11-15_A_CODE_LENGTH_IS_A_STRANDS_RELAXED_TWIST_A_LOCALE_THAT_CLOSES_IT_HOLDS_THE_REMAINDER_AS_TENSION_AND_STRAIN_PAST_ITS_THRESHOLD_COILS_INTO_THE_LEVEL_ABOVE.md)).
+- **The streaming read, scored** (the build thread, relayed 21:47 UTC: host, the same six sections, lap 38's mean
+  `MEAN.3000` against lap 14's last kept mean `MEAN.2000`). Written sites' held share at 1/16 bit, ticks 0, 1, 2, mean 38
+  against mean 14: code 0.472 / 0.479, 0.573 / 0.589, 0.768 / 0.772; web 0.415 / 0.420, 0.515 / 0.529, 0.724 / 0.727;
+  science 0.437 / 0.440, 0.549 / 0.550, 0.759 / 0.762; books 0.503 / 0.511, 0.602 / 0.614, 0.777 / 0.782; wikidata
+  0.386 / 0.398, 0.489 / 0.512, 0.706 / 0.714. Mean `|a|` a written site moved by −6% to +7%, rising at t1 and t2 in most
+  regions. The guess of a rise of 0.005 to 0.02 missed in sign in all fifteen cells: the held share fell by 0.001 to
+  0.023, most at t1.
+- **Why it missed.** The premise, that a site's move scales with the news its readers carry, was the guesser's, and the
+  logs held its answer: the compared places code 4.17 to 4.27 bits each, where the covector is saturated,
+  `‖g‖₁ = 2(1 − p̂(u))` being about 1.89 at 4.2 bits and 1.87 at 6% less. The readers' pull did not fall with the bits,
+  so `|a|` reads a tick's leverage, and training raised it at the later ticks: the field put more of its code into its
+  context's depth. At the tick level cost follows the compared places' news only where they go dark, under a nat, where
+  `‖g‖` is proportional to `c`. On this line the acceleration Brandon asked for stands at the units, whose count falls
+  with the bits (§9), not at ticks held at a fixed `σ`. Read through the strand lens, the context's tension grows as the
+  field learns because the readers it serves are still loud.
