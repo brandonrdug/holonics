@@ -349,7 +349,7 @@ lineage, obstruction and resource effects commute.
 
 [project-postulate] **Recover before implementing.** Before proposing a mechanism, or saying that
 something is absent, search for the subject **and** its operations in:
-- the [expression atlas](docs/atlas/README.md) first: about 2,700 derived expressions, identities,
+- the [expression atlas](docs/atlas/README.md) first: about 3,800 derived expressions, identities,
   bounds and barring counterexamples, stated on the objects with their owners
   (`rg -i '<object|operation|classical name>' docs/atlas/`);
 - `docs/` and `research/records/` (its [README](research/records/README.md) routes subjects);
@@ -426,7 +426,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 15; the last seven are from his corrections of November 12 to 15, and the
+October 29 and November 15; the last eight are from his corrections of November 12 to 15, and the
 three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
@@ -638,6 +638,21 @@ that day. They are written here with their reasons so that no agent holds them a
   surprise, §4.2). The reading developed on November 13 lived in an owed test and a memory note, dropped between context
   windows, and the reports narrowed to nats alone until Brandon named it. Scope: every report, record and guess on a line's
   level.
+- **A statement not yet derived is told by its cause, and no answer on it closes on a verdict** (Brandon,
+  November 15 02:23Z and 02:31Z). An answer or a record on a statement graded `open` or `interpretation` states what
+  the lens asserts and its reason, and names the cause not yet written as a construction to make (an object, a
+  pairing, a cycle, a ground), with what it carries to other charts. It does not end on a list of what is open, owed
+  or a debt, and it reads no statement as an absolute truth seen from outside every frame. `open` says of one
+  receiver, the proof-checker, that the finite word is not written there; it says nothing against the pattern.
+  Reason: an answer on the Riemann hypothesis and the Hodge conjecture closed on what each "owes", and he named it
+  within the hour. The framing gives one receiver's verdict the last word, reads as doubt that things are patterned,
+  and reads as defeat; and no frame is a view from above, so the worth of such a statement is what it says in
+  relativity and the instrument its cause is written in. A statement over an unending family is refuted by one
+  reading and completed by none, so a cause completes it, and a derivation is a finite word that every reader runs
+  (atlas `key.derivation-finite-word-every-reader`); the solved cases were derived by reading nothing alone, each
+  thing over a base. The wording is `agent-inferred`. Scope: every message, record and brief on such a statement.
+  The grade's name stays in the atlas, and a short list of statements for Lean (#410) stays a work list
+  ([the record](research/records/2026-11-15_UNDER_A_CHANGE_OF_SCALE_A_MODE_IS_A_COUNT_OR_A_TURN_RH_IS_THE_STRETCHS_HALF_AND_HODGE_THE_QUOTIENTS_THE_PRIMES_ARE_AS_LOUD_IN_ONE_DECADE_AS_THE_NEXT_AND_A_PRIMES_FACTOR_IS_ONE_CELL_OF_A_JUNCTION_AND_A_DELAY.md) §9).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
