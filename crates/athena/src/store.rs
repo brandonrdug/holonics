@@ -696,7 +696,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
                     };
                     let shares: Vec<String> = [6usize, 5, 4, 3, 2].iter().map(|&e| { let (a, b) = under(e); format!("s2^-{e}:{a:.3}/{b:.4}") }).collect();
                     let hist = |h: &[u64]| -> String { h.iter().enumerate().filter(|&(_, &v)| v > 0).map(|(b, v)| format!("{b}:{v}")).collect::<Vec<_>>().join(",") };
-                    println!("TICK_NEWS slice={name} tick={k} kind={label} sites={} unread_current={:.4} mean_abs_bits={:.6} under_sigma(sites/mass) {}", c.sites[kind], c.unread[kind] as f64 / n, c.cost_abs[kind] as f64 / n / (1u64 << 40) as f64, shares.join(" "));
+                    println!("TICK_NEWS slice={name} tick={k} kind={label} sites={} unread_current={:.4} rule_misses={}/{} mean_abs_bits={:.6} under_sigma(sites/mass) {}", c.sites[kind], c.unread[kind] as f64 / n, c.rule_misses[0], c.rule_misses[1], c.cost_abs[kind] as f64 / n / (1u64 << 40) as f64, shares.join(" "));
                     println!("TICK_NEWS_OCTAVES slice={name} tick={k} kind={label} cost {} update(80+) {} covector {}", hist(&c.cost[kind]), hist(&c.update[kind]), hist(&c.covector[kind]));
                 }
             }

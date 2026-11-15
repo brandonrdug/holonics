@@ -377,11 +377,14 @@ pub struct TickNews {
     pub covector: [[u64; TICK_OCTAVES]; 2],
     /// The sites whose contact current no reader returns to at this tick (`δỹ = 0` at every head): their rows are read by nobody.
     pub unread: [u64; 2],
+    /// The sites where the strand rule (a site's row is read iff it or a strand neighbour is open) disagrees with `δỹ = 0`: read by the rule
+    /// but unread (`[0]`), unread by the rule but read (`[1]`).
+    pub rule_misses: [u64; 2],
 }
 
 impl Default for TickNews {
     fn default() -> Self {
-        Self { sites: [0; 2], cost: [[0; TICK_OCTAVES]; 2], cost_abs: [0; 2], cost_mass: [[0; TICK_OCTAVES]; 2], update: [[0; TICK_OCTAVES]; 2], covector: [[0; TICK_OCTAVES]; 2], unread: [0; 2] }
+        Self { sites: [0; 2], cost: [[0; TICK_OCTAVES]; 2], cost_abs: [0; 2], cost_mass: [[0; TICK_OCTAVES]; 2], update: [[0; TICK_OCTAVES]; 2], covector: [[0; TICK_OCTAVES]; 2], unread: [0; 2], rule_misses: [0; 2] }
     }
 }
 
@@ -390,6 +393,7 @@ impl TickNews {
         for kind in 0..2 {
             self.sites[kind] += o.sites[kind];
             self.unread[kind] += o.unread[kind];
+            self.rule_misses[kind] += o.rule_misses[kind];
             self.cost_abs[kind] += o.cost_abs[kind];
             for b in 0..TICK_OCTAVES {
                 self.cost[kind][b] += o.cost[kind][b];
@@ -1174,6 +1178,13 @@ impl Constitution {
                 if let Some(cur) = currents.get(k) {
                     let quiet = (0..heads).all(|h| cur[(h * sites + t) * span..(h * sites + t + 1) * span].iter().all(|&v| v == 0));
                     r.unread[kind] += u64::from(quiet);
+                    let open = |u: usize| !Self::definite(region, u);
+                    let read = open(t) || (t > 0 && open(t - 1)) || (t + 1 < sites && open(t + 1));
+                    if read && quiet {
+                        r.rule_misses[0] += 1;
+                    } else if !read && !quiet {
+                        r.rule_misses[1] += 1;
+                    }
                 }
                 let span = t * dw..(t + 1) * dw;
                 let (mut a, mut dd, mut xx, mut ll) = (0i128, 0u128, 0u128, 0u128);
