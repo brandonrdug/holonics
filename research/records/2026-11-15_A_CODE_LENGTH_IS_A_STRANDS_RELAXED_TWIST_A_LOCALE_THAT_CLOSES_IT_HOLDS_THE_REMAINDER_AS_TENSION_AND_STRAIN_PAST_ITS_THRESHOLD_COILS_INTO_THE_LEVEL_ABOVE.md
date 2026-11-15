@@ -116,6 +116,18 @@ and no biology.
   15,644, 10,349 and 5,622 compared places), over the acceptance's 0.003 in four regions. Asked at 22:31 UTC: the carried
   forward at 1/64 and 1/16 bit. Guess, fixed then: at 1/64 bit the carried rise stands under 0.002 nats a compared place
   in every region (the drop's 0.0017 to 0.0067 there times the bound's fraction, with room for t2's drop).
+- **No reader at the last tick is a rounding, not a geometry** (the build thread, relayed 22:36 UTC). At t3, 56 to 63% of
+  written sites carried a contact current no reader returned to, and a mask from the strand rule (a row read iff its site
+  is compared or its strand mate is) was proposed to skip their work. Checked against the adjoint on the six sections,
+  the rule called 18,324, 8,629, 9,948, 4,304 and 3,972 sites unread whose current is read (of unread sets of 40,642,
+  17,435, 18,972, 11,218 and 7,570), because the line's 32 carry circles scan `Q(t) = κb(t) + release(γQ(t ∓ 1), 30)`
+  along the whole strand, so a written site's last `b` reaches every open site on its side. What left a site unread was
+  the scan's own release at every site rounding the carried term to zero over distance: a section inside an ordered
+  chain, which drops each remainder ([the record of a value read at a place](2026-11-15_A_VALUE_IS_READ_AT_A_PLACE_A_SUM_IS_ORDERED_ONLY_WHERE_A_RELEASE_IS_A_SECTION_A_CENSUS_CONFIRMS_TO_ITS_OWN_SPREAD_AND_THREADS_RECONCILE_AT_THEIR_CONDITIONAL_INFORMATION.md)).
+  The mask was withdrawn. Under the scan's unreleased orbit every written site reaches every open site on its side by
+  `γ^d`, so a reader's reach decays and is never cut: the tension of §3 reaches through the circles, and a saving there is
+  lawful only as a release at a declared tolerance with its remainder carried. The same circles are the shared reader of
+  the half-set read: each open site's circles sum the moves of every written site on its side.
 
 ## 5. Twist, writhe and the level above
 
