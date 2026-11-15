@@ -1,0 +1,89 @@
+# profile of 24 of the line's sections from lap 31's STATE.3000 (athena_c5n), FIELD_PROFILE: each kernel's launches and time
+1567 field_contact_rows 2304 680
+1416 field_contact_l5 574 2467
+1350 field_contact_columns 2304 586
+872 field_pace_skin_back 1152 757
+859 field_outer_x32 8544 100
+855 field_transposed 5184 164
+665 field_affine_tiled_x32 4368 152
+494 field_clock_fill 1008 490
+453 field_chart 1776 255
+425 field_exposure 576 738
+419 field_skin_fill 1152 364
+393 field_tied_face 432 911
+380 field_blank_bias_enc 288 1319
+295 field_moment_skinned_all 384 768
+287 field_blank_dy 288 996
+276 field_outer_x64 1392 198
+272 field_affine_tiled_x64 1392 195
+264 field_pair_scan_back 384 689
+221 field_tied_back_e 144 1535
+214 field_pair_scan 384 558
+199 field_blank_lift_read 288 693
+196 field_blank_dz 288 682
+190 field_moment_pace_back_all 384 496
+189 field_ratio_adjoint 1776 106
+185 field_spread 2304 80
+173 field_unit 576 301
+172 field_unit_probe 576 299
+161 field_paces 336 482
+141 field_moment_return_paced_all 384 367
+137 field_moment_prefix_paced_all 1872 73
+134 field_pace_kappa_back 384 350
+119 field_sums 576 207
+97 field_mark_rows 48 2027
+93 field_tied_back_y 144 651
+80 field_pace_c_back 384 210
+80 field_cavity_return_paced_all 768 104
+74 field_cavity_pace_back_all 48 1544
+70 field_unit_back_probe 576 122
+68 field_unit_back 576 119
+68 field_moment_strand_return_all 432 157
+# host phases (FIELD_PHASES)
+STORE_DEPOSIT_PARTS sections=24 read_and_return_ms=15916.6 compared_and_code_ms=64.9 covector_clone_ms=8.5 transfer_price_ms=18.4 entry_rates_ms=4.4 external_step_ms=73.6 external_price_ms=20.3 covector_grains_ms=47.7 moments_ms=10.1 step_ms=71.3 step_price_ms=20.3 reading_parts_ms=0.5 parts_price_ms=26.1 stepped_ms=20.7 rest_ms=0.1
+STORE_HOST sections=24 cut_ms=62.4 views_ms=0.1 realized_ms=16303.9 mean_ms=6.5 lines_ms=0.5 pass_ms=0.0 saves_ms=132.7 elapsed_ms=16671
+FIELD_PHASE name=batch_base marks=48 ms=29 us_a_mark=615 card_ms=0 host_ms=29
+FIELD_PHASE name=batch_drop_and_collect marks=48 ms=13 us_a_mark=278 card_ms=0 host_ms=13
+FIELD_PHASE name=batch_setup marks=96 ms=5 us_a_mark=57 card_ms=0 host_ms=5
+FIELD_PHASE name=batch_takes marks=144 ms=12 us_a_mark=84 card_ms=0 host_ms=12
+FIELD_PHASE name=covector_fetch marks=24 ms=9 us_a_mark=381 card_ms=0 host_ms=9
+FIELD_PHASE name=face_launch marks=96 ms=5 us_a_mark=54 card_ms=0 host_ms=5
+FIELD_PHASE name=mark_first_read marks=48 ms=0 us_a_mark=6 card_ms=0 host_ms=0
+FIELD_PHASE name=material_upload marks=24 ms=15 us_a_mark=638 card_ms=0 host_ms=15
+FIELD_PHASE name=opening_back marks=48 ms=362 us_a_mark=7548 card_ms=0 host_ms=362
+FIELD_PHASE name=opening_forward marks=48 ms=78 us_a_mark=1634 card_ms=0 host_ms=78
+FIELD_PHASE name=outside_the_card marks=24 ms=606 us_a_mark=25278 card_ms=0 host_ms=606
+FIELD_PHASE name=reverse_launch marks=96 ms=9930 us_a_mark=103441 card_ms=0 host_ms=9930
+FIELD_PHASE name=run_end marks=24 ms=36 us_a_mark=1523 card_ms=0 host_ms=36
+FIELD_PHASE name=run_setup marks=48 ms=15 us_a_mark=331 card_ms=0 host_ms=15
+FIELD_PHASE name=stage_lists marks=96 ms=871 us_a_mark=9081 card_ms=0 host_ms=871
+FIELD_PHASE name=stage_pack_upload marks=96 ms=8 us_a_mark=93 card_ms=0 host_ms=8
+FIELD_PHASE name=status_wait marks=96 ms=123 us_a_mark=1290 card_ms=0 host_ms=123
+FIELD_PHASE name=tick_exposure_wait marks=576 ms=2215 us_a_mark=3846 card_ms=0 host_ms=2215
+FIELD_PHASE name=tick_launch_post marks=576 ms=12 us_a_mark=21 card_ms=0 host_ms=12
+FIELD_PHASE name=tick_launch_pre marks=576 ms=2168 us_a_mark=3765 card_ms=0 host_ms=2168
+# gate 3, four fixes
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# timing, four fixes, one balanced hold
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=695.2
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=723.7
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=708.2
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=703.8
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=717.4
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=721.8
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=703.5
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=703.6
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=718.7
+# gate 3, five fixes (comparisons run by hand after the script was edited under it)
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL

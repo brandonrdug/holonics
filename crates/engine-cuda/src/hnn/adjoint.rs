@@ -409,7 +409,7 @@ impl<'c> Resident<'c> {
                     // region's sites from its last to its first, before `field_pace_c_back` and `field_blank_dz` read them.
                     let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
                     let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
-                    self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
+                    self.launch("field_pace_kappa_back", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words), arg(&mut dkp)])?;
                     self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
                     self.blank_back(field, words, clock, &dkappa, g, dx, sites)?;
                 }
@@ -438,7 +438,7 @@ impl<'c> Resident<'c> {
                 // [P58 item 2] Unzeroed, as each tick's: `field_pace_kappa_back` writes every word before `field_pace_c_back` reads it.
                 let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
                 let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
-                self.launch("field_pace_kappa_back", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words), arg(&mut dkp)])?;
+                self.launch("field_pace_kappa_back", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words), arg(&mut dkp)])?;
                 self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
             }
         }

@@ -134,7 +134,7 @@ impl<'c> Resident<'c> {
         let unresolved = words.unresolved;
         words.unresolved = words.blank_read;
         let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
-        self.launch("field_blank_dz", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
+        self.launch("field_blank_dz", (sites as u64).clamp(1, 65_535) as u32, BLANK_DZ_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
         let tiles = (sites as u64).div_ceil(64);
         {
             let (mut gp, mut enc, mut bias, mut dzp, mut yp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr());
@@ -221,7 +221,7 @@ impl<'c> Resident<'c> {
         self.launch("field_blank_rates", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut rp)])?;
         words.unresolved = unresolved;
         set_clock(words, Some(&clock), [0; 7]);
-        self.launch("field_paces", Self::cells((paced * regions) as u64), THREADS, &mut [arg(words)])?;
+        self.launch("field_paces", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words)])?;
         self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
         self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         self.moments(field, words, regions, sites, false)?;

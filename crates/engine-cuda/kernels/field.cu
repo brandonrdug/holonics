@@ -4979,40 +4979,73 @@ __device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, ui
 }
 
 // [definition; agent-inferred, November 5, §16.44] **A blank's clock returns through its face** (the host's
-// `Constitution::blank_return`), one thread a site and a class: at a silent open site `δz_b 2^30 = Σ_p rel(δκ_p · u_{p,b} · ln 2,
-// 24)` with `u_{p,b} = ⌊m_b (c_p[b] − ⌊Σ_a m_a c_p[a] / T⌉) / T⌉`, the face's masses `m` and total `T` its clock read;
-// zero elsewhere.
-extern "C" __global__ void field_blank_dz(FieldWords w, const wide *dkappa, wide *dz) {
-    const uint64_t cells = (uint64_t)w.T * w.A;
+// `Constitution::blank_return`): at a silent open site `δz_b 2^30 = Σ_p rel(δκ_p · u_{p,b} · ln 2, 24)` with
+// `u_{p,b} = ⌊m_b (c_p[b] − ⌊Σ_a m_a c_p[a] / T⌉) / T⌉`, the face's masses `m` and total `T` its clock read; zero elsewhere.
+// [realization; November 15, the engine audit's finding 5] One block a site: the mean `⌊Σ_a m_a c_p[a] / T⌉`, which no class `b` changes, is
+// the block's integer sum once a paced head, where every class had formed it again; then one thread a class, its heads in order. The
+// sums are integer sums, so the bits are the one-thread-a-class form's. Launched with `BLANK_DZ_THREADS` threads a block.
+#define BLANK_DZ_THREADS 256
+#define BLANK_DZ_PACED 8
+extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(FieldWords w, const wide *dkappa, wide *dz) {
+    __shared__ wide red[BLANK_DZ_THREADS];
+    __shared__ wide mean_s[BLANK_DZ_PACED];
+    const uint32_t tid = threadIdx.x, nt = blockDim.x;
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t s = c / w.A;
-        const uint32_t b = c % w.A;
-        dz[c] = 0;
+    if (w.paced > BLANK_DZ_PACED) {
+        if (blockIdx.x == 0 && tid == 0) {
+            atomicOr(w.status, REFUSED_CARRIER);
+        }
+        return;
+    }
+    for (uint64_t s = blockIdx.x; s < w.T; s += gridDim.x) {
         if (!w.unresolved[s] || w.mix_off[s] != w.mix_off[s + 1] || w.blank_totals[s] == 0) {
+            for (uint32_t b = tid; b < w.A; b += nt) {
+                dz[s * w.A + b] = 0;
+            }
             continue;
         }
         const wide total = (wide)w.blank_totals[s];
-        wide out = 0;
         for (uint32_t p = 0; p < w.paced; p++) {
             const wide dk = dkappa[(uint64_t)p * w.T + s];
             if (dk == 0 || depth_head(w, paced_head(w, p))) {
                 continue;
             }
             const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
-            wide sum = 0;
-            for (uint32_t a = 0; a < w.A; a++) {
-                sum += (wide)w.blank_masses[s * w.A + a] * (wide)w.theta[base + a];
+            wide part = 0;
+            for (uint32_t a = tid; a < w.A; a += nt) {
+                part += (wide)w.blank_masses[s * w.A + a] * (wide)w.theta[base + a];
             }
-            const wide mean = div_nearest(sum, total);
-            const wide u = div_nearest((wide)w.blank_masses[s * w.A + b] * ((wide)w.theta[base + b] - mean), total);
-            wide x = 0, y = 0;
-            if (!mul_fits(dk, u, &x) || !mul_fits(x, ln2, &y)) {
-                atomicOr(w.status, REFUSED_CARRIER);
+            red[tid] = part;
+            __syncthreads();
+            for (uint32_t half = nt / 2; half > 0; half >>= 1) {
+                if (tid < half) {
+                    red[tid] += red[tid + half];
+                }
+                __syncthreads();
             }
-            out += rel(y, PACE_BITS);
+            if (tid == 0) {
+                mean_s[p] = div_nearest(red[0], total);
+            }
+            __syncthreads();
         }
-        dz[c] = out;
+        for (uint32_t b = tid; b < w.A; b += nt) {
+            wide out = 0;
+            for (uint32_t p = 0; p < w.paced; p++) {
+                const wide dk = dkappa[(uint64_t)p * w.T + s];
+                if (dk == 0 || depth_head(w, paced_head(w, p))) {
+                    continue;
+                }
+                const uint64_t base = w.pace_at + (uint64_t)p * (w.A + 1);
+                const wide u = div_nearest((wide)w.blank_masses[s * w.A + b] * ((wide)w.theta[base + b] - mean_s[p]), total);
+                wide x = 0, y = 0;
+                if (!mul_fits(dk, u, &x) || !mul_fits(x, ln2, &y)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                }
+                out += rel(y, PACE_BITS);
+            }
+            dz[s * w.A + b] = out;
+        }
+        __syncthreads();
     }
 }
 
@@ -5134,35 +5167,70 @@ __device__ __forceinline__ uint32_t silent_stretch(const FieldWords &w, uint64_t
     return 0;
 }
 
-// [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Constitution::paces`),
-// one thread a paced head and a region over its sites in order: on the class sheet `κ = 2^24 + c_p[u_t]` (§16.16),
-// `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every rate is one (`plain`). Past the
-// region's last arrival every place runs at the first silent place's rate (§16.47, one passage).
-extern "C" __global__ void field_paces(FieldWords w) {
+// [definition; agent-inferred, November 2] **The turned heads' clocks over each region** (the host's `Constitution::paces`): on the
+// class sheet `κ = 2^24 + c_p[u_t]` (§16.16), `τ`, `σ` the exact prefix sums from zero at the region's first site, and whether every
+// rate is one (`plain`). Past the region's last arrival every place runs at the first silent place's rate (§16.47, one passage).
+// [realization; November 15, Brandon 15:19 "40 minutes a lap is a lot"] One block a paced head and region: each thread forms its site's
+// rate, which never reads the clock, and `τ` and `σ` are the block's inclusive scans of the rates past the first site, in tiles of the
+// block carried from one to the next. They are integer sums, so any order gives the bits the one-thread walk gave. Launched with
+// `PACE_SCAN_THREADS` threads a block.
+#define PACE_SCAN_THREADS 256
+extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_paces(FieldWords w) {
+    __shared__ wide sc[PACE_SCAN_THREADS], sv[PACE_SCAN_THREADS];
+    __shared__ uint32_t stretch_s;
+    __shared__ int plain_s;
+    const uint32_t tid = threadIdx.x, nt = blockDim.x;
     const uint64_t cells = (uint64_t)w.paced * w.R;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+    for (uint64_t c = blockIdx.x; c < cells; c += gridDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const uint32_t stretch = w.per_blank ? sites : silent_stretch(w, first, sites);
+        if (tid == 0) {
+            stretch_s = w.per_blank ? sites : silent_stretch(w, first, sites);
+            plain_s = 1;
+        }
+        __syncthreads();
+        const uint32_t stretch = stretch_s;
         // A depth ring's rate is its located increment alone (base zero).
         const wide one = depth_head(w, paced_head(w, p)) ? (wide)0 : (wide)1 << PACE_BITS;
-        wide clock = 0, variation = 0;
-        bool plain = true;
-        for (uint32_t t = 0; t < sites; t++) {
-            const uint64_t g = first + t;
-            const wide k = one + pace_rate(w, p, first + (t > stretch && !w.bare_stretch ? stretch : t));
-            if (t > 0) {
-                clock += k;
-                variation += k < 0 ? -k : k;
+        wide carry_c = 0, carry_v = 0;
+        for (uint32_t base = 0; base < sites; base += nt) {
+            const uint32_t t = base + tid;
+            wide k = 0, kc = 0, kv = 0;
+            if (t < sites) {
+                k = one + pace_rate(w, p, first + (t > stretch && !w.bare_stretch ? stretch : t));
+                if (t > 0) {
+                    kc = k;
+                    kv = k < 0 ? -k : k;
+                }
+                if (k != one) {
+                    plain_s = 0;
+                }
             }
-            plain = plain && k == one;
-            const uint64_t at = (uint64_t)p * w.T + g;
-            w.kappa[at] = fit64(k, w.status);
-            w.tau[at] = fit64(clock, w.status);
-            w.sigma[at] = fit64(variation, w.status);
+            sc[tid] = kc;
+            sv[tid] = kv;
+            __syncthreads();
+            for (uint32_t off = 1; off < nt; off <<= 1) {
+                const wide ac = tid >= off ? sc[tid - off] : (wide)0, av = tid >= off ? sv[tid - off] : (wide)0;
+                __syncthreads();
+                sc[tid] += ac;
+                sv[tid] += av;
+                __syncthreads();
+            }
+            if (t < sites) {
+                const uint64_t at = (uint64_t)p * w.T + first + t;
+                w.kappa[at] = fit64(k, w.status);
+                w.tau[at] = fit64(carry_c + sc[tid], w.status);
+                w.sigma[at] = fit64(carry_v + sv[tid], w.status);
+            }
+            carry_c += sc[nt - 1];
+            carry_v += sv[nt - 1];
+            __syncthreads();
         }
-        w.plain[(uint64_t)p * w.R + r] = plain ? 1 : 0;
+        if (tid == 0) {
+            w.plain[(uint64_t)p * w.R + r] = plain_s ? 1 : 0;
+        }
+        __syncthreads();
     }
 }
 
@@ -5528,11 +5596,15 @@ extern "C" __global__ void field_moment_paced_all(const MomentWords *ws, const u
 
 // [agent-inferred, November 2] **The paced far return's prefixes** (the host's `skinned`): for each moment mode, region
 // whose pace is not plain, octave level `ℓ` and side, `sk[2(ℓ − 2) + left][j] = Σ_(t<j, t reads its octave on that side)
-// D_(t,ℓ,side) release(ζ^(τ_t) δs_t, 30)` on `2^(−54)`, `left` the receivers that read their octave on the left. One
-// thread a mode, region and row, over the region's sites in order. `sk` is `[u][row][T + R][2]`.
-extern "C" __global__ void field_moment_skinned_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, const int64_t *dss, wide *sks, uint64_t stride, uint64_t sk_stride, uint32_t levels, uint32_t tm) {
+// D_(t,ℓ,side) release(ζ^(τ_t) δs_t, 30)` on `2^(−54)`, `left` the receivers that read their octave on the left. `sk` is
+// `[u][row][T + R][2]`. [realization; November 15] One block a mode, region and row: each thread forms its site's term (each released
+// before it enters the sum), and the prefixes are the block's scans in tiles carried from one to the next; integer sums, so the bits are
+// the one-thread walk's. Launched with `PACE_SCAN_THREADS` threads a block.
+extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_moment_skinned_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, const int64_t *dss, wide *sks, uint64_t stride, uint64_t sk_stride, uint32_t levels, uint32_t tm) {
+    __shared__ wide sr[PACE_SCAN_THREADS], si[PACE_SCAN_THREADS];
+    const uint32_t tid = threadIdx.x, nt = blockDim.x;
     const uint64_t cells = (uint64_t)tm * fw.R * 2 * levels;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+    for (uint64_t c = blockIdx.x; c < cells; c += gridDim.x) {
         const uint32_t row = c % (2 * levels);
         const uint32_t r = (c / (2 * levels)) % fw.R;
         const uint32_t u = c / ((uint64_t)2 * levels * fw.R);
@@ -5547,18 +5619,41 @@ extern "C" __global__ void field_moment_skinned_all(const MomentWords *ws, const
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
         const int64_t *ds = dss + (uint64_t)u * stride;
         wide *out = sks + (uint64_t)u * sk_stride + ((uint64_t)row * (fw.T + fw.R) + first + r) * 2;
-        MomentGauss sum = mg_make(0, 0);
-        out[0] = 0;
-        out[1] = 0;
-        for (uint32_t t = 0; t < sites; t++) {
-            const uint64_t gt = first + t;
-            const bool reads = ((uint64_t)1 << level) < sites && (left ? t >= ((uint32_t)1 << level) : (uint64_t)t + ((uint64_t)1 << level) < sites);
-            if (reads) {
-                const MomentGauss turned = mg_mul(paced_absolute(fw, w, pm, gt), mg_load(ds, gt));
-                sum = mg_add(sum, mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), clock_far(fw, pm, gt, level, !left)));
+        if (tid == 0) {
+            out[0] = 0;
+            out[1] = 0;
+        }
+        wide carry_re = 0, carry_im = 0;
+        for (uint32_t base = 0; base < sites; base += nt) {
+            const uint32_t t = base + tid;
+            wide tre = 0, tim = 0;
+            if (t < sites) {
+                const uint64_t gt = first + t;
+                const bool reads = ((uint64_t)1 << level) < sites && (left ? t >= ((uint32_t)1 << level) : (uint64_t)t + ((uint64_t)1 << level) < sites);
+                if (reads) {
+                    const MomentGauss turned = mg_mul(paced_absolute(fw, w, pm, gt), mg_load(ds, gt));
+                    const MomentGauss term = mg_scale(mg_make(rel(turned.re, MOVE_BITS), rel(turned.im, MOVE_BITS)), clock_far(fw, pm, gt, level, !left));
+                    tre = term.re;
+                    tim = term.im;
+                }
             }
-            out[2 * (uint64_t)(t + 1)] = sum.re;
-            out[2 * (uint64_t)(t + 1) + 1] = sum.im;
+            sr[tid] = tre;
+            si[tid] = tim;
+            __syncthreads();
+            for (uint32_t off = 1; off < nt; off <<= 1) {
+                const wide ar = tid >= off ? sr[tid - off] : (wide)0, ai = tid >= off ? si[tid - off] : (wide)0;
+                __syncthreads();
+                sr[tid] += ar;
+                si[tid] += ai;
+                __syncthreads();
+            }
+            if (t < sites) {
+                out[2 * (uint64_t)(t + 1)] = carry_re + sr[tid];
+                out[2 * (uint64_t)(t + 1) + 1] = carry_im + si[tid];
+            }
+            carry_re += sr[nt - 1];
+            carry_im += si[nt - 1];
+            __syncthreads();
         }
     }
 }
@@ -5897,33 +5992,74 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
     }
 }
 
-// [definition; agent-inferred, November 2] **The clocks return to their paces** (the host's tail of `returned`): one
-// thread a paced head and a region, over its sites from the last: `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t` (zero at
-// the region's first site, whose rate ticks no step), into `dkappa[p][t]`; past the last arrival the places' covectors
-// return to the first silent place, whose rate they ran at (§16.47).
-extern "C" __global__ void field_pace_kappa_back(FieldWords w, wide *dkappa) {
+// [definition; agent-inferred, November 2] **The clocks return to their paces** (the host's tail of `returned`), a paced head and a
+// region over its sites from the last: `δκ_k = Σ_(t≥k) δτ_t + sgn(κ_k) Σ_(t≥k) δσ_t` (zero at the region's first site, whose rate ticks
+// no step), into `dkappa[p][t]`; past the last arrival the places' covectors return to the first silent place, whose rate they ran at
+// (§16.47). [realization; November 15] One block a paced head and region: the suffix sums are the block's scans in tiles taken from the
+// region's end, each carried to the next, and the folded covectors past the stretch the block's sum; integer sums, so the bits are the
+// one-thread walk's. Launched with `PACE_SCAN_THREADS` threads a block.
+extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_pace_kappa_back(FieldWords w, wide *dkappa) {
+    __shared__ wide st[PACE_SCAN_THREADS], ss[PACE_SCAN_THREADS];
+    __shared__ wide folded_s;
+    __shared__ uint32_t stretch_s;
+    const uint32_t tid = threadIdx.x, nt = blockDim.x;
     const uint64_t cells = (uint64_t)w.paced * w.R;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+    for (uint64_t c = blockIdx.x; c < cells; c += gridDim.x) {
         const uint32_t p = c / w.R, r = c % w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const uint32_t stretch = w.per_blank ? sites : silent_stretch(w, first, sites);
-        wide tau = 0, sig = 0, folded = 0;
-        for (uint32_t t = sites; t-- > 0;) {
-            const uint64_t at = (uint64_t)p * w.T + first + t;
+        if (tid == 0) {
+            stretch_s = w.per_blank ? sites : silent_stretch(w, first, sites);
+            folded_s = 0;
+        }
+        __syncthreads();
+        const int64_t stretch = stretch_s;
+        const bool fold = !w.bare_stretch;
+        wide carry_t = 0, carry_s = 0;
+        for (int64_t end = sites; end > 0; end -= nt) {
+            const int64_t t = end - 1 - (int64_t)tid;
+            const uint64_t at = (uint64_t)p * w.T + first + (t >= 0 ? (uint64_t)t : 0);
+            const wide gt = t > 0 ? w.gtau[at] : (wide)0, gs = t > 0 ? w.gsig[at] : (wide)0;
+            st[tid] = gt;
+            ss[tid] = gs;
+            __syncthreads();
+            for (uint32_t off = 1; off < nt; off <<= 1) {
+                const wide at_ = tid >= off ? st[tid - off] : (wide)0, as_ = tid >= off ? ss[tid - off] : (wide)0;
+                __syncthreads();
+                st[tid] += at_;
+                ss[tid] += as_;
+                __syncthreads();
+            }
             wide own = 0;
             if (t > 0) {
-                tau += w.gtau[at];
-                sig += w.gsig[at];
+                const wide tau = carry_t + st[tid], sig = carry_s + ss[tid];
                 const int64_t k = w.kappa[at];
                 own = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
             }
-            if (t > stretch && !w.bare_stretch) {
-                folded += own;
-                dkappa[at] = 0;
-            } else {
-                dkappa[at] = own + (t == stretch && !w.bare_stretch ? folded : 0);
+            const wide tile_t = st[nt - 1], tile_s = ss[nt - 1];
+            __syncthreads();
+            st[tid] = (t >= 0 && fold && t > stretch) ? own : (wide)0;
+            __syncthreads();
+            for (uint32_t half = nt / 2; half > 0; half >>= 1) {
+                if (tid < half) {
+                    st[tid] += st[tid + half];
+                }
+                __syncthreads();
             }
+            if (tid == 0) {
+                folded_s += st[0];
+            }
+            __syncthreads();
+            if (t >= 0) {
+                if (fold && t > stretch) {
+                    dkappa[at] = 0;
+                } else {
+                    dkappa[at] = own + (fold && t == stretch ? folded_s : (wide)0);
+                }
+            }
+            carry_t += tile_t;
+            carry_s += tile_s;
+            __syncthreads();
         }
     }
 }
