@@ -375,11 +375,13 @@ pub struct TickNews {
     pub cost_mass: [[u128; TICK_OCTAVES]; 2],
     pub update: [[u64; TICK_OCTAVES]; 2],
     pub covector: [[u64; TICK_OCTAVES]; 2],
+    /// The sites whose contact current no reader returns to at this tick (`δỹ = 0` at every head): their rows are read by nobody.
+    pub unread: [u64; 2],
 }
 
 impl Default for TickNews {
     fn default() -> Self {
-        Self { sites: [0; 2], cost: [[0; TICK_OCTAVES]; 2], cost_abs: [0; 2], cost_mass: [[0; TICK_OCTAVES]; 2], update: [[0; TICK_OCTAVES]; 2], covector: [[0; TICK_OCTAVES]; 2] }
+        Self { sites: [0; 2], cost: [[0; TICK_OCTAVES]; 2], cost_abs: [0; 2], cost_mass: [[0; TICK_OCTAVES]; 2], update: [[0; TICK_OCTAVES]; 2], covector: [[0; TICK_OCTAVES]; 2], unread: [0; 2] }
     }
 }
 
@@ -387,6 +389,7 @@ impl TickNews {
     pub fn add(&mut self, o: &TickNews) {
         for kind in 0..2 {
             self.sites[kind] += o.sites[kind];
+            self.unread[kind] += o.unread[kind];
             self.cost_abs[kind] += o.cost_abs[kind];
             for b in 0..TICK_OCTAVES {
                 self.cost[kind][b] += o.cost[kind][b];
@@ -1158,14 +1161,20 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        let mut currents: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambdas), None)?;
         lambdas.reverse();
-        let (sites, dw) = (region.classes.len(), self.declaration.width);
+        currents.reverse();
+        let (sites, dw, heads, span) = (region.classes.len(), self.declaration.width, self.declaration.heads, 2 * self.declaration.modes);
         let mut out = Vec::with_capacity(pass.ticks.len());
-        for (cell, lambda) in pass.ticks.iter().zip(&lambdas) {
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
             let mut r = TickNews::default();
             for t in 0..sites {
                 let kind = usize::from(!Self::definite(region, t));
+                if let Some(cur) = currents.get(k) {
+                    let quiet = (0..heads).all(|h| cur[(h * sites + t) * span..(h * sites + t + 1) * span].iter().all(|&v| v == 0));
+                    r.unread[kind] += u64::from(quiet);
+                }
                 let span = t * dw..(t + 1) * dw;
                 let (mut a, mut dd, mut xx, mut ll) = (0i128, 0u128, 0u128, 0u128);
                 for ((&after, &before), &l) in cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]) {
@@ -1272,6 +1281,31 @@ impl Constitution {
         };
         let half = |which: bool| -> Vec<Vec<bool>> { (0..ticks).map(|k| (0..sites).map(|t| full[k][t] && side(k, t) == which).collect()).collect() };
         Ok([code(&pass), code(&self.pass_held(region, &full)?), code(&self.pass_held(region, &half(false))?), code(&self.pass_held(region, &half(true))?)])
+    }
+
+    /// [measurement; theory, November 15 22:04Z] **The held set a tick at a time** ([`Constitution::held_forward`]'s oracle at `σ = 2^(40−e)`):
+    /// the compared places' code whole, then with only tick `k`'s held written sites held, a tick each, on `2^(−20)` bits. A reading only.
+    pub fn held_by_tick(&self, region: &Region, e: u32) -> Result<Vec<i128>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let sigma = 1u128 << (40 - e);
+        let mut out = vec![code(&pass)];
+        for k0 in 0..ticks {
+            let mut hold = vec![vec![false; sites]; ticks];
+            let (cell, lambda) = (&pass.ticks[k0], &lambdas[k0]);
+            for t in (0..sites).filter(|&t| Self::definite(region, t)) {
+                let span = t * dw..(t + 1) * dw;
+                let a: i128 = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum();
+                hold[k0][t] = a.unsigned_abs() < sigma;
+            }
+            out.push(code(&self.pass_held(region, &hold)?));
+        }
+        Ok(out)
     }
 
     /// [measurement; G160] **The read's mirror at its founding** ([`Constitution::mirror_route`]): one region's forward and reverse, and for each tick

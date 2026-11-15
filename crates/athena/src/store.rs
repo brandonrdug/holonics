@@ -479,7 +479,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     // [measurement; theory, November 15 21:16Z] `ticks` and `held` read with OTHER's field where given (the sections stay STATE's pass's).
     let mode = args.get(13).map(String::as_str);
     let fits = match (args.len(), mode) {
-        (13, None) | (14, Some("crowds" | "ticks" | "held" | "halves")) => true,
+        (13, None) | (14, Some("crowds" | "ticks" | "held" | "halves" | "bytick")) => true,
         (16, Some("jitter" | "ticks" | "held")) => true,
         _ => false,
     };
@@ -490,6 +490,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let with_ticks = mode == Some("ticks");
     let with_held = mode == Some("held");
     let with_halves = mode == Some("halves");
+    let with_bytick = mode == Some("bytick");
     let loaded = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
     let (other, reader) = if mode == Some("jitter") { (loaded, None) } else { (None, loaded) };
     let started = std::time::Instant::now();
@@ -526,6 +527,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let mut news: Vec<Vec<holonics_engine::field::TickNews>> = vec![vec![holonics_engine::field::TickNews::default(); ticks]; names.len()];
     let mut held: Vec<holonics_engine::field::HeldRead> = vec![holonics_engine::field::HeldRead::default(); names.len()];
     let mut halves: Vec<[i128; 5]> = vec![[0; 5]; names.len()];
+    let mut bytick: Vec<Vec<i128>> = vec![Vec::new(); names.len()];
     let (mut done, mut regions_read) = (0usize, 0usize);
     while done < sections {
         let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
@@ -546,6 +548,19 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         let owned: Vec<OwnedRegion> = regions.iter().map(|(_, r)| r.clone()).collect();
         let views = views_of(&owned);
         let field = reader.as_ref().map_or(&learner.field, |r| &r.field);
+        if with_bytick {
+            // [measurement; theory, November 15 22:04Z] The held set at 1/16 bit a tick at a time, by slice.
+            let read: Vec<std::result::Result<Vec<i128>, String>> = views.par_iter().map(|v| field.held_by_tick(v, 4).map_err(|e| e.to_string())).collect();
+            for ((slice, _), cell) in regions.iter().zip(read) {
+                let c = cell?;
+                bytick[*slice].resize(c.len(), 0);
+                bytick[*slice].iter_mut().zip(&c).for_each(|(a, b)| *a += b);
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("BYTICK_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
         if with_halves {
             // [measurement; theory, November 15 21:45Z] The held set at 1/16 bit and its two complementary halves, by slice.
             let read: Vec<std::result::Result<[i128; 4], String>> = views.par_iter().map(|v| field.held_halves(v, 4).map_err(|e| e.to_string())).collect();
@@ -623,6 +638,16 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
     }
     let kind = |h: usize| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" };
+    if with_bytick {
+        for (s, name) in names.iter().enumerate() {
+            let c = &bytick[s];
+            let Some(&full) = c.first() else { continue };
+            let rises: Vec<String> = c[1..].iter().enumerate().map(|(k, &v)| format!("t{k}={:.3}", (v - full) as f64 / (1u64 << 20) as f64)).collect();
+            println!("BYTICK slice={name} sigma=2^-4 rise_bits {}", rises.join(" "));
+        }
+        println!("BYTICK_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
     if with_halves {
         for (s, name) in names.iter().enumerate() {
             let [full, all, a, b, sites] = halves[s];
@@ -671,7 +696,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
                     };
                     let shares: Vec<String> = [6usize, 5, 4, 3, 2].iter().map(|&e| { let (a, b) = under(e); format!("s2^-{e}:{a:.3}/{b:.4}") }).collect();
                     let hist = |h: &[u64]| -> String { h.iter().enumerate().filter(|&(_, &v)| v > 0).map(|(b, v)| format!("{b}:{v}")).collect::<Vec<_>>().join(",") };
-                    println!("TICK_NEWS slice={name} tick={k} kind={label} sites={} mean_abs_bits={:.6} under_sigma(sites/mass) {}", c.sites[kind], c.cost_abs[kind] as f64 / n / (1u64 << 40) as f64, shares.join(" "));
+                    println!("TICK_NEWS slice={name} tick={k} kind={label} sites={} unread_current={:.4} mean_abs_bits={:.6} under_sigma(sites/mass) {}", c.sites[kind], c.unread[kind] as f64 / n, c.cost_abs[kind] as f64 / n / (1u64 << 40) as f64, shares.join(" "));
                     println!("TICK_NEWS_OCTAVES slice={name} tick={k} kind={label} cost {} update(80+) {} covector {}", hist(&c.cost[kind]), hist(&c.update[kind]), hist(&c.covector[kind]));
                 }
             }
