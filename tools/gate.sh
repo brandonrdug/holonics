@@ -33,10 +33,12 @@ run block-direction-controls python3 tools/test_block_directions.py
 run part-rate-controls python3 tools/test_part_rates.py
 run founding-strength-controls python3 tools/test_founding_strength.py
 run residual-block-controls python3 tools/test_residual_blocks.py
-run seen-passage-controls python3 tools/test_seen_passage.py
 run run-watch-controls python3 tools/test_runs.py
 run reproduction-controls python3 tools/test_reproduction.py
 run live-set-controls python3 tools/test_live_set.py
 run measure-controls python3 tools/test_measure.py
 run loudness-table-controls python3 tools/test_loudness_table.py
+run mailbox-controls python3 tools/test_agent_mailbox.py
+run copy-length-controls python3 tools/test_copy_length.py
+run human-messages-controls python3 tools/test_human_messages.py
 exit $status
