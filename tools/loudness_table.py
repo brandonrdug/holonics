@@ -23,6 +23,9 @@ Printed for each slice (region), and for all slices together:
   - a letter's occurrence within its word (its first, second, third or later time in the word, the word a run of ASCII letters read from
     the places' own units: Brandon, November 15 01:17Z, a count felt as magnitude, never iterated), with loudness, code and color, and
     the places by their word's length;
+  - the ceilings broken: in each stretch read in place order, the places whose code stands above every earlier place's (Brandon,
+    November 15 03:00Z: a surprise past its context's ceiling is a phase transition), counted against the harmonic number an order
+    that carries nothing gives, with the loudness, code and color where they land;
   - each lane's loudness, so a lane that stands apart is seen.
 Rows `W` (the whole masks' open places) are printed as one line a slice: their code and loudness.
 """
@@ -121,6 +124,30 @@ def multiplicity(ps):
         close()
 
 
+def records(ps):
+    """The surprises that break their context's ceiling (Brandon, November 15 03:00Z: a surprise past what its context has held is a
+    phase transition, not noise): in each stretch, read in place order, a place whose code stands above every earlier place's. For a
+    sequence whose order carries nothing (exchangeable), the expected count over n places is the harmonic number H_n, as many in each
+    decade of places as the next (ln 10), so the count over its expectation is read beside the places where it lands."""
+    by = {}
+    for p in ps:
+        by.setdefault((p["slice"], p["stretch"]), []).append(p)
+    seen, expected, at = 0, 0.0, []
+    for seq in by.values():
+        seq.sort(key=lambda p: p["t"])
+        top = None
+        for k, p in enumerate(seq, 1):
+            expected += 1.0 / k
+            if top is None or p["code"] > top:
+                top = p["code"]
+                if k > 1:
+                    seen += 1
+                    at.append(p)
+            p["record"] = top == p["code"] and k > 1
+        expected -= 1.0  # the first place is a ceiling by definition, counted in neither
+    return seen, expected, at
+
+
 def table(name, ps, nlanes):
     out = []
     codes = [p["code"] for p in ps]
@@ -171,6 +198,8 @@ def table(name, ps, nlanes):
             label = f"{lo}-{hi}" if hi < 10**9 else f"{lo}+"
             parts.append(f"len {label}: places={len(sel)} loud={mean([p['loud'] for p in sel]):.3f} nats={mean([p['code'] for p in sel]):.3f}")
         out.append("  places by their word's length: " + "  ".join(parts))
+    seen, expected, at = records(ps)
+    out.append(f"  ceilings broken (a place's code above every earlier place's in its stretch, past the first): {seen} against {expected:.1f} for an order that carries nothing (ratio {seen / expected if expected else float('nan'):.3f}); at them nats={mean([p['code'] for p in at]):.3f} loud={mean([p['loud'] for p in at]):.3f} color={mean([p['color'] for p in at]):.4f} rank-1 share={sum(1 for p in at if p['rank'] == 1) / max(len(at), 1):.2f}")
     out.append("  by lane (octaves): " + "  ".join(f"lane{l}={mean([p['lanes'][l] for p in ps]):.3f}" for l in range(nlanes)))
     return out
 
