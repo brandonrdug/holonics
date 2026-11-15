@@ -129,6 +129,24 @@ and no biology.
   lawful only as a release at a declared tolerance with its remainder carried. The same circles are the shared reader of
   the half-set read: each open site's circles sum the moves of every written site on its side.
 
+- **The carried forward, scored, and the held tick withdrawn** (the build thread, relayed 22:55 UTC; host, lap 38's end,
+  the six sections, 1,400 s; a held move shown stale for one tick and added after the next). Code rise, nats a compared
+  place, dropped against carried: at 1/64 bit code 0.00674 / 0.00380, web 0.00173 / 0.00102, science 0.00529 / 0.00287,
+  books 0.00249 / 0.00167, wikidata 0.00250 / 0.00228; at 1/16 bit 0.02881 / 0.01199, 0.01607 / 0.00653, 0.02472 /
+  0.00942, 0.01748 / 0.00768, 0.02724 / 0.01791. Both guesses missed: under 0.002 at 1/64 bit held on web and books
+  only, and at 1/16 bit the bound missed by 2.0 to 3.3 times in every region. Against the acceptance's 0.003 only web
+  and books pass, at 1/64 bit, where the held share is 18 to 28% of written t0 and 26 to 37% of t1. The held tick at
+  written sites is withdrawn.
+- **Why the carry could not work there.** The bound priced a carry as a staleness the next tick heals, as if the ticks
+  relaxed toward a fixed point. Each tick is its own trained map, a layer, and the forward is their composition: a move
+  delayed one tick changes what the next layer computes from it, and adding it back afterwards does not undo that. A
+  carry is lossless where the carried quantity is summed, as the return's `Σ w c = S` is; a held move inside a
+  composition is a section inside an ordered chain, the release that made the carry scan's sites look unread above, and
+  its remainder has nowhere to be carried. So §3's identity of the two divisions with remainder holds for sums along a
+  strand (the news, the return, the units' count), and a layer's move is no such sum. The cost that follows news stands
+  where the operation is a sum or a quotient: the return on the clock of news and the composite level, whose units fall
+  with the bits. The strain lesson survives as a reading: held moves cost at their shared readers, the carry circles.
+
 ## 5. Twist, writhe and the level above
 
 `from training` for the rod; `agent-inferred` for the join.
