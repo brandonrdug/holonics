@@ -1112,6 +1112,11 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
 // words are staged, a longer walk spends no extra reading, and the bench read 64 × 128 sums at 87 millionths of a second a launch with a
 // walk of 256 (160 blocks) against 178 at 64 and 189 at 1,024, and 128 × 128 sums at 124 with 512 against 292 at 64 and 192 at 1,024.
 #define OUTER_WALK 64
+// [realization; November 15] The sites a thread of the open places' per-entry sums walks (`field_blank_bias_enc`, `field_blank_lift_read`,
+// `field_tied_back_e`): 512, where 64 added each entry's partial atomically once every 64 sites (some ten million 128-bit adds a launch of
+// the encoding's 31,476 entries). Each term is released before it enters the sum, so the walk changes no bit.
+#define BLANK_TILE 512
+
 
 __device__ __forceinline__ uint64_t warp_max64(uint64_t v) {
     for (int o = 16; o > 0; o >>= 1) {
@@ -1166,7 +1171,7 @@ __device__ __forceinline__ void chunk_max_in(uint64_t a, uint64_t b, unsigned lo
 // partial of a 64-bit sum then stands under it); a tile whose chunk breaks the proof begins again in the wide form, its sums on 128 bits over
 // the same words. The forward map's refusal reads each site's largest input over every term, read as the chunks are staged (a warp a site and
 // chunk), or by the wide form's own reading.
-template <typename X, bool TRANSPOSED>
+template <typename X, bool TRANSPOSED, uint32_t RELEASE = MATERIAL_BITS, bool BIAS_AFTER = false, bool ZERO_SKIPPED = false>
 __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved) {
     __shared__ __align__(16) int32_t as[MAP_KC][MAP_TO];
     __shared__ __align__(16) int32_t bs[MAP_KC][MAP_TS];
@@ -1191,10 +1196,14 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
             if (o >= outs) {
                 return;
             }
-            if (!TRANSPOSED && bias != NO_BIAS) {
-                sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+            if (!TRANSPOSED && !BIAS_AFTER && bias != NO_BIAS) {
+                sum += (wide)w.theta[bias + o] << RELEASE;
             }
-            const int64_t v = fit64(rel(sum, MATERIAL_BITS), w.status);
+            wide released = rel(sum, RELEASE);
+            if (!TRANSPOSED && BIAS_AFTER && bias != NO_BIAS) {
+                released += (wide)w.theta[bias + o];
+            }
+            const int64_t v = fit64(released, w.status);
             if (TRANSPOSED) {
                 const uint64_t c = t * cols + o;
                 out[c] = accumulate ? fit64((wide)out[c] + (wide)v, w.status) : v;
@@ -1202,6 +1211,23 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                 add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
             } else {
                 out[t * out_stride + o] = v;
+            }
+        };
+        // A site outside `only_unresolved` writes zeros where `ZERO_SKIPPED` (a reader that reads every site).
+        const auto skip = [&](int b) {
+            const uint64_t t = t0 + 4 * ts + b;
+            if (ZERO_SKIPPED && t < w.T && only_unresolved && !w.unresolved[t]) {
+#pragma unroll
+                for (int a = 0; a < 4; a++) {
+                    const uint32_t o = o0 + 4 * to + a;
+                    if (o < outs) {
+                        if (TRANSPOSED) {
+                            out[t * cols + o] = 0;
+                        } else {
+                            out[t * out_stride + o] = 0;
+                        }
+                    }
+                }
             }
         };
         const auto live = [&](int b, bool refusable) -> bool {
@@ -1294,6 +1320,8 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                         for (int a = 0; a < 4; a++) {
                             emit(a, b, (wide)acc[a][b]);
                         }
+                    } else {
+                        skip(b);
                     }
                 }
             }
@@ -1367,6 +1395,8 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                     for (int a = 0; a < 4; a++) {
                         emit(a, b, accw[a][b]);
                     }
+                } else {
+                    skip(b);
                 }
             }
         }
@@ -1397,6 +1427,19 @@ extern "C" __global__ void __launch_bounds__(256, 2) field_transposed(FieldWords
 // partials stand in 64 bits while the chunks' bound holds (below), on 128 bits otherwise. Each partial is added to its entry once a walk by the ring's atomic step (`add_wide`): an integer sum, the host's bits in any
 // order. The walk's two largest words go to `maxima` (atomic maxima of 64 bits, devices of compute capability 5.0 and over), where the
 // outer bound reads them.
+// [realization; November 15] The face read through the encoding (`field_tied_face`'s law) in the tile form: `z[t][a] = rel(Σ_i E[a][i] y[t][i], 16)
+// + c[a]` at an unresolved site, the encoding's rows the map's (`A × D` at `enc`), the lift `y` its 64-bit input; no site is refused (no weight
+// bound is read: the sum stands in 128 bits for any 32-bit weight and 64-bit lift over the declaration's width). The same integers.
+extern "C" __global__ void __launch_bounds__(256, 2) field_tied_face_tiled(FieldWords w, uint64_t enc, uint64_t bias, const int64_t *y, int64_t *z) {
+    map_tile<int64_t, false, 16, true>(w, enc, bias, 0, w.A, w.D, y, w.D, z, w.A, nullptr, 0, 1);
+}
+
+// [realization; November 15] The lift's covector from the face (`field_tied_back_y`'s law) in the tile form: `dy[t][i] = rel(Σ_a dz[t][a] E[a][i], 16)`
+// at an unresolved site, zero elsewhere. The same integers.
+extern "C" __global__ void __launch_bounds__(256, 2) field_tied_back_y_tiled(FieldWords w, uint64_t enc, const int64_t *dz, int64_t *dy) {
+    map_tile<int64_t, true, 16, false, true>(w, enc, NO_BIAS, 0, w.A, w.D, dz, w.A, dy, w.D, nullptr, 0, 1);
+}
+
 // [realization; November 15, the maps' second loop] The outer sum's tile with no reading pass before it: a walk's chunks are staged as 32-bit limbs while their largest
 // magnitudes are read, the narrow partials going on while the chunks' bound stands under `2^63`; a walk whose chunk breaks it begins again in
 // the wide form. The walk's two largest words go to `maxima` as before.
@@ -3989,53 +4032,21 @@ extern "C" __global__ void field_face_weigh(FieldWords w, const uint64_t *wm, co
 }
 
 // [definition; agent-inferred, November 3, §16.26] The face read through the encoding (the host's `Constitution::tied`): at an
-// unresolved site, `z[t][a] = rel(Σ_i E[a][i] y[t][i], 16) + c[a]`, `E` the encoding's rows at `enc`, `y` the lift on
-// 2^(−16), `c` the class bias at `bias`. One thread a (site, class).
-extern "C" __global__ void field_tied_face(FieldWords w, uint64_t enc, uint64_t bias, const int64_t *y, int64_t *z) {
-    const uint64_t cells = (uint64_t)w.T * w.A;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / w.A, a = c % w.A;
-        if (!w.unresolved[t]) {
-            continue;
-        }
-        const int32_t *row = w.theta + enc + a * w.D;
-        const int64_t *yt = y + t * w.D;
-        wide sum = 0;
-        for (uint32_t i = 0; i < w.D; i++) {
-            sum += (wide)row[i] * (wide)yt[i];
-        }
-        z[c] = fit64(rel(sum, 16) + (wide)w.theta[bias + a], w.status);
-    }
-}
-
-// The lift's covector (§16.26): `dy[t][i] = rel(Σ_a dz[t][a] E[a][i], 16)` at an unresolved site (zero elsewhere).
-extern "C" __global__ void field_tied_back_y(FieldWords w, uint64_t enc, const int64_t *dz, int64_t *dy) {
-    const uint64_t cells = (uint64_t)w.T * w.D;
-    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
-        const uint64_t t = c / w.D, i = c % w.D;
-        if (!w.unresolved[t]) {
-            dy[c] = 0;
-            continue;
-        }
-        wide sum = 0;
-        for (uint32_t a = 0; a < w.A; a++) {
-            sum += (wide)dz[t * w.A + a] * (wide)w.theta[enc + (uint64_t)a * w.D + i];
-        }
-        dy[c] = fit64(rel(sum, 16), w.status);
-    }
-}
+// unresolved site, `z[t][a] = rel(Σ_i E[a][i] y[t][i], 16) + c[a]`, `E` the encoding's rows at `enc`, `y` the lift on 2^(−16), `c` the class
+// bias at `bias`; and the lift's covector `dy[t][i] = rel(Σ_a dz[t][a] E[a][i], 16)` at an unresolved site (zero elsewhere). Both run in the
+// tile form (`field_tied_face_tiled`, `field_tied_back_y_tiled`, November 15), where one thread a cell walked every term on 128 bits.
 
 // The encoding's covector from the face (§16.26): `g[enc + a D + i] += Σ_t rel(dz[t][a] y[t][i], 16)` over the
 // unresolved sites, each term released to the encoding's covector grain before the integer sum (any order, the same
 // bits). One thread an entry and a tile of `OUTER_TILE` sites, as `outer`.
 extern "C" __global__ void field_tied_back_e(FieldWords w, wide *g, uint64_t enc, const int64_t *dz, const int64_t *y) {
     const uint64_t entries = (uint64_t)w.A * w.D;
-    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t a = entry / w.D, i = entry % w.D;
-        const uint64_t from = tile * 64;
-        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        const uint64_t from = tile * BLANK_TILE;
+        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
         wide sum = 0;
         for (uint64_t t = from; t < to; t++) {
             if (!w.unresolved[t]) {
@@ -5199,12 +5210,12 @@ extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(Fi
 // `δE(b)_i += Σ_t rel(δz_b y_i, 46)` over the silent sites, one thread an entry and a tile of 64 sites.
 extern "C" __global__ void field_blank_bias_enc(FieldWords w, wide *g, uint64_t enc, uint64_t bias, const wide *dz, const int64_t *y) {
     const uint64_t entries = (uint64_t)w.A * (w.D + 1);
-    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t b = entry / (w.D + 1), i = entry % (w.D + 1);
-        const uint64_t from = tile * 64;
-        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        const uint64_t from = tile * BLANK_TILE;
+        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
         wide sum = 0;
         for (uint64_t t = from; t < to; t++) {
             const wide d = dz[t * w.A + b];
@@ -5244,12 +5255,12 @@ extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide
 // `δR_(i,j) += Σ_t rel(δy_i r̂_j, 16)`, one thread an entry and a tile of 64 sites.
 extern "C" __global__ void field_blank_lift_read(FieldWords w, wide *g, uint64_t read, uint64_t bias, const int64_t *dy, const int32_t *r) {
     const uint64_t entries = (uint64_t)w.D * (w.D + 1);
-    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t i = entry / (w.D + 1), j = entry % (w.D + 1);
-        const uint64_t from = tile * 64;
-        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        const uint64_t from = tile * BLANK_TILE;
+        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
         wide sum = 0;
         for (uint64_t t = from; t < to; t++) {
             const int64_t d = dy[t * w.D + i];
@@ -5875,7 +5886,7 @@ __device__ __forceinline__ wide re_pair(const FieldWords &w, wide ar, wide ai, M
 
 // One skin term of the moments' clock covector (the host's `pace_return`'s `skin`): `at = release(release(release(inner
 // D, 30) b, 30), 46)`, `δσ_t −= sgn at`, `δσ_k += sgn at`, `sgn = sgn(σ_t − σ_k)`.
-__device__ __forceinline__ void moment_skin_back(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk, wide decay, wide inner, wide b) {
+__device__ __forceinline__ void moment_skin_back(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk, wide decay, wide inner, wide b, wide *own = nullptr) {
     const wide st = (wide)w.sigma[(uint64_t)pm.p * w.T + gt], sk = (wide)w.sigma[(uint64_t)pm.p * w.T + gk];
     if (st == sk) {
         return;
@@ -5886,7 +5897,13 @@ __device__ __forceinline__ void moment_skin_back(const FieldWords &w, const Pace
     }
     const wide at = rel(rel(y, MOVE_BITS), MOVE_BITS + FACE_BITS);
     const wide signed_at = st > sk ? at : -at;
-    add_wide(w.gsig + (uint64_t)pm.p * w.T + gt, -signed_at);
+    // [realization; November 15] With `own`, the receiver's own end is summed on the thread and added once a site (a ring sum on
+    // `Z/2^128`: the same bits), so each term costs one atomic step where it cost two.
+    if (own != nullptr) {
+        *own -= signed_at;
+    } else {
+        add_wide(w.gsig + (uint64_t)pm.p * w.T + gt, -signed_at);
+    }
     add_wide(w.gsig + (uint64_t)pm.p * w.T + gk, signed_at);
 }
 
@@ -5930,15 +5947,16 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
         add_wide(fw.gtau + (uint64_t)pm.p * fw.T + g, dtau);
         // The skins: the plain region's are the same law at whole variations.
         pm.plain = false;
+        wide own_sig = 0;
         const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
         for (uint32_t d = 0; d < forward; ++d) {
             const uint64_t gk = g - d;
-            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b, &own_sig);
         }
         const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
         for (uint32_t d = 0; d < backward; ++d) {
             const uint64_t gk = g + d;
-            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b, &own_sig);
         }
         PacedMode own = paced_mode(fw, cm, r);
         const MomentGauss home = mg_conj(paced_absolute(fw, w, own, g));
@@ -5953,8 +5971,11 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
                 const MomentGauss f = mg_mul(home, mg_sub(mg_load_wide(pre, hi + 1), mg_load_wide(pre, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
                 const uint64_t edge = right ? g + ((uint64_t)1 << level) : g - ((uint64_t)1 << level);
-                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b);
+                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b, &own_sig);
             }
+        }
+        if (own_sig != 0) {
+            add_wide(fw.gsig + (uint64_t)pm.p * fw.T + g, own_sig);
         }
     }
 }

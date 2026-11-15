@@ -123,7 +123,7 @@ impl<'c> Resident<'c> {
         let z = alloc64(sites * a)?;
         {
             let (mut enc, mut cb, mut yp, mut zp) = (cw.enc, cw.read_bias, lift.device_ptr(), z.device_ptr());
-            self.launch("field_tied_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
+            self.launch("field_tied_face_tiled", Self::map_grid(a, sites), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
         }
         let masses = self.timed(Kind::Alloc, || self.take::<u64>((sites * a).max(1))).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
@@ -157,10 +157,10 @@ impl<'c> Resident<'c> {
         let dy = alloc64(sites * dw)?;
         {
             let (mut gp, mut enc, mut dzp, mut yp, mut dyp) = (g.device_ptr(), cw.enc, dz.device_ptr(), op.lift.device_ptr(), dy.device_ptr());
-            let tiles = (sites as u64).div_ceil(64);
+            let tiles = (sites as u64).div_ceil(BLANK_TILE);
             self.launch("field_tied_back_e", Self::cells(a as u64 * dw as u64 * tiles), THREADS, &mut [arg(&mut cw), arg(&mut gp), arg(&mut enc), arg(&mut dzp), arg(&mut yp)])?;
             let mut enc = cw.enc;
-            self.launch("field_tied_back_y", Self::cells((sites * dw) as u64), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+            self.launch("field_tied_back_y_tiled", Self::map_grid(dw, sites), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
         }
         self.outer(&mut cw, g, l.opening_bias as u64, dw, 0, dy.device_ptr(), dw, 0, 0, false, true)?;
         self.outer(&mut cw, g, l.opening as u64, dw, dw, dy.device_ptr(), dw, op.read.device_ptr(), dw, false, true)?;

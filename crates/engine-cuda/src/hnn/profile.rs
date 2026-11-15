@@ -53,9 +53,9 @@ pub struct FieldTimes {
 
 /// [measurement; theory, November 12, P54 item 1] The ruler build's arrays whose words' bits it reads, by clock (`field_yard_bits_*`).
 /// [measurement; theory, November 13, P56 item 1] After them, the share `e` by head and by the receiver's kind (definite, open), heads 0 to 3.
-pub const BITS_NAMES: [&str; 30] = [
+pub const BITS_NAMES: [&str; 31] = [
     "e_score", "e_share", "sb", "ds", "dpb", "skin_l0", "skin_l1", "skin_l2", "skin_l3", "skin_l4", "skin_l5", "skin_l6", "skin_l7", "vf", "qf", "pq", "qf32", "pq32", "ce", "sc", "sw", "sv",
-    "e_share_h0_definite", "e_share_h0_open", "e_share_h1_definite", "e_share_h1_open", "e_share_h2_definite", "e_share_h2_open", "e_share_h3_definite", "e_share_h3_open",
+    "e_share_h0_definite", "e_share_h0_open", "e_share_h1_definite", "e_share_h1_open", "e_share_h2_definite", "e_share_h2_open", "e_share_h3_definite", "e_share_h3_open", "dyh",
 ];
 
 pub const BITS_TICKS: usize = 4;
