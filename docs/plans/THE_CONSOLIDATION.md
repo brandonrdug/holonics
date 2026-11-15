@@ -523,6 +523,11 @@ holds with the reads' lines.
   record. The 37 atlas rows keep their rows: two items that live in the engine's card crate name it,
   and the rest name their files at that commit. Owed to C7: the prose of about twenty guides still
   names `holonics_cuda` owners as current (the operator contract among them).
+- C8b, read November 15: the examples (about 42,000 lines), the notebook's three `[[example]]`
+  entries, holonics's dev-dependency on `athena`, and the listener's tools with their tests retired,
+  held at `8a77b7755`; gate 1 lost the six controls that ran them. The notebook's files stay as data
+  (D7). `hnn::overture` lost its two consumers (the overture examples); it is joined to the engine
+  or its state is written in #146 when `hnn/` retires.
 
 **C9. Position, order and data** (the cloud or the PC; text only).
 - `CONSTRUCTION_STATE.md` holds the position: each line that trains, its commit, its state, its
