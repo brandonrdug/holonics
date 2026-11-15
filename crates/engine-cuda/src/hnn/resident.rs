@@ -21,6 +21,8 @@ use crate::hnn::card::{Card, CardBuffer, CardError};
 pub(crate) const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 
 pub(crate) const THREADS: u32 = 256;
+/// [realization; November 15] The sites a thread of the open places' per-entry sums walks (the kernels' `BLANK_TILE`).
+pub(crate) const BLANK_TILE: u64 = 512;
 /// [realization; November 15] The block of `field_paces`, whose clocks are block scans (the kernel's `PACE_SCAN_THREADS`).
 pub(crate) const PACE_SCAN_THREADS: u32 = 256;
 /// [realization; November 15] The block of `field_blank_dz`, one block a site (the kernel's `BLANK_DZ_THREADS`).
@@ -718,6 +720,11 @@ impl<'c> Resident<'c> {
     }
 
     /// A grid of blocks of `per_block` warps, one warp a row.
+    /// [realization; November 15] A tile-form map's grid (`map_tile` in `kernels/field.cu`): a block a tile of 64 outputs by 64 sites.
+    pub(crate) fn map_grid(outs: usize, sites: usize) -> u32 {
+        (outs as u64).div_ceil(64).saturating_mul((sites as u64).div_ceil(64)).clamp(1, 65_535) as u32
+    }
+
     pub(crate) fn rows_grid(rows: u64, per_block: u64) -> u32 {
         rows.div_ceil(per_block).clamp(1, 1 << 20) as u32
     }
@@ -1747,7 +1754,7 @@ impl<'c> Resident<'c> {
             self.launch("field_tied_face_sharp", Self::cells(t64 * a as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut bp), arg(&mut zp), arg(&mut vp)])?;
         } else {
             let (mut enc, mut cb, mut yp, mut zp) = (words.enc, words.read_bias, lift.device_ptr(), z.device_ptr());
-            self.launch("field_tied_face", Self::cells(t64 * a as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
+            self.launch("field_tied_face_tiled", Self::map_grid(a, t64 as usize), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
         }
         // The cavity field (§15.3): a carried site's read less its own echo.
         if echo_has.iter().any(|&h| h != 0) {

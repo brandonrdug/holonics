@@ -135,7 +135,7 @@ impl<'c> Resident<'c> {
         words.unresolved = words.blank_read;
         let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
         self.launch("field_blank_dz", (sites as u64).clamp(1, 65_535) as u32, BLANK_DZ_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
-        let tiles = (sites as u64).div_ceil(64);
+        let tiles = (sites as u64).div_ceil(BLANK_TILE);
         {
             let (mut gp, mut enc, mut bias, mut dzp, mut yp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr());
             self.launch("field_blank_bias_enc", Self::cells(a as u64 * (dw as u64 + 1) * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut bias), arg(&mut dzp), arg(&mut yp)])?;
@@ -191,7 +191,7 @@ impl<'c> Resident<'c> {
         let z = self.timed(Kind::Alloc, || self.take::<i64>(sites * a)).map_err(device)?;
         {
             let (mut enc, mut cb, mut yp, mut zp) = (words.enc, words.read_bias, lift.device_ptr(), z.device_ptr());
-            self.launch("field_tied_face", Self::cells((sites * a) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
+            self.launch("field_tied_face_tiled", Self::map_grid(a, sites), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
         }
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = if zeroed { self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites)) } else { self.timed(Kind::Alloc, || self.take::<i128>(sites)) }.map_err(device)?;
