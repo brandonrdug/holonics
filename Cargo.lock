@@ -63,21 +63,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "holonics-cuda"
-version = "0.1.0"
-dependencies = [
- "athena",
- "holonics",
- "holonics-engine",
- "holonics-engine-cuda",
- "num-bigint",
- "num-rational",
- "num-traits",
- "rayon",
- "thiserror",
-]
-
-[[package]]
 name = "holonics-engine"
 version = "0.1.0"
 dependencies = [

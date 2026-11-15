@@ -130,7 +130,7 @@ later records, and each states its own scope.
 | Present construction | Evidence and limit |
 |---|---|
 | The Holon law, ratio/ring arithmetic at declared widths, frames, screws, winding, navigators, receivers and release | [`crates/holonics`](crates/holonics), with the [operator contract](docs/ELEMENTARY_OBJECTS.md#operator-contract) and Lean counterparts |
-| HNN host and resident CUDA word, source moments, paired adjoint, comparison, deposition and reception carry | [`holonics::hnn`](crates/holonics/src/hnn), [`holonics-cuda::hnn`](crates/holonics-cuda/src/hnn); [carry receipt](research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md). Per-law parity is scoped to its actual fixture. |
+| HNN host and resident CUDA word, source moments, paired adjoint, comparison, deposition and reception carry | [`holonics::hnn`](crates/holonics/src/hnn), [`holonics-cuda::hnn`](https://github.com/brandonrdug/holonics/tree/d6bbd1644/crates/holonics-cuda/src/hnn) (retired by C8 of #603); [carry receipt](research/records/2026-10-03_THE_RECEPTION_CARRIES_THE_INTERIOR_CHANGE_THE_SOURCE_PORT_IMPOSES_THE_MOMENT_AND_REST_IS_COMPLETE_ABSORPTION.md). Per-law parity is scoped to its actual fixture. |
 | Source entrance only through the producing `Encoded` chart; the card steps by located digits | [Entrance tests](crates/holonics/tests/source_entrance.rs), [encoding/ingest receipt](research/records/2026-10-05_THE_FIELDS_ENTRIES_TAKE_ONLY_THE_ENCODED_SOURCE.md). A refused occurrence moves nothing; a failed device open is discarded. |
 | Host save and cold continuation of contemporary material, charts, clock and arrived comparison | [Cold-restore tests](crates/holonics/tests/resident_cold_restore.rs), [PR #384](https://github.com/brandonrdug/holonics/pull/384). This establishes the declared host continuation cases; card passage restore, the general action-sufficient quotient and broader adaptive retention keep their own gates. |
 | Nonlinear loaded parametron with an executed-domain certificate and carried pump cycle | [Quartic domain](research/records/2026-10-05_THE_QUARTIC_STEP_NEEDS_AN_EXECUTED_DOMAIN_BEFORE_A_LOCK.md), [continuing component](research/records/2026-10-05_THE_LOADED_COMPONENT_CARRIES_ITS_ADMITTED_PUMP_CYCLE.md). The ordinary rounded word and whole nonlinear field are separate joins, and `Holon::interconnect` refuses a loaded quartic element until the joined nonlinear relation is retained. |
@@ -247,8 +247,8 @@ Failures are published with the same care as results.
   later steps update this entry.
 - [`crates/holonics`](crates/holonics) is the host library. Its modules are `holon`, `ratio`,
   `geometry`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `physics` and `hnn`.
-- [`crates/holonics-cuda`](crates/holonics-cuda) is the CUDA driver and the resident HNN.
-- [`accelerators/`](accelerators/README.md) holds device-only builds.
+- The October card crate [`crates/holonics-cuda`](https://github.com/brandonrdug/holonics/tree/d6bbd1644/crates/holonics-cuda) and the device-only builds of
+  [`accelerators/`](https://github.com/brandonrdug/holonics/blob/d6bbd1644/accelerators/README.md) retired with C8 of #603: no path from the engine reached them.
 
 **Research**
 - [Research reading routes](research/records/README.md) route the dated records from July 10, 2026
@@ -298,7 +298,7 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
 - **Physics.** Start with the [fluid construction](docs/HOLONIC_FLUID_CONSTRUCTION.md),
   [mass–energy](docs/MASS_ENERGY_AND_CAUSAL_TRANSPORT.md) and the atlas's `physics.tsv`.
 - **Formal methods.** Start with [`lean/README`](lean/README.md) and `Holonics.Framework`.
-- **GPU and computation at declared widths.** Start with `crates/holonics-cuda` and the hardware law in
+- **GPU and computation at declared widths.** Start with `crates/engine-cuda` and the hardware law in
   [CLAUDE.md](CLAUDE.md#the-objects-governing-laws).
 
 ## How the work is done
@@ -362,7 +362,7 @@ reports that its kernels are absent and refuses to open a card.
 bash tools/gate.sh                             # the workspace check, guard lints and guard doctests
 cargo test -p holonics                         # the host laws
 mkdir -p .local                                # the GPU lock lives here
-flock .local/gpu.lock cargo test -p holonics-cuda -- --include-ignored --test-threads=1  # alone, on an idle NVIDIA card
+flock .local/gpu.lock cargo test -p holonics-engine-cuda -- --include-ignored --test-threads=1  # alone, on an idle NVIDIA card
 bash tools/lean_check.sh                       # the Lean foundation, Holonics
 bash tools/lean_check.sh HolonicsResearch      # the research library
 ```
