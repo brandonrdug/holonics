@@ -358,6 +358,50 @@ pub struct RingStage {
     pub inner: i128,
 }
 
+/// The octaves a [`TickNews`] histogram holds.
+pub const TICK_OCTAVES: usize = 160;
+
+/// [measurement; theory, November 15 20:38Z, the return on the clock of news] **What each site's tick moves, and what reaches it**, one tick:
+/// for each site (`[0]` written, `[1]` open), with `Δx = x^(k+1) − x^k` the tick's own update and `λ^(k+1)` the covector its reverse
+/// receives, `a = ⟨λ^(k+1), Δx⟩` on `2^(−40)` bits (the code's first-order move were the site's tick held, the mirror's grain), counted by
+/// its octave (`0` where `a = 0`, else `⌊log₂|a|⌋ + 1`) with `Σ |a|`; the update against the state it moved, by the octave of
+/// `‖Δx‖² / ‖x^k‖²` (`80 + bits(‖Δx‖²) − bits(‖x^k‖²)`); and the covector's power, by the octave of `‖λ^(k+1)‖²`. A reading only.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TickNews {
+    pub sites: [u64; 2],
+    pub cost: [[u64; TICK_OCTAVES]; 2],
+    pub cost_abs: [u128; 2],
+    /// `Σ |a|` by the octave of `|a|`.
+    pub cost_mass: [[u128; TICK_OCTAVES]; 2],
+    pub update: [[u64; TICK_OCTAVES]; 2],
+    pub covector: [[u64; TICK_OCTAVES]; 2],
+}
+
+impl Default for TickNews {
+    fn default() -> Self {
+        Self { sites: [0; 2], cost: [[0; TICK_OCTAVES]; 2], cost_abs: [0; 2], cost_mass: [[0; TICK_OCTAVES]; 2], update: [[0; TICK_OCTAVES]; 2], covector: [[0; TICK_OCTAVES]; 2] }
+    }
+}
+
+impl TickNews {
+    pub fn add(&mut self, o: &TickNews) {
+        for kind in 0..2 {
+            self.sites[kind] += o.sites[kind];
+            self.cost_abs[kind] += o.cost_abs[kind];
+            for b in 0..TICK_OCTAVES {
+                self.cost[kind][b] += o.cost[kind][b];
+                self.cost_mass[kind][b] += o.cost_mass[kind][b];
+                self.update[kind][b] += o.update[kind][b];
+                self.covector[kind][b] += o.covector[kind][b];
+            }
+        }
+    }
+}
+
+fn octave_of(v: u128) -> usize {
+    ((128 - v.leading_zeros()) as usize).min(TICK_OCTAVES - 1)
+}
+
 /// `log₂ n` on `2^(−16)` for `n ≥ 1` ([`log2_face`] of `n/2^(⌊log₂ n⌋ + 1)` and the whole part).
 pub(crate) fn log2_grain(n: u128) -> i64 {
     let whole = 127 - i64::from(n.max(1).leading_zeros());
@@ -1054,6 +1098,42 @@ impl Constitution {
             }
         }
         Ok((out, audience))
+    }
+
+    /// [measurement; theory, November 15 20:38Z] **What each site's tick moves, and what reaches it** ([`TickNews`]), one region's forward and
+    /// reverse, a [`TickNews`] a tick in the forward's order. A reading only.
+    pub fn tick_news(&self, region: &Region) -> Result<Vec<TickNews>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw) = (region.classes.len(), self.declaration.width);
+        let mut out = Vec::with_capacity(pass.ticks.len());
+        for (cell, lambda) in pass.ticks.iter().zip(&lambdas) {
+            let mut r = TickNews::default();
+            for t in 0..sites {
+                let kind = usize::from(!Self::definite(region, t));
+                let span = t * dw..(t + 1) * dw;
+                let (mut a, mut dd, mut xx, mut ll) = (0i128, 0u128, 0u128, 0u128);
+                for ((&after, &before), &l) in cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]) {
+                    let dx = i128::from(after) - i128::from(before);
+                    a += i128::from(l) * dx;
+                    dd += dx.unsigned_abs().pow(2);
+                    xx += i128::from(before).unsigned_abs().pow(2);
+                    ll += i128::from(l).unsigned_abs().pow(2);
+                }
+                r.sites[kind] += 1;
+                r.cost[kind][octave_of(a.unsigned_abs())] += 1;
+                r.cost_mass[kind][octave_of(a.unsigned_abs())] += a.unsigned_abs();
+                r.cost_abs[kind] += a.unsigned_abs();
+                let rel = (80 + octave_of(dd) as i64 - octave_of(xx) as i64).clamp(0, TICK_OCTAVES as i64 - 1) as usize;
+                r.update[kind][if dd == 0 { 0 } else { rel }] += 1;
+                r.covector[kind][octave_of(ll)] += 1;
+            }
+            out.push(r);
+        }
+        Ok(out)
     }
 
     /// [measurement; G160] **The read's mirror at its founding** ([`Constitution::mirror_route`]): one region's forward and reverse, and for each tick

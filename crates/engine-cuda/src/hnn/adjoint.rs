@@ -395,6 +395,7 @@ impl<'c> Resident<'c> {
             .collect::<Result<_>>()?;
         let covectors = |at: usize| -> [u64; 3] { own.get(at).and_then(Option::as_ref).map_or([dm.device_ptr(), gtau.device_ptr(), gsig.device_ptr()], |b| [b[0].device_ptr(), b[1].device_ptr(), b[2].device_ptr()]) };
         for (at, tick) in ticks.iter().enumerate().rev() {
+            self.tick.set(Some(RETURN_TICK + at as u32));
             set_clock(words, clocks.get(at).and_then(Option::as_ref), base_clock);
             let [dmp, gtp, gsp] = covectors(at);
             (words.gtau, words.gsig) = (gtp, gsp);
@@ -419,6 +420,7 @@ impl<'c> Resident<'c> {
                 }
             }
         }
+        self.tick.set(None);
         set_clock(words, None, base_clock);
         (words.gtau, words.gsig) = (gtau.device_ptr(), gsig.device_ptr());
         // The moment's chart into the face (§16.22, the host's `returned_with`): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`,

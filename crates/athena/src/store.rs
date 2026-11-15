@@ -473,10 +473,11 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
 pub fn read_open_rows(args: &[String]) -> Result<()> {
     use holonics_engine::field::{OpenCrowds, OpenRows, OPEN_OCTAVES};
     use rayon::prelude::*;
-    if args.len() != 13 && !(args.len() == 14 && args[13] == "crowds") && !(args.len() == 16 && args[13] == "jitter") {
-        return Err("read-open-rows UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA [crowds | jitter OTHER OTHER_SHA]".into());
+    if args.len() != 13 && !(args.len() == 14 && (args[13] == "crowds" || args[13] == "ticks")) && !(args.len() == 16 && args[13] == "jitter") {
+        return Err("read-open-rows UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA [crowds | ticks | jitter OTHER OTHER_SHA]".into());
     }
-    let with_crowds = args.len() == 14;
+    let with_crowds = args.len() == 14 && args[13] == "crowds";
+    let with_ticks = args.len() == 14 && args[13] == "ticks";
     let other = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
     let started = std::time::Instant::now();
     refuse_variables("read-open-rows")?;
@@ -509,6 +510,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let mut acc: Vec<Vec<OpenRows>> = vec![vec![OpenRows::default(); ticks * heads]; names.len()];
     let mut crowds: Vec<Vec<OpenCrowds>> = vec![vec![OpenCrowds::default(); ticks * heads]; names.len()];
     let mut jitter: Vec<[[u64; 40]; OPEN_OCTAVES]> = vec![[[0u64; 40]; OPEN_OCTAVES]; ticks * heads];
+    let mut news: Vec<Vec<holonics_engine::field::TickNews>> = vec![vec![holonics_engine::field::TickNews::default(); ticks]; names.len()];
     let (mut done, mut regions_read) = (0usize, 0usize);
     while done < sections {
         let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
@@ -528,6 +530,19 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         }
         let owned: Vec<OwnedRegion> = regions.iter().map(|(_, r)| r.clone()).collect();
         let views = views_of(&owned);
+        if with_ticks {
+            // [measurement; theory, November 15 20:38Z] What each site's tick moves and what reaches it, by slice and tick.
+            let read: Vec<std::result::Result<Vec<holonics_engine::field::TickNews>, String>> = views.par_iter().map(|v| learner.field.tick_news(v).map_err(|e| e.to_string())).collect();
+            for ((slice, _), cells) in regions.iter().zip(read) {
+                for (k, c) in cells?.iter().enumerate() {
+                    news[*slice][k].add(c);
+                }
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("TICK_NEWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
         if let Some(other) = other.as_ref() {
             let read: Vec<std::result::Result<Vec<[[u64; 40]; OPEN_OCTAVES]>, String>> = views.par_iter().map(|v| learner.field.far_jitter(&other.field, v).map_err(|e| e.to_string())).collect();
             for cells in read {
@@ -566,6 +581,28 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
     }
     let kind = |h: usize| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" };
+    if with_ticks {
+        // `a` on `2^(−40)` bits; a share under `σ = 2^(−e)` bits counts the octaves `b ≤ 40 − e` (`|a| < 2^(40 − e)`).
+        for (s, name) in names.iter().enumerate() {
+            for k in 0..ticks {
+                let c = &news[s][k];
+                for (kind, label) in ["written", "open"].iter().enumerate() {
+                    let n = c.sites[kind].max(1) as f64;
+                    let total = c.cost_abs[kind].max(1) as f64;
+                    let under = |e: usize| -> (f64, f64) {
+                        let top = 40 - e;
+                        (c.cost[kind][..=top].iter().sum::<u64>() as f64 / n, c.cost_mass[kind][..=top].iter().sum::<u128>() as f64 / total)
+                    };
+                    let shares: Vec<String> = [6usize, 5, 4, 3, 2].iter().map(|&e| { let (a, b) = under(e); format!("s2^-{e}:{a:.3}/{b:.4}") }).collect();
+                    let hist = |h: &[u64]| -> String { h.iter().enumerate().filter(|&(_, &v)| v > 0).map(|(b, v)| format!("{b}:{v}")).collect::<Vec<_>>().join(",") };
+                    println!("TICK_NEWS slice={name} tick={k} kind={label} sites={} mean_abs_bits={:.6} under_sigma(sites/mass) {}", c.sites[kind], c.cost_abs[kind] as f64 / n / (1u64 << 40) as f64, shares.join(" "));
+                    println!("TICK_NEWS_OCTAVES slice={name} tick={k} kind={label} cost {} update(80+) {} covector {}", hist(&c.cost[kind]), hist(&c.update[kind]), hist(&c.covector[kind]));
+                }
+            }
+        }
+        println!("TICK_NEWS_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
     if other.is_some() {
         // The median and quartiles of |Δz| by head, tick and octave, in bits (the bin's upper edge, 2^(b+1) on the face's 2^(−16) grain).
         let quantile = |hist: &[u64; 40], q: f64| -> f64 {

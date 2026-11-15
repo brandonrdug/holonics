@@ -131,6 +131,9 @@ pub fn tile_proves(k: u128, a: u128, b: u128, bits: u32) -> bool {
 /// [measurement; P57 item 1] The launches a trace keeps: a section's are about 510, so four sections and the run's opening.
 pub const TRACE_LAUNCHES: usize = 2600;
 
+/// The offset of a return's tick in [`FieldProfile::by_tick`].
+pub const RETURN_TICK: u32 = 100;
+
 /// [agent-inferred, November 1] A declared reading (`Resident::profile`): every launch timed alone,
 /// the card synchronized before and after it, by entry; every transfer and allocation timed after the
 /// card's stream has drained, so a run's wall time splits into kernels, copies, allocations and the
@@ -145,6 +148,8 @@ pub struct FieldProfile {
     /// [measurement; theory, November 12, P50 step 0] The launches made a head at a time (the contact's return: its rows, its
     /// columns, the skin's return, the spread), by entry and head: launches and ns.
     pub by_head: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
+    /// [measurement; theory, November 15 20:38Z] The launches by entry and tick (`k` forward, `RETURN_TICK + k` return): launches and ns.
+    pub by_tick: std::collections::BTreeMap<(&'static str, u32), (u64, u128)>,
     /// The site pairs the forward contact met a head, `Σ_i |S_i^h|` over every row and tick of the runs counted in `FieldTimes::pairs`.
     pub pairs_by_head: Vec<u128>,
     /// Each head's kind as the declaration reads it: `still`, `paced` (a turned ring set that is no depth ring, whose skin reads its

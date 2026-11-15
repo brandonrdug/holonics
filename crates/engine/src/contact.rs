@@ -63,6 +63,9 @@ pub(crate) struct TickCell {
     pub(crate) after: Vec<i64>,
     /// [measurement; G162] The state the tick hands on (after the mirror's stage where it is read), kept where the pass keeps its ticks.
     pub(crate) handed: Vec<i64>,
+    /// [measurement; theory, November 15 20:38Z] The state the tick began from (`x^k`, `[t][D]`), kept where the pass keeps its ticks, for the
+    /// reading of what each site's tick moves ([`Constitution::tick_news`]).
+    pub(crate) before: Vec<i64>,
     pub(crate) read: Vec<i32>,
     pub(crate) scale: Vec<i128>,
     /// The unframed key word `[t][2M]`, and the unframed value and probe (the clock's covector reads them, §16).
@@ -819,6 +822,9 @@ impl Constitution {
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
             let began = d.junction.then(|| x.clone());
+            if keep {
+                cell.before = x.clone();
+            }
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
