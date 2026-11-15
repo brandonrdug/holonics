@@ -3,7 +3,8 @@
 November 15, 2026, 20:30 to 21:20 UTC. A derivation on two lenses, with a host ruler on made data. Nothing is built and
 nothing ran on a learner here; the line's readings quoted are the build thread's, relayed to the theory thread. Each
 paragraph carries its grade: `tree` (read in this repository or relayed from the build thread's receipts), `from training`
-(a result of the literature, named) or `agent-inferred` (this record's join).
+(a result of the literature, named) or `agent-inferred` (this record's join). A guess's time is the time its relay left
+the theory thread; the stamps written inside the relays ran up to eleven minutes ahead of that and are not used.
 
 Owners touched: `deposition.cost-follows-surprise`, `hnn.tower-news-clock`, `tower.participation-on-news-ticks`,
 `code.site-isolation-landmark`, `deposition.rate-temperature-standing-spread`, `contact.crowd-slip-bound`,
@@ -156,7 +157,7 @@ relayed 20:37 and 20:40 UTC); `agent-inferred` for the reading of them; `from tr
     pivot commute and leave nothing, so a surgical move is two moves that overlap on a small part with pivots apart, and
     solving is locating those keys by loop closure.
 - **The test and its score.** The gap `E[loud_t | c_(t−τ) in q5] − E[loud_t | c_(t−τ) in q1]` in octaves, own surprise q1,
-  was guessed (20:45 UTC) to dip by −0.13 to −0.16 at `τ = 1` in prose, halve by `τ` = 3 to 6, and stand within 0.02 of
+  was guessed (20:39 UTC) to dip by −0.13 to −0.16 at `τ = 1` in prose, halve by `τ` = 3 to 6, and stand within 0.02 of
   zero by 16, with wikidata's rise at own q5 halving by 6 to 12.
 
   | own q1, τ | 1 | 2 | 3 | 4 | 5 | 6 | 8 | 10 | 12 | 16 | 24 | 32 | 64 |
@@ -174,7 +175,7 @@ relayed 20:37 and 20:40 UTC); `agent-inferred` for the reading of them; `from tr
   every lag to 64 (wikidata about +0.06 to 32).
 - **What decides the long offset.** It is either a switch (a kick past a barrier into a basin that dwells) or a mixture
   (documents that are both more surprising and louder throughout). The read takes each document's own mean loudness out
-  and its fifths of surprise within the document, at `τ` = 1, 4, 16 and 64. Guess, fixed at 20:52 UTC: the offset at
+  and its fifths of surprise within the document, at `τ` = 1, 4, 16 and 64. Guess, fixed at 20:41 UTC: the offset at
   `τ ≥ 16` falls within 0.02 octave in both regions, so it is the mixture, while code's rebound at 6 to 10 places stays,
   a surprising token opening a stretch where its kind recurs. If the offset holds within documents, the switch's dwell
   time is the next reading.
@@ -227,10 +228,10 @@ subject.
   means 33 to 38 by region, at `σ` = 8 bits (one unpredicted octet, the November 13 reason) with 4 and 16 beside, and at
   earlier lap means if they are kept. Two sites stand `σ` apart on the clock of news, so the sites a place are at most
   `S/σ`: from lap 38's fifths (bits a place: code 0.74, science 1.05, books 1.21, web 1.26) 0.092, 0.131, 0.151 and 0.157
-  at 8 bits. Guess, fixed at 20:47 UTC: 0.6 to 0.9 of that bound in each region, falling 0.3 to 1.0% from lap 33 to 38
+  at 8 bits. Guess, fixed at 20:46 UTC: 0.6 to 0.9 of that bound in each region, falling 0.3 to 1.0% from lap 33 to 38
   with code's 0.75% and in at least four of the five steps. At today's rate the dividend in units is then about 1% over
   five laps, and a lap accelerates visibly only where the code still falls fast, which is the early laps he describes.
-- **The level whose sites are those units** (restated at 21:00 UTC; the first statement took the face's top, below). A
+- **The level whose sites are those units** (restated at 20:54 UTC; the first statement took the face's top, below). A
   site carries its composite: the continuation the level's face holds from the landmark (the span release of
   `tower.span-release`), a density `d_t` over the symbols at each interior place, at the field's own temperature. What
   crosses the place's section is the written symbol's news under it, `ĉ_t = −ln d_t(u_t)`. Inside the unit the place
@@ -265,8 +266,8 @@ subject.
   it is a site with chance about `1/k`, so a first round holds one site per `2σ` of news, in every region and lap and at
   every section many places wide, the bright tail adding the excess over one half. A level of these units then costs in
   proportion to the news, and its lap accelerates as its bits fall. The early acceleration Brandon expects lies before lap
-  14, the oldest mean kept. A guess for the level fixed at 20:52 UTC against one less the rank-1 share is withdrawn with the
-  statement it scored. Refixed at 21:00 UTC under the restated rule, from lap 38's fifths with `ĉ ≥ c` (the composite
+  14, the oldest mean kept. A guess for the level fixed at 20:48 UTC against one less the rank-1 share is withdrawn with the
+  statement it scored. Refixed at 20:54 UTC under the restated rule, from lap 38's fifths with `ĉ ≥ c` (the composite
   holds less than the field's own face): at `σ′` = 1/16 bit the places running whole are 0.45 to 0.65 of places on code
   and 0.65 to 0.90 on the prose regions, and they carry at least 0.98 of the unit's news; at `σ′` = 8 bits they are 0.08
   to 0.20 of places and carry 0.4 to 0.7 of it; the held excess code stands under 0.003 nats a place at 1/16 bit in every
@@ -343,7 +344,7 @@ subject.
   with `Σa/Σ|a|` by tick, all and held, beside); and the forward's own criterion (holding by the update in its readers'
   metric, the slip bound's `‖Δx‖` through each reading contact, at the oracle's held share, with the `|a|` mass it holds
   against the oracle's).
-- **Guesses, fixed at 21:16 UTC.**
+- **Guesses, fixed at 21:13 UTC.**
   - The deposit reaches a tick's scale, so the trained ticks stand near its stationary point: `|Σa|/Σ|a|` under 0.3 at
     each written tick in every region, all and held.
   - The held forward then rises under 0.002 bits a written site, summed over ticks, at 1/64 bit, and under 0.009 at 1/16
@@ -351,3 +352,31 @@ subject.
   - For streaming, on `MEAN.14` against `MEAN.38`: the held share at 1/16 bit rises 0.005 to 0.02 at each written tick
     by region, from the printed slope (about 0.16 of share a unit of `ln σ`) times the fall in bits from lap 14 to 38
     (5 to 8%), the move scaling with the news its readers carry.
+- **The held forward, read and scored** (the build thread, relayed 21:36 UTC: host, lap 38's end state, the six
+  sections, 1,095 regions, 1,081 s at 12 threads; compared places code 4.17 to 4.27 bits each). Rise in bits when every
+  written site-tick with `|a| < σ` is held (the oracle), and when as many are held by the chart's own move (the lane rays'
+  squared change, least first), summed over ticks a written site:
+
+  | region | 1/64 bit, oracle / chart | per compared place, oracle | 1/16 bit, oracle / chart | per compared place, oracle |
+  |---|---|---|---|---|
+  | code | 0.00459 / 0.01541 | 0.00972 | 0.01962 / 0.05415 | 0.0416 |
+  | web | 0.00146 / 0.01573 | 0.00249 | 0.01363 / 0.04037 | 0.0232 |
+  | science | 0.00367 / 0.01367 | 0.00763 | 0.01718 / 0.05321 | 0.0357 |
+  | books | 0.00209 / 0.01113 | 0.00359 | 0.01466 / 0.04175 | 0.0252 |
+  | wikidata | 0.00150 / 0.01300 | 0.00361 | 0.01628 / 0.04368 | 0.0393 |
+
+  `Σa/Σ|a|` read −0.030 to +0.053 over all written sites at each tick and −0.037 to +0.116 over the held: the first
+  guess held. The second missed: under 0.002 bits a written site at 1/64 bit held on web and wikidata, stood at the edge
+  on books (0.0021) and missed on code (0.0046) and science (0.0037); under 0.009 at 1/16 bit missed in every region
+  (0.014 to 0.020). The rises stand at 0.5 to 0.7 of the one-signed bounds while the first order cancels, so the cost is
+  second order. The chart's own move held 4.5 to 19 times the oracle's `|a|` mass at the oracle's count and cost 3 to 10
+  times its code, so a site's own metric is not its readers'. At 1/64 bit the oracle's rise a compared place is 0.0017 to
+  0.0067 nats, under the acceptance's 0.003 on web, books and wikidata only, so the held tick does not enter as a drop.
+- **What follows.** A per-site threshold drops each small move alone, the drop of §5 again, and the drops that meet at a
+  reader sum there. The law is restated as a carry: a held site carries its skipped move, and the reader's summed slip
+  `‖Σ_held J Δx‖` is released when it crosses `σ` or at the last tick a reader reads it. At a written site the last read
+  tick is t2 unless its strand mate is open, so a carry from t2 closes nowhere and is priced as a drop. Separating read,
+  sent at 21:37 UTC: a random half of the oracle's held set at 1/16 bit halves the rise if the second order is each
+  step's own curvature, and brings it near a quarter if it is the readers' summed strain. Guess, fixed then: 0.25 to 0.40
+  of the full set's rise in every region. Brandon's lens of 21:35 UTC reads the same law as strain held by the locale
+  ([the record](2026-11-15_A_CODE_LENGTH_IS_A_STRANDS_RELAXED_TWIST_A_LOCALE_THAT_CLOSES_IT_HOLDS_THE_REMAINDER_AS_TENSION_AND_STRAIN_PAST_ITS_THRESHOLD_COILS_INTO_THE_LEVEL_ABOVE.md)).
