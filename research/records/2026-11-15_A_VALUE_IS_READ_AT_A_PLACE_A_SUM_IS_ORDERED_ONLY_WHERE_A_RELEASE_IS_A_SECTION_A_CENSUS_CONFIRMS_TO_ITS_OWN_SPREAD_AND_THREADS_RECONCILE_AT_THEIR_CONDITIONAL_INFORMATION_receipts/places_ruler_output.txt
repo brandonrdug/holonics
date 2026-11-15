@@ -1,0 +1,27 @@
+1. A quotient commutes with every bracketing; a section commutes only once
+   wrapping sum, 4,096 terms, 200 orders: one result, the total; 102066 partial sums left the section
+   released after every add (grain 2): 195 distinct results over 200 orders
+   doubles, 2,000 terms over 40 binades, 100 orders: plain sum 58 distinct results;
+   with every add's remainder carried (TwoSum expansion): the expansion equals the rational total in every
+   order and its one release is 1 result, the rational total's nearest double
+2. Two places reconstruct a total: low digits on Z/2^w, a coarse reading at the real place
+   20,000 totals of 91 bits: recovered from 32 low bits and a reading off by less than 2^31
+3. The carry circle's chain: a section every step holds a charge no leak removes
+   zero drive, 400 steps, 400 gates each: the largest charge still held (grains of 2^-16)
+   |γ| 0.25: 0, |γ| 0.5: 0, |γ| 0.6: 1, |γ| 0.8: 2, |γ| 0.9: 6
+   |γ| 0.8, 64 sites, 50 chains: serial and tree prefixes of the unreleased orbit agree term for term;
+   the card's released chain stands within 2 grains of the orbit released once (bound 3.5)
+4. A census confirms to the grain of its own spread: four charts of one law
+   Mertens M(x): x = 1000: 2, x = 10000: -23, x = 100000: -48, x = 1000000: 212, x = 2000000: -247
+   largest |M(x)|/√x for 100 ≤ x ≤ 2·10^6: 0.567 (a random ±1 walk of the same density stands near 1)
+   y² = x³ − x, odd p < 3000: largest |a_p|/(2√p) = 0.999 (never above 1: the curve's own Frobenius)
+   bias 1/64: mean z of the census by N (and N ε²): 256: 0.42 (0.06), 1024: 0.24 (0.25), 4096: 1.23 (1.00), 16384: 1.95 (4.00), 65536: 3.82 (16.00)
+   |Σ_(n≤2·10^6) μ(n) e(n·0.414214)| / √N = 0.579
+   |Σ_(n≤2·10^6) μ(n) e(n·0.618034)| / √N = 0.907
+   |Σ_(n≤2·10^6) μ(n) e(n·0.333333)| / √N = 0.173
+   |Σ_(n≤2·10^6) μ(n) e(n·0.123457)| / √N = 1.459
+5. Reconciling two readings costs their conditional information (Slepian-Wolf), read by a census of parities
+   error rate 0.01: parities sent / (n h(p)) = 1.03 to 1.14; bits left unequal in 5 x 20,000: 0
+   error rate 0.03: parities sent / (n h(p)) = 1.15 to 1.20; bits left unequal in 5 x 20,000: 0
+   error rate 0.05: parities sent / (n h(p)) = 1.18 to 1.21; bits left unequal in 5 x 20,000: 0
+all checks pass
