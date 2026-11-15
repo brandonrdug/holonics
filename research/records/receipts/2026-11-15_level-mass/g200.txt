@@ -1,0 +1,14 @@
+# news = the opening's block code (cO), the level's own news
+G200 books     epochs=  2871 mean_len= 6.98 (a)rho(sum_power,code)=-0.487 rho(len,code)=-0.491 (b)within-length rho(power_a_place,code)=-0.006 pooled=2702
+G200 code      epochs=  3097 mean_len= 6.50 (a)rho(sum_power,code)=-0.156 rho(len,code)=-0.195 (b)within-length rho(power_a_place,code)=+0.243 pooled=2840
+G200 science   epochs=  3090 mean_len= 6.50 (a)rho(sum_power,code)=-0.436 rho(len,code)=-0.452 (b)within-length rho(power_a_place,code)=+0.058 pooled=2825
+G200 web       epochs=  3905 mean_len= 5.13 (a)rho(sum_power,code)=-0.268 rho(len,code)=-0.298 (b)within-length rho(power_a_place,code)=+0.131 pooled=3303
+G200 wikidata  epochs=  4947 mean_len= 4.09 (a)rho(sum_power,code)=-0.065 rho(len,code)=-0.184 (b)within-length rho(power_a_place,code)=+0.435 pooled=4437
+G200 all       epochs= 17910 mean_len= 5.61 (a)rho(sum_power,code)=-0.222 rho(len,code)=-0.281 (b)within-length rho(power_a_place,code)=+0.289 pooled=16167
+# news = the built opening's no-tick code (c0), the guess's first wording, not the level's news
+G200 books     epochs= 12697 mean_len= 1.58 (a)rho(sum_power,code)=+0.047 rho(len,code)=+0.049 (b)within-length rho(power_a_place,code)=-0.101 pooled=4536
+G200 code      epochs= 12429 mean_len= 1.62 (a)rho(sum_power,code)=+0.215 rho(len,code)=+0.168 (b)within-length rho(power_a_place,code)=+0.120 pooled=4073
+G200 science   epochs= 12389 mean_len= 1.62 (a)rho(sum_power,code)=+0.015 rho(len,code)=-0.013 (b)within-length rho(power_a_place,code)=-0.060 pooled=4455
+G200 web       epochs= 12993 mean_len= 1.54 (a)rho(sum_power,code)=+0.049 rho(len,code)=+0.009 (b)within-length rho(power_a_place,code)=+0.012 pooled=4377
+G200 wikidata  epochs= 13080 mean_len= 1.55 (a)rho(sum_power,code)=+0.162 rho(len,code)=-0.024 (b)within-length rho(power_a_place,code)=+0.327 pooled=4556
+G200 all       epochs= 63588 mean_len= 1.58 (a)rho(sum_power,code)=+0.124 rho(len,code)=+0.035 (b)within-length rho(power_a_place,code)=+0.123 pooled=22004
