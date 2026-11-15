@@ -1,0 +1,16 @@
+TREE_AT_JITTER head=0 kind=still tick=0 far_pairs=4221370 lower_edge: cover=0.5722 tree=0.9511 ratio=1.662  upper_edge: cover=0.4476 tree=0.9151 ratio=2.044
+TREE_AT_JITTER head=0 kind=still tick=1 far_pairs=4221370 lower_edge: cover=0.3919 tree=0.9333 ratio=2.381  upper_edge: cover=0.2780 tree=0.8732 ratio=3.141
+TREE_AT_JITTER head=0 kind=still tick=2 far_pairs=4221370 lower_edge: cover=0.4031 tree=0.9503 ratio=2.358  upper_edge: cover=0.2857 tree=0.9008 ratio=3.153
+TREE_AT_JITTER head=0 kind=still tick=3 far_pairs=4221370 lower_edge: cover=0.4278 tree=0.9581 ratio=2.240  upper_edge: cover=0.3064 tree=0.9158 ratio=2.989
+TREE_AT_JITTER head=1 kind=still tick=0 far_pairs=4221370 lower_edge: cover=0.4767 tree=0.8988 ratio=1.886  upper_edge: cover=0.3559 tree=0.8428 ratio=2.368
+TREE_AT_JITTER head=1 kind=still tick=1 far_pairs=4221370 lower_edge: cover=0.5546 tree=0.9635 ratio=1.737  upper_edge: cover=0.4253 tree=0.9281 ratio=2.182
+TREE_AT_JITTER head=1 kind=still tick=2 far_pairs=4221370 lower_edge: cover=0.4165 tree=0.9437 ratio=2.266  upper_edge: cover=0.2979 tree=0.8865 ratio=2.976
+TREE_AT_JITTER head=1 kind=still tick=3 far_pairs=4221370 lower_edge: cover=0.4297 tree=0.9488 ratio=2.208  upper_edge: cover=0.3100 tree=0.8971 ratio=2.894
+TREE_AT_JITTER head=2 kind=paced tick=0 far_pairs=4221370 lower_edge: cover=0.4904 tree=0.9719 ratio=1.982  upper_edge: cover=0.3739 tree=0.9521 ratio=2.546
+TREE_AT_JITTER head=2 kind=paced tick=1 far_pairs=4221370 lower_edge: cover=0.5366 tree=0.9835 ratio=1.833  upper_edge: cover=0.4181 tree=0.9694 ratio=2.319
+TREE_AT_JITTER head=2 kind=paced tick=2 far_pairs=4221370 lower_edge: cover=0.3922 tree=0.9618 ratio=2.452  upper_edge: cover=0.2844 tree=0.9235 ratio=3.247
+TREE_AT_JITTER head=2 kind=paced tick=3 far_pairs=4221370 lower_edge: cover=0.4539 tree=0.9611 ratio=2.118  upper_edge: cover=0.3367 tree=0.9323 ratio=2.769
+TREE_AT_JITTER head=3 kind=paced tick=0 far_pairs=4221370 lower_edge: cover=0.5348 tree=0.9785 ratio=1.830  upper_edge: cover=0.4097 tree=0.9609 ratio=2.346
+TREE_AT_JITTER head=3 kind=paced tick=1 far_pairs=4221370 lower_edge: cover=0.5301 tree=0.9826 ratio=1.854  upper_edge: cover=0.4013 tree=0.9652 ratio=2.405
+TREE_AT_JITTER head=3 kind=paced tick=2 far_pairs=4221370 lower_edge: cover=0.4456 tree=0.9724 ratio=2.182  upper_edge: cover=0.3275 tree=0.9430 ratio=2.879
+TREE_AT_JITTER head=3 kind=paced tick=3 far_pairs=4221370 lower_edge: cover=0.4649 tree=0.9732 ratio=2.093  upper_edge: cover=0.3390 tree=0.9456 ratio=2.790

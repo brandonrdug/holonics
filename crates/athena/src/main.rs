@@ -50,6 +50,10 @@ fn run(args: &[String]) -> Result<()> {
         return Err("field_pass parity|time|train complete-language COMMAND ARGS…".into());
     }
     println!("FIELD_COMMAND {}", rest[1..].join(" "));
+    // A reading on the host's threads alone opens no card: a run on the card (a timing hold) reads the card's process list empty of it.
+    if mode == "train" && rest.get(1).map(String::as_str) == Some("read-open-rows") {
+        return athena::store::read_open_rows(&rest[1..]);
+    }
     let opened = Card::open(0)?;
     let mut card = Resident::open(&opened)?;
     // [agent-inferred, November 1] A declared reading (`FIELD_PROFILE`): every launch, transfer and
@@ -274,6 +278,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("own-states") => athena::store::own_states(args),
+        Some("read-open-rows") => athena::store::read_open_rows(args),
         Some("write-store") => athena::store::write(args, realization),
         _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud, next-pass or own-states".into()),
     }

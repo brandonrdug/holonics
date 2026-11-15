@@ -464,6 +464,187 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
 /// line's lane words at zero in the first and at their family's mean in the second); every other line (the level's line, its field's
 /// declaration and material, the parts, the pass) is equal. Anything else is refused and nothing is written (November 11: a state tool that
 /// left a line behind). Reads no realization: that every face is kept is read on the card by the line's own held read of the founded state.
+/// [measurement; November 15, T6 of the theory thread's #841] `read-open-rows UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA
+/// SECTIONS STATE STATE_SHA`: the sections the line would train next from `STATE` (a lap's mean: its pass line places the cut), each region's
+/// forward on the host's threads, and its open rows' shares by where they lie ([`holonics_engine::field::OpenRows`]), summed by slice, head
+/// and tick: the near field's share, the far sources' by octave of distance, split by whether the receiver probes the source's class, with
+/// each octave's Rényi-2 count and largest share. A reading on the host beside the card's runs: the state is read, never written.
+#[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed fractions and counts (the precision law governs what the machinery stores and computes, not how a reading is written; October 18)")]
+pub fn read_open_rows(args: &[String]) -> Result<()> {
+    use holonics_engine::field::{OpenCrowds, OpenRows, OPEN_OCTAVES};
+    use rayon::prelude::*;
+    if args.len() != 13 && !(args.len() == 14 && args[13] == "crowds") && !(args.len() == 16 && args[13] == "jitter") {
+        return Err("read-open-rows UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA [crowds | jitter OTHER OTHER_SHA]".into());
+    }
+    let with_crowds = args.len() == 14;
+    let other = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
+    let started = std::time::Instant::now();
+    refuse_variables("read-open-rows")?;
+    let units = units_of(&args[1], &args[2])?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let role = args[5].as_str();
+    let keys = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?, units)?;
+    let sections = positive(&args[10])?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let pass = learner.pass.clone().ok_or("a state with no pass line: read-open-rows reads a state of the store's line")?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let names: Vec<&str> = SLICES.iter().copied().filter(|n| counts.contains_key(&(role.to_string(), n.to_string()))).collect();
+    if pass.role != role || pass.slices.iter().map(|s| s.name.as_str()).ne(names.iter().copied()) {
+        return Err("a state whose pass is of another role or slices".into());
+    }
+    let stem = if role == "held" { "HELD" } else { "DOCS" };
+    let mut slices = Vec::with_capacity(names.len());
+    for &name in &names {
+        let (count, quota) = counts[&(role.to_string(), name.to_string())];
+        slices.push(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) });
+    }
+    let d = learner.field.declaration;
+    let (heads, ticks) = (d.heads, d.ticks);
+    let mut cut = Cut { seed, slices, pass };
+    let mut acc: Vec<Vec<OpenRows>> = vec![vec![OpenRows::default(); ticks * heads]; names.len()];
+    let mut crowds: Vec<Vec<OpenCrowds>> = vec![vec![OpenCrowds::default(); ticks * heads]; names.len()];
+    let mut jitter: Vec<[[u64; 40]; OPEN_OCTAVES]> = vec![[[0u64; 40]; OPEN_OCTAVES]; ticks * heads];
+    let (mut done, mut regions_read) = (0usize, 0usize);
+    while done < sections {
+        let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
+        let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        while let Some(drawn) = cut.next() {
+            let n = drawn.sites();
+            if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
+                break;
+            }
+            let slice = drawn.slice;
+            let Stretch { region, .. } = cut.take(drawn, &codec)?;
+            (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
+            regions.push((slice, region));
+        }
+        if regions.is_empty() {
+            break;
+        }
+        let owned: Vec<OwnedRegion> = regions.iter().map(|(_, r)| r.clone()).collect();
+        let views = views_of(&owned);
+        if let Some(other) = other.as_ref() {
+            let read: Vec<std::result::Result<Vec<[[u64; 40]; OPEN_OCTAVES]>, String>> = views.par_iter().map(|v| learner.field.far_jitter(&other.field, v).map_err(|e| e.to_string())).collect();
+            for cells in read {
+                for (a, c) in jitter.iter_mut().zip(cells?) {
+                    for o in 0..OPEN_OCTAVES {
+                        for b in 0..40 {
+                            a[o][b] += c[o][b];
+                        }
+                    }
+                }
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
+        let read: Vec<std::result::Result<(Vec<OpenRows>, Vec<OpenCrowds>), String>> = views
+            .par_iter()
+            .map(|v| {
+                let rows = learner.field.open_rows(v).map_err(|e| e.to_string())?;
+                let cr = if with_crowds { learner.field.open_crowds(v).map_err(|e| e.to_string())? } else { Vec::new() };
+                Ok((rows, cr))
+            })
+            .collect();
+        for ((slice, _), cells) in regions.iter().zip(read) {
+            let (rows, cr) = cells?;
+            for (a, c) in acc[*slice].iter_mut().zip(rows) {
+                a.add(&c);
+            }
+            for (a, c) in crowds[*slice].iter_mut().zip(cr) {
+                a.add(&c);
+            }
+        }
+        regions_read += regions.len();
+        done += 1;
+        println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+    }
+    let kind = |h: usize| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" };
+    if other.is_some() {
+        // The median and quartiles of |Δz| by head, tick and octave, in bits (the bin's upper edge, 2^(b+1) on the face's 2^(−16) grain).
+        let quantile = |hist: &[u64; 40], q: f64| -> f64 {
+            let total: u64 = hist.iter().sum();
+            let mut run = 0u64;
+            for (b, &c) in hist.iter().enumerate() {
+                run += c;
+                if run as f64 >= q * total as f64 {
+                    return (1u64 << (b + 1)) as f64 / 65536.0;
+                }
+            }
+            f64::NAN
+        };
+        for h in 0..heads {
+            for k in 0..ticks {
+                let cell = &jitter[k * heads + h];
+                let mut all = [0u64; 40];
+                for o in 0..OPEN_OCTAVES {
+                    for b in 0..40 {
+                        all[b] += cell[o][b];
+                    }
+                }
+                let by: Vec<String> = (0..OPEN_OCTAVES).filter(|&o| cell[o].iter().sum::<u64>() > 0).map(|o| format!("o{o}:{:.4}/{:.4}/{:.4}", quantile(&cell[o], 0.25), quantile(&cell[o], 0.5), quantile(&cell[o], 0.75))).collect();
+                println!("FAR_JITTER head={h} kind={} tick={k} pairs={} q25_bits={:.4} median_bits={:.4} q75_bits={:.4} by_octave(q25/median/q75) {}", kind(h), all.iter().sum::<u64>(), quantile(&all, 0.25), quantile(&all, 0.5), quantile(&all, 0.75), by.join(" "));
+            }
+        }
+        println!("OPEN_ROWS_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
+    let frac = |x: u128, total: u128| if total == 0 { 0.0 } else { x as f64 / total as f64 };
+    for (s, name) in names.iter().enumerate() {
+        for h in 0..heads {
+            for k in 0..ticks {
+                let c = &acc[s][k * heads + h];
+                let total = c.near + c.crowd + c.far.iter().flatten().sum::<u128>();
+                let (probed, other): (u128, u128) = (c.far.iter().map(|f| f[1]).sum(), c.far.iter().map(|f| f[0]).sum());
+                println!("OPEN_ROWS slice={name} head={h} kind={} tick={k} rows={} near={:.4} crowd={:.4} far_probed={:.4} far_other={:.4}", kind(h), c.rows, frac(c.near, total), frac(c.crowd, total), frac(probed, total), frac(other, total));
+                let octaves: Vec<String> = (0..OPEN_OCTAVES)
+                    .filter(|&o| c.counted[o][0] + c.counted[o][1] > 0)
+                    .map(|o| {
+                        let part = |k: usize| {
+                            let n = c.counted[o][k].max(1) as f64;
+                            format!("{:.4}/{:.1}/{:.3}", frac(c.far[o][k], total), c.effective[o][k] as f64 / 256.0 / n, c.peak[o][k] as f64 / 65536.0 / n)
+                        };
+                        format!("o{o}:probed={},other={}", part(1), part(0))
+                    })
+                    .collect();
+                println!("OPEN_ROWS_OCTAVES slice={name} head={h} tick={k} (share/renyi2_count/peak) {}", octaves.join(" "));
+                if with_crowds {
+                    let c = &crowds[s][k * heads + h];
+                    let (pairs, band, lock): (u64, u64, u64) = (c.pairs.iter().sum(), c.band_terms.iter().sum(), c.lock_terms.iter().sum());
+                    println!("OPEN_CROWDS slice={name} head={h} kind={} tick={k} rows={} far_pairs={pairs} band_terms={band} band_ratio={:.4} lock_terms={lock} lock_ratio={:.4}", kind(h), c.rows, band as f64 / pairs.max(1) as f64, lock as f64 / pairs.max(1) as f64);
+                    let by: Vec<String> = (0..OPEN_OCTAVES)
+                        .filter(|&o| c.pairs[o] > 0)
+                        .map(|o| format!("o{o}:pairs={},band={:.3},lock={:.3},whole_band={:.3},whole_lock={:.3}", c.pairs[o], c.band_terms[o] as f64 / c.pairs[o] as f64, c.lock_terms[o] as f64 / c.pairs[o] as f64, c.band_whole[o] as f64 / c.crowds[o].max(1) as f64, c.lock_whole[o] as f64 / c.crowds[o].max(1) as f64))
+                        .collect();
+                    println!("OPEN_CROWDS_OCTAVES slice={name} head={h} tick={k} {}", by.join(" "));
+                    let wider: Vec<String> = ["quarter_bit", "one_bit", "four_bits"]
+                        .iter()
+                        .enumerate()
+                        .map(|(t, label)| format!("{label}:band={:.4},lock={:.4}", c.band_at[t].iter().sum::<u64>() as f64 / pairs.max(1) as f64, c.lock_at[t].iter().sum::<u64>() as f64 / pairs.max(1) as f64))
+                        .collect();
+                    println!("OPEN_CROWDS_WIDER slice={name} head={h} tick={k} {}", wider.join(" "));
+                    let cover: Vec<String> = ["sixteenth_bit", "quarter_bit", "one_bit", "four_bits"]
+                        .iter()
+                        .enumerate()
+                        .map(|(t, label)| format!("{label}={:.4}", c.cover[t].iter().sum::<u64>() as f64 / pairs.max(1) as f64))
+                        .collect();
+                    println!("OPEN_CROWDS_COVER slice={name} head={h} kind={} tick={k} (the floor of any grouping by lock, over the far pairs) {}", kind(h), cover.join(" "));
+                    let by_octave: Vec<String> = (0..OPEN_OCTAVES).filter(|&o| c.pairs[o] > 0).map(|o| format!("o{o}:{:.3}/{:.3}/{:.3}/{:.3}", c.cover[0][o] as f64 / c.pairs[o] as f64, c.cover[1][o] as f64 / c.pairs[o] as f64, c.cover[2][o] as f64 / c.pairs[o] as f64, c.cover[3][o] as f64 / c.pairs[o] as f64)).collect();
+                    println!("OPEN_CROWDS_COVER_OCTAVES slice={name} head={h} tick={k} {}", by_octave.join(" "));
+                }
+            }
+        }
+    }
+    println!("OPEN_ROWS_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
 pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());
