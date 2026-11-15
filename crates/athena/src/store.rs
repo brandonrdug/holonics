@@ -237,7 +237,7 @@ pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect() });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect() });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -610,6 +610,34 @@ pub fn found_loud(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// A state's text with its pass line replaced by `pass`'s, every other line byte for byte: the written text, its count of lines and the one
+/// line that differs (counted from 1), read back and checked (its field the source's, its count of stretches kept). Refused where any other
+/// line would differ. The one tool under [`next_pass`] and [`own_states`].
+fn with_pass(text: &str, learner: &FieldLearner, pass: StorePass) -> Result<(String, usize, usize)> {
+    let stretches = pass.stretches;
+    let mut next = learner.clone();
+    next.pass = Some(pass);
+    let written = next.to_text();
+    let (old_lines, new_lines): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
+    if old_lines.len() != new_lines.len() {
+        return Err("a written pass whose state has a different count of lines".into());
+    }
+    let differing: Vec<usize> = (0..old_lines.len()).filter(|&i| old_lines[i] != new_lines[i]).collect();
+    if differing.len() != 1 || !old_lines[differing[0]].starts_with("pass ") {
+        return Err(format!("a written pass that changes lines other than the pass line ({:?})", differing).into());
+    }
+    let back = FieldLearner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.pass.as_ref().map(|p| p.stretches) != Some(stretches) || back.field != learner.field || back.pass != next.pass {
+        return Err("a written pass whose state does not read back as the source's field, count and pass".into());
+    }
+    Ok((written, old_lines.len(), differing[0] + 1))
+}
+
+/// A pass's slices as `NAME:PIECE:TAKEN`, joined by commas.
+fn slices_text(pass: &StorePass) -> String {
+    pass.slices.iter().map(|s| format!("{}:{}:{}", s.name, s.piece, s.taken)).collect::<Vec<_>>().join(",")
+}
+
 /// [definition; agent-inferred, November 13] `next-pass STATE STATE_SHA OUT`: **a state's next pass over its role**: the state with its pass line's
 /// slices set back to their first piece (piece, cursor and places taken zero), its count of stretches kept, so the next pass's cuts and masks
 /// are drawn afresh from the key stream (a stretch's length and mask are keyed by that count, [`Cut::next`]) over the same documents, and
@@ -626,28 +654,40 @@ pub fn next_pass(args: &[String]) -> Result<()> {
         return Err(format!("{} exists", out.display()).into());
     }
     let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
-    let mut pass = learner.pass.clone().ok_or("a state with no pass line")?;
-    let before = pass.clone();
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    let mut pass = before.clone();
     for slice in &mut pass.slices {
         (slice.piece, slice.cursor, slice.taken) = (0, 0, 0);
     }
-    let mut next = learner.clone();
-    next.pass = Some(pass);
-    let written = next.to_text();
-    let (old_lines, new_lines): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
-    if old_lines.len() != new_lines.len() {
-        return Err("a next pass whose state has a different count of lines".into());
-    }
-    let differing: Vec<usize> = (0..old_lines.len()).filter(|&i| old_lines[i] != new_lines[i]).collect();
-    if differing.len() != 1 || !old_lines[differing[0]].starts_with("pass ") {
-        return Err(format!("a next pass that changes lines other than the pass line ({:?})", differing).into());
-    }
-    let back = FieldLearner::from_text(&written).map_err(|e| e.to_string())?;
-    if back.pass.as_ref().map(|p| p.stretches) != Some(before.stretches) || back.field != learner.field {
-        return Err("a next pass whose state does not read back as the source's field and count".into());
-    }
+    let after = slices_text(&pass);
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
-    println!("NEXT_PASS stretches={} before={} after={} lines={} differing_line={}", before.stretches, before.slices.iter().map(|s| format!("{}:{}:{}", s.name, s.piece, s.taken)).collect::<Vec<_>>().join(","), back.pass.as_ref().map_or(String::new(), |p| p.slices.iter().map(|s| format!("{}:{}:{}", s.name, s.piece, s.taken)).collect::<Vec<_>>().join(",")), old_lines.len(), differing[0] + 1);
+    println!("NEXT_PASS stretches={} before={} after={after} lines={lines} differing_line={differing}", before.stretches, slices_text(&before));
+    Ok(())
+}
+
+/// [definition; agent-inferred, November 15, the record of the states a field trains on, §5 item 1] `own-states STATE STATE_SHA OUT`: **a
+/// state whose training states are the field's own**: the state with its pass line's word `own` set ([`StorePass`]), its place in the pass
+/// kept, so the cut goes on over the same stretches and each stretch's state is the release's own at a crossing of its octaves
+/// ([`holonics_engine::passage::own_state_of`]); every other line byte for byte, read back and checked. Refused where the state's states
+/// are already its own.
+pub fn own_states(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("own-states STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.own {
+        return Err("a state whose training states are already its own".into());
+    }
+    let (written, lines, differing) = with_pass(&text, &learner, StorePass { own: true, ..before.clone() })?;
+    std::fs::write(out, &written)?;
+    println!("OWN_STATES stretches={} slices={} lines={lines} differing_line={differing}", before.stretches, slices_text(&before));
     Ok(())
 }
 
@@ -797,5 +837,47 @@ mod tests {
             }
         }
         assert!(writers > 100 && masks > 100, "{writers} {masks}");
+    }
+
+    /// [definition; the record of the states a field trains on, §5 item 2] **A stretch's own state is the release's at a crossing of its
+    /// octaves**: its context and near tail resolved, the run's places at distances under `2^o` resolved and every farther place open, `o` the
+    /// stretch's count modulo the run's crossings, its code a code of its open places with no domain; every crossing is met in turn, and
+    /// the state is the line's writer state wherever that state stands at a crossing (its order within an octave does not reach it).
+    #[test]
+    fn a_stretchs_own_state_is_the_releases_at_a_crossing_of_its_octaves() {
+        use holonics_engine::passage::own_state_of;
+        for a in [4usize, 5, 7, 8, 30, 64, 255, 256, 511] {
+            let q = 7usize;
+            let classes: Vec<usize> = (0..q + a + NEAR).map(|t| t % 5).collect();
+            let crossings = (usize::BITS - a.leading_zeros()) as u64;
+            let mut met = vec![0u32; crossings as usize];
+            for d in 1..3 * crossings + 1 {
+                let Stretch { region, kind, counted, .. } = own_state_of(d, classes.clone(), q, a);
+                let o = (d % crossings) as u32;
+                met[o as usize] += 1;
+                assert_eq!((kind, region.domain, counted), (Kind::Writer, None, a + 1 - (1 << o)));
+                for (t, &u) in region.unresolved.iter().enumerate() {
+                    assert_eq!(u, t >= q && t < q + a && t + 1 - q >= 1 << o, "a={a} d={d} t={t}");
+                }
+                assert_eq!(region.unresolved.iter().filter(|&&u| u).count(), counted, "the code is a code of the open places");
+            }
+            assert!(met.iter().all(|&m| m == 3), "a={a}: every crossing met in turn ({met:?})");
+        }
+        // Where the line's keyed writer state stands at a crossing (`k = 2^o − 1`), it is the own state at that crossing.
+        let (q, a) = (7usize, 30usize);
+        let classes: Vec<usize> = (0..q + a + NEAR).map(|t| t % 5).collect();
+        let mut seen = 0;
+        for d in 1..4000u64 {
+            let keyed = state_of(0xABCD, d, classes.clone(), q, a);
+            if keyed.kind != Kind::Writer || !(keyed.counted == a || (a + 1 - keyed.counted).is_power_of_two()) {
+                continue;
+            }
+            let k = a - keyed.counted;
+            let o = (usize::BITS - (k + 1).leading_zeros() - 1) as u64;
+            let own = own_state_of(o, classes.clone(), q, a);
+            assert_eq!(own.region.unresolved, keyed.region.unresolved, "d={d} k={k}");
+            seen += 1;
+        }
+        assert!(seen > 20, "{seen}");
     }
 }

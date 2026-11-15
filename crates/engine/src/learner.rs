@@ -219,6 +219,12 @@ pub struct FieldLearner {
 /// its cursor in the piece and the places taken from it. The cut itself (the trainer's, `train-store`) reads only this line and the store.
 /// Why in the learner's state (the record §4 items 3 and 5): a section is the unit a deposit consumes, so its extent is law and is carried
 /// in the state, never read from the device or a run's argument; the pass's place is what a continued run reads on from.
+///
+/// [definition; agent-inferred, November 15, the record of the states a field trains on, §3 and §5] `own`: **the states are the field's
+/// own**, each stretch's one state the release's own at a crossing of its octaves ([`crate::passage::own_state_of`]) in place of a keyed
+/// draw ([`crate::passage::state_of`]). Written as the word `own` after the bounds and only where set, so every state of the line reads and
+/// writes byte for byte as before. Why in the state: which states a field trains on is law (it sets the temperature the field holds, the
+/// record §1), and a law is carried in the learner's state, never in a run's switch (CLAUDE.md, November 8).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct StorePass {
     pub role: String,
@@ -228,6 +234,7 @@ pub struct StorePass {
     pub octaves: u64,
     pub pairs: u64,
     pub sites: u64,
+    pub own: bool,
     pub slices: Vec<PassSlice>,
 }
 
@@ -241,26 +248,31 @@ pub struct PassSlice {
 }
 
 impl StorePass {
-    /// The pass as its line: `pass ROLE STORE_SHA256 STRETCHES LEAST OCTAVES PAIRS SITES` and, for each slice in order, `NAME PIECE CURSOR
-    /// TAKEN`.
+    /// The pass as its line: `pass ROLE STORE_SHA256 STRETCHES LEAST OCTAVES PAIRS SITES`, the word `own` where the states are the field's
+    /// own, and, for each slice in order, `NAME PIECE CURSOR TAKEN`.
     pub fn to_line(&self) -> String {
         let slices: String = self.slices.iter().map(|s| format!(" {} {} {} {}", s.name, s.piece, s.cursor, s.taken)).collect();
-        format!("pass {} {} {} {} {} {} {}{slices}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
+        let own = if self.own { " own" } else { "" };
+        format!("pass {} {} {} {} {} {} {}{own}{slices}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
     }
 
     /// The pass read from its line ([`StorePass::to_line`]).
     pub fn from_line(line: &str) -> Result<Self> {
         let words: Vec<&str> = line.split(' ').collect();
-        if words.len() < 8 || words[0] != "pass" || (words.len() - 8) % 4 != 0 {
-            return refuse("a pass line that is not `pass ROLE STORE STRETCHES LEAST OCTAVES PAIRS SITES` and four words a slice");
+        // The word `own` stands ninth with four words a slice after it; with it absent the slices begin ninth. The two counts differ by one
+        // modulo four, so no slice's name is read as the word.
+        let own = words.len() >= 9 && words[8] == "own" && (words.len() - 9) % 4 == 0;
+        let from = if own { 9 } else { 8 };
+        if words.len() < 8 || words[0] != "pass" || (words.len() - from) % 4 != 0 {
+            return refuse("a pass line that is not `pass ROLE STORE STRETCHES LEAST OCTAVES PAIRS SITES [own]` and four words a slice");
         }
         let n = |w: &str| w.parse::<u64>().map_err(|_| TowerError::Refused("a pass's count that is not a count"));
         let word = |w: &str| if !w.is_empty() && w.bytes().all(|b| b.is_ascii_alphanumeric() || b == b'_') { Ok(w.to_string()) } else { refuse("a pass's name that is not a word") };
         if words[2].len() != 64 || !words[2].bytes().all(|b| b.is_ascii_hexdigit()) {
             return refuse("a pass's store that is not a SHA-256");
         }
-        let slices = words[8..].chunks(4).map(|c| Ok(PassSlice { name: word(c[0])?, piece: n(c[1])?, cursor: n(c[2])?, taken: n(c[3])? })).collect::<Result<Vec<_>>>()?;
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, slices };
+        let slices = words[from..].chunks(4).map(|c| Ok(PassSlice { name: word(c[0])?, piece: n(c[1])?, cursor: n(c[2])?, taken: n(c[3])? })).collect::<Result<Vec<_>>>()?;
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }

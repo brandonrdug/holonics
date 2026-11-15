@@ -314,8 +314,8 @@ pub enum Kind {
 /// writer's state (the context known, the run's places in the writer's octave order of their distance from the context, keyed within an
 /// octave, its first `k` resolved, `k` by octaves of reads, `k = 0` among them, and a true end's voids given); clear, a mask state (`shape`'s
 /// law over the whole stretch or past the context, the density `τ = u²`, weighed back by its domain `⌊2√(mK)⌋`). Regions are plain: no port.
-/// Returns the region, its kind, the sites its code is a code of (its weighed domain, or its open places for the writer's state), and
-/// for the writer's state its `k` and its front (the first open place of its order, the place the release draws next).
+/// Returns the region, its kind, the sites its code is a code of (its weighed domain, or its open places for the writer's state) and its
+/// context.
 pub fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> Stretch {
     let n = classes.len();
     let head = mix(seed, d);
@@ -336,24 +336,39 @@ pub fn state_of(seed: u64, d: u64, classes: Vec<usize>, q: usize, a: usize) -> S
         for &t in &order[..k] {
             unresolved[t] = false;
         }
-        return Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q, writer: Some((k, order[k])) };
+        return Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q };
     }
     let (mask, kind, from) = match shape(seed, d, q, n) {
         Shape::Masked(mask) => (mask, Kind::MaskWhole, 0),
         Shape::Answer(mask) => (mask, Kind::MaskRun, q),
     };
     let domain = weighed_domain(n - from, &mask);
-    Stretch { region: TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, counted: domain, q, writer: None }
+    Stretch { region: TrainRegion { domain: Some(domain), ..TrainRegion::plain(classes, mask) }, kind, counted: domain, q }
 }
 
-/// A stretch's one keyed state ([`state_of`]): its region, its kind, the sites its code is a code of, its context, and for the writer's
-/// state its `k` and its front place.
+/// [definition; agent-inferred, November 15, the record of the states a field trains on, §3 and §5 item 2] **A stretch's own state**: the
+/// release's own state at the `o`th crossing of its octaves, its context known, the run's places at distances `1` to `2^o − 1` from the
+/// context resolved (its first `o` octaves whole, `k = 2^o − 1`), every farther place open, and a true end's voids given; weighed as one
+/// link of the release's chain, its code a code of its open places (no importance weight). The crossing is the passage's own clock, the
+/// stretch's count `d` in the pass modulo the run's crossings `⌊log₂ a⌋ + 1` (the `o` with `2^o ≤ a`): no key is drawn. Why these states:
+/// the writer releases places by octaves of distance from its prompt ([`crate::field::Field::sample_runs`]), so at each crossing of an
+/// octave every place nearer stands resolved and every farther place open, whatever order it keeps within an octave; these are the states
+/// the field meets when it writes, read at octaves of `k`, so no scale of `k` is privileged. The record's step 2 ordered the run's places by
+/// the field's news, one extra read a stretch; at a crossing the order within an octave does not reach the state, so no read is needed.
+pub fn own_state_of(d: u64, classes: Vec<usize>, q: usize, a: usize) -> Stretch {
+    let crossings = u64::from(octave_of(a)) + 1;
+    let o = (d % crossings) as u32;
+    let unresolved: Vec<bool> = (0..classes.len()).map(|t| t >= q && t < q + a && octave_of(t + 1 - q) >= o).collect();
+    let k = (1usize << o) - 1;
+    Stretch { region: TrainRegion::plain(classes, unresolved), kind: Kind::Writer, counted: a - k, q }
+}
+
+/// A stretch's one state ([`state_of`], [`own_state_of`]): its region, its kind, the sites its code is a code of and its context.
 pub struct Stretch {
     pub region: TrainRegion,
     pub kind: Kind,
     pub counted: usize,
     pub q: usize,
-    pub writer: Option<(usize, usize)>,
 }
 
 /// [definition; the record §4 items 1 and 5; the port's `store`] **The cut over a role of the store**: the slices interleaved by least progress
@@ -394,7 +409,8 @@ impl Cut {
         if drawn.ends {
             classes.resize(classes.len() + NEAR, codec.void());
         }
-        let region = state_of(self.seed, drawn.d, classes, drawn.q as usize, drawn.a as usize);
+        let (q, a) = (drawn.q as usize, drawn.a as usize);
+        let region = if self.pass.own { own_state_of(drawn.d, classes, q, a) } else { state_of(self.seed, drawn.d, classes, q, a) };
         let place = &mut self.pass.slices[drawn.slice];
         place.taken += drawn.q + drawn.a;
         if drawn.done {
