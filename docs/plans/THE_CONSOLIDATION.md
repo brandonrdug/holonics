@@ -484,7 +484,7 @@ holds with the reads' lines.
     member it compiles as a dependency. Gate 1's guard lints now name their crates (`--no-deps`), so
     the card's owed float lints (C3) do not enter a lint that never named them.
 - Owed to C8: the harness (`solenoidal_alpha`, its tower and native lines) leaves with the
-  examples, and `tools/seen_passage.py`, a ruler of `train-field`'s withholding, with the tools.
+  examples, and `tools/seen_passage.py`, a ruler of `train-field`'s withholding, with the tools (C8d).
 
 **C7. Headers, comments and the engine guide** (the PC or the cloud; text only).
 - Every module and kernel header takes §5's form. A comment's dated reasoning moves to the record
@@ -538,6 +538,16 @@ holds with the reads' lines.
   and doctests, which now run on the engine. `tools/holonics_text_terrain.py` reads the Rust of `crates/*/src`. #404 and #76
   take their state lines.
 - Owed after C8c: the tools no live script or guide calls (C8's last item), and `vendor/num-bigint`'s timing read.
+- C8d, read November 15: the tools sweep. 28 files of `tools/` (3,785 lines) that no guide, no run script written in the last three days,
+  no crate and no standing tool calls retired, held at `457450864`: the October listener's and V92/V93 campaign tools
+  (`complete_language*`, `durable_training_*`, `native_output_pool`, `bounded_native_v92_controller`, `rate_guard_v92`, the two capture
+  tools, `listener_diagnostic_contract.md`), the October tower's readers (`answer_digits`, `arithmetic_lines`, `arithmetic_looks`,
+  `text_looks`, `tower_circuit`, `tower_modes`, `landmarks`), the field line's state tools (`pace_rates`, `round_state`, `split_report`)
+  and `seen_passage`, with their five tests; gate 1 lost the seen passage's controls. Four atlas owners name them at that commit. Kept
+  though no live script calls them, each for its input: `corpus_passage.py` and `code_passage.py`, which wrote the store and the held
+  passage the line reads, and `holonics_text_terrain.py` with `arithmetic_terrain.py`, the terrain of the Holonics text, the product's
+  first subject. The standing tools' tests that gate 1 did not run join it where they read only what they write (the mailbox, the copy
+  length, the human messages' fixtures); `test_corpus_passage.py` needs `pyarrow`, which the PC's Python lacks, and stays out of the gate.
 
 **C9. Position, order and data** (the cloud or the PC; text only).
 - `CONSTRUCTION_STATE.md` holds the position: each line that trains, its commit, its state, its
