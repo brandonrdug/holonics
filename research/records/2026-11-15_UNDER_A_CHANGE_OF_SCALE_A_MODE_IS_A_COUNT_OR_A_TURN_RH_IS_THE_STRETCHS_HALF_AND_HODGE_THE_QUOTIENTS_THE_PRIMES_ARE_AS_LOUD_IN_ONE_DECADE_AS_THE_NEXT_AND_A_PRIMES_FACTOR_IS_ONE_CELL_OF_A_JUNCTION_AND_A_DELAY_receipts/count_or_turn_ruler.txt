@@ -1,0 +1,31 @@
+BAND b=2 sech(eta)=0.942809 2sqrt(b)/(b+1)=0.942809 edge^2=0.888889 junction_pass=0.888889 share_of_turns_passed=0.7837 inside(+0.1 rad): least_pass_over_200_cells=0.3871 outside(-0.1 rad): decay_a_cell=0.2399 acosh(cosh(eta)cos(phi))=0.2456
+BAND b=3 sech(eta)=0.866025 2sqrt(b)/(b+1)=0.866025 edge^2=0.750000 junction_pass=0.750000 share_of_turns_passed=0.6667 inside(+0.1 rad): least_pass_over_200_cells=0.2669 outside(-0.1 rad): decay_a_cell=0.3209 acosh(cosh(eta)cos(phi))=0.3231
+BAND b=5 sech(eta)=0.745356 2sqrt(b)/(b+1)=0.745356 edge^2=0.555556 junction_pass=0.555556 share_of_turns_passed=0.5354 inside(+0.1 rad): least_pass_over_200_cells=0.1834 outside(-0.1 rad): decay_a_cell=0.4089 acosh(cosh(eta)cos(phi))=0.4078
+BAND b=7 sech(eta)=0.661438 2sqrt(b)/(b+1)=0.661438 edge^2=0.437500 junction_pass=0.437500 share_of_turns_passed=0.4601 inside(+0.1 rad): least_pass_over_200_cells=0.1475 outside(-0.1 rad): decay_a_cell=0.4640 acosh(cosh(eta)cos(phi))=0.4611
+BAND b=16 sech(eta)=0.470588 2sqrt(b)/(b+1)=0.470588 edge^2=0.221453 junction_pass=0.221453 share_of_turns_passed=0.3119 inside(+0.1 rad): least_pass_over_200_cells=0.0899 outside(-0.1 rad): decay_a_cell=0.6014 acosh(cosh(eta)cos(phi))=0.5948
+BAND b=256 sech(eta)=0.124514 2sqrt(b)/(b+1)=0.124514 edge^2=0.015504 junction_pass=0.015504 share_of_turns_passed=0.0795 inside(+0.1 rad): least_pass_over_200_cells=0.0149 outside(-0.1 rad): decay_a_cell=1.2030 acosh(cosh(eta)cos(phi))=1.1866
+TREE branches=3 m_2,m_4,m_6=3,15,87 m_600/m_598=7.96110 over_4b=0.99514 (1-3/(2k)=0.99500) radius^2=4b=8 =(b+1)^2*junction_pass=8.0
+TREE branches=4 m_2,m_4,m_6=4,28,232 m_600/m_598=11.94077 over_4b=0.99506 (1-3/(2k)=0.99500) radius^2=4b=12 =(b+1)^2*junction_pass=12.0
+TREE branches=6 m_2,m_4,m_6=6,66,876 m_600/m_598=19.90074 over_4b=0.99504 (1-3/(2k)=0.99500) radius^2=4b=20 =(b+1)^2*junction_pass=20.0
+TREE branches=8 m_2,m_4,m_6=8,120,2192 m_600/m_598=27.86082 over_4b=0.99503 (1-3/(2k)=0.99500) radius^2=4b=28 =(b+1)^2*junction_pass=28.0
+HASSE y^2=x^3+x+1 primes=301 (to 2000, without 2 and 31) cells_that_are_turns=301 largest|a_p|/(2sqrt(p))=0.9917 mean_cos^2(theta)=0.2330 (even on the half-circle of sin^2: 0.2500)
+HASSE p=3:a=0,theta=0.2500turn,delay=0.2500turn p=5:a=-3,theta=0.3670turn,delay=0.3333turn p=7:a=3,theta=0.1541turn,delay=0.1888turn p=11:a=-2,theta=0.2987turn,delay=0.2767turn p=101:a=-3,theta=0.2738turn,delay=0.2547turn p=1009:a=-24,theta=0.3117turn,delay=0.2538turn
+ZEROS first three heights 14.1372 21.0244 25.0184
+ZEROS height=100 counted=29 area_in_cells+7/8=29.00 difference=-0.00
+ZEROS height=200 counted=79 area_in_cells+7/8=79.19 difference=-0.19
+ZEROS height=500 counted=269 area_in_cells+7/8=269.59 difference=-0.59
+ZEROS height=1000 counted=649 area_in_cells+7/8=648.62 difference=+0.38
+ZEROS sum over the 649 zeros to 1000 of 2/(1/4+g^2)=0.04425 tail_from_the_area_count=0.00193 together=0.04619 2+gamma-ln(4pi)=0.04619 first_pair_share=0.216
+LOUD decade 10^1..10^2 power_in_the_half_chart_per_e-fold=0.04332 over_the_zeros'_sum=0.938 psi(10^2)-10^2=-5.95
+LOUD decade 10^2..10^3 power_in_the_half_chart_per_e-fold=0.04382 over_the_zeros'_sum=0.949 psi(10^3)-10^3=-3.32
+LOUD decade 10^3..10^4 power_in_the_half_chart_per_e-fold=0.04816 over_the_zeros'_sum=1.043 psi(10^4)-10^4=+13.40
+LOUD decade 10^4..10^5 power_in_the_half_chart_per_e-fold=0.04736 over_the_zeros'_sum=1.025 psi(10^5)-10^5=+51.56
+LOUD decade 10^5..10^6 power_in_the_half_chart_per_e-fold=0.04519 over_the_zeros'_sum=0.978 psi(10^6)-10^6=-413.40
+LOUD decade 10^6..10^7 power_in_the_half_chart_per_e-fold=0.04629 over_the_zeros'_sum=1.002 psi(10^7)-10^7=-1460.60
+LOUD decades from 10^2: mean=0.04616 over_the_zeros'_sum=0.999 slope_of_ln(power)_in_ln(scale)=+0.0020 rate=1/2+slope/2=0.5010
+LOUD a zero at real part 0.6 would add slope +0.2: x1.585 a decade, x10.0 over these five
+CM discriminant:places  -3:1 -4:1 -7:1 -8:1 -11:1 -12:1 -15:2 -16:1 -19:1 -20:2 -23:3 -24:2
+CM to |D|=100: discriminants=50 places=132 places/|D|^(3/2)=0.1320 (pi/(18 zeta(3))=0.1452)
+CM to |D|=1000: discriminants=500 places=4449 places/|D|^(3/2)=0.1407 (pi/(18 zeta(3))=0.1452)
+CM to |D|=10000: discriminants=5000 places=143715 places/|D|^(3/2)=0.1437 (pi/(18 zeta(3))=0.1452)
+CM classes of the torus's own type on E x E: 3 at a place with no relation, 4 at each place counted
