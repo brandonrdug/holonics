@@ -20,11 +20,13 @@ together. The learner reads a section, returns the comparison's covector through
 deposits it. The state it carries is its constitution, the deposit's two moments, its rates, and the pass's place
 over its store ([§5](#5-the-learners-state)).
 
-Everything is integer. Faces, charts and currents stand on `2^(−16)`, material on `2^(−24)`, frames and skins on
+Every value is a word at a declared grain. Faces, charts and currents stand on `2^(−16)`, material on `2^(−24)`, frames and skins on
 `2^(−30)`, a series row's exponential faces on `2^(−62)` with its shares on `2^(−63)`, covectors on `2^(−24)` and
 the contact's on `2^(−40)` ([`width.rs`](../crates/engine/src/width.rs)). Every product's remainder below its grain
-is released to the nearest numerator and every sum is an integer sum, so the host and any partition of the card
-give the same bits (CLAUDE.md, the precision law). The host realization (`Host`) is the reference the card's
+is released to the nearest numerator before the product enters a sum, and every sum keeps its terms, so the host
+and any partition of the card give the same bits (CLAUDE.md, the precision law). The chains (the carry circles' scan,
+the ticks) release at every step and run in their declared order, which is the law's
+([the record of November 15](../research/records/2026-11-15_A_VALUE_IS_READ_AT_A_PLACE_A_SUM_IS_ORDERED_ONLY_WHERE_A_RELEASE_IS_A_SECTION_A_CENSUS_CONFIRMS_TO_ITS_OWN_SPREAD_AND_THREADS_RECONCILE_AT_THEIR_CONDITIONAL_INFORMATION.md) §6). The host realization (`Host`) is the reference the card's
 bits are checked against. Learning runs on the card.
 
 ## 2. The one move
