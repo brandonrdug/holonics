@@ -1,0 +1,11 @@
+1. affine chain of 1000: tree depth 10 = ceil(log2 n), serial equal; with a section a step, 247 of 1000 reads differ from the once-released orbit, the largest by 1 grains
+2. host of 12 lanes: one host lane = at most 43.8 card lanes; the card wins past W/D = 541
+2. host of 24 lanes: one host lane = at most 43.8 card lanes; the card wins past W/D = 1144
+   a chain of launches: each step costs the card at least 23 us; a step moved to the host adds a crossing of 94 us each way, so only a chain whose terms already stand on the host moves
+3. Eb/N0 at 8 bits a tick spread over N channels: N=1: 31.875, N=2: 3.750, N=4: 1.500, N=8: 1.000, N=16: 0.828, N=64: 0.724, N=1024: 0.695; the floor ln 2 = 0.6931 (with N0 = kT, Landauer's kT ln 2)
+   dynamic energy per op ~ f^2 where V follows f: N lanes at f/N do the same work at 1/N^2 of the energy per op
+4. squared loss: (mean f - y)^2 = mean (f_i - y)^2 - mean (f_i - mean f)^2 on 200 draws, in rationals; log loss under log-linear pooling: CE(q, pooled) = mean CE(q, p_i) - mean KL(pooled || p_i) on 300 draws (largest gap 8.9e-16), and the subtracted term is -log Z >= 0
+5. ring of 1024, greedy steps: r=0: 27, r=1/2: 21, r=1: 21, octave: 19, r=3/2: 34, r=2: 72
+5. ring of 16384, greedy steps: r=0: 115, r=1/2: 60, r=1: 47, octave: 48, r=3/2: 127, r=2: 703
+   growth from 2^10 to 2^14 places: r=0 x4.25, r=1 x2.27, octave x2.47, r=2 x9.80  (log^2 ratio 1.96; n^(1/2) ratio 4.00)
+6. a crowd at its mean word on 400 draws: -T D^2 s^2 <= log mean_j e^(T lock_j) - T lock(mean b) <= 2 T D |a - D mean b| r_C (s^2 the members' mean square spread, r_C their largest distance from the mean): held on every draw
