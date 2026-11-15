@@ -636,6 +636,7 @@ impl Field {
                 None => None,
             };
             let mut ys: Vec<Vec<i64>> = Vec::new();
+            let mut radial: Vec<i64> = Vec::new();
             let mut xs: Vec<&[i32]> = Vec::new();
             for t in 0..sites {
                 let Some(face) = &pass.faces[t] else { continue };
@@ -657,8 +658,26 @@ impl Field {
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }
-                // Through the encoding (§16.26): `δE(a)_i += release(δz_a y_i, 16)` a term, `δy_i = release(Σ_a δz_a E(a)_i, 16)`.
                 let y = &pass.lift[t * dw..(t + 1) * dw];
+                // [Brandon, November 15 02:06Z] Through a loud face's sharpness: `δv_a = release(β δz_a, 16)` takes `δz`'s place below, `δβ =
+                // release(Σ_a δz_a v_a, 16)`, then `δκ_ℓ = release(δβ λ_ℓ, 16)`, `δb = δβ`, and `δλ_ℓ = release(δβ κ_ℓ, 16)` returned radially into the
+                // state the face read ([`Field::loud_radial`]).
+                let sharp = self.loud_beta(&pass.scale[t * lanes..(t + 1) * lanes])?;
+                let dz = match &sharp {
+                    None => dz,
+                    Some((beta, lambda)) => {
+                        let mut dbeta = 0i128;
+                        for (c, &dzc) in dz.iter().enumerate() {
+                            let row = &self.theta[l.enc + c * dw..l.enc + (c + 1) * dw];
+                            let v = release(row.iter().zip(y).map(|(&e, &yi)| e as i128 * yi as i128).sum(), STATE_BITS) as i128;
+                            dbeta += dzc as i128 * v;
+                        }
+                        let dbeta = release(dbeta, FACE_BITS) as i128;
+                        self.loud_return(lambda, dbeta, &pass.read[t * dw..(t + 1) * dw], &pass.scale[t * lanes..(t + 1) * lanes], g, &mut radial)?;
+                        dz.iter().map(|&d| fit64(release(*beta * d as i128, FACE_BITS) as i128)).collect::<Result<Vec<i64>>>()?
+                    }
+                };
+                // Through the encoding (§16.26): `δE(a)_i += release(δz_a y_i, 16)` a term, `δy_i = release(Σ_a δz_a E(a)_i, 16)`.
                 let mut dy = vec![0i64; dw];
                 for (i, slot) in dy.iter_mut().enumerate() {
                     let sum: i128 = dz.iter().enumerate().map(|(c, &dzc)| dzc as i128 * self.theta[l.enc + c * dw + i] as i128).sum();
@@ -677,6 +696,11 @@ impl Field {
                 transposed(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &dy, MATERIAL_BITS, &mut dr)?;
                 let back = lane_adjoint(rt, &pass.scale[t * lanes..(t + 1) * lanes], &dr)?;
                 dx[t * dw..(t + 1) * dw].copy_from_slice(&back);
+                if sharp.is_some() {
+                    for (slot, &v) in dx[t * dw..(t + 1) * dw].iter_mut().zip(&radial) {
+                        *slot = fit64(*slot as i128 + v as i128)?;
+                    }
+                }
                 ys.push(dy);
                 xs.push(rt);
             }
