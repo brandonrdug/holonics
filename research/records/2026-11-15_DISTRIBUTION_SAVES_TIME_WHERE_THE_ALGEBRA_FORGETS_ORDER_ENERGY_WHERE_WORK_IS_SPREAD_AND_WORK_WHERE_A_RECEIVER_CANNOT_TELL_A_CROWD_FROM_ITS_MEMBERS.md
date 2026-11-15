@@ -303,3 +303,70 @@ mean, its next training sections; relayed November 15, 18:50 and 19:01 UTC); `ag
   mean, and a misweighting under that jitter is one the line already pays. A share error reaches the code only through its
   covariance with the members' arriving values, which the band bounds as if aligned. All three are readings with no
   forward, relayed to the build thread at 19:05 UTC.
+
+## 12. The grain is the field's jitter, a value cover passes and a shared word tree does not, so the cut moves to a pair's cost
+
+`tree` for the readings (the build thread's host rulers on `claude/open-rows`, lap 35's mean `MEAN.3000` and end state
+`STATE.3000`, the next 2 training sections, 365 regions, the open rows' far pairs; relayed November 15, 19:10, 19:20 and 19:26
+UTC); `agent-inferred` for the reading of them.
+- **A cover by value passes where a split by place does not.** The fewest intervals of width `ε` that cover a crowd's member
+  locks, per receiver and octave at tick 3, as a share of far pairs: on still heads 0.63 to 0.84 at 1/16 bit, 0.37 to 0.63 at
+  1/4, 0.17 to 0.37 at 1 and 0.07 to 0.17 at 4; on paced heads 0.33 to 0.60 at 1/16 (head 2 0.33 to 0.42, head 3 0.52 to
+  0.60), down to 0.03 to 0.07 at 4. By octave on the code slice at 1/16 bit, head 0 falls from 0.997 at octave 2 to 0.72 at
+  octave 8, and head 2 from 0.99 to 0.11 at octave 8 and 0.02 at octave 9. Place crowds split by halves stood beside at 1/4
+  bit at 1.000 on still heads (floor 0.96 to 0.99) and 0.72 to 0.93 on head 2 (floor 0.62 to 0.84). The selection is in the
+  lock's value, as §11 read.
+- **The grain has its reason: it is the field's own jitter.** `|z_end − z_mean|` between the lap's end state and its mean,
+  each with its own temper, binned by octaves of the difference (each figure an upper edge, good to a factor of two). Still
+  heads: median 1/4 bit at tick 0 and 1/2 to 1 bit at tick 3 (head 0's quartiles 1/2, 1 and 2 bits), flat over distance
+  octaves 2 to 9. Paced heads: median 1/32 to 1/16 bit on head 2 and 1/16 to 1/4 on head 3, falling with distance (head 2 at
+  tick 3: 1/4 bit at octaves 2 to 5, then 1/8, 1/16, 1/32 and 1/64 at octaves 6 to 9; head 3 1/2 at 2 to 5 and 1/16 at 9).
+  This is the deposit's standing spread read on the lock (`deposition.rate-temperature-standing-spread`): a misweighting
+  inside it is one the line already pays between its draws, so it is the declared grain the opening criterion of §9 lacked.
+  At that grain the per-receiver cover is 0.33 to 0.42 of far pairs on head 2 (0.27 at octave 7 and 0.11 at octave 8, where
+  most of its far pairs stand), 0.52 to 0.60 on head 3 and 0.17 to 0.63 on still heads.
+- **A shared word tree keeps 84 to 98% of the pairs.** Each head's definite words were split by medians along its open
+  rows' probe principal directions (the eigenvectors of `Σ a aᵀ`, every direction above `10⁻⁹` of the top), then by `|b|²`,
+  down to single members; a cell is heard as one where its members' locks spread within the grain (each head, tick and
+  octave's own jitter median, at its bin's lower and upper edge), else its children are. On the end state, every head and
+  tick: the per-receiver cover 0.39 to 0.57 of far pairs at the lower edge and 0.28 to 0.45 at the upper; the shared tree
+  0.90 to 0.98 and 0.84 to 0.95. Tree over cover, lower edge / upper edge: head 0 (still) 1.66 to 2.38 / 2.04 to 3.15, head 1
+  (still) 1.74 to 2.27 / 2.18 to 2.98, head 2 (paced) 1.83 to 2.45 / 2.32 to 3.25, head 3 (paced) 1.83 to 2.18 / 2.34 to 2.88.
+- **The guesses, scored.** On the jitter: paced heads 1/8 to 1/2 bit, rising with octave. Missed in level (1/32 to 1/16
+  overall) and in direction (it falls); still heads above paced held. On the tree over the cover: head 2 1.2 to 1.6 missed
+  (1.83 to 2.45 at the lower edge); head 3 1.3 to 2.0 held only at ticks 0 and 1 on the lower edge; still heads 1.5 to 2.5
+  held on the lower edge. The rule fixed with them (under 1.5 a head's tree is the candidate for T7's forward, over 2.0 the
+  head keeps its pairs) puts every head over 2.0 on most ticks.
+- **What the direction of the jitter reads.** A paced head's skin carries a source's face by its gap, so a far source
+  reaches its receiver thinned, and its lock moves less from draw to draw in the same proportion; a still head has no skin,
+  and its jitter is flat. The grain is therefore the skin's, and a paced head's far octaves are both its most numerous pairs
+  and its finest grain, which is why the cover gains most there and a shared grouping least.
+- **No grouping is shared by the receivers.** Each open receiver's probes span its own directions, so a tree over the
+  sources that every receiver reads passes only where the receivers' words cluster, and here they do not (a dual-tree sum
+  gains by the clustering of both its queries and its sources, Gray and Moore 2001). A grouping per receiver must order that
+  receiver's sources by its own lock, which costs what its pairs cost. So the open rows' far pairs are the information the
+  field reads at its own grain, the slip bound stays the opening criterion of the crowds a written row hears as one, and no
+  forward of T7 is built.
+- **The cut moves to what a pair costs, and the records had already read where it is.** An open row listens to every
+  definite site of its region (`tower.field-open-row-pairs`: `O_r D_r` pairs a head and tick), so the region's open rows
+  share one support and their far pairs are one dense product, open receivers by definite sources, less the near band: the
+  shape the site maps take in their tile form (`tower.field-site-maps-tile`). A tile of `B` open receivers over staged
+  source rows fetches each row once a tile, so its octets a pair fall by `B` (the red-blue pebble bound of Hong and Kung,
+  1981). A guess was fixed at 19:29 UTC that this would bring the open rows' contact time to 0.5 to 0.65 of itself. It is
+  withdrawn: P59 had read the premise on copies on November 13
+  ([§8 there](2026-11-12_A_SITES_ARITHMETIC_IS_COUNTED_AGAINST_THE_CARDS_LANES_THE_STORE_TRAINER_RUNS_AT_ONE_FORTIETH_OF_THEM_A_PAIRS_SKIN_IS_FORMED_ONCE_A_CLOCK_AND_COST_FOLLOWS_SURPRISE.md)).
+  With every load of another site's row reading the warp's own, the limit of any staging, the rows read 0.881 of their
+  controls and the forward contact 0.951, so the pair kernels are bound by their arithmetic and their walk, not by where
+  their words lie. The guess repeated the failure the guide's method names (a guess on a premise a log has settled tests
+  the guesser's memory), and the build thread caught it at 19:31 UTC. No tile is built.
+- **What follows.** These readings answer the question that §9 of that record left to the design: the pair family's
+  multiple lies in the count of pair-terms, and the far pairs are the selection the field reads at its own grain, so that
+  count is the law's. What remains is a pair's arithmetic. Two of its widths are the carrier's and not the law's (§9 there):
+  the multiplier `2^62`, which a nearest quotient sheds with its divisor, and a value's 64 bits where the bits ruler reads
+  23. A face's 62 bits and a share's 63 are the law's. The order is P59's method on today's kernels, aimed at the
+  arithmetic, with guesses fixed at 19:32 UTC from §9's 0.68 ms a limb at 7.52 ms a launch: the forward contact without the
+  five-limb series at 0.55 to 0.75 of its control, without its wide compares at 0.90 to 0.97, and the rows without the
+  probe role's sum at 0.85 to 0.95. An open region's two pair products (the scores over its shared sources, then shares
+  times values) are dense products of narrow integer terms, so the precision law admits their limbs on the card's
+  narrowest lanes, a tensor core's 8-bit products with 32-bit sums, every bit kept. That is measured on a copy first, and
+  only where the copies say the arithmetic binds.
