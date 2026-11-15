@@ -479,7 +479,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     // [measurement; theory, November 15 21:16Z] `ticks` and `held` read with OTHER's field where given (the sections stay STATE's pass's).
     let mode = args.get(13).map(String::as_str);
     let fits = match (args.len(), mode) {
-        (13, None) | (14, Some("crowds" | "ticks" | "held")) => true,
+        (13, None) | (14, Some("crowds" | "ticks" | "held" | "halves")) => true,
         (16, Some("jitter" | "ticks" | "held")) => true,
         _ => false,
     };
@@ -489,6 +489,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let with_crowds = mode == Some("crowds");
     let with_ticks = mode == Some("ticks");
     let with_held = mode == Some("held");
+    let with_halves = mode == Some("halves");
     let loaded = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
     let (other, reader) = if mode == Some("jitter") { (loaded, None) } else { (None, loaded) };
     let started = std::time::Instant::now();
@@ -524,6 +525,7 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let mut jitter: Vec<[[u64; 40]; OPEN_OCTAVES]> = vec![[[0u64; 40]; OPEN_OCTAVES]; ticks * heads];
     let mut news: Vec<Vec<holonics_engine::field::TickNews>> = vec![vec![holonics_engine::field::TickNews::default(); ticks]; names.len()];
     let mut held: Vec<holonics_engine::field::HeldRead> = vec![holonics_engine::field::HeldRead::default(); names.len()];
+    let mut halves: Vec<[i128; 5]> = vec![[0; 5]; names.len()];
     let (mut done, mut regions_read) = (0usize, 0usize);
     while done < sections {
         let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
@@ -544,6 +546,21 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         let owned: Vec<OwnedRegion> = regions.iter().map(|(_, r)| r.clone()).collect();
         let views = views_of(&owned);
         let field = reader.as_ref().map_or(&learner.field, |r| &r.field);
+        if with_halves {
+            // [measurement; theory, November 15 21:45Z] The held set at 1/16 bit and its two complementary halves, by slice.
+            let read: Vec<std::result::Result<[i128; 4], String>> = views.par_iter().map(|v| field.held_halves(v, 4).map_err(|e| e.to_string())).collect();
+            for ((slice, r), cell) in regions.iter().zip(read) {
+                let c = cell?;
+                for i in 0..4 {
+                    halves[*slice][i] += c[i];
+                }
+                halves[*slice][4] += r.classes.len() as i128;
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("HALVES_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
         if with_held {
             // [measurement; theory, November 15 21:16Z] The forward with its quiet written site-ticks held, at 1/64 and 1/16 bit, by slice.
             let read: Vec<std::result::Result<holonics_engine::field::HeldRead, String>> = views.par_iter().map(|v| field.held_forward(v, &HELD_SIGMAS).map_err(|e| e.to_string())).collect();
@@ -606,6 +623,16 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
     }
     let kind = |h: usize| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" };
+    if with_halves {
+        for (s, name) in names.iter().enumerate() {
+            let [full, all, a, b, sites] = halves[s];
+            let rise = |v: i128| (v - full) as f64 / (1u64 << 20) as f64;
+            let (ra, rb, rf) = (rise(a), rise(b), rise(all));
+            println!("HALVES slice={name} sigma=2^-4 sites={sites} rise_bits all={rf:.3} half_a={ra:.3} half_b={rb:.3} half_over_all a={:.3} b={:.3} sum_over_all={:.3}", ra / rf, rb / rf, (ra + rb) / rf);
+        }
+        println!("HALVES_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
     if with_held {
         let bits = |v: i128| v as f64 / (1u64 << 20) as f64;
         let abits = |v: i128| v as f64 / (1u64 << 40) as f64;

@@ -1243,6 +1243,37 @@ impl Constitution {
         Ok(out)
     }
 
+    /// [measurement; theory, November 15 21:45Z] **Half the held set** ([`Constitution::held_forward`]'s oracle at `σ = 2^(40−e)`), split in two
+    /// complementary halves by a fixed mixing of the site and tick (a ruler's split, no symbol read): the compared places' code whole, under the
+    /// full held set and under each half, on `2^(−20)` bits. Per-site curvature halves the rise; a crowd of held steps at a shared reader, quadratic
+    /// in their sum, brings each half near a quarter. A reading only.
+    pub fn held_halves(&self, region: &Region, e: u32) -> Result<[i128; 4]> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let sigma = 1u128 << (40 - e);
+        let mut full = vec![vec![false; sites]; ticks];
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            for t in (0..sites).filter(|&t| Self::definite(region, t)) {
+                let span = t * dw..(t + 1) * dw;
+                let a: i128 = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum();
+                full[k][t] = a.unsigned_abs() < sigma;
+            }
+        }
+        let side = |k: usize, t: usize| -> bool {
+            let mut z = (t as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (k as u64).wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
+            z ^= z >> 31;
+            z = z.wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            (z >> 63) == 1
+        };
+        let half = |which: bool| -> Vec<Vec<bool>> { (0..ticks).map(|k| (0..sites).map(|t| full[k][t] && side(k, t) == which).collect()).collect() };
+        Ok([code(&pass), code(&self.pass_held(region, &full)?), code(&self.pass_held(region, &half(false))?), code(&self.pass_held(region, &half(true))?)])
+    }
+
     /// [measurement; G160] **The read's mirror at its founding** ([`Constitution::mirror_route`]): one region's forward and reverse, and for each tick
     /// (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written, `[2]` both) the written sources' [`MirrorSums`] of
     /// `a_j = ⟨λ_j^(k+1), μ_j⟩`, so for the stage `x_j ← x_j − s_h μ_j` after tick `k` the code moves by `−s_h Σ_j a_j 2^(−40)` bits (the
