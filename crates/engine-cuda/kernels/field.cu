@@ -5886,7 +5886,7 @@ __device__ __forceinline__ wide re_pair(const FieldWords &w, wide ar, wide ai, M
 
 // One skin term of the moments' clock covector (the host's `pace_return`'s `skin`): `at = release(release(release(inner
 // D, 30) b, 30), 46)`, `δσ_t −= sgn at`, `δσ_k += sgn at`, `sgn = sgn(σ_t − σ_k)`.
-__device__ __forceinline__ void moment_skin_back(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk, wide decay, wide inner, wide b) {
+__device__ __forceinline__ void moment_skin_back(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk, wide decay, wide inner, wide b, wide *own = nullptr) {
     const wide st = (wide)w.sigma[(uint64_t)pm.p * w.T + gt], sk = (wide)w.sigma[(uint64_t)pm.p * w.T + gk];
     if (st == sk) {
         return;
@@ -5897,7 +5897,13 @@ __device__ __forceinline__ void moment_skin_back(const FieldWords &w, const Pace
     }
     const wide at = rel(rel(y, MOVE_BITS), MOVE_BITS + FACE_BITS);
     const wide signed_at = st > sk ? at : -at;
-    add_wide(w.gsig + (uint64_t)pm.p * w.T + gt, -signed_at);
+    // [realization; November 15] With `own`, the receiver's own end is summed on the thread and added once a site (a ring sum on
+    // `Z/2^128`: the same bits), so each term costs one atomic step where it cost two.
+    if (own != nullptr) {
+        *own -= signed_at;
+    } else {
+        add_wide(w.gsig + (uint64_t)pm.p * w.T + gt, -signed_at);
+    }
     add_wide(w.gsig + (uint64_t)pm.p * w.T + gk, signed_at);
 }
 
@@ -5941,15 +5947,16 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
         add_wide(fw.gtau + (uint64_t)pm.p * fw.T + g, dtau);
         // The skins: the plain region's are the same law at whole variations.
         pm.plain = false;
+        wide own_sig = 0;
         const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
         for (uint32_t d = 0; d < forward; ++d) {
             const uint64_t gk = g - d;
-            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b, &own_sig);
         }
         const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
         for (uint32_t d = 0; d < backward; ++d) {
             const uint64_t gk = g + d;
-            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b, &own_sig);
         }
         PacedMode own = paced_mode(fw, cm, r);
         const MomentGauss home = mg_conj(paced_absolute(fw, w, own, g));
@@ -5964,8 +5971,11 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
                 const MomentGauss f = mg_mul(home, mg_sub(mg_load_wide(pre, hi + 1), mg_load_wide(pre, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
                 const uint64_t edge = right ? g + ((uint64_t)1 << level) : g - ((uint64_t)1 << level);
-                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b);
+                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b, &own_sig);
             }
+        }
+        if (own_sig != 0) {
+            add_wide(fw.gsig + (uint64_t)pm.p * fw.T + g, own_sig);
         }
     }
 }
