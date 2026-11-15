@@ -10,7 +10,8 @@
 #   PLACES          the read's places (the line's read script's count).
 # BIN is the athena build under test (release, the card's). OUT is a new scratch directory.
 #
-# In one hold of the card lock:
+# Beside whatever else the card runs (Brandon, November 15 16:20: only a timing hold takes the card alone; a gate checks bits, which
+# every sum of the engine, met at one grain and released once, makes the same on any schedule, and each run sizes its batches from the card memory free when it opens):
 #   1. parity-store on 3 of the line's sections from FROM: every read asked of the card and of the host and compared whole
 #      (STORE_PARITY_DONE ... EQUAL), and the run's STORE_SECTION lines equal to the lap's own (tools/reproduction.py);
 #   2. train-store on 24 of the line's sections from FROM, the card alone: the lines equal to the lap's;
@@ -25,21 +26,19 @@ LINE=$1; BIN=$2; OUT=$3
 # shellcheck disable=SC1090
 . "$LINE"
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
-LOCK=$(git -C "$ROOT" rev-parse --path-format=absolute --git-common-dir)/../.local/gpu.lock
 M="python3 -I $ROOT/tools/measure.py"
 sha() { sha256sum "$1" | cut -c1-64; }
 mkdir "$OUT" || exit 2
 status=0
 (
-  flock -w 14400 9 || exit 75
-  echo "# lock taken $(date -u +%H:%M:%S)"
+  echo "# gate begun $(date -u +%H:%M:%S)"
   env -i HOME="$HOME" PATH="$PATH" $M parity timeout 1800 "$BIN" parity complete-language parity-store "$U0" "$(sha "$U0")" "$S" "$(sha "$S/STORE.tsv")" prefix "$K" "$(sha "$K")" "$C2" "$(sha "$C2")" "$H" "$(sha "$H")" 3 3 1800000 "$OUT/parity" "$FROM" "$(sha "$FROM")" > "$OUT/parity.log" 2>&1
   echo "# parity: exit $? $(date -u +%H:%M:%S)"
   env -i HOME="$HOME" PATH="$PATH" $M repro timeout 1800 "$BIN" train complete-language train-store "$U0" "$(sha "$U0")" "$S" "$(sha "$S/STORE.tsv")" prefix "$K" "$(sha "$K")" "$C2" "$(sha "$C2")" "$H" "$(sha "$H")" 24 24 1800000 "$OUT/repro" "$FROM" "$(sha "$FROM")" > "$OUT/repro.log" 2>&1
   echo "# repro: exit $? $(date -u +%H:%M:%S)"
   env -i HOME="$HOME" PATH="$PATH" $M read timeout 1800 "$BIN" train complete-language read-cavity "$U0" "$(sha "$U0")" "$S" "$(sha "$S/STORE.tsv")" "$K" "$(sha "$K")" "$C" "$(sha "$C")" "$PLACES" "$MEAN" "$(sha "$MEAN")" "$OUT/read" > "$OUT/read.log" 2>&1
   echo "# read: exit $? $(date -u +%H:%M:%S)"
-) 9>"$LOCK"
+)
 grep -h "^STORE_PARITY" "$OUT/parity.log"
 grep -q "^STORE_PARITY_DONE .* EQUAL$" "$OUT/parity.log" || status=1
 python3 -I "$ROOT/tools/reproduction.py" "$OUT/parity.log" "$LAP_LOG" 3 --no-save || status=1

@@ -971,6 +971,9 @@ impl Drop for Context {
 /// A loaded module (a PTX image JIT-compiled by the driver). Unloaded on drop (best-effort).
 pub struct Module {
     module: ffi::CUmodule,
+    /// [realization; November 15] Each entry's handle, looked up once: a launch reads the handle the module already gave, where it
+    /// had asked the driver again by a new C string at every launch (about 2,900 launches a section of the store line).
+    functions: std::cell::RefCell<std::collections::HashMap<String, ffi::CUfunction>>,
 }
 
 impl Module {
@@ -989,10 +992,13 @@ impl Module {
                 "cuModuleLoadData",
             )?
         };
-        Ok(Module { module })
+        Ok(Module { module, functions: std::cell::RefCell::new(std::collections::HashMap::new()) })
     }
 
     pub fn function(&self, name: &str) -> Result<Function<'_>> {
+        if let Some(&func) = self.functions.borrow().get(name) {
+            return Ok(Function { func, _module: PhantomData });
+        }
         let cname = CString::new(name).map_err(|_| CudaError {
             code: -1,
             name: String::from("BAD_NAME"),
@@ -1006,6 +1012,7 @@ impl Module {
                 "cuModuleGetFunction",
             )?
         };
+        self.functions.borrow_mut().insert(name.to_owned(), func);
         Ok(Function {
             func,
             _module: PhantomData,

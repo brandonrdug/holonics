@@ -6,6 +6,7 @@ use crate::hnn::field::*;
 use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
+use rayon::prelude::*;
 #[allow(unused_imports)]
 use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
@@ -20,6 +21,10 @@ use crate::hnn::card::{Card, CardBuffer, CardError};
 pub(crate) const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.ptx"));
 
 pub(crate) const THREADS: u32 = 256;
+/// [realization; November 15] The block of `field_paces`, whose clocks are block scans (the kernel's `PACE_SCAN_THREADS`).
+pub(crate) const PACE_SCAN_THREADS: u32 = 256;
+/// [realization; November 15] The block of `field_blank_dz`, one block a site (the kernel's `BLANK_DZ_THREADS`).
+pub(crate) const BLANK_DZ_THREADS: u32 = 256;
 
 /// The device octets the runs keep to (the board's, the desktop included).
 pub(crate) const BOARD_CEILING: u64 = 12 << 30;
@@ -1092,20 +1097,10 @@ impl<'c> Resident<'c> {
     pub(crate) fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &Declaration, words: &mut Words) -> Result<Staged<'c>> {
         let ticks = declaration.ticks;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
-        let mut site_region = Vec::new();
-        let mut site_pos = Vec::new();
-        let mut region_off = vec![0u32];
-        let mut region_eoff = Vec::new();
-        // [theory, November 12, P51] The skins' support stride: each region's prefix of `S_r K_r`, and their sum.
-        let (mut region_soff, mut skin_entries) = (Vec::<u64>::new(), 0usize);
-        let mut classes = Vec::new();
-        let mut unresolved = Vec::new();
-        // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
-        let mut definite = Vec::new();
-        // Each site's echo (§15.3): its `B`, and its logits a class (zero where none).
-        let (mut echo_has, mut echo_b, mut echo_logits) = (Vec::new(), Vec::new(), Vec::new());
-        let (mut mix_off, mut mix_class, mut mix_share) = (vec![0u32], Vec::new(), Vec::new());
-        let mut pairs = 0usize;
+        // [realization; November 15, Brandon 15:19 "40 minutes a lap is a lot"] Each region's lists are built on its own core and then
+        // joined in region order, so every list is the regions' lists one after another, the same words as the one-thread walk; only the
+        // offsets (`region_off`, `region_eoff`, `region_soff`, `dstart`, `ostart`, `mix_off`) are prefixes over the regions before.
+        let ticks = declaration.ticks;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
         // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
         // circles (the host's `Declaration::room_window`, the one owner of the cut's admission).
@@ -1123,12 +1118,88 @@ impl<'c> Resident<'c> {
             })
             .collect();
         let computed: Vec<u8> = if windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t])))).collect() } else { Vec::new() };
-        // Each region's definite sites and its open ones, by place (§15.9: an open receiver hears every definite
-        // site, and a definite source is heard by every open one).
-        let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new(), Vec::<u32>::new());
+        // One region's lists: its sites' rows, its definite sites and its open ones by place (§15.9: an open receiver hears every definite
+        // site, and a definite source is heard by every open one), its echoes (§15.3) and its carried mixtures, `mix_off` counted from the
+        // region's own first mixture.
+        #[derive(Default)]
+        struct RegionLists {
+            classes: Vec<u32>,
+            unresolved: Vec<u8>,
+            definite: Vec<u8>,
+            dlist: Vec<u32>,
+            olist: Vec<u32>,
+            echo_has: Vec<u8>,
+            echo_b: Vec<u64>,
+            echo_logits: Vec<i64>,
+            mix_class: Vec<u32>,
+            mix_share: Vec<u32>,
+            mix_off: Vec<u32>,
+        }
+        let parts: Vec<RegionLists> = regions
+            .par_iter()
+            .zip(windows.par_iter())
+            .map(|(region, window)| {
+                let s = region.classes.len();
+                let mut l = RegionLists { classes: Vec::with_capacity(s), unresolved: Vec::with_capacity(s), definite: Vec::with_capacity(s), echo_has: Vec::with_capacity(s), echo_b: Vec::with_capacity(s), mix_off: Vec::with_capacity(s), ..Default::default() };
+                for t in 0..s {
+                    l.classes.push(region.classes[t] as u32);
+                    l.unresolved.push(u8::from(region.unresolved[t]));
+                    let carried = region.faces.get(t).and_then(Option::as_ref).is_some();
+                    let is_definite = (!region.unresolved[t] && !carried) || region.locked.get(t).copied().unwrap_or(false);
+                    l.definite.push(u8::from(is_definite));
+                    if is_definite {
+                        l.dlist.push(t as u32);
+                    } else if window.as_ref().is_none_or(|w| w[t]) {
+                        // [E] A definite source is heard by every open receiver its region computes (the host's `Constitution::tick`
+                        // skips the rest), so the receivers its return walks are those alone.
+                        l.olist.push(t as u32);
+                    }
+                    match region.echo.get(t).and_then(Option::as_ref) {
+                        Some(e) => {
+                            l.echo_has.push(1u8);
+                            l.echo_b.push(e.b);
+                            l.echo_logits.extend_from_slice(&e.logits);
+                        }
+                        None => {
+                            l.echo_has.push(0u8);
+                            l.echo_b.push(0u64);
+                            // (the logits are read only where a site carries an echo, so a batch with none keeps none)
+                            if any_echo {
+                                l.echo_logits.extend(std::iter::repeat_n(0i64, a));
+                            }
+                        }
+                    }
+                    for &(c, w) in region.faces.get(t).and_then(Option::as_ref).into_iter().flatten() {
+                        l.mix_class.push(c);
+                        l.mix_share.push(w);
+                    }
+                    l.mix_off.push(l.mix_class.len() as u32);
+                }
+                l
+            })
+            .collect();
+        let sites = regions.iter().map(|r| r.classes.len()).sum::<usize>();
+        let mixtures = parts.iter().map(|l| l.mix_class.len()).sum::<usize>();
+        let mut site_region = Vec::with_capacity(sites);
+        let mut site_pos = Vec::with_capacity(sites);
+        let mut region_off = Vec::with_capacity(regions.len() + 1);
+        region_off.push(0u32);
+        let mut region_eoff = Vec::with_capacity(regions.len());
+        // [theory, November 12, P51] The skins' support stride: each region's prefix of `S_r K_r`, and their sum.
+        let (mut region_soff, mut skin_entries) = (Vec::<u64>::with_capacity(regions.len() + 1), 0usize);
+        let mut classes = Vec::with_capacity(sites);
+        let mut unresolved = Vec::with_capacity(sites);
+        // A definite site (§14.1): known (resolved, carrying no mixture) or locked (a foil).
+        let mut definite = Vec::with_capacity(sites);
+        // Each site's echo (§15.3): its `B`, and its logits a class (zero where none).
+        let (mut echo_has, mut echo_b, mut echo_logits) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::new());
+        let (mut mix_off, mut mix_class, mut mix_share) = (Vec::with_capacity(sites + 1), Vec::with_capacity(mixtures), Vec::with_capacity(mixtures));
+        mix_off.push(0u32);
+        let mut pairs = 0usize;
+        let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::with_capacity(regions.len() + 1), Vec::<u32>::new(), Vec::<u32>::with_capacity(regions.len() + 1));
         // Each site's region's weight in the joint code (§16.23, `Region::weight`), for the reverse.
-        let mut site_weight: Vec<(u64, u64)> = Vec::new();
-        for (r, region) in regions.iter().enumerate() {
+        let mut site_weight: Vec<(u64, u64)> = Vec::with_capacity(sites);
+        for (r, (region, l)) in regions.iter().zip(parts).enumerate() {
             let s = region.classes.len();
             let weight = region.weight();
             site_weight.extend(std::iter::repeat_n(weight, s));
@@ -1137,45 +1208,24 @@ impl<'c> Resident<'c> {
             region_soff.push(skin_entries as u64);
             dstart.push(dlist.len() as u32);
             ostart.push(olist.len() as u32);
-            for t in 0..s {
-                site_region.push(r as u32);
-                site_pos.push(t as u32);
-                classes.push(region.classes[t] as u32);
-                unresolved.push(u8::from(region.unresolved[t]));
-                let carried = region.faces.get(t).and_then(Option::as_ref).is_some();
-                let is_definite = (!region.unresolved[t] && !carried) || region.locked.get(t).copied().unwrap_or(false);
-                definite.push(u8::from(is_definite));
-                if is_definite {
-                    dlist.push(t as u32);
-                } else if windows[r].as_ref().is_none_or(|w| w[t]) {
-                    // [E] A definite source is heard by every open receiver its region computes (the host's `Constitution::tick`
-                    // skips the rest), so the receivers its return walks are those alone.
-                    olist.push(t as u32);
-                }
-                match region.echo.get(t).and_then(Option::as_ref) {
-                    Some(e) => {
-                        echo_has.push(1u8);
-                        echo_b.push(e.b);
-                        echo_logits.extend_from_slice(&e.logits);
-                    }
-                    None => {
-                        echo_has.push(0u8);
-                        echo_b.push(0u64);
-                        // (the logits are read only where a site carries an echo, so a batch with none keeps none)
-                        if any_echo {
-                            echo_logits.extend(std::iter::repeat_n(0i64, a));
-                        }
-                    }
-                }
-                for &(c, w) in region.faces.get(t).and_then(Option::as_ref).into_iter().flatten() {
-                    mix_class.push(c);
-                    mix_share.push(w);
-                }
-                mix_off.push(mix_class.len() as u32);
-            }
+            site_region.extend(std::iter::repeat_n(r as u32, s));
+            site_pos.extend(0..s as u32);
+            classes.extend_from_slice(&l.classes);
+            unresolved.extend_from_slice(&l.unresolved);
+            definite.extend_from_slice(&l.definite);
+            let definites = l.dlist.len();
+            dlist.extend_from_slice(&l.dlist);
+            olist.extend_from_slice(&l.olist);
+            echo_has.extend_from_slice(&l.echo_has);
+            echo_b.extend_from_slice(&l.echo_b);
+            echo_logits.extend_from_slice(&l.echo_logits);
+            let before = mix_class.len() as u32;
+            mix_off.extend(l.mix_off.iter().map(|&o| before + o));
+            mix_class.extend_from_slice(&l.mix_class);
+            mix_share.extend_from_slice(&l.mix_share);
             region_off.push(site_region.len() as u32);
             // [theory, November 12, P51] The region's support stride `K_r = NEAR_SLOTS + D_r` a row (the clock's skins).
-            skin_entries += s * (2 * (NEAR - 1) + dlist.len() - *dstart.last().expect("the region's definite list opened") as usize);
+            skin_entries += s * (2 * (NEAR - 1) + definites);
         }
         region_soff.push(skin_entries as u64);
         let sites = site_region.len();
@@ -1306,7 +1356,7 @@ impl<'c> Resident<'c> {
         // [measurement; theory, November 13, P56 item 4] The batch's clocks' takes.
         self.mark("batch_takes");
         if paced > 0 {
-            self.launch("field_paces", Self::cells((paced * regions.len()) as u64), THREADS, &mut [arg(words)])?;
+            self.launch("field_paces", ((paced * regions.len()) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words)])?;
             self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }

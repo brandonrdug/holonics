@@ -191,10 +191,17 @@ reading "exact" in this sense, in code, guides or records.
   tolerance, with its remainder accounted. A width picked by hand, a doubled width, a max, or a
   fixed float width standing in for the series is arbitrary precision (October 14: "Floats and maxes
   have the same problem").
-- Integer series are the condition for parallel determinism. Integer and rational addition is
-  associative, so co-present terms summed in any order, on any partition of the card, give the same
-  bits; float addition is not associative, so a parallel float sum depends on its schedule. This is
-  what lets many cells deposit as one flow, and it holds for any limb layout: a term split into
+- A sum is schedule-free where its terms meet at one declared grain and nothing is released between
+  them: co-present terms summed in any order, on any partition of the card, then give the same bits.
+  The register's kind is not the reason (Brandon, November 15 16:22: "there is no abstract difference
+  in what you can do with the information in terms of mathematics. The integers are still of their
+  locales"). An integer at a declared grain is a word at its locale, and a float is a word carrying its
+  locale in its exponent. A float add releases at every step to the grain of the partial sum's exponent,
+  and that per-step release is what makes a float sum depend on its order; a float sum accumulated at
+  one shared grain and released once is as schedule-free. Reason for the wording: the earlier text
+  ("integer series are the condition for parallel determinism") and a message of that day ("every sum is
+  integer") set the register kind where the release's place belongs, a convolution of bit registers with
+  the mathematics. This is what lets many cells deposit as one flow, and it holds for any limb layout: a term split into
   narrow limbs whose products and sums fit their accumulator (a tensor core's, for one) gives the
   same bits. A device's units are widths; which limbs a kernel uses is the realization's choice,
   never the law's. A card is a surface of many slow lanes (Brandon, November 7: "the GPU is just a
@@ -793,6 +800,13 @@ foreground shell time went to wait loops.
   control and build put every build run on the slow state. It read a 2.8% gap that a balanced hold
   showed to be the order's
   ([the receipt](research/records/receipts/2026-11-14_engine-lift/README.md), C5).
+- **The card's lock is for timing** (Brandon, November 15 16:20). Only a timing hold has the card to itself: it takes
+  `.local/gpu.lock` and reads the card's process list (`nvidia-smi --query-compute-apps=pid --format=csv`) empty of other runs
+  before it times anything. A line's laps take the lock too, so a timing hold waits for a lap's end instead of splitting it.
+  Gates, parity, reproductions and readings take no lock and run beside whatever the card runs, a line's laps included. Reason: on November 15 every profile, gate and timing run of the realization's repair queued
+  behind the line's 35-minute laps, and each lap's reads stood between laps, about 8 minutes in every 43, while every sum of the engine
+  meets at one grain and is released once, so it gives the same bits on any schedule and each run sizes its batches from the card memory free when it opens (a lap peaks near 8.5 GB
+  of the 16). Scope: every script that launches on the card; a run that shares the card states it in its projection.
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
   by sleeping.
 
