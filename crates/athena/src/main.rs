@@ -269,10 +269,11 @@ fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Res
     match args.first().map(String::as_str) {
         Some("train-store") => athena::store::train(args, realization),
         Some("read-cavity") => athena::ruler::cavity::read_cavity(args, realization),
+        Some("read-loudness") => athena::ruler::loudness::read_loudness(args, realization),
         Some("found-lane") => athena::store::found_lane(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("write-store") => athena::store::write(args, realization),
-        _ => Err("a store command is train-store, read-cavity, write-store, found-lane or next-pass".into()),
+        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane or next-pass".into()),
     }
 }
 
