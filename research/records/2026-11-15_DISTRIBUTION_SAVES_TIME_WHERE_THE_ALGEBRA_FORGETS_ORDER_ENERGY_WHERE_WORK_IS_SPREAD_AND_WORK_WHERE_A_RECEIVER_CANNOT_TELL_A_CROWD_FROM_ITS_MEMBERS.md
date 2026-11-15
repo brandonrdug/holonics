@@ -425,3 +425,42 @@ UTC); `agent-inferred` for the reading of them.
   numerators' 62% is the term's instruction chain (its indices, the skin's address, the ballots that rank terms by limb
   and the accumulate's carries), each term after the last with few warps to hide it (`agent-inferred`). No guess on this
   kernel is fixed until its stall reasons, occupancy, registers and instructions a term are read.
+- **Four blocks a multiprocessor, scored** (the build thread, relayed 23:24 UTC; after the reboot, the card alone). The
+  guess, fixed at 22:50 UTC (`agent-inferred`): with `CONTACT_MIN_BLOCKS 4` the spills inside the walk go, so on the
+  expensive launches `field_contact_l4` reads 0.80 to 0.92 of the limbs build a launch, the l3 launches stay within 5%,
+  the exposure (which shares the bound) reads 0.90 to 1.00, and a section reads 0.980 to 0.995 of control in a balanced
+  hold. Gate 3 read equal. On lap 42's 24 sections, six blocks to four: l4 48.6 to 51.8 ms a section (1.066), the
+  exposure 17.2 to 18.8 (1.09), l3 2.5 to 2.5, the rows and columns unmoved; the balanced hold read 1.019 of control,
+  every run's 24 lines equal. Every guess missed, and the line stayed on the limbs build. The premise was that the spills
+  bind a term's chain; they cost it only part of its wait, and the warps they paid for hid more.
+- **The counters** (Nsight Compute on `field_contact_l4`, three launches on 2 of lap 42's sections, six blocks against
+  four). Duration 4.70 to 4.76 ms against 5.00 to 5.09; registers 80 against 128; achieved occupancy 43% against 28%
+  (active warps a scheduler 5.2 against 3.4, eligible 0.95 against 0.74); issued instructions a cycle 2.04 against
+  1.86; active threads a warp 21.7 of 32 in both; instructions 1.74e9 against 1.70e9 a launch. Stalls, in warps a
+  issued instruction, six blocks: long scoreboard 3.16, the fixed-latency wait 2.10, no instruction 1.15, math pipe
+  throttle 0.76, branch resolving 0.47, the rest under 0.35; four blocks: wait 1.92, long scoreboard 1.59, no
+  instruction 0.58. The ALU pipe stands at 52.8% of its peak (the multi-word adds, compares and selects), IMAD 15.5%,
+  loads and stores 21.5%. So the kernel is bound by latency at both settings: four blocks halve the long scoreboard
+  (the spills) and take a third of the warps that hid it, and what is left is a fixed-latency wait of about two cycles
+  an instruction with the ALU at half its peak, which is a dependent integer chain, and the instruction cache missing
+  over an entry of about 9,900 instructions.
+- **What the counters say in the law's terms.** The numerators are a sum of co-present terms at one grain, so by the
+  precision law's clause on releases any order and any partition of them gives the same bits once their carries are
+  released once (`radix.release-quotient-or-section`). The realization releases a carry at every term: each term's
+  wide add finds its carry by a compare and a select, ballots rank the terms by limb, and each term waits on the one
+  before it. That per-term release is a section standing between partials. Inside the integers it keeps every bit, but
+  it makes the sum's order the realization's chain, and the chain is what the wait counts. The quotient form is
+  carry-save: each signed term is cut into 32-bit chunks, each chunk is added into a lane-private 64-bit accumulator at
+  its limb's offset (no carry between chunks, room for 2^31 terms before any can overflow), and the carries are
+  released once at the row's end, after one reduction across the warp's lanes. Every bit is kept, a term's adds no
+  longer wait on the term before, no ranking is needed because a lane adds at the term's own offset, and the body
+  shrinks. It reaches the wait, the ALU's compares and selects, the ballots' divergence and the instruction cache
+  together (`agent-inferred`).
+- **The loop's static count** (the build thread, relayed 23:34 UTC). The numerators' loop of two terms an iteration is
+  352 instructions as laid out: IMAD 114, IADD3 56, SHF 35, ISETP 31, LOP3 29, SEL 22, BRA 10, LEA 9, LDS 8, LDG 6,
+  BSSY and BSYNC 5 each, LDL 3, VOTEU 2, PRMT 2. The layout holds every skin path (still, paced, the eight-mode table,
+  the general decay) behind branches the warp takes together, so one path runs and the static count overstates a term.
+  The compares, selects and votes that carry-save removes are 55 of the 352 as laid out (16%); IMAD's 114 mixes the
+  products with the moves and address arithmetic the compiler writes as IMAD, so its share is not read from the
+  layout. No guess on carry-save is fixed until the executed count a term by kind and the loop's stall samples are
+  read.
