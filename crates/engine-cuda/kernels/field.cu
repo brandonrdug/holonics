@@ -2088,31 +2088,38 @@ __device__ __forceinline__ Big<L> big_of(const Coef &c) {
     return r;
 }
 
-// `c · m` with `m` of one limb, or two where `WIDE` (needs `L ≥ 5`).
+// `c · m` with `m` of one limb, or two where `WIDE`, truncated to the carrier's `L` limbs (a dropped top is a quotient:
+// the row's total fits its carrier, so its partials may wrap).
 template <int L, bool WIDE>
 __device__ __forceinline__ Big<L> big_mul(const Coef &c, uint64_t m0, uint64_t m1) {
-    Big<L> r = big_zero<L>();
+    uint64_t r[5];
     uwide t = (uwide)c.c0 * (uwide)m0;
-    r.v[0] = (uint64_t)t;
+    r[0] = (uint64_t)t;
     uint64_t carry = (uint64_t)(t >> 64);
     t = (uwide)c.c1 * (uwide)m0 + (uwide)carry;
-    r.v[1] = (uint64_t)t;
+    r[1] = (uint64_t)t;
     carry = (uint64_t)(t >> 64);
     t = (uwide)c.c2 * (uwide)m0 + (uwide)carry;
-    r.v[2] = (uint64_t)t;
-    r.v[3] = (uint64_t)(t >> 64);
+    r[2] = (uint64_t)t;
+    r[3] = (uint64_t)(t >> 64);
+    r[4] = 0;
     if (WIDE) {
-        t = (uwide)c.c0 * (uwide)m1 + (uwide)r.v[1];
-        r.v[1] = (uint64_t)t;
+        t = (uwide)c.c0 * (uwide)m1 + (uwide)r[1];
+        r[1] = (uint64_t)t;
         carry = (uint64_t)(t >> 64);
-        t = (uwide)c.c1 * (uwide)m1 + (uwide)r.v[2] + (uwide)carry;
-        r.v[2] = (uint64_t)t;
+        t = (uwide)c.c1 * (uwide)m1 + (uwide)r[2] + (uwide)carry;
+        r[2] = (uint64_t)t;
         carry = (uint64_t)(t >> 64);
-        t = (uwide)c.c2 * (uwide)m1 + (uwide)r.v[3] + (uwide)carry;
-        r.v[3] = (uint64_t)t;
-        r.v[4] = (uint64_t)(t >> 64);
+        t = (uwide)c.c2 * (uwide)m1 + (uwide)r[3] + (uwide)carry;
+        r[3] = (uint64_t)t;
+        r[4] = (uint64_t)(t >> 64);
     }
-    return r;
+    Big<L> b = big_zero<L>();
+#pragma unroll
+    for (int k = 0; k < L && k < 5; k++) {
+        b.v[k] = r[k];
+    }
+    return b;
 }
 
 template <int L>
@@ -2232,7 +2239,12 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // -------------------------------------------------------------------------------------------
 // the resonance classes and their lists
 
-#define WEIGHT_BITS 62
+// [realization; agent-inferred, November 15] The host's series row weighs a source and a crowd's value by `2^62`
+// (`WEIGHT_BITS`) and a crowd's mass by its count `2^62`; the card weighs them by one and by the count. Every quotient
+// the row forms (a current `N/M`, a share `e_k 2^63/M`) has the same factor in its dividend and its divisor, so it is the
+// same rational, and the nearest quotient on a magnitude `⌊(|x| + ⌊m/2⌋)/m⌋` is unchanged by an even factor `K`: the
+// two differ only where `2|x| + m` is a multiple of `2m` with `m` odd, and an odd number never is (the theory thread's
+// lemma, `ratio.rs`'s test of it). So the row's carrier is the host's bound less the multiplier's 62 bits (`row_limbs`).
 // The contact carriers up to this many limbs add each numerator term where it stands (`add_window`); wider ones
 // (rare: a row spread past 512 bits) shift and complement it whole.
 #define WINDOW_LIMBS 8
@@ -3106,8 +3118,8 @@ __device__ __forceinline__ int64_t carried_s(const FieldWords &w, uint32_t h, ui
 // [definition; agent-inferred, November 1] **The contact, the series row and the current over each
 // site's support** (`Constitution::tick`, §14.10, §14.11, §15.2), one warp a head and a receiving site, the
 // carrier `L` limbs the exposure chose. The terms: each support entry's (a lane an entry) and each
-// crowd's (a lane a slot), `face · multiplier` shifted by `a − a_0` (the multiplier `2^62` of a source,
-// a crowd's count `2^62` in the mass and `2^62` in its value), summed whole into the row's mass (the
+// crowd's (a lane a slot), `face · multiplier` shifted by `a − a_0` (the multiplier one of a source,
+// a crowd's count in the mass and one in its value: the host's `2^62` cancels in every quotient), summed whole into the row's mass (the
 // lanes' partials, summed over the warp) and, times each value entry, into the numerators (the lanes
 // over the span's entries, a lane an entry and a part of the staged terms). The numerators are divided
 // once by the mass (`RowDiv`, the exact division to the nearest numerator) and returned to the
@@ -3278,15 +3290,15 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 } else {
                     s = (uint32_t)sh;
                 }
-                cf = coef_of(face, (uwide)1 << WEIGHT_BITS);
+                cf = coef_of(face, 1);
                 big_add(M, big_shl(big_of<L>(cf), s));
                 met += 1;
             }
             uint32_t nvalid = 32;
             if constexpr (L <= WINDOW_LIMBS) {
-                // The numerators add `face |v| 2^(62 + s)` by the limb `q` it stands at: the lanes rank their
+                // The numerators add `face |v| 2^s` by the limb `q` it stands at: the lanes rank their
                 // terms by `q` (ballots), and stage the face shifted by its bits within the limb in that order.
-                const uint32_t t = s + WEIGHT_BITS, b = t & 63;
+                const uint32_t t = s, b = t & 63;
                 const uint32_t key = (j != UINT32_MAX && (t >> 6) < (uint32_t)L) ? (t >> 6) : 0xFFFFFFFFu;
                 const uint32_t below = lane == 0 ? 0u : 0xFFFFFFFFu >> (32 - lane);
                 uint32_t rank = 0;
@@ -3316,7 +3328,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
             numerators(false, nvalid);
             __syncwarp();
         }
-        // The crowds' chunk: a crowd's value multiplier is `2^62`, its mass multiplier its count `2^62`.
+        // The crowds' chunk: a crowd's value multiplier is one, its mass multiplier its count.
         {
             Coef cf = {0, 0, 0};
             uint32_t s = 0, slot = UINT32_MAX, lo = 0, hi_ = 0, lv = 0;
@@ -3334,8 +3346,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     } else {
                         s = (uint32_t)sh;
                     }
-                    big_add(M, big_shl(big_of<L>(coef_of(face, (uwide)count << WEIGHT_BITS)), s));
-                    cf = coef_of(face, (uwide)1 << WEIGHT_BITS);
+                    big_add(M, big_shl(big_of<L>(coef_of(face, (uwide)count)), s));
+                    cf = coef_of(face, 1);
                 }
             }
             st0[warp][lane] = cf.c0;
@@ -3407,7 +3419,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     int64_t a;
                     uint64_t face;
                     term_of(w, (int64_t)erow[j], &a, &face);
-                    const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)1 << WEIGHT_BITS)), (uint32_t)(a - amin) + SHARE_BITS);
+                    const Big<L> x = big_shl(big_of<L>(coef_of(face, 1)), (uint32_t)(a - amin) + SHARE_BITS);
                     uint64_t p = 0;
                     if (!rowdiv_nearest(x, rd, &p)) {
                         p = UINT64_MAX;
@@ -3424,7 +3436,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                         int64_t a;
                         uint64_t face;
                         term_of(w, crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper, g, lo > i), &a, &face);
-                        const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)count << WEIGHT_BITS)), (uint32_t)(a - amin) + SHARE_BITS);
+                        const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)count)), (uint32_t)(a - amin) + SHARE_BITS);
                         if (!rowdiv_nearest(x, rd, &p)) {
                             p = UINT64_MAX;
                         }
@@ -3439,6 +3451,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
 
 #define CONTACT_ENTRY(LL) \
     extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOCKS) field_contact_l##LL(FieldWords w, uint32_t store) { contact_body<LL>(w, store); }
+CONTACT_ENTRY(3)
+CONTACT_ENTRY(4)
 CONTACT_ENTRY(5)
 CONTACT_ENTRY(6)
 CONTACT_ENTRY(7)
