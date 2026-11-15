@@ -1,0 +1,5 @@
+# the two card tests that hold the lanes' powers by stage equal on the card and the host
+# tests: lock taken 01:10:02
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 63.83s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+# tests: exit 0 01:11:23

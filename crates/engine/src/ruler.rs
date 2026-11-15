@@ -1030,6 +1030,17 @@ impl Field {
         Ok(stages)
     }
 
+    /// [measurement; Brandon, November 15 00:58Z; the record of November 13 on loudness beside surprise, §4 and test 1] **A region's lane
+    /// powers by stage**: every site's lane scales `‖r_ℓ‖_rms` (the powers the chart divides by, [`lane_chart`]) at each tick's opening and
+    /// after the last tick (the stage the faces read), `[t][L]` each, on the state's grain. Its stages are those of [`Field::tick_charts`]. A
+    /// reading: no state changes.
+    pub fn tick_scales(&self, region: &Region) -> Result<Vec<Vec<i128>>> {
+        let pass = self.pass(region, true)?;
+        let mut stages: Vec<Vec<i128>> = pass.ticks.iter().map(|c| c.scale.clone()).collect();
+        stages.push(pass.scale.clone());
+        Ok(stages)
+    }
+
     /// Each tick's read of `region` ([`TickRead`]), in tick order.
     pub fn tick_reads(&self, region: &Region) -> Result<Vec<TickRead>> {
         let pass = self.pass(region, true)?;

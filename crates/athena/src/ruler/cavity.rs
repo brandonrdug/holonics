@@ -9,6 +9,35 @@ use holonics_engine::passage::{Cut, Kind};
 use holonics_engine::region::{views_of, TrainRegion};
 use std::path::Path;
 
+/// One stretch of a slice as the store's cut draws it for a read: its region, its bytes, whether it ends a piece, and its kind.
+pub(crate) struct HeldStretch {
+    pub(crate) region: TrainRegion,
+    pub(crate) bytes: Vec<u8>,
+    pub(crate) ends: bool,
+    pub(crate) kind: Kind,
+}
+
+/// A slice of `role` cut afresh from stretch 1 with the key file's seed, whole stretches until at least `places` places (the cut every
+/// reading of the line's held places shares: [`read_cavity`] and the loudness ruler).
+#[allow(clippy::too_many_arguments, reason = "the cut's declared inputs, each a pinned file's reading or the pass's law")]
+pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &FieldCodec, places: usize) -> Result<Vec<HeldStretch>> {
+    let slice = open_slice(store, role, name, counts)?;
+    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
+    let mut cut = Cut { seed, slices: vec![slice], pass };
+    let mut out = Vec::new();
+    let mut taken = 0usize;
+    while taken < places {
+        let Some(drawn) = cut.next() else { break };
+        let at = cut.pass.slices[drawn.slice].clone();
+        let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+        let ends = drawn.ends;
+        let stretch = cut.take(drawn, codec)?;
+        taken += stretch.region.classes.len();
+        out.push(HeldStretch { region: stretch.region, bytes, ends, kind: stretch.kind });
+    }
+    Ok(out)
+}
+
 /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] `read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA
 /// CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]`: **a held place's news at its cavity opening**, a reading (with `ROLE` = `prefix`, the
 /// same reading on the documents the line trains on, G187). Each slice of the held role, alone and in the
@@ -91,23 +120,15 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
     println!("CAVITY_LAW role={role} places={places} least={} octaves={} pairs_bound={} sites_bound={} ticks={} alphabet={} ms={}", law.least, law.octaves, law.pairs, law.sites, learner.field.declaration.ticks, codec.alphabet(), started.elapsed().as_millis());
     const COPY_BOUND: usize = 1022;
     for &name in &names {
-        let slice = open_slice(store, role, name, &counts)?;
-        let pass = StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }] };
-        let mut cut = Cut { seed, slices: vec![slice], pass };
+        let cut = held_stretches(store, role, name, &counts, &args[4], seed, &law, &codec, places as usize)?;
+        let taken: usize = cut.iter().map(|s| s.region.classes.len()).sum();
         let mut stretches: Vec<(Vec<usize>, Vec<u8>, bool)> = Vec::new();
         let mut wholes: Vec<(usize, TrainRegion)> = Vec::new();
-        let mut taken = 0usize;
-        while taken < places as usize {
-            let Some(drawn) = cut.next() else { break };
-            let at = cut.pass.slices[drawn.slice].clone();
-            let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
-            let ends = drawn.ends;
-            let stretch = cut.take(drawn, &codec)?;
-            taken += stretch.region.classes.len();
-            if stretch.kind == Kind::MaskWhole {
-                wholes.push((stretches.len(), stretch.region.clone()));
+        for s in cut {
+            if s.kind == Kind::MaskWhole {
+                wholes.push((stretches.len(), s.region.clone()));
             }
-            stretches.push((stretch.region.classes.clone(), bytes, ends));
+            stretches.push((s.region.classes, s.bytes, s.ends));
         }
         // c0 on the host, a region a place; the first stretch's places checked against the whole opening.
         // [the ring record §4] On a field that reads twice the opening a place's chart begins from is the second read's, marked by the first

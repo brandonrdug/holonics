@@ -38,4 +38,5 @@ run run-watch-controls python3 tools/test_runs.py
 run reproduction-controls python3 tools/test_reproduction.py
 run live-set-controls python3 tools/test_live_set.py
 run measure-controls python3 tools/test_measure.py
+run loudness-table-controls python3 tools/test_loudness_table.py
 exit $status
