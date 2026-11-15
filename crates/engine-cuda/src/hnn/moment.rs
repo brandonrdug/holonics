@@ -11,7 +11,7 @@ use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, C
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
-use holonics_engine::inherited::tower::{TowerError, TowerFace, MATERIAL_BITS};
+use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS};
 #[allow(unused_imports)]
 use crate::cuda::{Dim3, Module};
 #[allow(unused_imports)]

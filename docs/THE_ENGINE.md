@@ -214,8 +214,7 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 
 ## 10. What is owed
 
-- **The cut's second part** (C5): the kernels' headers (one header a phase) and the `inherited` items distributed into
-  their modules. The renames stand (`Constitution`, `Declaration`, `Loci`, `Learner`, `Realization`, `Host`, `Resident`,
+- **The cut's second part** (C5): the kernels' headers (one header a phase). The October items stand in their objects' modules. The renames stand (`Constitution`, `Declaration`, `Loci`, `Learner`, `Realization`, `Host`, `Resident`,
   `Codec`, `Forward`, `ReadLogits`, `Next`, `Receipt`, `OwnedRegion`); the module paths `field` and `hnn::field` stay.
 - **The headers** (C7): every module and kernel header in §5's form (object, equations, kind and index, kernels, Lean,
   atlas, records), its dated reasoning moved to the records. Most of the cut modules still open with a line naming

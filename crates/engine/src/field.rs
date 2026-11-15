@@ -80,7 +80,7 @@
 //!
 //! [definition; agent-inferred, November 3, §16.24] **An answer port is compared through its coupling.** Where a region
 //! declares its port ([`Region::port`]), every site from its start is compared with the answer's cells by the coupling at
-//! temperature one ([`crate::inherited::coupling::coupling_code`]): an unused place writes the void, and the covector is
+//! temperature one ([`crate::coupling::coupling_code`]): an unused place writes the void, and the covector is
 //! the face less the target the coupling places there ([`port_reading`]).
 //!
 //! [definition; agent-inferred, November 2, §16.22] **A site opens on its moment.** The source enters as phase-carried
@@ -175,10 +175,6 @@
 //! the release's sweeps); the **cell holonomy** (the release's circulation receipt) and the **tower
 //! thread** (the octave falloff) stay attached.
 
-#[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 #[allow(unused_imports)]
 use rayon::prelude::*;
 

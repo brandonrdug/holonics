@@ -13,10 +13,6 @@
 #[allow(unused_imports)]
 use crate::field::*;
 #[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
-#[allow(unused_imports)]
 use rayon::prelude::*;
 
 /// [measurement; agent-inferred, November 5, §16.47] **One read of the release** ([`Constitution::sample_observed`]): its index
@@ -181,7 +177,7 @@ impl Constitution {
         }
         #[allow(clippy::too_many_arguments)]
         fn report<'a>(rounds: usize, active: &[bool], records: &[CertifiedRecord], faces: &[Vec<TowerFace>], answers: &'a [Vec<usize>], kept: usize, undone: usize, outside: i128, changed: i128) -> SettlePass<'a> {
-            let ln2 = crate::inherited::keyed_modes::ln2_face();
+            let ln2 = crate::field::ln2_face();
             let past = |nats: i128| -> usize { faces.iter().zip(answers).map(|(f, x)| f.iter().zip(x).filter(|&(face, &a)| ((face.code(a) as i128 - entropy(face)) * ln2) >> 30 > nats << 20).count()).sum() };
             let (over, over2) = (past(1), past(2));
             SettlePass {
@@ -868,7 +864,7 @@ pub fn exchange_proposals(x: &[usize], f: &[TowerFace], h: i128) -> Vec<(Vec<(us
 /// place already claimed; each its place and its letter, with its bare gain `c_t(x_t) − c_t(top)` on the codes' bits.
 pub fn redraw_proposals(x: &[usize], f: &[TowerFace], void: usize) -> Vec<(Vec<(usize, usize)>, i128)> {
     let (len, reach) = (x.len(), NEAR - 1);
-    let ln2 = crate::inherited::keyed_modes::ln2_face();
+    let ln2 = crate::field::ln2_face();
     let nats = |bits: i128| (bits * ln2) >> 30;
     let v: Vec<i128> = (0..len).map(|t| f[t].code(x[t]) as i128 - entropy(&f[t])).collect();
     let mut order: Vec<usize> = (0..len).filter(|&t| nats(v[t]) > 1 << 20).collect();
@@ -935,8 +931,8 @@ pub struct ExchangeMove {
 }
 
 /// [definition; theory, November 10 03:25 and 03:55] **An answer's root charge** `Σ_a N(a) log₂(N(a)/F(a))` on the codes'
-/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`crate::inherited::tower::code_of`], its smaller side over its larger, both
-/// scaled down together to the width its quotient reads: a count on `2^72` passes the `2^66` [`crate::inherited::tower::face_code`] can shift by
+/// `2^(−20)` bits ([`letter_balance`]; each ratio read through [`crate::ratio::ratio_code`], its smaller side over its larger, both
+/// scaled down together to the width its quotient reads: a count on `2^72` passes the `2^66` [`crate::field::face_code`] can shift by
 /// its unit, which wrapped and read the November 10 128-problem run's root as −636,886 nats).
 pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
     let (n, f) = letter_balance(x, faces);
@@ -944,7 +940,7 @@ pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
         .filter(|&c| n[c] > 0 && f[c] > 0)
         .map(|c| {
             let (num, den) = (n[c] as u128, f[c] as u128);
-            let ratio = if num >= den { crate::inherited::tower::code_of(den, num) as i128 } else { -(crate::inherited::tower::code_of(num, den) as i128) };
+            let ratio = if num >= den { crate::ratio::ratio_code(den, num) as i128 } else { -(crate::ratio::ratio_code(num, den) as i128) };
             (n[c] >> 72) * ratio
         })
         .sum()

@@ -11,7 +11,7 @@ publish = false
 name = "holonics_engine"
 path = "src/lib.rs"
 
-# The certificate's acceptance read (`inherited::tower`, `fewer_bits`), forwarded from the library's feature of the same name.
+# The certificate's acceptance read (`face`'s `fewer_bits`), forwarded from the library's feature of the same name.
 [features]
 certificate-check = []
 

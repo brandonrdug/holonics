@@ -11,10 +11,6 @@
 #[allow(unused_imports)]
 use crate::field::*;
 #[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
-#[allow(unused_imports)]
 use rayon::prelude::*;
 
 /// [definition; agent-inferred, November 1] **A contact row as a series** (the dispersing field's
@@ -112,4 +108,190 @@ impl Sums {
 /// `⌊log₂ d⌋` for `d ≥ 1`, the falloff's octave in bits (§2.3).
 pub fn octave(d: usize) -> u32 {
     usize::BITS - 1 - d.leading_zeros()
+}
+
+// The items this object owns that stood in the October tower until C5 (#603), each as it stood.
+
+/// `x / k` to the nearest integer, half away from zero.
+pub fn div_nearest(x: i128, k: i128) -> i128 {
+    if x >= 0 { (x + k / 2) / k } else { -((-x + k / 2) / k) }
+}
+
+/// `e^(a + i b)` on `2^(−30)`, `a`, `b` on `2^(−30)`: the series summed until its term releases
+/// to zero at the grain.
+pub fn exp_series(a: i128, b: i128) -> (i128, i128) {
+    let mut term = (1i128 << MOVE_BITS, 0i128);
+    let mut sum = term;
+    let mut k = 1i128;
+    loop {
+        let re = release(term.0 * a - term.1 * b, MOVE_BITS);
+        let im = release(term.0 * b + term.1 * a, MOVE_BITS);
+        term = (div_nearest(re, k), div_nearest(im, k));
+        if term == (0, 0) {
+            return sum;
+        }
+        sum = (sum.0 + term.0, sum.1 + term.1);
+        k += 1;
+    }
+}
+
+/// `π` on `2^(−bits)` by Machin's series `π = 16 atan(1/5) − 4 atan(1/239)`, each term an exact
+/// quotient sixteen grains finer, released once: the half turn's navigator face.
+pub fn half_turn(bits: u32) -> i128 {
+    const GUARD: u32 = 16;
+    let one = 1i128 << (bits + GUARD);
+    let atan_inverse = |k: i128| -> i128 {
+        let (mut power, mut sum, mut n) = (one / k, 0i128, 0i128);
+        while power != 0 {
+            let term = power / (2 * n + 1);
+            sum += if n % 2 == 0 { term } else { -term };
+            power /= k * k;
+            n += 1;
+        }
+        sum
+    };
+    release(16 * atan_inverse(5) - 4 * atan_inverse(239), GUARD)
+}
+
+/// `r̂ = r / ‖r‖_rms` on `2^(−16)` and `‖r‖_rms` on `2^(−16)`, `r` on `2^(−16)`; a zero face reads
+/// as zero.
+pub fn ratio_to_power(r: &[i64]) -> Result<(Vec<i32>, i128)> {
+    let power: i128 = r.iter().map(|&v| v as i128 * v as i128).sum();
+    let scale = ((power / r.len() as i128) as u128).isqrt() as i128;
+    if scale == 0 {
+        return Ok((vec![0; r.len()], 0));
+    }
+    let read = collect_exact(r.iter().map(|&v| fit32(div_nearest((v as i128) << FACE_BITS, scale), "a read's ratio outgrew its 32-bit carrier")))?;
+    Ok((read, scale))
+}
+
+/// The adjoint of [`ratio_to_power`]: `∂r = (∂r̂ − r̂ ⟨r̂, ∂r̂⟩/d) / ‖r‖_rms`, covectors on
+/// `2^(−24)`.
+pub fn ratio_adjoint(read: &[i32], scale: i128, cov: &[i64]) -> Result<Vec<i64>> {
+    if scale == 0 {
+        return Ok(vec![0; cov.len()]);
+    }
+    let dot: i128 = read.iter().zip(cov).map(|(&a, &b)| a as i128 * b as i128).sum(); // 2^(−40)
+    let mean = div_nearest(dot, read.len() as i128);
+    collect_exact(read.iter().zip(cov).map(|(&a, &b)| fit64(div_nearest((b as i128 - release(mean * a as i128, 2 * FACE_BITS)) << FACE_BITS, scale))))
+}
+
+/// `log₂ v` for `v ≥ 1` on `2^(−CERTIFICATE_DIGITS)`: the whole part from `v`'s width, then the
+/// mantissa's binary digits by squaring (released at `2^(−62)`), halving it when it passes two.
+/// A `v` wider than 63 bits enters through its leading 63 (a relative release below `2^(−62)`).
+pub fn log2_reading(v: u128) -> i128 {
+    log2_reading_at(v, CERTIFICATE_DIGITS)
+}
+
+/// `log₂ v` on `2^(−digits)`, `digits ≤ 60` ([`log2_reading`]).
+pub fn log2_reading_at(v: u128, digits: u32) -> i128 {
+    let v = v.max(1);
+    let width = 128 - v.leading_zeros();
+    let mut mantissa = if width > 63 { v >> (width - 63) } else { v << (63 - width) }; // in [2^62, 2^63)
+    let mut fraction = 0i128;
+    for _ in 0..digits {
+        mantissa = (mantissa * mantissa) >> 62;
+        fraction <<= 1;
+        if mantissa >= 1u128 << 63 {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    ((width as i128 - 1) << digits) + fraction
+}
+
+/// `m / t` on `2^(−62)`, at least one grain; a total past `2^64` is re-based so the shift fits.
+pub fn unit_of(m: u128, t: u128) -> u128 {
+    let shift = (128 - t.leading_zeros()).saturating_sub(64);
+    (((m >> shift) << UNIT_BITS) / (t >> shift).max(1)).clamp(1, 1u128 << UNIT_BITS)
+}
+
+/// `−log₂(m / t)` on `2^(−20)` bits, for any face's mass and total.
+pub fn ratio_code(m: u128, t: u128) -> i64 {
+    -(log2_face(unit_of(m, t), READ_BITS) as i64)
+}
+
+/// `x` released `bits` coarser, to the nearest numerator, half away from zero.
+pub fn release(x: i128, bits: u32) -> i128 {
+    if bits == 0 {
+        return x;
+    }
+    let half = 1i128 << (bits - 1);
+    if x >= 0 { (x + half) >> bits } else { -((-x + half) >> bits) }
+}
+
+/// [definition; agent-inferred] **The exponential's navigator face at `2^(−62)`**: `2^(2^(−i))`
+/// for `i = 1..=X`, each the floor of the exact integer square root of its predecessor's square
+/// re-based, from `2^1`. A value `2^(n + f)` with `f` on `2^(−X)` is `2^n` times the product of the
+/// factors the binary digits of `f` select, each product released at `2^(−62)`.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Exponential {
+    roots: Vec<u128>,
+    digits: u32,
+}
+
+/// The grain of `ln 2`'s face, `2^(−30)`.
+pub const LN2_BITS: u32 = 30;
+
+/// [definition; agent-inferred] **`ln 2` as its navigator's face** on `2^(−30)`: the series
+/// `Σ_(k≥1) 1/(k 2^k)`, its terms to `k = 60` read at `2^(−60)` and the sum released to `2^(−30)`
+/// (the tail past `k = 60` and the terms' floors stay below `2^(−50)`).
+pub fn ln2_face() -> i128 {
+    let sum: i128 = (1..=60).map(|k: i128| (1i128 << (60 - k)) / k).sum();
+    release(sum, 60 - LN2_BITS)
+}
+
+/// [definition; agent-inferred] **`log₂ p` on `2^(−X)`** for `p` on `2^(−62)`, `0 < p ≤ 2^62`: the
+/// inverse face of the `ln 2`/exponential navigator (`log₂` undoes [`Exponential`]). The whole part
+/// comes from the numerator's width, then `X` binary digits of the mantissa's logarithm, each read
+/// by squaring the mantissa (released at `2^(−62)`) and halving it when it passes two.
+pub fn log2_face(p: u128, digits: u32) -> i128 {
+    debug_assert!(p > 0 && p <= 1u128 << UNIT_BITS);
+    let width = 128 - p.leading_zeros(); // p in [2^(width−1), 2^width)
+    let whole = width as i128 - 1 - UNIT_BITS as i128; // ≤ 0
+    let mut mantissa = p << (UNIT_BITS + 1 - width); // in [2^62, 2^63)
+    let mut fraction = 0i128;
+    for _ in 0..digits {
+        mantissa = (mantissa * mantissa) >> UNIT_BITS;
+        fraction <<= 1;
+        if mantissa >= 2u128 << UNIT_BITS {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    (whole << digits) + fraction
+}
+
+impl Exponential {
+    pub fn new(digits: u32) -> Self {
+        let mut roots = Vec::with_capacity(digits as usize);
+        let mut previous: u128 = 2u128 << UNIT_BITS;
+        for _ in 0..digits {
+            previous = (previous << UNIT_BITS).isqrt();
+            roots.push(previous);
+        }
+        Self { roots, digits }
+    }
+    /// The navigator's resident face, `2^(2^(−i))` on `2^(−62)` for `i = 1..=X`.
+    pub fn roots(&self) -> &[u128] {
+        &self.roots
+    }
+
+    /// `2^(x / 2^X)` for `x ≤ 0` on `2^(−62)`, at least one grain (a class is never released to
+    /// zero mass by its exponent).
+    pub fn below_one(&self, x: i128) -> u128 {
+        debug_assert!(x <= 0);
+        let whole = (-x) >> self.digits; // floor of the magnitude's whole part
+        let frac = (-x) & ((1i128 << self.digits) - 1);
+        // 2^(−whole − frac) = 2^(−whole − 1) · 2^(1 − frac) when frac > 0.
+        let (shift, rest) = if frac == 0 { (whole, 0i128) } else { (whole + 1, (1i128 << self.digits) - frac) };
+        let mut value: u128 = 1u128 << UNIT_BITS;
+        for i in 0..self.digits {
+            if rest & (1i128 << (self.digits - 1 - i)) != 0 {
+                value = (value * self.roots[i as usize]) >> UNIT_BITS;
+            }
+        }
+        let shifted = if shift >= 128 { 0 } else { value >> shift };
+        shifted.max(1)
+    }
 }

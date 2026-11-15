@@ -474,6 +474,14 @@ type is named "Field", and parity, reproduction and timing hold after each.
   16's `STATE.3000` (a warm-up, then control, renamed, renamed, control, control, renamed, renamed, control): the control's runs
   read 712.1 to 712.9 ms a section, the renamed build's 712.2 to 713.6, every run's section lines equal to the first's. Done for
   C5 save the kernels' headers and the `inherited` items' distribution.
+- The `inherited` items, read November 15: each stands in the module of its object. The grains, the refusal, the carriers' fits and
+  the wide product are in `width`; the release, the exponential and logarithm faces, the nearest quotient, the half turn, the ratio's
+  adjoint and the code of a ratio (the October `code_of`, renamed `ratio_code` beside the face's own `code_of`) are in `ratio`; the
+  tower's face, its codes and the certificate's comparisons are in `face`; the maps and the covector are in `adjoint`; the deposit's
+  step and rates are in `deposit`. The receiver's coupling at temperature one and the width census are objects of their own, so they
+  are the modules `coupling` and `census` (agent-inferred: the plan's table put the coupling in `face`, but one file holds one object).
+  The keyed modes' copy of the unit grain went with them, `width` holding the one. Gate 1 passed, and gate 3 on lap 17 is equal. Timing was not
+  re-read: the items moved within one crate with their bodies unchanged. Owed to C5: the kernels' headers.
 
 **C6. The commands** (the PC). `crates/athena` with the live commands by §7's rule; the dispatch,
 `train-field`, its switches and the retired readings leave; `field_pass` leaves. Done when

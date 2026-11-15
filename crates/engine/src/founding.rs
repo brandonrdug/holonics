@@ -14,10 +14,6 @@
 #[allow(unused_imports)]
 use crate::field::*;
 #[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
-#[allow(unused_imports)]
 use rayon::prelude::*;
 
 impl Constitution {

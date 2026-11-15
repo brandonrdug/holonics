@@ -12,7 +12,7 @@
 
 use crate::exterior::*;
 use holonics_engine::field::{BlankClocks, CarryGates, Constitution, ReadLogits, Realization, HeldRows, Host, NearOffsets, RealizationCounters, Region, RowCurrent, TickRead};
-use holonics_engine::inherited::tower::{TowerError, TowerFace};
+use holonics_engine::field::{TowerError, TowerFace};
 use std::collections::BTreeMap;
 use std::time::Instant;
 

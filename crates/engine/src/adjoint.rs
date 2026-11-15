@@ -12,10 +12,6 @@
 #[allow(unused_imports)]
 use crate::field::*;
 #[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
-#[allow(unused_imports)]
 use rayon::prelude::*;
 
 /// [§16.44] One clock's covectors in the reverse: `δτ`, `δσ` `[pace index][t]` and the moments' `[t][2M]`.
@@ -312,7 +308,7 @@ impl Constitution {
             let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
             // A receiver's probe word (§16.19).
             let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
-            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - crate::inherited::tower::COVECTOR_BITS;
+            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - crate::field::COVECTOR_BITS;
             // [measurement; G157] A turned head's reach on its own clock: its founding covector by receiver row, where read.
             let mut reach_rows = [ReachSums::default(); 2];
             let reach_clock = reach.as_ref().and(paces.row[h]).filter(|_| d.carries_moment(h) && !d.is_depth(h)).map(|p| &paces.sigma[p]);
@@ -937,4 +933,116 @@ pub struct SplitReturn {
     pub forward_ns: u128,
     pub return_ns: u128,
     pub quiet_return_ns: u128,
+}
+
+// The items this object owns that stood in the October tower until C5 (#603), each as it stood.
+
+/// The covector a face returns when it is compared with `target`: `dz_c = p̂(c) − [c = target]` on
+/// `2^(−24)`, the cross-entropy logit gradient `p − q` at the face's grain representative. The
+/// reverse scan and the tension reading ([`Tower::read_tension`]) read this one law.
+pub fn covector(face: &TowerFace, target: usize) -> Vec<i64> {
+    (0..face.masses.len())
+        .map(|c| {
+            let p = ((face.masses[c] << COVECTOR_BITS) + face.total / 2) / face.total;
+            p as i64 - if c == target { 1i64 << COVECTOR_BITS } else { 0 }
+        })
+        .collect()
+}
+
+/// `out[o] = release(Σ_i w[o·cols + i] x[i] + bias[o] · 2^bias_shift, shift)`, in `i64` where the
+/// terms' bound allows and in `i128` otherwise; `x` a face carried in `i32` or `i64`.
+pub fn affine<V: Copy + Into<i64>>(w: &[i32], wmax: u64, cols: usize, x: &[V], bias: Option<&[i32]>, bias_shift: u32, shift: u32, out: &mut [i64]) -> Result<()> {
+    let xmax = x.iter().map(|&v| v.into().unsigned_abs()).max().unwrap_or(0);
+    let terms = (wmax as u128) * (xmax as u128) * (cols as u128 + 1);
+    if terms >= 1u128 << 126 {
+        return refuse("an affine sum outgrew its 128-bit carrier");
+    }
+    let narrow = terms < (1u128 << 62);
+    for (o, slot) in out.iter_mut().enumerate() {
+        let row = &w[o * cols..(o + 1) * cols];
+        let mut sum: i128 = if narrow {
+            row.iter().zip(x).map(|(a, &b)| *a as i64 * b.into()).sum::<i64>() as i128
+        } else {
+            row.iter().zip(x).map(|(a, &b)| *a as i128 * b.into() as i128).sum::<i128>()
+        };
+        if let Some(b) = bias {
+            sum += (b[o] as i128) << bias_shift;
+        }
+        *slot = fit64(release(sum, shift))?;
+    }
+    Ok(())
+}
+
+/// `out[i] = release(Σ_o w[o·cols + i] y[o], shift)`: the transposed read, `y` a covector (carried
+/// in `i64`: the reverse scan accumulates a slow mode's covector over the section).
+pub fn transposed(w: &[i32], wmax: u64, cols: usize, y: &[i64], shift: u32, out: &mut [i64]) -> Result<()> {
+    let ymax = reach64(y);
+    let rows = y.len();
+    let narrow = (wmax as u128) * (ymax as u128) * (rows as u128 + 1) < (1u128 << 62);
+    if narrow {
+        let mut acc = vec![0i64; cols];
+        for (o, &yo) in y.iter().enumerate() {
+            if yo == 0 {
+                continue;
+            }
+            let row = &w[o * cols..(o + 1) * cols];
+            for (a, &wv) in acc.iter_mut().zip(row) {
+                *a += wv as i64 * yo;
+            }
+        }
+        for (slot, a) in out.iter_mut().zip(acc) {
+            *slot = fit64(release(a as i128, shift))?;
+        }
+    } else {
+        let mut acc = vec![0i128; cols];
+        for (o, &yo) in y.iter().enumerate() {
+            let row = &w[o * cols..(o + 1) * cols];
+            for (a, &wv) in acc.iter_mut().zip(row) {
+                *a += wv as i128 * yo as i128;
+            }
+        }
+        for (slot, a) in out.iter_mut().zip(acc) {
+            *slot = fit64(release(a, shift))?;
+        }
+    }
+    Ok(())
+}
+
+/// `g[o·cols + i] += Σ_t y_t[o] x_t[i]`: a section's outer products of covectors with faces, at
+/// their summed grain. Integer addition is associative, so summing over the section's cells before
+/// the sum reaches the gradient gives the bits one product a cell gives; the sum runs in `i64` where
+/// the terms' bound `Σ_t max|y_t| max|x_t|` allows it, in `i128` below `2^126`, and is refused past
+/// it. A face `x` is carried in `i32` or `i64`.
+pub fn outer_sum<Y: AsRef<[i64]>, X: AsRef<[V]>, V: Copy + Into<i64>>(g: &mut [i128], cols: usize, ys: &[Y], xs: &[X]) -> Result<()> {
+    let mut bound = 0u128;
+    for (y, x) in ys.iter().zip(xs) {
+        let xmax = x.as_ref().iter().map(|&v| v.into().unsigned_abs()).max().unwrap_or(0);
+        bound = bound.checked_add(reach64(y.as_ref()) as u128 * xmax as u128).filter(|&b| b < 1u128 << 126).ok_or(TowerError::Refused("an outer sum outgrew its 128-bit carrier"))?;
+    }
+    for (o, row) in g.chunks_exact_mut(cols).enumerate() {
+        if bound < (1u128 << 62) {
+            let mut acc = vec![0i64; cols];
+            for (y, x) in ys.iter().zip(xs) {
+                let yo = y.as_ref()[o];
+                if yo != 0 {
+                    for (a, &xv) in acc.iter_mut().zip(x.as_ref()) {
+                        *a += yo * xv.into();
+                    }
+                }
+            }
+            for (slot, a) in row.iter_mut().zip(acc) {
+                *slot += a as i128;
+            }
+        } else {
+            for (y, x) in ys.iter().zip(xs) {
+                let yo = y.as_ref()[o] as i128;
+                if yo != 0 {
+                    for (slot, &xv) in row.iter_mut().zip(x.as_ref()) {
+                        *slot += yo * xv.into() as i128;
+                    }
+                }
+            }
+        }
+    }
+    Ok(())
 }

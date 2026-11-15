@@ -11,10 +11,7 @@
 
 #[allow(unused_imports)]
 use crate::field::*;
-#[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
+use num_bigint::BigUint;
 #[allow(unused_imports)]
 use rayon::prelude::*;
 
@@ -221,7 +218,7 @@ pub(crate) fn port_faces<'f>(faces: &'f [Option<TowerFace>], port: &Port) -> Res
         .collect()
 }
 
-/// The regions' code on `2^(−20)` bits: the weighed code of the sites before the ports (§16.23, [`crate::inherited::tower::weighed_code`])
+/// The regions' code on `2^(−20)` bits: the weighed code of the sites before the ports (§16.23, [`crate::field::weighed_code`])
 /// and the ports' coupling codes (§16.24).
 pub(crate) fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
     weighed_code(&c.pairs, spans) + c.coupled
@@ -234,7 +231,180 @@ pub(crate) fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
 /// running maximum's last value), read exactly as `m_∅(t) T_R 2^32 > u m_R T_t` on 256-bit products; the room's extent where
 /// none passes (none where no place carries void mass).
 pub fn one_end_length(room: &[Option<&TowerFace>], void: usize, u: u128) -> usize {
-    let wide = crate::inherited::context::wide_mul;
+    let wide = crate::field::wide_mul;
     let Some(top) = room.iter().flatten().copied().reduce(|a, b| if wide(b.masses[void], a.total) > wide(a.masses[void], b.total) { b } else { a }) else { return room.len() };
     room.iter().position(|f| f.is_some_and(|f| wide(f.masses[void] << 32, top.total) > wide(u * top.masses[void], f.total))).unwrap_or(room.len())
+}
+
+// The items this object owns that stood in the October tower until C5 (#603), each as it stood.
+
+/// One cell's face: each class's mass `2^(z_a − z_max)` on `2^(−62)`, and their sum.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TowerFace {
+    pub masses: Vec<u128>,
+    pub total: u128,
+}
+
+impl TowerFace {
+    /// The class's code, `−log₂ p̂(a)`, on `2^(−20)` bits.
+    pub fn code(&self, class: usize) -> i64 {
+        face_code(self.masses[class], self.total)
+    }
+
+    /// The comparison's descent covector against `target`, `p̂ − [· = target]` on `2^(−24)`: the
+    /// one law the reverse scan reads ([`covector`]), handed to an exterior reading.
+    pub fn covector(&self, target: usize) -> Vec<i64> {
+        covector(self, target)
+    }
+
+    /// The class's rank on the face: how many classes carry more mass than it (0 when none does).
+    pub fn rank(&self, class: usize) -> usize {
+        let m = self.masses[class];
+        self.masses.iter().filter(|&&x| x > m).count()
+    }
+}
+
+/// A class's code read off its mass and the face's total, `−log₂(mass/total)` on `2^(−20)` bits
+/// ([`TowerFace::code`]). Its domain is a positive total and a mass no greater than it, which every
+/// face the tower forms satisfies; a face a realization returns is admitted to it before it is read
+/// ([`realization::PassRead::admitted`]).
+pub fn face_code(mass: u128, total: u128) -> i64 {
+    let p = (mass << UNIT_BITS) / total;
+    -(log2_face(p.max(1), READ_BITS) as i64)
+}
+
+impl Default for TowerFace {
+    fn default() -> Self {
+        Self { masses: Vec::new(), total: 1 }
+    }
+}
+
+/// The exact comparison of two sections' codes: does `new` code strictly fewer bits than `old`?
+/// `Π p_new > Π p_old`, over the products of their faces' numerators and denominators.
+///
+/// [definition; agent-inferred, October 27] **The certificate decided by partition.** The products
+/// are compared through their logarithms first: each numerator and denominator `v` is read on
+/// `2^(−CERTIFICATE_DIGITS)` ([`log2_reading`]), whose reading lies within `CERTIFICATE_SLACK`
+/// grains of `log₂ v`. When the two sides' summed readings differ by more than every reading's
+/// slack together, the sign of the difference is the sign of `log₂ Π p_new − log₂ Π p_old`, and so
+/// the answer of the exact comparison; only inside that band are the products formed
+/// ([`fewer_bits_exact`]). The answer is always the exact comparison's: the readings partition the
+/// sections into those they decide and those the products decide. The readings are an integer sum,
+/// so any partition of the faces sums them to the same bits. Measured October 25, the products
+/// took 0.5 s a section at 320 streams and bounded the card's pass. The readings hold for positive
+/// values only: a zero mass or total (never a face's, whose masses are at least one; Epime's review
+/// of October 27 named the witness `[(0, 3)]` against `[(0, 2)]`) is decided by the products.
+pub fn fewer_bits(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    if old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
+        return fewer_bits_exact(old, new);
+    }
+    let side = |faces: &[(u128, u128)]| -> i128 { faces.par_iter().map(|&(m, t)| log2_reading(m) - log2_reading(t)).sum() };
+    let difference = side(new) - side(old);
+    let slack = CERTIFICATE_SLACK * 2 * (old.len() + new.len()) as i128;
+    if difference > slack {
+        return checked(true, old, new);
+    }
+    if difference < -slack {
+        return checked(false, old, new);
+    }
+    fewer_bits_exact(old, new)
+}
+
+/// [definition; agent-inferred, November 2, the field's §16.23] **The certificate on a weighed code**: does `new` code
+/// strictly fewer bits than `old` when each region's code is weighed by its state's `m/K` (the order-averaged joint
+/// code)? `spans` gives each region's open sites (its run of consecutive pairs) and its `(m, K)`. Where every weight is
+/// one it is [`fewer_bits`], the products. Otherwise the products cannot be formed (a rational power of a product), so
+/// it is decided by partition alone: each region's readings are summed exactly, the difference
+/// `ΔW = Σ_r (m_r/K_r) Σ_(i∈r) (log₂ p_new − log₂ p_old)` and its slack `Σ_r (m_r/K_r) · CERTIFICATE_SLACK · 2 · 2|r|`
+/// are exact rationals of the readings, and the sign of `ΔW` decides once it passes the slack. The readings are read
+/// at `CERTIFICATE_DIGITS` and, where the slack holds the difference, again at [`WEIGHED_DIGITS`], the readings' own
+/// floor (their mantissa is released at `2^(−62)`); a difference still inside the slack there is a tie at that floor,
+/// and a tie codes no fewer bits.
+pub fn fewer_bits_weighed(old: &[(u128, u128)], new: &[(u128, u128)], spans: &[(usize, u64, u64)]) -> bool {
+    use num_bigint::BigInt;
+    use num_rational::BigRational;
+    if spans.iter().all(|&(_, m, k)| m == k) {
+        return fewer_bits(old, new);
+    }
+    if old.iter().chain(new).any(|&(m, t)| m == 0 || t == 0) {
+        return false;
+    }
+    for digits in [CERTIFICATE_DIGITS, WEIGHED_DIGITS] {
+        let (mut difference, mut slack) = (BigRational::from_integer(BigInt::from(0)), BigRational::from_integer(BigInt::from(0)));
+        let mut at = 0usize;
+        for &(count, m, k) in spans {
+            let range = at..at + count;
+            at += count;
+            let side = |faces: &[(u128, u128)]| -> i128 { faces[range.clone()].par_iter().map(|&(mm, t)| log2_reading_at(mm, digits) - log2_reading_at(t, digits)).sum() };
+            let w = BigRational::new(BigInt::from(m), BigInt::from(k));
+            difference += &w * &BigRational::from_integer(BigInt::from(side(new) - side(old)));
+            slack += &w * &BigRational::from_integer(BigInt::from(CERTIFICATE_SLACK * 2 * 2 * count as i128));
+        }
+        if difference > slack {
+            return true;
+        }
+        if difference < -slack {
+            return false;
+        }
+    }
+    false
+}
+
+/// The weighed certificate's finer readings: the readings' own floor (a mantissa released at `2^(−62)` holds a
+/// reading within one grain and `2^(−60)` of `log₂ v`, so three grains at `2^(−60)`).
+pub const WEIGHED_DIGITS: u32 = 60;
+
+/// [definition; agent-inferred, November 2, the field's §16.23] **A weighed code** on `2^(−20)` bits: each region's
+/// code `Σ_(i∈r) −log₂ p_i` read at `m_r/K_r`, released once a region to the nearest (half away from zero), summed.
+pub fn weighed_code(pairs: &[(u128, u128)], spans: &[(usize, u64, u64)]) -> i64 {
+    let mut at = 0usize;
+    let mut sum = 0i64;
+    for &(count, m, k) in spans {
+        let code: i64 = pairs[at..at + count].par_iter().map(|&(mm, t)| face_code(mm, t)).sum();
+        at += count;
+        sum += if m == k { code } else { div_nearest(code as i128 * m as i128, k as i128) as i64 };
+    }
+    sum
+}
+
+/// A decision the readings made. Built with the `certificate-check` feature, it is compared with the
+/// products and a disagreement stops the run: the acceptance read that the partition decides as the
+/// products do on every call of a whole pass. Without the feature it is the decision.
+pub fn checked(decided: bool, old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    #[cfg(feature = "certificate-check")]
+    assert_eq!(decided, fewer_bits_exact(old, new), "the certificate's readings decided against its products");
+    let _ = (old, new);
+    decided
+}
+
+/// The fractional digits of the certificate's logarithmic readings.
+pub const CERTIFICATE_DIGITS: u32 = 32;
+
+/// How far a reading may lie from `log₂ v`, in grains of `2^(−CERTIFICATE_DIGITS)`. With `μ` the
+/// mantissa, `d_k` the digits and `ε_k ≥ 0` the logarithm each release at `2^(−62)` takes off
+/// (`ε_k < 2^(−61)`, the mantissa staying in `[1, 2)`), the squarings unroll to
+/// `log₂ μ = Σ_(k≤K) 2^(−k) d_k + 2^(−K) log₂ μ_K + Σ_(k≤K) 2^(−k) ε_k`, so a reading lies below
+/// `log₂ v` by less than one grain and `2^(−60)` (the entry release included), never above it;
+/// three grains hold that with room.
+pub const CERTIFICATE_SLACK: i128 = 3;
+
+/// The products themselves: `Π m_new · Π t_old > Π m_old · Π t_new`.
+pub fn fewer_bits_exact(old: &[(u128, u128)], new: &[(u128, u128)]) -> bool {
+    // The halves of a long product are formed together: an exact product is the same in any
+    // grouping.
+    fn product(v: &[u128]) -> BigUint {
+        match v.len() {
+            0 => BigUint::from(1u8),
+            1 => BigUint::from(v[0]),
+            n if n < 1 << 12 => product(&v[..n / 2]) * product(&v[n / 2..]),
+            n => {
+                let (a, b) = rayon::join(|| product(&v[..n / 2]), || product(&v[n / 2..]));
+                a * b
+            }
+        }
+    }
+    let (om, ot): (Vec<u128>, Vec<u128>) = old.iter().cloned().unzip();
+    let (nm, nt): (Vec<u128>, Vec<u128>) = new.iter().cloned().unzip();
+    let ((pnm, pot), (pom, pnt)) = rayon::join(|| rayon::join(|| product(&nm), || product(&ot)), || rayon::join(|| product(&om), || product(&nt)));
+    pnm * pot > pom * pnt
 }

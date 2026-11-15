@@ -52,10 +52,6 @@ pub fn region_classes(codec: &Codec, q: &[usize], a: &[usize], length: usize) ->
 #[allow(unused_imports)]
 use crate::field::*;
 #[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
-#[allow(unused_imports)]
 use rayon::prelude::*;
 
 /// [definition; agent-inferred, November 1] A region: each site's class, whether it is
@@ -82,7 +78,7 @@ pub struct Region<'a> {
     pub domain: Option<usize>,
     /// [definition; agent-inferred, November 3, §16.24] **The answer port**, where one is compared through its coupling:
     /// every site from `start` to the region's end is open, and their faces are compared with `target` (the answer's
-    /// cells, never the void) by the coupling at temperature one ([`crate::inherited::coupling::coupling_code`]), an
+    /// cells, never the void) by the coupling at temperature one ([`crate::coupling::coupling_code`]), an
     /// unused place writing `void`. `None` where every open site is compared at its own place.
     pub port: Option<Port<'a>>,
 }
@@ -122,14 +118,14 @@ pub struct Port<'a> {
 /// places there), from the faces at its places (each `(masses, total)`). The host's return and the card's read the same
 /// rows from the same faces.
 pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-    use crate::inherited::coupling::TemperatureRefusal as Why;
+    use crate::coupling::TemperatureRefusal as Why;
     if port.boundary {
         return boundary_reading(faces, port);
     }
     if port.letters {
         return letters_reading(faces, port);
     }
-    let read = crate::inherited::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
+    let read = crate::coupling::coupling_code(faces, port.void, port.target, None).map_err(|why| {
         TowerError::Refused(match why {
             Why::Short { .. } => "a port with more target cells than places",
             Why::VoidCell => "a port whose target holds the void",
@@ -139,7 +135,7 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
     })?;
     let mut rows = Vec::with_capacity(faces.len());
     for ((masses, total), placed) in faces.iter().zip(&read.placed) {
-        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::field::COVECTOR_BITS) + total / 2) / total) as i64).collect();
         for &(c, share) in placed {
             row[c] -= share as i64;
         }
@@ -163,7 +159,7 @@ pub fn port_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i
 /// letters on the face covector's `2^(−24)`, zero at the void, and the code `−log₂(m_(target_i)/(T − m_∅))` on `2^(−20)` bits; a
 /// resolved place (an empty face) is not compared.
 pub(crate) fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-    let one = 1i64 << crate::inherited::tower::COVECTOR_BITS;
+    let one = 1i64 << crate::field::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
     let mut code = 0i64;
     for (i, &(masses, total)) in faces.iter().enumerate() {
@@ -175,17 +171,17 @@ pub(crate) fn letters_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<
             return refuse("a port's face that is empty, misses a class or holds no letter");
         }
         let rest = total - masses[port.void];
-        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::field::COVECTOR_BITS) + rest / 2) / rest) as i64).collect();
         row[port.void] = 0;
         row[port.target[i]] -= one;
-        code += crate::inherited::tower::face_code(masses[port.target[i]], rest);
+        code += crate::field::face_code(masses[port.target[i]], rest);
         rows.push(row);
     }
     Ok((rows, code))
 }
 
 pub(crate) fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result<(Vec<Vec<i64>>, i64)> {
-    let one = 1i128 << crate::inherited::tower::COVECTOR_BITS;
+    let one = 1i128 << crate::field::COVECTOR_BITS;
     let mut rows = Vec::with_capacity(faces.len());
     let mut code = 0i64;
     for (i, &(masses, total)) in faces.iter().enumerate() {
@@ -197,7 +193,7 @@ pub(crate) fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result
         if total == 0 || port.void >= masses.len() {
             return refuse("a port's face that is empty or misses a class");
         }
-        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::inherited::tower::COVECTOR_BITS) + total / 2) / total) as i64).collect();
+        let mut row: Vec<i64> = masses.iter().map(|&m| (((m << crate::field::COVECTOR_BITS) + total / 2) / total) as i64).collect();
         let void = row[port.void] as i128;
         if i < port.target.len() {
             let rest = one - void;
@@ -206,10 +202,10 @@ pub(crate) fn boundary_reading(faces: &[(&[u128], u128)], port: &Port) -> Result
                     *slot = if rest == 0 { 0 } else { fit64(-div_nearest(*slot as i128 * void, rest))? };
                 }
             }
-            code += crate::inherited::tower::face_code(total - masses[port.void], total);
+            code += crate::field::face_code(total - masses[port.void], total);
         } else {
             row[port.void] -= one as i64;
-            code += crate::inherited::tower::face_code(masses[port.void], total);
+            code += crate::field::face_code(masses[port.void], total);
         }
         rows.push(row);
     }

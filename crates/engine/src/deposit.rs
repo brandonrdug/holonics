@@ -12,10 +12,6 @@
 #[allow(unused_imports)]
 use crate::field::*;
 #[allow(unused_imports)]
-use crate::inherited::tower::{affine, covector, deposit_step, div_nearest, exp_series, face_code, fewer_bits_weighed, fit32, fit64, half_turn, on_step_grain, outer_sum, ratio_adjoint, ratio_to_power, reach, refuse, release, toward, transposed, weighed_code, Result, TowerError, TowerFace, FACE_BITS, FIRST_RATE, MATERIAL_BITS, MOVE_BITS, SECOND_RATE};
-#[allow(unused_imports)]
-use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
-#[allow(unused_imports)]
 use rayon::prelude::*;
 
 /// [definition; theory, November 10 19:05] **The founded parts**: a part is a family of entries founded together, and steps at a rate
@@ -476,4 +472,56 @@ impl Learner {
     pub fn reading_parts(&self) -> Vec<u8> {
         self.field.founded_parts(self.rate_parts.map_or(self.field.declaration.contacts, |rp| rp.contacts_before))
     }
+}
+
+// The items this object owns that stood in the October tower until C5 (#603), each as it stood.
+
+/// The first moment's rate, `2^(−3)`, and the second's, `2^(−8)` (agent-inferred: the classical
+/// 0.9 and 0.999 read as dyadic rates; the second at `2^(−8)` so a pass of a few hundred sections
+/// renews it).
+pub const FIRST_RATE: u32 = 3;
+
+pub const SECOND_RATE: u32 = 8;
+
+/// A covector entry on the deposit's grain `2^(−32)` from its family's natural grain: a material
+/// family's `Σ δz x` on `2^(−40)` is released, a face family's `Σ δz` on `2^(−24)` raised. The moves
+/// step through their chart ([`Tower::to_move_chart`]) and are not read here.
+pub fn on_step_grain(grain: u32, v: i128) -> i128 {
+    if grain == MATERIAL_BITS {
+        release(v, COVECTOR_BITS + FACE_BITS - STEP_BITS)
+    } else {
+        v << (STEP_BITS - COVECTOR_BITS)
+    }
+}
+
+/// The deposit's step for one entry: its first moment `m` (on `2^(−32)`) over the root of its
+/// second `v`, at the rate `2^(−rate)`, on its family's own grain:
+/// `((m ≪ grain) ≫ rate) / (⌊√v⌋ + 1)`. The tower's certificate halves it; the field deposits it
+/// at this size (the step fluxes, Brandon, November 5).
+pub fn deposit_step(m: i128, v: i128, grain: u32, rate: u32) -> i128 {
+    deposit_over(m, deposit_root(v), grain, rate)
+}
+
+/// The deposit's divisor for a second moment `v`: `⌊√v⌋ + 1`.
+pub fn deposit_root(v: i128) -> i128 {
+    (v.max(0) as u128).isqrt() as i128 + 1
+}
+
+/// The deposit's step for a first moment `m` over its second moment's divisor `root`.
+pub fn deposit_over(m: i128, root: i128, grain: u32, rate: u32) -> i128 {
+    ((m << grain) >> rate) / root
+}
+
+/// A moment moved toward its input at the rate `2^(−rate)`: `m + release(g − m, rate)`, and at
+/// least one grain when that release rounds to zero. Released to the nearest grain alone, a moment
+/// within `2^(rate−1)` grains of its input never reaches it, so a contact that stops conducting
+/// keeps its last moments (`|m| ≤ 3`, `v ≤ 127` grains) and the step `m/(√v + 2^(−32))` reads that
+/// remainder as a covector of a quarter of the rate (measured October 23 on all 6,726 GSM8K
+/// problems, the narrow tower: no weight stalled through pass 2; 980 had by pass 3 and 2,146 by
+/// pass 4, the most of two contacts that had stopped conducting, each moving `2^(−9)` every section,
+/// one from 0.64 at pass 2 to 15.9 at pass 5). A silent contact's drifted weights meet the residual
+/// stream at full scale when it conducts again. Moved by a grain, the moment reaches its input.
+pub fn toward(m: i128, g: i128, rate: u32) -> i128 {
+    let step = release(g - m, rate);
+    m + if step == 0 { (g - m).signum() } else { step }
 }
