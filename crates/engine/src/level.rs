@@ -9,7 +9,7 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 #[allow(unused_imports)]
 use rayon::prelude::*;
 
-impl Field {
+impl Constitution {
 
     /// [definition; agent-inferred, November 1] **The landmarks** (the dispersing field's §3
     /// receipt): for each of `sites`, the `count` sites before `question` carrying the most weight in
@@ -32,7 +32,7 @@ impl Field {
     }
 }
 
-/// [`Field::landmarks`] from each site's still heads' weight rows at the last tick (each row's met
+/// [`Constitution::landmarks`] from each site's still heads' weight rows at the last tick (each row's met
 /// sources with their weights, and its mass): `Σ_h e_ij 2^16 / mass_i` at each source before
 /// `question`, the `count` heaviest (the earlier source on a tie). A realization reads the rows; the
 /// ranking is one law.

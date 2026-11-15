@@ -578,7 +578,7 @@ pub fn ingest_layout(
 /// its opener gave it, if any. See the module header.
 ///
 /// [realization; November 14, C3 of #603] A card opens with no image ([`Card::open`]): an owner that
-/// launches from its own image loads it (the field's, `CardField::open`), and the owners that launch
+/// launches from its own image loads it (the field's, `Resident::open`), and the owners that launch
 /// from the card's open it with theirs ([`Card::open_with_image`]; the October owners' is
 /// `crate::hnn::open_hnn`). Before, every open loaded `hnn.ptx`, which the field never launches.
 pub struct Card {

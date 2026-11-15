@@ -17,14 +17,14 @@
 //!
 //! An epoch is definite where every one of its places is, and keyed where any is. The cut, the phases and the clock are data: a carry
 //! has no first-order return, so nothing returns to the news. The material is the fine field's, the level's field's and the glue (`A`,
-//! `b_A`, `B`, `b_B`), in that order, one covector over all three ([`Field::material_len`], [`Field::families_all`]). Founded as a
-//! growth in scale ([`Field::scaled_up`]): `B` and `b_B` open at zero, so the level reads every face of the field it was founded on.
+//! `b_A`, `B`, `b_B`), in that order, one covector over all three ([`Constitution::material_len`], [`Constitution::families_all`]). Founded as a
+//! growth in scale ([`Constitution::scaled_up`]): `B` and `b_B` open at zero, so the level reads every face of the field it was founded on.
 //! With equal news a section a place and six harmonics, the chart is the discrete Fourier chart of six places: the packets of November
 //! 3 (retired with this law) are its plain case.
 
 use super::*;
 
-/// The level's field above a field ([`Field::scaled_up`]).
+/// The level's field above a field ([`Constitution::scaled_up`]).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Scale {
     /// The harmonics of the news phase the glue charts (`h_0 = 1`, then a cosine and a sine a whole turn, the last a cosine where
@@ -33,7 +33,7 @@ pub struct Scale {
     /// The fine ticks read before the restriction, `0 < split < K`.
     pub split: usize,
     /// The level's field.
-    pub coarse: Field,
+    pub coarse: Constitution,
     /// `A` (`D₁ × H D₀`, an epoch's harmonics of its places' reads) and `b_A` (`D₁`), then `B` (`H D₀ × D₁`) and `b_B` (`H D₀`, a bias
     /// a harmonic); matrices on `2^(−24)`, biases on the faces' `2^(−16)`.
     pub glue: Vec<i32>,
@@ -64,12 +64,12 @@ fn glue_layout(harmonics: usize, fine: usize, coarse: usize) -> (usize, usize, u
 /// the fine field's with an alphabet of two (a level names no symbol), no triads, no carry circles, no opening of its own, and the ticks
 /// the fine field has after its split (`d.ticks / 2` of them, the split [`level_split`]). Its reach is the fine field's: a region's
 /// epochs are at most its places.
-pub fn level_declaration(d: &FieldDeclaration) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, triads: 0, carry: 0, opening: false, junction: false, mark: false, loud: false, ticks: d.ticks - level_split(d), ..*d }
+pub fn level_declaration(d: &Declaration) -> Declaration {
+    Declaration { alphabet: 2, triads: 0, carry: 0, opening: false, junction: false, mark: false, loud: false, ticks: d.ticks - level_split(d), ..*d }
 }
 
 /// The fine ticks before a level's restriction: half the fine field's, at least one.
-pub fn level_split(d: &FieldDeclaration) -> usize {
+pub fn level_split(d: &Declaration) -> usize {
     (d.ticks / 2).max(1)
 }
 
@@ -231,7 +231,7 @@ impl ScalePass {
 /// [definition; theory, November 13, the design record §4.3 and §4.9] **The level's clock** on a region's epochs for every turned head:
 /// `τ¹` the news between the anchors in sections, `κ¹_j = τ¹_j − τ¹_(j−1)` (the first epoch's rate one), its variation the same (the
 /// rates are not negative), plain where every rate is one exactly.
-fn level_paces(d: &FieldDeclaration, cut: &LevelCut) -> Result<Paces> {
+fn level_paces(d: &Declaration, cut: &LevelCut) -> Result<Paces> {
     let one = 1i64 << PACE_BITS;
     let kappa: Vec<i64> = (0..cut.tau.len()).map(|j| if j == 0 { one } else { cut.tau[j] - cut.tau[j - 1] }).collect();
     let plain = kappa.iter().all(|&k| k == one);
@@ -272,13 +272,13 @@ fn uncharted(ht: &[i64], v: &[i64], width: usize, out: &mut [i64]) -> Result<()>
     Ok(())
 }
 
-impl Field {
+impl Constitution {
     /// The material's length: the field's, and with a level the level's field's and the glue's.
     pub fn material_len(&self) -> usize {
         self.theta.len() + self.scale.as_ref().map_or(0, |s| s.coarse.theta.len() + s.glue.len())
     }
 
-    /// Every family of the material, `(start, len, grain)` over [`Field::material_len`].
+    /// Every family of the material, `(start, len, grain)` over [`Constitution::material_len`].
     pub fn families_all(&self) -> Vec<(usize, usize, u32)> {
         let mut out = self.layout.families.clone();
         if let Some(s) = &self.scale {
@@ -292,7 +292,7 @@ impl Field {
         out
     }
 
-    /// The material entry `i` of [`Field::material_len`].
+    /// The material entry `i` of [`Constitution::material_len`].
     pub fn material(&self) -> impl Iterator<Item = &i32> {
         let (coarse, glue): (&[i32], &[i32]) = match self.scale.as_deref() {
             Some(s) => (&s.coarse.theta[..], &s.glue[..]),
@@ -301,7 +301,7 @@ impl Field {
         self.theta.iter().chain(coarse.iter()).chain(glue.iter())
     }
 
-    /// The material entry `i` of [`Field::material_len`], mutable.
+    /// The material entry `i` of [`Constitution::material_len`], mutable.
     pub fn material_mut(&mut self) -> impl Iterator<Item = &mut i32> {
         let (coarse, glue): (&mut [i32], &mut [i32]) = match self.scale.as_deref_mut() {
             Some(s) => (&mut s.coarse.theta[..], &mut s.glue[..]),
@@ -333,11 +333,11 @@ impl Field {
     /// of its ticks, the level's field founded on its own `declaration` from the key stream at `offset`, the restriction's `A` drawn after
     /// it on `±√(3/(H D₀))`, and `b_A`, `B`, `b_B` at zero, so every face reads as before. The level reads the opening's news, so the field
     /// carries the opening's block. Returns the tower and the key bytes read through.
-    pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: FieldDeclaration, keys: &[u8], offset: usize) -> Result<(Self, usize)> {
+    pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: Declaration, keys: &[u8], offset: usize) -> Result<(Self, usize)> {
         if self.scale.is_some() || harmonics == 0 || split == 0 || split >= self.declaration.ticks || !self.declaration.opening || declaration.opening {
             return refuse("a level needs a field with the opening's block and without a level, a harmonic, and a split inside the ticks; the level's own field has no opening");
         }
-        let coarse = Field::found(declaration, keys.get(offset..).ok_or(TowerError::Refused("a key file shorter than a level's founding"))?)?;
+        let coarse = Constitution::found(declaration, keys.get(offset..).ok_or(TowerError::Refused("a key file shorter than a level's founding"))?)?;
         let mut at = offset + 4 * declaration.founding_draws();
         let (d0, d1) = (self.declaration.width, declaration.width);
         let (a, ab, _, _, len) = glue_layout(harmonics, d0, d1);
@@ -410,7 +410,7 @@ impl Field {
 
     /// The level's reverse at the split: `dx`, the covector of the faces after the prolongation, is carried through the prolongation,
     /// the level's ticks and the restriction into the covector of the faces before it; the level's field's covector and the glue's are
-    /// added into `g` at their places in the material ([`Field::families_all`]). The cut is data and takes nothing.
+    /// added into `g` at their places in the material ([`Constitution::families_all`]). The cut is data and takes nothing.
     pub(crate) fn scale_return(&self, s: &Scale, pass: &ScalePass, dx: &mut [i64], g: &mut [i128]) -> Result<()> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let cut = &pass.cut;

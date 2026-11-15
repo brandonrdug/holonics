@@ -6,11 +6,11 @@
 use crate::exterior::*;
 use crate::ruler::cavity::held_stretches;
 use crate::store::{refuse_variables, role_names, store_counts};
-use holonics_engine::codec::FieldCodec;
-use holonics_engine::field::{FieldLearner, FieldRealization};
+use holonics_engine::codec::Codec;
+use holonics_engine::field::{Learner, Realization};
 use holonics_engine::inherited::tower::TowerFace;
 use holonics_engine::passage::Kind;
-use holonics_engine::region::{views_of, TrainRegion};
+use holonics_engine::region::{views_of, OwnedRegion};
 use std::path::Path;
 
 /// The rank of `class` in `face`: one more than the classes whose mass stands above its own (1 is the face's loudest class).
@@ -26,10 +26,10 @@ fn rank_of(face: &TowerFace, class: usize) -> usize {
 /// the realization), the rank of that class in its face, its unit and its written neighbours' (two before, one after, as hex of their bytes,
 /// so a ruler can read a place inside its recurring pieces: Brandon's lens of November 15 01:08Z, a piece such as `th` or `sty` being a
 /// geometric part whose stability a place's surprise and loudness show), and its lanes' powers `‖r_ℓ‖_rms` at every stage (each tick's opening, then after the
-/// last tick, the stage the faces read; [`FieldRealization::read_tick_scales`]), on the state's grain. One line a place to `OUT/loudness.tsv`
+/// last tick, the stage the faces read; [`Realization::read_tick_scales`]), on the state's grain. One line a place to `OUT/loudness.tsv`
 /// (numbers only; `tools/loudness_table.py` reads it by region and rank); a line a slice with the card's time. The output directory is private:
 /// it holds no text, but it is the held passage's places.
-pub fn read_loudness(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn read_loudness(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if args.len() != 13 && args.len() != 14 {
         return Err("read-loudness UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
     }
@@ -43,9 +43,9 @@ pub fn read_loudness(args: &[String], realization: &mut dyn FieldRealization) ->
     let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
     let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
-    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
     let places = positive(&args[9])?;
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     let law = learner.pass.clone().ok_or("a state with no pass line: read-loudness reads a state of the store's line")?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
@@ -67,7 +67,7 @@ pub fn read_loudness(args: &[String], realization: &mut dyn FieldRealization) ->
     writeln!(tsv, "row\tslice\tstretch\tt\tclass\tcode\trank\tprev2\tprev\tunit\tnext\t{}", power_cols.join("\t"))?;
     println!("LOUDNESS_LAW role={role} places={places} lanes={lanes} stages={stages} ticks={} alphabet={} ms={}", learner.field.declaration.ticks, codec.alphabet(), started.elapsed().as_millis());
     // One batch of regions on the realization under the pass's two bounds, each region's open places written out.
-    let mut read_rows = |row: &str, name: &str, jobs: &[(usize, TrainRegion)], tsv: &mut std::io::BufWriter<std::fs::File>| -> Result<(usize, usize)> {
+    let mut read_rows = |row: &str, name: &str, jobs: &[(usize, OwnedRegion)], tsv: &mut std::io::BufWriter<std::fs::File>| -> Result<(usize, usize)> {
         let (mut at, mut batches, mut placed) = (0usize, 0usize, 0usize);
         while at < jobs.len() {
             let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
@@ -78,7 +78,7 @@ pub fn read_loudness(args: &[String], realization: &mut dyn FieldRealization) ->
                 }
                 (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
             }
-            let regions: Vec<TrainRegion> = jobs[at..end].iter().map(|(_, r)| r.clone()).collect();
+            let regions: Vec<OwnedRegion> = jobs[at..end].iter().map(|(_, r)| r.clone()).collect();
             let (faces, scales) = realization.read_tick_scales(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
             for (((k, region), f), st) in jobs[at..end].iter().zip(&faces).zip(&scales) {
                 if st.len() != stages {
@@ -102,13 +102,13 @@ pub fn read_loudness(args: &[String], realization: &mut dyn FieldRealization) ->
     for &name in &role_names(&counts, role) {
         let card_start = std::time::Instant::now();
         let cut = held_stretches(store, role, name, &counts, &args[4], seed, &law, &codec, places)?;
-        let mut one: Vec<(usize, TrainRegion)> = Vec::new();
-        let mut wholes: Vec<(usize, TrainRegion)> = Vec::new();
+        let mut one: Vec<(usize, OwnedRegion)> = Vec::new();
+        let mut wholes: Vec<(usize, OwnedRegion)> = Vec::new();
         for (k, s) in cut.iter().enumerate() {
             for t in 0..s.region.classes.len() {
                 let mut mask = vec![false; s.region.classes.len()];
                 mask[t] = true;
-                one.push((k, TrainRegion::plain(s.region.classes.clone(), mask)));
+                one.push((k, OwnedRegion::plain(s.region.classes.clone(), mask)));
             }
             if s.kind == Kind::MaskWhole {
                 wholes.push((k, s.region.clone()));

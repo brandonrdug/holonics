@@ -11,11 +11,11 @@ use rayon::prelude::*;
 
 /// [definition; theory, November 10 19:05] **The founded parts**: a part is a family of entries founded together, and steps at a rate
 /// of its own ([`RateParts`]): `W`'s new columns, the new `a` rows, the new `b` rows (with the contacts' biases founded with them),
-/// and each lane family on its own (the second lane's coordinates, [`Field::laned`], of the encodings `E`, `E₋`, `E₊`, the key,
+/// and each lane family on its own (the second lane's coordinates, [`Constitution::laned`], of the encodings `E`, `E₋`, `E₊`, the key,
 /// value and probe charts, the current's return, the moment's chart, the readout's lift, the face biases together, and the lane's
 /// columns of `a` and `b`). The old entries (and `W`'s lane rows) are no part.
 ///
-/// [definition; theory, November 11 17:25] The carry circles are founded together and step at rates of their own ([`FieldDeclaration::carry`]):
+/// [definition; theory, November 11 17:25] The carry circles are founded together and step at rates of their own ([`Declaration::carry`]):
 /// `carry` their charts `Q`, `H` and both biases (part 15, which was the retired carry's third chart, `g_chart`), `w_carry` their columns of `W`,
 /// `a_carry` and `b_carry` their rows of the pair drives with the drives' biases. A parts line carries the three circle parts only where the field
 /// has carry circles ([`RateParts`]).
@@ -114,7 +114,7 @@ pub const OLD_PART: u8 = u8::MAX;
 
 /// [definition; theory, November 10 19:05] **A deposit rate per founded part**: part `p` steps at `2^(−(rate − octaves[p]))`, `octaves[p]`
 /// octaves faster than the old entries' `2^(−rate)`; `contacts_before` the contact count before the growth in contacts, which
-/// tells the new contacts ([`Field::founded_parts`]). Carried in the learner's text, with no run switch; moved between laps from the
+/// tells the new contacts ([`Constitution::founded_parts`]). Carried in the learner's text, with no run switch; moved between laps from the
 /// saved states by [`RateParts::updated`].
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct RateParts {
@@ -157,7 +157,7 @@ impl PartTravel {
 }
 
 /// [definition; theory, November 10 19:05] Each part's travel from three saved materials (`older`, `old`, `now`, each the field's
-/// material in order) over the entries `parts` ([`Field::founded_parts`]) assigns it.
+/// material in order) over the entries `parts` ([`Constitution::founded_parts`]) assigns it.
 pub fn part_travel(parts: &[u8], older: &[i32], old: &[i32], now: &[i32]) -> [PartTravel; PARTS] {
     let mut out = [PartTravel::default(); PARTS];
     for (i, &p) in parts.iter().enumerate() {
@@ -191,7 +191,7 @@ impl RateParts {
     }
 }
 
-impl Field {
+impl Constitution {
     /// [definition; theory, November 10 19:05] **Each material entry's founded part** ([`PART_NAMES`] by index; [`OLD_PART`] none): the
     /// lane's entries (the face coordinates past the first lane, where the field has more than one) by family, the new contacts'
     /// (the pair drives' rows and their biases, the pair's return's columns, of the contacts past `contacts_before`'s: real parts
@@ -293,7 +293,7 @@ impl Field {
 }
 
 /// `base` less `release(step, halvings)` in each entry, and whether any entry moved.
-pub(crate) fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Field, bool)> {
+pub(crate) fn stepped(base: &Constitution, step: &[i128], halvings: u32) -> Result<(Constitution, bool)> {
     let mut candidate = base.clone();
     let mut moved = false;
     for (slot, &q) in candidate.material_mut().zip(step) {
@@ -312,13 +312,13 @@ pub(crate) fn stepped(base: &Field, step: &[i128], halvings: u32) -> Result<(Fie
 pub(crate) struct Scaled {
     pub(crate) change: i64,
     pub(crate) halvings: u32,
-    pub(crate) standing: Option<(Field, Vec<Vec<Option<TowerFace>>>)>,
+    pub(crate) standing: Option<(Constitution, Vec<Vec<Option<TowerFace>>>)>,
 }
 
 /// [definition; agent-inferred, November 1] **A step's size read in at most three reads**: the held
-/// step's read on the next regions ([`FieldLearner::next_scale`]: no more bits), a declared
-/// comparison under [`FieldLearner::read_held`] only. From November 1 to 5 it was also the
-/// certificate's law ([`FieldLearner::section_realized`], `strict`: the stepped material had to code
+/// step's read on the next regions ([`Learner::next_scale`]: no more bits), a declared
+/// comparison under [`Learner::read_held`] only. From November 1 to 5 it was also the
+/// certificate's law ([`Learner::section_realized`], `strict`: the stepped material had to code
 /// the regions strictly fewer bits than `old`); the step fluxes since November 5, and `strict` has had
 /// no caller since (history, kept with its reading below). The step `base − release(step, h0)` is
 /// read; where it stands, it stands. Otherwise it is read at half its size; where that stands, it
@@ -336,7 +336,7 @@ pub(crate) struct Scaled {
 /// steps standing only at `2^(−12)` of their size or less, and the certificate's own halvings
 /// reached 9 to 18 on 14 sections; their direction, not their size, raised the code, which the
 /// parabola reads from two reads where the halvings read it from a dozen.
-pub(crate) fn scaled(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region], realization: &mut dyn FieldRealization) -> Result<Scaled> {
+pub(crate) fn scaled(base: &Constitution, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region], realization: &mut dyn Realization) -> Result<Scaled> {
     let spans = spans_of(regions);
     let stands = |new: &Compared| if strict { fewer(old, new, &spans) } else { !fewer(new, old, &spans) };
     let code_old = code_of(old, &spans);
@@ -397,13 +397,13 @@ pub struct MaterialMean {
 }
 
 impl MaterialMean {
-    /// No state joined, over a material of `entries` ([`Field::material_len`]).
+    /// No state joined, over a material of `entries` ([`Constitution::material_len`]).
     pub fn new(entries: usize) -> Self {
         Self { sum: vec![0; entries], states: 0 }
     }
 
     /// The field's material joins the sum; refused on a material of another length and past `2^31` states.
-    pub fn take(&mut self, field: &Field) -> Result<()> {
+    pub fn take(&mut self, field: &Constitution) -> Result<()> {
         if field.material_len() != self.sum.len() || self.states >= 1 << 31 {
             return refuse("a material joined to a mean of another length, or past the states its sums hold");
         }
@@ -421,7 +421,7 @@ impl MaterialMean {
 
     /// `field` with its material at the mean, the entries that differ from `field`'s own and `Σ (mean − θ)²` over them; refused
     /// before a state joined and onto a material of another length.
-    pub fn released(&self, field: &Field) -> Result<(Field, usize, i128)> {
+    pub fn released(&self, field: &Constitution) -> Result<(Constitution, usize, i128)> {
         if self.states == 0 || field.material_len() != self.sum.len() {
             return refuse("a mean released before a state joined, or onto a material of another length");
         }
@@ -440,11 +440,11 @@ impl MaterialMean {
     }
 }
 
-impl FieldLearner {
+impl Learner {
 
     /// [definition; theory, November 10 19:05] **Each entry's deposit rate**: the learner's `rate_bits`, and for an entry of a founded
-    /// part ([`Field::founded_parts`]) that many bits less its part's octaves ([`RateParts`]), never under one bit; where the learner
-    /// carries each entry's own rate ([`FieldLearner::own_rates`], November 12), that rate.
+    /// part ([`Constitution::founded_parts`]) that many bits less its part's octaves ([`RateParts`]), never under one bit; where the learner
+    /// carries each entry's own rate ([`Learner::own_rates`], November 12), that rate.
     pub fn entry_rates(&self) -> Vec<u32> {
         // [theory, November 12 00:20] An entry's own rate, where the learner carries the line, is its rate.
         if let Some(own) = &self.own_rates {
@@ -461,7 +461,7 @@ impl FieldLearner {
         rates
     }
 
-    /// [measurement; theory, November 12] **The founded parts a reading gathers by** ([`Field::founded_parts`]): the new contacts
+    /// [measurement; theory, November 12] **The founded parts a reading gathers by** ([`Constitution::founded_parts`]): the new contacts
     /// told from the contact count the learner's parts' rates carry, and from the field's own count where it carries none (so no
     /// contact is new). A reading's partition; no rate is read from it.
     pub fn reading_parts(&self) -> Vec<u8> {

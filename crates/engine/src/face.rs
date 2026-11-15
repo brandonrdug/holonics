@@ -9,7 +9,7 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 #[allow(unused_imports)]
 use rayon::prelude::*;
 
-impl Field {
+impl Constitution {
 
     /// [definition; agent-inferred, November 1] **A score's term** (§14.11): `2^z` for `z` on
     /// `2^(−16)` bits, as its whole bits `a = ⌊z⌋` and its fraction's face `2^(f − 1)` on `2^(−62)`
@@ -32,8 +32,8 @@ impl Field {
         Ok(BlankRead { read: r, scale: s, lift: y, face: self.tempered(&z, 1) })
     }
 
-    /// [Brandon, November 15 02:06Z] **The readout's face of a state** `x_t`: [`Field::face_of`]'s face with the sharpness a loud face reads from
-    /// the state's lanes' powers ([`Field::loud_beta`]); the same face on a field whose face does not read its sites' loudness. The readings of a
+    /// [Brandon, November 15 02:06Z] **The readout's face of a state** `x_t`: [`Constitution::face_of`]'s face with the sharpness a loud face reads from
+    /// the state's lanes' powers ([`Constitution::loud_beta`]); the same face on a field whose face does not read its sites' loudness. The readings of a
     /// place's code at its opening read it (a blank's clock keeps `face_of`).
     pub(crate) fn readout_face(&self, x: &[i64], reaches: &Reaches) -> Result<TowerFace> {
         let read = self.face_of(x, reaches)?;
@@ -52,7 +52,7 @@ impl Field {
     }
 
     /// Each unresolved site's readout logits over the region, on `2^(−16)` bits (`None` at a
-    /// resolved site): the face at `β = 1` is [`Field::tempered`] of them.
+    /// resolved site): the face at `β = 1` is [`Constitution::tempered`] of them.
     pub fn logits(&self, region: &Region) -> Result<Vec<Option<Vec<i64>>>> {
         Ok(self.pass(region, false)?.logits)
     }
@@ -100,7 +100,7 @@ impl Field {
         Ok(())
     }
 
-    /// [definition; Brandon, November 15 02:06Z] **A site's sharpness from its loudness** ([`FieldDeclaration::loud`]): `β = 2^16 +
+    /// [definition; Brandon, November 15 02:06Z] **A site's sharpness from its loudness** ([`Declaration::loud`]): `β = 2^16 +
     /// release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b` on `2^(−16)`, `λ_ℓ` the logarithm on the face's grain of lane `ℓ`'s power `s_ℓ` (the scale the chart divided
     /// it by); `None` on a field whose face does not read its sites' loudness. The readout's face is the one receiver that reads it: a blank's
     /// clock and the opening read their faces at temperature one, each its own receiver (`agent-inferred`: the code's comparison is the
@@ -142,8 +142,8 @@ impl Field {
         Ok(())
     }
 
-    /// The readout's face at a site with sharpness `β` ([`Field::loud_beta`]): `z(a) = release(β v_a, 16) + c_a`, `v_a = release(⟨E(a), y⟩, 16)`;
-    /// with no sharpness, [`Field::tied`].
+    /// The readout's face at a site with sharpness `β` ([`Constitution::loud_beta`]): `z(a) = release(β v_a, 16) + c_a`, `v_a = release(⟨E(a), y⟩, 16)`;
+    /// with no sharpness, [`Constitution::tied`].
     pub(crate) fn tied_sharp(&self, y: &[i64], beta: Option<i128>, z: &mut [i64]) -> Result<()> {
         let Some(beta) = beta else { return self.tied(y, z) };
         let (dw, l) = (self.declaration.width, &self.layout);
@@ -162,10 +162,10 @@ impl Field {
     }
 }
 
-impl Field {
+impl Constitution {
 
     /// [measurement; theory, November 13, P57 item 2 (G132)] **The readout's face from a chart** `r̂` (`D` words on `2^(−16)`): the lift
-    /// `R r̂ + b_R`, the encoding and the face at temperature one, as [`Field::face_of`] reads a state after its chart. A reading.
+    /// `R r̂ + b_R`, the encoding and the face at temperature one, as [`Constitution::face_of`] reads a state after its chart. A reading.
     pub fn face_of_read(&self, read: &[i32]) -> Result<TowerFace> {
         if self.declaration.loud {
             return refuse("a face whose sharpness is its site's loudness is read from a chart and its lanes' powers (face_of_chart)");
@@ -173,8 +173,8 @@ impl Field {
         self.face_of_chart(read, &[])
     }
 
-    /// [Brandon, November 15 02:06Z] **The readout's face from a chart and its lanes' powers**: as [`Field::face_of_read`], with the sharpness the
-    /// powers give where the face reads its sites' loudness ([`Field::loud_beta`]); the powers are not read on a field whose face does not. A
+    /// [Brandon, November 15 02:06Z] **The readout's face from a chart and its lanes' powers**: as [`Constitution::face_of_read`], with the sharpness the
+    /// powers give where the face reads its sites' loudness ([`Constitution::loud_beta`]); the powers are not read on a field whose face does not. A
     /// reading.
     pub fn face_of_chart(&self, read: &[i32], scales: &[i128]) -> Result<TowerFace> {
         let (d, l) = (&self.declaration, &self.layout);
@@ -220,7 +220,7 @@ pub(crate) fn code_of(c: &Compared, spans: &[(usize, u64, u64)]) -> i64 {
 
 /// [definition; §16.47] The octave of a distance `d ≥ 1` from the question: `⌊log₂ d⌋`, so octave `j` holds `[2^j, 2^(j+1))`.
 /// [definition; agent-inferred, November 6, the unified-theory reading of 07:21] **One end, one draw, conditioned on the room**
-/// ([`Field::sample_runs`] with `one_end`): `room`'s faces at the release's first read, place by place, and `u` on `2^(−32)`; the
+/// ([`Constitution::sample_runs`] with `one_end`): `room`'s faces at the release's first read, place by place, and `u` on `2^(−32)`; the
 /// length is the places before the first whose void mass passes `u M(R)`, `M(R)` the largest void mass over the room (the
 /// running maximum's last value), read exactly as `m_∅(t) T_R 2^32 > u m_R T_t` on 256-bit products; the room's extent where
 /// none passes (none where no place carries void mass).

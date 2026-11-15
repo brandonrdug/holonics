@@ -1,4 +1,4 @@
-//! The field's commands on the card (`holonics::hnn::tower::field`, `holonics_cuda::hnn::CardField`;
+//! The field's commands on the card (`holonics::hnn::tower::field`, `holonics_cuda::hnn::Resident`;
 //! record `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`).
 //!
 //! - `field_pass parity complete-language parity-field ARGS…`: the host's field against the card's on
@@ -14,9 +14,9 @@
 #![allow(dead_code, clippy::disallowed_methods, clippy::disallowed_types, reason = "explicit exterior CLI file/process boundary")]
 
 
-use holonics_engine::field::FieldRealization;
+use holonics_engine::field::Realization;
 use holonics_engine_cuda::hnn::card::Card;
-use holonics_engine_cuda::hnn::field::CardField;
+use holonics_engine_cuda::hnn::field::Resident;
 use std::error::Error;
 use std::time::Instant;
 
@@ -51,9 +51,9 @@ fn run(args: &[String]) -> Result<()> {
     }
     println!("FIELD_COMMAND {}", rest[1..].join(" "));
     let opened = Card::open(0)?;
-    let mut card = CardField::open(&opened)?;
+    let mut card = Resident::open(&opened)?;
     // [agent-inferred, November 1] A declared reading (`FIELD_PROFILE`): every launch, transfer and
-    // allocation timed alone (`CardField::profile`), printed at the end as `FIELD_PROFILE` lines.
+    // allocation timed alone (`Resident::profile`), printed at the end as `FIELD_PROFILE` lines.
     if std::env::var_os("FIELD_PROFILE").is_some() {
         card.profile();
     }
@@ -222,14 +222,14 @@ fn run(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; theory, November 12, P50 step 0b] `field_pass yardstick [ENTRIES] [SECONDS]`: the card's yardsticks
-/// ([`CardField::yardsticks`]), narrow products a second and octets a second, each timed alone to at least SECONDS (default 1.5)
+/// ([`Resident::yardsticks`]), narrow products a second and octets a second, each timed alone to at least SECONDS (default 1.5)
 /// of the card's time; ENTRIES (default 209) is a gathered row's count of entries of eight words.
 #[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed milliseconds and rates (the precision law governs what the machinery stores and computes, not how a reading is written; October 18)")]
 fn yardstick(args: &[String]) -> Result<()> {
     let entries: u32 = args.first().map(|a| a.parse()).transpose()?.unwrap_or(209);
     let seconds: f64 = args.get(1).map(|a| a.parse()).transpose()?.unwrap_or(1.5);
     let opened = Card::open(0)?;
-    let card = CardField::open(&opened)?;
+    let card = Resident::open(&opened)?;
     let y = card.yardsticks(entries, seconds)?;
     println!("YARDSTICK card={} multiprocessors={} product_blocks={} stream_blocks={} threads_a_block=256", opened.census().name, y.multiprocessors, y.product_blocks, y.stream_blocks);
     for (name, (rate, count, took)) in [("products_cell", y.cell), ("products_tile", y.tile)] {
@@ -248,11 +248,11 @@ fn yardstick(args: &[String]) -> Result<()> {
 /// sites, `D` definite, needing `pair S² + site S + region + entry S (near_slots + D) + crowd_site S` octets ([`holonics_engine_cuda::hnn::field::read_octets`],
 /// [`holonics_engine_cuda::hnn::field::skin_octets`]). Host arithmetic, no card.
 fn reserve(args: &[String]) -> Result<()> {
-    use holonics_engine::field::FieldDeclaration;
+    use holonics_engine::field::Declaration;
     use holonics_engine_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
-    let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false };
     let f = |s: usize| read_octets(&d, true, false, s);
     let (f1, f2, f3) = (f(1), f(2), f(3));
     let pair = (f3 + f1 - 2 * f2) / 2;
@@ -265,7 +265,7 @@ fn reserve(args: &[String]) -> Result<()> {
 }
 
 /// The store line's commands through a realization (moved from the store line's dispatch, `complete_language.rs`, by C6 of #603).
-fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("train-store") => athena::store::train(args, realization),
         Some("read-cavity") => athena::ruler::cavity::read_cavity(args, realization),
@@ -280,7 +280,7 @@ fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Res
 }
 
 /// The store line's parity: every read of `train-store`'s sections on the card held against the host's.
-fn parity_command(args: &[String], card: &mut dyn FieldRealization) -> Result<()> {
+fn parity_command(args: &[String], card: &mut dyn Realization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("parity-store") => athena::parity::parity(args, card),
         _ => Err("the parity command is parity-store".into()),

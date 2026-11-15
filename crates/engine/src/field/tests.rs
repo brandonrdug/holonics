@@ -22,23 +22,23 @@ fn keys(n: usize) -> Vec<u8> {
     (0..n.div_ceil(2)).flat_map(|_| next().to_be_bytes()).take(4 * n).collect()
 }
 
-fn tiny_declaration(still: usize) -> FieldDeclaration {
-    FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
+fn tiny_declaration(still: usize) -> Declaration {
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
 /// readout at zero, where no covector reaches the charts).
-fn shaped(still: usize) -> Field {
+fn shaped(still: usize) -> Constitution {
     shaped_with(tiny_declaration(still))
 }
 
 /// [`shaped`] on a declaration of the caller's.
-fn shaped_with(d: FieldDeclaration) -> Field {
-    drawn(Field::found(d, &keys(1 << 14)).unwrap())
+fn shaped_with(d: Declaration) -> Constitution {
+    drawn(Constitution::found(d, &keys(1 << 14)).unwrap())
 }
 
 /// Every family of `field` drawn from the keys, a uniform draw on `[−½, ½)` of its family's grain.
-fn drawn(mut field: Field) -> Field {
+fn drawn(mut field: Constitution) -> Constitution {
     let stream = keys(1 << 15);
     for (n, v) in field.theta.iter_mut().enumerate() {
         let word = &stream[4 * n..4 * n + 4];
@@ -52,7 +52,7 @@ fn drawn(mut field: Field) -> Field {
 
 /// The field with its strand contacts silent (`E₋ = E₊ = 0`, as founded): a site opens on its own
 /// class alone.
-fn silent_contacts(mut field: Field) -> Field {
+fn silent_contacts(mut field: Constitution) -> Constitution {
     let rows = (field.declaration.alphabet + 1) * field.declaration.width;
     let l = field.layout.clone();
     for start in [l.before, l.after] {
@@ -100,7 +100,7 @@ fn probe_step(grain: u32, predict: &dyn Fn(i32) -> i128, straddles: &dyn Fn(i32)
 }
 
 /// The code's own covector.
-fn covector_of(field: &Field, region: &Region) -> Vec<i128> {
+fn covector_of(field: &Constitution, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
     let mut g = vec![0i128; field.theta.len()];
     field.returned(region, &pass, &mut g).unwrap();
@@ -108,7 +108,7 @@ fn covector_of(field: &Field, region: &Region) -> Vec<i128> {
 }
 
 /// The learner's covector of one region (the reverse).
-fn reversed_of(field: &Field, region: &Region) -> Vec<i128> {
+fn reversed_of(field: &Constitution, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
     let mut g = vec![0i128; field.theta.len()];
     field.returned(region, &pass, &mut g).unwrap();
@@ -179,7 +179,7 @@ fn ring_phasors_close_on_the_unit_circle() {
 
 #[test]
 fn founding_opens_on_the_flat_face() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let faces = field.faces(&region()).unwrap();
     for (t, face) in faces.iter().enumerate() {
         match face {
@@ -192,13 +192,13 @@ fn founding_opens_on_the_flat_face() {
 #[test]
 fn text_restores_exactly() {
     let field = shaped(1);
-    let back = Field::from_text(&field.to_text()).unwrap();
+    let back = Constitution::from_text(&field.to_text()).unwrap();
     assert_eq!(back, field);
-    let mut learner = FieldLearner::new(field, 6);
+    let mut learner = Learner::new(field, 6);
     learner.section(&[region()]).unwrap();
-    let back = FieldLearner::from_text(&learner.to_text()).unwrap();
+    let back = Learner::from_text(&learner.to_text()).unwrap();
     // The transfer's operand is a reading's, not retained (§16.41).
-    assert_eq!(back, FieldLearner { last: None, ..learner });
+    assert_eq!(back, Learner { last: None, ..learner });
 }
 
 /// The covector agrees with the code's central difference on every family: the three entries of
@@ -210,7 +210,7 @@ fn text_restores_exactly() {
 /// it is left out (counted; most probes are read).
 #[test]
 fn covector_matches_the_codes_difference() {
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let (mut read, mut seams, mut halvings) = (0usize, 0usize, 0u32);
     // The region as it stands, and with two resolved sites and an unresolved one carried as mixtures
     // of several classes (a mixture opening returns to each class's rows by its share, the shares
@@ -231,10 +231,10 @@ fn covector_matches_the_codes_difference() {
     let lettered = Port { letters: true, target: &[2, 3, 1], ..port };
     // [the depth rings, November 6] And with a depth ring among the turned sets (its rate the located increment alone, no
     // skin, no moment).
-    // [the unified-theory reading of November 6, 10:31] And under the bare stretch (`Field::bare_stretch`: past the last arrival
+    // [the unified-theory reading of November 6, 10:31] And under the bare stretch (`Constitution::bare_stretch`: past the last arrival
     // a silent place runs at the bare rate and returns nothing), declared beside the one-rate stretch.
     for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(lettered) })].map(|(still, r)| (still, depth, bare, r))) {
-        let mut field = shaped_with(FieldDeclaration { depth, ..tiny_declaration(still) });
+        let mut field = shaped_with(Declaration { depth, ..tiny_declaration(still) });
         field.bare_stretch = bare;
         let g = covector_of(&field, &r);
         let (m, n, dw) = (field.declaration.complex(), field.declaration.modes, field.declaration.width);
@@ -453,8 +453,8 @@ fn framed_field_reads_place() {
 /// reread (none is read after it), and over a few sections the regions' code falls from the founding's.
 #[test]
 fn fluxing_deposits_lower_the_code() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 6);
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let mut learner = Learner::new(field, 6);
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
     let regions = [region(), Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
@@ -496,20 +496,20 @@ fn the_writer_draws_every_place_from_its_own_face() {
     let mut field = shaped(1);
     let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([6usize, 5]).map(|(q, a)| (*q, a)).collect();
-    let once = field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    let once = field.sample_realized(&problems, 3, 0, 0, 11, &mut Host, &mut |_, _| true).unwrap();
     assert_eq!(once.iter().map(Vec::len).collect::<Vec<_>>(), vec![6, 5]);
     assert!(once.iter().flatten().all(|&c| c < field.declaration.alphabet));
-    assert_eq!(field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| true).unwrap(), once, "the same draws");
-    assert!((12..20).any(|seed| field.sample_realized(&problems, 3, 0, 0, seed, &mut HostField, &mut |_, _| true).unwrap() != once), "another seed draws another answer");
+    assert_eq!(field.sample_realized(&problems, 3, 0, 0, 11, &mut Host, &mut |_, _| true).unwrap(), once, "the same draws");
+    assert!((12..20).any(|seed| field.sample_realized(&problems, 3, 0, 0, seed, &mut Host, &mut |_, _| true).unwrap() != once), "another seed draws another answer");
     let mut asked = 0;
-    let stopped = field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| {
+    let stopped = field.sample_realized(&problems, 3, 0, 0, 11, &mut Host, &mut |_, _| {
         asked += 1;
         asked < 2
     }).unwrap();
     assert_eq!(stopped.iter().map(Vec::len).collect::<Vec<_>>(), vec![6, 5], "a stopped write draws every place");
     let l = field.layout.clone();
     field.theta[l.read_bias + 2] = 40 << 16;
-    let pointed = field.sample_realized(&problems, 3, 0, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    let pointed = field.sample_realized(&problems, 3, 0, 0, 11, &mut Host, &mut |_, _| true).unwrap();
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
@@ -522,7 +522,7 @@ fn a_drawn_void_closes_the_answer() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     let mut closed_early = false;
     for seed in 11..27 {
-        for (places, n) in field.sample_realized(&problems, 4, 0, 0, seed, &mut HostField, &mut |_, _| true).unwrap().into_iter().zip([9usize, 8]) {
+        for (places, n) in field.sample_realized(&problems, 4, 0, 0, seed, &mut Host, &mut |_, _| true).unwrap().into_iter().zip([9usize, 8]) {
             assert_eq!(places.len(), n);
             if let Some(end) = places.iter().position(|&c| c == 0) {
                 assert!(places[end..].iter().all(|&c| c == 0), "a letter past the first void, seed {seed}: {places:?}");
@@ -590,15 +590,15 @@ fn the_grown_field_reads_the_old_faces() {
 
 #[test]
 fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 4);
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let mut learner = Learner::new(field, 4);
     learner.read_held = true;
     for _ in 0..3 {
         learner.section(&[region()]).unwrap();
     }
     let stream = keys(1 << 16);
     assert!(learner.holds_step() && learner.widened(2, &stream).is_err(), "a held step is read before the body widens");
-    learner.read_step_on(&[region()], &mut HostField).unwrap();
+    learner.read_step_on(&[region()], &mut Host).unwrap();
     let grown = learner.widened(2, &stream).unwrap();
     assert_eq!(grown.drawn, learner.drawn + 4 * learner.field.growth_draws(2));
     let l = grown.field.layout().clone();
@@ -608,7 +608,7 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
     assert_eq!(grown.first[l.enc], div_nearest(learner.first[old.enc], 2));
     assert_eq!(grown.second[l.enc], div_nearest(learner.second[old.enc], 4));
     // Whether a step is read on the next regions is the run's declaration, not the learner's text (§16.30).
-    let back = FieldLearner { read_held: grown.read_held, ..FieldLearner::from_text(&grown.to_text()).unwrap() };
+    let back = Learner { read_held: grown.read_held, ..Learner::from_text(&grown.to_text()).unwrap() };
     assert_eq!(back, grown);
     // One learned section on the grown learner parts some pair of encoding copies.
     let mut next = grown.clone();
@@ -620,8 +620,8 @@ fn the_grown_learner_lifts_its_moments_and_parts_its_copies() {
 
 /// The size the law reads a step at on `regions` against `old` (the doc of [`scaled`], step by
 /// step): the further halvings of the last size read and whether the step stands there.
-fn law_scale(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region]) -> (u32, bool) {
-    let on = |field: &Field| compared(&regions.iter().map(|r| field.faces(r).unwrap()).collect::<Vec<_>>(), regions).unwrap();
+fn law_scale(base: &Constitution, step: &[i128], h0: u32, old: &Compared, strict: bool, regions: &[Region]) -> (u32, bool) {
+    let on = |field: &Constitution| compared(&regions.iter().map(|r| field.faces(r).unwrap()).collect::<Vec<_>>(), regions).unwrap();
     let spans = spans_of(regions);
     let stands = |new: &Compared| if strict { fewer(old, new, &spans) } else { !fewer(new, old, &spans) };
     let at = |h: u32| stepped(base, step, h0 + h).unwrap();
@@ -650,8 +650,8 @@ fn law_scale(base: &Field, step: &[i128], h0: u32, old: &Compared, strict: bool,
 }
 
 /// The read the law makes of a held step on `regions`, from the material before it
-/// ([`FieldLearner::next_scale`]): the further halvings and whether it is refused.
-fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32, bool) {
+/// ([`Learner::next_scale`]): the further halvings and whether it is refused.
+fn law_next(before: &Constitution, step: &[i128], h0: u32, regions: &[Region]) -> (u32, bool) {
     let old = compared(&regions.iter().map(|r| before.faces(r).unwrap()).collect::<Vec<_>>(), regions).unwrap();
     let (halvings, stands) = law_scale(before, step, h0, &old, false, regions);
     (halvings, !stands)
@@ -663,9 +663,9 @@ fn law_next(before: &Field, step: &[i128], h0: u32, regions: &[Region]) -> (u32,
 /// the standing material's; the held step crosses the learner's text.
 #[test]
 fn a_held_step_is_read_on_the_next_section() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     // [§16.34] At `2^(−3)`: under the strand's pair contact the fixture certifies too few steps at `2^(−2)` to hold one.
-    let mut learner = FieldLearner::new(field, 3);
+    let mut learner = Learner::new(field, 3);
     // The read is the declared comparison (§16.30); the field's law lets a step stand unread.
     learner.read_held = true;
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
@@ -684,7 +684,7 @@ fn a_held_step_is_read_on_the_next_section() {
             for (slot, &q) in material.theta.iter_mut().zip(&held.step) {
                 *slot += release(q, held.halvings) as i32;
             }
-            let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
+            let compared_on = |field: &Constitution| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
             let old = compared_on(&material);
             assert_eq!(next.change, code_of(&compared_on(&before.field), &spans_of(&regions)) - code_of(&old, &spans_of(&regions)));
             assert_eq!((next.halvings, next.refused), law_next(&material, &held.step, held.halvings, &regions));
@@ -698,7 +698,7 @@ fn a_held_step_is_read_on_the_next_section() {
             assert_eq!(receipt.code_before, code_of(&compared_on(&standing), &spans_of(&regions)));
         }
         if learner.holds_step() {
-            assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), learner);
+            assert_eq!(Learner::from_text(&learner.to_text()).unwrap(), learner);
         }
     }
     // On these sections the law stands steps at their size, at half, at the parabola's halving
@@ -713,14 +713,14 @@ fn a_held_step_is_read_on_the_next_section() {
 fn a_step_that_codes_the_next_regions_higher_is_refused() {
     let material = shaped(1);
     let regions = [region()];
-    let compared_on = |field: &Field| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
+    let compared_on = |field: &Constitution| compared(&[field.faces(&regions[0]).unwrap()], &regions).unwrap();
     let old = compared_on(&material);
     // The covector is the code's gradient (a deposit subtracts the step), so the step that moved
     // the material to `material + sign(g) 2^k` climbed it; held, it is the negated sign.
     let g = covector_of(&material, &regions[0]);
     for k in [0u32, 3, 6] {
         let step: Vec<i128> = g.iter().map(|&v| -(v.signum() << k)).collect();
-        let mut learner = FieldLearner::new(material.clone(), 2);
+        let mut learner = Learner::new(material.clone(), 2);
         learner.field = stepped(&material, &step, 0).unwrap().0;
         let climbed = compared_on(&learner.field);
         learner.held = Some(HeldStep { step: step.clone(), halvings: 0 });
@@ -743,20 +743,20 @@ struct Counted {
     reads: usize,
 }
 
-impl FieldRealization for Counted {
-    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+impl Realization for Counted {
+    fn read_and_return(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         self.reads += 1;
         field.read_and_return(regions)
     }
-    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+    fn read_faces(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         self.reads += 1;
         field.read_faces(regions)
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+    fn read_logits(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<ReadLogits>> {
         self.reads += 1;
         field.read_logits(regions)
     }
-    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+    fn read_landmarks(&mut self, field: &Constitution, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
         field.landmarks(region, question, sites, count)
     }
 }
@@ -766,7 +766,7 @@ impl FieldRealization for Counted {
 /// every class has a word in the encoding and both strand contacts, and the unresolved rows carry none.
 #[test]
 fn the_founding_draws_the_key_and_the_probe_apart() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let (dw, a, m2) = (field.declaration.width, field.declaration.alphabet, 2 * field.declaration.complex());
     let l = field.layout.clone();
     let (key, probe) = (&field.theta[l.q..l.q + m2 * dw], &field.theta[l.probe..l.probe + m2 * dw]);
@@ -775,8 +775,8 @@ fn the_founding_draws_the_key_and_the_probe_apart() {
     let tm = field.declaration.moment_modes();
     assert_eq!(4 * field.declaration.founding_draws(), 4 * (3 * a * dw + 3 * m2 * dw + 2 * field.declaration.contacts * dw + 2 * tm * dw));
     let stream = keys(field.declaration.founding_draws());
-    assert_eq!(Field::found(tiny_declaration(1), &stream).unwrap(), field, "the draws counted are the draws read");
-    assert!(Field::found(tiny_declaration(1), &stream[..stream.len() - 1]).is_err());
+    assert_eq!(Constitution::found(tiny_declaration(1), &stream).unwrap(), field, "the draws counted are the draws read");
+    assert!(Constitution::found(tiny_declaration(1), &stream[..stream.len() - 1]).is_err());
     // The moment's chart into the face (§16.22): drawn at the modes that carry a moment, zero at a still mode's.
     let (m, n) = (field.declaration.complex(), field.declaration.modes);
     for k in 0..m2 {
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,10 +822,10 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
-    assert_eq!(FieldDeclaration { modes: 3, ..d }.class_trits(), 3);
-    assert_eq!((FieldDeclaration { reach: 81, ..d }.class_trits(), FieldDeclaration { reach: 82, ..d }.class_trits()), (2, 3));
+    assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
+    assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
 }
 
 /// A region's classes drawn from a seed (a fixed exterior stream for the fixtures).
@@ -877,14 +877,14 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = FieldDeclaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-    let sheets = |field: &Field| -> Vec<Vec<u32>> { field.pass(&r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let sheets = |field: &Constitution| -> Vec<Vec<u32>> { field.pass(&r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let (mut read, mut seams, mut far, mut halvings) = (0usize, 0usize, 0usize, 0u32);
     for still in [0usize, 1, 2] {
-        let mut field = Field::found(FieldDeclaration { still, ..d }, &keys(1 << 14)).unwrap();
+        let mut field = Constitution::found(Declaration { still, ..d }, &keys(1 << 14)).unwrap();
         let stream = keys(1 << 15);
         for (k, v) in field.theta.iter_mut().enumerate() {
             let word = &stream[4 * k..4 * k + 4];
@@ -910,7 +910,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
                         continue;
                     };
                     halvings += h;
-                    let code = |f: &Field| f.code(&r).unwrap().0;
+                    let code = |f: &Constitution| f.code(&r).unwrap().0;
                     // [agent-inferred, November 2] The slope through a wide window: a line fitted to 17 reads at
                     // `k δ/2`, `k = −8..8` (`±4δ`), read as its change over `2δ`, `4 Σ k c_k / Σ k²`; a window that
                     // crosses a sheet at any read is left out. Why: the integer forward's releases jump at steps no
@@ -965,13 +965,13 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = FieldDeclaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
     let open: Vec<bool> = (0..sites).map(|t| t >= sites - 40 && t % 2 == 0).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-    let read = |field: &Field| -> (u128, u128) {
+    let read = |field: &Constitution| -> (u128, u128) {
         let pass = field.pass(&r, true).unwrap();
         let (mut near, mut peak) = (0u128, 0u128);
         for cell in &pass.ticks {
@@ -986,7 +986,7 @@ fn a_listener_s_founding_row_keeps_its_near_field() {
         }
         (near, peak)
     };
-    let field = Field::found(d, &keys(1 << 20)).unwrap();
+    let field = Constitution::found(d, &keys(1 << 20)).unwrap();
     let (near, peak) = read(&field);
     eprintln!("LISTENER_FOUNDING near={} far_peak={} (millionths of a row on the mean)", (near * 1_000_000 >> SHARE_BITS) / 200, (peak * 1_000_000 >> SHARE_BITS) / 200);
     assert!(near > peak, "the near field holds more of a listener's row than its loudest far source");
@@ -1009,7 +1009,7 @@ fn a_listener_s_founding_row_keeps_its_near_field() {
 fn the_pace_covector_matches_the_code_at_two_steps() {
     // [§16.34] The sheets read with the probes' classes as the covector's own test reads them: a receiver whose probed
     // classes change crosses a seam its covector does not read.
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let long: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let long_open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     // [§16.47] A silent stretch of six places past the last arrival, whose rates return to its first place.
@@ -1019,7 +1019,7 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
         let mut d = tiny_declaration(still);
         d.reach = 32;
         d.depth = depth;
-        let mut field = Field::found(d, &keys(1 << 14)).unwrap();
+        let mut field = Constitution::found(d, &keys(1 << 14)).unwrap();
         let stream = keys(1 << 15);
         for (k, v) in field.theta.iter_mut().enumerate() {
             let word = &stream[4 * k..4 * k + 4];
@@ -1078,7 +1078,7 @@ fn a_blank_place_runs_at_its_expected_duration() {
         for (p, kappa) in clock.paces.kappa.iter().enumerate() {
             let base = field.layout.pace + p * width;
             for (t, &k) in kappa.iter().enumerate() {
-                if Field::silent(&r, t) {
+                if Constitution::silent(&r, t) {
                     let face = clock.blank[t].as_ref().expect("a blank's face");
                     let rate = release(face.iter().map(|&(c, w)| w as i128 * field.theta[base + c as usize] as i128).sum(), STATE_BITS);
                     assert_eq!(k as i128, (1i128 << PACE_BITS) + rate, "site {t}");
@@ -1096,7 +1096,7 @@ fn a_blank_place_runs_at_its_expected_duration() {
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
     let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-    assert_eq!(Field::silent_stretch(&stretch), 7);
+    assert_eq!(Constitution::silent_stretch(&stretch), 7);
     let mut between = false;
     for cell in &field.pass(&stretch, true).unwrap().ticks[1..] {
         let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
@@ -1115,11 +1115,11 @@ fn a_blank_place_runs_at_its_expected_duration() {
     }
     assert!(between, "a silent place between arrivals never ran off the bare rate");
     // [the depth rings] A depth ring takes no blank face: every silent place runs at rate zero at every tick.
-    let ring = shaped_with(FieldDeclaration { depth: 1, ..tiny_declaration(1) });
+    let ring = shaped_with(Declaration { depth: 1, ..tiny_declaration(1) });
     for cell in &ring.pass(&stretch, true).unwrap().ticks[1..] {
         let clock = cell.clock.as_ref().expect("a later tick reads its own clocks");
         for kappa in &clock.paces.kappa {
-            for t in (0..14).filter(|&t| Field::silent(&stretch, t)) {
+            for t in (0..14).filter(|&t| Constitution::silent(&stretch, t)) {
                 assert_eq!(kappa[t], 0, "a depth ring's silent place {t} turns");
             }
         }
@@ -1155,7 +1155,7 @@ fn a_blank_place_runs_at_its_expected_duration() {
 /// drawn, so a head's near and far pairs carry covector, and the reading sums each pair's `|δs|` once.
 #[test]
 fn the_covector_s_far_share_is_zero_at_the_founding_and_read_where_the_returns_move() {
-    let founded = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let founded = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t % 3 == 1).collect();
     let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -1168,7 +1168,7 @@ fn the_covector_s_far_share_is_zero_at_the_founding_and_read_where_the_returns_m
 }
 
 /// The field with its moment's chart into the face and its bias silent (the opening before §16.22).
-fn silent_moment_face(mut field: Field) -> Field {
+fn silent_moment_face(mut field: Constitution) -> Constitution {
     let (dw, m2) = (field.declaration.width, 2 * field.declaration.complex());
     let l = field.layout.clone();
     field.theta[l.moment_face..l.moment_face + dw * m2].iter_mut().for_each(|v| *v = 0);
@@ -1198,7 +1198,7 @@ fn a_site_opens_on_its_moment() {
             assert_eq!(x[a * dw..(a + 1) * dw], x[b * dw..(b + 1) * dw], "still {still}: no turned mode, no moment");
         }
     }
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let silent = silent_moment_face(field.clone());
     assert_ne!(field, silent, "the chart is drawn at the founding");
     assert_eq!(field.opening(&r).unwrap(), silent.opening(&r).unwrap());
@@ -1207,7 +1207,7 @@ fn a_site_opens_on_its_moment() {
 
 /// [theory, November 13, the design record of that day §4.4a; P60 item 1c] **A place's cavity opening is its masked opening**: at every
 /// place of each fixture region, written or open, the cavity opening formed from the region's standing sums
-/// ([`Field::cavity_openings`]) against the built opening of the region with that place unresolved and silent ([`Field::opening`]).
+/// ([`Constitution::cavity_openings`]) against the built opening of the region with that place unresolved and silent ([`Constitution::opening`]).
 /// The difference is printed by word, in the opening's last place (`2^(−16)`), and is not assumed zero: the cavity moment recomposes the
 /// far crowds from prefix sums at the standing phases, where the masked region's crowds are released at its own, so the two can part
 /// by the moment's release (one unit of `2^(−16)` a mode) carried through the moment's chart. The bound read is that rounding: one unit
@@ -1251,12 +1251,12 @@ fn a_place_s_cavity_opening_is_its_masked_opening() {
 }
 
 /// A tiny field with the opening's lift, every family drawn from the keys (the lift too, so its return reaches the chart and the moment).
-fn opened(still: usize) -> Field {
-    shaped_with(FieldDeclaration { opening: true, ..tiny_declaration(still) })
+fn opened(still: usize) -> Constitution {
+    shaped_with(Declaration { opening: true, ..tiny_declaration(still) })
 }
 
 /// [P60 item 1h] The opening comparison's covector alone at `places`, its clocks' covectors folded into the strides as the pass's own fold.
-fn opening_covector_of(field: &Field, region: &Region, places: std::ops::Range<usize>) -> Vec<i128> {
+fn opening_covector_of(field: &Constitution, region: &Region, places: std::ops::Range<usize>) -> Vec<i128> {
     let paces = field.paces(region).unwrap();
     let mut g = vec![0i128; field.theta.len()];
     let mut r = ClockReturn::new(paces.kappa.len(), region.classes.len(), 2 * field.declaration.complex());
@@ -1266,7 +1266,7 @@ fn opening_covector_of(field: &Field, region: &Region, places: std::ops::Range<u
 }
 
 /// The opening's summed code over a region's compared places, on `2^(−20)` bits.
-fn opening_code(field: &Field, region: &Region) -> i64 {
+fn opening_code(field: &Constitution, region: &Region) -> i64 {
     field.opening_codes(region).unwrap().iter().flatten().sum()
 }
 
@@ -1395,7 +1395,7 @@ fn a_place_s_comparison_reaches_nothing_of_its_own() {
 /// and a section on it returns the opening's codes. A field read without the block reads as the declaration without it.
 #[test]
 fn a_learner_founds_the_opening_lift_and_keeps_every_line() {
-    let mut learner = FieldLearner::new(shaped(1), 6);
+    let mut learner = Learner::new(shaped(1), 6);
     learner.rate_parts = Some(RateParts { contacts_before: learner.field.declaration.contacts, octaves: [1; PARTS] });
     learner.section(&[region()]).unwrap();
     let founded = learner.with_opening().unwrap();
@@ -1421,7 +1421,7 @@ fn a_learner_founds_the_opening_lift_and_keeps_every_line() {
             _ => assert_eq!(&wy[..wx.len()], &wx[..], "line {k} keeps every standing word, the block appended"),
         }
     }
-    let back = FieldLearner::from_text(&b).unwrap();
+    let back = Learner::from_text(&b).unwrap();
     assert_eq!(back.to_text(), b);
     let mut trained = founded.clone();
     let receipt = trained.section(&[region()]).unwrap();
@@ -1549,8 +1549,8 @@ fn an_open_stretch_leaves_the_other_sites_faces_as_they_were() {
 /// section opens on the stepped material, and its receipt reads no held step.
 #[test]
 fn a_step_stands_unread_at_its_certified_size() {
-    let field = Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
-    let mut learner = FieldLearner::new(field, 2);
+    let field = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
+    let mut learner = Learner::new(field, 2);
     assert!(!learner.read_held);
     let mut deposited = 0;
     for _ in 0..6 {
@@ -1580,9 +1580,9 @@ fn refinement_revisits_the_written_answer() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     let mut moved = false;
     for seed in 11..19 {
-        let once = field.sample_realized(&problems, 4, 0, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
-        let refined = field.sample_realized(&problems, 4, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap();
-        assert_eq!(field.sample_realized(&problems, 4, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap(), refined, "the same draws");
+        let once = field.sample_realized(&problems, 4, 0, 0, seed, &mut Host, &mut |_, _| true).unwrap();
+        let refined = field.sample_realized(&problems, 4, 2, 0, seed, &mut Host, &mut |_, _| true).unwrap();
+        assert_eq!(field.sample_realized(&problems, 4, 2, 0, seed, &mut Host, &mut |_, _| true).unwrap(), refined, "the same draws");
         for places in &refined {
             assert!(places.iter().all(|&c| c < field.declaration.alphabet));
             if let Some(end) = places.iter().position(|&c| c == 0) {
@@ -1594,7 +1594,7 @@ fn refinement_revisits_the_written_answer() {
     assert!(moved, "no refinement moved a place");
     let l = field.layout.clone();
     field.theta[l.read_bias + 2] = 40 << 16;
-    let pointed = field.sample_realized(&problems, 3, 2, 0, 11, &mut HostField, &mut |_, _| true).unwrap();
+    let pointed = field.sample_realized(&problems, 3, 2, 0, 11, &mut Host, &mut |_, _| true).unwrap();
     assert!(pointed.iter().flatten().all(|&c| c == 2), "{pointed:?}");
 }
 
@@ -1603,18 +1603,18 @@ struct RegionsCounted {
     regions: Vec<usize>,
 }
 
-impl FieldRealization for RegionsCounted {
-    fn read_and_return(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
+impl Realization for RegionsCounted {
+    fn read_and_return(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<i128>)> {
         field.read_and_return(regions)
     }
-    fn read_faces(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
+    fn read_faces(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         self.regions.push(regions.len());
         field.read_faces(regions)
     }
-    fn read_logits(&mut self, field: &Field, regions: &[Region]) -> Result<Vec<FieldRead>> {
+    fn read_logits(&mut self, field: &Constitution, regions: &[Region]) -> Result<Vec<ReadLogits>> {
         field.read_logits(regions)
     }
-    fn read_landmarks(&mut self, field: &Field, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
+    fn read_landmarks(&mut self, field: &Constitution, region: &Region, question: usize, sites: &[usize], count: usize) -> Result<Vec<Vec<(usize, u64)>>> {
         field.landmarks(region, question, sites, count)
     }
 }
@@ -1636,7 +1636,7 @@ fn a_finished_problem_leaves_the_reads() {
             // A problem's keys are its index's, so alone it is written as the batch's `k`th: pad the batch before it.
             let mut padded: Vec<(&[usize], usize)> = problems[..k].to_vec();
             padded.push(*problem);
-            alone.push(field.sample_realized(&padded, 9, 2, 0, seed, &mut HostField, &mut |_, _| true).unwrap().pop().unwrap());
+            alone.push(field.sample_realized(&padded, 9, 2, 0, seed, &mut Host, &mut |_, _| true).unwrap().pop().unwrap());
         }
         assert_eq!(together, alone, "seed {seed}");
     }
@@ -1651,7 +1651,7 @@ fn a_finished_problem_leaves_the_reads() {
 fn the_room_past_the_front_is_heard_only_through_the_near_field() {
     for still in [0usize, 1, 2] {
         for ticks in [2usize, 4] {
-        let field = shaped_with(FieldDeclaration { reach: 96, ticks, ..tiny_declaration(still) });
+        let field = shaped_with(Declaration { reach: 96, ticks, ..tiny_declaration(still) });
         let reach = field.declaration.reach;
         let q = [1usize, 4, 0, 2];
         let truth = [3usize, 1, 2, 4, 1, 3, 2, 1];
@@ -1677,7 +1677,7 @@ fn the_room_past_the_front_is_heard_only_through_the_near_field() {
 }
 
 /// [definition; the unified-theory reading of November 6, 10:31] **Past the last arrival the bare rate**: under
-/// `Field::bare_stretch` every silent place past the region's last arrival runs at one on a turned head (its clock the place
+/// `Constitution::bare_stretch` every silent place past the region's last arrival runs at one on a turned head (its clock the place
 /// count), reads no face and takes no covector, while a silent place between arrivals keeps its own face's rate.
 #[test]
 fn past_the_last_arrival_a_place_runs_at_the_bare_rate() {
@@ -1686,7 +1686,7 @@ fn past_the_last_arrival_a_place_runs_at_the_bare_rate() {
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
     let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-    assert_eq!(Field::silent_stretch(&r), 7);
+    assert_eq!(Constitution::silent_stretch(&r), 7);
     let one = 1i64 << PACE_BITS;
     let mut between = false;
     for cell in &field.pass(&r, true).unwrap().ticks[1..] {
@@ -1713,7 +1713,7 @@ fn past_the_last_arrival_a_place_runs_at_the_bare_rate() {
 fn a_cut_room_reads_and_returns_the_whole_rooms_bits() {
     for still in [0usize, 1, 2] {
         for ticks in [2usize, 4] {
-            let field = shaped_with(FieldDeclaration { reach: 400, ticks, ..tiny_declaration(still) });
+            let field = shaped_with(Declaration { reach: 400, ticks, ..tiny_declaration(still) });
             let dw = field.declaration.width;
             let q = [1usize, 4, 0, 2, 3, 1];
             let sites = field.declaration.reach;
@@ -1766,8 +1766,8 @@ fn a_read_releases_a_run() {
     let octave = |d: usize| usize::BITS - 1 - d.leading_zeros();
     let (mut fewer, mut reads_one, mut reads_run) = (false, 0usize, 0usize);
     for seed in 11..19 {
-        let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
-        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
+        let one = field.sample_observed(&problems, 9, 2, 0, seed, &mut Host, &mut |_, _| true, &mut |_| {}).unwrap();
+        assert_eq!(field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut Host, &mut |_, _| true, &mut |_| {}).unwrap(), one, "no bound, one place a read");
         let mut counted = RegionsCounted { regions: Vec::new() };
         field.sample_runs(&problems, 9, 2, 0, seed, 0, true, false, None, false, &mut counted, &mut |_, _| true, &mut |_| {}).unwrap();
         reads_one += counted.regions.len();
@@ -1816,7 +1816,7 @@ fn a_void_never_unwrites_a_letter() {
         for seed in 11..27 {
             let mut letters: Vec<Vec<Option<usize>>> = problems.iter().map(|&(q, n)| vec![None; q.len() + n]).collect();
             let places = field
-                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, &mut HostField, &mut |_, _| true, &mut |r| {
+                .sample_runs(&problems, 4, 0, 0, seed, run_bound, true, false, None, false, &mut Host, &mut |_, _| true, &mut |r| {
                     if r.pass != 0 {
                         return;
                     }
@@ -1879,13 +1879,13 @@ fn a_given_length_is_kept() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     for run_bound in [0i128, 1 << 20] {
         for seed in 11..19 {
-            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let written = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, Some(&[3, 5]), false, &mut Host, &mut |_, _| true, &mut |_| {}).unwrap();
             for (places, l) in written.iter().zip([3usize, 5]) {
                 assert!(places[..l].iter().all(|&c| c != 0), "a void inside the given length, seed {seed}: {places:?}");
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the given length, seed {seed}: {places:?}");
             }
             // One end, one draw: the length drawn from the first read is kept the same way.
-            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, &mut HostField, &mut |_, _| true, &mut |_| {}).unwrap();
+            let drawn = field.sample_runs(&problems, 4, 2, 0, seed, run_bound, true, false, None, true, &mut Host, &mut |_, _| true, &mut |_| {}).unwrap();
             for places in &drawn {
                 let l = places.iter().position(|&c| c == 0).unwrap_or(places.len());
                 assert!(places[l..].iter().all(|&c| c == 0), "a letter past the drawn end, seed {seed}: {places:?}");
@@ -1909,20 +1909,20 @@ fn the_writer_reads_its_region_to_the_near_field_past_its_void() {
         open[t] = false;
     }
     let whole = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
-    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut HostField).unwrap().remove(0);
+    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut Host).unwrap().remove(0);
     assert_eq!(read, field.faces(&whole).unwrap(), "before any void the region is read whole");
     let end = 8;
     for t in end..classes.len() {
         classes[t] = 0;
         open[t] = false;
     }
-    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut HostField).unwrap().remove(0);
+    let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut Host).unwrap().remove(0);
     let cut = Region { classes: &classes[..end + NEAR], unresolved: &open[..end + NEAR], faces: &[], locked: &[], echo: &[], domain: None, port: None };
     let short = field.faces(&cut).unwrap();
     assert_eq!(read.len(), classes.len());
     assert_eq!(&read[..end + NEAR], &short[..], "the faces are the cut region's");
     assert!(read[end + NEAR..].iter().all(Option::is_none), "no face past the cut");
-    let room = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, false, &mut HostField).unwrap().remove(0);
+    let room = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, false, &mut Host).unwrap().remove(0);
     assert_eq!(room, field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap(), "the whole room, declared");
 }
 
@@ -1938,7 +1938,7 @@ fn the_answer_is_released_by_octaves_of_distance() {
     let mut reads = 0;
     for seed in 11..19 {
         field
-            .sample_observed(&problems, 9, 0, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+            .sample_observed(&problems, 9, 0, 0, seed, &mut Host, &mut |_, _| true, &mut |r| {
                 for (k, &(q, _)) in problems.iter().enumerate() {
                     let earliest = (q.len()..r.classes[k].len()).filter(|&t| r.open[k][t]).map(|t| octave(t + 1 - q.len())).min();
                     if let Some(j) = earliest {
@@ -1970,7 +1970,7 @@ fn refinement_moves_the_end_one_place_a_read() {
         for refine in [3] {
         last = None;
         field
-            .sample_observed(&problems, 4, refine, 0, seed, &mut HostField, &mut |_, _| true, &mut |r| {
+            .sample_observed(&problems, 4, refine, 0, seed, &mut Host, &mut |_, _| true, &mut |r| {
                 if r.pass == 0 {
                     return;
                 }
@@ -1998,13 +1998,13 @@ fn refinement_moves_the_end_one_place_a_read() {
 }
 
 /// The level's field of the tower fixtures.
-fn coarse_declaration() -> FieldDeclaration {
-    FieldDeclaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
+fn coarse_declaration() -> Declaration {
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
 /// from the fixtures' keys past the fine field's founding.
-fn towered(still: usize) -> Field {
+fn towered(still: usize) -> Constitution {
     let field = opened(still);
     let offset = 4 * field.declaration.founding_draws();
     field.scaled_up(6, 1, coarse_declaration(), &keys(1 << 16), offset).unwrap().0
@@ -2012,7 +2012,7 @@ fn towered(still: usize) -> Field {
 
 /// [`towered`] with its prolongation and every family of its packets' field drawn, so every path of the tower carries a
 /// covector.
-fn towered_live(still: usize) -> Field {
+fn towered_live(still: usize) -> Constitution {
     let mut field = towered(still);
     let stream = keys(1 << 16);
     let families = field.families_all();
@@ -2027,7 +2027,7 @@ fn towered_live(still: usize) -> Field {
 }
 
 /// The tower's covector over its whole material.
-fn tower_covector(field: &Field, region: &Region) -> Vec<i128> {
+fn tower_covector(field: &Constitution, region: &Region) -> Vec<i128> {
     let pass = field.pass(region, true).unwrap();
     let mut g = vec![0i128; field.material_len()];
     field.returned(region, &pass, &mut g).unwrap();
@@ -2050,11 +2050,11 @@ fn a_tower_founded_on_a_field_reads_its_faces() {
             at += len;
         }
         assert_eq!(at, tower.material_len());
-        assert_eq!(Field::from_text(&tower.to_text()).unwrap(), tower);
+        assert_eq!(Constitution::from_text(&tower.to_text()).unwrap(), tower);
     }
-    let mut learner = FieldLearner::new(towered_live(1), 6);
+    let mut learner = Learner::new(towered_live(1), 6);
     learner.section(&[region()]).unwrap();
-    assert_eq!(FieldLearner::from_text(&learner.to_text()).unwrap(), FieldLearner { last: None, ..learner });
+    assert_eq!(Learner::from_text(&learner.to_text()).unwrap(), Learner { last: None, ..learner });
 }
 
 /// [definition; the tower record, D1] **The tower's covector agrees with its code's central difference** on the packets'
@@ -2063,7 +2063,7 @@ fn a_tower_founded_on_a_field_reads_its_faces() {
 /// counted), and the live prolongation reaching the code at the bytes.
 #[test]
 fn the_towers_covector_matches_its_codes_difference() {
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> {
         let pass = field.pass(r, true).unwrap();
         let coarse = pass.tower.iter().flat_map(|t| t.ticks().iter());
         pass.ticks.iter().chain(coarse).flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
@@ -2127,14 +2127,14 @@ fn a_lane_founded_beside_a_field_reads_its_faces() {
                 at += len;
             }
             assert_eq!(at, next.material_len());
-            assert_eq!(Field::from_text(&next.to_text()).unwrap(), next);
+            assert_eq!(Constitution::from_text(&next.to_text()).unwrap(), next);
             laned = next;
         }
         let g = covector_of(&laned, &region());
         let (l, dw, m2) = (laned.layout.clone(), laned.declaration.width, 2 * laned.declaration.complex());
         assert!((0..m2).any(|row| (8..dw).any(|j| g[l.q + row * dw + j] != 0)), "still {still}: the key chart's reads from the lanes carry a covector");
     }
-    let mut learner = FieldLearner::new(Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap(), 4);
+    let mut learner = Learner::new(Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap(), 4);
     for _ in 0..2 {
         learner.section(&[region()]).unwrap();
     }
@@ -2148,7 +2148,7 @@ fn a_lane_founded_beside_a_field_reads_its_faces() {
     let mean = enc_old.iter().map(|v| v / enc_old.len() as i128).sum::<i128>() + enc_old.iter().map(|v| v % enc_old.len() as i128).sum::<i128>() / enc_old.len() as i128;
     assert!(mean > 0);
     assert_eq!((laned.first[l.enc + 16 + 8], laned.second[l.enc + 16 + 8]), (0, mean), "the lane's entries open on their family's statistics");
-    let back = FieldLearner { read_held: laned.read_held, ..FieldLearner::from_text(&laned.to_text()).unwrap() };
+    let back = Learner { read_held: laned.read_held, ..Learner::from_text(&laned.to_text()).unwrap() };
     assert_eq!(back, laned);
 }
 
@@ -2158,10 +2158,10 @@ fn a_lane_founded_beside_a_field_reads_its_faces() {
 /// lane's chart and its adjoint are read on their own.
 #[test]
 fn the_laned_fields_covector_matches_its_codes_difference() {
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let (mut read, mut seams) = (0usize, 0usize);
     for still in [0usize, 1, 2] {
-        let field = shaped_with(FieldDeclaration { width: 16, lanes: 2, ..tiny_declaration(still) });
+        let field = shaped_with(Declaration { width: 16, lanes: 2, ..tiny_declaration(still) });
         let r = region();
         let g = covector_of(&field, &r);
         let l = field.layout.clone();
@@ -2202,7 +2202,7 @@ fn the_laned_fields_covector_matches_its_codes_difference() {
 #[test]
 fn a_steps_predicted_change_is_its_codes_change_in_the_small() {
     for still in [0usize, 1, 2] {
-        let mut learner = FieldLearner::new(shaped(still), 14);
+        let mut learner = Learner::new(shaped(still), 14);
         let receipt = learner.section(&[region()]).unwrap();
         let predicted = receipt.predicted.expect("a predicted change within its carrier") as i128;
         let r = [region()];
@@ -2222,10 +2222,10 @@ fn a_steps_transfer_is_the_next_sections_change_in_the_small() {
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
     let second = [Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
-    let code_on = |field: &Field| code_of(&compared(&[field.faces(&second[0]).unwrap()], &second).unwrap(), &spans_of(&second));
+    let code_on = |field: &Constitution| code_of(&compared(&[field.faces(&second[0]).unwrap()], &second).unwrap(), &spans_of(&second));
     let mut read = 0;
     for still in [0usize, 1, 2] {
-        let mut learner = FieldLearner::new(shaped(still), 14);
+        let mut learner = Learner::new(shaped(still), 14);
         let first = learner.section(&[region()]).unwrap();
         assert_eq!(first.transfer, None, "still {still}: the first section prices no step");
         if !first.deposited {
@@ -2246,8 +2246,8 @@ fn a_steps_transfer_is_the_next_sections_change_in_the_small() {
 
 /// A tiny learner grown by a lane and by four contacts (width 16 in two lanes, eight contacts, four of them new), a section into
 /// its life so every moment is open.
-fn grown_learner() -> FieldLearner {
-    let mut learner = FieldLearner::new(Field::found(tiny_declaration(1), &keys(1 << 14)).unwrap(), 6);
+fn grown_learner() -> Learner {
+    let mut learner = Learner::new(Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap(), 6);
     for _ in 0..2 {
         learner.section(&[region()]).unwrap();
     }
@@ -2396,11 +2396,11 @@ fn a_part_steps_at_its_own_rate_and_the_plain_rate_is_the_plain_deposit() {
         }
     }
     // The text.
-    let back = FieldLearner::from_text(&fast.to_text()).unwrap();
+    let back = Learner::from_text(&fast.to_text()).unwrap();
     assert_eq!(back.rate_parts, fast.rate_parts);
     assert_eq!(back.field.theta, fast.field.theta);
     let stripped: String = fast.to_text().lines().filter(|l| !l.starts_with("parts ")).map(|l| format!("{l}\n")).collect();
-    assert_eq!(FieldLearner::from_text(&stripped).unwrap().rate_parts, None, "a state without the line has no parts' rates");
+    assert_eq!(Learner::from_text(&stripped).unwrap().rate_parts, None, "a state without the line has no parts' rates");
     assert_eq!(stripped, grown_learner_text_of(&fast), "the state's other lines are a plain state's");
 }
 
@@ -2448,7 +2448,7 @@ fn the_predicted_change_by_part_is_its_totals_partition() {
 }
 
 /// The learner's text without its parts' rates (what a binary without them writes).
-fn grown_learner_text_of(learner: &FieldLearner) -> String {
+fn grown_learner_text_of(learner: &Learner) -> String {
     let mut plain = learner.clone();
     plain.rate_parts = None;
     plain.to_text()
@@ -2485,14 +2485,14 @@ fn an_entry_steps_at_its_own_rate_where_the_learner_carries_it() {
     }
     let text = free.to_text();
     assert!(text.lines().last().unwrap().starts_with("rates "), "the line trails the state");
-    assert_eq!(FieldLearner::from_text(&text).unwrap().own_rates, free.own_rates);
+    assert_eq!(Learner::from_text(&text).unwrap().own_rates, free.own_rates);
     let stripped: String = text.lines().filter(|l| !l.starts_with("rates ")).map(|l| format!("{l}\n")).collect();
-    assert_eq!(FieldLearner::from_text(&stripped).unwrap().own_rates, None, "a state without the line has no own rates");
+    assert_eq!(Learner::from_text(&stripped).unwrap().own_rates, None, "a state without the line has no own rates");
     let short: String = text.lines().map(|l| if l.starts_with("rates ") { format!("{}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
-    assert!(FieldLearner::from_text(&short).is_err(), "a line that is not one count an entry is refused");
+    assert!(Learner::from_text(&short).is_err(), "a line that is not one count an entry is refused");
     for bad in ["0", "128"] {
         let wrong: String = text.lines().map(|l| if l.starts_with("rates ") { format!("{} {bad}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
-        assert!(FieldLearner::from_text(&wrong).is_err(), "a rate of {bad} is refused");
+        assert!(Learner::from_text(&wrong).is_err(), "a rate of {bad} is refused");
     }
 }
 
@@ -2505,7 +2505,7 @@ fn an_entry_steps_at_its_own_rate_where_the_learner_carries_it() {
 #[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
 fn founded_parts_and_their_cosines_on_saved_states() {
     let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} names a saved state"));
-    let load = |k: &str| FieldLearner::from_text(&std::fs::read_to_string(var(k)).unwrap()).unwrap();
+    let load = |k: &str| Learner::from_text(&std::fs::read_to_string(var(k)).unwrap()).unwrap();
     let (older, old, now) = (load("HOLONICS_PARTS_OLDER"), load("HOLONICS_PARTS_OLD"), load("HOLONICS_PARTS_NOW"));
     let parts = now.field.founded_parts(var("HOLONICS_PARTS_BEFORE").parse().unwrap());
     let travel = part_travel(&parts, &older.field.theta, &old.field.theta, &now.field.theta);
@@ -2515,15 +2515,15 @@ fn founded_parts_and_their_cosines_on_saved_states() {
 }
 
 /// A tiny declaration with four complex contacts and no carry circle.
-fn four_contacts(still: usize) -> FieldDeclaration {
-    FieldDeclaration { contacts: 8, ..tiny_declaration(still) }
+fn four_contacts(still: usize) -> Declaration {
+    Declaration { contacts: 8, ..tiny_declaration(still) }
 }
 
 /// [`four_contacts`]'s founded field grown by two carry circles (complex contacts 4 and 5 of six: one scans from the left, one from the
 /// right), then every family drawn ([`drawn`]): the circles' charts, their biases and their `W` columns off zero, so the gate has friction
 /// on some sites and none on others.
-fn circled_shaped(still: usize) -> Field {
-    let plain = Field::found(four_contacts(still), &keys(1 << 14)).unwrap();
+fn circled_shaped(still: usize) -> Constitution {
+    let plain = Constitution::found(four_contacts(still), &keys(1 << 14)).unwrap();
     let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
     drawn(grown)
 }
@@ -2535,20 +2535,20 @@ fn circled_shaped(still: usize) -> Field {
 #[test]
 fn the_carry_circles_are_even_among_the_contacts_and_the_retired_carries_are_refused() {
     let d = four_contacts(1);
-    assert!(FieldDeclaration { carry: 2, ..d }.admit().is_ok() && FieldDeclaration { carry: 4, ..d }.admit().is_ok());
-    assert!(FieldDeclaration { carry: 1, ..d }.admit().is_err(), "an odd count of circles");
-    assert!(FieldDeclaration { carry: 6, ..d }.admit().is_err(), "more circles than complex contacts");
+    assert!(Declaration { carry: 2, ..d }.admit().is_ok() && Declaration { carry: 4, ..d }.admit().is_ok());
+    assert!(Declaration { carry: 1, ..d }.admit().is_err(), "an odd count of circles");
+    assert!(Declaration { carry: 6, ..d }.admit().is_err(), "more circles than complex contacts");
     let plain = d.to_text();
     assert!(plain.starts_with("hnn-field-v14 ") && plain.split(' ').count() == 12);
-    assert_eq!(FieldDeclaration::from_text(&plain).unwrap(), d);
-    let circled = FieldDeclaration { carry: 2, ..d }.to_text();
+    assert_eq!(Declaration::from_text(&plain).unwrap(), d);
+    let circled = Declaration { carry: 2, ..d }.to_text();
     assert!(circled.starts_with("hnn-field-v14e ") && circled.split(' ').count() == 13 && circled.ends_with(" 2"));
-    assert_eq!(FieldDeclaration::from_text(&circled).unwrap(), FieldDeclaration { carry: 2, ..d });
+    assert_eq!(Declaration::from_text(&circled).unwrap(), Declaration { carry: 2, ..d });
     let retired = format!("{} 1", plain.replacen("hnn-field-v14 ", "hnn-field-v14k ", 1));
-    assert!(matches!(FieldDeclaration::from_text(&retired), Err(TowerError::Refused(m)) if m.contains("zero friction is retired")));
+    assert!(matches!(Declaration::from_text(&retired), Err(TowerError::Refused(m)) if m.contains("zero friction is retired")));
     let linear = circled.replacen("hnn-field-v14e ", "hnn-field-v14t ", 1);
-    assert!(matches!(FieldDeclaration::from_text(&linear), Err(TowerError::Refused(m)) if m.contains("linear chart is retired")));
-    assert!(FieldDeclaration::from_text(&format!("{} 0", plain.replacen("hnn-field-v14 ", "hnn-field-v14e ", 1))).is_err());
+    assert!(matches!(Declaration::from_text(&linear), Err(TowerError::Refused(m)) if m.contains("linear chart is retired")));
+    assert!(Declaration::from_text(&format!("{} 0", plain.replacen("hnn-field-v14 ", "hnn-field-v14e ", 1))).is_err());
 }
 
 /// [definition; theory, November 11 17:25 and November 12, G96's third branch; `CarryGate.lean`] **The gate keeps its circle and its friction on
@@ -2707,7 +2707,7 @@ fn the_drive_is_charged_through_the_leak() {
 }
 
 /// [definition; theory, November 11 17:25] **A growth by carry circles keeps every face and returns through its circles**: on a field with every
-/// family drawn, [`Field::with_carry`] adds the circles as the last contacts (their `W` columns, leak rows and biases at zero, their turn rows
+/// family drawn, [`Constitution::with_carry`] adds the circles as the last contacts (their `W` columns, leak rows and biases at zero, their turn rows
 /// drawn), reads every face bit for bit, and the circles' `W` columns have a covector; a lane keeps the faces again with the lane's columns of the
 /// circles' charts at zero; a second growth, a plain growth by contacts and a growth by copies are refused; the learner opens the circles' entries
 /// as a growth in contacts opens them, its charts' moments at zero, its draws past the contacts' and the turn rows', and its text (the parts
@@ -2741,7 +2741,7 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
         assert!(grown.grown(2, &keys(grown.growth_draws(2))).is_err(), "a growth by copies with carry circles");
     }
     // The learner.
-    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.section(&[region()]).unwrap();
     learner.held = None;
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves: [0; PARTS] });
@@ -2763,7 +2763,7 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     // The parts a field with circles and no triads writes: every part before the triad's (twenty-two), the line as before the triads.
     assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(2, 0, false, false, false, false).len(), "a field with carry circles writes all twenty-two parts before the triad's");
     assert_eq!(written_parts(2, 0, false, false, false, false).len(), TRIAD_PART);
-    let back = FieldLearner::from_text(&text).unwrap();
+    let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.field.theta.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (grown.field.theta.clone(), grown.first.clone(), grown.second.clone(), grown.rate_parts, grown.drawn));
     assert_eq!(back.field.declaration, grown.field.declaration);
     assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0, 0, false, false, false, false).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
@@ -2850,7 +2850,7 @@ fn the_carry_circles_scan_is_the_law_site_by_site() {
 #[test]
 fn the_carry_circles_covector_matches_its_codes_difference() {
     // The seams: the class sheets.
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> {
         let pass = field.pass(r, true).unwrap();
         pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
     };
@@ -2936,12 +2936,12 @@ fn an_answers_root_charge_is_its_counts_against_its_summed_shares() {
 }
 
 /// [definition; theory, November 10 04:40] **The re-draws through a lens code the stop place and certify every pass**
-/// ([`Field::redraw_lensed`]): with a lens that weighs the void four times at the stop place, each answer's code at the start is
+/// ([`Constitution::redraw_lensed`]): with a lens that weighs the void four times at the stop place, each answer's code at the start is
 /// its lensed locked faces' code, the stop place at the void among them, and every pass that keeps changes lowers the pooled
 /// code by more than `h` for each one; every answer keeps its length and stops neutral or at rest.
 #[test]
 fn the_lensed_redraw_codes_its_stop_place_and_certifies_every_pass() {
-    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let field = shaped_with(Declaration { reach: 40, ..tiny_declaration(1) });
     let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
     let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
     let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
@@ -2953,14 +2953,14 @@ fn the_lensed_redraw_codes_its_stop_place_and_certifies_every_pass() {
         }
     };
     let answers0: Vec<Vec<usize>> = written.iter().map(|w| w[..20].to_vec()).collect();
-    let mut locked = field.locked_faces(&problems, &answers0, &[0, 1], 0, true, &mut HostField).unwrap();
+    let mut locked = field.locked_faces(&problems, &answers0, &[0, 1], 0, true, &mut Host).unwrap();
     for (x, f) in answers0.iter().zip(locked.iter_mut()) {
         assert_eq!(f.len(), x.len() + 1, "the stop place is read");
         lens(x, f);
     }
     for h in [0i128, 1 << 18] {
         let mut passes: Vec<(usize, usize, i128)> = Vec::new();
-        let (answers, records) = field.redraw_lensed(&problems, &written, 0, h, &lens, &mut HostField, &mut |p| {
+        let (answers, records) = field.redraw_lensed(&problems, &written, 0, h, &lens, &mut Host, &mut |p| {
             passes.push((p.pass, p.kept, p.code));
             true
         }).unwrap();
@@ -3005,21 +3005,21 @@ fn a_point_redraw_takes_the_top_letter_of_a_surprised_place() {
     assert!(out.iter().all(|(_, g)| *g > 0));
 }
 
-/// [definition; theory, November 10 04:15] **Point re-draws alternate with exchanges, certify every pass and stop** ([`Field::redraw`]):
+/// [definition; theory, November 10 04:15] **Point re-draws alternate with exchanges, certify every pass and stop** ([`Constitution::redraw`]):
 /// on the settle's two answers, at `h` zero and at a quarter of a bit, each answer keeps its length and its void, the passes
 /// alternate re-draw (odd) and exchange (even), every pass that keeps changes lowers the pooled code by more than `h` for each
 /// one, a pass that keeps none leaves it as it was, and every answer stops neutral (its code at or under its entropy) or at
 /// rest; its end is its final answer's code read again.
 #[test]
 fn point_redraws_alternate_with_exchanges_certify_every_pass_and_stop() {
-    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let field = shaped_with(Declaration { reach: 40, ..tiny_declaration(1) });
     let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
     let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
     let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
     let written = vec![letters(0, 20, 24), letters(3, 20, 22)];
     for h in [0i128, 1 << 18] {
         let mut passes: Vec<(usize, usize, usize, i128)> = Vec::new();
-        let (answers, records) = field.redraw(&problems, &written, 0, h, &mut HostField, &mut |p| {
+        let (answers, records) = field.redraw(&problems, &written, 0, h, &mut Host, &mut |p| {
             passes.push((p.pass, p.kind, p.kept, p.code));
             true
         }).unwrap();
@@ -3040,7 +3040,7 @@ fn point_redraws_alternate_with_exchanges_certify_every_pass_and_stop() {
             assert!(!r.neutral || r.end <= r.entropy, "h={h} problem {k}: neutral at or under its entropy");
             eprintln!("REDRAW h={h} problem={k} kept={} undone={} start={} end={} entropy={} neutral={} passes={}", r.kept.len(), r.undone, r.start, r.end, r.entropy, r.neutral, passes.len() - 1);
         }
-        let (_, check) = field.redraw(&problems, &answers, 0, i128::MAX, &mut HostField, &mut |_| false).unwrap();
+        let (_, check) = field.redraw(&problems, &answers, 0, i128::MAX, &mut Host, &mut |_| false).unwrap();
         for (k, r) in records.iter().enumerate() {
             assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");
         }
@@ -3048,13 +3048,13 @@ fn point_redraws_alternate_with_exchanges_certify_every_pass_and_stop() {
 }
 
 /// [definition; theory, November 10 01:36] **The parallel certified settle holds composition, certifies every pass and rests**
-/// ([`Field::settle`]): on two answers of twenty letters, at `h` zero and at a quarter of a bit, each answer keeps its letters
+/// ([`Constitution::settle`]): on two answers of twenty letters, at `h` zero and at a quarter of a bit, each answer keeps its letters
 /// and its void, every pass that keeps exchanges lowers the pooled code by more than `h` for each one (each problem's kept set
 /// is certified whole), a pass that keeps none leaves it as it was, every problem rests, and its end is its final
 /// answer's code read again; some exchange is kept.
 #[test]
 fn the_parallel_settle_certifies_every_pass_and_rests() {
-    let field = shaped_with(FieldDeclaration { reach: 40, ..tiny_declaration(1) });
+    let field = shaped_with(Declaration { reach: 40, ..tiny_declaration(1) });
     let (q1, q2) = ([1usize, 4, 0, 2, 2, 3], [3usize, 3, 1, 0]);
     let problems: Vec<(&[usize], usize)> = vec![(&q1, 24), (&q2, 22)];
     let letters = |seed: usize, n: usize, room: usize| -> Vec<usize> { (0..room).map(|t| if t < n { 1 + (t * 7 + t / 3 + seed) % 4 } else { 0 }).collect() };
@@ -3062,7 +3062,7 @@ fn the_parallel_settle_certifies_every_pass_and_rests() {
     let mut kept_any = false;
     for h in [0i128, 1 << 18] {
         let mut passes: Vec<(usize, usize, i128)> = Vec::new();
-        let (answers, records) = field.settle(&problems, &written, 0, h, &mut HostField, &mut |p| {
+        let (answers, records) = field.settle(&problems, &written, 0, h, &mut Host, &mut |p| {
             passes.push((p.pass, p.kept, p.code));
             true
         }).unwrap();
@@ -3085,7 +3085,7 @@ fn the_parallel_settle_certifies_every_pass_and_rests() {
             kept_any |= !r.kept.is_empty();
             eprintln!("SETTLE h={h} problem={k} kept={} undone={} start={} end={} passes={}", r.kept.len(), r.undone, r.start, r.end, passes.len() - 1);
         }
-        let (again, check) = field.settle(&problems, &answers, 0, i128::MAX, &mut HostField, &mut |_| true).unwrap();
+        let (again, check) = field.settle(&problems, &answers, 0, i128::MAX, &mut Host, &mut |_| true).unwrap();
         assert_eq!(again, answers);
         for (k, r) in records.iter().enumerate() {
             assert_eq!(check[k].start, r.end, "the end is the final answer's code read again");
@@ -3126,7 +3126,7 @@ fn the_carry_circles_gates_are_read_from_the_forwards_own_cells() {
 
 /// [measurement; theory, November 12, G90's first branch and G96's third] **The carry circles' leaks and charges, read**: on a drawn field
 /// grown by two carry circles ([`circled_shaped`]), with circle 0's leak row moved so that some reads fall below zero (the friction below its
-/// founding on the leak's log chart), [`Field::carry_leaks`] over each tick's pair chart gives every site's leak read `ℓ` as the forward's own
+/// founding on the leak's log chart), [`Constitution::carry_leaks`] over each tick's pair chart gives every site's leak read `ℓ` as the forward's own
 /// cell holds it (`qh`), and its charge after the site as the scan's value before the next site in scan order (`qm`, even contacts from the
 /// left and odd from the right); a field without circles refuses.
 #[test]
@@ -3164,12 +3164,12 @@ fn the_carry_circles_leaks_and_charges_are_the_forwards_own() {
 
 /// [definition; theory, November 11 19:56, G83's second defect, G85] **A field with carry circles keeps every room whole**: with the circles' charts,
 /// biases and `W` columns drawn (so from the second tick a circle carries a place's state past any window), a region whose port cuts its room reads
-/// the same faces, the same port code and the same covector as the same region with the cut off, because [`FieldDeclaration::room_window`] admits
+/// the same faces, the same port code and the same covector as the same region with the cut off, because [`Declaration::room_window`] admits
 /// no window where the field has circles; the same region on the field without circles still cuts.
 #[test]
 fn a_field_with_carry_circles_keeps_every_room_whole() {
     for ticks in [2usize, 4] {
-        let plain = Field::found(FieldDeclaration { reach: 400, ticks, ..four_contacts(1) }, &keys(1 << 14)).unwrap();
+        let plain = Constitution::found(Declaration { reach: 400, ticks, ..four_contacts(1) }, &keys(1 << 14)).unwrap();
         let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
         let field = drawn(grown);
         let q = [1usize, 4, 0, 2, 3, 1];
@@ -3214,9 +3214,9 @@ fn the_parts_line_reads_its_own_order_and_every_older_one() {
     let text = learner.to_text();
     let line = text.lines().find(|l| l.starts_with("parts ")).unwrap().to_string();
     assert_eq!(line.split(' ').count(), 2 + 19);
-    assert_eq!(FieldLearner::from_text(&text).unwrap().rate_parts, learner.rate_parts, "the line's own order round-trips");
+    assert_eq!(Learner::from_text(&text).unwrap().rate_parts, learner.rate_parts, "the line's own order round-trips");
     let older: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.split(' ').take(2 + PLAIN_PARTS).collect::<Vec<_>>().join(" ")) } else { format!("{l}\n") }).collect();
-    let read = FieldLearner::from_text(&older).unwrap().rate_parts.unwrap();
+    let read = Learner::from_text(&older).unwrap().rate_parts.unwrap();
     assert_eq!((read.octaves[3], read.octaves[19], read.octaves[20], read.octaves[21]), (1, 0, 0, 0), "a sixteen-part line reads the letter rows at octave 0");
     assert_eq!(written_parts(0, 0, false, false, false, false), (0..16).chain(19..22).collect::<Vec<_>>());
     assert_eq!(written_parts(2, 0, false, false, false, false), (0..22).collect::<Vec<_>>());
@@ -3225,10 +3225,10 @@ fn the_parts_line_reads_its_own_order_and_every_older_one() {
 /// The triads the drawn fixtures carry: four (the founding counts its triads in fours, the triad record §4).
 const TRIADS: usize = 4;
 
-/// [`four_contacts`]'s founded field grown by `triads` triads ([`Field::with_triads`]), then every family drawn ([`drawn`]): the triads' charts,
+/// [`four_contacts`]'s founded field grown by `triads` triads ([`Constitution::with_triads`]), then every family drawn ([`drawn`]): the triads' charts,
 /// their biases and their return `W_T` off zero, so every triad's product reaches the face and every leg has a covector.
-fn triad_shaped(still: usize, triads: usize) -> Field {
-    let plain = Field::found(four_contacts(still), &keys(1 << 14)).unwrap();
+fn triad_shaped(still: usize, triads: usize) -> Constitution {
+    let plain = Constitution::found(four_contacts(still), &keys(1 << 14)).unwrap();
     let (grown, _) = plain.with_triads(triads, &keys(plain.declaration.triad_draws(triads))).unwrap();
     drawn(grown)
 }
@@ -3236,8 +3236,8 @@ fn triad_shaped(still: usize, triads: usize) -> Field {
 /// [`four_contacts`]'s founded field grown by two carry circles and then by `triads` triads (the line's order: the triads are founded on a
 /// circle line's end), every family drawn, with the circles' leak rows and leak biases set back to zero (`ℓ = 0`, the friction at its founding at
 /// every site, far from its floor of one grain).
-fn circled_triad_shaped(still: usize, triads: usize) -> Field {
-    let plain = Field::found(four_contacts(still), &keys(1 << 14)).unwrap();
+fn circled_triad_shaped(still: usize, triads: usize) -> Constitution {
+    let plain = Constitution::found(four_contacts(still), &keys(1 << 14)).unwrap();
     let (circled, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
     let (grown, _) = circled.with_triads(triads, &keys(circled.declaration.triad_draws(triads))).unwrap();
     let mut field = drawn(grown);
@@ -3258,37 +3258,37 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
     let dw = d.width;
     let plain = d.to_text();
     assert!(plain.starts_with("hnn-field-v14 ") && plain.split(' ').count() == 12);
-    assert_eq!(FieldDeclaration::from_text(&plain).unwrap(), d);
-    let circled = FieldDeclaration { carry: 2, ..d };
+    assert_eq!(Declaration::from_text(&plain).unwrap(), d);
+    let circled = Declaration { carry: 2, ..d };
     let line = circled.to_text();
     assert!(line.starts_with("hnn-field-v14e ") && line.split(' ').count() == 13 && line.ends_with(" 2"));
-    assert_eq!(FieldDeclaration::from_text(&line).unwrap(), circled);
+    assert_eq!(Declaration::from_text(&line).unwrap(), circled);
     let counts: Vec<String> = plain.split(' ').skip(1).map(str::to_string).collect();
     let j = 16usize;
     for base in [d, circled] {
-        let tri = FieldDeclaration { triads: j, ..base };
+        let tri = Declaration { triads: j, ..base };
         assert!(tri.admit().is_ok());
         let text = tri.to_text();
         let words: Vec<&str> = text.split(' ').collect();
         let c = base.carry.to_string();
         assert_eq!((words[0], words.len(), words[12], words[13]), ("hnn-field-v14f", 14, c.as_str(), "16"), "C {c}: the thirteen words of v14e with C written, then J");
         assert_eq!(words[1..12], counts.iter().map(String::as_str).collect::<Vec<_>>()[..], "C {c}: the declaration's eleven counts as before");
-        assert_eq!(FieldDeclaration::from_text(&text).unwrap(), tri, "C {c}: the v14f line round-trips");
+        assert_eq!(Declaration::from_text(&text).unwrap(), tri, "C {c}: the v14f line round-trips");
         let none = format!("{} 0", words[..13].join(" "));
-        assert!(matches!(FieldDeclaration::from_text(&none), Err(TowerError::Refused(m)) if m.contains("no triads")), "C {c}: a v14f line with no triads is refused");
-        assert!(FieldDeclaration::from_text(&words[..13].join(" ")).is_err(), "C {c}: a v14f line of thirteen words is refused");
-        let (old, new) = (FieldLayout::new(&base), FieldLayout::new(&tri));
+        assert!(matches!(Declaration::from_text(&none), Err(TowerError::Refused(m)) if m.contains("no triads")), "C {c}: a v14f line with no triads is refused");
+        assert!(Declaration::from_text(&words[..13].join(" ")).is_err(), "C {c}: a v14f line of thirteen words is refused");
+        let (old, new) = (Loci::new(&base), Loci::new(&tri));
         assert_eq!((old.triad, old.triad_bias, old.w_triad), (old.len, old.len, old.len), "C {c}: at J = 0 the triads' families are zero long at the end");
         assert_eq!(new.families.len(), old.families.len() + 3);
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(FieldLayout { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
 /// [definition; theory, November 12, the triad record §4] **A growth by triads keeps every face, and its return has a covector**: on a drawn
-/// field, with carry circles and without, [`Field::with_triads`] lays the triads' families after every other (the charts' rows drawn, their biases
+/// field, with carry circles and without, [`Constitution::with_triads`] lays the triads' families after every other (the charts' rows drawn, their biases
 /// and `W_T` at zero), keeps every old entry at its offset, reads every face and the code bit for bit and restores from its text, and `W_T` has a
 /// covector while none yet reaches the charts (`∇_α ℓ = 0` while `W_T = 0`, §3.2); the draws counted are the draws read; a second growth, a growth
 /// in contacts, in circles, in lanes or by copies of a field with triads, a growth by none, a founding with triads and a tower's growth are
@@ -3307,13 +3307,13 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
             assert!(plain.with_triads(j, &keys(draws)[..4 * draws - 1]).is_err(), "the draws counted are the draws read");
             let (grown, from) = plain.with_triads(j, &keys(draws)).unwrap();
             let (d, l, dw) = (grown.declaration, grown.layout.clone(), grown.declaration.width);
-            assert_eq!(d, FieldDeclaration { triads: j, ..plain.declaration });
+            assert_eq!(d, Declaration { triads: j, ..plain.declaration });
             let old = plain.theta.len();
             assert_eq!(grown.theta[..old], plain.theta[..], "still {still} circled {circled}: every old entry at its offset");
             assert!(from.len() == grown.theta.len() && from[..old].iter().enumerate().all(|(i, &o)| o == Some(i)) && from[old..].iter().all(Option::is_none));
             assert_eq!(grown.faces(&region()).unwrap(), plain.faces(&region()).unwrap(), "still {still} circled {circled}: every face kept");
             assert_eq!(grown.code(&region()).unwrap(), plain.code(&region()).unwrap(), "still {still} circled {circled}: the code kept");
-            assert_eq!(Field::from_text(&grown.to_text()).unwrap(), grown);
+            assert_eq!(Constitution::from_text(&grown.to_text()).unwrap(), grown);
             assert_eq!(l.len, l.w_triad + dw * 2 * j);
             assert!(grown.theta[l.triad..l.triad_bias].iter().any(|&v| v != 0), "the charts' rows drawn");
             assert!(grown.theta[l.triad_bias..l.len].iter().all(|&v| v == 0), "the charts' biases and W_T at zero");
@@ -3328,11 +3328,11 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
         }
     }
     assert!(shaped_with(four_contacts(1)).with_triads(0, &keys(1)).is_err(), "a growth by no triads");
-    assert!(Field::found(FieldDeclaration { triads: 4, ..four_contacts(1) }, &keys(1 << 14)).is_err(), "a founding with triads");
+    assert!(Constitution::found(Declaration { triads: 4, ..four_contacts(1) }, &keys(1 << 14)).is_err(), "a founding with triads");
     let tower = towered(1);
     assert!(tower.with_triads(4, &keys(tower.declaration.triad_draws(4))).is_err(), "a tower's levels take triads level by level");
     // The learner.
-    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.section(&[region()]).unwrap();
     learner.held = None;
     let mut octaves = [0u32; PARTS];
@@ -3369,10 +3369,10 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
     let line = text.lines().find(|l| l.starts_with("parts ")).unwrap().to_string();
     assert_eq!(line.split(' ').count(), 2 + written_parts(0, j, false, false, false, false).len());
     assert_eq!(line.rsplit_once(' ').unwrap().1, "3", "the triad's octave written last");
-    let back = FieldLearner::from_text(&text).unwrap();
+    let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.field.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (fast.field.clone(), fast.first.clone(), fast.second.clone(), fast.rate_parts, fast.drawn));
     let before: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.rsplit_once(' ').unwrap().0) } else { format!("{l}\n") }).collect();
-    assert_eq!(FieldLearner::from_text(&before).unwrap().rate_parts, grown.rate_parts, "a line without the triad's octave reads it at 0 and every other part as written");
+    assert_eq!(Learner::from_text(&before).unwrap().rate_parts, grown.rate_parts, "a line without the triad's octave reads it at 0 and every other part as written");
     // Each entry's own rate, where the learner carries it.
     let mut own = learner.clone();
     own.own_rates = Some((0..own.field.material_len()).map(|i| if i % 3 == 0 { 8 } else { 5 }).collect());
@@ -3392,7 +3392,7 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
 #[test]
 fn the_quarter_turn_gauge_leaves_every_face_and_the_code() {
     // A leg turned `by` `i` (`1`) or `−i` (`−1`), or left (`0`): `(r, i) → (−by·i, by·r)` on its rows' entries and its biases.
-    let gauge = |field: &Field, alpha: i32, beta: i32| -> Field {
+    let gauge = |field: &Constitution, alpha: i32, beta: i32| -> Constitution {
         let mut out = field.clone();
         let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
         for k in 0..j {
@@ -3436,7 +3436,7 @@ fn the_quarter_turn_gauge_leaves_every_face_and_the_code() {
 /// counted); the triads' charts, biases and return are each read at least once.
 #[test]
 fn the_triads_covector_matches_its_codes_difference() {
-    let sheets = |field: &Field, r: &Region| -> Vec<Vec<u32>> {
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> {
         let pass = field.pass(r, true).unwrap();
         pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
     };
@@ -3608,13 +3608,13 @@ fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
         let mut before = field.clone();
         before.declaration.triads = 0;
         before.theta.truncate(l.triad);
-        before.layout = FieldLayout::new(&before.declaration);
+        before.layout = Loci::new(&before.declaration);
         assert_eq!(parts[..l.triad], before.founded_parts(contacts)[..], "circled {circled}: every old entry's part as before");
     }
 }
 
 /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **A growth by letters keeps every standing entry and reads
-/// each fresh letter at the least class bias**: on drawn fields (still heads or turned, plain, with carry circles, with triads), [`Field::lettered`]
+/// each fresh letter at the least class bias**: on drawn fields (still heads or turned, plain, with carry circles, with triads), [`Constitution::lettered`]
 /// at no fresh class returns the field as it stands (its text byte for byte, every entry its own); at one and three fresh classes every standing
 /// entry keeps its value (the open rows at the end of their families), each fresh class's rows of the encodings, the moment encodings and the
 /// paces stand at zero and its class bias at the least the standing classes hold, the text round-trips, and on a region of standing classes each
@@ -3624,7 +3624,7 @@ fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
 /// refused while a step is held.
 #[test]
 fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the_least_bias() {
-    let fields: Vec<(&str, Field)> = (0..3usize)
+    let fields: Vec<(&str, Constitution)> = (0..3usize)
         .flat_map(|still| [(format!("plain {still}"), shaped_with(four_contacts(still))), (format!("circled {still}"), circled_shaped(still)), (format!("triads {still}"), circled_triad_shaped(still, TRIADS))])
         .map(|(n, f)| (Box::leak(n.into_boxed_str()) as &str, f))
         .collect();
@@ -3640,7 +3640,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
         for fresh in [1usize, 3] {
             let (grown, from) = plain.lettered(fresh).unwrap();
             let (d, l, a2) = (grown.declaration, grown.layout.clone(), a + fresh);
-            assert_eq!(d, FieldDeclaration { alphabet: a2, ..plain.declaration }, "{name}: the alphabet grows and nothing else");
+            assert_eq!(d, Declaration { alphabet: a2, ..plain.declaration }, "{name}: the alphabet grows and nothing else");
             assert_eq!(from.len(), grown.theta.len());
             assert_eq!(from.iter().filter(|o| o.is_some()).count(), plain.theta.len(), "{name}: every standing entry is carried once");
             for (k, &o) in from.iter().enumerate() {
@@ -3662,7 +3662,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
             assert_eq!(grown.theta[l.read_bias..l.read_bias + a], plain.theta[ol.read_bias..ol.read_bias + a]);
             assert!(grown.theta[l.read_bias + a..l.read_bias + a2].iter().all(|&v| v == least), "{name} +{fresh}: a fresh class bias at the least standing one");
             assert!(from[l.read_bias + a..l.read_bias + a2].iter().all(Option::is_none));
-            assert_eq!(Field::from_text(&grown.to_text()).unwrap(), grown, "{name} +{fresh}: the text round-trips");
+            assert_eq!(Constitution::from_text(&grown.to_text()).unwrap(), grown, "{name} +{fresh}: the text round-trips");
             // The face read through the encoding, at any lift: every standing logit as before, every fresh one the least bias.
             let mut next = mixer(0x1E77 + fresh as u64);
             for _ in 0..16 {
@@ -3697,7 +3697,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     let tower = towered(1);
     assert!(tower.lettered(1).is_err(), "a tower's levels take letters level by level");
     // The learner.
-    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.section(&[region()]).unwrap();
     learner.held = None;
     let mut octaves = [0u32; PARTS];
@@ -3727,7 +3727,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
             }
         }
     }
-    assert_eq!(FieldLearner::from_text(&grown.to_text()).unwrap(), grown);
+    assert_eq!(Learner::from_text(&grown.to_text()).unwrap(), grown);
     let mut holding = learner.clone();
     holding.held = Some(HeldStep { step: vec![0; learner.field.material_len()], halvings: 0 });
     assert!(holding.lettered(1).is_err(), "refused while a step is held");
@@ -3738,12 +3738,12 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
 /// line after, and it reads back with it; a malformed pass line is refused.
 #[test]
 fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
-    let mut learner = FieldLearner::new(shaped_with(four_contacts(1)), 6);
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.section(&[region()]).unwrap();
     learner.held = None;
     let plain = learner.to_text();
     assert!(!plain.lines().any(|l| l.starts_with("pass ")));
-    assert_eq!(FieldLearner::from_text(&plain).unwrap().to_text(), plain, "a learner with no pass reads and writes byte for byte");
+    assert_eq!(Learner::from_text(&plain).unwrap().to_text(), plain, "a learner with no pass reads and writes byte for byte");
     let pass = StorePass {
         role: "prefix".into(),
         store: "0123456789abcdef".repeat(4),
@@ -3758,14 +3758,14 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
     assert_eq!(text, format!("{plain}{}\n", pass.to_line()), "the pass line follows every other line");
-    let back = FieldLearner::from_text(&text).unwrap();
+    let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.pass.as_ref(), back.to_text()), (Some(&pass), text.clone()));
     assert_eq!(StorePass::from_line(&pass.to_line()).unwrap(), pass);
     for bad in ["pass prefix", "pass prefix nothex 1 4 7 1 1", "pass prefix 0123 1 4 7 1 1 code 1 2"] {
         assert!(StorePass::from_line(bad).is_err(), "{bad}");
     }
     let short = format!("{plain}pass prefix {} 1 4 7 1 1 code 1 2\n", "ab".repeat(32));
-    assert!(FieldLearner::from_text(&short).is_err(), "a slice of three words is refused");
+    assert!(Learner::from_text(&short).is_err(), "a slice of three words is refused");
     // [the record of the states a field trains on, §5 item 1] The word `own` stands ninth only where set: the line without it is the line as
     // before, with it the slices follow it, and either reads back as itself.
     let own = StorePass { own: true, ..pass.clone() };
@@ -3837,8 +3837,8 @@ fn the_levels_cut_reads_its_phases_and_clock() {
 
 /// A field of four ticks and eight contacts, every family drawn: the return acts at three ticks, so a return's owed term reaches a tick with a
 /// return of its own.
-fn four_ticks(still: usize) -> Field {
-    shaped_with(FieldDeclaration { ticks: 4, contacts: 8, ..tiny_declaration(still) })
+fn four_ticks(still: usize) -> Constitution {
+    shaped_with(Declaration { ticks: 4, contacts: 8, ..tiny_declaration(still) })
 }
 
 /// [definition; theory, November 13, the junction record §7] **The junction's return founded at the matched load keeps every face and the built
@@ -3847,7 +3847,7 @@ fn four_ticks(still: usize) -> Field {
 /// return pairs a covector with a moved state; the head line is `hnn-field-v14j` and round-trips; a second growth is refused.
 #[test]
 fn the_junctions_return_founded_at_the_matched_load_keeps_every_face_and_the_built_reverse() {
-    let mut fields: Vec<(&str, Field)> = Vec::new();
+    let mut fields: Vec<(&str, Constitution)> = Vec::new();
     for still in [0usize, 1, 2] {
         fields.push(("four ticks", four_ticks(still)));
         fields.push(("carry", circled_shaped(still)));
@@ -3872,7 +3872,7 @@ fn the_junctions_return_founded_at_the_matched_load_keeps_every_face_and_the_bui
         assert!(g[l.junction..=l.junction_bias].iter().any(|&v| v != 0), "{name}: the chart has a covector at the founding");
         let text = d.to_text();
         assert!(text.starts_with("hnn-field-v14j "), "{name}: {text}");
-        assert_eq!(FieldDeclaration::from_text(&text).unwrap(), d);
+        assert_eq!(Declaration::from_text(&text).unwrap(), d);
         assert!(grown.with_junction().is_err(), "{name}: a second growth");
     }
     // The return reads every tick past the first, and none at the first.
@@ -3881,9 +3881,9 @@ fn the_junctions_return_founded_at_the_matched_load_keeps_every_face_and_the_bui
     assert_eq!(by_tick.iter().map(|(k, _, _)| *k).collect::<Vec<_>>(), vec![1, 2, 3]);
     assert!(four_ticks(1).junction_covectors(&region()).is_err());
     // The head line without the return, and a v14j line whose words are not the return's, refused.
-    assert!(FieldDeclaration::from_text(&FieldDeclaration { opening: true, ..four_ticks(1).declaration }.to_text()).unwrap().opening);
+    assert!(Declaration::from_text(&Declaration { opening: true, ..four_ticks(1).declaration }.to_text()).unwrap().opening);
     let line = grown.declaration.to_text();
-    assert!(FieldDeclaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a junction word of zero");
+    assert!(Declaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a junction word of zero");
 }
 
 /// [definition; theory, November 13, the junction record §7] **The return's covector matches its code's difference**: on fields of four ticks with
@@ -3910,7 +3910,7 @@ fn the_junctions_return_covector_matches_its_codes_difference() {
         let pass = field.pass(&r, true).unwrap();
         gammas.extend(pass.ticks.iter().flat_map(|c| c.jg.iter().copied()));
         let g = covector_of(&field, &r);
-        let sheets = |f: &Field| -> Vec<Vec<u32>> {
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
             let p = f.pass(&r, true).unwrap();
             p.ticks.iter().flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
         };
@@ -3989,7 +3989,7 @@ fn the_reachs_logs_are_zero_at_a_plain_clock() {
 /// is refused; the parts line carries the mark's part last.
 #[test]
 fn the_mark_founded_at_zero_keeps_every_face_and_the_built_reverse() {
-    let mut fields: Vec<(&str, Field)> = Vec::new();
+    let mut fields: Vec<(&str, Constitution)> = Vec::new();
     for still in [0usize, 1, 2] {
         fields.push(("four ticks", four_ticks(still)));
         fields.push(("carry", circled_shaped(still)));
@@ -4015,11 +4015,11 @@ fn the_mark_founded_at_zero_keeps_every_face_and_the_built_reverse() {
         assert!(g[l.mark..l.mark + MARK_BASES].iter().any(|&v| v != 0), "{name}: the strengths have a covector at the founding");
         let text = d.to_text();
         assert!(text.starts_with("hnn-field-v14m "), "{name}: {text}");
-        assert_eq!(FieldDeclaration::from_text(&text).unwrap(), d);
+        assert_eq!(Declaration::from_text(&text).unwrap(), d);
         assert!(grown.with_mark().is_err(), "{name}: a second growth");
     }
     let line = four_ticks(1).with_mark().unwrap().0.declaration.to_text();
-    assert!(FieldDeclaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a mark word of zero");
+    assert!(Declaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a mark word of zero");
 }
 
 /// [definition; agent-inferred, November 14, the ring record §4] **The mark's covector matches its code's difference**: on fields of four ticks
@@ -4038,12 +4038,12 @@ fn the_marks_covector_matches_its_codes_difference() {
         let r = region();
         let g = covector_of(&field, &r);
         let first = field.pass_with(&r, false, None).unwrap();
-        let marks: Vec<Option<Shares>> = (0..r.classes.len()).map(|t| if Field::silent(&r, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
+        let marks: Vec<Option<Shares>> = (0..r.classes.len()).map(|t| if Constitution::silent(&r, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
         // [G180] Both reads are compared: the first read's code and the second's with the marks held, summed (the covector is their mean).
-        let code_of = |p: FieldPass| -> i64 { p.faces.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|x| x.code(c))).sum() };
-        let held = |f: &Field| -> i64 { code_of(f.pass_with(&r, false, None).unwrap()) + code_of(f.pass_with(&r, false, Some(&marks)).unwrap()) };
+        let code_of = |p: Forward| -> i64 { p.faces.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|x| x.code(c))).sum() };
+        let held = |f: &Constitution| -> i64 { code_of(f.pass_with(&r, false, None).unwrap()) + code_of(f.pass_with(&r, false, Some(&marks)).unwrap()) };
         // Both reads' sheets, since both are compared: a probe that moves either read's classes stands on a seam.
-        let sheets = |f: &Field| -> Vec<Vec<u32>> {
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
             [f.pass_with(&r, true, None).unwrap(), f.pass_with(&r, true, Some(&marks)).unwrap()]
                 .iter()
                 .flat_map(|p| p.ticks.iter().flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect::<Vec<Vec<u32>>>())
@@ -4082,7 +4082,7 @@ fn the_marks_covector_matches_its_codes_difference() {
 }
 
 /// [definition; agent-inferred, November 14, the ring record §4 and §5] **The mark's founding covector is the carried slope G175 read**: on a field
-/// reading twice at its founding, the strengths' covectors sum to `Σ_t ⟨λ⁰_t, D_t⟩` of [`Field::carried_slopes`] on the field before the growth,
+/// reading twice at its founding, the strengths' covectors sum to `Σ_t ⟨λ⁰_t, D_t⟩` of [`Constitution::carried_slopes`] on the field before the growth,
 /// faced by its own first read, halved since both reads are compared and only the second is marked (G180); so the reading that sized the
 /// strength is the law's own first-order direction.
 #[test]
@@ -4118,7 +4118,7 @@ fn a_lane_founded_beside_a_tower_keeps_every_face() {
             f.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&[1 << 22, 1 << 21, 3 << 20]);
             f
         };
-        let fields: [(&str, Field); 4] = [("opened", opened(still)), ("tower", towered_live(still)), ("marked tower", marked), ("joined", four_ticks(still).with_junction().unwrap().0)];
+        let fields: [(&str, Constitution); 4] = [("opened", opened(still)), ("tower", towered_live(still)), ("marked tower", marked), ("joined", four_ticks(still).with_junction().unwrap().0)];
         for (name, field) in fields {
             let r = region();
             let draws = field.declaration.lane_draws();
@@ -4133,7 +4133,7 @@ fn a_lane_founded_beside_a_tower_keeps_every_face() {
                 at += len;
             }
             assert_eq!(at, laned.material_len(), "{name}");
-            assert_eq!(Field::from_text(&laned.to_text()).unwrap(), laned, "{name}: its text restores it");
+            assert_eq!(Constitution::from_text(&laned.to_text()).unwrap(), laned, "{name}: its text restores it");
             let (g, h) = (tower_covector(&laned, &r), tower_covector(&field, &r));
             for (n, o) in from.iter().enumerate() {
                 if let Some(o) = o {
@@ -4152,7 +4152,7 @@ fn a_lane_founded_beside_a_tower_keeps_every_face() {
 /// `hnn-field-v14l` and round-trips; a second growth is refused; a chart's face is refused without its lanes' powers.
 #[test]
 fn the_loudness_founded_at_zero_keeps_every_face_and_the_built_reverse() {
-    let mut fields: Vec<(&str, Field)> = Vec::new();
+    let mut fields: Vec<(&str, Constitution)> = Vec::new();
     for still in [0usize, 1, 2] {
         fields.push(("four ticks", four_ticks(still)));
         fields.push(("carry", circled_shaped(still)));
@@ -4177,7 +4177,7 @@ fn the_loudness_founded_at_zero_keeps_every_face_and_the_built_reverse() {
         assert!(g[l.loud..l.loud + d.lanes + 1].iter().any(|&v| v != 0), "{name}: the loudness has a covector at the founding");
         let text = d.to_text();
         assert!(text.starts_with("hnn-field-v14l "), "{name}: {text}");
-        assert_eq!(FieldDeclaration::from_text(&text).unwrap(), d);
+        assert_eq!(Declaration::from_text(&text).unwrap(), d);
         assert!(grown.with_loud().is_err(), "{name}: a second growth");
         assert!(grown.face_of_read(&vec![0; d.width]).is_err(), "{name}: a loud chart's face needs its powers");
     }
@@ -4199,8 +4199,8 @@ fn the_loudness_covector_matches_its_codes_difference() {
         field.theta[l.loud + lanes] = -(1 << 12);
         let r = region();
         let g = covector_of(&field, &r);
-        let code_of = |f: &Field| -> i64 { f.pass_with(&r, false, None).unwrap().faces.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|x| x.code(c))).sum() };
-        let sheets = |f: &Field| -> Vec<Vec<u32>> {
+        let code_of = |f: &Constitution| -> i64 { f.pass_with(&r, false, None).unwrap().faces.iter().zip(r.classes).filter_map(|(face, &c)| face.as_ref().map(|x| x.code(c))).sum() };
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
             f.pass_with(&r, true, None).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
         };
         for &(start, len, grain) in field.families() {

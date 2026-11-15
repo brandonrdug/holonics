@@ -22,7 +22,7 @@ impl ClockReturn {
     }
 }
 
-impl Field {
+impl Constitution {
 
     /// [definition; agent-inferred, November 5, §16.44] **A blank's clock returns through its face**: its rate
     /// `κ = 1 + Σ_a p_a c[a]` on each paced head moves with the face, so its covector `δκ` (the clocks' suffix sums at the
@@ -78,13 +78,13 @@ impl Field {
         Ok(())
     }
 
-    /// The exact reverse of [`Field::pass`] against each unresolved site's class: the code's own covector, added
+    /// The exact reverse of [`Constitution::pass`] against each unresolved site's class: the code's own covector, added
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
-    pub(crate) fn returned(&self, region: &Region, pass: &FieldPass, g: &mut [i128]) -> Result<()> {
+    pub(crate) fn returned(&self, region: &Region, pass: &Forward, g: &mut [i128]) -> Result<()> {
         self.returned_with(region, pass, g, None, None, None, None, None, None)?;
         // [definition; agent-inferred, November 14, G180] Where the field reads twice both reads are compared: the first read's own return is
-        // added beside the second's, and the consumer halves the section's sum once ([`Field::read_and_return`]), so the comparison is the two
+        // added beside the second's, and the consumer halves the section's sum once ([`Constitution::read_and_return`]), so the comparison is the two
         // reads' mean and at the founding (the reads equal) it is the one read's, bit for bit. Why: G180 read the first read, which no
         // comparison reached, drifting off its agreement with the passage (0.012 nats a place at one-place masks, 0.060 at whole masks) while
         // the field leaned on its marks; the field's own placement is kept its honest placement by the passage's comparison.
@@ -125,7 +125,7 @@ impl Field {
         for t in 0..sites {
             transposed(&self.theta[l.w..l.w + dw * f], reaches.w, f, dxs[t], MATERIAL_BITS, &mut dc[t * f..(t + 1) * f])?;
         }
-        // [definition; theory, November 12, the triad record §4] **The triads' reverse** ([`FieldDeclaration::triads`]): `W_T`'s covector the outer
+        // [definition; theory, November 12, the triad record §4] **The triads' reverse** ([`Declaration::triads`]): `W_T`'s covector the outer
         // sum over sites of `δx(t)` against `c^T(t)` (unreleased, as `W`'s); `δc^T(t) = W_Tᵀ δx(t)` released to the covector's grain; then the
         // products' covectors through their producing operands ([`triad_back`]), each slot one place's. Their charts' covectors follow below.
         let (triads, j2, j6) = (d.triads, 2 * d.triads, 6 * d.triads);
@@ -263,7 +263,7 @@ impl Field {
         let mut dv = vec![0i64; sites * m2];
         let mut dp = vec![0i64; sites * m2];
         let mut dyh = vec![0i64; sites * span];
-        // The current's covectors of this tick `[h][t][2n]`, where read ([`Field::row_currents`]).
+        // The current's covectors of this tick `[h][t][2n]`, where read ([`Constitution::row_currents`]).
         if let Some(c) = currents.as_deref_mut() {
             c.push(vec![0i64; heads * sites * span]);
         }
@@ -605,9 +605,9 @@ impl Field {
         Ok(())
     }
 
-    /// [`Field::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
-    /// (`[h][near, far]`, [`Field::covector_shares`]) where given.
-    pub(crate) fn returned_with(&self, region: &Region, pass: &FieldPass, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, mut lambdas: Option<&mut Vec<Vec<i64>>>, opening: Option<&mut Vec<i64>>) -> Result<()> {
+    /// [`Constitution::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
+    /// (`[h][near, far]`, [`Constitution::covector_shares`]) where given.
+    pub(crate) fn returned_with(&self, region: &Region, pass: &Forward, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, mut lambdas: Option<&mut Vec<Vec<i64>>>, opening: Option<&mut Vec<i64>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
         let m2 = 2 * m;
@@ -661,7 +661,7 @@ impl Field {
                 let y = &pass.lift[t * dw..(t + 1) * dw];
                 // [Brandon, November 15 02:06Z] Through a loud face's sharpness: `δv_a = release(β δz_a, 16)` takes `δz`'s place below, `δβ =
                 // release(Σ_a δz_a v_a, 16)`, then `δκ_ℓ = release(δβ λ_ℓ, 16)`, `δb = δβ`, and `δλ_ℓ = release(δβ κ_ℓ, 16)` returned radially into the
-                // state the face read ([`Field::loud_radial`]).
+                // state the face read ([`Constitution::loud_radial`]).
                 let sharp = self.loud_beta(&pass.scale[t * lanes..(t + 1) * lanes])?;
                 let dz = match &sharp {
                     None => dz,
@@ -715,7 +715,7 @@ impl Field {
             if let Some(out) = lambdas.as_deref_mut() {
                 out.push(dx.clone());
             }
-            // The return after this tick: `dx` holds `λ^(k+1)` and becomes the output's `(1 + Γ) λ^(k+1)` ([`Field::junction_back`]).
+            // The return after this tick: `dx` holds `λ^(k+1)` and becomes the output's `(1 + Γ) λ^(k+1)` ([`Constitution::junction_back`]).
             let joined = if cell.jg.is_empty() { None } else { Some(self.junction_back(cell, &mut dx)?) };
             self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut(), reach.as_deref_mut())?;
             // Its chart's covector into the state this tick began from, then what the next tick's return owed that state; both before a level's
@@ -802,7 +802,7 @@ impl Field {
     /// δκ_k`, a carried face's classes by their shares, and a blank's by the shares of the face its clock read, on the
     /// material's covector grain (`2^(−24)` times the opening's `2^(−16)`, a whole class's share `2^16`); where the clock's
     /// blank reads are given, each blank's `δκ` also returns through its face into the state's covector
-    /// ([`Field::blank_return`]). The opening takes nothing.
+    /// ([`Constitution::blank_return`]). The opening takes nothing.
     #[allow(clippy::type_complexity)]
     pub(crate) fn clock_return(&self, region: &Region, paces: &Paces, blank: &[Option<Shares>], faces: Option<(&[Option<BlankRead>], &mut Vec<i64>)>, r: &mut ClockReturn, g: &mut [i128]) -> Result<()> {
         let d = &self.declaration;
@@ -914,7 +914,7 @@ pub(crate) fn lane_adjoint(read: &[i32], scales: &[i128], cov: &[i64]) -> Result
     Ok(out)
 }
 
-/// [measurement; theory, November 11 04:48, G39] **A section's return split by news** ([`Field::read_and_return_split`]): the covector of the whole section, and of its quiet places alone.
+/// [measurement; theory, November 11 04:48, G39] **A section's return split by news** ([`Constitution::read_and_return_split`]): the covector of the whole section, and of its quiet places alone.
 #[derive(Clone, Debug, Default)]
 pub struct SplitReturn {
     /// `G`: the section's deposit covector (the regions' returns summed), each family on its natural grain.

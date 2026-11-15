@@ -10,17 +10,17 @@
 //! lap's sites for 0.018 of its compared places. Why one state a stretch (§4 item 2): a pass over fresh text meets a new stretch at every draw,
 //! and a second state of the same bytes buys less than the next stretch does. Why a declared section (§4 item 3): a section is the unit a
 //! deposit consumes, so its extent is law and is carried in the state; a section read from the device's free memory would let the bits follow
-//! the schedule. Why the letters at a crossing (§4 item 4, [`holonics_engine::field::Field::lettered`]): the codec held only the code
+//! the schedule. Why the letters at a crossing (§4 item 4, [`holonics_engine::field::Constitution::lettered`]): the codec held only the code
 //! passage's bytes and refused every other.
 
-use holonics_engine::codec::FieldCodec;
+use holonics_engine::codec::Codec;
 use holonics_engine::passage::held_out;
-use holonics_engine::region::{views_of, TrainRegion};
+use holonics_engine::region::{views_of, OwnedRegion};
 use crate::exterior::*;
 use holonics_engine::codec::count;
 use std::io::Read;
 use std::path::Path;
-use holonics_engine::field::{FieldLearner, FieldRealization, MaterialMean, PassSlice, StorePass};
+use holonics_engine::field::{Learner, Realization, MaterialMean, PassSlice, StorePass};
 use std::collections::HashMap;
 use std::io::{BufRead, Seek, SeekFrom};
 use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set};
@@ -68,7 +68,7 @@ struct Tally {
 }
 
 impl Tally {
-    fn take(&mut self, region: &TrainRegion, counted: usize) {
+    fn take(&mut self, region: &OwnedRegion, counted: usize) {
         let n = region.classes.len() as u64;
         self.regions += 1;
         self.sites += n;
@@ -164,7 +164,7 @@ fn micro(code: i64, sites: usize) -> i128 {
 }
 
 /// The realization's counters as a line's words (`-` where it keeps none).
-fn counters_text(realization: &dyn FieldRealization) -> String {
+fn counters_text(realization: &dyn Realization) -> String {
     match realization.counters() {
         Some(c) => format!("reads={} returns={} pairs={} batches={} peak_store={}", c.reads, c.returns, c.pairs, c.batches, c.peak_store),
         None => "counters=-".to_string(),
@@ -180,9 +180,9 @@ fn counters_text(realization: &dyn FieldRealization) -> String {
 /// [definition; the record §4 item 4] **The crossing** (a learner with no pass): the held passage read at the code line's codec and printed
 /// as `STORE_YARDSTICK at=before` (`train-field`'s `FIELD_HELD` read, [`held_out`]); the byte values the store's documents hold counted, the
 /// codec extended by the fresh ones in byte order (`field-codec-v3`, written as `OUT/CODEC`), the learner grown by as many letters
-/// ([`FieldLearner::lettered`]), the yardstick read again (`at=after`), the pass set at the store's start with its law (the octaves of a
+/// ([`Learner::lettered`]), the yardstick read again (`at=after`), the pass set at the store's start with its law (the octaves of a
 /// stretch's draws, the section's bounds) and `OUT/STATE.0` saved. A continued learner (with its pass) reads on from its place.
-pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if args.len() != 18 {
         return Err("train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA".into());
     }
@@ -207,7 +207,7 @@ pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<
     let (sections, save, stop_ms) = (positive(&args[12])?, positive(&args[13])?, positive(&args[14])? as u128);
     let out = Path::new(&args[15]);
     let from_text = pinned_read(&args[16], &args[17], STATE_BUDGET)?;
-    let mut learner = FieldLearner::from_text(std::str::from_utf8(&from_text)?).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&from_text)?).map_err(|e| e.to_string())?;
     // A state's text read and written back: every code line state reads and writes byte for byte (the pass line only where present).
     println!("STORE_STATE_TEXT bytes={} roundtrip={} pass={}", from_text.len(), if learner.to_text().as_bytes() == from_text.as_slice() { "equal" } else { "differs" }, if learner.pass.is_some() { "present" } else { "none" });
     if learner.to_text().as_bytes() != from_text.as_slice() {
@@ -218,7 +218,7 @@ pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<
         return Err(format!("a store with no slice of the role {role}").into());
     }
     std::fs::create_dir(out)?;
-    let mut codec = FieldCodec::from_text(&codec_text, units)?;
+    let mut codec = Codec::from_text(&codec_text, units)?;
     if learner.pass.is_none() {
         // The crossing.
         if learner.field.declaration.alphabet != codec.alphabet() {
@@ -290,7 +290,7 @@ pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<
     println!("STORE_PASS_AT stretches={} {} {} ms={}", pass.stretches, pass.slices.iter().map(|s| format!("{}_piece={} {}_cursor={} {}_taken={}", s.name, s.piece, s.name, s.cursor, s.name, s.taken)).collect::<Vec<_>>().join(" "), counters_text(realization), started.elapsed().as_millis());
     let mut cut = Cut { seed, slices, pass };
     let mut mean = MaterialMean::new(learner.field.material_len());
-    // The step's price since the last save ([`FieldReceipt::transfer`] and [`FieldReceipt::external`]), printed and never acted on.
+    // The step's price since the last save ([`Receipt::transfer`] and [`Receipt::external`]), printed and never acted on.
     let (mut transfers, mut externals, mut curvatures, mut priced, mut since) = (0i128, 0i128, 0i128, 0usize, 0usize);
     let mut prior: Option<i128> = None;
     let mut done = 0usize;
@@ -302,7 +302,7 @@ pub fn train(args: &[String], realization: &mut dyn FieldRealization) -> Result<
     let mut host = [0u128; 7];
     while done < sections {
         let section_start = std::time::Instant::now();
-        let mut regions: Vec<TrainRegion> = Vec::new();
+        let mut regions: Vec<OwnedRegion> = Vec::new();
         let (mut tally, mut by_slice) = (Tally::default(), vec![0u64; cut.slices.len()]);
         let (mut in_pairs, mut in_sites) = (0u64, 0u64);
         while let Some(drawn) = cut.next() {
@@ -457,7 +457,7 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
 }
 
 /// [definition; agent-inferred, November 14] **`found-lane STATE STATE_SHA KEYS KEYS_SHA OUT`**: the learner `STATE` with one more lane on its
-/// fine field ([`FieldLearner::laned`]: every read from the lane and every write into it at zero, a tower's level kept and the glue's reads and
+/// fine field ([`Learner::laned`]: every read from the lane and every write into it at zero, a tower's level kept and the glue's reads and
 /// writes of the lane at zero), its draws read from `KEYS` past the learner's count, written to `OUT`. Before it writes, every line is judged
 /// (`FOUND_LANE_LINE`): the learner's head may change only its count of key draws; the fine field's declaration only its width and its lanes;
 /// the fine field's material, the glue and the two moment lines keep every standing word at the place the founding's map gives it (a moment
@@ -470,7 +470,7 @@ pub fn found_lane(args: &[String]) -> Result<()> {
     }
     let started = std::time::Instant::now();
     let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
-    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
     if learner.to_text().as_bytes() != text.as_slice() {
         return Err("a state that does not read and write back byte for byte".into());
     }
@@ -541,7 +541,7 @@ pub fn found_lane(args: &[String]) -> Result<()> {
 }
 
 /// [definition; Brandon, November 15 02:06Z] **`found-loud STATE STATE_SHA OUT`**: the learner `STATE` whose face reads its sites' loudness
-/// ([`FieldLearner::with_loud`]: `κ` and `b` appended at zero, so every face is the source's), written to `OUT`. Before it writes, every line is
+/// ([`Learner::with_loud`]: `κ` and `b` appended at zero, so every face is the source's), written to `OUT`. Before it writes, every line is
 /// judged (`FOUND_LOUD_LINE`): the fine field's declaration only its head line's loudness (read back as the source's with the loudness on); the
 /// fine field's material and the two moment lines keep every standing word at the place the founding's map gives it, the new words zero; the
 /// parts line only one more octave, zero; every other line equal. Anything else is refused and nothing is written. Reads no realization: that
@@ -552,7 +552,7 @@ pub fn found_loud(args: &[String]) -> Result<()> {
     }
     let started = std::time::Instant::now();
     let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
-    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
     if learner.to_text().as_bytes() != text.as_slice() {
         return Err("a state that does not read and write back byte for byte".into());
     }
@@ -585,7 +585,7 @@ pub fn found_loud(args: &[String]) -> Result<()> {
         let verdict = if x == y {
             judged[0] += 1;
             "equal".to_string()
-        } else if k == 1 && wy[0] == "hnn-field-v14l" && wx.len() >= 12 && wy.len() == 18 && wx[1..12] == wy[1..12] && wy[17] == "1" && founded.field.declaration == (holonics_engine::field::FieldDeclaration { loud: true, ..old_d }) {
+        } else if k == 1 && wy[0] == "hnn-field-v14l" && wx.len() >= 12 && wy.len() == 18 && wx[1..12] == wy[1..12] && wy[17] == "1" && founded.field.declaration == (holonics_engine::field::Declaration { loud: true, ..old_d }) {
             judged[1] += 1;
             format!("declaration {} to {}", wx[0], wy[0])
         } else if wx.len() == old_fine && wy.len() == new_fine && mapped(&wx, &wy) {
@@ -613,7 +613,7 @@ pub fn found_loud(args: &[String]) -> Result<()> {
 /// A state's text with its pass line replaced by `pass`'s, every other line byte for byte: the written text, its count of lines and the one
 /// line that differs (counted from 1), read back and checked (its field the source's, its count of stretches kept). Refused where any other
 /// line would differ. The one tool under [`next_pass`] and [`own_states`].
-fn with_pass(text: &str, learner: &FieldLearner, pass: StorePass) -> Result<(String, usize, usize)> {
+fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, usize, usize)> {
     let stretches = pass.stretches;
     let mut next = learner.clone();
     next.pass = Some(pass);
@@ -626,7 +626,7 @@ fn with_pass(text: &str, learner: &FieldLearner, pass: StorePass) -> Result<(Str
     if differing.len() != 1 || !old_lines[differing[0]].starts_with("pass ") {
         return Err(format!("a written pass that changes lines other than the pass line ({:?})", differing).into());
     }
-    let back = FieldLearner::from_text(&written).map_err(|e| e.to_string())?;
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
     if back.pass.as_ref().map(|p| p.stretches) != Some(stretches) || back.field != learner.field || back.pass != next.pass {
         return Err("a written pass whose state does not read back as the source's field, count and pass".into());
     }
@@ -653,7 +653,7 @@ pub fn next_pass(args: &[String]) -> Result<()> {
     if out.exists() {
         return Err(format!("{} exists", out.display()).into());
     }
-    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
     let before = learner.pass.clone().ok_or("a state with no pass line")?;
     let mut pass = before.clone();
     for slice in &mut pass.slices {
@@ -680,7 +680,7 @@ pub fn own_states(args: &[String]) -> Result<()> {
     if out.exists() {
         return Err(format!("{} exists", out.display()).into());
     }
-    let learner = FieldLearner::from_text(&text).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
     let before = learner.pass.clone().ok_or("a state with no pass line")?;
     if before.own {
         return Err("a state whose training states are already its own".into());
@@ -694,14 +694,14 @@ pub fn own_states(args: &[String]) -> Result<()> {
 /// [measurement; theory, November 12, P49 item 4] `write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN
 /// OUT STATE STATE_SHA`: **the release from held prompts**. On the store's held role, for each slice in the store's order, its first
 /// `DOCUMENTS` pieces that open their document and hold at least `PROMPT + RUN` places; a problem is the piece's first `PROMPT` places and
-/// `RUN` open places. The release is the tower's as it stands, its law fixed here: [`holonics_engine::field::Field::sample_runs`] over
+/// `RUN` open places. The release is the tower's as it stands, its law fixed here: [`holonics_engine::field::Constitution::sample_runs`] over
 /// every problem at once with `sweeps = RUN` (one place a read), `refine = REFINE` (0 where none is given), the codec's void, the key file's seed, `run_bound = 0`, the
 /// near tail, the keyed order within an octave, no given lengths, no one-end draw, a sweep that always goes on and no observer: the store's
 /// writer state run from `k = 0` upward, by octaves of distance from the prompt. `OUT` is created new; each problem writes three files of
 /// raw bytes (`SLICE_NN.prompt`, `SLICE_NN.written`, the codec's decode up to the first void, and `SLICE_NN.reference`, the piece's next
 /// `RUN` places), and one line (`STORE_WRITE`: its slice, its document, the places written before a void and the release's reads); a closing
 /// line holds the card's counters and the time. A reading: the state is not touched.
-pub fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
+pub fn write(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if args.len() != 15 && args.len() != 16 {
         return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA [REFINE]".into());
     }
@@ -715,7 +715,7 @@ pub fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<
     let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
     let keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
-    let codec = FieldCodec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
     let (documents, prompt, run) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?);
     // [agent-inferred, November 14, the mark's record §3] `REFINE` passes after the sweeps, each revisiting the written run one place a read in
     // the writer's order and drawing each place again on the region as it stands (a place reopened is silent, so on a field that reads twice
@@ -723,7 +723,7 @@ pub fn write(args: &[String], realization: &mut dyn FieldRealization) -> Result<
     // the writer as it stood. (Read first as a count of reads: 256 passes passed a 300 s deadline on November 14.)
     let refine = match args.get(15) { Some(r) => r.parse::<usize>().map_err(|_| "REFINE is a count")?, None => 0 };
     let out = Path::new(&args[12]);
-    let learner = FieldLearner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }

@@ -9,7 +9,7 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 #[allow(unused_imports)]
 use rayon::prelude::*;
 
-/// [measurement; agent-inferred, November 5, §16.47] **One read of the release** ([`Field::sample_observed`]): its index
+/// [measurement; agent-inferred, November 5, §16.47] **One read of the release** ([`Constitution::sample_observed`]): its index
 /// (sweeps first, then the refine steps), its pass (zero for the sweeps, `p` for the `p`-th refine pass), and every
 /// problem's classes, open places and faces as the read meets them (no faces at the release's end).
 pub struct ReleaseRead<'a> {
@@ -18,7 +18,7 @@ pub struct ReleaseRead<'a> {
     pub classes: &'a [Vec<usize>],
     pub open: &'a [Vec<bool>],
     pub faces: Option<&'a [Vec<Option<TowerFace>>]>,
-    /// [measurement; §16.47] The read's runs' certificate ([`Field::sample_runs`]): the entropies past each run's first place
+    /// [measurement; §16.47] The read's runs' certificate ([`Constitution::sample_runs`]): the entropies past each run's first place
     /// summed over the problems, read on this read's own faces, on the codes' `2^(−20)` bits (zero, one place a read), and
     /// the problems whose sum reached the run's bound (a refine run is chosen on its places' last draws, and passes the bound
     /// where a redraw moved a context).
@@ -26,9 +26,9 @@ pub struct ReleaseRead<'a> {
     pub passed: usize,
 }
 
-impl Field {
+impl Constitution {
 
-    /// [definition; the ring record §4] The index of a mark's strength for the encoding at `base` ([`FieldLayout::mark`]'s order).
+    /// [definition; the ring record §4] The index of a mark's strength for the encoding at `base` ([`Loci::mark`]'s order).
     pub(crate) fn mark_base(&self, base: usize) -> usize {
         let l = &self.layout;
         if base == l.enc {
@@ -41,7 +41,7 @@ impl Field {
     }
 
     /// [definition; the ring record §4; G176] **The mark a silent site opens on**, with its strength on the material's grain: the law's where the
-    /// field reads twice and `marks` (the second read's) holds the site's, at `α_b`; else the ruler's ([`Field::mark`], its `2^(−16)` strength
+    /// field reads twice and `marks` (the second read's) holds the site's, at `α_b`; else the ruler's ([`Constitution::mark`], its `2^(−16)` strength
     /// carried to the material's grain); none at a resolved or carried site.
     pub(crate) fn marked<'m>(&'m self, region: &Region, base: usize, s: usize, marks: Option<&'m [Option<Shares>]>) -> Option<(i128, &'m Shares)> {
         if !region.unresolved[s] || Self::carried(region, s).is_some() {
@@ -54,7 +54,7 @@ impl Field {
         Some((i128::from(*alpha) << (MATERIAL_BITS - STATE_BITS), ruler.get(s)?.as_ref()?))
     }
 
-    /// The law's mark alone ([`Field::marked`]): where the field reads twice and the second read's `marks` holds the site's, at `α_b`.
+    /// The law's mark alone ([`Constitution::marked`]): where the field reads twice and the second read's `marks` holds the site's, at `α_b`.
     pub(crate) fn law_mark<'m>(&self, region: &Region, base: usize, s: usize, marks: Option<&'m [Option<Shares>]>) -> Option<(i128, &'m Shares)> {
         if !self.declaration.mark || !region.unresolved[s] || Self::carried(region, s).is_some() {
             return None;
@@ -64,7 +64,7 @@ impl Field {
     }
 
     /// [definition; agent-inferred, November 14, G180] **The two reads' mean**: where the field reads twice, the section's summed covector of
-    /// both reads ([`Field::returned`]) released by one bit, once, after every region is summed, so the bits are the partition's sum on any
+    /// both reads ([`Constitution::returned`]) released by one bit, once, after every region is summed, so the bits are the partition's sum on any
     /// partition; at the founding the two reads' covectors are equal and the mean is either. Unchanged where the field reads once.
     pub fn both_reads_mean(&self, mut g: Vec<i128>) -> Vec<i128> {
         if self.declaration.mark {
@@ -76,7 +76,7 @@ impl Field {
     }
 
     /// [definition; theory, November 10 01:36] **The parallel certified settle**: the exchange walk's law and `h`
-    /// ([`Field::exchange_walk`]: composition held, two places' letters exchanged, each place's face `f_t(· | rest)`, the
+    /// ([`Constitution::exchange_walk`]: composition held, two places' letters exchanged, each place's face `f_t(· | rest)`, the
     /// answer's code `C = Σ_t −log₂ f_t(x_t)` on the codes' `2^(−20)` bits), many exchanges a pass. Each pass, in each active
     /// problem: (1) **propose** greedily by bare gain `g = c_i(x_i) + c_j(x_j) − c_i(x_j) − c_j(x_i)` on the current faces (the
     /// most first, then the nearer pair, then the earlier), every pair with `g > h` whose claim (the places within `NEAR − 1`
@@ -88,7 +88,7 @@ impl Field {
     /// A problem rests at a pass that keeps nothing. `pass` is shown each pass ([`SettlePass`], the pass before the first,
     /// then each) and the settle stops where it returns false: a problem still active there has not rested. Returns each
     /// problem's answer (its places past the question, the void past its letters) and its record.
-    pub fn settle(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<SettleRecord>)> {
+    pub fn settle(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn Realization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<SettleRecord>)> {
         let (out, records) = self.certified_passes(problems, written, void, h, false, 2, 1, false, &|_, _| {}, realization, &mut |_, x, f| exchange_proposals(x, f, h), pass)?;
         let records = records
             .into_iter()
@@ -97,14 +97,14 @@ impl Field {
         Ok((out, records))
     }
 
-    /// [definition; theory, November 10 04:40] **The re-draws through a lens on the certificate** ([`Field::redraw`]'s law and
+    /// [definition; theory, November 10 04:40] **The re-draws through a lens on the certificate** ([`Constitution::redraw`]'s law and
     /// stops): every face the walk reads (each answer's places and its stop place, the first void past its letters where the
     /// room holds it) passes through `lens` (the answer's letters and its faces in place order, the stop place's last), and the
     /// certificate's code is read on the lensed faces, the stop place's at the void among them; the proposals, `v`, the entropy
     /// and the neutrality read the lensed faces too. A lens is a function of the answer as it stands, so a change's attributed
     /// fall carries what it did to the lens at every claimed place.
     #[allow(clippy::too_many_arguments)]
-    pub fn redraw_lensed(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, lens: &dyn Fn(&[usize], &mut [TowerFace]), realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+    pub fn redraw_lensed(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, lens: &dyn Fn(&[usize], &mut [TowerFace]), realization: &mut dyn Realization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
         self.certified_passes(problems, written, void, h, true, 1, 2, true, lens, realization, &mut |round, x, f| if round % 2 == 1 { redraw_proposals(x, f, void) } else { exchange_proposals(x, f, h) }, pass)
     }
 
@@ -112,15 +112,15 @@ impl Field {
     /// odd passes re-draw ([`redraw_proposals`]: each place with `v_t = c_t(x_t) − H(f_t)` above a nat, the most first, to
     /// its face's top letter given the rest, where that letter's bare price `ln f_t(top) − ln f_t(x_t)` is at least a nat, the
     /// claims within `NEAR − 1` disjoint), the even passes exchange ([`exchange_proposals`], the settle's); each pass certified
-    /// as the settle certifies ([`Field::settle`]: one re-read, each claim's attributed fall above `h` kept, the kept set's
+    /// as the settle certifies ([`Constitution::settle`]: one re-read, each claim's attributed fall above `h` kept, the kept set's
     /// whole fall above `h` × the kept, the weaker half undone until it is). An answer stops at neutrality (its code at or under
     /// its faces' summed entropy) or where nothing stands in a re-draw pass and an exchange pass in a row; `pass` stops the
     /// whole. Returns each answer and its record.
-    pub fn redraw(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn FieldRealization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+    pub fn redraw(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, realization: &mut dyn Realization, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
         self.certified_passes(problems, written, void, h, true, 1, 2, false, &|_, _| {}, realization, &mut |round, x, f| if round % 2 == 1 { redraw_proposals(x, f, void) } else { exchange_proposals(x, f, h) }, pass)
     }
 
-    /// [definition; theory, November 10 01:36 and 03:55] **The certified passes** [`Field::settle`] and [`Field::redraw`] share:
+    /// [definition; theory, November 10 01:36 and 03:55] **The certified passes** [`Constitution::settle`] and [`Constitution::redraw`] share:
     /// each pass, each active problem's proposals (`propose`, from its letters and its locked faces: each a set of places and
     /// the letters they take, its bare gain, the claims of different proposals disjoint), all applied and read once, each
     /// place's fall attributed to the proposal whose claim (the places within `NEAR − 1` of a place it rewrites) holds it, the
@@ -132,7 +132,7 @@ impl Field {
     /// its letters, where the room holds it) is read and coded at the void beside its letters, inside the claims near it; every
     /// face read passes through `lens` (the answer and its faces in place order) before anything reads it.
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn certified_passes(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, neutral: bool, least: usize, cycle: usize, stop: bool, lens: &dyn Fn(&[usize], &mut [TowerFace]), realization: &mut dyn FieldRealization, propose: &mut dyn FnMut(usize, &[usize], &[TowerFace]) -> Vec<(Vec<(usize, usize)>, i128)>, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
+    pub(crate) fn certified_passes(&self, problems: &[(&[usize], usize)], written: &[Vec<usize>], void: usize, h: i128, neutral: bool, least: usize, cycle: usize, stop: bool, lens: &dyn Fn(&[usize], &mut [TowerFace]), realization: &mut dyn Realization, propose: &mut dyn FnMut(usize, &[usize], &[TowerFace]) -> Vec<(Vec<(usize, usize)>, i128)>, pass: &mut dyn FnMut(&SettlePass) -> bool) -> Result<(Vec<Vec<usize>>, Vec<CertifiedRecord>)> {
         if written.len() != problems.len() {
             return refuse("a certified walk with one written answer a problem");
         }
@@ -142,7 +142,7 @@ impl Field {
         // Each place's code at its letter, the stop place's (past the letters) at the void.
         let codes = |faces: &[TowerFace], x: &[usize]| -> Vec<i128> { faces.iter().enumerate().map(|(t, f)| f.code(x.get(t).copied().unwrap_or(void)) as i128).collect() };
         let summed = |faces: &[TowerFace]| -> i128 { faces.iter().map(entropy).sum() };
-        let read = |answers: &[Vec<usize>], ks: &[usize], realization: &mut dyn FieldRealization| -> Result<Vec<Vec<TowerFace>>> {
+        let read = |answers: &[Vec<usize>], ks: &[usize], realization: &mut dyn Realization| -> Result<Vec<Vec<TowerFace>>> {
             let mut faces = self.locked_faces(problems, answers, ks, void, stop, realization)?;
             for (&k, f) in ks.iter().zip(faces.iter_mut()) {
                 lens(&answers[k], f);
@@ -338,7 +338,7 @@ impl Field {
     /// [measurement; theory, November 10 02:03] **Every face of the answers `ks` with every other place locked**
     /// (the exchange walks' read on main, kept for the transmission readings when the field was reset to the line, November 11), and with `stop` also the stop place, the first void past the
     /// letters, where the room holds it (its face last); in the order of `ks`.
-    pub fn locked_faces(&self, problems: &[(&[usize], usize)], answers: &[Vec<usize>], ks: &[usize], void: usize, stop: bool, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<TowerFace>>> {
+    pub fn locked_faces(&self, problems: &[(&[usize], usize)], answers: &[Vec<usize>], ks: &[usize], void: usize, stop: bool, realization: &mut dyn Realization) -> Result<Vec<Vec<TowerFace>>> {
         let region_of = |k: usize, answer: &[usize]| -> Vec<usize> {
             let (q, room) = problems[k];
             let mut classes: Vec<usize> = q.iter().chain(answer).copied().collect();
@@ -366,8 +366,8 @@ impl Field {
     }
 
     /// Each region's unresolved sites' logits, read in parallel.
-    pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<FieldRead>> {
-        regions.par_iter().map(|r| self.pass(r, false).map(|p| FieldRead { logits: p.logits, echo: p.echo })).collect()
+    pub fn read_logits(&self, regions: &[Region]) -> Result<Vec<ReadLogits>> {
+        regions.par_iter().map(|r| self.pass(r, false).map(|p| ReadLogits { logits: p.logits, echo: p.echo })).collect()
     }
 
     /// A site's face at its pump: over every class before the extent is read, over every class but the
@@ -383,7 +383,7 @@ impl Field {
     /// so the region stays an answer and its void tail, the only states training reads (§16.35). Returns each problem's
     /// answer places' classes, in place order, and stops early (every place it did not reach drawn on its last read) where
     /// `sweep` says to. `refine` passes then revisit the written answer, one place at a time (§16.36, §16.47); zero writes it once.
-    pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
+    pub fn sample_realized(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn Realization, sweep: &mut dyn FnMut(usize, usize) -> bool) -> Result<Vec<Vec<usize>>> {
         self.sample_observed(problems, sweeps, refine, void, seed, realization, sweep, &mut |_| {})
     }
 
@@ -397,7 +397,7 @@ impl Field {
     /// `NEAR` places past its lowest resolved void**, as every training region and the withheld read do: the places past it are
     /// the void, resolved, and no field trained under the near tail met them (a refine pass redrew each place beside up to
     /// 2,000 of them). Its faces past the cut are none; every open place stands before it.
-    pub(crate) fn read_active(&self, starts: &[usize], classes: &[Vec<usize>], open: &[Vec<bool>], active: &[usize], void: usize, near_tail: bool, realization: &mut dyn FieldRealization) -> Result<Vec<Vec<Option<TowerFace>>>> {
+    pub(crate) fn read_active(&self, starts: &[usize], classes: &[Vec<usize>], open: &[Vec<bool>], active: &[usize], void: usize, near_tail: bool, realization: &mut dyn Realization) -> Result<Vec<Vec<Option<TowerFace>>>> {
         let cut = |k: usize| -> usize {
             let len = classes[k].len();
             match (near_tail, (starts[k]..len).find(|&t| !open[k][t] && classes[k][t] == void)) {
@@ -417,17 +417,17 @@ impl Field {
         Ok(faces)
     }
 
-    /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Field::sample_realized`],
+    /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Constitution::sample_realized`],
     /// draw for draw): `observe` is shown every read the release makes (each sweep's and each refine step's), with every
     /// problem's classes, open places and faces as that read meets them, before its draws, and once more at the end with no
     /// faces. A reading only: nothing in the release reads it.
     #[allow(clippy::too_many_arguments)]
-    pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    pub fn sample_observed(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, realization: &mut dyn Realization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         self.release(problems, sweeps, refine, void, seed, 0, true, false, None, false, realization, sweep, observe)
     }
 
     /// [definition; agent-inferred, November 5, the unified-theory reading of 17:41, its bound read without a maximum]
-    /// **A read releases a run** ([`Field::sample_observed`] with `run_bound` on the codes' `2^(−20)` bits; zero, one place a
+    /// **A read releases a run** ([`Constitution::sample_observed`] with `run_bound` on the codes' `2^(−20)` bits; zero, one place a
     /// read): past each read's free places, the walk releases each next open place of its order (within the octave in the
     /// sweeps) while the entropies of the places it adds, read on this read's faces, sum within `run_bound`; a refine pass's
     /// run reopens the next places of its order whose entropies at their last draw sum so, and draws them all from one
@@ -437,18 +437,18 @@ impl Field {
     /// write of 32 answers about 3,000 full reads; a place whose face is nearly settled adds almost nothing to the joint's
     /// loss when it is drawn beside the run's first.
     #[allow(clippy::too_many_arguments)]
-    /// `near_tail` is the writer's region law ([`Field::read_active`]); `false` declares the whole room for comparison.
+    /// `near_tail` is the writer's region law ([`Constitution::read_active`]); `false` declares the whole room for comparison.
     /// `place_order` draws each octave's places in place order rather than its keyed order. [agent-inferred, November 6, the
     /// unified-theory reading of 03:08] `lengths`, where given, fixes each answer's length: its places past it stand resolved as
     /// the void from the first read (so the region is the question, the answer and its near tail), and every answer place,
     /// in the sweeps and in refine, draws from its face over the letters; the end never moves. `one_end` draws each answer's
-    /// length from the release's first read when none is given ([`Field::release`]).
-    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    /// length from the release's first read when none is given ([`Constitution::release`]).
+    pub fn sample_runs(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn Realization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         self.release(problems, sweeps, refine, void, seed, run_bound, near_tail, place_order, lengths, one_end, realization, sweep, observe)
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn FieldRealization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
+    pub(crate) fn release(&self, problems: &[(&[usize], usize)], sweeps: usize, refine: usize, void: usize, seed: u64, run_bound: i128, near_tail: bool, place_order: bool, lengths: Option<&[usize]>, one_end: bool, realization: &mut dyn Realization, sweep: &mut dyn FnMut(usize, usize) -> bool, observe: &mut dyn FnMut(ReleaseRead)) -> Result<Vec<Vec<usize>>> {
         if sweeps == 0 || void >= self.declaration.alphabet || problems.iter().any(|&(_, n)| n == 0) {
             return refuse("a sample needs a sweep, an answer place and a void class in the alphabet");
         }
@@ -789,7 +789,7 @@ impl Field {
     }
 }
 
-/// [measurement; theory, November 10 01:36] **One pass of the parallel certified settle**, as it ends ([`Field::settle`]): its
+/// [measurement; theory, November 10 01:36] **One pass of the parallel certified settle**, as it ends ([`Constitution::settle`]): its
 /// number (0 before the first), the problems still active after it, the exchanges it kept and undid, the answers' code summed
 /// over the problems, and of its apply-all re-read's code change (each place's `|c_t − c′_t|`, on the codes' `2^(−20)` bits)
 /// the part outside every claimed neighbourhood and the whole; and each problem's answer as it stands (its letters).
@@ -809,7 +809,7 @@ pub struct SettlePass<'a> {
     /// The places whose `v` passes two nats.
     pub over2: usize,
     pub places: usize,
-    /// The pass's proposer (its number modulo the walk's cycle: [`Field::redraw`]'s 1 a re-draw, 0 an exchange; 0 before the
+    /// The pass's proposer (its number modulo the walk's cycle: [`Constitution::redraw`]'s 1 a re-draw, 0 an exchange; 0 before the
     /// first pass).
     pub kind: usize,
     pub outside: i128,
@@ -883,7 +883,7 @@ pub fn redraw_proposals(x: &[usize], f: &[TowerFace], void: usize) -> Vec<(Vec<(
     out
 }
 
-/// [definition; theory, November 10 03:55] **One problem's certified walk** ([`Field::redraw`]): its places, its code at the
+/// [definition; theory, November 10 03:55] **One problem's certified walk** ([`Constitution::redraw`]): its places, its code at the
 /// written answer and at its end, its faces' summed entropy and its root charge at its end, its kept changes and those undone,
 /// and how it stopped: at neutrality, at rest (a pass kept nothing), or neither (the walk was stopped).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -899,7 +899,7 @@ pub struct CertifiedRecord {
     pub neutral: bool,
 }
 
-/// [definition; theory, November 10 01:36] **One problem's settle** ([`Field::settle`]): its places, its answer's code at the
+/// [definition; theory, November 10 01:36] **One problem's settle** ([`Constitution::settle`]): its places, its answer's code at the
 /// written answer and where the settle ended (on the codes' `2^(−20)` bits), its kept exchanges (each with its proposed gain
 /// and the fall attributed to it on the read that certified it), the exchanges undone, and whether it rested (a pass kept
 /// nothing).
@@ -914,7 +914,7 @@ pub struct SettleRecord {
 }
 
 /// [definition; theory, November 9 19:43 and 21:12] **One standing move of the certified exchange walk**
-/// ([`Field::exchange_walk`]): the two places in the answer exchanged, the gain it was proposed on (read on the faces before
+/// ([`Constitution::exchange_walk`]): the two places in the answer exchanged, the gain it was proposed on (read on the faces before
 /// it), and its certified fall in the answer's code (read on the faces after it), its heat; on the codes' `2^(−20)` bits.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct ExchangeMove {
@@ -940,7 +940,7 @@ pub fn root_charge(x: &[usize], faces: &[TowerFace]) -> i128 {
         .sum()
 }
 
-/// [definition; theory, November 10 03:55] **One kept change of a certified walk** ([`Field::settle`], [`Field::redraw`]): each
+/// [definition; theory, November 10 03:55] **One kept change of a certified walk** ([`Constitution::settle`], [`Constitution::redraw`]): each
 /// place it rewrote with its letter before and after, its bare gain, and the fall attributed to it on the read that certified
 /// it (on the codes' `2^(−20)` bits).
 #[derive(Clone, Debug, Default, PartialEq, Eq)]

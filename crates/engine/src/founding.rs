@@ -9,10 +9,10 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 #[allow(unused_imports)]
 use rayon::prelude::*;
 
-impl Field {
+impl Constitution {
 
-    pub(crate) fn with_theta(declaration: FieldDeclaration, theta: Vec<i32>) -> Self {
-        let layout = FieldLayout::new(&declaration);
+    pub(crate) fn with_theta(declaration: Declaration, theta: Vec<i32>) -> Self {
+        let layout = Loci::new(&declaration);
         let pi = half_turn(MOVE_BITS + 16);
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
@@ -21,10 +21,10 @@ impl Field {
     }
 
     /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
-    /// ([`FieldDeclaration::depth`]): their increments founded at zero (the rings plain, each a still head's reading with
+    /// ([`Declaration::depth`]): their increments founded at zero (the rings plain, each a still head's reading with
     /// frames that can turn), every other parameter kept; a turned head that becomes a ring gives up its clock and its moment.
     pub fn with_depth(mut self, depth: usize) -> Result<Self> {
-        let declaration = FieldDeclaration { depth, ..self.declaration };
+        let declaration = Declaration { depth, ..self.declaration };
         declaration.admit()?;
         let width = declaration.alphabet + 1;
         for (p, h) in (0..declaration.heads).filter(|&h| declaration.carries_moment(h)).enumerate() {
@@ -40,7 +40,7 @@ impl Field {
     }
 }
 
-impl Field {
+impl Constitution {
     /// The key draws a growth by `factor` reads, four bytes a draw: `f − 1` a part of each row
     /// copy's entry of every family the founding opens away from zero (the charts and the pair
     /// drives).
@@ -77,7 +77,7 @@ impl Field {
         }
         let old = self.declaration;
         let d = old.grown(factor)?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let (ol, f) = (&self.layout, factor);
         let (dw, m, fc, a) = (old.width, old.complex(), old.contacts, old.alphabet);
         let dw2 = d.width;
@@ -222,7 +222,7 @@ impl Field {
         }
         let old = self.declaration;
         let d = old.laned()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let ol = &self.layout;
         let (dw, dw2, m2, fc, a) = (old.width, d.width, 2 * old.complex(), old.contacts, old.alphabet);
         let mut new = vec![0i32; layout.len];
@@ -357,21 +357,21 @@ impl Field {
     }
 }
 
-impl Field {
-    /// [definition; theory, November 11 17:25] **The field with `circles` carry circles** ([`FieldDeclaration::carry`]): first the growth by
-    /// `2 circles` pair contacts ([`Field::contacted`], its draws from `keys`), so the circles are the grown field's last `circles` complex
+impl Constitution {
+    /// [definition; theory, November 11 17:25] **The field with `circles` carry circles** ([`Declaration::carry`]): first the growth by
+    /// `2 circles` pair contacts ([`Constitution::contacted`], its draws from `keys`), so the circles are the grown field's last `circles` complex
     /// contacts, their `a` and `b` drawn as a growth draws them, their columns of `W` and their biases at zero; then the circles' charts after
     /// every family: the turn rows `Q` drawn uniform on `±√(3/D)` at the material's grain from `keys` past the contacts' draws (four bytes a draw,
     /// the rows in order, as the contacts' drives are drawn), so `q` opens at unit power and a site's turn is a phase of about a radian set by its
     /// own read; the leak rows `L` and both biases `q_b`, `ℓ_b` at zero, so the leak's log chart reads `ℓ = 0` and `d = d₀ = 1/4` at every site
     /// ([`carry_friction`], [`CARRY_LEAK_FOUNDING`]) and each circle is founded as a turn with the near field's friction, `|γ| = 4/5`, a group of
-    /// `NEAR − 1` places (founded at `d = 0` the group was unbounded and the first carry lap was refused, [`FieldDeclaration::carry`]), its drive
+    /// `NEAR − 1` places (founded at `d = 0` the group was unbounded and the first carry lap was refused, [`Declaration::carry`]), its drive
     /// coupled at one ([`carry_coupling`]): the chart's zero is the founded friction. Every sum the forward forms into the face is
     /// then the old sum (the circles' `W` columns are zero), so every face is kept bit for bit; the circles' return has a covector from the
     /// first section on.
     ///
     /// Refused for a tower's levels and for a field that already has carry circles (a plain growth by contacts in such a field is refused
-    /// too, [`FieldDeclaration::contacted`]: the circles stay the last contacts). Returns the grown field and, for each entry, the old entry
+    /// too, [`Declaration::contacted`]: the circles stay the last contacts). Returns the grown field and, for each entry, the old entry
     /// it carries.
     pub fn with_carry(&self, circles: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
         if self.scale.is_some() {
@@ -388,9 +388,9 @@ impl Field {
             return refuse("a growth by no carry circles");
         }
         let (contacted, mut from) = self.contacted(2 * circles, keys)?;
-        let d = FieldDeclaration { carry: circles, ..contacted.declaration };
+        let d = Declaration { carry: circles, ..contacted.declaration };
         d.admit()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let dw = d.width;
         let mut theta = contacted.theta;
         debug_assert_eq!(theta.len(), layout.carry);
@@ -410,16 +410,16 @@ impl Field {
         Ok((out, from))
     }
 
-    /// [definition; theory, November 12, the triad record §4] **The field with `triads` triads** ([`FieldDeclaration::triads`]): the triads'
-    /// families after every other ([`FieldLayout::triad`]), every old entry kept at its offset; the charts' rows `A`, `B` and `G` drawn uniform on
+    /// [definition; theory, November 12, the triad record §4] **The field with `triads` triads** ([`Declaration::triads`]): the triads'
+    /// families after every other ([`Loci::triad`]), every old entry kept at its offset; the charts' rows `A`, `B` and `G` drawn uniform on
     /// `±√(3/D)` at the material's grain from `keys`, four bytes a draw, the rows in order (`A`, then `B`, then `G`), as a growth in contacts draws
-    /// the drives `a` and `b` ([`Field::contacted`]), so each leg's read opens at unit power; the charts' biases and the return `W_T` at zero. Every
+    /// the drives `a` and `b` ([`Constitution::contacted`]), so each leg's read opens at unit power; the charts' biases and the return `W_T` at zero. Every
     /// sum the forward forms into the face is then the old sum (`W_T` is zero, so the one sum `W c + W_T c^T + b_c` is `W c + b_c`), and every face
     /// is kept bit for bit; at the founding only `W_T` has a covector at first order (`∇_α ℓ = 0` while `W_T = 0`, §3.2), and as `W_T` opens the
     /// three legs open with it.
     ///
     /// Refused for a tower's levels, for a field that already has triads and for none. A growth in contacts, in circles, in lanes or by copies of a
-    /// field with triads is refused too ([`FieldDeclaration::contacted`], [`Field::with_carry`], [`Field::laned`], [`Field::grown`]): the triads
+    /// field with triads is refused too ([`Declaration::contacted`], [`Constitution::with_carry`], [`Constitution::laned`], [`Constitution::grown`]): the triads
     /// are founded last, and a growth after them is not built. Returns the grown field and, for each entry, the old entry it carries (`None` for
     /// the triads' own).
     pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
@@ -436,9 +436,9 @@ impl Field {
         if triads == 0 {
             return refuse("a growth by no triads");
         }
-        let d = FieldDeclaration { triads, ..self.declaration };
+        let d = Declaration { triads, ..self.declaration };
         d.admit()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let dw = d.width;
         let mut theta = self.theta.clone();
         debug_assert_eq!(theta.len(), layout.triad);
@@ -459,7 +459,7 @@ impl Field {
         Ok((out, from))
     }
 
-    /// [definition; theory, November 13, P60 items 1a and 3] **The field with the opening's lift** ([`FieldDeclaration::opening`]): `R⁰` and `b⁰`
+    /// [definition; theory, November 13, P60 items 1a and 3] **The field with the opening's lift** ([`Declaration::opening`]): `R⁰` and `b⁰`
     /// appended at the end of the material, founded at zero, every standing entry kept at its index; no key is read and the draws do not move.
     /// With `R⁰ = 0` and `b⁰ = 0` the opening's face is the class biases' alone, and the first covector reaches the block through `δR⁰ = δy⁰ r̂ᵀ`.
     /// Also the map from each new entry to the old one it copies (`None` for the block). Refused on a tower, and on a field that has it.
@@ -470,9 +470,9 @@ impl Field {
         if self.declaration.opening {
             return refuse("a field that already has the opening's lift");
         }
-        let d = FieldDeclaration { opening: true, ..self.declaration };
+        let d = Declaration { opening: true, ..self.declaration };
         d.admit()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let mut theta = self.theta.clone();
         if theta.len() != layout.opening {
             return refuse("a field whose material does not end where the opening's lift begins");
@@ -485,18 +485,18 @@ impl Field {
         Ok((out, from))
     }
 
-    /// [definition; theory, November 13, the junction record §7] **The field with the junction's return** ([`FieldDeclaration::junction`]): `L`
+    /// [definition; theory, November 13, the junction record §7] **The field with the junction's return** ([`Declaration::junction`]): `L`
     /// and `ℓ_b` appended at the end of the fine field's material, founded at zero (the matched load, `Γ = 0`), every standing entry kept; no key is
     /// read and the draws do not move. A tower keeps its level as it stands (its ticks carry no return), and its entries follow the fine field's in
-    /// the material ([`Field::material_len`]). Also the map over the whole material from each new entry to the old one it copies (`None` for the
+    /// the material ([`Constitution::material_len`]). Also the map over the whole material from each new entry to the old one it copies (`None` for the
     /// chart). Refused on a field that has the return.
     pub fn with_junction(&self) -> Result<(Self, Vec<Option<usize>>)> {
         if self.declaration.junction {
             return refuse("a field that already has the junction's return");
         }
-        let d = FieldDeclaration { junction: true, ..self.declaration };
+        let d = Declaration { junction: true, ..self.declaration };
         d.admit()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         if self.theta.len() != layout.junction {
             return refuse("a field whose material does not end where the junction's chart begins");
         }
@@ -512,7 +512,7 @@ impl Field {
         Ok((out, from))
     }
 
-    /// [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** ([`FieldDeclaration::mark`]): the mark's
+    /// [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** ([`Declaration::mark`]): the mark's
     /// strengths `α_b` appended at the end of the fine field's material, founded at zero, every standing entry kept; no key is read and the
     /// draws do not move. At zero the second read opens every silent site on its open row, so every face is the source's bit for bit. A tower
     /// keeps its level as it stands (it reads with the fine field). Also the map over the whole material from each new entry to the old one it
@@ -521,9 +521,9 @@ impl Field {
         if self.declaration.mark {
             return refuse("a field that already reads twice");
         }
-        let d = FieldDeclaration { mark: true, ..self.declaration };
+        let d = Declaration { mark: true, ..self.declaration };
         d.admit()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         if self.theta.len() != layout.mark {
             return refuse("a field whose material does not end where the mark's strengths begin");
         }
@@ -539,7 +539,7 @@ impl Field {
         Ok((out, from))
     }
 
-    /// [definition; Brandon, November 15 02:06Z] **The face that reads its sites' loudness** ([`FieldDeclaration::loud`]): `κ_ℓ` and `b` appended
+    /// [definition; Brandon, November 15 02:06Z] **The face that reads its sites' loudness** ([`Declaration::loud`]): `κ_ℓ` and `b` appended
     /// at the end of the fine field's material, founded at zero, every standing entry kept; no key is read and the draws do not move. At zero
     /// every site's sharpness is one, so every face is the source's bit for bit. A tower keeps its level as it stands. Also the map over the
     /// whole material from each new entry to the old one it copies (`None` for the new block). Refused on a field whose face already reads it.
@@ -547,9 +547,9 @@ impl Field {
         if self.declaration.loud {
             return refuse("a field whose face already reads its sites' loudness");
         }
-        let d = FieldDeclaration { loud: true, ..self.declaration };
+        let d = Declaration { loud: true, ..self.declaration };
         d.admit()?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         if self.theta.len() != layout.loud {
             return refuse("a field whose material does not end where the face's loudness begins");
         }
@@ -592,7 +592,7 @@ impl Field {
         }
         let old = self.declaration;
         let d = old.lettered(fresh)?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let ol = &self.layout;
         let (a, a2, dw, tm2, paced) = (old.alphabet, d.alphabet, old.width, 2 * old.moment_modes(), old.paced_heads());
         let mut new = vec![0i32; layout.len];
@@ -662,7 +662,7 @@ impl Field {
         }
         let old = self.declaration;
         let d = old.contacted(added)?;
-        let layout = FieldLayout::new(&d);
+        let layout = Loci::new(&d);
         let ol = &self.layout;
         let (dw, fc, f2) = (old.width, old.contacts, d.contacts);
         let mut new = vec![0i32; layout.len];
@@ -725,16 +725,16 @@ impl Field {
     }
 }
 
-impl FieldLearner {
+impl Learner {
 
-    /// [definition; agent-inferred, November 1] **The learner widened** ([`Field::grown`]), its
+    /// [definition; agent-inferred, November 1] **The learner widened** ([`Constitution::grown`]), its
     /// differences read from the founding key stream past every draw read before, and its moments
     /// lifted as the tower's are: split evenly, each grown coordinate's covector at the growth
     /// point is the old one divided among its `f` copies and the readout's the old one, so a grown
     /// coordinate carries `m/f` and `v/f²`, the readout `m` and `v`, and opens on the old
     /// normalized step. Each copy then steps as the old coordinate did, and the `f` copies of a
     /// sum move together, so the rate falls by `⌈log₂ f⌉` bits: the field's step stays the old one.
-    /// A learner holding a step is refused: the step is read first ([`FieldLearner::read_step_on`]).
+    /// A learner holding a step is refused: the step is read first ([`Learner::read_step_on`]).
     pub fn widened(&self, factor: usize, keys: &[u8]) -> Result<Self> {
         if self.held.is_some() {
             return refuse("a learner widens after its held step is read");
@@ -749,7 +749,7 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Field::laned`]), the lane's
+    /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Constitution::laned`]), the lane's
     /// draws read from the founding key stream past every draw read before. Every old entry keeps its moments; each of the
     /// lane's entries opens on its family's statistics, its first moment at zero and its second at the mean of its
     /// family's old second moments (a family no covector has reached opens at zero, at its own first covector, as a
@@ -786,15 +786,15 @@ impl FieldLearner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.lane_draws();
-        // [agent-inferred, November 14] The founded parts' rates are kept (the lane's entries join the lane parts, [`Field::founded_parts`]), and
+        // [agent-inferred, November 14] The founded parts' rates are kept (the lane's entries join the lane parts, [`Constitution::founded_parts`]), and
         // where the learner carries each entry's own rate every standing entry keeps it and a lane entry takes `rate_bits`.
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Field::with_carry`]), the circles' draws read from
+    /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Constitution::with_carry`]), the circles' draws read from
     /// the founding key stream past every draw read before. Every old entry keeps its moments and its remainder; the circles' contacts' entries
-    /// open as a growth in contacts opens them ([`FieldLearner::contacted`]: the first moments at zero, the second at the mean of their family's
+    /// open as a growth in contacts opens them ([`Learner::contacted`]: the first moments at zero, the second at the mean of their family's
     /// old second moments), and the circles' charts' moments at zero (a family with no old entry). The draws advance past the contacts' and
     /// the turn rows'. The founded parts' rates are kept, the circles' parts at the old rate (octaves 0), so the parts line goes on telling the
     /// contacts before the last plain growth; the held step and the last section's step, of the old layout, are dropped.
@@ -822,14 +822,14 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Field::with_triads`]), the triads' draws read
+    /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Constitution::with_triads`]), the triads' draws read
     /// from the founding key stream past every draw read before (`6 J D` draws, four bytes a draw). Every old entry keeps its moments and its
     /// remainder. The triads' first moments open at zero, and their second moments at the mean of their counterparts' old second moments: the
     /// charts `A`, `B` and `G` at the mean over the pair drives `a` and `b`, the charts' biases at the mean over the drives' biases, and `W_T` at the
-    /// mean over `W`. Reason (`agent-inferred`, from the growth in contacts' law, [`FieldLearner::contacted`]): a new entry's first step is then its
+    /// mean over `W`. Reason (`agent-inferred`, from the growth in contacts' law, [`Learner::contacted`]): a new entry's first step is then its
     /// covector over its family's scale, the step a trained entry takes, and never the largest normalized step of a fresh entry; the triad's charts
     /// and return are the drives' and `W`'s counterparts with one operand more. The draws advance by `4 · 6 J D` bytes. The founded parts' rates are
-    /// kept, the triad's part at octave 0 (the base rate), and where the learner carries each entry's own rate ([`FieldLearner::own_rates`]) every
+    /// kept, the triad's part at octave 0 (the base rate), and where the learner carries each entry's own rate ([`Learner::own_rates`]) every
     /// old entry keeps it and the triads' entries take the base rate, the rate their part's octave 0 gives. Reason for keeping them
     /// (`agent-inferred`, from the record of November 11 on a build entering a line): a growth that keeps every face and every moment keeps every
     /// old entry's rate too, since a state tool that left the part rates behind once made every part train at the base rate with nothing refused.
@@ -871,10 +871,10 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; theory, November 13, P60 items 1f and 3] **The learner with the opening's lift** ([`Field::with_opening`]), founded at zero.
+    /// [definition; theory, November 13, P60 items 1f and 3] **The learner with the opening's lift** ([`Constitution::with_opening`]), founded at zero.
     /// Every standing entry keeps its moments, its remainder and its rate; the block's first moments open at zero and its second at the mean of
     /// its counterpart's standing second moments (`R⁰` the readout's lift `R`, `b⁰` the lift's bias `b_R`), as a growth opens a new block's
-    /// ([`FieldLearner::with_triads`]), so its first step is its covector over its counterpart's scale. Its rate: the founded parts' rates are kept
+    /// ([`Learner::with_triads`]), so its first step is its covector over its counterpart's scale. Its rate: the founded parts' rates are kept
     /// and the opening's part takes octave 0, what a newly grown block takes in this line (the triads took it); where the learner carries each
     /// entry's own rate, every standing entry keeps it and the block's entries take `rate_bits`. The draws, the laps and the pass are kept; the
     /// held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
@@ -909,9 +909,9 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; theory, November 13, the junction record §7] **The learner with the junction's return** ([`Field::with_junction`]), founded at
+    /// [definition; theory, November 13, the junction record §7] **The learner with the junction's return** ([`Constitution::with_junction`]), founded at
     /// the matched load. Every standing entry keeps its moments, its remainder and its rate. The chart's first moments open at zero and its second
-    /// at the mean of its counterpart's standing second moments, as a growth opens a new block's ([`FieldLearner::with_opening`]): `L` and `ℓ_b`
+    /// at the mean of its counterpart's standing second moments, as a growth opens a new block's ([`Learner::with_opening`]): `L` and `ℓ_b`
     /// read the site's chart as the carry circles' leak chart and its biases do, and where the field has no circles as the pair drive `a` and its
     /// biases do (agent-inferred: the nearest block that reads the same chart into one real a site). Its rate: the founded parts' rates are kept
     /// and the junction's part takes octave 0, what a newly grown block takes in this line; where the learner carries each entry's own rate, every
@@ -946,7 +946,7 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Field::with_mark`]), its strengths
+    /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Constitution::with_mark`]), its strengths
     /// founded at zero. Every standing entry keeps its moments, its remainder and its rate. The strengths' moments open at zero, so each opens at
     /// its own first nonzero covector (the deposit's law for a coordinate with no history): a strength's covector sums a pairing over every
     /// marked site and coordinate, and no standing block's second moment is its scale (agent-inferred). Its rate: the founded parts' rates are
@@ -969,7 +969,7 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; Brandon, November 15 02:06Z] **The learner whose face reads its sites' loudness** ([`Field::with_loud`]): the new block's
+    /// [definition; Brandon, November 15 02:06Z] **The learner whose face reads its sites' loudness** ([`Constitution::with_loud`]): the new block's
     /// moments open at zero, so its first step is its own covector's, and its part's rate at the old entries'. Refused while a step is held.
     pub fn with_loud(&self) -> Result<Self> {
         if self.held.is_some() {
@@ -988,11 +988,11 @@ impl FieldLearner {
     }
 
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
-    /// ([`Field::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
+    /// ([`Constitution::lettered`]), founded at a passage's crossing. No key is read and the draws do not move. Every standing entry keeps its
     /// moments and its remainder (the open rows' with them, at their new place); a fresh entry's first moment opens at zero and its second
-    /// at the mean of its family's standing second moments, as a growth in contacts opens a new contact's ([`FieldLearner::contacted`]), so its
+    /// at the mean of its family's standing second moments, as a growth in contacts opens a new contact's ([`Learner::contacted`]), so its
     /// first step is its covector over its family's own scale and never the largest normalized step of a fresh entry. The founded parts'
-    /// rates are kept, and where the learner carries each entry's own rate ([`FieldLearner::own_rates`]) every standing entry keeps it and a
+    /// rates are kept, and where the learner carries each entry's own rate ([`Learner::own_rates`]) every standing entry keeps it and a
     /// fresh one takes `rate_bits`. The held step and the last section's step, of the old layout, are dropped; the pass is kept. Refused while
     /// a step is held.
     pub fn lettered(&self, fresh: usize) -> Result<Self> {
@@ -1018,10 +1018,10 @@ impl FieldLearner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
-    /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Field::contacted`]), the
+    /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Constitution::contacted`]), the
     /// contacts' draws read from the founding key stream past every draw read before. Every old entry keeps its moments and its
     /// remainder, and the families' lengths (the families are the same ones); each new contact's entries open on the moments the
-    /// lane's open on ([`FieldLearner::laned`]): the first at zero, the second at the mean of the family's old second moments, so a
+    /// lane's open on ([`Learner::laned`]): the first at zero, the second at the mean of the family's old second moments, so a
     /// new contact's first step is an eighth of its covector over the family's own scale, the step its family's trained entries
     /// take, and not the largest normalized step of a fresh entry. The rate is kept: no coordinate is shared among copies. The step
     /// the last section stood at is of the old layout and is dropped, as every growth drops it.
@@ -1050,10 +1050,10 @@ impl FieldLearner {
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
-    /// ([`Field::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
+    /// ([`Constitution::scaled_up`], the key stream read on from the learner's drawn bytes), its moments kept on the fine field's
     /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
     /// nonzero covector.
-    pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
+    pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: Declaration, keys: &[u8]) -> Result<Self> {
         let (field, drawn) = self.field.scaled_up(harmonics, split, declaration, keys, self.drawn)?;
         let len = field.material_len();
         let (mut first, mut second) = (self.first.clone(), self.second.clone());

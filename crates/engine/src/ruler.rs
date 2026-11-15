@@ -10,7 +10,7 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 use rayon::prelude::*;
 
 /// [measurement; agent-inferred, November 2] **A held read's rows at the answer sites by where their mass
-/// lies** ([`Field::held_rows`]), one cell a tick and head, over the unresolved sites of the regions read:
+/// lies** ([`Constitution::held_rows`]), one cell a tick and head, over the unresolved sites of the regions read:
 /// the rows, and the shares (on `2^(−63)`, summed) of the sources of three groups: `question`, the definite
 /// sites before the region's answer start; `soft_near`, the near field's sources that are not definite
 /// (unresolved or soft answer neighbours); `other`, everything else (the far definite sites, the near
@@ -37,7 +37,7 @@ pub struct HeldRows {
     pub near_definite: u128,
 }
 
-/// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Field::near_offsets`]): at
+/// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Constitution::near_offsets`]): at
 /// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
 /// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
 /// receiver's readout logits on `2^(−16)` bits where it is unresolved. Two shares of one row compare as their locks do:
@@ -50,7 +50,7 @@ pub struct NearOffsets {
 }
 
 /// [measurement; agent-inferred, November 2] **A held answer row's current by where it comes from** (§16.21,
-/// [`Field::row_currents`]): one row (a tick, a head and an unresolved site), its framed current's part from the
+/// [`Constitution::row_currents`]): one row (a tick, a head and an unresolved site), its framed current's part from the
 /// question past the near field (`far`, the definite sites before the answer start at `|i − j| ≥ NEAR`) and its part
 /// from the near field (`near`, every source at `|i − j| < NEAR`) and from every other source (`rest`: the answer's own
 /// sites past the near field and any site after the answer start), each `Σ release(p D ṽ_j, 63)` entry by entry on the
@@ -86,7 +86,7 @@ pub struct ReachSums {
 }
 
 /// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction at its founding, by written source**: over one
-/// tick's written sources of one head and kind of reader, `a_j = ⟨λ_j^(k+1), ρ_j⟩` ([`Field::reaction_covectors`]): their sum, sum in magnitude
+/// tick's written sources of one head and kind of reader, `a_j = ⟨λ_j^(k+1), ρ_j⟩` ([`Constitution::reaction_covectors`]): their sum, sum in magnitude
 /// and squares after a release of 32 bits (a random-sign level's input), with the sources counted, and `Σ|ρ_j|²` and `Σ|x_j|²` each entry
 /// released 8 bits before its square (`m² = Σ|ρ|²/Σ|x|²`, the unit `κ` is read in, on the reverse's grain).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
@@ -99,7 +99,7 @@ pub struct ReactionSums {
     pub x_sq: u128,
 }
 
-/// [measurement; G159] **The reaction's forms at one tick and head** ([`Field::reaction_forms`]): the written sources and the readers counted;
+/// [measurement; G159] **The reaction's forms at one tick and head** ([`Constitution::reaction_forms`]): the written sources and the readers counted;
 /// the route's `Σ_j a_j` and the pair decomposition's, with the sources where the two agree in sign; the source's chart's covector by coordinate
 /// (`Σ_j a_j r̂_j`, `Σ_j |a_j r̂_j|`) and the reader's (`Σ_i b_i r̂_i`, `Σ_i |b_i r̂_i|`); and the strength raised by the source's metric,
 /// summed, in magnitude and squared after a release of 8 bits.
@@ -117,7 +117,7 @@ pub struct ReactionForms {
     pub w_sq: u128,
 }
 
-/// [measurement; G160] **The read's mirror at one tick, head and kind of reader** ([`Field::mirror_covectors`]): the written sources heard,
+/// [measurement; G160] **The read's mirror at one tick, head and kind of reader** ([`Constitution::mirror_covectors`]): the written sources heard,
 /// the sum of `a_j = ⟨λ_j, μ_j⟩`, in magnitude and squared after a release of 32 bits; and with readers of both kinds the source's chart's
 /// covector by coordinate, the audience summed on `2^(−31)`, and the lanes' powers as `log₂` on `2^(−16)` summed and squared, with the lanes
 /// counted.
@@ -134,7 +134,7 @@ pub struct MirrorSums {
     pub lanes: u64,
 }
 
-/// [measurement; G162] **One stage of the free ring** ([`Field::free_ring`]): the open places, their code and the faces' expected code on
+/// [measurement; G162] **One stage of the free ring** ([`Constitution::free_ring`]): the open places, their code and the faces' expected code on
 /// `2^(−20)` bits summed, and the charts' change from the stage before (`Σ |Δr̂|²`, unsigned) and its pairing with the change before that.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct RingStage {
@@ -174,7 +174,7 @@ pub(crate) fn round_trips(before: &[Vec<Source>], after: &[Vec<Source>], sites: 
     }
 }
 
-impl Field {
+impl Constitution {
 
     /// [measurement] **A region's rows read by where their mass lies** (§15.9's reading): over every
     /// tick, head and receiver, open receivers (`[0]`) and definite ones (`[1]`) apart: the rows, the far
@@ -206,7 +206,7 @@ impl Field {
 
     /// [measurement; theory, November 13, the junction record §9 item 1] **Each site's echo by head** (`[h][i]` on `2^(−63)`): head `h`'s
     /// `B_i^h`, the mean over consecutive ticks of `Σ_j p_ji^(t) p_ij^(t+1)` ([`round_trips`]), the share of a site's arrival that is its own
-    /// state of two ticks before, returned by the sites it told. [`FieldRead::echo`] is its mean over heads. An unresolved site is no source,
+    /// state of two ticks before, returned by the sites it told. [`ReadLogits::echo`] is its mean over heads. An unresolved site is no source,
     /// so its row reads zero. A reading only: nothing in the law reads it.
     pub fn echo_by_head(&self, region: &Region) -> Result<Vec<Vec<u64>>> {
         let pass = self.pass(region, true)?;
@@ -223,7 +223,7 @@ impl Field {
 
     /// [measurement; theory, November 13, the theory thread's order after G151, item (c)] **Each site's round trips across heads** (`[h][h′][i]` on
     /// `2^(−63)`): the mean over consecutive ticks of `Σ_j p_ji^(t, h′) p_ij^(t+1, h)`, what site `i` told `j` in head `h′` coming back to it in head
-    /// `h` a tick later; the diagonal is [`Field::echo_by_head`]. The strand's pair contacts, triads and carry circles are outside it (they are two-way
+    /// `h` a tick later; the diagonal is [`Constitution::echo_by_head`]. The strand's pair contacts, triads and carry circles are outside it (they are two-way
     /// by build). A reading only: nothing in the law reads it.
     pub fn echo_across_heads(&self, region: &Region) -> Result<Vec<Vec<Vec<u64>>>> {
         let pass = self.pass(region, true)?;
@@ -341,7 +341,7 @@ impl Field {
         Ok(out)
     }
 
-    /// [`Field::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
+    /// [`Constitution::held_rows`] summed over `regions` (each with its own answer start `questions[r]`).
     pub fn held_rows_all(&self, regions: &[Region], questions: &[usize]) -> Result<Vec<HeldRows>> {
         if regions.len() != questions.len() {
             return refuse("a held read's answer starts that are not one a region");
@@ -372,7 +372,7 @@ impl Field {
     /// source's `ρ_j = J_r̂(x_j^k)ᵀ V_hᵀ conj(U_j) Σ_(i: j ∈ S_i^h) p_ij D_ij U_i (O_hᵀ x_i^(k+1))`, the reverse's value route alone (the frame,
     /// each met source's share and skin, a crowd's share spread over its definite sources at the octave's decay, the unframing, `V`'s transpose and
     /// the chart's lane adjoint, every release the reverse's), fed each reader's state after the tick where the reverse feeds its covector; with
-    /// `readers` only the readers of that kind (`false` open, `true` written). `[t][D]`. It repeats `Field::tick_return`'s value route, which a
+    /// `readers` only the readers of that kind (`false` open, `true` written). `[t][D]`. It repeats `Constitution::tick_return`'s value route, which a
     /// change there must carry here.
     pub(crate) fn reaction_route(&self, cell: &TickCell, paces: &Paces, definite: &[bool], h: usize, readers: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
@@ -452,7 +452,7 @@ impl Field {
 
     /// [measurement; theory, November 13, the junction record §13.8; G158] **The reader's reaction, read at its founding**: one region's forward
     /// and reverse, and for each tick (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written) the written sources'
-    /// [`ReactionSums`] of `a_j = ⟨λ_j^(k+1), ρ_j^(h,k)⟩` ([`Field::reaction_route`]), so `d(code)/dκ_h = −Σ_k Σ_j a_j` for the stage
+    /// [`ReactionSums`] of `a_j = ⟨λ_j^(k+1), ρ_j^(h,k)⟩` ([`Constitution::reaction_route`]), so `d(code)/dκ_h = −Σ_k Σ_j a_j` for the stage
     /// `x_j ← x_j − κ_h ρ_j` after tick `k`. A reading only: nothing in the law reads it.
     /// [measurement; agent-inferred, November 13, the ring record's §4 first reading] **The release carried as a face, at its founding**: for
     /// each site `t`, `r_t = ⟨λ⁰_t, D_t⟩`, the opening's covector `λ⁰` of the region's own comparison against the change the opening of `t`
@@ -620,7 +620,7 @@ impl Field {
         Ok((out, audience))
     }
 
-    /// [measurement; G160] **The read's mirror at its founding** ([`Field::mirror_route`]): one region's forward and reverse, and for each tick
+    /// [measurement; G160] **The read's mirror at its founding** ([`Constitution::mirror_route`]): one region's forward and reverse, and for each tick
     /// (in the forward's order), head and kind of reader (`[0]` open readers, `[1]` written, `[2]` both) the written sources' [`MirrorSums`] of
     /// `a_j = ⟨λ_j^(k+1), μ_j⟩`, so for the stage `x_j ← x_j − s_h μ_j` after tick `k` the code moves by `−s_h Σ_j a_j 2^(−40)` bits (the
     /// covector's grain against the state's, read from the reverse's checked central differences), and with both kinds the source's chart's
@@ -681,7 +681,7 @@ impl Field {
     /// source's chart's covector `Σ_j a_j r̂_j` and the reader's `Σ_i b_i r̂_i` (`a_j = Σ_i a_ij`, `b_i = Σ_j a_ij`), each coordinate with its
     /// magnitude; and the covector of the strength raised by the source's metric, `Σ_j Σ_lane a_j,lane ‖x_j,lane‖²/n_j` with `n_j = Σ_i p_ij D̄_ij`
     /// the source's audience (`D̄` the mean over the head's modes; the reaches' `γ_h²` a constant a head, left out). Beside them the route's own
-    /// `a_j` ([`Field::reaction_route`]) and the share of written sources where the two agree in sign. A reading only.
+    /// `a_j` ([`Constitution::reaction_route`]) and the share of written sources where the two agree in sign. A reading only.
     pub fn reaction_forms(&self, region: &Region) -> Result<Vec<Vec<ReactionForms>>> {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
@@ -825,7 +825,7 @@ impl Field {
 
     /// [measurement; agent-inferred, November 13; G162] **The free ring on the host**: one region's forward at the field's declared ticks (a caller
     /// sets them past the trained depth), and for each stage (the state each tick hands on, after the mirror's stage where
-    /// [`Field::mirror_strength`] is set) over the region's open places: the code of the place's class and the face's expected code, both on
+    /// [`Constitution::mirror_strength`] is set) over the region's open places: the code of the place's class and the face's expected code, both on
     /// `2^(−20)` bits summed, and the changes of the places' charts between stages, `Σ |Δr̂_k|²` and `Σ ⟨Δr̂_k, Δr̂_(k−1)⟩` (on `2^(−32)`, from
     /// the second stage), the free iteration's relaxation or turning as read-depth reads it on the card (G149). A reading only.
     pub fn free_ring(&self, region: &Region) -> Result<Vec<RingStage>> {
@@ -963,7 +963,7 @@ pub struct TickRead {
     pub pair_scale: Vec<i128>,
 }
 
-impl Field {
+impl Constitution {
     /// [measurement; theory, November 11 04:48, G39] **A section's return read twice**: each region's forward once, then its return `G`, then its return with the face covector of
     /// every loud place zeroed, `G_quiet`. A place's news mass is `m_t = ½ |p_t − q_t|₁` of its face `p_t` against its truth `q_t` (one-hot at the region's class), which is
     /// `1 − p_t(x_t)`: quiet where `m_t < 2^(−bits)`, i.e. `(total − mass(x_t)) 2^bits < total` on the face's integers. The deposit weights `m/K` are as they stand. A reading: the field and
@@ -1014,7 +1014,7 @@ impl Field {
                     Ok(a)
                 },
             )?;
-        // [G180] Where the field reads twice, both sums are the two reads' mean ([`Field::both_reads_mean`]).
+        // [G180] Where the field reads twice, both sums are the two reads' mean ([`Constitution::both_reads_mean`]).
         out.total = self.both_reads_mean(out.total);
         out.quiet = self.both_reads_mean(out.quiet);
         Ok(out)
@@ -1032,7 +1032,7 @@ impl Field {
 
     /// [measurement; Brandon, November 15 00:58Z; the record of November 13 on loudness beside surprise, §4 and test 1] **A region's lane
     /// powers by stage**: every site's lane scales `‖r_ℓ‖_rms` (the powers the chart divides by, [`lane_chart`]) at each tick's opening and
-    /// after the last tick (the stage the faces read), `[t][L]` each, on the state's grain. Its stages are those of [`Field::tick_charts`]. A
+    /// after the last tick (the stage the faces read), `[t][L]` each, on the state's grain. Its stages are those of [`Constitution::tick_charts`]. A
     /// reading: no state changes.
     pub fn tick_scales(&self, region: &Region) -> Result<Vec<Vec<i128>>> {
         let pass = self.pass(region, true)?;
@@ -1048,7 +1048,7 @@ impl Field {
     }
 }
 
-impl FieldLearner {
+impl Learner {
 
     /// [measurement; agent-inferred, November 3, §16.31] **Each family's step coherence**: over the family's entries, `Σ |m|`
     /// and `Σ √v` of the covector's two moments, so `Σ|m| / Σ√v` is near one where the family's covector keeps its sign

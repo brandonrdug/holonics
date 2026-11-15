@@ -114,7 +114,7 @@
 //! negative where it amplifies, with `2^(−β)·2n ≥ 2⌈log₂ reach⌉`, so in a still head a key that fits the
 //! probe at the reach still outweighs the rest of its support together wherever their keys stand
 //! orthogonal or opposed to it (a turned head carries it by its skin decay, fainter with distance)
-//! ([`FieldDeclaration::score_shift`]; the share is the gaps', `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`,
+//! ([`Declaration::score_shift`]; the share is the gaps', `p_* = (1 + Σ_(j≠*) 2^(−(z_* − z_j)))^(−1)`,
 //! so near-equal keys share its weight). Why the unit power (measured November 1, at a GSM8K region's 450
 //! sites and the seventh reading's declaration, founded on a mixed key stream): with the probe and key at
 //! the chart's scale alone, a site whose whole word recurs once peaked at its counterpart in 20 of 32 rows,
@@ -136,9 +136,9 @@
 //! operands that produced each carrier, held from the forward). The deposit is the tower's two moments of the covector,
 //! and the step deposits at its size, `m/(⌊√v⌋ + 1)` at `2^(−rate)`: at most about 4.2 times its rate, by Cauchy–Schwarz
 //! over the moments' rates `2^(−3)` and `2^(−8)` (agent-inferred). No reread decides it (Brandon, November 5: the step
-//! fluxes). What a step does is priced, never certified: predicted on its own section (`FieldReceipt::predicted`), at
-//! first order on the next section's covector (`FieldReceipt::transfer`), and before this section's covector moves the
-//! moments (`FieldReceipt::external`). History, kept as history ([`FieldLearner`]): from November 1 the step was
+//! fluxes). What a step does is priced, never certified: predicted on its own section (`Receipt::predicted`), at
+//! first order on the next section's covector (`Receipt::transfer`), and before this section's covector moves the
+//! moments (`Receipt::external`). History, kept as history ([`Learner`]): from November 1 the step was
 //! certified on the section's own regions (by the products of their faces where every weight is one, by partition of
 //! their readings where one is not, on the codes' grain where a port is read) and halved until it was certified or moved
 //! nothing, then held and read on the next section's regions, which it was not fit on, and halved again or refused where
@@ -146,7 +146,7 @@
 //! declared comparison only (`read_held`, `false`); the certificate itself was retired on November 5.
 //!
 //! [definition; agent-inferred, November 3, §16.27] **The writer is the training clock run backwards**
-//! ([`Field::sample_realized`]): training reads a region whose open sites are a uniform state of a random reading
+//! ([`Constitution::sample_realized`]): training reads a region whose open sites are a uniform state of a random reading
 //! order; the writer opens every answer place beside the known question and resolves them in one keyed random order,
 //! each drawn from its own face at temperature one on the read of the region as it stands, every place resolved before it
 //! known. Every place is written; a place drawn as the void is the answer's boundary, and every place past it is the void

@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -18,10 +18,10 @@ use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer, CardError};
 
 /// [theory, November 12, P50 step 1 and P51] The clock's skin store of a region of `sites` sites, `definite` of them definite
-/// ([`CardField::skin_fill`]): 32 bits a paced head, support entry and mode over the row's support stride `K = NEAR_SLOTS + definite` (atlas
+/// ([`Resident::skin_fill`]): 32 bits a paced head, support entry and mode over the row's support stride `K = NEAR_SLOTS + definite` (atlas
 /// `tower.field-support-stride`: every row's support fits it), and a paced head, site, crowd slot and mode. Returns (the region's octets, octets a
 /// reserved entry, octets a site's crowd edges, octets a site's near phases and skins).
-pub fn skin_octets(d: &FieldDeclaration, sites: usize, definite: usize) -> (u64, u64, u64, u64) {
+pub fn skin_octets(d: &Declaration, sites: usize, definite: usize) -> (u64, u64, u64, u64) {
     let per = 4 * d.paced_heads() as u64 * d.modes as u64;
     let (entry, site) = (per, per * crowd_slots(d.reach) as u64);
     let stride = (2 * (NEAR - 1) + definite) as u64;
@@ -118,14 +118,14 @@ pub(crate) fn held_at(b: &Option<Pooled<'_, i64>>) -> u64 {
     b.as_ref().map_or(0, |b| b.device_ptr())
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
 
-    /// [definition; §16.44] **A blank's clock returns through its face** (the host's `Field::blank_return`): from each
+    /// [definition; §16.44] **A blank's clock returns through its face** (the host's `Constitution::blank_return`): from each
     /// silent site's rates' covector `δκ` the face's logits' covector (held `2^30` finer), the encoding's bias and rows, the
     /// lift's covector (held `2^16` finer), the lift's bias and the read matrix, the chart's return and the lane adjoint, and
     /// the state's covector `dx` takes it.
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn blank_back(&self, field: &Field, words: &mut Words, clock: &CardClock<'c>, dkappa: &CardBuffer<'c, i128>, g: &CardBuffer<'c, i128>, dx: &CardBuffer<'c, i64>, sites: usize) -> Result<()> {
+    pub(crate) fn blank_back(&self, field: &Constitution, words: &mut Words, clock: &CardClock<'c>, dkappa: &CardBuffer<'c, i128>, g: &CardBuffer<'c, i128>, dx: &CardBuffer<'c, i64>, sites: usize) -> Result<()> {
         let d = field.declaration;
         let (dw, a) = (d.width, d.alphabet);
         let l = field.layout();
@@ -167,7 +167,7 @@ impl<'c> CardField<'c> {
     /// reads now (the chart, the lift, the encoding, at temperature one), each silent site's rate from its shares
     /// (`field_blank_rates`), and the clocks, frames and moments read again on those rates, into a tick's own buffers; the
     /// words are left pointing at them.
-    pub(crate) fn blank_clock(&self, field: &Field, words: &mut Words, regions: usize, sites: usize) -> Result<CardClock<'c>> {
+    pub(crate) fn blank_clock(&self, field: &Constitution, words: &mut Words, regions: usize, sites: usize) -> Result<CardClock<'c>> {
         let d = field.declaration;
         let (dw, a, n, m2, paced) = (d.width, d.alphabet, d.modes, 2 * d.complex(), d.paced_heads());
         // [realization; theory, November 13, P58 item 2] The blank's read, scale, lift and totals are taken without zeroing where no clock is read
@@ -232,7 +232,7 @@ impl<'c> CardField<'c> {
     /// support pair's and crowd edge's skin of the paced heads where their pace is not plain, read by the lock, the numerators, the rows, the columns
     /// and the skin's return. The test build first writes `SKIN_UNFILLED` over the store, so a reader of a word no fill formed is refused
     /// (`REFUSED_UNFILLED`); a level with no store (no paced head, the packets' plain clocks) forms none.
-    pub(crate) fn skin_fill(&self, field: &Field, words: &mut Words, sites: usize) -> Result<()> {
+    pub(crate) fn skin_fill(&self, field: &Constitution, words: &mut Words, sites: usize) -> Result<()> {
         let d = field.declaration;
         let paced = d.paced_heads();
         if paced == 0 || words.skin == 0 {
@@ -256,7 +256,7 @@ impl<'c> CardField<'c> {
     /// every moment mode's near phases and skins at every site of a paced head, and its far skins into the crowd edges' store, read by the moments, the
     /// skinned prefixes, the moments' return and the clocks' covector, and by the contact's crowds. The test build first writes `PHASE_UNFILLED` and
     /// `SKIN_UNFILLED` over the stores, so a reader of a word no fill formed is refused (`REFUSED_UNFILLED`).
-    pub(crate) fn clock_fill(&self, field: &Field, words: &Words, sites: usize) -> Result<()> {
+    pub(crate) fn clock_fill(&self, field: &Constitution, words: &Words, sites: usize) -> Result<()> {
         let d = field.declaration;
         let tm = words.tm as usize;
         if tm == 0 || words.mphase == 0 || words.cskin == 0 {

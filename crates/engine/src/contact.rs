@@ -51,7 +51,7 @@ pub(crate) struct TickCell {
     pub(crate) jg: Vec<i64>,
     pub(crate) jd: Vec<i64>,
     /// [measurement; theory, November 13, the junction record §13.8] The state after the tick (`x^(k+1)`, `[t][D]`), kept where the pass keeps
-    /// its ticks, for the reader's reaction's reading ([`Field::reaction_covectors`]).
+    /// its ticks, for the reader's reaction's reading ([`Constitution::reaction_covectors`]).
     pub(crate) after: Vec<i64>,
     /// [measurement; G162] The state the tick hands on (after the mirror's stage where it is read), kept where the pass keeps its ticks.
     pub(crate) handed: Vec<i64>,
@@ -297,7 +297,7 @@ pub struct Crowd {
     pub s: i64,
 }
 
-/// [measurement] Rows read by where their mass lies ([`Field::row_shares`]): `[0]` the open receivers,
+/// [measurement] Rows read by where their mass lies ([`Constitution::row_shares`]): `[0]` the open receivers,
 /// `[1]` the definite ones.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct RowShares {
@@ -343,7 +343,7 @@ pub(crate) fn decayed_wide((decay, grain): (i128, u32), v: i128) -> i128 {
     release(decay * v, grain)
 }
 
-impl FieldPass {
+impl Forward {
     /// The clocks a tick read (§16.44): its own, or the pass's.
     pub(crate) fn paces_at<'a>(&'a self, cell: &'a TickCell) -> &'a Paces {
         cell.clock.as_ref().map_or(&self.paces, |c| &c.paces)
@@ -353,7 +353,7 @@ impl FieldPass {
 /// A region's forward: each tick's temporaries (held when the reverse will read them), the last
 /// read, and each unresolved site's face.
 #[derive(Clone, Debug, Default)]
-pub(crate) struct FieldPass {
+pub(crate) struct Forward {
     pub(crate) ticks: Vec<TickCell>,
     pub(crate) read: Vec<i32>,
     pub(crate) scale: Vec<i128>,
@@ -364,7 +364,7 @@ pub(crate) struct FieldPass {
     pub(crate) logits: Vec<Option<Vec<i64>>>,
     /// The site pairs the contact met, `Σ_(h, tick, i) |S_i^h|`.
     pub(crate) pairs: u64,
-    /// Each site's echo on `2^(−63)` ([`FieldRead`]).
+    /// Each site's echo on `2^(−63)` ([`ReadLogits`]).
     pub(crate) echo: Vec<u64>,
     /// The turned heads' clocks over the region (§16, Law 1).
     pub(crate) paces: Paces,
@@ -374,12 +374,12 @@ pub(crate) struct FieldPass {
     pub(crate) tower: Option<crate::field::scale::ScalePass>,
     /// [measurement; theory, November 11 04:48, G39] The sites whose face covector a return leaves zero (empty: none), a reading of where the deposit's mass lies.
     pub(crate) skip: Vec<bool>,
-    /// [definition; agent-inferred, November 14, the ring record §4] The marks this read opened its silent sites on ([`FieldDeclaration::mark`]):
+    /// [definition; agent-inferred, November 14, the ring record §4] The marks this read opened its silent sites on ([`Declaration::mark`]):
     /// the shares of the faces the field's first read gave them, `None` at every other site; none on a read that is the first.
     pub(crate) marks: Option<Vec<Option<Shares>>>,
     /// [definition; agent-inferred, November 14, G180] The first read's forward, kept for its own return where the field reads twice and the
-    /// read keeps its temporaries: both reads are compared ([`Field::read_and_return`]).
-    pub(crate) first: Option<Box<FieldPass>>,
+    /// read keeps its temporaries: both reads are compared ([`Constitution::read_and_return`]).
+    pub(crate) first: Option<Box<Forward>>,
 }
 
 pub(crate) struct Reaches {
@@ -398,7 +398,7 @@ pub(crate) struct Reaches {
     pub(crate) junction: u64,
 }
 
-impl Field {
+impl Constitution {
 
 
     /// [definition; agent-inferred, November 2] **A row's gain bound from its temperatures' octaves** (§16.12): `4n T
@@ -414,7 +414,7 @@ impl Field {
     }
 
     /// [definition; agent-inferred, November 2] **A row's bound as the material stands** (§14.11,
-    /// §15.10): [`FieldDeclaration::row_bits`] with the gain read from the largest temperature the
+    /// §15.10): [`Declaration::row_bits`] with the gain read from the largest temperature the
     /// material holds, since the temperatures are deposited.
     pub fn row_bits(&self) -> Result<u32> {
         let d = &self.declaration;
@@ -678,7 +678,7 @@ impl Field {
         // [definition; agent-inferred, November 3, §16.34] The complex product a contact (§15.1) is a pair contact along the strand: contact
         // `e < f/2` is `a_e + i a_(f/2+e)` at the site against its strand neighbour's `b`, the one before it at an even `e` and the one after at
         // an odd ([`strand_mate`]), so two ring faces compose by adding their phases, `q(x + y) = q(x) q(y)`, across the strand's contact; none
-        // past the region's ends. The plain contacts are the first `f/2 − C` ([`FieldDeclaration::carry`]).
+        // past the region's ends. The plain contacts are the first `f/2 − C` ([`Declaration::carry`]).
         let plain = d.carry_first();
         for t in 0..sites {
             for e in 0..plain {
@@ -691,7 +691,7 @@ impl Field {
                 cell.c[t * f + half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
             }
         }
-        // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan** ([`FieldDeclaration::carry`]): at each site
+        // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan** ([`Declaration::carry`]): at each site
         // the circles' charts `q = Q r̂ + q_b`, `ℓ = L r̂ + ℓ_b` (one affine, at the grains `a` and `b` are read at), the gate
         // `γ = γ̂(q)/(1 + d₀ 2^ℓ)` ([`carry_gate`]) and the drive coupled through the same leak, `κ b` with `κ = N₀ d/(1 + d)` ([`carry_coupling`]);
         // then along the strand, one release a step in strand order (never a parallel prefix, which would reorder the releases): circle `k` is
@@ -734,7 +734,7 @@ impl Field {
                 }
             }
         }
-        // [definition; theory, November 12, the triad record §3 and §4] **The triads** ([`FieldDeclaration::triads`]): at each site the charts'
+        // [definition; theory, November 12, the triad record §3 and §4] **The triads** ([`Declaration::triads`]): at each site the charts'
         // reads `α, β, γ` (one affine of the pair chart with the charts' biases, at the grains `a` and `b` are read at, `[t][6J]`), then at each
         // site with both strand mates `p = α(t) β(t − 1)` and `c^T = p γ(t + 1)`, each released at the face's grain ([`triad_products`]); none at
         // the region's two ends. Kept in the cell for the reverse.
@@ -763,9 +763,9 @@ impl Field {
     }
 
     /// The region's forward: `K` ticks, then each unresolved site's face. `keep` holds each tick's
-    /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`FieldDeclaration::mark`]), the first read is this one
+    /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`Declaration::mark`]), the first read is this one
     /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
-    pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<FieldPass> {
+    pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
         if !self.declaration.mark {
             return self.pass_with(region, keep, None);
         }
@@ -779,8 +779,8 @@ impl Field {
         Ok(out)
     }
 
-    /// One read of the region ([`Field::pass`]), its silent sites opened on `marks` where given.
-    pub(crate) fn pass_with(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>) -> Result<FieldPass> {
+    /// One read of the region ([`Constitution::pass`]), its silent sites opened on `marks` where given.
+    pub(crate) fn pass_with(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>) -> Result<Forward> {
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
@@ -792,7 +792,7 @@ impl Field {
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
         let news = if self.scale.is_some() { self.level_news(region)? } else { Vec::new() };
-        let mut out = FieldPass::default();
+        let mut out = Forward::default();
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
         let mut before: Option<Vec<Vec<Source>>> = None;
@@ -903,7 +903,7 @@ impl Field {
 /// [definition; agent-inferred, November 4, §16.40] **The chart by lanes** (the tower record, D2): a site's face of `L`
 /// lanes is read lane by lane, each lane's `W = D/L` coordinates a ratio to its own power, `r̂_ℓ = r_ℓ / ‖r_ℓ‖_rms`, its
 /// scale `‖r_ℓ‖_rms` pushed after the lanes before it; one lane is the chart over the whole width. Why lanes: a lane
-/// founded beside trained ones with every read from it at zero ([`Field::laned`]) leaves each other lane's chart, and so
+/// founded beside trained ones with every read from it at zero ([`Constitution::laned`]) leaves each other lane's chart, and so
 /// every face, exactly as it was, which a chart over the whole width would not (the new coordinates would join the power
 /// every coordinate is divided by), and the reads from it carry a covector at once.
 pub(crate) fn lane_chart(xt: &[i64], lanes: usize, read: &mut Vec<i32>, scale: &mut Vec<i128>) -> Result<()> {

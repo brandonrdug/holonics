@@ -461,6 +461,19 @@ type is named "Field", and parity, reproduction and timing hold after each.
   - The renames. Three of §5's names collide with names that stand: `Layout` and `Realization`
     with the card's launch layout and its realization, and `Resident` with an October card owner
     (`holonics_cuda::hnn::port::Resident`). The renames choose around them.
+- The renames, read November 15: `Field` → `Constitution`, `FieldDeclaration` → `Declaration`, `FieldLearner` → `Learner`,
+  `FieldRealization` → `Realization`, `HostField` → `Host`, `CardField` → `Resident`, `FieldCodec` → `Codec`, `FieldPass` →
+  `Forward`, `FieldNext` → `Next`, `FieldReceipt` → `Receipt` and `TrainRegion` → `OwnedRegion`, in every crate, kernel comment,
+  three tools' comments, the engine guide and 134 of the atlas's live owners (`R:`); owners pinned at a commit keep their names.
+  Two names were chosen around what stands (`agent-inferred`): `FieldLayout` → `Loci`, since the card's launch `Layout` stands in
+  `hnn::card` (the layout's object is the constitution's loci, by block), and `FieldRead` → `ReadLogits`, since `std::io::Read` is
+  imported beside it in the commands and `inherited::census::Reading` stands in the engine (the struct is a read's logits and their
+  echoes). `Realization` and `Resident` no longer collide: the card's realization type is `Resident` itself, and the October card owner
+  retired with C8a. The saved text and the printed lines keep their words. Gate 1 passed, and gate 3 on lap 17 is equal (parity on 3
+  sections, 24 reproduced, the read byte for byte). Timing holds in one balanced hold on 24 of the line's sections from lap
+  16's `STATE.3000` (a warm-up, then control, renamed, renamed, control, control, renamed, renamed, control): the control's runs
+  read 712.1 to 712.9 ms a section, the renamed build's 712.2 to 713.6, every run's section lines equal to the first's. Done for
+  C5 save the kernels' headers and the `inherited` items' distribution.
 
 **C6. The commands** (the PC). `crates/athena` with the live commands by §7's rule; the dispatch,
 `train-field`, its switches and the retired readings leave; `field_pass` leaves. Done when

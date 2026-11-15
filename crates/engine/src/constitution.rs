@@ -10,13 +10,13 @@ use crate::inherited::keyed_modes::{ln2_face, log2_face, Exponential};
 use rayon::prelude::*;
 
 /// [definition; agent-inferred, November 1] **The field**: its declaration, its material `Θ`
-/// (one vector, the families of [`FieldLayout`] in order), the rings' resident faces and the
+/// (one vector, the families of [`Loci`] in order), the rings' resident faces and the
 /// exponential's.
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Field {
-    pub declaration: FieldDeclaration,
+pub struct Constitution {
+    pub declaration: Declaration,
     pub theta: Vec<i32>,
-    pub(crate) layout: FieldLayout,
+    pub(crate) layout: Loci,
     /// Each turned slot's period and its ring's phasors on `2^(−30)` (the residues a region within
     /// the reach reads).
     pub(crate) rings: Vec<(usize, Vec<(i64, i64)>)>,
@@ -25,11 +25,11 @@ pub struct Field {
     pub(crate) decays: Vec<Vec<i64>>,
     pub(crate) exponential: Exponential,
     /// The exponential's navigator at the material's grain (`2^(−24)`), the temperatures' face (§16.12): its
-    /// first sixteen roots are [`Field::exponential`]'s.
+    /// first sixteen roots are [`Constitution::exponential`]'s.
     pub(crate) fine: Exponential,
     /// The half turn on `2^(−46)`, the turn's faces' navigator.
     pub(crate) pi: i128,
-    /// The packets' level of a tower of scales ([`Field::scaled_up`]), none for a field on one scale.
+    /// The packets' level of a tower of scales ([`Constitution::scaled_up`]), none for a field on one scale.
     pub scale: Option<Box<Scale>>,
     /// [measurement; agent-inferred, November 6] Where set, every silent place runs its own per-blank rate past the last arrival
     /// too (the clock before §16.47's one-rate stretch), a declared comparison; not part of the state.
@@ -39,18 +39,18 @@ pub struct Field {
     /// drives its clock; between arrivals each blank keeps its expected duration (§16.44). Not part of the state.
     pub bare_stretch: bool,
     /// [measurement; agent-inferred, November 13, G161] Where set, **the read's mirror at uniform strength** `s_h` a head on `2^(−16)`: after
-    /// each tick but the last, `x_j ← x_j − release(s_h μ_j, 16)` summed over the heads ([`Field::mirror_route`], every head's mirror read from
+    /// each tick but the last, `x_j ← x_j − release(s_h μ_j, 16)` summed over the heads ([`Constitution::mirror_route`], every head's mirror read from
     /// the state the tick left), a reading at finite strength before the stage is a law; not part of the state, and no reverse reads it.
     pub mirror_strength: Option<Vec<i64>>,
     /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
     /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
-    /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Field::opening_term`]), and stays silent
+    /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Constitution::opening_term`]), and stays silent
     /// everywhere else (no voice, no moment, no clock of its own): the opening's part of the carried release, a ruler of the law's
     /// response along its strength before the strength is a part. Not part of the state, and no reverse reads it.
     pub mark: Option<(i64, Vec<Option<Shares>>)>,
 }
 
-impl Field {
+impl Constitution {
     /// **The founding configuration** (agent-inferred, November 1), read from a declared exterior
     /// key stream (four bytes a key, a signed 32-bit integer read as a uniform draw on `[−1, 1)`):
     /// the encoding and both strand contacts uniform on `[−1, 1)` at every class, their unresolved
@@ -61,17 +61,17 @@ impl Field {
     /// at the turned modes (§16.22), drawn last; the current's return `O`, the contact's return `W_c`, the
     /// readout and every bias at zero, so the field opens on the flat face and each tick on the
     /// identity.
-    pub fn found(declaration: FieldDeclaration, keys: &[u8]) -> Result<Self> {
+    pub fn found(declaration: Declaration, keys: &[u8]) -> Result<Self> {
         declaration.admit()?;
         if declaration.carry > 0 {
-            // [theory, November 11 17:25] The circles are grown onto a founded field, their `W` columns at zero ([`Field::with_carry`]).
-            return refuse("a founding with carry circles (they are grown onto a founded field, Field::with_carry)");
+            // [theory, November 11 17:25] The circles are grown onto a founded field, their `W` columns at zero ([`Constitution::with_carry`]).
+            return refuse("a founding with carry circles (they are grown onto a founded field, Constitution::with_carry)");
         }
         if declaration.triads > 0 {
-            // [theory, November 12, the triad record §4] The triads are grown onto a field, their return at zero ([`Field::with_triads`]).
-            return refuse("a founding with triads (they are grown onto a founded field, Field::with_triads)");
+            // [theory, November 12, the triad record §4] The triads are grown onto a field, their return at zero ([`Constitution::with_triads`]).
+            return refuse("a founding with triads (they are grown onto a founded field, Constitution::with_triads)");
         }
-        let layout = FieldLayout::new(&declaration);
+        let layout = Loci::new(&declaration);
         let mut theta = vec![0i32; layout.len];
         let mut cursor = 0usize;
         let mut draw = || -> Result<i64> {
@@ -166,7 +166,7 @@ impl Field {
 
     /// [definition; agent-inferred, November 2] **The skin across a pair** (§16, Law 1): local mode `l` of head
     /// `h` between sites `i` and `j`, `e^(−2π |σ_h(i) − σ_h(j)|/n)` on a head that reads a pace (its byte distance's
-    /// [`Field::decay`] where the pace is plain), the exact `1` on a still head.
+    /// [`Constitution::decay`] where the pace is plain), the exact `1` on a still head.
     pub(crate) fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
@@ -192,7 +192,7 @@ impl Field {
     }
 
     /// The material's layout.
-    pub fn layout(&self) -> &FieldLayout {
+    pub fn layout(&self) -> &Loci {
         &self.layout
     }
 
@@ -213,11 +213,11 @@ impl Field {
         Self::from_lines(&mut text.lines().peekable())
     }
 
-    /// A field read from its text's lines ([`Field::to_text`]), the lines after it left unread.
+    /// A field read from its text's lines ([`Constitution::to_text`]), the lines after it left unread.
     pub fn from_lines<'a>(lines: &mut std::iter::Peekable<impl Iterator<Item = &'a str>>) -> Result<Self> {
-        let d = FieldDeclaration::from_text(lines.next().unwrap_or(""))?;
+        let d = Declaration::from_text(lines.next().unwrap_or(""))?;
         let theta = read_numbers::<i32>(lines.next())?;
-        if theta.len() != FieldLayout::new(&d).len {
+        if theta.len() != Loci::new(&d).len {
             return refuse("a field's material that is not its declaration's length");
         }
         let mut field = Self::with_theta(d, theta);

@@ -24,7 +24,7 @@ octave reads it at 0. `open` writes STATE with the octaves OCTAVES
 (sixteen counts, fifteen with `carry` at the old rate, nineteen, or the written count, comma separated, in the line's order). `update` reads three saved states of one line and, for each part, the cosine c between its displacements OLD - OLDER and
 NOW - OLD over the entries it holds (exact integers): c > 1/2 one octave faster, c < 1/2 one slower, never under the old rate (octave 0) nor
 past rate - 1; c = 1/2 rests. It writes NOW with the moved octaves to OUT and prints FIELD_PART_RATE for every part. The parts are
-Field::founded_parts' (checked against it by the ignored test founded_parts_and_their_cosines_on_saved_states). Numbers only.
+Constitution::founded_parts' (checked against it by the ignored test founded_parts_and_their_cosines_on_saved_states). Numbers only.
 
 `means` reads the cosines from three lap means of one line (the trainer's MEAN.{lap}, or any three materials of one declaration) and
 moves the octaves that STATE carries, the lap's end state the next lap trains from: it writes STATE, every line and its material, with
@@ -41,11 +41,11 @@ octave line can say (an octave is never under 0). It refuses a rate that leaves 
 wrote, checked before a lap trains from it.
 
 Each entry's own rate (theory, November 12 00:20, the Einstein record's U2): a state may carry a trailing `rates r0 .. r(n-1)` line after its
-parts line, one count an entry (holonics::hnn::tower::field::FieldLearner::own_rates), and where it stands it is every entry's rate: the
+parts line, one count an entry (holonics::hnn::tower::field::Learner::own_rates), and where it stands it is every entry's rate: the
 parts' octaves and the base word then govern none (the parts line is kept for its contacts count). `blocks` writes it; the octave verbs
 (open, update, means, trend, polar) and `base` refuse a state that carries it, since an octave they moved would move no entry. Every reader
 here and in tools/state_travel.py takes an entry's rate from it where it stands. `own` writes STATE with the line set to the rates its
-parts and base word give (FieldLearner::entry_rates), every other line as it stands: the same rates carried the new way, a state a build
+parts and base word give (Learner::entry_rates), every other line as it stands: the same rates carried the new way, a state a build
 of the line trains from to show that the line changes no bit where the rates are the parts'. With BITS and one or more NAMEs, each a family
 of the layout whole or a carry circles' half as tools/state_travel.py's graft names it (carry/turn and carry/leak, the turn rows Q and the
 leak rows L of `carry`; carry_bias/turn and carry_bias/leak, q_b and the leak's l_b), the named entries' rates are BITS and every other
@@ -127,7 +127,7 @@ def layout(d):
 
 
 def founded_parts(d, contacts_before):
-    """Field::founded_parts: each entry's part index, OLD where it is none."""
+    """Constitution::founded_parts: each entry's part index, OLD where it is none."""
     fam, total = layout(d)
     dw, f, m2, a1 = d["width"], d["contacts"], 2 * d["heads"] * d["modes"], d["alphabet"] + 1
     lw = dw // d["lanes"] if d["lanes"] > 1 else dw
@@ -224,7 +224,7 @@ WIDEST_RATE = 127  # an entry's rate is under the step's carrier: the deposit sh
 
 
 def own_line(lines, total=None):
-    """A state's `rates` line, each entry's own deposit rate in bits (theory, November 12; FieldLearner::own_rates), as a list; None
+    """A state's `rates` line, each entry's own deposit rate in bits (theory, November 12; Learner::own_rates), as a list; None
     without one."""
     for l in lines:
         if l.startswith("rates "):
@@ -236,7 +236,7 @@ def own_line(lines, total=None):
 
 
 def learner_rates(d, rate, held, own, total):
-    """Each entry's deposit rate in bits (FieldLearner::entry_rates): its own where the state carries the `rates` line; otherwise the
+    """Each entry's deposit rate in bits (Learner::entry_rates): its own where the state carries the `rates` line; otherwise the
     base word, less its founded part's octaves (held, a parts line as parts_line reads it, or None), never under one bit."""
     if own is not None:
         assert len(own) == total, "a learner's own rates, one an entry"
@@ -249,7 +249,7 @@ def learner_rates(d, rate, held, own, total):
 
 
 def write_rates(lines, rates, out):
-    """A state's lines with its `rates` line set to RATES (one count an entry), after its parts line (FieldLearner::from_text reads the
+    """A state's lines with its `rates` line set to RATES (one count an entry), after its parts line (Learner::from_text reads the
     line where the parts line ends), every other line as it stands."""
     kept = [l for l in lines if not l.startswith("rates ")]
     while kept and kept[-1] == "":
@@ -577,7 +577,7 @@ def blocks(paths, state, out, sections=None, sites=None):
       rate, so a block that mixed parts (the first lane's read rows under a parts line) becomes one.
     - A block without heat holds, and every block holds where no block stood at the floor.
     STATE is written to OUT with its rates line (one count an entry, after its parts line, which is kept for its contacts count and no
-    longer governs; FieldLearner::own_rates), every other line as it stands. One FIELD_BLOCK_RATE line a block (its entries, the open ones
+    longer governs; Learner::own_rates), every other line as it stands. One FIELD_BLOCK_RATE line a block (its entries, the open ones
     in D, heat, base heat, fall, pi in the ruler's units, millionths of a bit a site, where SECTIONS and SITES are given; whether its
     window stands at one rate; its octave in STATE and the new), FIELD_BLOCK_FLOOR, and FIELD_BLOCK_RATES, the entries at each rate.
     Owed, each with its guess before it acts (agent-inferred): on a line with a founding inside the window, the floor leaves out the blocks

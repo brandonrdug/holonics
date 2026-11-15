@@ -17,4 +17,4 @@ pub use card::{
     Card, CardBuffer, CardError, DeviceCensus, EntryCensus, Layout, Operand, Realization,
     certificate_layout, copy_layout, ingest_layout, read_layout, word_layout,
 };
-pub use field::{CardField, FieldTimes, Yardsticks};
+pub use field::{Resident, FieldTimes, Yardsticks};

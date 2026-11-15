@@ -7,7 +7,7 @@ use core::ffi::c_void;
 #[allow(unused_imports)]
 use std::time::Instant;
 #[allow(unused_imports)]
-use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Field, FieldDeclaration, FieldRead, FieldRealization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
+use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
@@ -70,12 +70,12 @@ pub fn crowd_slots(sites: usize) -> usize {
 /// dynamic, never arbitrary): a row's carrier is as wide as the exponents its rows hold, `62` bits of face,
 /// `WEIGHT_BITS` of weight, `⌈log₂ reach⌉` of a crowd's count, the spread of whole bits `a − a₀` the widest
 /// row of the launch holds, the bits of the terms a row sums, `64 + ⌈log₂ reach⌉` of a value summed over the
-/// reach and the sign: [`Field::row_bits`] (its gain read from the largest temperature's octave the material
-/// holds, [`Field::row_gain`], §15.10, §16.12) with its spread bound (`4n 2^c + 1 + ⌊log₂ reach⌋ + 2`) replaced by
+/// reach and the sign: [`Constitution::row_bits`] (its gain read from the largest temperature's octave the material
+/// holds, [`Constitution::row_gain`], §15.10, §16.12) with its spread bound (`4n 2^c + 1 + ⌊log₂ reach⌋ + 2`) replaced by
 /// the spread read. A spread
 /// past that bound is refused (the bound is where a row ends), and so is a carrier past the twenty limbs the
 /// card keeps.
-pub fn row_limbs(field: &Field, spread: u64) -> Result<usize> {
+pub fn row_limbs(field: &Constitution, spread: u64) -> Result<usize> {
     let d = &field.declaration;
     let bound = field.row_gain()? + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
     if spread > bound {
@@ -148,9 +148,9 @@ pub(crate) struct Tick<'c> {
     pub(crate) bits: Pooled<'c, u32>,
 }
 
-impl<'c> CardField<'c> {
+impl<'c> Resident<'c> {
 
-    pub(crate) fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Field, stored: bool, returning: bool, dense: bool) -> Result<Tick<'c>> {
+    pub(crate) fn tick(&self, sites: usize, pairs: usize, regions: usize, field: &Constitution, stored: bool, returning: bool, dense: bool) -> Result<Tick<'c>> {
         let d = field.declaration;
         let rows = sites + regions;
         let slots = crowd_slots(d.reach);
@@ -214,10 +214,10 @@ impl<'c> CardField<'c> {
         })
     }
 
-    /// One tick of the constitution on the card over the staged sites of `words` (the host's `Field::tick`), its temporaries in
+    /// One tick of the constitution on the card over the staged sites of `words` (the host's `Constitution::tick`), its temporaries in
     /// `ticks[k]` (or the one shared tick where none is kept).
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn tick_forward(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], k: usize, kept: bool, stored: bool, keep_last: bool, logits: bool, returning: bool, pr: u64, sites: usize, pairs: usize, regions: usize) -> Result<()> {
+    pub(crate) fn tick_forward(&self, field: &Constitution, words: &mut Words, ticks: &[Tick<'c>], k: usize, kept: bool, stored: bool, keep_last: bool, logits: bool, returning: bool, pr: u64, sites: usize, pairs: usize, regions: usize) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m2, f, n, heads) = (d.width, 2 * d.complex(), d.contacts, d.modes, d.heads);
