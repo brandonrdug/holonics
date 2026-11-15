@@ -90,6 +90,20 @@ and no biology.
   separating read was sent to the build thread at 21:37 UTC: hold a random half of the oracle's held set at 1/16 bit.
   Strain that is per site halves the rise; strain summed at the reader, quadratic in the shared sum, brings it near a
   quarter. Guess, fixed then: 0.25 to 0.40 of the full set's rise in every region.
+- **The read, scored** (the build thread, relayed 22:04 UTC: host, lap 38's end, the six sections, 982 s; the held set
+  split in two by a fixed mixing of site and tick). Compared places' code rise summed over the sections, bits, the whole
+  set and its halves: code 1,287.9, halves 0.325 and 0.274 of it; web 414.9, 0.285 and 0.291; science 557.9, 0.178 and
+  0.260; books 261.0, 0.315 and 0.181; wikidata 220.9, 0.244 and 0.318. Eight of ten halves stand inside the guess and
+  two fall below it; none comes near a half. Write the rise as `D + X`, `D` each step's own curvature and `X` the cross
+  terms: a random half costs `D/2 + X/4`, so the halves sum to `D + X/2` and `X = 2(1 − Σ halves)`. With sums of 0.44 to
+  0.60, `X` is 0.80 to 1.12 of the rise and `D` −0.12 to 0.20. The cost is strain at shared readers, nearly whole; halves
+  under a quarter put `D` near zero or below, a compounding past second order where many held moves meet one reader.
+  The locale holds the strain, as the lens says, and the held tick enters only as a carry at its readers.
+- **The carry's premise and guess** (sent 22:06 UTC). First the drop's rise holding only t0's held sites, only t1's and
+  only t2's, at 1/16 bit by region. Guess, fixed as a formula on that read: the carried forward (t0 and t1 carried one
+  tick, t2 dropped, a written site's t2 having no later reader) rises by at most the t2-only drop plus 0.3 of the t0-only
+  and t1-only drops, in every region, since a carry turns a reader's strain into a one-tick staleness on ticks that
+  contract by 0.46 to 0.6 a tick.
 
 ## 5. Twist, writhe and the level above
 

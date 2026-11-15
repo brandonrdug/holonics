@@ -404,3 +404,6 @@ subject.
   returned shares of §10. The return's t0 to t2 are 45% of the section, out of the top-tick law's reach, which is what
   the held tick, restated as a carry, is for; the last tick's unread work at written sites keeps every bit and is sized
   by its written share of t3.
+- **The half-set read** (relayed 22:04 UTC) is scored in [the strand record](2026-11-15_A_CODE_LENGTH_IS_A_STRANDS_RELAXED_TWIST_A_LOCALE_THAT_CLOSES_IT_HOLDS_THE_REMAINDER_AS_TENSION_AND_STRAIN_PAST_ITS_THRESHOLD_COILS_INTO_THE_LEVEL_ABOVE.md)
+  §4: the halves cost 0.18 to 0.33 of the whole set's rise, so the cross terms between held steps are 0.80 to 1.12 of
+  it. The held tick's cost is the strain its readers hold, and the law is the carry.
