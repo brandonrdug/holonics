@@ -1,0 +1,17 @@
+CARRIED_SECTION n=1 regions=175 sites=39505 ms=208709
+CARRIED_SECTION n=2 regions=189 sites=41402 ms=370598
+CARRIED_SECTION n=3 regions=178 sites=39425 ms=552232
+CARRIED_SECTION n=4 regions=199 sites=41488 ms=736868
+CARRIED_SECTION n=5 regions=162 sites=37220 ms=961114
+CARRIED_SECTION n=6 regions=192 sites=41389 ms=1146766
+CARRIED slice=code sigma=2^-6 compared=30989 rise_nats_a_compared dropped=0.00674 carried=0.00380 carried_over_dropped=0.563
+CARRIED slice=code sigma=2^-4 compared=30989 rise_nats_a_compared dropped=0.02881 carried=0.01199 carried_over_dropped=0.416
+CARRIED slice=web sigma=2^-6 compared=17900 rise_nats_a_compared dropped=0.00173 carried=0.00102 carried_over_dropped=0.592
+CARRIED slice=web sigma=2^-4 compared=17900 rise_nats_a_compared dropped=0.01607 carried=0.00653 carried_over_dropped=0.406
+CARRIED slice=science sigma=2^-6 compared=15644 rise_nats_a_compared dropped=0.00529 carried=0.00287 carried_over_dropped=0.543
+CARRIED slice=science sigma=2^-4 compared=15644 rise_nats_a_compared dropped=0.02472 carried=0.00942 carried_over_dropped=0.381
+CARRIED slice=books sigma=2^-6 compared=10349 rise_nats_a_compared dropped=0.00249 carried=0.00167 carried_over_dropped=0.672
+CARRIED slice=books sigma=2^-4 compared=10349 rise_nats_a_compared dropped=0.01748 carried=0.00768 carried_over_dropped=0.439
+CARRIED slice=wikidata sigma=2^-6 compared=5622 rise_nats_a_compared dropped=0.00250 carried=0.00228 carried_over_dropped=0.911
+CARRIED slice=wikidata sigma=2^-4 compared=5622 rise_nats_a_compared dropped=0.02724 carried=0.01791 carried_over_dropped=0.658
+CARRIED_DONE sections=6 regions=1095 ms=1146766

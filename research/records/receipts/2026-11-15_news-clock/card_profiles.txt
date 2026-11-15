@@ -1,0 +1,20 @@
+TICK_PROFILE total_kernel_ms=3797 tagged_ms=3211 untagged_ms=586
+TICK_PROFILE dir=forward tick=0 ms=240 share=0.063 top field_contact_l5:90 field_exposure:26 field_affine_tiled_x32:21 field_chart:20 field_pair_scan:15 field_skin_fill:13
+TICK_PROFILE dir=forward tick=1 ms=244 share=0.064 top field_contact_l5:93 field_exposure:25 field_affine_tiled_x32:23 field_chart:19 field_pair_scan:15 field_skin_fill:13
+TICK_PROFILE dir=forward tick=2 ms=239 share=0.063 top field_contact_l5:91 field_exposure:26 field_affine_tiled_x32:21 field_chart:20 field_pair_scan:15 field_skin_fill:14
+TICK_PROFILE dir=forward tick=3 ms=236 share=0.062 top field_contact_l5:88 field_exposure:25 field_affine_tiled_x32:22 field_chart:20 field_pair_scan:15 field_skin_fill:13
+TICK_PROFILE dir=return tick=0 ms=407 share=0.107 top field_contact_rows:93 field_contact_columns:89 field_pace_skin_back:54 field_outer_x32:28 field_transposed:28 field_pair_scan_back:18
+TICK_PROFILE dir=return tick=1 ms=557 share=0.147 top field_contact_rows:92 field_contact_columns:89 field_pace_skin_back:56 field_transposed:39 field_blank_bias_enc:30 field_outer_x32:27
+TICK_PROFILE dir=return tick=2 ms=740 share=0.195 top field_contact_rows:115 field_contact_columns:109 field_pace_skin_back:69 field_transposed:61 field_outer_x32:54 field_blank_bias_enc:30
+TICK_PROFILE dir=return tick=3 ms=549 share=0.144 top field_contact_rows:90 field_contact_columns:82 field_pace_skin_back:52 field_transposed:37 field_blank_bias_enc:31 field_outer_x32:26
+LIMBS_PROFILE build=ctl kernel_ms_a_section=670.3 624.5
+LIMBS_ENTRY build=ctl entry=field_contact_columns launches=2304 ms=1557 us_a_launch=676 | launches=2304 ms=1446 us_a_launch=627
+LIMBS_ENTRY build=ctl entry=field_contact_l5 launches=574 ms=1591 us_a_launch=2772 | launches=574 ms=1491 us_a_launch=2597
+LIMBS_ENTRY build=ctl entry=field_contact_l6 launches=2 ms=5 us_a_launch=2875 | launches=2 ms=6 us_a_launch=3120
+LIMBS_ENTRY build=ctl entry=field_contact_rows launches=2304 ms=1596 us_a_launch=693 | launches=2304 ms=1590 us_a_launch=690
+LIMBS_PROFILE build=nw kernel_ms_a_section=633.6 630.9
+LIMBS_ENTRY build=nw entry=field_contact_columns launches=2304 ms=1469 us_a_launch=637 | launches=2304 ms=1469 us_a_launch=637
+LIMBS_ENTRY build=nw entry=field_contact_l3 launches=192 ms=66 us_a_launch=347 | launches=192 ms=67 us_a_launch=350
+LIMBS_ENTRY build=nw entry=field_contact_l4 launches=380 ms=1289 us_a_launch=3394 | launches=380 ms=1277 us_a_launch=3362
+LIMBS_ENTRY build=nw entry=field_contact_l5 launches=4 ms=17 us_a_launch=4291 | launches=4 ms=15 us_a_launch=3983
+LIMBS_ENTRY build=nw entry=field_contact_rows launches=2304 ms=1597 us_a_launch=693 | launches=2304 ms=1589 us_a_launch=690

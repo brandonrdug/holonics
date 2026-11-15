@@ -1,0 +1,56 @@
+SIGMA_PLACES mean=100508 end=100508 both=100508
+SIGMA region=books fifth=q1 places=4005 code_bits_mean=0.0082 dev_bits_median=0.00202 dev_bits_mean=0.00432 dev_q90=0.01062
+SIGMA region=books fifth=q2 places=4006 code_bits_mean=0.0540 dev_bits_median=0.01378 dev_bits_mean=0.02935 dev_q90=0.06664
+SIGMA region=books fifth=q3 places=4005 code_bits_mean=0.3153 dev_bits_median=0.08693 dev_bits_mean=0.13472 dev_q90=0.29795
+SIGMA region=books fifth=q4 places=4006 code_bits_mean=1.2604 dev_bits_median=0.23703 dev_bits_mean=0.32254 dev_q90=0.71840
+SIGMA region=books fifth=q5 places=4006 code_bits_mean=4.4163 dev_bits_median=0.38569 dev_bits_mean=0.49710 dev_q90=1.05321
+SIGMA region=books all places=20028 dev_bits_median=0.06130 dev_bits_mean=0.19762
+SIGMA region=code fifth=q1 places=4024 code_bits_mean=0.0005 dev_bits_median=0.00018 dev_bits_mean=0.00037 dev_q90=0.00089
+SIGMA region=code fifth=q2 places=4025 code_bits_mean=0.0046 dev_bits_median=0.00147 dev_bits_mean=0.00290 dev_q90=0.00661
+SIGMA region=code fifth=q3 places=4025 code_bits_mean=0.0310 dev_bits_median=0.00952 dev_bits_mean=0.01933 dev_q90=0.04531
+SIGMA region=code fifth=q4 places=4025 code_bits_mean=0.3081 dev_bits_median=0.07217 dev_bits_mean=0.12828 dev_q90=0.30563
+SIGMA region=code fifth=q5 places=4025 code_bits_mean=3.3425 dev_bits_median=0.35829 dev_bits_mean=0.47882 dev_q90=1.06265
+SIGMA region=code all places=20124 dev_bits_median=0.00889 dev_bits_mean=0.12595
+SIGMA region=science fifth=q1 places=4017 code_bits_mean=0.0052 dev_bits_median=0.00156 dev_bits_mean=0.00376 dev_q90=0.00986
+SIGMA region=science fifth=q2 places=4018 code_bits_mean=0.0353 dev_bits_median=0.00970 dev_bits_mean=0.01812 dev_q90=0.04164
+SIGMA region=science fifth=q3 places=4017 code_bits_mean=0.1541 dev_bits_median=0.04246 dev_bits_mean=0.06890 dev_q90=0.15638
+SIGMA region=science fifth=q4 places=4018 code_bits_mean=0.7997 dev_bits_median=0.16436 dev_bits_mean=0.24113 dev_q90=0.53903
+SIGMA region=science fifth=q5 places=4018 code_bits_mean=4.2320 dev_bits_median=0.33745 dev_bits_mean=0.46483 dev_q90=1.03030
+SIGMA region=science all places=20088 dev_bits_median=0.03630 dev_bits_mean=0.15936
+SIGMA region=web fifth=q1 places=4008 code_bits_mean=0.0054 dev_bits_median=0.00144 dev_bits_mean=0.00320 dev_q90=0.00808
+SIGMA region=web fifth=q2 places=4009 code_bits_mean=0.0388 dev_bits_median=0.01006 dev_bits_mean=0.01963 dev_q90=0.04383
+SIGMA region=web fifth=q3 places=4008 code_bits_mean=0.2072 dev_bits_median=0.05280 dev_bits_mean=0.08594 dev_q90=0.19831
+SIGMA region=web fifth=q4 places=4009 code_bits_mean=1.1151 dev_bits_median=0.20818 dev_bits_mean=0.29391 dev_q90=0.64323
+SIGMA region=web fifth=q5 places=4009 code_bits_mean=4.9217 dev_bits_median=0.34850 dev_bits_mean=0.47713 dev_q90=1.04870
+SIGMA region=web all places=20043 dev_bits_median=0.04276 dev_bits_mean=0.17598
+SIGMA region=wikidata fifth=q1 places=4045 code_bits_mean=0.0092 dev_bits_median=0.00217 dev_bits_mean=0.00596 dev_q90=0.01585
+SIGMA region=wikidata fifth=q2 places=4045 code_bits_mean=0.0747 dev_bits_median=0.02796 dev_bits_mean=0.04192 dev_q90=0.09269
+SIGMA region=wikidata fifth=q3 places=4045 code_bits_mean=0.3472 dev_bits_median=0.10093 dev_bits_mean=0.14582 dev_q90=0.32077
+SIGMA region=wikidata fifth=q4 places=4045 code_bits_mean=1.6837 dev_bits_median=0.25196 dev_bits_mean=0.33169 dev_q90=0.71186
+SIGMA region=wikidata fifth=q5 places=4045 code_bits_mean=5.3670 dev_bits_median=0.35355 dev_bits_mean=0.46596 dev_q90=1.00915
+SIGMA region=wikidata all places=20225 dev_bits_median=0.07329 dev_bits_mean=0.19827
+NEWS_CLOCK sigma_bits=0.01562 region=books returned_share=0.902 places=20028
+NEWS_CLOCK sigma_bits=0.01562 region=code returned_share=0.659 places=20124
+NEWS_CLOCK sigma_bits=0.01562 region=science returned_share=0.867 places=20088
+NEWS_CLOCK sigma_bits=0.01562 region=web returned_share=0.870 places=20043
+NEWS_CLOCK sigma_bits=0.01562 region=wikidata returned_share=0.901 places=20225
+NEWS_CLOCK sigma_bits=0.03125 region=books returned_share=0.840 places=20028
+NEWS_CLOCK sigma_bits=0.03125 region=code returned_share=0.588 places=20124
+NEWS_CLOCK sigma_bits=0.03125 region=science returned_share=0.806 places=20088
+NEWS_CLOCK sigma_bits=0.03125 region=web returned_share=0.808 places=20043
+NEWS_CLOCK sigma_bits=0.03125 region=wikidata returned_share=0.857 places=20225
+NEWS_CLOCK sigma_bits=0.06250 region=books returned_share=0.768 places=20028
+NEWS_CLOCK sigma_bits=0.06250 region=code returned_share=0.514 places=20124
+NEWS_CLOCK sigma_bits=0.06250 region=science returned_share=0.729 places=20088
+NEWS_CLOCK sigma_bits=0.06250 region=web returned_share=0.738 places=20043
+NEWS_CLOCK sigma_bits=0.06250 region=wikidata returned_share=0.803 places=20225
+NEWS_CLOCK sigma_bits=0.12500 region=books returned_share=0.700 places=20028
+NEWS_CLOCK sigma_bits=0.12500 region=code returned_share=0.446 places=20124
+NEWS_CLOCK sigma_bits=0.12500 region=science returned_share=0.643 places=20088
+NEWS_CLOCK sigma_bits=0.12500 region=web returned_share=0.660 places=20043
+NEWS_CLOCK sigma_bits=0.12500 region=wikidata returned_share=0.732 places=20225
+NEWS_CLOCK sigma_bits=0.25000 region=books returned_share=0.627 places=20028
+NEWS_CLOCK sigma_bits=0.25000 region=code returned_share=0.383 places=20124
+NEWS_CLOCK sigma_bits=0.25000 region=science returned_share=0.552 places=20088
+NEWS_CLOCK sigma_bits=0.25000 region=web returned_share=0.579 places=20043
+NEWS_CLOCK sigma_bits=0.25000 region=wikidata returned_share=0.652 places=20225

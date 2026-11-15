@@ -1,0 +1,36 @@
+places 100508 stretches 514 gaps 0
+REGION books places 19931 spearman loud~own_code -0.177 loud~prev_code -0.159 loud~prev_loud +0.386
+  own_q1 prev_q1=19.960(1542) prev_q2=19.942(956) prev_q3=19.863(764) prev_q4=19.810(482) prev_q5=19.798(242)
+  own_q2 prev_q1=19.893(1101) prev_q2=19.847(963) prev_q3=19.822(887) prev_q4=19.809(648) prev_q5=19.798(387)
+  own_q3 prev_q1=19.834(642) prev_q2=19.846(949) prev_q3=19.818(986) prev_q4=19.822(804) prev_q5=19.809(605)
+  own_q4 prev_q1=19.811(383) prev_q2=19.795(638) prev_q3=19.823(821) prev_q4=19.831(1061) prev_q5=19.807(1083)
+  own_q5 prev_q1=19.798(318) prev_q2=19.800(480) prev_q3=19.804(528) prev_q4=19.804(991) prev_q5=19.799(1670)
+  pieces(>=40) 65 places 5094 loud_var_total 0.0405 within_piece_share 0.522  within-piece spearman loud~prev_code weighted -0.046
+REGION code places 20017 spearman loud~own_code -0.046 loud~prev_code -0.025 loud~prev_loud +0.536
+  own_q1 prev_q1=19.544(2215) prev_q2=19.487(1103) prev_q3=19.495(407) prev_q4=19.480(197) prev_q5=19.412(79)
+  own_q2 prev_q1=19.504(1063) prev_q2=19.509(1213) prev_q3=19.483(941) prev_q4=19.489(540) prev_q5=19.456(248)
+  own_q3 prev_q1=19.487(406) prev_q2=19.480(937) prev_q3=19.521(1258) prev_q4=19.507(935) prev_q5=19.474(468)
+  own_q4 prev_q1=19.415(230) prev_q2=19.454(473) prev_q3=19.496(907) prev_q4=19.513(1304) prev_q5=19.476(1089)
+  own_q5 prev_q1=19.357(88) prev_q2=19.399(278) prev_q3=19.462(491) prev_q4=19.484(1027) prev_q5=19.486(2120)
+  pieces(>=40) 37 places 4194 loud_var_total 0.0335 within_piece_share 0.581  within-piece spearman loud~prev_code weighted +0.121
+REGION science places 19990 spearman loud~own_code -0.169 loud~prev_code -0.173 loud~prev_loud +0.555
+  own_q1 prev_q1=19.731(1965) prev_q2=19.755(991) prev_q3=19.695(604) prev_q4=19.674(303) prev_q5=19.617(134)
+  own_q2 prev_q1=19.730(1005) prev_q2=19.712(1091) prev_q3=19.714(889) prev_q4=19.689(685) prev_q5=19.640(328)
+  own_q3 prev_q1=19.687(586) prev_q2=19.699(871) prev_q3=19.626(1142) prev_q4=19.660(895) prev_q5=19.613(504)
+  own_q4 prev_q1=19.642(331) prev_q2=19.694(655) prev_q3=19.662(872) prev_q4=19.653(1129) prev_q5=19.622(1011)
+  own_q5 prev_q1=19.659(110) prev_q2=19.674(390) prev_q3=19.643(491) prev_q4=19.624(986) prev_q5=19.593(2022)
+  pieces(>=40) 58 places 4373 loud_var_total 0.0612 within_piece_share 0.434  within-piece spearman loud~prev_code weighted +0.058
+REGION web places 19939 spearman loud~own_code -0.127 loud~prev_code -0.123 loud~prev_loud +0.674
+  own_q1 prev_q1=19.689(1971) prev_q2=19.640(989) prev_q3=19.664(550) prev_q4=19.634(340) prev_q5=19.533(137)
+  own_q2 prev_q1=19.656(959) prev_q2=19.624(1145) prev_q3=19.609(922) prev_q4=19.596(645) prev_q5=19.563(317)
+  own_q3 prev_q1=19.616(592) prev_q2=19.612(917) prev_q3=19.618(1062) prev_q4=19.603(861) prev_q5=19.514(556)
+  own_q4 prev_q1=19.573(307) prev_q2=19.611(555) prev_q3=19.602(903) prev_q4=19.615(1171) prev_q5=19.553(1052)
+  own_q5 prev_q1=19.502(158) prev_q2=19.560(382) prev_q3=19.556(551) prev_q4=19.566(971) prev_q5=19.535(1926)
+  pieces(>=40) 30 places 2530 loud_var_total 0.0740 within_piece_share 0.318  within-piece spearman loud~prev_code weighted +0.062
+REGION wikidata places 20117 spearman loud~own_code +0.271 loud~prev_code +0.258 loud~prev_loud +0.655
+  own_q1 prev_q1=19.473(1719) prev_q2=19.429(941) prev_q3=19.409(742) prev_q4=19.412(359) prev_q5=19.387(261)
+  own_q2 prev_q1=19.428(1336) prev_q2=19.487(1232) prev_q3=19.560(848) prev_q4=19.526(415) prev_q5=19.514(193)
+  own_q3 prev_q1=19.442(515) prev_q2=19.493(1230) prev_q3=19.560(1080) prev_q4=19.577(751) prev_q5=19.591(448)
+  own_q4 prev_q1=19.487(309) prev_q2=19.498(425) prev_q3=19.539(816) prev_q4=19.597(1232) prev_q5=19.632(1241)
+  own_q5 prev_q1=19.464(144) prev_q2=19.505(195) prev_q3=19.571(538) prev_q4=19.578(1266) prev_q5=19.648(1881)
+  pieces(>=40) 36 places 5315 loud_var_total 0.0518 within_piece_share 0.532  within-piece spearman loud~prev_code weighted +0.677
