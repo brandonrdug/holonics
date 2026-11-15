@@ -791,12 +791,7 @@ impl<'c> CardField<'c> {
         if d.junction {
             return Err(TowerError::Refused("the junction's return has no card realization yet (the host's is the reference)"));
         }
-        // [Brandon, November 15 02:06Z] The face that reads its sites' loudness is built on the host first; refused here until its card realization
-        // passes its parity, so no card pass reads it as the built face.
-        if d.loud {
-            return Err(TowerError::Refused("the face's loudness has no card realization yet (the host's is the reference)"));
-        }
-                // [measurement; G161] The read's mirror at uniform strength is a host reading only.
+        // [measurement; G161] The read's mirror at uniform strength is a host reading only.
         if field.mirror_strength.is_some() {
             return Err(TowerError::Refused("the read's mirror at uniform strength is a host reading, with no card realization"));
         }
@@ -1684,7 +1679,23 @@ impl<'c> CardField<'c> {
         let lift = self.timed(Kind::Alloc, || self.take::<i64>(sites * dw)).map_err(device)?;
         let lift_bias = field.layout().lift_bias as u64;
         self.affine("field_affine_x32", words, words.read, lift_bias, words.rread, dw, dw, fread.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
-        {
+        // [Brandon, November 15 02:06Z] Where the face reads its sites' loudness (the host's `Field::loud_beta` and `Field::tied_sharp`): each open
+        // site's sharpness from the face's lanes' powers, then the face at it, the plain face kept for the return.
+        let loud = if field.declaration.loud {
+            let lanes = field.declaration.lanes;
+            let beta = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+            let lambda = self.timed(Kind::Alloc, || self.take::<i64>((sites * lanes).max(1))).map_err(device)?;
+            let plain = self.timed(Kind::Alloc, || self.take::<i64>((sites * a).max(1))).map_err(device)?;
+            let (mut sp, mut at, mut bp, mut lp) = (fscale.device_ptr(), field.layout().loud as u64, beta.device_ptr(), lambda.device_ptr());
+            self.launch("field_loud_beta", Self::cells(t64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut at), arg(&mut bp), arg(&mut lp)])?;
+            Some((beta, lambda, plain))
+        } else {
+            None
+        };
+        if let Some((beta, _, plain)) = loud.as_ref() {
+            let (mut enc, mut cb, mut yp, mut bp, mut zp, mut vp) = (words.enc, words.read_bias, lift.device_ptr(), beta.device_ptr(), z.device_ptr(), plain.device_ptr());
+            self.launch("field_tied_face_sharp", Self::cells(t64 * a as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut bp), arg(&mut zp), arg(&mut vp)])?;
+        } else {
             let (mut enc, mut cb, mut yp, mut zp) = (words.enc, words.read_bias, lift.device_ptr(), z.device_ptr());
             self.launch("field_tied_face", Self::cells(t64 * a as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
         }
@@ -1748,7 +1759,7 @@ impl<'c> CardField<'c> {
                     }
                 }
             }
-            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb), early_clocks)?;
+            self.reverse(field, words, &ticks, (&clocks, base_clock), g, &fread, &fscale, &lift, &masses, &totals, &classes, &unresolved, &site_pos, &mix_off, &mix_class, &mix_share, &site_weight, &ported, sites, pairs, tower.as_deref_mut().zip(tb), early_clocks, loud.as_ref().map(|(b, l, v)| (&**b, &**l, &**v)))?;
             if let Some(cov) = self.row_cov.borrow_mut().take() {
                 let span = 2 * n;
                 let mut out = self.row_out.borrow_mut();

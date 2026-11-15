@@ -207,6 +207,50 @@ mod tests {
         }
     }
 
+    /// [measurement; Brandon, November 15 02:06Z] **The loud face on the card reads the host's bits** (needs the card): a field of
+    /// `declaration(32, 4, 32)` grown by two carry circles and a second lane, whose face reads its sites' loudness
+    /// ([`holonics_engine::field::FieldLearner::with_loud`]), its readout and current moved off zero from a keyed stream's tail and the loudness's
+    /// `κ` and `b` off the founding, read and returned on regions of 2, 3, 5, 64 and 257 sites through the host and through the card: every face,
+    /// every logit and every covector entry equal, the loudness's covector nonzero, and the lanes' powers by stage equal.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_loud_face_on_the_card_reads_the_hosts_bits() {
+        use holonics_engine::field::FieldLearner;
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Field::found(declaration(32, 4, 32), &keys).unwrap();
+        let mut field = FieldLearner::new(founded, 12).with_carry(2, &keys).unwrap().laned(&keys).unwrap().with_loud().unwrap().field;
+        let d = field.declaration;
+        let (l, dw, f, m2) = (field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+        assert!(d.loud && d.lanes == 2);
+        let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw).map(|i| (i, 14)).chain((l.out..l.out + dw * m2).map(|i| (i, 14))).chain((l.w..l.w + dw * f).map(|i| (i, 14))).collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &(i, shift)) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        for k in 0..d.lanes {
+            field.theta[l.loud + k] = (1 << 13) - ((k as i32) << 11);
+        }
+        field.theta[l.loud + d.lanes] = -(1 << 12);
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = CardField::open(&card).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+        assert_eq!(host_faces, card_faces, "the loud faces");
+        let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
+        assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (loud at {})", unequal.len(), unequal.first(), l.loud);
+        assert!(host_g[l.loud..l.loud + d.lanes + 1].iter().all(|&v| v != 0), "the loudness takes a covector");
+        assert_eq!(holonics_engine::field::HostField.read_logits(&field, &regions).unwrap(), card_field.read_logits(&field, &regions).unwrap(), "the loud logits");
+        let (card_sf, card_scales) = card_field.read_tick_scales(&field, &regions).unwrap();
+        let (host_sf, host_scales) = holonics_engine::field::HostField.read_tick_scales(&field, &regions).unwrap();
+        assert!(card_sf == host_sf && card_scales == host_scales, "the lanes' powers by stage");
+        println!("LOUD_PARITY covector_entries={} loud_covector={:?} faces_equal=1 covector_equal=1", card_g.len(), &card_g[l.loud..l.loud + d.lanes + 1]);
+    }
+
     /// [measurement; theory, November 12; the triad record §4] **The triads on the card read the host's bits** (needs the card): a field of
     /// `declaration(32, 4, 32)` grown by two carry circles and sixteen triads ([`holonics_engine::field::FieldLearner::with_triads`]), its
     /// readout, current and pair returns, `W_T` and the triads' chart biases moved off zero from a keyed stream's tail (so the faces have a

@@ -312,7 +312,7 @@ impl<'c> CardField<'c> {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>) -> Result<()> {
+    pub(crate) fn reverse(&self, field: &Field, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>, loud: Option<(&CardBuffer<'c, i128>, &CardBuffer<'c, i64>, &CardBuffer<'c, i64>)>) -> Result<()> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
@@ -343,11 +343,24 @@ impl<'c> CardField<'c> {
             self.launch("field_face_set", Self::cells(count * a as u64), THREADS, &mut [arg(words), arg(&mut atp), arg(&mut rp), arg(&mut count), arg(&mut dzp)])?;
         }
         self.outer(words, g, words.read_bias, a, 0, dz.device_ptr(), a, 0, 0, false, true)?;
+        // [Brandon, November 15 02:06Z] Through a loud face's sharpness (the host's `Field::loud_return`): `δv = rel(β δz, 16)` takes `δz`'s place
+        // in the encoding's and the lift's covectors, `κ` and `b` take theirs, and the radial part is the base the chart's adjoint adds to.
+        let (sharp_dz, radial) = match loud {
+            Some((beta, lambda, plain)) => {
+                let dzv = alloc64(sites * a)?;
+                let radial = alloc64(sites * dw)?;
+                let (mut at, mut dzp, mut vp, mut bp, mut lp, mut sp, mut rp, mut gp, mut dvp, mut radp) = (field.layout().loud as u64, dz.device_ptr(), plain.device_ptr(), beta.device_ptr(), lambda.device_ptr(), fscale.device_ptr(), fread.device_ptr(), g.device_ptr(), dzv.device_ptr(), radial.device_ptr());
+                self.launch("field_loud_back", Self::cells(sites as u64), THREADS, &mut [arg(words), arg(&mut at), arg(&mut dzp), arg(&mut vp), arg(&mut bp), arg(&mut lp), arg(&mut sp), arg(&mut rp), arg(&mut gp), arg(&mut dvp), arg(&mut radp)])?;
+                (Some(dzv), Some(radial))
+            }
+            None => (None, None),
+        };
+        let dz_face = sharp_dz.as_ref().map_or(dz.device_ptr(), |b| b.device_ptr());
         // Through the encoding (§16.26, the host's `returned_with`): `δE(a)_i += Σ_t rel(δz_a y_i, 16)`, `δy = rel(Σ_a δz_a E(a), 16)`,
         // then the lift's own return.
         let dyl = alloc64(sites * dw)?;
         {
-            let (mut gp, mut enc, mut dzp, mut yp, mut dyp) = (g.device_ptr(), words.enc, dz.device_ptr(), lift.device_ptr(), dyl.device_ptr());
+            let (mut gp, mut enc, mut dzp, mut yp, mut dyp) = (g.device_ptr(), words.enc, dz_face, lift.device_ptr(), dyl.device_ptr());
             let tiles = (sites as u64).div_ceil(64);
             self.launch("field_tied_back_e", Self::cells(a as u64 * dw as u64 * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut dzp), arg(&mut yp)])?;
             let mut enc = words.enc;
@@ -357,7 +370,7 @@ impl<'c> CardField<'c> {
         self.outer(words, g, lift_bias, dw, 0, dyl.device_ptr(), dw, 0, 0, false, true)?;
         self.outer(words, g, words.read, dw, dw, dyl.device_ptr(), dw, fread.device_ptr(), dw, false, true)?;
         self.transposed(words, words.read, dw, dw, dyl.device_ptr(), dw, dr.device_ptr(), false, true)?;
-        self.ratio_adjoint(words, fread.device_ptr(), fscale.device_ptr(), dr.device_ptr(), 0, dx.device_ptr(), true)?;
+        self.ratio_adjoint(words, fread.device_ptr(), fscale.device_ptr(), dr.device_ptr(), radial.as_ref().map_or(0, |b| b.device_ptr()), dx.device_ptr(), true)?;
         // A tower's packets' reverse buffers, beside the fine field's.
         let cback = match (tower.as_mut(), field.scale.as_deref()) {
             (Some((tr, tb)), Some(s)) => Some(self.back_buffers(&s.coarse, &mut tr.cwords, tb.st.sites, tb.st.pairs, None)?),

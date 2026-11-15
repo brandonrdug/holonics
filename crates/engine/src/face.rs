@@ -32,6 +32,20 @@ impl Field {
         Ok(BlankRead { read: r, scale: s, lift: y, face: self.tempered(&z, 1) })
     }
 
+    /// [Brandon, November 15 02:06Z] **The readout's face of a state** `x_t`: [`Field::face_of`]'s face with the sharpness a loud face reads from
+    /// the state's lanes' powers ([`Field::loud_beta`]); the same face on a field whose face does not read its sites' loudness. The readings of a
+    /// place's code at its opening read it (a blank's clock keeps `face_of`).
+    pub(crate) fn readout_face(&self, x: &[i64], reaches: &Reaches) -> Result<TowerFace> {
+        let read = self.face_of(x, reaches)?;
+        if !self.declaration.loud {
+            return Ok(read.face);
+        }
+        let mut z = vec![0i64; self.declaration.alphabet];
+        let beta = self.loud_beta(&read.scale)?.map(|(b, _)| b);
+        self.tied_sharp(&read.lift, beta, &mut z)?;
+        Ok(self.tempered(&z, 1))
+    }
+
     /// Each unresolved site's face over the region (`None` at a resolved site).
     pub fn faces(&self, region: &Region) -> Result<Vec<Option<TowerFace>>> {
         Ok(self.pass(region, false)?.faces)

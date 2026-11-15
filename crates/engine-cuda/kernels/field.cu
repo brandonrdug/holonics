@@ -3903,6 +3903,106 @@ extern "C" __global__ void field_tied_back_e(FieldWords w, wide *g, uint64_t enc
     }
 }
 
+// [definition; Brandon, November 15 02:06Z] The face's loudness (the host's `FieldDeclaration::loud`, `Field::loud_beta`, `Field::tied_sharp`,
+// `Field::loud_return`). `log2` of a power on the face's grain, as the host's `log2_grain` (`log2_face` by repeated squaring, `UNIT_BITS = 62`):
+// a mantissa under `2^63` squares under `2^126`, inside `uwide`.
+__device__ __forceinline__ wide loud_log2_face(uwide p, unsigned digits) {
+    const uint32_t width = wide_bits((wide)p);
+    const wide whole = (wide)width - 1 - 62;
+    uwide mantissa = p << (62 + 1 - width);
+    wide fraction = 0;
+    for (unsigned k = 0; k < digits; k++) {
+        mantissa = (mantissa * mantissa) >> 62;
+        fraction <<= 1;
+        if (mantissa >= ((uwide)2 << 62)) {
+            fraction |= 1;
+            mantissa >>= 1;
+        }
+    }
+    return (whole << digits) + fraction;
+}
+
+__device__ __forceinline__ int64_t loud_log2_grain(wide s) {
+    const uwide n = s < 1 ? (uwide)1 : (uwide)s;
+    const wide whole = (wide)wide_bits((wide)n) - 1;
+    const uwide p = n << (61 - whole);
+    return (int64_t)(loud_log2_face(p, 16) + ((whole + 1) << 16));
+}
+
+// Each open site's sharpness from its lanes' powers: `λ_ℓ = log2_grain(s_ℓ)`, `β = 2^16 + rel(Σ_ℓ κ_ℓ λ_ℓ, 16) + b`, `κ_ℓ` and `b` at `loud`.
+extern "C" __global__ void field_loud_beta(FieldWords w, const wide *scale, uint64_t loud, wide *beta, int64_t *lambda) {
+    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
+        if (!w.unresolved[t]) {
+            continue;
+        }
+        wide sum = 0;
+        for (uint32_t l = 0; l < w.lanes; l++) {
+            const int64_t lam = loud_log2_grain(scale[t * w.lanes + l]);
+            lambda[t * w.lanes + l] = lam;
+            sum += (wide)w.theta[loud + l] * (wide)lam;
+        }
+        beta[t] = ((wide)1 << 16) + rel(sum, 16) + (wide)w.theta[loud + w.lanes];
+    }
+}
+
+// The readout's face at its sharpness: `v = rel(⟨E(a), y⟩, 16)` kept in `v`, `z(a) = rel(β v, 16) + c_a` at an open site.
+extern "C" __global__ void field_tied_face_sharp(FieldWords w, uint64_t enc, uint64_t bias, const int64_t *y, const wide *beta, int64_t *z, int64_t *v) {
+    const uint64_t cells = (uint64_t)w.T * w.A;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.A, a = c % w.A;
+        if (!w.unresolved[t]) {
+            continue;
+        }
+        const int32_t *row = w.theta + enc + a * w.D;
+        const int64_t *yt = y + t * w.D;
+        wide sum = 0;
+        for (uint32_t i = 0; i < w.D; i++) {
+            sum += (wide)row[i] * (wide)yt[i];
+        }
+        const wide plain = rel(sum, 16);
+        v[c] = fit64(plain, w.status);
+        z[c] = fit64(rel(beta[t] * plain, 16) + (wide)w.theta[bias + a], w.status);
+    }
+}
+
+// The return through the sharpness at an open site: `δβ = rel(Σ_a δz_a v_a, 16)`; `δv_a = rel(β δz_a, 16)` into `dzv` (the encoding's and
+// the lift's covectors read it in `δz`'s place); `δκ_ℓ = rel(δβ λ_ℓ, 16)` and `δb = δβ` into `g`; and `δλ_ℓ = rel(δβ κ_ℓ, 16)` returned
+// radially into the state, `radial_i = (δλ_ℓ r̂_i 2^30) / (W s_ℓ ln 2)`, the base the chart's adjoint adds to. One thread a site; every site's
+// radial row written (zero where closed or where the lane has no power).
+extern "C" __global__ void field_loud_back(FieldWords w, uint64_t loud, const int64_t *dz, const int64_t *v, const wide *beta, const int64_t *lambda, const wide *scale, const int32_t *read, wide *g, int64_t *dzv, int64_t *radial) {
+    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const uint32_t lw = w.D / w.lanes;
+    for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
+        for (uint32_t i = 0; i < w.D; i++) {
+            radial[t * w.D + i] = 0;
+        }
+        if (!w.unresolved[t]) {
+            continue;
+        }
+        wide sum = 0;
+        for (uint32_t a = 0; a < w.A; a++) {
+            sum += (wide)dz[t * w.A + a] * (wide)v[t * w.A + a];
+        }
+        const wide dbeta = rel(sum, 16);
+        for (uint32_t a = 0; a < w.A; a++) {
+            dzv[t * w.A + a] = fit64(rel(beta[t] * (wide)dz[t * w.A + a], 16), w.status);
+        }
+        for (uint32_t l = 0; l < w.lanes; l++) {
+            add_wide(g + loud + l, rel(dbeta * (wide)lambda[t * w.lanes + l], 16));
+            const wide s = scale[t * w.lanes + l];
+            if (s == 0) {
+                continue;
+            }
+            const wide dlam = rel(dbeta * (wide)w.theta[loud + l], 16);
+            const wide den = (wide)lw * s * ln2;
+            for (uint32_t i = l * lw; i < (l + 1) * lw; i++) {
+                radial[t * w.D + i] = fit64(div_nearest((dlam * (wide)read[t * w.D + i]) << 30, den), w.status);
+            }
+        }
+        add_wide(g + loud + w.lanes, dbeta);
+    }
+}
+
 // [definition; agent-inferred, November 3, §16.24] A port's places take their coupling's covector, read on the host
 // (`port_reading`): row `k` of `rows` written over the face covector of site `at[k]`.
 extern "C" __global__ void field_face_set(FieldWords w, const uint32_t *at, const int64_t *rows, uint64_t count, int64_t *dz) {
