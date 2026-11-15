@@ -273,8 +273,9 @@ fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Res
         Some("found-lane") => athena::store::found_lane(args),
         Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
+        Some("own-states") => athena::store::own_states(args),
         Some("write-store") => athena::store::write(args, realization),
-        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud or next-pass".into()),
+        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud, next-pass or own-states".into()),
     }
 }
 
