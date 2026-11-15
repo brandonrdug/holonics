@@ -1,4 +1,13 @@
-//! The engine's realization (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The port a realization implements.**
+//!
+//! a region batch's faces and the covector over a section's regions, bit for bit the host's (`Host`); a realization that cannot
+//! read a region refuses, never substitutes
+//!
+//! Kind: a schedule of the phases, no law of its own. Kernels: the card's `Resident` (`hnn/resident.rs`).
+//! Lean: none.
+//! Atlas: `tower.field-card-realization`, `tower.field-completion-covector`, `tower.field-deposit`, `tower.field-echo`,
+//! `tower.field-open-row-pairs`, `tower.field-step-price`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

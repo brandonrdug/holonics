@@ -1,4 +1,14 @@
-//! The engine's carry (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The strand: the pair, the carry circle, the junction and the triad.**
+//!
+//! the pair `x_t ← x_t + W_c(a_t · b_(s(t))) + b_c`; the carry circle `Q_t = κ_t b_t + γ_t Q_(t∓1)`, `γ = γ̂(q)/(1 + d)`,
+//! `κ = N₀ d/(1 + d)`; the triad's products along the strand
+//!
+//! Kind: gate a site, then chain along the strand. Kernels: `field_pair`, `field_pair_gamma`, `field_carry_gates_read`, `field_pair_scan`,
+//! `field_triad` (`hnn/carry.rs`, `hnn/contact.rs`).
+//! Lean: `HNN/CarryGate`, `HNN/TriadGauge`.
+//! Atlas: `contact.carried-product`, `tower.field-carry-leak-runs`.
+//! Records: `2026-11-11_RAISED_RATES_BUY…`, `2026-11-12_THE_FRICTION_A_REGION_SETS…`. The derivations' history is in the records; the items below
+//! keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

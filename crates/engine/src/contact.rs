@@ -1,4 +1,16 @@
-//! The engine's contact (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The contact and the tick.**
+//!
+//! `z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m²|k̃_jm|²/2] − ⌊log₂|i−j|⌋`, `e_ij = 2^(z_ij)` over the support `S_i^h`;
+//! `y_i = conj(U_i) ⊙ Σ e_ij D ṽ_j / Σ e_ij`, released once; `x ← x + O y + b_o` a tick
+//!
+//! Kind: gate (the lock) then sum over the sources; sum over the ticks. Kernels: `field_chart`, `field_affine_two_*`, `field_unit*`, `field_frame*`,
+//! `field_classes`, `field_sums`, `field_row_currents`, `field_held_rows`, `field_mark_shares`, `field_spread` (`hnn/contact.rs`).
+//! Lean: `HNN/Contact`, `HNN/ContactBreak`, `HNN/TickBlocks`, `HNN/TickFamily`.
+//! Atlas: `contact.triad-manley-rowe-gauge`, `hnn.field-energy-opening-words`, `tower.field-growth-by-lanes`, `tower.field-matching-lock`,
+//! `tower.field-one-region`, `tower.field-open-row-pairs`, `tower.field-reach-on-clock`, `tower.field-read-free-fall`,
+//! `tower.field-site-power-unread`, `tower.field-temperature-log`, `tower.field-tick-running-mean`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-01_THE_FIELD_DISPERSES…`. The derivations' history is in the records; the items below
+//! keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

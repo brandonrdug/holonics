@@ -1,4 +1,13 @@
-//! The engine's navigator (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **Rings, clocks and paces: the navigators' phase.**
+//!
+//! a turned ring set's phasor `U_(t,m) = e^(2πi (t mod n_m)/n_m)` on the solenoid's periods; a still set `U = 1`; a skin
+//! `D_m(d) = e^(−2πd/n_m)`; paced heads turn by located increments
+//!
+//! Kind: gate, a site. Kernels: `field_paces`, `field_skin_addresses`, `field_pframes`, `field_clock_fill`, `field_blank_*` (`hnn/clock.rs`).
+//! Lean: `HNN/Ring`, `HNN/RingLoci`.
+//! Atlas: `radix.face-width-from-readers`, `tower.field-one-region`, `tower.field-pace`, `tower.field-ring-face-route`,
+//! `tower.field-temperature-log`.
+//! Records: `2026-11-01_THE_FIELD_DISPERSES…`. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

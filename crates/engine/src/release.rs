@@ -1,4 +1,14 @@
-//! The engine's release (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **Reading until agreement, and writing.**
+//!
+//! the writer opens every answer place beside the known prompt and resolves them by octaves of distance from it, one place a
+//! read, each drawn from its face on the region as it stands; its refine passes reread each place with every other standing
+//!
+//! Kind: chain over the reads. Kernels: the forward's kernels, one read a place.
+//! Lean: `HNN/ReleaseRun`.
+//! Atlas: `hnn.field-residual-half-rank`, `tower.field-exchange-walk`, `tower.field-reach-census`, `tower.field-redraw`, `tower.field-ring-census`,
+//! `tower.field-ring-tilt`, `tower.field-settle`, `tower.field-state-charge`, `tower.field-write-by-the-training-clock`.
+//! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-13_THE_FIELD_RINGS…`, `2026-11-14_THE_MARK_IS…`. The derivations' history is in the
+//! records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

@@ -1,4 +1,13 @@
-//! The engine's ruler (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **Readings no law consumes.**
+//!
+//! a ruler measures the machine on a saved state or beside a run: it changes neither what the state carries nor what the
+//! deposit consumes
+//!
+//! Kind: readings. Kernels: `field_yard_*` and readings' gathers (`hnn/profile.rs`).
+//! Lean: none.
+//! Atlas: `tower.field-card-realization`, `tower.field-carried-founding`, `tower.field-echo`, `tower.field-reaction-mirror`,
+//! `tower.field-read-free-fall`, `tower.field-redraw`, `tower.field-state-charge`, `tower.field-tick-return`.
+//! Records: THE_ENGINE §3. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;

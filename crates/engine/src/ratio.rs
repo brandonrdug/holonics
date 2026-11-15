@@ -1,4 +1,12 @@
-//! The engine's ratio (C5 of #603: cut from `field.rs` by object, each item's text as it stood but for its visibility).
+//! **The Ratio: the undivided pair and its one release.**
+//!
+//! step `(M, J) ← (γM + m, γJ + mc)`; compose `(γ₂,m₂,j₂)∘(γ₁,m₁,j₁) = (γ₂γ₁, γ₂m₁ + m₂, γ₂j₁ + j₂)`; release `y = J/M` once,
+//! at the receiver; a row's exponential faces `2^z` on `2^(−62)`, its shares on `2^(−63)`
+//!
+//! Kind: the one move (THE_ENGINE §2): a sum at `γ = 1`, a chain at `γ ≠ 1`. Kernels: `field_exponential`, `field_series_check` (`hnn/contact.rs`).
+//! Lean: `Computation/AttentionModeCompression` (`weighted_summary_associative`).
+//! Atlas: `tower.field-one-region`.
+//! Records: THE_CONSOLIDATION §2. The derivations' history is in the records; the items below keep their reasons.
 
 #[allow(unused_imports)]
 use crate::field::*;
