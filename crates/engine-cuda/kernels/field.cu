@@ -1112,6 +1112,11 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
 // words are staged, a longer walk spends no extra reading, and the bench read 64 × 128 sums at 87 millionths of a second a launch with a
 // walk of 256 (160 blocks) against 178 at 64 and 189 at 1,024, and 128 × 128 sums at 124 with 512 against 292 at 64 and 192 at 1,024.
 #define OUTER_WALK 64
+// [realization; November 15] The sites a thread of the open places' per-entry sums walks (`field_blank_bias_enc`, `field_blank_lift_read`,
+// `field_tied_back_e`): 512, where 64 added each entry's partial atomically once every 64 sites (some ten million 128-bit adds a launch of
+// the encoding's 31,476 entries). Each term is released before it enters the sum, so the walk changes no bit.
+#define BLANK_TILE 512
+
 
 __device__ __forceinline__ uint64_t warp_max64(uint64_t v) {
     for (int o = 16; o > 0; o >>= 1) {
@@ -4036,12 +4041,12 @@ extern "C" __global__ void field_face_weigh(FieldWords w, const uint64_t *wm, co
 // bits). One thread an entry and a tile of `OUTER_TILE` sites, as `outer`.
 extern "C" __global__ void field_tied_back_e(FieldWords w, wide *g, uint64_t enc, const int64_t *dz, const int64_t *y) {
     const uint64_t entries = (uint64_t)w.A * w.D;
-    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t a = entry / w.D, i = entry % w.D;
-        const uint64_t from = tile * 64;
-        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        const uint64_t from = tile * BLANK_TILE;
+        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
         wide sum = 0;
         for (uint64_t t = from; t < to; t++) {
             if (!w.unresolved[t]) {
@@ -5205,12 +5210,12 @@ extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(Fi
 // `δE(b)_i += Σ_t rel(δz_b y_i, 46)` over the silent sites, one thread an entry and a tile of 64 sites.
 extern "C" __global__ void field_blank_bias_enc(FieldWords w, wide *g, uint64_t enc, uint64_t bias, const wide *dz, const int64_t *y) {
     const uint64_t entries = (uint64_t)w.A * (w.D + 1);
-    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t b = entry / (w.D + 1), i = entry % (w.D + 1);
-        const uint64_t from = tile * 64;
-        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        const uint64_t from = tile * BLANK_TILE;
+        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
         wide sum = 0;
         for (uint64_t t = from; t < to; t++) {
             const wide d = dz[t * w.A + b];
@@ -5250,12 +5255,12 @@ extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide
 // `δR_(i,j) += Σ_t rel(δy_i r̂_j, 16)`, one thread an entry and a tile of 64 sites.
 extern "C" __global__ void field_blank_lift_read(FieldWords w, wide *g, uint64_t read, uint64_t bias, const int64_t *dy, const int32_t *r) {
     const uint64_t entries = (uint64_t)w.D * (w.D + 1);
-    const uint64_t tiles = ((uint64_t)w.T + 63) / 64;
+    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t i = entry / (w.D + 1), j = entry % (w.D + 1);
-        const uint64_t from = tile * 64;
-        const uint64_t to = from + 64 < w.T ? from + 64 : w.T;
+        const uint64_t from = tile * BLANK_TILE;
+        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
         wide sum = 0;
         for (uint64_t t = from; t < to; t++) {
             const int64_t d = dy[t * w.D + i];

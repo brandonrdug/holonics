@@ -365,7 +365,7 @@ impl<'c> Resident<'c> {
         let dyl = alloc64(sites * dw)?;
         {
             let (mut gp, mut enc, mut dzp, mut yp, mut dyp) = (g.device_ptr(), words.enc, dz_face, lift.device_ptr(), dyl.device_ptr());
-            let tiles = (sites as u64).div_ceil(64);
+            let tiles = (sites as u64).div_ceil(BLANK_TILE);
             self.launch("field_tied_back_e", Self::cells(a as u64 * dw as u64 * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut dzp), arg(&mut yp)])?;
             let mut enc = words.enc;
             self.launch("field_tied_back_y_tiled", Self::map_grid(dw, sites), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
