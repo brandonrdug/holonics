@@ -278,3 +278,28 @@ Six rows enter:
 - `floor.wideband-bit-energy` (`information.tsv`): energy a bit against breadth, its floor `kT ln 2`.
 
 The receipts directory holds the ruler and its output.
+
+## 11. The first readings of T6 and T7, and what they read
+
+`tree` for the readings (the build thread's host rulers `open_rows` and `open_crowds` on `claude/open-rows`, the line's lap 35
+mean, its next training sections; relayed November 15, 18:50 and 19:01 UTC); `agent-inferred` for the reading of them.
+- **T6 held its structural prediction.** Open rows put 96 to 98% of their mass far on still heads and 79 to 97% on paced
+  ones. Still heads peak at every octave: at the code slice's last tick, octaves 5 to 8 each carry 0.10 to 0.27 of a row's
+  mass, a Rényi-2 count of 2 to 6 sources and a peak of 0.41 to 0.62 of the octave. Paced heads spread with distance: on
+  head 2, Rényi-2 counts of 3.6, 7.0, 13.6, 28, 52 and 66 at octaves 3 to 8, peaks falling from 0.52 to 0.09. Most far mass
+  lies outside a row's probed classes, except on still head 0 (0.28 to 0.51 inside).
+- **The guess on T7 missed.** At `ε = 1/16` bit, with the band and beside it each crowd's floor (the max less the min of its
+  members' own locks, which no band can pass under), the pair terms after splitting stood at 1.000 of before on still
+  heads, 0.876 to 0.993 on paced head 2 and 0.997 to 1.000 on paced head 3. The floor allowed 0.83 to 0.99, and whole crowds
+  admitted at octave 6 and up were 1.6 to 5%. The guess had paced pair terms falling by over half.
+- **What the miss reads.** A floor above `ε` is selection, not blur: a paced head's lock still picks among the members of
+  a place octave, so a Rényi count of tens is a spread of distinct shares, never an even one. A place octave is the right
+  coordinate for the falloff and the skin and the wrong one for the lock. A crowd must be tight in every coordinate its
+  score depends on (dual-tree kernel sums group sources by the kernel's own variable, Gray and Moore 2001), so a grouping
+  that can pass is by word within an octave. Its floor for one receiver is the fewest intervals of width `ε/T` that cover
+  its members' locks. If that stays near the member count, the far field carries about `log₂ N` bits of selection an octave,
+  and its pairs are its information, so the lever returns to the realization. `ε` itself had no reason. The theory's reason
+  is the field's own temperature: a member's lock jitters across the deposit's standing spread, between lap end and lap
+  mean, and a misweighting under that jitter is one the line already pays. A share error reaches the code only through its
+  covariance with the members' arriving values, which the band bounds as if aligned. All three are readings with no
+  forward, relayed to the build thread at 19:05 UTC.
