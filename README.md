@@ -235,16 +235,16 @@ Failures are published with the same care as results.
   gauge work.
 
 **Code**
-- **The engine**, the machine that trains, is today a chain through both crates; start here to
-  read it. Its law is [`crates/holonics/src/hnn/tower/field.rs`](crates/holonics/src/hnn/tower/field.rs),
-  whose opening text states its equations. Its card realization is
-  [`crates/holonics-cuda/src/hnn/field.rs`](crates/holonics-cuda/src/hnn/field.rs) with
-  [`kernels/field.cu`](crates/holonics-cuda/kernels/field.cu). Its commands (`train-store`,
-  `read-store`, `write-store`) are in
-  [`store_train.rs`](crates/holonics/examples/solenoidal_alpha/complete_language/store_train.rs),
-  run through [`field_pass.rs`](crates/holonics-cuda/examples/field_pass.rs). The consolidation
-  moves this chain to `crates/engine`, `crates/engine-cuda` and `crates/athena`; each move updates
-  this entry.
+- **The engine**, the machine that trains, stands in three crates; start here to read it. Its law
+  is [`crates/engine`](crates/engine) (package `holonics-engine`), whose
+  [`field.rs`](crates/engine/src/field.rs) states its equations and re-exports its modules, cut by
+  object. Its card realization is [`crates/engine-cuda`](crates/engine-cuda) with
+  [`kernels/field.cu`](crates/engine-cuda/kernels/field.cu). Its commands are the binary `athena`
+  ([`crates/athena`](crates/athena)): `train-store`, `write-store`, `found-lane` and `next-pass`
+  in [`store.rs`](crates/athena/src/store.rs), the line's reading `read-cavity` in
+  [`ruler/cavity.rs`](crates/athena/src/ruler/cavity.rs), and the card's parity against the host
+  in [`parity.rs`](crates/athena/src/parity.rs). The consolidation (#603) moved it there; its
+  later steps update this entry.
 - [`crates/holonics`](crates/holonics) is the host library. Its modules are `holon`, `ratio`,
   `geometry`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `physics` and `hnn`.
 - [`crates/holonics-cuda`](crates/holonics-cuda) is the CUDA driver and the resident HNN.
