@@ -11,8 +11,8 @@ Owners touched: `prime.ostrowski-first-differing-clock`, `trace.place-ledger`, `
 `holarchy.crossing-join-schedule-free`, `receiver.refining-grain`, `contact.carried-product-group-size`,
 `rh.primes-primitive-cycles`, `rh.hand-cancellation-props`, `trace.hasse-bound`, `bsd.local-frame-sha`,
 `coupling.bsd-hodge-one-cokernel-species`, `rh.self-crossing-needs-a-ground`. Seven atlas rows enter and one
-is reworded (§11). The precision law's clause on parallel determinism, its echo in the placement rule, and
-THE_ENGINE §1 are reworded in the same change (§4.3).
+is reworded (§11). The precision law's clause on parallel determinism gains the quotient and the section, its echoes in the
+placement and lock rules are amended, and THE_ENGINE §1 is rewritten, in the same change (§4.3).
 
 Receipts: [`places_ruler.py`](2026-11-15_A_VALUE_IS_READ_AT_A_PLACE_A_SUM_IS_ORDERED_ONLY_WHERE_A_RELEASE_IS_A_SECTION_A_CENSUS_CONFIRMS_TO_ITS_OWN_SPREAD_AND_THREADS_RECONCILE_AT_THEIR_CONDITIONAL_INFORMATION_receipts/places_ruler.py),
 every check an assert, all pass, about 8 s on the cloud container's host (stand-in Python, integers and
@@ -115,12 +115,13 @@ spread of what was counted.
 
 ### 4.3 The guides
 
-The precision law said "integer series are the condition for parallel determinism", the placement rule said
-"integer series give the same bits on any partition", and THE_ENGINE §1 said "every sum is an integer sum, so
-… any partition of the card give[s] the same bits". Each now says what holds: every release inside a co-present
-reduction is a quotient, and every section stands once a term, before the sum or after it; a section inside an
-ordered chain fixes that chain's order as the law's. `holarchy.associative-schedule-contractible` is reworded
-the same way.
+The precision law said "integer series are the condition for parallel determinism". The build's #836
+(merged 16:33 UTC) rewrote it by the release's place: a sum is free of its schedule where its terms meet at one
+grain and nothing is released between them. This change adds the two kinds of release to that clause (a
+quotient may stand anywhere, a section once), amends the placement rule's reason ("integer series give the same
+bits on any partition") and the lock rule's ("every sum of the engine meets at one grain") to name the chains,
+and rewrites THE_ENGINE §1, which said that everything is integer and every sum is an integer sum.
+`holarchy.associative-schedule-contractible` is reworded the same way.
 
 ## 5. A register needs the range of its total
 
