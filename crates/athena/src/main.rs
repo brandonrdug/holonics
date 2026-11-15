@@ -268,7 +268,7 @@ fn reserve(args: &[String]) -> Result<()> {
 fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Result<()> {
     match args.first().map(String::as_str) {
         Some("train-store") => athena::store::train(args, realization),
-        Some("read-cavity") => athena::store::read_cavity(args, realization),
+        Some("read-cavity") => athena::ruler::cavity::read_cavity(args, realization),
         Some("found-lane") => athena::store::found_lane(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("write-store") => athena::store::write(args, realization),
