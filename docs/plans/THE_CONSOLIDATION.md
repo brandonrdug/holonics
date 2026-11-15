@@ -528,6 +528,16 @@ holds with the reads' lines.
   held at `8a77b7755`; gate 1 lost the six controls that ran them. The notebook's files stay as data
   (D7). `hnn::overture` lost its two consumers (the overture examples); it is joined to the engine
   or its state is written in #146 when `hnn/` retires.
+- C8c, read November 15: `crates/holonics` (about 306,000 lines) retired whole, held at `d5ed4adc1`. After C6 no path from
+  `athena` reached any module of it, and no open issue names one as a consumer (#404 names the lifted field, #76 the October
+  card's debts, #410 laws of `number`). D6's test, read on the atlas: 904 rows named a library owner; 7 entries the library
+  re-exported from the engine now name the engine, and 2,123 entries name their file at `d5ed4adc1`. 310 of the rows had no
+  Lean or live owner; their law stands in the row itself, a guide entry with its record, as D6 asks. THE_MACHINE's
+  twenty-two guards each have an end in its table (two hold on the engine as lints, thirteen as practice rules, seven retire
+  with their objects); C7's engine guide carries the table. Gate 1 lost the library's fourteen controls and its guard lints
+  and doctests, which now run on the engine. `tools/holonics_text_terrain.py` reads the Rust of `crates/*/src`. #404 and #76
+  take their state lines.
+- Owed after C8c: the tools no live script or guide calls (C8's last item), and `vendor/num-bigint`'s timing read.
 
 **C9. Position, order and data** (the cloud or the PC; text only).
 - `CONSTRUCTION_STATE.md` holds the position: each line that trains, its commit, its state, its

@@ -275,7 +275,7 @@ momentum learner; the loss angle of the learner's own line separates the three.
 
 ## 7. Where the machine already carries it
 
-`[interpretation; agent-inferred]` The moment tower ([`hnn::tower`](../../crates/holonics/src/hnn/tower.rs))
+`[interpretation; agent-inferred]` The moment tower ([`hnn::tower`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs))
 is a field of basins. Each mode `λ` is a pole of its level's response, one tick per byte; its
 passivity bound `|h| ≤ √((1 + |λ|)/(1 − |λ|)) max|Bx|` is the square root of the basin's peak
 residence; its deposit moves in the chart `(ln(1 − |λ|), arg λ)`, which is viscosity and turn; and

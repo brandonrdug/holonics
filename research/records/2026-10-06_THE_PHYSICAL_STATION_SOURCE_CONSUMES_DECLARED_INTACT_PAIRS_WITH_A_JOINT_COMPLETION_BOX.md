@@ -43,8 +43,8 @@ pair is invented. Those belong to the existing `ingest` operation.
 
 [source-derived sufficient admission] The unit station clock follows the existing selective
 law, not the observed intact classes. On an identity chart,
-[`Encoded::advance`](../../crates/holonics/src/hnn/encoding.rs) returns no located digits;
-[`Field::advance_of` and `step_class`](../../crates/holonics/src/hnn/field.rs) apply
+[`Encoded::advance`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/encoding.rs) returns no located digits;
+[`Field::advance_of` and `step_class`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/field.rs) apply
 `advance_h = [class fits h] + carry_h` and propagate the actual wraps. If no possible class
 fits any predecessor h<g, induction from ring zero gives zero advance and outgoing carry at
 every predecessor. If every possible class fits source g, its advance is exactly one. Thus

@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 # Gate 1 for any code change (CLAUDE.md, AGENTS.md): the workspace check, THE_MACHINE's guard lints
-# (no floats, no disallowed types or methods: guards 7 and 12) and the guards' doctests: every
-# library doctest, so the compile_fail constructions in `hnn` (guards 2, 3, 4, 10, 16, 18), on the
-# receiver's sealed families (guard 20, `receiver::population`), at the wave chain's producing
-# receiver, and at the notebook's exterior (guards 19, 21, 22, `exterior_guards`) all run. A guard
-# that is not run does not hold: the lint receipt had failed unnoticed since October 1 because gate
-# 1 was `cargo check` alone, and until October 5 the doctests outside `hnn` were filtered out. Run
-# from the repository root; CARGO_TARGET_DIR should be the worktree's own.
+# (no floats, no disallowed types or methods: guards 7 and 12) on the engine and on athena, and the engine's
+# doctests. A guard that is not run does not hold: the lint receipt had failed unnoticed since October 1
+# because gate 1 was `cargo check` alone. The October library's constructions (guards 2, 3, 10, 16, 18, 20
+# to 22 and their compile_fail doctests) retired with it in C8c of #603; THE_MACHINE's table gives each
+# guard's end. Run from the repository root; CARGO_TARGET_DIR should be the worktree's own.
 set -u -o pipefail
 status=0
 run() { local name=$1; shift; local start; start=$(date +%s%3N)
@@ -20,9 +18,9 @@ run check cargo check --workspace --all-targets
 run engine-host-tests cargo test -p holonics-engine --lib field -- --skip the_covector_matches_the_code_across_the_far_support
 # `--no-deps` lints exactly the named crates: since C6 the harness's dev-dependency on athena reaches the card crate, whose
 # yardsticks still owe their float lints, and clippy lints a workspace member it compiles as a dependency.
-run guard-lints cargo clippy -p holonics-engine -p holonics --all-targets --no-deps -- -D clippy::disallowed_types \
+run guard-lints cargo clippy -p holonics-engine --all-targets --no-deps -- -D clippy::disallowed_types \
   -D clippy::disallowed_methods -D clippy::float_arithmetic
-run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics-engine -p holonics --doc
+run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics-engine --doc
 # The commands (`crates/athena`, C6 of #603): the exterior, so files and processes are lawful there by the crate's own allow,
 # and the float guard runs (a reading's printed floats are allowed where they are written). `--no-deps`, because the card
 # crate's yardsticks still owe their float lints (THE_CONSOLIDATION, C3).
@@ -40,17 +38,4 @@ run run-watch-controls python3 tools/test_runs.py
 run reproduction-controls python3 tools/test_reproduction.py
 run live-set-controls python3 tools/test_live_set.py
 run measure-controls python3 tools/test_measure.py
-run projected-statistics-controls cargo test -p holonics --lib projected_statistics_tests
-run native-class-advance-controls cargo test -p holonics --lib class_advance_tests
-run native-gram-carry-conservation cargo test -p holonics --lib gram_carry_conservation_tests
-run finite-solenoidal-controls cargo test -p holonics --lib solenoid
-run rational-place-controls cargo test -p holonics --lib ratio::places::tests::
-run plural-coupling-controls cargo test -p holonics --lib receiver::coupling::tests::
-run grouped-tube-controls cargo test -p holonics --lib constitution::tube_tests
-run observed-tube-controls cargo test -p holonics --lib observed_tube_passage
-run source-refinement-controls cargo test -p holonics --lib source_refinement_tests
-run actual-source-alignment cargo test -p holonics --lib actual_source_face_reads
-run actual-ray-joint-controls cargo test -p holonics --lib actual_ray_
-run actual-factor-refusal cargo test -p holonics --lib nonlinear_material_and_finer_source
-run refined-source-native-restore cargo test -p holonics --lib refined_source_map_is_consumed
 exit $status

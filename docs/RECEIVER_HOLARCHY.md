@@ -219,7 +219,7 @@ remaining obstruction to a seam theorem is the absent spectral realization, not 
 [established-bounded; formal-checked] The atlas's other receivers are Lean owners: Hodge
 (`Foundation/HodgeReceiver`), rigidity (`Foundation/RigidityReceiver`), topology
 (`Foundation/TopologicalReceiver`), width and release (`Foundation/ReceiverRelease`, with
-[`holonics::receiver::release`](../crates/holonics/src/receiver/release.rs)), the separating atlas
+[`holonics::receiver::release`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/receiver/release.rs)), the separating atlas
 (`Foundation/ReceiverAtlas.Separates`), acoustic (`Foundation/AcousticReceiver`) and
 physicochemical (`Foundation/PhysicochemicalReceiver`). Their other Rust owners are in history at
 `13f8c734`.
@@ -228,7 +228,7 @@ physicochemical (`Foundation/PhysicochemicalReceiver`). Their other Rust owners 
 
 ## Width and release
 
-[definition] Release has one owner, [`holonics::receiver::release`](../crates/holonics/src/receiver/release.rs)
+[definition] Release has one owner, [`holonics::receiver::release`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/receiver/release.rs)
 (Lean `Foundation/ReceiverRelease`), whose module doc states the contract: every emission is a
 `ReleaseReturn` of one decision law, whose arms are the threshold commit, the certified draw, the
 probe and the typed refusal. [proved-derived; formal-checked] The certified draw is the law at

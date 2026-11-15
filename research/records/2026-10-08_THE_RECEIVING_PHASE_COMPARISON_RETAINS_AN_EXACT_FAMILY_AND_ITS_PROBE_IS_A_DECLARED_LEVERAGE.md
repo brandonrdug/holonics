@@ -171,7 +171,7 @@ memory window, and inference never imports the actual World's coefficients.
   deposit refuses.
 
 **The C1b-1 source** [definition; agent-inferred, October 9; native scoped checks passed at
-`0a7fa87a4`, [receipt](receipts/2026-10-09-world-model/PUBLICATION.md)]. The owner is [`hnn::physical::action::model`](../../crates/holonics/src/hnn/physical/action/model.rs),
+`0a7fa87a4`, [receipt](receipts/2026-10-09-world-model/PUBLICATION.md)]. The owner is [`hnn::physical::action::model`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/physical/action/model.rs),
 and the Resident retains it beside the bound World.
 - **Keys.** `ModelKey` declares a midpoint port Holon law with its wave admittances. Its charts at
   commit `t` are read on unit columns of the law's own `prepare_commit` and the World's Robin
@@ -197,7 +197,7 @@ and the Resident retains it beside the bound World.
   The image answers a declared word; the closed loop through the native source is C2's.
 - **Bits.** Every key state's values and cut, and the reached tick, are charged in the Resident's
   state bits at every step.
-- **The test source** ([`tests/world_model.rs`](../../crates/holonics/tests/world_model.rs)) checks
+- **The test source** ([`tests/world_model.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/tests/world_model.rs)) checks
   against:
   - the World's executed states;
   - the batch preimage pushed forward;

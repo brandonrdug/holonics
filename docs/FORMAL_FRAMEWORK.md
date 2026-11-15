@@ -490,7 +490,7 @@ physical interpretation requires it.
 [definition] Its `WorldTube` composes addressed membrane contact, constitutive current, outward
 restriction and returned difference. Its outward radical is relative to the specified receiver.
 A silent boundary can contain active interior current.
-[`holonics::holon::restriction::tube`](../crates/holonics/src/holon/restriction/tube.rs) supplies the continuing
+[`holonics::holon::restriction::tube`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/restriction/tube.rs) supplies the continuing
 tube's commuting squares, circuit holonomy and wormhole receipt in its declared executable scope;
 it is not the definition of all smooth physical tubes.
 

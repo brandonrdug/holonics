@@ -46,7 +46,7 @@ these interactions, and distributed coupling needs no device endpoint.
 κ,β and nonzero α. Its forces and curvature are explicit; its Hessian stays symmetric
 despite `V(−z)≠V(z)`. Directed active force and asymmetric receiving comparison have
 different laws and work. The native
-[propagation owner](../../crates/holonics/src/hnn/propagation.rs) presently consumes
+[propagation owner](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/propagation.rs) presently consumes
 quadratic contact storage, stiffness and dissipation. The nonlinear potential,
 changing geometry and incidence growth still need their actual native consumers.
 
@@ -54,7 +54,7 @@ changing geometry and incidence growth still need their actual native consumers.
 The source enters as phase-carried moments. An actual ratio comparison returns its
 covector through the operands that produced the motion, and certified deposition
 changes the reached constitution. The existing
-[continuation chain](../../crates/holonics/src/hnn/word/continuation.rs) carries a
+[continuation chain](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/word/continuation.rs) carries a
 contact-C change into the next propagation with momentum held. Pumps also supply
 declared time-dependent material. General coefficient/geometry adaptation must extend
 this same chain, including its work and adjoint. Existing
@@ -200,11 +200,11 @@ product outputs are outside the publication boundary. No unified physical theory
 is claimed.
 
 The central existing consumer is
-[`hnn/word/continuation.rs`](../../crates/holonics/src/hnn/word/continuation.rs):
+[`hnn/word/continuation.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/word/continuation.rs):
 `Word::open_source → compare_contact_storage → ContactCut::continue_deposited → Word::continuing`.
 The source, current, producing constitution, comparison, reached deposit, end change, pump phase
 and next clock are bound by the owner. The focused
-[`reference/continuation.rs`](../../crates/holonics/src/hnn/reference/continuation.rs) consumer
+[`reference/continuation.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/reference/continuation.rs) consumer
 changes contact **C**; K, D, coupling conductance, ring, pump and source/receiver declarations
 remain fixed in that example. A later propagation responds; the lattice counterpart retains
 changed solve remainders even when its next representative is unchanged. This is a real native
@@ -272,8 +272,8 @@ For the helical pair, preserve both navigators' initial configurations, clocks a
 dissipation implies zero slip only where the material is definite on that slip space.
 Owners: [helical guide](../HELICAL_GEOMETRY.md),
 [`Transport/HelicalPairInteraction`](../../lean/Holonics/Transport/HelicalPairInteraction.lean),
-[`geometry/screw.rs`](../../crates/holonics/src/geometry/screw.rs),
-[`holon/contact.rs`](../../crates/holonics/src/holon/contact.rs).
+[`geometry/screw.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs),
+[`holon/contact.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/contact.rs).
 
 ### Recharting changes components; deposition changes the law
 
@@ -462,7 +462,7 @@ phase interference keep their distinct receiving laws while those transforms int
 ## 3. Power, phase and the boundary passage
 
 [executable, source-inspected] The scalar torsional realization of
-[`hnn/propagation.rs`](../../crates/holonics/src/hnn/propagation.rs) has angle u, rate w,
+[`hnn/propagation.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/propagation.rs) has angle u, rate w,
 inertia C, torsion stiffness K, damping D, step h and two oppositely oriented wave ports of
 impedance `1/G_c`. For inputs a,b its midpoint law is
 

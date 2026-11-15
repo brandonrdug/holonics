@@ -353,7 +353,7 @@ corrected ones.
 
 The face law reads every section through one pair contact `W(x̄ ⊗ ȳ)`, `x̄ = (x, 1)`, and the
 mathematics thread approved its mode form for the tower. `hnn::tower` now carries it as a contact
-law ([`ContactLaw`](../../crates/holonics/src/hnn/tower.rs)):
+law ([`ContactLaw`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs)):
 
 ```text
 Pair         v = (W_a r̂ + b_a) ⊙ (W_b r̂ + b_b)
@@ -393,7 +393,7 @@ From the mathematics thread's cycles record (PR #426), the reading the pair cont
 
 ## Where the pair tower's bilinear weight sits
 
-`read-tower-pair` reads [`Tower::bilinear_rungs`](../../crates/holonics/src/hnn/tower.rs): each
+`read-tower-pair` reads [`Tower::bilinear_rungs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs): each
 level's two drives read back onto the modes' faces, `A = W_a [C_re, −C_im]` and `B = W_b [C_re,
 −C_im]`, and the bilinear block's weight on the founded memory rungs of the two modes,
 `E_(s,s′) = Σ_o (Σ_(k on s) |A_(o,k)|²)(Σ_(k′ on s′) |B_(o,k′)|²)`. The ladder has eight rungs,
@@ -2592,7 +2592,7 @@ The founding's 391 is an exterior read: a probe fitted on the training text read
 cell `U` is the units digit in at least 370 of 495, and its code there is below the same pass
 without the ring.
 
-**The join** [definition; agent-inferred] ([`RingFace`](../../crates/holonics/src/hnn/tower.rs)). The
+**The join** [definition; agent-inferred] ([`RingFace`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs)). The
 founded rank rides mode 41 of level 0 inside the forward step, carried by each stream beside its
 modes, and the tower's face reads it through its own readout, `z += V ρ`, with `V` opened at zero.
 It is placed after the level's move, not lifted into the level's input: the moves it rides are keyed
@@ -2701,7 +2701,7 @@ z_t += W (x̂_t ⊗ ρ_t)                  W: A × (d + 1)·2R, on the material'
 
 with `(d + 1)·2R = 130` channels at width 64 and one rank. Its covector reaches `W`, the ring's
 face (and through it the carried face and the move the ring rode) and the top face, each through
-its ratio ([`RingFace`](../../crates/holonics/src/hnn/tower.rs)); the covector tests read the
+its ratio ([`RingFace`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs)); the covector tests read the
 code's difference with `W` keyed away from zero. On the foil after its pass, with the same forms
 joined, the same readout reads 80: the pass had already taken the ring's units away.
 
@@ -2771,7 +2771,7 @@ them. The acceptance is unchanged: after one training pass, the tower's own top 
 units digit in at least 370 of 495, and its code there is below the same pass without the ring (the
 foil: 72 of 495, 3.267 bits a digit).
 
-**The factors as material** [definition; agent-inferred] ([`RingFace`](../../crates/holonics/src/hnn/tower.rs),
+**The factors as material** [definition; agent-inferred] ([`RingFace`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs),
 `factor_on_material`). Each founded factor joins the learned material scaled by `2^k`, so that its
 root mean square lies in `[2^24, 2^25)`, the material's unit, and its release moves by the same
 `k`. A rank is read as a ratio to its own power, so a factor's scale is a gauge, and on the

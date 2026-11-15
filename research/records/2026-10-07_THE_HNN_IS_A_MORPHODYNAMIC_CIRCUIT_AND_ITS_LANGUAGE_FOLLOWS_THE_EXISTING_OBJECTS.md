@@ -113,7 +113,7 @@ Read against main:
   unchanged on main, and the [guide](../../docs/ELEMENTARY_OBJECTS.md#the-morphodynamic-circuit)
   now states them. The constitution, moment, receiving, reference, ratio and port owners have
   changed since the pin, so the guide's map of them is a `3c67beee` reading.
-- A charted physical receiver, [`hnn::prediction::charted`](../../crates/holonics/src/hnn/prediction/charted.rs),
+- A charted physical receiver, [`hnn::prediction::charted`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/prediction/charted.rs),
   is a new consuming call. Four fixed-law fixtures were accepted at source `0da1652c`,
   an unpublished commit whose files the receipt pins by SHA-256 (the owner has changed since),
   ([scoped receipt](receipts/charted-physical-learning-20261006/integrated-source-v1/SCOPED_ACCEPTANCE.v1.json)),

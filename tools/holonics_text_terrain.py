@@ -1,5 +1,6 @@
 """Cut a terrain of the public Holonics text for the tower: four media heard together, the dated
-records' prose, the Framework's Lean, the main library's Rust and the terrain of interacting digits
+records' prose, the Framework's Lean, the engine's and commands' Rust (`crates/*/src`; the October library's until
+C8c of #603) and the terrain of interacting digits
 (`arithmetic_terrain.py`), so arithmetic is one section of what the tower hears and not its subject.
 
 Each text medium is its tracked files in path order (`git ls-files` at the checkout), read at a
@@ -31,7 +32,7 @@ import sys
 MEDIA = [
     ("prose", "research/records/*.md", lambda p: p.count("/") == 2),
     ("lean", "lean/Holonics/*.lean", lambda p: True),
-    ("rust", "crates/holonics/src/*.rs", lambda p: True),
+    ("rust", "crates/*/src/*.rs", lambda p: True),
 ]
 
 
