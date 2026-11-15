@@ -18,7 +18,9 @@ run check cargo check --workspace --all-targets
 # with the tests of a step that changes the engine: `cargo test -p holonics-engine --lib the_covector_matches_the_code_across_the_far_support`.
 # Since C3 the engine is its own crate (`crates/engine`), and the guard lints and doctests run on it too.
 run engine-host-tests cargo test -p holonics-engine --lib field -- --skip the_covector_matches_the_code_across_the_far_support
-run guard-lints cargo clippy -p holonics-engine -p holonics --all-targets -- -D clippy::disallowed_types \
+# `--no-deps` lints exactly the named crates: since C6 the harness's dev-dependency on athena reaches the card crate, whose
+# yardsticks still owe their float lints, and clippy lints a workspace member it compiles as a dependency.
+run guard-lints cargo clippy -p holonics-engine -p holonics --all-targets --no-deps -- -D clippy::disallowed_types \
   -D clippy::disallowed_methods -D clippy::float_arithmetic
 run guard-doctests env RUSTC_BOOTSTRAP=1 cargo test -p holonics-engine -p holonics --doc
 # The commands (`crates/athena`, C6 of #603): the exterior, so files and processes are lawful there by the crate's own allow,
