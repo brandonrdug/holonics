@@ -1,0 +1,28 @@
+# hold: lock taken 20:45:32
+# card empty 20:53:02
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# next_bin written 21:00:50
+# run1 ctl exit 0 elapsed_ms=15505
+# run2 ctl exit 0 elapsed_ms=15478
+# run3 nw exit 0 elapsed_ms=15398
+# run4 nw exit 0 elapsed_ms=15371
+# run5 ctl exit 0 elapsed_ms=15499
+# run6 ctl exit 0 elapsed_ms=15493
+# run7 nw exit 0 elapsed_ms=15751
+# run8 nw exit 0 elapsed_ms=15381
+# run9 ctl exit 0 elapsed_ms=15474
+# hold: released 21:03:14
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=632.6
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=631.8
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=628.3
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=627.3
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=633.0
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=632.5
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=643.5
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=627.8
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=631.7
