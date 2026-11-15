@@ -242,3 +242,19 @@ subject.
   class's forms was written. It shows after the unit: substitute a unit by a form the field's own face at its landmark
   ranks near it, and read the later places' faces (their summed divergence at distances 1 to 64) against a substitution of
   unlike rank. Indifference is the first decaying faster than the second.
+- **The ruler, read and scored** (the build thread, 20:47 UTC: the held passage, 100,508 places in 514 stretches each
+  scanned alone, every kept lap mean from 14 to 38). Sites a place at 8 bits, lap 38 (lap 14): books 0.0822 (0.0870),
+  code 0.0506 (0.0553), science 0.0708 (0.0756), web 0.0856 (0.0904), wikidata 0.1029 (0.1073), with bits a place 1.211,
+  0.737, 1.045, 1.258 and 1.496 (1.292, 0.802, 1.138, 1.324, 1.596). Against `S/σ` they stand at 0.542 to 0.550 in every
+  region at 8 bits, and at 0.52 to 0.55 at 4 and 16 bits: the guess of 0.6 to 0.9 missed low everywhere, and the premise
+  it missed was in `code.site-isolation-landmark`'s own form for news alike, `c̄/(2x + c̄)`, 0.47 here, which was not read
+  before the guess. From lap 33 to 38 the change was −1.1% (books), −0.4% (code), −0.1% (science), +0.2% (web) and +0.2%
+  (wikidata), inside a lap-to-lap spread near 1%, so that guess missed too. From lap 14 to 38 the units fell 5.5%, 8.5%,
+  6.3%, 5.3% and 4.1% as bits fell 6.3%, 8.1%, 8.2%, 5.0% and 6.3%.
+- **What it says.** A first-round site is the largest news within `σ` on either side; with `k ≈ 2σ/c̄` places in that span
+  it is a site with chance about `1/k`, so a first round holds one site per `2σ` of news, in every region and lap and at
+  every section many places wide, the bright tail adding the excess over one half. A level of these units then costs in
+  proportion to the news, and its lap accelerates as its bits fall. The early acceleration Brandon expects lies before lap
+  14, the oldest mean kept. Guess for the level, fixed at 20:52 UTC beside the tick ruler: the places whose written symbol
+  departs from the composite's prediction stand at 1.1 to 1.6 times one less the rank-1 share by region (lap 38: code
+  0.14, science 0.20, web 0.23, books 0.25), since the composite predicts from its landmark alone.
