@@ -1,6 +1,6 @@
 # The return runs on the clock of news, a held tick costs nothing either way, and a basin is as loud as its present drive
 
-November 15, 2026, 20:30 to 20:55 UTC. A derivation on two lenses, with a host ruler on made data. Nothing is built and
+November 15, 2026, 20:30 to 21:20 UTC. A derivation on two lenses, with a host ruler on made data. Nothing is built and
 nothing ran on a learner here; the line's readings quoted are the build thread's, relayed to the theory thread. Each
 paragraph carries its grade: `tree` (read in this repository or relayed from the build thread's receipts), `from training`
 (a result of the literature, named) or `agent-inferred` (this record's join).
@@ -271,3 +271,83 @@ subject.
   and 0.65 to 0.90 on the prose regions, and they carry at least 0.98 of the unit's news; at `σ′` = 8 bits they are 0.08
   to 0.20 of places and carry 0.4 to 0.7 of it; the held excess code stands under 0.003 nats a place at 1/16 bit in every
   region and above it at 8 bits.
+
+## 10. The news's standing spread is one logit temperature, so `σ` is read against the deposit, and a written site's ticks thin with depth
+
+`tree` for the build thread's reads (relayed 21:07 and 21:09 UTC); `agent-inferred` for the rest.
+- **`σ` read** (lap 38 on the held passage, `|c_end − c_mean|` a place, bits). Medians by region: books 0.061, code 0.009,
+  science 0.036, web 0.043, wikidata 0.073 (means 0.198, 0.126, 0.159, 0.176, 0.198). By fifth of surprise the spread is
+  about a quarter of the place's code through q1 to q3 (books q1: code 0.008, spread 0.002; q3: 0.315, 0.087) and
+  flattens at q5 near 0.34 to 0.39 bits for codes of 3.3 to 5.4 bits.
+- **What it says.** It is one logit temperature. A confident face has `c ≈ Σ_(k≠u) e^(z_k − z_u)`, so a jitter `δz` of
+  the logits moves its news by `δc ≈ c·δz`; an unconfident face has `c ≈ z_max − z_u + …` and `δc ≈ δz`. The low fifths
+  read `δc/c ≈ 0.25` and q5 reads `δc ≈ 0.24` to `0.27` nats: `δz ≈ 0.25` nats at every place. The standing spread is one
+  number in the face's own chart, the log-density, and no width of news lies inside it everywhere, since a dark place's
+  news is resolved to a quarter of itself. So the reason §6 gave `σ` (the news's own standing spread) does not fix it.
+- **`σ`'s reason, moved to the deposit.** The clock trades the deposit's bias for a variance (§5). Per dark stride its
+  error is at most `2√2·σ‖J‖` (the returned place's `‖w g‖₂ ≤ √2·σΔτ` and the stride's own `Σ‖g‖₂ ≤ √2·σ`, since
+  `‖g‖₂² ≤ 2(1 − p̂(u))² ≤ 2c²`), and there are about `S_dark/σ` dark strides, so the added covector variance is about
+  `8σ·S_dark` a place (`‖J‖²` aside) against the deposit's own, `Σ‖g‖²` a place, about 0.35 to 0.7 from the fifths of §2.
+  With `S_dark` the news a place of the fifths under `σ` (§2's table over five fifths):
+  - `σ` = 1/16 bit: `S_dark` 0.0048 (code), 0.0056 (science), 0.0062 (web), 0.0086 (books) nats a place; added 0.2 to
+    0.9% of the deposit's own variance (the relay's 0.3 to 0.6% took the denominator at its middle);
+  - `σ` = 1/4 bit: q3 turns dark on the prose regions, `S_dark` 0.027 to 0.052, added 5 to 20%; code stays near 2%;
+  - `σ` = 1 bit: comparable to the deposit's own.
+
+  The deposit's variance is its temperature (`deposition.rate-temperature-standing-spread`), so 1/16 bit raises the
+  field's temperature by under 1%, inside the lap-to-lap spread near 1% that every level read shows. That is `σ`'s reason
+  for the first lap, carried in the learner's state; 1/4 bit is read only after it. The denominator `Σ‖g‖²` by region is
+  the premise to print beside the lap.
+- **The returned share, scored** (`Δτ ≥ 1` on the held read). At 1/16 bit: code 0.514, books 0.768, science 0.729, web
+  0.738, wikidata 0.803. The guesses of §6 (0.45 to 0.60 on code, 0.65 to 0.85 on web, science and books) held, and
+  wikidata, which was not named, read inside the second range. At 1/64 bit: 0.659, 0.902, 0.867, 0.870, 0.901; at 1/4 bit: 0.383,
+  0.627, 0.552, 0.579, 0.652 (no guess was fixed at either).
+- **The tick ruler** (the build thread, host, lap 38's end state, the six sections the line trains next: 1,095 regions,
+  242,376 site-ticks a tick). For each site and tick `a = ⟨λ^(k+1), x^(k+1) − x^k⟩` on `2^(−40)` bits, the code's first-order
+  move were the site's tick held; written sites are the definite ones, open sites the compared. Shares of sites with
+  `|a| < σ`, and after the slash their share of `Σ|a|` where it was relayed:
+
+  | region | tick | 1/64 bit | 1/16 bit | 1/4 bit |
+  |---|---|---|---|---|
+  | code | t0 | 0.272 / 0.003 | 0.474 / 0.020 | 0.719 / 0.100 |
+  | code | t1 | 0.349 / 0.006 | 0.575 / 0.038 | 0.801 / 0.156 |
+  | code | t2 | 0.600 / 0.016 | 0.769 / 0.063 | 0.898 / 0.201 |
+  | web | t0 | 0.220 / 0.002 | 0.420 / 0.016 | 0.667 / 0.082 |
+  | web | t1 | 0.296 / 0.005 | 0.524 / 0.030 | 0.754 / 0.126 |
+  | web | t2 | 0.564 / 0.013 | 0.728 / 0.049 | 0.863 / 0.167 |
+  | science | t0, t1 | 0.222, 0.306 | 0.436, 0.543 | 0.696, 0.786 |
+  | science | t2 | 0.587 / 0.018 | 0.762 / 0.067 | 0.894 / 0.211 |
+  | books | t0, t1 | 0.276, 0.373 | 0.509, 0.617 | 0.739, 0.808 |
+  | books | t2 | 0.640 / 0.017 | 0.783 / 0.058 | 0.893 / 0.184 |
+  | wikidata | t0, t1 | 0.184, 0.263 | 0.394, 0.499 | 0.641, 0.737 |
+  | wikidata | t2 | 0.534 / 0.012 | 0.707 / 0.050 | 0.853 / 0.177 |
+
+  At t3 every written site reads `a = 0`. Open sites at 1/16 bit hold 0.07 to 0.21 of their ticks (code 0.113, 0.203,
+  0.164, 0.214 at t0 to t3; web 0.110, 0.188, 0.198, 0.195; science 0.104, 0.184, 0.170, 0.197; books 0.114, 0.178, 0.209,
+  0.153; wikidata 0.074, 0.157, 0.194, 0.160), carrying 0.005 to 0.014 of their move. Mean `|a|` a site: written 0.40 to
+  0.55 bits at t0, 0.24 to 0.33 at t1, 0.11 to 0.15 at t2; open 0.68 to 1.08 at t0 and 0.40 to 0.69 after.
+- **What it shows.** No guess on the lower ticks had been fixed (§4). The ticks contract: a written site's move falls by
+  about 0.6 and then 0.46 a tick, so its held share grows with depth and the held sites carry 2 to 7% of the move at 1/16
+  bit. Compared sites are the face's support and keep their ticks. So the held tick thins the forward through the context:
+  the indifference Brandon named at 20:26 UTC, a context site whose move no reader feels, read on the forward.
+- **The last tick at a written site.** `λ^(4) = 0` there because no face reads its final state: the adjoint says no
+  receiver reads it. An open site's pair contact at that tick reads its strand mate's chart and contact current, so a
+  written site whose mate is open still owes its last contact row and chart; only its own pair contact, `W_c` and its
+  triads are unread, and the whole tick where both mates are written. Skipping unread work keeps
+  every bit, so it is a realization, entered with parity and a guess on time alone (the build thread sizes it from the
+  profile by tick).
+- **What `a` does not settle.** It is first order in a whole step: holding moves a step from 1 to 0 and costs
+  `−a + ½h + …`, and a small `a` can be a large move orthogonal to `λ`. The forward also cannot read `a`, which is the
+  adjoint's. Two reads decide (host, lap 38's end, the six sections, forward only): the held forward (every written
+  site-tick with `|a| < σ` held, its code read by region at 1/64 and 1/16 bit, per written site and per compared place,
+  with `Σa/Σ|a|` by tick, all and held, beside); and the forward's own criterion (holding by the update in its readers'
+  metric, the slip bound's `‖Δx‖` through each reading contact, at the oracle's held share, with the `|a|` mass it holds
+  against the oracle's).
+- **Guesses, fixed at 21:16 UTC.**
+  - The deposit reaches a tick's scale, so the trained ticks stand near its stationary point: `|Σa|/Σ|a|` under 0.3 at
+    each written tick in every region, all and held.
+  - The held forward then rises under 0.002 bits a written site, summed over ticks, at 1/64 bit, and under 0.009 at 1/16
+    bit (the one-signed bounds from the table and the mean `|a|`: 0.004 to 0.006, and about 0.028).
+  - For streaming, on `MEAN.14` against `MEAN.38`: the held share at 1/16 bit rises 0.005 to 0.02 at each written tick
+    by region, from the printed slope (about 0.16 of share a unit of `ln σ`) times the fall in bits from lap 14 to 38
+    (5 to 8%), the move scaling with the news its readers carry.
