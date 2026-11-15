@@ -42,6 +42,96 @@ pub struct HeldRows {
     pub near_definite: u128,
 }
 
+/// [measurement; November 15, the theory thread's T6 (#841, `contact.crowd-slip-bound`)] **An open row's shares by where they lie**
+/// ([`Constitution::open_rows`]): at each tick and head (`[tick · heads + head]`), over a region's open receivers (not definite), the
+/// shares on `2^(−63)`, summed: `near` the near field's (`|i − j| < NEAR`), `crowd` the crowds' (none on an open row under the present law,
+/// §15.9), and the far sources' by octave `⌊log₂|i − j|⌋` (`OPEN_OCTAVES` bins, the last holding every farther source), each split by whether
+/// the source's class is one the receiver probes (its own probed class or a class it probes across its seams: `[octave][probed]`). For each
+/// row and octave with a far share it adds the Rényi-2 count of its far sources `(Σ p)² / Σ p²` on `2^(−8)` (a lower bound of `2^H`) and its
+/// largest share over their sum on `2^(−16)`, and counts the row. A reading: nothing in the law reads it.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct OpenRows {
+    pub rows: u64,
+    pub near: u128,
+    pub crowd: u128,
+    pub far: [[u128; 2]; OPEN_OCTAVES],
+    pub effective: [[u128; 2]; OPEN_OCTAVES],
+    pub peak: [[u128; 2]; OPEN_OCTAVES],
+    pub counted: [[u64; 2]; OPEN_OCTAVES],
+}
+
+/// The octaves of distance an [`OpenRows`] reading keeps apart (the last holds every farther source).
+pub const OPEN_OCTAVES: usize = 16;
+
+impl OpenRows {
+    /// The sum of two readings of the same cell.
+    pub fn add(&mut self, o: &Self) {
+        self.rows += o.rows;
+        self.near += o.near;
+        self.crowd += o.crowd;
+        for b in 0..OPEN_OCTAVES {
+            for k in 0..2 {
+                self.far[b][k] += o.far[b][k];
+                self.effective[b][k] += o.effective[b][k];
+                self.peak[b][k] += o.peak[b][k];
+                self.counted[b][k] += o.counted[b][k];
+            }
+        }
+    }
+}
+
+/// [measurement; November 15, T7 of the theory thread's #841, `contact.crowd-slip-bound`] **An open row's far pairs heard as crowds where a
+/// band admits them** ([`Constitution::open_crowds`]): at each tick and head (`[tick · heads + head]`), over a region's open receivers, each
+/// octave's crowd of definite sources on each side (`crowd_ranges`) tested by the band `B_C = Σ_r (max − min of q_r on I_r)`, `q_r(c) =
+/// 2^(g+1) a_r c − c²` the lock's real `r` (the receiver's framed probe `a`), `I_r` the hull of `{D_lo, D_hi} × {min_r, max_r}` over the
+/// crowd's members (their framed unit words and their skins), admitted as one source where `T B_C` on the face's grain stands at or under
+/// `ε = 2^(FACE_BITS − 4)` (a sixteenth of a bit), else split into its halves down to members. Beside it the same test on the members' own
+/// locks (`max − min` of their bases, the band's floor). By octave (`OPEN_OCTAVES` bins): the far pairs met, the terms after the band's
+/// split and after the locks' own, and the crowds admitted whole. A reading only.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct OpenCrowds {
+    pub rows: u64,
+    pub pairs: [u64; OPEN_OCTAVES],
+    pub band_terms: [u64; OPEN_OCTAVES],
+    pub lock_terms: [u64; OPEN_OCTAVES],
+    pub crowds: [u64; OPEN_OCTAVES],
+    pub band_whole: [u64; OPEN_OCTAVES],
+    pub lock_whole: [u64; OPEN_OCTAVES],
+    /// The terms the band's and the locks' splits leave at the wider tolerances of [`OPEN_TOLERANCES`] (`[tolerance][octave]`).
+    pub band_at: [[u64; OPEN_OCTAVES]; 3],
+    pub lock_at: [[u64; OPEN_OCTAVES]; 3],
+    /// [the theory thread, 19:03Z] The floor of any grouping of a crowd's members by their own locks, `N(ε)`: the fewest intervals of width
+    /// `ε` on the face's grain that cover the members' `z` (sorted, greedy), summed by octave, at a sixteenth of a bit and the three wider
+    /// tolerances (`[tolerance][octave]`).
+    pub cover: [[u64; OPEN_OCTAVES]; 4],
+}
+
+/// The wider tolerances an [`OpenCrowds`] reading reads beside its sixteenth of a bit, as shifts of the face's grain: a quarter of a bit,
+/// one bit and four bits.
+pub const OPEN_TOLERANCES: [u32; 3] = [FACE_BITS - 2, FACE_BITS, FACE_BITS + 2];
+
+impl OpenCrowds {
+    /// The sum of two readings of the same cell.
+    pub fn add(&mut self, o: &Self) {
+        self.rows += o.rows;
+        for b in 0..OPEN_OCTAVES {
+            self.pairs[b] += o.pairs[b];
+            self.band_terms[b] += o.band_terms[b];
+            self.lock_terms[b] += o.lock_terms[b];
+            self.crowds[b] += o.crowds[b];
+            self.band_whole[b] += o.band_whole[b];
+            self.lock_whole[b] += o.lock_whole[b];
+            for t in 0..3 {
+                self.band_at[t][b] += o.band_at[t][b];
+                self.lock_at[t][b] += o.lock_at[t][b];
+            }
+            for t in 0..4 {
+                self.cover[t][b] += o.cover[t][b];
+            }
+        }
+    }
+}
+
 /// [measurement; agent-inferred, November 4, §16.42] **A receiver's near field by offset** ([`Constitution::near_offsets`]): at
 /// each tick and head (`[tick · heads + head]`), the share on `2^(−63)` of the source `d` sites before the receiver
 /// (`before[d − 1]`) and `d` sites after it (`after[d − 1]`), `0 < d < NEAR`, zero where that source is not met; and the
@@ -243,6 +333,206 @@ impl Constitution {
         }
         let read = (pass.ticks.len().saturating_sub(1)).max(1) as u128;
         Ok(trips.iter().map(|by_h| by_h.iter().map(|t| t.iter().map(|&b| ((b + read / 2) / read) as u64).collect()).collect()).collect())
+    }
+
+    /// [measurement; November 15, T6 of #841] **An open row's shares by where they lie** ([`OpenRows`]), each tick and head of the region's
+    /// forward. A reading only.
+    pub fn open_rows(&self, region: &Region) -> Result<Vec<OpenRows>> {
+        let pass = self.pass(region, true)?;
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let heads = d.heads;
+        let mut out = vec![OpenRows::default(); d.ticks * heads];
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            for h in 0..heads {
+                let acc = &mut out[tick * heads + h];
+                let lists = &cell.classes[h];
+                for i in (0..sites).filter(|&i| !Self::definite(region, i)) {
+                    acc.rows += 1;
+                    let hi = h * sites + i;
+                    let (mut m, mut sq, mut pk) = ([[0u128; 2]; OPEN_OCTAVES], [[0u128; 2]; OPEN_OCTAVES], [[0u128; 2]; OPEN_OCTAVES]);
+                    for src in &cell.rows[hi] {
+                        let j = src.j as usize;
+                        let gap = i.abs_diff(j);
+                        let p = src.p as u128;
+                        if gap < NEAR {
+                            acc.near += p;
+                            continue;
+                        }
+                        let o = ((usize::BITS - 1 - gap.leading_zeros()) as usize).min(OPEN_OCTAVES - 1);
+                        let c = lists.class[j];
+                        let k = usize::from(c == lists.probe_class[i] || lists.probes[i].contains(&c));
+                        m[o][k] += p;
+                        sq[o][k] += (p * p) >> SHARE_BITS;
+                        pk[o][k] = pk[o][k].max(p);
+                    }
+                    acc.crowd += cell.crowds[hi].iter().map(|c| c.e as u128).sum::<u128>();
+                    for o in 0..OPEN_OCTAVES {
+                        for k in 0..2 {
+                            if m[o][k] == 0 {
+                                continue;
+                            }
+                            acc.far[o][k] += m[o][k];
+                            acc.counted[o][k] += 1;
+                            if sq[o][k] > 0 {
+                                acc.effective[o][k] += ((m[o][k] * m[o][k]) >> (SHARE_BITS - 8)) / sq[o][k];
+                            }
+                            acc.peak[o][k] += (pk[o][k] << 16) / m[o][k];
+                        }
+                    }
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [measurement; November 15, T7 of #841] **An open row's far pairs heard as crowds where a band admits them** ([`OpenCrowds`]), each tick
+    /// and head of the region's forward. A reading only.
+    pub fn open_crowds(&self, region: &Region) -> Result<Vec<OpenCrowds>> {
+        let pass = self.pass(region, true)?;
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let (heads, n) = (d.heads, d.modes);
+        let span = 2 * n;
+        let epsilon = 1i128 << (FACE_BITS - 4);
+        let mut out = vec![OpenCrowds::default(); d.ticks * heads];
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            let paces = pass.paces_at(cell);
+            for h in 0..heads {
+                let acc = &mut out[tick * heads + h];
+                for i in (0..sites).filter(|&i| !Self::definite(region, i)) {
+                    acc.rows += 1;
+                    let temper = self.temper(h, true)?;
+                    let a = &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span];
+                    // Each met source's base (the lock at unit gain), read once a row.
+                    let mut base_of = vec![0i128; sites];
+                    for src in &cell.rows[h * sites + i] {
+                        base_of[src.j as usize] = src.s as i128;
+                    }
+                    // A crowd's members tested whole: the band over their words and skins, and their own locks' spread, each on the face's
+                    // grain at the head's temper (`T · width ≤ ε`).
+                    let widths = |members: &[usize]| -> Result<(i128, i128)> {
+                        let mut band = 0i128;
+                        let (mut lo_base, mut hi_base) = (i128::MAX, i128::MIN);
+                        let mut grain = 0u32;
+                        for l in 0..n {
+                            let (mut dlo, mut dhi) = (i128::MAX, i128::MIN);
+                            let (mut wlo, mut whi) = ([i128::MAX; 2], [i128::MIN; 2]);
+                            for &j in members {
+                                let (dj, g) = self.pair_decay(paces, h, l, i, j);
+                                grain = g;
+                                dlo = dlo.min(dj);
+                                dhi = dhi.max(dj);
+                                let q = &cell.q[(h * sites + j) * span..(h * sites + j + 1) * span];
+                                for (r, x) in [q[l] as i128, q[n + l] as i128].into_iter().enumerate() {
+                                    wlo[r] = wlo[r].min(x);
+                                    whi[r] = whi[r].max(x);
+                                }
+                            }
+                            for (r, ar) in [a[l] as i128, a[n + l] as i128].into_iter().enumerate() {
+                                let ends = [dlo * wlo[r], dlo * whi[r], dhi * wlo[r], dhi * whi[r]];
+                                let (clo, chi) = (*ends.iter().min().expect("four ends"), *ends.iter().max().expect("four ends"));
+                                let q = |c: i128| (ar << (grain + 1)) * c - c * c;
+                                let top = q((ar << grain).clamp(clo, chi));
+                                let bottom = q(clo).min(q(chi));
+                                band += top - bottom;
+                            }
+                        }
+                        for &j in members {
+                            lo_base = lo_base.min(base_of[j]);
+                            hi_base = hi_base.max(base_of[j]);
+                        }
+                        let band_base = band >> (FACE_BITS + 2 * grain + 1);
+                        Ok((release(temper * band_base, MATERIAL_BITS), release(temper * (hi_base - lo_base), MATERIAL_BITS)))
+                    };
+                    let test_at = |members: &[usize], eps: i128| -> Result<(bool, bool)> {
+                        let (b, l) = widths(members)?;
+                        Ok((b <= eps, l <= eps))
+                    };
+                    let test = |members: &[usize]| test_at(members, epsilon);
+                    // The terms a crowd leaves under a test: one where it admits, else its two halves', down to members.
+                    fn terms(members: &[usize], which: usize, test: &dyn Fn(&[usize]) -> Result<(bool, bool)>) -> Result<u64> {
+                        if members.len() <= 1 {
+                            return Ok(members.len() as u64);
+                        }
+                        let ok = test(members)?;
+                        if if which == 0 { ok.0 } else { ok.1 } {
+                            return Ok(1);
+                        }
+                        let half = members.len() / 2;
+                        Ok(terms(&members[..half], which, test)? + terms(&members[half..], which, test)?)
+                    }
+                    for (lo, hi_, level) in crate::contact::crowd_ranges(i, sites) {
+                        let members: Vec<usize> = (lo..=hi_).filter(|&j| Self::definite(region, j)).collect();
+                        if members.is_empty() {
+                            continue;
+                        }
+                        let o = (level as usize).min(OPEN_OCTAVES - 1);
+                        acc.pairs[o] += members.len() as u64;
+                        acc.crowds[o] += 1;
+                        let whole = test(&members)?;
+                        acc.band_whole[o] += u64::from(whole.0 || members.len() == 1);
+                        acc.lock_whole[o] += u64::from(whole.1 || members.len() == 1);
+                        acc.band_terms[o] += terms(&members, 0, &test)?;
+                        acc.lock_terms[o] += terms(&members, 1, &test)?;
+                        let mut zs: Vec<i128> = members.iter().map(|&j| release(temper * base_of[j], MATERIAL_BITS)).collect();
+                        zs.sort_unstable();
+                        for (t, shift) in [FACE_BITS - 4].into_iter().chain(OPEN_TOLERANCES).enumerate() {
+                            let width = 1i128 << shift;
+                            let (mut count, mut start) = (0u64, i128::MIN);
+                            for &z in &zs {
+                                if start == i128::MIN || z > start + width {
+                                    count += 1;
+                                    start = z;
+                                }
+                            }
+                            acc.cover[t][o] += count;
+                        }
+                        for (t, &shift) in OPEN_TOLERANCES.iter().enumerate() {
+                            let wide_test = |m: &[usize]| test_at(m, 1i128 << shift);
+                            acc.band_at[t][o] += terms(&members, 0, &wide_test)?;
+                            acc.lock_at[t][o] += terms(&members, 1, &wide_test)?;
+                        }
+                    }
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [measurement; November 15, the theory thread's ε from the field's own temperature] **How far a far pair's face moves between two
+    /// constitutions** (a lap's end and its mean): at each tick and head (`[tick · heads + head]`), over the region's open rows and their far
+    /// sources (`|i − j| ≥ NEAR`), `|z_j(self) − z_j(other)|` with `z = release(T base, 24)` each at its own constitution's temper, on the
+    /// face's grain, counted in octaves of its size (`[octave of distance][⌊log₂(1 + |Δz|)⌋]`, 40 bins). A reading only.
+    pub fn far_jitter(&self, other: &Constitution, region: &Region) -> Result<Vec<[[u64; 40]; OPEN_OCTAVES]>> {
+        let (pa, pb) = (self.pass(region, true)?, other.pass(region, true)?);
+        let (sites, d) = (region.classes.len(), &self.declaration);
+        let heads = d.heads;
+        let mut out = vec![[[0u64; 40]; OPEN_OCTAVES]; d.ticks * heads];
+        for (tick, (ca, cb)) in pa.ticks.iter().zip(&pb.ticks).enumerate() {
+            for h in 0..heads {
+                let (ta, tb) = (self.temper(h, true)?, other.temper(h, true)?);
+                let hist = &mut out[tick * heads + h];
+                for i in (0..sites).filter(|&i| !Self::definite(region, i)) {
+                    let hi = h * sites + i;
+                    let mut zb = vec![None; sites];
+                    for src in &cb.rows[hi] {
+                        zb[src.j as usize] = Some(release(tb * src.s as i128, MATERIAL_BITS));
+                    }
+                    for src in &ca.rows[hi] {
+                        let j = src.j as usize;
+                        let gap = i.abs_diff(j);
+                        if gap < NEAR {
+                            continue;
+                        }
+                        let Some(z_other) = zb[j] else { continue };
+                        let dz = (release(ta * src.s as i128, MATERIAL_BITS) - z_other).unsigned_abs();
+                        let o = ((usize::BITS - 1 - gap.leading_zeros()) as usize).min(OPEN_OCTAVES - 1);
+                        let bin = (u128::BITS - (dz + 1).leading_zeros() - 1).min(39) as usize;
+                        hist[o][bin] += 1;
+                    }
+                }
+            }
+        }
+        Ok(out)
     }
 
     /// [measurement; agent-inferred, November 2] **A held read's rows by where their mass lies** ([`HeldRows`]):
