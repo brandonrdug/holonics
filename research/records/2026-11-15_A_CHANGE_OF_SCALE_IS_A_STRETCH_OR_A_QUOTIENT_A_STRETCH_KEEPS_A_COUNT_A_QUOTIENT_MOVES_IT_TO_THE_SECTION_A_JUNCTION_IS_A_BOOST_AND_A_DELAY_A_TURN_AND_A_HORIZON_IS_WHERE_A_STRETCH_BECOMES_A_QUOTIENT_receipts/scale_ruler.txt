@@ -1,0 +1,55 @@
+JUNCTION step b: reflects, passes, tanh(ln b/2), sech(ln b/2)^2
+  b=2 reflects=0.333333 passes=0.888889 tanh=0.333333 sech2=0.888889
+  b=3 reflects=0.500000 passes=0.750000 tanh=0.500000 sech2=0.750000
+  b=10 reflects=0.818182 passes=0.330579 tanh=0.818182 sech2=0.330579
+CHAIN ratio=2^30 ln=20.794 one_step=3.725e-09 four_over_ratio=3.725e-09
+  steps=1 step_ratio=1073741824.0000 product=0.000000 floor_exp=0.000000 powers_summed=0.000000
+  steps=9 step_ratio=10.0794 product=0.000044 floor_exp=0.000006 powers_summed=0.051542
+  steps=30 step_ratio=2.0000 product=0.029203 floor_exp=0.027231 powers_summed=0.210526
+  steps=100 step_ratio=1.2311 product=0.339909 floor_exp=0.339250 powers_summed=0.479635
+  steps=300 step_ratio=1.0718 product=0.697490 floor_exp=0.697439 powers_summed=0.735033
+  steps=1000 step_ratio=1.0210 product=0.897538 floor_exp=0.897536 powers_summed=0.902441
+  steps=10000 step_ratio=1.0021 product=0.989248 floor_exp=0.989248 powers_summed=0.989305
+  steps for a half passed: floor form 156.0, powers summed 108.1
+CHAIN ratio=10^9 ln=20.723 one_step=4.000e-09 four_over_ratio=4.000e-09
+  steps=1 step_ratio=1000000000.0000 product=0.000000 floor_exp=0.000000 powers_summed=0.000000
+  steps=9 step_ratio=10.0000 product=0.000047 floor_exp=0.000007 powers_summed=0.052016
+  steps=30 step_ratio=1.9953 product=0.029903 floor_exp=0.027910 powers_summed=0.211713
+  steps=100 step_ratio=1.2303 product=0.342419 floor_exp=0.341764 powers_summed=0.481352
+  steps=300 step_ratio=1.0715 product=0.699208 floor_exp=0.699158 powers_summed=0.736366
+  steps=1000 step_ratio=1.0209 product=0.898201 floor_exp=0.898199 powers_summed=0.903043
+  steps=10000 step_ratio=1.0021 product=0.989321 floor_exp=0.989321 powers_summed=0.989378
+  steps for a half passed: floor form 154.9, powers summed 107.4
+CHAIN ratio=10^46 ln=105.919 one_step=4.000e-46 four_over_ratio=4.000e-46
+  steps=1 step_ratio=9999999999999999931398190359470212947659194368.0000 product=0.000000 floor_exp=0.000000 powers_summed=0.000000
+  steps=9 step_ratio=129154.9665 product=0.000000 floor_exp=0.000000 powers_summed=0.000003
+  steps=30 step_ratio=34.1455 product=0.000000 floor_exp=0.000000 powers_summed=0.004127
+  steps=100 step_ratio=2.8840 product=0.000000 floor_exp=0.000000 powers_summed=0.031477
+  steps=300 step_ratio=1.4234 product=0.000091 floor_exp=0.000087 powers_summed=0.095726
+  steps=1000 step_ratio=1.1117 product=0.060604 floor_exp=0.060525 powers_summed=0.262651
+  steps=10000 step_ratio=1.0106 product=0.755429 floor_exp=0.755428 powers_summed=0.780961
+  steps for a half passed: floor form 4046.3, powers summed 2804.7
+DELAYS a word of k boosts of eta = ln(rho)/(2k) with k - 1 turns between
+  rho=16 k=2 no_delay=0.221453 one_boost=0.221453 quarter_turns=1.000000 log_mean_over_delays=-0.892574 log_product=-0.892574
+  rho=16 k=3 no_delay=0.221453 one_boost=0.221453 quarter_turns=0.813555 log_mean_over_delays=-0.619025 log_product=-0.619025
+  rho=1024 k=3 no_delay=0.003899 one_boost=0.003899 quarter_turns=0.328445 log_mean_over_delays=-3.340153 log_product=-3.340153
+  rho=1024 k=4 no_delay=0.003899 one_boost=0.003899 quarter_turns=1.000000 log_mean_over_delays=-2.688527 log_product=-2.688527
+COMPTON 2 pi E R/(hbar c) at R = hbar/(m c), E = m c^2: 6.283185 nats (2 pi = 6.283185)
+STAR G m_p^2/(hbar c)=5.9059e-39 its power -3/2=2.203e+57 Sun's nucleons=1.189e+57 ratio=1.85
+TOWER p=2 levels=6 residues=64 triples=41664 two_longest_sides_unequal=0 depths_from_0_to_the_cell_of_1=[0]
+TOWER p=3 levels=4 residues=81 triples=85320 two_longest_sides_unequal=0 depths_from_0_to_the_cell_of_1=[0]
+TOWER p=5 levels=3 residues=125 triples=317750 two_longest_sides_unequal=0 depths_from_0_to_the_cell_of_1=[0]
+STEPS p=2 levels=6 greatest=12 pairs_at_each_count=[(2, 32), (4, 64), (6, 128), (8, 256), (10, 512), (12, 1024)] triangle_fails=0
+STEPS p=3 levels=4 greatest=8 pairs_at_each_count=[(2, 81), (4, 243), (6, 729), (8, 2187)] triangle_fails=0
+STEPS p=5 levels=3 greatest=6 pairs_at_each_count=[(2, 250), (4, 1250), (6, 6250)] triangle_fails=0
+GROUND m_p/m_e=1836.13 k=(m_e/m_p)^(1/4)=0.1528 k^2=0.02334 k^4=5.446e-04
+BATHS hot=5772 K cold=255 K quanta_out_per_quantum_in=22.6
+BATHS hot=5772 K cold=288 K quanta_out_per_quantum_in=20.0
+EUCLID primes=1 product_plus_one=3 least_factor=3 among_the_present=False
+EUCLID primes=2 product_plus_one=7 least_factor=7 among_the_present=False
+EUCLID primes=3 product_plus_one=31 least_factor=31 among_the_present=False
+EUCLID primes=4 product_plus_one=211 least_factor=211 among_the_present=False
+EUCLID primes=5 product_plus_one=2311 least_factor=2311 among_the_present=False
+EUCLID primes=6 product_plus_one=30031 least_factor=59 among_the_present=False
+EUCLID primes=7 product_plus_one=510511 least_factor=19 among_the_present=False
+EUCLID primes=8 product_plus_one=9699691 least_factor=347 among_the_present=False
