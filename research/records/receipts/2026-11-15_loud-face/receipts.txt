@@ -1,0 +1,38 @@
+# card parity
+.LOUD_PARITY covector_entries=64135 loud_covector=[2794366735, 2795031079, 183155379] faces_equal=1 covector_equal=1
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 22 filtered out; finished in 77.73s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+# gate 3 on lap 14 with the loudness off
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=1979 host_ms=174702
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=178.0 peak_rss_kib=6274396
+MEASURE lap=read rc=0 wall_s=273.0 peak_rss_kib=501280
+MEASURE lap=repro rc=0 wall_s=16.9 peak_rss_kib=344540
+GATE_ENGINE EQUAL
+# found-loud
+FOUND_LOUD_LINE k=0 equal
+FOUND_LOUD_LINE k=1 declaration hnn-field-v14m to hnn-field-v14l
+FOUND_LOUD_LINE k=2 fine material 242729 words to 242734
+FOUND_LOUD_LINE k=3 equal
+FOUND_LOUD_LINE k=4 equal
+FOUND_LOUD_LINE k=5 equal
+FOUND_LOUD_LINE k=6 equal
+FOUND_LOUD_LINE k=7 moments 392505 words to 392510
+FOUND_LOUD_LINE k=8 moments 392505 words to 392510
+FOUND_LOUD_LINE k=9 parts one more octave, zero
+FOUND_LOUD_LINE k=10 equal
+FOUND_LOUD lines=11 equal=6 material=392505 founded_material=392510 loud_entries=5 ms=222
+# the lap
+STORE_PASS_AT stretches=26811109 code_piece=56166 code_cursor=0 code_taken=237530838 web_piece=30619 web_cursor=0 web_taken=118809411 science_piece=18844 science_cursor=34940 science_taken=118699396 books_piece=1750 books_cursor=10372 books_taken=71198029 wikidata_piece=7494 wikidata_cursor=0 wikidata_taken=47576140 reads=0 returns=0 pairs=0 batches=0 peak_store=0 ms=231
+STORE_PASS role=prefix sections=3000 stretches_read=27395518 ended=false code_pieces=67730 web_pieces=36980 science_pieces=22585 books_pieces=2112 wikidata_pieces=9004 ms=2025321
+MEASURE lap=loud16 rc=0 wall_s=2025.8 peak_rss_kib=345704
+# its reads
+loud_L16.log:LOUDNESS_DONE ms=195885
+loud_L16.log:MEASURE lap=loudL16 rc=0 wall_s=196.3 peak_rss_kib=500952
+L16.log:CAVITY_DONE ms=457543
+L16.log:MEASURE lap=L16 rc=0 wall_s=458.0 peak_rss_kib=555520
