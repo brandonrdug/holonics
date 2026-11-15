@@ -173,6 +173,9 @@ impl FieldRealization for Paired<'_> {
     fn read_tick_charts(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i32>>>)> {
         self.both("read_tick_charts", |c| c.read_tick_charts(field, regions), |h| h.read_tick_charts(field, regions))
     }
+    fn read_tick_scales(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i128>>>)> {
+        self.both("read_tick_scales", |c| c.read_tick_scales(field, regions), |h| h.read_tick_scales(field, regions))
+    }
     fn read_faces_gated(&mut self, field: &Field, regions: &[Region]) -> Reads<(Faces, CarryGates)> {
         self.both("read_faces_gated", |c| c.read_faces_gated(field, regions), |h| h.read_faces_gated(field, regions))
     }

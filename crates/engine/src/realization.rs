@@ -81,6 +81,12 @@ pub trait FieldRealization {
     fn read_tick_charts(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>)> {
         refuse("a realization that cannot read its charts by stage")
     }
+    /// [measurement; Brandon, November 15 00:58Z; the record of November 13 on loudness beside surprise, test 1] Each region's faces and, by
+    /// stage ([`Field::tick_scales`]: each tick's opening, then after the last tick), the open sites' lane scales in site order (`L` each, the
+    /// lanes' powers), a reading.
+    fn read_tick_scales(&mut self, _field: &Field, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
+        refuse("a realization that cannot read its lane powers by stage")
+    }
     /// [measurement; theory, November 11 18:33, part P2] The faces of `regions` ([`FieldRealization::read_faces`]) and the carry circles' gates
     /// over their open sites ([`CarryGates`]), a reading. By default the faces are the realization's own read and the gates the host's
     /// ([`Field::carry_gates_of`]); a realization that holds the gates in its forward reads them from the same pass.
@@ -155,6 +161,19 @@ impl FieldRealization for HostField {
             })
             .collect::<Result<Vec<Vec<Vec<i32>>>>>()?;
         Ok((faces, charts))
+    }
+
+    fn read_tick_scales(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
+        let lanes = field.declaration.lanes;
+        let faces = field.read_faces(regions)?;
+        let scales = regions
+            .par_iter()
+            .map(|r| {
+                let stages = field.tick_scales(r)?;
+                Ok(stages.iter().map(|s| (0..r.classes.len()).filter(|&t| r.unresolved[t]).flat_map(|t| s[t * lanes..(t + 1) * lanes].iter().copied()).collect()).collect())
+            })
+            .collect::<Result<Vec<Vec<Vec<i128>>>>>()?;
+        Ok((faces, scales))
     }
 
     fn read_near_offsets(&mut self, field: &Field, region: &Region, sites: &[usize]) -> Result<Vec<NearOffsets>> {

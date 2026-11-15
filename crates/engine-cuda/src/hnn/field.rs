@@ -261,6 +261,13 @@ mod tests {
         assert_eq!(card_charts.len(), regions.len());
         assert!(card_charts == host_charts, "the charts by stage differ between the card and the host");
         assert_eq!(card_charts[4].len(), field.declaration.ticks + 1);
+        // [Brandon, November 15 00:58Z] The open sites' lane powers by stage on the card are the host's, beside the same faces.
+        let (scales_faces, card_scales) = card_field.read_tick_scales(&field, &regions).unwrap();
+        let (host_scales_faces, host_scales) = holonics_engine::field::HostField.read_tick_scales(&field, &regions).unwrap();
+        assert_eq!(scales_faces, host_scales_faces);
+        assert!(card_scales == host_scales, "the lane powers by stage differ between the card and the host");
+        assert_eq!(card_scales[4].len(), field.declaration.ticks + 1);
+        assert!(card_scales.iter().flatten().flatten().any(|&s| s != 0), "no lane power read");
         for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
             assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
         }
@@ -770,6 +777,9 @@ mod tests {
                 let (host_cf, host_charts) = HostField.read_tick_charts(&field, &regions).unwrap();
                 let (card_cf, card_charts) = card_field.read_tick_charts(&field, &regions).unwrap();
                 assert!(host_cf == card_cf && host_charts == card_charts, "{name} at {strengths:?}: the charts by stage");
+                let (host_sf, host_scales) = HostField.read_tick_scales(&field, &regions).unwrap();
+                let (card_sf, card_scales) = card_field.read_tick_scales(&field, &regions).unwrap();
+                assert!(host_sf == card_sf && host_scales == card_scales, "{name} at {strengths:?}: the lane powers by stage");
                 assert_eq!(HostField.read_logits(&field, &regions).unwrap(), card_field.read_logits(&field, &regions).unwrap(), "{name} at {strengths:?}: the logits and echoes");
                 let open_sites: usize = regions.iter().map(|r| r.unresolved.iter().filter(|&&u| u).count()).sum();
                 println!("MARK_PARITY field={name} strengths={strengths:?} open_sites={open_sites} covector_entries={} strengths_covector={:?} faces_equal=1 covector_equal=1", card_g.len(), &card_g[l.mark..l.mark + MARK_BASES]);

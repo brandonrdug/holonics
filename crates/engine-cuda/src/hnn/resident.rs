@@ -496,6 +496,9 @@ pub struct CardField<'c> {
     /// [measurement; theory, November 13, P57 item 2 (G132)] While the charts are read by stage
     /// ([`FieldRealization::read_tick_charts`]): each region's open sites' chart rows at each tick's opening and after the last tick.
     pub(crate) tick_charts: std::cell::RefCell<Option<Vec<Vec<Vec<i32>>>>>,
+    /// [measurement; Brandon, November 15 00:58Z] While the lane powers are read by stage ([`FieldRealization::read_tick_scales`]): each
+    /// region's open sites' lane scales at each tick's opening and after the last tick.
+    pub(crate) tick_scales: std::cell::RefCell<Option<Vec<Vec<Vec<i128>>>>>,
     /// [measurement; P57 item 1] The last phase marked, which a trace's launches are read under.
     pub(crate) last_mark: std::cell::Cell<&'static str>,
     /// [realization; theory, November 13, P60 items 1d and 2] While the training path reads the opening's codes
@@ -514,7 +517,7 @@ impl<'c> CardField<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1542,6 +1545,17 @@ impl<'c> CardField<'c> {
             }
             stage_rows = Some(stages);
         }
+        // [measurement; Brandon, November 15 00:58Z] The lanes' scales by stage, where they are read: each tick's at its opening (below),
+        // and after the last tick the face's (the stage the faces read). Every site's scales are fetched and the open sites' kept.
+        let mut stage_scales: Option<Vec<Vec<i128>>> = None;
+        if reading && self.tick_scales.borrow().is_some() {
+            let lanes = field.declaration.lanes;
+            let mut stages = Vec::with_capacity(ticks.len() + 1);
+            for tick in &ticks {
+                stages.push(self.timed(Kind::Copy, || card.fetch_range(&tick.scale, 0, sites * lanes)).map_err(device)?);
+            }
+            stage_scales = Some(stages);
+        }
         // Each tick's reads, where the ticks are read (a reading of expansion and volume).
         if let Some(out) = self.tick_reads.borrow_mut().as_mut().filter(|_| reading) {
             let mut per: Vec<Vec<TickRead>> = vec![Vec::new(); regions.len()];
@@ -1652,6 +1666,9 @@ impl<'c> CardField<'c> {
         let masses = self.timed(Kind::Alloc, || self.take::<u64>(sites * a)).map_err(device)?;
         let totals = self.timed(Kind::Alloc, || self.take::<i128>(sites)).map_err(device)?;
         self.chart(words, words.x, &fread, &fscale, true)?;
+        if let Some(stages) = stage_scales.as_mut() {
+            stages.push(self.timed(Kind::Copy, || card.fetch_range(&fscale, 0, sites * field.declaration.lanes)).map_err(device)?);
+        }
         // [P57 item 2] The chart after the last tick, the stage the faces read, gathered at the open sites beside each tick's.
         if let (Some(stages), Some(at)) = (stage_rows.as_mut(), open_buf.as_ref()) {
             stages.push(gather(fread.device_ptr(), at)?);
@@ -1810,6 +1827,15 @@ impl<'c> CardField<'c> {
             out.push(span.clone().map(|t| (unresolved[t] != 0).then(|| TowerFace { masses: masses[t * a..(t + 1) * a].iter().map(|&v| v as u128).collect(), total: totals[t] as u128 })).collect());
             if logits {
                 out_z.push(span.map(|t| (unresolved[t] != 0).then(|| zs[t * a..(t + 1) * a].to_vec())).collect());
+            }
+        }
+        // The lanes' scales by stage, each region's open sites in site order.
+        if let Some(out) = self.tick_scales.borrow_mut().as_mut() {
+            let lanes = field.declaration.lanes;
+            let stages = stage_scales.unwrap_or_default();
+            for r in 0..regions.len() {
+                let span = region_off[r] as usize..region_off[r + 1] as usize;
+                out.push(stages.iter().map(|s| span.clone().filter(|&t| unresolved[t] != 0).flat_map(|t| s[t * lanes..(t + 1) * lanes].iter().copied()).collect()).collect());
             }
         }
         // [P57 item 2] The charts by stage, each region's open rows in site order.
@@ -2015,6 +2041,18 @@ impl FieldRealization for CardField<'_> {
             return Err(TowerError::Refused("a read of the charts by stage that did not return one a region"));
         }
         Ok((faces, charts))
+    }
+
+    /// [measurement; Brandon, November 15 00:58Z] The faces and the open sites' lane scales by stage, from one forward that keeps every tick.
+    fn read_tick_scales(&mut self, field: &Field, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
+        *self.tick_scales.borrow_mut() = Some(Vec::new());
+        let read = self.run(field, regions, false, true, None);
+        let scales = self.tick_scales.borrow_mut().take().unwrap_or_default();
+        let faces = read?.0;
+        if scales.len() != regions.len() {
+            return Err(TowerError::Refused("a read of the lane powers by stage that did not return one a region"));
+        }
+        Ok((faces, scales))
     }
 
     /// [measurement; part P2] The faces and the carry circles' gates from the same pass: every tick's gate and leak reads are summed on the card
