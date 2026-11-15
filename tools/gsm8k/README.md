@@ -21,18 +21,8 @@ it is never the product
    `python3 -I tools/gsm8k/frame_gsm8k.py TRAIN_JSONL PARTITION_JSON OUT_DIR`.
    Learning and development-read frames contain their answer passages. Development-release
    frames contain only source passages and empty targets.
-3. Build the host listener with `cargo build -p holonics --example listener`.
-   Declare one route explicitly:
-   - `--route observed --learn FRAME --learn-count N --population P --keys KEY_FILE` runs one
-     continuing trunk. Every source and answer cell is compared, deposited and ingested. At the
-     question end a private fork draws a continuation and writes it before the answer is read.
-     Its maximum is the longest passage delivered so far. Population is fixed before content is
-     read; its typed horizon ends the run without increasing it. This route has no cap flag,
-     precision publication or serialized resume. Nothing the run reads is called unseen.
-   - `--route sections --max-release-octets C --learn FRAME --learn-count N` retains the section
-     boundary route for explicit parity. Add either `--read FRAME --read-count N` or
-     `--release FRAME --release-count N --keys KEY_FILE` in separate processes. The CUDA example
-     accepts only this route and refuses `observed` by name until its device fork is available.
+3. The listener example that read these frames (its `observed` and `sections` routes) retired with the
+   examples (C8 of #603); it is held at [`8a77b7755`](https://github.com/brandonrdug/holonics/tree/8a77b7755/crates/holonics/examples/listener).
 
 Releases on sets no run has read require separate processes from saved states, after continuing
 resume is available. The literal key read width and online baseline orders are exterior
@@ -45,6 +35,6 @@ For the tower (record `research/records/2026-10-30_THE_COARSE_LEVEL_HEADS_FOR_TH
 (END the record separator) with each byte's region (Q question, P prose, N digits outside the
 calculations, M the calculation markup), the written rules' texts and six development questions as
 flux prompts.
-The `complete_language` example's host route `read-written-coupling HELD HELD_SHA DIR` reads each free release in
+The `complete_language` example's host route `read-written-coupling HELD HELD_SHA DIR` (retired with the examples, C8 of #603) read each free release in
 `DIR/FREE.tsv` for its least-friction coupling with the held-out answer (`receiver::coupling`: `λ`, `F*`, plateaus),
 in the bytes and in the numerals, beside its contact with its own and the next question, and writes `DIR/COUPLING.tsv`.
