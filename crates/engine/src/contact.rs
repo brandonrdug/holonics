@@ -881,7 +881,9 @@ impl Field {
             // The face reads each class through its encoding (§16.26): the lift `y = R r̂ + b_R`, then `z(a) = ⟨E(a), y⟩ + c_a`.
             let mut y = vec![0i64; dw];
             affine(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &r, Some(&self.theta[l.lift_bias..l.lift_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
-            self.tied(&y, &mut z)?;
+            // [Brandon, November 15 02:06Z] Where the face reads its site's loudness, its sharpness `β` from the lanes' powers.
+            let beta = self.loud_beta(&s)?.map(|(b, _)| b);
+            self.tied_sharp(&y, beta, &mut z)?;
             out.lift[t * dw..(t + 1) * dw].copy_from_slice(&y);
             // The cavity field (§15.3): the read less its own echo, data from the read that formed it.
             if let Some(Some(echo)) = region.echo.get(t) {

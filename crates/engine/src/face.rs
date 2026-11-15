@@ -32,6 +32,20 @@ impl Field {
         Ok(BlankRead { read: r, scale: s, lift: y, face: self.tempered(&z, 1) })
     }
 
+    /// [Brandon, November 15 02:06Z] **The readout's face of a state** `x_t`: [`Field::face_of`]'s face with the sharpness a loud face reads from
+    /// the state's lanes' powers ([`Field::loud_beta`]); the same face on a field whose face does not read its sites' loudness. The readings of a
+    /// place's code at its opening read it (a blank's clock keeps `face_of`).
+    pub(crate) fn readout_face(&self, x: &[i64], reaches: &Reaches) -> Result<TowerFace> {
+        let read = self.face_of(x, reaches)?;
+        if !self.declaration.loud {
+            return Ok(read.face);
+        }
+        let mut z = vec![0i64; self.declaration.alphabet];
+        let beta = self.loud_beta(&read.scale)?.map(|(b, _)| b);
+        self.tied_sharp(&read.lift, beta, &mut z)?;
+        Ok(self.tempered(&z, 1))
+    }
+
     /// Each unresolved site's face over the region (`None` at a resolved site).
     pub fn faces(&self, region: &Region) -> Result<Vec<Option<TowerFace>>> {
         Ok(self.pass(region, false)?.faces)
@@ -86,6 +100,62 @@ impl Field {
         Ok(())
     }
 
+    /// [definition; Brandon, November 15 02:06Z] **A site's sharpness from its loudness** ([`FieldDeclaration::loud`]): `β = 2^16 +
+    /// release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b` on `2^(−16)`, `λ_ℓ` the logarithm on the face's grain of lane `ℓ`'s power `s_ℓ` (the scale the chart divided
+    /// it by); `None` on a field whose face does not read its sites' loudness. The readout's face is the one receiver that reads it: a blank's
+    /// clock and the opening read their faces at temperature one, each its own receiver (`agent-inferred`: the code's comparison is the
+    /// readout's, and a clock's duration is not sharpened by the site it times).
+    pub(crate) fn loud_beta(&self, scales: &[i128]) -> Result<Option<(i128, Vec<i64>)>> {
+        if !self.declaration.loud {
+            return Ok(None);
+        }
+        let l = &self.layout;
+        let lambda: Vec<i64> = scales.iter().map(|&s| log2_grain(s.max(1) as u128)).collect();
+        let kappa = &self.theta[l.loud..l.loud + lambda.len()];
+        let sum: i128 = kappa.iter().zip(&lambda).map(|(&k, &v)| k as i128 * v as i128).sum();
+        let beta = (1i128 << FACE_BITS) + release(sum, FACE_BITS) + self.theta[l.loud + lambda.len()] as i128;
+        Ok(Some((beta, lambda)))
+    }
+
+    /// [definition; Brandon, November 15 02:06Z] **The return through a loud face's sharpness**, given `δβ` (on `β`'s grain): `δκ_ℓ = release(δβ
+    /// λ_ℓ, 16)` and `δb = δβ` into the material's covector `g`, and `δλ_ℓ = release(δβ κ_ℓ, 16)` returned radially into the state the face read,
+    /// written into `radial` (`D` words): `∂λ_ℓ/∂x_i = r̂_i / (W s_ℓ ln 2)` on the lane, `r̂` the chart on `2^(−16)`, `s_ℓ` the lane's power and `W`
+    /// its width. The chart's own adjoint ([`lane_adjoint`]) keeps only the part off the ray; this is the part along it, which a face that reads
+    /// the site's power owes.
+    pub(crate) fn loud_return(&self, lambda: &[i64], dbeta: i128, read: &[i32], scales: &[i128], g: &mut [i128], radial: &mut Vec<i64>) -> Result<()> {
+        let (l, dw, lanes) = (&self.layout, self.declaration.width, self.declaration.lanes);
+        let lw = dw / lanes;
+        radial.clear();
+        radial.resize(dw, 0);
+        for (lane, (&lam, &s)) in lambda.iter().zip(scales).enumerate() {
+            g[l.loud + lane] += release(dbeta * lam as i128, FACE_BITS);
+            if s == 0 {
+                continue;
+            }
+            let dlam = release(dbeta * self.theta[l.loud + lane] as i128, FACE_BITS) as i128;
+            let den = lw as i128 * s * ln2_face();
+            for i in lane * lw..(lane + 1) * lw {
+                radial[i] = fit64(div_nearest((dlam * read[i] as i128) << LN2_FACE_BITS, den))?;
+            }
+        }
+        g[l.loud + lanes] += dbeta;
+        Ok(())
+    }
+
+    /// The readout's face at a site with sharpness `β` ([`Field::loud_beta`]): `z(a) = release(β v_a, 16) + c_a`, `v_a = release(⟨E(a), y⟩, 16)`;
+    /// with no sharpness, [`Field::tied`].
+    pub(crate) fn tied_sharp(&self, y: &[i64], beta: Option<i128>, z: &mut [i64]) -> Result<()> {
+        let Some(beta) = beta else { return self.tied(y, z) };
+        let (dw, l) = (self.declaration.width, &self.layout);
+        for (a, slot) in z.iter_mut().enumerate() {
+            let row = &self.theta[l.enc + a * dw..l.enc + (a + 1) * dw];
+            let sum: i128 = row.iter().zip(y).map(|(&e, &v)| e as i128 * v as i128).sum();
+            let v = release(sum, STATE_BITS) as i128;
+            *slot = fit64(release(beta * v, FACE_BITS) as i128 + self.theta[l.read_bias + a] as i128)?;
+        }
+        Ok(())
+    }
+
     /// Each region's faces, read in parallel.
     pub fn read_faces(&self, regions: &[Region]) -> Result<Vec<Vec<Option<TowerFace>>>> {
         regions.par_iter().map(|r| self.faces(r)).collect()
@@ -97,15 +167,26 @@ impl Field {
     /// [measurement; theory, November 13, P57 item 2 (G132)] **The readout's face from a chart** `r̂` (`D` words on `2^(−16)`): the lift
     /// `R r̂ + b_R`, the encoding and the face at temperature one, as [`Field::face_of`] reads a state after its chart. A reading.
     pub fn face_of_read(&self, read: &[i32]) -> Result<TowerFace> {
+        if self.declaration.loud {
+            return refuse("a face whose sharpness is its site's loudness is read from a chart and its lanes' powers (face_of_chart)");
+        }
+        self.face_of_chart(read, &[])
+    }
+
+    /// [Brandon, November 15 02:06Z] **The readout's face from a chart and its lanes' powers**: as [`Field::face_of_read`], with the sharpness the
+    /// powers give where the face reads its sites' loudness ([`Field::loud_beta`]); the powers are not read on a field whose face does not. A
+    /// reading.
+    pub fn face_of_chart(&self, read: &[i32], scales: &[i128]) -> Result<TowerFace> {
         let (d, l) = (&self.declaration, &self.layout);
         let dw = d.width;
-        if read.len() != dw {
-            return refuse("a chart that is not one word a coordinate");
+        if read.len() != dw || (d.loud && scales.len() != d.lanes) {
+            return refuse("a chart that is not one word a coordinate, or a loud face's powers that are not one a lane");
         }
         let mut y = vec![0i64; dw];
         affine(&self.theta[l.read..l.read + dw * dw], self.reaches().read, dw, read, Some(&self.theta[l.lift_bias..l.lift_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut y)?;
         let mut z = vec![0i64; d.alphabet];
-        self.tied(&y, &mut z)?;
+        let beta = self.loud_beta(scales)?.map(|(b, _)| b);
+        self.tied_sharp(&y, beta, &mut z)?;
         Ok(self.tempered(&z, 1))
     }
 }

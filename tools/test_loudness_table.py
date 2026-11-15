@@ -7,7 +7,8 @@
              a negative temperature and a rank-1 share in its loudest fifth above its quietest;
   flat       a region where loudness is drawn apart from the code reads a correlation near zero;
   pieces     a place's pieces are its written neighbours and its unit, an edge has none, and its color is its lanes' energy entropy;
-  count      a letter's occurrence within its word is counted from the places' own units, a word being a run of ASCII letters.
+  count      a letter's occurrence within its word is counted from the places' own units, a word being a run of ASCII letters;
+  ceiling    a stretch's broken ceilings are the places above every earlier place, counted against the harmonic number.
 """
 import math, os, random, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -84,4 +85,9 @@ ps = [r for r in lt.read(os.path.join(write(rows), "loudness.tsv"))[0]]
 lt.multiplicity(ps)
 check([p.get("j") for p in ps] == [1, 1, 2, 1, 3, None, 1, 1], "a letter's occurrence within its word")
 check(ps[0]["wlen"] == 5 and ps[6]["wlen"] == 2 and "j" not in ps[5], "a word's length, and a space in none")
+# ceilings: codes 1, 3, 2, 5, 4 in one stretch break the ceiling at 3 and 5 (two), against H_5 - 1
+rows = [["P", "c", 0, t, 1, int(c * one), 1, "-", "-", "61", "-", 1, 1, 1, 1, 2**8, 2**8] for t, c in enumerate([1, 3, 2, 5, 4])]
+ps = lt.read(os.path.join(write(rows), "loudness.tsv"))[0]
+seen, expected, at = lt.records(ps)
+check(seen == 2 and abs(expected - (1 + 1/2 + 1/3 + 1/4 + 1/5 - 1)) < 1e-12 and [p["t"] for p in at] == [1, 3], "the ceilings a stretch breaks, against the harmonic number")
 print(f"loudness_table controls: {passed} passed")

@@ -252,7 +252,7 @@ fn reserve(args: &[String]) -> Result<()> {
     use holonics_engine_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
-    let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false };
+    let d = FieldDeclaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false };
     let f = |s: usize| read_octets(&d, true, false, s);
     let (f1, f2, f3) = (f(1), f(2), f(3));
     let pair = (f3 + f1 - 2 * f2) / 2;
@@ -271,9 +271,10 @@ fn train_command(args: &[String], realization: &mut dyn FieldRealization) -> Res
         Some("read-cavity") => athena::ruler::cavity::read_cavity(args, realization),
         Some("read-loudness") => athena::ruler::loudness::read_loudness(args, realization),
         Some("found-lane") => athena::store::found_lane(args),
+        Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("write-store") => athena::store::write(args, realization),
-        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane or next-pass".into()),
+        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud or next-pass".into()),
     }
 }
 

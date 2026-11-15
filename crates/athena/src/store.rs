@@ -540,6 +540,76 @@ pub fn found_lane(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; Brandon, November 15 02:06Z] **`found-loud STATE STATE_SHA OUT`**: the learner `STATE` whose face reads its sites' loudness
+/// ([`FieldLearner::with_loud`]: `κ` and `b` appended at zero, so every face is the source's), written to `OUT`. Before it writes, every line is
+/// judged (`FOUND_LOUD_LINE`): the fine field's declaration only its head line's loudness (read back as the source's with the loudness on); the
+/// fine field's material and the two moment lines keep every standing word at the place the founding's map gives it, the new words zero; the
+/// parts line only one more octave, zero; every other line equal. Anything else is refused and nothing is written. Reads no realization: that
+/// every face is kept is read on the card by the line's own held read of the founded state.
+pub fn found_loud(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-loud STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = FieldLearner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.with_loud().map_err(|e| e.to_string())?;
+    let (field, from) = learner.field.with_loud().map_err(|e| e.to_string())?;
+    if field != founded.field {
+        return Err("the learner's founding and the field's differ".into());
+    }
+    let old_d = learner.field.declaration;
+    let (old_m, new_m) = (learner.field.material_len(), founded.field.material_len());
+    let (old_fine, new_fine) = (learner.field.theta.len(), founded.field.theta.len());
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let mapped = |wx: &[&str], wy: &[&str]| -> bool {
+        wy.iter().enumerate().all(|(n, w)| match from[n] {
+            Some(o) => o < wx.len() && *w == wx[o],
+            None => *w == "0",
+        })
+    };
+    let mut judged = [0usize; 5];
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        let verdict = if x == y {
+            judged[0] += 1;
+            "equal".to_string()
+        } else if k == 1 && wy[0] == "hnn-field-v14l" && wx.len() >= 12 && wy.len() == 18 && wx[1..12] == wy[1..12] && wy[17] == "1" && founded.field.declaration == (holonics_engine::field::FieldDeclaration { loud: true, ..old_d }) {
+            judged[1] += 1;
+            format!("declaration {} to {}", wx[0], wy[0])
+        } else if wx.len() == old_fine && wy.len() == new_fine && mapped(&wx, &wy) {
+            judged[2] += 1;
+            format!("fine material {old_fine} words to {new_fine}")
+        } else if wx.len() == old_m && wy.len() == new_m && mapped(&wx, &wy) {
+            judged[3] += 1;
+            format!("moments {old_m} words to {new_m}")
+        } else if x.starts_with("parts ") && *y == format!("{x} 0") {
+            judged[4] += 1;
+            "parts one more octave, zero".to_string()
+        } else {
+            return Err(format!("line {k}: a change the loudness's founding does not make").into());
+        };
+        println!("FOUND_LOUD_LINE k={k} {verdict}");
+    }
+    if judged[1] != 1 || judged[2] != 1 || judged[3] != 2 || (learner.rate_parts.is_some() && judged[4] != 1) {
+        return Err(format!("a founding whose lines were judged {judged:?}").into());
+    }
+    std::fs::write(out, b.as_bytes())?;
+    println!("FOUND_LOUD lines={} equal={} material={old_m} founded_material={new_m} loud_entries={} ms={}", la.len(), judged[0], from.iter().filter(|o| o.is_none()).count(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 13] `next-pass STATE STATE_SHA OUT`: **a state's next pass over its role**: the state with its pass line's
 /// slices set back to their first piece (piece, cursor and places taken zero), its count of stretches kept, so the next pass's cuts and masks
 /// are drawn afresh from the key stream (a stretch's length and mask are keyed by that count, [`Cut::next`]) over the same documents, and

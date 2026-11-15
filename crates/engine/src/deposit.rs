@@ -44,7 +44,10 @@ use rayon::prelude::*;
 /// [definition; agent-inferred, November 14, the ring record §4] The mark's strengths are one part, `mark` (index 25, [`MARK_PART`]): `α_b`.
 /// Why a part of its own: a new block whose covector reaches it only through the second read's opening, founded where G175 read that covector,
 /// and the part rates' law sets each block's rate from its own travel. A parts line carries it only where the field reads twice.
-pub const PART_NAMES: [&str; 26] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction", "mark"];
+/// [definition; Brandon, November 15 02:06Z] The face's loudness is one part, `loud` (index 26, [`LOUD_PART`]): `κ_ℓ` and `b`. Why a part of its
+/// own: a new block whose covector reaches it only through the readout's sharpness, founded at zero, and the part rates' law sets each block's
+/// rate from its own travel. A parts line carries it only where the face reads its sites' loudness.
+pub const PART_NAMES: [&str; 27] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction", "mark", "loud"];
 
 /// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.
 pub const TRIAD_PART: usize = 22;
@@ -57,6 +60,9 @@ pub const JUNCTION_PART: usize = 24;
 
 /// The mark's strengths' one part ([`PART_NAMES`] index 25), written last only where the field reads twice.
 pub const MARK_PART: usize = 25;
+
+/// The face's loudness's one part ([`PART_NAMES`] index 26), written last only where the face reads its sites' loudness.
+pub const LOUD_PART: usize = 26;
 
 /// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
@@ -76,7 +82,7 @@ pub const FIRST_PARTS: std::ops::Range<usize> = 19..22;
 ///
 /// [definition; theory, November 13, P60 item 1f] The opening's one part comes after them only where the field has the opening's lift, for the
 /// same reason: a field without it writes every line it wrote before. So does the junction's one part, last, only where the tick has the return.
-pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool, mark: bool) -> Vec<usize> {
+pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool, mark: bool, loud: bool) -> Vec<usize> {
     let mut out: Vec<usize> = (0..PLAIN_PARTS).collect();
     if carry > 0 {
         out.extend(CIRCLE_PARTS);
@@ -93,6 +99,9 @@ pub fn written_parts(carry: usize, triads: usize, opening: bool, junction: bool,
     }
     if mark {
         out.push(MARK_PART);
+    }
+    if loud {
+        out.push(LOUD_PART);
     }
     out
 }
@@ -274,6 +283,10 @@ impl Field {
         // [agent-inferred, November 14, the ring record §4] The mark's strengths, one part ([`MARK_PART`]).
         if d.mark {
             parts[l.mark..l.mark + MARK_BASES].fill(MARK_PART as u8);
+        }
+        // [Brandon, November 15 02:06Z] The face's loudness, one part ([`LOUD_PART`]).
+        if d.loud {
+            parts[l.loud..l.loud + d.lanes + 1].fill(LOUD_PART as u8);
         }
         parts
     }

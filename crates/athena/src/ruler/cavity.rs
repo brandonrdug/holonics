@@ -100,7 +100,14 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
         learner.field.opening_codes(&views[0]).map_err(|e| e.to_string())
     };
     let cell = |v: Option<i64>| v.map_or("-".to_string(), |c| c.to_string());
-    let code_of_read = |r: &[i32], class: usize| -> std::result::Result<i64, String> { Ok(learner.field.face_of_read(r).map_err(|e| e.to_string())?.code(class)) };
+    // [Brandon, November 15 02:06Z] A face that reads its sites' loudness is read from a chart and its lanes' powers at the same stage
+    // (`face_of_chart`); the powers are read beside the charts only on such a field, so a field without it reads as before.
+    let loud = learner.field.declaration.loud;
+    let lanes = learner.field.declaration.lanes;
+    let code_of_read = |r: &[i32], s: &[i128], class: usize| -> std::result::Result<i64, String> { Ok(learner.field.face_of_chart(r, s).map_err(|e| e.to_string())?.code(class)) };
+    let powers = |realization: &mut dyn FieldRealization, regions: &[TrainRegion]| -> std::result::Result<Vec<Vec<Vec<i128>>>, String> {
+        if loud { Ok(realization.read_tick_scales(&learner.field, &views_of(regions)).map_err(|e| e.to_string())?.1) } else { Ok(vec![Vec::new(); regions.len()]) }
+    };
     let put_words = |w: &mut std::io::BufWriter<std::fs::File>, rows: &[Vec<i32>], at: usize| -> std::io::Result<()> {
         for stage in rows {
             for &v in &stage[at * dw..(at + 1) * dw] {
@@ -166,6 +173,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
         // [P57 item 2] Each place's charts by stage (its one open row at each stage) and the trained readout's codes c1 to c3.
         let mut charts: Vec<Vec<Vec<Vec<i32>>>> = stretches.iter().map(|(c, _, _)| vec![Vec::new(); c.len()]).collect();
         let mut mid: Vec<Vec<[i64; 3]>> = stretches.iter().map(|(c, _, _)| vec![[0i64; 3]; c.len()]).collect();
+        let mut opening_powers: Vec<Vec<Vec<i128>>> = stretches.iter().map(|(c, _, _)| vec![Vec::new(); c.len()]).collect();
         let jobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, (c, _, _))| (0..c.len()).map(move |t| (k, t))).collect();
         let mut at = 0usize;
         let mut batches = 0usize;
@@ -188,16 +196,19 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
                 })
                 .collect();
             let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
-            for ((&(k, t), f), st) in jobs[at..end].iter().zip(&faces).zip(stages) {
+            let scales = powers(&mut *realization, &regions)?;
+            for (((&(k, t), f), st), sc) in jobs[at..end].iter().zip(&faces).zip(stages).zip(scales) {
+                let sc_at = |s: usize| -> &[i128] { sc.get(s).map_or(&[][..], |v| &v[..lanes.min(v.len())]) };
                 let class = stretches[k].0[t];
                 ck[k][t] = f[t].as_ref().ok_or("an open place without a face")?.code(class);
                 if st.len() != stages_expected || st.iter().any(|s| s.len() != dw) {
                     return Err("a place's charts by stage that are not one row of each stage".into());
                 }
-                if code_of_read(&st[stages_expected - 1], class)? != ck[k][t] {
+                if code_of_read(&st[stages_expected - 1], sc_at(stages_expected - 1), class)? != ck[k][t] {
                     return Err(format!("the face of the last chart differs from the realization's face (stretch {k}, place {t})").into());
                 }
-                mid[k][t] = [code_of_read(&st[1], class)?, code_of_read(&st[2], class)?, code_of_read(&st[3], class)?];
+                mid[k][t] = [code_of_read(&st[1], sc_at(1), class)?, code_of_read(&st[2], sc_at(2), class)?, code_of_read(&st[3], sc_at(3), class)?];
+                opening_powers[k][t] = sc_at(0).to_vec();
                 charts[k][t] = st;
             }
             batches += 1;
@@ -206,7 +217,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
         let card_ms = card_start.elapsed().as_millis();
         if marked {
             for (k, (classes, _, _)) in stretches.iter().enumerate() {
-                c0.push((0..classes.len()).map(|t| code_of_read(&charts[k][t][0], classes[t])).collect::<std::result::Result<Vec<i64>, _>>()?);
+                c0.push((0..classes.len()).map(|t| code_of_read(&charts[k][t][0], &opening_powers[k][t], classes[t])).collect::<std::result::Result<Vec<i64>, _>>()?);
             }
         }
         let opening_start = std::time::Instant::now();
@@ -214,7 +225,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
         let opening_ms = opening_start.elapsed().as_millis();
         for (k, (classes, _, _)) in stretches.iter().enumerate() {
             for t in 0..classes.len() {
-                if code_of_read(&charts[k][t][0], classes[t])? != c0[k][t] {
+                if code_of_read(&charts[k][t][0], &opening_powers[k][t], classes[t])? != c0[k][t] {
                     return Err(format!("the face of the opening's chart differs from the host's opening face (stretch {k}, place {t})").into());
                 }
                 let [c1, c2, c3] = mid[k][t];
@@ -237,7 +248,8 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
             }
             let regions: Vec<TrainRegion> = wholes[w_at..end].iter().map(|(_, r)| r.clone()).collect();
             let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
-            for ((k, region), (f, st)) in wholes[w_at..end].iter().zip(faces.iter().zip(&stages)) {
+            let scales = powers(&mut *realization, &regions)?;
+            for (((k, region), (f, st)), sc) in wholes[w_at..end].iter().zip(faces.iter().zip(&stages)).zip(&scales) {
                 let wo = opening_of(&region.classes, &region.unresolved)?;
                 if st.len() != stages_expected {
                     return Err("a whole mask's charts by stage that are not one of each stage".into());
@@ -246,10 +258,11 @@ pub fn read_cavity(args: &[String], realization: &mut dyn FieldRealization) -> R
                     let class = region.classes[t];
                     let cw = f[t].as_ref().ok_or("an open place without a face")?.code(class);
                     let at_row = |s: usize| &st[s][row * dw..(row + 1) * dw];
-                    if code_of_read(at_row(stages_expected - 1), class)? != cw {
+                    let sc_row = |s: usize| -> &[i128] { sc.get(s).map_or(&[][..], |v| &v[row * lanes..(row + 1) * lanes]) };
+                    if code_of_read(at_row(stages_expected - 1), sc_row(stages_expected - 1), class)? != cw {
                         return Err(format!("a whole mask's last chart's face differs from the realization's face (stretch {k}, place {t})").into());
                     }
-                    let (w0, w1, w2, w3) = (code_of_read(at_row(0), class)?, code_of_read(at_row(1), class)?, code_of_read(at_row(2), class)?, code_of_read(at_row(3), class)?);
+                    let (w0, w1, w2, w3) = (code_of_read(at_row(0), sc_row(0), class)?, code_of_read(at_row(1), sc_row(1), class)?, code_of_read(at_row(2), sc_row(2), class)?, code_of_read(at_row(3), sc_row(3), class)?);
                     writeln!(tsv, "W\t{name}\t{k}\t{t}\t{class}\t{w0}\t{cw}\t-\t{w1}\t{w2}\t{w3}\t{}", cell(wo[t]))?;
                     put_words(&mut words_whole, st, row)?;
                     whole_places += 1;

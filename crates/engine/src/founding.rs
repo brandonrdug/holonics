@@ -539,6 +539,32 @@ impl Field {
         Ok((out, from))
     }
 
+    /// [definition; Brandon, November 15 02:06Z] **The face that reads its sites' loudness** ([`FieldDeclaration::loud`]): `κ_ℓ` and `b` appended
+    /// at the end of the fine field's material, founded at zero, every standing entry kept; no key is read and the draws do not move. At zero
+    /// every site's sharpness is one, so every face is the source's bit for bit. A tower keeps its level as it stands. Also the map over the
+    /// whole material from each new entry to the old one it copies (`None` for the new block). Refused on a field whose face already reads it.
+    pub fn with_loud(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.loud {
+            return refuse("a field whose face already reads its sites' loudness");
+        }
+        let d = FieldDeclaration { loud: true, ..self.declaration };
+        d.admit()?;
+        let layout = FieldLayout::new(&d);
+        if self.theta.len() != layout.loud {
+            return refuse("a field whose material does not end where the face's loudness begins");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
     /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
     /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
@@ -937,6 +963,24 @@ impl FieldLearner {
         let rate_parts = self.rate_parts.map(|rp| {
             let mut octaves = rp.octaves;
             octaves[MARK_PART] = 0;
+            RateParts { octaves, ..rp }
+        });
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; Brandon, November 15 02:06Z] **The learner whose face reads its sites' loudness** ([`Field::with_loud`]): the new block's
+    /// moments open at zero, so its first step is its own covector's, and its part's rate at the old entries'. Refused while a step is held.
+    pub fn with_loud(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner reads its sites' loudness after its held step is read");
+        }
+        let (field, from) = self.field.with_loud()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let rate_parts = self.rate_parts.map(|rp| {
+            let mut octaves = rp.octaves;
+            octaves[LOUD_PART] = 0;
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());

@@ -140,6 +140,19 @@ pub struct FieldDeclaration {
     /// keeps no rows of its own (a table of free rows indexed by a class is refused, November 12). `false` writes every head line exactly as
     /// before; `true` writes `hnn-field-v14m`, the sixteen words of `v14j` with the junction's word written as `0` or `1`, then `1`.
     pub mark: bool,
+    /// [definition; Brandon, November 15 02:06Z on the loudness reading; the record of November 15 on loudness beside surprise, §4] **The face
+    /// reads a site's loudness as its own sharpness**: at each open site the face is `z(a) = release(β v_a, 16) + c_a`, `v_a =
+    /// release(⟨E(a), y⟩, 16)` the plain face, with `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b` on `2^(−16)`, `λ_ℓ` the logarithm on the face's
+    /// grain of lane `ℓ`'s power (the scale the chart divides that lane by, [`lane_chart`]) at the stage the face reads. `κ_ℓ` and `b`
+    /// ([`FieldLayout::loud`]) are deposited material, founded at zero ([`Field::with_loud`]), so at the founding every face is the source's bit
+    /// for bit. The return runs through `β` into `κ`, `b` and, radially, into the state's lane powers, the part the unit chart sets aside.
+    ///
+    /// Why (the loudness reading of lap 13, G193): no forward term read a site's power (atlas `tower.field-site-power-unread`), so a site's
+    /// loudness was inertia alone and moved by tenths of an octave where its surprise moved by three nats; the pump is the inverse temperature
+    /// (atlas `parametron.pump-inverse-temperature`), and a temperature is a store's state (CLAUDE.md), here the site's own power. `false`
+    /// writes every head line exactly as before; `true` writes `hnn-field-v14l`, the seventeen words of `v14m` with the mark's word written
+    /// as `0` or `1`, then `1`.
+    pub loud: bool,
 }
 
 impl FieldDeclaration {
@@ -433,7 +446,9 @@ impl FieldDeclaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.mark {
+        let head = if self.loud {
+            "hnn-field-v14l"
+        } else if self.mark {
             "hnn-field-v14m"
         } else if self.junction {
             "hnn-field-v14j"
@@ -446,7 +461,9 @@ impl FieldDeclaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.mark {
+        let tail = if self.loud {
+            format!(" {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark))
+        } else if self.mark {
             format!(" {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction))
         } else if self.junction {
             format!(" {} {} {} 1", self.carry, self.triads, u8::from(self.opening))
@@ -466,40 +483,46 @@ impl FieldDeclaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
-        let (depth_word, carry, triads, opening, junction, mark) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false, false, false),
+        let (depth_word, carry, triads, opening, junction, mark, loud) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false, false, false, false),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
-                c => (Some(words[11]), c, 0, false, false, false),
+                c => (Some(words[11]), c, 0, false, false, false, false),
             },
             // [theory, November 12, the triad record §4] `C` may be zero here, `J` may not, as `v14e` refuses `C = 0`.
             (Some("hnn-field-v14f"), 14) => match n(words[13])? {
                 0 => return refuse("an hnn-field-v14f head line with no triads (a field without them is hnn-field-v14 or hnn-field-v14e)"),
-                j => (Some(words[11]), n(words[12])?, j, false, false, false),
+                j => (Some(words[11]), n(words[12])?, j, false, false, false, false),
             },
             // [theory, November 13, §4.4a] The opening's word is one; a field without the comparison writes a line before `v14g`.
             (Some("hnn-field-v14g"), 15) => match n(words[14])? {
-                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true, false, false),
+                1 => (Some(words[11]), n(words[12])?, n(words[13])?, true, false, false, false),
                 _ => return refuse("an hnn-field-v14g head line whose opening word is not one (a field without the comparison writes the line before it)"),
             },
             // [theory, November 13, the junction record §7] The opening's word is zero or one here and the junction's is one; a field without the
             // return writes a line before `v14j`.
             (Some("hnn-field-v14j"), 16) => match (n(words[14])?, n(words[15])?) {
-                (o @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, true, false),
+                (o @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, true, false, false),
                 _ => return refuse("an hnn-field-v14j head line whose opening word is not zero or one or whose junction word is not one"),
             },
             // [agent-inferred, November 14, the ring record §4] The opening's and the junction's words are zero or one here and the mark's is one; a
             // field without the mark writes a line before `v14m`.
             (Some("hnn-field-v14m"), 17) => match (n(words[14])?, n(words[15])?, n(words[16])?) {
-                (o @ (0 | 1), j @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, true),
+                (o @ (0 | 1), j @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, true, false),
                 _ => return refuse("an hnn-field-v14m head line whose opening or junction word is not zero or one or whose mark word is not one"),
+            },
+            // [Brandon, November 15 02:06Z] The opening's, the junction's and the mark's words are zero or one here and the loudness's is one; a
+            // field whose face does not read its sites' loudness writes a line before `v14l`.
+            (Some("hnn-field-v14l"), 18) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?) {
+                (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, true),
+                _ => return refuse("an hnn-field-v14l head line whose opening, junction or mark word is not zero or one or whose loudness word is not one"),
             },
             (Some("hnn-field-v14k"), _) => return refuse("the carry founded at zero friction is retired (hnn-field-v14k): its states are receipts only"),
             (Some("hnn-field-v14t"), _) => return refuse("the carry's leak on its linear chart is retired (hnn-field-v14t): its states are receipts only"),
-            (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false),
+            (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud };
         d.admit()?;
         Ok(d)
     }
@@ -581,6 +604,9 @@ pub struct FieldLayout {
     /// encoding (`enc`, `before`, `after`, in that order) on the material's grain, so `α_b = 2^24` marks a site's row at its whole face; the last
     /// family, zero long where the field reads once.
     pub mark: usize,
+    /// [definition; Brandon, November 15 02:06Z] **The face's loudness** ([`FieldDeclaration::loud`]): `κ_ℓ`, one entry a lane, then `b`, on the
+    /// face's grain, so `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b`; the last family, zero long where the face does not read its sites' loudness.
+    pub loud: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -641,6 +667,7 @@ impl FieldLayout {
         let joined = usize::from(d.junction);
         let (junction, junction_bias) = (tail(joined * dw, MATERIAL_BITS), tail(joined, FACE_BITS));
         let mark = tail(usize::from(d.mark) * MARK_BASES, MATERIAL_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, len: at, families }
+        let loud = tail(usize::from(d.loud) * (d.lanes + 1), FACE_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, len: at, families }
     }
 }

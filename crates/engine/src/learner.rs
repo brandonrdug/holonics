@@ -462,7 +462,7 @@ impl FieldLearner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud).iter().map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
@@ -509,16 +509,20 @@ impl FieldLearner {
                 // it at the old rate, as a triad field's line without the triad's.
                 // [theory, November 13, the junction record §7] So does a field with the return whose line lacks the junction's octave.
                 // [agent-inferred, November 14, the ring record §4] So does a field that reads twice whose line lacks the mark's octave.
-                let (carry, triads, opening, junction, mark) = (field.declaration.carry, field.declaration.triads, field.declaration.opening, field.declaration.junction, field.declaration.mark);
-                let order = written_parts(carry, triads, opening, junction, mark);
-                let unmarked = written_parts(carry, triads, opening, junction, false);
-                let unjoined = written_parts(carry, triads, opening, false, false);
-                let unopened = written_parts(carry, triads, false, false, false);
-                let before = written_parts(carry, 0, false, false, false);
+                // [Brandon, November 15 02:06Z] So does a field whose face reads its sites' loudness and whose line lacks the loudness's octave.
+                let (carry, triads, opening, junction, mark, loud) = (field.declaration.carry, field.declaration.triads, field.declaration.opening, field.declaration.junction, field.declaration.mark, field.declaration.loud);
+                let order = written_parts(carry, triads, opening, junction, mark, loud);
+                let unloud = written_parts(carry, triads, opening, junction, mark, false);
+                let unmarked = written_parts(carry, triads, opening, junction, false, false);
+                let unjoined = written_parts(carry, triads, opening, false, false, false);
+                let unopened = written_parts(carry, triads, false, false, false, false);
+                let before = written_parts(carry, 0, false, false, false, false);
                 let older: Vec<usize> = if carry > 0 { (0..PLAIN_PARTS).chain(CIRCLE_PARTS).collect() } else { (0..PLAIN_PARTS).collect() };
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if loud && n == unloud.len() {
+                    unloud
                 } else if mark && n == unmarked.len() {
                     unmarked
                 } else if junction && n == unjoined.len() {

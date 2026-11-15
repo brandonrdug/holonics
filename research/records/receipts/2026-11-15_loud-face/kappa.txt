@@ -1,0 +1,5 @@
+# kappa_0..3 and b (2^-16 of beta per octave of lambda; b on 2^-16) at the loud lap's saved states
+STATE.1000 -92 -76 -77 -77 -68 
+STATE.2000 -121 -94 -84 -97 -81 
+STATE.3000 -141 -106 -94 -119 -78 
+MEAN.3000 -139 -106 -97 -114 -90 

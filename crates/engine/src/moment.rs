@@ -48,14 +48,14 @@ impl Field {
         for (slot, &v) in xt.iter_mut().zip(&term) {
             *slot = fit64(*slot as i128 + v as i128)?;
         }
-        Ok(self.face_of(&xt, &self.reaches())?.face)
+        self.readout_face(&xt, &self.reaches())
     }
 
     /// [measurement; theory, November 13, P55 part B] The same face from the whole opening (`open` over every place), the check of `opening_face`.
     pub fn opening_face_whole(&self, region: &Region, t: usize) -> Result<TowerFace> {
         let x = self.opening(region)?;
         let dw = self.declaration.width;
-        Ok(self.face_of(&x[t * dw..(t + 1) * dw], &self.reaches())?.face)
+        self.readout_face(&x[t * dw..(t + 1) * dw], &self.reaches())
     }
 
     /// Site `s`'s opening term in the encoding at `base`: its row, or the superposition of its
