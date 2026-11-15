@@ -210,3 +210,35 @@ relayed 20:37 and 20:40 UTC); `agent-inferred` for the reading of them; `from tr
   its drive at the present and that news is the kick.
 - Atlas rows (`objects.tsv`): `deposition.return-on-news-clock` (§3, §5, §6), `tower.field-held-tick` (§4) and
   `receiver.basin-loudness-present-drive` (§7). `deposition.cost-follows-surprise` now points to the first.
+
+## 9. The unit is the composed shape, not the codec's digit
+
+`tree` for the lens; `agent-inferred` for the rest. Brandon, 20:42 UTC, in the build thread (a paraphrase). A place is no
+small section of bytes: shapes coarse-grain, and that is compression. A form is compressed by what it does in the
+contexts it is used in, as an arithmetic operator is, so two forms of different length that do the same thing in an
+exchange are one, and the depth of the words is not paid where it need not be. His examples are examples, not the
+subject.
+- **The reading.** A byte is the codec's digit. The unit is the composite the field's own news shapes, and a composite is
+  coded by what it does at its receiver: forms that every admitted later receiver reads alike are one class, the kernel
+  of Holonic Compression, and only the choice among classes is news (the rule of November 14 that equivalent forms are
+  not ranked by the comparison). The composite's remaining digits are dark. §3 and §4 price a place; this section moves
+  the price to the unit.
+- **The ruler first.** The units are `code.site-isolation-landmark`'s first round `P(σ)`, read on the held passage at lap
+  means 33 to 38 by region, at `σ` = 8 bits (one unpredicted octet, the November 13 reason) with 4 and 16 beside, and at
+  earlier lap means if they are kept. Two sites stand `σ` apart on the clock of news, so the sites a place are at most
+  `S/σ`: from lap 38's fifths (bits a place: code 0.74, science 1.05, books 1.21, web 1.26) 0.092, 0.131, 0.151 and 0.157
+  at 8 bits. Guess, fixed at 20:47 UTC: 0.6 to 0.9 of that bound in each region, falling 0.3 to 1.0% from lap 33 to 38
+  with code's 0.75% and in at least four of the five steps. At today's rate the dividend in units is then about 1% over
+  five laps, and a lap accelerates visibly only where the code still falls fast, which is the early laps he describes.
+- **The level whose sites are those units.** A site carries its composite, the continuation the level's face predicts
+  from the landmark (the span release of `tower.span-release`). Each interior place is read through it: where the written
+  symbol is the predicted one the place is dark and held (`tower.field-held-tick`) and returned on the clock of news (§3);
+  where it departs, the place is bright and runs whole. Cost then follows units and departures, not places. In training
+  the symbol is known, so the check is a comparison and not a forward, the verify step of speculative decoding (Leviathan,
+  Kalman and Matias 2023), kept whole by the departure rule. Acceptance: every place held or whole; held code at lap mean
+  within 0.003 nats a place of the line's own lap by region; units, departures and section time beside. No guess on the
+  time is fixed until the ruler above and the tick ruler of §4 are read.
+- **Indifference, read downstream.** The trick he named is that a compressing field becomes indifferent to which of a
+  class's forms was written. It shows after the unit: substitute a unit by a form the field's own face at its landmark
+  ranks near it, and read the later places' faces (their summed divergence at distances 1 to 64) against a substitution of
+  unlike rank. Indifference is the first decaying faster than the second.
