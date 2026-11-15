@@ -4400,6 +4400,11 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         // and its skins as two (`pair_score8`).
         const bool eight = w.n == 8;
         const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+        // The row's covector's l1, the narrow form's bound (each lane reads the row's words, the same for the warp).
+        uwide dy_l1 = 0;
+        for (uint32_t x = 0; x < S; x++) {
+            dy_l1 += (uwide)mag64(dyi[x]);
+        }
         const auto pair_dp8 = [&](uint32_t j, uint32_t k, uint32_t gap) -> wide {
             const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
             uint32_t dec[8];
@@ -4416,12 +4421,37 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                 dec[0] = d0.x; dec[1] = d0.y; dec[2] = d0.z; dec[3] = d0.w;
                 dec[4] = d1.x; dec[5] = d1.y; dec[6] = d1.z; dec[7] = d1.w;
             }
-            wide dp = 0;
+            int64_t v[16];
+            uint64_t vm = 0;
 #pragma unroll
             for (int q = 0; q < 8; q++) {
                 const longlong2 t = v2[q];
-                dp += mul64_128(dyi[2 * q], still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
-                dp += mul64_128(dyi[2 * q + 1], still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
+                v[2 * q] = t.x;
+                v[2 * q + 1] = t.y;
+                vm = max(vm, max(mag64(t.x), mag64(t.y)));
+            }
+            // [realization; November 15] The narrow form: with every value under `2^31` and `D ≤ 2^30` (`skin_word`'s refusal, a decay at most
+            // one), each carried value `release(D v, 30)` stands at most `|v|` and is one 32 by 32 product, and the row's covector's l1 times
+            // the largest value bounds every product and every partial of the sum, so where that bound stands under `2^63` the sum is a
+            // 64-bit sum of 64-bit products: the same integer as the wide form's.
+            if (vm < (1ull << 31) && (uwide)dy_l1 * (uwide)vm < ((uwide)1 << 63)) {
+                int64_t acc = 0;
+#pragma unroll
+                for (int x = 0; x < 16; x++) {
+                    int64_t c = v[x];
+                    if (!still_h) {
+                        const uint64_t m = mag64(v[x]);
+                        const uint64_t r = ((uint64_t)(uint32_t)m * (uint64_t)dec[x & 7] + ((uint64_t)1 << (MOVE_BITS - 1))) >> MOVE_BITS;
+                        c = v[x] < 0 ? -(int64_t)r : (int64_t)r;
+                    }
+                    acc += dyi[x] * c;
+                }
+                return (wide)acc;
+            }
+            wide dp = 0;
+#pragma unroll
+            for (int x = 0; x < 16; x++) {
+                dp += mul64_128(dyi[x], still_h ? v[x] : carry_d(dec[x & 7], v[x]));
             }
             return dp;
         };

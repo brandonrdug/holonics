@@ -161,6 +161,10 @@ impl<'c> Resident<'c> {
         // first, then the columns', which adds the word's second role into the same slots.
         let (mut dyp, mut dyhp) = (dy.device_ptr(), dyh.device_ptr());
         self.launch("field_current_back", Self::cells((heads * sites * n) as u64), THREADS, &mut [arg(words), arg(&mut dyp), arg(&mut dyhp)])?;
+        // [measurement; November 15, the contact's widths, §9 of the engine record] The return's covector by head `δỹ` `[h][t][span]`, read by
+        // the rows' and the columns' pair sums before any narrow form is built on it.
+        #[cfg(feature = "ruler-bits")]
+        self.bits_words(dyh.device_ptr(), 0, heads * sites * span, 30, at)?;
         // The current's covector of this tick, where the held rows' currents are read (§16.21).
         if let Some(cov) = self.row_cov.borrow_mut().as_mut().filter(|_| readings) {
             cov[at] = self.timed(Kind::Copy, || self.card.fetch_range(&dyh, 0, heads * sites * span)).map_err(device)?;
