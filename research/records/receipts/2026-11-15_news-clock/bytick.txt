@@ -1,0 +1,12 @@
+BYTICK_SECTION n=1 regions=175 sites=39505 ms=193621
+BYTICK_SECTION n=2 regions=189 sites=41402 ms=420040
+BYTICK_SECTION n=3 regions=178 sites=39425 ms=597928
+BYTICK_SECTION n=4 regions=199 sites=41488 ms=778685
+BYTICK_SECTION n=5 regions=162 sites=37220 ms=973538
+BYTICK_SECTION n=6 regions=192 sites=41389 ms=1145586
+BYTICK slice=code sigma=2^-4 rise_bits t0=308.901 t1=245.254 t2=28.987 t3=0.000
+BYTICK slice=web sigma=2^-4 rise_bits t0=111.752 t1=33.686 t2=47.083 t3=0.000
+BYTICK slice=science sigma=2^-4 rise_bits t0=95.534 t1=51.825 t2=37.649 t3=0.000
+BYTICK slice=books sigma=2^-4 rise_bits t0=54.150 t1=27.217 t2=9.535 t3=0.000
+BYTICK slice=wikidata sigma=2^-4 rise_bits t0=85.284 t1=24.158 t2=17.804 t3=0.000
+BYTICK_DONE sections=6 regions=1095 ms=1145586

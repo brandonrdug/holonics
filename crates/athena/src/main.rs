@@ -148,6 +148,10 @@ fn run(args: &[String]) -> Result<()> {
         for (h, pairs) in p.pairs_by_head.iter().enumerate() {
             println!("FIELD_PROFILE_PAIRS head={h} kind={} pairs={pairs}", p.head_kinds.get(h).copied().unwrap_or("-"));
         }
+        for ((entry, k), (calls, ns)) in &p.by_tick {
+            let (dir, tick) = if *k >= holonics_engine_cuda::hnn::field::RETURN_TICK { ("return", k - holonics_engine_cuda::hnn::field::RETURN_TICK) } else { ("forward", *k) };
+            println!("FIELD_PROFILE_TICK entry={entry} dir={dir} tick={tick} launches={calls} us={}", ns / 1_000);
+        }
         for ((entry, h), (calls, ns)) in &p.by_head {
             let pairs = p.pairs_by_head.get(*h as usize).copied().unwrap_or(0);
             println!(

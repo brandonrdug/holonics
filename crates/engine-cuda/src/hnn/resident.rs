@@ -456,6 +456,9 @@ pub struct Resident<'c> {
     pub(crate) profile: Option<std::cell::RefCell<FieldProfile>>,
     /// The head a launch is made for, where the launches go a head at a time (a profile's reading by head).
     pub(crate) head: std::cell::Cell<Option<u32>>,
+    /// [measurement; theory, November 15 20:38Z] The tick a launch is made for: `k` in the forward, `RETURN_TICK + k` in the return (a profile's
+    /// reading by tick).
+    pub(crate) tick: std::cell::Cell<Option<u32>>,
     /// [measurement; P61 item 3] The last launch's timed ns, under the profile.
     pub(crate) last_ns: std::cell::Cell<u128>,
     /// [realization; P61 item 4f] The outer passes' slots for their largest words and the next slot ([`Resident::outer_slot`]).
@@ -524,7 +527,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -688,6 +691,11 @@ impl<'c> Resident<'c> {
             *p.threads.entry(entry).or_insert(0) += u128::from(grid.x) * u128::from(grid.y) * u128::from(grid.z) * u128::from(block);
             if let Some(h) = self.head.get() {
                 let slot = p.by_head.entry((entry, h)).or_insert((0, 0));
+                slot.0 += 1;
+                slot.1 += started.elapsed().as_nanos();
+            }
+            if let Some(k) = self.tick.get() {
+                let slot = p.by_tick.entry((entry, k)).or_insert((0, 0));
                 slot.0 += 1;
                 slot.1 += started.elapsed().as_nanos();
             }
@@ -1541,7 +1549,9 @@ impl<'c> Resident<'c> {
                     self.tower_forward(field, words, tr, tb, regions.len(), stored, returning, kept)?;
                 }
             }
+            self.tick.set(Some(k as u32));
             self.tick_forward(field, words, &ticks, k, kept, stored, keep.is_some(), logits, returning, pr.device_ptr(), sites, pairs, regions.len())?;
+            self.tick.set(None);
             if let Some(acc) = gate_acc.as_ref() {
                 let tick = &ticks[if kept { k } else { 0 }];
                 (words.pg, words.pgam) = (tick.pg.device_ptr(), tick.pgam.device_ptr());

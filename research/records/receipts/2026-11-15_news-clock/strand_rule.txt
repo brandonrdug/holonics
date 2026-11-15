@@ -1,0 +1,5 @@
+slice=code tick=3 kind=written sites=65636 unread_current=0.6192 rule_misses=6/18324
+slice=web tick=3 kind=written sites=30439 unread_current=0.5728 rule_misses=0/8629
+slice=science tick=3 kind=written sites=32476 unread_current=0.5842 rule_misses=0/9948
+slice=books tick=3 kind=written sites=17806 unread_current=0.6300 rule_misses=0/4304
+slice=wikidata tick=3 kind=written sites=13568 unread_current=0.5579 rule_misses=0/3972

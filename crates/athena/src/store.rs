@@ -456,6 +456,9 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
     Ok(Slice { name: name.to_string(), quota, pieces: pieces_of(&store.join(format!("{stem}_{name}.tsv")), count)?, source: Box::new(SliceFile(std::fs::File::open(store.join(format!("{stem}_{name}.bin")))?)) })
 }
 
+/// The sections the held forward reads at, `σ = 2^(−e)` bits.
+const HELD_SIGMAS: [u32; 2] = [6, 4];
+
 /// [definition; agent-inferred, November 14] **`found-lane STATE STATE_SHA KEYS KEYS_SHA OUT`**: the learner `STATE` with one more lane on its
 /// fine field ([`Learner::laned`]: every read from the lane and every write into it at zero, a tower's level kept and the glue's reads and
 /// writes of the lane at zero), its draws read from `KEYS` past the learner's count, written to `OUT`. Before it writes, every line is judged
@@ -473,11 +476,24 @@ pub(crate) fn open_slice(store: &Path, role: &str, name: &str, counts: &HashMap<
 pub fn read_open_rows(args: &[String]) -> Result<()> {
     use holonics_engine::field::{OpenCrowds, OpenRows, OPEN_OCTAVES};
     use rayon::prelude::*;
-    if args.len() != 13 && !(args.len() == 14 && args[13] == "crowds") && !(args.len() == 16 && args[13] == "jitter") {
-        return Err("read-open-rows UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA [crowds | jitter OTHER OTHER_SHA]".into());
+    // [measurement; theory, November 15 21:16Z] `ticks` and `held` read with OTHER's field where given (the sections stay STATE's pass's).
+    let mode = args.get(13).map(String::as_str);
+    let fits = match (args.len(), mode) {
+        (13, None) | (14, Some("crowds" | "ticks" | "held" | "halves" | "bytick" | "carried")) => true,
+        (16, Some("jitter" | "ticks" | "held")) => true,
+        _ => false,
+    };
+    if !fits {
+        return Err("read-open-rows UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA [crowds | ticks [OTHER OTHER_SHA] | held [OTHER OTHER_SHA] | jitter OTHER OTHER_SHA]".into());
     }
-    let with_crowds = args.len() == 14;
-    let other = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
+    let with_crowds = mode == Some("crowds");
+    let with_ticks = mode == Some("ticks");
+    let with_held = mode == Some("held");
+    let with_halves = mode == Some("halves");
+    let with_bytick = mode == Some("bytick");
+    let with_carried = mode == Some("carried");
+    let loaded = if args.len() == 16 { Some(Learner::from_text(std::str::from_utf8(&pinned_read(&args[14], &args[15], STATE_BUDGET)?)?).map_err(|e| e.to_string())?) } else { None };
+    let (other, reader) = if mode == Some("jitter") { (loaded, None) } else { (None, loaded) };
     let started = std::time::Instant::now();
     refuse_variables("read-open-rows")?;
     let units = units_of(&args[1], &args[2])?;
@@ -509,6 +525,12 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
     let mut acc: Vec<Vec<OpenRows>> = vec![vec![OpenRows::default(); ticks * heads]; names.len()];
     let mut crowds: Vec<Vec<OpenCrowds>> = vec![vec![OpenCrowds::default(); ticks * heads]; names.len()];
     let mut jitter: Vec<[[u64; 40]; OPEN_OCTAVES]> = vec![[[0u64; 40]; OPEN_OCTAVES]; ticks * heads];
+    let mut news: Vec<Vec<holonics_engine::field::TickNews>> = vec![vec![holonics_engine::field::TickNews::default(); ticks]; names.len()];
+    let mut held: Vec<holonics_engine::field::HeldRead> = vec![holonics_engine::field::HeldRead::default(); names.len()];
+    let mut halves: Vec<[i128; 5]> = vec![[0; 5]; names.len()];
+    let mut bytick: Vec<Vec<i128>> = vec![Vec::new(); names.len()];
+    let mut carried_acc: Vec<Vec<[i128; 3]>> = vec![Vec::new(); names.len()];
+    let mut carried_compared: Vec<u64> = vec![0; names.len()];
     let (mut done, mut regions_read) = (0usize, 0usize);
     while done < sections {
         let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
@@ -528,6 +550,77 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         }
         let owned: Vec<OwnedRegion> = regions.iter().map(|(_, r)| r.clone()).collect();
         let views = views_of(&owned);
+        let field = reader.as_ref().map_or(&learner.field, |r| &r.field);
+        if with_carried {
+            // [measurement; theory, November 15 22:29Z] The held set dropped and carried one tick, at 1/64 and 1/16 bit, by slice.
+            let read: Vec<std::result::Result<Vec<[i128; 3]>, String>> = views.par_iter().map(|v| field.held_carried(v, &HELD_SIGMAS).map_err(|e| e.to_string())).collect();
+            for ((slice, r), cell) in regions.iter().zip(read) {
+                let c = cell?;
+                carried_acc[*slice].resize(c.len(), [0; 3]);
+                for (acc, row) in carried_acc[*slice].iter_mut().zip(&c) {
+                    for i in 0..3 {
+                        acc[i] += row[i];
+                    }
+                }
+                carried_compared[*slice] += r.unresolved.iter().filter(|&&u| u).count() as u64;
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("CARRIED_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
+        if with_bytick {
+            // [measurement; theory, November 15 22:04Z] The held set at 1/16 bit a tick at a time, by slice.
+            let read: Vec<std::result::Result<Vec<i128>, String>> = views.par_iter().map(|v| field.held_by_tick(v, 4).map_err(|e| e.to_string())).collect();
+            for ((slice, _), cell) in regions.iter().zip(read) {
+                let c = cell?;
+                bytick[*slice].resize(c.len(), 0);
+                bytick[*slice].iter_mut().zip(&c).for_each(|(a, b)| *a += b);
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("BYTICK_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
+        if with_halves {
+            // [measurement; theory, November 15 21:45Z] The held set at 1/16 bit and its two complementary halves, by slice.
+            let read: Vec<std::result::Result<[i128; 4], String>> = views.par_iter().map(|v| field.held_halves(v, 4).map_err(|e| e.to_string())).collect();
+            for ((slice, r), cell) in regions.iter().zip(read) {
+                let c = cell?;
+                for i in 0..4 {
+                    halves[*slice][i] += c[i];
+                }
+                halves[*slice][4] += r.classes.len() as i128;
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("HALVES_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
+        if with_held {
+            // [measurement; theory, November 15 21:16Z] The forward with its quiet written site-ticks held, at 1/64 and 1/16 bit, by slice.
+            let read: Vec<std::result::Result<holonics_engine::field::HeldRead, String>> = views.par_iter().map(|v| field.held_forward(v, &HELD_SIGMAS).map_err(|e| e.to_string())).collect();
+            for ((slice, _), cell) in regions.iter().zip(read) {
+                held[*slice].add(&cell?);
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("HELD_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
+        if with_ticks {
+            // [measurement; theory, November 15 20:38Z] What each site's tick moves and what reaches it, by slice and tick.
+            let read: Vec<std::result::Result<Vec<holonics_engine::field::TickNews>, String>> = views.par_iter().map(|v| field.tick_news(v).map_err(|e| e.to_string())).collect();
+            for ((slice, _), cells) in regions.iter().zip(read) {
+                for (k, c) in cells?.iter().enumerate() {
+                    news[*slice][k].add(c);
+                }
+            }
+            regions_read += regions.len();
+            done += 1;
+            println!("TICK_NEWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
+        }
         if let Some(other) = other.as_ref() {
             let read: Vec<std::result::Result<Vec<[[u64; 40]; OPEN_OCTAVES]>, String>> = views.par_iter().map(|v| learner.field.far_jitter(&other.field, v).map_err(|e| e.to_string())).collect();
             for cells in read {
@@ -566,6 +659,84 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         println!("OPEN_ROWS_SECTION n={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
     }
     let kind = |h: usize| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" };
+    if with_carried {
+        let nats = std::f64::consts::LN_2 / (1u64 << 20) as f64;
+        for (s, name) in names.iter().enumerate() {
+            let n = carried_compared[s].max(1) as f64;
+            for (i, e) in HELD_SIGMAS.iter().enumerate() {
+                let Some(&[whole, dropped, carried]) = carried_acc[s].get(i) else { continue };
+                println!("CARRIED slice={name} sigma=2^-{e} compared={} rise_nats_a_compared dropped={:.5} carried={:.5} carried_over_dropped={:.3}", carried_compared[s], (dropped - whole) as f64 * nats / n, (carried - whole) as f64 * nats / n, (carried - whole) as f64 / (dropped - whole).max(1) as f64);
+            }
+        }
+        println!("CARRIED_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
+    if with_bytick {
+        for (s, name) in names.iter().enumerate() {
+            let c = &bytick[s];
+            let Some(&full) = c.first() else { continue };
+            let rises: Vec<String> = c[1..].iter().enumerate().map(|(k, &v)| format!("t{k}={:.3}", (v - full) as f64 / (1u64 << 20) as f64)).collect();
+            println!("BYTICK slice={name} sigma=2^-4 rise_bits {}", rises.join(" "));
+        }
+        println!("BYTICK_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
+    if with_halves {
+        for (s, name) in names.iter().enumerate() {
+            let [full, all, a, b, sites] = halves[s];
+            let rise = |v: i128| (v - full) as f64 / (1u64 << 20) as f64;
+            let (ra, rb, rf) = (rise(a), rise(b), rise(all));
+            println!("HALVES slice={name} sigma=2^-4 sites={sites} rise_bits all={rf:.3} half_a={ra:.3} half_b={rb:.3} half_over_all a={:.3} b={:.3} sum_over_all={:.3}", ra / rf, rb / rf, (ra + rb) / rf);
+        }
+        println!("HALVES_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
+    if with_held {
+        let bits = |v: i128| v as f64 / (1u64 << 20) as f64;
+        let abits = |v: i128| v as f64 / (1u64 << 40) as f64;
+        for (s, name) in names.iter().enumerate() {
+            let c = &held[s];
+            let (nc, nw) = (c.compared.max(1) as f64, c.written.max(1) as f64);
+            for (i, e) in HELD_SIGMAS.iter().enumerate() {
+                let (Some(&o), Some(&ch)) = (c.code_oracle.get(i), c.code_chart.get(i)) else { continue };
+                let ticks_text: Vec<String> = (0..c.a_all.len())
+                    .map(|k| {
+                        let (n, ah, abh, abc) = (c.held[i][k], c.a_held[i][k], c.abs_held[i][k], c.abs_chart[i][k]);
+                        format!("t{k}:held={:.3} sum_a/abs={:+.3} held_sum_a/abs={:+.3} held_abs_share={:.4} chart_abs_over_oracle={:.2}", n as f64 / nw, c.a_all[k] as f64 / c.abs_all[k].max(1) as f64, ah as f64 / abh.max(1) as f64, abh as f64 / c.abs_all[k].max(1) as f64, abc as f64 / abh.max(1) as f64)
+                    })
+                    .collect();
+                println!(
+                    "HELD slice={name} sigma=2^-{e} compared={} written={} code_bits_a_compared full={:.5} oracle={:+.5} chart={:+.5} rise_bits_a_written oracle={:+.5} chart={:+.5} {}",
+                    c.compared, c.written, bits(c.code_full) / nc, bits(o - c.code_full) / nc, bits(ch - c.code_full) / nc, bits(o - c.code_full) / nw, bits(ch - c.code_full) / nw, ticks_text.join(" ")
+                );
+                let _ = abits;
+            }
+        }
+        println!("HELD_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
+    if with_ticks {
+        // `a` on `2^(−40)` bits; a share under `σ = 2^(−e)` bits counts the octaves `b ≤ 40 − e` (`|a| < 2^(40 − e)`).
+        for (s, name) in names.iter().enumerate() {
+            for k in 0..ticks {
+                let c = &news[s][k];
+                for (kind, label) in ["written", "open"].iter().enumerate() {
+                    let n = c.sites[kind].max(1) as f64;
+                    let total = c.cost_abs[kind].max(1) as f64;
+                    let under = |e: usize| -> (f64, f64) {
+                        let top = 40 - e;
+                        (c.cost[kind][..=top].iter().sum::<u64>() as f64 / n, c.cost_mass[kind][..=top].iter().sum::<u128>() as f64 / total)
+                    };
+                    let shares: Vec<String> = [6usize, 5, 4, 3, 2].iter().map(|&e| { let (a, b) = under(e); format!("s2^-{e}:{a:.3}/{b:.4}") }).collect();
+                    let hist = |h: &[u64]| -> String { h.iter().enumerate().filter(|&(_, &v)| v > 0).map(|(b, v)| format!("{b}:{v}")).collect::<Vec<_>>().join(",") };
+                    println!("TICK_NEWS slice={name} tick={k} kind={label} sites={} unread_current={:.4} rule_misses={}/{} mean_abs_bits={:.6} under_sigma(sites/mass) {}", c.sites[kind], c.unread[kind] as f64 / n, c.rule_misses[0], c.rule_misses[1], c.cost_abs[kind] as f64 / n / (1u64 << 40) as f64, shares.join(" "));
+                    println!("TICK_NEWS_OCTAVES slice={name} tick={k} kind={label} cost {} update(80+) {} covector {}", hist(&c.cost[kind]), hist(&c.update[kind]), hist(&c.covector[kind]));
+                }
+            }
+        }
+        println!("TICK_NEWS_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+        return Ok(());
+    }
     if other.is_some() {
         // The median and quartiles of |Δz| by head, tick and octave, in bits (the bin's upper edge, 2^(b+1) on the face's 2^(−16) grain).
         let quantile = |hist: &[u64; 40], q: f64| -> f64 {

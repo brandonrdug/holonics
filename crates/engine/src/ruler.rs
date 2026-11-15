@@ -358,6 +358,109 @@ pub struct RingStage {
     pub inner: i128,
 }
 
+/// The octaves a [`TickNews`] histogram holds.
+pub const TICK_OCTAVES: usize = 160;
+
+/// [measurement; theory, November 15 20:38Z, the return on the clock of news] **What each site's tick moves, and what reaches it**, one tick:
+/// for each site (`[0]` written, `[1]` open), with `Δx = x^(k+1) − x^k` the tick's own update and `λ^(k+1)` the covector its reverse
+/// receives, `a = ⟨λ^(k+1), Δx⟩` on `2^(−40)` bits (the code's first-order move were the site's tick held, the mirror's grain), counted by
+/// its octave (`0` where `a = 0`, else `⌊log₂|a|⌋ + 1`) with `Σ |a|`; the update against the state it moved, by the octave of
+/// `‖Δx‖² / ‖x^k‖²` (`80 + bits(‖Δx‖²) − bits(‖x^k‖²)`); and the covector's power, by the octave of `‖λ^(k+1)‖²`. A reading only.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TickNews {
+    pub sites: [u64; 2],
+    pub cost: [[u64; TICK_OCTAVES]; 2],
+    pub cost_abs: [u128; 2],
+    /// `Σ |a|` by the octave of `|a|`.
+    pub cost_mass: [[u128; TICK_OCTAVES]; 2],
+    pub update: [[u64; TICK_OCTAVES]; 2],
+    pub covector: [[u64; TICK_OCTAVES]; 2],
+    /// The sites whose contact current no reader returns to at this tick (`δỹ = 0` at every head): their rows are read by nobody.
+    pub unread: [u64; 2],
+    /// The sites where the strand rule (a site's row is read iff it or a strand neighbour is open) disagrees with `δỹ = 0`: read by the rule
+    /// but unread (`[0]`), unread by the rule but read (`[1]`).
+    pub rule_misses: [u64; 2],
+}
+
+impl Default for TickNews {
+    fn default() -> Self {
+        Self { sites: [0; 2], cost: [[0; TICK_OCTAVES]; 2], cost_abs: [0; 2], cost_mass: [[0; TICK_OCTAVES]; 2], update: [[0; TICK_OCTAVES]; 2], covector: [[0; TICK_OCTAVES]; 2], unread: [0; 2], rule_misses: [0; 2] }
+    }
+}
+
+impl TickNews {
+    pub fn add(&mut self, o: &TickNews) {
+        for kind in 0..2 {
+            self.sites[kind] += o.sites[kind];
+            self.unread[kind] += o.unread[kind];
+            self.rule_misses[kind] += o.rule_misses[kind];
+            self.cost_abs[kind] += o.cost_abs[kind];
+            for b in 0..TICK_OCTAVES {
+                self.cost[kind][b] += o.cost[kind][b];
+                self.cost_mass[kind][b] += o.cost_mass[kind][b];
+                self.update[kind][b] += o.update[kind][b];
+                self.covector[kind][b] += o.covector[kind][b];
+            }
+        }
+    }
+}
+
+/// [measurement; theory, November 15 21:16Z] **What holding the quiet written site-ticks costs** ([`Constitution::held_forward`]), one region:
+/// the compared places and written sites; the compared places' code on `2^(−20)` bits, whole and held (by `a`, the oracle, and by the
+/// chart's move at the oracle's count), a section each; and by section and tick the sites held, `Σ a` and `Σ |a|` held (`2^(−40)` bits),
+/// `Σ |a|` the chart's criterion holds, with `Σ a` and `Σ |a|` over every written site a tick.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct HeldRead {
+    pub compared: u64,
+    pub written: u64,
+    pub code_full: i128,
+    pub code_oracle: Vec<i128>,
+    pub code_chart: Vec<i128>,
+    pub held: Vec<Vec<u64>>,
+    pub a_held: Vec<Vec<i128>>,
+    pub abs_held: Vec<Vec<u128>>,
+    pub abs_chart: Vec<Vec<u128>>,
+    pub a_all: Vec<i128>,
+    pub abs_all: Vec<u128>,
+}
+
+impl HeldRead {
+    pub fn add(&mut self, o: &HeldRead) {
+        self.compared += o.compared;
+        self.written += o.written;
+        self.code_full += o.code_full;
+        let grow = |v: &mut Vec<i128>, w: &[i128]| {
+            v.resize(v.len().max(w.len()), 0);
+            v.iter_mut().zip(w).for_each(|(x, y)| *x += y);
+        };
+        let grow_u = |v: &mut Vec<u128>, w: &[u128]| {
+            v.resize(v.len().max(w.len()), 0);
+            v.iter_mut().zip(w).for_each(|(x, y)| *x += y);
+        };
+        grow(&mut self.code_oracle, &o.code_oracle);
+        grow(&mut self.code_chart, &o.code_chart);
+        grow(&mut self.a_all, &o.a_all);
+        grow_u(&mut self.abs_all, &o.abs_all);
+        for (mine, theirs) in [(&mut self.a_held, &o.a_held)] {
+            mine.resize(mine.len().max(theirs.len()), Vec::new());
+            mine.iter_mut().zip(theirs).for_each(|(m, t)| grow(m, t));
+        }
+        for (mine, theirs) in [(&mut self.abs_held, &o.abs_held), (&mut self.abs_chart, &o.abs_chart)] {
+            mine.resize(mine.len().max(theirs.len()), Vec::new());
+            mine.iter_mut().zip(theirs).for_each(|(m, t)| grow_u(m, t));
+        }
+        self.held.resize(self.held.len().max(o.held.len()), Vec::new());
+        for (m, t) in self.held.iter_mut().zip(&o.held) {
+            m.resize(m.len().max(t.len()), 0);
+            m.iter_mut().zip(t).for_each(|(x, y)| *x += y);
+        }
+    }
+}
+
+fn octave_of(v: u128) -> usize {
+    ((128 - v.leading_zeros()) as usize).min(TICK_OCTAVES - 1)
+}
+
 /// `log₂ n` on `2^(−16)` for `n ≥ 1` ([`log2_face`] of `n/2^(⌊log₂ n⌋ + 1)` and the whole part).
 pub(crate) fn log2_grain(n: u128) -> i64 {
     let whole = 127 - i64::from(n.max(1).leading_zeros());
@@ -1054,6 +1157,194 @@ impl Constitution {
             }
         }
         Ok((out, audience))
+    }
+
+    /// [measurement; theory, November 15 20:38Z] **What each site's tick moves, and what reaches it** ([`TickNews`]), one region's forward and
+    /// reverse, a [`TickNews`] a tick in the forward's order. A reading only.
+    pub fn tick_news(&self, region: &Region) -> Result<Vec<TickNews>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        let mut currents: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        currents.reverse();
+        let (sites, dw, heads, span) = (region.classes.len(), self.declaration.width, self.declaration.heads, 2 * self.declaration.modes);
+        let mut out = Vec::with_capacity(pass.ticks.len());
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            let mut r = TickNews::default();
+            for t in 0..sites {
+                let kind = usize::from(!Self::definite(region, t));
+                if let Some(cur) = currents.get(k) {
+                    let quiet = (0..heads).all(|h| cur[(h * sites + t) * span..(h * sites + t + 1) * span].iter().all(|&v| v == 0));
+                    r.unread[kind] += u64::from(quiet);
+                    let open = |u: usize| !Self::definite(region, u);
+                    let read = open(t) || (t > 0 && open(t - 1)) || (t + 1 < sites && open(t + 1));
+                    if read && quiet {
+                        r.rule_misses[0] += 1;
+                    } else if !read && !quiet {
+                        r.rule_misses[1] += 1;
+                    }
+                }
+                let span = t * dw..(t + 1) * dw;
+                let (mut a, mut dd, mut xx, mut ll) = (0i128, 0u128, 0u128, 0u128);
+                for ((&after, &before), &l) in cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]) {
+                    let dx = i128::from(after) - i128::from(before);
+                    a += i128::from(l) * dx;
+                    dd += dx.unsigned_abs().pow(2);
+                    xx += i128::from(before).unsigned_abs().pow(2);
+                    ll += i128::from(l).unsigned_abs().pow(2);
+                }
+                r.sites[kind] += 1;
+                r.cost[kind][octave_of(a.unsigned_abs())] += 1;
+                r.cost_mass[kind][octave_of(a.unsigned_abs())] += a.unsigned_abs();
+                r.cost_abs[kind] += a.unsigned_abs();
+                let rel = (80 + octave_of(dd) as i64 - octave_of(xx) as i64).clamp(0, TICK_OCTAVES as i64 - 1) as usize;
+                r.update[kind][if dd == 0 { 0 } else { rel }] += 1;
+                r.covector[kind][octave_of(ll)] += 1;
+            }
+            out.push(r);
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 15 21:16Z] **The forward with its quiet written site-ticks held** ([`HeldRead`]): one region's forward and
+    /// reverse give each written site-tick its `a = ⟨λ^(k+1), Δx^k⟩` ([`TickNews`]); for each section `σ = 2^(40−e)` on `2^(−40)` bits (`e` in
+    /// `sigmas`) the forward is read again with every written site-tick of `|a| < σ` held (the oracle), and again with as many written sites held
+    /// at each tick by the chart's move (`Σ (r̂(x^(k+1)) − r̂(x^k))²` over the lanes' rays, least first: a criterion the forward can read), and
+    /// the compared places' code is summed for each. A reading only.
+    pub fn held_forward(&self, region: &Region, sigmas: &[u32]) -> Result<HeldRead> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let d = &self.declaration;
+        let (sites, dw, lanes, ticks) = (region.classes.len(), d.width, d.lanes, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let written: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
+        let mut out = HeldRead { compared: pass.faces.iter().filter(|f| f.is_some()).count() as u64, written: written.iter().filter(|&&w| w).count() as u64, code_full: code(&pass), ..HeldRead::default() };
+        // Each written site-tick's `a` and its chart's move.
+        let (mut a, mut moved) = (vec![vec![0i128; sites]; ticks], vec![vec![0u128; sites]; ticks]);
+        let (mut rb, mut sb, mut ra, mut sa) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            for t in (0..sites).filter(|&t| written[t]) {
+                let span = t * dw..(t + 1) * dw;
+                a[k][t] = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum();
+                (rb.clear(), sb.clear(), ra.clear(), sa.clear());
+                lane_chart(&cell.before[span.clone()], lanes, &mut rb, &mut sb)?;
+                lane_chart(&cell.after[span.clone()], lanes, &mut ra, &mut sa)?;
+                moved[k][t] = rb.iter().zip(&ra).map(|(&p, &q)| (i128::from(q) - i128::from(p)).unsigned_abs().pow(2)).sum();
+            }
+            out.a_all.push(a[k].iter().sum());
+            out.abs_all.push(a[k].iter().map(|v| v.unsigned_abs()).sum());
+        }
+        for &e in sigmas {
+            let sigma = 1u128 << (40 - e);
+            let oracle: Vec<Vec<bool>> = (0..ticks).map(|k| (0..sites).map(|t| written[t] && a[k][t].unsigned_abs() < sigma).collect()).collect();
+            let mut by_chart = vec![vec![false; sites]; ticks];
+            let (mut held, mut a_held, mut abs_held, mut abs_chart) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+            for k in 0..ticks {
+                let n = oracle[k].iter().filter(|&&h| h).count();
+                let mut order: Vec<usize> = (0..sites).filter(|&t| written[t]).collect();
+                order.sort_by_key(|&t| (moved[k][t], t));
+                for &t in order.iter().take(n) {
+                    by_chart[k][t] = true;
+                }
+                held.push(n as u64);
+                a_held.push((0..sites).filter(|&t| oracle[k][t]).map(|t| a[k][t]).sum::<i128>());
+                abs_held.push((0..sites).filter(|&t| oracle[k][t]).map(|t| a[k][t].unsigned_abs()).sum::<u128>());
+                abs_chart.push((0..sites).filter(|&t| by_chart[k][t]).map(|t| a[k][t].unsigned_abs()).sum::<u128>());
+            }
+            out.code_oracle.push(code(&self.pass_held(region, &oracle)?));
+            out.code_chart.push(code(&self.pass_held(region, &by_chart)?));
+            (out.held.push(held), out.a_held.push(a_held), out.abs_held.push(abs_held), out.abs_chart.push(abs_chart));
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 15 21:45Z] **Half the held set** ([`Constitution::held_forward`]'s oracle at `σ = 2^(40−e)`), split in two
+    /// complementary halves by a fixed mixing of the site and tick (a ruler's split, no symbol read): the compared places' code whole, under the
+    /// full held set and under each half, on `2^(−20)` bits. Per-site curvature halves the rise; a crowd of held steps at a shared reader, quadratic
+    /// in their sum, brings each half near a quarter. A reading only.
+    pub fn held_halves(&self, region: &Region, e: u32) -> Result<[i128; 4]> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let sigma = 1u128 << (40 - e);
+        let mut full = vec![vec![false; sites]; ticks];
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            for t in (0..sites).filter(|&t| Self::definite(region, t)) {
+                let span = t * dw..(t + 1) * dw;
+                let a: i128 = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum();
+                full[k][t] = a.unsigned_abs() < sigma;
+            }
+        }
+        let side = |k: usize, t: usize| -> bool {
+            let mut z = (t as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (k as u64).wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
+            z ^= z >> 31;
+            z = z.wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            (z >> 63) == 1
+        };
+        let half = |which: bool| -> Vec<Vec<bool>> { (0..ticks).map(|k| (0..sites).map(|t| full[k][t] && side(k, t) == which).collect()).collect() };
+        Ok([code(&pass), code(&self.pass_held(region, &full)?), code(&self.pass_held(region, &half(false))?), code(&self.pass_held(region, &half(true))?)])
+    }
+
+    /// [measurement; theory, November 15 22:04Z] **The held set a tick at a time** ([`Constitution::held_forward`]'s oracle at `σ = 2^(40−e)`):
+    /// the compared places' code whole, then with only tick `k`'s held written sites held, a tick each, on `2^(−20)` bits. A reading only.
+    pub fn held_by_tick(&self, region: &Region, e: u32) -> Result<Vec<i128>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let sigma = 1u128 << (40 - e);
+        let mut out = vec![code(&pass)];
+        for k0 in 0..ticks {
+            let mut hold = vec![vec![false; sites]; ticks];
+            let (cell, lambda) = (&pass.ticks[k0], &lambdas[k0]);
+            for t in (0..sites).filter(|&t| Self::definite(region, t)) {
+                let span = t * dw..(t + 1) * dw;
+                let a: i128 = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum();
+                hold[k0][t] = a.unsigned_abs() < sigma;
+            }
+            out.push(code(&self.pass_held(region, &hold)?));
+        }
+        Ok(out)
+    }
+
+    /// [measurement; theory, November 15 22:29Z] **The held set dropped and carried** ([`Constitution::held_forward`]'s oracle at each
+    /// `σ = 2^(40−e)`): the compared places' code whole, then a section's oracle set dropped at every tick and carried one tick
+    /// ([`Constitution::pass_carried`]), on `2^(−20)` bits, `[whole, dropped, carried]` a section. A reading only.
+    pub fn held_carried(&self, region: &Region, sigmas: &[u32]) -> Result<Vec<[i128; 3]>> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambdas: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        lambdas.reverse();
+        let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
+        let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
+        let mut a = vec![vec![0u128; sites]; ticks];
+        for (k, (cell, lambda)) in pass.ticks.iter().zip(&lambdas).enumerate() {
+            for t in (0..sites).filter(|&t| Self::definite(region, t)) {
+                let span = t * dw..(t + 1) * dw;
+                a[k][t] = cell.after[span.clone()].iter().zip(&cell.before[span.clone()]).zip(&lambda[span.clone()]).map(|((&x1, &x0), &l)| i128::from(l) * (i128::from(x1) - i128::from(x0))).sum::<i128>().unsigned_abs();
+            }
+        }
+        let whole = code(&pass);
+        let mut out = Vec::with_capacity(sigmas.len());
+        for &e in sigmas {
+            let sigma = 1u128 << (40 - e);
+            let hold: Vec<Vec<bool>> = (0..ticks).map(|k| (0..sites).map(|t| Self::definite(region, t) && a[k][t] < sigma).collect()).collect();
+            out.push([whole, code(&self.pass_held(region, &hold)?), code(&self.pass_carried(region, &hold)?)]);
+        }
+        Ok(out)
     }
 
     /// [measurement; G160] **The read's mirror at its founding** ([`Constitution::mirror_route`]): one region's forward and reverse, and for each tick

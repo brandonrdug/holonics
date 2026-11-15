@@ -1,0 +1,6 @@
+HALVES slice=code sigma=2^-4 sites=96625 rise_bits all=1287.889 half_a=418.106 half_b=352.373 half_over_all a=0.325 b=0.274 sum_over_all=0.598
+HALVES slice=web sigma=2^-4 sites=48339 rise_bits all=414.905 half_a=118.167 half_b=120.737 half_over_all a=0.285 b=0.291 sum_over_all=0.576
+HALVES slice=science sigma=2^-4 sites=48120 rise_bits all=557.912 half_a=99.317 half_b=145.115 half_over_all a=0.178 b=0.260 sum_over_all=0.438
+HALVES slice=books sigma=2^-4 sites=28155 rise_bits all=261.005 half_a=82.125 half_b=47.268 half_over_all a=0.315 b=0.181 sum_over_all=0.496
+HALVES slice=wikidata sigma=2^-4 sites=19190 rise_bits all=220.947 half_a=54.010 half_b=70.166 half_over_all a=0.244 b=0.318 sum_over_all=0.562
+HALVES_DONE sections=6 regions=1095 ms=981866
