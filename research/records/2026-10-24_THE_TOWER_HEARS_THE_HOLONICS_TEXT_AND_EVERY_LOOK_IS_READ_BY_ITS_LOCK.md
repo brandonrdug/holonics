@@ -2510,7 +2510,7 @@ At the units cell the digits' ring is the loudest form the cell holds, so the po
 it reads 391. `χ₉` is `χ₁`'s mirror, the same ring turned the other way, and the probe reads both.
 After `=` the line's marks were louder only because that landmark marks the line's end as well.
 
-**The machine's founding** (`found-tower-ring`, [`tower_ring.rs`](../../crates/holonics/examples/solenoidal_alpha/complete_language/tower_ring.rs)).
+**The machine's founding** (`found-tower-ring`, [`tower_ring.rs`](https://github.com/brandonrdug/holonics/blob/8a77b7755/crates/holonics/examples/solenoidal_alpha/complete_language/tower_ring.rs)).
 The machine now does what the exterior reads did:
 - **The ring** rides placement mode 41's own moves. The tower's reverse now returns each mode's move
   at every cell beside the input covector (`InputCovector::moves`).
