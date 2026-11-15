@@ -466,6 +466,25 @@ type is named "Field", and parity, reproduction and timing hold after each.
 `train-field`, its switches and the retired readings leave; `field_pass` leaves. Done when
 `athena` depends on the engine crates alone, the line's scripts run on it, and the reproduction
 holds with the reads' lines.
+- Read November 14 and 15 (the receipt's C6 section):
+  - `athena` holds the store line's live commands (`train-store`, `write-store`, `found-lane`,
+    `next-pass`), its live reading (`ruler::cavity`), the parity (`parity-store`) and the exterior's
+    shared reads and writes. The binary keeps field_pass's words and the card's measures
+    (`yardstick`, `attributes`, `reserve`, the profile). It depends on the engine crates and `rayon`.
+  - The field line retired (`field_train.rs`, `field_parity.rs`: 5,896 lines, held at `7a1eb3ce7`),
+    and 22 store readings and foundings, each guess read (held at `264161d8e`).
+  - Gate 3 is equal on lap 13, the line's last saved state, and timing holds state for state in a
+    balanced hold. The line goes on from lap 14 on `athena`.
+- Three facts the plan missed:
+  - `field_pass`'s `time` mode routed only `time-field`. On the store line the time read is
+    `train-store`'s own section lines, which every timing hold reads, so `time` left with it.
+  - The exterior items C4 left in the harness are shared by the harness and the commands. They are
+    `athena::exterior`, and the harness imports them back until C8.
+  - The harness's dev-dependency on `athena` reaches the card crate, and clippy lints a workspace
+    member it compiles as a dependency. Gate 1's guard lints now name their crates (`--no-deps`), so
+    the card's owed float lints (C3) do not enter a lint that never named them.
+- Owed to C8: the harness (`solenoidal_alpha`, its tower and native lines) leaves with the
+  examples, and `tools/seen_passage.py`, a ruler of `train-field`'s withholding, with the tools.
 
 **C7. Headers, comments and the engine guide** (the PC or the cloud; text only).
 - Every module and kernel header takes §5's form. A comment's dated reasoning moves to the record

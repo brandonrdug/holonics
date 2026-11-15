@@ -132,3 +132,37 @@ control's 703.8, a 2.8% gap outside the control's 1.5 ms spread.
 
 **The verdict.** The plan's guess for C5 (§8: within the spread) holds once the order is balanced. The first hold's reading of a 2.8%
 gap was the order's. The timing rule now asks for a balanced order (CLAUDE.md).
+
+## C6: the commands (branch `claude/consolidation-c6`)
+
+- **The move.** `store_train.rs` is `athena::store`, `store_parity.rs` is `athena::parity` and `field_pass.rs` is the binary
+  `athena`, whose words are field_pass's (`athena train complete-language train-store ...`). The exterior items the store line
+  shared with the harness are `athena::exterior`, imported back by the harness until it retires (C8). `read-cavity`, the line's
+  one live reading, sits in `athena::ruler::cavity`. `athena` depends on `holonics-engine`, `holonics-engine-cuda` and `rayon`.
+- **What retired.** The October field line: `field_train.rs` (5,241 lines) and `field_parity.rs` (655 lines) with `train-field`,
+  its 24 other commands, `parity-field` and `time-field`, held at `7a1eb3ce7`. Then 22 store readings and foundings, each built
+  for one guess and each guess read, held at `264161d8e`. Kept: `train-store`, `read-cavity`, `write-store`, `found-lane`,
+  `next-pass` (C1's inventory of the line's scripts), `parity-store`, and the card's measures (`yardstick`, `attributes`,
+  `reserve`, `FIELD_PROFILE`, `FIELD_PHASES`). `crates/athena/src` holds 1,703 lines.
+- **Gate 1** passed whole at `a584b5257` (59 steps), with athena's guard lints and tests among them. Its first run failed the
+  guard lints: the harness's dev-dependency on athena reached the card crate, whose yardsticks owe their float lints, and clippy
+  lints a workspace member it compiles as a dependency. The lints now name their crates with `--no-deps`.
+- **Gate 3** (`gate3_c6.txt`) printed `GATE_ENGINE EQUAL` on the line's lap 13, its last saved state, with the athena build:
+  parity on 3 sections; lap 13's first 24 sections reproduced from lap 12's stopped state; lap 13's read equal byte for byte.
+
+### Timing (`timing_c6.txt`)
+
+One balanced hold, a warm-up and then c5 c6 c6 c5 c5 c6 c6 c5, 24 sections from lap 12's stopped state. Every run's section lines
+are equal. The card's two states stand again:
+
+| State | C5 (field_pass) | C6 (athena) |
+|---|---|---|
+| Fast | 699.9 ms | 702.3, 700.0 ms |
+| Slow | 718.8, 719.4, 717.8 ms | 717.0, 732.5 ms |
+
+State for state, C6 equals C5 within 2.4 ms on the fast state and within 1.8 ms on the slow, apart from one run at 732.5 ms, as C4
+held one at 741 in C5's hold. The plan's guess (§8: within the spread) holds; no engine code changed.
+
+### The line on athena
+
+The four-lane line goes on from lap 14 on the athena build (`chain8.sh`, private), which starts only once gate 3 printed EQUAL.

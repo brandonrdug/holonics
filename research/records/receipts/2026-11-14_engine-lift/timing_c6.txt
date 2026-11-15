@@ -1,0 +1,18 @@
+# C6's timing in one balanced hold: a warm-up, then c5 c6 c6 c5 c5 c6 c6 c5 (control: field_pass at main after C5; build: athena at C6), 24 of the line's sections from lap 12's stopped state. Mean ms a section; every run's section lines equal. Numbers only.
+run1 c5 exit 0 ms=17402
+run2 c5 exit 0 ms=17557
+run3 c6 exit 0 ms=17150
+run4 c6 exit 0 ms=17511
+run5 c5 exit 0 ms=17557
+run6 c5 exit 0 ms=17092
+run7 c6 exit 0 ms=17879
+run8 c6 exit 0 ms=17095
+run9 c5 exit 0 ms=17519
+C6_TIMING t2-c5 sections=24 equal_to_first=24 mean_ms=718.8
+C6_TIMING t3-c6 sections=24 equal_to_first=24 mean_ms=702.3
+C6_TIMING t4-c6 sections=24 equal_to_first=24 mean_ms=717.0
+C6_TIMING t5-c5 sections=24 equal_to_first=24 mean_ms=719.4
+C6_TIMING t6-c5 sections=24 equal_to_first=24 mean_ms=699.9
+C6_TIMING t7-c6 sections=24 equal_to_first=24 mean_ms=732.5
+C6_TIMING t8-c6 sections=24 equal_to_first=24 mean_ms=700.0
+C6_TIMING t9-c5 sections=24 equal_to_first=24 mean_ms=717.8

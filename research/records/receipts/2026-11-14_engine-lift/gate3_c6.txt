@@ -1,0 +1,12 @@
+# Gate 3 on C6 (claude/consolidation-c6: the commands in crates/athena, the binary athena), the four-lane line's lap 13 (trained from lap 12's stopped state; its mean MEAN.2000 read into its own read). Numbers only.
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=2175 host_ms=198778
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=202.2 peak_rss_kib=6177504
+MEASURE lap=read rc=0 wall_s=279.0 peak_rss_kib=534688
+MEASURE lap=repro rc=0 wall_s=17.5 peak_rss_kib=346160
+GATE_ENGINE EQUAL
