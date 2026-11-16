@@ -836,3 +836,20 @@ UTC); `agent-inferred` for the reading of them.
   resident threads (80 multiprocessors of 1,536), its time is one thread's walk of 512 live sites, and a tile sized from
   the live count to fill the card shortens it in the same proportion as the tile, the partition of a sum whose order
   is free.
+- **The live walk, scored, and a tile sized to the card it does not have** (the build thread, relayed 08:44 UTC; lap
+  56's state against #888; #891 and #892, receipts `research/records/receipts/2026-11-16_blankload/`). Taken into the
+  build: the list compacted in ascending order by one block's scan (8.0 µs), the tile computed on the card from the live
+  count, four sites' operands read before their four terms, and the lift's covector written zero at a dead site. Gate 3
+  equal. A clean hold: control 536.0 ms a section (spread 1.4), the walk 511.4, 0.954 (24.5 ms; pairs 23.9 to 25.3),
+  inside the build's 0.945 to 0.965. By the profile the bias and encoding 15.29 to 5.38 ms a section (0.352, against
+  0.10 to 0.30), the lift and read 8.83 to 3.25 (0.368, against 0.15 to 0.35), both on the side of less saved, and the
+  lift's covector 11.12 to 3.79 (0.341, inside 0.15 to 0.35). A launch of the bias and encoding: issue 24 to 27% to
+  53.5%, the long scoreboard 37 to 42 an issued instruction to 5.1, warps active 97% to 60%. Why the walks stand at 58
+  to 60% of warps active (`agent-inferred`, from the relay's numbers): the tile is sized so that the cells fill
+  `want = 80 × 1,536 = 122,880` threads, but at 48 registers five blocks of 256 stand on a multiprocessor, so the launch
+  holds 102,400, and the grid's stride sends 0.2 of its threads round a second tile while the rest have finished. The
+  launch then lasts two tiles; its warps average about half of the 48, near what was read; and a tile sized to the
+  102,400 that stand would last 1.2 of the present tile's walk. Guess, fixed at 08:47 UTC, for that change alone (`want`
+  read from the kernel's own occupancy, the same partition of a sum whose order is free): gate 3 equal; the bias and
+  encoding and the lift and read 0.60 to 0.75 of their present time a launch, their warps active 72 to 83%; 2.2 to 3.5
+  ms a section, a section 0.993 to 0.996, under a hold's resolution, so scored on the profile.
