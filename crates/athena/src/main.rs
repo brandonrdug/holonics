@@ -58,6 +58,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-forms") {
         return athena::store::read_forms(&rest[1..], &mut holonics_engine::realization::Host);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-junction") {
+        return athena::store::read_junction(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-forms") {
         return athena::store::write_forms(&rest[1..], &mut holonics_engine::realization::Host);
     }

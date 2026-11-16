@@ -1516,9 +1516,13 @@ pub fn read_writes(args: &[String], realization: &mut dyn Realization) -> Result
 /// ruler sums them by form, by the operands' lengths, by the digit's place and by whether a carry entered it. A reading: the state is read,
 /// never written. It runs on the card (`train`) or on the host's threads (`host`, beside the card's runs: it opens no card).
 pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
-    if args.len() != 11 {
-        return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA".into());
-    }
+    // [measurement; the theory thread's R1 of 19:12 UTC] With `one`, each place of the run is coded open alone, the rest of the run known
+    // (the one-place receiver: the state a training mask meets where a digit's neighbours are known).
+    let one = match (args.len(), args.get(11).map(String::as_str)) {
+        (11, None) => false,
+        (12, Some("one")) => true,
+        _ => return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA [one]".into()),
+    };
     let started = std::time::Instant::now();
     refuse_variables("read-forms")?;
     let units = units_of(&args[1], &args[2])?;
@@ -1545,17 +1549,28 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
         }
         let mut classes = p.clone();
         classes.extend_from_slice(&r);
-        let mut open = vec![false; p.len()];
-        open.extend(std::iter::repeat_n(true, r.len()));
+        if one {
+            for j in 0..r.len() {
+                let mut open = vec![false; classes.len()];
+                open[p.len() + j] = true;
+                regions.push(OwnedRegion::plain(classes.clone(), open));
+            }
+        } else {
+            let mut open = vec![false; p.len()];
+            open.extend(std::iter::repeat_n(true, r.len()));
+            regions.push(OwnedRegion::plain(classes, open));
+        }
         rows.push((label.to_string(), p.len(), r));
-        regions.push(OwnedRegion::plain(classes, open));
     }
     if rows.is_empty() {
         return Err("a forms table of no rows".into());
     }
-    println!("FORMS_LAW rows={} alphabet={} pairs_bound={} sites_bound={} ms={}", rows.len(), codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
+    println!("FORMS_LAW rows={} receiver={} alphabet={} pairs_bound={} sites_bound={} ms={}", rows.len(), if one { "one" } else { "open" }, codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
     let micro = |code: i128, places: usize| -> i128 { if places == 0 { 0 } else { code * 1_000_000 / ((places as i128) << 20) } };
     let (mut at, mut batches) = (0usize, 0usize);
+    // Each region's row and its first open place: a row's places in order, one region a place under `one`.
+    let owner: Vec<(usize, usize)> = rows.iter().enumerate().flat_map(|(k, r)| if one { (0..r.2.len()).map(|j| (k, j)).collect::<Vec<_>>() } else { vec![(k, 0)] }).collect();
+    let mut codes_of: Vec<Vec<i128>> = rows.iter().map(|r| vec![0; r.2.len()]).collect();
     while at < regions.len() {
         let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
         while end < regions.len() {
@@ -1566,16 +1581,20 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
             (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
         }
         let faces = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
-        for (k, faces) in (at..end).zip(faces) {
-            let (label, prompt, run) = &rows[k];
-            let codes: Vec<i128> = (0..run.len())
-                .map(|j| faces[prompt + j].as_ref().map(|f| f.code(run[j]) as i128).ok_or("an open place without a face"))
-                .collect::<std::result::Result<_, _>>()?;
-            let total: i128 = codes.iter().sum();
-            println!("FORMS_ROW label={label} prompt_places={prompt} run_places={} code={} by_place={}", run.len(), micro(total, run.len()), codes.iter().map(|&c| micro(c, 1).to_string()).collect::<Vec<_>>().join(","));
+        for (r, faces) in (at..end).zip(faces) {
+            let (k, j0) = owner[r];
+            let (_, prompt, run) = &rows[k];
+            let places: Vec<usize> = if one { vec![j0] } else { (0..run.len()).collect() };
+            for j in places {
+                codes_of[k][j] = faces[prompt + j].as_ref().map(|f| f.code(run[j]) as i128).ok_or("an open place without a face")?;
+            }
         }
         batches += 1;
         at = end;
+    }
+    for ((label, _, run), codes) in rows.iter().zip(&codes_of) {
+        let total: i128 = codes.iter().sum();
+        println!("FORMS_ROW label={label} prompt_places={} run_places={} code={} by_place={}", rows.iter().find(|r| &r.0 == label).map_or(0, |r| r.1), run.len(), micro(total, run.len()), codes.iter().map(|&c| micro(c, 1).to_string()).collect::<Vec<_>>().join(","));
     }
     println!("FORMS_DONE rows={} batches={batches} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
     Ok(())
@@ -1638,6 +1657,110 @@ pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
     println!("FORMS_WRITE_DONE rows={} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 16, the theory thread's R2 of 19:12 UTC] `read-junction UNITS UNITS_SHA KEYS KEYS_SHA CODEC
+/// CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA`: **where an answer digit's contact weight goes.** For each held sum or difference of two
+/// operands in its symbols form (`anchor:LENGTHS:OP:symbols:N` rows of the forms table: `a OP b = ` and the value), each digit of the value
+/// is opened alone, the rest of the record known (R1's receiver), and each tick and head's row at that digit is read for the shares of its
+/// contact weight on the operands' digits: the aligned ones (`a_k` and `b_k`, the digits at the same place counted from each number's
+/// last digit) and the others. Each line gives, by the operands' lengths, tick and head, the mean share an aligned digit takes and the mean
+/// share another operand digit takes, in millionths of the row's weight, and their ratio in thousandths. A reading on the host's threads
+/// (it opens no card): the state is read, never written. A ruler: it names places by the world's own layout, outside the machine.
+pub fn read_junction(args: &[String]) -> Result<()> {
+    use rayon::prelude::*;
+    if args.len() != 11 {
+        return Err("read-junction UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-junction")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    // (lengths, region, aligned places, other operand places, the first operand's aligned place, the second's)
+    let mut work: Vec<(String, OwnedRegion, Vec<usize>, Vec<usize>, Vec<usize>, Vec<usize>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, prompt, run] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        let parts: Vec<&str> = label.split(':').collect();
+        if parts.len() != 5 || parts[0] != "anchor" || parts[3] != "symbols" || !(parts[2] == "+" || parts[2] == "-") {
+            continue;
+        }
+        let toks: Vec<&str> = prompt.split(' ').collect();
+        let (a, b) = (toks[0], toks[2]);
+        let (a_at, b_at) = (0usize, a.len() + 3);
+        let value = run.replace("\\n", "\n");
+        let bytes = format!("{prompt}{value}").into_bytes();
+        let classes = codec.encode(&bytes)?;
+        let digits = value.trim_end_matches('\n').trim_start_matches('-');
+        let v_at = prompt.len() + value.len() - 1 - digits.len();
+        for k in 0..digits.len() {
+            let place = v_at + digits.len() - 1 - k;
+            let mut aligned = Vec::new();
+            let (mut a_k, mut b_k) = (Vec::new(), Vec::new());
+            if k < a.len() {
+                aligned.push(a_at + a.len() - 1 - k);
+                a_k.push(a_at + a.len() - 1 - k);
+            }
+            if k < b.len() {
+                aligned.push(b_at + b.len() - 1 - k);
+                b_k.push(b_at + b.len() - 1 - k);
+            }
+            let others: Vec<usize> = (a_at..a_at + a.len()).chain(b_at..b_at + b.len()).filter(|j| !aligned.contains(j)).collect();
+            if aligned.is_empty() || others.is_empty() {
+                continue;
+            }
+            let mut open = vec![false; classes.len()];
+            open[place] = true;
+            work.push((parts[1].to_string(), OwnedRegion::plain(classes.clone(), open), aligned, others, a_k, b_k));
+        }
+    }
+    let (ticks, heads) = (learner.field.declaration.ticks, learner.field.declaration.heads);
+    println!("JUNCTION_LAW digits={} ticks={ticks} heads={heads} ms={}", work.len(), started.elapsed().as_millis());
+    let micro = |p: u128| -> u128 { (p * 1_000_000) >> holonics_engine::width::SHARE_BITS };
+    // Per digit and tick and head: the aligned digits' mean share, the others' mean share, and the first and second operand's aligned digit's
+    // share apart (the second's aligned digit stands at a fixed offset from the answer digit, `len(" = ") + len(value) − len(b)`, so its share
+    // alone cannot tell an address from a fixed reach; the first's offset moves with the second operand's length).
+    type Cell = (usize, usize, u128, u128, Option<u128>, Option<u128>);
+    let read: Vec<std::result::Result<(String, Vec<Cell>), String>> = work
+        .par_iter()
+        .map(|(lengths, region, aligned, others, a_k, b_k)| {
+            let rows = learner.field.open_sources(&holonics_engine::region::view_of(region)).map_err(|e| e.to_string())?;
+            Ok((lengths.clone(), rows.into_iter().map(|(t, h, _, srcs)| {
+                let on = |set: &[usize]| srcs.iter().filter(|(j, _)| set.contains(j)).map(|&(_, p)| micro(p)).sum::<u128>() / set.len().max(1) as u128;
+                (t, h, on(aligned), on(others), (!a_k.is_empty()).then(|| on(a_k)), (!b_k.is_empty()).then(|| on(b_k)))
+            }).collect()))
+        })
+        .collect();
+    let mut acc: std::collections::BTreeMap<(String, usize, usize), [u128; 7]> = std::collections::BTreeMap::new();
+    for r in read {
+        let (lengths, cells) = r?;
+        for (t, h, al, ot, a, b) in cells {
+            let e = acc.entry((lengths.clone(), t, h)).or_insert([0; 7]);
+            e[0] += 1;
+            e[1] += al;
+            e[2] += ot;
+            if let Some(a) = a {
+                (e[3], e[4]) = (e[3] + 1, e[4] + a);
+            }
+            if let Some(b) = b {
+                (e[5], e[6]) = (e[5] + 1, e[6] + b);
+            }
+        }
+    }
+    for ((lengths, t, h), e) in &acc {
+        let (am, om) = (e[1] / e[0], e[2] / e[0]);
+        let (a, b) = (e[4] / e[3].max(1), e[6] / e[5].max(1));
+        let milli = |x: u128| if om == 0 { 0 } else { x * 1000 / om };
+        println!("JUNCTION_HEAD lengths={lengths} tick={t} head={h} digits={} aligned_share={am} other_share={om} ratio_milli={} first_share={a} first_milli={} second_share={b} second_milli={}", e[0], milli(am), milli(a), milli(b));
+    }
+    println!("JUNCTION_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 
