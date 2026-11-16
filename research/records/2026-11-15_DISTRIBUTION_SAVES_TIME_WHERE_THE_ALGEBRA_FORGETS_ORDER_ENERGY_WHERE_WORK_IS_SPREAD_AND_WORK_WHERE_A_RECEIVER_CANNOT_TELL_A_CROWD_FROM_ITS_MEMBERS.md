@@ -699,3 +699,30 @@ UTC); `agent-inferred` for the reading of them.
   part. Guess, fixed at 05:37 UTC (`agent-inferred`), on the profile against #877: its instructions 0.82 to 0.92 (the
   width checks' 0.20, of which the count is the larger part), its time 0.88 to 0.98 a launch over all its launches,
   toward 1 if the blank's bytes bind; with it the composed section reads 0.986 to 0.997 in place of 0.988 to 0.997.
+- **The registers and the scans' neighbours, read** (the build thread, relayed 05:38 UTC). `field_outer_x64` issues at
+  22.4% (5.6 ms a section, 58 launches), so its branch is also 0.76 to 0.88. Every kernel of the latency class is held
+  by its registers: the rows at 128 (four blocks, 16 warps; 28% measured), the columns at 72 (28 warps; 40%), the four
+  limbs at 80 with 310 and 624 bytes spilled (24 warps; 43%), the exposure at 80 with spills (44%), the skin's return at
+  96 and its fill at 64, the tiled and outer maps at 124 to 128 (16 warps; 25 to 30%). The lead of 05:35 that a wide
+  accumulator's limbs could lie across lanes is withdrawn on reading `contact_body` (`field.cu`): the contact already
+  gives each lane an entry of the span, and its accumulators are that entry's partial, so limbs across lanes would take
+  lanes from entries; and the four limbs' spills were measured cheaper than lost warps on November 15 (six blocks to
+  four read 1.066). The scans are the class whose registers are free (56 and 78, held by their count of threads, one a
+  region and circle), and their source shows how much of a step the chain carries:
+  - `field_pair_scan` carries `q` alone, `q ← fit64(b̃ + rel(γ q, 30))`. The face's read `pc = rel(a q, 16)` reads `q`
+    and nothing on the chain reads it back, and `q` is already written to `pqm` each step, so `pc` can be formed after
+    the scan on the pair's grid: half of a step's wide products leave the chain.
+  - `field_pair_scan_back` carries `x` alone, `x ← fit64(h + rel(conj(γ) u, 30))` with `u` the carried `x`. Its drive
+    term `h = rel(conj(a) δp, 16)` reads `pa` and `dc` alone, `δa = rel(conj(Qm) δp, 16)` reads `pqm` and `dc` alone,
+    and `δγ = rel(conj(Qm) u, 16)` reads `u`, which the scan writes to `db` before the gate's return overwrites it. So
+    `h` and `δa` can be formed before the scan and `δγ` after it, each on the pair's grid: 12 of a step's 16 wide
+    products and 6 of its 8 loads leave the chain.
+  - The chain's remaining loads (`γ`, and `b̃` or `h`) are addressed by the step alone, so they can be issued steps ahead
+    of their use, in registers the scans have free.
+  Every term is the same expression on the same operands, and the refusals are an OR, which no order changes; `h` is
+  held at the width of its release (a 128-bit product released 16 bits) until it meets the chain's sum, since the chain
+  fits the sum and never its parts. This is §3's law in the code's own pattern: span is the law's only for the store a
+  section stands on, and the rest of a step is work that spreads, as the gate and its return already do "off the chain
+  on the pair's grid" (`field_pair_gamma`, `field_pair_gate_back`). The scans hold 24.3 ms a section; a guess is fixed
+  when the split is built. A second stream (the triads' affine map beside the forward scan, the triads' outer, a leaf
+  of the return, beside the reverse) waits until then, since the split changes what the scans leave idle.
