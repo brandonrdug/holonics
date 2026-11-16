@@ -1,0 +1,51 @@
+ROOT/.local/wt/lead/tools/tension_ruler.py:278: RuntimeWarning: Mean of empty slice
+  centre = lambda x, sel: x - x[sel].mean(axis=0)
+/usr/lib/python3.14/site-packages/numpy/_core/_methods.py:134: RuntimeWarning: invalid value encountered in divide
+  ret = um.true_divide(
+TENSION_READ rows=65144 places=16286 ticks=4 fit_rows=32096 test_rows=33048
+TENSION_CODE lengths op part places nats_a_digit
+TENSION_CODE met + both-carry 894 2.3889
+TENSION_CODE met + both-clear 1144 2.3803
+TENSION_CODE met + one-carry 1843 2.3395
+TENSION_CODE met + one-clear 2189 2.1580
+TENSION_CODE met + top 2216 1.6072
+TENSION_CODE met + units 8000 2.3701
+TENSION_SHARE scope tick rows power constant linear_chart standing_products linear_current
+TENSION_SHARE met 0 8262 4.515651e-02 0.0287 0.2358 0.0922 0.1712
+TENSION_SHARE met 1 8262 2.566489e-02 0.0323 0.2423 0.1221 0.1930
+TENSION_SHARE met 2 8262 1.943245e-02 0.0345 0.2353 0.1253 0.1645
+TENSION_SHARE met 3 8262 1.951462e-02 0.0366 0.2236 0.1116 0.1925
+TENSION_SHARE met+ 0 8262 4.515651e-02 0.0287 0.2358 0.0922 0.1712
+TENSION_SHARE met+ 1 8262 2.566489e-02 0.0323 0.2423 0.1221 0.1930
+TENSION_SHARE met+ 2 8262 1.943245e-02 0.0345 0.2353 0.1253 0.1645
+TENSION_SHARE met+ 3 8262 1.951462e-02 0.0366 0.2236 0.1116 0.1925
+TENSION_PRESENCE scope tick rows a_from_chart b_from_chart a_from_current b_from_current
+TENSION_PRESENCE met 0 8262 0.4531 0.5093 0.3607 0.4175
+TENSION_PRESENCE met 1 8262 0.4344 0.5592 0.3114 0.5027
+TENSION_PRESENCE met 2 8262 0.3637 0.4615 0.2989 0.2823
+TENSION_PRESENCE met 3 8262 0.3828 0.4577 0.3421 0.3455
+TENSION_PRESENCE met+ 0 8262 0.4531 0.5093 0.3607 0.4175
+TENSION_PRESENCE met+ 1 8262 0.4344 0.5592 0.3114 0.5027
+TENSION_PRESENCE met+ 2 8262 0.3637 0.4615 0.2989 0.2823
+TENSION_PRESENCE met+ 3 8262 0.3828 0.4577 0.3421 0.3455
+TENSION_PRESENCE met+both 0 5091 0.4352 0.5294 0.3389 0.4509
+TENSION_PRESENCE met+both 1 5091 0.4470 0.5813 0.3321 0.5290
+TENSION_PRESENCE met+both 2 5091 0.3413 0.4594 0.2750 0.2824
+TENSION_PRESENCE met+both 3 5091 0.3471 0.4269 0.3182 0.2995
+Traceback (most recent call last):
+  File "ROOT/.local/wt/lead/tools/tension_ruler.py", line 656, in <module>
+    main()
+    ~~~~^^
+  File "ROOT/.local/wt/lead/tools/tension_ruler.py", line 640, in main
+    oracle(sys.argv[2])
+    ~~~~~~^^^^^^^^^^^^^
+  File "ROOT/.local/wt/lead/tools/tension_ruler.py", line 286, in oracle
+    print(f"TENSION_PRESENCE {scope} {k} {t.sum()} {removed(read, ac, f, t):.4f} {removed(read, bc, f, t):.4f} {removed(cur, ac, f, t):.4f} {removed(cur, bc, f, t):.4f}")
+                                                    ~~~~~~~^^^^^^^^^^^^^^^^
+  File "ROOT/.local/wt/lead/tools/tension_ruler.py", line 134, in removed
+    w = np.linalg.solve(h, ff.T @ lam[fit])
+  File "/usr/lib/python3.14/site-packages/numpy/linalg/_linalg.py", line 463, in solve
+    r = gufunc(a, b, signature=signature)
+  File "/usr/lib/python3.14/site-packages/numpy/linalg/_linalg.py", line 144, in _raise_linalgerror_singular
+    raise LinAlgError("Singular matrix")
+numpy.linalg.LinAlgError: Singular matrix

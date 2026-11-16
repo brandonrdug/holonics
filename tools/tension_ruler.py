@@ -628,6 +628,69 @@ def temper(d, heads=4):
             print(f"TEMPER_SLICE {h} {name} {t.sum()} {dl[t].mean():+.3e} {np.sqrt((dl[t] ** 2).mean()):.3e} {(dl[t] ** 2).sum() / total:.4f}")
 
 
+def heat(d):
+    """The row's heat against its sources' spread (the lead, November 16; Brandon's lens of 23:00Z on barycentric location and basins
+    on saddles; atlas `compression.anneal-split-temperature`, `contact.crowd-slip-bound`). A ruler on a `read-tension … all` directory's
+    `shares.tsv`: an open row's shares are a Gibbs face over its sources, a point of their simplex, and the row stands at its crowd's
+    barycentre while it is hot against the spread of its log-weights. For each open answer place of a sum whose column both operands
+    hold, by tick and head: the row's entropy in nats beside the logarithm of its count of sources, the variance of its log-weights
+    under its own shares (the square of its gain times the spread of its slips: under one, the row cannot tell its sources apart), how
+    far the two aligned sources' log-weights stand above the row's mean in units of that spread, and the share the two aligned sources
+    would hold with the row's gain raised by 2, 4, 8 and 16 at the same keys (p ∝ p^κ). Where the cooled row closes on the aligned
+    pair the keys locate and the gain is short of its critical value; where it does not, the keys do not single the pair out."""
+    acc, off = {}, {}
+    for line in open(os.path.join(d, "shares.tsv")):
+        lab, place, k, h, i, *rest = line.rstrip("\n").split("\t")
+        _, kind, op, a, b, v = lab.split(":")
+        if op != "+" or not rest or not rest[0]:
+            continue
+        _, kv, _ = site_role(lab, int(i))
+        if kv >= len(a) or kv >= len(b):
+            continue
+        at_b = len(a) + 3
+        ak, bk = len(a) - 1 - kv, at_b + len(b) - 1 - kv
+        cells = [x.split(":") for x in rest[0].split(" ")]
+        js = np.array([int(c[0]) for c in cells])
+        p = np.array([max(int(c[1]), 1) for c in cells], dtype=float)
+        p /= p.sum()
+        lw = np.log(p)
+        mean = float((p * lw).sum())
+        var = float((p * (lw - mean) ** 2).sum())
+        pair = (js == ak) | (js == bk)
+        if pair.sum() != 2:
+            continue
+        # Where the row's weight stands: by a source digit's place from its number's end, less the answer place's (0 the aligned
+        # column, +1 the next higher place), beside the expression's other sites and the value's own.
+        o = off.setdefault((kind, int(k), int(h)), [0] + [0.0] * 9)
+        o[0] += 1
+        for j, pj in zip(js, p):
+            if j < len(a):
+                delta = (len(a) - 1 - j) - kv
+            elif at_b <= j < at_b + len(b):
+                delta = (at_b + len(b) - 1 - j) - kv
+            else:
+                o[8 if j < at_b + len(b) + 3 else 9] += pj
+                continue
+            o[1 + min(max(delta, -3), 3) + 3] += pj
+        e = acc.setdefault((kind, int(k), int(h)), [0] + [0.0] * 9)
+        e[0] += 1
+        e[1] += -mean
+        e[2] += np.log(len(js))
+        e[3] += var
+        e[4] += float((lw[pair].mean() - mean) / np.sqrt(var)) if var > 0 else 0.0
+        for n, kappa in enumerate((1, 2, 4, 8, 16)):
+            q = p**kappa
+            e[5 + n] += float(q[pair].sum() / q.sum())
+    print("TENSION_HEAT lengths tick head rows entropy_nats log_sources log_weight_variance aligned_above_mean_in_spreads aligned_pair_share_at_gain_x1 x2 x4 x8 x16")
+    for key in sorted(acc):
+        e = acc[key]
+        print(f"TENSION_HEAT {key[0]} {key[1]} {key[2]} {e[0]} " + " ".join(f"{x / e[0]:.4f}" for x in e[1:]))
+    print("TENSION_PLACE lengths tick head rows share_at_offset_-3_or_less -2 -1 0 +1 +2 +3_or_more other_expression_sites value_sites")
+    for key in sorted(off):
+        o = off[key]
+        print(f"TENSION_PLACE {key[0]} {key[1]} {key[2]} {o[0]} " + " ".join(f"{x / o[0]:.4f}" for x in o[1:]))
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -644,6 +707,8 @@ def main():
         temper(sys.argv[2])
     elif cmd == "closed":
         closed_lock(sys.argv[2])
+    elif cmd == "heat":
+        heat(sys.argv[2])
     elif cmd == "links":
         links(sys.argv[2])
     elif cmd == "found":

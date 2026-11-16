@@ -20,16 +20,22 @@ repository was reset on September 24; the pre-reset tree is
 
 ## What runs: the store line learns open text, arithmetic and word problems on the card
 
-- **The line.** One life from lap 1 to lap 76 on the RTX 4080 SUPER under `.local/gpu.lock`, through
+- **The line.** One life from lap 1 to lap 78 on the RTX 4080 SUPER under `.local/gpu.lock`, through
   `holonics_engine::field` in `crates/engine`, its card realization in `crates/engine-cuda` and the
   commands in `crates/athena` ([THE_ENGINE](docs/THE_ENGINE.md)). Laps 75 and 76 trained with the
-  crossing triads; lap 77 onward is queued with the refined act ([the hand-off record](research/records/2026-11-16_THE_LINE_MEETS_A_WORLD_THAT_ANSWERS_ITS_ACTS_THE_HEADS_ADDRESS_THE_DIGITS_AND_THE_CROSSING_TRIAD_IS_GROWN_STATE_FOR_THE_HAND_OFF.md) §1).
+  crossing triads and lap 77 with the refined act; from lap 78 the arithmetic slice is redrawn
+  ([the terrain's record](research/records/2026-11-16_THE_LOCK_AND_THE_JUNCTION_ARE_ONE_SADDLE_A_CARRIED_LOCK_COSTS_UNTRAINED_TEXT_AND_THE_ARITHMETIC_TERRAIN_IS_REDRAWN_AT_THE_WORD_PROBLEMS_OWN_COUNTS_WITH_A_RECORD_ALONE_IN_ITS_REGION.md) §4; [the hand-off record](research/records/2026-11-16_THE_LINE_MEETS_A_WORLD_THAT_ANSWERS_ITS_ACTS_THE_HEADS_ADDRESS_THE_DIGITS_AND_THE_CROSSING_TRIAD_IS_GROWN_STATE_FOR_THE_HAND_OFF.md) §1).
 - **Its passage: the store of November 16, from lap 71, in seven slices.** A section draws about 20%
   code, 10% web, 10% science, 6% books and 4% wikidata (the five slices of Common Corpus without its
   government collection, held as a 1 GB prefix of whole documents, 128 held documents a slice), 25%
   the arithmetic world and 25% word problems.
   - The arithmetic world is keyed `EXPR = VALUE` records of 1 to 6 digits, with 256 held records,
-    half of them at 7 to 9 digits.
+    half of them at 7 to 9 digits. Through lap 77 its training records were drawn uniform in length
+    and operation, 32 a document. From lap 78 they are drawn at the counts a ruler reads from the
+    word problems (numerals of one or two digits 0.84 of them; two operands 0.73 of expressions;
+    `*` 0.49, `+` 0.28, `-` 0.23 of the three operations), in documents of 1, 2, 4, 8, 16 and 32
+    records, as many octets each; the held records are unchanged (guesses G-V1 to G-V4, fixed
+    before the lap, are read at the means of laps 78 and 79).
   - The word problems are TinyGSM's question, its solution's statements and the world's answer.
     GSM8K's train and test splits are left out of them by eight-word runs. The test split (1,319
     problems) is the held yardstick and is never trained.
@@ -59,11 +65,18 @@ repository was reset on September 24; the pre-reset tree is
   target, so the reaction is a function of the act alone. From lap 77 the act is refined: one record
   a prompt, and the draft redrawn once in the landmarks' order with its predicted value written
   (`Constitution::refine_drafts`). On lap 74's mean the world read 67 of 128 refined drafts against
-  50 unrefined, before any lap trained on the refine (G-B3a held; its learned share, G-B3b, is read
-  from lap 77). The in-lap share of drafts the world reads stood at 0.44 through lap 74
+  50 unrefined, before any lap trained on the refine (G-B3a held). On lap 77 the world read 0.605
+  of the drafts and the share stood flat inside the lap, 0.598 in its first sixth and 0.590 in its
+  last, so G-B3b's rise within the lap did not show; lap 77 stopped at its bound after 2,599
+  sections (the refined act runs at 1.27 s a section). From lap 78 one stretch in 21 is an act, which
+  holds the world's share of a section on the redrawn slice. The in-lap share of drafts the world
+  reads stood at 0.44 through lap 74
   ([the friction record](research/records/2026-11-16_FEEDBACK_IS_FRICTION_AGAINST_A_WORLD_THAT_ANSWERS_THE_FIELDS_OWN_ACT_AGREEMENT_IS_THE_FRICTIONS_ZERO_AND_ARITHMETIC_IS_THE_FIRST_WORLD.md) §11, §12).
 - **Its levels** (nats a place of the held passage, 128 documents a slice never met, at lap means; the
   one-place receiver: each place opened alone among the written places).
+  - Lap 77 (its mean `MEAN.2000`): code 0.5559, web 0.9156, science 0.7657, books 0.8673, wikidata
+    1.0711, the held arithmetic 1.5279 and the GSM8K test split 0.7628; lap 76: 0.5526, 0.9184,
+    0.7660, 0.8720, 1.0686, 1.5271 and 0.7732.
   - Lap 74: code 0.5577, web 0.9167, science 0.7663, books 0.8736, wikidata 1.0620, the held
     arithmetic 1.5298 and the GSM8K test split 0.7623. Lap 74 stopped at its bound after 2,628
     sections, so its mean is `MEAN.2000`.
