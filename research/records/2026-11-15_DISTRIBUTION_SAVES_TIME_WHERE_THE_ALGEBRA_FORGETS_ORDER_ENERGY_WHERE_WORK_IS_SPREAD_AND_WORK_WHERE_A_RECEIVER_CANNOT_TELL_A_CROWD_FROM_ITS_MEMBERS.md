@@ -1097,3 +1097,21 @@ UTC); `agent-inferred` for the reading of them.
   0.255 to 0.15 to 0.20 of the columns' samples, the columns 0.97 to 0.99 a launch (its instructions unchanged), a section
   0.997 to 1.000; at 80, the columns 0.98 to 1.01; and nothing moves where the machine code already holds both loads in
   flight.
+- **The columns' probe ahead of the skin, scored, and the crowd divisor's reciprocal** (the build thread, relayed 14:44
+  and 15:21 UTC; #915, receipts `research/records/receipts/2026-11-16_colprobe/`). The machine code showed the probe's
+  load standing after the skin's whole branchy path, so no unroll was built: the receiver's probe and covector entry
+  are loaded right after the receiver's index, ahead of the skin, and the source's word is read once outside the
+  receivers' loop (72 registers, seven blocks; the register edge of 14:40 did not bind). My 14:40 guess was fixed on the
+  unroll, and a second, fixed at 14:45 UTC on this form: the bracket's line 0.10 to 0.18, the columns 0.95 to 0.98 a
+  launch, a section 0.995 to 0.999. Gate 3 equal. The samples 104,095 to 95,525 (0.918) and the instructions 497.0 to
+  479.2 million (0.964); the line 0.257 to 0.177; by launch 0.918 to 0.976; the profile 41.83 to 40.00 ms a section
+  (0.956); the hold 0.9955, every pair on one side and the mean inside the control's spread of 2.6, so unresolved by the
+  rule. The 14:45 guess held on all three, the columns by the profile; the premise of two conversions read 0.082 of the
+  samples and 3.6% of the instructions taking 4.4% of the columns' time. The next kernel by the profile is the skin's
+  pace return (30.7 ms a section). A lead for it and for the rows, no guess until read (`agent-inferred`): the crowd's
+  divisor forms `v = ⌊(2^128 − 1)/d⌋ − 2^64` by a 128-by-128 division in software, twice a crowd a row, where the
+  source its comment cites (Möller and Granlund, Algorithm 2) reaches the same `v` for a normalized 64-bit `d` from
+  its top nine bits by a 32-bit division and three Newton steps with one adjustment, about 25 instructions; `v` is the
+  unique floor and the algorithm is proved, so no bit moves, held by a host test over random `d`, both edges and every
+  count the line meets. Its share is read first on the line that forms `v`, in the skin's pace return and in the rows
+  (whose divisions together held 0.151 of the instructions).
