@@ -147,3 +147,31 @@ first terrain. It is also the first fresh passage, and box 4's questions are ask
 - **A single scalar of progress.** Every figure is given by slice, with loudness and color beside it.
 - **A refusal answered with a larger limit, or a workload cut to fit.** S2 adds a part. Fresh passage adds data.
   Nothing is cut.
+
+## 8. Scores (16:11 UTC, on the build's reads of 16:08)
+
+- **S1 held, at the lap's total; its slice part is unread.** The build read the section lines' training code before
+  each section's deposit, at the same place of each pass, on 18 aligned returns (laps n against n + 9, from 40 → 49
+  to 58 → 67). It set aside 46 → 55, whose laps close their passes at different places.
+  - Training falls at every return.
+  - Its mean fall is −0.0059 nats a place, against the held passage's −0.0064 over the same laps. The difference is
+    +0.0005, with a standard deviation of 0.0029 across the pairs and a standard error of 0.0007, inside the guess's
+    ±0.001.
+  - By return, the difference is +0.0008 (pass 2 to 3, six pairs), +0.0007 (3 to 4, nine) and −0.0007 (4 to 5,
+    three). None resolves from zero, so training does not pull ahead pass over pass.
+  - The section lines carry the slices' counts but not their codes, so "every slice" is unread.
+  - What follows: the field keeps the passage's law, not its documents, and repetition is not why the gains changed.
+- **What the pairs say of the slowing itself.** The held gain a return:
+  - 0.0080 nats a place over the second return (pass 2 to 3, places 3 to 8). It fell across the pass, from 0.0099 to
+    0.0058.
+  - 0.0056 over the third (places 1 to 9, deviation 0.0007).
+  - 0.0057 over the fourth so far (places 1 to 3).
+
+  So the gain settled by about lap 50, and the line has fallen a steady 0.0006 nats a place a lap since. At the
+  lap's total, the fifth pass has not slowed. Science's −0.0022 on lap 67 is one slice's draw (§2). No law of the line
+  changed in the window: every merge from lap 40 on was a realization that keeps every bit, or a reading. S2 stands as
+  the theory's read for raising that rate.
+- **Box 3, not yet by its acceptance.** `restore-store` (#918) reads a saved state cold and writes back its own bytes,
+  on lap 67's end, lap 64's pass close and lap 67's mean. Gate 3 reproduces a cold start's sections. Neither shows that
+  nothing a process holds unsaved changes the bits. The sibling test of §6 item 3 is still the box's test: about a
+  minute of card between laps.
