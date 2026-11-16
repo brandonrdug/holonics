@@ -543,3 +543,19 @@ UTC); `agent-inferred` for the reading of them.
   waits a round trip to memory, which is long-scoreboard time; the sum is a quotient, so its 32-bit chunks can go into
   64-bit accumulators by atomics that return nothing, with the carries released once where the sum is read. No guess on
   that until the premise is printed.
+- **The return's build, scored** (the build thread, relayed 02:49 UTC; lap 47's sections, the card alone; #870, training
+  from lap 49). Gate 3 equal. The columns read 0.92 to 0.93 a launch by Nsight Compute on its four launches (one head's two
+  ticks, instructions 0.98) and 0.845 in the profile over all 2,304 launches (56.6 to 47.8 ms a section); the rows 0.94 a
+  launch, instructions 0.91 to 0.92, 0.938 in the profile (64.5 to 60.5); a section 0.977 in a clean balanced hold
+  (control 583.3 to 584.7, the build 570.1 to 572.8). The rows now spill 20 and 44 octets at 128 registers, holding the
+  head's words live. Scored: the rows and the section held; the columns held on the four launches and missed low on the
+  profile's whole count, 0.845 against 0.85 to 0.95, as the narrow forms shortened the code beside the products.
+- **The skin's return, and two guesses** (lap 48's opening, `field_pace_skin_back`, 36 ms a section). The pace index and
+  its test 0.075 and 0.040 of the samples, the skin words 0.105, and the two overflow-checked products a pair and a mode
+  (`wide_bits` 0.122, `mul_fits` 0.077); the bracket's release 0.18 of the instructions. The pace test depends only on the
+  row's receiver, so it is the row's. Guesses, fixed at 02:49 UTC (`agent-inferred`), the card alone: with the pace test
+  lifted to the row, gate 3 equal, the kernel 0.86 to 0.94 a launch in the profile over all its launches, a section 0.991
+  to 0.997 of control; and after it, with the two products' width decided once a row (from P54's bounds where its table
+  covers their operands, otherwise from the row's operand bits read once, the wide path kept past them), gate 3 equal, the
+  kernel 0.80 to 0.90 of the lifted build, a section 0.990 to 0.996. If the second reads near 1 with the checks' samples
+  gone, the loads bind and their prefetch is next.
