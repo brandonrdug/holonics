@@ -1,0 +1,22 @@
+# Nsight Compute, the first launches of the four kernels on 2 of lap 57's sections, in the gap after lap 57 (November 16).
+# ctl = #892 (athena_blankload); nw = this build. Time in microseconds a launch; occ_reg the blocks a multiprocessor the registers allow.
+ctl  field_blank_bias_enc   us=  828.3 grid=  400 block=  256 regs=48 issue_pct=53.5 warps_pct=60.2 occ_reg=5.000000
+ctl  field_blank_lift_read  us=  447.2 grid=  400 block=  256 regs=48 issue_pct=46.6 warps_pct=57.7 occ_reg=5.000000
+ctl  field_spread           us=   68.6 grid=  129 block=  256 regs=48 issue_pct=8.6 warps_pct=23.0 occ_reg=5.000000
+ctl  field_spread           us=   68.6 grid=  129 block=  256 regs=48 issue_pct=8.6 warps_pct=23.0 occ_reg=5.000000
+ctl  field_spread           us=   68.0 grid=  129 block=  256 regs=48 issue_pct=8.7 warps_pct=23.0 occ_reg=5.000000
+ctl  field_spread           us=   68.2 grid=  129 block=  256 regs=48 issue_pct=8.7 warps_pct=22.9 occ_reg=5.000000
+ctl  field_sums             us=  258.8 grid=   67 block=  256 regs=32 issue_pct=5.5 warps_pct=8.5 occ_reg=8.000000
+ctl  field_sums             us=  259.6 grid=   67 block=  256 regs=32 issue_pct=5.5 warps_pct=8.5 occ_reg=8.000000
+ctl  field_sums             us=   34.6 grid=   67 block=  256 regs=32 issue_pct=8.4 warps_pct=9.1 occ_reg=8.000000
+ctl  field_sums             us=   34.8 grid=   67 block=  256 regs=32 issue_pct=8.4 warps_pct=9.1 occ_reg=8.000000
+nw   field_blank_bias_enc   us=  780.3 grid=  400 block=  256 regs=48 issue_pct=53.2 warps_pct=57.1 occ_reg=5.000000
+nw   field_blank_lift_read  us=  443.8 grid=  400 block=  256 regs=48 issue_pct=45.9 warps_pct=56.0 occ_reg=5.000000
+nw   field_spread           us=   43.6 grid=  129 block=  672 regs=48 issue_pct=14.5 warps_pct=43.7 occ_reg=1.000000
+nw   field_spread           us=   43.7 grid=  129 block=  672 regs=48 issue_pct=14.4 warps_pct=43.7 occ_reg=1.000000
+nw   field_spread           us=   44.1 grid=  129 block=  672 regs=48 issue_pct=14.4 warps_pct=43.7 occ_reg=1.000000
+nw   field_spread           us=   43.4 grid=  129 block=  672 regs=48 issue_pct=14.5 warps_pct=43.7 occ_reg=1.000000
+nw   field_sums             us=   81.3 grid=  516 block=1,024 regs=64 issue_pct=29.0 warps_pct=66.5 occ_reg=1.000000
+nw   field_sums             us=   82.4 grid=  516 block=1,024 regs=64 issue_pct=28.3 warps_pct=66.5 occ_reg=1.000000
+nw   field_sums             us=   26.5 grid=  516 block=1,024 regs=64 issue_pct=44.4 warps_pct=66.3 occ_reg=1.000000
+nw   field_sums             us=   26.2 grid=  516 block=1,024 regs=64 issue_pct=44.5 warps_pct=66.3 occ_reg=1.000000
