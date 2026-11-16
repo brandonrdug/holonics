@@ -976,3 +976,25 @@ UTC); `agent-inferred` for the reading of them.
   1.000. A second lead, no guess until built: a pair's covector sums sixteen 64-by-64 products into one 128-bit word,
   a serial chain beside the 1.84 cycles of fixed-latency wait an issue; two partials halve it, an integer sum, so no bit
   moves.
+- **The rows' gathered word, scored, and the contact family's structure** (the build thread, relayed 10:57 and 11:31
+  UTC; #903, receipts `research/records/receipts/2026-11-16_contactrows/`). A half-chunk of the staged sources' unit
+  words went to shared memory by asynchronous copy on 32 bits (`mul32` truncates each operand to 32 bits, so the low
+  word gives the same product); the rows' static shared memory is 20,128 octets a block, so the build sized the stage at
+  4 KB a block, not my 8 KB a warp. Gate 3 equal. The rows 0.976, 0.981, 0.995 and 0.982 a launch by Nsight Compute,
+  long scoreboard 3.78 to 4.18 an issue falling to 3.02 to 3.58, still four blocks a multiprocessor; the profile 60.54 to
+  59.50 ms a section; the hold 0.999 (0.7 ms), at the control's spread of 0.8. My 0.86 to 0.94 and the build's 0.88 to
+  0.96 missed on the side of less: the gather held about a fifth of the waits. The lesson (`agent-inferred`): the
+  ablation of November 15 removed the probe-role term's products, its loads and the registers it holds, so its third
+  was never the gather's share; a share of the waits is read from the source counters, never from an ablation. Two
+  readings of the family's structure, from the declared bounds: each of its three largest kernels fills a
+  multiprocessor's register file (the rows 4 × 128 threads × 128 registers = 65,536, the columns 7 × 128 × 72 = 64,512,
+  the forward contact 6 × 128 × 80 = 61,440), so a stream beside them overlaps only their tails; and the rows' lever is
+  occupancy by fission of the row by its passes, one kernel for the pairs' and crowds' covectors and the row's mean
+  (written once, an integer, so no bit moves), one for the comparison, the covector `δs`, the probe role and the crowds'
+  returns. Its premise is read by the compiler before any hold: each half's registers, spill and shared memory, where
+  the quarter floor gives five blocks at 96 registers, six at 80 and eight at 64, and the two divisor tables (8 KB of
+  the 20,128 octets) cap the second half at five blocks under 100 KB unless they leave shared memory. Guess, fixed at
+  11:33 UTC: both halves at six blocks or more with no growth of spill, the rows' two launches 0.78 to 0.92 of #903's
+  one, a section 0.985 to 0.995; the lesser at five, 0.88 to 0.98; either at four, no hold, and the two-partial lead of
+  10:52 is built instead. A lead, no guess until read: the crowd's divisor is formed by a 128-by-128 division in
+  software, twice a crowd a row, whose share of the rows' instructions the source counters read first.
