@@ -87,6 +87,9 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     std::fs::create_dir(out)?;
     write_new(&out.join("dims.tsv"), format!("lambda\t{dw}\nread\t{dw}\ncurrent\t{m2}\nproducts\t{j2}\nticks\t{ticks}\n").as_bytes())?;
     println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} threads={} ms={}", work.len(), rayon::current_num_threads(), started.elapsed().as_millis());
+    // The locks' temperatures as the state holds them: `log₂ T` on the material's grain, one a head and receiver kind (a class receiver, a listener).
+    let temper = learner.field.layout().temper;
+    println!("TENSION_TEMPER log2_on_2^-24 {}", (0..2 * d.heads).map(|k| learner.field.theta[temper + k].to_string()).collect::<Vec<_>>().join(" "));
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
     let (mut chart, mut shares) = if all { (Some(create("chart.i32")?), Some(create("shares.tsv")?)) } else { (None, None) };
@@ -129,7 +132,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
                 }
                 if let Some(f) = shares.as_mut() {
                     for (h, i, srcs) in tension.sources[k].iter().filter(|(_, i, _)| i == site) {
-                        let line: Vec<String> = srcs.iter().map(|&(j, p)| format!("{j}:{}", (p * 1_000_000) >> holonics_engine::width::SHARE_BITS)).collect();
+                        let line: Vec<String> = srcs.iter().map(|&(j, p, s)| format!("{j}:{}:{s}", (p * 1_000_000) >> holonics_engine::width::SHARE_BITS)).collect();
                         writeln!(f, "{label}\t{place}\t{k}\t{h}\t{i}\t{}", line.join(" "))?;
                     }
                 }

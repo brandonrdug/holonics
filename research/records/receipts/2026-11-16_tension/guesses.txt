@@ -38,7 +38,7 @@ What each outcome decides.
 - G-L0 above 0.35 with G-L2 under 0.01: the ruler's locator is at fault before the machine is; the table's share bounds it.
 
 ------------------------------------------------------------------------------------------------------------------------------------------
-The operand's way to the answer's place, link by link: guesses fixed before the read (November 16, 2026, 22:29 UTC, read from the clock)
+The operand's way to the answer's place, link by link: guesses fixed before the read (November 16, 2026, 22:28 UTC, read from the clock)
 
 State read: lap 76's mean (MEAN.3000). Reading: `read-tension … all` on 3,600 fresh sums and differences (3,000 met, 600 far; key
 links-2026-11-16), two value digits a record opened alone; every site written at every tick with the tick's opening chart and the open

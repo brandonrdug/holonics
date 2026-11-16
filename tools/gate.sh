@@ -38,6 +38,7 @@ run reproduction-controls python3 tools/test_reproduction.py
 run live-set-controls python3 tools/test_live_set.py
 run measure-controls python3 tools/test_measure.py
 run loudness-table-controls python3 tools/test_loudness_table.py
+run tension-ruler-controls python3 tools/test_tension_ruler.py
 run mailbox-controls python3 tools/test_agent_mailbox.py
 run copy-length-controls python3 tools/test_copy_length.py
 run human-messages-controls python3 tools/test_human_messages.py

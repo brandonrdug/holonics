@@ -1807,7 +1807,7 @@ impl Constitution {
         let sources = pass
             .ticks
             .iter()
-            .map(|cell| (0..heads).flat_map(|h| (0..sites).filter(|&i| !Self::definite(region, i)).map(move |i| (h, i))).map(|(h, i)| (h, i, cell.rows[h * sites + i].iter().map(|src| (src.j as usize, src.p as u128)).collect())).collect())
+            .map(|cell| (0..heads).flat_map(|h| (0..sites).filter(|&i| !Self::definite(region, i)).map(move |i| (h, i))).map(|(h, i)| (h, i, cell.rows[h * sites + i].iter().map(|src| (src.j as usize, src.p as u128, src.s)).collect())).collect())
             .collect();
         Ok(CrossingTension {
             lambda,
@@ -1830,9 +1830,10 @@ pub struct CrossingTension {
     pub lambda: Vec<Vec<i64>>,
     /// Each tick's opening chart `r̂` (`[t][D]` on `2^(−16)`), which the tick's keys, probes and values read.
     pub chart: Vec<Vec<i32>>,
-    /// Each tick's open rows: for each head and open site, the sources its row met and each one's share of the row's weight (on `SHARE_BITS`).
+    /// Each tick's open rows: for each head and open site, the sources its row met, each one's share of the row's weight (on `SHARE_BITS`)
+    /// and its lock at unit gain (on `2^(−16)`, before the temperature and the falloff).
     #[allow(clippy::type_complexity)]
-    pub sources: Vec<Vec<(usize, usize, Vec<(usize, u128)>)>>,
+    pub sources: Vec<Vec<(usize, usize, Vec<(usize, u128, i64)>)>>,
     pub read: Vec<Vec<i32>>,
     pub current: Vec<Vec<i64>>,
     pub products: Vec<Vec<i64>>,

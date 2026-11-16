@@ -23,6 +23,9 @@ material's grain.
   tension_ruler.py links DIR                    on a `read-tension … all` directory: an operand digit's way to the answer's place, link by
                                                 link (a site's own digit and its place from its chart, the open row's share on its
                                                 aligned digits by tick and head, and what each head's current brings).
+  tension_ruler.py closed DIR                   what a closed lock would open: the two aligned digits as a lock closed on their column
+                                                would bring them, summed and unordered, read linearly (a copy) and through located
+                                                products (a junction), by part, beside the pair's table.
   tension_ruler.py found STORE_DIR OUT [DIR]    legs located on a `read-tension-store` directory's sections (all ticks together, the last
                                                 section held out to score them), written as OUT.legs for `found-crossing` (32-bit
                                                 little-endian integers: the charts on the material's grain, the biases on the faces');
@@ -459,7 +462,7 @@ def links(d, heads=4):
                 place = removed(chart, centre(onehot(np.clip(k_end, 0, 9)), sel), f, t)
                 print(f"LINKS_PURITY {scope} {rname} {k} {t.sum()} {own:.4f} {place:.4f}", flush=True)
     # The lock: the open row's shares, from shares.tsv (label, place, tick, head, site, "j:share …" in millionths).
-    acc = {}
+    acc, score_acc = {}, {}
     for line in open(os.path.join(d, "shares.tsv")):
         lab, place, k, h, i, *rest = line.rstrip("\n").split("\t")
         _, kind, op, a, b, v = lab.split(":")
@@ -472,9 +475,25 @@ def links(d, heads=4):
         bk = at_b + len(b) - 1 - kv if kv < len(b) else None
         if ak is None or bk is None:
             continue
-        shares = dict((int(x.split(":")[0]), int(x.split(":")[1])) for x in (rest[0].split(" ") if rest and rest[0] else []))
+        cells = [x.split(":") for x in (rest[0].split(" ") if rest and rest[0] else [])]
+        shares = dict((int(c[0]), int(c[1])) for c in cells)
+        scores = dict((int(c[0]), int(c[2]) / 2.0**FACE) for c in cells if len(c) > 2)
         others = [j for j in list(range(len(a))) + list(range(at_b, at_b + len(b))) if j not in (ak, bk)]
         value_sites = [j for j in shares if j >= at_b + len(b) + 3]
+        if scores:
+            sc = score_acc.setdefault((kind, int(k), int(h)), [0, 0.0, 0.0, 0.0, 0, 0.0, 0])
+            if ak in scores and bk in scores:
+                sc[0] += 1
+                sc[1] += scores[ak]
+                sc[2] += scores[bk]
+            rest_scores = [scores[j] for j in others if j in scores]
+            if rest_scores:
+                sc[3] += sum(rest_scores)
+                sc[4] += len(rest_scores)
+            vs = [scores[j] for j in value_sites if j in scores]
+            if vs:
+                sc[5] += sum(vs)
+                sc[6] += len(vs)
         e = acc.setdefault((kind, int(k), int(h)), [0, 0.0, 0.0, 0.0, 0.0, 0.0])
         e[0] += 1
         e[1] += shares.get(ak, 0)
@@ -486,6 +505,12 @@ def links(d, heads=4):
     for key in sorted(acc):
         e = acc[key]
         print(f"LINKS_LOCK {key[0]} {key[1]} {key[2]} {e[0]} {e[1] / e[0]:.0f} {e[2] / e[0]:.0f} {e[3] / e[0]:.0f} {e[4] / e[0]:.0f} {e[5] / e[0]:.0f}")
+    if score_acc:
+        print("LINKS_SCORE lengths tick head rows lock_a_k lock_b_k lock_other_operand_digit lock_value_site (the lock at unit gain, before the temperature and the falloff)")
+        for key in sorted(score_acc):
+            sc = score_acc[key]
+            if sc[0]:
+                print(f"LINKS_SCORE {key[0]} {key[1]} {key[2]} {sc[0]} {sc[1] / sc[0]:.3f} {sc[2] / sc[0]:.3f} {sc[3] / max(sc[4], 1):.3f} {sc[5] / max(sc[6], 1):.3f}")
     # What arrives: the aligned operand digits read from each head's current at the open place (columns both operands hold).
     by_region = {}
     for idx in np.nonzero(opened)[0]:
@@ -514,6 +539,33 @@ def links(d, heads=4):
                 print(f"LINKS_ARRIVES {scope} {k} {t.sum()} {h} {removed(c[:, cols], a1, f, t):.4f} {removed(c[:, cols], b1, f, t):.4f}", flush=True)
 
 
+def closed_lock(d, triads=10):
+    """What a closed lock would open, by ruler arithmetic on a `read-tension` directory: in place of what the open row gathered, the two
+    aligned operand digits as a lock closed on their column would bring them through a pure value, summed and unordered
+    (`e(a_k) + e(b_k)`, ten coordinates; one digit alone where one operand holds the column). The covector's share that a linear read of
+    that sum removes (a copy), and that products located on one half of the records remove on the other (a junction), by part, beside the
+    pair's table. Nothing of the machine is changed: it says what the next founding could reach once the lock closes."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    held = np.array([k[7] for k in kinds])
+    hi_only = (held == 1)[:, None]
+    gathered = onehot(da) + np.where(hi_only, 0.0, onehot(db))
+    gathered = np.where((held == 0)[:, None], 0.0, gathered)
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    print("CLOSED_LOCK scope part tick test_rows nats linear_of_sum located_1 located_5 located_all table")
+    for scope, mask in (("met+", met & plus), ("met-", met & ~plus)):
+        for pid, pname in enumerate(PARTS):
+            for k in (0, ticks - 1):
+                sel = mask & (tick == k) & (part == pid)
+                f, t = sel & fit, sel & test
+                if t.sum() < 200 or pname == "top":
+                    continue
+                a, b = locate(gathered[f], lam[f], triads, sweeps=20, starts=3)
+                shares = [removed(np.hstack([gathered, products_of(gathered, a[:j], b[:j])]), lam, f, t) for j in (1, 5, triads)]
+                print(f"CLOSED_LOCK {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {removed(gathered, lam, f, t):.4f} {shares[0]:.4f} {shares[1]:.4f} {shares[2]:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -526,6 +578,8 @@ def main():
         oracle(sys.argv[2])
     elif cmd == "located":
         located_shares(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 10)
+    elif cmd == "closed":
+        closed_lock(sys.argv[2])
     elif cmd == "links":
         links(sys.argv[2])
     elif cmd == "found":
