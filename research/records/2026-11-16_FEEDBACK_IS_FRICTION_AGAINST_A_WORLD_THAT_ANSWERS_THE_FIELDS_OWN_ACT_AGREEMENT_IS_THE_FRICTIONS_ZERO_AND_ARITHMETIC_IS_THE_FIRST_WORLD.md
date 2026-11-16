@@ -132,3 +132,37 @@ with GSM8K's test before use, and its provenance stays exterior codec informatio
   family.
 - **A modality as an exception.** Arithmetic is one specimen of a world that answers, as an interpreter or a listener
   is.
+
+## 7. Certainty as an anchor for words (guesses fixed 17:08 UTC)
+
+Brandon, 17:06Z, paraphrased, approved TinyGSM and the generated world, and named what he will watch:
+- whether the words bend around the problems once the number exchanges hold;
+- certainty about symbols as an anchor: a field that knows what `x + y = z` does couples "add" and "equals" to it;
+- those words then anchoring the composition of their partials (`addition` → `add` + `ition` → `it` + `ion`), by
+  coarse graining and auto-induction.
+
+On the objects (`agent-inferred`):
+- **A symbol's certainty is a dense basin.** A world that answers consistently makes the symbol's face sharp.
+- **An anchor is shared residues.** A word anchors where its rows share that face's residues (a symbol is a word on
+  located rings).
+- **The test is substitution.** By the helical code's law, a coordinated substitution is absorbed exactly when its
+  reached difference lies in the kernel. Swapping `+` for "plus" should then cost nothing at the answer.
+
+**The test.** The world's generator writes each held problem in three forms from the same numbers:
+- in symbols: `a + b =`;
+- in words: `a plus b equals`, and the same for "times" and "minus";
+- in a foil: words of the same length that the passage never uses for an operator, such as `a plux b eqvals`.
+
+`read-prompt` codes the answer, open whole, under each form. The codes are reported by operator and by the answer
+digit's carry state. The passage carries TinyGSM beside the symbol slice, so that words stand around numbers.
+
+**The guesses.**
+- **G-an1 (the anchor).** From the lap on which G-ar1's no-carry digits code at most 1.0 nats a digit, the answer under
+  words codes within 0.3 nats a digit of its symbolic form, for every operator.
+- **G-an2 (the foil).** The foil form codes at least 0.8 nats a digit above the word form. That gap separates anchoring
+  from context alone.
+- **G-an3 (the order).** On laps before the symbols reach that level, the word form stands more than 0.3 above the
+  symbolic form: the symbols' certainty comes first and the words follow.
+
+The partials are read later, at the composite level (the unit as a composed shape, November 15). Their guess is fixed
+when that level's units are built.
