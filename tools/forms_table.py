@@ -12,8 +12,8 @@
                                     the operator, not a null.
   forms_table.py gsm8k STORE OUT N  writes OUT from the word problems' held role (GSM8K's test split, `HELD_words.*`): the first N problems,
                                     each its question and a line feed as the prompt and GSM8K's own answer as the run.
-  forms_table.py acts STORE OUT N    writes OUT, the prompts of N acts for `write-forms`: each three held records at met lengths, one after
-                                    another, as a prompt (`act:N`), and an empty run.
+  forms_table.py acts STORE OUT N [R]  writes OUT, the prompts of N acts for `write-forms` or `write-acts`: each R (three) held records at
+                                    met lengths, one after another, as a prompt (`act:N`), and an empty run.
   forms_table.py react WRITTEN OUT   reads `write-forms`' OUT/forms.written for the acts and writes OUT, the world's reactions as a table for
                                     `read-forms`: each act's prompt and draft up to its first `= ` (or its line feed) as the prompt, the
                                     world's reaction as the run (`world:read:K` where the world read an expression, `world:refused:K` where
@@ -92,14 +92,14 @@ def gsm8k(store, out, n):
     print(f"FORMS_TABLE rows={len(rows)}")
 
 
-def acts(store, out, n):
+def acts(store, out, n, records=3):
     data = open(os.path.join(store, "HELD_arithmetic.bin"), "rb").read().decode()
     with open(os.path.join(store, "HELD_IDS_arithmetic.txt")) as f:
         ids = [l.strip() for l in f]
     met = [r for r, i in zip(data.splitlines(keepends=True), ids) if i.startswith("held-met")]
     with open(out, "x") as f:
         for k in range(n):
-            prompt = "".join(met[(3 * k + j) % len(met)] for j in range(3))
+            prompt = "".join(met[(records * k + j) % len(met)] for j in range(records))
             f.write(f"act:{k}\t{esc(prompt)}\t{esc('?')}\n")
     print(f"FORMS_TABLE rows={n}")
 
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     if sys.argv[1] == "make":
         make(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "acts":
-        acts(sys.argv[2], sys.argv[3], int(sys.argv[4]))
+        acts(sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5]) if len(sys.argv) > 5 else 3)
     elif sys.argv[1] == "react":
         react(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "gsm8k":

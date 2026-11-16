@@ -260,6 +260,10 @@ pub struct PassWorld {
     pub every: u64,
     pub records: u64,
     pub run: u64,
+    /// [definition; theory, November 16 20:39Z] Whether each act's draft is redrawn once after its predicted reaction is drawn
+    /// ([`Constitution::refine_drafts`]): one where it is, written as a fifth word of the clause only where set, so a clause without it reads
+    /// and writes as before.
+    pub refine: u64,
 }
 
 /// A slice's place in a pass ([`StorePass`]): its name, the piece it stands in, its cursor in that piece and its places taken.
@@ -277,7 +281,10 @@ impl StorePass {
     pub fn to_line(&self) -> String {
         let slices: String = self.slices.iter().map(|s| format!(" {} {} {} {}", s.name, s.piece, s.cursor, s.taken)).collect();
         let own = if self.own { " own" } else { "" };
-        let world = self.world.as_ref().map_or(String::new(), |w| format!(" world {} {} {} {}", w.slice, w.every, w.records, w.run));
+        let world = self.world.as_ref().map_or(String::new(), |w| {
+            let refine = if w.refine > 0 { format!(" {}", w.refine) } else { String::new() };
+            format!(" world {} {} {} {}{refine}", w.slice, w.every, w.records, w.run)
+        });
         format!("pass {} {} {} {} {} {} {}{own}{slices}{world}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
     }
 
@@ -285,7 +292,13 @@ impl StorePass {
     pub fn from_line(line: &str) -> Result<Self> {
         let all: Vec<&str> = line.split(' ').collect();
         // The world's clause, where set, is the line's last five words, opened by the word `world` (no slice is named `world`).
-        let (words, world_words) = if all.len() >= 13 && all[all.len() - 5] == "world" { (&all[..all.len() - 5], Some(&all[all.len() - 4..])) } else { (&all[..], None) };
+        let (words, world_words) = if all.len() >= 13 && all[all.len() - 5] == "world" {
+            (&all[..all.len() - 5], Some(&all[all.len() - 4..]))
+        } else if all.len() >= 14 && all[all.len() - 6] == "world" {
+            (&all[..all.len() - 6], Some(&all[all.len() - 5..]))
+        } else {
+            (&all[..], None)
+        };
         // The word `own` stands ninth with four words a slice after it; with it absent the slices begin ninth. The two counts differ by one
         // modulo four, so no slice's name is read as the word.
         let own = words.len() >= 9 && words[8] == "own" && (words.len() - 9) % 4 == 0;
@@ -303,11 +316,11 @@ impl StorePass {
             return refuse("a pass with a slice named `world`, the word of the world's clause");
         }
         let world = match world_words {
-            Some(w) => Some(PassWorld { slice: word(w[0])?, every: n(w[1])?, records: n(w[2])?, run: n(w[3])? }),
+            Some(w) => Some(PassWorld { slice: word(w[0])?, every: n(w[1])?, records: n(w[2])?, run: n(w[3])?, refine: w.get(4).map(|r| n(r)).transpose()?.unwrap_or(0) }),
             None => None,
         };
         if let Some(w) = &world {
-            if w.every == 0 || w.records == 0 || w.run == 0 || !slices.iter().any(|s| s.name == w.slice) {
+            if w.every == 0 || w.records == 0 || w.run == 0 || w.refine > 1 || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
                 return refuse("a world whose share, records or run is zero, or whose slice is not the pass's");
             }
         }
