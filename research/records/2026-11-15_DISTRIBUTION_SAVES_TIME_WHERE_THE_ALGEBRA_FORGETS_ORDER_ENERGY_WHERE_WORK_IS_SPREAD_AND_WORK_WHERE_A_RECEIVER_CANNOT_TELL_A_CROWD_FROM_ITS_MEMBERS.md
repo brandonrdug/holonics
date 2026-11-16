@@ -592,3 +592,47 @@ UTC); `agent-inferred` for the reading of them.
   0.978 of control, in place of the 03:29 range. If the store's samples stay and read as the load's wait, the next tile's
   load moves behind the current accumulate. The chart's nearest quotient by the lane's scale can take a divisor formed once
   a lane (a Möller–Granlund quotient corrected to the exact one, as the crowds' division already does), the same integer.
+- **The paced build, scored** (the build thread, relayed 04:12 UTC; lap 49's sections, the card alone; #874, training from
+  lap 51). Gate 3 equal. Profiles over all launches: the skin's return 35.2 to 30.9 ms a section (0.878, the guess 0.69 to
+  0.85); the outer map 22.0 to 20.4 (0.927), its bias launches 0.62 to 0.76 by Nsight Compute (the guess 0.50 to 0.75) and
+  its outer-tile launches unmoved; the transposed map 26.5 to 26.3 (0.99, the guess 0.80 to 0.92); the affine tiled maps
+  19.1 to 18.3 (0.958) and 7.6 to 7.3, inside 0.85 to 0.96; 7.2 ms a section in all, about 0.987, against 0.945 to 0.978.
+  The balanced hold did not resolve (the control's spread 21.4 ms). The staging's decider held: in the transposed map the
+  throttle of the shared memory's pipe fell from 0.22 and 0.18 to 0.14 and 0.16 and the short scoreboard from 0.55 and 0.48
+  to 0.39 and 0.42 an issued instruction, the long scoreboard stayed at 5.5 to 7.0 and the time did not move, so the
+  store's samples were its loaded word's wait. Two lessons (`agent-inferred`): a guess on a kernel weighs the profile's
+  mix of its launches, never the launches a source read sampled (the outer map's read had sampled only bias launches); and
+  the guesses on this build ran optimistic on every kernel they missed.
+- **The tiles' prefetch, and its guess.** The next build issues the next chunk's loads before the current chunk's
+  accumulate in the tiled maps (about 52 ms a section), by an asynchronous copy into a second shared buffer, since those
+  kernels stand at 124 to 126 of their 128 registers. Guess, fixed at 04:12 UTC (`agent-inferred`), on the premise that the
+  second buffer keeps two blocks a multiprocessor, the card alone against #874: gate 3 equal; the transposed map 0.75 to
+  0.92 a launch over all its launches (the loaded word's wait, 0.225 and 0.120 of its samples, overlaps the accumulate's
+  0.222, so the time tends to the larger and not the sum); the affine tiled maps 0.85 to 0.95; a section 0.975 to 0.992 of
+  control in a hold whose control spreads under 5 ms. If the buffer costs a block, the guess is void and the read says what
+  the lost warps cost.
+  As built (`claude/tile-prefetch`, relayed 04:15 UTC) the next chunk waits in registers, not in a second shared buffer:
+  the shared memory is unchanged (17.4 KB for the transposed map, 18 KB for the affine), so two blocks a multiprocessor
+  stand and the premise holds; the transposed map takes 124 registers with no spills, `affine_tiled_x32` 128 with 4 of
+  16 octets spilled, `affine_tiled_x64` 8 of 8, so the risk moves from the blocks to the spills.
+- **The chart's first place, and its guess** (the build thread, relayed 04:18 UTC, in the same hold). The chart's square
+  root found its first digit's place by stepping 2^126 down two bits at a time while it stood above the power; the power
+  over a lane stands far below 2^126, so about twenty steps were idle, 0.314 of `field_chart`'s instructions and 0.115 of
+  its samples. The build reads the place, the largest power of four not above the power, from its bit length as
+  `2^((len − 1) & ~1)`, which caps at 2^126 alike; the digit loop after it is unchanged. The ruler
+  (`chart_place_ruler.py` in this record's receipts) asserts that the two places, and the roots against `isqrt`, agree on
+  100,383 powers of one or more, every `2^j − 1`, `2^j` and `2^j + 1` among them. A silent lane is lawful state (a
+  dormant mode's power is zero), and there the two differ: the stepped place falls to 0 after 64 idle steps and the root
+  is 0, while a bit length of 0 makes `len − 1` negative (a subtraction that overflows in a checked build, and a shift
+  past the word that a card's compiler leaves undefined). The read is guarded before the guess is scored: a power of
+  zero gives a root of zero on both surfaces, and the parity reads 0, 1, 3, 4 and the top of the word. Guess, fixed at
+  04:21 UTC (`agent-inferred`), against #874, the card alone: gate 3 equal; `field_chart` 0.86 to 0.95 a launch over all
+  its launches (19.4 ms a section under #870, the place's 0.115 of the samples going, the range widened toward 1 because
+  the share was read on two launches of two sections and the guesses on this build ran optimistic), its instructions
+  0.66 to 0.74; the chart's 1.0 to 2.7 ms a section stand under a hold's resolution, so the composed build's section reads
+  0.971 to 0.990 of control in place of the 04:12 range, the transposed and affine guesses unchanged. A lead with no
+  guess: after the place the digit loop on a power of 87 bits runs 44 steps, and from the 24th or 25th on the remainder
+  and `res + bit` stand below 2^64 (the ruler reads the crossing near step `len − 63` at every length from 70 to 110), so
+  the loop's tail can continue on one limb from that crossing, the same integer: a carrier narrowing where its term no
+  longer needs the width, the precision law's own, and about 0.03 of the kernel if the digit loop's samples are its
+  limbs' work.
