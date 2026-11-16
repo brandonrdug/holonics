@@ -794,3 +794,27 @@ UTC); `agent-inferred` for the reading of them.
   its bound holds it at five. Guess, fixed at 07:12 UTC beside the build's: the skin's return 0.97 to 1.06 of its time
   a launch if it holds four blocks, its instructions' fall against a fifth of its warps; at five blocks, its time follows
   its instructions' guess.
+- **The release, scored** (the build thread, relayed 07:48 UTC; lap 54's state, against #885; the realization taken is
+  `athena_rel5`, the skin's return bounded to five blocks). Gate 3 equal on it; two other gate runs were refused, not
+  failed, beside a lap whose pool held 10.7 GB. A clean balanced hold: control 533.8 ms a section (spread 2.4), the build
+  523.2, 0.980 (10.6 ms; paired run by run 9.2 to 11.4), against the build's 0.985 to 0.997, a miss on the side of more
+  saved. By Nsight Compute a launch against the control: the tied face's return instructions 0.786 and time 0.823 (an
+  issue-bound kernel, its time following its instructions); the reverse scan instructions 0.862 and time 1.001; the
+  skin's return unbounded instructions 0.873, time 1.000 at four blocks (the guess of 07:12, 0.97 to 1.06, held, and the
+  register limit read five to four), bounded at 96 registers time 0.921 at five blocks (inside its 0.90 to 0.97); the
+  clock's fill 0.963, the exposure 0.982, the columns 0.974 on 1.032 of their instructions, the rows 0.994. Weighted by
+  each kernel's time a section these six give 7.6 ms of the hold's 10.6; the profile's two totals (one run each, seven
+  minutes apart) stand inside the card's two states and do not score the section. A refinement of the lesson of 04:57
+  (`agent-inferred`): the reverse scan shed 0.14 of its instructions at no time, because since the split its time is
+  its chain's latency, and an instruction off the chain's critical path costs nothing there; so a guess on a chain
+  bound to one warp reads the depth of the chain's step, not its count of instructions.
+- **The blanks wait on their loads at full occupancy** (the same relay; two launches each on #885). The bias and
+  encoding 2.18 to 2.26 ms a launch, issue 28 to 33% at 97% of warps, stalls 36 to 42 an issued instruction of which the
+  long scoreboard 29 to 35, hits 74% in the first level and 70 to 73% in the second; the lift's covector 1.40 to 1.55 ms,
+  42 to 47% at 96%, long scoreboard 16 to 20; the lift and read 1.30 to 1.31 ms, 36% at 95%, long scoreboard 24.5. Each
+  thread walks 512 sites with a load the next term's product waits on, so even 48 warps do not cover it. Two levers keep
+  the bits, since the terms' loads do not depend on the sum and the release stands once a term: the cheaper issues
+  several sites' loads ahead of their products in each thread (the blanks stand at 35 to 38 registers, so eight in
+  flight still leave 48 warps a multiprocessor, below 40 registers a lane); the larger stages both operands in the outer
+  or transposed tile, so that a loaded word serves four products and its neighbour's. The share of live sites, read
+  after lap 55, says whether a gather of them comes first.
