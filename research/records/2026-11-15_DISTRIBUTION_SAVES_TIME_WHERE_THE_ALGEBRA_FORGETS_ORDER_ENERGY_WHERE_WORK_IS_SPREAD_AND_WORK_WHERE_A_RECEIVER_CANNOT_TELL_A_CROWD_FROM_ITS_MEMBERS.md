@@ -797,7 +797,7 @@ UTC); `agent-inferred` for the reading of them.
 - **The release, scored** (the build thread, relayed 07:48 UTC; lap 54's state, against #885; the realization taken is
   `athena_rel5`, the skin's return bounded to five blocks). Gate 3 equal on it; two other gate runs were refused, not
   failed, beside a lap whose pool held 10.7 GB. A clean balanced hold: control 533.8 ms a section (spread 2.4), the build
-  523.2, 0.980 (10.6 ms; paired run by run 9.2 to 11.4), against the build's 0.985 to 0.997, a miss on the side of more
+  523.2, 0.980 (10.6 ms; each build run paired with the control beside it 12.2, 9.2, 11.0 and 9.7; receipts `research/records/receipts/2026-11-16_rel/`, #888), against the build's 0.985 to 0.997, a miss on the side of more
   saved. By Nsight Compute a launch against the control: the tied face's return instructions 0.786 and time 0.823 (an
   issue-bound kernel, its time following its instructions); the reverse scan instructions 0.862 and time 1.001; the
   skin's return unbounded instructions 0.873, time 1.000 at four blocks (the guess of 07:12, 0.97 to 1.06, held, and the
