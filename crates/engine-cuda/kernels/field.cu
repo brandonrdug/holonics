@@ -5395,9 +5395,12 @@ __device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, ui
 // [realization; November 15, the engine audit's finding 5] One block a site: the mean `⌊Σ_a m_a c_p[a] / T⌉`, which no class `b` changes, is
 // the block's integer sum once a paced head, where every class had formed it again; then one thread a class, its heads in order. The
 // sums are integer sums, so the bits are the one-thread-a-class form's. Launched with `BLANK_DZ_THREADS` threads a block.
+// [realization; November 16, the blank covector's nonzero share] Each site is also marked live (`live_at[s] = 1`) where any class's `δz`
+// is nonzero: on 48 returns of lap 54's sections 0.140 of the sites the face's sums walked carried a nonzero term
+// (`field_blank_live_scan` lists them).
 #define BLANK_DZ_THREADS 256
 #define BLANK_DZ_PACED 8
-extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(FieldWords w, const wide *dkappa, wide *dz) {
+extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(FieldWords w, const wide *dkappa, wide *dz, uint8_t *live_at) {
     __shared__ wide red[BLANK_DZ_THREADS];
     __shared__ wide mean_s[BLANK_DZ_PACED];
     const uint32_t tid = threadIdx.x, nt = blockDim.x;
@@ -5412,6 +5415,9 @@ extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(Fi
         if (!w.unresolved[s] || w.mix_off[s] != w.mix_off[s + 1] || w.blank_totals[s] == 0) {
             for (uint32_t b = tid; b < w.A; b += nt) {
                 dz[s * w.A + b] = 0;
+            }
+            if (tid == 0) {
+                live_at[s] = 0;
             }
             continue;
         }
@@ -5439,6 +5445,7 @@ extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(Fi
             }
             __syncthreads();
         }
+        bool nonzero = false;
         for (uint32_t b = tid; b < w.A; b += nt) {
             wide out = 0;
             for (uint32_t p = 0; p < w.paced; p++) {
@@ -5455,28 +5462,93 @@ extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(Fi
                 out += rel(y, PACE_BITS);
             }
             dz[s * w.A + b] = out;
+            nonzero |= out != 0;
         }
-        __syncthreads();
+        const bool any = __syncthreads_or(nonzero);
+        if (tid == 0) {
+            live_at[s] = any ? 1 : 0;
+        }
     }
 }
 
+// [realization; November 16, the theory thread's 08:01 UTC note] **The live sites in ascending order**: one block, each thread a
+// contiguous run of the batch's sites, its count of live sites scanned across the block, then its live sites written at its offset,
+// so the list is the same on every schedule and neighbouring threads of its readers read neighbouring sites. `*nlive` is the count.
+#define BLANK_SCAN_THREADS 1024
+extern "C" __global__ void __launch_bounds__(BLANK_SCAN_THREADS) field_blank_live_scan(FieldWords w, const uint8_t *live_at, uint32_t *live, uint32_t *nlive) {
+    __shared__ uint32_t part[BLANK_SCAN_THREADS];
+    const uint32_t tid = threadIdx.x, nt = blockDim.x;
+    const uint64_t run = ((uint64_t)w.T + nt - 1) / nt;
+    const uint64_t lo = (uint64_t)tid * run < w.T ? (uint64_t)tid * run : w.T;
+    const uint64_t hi = lo + run < w.T ? lo + run : w.T;
+    uint32_t count = 0;
+    for (uint64_t t = lo; t < hi; t++) {
+        count += live_at[t];
+    }
+    part[tid] = count;
+    __syncthreads();
+    for (uint32_t off = 1; off < nt; off <<= 1) {
+        const uint32_t v = tid >= off ? part[tid - off] : 0;
+        __syncthreads();
+        part[tid] += v;
+        __syncthreads();
+    }
+    uint32_t at = part[tid] - count;
+    for (uint64_t t = lo; t < hi; t++) {
+        if (live_at[t]) {
+            live[at++] = (uint32_t)t;
+        }
+    }
+    if (tid == nt - 1) {
+        *nlive = part[nt - 1];
+    }
+}
+
+// [realization; November 16, the theory thread's 08:01 UTC note] The live sites a thread of a blank's outer sums walks: as few as let
+// `entries` threads a tile cover the `n` live sites in about `want` threads, the entry's resident threads on the card (its multiprocessors
+// times the blocks of the entry each holds, as the driver reads its occupancy), so the launch fills the card once and each thread's walk is as short as that allows. Each term is released before it
+// enters the sum, and the partials meet in integer adds, so the tile changes no bit.
+__device__ __forceinline__ uint64_t blank_live_tile(uint64_t entries, uint64_t n, uint64_t want) {
+    const uint64_t tile = (entries * n + want - 1) / (want > 0 ? want : 1);
+    return tile > 0 ? tile : 1;
+}
+
 // The encoding's bias and rows from a blank's face covector (held `2^30` finer): `δc_b += Σ_t rel(δz_b, 30)`,
-// `δE(b)_i += Σ_t rel(δz_b y_i, 46)` over the silent sites, one thread an entry and a tile of 64 sites.
-extern "C" __global__ void field_blank_bias_enc(FieldWords w, wide *g, uint64_t enc, uint64_t bias, const wide *dz, const int64_t *y) {
+// `δE(b)_i += Σ_t rel(δz_b y_i, 46)` over the silent sites, one thread an entry and a tile of the live sites (a site whose `δz` is zero in
+// every class adds nothing). [realization; November 16] A zero term adds zero, so the walk reads four sites' operands before it forms
+// their four terms, with no test of each: the loads of a step no longer wait on the one before.
+extern "C" __global__ void field_blank_bias_enc(FieldWords w, wide *g, uint64_t enc, uint64_t bias, const wide *dz, const int64_t *y, const uint32_t *live, const uint32_t *nlive, uint64_t want) {
     const uint64_t entries = (uint64_t)w.A * (w.D + 1);
-    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
+    const uint64_t n = *nlive;
+    const uint64_t span = blank_live_tile(entries, n, want);
+    const uint64_t tiles = (n + span - 1) / span;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t b = entry / (w.D + 1), i = entry % (w.D + 1);
-        const uint64_t from = tile * BLANK_TILE;
-        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
+        const uint64_t from = tile * span;
+        const uint64_t to = from + span < n ? from + span : n;
         wide sum = 0;
-        for (uint64_t t = from; t < to; t++) {
-            const wide d = dz[t * w.A + b];
-            if (d == 0) {
-                continue;
+        uint64_t k = from;
+        if (i == w.D) {
+            for (; k + 4 <= to; k += 4) {
+                const wide d0 = dz[(uint64_t)live[k] * w.A + b], d1 = dz[(uint64_t)live[k + 1] * w.A + b];
+                const wide d2 = dz[(uint64_t)live[k + 2] * w.A + b], d3 = dz[(uint64_t)live[k + 3] * w.A + b];
+                sum += rel(d0, 30) + rel(d1, 30) + rel(d2, 30) + rel(d3, 30);
             }
-            sum += i == w.D ? rel(d, 30) : rel(d * (wide)y[t * w.D + i], FACE_BITS + 30);
+            for (; k < to; k++) {
+                sum += rel(dz[(uint64_t)live[k] * w.A + b], 30);
+            }
+        } else {
+            for (; k + 4 <= to; k += 4) {
+                const uint64_t t0 = live[k], t1 = live[k + 1], t2 = live[k + 2], t3 = live[k + 3];
+                const wide d0 = dz[t0 * w.A + b], d1 = dz[t1 * w.A + b], d2 = dz[t2 * w.A + b], d3 = dz[t3 * w.A + b];
+                const int64_t y0 = y[t0 * w.D + i], y1 = y[t1 * w.D + i], y2 = y[t2 * w.D + i], y3 = y[t3 * w.D + i];
+                sum += rel(d0 * (wide)y0, FACE_BITS + 30) + rel(d1 * (wide)y1, FACE_BITS + 30) + rel(d2 * (wide)y2, FACE_BITS + 30) + rel(d3 * (wide)y3, FACE_BITS + 30);
+            }
+            for (; k < to; k++) {
+                const uint64_t t = live[k];
+                sum += rel(dz[t * w.A + b] * (wide)y[t * w.D + i], FACE_BITS + 30);
+            }
         }
         if (sum != 0) {
             add_wide(g + (i == w.D ? bias + b : enc + b * w.D + i), sum);
@@ -5486,10 +5558,15 @@ extern "C" __global__ void field_blank_bias_enc(FieldWords w, wide *g, uint64_t 
 
 // The lift's covector from a blank's face covector, held `2^16` finer: `δy_i = rel(Σ_b δz_b E(b)_i, 30)` at a silent
 // site, zero elsewhere.
-extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide *dz, int64_t *dy) {
+// [realization; November 16] A site whose `δz` is zero in every class (`live_at[t] = 0`) has `δy = 0` with no walk of its classes.
+extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide *dz, int64_t *dy, const uint8_t *live_at) {
     const uint64_t cells = (uint64_t)w.T * w.D;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
+        if (!live_at[t]) {
+            dy[c] = 0;
+            continue;
+        }
         wide sum = 0;
         for (uint32_t b = 0; b < w.A; b++) {
             const wide d = dz[t * w.A + b];
@@ -5510,22 +5587,40 @@ extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide
 }
 
 // The lift's bias and the read matrix from a blank's lift covector (held `2^16` finer): `δb_i += Σ_t rel(δy_i, 16)`,
-// `δR_(i,j) += Σ_t rel(δy_i r̂_j, 16)`, one thread an entry and a tile of 64 sites.
-extern "C" __global__ void field_blank_lift_read(FieldWords w, wide *g, uint64_t read, uint64_t bias, const int64_t *dy, const int32_t *r) {
+// `δR_(i,j) += Σ_t rel(δy_i r̂_j, 16)`, one thread an entry and a tile of the live sites (`δy` is zero at every other site), four sites'
+// operands read before their four terms (a zero term adds zero).
+extern "C" __global__ void field_blank_lift_read(FieldWords w, wide *g, uint64_t read, uint64_t bias, const int64_t *dy, const int32_t *r, const uint32_t *live, const uint32_t *nlive, uint64_t want) {
     const uint64_t entries = (uint64_t)w.D * (w.D + 1);
-    const uint64_t tiles = ((uint64_t)w.T + BLANK_TILE - 1) / BLANK_TILE;
+    const uint64_t n = *nlive;
+    const uint64_t span = blank_live_tile(entries, n, want);
+    const uint64_t tiles = (n + span - 1) / span;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < entries * tiles; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t entry = c % entries, tile = c / entries;
         const uint64_t i = entry / (w.D + 1), j = entry % (w.D + 1);
-        const uint64_t from = tile * BLANK_TILE;
-        const uint64_t to = from + BLANK_TILE < w.T ? from + BLANK_TILE : w.T;
+        const uint64_t from = tile * span;
+        const uint64_t to = from + span < n ? from + span : n;
         wide sum = 0;
-        for (uint64_t t = from; t < to; t++) {
-            const int64_t d = dy[t * w.D + i];
-            if (d == 0) {
-                continue;
+        uint64_t k = from;
+        if (j == w.D) {
+            for (; k + 4 <= to; k += 4) {
+                const int64_t d0 = dy[(uint64_t)live[k] * w.D + i], d1 = dy[(uint64_t)live[k + 1] * w.D + i];
+                const int64_t d2 = dy[(uint64_t)live[k + 2] * w.D + i], d3 = dy[(uint64_t)live[k + 3] * w.D + i];
+                sum += rel((wide)d0, FACE_BITS) + rel((wide)d1, FACE_BITS) + rel((wide)d2, FACE_BITS) + rel((wide)d3, FACE_BITS);
             }
-            sum += j == w.D ? rel((wide)d, FACE_BITS) : rel((wide)d * (wide)r[t * w.D + j], FACE_BITS);
+            for (; k < to; k++) {
+                sum += rel((wide)dy[(uint64_t)live[k] * w.D + i], FACE_BITS);
+            }
+        } else {
+            for (; k + 4 <= to; k += 4) {
+                const uint64_t t0 = live[k], t1 = live[k + 1], t2 = live[k + 2], t3 = live[k + 3];
+                const int64_t d0 = dy[t0 * w.D + i], d1 = dy[t1 * w.D + i], d2 = dy[t2 * w.D + i], d3 = dy[t3 * w.D + i];
+                const int32_t r0 = r[t0 * w.D + j], r1 = r[t1 * w.D + j], r2 = r[t2 * w.D + j], r3 = r[t3 * w.D + j];
+                sum += rel((wide)d0 * (wide)r0, FACE_BITS) + rel((wide)d1 * (wide)r1, FACE_BITS) + rel((wide)d2 * (wide)r2, FACE_BITS) + rel((wide)d3 * (wide)r3, FACE_BITS);
+            }
+            for (; k < to; k++) {
+                const uint64_t t = live[k];
+                sum += rel((wide)dy[t * w.D + i] * (wide)r[t * w.D + j], FACE_BITS);
+            }
         }
         if (sum != 0) {
             add_wide(g + (j == w.D ? bias + i : read + i * w.D + j), sum);

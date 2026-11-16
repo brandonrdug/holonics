@@ -133,8 +133,18 @@ impl<'c> Resident<'c> {
         // The faces were read at the sites a clock reads alone (`blank_clock`), and return there alone.
         let unresolved = words.unresolved;
         words.unresolved = words.blank_read;
-        let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
-        self.launch("field_blank_dz", (sites as u64).clamp(1, 65_535) as u32, BLANK_DZ_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
+        // [realization; November 16] The sites whose `δz` is nonzero in some class, marked (`live_at`, written at every site) and listed in
+        // ascending order (`live`, its count `nlive`, by `field_blank_live_scan`): the outer sums walk the list and the lift's covector is zero
+        // off it.
+        let live_at = self.timed(Kind::Alloc, || self.take::<u8>(sites.max(1))).map_err(device)?;
+        let live = self.timed(Kind::Alloc, || self.take::<u32>(sites.max(1))).map_err(device)?;
+        let nlive = self.timed(Kind::Alloc, || self.take::<u32>(1)).map_err(device)?;
+        let (mut dkp, mut dzp, mut lap) = (dkappa.device_ptr(), dz.device_ptr(), live_at.device_ptr());
+        self.launch("field_blank_dz", (sites as u64).clamp(1, 65_535) as u32, BLANK_DZ_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp), arg(&mut lap)])?;
+        {
+            let (mut lap, mut lp, mut nlp) = (live_at.device_ptr(), live.device_ptr(), nlive.device_ptr());
+            self.launch("field_blank_live_scan", 1, BLANK_SCAN_THREADS, &mut [arg(words), arg(&mut lap), arg(&mut lp), arg(&mut nlp)])?;
+        }
         // [measurement; theory, November 16] Which of the walked sites the blank's outer sums meet with a nonzero term: a reading of `δz`,
         // which moves nothing the field computes.
         if let Some(profile) = self.profile.as_ref().filter(|_| std::env::var_os("FIELD_BLANK_LIVE").is_some()) {
@@ -146,19 +156,27 @@ impl<'c> Resident<'c> {
                 *slot += v;
             }
         }
-        let tiles = (sites as u64).div_ceil(BLANK_TILE);
+        // The outer sums' launches fill the card's resident threads for their entry once (its multiprocessors times the blocks of the entry
+        // each holds, as the driver reads the entry's occupancy); each kernel reads the list's count and sizes its tiles to that.
+        let multiprocessors = u64::from(self.card.census().multiprocessors.max(1));
+        let resident = |entry: &str| -> Result<u64> {
+            let blocks = self.module.function(entry).and_then(|f| f.active_blocks_per_multiprocessor(THREADS, 0)).map_err(|e| device(e.into()))?;
+            Ok(multiprocessors * u64::from(blocks.max(1)) * u64::from(THREADS))
+        };
+        let mut want = resident("field_blank_bias_enc")?;
         {
-            let (mut gp, mut enc, mut bias, mut dzp, mut yp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr());
-            self.launch("field_blank_bias_enc", Self::cells(a as u64 * (dw as u64 + 1) * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut bias), arg(&mut dzp), arg(&mut yp)])?;
+            let (mut gp, mut enc, mut bias, mut dzp, mut yp, mut lp, mut nlp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr(), live.device_ptr(), nlive.device_ptr());
+            self.launch("field_blank_bias_enc", Self::cells(want), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut enc), arg(&mut bias), arg(&mut dzp), arg(&mut yp), arg(&mut lp), arg(&mut nlp), arg(&mut want)])?;
         }
         let dy = self.timed(Kind::Alloc, || self.take::<i64>((sites * dw).max(1))).map_err(device)?;
         {
-            let (mut enc, mut dzp, mut dyp) = (words.enc, dz.device_ptr(), dy.device_ptr());
-            self.launch("field_blank_dy", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+            let (mut enc, mut dzp, mut dyp, mut lap) = (words.enc, dz.device_ptr(), dy.device_ptr(), live_at.device_ptr());
+            self.launch("field_blank_dy", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp), arg(&mut lap)])?;
         }
         {
-            let (mut gp, mut read, mut bias, mut dyp, mut rp) = (g.device_ptr(), words.read, l.lift_bias as u64, dy.device_ptr(), clock.fread.device_ptr());
-            self.launch("field_blank_lift_read", Self::cells(dw as u64 * (dw as u64 + 1) * tiles), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut read), arg(&mut bias), arg(&mut dyp), arg(&mut rp)])?;
+            let (mut gp, mut read, mut bias, mut dyp, mut rp, mut lp, mut nlp) = (g.device_ptr(), words.read, l.lift_bias as u64, dy.device_ptr(), clock.fread.device_ptr(), live.device_ptr(), nlive.device_ptr());
+            want = resident("field_blank_lift_read")?;
+            self.launch("field_blank_lift_read", Self::cells(want), THREADS, &mut [arg(words), arg(&mut gp), arg(&mut read), arg(&mut bias), arg(&mut dyp), arg(&mut rp), arg(&mut lp), arg(&mut nlp), arg(&mut want)])?;
         }
         // [realization; theory, November 13, P58 item 2] `dr` and `back` unzeroed. `field_transposed` (no accumulation) writes every column of a
         // site the clock read (`blank_read`, set above), and `dr`'s one reader, `field_ratio_adjoint` on the same sites, reads its covector only
