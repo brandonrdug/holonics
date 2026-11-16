@@ -3638,10 +3638,10 @@ CONTACT_ENTRY(20)
 // [definition; agent-inferred, November 1] **The moment modes are batched** (§15.1): a launch carries every
 // moment mode of the batch, `blockIdx.y` (or the quotient of the thread's cell) naming the mode `u`, whose
 // ring slot, skin and admission flags are `ws[u]` (`MomentWords`, one per mode), and whose strands, prefix
-// sums and results stand at the mode's stride in one array each. The bodies are `field_moment.cuh`'s
-// (`moment_admit_regions`, `moment_prefix_regions`, `moment_site_exact`, `moment_return_site`), so a mode's
-// bits are the single-mode launch's; only the launch is shared (the saving: a batch's launches no longer
-// grow with its moment modes).
+// sums and results stand at the mode's stride in one array each. The sites' bodies are `field_moment.cuh`'s
+// (`moment_site_exact`, `moment_return_site`) beside the paced admission and prefixes below, so a mode's bits
+// are those it would have alone; only the launch is shared (the saving: a batch's launches no longer grow with
+// its moment modes). The single-mode and unpaced entries retired on November 16: no host code launched them.
 
 // Site `t`'s strand encoding of the moment mode `idx` (the real part, then the imaginary `T` on): its
 // class's row of the family at `base` (`2T` wide), zero at a silent open site, or its carried mixture `release(
@@ -3669,45 +3669,6 @@ extern "C" __global__ void field_moment_strands_all(FieldWords w, uint64_t base_
             before[(uint64_t)u * 2 * w.T + 2 * t + part] = moment_strand(w, base_before, tm, u, t, part);
             after[(uint64_t)u * 2 * w.T + 2 * t + part] = moment_strand(w, base_after, tm, u, t, part);
         }
-    }
-}
-
-// Every moment mode's admission (the forward's: `x` = before, `y` = after; the return's, `returning`: `x` the
-// covector, `y` null). Grid `(regions, modes)`, dynamic shared memory `3 · blockDim.x · 16`.
-extern "C" __global__ void field_moment_admit_all(const MomentWords *ws, const int64_t *x, const int64_t *y, uint64_t stride, uint32_t returning) {
-    moment_admit_regions(ws[blockIdx.y], x + (uint64_t)blockIdx.y * stride, y ? y + (uint64_t)blockIdx.y * stride : nullptr, returning != 0);
-}
-
-// Every moment mode's prefix sums of a strand (`released`: the return's `Q`, else the forward's exact `P`).
-// Grid `(regions, modes)`, dynamic shared memory `blockDim.x · 32`.
-extern "C" __global__ void field_moment_prefix_all(const MomentWords *ws, const int64_t *x, wide *pre, uint64_t stride, uint64_t pre_stride, uint32_t released) {
-    moment_prefix_regions(ws[blockIdx.y], x + (uint64_t)blockIdx.y * stride, pre + (uint64_t)blockIdx.y * pre_stride, released != 0);
-}
-
-// Every moment mode's moments `s[u][t]` (the body of `field_moment`). Grid `(cells, modes)`.
-extern "C" __global__ void field_moment_all(const MomentWords *ws, const int64_t *before, const int64_t *after, const wide *up, const wide *down, int64_t *s, uint64_t stride, uint64_t pre_stride) {
-    const uint32_t u = blockIdx.y;
-    const MomentWords &w = ws[u];
-    before += (uint64_t)u * stride;
-    after += (uint64_t)u * stride;
-    s += (uint64_t)u * stride;
-    up += (uint64_t)u * pre_stride;
-    down += (uint64_t)u * pre_stride;
-    for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t r = w.site_region[g], t = w.site_pos[g];
-        if (!w.ok[r]) {
-            s[2 * g] = 0;
-            s[2 * g + 1] = 0;
-            continue;
-        }
-        const uint64_t first = w.region_off[r];
-        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        MomentGauss v;
-        if (!moment_site_exact(before + 2 * first, after + 2 * first, up + 2 * (first + r), down + 2 * (first + r), w.ring, w.n, w.ring_len, w.decay, sites, t, &v)) {
-            atomicOr(w.status, MOMENT_REFUSED_SHAPE);
-        }
-        s[2 * g] = fit64(rel(v.re, MOMENT_COEFFICIENT_BITS), w.status);
-        s[2 * g + 1] = fit64(rel(v.im, MOMENT_COEFFICIENT_BITS), w.status);
     }
 }
 
@@ -3760,34 +3721,6 @@ extern "C" __global__ void field_moment_ds_all(FieldWords w, const wide *dm, con
         const uint32_t cm = cmap[u] & 0x7FFFFFFFu;
         ds[(uint64_t)u * 2 * w.T + 2 * t] = dead ? 0 : fit64(dm[t * w.M2 + cm], w.status);
         ds[(uint64_t)u * 2 * w.T + 2 * t + 1] = dead ? 0 : fit64(dm[t * w.M2 + w.M + cm], w.status);
-    }
-}
-
-// Every moment mode's return (the body of `field_moment_return`): `d_before[u][t]`, `d_after[u][t]`.
-// Grid `(cells, modes)`.
-extern "C" __global__ void field_moment_return_all(const MomentWords *ws, const int64_t *ds, const wide *q, wide *d_before, wide *d_after, uint64_t stride, uint64_t pre_stride) {
-    const uint32_t u = blockIdx.y;
-    const MomentWords &w = ws[u];
-    ds += (uint64_t)u * stride;
-    d_before += (uint64_t)u * stride;
-    d_after += (uint64_t)u * stride;
-    q += (uint64_t)u * pre_stride;
-    for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t r = w.site_region[g], k = w.site_pos[g];
-        if (!w.ok[r]) {
-            d_before[2 * g] = d_before[2 * g + 1] = d_after[2 * g] = d_after[2 * g + 1] = 0;
-            continue;
-        }
-        const uint64_t first = w.region_off[r];
-        const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        MomentGauss plus, minus;
-        if (!moment_return_site(ds + 2 * first, q + 2 * (first + r), w.ring, w.n, w.ring_len, w.decay, sites, k, &plus, &minus)) {
-            atomicOr(w.status, MOMENT_REFUSED_SHAPE);
-        }
-        d_before[2 * g] = rel(plus.re, MOMENT_RETURN_RELEASE_BITS);
-        d_before[2 * g + 1] = rel(plus.im, MOMENT_RETURN_RELEASE_BITS);
-        d_after[2 * g] = rel(minus.re, MOMENT_RETURN_RELEASE_BITS);
-        d_after[2 * g + 1] = rel(minus.im, MOMENT_RETURN_RELEASE_BITS);
     }
 }
 
@@ -5977,7 +5910,7 @@ __device__ MomentGauss moment_site_paced(const FieldWords &fw, const PacedMode &
     return s;
 }
 
-// Every moment mode's moments on a paced field (`field_moment_all`, the paced regions by `moment_site_paced`).
+// Every moment mode's moments on a paced field (the paced regions by `moment_site_paced`).
 extern "C" __global__ void field_moment_paced_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, const int64_t *before, const int64_t *after, const wide *up, const wide *down, int64_t *s, uint64_t stride, uint64_t pre_stride) {
     const uint32_t u = blockIdx.y;
     const MomentWords &w = ws[u];
@@ -6073,7 +6006,7 @@ extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_moment_ski
     }
 }
 
-// Every moment mode's return on a paced field (`field_moment_return_all`, the paced regions by the paced law: the near
+// Every moment mode's return on a paced field (the paced regions by the paced law: the near
 // terms at `ζ^(τ_k − τ_t) D(σ)`, the far ones from the skinned prefixes).
 extern "C" __global__ void field_moment_return_paced_all(const MomentWords *ws, const uint32_t *cmap, FieldWords fw, const int64_t *dss, const wide *qs, const wide *sks, wide *d_before, wide *d_after, uint64_t stride, uint64_t pre_stride, uint64_t sk_stride) {
     const uint32_t u = blockIdx.y;
