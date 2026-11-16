@@ -836,3 +836,44 @@ UTC); `agent-inferred` for the reading of them.
   resident threads (80 multiprocessors of 1,536), its time is one thread's walk of 512 live sites, and a tile sized from
   the live count to fill the card shortens it in the same proportion as the tile, the partition of a sum whose order
   is free.
+- **The live walk, scored, and a tile sized to the card it does not have** (the build thread, relayed 08:44 UTC; lap
+  56's state against #888; #891 and #892, receipts `research/records/receipts/2026-11-16_blankload/`). Taken into the
+  build: the list compacted in ascending order by one block's scan (8.0 µs), the tile computed on the card from the live
+  count, four sites' operands read before their four terms, and the lift's covector written zero at a dead site. Gate 3
+  equal. A clean hold: control 536.0 ms a section (spread 1.4), the walk 511.4, 0.954 (24.5 ms; pairs 23.9 to 25.3),
+  inside the build's 0.945 to 0.965. By the profile the bias and encoding 15.29 to 5.38 ms a section (0.352, against
+  0.10 to 0.30), the lift and read 8.83 to 3.25 (0.368, against 0.15 to 0.35), both on the side of less saved, and the
+  lift's covector 11.12 to 3.79 (0.341, inside 0.15 to 0.35). A launch of the bias and encoding: issue 24 to 27% to
+  53.5%, the long scoreboard 37 to 42 an issued instruction to 5.1, warps active 97% to 60%. Why the walks stand at 58
+  to 60% of warps active (`agent-inferred`, from the relay's numbers): the tile is sized so that the cells fill
+  `want = 80 × 1,536 = 122,880` threads, but at 48 registers five blocks of 256 stand on a multiprocessor, so the launch
+  holds 102,400, and the grid's stride sends 0.2 of its threads round a second tile while the rest have finished. The
+  launch then lasts two tiles; its warps average about half of the 48, near what was read; and a tile sized to the
+  102,400 that stand would last 1.2 of the present tile's walk. Guess, fixed at 08:46 UTC, for that change alone (`want`
+  read from the kernel's own occupancy, the same partition of a sum whose order is free): gate 3 equal; the bias and
+  encoding and the lift and read 0.60 to 0.75 of their present time a launch, their warps active 72 to 83%; 2.2 to 3.5
+  ms a section, a section 0.993 to 0.996, under a hold's resolution, so scored on the profile.
+  Corrected the same hour (the build thread, relayed 08:47 UTC): the build already read `want` from the kernel's
+  occupancy (102,400, the profile's mean grid for both walks), so the reading above put the tail on the wrong ceiling.
+  It stands on the tiles' ceilings: with `tile = ⌈entries · n / want⌉` and `tiles = ⌈n / tile⌉`, the cells can pass
+  `want` by up to `entries − 1`, and those threads walk a second, short tile. On a typical return the bias and encoding
+  has 15,860 entries and 2,813 live sites, so a tile of 436, 7 tiles, 111,020 cells: 8,620 threads walk 436 and then
+  197, the launch lasts 1.45 tiles and its warps average 83% / 1.45 = 57%, as read; the lift and read, 4,160 entries,
+  tiles of 115 and 1.46 tiles. The fix sets `tiles = max(1, ⌊want / entries⌋)` and `tile = ⌈n / tiles⌉`, so the cells
+  stay within `want` and every thread walks one tile: 469 sites against 633 (0.74) and 118 against 168 (0.70) by that
+  arithmetic. The guess of 08:46 was fixed on the mechanism the fix answers (one tile a thread) and carries to it as
+  fixed; the build's arithmetic puts both at its top. A lesson (`agent-inferred`): a guess's premise that a log can
+  print is read before the guess, here the profile's grid, which had printed 102,400.
+- **The spread and the sums in chunks, and the waves they take** (the build thread, relayed 08:50 UTC;
+  `claude/region-scan`, gate 1 passed; its guesses fixed at 08:52 UTC: gate 3 equal, the spread 0.30 to 0.55 of its time
+  a section, the sums 0.25 to 0.50, the blank walks the 08:46 guess, a section 0.973 to 0.983). The spread runs a block
+  of 1,024 a region (32 chunks of the span's 32), at 48 registers one block a multiprocessor, so the 96 regions take two
+  waves, the second on 16 of the 80 multiprocessors; the sums run a block of 1,024 a head and region (65 entries by 15
+  chunks) at 64 registers, one a multiprocessor, 192 blocks in three waves, the third on 32. A wave of a kernel whose
+  blocks are regions costs a region's walk whether it is full or not (`agent-inferred`): the spread at 1,024 a block
+  lasts two walks of 32 chunks, as long as one walk of 16 (a block of 512, two a multiprocessor, one wave), and a block
+  of 672 (21 chunks; two a multiprocessor at 48 registers, 64,512 of 65,536) lasts one walk of 21, about 0.76 of either
+  where the walk dominates. A lead, no guess until built: size a region's block so that its blocks fill one wave at the
+  registers it takes, here 96 regions on 160 slots; for the sums the same reading keeps the build's block: one wave
+  of 192 needs three blocks a multiprocessor, at most 10 warps a block at 64 registers, so 4 chunks and about 53 site
+  steps a walk, against three waves of 14 (about 42) at 1,024.
