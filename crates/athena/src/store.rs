@@ -1019,6 +1019,37 @@ pub fn next_pass(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
+/// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
+/// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored
+/// state writes the same bytes. With gate 3's reproduction (a cold process from a saved state codes the line's sections and reads the
+/// line's cavity table byte for byte), it is the engine's receipt that a restart keeps what the line learned.
+pub fn restore(args: &[String]) -> Result<()> {
+    if args.len() != 3 {
+        return Err("restore-store STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    let bytes = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let text = std::str::from_utf8(&bytes)?;
+    let learner = Learner::from_text(text).map_err(|e| e.to_string())?;
+    let written = learner.to_text();
+    let equal = written.as_bytes() == bytes.as_slice();
+    let first = written.as_bytes().iter().zip(bytes.iter()).position(|(a, b)| a != b).map_or("-".to_string(), |k| k.to_string());
+    println!(
+        "STORE_RESTORE octets={} written_octets={} laps={} drawn={} entries={} equal={equal} first_unequal_octet={first} ms={}",
+        bytes.len(),
+        written.len(),
+        learner.laps,
+        learner.drawn,
+        learner.field.material_len(),
+        started.elapsed().as_millis()
+    );
+    if !equal {
+        return Err("the restored state does not write the saved bytes".into());
+    }
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 15, the record of the states a field trains on, §5 item 1] `own-states STATE STATE_SHA OUT`: **a
 /// state whose training states are the field's own**: the state with its pass line's word `own` set ([`StorePass`]), its place in the pass
 /// kept, so the cut goes on over the same stretches and each stretch's state is the release's own at a crossing of its octaves

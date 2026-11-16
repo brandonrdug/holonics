@@ -285,6 +285,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-lane") => athena::store::found_lane(args),
         Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
+        Some("restore-store") => athena::store::restore(args),
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),
         Some("write-store") => athena::store::write(args, realization),
