@@ -920,3 +920,34 @@ UTC); `agent-inferred` for the reading of them.
   wide add goes to the bias's entry. Guess, fixed at 09:32 UTC: gate 3 equal; a section 0.995 to 0.999 of its control
   (0.5 to 3 ms, centre 1.5 ms), near a hold's resolution; `field_outer_x64` 1.00 to 1.03 and `field_outer_x32` 1.00
   to 1.04 by Nsight Compute, local traffic under 1% of the kernel's L1 sectors.
+- **The fused bias, scored** (the build thread, relayed 10:08 UTC; #899, receipts
+  `research/records/receipts/2026-11-16_occupancy/`). Gate 3 equal. Control #896 at 494.5 to 496.5 ms a section (spread
+  2.0), the build 494.3 to 494.7, 0.998 (1.2 ms), inside the control's spread: my 0.995 to 0.999 held, the build's 0.990 to
+  0.997 missed. The outer sums, matched by grid against #896: `field_outer_x32` 1.02 at 405 blocks and 1.07 at 204
+  (166 to 178 µs), `field_outer_x64` 1.06 at 148 and 204; my 1.00 to 1.04 and 1.00 to 1.03 missed where the grids are
+  large, and so did the build's 1.00 to 1.05. My reading of the miss (`agent-inferred`): the cost follows the share of a
+  launch's tiles that carry the bias (the first column block, `1/itiles`, all of them where `cols` is 64, half at 128).
+  The bias's adds stood in the inner loop on half of warp 0's lanes, ahead of each chunk's barrier, so the whole block
+  waited on that warp. The constant-one column of 09:32 has no padding slot where `cols` is a multiple of 64, as the
+  line's common shapes are (64 and 128), so it would cost a column of tiles. The spread at 640 read 45.2 µs a launch
+  against 43.4 at 672 (1.04); my 0.60 to 0.85 missed. The 123 region blocks are unequal, and one block takes its
+  multiprocessor's issue (two co-resident blocks last as long as two in sequence), so the launch lasts as long as the
+  busiest multiprocessor's work, about 96,000 to 101,000 cycles against a mean of 62,000 to 65,000, whether the blocks
+  stand one or two a multiprocessor. This corrects the 08:50 lesson: a wave of region-blocks costs a region's walk only
+  where one block leaves the issue idle; where it does not, the lever is the balance of work over multiprocessors. The
+  blank walks (unchanged) end unevenly across and within multiprocessors with equal tiles (bias and encoding: the
+  multiprocessors' active cycles 0.72 to 1.00 of the most, mean 0.88; the schedulers' 0.55 to 1.00, mean 0.77).
+- **The bias as a shared word a row** (the build thread, relayed 10:11 UTC; `claude/bias-shared` at `5da9ae056`, held
+  in the gap after lap 59 against #899). The first 64 threads of a tile add a chunk's staged `ys[kc][tid]` into
+  `bsh[tid]` after the chunk's products, and add it once the walk ends narrow; the wide form is unchanged; 128 registers
+  and no spill; the spread back at 672. Conditions on the bits: the adds stand before the chunk's trailing barrier (the
+  next chunk's staging overwrites `ys` after it); `bsh` is zeroed at each walk's start and added only where the walk
+  ends narrow; only the first column block adds. The build's guess (10:15 UTC): the outer sums 0.93 to 1.00 of #899's
+  a launch at the 204 and 148 grids, the spread 0.94 to 0.98, a section 0.996 to 1.000. Mine, fixed at 10:13 UTC: gate
+  3 equal; the outer sums at those grids 0.95 to 0.98 of #899's a launch (1.02 to 1.04 of #896's); the spread 0.95 to
+  0.97 of #899's (#896's own); a section 0.997 to 1.000 of #899's, inside the control's spread. Two leads, no guess until
+  built (`agent-inferred`): the bias over every warp (thread `j` sums row `j mod 64` over the steps `kc ≡ ⌊j/64⌋ mod 4`,
+  eight reads and adds a chunk each, the quarters meeting in shared memory at the walk's end), so no warp stands behind
+  the barrier; and the spread's regions launched largest first (each region's outputs are its own, so no bit moves),
+  whose floor is the larger of the mean multiprocessor's work and the largest block, about 0.67 to 0.75 of now if no
+  region passes about 50,000 cycles, its premise the regions' site counts read from `region_off` first.
