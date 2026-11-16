@@ -2739,6 +2739,23 @@ __device__ __forceinline__ uwide mulu64(uint64_t a, uint64_t b) {
     return ((uwide)__umul64hi(a, b) << 64) | (uwide)(a * b);
 }
 
+// [realization; November 16, (c) of the theory thread] `a · b` for a 64-bit word `a` (its magnitude `ua` and its sign) and a wide `b`, where it
+// fits `i128` (`mul_fits`): the product formed 64 by 128 from `b`'s halves and its overflow read from the words above it, with no count of
+// either operand's bits. `mul_fits` takes the 128 by 128 product where the operands' bits sum to at most 126 and the full product past them;
+// both return the product exactly where it fits and refuse where it does not, so this is the same integer and the same refusal.
+__device__ __forceinline__ bool mul_fits_w64(uint64_t ua, bool aneg, wide b, wide *r) {
+    const bool neg = aneg != (b < 0);
+    const uwide ub = (uwide)(b < 0 ? -b : b);
+    const uwide p0 = mulu64(ua, (uint64_t)ub), p1 = mulu64(ua, (uint64_t)(ub >> 64));
+    const uwide lo = p0 + ((uwide)(uint64_t)p1 << 64);
+    const uwide limit = neg ? ((uwide)1 << 127) : (((uwide)1 << 127) - 1);
+    if ((uint64_t)(p1 >> 64) != 0 || lo < p0 || lo > limit) {
+        return false;
+    }
+    *r = neg ? (wide)(0 - lo) : (wide)lo;
+    return true;
+}
+
 __device__ __forceinline__ wide mulu64_128(uint64_t a, int64_t b) {
     const wide p = (wide)mulu64(a, mag64(b));
     return b < 0 ? -p : p;
@@ -6135,6 +6152,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
     if (p < 0) {
         return;
     }
+    const HeadSkin hs = head_skin(w, h);
     for (uint32_t l = threadIdx.x; l < n; l += blockDim.x) {
         turn_b[l] = turn_rate_dev(w, l * (w.frames - w.still) + h % w.frames - w.still);
     }
@@ -6166,6 +6184,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        // [realization; November 16, the return's source counters] Whether the head's skins read its clock over the receiver's region is the
+        // row's (`paced_at(w, h, g)`), so it is read once a row, not at every pair's every mode; the skins are the same words.
+        const bool pg = paced_hs(w, hs, g);
         wide own = 0;
         for (uint32_t k = lane; k < K; k += 32) {
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
@@ -6182,11 +6203,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
             // [P55 step 5] The modes' sums to the source's covector, added on the lane and summed once (a ring sum on `Z/2^128`: the same bits).
             uwide to_source = 0;
             for (uint32_t l = 0; l < n; l++) {
-                const wide dec = skin_ij_at(w, h, l, g, srow + k, gap);
+                const wide dec = pg ? pair_skin_word(w, p, srow + k, l) : decay_hs(w, hs, l, gap);
                 // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
                 const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
                 wide value = 0;
-                if (!mul_fits((wide)e[j], inner, &value)) {
+                if (!mul_fits_w64(e[j], false, inner, &value)) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
                 value = rel(value, SHARE_BITS);
@@ -6196,7 +6217,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                 const uint64_t power = (uint64_t)mul32(kr, kr) + (uint64_t)mul32(ki, ki);
                 const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec);
                 wide lock = 0;
-                if (!mul_fits((wide)dsr[j], bracket, &lock)) {
+                if (!mul_fits_w64(mag64(dsr[j]), dsr[j] < 0, bracket, &lock)) {
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
@@ -6221,10 +6242,10 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                     const Divisor qc = divisor_of(count), qc2 = divisor_of(count * count);
                     uwide to_edge = 0;
                     for (uint32_t l = 0; l < n; l++) {
-                        const wide dec = crowd_skin_ij(w, h, l, g, lv, right);
+                        const wide dec = pg ? crowd_skin_word(w, p, g, lv, right, l) : decay_hs(w, hs, l, (uint32_t)1 << lv);
                         const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(uint64_t)(hi_ + 1) * S + n + l] - svp[(uint64_t)lo * S + n + l];
                         wide x = 0, y = 0, value = 0;
-                        if (!mul_fits((wide)dyi[l], vr, &x) || !mul_fits((wide)dyi[n + l], vi, &y) || !mul_fits((wide)w.ce[hg * w.slots + lane], x + y, &value)) {
+                        if (!mul_fits_w64(mag64(dyi[l]), dyi[l] < 0, vr, &x) || !mul_fits_w64(mag64(dyi[n + l]), dyi[n + l] < 0, vi, &y) || !mul_fits_w64(w.ce[hg * w.slots + lane], false, x + y, &value)) {
                             atomicOr(w.status, REFUSED_CARRIER);
                         }
                         value = div_nearest_by(rel(value, SHARE_BITS), qc);
@@ -6242,7 +6263,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_
                             bracket = div_nearest_by(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), qc2);
                         }
                         wide lock = 0;
-                        if (!mul_fits((wide)w.cds[hg * w.slots + lane], bracket, &lock)) {
+                        if (!mul_fits_w64(mag64(w.cds[hg * w.slots + lane]), w.cds[hg * w.slots + lane] < 0, bracket, &lock)) {
                             atomicOr(w.status, REFUSED_KEY);
                         }
                         lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
