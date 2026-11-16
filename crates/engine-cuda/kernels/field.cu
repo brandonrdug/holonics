@@ -3175,6 +3175,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         uint32_t negs = 0, met = 0;
         // The numerators of a staged term: the lanes of an entry add their part of it.
         const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+        // [realization; theory, November 16 00:55Z] The row's head is fixed, so its pace index is read once a row, not a term.
+        const int32_t ph = paced_index(w, h);
         const auto numerators = [&](bool crowd, uint32_t nvalid) {
             if (!active) {
                 return;
@@ -3215,7 +3217,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                         const uint32_t gap = j > i ? j - i : i - j;
                         const int64_t raw = values[(uint64_t)j * S + entry];
                         // (a head of eight modes reads its skin from the vector table: the eight modes of a gap stand together)
-                        const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)pair_skin_word(w, paced_index(w, h), srow + stk[warp][pos], m), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
+                        const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)pair_skin_word(w, ph, srow + stk[warp][pos], m), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
                         const bool neg = v < 0;
                         const uint64_t mag = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
                         const uwide lo = (uwide)st0[warp][pos] * (uwide)mag;
@@ -3352,7 +3354,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         // The crowds' chunk: a crowd's value multiplier is one, its mass multiplier its count.
         {
             Coef cf = {0, 0, 0};
-            uint32_t s = 0, slot = UINT32_MAX, lo = 0, hi_ = 0, lv = 0;
+            uint32_t s = 0, slot = UINT32_MAX, lo = 0, hi_ = 0, lv = 0, sx = 0;
             if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
                 const uint64_t count = scp[hi_ + 1] - scp[lo];
                 if (count != 0) {
@@ -3369,6 +3371,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     }
                     big_add(M, big_shl(big_of<L>(coef_of(face, (uwide)count)), s));
                     cf = coef_of(face, 1);
+                    sx = (uint32_t)sh;
                 }
             }
             st0[warp][lane] = cf.c0;
@@ -3376,6 +3379,10 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
             st2[warp][lane] = cf.c2;
             sts[warp][lane] = s;
             stj[warp][lane] = slot;
+            // [realization; theory, November 16 00:55Z] The crowd's term stays staged for its share in pass three: its face is
+            // `st0` (`coef_of(face, 1)`) and its bits above the row's least `stk` (unread by a crowd's numerators), so the
+            // crowd's score is computed once a row. The same lane holds the same slot in both passes.
+            stk[warp][lane] = sx;
             crlo[warp][lane] = lo;
             crhi[warp][lane] = hi_;
             crlv[warp][lane] = lv;
@@ -3448,19 +3455,13 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     erow[j] = p;
                 }
             }
-            uint32_t lo, hi_, lv;
             if (lane < nslots) {
                 uint64_t p = 0;
-                if (crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
-                    const uint64_t count = scp[hi_ + 1] - scp[lo];
-                    if (count != 0) {
-                        int64_t a;
-                        uint64_t face;
-                        term_of(w, crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper, g, lo > i), &a, &face);
-                        const Big<L> x = big_shl(big_of<L>(coef_of(face, (uwide)count)), (uint32_t)(a - amin) + SHARE_BITS);
-                        if (!rowdiv_nearest(x, rd, &p)) {
-                            p = UINT64_MAX;
-                        }
+                if (stj[warp][lane] == lane) {
+                    const uint64_t count = scp[crhi[warp][lane] + 1] - scp[crlo[warp][lane]];
+                    const Big<L> x = big_shl(big_of<L>(coef_of(st0[warp][lane], (uwide)count)), stk[warp][lane] + SHARE_BITS);
+                    if (!rowdiv_nearest(x, rd, &p)) {
+                        p = UINT64_MAX;
                     }
                 }
                 w.ce[hg * w.slots + lane] = p;

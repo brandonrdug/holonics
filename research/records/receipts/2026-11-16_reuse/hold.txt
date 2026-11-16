@@ -1,0 +1,79 @@
+# The reuse build's hold after lap 45 (01:26 to 01:45 UTC, November 16): gate 3 on lap 17, Nsight Compute on both builds, profiles of both
+# on 24 of lap 45's sections, and the balanced timing hold (ctl = the carry-save build, the line's binary from lap 46; nw = reuse).
+# hold: lock taken 01:26:40
+# card empty 01:33:55
+# gate begun 01:33:55
+# parity: exit 0 01:37:15
+# repro: exit 0 01:37:30
+# read: exit 0 01:41:32
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# next_bin written 01:41:32
+# ncu ctl exit 0
+# ncu nw exit 0
+# profile ctl exit 0
+# profile nw exit 0
+# run1 ctl exit 0 elapsed_ms=14580
+# run2 ctl exit 0 elapsed_ms=14593
+# run3 nw exit 0 elapsed_ms=14310
+# run4 nw exit 0 elapsed_ms=14375
+# run5 ctl exit 0 elapsed_ms=14810
+# run6 ctl exit 0 elapsed_ms=14896
+# run7 nw exit 0 elapsed_ms=13955
+# run8 nw exit 0 elapsed_ms=13913
+# run9 ctl exit 0 elapsed_ms=14887
+# hold: released 01:44:35
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=595.4
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=595.3
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=584.2
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=587.2
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=604.7
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=607.2
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=568.5
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=567.2
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=607.7
+PROFILE_PAIR entry=field_contact_rows ctl_ms_a_section=65.7 nw_ms_a_section=66.0 ctl_launches=2304 nw_launches=2304
+PROFILE_PAIR entry=field_contact_columns ctl_ms_a_section=57.3 nw_ms_a_section=58.2 ctl_launches=2304 nw_launches=2304
+PROFILE_PAIR entry=field_contact_l4 ctl_ms_a_section=48.9 nw_ms_a_section=39.0 ctl_launches=378 nw_launches=378
+PROFILE_PAIR entry=field_pace_skin_back ctl_ms_a_section=36.9 nw_ms_a_section=37.5 ctl_launches=1152 nw_launches=1152
+PROFILE_PAIR entry=field_transposed ctl_ms_a_section=27.5 nw_ms_a_section=28.1 ctl_launches=5184 nw_launches=5184
+PROFILE_PAIR entry=field_outer_x32 ctl_ms_a_section=23.7 nw_ms_a_section=24.4 ctl_launches=8544 nw_launches=8544
+PROFILE_PAIR entry=field_affine_tiled_x32 ctl_ms_a_section=21.0 nw_ms_a_section=21.6 ctl_launches=4368 nw_launches=4368
+PROFILE_PAIR entry=field_clock_fill ctl_ms_a_section=20.7 nw_ms_a_section=20.8 ctl_launches=1008 nw_launches=1008
+PROFILE_PAIR entry=field_chart ctl_ms_a_section=19.4 nw_ms_a_section=19.5 ctl_launches=1776 nw_launches=1776
+PROFILE_PAIR entry=field_exposure ctl_ms_a_section=17.9 nw_ms_a_section=18.0 ctl_launches=576 nw_launches=576
+PROFILE_PAIR entry=field_skin_fill ctl_ms_a_section=17.7 nw_ms_a_section=17.9 ctl_launches=1152 nw_launches=1152
+PROFILE_PAIR entry=field_blank_bias_enc ctl_ms_a_section=15.5 nw_ms_a_section=15.5 ctl_launches=288 nw_launches=288
+PROFILE_PAIR entry=field_blank_dy ctl_ms_a_section=12.1 nw_ms_a_section=12.4 ctl_launches=288 nw_launches=288
+PROFILE_PAIR entry=field_pair_scan_back ctl_ms_a_section=11.0 nw_ms_a_section=11.0 ctl_launches=384 nw_launches=384
+PROFILE_PAIR entry=field_spread ctl_ms_a_section=9.1 nw_ms_a_section=10.0 ctl_launches=2304 nw_launches=2304
+PROFILE_PAIR entry=field_affine_tiled_x64 ctl_ms_a_section=9.4 nw_ms_a_section=9.8 ctl_launches=1392 nw_launches=1392
+PROFILE_PAIR entry=field_tied_back_e ctl_ms_a_section=9.1 nw_ms_a_section=9.1 ctl_launches=144 nw_launches=144
+PROFILE_PAIR entry=field_blank_lift_read ctl_ms_a_section=8.8 nw_ms_a_section=9.1 ctl_launches=288 nw_launches=288
+PROFILE_PAIR entry=field_pair_scan ctl_ms_a_section=8.9 nw_ms_a_section=9.0 ctl_launches=384 nw_launches=384
+PROFILE_PAIR entry=field_ratio_adjoint ctl_ms_a_section=8.1 nw_ms_a_section=8.4 ctl_launches=1776 nw_launches=1776
+PROFILE_PAIR entry=field_moment_skinned_all ctl_ms_a_section=7.8 nw_ms_a_section=7.9 ctl_launches=384 nw_launches=384
+PROFILE_PAIR entry=field_moment_pace_back_all ctl_ms_a_section=7.8 nw_ms_a_section=7.8 ctl_launches=384 nw_launches=384
+PROFILE_PAIR entry=field_unit_probe ctl_ms_a_section=7.3 nw_ms_a_section=7.4 ctl_launches=576 nw_launches=576
+PROFILE_PAIR entry=field_unit ctl_ms_a_section=7.2 nw_ms_a_section=7.3 ctl_launches=576 nw_launches=576
+PROFILE_PAIR entry=field_moment_return_paced_all ctl_ms_a_section=6.2 nw_ms_a_section=6.2 ctl_launches=384 nw_launches=384
+PROFILE_PAIR entry=field_outer_x64 ctl_ms_a_section=6.1 nw_ms_a_section=6.1 ctl_launches=1392 nw_launches=1392
+PROFILE_PAIR entry=field_moment_prefix_paced_all ctl_ms_a_section=5.8 nw_ms_a_section=6.0 ctl_launches=1872 nw_launches=1872
+PROFILE_PAIR entry=field_sums ctl_ms_a_section=5.1 nw_ms_a_section=5.3 ctl_launches=576 nw_launches=576
+PROFILE_PAIR entry=field_tied_face_tiled ctl_ms_a_section=4.8 nw_ms_a_section=4.9 ctl_launches=432 nw_launches=432
+PROFILE_PAIR entry=field_mark_rows ctl_ms_a_section=3.9 nw_ms_a_section=3.9 ctl_launches=48 nw_launches=48
+PROFILE_PAIR entry=field_cavity_return_paced_all ctl_ms_a_section=3.5 nw_ms_a_section=3.5 ctl_launches=768 nw_launches=768
+PROFILE_PAIR entry=field_pace_c_back ctl_ms_a_section=3.3 nw_ms_a_section=3.3 ctl_launches=384 nw_launches=384
+PROFILE_PAIR entry=field_moment_strand_return_all ctl_ms_a_section=3.2 nw_ms_a_section=3.2 ctl_launches=432 nw_launches=432
+PROFILE_PAIR entry=field_unit_back ctl_ms_a_section=3.0 nw_ms_a_section=3.2 ctl_launches=576 nw_launches=576
+PROFILE_PAIR entry=field_cavity_pace_back_all ctl_ms_a_section=3.1 nw_ms_a_section=3.1 ctl_launches=48 nw_launches=48
+PROFILE_PAIR entry=field_moment_accumulate ctl_ms_a_section=2.9 nw_ms_a_section=3.1 ctl_launches=1296 nw_launches=1296
+PROFILE_PAIR entry=field_unit_back_probe ctl_ms_a_section=3.0 nw_ms_a_section=3.1 ctl_launches=576 nw_launches=576
+PROFILE_PAIR entry=field_moment_paced_all ctl_ms_a_section=2.8 nw_ms_a_section=3.0 ctl_launches=336 nw_launches=336
+PROFILE_PAIR entry=field_unframe ctl_ms_a_section=2.7 nw_ms_a_section=3.0 ctl_launches=1728 nw_launches=1728
+PROFILE_PAIR entry=field_outer_bound_x32 ctl_ms_a_section=2.8 nw_ms_a_section=3.0 ctl_launches=3504 nw_launches=3504
