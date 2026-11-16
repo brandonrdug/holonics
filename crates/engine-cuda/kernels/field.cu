@@ -1557,13 +1557,16 @@ extern "C" __global__ void __launch_bounds__(256, 2) field_tied_back_y_tiled(Fie
 // [realization; November 16, the maps' launch shapes on lap 57's sections] With `bias` given (not `NO_BIAS`), the tiles of the first column
 // block also sum the rows' bias `Σ_t y_t` into `g[bias + o]` from the words they stage: the bias's own launch (`outer_bias_tile`, 192
 // launches a section of 26 to 40 µs each, its products a few thousand) read the same `y` over the same sites. Integer sums, so the
-// partial's walk changes no bit.
+// partial's walk changes no bit. [realization; November 16, the gap after lap 58] The partial stands in shared memory, a word a row added
+// by the tile's first 64 threads after each chunk's products: held in four registers a thread it put `field_outer_x32` at 128 registers
+// with 12 octets of spill and its launches at 1.02 to 1.07 of their time.
 template <typename X>
 __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk, uint64_t bias) {
     __shared__ __align__(16) int32_t ys[MAP_KC][MAP_TO];
     __shared__ __align__(16) int32_t xs[MAP_KC][MAP_TS];
     __shared__ uint64_t part[8];
     __shared__ unsigned long long cm[2][2];
+    __shared__ int64_t bsh[MAP_TO];
     const uint32_t to = threadIdx.x % 16, ti = threadIdx.x / 16;
     const uint64_t otiles = (rows + MAP_TO - 1) / MAP_TO, itiles = (cols + MAP_TS - 1) / MAP_TS, walks = ((uint64_t)w.T + walk - 1) / walk;
     if (threadIdx.x < 4) {
@@ -1577,9 +1580,11 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
         bool narrow = true;
         uint64_t ywalk = 0, xwalk = 0;
         const bool biased = bias != NO_BIAS && i0 == 0;
+        if (biased && threadIdx.x < MAP_TO) {
+            bsh[threadIdx.x] = 0;
+        }
         {
             int64_t acc[4][4];
-            int64_t bsum[4] = {0, 0, 0, 0};
 #pragma unroll
             for (int a = 0; a < 4; a++) {
 #pragma unroll
@@ -1655,12 +1660,13 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                             acc[a][b] += (int64_t)yy[a] * (int64_t)xx[b];
                         }
                     }
-                    if (biased && ti == 0) {
-#pragma unroll
-                        for (int a = 0; a < 4; a++) {
-                            bsum[a] += (int64_t)yy[a];
-                        }
+                }
+                if (biased && threadIdx.x < MAP_TO) {
+                    int64_t b = 0;
+                    for (uint32_t kc = 0; kc < chunk; kc++) {
+                        b += (int64_t)ys[kc][threadIdx.x];
                     }
+                    bsh[threadIdx.x] += b;
                 }
                 __syncthreads();
             }
@@ -1675,13 +1681,10 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                         }
                     }
                 }
-                if (biased && ti == 0) {
-#pragma unroll
-                    for (int a = 0; a < 4; a++) {
-                        const uint32_t o = o0 + 4 * to + a;
-                        if (o < rows && bsum[a] != 0) {
-                            add_wide(g + bias + o, (wide)bsum[a]);
-                        }
+                if (biased && threadIdx.x < MAP_TO) {
+                    const uint32_t o = o0 + threadIdx.x;
+                    if (o < rows && bsh[threadIdx.x] != 0) {
+                        add_wide(g + bias + o, (wide)bsh[threadIdx.x]);
                     }
                 }
             }
@@ -2407,12 +2410,12 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // exposure. [realization; G191, November 14] At 8 both spilled under a 64-register bound (778 and 220 spill stores, the engine audit's
 // finding 4); timed with the outer sums' walk of 64 (above), the pair reads about 3 ms a section under 8 and 512 with the card warmed.
 #define CONTACT_MIN_BLOCKS 6
-// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 640, where 256 gave a
-// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 to 129 blocks a launch at 10% issue. 640 threads are
-// 20 chunks of 20 warps, and at the kernel's 48 registers (1,536 a warp) two blocks stand on a multiprocessor: the register file is split
-// across its four schedulers, 16,384 registers each, so two blocks of 20 warps take 10 a scheduler, where 672 (21 warps) needed 11 and
-// stood one a multiprocessor (ncu's register limit, the gap after lap 57). The prefix sums are integer sums, so the chunking changes no bit.
-#define SPREAD_THREADS 640
+// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 672, where 256 gave a
+// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 to 129 blocks a launch at 10% issue: 21 chunks. At
+// the kernel's 48 registers it stands one block a multiprocessor (the register file's four quarters hold 10 warps of 1,536 each), and 640
+// threads, two a multiprocessor, read 1.04 of its time a launch in the gap after lap 58: two blocks share a multiprocessor's issue, so a
+// wave of two costs what two waves of one do. The prefix sums are integer sums, so the chunking changes no bit.
+#define SPREAD_THREADS 672
 // The block of `field_sums` (a head and a region a block), its entries' chunks of the region's sites summed, scanned and walked again.
 #define SUMS_THREADS 1024
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
