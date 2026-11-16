@@ -209,7 +209,9 @@ impl<'c> Resident<'c> {
                     &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp_s), arg(&mut dqp_s), arg(&mut dpp_s), arg(&mut dpbp_s), arg(&mut cdsp_s), arg(&mut cwp_s), arg(&mut cvp_s), arg(&mut gcp_s)],
                 )?;
             }
-            self.launch("field_contact_rows", Self::rows_grid(sites as u64, REV_ROWS), (REV_ROWS * 32) as u32, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+            // [realization; November 16] Pass B's staged words: a half-chunk of 16 pairs' words of 32 bits a warp (`rows_words`).
+            let rows_words = (REV_ROWS as u32) * 16 * (words.span as u32) * 4;
+            self.launch_grid("field_contact_rows", crate::cuda::Dim3 { x: Self::rows_grid(sites as u64, REV_ROWS), y: 1, z: 1 }, (REV_ROWS * 32) as u32, rows_words, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
             #[cfg(feature = "ruler-bits")]
             {
                 self.bits_pairs(words, h, 2, 0, ds.device_ptr(), 3, at, sites)?;
