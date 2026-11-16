@@ -441,9 +441,10 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 16; the last ten are from his corrections of November 12 to 16, and the
-three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
-that day. They are written here with their reasons so that no agent holds them as slogans.
+October 29 and November 16; the ten before the last three are from his corrections of November 12 to 16, and the
+three before those were derived from a failure, from readings of November 11 and from Brandon's lens of
+that day. The last three are the lead's, from the readings of November 16 (`agent-inferred`). They are
+written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
   included. Reason: arms cost card time and choose by a short reading, and a winner picked that way
@@ -689,6 +690,35 @@ that day. They are written here with their reasons so that no agent holds them a
   gains or you couldn't care less"). On November 16 the work ran from about 07:00 to 15:50 UTC as kernel holds, each gap after a
   lap costing the line 15 to 20 minutes for gains of 0.1 to 1.4% a section, while the line's writes went unread from
   November 14 05:38; on November 15 a 40-minute lap had stood until he named it. Scope: every loop, plan and brief.
+- **A premise is a presence at the consumer, read before the build** (the lead, November 16). Before a law is ordered, its
+  consumer's equation is traced link by link on the machine's own saved states by a host ruler: at each link, the share of the
+  operand present at the next place (what a least-squares read of that place's state gives of it, fitted on one half of the
+  records and read on the other). The law enters at the first link that slips. A ratio of shares is no presence, and neither is a
+  code. Reason: the crossing triad was derived, realized on the card, held to the line and trained for two laps on "the address
+  stands", which was head 0 giving an aligned digit 7 to 8 times another digit's share. That share was a fifth of the row, the
+  digit arrived at a tenth of itself, and about ten minutes of host reading showed it: the source whole (0.999), its place known at
+  both ends (0.73 to 0.89), the lock at a sixth, the arrival at 0.06 to 0.18. Scope: every law, part and guess that takes an
+  operand from another place or another tick
+  ([the record](research/records/2026-11-16_THE_LINK_THAT_SLIPS_IS_THE_LOCK_A_FAR_DIGIT_ARRIVES_AT_A_TENTH_OF_ITSELF_THE_SUMS_LAW_SITS_IN_A_PRODUCT_NO_READING_REACHES_UNTIL_THE_LOCK_CLOSES_AND_A_PART_ENTERS_BY_A_TENSION_READ_ALONG_ITS_CONSUMERS_EQUATION.md)).
+- **A part enters by its tension read** (the lead, November 16; the founding law of October 24, atlas `contact.pool-founding`,
+  `contact.tension-founds-face`). Before a part is ordered, three shares of the covector's power are read at its locus on a held
+  half (`athena host complete-language read-tension`, `tools/tension_ruler.py`): what the present faces remove, what the law's
+  table removes (the ceiling), and what the part's own operands, located from the tension, remove. A part whose founding is a
+  saddle (its operands' covectors vanish while its return stands at zero) enters with located operands or waits; where nothing
+  locates, the reading is the result and no lap is spent waiting. A part with a slope at its founding (a lane, a return whose
+  operands already carry the law) may still be founded at zero. Reason: the founding law was restated four times between
+  November 13 and 16 ("the machine locates a character instead of waiting") and no build ran it; every part of those days entered
+  at zero or with drawn operands and was waited for, each buying one to three hundredths of a nat where it bought anything; and
+  the same reading that found nothing to locate at the junction (−0.0026 on a held section) showed five located products carrying
+  the sum's law once the lock is closed (0.72 to 0.93, the table's own share). Scope: every growth and every founding. The engine
+  itself holds no founding law yet; until it does, the ruler's read stands in front of every part.
+- **A ruler's null is held to a planted law, its stamps are read from the clock, and its threads are counted** (the lead,
+  November 16). A ruler that reports that nothing was found has recovered a planted instance on the same shapes in the same run.
+  A time written into a guess or a record is read from `date -u`. A reading beside a lap states its host threads, and the lap's
+  time beside it is read. Reasons: a null from an unproved instrument reads the instrument (the locator's first solve also ran 16
+  minutes on one thread of this host's reference BLAS before it was read); tool calls run faster than they feel, and the first
+  guess file's stamp was a minute ahead of the clock, as several of the build's had been; lap 76 took 3,154 s against lap 75's
+  2,942 s with up to eighteen host threads reading beside it, the cause not separated. Scope: every ruler and every receipt.
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

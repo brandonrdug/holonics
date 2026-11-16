@@ -912,6 +912,50 @@ impl Learner {
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }
 
+    /// [definition; the lead, November 16 21:40Z; atlas `contact.pool-founding`, `contact.tension-founds-face`] **The learner with its triads' legs
+    /// founded where the tension leads**: `legs` the charts `A`, `B` and `G` with their biases as [`Loci`] lays them (`6J × D` rows, then `6J`
+    /// biases, on the material's grain), read by a ruler from the covector at the strand's return against products of the pair chart
+    /// ([`Constitution::crossing_tension`]). With `ret` none the return `W_T` is set to zero, so every face reads bit for bit as the field's before
+    /// it and the first deposits charge the return from the covector that reaches it: a founding. With `ret` (`D × 2J`) the return is the
+    /// ruler's too: a ruler's state, never trained from. The triads' moments open as a growth opens them ([`Learner::with_triads`]): first
+    /// moments at zero, second moments at the mean of their counterparts'; every other entry, moment, rate and line is kept. Why the legs and
+    /// not the return: with `W_T = 0` the legs' covectors vanish (atlas `contact.triad-manley-rowe-gauge`), so drawn legs wait on a return that
+    /// drawn products charge only by chance, and a law that lives wholly in a product (`code.triad-character-of-composition`) is then met at
+    /// its unicity distance by a walk; legs located from the tension give the return its covector at the first section. Refused on a learner
+    /// without triads, while a step is held, or where the lengths are not the declaration's.
+    pub fn with_located_legs(&self, legs: &[i32], ret: Option<&[i32]>) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner's legs are founded after its held step is read");
+        }
+        let d = &self.field.declaration;
+        let (dw, f, j2, j6) = (d.width, d.contacts, 2 * d.triads, 6 * d.triads);
+        if d.triads == 0 || legs.len() != j6 * dw + j6 || ret.is_some_and(|r| r.len() != dw * j2) {
+            return refuse("a triad material that is not its declaration's");
+        }
+        let l = self.field.layout.clone();
+        let mut out = self.clone();
+        out.field.theta[l.triad..l.triad + j6 * dw].copy_from_slice(&legs[..j6 * dw]);
+        out.field.theta[l.triad_bias..l.triad_bias + j6].copy_from_slice(&legs[j6 * dw..]);
+        match ret {
+            Some(r) => out.field.theta[l.w_triad..l.w_triad + dw * j2].copy_from_slice(r),
+            None => out.field.theta[l.w_triad..l.w_triad + dw * j2].fill(0),
+        }
+        let mean = |ranges: &[(usize, usize)]| -> i128 {
+            let values: Vec<i128> = ranges.iter().flat_map(|&(start, len)| self.second[start..start + len].iter().copied()).collect();
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        for (start, len, second) in [(l.triad, j6 * dw, mean(&[(l.a, f * dw), (l.b, f * dw)])), (l.triad_bias, j6, mean(&[(l.a_bias, f), (l.b_bias, f)])), (l.w_triad, dw * j2, mean(&[(l.w, dw * f)]))] {
+            out.first[start..start + len].fill(0);
+            out.second[start..start + len].fill(second);
+        }
+        (out.held, out.last) = (None, None);
+        Ok(out)
+    }
+
     /// [definition; theory, November 13, P60 items 1f and 3] **The learner with the opening's lift** ([`Constitution::with_opening`]), founded at zero.
     /// Every standing entry keeps its moments, its remainder and its rate; the block's first moments open at zero and its second at the mean of
     /// its counterpart's standing second moments (`R⁰` the readout's lift `R`, `b⁰` the lift's bias `b_R`), as a growth opens a new block's

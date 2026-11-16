@@ -1790,7 +1790,56 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         Ok(pass.ticks.iter().map(|c| TickRead { read: c.read.clone(), scale: c.scale.clone(), pair_read: c.read2.clone(), pair_scale: c.scale2.clone() }).collect())
     }
+
+    /// [measurement; the lead, November 16 21:40Z; atlas `contact.effective-tension`, `contact.pool-founding`] **The tension at the strand's
+    /// return, by tick** ([`CrossingTension`]): one region's forward and reverse, and for each tick the covector its reverse receives (`λ`, of
+    /// the state the pair's and the triads' return wrote, weighed as the region's state in the joint code), the chart that return's operands
+    /// read (`r̂′`, the pair chart), the current the tick gathered (`y`) and the triads' products as they stand (`c^T`), with each open site's
+    /// code of its class. `Σ_t λ_t ⊗ f(r̂′_t)` over a pool `f` of products of `r̂′`'s entries is the pool's moment `M` of the founding law: what
+    /// the present faces cannot bridge and a product of them can. The second read where the field reads twice. A reading: no state changes.
+    pub fn crossing_tension(&self, region: &Region) -> Result<CrossingTension> {
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambda: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambda), None)?;
+        lambda.reverse();
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let sources = pass
+            .ticks
+            .iter()
+            .map(|cell| (0..heads).flat_map(|h| (0..sites).filter(|&i| !Self::definite(region, i)).map(move |i| (h, i))).map(|(h, i)| (h, i, cell.rows[h * sites + i].iter().map(|src| (src.j as usize, src.p as u128, src.s)).collect())).collect())
+            .collect();
+        Ok(CrossingTension {
+            lambda,
+            chart: pass.ticks.iter().map(|c| c.read.clone()).collect(),
+            sources,
+            read: pass.ticks.iter().map(|c| c.read2.clone()).collect(),
+            current: pass.ticks.iter().map(|c| c.y.clone()).collect(),
+            products: pass.ticks.iter().map(|c| c.ct.clone()).collect(),
+            codes: pass.faces.iter().enumerate().map(|(t, f)| f.as_ref().map(|f| f.code(region.classes[t]))).collect(),
+        })
+    }
 }
+
+/// [measurement; the lead, November 16 21:40Z] **A region's tension at the strand's return** ([`Constitution::crossing_tension`]), each list one
+/// entry a tick in tick order: `lambda` the covector the tick's reverse receives (`[t][D]`, on the covector's grain `2^(−24)`), `read` the
+/// pair chart `r̂′` (`[t][D]` on `2^(−16)`), `current` the gathered current `y` (`[t][2M]` on `2^(−16)`, each site's own frame), `products`
+/// the triads' `c^T` (`[t][2J]` on `2^(−16)`, empty without triads); and `codes` each open site's code of its class on `2^(−20)` bits.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct CrossingTension {
+    pub lambda: Vec<Vec<i64>>,
+    /// Each tick's opening chart `r̂` (`[t][D]` on `2^(−16)`), which the tick's keys, probes and values read.
+    pub chart: Vec<Vec<i32>>,
+    /// Each tick's open rows: for each head and open site, the sources its row met, each one's share of the row's weight (on `SHARE_BITS`)
+    /// and its lock at unit gain (on `2^(−16)`, before the temperature and the falloff).
+    #[allow(clippy::type_complexity)]
+    pub sources: Vec<Vec<(usize, usize, Vec<(usize, u128, i64)>)>>,
+    pub read: Vec<Vec<i32>>,
+    pub current: Vec<Vec<i64>>,
+    pub products: Vec<Vec<i64>>,
+    pub codes: Vec<Option<i64>>,
+}
+
 
 impl Learner {
 

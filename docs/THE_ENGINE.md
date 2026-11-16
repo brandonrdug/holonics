@@ -168,6 +168,8 @@ SHA-256 and prints one line a unit of work.
 | `found-lane`, `found-loud` | found a part at zero on a state, every other line judged | `FOUND_LANE`, `FOUND_LOUD` and a verdict a line |
 | `next-pass`, `own-states` | a state's next pass; a state whose training states are its own | `NEXT_PASS`, `OWN_STATES` |
 | `parity-store` | every read asked of the card and of the host, compared whole | `STORE_PARITY_DONE` |
+| `read-tension`, `read-tension-store` (host) | the covector at the strand's return beside the pair chart, the gathered current and the triads' products, by tick: at the places a forms table names (with `all`, every site, the tick's opening chart and the open row's sources, shares and locks at unit gain), or over the sections a lap meets next (`tools/tension_ruler.py` reads them) | `TENSION_LAW`, `TENSION_TEMPER`, `TENSION_BLOCK`, `TENSION_SECTION`, `TENSION_DONE` |
+| `grow-crossings`, `zero-triad-return`, `found-crossing` | crossing triads grown with drawn legs and a zero return; a ruler's state with the return zeroed; the triads' legs set from a ruler's located file, the return at zero (a founding) or the ruler's (a ruler's state) | `GROW_CROSSINGS`, `ZERO_TRIAD_RETURN`, `FOUND_CROSSING` |
 
 Gate 3 for the engine is `bash tools/gate_engine.sh LINE BIN OUT`: parity on 3 of the line's sections, 24 sections
 reproduced, and the lap's read byte for byte (CLAUDE.md, the gates).
@@ -215,6 +217,11 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 | 22. A run's limits are a committed pin's | practice rule | CLAUDE.md, waiting, deadlines and concurrency: never raise a limit |
 
 ## 10. What is owed
+
+- **A founding law, and a lock that closes** (November 16, [the record](../research/records/2026-11-16_THE_LINK_THAT_SLIPS_IS_THE_LOCK_A_FAR_DIGIT_ARRIVES_AT_A_TENTH_OF_ITSELF_THE_SUMS_LAW_SITS_IN_A_PRODUCT_NO_READING_REACHES_UNTIL_THE_LOCK_CLOSES_AND_A_PART_ENTERS_BY_A_TENSION_READ_ALONG_ITS_CONSUMERS_EQUATION.md)). Every part
+  of the engine enters at zero or with drawn operands; the founding law of October 24 (`contact.pool-founding`) stands in a host ruler
+  (`tools/tension_ruler.py`) and in `found-crossing`, unused. A lock's temperature is one entry a head and receiver kind (`Loci::temper`),
+  the open row's weights are formed afresh at every tick, and the readings of that day place the line's missing step there.
 
 - **The cut's second part** (C5): the kernels' headers (one header a phase). The October items stand in their objects' modules. The renames stand (`Constitution`, `Declaration`, `Loci`, `Learner`, `Realization`, `Host`, `Resident`,
   `Codec`, `Forward`, `ReadLogits`, `Next`, `Receipt`, `OwnedRegion`); the module paths `field` and `hnn::field` stay.
