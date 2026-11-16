@@ -5418,7 +5418,11 @@ extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide
             const wide d = dz[t * w.A + b];
             if (d != 0) {
                 wide x = 0;
-                if (!mul_fits(d, (wide)w.theta[enc + (uint64_t)b * w.D + i], &x)) {
+                // [realization; November 16, the next kernels' source counters] The weight is a 32-bit word, so the checked product is
+                // formed 64 by 128 (`mul_fits_w64`) with no count of either operand's bits (`wide_bits` and `mul_fits` held 0.20 of this
+                // kernel's instructions): the same product where it fits and the same refusal where it does not.
+                const int32_t e = w.theta[enc + (uint64_t)b * w.D + i];
+                if (!mul_fits_w64(mag64((int64_t)e), e < 0, d, &x)) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
                 sum += x;
