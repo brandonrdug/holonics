@@ -464,3 +464,20 @@ UTC); `agent-inferred` for the reading of them.
   products with the moves and address arithmetic the compiler writes as IMAD, so its share is not read from the
   layout. No guess on carry-save is fixed until the executed count a term by kind and the loop's stall samples are
   read.
+- **The loop's executed count, and the carry-save guess** (the build thread, relayed 00:10 UTC, November 16; Nsight
+  Compute's source counters on the line's binary, the first of two launches on lap 43's next sections: 1.668e9 warp
+  instructions, 402,233 stall samples). Whole kernel, executed share against stall share: IMAD 0.308 against 0.247,
+  IADD3 0.169 against 0.183, ISETP 0.128 against 0.215, SEL 0.073 against 0.042, LOP3 0.060, SHF 0.060, branches and
+  their syncs 0.078, local loads and stores 0.021, global loads 0.013 against 0.022; the compares hold 13% of the
+  instructions and 22% of the stalls, since a compare waits on the add it tests. The chunk loop holds 0.346 of the
+  instructions and 0.350 of the samples, about 111 instructions a term at full chunks (IMAD 34, ISETP 19, IADD3 17.5, SEL
+  9.8, LOP3 6.5, the rest under 5 each); the compares and selects that detect a carry at every term are 29 of the 111.
+  The other 0.65 lies outside that loop (the mass and share passes, the crowds' loop, whose 32-slot loop runs 1.79e6
+  trips mostly to skip an empty slot, and the row's division) and waits on a read with line information. Guess, fixed at
+  00:11 UTC (`agent-inferred`), for carry-save on the chunk loop (32-bit chunks of each signed term into lane-private
+  64-bit accumulators at their limbs' offsets, one reduction across the warp and one release of carries at the row's
+  end): gate 3 equal; the loop's instructions a term 0.63 to 0.77 of 111; `field_contact_l4` 0.86 to 0.94 of the limbs
+  build a launch on the expensive launches; the exposure within 3% unless it shares the loop's code; a section 0.985 to
+  0.995 of control in a balanced hold. A count that falls with no fall in time would say the wait was never the carries'
+  chain. The crowds' loop over empty slots is a cost that follows the slot count instead of the content; iterating the
+  set bits of the occupied mask keeps every bit, and no guess on it is fixed until its share is printed.
