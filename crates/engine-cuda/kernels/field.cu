@@ -1557,16 +1557,18 @@ extern "C" __global__ void __launch_bounds__(256, 2) field_tied_back_y_tiled(Fie
 // [realization; November 16, the maps' launch shapes on lap 57's sections] With `bias` given (not `NO_BIAS`), the tiles of the first column
 // block also sum the rows' bias `Σ_t y_t` into `g[bias + o]` from the words they stage: the bias's own launch (`outer_bias_tile`, 192
 // launches a section of 26 to 40 µs each, its products a few thousand) read the same `y` over the same sites. Integer sums, so the
-// partial's walk changes no bit. [realization; November 16, the gap after lap 58] The partial stands in shared memory, a word a row added
-// by the tile's first 64 threads after each chunk's products: held in four registers a thread it put `field_outer_x32` at 128 registers
-// with 12 octets of spill and its launches at 1.02 to 1.07 of their time.
+// partial's walk changes no bit. [realization; November 16, the gap after lap 58] The partial stands in shared memory, a word a row and
+// quarter: after each chunk's products thread `j` adds row `j mod 64`'s staged words at the chunk's places `kc ≡ ⌊j/64⌋ (mod 4)` (eight a
+// chunk), so every warp carries a share and none stands behind the barrier for it (the theory thread's lead of 10:13 UTC); the four
+// quarters meet at the walk's end. Held in four registers a thread, the partial had put `field_outer_x32` at 128 registers with 12 octets
+// of spill and its launches at 1.02 to 1.07 of their time.
 template <typename X>
 __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk, uint64_t bias) {
     __shared__ __align__(16) int32_t ys[MAP_KC][MAP_TO];
     __shared__ __align__(16) int32_t xs[MAP_KC][MAP_TS];
     __shared__ uint64_t part[8];
     __shared__ unsigned long long cm[2][2];
-    __shared__ int64_t bsh[MAP_TO];
+    __shared__ int64_t bsh[4][MAP_TO];
     const uint32_t to = threadIdx.x % 16, ti = threadIdx.x / 16;
     const uint64_t otiles = (rows + MAP_TO - 1) / MAP_TO, itiles = (cols + MAP_TS - 1) / MAP_TS, walks = ((uint64_t)w.T + walk - 1) / walk;
     if (threadIdx.x < 4) {
@@ -1580,8 +1582,8 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
         bool narrow = true;
         uint64_t ywalk = 0, xwalk = 0;
         const bool biased = bias != NO_BIAS && i0 == 0;
-        if (biased && threadIdx.x < MAP_TO) {
-            bsh[threadIdx.x] = 0;
+        if (biased) {
+            bsh[threadIdx.x / MAP_TO][threadIdx.x % MAP_TO] = 0;
         }
         {
             int64_t acc[4][4];
@@ -1661,12 +1663,12 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                         }
                     }
                 }
-                if (biased && threadIdx.x < MAP_TO) {
+                if (biased) {
                     int64_t b = 0;
-                    for (uint32_t kc = 0; kc < chunk; kc++) {
-                        b += (int64_t)ys[kc][threadIdx.x];
+                    for (uint32_t kc = threadIdx.x / MAP_TO; kc < chunk; kc += 4) {
+                        b += (int64_t)ys[kc][threadIdx.x % MAP_TO];
                     }
-                    bsh[threadIdx.x] += b;
+                    bsh[threadIdx.x / MAP_TO][threadIdx.x % MAP_TO] += b;
                 }
                 __syncthreads();
             }
@@ -1683,8 +1685,9 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                 }
                 if (biased && threadIdx.x < MAP_TO) {
                     const uint32_t o = o0 + threadIdx.x;
-                    if (o < rows && bsh[threadIdx.x] != 0) {
-                        add_wide(g + bias + o, (wide)bsh[threadIdx.x]);
+                    const int64_t b = bsh[0][threadIdx.x] + bsh[1][threadIdx.x] + bsh[2][threadIdx.x] + bsh[3][threadIdx.x];
+                    if (o < rows && b != 0) {
+                        add_wide(g + bias + o, (wide)b);
                     }
                 }
             }
