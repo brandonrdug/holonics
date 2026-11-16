@@ -2367,10 +2367,12 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // exposure. [realization; G191, November 14] At 8 both spilled under a 64-register bound (778 and 220 spill stores, the engine audit's
 // finding 4); timed with the outer sums' walk of 64 (above), the pair reads about 3 ms a section under 8 and 512 with the card warmed.
 #define CONTACT_MIN_BLOCKS 6
-// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 1,024, where 256 gave a
-// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 blocks a launch at 10% issue; 32 chunks cut each
-// walk to about 7 sites. The prefix sums are integer sums, so the chunking changes no bit.
-#define SPREAD_THREADS 1024
+// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 672, where 256 gave a
+// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 blocks a launch at 10% issue. 672 threads are 21
+// chunks, and at the kernel's 48 registers two blocks stand on a multiprocessor (2 × 21 warps × 1,536 registers = 64,512 of 65,536), so the
+// 96 regions run in one wave; 1,024 would run them in two (the theory thread's note of 08:51 UTC). The prefix sums are integer sums, so the
+// chunking changes no bit.
+#define SPREAD_THREADS 672
 // The block of `field_sums` (a head and a region a block), its entries' chunks of the region's sites summed, scanned and walked again.
 #define SUMS_THREADS 1024
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
