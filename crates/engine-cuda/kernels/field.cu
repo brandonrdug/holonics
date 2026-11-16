@@ -201,10 +201,15 @@ __device__ __forceinline__ uint64_t mag64(int64_t v) {
 
 __device__ uwide isqrt128(uwide n) {
     uwide res = 0;
-    uwide bit = (uwide)1 << 126;
-    while (bit > n) {
-        bit >>= 2;
+    // [realization; November 16, the next kernels' source counters] The first digit's place, the largest power of four not above `n`
+    // (at most `2^126`), read from `n`'s bit length. The loop it replaces stepped down from `2^126` two bits at a time, and it held
+    // 0.314 of `field_chart`'s instructions. It is the same place, so the root is the same.
+    if (n == 0) {
+        return 0;
     }
+    const uint64_t top = (uint64_t)(n >> 64);
+    const uint32_t len = top != 0 ? 128 - (uint32_t)__clzll((long long)top) : 64 - (uint32_t)__clzll((long long)(uint64_t)n);
+    uwide bit = (uwide)1 << ((len - 1) & ~1u);
     while (bit != 0) {
         if (n >= res + bit) {
             n -= res + bit;
@@ -1161,6 +1166,9 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
 // a warp's lanes on 32 consecutive terms of one row, a row's words 64 apart: one bank, 32 ways, and the store held 0.225 of
 // `field_transposed`'s stall samples. The words staged and the sums over them are the same.
 #define MAP_PAD 4
+// The lanes of a tile's block (`THREADS`) and the words each stages a chunk (both operands' chunks are `MAP_KC` by 64).
+#define MAP_THREADS 256
+#define MAP_STAGE (MAP_KC * MAP_TO / MAP_THREADS)
 __device__ __forceinline__ void map_stage(uint32_t c, uint32_t *kc, uint32_t *row) {
     const uint32_t g = c >> 5;
     *kc = (c & 7) + 8 * (g % (MAP_KC / 8));
@@ -1319,9 +1327,17 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
             }
             uwide bound = 0;
             uint32_t parity = 0;
-            for (uint32_t k0 = 0; k0 < terms; k0 += MAP_KC, parity ^= 1) {
-                uint64_t am = 0, bm = 0;
-                for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TO; c += blockDim.x) {
+            // [realization; November 16, the next kernels' source counters] **The next chunk's words in flight behind this chunk's
+            // products.** A chunk's words are read into registers (`fetch`) as soon as the chunk before them is staged and proved narrow,
+            // and staged into shared memory once its products are summed; the tile's wait was the loaded word's (long scoreboard 5.5 to
+            // 7.0 an issued instruction in `field_transposed`, the shared store's samples unmoved by its conflicts' removal). The words
+            // staged, their order, the proof and the sums are the same. A block is `THREADS` (256) lanes, each fetching `MAP_STAGE` words.
+            int32_t pwv[MAP_STAGE];
+            X pxv[MAP_STAGE];
+            const auto fetch = [&](uint32_t k0) {
+#pragma unroll
+                for (uint32_t r = 0; r < MAP_STAGE; r++) {
+                    const uint32_t c = threadIdx.x + r * MAP_THREADS;
                     uint32_t kc, o;
                     if (TRANSPOSED) {
                         kc = c / MAP_TO;
@@ -1330,16 +1346,41 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                         map_stage(c, &kc, &o);
                     }
                     const uint32_t term = k0 + kc, output = o0 + o;
-                    const int32_t v = (term < terms && output < outs) ? weight_at(term, output) : 0;
+                    pwv[r] = (term < terms && output < outs) ? weight_at(term, output) : 0;
+                }
+#pragma unroll
+                for (uint32_t r = 0; r < MAP_STAGE; r++) {
+                    const uint32_t c = threadIdx.x + r * MAP_THREADS;
+                    uint32_t s, kc;
+                    map_stage(c, &kc, &s);
+                    const uint64_t t = t0 + s;
+                    pxv[r] = (t < w.T && k0 + kc < terms) ? x[t * x_stride + k0 + kc] : (X)0;
+                }
+            };
+            fetch(0);
+            for (uint32_t k0 = 0; k0 < terms; k0 += MAP_KC, parity ^= 1) {
+                uint64_t am = 0, bm = 0;
+#pragma unroll
+                for (uint32_t r = 0; r < MAP_STAGE; r++) {
+                    const uint32_t c = threadIdx.x + r * MAP_THREADS;
+                    uint32_t kc, o;
+                    if (TRANSPOSED) {
+                        kc = c / MAP_TO;
+                        o = c % MAP_TO;
+                    } else {
+                        map_stage(c, &kc, &o);
+                    }
+                    const int32_t v = pwv[r];
                     as[kc][o] = v;
                     const uint64_t g = mag64((int64_t)v);
                     am = g > am ? g : am;
                 }
-                for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TS; c += blockDim.x) {
+#pragma unroll
+                for (uint32_t r = 0; r < MAP_STAGE; r++) {
+                    const uint32_t c = threadIdx.x + r * MAP_THREADS;
                     uint32_t s, kc;
                     map_stage(c, &kc, &s);
-                    const uint64_t t = t0 + s;
-                    const int64_t v = (t < w.T && k0 + kc < terms) ? (int64_t)x[t * x_stride + k0 + kc] : 0;
+                    const int64_t v = (int64_t)pxv[r];
                     bs[kc][s] = (int32_t)v;
                     const uint64_t g = mag64(v);
                     bm = g > bm ? g : bm;
@@ -1361,6 +1402,9 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                 if (!narrow) {
                     __syncthreads();
                     break;
+                }
+                if (k0 + MAP_KC < terms) {
+                    fetch(k0 + MAP_KC);
                 }
                 for (uint32_t kc = 0; kc < chunk; kc++) {
                     const int4 av = *reinterpret_cast<const int4 *>(&as[kc][4 * to]);
