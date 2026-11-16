@@ -34,21 +34,31 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     // row's `site` and whether it is the open one), with the tick's opening chart beside the pair chart (`chart.i32`, what the tick's keys,
     // probes and values read) and, in `shares.tsv`, the open place's row by tick and head: each source site and its share of the row's
     // weight in millionths. A ruler traces a far symbol's way to the open place link by link from them.
-    let all = match (args.len(), args.get(12).map(String::as_str)) {
-        (12, None) => false,
-        (13, Some("all")) => true,
-        _ => return Err("read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all]".into()),
-    };
+    // [measurement; the lead, November 16 23:00Z] With `carry=MILLI`, every open row carries its lock along the ticks at `γ = MILLI/1000`
+    // ([`holonics_engine::field::Constitution::lock_carry`]): a ruler's forward, read before the stage is a law.
+    let usage = "read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all] [carry=MILLI]";
+    if args.len() < 12 || args.len() > 14 {
+        return Err(usage.into());
+    }
+    let (mut all, mut carry) = (false, None);
+    for word in &args[12..] {
+        match (word.as_str(), word.strip_prefix("carry=")) {
+            ("all", _) => all = true,
+            (_, Some(m)) => carry = Some(crate::ruler::tension::carry_of(m)?),
+            _ => return Err(usage.into()),
+        }
+    }
     let started = std::time::Instant::now();
     refuse_variables("read-tension")?;
     let units = units_of(&args[1], &args[2])?;
     let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
     let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
-    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
+    learner.field.lock_carry = carry;
     let out = Path::new(&args[11]);
     let unescape = |t: &str| t.replace("\\n", "\n");
     // (label, the place's index in its run, the place's site, the region)
@@ -86,7 +96,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     let (dw, m2, j2, ticks) = (d.width, 2 * d.heads * d.modes, 2 * d.triads, d.ticks);
     std::fs::create_dir(out)?;
     write_new(&out.join("dims.tsv"), format!("lambda\t{dw}\nread\t{dw}\ncurrent\t{m2}\nproducts\t{j2}\nticks\t{ticks}\n").as_bytes())?;
-    println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} threads={} ms={}", work.len(), rayon::current_num_threads(), started.elapsed().as_millis());
+    println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} carry={} threads={} ms={}", work.len(), carry.map_or("-".to_string(), |g| g.to_string()), rayon::current_num_threads(), started.elapsed().as_millis());
     // The locks' temperatures as the state holds them: `log₂ T` on the material's grain, one a head and receiver kind (a class receiver, a listener).
     let temper = learner.field.layout().temper;
     println!("TENSION_TEMPER log2_on_2^-24 {}", (0..2 * d.heads).map(|k| learner.field.theta[temper + k].to_string()).collect::<Vec<_>>().join(" "));
@@ -271,4 +281,13 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
     }
     println!("TENSION_DONE rows={written} sections={done} ms={}", started.elapsed().as_millis());
     Ok(())
+}
+
+/// A ruler's carried-lock gain from thousandths, on `2^(−30)`: `carry=1000` is a row that keeps its whole lock.
+pub fn carry_of(milli: &str) -> Result<i64> {
+    let m: i64 = milli.parse().map_err(|_| "carry=MILLI is a count of thousandths")?;
+    if !(0..=1000).contains(&m) {
+        return Err("carry=MILLI stands between 0 and 1000".into());
+    }
+    Ok((m << 30) / 1000)
 }

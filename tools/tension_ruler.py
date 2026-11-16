@@ -26,6 +26,9 @@ material's grain.
   tension_ruler.py closed DIR                   what a closed lock would open: the two aligned digits as a lock closed on their column
                                                 would bring them, summed and unordered, read linearly (a copy) and through located
                                                 products (a junction), by part, beside the pair's table.
+  tension_ruler.py temper STORE_DIR             the premise of a row's own temperature: each open row's temperature covector beside its
+                                                opening chart, by head (how nearly the rows cancel, what the chart removes on the held
+                                                section) and by slice (each slice's mean ask).
   tension_ruler.py found STORE_DIR OUT [DIR]    legs located on a `read-tension-store` directory's sections (all ticks together, the last
                                                 section held out to score them), written as OUT.legs for `found-crossing` (32-bit
                                                 little-endian integers: the charts on the material's grain, the biases on the faces');
@@ -566,6 +569,46 @@ def closed_lock(d, triads=10):
                 print(f"CLOSED_LOCK {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {removed(gathered, lam, f, t):.4f} {shares[0]:.4f} {shares[1]:.4f} {shares[2]:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
 
 
+def temper(d, heads=4):
+    """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
+    reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
+    covectors cancel, what a linear read of the row's chart removes of their power on the held section, and each slice's mean ask (below
+    zero: the code falls as the lock sharpens)."""
+    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
+    dw, ticks = int(dims["lambda"]), int(dims["ticks"])
+    rows = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    n = len(rows)
+    chart = (np.fromfile(os.path.join(d, "chart.i32"), dtype="<i4").reshape(n, dw) / 2.0**FACE).astype(np.float64)
+    at = {(r[0], int(r[1]), int(r[2]), int(r[3]), int(r[4])): k for k, r in enumerate(rows)}
+    asks = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "temper.tsv"))]
+    idx = np.array([at[(a[0], int(a[1]), int(a[2]), int(a[3]), int(a[4]))] for a in asks])
+    head = np.array([int(a[5]) for a in asks])
+    tick = np.array([int(a[4]) for a in asks])
+    section = np.array([int(a[1]) for a in asks])
+    slices = np.array([a[0] for a in asks])
+    dl = np.array([int(a[6]) for a in asks], dtype=np.float64) / 2.0**40
+    held = section == section.max()
+    print(f"TEMPER_READ rows={len(asks)} fit_rows={(~held).sum()} held_rows={held.sum()} sections={section.max() + 1}")
+    print("TEMPER_HEAD head held_rows sum_over_abs chart_share chart_share_by_tick…")
+    for h in range(heads):
+        sel = head == h
+        f, t = sel & ~held, sel & held
+        y = dl[:, None]
+        balance = abs(dl[t].sum()) / np.abs(dl[t]).sum()
+        share = removed(chart[idx], y, f, t)
+        by_tick = [removed(chart[idx], y, f & (tick == k), t & (tick == k)) for k in range(ticks)]
+        print(f"TEMPER_HEAD {h} {t.sum()} {balance:.4f} {share:.4f} " + " ".join(f"{x:.4f}" for x in by_tick), flush=True)
+    print("TEMPER_SLICE head slice held_rows mean_ask rms_ask share_of_power")
+    for h in range(heads):
+        sel = (head == h) & held
+        total = (dl[sel] ** 2).sum()
+        for name in sorted(set(slices)):
+            t = sel & (slices == name)
+            if t.sum() == 0:
+                continue
+            print(f"TEMPER_SLICE {h} {name} {t.sum()} {dl[t].mean():+.3e} {np.sqrt((dl[t] ** 2).mean()):.3e} {(dl[t] ** 2).sum() / total:.4f}")
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -578,6 +621,8 @@ def main():
         oracle(sys.argv[2])
     elif cmd == "located":
         located_shares(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 10)
+    elif cmd == "temper":
+        temper(sys.argv[2])
     elif cmd == "closed":
         closed_lock(sys.argv[2])
     elif cmd == "links":

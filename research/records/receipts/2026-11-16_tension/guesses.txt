@@ -67,7 +67,7 @@ What each outcome decides.
 - K1 misses: the value is not pure at its source. The next law is the value's chart (what a source offers of itself).
 
 ------------------------------------------------------------------------------------------------------------------------------------------
-A row's own temperature: the premise, guesses fixed before the read (November 16, 2026, 22:53 UTC, read from the clock)
+A row's own temperature: the premise, guesses fixed before the read (November 16, 2026, 22:48 UTC, read from the clock; first written as 22:53 from an estimate and corrected)
 
 State read: lap 76's mean (MEAN.3000). Reading: `read-tension-store`, four sections as the trainer cuts them after lap 76's end, every open
 site at every tick and head: its row's temperature covector as the reverse forms it for that row (`temper.tsv`), beside its opening chart.
@@ -90,3 +90,39 @@ falls as ℓ rises), and in at least two of the five older slices they ask on av
 What each outcome decides. G-T2 held: a row's temperature read from its own site has a slope at its founding, and it is built (host,
 card, parity), founded at zero. G-T2 under 0.01 at head 0: the rows' asks are not a function of the site's chart; the carried row
 (accumulated76.txt) is the lock's first term instead.
+
+Scores of the temperature premise (temper76.txt; 865,888 open rows by tick and head, 207,824 on the held section): G-T1 held (0.029, 0.007,
+0.019, 0.003 by head). G-T2 missed: the chart removes -0.003, -0.002, -0.002, -0.003 of the rows' covector power, nothing at any tick.
+G-T3 missed: the arithmetic rows' mean ask at head 0 is +0.0014 on an rms of 0.086, the smallest asks of any slice (1.2% of head 0's
+power), where the text slices' rms is 0.25 to 0.54. By the branch fixed above, a row's own temperature is not built. The reading's sense:
+where both operands hold a digit one digit alone is of no use to any reading, so an answer row is indifferent to its own sharpness at
+first order; the lock and the junction are a joint saddle, and neither has a slope alone.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+The carried lock, read on the host's forward before it is a law: guesses fixed before the read (November 16, 2026, 22:54 UTC, from date -u)
+
+State read: lap 76's mean. Reading: the host's forward with every open row carrying its lock along the ticks, S(k) = s(k) + g S(k-1) at
+unit gain, read through the temperature and the falloff once (a ruler-set field, Constitution::lock_carry; no reverse, no state written):
+(1) read-tension all carry=1000 on the links table (7,124 open digits), (2) read-tension carry=1000 on the first read's table (53,227
+digits) for the codes by kind of place, the table's share and the located products.
+
+What the logs print (read first): accumulated76.txt (ruler arithmetic on the fresh rows' shares: 0.26 to 0.51 where both hold, 0.76 at a
+copy, last tick); links76.txt (arrival 0.06 to 0.18; codes 2.14 at a copy column, 2.33 to 2.36 where both hold); located75_partial.txt
+(one located product 0.003 to 0.016, nothing where both hold); temper76.txt (no first-order ask for sharpness).
+
+The theory's pick (agent-inferred). A lock closes by its own law, as the carry circle turns by its founded friction, never by a reward:
+evidence that agrees across the ticks adds as their count and evidence that does not adds as its root. Closing it has no slope alone and
+the junction has none alone; with the lock closed the junction's legs are locatable, and then the deposit has a slope in both.
+
+G-C1 (the lock closes in the forward). Carried whole, head 0's share on the aligned column at the last tick is at least 0.40 where both
+operands hold a digit and at least 0.60 at a copy column (met sums).
+G-C2 (more arrives). What every head's current gives of an aligned digit at its best tick is at least 0.25 (0.09 to 0.18 fresh).
+G-C3 (the code, with nothing deposited). The copy columns of met sums code at most 2.09 nats a digit (2.14 fresh), and the columns both
+operands hold stay within 0.1 of their fresh 2.33 to 2.36.
+G-C4 (the junction becomes locatable). On the carried states, products located on half the records remove at least 0.03 of what the
+linear chart leaves on the other half, at a column both operands hold, at some tick (under 0.01 and mostly negative fresh).
+
+What each outcome decides. C1 and C4 held: the lock's carried row is built as a law founded at its own value (host reverse, card, parity,
+gate 3), and the junction's legs are located on its states and founded with it. C1 held and C4 missed: the carried row closes the lock
+but the operands still do not reach the legs' chart; the value's chart is read next. C1 missed: the forward does not keep what the
+arithmetic on fresh shares promised (the states move under the carried lock), and the row's store is rederived.

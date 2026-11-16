@@ -1638,10 +1638,13 @@ pub fn read_writes(args: &[String], realization: &mut dyn Realization) -> Result
 pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     // [measurement; the theory thread's R1 of 19:12 UTC] With `one`, each place of the run is coded open alone, the rest of the run known
     // (the one-place receiver: the state a training mask meets where a digit's neighbours are known).
-    let one = match (args.len(), args.get(11).map(String::as_str)) {
-        (11, None) => false,
-        (12, Some("one")) => true,
-        _ => return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA [one]".into()),
+    // [measurement; the lead, November 16 23:00Z] With `carry=MILLI`, every open row carries its lock along the ticks at `γ = MILLI/1000`
+    // ([`holonics_engine::field::Constitution::lock_carry`]), on the host's realization: a ruler's forward, read before the stage is a law.
+    let (one, carry) = match (args.len(), args.get(11).map(String::as_str), args.get(12).and_then(|w| w.strip_prefix("carry="))) {
+        (11, None, None) => (false, None),
+        (12, Some("one"), None) => (true, None),
+        (13, Some("one"), Some(m)) => (true, Some(crate::ruler::tension::carry_of(m)?)),
+        _ => return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA [one [carry=MILLI]]".into()),
     };
     let started = std::time::Instant::now();
     refuse_variables("read-forms")?;
@@ -1652,10 +1655,11 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
     let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
     let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
-    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
+    learner.field.lock_carry = carry;
     let law = learner.pass.clone().ok_or("a state with no pass line: read-forms reads a state of the store's line")?;
     let unescape = |t: &str| t.replace("\\n", "\n");
     let mut rows: Vec<(String, usize, Vec<usize>)> = Vec::new();
