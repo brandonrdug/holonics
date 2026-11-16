@@ -1115,3 +1115,15 @@ UTC); `agent-inferred` for the reading of them.
   unique floor and the algorithm is proved, so no bit moves, held by a host test over random `d`, both edges and every
   count the line meets. Its share is read first on the line that forms `v`, in the skin's pace return and in the rows
   (whose divisions together held 0.151 of the instructions).
+
+- **The crowd divisor's reciprocal by Newton, scored** (#919; guess of 15:27 UTC).
+  - **The premise missed.** `divisor_of`'s software division held 0.020 of the rows' instructions and 0.024 of the
+    pace return's (its division inlined there). The guess took about 0.10 of the rows'. After the change they read
+    0.010 and 0.014, and each kernel's instructions fell 1.1%.
+  - **The timing is unscored.** Nsight read the rows at 0.975 to 1.032 a launch, and the profiles were flat. The hold
+    was disturbed by its own host work (a host reading that opens the card, and gate 1).
+  - **Merged anyway**, as a realization that keeps every bit and shows no measured gain.
+  - **Why the premise missed** (`agent-inferred`). The rows' "divisions together" (0.151) were mostly the per-term
+    `divide_word`s, not the divisor's reciprocal.
+  - **This closes the thread's kernel guesses.** From November 16 at 15:52Z, speed is a steady background
+    ([the record of that day](2026-11-16_THE_LINES_GAINS_ARE_READ_BY_THEIR_RETURN_BEFORE_A_CAUSE_IS_NAMED_A_PASS_IS_A_BILLION_PLACES_AGAINST_FOUR_HUNDRED_THOUSAND_ENTRIES_AND_ALPHAS_BOXES_ARE_FIXED_ON_THE_STORE_LINE.md)).
