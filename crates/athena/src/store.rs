@@ -1199,6 +1199,32 @@ pub fn grow_crossings(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; theory, November 16 19:10Z, G-tr2] `zero-triad-return STATE STATE_SHA OUT`: **a control for the triads**: the state with its
+/// triads' return `W_T` set to zero (every other entry, moment and line as it stands), so a reading of it is the field's faces with the
+/// triads' products unread. A ruler's state: never trained from. Refused on a state with no triads.
+pub fn zero_triad_return(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("zero-triad-return STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let d = learner.field.declaration;
+    if d.triads == 0 {
+        return Err("a state with no triads".into());
+    }
+    let l = learner.field.layout().clone();
+    let span = l.w_triad..l.w_triad + d.width * 2 * d.triads;
+    let moved = learner.field.theta[span.clone()].iter().filter(|&&v| v != 0).count();
+    learner.field.theta[span].fill(0);
+    std::fs::write(out, learner.to_text())?;
+    println!("ZERO_TRIAD_RETURN triads={} crossing={} entries={} nonzero_before={moved}", d.triads, d.crossing, d.width * 2 * d.triads);
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored
