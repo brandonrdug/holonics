@@ -849,7 +849,7 @@ UTC); `agent-inferred` for the reading of them.
   `want = 80 × 1,536 = 122,880` threads, but at 48 registers five blocks of 256 stand on a multiprocessor, so the launch
   holds 102,400, and the grid's stride sends 0.2 of its threads round a second tile while the rest have finished. The
   launch then lasts two tiles; its warps average about half of the 48, near what was read; and a tile sized to the
-  102,400 that stand would last 1.2 of the present tile's walk. Guess, fixed at 08:47 UTC, for that change alone (`want`
+  102,400 that stand would last 1.2 of the present tile's walk. Guess, fixed at 08:46 UTC, for that change alone (`want`
   read from the kernel's own occupancy, the same partition of a sum whose order is free): gate 3 equal; the bias and
   encoding and the lift and read 0.60 to 0.75 of their present time a launch, their warps active 72 to 83%; 2.2 to 3.5
   ms a section, a section 0.993 to 0.996, under a hold's resolution, so scored on the profile.
