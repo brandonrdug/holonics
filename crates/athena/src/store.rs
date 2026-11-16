@@ -1085,6 +1085,148 @@ pub fn own_states(args: &[String]) -> Result<()> {
 /// raw bytes (`SLICE_NN.prompt`, `SLICE_NN.written`, the codec's decode up to the first void, and `SLICE_NN.reference`, the piece's next
 /// `RUN` places), and one line (`STORE_WRITE`: its slice, its document, the places written before a void and the release's reads); a closing
 /// line holds the card's counters and the time. A reading: the state is not touched.
+/// The held problems the writer and the prompt's reading meet: `DOCUMENTS` held pieces a slice that open and hold `PROMPT + RUN` places, each
+/// its slice, its document, its prompt's classes, its prompt's bytes and its reference continuation's bytes.
+#[allow(clippy::type_complexity, reason = "a problem's five parts, named at the one place they are built")]
+fn held_problems<'n>(store: &Path, counts: &HashMap<(String, String), (u64, u128)>, names: &[&'n str], codec: &Codec, documents: usize, prompt: usize, run: usize) -> Result<Vec<(&'n str, u64, Vec<usize>, Vec<u8>, Vec<u8>)>> {
+    let mut problems: Vec<(&str, u64, Vec<usize>, Vec<u8>, Vec<u8>)> = Vec::new();
+    for &name in names {
+        let mut slice = open_slice(store, "held", name, counts)?;
+        let chosen: Vec<usize> = (0..slice.pieces.len()).filter(|&k| slice.pieces[k].opens && slice.pieces[k].places() >= (prompt + run) as u64).take(documents).collect();
+        for k in chosen {
+            let bytes = slice.bytes(k, 0, (prompt + run) as u64)?;
+            let classes = codec.encode(&bytes[..prompt])?;
+            if classes.len() != prompt {
+                return Err("a prompt whose bytes are not one class each".into());
+            }
+            problems.push((name, slice.pieces[k].document, classes, bytes[..prompt].to_vec(), bytes[prompt..].to_vec()));
+        }
+    }
+    if problems.is_empty() {
+        return Err("no held piece holds the prompt and the run".into());
+    }
+    Ok(problems)
+}
+
+/// [measurement; agent-inferred, November 16, Athena alpha's answer box (#404) and the theory thread's acceptance (d) of 16:02 UTC]
+/// `read-prompt UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN STATE STATE_SHA`: **whether a continuation
+/// is read from its own prompt.** For each of the writer's held problems the reference continuation is coded with every one of its places
+/// open, beside its own prompt and beside a foil, the next problem's prompt of the same slice (the last takes the first's), the region the
+/// writer's first read meets (the prompt resolved, the run open). A continuation that depends on its prompt codes lower beside its own. Each
+/// problem's line gives both codes over the run in millionths of a bit a place and their difference, and by octave of the place's distance
+/// from the prompt (`1`, `2–3`, `4–7`, … places in), so the nearest places, where a prompt can reach first, stand beside the far ones; each
+/// slice's line sums its problems. A reading: the state is read, never written; the texts stay unprinted (the held documents are private).
+pub fn read_prompt(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("read-prompt UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-prompt")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let _keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let (documents, prompt, run) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?);
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[12], &args[13], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-prompt reads a state of the store's line")?;
+    let names = role_names(&counts, "held");
+    let problems = held_problems(store, &counts, &names, &codec, documents, prompt, run)?;
+    // The continuation's classes (a byte a class, as the prompt's).
+    let runs: Vec<Vec<usize>> = problems.iter().map(|p| codec.encode(&p.4)).collect::<std::result::Result<Vec<_>, _>>()?;
+    if runs.iter().any(|r| r.len() != run) {
+        return Err("a continuation whose bytes are not one class each".into());
+    }
+    // Each problem's foil: the next problem of its slice, the slice's last taking its first.
+    let foil_of: Vec<usize> = (0..problems.len())
+        .map(|k| {
+            let name = problems[k].0;
+            let same: Vec<usize> = (0..problems.len()).filter(|&j| problems[j].0 == name).collect();
+            let at = same.iter().position(|&j| j == k).unwrap_or(0);
+            same[(at + 1) % same.len()]
+        })
+        .collect();
+    println!("PROMPT_LAW problems={} documents={documents} prompt={prompt} run={run} alphabet={} pairs_bound={} sites_bound={} ms={}", problems.len(), codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
+    // The regions: for problem `k`, its own (`2k`) and its foil's (`2k + 1`) prompt with its continuation open.
+    let regions: Vec<OwnedRegion> = (0..problems.len())
+        .flat_map(|k| {
+            [k, foil_of[k]].into_iter().map(move |p| (k, p))
+        })
+        .map(|(k, p)| {
+            let mut classes = problems[p].2.clone();
+            classes.extend_from_slice(&runs[k]);
+            let mut open = vec![false; prompt];
+            open.extend(std::iter::repeat_n(true, run));
+            OwnedRegion::plain(classes, open)
+        })
+        .collect();
+    const OCTAVES: usize = 9;
+    let octave = |d: usize| -> usize { ((usize::BITS - 1 - d.leading_zeros()) as usize).min(OCTAVES - 1) };
+    // Per problem: [own, foil] codes summed by octave, on `2^(−20)` bits, and the places in each octave.
+    let mut sums: Vec<[[i128; OCTAVES]; 2]> = vec![[[0; OCTAVES]; 2]; problems.len()];
+    let mut in_octave = [0usize; OCTAVES];
+    for d in 1..=run {
+        in_octave[octave(d)] += 1;
+    }
+    let mut at = 0usize;
+    let mut batches = 0usize;
+    while at < regions.len() {
+        let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+        while end < regions.len() {
+            let s = regions[end].classes.len() as u64;
+            if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                break;
+            }
+            (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+        }
+        let faces = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
+        for (r, faces) in (at..end).zip(faces) {
+            let (k, side) = (r / 2, r % 2);
+            for (t, face) in faces.iter().enumerate().skip(prompt) {
+                let face = face.as_ref().ok_or("an open place without a face")?;
+                sums[k][side][octave(t - prompt + 1)] += face.code(runs[k][t - prompt]) as i128;
+            }
+        }
+        batches += 1;
+        at = end;
+    }
+    let micro = |code: i128, places: usize| -> i128 { if places == 0 { 0 } else { code * 1_000_000 / ((places as i128) << 20) } };
+    let mut index: HashMap<&str, usize> = HashMap::new();
+    let mut by_slice: Vec<(&str, [[i128; OCTAVES]; 2], usize)> = Vec::new();
+    for (k, p) in problems.iter().enumerate() {
+        let i = index.entry(p.0).or_insert(0);
+        let stem = format!("{}_{:02}", p.0, *i);
+        *i += 1;
+        let total = |side: usize| sums[k][side].iter().sum::<i128>();
+        let octaves: Vec<String> = (0..OCTAVES).filter(|&o| in_octave[o] > 0).map(|o| format!("{}", micro(sums[k][1][o] - sums[k][0][o], in_octave[o]))).collect();
+        println!("PROMPT problem={stem} document={} foil={} own={} foil_code={} foil_less_own={} by_octave_foil_less_own={}", p.1, foil_of[k], micro(total(0), run), micro(total(1), run), micro(total(1) - total(0), run), octaves.join(","));
+        match by_slice.iter_mut().find(|e| e.0 == p.0) {
+            Some(e) => {
+                for side in 0..2 {
+                    for o in 0..OCTAVES {
+                        e.1[side][o] += sums[k][side][o];
+                    }
+                }
+                e.2 += 1;
+            }
+            None => by_slice.push((p.0, sums[k], 1)),
+        }
+    }
+    for (name, s, n) in &by_slice {
+        let total = |side: usize| s[side].iter().sum::<i128>();
+        let octaves: Vec<String> = (0..OCTAVES).filter(|&o| in_octave[o] > 0).map(|o| format!("{}", micro(s[1][o] - s[0][o], in_octave[o] * n))).collect();
+        println!("PROMPT_SLICE slice={name} problems={n} own={} foil_code={} foil_less_own={} by_octave_foil_less_own={}", micro(total(0), run * n), micro(total(1), run * n), micro(total(1) - total(0), run * n), octaves.join(","));
+    }
+    println!("PROMPT_DONE problems={} batches={batches} {} ms={}", problems.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
 pub fn write(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if args.len() != 15 && args.len() != 16 {
         return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA [REFINE]".into());
@@ -1111,25 +1253,8 @@ pub fn write(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
-    let role = "held";
-    let names = role_names(&counts, role);
-    // Each problem: its slice, its document, its prompt's classes, its prompt's bytes and its reference continuation's bytes.
-    let mut problems: Vec<(&str, u64, Vec<usize>, Vec<u8>, Vec<u8>)> = Vec::new();
-    for &name in &names {
-        let mut slice = open_slice(store, role, name, &counts)?;
-        let chosen: Vec<usize> = (0..slice.pieces.len()).filter(|&k| slice.pieces[k].opens && slice.pieces[k].places() >= (prompt + run) as u64).take(documents).collect();
-        for k in chosen {
-            let bytes = slice.bytes(k, 0, (prompt + run) as u64)?;
-            let classes = codec.encode(&bytes[..prompt])?;
-            if classes.len() != prompt {
-                return Err("a prompt whose bytes are not one class each".into());
-            }
-            problems.push((name, slice.pieces[k].document, classes, bytes[..prompt].to_vec(), bytes[prompt..].to_vec()));
-        }
-    }
-    if problems.is_empty() {
-        return Err("no held piece holds the prompt and the run".into());
-    }
+    let names = role_names(&counts, "held");
+    let problems = held_problems(store, &counts, &names, &codec, documents, prompt, run)?;
     std::fs::create_dir(out)?;
     println!("STORE_WRITE_LAW problems={} documents={documents} prompt={prompt} run={run} sweeps={run} refine={refine} run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet={} void={} ms={}", problems.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
     let release: Vec<(&[usize], usize)> = problems.iter().map(|p| (p.2.as_slice(), run)).collect();

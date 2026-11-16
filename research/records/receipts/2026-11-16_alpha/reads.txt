@@ -1,0 +1,37 @@
+STORE_WRITE_LAW problems=20 documents=4 prompt=256 run=256 sweeps=256 refine=0 run_bound=0 near_tail=true place_order=false lengths=none one_end=false alphabet=244 void=99 ms=60
+STORE_WRITE_DONE problems=20 reads=256 reads=256 returns=0 pairs=9444479865 batches=256 peak_store=1257922360 ms=13113
+MEASURE lap=w68 rc=0 wall_s=13.5 peak_rss_kib=277564
+PROMPT_LAW problems=20 documents=4 prompt=256 run=256 alphabet=244 pairs_bound=15606223 sites_bound=41490 ms=55
+PROMPT problem=code_00 document=0 foil=1 own=5446278 foil_code=5483875 foil_less_own=37596 by_octave_foil_less_own=4471946,-462425,-1195495,2194135,265504,-152084,21045,-57928,-6965
+PROMPT problem=code_01 document=1 foil=2 own=5318969 foil_code=5610546 foil_less_own=291577 by_octave_foil_less_own=9352693,4128246,1148968,383750,-127934,24171,200778,291282,508276
+PROMPT problem=code_02 document=4 foil=3 own=4661215 foil_code=4981100 foil_less_own=319884 by_octave_foil_less_own=4956779,4923336,1640697,-143892,237813,248131,344550,221468,-468974
+PROMPT problem=code_03 document=6 foil=0 own=4873621 foil_code=5281683 foil_less_own=408061 by_octave_foil_less_own=4826002,4809676,3770746,478475,367611,543583,263473,243846,-243457
+PROMPT problem=web_00 document=1 foil=5 own=5051262 foil_code=5187012 foil_less_own=135750 by_octave_foil_less_own=1295964,818056,49013,871066,591941,184607,285160,-73491,433593
+PROMPT problem=web_01 document=2 foil=6 own=5692693 foil_code=6056203 foil_less_own=363510 by_octave_foil_less_own=1202431,1703406,-510932,-357576,-411175,552393,-164507,712116,1633584
+PROMPT problem=web_02 document=3 foil=7 own=4940274 foil_code=4972248 foil_less_own=31974 by_octave_foil_less_own=-623747,185739,437985,270419,7709,43199,39601,2595,149983
+PROMPT problem=web_03 document=5 foil=4 own=5183878 foil_code=5179625 foil_less_own=-4253 by_octave_foil_less_own=468811,-674944,-150180,-116784,11871,6133,61171,-25400,277269
+PROMPT problem=science_00 document=0 foil=9 own=5354437 foil_code=5451668 foil_less_own=97231 by_octave_foil_less_own=728796,1444551,445835,-72307,106651,64959,-5586,130275,-34348
+PROMPT problem=science_01 document=1 foil=10 own=4722251 foil_code=4836627 foil_less_own=114375 by_octave_foil_less_own=4194231,2699503,-20780,-248866,275451,11160,28477,115452,396107
+PROMPT problem=science_02 document=2 foil=11 own=5556246 foil_code=5848049 foil_less_own=291803 by_octave_foil_less_own=5921381,1557766,-396082,-274686,185184,183613,143193,401565,43312
+PROMPT problem=science_03 document=4 foil=8 own=5141187 foil_code=5192012 foil_less_own=50825 by_octave_foil_less_own=3782053,-2299233,-440322,44911,-186369,-62576,154873,78593,242160
+PROMPT problem=books_00 document=0 foil=13 own=4263084 foil_code=4382018 foil_less_own=118933 by_octave_foil_less_own=7319598,-5595,-88856,250691,119952,148685,50944,88340,243295
+PROMPT problem=books_01 document=1 foil=14 own=6116572 foil_code=6510187 foil_less_own=393615 by_octave_foil_less_own=388733,-457065,2104664,746303,111687,456621,406529,349331,-229391
+PROMPT problem=books_02 document=2 foil=15 own=4576001 foil_code=4639602 foil_less_own=63601 by_octave_foil_less_own=5360386,172667,216180,-79542,48579,107875,92903,1892,-69338
+PROMPT problem=books_03 document=3 foil=12 own=4446276 foil_code=4420241 foil_less_own=-26034 by_octave_foil_less_own=5778311,857925,-62444,-69254,-5361,-35555,-47265,-68678,-315735
+PROMPT problem=wikidata_00 document=0 foil=17 own=4896531 foil_code=4964102 foil_less_own=67571 by_octave_foil_less_own=6612912,8387128,690266,-305871,-28606,-88494,-35313,-4685,-253737
+PROMPT problem=wikidata_01 document=1 foil=18 own=4855343 foil_code=5085102 foil_less_own=229759 by_octave_foil_less_own=9782680,5262116,2979105,353308,-1025,6907,122635,122425,44891
+PROMPT problem=wikidata_02 document=3 foil=19 own=5305358 foil_code=5728575 foil_less_own=423217 by_octave_foil_less_own=7546518,6689987,539708,36847,-27181,113369,61716,582456,3266503
+PROMPT problem=wikidata_03 document=4 foil=16 own=4607340 foil_code=4820276 foil_less_own=212935 by_octave_foil_less_own=12635815,7649193,923514,25766,36579,215528,136611,50724,-40857
+PROMPT_SLICE slice=code problems=4 own=5075021 foil_code=5339301 foil_less_own=264280 by_octave_foil_less_own=5901855,3349708,1341229,728117,185748,165950,207461,174667,-52780
+PROMPT_SLICE slice=web problems=4 own=5217027 foil_code=5348772 foil_less_own=131745 by_octave_foil_less_own=585865,508064,-43528,166781,50086,196583,55356,153955,623607
+PROMPT_SLICE slice=science problems=4 own=5193530 foil_code=5332089 foil_less_own=138558 by_octave_foil_less_own=3656616,850646,-102837,-137737,95229,49289,80239,181471,161808
+PROMPT_SLICE slice=books problems=4 own=4850483 foil_code=4988012 foil_less_own=137529 by_octave_foil_less_own=4711757,141983,542386,212049,68714,169406,125777,92721,-92792
+PROMPT_SLICE slice=wikidata problems=4 own=4916143 foil_code=5149514 foil_less_own=233371 by_octave_foil_less_own=9144481,6997106,1283148,27512,-5058,61827,71412,187730,754199
+PROMPT_DONE problems=20 batches=1 reads=1 returns=0 pairs=94558972 batches=1 peak_store=2314024000 ms=163
+MEASURE lap=p68 rc=0 wall_s=0.4 peak_rss_kib=306464
+# restart one exit 0 16:31:56
+# restart first exit 0 16:32:08
+# restart second exit 0 16:32:21
+# restart state one/STATE.48 54ae8dc960278b0a2bbaecee1b3aa0168f0884651d3d532f8d5a4dc4d9d2b2ab 15861841
+# restart state second/STATE.24 54ae8dc960278b0a2bbaecee1b3aa0168f0884651d3d532f8d5a4dc4d9d2b2ab 15861841
+RESTART_EQUAL states byte for byte

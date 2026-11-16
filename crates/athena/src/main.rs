@@ -289,6 +289,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),
         Some("write-store") => athena::store::write(args, realization),
+        Some("read-prompt") => athena::store::read_prompt(args, realization),
         _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud, next-pass or own-states".into()),
     }
 }
