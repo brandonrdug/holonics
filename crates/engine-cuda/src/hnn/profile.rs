@@ -189,6 +189,10 @@ pub struct FieldProfile {
     pub phase_peak: std::collections::BTreeMap<&'static str, u64>,
     /// [measurement; theory, November 13, P56 item 4] Every timed launch, copy, take and zeroing summed (ns): what a phase's wall holds of the card's.
     pub timed_ns: u128,
+    /// [measurement; theory, November 16, the blanks' outer sums] Under `FIELD_BLANK_LIVE` (with the profile), a blank's face covector `δz` read
+    /// back after `field_blank_dz` at each return: the returns, the sites the blank kernels walk, the sites with a nonzero `δz` in any symbol, the
+    /// entries (sites × symbols) and the nonzero entries.
+    pub blank_live: [u128; 5],
 }
 
 /// [measurement; theory, November 12, P50 step 0b] The card's yardsticks ([`Resident::yardsticks`]): each reading as (rate a

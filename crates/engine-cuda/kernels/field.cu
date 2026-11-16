@@ -89,12 +89,16 @@ typedef unsigned __int128 uwide;
 // against the host reads that equality.
 
 // `x` released `bits` coarser, to the nearest numerator, half away from zero (`release`).
+// [realization; November 16, the issue table] One add and one arithmetic shift, with no branch and no negation: for `x < 0`,
+// `−⌊(−x + h)/2^b⌋ = ⌈(x − h)/2^b⌉ = ⌊(x − h + 2^b − 1)/2^b⌋ = ⌊(x + h − 1)/2^b⌋` with `h = 2^(b−1)`, and `>>` on a signed word is the floor
+// (C++20). The same quotient for every `|x| < 2^127 − h`, the domain where the form it replaces did not overflow; `rel` held 0.33 to 0.36
+// of the instructions of `field_tied_back_e` and `field_pair_scan_back` and 0.18 of `field_pace_skin_back`'s.
 __device__ __forceinline__ wide rel(wide x, unsigned bits) {
     if (bits == 0) {
         return x;
     }
     const wide half = (wide)1 << (bits - 1);
-    return x >= 0 ? (x + half) >> bits : -((-x + half) >> bits);
+    return (x + half - (wide)(x < 0)) >> bits;
 }
 
 // `x / k` to the nearest integer, half away from zero, `k > 0` (`div_nearest`).
@@ -660,7 +664,7 @@ __device__ __forceinline__ int64_t series_product(int64_t t, int64_t b) {
     if (bit_length(mag64(t)) + bit_length(mag64(b)) <= 62) {
         const int64_t x = t * b;
         const int64_t half = (int64_t)1 << (MOVE_BITS - 1);
-        return x >= 0 ? (x + half) >> MOVE_BITS : -((-x + half) >> MOVE_BITS);
+        return (x + half - (int64_t)(x < 0)) >> MOVE_BITS;
     }
     return (int64_t)rel((wide)t * (wide)b, MOVE_BITS);
 }
@@ -6276,7 +6280,9 @@ extern "C" __global__ void field_pace_frame_back(FieldWords w, const int64_t *dq
 // (`release(p Re(conj(δỹ_i) ṽ_j), 63)`) and the lock (`release(δs (2 (w·k) 2^g − 2 D |k|²), 63)`), then
 // `δσ_i −= sgn at`, `δσ_j += sgn at`, `at = skin_back(b, D, E)`; a crowd's alike at the place `2^ℓ` away on its side
 // (its value `release(p_C Re(conj(δỹ) V), 63)/|C|`, its lock bracket over `|C|²`).
-extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_pace_skin_back(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds) {
+// [realization; theory, November 16 07:11 UTC] Five blocks a multiprocessor: the one-shift release left this entry at 104 registers a lane, four
+// blocks of four warps (13,312 registers a block of 65,536), where 96 had held five; the bound holds it at 96.
+extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_skin_back(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds) {
     __shared__ RowCls rcs[CONTACT_ROWS];
     // [theory, November 13, P55 step 5] Each mode's turn rate `b_l = release(2π/n_l, 16)` read once a block (`turn_rate_dev`): the quotient is the
     // head's and the mode's, the same at every pair and crowd of every row (at most 16 modes: the card's span is at most 32 entries).

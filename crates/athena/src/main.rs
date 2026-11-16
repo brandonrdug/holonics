@@ -133,6 +133,10 @@ fn run(args: &[String]) -> Result<()> {
             let threads = p.threads.get(entry).copied().unwrap_or(0);
             println!("FIELD_PROFILE entry={entry} launches={calls} ms={} us_a_launch={} grid_threads={threads} mean_grid_threads={}", ns / 1_000_000, ns / 1_000 / (*calls as u128).max(1), threads / (*calls as u128).max(1));
         }
+        if p.blank_live[0] > 0 {
+            let [returns, sites, live_sites, entries, live] = p.blank_live;
+            println!("FIELD_BLANK_LIVE returns={returns} sites={sites} live_sites={live_sites} entries={entries} live_entries={live}");
+        }
         // [measurement; theory, November 13, P61 item 3] A site's maps by launch kind, and under the trace their operands' bits and tiles.
         for ((entry, rows, cols, only_unresolved, add), (calls, ns, products)) in &p.maps {
             println!("FIELD_PROFILE_MAP entry={entry} rows={rows} cols={cols} only_unresolved={} add={} launches={calls} us={} us_a_launch={} products={products} products_a_launch={}", u8::from(*only_unresolved), u8::from(*add), ns / 1_000, ns / 1_000 / (*calls as u128).max(1), products / (*calls as u128).max(1));
