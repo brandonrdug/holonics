@@ -340,3 +340,55 @@ The guesses:
 If G-ar5 holds, the next law is the radix. A digit's place in its number, counted from the number's end, is founded as
 its class, so that equal powers meet at a crossing: Brandon's "founds units into a radix", with the pair as its junction
 and the carry circle as its carry. If G-ar5 misses and G-ar4 holds, the junction is the missing term.
+
+## 10. The address stands and the junction is missing: the crossing triad (sent to the build 19:10 UTC)
+
+**The reads** (lap 72's mean, on the host; the build's relay, with raw logs in the line's directory, `read-forms one` and
+`read-junction` on the build's branch).
+- **R1, the one-place receiver.** At met lengths in the symbols form, digit places code 2.13 to 2.45 nats a digit (the
+  units digit 2.44), the lead digit 2.27 and the line feed 1.12. Carry against no-carry:
+  - met sums 2.23 / 2.21;
+  - met differences 2.30 / 2.14;
+  - far sums 2.35 / 2.41.
+- **R2, the address ruler.** Head 0 puts on the aligned operand digits:
+  - at met lengths, ticks 0 and 1: 7 to 8 times the mean share of the record's other operand digits (a_k 211,165 and
+    b_k 205,384 millionths against 30,375 at tick 0);
+  - at met lengths, ticks 2 and 3: 1.8 to 3.9 times;
+  - at far lengths: 1.6 to 4.4 times.
+
+  Head 1 favours b_k alone (1.5 to 2.6 times). Heads 2 and 3 stand near 1.
+
+**Scores.**
+- **G-ar4** held: no digit law is located under any receiver.
+- **G-ar5** missed at head 0. At met lengths a_k takes as much as b_k, although a_k's offset from c_k moves with b's
+  length. So head 0 addresses by place, not by a fixed reach. At tick 0 an open site carries only its moment, so its
+  probe holds no reading of its own digit, and the aligned share there is address, not copy (`agent-inferred`). By the
+  branch of §9, the junction is the missing term, and the radix's address has formed at met lengths without a new law.
+
+**Why, from the atlas.** `code.triad-character-of-composition` already states it. For an abelian law x = L + R on ℤ/n
+with fair, independent operands, I(x; L) = I(x; R) = 0: every pair term reads nothing. The law's information sits wholly
+in the triad u_k(L) w_k(x) v_k(R), whose phases add across its legs. The address gathers a_k and b_k as pair terms into
+one sum, and R1 shows that sum reading nothing of c_k (the units digit at 2.44 nats). The field's triad
+(`contact.triad-manley-rowe-gauge`) runs only along the strand, with legs t − 1, t and t + 1. Its L and R are the
+answer's neighbours, never the far digits.
+
+**The law: the crossing triad.**
+- At a site, the triad's two outer legs come from its gathered currents: α from one head's current, β from another's or
+  the same head's. Its third leg is the site's own reading: c_k(t) = α_k(y^h_t) · β_k(y^h′_t).
+- W_T reads it as it reads the strand triad, with the same gauge.
+- A far pair then multiplies at the crossing where both strands carry share. This is Brandon's knot crossing as a
+  junction, and the sparse binding of §4, now with its product.
+- A chart of the real state reaches the conjugate as well, so differences close as sums do.
+- The carry is the product phase's whole winding. The ring of 10 reads the residue, and its parent ring reads the winding
+  (the parametron's "the winding is the carry"). The carry circle carries it leftward.
+- What does not transfer: the optics of three-wave mixing, of which this is the χ(2) chart. Its constitution is the
+  field's own, and its charts are located by deposition.
+
+**Guesses, fixed 19:10 UTC.** They are read under R1 at lap means once the crossing triad enters a run, its card
+realization and parity first.
+- **G-tr1.** Within two laps, met no-carry digits of sums and differences code at most 1.8 nats a digit (0.5 under
+  ln 10), and carry-entered digits stand at least 0.4 above them.
+- **G-tr2.** With the crossing triad's W_T zeroed on the same state, those digits return within 0.1 of ln 10. The law's
+  acceptance vanishes when it is removed.
+
+Build B runs as built and reads G-B1.
