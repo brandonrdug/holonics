@@ -1,0 +1,9 @@
+places and roots agree on 100383 inputs n >= 1 (edges 2^j - 1, 2^j, 2^j + 1)
+n = 0, stepped: the place falls to 0 after 64 idle steps and the root is 0
+n = 0, from the length: len - 1 = -1, masked -2; as u32 4294967294
+a power of 87 bits: 20 idle steps of the stepped place
+len 70: 35 digit steps, one limb from step 6 to 7
+len 80: 40 digit steps, one limb from step 16 to 17
+len 87: 44 digit steps, one limb from step 24 to 25
+len 96: 48 digit steps, one limb from step 32 to 33
+len 110: 55 digit steps, one limb from step 46 to 47
