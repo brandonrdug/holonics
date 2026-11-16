@@ -559,3 +559,25 @@ UTC); `agent-inferred` for the reading of them.
   covers their operands, otherwise from the row's operand bits read once, the wide path kept past them), gate 3 equal, the
   kernel 0.80 to 0.90 of the lifted build, a section 0.990 to 0.996. If the second reads near 1 with the checks' samples
   gone, the loads bind and their prefetch is next.
+- **Five more kernels' counters, and the guess on one build of three changes** (the build thread, relayed 03:28 UTC; a copy
+  of #870 with line information, two launches each on two of lap 47's sections, the card alone; costs in ms a section from
+  #870's hold). `field_transposed` 27.4 (124 registers, long scoreboard 5.6 to 7.0; the tile's shared store 0.225 of the
+  samples, the loaded words' magnitudes 0.120, the 64-by-64 accumulate 0.222); `field_outer_x32` 23.0 (every launch on the
+  bias path, whose first pass reads the walk only for its largest magnitude, 0.496 of the samples, before a second pass
+  sums it); `field_clock_fill` 20.7 (the series' products 0.18, quotients 0.16, the turn's phasor 0.14, nearest quotients
+  0.14); `field_chart` 19.4 (an integer square root bit by bit, 0.68 of the instructions and 0.27 of the samples; a nearest
+  quotient by the lane's scale an element 0.11 of the instructions); `field_skin_fill` 17.2 (the pair's skin 0.40, the
+  exponential's series 0.36, long scoreboard 10). Built since on one branch, every bit kept: the pace test read once a row;
+  the checked products of a word by a wide word formed 64 by 128 from the wide word's halves, the overflow read from the
+  words above with no count of bits; and the bias tile's walk summed on 128 bits in one pass, the pass for its largest
+  magnitude dropped (both partials the same integer). Guess, fixed at 03:29 UTC (`agent-inferred`), the card alone against
+  #870: gate 3 equal; `field_pace_skin_back` 0.69 to 0.85 a launch in the profile (the 02:49 guesses composed); `field_outer_x32`
+  0.50 to 0.75 (near a half if the walk was cold for both passes, near three quarters if it stood in the second level of
+  the card's cache between them, where one pass now pays the cold read and a wider sum); a section 0.961 to 0.983 of control.
+  Leads with no guess until built: the square root is a navigator converging a bit a step, and from a seed read off its
+  count of leading zeros two or three Newton steps on 64-bit words and one correction by squaring give the same floor with
+  no float; the exponential's series a pair takes as its argument a whole distance on a ring where the head is still, so
+  its values are at most the reach times the rings and can be navigated once each at their grain and read by every pair, a
+  navigator's resident face (the record of September 29 on systolic flow), where a recurrence by `e^(−2π/n)` would round at
+  each step and change the bits; the transposed tile's store and magnitudes wait on its loads, which a second buffer hides
+  behind the accumulate.
