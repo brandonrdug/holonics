@@ -511,3 +511,18 @@ UTC); `agent-inferred` for the reading of them.
   from its operands' bounds when it opens, the wide path kept past them; and the loads, about 0.13 of the samples with the
   long scoreboard the largest stall, are hidden by reading the next chunk's skin and support words while the current chunk
   accumulates. No guess on either until its share is read again.
+- **Carry-save's hold, and the score held once a row, scored** (the build thread, relayed 01:04 and 01:46 UTC, November 16;
+  receipts `research/records/receipts/2026-11-16_reuse/`). Carry-save's balanced hold read 0.996 of a section (control
+  604.5 ms with a spread of 2.5, carry-save 602.2), the forward contact 49.2 to 47.1 ms a section, every other entry within
+  0.2 ms; it trains from lap 46 (#866). Holding each crowd's face and bits in the warp's slot for the shares' pass, with
+  the pace index read once a row (#867, from lap 47): gate 3 equal; by Nsight Compute `field_contact_l4` read 0.784 a launch
+  (4.30 to 4.33 ms against 3.37 to 3.42) on 0.793 of the instructions; the stall for want of an instruction halved (0.92 to
+  0.97 an issued instruction against 0.42 to 0.43) as the entry's code shrank, and the long scoreboard rose from 3.42 to
+  3.71; in the profile l4 fell from 48.9 to 39.0 ms a section and the exposure held at 17.9 against 18.0; the balanced
+  hold read 0.958 of a section (0.984 and 0.935 in the card's two states). The guess's exposure held and its l4 and section
+  missed on the low side (0.88 to 0.94, 0.990 to 0.996). Why: the guess priced the samples the removed work held, and the
+  removal also shrank the code, which halved the instruction cache's stall over the whole body. In an entry whose
+  instruction cache misses, code inlined twice costs every instruction, not only its own, so a term for the code's size
+  enters every guess on this kernel (`agent-inferred`). The crowd's score the exposure already computes could be held for
+  the contact where the tick is stored; that choice is a realization, the bits the same either way with a parity receipt
+  on both, and it is a few ms a section against the 124 ms the rows and columns now cost, which are read next.
