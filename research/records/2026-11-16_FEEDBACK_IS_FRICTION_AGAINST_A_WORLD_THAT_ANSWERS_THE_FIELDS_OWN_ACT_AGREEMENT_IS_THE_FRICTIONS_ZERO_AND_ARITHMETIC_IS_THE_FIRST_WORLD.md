@@ -498,3 +498,9 @@ overhead.
 - **G-B3b.** Within two loop laps with the refine, the in-lap parse share rises by at least 0.05 more. This is the
   learned refusal pulling.
 - Without the refine, the share stays within 0.05 of 0.44.
+
+**G-B3a, scored 20:51 UTC: held.** The build's relay: on lap 74's mean, with 128 acts of one held record each and one
+key (`write-acts`, host), the world read 50 of 128 drafts at `REFINE 0` (0.39) and 67 at `REFINE 1` (0.52), a rise of
+0.13. The refine was built as set (`Constitution::refine_drafts`), at 1.37 times the release's reads. The predicted
+reaction, once drawn, pulls the act toward the forms that precede a value, before any lap has trained on the refine.
+G-B3b is read from lap 77, with one record a prompt and the refine on.
