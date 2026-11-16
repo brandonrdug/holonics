@@ -253,7 +253,7 @@ impl<'c> Resident<'c> {
         let mut ps = tick.pscale.device_ptr();
         self.launch("field_unit_probe", Self::warps((heads * sites) as u64), THREADS, &mut [arg(words), arg(&mut ps)])?;
         // The definite sites' prefix sums (§14.10), read by the contact's crowds.
-        self.launch("field_sums", Self::cells((heads * regions * (2 * span + 1)) as u64), THREADS, &mut [arg(words)])?;
+        self.launch("field_sums", ((heads * regions) as u64).clamp(1, 65_535) as u32, SUMS_THREADS, &mut [arg(words)])?;
         // The clock's skins, formed once for the exposure and the contact (the return forms them again for this tick's clock).
         self.skin_fill(field, words, sites)?;
         #[cfg(feature = "ruler-bits")]
