@@ -742,3 +742,15 @@ UTC); `agent-inferred` for the reading of them.
   step ahead hides a load only behind one step of arithmetic, which the split has shortened; if the scans' stalls in the
   hold's counters stand mostly on the long scoreboard, the step waits on its load, the reads come in at the top of the
   ranges or above, and the next build reads several steps ahead in the registers the scans have free.
+- **The outer tile's prefetch and the blank return's product, scored** (the build thread, relayed 06:18 UTC; #883,
+  training from lap 54; lap 52's sections, the card alone). Gate 3 equal; two blocks a multiprocessor before and after
+  (the registers' limit), so the guess stands. The outer-tile launches by Nsight Compute 220.3, 228.4, 213.9 and 214.1
+  µs to 168.7, 166.7, 164.4 and 164.2 (0.766, 0.730, 0.769, 0.767), three inside 0.76 to 0.88 and one under it, the long
+  scoreboard from 5.3 to 5.9 an issued instruction to 1.8 to 2.0; the bias launches unmoved, so the kernel reads 0.94
+  over all its launches (22.4 to 21.0 ms a section). `field_outer_x64` 6.1 to 5.2 (0.85, inside). `field_blank_dy` 12.0
+  to 10.9 (0.91, inside 0.88 to 0.98). The hold did not resolve (the control 531.5 to 558.1 ms, a spread of 26.6), so the
+  section is unscored; the profiles give about 3.4 ms a section. A regularity across the three tiled kinds
+  (`agent-inferred`): a prefetch that took the long scoreboard from about 5.5 to about 2 an issued instruction read 0.72
+  to 0.77 a launch in every one (the transposed map, the affine maps and the outer tile), at the two blocks their
+  registers allow; it calibrates the next guess on a prefetch at that occupancy. Twice now the control's spread (21.4
+  and 26.6 ms) has been the card's two states, so a hold is read state for state, as the waiting standard says.
