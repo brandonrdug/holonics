@@ -1,0 +1,20 @@
+== the return build (#870, the line binary from lap 49): the first eight launches of field_pace_skin_back, field_outer_x32, field_transposed or field_affine_tiled_x32, on 2 of lap 49's sections
+kernel                                                                                  field_affine_tiled_x32 field_outer_x32 field_outer_x32 field_outer_x32 field_transposed field_outer_x32 field_transposed field_affine_tiled_x32
+gpu__time_duration.sum                                                           us     231.136000 105.408000 73.024000 219.968000 216.096000 74.880000 126.144000 128.064000
+smsp__inst_executed.sum                                                          inst   43266274.000000 13171572.000000 6934908.000000 34546256.000000 41193418.000000 6934908.000000 20576375.000000 21550488.000000
+launch__registers_per_thread                                                     register/thread 126 126 126 126 124 126 124 126
+sm__warps_active.avg.pct_of_peak_sustained_active                                %      32.474590 31.537642 32.560627 28.398348 32.389494 32.364736 29.818343 30.392493
+smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio         inst   5.998709 16.739295 10.116381 5.357597 5.647491 10.166355 7.110193 7.017927
+smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio            inst   0.187309 0.001914 0.003855 0.077655 0.223123 0.003986 0.175084 0.114613
+smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio        inst   0.561995 0.052052 0.099951 0.298546 0.546886 0.100360 0.482517 0.483675
+smsp__average_warps_issue_stalled_wait_per_issue_active.ratio                    inst   3.552112 1.633938 1.659531 3.790555 3.669677 1.659168 3.653228 3.555489
+== the paced build: the first eight launches of field_pace_skin_back, field_outer_x32, field_transposed or field_affine_tiled_x32, on 2 of lap 49's sections
+kernel                                                                                  field_affine_tiled_x32 field_outer_x32 field_outer_x32 field_outer_x32 field_transposed field_outer_x32 field_transposed field_affine_tiled_x32
+gpu__time_duration.sum                                                           us     224.064000 80.320000 45.568000 220.576000 217.632000 47.296000 130.016000 129.024000
+smsp__inst_executed.sum                                                          inst   45901990.000000 4212089.000000 2233712.000000 34598592.000000 42578304.000000 2233712.000000 21308012.000000 22900907.000000
+launch__registers_per_thread                                                     register/thread 126 126 126 126 124 126 124 126
+sm__warps_active.avg.pct_of_peak_sustained_active                                %      32.342956 31.632575 19.256962 28.440669 32.257564 19.852048 29.954925 30.483218
+smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio         inst   5.345720 43.673761 26.713737 5.292639 5.501038 26.075007 6.965222 6.496984
+smsp__average_warps_issue_stalled_mio_throttle_per_issue_active.ratio            inst   0.048338 0.009865 0.018664 0.077855 0.143177 0.018836 0.159142 0.047888
+smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio        inst   0.258495 0.057994 0.108899 0.296221 0.392731 0.109175 0.417853 0.273732
+smsp__average_warps_issue_stalled_wait_per_issue_active.ratio                    inst   3.402104 1.462655 1.573744 3.787313 3.568765 1.574727 3.565344 3.404807
