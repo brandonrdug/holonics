@@ -781,3 +781,16 @@ UTC); `agent-inferred` for the reading of them.
   is the lens's unification on the realization's own owners: one operation, two notations, and the second never took
   the first's staging. The blanks hold 41.5 ms a section; a guess is fixed when one is built, after their stall split
   and the share of silent sites (the terms the tile would form as zeros) are read.
+- **The release as one add and one shift** (the build thread, relayed 07:10 UTC; its guesses fixed at dispatch, 07:09
+  UTC: gate 3 equal, the instructions a launch 0.82 to 0.92 in the tied face's return, 0.85 to 0.95 in the reverse scan
+  and 0.92 to 0.98 in the skin's return, a section 0.985 to 0.997). For `x < 0`, `−⌊(−x + h)/2^b⌋ = ⌈(x − h)/2^b⌉ =
+  ⌊(x + h − 1)/2^b⌋` with `h = 2^(b−1)`, since `2^b − h = h`, so `rel(x, b) = (x + h − [x < 0]) >> b`, the arithmetic
+  shift being the floor. The ruler (`release_shift_ruler.py` in this record's receipts) asserts the two forms equal on
+  52,699 reads, every `b` from 1 to 127; the new form's add leaves the word only where the old positive branch's did,
+  and the old negative branch's `−x` at the word's foot is gone. At `b = 0` there is no `h`, so the form keeps the guard
+  `rel(x, 0) = x`. A risk the instruction guesses do not see (`agent-inferred`): the registers moved in twelve
+  entries, and the skin's return went from 96 to 104 a lane; at four warps a block, 96 registers a lane allow five
+  blocks a multiprocessor (12,288 of 65,536 a block) and 104 allow four (13,312), so it falls from 20 warps to 16 unless
+  its bound holds it at five. Guess, fixed at 07:12 UTC beside the build's: the skin's return 0.97 to 1.06 of its time
+  a launch if it holds four blocks, its instructions' fall against a fifth of its warps; at five blocks, its time follows
+  its instructions' guess.
