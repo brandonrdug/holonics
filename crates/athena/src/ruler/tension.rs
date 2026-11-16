@@ -203,6 +203,10 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
     println!("TENSION_LAW role={role} sections={sections} every={every} ticks={ticks} width={dw} current={m2} products={j2} threads={} ms={}", rayon::current_num_threads(), started.elapsed().as_millis());
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
+    // [measurement; the lead, November 16 23:00Z] Beside them, each row's opening chart (`chart.i32`, what a tick's probes read) and, for every
+    // open site at every tick and head, its row's temperature covector as the reverse forms it before the rows are summed into the head's one
+    // entry (`temper.tsv`: `slice`, `section`, `region`, `site`, `tick`, `head`, `δℓ` on `2^(−40)`): the premise of a row's own temperature.
+    let (mut chart, mut temper) = (create("chart.i32")?, create("temper.tsv")?);
     let mut cut = Cut { seed, slices, pass };
     let (mut done, mut written) = (0usize, 0usize);
     while done < sections {
@@ -239,6 +243,9 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
                     for &v in &tension.read[k][site * dw..(site + 1) * dw] {
                         read.write_all(&v.to_le_bytes())?;
                     }
+                    for &v in &tension.chart[k][site * dw..(site + 1) * dw] {
+                        chart.write_all(&v.to_le_bytes())?;
+                    }
                     for &v in &tension.current[k][site * m2..(site + 1) * m2] {
                         current.write_all(&v.to_le_bytes())?;
                     }
@@ -250,11 +257,16 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
                     written += 1;
                 }
             }
+            for (k, rows_k) in tension.temper.iter().enumerate() {
+                for &(h, i, dl) in rows_k {
+                    writeln!(temper, "{}\t{done}\t{r}\t{i}\t{k}\t{h}\t{dl}", names[*slice])?;
+                }
+            }
         }
         done += 1;
         println!("TENSION_SECTION n={done} regions={} sites={in_sites} rows={written} ms={}", regions.len(), started.elapsed().as_millis());
     }
-    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products] {
+    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products, &mut chart, &mut temper] {
         w.flush()?;
     }
     println!("TENSION_DONE rows={written} sections={done} ms={}", started.elapsed().as_millis());

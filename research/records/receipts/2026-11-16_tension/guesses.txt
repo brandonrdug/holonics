@@ -65,3 +65,28 @@ What each outcome decides.
 - K2 misses (place under 0.5): the address has no content to match. The next law is the count along the strand (the carry circle as an
   odometer, the radix founded as a class).
 - K1 misses: the value is not pure at its source. The next law is the value's chart (what a source offers of itself).
+
+------------------------------------------------------------------------------------------------------------------------------------------
+A row's own temperature: the premise, guesses fixed before the read (November 16, 2026, 22:53 UTC, read from the clock)
+
+State read: lap 76's mean (MEAN.3000). Reading: `read-tension-store`, four sections as the trainer cuts them after lap 76's end, every open
+site at every tick and head: its row's temperature covector as the reverse forms it for that row (`temper.tsv`), beside its opening chart.
+Ruler: `tools/tension_ruler.py temper`. Fit on the first three sections, read on the fourth.
+
+What the logs print (read first): a lock's temperature is one entry a head and receiver kind; head 0's listener entry stands at
+log2 T = 2.0001, heads 1 to 3 at 0.46, 1.13 and 1.47 (links76s, TENSION_TEMPER); each row's covector is summed into that entry
+(adjoint.rs, tick_return). At a balance the rows' sum is near zero whatever each row asks.
+
+The theory's pick (agent-inferred). A temperature is a receiver's state. Rows that would gain from a closed lock (an answer digit beside
+its operands) and rows that gain from a broad one (prose) pull one entry opposite ways and it stands still; a chart of the row's own site
+tells them apart.
+
+G-T1 (a balance). For head 0's open rows on the held section, |sum of δℓ| is at most 0.1 of the sum of |δℓ|.
+G-T2 (the site tells). A linear read of the row's opening chart removes at least 0.05 of head 0's open rows' δℓ power on the held
+section, and at least 0.02 at every head.
+G-T3 (who asks for what). In the arithmetic slice, head 0's open rows ask on average for a sharper lock (mean δℓ below zero: the code
+falls as ℓ rises), and in at least two of the five older slices they ask on average for a softer one.
+
+What each outcome decides. G-T2 held: a row's temperature read from its own site has a slope at its founding, and it is built (host,
+card, parity), founded at zero. G-T2 under 0.01 at head 0: the rows' asks are not a function of the site's chart; the carried row
+(accumulated76.txt) is the lock's first term instead.
