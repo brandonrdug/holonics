@@ -61,6 +61,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-junction") {
         return athena::store::read_junction(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-cavity") {
+        return athena::ruler::cavity::read_cavity(&rest[1..], &mut holonics_engine::realization::Host);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension") {
         return athena::ruler::tension::read_tension(&rest[1..]);
     }
@@ -305,6 +308,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("join-store") => athena::store::join_store(args),
+        Some("move-store") => athena::store::move_store(args),
         Some("set-world") => athena::store::set_world(args),
         Some("grow-crossings") => athena::store::grow_crossings(args),
         Some("zero-triad-return") => athena::store::zero_triad_return(args),

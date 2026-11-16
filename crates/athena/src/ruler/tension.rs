@@ -34,21 +34,31 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     // row's `site` and whether it is the open one), with the tick's opening chart beside the pair chart (`chart.i32`, what the tick's keys,
     // probes and values read) and, in `shares.tsv`, the open place's row by tick and head: each source site and its share of the row's
     // weight in millionths. A ruler traces a far symbol's way to the open place link by link from them.
-    let all = match (args.len(), args.get(12).map(String::as_str)) {
-        (12, None) => false,
-        (13, Some("all")) => true,
-        _ => return Err("read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all]".into()),
-    };
+    // [measurement; the lead, November 16 23:00Z] With `carry=MILLI`, every open row carries its lock along the ticks at `γ = MILLI/1000`
+    // ([`holonics_engine::field::Constitution::lock_carry`]): a ruler's forward, read before the stage is a law.
+    let usage = "read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all] [carry=MILLI]";
+    if args.len() < 12 || args.len() > 14 {
+        return Err(usage.into());
+    }
+    let (mut all, mut carry) = (false, None);
+    for word in &args[12..] {
+        match (word.as_str(), word.strip_prefix("carry=")) {
+            ("all", _) => all = true,
+            (_, Some(m)) => carry = Some(crate::ruler::tension::carry_of(m)?),
+            _ => return Err(usage.into()),
+        }
+    }
     let started = std::time::Instant::now();
     refuse_variables("read-tension")?;
     let units = units_of(&args[1], &args[2])?;
     let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
     let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
-    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
+    learner.field.lock_carry = carry;
     let out = Path::new(&args[11]);
     let unescape = |t: &str| t.replace("\\n", "\n");
     // (label, the place's index in its run, the place's site, the region)
@@ -86,13 +96,15 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     let (dw, m2, j2, ticks) = (d.width, 2 * d.heads * d.modes, 2 * d.triads, d.ticks);
     std::fs::create_dir(out)?;
     write_new(&out.join("dims.tsv"), format!("lambda\t{dw}\nread\t{dw}\ncurrent\t{m2}\nproducts\t{j2}\nticks\t{ticks}\n").as_bytes())?;
-    println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} threads={} ms={}", work.len(), rayon::current_num_threads(), started.elapsed().as_millis());
+    println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} carry={} threads={} ms={}", work.len(), carry.map_or("-".to_string(), |g| g.to_string()), rayon::current_num_threads(), started.elapsed().as_millis());
     // The locks' temperatures as the state holds them: `log₂ T` on the material's grain, one a head and receiver kind (a class receiver, a listener).
     let temper = learner.field.layout().temper;
     println!("TENSION_TEMPER log2_on_2^-24 {}", (0..2 * d.heads).map(|k| learner.field.theta[temper + k].to_string()).collect::<Vec<_>>().join(" "));
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
     let (mut chart, mut shares) = if all { (Some(create("chart.i32")?), Some(create("shares.tsv")?)) } else { (None, None) };
+    // With `all`, each site's value word beside its chart (`value.i64`, `2M` entries on `2^(−16)`): what the site offers a row that meets it.
+    let mut value = if all { Some(create("value.i64")?) } else { None };
     let mut written = 0usize;
     // Regions in blocks, so that what is held before it is written stays bounded; rows in the table's order.
     for block in work.chunks(1024) {
@@ -128,6 +140,11 @@ pub fn read_tension(args: &[String]) -> Result<()> {
                             c.write_all(&v.to_le_bytes())?;
                         }
                     }
+                    if let Some(c) = value.as_mut() {
+                        for &v in &tension.value[k][s * m2..(s + 1) * m2] {
+                            c.write_all(&v.to_le_bytes())?;
+                        }
+                    }
                     written += 1;
                 }
                 if let Some(f) = shares.as_mut() {
@@ -144,6 +161,9 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         w.flush()?;
     }
     if let Some(c) = chart.as_mut() {
+        c.flush()?;
+    }
+    if let Some(c) = value.as_mut() {
         c.flush()?;
     }
     if let Some(f) = shares.as_mut() {
@@ -203,6 +223,10 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
     println!("TENSION_LAW role={role} sections={sections} every={every} ticks={ticks} width={dw} current={m2} products={j2} threads={} ms={}", rayon::current_num_threads(), started.elapsed().as_millis());
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
+    // [measurement; the lead, November 16 23:00Z] Beside them, each row's opening chart (`chart.i32`, what a tick's probes read) and, for every
+    // open site at every tick and head, its row's temperature covector as the reverse forms it before the rows are summed into the head's one
+    // entry (`temper.tsv`: `slice`, `section`, `region`, `site`, `tick`, `head`, `δℓ` on `2^(−40)`): the premise of a row's own temperature.
+    let (mut chart, mut temper) = (create("chart.i32")?, create("temper.tsv")?);
     let mut cut = Cut { seed, slices, pass };
     let (mut done, mut written) = (0usize, 0usize);
     while done < sections {
@@ -239,6 +263,9 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
                     for &v in &tension.read[k][site * dw..(site + 1) * dw] {
                         read.write_all(&v.to_le_bytes())?;
                     }
+                    for &v in &tension.chart[k][site * dw..(site + 1) * dw] {
+                        chart.write_all(&v.to_le_bytes())?;
+                    }
                     for &v in &tension.current[k][site * m2..(site + 1) * m2] {
                         current.write_all(&v.to_le_bytes())?;
                     }
@@ -250,13 +277,27 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
                     written += 1;
                 }
             }
+            for (k, rows_k) in tension.temper.iter().enumerate() {
+                for &(h, i, dl) in rows_k {
+                    writeln!(temper, "{}\t{done}\t{r}\t{i}\t{k}\t{h}\t{dl}", names[*slice])?;
+                }
+            }
         }
         done += 1;
         println!("TENSION_SECTION n={done} regions={} sites={in_sites} rows={written} ms={}", regions.len(), started.elapsed().as_millis());
     }
-    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products] {
+    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products, &mut chart, &mut temper] {
         w.flush()?;
     }
     println!("TENSION_DONE rows={written} sections={done} ms={}", started.elapsed().as_millis());
     Ok(())
+}
+
+/// A ruler's carried-lock gain from thousandths, on `2^(−30)`: `carry=1000` is a row that keeps its whole lock.
+pub fn carry_of(milli: &str) -> Result<i64> {
+    let m: i64 = milli.parse().map_err(|_| "carry=MILLI is a count of thousandths")?;
+    if !(0..=1000).contains(&m) {
+        return Err("carry=MILLI stands between 0 and 1000".into());
+    }
+    Ok((m << 30) / 1000)
 }

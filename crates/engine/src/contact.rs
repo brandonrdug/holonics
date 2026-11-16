@@ -110,6 +110,9 @@ pub(crate) struct TickCell {
     pub(crate) abg: Vec<i64>,
     pub(crate) tp: Vec<i64>,
     pub(crate) ct: Vec<i64>,
+    /// [measurement; the lead, November 16 23:00Z] Where an open row carries its lock ([`Constitution::lock_carry`]): what each row carried
+    /// from the tick before, `[h][i]` a list of `(j, S)` (the source and the row's carried lock on it at unit gain); empty otherwise.
+    pub(crate) lock_prev: Vec<Vec<(u32, i64)>>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -567,6 +570,7 @@ impl Constitution {
         // `y_i = conj(U_i) ỹ_i`.
         cell.rows = Vec::with_capacity(heads * sites);
         cell.y = vec![0i64; sites * m2];
+        let lock_prev = std::mem::take(&mut cell.lock_prev);
         let one = 1u128 << WEIGHT_BITS;
         let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
         cell.crowds = Vec::with_capacity(heads * sites);
@@ -617,6 +621,14 @@ impl Constitution {
                         (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
                     }
                     let base = fit64(release(s, FACE_BITS + 2 * self.decay(h, 0, d).1 + 1))?;
+                    // [measurement] An open row's carried lock, where read ([`Constitution::lock_carry`]).
+                    let base = match (self.lock_carry, lock_prev.get(h * sites + i)) {
+                        (Some(g), Some(prev)) if lists.listens(i) => {
+                            let carried = prev.iter().find(|&&(pj, _)| pj as usize == j).map_or(0, |&(_, c)| c);
+                            fit64(base as i128 + release(g as i128 * carried as i128, GAMMA_BITS))?
+                        }
+                        _ => base,
+                    };
                     let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (falloff(d, j) << FACE_BITS))?;
                     series.push(self.face(z), one, one, &value);
                     row.push(Source { j: j as u32, p: 0, s: base });
@@ -844,6 +856,8 @@ impl Constitution {
         let mut prior: Option<Vec<i64>> = None;
         // [measurement] The moves carried from the tick before, added once this tick has run (`pass_carried`).
         let mut carried: Vec<i64> = Vec::new();
+        // [measurement] The open rows' locks carried from the tick before, where read ([`Constitution::lock_carry`]).
+        let mut locks: Vec<Vec<(u32, i64)>> = Vec::new();
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep)?);
@@ -859,7 +873,13 @@ impl Constitution {
             if carried.is_empty() {
                 carried = vec![0i64; x.len()];
             }
+            if self.lock_carry.is_some() {
+                cell.lock_prev = std::mem::take(&mut locks);
+            }
             self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
+            if self.lock_carry.is_some() {
+                locks = cell.rows.iter().map(|row| row.iter().map(|src| (src.j, src.s)).collect()).collect();
+            }
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
             }

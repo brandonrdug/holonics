@@ -1801,9 +1801,41 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambda: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambda), None)?;
+        let mut currents: Vec<Vec<i64>> = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambda), None)?;
         lambda.reverse();
+        currents.reverse();
         let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        // Each open row's temperature covector, as the reverse forms it before it sums the rows into the head's one entry: with the current's
+        // covector `δỹ_i` (framed, by head), `δp_j = ⟨δỹ_i, D ṽ_j⟩`, `μ = Σ_j p_j δp_j`, `δz_j = ln 2 · p_j (δp_j − μ)`, `δT = Σ_j δz_j s_j` and
+        // `δℓ = δT · T ln 2` ([`temperature_chain`]). An open row hears no crowd, so its sources are the whole row.
+        let (n, span) = (self.declaration.modes, 2 * self.declaration.modes);
+        let ln2 = ln2_face();
+        let mut temper: Vec<Vec<(usize, usize, i128)>> = Vec::with_capacity(pass.ticks.len());
+        for (cell, dy) in pass.ticks.iter().zip(&currents) {
+            let paces = pass.paces_at(cell);
+            let mut rows_out = Vec::new();
+            for h in 0..heads {
+                let vh = &cell.v[h * sites * span..(h + 1) * sites * span];
+                let dyh = &dy[h * sites * span..(h + 1) * sites * span];
+                let t = self.temper(h, true)?;
+                for i in (0..sites).filter(|&i| cell.classes[h].listens(i)) {
+                    let row = &cell.rows[h * sites + i];
+                    let dyi = &dyh[i * span..(i + 1) * span];
+                    let dp: Vec<i128> = row
+                        .iter()
+                        .map(|src| {
+                            let j = src.j as usize;
+                            (0..n).map(|l| { let decay = self.pair_decay(paces, h, l, i, j); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
+                        })
+                        .collect();
+                    let mean = release(row.iter().zip(&dp).map(|(src, &dpj)| src.p as i128 * dpj).sum::<i128>(), SHARE_BITS);
+                    let dt: i128 = row.iter().zip(&dp).map(|(src, &dpj)| release(release(ln2 * release(src.p as i128 * (dpj - mean), SHARE_BITS), MOVE_BITS) * src.s as i128, FACE_BITS)).sum();
+                    rows_out.push((h, i, temperature_chain(t, dt)?));
+                }
+            }
+            temper.push(rows_out);
+        }
         let sources = pass
             .ticks
             .iter()
@@ -1811,7 +1843,9 @@ impl Constitution {
             .collect();
         Ok(CrossingTension {
             lambda,
+            temper,
             chart: pass.ticks.iter().map(|c| c.read.clone()).collect(),
+            value: pass.ticks.iter().map(|c| c.vword.clone()).collect(),
             sources,
             read: pass.ticks.iter().map(|c| c.read2.clone()).collect(),
             current: pass.ticks.iter().map(|c| c.y.clone()).collect(),
@@ -1828,8 +1862,13 @@ impl Constitution {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CrossingTension {
     pub lambda: Vec<Vec<i64>>,
+    /// Each tick's open rows' temperature covectors: for each head and open site, `δℓ` as the reverse forms it for that row (on the material's
+    /// covector grain `2^(−40)`), before the rows are summed into the head's one entry.
+    pub temper: Vec<Vec<(usize, usize, i128)>>,
     /// Each tick's opening chart `r̂` (`[t][D]` on `2^(−16)`), which the tick's keys, probes and values read.
     pub chart: Vec<Vec<i32>>,
+    /// Each tick's value words (`[t][2M]` on `2^(−16)`, unframed, a site's moment added): what a site offers a row that meets it.
+    pub value: Vec<Vec<i64>>,
     /// Each tick's open rows: for each head and open site, the sources its row met, each one's share of the row's weight (on `SHARE_BITS`)
     /// and its lock at unit gain (on `2^(−16)`, before the temperature and the falloff).
     #[allow(clippy::type_complexity)]

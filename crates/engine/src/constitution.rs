@@ -47,6 +47,12 @@ pub struct Constitution {
     /// each tick but the last, `x_j ← x_j − release(s_h μ_j, 16)` summed over the heads ([`Constitution::mirror_route`], every head's mirror read from
     /// the state the tick left), a reading at finite strength before the stage is a law; not part of the state, and no reverse reads it.
     pub mirror_strength: Option<Vec<i64>>,
+    /// [measurement; the lead, November 16 23:00Z; the record of the lock, §4.5] Where set, **an open row carries its lock along the ticks**:
+    /// with `γ` on `2^(−30)`, a listener's lock on source `j` at unit gain is `S^(k) = s^(k) + release(γ S^(k−1), 30)` (its fresh lock and what
+    /// the row carried of the same source from the tick before), read through the temperature and the falloff as the fresh lock is,
+    /// `z = T S − falloff`. A reading at a set `γ` of what a row that keeps its evidence does, before the stage is a law: not part of the
+    /// state, and no reverse reads it.
+    pub lock_carry: Option<i64>,
     /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
     /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
     /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Constitution::opening_term`]), and stays silent

@@ -170,6 +170,7 @@ SHA-256 and prints one line a unit of work.
 | `parity-store` | every read asked of the card and of the host, compared whole | `STORE_PARITY_DONE` |
 | `read-tension`, `read-tension-store` (host) | the covector at the strand's return beside the pair chart, the gathered current and the triads' products, by tick: at the places a forms table names (with `all`, every site, the tick's opening chart and the open row's sources, shares and locks at unit gain), or over the sections a lap meets next (`tools/tension_ruler.py` reads them) | `TENSION_LAW`, `TENSION_TEMPER`, `TENSION_BLOCK`, `TENSION_SECTION`, `TENSION_DONE` |
 | `grow-crossings`, `zero-triad-return`, `found-crossing` | crossing triads grown with drawn legs and a zero return; a ruler's state with the return zeroed; the triads' legs set from a ruler's located file, the return at zero (a founding) or the ruler's (a ruler's state) | `GROW_CROSSINGS`, `ZERO_TRIAD_RETURN`, `FOUND_CROSSING` |
+| `move-store` | a state's pass moved to a store whose slice was redrawn: the slice set to the first piece at or past the places the pass has taken of it, its cursor zero, every other line of the state byte for byte (`join-store` adds slices at a new pass and sets every slice back) | `MOVE_STORE` |
 
 Gate 3 for the engine is `bash tools/gate_engine.sh LINE BIN OUT`: parity on 3 of the line's sections, 24 sections
 reproduced, and the lap's read byte for byte (CLAUDE.md, the gates).

@@ -1161,6 +1161,54 @@ pub fn join_store(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, the lead, November 16] `move-store STATE STATE_SHA STORE STORE_SHA SLICE OUT`: **a state's pass moved to a
+/// store whose slice `SLICE` was redrawn**: the state with its pass line's store set to `STORE` (`STORE_SHA` its `STORE.tsv`'s), the same
+/// slices in the same order, every other slice's place kept, and `SLICE` set to the start of the first piece that begins at or past the
+/// places the pass has taken of it (its cursor zero, its places taken kept), so the slice goes on at the share of its octets it stood at
+/// and ends its pass with the others; every other line of the state byte for byte (read back and checked, as [`next_pass`]). Refused where
+/// the store's slices of the role are not the state's. Why not [`join_store`]: it adds slices at a new pass and sets every slice back to
+/// its first piece; a slice redrawn at the same octets changes no quota, and its pieces' lengths alone change, so a kept cursor could
+/// stand past its piece's places. Where the pass has taken more than the redrawn slice holds, the slice stands at its end.
+pub fn move_store(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("move-store STATE STATE_SHA STORE STORE_SHA SLICE OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    let names = role_names(&counts, &before.role);
+    if before.slices.iter().map(|s| s.name.as_str()).ne(names.iter().copied()) {
+        return Err(format!("a store whose {} slices ({}) are not the state's", before.role, names.join(",")).into());
+    }
+    let at = before.slices.iter().position(|s| s.name == args[5]).ok_or_else(|| format!("a pass with no slice {}", args[5]))?;
+    let pieces = open_slice(store, &before.role, &args[5], &counts)?.pieces;
+    let taken = before.slices[at].taken;
+    let piece = pieces.partition_point(|p| p.offset < taken);
+    let mut pass = before.clone();
+    pass.store = args[4].clone();
+    (pass.slices[at].piece, pass.slices[at].cursor) = (piece as u64, 0);
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
+    std::fs::write(out, &written)?;
+    println!(
+        "MOVE_STORE stretches={} store_before={} store_after={} slice={} pieces={} taken={taken} piece_before={} cursor_before={} piece_after={piece} piece_offset={} lines={lines} differing_line={differing}",
+        before.stretches,
+        before.store,
+        args[4],
+        args[5],
+        pieces.len(),
+        before.slices[at].piece,
+        before.slices[at].cursor,
+        pieces.get(piece).map_or("end".to_string(), |p| p.offset.to_string())
+    );
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, the theory thread's Build B] `set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT`: **a world
 /// joined to a state's pass** ([`holonics_engine::field::PassWorld`]): the state with its pass line's world clause set (one stretch in
 /// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
@@ -1638,10 +1686,13 @@ pub fn read_writes(args: &[String], realization: &mut dyn Realization) -> Result
 pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     // [measurement; the theory thread's R1 of 19:12 UTC] With `one`, each place of the run is coded open alone, the rest of the run known
     // (the one-place receiver: the state a training mask meets where a digit's neighbours are known).
-    let one = match (args.len(), args.get(11).map(String::as_str)) {
-        (11, None) => false,
-        (12, Some("one")) => true,
-        _ => return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA [one]".into()),
+    // [measurement; the lead, November 16 23:00Z] With `carry=MILLI`, every open row carries its lock along the ticks at `γ = MILLI/1000`
+    // ([`holonics_engine::field::Constitution::lock_carry`]), on the host's realization: a ruler's forward, read before the stage is a law.
+    let (one, carry) = match (args.len(), args.get(11).map(String::as_str), args.get(12).and_then(|w| w.strip_prefix("carry="))) {
+        (11, None, None) => (false, None),
+        (12, Some("one"), None) => (true, None),
+        (13, Some("one"), Some(m)) => (true, Some(crate::ruler::tension::carry_of(m)?)),
+        _ => return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA [one [carry=MILLI]]".into()),
     };
     let started = std::time::Instant::now();
     refuse_variables("read-forms")?;
@@ -1652,10 +1703,11 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
     let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
     let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
-    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
+    learner.field.lock_carry = carry;
     let law = learner.pass.clone().ok_or("a state with no pass line: read-forms reads a state of the store's line")?;
     let unescape = |t: &str| t.replace("\\n", "\n");
     let mut rows: Vec<(String, usize, Vec<usize>)> = Vec::new();

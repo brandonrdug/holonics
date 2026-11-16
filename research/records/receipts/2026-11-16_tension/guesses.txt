@@ -65,3 +65,162 @@ What each outcome decides.
 - K2 misses (place under 0.5): the address has no content to match. The next law is the count along the strand (the carry circle as an
   odometer, the radix founded as a class).
 - K1 misses: the value is not pure at its source. The next law is the value's chart (what a source offers of itself).
+
+------------------------------------------------------------------------------------------------------------------------------------------
+A row's own temperature: the premise, guesses fixed before the read (November 16, 2026, 22:48 UTC, read from the clock; first written as 22:53 from an estimate and corrected)
+
+State read: lap 76's mean (MEAN.3000). Reading: `read-tension-store`, four sections as the trainer cuts them after lap 76's end, every open
+site at every tick and head: its row's temperature covector as the reverse forms it for that row (`temper.tsv`), beside its opening chart.
+Ruler: `tools/tension_ruler.py temper`. Fit on the first three sections, read on the fourth.
+
+What the logs print (read first): a lock's temperature is one entry a head and receiver kind; head 0's listener entry stands at
+log2 T = 2.0001, heads 1 to 3 at 0.46, 1.13 and 1.47 (links76s, TENSION_TEMPER); each row's covector is summed into that entry
+(adjoint.rs, tick_return). At a balance the rows' sum is near zero whatever each row asks.
+
+The theory's pick (agent-inferred). A temperature is a receiver's state. Rows that would gain from a closed lock (an answer digit beside
+its operands) and rows that gain from a broad one (prose) pull one entry opposite ways and it stands still; a chart of the row's own site
+tells them apart.
+
+G-T1 (a balance). For head 0's open rows on the held section, |sum of δℓ| is at most 0.1 of the sum of |δℓ|.
+G-T2 (the site tells). A linear read of the row's opening chart removes at least 0.05 of head 0's open rows' δℓ power on the held
+section, and at least 0.02 at every head.
+G-T3 (who asks for what). In the arithmetic slice, head 0's open rows ask on average for a sharper lock (mean δℓ below zero: the code
+falls as ℓ rises), and in at least two of the five older slices they ask on average for a softer one.
+
+What each outcome decides. G-T2 held: a row's temperature read from its own site has a slope at its founding, and it is built (host,
+card, parity), founded at zero. G-T2 under 0.01 at head 0: the rows' asks are not a function of the site's chart; the carried row
+(accumulated76.txt) is the lock's first term instead.
+
+Scores of the temperature premise (temper76.txt; 865,888 open rows by tick and head, 207,824 on the held section): G-T1 held (0.029, 0.007,
+0.019, 0.003 by head). G-T2 missed: the chart removes -0.003, -0.002, -0.002, -0.003 of the rows' covector power, nothing at any tick.
+G-T3 missed: the arithmetic rows' mean ask at head 0 is +0.0014 on an rms of 0.086, the smallest asks of any slice (1.2% of head 0's
+power), where the text slices' rms is 0.25 to 0.54. By the branch fixed above, a row's own temperature is not built. The reading's sense:
+where both operands hold a digit one digit alone is of no use to any reading, so an answer row is indifferent to its own sharpness at
+first order; the lock and the junction are a joint saddle, and neither has a slope alone.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+The carried lock, read on the host's forward before it is a law: guesses fixed before the read (November 16, 2026, 22:54 UTC, from date -u)
+
+State read: lap 76's mean. Reading: the host's forward with every open row carrying its lock along the ticks, S(k) = s(k) + g S(k-1) at
+unit gain, read through the temperature and the falloff once (a ruler-set field, Constitution::lock_carry; no reverse, no state written):
+(1) read-tension all carry=1000 on the links table (7,124 open digits), (2) read-tension carry=1000 on the first read's table (53,227
+digits) for the codes by kind of place, the table's share and the located products.
+
+What the logs print (read first): accumulated76.txt (ruler arithmetic on the fresh rows' shares: 0.26 to 0.51 where both hold, 0.76 at a
+copy, last tick); links76.txt (arrival 0.06 to 0.18; codes 2.14 at a copy column, 2.33 to 2.36 where both hold); located75_partial.txt
+(one located product 0.003 to 0.016, nothing where both hold); temper76.txt (no first-order ask for sharpness).
+
+The theory's pick (agent-inferred). A lock closes by its own law, as the carry circle turns by its founded friction, never by a reward:
+evidence that agrees across the ticks adds as their count and evidence that does not adds as its root. Closing it has no slope alone and
+the junction has none alone; with the lock closed the junction's legs are locatable, and then the deposit has a slope in both.
+
+G-C1 (the lock closes in the forward). Carried whole, head 0's share on the aligned column at the last tick is at least 0.40 where both
+operands hold a digit and at least 0.60 at a copy column (met sums).
+G-C2 (more arrives). What every head's current gives of an aligned digit at its best tick is at least 0.25 (0.09 to 0.18 fresh).
+G-C3 (the code, with nothing deposited). The copy columns of met sums code at most 2.09 nats a digit (2.14 fresh), and the columns both
+operands hold stay within 0.1 of their fresh 2.33 to 2.36.
+G-C4 (the junction becomes locatable). On the carried states, products located on half the records remove at least 0.03 of what the
+linear chart leaves on the other half, at a column both operands hold, at some tick (under 0.01 and mostly negative fresh).
+
+What each outcome decides. C1 and C4 held: the lock's carried row is built as a law founded at its own value (host reverse, card, parity,
+gate 3), and the junction's legs are located on its states and founded with it. C1 held and C4 missed: the carried row closes the lock
+but the operands still do not reach the legs' chart; the value's chart is read next. C1 missed: the forward does not keep what the
+arithmetic on fresh shares promised (the states move under the carried lock), and the row's store is rederived.
+
+Scores of the carried lock so far (links76c.txt, oracle76c.txt, arrive76.txt; the located products are still being read):
+G-C1 held: head 0's share on the aligned column at the last tick is 0.50 where both operands hold a digit and 0.76 at a copy column (the
+arithmetic on fresh shares had said 0.51 and 0.76). G-C2 missed: what arrives of an aligned digit is 0.09 and 0.06 at tick 0, 0.06 and
+0.14 at tick 1, under 0.01 and 0.09 after; the decomposition of a fresh row (arrive76.txt) shows why: a_k read from its own term alone
+0.26 to 0.43, from the two aligned terms together 0.07 to 0.13, from the whole row 0.045 to nothing: the rest of the row, two thirds of
+its weight on other digits' values, covers the column, and half a row on the column is not enough. G-C3 held: the copy columns code at
+1.97 nats a digit with nothing deposited (2.14 fresh) and the columns both hold stay at 2.35.
+
+The carried lock on the held passage: guess fixed at 23:06:13 UTC (from date -u), after the read was dispatched and before any of its output
+was read. read-cavity on the host, 400 places a slice, lap 76's mean, fresh and carried whole.
+G-C5. With nothing deposited, each of the five older slices and the word problems' held slice rises by between 0.01 and 0.15 nats a place
+under the carried lock (one-place masks), and the held arithmetic falls by at least 0.02. A row sharpened fourfold by its last tick with
+temperatures deposited for fresh rows pays on prose until the deposit lowers them.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+Short sums as the staircase's lower step: guesses fixed at 23:07:37 UTC (from date -u), before the read
+
+State read: lap 76's mean, fresh forward. Reading: read-tension on 8,000 sums of operands of one and two digits (key short-2026-11-16),
+every value digit opened alone. Where an expression holds two to four operand digits there is little of a row for the column to be lost in.
+What the logs print: on operands of one to six digits the answer's place holds each aligned digit at 0.10 to 0.15 and nothing is located;
+with a lock closed on the column five located products carry the sum (closed75.txt). The arithmetic slice draws each operand's length
+evenly from one to six, so a sum of two one-digit operands is about one record in 320 and a sum of operands up to two digits one in 80.
+
+The theory's pick (agent-inferred). The staircase's lower step is a record whose alignment is given, as a crib gives a menu its loops: on
+short sums the operands already arrive, so the junction's legs are locatable there today, and a junction that carries the sum gives the
+lock on longer records the first-order ask it lacks.
+
+G-S1 (presence). On short sums, where both operands hold the column, the answer's place gives each aligned operand digit at 0.25 or more
+(the pair chart, best tick), against 0.10 to 0.15 on operands of one to six digits.
+G-S2 (locatable). Ten products located on half the records remove at least 0.10 of what the linear chart leaves on the other half at the
+units place, at some tick.
+G-S3 (the code). The short sums' units digits code within 0.15 of ln 10: the law is not held, only reachable.
+
+What each outcome decides. S2 held: the triads' legs are founded from the short sums' tension (found-crossing, the return at zero, every
+face bit for bit) at the next lap gap, and the arithmetic slice is redrawn with short records in weight so that the return charges.
+S1 held and S2 missed: the legs' chart does not carry the product even where the operands arrive; the leg on the heads' currents is read.
+S1 missed: even two digits are lost in the row, and the lock's address is the only step.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+A record among its document's records: guess fixed at 23:15:57 UTC (from date -u), before the read
+
+Reading: read-tension on 3,000 of the first read's met sums and differences, each with eight other records of the same draw written before
+its expression (as the arithmetic slice's documents hold 32 records one after another and a training stretch spans several), every value
+digit opened alone; lap 76's mean, fresh forward. Read from the source first: an open site's row meets every definite site of its region,
+and a still head weighs a source by its class's count, never by its distance (contact.rs, the support and the falloff), so every digit at
+the same place of every other record in the region stands in the row beside the aligned pair.
+G-R1. Where both operands hold the column, the answer's place gives each aligned operand digit at no more than half of what it gives in a
+region of the record alone: at most 0.05 and 0.07 (the pair chart, ticks 0 and 1), against 0.10 and 0.12 to 0.15.
+What it decides. Held: the line trains its arithmetic in regions where the operands are lost in a crowd of other records' digits, and
+reads it in regions of one record; a record is the relatively complete region of its own equation, and the arithmetic slice is redrawn
+one record a document.
+
+SCORES of G-R1 and G-C5 (read from the clock at 23:34:10 UTC, November 16; outputs oracle_crowd76.txt and cavs76_{0,1000}/cavity.tsv)
+G-R1: not scored. The crowd read holds 193 met both-column places (992 places in all, two a record), and the presence ruler fits a
+  128-wide chart on half of them: its held shares read -1.3 to -2.1, which is the ruler past its size, not a presence. The same ruler
+  read 0.10 to 0.15 on 4,994 such places of one-record regions. A null from an instrument that small is the instrument's; the question
+  is carried by the redrawn slice below, which tests the crowd by training and no longer by this read.
+G-C5 (the held passage, 100 places a slice, one-place code, fresh lock against the carried lock at unit carry, lap 76's mean):
+  code +0.244, web +0.112, science +0.246, books +0.104, wikidata +0.043, words +0.174, arithmetic +0.016 nats a place.
+  Held for books, web and wikidata (inside 0.01 to 0.15); missed above for code, science and words; missed for the held arithmetic,
+  which rose by 0.016 where a fall of 0.02 was guessed. The carried lock at unit carry is no free gain: untrained, it costs text
+  0.04 to 0.25 nats a place and gives the held arithmetic nothing, the copy columns' 0.18 aside.
+
+GUESSES G-V1 to G-V4, fixed at 23:34:10 UTC, November 16, before any lap on the redrawn arithmetic slice (the lead)
+The change: the arithmetic slice's training documents redrawn (tools/arithmetic_world.py with weights read by
+tools/words_arithmetic_ruler.py from the store's word problems: operand lengths 1 to 6 at 5782605, 4735355, 1550212, 348121, 76807,
+22954; two to four operands at 2005714, 565595, 165359; + - * at 919854, 749478, 1582919; documents of 1, 2, 4, 8, 16 and 32 records,
+as many octets an octave), the pass moved to it at a lap gap (move-store), the world's acts set from one stretch in 8 to one in 21
+(the redrawn slice cuts into 4.4 times the stretches a place and 2.6 times the acts, by the cut's simulation). No law of the engine
+changes and the lap binary is chain 22's. The held slices stay as they were.
+Premise read first (G-S1, lap 76's mean): in a region of one short sum the operands' digits stand at the answer's units site at 0.44
+(a) and 0.53 to 0.58 (b), against 0.10 to 0.15 for sums of 1 to 6 digits; the table removes 0.58 to 0.89 of the covector there and ten
+located products 0.03 to 0.09, so the junction has a slope where the operands arrive, and the uniform slice gave that region about one
+record in eighty, cut at random among thirty-one others.
+Readings: read-tension on short76.tsv (sums of one- and two-digit operands, a record a region, every answer place opened alone) at a
+lap's mean, tension_ruler.py oracle; the chain's held read; the lap's wall time.
+G-V1: at the mean of the second lap on the redrawn slice, the units digit of a short sum codes at 2.10 nats or less (2.37 to 2.39 at
+  lap 76's mean; a flat digit is 2.303), and it falls from the first such lap's mean to the second's.
+G-V2: there the operands' presence at the units site, tick 0, stands at 0.60 or more for a and 0.70 or more for b.
+G-V3: the five text slices' held one-place codes at that mean stand within 0.01 nats a place of lap 77's, slice by slice, and the
+  lap's wall time within a tenth of lap 77's.
+G-V4: the held arithmetic slice (the uniform draw's records, 1 to 6 digits) moves by less than 0.05 nats a place either way.
+What each outcome decides: V1 missed with V2 held says the junction does not ride from drawn operands even where the operands arrive,
+and the located founding read on short sums is the next change; V1 and V2 both missed says the terrain was not the lever; V1 held is
+the first sum digit the line codes under a flat digit.
+G-B3b (the in-lap share of drafts the world reads, laps 77 and 78) is scored on lap 77 alone, since the redrawn slice changes what a
+draft's prompt is from the lap after the gap.
+
+BASELINE for G-V1 and G-V2, read from the clock at 23:57:26 UTC, November 16 (oracle_short77.txt; short.sh, the open places alone, 8 host
+threads beside lap 78): at lap 77's mean (MEAN.2000, the last mean before the redrawn slice) the units digit of a short sum codes at
+2.365 nats (2.370 at lap 76's mean), both-clear 2.391, both-carry 2.391, one-clear 2.164, the top digit 1.545; the operands' presence at
+the answer's site, tick 0: a 0.446, b 0.516. A first read of this lap with every site written (short77a) gave presences of 0.17 and 0.24
+over 101,472 rows: that dump's rows are every site and the oracle's shares on it are not the instrument's; it is kept for the rows'
+heat alone (heat_short77.txt). The oracle exits 1 on short sums after it prints its code, share and presence lines (a later table's
+solve is singular where a kind of place has too few rows).
+G-B3b, scored on lap 77 (STORE_WORLD lines, by sixths of the lap): the world read 0.598, 0.592, 0.606, 0.620, 0.610, 0.590 of the
+drafts, 0.605 over the lap (0.470 and 0.485 on laps 75 and 76). No rise of 0.05 inside the lap: missed on the lap it had.

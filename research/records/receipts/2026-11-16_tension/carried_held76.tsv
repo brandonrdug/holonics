@@ -1,0 +1,8 @@
+slice	places	fresh_nats	carried_nats	difference
+code	116	0.7025	0.9463	+0.2439
+web	116	0.9146	1.0269	+0.1124
+science	116	0.7871	1.0332	+0.2461
+books	116	0.7001	0.8035	+0.1035
+wikidata	116	0.4969	0.5401	+0.0432
+arithmetic	120	1.1170	1.1330	+0.0161
+words	116	0.9141	1.0885	+0.1744

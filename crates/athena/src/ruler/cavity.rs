@@ -55,6 +55,12 @@ pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std:
 /// 32-bit words a place). The same is read at the open places of each slice's whole masks, as `read-store` cut them (rows `W`,
 /// `OUT/words_whole.bin`). The output directory is private: it holds no text, but it is the held passage's places.
 pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    // [measurement; the lead, November 16 23:10Z] A last word `carry=MILLI` reads the held passage with every open row carrying its lock along
+    // the ticks ([`holonics_engine::field::Constitution::lock_carry`]): a ruler's forward on the host's realization, before the stage is a law.
+    let (args, carry) = match args.last().and_then(|w| w.strip_prefix("carry=")) {
+        Some(m) => (&args[..args.len() - 1], Some(crate::ruler::tension::carry_of(m)?)),
+        None => (args, None),
+    };
     if args.len() != 13 && args.len() != 14 {
         return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
     }
@@ -70,7 +76,8 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
     let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
     let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
     let places = positive(&args[9])?;
-    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[10], &args[11], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    learner.field.lock_carry = carry;
     let law = learner.pass.clone().ok_or("a state with no pass line: read-cavity reads a state of the store's line")?;
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
