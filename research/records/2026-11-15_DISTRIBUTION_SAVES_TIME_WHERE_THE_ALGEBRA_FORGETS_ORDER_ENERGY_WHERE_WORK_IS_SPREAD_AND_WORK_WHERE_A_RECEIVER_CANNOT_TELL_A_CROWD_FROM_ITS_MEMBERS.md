@@ -1081,3 +1081,19 @@ UTC); `agent-inferred` for the reading of them.
   equal; the line 0.05 to 0.10 and the address's lines under 0.06; the columns 0.91 to 0.96 a launch; a section 0.991
   to 0.996, on the rows' conversion (about 0.35 of a share in time at 16 warps a multiprocessor) taken lower, about 0.3,
   for the columns' 28 warps, which already hid more of what is removed.
+- **The columns' gather, scored; a share's worth in time; the unroll's register edge** (the build thread, relayed 14:40
+  UTC; #913, receipts `research/records/receipts/2026-11-16_colgather/`). Gate 3 equal. The columns' samples 123,708 to
+  98,479 (0.796) and their warp instructions 551.1 to 472.3 million (0.857); the covector's line 0.228 to 0.008, the
+  receiver's address 0.142 to 0.024, the bracket's line now 0.255 (the receiver's probe); by launch 0.792 to 0.931; the
+  profile 47.79 to 41.75 ms a section (0.874); the hold 0.986, resolved (7.0 ms a section). My 14:03 guess: the address
+  held, the rest missed on the side of less (the line 0.05 to 0.10, the columns 0.91 to 0.96, a section 0.991 to 0.996);
+  the build's held by the profile and at the section's edge. The premise is corrected as the build reads it: a share of
+  samples is worth about 0.35 of itself in time where the removed wait leaves its instructions in place (the batched
+  atomics), and about 0.6 where the removed loads were instructions too (the index chain and the column's addresses,
+  14% of them here). A guess's conversion is fixed from the samples and the instructions it removes, both. The build's
+  next: two receivers' probe loads in flight by unrolling the loop by two, read first in the machine code. Its register
+  edge: at 72 registers the quarter floor gives `⌊16,384 / (32 · 72)⌋ = 7` blocks of four warps, and a thread's registers
+  go in steps of eight, so 80 gives six. Guess, fixed at 14:40 UTC: gate 3 equal; at 72 registers the bracket's line
+  0.255 to 0.15 to 0.20 of the columns' samples, the columns 0.97 to 0.99 a launch (its instructions unchanged), a section
+  0.997 to 1.000; at 80, the columns 0.98 to 1.01; and nothing moves where the machine code already holds both loads in
+  flight.
