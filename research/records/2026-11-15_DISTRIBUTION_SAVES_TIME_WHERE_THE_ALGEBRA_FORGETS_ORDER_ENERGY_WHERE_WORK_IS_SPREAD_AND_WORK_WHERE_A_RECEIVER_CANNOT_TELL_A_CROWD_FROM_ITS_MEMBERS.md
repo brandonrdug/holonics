@@ -1062,3 +1062,22 @@ UTC); `agent-inferred` for the reading of them.
   wide word, an integer sum in the ring, so no bit moves. Guess, fixed at 13:37 UTC, for the sums on that layout: gate 3
   equal; their share 0.050 to 0.015 to 0.030 of the samples, the excess sectors under 10%; the rows 0.985 to 0.995 a
   launch; a section 0.998 to 1.000, likely inside a hold's resolution.
+- **The crowds' sums, scored, and the columns' gather** (the build thread, relayed 13:43, 13:44 and 14:03 UTC; #911,
+  receipts `research/records/receipts/2026-11-16_crowdsums/`). The sums take a part's lanes over a crowd's entries and a
+  tree over the part's lanes; where the span does not divide 32 (one part), a lane past the span forms no term, since its
+  entry wraps there and would add the first entries again (the build's guard, which the line's span of 16 never takes).
+  Gate 3 equal. The sums' line 0.050 to 0.023 of the rows' samples (the tree 0.013), the block's second-level sectors
+  13.8 to 6.9 million (45% excess to under 0.3%), 2.2% more instructions on the two sampled launches; by launch 0.951 to
+  1.028 (the smaller shapes 1.00 to 1.03, the larger 0.95 to 0.975); the profile 0.982; the hold 0.998, unresolved inside
+  the control's spread of 1.7 (one control run set aside, 13,161 ms against about 12,100, a disturbance of the card at
+  the hold's end). My 13:37 guess: the share and the excess held, the rows' 0.985 to 0.995 missed on both sides by launch
+  (0.982 by the profile), a section held. The columns' source counters (#909, two launches, 524.8 million instructions,
+  117,482 samples): the covector's product 0.233 of the samples, two thirds of it the long wait on `δs_ij` read down a
+  column; the bracket 0.134, half of it the receiver's probe, whose load runs 50% excess sectors; the share 0.082; the
+  receiver's address 0.142, each pass of the loop waiting on its chain of index loads before the column's entries. The
+  build locates a chunk of 32 receivers at once, a lane a receiver, and reads their `δs_ij` and `p_ij` into the warp's
+  rows (2,560 octets a block) for the entry lanes, an integer sum released once, so no bit moves. Its guess (14:03 UTC):
+  that line under 0.08, the columns 0.85 to 0.95 a launch, a section 0.985 to 0.996. Mine, fixed at 14:03 UTC: gate 3
+  equal; the line 0.05 to 0.10 and the address's lines under 0.06; the columns 0.91 to 0.96 a launch; a section 0.991
+  to 0.996, on the rows' conversion (about 0.35 of a share in time at 16 warps a multiprocessor) taken lower, about 0.3,
+  for the columns' 28 warps, which already hid more of what is removed.
