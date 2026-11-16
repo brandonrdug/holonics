@@ -1655,46 +1655,29 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
     }
 }
 
-// The bias's sum (no `x`): one thread an entry of up to 256, a block a walk of `OUTER_WALK` sites, its partial in 64 bits where `walk · ymax`
-// stands under `2^63`, on 128 bits otherwise, added once a walk.
+// The bias's sum (no `x`): one thread an entry of up to 256, a block a walk of `OUTER_WALK` sites, its partial added once a walk.
+// [realization; November 16, the next kernels' source counters] The partial is summed on 128 bits in one pass over the walk. The 64-bit
+// partial it replaces was chosen where `walk · ymax` stood under `2^63`, and the walk was read twice: first for its largest magnitude (half
+// of the kernel's stall samples stood on that load), then for the sum. Both forms give the same integer, so this is the same partial with
+// one read of `y`.
 __device__ void outer_bias_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, const int64_t *y, uint64_t y_stride, uint32_t only_unresolved) {
-    __shared__ uint64_t part[8];
     const uint64_t otiles = (rows + blockDim.x - 1) / blockDim.x, walks = ((uint64_t)w.T + OUTER_WALK - 1) / OUTER_WALK;
     for (uint64_t blk = blockIdx.x; blk < otiles * walks; blk += gridDim.x) {
         const uint32_t o = (uint32_t)(blk % otiles) * blockDim.x + threadIdx.x;
         const uint64_t s0 = (blk / otiles) * OUTER_WALK;
         const uint64_t s1 = s0 + OUTER_WALK < w.T ? s0 + OUTER_WALK : w.T;
-        uint64_t ym = 0;
         if (o < rows) {
-            for (uint64_t t = s0; t < s1; t++) {
-                if (only_unresolved && !w.unresolved[t]) {
-                    continue;
-                }
-                const uint64_t m = mag64(y[t * y_stride + o]);
-                ym = m > ym ? m : ym;
-            }
-        }
-        ym = block_max64(ym, part);
-        const bool narrow = (uwide)(s1 - s0) * (uwide)ym < ((uwide)1 << 63);
-        if (o < rows) {
-            int64_t acc = 0;
             wide accw = 0;
             for (uint64_t t = s0; t < s1; t++) {
                 if (only_unresolved && !w.unresolved[t]) {
                     continue;
                 }
-                if (narrow) {
-                    acc += y[t * y_stride + o];
-                } else {
-                    accw += (wide)y[t * y_stride + o];
-                }
+                accw += (wide)y[t * y_stride + o];
             }
-            const wide v = narrow ? (wide)acc : accw;
-            if (v != 0) {
-                add_wide(g + at + o, v);
+            if (accw != 0) {
+                add_wide(g + at + o, accw);
             }
         }
-        __syncthreads();
     }
 }
 
