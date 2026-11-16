@@ -1155,6 +1155,17 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
 #define MAP_TO 64
 #define MAP_TS 64
 #define MAP_KC 32
+// [realization; November 16, the next kernels' source counters] **The tile's staging without bank conflicts.** A chunk is staged with each
+// warp's lanes on eight consecutive terms of four rows (`map_stage`), so the global reads stay whole 64-octet runs, and each staged row is
+// padded by four words, so those 32 lanes fall on 32 distinct banks (`4 kc + s` is distinct for `kc < 8`, `s < 4`). The rows were staged with
+// a warp's lanes on 32 consecutive terms of one row, a row's words 64 apart: one bank, 32 ways, and the store held 0.225 of
+// `field_transposed`'s stall samples. The words staged and the sums over them are the same.
+#define MAP_PAD 4
+__device__ __forceinline__ void map_stage(uint32_t c, uint32_t *kc, uint32_t *row) {
+    const uint32_t g = c >> 5;
+    *kc = (c & 7) + 8 * (g % (MAP_KC / 8));
+    *row = ((c >> 3) & 3) + 4 * (g / (MAP_KC / 8));
+}
 // [realization; G191, November 14] The sites an outer sum's block walks: 64, where 512 left a launch at 35 blocks on average of the card's 80
 // multiprocessors (the engine audit's finding 2). Timed with the forward contact's bound of 6 (below) in three holds on 24 sections, every
 // section line kept: with the card warmed (a hold's first two runs read 10 to 20 ms slow), the pair reads 656 ms a section against 659 for
@@ -1226,8 +1237,8 @@ __device__ __forceinline__ void chunk_max_in(uint64_t a, uint64_t b, unsigned lo
 // chunk), or by the wide form's own reading.
 template <typename X, bool TRANSPOSED, uint32_t RELEASE = MATERIAL_BITS, bool BIAS_AFTER = false, bool ZERO_SKIPPED = false>
 __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved) {
-    __shared__ __align__(16) int32_t as[MAP_KC][MAP_TO];
-    __shared__ __align__(16) int32_t bs[MAP_KC][MAP_TS];
+    __shared__ __align__(16) int32_t as[MAP_KC][MAP_TO + MAP_PAD];
+    __shared__ __align__(16) int32_t bs[MAP_KC][MAP_TS + MAP_PAD];
     __shared__ uint64_t smax[MAP_TS];
     __shared__ unsigned long long cm[2][2];
     const uint32_t outs = TRANSPOSED ? cols : rows, terms = TRANSPOSED ? rows : cols;
@@ -1316,8 +1327,7 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                         kc = c / MAP_TO;
                         o = c % MAP_TO;
                     } else {
-                        o = c / MAP_KC;
-                        kc = c % MAP_KC;
+                        map_stage(c, &kc, &o);
                     }
                     const uint32_t term = k0 + kc, output = o0 + o;
                     const int32_t v = (term < terms && output < outs) ? weight_at(term, output) : 0;
@@ -1326,7 +1336,8 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                     am = g > am ? g : am;
                 }
                 for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TS; c += blockDim.x) {
-                    const uint32_t s = c / MAP_KC, kc = c % MAP_KC;
+                    uint32_t s, kc;
+                    map_stage(c, &kc, &s);
                     const uint64_t t = t0 + s;
                     const int64_t v = (t < w.T && k0 + kc < terms) ? (int64_t)x[t * x_stride + k0 + kc] : 0;
                     bs[kc][s] = (int32_t)v;
@@ -1414,8 +1425,7 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
                         kc = c / MAP_TO;
                         o = c % MAP_TO;
                     } else {
-                        o = c / MAP_KC;
-                        kc = c % MAP_KC;
+                        map_stage(c, &kc, &o);
                     }
                     const uint32_t term = k0 + kc, output = o0 + o;
                     as[kc][o] = (term < terms && output < outs) ? weight_at(term, output) : 0;
