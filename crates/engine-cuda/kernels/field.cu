@@ -2367,8 +2367,14 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // exposure. [realization; G191, November 14] At 8 both spilled under a 64-register bound (778 and 220 spill stores, the engine audit's
 // finding 4); timed with the outer sums' walk of 64 (above), the pair reads about 3 ms a section under 8 and 512 with the card warmed.
 #define CONTACT_MIN_BLOCKS 6
-// The block of `field_spread` (a region a block).
-#define SPREAD_THREADS 256
+// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 672, where 256 gave a
+// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 blocks a launch at 10% issue. 672 threads are 21
+// chunks, and at the kernel's 48 registers two blocks stand on a multiprocessor (2 × 21 warps × 1,536 registers = 64,512 of 65,536), so the
+// 96 regions run in one wave; 1,024 would run them in two (the theory thread's note of 08:51 UTC). The prefix sums are integer sums, so the
+// chunking changes no bit.
+#define SPREAD_THREADS 672
+// The block of `field_sums` (a head and a region a block), its entries' chunks of the region's sites summed, scanned and walked again.
+#define SUMS_THREADS 1024
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
 // (`2^b − 1`, its own probe class beside them).
 #define MAX_CLASS_TRITS 7
@@ -2518,39 +2524,65 @@ extern "C" __global__ void field_classes(FieldWords w) {
 // [definition; agent-inferred, November 1] **The definite words' and values' prefix sums** (the host's
 // `Sums::of`, §14.10), one head and region: `sw[row][x]`, `sv[row][x]` the sums of the definite sites'
 // unit words and framed values before place `t` (`row = region_off[r] + r + t`, a region's `S + 1`
-// rows), `sc[row]` their number. One thread an entry, each over its region's sites in order.
-extern "C" __global__ void field_sums(FieldWords w) {
-    const uint64_t per = 2 * (uint64_t)w.span + 1;
-    const uint64_t threads = (uint64_t)w.H * w.R * per;
+// rows), `sc[row]` their number. [realization; November 16, the profile of lap 56's sections] A block a head and a region, each of its
+// `2S + 1` entries over chunks of the region's sites: a chunk summed, the chunks' sums scanned, each chunk walked again from its offset to
+// the outputs (one thread an entry walked a region's sites in order, 12,480 threads a launch at 5% issue). Integer sums: the chunking
+// changes no bit. Launched with `SUMS_THREADS` threads a block.
+extern "C" __global__ void __launch_bounds__(SUMS_THREADS) field_sums(FieldWords w) {
+    __shared__ wide part[SUMS_THREADS];
+    const uint32_t per = 2 * w.span + 1;
+    const uint32_t nchunk = blockDim.x / per;
+    const uint32_t x = threadIdx.x % per, ck = threadIdx.x / per;
+    const bool live = ck < nchunk;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
-    for (uint64_t u = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; u < threads; u += (uint64_t)gridDim.x * blockDim.x) {
-        const uint32_t x = u % per;
-        const uint64_t hr = u / per;
+    for (uint64_t hr = blockIdx.x; hr < (uint64_t)w.H * w.R; hr += gridDim.x) {
         const uint32_t r = hr % w.R, h = hr / w.R;
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        const uint32_t len = (sites + nchunk - 1) / nchunk;
+        const uint32_t lo = min(sites, ck * len), hi = min(sites, lo + len);
         const uint64_t base = (uint64_t)h * rows1 + first + r;
-        if (x < 2 * w.span) {
-            const uint32_t xx = x % w.span;
-            wide *out = (x < w.span ? w.sw : w.sv) + base * w.span + xx;
-            const int64_t *src = (x < w.span ? w.qf : w.vf) + ((uint64_t)h * w.T + first) * w.span + xx;
-            wide run = 0;
-            out[0] = 0;
-            for (uint32_t t = 0; t < sites; t++) {
+        const bool word = x < 2 * w.span;
+        const uint32_t xx = x % w.span;
+        const int64_t *src = word ? (x < w.span ? w.qf : w.vf) + ((uint64_t)h * w.T + first) * w.span + xx : nullptr;
+        wide sum = 0;
+        if (live) {
+            for (uint32_t t = lo; t < hi; t++) {
                 if (definite_site(w, first + t)) {
-                    run += (wide)src[(uint64_t)t * w.span];
+                    sum += word ? (wide)src[(uint64_t)t * w.span] : (wide)1;
                 }
-                out[(uint64_t)(t + 1) * w.span] = run;
             }
-        } else {
-            uint64_t *out = w.sc + base;
-            uint64_t run = 0;
-            out[0] = 0;
-            for (uint32_t t = 0; t < sites; t++) {
-                run += definite_site(w, first + t) ? 1 : 0;
-                out[t + 1] = run;
+            part[threadIdx.x] = sum;
+        }
+        __syncthreads();
+        if (live) {
+            wide run = 0;
+            for (uint32_t c = 0; c < ck; c++) {
+                run += part[c * per + x];
+            }
+            if (word) {
+                wide *out = (x < w.span ? w.sw : w.sv) + base * w.span + xx;
+                if (ck == 0) {
+                    out[0] = 0;
+                }
+                for (uint32_t t = lo; t < hi; t++) {
+                    if (definite_site(w, first + t)) {
+                        run += (wide)src[(uint64_t)t * w.span];
+                    }
+                    out[(uint64_t)(t + 1) * w.span] = run;
+                }
+            } else {
+                uint64_t *out = w.sc + base;
+                if (ck == 0) {
+                    out[0] = 0;
+                }
+                for (uint32_t t = lo; t < hi; t++) {
+                    run += definite_site(w, first + t) ? 1 : 0;
+                    out[t + 1] = (uint64_t)run;
+                }
             }
         }
+        __syncthreads();
     }
 }
 
@@ -5437,12 +5469,16 @@ extern "C" __global__ void __launch_bounds__(BLANK_SCAN_THREADS) field_blank_liv
     }
 }
 
-// [realization; November 16, the theory thread's 08:01 UTC note] The live sites a thread of a blank's outer sums walks: as few as let
-// `entries` threads a tile cover the `n` live sites in about `want` threads, the entry's resident threads on the card (its multiprocessors
-// times the blocks of the entry each holds, as the driver reads its occupancy), so the launch fills the card once and each thread's walk is as short as that allows. Each term is released before it
-// enters the sum, and the partials meet in integer adds, so the tile changes no bit.
+// [realization; November 16, the theory thread's 08:01 UTC note] The live sites a thread of a blank's outer sums walks. The tiles are as
+// many as `entries` threads a tile fit in `want`, the entry's resident threads on the card (its multiprocessors times the blocks of the
+// entry each holds, as the driver reads its occupancy), and the tile covers the `n` live sites in that many: so every thread walks one
+// tile and the launch stands one tile long. [realization; November 16, 08:50 UTC] The tile was first the fewest sites that let the cells
+// cover `want`, and the ceiling on the tiles then put up to `entries − 1` cells past `want`, whose threads walked a second, shorter tile
+// while the rest had finished (warps active 58 to 60% where 40 of 48 stand). Each term is released before it enters the sum, and the
+// partials meet in integer adds, so the tile changes no bit.
 __device__ __forceinline__ uint64_t blank_live_tile(uint64_t entries, uint64_t n, uint64_t want) {
-    const uint64_t tile = (entries * n + want - 1) / (want > 0 ? want : 1);
+    const uint64_t tiles = entries > 0 && want / entries > 0 ? want / entries : 1;
+    const uint64_t tile = (n + tiles - 1) / tiles;
     return tile > 0 ? tile : 1;
 }
 

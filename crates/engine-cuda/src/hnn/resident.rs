@@ -23,6 +23,10 @@ pub(crate) const IMAGE: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/field.
 pub(crate) const THREADS: u32 = 256;
 /// [realization; November 15] The sites a thread of the open places' per-entry sums walks (the kernels' `BLANK_TILE`).
 pub(crate) const BLANK_TILE: u64 = 512;
+/// [realization; November 16] The blocks of `field_spread` (a region a block) and `field_sums` (a head and a region a block), the kernels'
+/// `SPREAD_THREADS` and `SUMS_THREADS`.
+pub(crate) const SPREAD_THREADS: u32 = 672;
+pub(crate) const SUMS_THREADS: u32 = 1024;
 /// [realization; November 16] The block of `field_blank_live_scan`, one block a batch (the kernel's `BLANK_SCAN_THREADS`).
 pub(crate) const BLANK_SCAN_THREADS: u32 = 1024;
 /// [realization; November 15] The block of `field_paces`, whose clocks are block scans (the kernel's `PACE_SCAN_THREADS`).
