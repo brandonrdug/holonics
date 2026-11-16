@@ -877,3 +877,46 @@ UTC); `agent-inferred` for the reading of them.
   registers it takes, here 96 regions on 160 slots; for the sums the same reading keeps the build's block: one wave
   of 192 needs three blocks a multiprocessor, at most 10 warps a block at 64 registers, so 4 chunks and about 53 site
   steps a walk, against three waves of 14 (about 42) at 1,024.
+- **The region scan, scored** (the build thread, relayed 09:26 UTC; #896, receipts
+  `research/records/receipts/2026-11-16_regionscan/`). Gate 3 equal. A clean hold: control 500.1 ms a section (spread
+  0.6), the build 496.0, 0.992 (4.1 ms; pairs 3.5 to 4.6), against the build's 0.973 to 0.983, a miss on the side of less
+  saved. The sums 5.00 to 2.17 ms a section (0.43, inside 0.25 to 0.50), 259 to 82 µs a launch, issue 5.5% to 29%, warps
+  active 8.5% to 66.5%. The spread 0.85 a section by the profile and 0.64 a launch by Nsight Compute, against 0.30 to
+  0.55, and my reading of 08:50 missed with it: the register file stands in four quarters of 16,384, one a scheduler, so
+  at 48 registers a quarter holds 10 warps and a multiprocessor 40, not the 42 that 65,536 over 1,536 gives, and two
+  blocks of 21 warps (42) do not fit; one block of 672 stood, two waves of 21 chunks. Two blocks need 20 warps or fewer
+  each (640 threads, 20 chunks), three 13 or fewer. The blank walks with one tile a thread: the bias and encoding 828 to
+  780 µs a launch (0.94), the lift and read 447 to 444 (0.99), warps active 57% and 56%, against 0.60 to 0.75 and 72 to
+  83%: the 08:46 guess missed, and by its own test the tail is not the tiles' ceiling; with 93% of the threads holding
+  equal tiles, the warps average 27 of 48, so something holds blocks unevenly, which the next counters (warps active a
+  scheduler, waves a multiprocessor) read. Two lessons (`agent-inferred`): an occupancy is read from the kernel's
+  limiter or computed by the quarter's floor, `4⌊16,384 / 32r⌋` warps at `r` registers, never from the whole file; and
+  the profile times a launch between two host synchronizations (`launch_grid` in `hnn/resident.rs`), so each launch's
+  entry carries about 30 µs of the ruler's own (the spread's 96 launches read 75 µs a launch against 44 of kernel), which
+  the timed path, queued on one stream, does not pay; an entry of many short launches is scored by the counters a launch
+  and by the hold, never by the profile's sum. Guess, fixed at 09:29 UTC, for the spread at 640 threads (two blocks a
+  multiprocessor, one wave of 20 chunks): gate 3 equal; 0.40 to 0.55 of #892's time a launch by Nsight Compute, and 0.60
+  to 0.85 of #896's; about 1 to 2 ms a section, under a hold's resolution.
+- **The outer sum takes its rows' bias** (the build thread, relayed 09:29 and 09:32 UTC). The 192 launches a section of
+  the bias alone (4,608 over 24 sections) fold into the first column block of the outer sum's tiles: the narrow form
+  sums `Σ_t y_t` from the words it has staged, the wide form over the walk on 128 bits. The build's guess, 09:35: gate 3
+  equal, the outer launches 1.00 to 1.05 of their time by Nsight Compute, a section 0.990 to 0.997 (1.5 to 5 ms). ptxas
+  then put `field_outer_x32` at the (256, 2) bound's 128 registers with 12 octets of spill stores (126 and none on #883),
+  `field_outer_x64` at 128 with none. Read against `main`'s source (the fused form is not yet pushed), four conditions
+  on the bits, each one gate 3 reads only where the line's declaration exercises it: the bias's narrow partial needs no
+  bound of its own, since the narrow proof holds every chunk's `cy` under `2^31` and the walk is clamped to 512
+  (`outer_grid` in `hnn/contact.rs`), so `|Σy| < 2^40` on 64 bits whatever `x` holds (my first reading, that the
+  products' bound covers the bias only where `xmax ≥ 1`, missed the per-chunk test); the narrow form gives up mid-walk
+  and the wide form begins again from the walk's start, so the bias's narrow partial goes in only where the walk ends
+  narrow, beside the products' partials, or the chunks before the break count twice; the 16 threads of a row group share
+  its four rows, so one of them sums the bias; and each bias launch had an outer partner on the same `y`, stride, rows
+  and unresolved flag, with at least one column, or its bias is dropped. The profile's 26 to 40 µs a bias launch is the
+  ruler's window (a launch and a synchronization's return, above), so the hold can save only the kernel's own time and
+  the stream's gap between launches, read first by Nsight Compute on the old launches. A spill's count is static; where
+  its reloads stand decides its cost (once a chunk in the fetch, nothing; once a step in the inner loop, a cost), read by
+  the local loads and stores. A lead, no guess until built (`agent-inferred`): the bias is the outer sum against the
+  constant one, the classical augmented input, so a padding column (`i = cols` where `cols` is not a multiple of the
+  tile's 64) staged as 1 holds `Σy` in its product partial at no register, its bound carried by `cx ≥ 1`, and only its
+  wide add goes to the bias's entry. Guess, fixed at 09:32 UTC: gate 3 equal; a section 0.995 to 0.999 of its control
+  (0.5 to 3 ms, centre 1.5 ms), near a hold's resolution; `field_outer_x64` 1.00 to 1.03 and `field_outer_x32` 1.00
+  to 1.04 by Nsight Compute, local traffic under 1% of the kernel's L1 sectors.
