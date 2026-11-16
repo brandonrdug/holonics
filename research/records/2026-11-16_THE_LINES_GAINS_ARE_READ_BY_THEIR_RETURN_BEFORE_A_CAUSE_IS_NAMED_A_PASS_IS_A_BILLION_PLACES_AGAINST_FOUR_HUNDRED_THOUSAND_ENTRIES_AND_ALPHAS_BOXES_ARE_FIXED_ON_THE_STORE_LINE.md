@@ -221,7 +221,7 @@ and the next reads stand there, in this order:
 3. The release's heat as a store, charged by its own news and leaking, so that the draft cools as it settles with no
    temperature set by hand (the heat record §6 and §8).
 
-## 11. The writer's test, scored (18:10 UTC; the build's reads, `receipts/2026-11-16_writerefine/`)
+## 11. The writer's test, scored (18:00 UTC; the build's reads, `receipts/2026-11-16_writerefine/`)
 
 The build scored the four guesses on lap 69's end state, 20 problems:
 

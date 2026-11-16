@@ -167,7 +167,7 @@ digit's carry state. The passage carries TinyGSM beside the symbol slice, so tha
 The partials are read later, at the composite level (the unit as a composed shape, November 15). Their guess is fixed
 when that level's units are built.
 
-## 8. The comparison's heat and the tug-of-war's price (Codex's note, read 18:00 UTC)
+## 8. The comparison's heat and the tug-of-war's price (Codex's note, read before 18:00 UTC)
 
 Codex sent a research note on November 16, kept outside the repository: Brandon had asked it for an independent pass on
 codecs, ciphers, heat and propagation. Read against this record, the note confirms one placement, adds two theorems and
@@ -226,7 +226,7 @@ word is anchored, both carry the same news at the answer. Codex's controls sharp
   that reads word shapes still receives part of the operator through them. On lap 69's read, before any arithmetic,
   the value after the words coded 0.51 bits a place above the value after the foil on met rows. On far rows the two
   agreed (`receipts/2026-11-16_arithworld/`).
-- **Two forms are added.** They were sent to the build at 18:03 UTC, before lap 71's read, and the change is to the forms
+- **Two forms are added.** They were sent to the build before 18:00 UTC (the message stamped them 18:03, a time not read from the clock), before lap 71's read, and the change is to the forms
   table only:
   - a null foil: the same lengths, in letters the operator word and `equals` lack, drawn by the world's key;
   - swapped words: another operator's word before this operator's value (`a times b equals` before a + b's value).
