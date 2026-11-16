@@ -1,0 +1,36 @@
+== reuse build (the line binary from lap 47): field_contact_rows and field_contact_columns, the first four launches on 2 of lap 47's sections
+kernel                                                                                      field_contact_rows field_contact_columns field_contact_rows field_contact_columns
+gpu__time_duration.sum                                                             ms       1.303680 0.866976 1.152704 0.726720
+launch__occupancy_limit_registers                                                  block    4.000000 7.000000 4.000000 7.000000
+launch__registers_per_thread                                                       register/thread 128 72 128 72
+sm__inst_executed_pipe_alu.avg.pct_of_peak_sustained_active                        %        37.954228 35.352760 39.412205 35.671254
+sm__inst_executed_pipe_fma.avg.pct_of_peak_sustained_active                        %        14.226749 22.613681 14.364021 22.599359
+sm__inst_executed_pipe_lsu.avg.pct_of_peak_sustained_active                        %        13.744271 14.235783 14.056645 14.331339
+sm__inst_executed_pipe_xu.avg.pct_of_peak_sustained_active                         %        4.647313 0.531528 4.503119 0.672527
+sm__warps_active.avg.pct_of_peak_sustained_active                                  %        28.153560 42.012262 28.256428 41.469478
+smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio           inst     3.117473 4.364376 2.957131 3.969852
+smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio        inst     0.381264 0.973029 0.399325 1.035866
+smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio            inst     0.379113 0.214302 0.376163 0.219814
+smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio              inst     0.414411 0.879364 0.433043 0.915746
+smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio          inst     0.357004 0.018496 0.331961 0.023269
+smsp__average_warps_issue_stalled_wait_per_issue_active.ratio                      inst     1.923984 2.234632 1.903550 2.225699
+smsp__inst_executed.sum                                                            inst     363197536.000000 272159612.000000 328182446.000000 216502387.000000
+smsp__issue_active.avg.pct_of_peak_sustained_active                                %        40.034048 49.058622 40.969575 48.080906
+== return build: field_contact_rows and field_contact_columns, the first four launches on 2 of lap 47's sections
+kernel                                                                                      field_contact_rows field_contact_columns field_contact_rows field_contact_columns
+gpu__time_duration.sum                                                             ms       1.224800 0.803872 1.078208 0.670784
+launch__occupancy_limit_registers                                                  block    4.000000 7.000000 4.000000 7.000000
+launch__registers_per_thread                                                       register/thread 128 72 128 72
+sm__inst_executed_pipe_alu.avg.pct_of_peak_sustained_active                        %        37.408562 47.997862 39.257977 47.379234
+sm__inst_executed_pipe_fma.avg.pct_of_peak_sustained_active                        %        13.558199 19.339274 13.854463 18.964310
+sm__inst_executed_pipe_lsu.avg.pct_of_peak_sustained_active                        %        14.782301 15.687805 15.170579 15.473668
+sm__inst_executed_pipe_xu.avg.pct_of_peak_sustained_active                         %        1.468326 0.502033 1.664305 0.622961
+sm__warps_active.avg.pct_of_peak_sustained_active                                  %        28.519890 42.150044 28.690854 41.592332
+smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio           inst     3.778615 3.757204 3.524061 4.069378
+smsp__average_warps_issue_stalled_math_pipe_throttle_per_issue_active.ratio        inst     0.368642 0.873584 0.385280 0.866343
+smsp__average_warps_issue_stalled_no_instruction_per_issue_active.ratio            inst     0.375524 0.250354 0.367799 0.256605
+smsp__average_warps_issue_stalled_not_selected_per_issue_active.ratio              inst     0.391244 0.898400 0.411313 0.984157
+smsp__average_warps_issue_stalled_short_scoreboard_per_issue_active.ratio          inst     0.264998 0.017400 0.247041 0.021889
+smsp__average_warps_issue_stalled_wait_per_issue_active.ratio                      inst     1.842167 2.088939 1.835769 2.082441
+smsp__inst_executed.sum                                                            inst     332076921.000000 266755663.000000 302976525.000000 212041403.000000
+smsp__issue_active.avg.pct_of_peak_sustained_active                                %        38.665256 51.748074 40.038407 51.295602
