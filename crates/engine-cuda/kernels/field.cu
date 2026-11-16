@@ -4608,17 +4608,7 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 // (`REV_ROWS · 16 · S` words of 32 bits, `rows_words` below) by asynchronous copies, each lane the entries it then reads, and waited for once:
 // the sixteen staged pairs' words, which the inner loop read one by one behind each load, now stand in flight together with no register held
 // for them. The word is read on 32 bits as `mul32` reads it, so the products are the same.
-// [realization; November 16, the theory thread's lever of 11:33 UTC] **The rows in two launches** (`field_contact_rows_a`, `field_contact_rows_b`):
-// pass A forms the pairs' covectors `dpr` (in the region block, as before), the crowds' `dpc` and the row's mean, the mean and `dpc` written to
-// `rmean[g]` and `rdpc[g · slots + lane]`; pass B reads them back and forms `δs`, the probe role and the crowds' returns. The mean and `dpc` are
-// integers written once and read once, so the bits are the one-launch form's; each launch holds only its own pass's state. Pass A stands six
-// blocks a multiprocessor at 80 registers with no spill (eight would hold 64 with 56 octets of spill stores); pass B four at 128 with no spill
-// (five held 96 with 76, and its 20,128 octets of static shared memory and the staged words cap it at four in any case), where the one launch
-// stood four at 128 with 28 octets of spill stores and 52 of loads.
-#define ROWS_A 1
-#define ROWS_B 2
-template <int PASS>
-__device__ __forceinline__ void contact_rows_pass(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq, wide *rmean, wide *rdpc) {
+extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
     extern __shared__ __align__(16) int32_t rows_words[];
     __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
@@ -4641,9 +4631,6 @@ __device__ __forceinline__ void contact_rows_pass(FieldWords w, uint32_t h, cons
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
         if (skipped_row(w, g)) {
-            if (PASS == ROWS_A) {
-                continue;
-            }
             if (lane < S) {
                 const uint32_t mc = h * n + lane % n;
                 const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
@@ -4727,15 +4714,11 @@ __device__ __forceinline__ void contact_rows_pass(FieldWords w, uint32_t h, cons
             crlv[warp][lane] = lv;
             if (count != 0) {
                 cdiv[warp][lane] = divisor_of(count);
-                if (PASS == ROWS_B) {
-                    cdiv2[warp][lane] = divisor_of(count * count);
-                }
+                cdiv2[warp][lane] = divisor_of(count * count);
             }
         }
         __syncwarp();
         // Pass A: the weighted sum of the pairs' and crowds' covectors.
-        wide mean = 0;
-        if (PASS == ROWS_A) {
         wide weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
             const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
@@ -4755,21 +4738,10 @@ __device__ __forceinline__ void contact_rows_pass(FieldWords w, uint32_t h, cons
                 sum += (wide)dyi[x] * crowd_carried_wide_hs(w, hs, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
             }
             const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
-            rdpc[g * w.slots + lane] = dpc;
+            dpcs[warp][lane] = dpc;
             weighted += (wide)w.ce[hg * w.slots + lane] * dpc;
         }
-        mean = rel(warp_sum(weighted), SHARE_BITS);
-        if (lane == 0) {
-            rmean[g] = mean;
-        }
-        __syncwarp();
-        continue;
-        }
-        // Pass B reads the mean and the crowds' covectors pass A wrote.
-        mean = rmean[g];
-        if (cnts[warp][lane] != 0) {
-            dpcs[warp][lane] = rdpc[g * w.slots + lane];
-        }
+        const wide mean = rel(warp_sum(weighted), SHARE_BITS);
         // The comparison of a term `p` (its covector `dpk`): the face's.
         const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * rel(p * (dpk - mean), SHARE_BITS), MOVE_BITS); };
         // Pass B: δs over the pairs, in chunks of 32 into the warp's shared chunk, whose sum over the word is
@@ -4904,14 +4876,6 @@ __device__ __forceinline__ void contact_rows_pass(FieldWords w, uint32_t h, cons
         }
         __syncwarp();
     }
-}
-
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_contact_rows_a(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq, wide *rmean, wide *rdpc) {
-    contact_rows_pass<ROWS_A>(w, h, dyh, ds, dq, rmean, rdpc);
-}
-
-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_rows_b(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq, wide *rmean, wide *rdpc) {
-    contact_rows_pass<ROWS_B>(w, h, dyh, ds, dq, rmean, rdpc);
 }
 
 // [definition; agent-inferred, November 1] **The word's column return and the values' over one head**
