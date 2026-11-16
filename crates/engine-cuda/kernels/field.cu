@@ -3137,6 +3137,20 @@ __device__ __forceinline__ wide parts_sum(wide v, uint32_t span, uint32_t parts)
     return (wide)u;
 }
 
+// A part's lanes' partials summed over the span's entries (lanes `p span .. p span + span - 1`), every lane of the part holding the sum:
+// a tree within the part where the span divides the warp, else the warp's sum (one part, its idle lanes holding zero). Every lane of the
+// warp calls it.
+__device__ __forceinline__ wide entries_sum(wide v, uint32_t span, uint32_t parts) {
+    if (parts == 1) {
+        return warp_sum(v);
+    }
+    uwide u = (uwide)v;
+    for (uint32_t o = 1; o < span; o <<= 1) {
+        u += shfl_wide(u, (int)o);
+    }
+    return (wide)u;
+}
+
 
 // -------------------------------------------------------------------------------------------
 // the exposure and the contact
@@ -4744,13 +4758,30 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             dpr[j] = dpj;
             weighted += p * dpj;
         }
-        if (cnts[warp][lane] != 0) {
-            const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
-            wide sum = 0;
-            for (uint32_t x = 0; x < S; x++) {
-                sum += (wide)dyi[x] * crowd_carried_wide_hs(w, hs, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
+        // [realization; November 16, the rows' source counters and the theory thread's reading of 13:37 UTC] The crowds' sums with a part's
+        // lanes over the span's entries of one crowd at a time, as the crowds' returns read them: a crowd's two summed rows are read whole
+        // (an entry a lane, 16 octets each), each lane's term carries its one `δỹ_i` entry, and the part's lanes add their terms by a tree.
+        // Before, a lane was a crowd and walked the span, so each load took one entry of each of 32 crowds' rows, half of each sector, and
+        // the line held 0.050 of the rows' stall samples with 45% of its L2 sectors in excess. A ring sum in any bracketing: the same bits.
+        // The crowd's sum is staged in `dpcs`, where its lane then divides it.
+        {
+            const int64_t dye = dyi[entry];
+            for (uint32_t c0 = 0; c0 < nslots; c0 += parts) {
+                const uint32_t jj = c0 + part;
+                wide term = 0;
+                if (active && jj < nslots && cnts[warp][jj] != 0) {
+                    const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
+                    term = (wide)dye * crowd_carried_wide_hs(w, hs, m, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
+                }
+                term = entries_sum(term, S, parts);
+                if (active && entry == 0 && jj < nslots) {
+                    dpcs[warp][jj] = term;
+                }
             }
-            const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
+            __syncwarp();
+        }
+        if (cnts[warp][lane] != 0) {
+            const wide dpc = div_nearest_by(dpcs[warp][lane], cdiv[warp][lane]);
             dpcs[warp][lane] = dpc;
             weighted += (wide)w.ce[hg * w.slots + lane] * dpc;
         }
