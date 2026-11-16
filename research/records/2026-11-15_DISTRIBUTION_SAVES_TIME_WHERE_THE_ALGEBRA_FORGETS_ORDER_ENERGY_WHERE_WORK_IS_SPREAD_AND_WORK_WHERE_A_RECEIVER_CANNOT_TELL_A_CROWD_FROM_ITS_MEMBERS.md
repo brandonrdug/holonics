@@ -1046,3 +1046,19 @@ UTC); `agent-inferred` for the reading of them.
   top word may wrap, since `2^64 · 2^64` is the ring's modulus, and the lower two take 32-bit terms, so they hold without
   wrap below `2^32` adds, more than a region's rows. Its price is the spread's two walks reading 1.5 times the octets of
   the difference arrays, scored from the next hold's low-word share and the spread's share of loads before it is built.
+- **The batched atomics, scored, and the crowds' sums** (the build thread, relayed 13:36 UTC; #909, receipts
+  `research/records/receipts/2026-11-16_rowsatomics/`). Gate 3 equal. The low word's wait fell from 0.089 of the rows'
+  samples to 0.034 (the high words' 0.031, the crowd's first 0.020 and the next three 0.008: one round trip a crowd), the
+  samples 222,453 to 215,494 on 0.5% more instructions; the rows 0.971 to 0.984 a launch; the hold 0.998 (1.0 ms a
+  section), resolved against a control's spread of 0.5. My 13:02 guess held on all three (the share 0.030 to 0.045, the
+  rows 0.965 to 0.985, a section 0.995 to 0.999), the build's too, its section at its edge. The build's conversion: 0.055
+  of the samples bought about 2% of the rows, so a share of the samples is worth about 0.35 of itself in time here;
+  scored on it, the carry-save lead of 13:02 would buy about 1% of the rows (0.6 ms a section) against the spread's
+  reads at 1.5 times the octets, and waits for the spread's share of loads. The crowds' sums (0.050 of the samples, 45%
+  excess second-level sectors) read, in the source, a crowd slot a lane walking the span's entries in turn, each step a
+  16-octet word from 32 crowds' rows, half of each sector, with about 14 lanes live and the current's entry loaded each
+  step. The kernel's crowd returns already hold the layout that reads those rows whole (a lane an entry and a part of
+  the crowds, 256 octets a row in eight sectors), and a sum over the entries is a reduction of four shuffle steps of a
+  wide word, an integer sum in the ring, so no bit moves. Guess, fixed at 13:37 UTC, for the sums on that layout: gate 3
+  equal; their share 0.050 to 0.015 to 0.030 of the samples, the excess sectors under 10%; the rows 0.985 to 0.995 a
+  launch; a section 0.998 to 1.000, likely inside a hold's resolution.
