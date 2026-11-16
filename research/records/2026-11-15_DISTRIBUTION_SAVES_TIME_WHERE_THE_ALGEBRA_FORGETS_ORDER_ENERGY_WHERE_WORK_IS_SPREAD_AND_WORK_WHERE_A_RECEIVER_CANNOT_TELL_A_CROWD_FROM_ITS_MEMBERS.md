@@ -726,3 +726,19 @@ UTC); `agent-inferred` for the reading of them.
   on the pair's grid" (`field_pair_gamma`, `field_pair_gate_back`). The scans hold 24.3 ms a section; a guess is fixed
   when the split is built. A second stream (the triads' affine map beside the forward scan, the triads' outer, a leaf
   of the return, beside the reverse) waits until then, since the split changes what the scans leave idle.
+- **The scans split, and the guess** (the build thread, relayed 05:45 UTC; `claude/scan-split` on the outer build). The
+  forward scan carries `Q` alone and reads its step's `γ` and drive a step ahead; `field_pair_scan_face`, on the pair's
+  grid, forms `pc` from `pqm` after it. `field_pair_scan_pre`, on the grid, forms `δa` and `h` (held on 128 bits) before
+  the reverse, which carries `u` alone and reads `h` and `γ` a step ahead; the gate's return forms `δγ` from `db` and
+  `pqm` and writes it before anything in it can refuse, so a refused cell holds what it held. Read against the source:
+  `pqm` holds the carried `Q` (a fitted word fitted again is itself), and `db` the carried `u`, so each term moved off the
+  chain reads the operands it read on it; the gate's return reads `u` from `db` before `δb` takes its place, cell by
+  cell. Registers 62 and 78 on the scans, 40 and 38 on the grid's passes, 66 on the gate's return, no spills. Guess,
+  fixed at 05:48 UTC (`agent-inferred`), in the hold after lap 53 against the outer build, the card alone: gate 3 equal;
+  the forward scan 0.50 to 0.75 a launch over all its launches and the reverse 0.30 to 0.55 (half and three quarters of
+  their products leave the chain, at 26% and 39% issue on fewer than one warp a scheduler, where a lone warp's time
+  follows its instructions); the grid's passes with the moved `δγ` add 0.03 to 0.10 of the old scans' time; 7 to 13.5 ms
+  a section saved in all, a section 0.975 to 0.987 of control in a balanced hold whose control spreads under 3 ms. One
+  step ahead hides a load only behind one step of arithmetic, which the split has shortened; if the scans' stalls in the
+  hold's counters stand mostly on the long scoreboard, the step waits on its load, the reads come in at the top of the
+  ranges or above, and the next build reads several steps ahead in the registers the scans have free.
