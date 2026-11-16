@@ -1,0 +1,64 @@
+kernel: 1099899328 warp instructions executed, 294740 stall samples
+lines 6489-6635 (the kernel body): instr 0.334 samples 0.401
+functions outside the body, by samples:
+  mul_fits_w64                       instr  0.157 samples  0.083
+  skin_word                          instr  0.008 samples  0.072
+  mul64_128                          instr  0.037 samples  0.060
+  pair_skin_word                     instr  0.008 samples  0.058
+  skin_back_proved                   instr  0.098 samples  0.058
+  rel                                instr  0.093 samples  0.055
+  mulu64                             instr  0.104 samples  0.046
+  divide_word                        instr  0.055 samples  0.030
+  (other files)                      instr  0.010 samples  0.020
+  divisor_of                         instr  0.024 samples  0.019
+  support_at                         instr  0.005 samples  0.017
+  crowd_skin_word                    instr  0.003 samples  0.017
+  add_wide                           instr  0.003 samples  0.014
+  row_prepare                        instr  0.004 samples  0.012
+  divide_by                          instr  0.019 samples  0.009
+  narrow31                           instr  0.011 samples  0.006
+  div_nearest_by                     instr  0.015 samples  0.005
+  div_nearest                        instr  0.003 samples  0.003
+  turn_rate_dev                      instr  0.002 samples  0.003
+  paced_index                        instr  0.002 samples  0.003
+  crowd_at                           instr  0.001 samples  0.002
+  support_row                        instr  0.001 samples  0.002
+  crowd_slots                        instr  0.001 samples  0.002
+  definite_site                      instr  0.000 samples  0.001
+  warp_sum                           instr  0.001 samples  0.001
+  paced_hs                           instr  0.001 samples  0.001
+  skipped_row                        instr  0.000 samples  0.001
+  shfl_wide                          instr  0.001 samples  0.000
+  octave_edge                        instr  0.000 samples  0.000
+  head_skin                          instr  0.000 samples  0.000
+the body's lines, by samples (top 30):
+   6560 instr  0.077 samples  0.090  const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], 
+   6568 instr  0.018 samples  0.054  const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], ki);
+   6598 instr  0.018 samples  0.039  const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(ui
+   6605 instr  0.007 samples  0.021  const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * S + l], mi = swp[(ui
+   6600 instr  0.018 samples  0.018  if (!mul_fits_w64(mag64(dyi[l]), dyi[l] < 0, vr, &x) || !mul_fits_w64(mag64(dyi[n + l]), d
+   6513 instr  0.002 samples  0.016  for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (u
+   6558 instr  0.005 samples  0.013  const wide dec = pg ? pair_skin_word(w, p, srow + k, l) : decay_hs(w, hs, l, gap);
+   6618 instr  0.003 samples  0.013  if (!mul_fits_w64(mag64(w.cds[hg * w.slots + lane]), w.cds[hg * w.slots + lane] < 0, brack
+   6549 instr  0.005 samples  0.011  const wide sgn = sigma[g] > sigma[gj] ? 1 : sigma[g] < sigma[gj] ? -1 : 0;
+   6575 instr  0.012 samples  0.009  lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
+   6502 instr  0.007 samples  0.009  const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+   6577 instr  0.022 samples  0.009  own -= sgn * at;
+   6572 instr  0.010 samples  0.007  if (!mul_fits_w64(mag64(dsr[j]), dsr[j] < 0, bracket, &lock)) {
+   6570 instr  0.026 samples  0.007  const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec)
+   6611 instr  0.001 samples  0.007  const int64_t pairing = mul32(wi[l], mr32) + mul32(wi[n + l], mi32);
+   6576 instr  0.007 samples  0.005  at = skin_back_proved(turn_b[l], dec, value + lock);
+   6610 instr  0.006 samples  0.004  if (narrow31(mr, &mr32) & narrow31(mi, &mi32)) {
+   6597 instr  0.001 samples  0.004  const wide dec = pg ? crowd_skin_word(w, p, g, lv, right, l) : decay_hs(w, hs, l, (uint32_
+   6512 instr  0.001 samples  0.004  const uint64_t rows1 = (uint64_t)w.T + w.R;
+   6521 instr  0.000 samples  0.003  const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+   6586 instr  0.006 samples  0.003  const bool right = lo > i;
+   6585 instr  0.001 samples  0.003  const uint64_t count = scp[hi_ + 1] - scp[lo];
+   6613 instr  0.010 samples  0.003  bracket = div_nearest_by((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128
+   6623 instr  0.007 samples  0.003  own -= sgn * at;
+   6557 instr  0.005 samples  0.003  for (uint32_t l = 0; l < n; l++) {
+   6567 instr  0.007 samples  0.003  const int64_t kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
+   6621 instr  0.004 samples  0.003  lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
+   6588 instr  0.002 samples  0.002  const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
+   6514 instr  0.004 samples  0.002  const uint64_t hg = (uint64_t)h * w.T + g;
+   6603 instr  0.004 samples  0.002  value = div_nearest_by(rel(value, SHARE_BITS), qc);

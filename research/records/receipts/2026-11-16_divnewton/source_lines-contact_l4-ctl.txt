@@ -1,0 +1,93 @@
+kernel: 3083313997 warp instructions executed, 801212 stall samples
+lines 3370-3716 (the kernel body): instr 0.407 samples 0.330
+functions outside the body, by samples:
+  pair_skin_word                     instr  0.024 samples  0.101
+  skin_word                          instr  0.003 samples  0.098
+  support_at                         instr  0.015 samples  0.039
+  (other files)                      instr  0.018 samples  0.031
+  wide_bits                          instr  0.040 samples  0.030
+  crowd_base                         instr  0.024 samples  0.028
+  carry_d                            instr  0.047 samples  0.026
+  below_one_face                     instr  0.030 samples  0.023
+  lock_of                            instr  0.039 samples  0.023
+  term_of                            instr  0.003 samples  0.022
+  mul_fits                           instr  0.029 samples  0.022
+  big_shl                            instr  0.055 samples  0.022
+  paced_at                           instr  0.007 samples  0.020
+  crowd_skin_word                    instr  0.007 samples  0.020
+  row_prepare                        instr  0.008 samples  0.017
+  big_add                            instr  0.029 samples  0.017
+  paced_index                        instr  0.010 samples  0.010
+  div_nearest                        instr  0.019 samples  0.009
+  rowdiv_nearest                     instr  0.014 samples  0.008
+  temper_of                          instr  0.012 samples  0.008
+  big_mul                            instr  0.017 samples  0.007
+  divisor_of                         instr  0.012 samples  0.007
+  add_window_at                      instr  0.005 samples  0.007
+  frame_of                           instr  0.002 samples  0.006
+  big_mul_limb                       instr  0.013 samples  0.005
+  divide_word                        instr  0.011 samples  0.005
+  add_fits                           instr  0.010 samples  0.005
+  big_sub                            instr  0.011 samples  0.004
+  bit_length                         instr  0.012 samples  0.004
+  support_row                        instr  0.002 samples  0.004
+  big_bits                           instr  0.009 samples  0.004
+  crowd_slots                        instr  0.003 samples  0.003
+  crowd_carried_wide_ij              instr  0.006 samples  0.003
+  add_window                         instr  0.008 samples  0.003
+  rel                                instr  0.006 samples  0.003
+  crowd_skin_ij                      instr  0.003 samples  0.003
+  crowd_at                           instr  0.002 samples  0.003
+  sub_fits                           instr  0.003 samples  0.002
+  skinless                           instr  0.003 samples  0.002
+  scored                             instr  0.001 samples  0.002
+  crowd_skin_raw                     instr  0.002 samples  0.002
+  span_parts                         instr  0.002 samples  0.002
+  still_head                         instr  0.001 samples  0.001
+  fit64                              instr  0.002 samples  0.001
+  definite_site                      instr  0.000 samples  0.001
+  warp_sum_u64                       instr  0.001 samples  0.001
+  big_add_small                      instr  0.002 samples  0.001
+  depth_head                         instr  0.002 samples  0.001
+  contact_body                       instr  0.000 samples  0.001
+  skipped_row                        instr  0.000 samples  0.001
+  big_shr1                           instr  0.002 samples  0.001
+  coef_of                            instr  0.001 samples  0.000
+  big_negate                         instr  0.001 samples  0.000
+  shfl_big                           instr  0.001 samples  0.000
+  crowd_slot_of                      instr  0.000 samples  0.000
+  rowdiv_of                          instr  0.001 samples  0.000
+  crowd_score                        instr  0.000 samples  0.000
+  decay_of                           instr  0.000 samples  0.000
+  carried_s                          instr  0.000 samples  0.000
+the body's lines, by samples (top 30):
+   3464 instr  0.030 samples  0.029  const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)pair_skin_word(w, ph, srow +
+   3465 instr  0.003 samples  0.021  const bool neg = v < 0;
+   3462 instr  0.017 samples  0.019  const int64_t raw = values[(uint64_t)j * S + entry];
+   3477 instr  0.050 samples  0.015  if (q != cq) {
+   3527 instr  0.008 samples  0.014  const wide v = crowd_carried_wide_ij(w, h, m, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S +
+   3461 instr  0.009 samples  0.014  const uint32_t gap = j > i ? j - i : i - j;
+   3467 instr  0.028 samples  0.014  const uwide lo = (uwide)st0[warp][pos] * (uwide)mag;
+   3468 instr  0.037 samples  0.013  const uwide mid = (uwide)st1[warp][pos] * (uwide)mag + (lo >> 64);
+   3492 instr  0.014 samples  0.011  for (; pos + parts < nvalid; pos += 2 * parts) {
+   3576 instr  0.007 samples  0.010  rank += (key > (uint32_t)c ? __popc(mk) : 0) + (key == (uint32_t)c ? __popc(mk & below) : 
+   3688 instr  0.002 samples  0.009  for (uint32_t k = lane; k < K; k += 32) {
+   3602 instr  0.002 samples  0.007  if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+   3551 instr  0.002 samples  0.007  const int64_t z = (int64_t)erow[j];
+   3469 instr  0.006 samples  0.007  const uint64_t mask = neg ? ~(uint64_t)0 : 0;
+   3512 instr  0.002 samples  0.007  if (j == UINT32_MAX) {
+   3693 instr  0.002 samples  0.006  term_of(w, (int64_t)erow[j], &a, &face);
+   3382 instr  0.002 samples  0.006  const bool active = lane < S * parts;
+   3466 instr  0.019 samples  0.006  const uint64_t mag = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
+   3510 instr  0.004 samples  0.005  for (uint32_t jj = part; jj < 32; jj += parts) {
+   3544 instr  0.000 samples  0.005  const uint32_t k = k0 + lane;
+   3633 instr  0.000 samples  0.003  __syncwarp();
+   3683 instr  0.004 samples  0.003  w.y[g * w.M2 + w.M + mc] = fit64(rel(ur * (wide)yi - ui * (wide)y, MOVE_BITS), w.status);
+   3603 instr  0.001 samples  0.003  const uint64_t count = scp[hi_ + 1] - scp[lo];
+   3511 instr  0.002 samples  0.003  const uint32_t j = stj[warp][jj];
+   3439 instr  0.003 samples  0.003  if (cq == 0xFFFFFFFFu) {
+   3408 instr  0.003 samples  0.003  const wide *swp = w.sw + prow0 * S;
+   3476 instr  0.004 samples  0.003  const uint32_t q = sts[warp][pos];
+   3460 instr  0.006 samples  0.003  const uint32_t j = stj[warp][pos];
+   3540 instr  0.006 samples  0.003  big_add(N, p);
+   3484 instr  0.006 samples  0.003  c1 += x0 >> 32;

@@ -123,13 +123,30 @@ struct Divisor {
     uint32_t s;
 };
 
+// [realization; November 16, the theory thread's lead of 15:22 UTC] The reciprocal `v = ⌊(2^128 − 1)/d⌋ − 2^64` of a normalized `d`
+// (`2^63 ≤ d < 2^64`) by the same paper's Algorithm 2 (`reciprocal_word`): a first approximation from `d`'s top nine bits by one 32-bit
+// division, two Newton steps and a third in 64-bit products, and one adjustment. Before, it was a 128 by 128 division in software, a
+// routine of a loop, taken twice a crowd a row in the contact rows and in the pace skin's return. `v` is the unique floor, and the
+// algorithm reaches it for every normalized `d` (the paper's Theorem 2); the receipt's host ruler compares the two forms on 433 million
+// values (every `k` and `k²` normalized for `k < 2^24`, both edges, and random words) with none unequal. So the quotients are the same.
+__device__ __forceinline__ uint64_t reciprocal_word(uint64_t d) {
+    const uint64_t d0 = d & 1, d9 = d >> 55, d40 = (d >> 24) + 1, d63 = (d >> 1) + d0;
+    const uint64_t v0 = (uint32_t)((((uint32_t)1 << 19) - 3 * ((uint32_t)1 << 8)) / (uint32_t)d9);
+    const uint64_t v1 = (v0 << 11) - ((v0 * v0 * d40) >> 40) - 1;
+    const uint64_t v2 = (v1 << 13) + ((v1 * (((uint64_t)1 << 60) - v1 * d40)) >> 47);
+    const uint64_t e = ((v2 >> 1) & ((uint64_t)0 - d0)) - v2 * d63;
+    const uint64_t v3 = (__umul64hi(v2, e) >> 1) + (v2 << 31);
+    const uwide p = (uwide)v3 * d + d;
+    return v3 - (uint64_t)(p >> 64) - d;
+}
+
 __device__ __forceinline__ Divisor divisor_of(uint64_t k) {
     Divisor q;
     q.k = k;
     q.s = (uint32_t)__clzll((long long)k);
     q.d = k << q.s;
     // ⌊(2^128 − 1)/d⌋ − 2^64 = ⌊((2^64 − 1 − d) 2^64 + 2^64 − 1)/d⌋, below 2^64 since d ≥ 2^63.
-    q.v = (uint64_t)((((uwide)(~q.d)) << 64 | (uwide)UINT64_MAX) / (uwide)q.d);
+    q.v = reciprocal_word(q.d);
     return q;
 }
 

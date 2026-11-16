@@ -1,0 +1,87 @@
+kernel: 709470166 warp instructions executed, 223089 stall samples
+lines 4631-4937 (the kernel body): instr 0.498 samples 0.574
+functions outside the body, by samples:
+  crowd_base_narrow                  instr  0.060 samples  0.062
+  support_at                         instr  0.016 samples  0.045
+  mul64_128                          instr  0.039 samples  0.039
+  (other files)                      instr  0.042 samples  0.033
+  divide_word                        instr  0.074 samples  0.032
+  add_wide_high                      instr  0.010 samples  0.029
+  row_prepare                        instr  0.006 samples  0.018
+  divisor_of                         instr  0.020 samples  0.013
+  entries_sum                        instr  0.013 samples  0.011
+  wide_bits                          instr  0.014 samples  0.011
+  div_nearest                        instr  0.016 samples  0.011
+  mulu64                             instr  0.004 samples  0.010
+  div_nearest_by                     instr  0.024 samples  0.009
+  rel                                instr  0.023 samples  0.009
+  temper_of                          instr  0.012 samples  0.008
+  divide_by                          instr  0.021 samples  0.008
+  narrow31                           instr  0.015 samples  0.008
+  skin_raw_hs                        instr  0.010 samples  0.008
+  mul_fits                           instr  0.012 samples  0.007
+  bit_length                         instr  0.008 samples  0.006
+  skin_word                          instr  0.008 samples  0.005
+  pair_skin_word                     instr  0.008 samples  0.004
+  warp_sum                           instr  0.003 samples  0.004
+  add_fits                           instr  0.006 samples  0.003
+  mulu64_128                         instr  0.007 samples  0.003
+  definite_site                      instr  0.000 samples  0.003
+  add_wide                           instr  0.001 samples  0.002
+  skin_ij_hs                         instr  0.004 samples  0.002
+  still_head                         instr  0.002 samples  0.002
+  carry_d                            instr  0.000 samples  0.002
+  crowd_slots                        instr  0.002 samples  0.002
+  shfl_wide                          instr  0.002 samples  0.002
+  skinless                           instr  0.001 samples  0.002
+  span_parts                         instr  0.002 samples  0.002
+  crowd_at                           instr  0.002 samples  0.001
+  paced_hs                           instr  0.001 samples  0.001
+  lock_of                            instr  0.000 samples  0.001
+  parts_sum                          instr  0.001 samples  0.001
+  add_wide_low                       instr  0.003 samples  0.001
+  support_row                        instr  0.001 samples  0.001
+  mag64                              instr  0.002 samples  0.001
+  temper_chain                       instr  0.001 samples  0.001
+  crowd_skin_raw_hs                  instr  0.001 samples  0.001
+  crowd_skin_raw                     instr  0.002 samples  0.001
+  paced_index                        instr  0.000 samples  0.001
+  fit64                              instr  0.001 samples  0.000
+  depth_head                         instr  0.001 samples  0.000
+  crowd_skin_hs                      instr  0.000 samples  0.000
+  skipped_row                        instr  0.000 samples  0.000
+  crowd_carried_wide_hs              instr  0.000 samples  0.000
+  paced_at                           instr  0.000 samples  0.000
+  crowd_skin_ij                      instr  0.000 samples  0.000
+  head_skin                          instr  0.000 samples  0.000
+the body's lines, by samples (top 30):
+   4726 instr  0.050 samples  0.088  dp += mul64_128(dyi[2 * q], still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
+   4838 instr  0.120 samples  0.072  sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][j
+   4727 instr  0.052 samples  0.041  dp += mul64_128(dyi[2 * q + 1], still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
+   4836 instr  0.008 samples  0.035  if (jx != UINT32_MAX) {
+   4834 instr  0.014 samples  0.031  for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+   4790 instr  0.015 samples  0.028  const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * rel(p * (dpk - mean)
+   4804 instr  0.005 samples  0.023  const wide dzj = compare((wide)e[j], dpr[j]);
+   4826 instr  0.013 samples  0.022  for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+   4828 instr  0.012 samples  0.021  if (jx != UINT32_MAX) {
+   4774 instr  0.014 samples  0.021  term = (wide)dye * crowd_carried_wide_hs(w, hs, m, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) 
+   4912 instr  0.000 samples  0.018  add_wide_high(w0, pw, ow0);
+   4885 instr  0.006 samples  0.016  const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
+   4835 instr  0.008 samples  0.014  const uint32_t jx = stj[warp][jj];
+   4827 instr  0.014 samples  0.010  const uint32_t jx = stj[warp][jj];
+   4829 instr  0.026 samples  0.009  __pipeline_memcpy_async(&ws[(jj - half) * S + entry], &words[(uint64_t)jx * S + entry], 4)
+   4805 instr  0.008 samples  0.007  tacc += rel(dzj * (wide)sbr[j], FACE_BITS);
+   4672 instr  0.000 samples  0.006  const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+   4913 instr  0.003 samples  0.006  add_wide_high(w1, -pw, ow1);
+   4772 instr  0.005 samples  0.005  if (active && jj < nslots && cnts[warp][jj] != 0) {
+   4736 instr  0.001 samples  0.005  count = scp[hi_ + 1] - scp[lo];
+   4851 instr  0.002 samples  0.004  tacc += rel(dzc * (wide)cs, FACE_BITS);
+   4768 instr  0.003 samples  0.004  const int64_t dye = dyi[entry];
+   4893 instr  0.007 samples  0.003  bracket = rel((mul64_128(mul32((int64_t)d, w.pq[((uint64_t)h * w.T + g) * S + entry]), (in
+   4801 instr  0.001 samples  0.003  const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+   4813 instr  0.006 samples  0.003  if ((j > i ? j - i : i - j) < NEAR) {
+   4658 instr  0.002 samples  0.003  for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (u
+   4878 instr  0.001 samples  0.002  const uint64_t count = cnts[warp][jj];
+   4751 instr  0.001 samples  0.002  const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+   4879 instr  0.002 samples  0.002  if (count == 0) {
+   4806 instr  0.005 samples  0.002  const wide dz = rel(temper * dzj, MATERIAL_BITS);
