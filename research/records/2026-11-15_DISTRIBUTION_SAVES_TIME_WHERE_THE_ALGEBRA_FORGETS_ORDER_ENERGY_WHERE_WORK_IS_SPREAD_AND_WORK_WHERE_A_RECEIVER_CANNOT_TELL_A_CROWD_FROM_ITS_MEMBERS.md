@@ -853,3 +853,14 @@ UTC); `agent-inferred` for the reading of them.
   read from the kernel's own occupancy, the same partition of a sum whose order is free): gate 3 equal; the bias and
   encoding and the lift and read 0.60 to 0.75 of their present time a launch, their warps active 72 to 83%; 2.2 to 3.5
   ms a section, a section 0.993 to 0.996, under a hold's resolution, so scored on the profile.
+  Corrected the same hour (the build thread, relayed 08:47 UTC): the build already read `want` from the kernel's
+  occupancy (102,400, the profile's mean grid for both walks), so the reading above put the tail on the wrong ceiling.
+  It stands on the tiles' ceilings: with `tile = ⌈entries · n / want⌉` and `tiles = ⌈n / tile⌉`, the cells can pass
+  `want` by up to `entries − 1`, and those threads walk a second, short tile. On a typical return the bias and encoding
+  has 15,860 entries and 2,813 live sites, so a tile of 436, 7 tiles, 111,020 cells: 8,620 threads walk 436 and then
+  197, the launch lasts 1.45 tiles and its warps average 83% / 1.45 = 57%, as read; the lift and read, 4,160 entries,
+  tiles of 115 and 1.46 tiles. The fix sets `tiles = max(1, ⌊want / entries⌋)` and `tile = ⌈n / tiles⌉`, so the cells
+  stay within `want` and every thread walks one tile: 469 sites against 633 (0.74) and 118 against 168 (0.70) by that
+  arithmetic. The guess of 08:46 was fixed on the mechanism the fix answers (one tile a thread) and carries to it as
+  fixed; the build's arithmetic puts both at its top. A lesson (`agent-inferred`): a guess's premise that a log can
+  print is read before the guess, here the profile's grid, which had printed 102,400.
