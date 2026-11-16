@@ -29,6 +29,7 @@
 // integer sum, so a row read by 32 lanes, a covector summed over sites or a sum over regions gives the
 // host's bits whatever the order.
 
+#include <cuda_pipeline.h>
 #include <stdint.h>
 
 typedef __int128 wide;
@@ -4603,7 +4604,12 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
 #define REV_ROWS 4
 // [theory, November 13, P55 step 5, G126 (e)] Four blocks a multiprocessor in the launch bounds: in one hold the rows read 0.881 of their time at
 // four, 128 registers and 8 octets of stack against six's cap of 80 registers, 136 octets of stack and 208 and 384 octets of spills (p55_helpers.txt).
+// [realization; November 16, the theory thread's pick of 10:52 UTC] Pass B's words are staged a half-chunk at a time into dynamic shared memory
+// (`REV_ROWS · 16 · S` words of 32 bits, `rows_words` below) by asynchronous copies, each lane the entries it then reads, and waited for once:
+// the sixteen staged pairs' words, which the inner loop read one by one behind each load, now stand in flight together with no register held
+// for them. The word is read on 32 bits as `mul32` reads it, so the products are the same.
 extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+    extern __shared__ __align__(16) int32_t rows_words[];
     __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
     __shared__ int64_t dss[REV_ROWS][32];
     __shared__ wide dpcs[REV_ROWS][MAX_CROWD_SLOTS];
@@ -4771,11 +4777,22 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             stk[warp][lane] = k;
             __syncwarp();
             if (active) {
-                for (uint32_t jj = part; jj < 32; jj += parts) {
-                    const uint32_t jx = stj[warp][jj];
-                    if (jx != UINT32_MAX) {
-                        // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
-                        sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), words[(uint64_t)jx * S + entry]));
+                int32_t *ws = rows_words + (uint64_t)warp * 16 * S;
+                for (uint32_t half = 0; half < 32; half += 16) {
+                    for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+                        const uint32_t jx = stj[warp][jj];
+                        if (jx != UINT32_MAX) {
+                            __pipeline_memcpy_async(&ws[(jj - half) * S + entry], &words[(uint64_t)jx * S + entry], 4);
+                        }
+                    }
+                    __pipeline_commit();
+                    __pipeline_wait_prior(0);
+                    for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+                        const uint32_t jx = stj[warp][jj];
+                        if (jx != UINT32_MAX) {
+                            // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
+                            sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), (int64_t)ws[(jj - half) * S + entry]));
+                        }
                     }
                 }
             }
