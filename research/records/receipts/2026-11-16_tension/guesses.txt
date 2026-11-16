@@ -214,3 +214,13 @@ and the located founding read on short sums is the next change; V1 and V2 both m
 the first sum digit the line codes under a flat digit.
 G-B3b (the in-lap share of drafts the world reads, laps 77 and 78) is scored on lap 77 alone, since the redrawn slice changes what a
 draft's prompt is from the lap after the gap.
+
+BASELINE for G-V1 and G-V2, read from the clock at 23:57:26 UTC, November 16 (oracle_short77.txt; short.sh, the open places alone, 8 host
+threads beside lap 78): at lap 77's mean (MEAN.2000, the last mean before the redrawn slice) the units digit of a short sum codes at
+2.365 nats (2.370 at lap 76's mean), both-clear 2.391, both-carry 2.391, one-clear 2.164, the top digit 1.545; the operands' presence at
+the answer's site, tick 0: a 0.446, b 0.516. A first read of this lap with every site written (short77a) gave presences of 0.17 and 0.24
+over 101,472 rows: that dump's rows are every site and the oracle's shares on it are not the instrument's; it is kept for the rows'
+heat alone (heat_short77.txt). The oracle exits 1 on short sums after it prints its code, share and presence lines (a later table's
+solve is singular where a kind of place has too few rows).
+G-B3b, scored on lap 77 (STORE_WORLD lines, by sixths of the lap): the world read 0.598, 0.592, 0.606, 0.620, 0.610, 0.590 of the
+drafts, 0.605 over the lap (0.470 and 0.485 on laps 75 and 76). No rise of 0.05 inside the lap: missed on the lap it had.
