@@ -1,0 +1,15 @@
+WRITE_WORDS writes=w69r0 slice=books strings=169 in_passage=98 share=0.580 commonest_octet=32 commonest_share=0.166
+WRITE_WORDS writes=w69r4 slice=books strings=180 in_passage=117 share=0.650 commonest_octet=32 commonest_share=0.179
+WRITE_WORDS writes=w69r16 slice=books strings=178 in_passage=110 share=0.618 commonest_octet=32 commonest_share=0.184
+WRITE_WORDS writes=w69r0 slice=code strings=104 in_passage=46 share=0.442 commonest_octet=47 commonest_share=0.119
+WRITE_WORDS writes=w69r4 slice=code strings=103 in_passage=42 share=0.408 commonest_octet=47 commonest_share=0.219
+WRITE_WORDS writes=w69r16 slice=code strings=108 in_passage=56 share=0.519 commonest_octet=47 commonest_share=0.252
+WRITE_WORDS writes=w69r0 slice=science strings=141 in_passage=48 share=0.340 commonest_octet=32 commonest_share=0.137
+WRITE_WORDS writes=w69r4 slice=science strings=140 in_passage=54 share=0.386 commonest_octet=32 commonest_share=0.131
+WRITE_WORDS writes=w69r16 slice=science strings=140 in_passage=62 share=0.443 commonest_octet=32 commonest_share=0.132
+WRITE_WORDS writes=w69r0 slice=web strings=136 in_passage=57 share=0.419 commonest_octet=32 commonest_share=0.148
+WRITE_WORDS writes=w69r4 slice=web strings=126 in_passage=67 share=0.532 commonest_octet=32 commonest_share=0.149
+WRITE_WORDS writes=w69r16 slice=web strings=157 in_passage=89 share=0.567 commonest_octet=32 commonest_share=0.182
+WRITE_WORDS writes=w69r0 slice=wikidata strings=130 in_passage=29 share=0.223 commonest_octet=32 commonest_share=0.110
+WRITE_WORDS writes=w69r4 slice=wikidata strings=127 in_passage=17 share=0.134 commonest_octet=32 commonest_share=0.101
+WRITE_WORDS writes=w69r16 slice=wikidata strings=117 in_passage=16 share=0.137 commonest_octet=101 commonest_share=0.093

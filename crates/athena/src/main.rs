@@ -54,6 +54,10 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "train" && rest.get(1).map(String::as_str) == Some("read-open-rows") {
         return athena::store::read_open_rows(&rest[1..]);
     }
+    // [measurement; November 16] A reading of forms on the host's threads (beside the card's runs: it opens no card).
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-forms") {
+        return athena::store::read_forms(&rest[1..], &mut holonics_engine::realization::Host);
+    }
     let opened = Card::open(0)?;
     let mut card = Resident::open(&opened)?;
     // [agent-inferred, November 1] A declared reading (`FIELD_PROFILE`): every launch, transfer and
@@ -285,12 +289,15 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-lane") => athena::store::found_lane(args),
         Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
+        Some("join-store") => athena::store::join_store(args),
         Some("restore-store") => athena::store::restore(args),
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),
         Some("write-store") => athena::store::write(args, realization),
         Some("read-prompt") => athena::store::read_prompt(args, realization),
-        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud, next-pass or own-states".into()),
+        Some("read-forms") => athena::store::read_forms(args, realization),
+        Some("read-writes") => athena::store::read_writes(args, realization),
+        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, read-prompt, read-writes, read-forms, found-lane, found-loud, next-pass, join-store or own-states".into()),
     }
 }
 

@@ -25,8 +25,9 @@ use std::collections::HashMap;
 use std::io::{BufRead, Seek, SeekFrom};
 use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set};
 
-/// The store's slices in its own order (`tools/corpus_passage.py`'s `SLICES`).
-const SLICES: [&str; 5] = ["code", "web", "science", "books", "wikidata"];
+/// The store's slices in its own order: `tools/corpus_passage.py`'s `SLICES` (Common Corpus's five), then the arithmetic world
+/// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
+const SLICES: [&str; 7] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words"];
 /// The head of a slice's index of pieces (`tools/corpus_passage.py`'s `INDEX_HEAD`).
 const INDEX_HEAD: &str = "document\ttitle_octets\ttext_octets\topens\tcloses";
 /// The head of a store's counts (`tools/corpus_passage.py`'s `STORE_HEAD`).
@@ -1019,6 +1020,49 @@ pub fn next_pass(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 16, the theory thread's Build A] `join-store STATE STATE_SHA STORE STORE_SHA OUT`: **a state's pass
+/// joined to a grown store**: the state with its pass line set to the store `STORE` (`STORE_SHA` its `STORE.tsv`'s), its slices those of the
+/// store's role in the store's order, every slice at its first piece (piece, cursor and places taken zero), its count of stretches kept, and every
+/// other line of the state byte for byte (read back and checked, as [`next_pass`]). Refused where the state's slices are not the first of the
+/// grown store's, in order, or where the store adds no slice. Why at a new pass: the cut draws the slice whose places taken stand least against its
+/// quota ([`holonics_engine::passage::Cut::next`]), so a slice joined in the middle of a pass is drawn alone until it reaches the others' share,
+/// or, set to their share, is drawn alone once theirs end: on November 16 the line stood at 0.609 of its pass, and either join would have run
+/// some five laps on the joined slices alone. Joined at a new pass, every slice is drawn at its quota from the first section, and the pass ends
+/// for all of them together. What the old slices had left of their pass is read on the next one, the same law over the same passage.
+pub fn join_store(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("join-store STATE STATE_SHA STORE STORE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    let names = role_names(&counts, &before.role);
+    let held: Vec<&str> = before.slices.iter().map(|s| s.name.as_str()).collect();
+    if names.len() <= held.len() || names[..held.len()] != held[..] {
+        return Err(format!("a store whose {} slices ({}) do not extend the state's ({})", before.role, names.join(","), held.join(",")).into());
+    }
+    let mut pass = before.clone();
+    pass.store = args[4].clone();
+    pass.slices = names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect();
+    let after = slices_text(&pass);
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
+    std::fs::write(out, &written)?;
+    println!(
+        "JOIN_STORE stretches={} store_before={} store_after={} before={} after={after} lines={lines} differing_line={differing}",
+        before.stretches,
+        before.store,
+        args[4],
+        slices_text(&before)
+    );
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored
@@ -1224,6 +1268,209 @@ pub fn read_prompt(args: &[String], realization: &mut dyn Realization) -> Result
         println!("PROMPT_SLICE slice={name} problems={n} own={} foil_code={} foil_less_own={} by_octave_foil_less_own={}", micro(total(0), run * n), micro(total(1), run * n), micro(total(1) - total(0), run * n), octaves.join(","));
     }
     println!("PROMPT_DONE problems={} batches={batches} {} ms={}", problems.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 16, the theory thread's writer guesses W1 of 16:37 UTC] `read-writes UNITS UNITS_SHA STORE STORE_SHA
+/// KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN WRITES STATE STATE_SHA`: **a write's code beside its reference's.** For each of the
+/// writer's held problems (the same choice as `write-store`'s), the written run read from `WRITES/{problem}.written` and the reference
+/// continuation are each coded after the problem's prompt two ways: every place of the run open alone among the run's other places (the
+/// one-place receiver, both sides known), and every place of the run open at once (the receiver of the writer's first read). A write that
+/// the field reads as its own codes lower than the reference under the first; how the two receivers part says where the writer's draft
+/// stands. Codes in millionths of a bit a place, over the written places before the first void (a write that voids early is coded on what
+/// it wrote), the reference over its whole run; each slice's line sums its problems. A reading: nothing is written, the texts unprinted.
+pub fn read_writes(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    if args.len() != 15 {
+        return Err("read-writes UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN WRITES STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-writes")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let _keys = pinned_read(&args[5], &args[6], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?, units)?;
+    let (documents, prompt, run) = (positive(&args[9])?, positive(&args[10])?, positive(&args[11])?);
+    let writes = Path::new(&args[12]);
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[13], &args[14], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-writes reads a state of the store's line")?;
+    let names = role_names(&counts, "held");
+    let problems = held_problems(store, &counts, &names, &codec, documents, prompt, run)?;
+    let mut index: HashMap<&str, usize> = HashMap::new();
+    // Each problem: its stem, its write's classes and its reference's classes.
+    let mut runs: Vec<(String, Vec<usize>, Vec<usize>)> = Vec::new();
+    for p in &problems {
+        let i = index.entry(p.0).or_insert(0);
+        let stem = format!("{}_{:02}", p.0, *i);
+        *i += 1;
+        let written = std::fs::read(writes.join(format!("{stem}.written")))?;
+        let w = codec.encode(&written)?;
+        let r = codec.encode(&p.4)?;
+        if r.len() != run {
+            return Err("a reference whose bytes are not one class each".into());
+        }
+        runs.push((stem, w.into_iter().take(run).collect(), r));
+    }
+    println!("WRITES_LAW problems={} documents={documents} prompt={prompt} run={run} alphabet={} ms={}", problems.len(), codec.alphabet(), started.elapsed().as_millis());
+    // The regions: for problem `k` and side `s` (0 the write, 1 the reference), the whole-open region, then one region a place.
+    let mut jobs: Vec<(usize, usize, Option<usize>)> = Vec::new();
+    for (k, (_, w, r)) in runs.iter().enumerate() {
+        for (s, len) in [(0usize, w.len()), (1usize, r.len())] {
+            if len == 0 {
+                continue;
+            }
+            jobs.push((k, s, None));
+            jobs.extend((0..len).map(|t| (k, s, Some(t))));
+        }
+    }
+    let region_of = |&(k, s, at): &(usize, usize, Option<usize>)| -> OwnedRegion {
+        let body = if s == 0 { &runs[k].1 } else { &runs[k].2 };
+        let mut classes = problems[k].2.clone();
+        classes.extend_from_slice(body);
+        let mut open = vec![false; prompt];
+        match at {
+            None => open.extend(std::iter::repeat_n(true, body.len())),
+            Some(t) => open.extend((0..body.len()).map(|u| u == t)),
+        }
+        OwnedRegion::plain(classes, open)
+    };
+    // Per problem and side: [one-place, all-open] codes on `2^(−20)` bits.
+    let mut sums: Vec<[[i128; 2]; 2]> = vec![[[0; 2]; 2]; runs.len()];
+    let mut at = 0usize;
+    let mut batches = 0usize;
+    while at < jobs.len() {
+        let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+        while end < jobs.len() {
+            let (k, s, _) = jobs[end];
+            let n = (prompt + if s == 0 { runs[k].1.len() } else { runs[k].2.len() }) as u64;
+            if in_sites > 0 && (in_pairs + n * n > law.pairs || in_sites + n > law.sites) {
+                break;
+            }
+            (in_pairs, in_sites, end) = (in_pairs + n * n, in_sites + n, end + 1);
+        }
+        let regions: Vec<OwnedRegion> = jobs[at..end].iter().map(region_of).collect();
+        let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+        for (&(k, s, place), (faces, region)) in jobs[at..end].iter().zip(faces.iter().zip(&regions)) {
+            for (t, face) in faces.iter().enumerate().skip(prompt) {
+                if !region.unresolved[t] {
+                    continue;
+                }
+                let face = face.as_ref().ok_or("an open place without a face")?;
+                sums[k][s][usize::from(place.is_none())] += face.code(region.classes[t]) as i128;
+            }
+        }
+        batches += 1;
+        at = end;
+    }
+    let micro = |code: i128, places: usize| -> i128 { if places == 0 { 0 } else { code * 1_000_000 / ((places as i128) << 20) } };
+    let mut by_slice: Vec<(&str, [[i128; 2]; 2], usize, usize)> = Vec::new();
+    for (k, (stem, w, r)) in runs.iter().enumerate() {
+        println!(
+            "WRITES problem={stem} written_places={} write_one={} reference_one={} write_open={} reference_open={}",
+            w.len(),
+            micro(sums[k][0][0], w.len()),
+            micro(sums[k][1][0], r.len()),
+            micro(sums[k][0][1], w.len()),
+            micro(sums[k][1][1], r.len())
+        );
+        let name = problems[k].0;
+        match by_slice.iter_mut().find(|e| e.0 == name) {
+            Some(e) => {
+                for s in 0..2 {
+                    for m in 0..2 {
+                        e.1[s][m] += sums[k][s][m];
+                    }
+                }
+                e.2 += w.len();
+                e.3 += r.len();
+            }
+            None => by_slice.push((name, sums[k], w.len(), r.len())),
+        }
+    }
+    for (name, s, wp, rp) in &by_slice {
+        println!("WRITES_SLICE slice={name} written_places={wp} write_one={} reference_one={} write_open={} reference_open={}", micro(s[0][0], *wp), micro(s[1][0], *rp), micro(s[0][1], *wp), micro(s[1][1], *rp));
+    }
+    println!("WRITES_DONE problems={} regions={} batches={batches} {} ms={}", runs.len(), jobs.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 16, the theory thread's anchor and answer reads of Build A] `read-forms UNITS UNITS_SHA KEYS
+/// KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA`: **a continuation coded after its own prompt.** `FORMS` is a table of rows
+/// `label<TAB>prompt<TAB>run` (a line feed in a prompt or a run written `\n`), made by a ruler on the host from the arithmetic world's held
+/// files (`tools/forms_table.py`): the same sum after `a + b = `, `a plus b equals ` and the foil `a plux b eqvals `, or a held record cut
+/// after its `= `. Each row's region is its prompt resolved and its run open, the region the writer's first read meets, and each open place
+/// is coded under its written byte. Each row's line gives the run's code in millionths of a bit a place and each place's code in order, so a
+/// ruler sums them by form, by the operands' lengths, by the digit's place and by whether a carry entered it. A reading: the state is read,
+/// never written. It runs on the card (`train`) or on the host's threads (`host`, beside the card's runs: it opens no card).
+pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-forms")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-forms reads a state of the store's line")?;
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, usize, Vec<usize>)> = Vec::new();
+    let mut regions: Vec<OwnedRegion> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, prompt, run] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        let (p, r) = (codec.encode(unescape(prompt).as_bytes())?, codec.encode(unescape(run).as_bytes())?);
+        if p.is_empty() || r.is_empty() {
+            return Err("a forms row with an empty prompt or run".into());
+        }
+        let mut classes = p.clone();
+        classes.extend_from_slice(&r);
+        let mut open = vec![false; p.len()];
+        open.extend(std::iter::repeat_n(true, r.len()));
+        rows.push((label.to_string(), p.len(), r));
+        regions.push(OwnedRegion::plain(classes, open));
+    }
+    if rows.is_empty() {
+        return Err("a forms table of no rows".into());
+    }
+    println!("FORMS_LAW rows={} alphabet={} pairs_bound={} sites_bound={} ms={}", rows.len(), codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
+    let micro = |code: i128, places: usize| -> i128 { if places == 0 { 0 } else { code * 1_000_000 / ((places as i128) << 20) } };
+    let (mut at, mut batches) = (0usize, 0usize);
+    while at < regions.len() {
+        let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+        while end < regions.len() {
+            let s = regions[end].classes.len() as u64;
+            if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                break;
+            }
+            (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+        }
+        let faces = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
+        for (k, faces) in (at..end).zip(faces) {
+            let (label, prompt, run) = &rows[k];
+            let codes: Vec<i128> = (0..run.len())
+                .map(|j| faces[prompt + j].as_ref().map(|f| f.code(run[j]) as i128).ok_or("an open place without a face"))
+                .collect::<std::result::Result<_, _>>()?;
+            let total: i128 = codes.iter().sum();
+            println!("FORMS_ROW label={label} prompt_places={prompt} run_places={} code={} by_place={}", run.len(), micro(total, run.len()), codes.iter().map(|&c| micro(c, 1).to_string()).collect::<Vec<_>>().join(","));
+        }
+        batches += 1;
+        at = end;
+    }
+    println!("FORMS_DONE rows={} batches={batches} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
     Ok(())
 }
 
