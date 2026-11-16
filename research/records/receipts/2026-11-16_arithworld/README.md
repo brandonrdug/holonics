@@ -20,19 +20,23 @@ life. Refs #404.
 - **The word problems** (`tools/words_passage.py`, from TinyGSM, MIT). A document is the problem's question, its solution's statements (the
   function's body without its docstring or its `return`), and the world's answer, `answer = VALUE`. The answer is interpreted at the boundary
   from the solution's syntax tree on rationals (a straight line of assignments of `+ − × / // %`, bounded powers); no downloaded code is run.
-  - Read 2,500,077 problems in the dataset's order. 245,823 left out for sharing an eight-word run with a GSM8K question (the train split and
-    the 128 held problems), so GSM8K stays a yardstick. 780,267 refused: 464,093 with an answer that is not an integer, 173,672 with an
-    expression outside arithmetic (a call, a comparison), 125,817 with a statement outside a straight line of assignments, 16,646 with a
-    power past its bound, 30 others. 1,473,987 kept: 500,000,389 octets (`287be304…ae6d`). 100 s on one host thread.
-  - Held: the line's 128 GSM8K problems as GSM8K writes them, one document each, 66,476 octets (`548c3f68…359e`). Their form is GSM8K's
-    (its reasoning lines and `#### N`), not the training documents': the yardstick reads the words across that change of form.
+  - Read 2,519,266 problems in the dataset's order. 265,164 left out for sharing an eight-word run with a GSM8K question (the train split,
+    with the line's 128 held problems drawn from it, and the test split), so GSM8K stays a yardstick. 780,283 refused: 463,646 with an
+    answer that is not an integer, 173,795 with an expression outside arithmetic (a call, a comparison), 126,050 with a statement outside a
+    straight line of assignments, 16,752 with a power past its bound, 31 others. 1,473,819 kept: 500,000,195 octets (`5f68a5c3…43fb`).
+    100 s on one host thread.
+  - Held: GSM8K's test split (openai/gsm8k, MIT; 1,319 problems, fetched on Brandon's word of 17:24 UTC) as GSM8K writes it, each problem
+    its question, a line feed and its answer, one document each: 705,818 octets (`f9b94e34…df40`). Their form is GSM8K's (its reasoning
+    lines, its `<<…>>` calculations and `#### N`), not the training documents': the yardstick reads the words across that change of form.
+  - The slice was first built against the train split alone; the test split, read against it, shared an eight-word run with 11,242 of its
+    documents (by their first line), so it was rebuilt before the line read it, with both splits left out.
 - Every byte of both slices is in the line's codec (18 byte values in the arithmetic world, 169 in the word problems), so the join grows no
   letter.
 
 ## The store and the join
 
 The store of November 16 is the store of November 12's five slices (code, web, science, books, wikidata; the same files) with the two new
-slices after them: `STORE.tsv` SHA-256 `79db8227…8187`. The trainer's prefix role draws each slice in proportion to its prefix octets, so a
+slices after them: `STORE.tsv` SHA-256 `4f4ac1a4…a8f1`. The trainer's prefix role draws each slice in proportion to its prefix octets, so a
 section's draws are about 20% code, 10% web, 10% science, 6% books, 4% wikidata, 25% arithmetic and 25% word problems.
 
 `join-store STATE STATE_SHA STORE STORE_SHA OUT` (`crates/athena/src/store.rs`, beside `next-pass`) writes the state with its pass line set

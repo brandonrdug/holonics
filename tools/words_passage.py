@@ -10,14 +10,16 @@ line of assignments of arithmetic is interpreted (numbers, names already assigne
 call, a loop, a branch, an import), or whose answer is not an integer, is left out and counted. No downloaded code is executed.
 
 Overlap with GSM8K is left out: a problem whose question shares any eight-word shingle (lower case, words of letters and digits) with any
-GSM8K question in GSM8K_JSONL (one JSON object a line with a `question`) is counted and dropped, so GSM8K stays a yardstick.
+GSM8K question in GSM8K_JSONL (comma-separated files, one JSON object a line with a `question`: the train and the test splits) is counted
+and dropped, so GSM8K stays a yardstick.
 
-Usage: words_passage.py OUT PARQUET_DIR GSM8K_JSONL TEXT_OCTETS [--held-text HELD]
+Usage: words_passage.py OUT PARQUET_DIR GSM8K_JSONL TEXT_OCTETS [--held-text HELD | --held-jsonl HELD]
 
 Writes corpus_passage.py's files for the slice `words` (`DOCS_words.*`, `IDS_words.txt`): the problems in the dataset's order (its
 parquet files by name, rows in order) until the text reaches TEXT_OCTETS. With HELD (GSM8K problems as text, one problem a paragraph:
 its question, a line feed and its answer as GSM8K writes it, problems apart by a blank line), writes `HELD_words.*` from them, each problem
-one document, and leaves out of training every problem sharing a shingle with one of them.
+one document, and leaves out of training every problem sharing a shingle with one of them. HELD_JSONL is the same from GSM8K's own file
+(its `question`, a line feed and its `answer`): the test split, the yardstick.
 Prints the slice's `STORE.tsv` rows with their SHA-256 and the counts left out.
 """
 import argparse
@@ -135,15 +137,22 @@ def main():
     p.add_argument("gsm8k_jsonl")
     p.add_argument("text_octets", type=int)
     p.add_argument("--held-text")
+    p.add_argument("--held-jsonl")
     a = p.parse_args()
     seen = set()
-    for line in open(a.gsm8k_jsonl):
-        seen |= shingles(json.loads(line)["question"])
+    for path in a.gsm8k_jsonl.split(","):
+        for line in open(path):
+            seen |= shingles(json.loads(line)["question"])
     held_problems = []
     if a.held_text:
         held_problems = [h.strip() for h in open(a.held_text).read().split("\n\n") if h.strip()]
         for h in held_problems:
             seen |= shingles(h.split("\n", 1)[0])
+    if a.held_jsonl:
+        for line in open(a.held_jsonl):
+            r = json.loads(line)
+            held_problems.append(f"{r['question'].strip()}\n{r['answer'].strip()}")
+            seen |= shingles(r["question"])
     counts = {"read": 0, "overlap": 0, "refused": 0, "kept": 0}
     reasons = {}
     total = [0]
