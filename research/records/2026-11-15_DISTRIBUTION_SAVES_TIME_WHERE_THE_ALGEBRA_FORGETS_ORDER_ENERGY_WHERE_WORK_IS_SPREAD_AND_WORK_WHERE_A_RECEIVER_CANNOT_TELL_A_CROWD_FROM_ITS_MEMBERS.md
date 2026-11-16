@@ -1019,3 +1019,30 @@ UTC); `agent-inferred` for the reading of them.
   eight rows read whole an instruction, about 8 wavefronts against 32 and half the sectors, at about 1.6 times the pass's
   instructions; an integer sum, so no bit moves. Guess, fixed at 12:17 UTC, for the two partials of a pair's covector on
   the one launch: gate 3 equal; the rows 0.96 to 0.995 a launch; a section 0.996 to 1.000, likely unresolved.
+- **A pair's two partials, scored; the rows' waits by their source, and a correction** (the build thread, relayed 12:24
+  and 13:01 UTC; #907, receipts `research/records/receipts/2026-11-16_rowsacc/`). Gate 3 equal. The rows 0.994 to 1.005
+  a launch (eight launches, 0.3% more instructions), a section 0.9987, unresolved: my rows' 0.96 to 0.995 missed on six
+  launches of eight and my section's 0.996 to 1.000 held; the build's premise held (the chain of a pair's sixteen adds is
+  short beside the instructions a pair issues on a scheduler of four warps). The counters the 12:17 lead asked for show
+  no unit near its peak: on the one launch the global loads take 4.9 to 7.1 sectors a request, the first-level cache 24
+  to 31% of its peak, the second 32 to 43%, the memory 22 to 28%; on the split's first pass 6.4 to 7.0 sectors, 41 to
+  57%, 40 to 53% and 32 to 46%, at a long-scoreboard wait of 5.2 to 7.5 an issue. So my 12:17 reading of that pass's
+  waits as a resource at its throughput is withdrawn: the waits rose 1.5 to 2.3 times with 1.5 times the warps and no
+  measured unit stood at its peak, and what holds them is unread (`agent-inferred` candidates: a multiprocessor's
+  capacity for outstanding misses, or the pass's loads arriving in phase). The test stands as the check before an
+  occupancy lever: the waits an issue against the warps. The four lanes a source are not built. The rows' source
+  counters (a `-lineinfo` copy of #903, two launches, 599.1 million warp instructions, 182,503 samples): a pair's first
+  product 0.100 of the samples on 0.050 of the instructions, three quarters of it the long wait on the source's row of
+  values; the crowd returns' low-word atomic add 0.077 on 0.011, 0.92 of it the wait for its returned word; the staged
+  products of the probe role 0.068 on 0.114; the crowd's narrow base 0.056 on 0.057; the crowds' sums 0.044 on 0.043,
+  with 45% excess second-level sectors; the divisions 0.068 on 0.151; the support's address 0.045 on 0.017. In #903's
+  machine code a crowd's returns ran atomic, reduction, atomic, reduction, two round trips; the build now issues the
+  crowd's four low-word atomics back to back before the four high-word reductions, one round trip, each carry from its
+  own term's returned word, so no bit moves. Its guess (13:00 UTC): the low word's share 0.02 to 0.04, the rows 0.95 to
+  0.985, a section 0.993 to 0.998. Mine, fixed at 13:02 UTC: gate 3 equal; the share 0.030 to 0.045; the rows 0.965 to
+  0.985; a section 0.995 to 0.999. A lead, no guess until built (`agent-inferred`): the ring's own carry-save with no
+  returned word, each difference entry as three 64-bit words added by reductions alone, the signed top
+  `A₂ += v >> 64`, `A₁ += (v mod 2^64) >> 32` and `A₀ += v mod 2^32`, read as `2^64 A₂ + 2^32 A₁ + A₀ (mod 2^128)`. The
+  top word may wrap, since `2^64 · 2^64` is the ring's modulus, and the lower two take 32-bit terms, so they hold without
+  wrap below `2^32` adds, more than a region's rows. Its price is the spread's two walks reading 1.5 times the octets of
+  the difference arrays, scored from the next hold's low-word share and the spread's share of loads before it is built.
