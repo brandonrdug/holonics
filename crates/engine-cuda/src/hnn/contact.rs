@@ -331,6 +331,8 @@ impl<'c> Resident<'c> {
             self.affine("field_affine_x32", words, words.wg, words.wgb, words.rg, 2 * circles, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), 2 * circles, 0, false)?;
             self.launch("field_pair_gamma", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pair_scan", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words)])?;
+            // [realization; theory, November 16 05:40Z] The circles' faces `p = a Q(t∓1)` off the chain, from the operand the scan kept.
+            self.launch("field_pair_scan_face", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words)])?;
         }
         let triads = d.triads;
         if triads > 0 {

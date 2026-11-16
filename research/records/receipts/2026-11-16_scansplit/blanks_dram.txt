@@ -1,0 +1,8 @@
+# The three blanks under Nsight Compute on #883 (two launches each, 2 of lap 53's sections): DRAM throughput as a share of peak.
+Kernel Name[] | gpu__time_duration.sum[ns] | dram__throughput.avg.pct_of_peak_sustained_elapsed[%] | dram__bytes.sum[byte] | lts__t_sector_hit_rate.pct[%] | smsp__issue_active.avg.pct_of_peak_sustained_active[%]
+field_blank_bias_enc | 2116960 | 8.22 | 125184512 | 68.90 | 28.84
+field_blank_dy | 1403616 | 12.58 | 127075840 | 48.37 | 42.34
+field_blank_lift_read | 1181120 | 3.87 | 32850304 | 80.23 | 33.42
+field_blank_bias_enc | 2076576 | 8.23 | 122958464 | 65.49 | 25.80
+field_blank_dy | 1325600 | 13.30 | 126836608 | 39.63 | 38.72
+field_blank_lift_read | 1181312 | 3.57 | 30338176 | 82.10 | 33.40

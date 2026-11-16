@@ -3,7 +3,7 @@
 //! the covector `p̂ − q` (weighed by a state's domain) returned through the `K` ticks, each carrier's operands held from the forward;
 //! the logarithmic derivative `R⁻¹dR` of the comparison's ratio
 //!
-//! Kind: the forward's kinds, reversed. Kernels: `field_ratio_adjoint`, `field_current_back`, `field_pair_back`, `field_pair_scan_back`,
+//! Kind: the forward's kinds, reversed. Kernels: `field_ratio_adjoint`, `field_current_back`, `field_pair_back`, `field_pair_scan_pre`, `field_pair_scan_back`,
 //! `field_triad_back`, `field_unit_back*`, `field_tied_back_*`, `field_loud_back` and the moments' returns (`hnn/adjoint.rs`).
 //! Lean: `HNN/SourceReceiverReturn`.
 //! Atlas: `contact.triad-manley-rowe-gauge`, `tower.field-growth-by-lanes`, `tower.field-read-free-fall`.
