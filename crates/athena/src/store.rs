@@ -28,6 +28,31 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 /// The store's slices in its own order: `tools/corpus_passage.py`'s `SLICES` (Common Corpus's five), then the arithmetic world
 /// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
 const SLICES: [&str; 7] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words"];
+/// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
+/// `?` between two line feeds.
+const REACTION_BOUND: u64 = 41;
+
+/// [definition; Build B] Whether the stretch of count `d` is an act of the world joined to its slice: one in `every`, keyed by the key
+/// file's seed and the stretch's count (the mixer of [`holonics_engine::passage`]'s draws, SplitMix64).
+fn acts_here(seed: u64, d: u64, every: u64) -> bool {
+    let mut z = seed.wrapping_add(d.wrapping_mul(0x9E37_79B9_7F4A_7C15)) ^ 0x776F_726C_6400_0000;
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    (z ^ (z >> 31)) % every == 0
+}
+
+/// [definition; Build B] An act's prompt from its stretch's bytes: the last `records` whole lines of the stretch (each ending with its line
+/// feed), or none where the stretch holds no whole line.
+fn world_prompt(bytes: &[u8], records: usize) -> Option<Vec<u8>> {
+    let last = bytes.iter().rposition(|&b| b == b'\n')?;
+    let body = &bytes[..=last];
+    let starts: Vec<usize> = std::iter::once(0).chain(body.iter().enumerate().filter(|(_, b)| **b == b'\n').map(|(k, _)| k + 1)).filter(|&k| k <= last).collect();
+    // A line begins at the stretch's start only where the stretch begins a record; the first partial line is never a record.
+    let whole: Vec<usize> = starts.iter().copied().filter(|&k| k > 0).collect();
+    let from = *whole.iter().rev().nth(records.saturating_sub(1)).or(whole.first())?;
+    Some(body[from..].to_vec())
+}
+
 /// The head of a slice's index of pieces (`tools/corpus_passage.py`'s `INDEX_HEAD`).
 const INDEX_HEAD: &str = "document\ttitle_octets\ttext_octets\topens\tcloses";
 /// The head of a store's counts (`tools/corpus_passage.py`'s `STORE_HEAD`).
@@ -239,7 +264,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect() });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -307,20 +332,68 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let mut regions: Vec<OwnedRegion> = Vec::new();
         let (mut tally, mut by_slice) = (Tally::default(), vec![0u64; cut.slices.len()]);
         let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
+        let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
         while let Some(drawn) = cut.next() {
-            let n = drawn.sites();
+            let act = cut.pass.world.as_ref().filter(|w| cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
+            let n = drawn.sites() + act.map_or(0, |run| run + REACTION_BOUND);
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
             }
+            let prompt = match act {
+                Some(_) => {
+                    let at = cut.pass.slices[drawn.slice].clone();
+                    let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+                    cut.pass.world.as_ref().and_then(|w| world_prompt(&bytes, w.records as usize))
+                }
+                None => None,
+            };
+            let slice = drawn.slice;
             let Stretch { region, counted, .. } = cut.take(drawn, &codec)?;
-            tally.take(&region, counted);
-            by_slice[drawn.slice] += 1;
+            by_slice[slice] += 1;
             (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
-            regions.push(region);
+            match prompt {
+                Some(p) => acts.push((codec.encode(&p)?, slice)),
+                None => {
+                    tally.take(&region, counted);
+                    regions.push(region);
+                }
+            }
         }
-        if regions.is_empty() {
+        if regions.is_empty() && acts.is_empty() {
             ended = true;
             break;
+        }
+        // [definition; Build B] The field acts and the world answers: each act's prompt released `run` places on the field as it stands
+        // (the writer `write-store` runs, keyed by the pass's count of stretches), the world's reaction to each draft appended, and the
+        // reaction alone open. The prompt and the draft are known context, never a target.
+        let mut world_line = String::new();
+        if let (Some(w), false) = (cut.pass.world.clone(), acts.is_empty()) {
+            let run = w.run as usize;
+            let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _)| (p.as_slice(), run)).collect();
+            let act_seed = seed ^ cut.pass.stretches.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+            let drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+            let (mut read_ok, mut draft_places, mut world_places) = (0usize, 0usize, 0usize);
+            let first = regions.len();
+            for ((prompt, _), draft) in acts.iter().zip(&drafts) {
+                let written = &draft[..draft.iter().position(|&c| c == codec.void()).unwrap_or(draft.len())];
+                let reaction = crate::world::react(&codec.decode(written));
+                if reaction.appended != b"?\n" && reaction.appended != b"\n?\n" {
+                    read_ok += 1;
+                }
+                let answered = codec.encode(&reaction.appended)?;
+                let mut classes = prompt.clone();
+                classes.extend_from_slice(&written[..reaction.read.min(written.len())]);
+                let known = classes.len();
+                classes.extend_from_slice(&answered);
+                let mut open = vec![false; known];
+                open.extend(std::iter::repeat_n(true, answered.len()));
+                let region = OwnedRegion::plain(classes, open);
+                tally.take(&region, answered.len());
+                (draft_places, world_places) = (draft_places + reaction.read.min(written.len()), world_places + answered.len());
+                regions.push(region);
+            }
+            world_line = format!("acts={} read={read_ok} draft_places={draft_places} world_places={world_places} first={first}", acts.len());
         }
         let regions_ms = section_start.elapsed().as_millis();
         host[0] += section_start.elapsed().as_nanos();
@@ -360,6 +433,13 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             learner.rate_bits,
             section_start.elapsed().as_millis()
         );
+        if !world_line.is_empty() {
+            // [measurement; Build B] The world's places' code at the section's comparison (the opening's, before the deposit), in millionths of a
+            // bit a place, beside the section's own line.
+            let first: usize = world_line.rsplit("first=").next().and_then(|v| v.parse().ok()).unwrap_or(regions.len());
+            let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
+            println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
+        }
         if let (Some(t), Some(e)) = (receipt.transfer, prior) {
             (transfers, externals, curvatures, priced) = (transfers + t as i128, externals + e, curvatures + (t as i128 - e), priced + 1);
         }
@@ -1063,6 +1143,33 @@ pub fn join_store(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 16, the theory thread's Build B] `set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT`: **a world
+/// joined to a state's pass** ([`holonics_engine::field::PassWorld`]): the state with its pass line's world clause set (one stretch in
+/// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
+/// other line byte for byte (read back and checked, as [`next_pass`]). Refused where the pass holds no slice `SLICE`.
+pub fn set_world(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[7]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if !before.slices.iter().any(|s| s.name == args[3]) {
+        return Err(format!("a pass with no slice {}", args[3]).into());
+    }
+    let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: positive(&args[5])? as u64, run: positive(&args[6])? as u64 };
+    let pass = StorePass { world: Some(world), ..before.clone() };
+    let line = pass.to_line();
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
+    std::fs::write(out, &written)?;
+    println!("SET_WORLD stretches={} lines={lines} differing_line={differing} pass_tail={}", before.stretches, line.rsplit(" world ").next().map_or(String::new(), |w| format!("world {w}")));
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored
@@ -1599,6 +1706,20 @@ pub fn write(args: &[String], realization: &mut dyn Realization) -> Result<()> {
 mod tests {
     use super::*;
     use holonics_engine::field::NEAR;
+
+    /// [definition; Build B] An act's prompt is the stretch's last whole lines, never its first partial line; and one stretch in `every` acts.
+    #[test]
+    fn an_acts_prompt_is_its_stretchs_last_whole_lines() {
+        assert_eq!(world_prompt(b"7 = 9\n1 + 1 = 2\n2 * 3 = 6\n4 - ", 3), Some(b"1 + 1 = 2\n2 * 3 = 6\n".to_vec()), "the partial first line is no record");
+        assert_eq!(world_prompt(b"7 = 9\n1 + 1 = 2\n2 * 3 = 6\n4 - ", 1), Some(b"2 * 3 = 6\n".to_vec()));
+        assert_eq!(world_prompt(b"x\na\nb\nc\nd\n", 2), Some(b"c\nd\n".to_vec()));
+        assert_eq!(world_prompt(b"half a record", 3), None);
+        assert_eq!(world_prompt(b"half\nno whole line", 3), None, "a line feed with no whole line after it");
+        for every in [1u64, 4, 8] {
+            let hits = (1..80_001u64).filter(|&d| acts_here(0x5EED, d, every)).count() as u64;
+            assert!(hits * every > 76_000 && hits * every < 84_000, "every={every} hits={hits}");
+        }
+    }
     use holonics_engine::passage::{cut_of, lengths_of, state_of, Kind};
 
     /// [definition; the record §4 item 1] **A stretch's draws and cut are the port's**: the draws stand on the octaves `[4, 8)` to `[256, 512)`,

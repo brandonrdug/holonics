@@ -3704,7 +3704,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }] });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -3754,6 +3754,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         sites: 41_490,
         own: false,
         slices: ["code", "web", "science", "books", "wikidata"].iter().enumerate().map(|(k, n)| PassSlice { name: n.to_string(), piece: k as u64, cursor: 3 * k as u64, taken: 100 * k as u64 }).collect(),
+        world: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -3776,6 +3777,19 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     assert_eq!(StorePass::from_line(&named_own.to_line()).unwrap(), named_own, "a slice named `own` is a slice");
     let both = StorePass { own: true, ..named_own };
     assert_eq!(StorePass::from_line(&both.to_line()).unwrap(), both);
+    // [the theory thread's Build B, November 16] A world's clause stands last only where set; with `own` or without, it reads back as itself,
+    // and a world on a slice the pass lacks, a zero count, or a slice named `world` is refused.
+    let world = StorePass { world: Some(PassWorld { slice: "books".into(), every: 8, records: 3, run: 48 }), ..pass.clone() };
+    assert_eq!(world.to_line(), format!("{} world books 8 3 48", pass.to_line()));
+    assert_eq!(StorePass::from_line(&world.to_line()).unwrap(), world);
+    let world_own = StorePass { own: true, ..world.clone() };
+    assert_eq!(StorePass::from_line(&world_own.to_line()).unwrap(), world_own);
+    assert!(!pass.to_line().contains(" world"));
+    for bad in [format!("{} world arithmetic 8 3 48", pass.to_line()), format!("{} world books 0 3 48", pass.to_line()), format!("{} world books 8 3 0", pass.to_line())] {
+        assert!(StorePass::from_line(&bad).is_err(), "{bad}");
+    }
+    let named_world = StorePass { slices: vec![PassSlice { name: "world".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
+    assert!(StorePass::from_line(&named_world.to_line()).is_err(), "a slice named `world` is refused");
 }
 
 /// [definition; theory, November 13, the record of the landmarks §5 and the design record §4.9] **A level's sites are the landmarks of its
