@@ -874,6 +874,6 @@ UTC); `agent-inferred` for the reading of them.
   lasts two walks of 32 chunks, as long as one walk of 16 (a block of 512, two a multiprocessor, one wave), and a block
   of 672 (21 chunks; two a multiprocessor at 48 registers, 64,512 of 65,536) lasts one walk of 21, about 0.76 of either
   where the walk dominates. A lead, no guess until built: size a region's block so that its blocks fill one wave at the
-  registers it takes, here 96 regions on 160 slots; for the sums the same reading gives three waves of 14 site steps
-  against one wave of 35 at blocks of 390 (6 chunks, three a multiprocessor), little to choose, since the third wave is
-  the cost of 192 blocks a multiprocessor cannot hold three of at 1,024.
+  registers it takes, here 96 regions on 160 slots; for the sums the same reading keeps the build's block: one wave
+  of 192 needs three blocks a multiprocessor, at most 10 warps a block at 64 registers, so 4 chunks and about 53 site
+  steps a walk, against three waves of 14 (about 42) at 1,024.
