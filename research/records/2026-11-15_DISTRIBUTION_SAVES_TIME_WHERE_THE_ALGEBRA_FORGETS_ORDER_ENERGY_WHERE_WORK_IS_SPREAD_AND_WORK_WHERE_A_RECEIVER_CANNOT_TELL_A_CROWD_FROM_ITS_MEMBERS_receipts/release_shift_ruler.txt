@@ -1,0 +1,2 @@
+the two forms agree on 52699 reads, b from 1 to 127, |x| inside the word less h
+b = 0: h = 2^(-1) is no integer (a negative shift); rel(x, 0) = x stays a guard
