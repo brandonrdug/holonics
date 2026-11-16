@@ -1,0 +1,686 @@
+anchor:met:+:symbols:2	619136 + 272568 = 	891704\n
+anchor:met:+:words:2	619136 plus 272568 equals 	891704\n
+anchor:met:+:foil:2	619136 plux 272568 eqvals 	891704\n
+anchor:met:+:null:2	619136 ndiw 272568 bfcmfo 	891704\n
+anchor:met:+:swapped:2	619136 times 272568 equals 	891704\n
+anchor:met:+:symbols:5	6 + 47439 = 	47445\n
+anchor:met:+:words:5	6 plus 47439 equals 	47445\n
+anchor:met:+:foil:5	6 plux 47439 eqvals 	47445\n
+anchor:met:+:null:5	6 zorc 47439 pwmcrc 	47445\n
+anchor:met:+:swapped:5	6 times 47439 equals 	47445\n
+anchor:met:+:symbols:7	90 + 81 = 	171\n
+anchor:met:+:words:7	90 plus 81 equals 	171\n
+anchor:met:+:foil:7	90 plux 81 eqvals 	171\n
+anchor:met:+:null:7	90 wvbv 81 rmbgck 	171\n
+anchor:met:+:swapped:7	90 times 81 equals 	171\n
+anchor:met:*:symbols:10	15328 * 95965 = 	1470951520\n
+anchor:met:*:words:10	15328 times 95965 equals 	1470951520\n
+anchor:met:*:foil:10	15328 timex 95965 eqvals 	1470951520\n
+anchor:met:*:null:10	15328 rngwh 95965 vwgbhh 	1470951520\n
+anchor:met:*:swapped:10	15328 minus 95965 equals 	1470951520\n
+anchor:met:-:symbols:15	58 - 43 = 	15\n
+anchor:met:-:words:15	58 minus 43 equals 	15\n
+anchor:met:-:foil:15	58 minux 43 eqvals 	15\n
+anchor:met:-:null:15	58 ghzvb 43 kvpmfx 	15\n
+anchor:met:-:swapped:15	58 plus 43 equals 	15\n
+anchor:met:-:symbols:18	31864 - 75399 = 	-43535\n
+anchor:met:-:words:18	31864 minus 75399 equals 	-43535\n
+anchor:met:-:foil:18	31864 minux 75399 eqvals 	-43535\n
+anchor:met:-:null:18	31864 vvtty 75399 fvbnmw 	-43535\n
+anchor:met:-:swapped:18	31864 plus 75399 equals 	-43535\n
+anchor:met:-:symbols:23	878893 - 35917 = 	842976\n
+anchor:met:-:words:23	878893 minus 35917 equals 	842976\n
+anchor:met:-:foil:23	878893 minux 35917 eqvals 	842976\n
+anchor:met:-:null:23	878893 cyydo 35917 mrmztm 	842976\n
+anchor:met:-:swapped:23	878893 plus 35917 equals 	842976\n
+anchor:met:-:symbols:33	360235 - 0 = 	360235\n
+anchor:met:-:words:33	360235 minus 0 equals 	360235\n
+anchor:met:-:foil:33	360235 minux 0 eqvals 	360235\n
+anchor:met:-:null:33	360235 oooxo 0 gzizgm 	360235\n
+anchor:met:-:swapped:33	360235 plus 0 equals 	360235\n
+anchor:met:+:symbols:34	863736 + 1 = 	863737\n
+anchor:met:+:words:34	863736 plus 1 equals 	863737\n
+anchor:met:+:foil:34	863736 plux 1 eqvals 	863737\n
+anchor:met:+:null:34	863736 hokb 1 ftxhfx 	863737\n
+anchor:met:+:swapped:34	863736 times 1 equals 	863737\n
+anchor:met:-:symbols:39	3 - 946 = 	-943\n
+anchor:met:-:words:39	3 minus 946 equals 	-943\n
+anchor:met:-:foil:39	3 minux 946 eqvals 	-943\n
+anchor:met:-:null:39	3 kcxgz 946 dmmnph 	-943\n
+anchor:met:-:swapped:39	3 plus 946 equals 	-943\n
+anchor:met:*:symbols:40	9333 * 95 = 	886635\n
+anchor:met:*:words:40	9333 times 95 equals 	886635\n
+anchor:met:*:foil:40	9333 timex 95 eqvals 	886635\n
+anchor:met:*:null:40	9333 xxwwz 95 miwkjy 	886635\n
+anchor:met:*:swapped:40	9333 minus 95 equals 	886635\n
+anchor:met:-:symbols:41	716 - 5 = 	711\n
+anchor:met:-:words:41	716 minus 5 equals 	711\n
+anchor:met:-:foil:41	716 minux 5 eqvals 	711\n
+anchor:met:-:null:41	716 cwzvw 5 dpobgr 	711\n
+anchor:met:-:swapped:41	716 plus 5 equals 	711\n
+anchor:met:*:symbols:44	240452 * 245 = 	58910740\n
+anchor:met:*:words:44	240452 times 245 equals 	58910740\n
+anchor:met:*:foil:44	240452 timex 245 eqvals 	58910740\n
+anchor:met:*:null:44	240452 hchbp 245 dmyyjm 	58910740\n
+anchor:met:*:swapped:44	240452 minus 245 equals 	58910740\n
+anchor:met:-:symbols:48	711464 - 3158 = 	708306\n
+anchor:met:-:words:48	711464 minus 3158 equals 	708306\n
+anchor:met:-:foil:48	711464 minux 3158 eqvals 	708306\n
+anchor:met:-:null:48	711464 bvhvw 3158 zrwxdy 	708306\n
+anchor:met:-:swapped:48	711464 plus 3158 equals 	708306\n
+anchor:met:-:symbols:55	524 - 0 = 	524\n
+anchor:met:-:words:55	524 minus 0 equals 	524\n
+anchor:met:-:foil:55	524 minux 0 eqvals 	524\n
+anchor:met:-:null:55	524 bhrcc 0 rrmjgg 	524\n
+anchor:met:-:swapped:55	524 plus 0 equals 	524\n
+anchor:met:+:symbols:59	149882 + 544476 = 	694358\n
+anchor:met:+:words:59	149882 plus 544476 equals 	694358\n
+anchor:met:+:foil:59	149882 plux 544476 eqvals 	694358\n
+anchor:met:+:null:59	149882 kmyf 544476 wympfx 	694358\n
+anchor:met:+:swapped:59	149882 times 544476 equals 	694358\n
+anchor:met:*:symbols:61	9262 * 219 = 	2028378\n
+anchor:met:*:words:61	9262 times 219 equals 	2028378\n
+anchor:met:*:foil:61	9262 timex 219 eqvals 	2028378\n
+anchor:met:*:null:61	9262 fwybk 219 hjxzkb 	2028378\n
+anchor:met:*:swapped:61	9262 minus 219 equals 	2028378\n
+anchor:met:-:symbols:63	36792 - 6122 = 	30670\n
+anchor:met:-:words:63	36792 minus 6122 equals 	30670\n
+anchor:met:-:foil:63	36792 minux 6122 eqvals 	30670\n
+anchor:met:-:null:63	36792 gczvf 6122 znowro 	30670\n
+anchor:met:-:swapped:63	36792 plus 6122 equals 	30670\n
+anchor:met:*:symbols:69	40638 * 990 = 	40231620\n
+anchor:met:*:words:69	40638 times 990 equals 	40231620\n
+anchor:met:*:foil:69	40638 timex 990 eqvals 	40231620\n
+anchor:met:*:null:69	40638 pbcdh 990 dfffby 	40231620\n
+anchor:met:*:swapped:69	40638 minus 990 equals 	40231620\n
+anchor:met:*:symbols:72	36 * 0 = 	0\n
+anchor:met:*:words:72	36 times 0 equals 	0\n
+anchor:met:*:foil:72	36 timex 0 eqvals 	0\n
+anchor:met:*:null:72	36 nbjkc 0 iyxjni 	0\n
+anchor:met:*:swapped:72	36 minus 0 equals 	0\n
+anchor:met:*:symbols:73	23142 * 3 = 	69426\n
+anchor:met:*:words:73	23142 times 3 equals 	69426\n
+anchor:met:*:foil:73	23142 timex 3 eqvals 	69426\n
+anchor:met:*:null:73	23142 ydvrw 3 pihwnz 	69426\n
+anchor:met:*:swapped:73	23142 minus 3 equals 	69426\n
+anchor:met:+:symbols:75	41 + 344321 = 	344362\n
+anchor:met:+:words:75	41 plus 344321 equals 	344362\n
+anchor:met:+:foil:75	41 plux 344321 eqvals 	344362\n
+anchor:met:+:null:75	41 djfz 344321 jkcgow 	344362\n
+anchor:met:+:swapped:75	41 times 344321 equals 	344362\n
+anchor:met:*:symbols:77	71 * 8498 = 	603358\n
+anchor:met:*:words:77	71 times 8498 equals 	603358\n
+anchor:met:*:foil:77	71 timex 8498 eqvals 	603358\n
+anchor:met:*:null:77	71 wjwxh 8498 nbcchd 	603358\n
+anchor:met:*:swapped:77	71 minus 8498 equals 	603358\n
+anchor:met:*:symbols:79	4 * 317 = 	1268\n
+anchor:met:*:words:79	4 times 317 equals 	1268\n
+anchor:met:*:foil:79	4 timex 317 eqvals 	1268\n
+anchor:met:*:null:79	4 jofno 317 dcknow 	1268\n
+anchor:met:*:swapped:79	4 minus 317 equals 	1268\n
+anchor:met:-:symbols:80	6 - 2325 = 	-2319\n
+anchor:met:-:words:80	6 minus 2325 equals 	-2319\n
+anchor:met:-:foil:80	6 minux 2325 eqvals 	-2319\n
+anchor:met:-:null:80	6 tbzcj 2325 jjzbdr 	-2319\n
+anchor:met:-:swapped:80	6 plus 2325 equals 	-2319\n
+anchor:met:*:symbols:83	6707 * 0 = 	0\n
+anchor:met:*:words:83	6707 times 0 equals 	0\n
+anchor:met:*:foil:83	6707 timex 0 eqvals 	0\n
+anchor:met:*:null:83	6707 cyvdo 0 pjdhxc 	0\n
+anchor:met:*:swapped:83	6707 minus 0 equals 	0\n
+anchor:met:-:symbols:85	22769 - 2 = 	22767\n
+anchor:met:-:words:85	22769 minus 2 equals 	22767\n
+anchor:met:-:foil:85	22769 minux 2 eqvals 	22767\n
+anchor:met:-:null:85	22769 twvjh 2 hofxnt 	22767\n
+anchor:met:-:swapped:85	22769 plus 2 equals 	22767\n
+anchor:met:+:symbols:86	91 + 89069 = 	89160\n
+anchor:met:+:words:86	91 plus 89069 equals 	89160\n
+anchor:met:+:foil:86	91 plux 89069 eqvals 	89160\n
+anchor:met:+:null:86	91 gjrm 89069 whnitf 	89160\n
+anchor:met:+:swapped:86	91 times 89069 equals 	89160\n
+anchor:met:-:symbols:88	10554 - 6 = 	10548\n
+anchor:met:-:words:88	10554 minus 6 equals 	10548\n
+anchor:met:-:foil:88	10554 minux 6 eqvals 	10548\n
+anchor:met:-:null:88	10554 gyhfp 6 bjywkz 	10548\n
+anchor:met:-:swapped:88	10554 plus 6 equals 	10548\n
+anchor:met:-:symbols:91	53 - 974 = 	-921\n
+anchor:met:-:words:91	53 minus 974 equals 	-921\n
+anchor:met:-:foil:91	53 minux 974 eqvals 	-921\n
+anchor:met:-:null:91	53 bjxdh 974 vxtcnp 	-921\n
+anchor:met:-:swapped:91	53 plus 974 equals 	-921\n
+anchor:met:+:symbols:92	3 + 918 = 	921\n
+anchor:met:+:words:92	3 plus 918 equals 	921\n
+anchor:met:+:foil:92	3 plux 918 eqvals 	921\n
+anchor:met:+:null:92	3 irzf 918 xhjwrr 	921\n
+anchor:met:+:swapped:92	3 times 918 equals 	921\n
+anchor:met:-:symbols:96	6327 - 793 = 	5534\n
+anchor:met:-:words:96	6327 minus 793 equals 	5534\n
+anchor:met:-:foil:96	6327 minux 793 eqvals 	5534\n
+anchor:met:-:null:96	6327 ygbow 793 ghwycp 	5534\n
+anchor:met:-:swapped:96	6327 plus 793 equals 	5534\n
+anchor:met:+:symbols:110	99113 + 19683 = 	118796\n
+anchor:met:+:words:110	99113 plus 19683 equals 	118796\n
+anchor:met:+:foil:110	99113 plux 19683 eqvals 	118796\n
+anchor:met:+:null:110	99113 cyyr 19683 zwzvhy 	118796\n
+anchor:met:+:swapped:110	99113 times 19683 equals 	118796\n
+anchor:met:+:symbols:119	9897 + 759089 = 	768986\n
+anchor:met:+:words:119	9897 plus 759089 equals 	768986\n
+anchor:met:+:foil:119	9897 plux 759089 eqvals 	768986\n
+anchor:met:+:null:119	9897 jdwr 759089 mbpjvn 	768986\n
+anchor:met:+:swapped:119	9897 times 759089 equals 	768986\n
+anchor:met:-:symbols:120	52 - 28169 = 	-28117\n
+anchor:met:-:words:120	52 minus 28169 equals 	-28117\n
+anchor:met:-:foil:120	52 minux 28169 eqvals 	-28117\n
+anchor:met:-:null:120	52 gcyrz 28169 gywfjy 	-28117\n
+anchor:met:-:swapped:120	52 plus 28169 equals 	-28117\n
+anchor:met:*:symbols:121	6523 * 449 = 	2928827\n
+anchor:met:*:words:121	6523 times 449 equals 	2928827\n
+anchor:met:*:foil:121	6523 timex 449 eqvals 	2928827\n
+anchor:met:*:null:121	6523 vffwk 449 czhrnz 	2928827\n
+anchor:met:*:swapped:121	6523 minus 449 equals 	2928827\n
+anchor:met:-:symbols:126	2804 - 701 = 	2103\n
+anchor:met:-:words:126	2804 minus 701 equals 	2103\n
+anchor:met:-:foil:126	2804 minux 701 eqvals 	2103\n
+anchor:met:-:null:126	2804 zovrc 701 zxnbmh 	2103\n
+anchor:met:-:swapped:126	2804 plus 701 equals 	2103\n
+anchor:far:+:symbols:128	44322046 + 650022442 = 	694344488\n
+anchor:far:+:words:128	44322046 plus 650022442 equals 	694344488\n
+anchor:far:+:foil:128	44322046 plux 650022442 eqvals 	694344488\n
+anchor:far:+:null:128	44322046 zhbd 650022442 fzrvbr 	694344488\n
+anchor:far:+:swapped:128	44322046 times 650022442 equals 	694344488\n
+anchor:far:-:symbols:129	278512214 - 16221432 = 	262290782\n
+anchor:far:-:words:129	278512214 minus 16221432 equals 	262290782\n
+anchor:far:-:foil:129	278512214 minux 16221432 eqvals 	262290782\n
+anchor:far:-:null:129	278512214 kxobp 16221432 jyppgm 	262290782\n
+anchor:far:-:swapped:129	278512214 plus 16221432 equals 	262290782\n
+anchor:far:-:symbols:134	89983046 - 47683962 = 	42299084\n
+anchor:far:-:words:134	89983046 minus 47683962 equals 	42299084\n
+anchor:far:-:foil:134	89983046 minux 47683962 eqvals 	42299084\n
+anchor:far:-:null:134	89983046 bfdzw 47683962 iixbgt 	42299084\n
+anchor:far:-:swapped:134	89983046 plus 47683962 equals 	42299084\n
+anchor:far:+:symbols:138	36276378 + 10544157 = 	46820535\n
+anchor:far:+:words:138	36276378 plus 10544157 equals 	46820535\n
+anchor:far:+:foil:138	36276378 plux 10544157 eqvals 	46820535\n
+anchor:far:+:null:138	36276378 cfbw 10544157 topotx 	46820535\n
+anchor:far:+:swapped:138	36276378 times 10544157 equals 	46820535\n
+anchor:far:-:symbols:142	40871183 - 317735859 = 	-276864676\n
+anchor:far:-:words:142	40871183 minus 317735859 equals 	-276864676\n
+anchor:far:-:foil:142	40871183 minux 317735859 eqvals 	-276864676\n
+anchor:far:-:null:142	40871183 xobfh 317735859 vopoxi 	-276864676\n
+anchor:far:-:swapped:142	40871183 plus 317735859 equals 	-276864676\n
+anchor:far:*:symbols:143	838138617 * 757203020 = 	634641091971023340\n
+anchor:far:*:words:143	838138617 times 757203020 equals 	634641091971023340\n
+anchor:far:*:foil:143	838138617 timex 757203020 eqvals 	634641091971023340\n
+anchor:far:*:null:143	838138617 vvwjp 757203020 bdcckw 	634641091971023340\n
+anchor:far:*:swapped:143	838138617 minus 757203020 equals 	634641091971023340\n
+anchor:far:*:symbols:145	664076847 * 6435384 = 	4273589515954248\n
+anchor:far:*:words:145	664076847 times 6435384 equals 	4273589515954248\n
+anchor:far:*:foil:145	664076847 timex 6435384 eqvals 	4273589515954248\n
+anchor:far:*:null:145	664076847 zghwd 6435384 mvrbfo 	4273589515954248\n
+anchor:far:*:swapped:145	664076847 minus 6435384 equals 	4273589515954248\n
+anchor:far:*:symbols:146	749560208 * 4757025 = 	3565676648461200\n
+anchor:far:*:words:146	749560208 times 4757025 equals 	3565676648461200\n
+anchor:far:*:foil:146	749560208 timex 4757025 eqvals 	3565676648461200\n
+anchor:far:*:null:146	749560208 jzfzz 4757025 kmbngk 	3565676648461200\n
+anchor:far:*:swapped:146	749560208 minus 4757025 equals 	3565676648461200\n
+anchor:far:*:symbols:147	22016480 * 53841557 = 	1185401562859360\n
+anchor:far:*:words:147	22016480 times 53841557 equals 	1185401562859360\n
+anchor:far:*:foil:147	22016480 timex 53841557 eqvals 	1185401562859360\n
+anchor:far:*:null:147	22016480 rrvzj 53841557 khgjkv 	1185401562859360\n
+anchor:far:*:swapped:147	22016480 minus 53841557 equals 	1185401562859360\n
+anchor:far:-:symbols:151	7252254 - 23312633 = 	-16060379\n
+anchor:far:-:words:151	7252254 minus 23312633 equals 	-16060379\n
+anchor:far:-:foil:151	7252254 minux 23312633 eqvals 	-16060379\n
+anchor:far:-:null:151	7252254 tdtbb 23312633 ypcgxf 	-16060379\n
+anchor:far:-:swapped:151	7252254 plus 23312633 equals 	-16060379\n
+anchor:far:*:symbols:154	65955397 * 56966636 = 	3757257093134492\n
+anchor:far:*:words:154	65955397 times 56966636 equals 	3757257093134492\n
+anchor:far:*:foil:154	65955397 timex 56966636 eqvals 	3757257093134492\n
+anchor:far:*:null:154	65955397 kyczg 56966636 ywggoh 	3757257093134492\n
+anchor:far:*:swapped:154	65955397 minus 56966636 equals 	3757257093134492\n
+anchor:far:-:symbols:157	32295525 - 413253692 = 	-380958167\n
+anchor:far:-:words:157	32295525 minus 413253692 equals 	-380958167\n
+anchor:far:-:foil:157	32295525 minux 413253692 eqvals 	-380958167\n
+anchor:far:-:null:157	32295525 fpcxv 413253692 tvvdjt 	-380958167\n
+anchor:far:-:swapped:157	32295525 plus 413253692 equals 	-380958167\n
+anchor:far:-:symbols:160	30150983 - 95030800 = 	-64879817\n
+anchor:far:-:words:160	30150983 minus 95030800 equals 	-64879817\n
+anchor:far:-:foil:160	30150983 minux 95030800 eqvals 	-64879817\n
+anchor:far:-:null:160	30150983 fgybo 95030800 gjihro 	-64879817\n
+anchor:far:-:swapped:160	30150983 plus 95030800 equals 	-64879817\n
+anchor:far:-:symbols:161	93829940 - 2077406 = 	91752534\n
+anchor:far:-:words:161	93829940 minus 2077406 equals 	91752534\n
+anchor:far:-:foil:161	93829940 minux 2077406 eqvals 	91752534\n
+anchor:far:-:null:161	93829940 wkbjj 2077406 mivjry 	91752534\n
+anchor:far:-:swapped:161	93829940 plus 2077406 equals 	91752534\n
+anchor:far:-:symbols:164	322839317 - 400138101 = 	-77298784\n
+anchor:far:-:words:164	322839317 minus 400138101 equals 	-77298784\n
+anchor:far:-:foil:164	322839317 minux 400138101 eqvals 	-77298784\n
+anchor:far:-:null:164	322839317 yxbxy 400138101 bdwbrr 	-77298784\n
+anchor:far:-:swapped:164	322839317 plus 400138101 equals 	-77298784\n
+anchor:far:*:symbols:171	749192644 * 21447242 = 	16068115940487848\n
+anchor:far:*:words:171	749192644 times 21447242 equals 	16068115940487848\n
+anchor:far:*:foil:171	749192644 timex 21447242 eqvals 	16068115940487848\n
+anchor:far:*:null:171	749192644 nfgkh 21447242 cprgdg 	16068115940487848\n
+anchor:far:*:swapped:171	749192644 minus 21447242 equals 	16068115940487848\n
+anchor:far:*:symbols:173	268189669 * 8321902 = 	2231848142830438\n
+anchor:far:*:words:173	268189669 times 8321902 equals 	2231848142830438\n
+anchor:far:*:foil:173	268189669 timex 8321902 eqvals 	2231848142830438\n
+anchor:far:*:null:173	268189669 hnfko 8321902 zhtzfr 	2231848142830438\n
+anchor:far:*:swapped:173	268189669 minus 8321902 equals 	2231848142830438\n
+anchor:far:*:symbols:178	5613210 * 407445487 = 	2287077082083270\n
+anchor:far:*:words:178	5613210 times 407445487 equals 	2287077082083270\n
+anchor:far:*:foil:178	5613210 timex 407445487 eqvals 	2287077082083270\n
+anchor:far:*:null:178	5613210 okcog 407445487 dkbpfm 	2287077082083270\n
+anchor:far:*:swapped:178	5613210 minus 407445487 equals 	2287077082083270\n
+anchor:far:+:symbols:179	11498026 + 316292910 = 	327790936\n
+anchor:far:+:words:179	11498026 plus 316292910 equals 	327790936\n
+anchor:far:+:foil:179	11498026 plux 316292910 eqvals 	327790936\n
+anchor:far:+:null:179	11498026 jixf 316292910 gzxhnc 	327790936\n
+anchor:far:+:swapped:179	11498026 times 316292910 equals 	327790936\n
+anchor:far:+:symbols:181	46403080 + 3644161 = 	50047241\n
+anchor:far:+:words:181	46403080 plus 3644161 equals 	50047241\n
+anchor:far:+:foil:181	46403080 plux 3644161 eqvals 	50047241\n
+anchor:far:+:null:181	46403080 nmbx 3644161 oitndt 	50047241\n
+anchor:far:+:swapped:181	46403080 times 3644161 equals 	50047241\n
+anchor:far:+:symbols:185	108350954 + 68878678 = 	177229632\n
+anchor:far:+:words:185	108350954 plus 68878678 equals 	177229632\n
+anchor:far:+:foil:185	108350954 plux 68878678 eqvals 	177229632\n
+anchor:far:+:null:185	108350954 ymkf 68878678 zowhkd 	177229632\n
+anchor:far:+:swapped:185	108350954 times 68878678 equals 	177229632\n
+anchor:far:-:symbols:186	2271825 - 3805633 = 	-1533808\n
+anchor:far:-:words:186	2271825 minus 3805633 equals 	-1533808\n
+anchor:far:-:foil:186	2271825 minux 3805633 eqvals 	-1533808\n
+anchor:far:-:null:186	2271825 pbcww 3805633 ivymvv 	-1533808\n
+anchor:far:-:swapped:186	2271825 plus 3805633 equals 	-1533808\n
+anchor:far:-:symbols:191	464950374 - 990579795 = 	-525629421\n
+anchor:far:-:words:191	464950374 minus 990579795 equals 	-525629421\n
+anchor:far:-:foil:191	464950374 minux 990579795 eqvals 	-525629421\n
+anchor:far:-:null:191	464950374 dxprv 990579795 ckfwog 	-525629421\n
+anchor:far:-:swapped:191	464950374 plus 990579795 equals 	-525629421\n
+anchor:far:*:symbols:192	1189967 * 5316529 = 	6326494064543\n
+anchor:far:*:words:192	1189967 times 5316529 equals 	6326494064543\n
+anchor:far:*:foil:192	1189967 timex 5316529 eqvals 	6326494064543\n
+anchor:far:*:null:192	1189967 pdzrk 5316529 vmnnih 	6326494064543\n
+anchor:far:*:swapped:192	1189967 minus 5316529 equals 	6326494064543\n
+anchor:far:+:symbols:193	714597288 + 5420351 = 	720017639\n
+anchor:far:+:words:193	714597288 plus 5420351 equals 	720017639\n
+anchor:far:+:foil:193	714597288 plux 5420351 eqvals 	720017639\n
+anchor:far:+:null:193	714597288 wydg 5420351 mtmfnt 	720017639\n
+anchor:far:+:swapped:193	714597288 times 5420351 equals 	720017639\n
+anchor:far:+:symbols:194	543966908 + 5948181 = 	549915089\n
+anchor:far:+:words:194	543966908 plus 5948181 equals 	549915089\n
+anchor:far:+:foil:194	543966908 plux 5948181 eqvals 	549915089\n
+anchor:far:+:null:194	543966908 txrk 5948181 bcdpxr 	549915089\n
+anchor:far:+:swapped:194	543966908 times 5948181 equals 	549915089\n
+anchor:far:+:symbols:196	24915096 + 365780703 = 	390695799\n
+anchor:far:+:words:196	24915096 plus 365780703 equals 	390695799\n
+anchor:far:+:foil:196	24915096 plux 365780703 eqvals 	390695799\n
+anchor:far:+:null:196	24915096 kvkd 365780703 ncohgm 	390695799\n
+anchor:far:+:swapped:196	24915096 times 365780703 equals 	390695799\n
+anchor:far:+:symbols:198	8756353 + 517405735 = 	526162088\n
+anchor:far:+:words:198	8756353 plus 517405735 equals 	526162088\n
+anchor:far:+:foil:198	8756353 plux 517405735 eqvals 	526162088\n
+anchor:far:+:null:198	8756353 wdco 517405735 ththco 	526162088\n
+anchor:far:+:swapped:198	8756353 times 517405735 equals 	526162088\n
+anchor:far:-:symbols:199	13464171 - 451064728 = 	-437600557\n
+anchor:far:-:words:199	13464171 minus 451064728 equals 	-437600557\n
+anchor:far:-:foil:199	13464171 minux 451064728 eqvals 	-437600557\n
+anchor:far:-:null:199	13464171 bzdbz 451064728 npfgjc 	-437600557\n
+anchor:far:-:swapped:199	13464171 plus 451064728 equals 	-437600557\n
+anchor:far:+:symbols:201	96345834 + 55224793 = 	151570627\n
+anchor:far:+:words:201	96345834 plus 55224793 equals 	151570627\n
+anchor:far:+:foil:201	96345834 plux 55224793 eqvals 	151570627\n
+anchor:far:+:null:201	96345834 thvr 55224793 wgjiwr 	151570627\n
+anchor:far:+:swapped:201	96345834 times 55224793 equals 	151570627\n
+anchor:far:+:symbols:203	67638595 + 2814293 = 	70452888\n
+anchor:far:+:words:203	67638595 plus 2814293 equals 	70452888\n
+anchor:far:+:foil:203	67638595 plux 2814293 eqvals 	70452888\n
+anchor:far:+:null:203	67638595 hwjn 2814293 mxfcjf 	70452888\n
+anchor:far:+:swapped:203	67638595 times 2814293 equals 	70452888\n
+anchor:far:*:symbols:204	1277417 * 99253636 = 	126788281938212\n
+anchor:far:*:words:204	1277417 times 99253636 equals 	126788281938212\n
+anchor:far:*:foil:204	1277417 timex 99253636 eqvals 	126788281938212\n
+anchor:far:*:null:204	1277417 zrgdz 99253636 yzxtfc 	126788281938212\n
+anchor:far:*:swapped:204	1277417 minus 99253636 equals 	126788281938212\n
+anchor:far:+:symbols:205	5352750 + 51251783 = 	56604533\n
+anchor:far:+:words:205	5352750 plus 51251783 equals 	56604533\n
+anchor:far:+:foil:205	5352750 plux 51251783 eqvals 	56604533\n
+anchor:far:+:null:205	5352750 xftc 51251783 kbxpnt 	56604533\n
+anchor:far:+:swapped:205	5352750 times 51251783 equals 	56604533\n
+anchor:far:*:symbols:207	59941544 * 46478188 = 	2785974351042272\n
+anchor:far:*:words:207	59941544 times 46478188 equals 	2785974351042272\n
+anchor:far:*:foil:207	59941544 timex 46478188 eqvals 	2785974351042272\n
+anchor:far:*:null:207	59941544 fpgdk 46478188 jdyzzw 	2785974351042272\n
+anchor:far:*:swapped:207	59941544 minus 46478188 equals 	2785974351042272\n
+anchor:far:*:symbols:211	51118569 * 306900074 = 	15688292608874106\n
+anchor:far:*:words:211	51118569 times 306900074 equals 	15688292608874106\n
+anchor:far:*:foil:211	51118569 timex 306900074 eqvals 	15688292608874106\n
+anchor:far:*:null:211	51118569 fjwho 306900074 fhmttb 	15688292608874106\n
+anchor:far:*:swapped:211	51118569 minus 306900074 equals 	15688292608874106\n
+anchor:far:+:symbols:212	7369951 + 77575607 = 	84945558\n
+anchor:far:+:words:212	7369951 plus 77575607 equals 	84945558\n
+anchor:far:+:foil:212	7369951 plux 77575607 eqvals 	84945558\n
+anchor:far:+:null:212	7369951 mvik 77575607 vfizmd 	84945558\n
+anchor:far:+:swapped:212	7369951 times 77575607 equals 	84945558\n
+anchor:far:*:symbols:216	10248953 * 581973782 = 	5964621938950246\n
+anchor:far:*:words:216	10248953 times 581973782 equals 	5964621938950246\n
+anchor:far:*:foil:216	10248953 timex 581973782 eqvals 	5964621938950246\n
+anchor:far:*:null:216	10248953 gnrgy 581973782 ivkfgi 	5964621938950246\n
+anchor:far:*:swapped:216	10248953 minus 581973782 equals 	5964621938950246\n
+anchor:far:+:symbols:219	42645778 + 849803957 = 	892449735\n
+anchor:far:+:words:219	42645778 plus 849803957 equals 	892449735\n
+anchor:far:+:foil:219	42645778 plux 849803957 eqvals 	892449735\n
+anchor:far:+:null:219	42645778 vzwz 849803957 ttnhrh 	892449735\n
+anchor:far:+:swapped:219	42645778 times 849803957 equals 	892449735\n
+anchor:far:*:symbols:221	1796339 * 548340756 = 	985005885292284\n
+anchor:far:*:words:221	1796339 times 548340756 equals 	985005885292284\n
+anchor:far:*:foil:221	1796339 timex 548340756 eqvals 	985005885292284\n
+anchor:far:*:null:221	1796339 kjvrj 548340756 tokdzx 	985005885292284\n
+anchor:far:*:swapped:221	1796339 minus 548340756 equals 	985005885292284\n
+anchor:far:+:symbols:222	67786173 + 217168141 = 	284954314\n
+anchor:far:+:words:222	67786173 plus 217168141 equals 	284954314\n
+anchor:far:+:foil:222	67786173 plux 217168141 eqvals 	284954314\n
+anchor:far:+:null:222	67786173 vtbz 217168141 mymfjf 	284954314\n
+anchor:far:+:swapped:222	67786173 times 217168141 equals 	284954314\n
+anchor:far:-:symbols:225	3027603 - 2300892 = 	726711\n
+anchor:far:-:words:225	3027603 minus 2300892 equals 	726711\n
+anchor:far:-:foil:225	3027603 minux 2300892 eqvals 	726711\n
+anchor:far:-:null:225	3027603 tfyvr 2300892 wtwjtt 	726711\n
+anchor:far:-:swapped:225	3027603 plus 2300892 equals 	726711\n
+anchor:far:+:symbols:228	2080228 + 90423676 = 	92503904\n
+anchor:far:+:words:228	2080228 plus 90423676 equals 	92503904\n
+anchor:far:+:foil:228	2080228 plux 90423676 eqvals 	92503904\n
+anchor:far:+:null:228	2080228 krct 90423676 ytzbyh 	92503904\n
+anchor:far:+:swapped:228	2080228 times 90423676 equals 	92503904\n
+anchor:far:*:symbols:229	5838895 * 4917333 = 	28711791067035\n
+anchor:far:*:words:229	5838895 times 4917333 equals 	28711791067035\n
+anchor:far:*:foil:229	5838895 timex 4917333 eqvals 	28711791067035\n
+anchor:far:*:null:229	5838895 jzdzc 4917333 dntdtj 	28711791067035\n
+anchor:far:*:swapped:229	5838895 minus 4917333 equals 	28711791067035\n
+anchor:far:+:symbols:231	6544018 + 41709146 = 	48253164\n
+anchor:far:+:words:231	6544018 plus 41709146 equals 	48253164\n
+anchor:far:+:foil:231	6544018 plux 41709146 eqvals 	48253164\n
+anchor:far:+:null:231	6544018 mvgh 41709146 moppwi 	48253164\n
+anchor:far:+:swapped:231	6544018 times 41709146 equals 	48253164\n
+anchor:far:+:symbols:235	3259733 + 9144889 = 	12404622\n
+anchor:far:+:words:235	3259733 plus 9144889 equals 	12404622\n
+anchor:far:+:foil:235	3259733 plux 9144889 eqvals 	12404622\n
+anchor:far:+:null:235	3259733 vwbr 9144889 yrjpmb 	12404622\n
+anchor:far:+:swapped:235	3259733 times 9144889 equals 	12404622\n
+anchor:far:*:symbols:236	36642904 * 6247085 = 	228911335934840\n
+anchor:far:*:words:236	36642904 times 6247085 equals 	228911335934840\n
+anchor:far:*:foil:236	36642904 timex 6247085 eqvals 	228911335934840\n
+anchor:far:*:null:236	36642904 xroco 6247085 zyxdcb 	228911335934840\n
+anchor:far:*:swapped:236	36642904 minus 6247085 equals 	228911335934840\n
+anchor:far:-:symbols:243	87358114 - 281061319 = 	-193703205\n
+anchor:far:-:words:243	87358114 minus 281061319 equals 	-193703205\n
+anchor:far:-:foil:243	87358114 minux 281061319 eqvals 	-193703205\n
+anchor:far:-:null:243	87358114 jydxh 281061319 gggzpm 	-193703205\n
+anchor:far:-:swapped:243	87358114 plus 281061319 equals 	-193703205\n
+anchor:far:+:symbols:250	59212771 + 68453970 = 	127666741\n
+anchor:far:+:words:250	59212771 plus 68453970 equals 	127666741\n
+anchor:far:+:foil:250	59212771 plux 68453970 eqvals 	127666741\n
+anchor:far:+:null:250	59212771 kkfd 68453970 jhirym 	127666741\n
+anchor:far:+:swapped:250	59212771 times 68453970 equals 	127666741\n
+anchor:far:-:symbols:252	14285765 - 1962847 = 	12322918\n
+anchor:far:-:words:252	14285765 minus 1962847 equals 	12322918\n
+anchor:far:-:foil:252	14285765 minux 1962847 eqvals 	12322918\n
+anchor:far:-:null:252	14285765 kgvdp 1962847 pjovyw 	12322918\n
+anchor:far:-:swapped:252	14285765 plus 1962847 equals 	12322918\n
+answer:met:0	(5 * 34) * 1279 = 	217430\n
+answer:met:1	(8 + 6) * 9 = 	126\n
+answer:met:2	619136 + 272568 = 	891704\n
+answer:met:3	4379 * (3 - 627) = 	-2732496\n
+answer:met:4	0 + ((7113 - 8) - 9) = 	7096\n
+answer:met:5	6 + 47439 = 	47445\n
+answer:met:6	9 - (0 + 98) = 	-89\n
+answer:met:7	90 + 81 = 	171\n
+answer:met:8	(266070 + (6835 - 39667)) * 642 = 	149738796\n
+answer:met:9	(7 - 660) - (9516 - 46) = 	-10123\n
+answer:met:10	15328 * 95965 = 	1470951520\n
+answer:met:11	(33959 + 85445) + (57268 + 4430) = 	181102\n
+answer:met:12	((908 + 70) * 24) * 23 = 	539856\n
+answer:met:13	18 + ((78953 + 665) - 283) = 	79353\n
+answer:met:14	(23 + 2935) + (161 + 73423) = 	76542\n
+answer:met:15	58 - 43 = 	15\n
+answer:met:16	(2 - (661359 + 14)) + 5 = 	-661366\n
+answer:met:17	53 - (551958 + (7598 + 525)) = 	-560028\n
+answer:met:18	31864 - 75399 = 	-43535\n
+answer:met:19	90 * (9514 * 250512) = 	214503405120\n
+answer:met:20	(79367 + 0) * (561 + 4407) = 	394295256\n
+answer:met:21	5448 * (1554 * 85) = 	719626320\n
+answer:met:22	34 + (226 * 1543) = 	348752\n
+answer:met:23	878893 - 35917 = 	842976\n
+answer:met:24	62 * ((52 * 99106) * 2319) = 	740961648336\n
+answer:met:25	9442 + (86 * (5 - 582266)) = 	-50065004\n
+answer:met:26	63081 * (927 * 476) = 	27834617412\n
+answer:met:27	(779 * 621547) + 662419 = 	484847532\n
+answer:met:28	((5 * 41267) - 29196) - 827 = 	176312\n
+answer:met:29	(583206 + 287) + 87 = 	583580\n
+answer:met:30	(659796 - (14705 + 83090)) * 547 = 	307414547\n
+answer:met:31	(4462 * 596570) - (3 * 93) = 	2661895061\n
+answer:met:32	865746 + (333992 * 80533) = 	26898243482\n
+answer:met:33	360235 - 0 = 	360235\n
+answer:met:34	863736 + 1 = 	863737\n
+answer:met:35	((1 + 714) + 951716) + 9 = 	952440\n
+answer:met:36	(6 * 42) + 6 = 	258\n
+answer:met:37	45 * (88025 + (747415 - 9980)) = 	37145700\n
+answer:met:38	(3536 * 32124) - 4 = 	113590460\n
+answer:met:39	3 - 946 = 	-943\n
+answer:met:40	9333 * 95 = 	886635\n
+answer:met:41	716 - 5 = 	711\n
+answer:met:42	((770733 + 558645) + 743041) * 95 = 	196879805\n
+answer:met:43	(57399 * 137517) - 24 = 	7893338259\n
+answer:met:44	240452 * 245 = 	58910740\n
+answer:met:45	(50 - 369958) * (70123 + 90055) = 	-59251123624\n
+answer:met:46	7548 * (14 - 64164) = 	-484204200\n
+answer:met:47	3 + (9 - 3) = 	9\n
+answer:met:48	711464 - 3158 = 	708306\n
+answer:met:49	(3440 + 9) - 79 = 	3370\n
+answer:met:50	(542 - 128514) - 29 = 	-128001\n
+answer:met:51	343119 + ((981 * 991) - 5) = 	1315285\n
+answer:met:52	(6 * 174) - (82 + 15032) = 	-14070\n
+answer:met:53	74457 + ((2 * 321) + 96853) = 	171952\n
+answer:met:54	82772 * (8752 + 8623) = 	1438163500\n
+answer:met:55	524 - 0 = 	524\n
+answer:met:56	(569 - 19752) + (3021 + 64) = 	-16098\n
+answer:met:57	(99942 + 52) + 708 = 	100702\n
+answer:met:58	62 * (8943 * 92) = 	51010872\n
+answer:met:59	149882 + 544476 = 	694358\n
+answer:met:60	50575 + (57 * 106164) = 	6101923\n
+answer:met:61	9262 * 219 = 	2028378\n
+answer:met:62	(93 - 993857) + 37 = 	-993727\n
+answer:met:63	36792 - 6122 = 	30670\n
+answer:met:64	16 + (54172 - (517 * 6149)) = 	-3124845\n
+answer:met:65	(1668 + (71745 - 646)) - 2 = 	72765\n
+answer:met:66	(948661 * 17) * 169 = 	2725503053\n
+answer:met:67	(4 - 15) * 830 = 	-9130\n
+answer:met:68	8126 * (479 * 8) = 	31138832\n
+answer:met:69	40638 * 990 = 	40231620\n
+answer:met:70	511 * (6498 * 97376) = 	323334865728\n
+answer:met:71	((17 * 63) * 2993) + 946 = 	3206449\n
+answer:met:72	36 * 0 = 	0\n
+answer:met:73	23142 * 3 = 	69426\n
+answer:met:74	7581 + (865 - 627041) = 	-618595\n
+answer:met:75	41 + 344321 = 	344362\n
+answer:met:76	((298 + 48495) - 50) + 599496 = 	648239\n
+answer:met:77	71 * 8498 = 	603358\n
+answer:met:78	(823706 + 24164) - 1 = 	847869\n
+answer:met:79	4 * 317 = 	1268\n
+answer:met:80	6 - 2325 = 	-2319\n
+answer:met:81	1 + (2 + 9705) = 	9708\n
+answer:met:82	482 - (55477 * 22) = 	-1220012\n
+answer:met:83	6707 * 0 = 	0\n
+answer:met:84	(42490 - 80) - (361 - 34776) = 	76825\n
+answer:met:85	22769 - 2 = 	22767\n
+answer:met:86	91 + 89069 = 	89160\n
+answer:met:87	(7791 * (52861 * 7504)) - 61 = 	3090447742643\n
+answer:met:88	10554 - 6 = 	10548\n
+answer:met:89	8 - (90635 + 1) = 	-90628\n
+answer:met:90	(480842 * 0) - 43 = 	-43\n
+answer:met:91	53 - 974 = 	-921\n
+answer:met:92	3 + 918 = 	921\n
+answer:met:93	(73 - 8) * 86 = 	5590\n
+answer:met:94	((0 - 3673) * 3) * 765 = 	-8429535\n
+answer:met:95	(21 * 2247) + (58188 - 6) = 	105369\n
+answer:met:96	6327 - 793 = 	5534\n
+answer:met:97	118906 + (7 + 401) = 	119314\n
+answer:met:98	97776 - (3377 - 54254) = 	148653\n
+answer:met:99	16 * (81 + 626) = 	11312\n
+answer:met:100	4 * (15294 * 938913) = 	57438941688\n
+answer:met:101	(71 - 574) * (2 - 6400) = 	3218194\n
+answer:met:102	(8516 - 2950) * 219137 = 	1219716542\n
+answer:met:103	(641011 - 95022) * 84 = 	45863076\n
+answer:met:104	460 * (9466 + 69) = 	4386100\n
+answer:met:105	(223 * 993163) - (1972 * 49) = 	221378721\n
+answer:met:106	43 - (618477 - (12494 - 38)) = 	-605978\n
+answer:met:107	(6 - (4 + 845753)) - 336266 = 	-1182017\n
+answer:met:108	((46 + 4) - 79) + 356 = 	327\n
+answer:met:109	(325 * 6978) * (1 - 99) = 	-222249300\n
+answer:met:110	99113 + 19683 = 	118796\n
+answer:met:111	387 - (556 + 60) = 	-229\n
+answer:met:112	(75 - (193917 * 5)) * 1700 = 	-1648167000\n
+answer:met:113	((8 * 880450) * 4330) - 132 = 	30498787868\n
+answer:met:114	(43 * 11587) * (1 - 24) = 	-11459543\n
+answer:met:115	((42709 * 2) * 893) - 44 = 	76278230\n
+answer:met:116	((604 + 52) + 732) * 1 = 	1388\n
+answer:met:117	(53669 + 677431) * (63 + 479192) = 	350383330500\n
+answer:met:118	(846 + 167) - 9 = 	1004\n
+answer:met:119	9897 + 759089 = 	768986\n
+answer:met:120	52 - 28169 = 	-28117\n
+answer:met:121	6523 * 449 = 	2928827\n
+answer:met:122	(775 * 5562) * (96688 * 4268) = 	1778810460451200\n
+answer:met:123	2 + (9 + (598632 * 270)) = 	161630651\n
+answer:met:124	(772 - 77177) - (550021 * 48573) = 	-26716246438\n
+answer:met:125	5 + (8053 - (314 * 273)) = 	-77664\n
+answer:met:126	2804 - 701 = 	2103\n
+answer:met:127	((595364 + 0) * 828) * 660 = 	325354518720\n
+answer:far:0	44322046 + 650022442 = 	694344488\n
+answer:far:1	278512214 - 16221432 = 	262290782\n
+answer:far:2	4253978 + (415577240 + 225356875) = 	645188093\n
+answer:far:3	((66032556 - 6036849) + 4451008) * 195947845 = 	12628194921579175\n
+answer:far:4	39575413 + (43389163 * 599782286) = 	26024051411342031\n
+answer:far:5	(2129078 - 785095328) + (52397658 + 353735985) = 	-376832607\n
+answer:far:6	89983046 - 47683962 = 	42299084\n
+answer:far:7	10006303 + (938395995 * (638261672 * 9013284)) = 	5398436119043082989560063\n
+answer:far:8	(93724597 * 6157040) - 7685185 = 	577066085027695\n
+answer:far:9	6869969 - (5235382 + (3977296 * 902195513)) = 	-3588298603438261\n
+answer:far:10	36276378 + 10544157 = 	46820535\n
+answer:far:11	(7110475 - (875177707 + 291161684)) + 8454207 = 	-1150774709\n
+answer:far:12	(55819599 - 32011041) + 1752345 = 	25560903\n
+answer:far:13	(7326793 - 3508090) + (880441046 * 20065989) = 	17666920348003197\n
+answer:far:14	40871183 - 317735859 = 	-276864676\n
+answer:far:15	838138617 * 757203020 = 	634641091971023340\n
+answer:far:16	(44493716 - 813243162) * (2066307 * 16786655) = 	-26665137509803059620910\n
+answer:far:17	664076847 * 6435384 = 	4273589515954248\n
+answer:far:18	749560208 * 4757025 = 	3565676648461200\n
+answer:far:19	22016480 * 53841557 = 	1185401562859360\n
+answer:far:20	38681965 - ((40771584 + 55951646) + 57040152) = 	-115081417\n
+answer:far:21	(3707109 * 544975451) + 1848354 = 	2020283401029513\n
+answer:far:22	(1322231 + 38493790) * 5151885 = 	205127561349585\n
+answer:far:23	7252254 - 23312633 = 	-16060379\n
+answer:far:24	(175930069 * 8045289) * 5081054 = 	7191765744680635547814\n
+answer:far:25	(189288442 + 62851946) * 766842400 = 	193351940270851200\n
+answer:far:26	65955397 * 56966636 = 	3757257093134492\n
+answer:far:27	869334396 * (32322946 + 8434219) = 	35431605417947340\n
+answer:far:28	762045563 * (37003409 * 65477427) = 	1846351058846536156821009\n
+answer:far:29	32295525 - 413253692 = 	-380958167\n
+answer:far:30	797916029 + (70058314 - (79752756 + 91885459)) = 	696336128\n
+answer:far:31	508290168 + (8044704 - 69030455) = 	447304417\n
+answer:far:32	30150983 - 95030800 = 	-64879817\n
+answer:far:33	93829940 - 2077406 = 	91752534\n
+answer:far:34	((58099464 - 3516512) + 6719860) * 1699375 = 	104176466142500\n
+answer:far:35	(810780377 - (499909099 + 6804478)) + 205500285 = 	509567085\n
+answer:far:36	322839317 - 400138101 = 	-77298784\n
+answer:far:37	53475157 - (120803164 * 4296210) = 	-518995707733283\n
+answer:far:38	1202230 * (79805157 + 5530720) = 	102593351405710\n
+answer:far:39	(6147511 - 1058712) * 512069338 = 	2605817935145062\n
+answer:far:40	14705724 + (3272591 - (17466255 * 635944500)) = 	-11107568784869185\n
+answer:far:41	338733398 - (822027624 + 583268084) = 	-1066562310\n
+answer:far:42	(413434216 - 4996001) + (45183964 - 4174555) = 	449447624\n
+answer:far:43	749192644 * 21447242 = 	16068115940487848\n
+answer:far:44	793374121 - (862817925 * (7023996 - 2437967)) = 	-3956907232395704\n
+answer:far:45	268189669 * 8321902 = 	2231848142830438\n
+answer:far:46	(53839691 + 307458279) - (7287030 + 44388168) = 	309622772\n
+answer:far:47	(284325225 * 512596363) + 87470919 = 	145744076331627594\n
+answer:far:48	(4444123 * 20158962) + (1567762 * 77058719) = 	210398638097204\n
+answer:far:49	(8987368 - 31842213) - 256272061 = 	-279126906\n
+answer:far:50	5613210 * 407445487 = 	2287077082083270\n
+answer:far:51	11498026 + 316292910 = 	327790936\n
+answer:far:52	658422957 - ((613339901 - 247328527) + 68356667) = 	224054916\n
+answer:far:53	46403080 + 3644161 = 	50047241\n
+answer:far:54	(5427268 + 694642261) * (113564539 + 427234005) = 	378596581981965776\n
+answer:far:55	2928708 * (1493841 * 3160279) = 	13826296747992872412\n
+answer:far:56	((3006538 + 6553053) * 4246510) * 9445321 = 	383431849915144998610\n
+answer:far:57	108350954 + 68878678 = 	177229632\n
+answer:far:58	2271825 - 3805633 = 	-1533808\n
+answer:far:59	484565277 * (357015129 * (2419756 - 48459360)) = 	-7964719582875155425329732\n
+answer:far:60	5315822 - (6740910 * 4070782) = 	-27440769775798\n
+answer:far:61	(71766530 + 69617488) * 358276402 = 	50654557269343236\n
+answer:far:62	2351141 + (55500489 + (142988412 + 28675416)) = 	229515458\n
+answer:far:63	464950374 - 990579795 = 	-525629421\n
+answer:far:64	1189967 * 5316529 = 	6326494064543\n
+answer:far:65	714597288 + 5420351 = 	720017639\n
+answer:far:66	543966908 + 5948181 = 	549915089\n
+answer:far:67	(80319996 + 3523257) - (195486817 - 154367412) = 	42723848\n
+answer:far:68	24915096 + 365780703 = 	390695799\n
+answer:far:69	944777253 - (234845073 - 6195953) = 	716128133\n
+answer:far:70	8756353 + 517405735 = 	526162088\n
+answer:far:71	13464171 - 451064728 = 	-437600557\n
+answer:far:72	918721323 * (775732123 - 364803408) = 	377528972703489945\n
+answer:far:73	96345834 + 55224793 = 	151570627\n
+answer:far:74	9109790 + ((9012916 - 4198508) + 364915680) = 	378839878\n
+answer:far:75	67638595 + 2814293 = 	70452888\n
+answer:far:76	1277417 * 99253636 = 	126788281938212\n
+answer:far:77	5352750 + 51251783 = 	56604533\n
+answer:far:78	542312836 * (83133350 - 820565888) = 	-399919131041457768\n
+answer:far:79	59941544 * 46478188 = 	2785974351042272\n
+answer:far:80	(44013557 - (878917582 * 15664733)) * 283732976 = 	-3906438225903766060387824\n
+answer:far:81	(9789506 + 36692225) * 3617709 = 	168157376574279\n
+answer:far:82	8880519 * (976879832 * 2149600) = 	18648209723941020076800\n
+answer:far:83	51118569 * 306900074 = 	15688292608874106\n
+answer:far:84	7369951 + 77575607 = 	84945558\n
+answer:far:85	(12300546 * 8673129) + (15525936 * 624097054) = 	9796375140420978\n
+answer:far:86	((6748824 * 8016385) + 99919408) + 6594669 = 	54101277995317\n
+answer:far:87	1943983 + (3053817 + (73460551 + 48092337)) = 	126550688\n
+answer:far:88	10248953 * 581973782 = 	5964621938950246\n
+answer:far:89	((723590394 * 409626456) - 41593453) - 85619180 = 	296401768562651031\n
+answer:far:90	97519071 + (32525553 - 52347977) = 	77696647\n
+answer:far:91	42645778 + 849803957 = 	892449735\n
+answer:far:92	(800839698 * 75509322) - (410553602 * 22707200) = 	51148339875330356\n
+answer:far:93	1796339 * 548340756 = 	985005885292284\n
+answer:far:94	67786173 + 217168141 = 	284954314\n
+answer:far:95	(913489757 * 732315209) - (6843266 + 925676068) = 	668962441384294879\n
+answer:far:96	(5657059 - 2089152) * 780495863 = 	2784736653068741\n
+answer:far:97	3027603 - 2300892 = 	726711\n
+answer:far:98	(5261725 + 965301978) - 4169503 = 	966394200\n
+answer:far:99	((5824092 - 462371405) + 309512044) - 106189427 = 	-253224696\n
+answer:far:100	2080228 + 90423676 = 	92503904\n
+answer:far:101	5838895 * 4917333 = 	28711791067035\n
+answer:far:102	(9161031 * 528157444) + 2288895 = 	4838466719653659\n
+answer:far:103	6544018 + 41709146 = 	48253164\n
+answer:far:104	3617685 * (4315387 * 61060515) = 	953259102645012533925\n
+answer:far:105	(5149859 * 742861369) + (9989039 * 914702632) = 	12962631571347619\n
+answer:far:106	(46312175 - 481003850) + (5390659 * 39405323) = 	212420224386182\n
+answer:far:107	3259733 + 9144889 = 	12404622\n
+answer:far:108	36642904 * 6247085 = 	228911335934840\n
+answer:far:109	(248769125 * 4184299) - 6995779 = 	1040924393972596\n
+answer:far:110	48367342 * ((84059860 + 76423006) - 6612668) = 	7442292490273716\n
+answer:far:111	((654763749 * 1228369) + 142300307) - 3685341 = 	804291630210347\n
+answer:far:112	24689604 + (9514186 - 2799236) = 	31404554\n
+answer:far:113	((2378771 - 197788632) - 89775466) + 84887666 = 	-200297661\n
+answer:far:114	2832718 + (846413382 - 21844974) = 	827401126\n
+answer:far:115	87358114 - 281061319 = 	-193703205\n
+answer:far:116	(6237143 - 2975779) * 54964114 = 	179257982691496\n
+answer:far:117	(2758714 * 458787145) * 774135550 = 	979794350981580938891500\n
+answer:far:118	171445218 * (38868966 * 655201101) = 	4366193535416448641951388\n
+answer:far:119	7704574 - (242419518 + 991196200) = 	-1225911144\n
+answer:far:120	29391094 - (65733291 * (147009493 - 78732058)) = 	-4488100474197491\n
+answer:far:121	501603002 * (344172984 + 289146331) = 	317674869628583630\n
+answer:far:122	59212771 + 68453970 = 	127666741\n
+answer:far:123	37328730 - (11566812 + 54801315) = 	-29039397\n
+answer:far:124	14285765 - 1962847 = 	12322918\n
+answer:far:125	(53725249 * 98037772) - 670244369 = 	5267103041860859\n
+answer:far:126	(28202017 * 3876277) - 135561590 = 	109318694289119\n
+answer:far:127	277344288 + (109015198 * 73461185) = 	8008385905433918\n

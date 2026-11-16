@@ -1,0 +1,9 @@
+LOUDNESS region=code places=20124 nats_a_place=0.5449 loudness_octaves=19.847 spearman_loud_code=-0.101
+LOUDNESS region=web places=20043 nats_a_place=0.9061 loudness_octaves=19.935 spearman_loud_code=-0.099
+LOUDNESS region=science places=20088 nats_a_place=0.7566 loudness_octaves=20.016 spearman_loud_code=-0.181
+LOUDNESS region=books places=20028 nats_a_place=0.8654 loudness_octaves=20.142 spearman_loud_code=-0.210
+LOUDNESS region=wikidata places=20225 nats_a_place=1.0509 loudness_octaves=19.886 spearman_loud_code=+0.304
+LOUDNESS region=arithmetic places=11493 nats_a_place=1.5425 loudness_octaves=20.233 spearman_loud_code=-0.460
+LOUDNESS region=words places=20496 nats_a_place=0.8106 loudness_octaves=19.972 spearman_loud_code=-0.275
+LOUDNESS region=all places=132497 nats_a_place=0.8850 loudness_octaves=19.990 spearman_loud_code=-0.057
+MEASURE lap=lap71 rc=0 wall_s=1414.7 peak_rss_kib=465096
