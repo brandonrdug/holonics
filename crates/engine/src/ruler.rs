@@ -1845,6 +1845,7 @@ impl Constitution {
             lambda,
             temper,
             chart: pass.ticks.iter().map(|c| c.read.clone()).collect(),
+            value: pass.ticks.iter().map(|c| c.vword.clone()).collect(),
             sources,
             read: pass.ticks.iter().map(|c| c.read2.clone()).collect(),
             current: pass.ticks.iter().map(|c| c.y.clone()).collect(),
@@ -1866,6 +1867,8 @@ pub struct CrossingTension {
     pub temper: Vec<Vec<(usize, usize, i128)>>,
     /// Each tick's opening chart `r̂` (`[t][D]` on `2^(−16)`), which the tick's keys, probes and values read.
     pub chart: Vec<Vec<i32>>,
+    /// Each tick's value words (`[t][2M]` on `2^(−16)`, unframed, a site's moment added): what a site offers a row that meets it.
+    pub value: Vec<Vec<i64>>,
     /// Each tick's open rows: for each head and open site, the sources its row met, each one's share of the row's weight (on `SHARE_BITS`)
     /// and its lock at unit gain (on `2^(−16)`, before the temperature and the falloff).
     #[allow(clippy::type_complexity)]

@@ -61,6 +61,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-junction") {
         return athena::store::read_junction(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-cavity") {
+        return athena::ruler::cavity::read_cavity(&rest[1..], &mut holonics_engine::realization::Host);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension") {
         return athena::ruler::tension::read_tension(&rest[1..]);
     }

@@ -453,6 +453,25 @@ def links(d, heads=4):
     fit, test = half == 0, half == 1
     centre = lambda x, sel: x - x[sel].mean(axis=0)
     print(f"LINKS_READ rows={n} regions={int(opened.sum()) // ticks} ticks={ticks}")
+    value_path = os.path.join(d, "value.i64")
+    if os.path.exists(value_path):
+        # What a source offers: its own digit read from its value word, every head's and each head's part (the head's 2n coordinates).
+        val = (np.fromfile(value_path, dtype="<i8").reshape(n, m2) / 2.0**FACE).astype(np.float32)
+        n_modes = m2 // (2 * heads)
+        print("LINKS_VALUE scope role tick rows own_digit_from_value_all_heads head0 head1 head2 head3")
+        for scope, mask in (("met+", met & plus),):
+            for rname, rid in (("a", 0), ("b", 1)):
+                for k in range(ticks):
+                    sel = mask & (role == rid) & (tick == k) & ~opened
+                    f, t = sel & fit, sel & test
+                    if t.sum() < 300:
+                        continue
+                    target = centre(onehot(np.clip(digit, 0, 9)), sel)
+                    by_head = []
+                    for h in range(heads):
+                        cols = np.r_[h * n_modes : (h + 1) * n_modes, m2 // 2 + h * n_modes : m2 // 2 + (h + 1) * n_modes]
+                        by_head.append(removed(val[:, cols], target, f, t))
+                    print(f"LINKS_VALUE {scope} {rname} {k} {t.sum()} {removed(val, target, f, t):.4f} " + " ".join(f"{x:.4f}" for x in by_head), flush=True)
     print("LINKS_PURITY scope role tick rows own_digit_from_chart place_from_chart")
     for scope, mask in (("met+", met & plus), ("far+", ~met & plus)):
         for rname, rid in (("a", 0), ("b", 1), ("v-known", 2), ("v-open", 2)):

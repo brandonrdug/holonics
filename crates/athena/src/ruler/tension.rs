@@ -103,6 +103,8 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
     let (mut chart, mut shares) = if all { (Some(create("chart.i32")?), Some(create("shares.tsv")?)) } else { (None, None) };
+    // With `all`, each site's value word beside its chart (`value.i64`, `2M` entries on `2^(−16)`): what the site offers a row that meets it.
+    let mut value = if all { Some(create("value.i64")?) } else { None };
     let mut written = 0usize;
     // Regions in blocks, so that what is held before it is written stays bounded; rows in the table's order.
     for block in work.chunks(1024) {
@@ -138,6 +140,11 @@ pub fn read_tension(args: &[String]) -> Result<()> {
                             c.write_all(&v.to_le_bytes())?;
                         }
                     }
+                    if let Some(c) = value.as_mut() {
+                        for &v in &tension.value[k][s * m2..(s + 1) * m2] {
+                            c.write_all(&v.to_le_bytes())?;
+                        }
+                    }
                     written += 1;
                 }
                 if let Some(f) = shares.as_mut() {
@@ -154,6 +161,9 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         w.flush()?;
     }
     if let Some(c) = chart.as_mut() {
+        c.flush()?;
+    }
+    if let Some(c) = value.as_mut() {
         c.flush()?;
     }
     if let Some(f) = shares.as_mut() {

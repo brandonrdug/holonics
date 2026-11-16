@@ -126,3 +126,17 @@ What each outcome decides. C1 and C4 held: the lock's carried row is built as a 
 gate 3), and the junction's legs are located on its states and founded with it. C1 held and C4 missed: the carried row closes the lock
 but the operands still do not reach the legs' chart; the value's chart is read next. C1 missed: the forward does not keep what the
 arithmetic on fresh shares promised (the states move under the carried lock), and the row's store is rederived.
+
+Scores of the carried lock so far (links76c.txt, oracle76c.txt, arrive76.txt; the located products are still being read):
+G-C1 held: head 0's share on the aligned column at the last tick is 0.50 where both operands hold a digit and 0.76 at a copy column (the
+arithmetic on fresh shares had said 0.51 and 0.76). G-C2 missed: what arrives of an aligned digit is 0.09 and 0.06 at tick 0, 0.06 and
+0.14 at tick 1, under 0.01 and 0.09 after; the decomposition of a fresh row (arrive76.txt) shows why: a_k read from its own term alone
+0.26 to 0.43, from the two aligned terms together 0.07 to 0.13, from the whole row 0.045 to nothing: the rest of the row, two thirds of
+its weight on other digits' values, covers the column, and half a row on the column is not enough. G-C3 held: the copy columns code at
+1.97 nats a digit with nothing deposited (2.14 fresh) and the columns both hold stay at 2.35.
+
+The carried lock on the held passage: guess fixed at 23:06:13 UTC (from date -u), after the read was dispatched and before any of its output
+was read. read-cavity on the host, 400 places a slice, lap 76's mean, fresh and carried whole.
+G-C5. With nothing deposited, each of the five older slices and the word problems' held slice rises by between 0.01 and 0.15 nats a place
+under the carried lock (one-place masks), and the held arithmetic falls by at least 0.02. A row sharpened fourfold by its last tick with
+temperatures deposited for fresh rows pays on prose until the deposit lowers them.
