@@ -592,3 +592,22 @@ UTC); `agent-inferred` for the reading of them.
   0.978 of control, in place of the 03:29 range. If the store's samples stay and read as the load's wait, the next tile's
   load moves behind the current accumulate. The chart's nearest quotient by the lane's scale can take a divisor formed once
   a lane (a Möller–Granlund quotient corrected to the exact one, as the crowds' division already does), the same integer.
+- **The paced build, scored** (the build thread, relayed 04:12 UTC; lap 49's sections, the card alone; #874, training from
+  lap 51). Gate 3 equal. Profiles over all launches: the skin's return 35.2 to 30.9 ms a section (0.878, the guess 0.69 to
+  0.85); the outer map 22.0 to 20.4 (0.927), its bias launches 0.62 to 0.76 by Nsight Compute (the guess 0.50 to 0.75) and
+  its outer-tile launches unmoved; the transposed map 26.5 to 26.3 (0.99, the guess 0.80 to 0.92); the affine tiled maps
+  19.1 to 18.3 (0.958) and 7.6 to 7.3, inside 0.85 to 0.96; 7.2 ms a section in all, about 0.987, against 0.945 to 0.978.
+  The balanced hold did not resolve (the control's spread 21.4 ms). The staging's decider held: in the transposed map the
+  throttle of the shared memory's pipe fell from 0.22 and 0.18 to 0.14 and 0.16 and the short scoreboard from 0.55 and 0.48
+  to 0.39 and 0.42 an issued instruction, the long scoreboard stayed at 5.5 to 7.0 and the time did not move, so the
+  store's samples were its loaded word's wait. Two lessons (`agent-inferred`): a guess on a kernel weighs the profile's
+  mix of its launches, never the launches a source read sampled (the outer map's read had sampled only bias launches); and
+  the guesses on this build ran optimistic on every kernel they missed.
+- **The tiles' prefetch, and its guess.** The next build issues the next chunk's loads before the current chunk's
+  accumulate in the tiled maps (about 52 ms a section), by an asynchronous copy into a second shared buffer, since those
+  kernels stand at 124 to 126 of their 128 registers. Guess, fixed at 04:12 UTC (`agent-inferred`), on the premise that the
+  second buffer keeps two blocks a multiprocessor, the card alone against #874: gate 3 equal; the transposed map 0.75 to
+  0.92 a launch over all its launches (the loaded word's wait, 0.225 and 0.120 of its samples, overlaps the accumulate's
+  0.222, so the time tends to the larger and not the sum); the affine tiled maps 0.85 to 0.95; a section 0.975 to 0.992 of
+  control in a hold whose control spreads under 5 ms. If the buffer costs a block, the guess is void and the read says what
+  the lost warps cost.
