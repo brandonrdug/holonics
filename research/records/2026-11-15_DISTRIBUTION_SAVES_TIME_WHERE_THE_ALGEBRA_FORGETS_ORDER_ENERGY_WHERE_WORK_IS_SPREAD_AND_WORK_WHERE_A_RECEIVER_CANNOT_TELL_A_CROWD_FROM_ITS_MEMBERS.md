@@ -481,3 +481,33 @@ UTC); `agent-inferred` for the reading of them.
   0.995 of control in a balanced hold. A count that falls with no fall in time would say the wait was never the carries'
   chain. The crowds' loop over empty slots is a cost that follows the slot count instead of the content; iterating the
   set bits of the occupied mask keeps every bit, and no guess on it is fixed until its share is printed.
+- **Carry-save, scored** (the build thread, relayed 00:55 UTC; the gap after lap 44, the card alone). As built, a term's
+  three words, complemented where negative, go as six 32-bit chunks into six 64-bit sums with the negative term's +1 and
+  sign extension counted, and the carries are released when the term's limb changes. Gate 3 read equal. Nsight Compute
+  on `field_contact_l4`: 4.65 to 4.67 ms a launch against 4.83 to 4.88 for the line's build (0.957), instructions 0.963,
+  both at 80 registers, the long scoreboard 3.43 against 3.18 stalls an issued instruction and the fixed-latency wait 2.12
+  against 2.09. The limb groups are long: on the line's build the accumulate ran 46.7e6 times and the limb changed 3.04e6
+  times, about 15 terms a group. Both guesses missed: l4 0.957 against 0.86 to 0.94, and the loop's instructions a term
+  about 0.89 of 111 against 0.63 to 0.77 (the kernel's 0.963 on the loop's share of 0.346). By the rule fixed with the
+  guess, the wait was never the carries' chain. The build keeps every bit and is worth its 4% if the balanced hold confirms
+  it.
+- **Where the entry's work is** (a copy of the line's binary compiled with line information, its first l4 launch: 1.906e9
+  instructions, 493,248 samples; executed share against sample share). The contact body's own lines 0.336 against 0.284.
+  The crowds' scores (the lock through overflow-checked products: `lock_of`, `mul_fits`, `add_fits`, `wide_bits`,
+  `div_nearest`) 0.267 against 0.165, computed twice a row, once in the mass's chunk and again in the shares' pass. The
+  term's skin index `paced_index` (an integer division of the row's head) 0.037 against 0.031, per term. The mass's wide
+  term 0.079 against 0.038; `carry_d` 0.032; the term's face 0.027; the row's division and shares 0.040. The loads stand
+  far above their instructions: the pair's skin word 0.017 against 0.072, the crowd's skin word 0.025 of the samples and
+  the support 0.032. The crowds' loop over 32 slots is 1.79e6 trips of about 9 instructions, under 1%.
+- **What the theory reads there, and the next guess** (`agent-inferred`). A crowd's score computed twice in one row is one
+  intermediate of that row read by two passes; holding it in the warp's slot for its own row's second pass is the row's
+  own computation, never a table across contexts, so it is no cache. The skin index belongs to the row and leaves the
+  term. Both keep every bit. Guess, fixed at 00:55 UTC: gate 3 equal; on lap 45's sections, card alone, `field_contact_l4`
+  reads 0.88 to 0.94 of the carry-save build a launch (the counts remove about 0.08 of the samples by the first and 0.03 by
+  the second, and the guess takes less, since three guesses on this kernel ran optimistic); the exposure within 3% unless
+  it calls the crowd's score; a section 0.990 to 0.996 of control in a balanced hold. After that read: the products'
+  overflow checks (`wide_bits`' count of leading zeros 0.049, `mul_fits` 0.048, `add_fits` 0.017) decide a width at every
+  product, where the precision law decides it at a declared crossing, so the narrow or wide path is chosen once a crowd
+  from its operands' bounds when it opens, the wide path kept past them; and the loads, about 0.13 of the samples with the
+  long scoreboard the largest stall, are hidden by reading the next chunk's skin and support words while the current chunk
+  accumulates. No guess on either until its share is read again.
