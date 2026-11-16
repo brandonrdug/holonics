@@ -636,3 +636,109 @@ UTC); `agent-inferred` for the reading of them.
   the loop's tail can continue on one limb from that crossing, the same integer: a carrier narrowing where its term no
   longer needs the width, the precision law's own, and about 0.03 of the kernel if the digit loop's samples are its
   limbs' work.
+- **The tiles' prefetch and the chart's place, scored** (the build thread, relayed 04:57 UTC; #877, training from lap
+  52; lap 50's sections, the card alone). Gate 3 equal; the zero guard stood in the card's kernel before the read, the
+  host's root untouched. A clean balanced hold: control 567.9 to 569.9 ms a section (spread 2.0), the build 545.6 to
+  547.9, means 568.7 to 546.6, 0.961 against 0.971 to 0.990, a miss on the side of more saved; the profiles over all
+  launches give 20.1 ms of the hold's 22.1. The transposed map 27.1 to 23.0 (0.849, inside 0.75 to 0.92); the affine
+  tiled maps 20.0 to 16.2 (0.81) and 8.6 to 7.2 (0.84), under 0.85 to 0.95; the tied face's tiled map 4.8 to 3.8; the
+  long scoreboard of the tiled launches fell from 5.4 to 7.4 an issued instruction to 1.0 to 3.1, the barrier held at
+  0.36 to 0.58, and by Nsight Compute they read 0.72 to 0.76 a launch: the loads' wait was most of what the affine maps
+  waited on, and the registers' spills cost less than it. `field_chart` 19.4 to 13.9 (0.716, against 0.86 to 0.95), and
+  the root's two other callers alike, `field_unit` 7.2 to 5.1 (0.708) and `field_unit_probe` 7.3 to 5.1 (0.699). The
+  three read where the place's share of the instructions puts them (1 − 0.314 = 0.686, with the bit length's few
+  instructions added), and far under where its share of the samples put them (0.885). A lesson (`agent-inferred`):
+  samples count where warps wait, and time follows them where issue slots stand idle; where other warps fill the slots,
+  a wait is hidden and time follows the instructions issued, so before a guess takes a line's share, the kernel's issue
+  activity says which share it takes. The place's loop is integer work on fixed latencies in every lane of every
+  launch, the kind that fills slots. With the instructions as the measure, the digit loop is now about half of the three
+  kernels (24.1 ms a section), and the one-limb tail of the 04:21 lead (about 20 of a power of 87 bits' 44 steps, each
+  about half the instructions of a two-limb step) would take about a quarter of it, near 3 ms a section; it keeps no
+  guess until built.
+- **The outer tile's prefetch, and a guess conditioned on a counter read first** (the build thread, relayed 04:59 UTC;
+  `claude/outer-prefetch`, 126 registers in both kernels, no spills, shared memory unchanged at 16.5 KB). The outer tile
+  takes the tiled maps' fetch: once the current chunk of the walk is staged and proved narrow, the next chunk's loads
+  wait in registers and are staged after the products. Its staging was already free of conflicts (a warp's lanes run
+  along consecutive outputs of one row), so the read is the prefetch alone, as it was in the affine maps (0.81 and 0.84
+  over all launches). It serves `field_outer_x32`'s outer launches (about 21 ms a section) and `field_outer_x64` (6.0).
+  The read after lap 51 prints every kernel's issue activity before this build is read, and the guess takes the share
+  that the lesson above says it takes. Guess, fixed at 05:00 UTC (`agent-inferred`), against #877, the card alone, on the
+  premise that each kernel keeps its blocks a multiprocessor (void if one is lost): gate 3 equal; for each kernel whose
+  outer-tile launches issue under half the peak with the long scoreboard their largest stall, 0.76 to 0.88 a launch over
+  all those launches; for one that issues at half the peak or more, 0.90 to 1.00, since its loads' wait is already
+  hidden by other warps; a section 0.988 to 0.997 of control in a balanced hold, which resolves only if the control
+  spreads under 2 ms, the kernels being scored on the profile otherwise.
+- **The section read by what binds each kernel** (the build thread, relayed 05:34 UTC; one section of training on #877
+  under Nsight Compute, every launch serialized, 2,909 launches, 555.7 ms; each kernel's issue activity and warps active
+  weighted by launch time; the table `research/records/receipts/2026-11-16_issue/issue_by_kernel.txt` lands with the
+  outer build). `field_outer_x32` issues at 18.9% of peak with the long scoreboard its stall, so the 05:00 guess takes
+  its first branch, 0.76 to 0.88 a launch; `field_outer_x64` is not in the table and its branch is fixed when its issue
+  prints. The kernels of 10 ms or more fall into four classes, each the record's own term (`agent-inferred`):
+  - **Latency at an occupancy the registers hold**, 240.1 ms (0.432): the contact's rows, columns and four limbs, the
+    transposed map, the skin's fill, the outer map and the affine map, at 25 to 52% of warps active and 19 to 52% issue.
+    At 124 to 128 registers a lane a multiprocessor holds 16 of its 48 warps, so a wait is hidden only by work inside a
+    warp. Where those registers are a wide accumulator's limbs, carry-save (#866) made the limbs independent until the
+    row's release, so they can lie across lanes, a limb a lane released once by a shuffle at the row's end: the same
+    integer, fewer registers a lane and more warps, the precision law's narrow terms dispersed over many slow lanes.
+  - **Issue**, 106.9 ms (0.192): the clock's fill, the tied face's return, the chart, the exposure, and the skin's return
+    at the border (54% issue at 33% warps). Time follows the instructions: the width checks hold 0.15 to 0.20 of the
+    exposure's and the blank return's instructions and can be read once a crowd, and the relative transport 0.33 to
+    0.36 of the tied face's and the pair scan's returns.
+  - **Full warps with issue idle**, 44.5 ms (0.080): the three blank passes at 96 to 97% of warps and 26 to 51% issue,
+    each body holding 0.93 to 0.98 of its samples. If their memory throughput reads near its peak they are bound by
+    bytes moved, and the lever is the width a stored term needs, or the pass folded into its producer.
+  - **Few threads**, 34.1 ms (0.061): the two pair scans at 7% of warps, one thread a region and circle along a chain
+    with a section at each step, so their order is the law's (§3: span is shortened only where the algebra forgets
+    order), and the spread and the sums. For 24 ms a section 93% of the card waits. A kernel whose reads and writes
+    commute with a scan's runs beside it on a second stream with the same bits (the hardware law), so the scans' share
+    of the section is whatever no other kernel can share with them, read from their producers and consumers.
+- **The blank return's checked product, and its guess** (the build thread, relayed 05:35 UTC, in the outer build's hold).
+  `field_blank_dy` checked its product of a wide `dz` by the 32-bit weight `E` with a count of bits; it now forms it 64 by
+  128 from the wide word's halves with no count, the same product and the same refusal. The kernel stands at the
+  lesson's border (50.9% issue at 96% of warps, its body 0.93 of its samples), so time follows its instructions only in
+  part. Guess, fixed at 05:37 UTC (`agent-inferred`), on the profile against #877: its instructions 0.82 to 0.92 (the
+  width checks' 0.20, of which the count is the larger part), its time 0.88 to 0.98 a launch over all its launches,
+  toward 1 if the blank's bytes bind; with it the composed section reads 0.986 to 0.997 in place of 0.988 to 0.997.
+- **The registers and the scans' neighbours, read** (the build thread, relayed 05:38 UTC). `field_outer_x64` issues at
+  22.4% (5.6 ms a section, 58 launches), so its branch is also 0.76 to 0.88. Every kernel of the latency class is held
+  by its registers: the rows at 128 (four blocks, 16 warps; 28% measured), the columns at 72 (28 warps; 40%), the four
+  limbs at 80 with 310 and 624 bytes spilled (24 warps; 43%), the exposure at 80 with spills (44%), the skin's return at
+  96 and its fill at 64, the tiled and outer maps at 124 to 128 (16 warps; 25 to 30%). The lead of 05:35 that a wide
+  accumulator's limbs could lie across lanes is withdrawn on reading `contact_body` (`field.cu`): the contact already
+  gives each lane an entry of the span, and its accumulators are that entry's partial, so limbs across lanes would take
+  lanes from entries; and the four limbs' spills were measured cheaper than lost warps on November 15 (six blocks to
+  four read 1.066). The scans are the class whose registers are free (56 and 78, held by their count of threads, one a
+  region and circle), and their source shows how much of a step the chain carries:
+  - `field_pair_scan` carries `q` alone, `q ← fit64(b̃ + rel(γ q, 30))`. The face's read `pc = rel(a q, 16)` reads `q`
+    and nothing on the chain reads it back, and `q` is already written to `pqm` each step, so `pc` can be formed after
+    the scan on the pair's grid: half of a step's wide products leave the chain.
+  - `field_pair_scan_back` carries `x` alone, `x ← fit64(h + rel(conj(γ) u, 30))` with `u` the carried `x`. Its drive
+    term `h = rel(conj(a) δp, 16)` reads `pa` and `dc` alone, `δa = rel(conj(Qm) δp, 16)` reads `pqm` and `dc` alone,
+    and `δγ = rel(conj(Qm) u, 16)` reads `u`, which the scan writes to `db` before the gate's return overwrites it. So
+    `h` and `δa` can be formed before the scan and `δγ` after it, each on the pair's grid: 12 of a step's 16 wide
+    products and 6 of its 8 loads leave the chain.
+  - The chain's remaining loads (`γ`, and `b̃` or `h`) are addressed by the step alone, so they can be issued steps ahead
+    of their use, in registers the scans have free.
+  Every term is the same expression on the same operands, and the refusals are an OR, which no order changes; `h` is
+  held at the width of its release (a 128-bit product released 16 bits) until it meets the chain's sum, since the chain
+  fits the sum and never its parts. This is §3's law in the code's own pattern: span is the law's only for the store a
+  section stands on, and the rest of a step is work that spreads, as the gate and its return already do "off the chain
+  on the pair's grid" (`field_pair_gamma`, `field_pair_gate_back`). The scans hold 24.3 ms a section; a guess is fixed
+  when the split is built. A second stream (the triads' affine map beside the forward scan, the triads' outer, a leaf
+  of the return, beside the reverse) waits until then, since the split changes what the scans leave idle.
+- **The scans split, and the guess** (the build thread, relayed 05:45 UTC; `claude/scan-split` on the outer build). The
+  forward scan carries `Q` alone and reads its step's `γ` and drive a step ahead; `field_pair_scan_face`, on the pair's
+  grid, forms `pc` from `pqm` after it. `field_pair_scan_pre`, on the grid, forms `δa` and `h` (held on 128 bits) before
+  the reverse, which carries `u` alone and reads `h` and `γ` a step ahead; the gate's return forms `δγ` from `db` and
+  `pqm` and writes it before anything in it can refuse, so a refused cell holds what it held. Read against the source:
+  `pqm` holds the carried `Q` (a fitted word fitted again is itself), and `db` the carried `u`, so each term moved off the
+  chain reads the operands it read on it; the gate's return reads `u` from `db` before `δb` takes its place, cell by
+  cell. Registers 62 and 78 on the scans, 40 and 38 on the grid's passes, 66 on the gate's return, no spills. Guess,
+  fixed at 05:47 UTC (`agent-inferred`), in the hold after lap 53 against the outer build, the card alone: gate 3 equal;
+  the forward scan 0.50 to 0.75 a launch over all its launches and the reverse 0.30 to 0.55 (half and three quarters of
+  their products leave the chain, at 26% and 39% issue on fewer than one warp a scheduler, where a lone warp's time
+  follows its instructions); the grid's passes with the moved `δγ` add 0.03 to 0.10 of the old scans' time; 7 to 13.5 ms
+  a section saved in all, a section 0.975 to 0.987 of control in a balanced hold whose control spreads under 3 ms. One
+  step ahead hides a load only behind one step of arithmetic, which the split has shortened; if the scans' stalls in the
+  hold's counters stand mostly on the long scoreboard, the step waits on its load, the reads come in at the top of the
+  ranges or above, and the next build reads several steps ahead in the registers the scans have free.
