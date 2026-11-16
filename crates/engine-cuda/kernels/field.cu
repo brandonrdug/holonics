@@ -1579,15 +1579,33 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
             }
             uwide bound = 0;
             uint32_t parity = 0;
-            for (uint64_t k0 = s0; k0 < s1; k0 += MAP_KC, parity ^= 1) {
+            // [realization; November 16, as in `map_tile`] The walk's next chunk is read into registers (`fetch`) once the chunk before it
+            // is staged and proved narrow, and staged once that chunk's products are summed, so its loads stand in flight behind them. The
+            // words, their order, the proof and the partials are the same.
+            int64_t pyv[MAP_STAGE];
+            X pxv[MAP_STAGE];
+            const auto fetch = [&](uint64_t k0) {
                 const uint32_t chunk = s1 - k0 < MAP_KC ? (uint32_t)(s1 - k0) : MAP_KC;
-                uint64_t ym = 0, xm = 0;
-                for (uint32_t c = threadIdx.x; c < MAP_KC * MAP_TO; c += blockDim.x) {
+#pragma unroll
+                for (uint32_t r = 0; r < MAP_STAGE; r++) {
+                    const uint32_t c = threadIdx.x + r * MAP_THREADS;
                     const uint32_t kc = c / MAP_TO, e = c % MAP_TO;
                     const uint64_t t = k0 + kc;
                     const bool live = kc < chunk && !(only_unresolved && !w.unresolved[t]);
-                    const int64_t yv = (live && o0 + e < rows) ? y[t * y_stride + o0 + e] : 0;
-                    const int64_t xv = (live && i0 + e < cols) ? (int64_t)x[t * x_stride + i0 + e] : 0;
+                    pyv[r] = (live && o0 + e < rows) ? y[t * y_stride + o0 + e] : 0;
+                    pxv[r] = (live && i0 + e < cols) ? x[t * x_stride + i0 + e] : (X)0;
+                }
+            };
+            fetch(s0);
+            for (uint64_t k0 = s0; k0 < s1; k0 += MAP_KC, parity ^= 1) {
+                const uint32_t chunk = s1 - k0 < MAP_KC ? (uint32_t)(s1 - k0) : MAP_KC;
+                uint64_t ym = 0, xm = 0;
+#pragma unroll
+                for (uint32_t r = 0; r < MAP_STAGE; r++) {
+                    const uint32_t c = threadIdx.x + r * MAP_THREADS;
+                    const uint32_t kc = c / MAP_TO, e = c % MAP_TO;
+                    const int64_t yv = pyv[r];
+                    const int64_t xv = (int64_t)pxv[r];
                     ys[kc][e] = (int32_t)yv;
                     xs[kc][e] = (int32_t)xv;
                     const uint64_t a = mag64(yv), b = mag64(xv);
@@ -1612,6 +1630,9 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                 if (!narrow) {
                     __syncthreads();
                     break;
+                }
+                if (k0 + MAP_KC < s1) {
+                    fetch(k0 + MAP_KC);
                 }
                 for (uint32_t kc = 0; kc < chunk; kc++) {
                     const int4 yv = *reinterpret_cast<const int4 *>(&ys[kc][4 * to]);
@@ -5397,7 +5418,11 @@ extern "C" __global__ void field_blank_dy(FieldWords w, uint64_t enc, const wide
             const wide d = dz[t * w.A + b];
             if (d != 0) {
                 wide x = 0;
-                if (!mul_fits(d, (wide)w.theta[enc + (uint64_t)b * w.D + i], &x)) {
+                // [realization; November 16, the next kernels' source counters] The weight is a 32-bit word, so the checked product is
+                // formed 64 by 128 (`mul_fits_w64`) with no count of either operand's bits (`wide_bits` and `mul_fits` held 0.20 of this
+                // kernel's instructions): the same product where it fits and the same refusal where it does not.
+                const int32_t e = w.theta[enc + (uint64_t)b * w.D + i];
+                if (!mul_fits_w64(mag64((int64_t)e), e < 0, d, &x)) {
                     atomicOr(w.status, REFUSED_CARRIER);
                 }
                 sum += x;
