@@ -1,0 +1,61 @@
+kernel: 524777263 warp instructions executed, 117482 stall samples
+lines 4900-4968 (the kernel body): instr 0.497 samples 0.588
+functions outside the body, by samples:
+  receiver_at                        instr  0.087 samples  0.142
+  mulu64_128                         instr  0.060 samples  0.053
+  mul64_128                          instr  0.060 samples  0.033
+  rel                                instr  0.060 samples  0.031
+  mag64                              instr  0.021 samples  0.029
+  mulu64                             instr  0.046 samples  0.023
+  pair_skin_word                     instr  0.053 samples  0.017
+  decay_hs                           instr  0.032 samples  0.013
+  skipped_row                        instr  0.007 samples  0.009
+  skin_raw_hs                        instr  0.014 samples  0.008
+  keyed_site                         instr  0.001 samples  0.008
+  head_skin                          instr  0.006 samples  0.006
+  skin_ij_hs                         instr  0.018 samples  0.006
+  paced_hs                           instr  0.007 samples  0.006
+  (other files)                      instr  0.005 samples  0.004
+  skin_word                          instr  0.007 samples  0.004
+  definite_site                      instr  0.000 samples  0.004
+  carried_hs                         instr  0.004 samples  0.003
+  parts_sum                          instr  0.003 samples  0.002
+  span_parts                         instr  0.003 samples  0.002
+  still_head                         instr  0.003 samples  0.002
+  receiver_len                       instr  0.000 samples  0.002
+  depth_head                         instr  0.002 samples  0.001
+  fit64                              instr  0.002 samples  0.001
+  skinless                           instr  0.001 samples  0.001
+  shfl_wide                          instr  0.001 samples  0.000
+  paced_index                        instr  0.001 samples  0.000
+the body's lines, by samples (top 30):
+   4954 instr  0.106 samples  0.232  sk += mul64_128(dsc[at], (int64_t)bracket);
+   4953 instr  0.159 samples  0.133  const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - mul64_128(mul32((int
+   4955 instr  0.078 samples  0.082  sv += mulu64_128(e[at], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dyr[(uint64_
+   4937 instr  0.042 samples  0.035  if (i == UINT32_MAX || skipped_row(w, first + i)) {
+   4948 instr  0.035 samples  0.027  const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
+   4935 instr  0.015 samples  0.023  for (uint32_t k = part; k < K; k += parts) {
+   4941 instr  0.011 samples  0.009  const uint32_t gap = j > i ? j - i : i - j;
+   4963 instr  0.002 samples  0.009  dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + g0), w.status);
+   4919 instr  0.007 samples  0.005  const uint64_t first = w.region_off[r];
+   4945 instr  0.007 samples  0.004  const wide dec = skin_raw_hs(w, hs, m, first + i, sentry, gap);
+   4944 instr  0.007 samples  0.004  const uint64_t sentry = paced_c && paced_hs(w, hs, first + i) ? support_row(w, r, i) + sup
+   4936 instr  0.004 samples  0.004  const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
+   4961 instr  0.002 samples  0.003  const uint32_t mc = h * n + lane % n;
+   4928 instr  0.002 samples  0.002  const uint32_t K = keyed_site(w, g) ? receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r
+   4911 instr  0.003 samples  0.002  const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+   4916 instr  0.002 samples  0.002  for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (u
+   4930 instr  0.001 samples  0.001  const int64_t *dsc = ds + w.region_eoff[r] + j;
+   4920 instr  0.001 samples  0.001  const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+   4914 instr  0.000 samples  0.001  const bool paced_c = !still && paced_index(w, h) >= 0;
+   4959 instr  0.001 samples  0.001  sv = parts_sum(part < parts ? sv : 0, S, parts);
+   4908 instr  0.001 samples  0.001  const uint32_t lane = threadIdx.x & 31;
+   4922 instr  0.001 samples  0.001  const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
+   4913 instr  0.004 samples  0.001  const uint32_t g0 = still ? 0 : MOVE_BITS;
+   4964 instr  0.001 samples  0.001  dv[slot] = fit64(rel(sv, SHARE_BITS), w.status);
+   4909 instr  0.001 samples  0.000  const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+   4929 instr  0.001 samples  0.000  const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + j;
+   4923 instr  0.001 samples  0.000  const uint32_t c = w.cls[(uint64_t)h * w.T + g];
+   4962 instr  0.001 samples  0.000  const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);
+   4917 instr  0.000 samples  0.000  const uint32_t r = w.site_region[g];
+   4924 instr  0.001 samples  0.000  const uint32_t *poff = w.poff + ((uint64_t)h * w.R + r) * (classes + 1);
