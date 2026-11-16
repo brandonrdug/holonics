@@ -1803,8 +1803,16 @@ impl Constitution {
         let mut lambda: Vec<Vec<i64>> = Vec::new();
         self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambda), None)?;
         lambda.reverse();
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let sources = pass
+            .ticks
+            .iter()
+            .map(|cell| (0..heads).flat_map(|h| (0..sites).filter(|&i| !Self::definite(region, i)).map(move |i| (h, i))).map(|(h, i)| (h, i, cell.rows[h * sites + i].iter().map(|src| (src.j as usize, src.p as u128)).collect())).collect())
+            .collect();
         Ok(CrossingTension {
             lambda,
+            chart: pass.ticks.iter().map(|c| c.read.clone()).collect(),
+            sources,
             read: pass.ticks.iter().map(|c| c.read2.clone()).collect(),
             current: pass.ticks.iter().map(|c| c.y.clone()).collect(),
             products: pass.ticks.iter().map(|c| c.ct.clone()).collect(),
@@ -1820,6 +1828,11 @@ impl Constitution {
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct CrossingTension {
     pub lambda: Vec<Vec<i64>>,
+    /// Each tick's opening chart `r̂` (`[t][D]` on `2^(−16)`), which the tick's keys, probes and values read.
+    pub chart: Vec<Vec<i32>>,
+    /// Each tick's open rows: for each head and open site, the sources its row met and each one's share of the row's weight (on `SHARE_BITS`).
+    #[allow(clippy::type_complexity)]
+    pub sources: Vec<Vec<(usize, usize, Vec<(usize, u128)>)>>,
     pub read: Vec<Vec<i32>>,
     pub current: Vec<Vec<i64>>,
     pub products: Vec<Vec<i64>>,

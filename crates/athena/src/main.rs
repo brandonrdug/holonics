@@ -64,6 +64,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension") {
         return athena::ruler::tension::read_tension(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension-store") {
+        return athena::ruler::tension::read_tension_store(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-acts") {
         return athena::store::write_acts(&rest[1..], &mut holonics_engine::realization::Host);
     }

@@ -1,4 +1,4 @@
-The tension at the crossing: guesses fixed before the read (November 16, 2026, 21:45 UTC; the lead; Refs #404)
+The tension at the crossing: guesses fixed before the read (November 16, 2026, 21:44 UTC, read from the clock; the lead; Refs #404)
 
 State read: the line's lap 75 mean (four lanes, ten crossing triads grown at lap 75 with drawn legs and W_T at zero, one lap trained).
 Reading: `athena host complete-language read-tension` on fresh two-operand sums and differences as the arithmetic world writes them
@@ -36,3 +36,32 @@ What each outcome decides.
   section count is predicted from the read share before a lap trains from it (the cipher record's Test 1).
 - G-L2's share above 0.10: the junction was within reach and the drawn founding alone held it back; the same founding, a larger step.
 - G-L0 above 0.35 with G-L2 under 0.01: the ruler's locator is at fault before the machine is; the table's share bounds it.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+The operand's way to the answer's place, link by link: guesses fixed before the read (November 16, 2026, 22:29 UTC, read from the clock)
+
+State read: lap 76's mean (MEAN.3000). Reading: `read-tension … all` on 3,600 fresh sums and differences (3,000 met, 600 far; key
+links-2026-11-16), two value digits a record opened alone; every site written at every tick with the tick's opening chart and the open
+row's shares by head. Ruler: `tools/tension_ruler.py links`. Fits on one half of the records, shares read on the other.
+
+What the logs print about the premise (read first): the scores above (presence 0.10 to 0.15 where both operands hold a digit; located
+products remove nothing on the line's own sections, found76.txt); R2 at lap 72 (head 0: 0.21 of its row on a_k and on b_k at ticks 0 and 1).
+
+The theory's pick (agent-inferred): the link that slips is the lock. A source's own class's row stands in its opening, so its digit is
+there to be read; its place in its number is a count along the strand that the near field and the carry circles can form; the open
+row's share on the aligned digit is about a fifth, so what arrives is a fifth of one digit among four fifths of others.
+
+G-K1 (purity). At the operands' digit sites of met sums, a linear read of the site's opening chart gives its own digit with R^2 at least
+0.9 at tick 0 and at least 0.6 at tick 3.
+G-K2 (place). The same chart gives the site's place counted from its number's end (one-hot) with R^2 at least 0.5 at the best tick, at
+the operands' digits and at the open place alike.
+G-K3 (the lock). Head 0 at ticks 0 and 1 puts between 0.15 and 0.30 of the open row on a_k and the same on b_k (columns both operands
+hold, met sums); no other head puts 0.10 on either.
+G-K4 (what arrives). Head 0's current alone gives a_k with at least 0.6 of the R^2 every head's current gives together.
+
+What each outcome decides.
+- K1 and K2 hold with K3: the lock slips. The next law is the lock's closing (a probe that sets its own sharpness, or a row that sharpens
+  across ticks), derived on the pair contact and the parametron before any build.
+- K2 misses (place under 0.5): the address has no content to match. The next law is the count along the strand (the carry circle as an
+  odometer, the radix founded as a class).
+- K1 misses: the value is not pure at its source. The next law is the value's chart (what a source offers of itself).
