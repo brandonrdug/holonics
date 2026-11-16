@@ -814,7 +814,8 @@ UTC); `agent-inferred` for the reading of them.
   42 to 47% at 96%, long scoreboard 16 to 20; the lift and read 1.30 to 1.31 ms, 36% at 95%, long scoreboard 24.5. Each
   thread walks 512 sites with a load the next term's product waits on, so even 48 warps do not cover it. Two levers keep
   the bits, since the terms' loads do not depend on the sum and the release stands once a term: the cheaper issues
-  several sites' loads ahead of their products in each thread (the blanks stand at 35 to 38 registers, so eight in
-  flight still leave 48 warps a multiprocessor, below 40 registers a lane); the larger stages both operands in the outer
+  several sites' loads ahead of their products in each thread (a site in flight holds about six registers, a wide `δz`
+  and a word, so four in flight bring a thread from 35 to 38 registers near 64 and 32 warps a multiprocessor, near three
+  times the loads in flight that 48 warps of one each hold now); the larger stages both operands in the outer
   or transposed tile, so that a loaded word serves four products and its neighbour's. The share of live sites, read
   after lap 55, says whether a gather of them comes first.
