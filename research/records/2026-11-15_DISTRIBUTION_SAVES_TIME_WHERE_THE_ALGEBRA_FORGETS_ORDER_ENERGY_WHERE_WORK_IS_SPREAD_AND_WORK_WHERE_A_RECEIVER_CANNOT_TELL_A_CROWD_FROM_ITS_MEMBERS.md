@@ -951,3 +951,28 @@ UTC); `agent-inferred` for the reading of them.
   the barrier; and the spread's regions launched largest first (each region's outputs are its own, so no bit moves),
   whose floor is the larger of the mean multiprocessor's work and the largest block, about 0.67 to 0.75 of now if no
   region passes about 50,000 cycles, its premise the regions' site counts read from `region_off` first.
+- **The bias over every warp, scored, and the contact family's next lever** (the build thread, relayed 10:14, 10:16
+  and 10:50 UTC; #901, receipts `research/records/receipts/2026-11-16_biasshared/`). The build took the 10:13 lead before
+  its hold read, so my 10:13 guess is scored as fixed on the one-quarter form and a second, fixed at 10:14 UTC, on this
+  build; the walk's closing barrier stands before the next walk zeroes the quarters. Gate 3 equal. Control #899 at 494.9
+  to 496.3 ms a section (spread 1.4), the build 494.4 to 496.3, 1.000: nothing resolved, and my 0.997 to 1.000 held. By
+  grid against #899: `field_outer_x32` 0.946, 0.936, 0.938 and 0.989 at 156, 158, 216 and 431 blocks, `field_outer_x64`
+  0.979 and 0.939 at 158 and 216 (8 octets of spill on x64, none on x32); my 0.94 to 0.97 held except at the two grids of
+  158 blocks. The spread at 672 read 0.928 of #899's 640 a launch, against my 0.95 to 0.97, a miss on the side of more
+  saved. The bias line closes at about #896's time with 204 fewer launches a section, the section standing at 494 to 496
+  ms on laps 57 to 59. The contact family holds about 48% of the profile (the rows 61, the columns 49.5, the four-limb
+  forward contact 39.7, the skin's pace return 30.8, the clock's fill 20, the skin's fill 18, the exposure 17.9 ms a
+  section). My pick for the next lever, fixed at 10:52 UTC (`agent-inferred`): the rows' probe-role sum, which the limbs
+  ablation of November 15 measured at a third of the rows (713 to 488 µs a launch without it). Its loop over a chunk's 32
+  staged sources makes one gathered load of the unit word a step, independent across steps, and the rows wait on long
+  scoreboard 3.5 to 3.8 cycles an issue with four warps a scheduler; a row's lane makes about `16 ⌈K/32⌉` such loads
+  against about `nslots / parts`, near 7, crowd returns whose high word waits on the low word's returned value, so the
+  build's candidate (the crowd returns' reductions without return) removes perhaps a fifth to a tenth as much waiting.
+  The choice is the source counters': the long-scoreboard samples on the gathered word's line against the crowd block's
+  four `add_wide` lines. The form: at 128 registers with 20 and 44 octets of spill a register prefetch spills more, so a
+  half-chunk's 16 rows of words go to shared memory by asynchronous copy (2 KB a warp, about 32 KB at four blocks), and
+  the products read them there; no register, no bit moved. Guess: gate 3 equal; the rows 0.86 to 0.94 a launch by
+  Nsight Compute; a section 0.986 to 0.994. Were the reductions built instead: the rows 0.95 to 0.99, a section 0.995 to
+  1.000. A second lead, no guess until built: a pair's covector sums sixteen 64-by-64 products into one 128-bit word,
+  a serial chain beside the 1.84 cycles of fixed-latency wait an issue; two partials halve it, an integer sum, so no bit
+  moves.
