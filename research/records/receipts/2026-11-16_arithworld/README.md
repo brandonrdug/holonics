@@ -94,3 +94,12 @@ All 256 held records cut after `= `: 4.62 bits a place on met lengths, 4.31 on f
 ## Gates
 
 - Gate 1 (`bash tools/gate.sh`): passed.
+- Gate 3 (`bash tools/gate_engine.sh` against the line's lap 17, on the store of November 12; `gate3.txt`): the build with the seven slices,
+  `join-store`, `read-forms` and `read-writes` gives the line's bits, card against host on 3 sections, its 24 sections reproduced and its
+  lap's cavity read byte for byte: **EQUAL**, 17:40 to 17:47 UTC in the gap after lap 70.
+
+## The join
+
+`join-store` on lap 70's end state at 17:47 UTC: the pass line of the store of November 12 (code at piece 69,378 with 293,142,241 places
+taken, 0.731 of its prefix quota; web 37,824, science 23,106, books 2,161, wikidata 9,222) set to the store of November 16 at its first
+piece in all seven slices, 56,242,853 stretches kept, one line of eleven changed. Lap 71 trains from it.
