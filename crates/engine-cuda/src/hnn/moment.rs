@@ -162,8 +162,7 @@ impl<'c> Resident<'c> {
             let mut enc = cw.enc;
             self.launch("field_tied_back_y_tiled", Self::map_grid(dw, sites), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
         }
-        self.outer(&mut cw, g, l.opening_bias as u64, dw, 0, dy.device_ptr(), dw, 0, 0, false, true)?;
-        self.outer(&mut cw, g, l.opening as u64, dw, dw, dy.device_ptr(), dw, op.read.device_ptr(), dw, false, true)?;
+        self.outer_biased(&mut cw, g, l.opening as u64, l.opening_bias as u64, dw, dw, dy.device_ptr(), dw, op.read.device_ptr(), dw, false, true)?;
         let dr = alloc64(sites * dw)?;
         self.transposed(&mut cw, l.opening as u64, dw, dw, dy.device_ptr(), dw, dr.device_ptr(), false, true)?;
         let dx = zeroed64(sites * dw)?;
@@ -196,8 +195,7 @@ impl<'c> Resident<'c> {
         }
         // The moment's chart on the cavity moment: `δC += Σ_t δx_t s_tᵀ`, `δb += Σ_t δx_t`, `δs_t = Cᵀ δx_t` (zero past the compared places).
         let (mface, mface_bias, _) = moment_face(field);
-        self.outer(&mut cw, g, mface_bias, dw, 0, dx.device_ptr(), dw, 0, 0, false, true)?;
-        self.outer(&mut cw, g, mface, dw, m2, dx.device_ptr(), dw, op.cmoment.device_ptr(), m2, true, true)?;
+        self.outer_biased(&mut cw, g, mface, mface_bias, dw, m2, dx.device_ptr(), dw, op.cmoment.device_ptr(), m2, true, true)?;
         let dq = zeroed64(sites * m2)?;
         self.transposed(&mut cw, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, true)?;
         let Some(k) = op.keep.as_ref().filter(|_| tm > 0) else {

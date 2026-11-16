@@ -103,8 +103,7 @@ impl<'c> Resident<'c> {
         words.pc = tick.pc.device_ptr();
         set_triads(words, tick);
         // The pair contact: x_out = x_mid + W_c c + b_c.
-        self.outer(words, g, words.w_bias, dw, 0, dx.device_ptr(), dw, 0, 0, false, false)?;
-        self.outer(words, g, words.w, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
+        self.outer_biased(words, g, words.w, words.w_bias, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
         self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
         // [definition; theory, November 12; the triad record §4] The triads' reverse, by the product rule through the producing operands: `W_T`'s
         // covector `Σ_t δx_t c^T_tᵀ`, the products' covector `δc^T = W_Tᵀ δx` a site, then the legs' covectors `δα`, `δβ`, `δγ` (`field_triad_back`), each
@@ -134,18 +133,14 @@ impl<'c> Resident<'c> {
             let (mut dgp, mut dbp) = (dg.device_ptr(), db.device_ptr());
             self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp), arg(&mut dbp)])?;
         }
-        self.outer(words, g, words.wa, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
-        self.outer(words, g, words.wb, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
-        self.outer(words, g, words.a_bias, f, 0, da.device_ptr(), f, 0, 0, false, false)?;
-        self.outer(words, g, words.b_bias, f, 0, db.device_ptr(), f, 0, 0, false, false)?;
+        self.outer_biased(words, g, words.wa, words.a_bias, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
+        self.outer_biased(words, g, words.wb, words.b_bias, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         if circles > 0 {
-            self.outer(words, g, words.wg, 2 * circles, dw, dg.device_ptr(), 2 * circles, tick.read2.device_ptr(), dw, false, false)?;
-            self.outer(words, g, words.wgb, 2 * circles, 0, dg.device_ptr(), 2 * circles, 0, 0, false, false)?;
+            self.outer_biased(words, g, words.wg, words.wgb, 2 * circles, dw, dg.device_ptr(), 2 * circles, tick.read2.device_ptr(), dw, false, false)?;
         }
         if triads > 0 {
             // The triads' chart: `Σ_t δabg(t) r̂(t)ᵀ` into `A`, `B` and `G`, and `Σ_t δabg(t)` into their biases.
-            self.outer(words, g, words.wt, 6 * triads, dw, dabgp, 6 * triads, tick.read2.device_ptr(), dw, false, false)?;
-            self.outer(words, g, words.wtb, 6 * triads, 0, dabgp, 6 * triads, 0, 0, false, false)?;
+            self.outer_biased(words, g, words.wt, words.wtb, 6 * triads, dw, dabgp, 6 * triads, tick.read2.device_ptr(), dw, false, false)?;
         }
         self.transposed(words, words.wa, f, dw, da.device_ptr(), f, ra.device_ptr(), false, false)?;
         self.transposed(words, words.wb, f, dw, db.device_ptr(), f, rb.device_ptr(), false, false)?;
@@ -160,8 +155,7 @@ impl<'c> Resident<'c> {
         self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut rap), arg(&mut rbp), arg(&mut cells)])?;
         self.ratio_adjoint(words, tick.read2.device_ptr(), tick.scale2.device_ptr(), rb.device_ptr(), dx.device_ptr(), dmid.device_ptr(), false)?;
         // The current: x_mid = x_in + O y + b_o.
-        self.outer(words, g, words.out_bias, dw, 0, dmid.device_ptr(), dw, 0, 0, false, false)?;
-        self.outer(words, g, words.out, dw, m2, dmid.device_ptr(), dw, tick.y.device_ptr(), m2, true, false)?;
+        self.outer_biased(words, g, words.out, words.out_bias, dw, m2, dmid.device_ptr(), dw, tick.y.device_ptr(), m2, true, false)?;
         self.transposed(words, words.out, dw, m2, dmid.device_ptr(), dw, dy.device_ptr(), false, false)?;
         // The weights and the contact over each site's support, head by head: the rows' return
         // first, then the columns', which adds the word's second role into the same slots.
@@ -256,8 +250,7 @@ impl<'c> Resident<'c> {
         }
         card.zero_octets(&dr, 0, 8 * sites * dw).map_err(device)?;
         for (weight, bias, chart) in [(words.q, words.q_bias, &dq), (words.v, words.v_bias, &dv), (words.probe, words.probe_bias, &dp)] {
-            self.outer(words, g, weight, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
-            self.outer(words, g, bias, m2, 0, chart.device_ptr(), m2, 0, 0, false, false)?;
+            self.outer_biased(words, g, weight, bias, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
             self.transposed(words, weight, m2, dw, chart.device_ptr(), m2, dr.device_ptr(), true, false)?;
         }
         self.ratio_adjoint(words, tick.read.device_ptr(), tick.scale.device_ptr(), dr.device_ptr(), dmid.device_ptr(), dx.device_ptr(), false)?;
@@ -378,8 +371,7 @@ impl<'c> Resident<'c> {
             self.launch("field_tied_back_y_tiled", Self::map_grid(dw, sites), THREADS, &mut [arg(words), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
         }
         let lift_bias = field.layout().lift_bias as u64;
-        self.outer(words, g, lift_bias, dw, 0, dyl.device_ptr(), dw, 0, 0, false, true)?;
-        self.outer(words, g, words.read, dw, dw, dyl.device_ptr(), dw, fread.device_ptr(), dw, false, true)?;
+        self.outer_biased(words, g, words.read, lift_bias, dw, dw, dyl.device_ptr(), dw, fread.device_ptr(), dw, false, true)?;
         self.transposed(words, words.read, dw, dw, dyl.device_ptr(), dw, dr.device_ptr(), false, true)?;
         self.ratio_adjoint(words, fread.device_ptr(), fscale.device_ptr(), dr.device_ptr(), radial.as_ref().map_or(0, |b| b.device_ptr()), dx.device_ptr(), true)?;
         // A tower's packets' reverse buffers, beside the fine field's.
@@ -433,8 +425,7 @@ impl<'c> Resident<'c> {
         // The moment's chart into the face (§16.22, the host's `returned_with`): `δC += Σ_t δx⁰_t s_tᵀ`, `δb += Σ_t δx⁰_t`,
         // and the moments' covector `δs_t += Cᵀ δx⁰_t` (formed in `dq`, free past the ticks) joined to the values' and probes'.
         let (mface, mface_bias, _) = moment_face(field);
-        self.outer(words, g, mface_bias, dw, 0, dx.device_ptr(), dw, 0, 0, false, false)?;
-        self.outer(words, g, mface, dw, m2, dx.device_ptr(), dw, words.moment, m2, true, false)?;
+        self.outer_biased(words, g, mface, mface_bias, dw, m2, dx.device_ptr(), dw, words.moment, m2, true, false)?;
         self.transposed(words, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, false)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;

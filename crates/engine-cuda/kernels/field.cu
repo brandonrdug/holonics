@@ -1554,8 +1554,12 @@ extern "C" __global__ void __launch_bounds__(256, 2) field_tied_back_y_tiled(Fie
 // [realization; November 15, the maps' second loop] The outer sum's tile with no reading pass before it: a walk's chunks are staged as 32-bit limbs while their largest
 // magnitudes are read, the narrow partials going on while the chunks' bound stands under `2^63`; a walk whose chunk breaks it begins again in
 // the wide form. The walk's two largest words go to `maxima` as before.
+// [realization; November 16, the maps' launch shapes on lap 57's sections] With `bias` given (not `NO_BIAS`), the tiles of the first column
+// block also sum the rows' bias `Σ_t y_t` into `g[bias + o]` from the words they stage: the bias's own launch (`outer_bias_tile`, 192
+// launches a section of 26 to 40 µs each, its products a few thousand) read the same `y` over the same sites. Integer sums, so the
+// partial's walk changes no bit.
 template <typename X>
-__device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk) {
+__device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const X *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk, uint64_t bias) {
     __shared__ __align__(16) int32_t ys[MAP_KC][MAP_TO];
     __shared__ __align__(16) int32_t xs[MAP_KC][MAP_TS];
     __shared__ uint64_t part[8];
@@ -1572,8 +1576,10 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
         const uint64_t s1 = s0 + walk < w.T ? s0 + walk : w.T;
         bool narrow = true;
         uint64_t ywalk = 0, xwalk = 0;
+        const bool biased = bias != NO_BIAS && i0 == 0;
         {
             int64_t acc[4][4];
+            int64_t bsum[4] = {0, 0, 0, 0};
 #pragma unroll
             for (int a = 0; a < 4; a++) {
 #pragma unroll
@@ -1649,6 +1655,12 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                             acc[a][b] += (int64_t)yy[a] * (int64_t)xx[b];
                         }
                     }
+                    if (biased && ti == 0) {
+#pragma unroll
+                        for (int a = 0; a < 4; a++) {
+                            bsum[a] += (int64_t)yy[a];
+                        }
+                    }
                 }
                 __syncthreads();
             }
@@ -1660,6 +1672,15 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                         const uint32_t o = o0 + 4 * to + a, i = i0 + 4 * ti + b;
                         if (o < rows && i < cols && acc[a][b] != 0) {
                             add_wide(g + at + (uint64_t)o * cols + i, (wide)acc[a][b]);
+                        }
+                    }
+                }
+                if (biased && ti == 0) {
+#pragma unroll
+                    for (int a = 0; a < 4; a++) {
+                        const uint32_t o = o0 + 4 * to + a;
+                        if (o < rows && bsum[a] != 0) {
+                            add_wide(g + bias + o, (wide)bsum[a]);
                         }
                     }
                 }
@@ -1722,6 +1743,25 @@ __device__ void outer_tile(const FieldWords &w, wide *g, uint64_t at, uint32_t r
                     }
                 }
             }
+            // The bias over the walk, on 128 bits as `outer_bias_tile` sums it.
+            if (biased && ti == 0) {
+#pragma unroll
+                for (int a = 0; a < 4; a++) {
+                    const uint32_t o = o0 + 4 * to + a;
+                    if (o >= rows) {
+                        continue;
+                    }
+                    wide bw = 0;
+                    for (uint64_t t = s0; t < s1; t++) {
+                        if (!(only_unresolved && !w.unresolved[t])) {
+                            bw += (wide)y[t * y_stride + o];
+                        }
+                    }
+                    if (bw != 0) {
+                        add_wide(g + bias + o, bw);
+                    }
+                }
+            }
         }
         if (maxima && threadIdx.x == 0) {
             atomicMax(maxima, (unsigned long long)ywalk);
@@ -1760,17 +1800,17 @@ __device__ void outer_bias_tile(const FieldWords &w, wide *g, uint64_t at, uint3
     }
 }
 
-extern "C" __global__ void __launch_bounds__(256, 2) field_outer_x32(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int32_t *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk) {
+extern "C" __global__ void __launch_bounds__(256, 2) field_outer_x32(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int32_t *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk, uint64_t bias) {
     if (x) {
-        outer_tile<int32_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima, walk);
+        outer_tile<int32_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima, walk, bias);
     } else {
         outer_bias_tile(w, g, at, rows, y, y_stride, only_unresolved);
     }
 }
 
-extern "C" __global__ void __launch_bounds__(256, 2) field_outer_x64(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int64_t *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk) {
+extern "C" __global__ void __launch_bounds__(256, 2) field_outer_x64(FieldWords w, wide *g, uint64_t at, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, const int64_t *x, uint64_t x_stride, uint32_t only_unresolved, unsigned long long *maxima, uint32_t walk, uint64_t bias) {
     if (x) {
-        outer_tile<int64_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima, walk);
+        outer_tile<int64_t>(w, g, at, rows, cols, y, y_stride, x, x_stride, only_unresolved, maxima, walk, bias);
     } else {
         outer_bias_tile(w, g, at, rows, y, y_stride, only_unresolved);
     }
@@ -2367,12 +2407,12 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
 // exposure. [realization; G191, November 14] At 8 both spilled under a 64-register bound (778 and 220 spill stores, the engine audit's
 // finding 4); timed with the outer sums' walk of 64 (above), the pair reads about 3 ms a section under 8 and 512 with the card warmed.
 #define CONTACT_MIN_BLOCKS 6
-// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 672, where 256 gave a
-// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 blocks a launch at 10% issue. 672 threads are 21
-// chunks, and at the kernel's 48 registers two blocks stand on a multiprocessor (2 × 21 warps × 1,536 registers = 64,512 of 65,536), so the
-// 96 regions run in one wave; 1,024 would run them in two (the theory thread's note of 08:51 UTC). The prefix sums are integer sums, so the
-// chunking changes no bit.
-#define SPREAD_THREADS 672
+// The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 640, where 256 gave a
+// region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 to 129 blocks a launch at 10% issue. 640 threads are
+// 20 chunks of 20 warps, and at the kernel's 48 registers (1,536 a warp) two blocks stand on a multiprocessor: the register file is split
+// across its four schedulers, 16,384 registers each, so two blocks of 20 warps take 10 a scheduler, where 672 (21 warps) needed 11 and
+// stood one a multiprocessor (ncu's register limit, the gap after lap 57). The prefix sums are integer sums, so the chunking changes no bit.
+#define SPREAD_THREADS 640
 // The block of `field_sums` (a head and a region a block), its entries' chunks of the region's sites summed, scanned and walked again.
 #define SUMS_THREADS 1024
 // The most address modes a head's class carries, and the most classes a receiver probes across its seams
