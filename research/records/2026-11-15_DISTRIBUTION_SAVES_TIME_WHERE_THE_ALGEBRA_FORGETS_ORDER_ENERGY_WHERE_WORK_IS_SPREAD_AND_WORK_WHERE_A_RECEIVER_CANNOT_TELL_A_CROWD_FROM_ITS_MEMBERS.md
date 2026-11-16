@@ -655,3 +655,16 @@ UTC); `agent-inferred` for the reading of them.
   kernels (24.1 ms a section), and the one-limb tail of the 04:21 lead (about 20 of a power of 87 bits' 44 steps, each
   about half the instructions of a two-limb step) would take about a quarter of it, near 3 ms a section; it keeps no
   guess until built.
+- **The outer tile's prefetch, and a guess conditioned on a counter read first** (the build thread, relayed 04:59 UTC;
+  `claude/outer-prefetch`, 126 registers in both kernels, no spills, shared memory unchanged at 16.5 KB). The outer tile
+  takes the tiled maps' fetch: once the current chunk of the walk is staged and proved narrow, the next chunk's loads
+  wait in registers and are staged after the products. Its staging was already free of conflicts (a warp's lanes run
+  along consecutive outputs of one row), so the read is the prefetch alone, as it was in the affine maps (0.81 and 0.84
+  over all launches). It serves `field_outer_x32`'s outer launches (about 21 ms a section) and `field_outer_x64` (6.0).
+  The read after lap 51 prints every kernel's issue activity before this build is read, and the guess takes the share
+  that the lesson above says it takes. Guess, fixed at 05:01 UTC (`agent-inferred`), against #877, the card alone, on the
+  premise that each kernel keeps its blocks a multiprocessor (void if one is lost): gate 3 equal; for each kernel whose
+  outer-tile launches issue under half the peak with the long scoreboard their largest stall, 0.76 to 0.88 a launch over
+  all those launches; for one that issues at half the peak or more, 0.90 to 1.00, since its loads' wait is already
+  hidden by other warps; a section 0.988 to 0.997 of control in a balanced hold, which resolves only if the control
+  spreads under 2 ms, the kernels being scored on the profile otherwise.
