@@ -606,6 +606,23 @@ impl Constitution {
         Ok(out)
     }
 
+    /// [measurement; agent-inferred, November 16, the theory thread's R2 of 19:12 UTC] **An open row's sources and their shares**, each tick
+    /// and head of the region's forward: for each open site `i`, the sources `j` its row met and each one's share of the row's contact weight
+    /// (on `SHARE_BITS`), near and far alike. A reading only: a ruler outside the machine sums them by where the sources stand.
+    pub fn open_sources(&self, region: &Region) -> Result<Vec<(usize, usize, usize, Vec<(usize, u128)>)>> {
+        let pass = self.pass(region, true)?;
+        let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        let mut out = Vec::new();
+        for (tick, cell) in pass.ticks.iter().enumerate() {
+            for h in 0..heads {
+                for i in (0..sites).filter(|&i| !Self::definite(region, i)) {
+                    out.push((tick, h, i, cell.rows[h * sites + i].iter().map(|src| (src.j as usize, src.p as u128)).collect()));
+                }
+            }
+        }
+        Ok(out)
+    }
+
     /// [measurement; November 15, T7 of #841] **An open row's far pairs heard as crowds where a band admits them** ([`OpenCrowds`]), each tick
     /// and head of the region's forward. A reading only.
     pub fn open_crowds(&self, region: &Region) -> Result<Vec<OpenCrowds>> {

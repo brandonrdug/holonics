@@ -28,6 +28,31 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 /// The store's slices in its own order: `tools/corpus_passage.py`'s `SLICES` (Common Corpus's five), then the arithmetic world
 /// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
 const SLICES: [&str; 7] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words"];
+/// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
+/// `?` between two line feeds.
+const REACTION_BOUND: u64 = 41;
+
+/// [definition; Build B] Whether the stretch of count `d` is an act of the world joined to its slice: one in `every`, keyed by the key
+/// file's seed and the stretch's count (the mixer of [`holonics_engine::passage`]'s draws, SplitMix64).
+fn acts_here(seed: u64, d: u64, every: u64) -> bool {
+    let mut z = seed.wrapping_add(d.wrapping_mul(0x9E37_79B9_7F4A_7C15)) ^ 0x776F_726C_6400_0000;
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    (z ^ (z >> 31)) % every == 0
+}
+
+/// [definition; Build B] An act's prompt from its stretch's bytes: the last `records` whole lines of the stretch (each ending with its line
+/// feed), or none where the stretch holds no whole line.
+fn world_prompt(bytes: &[u8], records: usize) -> Option<Vec<u8>> {
+    let last = bytes.iter().rposition(|&b| b == b'\n')?;
+    let body = &bytes[..=last];
+    let starts: Vec<usize> = std::iter::once(0).chain(body.iter().enumerate().filter(|(_, b)| **b == b'\n').map(|(k, _)| k + 1)).filter(|&k| k <= last).collect();
+    // A line begins at the stretch's start only where the stretch begins a record; the first partial line is never a record.
+    let whole: Vec<usize> = starts.iter().copied().filter(|&k| k > 0).collect();
+    let from = *whole.iter().rev().nth(records.saturating_sub(1)).or(whole.first())?;
+    Some(body[from..].to_vec())
+}
+
 /// The head of a slice's index of pieces (`tools/corpus_passage.py`'s `INDEX_HEAD`).
 const INDEX_HEAD: &str = "document\ttitle_octets\ttext_octets\topens\tcloses";
 /// The head of a store's counts (`tools/corpus_passage.py`'s `STORE_HEAD`).
@@ -239,7 +264,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect() });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -307,20 +332,68 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let mut regions: Vec<OwnedRegion> = Vec::new();
         let (mut tally, mut by_slice) = (Tally::default(), vec![0u64; cut.slices.len()]);
         let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
+        let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
         while let Some(drawn) = cut.next() {
-            let n = drawn.sites();
+            let act = cut.pass.world.as_ref().filter(|w| cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
+            let n = drawn.sites() + act.map_or(0, |run| run + REACTION_BOUND);
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
             }
+            let prompt = match act {
+                Some(_) => {
+                    let at = cut.pass.slices[drawn.slice].clone();
+                    let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+                    cut.pass.world.as_ref().and_then(|w| world_prompt(&bytes, w.records as usize))
+                }
+                None => None,
+            };
+            let slice = drawn.slice;
             let Stretch { region, counted, .. } = cut.take(drawn, &codec)?;
-            tally.take(&region, counted);
-            by_slice[drawn.slice] += 1;
+            by_slice[slice] += 1;
             (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
-            regions.push(region);
+            match prompt {
+                Some(p) => acts.push((codec.encode(&p)?, slice)),
+                None => {
+                    tally.take(&region, counted);
+                    regions.push(region);
+                }
+            }
         }
-        if regions.is_empty() {
+        if regions.is_empty() && acts.is_empty() {
             ended = true;
             break;
+        }
+        // [definition; Build B] The field acts and the world answers: each act's prompt released `run` places on the field as it stands
+        // (the writer `write-store` runs, keyed by the pass's count of stretches), the world's reaction to each draft appended, and the
+        // reaction alone open. The prompt and the draft are known context, never a target.
+        let mut world_line = String::new();
+        if let (Some(w), false) = (cut.pass.world.clone(), acts.is_empty()) {
+            let run = w.run as usize;
+            let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _)| (p.as_slice(), run)).collect();
+            let act_seed = seed ^ cut.pass.stretches.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+            let drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+            let (mut read_ok, mut draft_places, mut world_places) = (0usize, 0usize, 0usize);
+            let first = regions.len();
+            for ((prompt, _), draft) in acts.iter().zip(&drafts) {
+                let written = &draft[..draft.iter().position(|&c| c == codec.void()).unwrap_or(draft.len())];
+                let reaction = crate::world::react(&codec.decode(written));
+                if reaction.appended != b"?\n" && reaction.appended != b"\n?\n" {
+                    read_ok += 1;
+                }
+                let answered = codec.encode(&reaction.appended)?;
+                let mut classes = prompt.clone();
+                classes.extend_from_slice(&written[..reaction.read.min(written.len())]);
+                let known = classes.len();
+                classes.extend_from_slice(&answered);
+                let mut open = vec![false; known];
+                open.extend(std::iter::repeat_n(true, answered.len()));
+                let region = OwnedRegion::plain(classes, open);
+                tally.take(&region, answered.len());
+                (draft_places, world_places) = (draft_places + reaction.read.min(written.len()), world_places + answered.len());
+                regions.push(region);
+            }
+            world_line = format!("acts={} read={read_ok} draft_places={draft_places} world_places={world_places} first={first}", acts.len());
         }
         let regions_ms = section_start.elapsed().as_millis();
         host[0] += section_start.elapsed().as_nanos();
@@ -360,6 +433,13 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             learner.rate_bits,
             section_start.elapsed().as_millis()
         );
+        if !world_line.is_empty() {
+            // [measurement; Build B] The world's places' code at the section's comparison (the opening's, before the deposit), in millionths of a
+            // bit a place, beside the section's own line.
+            let first: usize = world_line.rsplit("first=").next().and_then(|v| v.parse().ok()).unwrap_or(regions.len());
+            let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
+            println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
+        }
         if let (Some(t), Some(e)) = (receipt.transfer, prior) {
             (transfers, externals, curvatures, priced) = (transfers + t as i128, externals + e, curvatures + (t as i128 - e), priced + 1);
         }
@@ -1063,6 +1143,62 @@ pub fn join_store(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 16, the theory thread's Build B] `set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT`: **a world
+/// joined to a state's pass** ([`holonics_engine::field::PassWorld`]): the state with its pass line's world clause set (one stretch in
+/// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
+/// other line byte for byte (read back and checked, as [`next_pass`]). Refused where the pass holds no slice `SLICE`.
+pub fn set_world(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[7]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if !before.slices.iter().any(|s| s.name == args[3]) {
+        return Err(format!("a pass with no slice {}", args[3]).into());
+    }
+    let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: positive(&args[5])? as u64, run: positive(&args[6])? as u64 };
+    let pass = StorePass { world: Some(world), ..before.clone() };
+    let line = pass.to_line();
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
+    std::fs::write(out, &written)?;
+    println!("SET_WORLD stretches={} lines={lines} differing_line={differing} pass_tail={}", before.stretches, line.rsplit(" world ").next().map_or(String::new(), |w| format!("world {w}")));
+    Ok(())
+}
+
+/// [definition; theory, November 16 19:10Z, the crossing triad] `grow-crossings STATE STATE_SHA KEYS KEYS_SHA TRIADS OUT`: **the learner with crossing
+/// triads** ([`holonics_engine::field::Learner::with_crossings`]): `TRIADS` triads whose legs stand at the site, their charts drawn from the key
+/// stream past the learner's draws, their return `W_T` at zero, so every face the grown field reads is the field's before it, bit for bit; every
+/// standing entry keeps its value, its moments and its rate at its new index, and the pass is kept. Refused on a learner that has triads.
+pub fn grow_crossings(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("grow-crossings STATE STATE_SHA KEYS KEYS_SHA TRIADS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let triads = positive(&args[5])?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let grown = learner.with_crossings(triads, &keys).map_err(|e| e.to_string())?;
+    let written = grown.to_text();
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.to_text() != written || back.field != grown.field || back.pass != learner.pass {
+        return Err("a grown learner that does not read back as itself with its pass".into());
+    }
+    std::fs::write(out, &written)?;
+    let (old, new) = (learner.field.material_len(), grown.field.material_len());
+    let d = grown.field.declaration;
+    println!("GROW_CROSSINGS triads={} crossing={} material_before={old} material_after={new} drawn_before={} drawn_after={}", d.triads, d.crossing, learner.drawn, grown.drawn);
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored
@@ -1409,9 +1545,13 @@ pub fn read_writes(args: &[String], realization: &mut dyn Realization) -> Result
 /// ruler sums them by form, by the operands' lengths, by the digit's place and by whether a carry entered it. A reading: the state is read,
 /// never written. It runs on the card (`train`) or on the host's threads (`host`, beside the card's runs: it opens no card).
 pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
-    if args.len() != 11 {
-        return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA".into());
-    }
+    // [measurement; the theory thread's R1 of 19:12 UTC] With `one`, each place of the run is coded open alone, the rest of the run known
+    // (the one-place receiver: the state a training mask meets where a digit's neighbours are known).
+    let one = match (args.len(), args.get(11).map(String::as_str)) {
+        (11, None) => false,
+        (12, Some("one")) => true,
+        _ => return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA [one]".into()),
+    };
     let started = std::time::Instant::now();
     refuse_variables("read-forms")?;
     let units = units_of(&args[1], &args[2])?;
@@ -1438,17 +1578,28 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
         }
         let mut classes = p.clone();
         classes.extend_from_slice(&r);
-        let mut open = vec![false; p.len()];
-        open.extend(std::iter::repeat_n(true, r.len()));
+        if one {
+            for j in 0..r.len() {
+                let mut open = vec![false; classes.len()];
+                open[p.len() + j] = true;
+                regions.push(OwnedRegion::plain(classes.clone(), open));
+            }
+        } else {
+            let mut open = vec![false; p.len()];
+            open.extend(std::iter::repeat_n(true, r.len()));
+            regions.push(OwnedRegion::plain(classes, open));
+        }
         rows.push((label.to_string(), p.len(), r));
-        regions.push(OwnedRegion::plain(classes, open));
     }
     if rows.is_empty() {
         return Err("a forms table of no rows".into());
     }
-    println!("FORMS_LAW rows={} alphabet={} pairs_bound={} sites_bound={} ms={}", rows.len(), codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
+    println!("FORMS_LAW rows={} receiver={} alphabet={} pairs_bound={} sites_bound={} ms={}", rows.len(), if one { "one" } else { "open" }, codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
     let micro = |code: i128, places: usize| -> i128 { if places == 0 { 0 } else { code * 1_000_000 / ((places as i128) << 20) } };
     let (mut at, mut batches) = (0usize, 0usize);
+    // Each region's row and its first open place: a row's places in order, one region a place under `one`.
+    let owner: Vec<(usize, usize)> = rows.iter().enumerate().flat_map(|(k, r)| if one { (0..r.2.len()).map(|j| (k, j)).collect::<Vec<_>>() } else { vec![(k, 0)] }).collect();
+    let mut codes_of: Vec<Vec<i128>> = rows.iter().map(|r| vec![0; r.2.len()]).collect();
     while at < regions.len() {
         let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
         while end < regions.len() {
@@ -1459,16 +1610,20 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
             (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
         }
         let faces = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
-        for (k, faces) in (at..end).zip(faces) {
-            let (label, prompt, run) = &rows[k];
-            let codes: Vec<i128> = (0..run.len())
-                .map(|j| faces[prompt + j].as_ref().map(|f| f.code(run[j]) as i128).ok_or("an open place without a face"))
-                .collect::<std::result::Result<_, _>>()?;
-            let total: i128 = codes.iter().sum();
-            println!("FORMS_ROW label={label} prompt_places={prompt} run_places={} code={} by_place={}", run.len(), micro(total, run.len()), codes.iter().map(|&c| micro(c, 1).to_string()).collect::<Vec<_>>().join(","));
+        for (r, faces) in (at..end).zip(faces) {
+            let (k, j0) = owner[r];
+            let (_, prompt, run) = &rows[k];
+            let places: Vec<usize> = if one { vec![j0] } else { (0..run.len()).collect() };
+            for j in places {
+                codes_of[k][j] = faces[prompt + j].as_ref().map(|f| f.code(run[j]) as i128).ok_or("an open place without a face")?;
+            }
         }
         batches += 1;
         at = end;
+    }
+    for ((label, _, run), codes) in rows.iter().zip(&codes_of) {
+        let total: i128 = codes.iter().sum();
+        println!("FORMS_ROW label={label} prompt_places={} run_places={} code={} by_place={}", rows.iter().find(|r| &r.0 == label).map_or(0, |r| r.1), run.len(), micro(total, run.len()), codes.iter().map(|&c| micro(c, 1).to_string()).collect::<Vec<_>>().join(","));
     }
     println!("FORMS_DONE rows={} batches={batches} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
     Ok(())
@@ -1531,6 +1686,110 @@ pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
     println!("FORMS_WRITE_DONE rows={} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 16, the theory thread's R2 of 19:12 UTC] `read-junction UNITS UNITS_SHA KEYS KEYS_SHA CODEC
+/// CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA`: **where an answer digit's contact weight goes.** For each held sum or difference of two
+/// operands in its symbols form (`anchor:LENGTHS:OP:symbols:N` rows of the forms table: `a OP b = ` and the value), each digit of the value
+/// is opened alone, the rest of the record known (R1's receiver), and each tick and head's row at that digit is read for the shares of its
+/// contact weight on the operands' digits: the aligned ones (`a_k` and `b_k`, the digits at the same place counted from each number's
+/// last digit) and the others. Each line gives, by the operands' lengths, tick and head, the mean share an aligned digit takes and the mean
+/// share another operand digit takes, in millionths of the row's weight, and their ratio in thousandths. A reading on the host's threads
+/// (it opens no card): the state is read, never written. A ruler: it names places by the world's own layout, outside the machine.
+pub fn read_junction(args: &[String]) -> Result<()> {
+    use rayon::prelude::*;
+    if args.len() != 11 {
+        return Err("read-junction UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-junction")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    // (lengths, region, aligned places, other operand places, the first operand's aligned place, the second's)
+    let mut work: Vec<(String, OwnedRegion, Vec<usize>, Vec<usize>, Vec<usize>, Vec<usize>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, prompt, run] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        let parts: Vec<&str> = label.split(':').collect();
+        if parts.len() != 5 || parts[0] != "anchor" || parts[3] != "symbols" || !(parts[2] == "+" || parts[2] == "-") {
+            continue;
+        }
+        let toks: Vec<&str> = prompt.split(' ').collect();
+        let (a, b) = (toks[0], toks[2]);
+        let (a_at, b_at) = (0usize, a.len() + 3);
+        let value = run.replace("\\n", "\n");
+        let bytes = format!("{prompt}{value}").into_bytes();
+        let classes = codec.encode(&bytes)?;
+        let digits = value.trim_end_matches('\n').trim_start_matches('-');
+        let v_at = prompt.len() + value.len() - 1 - digits.len();
+        for k in 0..digits.len() {
+            let place = v_at + digits.len() - 1 - k;
+            let mut aligned = Vec::new();
+            let (mut a_k, mut b_k) = (Vec::new(), Vec::new());
+            if k < a.len() {
+                aligned.push(a_at + a.len() - 1 - k);
+                a_k.push(a_at + a.len() - 1 - k);
+            }
+            if k < b.len() {
+                aligned.push(b_at + b.len() - 1 - k);
+                b_k.push(b_at + b.len() - 1 - k);
+            }
+            let others: Vec<usize> = (a_at..a_at + a.len()).chain(b_at..b_at + b.len()).filter(|j| !aligned.contains(j)).collect();
+            if aligned.is_empty() || others.is_empty() {
+                continue;
+            }
+            let mut open = vec![false; classes.len()];
+            open[place] = true;
+            work.push((parts[1].to_string(), OwnedRegion::plain(classes.clone(), open), aligned, others, a_k, b_k));
+        }
+    }
+    let (ticks, heads) = (learner.field.declaration.ticks, learner.field.declaration.heads);
+    println!("JUNCTION_LAW digits={} ticks={ticks} heads={heads} ms={}", work.len(), started.elapsed().as_millis());
+    let micro = |p: u128| -> u128 { (p * 1_000_000) >> holonics_engine::width::SHARE_BITS };
+    // Per digit and tick and head: the aligned digits' mean share, the others' mean share, and the first and second operand's aligned digit's
+    // share apart (the second's aligned digit stands at a fixed offset from the answer digit, `len(" = ") + len(value) − len(b)`, so its share
+    // alone cannot tell an address from a fixed reach; the first's offset moves with the second operand's length).
+    type Cell = (usize, usize, u128, u128, Option<u128>, Option<u128>);
+    let read: Vec<std::result::Result<(String, Vec<Cell>), String>> = work
+        .par_iter()
+        .map(|(lengths, region, aligned, others, a_k, b_k)| {
+            let rows = learner.field.open_sources(&holonics_engine::region::view_of(region)).map_err(|e| e.to_string())?;
+            Ok((lengths.clone(), rows.into_iter().map(|(t, h, _, srcs)| {
+                let on = |set: &[usize]| srcs.iter().filter(|(j, _)| set.contains(j)).map(|&(_, p)| micro(p)).sum::<u128>() / set.len().max(1) as u128;
+                (t, h, on(aligned), on(others), (!a_k.is_empty()).then(|| on(a_k)), (!b_k.is_empty()).then(|| on(b_k)))
+            }).collect()))
+        })
+        .collect();
+    let mut acc: std::collections::BTreeMap<(String, usize, usize), [u128; 7]> = std::collections::BTreeMap::new();
+    for r in read {
+        let (lengths, cells) = r?;
+        for (t, h, al, ot, a, b) in cells {
+            let e = acc.entry((lengths.clone(), t, h)).or_insert([0; 7]);
+            e[0] += 1;
+            e[1] += al;
+            e[2] += ot;
+            if let Some(a) = a {
+                (e[3], e[4]) = (e[3] + 1, e[4] + a);
+            }
+            if let Some(b) = b {
+                (e[5], e[6]) = (e[5] + 1, e[6] + b);
+            }
+        }
+    }
+    for ((lengths, t, h), e) in &acc {
+        let (am, om) = (e[1] / e[0], e[2] / e[0]);
+        let (a, b) = (e[4] / e[3].max(1), e[6] / e[5].max(1));
+        let milli = |x: u128| if om == 0 { 0 } else { x * 1000 / om };
+        println!("JUNCTION_HEAD lengths={lengths} tick={t} head={h} digits={} aligned_share={am} other_share={om} ratio_milli={} first_share={a} first_milli={} second_share={b} second_milli={}", e[0], milli(am), milli(a), milli(b));
+    }
+    println!("JUNCTION_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }
 
@@ -1599,6 +1858,20 @@ pub fn write(args: &[String], realization: &mut dyn Realization) -> Result<()> {
 mod tests {
     use super::*;
     use holonics_engine::field::NEAR;
+
+    /// [definition; Build B] An act's prompt is the stretch's last whole lines, never its first partial line; and one stretch in `every` acts.
+    #[test]
+    fn an_acts_prompt_is_its_stretchs_last_whole_lines() {
+        assert_eq!(world_prompt(b"7 = 9\n1 + 1 = 2\n2 * 3 = 6\n4 - ", 3), Some(b"1 + 1 = 2\n2 * 3 = 6\n".to_vec()), "the partial first line is no record");
+        assert_eq!(world_prompt(b"7 = 9\n1 + 1 = 2\n2 * 3 = 6\n4 - ", 1), Some(b"2 * 3 = 6\n".to_vec()));
+        assert_eq!(world_prompt(b"x\na\nb\nc\nd\n", 2), Some(b"c\nd\n".to_vec()));
+        assert_eq!(world_prompt(b"half a record", 3), None);
+        assert_eq!(world_prompt(b"half\nno whole line", 3), None, "a line feed with no whole line after it");
+        for every in [1u64, 4, 8] {
+            let hits = (1..80_001u64).filter(|&d| acts_here(0x5EED, d, every)).count() as u64;
+            assert!(hits * every > 76_000 && hits * every < 84_000, "every={every} hits={hits}");
+        }
+    }
     use holonics_engine::passage::{cut_of, lengths_of, state_of, Kind};
 
     /// [definition; the record §4 item 1] **A stretch's draws and cut are the port's**: the draws stand on the octaves `[4, 8)` to `[256, 512)`,

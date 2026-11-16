@@ -210,14 +210,19 @@ pub(crate) fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dg
 /// imaginary. Why two releases: the triad is the plain contact with one operand more, a word of two contacts through the place, and each contact
 /// of the word is released at the face's grain as a plain contact is; each product is one site's, so no sum is formed and no order chosen, and
 /// the card's per-site products give the same bits.
-pub(crate) fn triad_products(triads: usize, sites: usize, abg: &[i64]) -> Result<(Vec<i64>, Vec<i64>)> {
+///
+/// [definition; theory, November 16 19:10Z, [`Declaration::crossing`]] With `crossing` the three legs stand at the site, `p = α_k(t) β_k(t)` and
+/// `c^T = p γ_k(t)`, at every site of the region; each product is still one site's, so nothing is summed and no order chosen.
+pub(crate) fn triad_products(triads: usize, sites: usize, abg: &[i64], crossing: bool) -> Result<(Vec<i64>, Vec<i64>)> {
     let (j2, j6) = (2 * triads, 6 * triads);
     let (mut p, mut c) = (vec![0i64; sites * j2], vec![0i64; sites * j2]);
-    for t in 1..sites.saturating_sub(1) {
+    let (from, to) = if crossing { (0, sites) } else { (1, sites.saturating_sub(1)) };
+    for t in from..to {
+        let (tb, tg) = if crossing { (t, t) } else { (t - 1, t + 1) };
         for k in 0..triads {
             let (ar, ai) = (i128::from(abg[t * j6 + k]), i128::from(abg[t * j6 + triads + k]));
-            let (br, bi) = (i128::from(abg[(t - 1) * j6 + j2 + k]), i128::from(abg[(t - 1) * j6 + j2 + triads + k]));
-            let (gr, gi) = (i128::from(abg[(t + 1) * j6 + 2 * j2 + k]), i128::from(abg[(t + 1) * j6 + 2 * j2 + triads + k]));
+            let (br, bi) = (i128::from(abg[tb * j6 + j2 + k]), i128::from(abg[tb * j6 + j2 + triads + k]));
+            let (gr, gi) = (i128::from(abg[tg * j6 + 2 * j2 + k]), i128::from(abg[tg * j6 + 2 * j2 + triads + k]));
             let (pr, pi) = (fit64(release(ar * br - ai * bi, FACE_BITS))?, fit64(release(ar * bi + ai * br, FACE_BITS))?);
             (p[t * j2 + k], p[t * j2 + triads + k]) = (pr, pi);
             let (pr, pi) = (i128::from(pr), i128::from(pi));
@@ -240,25 +245,30 @@ pub(crate) fn triad_products(triads: usize, sites: usize, abg: &[i64]) -> Result
 /// `δ(α, β, γ)`, `[t][6J]` as `abg` is laid. Each site's `α` is read by its own place alone, its `β` by the place after it and its `γ` by the place
 /// before it, so each slot is written by one place: nothing is summed and no order is chosen. `δα` is zero at the region's two ends, `δβ` at its
 /// last two sites and `δγ` at its first two.
-pub(crate) fn triad_back(triads: usize, sites: usize, abg: &[i64], p: &[i64], dct: &[i64]) -> Result<Vec<i64>> {
+///
+/// [definition; theory, November 16 19:10Z, [`Declaration::crossing`]] With `crossing` every leg is the site's own and every site has them: each of the
+/// site's three slots is still written by one place, its own.
+pub(crate) fn triad_back(triads: usize, sites: usize, abg: &[i64], p: &[i64], dct: &[i64], crossing: bool) -> Result<Vec<i64>> {
     let (j2, j6) = (2 * triads, 6 * triads);
     let mut out = vec![0i64; sites * j6];
     let conj = |(zr, zi): (i128, i128), (ur, ui): (i128, i128)| -> Result<(i64, i64)> { Ok((fit64(release(zr * ur + zi * ui, FACE_BITS))?, fit64(release(zr * ui - zi * ur, FACE_BITS))?)) };
-    for t in 1..sites.saturating_sub(1) {
+    let (from, to) = if crossing { (0, sites) } else { (1, sites.saturating_sub(1)) };
+    for t in from..to {
+        let (tb, tg) = if crossing { (t, t) } else { (t - 1, t + 1) };
         for k in 0..triads {
             let u = (i128::from(dct[t * j2 + k]), i128::from(dct[t * j2 + triads + k]));
             let pt = (i128::from(p[t * j2 + k]), i128::from(p[t * j2 + triads + k]));
             let alpha = (i128::from(abg[t * j6 + k]), i128::from(abg[t * j6 + triads + k]));
-            let beta = (i128::from(abg[(t - 1) * j6 + j2 + k]), i128::from(abg[(t - 1) * j6 + j2 + triads + k]));
-            let gamma = (i128::from(abg[(t + 1) * j6 + 2 * j2 + k]), i128::from(abg[(t + 1) * j6 + 2 * j2 + triads + k]));
+            let beta = (i128::from(abg[tb * j6 + j2 + k]), i128::from(abg[tb * j6 + j2 + triads + k]));
+            let gamma = (i128::from(abg[tg * j6 + 2 * j2 + k]), i128::from(abg[tg * j6 + 2 * j2 + triads + k]));
             let dgamma = conj(pt, u)?;
             let (dpr, dpi) = conj(gamma, u)?;
             let dp = (i128::from(dpr), i128::from(dpi));
             let dalpha = conj(beta, dp)?;
             let dbeta = conj(alpha, dp)?;
-            (out[(t + 1) * j6 + 2 * j2 + k], out[(t + 1) * j6 + 2 * j2 + triads + k]) = dgamma;
+            (out[tg * j6 + 2 * j2 + k], out[tg * j6 + 2 * j2 + triads + k]) = dgamma;
             (out[t * j6 + k], out[t * j6 + triads + k]) = dalpha;
-            (out[(t - 1) * j6 + j2 + k], out[(t - 1) * j6 + j2 + triads + k]) = dbeta;
+            (out[tb * j6 + j2 + k], out[tb * j6 + j2 + triads + k]) = dbeta;
         }
     }
     Ok(out)

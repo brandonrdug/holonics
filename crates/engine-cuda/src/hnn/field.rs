@@ -58,7 +58,7 @@ mod tests {
     use holonics_engine::contact::WEIGHT_BITS;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> Declaration {
-        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
+        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -72,7 +72,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
         let describe = |name: &str, d: Declaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics_engine::field::Constitution::found(d, &vec![7u8; draws]).expect("founded");
@@ -273,6 +273,73 @@ mod tests {
         let d = field.declaration;
         let (l, dw, f, m2) = (field.layout().clone(), d.width, d.contacts, 2 * d.complex());
         assert_eq!((d.triads, d.carry), (triads, 2));
+        // Each moved entry with its shift: the material's families on `2^(−24)`, the triads' biases on the face's grain, eight bits coarser.
+        let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw)
+            .map(|i| (i, 14))
+            .chain((l.out..l.out + dw * m2).map(|i| (i, 14)))
+            .chain((l.w..l.w + dw * f).map(|i| (i, 14)))
+            .chain((l.w_triad..l.w_triad + dw * 2 * triads).map(|i| (i, 12)))
+            .chain((l.triad_bias..l.triad_bias + 6 * triads).map(|i| (i, 20)))
+            .collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &(i, shift)) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+        let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+        assert_eq!(host_faces, card_faces);
+        assert_eq!(host_g.len(), card_g.len());
+        let unequal: Vec<usize> = (0..host_g.len()).filter(|&i| host_g[i] != card_g[i]).collect();
+        assert!(unequal.is_empty(), "{} covector entries differ, the first at {:?} (triad at {}, triad_bias at {}, w_triad at {})", unequal.len(), unequal.first(), l.triad, l.triad_bias, l.w_triad);
+        // [P58 item 3] The faces at their classes gathered on the card are the whole faces' at their classes, beside the same covector.
+        let (at_class, narrow_g) = card_field.read_and_return_at_class(&field, &regions).unwrap();
+        assert_eq!(at_class, holonics_engine::field::faces_at_class(&host_faces, &regions));
+        assert!(narrow_g == card_g, "the narrow read's covector differs from the whole read's");
+        // [P57 item 2] The open sites' charts by stage on the card are the host's, beside the same faces.
+        let (charts_faces, card_charts) = card_field.read_tick_charts(&field, &regions).unwrap();
+        let (host_charts_faces, host_charts) = holonics_engine::field::Host.read_tick_charts(&field, &regions).unwrap();
+        assert_eq!(charts_faces, host_charts_faces);
+        assert_eq!(card_charts.len(), regions.len());
+        assert!(card_charts == host_charts, "the charts by stage differ between the card and the host");
+        assert_eq!(card_charts[4].len(), field.declaration.ticks + 1);
+        // [Brandon, November 15 00:58Z] The open sites' lane powers by stage on the card are the host's, beside the same faces.
+        let (scales_faces, card_scales) = card_field.read_tick_scales(&field, &regions).unwrap();
+        let (host_scales_faces, host_scales) = holonics_engine::field::Host.read_tick_scales(&field, &regions).unwrap();
+        assert_eq!(scales_faces, host_scales_faces);
+        assert!(card_scales == host_scales, "the lane powers by stage differ between the card and the host");
+        assert_eq!(card_scales[4].len(), field.declaration.ticks + 1);
+        assert!(card_scales.iter().flatten().flatten().any(|&s| s != 0), "no lane power read");
+        for (name, start, len) in [("w_triad", l.w_triad, dw * 2 * triads), ("triad", l.triad, 6 * triads * dw), ("triad_bias", l.triad_bias, 6 * triads)] {
+            assert!(host_g[start..start + len].iter().any(|&v| v != 0), "the triads' {name} takes no covector");
+        }
+    }
+
+    /// [measurement; theory, November 16 19:10Z, the crossing triad] **The crossing triads on the card read the host's bits** (the strand's test below
+    /// with the triads' legs at the site, `Learner::with_crossings`) (needs the card): a field of
+    /// `declaration(32, 4, 32)` grown by two carry circles and sixteen triads ([`holonics_engine::field::Learner::with_triads`]), its
+    /// readout, current and pair returns, `W_T` and the triads' chart biases moved off zero from a keyed stream's tail (so the faces have a
+    /// covector and every triad term, forward and reverse, is read), read and returned on regions of 2, 3, 5, 64 and 257 sites through the host and
+    /// through the card: every face and every covector entry equal, and the covector nonzero on `W_T`, the triads' chart and their biases. The
+    /// ends are read with them: a region of two sites has no place with both strand mates, one of three a single one, and one of five reads each
+    /// leg's covector at one place only.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_crossing_triads_on_the_card_read_the_hosts_bits() {
+        use holonics_engine::field::Learner;
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
+        let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
+        let triads = 16usize;
+        let mut field = Learner::new(founded, 12).with_carry(2, &keys).unwrap().with_crossings(triads, &keys).unwrap().field;
+        let d = field.declaration;
+        let (l, dw, f, m2) = (field.layout().clone(), d.width, d.contacts, 2 * d.complex());
+        assert_eq!((d.triads, d.carry, d.crossing), (triads, 2, true));
         // Each moved entry with its shift: the material's families on `2^(−24)`, the triads' biases on the face's grain, eight bits coarser.
         let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw)
             .map(|i| (i, 14))

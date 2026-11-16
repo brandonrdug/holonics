@@ -159,6 +159,18 @@ pub struct Declaration {
     /// writes every head line exactly as before; `true` writes `hnn-field-v14l`, the seventeen words of `v14m` with the mark's word written
     /// as `0` or `1`, then `1`.
     pub loud: bool,
+    /// [definition; theory, November 16 19:10Z (the crossing triad); agent-inferred realization] **The triads' legs stand at the site**: with
+    /// `true`, triad `k` at site `t` is `p = α_k(t) β_k(t)`, `c^T = p γ_k(t)`, all three legs charts of the site's own read after the current's
+    /// return, which holds every head's gathered current, so a far pair the heads gathered meets at the site in one product and the third leg
+    /// reads the site itself (`u_k(L) w_k(x) v_k(R)`, atlas `code.triad-character-of-composition`). Every site has its legs, the region's ends
+    /// included. With `false` the legs are the strand's, `α(t) β(t − 1) γ(t + 1)`, as before. Why at the site: on November 16 the heads
+    /// addressed an answer digit's aligned operand digits (head 0 gave them seven to eight times the other operand digits' share, R2), while
+    /// every answer digit coded at ln 10 under every receiver (R1, G-ar4): the gathered pair was summed, and a sum of pair terms reads nothing of
+    /// `L + R` on `Z/n`; the strand's triad multiplies only the strand's neighbours. Realized as the strand triad's legs moved to the site, so the
+    /// legs read the gathered currents through the return's material (`W_out`), not through a chart of their own: the theory's `α(y^h)` is
+    /// `α(r̂(x + W_out y))` (`agent-inferred`). Needs triads; `false` writes every head line exactly as before; `true` writes `hnn-field-v14x`,
+    /// the eighteen words of `v14l` with the loudness's word written as `0` or `1`, then `1`.
+    pub crossing: bool,
 }
 
 impl Declaration {
@@ -437,6 +449,9 @@ impl Declaration {
         if self.carry % 2 != 0 || self.carry > self.contacts / 2 {
             return refuse("a field's carry circles are even in count (as many scan from each side) and among its complex contacts");
         }
+        if self.crossing && self.triads == 0 {
+            return refuse("a field whose triads' legs stand at the site needs triads");
+        }
         // The triads' families, `6J` rows of `D`, `6J` biases and `D × 2J`, are laid within the carrier their offsets are counted in.
         if self.triads.checked_mul(6).and_then(|r| r.checked_mul(self.width.saturating_add(1))).is_none() {
             return refuse("a field's triads past the carrier their families are laid in");
@@ -452,7 +467,9 @@ impl Declaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.loud {
+        let head = if self.crossing {
+            "hnn-field-v14x"
+        } else if self.loud {
             "hnn-field-v14l"
         } else if self.mark {
             "hnn-field-v14m"
@@ -467,7 +484,9 @@ impl Declaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.loud {
+        let tail = if self.crossing {
+            format!(" {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud))
+        } else if self.loud {
             format!(" {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark))
         } else if self.mark {
             format!(" {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction))
@@ -489,7 +508,15 @@ impl Declaration {
         let words: Vec<&str> = line.split(' ').collect();
         // A v13 head line is a field with no depth ring (the line before the depth rings, its states the line's own).
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
+        // [theory, November 16 19:10Z] The crossing's word is read from `v14x` alone; every older head line is a field whose triads, if any, are the
+        // strand's.
+        let crossing = words.first().copied() == Some("hnn-field-v14x");
         let (depth_word, carry, triads, opening, junction, mark, loud) = match (words.first().copied(), words.len()) {
+            // [theory, November 16 19:10Z] The words of `v14l` with the loudness's word zero or one, then the crossing's word, one.
+            (Some("hnn-field-v14x"), 19) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
+                (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
+                _ => return refuse("an hnn-field-v14x head line whose opening, junction, mark or loudness word is not zero or one or whose crossing word is not one"),
+            },
             (Some("hnn-field-v14"), 12) => (Some(words[11]), 0, 0, false, false, false, false),
             (Some("hnn-field-v14e"), 13) => match n(words[12])? {
                 0 => return refuse("an hnn-field-v14e head line with no carry circles (a field without them is hnn-field-v14)"),
@@ -528,7 +555,7 @@ impl Declaration {
             (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing };
         d.admit()?;
         Ok(d)
     }

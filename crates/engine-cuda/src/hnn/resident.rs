@@ -224,6 +224,9 @@ pub(crate) struct Words {
     pub(crate) pabg: u64,
     pub(crate) ptp: u64,
     pub(crate) pct: u64,
+    // [theory, November 16 19:10Z] Whether the triads' legs stand at the site (`Declaration::crossing`): one where they do, zero where they are the
+    // strand's.
+    pub(crate) crossing: u64,
     // [theory, November 12, P50 step 1] The clock's skins (`FieldWords::skin`, `cskin`): a paced head's skin of each support pair `[p][pair][l]` and
     // of each crowd edge `[p][t][slot][l]`, 32 bits each, formed once a clock by `field_skin_fill`. Zero where the batch keeps none.
     pub(crate) skin: u64,
@@ -898,6 +901,7 @@ impl<'c> Resident<'c> {
             rt: reach(l.triad, 6 * d.triads * dw),
             wtr: l.w_triad as u64,
             rwt: reach(l.w_triad, dw * 2 * d.triads),
+            crossing: u64::from(d.crossing),
             rb: reach(l.b, f * dw),
             rw: reach(l.w, dw * f),
             rread: reach(l.read, dw * dw),

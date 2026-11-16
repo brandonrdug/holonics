@@ -241,6 +241,25 @@ pub struct StorePass {
     pub sites: u64,
     pub own: bool,
     pub slices: Vec<PassSlice>,
+    /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC] The world that answers the field's act, where one
+    /// is joined ([`PassWorld`]).
+    pub world: Option<PassWorld>,
+}
+
+/// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC, the friction record §3 and §5] **A world joined at the
+/// pass's boundary**: a receiver outside the machine that answers the field's own act. One stretch in `every` of the slice `slice` (keyed by
+/// the stretch's count) becomes an act: its last `records` whole lines are the prompt, the field releases `run` places after them (its
+/// draft), and the world appends its reaction to the draft, which is the only part of the region compared; the prompt and the draft are
+/// known context, never a target. The world's law (what it answers) is terrain at the exterior, never the machine's: the machine meets
+/// only the bytes it returns. Written after the slices as `world SLICE EVERY RECORDS RUN`, only where set, so every state without one reads
+/// and writes byte for byte as before. Why in the state: which acts the world answers is law, carried in the learner's state (CLAUDE.md,
+/// November 8).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PassWorld {
+    pub slice: String,
+    pub every: u64,
+    pub records: u64,
+    pub run: u64,
 }
 
 /// A slice's place in a pass ([`StorePass`]): its name, the piece it stands in, its cursor in that piece and its places taken.
@@ -258,12 +277,15 @@ impl StorePass {
     pub fn to_line(&self) -> String {
         let slices: String = self.slices.iter().map(|s| format!(" {} {} {} {}", s.name, s.piece, s.cursor, s.taken)).collect();
         let own = if self.own { " own" } else { "" };
-        format!("pass {} {} {} {} {} {} {}{own}{slices}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
+        let world = self.world.as_ref().map_or(String::new(), |w| format!(" world {} {} {} {}", w.slice, w.every, w.records, w.run));
+        format!("pass {} {} {} {} {} {} {}{own}{slices}{world}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
     }
 
     /// The pass read from its line ([`StorePass::to_line`]).
     pub fn from_line(line: &str) -> Result<Self> {
-        let words: Vec<&str> = line.split(' ').collect();
+        let all: Vec<&str> = line.split(' ').collect();
+        // The world's clause, where set, is the line's last five words, opened by the word `world` (no slice is named `world`).
+        let (words, world_words) = if all.len() >= 13 && all[all.len() - 5] == "world" { (&all[..all.len() - 5], Some(&all[all.len() - 4..])) } else { (&all[..], None) };
         // The word `own` stands ninth with four words a slice after it; with it absent the slices begin ninth. The two counts differ by one
         // modulo four, so no slice's name is read as the word.
         let own = words.len() >= 9 && words[8] == "own" && (words.len() - 9) % 4 == 0;
@@ -277,7 +299,19 @@ impl StorePass {
             return refuse("a pass's store that is not a SHA-256");
         }
         let slices = words[from..].chunks(4).map(|c| Ok(PassSlice { name: word(c[0])?, piece: n(c[1])?, cursor: n(c[2])?, taken: n(c[3])? })).collect::<Result<Vec<_>>>()?;
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices };
+        if slices.iter().any(|s| s.name == "world") {
+            return refuse("a pass with a slice named `world`, the word of the world's clause");
+        }
+        let world = match world_words {
+            Some(w) => Some(PassWorld { slice: word(w[0])?, every: n(w[1])?, records: n(w[2])?, run: n(w[3])? }),
+            None => None,
+        };
+        if let Some(w) = &world {
+            if w.every == 0 || w.records == 0 || w.run == 0 || !slices.iter().any(|s| s.name == w.slice) {
+                return refuse("a world whose share, records or run is zero, or whose slice is not the pass's");
+            }
+        }
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }

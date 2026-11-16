@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -1999,7 +1999,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3513,6 +3513,78 @@ fn each_triads_legs_and_return_carry_one_scale_covector() {
     }
 }
 
+/// [`triad_shaped`] with the triads' legs at the site ([`Declaration::crossing`]): the same material, the legs read where the theory's crossing
+/// triad reads them.
+fn crossing_shaped(still: usize, triads: usize) -> Constitution {
+    let strand = triad_shaped(still, triads);
+    let d = Declaration { crossing: true, ..strand.declaration };
+    let mut out = Constitution::with_theta(d, strand.theta.clone());
+    (out.per_blank_clock, out.bare_stretch) = (strand.per_blank_clock, strand.bare_stretch);
+    out
+}
+
+/// [definition; theory, November 16 19:10Z, the crossing triad] **The crossing triads are the law at every site, the region's ends included**: with
+/// the legs at the site, `p = release(α(t) β(t), 16)` and `c^T = release(p γ(t), 16)` at every site (a region of two sites included), and the
+/// reverse is each site's own three slots (`δγ(t) = conj(p) u`, `δp = conj(γ(t)) u`, `δα(t) = conj(β(t)) δp`, `δβ(t) = conj(α(t)) δp`); each leg
+/// and the return carry one scale covector (the Manley–Rowe gauge, as the strand's legs do); and the declaration's head line reads and writes back
+/// as `hnn-field-v14x` while every field without the crossing writes its line as before.
+#[test]
+fn the_crossing_triads_are_the_law_at_every_site() {
+    let field = crossing_shaped(1, TRIADS);
+    let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
+    let (j2, j6) = (2 * j, 6 * j);
+    let sites = CLASSES.len();
+    let pass = field.pass(&region(), true).unwrap();
+    let conj = |(zr, zi): (i128, i128), (ur, ui): (i128, i128)| (release(zr * ur + zi * ui, FACE_BITS), release(zr * ui - zi * ur, FACE_BITS));
+    let leg = |v: &[i64], s: usize, base: usize, k: usize| (i128::from(v[s * j6 + base + k]), i128::from(v[s * j6 + base + j + k]));
+    let pair = |v: &[i64], s: usize, k: usize| (i128::from(v[s * j2 + k]), i128::from(v[s * j2 + j + k]));
+    for (tick, cell) in pass.ticks.iter().enumerate() {
+        for t in 0..sites {
+            for k in 0..j {
+                let ((ar, ai), (br, bi), (gr, gi)) = (leg(&cell.abg, t, 0, k), leg(&cell.abg, t, j2, k), leg(&cell.abg, t, 2 * j2, k));
+                let (pr, pi) = (release(ar * br - ai * bi, FACE_BITS), release(ar * bi + ai * br, FACE_BITS));
+                assert_eq!(pair(&cell.tp, t, k), (pr, pi), "tick {tick} site {t} triad {k}: p = α(t) β(t)");
+                assert_eq!(pair(&cell.ct, t, k), (release(pr * gr - pi * gi, FACE_BITS), release(pr * gi + pi * gr, FACE_BITS)), "tick {tick} site {t} triad {k}: c^T = p γ(t)");
+            }
+        }
+        assert!(cell.ct[..j2].iter().chain(&cell.ct[(sites - 1) * j2..]).any(|&v| v != 0), "tick {tick}: the crossing stands at the region's ends");
+        let dct: Vec<i64> = (0..sites * j2).map(|i| ((i % 7) as i64 - 3) << 30).collect();
+        let dabg = triad_back(j, sites, &cell.abg, &cell.tp, &dct, true).unwrap();
+        for t in 0..sites {
+            for k in 0..j {
+                let u = pair(&dct, t, k);
+                let dp = conj(leg(&cell.abg, t, 2 * j2, k), u);
+                assert_eq!(leg(&dabg, t, 2 * j2, k), conj(pair(&cell.tp, t, k), u), "tick {tick} site {t} triad {k}: δγ(t) = conj(p) u");
+                assert_eq!(leg(&dabg, t, 0, k), conj(leg(&cell.abg, t, j2, k), dp), "tick {tick} site {t} triad {k}: δα(t) = conj(β(t)) δp");
+                assert_eq!(leg(&dabg, t, j2, k), conj(leg(&cell.abg, t, 0, k), dp), "tick {tick} site {t} triad {k}: δβ(t) = conj(α(t)) δp");
+            }
+        }
+    }
+    let (two, open) = ([1usize, 3], [false, true]);
+    let small = Region { classes: &two, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    assert!(field.pass(&small, true).unwrap().ticks.iter().any(|c| c.ct.iter().any(|&v| v != 0)), "a region of two sites holds crossing triads");
+    // One scale covector across each triad's legs and its return, as the strand's.
+    let g = covector_of(&field, &region());
+    let scale = |entries: &[usize], shift: u32| -> i128 { entries.iter().map(|&i| i128::from(field.theta[i]) * g[i]).sum::<i128>() >> shift };
+    let mut standing = 0usize;
+    for k in 0..j {
+        let columns: Vec<usize> = (0..dw).flat_map(|o| [l.w_triad + o * 2 * j + k, l.w_triad + o * 2 * j + j + k]).collect();
+        let ret = scale(&columns, 44);
+        standing += usize::from(ret.abs() > 64);
+        for (re, im) in [(k, j + k), (2 * j + k, 3 * j + k), (4 * j + k, 5 * j + k)] {
+            let rows: Vec<usize> = (0..dw).flat_map(|c| [l.triad + re * dw + c, l.triad + im * dw + c]).collect();
+            let along = scale(&rows, 44) + scale(&[l.triad_bias + re, l.triad_bias + im], 20);
+            assert!((along - ret).abs() <= ret.abs() / 8 + 64, "triad {k}: Re⟨leg, ∇⟩ {along} against Re⟨w, ∇_w⟩ {ret}");
+        }
+    }
+    assert!(standing > 0, "some crossing triad's scale covector stands above the floor");
+    let line = field.declaration.to_text();
+    assert!(line.starts_with("hnn-field-v14x ") && line.ends_with(" 1"), "{line}");
+    assert_eq!(Declaration::from_text(&line).unwrap(), field.declaration);
+    assert!(!triad_shaped(1, TRIADS).declaration.to_text().starts_with("hnn-field-v14x"));
+    assert!(Declaration::from_text(&line.replace("hnn-field-v14x", "hnn-field-v14l")).is_err(), "a crossing word after a v14l head is no line");
+}
+
 /// [definition; theory, November 12, the triad record §3 and §4] **The triads are the law site by site, with no triad and no covector at a
 /// region's two ends**: on a drawn field with triads, at every tick each site's reads `α, β, γ` are the charts' affine of its pair chart, and at
 /// every site with both strand mates `p = release(α(t) β(t − 1), 16)` and `c^T = release(p γ(t + 1), 16)`, while `p` and `c^T` are zero at the first
@@ -3551,7 +3623,7 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
         assert!(cell.ct.iter().any(|&v| v != 0), "tick {tick}: the triads stand inside the region");
         // The reverse against a covector standing at every site.
         let dct: Vec<i64> = (0..sites * j2).map(|i| ((i % 7) as i64 - 3) << 30).collect();
-        let dabg = triad_back(j, sites, &cell.abg, &cell.tp, &dct).unwrap();
+        let dabg = triad_back(j, sites, &cell.abg, &cell.tp, &dct, false).unwrap();
         for k in 0..j {
             for t in [0, sites - 1] {
                 assert_eq!(leg(&dabg, t, 0, k), (0, 0), "tick {tick} triad {k}: no δα at the end {t}");
@@ -3704,7 +3776,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }] });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -3754,6 +3826,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         sites: 41_490,
         own: false,
         slices: ["code", "web", "science", "books", "wikidata"].iter().enumerate().map(|(k, n)| PassSlice { name: n.to_string(), piece: k as u64, cursor: 3 * k as u64, taken: 100 * k as u64 }).collect(),
+        world: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -3776,6 +3849,19 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     assert_eq!(StorePass::from_line(&named_own.to_line()).unwrap(), named_own, "a slice named `own` is a slice");
     let both = StorePass { own: true, ..named_own };
     assert_eq!(StorePass::from_line(&both.to_line()).unwrap(), both);
+    // [the theory thread's Build B, November 16] A world's clause stands last only where set; with `own` or without, it reads back as itself,
+    // and a world on a slice the pass lacks, a zero count, or a slice named `world` is refused.
+    let world = StorePass { world: Some(PassWorld { slice: "books".into(), every: 8, records: 3, run: 48 }), ..pass.clone() };
+    assert_eq!(world.to_line(), format!("{} world books 8 3 48", pass.to_line()));
+    assert_eq!(StorePass::from_line(&world.to_line()).unwrap(), world);
+    let world_own = StorePass { own: true, ..world.clone() };
+    assert_eq!(StorePass::from_line(&world_own.to_line()).unwrap(), world_own);
+    assert!(!pass.to_line().contains(" world"));
+    for bad in [format!("{} world arithmetic 8 3 48", pass.to_line()), format!("{} world books 0 3 48", pass.to_line()), format!("{} world books 8 3 0", pass.to_line())] {
+        assert!(StorePass::from_line(&bad).is_err(), "{bad}");
+    }
+    let named_world = StorePass { slices: vec![PassSlice { name: "world".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
+    assert!(StorePass::from_line(&named_world.to_line()).is_err(), "a slice named `world` is refused");
 }
 
 /// [definition; theory, November 13, the record of the landmarks §5 and the design record §4.9] **A level's sites are the landmarks of its

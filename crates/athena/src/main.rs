@@ -58,6 +58,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-forms") {
         return athena::store::read_forms(&rest[1..], &mut holonics_engine::realization::Host);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-junction") {
+        return athena::store::read_junction(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-forms") {
         return athena::store::write_forms(&rest[1..], &mut holonics_engine::realization::Host);
     }
@@ -271,7 +274,7 @@ fn reserve(args: &[String]) -> Result<()> {
     use holonics_engine_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
-    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false };
+    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false, crossing: false };
     let f = |s: usize| read_octets(&d, true, false, s);
     let (f1, f2, f3) = (f(1), f(2), f(3));
     let pair = (f3 + f1 - 2 * f2) / 2;
@@ -293,6 +296,8 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-loud") => athena::store::found_loud(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("join-store") => athena::store::join_store(args),
+        Some("set-world") => athena::store::set_world(args),
+        Some("grow-crossings") => athena::store::grow_crossings(args),
         Some("restore-store") => athena::store::restore(args),
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),
