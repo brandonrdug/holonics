@@ -819,3 +819,20 @@ UTC); `agent-inferred` for the reading of them.
   times the loads in flight that 48 warps of one each hold now); the larger stages both operands in the outer
   or transposed tile, so that a loaded word serves four products and its neighbour's. The share of live sites, read
   after lap 55, says whether a gather of them comes first.
+- **The blank's live sites, and the gather** (the build thread, relayed 07:59 UTC; `FIELD_BLANK_LIVE` on four of lap
+  54's sections, 48 blank returns, a reading that moves no bit). Of 964,866 walked sites 135,014 are live, some symbol's
+  `δz` nonzero (0.140); of 235,427,304 entries (sites times 244 symbols) 14,086,934 are nonzero, 0.060 of all and 0.427
+  within a live site. So the bias and encoding and the lift and read load a zero at 86% of the sites they walk, and the
+  lift's covector loops over 244 symbols at every cell of a dead site: the silent sites are the walk's, the zeros the
+  realization's. The build gathers the live sites first (the blank's face covector flags each site over its row and
+  appends it to a list), walks tiles of the list, and writes the lift's covector zero at a dead site from its flag; each
+  term is released before its sum and the partials meet in a quotient, so the list's order moves no bit. Its guesses,
+  fixed at 08:01 UTC against `athena_rel5`: the bias and encoding 0.20 to 0.40 a launch, the lift and read 0.25 to 0.45,
+  the lift's covector 0.15 to 0.35; the three held 34.6 ms a section, so a section 0.950 to 0.970 (16 to 27 ms); gate 3
+  equal. Two notes on the realization, neither a change of bits (`agent-inferred`): a list compacted by an exclusive
+  scan of the flags ascends in its sites, so neighbouring warps read neighbouring sites in the second level of the cache
+  and the list is the same on every schedule, where an atomic append orders it by the schedule; and the walk's threads
+  fall with its sites to about 0.14 of before, so if a launch of tiles of 512 then holds under one wave of the card's
+  resident threads (80 multiprocessors of 1,536), its time is one thread's walk of 512 live sites, and a tile sized from
+  the live count to fill the card shortens it in the same proportion as the tile, the partition of a sum whose order
+  is free.
