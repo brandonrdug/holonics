@@ -692,3 +692,10 @@ UTC); `agent-inferred` for the reading of them.
     order), and the spread and the sums. For 24 ms a section 93% of the card waits. A kernel whose reads and writes
     commute with a scan's runs beside it on a second stream with the same bits (the hardware law), so the scans' share
     of the section is whatever no other kernel can share with them, read from their producers and consumers.
+- **The blank return's checked product, and its guess** (the build thread, relayed 05:35 UTC, in the outer build's hold).
+  `field_blank_dy` checked its product of a wide `dz` by the 32-bit weight `E` with a count of bits; it now forms it 64 by
+  128 from the wide word's halves with no count, the same product and the same refusal. The kernel stands at the
+  lesson's border (50.9% issue at 96% of warps, its body 0.93 of its samples), so time follows its instructions only in
+  part. Guess, fixed at 05:37 UTC (`agent-inferred`), on the profile against #877: its instructions 0.82 to 0.92 (the
+  width checks' 0.20, of which the count is the larger part), its time 0.88 to 0.98 a launch over all its launches,
+  toward 1 if the blank's bytes bind; with it the composed section reads 0.986 to 0.997 in place of 0.988 to 0.997.
