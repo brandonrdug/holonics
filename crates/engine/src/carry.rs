@@ -3,7 +3,7 @@
 //! the pair `x_t ← x_t + W_c(a_t · b_(s(t))) + b_c`; the carry circle `Q_t = κ_t b_t + γ_t Q_(t∓1)`, `γ = γ̂(q)/(1 + d)`,
 //! `κ = N₀ d/(1 + d)`; the triad's products along the strand
 //!
-//! Kind: gate a site, then chain along the strand. Kernels: `field_pair`, `field_pair_gamma`, `field_carry_gates_read`, `field_pair_scan`,
+//! Kind: gate a site, then chain along the strand. Kernels: `field_pair`, `field_pair_gamma`, `field_carry_gates_read`, `field_pair_scan`, `field_pair_scan_face`,
 //! `field_triad` (`hnn/carry.rs`, `hnn/contact.rs`).
 //! Lean: `HNN/CarryGate`, `HNN/TriadGauge`.
 //! Atlas: `contact.carried-product`, `tower.field-carry-leak-runs`.

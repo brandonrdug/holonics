@@ -27,6 +27,9 @@ pub(crate) struct Back<'c> {
     /// [theory, November 11 17:25] The carry circles' covector `[t][2C]` (one slot without them): the scan's reverse writes `δγ`, and the gate's
     /// reverse writes `δq`, `δℓ` over it in place, the circles' charts' row order.
     pub(crate) dg: Pooled<'c, i64>,
+    /// [realization; theory, November 16 05:40Z] The circles' pair part `h = conj(a) δp` `[t][2C]` (one slot without them), formed off the chain on
+    /// 128 bits by `field_pair_scan_pre` and read by the scan's reverse, where it meets the chain's sum before that sum's one fit.
+    pub(crate) dh: Pooled<'c, i128>,
     /// [theory, November 12; the triad record §4] The triads' covectors (none without them): the products' `δc^T = W_Tᵀ δx` `[t][2J]`, and the legs'
     /// `δα`, `δβ`, `δγ` `[t][6J]` in the chart's row order.
     pub(crate) dct: Option<Pooled<'c, i64>>,
@@ -69,7 +72,7 @@ impl<'c> Resident<'c> {
         let regions = words.r as usize;
         let rows = sites + regions;
         let paced = d.paced_heads();
-        let Back { dx, dr, dc, da, db, dg, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
+        let Back { dx, dr, dc, da, db, dg, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
         words.qf = tick.qf.device_ptr();
         words.qf32 = tick.qf32.device_ptr();
         words.pq = tick.pq.device_ptr();
@@ -123,8 +126,11 @@ impl<'c> Resident<'c> {
             // [theory, November 11 17:25 and November 12 (G98)] The circles' reverse: the same (region, circle) jobs in the opposite strand order, with the
             // forward's `γ`, coupled drive and `Q` operand, writing `δγ` and `u` a site and circle; then `δq`, `δℓ` and the drive's `δb = κ u` off the chain
             // on the pair's grid, the divisions out of the chain.
-            let mut dgp = dg.device_ptr();
-            self.launch("field_pair_scan_back", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dbp), arg(&mut dgp)])?;
+            // [realization; theory, November 16 05:40Z] The chain's terms that read no `u` first, on the pair's grid (`h` and `δa`); the chain then
+            // carries `u` alone, and the gate's reverse forms `δγ` from it.
+            let mut dhp = dh.device_ptr();
+            self.launch("field_pair_scan_pre", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dhp)])?;
+            self.launch("field_pair_scan_back", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words), arg(&mut dhp), arg(&mut dbp)])?;
             let (mut dgp, mut dbp) = (dg.device_ptr(), db.device_ptr());
             self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp), arg(&mut dbp)])?;
         }
@@ -270,6 +276,7 @@ impl<'c> Resident<'c> {
         let da = alloc64(sites * f)?;
         let db = alloc64(sites * f)?;
         let dg = alloc64(if d.carry > 0 { sites * 2 * d.carry } else { 1 })?;
+        let dh = self.timed(Kind::Alloc, || self.take::<i128>(if d.carry > 0 { sites * 2 * d.carry } else { 1 })).map_err(device)?;
         // [theory, November 12; the triad record §4] The triads' covectors, `δc^T` `[t][2J]` and `δabg` `[t][6J]`, none without triads.
         let triad = |rows: usize| if d.triads > 0 { alloc64(sites * rows * d.triads).map(Some) } else { Ok(None) };
         let (dct, dabg) = (triad(2)?, triad(6)?);
@@ -312,7 +319,7 @@ impl<'c> Resident<'c> {
         words.gtau = gtau.device_ptr();
         words.gsig = gsig.device_ptr();
         words.cds = cds.device_ptr();
-        Ok(Back { dx, dr, dc, da, db, dg, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
+        Ok(Back { dx, dr, dc, da, db, dg, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
     }
 
     #[allow(clippy::too_many_arguments)]

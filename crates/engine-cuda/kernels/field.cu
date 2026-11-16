@@ -3891,21 +3891,53 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
         const uint32_t r = (uint32_t)(j / C);
         const uint64_t k = j % C, e = plain + k;
         const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
+        // [realization; theory, November 16 05:40Z] The chain carries `Q` alone. The face's read `p = a Q(t∓1)` is never read back on it, so it is
+        // formed after the scan from the operand kept a step (`field_pair_scan_face`), and the step's gate and drive are read a step ahead, so the
+        // chain's loads stand in flight behind its products. The same terms on the same operands, the refusals an OR.
         wide qr = 0, qi = 0;
+        const auto at = [&](uint64_t step) -> uint64_t { return first + ((e % 2 == 0) ? step : sites - 1 - step); };
+        int64_t yr = 0, yi = 0, kr = 0, ki = 0;
+        if (sites != 0) {
+            const uint64_t gr = at(0) * c2 + k;
+            yr = w.pgam[gr];
+            yi = w.pgam[gr + C];
+            kr = w.pkb[gr];
+            ki = w.pkb[gr + C];
+        }
         for (uint64_t step = 0; step < sites; ++step) {
-            const uint64_t t = first + ((e % 2 == 0) ? step : sites - 1 - step);
-            const uint64_t re = t * w.f + e, im = re + half, gr = t * c2 + k, gi = gr + C;
-            const wide yr = w.pgam[gr], yi = w.pgam[gi];
+            const uint64_t gr = at(step) * c2 + k, gi = gr + C;
+            const wide cyr = yr, cyi = yi, ckr = kr, cki = ki;
+            if (step + 1 < sites) {
+                const uint64_t nr = at(step + 1) * c2 + k;
+                yr = w.pgam[nr];
+                yi = w.pgam[nr + C];
+                kr = w.pkb[nr];
+                ki = w.pkb[nr + C];
+            }
             w.pqm[gr] = fit64(qr, w.status);
             w.pqm[gi] = fit64(qi, w.status);
-            const wide ar = w.pa[re], ai = w.pa[im];
-            w.pc[re] = fit64(rel(ar * qr - ai * qi, FACE_BITS), w.status);
-            w.pc[im] = fit64(rel(ar * qi + ai * qr, FACE_BITS), w.status);
-            const wide nr = (wide)w.pkb[gr] + rel(yr * qr - yi * qi, MOVE_BITS);
-            const wide ni = (wide)w.pkb[gi] + rel(yr * qi + yi * qr, MOVE_BITS);
+            const wide nr = ckr + rel(cyr * qr - cyi * qi, MOVE_BITS);
+            const wide ni = cki + rel(cyr * qi + cyi * qr, MOVE_BITS);
             qr = fit64(nr, w.status);
             qi = fit64(ni, w.status);
         }
+    }
+}
+
+// [realization; theory, November 16 05:40Z] **The carry circles' faces, off the chain** (T C cells): `p(t) = a(t) Q(t∓1)` from the operand the scan kept
+// (`pqm`, the `Q` it carried into site `t`), released at the face's grain, written to the pair's face `pc` at the circle's contact. The scan wrote these
+// as it went; they are the same terms on the same operands.
+extern "C" __global__ void field_pair_scan_face(FieldWords w) {
+    const uint32_t half = w.f / 2;
+    const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
+    const uint64_t cells = (uint64_t)w.T * C;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / C, k = c % C;
+        const uint64_t re = t * w.f + plain + k, im = re + half, gr = t * c2 + k, gi = gr + C;
+        const wide qr = w.pqm[gr], qi = w.pqm[gi];
+        const wide ar = w.pa[re], ai = w.pa[im];
+        w.pc[re] = fit64(rel(ar * qr - ai * qi, FACE_BITS), w.status);
+        w.pc[im] = fit64(rel(ar * qi + ai * qr, FACE_BITS), w.status);
     }
 }
 
@@ -3968,7 +4000,31 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
 // `field_pair_gate_back` carries through the coupling), `δa(t) = conj(Qm(t)) δp(t)`, `δγ(t) = conj(Qm(t)) u` released at the face's grain and written to `dg`
 // `[t][2C]` (real parts then imaginary), `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u` (the next `u`). The gate's and the coupling's covectors are formed off the
 // chain (`field_pair_gate_back`).
-extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc, int64_t *da, int64_t *db, int64_t *dg) {
+// [realization; theory, November 16 05:40Z] **The reverse's terms off the chain** (T C cells): the pair's part `h(t) = conj(a(t)) δp(t)` released at the
+// face's grain, kept on 128 bits until it meets the chain's sum (`fit64` stands on the sum, never on a part), and `δa(t) = conj(Qm(t)) δp(t)`, which
+// reads no `u`. The chain then carries `u` alone, and `δγ` is formed after it by the gate's reverse. The same terms on the same operands.
+extern "C" __global__ void field_pair_scan_pre(FieldWords w, const int64_t *dc, int64_t *da, wide *dh) {
+    const uint32_t half = w.f / 2;
+    const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
+    const uint64_t cells = (uint64_t)w.T * C;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / C, k = c % C;
+        const uint64_t re = t * w.f + plain + k, im = re + half, gr = t * c2 + k, gi = gr + C;
+        const wide pr = dc[re], pi = dc[im];
+        const wide ar = w.pa[re], ai = w.pa[im];
+        const wide qr = w.pqm[gr], qi = w.pqm[gi];
+        da[re] = fit64(rel(qr * pr + qi * pi, FACE_BITS), w.status);
+        da[im] = fit64(rel(qr * pi - qi * pr, FACE_BITS), w.status);
+        dh[gr] = rel(ar * pr + ai * pi, FACE_BITS);
+        dh[gi] = rel(ar * pi - ai * pr, FACE_BITS);
+    }
+}
+
+// The carry circles' reverse (the host's `tick_return`): the same (region, circle) jobs in the opposite strand order. With `u` the covector of `Q(t)` (the
+// next site of the reverse), `u` is written to `db` (the coupled drive's covector, which `field_pair_gate_back` carries through the coupling and from which
+// it forms `δγ(t) = conj(Qm(t)) u`), and `X(t) = h(t) + conj(γ(t)) u` (the next `u`), `h` the pair's part `field_pair_scan_pre` formed. The step's `h` and
+// gate are read a step ahead.
+extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, int64_t *db) {
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t jobs = (uint64_t)w.R * C;
@@ -3976,23 +4032,33 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dc,
         const uint32_t r = (uint32_t)(j / C);
         const uint64_t k = j % C, e = plain + k;
         const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
+        const auto at = [&](uint64_t step) -> uint64_t { return first + ((e % 2 == 0) ? sites - 1 - step : step); };
         wide xr = 0, xi = 0;
+        wide hr = 0, hi = 0;
+        int64_t yr = 0, yi = 0;
+        if (sites != 0) {
+            const uint64_t gr = at(0) * c2 + k;
+            hr = dh[gr];
+            hi = dh[gr + C];
+            yr = w.pgam[gr];
+            yi = w.pgam[gr + C];
+        }
         for (uint64_t step = 0; step < sites; ++step) {
-            const uint64_t t = first + ((e % 2 == 0) ? sites - 1 - step : step);
-            const uint64_t re = t * w.f + e, im = re + half, gr = t * c2 + k, gi = gr + C;
-            const wide pr = dc[re], pi = dc[im];
-            const wide ar = w.pa[re], ai = w.pa[im];
-            const wide qr = w.pqm[gr], qi = w.pqm[gi];
-            const wide yr = w.pgam[gr], yi = w.pgam[gi];
+            const uint64_t t = at(step);
+            const uint64_t re = t * w.f + e, im = re + half;
+            const wide chr = hr, chi = hi, cyr = yr, cyi = yi;
+            if (step + 1 < sites) {
+                const uint64_t nr = at(step + 1) * c2 + k;
+                hr = dh[nr];
+                hi = dh[nr + C];
+                yr = w.pgam[nr];
+                yi = w.pgam[nr + C];
+            }
             const wide ur = xr, ui = xi;
             db[re] = fit64(ur, w.status);
             db[im] = fit64(ui, w.status);
-            da[re] = fit64(rel(qr * pr + qi * pi, FACE_BITS), w.status);
-            da[im] = fit64(rel(qr * pi - qi * pr, FACE_BITS), w.status);
-            dg[gr] = fit64(rel(qr * ur + qi * ui, FACE_BITS), w.status);
-            dg[gi] = fit64(rel(qr * ui - qi * ur, FACE_BITS), w.status);
-            xr = fit64(rel(ar * pr + ai * pi, FACE_BITS) + rel(yr * ur + yi * ui, MOVE_BITS), w.status);
-            xi = fit64(rel(ar * pi - ai * pr, FACE_BITS) + rel(yr * ui - yi * ur, MOVE_BITS), w.status);
+            xr = fit64(chr + rel(cyr * ur + cyi * ui, MOVE_BITS), w.status);
+            xi = fit64(chi + rel(cyr * ui - cyi * ur, MOVE_BITS), w.status);
         }
     }
 }
@@ -4014,6 +4080,15 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / C, k = c % C;
         const uint64_t gr = t * c2 + k, gi = gr + C;
+        const uint64_t bre = t * w.f + plain + k, bim = bre + half;
+        const wide ur = db[bre], ui = db[bim];
+        // [realization; theory, November 16 05:40Z] `δγ = conj(Qm) u`, formed here from the scan's `u` (in `db`) and the operand the forward kept, where the
+        // scan's reverse wrote it before: the same term, written to `dg` before anything can refuse, so a refused cell keeps it as it did.
+        {
+            const wide qr = w.pqm[gr], qi = w.pqm[gi];
+            dg[gr] = fit64(rel(qr * ur + qi * ui, FACE_BITS), w.status);
+            dg[gi] = fit64(rel(qr * ui - qi * ur, FACE_BITS), w.status);
+        }
         const wide yr = w.pgam[gr], yi = w.pgam[gi], dr = dg[gr], di = dg[gi];
         const wide im = rel(yr * di - yi * dr, MOVE_BITS), re = rel(yr * dr + yi * di, MOVE_BITS);
         const wide q = w.pg[gr];
@@ -4027,8 +4102,6 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
         }
         const wide one = ((wide)1 << FACE_BITS) + d;
         const wide dd = -div_nearest(re << 16, one);
-        const uint64_t bre = t * w.f + plain + k, bim = bre + half;
-        const wide ur = db[bre], ui = db[bim];
         const wide cw = fit64(rel((wide)w.pb[bre] * ur + (wide)w.pb[bim] * ui, FACE_BITS), w.status);
         const wide ddk = fit64(div_nearest((CARRY_GROUP_FOUNDING * cw) << (2 * FACE_BITS), one * one), w.status);
         const int64_t shift = 62 - a;
