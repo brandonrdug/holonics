@@ -581,3 +581,14 @@ UTC); `agent-inferred` for the reading of them.
   navigator's resident face (the record of September 29 on systolic flow), where a recurrence by `e^(−2π/n)` would round at
   each step and change the bits; the transposed tile's store and magnitudes wait on its loads, which a second buffer hides
   behind the accumulate.
+- **The tiles' staging, and its guess** (the build thread, relayed 03:32 UTC). The tiles' shared staging stored each warp's
+  32 consecutive terms of one row 64 words apart, every lane on one bank of the shared memory, 32 ways in conflict, at
+  0.225 of `field_transposed`'s samples on 0.039 of its instructions. The build now stages eight terms of four rows a warp
+  with every global read a whole run of 64 octets, each row padded by four words, so the 32 lanes fall on 32 banks; the
+  words and sums are unchanged. It serves the transposed map (27.4 ms a section) and the affine tiled maps (20.2 and 8.6).
+  Guess, fixed at 03:33 UTC (`agent-inferred`), in the same hold against #870, the card alone: gate 3 equal; the transposed
+  map 0.80 to 0.92 a launch (the conflicts' replays go, the store's wait on the loaded word stays); the affine tiled maps
+  0.85 to 0.96 if their forward stores conflicted alike, within 3% if they did not; the whole build's section 0.945 to
+  0.978 of control, in place of the 03:29 range. If the store's samples stay and read as the load's wait, the next tile's
+  load moves behind the current accumulate. The chart's nearest quotient by the lane's scale can take a divisor formed once
+  a lane (a Möller–Granlund quotient corrected to the exact one, as the crowds' division already does), the same integer.
