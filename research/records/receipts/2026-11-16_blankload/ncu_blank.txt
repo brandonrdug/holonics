@@ -1,0 +1,29 @@
+# Nsight Compute, the blank kernels' first launches on 2 of lap 56's sections, in the gap after lap 56 (November 16).
+# ctl = #888 (athena_rel5); nw = the live walk. Time in microseconds a launch; stalls are warps stalled a reason per issued instruction.
+ctl  field_blank_bias_enc   us=  1989.0 grid=  6,025 block=256 regs=38 issue_pct=27.1 warps_pct=97.1 stalls=43.0 long_scoreboard=36.7 wait=2.7 selected=1.0
+ctl  field_blank_bias_enc   us=  1937.5 grid=  6,025 block=256 regs=38 issue_pct=24.4 warps_pct=97.0 stalls=47.8 long_scoreboard=41.6 wait=2.9 selected=1.0
+ctl  field_blank_bias_enc   us=  1941.6 grid=  6,025 block=256 regs=38 issue_pct=24.6 warps_pct=97.0 stalls=47.0 long_scoreboard=40.9 wait=2.8 selected=1.0
+ctl  field_blank_dy         us=  1339.9 grid= 12,523 block=256 regs=37 issue_pct=43.0 warps_pct=96.1 stalls=27.0 long_scoreboard=18.7 wait=2.3 branch_resolving=1.5
+ctl  field_blank_dy         us=  1246.0 grid= 12,523 block=256 regs=37 issue_pct=39.3 warps_pct=96.4 stalls=29.5 long_scoreboard=21.9 wait=2.4 branch_resolving=1.7
+ctl  field_blank_dy         us=  1252.5 grid= 12,523 block=256 regs=37 issue_pct=39.7 warps_pct=96.2 stalls=29.0 long_scoreboard=21.4 wait=2.4 branch_resolving=1.7
+ctl  field_blank_dz         us=   213.5 grid= 25,046 block=256 regs=48 issue_pct=57.9 warps_pct=77.0 stalls=15.9 long_scoreboard=3.9 barrier=3.8 wait=2.3
+ctl  field_blank_dz         us=   190.5 grid= 25,046 block=256 regs=48 issue_pct=57.9 warps_pct=77.0 stalls=15.8 barrier=4.0 long_scoreboard=3.9 wait=2.3
+ctl  field_blank_dz         us=   190.5 grid= 25,046 block=256 regs=48 issue_pct=58.4 warps_pct=76.9 stalls=15.7 barrier=4.0 long_scoreboard=3.8 wait=2.3
+ctl  field_blank_lift_read  us=  1103.4 grid=  3,161 block=256 regs=36 issue_pct=30.1 warps_pct=96.6 stalls=38.3 long_scoreboard=31.0 wait=2.8 not_selected=1.2
+ctl  field_blank_lift_read  us=  1116.8 grid=  3,161 block=256 regs=36 issue_pct=30.4 warps_pct=96.6 stalls=38.3 long_scoreboard=31.0 wait=2.8 not_selected=1.2
+ctl  field_blank_lift_read  us=  1098.0 grid=  3,161 block=256 regs=36 issue_pct=30.4 warps_pct=97.1 stalls=38.7 long_scoreboard=31.4 wait=2.8 not_selected=1.2
+nw   field_blank_bias_enc   us=   755.1 grid=    400 block=256 regs=48 issue_pct=53.5 warps_pct=60.1 stalls=15.2 long_scoreboard=5.1 math_pipe_throttle=3.0 not_selected=2.8
+nw   field_blank_bias_enc   us=   753.6 grid=    400 block=256 regs=48 issue_pct=53.5 warps_pct=60.1 stalls=15.2 long_scoreboard=5.1 math_pipe_throttle=3.0 not_selected=2.8
+nw   field_blank_bias_enc   us=   753.6 grid=    400 block=256 regs=48 issue_pct=53.5 warps_pct=60.1 stalls=15.3 long_scoreboard=5.1 math_pipe_throttle=3.0 not_selected=2.8
+nw   field_blank_dy         us=   558.7 grid= 12,704 block=256 regs=37 issue_pct=63.1 warps_pct=84.3 stalls=16.1 long_scoreboard=4.8 not_selected=3.5 math_pipe_throttle=3.2
+nw   field_blank_dy         us=   394.8 grid= 12,704 block=256 regs=37 issue_pct=61.5 warps_pct=85.0 stalls=16.6 long_scoreboard=6.9 not_selected=2.7 math_pipe_throttle=2.4
+nw   field_blank_dy         us=   417.5 grid= 12,704 block=256 regs=37 issue_pct=62.0 warps_pct=85.5 stalls=16.5 long_scoreboard=6.5 not_selected=2.9 math_pipe_throttle=2.5
+nw   field_blank_dz         us=   200.2 grid= 25,407 block=256 regs=48 issue_pct=58.4 warps_pct=76.3 stalls=15.8 long_scoreboard=3.9 barrier=3.8 wait=2.2
+nw   field_blank_dz         us=   202.2 grid= 25,407 block=256 regs=48 issue_pct=58.2 warps_pct=76.4 stalls=15.7 barrier=3.9 long_scoreboard=3.8 wait=2.2
+nw   field_blank_dz         us=   203.9 grid= 25,407 block=256 regs=48 issue_pct=58.3 warps_pct=76.6 stalls=16.0 barrier=4.1 long_scoreboard=3.9 wait=2.2
+nw   field_blank_lift_read  us=   407.3 grid=    400 block=256 regs=48 issue_pct=46.6 warps_pct=57.7 stalls=17.7 long_scoreboard=6.6 math_pipe_throttle=3.3 not_selected=3.3
+nw   field_blank_lift_read  us=   407.2 grid=    400 block=256 regs=48 issue_pct=46.5 warps_pct=57.7 stalls=16.2 long_scoreboard=5.3 math_pipe_throttle=3.3 not_selected=3.3
+nw   field_blank_lift_read  us=   406.0 grid=    400 block=256 regs=48 issue_pct=46.5 warps_pct=57.7 stalls=16.2 long_scoreboard=5.3 math_pipe_throttle=3.3 not_selected=3.3
+nw   field_blank_live_scan  us=     8.0 grid=      1 block=1,024 regs=35 issue_pct=30.2 warps_pct=64.7 stalls=25.9 long_scoreboard=7.4 lg_throttle=5.2 barrier=2.8
+nw   field_blank_live_scan  us=     8.0 grid=      1 block=1,024 regs=35 issue_pct=30.4 warps_pct=64.7 stalls=26.0 long_scoreboard=7.3 lg_throttle=5.1 barrier=3.0
+nw   field_blank_live_scan  us=     8.0 grid=      1 block=1,024 regs=35 issue_pct=30.4 warps_pct=64.9 stalls=26.0 long_scoreboard=7.3 lg_throttle=5.2 barrier=3.0
