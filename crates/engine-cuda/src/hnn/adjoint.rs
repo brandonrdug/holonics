@@ -184,6 +184,10 @@ impl<'c> Resident<'c> {
                 p.head_kinds = (0..heads).map(|h| if !d.carries_moment(h) { "still" } else if d.is_depth(h) { "depth" } else { "paced" }).collect();
             }
         }
+        // [realization; November 16] The rows' pass A writes a row's mean and its crowds' covectors for pass B, a head at a time (each written
+        // at every row pass B reads before it reads it).
+        let rmean = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+        let rdpc = self.timed(Kind::Alloc, || self.take::<i128>((sites * words.slots as usize).max(1))).map_err(device)?;
         for h in 0..heads {
             self.head.set(Some(h as u32));
             // The crowds' difference arrays start empty a head (§14.10).
@@ -209,9 +213,14 @@ impl<'c> Resident<'c> {
                     &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp_s), arg(&mut dqp_s), arg(&mut dpp_s), arg(&mut dpbp_s), arg(&mut cdsp_s), arg(&mut cwp_s), arg(&mut cvp_s), arg(&mut gcp_s)],
                 )?;
             }
-            // [realization; November 16] Pass B's staged words: a half-chunk of 16 pairs' words of 32 bits a warp (`rows_words`).
+            // [realization; November 16] Pass B's staged words: a half-chunk of 16 pairs' words of 32 bits a warp (`rows_words`). The rows run in
+            // two launches, pass A writing each row's mean and its crowds' covectors (`rmean`, `rdpc`) for pass B.
             let rows_words = (REV_ROWS as u32) * 16 * (words.span as u32) * 4;
-            self.launch_grid("field_contact_rows", crate::cuda::Dim3 { x: Self::rows_grid(sites as u64, REV_ROWS), y: 1, z: 1 }, (REV_ROWS * 32) as u32, rows_words, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp)])?;
+            let rows_grid = crate::cuda::Dim3 { x: Self::rows_grid(sites as u64, REV_ROWS), y: 1, z: 1 };
+            let (mut rmp, mut rdp) = (rmean.device_ptr(), rdpc.device_ptr());
+            self.launch_grid("field_contact_rows_a", rows_grid, (REV_ROWS * 32) as u32, 0, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut rmp), arg(&mut rdp)])?;
+            let (mut hh, mut dyhp, mut dsp, mut dqp, mut rmp, mut rdp) = (h as u32, dyh.device_ptr(), ds.device_ptr(), dq.device_ptr(), rmean.device_ptr(), rdpc.device_ptr());
+            self.launch_grid("field_contact_rows_b", rows_grid, (REV_ROWS * 32) as u32, rows_words, &mut [arg(words), arg(&mut hh), arg(&mut dyhp), arg(&mut dsp), arg(&mut dqp), arg(&mut rmp), arg(&mut rdp)])?;
             #[cfg(feature = "ruler-bits")]
             {
                 self.bits_pairs(words, h, 2, 0, ds.device_ptr(), 3, at, sites)?;
