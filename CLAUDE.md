@@ -826,6 +826,11 @@ foreground shell time went to wait loops.
   behind the line's 35-minute laps, and each lap's reads stood between laps, about 8 minutes in every 43, while every sum of the engine
   meets at one grain and is released once and every chain runs in its declared order, so it gives the same bits on any schedule and each run sizes its batches from the card memory free when it opens (a lap peaks near 8.5 GB
   of the 16). Scope: every script that launches on the card; a run that shares the card states it in its projection.
+  A run beside a lap still needs the exponential's resident face (`8 · 2^digits` octets, 4 GiB on the store line) under its own
+  batch budget. On November 16 a lap's pool held 10.7 GB of the 16 (its budget 10.8 GB from 15.8 GB free at its open), and the
+  4.6 GB left refused all three of gate 3's runs at 07:15 UTC ("the exponential's resident face passes the card's batch budget"),
+  as 5.2 GB had refused five counter reads beside lap 48. So while a lap's budget leaves less than that, gates and readings run
+  in the gap between laps, under the lock (`research/records/receipts/2026-11-16_rel/README.md`).
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never
   by sleeping.
 

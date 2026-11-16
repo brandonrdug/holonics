@@ -1,0 +1,14 @@
+# Nsight Compute, every launch of one section from lap 54's STATE.3000 (each launch serialized), in the gap after lap 54 (November 16).
+# ctl = #885 (athena_scansplit); rel = the one-shift release; rel5 = the same with field_pace_skin_back bounded at five blocks.
+# Per launch, this build over the control: time and instructions executed; registers a lane and the blocks a multiprocessor the registers allow.
+kernel                   launches    ctl_ms    rel_ns  rel_inst   rel5_ns rel5_inst      regs      blocks            
+field_contact_rows             96     67.74     0.994     0.967     0.994     0.967 128/128/128       4/4/4
+field_contact_columns          96     47.58     0.974     1.032     0.975     1.032  72/72/72       7/7/7
+field_contact_l4               16     42.66     0.999     0.993     0.998     0.993  80/80/80       6/6/6
+field_pace_skin_back           48     35.52     1.000     0.873     0.921     0.868 96/104/96       5/4/5
+field_clock_fill               42     24.07     0.963     0.944     0.964     0.944  46/46/46       5/5/5
+field_exposure                 24     19.40     0.982     0.978     0.983     0.978  80/80/80       6/6/6
+field_skin_fill                48     17.86     0.994     1.000     0.999     1.000  64/64/64       8/8/8
+field_chart                    74     13.78     1.000     1.000     1.001     1.000  40/40/40       6/6/6
+field_tied_back_e               6     10.92     0.823     0.786     0.824     0.786  34/34/34       6/6/6
+field_pair_scan_back           16      4.06     1.001     0.862     1.003     0.862  78/72/72       3/3/3

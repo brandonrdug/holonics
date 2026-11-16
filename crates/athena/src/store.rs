@@ -43,8 +43,9 @@ const OCTAVES: u64 = 7;
 /// declared crossing (a growth of the constitution).
 const PAIRS_BOUND: u64 = 15_606_223;
 const SITES_BOUND: u64 = 41_490;
-/// The readings the card's driver reads before any command, which leave the state's bytes as they are.
-const READINGS: [&str; 3] = ["FIELD_PROFILE", "FIELD_PHASES", "FIELD_TRACE"];
+/// The readings the card's driver reads before any command, which leave the state's bytes as they are; `FIELD_BLANK_LIVE` (with the profile)
+/// reads a blank's face covector back at each return (November 16).
+const READINGS: [&str; 4] = ["FIELD_PROFILE", "FIELD_PHASES", "FIELD_TRACE", "FIELD_BLANK_LIVE"];
 
 /// A slice's file as its source of bytes.
 struct SliceFile(std::fs::File);
