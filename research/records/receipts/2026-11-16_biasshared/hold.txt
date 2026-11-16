@@ -1,0 +1,93 @@
+# hold: lock taken 10:32:18 from lap59/STATE.3000
+# card empty 10:39:03
+# gate begun 10:39:03
+# parity: exit 0 10:42:06
+# repro: exit 0 10:42:19
+# read: exit 0 10:46:06
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# next_bin written 10:46:06
+# ncu ctl exit 0
+# ncu nw exit 0
+# profile ctl exit 0
+# profile nw exit 0
+# run1 ctl exit 0 elapsed_ms=12191
+# run2 ctl exit 0 elapsed_ms=12206
+# run3 nw exit 0 elapsed_ms=12175
+# run4 nw exit 0 elapsed_ms=12228
+# run5 ctl exit 0 elapsed_ms=12200
+# run6 ctl exit 0 elapsed_ms=12211
+# run7 nw exit 0 elapsed_ms=12224
+# run8 nw exit 0 elapsed_ms=12192
+# run9 ctl exit 0 elapsed_ms=12196
+# hold: released 10:49:00
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=495.4
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=494.9
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=494.4
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=496.3
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=495.7
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=496.3
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=496.0
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=495.0
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=495.1
+PROFILE_TOTAL ctl_ms_a_section=495.9 nw_ms_a_section=483.3
+PROFILE_PAIR entry=field_contact_rows ctl_ms_a_section=61.58 nw_ms_a_section=61.62 launches=2304/2304 mean_grid_threads=477356/477353
+PROFILE_PAIR entry=field_contact_columns ctl_ms_a_section=49.50 nw_ms_a_section=47.88 launches=2304/2304 mean_grid_threads=477356/477353
+PROFILE_PAIR entry=field_contact_l4 ctl_ms_a_section=39.42 nw_ms_a_section=38.38 launches=380/380 mean_grid_threads=2608398/2608398
+PROFILE_PAIR entry=field_pace_skin_back ctl_ms_a_section=31.50 nw_ms_a_section=30.75 launches=1152/1152 mean_grid_threads=477356/477353
+PROFILE_PAIR entry=field_transposed ctl_ms_a_section=22.54 nw_ms_a_section=22.21 launches=5184/5184 mean_grid_threads=115280/115289
+PROFILE_PAIR entry=field_clock_fill ctl_ms_a_section=20.21 nw_ms_a_section=20.12 launches=1008/1008 mean_grid_threads=265947/266012
+PROFILE_PAIR entry=field_skin_fill ctl_ms_a_section=18.29 nw_ms_a_section=17.88 launches=1152/1152 mean_grid_threads=954647/954645
+PROFILE_PAIR entry=field_exposure ctl_ms_a_section=17.75 nw_ms_a_section=17.46 launches=576/576 mean_grid_threads=1909231/1909231
+PROFILE_PAIR entry=field_affine_tiled_x32 ctl_ms_a_section=16.42 nw_ms_a_section=15.92 launches=4368/4368 mean_grid_threads=90550/90560
+PROFILE_PAIR entry=field_outer_x32 ctl_ms_a_section=14.29 nw_ms_a_section=13.71 launches=3648/3648 mean_grid_threads=37684/37732
+PROFILE_PAIR entry=field_chart ctl_ms_a_section=14.21 nw_ms_a_section=13.79 launches=1776/1776 mean_grid_threads=510993/510988
+PROFILE_PAIR entry=field_spread ctl_ms_a_section=8.50 nw_ms_a_section=7.25 launches=2304/2304 mean_grid_threads=62400/65520
+PROFILE_PAIR entry=field_ratio_adjoint ctl_ms_a_section=8.00 nw_ms_a_section=7.75 launches=1776/1776 mean_grid_threads=510993/510988
+PROFILE_PAIR entry=field_moment_skinned_all ctl_ms_a_section=7.88 nw_ms_a_section=7.96 launches=384/384 mean_grid_threads=7987200/7987200
+PROFILE_PAIR entry=field_tied_back_e ctl_ms_a_section=7.67 nw_ms_a_section=7.58 launches=144/144 mean_grid_threads=1262293/1262293
+PROFILE_PAIR entry=field_moment_pace_back_all ctl_ms_a_section=7.54 nw_ms_a_section=7.54 launches=384/384 mean_grid_threads=329216/329301
+PROFILE_PAIR entry=field_affine_tiled_x64 ctl_ms_a_section=7.29 nw_ms_a_section=6.54 launches=1392/1392 mean_grid_threads=112704/112709
+PROFILE_PAIR entry=field_moment_return_paced_all ctl_ms_a_section=6.21 nw_ms_a_section=6.04 launches=384/384 mean_grid_threads=329216/329301
+PROFILE_PAIR entry=field_outer_x64 ctl_ms_a_section=5.83 nw_ms_a_section=5.46 launches=1392/1392 mean_grid_threads=36406/36467
+PROFILE_PAIR entry=field_moment_prefix_paced_all ctl_ms_a_section=5.79 nw_ms_a_section=5.50 launches=1872/1872 mean_grid_threads=399360/399360
+PROFILE_PAIR entry=field_unit_probe ctl_ms_a_section=5.17 nw_ms_a_section=5.17 launches=576/576 mean_grid_threads=1909294/1909290
+PROFILE_PAIR entry=field_blank_bias_enc ctl_ms_a_section=5.12 nw_ms_a_section=5.12 launches=288/288 mean_grid_threads=102400/102400
+PROFILE_PAIR entry=field_unit ctl_ms_a_section=5.08 nw_ms_a_section=5.08 launches=576/576 mean_grid_threads=1909294/1909290
+PROFILE_PAIR entry=field_pair_scan_back ctl_ms_a_section=4.29 nw_ms_a_section=4.25 launches=384/384 mean_grid_threads=3242/3242
+PROFILE_PAIR entry=field_blank_dy ctl_ms_a_section=3.79 nw_ms_a_section=3.75 launches=288/288 mean_grid_threads=2618880/2618880
+PROFILE_PAIR entry=field_tied_face_tiled ctl_ms_a_section=3.71 nw_ms_a_section=3.75 launches=432/432 mean_grid_threads=327786/327786
+PROFILE_PAIR entry=field_mark_rows ctl_ms_a_section=3.58 nw_ms_a_section=3.54 launches=48/48 mean_grid_threads=9854944/9854949
+PROFILE_PAIR entry=field_cavity_return_paced_all ctl_ms_a_section=3.42 nw_ms_a_section=3.38 launches=768/768 mean_grid_threads=20576/20581
+PROFILE_PAIR entry=field_pace_c_back ctl_ms_a_section=3.33 nw_ms_a_section=3.25 launches=384/384 mean_grid_threads=41040/41045
+PROFILE_PAIR entry=field_unit_back_probe ctl_ms_a_section=3.29 nw_ms_a_section=3.12 launches=576/576 mean_grid_threads=1909294/1909290
+NCU_BLANK build=ctl entry=field_outer_x32 ms=82.592000 inst=4405791.000000 issue_pct=7.5 warps_pct=31.3 grid=431 block=256 regs=128 stalls=49.0 long_scoreboard=45.0 wait=1.5 selected=1.0
+NCU_BLANK build=ctl entry=field_outer_x32 ms=180.672000 inst=46087437.000000 issue_pct=39.7 warps_pct=28.6 grid=216 block=256 regs=128 stalls=8.7 wait=2.5 long_scoreboard=1.4 math_pipe_throttle=1.4
+NCU_BLANK build=ctl entry=field_outer_x32 ms=31.360000 inst=4389257.000000 issue_pct=22.9 warps_pct=30.8 grid=431 block=256 regs=128 stalls=16.2 long_scoreboard=11.8 wait=1.4 selected=1.0
+NCU_BLANK build=ctl entry=field_outer_x32 ms=177.984000 inst=45755972.000000 issue_pct=39.8 warps_pct=28.5 grid=216 block=256 regs=128 stalls=8.6 wait=2.5 math_pipe_throttle=1.4 long_scoreboard=1.4
+NCU_BLANK build=nw entry=field_outer_x32 ms=81.888000 inst=4402343.000000 issue_pct=7.9 warps_pct=31.6 grid=431 block=256 regs=128 stalls=50.4 long_scoreboard=46.5 wait=1.5 selected=1.0
+NCU_BLANK build=nw entry=field_outer_x32 ms=168.864000 inst=36589087.000000 issue_pct=33.5 warps_pct=28.7 grid=216 block=256 regs=128 stalls=10.3 wait=3.7 long_scoreboard=1.7 math_pipe_throttle=1.4
+NCU_BLANK build=nw entry=field_outer_x32 ms=30.816000 inst=4385809.000000 issue_pct=22.9 warps_pct=30.7 grid=431 block=256 regs=128 stalls=16.5 long_scoreboard=12.0 wait=1.4 selected=1.0
+NCU_BLANK build=nw entry=field_outer_x32 ms=165.824000 inst=36261727.000000 issue_pct=33.7 warps_pct=28.5 grid=216 block=256 regs=128 stalls=10.2 wait=3.7 long_scoreboard=1.6 math_pipe_throttle=1.4
+NCU_BLANK build=ctl entry=field_outer_x64 ms=89.184000 inst=23020584.000000 issue_pct=37.1 warps_pct=29.3 grid=158 block=256 regs=128 stalls=9.4 wait=2.5 long_scoreboard=1.8 math_pipe_throttle=1.3
+NCU_BLANK build=ctl entry=field_outer_x64 ms=178.912000 inst=44983300.000000 issue_pct=39.0 warps_pct=28.8 grid=216 block=256 regs=128 stalls=8.9 wait=2.4 long_scoreboard=1.6 math_pipe_throttle=1.4
+NCU_BLANK build=ctl entry=field_outer_x64 ms=95.936000 inst=22713854.000000 issue_pct=35.0 warps_pct=28.6 grid=158 block=256 regs=128 stalls=9.9 wait=2.4 long_scoreboard=2.4 math_pipe_throttle=1.4
+NCU_BLANK build=ctl entry=field_outer_x64 ms=180.128000 inst=45046408.000000 issue_pct=39.0 warps_pct=28.8 grid=216 block=256 regs=128 stalls=9.0 wait=2.4 long_scoreboard=1.7 math_pipe_throttle=1.4
+NCU_BLANK build=nw entry=field_outer_x64 ms=85.056000 inst=18861994.000000 issue_pct=31.3 warps_pct=29.6 grid=158 block=256 regs=128 stalls=11.2 wait=3.7 long_scoreboard=2.3 math_pipe_throttle=1.3
+NCU_BLANK build=nw entry=field_outer_x64 ms=168.000000 inst=35549853.000000 issue_pct=32.7 warps_pct=28.8 grid=216 block=256 regs=128 stalls=10.6 wait=3.6 long_scoreboard=1.9 math_pipe_throttle=1.4
+NCU_BLANK build=nw entry=field_outer_x64 ms=98.080000 inst=18512013.000000 issue_pct=29.6 warps_pct=30.8 grid=158 block=256 regs=128 stalls=13.4 long_scoreboard=4.0 wait=3.6 math_pipe_throttle=1.4
+NCU_BLANK build=nw entry=field_outer_x64 ms=169.280000 inst=35612025.000000 issue_pct=32.3 warps_pct=28.8 grid=216 block=256 regs=128 stalls=10.6 wait=3.6 long_scoreboard=2.0 math_pipe_throttle=1.3
+NCU_BLANK build=ctl entry=field_spread ms=52.064000 inst=2977883.000000 issue_pct=14.1 warps_pct=59.4 grid=128 block=640 regs=48 stalls=56.0 long_scoreboard=37.4 barrier=10.7 wait=1.8
+NCU_BLANK build=ctl entry=field_spread ms=52.160000 inst=2977883.000000 issue_pct=14.2 warps_pct=59.3 grid=128 block=640 regs=48 stalls=56.7 long_scoreboard=38.3 barrier=10.5 wait=1.8
+NCU_BLANK build=ctl entry=field_spread ms=53.120000 inst=2977883.000000 issue_pct=14.2 warps_pct=59.3 grid=128 block=640 regs=48 stalls=54.1 long_scoreboard=33.1 barrier=13.1 wait=1.8
+NCU_BLANK build=ctl entry=field_spread ms=52.928000 inst=2977883.000000 issue_pct=12.5 warps_pct=59.4 grid=128 block=640 regs=48 stalls=51.4 long_scoreboard=33.0 barrier=10.5 wait=1.8
+NCU_BLANK build=nw entry=field_spread ms=48.480000 inst=3061273.000000 issue_pct=14.1 warps_pct=43.7 grid=128 block=672 regs=48 stalls=41.7 long_scoreboard=26.6 barrier=8.0 wait=1.8
+NCU_BLANK build=nw entry=field_spread ms=48.320000 inst=3061273.000000 issue_pct=14.2 warps_pct=43.7 grid=128 block=672 regs=48 stalls=38.9 long_scoreboard=21.7 barrier=10.1 wait=1.8
+NCU_BLANK build=nw entry=field_spread ms=50.400000 inst=3061273.000000 issue_pct=12.1 warps_pct=43.7 grid=128 block=672 regs=48 stalls=43.0 long_scoreboard=25.5 barrier=10.3 wait=1.8
+NCU_BLANK build=nw entry=field_spread ms=48.864000 inst=3061273.000000 issue_pct=14.2 warps_pct=43.7 grid=128 block=672 regs=48 stalls=37.8 long_scoreboard=22.7 barrier=8.0 wait=1.8
+RUN_EXIT 0 2026-11-16T10:49:00Z
