@@ -726,3 +726,31 @@ UTC); `agent-inferred` for the reading of them.
   on the pair's grid" (`field_pair_gamma`, `field_pair_gate_back`). The scans hold 24.3 ms a section; a guess is fixed
   when the split is built. A second stream (the triads' affine map beside the forward scan, the triads' outer, a leaf
   of the return, beside the reverse) waits until then, since the split changes what the scans leave idle.
+- **The scans split, and the guess** (the build thread, relayed 05:45 UTC; `claude/scan-split` on the outer build). The
+  forward scan carries `Q` alone and reads its step's `γ` and drive a step ahead; `field_pair_scan_face`, on the pair's
+  grid, forms `pc` from `pqm` after it. `field_pair_scan_pre`, on the grid, forms `δa` and `h` (held on 128 bits) before
+  the reverse, which carries `u` alone and reads `h` and `γ` a step ahead; the gate's return forms `δγ` from `db` and
+  `pqm` and writes it before anything in it can refuse, so a refused cell holds what it held. Read against the source:
+  `pqm` holds the carried `Q` (a fitted word fitted again is itself), and `db` the carried `u`, so each term moved off the
+  chain reads the operands it read on it; the gate's return reads `u` from `db` before `δb` takes its place, cell by
+  cell. Registers 62 and 78 on the scans, 40 and 38 on the grid's passes, 66 on the gate's return, no spills. Guess,
+  fixed at 05:47 UTC (`agent-inferred`), in the hold after lap 53 against the outer build, the card alone: gate 3 equal;
+  the forward scan 0.50 to 0.75 a launch over all its launches and the reverse 0.30 to 0.55 (half and three quarters of
+  their products leave the chain, at 26% and 39% issue on fewer than one warp a scheduler, where a lone warp's time
+  follows its instructions); the grid's passes with the moved `δγ` add 0.03 to 0.10 of the old scans' time; 7 to 13.5 ms
+  a section saved in all, a section 0.975 to 0.987 of control in a balanced hold whose control spreads under 3 ms. One
+  step ahead hides a load only behind one step of arithmetic, which the split has shortened; if the scans' stalls in the
+  hold's counters stand mostly on the long scoreboard, the step waits on its load, the reads come in at the top of the
+  ranges or above, and the next build reads several steps ahead in the registers the scans have free.
+- **The outer tile's prefetch and the blank return's product, scored** (the build thread, relayed 06:18 UTC; #883,
+  training from lap 54; lap 52's sections, the card alone). Gate 3 equal; two blocks a multiprocessor before and after
+  (the registers' limit), so the guess stands. The outer-tile launches by Nsight Compute 220.3, 228.4, 213.9 and 214.1
+  µs to 168.7, 166.7, 164.4 and 164.2 (0.766, 0.730, 0.769, 0.767), three inside 0.76 to 0.88 and one under it, the long
+  scoreboard from 5.3 to 5.9 an issued instruction to 1.8 to 2.0; the bias launches unmoved, so the kernel reads 0.94
+  over all its launches (22.4 to 21.0 ms a section). `field_outer_x64` 6.1 to 5.2 (0.85, inside). `field_blank_dy` 12.0
+  to 10.9 (0.91, inside 0.88 to 0.98). The hold did not resolve (the control 531.5 to 558.1 ms, a spread of 26.6), so the
+  section is unscored; the profiles give about 3.4 ms a section. A regularity across the three tiled kinds
+  (`agent-inferred`): a prefetch that took the long scoreboard from about 5.5 to about 2 an issued instruction read 0.72
+  to 0.77 a launch in every one (the transposed map, the affine maps and the outer tile), at the two blocks their
+  registers allow; it calibrates the next guess on a prefetch at that occupancy. Twice now the control's spread (21.4
+  and 26.6 ms) has been the card's two states, so a hold is read state for state, as the waiting standard says.
