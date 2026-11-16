@@ -1247,6 +1247,49 @@ pub fn zero_triad_return(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 16 21:40Z; atlas `contact.pool-founding`] `found-crossing STATE STATE_SHA LEGS LEGS_SHA OUT [RETURN RETURN_SHA]`:
+/// **the triads' legs founded where the tension leads** ([`holonics_engine::field::Learner::with_located_legs`]). `LEGS` holds the charts `A`, `B`
+/// and `G` and then their biases as the state lays them (`6J × D + 6J` entries, little-endian 32-bit integers on the material's grain), read by
+/// a ruler on the host from `read-tension`'s rows (`tools/tension_ruler.py`). Without `RETURN` the triads' return `W_T` is set to zero, so every
+/// face reads bit for bit as the state's before it: a founding, and a lap may train from it. With `RETURN` (`D × 2J` entries, the same form) the
+/// return is the ruler's regression too: a ruler's state for a capacity read, never trained from. Every other entry, moment, rate and line is
+/// kept; the triads' moments open as a growth opens them.
+pub fn found_crossing(args: &[String]) -> Result<()> {
+    if args.len() != 6 && args.len() != 8 {
+        return Err("found-crossing STATE STATE_SHA LEGS LEGS_SHA OUT [RETURN RETURN_SHA]".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let words = |bytes: Vec<u8>| -> Result<Vec<i32>> {
+        if bytes.len() % 4 != 0 {
+            return Err("a material file that is not whole 32-bit words".into());
+        }
+        Ok(bytes.chunks_exact(4).map(|w| i32::from_le_bytes([w[0], w[1], w[2], w[3]])).collect())
+    };
+    let legs = words(pinned_read(&args[3], &args[4], READ_BUDGET as usize)?)?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let ret = match args.get(6) {
+        Some(path) => Some(words(pinned_read(path, &args[7], READ_BUDGET as usize)?)?),
+        None => None,
+    };
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let founded = learner.with_located_legs(&legs, ret.as_deref()).map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.to_text() != written || back.field != founded.field || back.pass != learner.pass {
+        return Err("a founded learner that does not read back as itself with its pass".into());
+    }
+    std::fs::write(out, &written)?;
+    let d = founded.field.declaration;
+    let l = founded.field.layout().clone();
+    let moved = learner.field.theta[l.triad..l.triad + 6 * d.triads * d.width].iter().zip(&founded.field.theta[l.triad..l.triad + 6 * d.triads * d.width]).filter(|(a, b)| a != b).count();
+    let standing = founded.field.theta[l.w_triad..l.w_triad + d.width * 2 * d.triads].iter().filter(|&&v| v != 0).count();
+    println!("FOUND_CROSSING triads={} crossing={} legs_entries={} legs_moved={moved} return={} return_nonzero={standing}", d.triads, d.crossing, legs.len(), if ret.is_some() { "ruler" } else { "zero" });
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored

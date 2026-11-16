@@ -1,0 +1,38 @@
+The tension at the crossing: guesses fixed before the read (November 16, 2026, 21:45 UTC; the lead; Refs #404)
+
+State read: the line's lap 75 mean (four lanes, ten crossing triads grown at lap 75 with drawn legs and W_T at zero, one lap trained).
+Reading: `athena host complete-language read-tension` on fresh two-operand sums and differences as the arithmetic world writes them
+(8,000 at one to six digits, 2,000 at seven to nine; key tension-2026-11-16), each value digit opened alone (the one-place receiver),
+on the host's threads beside the card's lap. Ruler: tools/tension_ruler.py. Records split in two halves by a hash of the label: every
+fit on one half, every share read on the other. A share is the part of the covector's power (at the strand's return, at the open place,
+by tick) that a least-squares map of the named features removes.
+
+What the logs already print about the premise (read before fixing): R1 at lap 75, met sums: 2.20 to 2.33 nats a digit, the same with W_T
+zeroed (trread.out). R2 at lap 72: head 0 puts 0.21 of its row on a_k and 0.21 on b_k at ticks 0 and 1 against 0.03 on another operand
+digit; 1.8 to 3.9 times at ticks 2 and 3; head 1 favours b_k; heads 2 and 3 near 1 (the friction record §10).
+
+The theory's reading (agent-inferred). A source's value is a chart of its opening, which holds its own class's row beside its two
+neighbours' rows, so an aligned digit's identity is about a third of its value's power; the address is soft (0.42 of the row on the two
+aligned digits). The operands are therefore present at the answer's place but faint, and a product of two faint presences is fainter
+(signal share of a product about (s/(1+s))^2 at a presence s near 0.16). The law is in the product alone
+(code.triad-character-of-composition): no additive reading of the two operand digits removes anything, a table of the pair removes most.
+Drawn legs are blind to it. Legs located from the tension see it, weakly, and the rest of the law waits on the address sharpening once the
+junction gives it a consumer (contact.lap-founds-reachable: a staircase).
+
+G-L0 (presence). At met lengths, the best tick: a linear read of the pair chart gives the aligned digit a_k (one-hot, centred) with R^2
+between 0.05 and 0.35; b_k at least a_k's.
+G-L1 (drawn legs are blind). At met sums' digits the triads' products as they stand remove at most 0.005 of the covector's power on the
+held half, at every tick.
+G-L2 (located legs see the law). Ten located products (fit on one half) remove, on the other half, between 0.01 and 0.10 of the power
+the linear chart leaves, at met sums' digits at the best tick, and at least 4 times what the standing products remove there.
+G-L3 (the law is in the product). At met sums' units places: the additive reading (one-hot a_0 beside one-hot b_0) removes at most 0.02;
+the pair's table (one-hot a_0 times one-hot b_0) removes at least 0.5.
+G-L4 (a first step of a staircase). At met sums' units places the located products remove at most 0.2 of what the pair's table removes.
+
+What each outcome decides.
+- G-L3 holds and G-L2's share is under 0.01: the operands do not reach the legs' chart; the next law is the theory's own leg (charts of
+  the heads' currents, Demeter's G-D0 branch), read by the same ruler on `current`.
+- G-L2 holds: the legs are founded where the tension leads (`found-crossing`, W_T at zero, every face bit for bit), and the founding's
+  section count is predicted from the read share before a lap trains from it (the cipher record's Test 1).
+- G-L2's share above 0.10: the junction was within reach and the drawn founding alone held it back; the same founding, a larger step.
+- G-L0 above 0.35 with G-L2 under 0.01: the ruler's locator is at fault before the machine is; the table's share bounds it.
