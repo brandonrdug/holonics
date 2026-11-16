@@ -3,19 +3,39 @@
 
   forms_table.py make STORE OUT     writes OUT, the table `read-forms` reads (`label<TAB>prompt<TAB>run`, a line feed written `\\n`):
                                     each held sum of two operands (`HELD_FORMS_arithmetic.tsv`) after its symbols (`a + b = `), its words
-                                    (`a plus b equals `) and its foil (`a plux b eqvals `), and each held record (`HELD_arithmetic.*`) cut
-                                    after its `= `; the run is the value and its line feed.
+                                    (`a plus b equals `), its foil (`a plux b eqvals `), a null foil of the same lengths (letters drawn
+                                    by the world's key from those its operator's word and `equals` lack) and swapped words (another
+                                    operation's word: `times` before a sum's value, `plus` before a difference's, `minus` before a
+                                    product's), and each held record (`HELD_arithmetic.*`) cut after its `= `; the run is the value and its
+                                    line feed. The null foil and the swapped words are the theory thread's controls of 17:58 UTC: the foil
+                                    is one letter from the operator's word, so for a field that reads word shapes it is a noisy source of
+                                    the operator, not a null.
+  forms_table.py gsm8k STORE OUT N  writes OUT from the word problems' held role (GSM8K's test split, `HELD_words.*`): the first N problems,
+                                    each its question and a line feed as the prompt and GSM8K's own answer as the run.
   forms_table.py sum OUT LOG        sums a `read-forms` log over the table: by form and the operands' lengths (met: one to six digits, as
                                     training; far: seven to nine), by the digit's place counted from the value's last, and for sums of two
                                     operands by whether a carry entered the digit's column. Codes in millionths of a bit a place.
 
 A ruler on the host, outside the machine: it writes the held forms and adds up what the reading printed; it never enters a law. The world is
 synthetic (tools/arithmetic_world.py), so its forms and values are printed freely."""
+import hashlib
 import os
 import sys
 from collections import defaultdict
 
 WORDS = {"+": "plus", "-": "minus", "*": "times"}
+SWAP = {"+": "*", "-": "+", "*": "-"}
+KEY = "arith-2026-11-16"
+
+
+def null_word(word, held, k):
+    """A word of `word`'s length, its letters drawn by the world's key from those the operator's word and `equals` lack."""
+    pool = sorted(set("abcdefghijklmnopqrstuvwxyz") - set(word) - set("equals"))
+    out = []
+    for j in range(len(word)):
+        h = hashlib.sha256(f"{KEY}:null:{held}:{k}:{j}".encode()).digest()
+        out.append(pool[int.from_bytes(h[:4], "big") % len(pool)])
+    return "".join(out)
 
 
 def esc(t):
@@ -28,7 +48,11 @@ def make(store, out):
         head = f.readline().rstrip("\n").split("\t")
         for line in f:
             r = dict(zip(head, line.rstrip("\n").split("\t")))
-            for form in ("symbols", "words", "foil"):
+            a, _, b = r["symbols"].split()[:3]
+            word = WORDS[r["op"]]
+            r["null"] = f"{a} {null_word(word, r['held'], 0)} {b} {null_word('equals', r['held'], 1)}"
+            r["swapped"] = f"{a} {WORDS[SWAP[r['op']]]} {b} equals"
+            for form in ("symbols", "words", "foil", "null", "swapped"):
                 rows.append((f"anchor:{r['lengths']}:{r['op']}:{form}:{r['held']}", r[form] + " ", r["value"] + "\n"))
     data = open(os.path.join(store, "HELD_arithmetic.bin"), "rb").read().decode()
     with open(os.path.join(store, "HELD_IDS_arithmetic.txt")) as f:
@@ -38,6 +62,24 @@ def make(store, out):
     for ident, rec in zip(ids, records):
         expr, value = rec.split(" = ")
         rows.append((f"answer:{ident.split(':')[0].split('-')[1]}:{ident.split(':')[1]}", expr + " = ", value))
+    with open(out, "x") as f:
+        for label, prompt, run in rows:
+            f.write(f"{label}\t{esc(prompt)}\t{esc(run)}\n")
+    print(f"FORMS_TABLE rows={len(rows)}")
+
+
+def gsm8k(store, out, n):
+    data = open(os.path.join(store, "HELD_words.bin"), "rb").read()
+    rows, at = [], 0
+    with open(os.path.join(store, "HELD_words.tsv")) as f:
+        f.readline()
+        for k, line in enumerate(f):
+            octets = int(line.split("\t")[2])
+            doc = data[at:at + octets].decode()
+            at += octets
+            if k < n:
+                question, answer = doc.split("\n", 1)
+                rows.append((f"gsm8k:test:{k}", question + "\n", answer))
     with open(out, "x") as f:
         for label, prompt, run in rows:
             f.write(f"{label}\t{esc(prompt)}\t{esc(run)}\n")
@@ -115,6 +157,8 @@ def summ(table, log):
 if __name__ == "__main__":
     if sys.argv[1] == "make":
         make(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "gsm8k":
+        gsm8k(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     elif sys.argv[1] == "sum":
         summ(sys.argv[2], sys.argv[3])
     else:

@@ -1474,6 +1474,66 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
     Ok(())
 }
 
+/// [measurement; agent-inferred, November 16, Brandon's 17:06Z: how the words warp around the problems] `write-forms UNITS UNITS_SHA KEYS
+/// KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [REFINE]`: **the writer after each prompt of a forms table** (the table
+/// `read-forms` reads: `label<TAB>prompt<TAB>run`, a line feed written `\n`). Each row's prompt is released with `RUN` places open, by the
+/// writer `write-store` runs (`sample_runs`: as many sweeps as places, `REFINE` passes after them, zero by default), the key file's seed.
+/// `OUT/forms.written` holds a row a problem, `label<TAB>prompt<TAB>written<TAB>reference` with line feeds written `\n`, the written run
+/// decoded up to its first void. A writing: the state is read, never written. It runs on the card (`train`) or on the host's threads
+/// (`host`). The arithmetic world's tables are synthetic and GSM8K's test split is public, so `OUT` may be shown; a table made from a
+/// private passage keeps its `OUT` private.
+pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    if args.len() != 13 && args.len() != 14 {
+        return Err("write-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [REFINE]".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("write-forms")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let run = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let refine = match args.get(13) { Some(r) => r.parse::<usize>().map_err(|_| "REFINE is a count")?, None => 0 };
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let escape = |b: &[u8]| String::from_utf8_lossy(b).replace('\n', "\\n").replace('\t', "\\t");
+    let mut rows: Vec<(String, Vec<u8>, Vec<usize>, Vec<u8>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, prompt, reference] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        let bytes = unescape(prompt).into_bytes();
+        let classes = codec.encode(&bytes)?;
+        if classes.is_empty() {
+            return Err("a forms row with an empty prompt".into());
+        }
+        rows.push((label.to_string(), bytes, classes, unescape(reference).into_bytes()));
+    }
+    std::fs::create_dir(out)?;
+    println!("FORMS_WRITE_LAW rows={} run={run} sweeps={run} refine={refine} alphabet={} void={} ms={}", rows.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
+    let release: Vec<(&[usize], usize)> = rows.iter().map(|r| (r.2.as_slice(), run)).collect();
+    let written = learner
+        .field
+        .sample_runs(&release, run, refine, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {})
+        .map_err(|e| e.to_string())?;
+    let mut text = String::new();
+    for ((label, prompt, _, reference), w) in rows.iter().zip(&written) {
+        let before_void = w.iter().position(|&c| c == codec.void()).unwrap_or(w.len());
+        let decoded = codec.decode(&w[..before_void]);
+        text.push_str(&format!("{label}\t{}\t{}\t{}\n", escape(prompt), escape(&decoded), escape(reference)));
+    }
+    write_new(&out.join("forms.written"), text.as_bytes())?;
+    println!("FORMS_WRITE_DONE rows={} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
 pub fn write(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     if args.len() != 15 && args.len() != 16 {
         return Err("write-store UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA DOCUMENTS PROMPT RUN OUT STATE STATE_SHA [REFINE]".into());
