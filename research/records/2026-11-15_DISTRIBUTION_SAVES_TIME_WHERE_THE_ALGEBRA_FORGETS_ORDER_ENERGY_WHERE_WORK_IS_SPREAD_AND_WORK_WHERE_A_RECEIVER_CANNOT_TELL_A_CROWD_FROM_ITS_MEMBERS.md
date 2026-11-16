@@ -526,3 +526,20 @@ UTC); `agent-inferred` for the reading of them.
   enters every guess on this kernel (`agent-inferred`). The crowd's score the exposure already computes could be held for
   the contact where the tick is stored; that choice is a realization, the bits the same either way with a parity receipt
   on both, and it is a few ms a section against the 124 ms the rows and columns now cost, which are read next.
+- **The return's source counters, and the next guess** (the build thread, relayed 02:01 UTC; a copy of the reuse build
+  with line information, two launches each on two of lap 45's sections, the card alone). `field_contact_columns`: 72
+  registers, seven blocks, 39% of warps active, long scoreboard 4.0 to 4.1 and math-pipe throttle 0.9 to 1.0 stalls an
+  issued instruction; one line holds 0.547 of the samples and 0.396 of the instructions, a share times a released bracket
+  of the receiver's probe and the source's word, each of its three products formed 128 by 128 where P54's bounds give one
+  product of 32 by 32 bits and two of 64 by 64; the next line, a share times a carried value under `2^127`, 0.061.
+  `field_contact_rows`: 128 registers, four blocks, 28% active, long scoreboard 3.0 to 3.2; the pair's skin sum 0.138 of
+  the samples, the still head's test `h % frames < still` 0.059 (the head is the launch's argument, and each term's skin,
+  carried value, decay and pace divide by the frames again), the wide add's two 64-bit atomics 0.075, the pair's products
+  0.090. The build reads the head's ring set once for those helpers and forms the columns' products at P54's widths, every
+  bit kept. Guess, fixed at 02:02 UTC (`agent-inferred`): gate 3 equal; on lap 47's sections, the card alone, the columns
+  0.85 to 0.95 of the reuse build a launch (the narrow products relieve the throttle and the line's instructions and leave
+  the long scoreboard, as they did on l4); the rows 0.90 to 0.96; a section 0.975 to 0.992 of control in a balanced hold.
+  For after that read: if the wide add reads its first atomic's return to find the carry into the second, every term
+  waits a round trip to memory, which is long-scoreboard time; the sum is a quotient, so its 32-bit chunks can go into
+  64-bit accumulators by atomics that return nothing, with the carries released once where the sum is read. No guess on
+  that until the premise is printed.
