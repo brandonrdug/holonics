@@ -220,3 +220,25 @@ and the next reads stand there, in this order:
 2. A refine whose order is the places' news, the most surprised place first and never by a face's top.
 3. The release's heat as a store, charged by its own news and leaking, so that the draft cools as it settles with no
    temperature set by hand (the heat record §6 and §8).
+
+## 11. The writer's test, scored (18:10 UTC; the build's reads, `receipts/2026-11-16_writerefine/`)
+
+The build scored the four guesses on lap 69's end state, 20 problems:
+
+| Guess | Score | What the read printed |
+|---|---|---|
+| W1 | partly missed | The one-place code fell in four slices; books turned back from 4 to 16 passes. At 16 passes every slice stood 0.25 to 1.18 nats above its reference, never under. |
+| W2 | missed | The share of met words rose 0.10 or more in two slices (web, science). Wikidata fell 0.09. |
+| W3 | missed | In code, `/` rose to a quarter of the written octets. |
+| W4 | held | No sentence at 16 passes. |
+
+What the theory takes:
+- **Reading outruns writing.** Under the one-place receiver, the field codes the held references more cheaply than its
+  own drafts, even after sixteen refine passes. The release does not reach the agreement that the field's material
+  already gives text it reads.
+- **Refine is self-hearing.** It is the draft heard as the field's own text, with no world answering. It buys one-place
+  self-agreement, and in code it buys repetition of one octet: G169's drift, which the friction record (§3, §8) answers
+  with a world whose reaction alone is compared.
+- **The §10 order is replaced.** Its order applied if W2 and W4 both held, and W2 missed. The writer's next reads are
+  Build B's, on the arithmetic world and the word problems, where the world's answer is the reference. The fifth lane
+  (S2) stands as it was.
