@@ -452,3 +452,49 @@ are read on laps 75 and 76.
 **Speed, from the build's counters.** The acts' release costs about 0.5 s a section. Training the section's ~40,000
 places costs about 0.47 s, so 112 released places cost as much as the section, about 360 times a trained place's cost.
 The release is far over its count, and that is the realization's to repair before the loop runs long.
+
+## 12. How the predicted reaction pulls on the act, and the act's extents (sent to the build 20:39 UTC)
+
+**G-old, scored on lap 72's region lines** (the build's relay: lap 72 → lap 73, nats a place):
+
+| Region | Lap 72 | Lap 73 | Change | G-old |
+|---|---|---|---|---|
+| code | 0.5511 | 0.5554 | +0.0043 | held |
+| web | 0.9094 | 0.9139 | +0.0045 | held |
+| science | 0.7623 | 0.7647 | +0.0024 | held |
+| books | 0.8692 | 0.8731 | +0.0039 | held |
+| wikidata | 1.0607 | 1.0665 | +0.0058 | missed |
+
+The guess held in four regions and missed in wikidata.
+
+**Where the pull lives.** The build answered §11's construction: the act's region already holds the predicted reaction,
+since the release writes past the draft's `= ` through the field's own predicted value. What it lacks is the pull back.
+- **An open place is silent.** It is no source and adds nothing to any moment (`Region::silent`), and the release
+  builds its regions with no carried faces. So a predicted reaction cannot pull on the draft until it is drawn, and the
+  pull back is a refine.
+- **The pull's direction comes from the passage**, with no goal set from outside and no selection added. The field
+  drafts in the world's form, so its drawn reaction is a value, and redrawing the draft given `= value` pulls it toward
+  the forms that precede a value. As the loop trains the world's refusal, a draft the world refuses becomes unlikely
+  before a value, by Bayes through the field's own model of the reaction. The comparison still trains only the
+  prediction of the reaction (§3). The act improves because it is drawn from the joint field, the limb placed by the
+  contact it expects.
+
+**The act's extents, from the object** (`agent-inferred`).
+- **The prompt is one record.** The world's form is one record. More records make the act a continuation of samples
+  rather than the field's own. This halves the act's sites.
+- **The sweeps draw one place a read.** A record's places are coupled through its frame, and an octave holds adjacent
+  places, which a shared read would draw apart.
+- **The refine is one pass over the draft's places** after its predicted value is drawn, each place redrawn once. At
+  each read the redrawn place is the draft place whose written symbol carries the most news under the joint faces. That
+  is the landmark law's order on places' news (`code.site-isolation-landmark`), never a face's top.
+
+About half the sites and 1.4 times the reads come to about 0.7 times the release's present cost. A released place costs
+its region's whole forward, which is the release's law (each read conditions on everything written), not a launch's
+overhead.
+
+**G-B3, restated before the refine runs:**
+- **G-B3a.** On lap 74's state, the refine pass alone raises the offline parse share (128 drafts) by at least 0.05 over
+  `REFINE 0`. This is the passage's form pulling.
+- **G-B3b.** Within two loop laps with the refine, the in-lap parse share rises by at least 0.05 more. This is the
+  learned refusal pulling.
+- Without the refine, the share stays within 0.05 of 0.44.
