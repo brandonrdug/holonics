@@ -1,0 +1,117 @@
+# hold: lock taken 13:18:32 from lap63/STATE.3000
+# card empty 13:25:02
+# gate begun 13:25:02
+# parity: exit 0 13:28:17
+# repro: exit 0 13:28:30
+# read: exit 0 13:32:08
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# next_bin written 13:32:08
+# ncu src ctl exit 0
+LINES ctl kernel: 676596219 warp instructions executed, 222453 stall samples
+LINES ctl lines 4604-4887 (the kernel body): instr 0.485 samples 0.517
+LINES ctl functions outside the body, by samples:
+LINES ctl   add_wide                           instr  0.013 samples  0.089
+LINES ctl   crowd_base_narrow                  instr  0.063 samples  0.061
+LINES ctl   support_at                         instr  0.016 samples  0.044
+LINES ctl   mul64_128                          instr  0.043 samples  0.038
+LINES ctl   divide_word                        instr  0.084 samples  0.035
+LINES ctl   (other files)                      instr  0.028 samples  0.033
+LINES ctl   row_prepare                        instr  0.007 samples  0.019
+LINES ctl   divisor_of                         instr  0.023 samples  0.014
+LINES ctl   mulu64_128                         instr  0.008 samples  0.011
+LINES ctl   wide_bits                          instr  0.015 samples  0.011
+LINES ctl   div_nearest                        instr  0.019 samples  0.011
+LINES ctl   div_nearest_by                     instr  0.028 samples  0.010
+LINES ctl   mag64                              instr  0.002 samples  0.009
+LINES ctl   temper_of                          instr  0.015 samples  0.009
+LINES ctl   divide_by                          instr  0.023 samples  0.008
+LINES ctl   rel                                instr  0.023 samples  0.008
+LINES ctl   mul_fits                           instr  0.013 samples  0.008
+LINES ctl   skin_raw_hs                        instr  0.009 samples  0.006
+LINES ctl   narrow31                           instr  0.017 samples  0.006
+LINES ctl   bit_length                         instr  0.009 samples  0.006
+LINES ctl   skin_word                          instr  0.007 samples  0.004
+# ncu src nw exit 0
+LINES nw kernel: 680211251 warp instructions executed, 215494 stall samples
+LINES nw lines 4617-4906 (the kernel body): instr 0.485 samples 0.565
+LINES nw functions outside the body, by samples:
+LINES nw   crowd_base_narrow                  instr  0.063 samples  0.065
+LINES nw   support_at                         instr  0.016 samples  0.046
+LINES nw   mul64_128                          instr  0.043 samples  0.038
+LINES nw   divide_word                        instr  0.084 samples  0.036
+LINES nw   (other files)                      instr  0.028 samples  0.035
+LINES nw   add_wide_high                      instr  0.011 samples  0.031
+LINES nw   row_prepare                        instr  0.007 samples  0.020
+LINES nw   divisor_of                         instr  0.023 samples  0.015
+LINES nw   mulu64                             instr  0.005 samples  0.012
+LINES nw   wide_bits                          instr  0.015 samples  0.012
+LINES nw   div_nearest                        instr  0.019 samples  0.011
+LINES nw   div_nearest_by                     instr  0.028 samples  0.010
+LINES nw   temper_of                          instr  0.014 samples  0.009
+LINES nw   divide_by                          instr  0.023 samples  0.009
+LINES nw   rel                                instr  0.023 samples  0.009
+LINES nw   mul_fits                           instr  0.013 samples  0.008
+LINES nw   narrow31                           instr  0.017 samples  0.007
+LINES nw   bit_length                         instr  0.009 samples  0.006
+LINES nw   skin_raw_hs                        instr  0.009 samples  0.006
+LINES nw   warp_sum                           instr  0.004 samples  0.004
+LINES nw   skin_word                          instr  0.007 samples  0.004
+# ncu ctl exit 0
+# ncu nw exit 0
+# profile ctl exit 0
+# profile nw exit 0
+# run1 ctl exit 0 elapsed_ms=11828
+# run2 ctl exit 0 elapsed_ms=11834
+# run3 nw exit 0 elapsed_ms=11833
+# run4 nw exit 0 elapsed_ms=11795
+# run5 ctl exit 0 elapsed_ms=11834
+# run6 ctl exit 0 elapsed_ms=11826
+# run7 nw exit 0 elapsed_ms=11832
+# run8 nw exit 0 elapsed_ms=11825
+# run9 ctl exit 0 elapsed_ms=11849
+# hold: released 13:35:15
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=480.2
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=480.3
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=479.5
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=478.6
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=480.1
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=480.1
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=479.5
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=479.4
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=480.6
+PROFILE_TOTAL ctl_ms_a_section=470.0 nw_ms_a_section=469.4
+PROFILE_PAIR entry=field_contact_rows ctl_ms_a_section=59.46 nw_ms_a_section=58.33 launches=2304/2304
+PROFILE_PAIR entry=field_contact_columns ctl_ms_a_section=46.42 nw_ms_a_section=46.42 launches=2304/2304
+PROFILE_PAIR entry=field_contact_l4 ctl_ms_a_section=37.04 nw_ms_a_section=36.96 launches=375/375
+PROFILE_PAIR entry=field_pace_skin_back ctl_ms_a_section=29.54 nw_ms_a_section=29.83 launches=1152/1152
+PROFILE_PAIR entry=field_transposed ctl_ms_a_section=21.96 nw_ms_a_section=22.08 launches=5184/5184
+PROFILE_PAIR entry=field_clock_fill ctl_ms_a_section=20.08 nw_ms_a_section=20.12 launches=1008/1008
+PROFILE_PAIR entry=field_exposure ctl_ms_a_section=17.38 nw_ms_a_section=17.25 launches=576/576
+PROFILE_PAIR entry=field_skin_fill ctl_ms_a_section=17.21 nw_ms_a_section=17.25 launches=1152/1152
+PROFILE_PAIR entry=field_affine_tiled_x32 ctl_ms_a_section=15.58 nw_ms_a_section=15.50 launches=4368/4368
+PROFILE_PAIR entry=field_outer_x32 ctl_ms_a_section=13.42 nw_ms_a_section=13.54 launches=3648/3648
+PROFILE_PAIR entry=field_chart ctl_ms_a_section=13.33 nw_ms_a_section=13.38 launches=1776/1776
+PROFILE_PAIR entry=field_moment_skinned_all ctl_ms_a_section=8.00 nw_ms_a_section=8.00 launches=384/384
+NCU_ROWS build=ctl entry=field_contact_rows us=1177.7 inst=329736246 issue_pct=40.2 warps_pct=28.2 regs=128 sectors_a_request=7.45 l1_pct=31.2 l2_pct=49.1 dram_pct=29.1 shared_wavefronts=15869381 bank_conflicts=1510275 long_scoreboard=3.10 wait=1.91 selected=1.00 branch_resolving=0.60
+NCU_ROWS build=ctl entry=field_contact_rows us=1031.1 inst=296800385 issue_pct=41.3 warps_pct=28.6 regs=128 sectors_a_request=7.03 l1_pct=31.6 l2_pct=48.1 dram_pct=24.3 shared_wavefronts=13120851 bank_conflicts=1225749 long_scoreboard=3.05 wait=1.90 selected=1.00 branch_resolving=0.59
+NCU_ROWS build=ctl entry=field_contact_rows us=1423.9 inst=384066819 issue_pct=39.3 warps_pct=27.5 regs=128 sectors_a_request=5.09 l1_pct=23.4 l2_pct=35.6 dram_pct=20.1 shared_wavefronts=12749863 bank_conflicts=1087651 long_scoreboard=3.52 wait=2.06 selected=1.00 branch_resolving=0.47
+NCU_ROWS build=ctl entry=field_contact_rows us=1547.0 inst=409612503 issue_pct=38.3 warps_pct=27.0 regs=128 sectors_a_request=5.18 l1_pct=23.8 l2_pct=36.4 dram_pct=22.7 shared_wavefronts=14274494 bank_conflicts=1205426 long_scoreboard=3.70 wait=2.07 selected=1.00 branch_resolving=0.47
+NCU_ROWS build=ctl entry=field_contact_rows us=1183.6 inst=335305899 issue_pct=40.3 warps_pct=28.1 regs=128 sectors_a_request=7.46 l1_pct=31.9 l2_pct=49.2 dram_pct=30.1 shared_wavefronts=16132424 bank_conflicts=1540302 long_scoreboard=3.05 wait=1.92 selected=1.00 branch_resolving=0.60
+NCU_ROWS build=ctl entry=field_contact_rows us=1067.5 inst=307559591 issue_pct=41.2 warps_pct=28.5 regs=128 sectors_a_request=7.15 l1_pct=31.7 l2_pct=48.0 dram_pct=25.9 shared_wavefronts=13825885 bank_conflicts=1299989 long_scoreboard=3.01 wait=1.91 selected=1.00 branch_resolving=0.59
+NCU_ROWS build=ctl entry=field_contact_rows us=1434.8 inst=387924393 issue_pct=39.3 warps_pct=27.5 regs=128 sectors_a_request=5.10 l1_pct=23.4 l2_pct=35.5 dram_pct=19.8 shared_wavefronts=12841132 bank_conflicts=1094007 long_scoreboard=3.51 wait=2.06 selected=1.00 branch_resolving=0.47
+NCU_ROWS build=ctl entry=field_contact_rows us=1615.4 inst=423750333 issue_pct=37.7 warps_pct=26.4 regs=128 sectors_a_request=5.22 l1_pct=23.1 l2_pct=35.7 dram_pct=22.8 shared_wavefronts=14996872 bank_conflicts=1269484 long_scoreboard=3.57 wait=2.07 selected=1.00 branch_resolving=0.47
+NCU_ROWS build=nw entry=field_contact_rows us=1151.0 inst=330333236 issue_pct=41.3 warps_pct=27.9 regs=128 sectors_a_request=7.45 l1_pct=33.2 l2_pct=50.9 dram_pct=29.5 shared_wavefronts=15875579 bank_conflicts=1511542 long_scoreboard=2.69 wait=1.89 selected=1.00 branch_resolving=0.60
+NCU_ROWS build=nw entry=field_contact_rows us=1008.5 inst=297403093 issue_pct=42.5 warps_pct=28.2 regs=128 sectors_a_request=7.03 l1_pct=32.6 l2_pct=49.9 dram_pct=24.0 shared_wavefronts=13125837 bank_conflicts=1226305 long_scoreboard=2.63 wait=1.87 selected=1.00 branch_resolving=0.59
+NCU_ROWS build=nw entry=field_contact_rows us=1393.8 inst=384914424 issue_pct=40.3 warps_pct=27.2 regs=128 sectors_a_request=5.09 l1_pct=23.9 l2_pct=36.8 dram_pct=20.2 shared_wavefronts=12871971 bank_conflicts=1085574 long_scoreboard=3.20 wait=2.03 selected=1.00 branch_resolving=0.47
+NCU_ROWS build=nw entry=field_contact_rows us=1517.5 inst=410457480 issue_pct=39.2 warps_pct=26.7 regs=128 sectors_a_request=5.18 l1_pct=24.4 l2_pct=37.7 dram_pct=22.9 shared_wavefronts=14394513 bank_conflicts=1201316 long_scoreboard=3.29 wait=2.05 selected=1.00 branch_resolving=0.47
+NCU_ROWS build=nw entry=field_contact_rows us=1154.7 inst=335900999 issue_pct=41.5 warps_pct=27.8 regs=128 sectors_a_request=7.46 l1_pct=33.0 l2_pct=51.1 dram_pct=30.4 shared_wavefronts=16136109 bank_conflicts=1542430 long_scoreboard=2.64 wait=1.90 selected=1.00 branch_resolving=0.60
+NCU_ROWS build=nw entry=field_contact_rows us=1036.2 inst=308160487 issue_pct=42.6 warps_pct=28.1 regs=128 sectors_a_request=7.15 l1_pct=32.7 l2_pct=50.1 dram_pct=26.1 shared_wavefronts=13832944 bank_conflicts=1303013 long_scoreboard=2.57 wait=1.88 selected=1.00 branch_resolving=0.59
+NCU_ROWS build=nw entry=field_contact_rows us=1408.9 inst=388769595 issue_pct=40.3 warps_pct=27.1 regs=128 sectors_a_request=5.10 l1_pct=24.0 l2_pct=36.6 dram_pct=20.3 shared_wavefronts=12963999 bank_conflicts=1089068 long_scoreboard=3.20 wait=2.04 selected=1.00 branch_resolving=0.46
+NCU_ROWS build=nw entry=field_contact_rows us=1590.1 inst=424597671 issue_pct=38.6 warps_pct=26.2 regs=128 sectors_a_request=5.22 l1_pct=23.7 l2_pct=36.8 dram_pct=23.2 shared_wavefronts=15118227 bank_conflicts=1270362 long_scoreboard=3.28 wait=2.05 selected=1.00 branch_resolving=0.47
+RUN_EXIT 0 2026-11-16T13:35:15Z
