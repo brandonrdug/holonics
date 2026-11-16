@@ -392,3 +392,115 @@ realization and parity first.
   acceptance vanishes when it is removed.
 
 Build B runs as built and reads G-B1.
+
+## 11. Build B read on lap 74: what only a reacting world teaches (sent to the build 20:36 UTC)
+
+**The reads** (the build's relay; chain 20, world `arithmetic 8 3 48`, about seven acts a section).
+- **The lap.** It stopped at its bound after 2,628 sections, so its mean is `MEAN.2000`.
+- **The drafts.** In the lap, 42 to 46% held an expression the world reads, with no trend. Offline, 56 of 128 drafts
+  parsed at lap 73 and 58 at lap 74.
+- **The world's places.**
+  - Digits: 2.458 → 2.396 nats a digit, and 2.33 to 2.42 by the value's length.
+  - Line feed: 3.99 → 1.23 bits.
+  - Refusal `?`: 16.8 → 1.39 bits a place.
+- **A's held answers.**
+  - The value's line feed: 4.22 → 1.76 bits at met lengths, and 5.96 → 3.91 far.
+  - The digits moved 0.05 to 0.14 bits; met digit places stand at 2.24 to 2.57 nats.
+- **The regions, lap 73 → 74** (nats a place):
+
+  | Region | Lap 73 | Lap 74 |
+  |---|---|---|
+  | code | 0.5554 | 0.5577 |
+  | web | 0.9139 | 0.9167 |
+  | science | 0.7647 | 0.7663 |
+  | books | 0.8731 | 0.8736 |
+  | wikidata | 1.0665 | 1.0620 |
+  | held arithmetic | 1.5423 | 1.5298 |
+  | GSM8K test | 0.7645 | 0.7623 |
+
+**Scores.**
+- **G-B1** held. The loop's world digits stand within 0.1 nats of A's at matched value lengths, and A's stand near
+  ln 10.
+- **G-old** missed. Wikidata rose 0.0156 from lap 71 to lap 73, so lap 73 stands at least 0.0056 above lap 72 whatever
+  lap 72's rise was. The other four need lap 72's region lines. The old five settle over more than one lap.
+
+**What the loop taught.**
+- **Length.** It may be the receiver's match rather than the act. The loop's stretches pose exactly the read's receiver:
+  the expression known, the value and its line feed open.
+- **Refusal.** Only a world that answers the field's own acts can teach it, and the field learned to code the world's
+  refusal of its draft.
+- **The act did not learn from the reaction.** The parse share stayed flat. The release drafts the expression without
+  the reaction's places in its region, so the friction trains the field's prediction of the world's reaction and never
+  the act. The construction to make: the act drafted in one joint region with the world's places open, refined
+  together, so that the predicted reaction pulls on the draft. That is the efference copy used forward, the limb placed
+  by its predicted contact, and the generation law's joint field with the world's port in it. Choosing an act by its
+  predicted consequence is the inverse problem Brandon named on November 13 (inverse kinematics), here with the world's
+  law as the forward map.
+
+**The guesses.**
+- **G-B2 (the receiver or the act).** A control lap from lap 73's state, with the acts replaced by the world's own
+  records posed the same way (expression known, value and line feed open, the same count a section), puts A's met value
+  line feed within 0.3 bits of the loop lap's 1.76, or lower.
+- **G-B3 (the act learns from the reaction).** While the act is drafted without the reaction's places, the parse share
+  stays within 0.05 of 0.44 on every lap. With the joint region, it rises by at least 0.10 within two laps.
+
+**The crossing as built** (chain 21; `Declaration::crossing`). All three legs are charts of r̂(x) after the current's
+return, so α reads a head's current through W_out. The triple product then holds α·β·γ_b through γ's bias: the bilinear
+term whose cross part carries a_k·b_k. So the built crossing is the theory's object (`agent-inferred`). G-tr1 and G-tr2
+are read on laps 75 and 76.
+
+**Speed, from the build's counters.** The acts' release costs about 0.5 s a section. Training the section's ~40,000
+places costs about 0.47 s, so 112 released places cost as much as the section, about 360 times a trained place's cost.
+The release is far over its count, and that is the realization's to repair before the loop runs long.
+
+## 12. How the predicted reaction pulls on the act, and the act's extents (sent to the build 20:39 UTC)
+
+**G-old, scored on lap 72's region lines** (the build's relay: lap 72 → lap 73, nats a place):
+
+| Region | Lap 72 | Lap 73 | Change | G-old |
+|---|---|---|---|---|
+| code | 0.5511 | 0.5554 | +0.0043 | held |
+| web | 0.9094 | 0.9139 | +0.0045 | held |
+| science | 0.7623 | 0.7647 | +0.0024 | held |
+| books | 0.8692 | 0.8731 | +0.0039 | held |
+| wikidata | 1.0607 | 1.0665 | +0.0058 | missed |
+
+The guess held in four regions and missed in wikidata.
+
+**Where the pull lives.** The build answered §11's construction: the act's region already holds the predicted reaction,
+since the release writes past the draft's `= ` through the field's own predicted value. What it lacks is the pull back.
+- **An open place is silent.** It is no source and adds nothing to any moment (`Region::silent`), and the release
+  builds its regions with no carried faces. So a predicted reaction cannot pull on the draft until it is drawn, and the
+  pull back is a refine.
+- **The pull's direction comes from the passage**, with no goal set from outside and no selection added. The field
+  drafts in the world's form, so its drawn reaction is a value, and redrawing the draft given `= value` pulls it toward
+  the forms that precede a value. As the loop trains the world's refusal, a draft the world refuses becomes unlikely
+  before a value, by Bayes through the field's own model of the reaction. The comparison still trains only the
+  prediction of the reaction (§3). The act improves because it is drawn from the joint field, the limb placed by the
+  contact it expects.
+
+**The act's extents, from the object** (`agent-inferred`).
+- **The prompt is one record.** The world's form is one record. More records make the act a continuation of samples
+  rather than the field's own. This halves the act's sites.
+- **The sweeps draw one place a read.** A record's places are coupled through its frame, and an octave holds adjacent
+  places, which a shared read would draw apart.
+- **The refine is one pass over the draft's places** after its predicted value is drawn, each place redrawn once. At
+  each read the redrawn place is the draft place whose written symbol carries the most news under the joint faces. That
+  is the landmark law's order on places' news (`code.site-isolation-landmark`), never a face's top.
+
+About half the sites and 1.4 times the reads come to about 0.7 times the release's present cost. A released place costs
+its region's whole forward, which is the release's law (each read conditions on everything written), not a launch's
+overhead.
+
+**G-B3, restated before the refine runs:**
+- **G-B3a.** On lap 74's state, the refine pass alone raises the offline parse share (128 drafts) by at least 0.05 over
+  `REFINE 0`. This is the passage's form pulling.
+- **G-B3b.** Within two loop laps with the refine, the in-lap parse share rises by at least 0.05 more. This is the
+  learned refusal pulling.
+- Without the refine, the share stays within 0.05 of 0.44.
+
+**G-B3a, scored 20:51 UTC: held.** The build's relay: on lap 74's mean, with 128 acts of one held record each and one
+key (`write-acts`, host), the world read 50 of 128 drafts at `REFINE 0` (0.39) and 67 at `REFINE 1` (0.52), a rise of
+0.13. The refine was built as set (`Constitution::refine_drafts`), at 1.37 times the release's reads. The predicted
+reaction, once drawn, pulls the act toward the forms that precede a value, before any lap has trained on the refine.
+G-B3b is read from lap 77, with one record a prompt and the refine on.
