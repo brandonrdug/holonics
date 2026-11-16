@@ -178,3 +178,39 @@ region of the record alone: at most 0.05 and 0.07 (the pair chart, ticks 0 and 1
 What it decides. Held: the line trains its arithmetic in regions where the operands are lost in a crowd of other records' digits, and
 reads it in regions of one record; a record is the relatively complete region of its own equation, and the arithmetic slice is redrawn
 one record a document.
+
+SCORES of G-R1 and G-C5 (read from the clock at 23:34:10 UTC, November 16; outputs oracle_crowd76.txt and cavs76_{0,1000}/cavity.tsv)
+G-R1: not scored. The crowd read holds 193 met both-column places (992 places in all, two a record), and the presence ruler fits a
+  128-wide chart on half of them: its held shares read -1.3 to -2.1, which is the ruler past its size, not a presence. The same ruler
+  read 0.10 to 0.15 on 4,994 such places of one-record regions. A null from an instrument that small is the instrument's; the question
+  is carried by the redrawn slice below, which tests the crowd by training and no longer by this read.
+G-C5 (the held passage, 100 places a slice, one-place code, fresh lock against the carried lock at unit carry, lap 76's mean):
+  code +0.244, web +0.112, science +0.246, books +0.104, wikidata +0.043, words +0.174, arithmetic +0.016 nats a place.
+  Held for books, web and wikidata (inside 0.01 to 0.15); missed above for code, science and words; missed for the held arithmetic,
+  which rose by 0.016 where a fall of 0.02 was guessed. The carried lock at unit carry is no free gain: untrained, it costs text
+  0.04 to 0.25 nats a place and gives the held arithmetic nothing, the copy columns' 0.18 aside.
+
+GUESSES G-V1 to G-V4, fixed at 23:34:10 UTC, November 16, before any lap on the redrawn arithmetic slice (the lead)
+The change: the arithmetic slice's training documents redrawn (tools/arithmetic_world.py with weights read by
+tools/words_arithmetic_ruler.py from the store's word problems: operand lengths 1 to 6 at 5782605, 4735355, 1550212, 348121, 76807,
+22954; two to four operands at 2005714, 565595, 165359; + - * at 919854, 749478, 1582919; documents of 1, 2, 4, 8, 16 and 32 records,
+as many octets an octave), the pass moved to it at a lap gap (move-store), the world's acts set from one stretch in 8 to one in 21
+(the redrawn slice cuts into 4.4 times the stretches a place and 2.6 times the acts, by the cut's simulation). No law of the engine
+changes and the lap binary is chain 22's. The held slices stay as they were.
+Premise read first (G-S1, lap 76's mean): in a region of one short sum the operands' digits stand at the answer's units site at 0.44
+(a) and 0.53 to 0.58 (b), against 0.10 to 0.15 for sums of 1 to 6 digits; the table removes 0.58 to 0.89 of the covector there and ten
+located products 0.03 to 0.09, so the junction has a slope where the operands arrive, and the uniform slice gave that region about one
+record in eighty, cut at random among thirty-one others.
+Readings: read-tension on short76.tsv (sums of one- and two-digit operands, a record a region, every answer place opened alone) at a
+lap's mean, tension_ruler.py oracle; the chain's held read; the lap's wall time.
+G-V1: at the mean of the second lap on the redrawn slice, the units digit of a short sum codes at 2.10 nats or less (2.37 to 2.39 at
+  lap 76's mean; a flat digit is 2.303), and it falls from the first such lap's mean to the second's.
+G-V2: there the operands' presence at the units site, tick 0, stands at 0.60 or more for a and 0.70 or more for b.
+G-V3: the five text slices' held one-place codes at that mean stand within 0.01 nats a place of lap 77's, slice by slice, and the
+  lap's wall time within a tenth of lap 77's.
+G-V4: the held arithmetic slice (the uniform draw's records, 1 to 6 digits) moves by less than 0.05 nats a place either way.
+What each outcome decides: V1 missed with V2 held says the junction does not ride from drawn operands even where the operands arrive,
+and the located founding read on short sums is the next change; V1 and V2 both missed says the terrain was not the lever; V1 held is
+the first sum digit the line codes under a flat digit.
+G-B3b (the in-lap share of drafts the world reads, laps 77 and 78) is scored on lap 77 alone, since the redrawn slice changes what a
+draft's prompt is from the lap after the gap.

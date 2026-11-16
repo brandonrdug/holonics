@@ -5,6 +5,7 @@ routines at declared widths, and only its text reaches the machine: the expressi
 integer arithmetic, and the field meets only the records.
 
 Usage: arithmetic_world.py OUT KEY TEXT_OCTETS [--records-a-document R] [--held K]
+       [--lengths W1,..,W6 --operands W2,W3,W4 --ops W+,W-,W*] [--octaves N]
 
 A record is one line, `EXPR = VALUE`, as written (the most significant digit first, a negative value with its sign): two to four operands,
 each of one to six digits drawn uniform in length and in digits (a leading digit nonzero unless the operand is one digit), joined by `+`,
@@ -17,6 +18,15 @@ Held (`HELD_arithmetic.*`): K (128) of those held-out records at the met lengths
 (lengths no training record has), each record one document of its own. `HELD_FORMS_arithmetic.tsv` gives, for each held record of two
 operands, the same numbers in three forms for the anchor read: symbols (`a + b =`), words (`a plus b equals`, `minus`, `times`) and a foil
 of the same lengths the passage never uses (`plux`, `minux`, `timex`, `eqvals`), with the value.
+
+The weighed draw (the lead, November 16; `--lengths`, `--operands`, `--ops`, given together): the operand lengths one to six, the count
+of operands two to four and the operations are drawn with integer weights in place of the uniform draws, under their own draw label, so a
+slice drawn without them is the bytes it was. The weights are counts a ruler reads from the store's word problems
+(`tools/words_arithmetic_ruler.py`): the arithmetic the word problems hold has numerals of one or two digits at more than four in five,
+where the uniform draw gives a third. `--octaves N` cuts the training documents at 1, 2, 4, ... 2^(N-1) records, as many octets an
+octave: a record alone is the region its own equation closes in, and the larger documents ask a place to find its operands among other
+records' digits. The held records at the met lengths follow the same draw; a store that keeps its earlier held files keeps their
+records out of training, since the held mark is keyed by a record's text alone.
 
 The files are corpus_passage.py's: `DOCS_<slice>.bin` the documents' bytes one after another, `DOCS_<slice>.tsv` one row a piece
 (`document title_octets text_octets opens closes`; no title, every piece a whole document), `IDS_<slice>.txt` an identifier a document. It
@@ -49,18 +59,27 @@ class Draw:
         return int.from_bytes(out, "big")
 
 
-def operand(d, low, high):
-    length = low + d.take(1) % (high - low + 1)
+def weighted(d, weights):
+    """An index drawn with the given integer weights: a keyed draw of eight octets modulo their sum."""
+    u = d.take(8) % sum(weights)
+    for i, w in enumerate(weights):
+        if u < w:
+            return i
+        u -= w
+
+
+def operand(d, low, high, lengths=None):
+    length = low + (d.take(1) % (high - low + 1) if lengths is None else weighted(d, lengths))
     first = 0 if length == 1 else 10 ** (length - 1)
     return first + d.take(8) % (10**length - first)
 
 
-def tree(d, leaves):
+def tree(d, leaves, ops=None):
     """A binary tree of `leaves` operands: a leaf is None, an inner node (op, left, right)."""
     if leaves == 1:
         return None
     left = 1 + d.take(1) % (leaves - 1)
-    return (OPS[d.take(1) % 3], tree(d, left), tree(d, leaves - left))
+    return (OPS[d.take(1) % 3 if ops is None else weighted(d, ops)], tree(d, left, ops), tree(d, leaves - left, ops))
 
 
 def fill(node, numbers):
@@ -86,11 +105,20 @@ def written(node, root=True):
     return text if root else f"({text})"
 
 
-def record(key, k, low, high):
-    d = Draw(key, f"draw:{low}:{high}:{k}")
-    leaves = 2 + d.take(1) % 3
-    shape = tree(d, leaves)
-    numbers = [operand(d, low, high) for _ in range(leaves)]
+def record(key, k, low, high, law=None):
+    """The k-th record. `law` (lengths, operands, ops: integer weights) draws a weighed record under its own label, so the uniform draw's
+    records stay the bytes they were."""
+    if law is None:
+        d = Draw(key, f"draw:{low}:{high}:{k}")
+        leaves = 2 + d.take(1) % 3
+        shape = tree(d, leaves)
+        numbers = [operand(d, low, high) for _ in range(leaves)]
+    else:
+        lengths, operands, ops = law
+        d = Draw(key, f"draw:weighed:{low}:{high}:{k}")
+        leaves = 2 + weighted(d, operands)
+        shape = tree(d, leaves, ops)
+        numbers = [operand(d, low, high, lengths) for _ in range(leaves)]
     expr = fill(shape, numbers)
     return expr, f"{written(expr)} = {value(expr)}\n"
 
@@ -122,16 +150,33 @@ def main():
     p.add_argument("text_octets", type=int)
     p.add_argument("--records-a-document", type=int, default=32)
     p.add_argument("--held", type=int, default=128)
+    p.add_argument("--lengths", help="six weights, the operand lengths one to six")
+    p.add_argument("--operands", help="three weights, two to four operands")
+    p.add_argument("--ops", help="three weights: + - *")
+    p.add_argument("--octaves", type=int, help="documents of 1, 2, 4, ... records, as many octets an octave")
     a = p.parse_args()
+    weights = [a.lengths, a.operands, a.ops]
+    if any(weights) and not all(weights):
+        raise SystemExit("--lengths, --operands and --ops are given together")
+    law = tuple([int(w) for w in v.split(",")] for v in weights) if all(weights) else None
+    if law is not None and [len(w) for w in law] != [6, 3, 3]:
+        raise SystemExit("--lengths takes six weights, --operands three and --ops three")
     os.makedirs(a.out, exist_ok=True)
     held_met, k, total = [], 0, 0
     train_docs = []
 
+    by_octave = [0] * (a.octaves or 0)
+
     def training():
         nonlocal k, total
         lines = []
+        # [definition; agent-inferred, the lead, November 16] With `--octaves N` a document holds 1, 2, 4, ... or 2^(N-1) records, the next
+        # document's octave the one that holds the fewest octets so far (the lowest at a tie), so every octave holds as many octets and no
+        # count of records a document is privileged, as the cut draws a stretch's context and run by octaves.
+        size = 1 if a.octaves else a.records_a_document
+        octave = 0
         while total < a.text_octets:
-            expr, line = record(a.key, k, 1, 6)
+            expr, line = record(a.key, k, 1, 6, law)
             k += 1
             if held_mark(a.key, line):
                 if len(held_met) < a.held:
@@ -139,9 +184,13 @@ def main():
                 continue
             lines.append(line)
             total += len(line)
-            if len(lines) == a.records_a_document:
+            if len(lines) == size:
                 yield (f"arithmetic:{len(train_docs)}", "".join(lines))
                 train_docs.append(None)
+                if a.octaves:
+                    by_octave[octave] += sum(len(x) for x in lines)
+                    octave = min(range(a.octaves), key=lambda o: (by_octave[o], o))
+                    size = 1 << octave
                 lines = []
         if lines:
             yield (f"arithmetic:{len(train_docs)}", "".join(lines))
@@ -150,7 +199,7 @@ def main():
     octets, sha = write_slice(a.out, "DOCS", training())
     kh = k
     while len(held_met) < a.held:
-        expr, line = record(a.key, kh, 1, 6)
+        expr, line = record(a.key, kh, 1, 6, law)
         kh += 1
         if held_mark(a.key, line):
             held_met.append((expr, line))
@@ -169,6 +218,8 @@ def main():
         print(f"{role}\t{SLICE}\t-\t0\t{docs}\t{docs}\t{octets}\t{octets}\t{sha}")
     print(f"held\t{SLICE}\t-\t0\t{len(held)}\t{len(held)}\t{held_octets}\t{held_octets}\t{held_sha}")
     print(f"ARITHMETIC_WORLD records_drawn={k} training_documents={docs} training_octets={octets} held={len(held)} held_drawn={kh - k}")
+    if a.octaves:
+        print("ARITHMETIC_OCTAVES " + " ".join(f"{1 << o}:{n}" for o, n in enumerate(by_octave)))
 
 
 if __name__ == "__main__":

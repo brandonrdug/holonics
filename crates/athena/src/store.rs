@@ -1161,6 +1161,54 @@ pub fn join_store(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, the lead, November 16] `move-store STATE STATE_SHA STORE STORE_SHA SLICE OUT`: **a state's pass moved to a
+/// store whose slice `SLICE` was redrawn**: the state with its pass line's store set to `STORE` (`STORE_SHA` its `STORE.tsv`'s), the same
+/// slices in the same order, every other slice's place kept, and `SLICE` set to the start of the first piece that begins at or past the
+/// places the pass has taken of it (its cursor zero, its places taken kept), so the slice goes on at the share of its octets it stood at
+/// and ends its pass with the others; every other line of the state byte for byte (read back and checked, as [`next_pass`]). Refused where
+/// the store's slices of the role are not the state's. Why not [`join_store`]: it adds slices at a new pass and sets every slice back to
+/// its first piece; a slice redrawn at the same octets changes no quota, and its pieces' lengths alone change, so a kept cursor could
+/// stand past its piece's places. Where the pass has taken more than the redrawn slice holds, the slice stands at its end.
+pub fn move_store(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("move-store STATE STATE_SHA STORE STORE_SHA SLICE OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    let names = role_names(&counts, &before.role);
+    if before.slices.iter().map(|s| s.name.as_str()).ne(names.iter().copied()) {
+        return Err(format!("a store whose {} slices ({}) are not the state's", before.role, names.join(",")).into());
+    }
+    let at = before.slices.iter().position(|s| s.name == args[5]).ok_or_else(|| format!("a pass with no slice {}", args[5]))?;
+    let pieces = open_slice(store, &before.role, &args[5], &counts)?.pieces;
+    let taken = before.slices[at].taken;
+    let piece = pieces.partition_point(|p| p.offset < taken);
+    let mut pass = before.clone();
+    pass.store = args[4].clone();
+    (pass.slices[at].piece, pass.slices[at].cursor) = (piece as u64, 0);
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
+    std::fs::write(out, &written)?;
+    println!(
+        "MOVE_STORE stretches={} store_before={} store_after={} slice={} pieces={} taken={taken} piece_before={} cursor_before={} piece_after={piece} piece_offset={} lines={lines} differing_line={differing}",
+        before.stretches,
+        before.store,
+        args[4],
+        args[5],
+        pieces.len(),
+        before.slices[at].piece,
+        before.slices[at].cursor,
+        pieces.get(piece).map_or("end".to_string(), |p| p.offset.to_string())
+    );
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, the theory thread's Build B] `set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT`: **a world
 /// joined to a state's pass** ([`holonics_engine::field::PassWorld`]): the state with its pass line's world clause set (one stretch in
 /// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
