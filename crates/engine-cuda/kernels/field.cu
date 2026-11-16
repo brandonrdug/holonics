@@ -201,10 +201,15 @@ __device__ __forceinline__ uint64_t mag64(int64_t v) {
 
 __device__ uwide isqrt128(uwide n) {
     uwide res = 0;
-    uwide bit = (uwide)1 << 126;
-    while (bit > n) {
-        bit >>= 2;
+    // [realization; November 16, the next kernels' source counters] The first digit's place, the largest power of four not above `n`
+    // (at most `2^126`), read from `n`'s bit length. The loop it replaces stepped down from `2^126` two bits at a time, and it held
+    // 0.314 of `field_chart`'s instructions. It is the same place, so the root is the same.
+    if (n == 0) {
+        return 0;
     }
+    const uint64_t top = (uint64_t)(n >> 64);
+    const uint32_t len = top != 0 ? 128 - (uint32_t)__clzll((long long)top) : 64 - (uint32_t)__clzll((long long)(uint64_t)n);
+    uwide bit = (uwide)1 << ((len - 1) & ~1u);
     while (bit != 0) {
         if (n >= res + bit) {
             n -= res + bit;
