@@ -1,0 +1,18 @@
+Z_5: smallest |minor| over every square minor = 1.0000 (none vanish)
+Z_7: smallest |minor| over every square minor = 0.8678 (none vanish)
+Z_8: some 2x2..4x4 minor vanishes (min 0.0e+00)
+Z_16: delta_0 - delta_8 vanishes at every even mode: True
+Z_12 comb: supports 4 3 sum 7 < 13
+Z_97: all 96 nonzero modes faithful; Z_96: only 32 of 95 (phi(96)=32)
+dyadic Huffman: every output bit fair given its prefix (first 6 bits, all prefixes)
+non-dyadic (.4,.3,.2,.1) same code: first bit P(1) = 0.60
+frames: FP = tr S^2 and norms majorized by the spectrum, 200 random 4x9 frames
+S5: [a,b] of two 5-cycles is a 5-cycle; identity whenever either is the identity
+Enigma key 76.5 bits; redundancy 3.20 bits/letter; unicity ~ 24 letters; plugboard 150738274937250
+n=1024 k=10: log2 C(n,k) = 78.1 bits; k log2(n/k) = 66.8
+n=4096 k=32: log2 C(n,k) = 266.2 bits; k log2(n/k) = 224.0
+ban = log2 10 = 3.322 bits; deciban = 0.332
+participation: modes <= places on 200 frames; parallel places occupy one mode
+rho=0.2500 pool 64: founds at N = 42 places
+rho=0.0625 pool 64: founds at N = 212 places
+rho=0.0156 pool 4096: founds at N = 1522 places
