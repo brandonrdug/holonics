@@ -938,6 +938,59 @@ __device__ __forceinline__ wide crowd_carried_wide_ij(const FieldWords &w, uint3
     return skinless(w, h) ? v : rel(crowd_skin_ij(w, h, l, gi, level, right) * v, MOVE_BITS);
 }
 
+// [realization; November 16, the return's source counters] **A head's ring set, read once.** Whether the head carries a skin, its pace
+// index and its slot among the turned sets' decays are properties of the head alone (`h mod frames`, `h / frames`); the helpers above
+// divide by the frames at every call, and in the return's loops that is every term (a fifteenth of `field_contact_rows`' instructions).
+// The `_hs` forms read them from one `HeadSkin` formed where the head is fixed (a launch's or a row's): the same words, every bit kept.
+struct HeadSkin {
+    bool skinless;
+    int32_t paced;
+    uint32_t dbase, dstride;
+};
+
+__device__ __forceinline__ HeadSkin head_skin(const FieldWords &w, uint32_t h) {
+    HeadSkin s;
+    s.skinless = skinless(w, h);
+    s.paced = paced_index(w, h);
+    s.dbase = h % w.frames - w.still;
+    s.dstride = w.frames - w.still;
+    return s;
+}
+
+__device__ __forceinline__ bool paced_hs(const FieldWords &w, const HeadSkin &s, uint64_t g) {
+    return s.paced >= 0 && !w.plain[(uint64_t)s.paced * w.R + w.site_region[g]];
+}
+
+__device__ __forceinline__ wide decay_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint32_t d) {
+    return w.decay[(uint64_t)(l * s.dstride + s.dbase) * w.dreach + d];
+}
+
+__device__ __forceinline__ wide skin_ij_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint64_t gi, uint64_t entry, uint32_t gap) {
+    if (paced_hs(w, s, gi)) {
+        return pair_skin_word(w, s.paced, entry, l);
+    }
+    return decay_hs(w, s, l, gap);
+}
+
+__device__ __forceinline__ wide skin_raw_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint64_t gi, uint64_t entry, uint32_t gap) {
+    return s.skinless ? (wide)1 : skin_ij_hs(w, s, l, gi, entry, gap);
+}
+
+__device__ __forceinline__ wide crowd_skin_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint64_t gi, uint32_t level, bool right) {
+    if (paced_hs(w, s, gi)) {
+        return crowd_skin_word(w, s.paced, gi, level, right, l);
+    }
+    return decay_hs(w, s, l, (uint32_t)1 << level);
+}
+
+__device__ __forceinline__ wide crowd_skin_raw_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint64_t gi, uint32_t level, bool right) {
+    return s.skinless ? (wide)1 : crowd_skin_hs(w, s, l, gi, level, right);
+}
+
+__device__ __forceinline__ wide crowd_carried_wide_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint64_t gi, uint32_t level, bool right, wide v) {
+    return s.skinless ? v : rel(crowd_skin_hs(w, s, l, gi, level, right) * v, MOVE_BITS);
+}
+
 // The site an octave's crowd is skinned to from receiver `gi` (§16): the place `2^level` away on its side.
 __device__ __forceinline__ uint64_t octave_edge(uint64_t gi, uint32_t level, bool right) {
     return right ? gi + ((uint64_t)1 << level) : gi - ((uint64_t)1 << level);
@@ -2699,6 +2752,12 @@ __device__ __forceinline__ int64_t mul32(int64_t a, int64_t b) {
     return r;
 }
 
+// A value carried by a skin read from the head's ring set once (`carried_ij_at`): the skin (`D ≤ 2^30`) and the value as one 64 by 64
+// product, released by 30, the same integer as their 128 by 128 product.
+__device__ __forceinline__ wide carried_hs(const FieldWords &w, const HeadSkin &s, uint32_t l, uint64_t gi, uint64_t entry, uint32_t gap, int64_t v) {
+    return s.skinless ? (wide)v : rel(mul64_128((int64_t)skin_ij_hs(w, s, l, gi, entry, gap), v), MOVE_BITS);
+}
+
 // Whether a wide word is under `2^31` in magnitude, and the word on 32 bits.
 __device__ __forceinline__ bool narrow31(wide v, int32_t *out) {
     *out = (int32_t)(int64_t)v;
@@ -4397,6 +4456,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
     const uint32_t entry = lane % S, part = lane / S, m = entry % n;
     const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
     const bool still = skinless(w, h);
+    const HeadSkin hs = head_skin(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
@@ -4439,14 +4499,14 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             wide dp = 0;
             for (uint32_t x = 0; x < S; x++) {
                 // [P54 step 4] The carried value is under `2^63` (`D ≤ 2^30`): the covector's product is 64 by 64.
-                dp += mul64_128(dyi[x], (int64_t)carried_ij_at(w, h, x % n, g, srow + k, gap, vj[x]));
+                dp += mul64_128(dyi[x], (int64_t)carried_hs(w, hs, x % n, g, srow + k, gap, vj[x]));
             }
             return dp;
         };
         // The same for a head of eight modes, from vector rows: the source's sixteen values as eight 16-octet loads
         // and its skins as two (`pair_score8`).
         const bool eight = w.n == 8;
-        const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+        const bool still_h = hs.skinless, paced_h = paced_hs(w, hs, g);
         const auto pair_dp8 = [&](uint32_t j, uint32_t k, uint32_t gap) -> wide {
             const longlong2 *v2 = reinterpret_cast<const longlong2 *>(values + (uint64_t)j * S);
             uint32_t dec[8];
@@ -4456,7 +4516,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                     dec[l] = 1;
                 }
             } else if (paced_h) {
-                pair_skins8(w, paced_index(w, h), srow + k, dec);
+                pair_skins8(w, hs.paced, srow + k, dec);
             } else {
                 const uint4 *d4 = reinterpret_cast<const uint4 *>(w.decay_t + ((uint64_t)h * w.dreach + gap) * 8);
                 const uint4 d0 = d4[0], d1 = d4[1];
@@ -4506,7 +4566,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
             wide sum = 0;
             for (uint32_t x = 0; x < S; x++) {
-                sum += (wide)dyi[x] * crowd_carried_wide_ij(w, h, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
+                sum += (wide)dyi[x] * crowd_carried_wide_hs(w, hs, x % n, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + x] - svp[(uint64_t)lo * S + x]);
             }
             const wide dpc = div_nearest_by(sum, cdiv[warp][lane]);
             dpcs[warp][lane] = dpc;
@@ -4552,7 +4612,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                     const uint32_t jx = stj[warp][jj];
                     if (jx != UINT32_MAX) {
                         // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
-                        sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), words[(uint64_t)jx * S + entry]));
+                        sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), words[(uint64_t)jx * S + entry]));
                     }
                 }
             }
@@ -4596,7 +4656,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                     continue;
                 }
                 const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                const wide d = crowd_skin_raw(w, h, m, g, lv, lo > i);
+                const wide d = crowd_skin_raw_hs(w, hs, m, g, lv, lo > i);
                 const wide dsk = dsks[warp][jj];
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
                 // [P54 step 4] Where the crowd's summed word is under `2^31`: `D W`, `D ŵ_i` and `D²` on 32 bits (under `2^61`), their
@@ -4619,7 +4679,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                 add_wide(w.cw + (first + r + lo) * S + entry, pw);
                 add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
                 // [P54 step 4] The carried covector `release(D δỹ, 30)` on 64 bits (`carry_d`, under `2^63`), its share's product unsigned by signed.
-                const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_ij(w, h, m, g, lv, lo > i), dyi[entry]);
+                const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_hs(w, hs, m, g, lv, lo > i), dyi[entry]);
                 const wide pv = div_nearest_by(mulu64_128(w.ce[hg * w.slots + jj], cy), cdiv[warp][jj]);
                 add_wide(w.cv + (first + r + lo) * S + entry, pv);
                 add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
@@ -4653,6 +4713,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
     const bool still = skinless(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
     const bool paced_c = !still && paced_index(w, h) >= 0;
+    const HeadSkin hs = head_skin(w, h);
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint32_t r = w.site_region[g];
         const uint32_t j = w.site_pos[g];
@@ -4681,13 +4742,18 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 const uint32_t gap = j > i ? j - i : i - j;
                 // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
                 // whose pace is not plain there, the one row that reads the store.
-                const uint64_t sentry = paced_c && paced_at(w, h, first + i) ? support_row(w, r, i) + support_entry(w, h, r, first, members, off, i, j) : 0;
-                const wide dec = skin_raw_at(w, h, m, first + i, sentry, gap);
+                const uint64_t sentry = paced_c && paced_hs(w, hs, first + i) ? support_row(w, r, i) + support_entry(w, h, r, first, members, off, i, j) : 0;
+                const wide dec = skin_raw_hs(w, hs, m, first + i, sentry, gap);
                 // The key's bracket released by the skin's bits once (the probe's grain), then by the covector,
                 // against the receiver's probe (§16.19).
                 const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
-                sk += (wide)dsc[at] * rel(((dec * (wide)probe_i) << g0) - dec * dec * (wide)words[(uint64_t)j * S + entry], g0);
-                sv += (wide)e[at] * carried_ij_at(w, h, m, first + i, sentry, gap, dyr[(uint64_t)i * S + entry]);
+                // [realization; November 16] The bracket on the words P54's bounds give: the skin (`D ≤ 2^30`) and the probe and the word
+                // (32 bits each, `field_unit`) as one 32 by 32 product each, `D²` (under `2^61`) times the word as one 64 by 64, the
+                // bracket under `2^92` released to under `2^63`, and the covector times it one 64 by 64; the share times the carried
+                // value (under `2^63`) is its magnitude's product. The same integers as the 128 by 128 products they replace.
+                const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - mul64_128(mul32((int64_t)dec, (int64_t)dec), words[(uint64_t)j * S + entry]), g0);
+                sk += mul64_128(dsc[at], (int64_t)bracket);
+                sv += mulu64_128(e[at], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dyr[(uint64_t)i * S + entry]));
             }
         }
         sk = parts_sum(part < parts ? sk : 0, S, parts);
