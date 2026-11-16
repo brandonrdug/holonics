@@ -140,3 +140,27 @@ was read. read-cavity on the host, 400 places a slice, lap 76's mean, fresh and 
 G-C5. With nothing deposited, each of the five older slices and the word problems' held slice rises by between 0.01 and 0.15 nats a place
 under the carried lock (one-place masks), and the held arithmetic falls by at least 0.02. A row sharpened fourfold by its last tick with
 temperatures deposited for fresh rows pays on prose until the deposit lowers them.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+Short sums as the staircase's lower step: guesses fixed at 23:07:37 UTC (from date -u), before the read
+
+State read: lap 76's mean, fresh forward. Reading: read-tension on 8,000 sums of operands of one and two digits (key short-2026-11-16),
+every value digit opened alone. Where an expression holds two to four operand digits there is little of a row for the column to be lost in.
+What the logs print: on operands of one to six digits the answer's place holds each aligned digit at 0.10 to 0.15 and nothing is located;
+with a lock closed on the column five located products carry the sum (closed75.txt). The arithmetic slice draws each operand's length
+evenly from one to six, so a sum of two one-digit operands is about one record in 320 and a sum of operands up to two digits one in 80.
+
+The theory's pick (agent-inferred). The staircase's lower step is a record whose alignment is given, as a crib gives a menu its loops: on
+short sums the operands already arrive, so the junction's legs are locatable there today, and a junction that carries the sum gives the
+lock on longer records the first-order ask it lacks.
+
+G-S1 (presence). On short sums, where both operands hold the column, the answer's place gives each aligned operand digit at 0.25 or more
+(the pair chart, best tick), against 0.10 to 0.15 on operands of one to six digits.
+G-S2 (locatable). Ten products located on half the records remove at least 0.10 of what the linear chart leaves on the other half at the
+units place, at some tick.
+G-S3 (the code). The short sums' units digits code within 0.15 of ln 10: the law is not held, only reachable.
+
+What each outcome decides. S2 held: the triads' legs are founded from the short sums' tension (found-crossing, the return at zero, every
+face bit for bit) at the next lap gap, and the arithmetic slice is redrawn with short records in weight so that the return charges.
+S1 held and S2 missed: the legs' chart does not carry the product even where the operands arrive; the leg on the heads' currents is read.
+S1 missed: even two digits are lost in the row, and the lock's address is the only step.
