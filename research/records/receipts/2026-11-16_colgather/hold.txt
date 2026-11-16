@@ -1,0 +1,117 @@
+# hold: lock taken 14:22:02 from lap65/STATE.3000
+# card empty 14:28:32
+# gate begun 14:28:32
+# parity: exit 0 14:31:58
+# repro: exit 0 14:32:10
+# read: exit 0 14:35:52
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# next_bin written 14:35:52
+# ncu src ctl exit 0
+LINES ctl kernel: 551103119 warp instructions executed, 123708 stall samples
+LINES ctl lines 4931-4999 (the kernel body): instr 0.497 samples 0.591
+LINES ctl functions outside the body, by samples:
+LINES ctl   receiver_at                        instr  0.088 samples  0.142
+LINES ctl   mulu64_128                         instr  0.060 samples  0.053
+LINES ctl   mul64_128                          instr  0.060 samples  0.032
+LINES ctl   rel                                instr  0.060 samples  0.030
+LINES ctl   mag64                              instr  0.021 samples  0.029
+LINES ctl   mulu64                             instr  0.046 samples  0.024
+LINES ctl   pair_skin_word                     instr  0.053 samples  0.017
+LINES ctl   decay_hs                           instr  0.032 samples  0.013
+LINES ctl   skipped_row                        instr  0.007 samples  0.009
+LINES ctl   skin_raw_hs                        instr  0.014 samples  0.008
+LINES ctl   keyed_site                         instr  0.001 samples  0.008
+LINES ctl   paced_hs                           instr  0.007 samples  0.006
+LINES ctl   head_skin                          instr  0.006 samples  0.006
+LINES ctl   skin_ij_hs                         instr  0.018 samples  0.006
+LINES ctl   skin_word                          instr  0.007 samples  0.004
+LINES ctl   (other files)                      instr  0.005 samples  0.004
+LINES ctl   definite_site                      instr  0.000 samples  0.003
+LINES ctl   carried_hs                         instr  0.004 samples  0.003
+LINES ctl   parts_sum                          instr  0.003 samples  0.003
+LINES ctl   still_head                         instr  0.003 samples  0.002
+LINES ctl   span_parts                         instr  0.003 samples  0.002
+# ncu src nw exit 0
+LINES nw kernel: 472290527 warp instructions executed, 98479 stall samples
+LINES nw lines 4931-5027 (the kernel body): instr 0.441 samples 0.587
+LINES nw functions outside the body, by samples:
+LINES nw   mul64_128                          instr  0.144 samples  0.120
+LINES nw   rel                                instr  0.069 samples  0.046
+LINES nw   mulu64                             instr  0.054 samples  0.036
+LINES nw   mulu64_128                         instr  0.066 samples  0.033
+LINES nw   receiver_at                        instr  0.010 samples  0.024
+LINES nw   pair_skin_word                     instr  0.062 samples  0.023
+LINES nw   decay_hs                           instr  0.033 samples  0.022
+LINES nw   skin_raw_hs                        instr  0.017 samples  0.014
+LINES nw   keyed_site                         instr  0.002 samples  0.012
+LINES nw   mag64                              instr  0.025 samples  0.012
+LINES nw   paced_hs                           instr  0.009 samples  0.011
+LINES nw   skin_ij_hs                         instr  0.022 samples  0.009
+LINES nw   head_skin                          instr  0.010 samples  0.008
+LINES nw   (other files)                      instr  0.007 samples  0.007
+LINES nw   skin_word                          instr  0.008 samples  0.006
+LINES nw   carried_hs                         instr  0.005 samples  0.005
+LINES nw   definite_site                      instr  0.000 samples  0.005
+LINES nw   parts_sum                          instr  0.003 samples  0.004
+LINES nw   skipped_row                        instr  0.002 samples  0.004
+LINES nw   still_head                         instr  0.003 samples  0.003
+LINES nw   span_parts                         instr  0.003 samples  0.003
+# ncu ctl exit 0
+# ncu nw exit 0
+# profile ctl exit 0
+# profile nw exit 0
+# run1 ctl exit 0 elapsed_ms=12171
+# run2 ctl exit 0 elapsed_ms=12165
+# run3 nw exit 0 elapsed_ms=11999
+# run4 nw exit 0 elapsed_ms=12026
+# run5 ctl exit 0 elapsed_ms=12165
+# run6 ctl exit 0 elapsed_ms=12165
+# run7 nw exit 0 elapsed_ms=12007
+# run8 nw exit 0 elapsed_ms=11991
+# run9 ctl exit 0 elapsed_ms=12159
+# hold: released 14:38:49
+RATE_TIMING t1-ctl sections=24 equal_to_first=24 mean_ms=494.2
+RATE_TIMING t2-ctl sections=24 equal_to_first=24 mean_ms=493.9
+RATE_TIMING t3-nw sections=24 equal_to_first=24 mean_ms=487.1
+RATE_TIMING t4-nw sections=24 equal_to_first=24 mean_ms=487.5
+RATE_TIMING t5-ctl sections=24 equal_to_first=24 mean_ms=494.2
+RATE_TIMING t6-ctl sections=24 equal_to_first=24 mean_ms=494.3
+RATE_TIMING t7-nw sections=24 equal_to_first=24 mean_ms=487.4
+RATE_TIMING t8-nw sections=24 equal_to_first=24 mean_ms=486.5
+RATE_TIMING t9-ctl sections=24 equal_to_first=24 mean_ms=494.2
+PROFILE_TOTAL ctl_ms_a_section=478.8 nw_ms_a_section=473.4
+PROFILE_PAIR entry=field_contact_rows ctl_ms_a_section=58.00 nw_ms_a_section=58.08 launches=2304/2304
+PROFILE_PAIR entry=field_contact_columns ctl_ms_a_section=47.79 nw_ms_a_section=41.75 launches=2304/2304
+PROFILE_PAIR entry=field_contact_l4 ctl_ms_a_section=38.92 nw_ms_a_section=39.08 launches=383/383
+PROFILE_PAIR entry=field_pace_skin_back ctl_ms_a_section=30.38 nw_ms_a_section=30.46 launches=1152/1152
+PROFILE_PAIR entry=field_transposed ctl_ms_a_section=22.29 nw_ms_a_section=22.21 launches=5184/5184
+PROFILE_PAIR entry=field_clock_fill ctl_ms_a_section=20.08 nw_ms_a_section=20.08 launches=1008/1008
+PROFILE_PAIR entry=field_skin_fill ctl_ms_a_section=17.75 nw_ms_a_section=18.00 launches=1152/1152
+PROFILE_PAIR entry=field_exposure ctl_ms_a_section=17.38 nw_ms_a_section=17.54 launches=576/576
+PROFILE_PAIR entry=field_affine_tiled_x32 ctl_ms_a_section=15.96 nw_ms_a_section=15.96 launches=4368/4368
+PROFILE_PAIR entry=field_outer_x32 ctl_ms_a_section=13.58 nw_ms_a_section=13.71 launches=3648/3648
+PROFILE_PAIR entry=field_chart ctl_ms_a_section=13.62 nw_ms_a_section=13.46 launches=1776/1776
+PROFILE_PAIR entry=field_moment_skinned_all ctl_ms_a_section=7.92 nw_ms_a_section=8.04 launches=384/384
+NCU_ROWS build=ctl entry=field_contact_columns us=725.0 inst=267645776 issue_pct=56.5 warps_pct=39.9 regs=72 sectors_a_request=3.32 l1_pct=14.4 l2_pct=15.1 dram_pct=16.4 shared_wavefronts=323037 bank_conflicts=158 long_scoreboard=2.64 wait=1.85 not_selected=1.25 math_pipe_throttle=1.12
+NCU_ROWS build=ctl entry=field_contact_columns us=600.6 inst=213161523 issue_pct=55.9 warps_pct=40.7 regs=72 sectors_a_request=3.33 l1_pct=14.7 l2_pct=12.3 dram_pct=15.9 shared_wavefronts=323034 bank_conflicts=233 long_scoreboard=2.57 wait=1.85 not_selected=1.29 math_pipe_throttle=1.14
+NCU_ROWS build=ctl entry=field_contact_columns us=994.8 inst=306573538 issue_pct=49.6 warps_pct=41.2 regs=72 sectors_a_request=1.99 l1_pct=23.0 l2_pct=9.0 dram_pct=15.9 shared_wavefronts=1087550 bank_conflicts=126 long_scoreboard=4.58 wait=2.37 selected=1.00 not_selected=0.84
+NCU_ROWS build=ctl entry=field_contact_columns us=1170.0 inst=371838849 issue_pct=49.4 warps_pct=41.2 regs=72 sectors_a_request=1.92 l1_pct=24.1 l2_pct=10.7 dram_pct=15.5 shared_wavefronts=1204358 bank_conflicts=113 long_scoreboard=4.71 wait=2.45 selected=1.00 not_selected=0.78
+NCU_ROWS build=ctl entry=field_contact_columns us=776.5 inst=272459943 issue_pct=56.5 warps_pct=42.9 regs=72 sectors_a_request=3.32 l1_pct=14.9 l2_pct=14.4 dram_pct=15.9 shared_wavefronts=322663 bank_conflicts=146 long_scoreboard=2.64 wait=1.85 not_selected=1.27 math_pipe_throttle=1.12
+NCU_ROWS build=ctl entry=field_contact_columns us=623.1 inst=220847790 issue_pct=55.5 warps_pct=41.0 regs=72 sectors_a_request=3.33 l1_pct=14.9 l2_pct=12.6 dram_pct=15.7 shared_wavefronts=323401 bank_conflicts=241 long_scoreboard=2.55 wait=1.85 not_selected=1.29 math_pipe_throttle=1.14
+NCU_ROWS build=ctl entry=field_contact_columns us=998.0 inst=314121008 issue_pct=49.4 warps_pct=40.9 regs=72 sectors_a_request=1.99 l1_pct=23.0 l2_pct=9.4 dram_pct=16.0 shared_wavefronts=1102387 bank_conflicts=117 long_scoreboard=4.61 wait=2.38 selected=1.00 not_selected=0.83
+NCU_ROWS build=ctl entry=field_contact_columns us=1248.8 inst=401544881 issue_pct=48.7 warps_pct=40.5 regs=72 sectors_a_request=1.90 l1_pct=24.1 l2_pct=10.6 dram_pct=15.7 shared_wavefronts=1258456 bank_conflicts=96 long_scoreboard=4.65 wait=2.48 selected=1.00 not_selected=0.77
+NCU_ROWS build=nw entry=field_contact_columns us=588.4 inst=220893402 issue_pct=57.7 warps_pct=41.2 regs=72 sectors_a_request=6.67 l1_pct=16.9 l2_pct=23.0 dram_pct=21.0 shared_wavefronts=4151440 bank_conflicts=0 long_scoreboard=2.52 wait=1.67 not_selected=1.40 math_pipe_throttle=1.29
+NCU_ROWS build=nw entry=field_contact_columns us=515.4 inst=176802194 issue_pct=57.2 warps_pct=43.2 regs=72 sectors_a_request=6.56 l1_pct=16.1 l2_pct=18.5 dram_pct=18.0 shared_wavefronts=3349150 bank_conflicts=0 long_scoreboard=1.98 wait=1.67 not_selected=1.43 math_pipe_throttle=1.30
+NCU_ROWS build=nw entry=field_contact_columns us=925.8 inst=263966610 issue_pct=48.0 warps_pct=43.3 regs=72 sectors_a_request=2.34 l1_pct=24.5 l2_pct=11.3 dram_pct=20.9 shared_wavefronts=3792863 bank_conflicts=0 long_scoreboard=4.99 wait=2.30 selected=1.00 not_selected=0.80
+NCU_ROWS build=nw entry=field_contact_columns us=1086.3 inst=323698155 issue_pct=46.6 warps_pct=41.1 regs=72 sectors_a_request=2.21 l1_pct=25.3 l2_pct=13.3 dram_pct=16.9 shared_wavefronts=4311442 bank_conflicts=0 long_scoreboard=5.22 wait=2.40 selected=1.00 not_selected=0.74
+NCU_ROWS build=nw entry=field_contact_columns us=617.2 inst=224718490 issue_pct=57.7 warps_pct=40.7 regs=72 sectors_a_request=6.69 l1_pct=17.0 l2_pct=22.6 dram_pct=20.1 shared_wavefronts=4218704 bank_conflicts=0 long_scoreboard=2.47 wait=1.67 not_selected=1.36 math_pipe_throttle=1.28
+NCU_ROWS build=nw entry=field_contact_columns us=493.7 inst=183001899 issue_pct=56.9 warps_pct=40.3 regs=72 sectors_a_request=6.58 l1_pct=16.0 l2_pct=20.3 dram_pct=18.7 shared_wavefronts=3461097 bank_conflicts=0 long_scoreboard=1.98 wait=1.67 not_selected=1.41 math_pipe_throttle=1.30
+NCU_ROWS build=nw entry=field_contact_columns us=908.4 inst=270770847 issue_pct=47.3 warps_pct=41.1 regs=72 sectors_a_request=2.32 l1_pct=24.6 l2_pct=12.1 dram_pct=17.0 shared_wavefronts=3859150 bank_conflicts=0 long_scoreboard=5.01 wait=2.31 selected=1.00 not_selected=0.80
+NCU_ROWS build=nw entry=field_contact_columns us=1128.6 inst=350631639 issue_pct=46.1 warps_pct=40.6 regs=72 sectors_a_request=2.17 l1_pct=25.3 l2_pct=13.9 dram_pct=17.2 shared_wavefronts=4555722 bank_conflicts=0 long_scoreboard=5.19 wait=2.43 selected=1.00 not_selected=0.73
+RUN_EXIT 0 2026-11-16T14:38:49Z

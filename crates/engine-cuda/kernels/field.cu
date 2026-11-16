@@ -4936,6 +4936,14 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
 // span's entries (a lane an entry and a part of the receivers), `p_ij` and `δs_ij` read at the region
 // block's dense address `[i][j]`.
 extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_columns(FieldWords w, uint32_t h, const int64_t *dyh, const int64_t *ds, int64_t *dq, int64_t *dv) {
+    // [realization; November 16, the columns' source counters] A chunk of 32 receivers is located and its column entries `δs_ij` and
+    // `p_ij` read at once, a lane a receiver, into the warp's shared rows, before the lanes over the span read them. Before, each pass of
+    // the loop waited on a chain, the receiver's index and then its two column entries, and the line that adds `δs_ij` times the bracket
+    // held 0.233 of the kernel's stall samples. Each part keeps its receivers and their order, so the sums are the same.
+    __shared__ uint32_t cgi[CONTACT_ROWS][32];
+    __shared__ int64_t cgd[CONTACT_ROWS][32];
+    __shared__ uint64_t cge[CONTACT_ROWS][32];
+    const uint32_t warp = threadIdx.x >> 5;
     const uint32_t lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const uint32_t parts = span_parts(S);
@@ -4962,13 +4970,32 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *dyr = dyh + ((uint64_t)h * w.T + first) * S;
         wide sk = 0, sv = 0;
-        if (part < parts) {
-            for (uint32_t k = part; k < K; k += parts) {
-                const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
-                if (i == UINT32_MAX || skipped_row(w, first + i)) {
+        for (uint32_t k0 = 0; k0 < K; k0 += 32) {
+            {
+                const uint32_t k = k0 + lane;
+                uint32_t iv = UINT32_MAX;
+                int64_t dsv = 0;
+                uint64_t ev = 0;
+                if (k < K) {
+                    const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
+                    if (i != UINT32_MAX && !skipped_row(w, first + i)) {
+                        const uint64_t at = (uint64_t)i * sites;
+                        iv = i;
+                        dsv = dsc[at];
+                        ev = e[at];
+                    }
+                }
+                cgi[warp][lane] = iv;
+                cgd[warp][lane] = dsv;
+                cge[warp][lane] = ev;
+            }
+            __syncwarp();
+            const uint32_t kn = K - k0 < 32 ? K - k0 : 32;
+            for (uint32_t kk = part; part < parts && kk < kn; kk += parts) {
+                const uint32_t i = cgi[warp][kk];
+                if (i == UINT32_MAX) {
                     continue;
                 }
-                const uint64_t at = (uint64_t)i * sites;
                 const uint32_t gap = j > i ? j - i : i - j;
                 // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
                 // whose pace is not plain there, the one row that reads the store.
@@ -4982,9 +5009,10 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 // bracket under `2^92` released to under `2^63`, and the covector times it one 64 by 64; the share times the carried
                 // value (under `2^63`) is its magnitude's product. The same integers as the 128 by 128 products they replace.
                 const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - mul64_128(mul32((int64_t)dec, (int64_t)dec), words[(uint64_t)j * S + entry]), g0);
-                sk += mul64_128(dsc[at], (int64_t)bracket);
-                sv += mulu64_128(e[at], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dyr[(uint64_t)i * S + entry]));
+                sk += mul64_128(cgd[warp][kk], (int64_t)bracket);
+                sv += mulu64_128(cge[warp][kk], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dyr[(uint64_t)i * S + entry]));
             }
+            __syncwarp();
         }
         sk = parts_sum(part < parts ? sk : 0, S, parts);
         sv = parts_sum(part < parts ? sv : 0, S, parts);

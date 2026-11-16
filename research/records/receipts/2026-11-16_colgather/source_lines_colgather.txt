@@ -1,0 +1,61 @@
+kernel: 472290527 warp instructions executed, 98479 stall samples
+lines 4931-5027 (the kernel body): instr 0.441 samples 0.587
+functions outside the body, by samples:
+  mul64_128                          instr  0.144 samples  0.120
+  rel                                instr  0.069 samples  0.046
+  mulu64                             instr  0.054 samples  0.036
+  mulu64_128                         instr  0.066 samples  0.033
+  receiver_at                        instr  0.010 samples  0.024
+  pair_skin_word                     instr  0.062 samples  0.023
+  decay_hs                           instr  0.033 samples  0.022
+  skin_raw_hs                        instr  0.017 samples  0.014
+  keyed_site                         instr  0.002 samples  0.012
+  mag64                              instr  0.025 samples  0.012
+  paced_hs                           instr  0.009 samples  0.011
+  skin_ij_hs                         instr  0.022 samples  0.009
+  head_skin                          instr  0.010 samples  0.008
+  (other files)                      instr  0.007 samples  0.007
+  skin_word                          instr  0.008 samples  0.006
+  carried_hs                         instr  0.005 samples  0.005
+  definite_site                      instr  0.000 samples  0.005
+  parts_sum                          instr  0.003 samples  0.004
+  skipped_row                        instr  0.002 samples  0.004
+  still_head                         instr  0.003 samples  0.003
+  span_parts                         instr  0.003 samples  0.003
+  receiver_len                       instr  0.001 samples  0.003
+  depth_head                         instr  0.002 samples  0.001
+  fit64                              instr  0.002 samples  0.001
+  shfl_wide                          instr  0.001 samples  0.000
+  skinless                           instr  0.001 samples  0.000
+  paced_index                        instr  0.001 samples  0.000
+the body's lines, by samples (top 30):
+   5011 instr  0.161 samples  0.255  const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - mul64_128(mul32((int
+   5013 instr  0.079 samples  0.061  sv += mulu64_128(cge[warp][kk], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dyr[
+   4995 instr  0.017 samples  0.057  const uint32_t i = cgi[warp][kk];
+   5006 instr  0.041 samples  0.036  const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
+   4989 instr  0.000 samples  0.035  cgd[warp][lane] = dsv;
+   4994 instr  0.018 samples  0.024  for (uint32_t kk = part; part < parts && kk < kn; kk += parts) {
+   4993 instr  0.009 samples  0.019  const uint32_t kn = K - k0 < 32 ? K - k0 : 32;
+   5022 instr  0.002 samples  0.012  dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + g0), w.status);
+   5002 instr  0.012 samples  0.010  const uint64_t sentry = paced_c && paced_hs(w, hs, first + i) ? support_row(w, r, i) + sup
+   4996 instr  0.004 samples  0.009  if (i == UINT32_MAX) {
+   5012 instr  0.029 samples  0.008  sk += mul64_128(cgd[warp][kk], (int64_t)bracket);
+   4981 instr  0.005 samples  0.007  if (i != UINT32_MAX && !skipped_row(w, first + i)) {
+   4999 instr  0.016 samples  0.006  const uint32_t gap = j > i ? j - i : i - j;
+   5003 instr  0.008 samples  0.006  const wide dec = skin_raw_hs(w, hs, m, first + i, sentry, gap);
+   5020 instr  0.002 samples  0.004  const uint32_t mc = h * n + lane % n;
+   4967 instr  0.002 samples  0.004  const uint32_t K = keyed_site(w, g) ? receiver_len(off, poff, w.ostart[r + 1] - w.ostart[r
+   4950 instr  0.003 samples  0.003  const uint32_t entry = lane % S, part = lane / S, m = entry % n;
+   4973 instr  0.002 samples  0.003  for (uint32_t k0 = 0; k0 < K; k0 += 32) {
+   4984 instr  0.003 samples  0.002  dsv = dsc[at];
+   4955 instr  0.002 samples  0.002  for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (u
+   4947 instr  0.001 samples  0.002  const uint32_t lane = threadIdx.x & 31;
+   4979 instr  0.002 samples  0.002  if (k < K) {
+   4953 instr  0.000 samples  0.001  const bool paced_c = !still && paced_index(w, h) >= 0;
+   4969 instr  0.001 samples  0.001  const int64_t *dsc = ds + w.region_eoff[r] + j;
+   4959 instr  0.001 samples  0.001  const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+   4968 instr  0.002 samples  0.001  const uint64_t *e = w.e + (uint64_t)h * w.E + w.region_eoff[r] + j;
+   5015 instr  0.000 samples  0.001  __syncwarp();
+   4980 instr  0.001 samples  0.001  const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
+   4985 instr  0.002 samples  0.001  ev = e[at];
+   4962 instr  0.001 samples  0.001  const uint32_t c = w.cls[(uint64_t)h * w.T + g];
