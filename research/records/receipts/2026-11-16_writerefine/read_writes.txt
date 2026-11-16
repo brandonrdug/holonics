@@ -1,0 +1,21 @@
+rw69r0 WRITES_SLICE slice=code written_places=1024 write_one=2475814 reference_one=620559 write_open=5018026 reference_open=5056143
+rw69r0 WRITES_SLICE slice=web written_places=1024 write_one=2811275 reference_one=995275 write_open=4962229 reference_open=5228695
+rw69r0 WRITES_SLICE slice=science written_places=1024 write_one=2971271 reference_one=1797008 write_open=5012559 reference_open=5230246
+rw69r0 WRITES_SLICE slice=books written_places=1024 write_one=2494094 reference_one=1607328 write_open=4675163 reference_open=4800385
+rw69r0 WRITES_SLICE slice=wikidata written_places=1024 write_one=3089973 reference_one=702846 write_open=5251572 reference_open=4941805
+rw69r0 WRITES_DONE problems=20 regions=10280 batches=175 reads=175 returns=0 pairs=9101069645 batches=175 peak_store=3906179960 ms=20949
+rw69r0 MEASURE lap=rw69r0 rc=0 wall_s=21.3 peak_rss_kib=305992
+rw69r4 WRITES_SLICE slice=code written_places=1024 write_one=2089218 reference_one=620559 write_open=4991251 reference_open=5056143
+rw69r4 WRITES_SLICE slice=web written_places=1024 write_one=2712957 reference_one=995275 write_open=5139095 reference_open=5228695
+rw69r4 WRITES_SLICE slice=science written_places=1024 write_one=2872065 reference_one=1797008 write_open=5142910 reference_open=5230246
+rw69r4 WRITES_SLICE slice=books written_places=1024 write_one=1887301 reference_one=1607328 write_open=4688657 reference_open=4800385
+rw69r4 WRITES_SLICE slice=wikidata written_places=1024 write_one=2926253 reference_one=702846 write_open=5337795 reference_open=4941805
+rw69r4 WRITES_DONE problems=20 regions=10280 batches=175 reads=175 returns=0 pairs=9040188088 batches=175 peak_store=3906179960 ms=20653
+rw69r4 MEASURE lap=rw69r4 rc=0 wall_s=21.0 peak_rss_kib=308592
+rw69r16 WRITES_SLICE slice=code written_places=1024 write_one=1369542 reference_one=620559 write_open=5078553 reference_open=5056143
+rw69r16 WRITES_SLICE slice=web written_places=1024 write_one=2680522 reference_one=995275 write_open=5249496 reference_open=5228695
+rw69r16 WRITES_SLICE slice=science written_places=1024 write_one=2474928 reference_one=1797008 write_open=5349926 reference_open=5230246
+rw69r16 WRITES_SLICE slice=books written_places=1024 write_one=1969923 reference_one=1607328 write_open=4870321 reference_open=4800385
+rw69r16 WRITES_SLICE slice=wikidata written_places=1024 write_one=2406569 reference_one=702846 write_open=5468830 reference_open=4941805
+rw69r16 WRITES_DONE problems=20 regions=10280 batches=175 reads=175 returns=0 pairs=9032675334 batches=175 peak_store=3906179960 ms=21743
+rw69r16 MEASURE lap=rw69r16 rc=0 wall_s=22.1 peak_rss_kib=301360

@@ -296,7 +296,8 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("write-store") => athena::store::write(args, realization),
         Some("read-prompt") => athena::store::read_prompt(args, realization),
         Some("read-forms") => athena::store::read_forms(args, realization),
-        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, found-lane, found-loud, next-pass, join-store or own-states".into()),
+        Some("read-writes") => athena::store::read_writes(args, realization),
+        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, read-prompt, read-writes, read-forms, found-lane, found-loud, next-pass, join-store or own-states".into()),
     }
 }
 
