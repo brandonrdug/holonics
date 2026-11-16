@@ -1755,6 +1755,26 @@ fn a_cut_room_reads_and_returns_the_whole_rooms_bits() {
     }
 }
 
+/// [definition; theory, November 16 20:39Z] **A draft is redrawn once, place by place, the rest of its run kept**: the refine takes as many
+/// reads as the longest draft has places, keeps every place past each draft and the void out of each draft, keyed by its seed (the same
+/// seed the same bits), and a draft of no places is the run as written.
+#[test]
+fn a_draft_is_redrawn_once_place_by_place() {
+    let field = shaped(1);
+    let questions: [&[usize]; 2] = [&[1, 4, 0, 2], &[3, 3]];
+    let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
+    let written = field.sample_runs(&problems, 9, 0, 0, 13, 0, true, false, None, false, &mut Host, &mut |_, _| true, &mut |_| {}).unwrap();
+    let (drafts, void) = ([5usize, 0], 0usize);
+    let mut counted = RegionsCounted { regions: Vec::new() };
+    let refined = field.refine_drafts(&questions, &written, &drafts, void, 17, &mut counted).unwrap();
+    assert_eq!(counted.regions.len(), 5, "one read a place of the longest draft, the draft of none read never");
+    assert_eq!(refined[1], written[1], "a draft of no places is its run");
+    assert_eq!(refined[0][5..], written[0][5..], "the run past the draft stands");
+    assert!(refined[0][..5].iter().all(|&c| c != void), "a draft place is drawn a letter");
+    assert_eq!(field.refine_drafts(&questions, &written, &drafts, void, 17, &mut Host).unwrap(), refined, "the same seed, the same bits");
+    assert!(field.refine_drafts(&questions, &written, &[10, 0], void, 17, &mut Host).is_err(), "a draft past its run is refused");
+}
+
 /// [definition; §16.47] **A read releases a run**: with no bound the runs are the one place a read's writer, the same bits;
 /// with a bound of a bit the writer reads no more often, and its answers keep the closing law at every read, no letter at a
 /// later octave while an earlier one is open, and a boundary that moves at most one place a read in the refine passes.
@@ -3851,7 +3871,11 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     assert_eq!(StorePass::from_line(&both.to_line()).unwrap(), both);
     // [the theory thread's Build B, November 16] A world's clause stands last only where set; with `own` or without, it reads back as itself,
     // and a world on a slice the pass lacks, a zero count, or a slice named `world` is refused.
-    let world = StorePass { world: Some(PassWorld { slice: "books".into(), every: 8, records: 3, run: 48 }), ..pass.clone() };
+    let world = StorePass { world: Some(PassWorld { slice: "books".into(), every: 8, records: 3, run: 48, refine: 0 }), ..pass.clone() };
+    let refined = StorePass { world: Some(PassWorld { refine: 1, ..world.world.clone().unwrap() }), ..pass.clone() };
+    assert_eq!(refined.to_line(), format!("{} world books 8 3 48 1", pass.to_line()));
+    assert_eq!(StorePass::from_line(&refined.to_line()).unwrap(), refined);
+    assert!(StorePass::from_line(&format!("{} world books 8 3 48 0", pass.to_line())).is_err(), "a refine word of zero is no clause");
     assert_eq!(world.to_line(), format!("{} world books 8 3 48", pass.to_line()));
     assert_eq!(StorePass::from_line(&world.to_line()).unwrap(), world);
     let world_own = StorePass { own: true, ..world.clone() };

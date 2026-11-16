@@ -423,6 +423,76 @@ impl Constitution {
         Ok(faces)
     }
 
+    /// [definition; theory, November 16 20:39Z, Build B's refine] **An act's draft redrawn once, place by place, its predicted reaction known.**
+    /// Problem `k` is the prompt `prompts[k]` and the run `written[k]` the release wrote after it; its first `drafts[k]` places are the draft. The
+    /// draft's places are opened (silent, as every open place is) and the rest of the run, the field's own predicted reaction, stays written.
+    /// At each read every problem with a draft place left redraws one: the place whose written symbol carries the most news under the read's
+    /// faces (the earlier at equal news), which is the landmark order on places' news (atlas `code.site-isolation-landmark`), never a face's top.
+    /// It is drawn as the release draws a letter, by a keyed uniform against the face's masses with the void left out, and stands resolved for
+    /// the next read. Each draft place is redrawn once, so a problem takes as many reads as its draft has places. Returns each run with its
+    /// draft redrawn. Why: an open place is silent, so the predicted reaction can pull on the draft only once the draft is reopened with the
+    /// reaction written; the pull comes from the passage alone (the field drafts in the world's form, and a draft redrawn before a value
+    /// draws toward forms that precede a value), with no goal from outside and no selection.
+    #[allow(clippy::too_many_arguments)]
+    pub fn refine_drafts(&self, prompts: &[&[usize]], written: &[Vec<usize>], drafts: &[usize], void: usize, seed: u64, realization: &mut dyn Realization) -> Result<Vec<Vec<usize>>> {
+        if prompts.len() != written.len() || prompts.len() != drafts.len() || drafts.iter().zip(written).any(|(&d, w)| d > w.len()) || void >= self.declaration.alphabet {
+            return refuse("drafts to refine that are not one a problem within its run, or a void outside the alphabet");
+        }
+        let mix = |counter: u64| -> u64 {
+            let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+            z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+            z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+            z ^ (z >> 31)
+        };
+        let starts: Vec<usize> = prompts.iter().map(|q| q.len()).collect();
+        let mut classes: Vec<Vec<usize>> = prompts.iter().zip(written).map(|(q, w)| q.iter().copied().chain(w.iter().copied()).collect()).collect();
+        let mut open: Vec<Vec<bool>> = classes.iter().map(|c| vec![false; c.len()]).collect();
+        let mut left: Vec<Vec<usize>> = (0..prompts.len()).map(|k| (starts[k]..starts[k] + drafts[k]).collect()).collect();
+        let held: Vec<Vec<usize>> = classes.clone();
+        for (k, places) in left.iter().enumerate() {
+            for &t in places {
+                open[k][t] = true;
+                classes[k][t] = void;
+            }
+        }
+        let mut read = 0u64;
+        loop {
+            let active: Vec<usize> = (0..prompts.len()).filter(|&k| !left[k].is_empty()).collect();
+            if active.is_empty() {
+                break;
+            }
+            let faces = self.read_active(&starts, &classes, &open, &active, void, true, realization)?;
+            for &k in &active {
+                let mut pick: Option<(usize, i64)> = None;
+                for (i, &t) in left[k].iter().enumerate() {
+                    let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a draft's open place without a face"))?;
+                    let news = face.code(held[k][t]);
+                    if pick.is_none_or(|(_, best)| news > best) {
+                        pick = Some((i, news));
+                    }
+                }
+                let Some((i, _)) = pick else { continue };
+                let t = left[k].remove(i);
+                let face = faces[k][t].as_ref().ok_or(TowerError::Refused("a draft's open place without a face"))?;
+                let u = ((mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (read << 56) ^ 0x1D) as u128) << 64) | mix(((k as u64) << 40) ^ ((t as u64) << 8) ^ (read << 56) ^ 0x1E) as u128;
+                let letters = face.total - face.masses[void];
+                classes[k][t] = if letters == 0 {
+                    held[k][t]
+                } else {
+                    let u = u % letters;
+                    let mut acc = 0u128;
+                    (0..face.masses.len()).filter(|&c| c != void).find(|&c| {
+                        acc += face.masses[c];
+                        acc > u
+                    }).unwrap_or(held[k][t])
+                };
+                open[k][t] = false;
+            }
+            read += 1;
+        }
+        Ok(classes.iter().zip(&starts).map(|(c, &q)| c[q..].to_vec()).collect())
+    }
+
     /// [measurement; agent-inferred, November 5, §16.47] **The release, read as it writes** ([`Constitution::sample_realized`],
     /// draw for draw): `observe` is shown every read the release makes (each sweep's and each refine step's), with every
     /// problem's classes, open places and faces as that read meets them, before its draws, and once more at the end with no

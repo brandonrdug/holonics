@@ -61,6 +61,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-junction") {
         return athena::store::read_junction(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("write-acts") {
+        return athena::store::write_acts(&rest[1..], &mut holonics_engine::realization::Host);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-forms") {
         return athena::store::write_forms(&rest[1..], &mut holonics_engine::realization::Host);
     }
@@ -306,6 +309,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("read-prompt") => athena::store::read_prompt(args, realization),
         Some("read-forms") => athena::store::read_forms(args, realization),
         Some("write-forms") => athena::store::write_forms(args, realization),
+        Some("write-acts") => athena::store::write_acts(args, realization),
         Some("read-writes") => athena::store::read_writes(args, realization),
         _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, read-prompt, read-writes, read-forms, write-forms, found-lane, found-loud, next-pass, join-store or own-states".into()),
     }

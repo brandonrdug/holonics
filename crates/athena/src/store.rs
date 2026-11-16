@@ -41,6 +41,18 @@ fn acts_here(seed: u64, d: u64, every: u64) -> bool {
     (z ^ (z >> 31)) % every == 0
 }
 
+/// [definition; theory, November 16 20:39Z] A draft's own places, the ones its refine redraws: its expression before its first `= `, or the
+/// places before its first line feed, or every place it wrote. The `= `, the predicted value and what follows stay written.
+fn draft_places(draft: &[u8]) -> usize {
+    let eq = draft.windows(2).position(|w| w == b"= ");
+    let feed = draft.iter().position(|&b| b == b'\n');
+    match (eq, feed) {
+        (Some(e), f) if f.is_none_or(|f| e < f) => e,
+        (_, Some(f)) => f,
+        _ => draft.len(),
+    }
+}
+
 /// [definition; Build B] An act's prompt from its stretch's bytes: the last `records` whole lines of the stretch (each ending with its line
 /// feed), or none where the stretch holds no whole line.
 fn world_prompt(bytes: &[u8], records: usize) -> Option<Vec<u8>> {
@@ -372,7 +384,13 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let run = w.run as usize;
             let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _)| (p.as_slice(), run)).collect();
             let act_seed = seed ^ cut.pass.stretches.wrapping_mul(0x9E37_79B9_7F4A_7C15);
-            let drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+            let mut drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+            if w.refine > 0 {
+                // [definition; theory, November 16 20:39Z] Each draft redrawn once, place by place in landmark order, its predicted reaction known.
+                let lens: Vec<usize> = drafts.iter().map(|d| draft_places(&codec.decode(&d[..d.iter().position(|&c| c == codec.void()).unwrap_or(d.len())]))).collect();
+                let prompts: Vec<&[usize]> = acts.iter().map(|(p, _)| p.as_slice()).collect();
+                drafts = learner.field.refine_drafts(&prompts, &drafts, &lens, codec.void(), act_seed ^ 0x7265_6669_6E65, realization).map_err(|e| e.to_string())?;
+            }
             let (mut read_ok, mut draft_places, mut world_places) = (0usize, 0usize, 0usize);
             let first = regions.len();
             for ((prompt, _), draft) in acts.iter().zip(&drafts) {
@@ -1148,8 +1166,8 @@ pub fn join_store(args: &[String]) -> Result<()> {
 /// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
 /// other line byte for byte (read back and checked, as [`next_pass`]). Refused where the pass holds no slice `SLICE`.
 pub fn set_world(args: &[String]) -> Result<()> {
-    if args.len() != 8 {
-        return Err("set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT".into());
+    if args.len() != 8 && args.len() != 9 {
+        return Err("set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT [REFINE]".into());
     }
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let out = Path::new(&args[7]);
@@ -1161,7 +1179,11 @@ pub fn set_world(args: &[String]) -> Result<()> {
     if !before.slices.iter().any(|s| s.name == args[3]) {
         return Err(format!("a pass with no slice {}", args[3]).into());
     }
-    let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: positive(&args[5])? as u64, run: positive(&args[6])? as u64 };
+    let refine = match args.get(8) { Some(r) => r.parse::<u64>().map_err(|_| "REFINE is zero or one")?, None => 0 };
+    if refine > 1 {
+        return Err("REFINE is zero or one".into());
+    }
+    let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: positive(&args[5])? as u64, run: positive(&args[6])? as u64, refine };
     let pass = StorePass { world: Some(world), ..before.clone() };
     let line = pass.to_line();
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
@@ -1816,6 +1838,52 @@ pub fn read_junction(args: &[String]) -> Result<()> {
         println!("JUNCTION_HEAD lengths={lengths} tick={t} head={h} digits={} aligned_share={am} other_share={om} ratio_milli={} first_share={a} first_milli={} second_share={b} second_milli={}", e[0], milli(am), milli(a), milli(b));
     }
     println!("JUNCTION_DONE ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; theory, November 16 20:39Z, G-B3a] `write-acts UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN REFINE SEED STATE
+/// STATE_SHA`: **the trainer's acts, off the line**: each row's prompt of a forms table (`forms_table.py acts`) released `RUN` places as the
+/// trainer's act path releases them, its draft redrawn once where `REFINE` is one ([`holonics_engine::field::Constitution::refine_drafts`]),
+/// and the world's reaction (`crate::world::react`). Prints each act's draft and reaction (`ACT`; the world is synthetic) and the share of
+/// drafts the world read (`ACTS_DONE`). `SEED` keys the release as the trainer's count of stretches does. A writing: the state is read,
+/// never written. On the card (`train`) or the host's threads (`host`).
+pub fn write_acts(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    if args.len() != 14 {
+        return Err("write-acts UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN REFINE SEED STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("write-acts")?;
+    let units = units_of(&args[1], &args[2])?;
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let (run, refine, count) = (positive(&args[9])?, args[10].parse::<u64>().map_err(|_| "REFINE is zero or one")?, args[11].parse::<u64>().map_err(|_| "SEED is a count")?);
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[12], &args[13], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mut prompts: Vec<Vec<usize>> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [_, prompt, _] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        prompts.push(codec.encode(prompt.replace("\\n", "\n").as_bytes())?);
+    }
+    let act_seed = seed ^ count.wrapping_mul(0x9E37_79B9_7F4A_7C15);
+    let release: Vec<(&[usize], usize)> = prompts.iter().map(|p| (p.as_slice(), run)).collect();
+    let mut drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+    if refine > 0 {
+        let lens: Vec<usize> = drafts.iter().map(|d| draft_places(&codec.decode(&d[..d.iter().position(|&c| c == codec.void()).unwrap_or(d.len())]))).collect();
+        let views: Vec<&[usize]> = prompts.iter().map(Vec::as_slice).collect();
+        drafts = learner.field.refine_drafts(&views, &drafts, &lens, codec.void(), act_seed ^ 0x7265_6669_6E65, realization).map_err(|e| e.to_string())?;
+    }
+    let escape = |b: &[u8]| String::from_utf8_lossy(b).replace('\n', "\\n");
+    let mut read_ok = 0usize;
+    for (k, d) in drafts.iter().enumerate() {
+        let written = codec.decode(&d[..d.iter().position(|&c| c == codec.void()).unwrap_or(d.len())]);
+        let reaction = crate::world::react(&written);
+        let ok = reaction.appended != b"?\n" && reaction.appended != b"\n?\n";
+        read_ok += usize::from(ok);
+        println!("ACT k={k} read={} draft={} world={}", u8::from(ok), escape(&written[..reaction.read.min(written.len())]), escape(&reaction.appended));
+    }
+    println!("ACTS_DONE acts={} read={read_ok} refine={refine} run={run} {} ms={}", drafts.len(), counters_text(realization), started.elapsed().as_millis());
     Ok(())
 }
 
