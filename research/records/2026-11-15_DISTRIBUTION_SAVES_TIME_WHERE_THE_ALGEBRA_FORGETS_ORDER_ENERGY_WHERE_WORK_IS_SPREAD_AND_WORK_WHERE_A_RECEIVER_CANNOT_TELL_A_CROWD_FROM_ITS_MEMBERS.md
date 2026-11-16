@@ -662,7 +662,7 @@ UTC); `agent-inferred` for the reading of them.
   along consecutive outputs of one row), so the read is the prefetch alone, as it was in the affine maps (0.81 and 0.84
   over all launches). It serves `field_outer_x32`'s outer launches (about 21 ms a section) and `field_outer_x64` (6.0).
   The read after lap 51 prints every kernel's issue activity before this build is read, and the guess takes the share
-  that the lesson above says it takes. Guess, fixed at 05:01 UTC (`agent-inferred`), against #877, the card alone, on the
+  that the lesson above says it takes. Guess, fixed at 05:00 UTC (`agent-inferred`), against #877, the card alone, on the
   premise that each kernel keeps its blocks a multiprocessor (void if one is lost): gate 3 equal; for each kernel whose
   outer-tile launches issue under half the peak with the long scoreboard their largest stall, 0.76 to 0.88 a launch over
   all those launches; for one that issues at half the peak or more, 0.90 to 1.00, since its loads' wait is already
