@@ -668,3 +668,34 @@ UTC); `agent-inferred` for the reading of them.
   all those launches; for one that issues at half the peak or more, 0.90 to 1.00, since its loads' wait is already
   hidden by other warps; a section 0.988 to 0.997 of control in a balanced hold, which resolves only if the control
   spreads under 2 ms, the kernels being scored on the profile otherwise.
+- **The section read by what binds each kernel** (the build thread, relayed 05:34 UTC; one section of training on #877
+  under Nsight Compute, every launch serialized, 2,909 launches, 555.7 ms; each kernel's issue activity and warps active
+  weighted by launch time; the table `research/records/receipts/2026-11-16_issue/issue_by_kernel.txt` lands with the
+  outer build). `field_outer_x32` issues at 18.9% of peak with the long scoreboard its stall, so the 05:00 guess takes
+  its first branch, 0.76 to 0.88 a launch; `field_outer_x64` is not in the table and its branch is fixed when its issue
+  prints. The kernels of 10 ms or more fall into four classes, each the record's own term (`agent-inferred`):
+  - **Latency at an occupancy the registers hold**, 240.1 ms (0.432): the contact's rows, columns and four limbs, the
+    transposed map, the skin's fill, the outer map and the affine map, at 25 to 52% of warps active and 19 to 52% issue.
+    At 124 to 128 registers a lane a multiprocessor holds 16 of its 48 warps, so a wait is hidden only by work inside a
+    warp. Where those registers are a wide accumulator's limbs, carry-save (#866) made the limbs independent until the
+    row's release, so they can lie across lanes, a limb a lane released once by a shuffle at the row's end: the same
+    integer, fewer registers a lane and more warps, the precision law's narrow terms dispersed over many slow lanes.
+  - **Issue**, 106.9 ms (0.192): the clock's fill, the tied face's return, the chart, the exposure, and the skin's return
+    at the border (54% issue at 33% warps). Time follows the instructions: the width checks hold 0.15 to 0.20 of the
+    exposure's and the blank return's instructions and can be read once a crowd, and the relative transport 0.33 to
+    0.36 of the tied face's and the pair scan's returns.
+  - **Full warps with issue idle**, 44.5 ms (0.080): the three blank passes at 96 to 97% of warps and 26 to 51% issue,
+    each body holding 0.93 to 0.98 of its samples. If their memory throughput reads near its peak they are bound by
+    bytes moved, and the lever is the width a stored term needs, or the pass folded into its producer.
+  - **Few threads**, 34.1 ms (0.061): the two pair scans at 7% of warps, one thread a region and circle along a chain
+    with a section at each step, so their order is the law's (§3: span is shortened only where the algebra forgets
+    order), and the spread and the sums. For 24 ms a section 93% of the card waits. A kernel whose reads and writes
+    commute with a scan's runs beside it on a second stream with the same bits (the hardware law), so the scans' share
+    of the section is whatever no other kernel can share with them, read from their producers and consumers.
+- **The blank return's checked product, and its guess** (the build thread, relayed 05:35 UTC, in the outer build's hold).
+  `field_blank_dy` checked its product of a wide `dz` by the 32-bit weight `E` with a count of bits; it now forms it 64 by
+  128 from the wide word's halves with no count, the same product and the same refusal. The kernel stands at the
+  lesson's border (50.9% issue at 96% of warps, its body 0.93 of its samples), so time follows its instructions only in
+  part. Guess, fixed at 05:37 UTC (`agent-inferred`), on the profile against #877: its instructions 0.82 to 0.92 (the
+  width checks' 0.20, of which the count is the larger part), its time 0.88 to 0.98 a launch over all its launches,
+  toward 1 if the blank's bytes bind; with it the composed section reads 0.986 to 0.997 in place of 0.988 to 0.997.
