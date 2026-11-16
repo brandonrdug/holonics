@@ -894,6 +894,6 @@ UTC); `agent-inferred` for the reading of them.
   the profile times a launch between two host synchronizations (`launch_grid` in `hnn/resident.rs`), so each launch's
   entry carries about 30 µs of the ruler's own (the spread's 96 launches read 75 µs a launch against 44 of kernel), which
   the timed path, queued on one stream, does not pay; an entry of many short launches is scored by the counters a launch
-  and by the hold, never by the profile's sum. Guess, fixed at 09:31 UTC, for the spread at 640 threads (two blocks a
+  and by the hold, never by the profile's sum. Guess, fixed at 09:29 UTC, for the spread at 640 threads (two blocks a
   multiprocessor, one wave of 20 chunks): gate 3 equal; 0.40 to 0.55 of #892's time a launch by Nsight Compute, and 0.60
   to 0.85 of #896's; about 1 to 2 ms a section, under a hold's resolution.
