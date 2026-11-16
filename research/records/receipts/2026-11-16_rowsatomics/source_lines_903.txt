@@ -1,0 +1,84 @@
+kernel: 676596219 warp instructions executed, 222453 stall samples
+lines 4604-4887 (the kernel body): instr 0.485 samples 0.517
+functions outside the body, by samples:
+  add_wide                           instr  0.013 samples  0.089
+  crowd_base_narrow                  instr  0.063 samples  0.061
+  support_at                         instr  0.016 samples  0.044
+  mul64_128                          instr  0.043 samples  0.038
+  divide_word                        instr  0.084 samples  0.035
+  (other files)                      instr  0.028 samples  0.033
+  row_prepare                        instr  0.007 samples  0.019
+  divisor_of                         instr  0.023 samples  0.014
+  mulu64_128                         instr  0.008 samples  0.011
+  wide_bits                          instr  0.015 samples  0.011
+  div_nearest                        instr  0.019 samples  0.011
+  div_nearest_by                     instr  0.028 samples  0.010
+  mag64                              instr  0.002 samples  0.009
+  temper_of                          instr  0.015 samples  0.009
+  divide_by                          instr  0.023 samples  0.008
+  rel                                instr  0.023 samples  0.008
+  mul_fits                           instr  0.013 samples  0.008
+  skin_raw_hs                        instr  0.009 samples  0.006
+  narrow31                           instr  0.017 samples  0.006
+  bit_length                         instr  0.009 samples  0.006
+  skin_word                          instr  0.007 samples  0.004
+  pair_skin_word                     instr  0.007 samples  0.004
+  warp_sum                           instr  0.004 samples  0.004
+  mulu64                             instr  0.005 samples  0.004
+  add_fits                           instr  0.006 samples  0.003
+  definite_site                      instr  0.000 samples  0.003
+  carry_d                            instr  0.000 samples  0.002
+  skin_ij_hs                         instr  0.003 samples  0.002
+  crowd_slots                        instr  0.003 samples  0.002
+  paced_hs                           instr  0.001 samples  0.002
+  span_parts                         instr  0.002 samples  0.002
+  crowd_at                           instr  0.002 samples  0.002
+  shfl_wide                          instr  0.001 samples  0.001
+  lock_of                            instr  0.000 samples  0.001
+  still_head                         instr  0.002 samples  0.001
+  crowd_skin_hs                      instr  0.000 samples  0.001
+  parts_sum                          instr  0.001 samples  0.001
+  support_row                        instr  0.001 samples  0.001
+  crowd_skin_raw_hs                  instr  0.001 samples  0.001
+  fit64                              instr  0.001 samples  0.001
+  crowd_carried_wide_hs              instr  0.001 samples  0.001
+  paced_index                        instr  0.000 samples  0.001
+  temper_chain                       instr  0.001 samples  0.001
+  crowd_skin_raw                     instr  0.002 samples  0.000
+  skipped_row                        instr  0.001 samples  0.000
+  depth_head                         instr  0.001 samples  0.000
+  paced_at                           instr  0.000 samples  0.000
+  crowd_skin_ij                      instr  0.000 samples  0.000
+  head_skin                          instr  0.000 samples  0.000
+  skinless                           instr  0.001 samples  0.000
+the body's lines, by samples (top 30):
+   4699 instr  0.043 samples  0.089  dp += mul64_128(dyi[2 * q], still_h ? t.x : carry_d(dec[(2 * q) & 7], t.x));
+   4794 instr  0.102 samples  0.059  sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][j
+   4738 instr  0.047 samples  0.046  sum += (wide)dyi[x] * crowd_carried_wide_hs(w, hs, x % n, g, lv, lo > i, svp[(uint64_t)(hi
+   4790 instr  0.012 samples  0.027  for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+   4746 instr  0.013 samples  0.026  const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * rel(p * (dpk - mean)
+   4792 instr  0.007 samples  0.026  if (jx != UINT32_MAX) {
+   4700 instr  0.047 samples  0.021  dp += mul64_128(dyi[2 * q + 1], still_h ? t.y : carry_d(dec[(2 * q + 1) & 7], t.y));
+   4760 instr  0.004 samples  0.021  const wide dzj = compare((wide)e[j], dpr[j]);
+   4782 instr  0.012 samples  0.018  for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+   4784 instr  0.010 samples  0.018  if (jx != UINT32_MAX) {
+   4841 instr  0.006 samples  0.016  const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
+   4791 instr  0.007 samples  0.014  const uint32_t jx = stj[warp][jj];
+   4863 instr  0.003 samples  0.010  const wide pv = div_nearest_by(mulu64_128(w.ce[hg * w.slots + jj], cy), cdiv[warp][jj]);
+   4783 instr  0.012 samples  0.008  const uint32_t jx = stj[warp][jj];
+   4785 instr  0.022 samples  0.008  __pipeline_memcpy_async(&ws[(jj - half) * S + entry], &words[(uint64_t)jx * S + entry], 4)
+   4742 instr  0.001 samples  0.007  weighted += (wide)w.ce[hg * w.slots + lane] * dpc;
+   4761 instr  0.007 samples  0.005  tacc += rel(dzj * (wide)sbr[j], FACE_BITS);
+   4709 instr  0.001 samples  0.005  count = scp[hi_ + 1] - scp[lo];
+   4645 instr  0.000 samples  0.005  const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+   4807 instr  0.002 samples  0.005  tacc += rel(dzc * (wide)cs, FACE_BITS);
+   4631 instr  0.005 samples  0.004  for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (u
+   4849 instr  0.008 samples  0.003  bracket = rel((mul64_128(mul32((int64_t)d, w.pq[((uint64_t)h * w.T + g) * S + entry]), (in
+   4735 instr  0.002 samples  0.003  const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
+   4646 instr  0.000 samples  0.002  const uint32_t *members = w.members + (uint64_t)h * w.T + first;
+   4834 instr  0.001 samples  0.002  const uint64_t count = cnts[warp][jj];
+   4757 instr  0.001 samples  0.002  const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+   4835 instr  0.002 samples  0.002  if (count == 0) {
+   4840 instr  0.006 samples  0.002  const wide dsk = dsks[warp][jj];
+   4833 instr  0.002 samples  0.002  for (uint32_t jj = part; jj < nslots; jj += parts) {
+   4871 instr  0.001 samples  0.002  const uint64_t slot = g * w.M2 + (lane < n ? mc : w.M + mc);

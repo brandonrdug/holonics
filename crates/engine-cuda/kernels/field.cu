@@ -184,6 +184,19 @@ __device__ __forceinline__ void add_wide(wide *at, wide v) {
     atomicAdd(word + 1, hi + (old + lo < old ? 1ull : 0ull));
 }
 
+// [realization; November 16, the rows' source counters] The same step in its two halves, so that several low words stand in flight before
+// the first high word waits on its carry: `add_wide_low` adds the low word and returns the word it found, `add_wide_high` adds the high word
+// with that carry. Each term's carry is read from its own low word's add, so any order and any interleaving leave the same 128 bits.
+__device__ __forceinline__ unsigned long long add_wide_low(wide *at, wide v) {
+    return atomicAdd((unsigned long long *)at, (unsigned long long)(uint64_t)v);
+}
+
+__device__ __forceinline__ void add_wide_high(wide *at, wide v, unsigned long long old) {
+    const unsigned long long lo = (unsigned long long)(uint64_t)v;
+    const unsigned long long hi = (unsigned long long)(uint64_t)((uwide)v >> 64);
+    atomicAdd((unsigned long long *)at + 1, hi + (old + lo < old ? 1ull : 0ull));
+}
+
 __device__ __forceinline__ int64_t fit64(wide v, uint32_t *st) {
     if (v > (wide)INT64_MAX || v < (wide)INT64_MIN) {
         atomicOr(st, REFUSED_WORD64);
@@ -4856,13 +4869,19 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                     atomicOr(w.status, REFUSED_KEY);
                 }
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
-                add_wide(w.cw + (first + r + lo) * S + entry, pw);
-                add_wide(w.cw + (first + r + hi_ + 1) * S + entry, -pw);
                 // [P54 step 4] The carried covector `release(D δỹ, 30)` on 64 bits (`carry_d`, under `2^63`), its share's product unsigned by signed.
                 const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_hs(w, hs, m, g, lv, lo > i), dyi[entry]);
                 const wide pv = div_nearest_by(mulu64_128(w.ce[hg * w.slots + jj], cy), cdiv[warp][jj]);
-                add_wide(w.cv + (first + r + lo) * S + entry, pv);
-                add_wide(w.cv + (first + r + hi_ + 1) * S + entry, -pv);
+                // [realization; November 16] The crowd's four ring sums into the difference arrays at its two ends: the four low words first,
+                // so their round trips stand together (the returned low word held 0.077 of the rows' stall samples when each waited alone).
+                wide *const w0 = w.cw + (first + r + lo) * S + entry, *const w1 = w.cw + (first + r + hi_ + 1) * S + entry;
+                wide *const v0 = w.cv + (first + r + lo) * S + entry, *const v1 = w.cv + (first + r + hi_ + 1) * S + entry;
+                const unsigned long long ow0 = add_wide_low(w0, pw), ow1 = add_wide_low(w1, -pw);
+                const unsigned long long ov0 = add_wide_low(v0, pv), ov1 = add_wide_low(v1, -pv);
+                add_wide_high(w0, pw, ow0);
+                add_wide_high(w1, -pw, ow1);
+                add_wide_high(v0, pv, ov0);
+                add_wide_high(v1, -pv, ov1);
             }
         }
         sum = parts_sum(active ? sum : 0, S, parts);
