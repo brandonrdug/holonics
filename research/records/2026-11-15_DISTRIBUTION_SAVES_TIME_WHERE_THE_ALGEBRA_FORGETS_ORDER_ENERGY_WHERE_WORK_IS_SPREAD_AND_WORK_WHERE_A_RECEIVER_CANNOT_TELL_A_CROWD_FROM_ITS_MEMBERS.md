@@ -864,3 +864,16 @@ UTC); `agent-inferred` for the reading of them.
   arithmetic. The guess of 08:46 was fixed on the mechanism the fix answers (one tile a thread) and carries to it as
   fixed; the build's arithmetic puts both at its top. A lesson (`agent-inferred`): a guess's premise that a log can
   print is read before the guess, here the profile's grid, which had printed 102,400.
+- **The spread and the sums in chunks, and the waves they take** (the build thread, relayed 08:50 UTC;
+  `claude/region-scan`, gate 1 passed; its guesses fixed at 08:52 UTC: gate 3 equal, the spread 0.30 to 0.55 of its time
+  a section, the sums 0.25 to 0.50, the blank walks the 08:46 guess, a section 0.973 to 0.983). The spread runs a block
+  of 1,024 a region (32 chunks of the span's 32), at 48 registers one block a multiprocessor, so the 96 regions take two
+  waves, the second on 16 of the 80 multiprocessors; the sums run a block of 1,024 a head and region (65 entries by 15
+  chunks) at 64 registers, one a multiprocessor, 192 blocks in three waves, the third on 32. A wave of a kernel whose
+  blocks are regions costs a region's walk whether it is full or not (`agent-inferred`): the spread at 1,024 a block
+  lasts two walks of 32 chunks, as long as one walk of 16 (a block of 512, two a multiprocessor, one wave), and a block
+  of 672 (21 chunks; two a multiprocessor at 48 registers, 64,512 of 65,536) lasts one walk of 21, about 0.76 of either
+  where the walk dominates. A lead, no guess until built: size a region's block so that its blocks fill one wave at the
+  registers it takes, here 96 regions on 160 slots; for the sums the same reading gives three waves of 14 site steps
+  against one wave of 35 at blocks of 390 (6 chunks, three a multiprocessor), little to choose, since the third wave is
+  the cost of 192 blocks a multiprocessor cannot hold three of at 1,024.
