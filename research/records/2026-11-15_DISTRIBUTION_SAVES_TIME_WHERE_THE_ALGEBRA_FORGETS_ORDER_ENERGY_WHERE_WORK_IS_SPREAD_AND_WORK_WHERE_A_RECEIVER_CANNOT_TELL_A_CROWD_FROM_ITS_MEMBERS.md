@@ -998,3 +998,24 @@ UTC); `agent-inferred` for the reading of them.
   one, a section 0.985 to 0.995; the lesser at five, 0.88 to 0.98; either at four, no hold, and the two-partial lead of
   10:52 is built instead. A lead, no guess until read: the crowd's divisor is formed by a 128-by-128 division in
   software, twice a crowd a row, whose share of the rows' instructions the source counters read first.
+- **The rows' fission, read and kept out of the line** (the build thread, relayed 11:39 and 12:16 UTC; #905, receipts
+  `research/records/receipts/2026-11-16_rowsfission/`). The compiler's premise was read first: the first pass (the
+  pairs' and crowds' covectors and the row's mean) at 80 registers and six blocks without spill; the second (the
+  comparison, `δs`, the probe role and the crowds' returns) at 128 and four, its static shared memory alone capping it at
+  four. The build held it on a reason my rule of 11:33 had not weighed (the second pass had lost the one launch's spill),
+  and my guess for that configuration was fixed at 11:39 UTC: the pair 0.87 to 0.97 of the one launch, a section 0.985
+  to 0.996, on a premise that the first pass held about 0.4 of the time. Gate 3 equal. By launch, matched to #903's one:
+  the pair 1.01 to 1.09; the first pass 0.27 to 0.29 of the one launch at 43% of warps active, its long-scoreboard wait
+  5.5 to 8.4 cycles an issue against 2.9 to 3.6 in the one launch; the second 0.73 to 0.82, without spill at the same four
+  blocks and no faster; the pair issued 3 to 4% more instructions. The hold read 1.012 of the control, resolved (pairs of
+  5.2 to 6.0 ms against the control's spread of 1.5): both guesses missed on the side of more cost, and so did my
+  premise. The lesson (`agent-inferred`) is Little's law: what a resource delivers is what stands in flight over its
+  wait, so where more resident warps only lengthen each one's wait, the resource is at its throughput and occupancy buys
+  nothing; the test before an occupancy lever is whether the waits an issue grow in proportion to the warps. The spread's
+  co-resident blocks of 10:13 showed the same shape at the issue. The first pass's loads are the candidate resource: a
+  pair's covector reads its source's whole row of sixteen values on one lane, so a warp's 16-octet load touches 32 rows,
+  32 wavefronts of the first-level cache and sectors half used. A lead, no guess until its premise reads (the cache's
+  throughput against its peak and its sectors a request on that pass): four lanes a source, a quarter of the row each,
+  eight rows read whole an instruction, about 8 wavefronts against 32 and half the sectors, at about 1.6 times the pass's
+  instructions; an integer sum, so no bit moves. Guess, fixed at 12:17 UTC, for the two partials of a pair's covector on
+  the one launch: gate 3 equal; the rows 0.96 to 0.995 a launch; a section 0.996 to 1.000, likely unresolved.
