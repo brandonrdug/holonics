@@ -430,28 +430,53 @@ impl Constitution {
     /// are founded last, and a growth after them is not built. Returns the grown field and, for each entry, the old entry it carries (`None` for
     /// the triads' own).
     pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.scale.is_some() {
+        self.with_triads_at(triads, keys, false)
+    }
+
+    /// [definition; theory, November 16 19:10Z, the crossing triad] **The field with crossing triads**: [`Constitution::with_triads`] with the triads'
+    /// legs at the site ([`Declaration::crossing`]); the same families, founded the same way (`W_T` at zero, so every face is the field's before the
+    /// growth, bit for bit).
+    pub fn with_crossings(&self, triads: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        self.with_triads_at(triads, keys, true)
+    }
+
+    /// The triads' growth, their legs on the strand or at the site. [definition; November 16] The triads' families stand after the carry circles'
+    /// and before the opening's lift, the junction, the mark and the loudness, so on a field that has any of those the growth inserts the triads'
+    /// families where they stand and every later family moves by their length, each entry with its value (the map `from` says which old entry
+    /// each new one copies). Why: the line of November 16 holds the opening's lift, the junction, the mark and the loudness, which were grown after
+    /// the triads' place, and the November 13 refusal of a field with the opening's lift (`agent-inferred` then: "triads grown after it would move
+    /// it") is answered by moving it.
+    fn with_triads_at(&self, triads: usize, keys: &[u8], crossing: bool) -> Result<(Self, Vec<Option<usize>>)> {
+        // [November 16] A tower keeps its level as it stands with the strand's triads refused there as before; crossing triads grow on the fine
+        // field alone, as the junction's return and the mark do, and the level's entries follow the fine field's in the material
+        // (`agent-inferred`: the crossing reads the fine field's gathered currents, which the level does not hold).
+        if self.scale.is_some() && !crossing {
             return refuse("a tower's levels take triads level by level, not through the fine field alone");
         }
         if self.declaration.triads > 0 {
             return refuse("a field that already has triads");
         }
-        if self.declaration.opening {
-            // [agent-inferred, November 13] The opening's lift stands after the triads' families; triads grown after it would move it.
-            return refuse("a field with the opening's lift takes triads before it");
-        }
         if triads == 0 {
             return refuse("a growth by no triads");
         }
-        let d = Declaration { triads, ..self.declaration };
+        let d = Declaration { triads, crossing, ..self.declaration };
         d.admit()?;
         let layout = Loci::new(&d);
         let dw = d.width;
-        let mut theta = self.theta.clone();
-        debug_assert_eq!(theta.len(), layout.triad);
-        theta.resize(layout.len, 0);
-        let mut from: Vec<Option<usize>> = (0..self.theta.len()).map(Some).collect();
-        from.resize(layout.len, None);
+        let old = &self.layout;
+        // The triads' families are zero long in the old layout, at `old.triad`; every entry before it keeps its index and every entry from it moves
+        // past the new families.
+        let inserted = layout.len - self.theta.len();
+        if old.triad != layout.triad || old.triad_bias != old.triad || old.w_triad != old.triad || layout.w_triad + dw * 2 * triads != old.triad + inserted {
+            return refuse("a field whose triads' families do not stand where a growth inserts them");
+        }
+        let mut theta = Vec::with_capacity(layout.len);
+        theta.extend_from_slice(&self.theta[..old.triad]);
+        theta.resize(old.triad + inserted, 0);
+        theta.extend_from_slice(&self.theta[old.triad..]);
+        let mut from: Vec<Option<usize>> = (0..old.triad).map(Some).collect();
+        from.resize(old.triad + inserted, None);
+        from.extend((old.triad..self.material_len()).map(Some));
         let (num, den) = chart_scale(dw);
         let mut cursor = 0usize;
         for v in theta[layout.triad..layout.triad + 6 * triads * dw].iter_mut() {
@@ -462,6 +487,7 @@ impl Constitution {
         }
         debug_assert_eq!(cursor, 4 * self.declaration.triad_draws(triads));
         let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
         Ok((out, from))
     }
@@ -842,11 +868,21 @@ impl Learner {
     /// old entry's rate too, since a state tool that left the part rates behind once made every part train at the base rate with nothing refused.
     /// The held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
     pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<Self> {
+        self.with_triads_at(triads, keys, false)
+    }
+
+    /// [definition; theory, November 16 19:10Z] **The learner with crossing triads** ([`Constitution::with_crossings`]), opened as
+    /// [`Learner::with_triads`] opens the strand's: every standing entry keeps its moments, its remainder and its rate at its new index.
+    pub fn with_crossings(&self, triads: usize, keys: &[u8]) -> Result<Self> {
+        self.with_triads_at(triads, keys, true)
+    }
+
+    fn with_triads_at(&self, triads: usize, keys: &[u8], crossing: bool) -> Result<Self> {
         if self.held.is_some() {
             return refuse("a learner takes triads after its held step is read");
         }
         let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the triads' draws"))?;
-        let (field, from) = self.field.with_triads(triads, rest)?;
+        let (field, from) = if crossing { self.field.with_crossings(triads, rest)? } else { self.field.with_triads(triads, rest)? };
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let (old, new) = (&self.field.layout, &field.layout);
@@ -869,11 +905,9 @@ impl Learner {
             octaves[TRIAD_PART] = 0;
             RateParts { octaves, ..rp }
         });
-        let own_rates = self.own_rates.as_ref().map(|own| {
-            let mut rates = own.clone();
-            rates.resize(field.material_len(), self.rate_bits);
-            rates
-        });
+        // Each entry's own rate follows it to its new index; the triads' entries take `rate_bits` (November 16: the families may be inserted
+        // before later ones, so the rates are mapped, not appended).
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect::<Vec<_>>());
         let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
         Ok(Self { field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, last: None, pass: self.pass.clone() })
     }

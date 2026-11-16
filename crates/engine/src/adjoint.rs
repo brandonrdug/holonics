@@ -141,7 +141,7 @@ impl Constitution {
             for t in 0..sites {
                 transposed(&self.theta[l.w_triad..l.w_triad + dw * j2], reaches.w_triad, j2, dxs[t], MATERIAL_BITS, &mut dct[t * j2..(t + 1) * j2])?;
             }
-            triad_back(triads, sites, &cell.abg, &cell.tp, &dct)?
+            triad_back(triads, sites, &cell.abg, &cell.tp, &dct, d.crossing)?
         } else {
             Vec::new()
         };

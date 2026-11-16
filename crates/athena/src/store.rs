@@ -1170,6 +1170,35 @@ pub fn set_world(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; theory, November 16 19:10Z, the crossing triad] `grow-crossings STATE STATE_SHA KEYS KEYS_SHA TRIADS OUT`: **the learner with crossing
+/// triads** ([`holonics_engine::field::Learner::with_crossings`]): `TRIADS` triads whose legs stand at the site, their charts drawn from the key
+/// stream past the learner's draws, their return `W_T` at zero, so every face the grown field reads is the field's before it, bit for bit; every
+/// standing entry keeps its value, its moments and its rate at its new index, and the pass is kept. Refused on a learner that has triads.
+pub fn grow_crossings(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("grow-crossings STATE STATE_SHA KEYS KEYS_SHA TRIADS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let triads = positive(&args[5])?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let grown = learner.with_crossings(triads, &keys).map_err(|e| e.to_string())?;
+    let written = grown.to_text();
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.to_text() != written || back.field != grown.field || back.pass != learner.pass {
+        return Err("a grown learner that does not read back as itself with its pass".into());
+    }
+    std::fs::write(out, &written)?;
+    let (old, new) = (learner.field.material_len(), grown.field.material_len());
+    let d = grown.field.declaration;
+    println!("GROW_CROSSINGS triads={} crossing={} material_before={old} material_after={new} drawn_before={} drawn_after={}", d.triads, d.crossing, learner.drawn, grown.drawn);
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored

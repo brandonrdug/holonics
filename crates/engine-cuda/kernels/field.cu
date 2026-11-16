@@ -514,6 +514,9 @@ struct FieldWords {
     int64_t *pabg;
     int64_t *ptp;
     int64_t *pct;
+    // [definition; theory, November 16 19:10Z] Whether the triads' legs stand at the site (`Declaration::crossing`): `p = α(t) β(t)`, `c^T = p γ(t)` at
+    // every site where it is one; the strand's legs where it is zero.
+    uint64_t crossing;
     // [definition; theory, November 12, P50 step 1 and P51] **The clock's skins** (`field_skin_fill`): a paced head's skin of each support entry
     // `[p][entry][l]` at the row's support stride (atlas `tower.field-support-stride`): `entry = region_soff[r] + i K_r + k` for receiver `i`'s entry `k`,
     // `K_r = NEAR_SLOTS + D_r` (`D_r` the region's definite sites, `dstart`), `region_soff` the prefix of `S_r K_r` over the batch's regions and `E2` its
@@ -4236,14 +4239,15 @@ extern "C" __global__ void field_triad(FieldWords w) {
         const uint32_t r = w.site_region[t];
         const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[t];
         const uint64_t pr = t * j2 + k, pi = pr + J;
-        if (i == 0 || i + 1 >= sites) {
+        if (!w.crossing && (i == 0 || i + 1 >= sites)) {
             w.ptp[pr] = 0;
             w.ptp[pi] = 0;
             w.pct[pr] = 0;
             w.pct[pi] = 0;
             continue;
         }
-        const int64_t *at = w.pabg + t * j6, *before = at - j6, *after = at + j6;
+        // [theory, November 16 19:10Z] With the crossing every leg is the site's own.
+        const int64_t *at = w.pabg + t * j6, *before = w.crossing ? at : at - j6, *after = w.crossing ? at : at + j6;
         const wide ar = at[k], ai = at[J + k];
         const wide br = before[2 * J + k], bi = before[3 * J + k];
         const wide gr = after[4 * J + k], gi = after[5 * J + k];
@@ -4562,6 +4566,24 @@ extern "C" __global__ void field_triad_back(FieldWords w, const int64_t *dct, in
         const uint32_t r = w.site_region[s];
         const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[s];
         int64_t *out = dabg + s * j6;
+        // [theory, November 16 19:10Z] With the crossing each site's three legs are read by the site alone: `δγ(s) = conj(p(s)) u`, `δp = conj(γ(s))
+        // u`, `δα(s) = conj(β(s)) δp`, `δβ(s) = conj(α(s)) δp`, at every site.
+        if (w.crossing) {
+            const int64_t *at = w.pabg + s * j6;
+            const int64_t ur = dct[s * j2 + k], ui = dct[s * j2 + J + k];
+            int64_t dpr, dpi, v0, v1;
+            triad_conj_product(w, at[4 * J + k], at[5 * J + k], ur, ui, &dpr, &dpi);
+            triad_conj_product(w, at[2 * J + k], at[3 * J + k], dpr, dpi, &v0, &v1);
+            out[k] = v0;
+            out[J + k] = v1;
+            triad_conj_product(w, at[k], at[J + k], dpr, dpi, &v0, &v1);
+            out[2 * J + k] = v0;
+            out[3 * J + k] = v1;
+            triad_conj_product(w, w.ptp[s * j2 + k], w.ptp[s * j2 + J + k], ur, ui, &v0, &v1);
+            out[4 * J + k] = v0;
+            out[5 * J + k] = v1;
+            continue;
+        }
         // `δp` at place `t` (interior): `release(conj(γ_k(t + 1)) δc^T_k(t), 16)`.
         const auto dp_at = [&](uint64_t t, int64_t *dpr, int64_t *dpi) {
             const int64_t *after = w.pabg + (t + 1) * j6;

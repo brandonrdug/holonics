@@ -756,7 +756,7 @@ impl Constitution {
                 let rt = &cell.read2[t * dw..(t + 1) * dw];
                 affine(&self.theta[l.triad..l.triad + j6 * dw], reaches.triad, dw, rt, Some(&self.theta[l.triad_bias..l.triad_bias + j6]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.abg[t * j6..(t + 1) * j6])?;
             }
-            (cell.tp, cell.ct) = triad_products(triads, sites, &cell.abg)?;
+            (cell.tp, cell.ct) = triad_products(triads, sites, &cell.abg, d.crossing)?;
         }
         // The pair's return, `x ← x + release(W c + b_c 2^M, M)`; with triads `W c + W_T c^T + b_c 2^M` is one sum released once
         // ([`affine_joint`]), and at `J = 0` the plain affine is the one called, so every bit is as before.
