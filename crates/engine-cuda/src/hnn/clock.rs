@@ -135,6 +135,17 @@ impl<'c> Resident<'c> {
         words.unresolved = words.blank_read;
         let (mut dkp, mut dzp) = (dkappa.device_ptr(), dz.device_ptr());
         self.launch("field_blank_dz", (sites as u64).clamp(1, 65_535) as u32, BLANK_DZ_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dzp)])?;
+        // [measurement; theory, November 16] Which of the walked sites the blank's outer sums meet with a nonzero term: a reading of `δz`,
+        // which moves nothing the field computes.
+        if let Some(profile) = self.profile.as_ref().filter(|_| std::env::var_os("FIELD_BLANK_LIVE").is_some()) {
+            let z = self.timed(Kind::Copy, || self.card.fetch_range(&dz, 0, sites * a)).map_err(device)?;
+            let live_sites = z.chunks(a.max(1)).filter(|row| row.iter().any(|v| *v != 0)).count() as u128;
+            let live = z.iter().filter(|v| **v != 0).count() as u128;
+            let mut p = profile.borrow_mut();
+            for (slot, v) in p.blank_live.iter_mut().zip([1, sites as u128, live_sites, (sites * a) as u128, live]) {
+                *slot += v;
+            }
+        }
         let tiles = (sites as u64).div_ceil(BLANK_TILE);
         {
             let (mut gp, mut enc, mut bias, mut dzp, mut yp) = (g.device_ptr(), words.enc, words.read_bias, dz.device_ptr(), clock.lift.device_ptr());
