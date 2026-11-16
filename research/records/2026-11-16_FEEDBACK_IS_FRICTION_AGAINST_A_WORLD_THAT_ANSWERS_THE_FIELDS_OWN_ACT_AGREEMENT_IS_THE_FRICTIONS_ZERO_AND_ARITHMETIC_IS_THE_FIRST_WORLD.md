@@ -166,3 +166,90 @@ digit's carry state. The passage carries TinyGSM beside the symbol slice, so tha
 
 The partials are read later, at the composite level (the unit as a composed shape, November 15). Their guess is fixed
 when that level's units are built.
+
+## 8. The comparison's heat and the tug-of-war's price (Codex's note, read 18:00 UTC)
+
+Codex sent a research note on November 16, kept outside the repository: Brandon had asked it for an independent pass on
+codecs, ciphers, heat and propagation. Read against this record, the note confirms one placement, adds two theorems and
+sharpens the anchor test. Each item below is restated on the objects.
+
+**The draft's placement is a Landauer statement.** `floor.landauer-erasure` already prices a merge with retained side
+information Z at k_BT ln 2 · H₂(X | Y, Z). In Build B the draft d is that side information at the comparison
+(`agent-inferred`). There are three placements:
+- **d in context.** The world's places owe the excess over H(w | d). For a deterministic world H(w | d) is zero, so the
+  friction is all excess, and agreement makes it vanish.
+- **d dropped** (a local reset). They owe I(d; w) more: the field pays for news it made.
+- **d as a target.** The field deposits toward its own act. This is G169's drift, read again on November 16, when
+  sixteen refine passes turned a quarter of the code slice's written octets into `/` (`receipts/2026-11-16_writerefine/`).
+
+Only the placement of §3 owes neither.
+
+**Every interaction is a friction: the subsystem's second law** (Horowitz and Esposito 2014). Take bipartite jump
+dynamics: each transition moves one part, each part touches its own bath, and local detailed balance holds. Part X's
+entropy production is then σ_X = d_tS_X − βQ̇_X − İ_X ≥ 0. Here Q̇_X is the heat into X, and İ_X is the rate at which X's
+own transitions change I(X; Y).
+- A part that learns about the other (İ_X > 0) pays at least that rate in its own entropy and its bath's. A sensor's
+  learning rate is bounded by its dissipation (Hartich, Barato and Seifert 2014).
+- A part whose transitions spend a correlation (İ_X < 0) can draw heat from its bath.
+- Codex checked a four-state case: each part's own entropy stays constant while heat and information flow. A change of
+  correlation is therefore thermodynamically active even when neither part's own entropy moves.
+
+This is the lens's sentence as a theorem. A field learns from a world it touches no faster than the contact dissipates,
+and the correlation it holds with the world (its prediction) is what spares it the reset's price. For the machine it
+names a ratio: the nats a region gains in a lap over the dissipation its deposits pay there, a deposit's rate being a
+temperature (`deposition.rate-temperature-standing-spread`). The construction to make is the deposit's dissipation as a
+reading by locus, so that the ratio stands beside loudness by region. The row is `floor.subsystem-information-flow`.
+
+**The tug-of-war's price.** Codex's rule for a selective change, restated on the objects:
+- A deposit δ is taken in the material's metric M ≻ 0.
+- The held reads Aδ = 0 are the readers a change must not move.
+- The pulled read is gᵀδ = Δ.
+
+The cheapest such deposit is δ* = Δ·Pg/c, at cost Δ²/c, with:
+- P = M⁻¹ − M⁻¹Aᵀ(AM⁻¹Aᵀ)⁺AM⁻¹, the material's compliance on the held reads' kernel (the top-left block of the
+  bordered matrix's inverse, a Schur elimination like `contact.effective-tension`'s);
+- c = gᵀPg.
+
+c is zero exactly when g is a combination of the held reads. This was checked here on exact rationals: six random
+four-dimensional materials with two held reads, where the cost equals Δ²/c, no feasible perturbation lowers it, and g
+in the span of the held reads gives c = 0.
+
+The rule is "no single string can be pulled without bound" with its price. Pulling one read while the others hold costs
+Δ²/c. The price diverges as the pulled read nears the span of the held ones, and at c = 0 the pull is barred: that is
+frustration. Founding (`contact.pool-founding`) adds a face where the effective tension leads, and the added face is what
+raises c. In the arithmetic world, G-ar2's carry gap is such a direction of the present faces, and the carry founded as a
+turn (`contact.carry-gate-turn-and-friction`) is the face that opens it. The row is `contact.selective-pull-price`.
+
+**The anchor test is Codex's matched-news, unequal-length substitution.** `+` is one octet and `plus` is four; if the
+word is anchored, both carry the same news at the answer. Codex's controls sharpen §7.
+- **The foil is a noisy source, not a null.** `plux` and `eqvals` are one-letter edits of the operator words, so a field
+  that reads word shapes still receives part of the operator through them. On lap 69's read, before any arithmetic,
+  the value after the words coded 0.51 bits a place above the value after the foil on met rows. On far rows the two
+  agreed (`receipts/2026-11-16_arithworld/`).
+- **Two forms are added.** They were sent to the build at 18:03 UTC, before lap 71's read, and the change is to the forms
+  table only:
+  - a null foil: the same lengths, in letters the operator word and `equals` lack, drawn by the world's key;
+  - swapped words: another operator's word before this operator's value (`a times b equals` before a + b's value).
+- **G-an4 (the noisy source).** The guess holds from the first lap on which the words code the value at least 0.2 nats a
+  place under the null foil. From then on, the edited foil stands between the two, at least a quarter of the way down
+  from the null toward the words.
+- **G-an5 (the word read as its operator).** From that same lap, the swapped words code the value at least 0.1 nats a
+  place above the null foil: a word that names another operator leads further from the world's answer than no operator
+  does. Before that lap, swapped and matched words differ by less than 0.1.
+
+  Both are read in nats a place on met rows at a lap's mean.
+- **Names.** The build's receipt fixed its own lap-71 guesses as G-an0 to G-an3. This record's guesses are cited as
+  G-an1 to G-an3 (17:08).
+- **The frame carries no length.** Codex's synthetic cipher leaks a payload's length. `read-forms` ends a region at the
+  answer's line feed with no void tail. In training, a region ends at a cut, and only a document's true end carries a
+  void tail (`passage::Drawn::sites`). So the region's end tells the field nothing about where an answer stops, and the
+  line feed's code is the field's own reading of the answer's length (`agent-inferred` from the code).
+
+**Held already, or not taken now.**
+- **Fixed-moment frames** (Needham and Shonkwiler). Two frames with the same moments that receivers read differently are
+  the relatively complete region's clause: conserved charges count, but they do not determine the interior.
+- **Cheng's projection between uniform grains.** Two partitions of one span into m and n cells overlap in exactly
+  m + n − gcd(m, n) pieces, checked here for every pair from 1 to 20. So a projection between grains needs those terms
+  and never the lcm grid. The round trip m → n → m is not idempotent: 3 → 2 → 3 takes (1, 0, −1) to two thirds of itself,
+  and (1, −2, 1) is the kernel of 3 → 2. The residual is carried by the precision law's remainder. It applies where one
+  level reads another's grain, which the composite level will.
