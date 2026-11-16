@@ -441,7 +441,7 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 15; the last nine are from his corrections of November 12 to 15, and the
+October 29 and November 16; the last ten are from his corrections of November 12 to 16, and the
 three before them were derived from a failure, from readings of November 11 and from Brandon's lens of
 that day. They are written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
@@ -680,6 +680,15 @@ that day. They are written here with their reasons so that no agent holds them a
   one. The landmark law's order (`code.site-isolation-landmark`) compares places' news, not a face's symbols, and is
   outside the rule (`agent-inferred`)
   ([the record](research/records/2026-11-15_THE_RETURN_RUNS_ON_THE_CLOCK_OF_NEWS_A_HELD_TICK_COSTS_NOTHING_EITHER_WAY_AND_A_BASIN_IS_AS_LOUD_AS_ITS_PRESENT_DRIVE.md) §9).
+- **Speed is a steady background, never a pendulum** (Brandon, November 16 15:52Z). The main effort is the product
+  (Athena's acceptance: online ingestion with retained deposition, a cold restart, answers from the retained state with their
+  provenance, readable text, GSM8K the yardstick), and its decoded writes are read and shown beside the nats and the loudness.
+  Where the counters a mission step already reads show a clear, cheap gain that keeps every bit, it is taken in the same loop;
+  sub-percent section gains are not run as a campaign of their own, and a realization standing far over its count (the rule
+  above) is not left to stand either. Reason: he named the swing between the two the same day ("either OBSESSED with performance
+  gains or you couldn't care less"). On November 16 the work ran from about 07:00 to 15:50 UTC as kernel holds, each gap after a
+  lap costing the line 15 to 20 minutes for gains of 0.1 to 1.4% a section, while the line's writes went unread from
+  November 14 05:38; on November 15 a 40-minute lap had stood until he named it. Scope: every loop, plan and brief.
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
