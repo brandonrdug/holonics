@@ -4970,6 +4970,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         const int64_t *words = w.qf + ((uint64_t)h * w.T + first) * S;
         const int64_t *dyr = dyh + ((uint64_t)h * w.T + first) * S;
         wide sk = 0, sv = 0;
+        // The source's own word, read once for its receivers.
+        const int64_t word_j = words[(uint64_t)j * S + entry];
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             {
                 const uint32_t k = k0 + lane;
@@ -4996,6 +4998,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 if (i == UINT32_MAX) {
                     continue;
                 }
+                // [realization; November 16, the columns' source counters after the gather] The receiver's probe and its covector entry are
+                // asked for as soon as the receiver is known, so their loads stand in flight while its skin is formed; the bracket's line,
+                // which waited on the probe, held 0.255 of the kernel's stall samples. The same integers in the same order.
+                const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
+                const int64_t dy_i = dyr[(uint64_t)i * S + entry];
                 const uint32_t gap = j > i ? j - i : i - j;
                 // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
                 // whose pace is not plain there, the one row that reads the store.
@@ -5003,14 +5010,13 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 const wide dec = skin_raw_hs(w, hs, m, first + i, sentry, gap);
                 // The key's bracket released by the skin's bits once (the probe's grain), then by the covector,
                 // against the receiver's probe (§16.19).
-                const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
                 // [realization; November 16] The bracket on the words P54's bounds give: the skin (`D ≤ 2^30`) and the probe and the word
                 // (32 bits each, `field_unit`) as one 32 by 32 product each, `D²` (under `2^61`) times the word as one 64 by 64, the
                 // bracket under `2^92` released to under `2^63`, and the covector times it one 64 by 64; the share times the carried
                 // value (under `2^63`) is its magnitude's product. The same integers as the 128 by 128 products they replace.
-                const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - mul64_128(mul32((int64_t)dec, (int64_t)dec), words[(uint64_t)j * S + entry]), g0);
+                const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - mul64_128(mul32((int64_t)dec, (int64_t)dec), word_j), g0);
                 sk += mul64_128(cgd[warp][kk], (int64_t)bracket);
-                sv += mulu64_128(cge[warp][kk], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dyr[(uint64_t)i * S + entry]));
+                sv += mulu64_128(cge[warp][kk], (int64_t)carried_hs(w, hs, m, first + i, sentry, gap, dy_i));
             }
             __syncwarp();
         }
