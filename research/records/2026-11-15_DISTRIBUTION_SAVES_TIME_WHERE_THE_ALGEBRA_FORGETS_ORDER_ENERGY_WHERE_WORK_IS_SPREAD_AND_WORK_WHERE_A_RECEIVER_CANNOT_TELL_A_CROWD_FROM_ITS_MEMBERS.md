@@ -754,3 +754,30 @@ UTC); `agent-inferred` for the reading of them.
   to 0.77 a launch in every one (the transposed map, the affine maps and the outer tile), at the two blocks their
   registers allow; it calibrates the next guess on a prefetch at that occupancy. Twice now the control's spread (21.4
   and 26.6 ms) has been the card's two states, so a hold is read state for state, as the waiting standard says.
+- **The scans' split, scored** (the build thread, relayed 07:02 UTC; #885, training from lap 55; lap 53's sections, the
+  card alone; receipts `research/records/receipts/2026-11-16_scansplit/`). Gate 3 equal. The forward scan 727 to 744 µs
+  a launch to 259 to 263 (0.35, against 0.50 to 0.75: a miss on the side of more saved), its issue 25.8% to 43.4% and its
+  long scoreboard 2.3 to 3.0 an issued instruction to 0.5 to 0.6; the reverse 836 to 838 to 277 (0.33, inside 0.30 to
+  0.55); the grid's passes 0.88 and 1.83 ms a section, 0.13 of the old scans' 20.46 against 0.03 to 0.10, a miss on the
+  side of more cost, and the gate's return 2.25 to 2.08 ms while forming `δγ`; the circles' kernels 22.7 to 12.4 ms a
+  section. A clean hold (control spread 2.3 ms): 546.7 to 535.7 ms a section, 0.980 (11.0 ms), inside 0.975 to 0.987 and
+  inside 7 to 13.5 ms; paired by neighbouring state 9.8 to 13.1. Why the forward fell further (`agent-inferred`): the
+  old step paid its loads in full every step, since its stores went through pointers the compiler could not prove apart
+  from its loads, so no load of the next step could rise above them; the guess counted the arithmetic that left the
+  chain and not the wait that left with the reading a step ahead. The decider read as the guess said it would decide:
+  the long scoreboard no longer holds the chain, and what remains is the chain's own arithmetic at 43% issue, so
+  reading further ahead has little left to hide. The scans now hold the order the law gives them and little more.
+- **The blanks are the outer and transposed maps' operations, and bytes do not bind them** (the same relay). Their
+  memory throughput reads 8.2% of peak for the bias and encoding (L2 hits 66 to 69%), 12.6 to 13.3% for the lift's
+  covector (40 to 48%) and 3.6 to 3.9% for the lift and read (80 to 82%), so the class of 05:35 is not bytes. Their
+  source (`field.cu`, `field_blank_bias_enc`, `field_blank_dy`, `field_blank_lift_read`) names what they are:
+  `δE(b)_i += Σ_t rel(δz_b y_i, 46)` and `δR_(i,j) += Σ_t rel(δy_i r̂_j, 16)` are sums of outer products over the silent
+  sites, the outer map's operation, and `δy_i = rel(Σ_b δz_b E(b)_i, 30)` is a map by the encoding's transpose, the
+  transposed map's. Each is written as a thread an entry that re-reads its column from the second level of the cache
+  for every term, where the outer tile stages a tile of each operand in shared memory and a thread forms four by four
+  products from eight loaded words. The blank's release stands once a term before its sum (a section that commutes
+  there), so its products can be formed in the outer tile's staging with the release inside the product, the same
+  integers in any order; the transposed map's staging likewise for the lift's covector, with its checked product. This
+  is the lens's unification on the realization's own owners: one operation, two notations, and the second never took
+  the first's staging. The blanks hold 41.5 ms a section; a guess is fixed when one is built, after their stall split
+  and the share of silent sites (the terms the tile would form as zeros) are read.
