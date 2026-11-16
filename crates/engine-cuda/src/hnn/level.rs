@@ -231,8 +231,7 @@ impl<'c> Resident<'c> {
         // The prolongation: `δv(j)` each epoch's harmonics of its places' covectors, then `δb_B`, `δB` and `δr̂¹ = Bᵀ δv`.
         let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (back.dx.device_ptr(), tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.pad.device_ptr());
         self.launch("field_level_chart64", Self::cells((epochs * h * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut hp), arg(&mut op), arg(&mut e64), arg(&mut h32), arg(&mut w32), arg(&mut dst)])?;
-        self.outer(&mut tr.cwords, gg, bb as u64, h * d0, 0, tb.pad.device_ptr(), h * d0, 0, 0, false, false)?;
-        self.outer(&mut tr.cwords, gg, b as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, tb.read1.device_ptr(), d1, false, false)?;
+        self.outer_biased(&mut tr.cwords, gg, b as u64, bb as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, tb.read1.device_ptr(), d1, false, false)?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.transposed(&mut gwords, b as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, cb.dr.device_ptr(), false, false)?;
@@ -242,8 +241,7 @@ impl<'c> Resident<'c> {
             self.tick_back(&s.coarse, &mut tr.cwords, tick, at, cg, cb, cb.dm.device_ptr(), epochs, false)?;
         }
         // The restriction: `δb_A`, `δA` and `δm = Aᵀ δx¹`, each place's part at its own phase through its read's adjoint into `δx`.
-        self.outer(&mut tr.cwords, gg, ab as u64, d1, 0, cb.dx.device_ptr(), d1, 0, 0, false, false)?;
-        self.outer(&mut tr.cwords, gg, a as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.restricted.device_ptr(), h * d0, true, false)?;
+        self.outer_biased(&mut tr.cwords, gg, a as u64, ab as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.restricted.device_ptr(), h * d0, true, false)?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.transposed(&mut gwords, a as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.pad.device_ptr(), false, false)?;

@@ -403,14 +403,25 @@ impl<'c> Resident<'c> {
     /// the host's per-region refusal of its carrier when `x` is given.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn outer(&self, words: &mut Words, g: &CardBuffer<'c, i128>, at: u64, rows: usize, cols: usize, y: u64, y_stride: usize, x: u64, x_stride: usize, x64: bool, only_unresolved: bool) -> Result<()> {
-        let (mut gp, mut at, mut rows32, mut cols32, mut y, mut ys, mut x, mut xs, mut u) = (g.device_ptr(), at, rows as u32, cols as u32, y, y_stride as u64, x, x_stride as u64, u32::from(only_unresolved));
+        self.outer_biased(words, g, at, u64::MAX, rows, cols, y, y_stride, x, x_stride, x64, only_unresolved)
+    }
+
+    /// [realization; November 16] The outer sum `g[at..] += Σ_t y_t ⊗ x_t` with its rows' bias `g[bias..] += Σ_t y_t` formed in the same
+    /// launch (`bias` the bias's address, `u64::MAX` for none): the tiles of the first column block sum the bias from the words they stage, where
+    /// the bias had a launch of its own over the same `y` and sites. Integer sums: the same bits.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn outer_biased(&self, words: &mut Words, g: &CardBuffer<'c, i128>, at: u64, bias: u64, rows: usize, cols: usize, y: u64, y_stride: usize, x: u64, x_stride: usize, x64: bool, only_unresolved: bool) -> Result<()> {
+        if bias != u64::MAX && x == 0 {
+            return self.outer(words, g, bias, rows, 0, y, y_stride, 0, 0, false, only_unresolved);
+        }
+        let (mut gp, mut at, mut rows32, mut cols32, mut y, mut ys, mut x, mut xs, mut u, mut nb) = (g.device_ptr(), at, rows as u32, cols as u32, y, y_stride as u64, x, x_stride as u64, u32::from(only_unresolved), bias);
         // [realization; P61 items 4e and 4f] The outer sum in the tile form, then (where `x` is given) the host's per-region refusal, which
         // first reads the outer pass's largest words from a slot of its own (`outer_slot`) and reads a region again only where they leave
         // its bound open. Without a slot the bound reads every region as before.
         let mut maxima = if x != 0 { self.outer_slot()? } else { 0 };
         let entry = if x64 { "field_outer_x64" } else { "field_outer_x32" };
         let (grid, mut walk) = self.outer_grid(rows, cols, x != 0, words.t as usize);
-        self.launch(entry, grid, THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima), arg(&mut walk)])?;
+        self.launch(entry, grid, THREADS, &mut [arg(words), arg(&mut gp), arg(&mut at), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut x), arg(&mut xs), arg(&mut u), arg(&mut maxima), arg(&mut walk), arg(&mut nb)])?;
         let ops: Vec<(u64, bool, usize, usize)> = if x != 0 { vec![(y, true, ys as usize, rows), (x, x64, xs as usize, cols)] } else { vec![(y, true, ys as usize, rows)] };
         self.map_record((entry, rows32, if x != 0 { cols32 } else { 0 }, u != 0, false), words, None, None, None, &ops)?;
         if x != 0 {

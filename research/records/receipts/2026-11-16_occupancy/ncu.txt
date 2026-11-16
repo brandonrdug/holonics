@@ -1,0 +1,25 @@
+# Nsight Compute on 2 of lap 58's sections, in the gap after lap 58 (November 16): the first launches of the spread, the blank walks and
+# the outer sums. ctl = #896 (athena_regionscan); nw = this build. smcyc and spcyc are the multiprocessors' and the schedulers' active cycles
+# (avg, max, min), read from the WorkloadDistribution section.
+ctl field_blank_bias_enc   us=  540.3 grid=  400 block=  256 regs=48 warps_pct=55.8 blocks_a_mp=5.000000 waves=1 smcyc=1087580/1237185/887832 spcyc=950733/1241215/688737
+ctl field_blank_lift_read  us=  294.3 grid=  400 block=  256 regs=48 warps_pct=55.8 blocks_a_mp=5.000000 waves=1 smcyc=601054/672809/454997 spcyc=554971/673238/404394
+ctl field_outer_x32        us=   76.3 grid=  405 block=  256 regs=126 warps_pct=31.3 blocks_a_mp=2.000000 waves=2.53 smcyc=162815/172742/135590 spcyc=161553/174706/135450
+ctl field_outer_x32        us=   47.1 grid=  405 block=  256 regs=126 warps_pct=20.0 blocks_a_mp=2.000000 waves=2.53 smcyc=94491/105493/87231 spcyc=92869/103849/85394
+ctl field_outer_x32        us=  166.1 grid=  204 block=  256 regs=126 warps_pct=28.8 blocks_a_mp=2.000000 waves=1.27 smcyc=317276/378378/242502 spcyc=317530/378390/246879
+ctl field_outer_x64        us=   81.7 grid=  148 block=  256 regs=126 warps_pct=28.2 blocks_a_mp=2.000000 waves=0.93 smcyc=169589/184987/126841 spcyc=168806/183941/125817
+ctl field_outer_x64        us=  164.3 grid=  204 block=  256 regs=126 warps_pct=28.8 blocks_a_mp=2.000000 waves=1.27 smcyc=314277/374117/253170 spcyc=312160/371460/248642
+ctl field_outer_x64        us=   88.1 grid=  148 block=  256 regs=126 warps_pct=28.1 blocks_a_mp=2.000000 waves=0.93 smcyc=179462/199497/122490 spcyc=179190/200305/119201
+ctl field_spread           us=   43.1 grid=  123 block=  672 regs=48 warps_pct=43.7 blocks_a_mp=1.000000 waves=1.54 smcyc=64900/96047/45971 spcyc=64962/96114/45631
+ctl field_spread           us=   43.8 grid=  123 block=  672 regs=48 warps_pct=43.7 blocks_a_mp=1.000000 waves=1.54 smcyc=64792/97617/46276 spcyc=65662/98517/45299
+ctl field_spread           us=   43.3 grid=  123 block=  672 regs=48 warps_pct=43.7 blocks_a_mp=1.000000 waves=1.54 smcyc=65002/96621/45883 spcyc=64692/96096/45821
+nw  field_blank_bias_enc   us=  539.7 grid=  400 block=  256 regs=48 warps_pct=55.8 blocks_a_mp=5.000000 waves=1 smcyc=1086320/1236125/894154 spcyc=950888/1237899/689111
+nw  field_blank_lift_read  us=  294.5 grid=  400 block=  256 regs=48 warps_pct=56.0 blocks_a_mp=5.000000 waves=1 smcyc=600504/673126/454901 spcyc=552960/673012/405753
+nw  field_outer_x32        us=   77.9 grid=  405 block=  256 regs=128 warps_pct=31.8 blocks_a_mp=2.000000 waves=2.53 smcyc=164211/176002/138785 spcyc=165415/177238/140536
+nw  field_outer_x32        us=  178.3 grid=  204 block=  256 regs=128 warps_pct=28.8 blocks_a_mp=2.000000 waves=1.27 smcyc=341595/406366/263192 spcyc=341562/406825/261978
+nw  field_outer_x32        us=   27.9 grid=  405 block=  256 regs=128 warps_pct=30.5 blocks_a_mp=2.000000 waves=2.53 smcyc=52878/61555/41053 spcyc=52528/61162/39874
+nw  field_outer_x64        us=   86.7 grid=  148 block=  256 regs=128 warps_pct=28.1 blocks_a_mp=2.000000 waves=0.93 smcyc=182806/196235/134088 spcyc=182571/196947/132783
+nw  field_outer_x64        us=  175.2 grid=  204 block=  256 regs=128 warps_pct=28.9 blocks_a_mp=2.000000 waves=1.27 smcyc=337298/399136/270810 spcyc=337109/399378/267582
+nw  field_outer_x64        us=   93.9 grid=  148 block=  256 regs=128 warps_pct=27.8 blocks_a_mp=2.000000 waves=0.93 smcyc=191585/212961/117467 spcyc=190951/215076/115854
+nw  field_spread           us=   45.3 grid=  123 block=  640 regs=48 warps_pct=57.6 blocks_a_mp=2.000000 waves=0.77 smcyc=61907/101585/24921 spcyc=62106/101922/25244
+nw  field_spread           us=   45.3 grid=  123 block=  640 regs=48 warps_pct=57.6 blocks_a_mp=2.000000 waves=0.77 smcyc=61547/101555/25013 spcyc=62031/101436/24675
+nw  field_spread           us=   45.1 grid=  123 block=  640 regs=48 warps_pct=57.6 blocks_a_mp=2.000000 waves=0.77 smcyc=61773/101024/25677 spcyc=61611/100070/25926
