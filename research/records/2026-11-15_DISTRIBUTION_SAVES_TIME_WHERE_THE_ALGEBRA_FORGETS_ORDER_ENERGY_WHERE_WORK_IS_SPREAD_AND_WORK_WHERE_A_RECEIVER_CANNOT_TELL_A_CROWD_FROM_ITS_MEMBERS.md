@@ -734,7 +734,7 @@ UTC); `agent-inferred` for the reading of them.
   `pqm` holds the carried `Q` (a fitted word fitted again is itself), and `db` the carried `u`, so each term moved off the
   chain reads the operands it read on it; the gate's return reads `u` from `db` before `δb` takes its place, cell by
   cell. Registers 62 and 78 on the scans, 40 and 38 on the grid's passes, 66 on the gate's return, no spills. Guess,
-  fixed at 05:48 UTC (`agent-inferred`), in the hold after lap 53 against the outer build, the card alone: gate 3 equal;
+  fixed at 05:47 UTC (`agent-inferred`), in the hold after lap 53 against the outer build, the card alone: gate 3 equal;
   the forward scan 0.50 to 0.75 a launch over all its launches and the reverse 0.30 to 0.55 (half and three quarters of
   their products leave the chain, at 26% and 39% issue on fewer than one warp a scheduler, where a lone warp's time
   follows its instructions); the grid's passes with the moved `δγ` add 0.03 to 0.10 of the old scans' time; 7 to 13.5 ms
