@@ -1,0 +1,4 @@
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=1466 host_ms=172697
+STORE_PARITY method=read_faces calls=144 unequal=0 card_ms=1851 host_ms=112402
+STORE_PARITY_DONE calls=147 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+MEASURE lap=parity_cross rc=0 wall_s=289.8 peak_rss_kib=5478824

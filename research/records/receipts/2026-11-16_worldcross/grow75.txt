@@ -1,0 +1,1 @@
+GROW_CROSSINGS triads=10 crossing=true material_before=392505 material_after=402805 drawn_before=593408 drawn_after=624128

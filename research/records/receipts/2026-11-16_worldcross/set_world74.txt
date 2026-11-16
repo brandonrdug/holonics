@@ -1,0 +1,1 @@
+SET_WORLD stretches=58301786 lines=11 differing_line=11 pass_tail=world arithmetic 8 3 48
