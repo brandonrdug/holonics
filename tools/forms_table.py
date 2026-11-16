@@ -12,6 +12,12 @@
                                     the operator, not a null.
   forms_table.py gsm8k STORE OUT N  writes OUT from the word problems' held role (GSM8K's test split, `HELD_words.*`): the first N problems,
                                     each its question and a line feed as the prompt and GSM8K's own answer as the run.
+  forms_table.py acts STORE OUT N    writes OUT, the prompts of N acts for `write-forms`: each three held records at met lengths, one after
+                                    another, as a prompt (`act:N`), and an empty run.
+  forms_table.py react WRITTEN OUT   reads `write-forms`' OUT/forms.written for the acts and writes OUT, the world's reactions as a table for
+                                    `read-forms`: each act's prompt and draft up to its first `= ` (or its line feed) as the prompt, the
+                                    world's reaction as the run (`world:read:K` where the world read an expression, `world:refused:K` where
+                                    it answered `?`), the world as crates/athena/src/world.rs reads it.
   forms_table.py sum OUT LOG        sums a `read-forms` log over the table: by form and the operands' lengths (met: one to six digits, as
                                     training; far: seven to nine), by the digit's place counted from the value's last, and for sums of two
                                     operands by whether a carry entered the digit's column. Codes in millionths of a bit a place.
@@ -86,6 +92,100 @@ def gsm8k(store, out, n):
     print(f"FORMS_TABLE rows={len(rows)}")
 
 
+def acts(store, out, n):
+    data = open(os.path.join(store, "HELD_arithmetic.bin"), "rb").read().decode()
+    with open(os.path.join(store, "HELD_IDS_arithmetic.txt")) as f:
+        ids = [l.strip() for l in f]
+    met = [r for r, i in zip(data.splitlines(keepends=True), ids) if i.startswith("held-met")]
+    with open(out, "x") as f:
+        for k in range(n):
+            prompt = "".join(met[(3 * k + j) % len(met)] for j in range(3))
+            f.write(f"act:{k}\t{esc(prompt)}\t{esc('?')}\n")
+    print(f"FORMS_TABLE rows={n}")
+
+
+class Refuse(Exception):
+    pass
+
+
+def world_value(text):
+    """The world's value of an expression as crates/athena/src/world.rs reads it, or None."""
+    t, at = text, [0]
+
+    def skip():
+        while at[0] < len(t) and t[at[0]] == " ":
+            at[0] += 1
+
+    def atom():
+        skip()
+        if at[0] < len(t) and t[at[0]] == "(":
+            at[0] += 1
+            v = total()
+            skip()
+            if at[0] >= len(t) or t[at[0]] != ")":
+                raise Refuse
+            at[0] += 1
+            return v
+        start = at[0]
+        while at[0] < len(t) and t[at[0]].isdigit():
+            at[0] += 1
+        digits = t[start:at[0]]
+        if not digits or (len(digits) > 1 and digits[0] == "0"):
+            raise Refuse
+        return int(digits)
+
+    def product():
+        v = atom()
+        while True:
+            skip()
+            if at[0] < len(t) and t[at[0]] == "*":
+                at[0] += 1
+                v *= atom()
+            else:
+                return v
+
+    def total():
+        v = product()
+        while True:
+            skip()
+            if at[0] < len(t) and t[at[0]] in "+-":
+                op = t[at[0]]
+                at[0] += 1
+                w = product()
+                v = v + w if op == "+" else v - w
+            else:
+                return v
+
+    try:
+        v = total()
+        skip()
+        if at[0] != len(t) or abs(v) >= 2**127:
+            return None
+        return v
+    except (Refuse, RecursionError):
+        return None
+
+
+def react(written, out):
+    rows = []
+    for line in open(os.path.join(written, "forms.written")):
+        label, prompt, draft, _ = line.rstrip("\n").split("\t")
+        prompt, draft = prompt.replace("\\n", "\n"), draft.replace("\\n", "\n")
+        eq, feed = draft.find("= "), draft.find("\n")
+        if eq >= 0 and (feed < 0 or eq < feed):
+            v = world_value(draft[:eq])
+            read, reaction, kind = draft[:eq + 2], (f"{v}\n" if v is not None else "?\n"), ("read" if v is not None else "refused")
+        elif feed >= 0:
+            read, reaction, kind = draft[:feed + 1], "?\n", "refused"
+        else:
+            read, reaction, kind = draft, "\n?\n", "refused"
+        rows.append((f"world:{kind}:{label.split(':')[1]}", prompt + read, reaction))
+    with open(out, "x") as f:
+        for label, prompt, run in rows:
+            f.write(f"{label}\t{esc(prompt)}\t{esc(run)}\n")
+    print(f"WORLD_TABLE rows={len(rows)} read={sum(1 for r in rows if ':read:' in r[0])}")
+
+
 def carries(a, b, op, places):
     """For a + b (or a − b, as a borrow), whether column j (from the last digit) took a carry from column j − 1."""
     if op == "-" and a < b:
@@ -157,6 +257,10 @@ def summ(table, log):
 if __name__ == "__main__":
     if sys.argv[1] == "make":
         make(sys.argv[2], sys.argv[3])
+    elif sys.argv[1] == "acts":
+        acts(sys.argv[2], sys.argv[3], int(sys.argv[4]))
+    elif sys.argv[1] == "react":
+        react(sys.argv[2], sys.argv[3])
     elif sys.argv[1] == "gsm8k":
         gsm8k(sys.argv[2], sys.argv[3], int(sys.argv[4]))
     elif sys.argv[1] == "sum":
