@@ -1,0 +1,24 @@
+== #877 (the line binary from lap 52): the first twelve launches of field_outer_x32 or field_outer_x64, on 2 of lap 52's sections
+kernel                                                                                  field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x64 field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x64 field_outer_x32 field_outer_x32
+gpu__time_duration.sum                                                           us     95.040000 47.872000 220.256000 48.256000 100.416000 29.184000 18.368000 182.240000 43.616000 228.448000 213.920000 214.112000
+smsp__inst_executed.sum                                                          inst   4417524.000000 2342476.000000 36270888.000000 2342476.000000 17965476.000000 4399751.000000 2334256.000000 36196044.000000 1370460.000000 34838644.000000 35293832.000000 35298072.000000
+launch__registers_per_thread                                                     register/thread 126 126 126 126 128 126 126 126 126 128 126 126
+launch__occupancy_limit_registers                                                block  2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000
+launch__occupancy_limit_shared_mem                                               block  3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000
+launch__occupancy_limit_blocks                                                   block  24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000
+sm__warps_active.avg.pct_of_peak_sustained_active                                %      31.483664 19.486206 27.920326 20.113798 31.339630 30.120536 19.572830 28.458664 20.324769 28.005794 27.968681 27.975588
+smsp__issue_active.avg.pct_of_peak_sustained_active                              %      7.896295 7.551659 26.093091 7.657943 25.709031 25.308878 22.251616 32.080805 4.701387 25.422128 26.002295 26.080885
+smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio         inst   44.535798 26.779810 5.314283 26.673100 6.258981 10.313576 6.009055 2.498887 48.330244 5.855717 5.425541 5.393298
+smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio                 inst   0.000000 0.000000 0.417619 0.000000 0.940685 0.000000 0.000000 0.461876 0.000000 0.492952 0.426874 0.428489
+== this build: the first twelve launches of field_outer_x32 or field_outer_x64, on 2 of lap 52's sections
+kernel                                                                                  field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x64 field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x32 field_outer_x64 field_outer_x32 field_outer_x32
+gpu__time_duration.sum                                                           us     81.344000 47.456000 168.736000 48.064000 82.528000 28.864000 18.880000 166.784000 45.024000 166.720000 164.416000 164.160000
+smsp__inst_executed.sum                                                          inst   4417524.000000 2342476.000000 35427332.000000 2342476.000000 17738382.000000 4399751.000000 2334256.000000 35102392.000000 1370460.000000 34398784.000000 34526696.000000 34538300.000000
+launch__registers_per_thread                                                     register/thread 126 126 126 126 126 126 126 126 126 126 126 126
+launch__occupancy_limit_registers                                                block  2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000 2.000000
+launch__occupancy_limit_shared_mem                                               block  3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000 3.000000
+launch__occupancy_limit_blocks                                                   block  24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000 24.000000
+sm__warps_active.avg.pct_of_peak_sustained_active                                %      31.383251 19.762253 28.598804 19.575517 30.321097 29.875683 19.590010 28.466883 17.427153 28.686057 28.634264 28.695479
+smsp__issue_active.avg.pct_of_peak_sustained_active                              %      7.834597 7.669251 32.676632 7.585548 30.966648 24.978037 22.357363 32.562456 4.679150 31.845058 32.333132 32.249322
+smsp__average_warps_issue_stalled_long_scoreboard_per_issue_active.ratio         inst   44.455648 25.631373 1.832773 26.437652 2.484631 10.240159 6.094701 1.869078 38.437698 2.032575 1.891125 1.915236
+smsp__average_warps_issue_stalled_barrier_per_issue_active.ratio                 inst   0.000000 0.000000 0.382237 0.000000 0.941671 0.000000 0.000000 0.345299 0.000000 0.461116 0.470299 0.463727
