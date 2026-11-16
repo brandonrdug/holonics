@@ -636,3 +636,22 @@ UTC); `agent-inferred` for the reading of them.
   the loop's tail can continue on one limb from that crossing, the same integer: a carrier narrowing where its term no
   longer needs the width, the precision law's own, and about 0.03 of the kernel if the digit loop's samples are its
   limbs' work.
+- **The tiles' prefetch and the chart's place, scored** (the build thread, relayed 04:57 UTC; #877, training from lap
+  52; lap 50's sections, the card alone). Gate 3 equal; the zero guard stood in the card's kernel before the read, the
+  host's root untouched. A clean balanced hold: control 567.9 to 569.9 ms a section (spread 2.0), the build 545.6 to
+  547.9, means 568.7 to 546.6, 0.961 against 0.971 to 0.990, a miss on the side of more saved; the profiles over all
+  launches give 20.1 ms of the hold's 22.1. The transposed map 27.1 to 23.0 (0.849, inside 0.75 to 0.92); the affine
+  tiled maps 20.0 to 16.2 (0.81) and 8.6 to 7.2 (0.84), under 0.85 to 0.95; the tied face's tiled map 4.8 to 3.8; the
+  long scoreboard of the tiled launches fell from 5.4 to 7.4 an issued instruction to 1.0 to 3.1, the barrier held at
+  0.36 to 0.58, and by Nsight Compute they read 0.72 to 0.76 a launch: the loads' wait was most of what the affine maps
+  waited on, and the registers' spills cost less than it. `field_chart` 19.4 to 13.9 (0.716, against 0.86 to 0.95), and
+  the root's two other callers alike, `field_unit` 7.2 to 5.1 (0.708) and `field_unit_probe` 7.3 to 5.1 (0.699). The
+  three read where the place's share of the instructions puts them (1 − 0.314 = 0.686, with the bit length's few
+  instructions added), and far under where its share of the samples put them (0.885). A lesson (`agent-inferred`):
+  samples count where warps wait, and time follows them where issue slots stand idle; where other warps fill the slots,
+  a wait is hidden and time follows the instructions issued, so before a guess takes a line's share, the kernel's issue
+  activity says which share it takes. The place's loop is integer work on fixed latencies in every lane of every
+  launch, the kind that fills slots. With the instructions as the measure, the digit loop is now about half of the three
+  kernels (24.1 ms a section), and the one-limb tail of the 04:21 lead (about 20 of a power of 87 bits' 44 steps, each
+  about half the instructions of a two-limb step) would take about a quarter of it, near 3 ms a section; it keeps no
+  guess until built.
