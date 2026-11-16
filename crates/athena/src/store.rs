@@ -25,8 +25,9 @@ use std::collections::HashMap;
 use std::io::{BufRead, Seek, SeekFrom};
 use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set};
 
-/// The store's slices in its own order (`tools/corpus_passage.py`'s `SLICES`).
-const SLICES: [&str; 5] = ["code", "web", "science", "books", "wikidata"];
+/// The store's slices in its own order: `tools/corpus_passage.py`'s `SLICES` (Common Corpus's five), then the arithmetic world
+/// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
+const SLICES: [&str; 7] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words"];
 /// The head of a slice's index of pieces (`tools/corpus_passage.py`'s `INDEX_HEAD`).
 const INDEX_HEAD: &str = "document\ttitle_octets\ttext_octets\topens\tcloses";
 /// The head of a store's counts (`tools/corpus_passage.py`'s `STORE_HEAD`).
@@ -1019,6 +1020,49 @@ pub fn next_pass(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; agent-inferred, November 16, the theory thread's Build A] `join-store STATE STATE_SHA STORE STORE_SHA OUT`: **a state's pass
+/// joined to a grown store**: the state with its pass line set to the store `STORE` (`STORE_SHA` its `STORE.tsv`'s), its slices those of the
+/// store's role in the store's order, every slice at its first piece (piece, cursor and places taken zero), its count of stretches kept, and every
+/// other line of the state byte for byte (read back and checked, as [`next_pass`]). Refused where the state's slices are not the first of the
+/// grown store's, in order, or where the store adds no slice. Why at a new pass: the cut draws the slice whose places taken stand least against its
+/// quota ([`holonics_engine::passage::Cut::next`]), so a slice joined in the middle of a pass is drawn alone until it reaches the others' share,
+/// or, set to their share, is drawn alone once theirs end: on November 16 the line stood at 0.609 of its pass, and either join would have run
+/// some five laps on the joined slices alone. Joined at a new pass, every slice is drawn at its quota from the first section, and the pass ends
+/// for all of them together. What the old slices had left of their pass is read on the next one, the same law over the same passage.
+pub fn join_store(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("join-store STATE STATE_SHA STORE STORE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    let names = role_names(&counts, &before.role);
+    let held: Vec<&str> = before.slices.iter().map(|s| s.name.as_str()).collect();
+    if names.len() <= held.len() || names[..held.len()] != held[..] {
+        return Err(format!("a store whose {} slices ({}) do not extend the state's ({})", before.role, names.join(","), held.join(",")).into());
+    }
+    let mut pass = before.clone();
+    pass.store = args[4].clone();
+    pass.slices = names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect();
+    let after = slices_text(&pass);
+    let (written, lines, differing) = with_pass(&text, &learner, pass)?;
+    std::fs::write(out, &written)?;
+    println!(
+        "JOIN_STORE stretches={} store_before={} store_after={} before={} after={after} lines={lines} differing_line={differing}",
+        before.stretches,
+        before.store,
+        args[4],
+        slices_text(&before)
+    );
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored
@@ -1224,6 +1268,80 @@ pub fn read_prompt(args: &[String], realization: &mut dyn Realization) -> Result
         println!("PROMPT_SLICE slice={name} problems={n} own={} foil_code={} foil_less_own={} by_octave_foil_less_own={}", micro(total(0), run * n), micro(total(1), run * n), micro(total(1) - total(0), run * n), octaves.join(","));
     }
     println!("PROMPT_DONE problems={} batches={batches} {} ms={}", problems.len(), counters_text(realization), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; agent-inferred, November 16, the theory thread's anchor and answer reads of Build A] `read-forms UNITS UNITS_SHA KEYS
+/// KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA`: **a continuation coded after its own prompt.** `FORMS` is a table of rows
+/// `label<TAB>prompt<TAB>run` (a line feed in a prompt or a run written `\n`), made by a ruler on the host from the arithmetic world's held
+/// files (`tools/forms_table.py`): the same sum after `a + b = `, `a plus b equals ` and the foil `a plux b eqvals `, or a held record cut
+/// after its `= `. Each row's region is its prompt resolved and its run open, the region the writer's first read meets, and each open place
+/// is coded under its written byte. Each row's line gives the run's code in millionths of a bit a place and each place's code in order, so a
+/// ruler sums them by form, by the operands' lengths, by the digit's place and by whether a carry entered it. A reading: the state is read,
+/// never written. It runs on the card (`train`) or on the host's threads (`host`, beside the card's runs: it opens no card).
+pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
+    if args.len() != 11 {
+        return Err("read-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-forms")?;
+    let units = units_of(&args[1], &args[2])?;
+    if !units.merges().is_empty() {
+        return Err("the store's cut is on bytes: a units file of merges is refused".into());
+    }
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let law = learner.pass.clone().ok_or("a state with no pass line: read-forms reads a state of the store's line")?;
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, usize, Vec<usize>)> = Vec::new();
+    let mut regions: Vec<OwnedRegion> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, prompt, run] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        let (p, r) = (codec.encode(unescape(prompt).as_bytes())?, codec.encode(unescape(run).as_bytes())?);
+        if p.is_empty() || r.is_empty() {
+            return Err("a forms row with an empty prompt or run".into());
+        }
+        let mut classes = p.clone();
+        classes.extend_from_slice(&r);
+        let mut open = vec![false; p.len()];
+        open.extend(std::iter::repeat_n(true, r.len()));
+        rows.push((label.to_string(), p.len(), r));
+        regions.push(OwnedRegion::plain(classes, open));
+    }
+    if rows.is_empty() {
+        return Err("a forms table of no rows".into());
+    }
+    println!("FORMS_LAW rows={} alphabet={} pairs_bound={} sites_bound={} ms={}", rows.len(), codec.alphabet(), law.pairs, law.sites, started.elapsed().as_millis());
+    let micro = |code: i128, places: usize| -> i128 { if places == 0 { 0 } else { code * 1_000_000 / ((places as i128) << 20) } };
+    let (mut at, mut batches) = (0usize, 0usize);
+    while at < regions.len() {
+        let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, at);
+        while end < regions.len() {
+            let s = regions[end].classes.len() as u64;
+            if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                break;
+            }
+            (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+        }
+        let faces = realization.read_faces(&learner.field, &views_of(&regions[at..end])).map_err(|e| e.to_string())?;
+        for (k, faces) in (at..end).zip(faces) {
+            let (label, prompt, run) = &rows[k];
+            let codes: Vec<i128> = (0..run.len())
+                .map(|j| faces[prompt + j].as_ref().map(|f| f.code(run[j]) as i128).ok_or("an open place without a face"))
+                .collect::<std::result::Result<_, _>>()?;
+            let total: i128 = codes.iter().sum();
+            println!("FORMS_ROW label={label} prompt_places={prompt} run_places={} code={} by_place={}", run.len(), micro(total, run.len()), codes.iter().map(|&c| micro(c, 1).to_string()).collect::<Vec<_>>().join(","));
+        }
+        batches += 1;
+        at = end;
+    }
+    println!("FORMS_DONE rows={} batches={batches} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
     Ok(())
 }
 
