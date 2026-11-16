@@ -175,3 +175,48 @@ first terrain. It is also the first fresh passage, and box 4's questions are ask
   on lap 67's end, lap 64's pass close and lap 67's mean. Gate 3 reproduces a cold start's sections. Neither shows that
   nothing a process holds unsaved changes the bits. The sibling test of §6 item 3 is still the box's test: about a
   minute of card between laps.
+
+## 9. The boxes' reads after lap 68, scored (16:37 UTC; receipts `receipts/2026-11-16_alpha/`, #922)
+
+- **Box 3 held.** From lap 68's end, 48 sections in one process against 24, a save, a new process and 24 more: the two
+  `STATE`s are equal byte for byte (15,861,841 octets).
+- **Box 4's threshold held, every slice.** `read-prompt` codes the reference continuation with every run place open,
+  beside its own prompt and beside the next same-slice problem's. The foil less the own code, in millionths of a bit a
+  place:
+  - code 264,280
+  - web 131,745
+  - science 138,558
+  - books 137,529
+  - wikidata 233,371
+
+  That is 0.09 to 0.18 nats, against the guess of at least 0.05, and 18 of the 20 problems lean the same way. The first
+  place reads 0.59 to 9.1 bits by slice, and the far octaves are mostly positive. The field's conditionals carry their
+  prompt.
+- **Box 5: the writes do not compose.** `write-store`, 4 problems a slice, a prompt of 256 places, a run of 256 and no
+  refine. Each write keeps its slice's texture, echoes the prompt's words, and holds real words and short phrases, but
+  no sentence. Brandon has read five whole.
+
+## 10. The writer's test, guesses fixed 16:37 UTC
+
+The writer's two receivers (`agent-inferred`, from G182 and the plateau record §1):
+- **The sweeps.** They draw each place from the open-stretch receiver, which codes at the whole masks' level, 2.2 to
+  2.3 nats a place. That is near a count of three known neighbours a side, so a sweep's draft is text at that reach.
+- **The refine.** It redraws each place from the one-place receiver, with both sides known, at about 0.78 nats. It can
+  repair a word, but its reach is a few neighbours, so it cannot compose a sentence.
+
+The test is the own-states record's open question: `write-store` at `REFINE` 0, 4 and 16, on the same 20 problems.
+- **W1.** The write's one-place code (each place open alone among the written places, its prompt known) falls from 0 to
+  4 to 16 passes in every slice. At 0 passes it stands 0.3 to 1.0 nats a place above the reference continuation's
+  one-place code, and at 16 passes 0.1 to 0.5 under it, as the draft settles into the field's dense forms.
+- **W2.** The share of the write's whitespace-delimited strings of two bytes or more that occur as words in the slice's
+  1 GB passage rises by at least 0.10 from 0 to 16 passes, in at least four slices. This is a host ruler.
+- **W3.** There is no lock. The commonest byte's share moves by at most 0.03 at 4 passes and rises by at most 0.05 at
+  16, in every slice; G182 read it level at 0 to 2 passes.
+- **W4.** There is still no sentence at 16 passes. Brandon's eye decides.
+
+The whole-mask code at lap 68's mean is printed beside them. If W2 and W4 both hold, the limit is the sweep's receiver,
+and the next reads stand there, in this order:
+1. The fifth lane (S2), priced at whole masks as well.
+2. A refine whose order is the places' news, the most surprised place first and never by a face's top.
+3. The release's heat as a store, charged by its own news and leaking, so that the draft cools as it settles with no
+   temperature set by hand (the heat record §6 and §8).
