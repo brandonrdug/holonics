@@ -253,3 +253,90 @@ word is anchored, both carry the same news at the answer. Codex's controls sharp
   and never the lcm grid. The round trip m → n → m is not idempotent: 3 → 2 → 3 takes (1, 0, −1) to two thirds of itself,
   and (1, −2, 1) is the kernel of 3 → 2. The residual is carried by the precision law's remainder. It applies where one
   level reads another's grain, which the composite level will.
+
+## 9. Build A on laps 71 and 72, Build B's object, and the junction (sent to the build by 18:57 UTC)
+
+The two messages to the build carried the stamps 18:58 and 19:12. Neither was read from the clock, which stood at 18:57
+when both had been sent.
+
+**The reads.** Bits a place on met rows, laps 70, 71 and 72 (`receipts/2026-11-16_arithreads/`, #929; lap 72's from the
+build's relay):
+
+| Form | Lap 70 | Lap 71 | Lap 72 |
+|---|---|---|---|
+| Symbols | 4.35 | 3.55 | 3.51 |
+| Words | 7.04 | 6.28 | 6.57 |
+| Edited foil | 6.44 | 5.96 | 5.95 |
+| Null foil | 5.72 | 5.70 | 5.71 |
+| Swapped words | 7.05 | 6.34 | 6.57 |
+
+Under the open-whole read, the held answer digits code 2.45 to 2.52 nats a digit at met and at far lengths, carry or
+not. Ten digits held level would code at ln 10 = 2.30.
+
+**The scores:**
+- **G-ar1** missed. No-carry digits code 2.49 nats and carry-entered digits 2.45.
+- **G-ar2**, first clause: it stands only at chance (far 2.52, met 2.49). Equal levels at chance carry no evidence of
+  relative transport, so the clause is untested.
+- **G-ar2**, second clause: missed. Carry-entered digits stand 0.02 bits above the others at far lengths.
+- **G-an1 to G-an3 (17:08)**: not opened. They are read from the lap on which G-ar1's level is reached.
+- **G-an4**: not opened. Words stand 0.40 nats above the null at lap 71 and 0.60 at lap 72.
+- **G-an5**: its first clause holds (swapped and matched words 0.04 nats apart at lap 71).
+
+The 0.8-bit fall at lap 71 is the record's shape: a digit goes here. Which digit is still level after two laps with
+about a quarter of the draws arithmetic. The writer writes that shape after the symbols, and after GSM8K's questions it
+writes the word problems' solution form. So the blocker is not feedback.
+
+**The old five.** Their code rose 0.035 to 0.059 nats a place at lap 71 and 0.003 to 0.010 more at lap 72. Two causes
+stand:
+- their drive halved: a store held by upkeep settles to a higher balance under less drive (`store.finite-quality`);
+- the new slices' pulls on shared material (§8, the tug-of-war's price).
+
+The theory picks the first (`agent-inferred`), for two reasons. The rise slows from the first lap to the second, as a
+relaxation to a new balance does. It is also not gathered where the old slices write digits: wikidata, the slice
+densest in digits, rose least (0.035). Guess G-old: at lap 73's mean, each of the old five stands within 0.005 of its
+lap-72 mean. The fifth lane (S2) stands beside it.
+
+**Build B's object, checked against the lens before its guess.** Suppose the world appends its own problem's value after
+the field's drafted value. Then the reaction does not depend on the act, and the draft adds only a copy channel at a
+fixed offset: October's numeral copying. The lens's object makes the expression the act:
+1. The prompt is a few of the world's records.
+2. The writer releases the next record up to `= `.
+3. The world evaluates the field's own expression and appends its value and a line feed. A draft that does not parse
+   gets a fixed reaction instead (`?` and a line feed).
+4. The comparison runs at the world's places only, with the draft as known context.
+
+The reaction is then a function of the act alone, and the field learns on its own expressions: babbling, answered.
+- **G-B1.** While A's held answer digits code within 0.2 nats of ln 10, the loop's world digits code within 0.1 of A's
+  level at matched operand lengths. Feedback without the junction opens no digit law.
+- **G-B1′.** If the value-draft form is built instead, its world digits code under A's only where the draft's digit
+  equals the world's (the copy), and no lower elsewhere.
+
+**The junction, read from the forward** (`crates/engine/src/field.rs`, `carry.rs`, `adjoint.rs`). An answer digit
+c_k = a_k + b_k + carry (mod 10) needs three terms of the law.
+1. **The address.** c_k meets a_k and b_k across the expression only by class. A far source is met where its key's
+   class is the receiver's probe's (the support of the forward's table). The aligned place is counted from each
+   number's right end.
+2. **The junction.** Two digits' phases add only under a product. The forward's products along the strand are the pair
+   x_t ← x_t + W_c(a_t · b_s(t)) and the triad. The pair is a plain complex product (its reverse is δa_t = conj(b_s)
+   δc_t), so phases add. A current is a weighted sum, and the phase of a sum of two unit phasors is their half-sum, read
+   only through a product. So a far pair joins only as a composition: c_k gathers one digit, its strand mate gathers the
+   other, and the pair multiplies them. That is Brandon's crossing as a junction, built from two learned addresses and
+   one product.
+3. **The carry.** It is the carry circle along the answer's strand, right to left (`contact.carried-product`).
+
+The open-whole read asks all three at once, with the answer's right end open, so it is the hardest receiver. Training's
+masks (`passage::shape`, τ = u²) include states in which a digit's neighbours are known, so a located law shows first
+under the one-place receiver. Two reads were asked on the latest lap mean:
+- **R1:** the one-place receiver on the 256 held records.
+- **R2:** a ruler. It reads each head's share of a value digit's contact weight on its aligned operand digits, against
+  the mean share on the record's other operand digits.
+
+The guesses:
+- **G-ar4.** Under R1, met value digits other than the lead code within 0.3 nats of ln 10, carry or not. No digit law is
+  located under any receiver yet.
+- **G-ar5.** Under R2, at every head the aligned digits take under twice the other operand digits' mean share. The
+  address is not formed.
+
+If G-ar5 holds, the next law is the radix. A digit's place in its number, counted from the number's end, is founded as
+its class, so that equal powers meet at a crossing: Brandon's "founds units into a radix", with the pair as its junction
+and the carry circle as its carry. If G-ar5 misses and G-ar4 holds, the junction is the missing term.
