@@ -1,0 +1,134 @@
+# Feedback is friction against a world that answers the field's own act: agreement is the friction's zero, and arithmetic is the first world
+
+Theory, November 16, 2026, 17:05 UTC (the guesses' time, sent to the build before any read). Refs #404.
+
+## 1. The lens
+
+At 17:00Z Brandon, paraphrased, said five things.
+- **The writes.** They pick up the shapes of words, but this does not compound into composition. Composition is
+  self-induction: the field founds units into a radix, or a cloud.
+- **Feedback.** The field then needs feedback that biases its consistent and coherent parts. He refuses the name
+  "reward", because a reward is no physical mechanism.
+- **Friction.** The mechanism is friction, an exchange of momenta with a world that answers deterministically, as an
+  interpreter or a compiler does.
+  - Its specimens: a limb placed against the body's orientation (a child learning to walk), a finger reading Braille,
+    and the tongue and lips navigating food without biting a seed core.
+  - Skin hairs, the cochlea's stereocilia and the retina are one mechanism.
+  - Every interaction exchanges heat, so every interaction is a friction.
+- **Tension.** The tension is resonant coherence, a tug-of-war of the network with itself and with what it meets. No
+  single string can be pulled without bound, which is the industry's misalignment.
+- **Sparse binding.** Knot crossings are junctions, so binding is sparse. It grows into a global pass only where the
+  whole network is relevant.
+
+He asked to go back to arithmetic, in symbols and in word problems, and named GSM8K as a benchmark rather than a
+passage.
+
+## 2. What the tree already held, under its own names
+
+The search ran on the atlas for friction, tension, reafference, interpreter and compiler before this was written. Four
+rows already state most of the lens.
+
+- **The covector is friction.** `contact.closure-channels` defines a cell's covector as its two-sided friction: what
+  was opened and did not arrive, and what arrived unopened. Its size is the lock's friction on the aligned coupling.
+  - The comparison law therefore needs no new term. `p − q` is zero exactly where the field agrees with what crossed,
+    so every pull is a spring toward an agreement.
+  - It is bounded by the disagreement and goes quiet when agreement holds. There is no string to pull without bound.
+  - A reward unbounded above has no such zero, which is why "reward" names no balance.
+  - The law of November 14 (reward and agreement are one quantity) is this row read from the other side.
+- **Tension founds the units.** `contact.effective-tension` names tension as what a block's material cannot bridge
+  from its present face: the Schur complement. `contact.pool-founding` founds the next face as the leading direction
+  of that tension, read from a pool of products of present faces.
+  - `contact.lap-founds-reachable` adds that a lap over the same passage adds evidence only through what the last lap
+    founded. So learning climbs a staircase of composition.
+  - The founded faces are the units. Their products are the radix, or cloud, the next level reads.
+- **The tug-of-war.** Every receiver the field faces pulls on shared loci: the held reader, the writer's sweeps, its
+  refine, and a world's port. The pulls are the contacts' springs `Σ w J* D J`, and the deposit stands at their balance.
+  - A store holds that balance by upkeep (`store.finite-quality`), so the balance is a resonance with a finite quality,
+    never a fact set down.
+  - Coherence is what survives the deposit's sum. Receipts that agree across N contacts add as N; noise that is
+    independent across contacts adds as √N.
+- **Reafference.** `receipt.reafference-lag` states that a receiver cancels its own release only at its own clock's
+  phase. What the world adds beyond the field's prediction of its own act is the news.
+
+## 3. The missing term: a world that answers the act
+
+Text is a world that does not answer. The passage is the same whatever the field writes, so the friction the field
+meets there never depends on its acts, and its acts' consequences are never felt. Every specimen in the lens is an act
+whose sensed texture depends on the motion:
+- the limb's placement against the body's orientation;
+- the finger's stroke across a Braille cell;
+- the jaw's closure on a seed.
+
+On the objects (`agent-inferred`), a deterministic receiver joined at the field's boundary closes the loop:
+1. The field drafts (its release is the act).
+2. The world returns its reaction, which is a function of the act alone.
+3. The comparison runs on the reaction's places only. The draft is known context and never a target.
+
+The last clause is not optional. G169 and G182 read a field hearing its own draft as written text, and the draft
+drifted toward filler. The draft is the efference copy, and only the world's reaction is the afference.
+
+A deterministic world is what makes the bias toward the coherent parts automatic. Every contact with one law returns a
+receipt that agrees with every other contact's, so the law's direction adds as N in the deposit and the rest as √N.
+No selection is added on top.
+
+This is a chart of the lessons' foil `κ = S ⊖ E` with the world in the place of the passage.
+
+What does not transfer:
+- the anatomy;
+- the scalar reward of reinforcement learning;
+- any table of the world's answers inside the machine.
+
+The evaluator is terrain, generated by an authored routine at declared widths at the exterior, which the guide allows.
+No receiver of the machine computes an answer.
+
+## 4. Sparse binding
+
+A crossing passes current only where both strands carry share at it. The open rows' far pairs carry their selection
+(the record of November 15 on open rows), so the field's binding is already sparse by construction and reaches far only
+where far sources carry share.
+
+Arithmetic gives the first clean reading of it. Written as the world writes it, an answer digit of an n-digit sum
+binds its two operand digits at fixed offsets: n + 1 places back, and 2n + 2. A field that binds by relative transport
+on its rings keeps that crossing at every n. A field that met offsets keeps only the lengths it met.
+
+## 5. The builds, and the guesses fixed at 17:05 UTC
+
+**Build A: the arithmetic world as a slice, with no new law.**
+- Records of the form `expr=value`, with +, −, × and parentheses to depth 2, written as the world writes them and
+  never digit-reversed, because the carry's order is the field's to locate.
+- Training operands have 1 to 6 digits. The held set has unseen problems at those lengths and operands of 7 to 9
+  digits.
+- The line continues from its own state as one life.
+- The read is `read-prompt` with the answer open whole, each answer digit split by whether a carry enters it.
+
+The guesses, read after one lap:
+- **G-ar1.** At met lengths, digits no carry enters code at most 1.0 nats a digit, and digits a carry enters code at
+  least 0.5 above them.
+- **G-ar2.** At 7 to 9 digits, the no-carry digits stand within 0.3 nats of their level at met lengths: alignment is
+  relative transport on the rings, so it carries. The carry-entered digits stand at least 1.0 above the no-carry ones:
+  the carry is not yet a founded winding.
+
+If G-ar2's gap holds, the next law founds the digit ring's carry as a turn with a friction
+(`contact.carry-gate-turn-and-friction`). That is the radix founded as the helix's own carry.
+
+**Build B: the loop, after A reads.**
+- The writer drafts the value, and the world appends its own.
+- Only the world's places are compared, and the draft is context, never a target.
+- Its guess is fixed when A has read.
+
+**Data.** GSM8K's 7,473 training problems are a yardstick, not a passage. Symbol arithmetic is generated without limit
+by the world itself. For word problems the fitting set is TinyGSM (Liu et al. 2023, about 12.3 million problems with
+Python solutions an interpreter runs), the compiler-like world of the lens literally. Its rows are read for overlap
+with GSM8K's test before use, and its provenance stays exterior codec information.
+
+## 6. Recorded failures this could repeat
+
+- **Catered machinery.** The evaluator is terrain at the exterior. The codec stays bytes, with no digit-aware chart,
+  no reversed order and no carry handed in.
+- **Recitation counted as generation.** Unseen lengths are held, and the carry's split decides between a law and a
+  table.
+- **Self-hearing.** The draft is never a target in Build B.
+- **A scalar of progress.** Each read is split by the answer digit's carry state and by length, and is reported by
+  family.
+- **A modality as an exception.** Arithmetic is one specimen of a world that answers, as an interpreter or a listener
+  is.
