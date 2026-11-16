@@ -3182,11 +3182,35 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
             if constexpr (L <= WINDOW_LIMBS) {
                 if (!crowd) {
                     // The chunk's terms by limb (`stj`, `sts`, `st0`, `st1` ranked), those of one limb summed.
-                    uwide ulo = 0, uhi = 0;
+                    // [realization; theory, November 16 00:12Z] Carry-save: a term's three words, complemented where it is negative, are
+                    // added as six 32-bit chunks into six 64-bit sums with no carry between them (each holds 2^31 terms), a negative
+                    // term's +1 into the lowest and its sign extension (−2^192) counted in `gneg`; the carries are released once, when
+                    // the limb changes. The sum is co-present at one grain and released once, so every bit is the per-term carry's.
+                    uint64_t c0 = 0, c1 = 0, c2 = 0, c3 = 0, c4 = 0, c5 = 0;
+                    uint32_t gneg = 0;
                     uint32_t cq = 0xFFFFFFFFu;
+                    const auto flush = [&]() {
+                        if (cq == 0xFFFFFFFFu) {
+                            return;
+                        }
+                        uint64_t v = c0;
+                        const uint64_t o0 = (uint32_t)v;
+                        v = (v >> 32) + c1;
+                        const uint64_t o1 = (uint32_t)v;
+                        v = (v >> 32) + c2;
+                        const uint64_t o2 = (uint32_t)v;
+                        v = (v >> 32) + c3;
+                        const uint64_t o3 = (uint32_t)v;
+                        v = (v >> 32) + c4;
+                        const uint64_t o4 = (uint32_t)v;
+                        v = (v >> 32) + c5;
+                        const uint64_t o5 = (uint32_t)v;
+                        const uint64_t top = (v >> 32) - (uint64_t)gneg;
+                        add_window_at<L, 0>(N, cq, o0 | (o1 << 32), o2 | (o3 << 32), o4 | (o5 << 32), top, (top >> 63) != 0 ? ~(uint64_t)0 : 0);
+                    };
                     // Two terms at a time: their values, skins and products are independent, so the loads and the
                     // multiplications of both are in flight together; they are then added in rank order.
-                    const auto product = [&](uint32_t pos, uwide *xlo, uwide *xhi, uint32_t *negative) {
+                    const auto product = [&](uint32_t pos, uint64_t *w0, uint64_t *w1, uint64_t *w2, uint32_t *negative) {
                         const uint32_t j = stj[warp][pos];
                         const uint32_t gap = j > i ? j - i : i - j;
                         const int64_t raw = values[(uint64_t)j * S + entry];
@@ -3196,47 +3220,44 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                         const uint64_t mag = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
                         const uwide lo = (uwide)st0[warp][pos] * (uwide)mag;
                         const uwide mid = (uwide)st1[warp][pos] * (uwide)mag + (lo >> 64);
-                        const uwide mask = neg ? ~(uwide)0 : 0;
-                        *xlo = ((mid << 64) | (uwide)(uint64_t)lo) ^ mask;
-                        *xhi = (uwide)(uint64_t)(mid >> 64) ^ mask;
+                        const uint64_t mask = neg ? ~(uint64_t)0 : 0;
+                        *w0 = (uint64_t)lo ^ mask;
+                        *w1 = (uint64_t)mid ^ mask;
+                        *w2 = (uint64_t)(mid >> 64) ^ mask;
                         *negative = neg ? 1u : 0u;
                     };
-                    const auto accumulate = [&](uint32_t pos, uwide xlo, uwide xhi, uint32_t neg) {
+                    const auto accumulate = [&](uint32_t pos, uint64_t x0, uint64_t x1, uint64_t x2, uint32_t neg) {
                         const uint32_t q = sts[warp][pos];
                         if (q != cq) {
-                            if (cq != 0xFFFFFFFFu) {
-                                const uint64_t top = (uint64_t)(uhi >> 64);
-                                add_window_at<L, 0>(N, cq, (uint64_t)ulo, (uint64_t)(ulo >> 64), (uint64_t)uhi, top, (top >> 63) != 0 ? ~(uint64_t)0 : 0);
-                            }
+                            flush();
                             cq = q;
-                            ulo = 0;
-                            uhi = 0;
+                            c0 = c1 = c2 = c3 = c4 = c5 = 0;
+                            gneg = 0;
                         }
-                        const uwide t1 = ulo + xlo;
-                        const uwide t2 = t1 + (uwide)neg;
-                        const uint64_t carry = (t1 < xlo) | (t2 < t1);
-                        ulo = t2;
-                        uhi += xhi + (uwide)carry;
+                        c0 += (uint64_t)(uint32_t)x0 + neg;
+                        c1 += x0 >> 32;
+                        c2 += (uint64_t)(uint32_t)x1;
+                        c3 += x1 >> 32;
+                        c4 += (uint64_t)(uint32_t)x2;
+                        c5 += x2 >> 32;
+                        gneg += neg;
                     };
                     uint32_t pos = part;
                     for (; pos + parts < nvalid; pos += 2 * parts) {
-                        uwide alo, ahi, blo, bhi;
+                        uint64_t a0, a1, a2, b0, b1, b2;
                         uint32_t an, bn;
-                        product(pos, &alo, &ahi, &an);
-                        product(pos + parts, &blo, &bhi, &bn);
-                        accumulate(pos, alo, ahi, an);
-                        accumulate(pos + parts, blo, bhi, bn);
+                        product(pos, &a0, &a1, &a2, &an);
+                        product(pos + parts, &b0, &b1, &b2, &bn);
+                        accumulate(pos, a0, a1, a2, an);
+                        accumulate(pos + parts, b0, b1, b2, bn);
                     }
                     if (pos < nvalid) {
-                        uwide alo, ahi;
+                        uint64_t a0, a1, a2;
                         uint32_t an;
-                        product(pos, &alo, &ahi, &an);
-                        accumulate(pos, alo, ahi, an);
+                        product(pos, &a0, &a1, &a2, &an);
+                        accumulate(pos, a0, a1, a2, an);
                     }
-                    if (cq != 0xFFFFFFFFu) {
-                        const uint64_t top = (uint64_t)(uhi >> 64);
-                        add_window_at<L, 0>(N, cq, (uint64_t)ulo, (uint64_t)(ulo >> 64), (uint64_t)uhi, top, (top >> 63) != 0 ? ~(uint64_t)0 : 0);
-                    }
+                    flush();
                     return;
                 }
             }
