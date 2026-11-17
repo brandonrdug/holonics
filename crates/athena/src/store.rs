@@ -1295,6 +1295,34 @@ pub fn zero_triad_return(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 17 01:26Z] `read-pace UNITS UNITS_SHA CODEC CODEC_SHA STATE STATE_SHA`: **the turned heads' located rates,
+/// by symbol**: for each paced head, its clock's rate `κ = 1 + c_h[u]` (`Loci::pace`, on the material's grain) at the ten digits, the
+/// space, the signs `+ - * =`, the line feed and the letters `a e t`, in thousandths. A ruler: it names symbols by their bytes, outside the
+/// machine, and reads a state. Why: a digit that advanced a ring by its own value would show rates rising with the digit, and a clock in
+/// a number's own frame would stand still on digits and step at separators; this reads where deposition has put them.
+pub fn read_pace(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("read-pace UNITS UNITS_SHA CODEC CODEC_SHA STATE STATE_SHA".into());
+    }
+    let units = units_of(&args[1], &args[2])?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[3], &args[4], READ_BUDGET as usize)?)?, units)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[5], &args[6], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let d = learner.field.declaration;
+    let (at, rows) = (learner.field.layout().pace, d.alphabet + 1);
+    let named: Vec<(String, u8)> = (b'0'..=b'9').map(|b| ((b as char).to_string(), b)).chain([("space".to_string(), b' '), ("+".to_string(), b'+'), ("-".to_string(), b'-'), ("*".to_string(), b'*'), ("=".to_string(), b'='), ("feed".to_string(), b'\n'), ("a".to_string(), b'a'), ("e".to_string(), b'e'), ("t".to_string(), b't')]).collect();
+    for p in 0..d.paced_heads() {
+        let mut line = format!("PACE paced_head={p}");
+        for (name, byte) in &named {
+            let class = codec.encode(&[*byte])?[0];
+            let c = learner.field.theta[at + p * rows + class] as i128;
+            let kappa = (1i128 << holonics_engine::field::MATERIAL_BITS) + c;
+            line.push_str(&format!(" {name}={}", (kappa * 1000) >> holonics_engine::field::MATERIAL_BITS));
+        }
+        println!("{line}");
+    }
+    Ok(())
+}
+
 /// [measurement; the lead, November 16 23:58Z; atlas `contact.row-heat-keys-short`] `ruler-temper STATE STATE_SHA HEAD MILLI OUT`: **a ruler's
 /// state with one head's listener cooled**: the state with `MILLI` thousandths of an octave added to head `HEAD`'s listener temperature
 /// (`Loci::temper`, `[h][1]`, the logarithm of the row's gain on the material's grain), every other entry, moment and line kept. A ruler's

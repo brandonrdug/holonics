@@ -400,3 +400,18 @@ G-R2 held: at columns both operands hold, the digit up to its carry codes at 1.6
   register that knows nothing), and the carry's bit given that at 0.722 and 0.720. The winding is not read, and neither is the
   redundant digit's release.
 The top digit, for comparison: its bit 0.480, its five-residue given the bit 0.808; a column one operand holds, no carry: 0.673, 1.443.
+
+SCORE of G-L5, read from the clock at 01:29:01 UTC, November 17 (located_sums78.txt; 60,000 sums, 140,480 places, lap 78's mean; ten
+products with 128-wide legs located a tick on about 69,000 places, read on about 71,000; shares of the covector left after the linear
+chart's part): missed. At the units place the located products remove 0.073 at tick 0 and 0.116 at tick 1 on the held half (0.20 or
+more was guessed), and -0.184 and -0.048 at ticks 2 and 3; at columns both operands hold past the units, 0.114, 0.105, 0.100, 0.093
+(clear) and 0.126, 0.116, 0.096, 0.100 (carried); at a column one operand holds, 0.25 to 0.31; at the top digit 0.64 to 0.74. Over
+every place the ten products fit 0.21 to 0.26 and hold 0.106, 0.146, 0.020, 0.083. The engine's standing triads remove 0.000 to
+0.007. With nine times the places the covector alone shows the junction at about a tenth of the sum's columns, a third of what the
+labelled coordinates hold: above nothing, and under the guess.
+
+A READING with no guess (pace_by_symbol.txt, 01:27 UTC): the turned heads' located clock rates by symbol, lap 78's mean. Paced head 0:
+the ten digits 2.20 to 2.44 with no order by value, a space 9.94, the signs + - * 5.68, 6.48, 6.78, the equals sign 8.99, the line
+feed 11.59, the letters a e t 1.45, 1.14, 0.99. Paced head 1: the digit 0 at 2.19 and 1 to 9 at 3.29 to 3.82, a space 3.79, + - *
+2.43, 2.79, 5.14, the equals sign 2.14, the line feed 16.56, a e t 1.22, 2.16, 1.17. The clocks stride at separators and step alike on
+every digit: no digit advances a ring by its value, and neither clock stands still on digits.
