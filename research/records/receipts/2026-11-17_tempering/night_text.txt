@@ -1,0 +1,105 @@
+# The night's text run (G-N1) to pass 15 and its control (G-N2). Reads and counts only: the writes are the store's text and stay private.
+# READ: next place on its whole left context, micronats, by group. PANEL: sixteen prompts written by write-next (one place a read, each
+# the last of its region, 48 known places); words of two letters or more in the fifty books' lexicon, and the longest run shared with them.
+== before (lap 94's state)
+READ pass=0 fit next=2067596
+READ pass=0 held next=2050209
+READ pass=0 unread next=2019647
+n_lap94/forms.written seen: words 38 in_lexicon 13 (34%) longest_copy 11 held: words 59 in_lexicon 23 (38%) longest_copy 10 unread: words 58 in_lexicon 23 (39%) longest_copy 10 mean_copy 11.8
+== the run, passes 1 to 15
+PANEL pass=1 20:52:55 n_p1/forms.written seen: words 44 in_lexicon 22 (50%) longest_copy 11 held: words 71 in_lexicon 41 (57%) longest_copy 13 unread: words 74 in_lexicon 54 (72%) longest_copy 12 
+READ pass=1 fit next=1717793
+READ pass=1 held next=1732015
+READ pass=1 unread next=1727773
+PANEL pass=2 20:53:58 n_p2/forms.written seen: words 46 in_lexicon 33 (71%) longest_copy 14 held: words 73 in_lexicon 51 (69%) longest_copy 14 unread: words 74 in_lexicon 55 (74%) longest_copy 14 
+READ pass=2 fit next=1614711
+READ pass=2 held next=1645141
+READ pass=2 unread next=1659486
+PANEL pass=3 21:02:00 n_p3/forms.written seen: words 49 in_lexicon 39 (79%) longest_copy 15 held: words 66 in_lexicon 42 (63%) longest_copy 13 unread: words 71 in_lexicon 48 (67%) longest_copy 14 
+READ pass=3 fit next=1565176
+READ pass=3 held next=1603209
+READ pass=3 unread next=1622519
+PANEL pass=4 21:10:03 n_p4/forms.written seen: words 47 in_lexicon 34 (72%) longest_copy 13 held: words 71 in_lexicon 55 (77%) longest_copy 13 unread: words 65 in_lexicon 48 (73%) longest_copy 18 
+READ pass=4 fit next=1529283
+READ pass=4 held next=1582400
+READ pass=4 unread next=1598895
+PANEL pass=5 21:18:45 n_p5/forms.written seen: words 47 in_lexicon 37 (78%) longest_copy 12 held: words 73 in_lexicon 50 (68%) longest_copy 14 unread: words 75 in_lexicon 61 (81%) longest_copy 13 
+READ pass=5 fit next=1503192
+READ pass=5 held next=1568844
+READ pass=5 unread next=1581906
+PANEL pass=6 21:27:28 n_p6/forms.written seen: words 46 in_lexicon 32 (69%) longest_copy 13 held: words 76 in_lexicon 61 (80%) longest_copy 14 unread: words 75 in_lexicon 56 (74%) longest_copy 17 
+READ pass=6 fit next=1484779
+READ pass=6 held next=1558510
+READ pass=6 unread next=1577673
+PANEL pass=7 21:36:31 n_p7/forms.written seen: words 46 in_lexicon 36 (78%) longest_copy 14 held: words 63 in_lexicon 41 (65%) longest_copy 14 unread: words 70 in_lexicon 53 (75%) longest_copy 16 
+READ pass=7 fit next=1470936
+READ pass=7 held next=1554825
+READ pass=7 unread next=1572874
+PANEL pass=8 21:45:34 n_p8/forms.written seen: words 48 in_lexicon 38 (79%) longest_copy 17 held: words 71 in_lexicon 51 (71%) longest_copy 15 unread: words 74 in_lexicon 61 (82%) longest_copy 16 
+READ pass=8 fit next=1458722
+READ pass=8 held next=1551440
+READ pass=8 unread next=1568208
+PANEL pass=9 21:54:17 n_p9/forms.written seen: words 51 in_lexicon 35 (68%) longest_copy 13 held: words 69 in_lexicon 52 (75%) longest_copy 16 unread: words 71 in_lexicon 52 (73%) longest_copy 17 
+READ pass=9 fit next=1448913
+READ pass=9 held next=1542151
+READ pass=9 unread next=1563295
+PANEL pass=10 22:02:59 n_p10/forms.written seen: words 47 in_lexicon 36 (76%) longest_copy 14 held: words 62 in_lexicon 43 (69%) longest_copy 16 unread: words 72 in_lexicon 53 (73%) longest_copy 15 
+READ pass=10 fit next=1439271
+READ pass=10 held next=1536388
+READ pass=10 unread next=1563213
+PANEL pass=11 22:12:02 n_p11/forms.written seen: words 38 in_lexicon 28 (73%) longest_copy 15 held: words 71 in_lexicon 59 (83%) longest_copy 15 unread: words 68 in_lexicon 49 (72%) longest_copy 14 
+READ pass=11 fit next=1424308
+READ pass=11 held next=1531507
+READ pass=11 unread next=1560958
+PANEL pass=12 22:20:24 n_p12/forms.written seen: words 47 in_lexicon 36 (76%) longest_copy 17 held: words 68 in_lexicon 48 (70%) longest_copy 13 unread: words 79 in_lexicon 69 (87%) longest_copy 14 
+READ pass=12 fit next=1410478
+READ pass=12 held next=1531048
+READ pass=12 unread next=1567395
+PANEL pass=13 22:28:47 n_p13/forms.written seen: words 48 in_lexicon 37 (77%) longest_copy 14 held: words 65 in_lexicon 44 (67%) longest_copy 16 unread: words 75 in_lexicon 54 (72%) longest_copy 16 
+READ pass=13 fit next=1406313
+READ pass=13 held next=1532061
+READ pass=13 unread next=1566406
+PANEL pass=14 22:37:09 n_p14/forms.written seen: words 45 in_lexicon 36 (80%) longest_copy 15 held: words 75 in_lexicon 56 (74%) longest_copy 14 unread: words 69 in_lexicon 54 (78%) longest_copy 17 
+READ pass=14 fit next=1402578
+READ pass=14 held next=1528598
+READ pass=14 unread next=1564852
+PANEL pass=15 22:45:51 n_p15/forms.written seen: words 44 in_lexicon 30 (68%) longest_copy 14 held: words 69 in_lexicon 54 (78%) longest_copy 16 unread: words 71 in_lexicon 56 (78%) longest_copy 14 
+READ pass=15 fit next=1396990
+READ pass=15 held next=1527158
+READ pass=15 unread next=1569767
+== the control: the same fifty books as rows of 48 known places and a run of 32 with a keyed half open, 10 passes of 141 sections of 400 rows
+READ pass=0 fit next=2092805
+READ pass=0 held next=2075528
+READ pass=0 unread next=2019647
+READ pass=1 fit next=1953081
+READ pass=1 held next=1945404
+READ pass=1 unread next=1924400
+READ pass=2 fit next=1926265
+READ pass=2 held next=1921656
+READ pass=2 unread next=1900519
+READ pass=3 fit next=1912548
+READ pass=3 held next=1901647
+READ pass=3 unread next=1884552
+READ pass=4 fit next=1899786
+READ pass=4 held next=1891456
+READ pass=4 unread next=1879603
+READ pass=5 fit next=1883522
+READ pass=5 held next=1876283
+READ pass=5 unread next=1868541
+READ pass=6 fit next=1881380
+READ pass=6 held next=1868714
+READ pass=6 unread next=1862822
+READ pass=7 fit next=1872757
+READ pass=7 held next=1858800
+READ pass=7 unread next=1860041
+READ pass=8 fit next=1868490
+READ pass=8 held next=1850445
+READ pass=8 unread next=1852921
+READ pass=9 fit next=1858145
+READ pass=9 held next=1840775
+READ pass=9 unread next=1844574
+READ pass=10 fit next=1858470
+READ pass=10 held next=1834374
+READ pass=10 unread next=1836520
+CONTROL one place a read: n_half/forms.written seen: words 45 in_lexicon 26 (57%) longest_copy 11 held: words 76 in_lexicon 46 (60%) longest_copy 12 unread: words 64 in_lexicon 32 (50%) longest_copy 12 
+CONTROL the law's writer in place order: w_half_place/forms.written seen: words 42 in_lexicon 18 (42%) longest_copy 12 held: words 66 in_lexicon 35 (53%) longest_copy 10 unread: words 63 in_lexicon 34 (53%) longest_copy 11 

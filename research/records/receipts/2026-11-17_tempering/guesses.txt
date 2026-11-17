@@ -271,3 +271,11 @@ both writers (one place a read as the last of its region; the law's writer in pl
   count of compared places); its panel under 60% of words in the lexicon by its better writer (the night's run 72% to 77%).
   What it decides: a control at the night run's level says the register did it and the state did not; a control left near the first
   dwell's level (1.87, 59%) says the comparison at the boundary is what text needed first.
+
+Scored (2026-11-17T22:58:06Z), G-N2 (night_text.txt): held on both parts. The control (the same fifty books, rows of 48 known places and a run of 32
+with a keyed half open, 10 passes, about 9 million compared places) leaves the held next place at 1.813 nats (1.80 or above guessed;
+2.050 before; 1.922 after its first pass), where the night's run read 1.732 after its first pass and 1.536 after its tenth, the same
+counts of compared places. Its panel: 104 of 185 words in the lexicon (56%) by the writer of one place a read, 87 of 171 (51%) by the
+law's writer in place order (under 60% guessed); the night's run at pass 15: 140 of 184 (76%), held next place 1.527. By eye the
+control writes almost-words and the run writes real words in broken phrases. The comparison at the boundary is what text needed first;
+the register alone does not do it.

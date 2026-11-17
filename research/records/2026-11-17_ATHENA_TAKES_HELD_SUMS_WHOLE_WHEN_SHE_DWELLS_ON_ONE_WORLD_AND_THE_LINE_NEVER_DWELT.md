@@ -328,3 +328,18 @@ she was not compared on, so her left columns read high; the right columns are th
 text. So her context is wide and soft, where a word needs the last five symbols held sharply together. That is §9's reading measured:
 nothing binds. It is also what the boundary chart alone will not change, and what the work after it is for.
 
+## 15. The control: the same books under the old kind of comparison
+
+§12's reading rested on a run that changed two things at once, the state compared and the text (fifty storybooks). The control changes
+one (G-N2, `night_text.txt`): the same fifty books from the same start, read as the first dwell read its three, rows of 48 known places
+and a run of 32 with a keyed half open, for the count of compared places the night's run had made.
+
+| at equal compared places | 0.9 million | 9 million | the panel's words in the lexicon |
+|---|---|---|---|
+| each place compared as the boundary of what is known (the night's run, passes 1 and 10) | 1.732 | 1.536 | 73% at pass 10, 76% at pass 15 |
+| a keyed half of a run open (the control, passes 1 and 10) | 1.922 | 1.813 | 56% (51% by the law's writer in place order) |
+
+(The held next place on its whole left context, nats; 2.050 before either.) By eye the control writes almost-words again and the run
+writes real words in broken phrases. Both guesses of G-N2 held. So the comparison at the boundary is what text needed first, and the
+register by itself does not give it. The night's run stood at 1.527 nats at pass 15 and goes on to pass 40.
+
