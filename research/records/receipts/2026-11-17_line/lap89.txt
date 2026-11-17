@@ -1,0 +1,17 @@
+11:34:49
+# lap89: exit 0 released 11:25:59
+MEASURE lap=lap89 rc=0 wall_s=3292.0 peak_rss_kib=860056
+STORE_PASS role=prefix sections=3000 stretches_read=74168552 ended=fal
+== loud 88
+code 0.5566 20.054 -0.029;web 0.9151 20.175 -0.096;science 0.7596 20.255 -0.160;books 0.8738 20.378 -0.193;wikidata 1.0775 20.122 +0.230;arithmetic 1.6070 20.613 -0.375;words 0.7773 20.163 -0.318;all 0.8943 20.228 -0.018;
+== loud 89
+code 0.5542 20.061 -0.032;web 0.9042 20.179 -0.091;science 0.7622 20.265 -0.164;books 0.8620 20.394 -0.210;wikidata 1.0699 20.131 +0.248;arithmetic 1.5987 20.636 -0.368;words 0.7731 20.175 -0.316;all 0.8884 20.238 -0.012;
+letter 0.614 0.4549;digit 0.101 1.9751;space 0.185 0.2252;mark 0.090 2.8292;
+WRITES_BY_PLACE  met 128 0.984 0.750 0.195 0.086 0.016 0.141 0.000
+world read share 0.889
+WRITE bolts = 2/0\nbolts = 5\nfiberno_cand = bost * libect\nadd_idds = 2\nfiber_to_cand = 1\ntotal_blues\nboot = faler_itere fibont\nrosult = dang_fiber + note_fiber_to_cans * to_per_gigh * cotal_chers * \n
+90 + 81 =  | 416\n15 + 8 = 88\n | 171\n
+58 - 43 =  | 32\n(7 + 4) + 900 | 15\n
+36 * 0 =  | 386\n2516 * 0 * 2 | 0\n
+4 * 317 =  | 239\n5 * 9526 = 1 | 1268\n
+
