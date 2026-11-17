@@ -18,6 +18,17 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
+## Where the work stands (November 17): the phase is reviewed and the build is a founding law
+
+The phase from lap 71 to lap 94 (the arithmetic world, the word problems and the world's acts) trained no behaviour: no held value
+is written whole, a sum's units digit codes flat, and on prose the line codes no better than a plain count of three neighbours a
+side (0.86 nats a missing byte on held books against 0.73 for a count fitted on 32 MB). The engine rides what descent gives it and
+never founds. The arithmetic world leaves the line at lap 94's end; laps are no longer the work. What is built is one law,
+founding: keys located by closing the menu of the engine's own rows, a part that multiplies keyed sources, and the machine's
+navigation of its passage by where its menus close, each loop ending in a reading Brandon can look at. The first is the engine's
+host forward on a state founded by the ruler, with the held sums it writes. The engine's rate is read against the card before
+anything grows ([the review](research/records/2026-11-17_THE_PHASE_REVIEWED_THE_ENGINE_RIDES_AND_NEVER_FOUNDS_ON_PROSE_IT_CODES_NO_BETTER_THAN_A_COUNT_OF_THREE_NEIGHBOURS_A_SIDE_THE_ARITHMETIC_WORLD_TRAINED_NO_BEHAVIOUR_AND_A_PLATEAU_WAS_REPORTED_AS_A_LEVEL.md)). The sections below describe the line as it stood through lap 94.
+
 ## What runs: the store line learns open text, arithmetic and word problems on the card
 
 - **The line.** One life from lap 1 to lap 87 on the RTX 4080 SUPER under `.local/gpu.lock` (laps 88 to 97 queued), through

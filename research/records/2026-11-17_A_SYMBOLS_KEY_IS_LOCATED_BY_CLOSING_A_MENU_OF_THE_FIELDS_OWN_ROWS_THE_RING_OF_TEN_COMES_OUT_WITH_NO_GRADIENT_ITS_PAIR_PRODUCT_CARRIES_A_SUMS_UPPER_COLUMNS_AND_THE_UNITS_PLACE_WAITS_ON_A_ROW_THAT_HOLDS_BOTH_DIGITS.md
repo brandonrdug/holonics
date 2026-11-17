@@ -209,6 +209,13 @@ the records whose only sign is the plus stand in one context of about ten thousa
 closure closes where a record holds one law at short operands, and on the machine's own region as it is drawn it does not, at
 this sample, under any context read here.
 
+**The law is in the chart** (a diagnosis, not guessed; `sign_in_chart86.txt`, `loop_closure_ruler.py sign`). On the three-operation records a linear read of
+the open place's pair chart gives the record's sign at 0.91 to 0.95 at the value's units place, 0.89 to 0.90 at its other digits
+and 0.97 to 0.99 at the operands' digits, on the held half. So which law a place is under stands at the place, in a direction of
+small spread that the charts' largest groups do not follow; and where the sign itself is the open place the chart still gives it
+at 0.51 to 0.59 from the operands and the value. A return that multiplies a pair product by a read of the place's own chart has
+its context there.
+
 **Products across heads** (a diagnosis, not guessed; `release86_cross.txt`, `loop_closure_ruler.py cross`). At the units
 place one row holds one aligned digit or the other. With every head's keyed barycentre and the products of two heads' barycentres
 beside head 0's own pair product, the wheel's digit is read at 0.26, 0.43 and 0.29 at ticks 0 to 2 (0.22, 0.22, 0.18 from head 0
@@ -281,7 +288,7 @@ covector closes the row on both digits. A founding that moves neither is a faile
 `receipts/2026-11-16_tension/`: `guesses.txt` (G-HC, G-J, G-LC, G-RL, each fixed and pushed before its read, with its score);
 `circles86.txt`, `circles86_planted.txt`; `junction_sums78.txt`; `oracle_short86.txt`, `heat_short86.txt`, `midpoint_short86.txt`;
 `closure86.txt`, `closure86_planted.txt`, `closure77_units_tick0.txt`; `release86.txt`, `release86_cross.txt`; `planes86.txt`, `planes86_planted.txt`,
-`planes86_block.txt`; `context86.txt`, `context86_planted.txt`, `context86_presence.txt`; `text86_closure.txt`; `clusters86.txt`; `slice86_presence.txt`, `slice86_sets.txt` (G-DH, G-SG, G-TX, G-CX, G-SL, G-SET). Tools:
+`planes86_block.txt`; `context86.txt`, `context86_planted.txt`, `context86_presence.txt`; `text86_closure.txt`; `clusters86.txt`; `slice86_presence.txt`, `slice86_sets.txt`; `sign_in_chart86.txt` (G-DH, G-SG, G-TX, G-CX, G-SL, G-SET). Tools:
 `tools/loop_closure_ruler.py` (`DIR`, `planted`, `release`, `cross`, `planes`, `context TABLE`, `text TABLE`, `clusters TABLE`), `tools/store_windows.py`, `tools/tension_ruler.py` (`circles`,
 `junction`), `athena host complete-language read-tension` (now with `charge.i64` and `gate.i64`, and `shares` for the open rows'
 shares alone), `athena train complete-language read-triads`. The reads ran on the host beside laps 87

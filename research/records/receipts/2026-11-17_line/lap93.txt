@@ -1,0 +1,17 @@
+16:06:16
+# lap93: exit 0 released 15:57:06
+MEASURE lap=lap93 rc=0 wall_s=3037.0 peak_rss_kib=861540
+STORE_PASS role=prefix sections=3000 stretches_read=78975248 ended=fal
+== loud 92
+code 0.5527 20.085 -0.025;web 0.9028 20.195 -0.082;science 0.7544 20.284 -0.159;books 0.8607 20.407 -0.201;wikidata 1.0647 20.154 +0.239;arithmetic 1.6013 20.671 -0.308;words 0.7618 20.176 -0.311;all 0.8843 20.256 -0.006;
+== loud 93
+code 0.5544 20.095 -0.025;web 0.9049 20.206 -0.083;science 0.7595 20.297 -0.148;books 0.8596 20.419 -0.202;wikidata 1.0632 20.165 +0.267;arithmetic 1.6017 20.669 -0.279;words 0.7627 20.200 -0.308;all 0.8854 20.268 +0.001;
+letter 0.614 0.4492;digit 0.101 1.9908;space 0.185 0.2263;mark 0.090 2.7328;
+WRITES_BY_PLACE  met 128 0.969 0.734 0.258 0.125 0.047 0.125 0.000
+world read share 0.897
+WRITE trakes_bold = 16 mainth = 310\nribery_bent = peake_pence * fibery_bolts_pense = (trake_peake_bolts) + filer)\n= mage_spen = spetal\npense_idet = to_takes = total_cults\n     peake_grats = 35\ntais_
+90 + 81 =  | 100\n72 * (4 * 80 | 171\n
+58 - 43 =  | -33\n(70 + 84) *  | 15\n
+36 * 0 =  | 760\n1 * 2 = 8\n?\n | 0\n
+4 * 317 =  | 191\n234\n(12 - 8) | 1268\n
+

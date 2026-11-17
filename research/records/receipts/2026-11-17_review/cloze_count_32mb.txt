@@ -1,0 +1,3 @@
+CLOZE_COUNT slice=books train_octets=32000000 held_places=100274 count_of_bytes=3.2411 1_a_side=1.7856 2_a_side=0.9876 3_a_side=0.7331 4_a_side=0.6919 5_a_side=0.6887
+CLOZE_COUNT slice=web train_octets=32000000 held_places=122682 count_of_bytes=3.4498 1_a_side=1.9523 2_a_side=1.0127 3_a_side=0.7637 4_a_side=0.7347 5_a_side=0.7325
+16:17:44

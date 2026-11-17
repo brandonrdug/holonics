@@ -1,0 +1,17 @@
+15:06:36
+# lap92: exit 0 released 14:57:44
+MEASURE lap=lap92 rc=0 wall_s=3050.5 peak_rss_kib=860344
+STORE_PASS role=prefix sections=3000 stretches_read=77772997 ended=fal
+== loud 91
+code 0.5521 20.080 -0.020;web 0.9013 20.188 -0.090;science 0.7581 20.277 -0.153;books 0.8619 20.411 -0.204;wikidata 1.0656 20.131 +0.244;arithmetic 1.6172 20.611 -0.363;words 0.7570 20.183 -0.312;all 0.8854 20.246 -0.015;
+== loud 92
+code 0.5527 20.085 -0.025;web 0.9028 20.195 -0.082;science 0.7544 20.284 -0.159;books 0.8607 20.407 -0.201;wikidata 1.0647 20.154 +0.239;arithmetic 1.6013 20.671 -0.308;words 0.7618 20.176 -0.311;all 0.8843 20.256 -0.006;
+letter 0.614 0.4525;digit 0.101 1.9634;space 0.185 0.2304;mark 0.090 2.7217;
+WRITES_BY_PLACE  met 128 0.969 0.719 0.234 0.141 0.031 0.164 0.000
+world read share 0.901
+WRITE siber_could = 38\nfiber_lecko_lecke = lorge, total = olage_sonth_ofiber_chole_sop = intotal * Sibers ofigure_\nwiber_lorge = stiler_takes / (14 loingefiber_cholls * +\nsiberstages_cos = stelutary
+90 + 81 =  | 81\ny - (6 * 86)  | 171\n
+58 - 43 =  | 122\n2 - 179 =  1 | 15\n
+36 * 0 =  | 2007 * 286) = 40 | 0\n
+4 * 317 =  | 842\n660 + 1 = 50 | 1268\n
+

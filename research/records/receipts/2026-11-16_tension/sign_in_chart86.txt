@@ -1,0 +1,8 @@
+SIGN_IN_CHART role tick test_rows share_of_the_sign_a_linear_read_gives
+SIGN_IN_CHART value units: 0.928 0.947 0.929 0.908  (test rows a tick 2265)
+SIGN_IN_CHART value: 0.889 0.903 0.903 0.898  (test rows a tick 2948)
+SIGN_IN_CHART operand a units: 0.987 0.995 0.992 0.992  (test rows a tick 1431)
+SIGN_IN_CHART operand b units: 0.977 0.987 0.976 0.972  (test rows a tick 2265)
+SIGN_IN_CHART operand b: 0.948 0.992 0.991 0.990  (test rows a tick 1438)
+SIGN_IN_CHART the sign itself: 0.513 0.544 0.565 0.590  (test rows a tick 2265)
+SIGN_IN_CHART other: 0.901 0.900 0.843 0.797  (test rows a tick 13971)
