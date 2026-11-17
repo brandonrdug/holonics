@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted]]
+Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted] | text TABLE]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -56,6 +56,13 @@ share no plane (`w ↦ u w` against `w ↦ w + u`), so one menu of pairs cannot 
 `CONTEXT_SPAN` gives each clean line or plane under each context with its support and the keys of its symbols in turns; the scores
 beside it (the ten digits as characters of ℤ/10; the digits 1, 3, 9, 7 and 2, 6, 8, 4 as characters of ℤ/4, a discrete logarithm's
 order) are the ruler's.
+
+With `text TABLE`, DIR is a read of a store's own windows (`tools/store_windows.py`; a label is `win:<slice>:<n>`): the menu of
+pairs is gathered over every slice together and over the arithmetic windows, the word problems' and the other slices' apart, cut to
+blocks and closed by lines and planes. `TEXT_BLOCKS` lists the blocks of four symbols or more; `TEXT_SPAN` each clean line or plane
+of a block with its support and, for its keys, the smallest order of a lattice they sit on and how many of its residues are
+occupied (one residue is a function of constant phase, a block's own indicator and no ring). The same is printed for the menu with
+the written symbols dealt at random among the places.
 
 Floats, counts and the knowledge of which bytes are digits are a ruler's (CLAUDE.md, a ruler is an instrument). The sums are synthetic,
 so their records are printed freely."""
@@ -341,6 +348,83 @@ def report_context(name, tables, symbols, ticks=(0, 1)):
                     print(f"CONTEXT_SPAN {name} tick={tick} context={show(s_)} modulus={modulus:.3f} in_one={one:.3f} in_two={two:.3f} flatness={flat:.3f} support=[{members}]{wheel}{four} keys_in_turns={keys}", flush=True)
 
 
+def menus_text(d, texts, head=0, ticks=(0, 1), dealt=False, seed=17):
+    """The pair menus of a read of a store's windows, by scope (`pooled`, `arithmetic`, `words`, `other`) and tick, for one head."""
+    rng = np.random.default_rng(seed)
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    lines = [line for line in lines if int(line[3]) == head and int(line[2]) in ticks]
+    symbols = sorted({c for line in lines for c in texts[line[0]]})
+    index = {c: i for i, c in enumerate(symbols)}
+    n = len(symbols)
+    written = [texts[line[0]][int(line[4])] for line in lines]
+    if dealt:
+        places = sorted({(line[0], line[4]) for line in lines})
+        deal = dict(zip(places, rng.permutation([texts[lab][int(site)] for lab, site in places])))
+        written = [deal[(line[0], line[4])] for line in lines]
+    out = {}
+    for line, x in zip(lines, written):
+        text = texts[line[0]]
+        sources = [(int(j), int(p_) / 1e6) for j, p_, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        if len(sources) < 2:
+            continue
+        us = np.array([index[text[j]] for j, _ in sources])
+        ps = np.array([p_ for _, p_ in sources])
+        q1, q2 = np.bincount(us, weights=ps, minlength=n), np.bincount(us, weights=ps**2, minlength=n)
+        pair = np.outer(q1, q1) - np.diag(q2)
+        slice_name = line[0].split(":")[1]
+        for scope in ("pooled", slice_name if slice_name in ("arithmetic", "words") else "other"):
+            out.setdefault((scope, int(line[2])), np.zeros((n, n, n)))[:, :, index[x]] += pair
+    return out, symbols
+
+
+def lattice(f, sup, orders=range(2, 13)):
+    """The smallest order of a lattice the phases of `f` on its support sit on at 0.9 (the resultant of `m` times the phases, taken
+    from the support's first symbol), with that resultant and how many of the lattice's residues are occupied; (0, 0.0, 0) if none."""
+    idx = np.flatnonzero(sup)
+    theta = np.angle(f[idx] / f[idx[0]])
+    for m in orders:
+        fit = abs(np.exp(1j * m * theta).mean())
+        if fit >= 0.9:
+            return m, fit, len({int(round(t * m / (2 * np.pi))) % m for t in theta})
+    return 0, 0.0, 0
+
+
+def report_text(name, tables, symbols, cap=6):
+    digits = [symbols.index(str(d)) for d in range(10)] if all(str(d) in symbols for d in range(10)) else None
+    shown = {" ": "space", "\n": "feed"}
+    show = lambda i: shown.get(symbols[i], symbols[i])
+    for key in sorted(tables):
+        scope, tick = key
+        t = tables[key]
+        blocks = [b for b in blocks_of(t) if len(b) >= 4]
+        print(f"TEXT_BLOCKS {name} scope={scope} tick={tick} symbols={int((t.sum(axis=(1, 2)) > 0).sum())} blocks={len(blocks)}: " + " | ".join(" ".join(show(i) for i in b) for b in blocks))
+        for b in blocks:
+            z = np.zeros_like(t)
+            ix = np.ix_(b, b, b)
+            z[ix] = t[ix]
+            share = z.sum() / max(t.sum(), 1e-30)
+            printed, seen = 0, []
+            for modulus, one, two, f, flat, sup in spans(z, symbols):
+                if two < 0.9 or flat < 0.95 or sup.sum() < 4:
+                    continue
+                order, fit, residues = lattice(f, sup)
+                members = " ".join(show(i) for i in range(len(symbols)) if sup[i])
+                wheel = ""
+                if digits is not None and all(sup[i] for i in digits):
+                    amp, pct = characters(np.angle(f[digits]))
+                    j = 1 + int(amp[1:].argmax())
+                    wheel = f" ten: j={j} a_j={amp[j]:.3f} null_pct={pct:.3f}"
+                sig = (members, order, residues)
+                if sig in seen:
+                    continue
+                seen.append(sig)
+                keys = " ".join(f"{show(i)}:{(np.angle(f[i] / f[np.flatnonzero(sup)[0]]) / (2 * np.pi)) % 1:.2f}" for i in range(len(symbols)) if sup[i])
+                print(f"TEXT_SPAN {name} scope={scope} tick={tick} block_share={share:.3f} modulus={modulus:.3f} in_one={one:.3f} in_two={two:.3f} flatness={flat:.3f} lattice_order={order} lattice_fit={fit:.3f} residues={residues} support=[{members}]{wheel} keys_in_turns={keys}", flush=True)
+                printed += 1
+                if printed == cap:
+                    break
+
+
 def characters(phases, shuffles=2000, seed=5):
     """The ten located phases as characters of ℤ/10: `a_j`, and the percentile of the largest `a_(j≠0)` under permutations of the digits."""
     omega = np.exp(-2j * np.pi * np.outer(np.arange(10), np.arange(10)) / 10)
@@ -570,6 +654,13 @@ def main():
         return
     if len(sys.argv) > 2 and sys.argv[2] == "cross":
         cross(d)
+        return
+    if len(sys.argv) > 3 and sys.argv[2] == "text":
+        texts = table_texts(sys.argv[3])
+        for dealt in (False, True):
+            tables, symbols = menus_text(d, texts, dealt=dealt)
+            print(f"TEXT_READ menu={'dealt' if dealt else 'rows'} symbols={len(symbols)} tables={len(tables)}")
+            report_text("dealt" if dealt else "rows", tables, symbols)
         return
     if len(sys.argv) > 3 and sys.argv[2] == "context":
         texts = table_texts(sys.argv[3])

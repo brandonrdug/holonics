@@ -762,3 +762,33 @@ for the letters' null.
 What it decides: G-TX2 held, a founding cannot be read off the store's pooled menu, and a key's founding waits on a context
 read from the place; missed, the ring is in the store's own menu and a founding is ready to state. G-TX3 missed would be a
 find: a law of composition among letters that nobody handed the ruler.
+
+SCORES of G-TX1 to G-TX3, read from the clock at 10:57:54 UTC, November 17 (text86_closure.txt; 2,300 windows of the store's
+training documents, 13,800 places, lap 86's mean, head 0; the dump 277 s on eight host threads as run text86, the ruler 7
+minutes on one, beside lap 89 on the card)
+G-TX1 missed by one symbol: the pooled menu's blocks hold the digits 1 to 9 together at both ticks and the zero apart. The
+blocks are otherwise the passage's own classes with no label: the four signs * + - =, the consonants (b c d f g h k l m n p r
+s t v w y, with S and C), the vowels with a few liquids (a e g i l n o u z), and at tick 1 the layout's marks.
+G-TX2 held: no block of digits gives a clean line or plane in the pooled menu or in the arithmetic windows alone, so no wheel
+is returned from the store's own mixture. The arithmetic windows are 2,400 places of the slice as it draws them (three
+operations, parentheses, two to four operands), where the specimen reads had 41,000 to 53,000 places of one or three laws.
+G-TX3 held: no block of six or more letters gives a line or plane with keys on a lattice. Seven spans of four or five symbols
+sit on a lattice of order 4 to 12 with three residues occupied (C c d p; g l n z; : ; j {), which four points do easily; the
+dealt menu gives none, and none is claimed as a ring.
+Decided as the guess said: a founding cannot be read off the store's pooled menu as the closure stands. Where one law of
+composition stands the menu closes on it; the store mixes several on the same symbols, and the context that tells them apart
+has to be read first.
+
+GUESSES G-CX1 and G-CX2, fixed at 10:57:54 UTC, November 17 (from date -u), before the read: a context read from the place's own chart
+Reading: on the three-operation records of G-SG (4,500 distinct, every place open, 52,854 places, lap 86's mean), the places
+are grouped by their own pair charts at tick 1 (k-means, sixteen groups, no label), and head 0's menu of pairs at tick 0 is
+closed inside each group, cut to blocks, by lines and planes (loop_closure_ruler.py clusters). The reason: the row's share on
+a sign was too thin to pick the law, and the place's chart has gathered its record by then; if it tells a sum's place from a
+product's, a group of like charts is a context nobody labelled.
+G-CX1: at least one group's menu returns the wheel at 0.9 or more at a j coprime to ten from a block that holds the ten
+digits.
+G-CX2: at least one group's menu returns the ring of four of the units' group under multiplication (the digits 1, 3, 9, 7 or
+2, 6, 8, 4 on quarter turns at 0.9 or more), from a group made mostly of products' places.
+What it decides: G-CX1 held, a founding can take its context from the field's own charts with no label, and the store's
+mixture is closable group by group; missed, the charts do not yet tell the laws apart well enough to found from, and the key
+waits on that.
