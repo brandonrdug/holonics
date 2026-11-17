@@ -443,3 +443,16 @@ G-KR1: the leading mode of the digits' block holds under 0.5 of its power on the
 G-KR2: none of the first three modes holds 0.75 or more on one character.
 What it decides: both held, the engine's tension does not show the ring of ten as October's did, and a key located from this
 tension would not be a ring; either missed, the ring is locatable here from the tension alone, as the symbol's law asks.
+
+SCORES of G-KR1 and G-KR2, read from the clock at 07:11:42 UTC, November 17 (coupling_short79.txt; 184,645 written sites of 8,000 short
+sums, lap 79's mean, tick 0)
+The instrument first. Its first two forms did not return a planted ring and their reads are void: with a site's whole chart as the
+feature a class's moment is its own mean chart's and K reads diagonal; a law planted as a constant covector a class cannot be seen
+by a coupling of states. As repaired (the feature is the state a symbol arrives into, the chart less its class's mean; the two
+moments of a pair on two halves of the records), a law planted on the same shapes, one drawn map of the state turned by the digit's
+first character at a tenth of the covector's power, is returned as the two leading modes with 0.67 and 0.89 of their power on the
+first character and ten times the eigenvalue.
+G-KR1 held: the leading mode of the digits' coupling holds 0.18 of its power on the first character.
+G-KR2 held: the first three modes hold at most 0.46 on one character (0.18, 0.40, 0.46 on the first; the fourth 0.49).
+The engine's tension at lap 79 does not show the ring of ten that October's arithmetic tower showed (0.84 and 0.78). A key located
+from this tension would not be a ring. It agrees with the register read: nothing downstream yet asks the digits for their sum.
