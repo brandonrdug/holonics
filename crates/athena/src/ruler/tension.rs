@@ -335,7 +335,8 @@ pub fn carry_of(milli: &str) -> Result<i64> {
 
 /// [measurement; the lead, November 17, the founding records and the record of the step back] `try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC
 /// CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT`: **passes over a small table by the learner's own section step**: the
-/// state's learner takes `PASSES` passes over a forms table (`label<TAB>prompt<TAB>run`), `RECORDS` records a section, each record a region
+/// state's learner takes `PASSES` passes over a forms table (`label<TAB>prompt<TAB>run`, and `suffix` as a fourth field where a row's run
+/// is opened from a keyed place to its end), `RECORDS` records a section, each record a region
 /// with a keyed half of its run's places open (a place is open where [`keyed_bit`] of `label:pass:place` is odd, and one place where none
 /// is), on the realization it is called through (the card under `train`, the host's threads under `host`), and the learner is
 /// written to `OUT`. One line a pass: its sections, its sites and its code in nats a place.
@@ -379,7 +380,9 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         return Err("try-passes writes a new state from one pass or more of one record or more a section".into());
     }
     let unescape = |t: &str| t.replace("\\n", "\n");
-    let mut rows: Vec<(String, Vec<usize>, Vec<usize>)> = Vec::new();
+    // A row's fourth field, where it stands, names its opening: `suffix` opens the run from a keyed place to its end (the state a write
+    // in place order meets: every earlier place known, every later one open); absent, a keyed half of the run's places.
+    let mut rows: Vec<(String, Vec<usize>, Vec<usize>, bool)> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         if w.len() < 3 {
@@ -389,7 +392,12 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         if p.is_empty() || r.is_empty() {
             return Err("a forms row with an empty prompt or run".into());
         }
-        rows.push((w[0].to_string(), p, r));
+        let suffix = match w.get(3).copied() {
+            None | Some("") => false,
+            Some("suffix") => true,
+            Some(_) => return Err("a forms row whose opening is not `suffix`".into()),
+        };
+        rows.push((w[0].to_string(), p, r, suffix));
     }
     if stride.is_some_and(|n| n * sweeps > rows.len()) {
         return Err("a stream of fewer rows than its passes take".into());
@@ -498,13 +506,18 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         for chunk in taken.chunks(records) {
             let regions: Vec<OwnedRegion> = chunk
                 .iter()
-                .map(|(label, p, r)| {
+                .map(|(label, p, r, suffix)| {
                     let bit = |j: usize| keyed_bit(&format!("{label}:{sweep}:{j}"));
                     let mut classes = p.clone();
                     classes.extend_from_slice(r);
                     let mut open = vec![false; classes.len()];
-                    for j in 0..r.len() {
-                        open[p.len() + j] = bit(j) & 1 == 1;
+                    if *suffix {
+                        let from = (bit(r.len()) % r.len() as u64) as usize;
+                        open[p.len() + from..].fill(true);
+                    } else {
+                        for j in 0..r.len() {
+                            open[p.len() + j] = bit(j) & 1 == 1;
+                        }
                     }
                     if !open.iter().any(|&o| o) {
                         open[p.len() + (bit(r.len()) % r.len() as u64) as usize] = true;
