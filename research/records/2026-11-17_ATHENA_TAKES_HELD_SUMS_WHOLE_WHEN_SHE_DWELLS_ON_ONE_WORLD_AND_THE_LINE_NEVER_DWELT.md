@@ -262,3 +262,51 @@ unknown; in a mask state the right side is half known. She was almost never comp
 place compared beyond open places is trained to a blend, and her almost-words are blends. The generation law asks for a boundary that
 is released; the boundary of a passage being read is its next place.
 
+## 13. The build the night's run points to, fixed before it is made
+
+Read at pass 5 (`guesses.txt`): the held next place 1.732, 1.645, 1.603, 1.582, 1.569 nats (2.050 before), the panel's words in the
+lexicon 61%, 72%, 69%, 74%, 75% (38% before). The fall flattens toward about 1.5, and the writes at pass 5 are real short words and
+phrases with no clean sentence. So the comparison's state removed the debris in an hour, and what shows now is the engine's own level.
+Two things follow, in this order.
+
+**1. The boundary chart** [definition; agent-inferred, November 17, to be built]. A passage being read has a boundary, its next place.
+A receiver at place `t` reads the passage's current up to `t − 1` and its face is compared with the symbol that arrives at `t`. Every
+place of a known passage is such a boundary at its own time, and one forward compares them all when the transport is one-sided: no site
+reads its own symbol or anything past it.
+
+```text
+moment     s_t = Σ_(k<t) ζ^(k−t) D(t−k) E₋(u_k)                       the retarded moment: the strand's past at the place
+open       x⁰_t = E₋(u_(t−1)) + C s_t + b_s                           no row of the site's own symbol, none of the next
+support    S_i = { j < i : near or of the probe's class }               sources stand before their receiver
+strand     the pair's mate t − 1; the circles' scan in the passage's direction
+face       at every site, compared with the symbol that arrives there
+```
+
+By induction over the ticks a site's state is then a function of `u_(<t)` alone, so a site is a source for every later site and a
+receiver of its own symbol at once, and no site is veiled. The two-sided field stays for a region that is complete in space (a problem
+with its port, an image, a place to fill), under the declaration's word.
+
+Why: tonight's run compares one place a region of 49 sites, 400 comparisons a section. The chart compares every site of a region, about
+48 times the comparisons for the same forward, which is what makes megabytes a minute and not a pass in eight. And it is the generation
+law read on a passage: the boundary that is released is the next place, where the writer by octaves released far places before near
+ones and the trainer's states followed it (§12).
+
+The recorded failures it could repeat, checked: a design thought in offsets (it is stated on the retarded moment and the support's side,
+and the trial's 48 known places are a ruler's convenience, not the chart's reach); a modality's exception (a passage in time is read
+this way whatever it carries; a region in space keeps the two-sided field); a context window standing in for learning (the reach is the
+declaration's: moments and far sources span the region); the transformer's global pass (the field still disperses: near field and
+classes, one side of them).
+
+Acceptance, fixed now. (a) With the word off every state reads and trains bit for bit as before, and the card's bits are the host's
+with it on. (b) A place's face under the chart does not change when any symbol at or past it is changed (tested on the bits). (c) On
+the fifty books, a pass that compares every place once takes under a minute of the card, and the panel after equal comparisons is at
+tonight's level or past it, read by eye first. Parts not yet made one-sided (the second read's mark, the level, the junction, the
+triad's forward leg, the blank clocks) are refused under the word until each is.
+
+**2. Then her own navigation**, which this chart makes natural: a reader's boundary moves, so reading is the navigation. The passage's
+moments carried across a stretch's end (Codex's one-opening packet is the oracle for what crosses; a cold restart between), then the
+stride, the choice to stay and the next piece read from her own progress (the receipt's `predicted` and `transfer`).
+
+What neither gives is depth of binding: at about 1.5 nats a place she writes as a short-context model does. A law's own entries and its
+own comparison (§9), sized by what a founding saves, is the work after these two, and the chart is what makes its trials cheap.
+

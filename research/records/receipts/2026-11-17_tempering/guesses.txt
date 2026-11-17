@@ -251,3 +251,11 @@ G-W1's one pair (worded_pair.txt): from the founded state the worded form's stri
   0.095 at 400 (held: under 0.1 by 1,200), 0.002 by 3,000; its panel 95 of 96 whole. From lap 94's state 2.2 to 2.3 through section
   1,400, 0.883 at 2,000, 0.155 at 3,000 (held: not under 0.1 before 2,400). The sign form through the worded dwell: 0.37 to 1.13 nats,
   its panel 53 of 96 after it (missed: under 0.5 guessed). About eight times sooner from the founded state.
+
+Read (2026-11-17T21:28:13Z), G-N1 at passes 1 to 5 (the run goes on to pass 40; scored in full at its end). Next place on its whole left context,
+nats, fitted / held twentieths / unread books: 2.068 / 2.050 / 2.020 before; pass 1 1.718 / 1.732 / 1.728; pass 2 1.615 / 1.645 / 1.659;
+pass 3 1.565 / 1.603 / 1.623; pass 4 1.529 / 1.582 / 1.599; pass 5 1.503 / 1.569 / 1.582. The fall a pass on the held rows: 0.318,
+0.087, 0.042, 0.021, 0.013. Sixteen prompts written by the matched writer (write-next), words in the fifty books' lexicon: lap 94's state
+59 of 155 (38%); passes 1 to 5: 61%, 72%, 69%, 74%, 75%; longest run shared with the fitted text 13 to 18 octets. The guess's held range
+(1.60 to 1.72 at pass 40) is already passed under at pass 4, and its panel clause (65% or more) at pass 2; the flattening it named is
+there by pass 5. By eye at pass 5: real short words and phrases, no clean sentence.
