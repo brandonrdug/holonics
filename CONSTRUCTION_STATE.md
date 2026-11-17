@@ -20,7 +20,7 @@ repository was reset on September 24; the pre-reset tree is
 
 ## What runs: the store line learns open text, arithmetic and word problems on the card
 
-- **The line.** One life from lap 1 to lap 78 on the RTX 4080 SUPER under `.local/gpu.lock`, through
+- **The line.** One life from lap 1 to lap 83 on the RTX 4080 SUPER under `.local/gpu.lock` (lap 84 onward queued to lap 90), through
   `holonics_engine::field` in `crates/engine`, its card realization in `crates/engine-cuda` and the
   commands in `crates/athena` ([THE_ENGINE](docs/THE_ENGINE.md)). Laps 75 and 76 trained with the
   crossing triads and lap 77 with the refined act; from lap 78 the arithmetic slice is redrawn
@@ -74,6 +74,16 @@ repository was reset on September 24; the pre-reset tree is
   ([the friction record](research/records/2026-11-16_FEEDBACK_IS_FRICTION_AGAINST_A_WORLD_THAT_ANSWERS_THE_FIELDS_OWN_ACT_AGREEMENT_IS_THE_FRICTIONS_ZERO_AND_ARITHMETIC_IS_THE_FIRST_WORLD.md) §11, §12).
 - **Its levels** (nats a place of the held passage, 128 documents a slice never met, at lap means; the
   one-place receiver: each place opened alone among the written places).
+  - Lap 83, the sixth on the redrawn arithmetic slice: code 0.5603, web 0.9082, science 0.7614, books 0.8667, wikidata 1.0705, the
+    held arithmetic (the uniform draw's records) 1.6116 and the GSM8K test split 0.7789; every place 0.8926 (0.8842 at lap 77).
+    The GSM8K test split rose by 0.016 over laps 79 to 82 and the whole rise stands at its marks (2.52 to 2.82 nats on 0.09 of its
+    places, its letters 0.478 to 0.462, its digits 1.98 throughout): its markup writes no spaces around a sign, and the passages
+    the line trains on do (`tools/cavity_by_kind.py`).
+  - What six laps on the redrawn slice moved: the share of drafts the world reads 0.61 to 0.88, the top digit of a short sum 1.55
+    to 1.41 nats, the writes' form (short assignment lines closing on an answer line). What they did not: a sum's digit, held in no
+    register (its bit 0.727 nats against 0.693, [the record](research/records/2026-11-17_A_ROWS_MIDPOINT_IS_IN_THE_CHART_AND_ITS_DOUBLING_CARRIES_THE_SUM_BUT_ONLY_A_LABELLED_READ_FINDS_IT_THE_ADDRESS_IS_ONE_HEADS_A_RENAMED_REGION_IS_READ_BY_ITS_OWN_USE_AND_A_SYMBOL_IS_STILL_A_FREE_ROW.md) §3.8); a held record's value is
+    written whole once in 128 (`tools/arithmetic_writes_by_place.py`: its sign agrees at 0.64 to 0.73, its count of digits at 0.20,
+    its last digit at a blind guess's rate).
   - Lap 78, the first on the redrawn arithmetic slice: code 0.5598, web 0.9172, science 0.7672, books 0.8710, wikidata 1.0779, the
     held arithmetic (the uniform draw's records) 1.6108 and the GSM8K test split 0.7694. Read alone, a short sum's units digit codes
     at 2.359 nats (2.365 at lap 77's mean) and its top digit at 1.389 (1.545).
@@ -191,10 +201,22 @@ removes, fitted on one half of the records and read on the other.
   rings, is owed: on November 12 each class held 259 entries of its own, 0.54 of the constitution
   ([THE_ENGINE](docs/THE_ENGINE.md) §9, §10;
   [the symbol's record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md)).
+  On November 17 the rows were read: the three tables of a row a class hold 94,080 of the constitution's 402,805 entries, the
+  digits' rows hold 0.40 of their power on the ring of ten's first character against 0.22 for a blind order, a renamed region is
+  coded 2.0 to 2.7 nats a place over plain text and closes with its length (guard 9's law, measured), and a doubled byte's twin is
+  not read as its twin ([the record](research/records/2026-11-17_A_ROWS_MIDPOINT_IS_IN_THE_CHART_AND_ITS_DOUBLING_CARRIES_THE_SUM_BUT_ONLY_A_LABELLED_READ_FINDS_IT_THE_ADDRESS_IS_ONE_HEADS_A_RENAMED_REGION_IS_READ_BY_ITS_OWN_USE_AND_A_SYMBOL_IS_STILL_A_FREE_ROW.md) §3.5, §3.6).
+- **The next build is the symbol's own line, and it is a design's statement only.** A symbol's move on a ring is a turn, a
+  half-turn or a collapse; the engine's clocks only turn and its carry circles have no hand; October's tower held the hand, a
+  pair-located turn, a face of harmonics and a ring founded from the tension, wrote 445 of 495 held-out sums on its own terrain
+  and did not carry to word problems. The line proposed is for every stream, its form may be handed as a gene, and its bar is
+  October's unpassed one: word problems' calculations never met in training written above an 8-gram's level
+  ([the wheel's record](research/records/2026-11-17_THE_DIGITS_WHEEL_A_SYMBOLS_MOVE_ON_A_RING_IS_A_TURN_A_HALF_TURN_OR_A_COLLAPSE_THE_ENGINES_CLOCKS_ONLY_TURN_AND_A_SUM_NEEDS_THE_HAND_FLIPPED_AT_THE_EQUALS_SIGN.md)). Nothing of it is built; its first host reads are owed.
 - **The engine has no founding law.** Every part since November 13 entered at zero (a lane, a mark's
   strengths, the crossing's return) or with drawn operands (the crossing's legs). The founding law of
   October 24 stands in a host ruler (`tools/tension_ruler.py`) and a state tool (`found-crossing`); read
-  on lap 76's sections it found nothing to found at the junction, whose operands are not yet there
+  on lap 76's sections it found nothing to found at the junction, whose operands are not yet there; on 140,480 places of short
+  sums at lap 78's mean the covector alone locates products that hold a tenth of the sum's columns, where ten coordinates fitted
+  to the digits hold 0.28 to 0.39 (a gate on capacity, never a founding)
   ([THE_CONSOLIDATION](docs/plans/THE_CONSOLIDATION.md#10-declared-extents-that-stand-in-for-laws) §10, §11).
 - **The act's release stands far over the card's count.** One released place costs about 360
   times a trained place, which is the realization's to repair before the loop runs long
