@@ -1,0 +1,24 @@
+# Two rulers on the night run's pass-5 state (host). reach: her next-place code on 1,200 held rows when only the last k places are
+# known (the region is those k places and the open place). count: a count model's code on the same rows by the longest context it may
+# use (interpolated Witten-Bell, counted on the fitted text), a yardstick outside the machine.
+REACH known=48 next_place_micronats=1547469 rows=1203
+REACH known=32 next_place_micronats=1543577 rows=1203
+REACH known=24 next_place_micronats=1549314 rows=1206
+REACH known=16 next_place_micronats=1590862 rows=1202
+REACH known=12 next_place_micronats=1619476 rows=1206
+REACH known=8 next_place_micronats=1710852 rows=1205
+REACH known=6 next_place_micronats=1843228 rows=1203
+REACH known=4 next_place_micronats=2082877 rows=1200
+REACH known=3 next_place_micronats=2422261 rows=1204
+REACH known=2 next_place_micronats=2957303 rows=1205
+REACH known=1 next_place_micronats=4241233 rows=1202
+REACH_DONE 21:34:39
+COUNT known=0 next_place_nats=3.013 rows=1200
+COUNT known=1 next_place_nats=2.373 rows=1200
+COUNT known=2 next_place_nats=1.924 rows=1200
+COUNT known=3 next_place_nats=1.577 rows=1200
+COUNT known=4 next_place_nats=1.395 rows=1200
+COUNT known=5 next_place_nats=1.361 rows=1200
+COUNT known=6 next_place_nats=1.374 rows=1200
+COUNT known=8 next_place_nats=1.508 rows=1200
+COUNT known=10 next_place_nats=1.663 rows=1200

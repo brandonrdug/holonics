@@ -310,3 +310,21 @@ stride, the choice to stay and the next piece read from her own progress (the re
 What neither gives is depth of binding: at about 1.5 nats a place she writes as a short-context model does. A law's own entries and its
 own comparison (§9), sized by what a founding saves, is the work after these two, and the chart is what makes its trials cheap.
 
+## 14. How far back she reads, against a count of the same text
+
+Two rulers on the pass-5 state, the same 1,200 held rows (`reach_and_count.txt`). Her next-place code when only the last `k` places
+stand in the region, and a count model's code by the longest context it may use (interpolated Witten-Bell, counted on the fitted text):
+
+| known places | 1 | 2 | 3 | 4 | 6 | 8 | 12 | 16 | 24 | 48 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Athena, pass 5 (nats) | 4.241 | 2.957 | 2.422 | 2.083 | 1.843 | 1.711 | 1.619 | 1.591 | 1.549 | 1.547 |
+
+| the count's longest context | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| a count model (nats) | 3.013 | 2.373 | 1.924 | 1.577 | 1.395 | 1.361 | 1.374 |
+
+She draws on about twenty-four places, and with all of them she codes what a count of three places codes. (Her short regions are states
+she was not compared on, so her left columns read high; the right columns are the fair ones.) A count of five places reads 1.36 on this
+text. So her context is wide and soft, where a word needs the last five symbols held sharply together. That is §9's reading measured:
+nothing binds. It is also what the boundary chart alone will not change, and what the work after it is for.
+
