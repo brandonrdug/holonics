@@ -382,3 +382,12 @@ G-L5: at the units place at tick 1 the ten located products remove 0.20 or more 
   same locator fitted 0.40 and held 0.08; the labelled ten coordinates hold 0.39). Held, a founding located from the tension alone
   exists at this count of places and its legs are written for found-crossing; missed under 0.10, the covector does not show the
   junction to a locator at this count either, and the deposit, which reads the same covector, is not expected to find it soon.
+
+GUESSES G-R1 and G-R2, fixed at 01:08:39 UTC, November 17 (from date -u), before the read: a digit's code by its registers
+Reading: tension_ruler.py registers on the open place's whole face (read-tension now writes faces.i64): the 8,000 short sums, lap
+78's mean, host on 8 threads. The ten digits' shares among the digits split into the bit and the five-residue; at a column both
+operands hold, the digit up to its carry and the carry's bit.
+G-R1: at the units place the bit codes at 0.68 nats or more (a register that knows nothing: 0.693) and the five-residue given the bit
+  at 1.60 or more (1.609): neither register is held.
+G-R2: at the columns both operands hold, the carry's bit given the digit up to its carry codes within 0.05 nats for columns with a
+  carry in and columns with none, and at 0.60 or more for both: the winding is not read.

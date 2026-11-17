@@ -680,6 +680,53 @@ def modes(d, triads=10):
                         print(f"TENSION_MODES {scope} {pname} {k} {t.sum()} {sname} {m} " + " ".join(f"{v:.4f}" for v in out) + f" {removed(pair, lam, f, t):.4f}", flush=True)
 
 
+def registers(d, codec):
+    """A value digit's code read by its registers (the lead, November 17; Brandon's reminder of 00:44Z on radix and registers; atlas
+    `radix.trailing-unit-rings`, `radix.carry-cascade-consumer`, `radix.carry-section-flux`). On a `read-tension` directory with
+    `faces.i64` (the open place's whole face), the ten digits' shares of the face, taken among the digits, are split as the ring of
+    ten splits: the bit (the digit modulo 2) and the five-residue given the bit, and the other way round; and, at a column both
+    operands hold, the release of the redundant digit `a_k + b_k`: the digit up to its carry (the face's share on the pair sum's
+    last digit and on the next digit together) and the carry's bit given that. Beside each stands a register that knows nothing:
+    ln 2 for a bit, ln 5 for a five-residue or for a digit up to its carry, ln 10 for the digit. By part, nats a place."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    with open(codec) as f:
+        void = int(f.readline().split()[2])
+        units = [int(x) for x in f.readline().split()]
+    cls = {b: (k if k < void else k + 1) for k, b in enumerate(units)}
+    alphabet = len(units) + 1
+    faces = np.fromfile(os.path.join(d, "faces.i64"), dtype="<i8").reshape(-1, alphabet).astype(np.float64) / 2.0**20 * np.log(2.0)
+    first = np.arange(0, len(rows), ticks)
+    assert len(first) == len(faces), (len(first), len(faces))
+    p = np.exp(-faces[:, [cls[48 + k] for k in range(10)]])
+    mass = p.sum(axis=1)
+    q = p / mass[:, None]
+    part = np.array([PARTS.index(part_of(kinds[i])) for i in first])
+    digit = np.array([kinds[i][6] for i in first])
+    da, db, held = (np.array([kinds[i][j] for i in first]) for j in (4, 5, 7))
+    carried = np.array([kinds[i][3] for i in first])
+    sel_plus = np.array([kinds[i][1] == "+" and kinds[i][0] == "met" for i in first])
+    n = np.arange(len(first))
+    same_bit = np.array([[c % 2 == dd % 2 for c in range(10)] for dd in digit])
+    same_five = np.array([[c % 5 == dd % 5 for c in range(10)] for dd in digit])
+    whole = -np.log(q[n, digit])
+    bit = -np.log((q * same_bit).sum(axis=1))
+    five = -np.log((q * same_five).sum(axis=1))
+    s = (da + db) % 10
+    upto = -np.log(q[n, s] + q[n, (s + 1) % 10])
+    print(f"TENSION_REGISTERS chance: bit {np.log(2):.3f}  five {np.log(5):.3f}  digit {np.log(10):.3f}")
+    print("TENSION_REGISTERS part places off_the_digits digit bit five_given_bit five bit_given_five")
+    for pid, pname in enumerate(PARTS):
+        m = sel_plus & (part == pid)
+        if m.sum() < 100:
+            continue
+        print(f"TENSION_REGISTERS {pname} {m.sum()} {(-np.log(mass[m])).mean():.4f} {whole[m].mean():.4f} {bit[m].mean():.4f} {(whole[m] - bit[m]).mean():.4f} {five[m].mean():.4f} {(whole[m] - five[m]).mean():.4f}")
+    print("TENSION_RELEASE columns places digit digit_up_to_its_carry carry_bit_given_that")
+    for name, m in (("both hold, no carry in", sel_plus & (held == 2) & ~carried), ("both hold, a carry in", sel_plus & (held == 2) & carried)):
+        if m.sum() < 100:
+            continue
+        print(f"TENSION_RELEASE {name.replace(' ', '_')} {m.sum()} {whole[m].mean():.4f} {upto[m].mean():.4f} {(whole[m] - upto[m]).mean():.4f}")
+
+
 def temper(d, heads=4):
     """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
     reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
@@ -809,6 +856,8 @@ def main():
         midpoint(sys.argv[2])
     elif cmd == "modes":
         modes(sys.argv[2])
+    elif cmd == "registers":
+        registers(sys.argv[2], sys.argv[3])
     elif cmd == "heat":
         heat(sys.argv[2])
     elif cmd == "links":

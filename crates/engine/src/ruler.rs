@@ -1851,6 +1851,7 @@ impl Constitution {
             current: pass.ticks.iter().map(|c| c.y.clone()).collect(),
             products: pass.ticks.iter().map(|c| c.ct.clone()).collect(),
             codes: pass.faces.iter().enumerate().map(|(t, f)| f.as_ref().map(|f| f.code(region.classes[t]))).collect(),
+            faces: pass.faces.iter().map(|f| f.as_ref().map(|f| (0..self.declaration.alphabet).map(|c| f.code(c)).collect())).collect(),
         })
     }
 }
@@ -1877,6 +1878,9 @@ pub struct CrossingTension {
     pub current: Vec<Vec<i64>>,
     pub products: Vec<Vec<i64>>,
     pub codes: Vec<Option<i64>>,
+    /// An open site's whole face: the code of every class there (`[site][A]`, on `2^(−20)` bits), so a ruler can read a symbol's code by
+    /// its registers (a digit's bit and its five-residue; a column's sum apart from its carry). Written by `read-tension` as `faces.i64`.
+    pub faces: Vec<Option<Vec<i64>>>,
 }
 
 
