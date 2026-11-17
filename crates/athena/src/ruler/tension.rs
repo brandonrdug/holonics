@@ -334,23 +334,22 @@ pub fn carry_of(milli: &str) -> Result<i64> {
     Ok((m << 30) / 1000)
 }
 
-/// [measurement; the lead, November 17, the founding records] `try-closed UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE
-/// STATE_SHA SWEEPS RECORDS OUT`: **a premise's trial on the host**: the state's learner takes `SWEEPS` passes over a forms table
-/// (`label<TAB>prompt<TAB>run`), `RECORDS` records a section, each record a region with a keyed half of its run's places open (a place is
-/// open where the low bit of an FNV-1a hash of `label:sweep:place` is one, and one place where none is), by the learner's own section step
-/// on the host's threads, and the learner is written to `OUT`. One line a section: its sites, its code before and after on `2^(−20)` bits,
-/// and whether its step was deposited.
+/// [measurement; the lead, November 17, the founding records and the record of the step back] `try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC
+/// CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT`: **passes over a small table by the learner's own section step**: the
+/// state's learner takes `PASSES` passes over a forms table (`label<TAB>prompt<TAB>run`), `RECORDS` records a section, each record a region
+/// with a keyed half of its run's places open (a place is open where bit 17 of an FNV-1a hash of `label:pass:place` is one, and one place
+/// where none is), on the realization it is called through (the card under `train`, the host's threads under `host`), and the learner is
+/// written to `OUT`. One line a pass: its sections, its sites and its code in nats a place.
 ///
-/// Why on the host, and what it is not: the closed face ([`holonics_engine::closed`]) has no card realization, and whether its pull on
-/// the rows closes a lock is the premise that decides whether one is built. A table of a few thousand records is read in minutes on the
-/// host's threads. The state it writes is a ruler's: it is no line's state, no lap trains from it, and what it reads is the premise on
-/// this table, never the line's learning (the learner's laps run on the card).
-pub fn try_closed(args: &[String]) -> Result<()> {
+/// Why: the tempering study (the record of the step back, §6) reads what many passes over little do to the machine, law by law, on tables
+/// of a few thousand records. A field the card does not realize (closed characters) is tried on the host's threads as a premise's trial,
+/// reported as one. The state it writes is a study's: it is no line's state and no lap trains from it.
+pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
     if args.len() != 14 {
-        return Err("try-closed UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA SWEEPS RECORDS OUT".into());
+        return Err("try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT".into());
     }
     let started = std::time::Instant::now();
-    refuse_variables("try-closed")?;
+    refuse_variables("try-passes")?;
     let units = units_of(&args[1], &args[2])?;
     let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
     let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
@@ -362,7 +361,7 @@ pub fn try_closed(args: &[String]) -> Result<()> {
     let (sweeps, records): (usize, usize) = (args[11].parse()?, args[12].parse()?);
     let out = Path::new(&args[13]);
     if out.exists() || sweeps == 0 || records == 0 {
-        return Err("try-closed writes a new state from one sweep or more of one record or more a section".into());
+        return Err("try-passes writes a new state from one pass or more of one record or more a section".into());
     }
     let unescape = |t: &str| t.replace("\\n", "\n");
     let mut rows: Vec<(String, Vec<usize>, Vec<usize>)> = Vec::new();
@@ -377,9 +376,10 @@ pub fn try_closed(args: &[String]) -> Result<()> {
         }
         rows.push((w[0].to_string(), p, r));
     }
-    println!("TRIAL_HOST records={} sweeps={sweeps} records_a_section={records} closed={} threads={}", rows.len(), learner.field.declaration.closed, rayon::current_num_threads());
+    println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} threads={}", rows.len(), learner.field.declaration.closed, rayon::current_num_threads());
     let mut section = 0usize;
     for sweep in 0..sweeps {
+        let (mut sites, mut code) = (0usize, 0i128);
         for chunk in rows.chunks(records) {
             let regions: Vec<OwnedRegion> = chunk
                 .iter()
@@ -398,10 +398,14 @@ pub fn try_closed(args: &[String]) -> Result<()> {
                 })
                 .collect();
             let views: Vec<_> = regions.iter().map(view_of).collect();
-            let receipt = learner.section(&views).map_err(|e| e.to_string())?;
-            println!("TRIAL_SECTION sweep={sweep} section={section} sites={} code_before={} code_after={} deposited={} ms={}", receipt.sites, receipt.code_before, receipt.code_after.map_or("-".to_string(), |c| c.to_string()), receipt.deposited, started.elapsed().as_millis());
+            let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
+            sites += receipt.sites;
+            code += receipt.code_before as i128;
             section += 1;
         }
+        // The pass's code in millionths of a nat a place (ln 2 on 2^(−30), the code on 2^(−20) bits).
+        let nats = (code * holonics_engine::field::ln2_face() * 1_000_000) >> 50;
+        println!("TRIAL_PASS pass={sweep} sections={section} sites={sites} micronats_a_place={} ms={}", nats / sites.max(1) as i128, started.elapsed().as_millis());
     }
     write_new(out, learner.to_text().as_bytes())?;
     println!("TRIAL_DONE sections={section} ms={}", started.elapsed().as_millis());
