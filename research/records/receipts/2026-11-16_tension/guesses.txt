@@ -335,3 +335,11 @@ G-P2: products located from the covector alone on the 16 leading principal coord
   chart's 16 leading coordinates of variance).
 What it decides: P2 held, the junction's legs can be founded with no label on the directions that answer a source's change, a form
 for every stream; missed, the label-free founding waits for a location on far more places or for the deposit's own laps.
+
+SCORE of G-Y2, read from the clock at 00:42:58 UTC, November 17 (sym77.txt): first clause held, second on the line. With every byte written
+twice the first copy codes at 3.307, 3.070, 2.859 and 2.744 nats a place and the second at 3.353, 3.137, 2.929 and 2.875, for windows
+of 32, 64, 128 and 256 places of the passage (64 to 512 sites). Each copy stands above 2.0. From 64 to 256 places the first copy
+falls by 0.33 (within 0.3 was guessed: missed by 0.03) and the second by 0.26 (held). The second copy codes no better than the first,
+so a place's twin beside it is not read as its twin; the fall with the window is of the size the renamed frame shows over the same
+lengths. The baseline for the symbol's line's acceptance, lap 77's mean: plain 0.81 to 1.12; renamed 3.74 at 32 places to 2.81 at
+512; every letter drawn afresh 3.68 to 3.89; doubled 2.74 to 3.35.
