@@ -368,3 +368,17 @@ ticks 2 and 3; two back 0.04 and 0.48 to 0.51; four back (an operand's last digi
 GUESS G-P3, fixed at 00:59:43 UTC before its read (an instrument's variant tried after a miss, said as such): each response taken as a
 direction (scaled to unit length, so a source counts once whatever the size of its perturbation), products located on the 16 leading
 principal coordinates of those directions remove 0.15 or more at the units place at tick 1 on the held half.
+
+SCORE of G-P3, read from the clock at 01:02:54 UTC, November 17 (resp77b.txt): missed. On the 16 leading coordinates of the responses
+taken as directions, products remove 0.072 (five) and 0.053 (ten) at the units place at tick 1, the chart's coordinates of variance
+0.067. Three label-free choices of a small subspace (variance, response, response as direction) each carry 0.04 to 0.13 where the ten
+coordinates fitted to the digits carry 0.39. No further variant of the subspace is tried.
+
+GUESS G-L5, fixed at 01:02:54 UTC before its read: the junction located from the covector alone on many places
+Reading: 60,000 plain sums with operands at the word problems' lengths (sums78.tsv, 140,480 places), a record a region, every value
+digit opened alone, lap 78's mean on the host (8 threads); ten products with 128-wide legs located a tick on the fit half
+(tension_ruler.py located), read on the held half by part.
+G-L5: at the units place at tick 1 the ten located products remove 0.20 or more of the covector on the held half (on 8,262 places the
+  same locator fitted 0.40 and held 0.08; the labelled ten coordinates hold 0.39). Held, a founding located from the tension alone
+  exists at this count of places and its legs are written for found-crossing; missed under 0.10, the covector does not show the
+  junction to a locator at this count either, and the deposit, which reads the same covector, is not expected to find it soon.

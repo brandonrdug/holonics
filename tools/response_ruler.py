@@ -17,8 +17,9 @@ and the opened places the same. The procedure names no digit and no operator, an
 - `RESPONSE_PAIR` (a ruler's labels: the arithmetic layout of the records): the share of the response's power, at a column both
   operands hold, that comes from the two aligned operand digits.
 - `RESPONSE_MODES`: products located from the covector alone on the m leading principal coordinates of the responses (the directions
-  of the open place's chart that answer when a source changes), by part and tick, on the held half of the records, beside the same on
-  the chart's leading coordinates of variance and beside the pair's table. No label enters the coordinates or the legs; the parts and
+  of the open place's chart that answer when a source changes), by part and tick, on the held half of the records; the same with
+  each response scaled to unit length first (`direction`: a source counts once whatever the size of its perturbation); beside the
+  chart's leading coordinates of variance and the pair's table. No label enters the coordinates or the legs; the parts and
   the table are the ruler's.
 
 A ruler: it perturbs text outside the machine and reads a state; it writes none.
@@ -151,7 +152,9 @@ def read(d):
             _, _, vr = np.linalg.svd(deltas[dsel], full_matrices=False)
             centred = chart_b - chart_b[f].mean(axis=0)
             _, _, vv = np.linalg.svd(centred[f], full_matrices=False)
-            for cname, basis in (("response", vr), ("variance", vv)):
+            unit = deltas[dsel] / np.maximum(np.linalg.norm(deltas[dsel], axis=1, keepdims=True), 1e-12)
+            _, _, vu = np.linalg.svd(unit, full_matrices=False)
+            for cname, basis in (("response", vr), ("direction", vu), ("variance", vv)):
                 for m in (8, 16):
                     z = centred @ basis[:m].T
                     a, b = t.locate(z[f], lam_b[f], 10, sweeps=20, starts=3)
