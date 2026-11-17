@@ -724,3 +724,22 @@ lattice.
 Decided as the guess said: three shares are too thin a menu for the rows as they stand, since head 0 gives a sign a few
 hundredths of its row. Which law a place is under is known at the place by other ways than this row's share on the sign, so a
 context has to come from the place's own chart, and a product's units law is not closed by anything read here.
+
+GUESSES G-TX1 to G-TX3, fixed at 10:45:01 UTC, November 17 (from date -u), before the read: the closure on the store's own text
+Reading: the block and plane closure of G-DH's diagnosis on a menu gathered over the store's own mixture
+(tools/store_windows.py: 2,300 windows of 40 octets from the training documents, 600 of code, 300 of web, 300 of science, 180
+of books, 120 of wikidata, 400 of the redrawn arithmetic slice and 400 of the word problems; six places a window drawn by key
+and opened alone, 13,800 places; lap 86's mean, head 0 at ticks 0 and 1; loop_closure_ruler.py text). The arithmetic windows
+hold sums, differences and products as the slice draws them, and the text holds numerals of its own (dates, counts, code).
+G-TX1: the ten digits come out as one block, read from the pooled menu with no label (other symbols may join it).
+G-TX2: inside that block the pooled menu does not return the wheel: under 0.9 at every j coprime to ten at both ticks,
+because products and the text's numerals share the digits with the sums. The windows of the arithmetic slice alone do not
+return it either.
+G-TX3: text holds no ring of its own that this closure finds: no block of six or more letters gives a clean line or plane
+(0.9 of its images' power, flatness 0.95) whose keys sit on a lattice of order 3 to 12 at 0.9 with three residues or more
+occupied.
+The instrument's planted checks are those of G-DH and G-SG (the same functions); here the dealt menu is read beside the rows
+for the letters' null.
+What it decides: G-TX2 held, a founding cannot be read off the store's pooled menu, and a key's founding waits on a context
+read from the place; missed, the ring is in the store's own menu and a founding is ready to state. G-TX3 missed would be a
+find: a law of composition among letters that nobody handed the ruler.
