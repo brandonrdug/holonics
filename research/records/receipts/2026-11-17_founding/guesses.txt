@@ -45,3 +45,14 @@ G-FC1. Over the steps read, the held half as a whole codes lowest at step 128 (1
   outside the 0.1 guessed, a fall). The step against the covector codes the units digit 2.356 (held, above 2.33).
   The fitting half's own codes were not printed by the ladder, so the step is the held half's lowest of the two that tie; the descent that
   followed prints both halves (descend_a.txt).
+
+G-FL1 (2026-11-17T17:11:30Z). The part with the receiving site's leg, its return and leg solved on the host by twelve rounds under mixed openings
+(each place read with a keyed half of its run's other places open) on runs that extend five symbols past the answer's line feed
+(1,400 records, lap 94's end state, keys closed on the plain short sums).
+  Codes on the held half under those openings: the units digit falls by 0.3 nats or more from the base state's; the line feed and the
+  places past it stay within 0.05 nats of the base state's.
+  The free release of 8 places after the 96 held prompts: last digit equal to the reference answer's at 20 to 40 of 96 (9 before the
+  founding, 10 with the first attempt); first line equal at 4 to 15 of 96 (2 before, 1 with the first attempt); the writes keep the
+  record's form (a number, a line feed, a new record).
+What a miss would say: a release that still runs digits past the answer says the leg, read from the opening chart, does not know its
+place while its neighbours are open, and the site's factor then has to be the face's own ring mass or be deposited under the trainer's openings.
