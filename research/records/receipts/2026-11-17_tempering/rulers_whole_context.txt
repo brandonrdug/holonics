@@ -1,0 +1,43 @@
+# Rulers outside the machine on the fifty books (host; counts and codes only, no text): what a place codes and writes when its context
+# arrives whole, at the codec's grain (windows of symbols) and as units cut at landmarks of news. Each ruler is a count reader's kin
+# with rows shared on two coprime rings; none is the engine, and none is a part.
+== windows of the last k symbols (and a word boundary that is authored: a yardstick at the codec's grain)
+STRAND_READ strands=1 held=2.428 unread=2.418 fit=2.450
+STRAND_READ strands=1+2 held=2.003 unread=1.990 fit=1.978
+STRAND_READ strands=1+2+3 held=1.698 unread=1.664 fit=1.636
+STRAND_READ strands=1+2+3+4 held=1.502 unread=1.486 fit=1.399
+STRAND_READ strands=1+2+3+4+5 held=1.433 unread=1.442 fit=1.263
+STRAND_READ strands=1+2+3+4+5+6 held=1.395 unread=1.414 fit=1.150
+STRAND_READ strands=1+2+3+4+5+word+word before held=1.390 unread=1.396 fit=1.195
+panel.written seen: words 51 in_lexicon 46 (90%) longest_copy 16 held: words 67 in_lexicon 60 (89%) longest_copy 19 unread: words 68 in_lexicon 63 (92%) longest_copy 19 mean_copy 23.0
+== units cut where a two-symbol count model's news is sigma or more; one period: the symbol before, the unit in progress, the two before
+UNITS_CUT sigma=1.5 leaders=0.563 of places; a unit is 1.78 symbols and 3.41 nats of this ruler's news on average
+UNITS_READ sigma=1.5 held=1.948 unread=1.950 fit=1.894
+UNITS_CUT sigma=2.5 leaders=0.302 of places; a unit is 3.31 symbols and 6.34 nats of this ruler's news on average
+UNITS_READ sigma=2.5 held=1.831 unread=1.865 fit=1.634
+UNITS_CUT sigma=3.5 leaders=0.120 of places; a unit is 8.35 symbols and 16.02 nats of this ruler's news on average
+UNITS_READ sigma=3.5 held=2.026 unread=2.004 fit=1.623
+units_1.5.written seen: words 48 in_lexicon 26 (54%) longest_copy 13 held: words 62 in_lexicon 29 (46%) longest_copy 12 unread: words 58 in_lexicon 26 (44%) longest_copy 13 mean_copy 15.0
+units_2.5.written seen: words 42 in_lexicon 24 (57%) longest_copy 15 held: words 66 in_lexicon 45 (68%) longest_copy 15 unread: words 67 in_lexicon 38 (56%) longest_copy 14 mean_copy 17.8
+units_3.5.written seen: words 36 in_lexicon 17 (47%) longest_copy 13 held: words 58 in_lexicon 33 (56%) longest_copy 12 unread: words 57 in_lexicon 27 (47%) longest_copy 12 mean_copy 15.8
+== the same, six periods at once (the unit in progress and the unit before at each)
+UNITS_TOWER periods=(1.0, 1.5, 2.0, 2.5, 3.0, 3.5) strands=13: units of 1.44, 1.78, 2.29, 3.31, 5.09, 8.35 symbols
+UNITS_READ sigma=(1.0, 1.5, 2.0, 2.5, 3.0, 3.5) held=1.627 unread=1.626 fit=1.358
+units_tower.written seen: words 50 in_lexicon 40 (80%) longest_copy 14 held: words 69 in_lexicon 49 (71%) longest_copy 17 unread: words 69 in_lexicon 53 (76%) longest_copy 14 mean_copy 17.8
+== two levels: units cut at landmarks of a three-symbol reader's news, each one symbol of a count reader of units; held text coded as units against its bytes one by one (a five-symbol reader); the panel written a unit at a time
+TWO sigma=1.5: units of 2.10 symbols on average, 4750 distinct in 856143
+TWO sigma=1.5 held: 94408 bytes in 45810 units; nats a byte: bytes one by one 1.430, units as symbols 1.508; units met before 100% (100% of the bytes), of those a unit's own length is shorter than its bytes' added in 49%, by -0.15 nats a unit on average
+TWO sigma=1.5 unread: 75374 bytes in 37143 units; nats a byte: bytes one by one 1.498, units as symbols 1.609; units met before 100% (100% of the bytes), of those a unit's own length is shorter than its bytes' added in 47%, by -0.21 nats a unit on average
+TWO sigma=2.0: units of 2.76 symbols on average, 14136 distinct in 650446
+TWO sigma=2.0 held: 94408 bytes in 35077 units; nats a byte: bytes one by one 1.430, units as symbols 1.550; units met before 99% (98% of the bytes), of those a unit's own length is shorter than its bytes' added in 48%, by -0.28 nats a unit on average
+TWO sigma=2.0 unread: 75374 bytes in 28603 units; nats a byte: bytes one by one 1.498, units as symbols 1.670; units met before 99% (97% of the bytes), of those a unit's own length is shorter than its bytes' added in 45%, by -0.39 nats a unit on average
+TWO sigma=2.5: units of 3.84 symbols on average, 41465 distinct in 468297
+TWO sigma=2.5 held: 94408 bytes in 25708 units; nats a byte: bytes one by one 1.430, units as symbols 1.606; units met before 95% (87% of the bytes), of those a unit's own length is shorter than its bytes' added in 41%, by -0.46 nats a unit on average
+TWO sigma=2.5 unread: 75374 bytes in 20936 units; nats a byte: bytes one by one 1.498, units as symbols 1.725; units met before 95% (86% of the bytes), of those a unit's own length is shorter than its bytes' added in 37%, by -0.61 nats a unit on average
+TWO sigma=3.0: units of 5.76 symbols on average, 82448 distinct in 311870
+TWO sigma=3.0 held: 94408 bytes in 17450 units; nats a byte: bytes one by one 1.430, units as symbols 1.577; units met before 81% (57% of the bytes), of those a unit's own length is shorter than its bytes' added in 34%, by -0.39 nats a unit on average
+TWO sigma=3.0 unread: 75374 bytes in 14474 units; nats a byte: bytes one by one 1.498, units as symbols 1.685; units met before 81% (56% of the bytes), of those a unit's own length is shorter than its bytes' added in 30%, by -0.59 nats a unit on average
+two_1.5.written seen: words 45 in_lexicon 35 (77%) longest_copy 16 held: words 67 in_lexicon 53 (79%) longest_copy 19 unread: words 73 in_lexicon 63 (86%) longest_copy 19 mean_copy 22.5
+two_2.0.written seen: words 49 in_lexicon 41 (83%) longest_copy 20 held: words 71 in_lexicon 60 (84%) longest_copy 21 unread: words 64 in_lexicon 52 (81%) longest_copy 26 mean_copy 26.8
+two_2.5.written seen: words 44 in_lexicon 34 (77%) longest_copy 23 held: words 73 in_lexicon 65 (89%) longest_copy 28 unread: words 67 in_lexicon 57 (85%) longest_copy 49 mean_copy 37.0
+two_3.0.written seen: words 44 in_lexicon 42 (95%) longest_copy 64 held: words 72 in_lexicon 63 (87%) longest_copy 34 unread: words 75 in_lexicon 64 (85%) longest_copy 44 mean_copy 43.0

@@ -428,3 +428,38 @@ whose sites are landmarks of news but which hands down mixtures and commits no u
 fourth and fifth symbol never arrive" is this reading at the wrong grain, and its last paragraph's premise is restated: what the unit
 in progress and the completed units before it, each one address and cut by news with nothing authored, let a place code and write.
 
+## 18. Rulers for the other side, and what they are worth
+
+After §17 I priced the theory's side with rulers outside the machine on the fifty books, three in an hour
+(`rulers_whole_context.txt`; each a count reader's kin with rows shared on two coprime rings; counts and codes only).
+
+- **Windows of symbols** (the codec's grain; a yardstick). The last one to six symbols as nested addresses: held next place 2.43, 2.00,
+  1.70, 1.50, 1.43, 1.40 nats; its panel 90% of words in the lexicon, written in a minute of the host. What a place writes when its
+  context arrives whole is plain.
+- **Units cut at landmarks of news as addresses for the next symbol.** One period at a time: 1.95, 1.83, 2.03 nats; six periods at
+  once: 1.63 and 76%, her own level.
+- **Two levels**, the record of November 12 read as written (a site of the level above is an epoch of the clock of news; a composite
+  is a prime of higher rank whose own length is shorter than its bytes' added): units cut at landmarks of a three-symbol reader's
+  news, each completed unit one symbol of a count reader of units, the held text coded as units against the same bytes one by one:
+
+| mean unit | distinct units | bytes one by one | units as symbols | units met before | a unit shorter than its bytes added | longest run shared with the books |
+|---|---|---|---|---|---|---|
+| 2.1 symbols | 4,750 | 1.430 | 1.508 | 100% | 49% | 19 octets |
+| 2.8 | 14,136 | 1.430 | 1.550 | 99% | 48% | 26 |
+| 3.8 | 41,465 | 1.430 | 1.606 | 95% | 41% | 49 |
+| 5.8 | 82,448 | 1.430 | 1.577 | 81% | 34% | 64 |
+
+  Written a unit at a time the words are real (81% to 88%), and at the larger units it is recitation: a panel line of 64 octets copied
+  whole.
+
+These do not show the theory's coarse graining paying on this text, and they are a verdict on my constructions. Each unit there is a
+free row addressed by its content, the index of contexts the lessons refuse, which recites as it grows; in the theory a unit shares
+its rings with its kind (the record of November 12, §10: a key factors as its family and its member; rows shared along the ladder) and
+a level is a receiver compared at its own grain. I built neither, and I built three rulers at the speed Brandon had named the same
+hour. None becomes a part.
+
+What follows is slower. The machine has a level whose sites are landmarks of her own news, in lap 94's state and in tonight's, and no
+reading of this record has looked at it. Its records of November 13 to 15 are read first, then that level is traced on tonight's state
+as §16 and §17 traced the byte path: where her epochs fall, what an epoch holds of itself, and whether anything crosses from one epoch
+to the next.
+
