@@ -1310,6 +1310,13 @@ pub fn read_pace(args: &[String]) -> Result<()> {
     let d = learner.field.declaration;
     let (at, rows) = (learner.field.layout().pace, d.alphabet + 1);
     let named: Vec<(String, u8)> = (b'0'..=b'9').map(|b| ((b as char).to_string(), b)).chain([("space".to_string(), b' '), ("+".to_string(), b'+'), ("-".to_string(), b'-'), ("*".to_string(), b'*'), ("=".to_string(), b'='), ("feed".to_string(), b'\n'), ("a".to_string(), b'a'), ("e".to_string(), b'e'), ("t".to_string(), b't')]).collect();
+    // The rings a turned head's modes stand on: slot `l (frames − still) + (head − still)` of the solenoid's periods, mode `l` of the head.
+    let periods = holonics_engine::field::ring_periods(d.turned_slots(), d.reach);
+    println!("PACE_RINGS slots={} reach={} periods={}", d.turned_slots(), d.reach, periods.iter().map(usize::to_string).collect::<Vec<_>>().join(","));
+    for p in 0..d.paced_heads() {
+        let mine: Vec<String> = (0..d.modes).map(|l| periods[l * (d.frames - d.still) + p].to_string()).collect();
+        println!("PACE_HEAD paced_head={p} modes_on_rings={}", mine.join(","));
+    }
     for p in 0..d.paced_heads() {
         let mut line = format!("PACE paced_head={p}");
         for (name, byte) in &named {

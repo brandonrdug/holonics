@@ -112,6 +112,14 @@ wheel does not enter by the pace and the design returns to the symbol's rows.
   question left is how the field locates the rates, which is the symbol's key and its founding; capacity missed, the closure does not
   reach the face in this realization and the design changes before any build.
 
+**The rings, read at 02:30 UTC** (`pace_by_symbol.txt`, `read-pace`). The solenoid's sixteen slots stand on 2, 3, 4, 9, 16, 27, 32,
+81, 128, 243, 256, 729, 1024, 2187, 4096 and 6561. One turned head holds the dyadic rings (2, 4, 16, 32, 128, 256, 1024, 4096) and
+the other the triadic (3, 9, 27, 81, 243, 729, 2187, 6561), so the gate's head is the triadic one. Its skin is one e-fold a radian
+of turn, `e^(−2π|σ_i − σ_j|/n)` with `σ = Σ|κ|`: at rates equal to the digits' values a record's `σ` reaches about forty, so the
+operands are gone from ring 9 at the answer's site and stand at 0.05 on ring 81 and 0.36 on ring 243. On those rings the clock
+carries the digit sum as an integer, `A + B − C = 9 × (the count of carries)`, and the face would read a digit through a comb of
+phases nine apart. The gate reads the covector by mode for that reason.
+
 ## 7. Acceptance, fixed before any build
 
 - The nine-residue of an open answer digit of a short sum, read by the one-place receiver, falls from 2.19 nats to 1.1 or less; the
