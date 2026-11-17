@@ -35,6 +35,10 @@ material's grain.
                                                 chart's share of the covector's power. With `planted`, one circle's gate is turned by
                                                 2π(3d + 2)/10 at the digits' sites and one circle's charge is set to the wheel digit's
                                                 phase at the answer place, each with noise: the instrument's own check.
+  tension_ruler.py junction DIR [J]             products located on the answer site's gathered current in place of its chart: each
+                                                head's current alone (its 2n coordinates and a one) and every head's, the linear chart's
+                                                part taken out first, legs located on one half of the records and read on the other, by
+                                                part and tick, beside the pair's table.
   tension_ruler.py temper STORE_DIR             the premise of a row's own temperature: each open row's temperature covector beside its
                                                 opening chart, by head (how nearly the rows cancel, what the chart removes on the held
                                                 section) and by slice (each slice's mean ask).
@@ -852,6 +856,41 @@ def circles(d, planted=False, harmonics=5, ridge=1e-3, shuffles=1000):
             print(f"CIRCLES_TENSION {pname} {k} {t.sum()} | " + " ".join(f"{v:.4f}" for v in shares), flush=True)
 
 
+def junction(d, triads=10, heads=4):
+    """The junction located on a head's current (the lead, November 17; atlas `contact.row-barycentre-sum-outside-simplex`,
+    `contact.pool-founding`). A row brings its sources as a barycentre of their value words, and that barycentre is the head's gathered
+    current before the return spreads it into the chart. So products are located with their legs on the current: each head's `2n`
+    coordinates alone and every head's together, with no label. As `located` does, the linear chart's part is taken out of the covector
+    first, the legs are located on one half of the records and their products' share is read on the other, by part and tick."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    m2 = cur.shape[1]
+    n_modes = m2 // (2 * heads)
+    cols = lambda h: np.r_[h * n_modes : (h + 1) * n_modes, m2 // 2 + h * n_modes : m2 // 2 + (h + 1) * n_modes]
+    spaces = [(f"head={h}", cur[:, cols(h)]) for h in range(heads)] + [("heads=all", cur)]
+    fb = np.hstack([read, np.ones((len(read), 1))])
+    print(f"JUNCTION_READ products={triads} coordinates_a_head={2 * n_modes} heads={heads}")
+    print("JUNCTION scope tick legs_on fit_rows test_rows share_fit share_test")
+    print("JUNCTION_PART scope tick legs_on part test_rows located table")
+    for scope, mask in (("met+", met & plus),):
+        for k in range(ticks):
+            sel = mask & (tick == k)
+            f, t = sel & fit, sel & test
+            w = np.linalg.lstsq(fb[f], lam[f], rcond=None)[0]
+            rem = lam - fb @ w
+            for name, x in spaces:
+                a, b = locate(x[f], rem[f], triads, sweeps=20, starts=2)
+                feats = products_of(x, a, b)
+                print(f"JUNCTION {scope} tick={k} {name} {f.sum()} {t.sum()} {removed(feats, rem, f, f):.4f} {removed(feats, rem, f, t):.4f}", flush=True)
+                for pid, pname in enumerate(PARTS):
+                    fp, tp = f & (part == pid), t & (part == pid)
+                    if tp.sum() < 200:
+                        continue
+                    print(f"JUNCTION_PART {scope} tick={k} {name} {pname} {tp.sum()} {removed(feats, rem, fp, tp):.4f} {removed(pair, rem, fp, tp):.4f}", flush=True)
+
+
 def temper(d, heads=4):
     """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
     reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
@@ -985,6 +1024,8 @@ def main():
         registers(sys.argv[2], sys.argv[3])
     elif cmd == "heat":
         heat(sys.argv[2])
+    elif cmd == "junction":
+        junction(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 10)
     elif cmd == "circles":
         circles(sys.argv[2], planted=len(sys.argv) > 3 and sys.argv[3] == "planted")
     elif cmd == "links":

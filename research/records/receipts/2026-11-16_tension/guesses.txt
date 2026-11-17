@@ -526,3 +526,18 @@ G-J3: at the clear and carried columns both operands hold they remove at least 0
 What it decides: G-J1 held, the junction has a label-free founding of a few dozen numbers a product, on the place the row
 delivers to, and a founding lap is ordered from it; missed, the pair does not stand in one head's current well enough to
 multiply and the lock is still the link that slips.
+
+SCORES of G-J1 to G-J3, read from the clock at 10:00:09 UTC, November 17 (junction_sums78.txt; 140,480 answer places of 60,000 sums,
+lap 78's mean; host, one ruler, 13 minutes, beside lap 87 on the card)
+G-J1 missed: ten products located on head 0's current remove 0.030 and 0.004 of the remainder at the units place (ticks 0 and
+1), under the chart's 0.07 and 0.12; at least 0.15 was guessed. No single head's current does better (0.060 at most, head 1 at
+tick 1), and every head's current together gives 0.038 and 0.076.
+G-J2 held, emptily: far under 0.35.
+G-J3 missed: at the columns both operands hold, head 0's current gives 0.037 to 0.050 and every head's 0.055 to 0.102 (ticks 0
+and 1); at least 0.15 was guessed.
+Beside them: the columns one operand holds 0.15 to 0.21 on head 0's current and 0.20 to 0.28 on every head's (the chart 0.25 to
+0.32); the top digit 0.60 to 0.63 on any one head's.
+Decided as the guess said: the aligned pair does not stand in a head's gathered current well enough to multiply, on the
+terrain's own lengths at lap 78. The chart holds more of it than the currents do, so part of what reaches the place comes by
+the strand (the circles hold the unordered pair at 0.32 to 0.44 at lap 86, G-HC's read). No founding lap is ordered from these
+legs; the lock is still the link that slips.

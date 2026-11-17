@@ -1330,6 +1330,43 @@ pub fn read_pace(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 17 09:50Z] `read-triads STATE STATE_SHA`: **the triads' material as it stands, by triad**: for each of the
+/// `J` triads the root mean square of its return's two columns of `W_T` (`Loci::w_triad`, the real and the imaginary product's) and of its
+/// three legs' rows of the charts `A`, `B` and `G` (`Loci::triad`), in millionths of the material's unit, with its legs' biases in thousandths
+/// of the face's; and beside them the root mean square of the pairs' return `W`. A ruler reading a state. Why: a founding that sets a triad's
+/// legs where the tension leads releases what that triad's return holds, so what each standing triad carries is read before any is founded
+/// again.
+pub fn read_triads(args: &[String]) -> Result<()> {
+    if args.len() != 3 {
+        return Err("read-triads STATE STATE_SHA".into());
+    }
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let d = learner.field.declaration;
+    let l = learner.field.layout();
+    let (dw, f, j, j2) = (d.width, d.contacts, d.triads, 2 * d.triads);
+    let theta = &learner.field.theta;
+    // The root mean square of a list of entries on the material's grain, in millionths of its unit.
+    let rms = |values: &mut dyn Iterator<Item = i64>| -> u128 {
+        let (mut sum, mut n) = (0u128, 0u128);
+        for v in values {
+            sum += (v as i128 * v as i128) as u128;
+            n += 1;
+        }
+        if n == 0 {
+            return 0;
+        }
+        ((sum / n).isqrt() * 1_000_000) >> holonics_engine::field::MATERIAL_BITS
+    };
+    println!("TRIADS triads={j} width={dw} crossing={} pairs_return_rms_millionths={}", d.crossing, rms(&mut theta[l.w..l.w + dw * f].iter().map(|&v| v as i64)));
+    for k in 0..j {
+        let ret = rms(&mut (0..dw).flat_map(|o| [theta[l.w_triad + o * j2 + k] as i64, theta[l.w_triad + o * j2 + j + k] as i64]));
+        let leg = |chart: usize| rms(&mut [k, j + k].into_iter().flat_map(|row| theta[l.triad + (chart * j2 + row) * dw..l.triad + (chart * j2 + row + 1) * dw].iter().map(|&v| v as i64)));
+        let bias = |chart: usize| -> String { [k, j + k].iter().map(|row| ((theta[l.triad_bias + chart * j2 + row] as i128 * 1000) >> holonics_engine::field::FACE_BITS).to_string()).collect::<Vec<_>>().join(",") };
+        println!("TRIAD k={k} return_rms={ret} leg_a_rms={} leg_b_rms={} leg_g_rms={} bias_a={} bias_b={} bias_g={}", leg(0), leg(1), leg(2), bias(0), bias(1), bias(2));
+    }
+    Ok(())
+}
+
 /// [measurement; the lead, November 16 23:58Z; atlas `contact.row-heat-keys-short`] `ruler-temper STATE STATE_SHA HEAD MILLI OUT`: **a ruler's
 /// state with one head's listener cooled**: the state with `MILLI` thousandths of an octave added to head `HEAD`'s listener temperature
 /// (`Loci::temper`, `[h][1]`, the logarithm of the row's gain on the material's grain), every other entry, moment and line kept. A ruler's
