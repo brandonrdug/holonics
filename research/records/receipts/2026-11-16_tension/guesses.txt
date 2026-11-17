@@ -827,3 +827,17 @@ layout's symbols and the digits together.
 Decided as the guess said: on the slice as the trainer draws it the closure does not close, under any context read tonight.
 It closes where a record holds one law (short sums; the two additive laws on two-operand records under a sign's presence).
 A founding read off the machine's own region is therefore not in hand, and none is ordered.
+
+GUESS G-SET1, fixed at 11:12:32 UTC, November 17 (from date -u), before the read: the context as the set of symbols a row meets
+Reading: on the slice as drawn (slice86, the dump of G-SL1) a symbol's presence failed because a record of three or four
+operands carries the plus beside other signs. The context is taken instead as the whole set of symbols a row meets outside
+the digits' block (the block read from the pooled menu, no label): each distinct set is a context, and its menu of pairs is
+cut to blocks and closed (loop_closure_ruler.py context TABLE sets). A two-operand sum's rows all meet one set (the space,
+the plus, the equals sign, the feed), a two-operand product's another, and a parenthesized record's a third, so a set
+isolates a law where a single symbol's presence does not.
+G-SET1: the context that is a two-operand sum's set returns the wheel at 0.9 or more at a j coprime to ten at tick 0 or tick
+1, from a block holding the ten digits. I hold it likely (three in four): on the two-operand records of G-SG the plus's
+presence, which there is this same population, returned 0.937.
+What it decides: held, a key's founding is readable off the machine's own arithmetic region as it is drawn, with no label
+and no chosen specimen, by a context the row itself carries; missed, the slice's sums are too few or their rows too diffuse
+for a closure at this sample.
