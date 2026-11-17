@@ -588,6 +588,43 @@ def closed_lock(d, triads=10):
                 print(f"CLOSED_LOCK {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {removed(gathered, lam, f, t):.4f} {shares[0]:.4f} {shares[1]:.4f} {shares[2]:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
 
 
+def midpoint(d, triads=10):
+    """One located midpoint (the lead, November 17; atlas `contact.row-barycentre-sum-outside-simplex`): on a `read-tension` directory,
+    how much of the aligned digits' unordered sum `s = e(a_k) + e(b_k)` the answer site's pair chart holds, and what a junction could
+    carry from it. The chart is 128 wide and a product's two legs on it are 256 numbers a product, more than a few thousand places can
+    locate; a junction needs only the ten coordinates of `s`. So `ŝ = W r̂'` is the least-squares read of `s` from the chart, fitted on one
+    half of the records, and products are located on `ŝ`'s ten coordinates (twenty numbers a product). By part and tick: the share of `s`
+    the chart holds on the held half; the covector's share removed on the held half by a linear read of `ŝ`, by `ŝ` with five and with
+    ten located products, by the true `s` with ten located products (a lock closed on the column), and by the pair's table."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    held = np.array([k[7] for k in kinds])
+    s_true = onehot(da) + np.where((held == 1)[:, None], 0.0, onehot(db))
+    s_true = np.where((held == 0)[:, None], 0.0, s_true)
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    print("TENSION_MIDPOINT scope part tick test_rows nats sum_in_chart linear_of_read read_5_products read_10_products true_sum_10_products table")
+    for scope, mask in (("met+", met & plus),):
+        for pid, pname in enumerate(PARTS):
+            for k in range(ticks):
+                sel = mask & (tick == k) & (part == pid)
+                f, t = sel & fit, sel & test
+                if t.sum() < 200 or pname == "top":
+                    continue
+                target = s_true - s_true[sel].mean(axis=0)
+                x = np.hstack([read, np.ones((len(read), 1))])
+                w = np.linalg.solve(x[f].T @ x[f] + 1e-6 * np.eye(x.shape[1]), x[f].T @ target[f])
+                s_hat = x @ w
+                present = 1.0 - ((target[t] - s_hat[t]) ** 2).sum() / (target[t] ** 2).sum()
+                out = []
+                a, b = locate(s_hat[f], lam[f], triads, sweeps=20, starts=3)
+                for j in (0, 5, triads):
+                    out.append(removed(np.hstack([s_hat, products_of(s_hat, a[:j], b[:j])]) if j else s_hat, lam, f, t))
+                a2, b2 = locate(s_true[f], lam[f], triads, sweeps=20, starts=3)
+                closed = removed(np.hstack([s_true, products_of(s_true, a2, b2)]), lam, f, t)
+                print(f"TENSION_MIDPOINT {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {present:.4f} " + " ".join(f"{v:.4f}" for v in out) + f" {closed:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
+
+
 def temper(d, heads=4):
     """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
     reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
@@ -711,6 +748,8 @@ def main():
         temper(sys.argv[2])
     elif cmd == "closed":
         closed_lock(sys.argv[2])
+    elif cmd == "midpoint":
+        midpoint(sys.argv[2])
     elif cmd == "heat":
         heat(sys.argv[2])
     elif cmd == "links":

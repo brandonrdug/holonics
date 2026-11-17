@@ -274,3 +274,25 @@ G-Y2: doubled, each copy codes at 2.0 nats a place or more, and the 256-place wi
 What it decides: held, the two figures are the baseline of the symbol's line's acceptance (the code falls along a renamed region; a
 re-rastered passage keeps its crossings). A fall with the window's length in either frame would say the engine locates a key inside a
 region past what its rows hold.
+
+SCORES of G-K1 to G-K5, read from the clock at 00:32:11 UTC, November 17 (cool77h0_*.{oracle,heat,located}.txt, cooled_held77.tsv,
+midpoint_short77.txt, midpoint_cooled77.txt): head 0's listener raised two octaves, lap 77's mean, short sums
+G-K1 held: the aligned pair's share of head 0's row is 0.423 at tick 0 (0.405) and 0.726 at tick 3 (0.470); 0.422 and 0.630 at one octave.
+G-K2 missed: the operands' presence at tick 3 fell to 0.358 and 0.435 (0.375 and 0.457), where 0.42 and 0.50 or more were guessed.
+G-K3 held: the units digit codes at 2.379 nats (2.365).
+G-K4 missed on its instrument: ten products with 128-wide legs remove nothing on the held half (-0.05 to -0.30 at the units place).
+  That locator fits 256 numbers a product on about 2,000 places and its held share is the fit's own excess. The midpoint read
+  (products located on the ten coordinates of the chart's read of the unordered pair) gives, at the units place and ticks 0 to 3:
+  fresh 0.283, 0.398, 0.234, 0.192; head 0 cooled two octaves 0.208, 0.312, 0.210, 0.142. Cooling head 0 lowers what a junction
+  could carry.
+G-K5 held: at two octaves four text slices rise by 0.05 nats a place or more (code +0.175, words +0.148, science +0.108, books
+  +0.062; web +0.026, wikidata -0.035; the held arithmetic +0.018). At one octave: +0.093, +0.090, +0.059, +0.030, +0.005, -0.031.
+What it says: head 0's temperature stands where the deposit put it. Raised by hand it closes the last tick's row on the pair, costs
+text, and lowers the midpoint's presence at the answer's site (0.746 to 0.715 at tick 0). The gain is not the lever.
+
+THE MIDPOINT READ (tension_ruler.py midpoint; taken at 00:28 UTC, November 17, with no guess of its own: it was run to settle G-K4's
+instrument). Short sums at lap 77's mean, the units place, ticks 0 to 3: the unordered pair of aligned digits is present in the answer
+site's chart at 0.746, 0.770, 0.656, 0.636; a linear read of it removes 0.006 to 0.012 of the covector; five products located on its
+ten coordinates remove 0.278, 0.391, 0.227, 0.187 on the held half; the table 0.646, 0.797, 0.928, 0.957. Sums of 1 to 6 digits at lap
+75's mean: units place, present 0.460, 0.538, 0.428, 0.407 and five products 0.092, 0.162, 0.103, 0.094; inner columns, present 0.10
+to 0.17 and products 0.00.
