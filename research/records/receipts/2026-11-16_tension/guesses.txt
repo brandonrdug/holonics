@@ -817,3 +817,13 @@ sign, and the presence of the plus then says less.
 What it decides: held, a key's founding can be read off the machine's own arithmetic region with no label and no chosen
 specimen; missed, the founding as it stands needs records of one law, which the slice does not give it, and the context is
 still the open question.
+
+SCORE of G-SL1, read from the clock at 11:10:29 UTC, November 17 (slice86_presence.txt; 4,000 distinct records of the redrawn
+slice as drawn, 61,119 places, 1,215 records with parentheses, 2,598 times signs, 1,597 plus signs and 1,242 minus signs;
+lap 86's mean, head 0; the dump 426 s on eight host threads as run slice86, the ruler under a minute, beside lap 89)
+G-SL1 missed: under the plus's presence the digits come out as one block with the closing parenthesis, and no line or plane
+of it carries keys; the same under the minus and the times sign. The clean spans are functions of constant phase on the
+layout's symbols and the digits together.
+Decided as the guess said: on the slice as the trainer draws it the closure does not close, under any context read tonight.
+It closes where a record holds one law (short sums; the two additive laws on two-operand records under a sign's presence).
+A founding read off the machine's own region is therefore not in hand, and none is ordered.
