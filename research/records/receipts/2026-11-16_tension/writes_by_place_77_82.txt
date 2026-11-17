@@ -1,0 +1,9 @@
+WRITES_BY_PLACE table kind rows number sign length lead lead_and_length units whole
+WRITES_BY_PLACE wf77/forms.written far 128 0.930 0.633 0.055 0.133 0.008 0.148 0.000
+WRITES_BY_PLACE wf77/forms.written met 128 0.875 0.625 0.133 0.102 0.016 0.094 0.000
+WRITES_BY_PLACE wf79/forms.written far 128 0.938 0.711 0.086 0.133 0.023 0.133 0.000
+WRITES_BY_PLACE wf79/forms.written met 128 0.969 0.664 0.102 0.094 0.023 0.125 0.000
+WRITES_BY_PLACE wf81/forms.written far 128 0.922 0.617 0.125 0.102 0.008 0.086 0.000
+WRITES_BY_PLACE wf81/forms.written met 128 0.961 0.719 0.156 0.109 0.016 0.133 0.000
+WRITES_BY_PLACE wf82/forms.written far 128 0.930 0.664 0.086 0.094 0.008 0.125 0.000
+WRITES_BY_PLACE wf82/forms.written met 128 0.938 0.734 0.211 0.125 0.031 0.141 0.000
