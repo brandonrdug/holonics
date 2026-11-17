@@ -1495,6 +1495,30 @@ pub fn hold_families(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 17, the step back's record §11] `set-leak STATE STATE_SHA BITS OUT`: **a learner with the store's leak
+/// set** ([`Learner::leak`]): every material entry relaxes by `2^(−BITS)` of itself after each section's step; `BITS` of zero clears it.
+/// The leak is law and is carried in the learner's state, never in a run's switch. It writes a new state.
+pub fn set_leak(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("set-leak STATE STATE_SHA BITS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let bits: u32 = args[3].parse()?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    learner.leak = (bits > 0).then_some(bits);
+    let written = learner.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a leaking learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_LEAK bits={bits} rate_bits={} entries={}", learner.rate_bits, learner.field.material_len());
+    Ok(())
+}
+
 /// [definition; the lead, November 17, the founding records] `found-closed STATE STATE_SHA CLOSED CLOSED_SHA OUT`: **the closed characters
 /// founded from a ruler's words** ([`Learner::with_closed`]). `CLOSED` is little-endian 32-bit words: `E`, then the keys (`A × 2E` on
 /// `2^(−16)`: a class's `E` real parts, then its `E` imaginary parts), then the odds (`heads` rows of `D` on `2^(−24)`, then a bias a head

@@ -481,6 +481,11 @@ impl Learner {
 /// renews it).
 pub const FIRST_RATE: u32 = 3;
 
+/// [definition; the lead, November 17] **The rate past which an entry is held**: at an own rate of this many bits or more
+/// ([`Learner::own_rates`]) an entry's step `((m ≪ grain) ≫ rate) / root` releases to zero for every moment (the ratio `m / root` is
+/// under about 4.2 and the grain at most 24 bits), so the entry is outside the deposit and its leak ([`Learner::leak`]) passes it by.
+pub const HELD_RATE: u32 = 64;
+
 pub const SECOND_RATE: u32 = 8;
 
 /// A covector entry on the deposit's grain `2^(−32)` from its family's natural grain: a material

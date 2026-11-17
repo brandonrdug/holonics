@@ -98,3 +98,22 @@ Scored (2026-11-17T19:03:35Z), G-O2 (october_protected.txt): the October run rep
   passes, the return and the readout still do not come to read it. Stepping on the one comparison leaves a conducted product unread, as
   it leaves a diffuse one untaken (the plain arm of November 17). What I wrote to Brandon at 18:47 UTC and in the record's §8, that the
   stepped passes erased the founded product, over-read the share and is withdrawn.
+
+G-L1 (2026-11-17T19:18:41Z). The long trial: the plain engine from lap 94's end state, 1,500 passes over the fitting half's 3,923 short sums (1,766
+distinct pairs; 100 records a section, so 60,000 sections), on the card, each run's places opened by the repaired keyed draw (a half).
+Three arms that differ only in the store's leak (Learner::leak, new today): none, 12 bits (the deposit's own rate) and 14 bits. Read every
+25 passes on 486 strictly held sums (neither operand order in the fit), 251 held sums whose pair stands in the fit in the other order, and
+400 fitted rows: the answer's last digit open alone, in nats a place.
+  Premises read from the logs first: the ten-pass plain arm (400 sections) left held units at 2.272 nats; the 500 passes over 200 sums
+  (1,000 sections) left the fitted units at 1.557 with the pass's code still falling a tenth every 50 passes, so that run was read
+  mid-descent; no run of this engine on a small world has passed 1,000 sections. Every units pair stands in the fit ten times or more.
+  The guess, which is the step back's own claim (its record §10: stepping on the one comparison does not take a law that lives in a
+  product) put to the regime where classical learners are known to take such laws (many passes over little, with a decay):
+    no leak:  fitted last digit at or under 0.6 nats at pass 1,500; strictly held last digit at or above 1.8 (ten flat are 2.303).
+    leak 12:  fitted last digit above the no-leak arm's; strictly held under the no-leak arm's by 0.3 or more, and at or above 1.2.
+    leak 14:  between the two on both.
+  My confidence in it is about even. What a miss says, fixed now: if any arm's strictly held last digit falls under 0.8 nats, §10's
+  sentence is withdrawn for this engine: the fault of the ten-pass trials was their length and the deposit's lack of a leak, the engine
+  takes a pair law by its own descent, and the plan turns to the deposit (the leak as law, concentrated worlds) before any founding
+  part. If no arm falls under 1.8 while the fitted code passes under 0.6, the claim stands in the classical regime too. Either way the
+  held prompts are written whole at the end of each arm and read first.

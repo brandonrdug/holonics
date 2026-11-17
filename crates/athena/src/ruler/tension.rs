@@ -343,9 +343,16 @@ pub fn carry_of(milli: &str) -> Result<i64> {
 /// Why: the tempering study (the record of the step back, §6) reads what many passes over little do to the machine, law by law, on tables
 /// of a few thousand records. A field the card does not realize (closed characters) is tried on the host's threads as a premise's trial,
 /// reported as one. The state it writes is a study's: it is no line's state and no lap trains from it.
+///
+/// With `READ READ_SHA EVERY SAVE` after `OUT` (the long trial of November 17, the step back's record §11): every `EVERY` passes, and before
+/// the first, the rows of a second table are read with nothing deposited, gathered by the first field of their labels, and one line a
+/// group is printed (`TRIAL_READ`): the code of the answer's last digit open alone (the one-place receiver), the same digit's code with
+/// the whole run open (the state a free release's first read meets), and the answer's first digit open alone where the answer has two
+/// digits or more, in millionths of a nat a place, with the mean density at the written last digit in thousandths. Every `SAVE` passes
+/// the learner is written to `OUT.pN`. A row whose run holds no line feed after a digit is refused.
 pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
-    if args.len() != 14 {
-        return Err("try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT".into());
+    if args.len() != 14 && args.len() != 18 {
+        return Err("try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT [READ READ_SHA EVERY SAVE]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("try-passes")?;
@@ -375,7 +382,81 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         }
         rows.push((w[0].to_string(), p, r));
     }
-    println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} threads={}", rows.len(), learner.field.declaration.closed, rayon::current_num_threads());
+    println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} leak={} threads={}", rows.len(), learner.field.declaration.closed, learner.leak.map_or("none".to_string(), |k| k.to_string()), rayon::current_num_threads());
+    // The read table, where one is given: each row's group, prompt, run and the place of its answer's last digit in the run.
+    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, usize)> = Vec::new();
+    let (mut every, mut save) = (0usize, 0usize);
+    if args.len() == 18 {
+        let feed = codec.encode(b"\n")?;
+        if feed.len() != 1 {
+            return Err("a codec whose line feed is not one class".into());
+        }
+        for line in String::from_utf8(pinned_read(&args[14], &args[15], READ_BUDGET as usize)?)?.lines() {
+            let w: Vec<&str> = line.split('\t').collect();
+            if w.len() < 3 {
+                return Err("a read row that is not label, prompt and run".into());
+            }
+            let (p, r) = (codec.encode(unescape(w[1]).as_bytes())?, codec.encode(unescape(w[2]).as_bytes())?);
+            let last = r.iter().position(|&c| c == feed[0]).filter(|&at| at > 0).ok_or("a read row whose run holds no line feed after a digit")? - 1;
+            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, last));
+        }
+        (every, save) = (args[16].parse()?, args[17].parse()?);
+        if every == 0 || save == 0 || read_rows.is_empty() {
+            return Err("try-passes reads a table of one row or more every pass or more, and saves every pass or more".into());
+        }
+    }
+    // One read of the read table: the last digit open alone, the whole run open, the first digit open alone.
+    let read_table = |learner: &Learner, realization: &mut dyn holonics_engine::realization::Realization, pass: usize| -> Result<()> {
+        if read_rows.is_empty() {
+            return Ok(());
+        }
+        let region_of = |(_, p, r, last): &(String, Vec<usize>, Vec<usize>, usize), kind: usize| {
+            let mut classes = p.clone();
+            classes.extend_from_slice(r);
+            let mut open = vec![false; classes.len()];
+            match kind {
+                0 => open[p.len() + last] = true,
+                1 => open[p.len()..].fill(true),
+                _ => open[p.len()] = true,
+            }
+            OwnedRegion::plain(classes, open)
+        };
+        let mut groups: std::collections::BTreeMap<String, [(i128, usize); 3]> = std::collections::BTreeMap::new();
+        let mut mass: std::collections::BTreeMap<String, f64> = std::collections::BTreeMap::new();
+        for kind in 0..3usize {
+            let regions: Vec<OwnedRegion> = read_rows.iter().map(|row| region_of(row, kind)).collect();
+            let views: Vec<_> = regions.iter().map(view_of).collect();
+            let faces = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+            for ((row, face), region) in read_rows.iter().zip(&faces).zip(&regions) {
+                let at = row.1.len() + if kind == 2 { 0 } else { row.3 };
+                if kind == 2 && row.3 == 0 {
+                    continue;
+                }
+                let f = face[at].as_ref().ok_or("a read place that carries no face")?;
+                let (m, t) = (f.masses[region.classes[at]], f.total);
+                let slot = &mut groups.entry(row.0.clone()).or_insert([(0, 0); 3])[kind];
+                slot.0 += i128::from(holonics_engine::field::ratio_code(m, t));
+                slot.1 += 1;
+                if kind == 0 {
+                    *mass.entry(row.0.clone()).or_insert(0.0) += m as f64 / t as f64;
+                }
+            }
+        }
+        for (group, sums) in &groups {
+            let nats = |(code, n): (i128, usize)| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
+            println!(
+                "TRIAL_READ pass={pass} group={group} rows={} last_alone={} last_run_open={} first_alone={} first_rows={} density_at_last_milli={}",
+                sums[0].1,
+                nats(sums[0]),
+                nats(sums[1]),
+                nats(sums[2]),
+                sums[2].1,
+                (1000.0 * mass.get(group).copied().unwrap_or(0.0) / sums[0].1.max(1) as f64).round() as i64
+            );
+        }
+        Ok(())
+    };
+    read_table(&learner, realization, 0)?;
     let mut section = 0usize;
     for sweep in 0..sweeps {
         let (mut sites, mut code) = (0usize, 0i128);
@@ -405,6 +486,12 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         // The pass's code in millionths of a nat a place (ln 2 on 2^(−30), the code on 2^(−20) bits).
         let nats = (code * holonics_engine::field::ln2_face() * 1_000_000) >> 50;
         println!("TRIAL_PASS pass={sweep} sections={section} sites={sites} micronats_a_place={} ms={}", nats / sites.max(1) as i128, started.elapsed().as_millis());
+        if every > 0 && (sweep + 1) % every == 0 {
+            read_table(&learner, realization, sweep + 1)?;
+        }
+        if save > 0 && (sweep + 1) % save == 0 && sweep + 1 < sweeps {
+            write_new(Path::new(&format!("{}.p{}", out.display(), sweep + 1)), learner.to_text().as_bytes())?;
+        }
     }
     write_new(out, learner.to_text().as_bytes())?;
     println!("TRIAL_DONE sections={section} ms={}", started.elapsed().as_millis());
