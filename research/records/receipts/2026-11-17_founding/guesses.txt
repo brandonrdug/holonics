@@ -87,3 +87,14 @@ a keyed half of each run's places open, by the learner's own section step at the
   The sections' own code falls from the first pass to the tenth by 0.05 nats a place or more.
 What a miss would say: no fall of the units digit with the sections' code flat says the pull is too weak at the state's rates to close a
 lock inside a lap, and the lock then needs the founding to place it (the closure's target solved into the lock's words) before any deposit.
+
+Read (2026-11-17T17:46:33Z), G-TC1's trial (trial_a.txt): held half under mixed openings, founded → after 400 host sections:
+  units 2.591 → 0.860 nats; top 1.868 → 1.255; middle 2.267 → 1.525; line feed 0.389 → 0.039; past 1.978 → 1.207; every place 1.851 → 1.030.
+  The sections' own code fell from 1.659 nats a place in the first pass to 1.157 in the tenth. The units fall was guessed at 0.05 to 0.4
+  and read 1.73: missed, far past the guess. Not yet scored as the closed face's: ten passes over one table also teach the field the
+  table's form (the line feed's fall is that), so the cause is separated by a control before it is claimed.
+G-TC2 (2026-11-17T17:46:33Z). The control: the same ten passes, sections and openings from lap 94's end state with no closed characters.
+  Held units digit after it: 2.0 nats or more (the field alone does not come to add from 3,923 sums in 400 sections; it did not in 94 laps);
+  the line feed falls as in the trial (under 0.1), the places past it within 0.15 of the trial's 1.207.
+  If the control's units digit stands within 0.3 nats of the trial's 0.860, the closed face is not the cause and the trial reads only
+  what concentrated passes over one table do.
