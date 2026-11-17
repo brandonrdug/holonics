@@ -601,6 +601,16 @@ written here with their reasons so that no agent holds them as slogans.
   acoustic and motor input, and every message, record and brief that describes one. The built
   line's class names stay the code's where the code is cited
   ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).
+  The symbol's form may be authored as a gene, and what stays barred is a merge table (Brandon, November 16 and 17). The rings and
+  their periods, the terms of the series a family reads and where a chart reads are a form handed at founding, the same for every
+  stream, and the opening key may be lifted from the passage's own spectrum; the machine locates the assignment by deposition (atlas
+  `unicity.gene-partial-key`). Barred as before: bytes merged into units by a table at the input (UTF-8 units with a pair-merge table
+  or its kin), an authored assignment, and font rendering. Reason: he named the short form of this rule ("no authored tokenizers") as
+  redundant once genetics were authorized. It had been read as barring every authored form, which kept the symbol's line unbuilt. What
+  he refuses is the reflex of a byte code with a merge table, which rebuilds units from coordination and discards what the symbols are
+  to each other. His lens: a symbol has a resolution and an aspect, like a spectrum, and a receiver should be able to identify its
+  signature. On the objects (`agent-inferred`): resolution is the count of rings a receiver reads, aspect is a symbol's stride along the
+  passage against its key's length, and a signature is what a change of frame (a renaming, a re-rastering) leaves fixed.
 - **One law reads every stream, and nothing branches on the kind of input** (Brandon,
   November 12 and 13). A symbol and a sample are one thing: a digit of a passage, read by a
   receiver at its own clock. No law, test, guess or vocabulary takes a modality or an interface
