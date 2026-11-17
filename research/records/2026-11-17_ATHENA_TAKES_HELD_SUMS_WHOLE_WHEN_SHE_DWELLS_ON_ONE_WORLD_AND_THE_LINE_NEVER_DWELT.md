@@ -226,3 +226,39 @@ equals` from the founded state and from lap 94's), and is read in `guesses.txt`.
 3. **What text needs that a count does not give**: a law its own entries and its own comparison (§9), if the night's run leaves
    almost-words on the page.
 4. Every step's report opens with the panel, whole.
+
+## 12. The one worded pair, and the night's run at its second pass
+
+**The pair** (`worded_zero.txt`, `worded_pair.txt`; G-W1). Zero-shot, the state that writes `a + b =` whole writes 0 to 3 of the 96 held
+sums in each worded form (`a plus b equals`, `a plus b =`, `a + b equals`, `add a to b =`, `add(a,b) =`), which Brandon reads as
+expected: she was never shown that `plus` is `+`. Shown `a plus b equals` as a stream of fresh records, the state that had founded the
+sign form takes it under 0.1 nats by section 400 and writes 95 of 96 held sums in it; lap 94's state, shown the same, takes about 3,000
+sections, the first founding's count. What she had founded carried, about eight times sooner, and only where the operands stand had to
+be found again. The sign form loosened while she was away from it (its panel 86 to 53 of 96), which the alternating arm of §8 does not
+show. This is the last of the arithmetic.
+
+**The night's run at pass 2** (G-N1; the writes are the store's and stay private, the counts are here). Lap 94's state codes the next
+place on its whole left context at 2.05 nats on the held twentieths; after one pass over the fifty books (2,244 sections, eleven
+minutes) 1.732, after two 1.645 (fitted 1.615, the unread books 1.659).
+
+The law's writer could not read it. A field compared only on a place that ends its region meets, under `write-forms`, a place with a
+run of open places to its right, a state it was never compared on, and the first panel came out as dashes and quotation marks. A
+ruler's writer that meets the compared state (`write-next`: one place a read, each place the last of its region, 48 known places)
+reads it:
+
+| sixteen prompts, 64 places each | words written | in the fifty books' lexicon |
+|---|---|---|
+| lap 94's state | 155 | 59 (38%) |
+| after pass 1 | 189 | 117 (62%) |
+| after pass 2 | 193 | 139 (72%) |
+
+By eye: lap 94's state writes debris of every register it met (code, markup, almost-words). After pass 1 the writes are plain prose
+with real short words and sentence marks; after pass 2 most words are real and the syntax is word salad. Not clean. It is the largest
+change in her text of any step this month, in twenty-two minutes, and the only thing changed is the state she is compared on.
+
+The reading it supports (`agent-inferred`, the run goes on to pass 40): the line compared her on writer's states and mask states
+(`passage::state_of`). In a writer's state the open places past the first stand beyond other open places, so their near left is
+unknown; in a mask state the right side is half known. She was almost never compared on a place as the boundary of what is known. A
+place compared beyond open places is trained to a blend, and her almost-words are blends. The generation law asks for a boundary that
+is released; the boundary of a passage being read is its next place.
+
