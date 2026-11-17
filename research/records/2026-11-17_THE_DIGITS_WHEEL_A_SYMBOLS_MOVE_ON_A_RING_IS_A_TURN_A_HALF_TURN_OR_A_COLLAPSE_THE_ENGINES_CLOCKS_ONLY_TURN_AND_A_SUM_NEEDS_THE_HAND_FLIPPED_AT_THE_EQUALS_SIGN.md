@@ -60,7 +60,7 @@ ring move with `β ≡ 0`. So the wheel has two candidate homes, and the second 
 founding from the tension's coupling of the digits. Which one is read before either is built, and a founding with its return at
 zero is not entered without an answer to the dephasing.
 
-**What October's ring was made of** (read at 04:10 UTC from a reader's digest of the tower's record, lines 1339 to 3666, its key
+**What October's ring was made of** (read at 04:04 UTC from a reader's digest of the tower's record, lines 1339 to 3666, its key
 equations checked at source; the digest's later parts on the tens, the hand's reads and the retirement are not yet read by the lead):
 
 1. *A move located per pair.* In its final form each pair (the byte before, the arriving byte) has its own turn, a share of a key
