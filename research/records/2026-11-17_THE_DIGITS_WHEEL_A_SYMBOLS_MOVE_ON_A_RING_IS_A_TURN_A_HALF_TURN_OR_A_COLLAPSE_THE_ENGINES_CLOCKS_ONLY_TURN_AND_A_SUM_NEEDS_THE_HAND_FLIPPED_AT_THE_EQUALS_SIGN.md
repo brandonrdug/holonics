@@ -122,6 +122,32 @@ October's own unpassed acceptance on the yardstick, calculations never met in tr
   from this engine's tension today would not be a ring: nothing downstream yet asks the digits for their sum, which is the register
   read's finding seen from the source side. October's tower had been trained on arithmetic alone before its tension showed the ring.
 
+- **No carry circle holds a digit's phase, and a symbol reaches a circle as a displacement, never as a turn** (read at 09:41 UTC,
+  `circles86.txt`, `circles86_planted.txt`, guesses G-HC). `read-tension` now writes each row's circles as the site meets them, the
+  arriving charge `Qm` and the gate `γ` (`charge.i64`, `gate.i64`), and `tools/tension_ruler.py circles` reads them on 8,000 short
+  sums at lap 86's mean. The circle's law has two places for a symbol, `Q_t = γ_t Q_(t∓1) + κ_t b_t`: its drive `b`, added to the
+  charge, and its gate `γ`, which turns what the circle already holds. A wheel is the second: after digits `d₁ … d_n` the charge is
+  `Q₀ e^(2πi(jΣd + nc)/10)`, a product of turns, and the circle's one face `a(t) · Qm(t)` would reach its first harmonic alone, two
+  of the nine coordinates that tell ten digits apart.
+  - The turn. Over 70,643 written digits' sites the ten digits' mean turns, as characters of ℤ/10 (`a_j`, `Σ a_j² = 1`), stand at
+    a median `a_0` of 0.991 to 0.995 over the 32 circles by tick: every circle turns alike on every digit. The largest amplitude at
+    `j ≠ 0` is 0.15 to 0.22, inside its permutation null (0, 1, 0, 0 circles past the 99th percentile).
+  - The charge. At the units place the wheel's digit `a_k + b_k mod 10` is held by nothing: the harmonics of all 32 charges −0.22
+    on the held half, the best single circle's −0.02, the charges read linearly −0.04, the chart −0.06. Beside the chart the
+    harmonics add nothing to its share of the covector at any column both operands hold.
+  - What a circle does carry. At a column one operand holds, the charges read linearly give the digit before the place at 0.43 to
+    0.52 and one circle's harmonics alone at 0.23 to 0.44, above the two ninths a wheel's first harmonic would give; there the
+    harmonics add 0.088 and 0.043 of the covector's power at tick 0 (G-HC3 missed there), 0.066 and 0.035 of it through the charges
+    read linearly. The aligned digits' unordered sum is in the charges at 0.32 to 0.44 at the units place (the chart 0.50 to 0.62).
+  - The instrument returns a planted wheel on the same shapes: a gate turned by `2π(3d + 2)/10` reads `a_3 = 1.000`, alone; a
+    charge set to the wheel digit's phase is held at 0.84 by the harmonics and 0.19 linearly, and the harmonics then remove 0.65 to
+    0.86 of the units place's covector by tick, where the value's own digit removes 0.66 to 0.96.
+
+  So the charge is a leaky sum of the symbols' displacements, a barycentre as a row's is (the third record §3), and the place of
+  the wheel in the circle's own law, the gate, is turned alike by every digit. A face of harmonics, October's fourth law, would
+  have nothing to read at a sum's column today; ported first it would buy the two to five hundredths of the covector a copied
+  digit's direction holds past its first harmonic. The part that is absent is the turn located by the symbol (October's first law).
+
 ## 4. The law, as the records give it
 
 On a ring ℤ/m a digit `d` read in base `b` is the affine move `n ↦ λ n + d` with `λ = b mod m`. On the base's cheap rings `λ` takes
@@ -221,8 +247,9 @@ phases nine apart. The gate reads the covector by mode for that reason.
 
 The order this record now points at (not ordered as work, and each step has its own read first): the rest of October's record read
 by the lead; a ruler's port of the harmonic face on the carry circles as they stand (does any circle already hold a digit's phase
-that one harmonic cannot read); the coupling `K` of the arriving classes read on the engine's own tension (done at 07:11 UTC: it
-shows no ring, §3); then the hand and the pair-located turn as laws of the circle. With no ring in the tension, a founding located
+that one harmonic cannot read; done at 09:41 UTC: none does at a sum's column, and every digit turns every circle alike, §3); the
+coupling `K` of the arriving classes read on the engine's own tension (done at 07:11 UTC: it shows no ring, §3); then the hand and
+the pair-located turn as laws of the circle. With no ring in the tension, a founding located
 from the tension has nothing to locate for the digits today, and what would put it there is the open question: October's answer
 was a terrain of arithmetic alone and a landmark, neither of which this record takes.
 
@@ -234,5 +261,5 @@ started.
 ## 10. Receipts
 
 `receipts/2026-11-16_tension/`: `registers_short78.txt` (with the nine-ring's split), `pace_by_symbol.txt`, `located_sums78.txt`,
-`oracle_short79.txt`, `midpoint_short79.txt`, `guesses.txt` (G-L5, G-V). A reader's digest of the records cited in §2 was checked
+`oracle_short79.txt`, `midpoint_short79.txt`, `circles86.txt`, `circles86_planted.txt`, `guesses.txt` (G-L5, G-V, G-KR, G-HC). A reader's digest of the records cited in §2 was checked
 against the sources at the passages quoted here.
