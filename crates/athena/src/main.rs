@@ -77,6 +77,10 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-acts") {
         return athena::store::write_acts(&rest[1..], &mut holonics_engine::realization::Host);
     }
+    // [the lead, November 17] A study's state tool: it reads and writes a state alone, so it opens no card.
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("hold-families") {
+        return athena::store::hold_families(&rest[1..]);
+    }
     // [the lead, November 17] A founding from a ruler's words reads and writes states alone, so it opens no card.
     if mode == "host" && rest.get(1).map(String::as_str) == Some("found-closed") {
         return athena::store::found_closed(&rest[1..]);

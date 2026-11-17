@@ -20,3 +20,18 @@ Scored (2026-11-17T18:10:03Z), G-T0 (t0.txt, t0_writes_trained.txt, t0_writes_he
   Reading: a rote regime exists and is slow. After 500 passes the engine has half-taken 200 records by rote, the held units digit has
   risen, and nothing in the writes carries to a sum it has not met. Stepping on the comparison binds a record to its answer and locates
   no law.
+
+G-T1 (2026-11-17T18:13:13Z). Lap 1 of the lap law on the small world: lap 94's end state founded with the closed face (keys closed by the ruler,
+each head's odds at its one-odds fit), then ten passes over the fitting half's 3,923 sums in which only the blocks the founding reaches
+are moved (the lock's words q and probe with their biases, the lock temperatures, the odds, and the readout: read, read_bias, lift_bias)
+and every other family is held (athena host complete-language hold-families). The foil lap: the same passes and the same held families
+from lap 94's state with no founding. Beside them stands the earlier arm in which everything was stepped (0.860 nats at held units,
+11 of 96 written whole).
+  Held units digit, mixed openings: 1.0 nats or under with the founding; 2.2 or more for the foil.
+  Held prompts written whole: 8 or more of 96 with the founding; 3 or fewer for the foil.
+  A text table (store windows, 5 slices, one place opened at a time; the code alone is read): the founded lap's state within 0.05 nats a
+  place of lap 94's; the everything-stepped arm 0.1 or more above lap 94's (ten passes over one table step the text's material away).
+What a miss would say: a founded lap that reads the units digit well above the everything-stepped arm says the held values and returns
+were carrying part of that arm's gain, and the lap law's bridge then has to reach them; text standing as high under the founded lap as
+under the stepped arm says holding families does not protect what the lock's move re-encodes, and the closed face then needs a lock of
+its own.

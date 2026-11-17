@@ -1441,6 +1441,60 @@ pub fn found_crossing(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 17, the record of the step back §7] `hold-families STATE STATE_SHA OUT FAMILY…`: **a learner whose
+/// deposit moves the named families alone**: every entry outside them takes its own rate of 100 bits, at which a step releases to zero,
+/// and every entry inside them the learner's rate (each entry's own rate, [`Learner::own_rates`], written as the state's `rates` line).
+/// The families are named as the layout names them (`q`, `q_bias`, `probe`, `probe_bias`, `temper`, `read`, `read_bias`, `lift_bias`,
+/// `v`, `v_bias`, `out`, `out_bias`, `closed_odds`, `closed_odds_bias`, `enc`). Why: the lap law finishes a block's bridge with the rest
+/// of the constitution held (the staircase record of October 25, §1: a block pass that held every family but the readouts kept what was
+/// founded, and a full stepped pass eroded it). A study's tool: it writes a new state and changes no law.
+pub fn hold_families(args: &[String]) -> Result<()> {
+    if args.len() < 5 {
+        return Err("hold-families STATE STATE_SHA OUT FAMILY…".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let d = learner.field.declaration;
+    let l = learner.field.layout().clone();
+    let (dw, m2, a, h) = (d.width, 2 * d.heads * d.modes, d.alphabet, d.heads);
+    let mut rates = vec![100u32; learner.field.material_len()];
+    let mut moved = 0usize;
+    for name in &args[4..] {
+        let (start, len) = match name.as_str() {
+            "enc" => (l.enc, (a + 1) * dw),
+            "q" => (l.q, m2 * dw),
+            "q_bias" => (l.q_bias, m2),
+            "v" => (l.v, m2 * dw),
+            "v_bias" => (l.v_bias, m2),
+            "out" => (l.out, dw * m2),
+            "out_bias" => (l.out_bias, dw),
+            "probe" => (l.probe, m2 * dw),
+            "probe_bias" => (l.probe_bias, m2),
+            "temper" => (l.temper, 2 * h),
+            "read" => (l.read, dw * dw),
+            "read_bias" => (l.read_bias, a),
+            "lift_bias" => (l.lift_bias, dw),
+            "closed_odds" => (l.closed_odds, usize::from(d.closed > 0) * h * dw),
+            "closed_odds_bias" => (l.closed_odds_bias, usize::from(d.closed > 0) * h),
+            _ => return Err(format!("hold-families knows no family {name}").into()),
+        };
+        rates[start..start + len].fill(learner.rate_bits);
+        moved += len;
+    }
+    learner.own_rates = Some(rates);
+    let written = learner.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a held learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("HOLD_FAMILIES moving={} entries_moving={moved} entries_held={} rate_bits={}", args[4..].join(","), learner.field.material_len() - moved, learner.rate_bits);
+    Ok(())
+}
+
 /// [definition; the lead, November 17, the founding records] `found-closed STATE STATE_SHA CLOSED CLOSED_SHA OUT`: **the closed characters
 /// founded from a ruler's words** ([`Learner::with_closed`]). `CLOSED` is little-endian 32-bit words: `E`, then the keys (`A × 2E` on
 /// `2^(−16)`: a class's `E` real parts, then its `E` imaginary parts), then the odds (`heads` rows of `D` on `2^(−24)`, then a bias a head
