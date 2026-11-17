@@ -1,0 +1,33 @@
+== round 0 16:53:33
+half=fit column=every places=1961 nats=1.9200;half=held column=every places=2121 nats=1.8842;half=fit column=middle places=172 nats=2.0379;half=fit column=top places=834 nats=1.7710;half=fit column=units places=955 nats=2.0290;half=held column=middle places=181 nats=1.9004;half=held column=top places=895 nats=1.7136;half=held column=units places=1045 nats=2.0274;
+STEP rows=16328 fit=7844 covector_share_removed_held=0.0153 rms_covector=1.387e-02 eta=64 largest_return=2.524 rms_return=0.1992
+== round 1 eta 64 16:53:53
+half=fit column=every places=1961 nats=1.7692;half=held column=every places=2121 nats=1.7844;half=fit column=middle places=172 nats=1.9220;half=fit column=top places=834 nats=1.6222;half=fit column=units places=955 nats=1.8700;half=held column=middle places=181 nats=1.8940;half=held column=top places=895 nats=1.6319;half=held column=units places=1045 nats=1.8960;
+STEP rows=16328 fit=7844 covector_share_removed_held=0.0070 rms_covector=1.297e-02 eta=64 largest_return=2.529 rms_return=0.2483
+== round 2 eta 64 16:54:13
+half=fit column=every places=1961 nats=1.6949;half=held column=every places=2121 nats=1.7361;half=fit column=middle places=172 nats=1.8746;half=fit column=top places=834 nats=1.5750;half=fit column=units places=955 nats=1.7672;half=held column=middle places=181 nats=1.8340;half=held column=top places=895 nats=1.6186;half=held column=units places=1045 nats=1.8199;
+STEP rows=16328 fit=7844 covector_share_removed_held=0.0040 rms_covector=1.250e-02 eta=64 largest_return=2.729 rms_return=0.2779
+== round 3 eta 64 16:54:33
+half=fit column=every places=1961 nats=1.6424;half=held column=every places=2121 nats=1.7081;half=fit column=middle places=172 nats=1.8352;half=fit column=top places=834 nats=1.5476;half=fit column=units places=955 nats=1.6905;half=held column=middle places=181 nats=1.8267;half=held column=top places=895 nats=1.6151;half=held column=units places=1045 nats=1.7672;
+STEP rows=16328 fit=7844 covector_share_removed_held=0.0018 rms_covector=1.237e-02 eta=64 largest_return=3.050 rms_return=0.3132
+== round 4 eta 64 16:54:52
+half=fit column=every places=1961 nats=1.6006;half=held column=every places=2121 nats=1.6852;half=fit column=middle places=172 nats=1.8019;half=fit column=top places=834 nats=1.5266;half=fit column=units places=955 nats=1.6290;half=held column=middle places=181 nats=1.7980;half=held column=top places=895 nats=1.6149;half=held column=units places=1045 nats=1.7258;
+STEP rows=16328 fit=7844 covector_share_removed_held=0.0007 rms_covector=1.221e-02 eta=64 largest_return=3.373 rms_return=0.3393
+== round 5 eta 64 16:55:13
+half=fit column=every places=1961 nats=1.5686;half=held column=every places=2121 nats=1.6720;half=fit column=middle places=172 nats=1.7663;half=fit column=top places=834 nats=1.5078;half=fit column=units places=955 nats=1.5860;half=held column=middle places=181 nats=1.7995;half=held column=top places=895 nats=1.6198;half=held column=units places=1045 nats=1.6945;
+STEP rows=16328 fit=7844 covector_share_removed_held=0.0003 rms_covector=1.218e-02 eta=64 largest_return=3.640 rms_return=0.3663
+== round 6 eta 64 16:55:33
+half=fit column=every places=1961 nats=1.5383;half=held column=every places=2121 nats=1.6607;half=fit column=middle places=172 nats=1.7379;half=fit column=top places=834 nats=1.4916;half=fit column=units places=955 nats=1.5432;half=held column=middle places=181 nats=1.7893;half=held column=top places=895 nats=1.6232;half=held column=units places=1045 nats=1.6704;
+STEP rows=16328 fit=7844 covector_share_removed_held=-0.0001 rms_covector=1.210e-02 eta=64 largest_return=3.886 rms_return=0.3899
+== round 7 eta 64 16:55:53
+half=fit column=every places=1961 nats=1.5125;half=held column=every places=2121 nats=1.6518;half=fit column=middle places=172 nats=1.7133;half=fit column=top places=834 nats=1.4753;half=fit column=units places=955 nats=1.5088;half=held column=middle places=181 nats=1.8002;half=held column=top places=895 nats=1.6262;half=held column=units places=1045 nats=1.6480;
+STEP rows=16328 fit=7844 covector_share_removed_held=-0.0005 rms_covector=1.205e-02 eta=64 largest_return=4.078 rms_return=0.4130
+== round 8 eta 64 16:56:13
+half=fit column=every places=1961 nats=1.4913;half=held column=every places=2121 nats=1.6456;half=fit column=middle places=172 nats=1.6874;half=fit column=top places=834 nats=1.4631;half=fit column=units places=955 nats=1.4806;half=held column=middle places=181 nats=1.8072;half=held column=top places=895 nats=1.6297;half=held column=units places=1045 nats=1.6312;
+STEP rows=16328 fit=7844 covector_share_removed_held=-0.0006 rms_covector=1.203e-02 eta=64 largest_return=4.287 rms_return=0.4347
+== round 9 eta 64 16:56:33
+half=fit column=every places=1961 nats=1.4717;half=held column=every places=2121 nats=1.6409;half=fit column=middle places=172 nats=1.6694;half=fit column=top places=834 nats=1.4518;half=fit column=units places=955 nats=1.4534;half=held column=middle places=181 nats=1.8290;half=held column=top places=895 nats=1.6317;half=held column=units places=1045 nats=1.6162;
+STEP rows=16328 fit=7844 covector_share_removed_held=-0.0010 rms_covector=1.204e-02 eta=64 largest_return=4.571 rms_return=0.4554
+== round 10 eta 64 16:56:53
+half=fit column=every places=1961 nats=1.4528;half=held column=every places=2121 nats=1.6358;half=fit column=middle places=172 nats=1.6442;half=fit column=top places=834 nats=1.4417;half=fit column=units places=955 nats=1.4281;half=held column=middle places=181 nats=1.8305;half=held column=top places=895 nats=1.6366;half=held column=units places=1045 nats=1.6013;
+DESCEND_DONE best_round=10 closed=ROOT/.local/wt/lead/.local/run/founding/g94.r10.closed fit_code=1.4528

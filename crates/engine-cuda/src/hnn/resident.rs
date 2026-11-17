@@ -752,6 +752,10 @@ impl<'c> Resident<'c> {
     /// the octets of the resident face this upload holds.
     pub(crate) fn upload(&self, field: &Constitution, shared_face: Option<u64>) -> Result<(Words, Upload<'c>, u64)> {
         let d = field.declaration;
+        // [the lead, November 17] The closed characters' keyed pair product has no card realization yet: its state is a ruler's.
+        if d.closed > 0 {
+            return Err(TowerError::Refused("a field with closed characters has no card realization yet (hnn-field-v14c is the host forward's)"));
+        }
         let l = field.layout();
         let mut ring_off = Vec::new();
         let mut ring_n = Vec::new();

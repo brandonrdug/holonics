@@ -619,6 +619,10 @@ impl Constitution {
         let sites = region.classes.len();
         let l = &self.layout;
         let reaches = self.reaches();
+        // [the lead, November 17] The closed characters' keyed pair product has no reverse yet, so no deposit reads a field that has it.
+        if d.closed > 0 && !self.closed_blind {
+            return refuse("a field with closed characters has no reverse yet (hnn-field-v14c is the host forward's; no lap trains from it)");
+        }
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }

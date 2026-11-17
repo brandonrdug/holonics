@@ -1802,10 +1802,18 @@ impl Constitution {
         let mut g = vec![0i128; self.material_len()];
         let mut lambda: Vec<Vec<i64>> = Vec::new();
         let mut currents: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambda), None)?;
-        lambda.reverse();
-        currents.reverse();
         let (sites, heads) = (region.classes.len(), self.declaration.heads);
+        // [the lead, November 17] A field with closed characters has no reverse yet: its forward alone is read (the codes, the charts, the rows),
+        // with every covector written as zero, unless the ruler reads its reverse with their return held constant
+        // ([`Constitution::closed_blind`]).
+        if self.declaration.closed > 0 && !self.closed_blind {
+            lambda = vec![vec![0i64; sites * self.declaration.width]; pass.ticks.len()];
+            currents = vec![vec![0i64; heads * sites * 2 * self.declaration.modes]; pass.ticks.len()];
+        } else {
+            self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambda), None)?;
+            lambda.reverse();
+            currents.reverse();
+        }
         // Each open row's temperature covector, as the reverse forms it before it sums the rows into the head's one entry: with the current's
         // covector `δỹ_i` (framed, by head), `δp_j = ⟨δỹ_i, D ṽ_j⟩`, `μ = Σ_j p_j δp_j`, `δz_j = ln 2 · p_j (δp_j − μ)`, `δT = Σ_j δz_j s_j` and
         // `δℓ = δT · T ln 2` ([`temperature_chain`]). An open row hears no crowd, so its sources are the whole row.

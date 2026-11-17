@@ -37,3 +37,11 @@ place). One-place receivers on held short sums, before: units 2.329 nats, top 1.
   The step against the covector (−8) codes the units digit above 2.33.
 What a miss would say: units above 1.9 at every step says one step along the covector does not carry the product through the chart and the
 readout, and the return then needs a solve through the readout itself.
+
+Scored (2026-11-17T17:00:25Z), from ladder_a.txt and ladder_b.txt (lap 94's state at its section 2,000, the 2,000-record table's held half: 1,045 units places,
+895 top, 181 middle):
+G-FC1. Over the steps read, the held half as a whole codes lowest at step 128 (1.874 nats a place, 1.884 at step 64, 2.104 before). There the
+  units digit codes 1.855 nats (held, in 1.4 to 1.9), the top column 1.900 (+0.092, held within 0.1) and the middle column 1.859 (−0.414,
+  outside the 0.1 guessed, a fall). The step against the covector codes the units digit 2.356 (held, above 2.33).
+  The fitting half's own codes were not printed by the ladder, so the step is the held half's lowest of the two that tie; the descent that
+  followed prints both halves (descend_a.txt).
