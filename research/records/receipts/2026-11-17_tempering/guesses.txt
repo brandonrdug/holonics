@@ -117,3 +117,23 @@ Three arms that differ only in the store's leak (Learner::leak, new today): none
   takes a pair law by its own descent, and the plan turns to the deposit (the leak as law, concentrated worlds) before any founding
   part. If no arm falls under 1.8 while the fitted code passes under 0.6, the claim stands in the classical regime too. Either way the
   held prompts are written whole at the end of each arm and read first.
+
+G-L2 (2026-11-17T19:27:18Z). The same dwell on plain text, beside G-L1's arms (which are still running and unread past pass 25). The world: three
+simple narrative books of the store's books slice (about 41 thousand octets each, a line break's hyphen joined at the boundary), their
+first nine tenths the fitting text (111,469 octets; rows of 48 known places and a run of 32, 3,478 rows, 35 sections a pass), their last
+tenths held, and a fourth book never read. From lap 94's end state, 400 passes on the card, two arms: no leak, and a leak of 12 bits.
+Read every 10 passes: a keyed half of the run open, the whole run open, and the run's first place on its left context alone. The panel:
+twelve prompts (four from the fitting text, four from the held tenths, four from the unread book), 64 places each, written in the
+law's keyed order and in place order.
+  Premises read first. Lap 94's state codes a keyed half of the run at 2.05 nats a place on the fitting rows, 2.04 on the held and 1.97
+  on the unread book. Its panel is scrambled almost-words in both orders: 54 of 127 written words (two letters or more) stand in the
+  fitting text's lexicon of 3,198 words, 43%, where the held text's own words stand in it at 88% and the unread book's at 81%; its
+  longest run shared with the fitting text is 11 octets. The line that made this state read each stretch of an 8.5 GB store once.
+  The guess:
+    no leak, pass 400: the fitting rows' keyed half at or under 1.2 nats; the held rows' lowest read between 1.7 and 2.0, and their last
+      read above their lowest by 0.05 or more; panel in place order, words in the lexicon: 60% or more on the fitted prompts, 50% or more
+      on the held and unread ones; a shared run of 16 octets or more on a fitted prompt.
+    leak 12: the fitting rows above the no-leak arm's by 0.1 or more; the held rows' lowest under the no-leak arm's lowest by 0.05 or
+      more and their last read within 0.02 of their lowest; held and unread prompts' words in the lexicon at or above the no-leak arm's.
+  What it decides: held and unread prompts written at 70% or more in the lexicon, with no long shared run, say that dwelling on a small
+  plain world is what the line's single pass withheld. A fitted code that falls while the held prompts stay near 43% says rote.

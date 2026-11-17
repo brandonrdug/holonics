@@ -2001,8 +2001,12 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
 /// (`host`). The arithmetic world's tables are synthetic and GSM8K's test split is public, so `OUT` may be shown; a table made from a
 /// private passage keeps its `OUT` private.
 pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
-    if args.len() != 13 && args.len() != 14 {
-        return Err("write-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [REFINE]".into());
+    // [measurement; the lead, November 17] With `place` after `REFINE`, each octave's places are drawn in place order (the run written
+    // left to right, each place on a read whose every earlier place is resolved), where the law draws them in a keyed order: a ruler's
+    // comparison of what the order within an octave costs a write, read before any change of the release's law.
+    let place_order = args.len() == 15 && args[14] == "place";
+    if args.len() != 13 && args.len() != 14 && !place_order {
+        return Err("write-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [REFINE [place]]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("write-forms")?;
@@ -2039,7 +2043,7 @@ pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result
     let release: Vec<(&[usize], usize)> = rows.iter().map(|r| (r.2.as_slice(), run)).collect();
     let written = learner
         .field
-        .sample_runs(&release, run, refine, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {})
+        .sample_runs(&release, run, refine, codec.void(), seed, 0, true, place_order, None, false, realization, &mut |_, _| true, &mut |_| {})
         .map_err(|e| e.to_string())?;
     let mut text = String::new();
     for ((label, prompt, _, reference), w) in rows.iter().zip(&written) {

@@ -349,7 +349,10 @@ pub fn carry_of(milli: &str) -> Result<i64> {
 /// group is printed (`TRIAL_READ`): the code of the answer's last digit open alone (the one-place receiver), the same digit's code with
 /// the whole run open (the state a free release's first read meets), and the answer's first digit open alone where the answer has two
 /// digits or more, in millionths of a nat a place, with the mean density at the written last digit in thousandths. Every `SAVE` passes
-/// the learner is written to `OUT.pN`. A row whose run holds no line feed after a digit is refused.
+/// the learner is written to `OUT.pN`. A row whose run holds no line feed past its first place is a plain row (a stretch of text): its
+/// two reads are a keyed half of its run open (the key the row's label and the place, the same at every pass) and the whole run open,
+/// each a mean over the open places; its third is the whole run open again, coded at the run's first place alone (the next place on
+/// its left context, the state a write's first place meets).
 pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
     if args.len() != 14 && args.len() != 18 {
         return Err("try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT [READ READ_SHA EVERY SAVE]".into());
@@ -384,7 +387,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     }
     println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} leak={} threads={}", rows.len(), learner.field.declaration.closed, learner.leak.map_or("none".to_string(), |k| k.to_string()), rayon::current_num_threads());
     // The read table, where one is given: each row's group, prompt, run and the place of its answer's last digit in the run.
-    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, usize)> = Vec::new();
+    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, Option<usize>, String)> = Vec::new();
     let (mut every, mut save) = (0usize, 0usize);
     if args.len() == 18 {
         let feed = codec.encode(b"\n")?;
@@ -397,8 +400,11 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
                 return Err("a read row that is not label, prompt and run".into());
             }
             let (p, r) = (codec.encode(unescape(w[1]).as_bytes())?, codec.encode(unescape(w[2]).as_bytes())?);
-            let last = r.iter().position(|&c| c == feed[0]).filter(|&at| at > 0).ok_or("a read row whose run holds no line feed after a digit")? - 1;
-            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, last));
+            if p.is_empty() || r.is_empty() {
+                return Err("a read row with an empty prompt or run".into());
+            }
+            let last = r.iter().position(|&c| c == feed[0]).filter(|&at| at > 0).map(|at| at - 1);
+            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, last, w[0].to_string()));
         }
         (every, save) = (args[16].parse()?, args[17].parse()?);
         if every == 0 || save == 0 || read_rows.is_empty() {
@@ -410,13 +416,21 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         if read_rows.is_empty() {
             return Ok(());
         }
-        let region_of = |(_, p, r, last): &(String, Vec<usize>, Vec<usize>, usize), kind: usize| {
+        let region_of = |(_, p, r, last, label): &(String, Vec<usize>, Vec<usize>, Option<usize>, String), kind: usize| {
             let mut classes = p.clone();
             classes.extend_from_slice(r);
             let mut open = vec![false; classes.len()];
-            match kind {
-                0 => open[p.len() + last] = true,
-                1 => open[p.len()..].fill(true),
+            match (kind, last) {
+                (0, Some(last)) => open[p.len() + last] = true,
+                (0, None) => {
+                    for j in 0..r.len() {
+                        open[p.len() + j] = keyed_bit(&format!("{label}:read:{j}")) & 1 == 1;
+                    }
+                    if !open.iter().any(|&o| o) {
+                        open[p.len()] = true;
+                    }
+                }
+                (1, _) | (2, None) => open[p.len()..].fill(true),
                 _ => open[p.len()] = true,
             }
             OwnedRegion::plain(classes, open)
@@ -428,17 +442,24 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             let views: Vec<_> = regions.iter().map(view_of).collect();
             let faces = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
             for ((row, face), region) in read_rows.iter().zip(&faces).zip(&regions) {
-                let at = row.1.len() + if kind == 2 { 0 } else { row.3 };
-                if kind == 2 && row.3 == 0 {
-                    continue;
-                }
-                let f = face[at].as_ref().ok_or("a read place that carries no face")?;
-                let (m, t) = (f.masses[region.classes[at]], f.total);
-                let slot = &mut groups.entry(row.0.clone()).or_insert([(0, 0); 3])[kind];
-                slot.0 += i128::from(holonics_engine::field::ratio_code(m, t));
-                slot.1 += 1;
-                if kind == 0 {
-                    *mass.entry(row.0.clone()).or_insert(0.0) += m as f64 / t as f64;
+                // A plain row sums every open place of its two reads; a sum's row reads its one place.
+                let places: Vec<usize> = match (kind, row.3) {
+                    (2, Some(0)) => continue,
+                    // A plain row's third read: its whole run open, coded at its first place alone (the next place on its left context).
+                    (2, None) => vec![row.1.len()],
+                    (2, Some(_)) => vec![row.1.len()],
+                    (_, Some(last)) => vec![row.1.len() + last],
+                    (_, None) => (row.1.len()..region.classes.len()).filter(|&t| region.unresolved[t]).collect(),
+                };
+                for at in places {
+                    let f = face[at].as_ref().ok_or("a read place that carries no face")?;
+                    let (m, t) = (f.masses[region.classes[at]], f.total);
+                    let slot = &mut groups.entry(row.0.clone()).or_insert([(0, 0); 3])[kind];
+                    slot.0 += i128::from(holonics_engine::field::ratio_code(m, t));
+                    slot.1 += 1;
+                    if kind == 0 {
+                        *mass.entry(row.0.clone()).or_insert(0.0) += m as f64 / t as f64;
+                    }
                 }
             }
         }
