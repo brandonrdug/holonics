@@ -18,24 +18,38 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 17, evening): the line is stopped and the learning law is under review
+## Where the work stands (November 17, night): Athena takes held sums whole when she dwells on one world, and the line never dwelt
 
-Brandon read the day's writes as no gain on what was already attained, and the step back agrees
-([the record](research/records/2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)).
-Athena learns structure and does not compound. What trains is a small masked-reconstruction stack changed only by a step on one
-comparison: nothing binds (a row never locks onto its sources, so a face is a blend), nothing tempers (the deposit has no leak and its
-rates never fall), a part has no receipt of its own, and a symbol is a free row. The October records had measured this design and derived
-its repair, and the November field consumed none of them ([THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine)
-holds the table). One controlled run places the fault: ten concentrated passes over 3,923 short sums leave the plain engine's held units
-digit at 2.27 nats (flat 2.30; 1 of 96 held sums written whole), and the same passes with one part's rows compared themselves, the closed
-face, bring it to 0.86 (11 of 96). Both arms' writes are poor as products.
+The plain engine, no part added, from lap 94's end state, dwelt on 3,923 short sums for 150 passes (6,000 sections, fourteen minutes of
+the card) and then wrote 86 of 96 held sums whole, lengths included, where lap 94's state wrote 2
+([the record](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)).
+Nothing moves for about 1,000 sections; then a strictly held sum's last digit falls from 2.29 nats to under 0.1 inside the next 2,000.
+An independent read by Codex on its own squares agrees. The trials of the same morning stopped at ten passes, short of the transition,
+and everything concluded from them is withdrawn there: that stepping cannot take a law that lives in a product, that a founding part was
+needed, and the reading of the October machine at three passes. The guide carries the rule (a learner's null is held to a length).
 
-Decided: lap 94's state is frozen and the line is stopped after lap 95; no part is added to that state. The work is a study on small
-worlds, many laps over little, of the learning law the records of October 24 and 25 already state and the November field never took: each
-block keeps its tension over a lap at a held constitution, a lap founds the face that carries it where the drop pays its
-description-length charge, the bridge is refounded exactly, and nothing is stepped (the record's §7; the stepped engine takes 200 sums
-half by rote in 500 passes and carries nothing to a held one). Its acceptance is the staircase record's, with the writes read first at
-every step (the guide's method rule of November 17). The machine that follows is decided from what the study writes.
+The line's fault is read from its own pass line: 701 MB taken once through, never a stretch twice, every section a mix of all seven
+slices, arithmetic a quarter of each (3.6 million pieces), and a short sum's units digit never moved. Nothing was ever dwelt on.
+
+Plain text does not settle the same way. The same dwell on three simple books falls slowly with no transition and still writes
+almost-words at pass 400 (the record's §9): a text is thousands of small laws that share every entry, and a dwell alone gives no law
+its own entries or its own comparison.
+
+Standing: lap 94's state is frozen, the line is stopped, and no part is added to that state. A stream in which no sum is met twice founds the law as fast (88 of 96 held sums whole), so it is the world met alone,
+not the records met again. In order: the two mixed arms that say what a section must be (sums and text in alternate sections, sums
+inside mixed sections as the line had them); the pass's own
+navigation (stay on a world or leave, read from the learner's own progress there, against the quota law on a matched replay); and what
+text needs that a dwell does not give. Every report opens with the panel, whole. The store's leak is a state of the learner
+(`Learner::leak`), absent from every standing state.
+
+### Earlier on November 17 (evening): the step back's first reading, corrected above
+
+Brandon read the day's writes as no gain on what was already attained
+([the record of the step back](research/records/2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)).
+What stands of it: Athena is one state rolled through everything; her writes of November 12 to 17 are as he read them; the engine is a
+small masked-reconstruction stack changed by a step on one comparison, its rows soft mixtures, a symbol a free row; and the October
+records' laws were consumed by none of it ([THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine)). What does not
+stand: its ten-pass trial's reading and the study it decided on (a lap law with nothing stepped, on small worlds).
 
 ### Earlier on November 17: the phase reviewed and the first founding attempt
 

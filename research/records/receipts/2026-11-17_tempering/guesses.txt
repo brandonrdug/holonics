@@ -98,3 +98,91 @@ Scored (2026-11-17T19:03:35Z), G-O2 (october_protected.txt): the October run rep
   passes, the return and the readout still do not come to read it. Stepping on the one comparison leaves a conducted product unread, as
   it leaves a diffuse one untaken (the plain arm of November 17). What I wrote to Brandon at 18:47 UTC and in the record's §8, that the
   stepped passes erased the founded product, over-read the share and is withdrawn.
+
+G-L1 (2026-11-17T19:18:41Z). The long trial: the plain engine from lap 94's end state, 1,500 passes over the fitting half's 3,923 short sums (1,766
+distinct pairs; 100 records a section, so 60,000 sections), on the card, each run's places opened by the repaired keyed draw (a half).
+Three arms that differ only in the store's leak (Learner::leak, new today): none, 12 bits (the deposit's own rate) and 14 bits. Read every
+25 passes on 486 strictly held sums (neither operand order in the fit), 251 held sums whose pair stands in the fit in the other order, and
+400 fitted rows: the answer's last digit open alone, in nats a place.
+  Premises read from the logs first: the ten-pass plain arm (400 sections) left held units at 2.272 nats; the 500 passes over 200 sums
+  (1,000 sections) left the fitted units at 1.557 with the pass's code still falling a tenth every 50 passes, so that run was read
+  mid-descent; no run of this engine on a small world has passed 1,000 sections. Every units pair stands in the fit ten times or more.
+  The guess, which is the step back's own claim (its record §10: stepping on the one comparison does not take a law that lives in a
+  product) put to the regime where classical learners are known to take such laws (many passes over little, with a decay):
+    no leak:  fitted last digit at or under 0.6 nats at pass 1,500; strictly held last digit at or above 1.8 (ten flat are 2.303).
+    leak 12:  fitted last digit above the no-leak arm's; strictly held under the no-leak arm's by 0.3 or more, and at or above 1.2.
+    leak 14:  between the two on both.
+  My confidence in it is about even. What a miss says, fixed now: if any arm's strictly held last digit falls under 0.8 nats, §10's
+  sentence is withdrawn for this engine: the fault of the ten-pass trials was their length and the deposit's lack of a leak, the engine
+  takes a pair law by its own descent, and the plan turns to the deposit (the leak as law, concentrated worlds) before any founding
+  part. If no arm falls under 1.8 while the fitted code passes under 0.6, the claim stands in the classical regime too. Either way the
+  held prompts are written whole at the end of each arm and read first.
+
+G-L2 (2026-11-17T19:27:18Z). The same dwell on plain text, beside G-L1's arms (which are still running and unread past pass 25). The world: three
+simple narrative books of the store's books slice (about 41 thousand octets each, a line break's hyphen joined at the boundary), their
+first nine tenths the fitting text (111,469 octets; rows of 48 known places and a run of 32, 3,478 rows, 35 sections a pass), their last
+tenths held, and a fourth book never read. From lap 94's end state, 400 passes on the card, two arms: no leak, and a leak of 12 bits.
+Read every 10 passes: a keyed half of the run open, the whole run open, and the run's first place on its left context alone. The panel:
+twelve prompts (four from the fitting text, four from the held tenths, four from the unread book), 64 places each, written in the
+law's keyed order and in place order.
+  Premises read first. Lap 94's state codes a keyed half of the run at 2.05 nats a place on the fitting rows, 2.04 on the held and 1.97
+  on the unread book. Its panel is scrambled almost-words in both orders: 54 of 127 written words (two letters or more) stand in the
+  fitting text's lexicon of 3,198 words, 43%, where the held text's own words stand in it at 88% and the unread book's at 81%; its
+  longest run shared with the fitting text is 11 octets. The line that made this state read each stretch of an 8.5 GB store once.
+  The guess:
+    no leak, pass 400: the fitting rows' keyed half at or under 1.2 nats; the held rows' lowest read between 1.7 and 2.0, and their last
+      read above their lowest by 0.05 or more; panel in place order, words in the lexicon: 60% or more on the fitted prompts, 50% or more
+      on the held and unread ones; a shared run of 16 octets or more on a fitted prompt.
+    leak 12: the fitting rows above the no-leak arm's by 0.1 or more; the held rows' lowest under the no-leak arm's lowest by 0.05 or
+      more and their last read within 0.02 of their lowest; held and unread prompts' words in the lexicon at or above the no-leak arm's.
+  What it decides: held and unread prompts written at 70% or more in the lexicon, with no long shared run, say that dwelling on a small
+  plain world is what the line's single pass withheld. A fitted code that falls while the held prompts stay near 43% says rote.
+
+Read (2026-11-17T19:31:45Z), G-L1 at pass 100 (the arms run on; scored in full below when they are stopped): the strictly held last digit open alone
+reads 2.292 nats at pass 25, 0.521 at pass 50, 0.072 at pass 75 and 0.017 at pass 100 on the arm with no leak (density at the written
+digit 0.991; with the whole run open 0.015; the first digit 0.007); the 12-bit leak 0.276, 0.089, 0.023; the 14-bit leak 0.374, 0.060
+(stopped near pass 95 to free the card). G-L1 missed: every arm passed under 0.8, by pass 75. The step back's sentence is withdrawn.
+
+G-L3 (2026-11-17T19:31:45Z). What took the sums: records met again and again, or a world dwelt on? And does a second world between the sections stop it?
+Two arms from lap 94's end state, fixed before either is launched (the concentrated arm above is their control: its transition's
+middle stands near section 2,000, strictly held last digit 0.52 at section 2,000 and 0.07 at 3,000).
+  the stream (no sum met twice: 400,000 fresh sums of the fitting half's operand law, no held pair in either order, 40 sections a
+    pass): the strictly held last digit under 0.1 nats by section 3,000, the control's place or sooner. What a miss says: repetition of
+    records carries the transition, and a stream cannot found it.
+  the interleaved arm (sections of 100 sums and sections of 100 text rows of the plain-text world alternating, 200 passes of 75
+    sections): the transition comes later than the control's in sum sections: the strictly held last digit still above 1.0 after 2,000
+    sum sections (pass 51) and under 0.5 by 7,800 (pass 200); the text's held rows' keyed half within 0.05 nats of the text-alone arm's
+    at equal text sections. What it decides: if the sums are never taken beside text, a single stream of mixed worlds cannot found a
+    law that a dwelt world founds in five minutes, which is what the line was (one pass over seven registers, sums a tenth of each
+    section); if they are taken as soon as alone, the mixing was not the line's fault and its fault is the sums' share and form there.
+
+Read (2026-11-17T19:43:37Z), the held panel written from the no-leak arm's state at pass 250 (host forward, 8 places a prompt): 63 of 96 held sums
+written whole, the last digit the reference's in 87 (lap 94's state: 2 and 9). By the reference answer's length: two digits 63 of 66
+whole; three digits 0 of 20; one digit 0 of 10; EVERY write is two digits long. The cause is the trial's rows, not the engine: a run was
+the answer, its line feed and five symbols more, so a region's extent told the answer's length (7, 8 or 9 open places), and a write's 8
+places are a two-digit answer's extent. The reads "with the whole run open" carried the same leak. The last digit open alone does not
+(its place is given, its value is not), so G-L1's read stands for the last digit, and a sum's length is unread.
+G-L1b (2026-11-17T19:43:37Z). The control again with a run of one extent (8 places: the answer, its line feed and the next record's opening to fill),
+so nothing but the operands says how long the answer is; 150 passes, read every 10, the panel written at the end (8 places).
+  The guess: the strictly held last digit under 0.1 nats by pass 100, as before; the panel at pass 150: 60 or more of the 66 two-digit
+  answers whole, 8 or more of the 10 one-digit, 10 or more of the 20 three-digit (the hundreds' carry is the later law), 78 or more of 96.
+
+Scored (2026-11-17T20:11:21Z).
+G-L1 (long_none.txt, long_leak12.txt, long_leak14.txt): missed on every arm. Strictly held last digit open alone: no leak 2.292 at pass
+  25, 0.521 at 50, 0.072 at 75, 0.017 at 100, 0.016 at 250 (fitted 0.008); leak 12: 0.276 at 50, 0.023 at 100 (stopped near 105);
+  leak 14: 0.374 at 50, 0.060 at 75 (stopped near 95). No arm stood above 1.8; the leak arms did not stand above the no-leak arm
+  either. The arms were stopped once read, short of the 1,500 passes the guess named, to free the card; the read that decided is at
+  pass 75. The sentence of the step back's §10 is withdrawn, as fixed.
+G-L1b (fixed.txt): held on all four parts. Strictly held last digit 0.081 at pass 100 (0.062 at 80, 0.118 at 150). The panel at pass
+  150: 86 of 96 whole (78 guessed); two digits 60 of 66 (60), one digit 9 of 10 (8), three digits 17 of 20 (10); written length the
+  reference's in 93; 55 of the 63 prompts whose pair stands in the fit in neither order.
+G-L2 (text_none.txt), the no-leak arm at pass 400: fitting rows 1.494 (missed: 1.2 or under guessed); held rows' lowest 1.746 near pass
+  200 (held: between 1.7 and 2.0), last read 1.773, 0.027 above it (missed: 0.05 or more guessed); the unread book 1.849 at pass 100,
+  1.935 at 400. Panel in place order, words in the lexicon: fitted prompts 31 of 48 (64%, held: 60% guessed), held 28 of 49 (57%, held),
+  unread 24 of 44 (54%, held); longest shared run on a fitted prompt 9 octets (missed: 16 guessed; nothing was recited). In the law's
+  keyed order 56 of 131 (43%), as lap 94's. The leak arm was stopped at pass 12 to free the card for G-L3 and is unread. As fixed: held
+  and unread prompts stand under 70%, so the dwell alone does not settle text into words; it is not rote either.
+G-L3, the stream (stream.txt): held. Strictly held last digit 2.301 at section 1,000, 0.843 at 2,000, 0.075 at 2,800 (0.114 at 3,000,
+  0.020 at 3,800); panel at section 4,000: 88 of 96 whole, length the reference's in 95. A world met alone founds the law with no record
+  met twice. The interleaved arm and the arm mixed inside each section (G-L3's second part and its within-section form, the same fixed
+  guess: the line's condition, never taken or taken late) are running.

@@ -81,6 +81,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("hold-families") {
         return athena::store::hold_families(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("set-leak") {
+        return athena::store::set_leak(&rest[1..]);
+    }
     // [the lead, November 17] A founding from a ruler's words reads and writes states alone, so it opens no card.
     if mode == "host" && rest.get(1).map(String::as_str) == Some("found-closed") {
         return athena::store::found_closed(&rest[1..]);

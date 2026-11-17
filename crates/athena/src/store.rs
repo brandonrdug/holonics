@@ -1495,6 +1495,30 @@ pub fn hold_families(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 17, the step back's record §11] `set-leak STATE STATE_SHA BITS OUT`: **a learner with the store's leak
+/// set** ([`Learner::leak`]): every material entry relaxes by `2^(−BITS)` of itself after each section's step; `BITS` of zero clears it.
+/// The leak is law and is carried in the learner's state, never in a run's switch. It writes a new state.
+pub fn set_leak(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("set-leak STATE STATE_SHA BITS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let bits: u32 = args[3].parse()?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    learner.leak = (bits > 0).then_some(bits);
+    let written = learner.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a leaking learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_LEAK bits={bits} rate_bits={} entries={}", learner.rate_bits, learner.field.material_len());
+    Ok(())
+}
+
 /// [definition; the lead, November 17, the founding records] `found-closed STATE STATE_SHA CLOSED CLOSED_SHA OUT`: **the closed characters
 /// founded from a ruler's words** ([`Learner::with_closed`]). `CLOSED` is little-endian 32-bit words: `E`, then the keys (`A × 2E` on
 /// `2^(−16)`: a class's `E` real parts, then its `E` imaginary parts), then the odds (`heads` rows of `D` on `2^(−24)`, then a bias a head
@@ -1977,8 +2001,12 @@ pub fn read_forms(args: &[String], realization: &mut dyn Realization) -> Result<
 /// (`host`). The arithmetic world's tables are synthetic and GSM8K's test split is public, so `OUT` may be shown; a table made from a
 /// private passage keeps its `OUT` private.
 pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result<()> {
-    if args.len() != 13 && args.len() != 14 {
-        return Err("write-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [REFINE]".into());
+    // [measurement; the lead, November 17] With `place` after `REFINE`, each octave's places are drawn in place order (the run written
+    // left to right, each place on a read whose every earlier place is resolved), where the law draws them in a keyed order: a ruler's
+    // comparison of what the order within an octave costs a write, read before any change of the release's law.
+    let place_order = args.len() == 15 && args[14] == "place";
+    if args.len() != 13 && args.len() != 14 && !place_order {
+        return Err("write-forms UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [REFINE [place]]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("write-forms")?;
@@ -2015,7 +2043,7 @@ pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result
     let release: Vec<(&[usize], usize)> = rows.iter().map(|r| (r.2.as_slice(), run)).collect();
     let written = learner
         .field
-        .sample_runs(&release, run, refine, codec.void(), seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {})
+        .sample_runs(&release, run, refine, codec.void(), seed, 0, true, place_order, None, false, realization, &mut |_, _| true, &mut |_| {})
         .map_err(|e| e.to_string())?;
     let mut text = String::new();
     for ((label, prompt, _, reference), w) in rows.iter().zip(&written) {

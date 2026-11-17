@@ -2077,6 +2077,49 @@ fn a_tower_founded_on_a_field_reads_its_faces() {
     assert_eq!(Learner::from_text(&learner.to_text()).unwrap(), Learner { last: None, ..learner });
 }
 
+/// [definition; the lead, November 17] **The store's leak** ([`Learner::leak`]): a learner with a leak deposits the unleaked learner's
+/// step and then relaxes every entry by `release(θ, leak)`; an entry held by its rate does not leak; the leak is carried in the learner's
+/// text, a state without the line has none, and a leak under one bit or past the carrier is refused.
+#[test]
+fn the_stores_leak_relaxes_each_entry_after_its_step_and_is_carried_in_the_text() {
+    let mut plain = Learner::new(towered_live(1), 6);
+    let mut leaky = plain.clone();
+    leaky.leak = Some(4);
+    for _ in 0..3 {
+        let before = leaky.clone();
+        let mut twin = Learner { leak: None, ..before.clone() };
+        twin.section(&[region()]).unwrap();
+        leaky.section(&[region()]).unwrap();
+        let mut moved = 0;
+        for ((&l, &t), &b) in leaky.field.material().zip(twin.field.material()).zip(before.field.material()) {
+            assert_eq!(i128::from(l), i128::from(t) - release(i128::from(t), 4));
+            moved += usize::from(l != b);
+        }
+        assert!(moved > 0);
+        assert_eq!((&leaky.first, &leaky.second), (&twin.first, &twin.second), "the moments read the covector alone");
+    }
+    plain.section(&[region()]).unwrap();
+    assert_ne!(plain.field, leaky.field);
+    let text = leaky.to_text();
+    assert!(text.contains("\nleak 4\n"));
+    assert_eq!(Learner::from_text(&text).unwrap(), Learner { last: None, ..leaky.clone() });
+    assert!(!plain.to_text().contains("leak"));
+    assert_eq!(Learner::from_text(&plain.to_text()).unwrap().leak, None);
+    for bad in ["leak 0", "leak 32", "leak x"] {
+        assert!(Learner::from_text(&text.replace("leak 4", bad)).is_err(), "{bad}");
+    }
+    // An entry held by its rate neither steps nor leaks.
+    let mut held = leaky.clone();
+    held.own_rates = Some((0..held.field.material_len()).map(|i| if i % 2 == 0 { 100 } else { 6 }).collect());
+    let before: Vec<i32> = held.field.material().copied().collect();
+    held.section(&[region()]).unwrap();
+    for (i, (&a, &b)) in held.field.material().zip(&before).enumerate() {
+        if i % 2 == 0 {
+            assert_eq!(a, b, "entry {i} is held");
+        }
+    }
+}
+
 /// [definition; the tower record, D1] **The tower's covector agrees with its code's central difference** on the packets'
 /// field's families and the glue's: each family's three entries with the largest covectors, moved by `±δ` (the probe law of
 /// [`covector_matches_the_codes_difference`], a probe whose step moves a site or a packet across a sheet left out and

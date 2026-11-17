@@ -207,6 +207,17 @@ pub struct Learner {
     /// line is kept beside it for its contacts count. None in a state without the line, and after every growth (the law sets it again) but the
     /// triads' ([`Learner::with_triads`]), which keeps each old entry's own rate and opens the triads' entries at the base rate.
     pub own_rates: Option<Vec<u32>>,
+    /// [definition; the lead, November 17, the step back's record §11] **The store's leak**, in bits: after a section's step every material
+    /// entry relaxes toward rest by `2^(−leak)` of itself, `θ ← θ − release(θ, leak)` (to the nearest grain, a half away from zero, so an
+    /// entry under `2^(leak − 1)` grains stands where it is). An entry held by its own rate (past [`HELD_RATE`] bits) is outside the
+    /// deposit and does not leak. Why: no store is at rest (CLAUDE.md, November 11): a store holds by upkeep and relaxes through its one
+    /// coupling, and the deposit had none, so an entry moved once stood for ever and a structure the passage keeps driving had no advantage
+    /// over what one section left behind. With the leak an entry's steady state is `2^(leak − rate)` times the mean of its own step's
+    /// ratio `m / (⌊√v⌋ + 1)`: what its flux keeps up. Carried in the learner's text as a trailing `leak K` line after the rates' and only
+    /// where set, so every state without one reads and writes byte for byte as before; none on a state without the line. Kept by every
+    /// growth. Its value is a trial's bracket until a law gives it (`agent-inferred`: the deposit's own rate is the candidate, the
+    /// balance of a store's noise against its dissipation).
+    pub leak: Option<u32>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`Receipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -338,7 +349,7 @@ impl Learner {
     pub fn new(field: Constitution, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, last: None, pass: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -501,9 +512,11 @@ impl Learner {
         let (candidate, moved) = stepped(&self.field, &step, 0)?;
         mark(13);
         if !moved {
+            self.relax(&rates);
             return Ok(Receipt { sites, code_before, code_after: None, halvings: 0, deposited: false, next, predicted, change: None, transfer, external, predicted_parts, opening });
         }
         self.field = candidate;
+        self.relax(&rates);
         if self.read_held {
             self.held = Some(HeldStep { step, halvings: 0 });
         } else {
@@ -511,6 +524,18 @@ impl Learner {
         }
         mark(14);
         Ok(Receipt { sites, code_before, code_after: None, halvings: 0, deposited: true, next, predicted, change: None, transfer, external, predicted_parts, opening })
+    }
+
+    /// [definition; the lead, November 17] **The leak's relaxation** ([`Learner::leak`]): every material entry whose rate is under
+    /// [`HELD_RATE`] bits moves toward rest by `release(θ, leak)`; nothing where the learner carries no leak. Each entry reads only itself,
+    /// so the order is free.
+    pub(crate) fn relax(&mut self, rates: &[u32]) {
+        let Some(k) = self.leak else { return };
+        for (slot, &rate) in self.field.material_mut().zip(rates) {
+            if rate < HELD_RATE {
+                *slot -= release(i128::from(*slot), k) as i32;
+            }
+        }
     }
 
     /// The learner as text: its head line (the held step's halvings, or `-`), the field, each
@@ -531,7 +556,9 @@ impl Learner {
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
             let pass = self.pass.as_ref().map_or(String::new(), |p| format!("{}\n", p.to_line()));
-            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+            // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
+            let leak = self.leak.map_or(String::new(), |k| format!("leak {k}\n"));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
 
@@ -623,11 +650,23 @@ impl Learner {
             }
             _ => None,
         };
+        // [definition; the lead, November 17] The store's leak, a trailing line after the rates' (`leak K`): at least one bit and under the
+        // material's 32-bit carrier.
+        let leak = match lines.peek() {
+            Some(l) if l.starts_with("leak ") => {
+                let k = lines.next().and_then(|l| l.strip_prefix("leak ")).and_then(|w| w.parse::<u32>().ok()).ok_or(TowerError::Refused("a learner's leak that is not a count"))?;
+                if k == 0 || k >= 32 {
+                    return refuse("a leak under one bit or past the material's carrier");
+                }
+                Some(k)
+            }
+            _ => None,
+        };
         // [definition; theory, November 12] The pass's place over a store, the text's last line where present ([`StorePass`]).
         let pass = match lines.peek() {
             Some(l) if l.starts_with("pass ") => Some(StorePass::from_line(lines.next().unwrap_or(""))?),
             _ => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, last: None, pass })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, last: None, pass })
     }
 }
