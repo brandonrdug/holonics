@@ -224,3 +224,17 @@ heat alone (heat_short77.txt). The oracle exits 1 on short sums after it prints 
 solve is singular where a kind of place has too few rows).
 G-B3b, scored on lap 77 (STORE_WORLD lines, by sixths of the lap): the world read 0.598, 0.592, 0.606, 0.620, 0.610, 0.590 of the
 drafts, 0.605 over the lap (0.470 and 0.485 on laps 75 and 76). No rise of 0.05 inside the lap: missed on the lap it had.
+
+GUESSES G-H1 to G-H5, fixed at 00:00:58 UTC, November 16 (from date -u), before the read: a turned head cooled on short sums
+Premise read first (heat_short77.txt): at lap 77's mean, on sums of one- and two-digit operands read a record a region, head 3's row
+gives the aligned pair 0.470 at tick 0, and the same row's shares raised to the fourth power at the same keys give it 0.731.
+Reading: a ruler's state (ruler-temper: head 3's listener temperature raised by two octaves, its gain times four; never trained from),
+then the instrument of G-V (short.sh's two reads, the oracle and the heat), ten located products at the units place, and the held passage
+at 100 places a slice on the host. One octave is read beside it.
+G-H1: head 3's share on the aligned pair, tick 0, is 0.65 or more (0.470).
+G-H2: the operands' presence at the answer's site at tick 1 is 0.55 or more for a and 0.65 or more for b (0.427 and 0.564).
+G-H3: the units digit's code moves by less than 0.05 nats either way (2.365): nothing at the junction uses what arrives.
+G-H4: ten located products remove 0.20 or more of the covector at the units place on the held half at tick 1 (0.090 at lap 76's mean).
+G-H5: each of the six text slices' held one-place codes rises by 0.05 nats a place or less.
+What it decides: H1, H2 and H4 held say the junction is locatable under a cooled turned head where a record stands alone, so the
+founding is the head's temperature and the legs together; H5 says what one temperature a head for every slice would cost text.
