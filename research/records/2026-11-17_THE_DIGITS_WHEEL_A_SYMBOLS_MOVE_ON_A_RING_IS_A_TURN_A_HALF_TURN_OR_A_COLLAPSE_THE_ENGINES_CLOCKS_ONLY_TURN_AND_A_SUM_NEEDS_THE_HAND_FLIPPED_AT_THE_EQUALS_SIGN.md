@@ -36,6 +36,30 @@ they lack.
   `β(u) = E±(u)`; two strands bring the sources on either side with opposite signs of the clock's difference; the still heads carry
   no frame. The symbol's law of November 12 (§8.8) already says that only the pace keeps the located advance's form.
 
+**October held the hand already** (added at 03:45 UTC, after the first statement; found through the output survey's note and a
+second reader, then read at source). This record's §4 restates a law the tree owns, and §2 as first written missed its owner:
+
+- [The tower's record of October 24](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK.md), its section
+  on the hand: "A ring move `h ↦ λh + βh̄` keeps the ring's hand where its determinant `|λ|² − |β|²` is positive, reverses it where
+  negative (a reflection …), and restarts it where zero (a collapse …)". The three kinds of §4 are that determinant's three signs.
+  It is formal-checked (`lean/HolonicsResearch/HNN/RingHand.lean`: `handMatrix`, `det_handMatrix`, `hand_from_rest_reads_positive`).
+- The ring it rode: `r_t = λ_(m,t) r_(t−1) + β_(m,t) conj(r_(t−1)) + c_t`, read at every cell through a lift into the input, its
+  form founded by the pool law against the input covector, with no label.
+- The digits' ring of ten was located from the tension: the digits coupled through what their arrivals leave,
+  `K_de = tr(Y_r⁻¹ M̃_dᵀ S̄⁻¹ M̃_e)/√(n_d n_e)`, "no label enters `K`".
+- What it wrote: 445 of 495 held-out sums on the arithmetic terrain (the record of October 26 cites it), the units ring alone fewer,
+  and with the hand the differences rose from 129 to 144 of 268.
+- What it warns: "the tower's own pass dephases the ring". A founded form whose readout stands at zero carries no code, so nothing
+  in a pass protects what it reads, and it was lost before its readout learned to read it (340 to between 46 and 69 after one pass).
+- It did not carry to word problems' text, its capture navigator was retired as catered, and the whole machine retired with the
+  consolidation. The November engine never took the ring's hand.
+
+In the engine's forms the nearest part is the carry circle, `Q_t = γ_t Q_(t∓1) + κ_t b_t` with `γ` a located turn with a leak: the
+ring move with `β ≡ 0`. So the wheel has two candidate homes, and the second is the precedent's: a turned head's clock with a hand
+(§6's amendment), or a carry circle with October's antilinear term, its turn and its hand charts of the site's state and its
+founding from the tension's coupling of the digits. Which one is read before either is built, and a founding with its return at
+zero is not entered without an answer to the dephasing.
+
 ## 3. Tonight's readings in those terms
 
 - No register of a sum's digit is held, on any ring: its bit 0.727 nats (0.693 for a register that knows nothing), its five-residue
@@ -136,6 +160,8 @@ phases nine apart. The gate reads the covector by mode for that reason.
 - One realization patched with a new law for each failure. This is the fourth part proposed for the sum since November 13. It is
   stated from October's records and enters, if it does, by a premise read and not by a build.
 - A width set by hand. No ring is added by choice; §5 item 3 waits for a ruler.
+- A law stated as new that the tree owned. §4 was written before the tower's record of October 24 was searched for the hand, and a
+  message to Brandon said the reflection "was never built"; it was built, formal-checked and retired. The message was edited.
 
 ## 9. Owed
 
