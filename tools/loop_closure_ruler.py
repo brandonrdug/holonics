@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted] | text TABLE | clusters TABLE [K]]
+Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted | presence] | text TABLE | clusters TABLE [K]]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -53,6 +53,8 @@ symbol written. Each context symbol `s` has its own family of operators `(P_(s,u
 of symbols read from the menu (two symbols alike where the symbols written beside them, as sources, correlate at 0.9) and closed by
 lines and planes as `planes` does. Why: a passage that holds sums, differences and products on the same symbols holds operators that
 share no plane (`w ↦ u w` against `w ↦ w + u`), so one menu of pairs cannot close on it, and the row meets the sign too.
+With `presence` the context is a symbol present among the row's sources at any share and the menu is the menu of pairs (a row's
+share on a sign is a few hundredths, and a product of three shares is too thin a menu).
 `CONTEXT_SPAN` gives each clean line or plane under each context with its support and the keys of its symbols in turns; the scores
 beside it (the ten digits as characters of ℤ/10; the digits 1, 3, 9, 7 and 2, 6, 8, 4 as characters of ℤ/4, a discrete logarithm's
 order) are the ruler's.
@@ -245,6 +247,31 @@ def table_texts(table):
         w = line.rstrip("\n").split("\t")
         out[w[0]] = (w[1] + w[2]).replace("\\n", "\n")
     return out
+
+
+def menus_presence(d, texts, head=0, ticks=(0, 1)):
+    """`T[tick][s, u, w, x]` for one head with the context a symbol present among the row's sources: the row's menu of pairs, added
+    under every symbol the row meets."""
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    lines = [line for line in lines if int(line[3]) == head and int(line[2]) in ticks]
+    symbols = sorted({c for line in lines for c in texts[line[0]]})
+    index = {c: i for i, c in enumerate(symbols)}
+    n = len(symbols)
+    out = {}
+    for line in lines:
+        text = texts[line[0]]
+        sources = [(int(j), int(p_) / 1e6) for j, p_, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        if len(sources) < 2:
+            continue
+        us = np.array([index[text[j]] for j, _ in sources])
+        ps = np.array([p_ for _, p_ in sources])
+        q1, q2 = np.bincount(us, weights=ps, minlength=n), np.bincount(us, weights=ps**2, minlength=n)
+        pair = np.outer(q1, q1) - np.diag(q2)
+        t = out.setdefault(int(line[2]), np.zeros((n, n, n, n)))
+        xi = index[text[int(line[4])]]
+        for s_ in set(us.tolist()):
+            t[s_, :, :, xi] += pair
+    return out, symbols
 
 
 def menus_context(d, texts, planted=None, head=0, seed=17):
@@ -759,6 +786,11 @@ def main():
         return
     if len(sys.argv) > 3 and sys.argv[2] == "context":
         texts = table_texts(sys.argv[3])
+        if len(sys.argv) > 4 and sys.argv[4] == "presence":
+            tables, symbols = menus_presence(d, texts)
+            print(f"CONTEXT_READ menu=presence symbols={len(symbols)} ticks={sorted(tables)}")
+            report_context("presence", tables, symbols, ticks=(0, 1))
+            return
         for planted in ("aligned", "dealt") if len(sys.argv) > 4 and sys.argv[4] == "planted" else (None,):
             tables, symbols = menus_context(d, texts, planted)
             print(f"CONTEXT_READ menu={planted or 'rows'} symbols={len(symbols)} ticks={sorted(tables)}")

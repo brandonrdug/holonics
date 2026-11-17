@@ -1,3 +1,4 @@
+CONTEXT_READ menu=presence symbols=16 ticks=[0, 1]
 CONTEXT presence tick=0 context=space share_of_menu=0.128 blocks: 1 2 3 4 5 6 7 8 9 | space 1 2 3 4 5 6 7 8 9
 CONTEXT presence tick=0 context=* share_of_menu=0.045 blocks: feed space 8 9 = | 1 2 3 4 5 6 7 8 9 | 1 2 3 4 5 7 9 | 1 2 3 4 6 7 8 9 | space 1 2 3 4 6 7 8 9 | space 1 2 3 4 5 6 7 8 9
 CONTEXT_SPAN presence tick=0 context=* modulus=3.211 in_one=0.968 in_two=0.992 flatness=1.000 support=[feed space 8 9 =] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000 keys_in_turns=feed:0.00 space:0.88 8:0.89 9:0.88 =:0.80
