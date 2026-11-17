@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted | presence | sets] | text TABLE | clusters TABLE [K]]
+Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted | presence | sets] | text TABLE | clusters TABLE [K] | sign TABLE]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -73,6 +73,10 @@ With `clusters TABLE [K]`, a context is read from the places' own charts: the op
 tick 1 (k-means, K groups, sixteen by default, drawn by a fixed seed, no label), and head 0's menu of pairs at tick 0 is closed
 inside each group as `planes` and `text` do. `CLUSTER` gives each group's size and, by the ruler's knowledge of the records
 (`a op b = value`), what it is made of; `CLUSTER_SPAN` each clean line or plane with its scores.
+
+With `sign TABLE`, on a read of `a op b = value` records with every place open: the share of the record's sign that a linear read of
+the open place's pair chart gives on a held half (`SIGN_IN_CHART`), by the place's role and tick. Whether the law a place is under
+stands at the place.
 
 Floats, counts and the knowledge of which bytes are digits are a ruler's (CLAUDE.md, a ruler is an instrument). The sums are synthetic,
 so their records are printed freely."""
@@ -829,6 +833,50 @@ def cross(d, ridge=1e-3):
             print(f"CROSS {tr.PARTS[pid]} tick={k} {t.sum()} | " + " ".join(f"{v:.3f}" for v in vals), flush=True)
 
 
+def sign_in_chart(d, texts, ridge=1e-3):
+    """How much of the record's sign the open place's pair chart holds (see the module's text)."""
+    import hashlib
+    import re
+
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tension_ruler as tr
+
+    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
+    dw, ticks = int(dims["lambda"]), int(dims["ticks"])
+    rows = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    n = len(rows)
+    read = np.fromfile(os.path.join(d, "read.i32"), dtype="<i4").reshape(n, dw).astype(np.float64) / 2.0**tr.FACE
+    record = re.compile(r"^(\d+) ([+\-*]) (\d+) = (-?\d+)\n$")
+    tick = np.array([int(r[2]) for r in rows])
+    sign = np.zeros((n, 3))
+    role = np.empty(n, dtype=object)
+    for i, r in enumerate(rows):
+        text = texts[r[0]]
+        m = record.match(text)
+        site = len(text) - len(text[1:]) + int(r[1])  # the prompt is the record's first symbol
+        sign[i, "+-*".index(m[2])] = 1
+        ro = "other"
+        for name, g in (("a", 1), ("b", 3), ("v", 4)):
+            if m.start(g) <= site < m.end(g) and text[site].isdigit():
+                ro = ("value" if name == "v" else "operand " + name) + (" units" if site == m.end(g) - 1 else "")
+        if site == m.start(2):
+            ro = "the sign itself"
+        role[i] = ro
+    half = np.array([hashlib.sha256(f"half:{r[0]}".encode()).digest()[0] % 2 for r in rows])
+    print("SIGN_IN_CHART role tick test_rows share_of_the_sign_a_linear_read_gives")
+    for ro in ("value units", "value", "operand a units", "operand b units", "operand a", "operand b", "the sign itself", "other"):
+        out, last = [], 0
+        for k in range(ticks):
+            sel = (role == ro) & (tick == k)
+            f, t = sel & (half == 0), sel & (half == 1)
+            if t.sum() < 200:
+                continue
+            out.append(f"{tr.removed(read, sign - sign[sel].mean(axis=0), f, t, ridge):.3f}")
+            last = int(t.sum())
+        if out:
+            print(f"SIGN_IN_CHART {ro}: " + " ".join(out) + f"  (test rows a tick {last})")
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -838,6 +886,9 @@ def main():
         return
     if len(sys.argv) > 2 and sys.argv[2] == "cross":
         cross(d)
+        return
+    if len(sys.argv) > 3 and sys.argv[2] == "sign":
+        sign_in_chart(d, table_texts(sys.argv[3]))
         return
     if len(sys.argv) > 3 and sys.argv[2] == "clusters":
         clusters(d, table_texts(sys.argv[3]), int(sys.argv[4]) if len(sys.argv) > 4 else 16)

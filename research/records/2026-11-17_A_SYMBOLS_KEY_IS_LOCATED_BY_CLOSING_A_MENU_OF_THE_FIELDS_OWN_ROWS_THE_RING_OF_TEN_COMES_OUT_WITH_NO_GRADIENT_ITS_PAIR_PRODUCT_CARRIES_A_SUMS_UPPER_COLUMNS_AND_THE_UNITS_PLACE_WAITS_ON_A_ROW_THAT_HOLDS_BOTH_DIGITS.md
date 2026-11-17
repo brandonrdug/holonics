@@ -209,7 +209,7 @@ the records whose only sign is the plus stand in one context of about ten thousa
 closure closes where a record holds one law at short operands, and on the machine's own region as it is drawn it does not, at
 this sample, under any context read here.
 
-**The law is in the chart** (a diagnosis, not guessed; `sign_in_chart86.txt`). On the three-operation records a linear read of
+**The law is in the chart** (a diagnosis, not guessed; `sign_in_chart86.txt`, `loop_closure_ruler.py sign`). On the three-operation records a linear read of
 the open place's pair chart gives the record's sign at 0.91 to 0.95 at the value's units place, 0.89 to 0.90 at its other digits
 and 0.97 to 0.99 at the operands' digits, on the held half. So which law a place is under stands at the place, in a direction of
 small spread that the charts' largest groups do not follow; and where the sign itself is the open place the chart still gives it
