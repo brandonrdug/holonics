@@ -56,3 +56,15 @@ G-FL1 (2026-11-17T17:11:30Z). The part with the receiving site's leg, its return
   record's form (a number, a line feed, a new record).
 What a miss would say: a release that still runs digits past the answer says the leg, read from the opening chart, does not know its
 place while its neighbours are open, and the site's factor then has to be the face's own ring mass or be deposited under the trainer's openings.
+
+(2026-11-17T17:24:19Z) G-FL1's solve was stopped unscored: the leg's first step (a least-squares map of its covector at step 64) put its rows at 7.6 a
+unit of chart and the codes at 10 to 18 nats, and the halving had not found a scale by the seventh round. Read before it blew: under mixed
+openings on runs past the answer the base state codes the held units digit at 2.674 nats, the line feed 0.355 and the places past it 1.986;
+the plain return at step 64 (the leg at one) codes them 2.745, 0.776 and 3.885. The product returned into the state harms the places
+where no pair closes, and its regression over every kind of place removes none of the held covector (−0.006).
+G-MX1 (2026-11-17T17:24:19Z). The part restated as a second face: each head's last-tick row gives a density over the ring, R_h(x) = Σ_(s≠s') p_s p_s' c(u_s, u_s', x),
+and the place's face is the field's own mixed with them at odds read from the place's last pair chart,
+p(x) = (1 − Σ_h w_h M_h) p_field(x) + Σ_h w_h R_h(x). Read by a host ruler on the same dump (lap 94's end state, mixed openings, runs past
+the answer), the odds' rows fitted on the fitting half:
+  held units digit: 2.674 → 2.0 nats or under; the line feed and the places past it within 0.02 nats of the field's face (a mixture's harm
+  is bounded by its weight); top and middle fall by 0.05 to 0.3.
