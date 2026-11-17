@@ -343,3 +343,13 @@ falls by 0.33 (within 0.3 was guessed: missed by 0.03) and the second by 0.26 (h
 so a place's twin beside it is not read as its twin; the fall with the window is of the size the renamed frame shows over the same
 lengths. The baseline for the symbol's line's acceptance, lap 77's mean: plain 0.81 to 1.12; renamed 3.74 at 32 places to 2.81 at
 512; every letter drawn afresh 3.68 to 3.89; doubled 2.74 to 3.35.
+
+G-V, THE FIRST LAP'S READ, from the clock at 00:49:49 UTC, November 17 (oracle_short78.txt, heat_short78.txt, midpoint_short78.txt; lap 78's
+mean MEAN.3000, the first lap on the redrawn slice, 3,000 sections in 3,129 s; lap 77's mean beside it). Not yet a score: G-V1 and
+G-V2 are read at lap 79's mean.
+  the units digit of a short sum: 2.359 nats (2.365); a column both hold, clear 2.420 (2.391), carried 2.416 (2.391); a column one
+  holds 2.181 (2.164); the top digit 1.389 (1.545).
+  the operands' presence at the answer's site, tick 0: a 0.467 (0.446), b 0.519 (0.516).
+  the unordered pair in the chart at the units place, ticks 0 to 3: 0.792, 0.789, 0.629, 0.673 (0.746, 0.770, 0.656, 0.636).
+  head 0's share on the aligned pair: 0.411 at tick 0 (0.405), 0.515 at tick 3 (0.470).
+One lap on the redrawn slice sharpened the arrival a little and took 0.16 nats off the top digit; the sum's units digit did not move.
