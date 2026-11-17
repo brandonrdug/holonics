@@ -2,8 +2,9 @@
 """The founding law's premise, read on the engine's own rows (the lead, November 17).
 
 Usage: founding_ruler.py targets DIR
-       founding_ruler.py solve DIR CODEC OUT STEP[,STEP…] [KEY_MODULUS]
-       founding_ruler.py step DIR CODEC CLOSED_IN CLOSED_OUT ETA
+       founding_ruler.py solve DIR CODEC OUT STEP[,STEP…] [KEY_MODULUS [KEYS_DIR]]
+       founding_ruler.py step DIR CODEC CLOSED_IN CLOSED_OUT ETA ETA_LEG
+       founding_ruler.py mixture DIR CODEC KEYS_DIR
        founding_ruler.py codes DIR [BEFORE_DIR]
 
 DIR is a `read-tension … all` (or `shares`) directory of short sums `a + b = v`, every answer place opened alone.
@@ -43,7 +44,14 @@ import loop_closure_ruler as lc
 
 
 def half_of(lab):
-    return hashlib.sha256(f"half:{lab}".encode()).digest()[0] % 2
+    """A record's half, by its sum: a label's first six fields (a table may add a seventh, the text past the answer)."""
+    return hashlib.sha256(f"half:{':'.join(lab.split(':')[:6])}".encode()).digest()[0] % 2
+
+
+def text_of(lab):
+    """A label's text: the sum's record, then the text past its answer where the label carries it as a seventh field."""
+    parts = lab.split(":")
+    return lc.text_of(":".join(parts[:6])) + (parts[6] if len(parts) > 6 else "")
 
 
 def read_rows(d):
@@ -68,14 +76,14 @@ def aligned(label, site):
 
 
 def locate_keys(rows, head=0, tick=0):
-    symbols = sorted({ch for r in rows for ch in lc.text_of(r[0])})
+    symbols = sorted({ch for r in rows for ch in text_of(r[0])})
     index = {ch: i for i, ch in enumerate(symbols)}
     m = len(symbols)
     menu = np.zeros((m, m, m))
     for lab, _, tk, h, site, src in rows:
         if h != head or tk != tick or half_of(lab) != 0:
             continue
-        text = lc.text_of(lab)
+        text = text_of(lab)
         xi = index[text[site]]
         for i1, (j1, p1) in enumerate(src):
             for i2, (j2, p2) in enumerate(src):
@@ -112,7 +120,7 @@ def targets(d, deal=False, seed=5):
         if al is None or not src:
             continue
         c, sa, sb = al
-        text = lc.text_of(lab)
+        text = text_of(lab)
         x = index[text[site]]
         us = [index[text[j]] for j, _ in src]
         if deal:
@@ -162,111 +170,228 @@ def targets(d, deal=False, seed=5):
         print(f"FOUND_WRITE {key[0]} {key[1]} {key[2]} {res[0][2]} | {np.log(len(ring)):.3f} {res[0][0]:.3f}(g={res[0][1]}) {res[1][0]:.3f}(g={res[1][1]}) {res[2][0]:.3f}(g={res[2][1]})", flush=True)
 
 
-def solve(d, codec, out, steps, gain=1.0):
-    """The closed characters' keys and return, written for `athena found-closed` (see the module's text). `steps` is a comma list of step
-    sizes; one file `OUT.<k>.closed` is written a step."""
+def open_rows(d):
+    """A `read-tension` directory's open rows in order (a row a place and tick): labels, places, ticks, the covector at the place and the
+    place's opening chart, with the shares lines grouped a row. Both layouts: `all` (every site, the open one flagged) and `shares`."""
     dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
-    dw, ticks = int(dims["lambda"]), int(dims["ticks"])
+    dw = int(dims["lambda"])
     table = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
-    opened = np.flatnonzero(np.array([r[5] == "1" for r in table]))
+    opened = np.flatnonzero(np.array([len(r) < 6 or r[5] == "1" for r in table]))
     lam = np.asarray(np.memmap(os.path.join(d, "lambda.i64"), dtype="<i8", mode="r", shape=(len(table), dw))[opened]).astype(np.float64) / 2.0**24
+    chart = np.asarray(np.memmap(os.path.join(d, "chart.i32"), dtype="<i4", mode="r", shape=(len(table), dw))[opened]).astype(np.float64) / 2.0**16
     rows = read_rows(d)
     heads = len(rows) // len(opened)
     assert heads * len(opened) == len(rows), "shares.tsv does not hold one line a head for every open row"
-    symbols, index, keys, member = locate_keys(rows)
-    e = len(keys)
-    feats = np.zeros((len(opened), heads * 2 * e))
-    fit = np.zeros(len(opened), dtype=bool)
-    for n, (lab, place, tk, h, site, src) in enumerate(rows):
-        i = n // heads
-        assert (table[opened[i]][0], int(table[opened[i]][1]), int(table[opened[i]][2])) == (lab, place, tk), "shares.tsv is not in the rows' order"
-        fit[i] = half_of(lab) == 0
-        if not src:
-            continue
-        text = lc.text_of(lab)
-        t = keys[:, [index[text[j]] for j, _ in src]] * np.array([p for _, p in src])[None, :]
-        pair = t.sum(axis=1) ** 2 - (t**2).sum(axis=1)
-        feats[i, h * 2 * e : h * 2 * e + e] = pair.real
-        feats[i, h * 2 * e + e : (h + 1) * 2 * e] = pair.imag
-    # The return's direction: the least-squares map from the keyed pair products to the covector at the place, on the fitting half, every tick's
-    # rows together (the return is every tick's). A step along it lowers the code to first order.
-    x, y = feats[fit], lam[fit]
-    gram = x.T @ x
-    b = np.linalg.solve(gram + 1e-6 * np.trace(gram) / gram.shape[0] * np.eye(gram.shape[0]), x.T @ y).T  # [D][heads·2E]
-    pred = feats[~fit] @ b.T
-    share = 1.0 - ((lam[~fit] - pred) ** 2).sum() / (lam[~fit] ** 2).sum()
-    print(f"SOLVE_RETURN rows={len(opened)} fit={int(fit.sum())} heads={heads} characters={e} covector_share_removed_held={share:.4f} rms_covector={np.sqrt((lam**2).mean()):.3e} rms_predicted={np.sqrt((pred**2).mean()):.3e}")
+    meta = [(table[i][0], int(table[i][1]), int(table[i][2])) for i in opened]
+    for n in range(0, len(rows), heads):
+        assert rows[n][:3] == meta[n // heads], "shares.tsv is not in the rows' order"
+    return dw, heads, meta, lam, chart, rows
+
+
+def codec_classes(codec):
     with open(codec) as f:
         void = int(f.readline().split()[2])
         units = [int(v) for v in f.readline().split()]
-    cls = {u: (k if k < void else k + 1) for k, u in enumerate(units)}
-    alphabet = len(units) + 1
+    return {u: (k if k < void else k + 1) for k, u in enumerate(units)}, len(units) + 1
+
+
+def products(rows, heads, n_rows, key_of, e):
+    """Every head's keyed pair product at each open row (`[row][heads·2E]`, a head's real parts then its imaginary parts)."""
+    feats = np.zeros((n_rows, heads * 2 * e))
+    for n, (lab, _, _, h, _, src) in enumerate(rows):
+        if not src:
+            continue
+        text = text_of(lab)
+        t = key_of(text, [j for j, _ in src]) * np.array([p for _, p in src])[None, :]
+        pair = t.sum(axis=1) ** 2 - (t**2).sum(axis=1)
+        feats[n // heads, h * 2 * e : h * 2 * e + e] = pair.real
+        feats[n // heads, h * 2 * e + e : (h + 1) * 2 * e] = pair.imag
+    return feats
+
+
+def write_closed(path, e, kwords, leg, bias, w):
+    out = [np.rint(leg * 2.0**24), np.rint(bias * 2.0**16), np.rint(w * 2.0**24)]
+    assert max(np.abs(o).max() for o in out) < 2**31, "a word past its 32 bits"
+    with open(path, "xb") as f:
+        f.write(np.array([e], dtype="<i4").tobytes())
+        f.write(kwords.astype("<i4").tobytes())
+        for o in out:
+            f.write(o.astype("<i4").tobytes())
+
+
+def least_squares(x, y):
+    gram = x.T @ x
+    return np.linalg.solve(gram + 1e-6 * np.trace(gram) / gram.shape[0] * np.eye(gram.shape[0]), x.T @ y).T
+
+
+def solve(d, codec, out, steps, gain=1.0, keys_dir=None):
+    """The closed characters' keys, leg and return, written for `athena found-closed` (see the module's text). `steps` is a comma list of
+    step sizes; one file `OUT.<k>.closed` is written a step. The site's leg is founded at one. The keys are closed on KEYS_DIR's rows where
+    given (a directory whose open places are a ring's symbols alone), DIR's otherwise."""
+    dw, heads, meta, lam, _, rows = open_rows(d)
+    symbols, index, keys, member = locate_keys(read_rows(keys_dir) if keys_dir else rows)
+    for ch in {c for m in meta for c in text_of(m[0])} - set(index):
+        index[ch] = len(member)
+        member = np.append(member, False)
+        keys = np.hstack([keys, np.zeros((len(keys), 1))])
+    e = len(keys)
+    feats = products(rows, heads, len(meta), lambda text, js: keys[:, [index[text[j]] for j in js]], e)
+    fit = np.array([half_of(m[0]) == 0 for m in meta])
+    b = least_squares(feats[fit], lam[fit])  # [D][heads·2E]
+    pred = feats[~fit] @ b.T
+    share = 1.0 - ((lam[~fit] - pred) ** 2).sum() / (lam[~fit] ** 2).sum()
+    print(f"SOLVE_RETURN rows={len(meta)} fit={int(fit.sum())} heads={heads} characters={e} covector_share_removed_held={share:.4f} rms_covector={np.sqrt((lam**2).mean()):.3e} rms_predicted={np.sqrt((pred**2).mean()):.3e}")
+    cls, alphabet = codec_classes(codec)
     kw = np.zeros((alphabet, 2 * e))
     for ch, i in index.items():
         if member[i]:
             kw[cls[ord(ch)], :e] = keys[:, i].real
             kw[cls[ord(ch)], e:] = keys[:, i].imag
     # A key at modulus `gain`: the products then stand `gain²` higher and the return's entries as much lower, inside their 32-bit words.
-    kwords = np.rint(gain * kw * 2.0**16).astype("<i4")
+    kwords = np.rint(gain * kw * 2.0**16)
     print(f"SOLVE_KEYS ring={''.join(ch for ch, i in sorted(index.items(), key=lambda t: t[1]) if member[i])!r} classes={[cls[ord(ch)] for ch, i in sorted(index.items(), key=lambda t: t[1]) if member[i]]}")
+    cols = heads * 2 * e
+    leg, bias = np.zeros((cols, dw)), np.zeros(cols)
+    for h in range(heads):
+        bias[h * 2 * e : h * 2 * e + e] = 1.0
     for k, step in enumerate(steps):
-        w = -step * b
-        words = np.rint(w / gain**2 * 2.0**24)
-        assert np.abs(words).max() < 2**31, "a return past its 32-bit word"
+        w = -step * b / gain**2
         path = f"{out}.{k}.closed"
-        with open(path, "xb") as f:
-            f.write(np.array([e], dtype="<i4").tobytes())
-            f.write(kwords.tobytes())
-            f.write(words.astype("<i4").tobytes())
-        print(f"SOLVE_WRITTEN {path} step={step:g} key_modulus={gain:g} largest_return={np.abs(w).max() / gain**2:.4f} rms_move={np.sqrt(((feats @ w.T) ** 2).mean()):.4e}")
+        write_closed(path, e, kwords, leg, bias, w)
+        print(f"SOLVE_WRITTEN {path} step={step:g} key_modulus={gain:g} largest_return={np.abs(w).max():.4f}")
 
 
-def step(d, codec, closed_in, closed_out, eta):
-    """One more step of the return's solve: DIR is a `read-tension … all` directory of the state founded with CLOSED_IN (the ruler's reverse,
-    the closed characters' return held constant). The keyed pair products are formed from the rows with CLOSED_IN's own keys, the covector
-    at the open places is regressed on them over the fitting half, and CLOSED_OUT is CLOSED_IN with its return moved `−ETA` times that map."""
-    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
-    dw = int(dims["lambda"])
+def step(d, codec, closed_in, closed_out, eta, eta_leg):
+    """One more step of the solve: DIR is a `read-tension` directory (`all` or `shares`) of the state founded with CLOSED_IN (the ruler's
+    reverse, the closed characters' return held constant). With CLOSED_IN's own keys and leg the products `c = E γ` are formed at each open
+    row. The return moves `−ETA` times the least-squares map from `c` to the covector at the place; the leg moves `−ETA_LEG` times the
+    least-squares map from the place's opening chart to the leg's covector, `conj(E) (W_Kᵀ λ)`. Both on the fitting half."""
+    dw, heads, meta, lam, chart, rows = open_rows(d)
     words = np.fromfile(closed_in, dtype="<i4")
     e = int(words[0])
-    with open(codec) as f:
-        void = int(f.readline().split()[2])
-        units = [int(v) for v in f.readline().split()]
-    cls = {u: (k if k < void else k + 1) for k, u in enumerate(units)}
-    alphabet = len(units) + 1
-    kw = words[1 : 1 + alphabet * 2 * e].reshape(alphabet, 2 * e).astype(np.float64) / 2.0**16
-    key = kw[:, :e] + 1j * kw[:, e:]  # [class][character]
-    table = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
-    opened = np.flatnonzero(np.array([r[5] == "1" for r in table]))
-    lam = np.asarray(np.memmap(os.path.join(d, "lambda.i64"), dtype="<i8", mode="r", shape=(len(table), dw))[opened]).astype(np.float64) / 2.0**24
-    rows = read_rows(d)
-    heads = len(rows) // len(opened)
-    assert heads * len(opened) == len(rows), "shares.tsv does not hold one line a head for every open row"
-    w_old = words[1 + alphabet * 2 * e :].reshape(dw, heads * 2 * e).astype(np.float64) / 2.0**24
-    feats = np.zeros((len(opened), heads * 2 * e))
-    fit = np.zeros(len(opened), dtype=bool)
-    for n, (lab, _, _, h, _, src) in enumerate(rows):
-        i = n // heads
-        fit[i] = half_of(lab) == 0
-        if not src:
-            continue
-        text = lc.text_of(lab)
-        t = key[[cls[ord(text[j])] for j, _ in src]].T * np.array([p for _, p in src])[None, :]
-        pair = t.sum(axis=1) ** 2 - (t**2).sum(axis=1)
-        feats[i, h * 2 * e : h * 2 * e + e] = pair.real
-        feats[i, h * 2 * e + e : (h + 1) * 2 * e] = pair.imag
-    x, y = feats[fit], lam[fit]
-    gram = x.T @ x
-    b = np.linalg.solve(gram + 1e-6 * np.trace(gram) / gram.shape[0] * np.eye(gram.shape[0]), x.T @ y).T
-    pred = feats[~fit] @ b.T
+    cls, alphabet = codec_classes(codec)
+    cols = heads * 2 * e
+    at = 1 + alphabet * 2 * e
+    kwords = words[1:at]
+    kw = kwords.reshape(alphabet, 2 * e).astype(np.float64) / 2.0**16
+    key = kw[:, :e] + 1j * kw[:, e:]
+    leg = words[at : at + cols * dw].reshape(cols, dw).astype(np.float64) / 2.0**24
+    bias = words[at + cols * dw : at + cols * (dw + 1)].astype(np.float64) / 2.0**16
+    w = words[at + cols * (dw + 1) :].reshape(dw, cols).astype(np.float64) / 2.0**24
+    feats = products(rows, heads, len(meta), lambda text, js: key[[cls[ord(text[j])] for j in js]].T, e)
+    fit = np.array([half_of(m[0]) == 0 for m in meta])
+    gamma = chart @ leg.T + bias  # [row][cols]
+    re = np.concatenate([np.arange(h * 2 * e, h * 2 * e + e) for h in range(heads)])
+    im = re + e
+    c = np.zeros_like(feats)
+    c[:, re] = feats[:, re] * gamma[:, re] - feats[:, im] * gamma[:, im]
+    c[:, im] = feats[:, re] * gamma[:, im] + feats[:, im] * gamma[:, re]
+    b = least_squares(c[fit], lam[fit])
+    pred = c[~fit] @ b.T
     share = 1.0 - ((lam[~fit] - pred) ** 2).sum() / (lam[~fit] ** 2).sum()
-    w_new = w_old - eta * b
-    out = np.rint(w_new * 2.0**24)
-    assert np.abs(out).max() < 2**31, "a return past its 32-bit word"
-    with open(closed_out, "xb") as f:
-        f.write(words[: 1 + alphabet * 2 * e].astype("<i4").tobytes())
-        f.write(out.astype("<i4").tobytes())
-    print(f"STEP rows={len(opened)} fit={int(fit.sum())} covector_share_removed_held={share:.4f} rms_covector={np.sqrt((lam**2).mean()):.3e} eta={eta:g} largest_return={np.abs(w_new).max():.3f} rms_return={np.sqrt((w_new**2).mean()):.4f}")
+    dc = lam @ w  # [row][cols], the products' covector
+    dg = np.zeros_like(dc)
+    dg[:, re] = feats[:, re] * dc[:, re] + feats[:, im] * dc[:, im]
+    dg[:, im] = -feats[:, im] * dc[:, re] + feats[:, re] * dc[:, im]
+    x1 = np.hstack([chart, np.ones((len(meta), 1))])
+    bg = least_squares(x1[fit], dg[fit])  # [cols][D + 1]
+    w_new = w - eta * b
+    leg_new, bias_new = leg - eta_leg * bg[:, :dw], bias - eta_leg * bg[:, dw]
+    write_closed(closed_out, e, kwords, leg_new, bias_new, w_new)
+    print(f"STEP rows={len(meta)} fit={int(fit.sum())} covector_share_removed_held={share:.4f} rms_covector={np.sqrt((lam**2).mean()):.3e} eta={eta:g} eta_leg={eta_leg:g} largest_return={np.abs(w_new).max():.3f} rms_leg_row={np.sqrt((leg_new**2).mean()):.4f} leg_bias_mean_real={bias_new[re].mean():.3f}")
+
+
+def kind_of(label, place):
+    v = label.split(":")[5]
+    c = len(v) - 1 - place
+    return "units" if c == 0 else ("top" if place == 0 else ("middle" if c > 0 else ("line_feed" if c == -1 else "past")))
+
+
+def mixture(d, codec, keys_dir, rounds=400, rate=0.05):
+    """The closed face as a mixture, read on a `read-tension … shares` directory (see the module's text): the written symbol's code under
+    the field's own face, and under that face mixed with each head's ring face at odds read from the place's last pair chart, the odds'
+    rows fitted on the fitting half by ascent on the written symbol's likelihood. By kind of place, held half, nats a place."""
+    dw, heads, meta, _, _, rows = open_rows(d)
+    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
+    ticks = int(dims["ticks"])
+    cls, alphabet = codec_classes(codec)
+    symbols, index, keys, member = locate_keys(read_rows(keys_dir))
+    e = len(keys)
+    ring = [i for i in range(len(symbols)) if member[i]]
+    ring_cls = np.array([cls[ord(symbols[i])] for i in ring])
+    rk = keys[:, ring]  # [e][ring]
+    n_places = len(meta) // ticks
+    faces = np.fromfile(os.path.join(d, "faces.i64"), dtype="<i8").reshape(n_places, alphabet).astype(np.float64) / 2.0**20
+    table = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    opened = np.flatnonzero(np.array([len(r) < 6 or r[5] == "1" for r in table]))
+    read = np.asarray(np.memmap(os.path.join(d, "read.i32"), dtype="<i4", mode="r", shape=(len(table), dw))[opened]).astype(np.float64) / 2.0**16
+    last = np.array([i for i, m in enumerate(meta) if m[2] == ticks - 1])
+    assert len(last) == n_places
+    x = np.hstack([read[last], np.ones((n_places, 1))])
+    labels = [meta[i][0] for i in last]
+    places = [meta[i][1] for i in last]
+    written = np.array([cls[ord(text_of(l)[len(text_of(l)) - len(l.split(':')[5]) - 1 - (len(l.split(':')[6]) if len(l.split(':')) > 6 else 0) + pl])] for l, pl in zip(labels, places)])
+    p_field = 2.0 ** (-faces[np.arange(n_places), written])
+    # Each head's ring face at the written symbol and its member-pair mass, from the last tick's rows.
+    r_at = np.zeros((n_places, heads))
+    m2 = np.zeros((n_places, heads))
+    pos = {int(c): k for k, c in enumerate(ring_cls)}
+    where = {i: n for n, i in enumerate(last)}
+    for n, (lab, _, tk, h, _, src) in enumerate(rows):
+        if tk != ticks - 1 or not src:
+            continue
+        i = where[n // heads]
+        text = text_of(lab)
+        us = [index[text[j]] for j, _ in src]
+        ps = np.array([p for _, p in src])
+        mem = np.array([member[u] for u in us])
+        if mem.sum() < 2:
+            continue
+        t = keys[:, [u for u in us if member[u]]] * ps[mem][None, :]
+        pm = ps[mem]
+        mass = pm.sum() ** 2 - (pm**2).sum()
+        pair = t.sum(axis=1) ** 2 - (t**2).sum(axis=1)  # [e]
+        dens = np.maximum((mass + (np.conj(rk) * pair[:, None]).real.sum(axis=0)) / (e + 1), 0.0)  # over the ring
+        m2[i, h] = dens.sum()
+        if int(written[i]) in pos:
+            r_at[i, h] = dens[pos[int(written[i])]]
+    fit = np.array([half_of(l) == 0 for l in labels])
+    kinds = np.array([kind_of(l, pl) for l, pl in zip(labels, places)])
+
+    def code(w):  # w: [heads][dw + 1], the odds' rows; the mixture's code of the written symbol
+        z = np.clip(x @ w.T, -40, 40)
+        odds = np.exp(z)
+        wt = odds / (1.0 + odds.sum(axis=1, keepdims=True))
+        p = (1.0 - (wt * m2).sum(axis=1)) * p_field + (wt * r_at).sum(axis=1)
+        return -np.log(np.maximum(p, 1e-300)), wt, p
+
+    def fit_rows(cols):
+        w = np.zeros((heads, dw + 1))
+        w[:, dw] = -3.0
+        m_, v_ = np.zeros_like(w), np.zeros_like(w)
+        for it in range(1, rounds + 1):
+            _, wt, p = code(w)
+            # d(−log p)/dz_h = −wt_h [(r_h − m2_h p_field) − Σ_k wt_k (r_k − m2_k p_field)] / p
+            a = r_at - m2 * p_field[:, None]
+            g_z = -wt * (a - (wt * a).sum(axis=1, keepdims=True)) / p[:, None]
+            grad = (g_z[fit].T @ x[fit][:, cols]) / fit.sum()
+            m_[:, cols] = 0.9 * m_[:, cols] + 0.1 * grad
+            v_[:, cols] = 0.999 * v_[:, cols] + 0.001 * grad**2
+            w[:, cols] -= rate * (m_[:, cols] / (1 - 0.9**it)) / (np.sqrt(v_[:, cols] / (1 - 0.999**it)) + 1e-8)
+        return w
+
+    base = -np.log(p_field)
+    w_bias = fit_rows(np.array([dw]))
+    w_full = fit_rows(np.arange(dw + 1))
+    c_bias, c_full = code(w_bias)[0], code(w_full)[0]
+    wt_full = code(w_full)[1].sum(axis=1)
+    print(f"MIXTURE places={n_places} heads={heads} characters={e} last_tick={ticks - 1} fit={int(fit.sum())}")
+    print("MIXTURE kind held_places | nats: field's_face  mixed_at_one_odds_a_head  mixed_at_odds_from_the_chart | mean_weight_on_the_ring_faces  member_pair_mass(head 0)")
+    for kind in ("units", "middle", "top", "line_feed", "past", "every"):
+        sel = (~fit) & ((kinds == kind) | (kind == "every"))
+        if sel.sum():
+            print(f"MIXTURE {kind} {int(sel.sum())} | {base[sel].mean():.4f} {c_bias[sel].mean():.4f} {c_full[sel].mean():.4f} | {wt_full[sel].mean():.3f} {m2[sel, 0].mean():.3f}")
+    np.save(os.path.join(d, "mixture_rows.npy"), w_full)
 
 
 def codes(d, base=None):
@@ -278,12 +403,10 @@ def codes(d, base=None):
             f = line.rstrip("\n").split("\t")
             if int(f[2]) != 0 or (len(f) > 5 and f[5] != "1"):
                 continue
-            site = int(f[4]) if len(f) > 5 else None
-            _, _, _, a, b, v = f[0].split(":")
+            _, _, _, a, b, v = f[0].split(":")[:6]
             c = len(v) - 1 - int(f[1])
-            if c < 0:
-                continue
-            key = (half_of(f[0]), "units" if c == 0 else ("top" if int(f[1]) == 0 else "middle"))
+            kind = "units" if c == 0 else ("top" if int(f[1]) == 0 else ("middle" if c > 0 else ("line_feed" if c == -1 else "past")))
+            key = (half_of(f[0]), kind)
             t = acc.setdefault(key, [0, 0.0])
             t[0] += 1
             t[1] += int(f[3]) / 2.0**20 * np.log(2.0)
@@ -303,9 +426,11 @@ def codes(d, base=None):
 
 def main():
     if len(sys.argv) >= 6 and sys.argv[1] == "solve":
-        return solve(sys.argv[2], sys.argv[3], sys.argv[4], [float(v) for v in sys.argv[5].split(",")], float(sys.argv[6]) if len(sys.argv) > 6 else 1.0)
-    if len(sys.argv) == 7 and sys.argv[1] == "step":
-        return step(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], float(sys.argv[6]))
+        return solve(sys.argv[2], sys.argv[3], sys.argv[4], [float(v) for v in sys.argv[5].split(",")], float(sys.argv[6]) if len(sys.argv) > 6 else 1.0, sys.argv[7] if len(sys.argv) > 7 else None)
+    if len(sys.argv) == 8 and sys.argv[1] == "step":
+        return step(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], float(sys.argv[6]), float(sys.argv[7]))
+    if len(sys.argv) == 5 and sys.argv[1] == "mixture":
+        return mixture(sys.argv[2], sys.argv[3], sys.argv[4])
     if len(sys.argv) >= 3 and sys.argv[1] == "codes":
         return codes(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
     if len(sys.argv) < 3 or sys.argv[1] != "targets":

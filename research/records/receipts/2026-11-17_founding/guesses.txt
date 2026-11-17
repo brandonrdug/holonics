@@ -68,3 +68,11 @@ p(x) = (1 − Σ_h w_h M_h) p_field(x) + Σ_h w_h R_h(x). Read by a host ruler o
 the answer), the odds' rows fitted on the fitting half:
   held units digit: 2.674 → 2.0 nats or under; the line feed and the places past it within 0.02 nats of the field's face (a mixture's harm
   is bounded by its weight); top and middle fall by 0.05 to 0.3.
+
+Scored (2026-11-17T17:25:14Z), G-MX1 (held half of lap 94's end state under mixed openings, 1,400 records with runs past the answer; 736 units places, 639 top,
+125 middle, 736 line feeds, 3,680 places past them), field's face → mixed at odds from the chart:
+  units 2.674 → 2.391 nats (missed: 2.0 or under was guessed); line feed 0.355 → 0.359 (held, within 0.02); past 1.986 → 1.964 (a fall of
+  0.022, a hair outside the 0.02 guessed); top 1.850 → 1.852 and middle 2.265 → 2.259 (missed: falls of 0.05 to 0.3 were guessed);
+  every place 1.860 → 1.812. The member-pair mass of head 0's last-tick row at a units place is 0.285: the row is diffuse, so its ring
+  density is flat and the mixture has little to mix in. The gain waits on the lock; the mixture's covector on the row's shares is the
+  closure's pull.
