@@ -1,0 +1,18 @@
+09:12:13
+# lap86: exit 0 released 09:03:28
+MEASURE lap=lap86 rc=0 wall_s=3121.2 peak_rss_kib=861712
+STORE_PASS role=prefix sections=3000 stretches_read=71601374 ended=fal
+== loud 85
+code 0.5558 20.030 -0.051;web 0.9074 20.132 -0.106;science 0.7612 20.225 -0.170;books 0.8661 20.339 -0.221;wikidata 1.0624 20.063 +0.205;arithmetic 1.5958 20.542 -0.430;words 0.7788 20.125 -0.321;all 0.8891 20.186 -0.041;
+== loud 86
+code 0.5567 20.046 -0.049;web 0.9119 20.147 -0.099;science 0.7559 20.239 -0.162;books 0.8668 20.361 -0.209;wikidata 1.0689 20.113 +0.242;arithmetic 1.6176 20.583 -0.406;words 0.7655 20.129 -0.316;all 0.8900 20.208 -0.022;
+letter 0.614 0.4580;digit 0.101 1.9888;space 0.185 0.2281;mark 0.090 2.7013;
+WRITES_BY_PLACE  met 128 0.953 0.664 0.195 0.117 0.008 0.117 0.000
+world read share 0.882
+WRITE proney c_day = on 550\nto_firnt = 1/15 + node_take = op_lgat * 22+ maget * ona - 12+ far_to_count_gake_ene_take - 32 * 214\nfar_day_bake = 112\nboentan_= 15\nwhite_tage = total_total_ay_per_bake b
+90 + 81 =  | 938\n34 - 9 = -2\n | 171\n
+58 - 43 =  | 232\n602 * (6218  | 15\n
+36 * 0 =  | 12\n4 * 2 = 50\n63 | 0\n
+4 * 317 =  | 30372\n10 * 7 = 1 | 1268\n
+
+[exited with code 0]

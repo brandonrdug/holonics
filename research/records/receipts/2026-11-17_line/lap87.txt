@@ -1,0 +1,17 @@
+10:14:13
+# lap87: exit 0 released 10:04:46
+MEASURE lap=lap87 rc=0 wall_s=3153.6 peak_rss_kib=859652
+STORE_PASS role=prefix sections=3000 stretches_read=72803447 ended=fal
+== loud 86
+code 0.5567 20.046 -0.049;web 0.9119 20.147 -0.099;science 0.7559 20.239 -0.162;books 0.8668 20.361 -0.209;wikidata 1.0689 20.113 +0.242;arithmetic 1.6176 20.583 -0.406;words 0.7655 20.129 -0.316;all 0.8900 20.208 -0.022;
+== loud 87
+code 0.5547 20.047 -0.021;web 0.9077 20.164 -0.086;science 0.7569 20.256 -0.156;books 0.8688 20.385 -0.201;wikidata 1.0696 20.127 +0.253;arithmetic 1.6128 20.613 -0.384;words 0.7719 20.150 -0.324;all 0.8902 20.225 -0.008;
+letter 0.614 0.4572;digit 0.101 1.9865;space 0.185 0.2343;mark 0.090 2.7684;
+WRITES_BY_PLACE  met 128 0.969 0.727 0.203 0.125 0.039 0.117 0.000
+world read share 0.892
+WRITE fiber = times - pre_altato_boltspalss / #ezair_pence = carrital costif_corrage = times_fiben_cost + lef_cost + lef_cost_in_pence = //2\ntimema_lones = 20\nresult = 5 * robe_cost_unper = 5\n
+90 + 81 =  | 73\n(9 + 15) = 15 | 171\n
+58 - 43 =  | -12\n7 * 57 = 41\n | 15\n
+36 * 0 =  | 3470\n949 * 0 = 2 | 0\n
+4 * 317 =  | 802\n(30 * 1) + 1 | 1268\n
+

@@ -456,3 +456,179 @@ G-KR1 held: the leading mode of the digits' coupling holds 0.18 of its power on 
 G-KR2 held: the first three modes hold at most 0.46 on one character (0.18, 0.40, 0.46 on the first; the fourth 0.49).
 The engine's tension at lap 79 does not show the ring of ten that October's arithmetic tower showed (0.84 and 0.78). A key located
 from this tension would not be a ring. It agrees with the register read: nothing downstream yet asks the digits for their sum.
+
+GUESSES G-HC1 to G-HC3, fixed at 09:36:27 UTC, November 17 (from date -u), before the read: a digit's phase on the carry circles
+Reading: the engine's 32 carry circles as a site meets them (read-tension now writes each row's arriving charge Qm and gate γ,
+charge.i64 and gate.i64), on 8,000 short sums with every site written, lap 86's mean, by a ruler (tension_ruler.py circles). The
+circles' one face is the product a(t)·Qm(t), linear in the charge, so a phase of 2πd/10 on a circle would reach it only through
+its first harmonic, two of the nine coordinates that tell ten digits apart. Three reads: (1) the gate's turn at a written digit's
+site by the digit, as the characters of ℤ/10 of the ten mean turns (amplitudes a_j, Σ a_j² = 1; a wheel is one a_j near one at
+j ≠ 0, digits turning alike is a_0 near one, ten unrelated turns give about 0.3 each), with a permutation of the digits as its
+null; (2) at an open answer place, the share of the value's digit, of the wheel's digit (a_k + b_k mod 10) and of the aligned
+digits' unordered sum that a linear read of the 32 charges gives on the held half, and that their phases' five harmonics give
+(all circles, and the one circle that reads best on the fitting half); (3) what the charges, and their harmonics, add to the
+chart's share of the covector's power. The premise in the logs: no lap prints the circles on this line; the coupling read found
+no ring in the tension (G-KR) and the registers hold no sum (G-R), so nothing has asked a circle to turn by a digit.
+G-HC1: no circle's turn is a wheel. On every circle and tick the largest character amplitude at j ≠ 0 stays under 0.6, and no
+more than three of the 32 circles pass the 99th percentile of their own permutation null at any one tick.
+G-HC2: at the units place of a short sum, last tick, the harmonics of all 32 charges hold the wheel's digit at under 0.20 on the
+held half, and the best single circle's harmonics under 0.05; the harmonics hold it by no more than 0.05 above the linear read
+of the same charges.
+G-HC3: the charges' harmonics beside the chart remove no more than 0.03 above the chart alone of the covector's power, at every
+part with 200 held rows or more.
+The instrument is held to a planted wheel on the same shapes in the same run: one circle's gate turned by 2π(3d + 2)/10 at the
+digits' sites, and one circle's charge set to the phase of the wheel's digit at the answer place, each with noise; the read
+returns them or its null is void.
+What it decides: all held, no circle holds a digit's phase and a harmonic face would have nothing to read today, so the wheel
+does not enter as a face on the circles as they stand and the turn itself (a pair-located advance) is the missing part; G-HC2
+missed, a circle already carries a phase its face cannot read and October's harmonic face is the first part to port.
+
+SCORES of G-HC1 to G-HC3, read from the clock at 09:41:45 UTC, November 17 (circles86.txt, circles86_planted.txt; 8,000 short sums,
+16,286 answer places, 803,724 written rows, lap 86's mean; host, eight threads for the dump in 72 s and four a ruler in 15 s,
+beside lap 87 on the card)
+The instrument first. A planted wheel is returned on the same shapes: a gate turned by 2π(3d + 2)/10 reads a_3 = 1.000 at the
+100th percentile of its permutation null, alone among the 32 circles; a charge set to the wheel digit's phase at the answer
+place is held at 0.84 by the harmonics (0.85 by that one circle's) and at 0.19 by the charges read linearly, the first
+harmonic's two ninths; and beside the chart the harmonics then remove 0.65 to 0.86 of the units place's covector by tick, the
+value's own digit removing 0.66 to 0.96.
+G-HC1 held: no circle's turn is a wheel. The largest character amplitude at j ≠ 0 is 0.22, 0.15, 0.20, 0.20 by tick, and 0, 1,
+0, 0 circles pass the 99th percentile of their null. Over the circles the median a_0 is 0.991 to 0.995: on every circle the ten
+digits turn alike.
+G-HC2 held: at the units place, last tick, the harmonics of all 32 charges hold the wheel's digit at −0.22 on the held half
+(nothing; the wide fit's own cost), the best single circle's at −0.02, the charges read linearly at −0.04. The chart holds it
+at −0.06 there, as the register read found.
+G-HC3 missed at the columns one operand holds: beside the chart the harmonics add 0.088 (clear) and 0.043 (carried into) of the
+covector's power at tick 0, of which the charges read linearly add 0.066 and 0.035; at the other ticks 0.006 to 0.024 or
+nothing. At the columns both operands hold (the units place, clear and carried columns) they add nothing at any tick.
+What else the read shows. A circle does carry which digit stood before the place: at a column one operand holds, the charges
+read linearly give that digit at 0.43 to 0.52 and one circle's harmonics alone at 0.23 to 0.44 (circles 6 and 18), above the
+two ninths a wheel's first harmonic could give; and the aligned digits' unordered sum is held by the charges at 0.32 to 0.44 at
+the units place (the chart 0.50 to 0.62). So a symbol reaches a circle through its drive, a displacement b(t) added to the
+charge, and not through its turn: the charge is a leaky sum of the symbols' displacements, a barycentre again, where a wheel is
+a product of their turns.
+Decided as the guess said: no circle holds a digit's phase, a harmonic face on the circles as they stand would have nothing to
+read at a sum's column, and the unused channel is the turn. The harmonic face is not the first part.
+
+GUESSES G-J1 to G-J3, fixed at 09:45:16 UTC, November 17 (from date -u), before the read: the junction located on a head's current
+Reading: the label-free location of G-L5 taken again on the same rows (sums78: 60,000 sums at the word problems' lengths,
+140,480 answer places, lap 78's mean), with the products' legs reading the answer site's gathered current in place of its
+128-wide chart: head 0's current alone (16 coordinates and a one, 34 numbers a product), and every head's (64). The reason:
+a row brings the aligned digits as a barycentre of its sources' value words, and that barycentre is the head's current
+before the return spreads it into the chart; the chart's locator had 256 numbers a product to place and held 0.07 and 0.12 of
+the remainder at the units place (ticks 0 and 1), 0.10 to 0.13 at the columns both operands hold, where the labelled read on
+ten coordinates held 0.28 to 0.39 and the pair's table 0.67 to 0.82. As there, the linear chart's part is taken out first, the
+legs are located on one half of the records and read on the other, by part and tick.
+G-J1: ten products located on head 0's current remove at least 0.15 of the remainder at the units place at tick 0 or tick 1,
+above the chart's 0.07 and 0.12.
+G-J2: they stay under 0.35 there (under half the table's share).
+G-J3: at the clear and carried columns both operands hold they remove at least 0.15 at tick 0 or tick 1 (the chart's 0.10 to
+0.13).
+What it decides: G-J1 held, the junction has a label-free founding of a few dozen numbers a product, on the place the row
+delivers to, and a founding lap is ordered from it; missed, the pair does not stand in one head's current well enough to
+multiply and the lock is still the link that slips.
+
+SCORES of G-J1 to G-J3, read from the clock at 10:00:09 UTC, November 17 (junction_sums78.txt; 140,480 answer places of 60,000 sums,
+lap 78's mean; host, one ruler, 13 minutes, beside lap 87 on the card)
+G-J1 missed: ten products located on head 0's current remove 0.030 and 0.004 of the remainder at the units place (ticks 0 and
+1), under the chart's 0.07 and 0.12; at least 0.15 was guessed. No single head's current does better (0.060 at most, head 1 at
+tick 1), and every head's current together gives 0.038 and 0.076.
+G-J2 held, emptily: far under 0.35.
+G-J3 missed: at the columns both operands hold, head 0's current gives 0.037 to 0.050 and every head's 0.055 to 0.102 (ticks 0
+and 1); at least 0.15 was guessed.
+Beside them: the columns one operand holds 0.15 to 0.21 on head 0's current and 0.20 to 0.28 on every head's (the chart 0.25 to
+0.32); the top digit 0.60 to 0.63 on any one head's.
+Decided as the guess said: the aligned pair does not stand in a head's gathered current well enough to multiply, on the
+terrain's own lengths at lap 78. The chart holds more of it than the currents do, so part of what reaches the place comes by
+the strand (the circles hold the unordered pair at 0.32 to 0.44 at lap 86, G-HC's read). No founding lap is ordered from these
+legs; the lock is still the link that slips.
+
+GUESSES G-LC1 to G-LC3, fixed at 10:05:54 UTC, November 17 (from date -u), before the read: the digits' ring located by loop closure
+Reading: the Bombe's inference (atlas key.menu-loop-closure, hnn.contact-menu-closes) taken on the engine's own rows and the
+passage, by a ruler (tools/loop_closure_ruler.py). The menu: at each open place of 8,000 short sums (lap 86's mean), for a head
+and a tick, every ordered pair of the sources its row meets, weighed by the product of their shares, with the symbol written at
+the place: T[u, w, x] over symbols, no label of a sum and no knowledge of which symbols are digits. A source symbol u is then an
+operator on functions of the written symbol, (P_u f)(w) = E[f(x) | u, w]; where a group law stands under diffuse rows these
+operators commute and their common eigenvectors are its characters, P_u χ_j = α ω^(ju) χ_j, so the phase of u's eigenvalue is u's
+key on that ring and its modulus says whether u is on the ring at all. The ruler takes the leading eigenvectors of a drawn
+combination of the operators past the constant one, reads every symbol's eigenvalue on each, and scores the ten digits' located
+phases against the characters of ℤ/10 (a_j as in G-HC1, with the permutation null). Where the tension's coupling read states
+and found no ring (G-KR), this reads symbols, their rows and what the passage wrote.
+G-LC1: at the units places, head 0's rows at tick 0 return the wheel: on a leading eigenvector the ten digits' phases hold a
+character amplitude of 0.9 or more at a j coprime to ten, past the 99th percentile of the permutation null.
+G-LC2: on every answer place together (carried columns included) the same head and tick still return 0.8 or more at a j
+coprime to ten.
+G-LC3: the turned heads (heads 2 and 3) do not: under 0.6 at tick 0 at the units places.
+The instrument is held to a planted menu on the same records: one built from the aligned pairs alone returns the wheel at one,
+and the true menu with the written symbols dealt at random among the places returns nothing past its null.
+What it decides: G-LC1 held, the ring of ten is locatable today from the rows the field already forms and the text it is
+given, by closure and with no gradient, so a symbol's key has a founding source where the tension has none; missed, the rows
+are too diffuse for a menu and the lock comes first.
+
+SCORES of G-LC1 to G-LC3, read from the clock at 10:09:12 UTC, November 17 (closure86.txt, closure86_planted.txt,
+closure77_units_tick0.txt; 8,000 short sums, 16,286 answer places, lap 86's mean; host, one thread, 13 s a read)
+The instrument first. A menu of the aligned operand digits alone returns all nine characters at 1.000 with every digit's key on
+its tenth of a turn. The true rows with the written symbols dealt at random among the places return nothing: amplitudes 0.46 to
+0.65 inside the permutation null (percentiles 0.11 to 0.95), the digits' eigenvalues at a modulus of 0.06 to 0.16.
+G-LC1 held: at the units places, head 0's rows at tick 0 return the wheel. Digit pairs are 0.076 of the menu's weight, and
+among them the written digit is the pair's sum modulo ten at 0.881. On the common eigenvectors the ten digits' keys read, in
+tenths of a turn, 0.0 9.0 8.0 7.0 6.0 4.9 4.0 3.0 2.0 1.0 (j = 9, amplitude 1.000), 0.0 3.2 6.1 9.0 1.9 5.1 8.0 1.1 3.9 7.0
+(j = 3, 0.998) and 10.0 7.0 4.0 1.0 8.0 5.0 2.0 9.0 6.0 3.0 (j = 7, 1.000), each at the 100th percentile of its null; the ring
+of five (j = 2, 4, 6) and the ring of two (j = 5) at 1.000 beside them. The digits' eigenvalues stand at a modulus of 0.83 to
+0.93 and the space, the plus, the equals sign and the line feed at 0.01 to 0.21: the closure says which symbols are on the ring
+as well as where, and the ring's order is read from it, not given to it.
+G-LC2 held: on every answer place together, head 0 at tick 0 returns j = 9 at 0.998 (the digits' modulus 0.61), all nine
+characters at 0.9 or more.
+G-LC3 missed for head 2 and held for head 3: head 2's rows return j = 7 at 0.988 at the units places at tick 0, from a menu
+where the written digit is the pair's sum at 0.197 (a tenth is chance) and the digits' modulus is 0.13; head 3's return 0.644,
+inside its null. Head 1's return 0.996 at a modulus of 0.17. The closure needs far less of a row than was guessed.
+By tick, head 0 at the units places: 1.000, 0.999, 0.996, 0.989, the written-is-sum share falling 0.881, 0.639, 0.324, 0.247.
+Earlier laps, same sums: lap 77's mean returns j = 9 at 1.000 from head 0 at tick 0 (written-is-sum 0.815, modulus 0.78), lap
+79's the same (0.887, 0.85). So the key has been locatable for at least ten laps, the redrawn terrain not needed for it.
+Decided as the guess said: the ring of ten is locatable today from the rows the field already forms and the text it is given,
+by closure and with no gradient, where its tension shows none (G-KR) and its code at the units place is flat (2.329 nats at lap
+86). A symbol's key has a founding source.
+Short sums at lap 86 beside laps 77 to 79 (oracle_short86.txt, the instrument of G-V): the units digit 2.365, 2.359, 2.360,
+then 2.329 nats; a column both hold, clear 2.391, 2.420, 2.405, then 2.264, carried into 2.391, 2.416, 2.407, then 2.293; a
+column one holds, clear 2.164, 2.181, 2.122, then 1.920, carried into 2.337, 2.382, 2.361, then 2.169; the top digit 1.545,
+1.389, 1.412, then 1.412. Flat is 2.303. In seven laps the columns above the units fell 0.11 to 0.20 and the units 0.03.
+
+GUESSES G-RL1 to G-RL3, fixed at 10:11:04 UTC, November 17 (from date -u), before the read: what the located key delivers through the rows
+Reading: a ruler's capacity read with nothing labelled in its features (tools/loop_closure_ruler.py release), on the 8,000 short
+sums at lap 86's mean. The keys are the closure's own output, each symbol's eigenvalue λ_u on each common eigenvector, located on
+one half of the records from head 0's rows at tick 0 over every answer place. At an open place the row then delivers, on each
+eigenvector, its barycentre y = Σ_s p_s λ(u_s) and its pair product E = Σ_(s ≠ s') p_s p_s' λ(u_s) λ(u_s') (the menu's own
+weighting; y² less the sources' self terms). Where the aligned pair leads the row, E's phase is the sum's character, as the
+identity of the third record gives it. A least-squares read of these features, fitted on the same half and read on the other:
+how much of the written digit they give, and what they remove of the covector beside the chart. For scale, at the units place
+the chart alone holds none of the written digit (−0.06) and removes 0.14 of the covector at tick 0, a labelled read's five
+products 0.28, the pair's table 0.56.
+G-RL1: at the units place the features give the written digit (its one-hot, centred) at 0.5 or more on the held half.
+G-RL2: beside the chart they remove 0.35 or more of the covector's power at the units place at tick 0.
+G-RL3: at the columns both operands hold they give the wheel's digit (a_k + b_k modulo ten) at 0.4 or more.
+What it decides: G-RL1 and G-RL2 held, the rows as they stand already deliver the sum's digit to a release that multiplies on
+the located ring, with no label anywhere, and the symbol's line has its founding and its first part (a pair product on a
+located ring, read by its characters); missed, the rows' shares scatter too much for a product and the release needs the lock
+closed first.
+
+SCORES of G-RL1 to G-RL3, read from the clock at 10:15:05 UTC, November 17 (release86.txt; 8,000 short sums, lap 86's mean; host, one
+thread, 5 s)
+The instrument first: its first form matched a row's shares to its open row by the sum's label, and the table holds 3,480
+distinct sums among its 8,000, so repeated sums read zeros; its figures (0.11 at the units place) are void. As repaired the
+shares are matched by their order in the dump.
+G-RL1 missed: at the units place the features give the written digit at 0.224, 0.219, 0.178 and 0.015 by tick; 0.5 or more
+was guessed. The barycentre alone gives nothing (−0.005); all of it is the pair product.
+G-RL2 missed: beside the chart they remove 0.232 of the covector's power at the units place at tick 0, the chart alone 0.137;
+0.35 or more was guessed. By tick the gain over the chart is 0.095, 0.065, 0.078, 0.040.
+G-RL3 held at ticks 1 and 2: at a clear column both operands hold the features give the wheel's digit at 0.133, 0.485, 0.541,
+0.063 by tick, at a carried one 0.312, 0.427, 0.495, 0.050; and beside the chart they remove 0.561 and 0.596 (clear), 0.564
+and 0.551 (carried) of the covector's power at ticks 1 and 2, where the chart alone removes 0.26 to 0.30.
+Why the units place misses (a diagnosis from the same dump, head 0 at tick 0): the row holds the aligned digits at shares of
+0.228 and 0.164 on average, and both above a tenth at 0.187 of the places; the lesser of the two is under 0.03 at half of them.
+The row brings one aligned digit or the other. The menu still closes on that (a closure needs a weak excess), and a product
+inside one row has both factors at a fifth of the places.
+For scale on the same sums: the labelled read's five products with its ten coordinates remove 0.277 and 0.387 at the units
+place (ticks 0 and 1) and 0.44 to 0.50 at the columns both hold (midpoint_short86.txt); the 128-wide chart's label-free
+location held 0.07 and 0.12 at the units place and 0.10 to 0.13 at the columns both hold (G-L5, on longer sums).
+Decided as the guess said for the units place: the rows' shares scatter too much there for a product inside one row, and the
+lock comes first. Beside it: at the columns both operands hold, a pair product on the located ring, with nothing labelled,
+already carries what the labelled read carried.

@@ -93,10 +93,10 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         return Err("a tension table of no places".into());
     }
     let d = learner.field.declaration;
-    let (dw, m2, j2, ticks) = (d.width, 2 * d.heads * d.modes, 2 * d.triads, d.ticks);
+    let (dw, m2, j2, c2, ticks) = (d.width, 2 * d.heads * d.modes, 2 * d.triads, 2 * d.carry, d.ticks);
     std::fs::create_dir(out)?;
-    write_new(&out.join("dims.tsv"), format!("lambda\t{dw}\nread\t{dw}\ncurrent\t{m2}\nproducts\t{j2}\nticks\t{ticks}\n").as_bytes())?;
-    println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} carry={} threads={} ms={}", work.len(), carry.map_or("-".to_string(), |g| g.to_string()), rayon::current_num_threads(), started.elapsed().as_millis());
+    write_new(&out.join("dims.tsv"), format!("lambda\t{dw}\nread\t{dw}\ncurrent\t{m2}\nproducts\t{j2}\nticks\t{ticks}\ncharge\t{c2}\n").as_bytes())?;
+    println!("TENSION_LAW places={} ticks={ticks} width={dw} current={m2} products={j2} circles={} carry={} threads={} ms={}", work.len(), d.carry, carry.map_or("-".to_string(), |g| g.to_string()), rayon::current_num_threads(), started.elapsed().as_millis());
     // The locks' temperatures as the state holds them: `log₂ T` on the material's grain, one a head and receiver kind (a class receiver, a listener).
     let temper = learner.field.layout().temper;
     println!("TENSION_TEMPER log2_on_2^-24 {}", (0..2 * d.heads).map(|k| learner.field.theta[temper + k].to_string()).collect::<Vec<_>>().join(" "));
@@ -107,6 +107,10 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     let mut value = if all { Some(create("value.i64")?) } else { None };
     // The open place's whole face, a record a place in the table's order (`faces.i64`, the code of each of the `A` classes on `2^(−20)` bits).
     let mut faces = create("faces.i64")?;
+    // [measurement; the lead, November 17] Each row's carry circles (`charge.i64` and `gate.i64`, `2C` entries a row, the real parts then the
+    // imaginary: the charge arriving at the site on `2^(−16)` and the site's gate on `2^(−30)`), for a ruler's read of a circle's phase by its
+    // harmonics; `dims.tsv` names their width as `charge`.
+    let (mut charge, mut gate) = (create("charge.i64")?, create("gate.i64")?);
     let mut written = 0usize;
     // Regions in blocks, so that what is held before it is written stays bounded; rows in the table's order.
     for block in work.chunks(1024) {
@@ -150,6 +154,14 @@ pub fn read_tension(args: &[String]) -> Result<()> {
                             c.write_all(&v.to_le_bytes())?;
                         }
                     }
+                    if c2 > 0 {
+                        for &v in &tension.charge[k][s * c2..(s + 1) * c2] {
+                            charge.write_all(&v.to_le_bytes())?;
+                        }
+                        for &v in &tension.gate[k][s * c2..(s + 1) * c2] {
+                            gate.write_all(&v.to_le_bytes())?;
+                        }
+                    }
                     written += 1;
                 }
                 if let Some(f) = shares.as_mut() {
@@ -162,7 +174,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         }
         println!("TENSION_BLOCK rows={written} ms={}", started.elapsed().as_millis());
     }
-    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products, &mut faces] {
+    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products, &mut faces, &mut charge, &mut gate] {
         w.flush()?;
     }
     if let Some(c) = chart.as_mut() {

@@ -26,6 +26,19 @@ material's grain.
   tension_ruler.py closed DIR                   what a closed lock would open: the two aligned digits as a lock closed on their column
                                                 would bring them, summed and unordered, read linearly (a copy) and through located
                                                 products (a junction), by part, beside the pair's table.
+  tension_ruler.py circles DIR [planted]        on a `read-tension … all` directory with the carry circles' rows (`charge.i64`,
+                                                `gate.i64`): whether a circle holds a digit's phase. The gate's turn at a written
+                                                digit's site by the digit, as the characters of ℤ/10 of the ten mean turns, against a
+                                                permutation of the digits; at an open answer place, the share of the value's digit, the
+                                                wheel's digit (a_k + b_k mod 10) and the aligned digits' unordered sum that the charges
+                                                give read linearly and by their phases' five harmonics; and what each adds to the
+                                                chart's share of the covector's power. With `planted`, one circle's gate is turned by
+                                                2π(3d + 2)/10 at the digits' sites and one circle's charge is set to the wheel digit's
+                                                phase at the answer place, each with noise: the instrument's own check.
+  tension_ruler.py junction DIR [J]             products located on the answer site's gathered current in place of its chart: each
+                                                head's current alone (its 2n coordinates and a one) and every head's, the linear chart's
+                                                part taken out first, legs located on one half of the records and read on the other, by
+                                                part and tick, beside the pair's table.
   tension_ruler.py temper STORE_DIR             the premise of a row's own temperature: each open row's temperature covector beside its
                                                 opening chart, by head (how nearly the rows cancel, what the chart removes on the held
                                                 section) and by slice (each slice's mean ask).
@@ -740,6 +753,144 @@ def registers(d, codec):
         print(f"TENSION_RELEASE {name.replace(' ', '_')} {m.sum()} {whole[m].mean():.4f} {upto[m].mean():.4f} {(whole[m] - upto[m]).mean():.4f}")
 
 
+def circles(d, planted=False, harmonics=5, ridge=1e-3, shuffles=1000):
+    """Whether a carry circle holds a digit's phase (the lead, November 17; the wheel record §9, October's face of harmonics). The circles'
+    one face is `a(t) · Qm(t)`, linear in the arriving charge, so a phase of `2πd/10` reaches it through the first harmonic alone. Three
+    reads on a `read-tension … all` directory, every fit on one half of the records and read on the other:
+
+    - `CIRCLES_TURN`: by tick, over the written (definite) digits' sites, each circle's mean turn a digit `θ_d = arg mean(γ/|γ|)` and its
+      characters `a_j = |Σ_d e^(iθ_d) e^(−2πijd/10)|/10` (`Σ_j a_j² = 1`): a wheel is one `a_j` near one at `j ≠ 0`, digits turning alike is
+      `a_0` near one. The null is the same statistic under `shuffles` permutations of the ten digits.
+    - `CIRCLES_HOLD`: by part and tick at the open place, the share of the value's digit, the wheel's digit and the unordered sum (each
+      centred one-hots) given by the chart, by the charges read linearly, by the harmonics of all circles' phases, and by the harmonics of
+      the one circle that reads the wheel's digit best on the fitting half.
+    - `CIRCLES_TENSION`: the covector's share removed by the chart, the chart with the charges, the chart with their harmonics, beside the
+      pair's table."""
+    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
+    dw, ticks, c2 = int(dims["lambda"]), int(dims["ticks"]), int(dims["charge"])
+    cn = c2 // 2
+    rows = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    n = len(rows)
+    label = [r[0] for r in rows]
+    place = np.array([int(r[1]) for r in rows])
+    tick = np.array([int(r[2]) for r in rows])
+    code = np.array([int(r[3]) for r in rows]) / 2.0**20 * np.log(2.0)
+    site = np.array([int(r[4]) for r in rows])
+    opened = np.array([r[5] == "1" for r in rows])
+    charge = np.memmap(os.path.join(d, "charge.i64"), dtype="<i8", mode="r", shape=(n, c2))
+    gate = np.memmap(os.path.join(d, "gate.i64"), dtype="<i8", mode="r", shape=(n, c2))
+    roles = [site_role(l, s_) for l, s_ in zip(label, site)]
+    digit = np.array([r[2] for r in roles])
+    half = np.array([hashlib.sha256(f"half:{l}".encode()).digest()[0] % 2 for l in label])
+    fit, test = half == 0, half == 1
+    rng = np.random.default_rng(17)
+    print(f"CIRCLES_READ rows={n} regions={int(opened.sum()) // ticks} ticks={ticks} circles={cn} planted={int(planted)} ridge={ridge}")
+
+    # (1) The gate's turn at a written digit's site, by the digit.
+    omega = np.exp(-2j * np.pi * np.outer(np.arange(10), np.arange(10)) / 10)  # [j][d]
+    perms = np.array([rng.permutation(10) for _ in range(shuffles)])
+    print("CIRCLES_TURN tick digit_sites wheels_over_0.6 wheels_over_0.9 past_null_99 | best: circle= j= a_j= a_0= null_pct= within_digit_concentration= turn_range_rad= | median over circles: a_0= top_other=")
+    for k in range(ticks):
+        sel = np.flatnonzero((tick == k) & ~opened & (digit >= 0))
+        g = np.asarray(gate[sel]).astype(np.float64) / 2.0**30
+        z = g[:, :cn] + 1j * g[:, cn:]
+        dsel = digit[sel]
+        if planted:
+            z[:, 0] = np.exp(1j * (2 * np.pi * (3 * dsel + 2) / 10 + 0.2 * rng.standard_normal(len(sel))))
+        unit = z / np.maximum(np.abs(z), 1e-12)
+        mean = np.array([unit[dsel == v].mean(axis=0) for v in range(10)])  # [d][circle]
+        theta = np.angle(mean)
+        conc = np.abs(mean).mean(axis=0)
+        phase = np.exp(1j * theta)  # [d][circle]
+        amp = np.abs(omega @ phase) / 10  # [j][circle]
+        other = amp[1:].max(axis=0)
+        null = np.array([(np.abs(omega @ phase[p]) / 10)[1:].max(axis=0) for p in perms])  # [shuffle][circle]
+        pct = (null < other[None, :]).mean(axis=0)
+        best = int(other.argmax())
+        spread = np.array([np.ptp(np.unwrap(np.sort(theta[:, c]))) for c in range(cn)])
+        print(f"CIRCLES_TURN {k} {len(sel)} {(other > 0.6).sum()} {(other > 0.9).sum()} {(pct > 0.99).sum()} | best: circle={best} j={1 + int(amp[1:, best].argmax())} a_j={other[best]:.3f} a_0={amp[0, best]:.3f} null_pct={pct[best]:.3f} within_digit_concentration={conc[best]:.3f} turn_range_rad={spread[best]:.3f} | median over circles: a_0={np.median(amp[0]):.3f} top_other={np.median(other):.3f}", flush=True)
+
+    # (2), (3) At the open place.
+    o = np.flatnonzero(opened)
+    kinds = [place_kind(label[i], int(place[i])) for i in o]
+    part = np.array([PARTS.index(part_of(kd)) for kd in kinds])
+    da, db, dv = (np.array([kd[i] for kd in kinds]) for i in (4, 5, 6))
+    held = np.array([kd[7] for kd in kinds])
+    plus = np.array([kd[1] == "+" for kd in kinds])
+    lam = np.fromfile(os.path.join(d, "lambda.i64"), dtype="<i8").reshape(n, dw)[o].astype(np.float64) / 2.0**MATERIAL
+    read = np.fromfile(os.path.join(d, "read.i32"), dtype="<i4").reshape(n, dw)[o].astype(np.float64) / 2.0**FACE
+    q = np.asarray(charge[o]).astype(np.float64) / 2.0**FACE
+    zq = q[:, :cn] + 1j * q[:, cn:]
+    wheel = (da + np.where(held == 2, db, 0)) % 10
+    if planted:
+        radius = np.median(np.abs(zq[:, 0])) + 1e-3
+        zq[:, 0] = radius * np.exp(1j * (2 * np.pi * wheel / 10 + 0.15 * rng.standard_normal(len(o))))
+    modulus = np.abs(zq)
+    unit = np.where(modulus > 2.0**-FACE, zq / np.maximum(modulus, 1e-12), 0)
+    q_lin = np.hstack([zq.real, zq.imag])
+    harm = [np.hstack([(unit[:, c : c + 1] ** m).real for m in range(1, harmonics + 1)] + [(unit[:, c : c + 1] ** m).imag for m in range(1, harmonics + 1)]) for c in range(cn)]
+    q_harm = np.hstack(harm)
+    s_sum = np.where((held == 0)[:, None], 0.0, onehot(da) + np.where((held == 1)[:, None], 0.0, onehot(db)))
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(o), 100)
+    tk, fo, to, co = tick[o], fit[o], test[o], code[o]
+    centre = lambda x, sel: x - x[sel].mean(axis=0)
+    print(f"CIRCLES_CHARGE median_modulus_by_circle_on_2^-16_units " + " ".join(f"{v:.2f}" for v in np.median(modulus, axis=0)))
+    print("CIRCLES_HOLD part tick test_rows nats | value_digit: chart charges harmonics | wheel_digit: chart charges harmonics best_circle=c:share | unordered_sum: chart charges harmonics")
+    print("CIRCLES_TENSION part tick test_rows | covector share: chart chart+charges chart+harmonics value_digit table")
+    for pid, pname in enumerate(PARTS):
+        for k in range(ticks):
+            sel = plus & (tk == k) & (part == pid)
+            f, t = sel & fo, sel & to
+            if t.sum() < 200:
+                continue
+            out = []
+            for target in (onehot(dv), onehot(wheel), s_sum):
+                tc = centre(target, sel)
+                out.append([removed(x, tc, f, t, ridge) for x in (read, q_lin, q_harm)])
+            wc = centre(onehot(wheel), sel)
+            inside = [removed(h, wc, f, f, ridge) for h in harm]
+            best = int(np.argmax(inside))
+            best_share = removed(harm[best], wc, f, t, ridge)
+            print(f"CIRCLES_HOLD {pname} {k} {t.sum()} {co[t].mean():.3f} | " + " ".join(f"{v:.4f}" for v in out[0]) + " | " + " ".join(f"{v:.4f}" for v in out[1]) + f" best_circle={best}:{best_share:.4f} | " + " ".join(f"{v:.4f}" for v in out[2]), flush=True)
+            shares = [removed(x, lam, f, t, ridge) for x in (read, np.hstack([read, q_lin]), np.hstack([read, q_harm]), onehot(dv), pair)]
+            print(f"CIRCLES_TENSION {pname} {k} {t.sum()} | " + " ".join(f"{v:.4f}" for v in shares), flush=True)
+
+
+def junction(d, triads=10, heads=4):
+    """The junction located on a head's current (the lead, November 17; atlas `contact.row-barycentre-sum-outside-simplex`,
+    `contact.pool-founding`). A row brings its sources as a barycentre of their value words, and that barycentre is the head's gathered
+    current before the return spreads it into the chart. So products are located with their legs on the current: each head's `2n`
+    coordinates alone and every head's together, with no label. As `located` does, the linear chart's part is taken out of the covector
+    first, the legs are located on one half of the records and their products' share is read on the other, by part and tick."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    m2 = cur.shape[1]
+    n_modes = m2 // (2 * heads)
+    cols = lambda h: np.r_[h * n_modes : (h + 1) * n_modes, m2 // 2 + h * n_modes : m2 // 2 + (h + 1) * n_modes]
+    spaces = [(f"head={h}", cur[:, cols(h)]) for h in range(heads)] + [("heads=all", cur)]
+    fb = np.hstack([read, np.ones((len(read), 1))])
+    print(f"JUNCTION_READ products={triads} coordinates_a_head={2 * n_modes} heads={heads}")
+    print("JUNCTION scope tick legs_on fit_rows test_rows share_fit share_test")
+    print("JUNCTION_PART scope tick legs_on part test_rows located table")
+    for scope, mask in (("met+", met & plus),):
+        for k in range(ticks):
+            sel = mask & (tick == k)
+            f, t = sel & fit, sel & test
+            w = np.linalg.lstsq(fb[f], lam[f], rcond=None)[0]
+            rem = lam - fb @ w
+            for name, x in spaces:
+                a, b = locate(x[f], rem[f], triads, sweeps=20, starts=2)
+                feats = products_of(x, a, b)
+                print(f"JUNCTION {scope} tick={k} {name} {f.sum()} {t.sum()} {removed(feats, rem, f, f):.4f} {removed(feats, rem, f, t):.4f}", flush=True)
+                for pid, pname in enumerate(PARTS):
+                    fp, tp = f & (part == pid), t & (part == pid)
+                    if tp.sum() < 200:
+                        continue
+                    print(f"JUNCTION_PART {scope} tick={k} {name} {pname} {tp.sum()} {removed(feats, rem, fp, tp):.4f} {removed(pair, rem, fp, tp):.4f}", flush=True)
+
+
 def temper(d, heads=4):
     """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
     reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
@@ -873,6 +1024,10 @@ def main():
         registers(sys.argv[2], sys.argv[3])
     elif cmd == "heat":
         heat(sys.argv[2])
+    elif cmd == "junction":
+        junction(sys.argv[2], int(sys.argv[3]) if len(sys.argv) > 3 else 10)
+    elif cmd == "circles":
+        circles(sys.argv[2], planted=len(sys.argv) > 3 and sys.argv[3] == "planted")
     elif cmd == "links":
         links(sys.argv[2])
     elif cmd == "found":
