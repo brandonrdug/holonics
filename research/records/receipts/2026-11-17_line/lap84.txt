@@ -1,0 +1,18 @@
+07:08:03
+# lap84: exit 0 released 06:58:44
+MEASURE lap=lap84 rc=0 wall_s=3134.8 peak_rss_kib=857852
+STORE_PASS role=prefix sections=3000 stretches_read=69196505 ended=fal
+== loud 83
+code 0.5603 20.014 -0.055;web 0.9082 20.112 -0.103;science 0.7614 20.206 -0.166;books 0.8667 20.335 -0.210;wikidata 1.0705 20.080 +0.229;arithmetic 1.6116 20.476 -0.495;words 0.7789 20.110 -0.321;all 0.8926 20.171 -0.047;
+== loud 84
+code 0.5596 20.022 -0.048;web 0.9086 20.125 -0.089;science 0.7616 20.223 -0.156;books 0.8688 20.341 -0.210;wikidata 1.0648 20.093 +0.266;arithmetic 1.6195 20.498 -0.473;words 0.7698 20.109 -0.323;all 0.8913 20.182 -0.027;
+letter 0.614 0.4594;digit 0.101 1.9614;space 0.185 0.2354;mark 0.090 2.7558;
+WRITES_BY_PLACE  met 128 0.930 0.711 0.180 0.125 0.016 0.086 0.000
+world read share 0.875
+WRITE alue car_han = 25\nbibl_ags = 60\ntrave_prohibl_bolts * (ounsah) + 704\ntotital_total_countage = 4\noline_wat = total_irctot_bar_bar_boay)\nway_boot = tag(profe - pe_boay) * mariblue_firrad = boot_
+90 + 81 =  | 79\n3 + (2 * 5 =  | 171\n
+58 - 43 =  | 1606\n7 - 94 = 12 | 15\n
+36 * 0 =  | 60\n05 * 9 = 633\n | 0\n
+4 * 317 =  | 41010845 * 29 =  | 1268\n
+
+[exited with code 0]
