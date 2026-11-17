@@ -113,6 +113,15 @@ October's own unpassed acceptance on the yardstick, calculations never met in tr
   2.1; a line feed 11.6 and 16.6.
 - The redundant digit `a_k + b_k` stands in the answer site's chart at 0.78, brought by head 0's row (the third record §3.2).
 
+- **The digits' coupling through the tension shows no ring** (read at 07:11 UTC, `coupling_short79.txt`, guesses G-KR). October's
+  location of the ring of ten, taken on the engine by `tools/class_coupling_ruler.py`: over 184,645 written sites of 8,000 short
+  sums at lap 79's mean, each class's moment of the covector against the state its symbol arrives into, coupled through the common
+  metrics, no label of a sum entering. The leading mode of the digits' block holds 0.18 of its power on the first character and the
+  next three 0.40, 0.46 and 0.49, where October's tower showed 0.84 and 0.78. The ruler returns a ring planted on the same shapes at
+  a tenth of the covector's power (0.67 and 0.89 on the first character), after two forms of it that did not. So a key located
+  from this engine's tension today would not be a ring: nothing downstream yet asks the digits for their sum, which is the register
+  read's finding seen from the source side. October's tower had been trained on arithmetic alone before its tension showed the ring.
+
 ## 4. The law, as the records give it
 
 On a ring ℤ/m a digit `d` read in base `b` is the affine move `n ↦ λ n + d` with `λ = b mod m`. On the base's cheap rings `λ` takes
@@ -212,8 +221,10 @@ phases nine apart. The gate reads the covector by mode for that reason.
 
 The order this record now points at (not ordered as work, and each step has its own read first): the rest of October's record read
 by the lead; a ruler's port of the harmonic face on the carry circles as they stand (does any circle already hold a digit's phase
-that one harmonic cannot read); the coupling `K` of the arriving classes read on the engine's own tension (does its spectrum show
-the ring of ten here as it did in October); then the hand and the pair-located turn as laws of the circle.
+that one harmonic cannot read); the coupling `K` of the arriving classes read on the engine's own tension (done at 07:11 UTC: it
+shows no ring, §3); then the hand and the pair-located turn as laws of the circle. With no ring in the tension, a founding located
+from the tension has nothing to locate for the digits today, and what would put it there is the open question: October's answer
+was a terrain of arithmetic alone and a landmark, neither of which this record takes.
 
 
 The clock with a hand as a law: its composition and its adjoint (Lean beside `Geometry/AffineSwing` and `HNN/Moment`), the moment
