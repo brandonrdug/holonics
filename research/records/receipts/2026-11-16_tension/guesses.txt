@@ -296,3 +296,15 @@ site's chart at 0.746, 0.770, 0.656, 0.636; a linear read of it removes 0.006 to
 ten coordinates remove 0.278, 0.391, 0.227, 0.187 on the held half; the table 0.646, 0.797, 0.928, 0.957. Sums of 1 to 6 digits at lap
 75's mean: units place, present 0.460, 0.538, 0.428, 0.407 and five products 0.092, 0.162, 0.103, 0.094; inner columns, present 0.10
 to 0.17 and products 0.00.
+
+FIRST SCORES of G-Y, read from the clock at 00:33:58 UTC, November 17 (the plain and renamed reads; the doubled read still runs)
+G-Y0 missed narrowly: plain windows code at 1.072, 1.008, 1.123, 1.032 and 0.814 nats a place at 32, 64, 128, 256 and 512 places (0.6
+  to 1.0 was guessed; these are ASCII windows cut inside documents, eight places a window).
+G-Y1, first clause held: renamed windows code at 3.743, 3.626, 3.624, 3.219 and 2.808 nats a place. Second clause missed: the 512-place
+  windows stand 0.82 nats under the 64-place windows (within 0.3 was guessed), where the plain windows' difference is 0.19. The code of
+  a renamed region falls with the region's length. A region's own repeats would do that with no key located (a row meets every
+  definite site of its region and can copy what followed an earlier like context), so a control is read before it is named.
+G-Y3, fixed at 00:33:58 UTC before its read: the same windows with every letter's occurrence drawn afresh (no consistent key, no repeat
+  kept; symbol_frame_ruler.py scramble) code at 3.5 nats a place or more at every length, and the 512-place windows within 0.3 nats
+  of the 64-place windows. Held, the renamed frame's fall is the region's consistent use; missed with a like fall, it is the window's
+  length alone.

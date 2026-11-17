@@ -2,6 +2,7 @@
 """A ruler: a passage read under two changes of frame (the lead, November 17; Brandon's question of 00:18Z).
 
 Usage: symbol_frame_ruler.py table STORE SLICE OUT_PREFIX   (writes OUT_PREFIX.{plain,renamed,doubled}.tsv)
+       symbol_frame_ruler.py scramble PLAIN.tsv OUT.tsv      (the renamed frame's control: every letter drawn afresh)
        symbol_frame_ruler.py read DIR [DIR …]               (the codes of `read-tension` directories read from those tables)
 
 A signature is what a change of frame leaves fixed. Two frames a reader of symbols should be able to locate inside one region:
@@ -83,6 +84,34 @@ def table(store, slice_name, prefix):
     print("SYMBOL_FRAME_TABLE " + " ".join(f"{length}:{len(found)}" for length, found in cut.items()))
 
 
+def scramble(plain, out):
+    """The control of the renamed frame: the plain table with every letter's occurrence drawn afresh (uniform over the alphabet, its
+    case kept), so no key is consistent and a region's repeats are gone, the windows and the opened places the same."""
+    rng = random.Random(171117)
+    with open(plain) as f, open(out, "x") as g:
+        for line in f:
+            label, prompt, run, places = line.rstrip("\n").split("\t")
+
+            def draw(text):
+                chars = []
+                k = 0
+                while k < len(text):
+                    if text[k] == "\\" and text[k + 1:k + 2] == "n":
+                        chars.append("\\n")
+                        k += 2
+                        continue
+                    c = text[k]
+                    if c.islower():
+                        c = chr(97 + rng.randrange(26))
+                    elif c.isupper():
+                        c = chr(65 + rng.randrange(26))
+                    chars.append(c)
+                    k += 1
+                return "".join(chars)
+
+            g.write(f"{label.replace(':plain:', ':scrambled:')}\t{draw(prompt)}\t{draw(run)}\t{places}\n")
+
+
 def read(dirs):
     import math
     acc = {}
@@ -105,6 +134,8 @@ def read(dirs):
 if __name__ == "__main__":
     if len(sys.argv) >= 5 and sys.argv[1] == "table":
         table(sys.argv[2], sys.argv[3], sys.argv[4])
+    elif len(sys.argv) == 4 and sys.argv[1] == "scramble":
+        scramble(sys.argv[2], sys.argv[3])
     elif len(sys.argv) >= 3 and sys.argv[1] == "read":
         read(sys.argv[2:])
     else:
