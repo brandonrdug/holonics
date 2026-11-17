@@ -651,3 +651,33 @@ differences together) must return the wheel at one from a plane, and the written
 What it decides: G-DH2 held, a key is founded by closure from every place the field reads, with no choice of which places are
 composed, and the read goes on to the store's text; missed, the closure as it stands needs to be told where a composition is
 written, which the field is not, and the founding is rethought before any part.
+
+SCORES of G-DH1 and G-DH2, read from the clock at 10:31:03 UTC, November 17 (planes86.txt, planes86_planted.txt, planes86_block.txt;
+3,480 distinct short sums, every place but a record's first opened in turn, 41,004 places, lap 86's mean; host, eight threads
+for the dump in 206 s, one for each ruler in under a minute, beside lap 88 on the card)
+The instrument first. The first form took a line wherever nine tenths of an eigenvector's images lay along it; under a mixture
+of translations and reflections an eigenvector is nearly kept and is still no character, and that form returned partial
+supports at 0.67 to 0.89 from the planted menu. As repaired the plane is searched unless the line is clean. The planted menu
+of aligned triples at every digit's place then returns the wheel from planes at 0.997 (j = 9), 0.986 (j = 3) and 0.998
+(j = 7), with the ten digits as support. By role it shows the theory's form: at the value's places lines, the plain closure at
+1.000; at the operands' places planes (half of an eigenvector's images' power along it, 0.98 to 0.995 in two directions)
+whose flat functions are the characters at 0.996 to 1.000, where the plain closure's eigenvalue keys fall to 0.796. The menu
+with the written symbols dealt at random returns no line or plane with keys.
+G-DH1 missed: on the real rows the plain closure's eigenvalue keys hold 0.926 at tick 0 and 0.923 at tick 1 at a j coprime to
+ten (the digits' modulus 0.28 and 0.26); under 0.9 was guessed. They fall to 0.761 and 0.634 at ticks 2 and 3.
+G-DH2 missed: on the pooled menu of every place no invariant line or plane returns the wheel at 0.9. The leading spans are
+functions of the layout's own symbols (the line feed, the equals sign, the plus); the nearest ring's are the ring of five at
+0.994 on a span holding 0.89 of its images (tick 1) and a j = 9 at 0.881 on one holding 0.86 (tick 0).
+By the ruler's knowledge of the roles the ring is there at both kinds of place: the value's places return the plain closure at
+0.996, and the operands' places return planes, the ring of five at 0.998 (tick 0) and the wheel at j = 3 at 0.996 (tick 1).
+A diagnosis read after the scores (planes86_block.txt; not guessed): the pooled menu closes once it is cut to a block of
+symbols, and the block is read from the menu with no label. Two symbols are taken as alike where the symbols written beside
+them, as sources, correlate at 0.9; at ticks 0, 1 and 3 that gives the ten digits as one block and the space, the signs and
+the feed apart (at tick 2 the feed joins the digits and nothing closes). Inside the digits' block, which holds 0.07 to 0.28 of
+the menu's weight, every place pooled, the plane closure returns j = 9 at 0.963, 0.966 and 0.957 (ticks 0, 1, 3), j = 3 at
+0.978 and 0.994 (ticks 1, 3) and j = 7 at 0.916 (tick 0), each at the 100th percentile of its null.
+Decided: as fixed, the closure as G-LC stated it needs to be told where a composition is written. What the diagnosis adds is
+that it does not need the place's role: it needs a ring's members before its keys, and the members are a block the menu
+itself shows. The store's own arithmetic holds differences and products beside sums on the same ten symbols, and
+multiplication does not share a translation's planes, so there the operator must also carry the sign its row meets (a menu of
+three sources); that read is owed before the store's text is.

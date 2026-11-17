@@ -36,14 +36,17 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     // weight in millionths. A ruler traces a far symbol's way to the open place link by link from them.
     // [measurement; the lead, November 16 23:00Z] With `carry=MILLI`, every open row carries its lock along the ticks at `γ = MILLI/1000`
     // ([`holonics_engine::field::Constitution::lock_carry`]): a ruler's forward, read before the stage is a law.
-    let usage = "read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all] [carry=MILLI]";
-    if args.len() < 12 || args.len() > 14 {
+    // [measurement; the lead, November 17 10:25Z] With `shares`, `shares.tsv` alone of `all`'s files is written (the open place's row by tick
+    // and head), for a ruler that closes a menu of the rows on longer regions without every site's charts on disk.
+    let usage = "read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all] [shares] [carry=MILLI]";
+    if args.len() < 12 || args.len() > 15 {
         return Err(usage.into());
     }
-    let (mut all, mut carry) = (false, None);
+    let (mut all, mut carry, mut shares_alone) = (false, None, false);
     for word in &args[12..] {
         match (word.as_str(), word.strip_prefix("carry=")) {
             ("all", _) => all = true,
+            ("shares", _) => shares_alone = true,
             (_, Some(m)) => carry = Some(crate::ruler::tension::carry_of(m)?),
             _ => return Err(usage.into()),
         }
@@ -102,7 +105,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     println!("TENSION_TEMPER log2_on_2^-24 {}", (0..2 * d.heads).map(|k| learner.field.theta[temper + k].to_string()).collect::<Vec<_>>().join(" "));
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
-    let (mut chart, mut shares) = if all { (Some(create("chart.i32")?), Some(create("shares.tsv")?)) } else { (None, None) };
+    let (mut chart, mut shares) = (if all { Some(create("chart.i32")?) } else { None }, if all || shares_alone { Some(create("shares.tsv")?) } else { None });
     // With `all`, each site's value word beside its chart (`value.i64`, `2M` entries on `2^(−16)`): what the site offers a row that meets it.
     let mut value = if all { Some(create("value.i64")?) } else { None };
     // The open place's whole face, a record a place in the table's order (`faces.i64`, the code of each of the `A` classes on `2^(−20)` bits).

@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release]
+Usage: loop_closure_ruler.py DIR [planted | release | planes [planted]]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -31,6 +31,16 @@ then gives, on each eigenvector, its barycentre `y = Σ_s p_s λ(u_s)` and its p
 (`y²` less the sources' self terms, the menu's own weighting). `RELEASE_HOLD` is the share of the written digit and of the wheel's
 digit `a_k + b_k mod 10` a least-squares read of these features gives on the held half, and `RELEASE_TENSION` what they remove of the
 covector beside the chart, by part and tick, beside the value's own digit and the pair's table. Nothing in the features is labelled.
+
+With `planes`, DIR holds every place of each record opened in turn (operands' digits, signs and spaces as well as the value's), so
+nothing chooses which places are composed. A place at an operand is written `x = v − w`: a translation composed with the reflection
+`w ↦ −w`, or a translation by `−u`, by which of the two sources `u` is. The operators then generate the ring's dihedral group and
+share planes `span(χ_j, χ_(−j))` in place of lines, and their eigenvalues are no longer keys. For each eigenvector of the drawn
+combination the ruler takes the span its images under every operator fill (`CLOSURE_SPAN`: a line or a plane, by the share of the
+images' power its first one and two singular directions hold), and in it the function of flattest modulus on its support, which in
+such a plane is a character; that function's own phases at the symbols are the keys, and its support is the ring's membership. The
+plain closure's read of the same menu is printed beside it, and by the ruler's knowledge of the roles the menu of the value's places
+alone and of the operands' places alone.
 
 Floats, counts and the knowledge of which bytes are digits are a ruler's (CLAUDE.md, a ruler is an instrument). The sums are synthetic,
 so their records are printed freely."""
@@ -82,6 +92,123 @@ def menus(d, planted=None, seed=17):
                     if j1 != j2:
                         t[index[text[j1]], index[text[j2]], xi] += p1 * p2
     return out, symbols
+
+
+def menus_every(d, planted=None, seed=17):
+    """The menus of a directory where every place of a record is opened in turn, one head and tick at a time: `every` (all places), and
+    by the ruler's knowledge of the roles `value` and `operand` (the places at the value's digits, at the operands' digits). `planted`
+    as in [`menus`]; "aligned" takes, at a digit's place, the two aligned digits of the record's other two numbers at equal shares."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tension_ruler as tr
+
+    rng = np.random.default_rng(seed)
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    symbols = sorted({c for line in lines for c in text_of(line[0])})
+    index = {c: i for i, c in enumerate(symbols)}
+    n = len(symbols)
+    written = [text_of(line[0])[int(line[4])] for line in lines]
+    if planted == "dealt":
+        places = sorted({(line[0], line[4]) for line in lines})
+        dealt = dict(zip(places, rng.permutation([text_of(lab)[int(site)] for lab, site in places])))
+        written = [dealt[(line[0], line[4])] for line in lines]
+    out = {}
+    for line, x in zip(lines, written):
+        label, tick, head, site = line[0], int(line[2]), int(line[3]), int(line[4])
+        text = text_of(label)
+        _, _, _, a, b, v = label.split(":")
+        role, k, _ = tr.site_role(label, site)
+        if planted == "aligned":
+            sources = []
+            if role is not None:
+                for name, start, number in (("a", 0, a), ("b", len(a) + 3, b), ("v", len(a) + len(b) + 6, v)):
+                    if name != role and k < len(number):
+                        sources.append((start + len(number) - 1 - k, 0.5))
+        else:
+            sources = [(int(j), int(p) / 1e6) for j, p, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        scopes = ["every"] + (["value"] if role == "v" else ["operand"] if role in ("a", "b") else [])
+        for scope in scopes:
+            t = out.setdefault((scope, head, tick), np.zeros((n, n, n)))
+            xi = index[x]
+            for j1, p1 in sources:
+                for j2, p2 in sources:
+                    if j1 != j2:
+                        t[index[text[j1]], index[text[j2]], xi] += p1 * p2
+    return out, symbols
+
+
+def spans(t, symbols, seed=3, grid=(46, 90)):
+    """The invariant lines and planes of a menu's operators, each with its flattest function: for every eigenvector `v` of one drawn
+    combination, the images `P_u v` weighed by the roots of the sources' menu weights, their singular directions, and in the first one
+    or two the function of flattest modulus on the support. Returns (the eigenvalue's modulus, the share of the images' power in one
+    and in two directions, the flat function over all symbols (zero where a symbol is never written), its flatness, its support)."""
+    n = len(symbols)
+    xs = np.flatnonzero(t.sum(axis=(0, 1)) > 0)
+    tx = t[:, xs][:, :, xs]
+    mass = tx.sum(axis=2, keepdims=True)
+    p = np.where(mass > 0, tx / np.maximum(mass, 1e-30), 0.0)
+    weight = tx.sum(axis=(1, 2))
+    rng = np.random.default_rng(seed)
+    c = (rng.standard_normal(n) + 1j * rng.standard_normal(n)) * (weight > 0)
+    values, right = np.linalg.eig(np.einsum("u,uwx->wx", c, p))
+    roots = np.sqrt(weight / max(weight.sum(), 1e-30))
+    angles_t = np.linspace(0, np.pi / 2, grid[0])
+    angles_f = np.linspace(0, 2 * np.pi, grid[1], endpoint=False)
+    out = []
+    for e in np.argsort(-np.abs(values)):
+        v = right[:, e]
+        if np.abs(v - v.mean()).max() < 0.05 * np.abs(v).max():
+            continue
+        images = np.stack([roots[u] * (p[u] @ v) for u in range(n)], axis=1)
+        left, sing, _ = np.linalg.svd(images, full_matrices=False)
+        power = sing**2 / max((sing**2).sum(), 1e-30)
+        one, two = power[0], power[:2].sum()
+        # A line only where the images leave nothing beside it: under a mixture of translations and reflections an eigenvector is
+        # nearly kept (most of its images' power along it) and is still no character, so the plane is searched unless the line is clean.
+        basis = left[:, :1] if one >= 0.995 else left[:, :2]
+        energy = (np.abs(basis) ** 2).sum(axis=1)
+        support = energy >= 0.25 * energy.max()
+        best = None
+        if basis.shape[1] == 1:
+            cands = [basis[:, 0]]
+        else:
+            cands = [np.cos(a) * basis[:, 0] + np.exp(1j * f_) * np.sin(a) * basis[:, 1] for a in angles_t for f_ in angles_f]
+        for f in cands:
+            mod = np.abs(f[support])
+            flat = mod.mean() ** 2 / max((mod**2).mean(), 1e-30)
+            if best is None or flat > best[0]:
+                best = (flat, f)
+        full = np.zeros(n, dtype=complex)
+        full[xs] = best[1]
+        sup = np.zeros(n, dtype=bool)
+        sup[xs] = support
+        out.append((abs(values[e]), one, two, full, best[0], sup))
+    return out
+
+
+def report_planes(name, tables, symbols, head=0, tick=0):
+    digits = [symbols.index(str(d)) for d in range(10)]
+    shown = {" ": "space", "\n": "feed"}
+    for scope in ("every", "value", "operand"):
+        t = tables.get((scope, head, tick))
+        if t is None:
+            continue
+        found, _ = closure(t, symbols)
+        best = max(((characters(np.angle(lam[digits]))[0], np.abs(lam[digits]).mean()) for _, lam in found), key=lambda r: max(r[0][j] for j in (1, 3, 7, 9)), default=None)
+        if best is not None:
+            j = max((1, 3, 7, 9), key=lambda q: best[0][q])
+            print(f"CLOSURE_PLAIN {name} scope={scope} head={head} tick={tick} eigenvalue keys: best coprime j={j} a_j={best[0][j]:.3f} digits_modulus={best[1]:.3f}")
+        seen = []
+        for modulus, one, two, f, flat, sup in spans(t, symbols):
+            kind = "line" if one >= 0.995 else "plane" if two >= 0.9 else "neither"
+            amp, pct = characters(np.angle(f[digits]))
+            j = 1 + int(amp[1:].argmax())
+            keys = " ".join(f"{(np.angle(f[i] / f[digits[0]]) / (2 * np.pi) * 10) % 10:.1f}" for i in digits) if abs(f[digits[0]]) > 0 else "-"
+            members = "".join(shown.get(s_, s_) + " " for i, s_ in enumerate(symbols) if sup[i]).strip()
+            line = f"CLOSURE_SPAN {name} scope={scope} head={head} tick={tick} modulus={modulus:.3f} in_one={one:.3f} in_two={two:.3f} kind={kind} flatness={flat:.3f} best_j={j} a_j={amp[j]:.3f} null_pct={pct:.3f} support=[{members}] digits_keys_in_tenths_of_a_turn={keys}"
+            sig = (kind, j, round(amp[j], 2), members)
+            if sig not in seen:
+                seen.append(sig)
+                print(line, flush=True)
 
 
 def characters(phases, shuffles=2000, seed=5):
@@ -239,6 +366,15 @@ def main():
     d = sys.argv[1]
     if len(sys.argv) > 2 and sys.argv[2] == "release":
         release(d)
+        return
+    if len(sys.argv) > 2 and sys.argv[2] == "planes":
+        for planted in ("aligned", "dealt") if len(sys.argv) > 3 and sys.argv[3] == "planted" else (None,):
+            tables, symbols = menus_every(d, planted)
+            print(f"CLOSURE_READ menu={planted or 'rows'} places=every symbols={len(symbols)} tables={len(tables)}")
+            for tick in range(1 + max(k[2] for k in tables)):
+                report_planes(planted or "rows", tables, symbols, 0, tick)
+                if planted:
+                    break
         return
     plants = ("aligned", "dealt") if len(sys.argv) > 2 and sys.argv[2] == "planted" else (None,)
     for planted in plants:
