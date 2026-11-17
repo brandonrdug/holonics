@@ -227,3 +227,31 @@ non-arithmetic world for the act is a document's own pieces as the legal next co
 next section, a deposit that steps everything erases what was placed, so the crossing and a deposit that does not step what was founded
 are held together.
 
+## 10. The October machine read twice, and §8's "erased" withdrawn
+
+Both reads ran the October tree as it stood (commit `7e7d89842`, rebuilt with one hold each) on the archived run's own inputs and its
+founded state `PRA_STATE`, and were read by that run's own tools (`receipts/2026-11-17_tempering/october_held.txt`,
+`october_protected.txt`; G-O1 and G-O2 fixed first).
+
+| three passes from `PRA_STATE` | never-met at the equals, of 876 | all, of 2,448 | held-out bits a byte | the comparison's share after |
+|---|---|---|---|---|
+| October's run, everything stepped (`PRA`) | 18 | 286 | 1.824 | 0 |
+| every family held but the readout | 3 | 87 | 2.718 | 250 thousandths |
+| everything stepped but the opened comparison's own entries, held | 15 | 328 | 1.795 | 0 |
+| an 8-gram (October's foil) | 34 | | | |
+
+- **G-O1 missed on an unread premise.** `PRA_STATE` is a fresh founding, a drawn tower with the strands and the comparison placed. Holding
+  all but its readout leaves a body that was never trained, and 962 of its 2,448 writes are no number. It separates nothing.
+- **G-O2 separates, and it misses the other way.** With the comparison's own entries held through all three passes, never-met
+  calculations stand at 15 and the numbers' agreement modulo ten keeps the same lead over its foil as the October run's (768 of 2,060
+  against 593, where `PRA` read 807 of 2,085 against 588). The product was conducted as founded the whole time, and the return and the
+  readout did not come to read it.
+- **The share reads dilution.** It is the comparison's part of the level's whole bilinear weight. In the protected run its entries are
+  held bit for bit and the share still reads zero, because the other contacts grew. §8's sentence that the stepped passes erased the
+  founded product over-read that figure and is withdrawn, with what I wrote to Brandon from it.
+
+What stands, on two machines now: stepping on the one comparison does not take a law that lives in a product, whether the product's
+operands are diffuse (the plain arm of §2), bound by rote (§7) or conducted exactly and held (this section). Where a part was compared
+itself, it was taken (§2's closed face, with §9's limits). The read of a founded face has to be founded too, from its own tension, which
+is the half of October 24's law that no run on either machine has made.
+
