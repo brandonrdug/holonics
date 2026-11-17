@@ -259,3 +259,15 @@ pass 3 1.565 / 1.603 / 1.623; pass 4 1.529 / 1.582 / 1.599; pass 5 1.503 / 1.569
 59 of 155 (38%); passes 1 to 5: 61%, 72%, 69%, 74%, 75%; longest run shared with the fitted text 13 to 18 octets. The guess's held range
 (1.60 to 1.72 at pass 40) is already passed under at pass 4, and its panel clause (65% or more) at pass 2; the flattening it named is
 there by pass 5. By eye at pass 5: real short words and phrases, no clean sentence.
+
+Read (2026-11-17T21:58:50Z), G-N1 at pass 9: next place fitted 1.449, held 1.542, unread 1.563 (the fall a pass on the held rows now 0.004 to 0.010);
+panel 72% to 77% of words in the lexicon from pass 4 on.
+G-N2 (2026-11-17T21:58:50Z). A control the night's run owes: is it the state she is compared on, or only that the text is fifty storybooks? The run
+is stopped after pass 15, and from lap 94's state the same fifty books are read as the first dwell read its three: rows of 48 known
+places and a run of 32 with a keyed half open (56 thousand rows, 400 a section, about 0.9 million compared places a pass, the count a
+pass of the night's run compares), 10 passes. Read on the night run's own read rows (the next place on its left context) and written by
+both writers (one place a read as the last of its region; the law's writer in place order). Then the night's run goes on from pass 15.
+  The guess: after 10 passes the control's held next place stands at 1.80 nats or above (the night's run read 1.56 at pass 6, the same
+  count of compared places); its panel under 60% of words in the lexicon by its better writer (the night's run 72% to 77%).
+  What it decides: a control at the night run's level says the register did it and the state did not; a control left near the first
+  dwell's level (1.87, 59%) says the comparison at the boundary is what text needed first.
