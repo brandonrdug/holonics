@@ -74,6 +74,9 @@ repository was reset on September 24; the pre-reset tree is
   ([the friction record](research/records/2026-11-16_FEEDBACK_IS_FRICTION_AGAINST_A_WORLD_THAT_ANSWERS_THE_FIELDS_OWN_ACT_AGREEMENT_IS_THE_FRICTIONS_ZERO_AND_ARITHMETIC_IS_THE_FIRST_WORLD.md) §11, §12).
 - **Its levels** (nats a place of the held passage, 128 documents a slice never met, at lap means; the
   one-place receiver: each place opened alone among the written places).
+  - Lap 78, the first on the redrawn arithmetic slice: code 0.5598, web 0.9172, science 0.7672, books 0.8710, wikidata 1.0779, the
+    held arithmetic (the uniform draw's records) 1.6108 and the GSM8K test split 0.7694. Read alone, a short sum's units digit codes
+    at 2.359 nats (2.365 at lap 77's mean) and its top digit at 1.389 (1.545).
   - Lap 77 (its mean `MEAN.2000`): code 0.5559, web 0.9156, science 0.7657, books 0.8673, wikidata
     1.0711, the held arithmetic 1.5279 and the GSM8K test split 0.7628; lap 76: 0.5526, 0.9184,
     0.7660, 0.8720, 1.0686, 1.5271 and 0.7732.

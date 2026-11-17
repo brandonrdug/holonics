@@ -1295,6 +1295,37 @@ pub fn zero_triad_return(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 16 23:58Z; atlas `contact.row-heat-keys-short`] `ruler-temper STATE STATE_SHA HEAD MILLI OUT`: **a ruler's
+/// state with one head's listener cooled**: the state with `MILLI` thousandths of an octave added to head `HEAD`'s listener temperature
+/// (`Loci::temper`, `[h][1]`, the logarithm of the row's gain on the material's grain), every other entry, moment and line kept. A ruler's
+/// state for a reading of what a row would gather at another gain with its present keys; never trained from, and no law reads it. Why a state
+/// and not a reading's argument: a temperature is a store's state (CLAUDE.md), so the ruler moves the store and the reads stay the engine's own.
+pub fn ruler_temper(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("ruler-temper STATE STATE_SHA HEAD MILLI OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let d = learner.field.declaration;
+    let head: usize = args[3].parse().map_err(|_| "HEAD is a head's count")?;
+    if head >= d.heads {
+        return Err(format!("a state of {} heads", d.heads).into());
+    }
+    let milli: i64 = args[4].parse().map_err(|_| "MILLI is thousandths of an octave")?;
+    let at = learner.field.layout().temper + 2 * head + 1;
+    let before = learner.field.theta[at];
+    let delta = (milli as i128 * (1i128 << holonics_engine::field::MATERIAL_BITS)) / 1000;
+    let after = i32::try_from(before as i128 + delta).map_err(|_| "a temperature past its entry")?;
+    learner.field.theta[at] = after;
+    std::fs::write(out, learner.to_text())?;
+    println!("RULER_TEMPER head={head} milli={milli} before={before} after={after} grain_bits={}", holonics_engine::field::MATERIAL_BITS);
+    Ok(())
+}
+
 /// [definition; the lead, November 16 21:40Z; atlas `contact.pool-founding`] `found-crossing STATE STATE_SHA LEGS LEGS_SHA OUT [RETURN RETURN_SHA]`:
 /// **the triads' legs founded where the tension leads** ([`holonics_engine::field::Learner::with_located_legs`]). `LEGS` holds the charts `A`, `B`
 /// and `G` and then their biases as the state lays them (`6J × D + 6J` entries, little-endian 32-bit integers on the material's grain), read by

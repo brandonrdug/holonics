@@ -224,3 +224,179 @@ heat alone (heat_short77.txt). The oracle exits 1 on short sums after it prints 
 solve is singular where a kind of place has too few rows).
 G-B3b, scored on lap 77 (STORE_WORLD lines, by sixths of the lap): the world read 0.598, 0.592, 0.606, 0.620, 0.610, 0.590 of the
 drafts, 0.605 over the lap (0.470 and 0.485 on laps 75 and 76). No rise of 0.05 inside the lap: missed on the lap it had.
+
+GUESSES G-H1 to G-H5, fixed at 00:00:58 UTC, November 16 (from date -u), before the read: a turned head cooled on short sums
+Premise read first (heat_short77.txt): at lap 77's mean, on sums of one- and two-digit operands read a record a region, head 3's row
+gives the aligned pair 0.470 at tick 0, and the same row's shares raised to the fourth power at the same keys give it 0.731.
+Reading: a ruler's state (ruler-temper: head 3's listener temperature raised by two octaves, its gain times four; never trained from),
+then the instrument of G-V (short.sh's two reads, the oracle and the heat), ten located products at the units place, and the held passage
+at 100 places a slice on the host. One octave is read beside it.
+G-H1: head 3's share on the aligned pair, tick 0, is 0.65 or more (0.470).
+G-H2: the operands' presence at the answer's site at tick 1 is 0.55 or more for a and 0.65 or more for b (0.427 and 0.564).
+G-H3: the units digit's code moves by less than 0.05 nats either way (2.365): nothing at the junction uses what arrives.
+G-H4: ten located products remove 0.20 or more of the covector at the units place on the held half at tick 1 (0.090 at lap 76's mean).
+G-H5: each of the six text slices' held one-place codes rises by 0.05 nats a place or less.
+What it decides: H1, H2 and H4 held say the junction is locatable under a cooled turned head where a record stands alone, so the
+founding is the head's temperature and the legs together; H5 says what one temperature a head for every slice would cost text.
+
+G-H1 to G-H5: VOID, read from the clock at 00:10:42 UTC, November 17. Their premise was a mislabelled row. The heat ruler prints
+"lengths tick head", and the row quoted as head 3's at tick 0 (0.470, 0.731 at the fourth power) is head 0's at tick 3. Rightly labelled,
+at lap 77's mean on short sums the aligned pair's share is, at tick 0 by head: 0.405, 0.241, 0.066, 0.002; and for head 0 by tick: 0.405,
+0.239, 0.235, 0.470. On sums of 1 to 6 digits at lap 76's mean, at tick 0 by head: 0.332, 0.179, 0.063, 0.003; head 0 by tick: 0.332,
+0.254, 0.192, 0.256. The check that was at hand and not made: the first record's link trace already gave head 0's shares by tick
+(0.171 + 0.161, 0.106 + 0.148, 0.089 + 0.103, 0.114 + 0.142), and the rows read as heads 1 to 3 are those sums.
+What the read of head 3's listener raised two octaves did show (cool77_2000.*): its row holds nothing of the pair before or after
+(0.002, 0.000); the operands' presence at the answer's site stays where it was (0.437 and 0.476 at tick 0, 0.420 and 0.550 at tick 1,
+against 0.446, 0.516, 0.427, 0.564); the units digit codes at 2.372 (2.365); ten located products at the units place remove 0.000 on the
+held half at tick 1. The turned heads carry none of a short sum's operands; the address is the still heads', head 0 first.
+
+GUESSES G-K1 to G-K5, fixed at 00:10:42 UTC, November 17 (from date -u), before the read: head 0 cooled on short sums
+Premise, rightly labelled (heat_short77.txt): head 0's row gives the aligned pair 0.405, 0.239, 0.235 and 0.470 at ticks 0 to 3, and its
+shares raised to the fourth power give 0.450, 0.261, 0.233 and 0.731 (a still head has no falloff by distance, so the power is near what
+its temperature does at the first tick; later ticks' keys move with what arrived).
+Reading: ruler states of lap 77's mean with head 0's listener temperature raised by one octave and by two (ruler-temper), the instrument
+of G-V, ten located products at the units place, and the held passage at 100 places a slice against the same mean read fresh.
+G-K1: at two octaves head 0's share on the aligned pair is between 0.40 and 0.52 at tick 0 and 0.55 or more at tick 3.
+G-K2: the operands' presence at the answer's site at tick 3 rises to 0.42 or more for a and 0.50 or more for b (0.375 and 0.457).
+G-K3: the units digit's code moves by less than 0.05 nats either way (2.365).
+G-K4: ten located products at the units place remove 0.12 or more on the held half at some tick (0.090 at most, lap 76's mean).
+G-K5: at two octaves at least three of the six text slices' held one-place codes rise by 0.05 nats a place or more.
+
+GUESSES G-Y0 to G-Y2, fixed at 00:26:49 UTC, November 17 (from date -u), before the read: a passage under two changes of frame
+Reading: tools/symbol_frame_ruler.py: windows of 32 to 512 places of the held books (ASCII windows; 164 of them), eight places a window
+opened alone, at lap 77's mean on the host (8 threads): plain; renamed (its letters through one fixed permutation, both cases alike);
+doubled (every byte written twice, windows to 256 places, both copies of each place opened in turn).
+G-Y0: plain, the code stands between 0.6 and 1.0 nats a place at every window length.
+G-Y1: renamed, the code stands at 2.5 nats a place or more at every window length, and the 512-place windows code within 0.3 nats
+  of the 64-place windows: the region's length buys nothing, since a symbol is its row and no key is located inside a region.
+G-Y2: doubled, each copy codes at 2.0 nats a place or more, and the 256-place windows within 0.3 nats of the 64-place windows: the
+  clock is one site a byte, and a place's twin beside it is not read as its twin.
+What it decides: held, the two figures are the baseline of the symbol's line's acceptance (the code falls along a renamed region; a
+re-rastered passage keeps its crossings). A fall with the window's length in either frame would say the engine locates a key inside a
+region past what its rows hold.
+
+SCORES of G-K1 to G-K5, read from the clock at 00:32:11 UTC, November 17 (cool77h0_*.{oracle,heat,located}.txt, cooled_held77.tsv,
+midpoint_short77.txt, midpoint_cooled77.txt): head 0's listener raised two octaves, lap 77's mean, short sums
+G-K1 held: the aligned pair's share of head 0's row is 0.423 at tick 0 (0.405) and 0.726 at tick 3 (0.470); 0.422 and 0.630 at one octave.
+G-K2 missed: the operands' presence at tick 3 fell to 0.358 and 0.435 (0.375 and 0.457), where 0.42 and 0.50 or more were guessed.
+G-K3 held: the units digit codes at 2.379 nats (2.365).
+G-K4 missed on its instrument: ten products with 128-wide legs remove nothing on the held half (-0.05 to -0.30 at the units place).
+  That locator fits 256 numbers a product on about 2,000 places and its held share is the fit's own excess. The midpoint read
+  (products located on the ten coordinates of the chart's read of the unordered pair) gives, at the units place and ticks 0 to 3:
+  fresh 0.283, 0.398, 0.234, 0.192; head 0 cooled two octaves 0.208, 0.312, 0.210, 0.142. Cooling head 0 lowers what a junction
+  could carry.
+G-K5 held: at two octaves four text slices rise by 0.05 nats a place or more (code +0.175, words +0.148, science +0.108, books
+  +0.062; web +0.026, wikidata -0.035; the held arithmetic +0.018). At one octave: +0.093, +0.090, +0.059, +0.030, +0.005, -0.031.
+What it says: head 0's temperature stands where the deposit put it. Raised by hand it closes the last tick's row on the pair, costs
+text, and lowers the midpoint's presence at the answer's site (0.746 to 0.715 at tick 0). The gain is not the lever.
+
+THE MIDPOINT READ (tension_ruler.py midpoint; taken at 00:28 UTC, November 17, with no guess of its own: it was run to settle G-K4's
+instrument). Short sums at lap 77's mean, the units place, ticks 0 to 3: the unordered pair of aligned digits is present in the answer
+site's chart at 0.746, 0.770, 0.656, 0.636; a linear read of it removes 0.006 to 0.012 of the covector; five products located on its
+ten coordinates remove 0.278, 0.391, 0.227, 0.187 on the held half; the table 0.646, 0.797, 0.928, 0.957. Sums of 1 to 6 digits at lap
+75's mean: units place, present 0.460, 0.538, 0.428, 0.407 and five products 0.092, 0.162, 0.103, 0.094; inner columns, present 0.10
+to 0.17 and products 0.00.
+
+FIRST SCORES of G-Y, read from the clock at 00:33:58 UTC, November 17 (the plain and renamed reads; the doubled read still runs)
+G-Y0 missed narrowly: plain windows code at 1.072, 1.008, 1.123, 1.032 and 0.814 nats a place at 32, 64, 128, 256 and 512 places (0.6
+  to 1.0 was guessed; these are ASCII windows cut inside documents, eight places a window).
+G-Y1, first clause held: renamed windows code at 3.743, 3.626, 3.624, 3.219 and 2.808 nats a place. Second clause missed: the 512-place
+  windows stand 0.82 nats under the 64-place windows (within 0.3 was guessed), where the plain windows' difference is 0.19. The code of
+  a renamed region falls with the region's length. A region's own repeats would do that with no key located (a row meets every
+  definite site of its region and can copy what followed an earlier like context), so a control is read before it is named.
+G-Y3, fixed at 00:33:58 UTC before its read: the same windows with every letter's occurrence drawn afresh (no consistent key, no repeat
+  kept; symbol_frame_ruler.py scramble) code at 3.5 nats a place or more at every length, and the 512-place windows within 0.3 nats
+  of the 64-place windows. Held, the renamed frame's fall is the region's consistent use; missed with a like fall, it is the window's
+  length alone.
+
+A LIMIT ON THE MIDPOINT READ, written at 00:38:48 UTC, November 17 (modes_short77.txt). The midpoint read fits its ten coordinates to the
+digits' labels, so it is a ruler's gate on capacity (the Demeter record §4: a task's law enters only as a planted gate; a chart's or a
+triad's direction written from a fit is learning by an authored routine on the host). It was first reported to Brandon as a founding
+in hand and the message was edited at 00:38. Located with no label, on the 8 or 16 leading principal coordinates of the pair chart or of
+the gathered current at the same places, products remove 0.04 to 0.07 at ticks 0 and 1 (0.13 at best: the current, 16 coordinates,
+five products, tick 1), against the labelled read's 0.28 and 0.39: the midpoint does not stand in the chart's loudest directions. A
+founding for the line is located from the covector alone, which about 2,000 places a tick cannot do with 256 numbers a product; it is
+read next on far more places, and a lap on the redrawn slice gives the deposit more places still.
+
+SCORE of G-Y3, read from the clock at 00:41:44 UTC, November 17 (sym77s.out): held. With every letter drawn afresh the windows code at 3.886,
+3.687, 3.777, 3.749 and 3.682 nats a place at 32 to 512 places: flat. So the renamed frame's fall (3.626 at 64 places to 2.808 at 512)
+is the region's consistent use: by 512 places a renamed region has recovered 0.87 of the 2.87 nats between a scramble and the plain
+text. The engine reads a region's own repeats under names it never met, through its contacts; "it stays flat" was the guess and the
+message, and both missed.
+
+GUESSES G-P1 and G-P2, fixed at 00:41:44 UTC, November 17 (from date -u), before the read: a receiver's response to each source
+Reading: tools/response_ruler.py: the 8,000 short sums of short76.tsv, each read beside one perturbed copy for every site of its
+expression (the site's symbol replaced by the symbol whose encoding row stands nearest it at lap 77's mean: a digit's nearest is
+another digit, 0 to 9 giving 5 2 3 4 3 4 7 6 7 7), every value digit opened alone, lap 77's mean, the host on 8 threads.
+G-P1: at a column both operands hold, tick 0, the two aligned operand digits give half or more of the response's power at the answer
+  site's pair chart.
+G-P2: products located from the covector alone on the 16 leading principal coordinates of the responses remove 0.20 or more of the
+  covector at the units place at tick 1 on the held half (0.39 for the ten coordinates fitted to the digits' labels; 0.07 for the
+  chart's 16 leading coordinates of variance).
+What it decides: P2 held, the junction's legs can be founded with no label on the directions that answer a source's change, a form
+for every stream; missed, the label-free founding waits for a location on far more places or for the deposit's own laps.
+
+SCORE of G-Y2, read from the clock at 00:42:58 UTC, November 17 (sym77.txt): first clause held, second on the line. With every byte written
+twice the first copy codes at 3.307, 3.070, 2.859 and 2.744 nats a place and the second at 3.353, 3.137, 2.929 and 2.875, for windows
+of 32, 64, 128 and 256 places of the passage (64 to 512 sites). Each copy stands above 2.0. From 64 to 256 places the first copy
+falls by 0.33 (within 0.3 was guessed: missed by 0.03) and the second by 0.26 (held). The second copy codes no better than the first,
+so a place's twin beside it is not read as its twin; the fall with the window is of the size the renamed frame shows over the same
+lengths. The baseline for the symbol's line's acceptance, lap 77's mean: plain 0.81 to 1.12; renamed 3.74 at 32 places to 2.81 at
+512; every letter drawn afresh 3.68 to 3.89; doubled 2.74 to 3.35.
+
+G-V, THE FIRST LAP'S READ, from the clock at 00:49:49 UTC, November 17 (oracle_short78.txt, heat_short78.txt, midpoint_short78.txt; lap 78's
+mean MEAN.3000, the first lap on the redrawn slice, 3,000 sections in 3,129 s; lap 77's mean beside it). Not yet a score: G-V1 and
+G-V2 are read at lap 79's mean.
+  the units digit of a short sum: 2.359 nats (2.365); a column both hold, clear 2.420 (2.391), carried 2.416 (2.391); a column one
+  holds 2.181 (2.164); the top digit 1.389 (1.545).
+  the operands' presence at the answer's site, tick 0: a 0.467 (0.446), b 0.519 (0.516).
+  the unordered pair in the chart at the units place, ticks 0 to 3: 0.792, 0.789, 0.629, 0.673 (0.746, 0.770, 0.656, 0.636).
+  head 0's share on the aligned pair: 0.411 at tick 0 (0.405), 0.515 at tick 3 (0.470).
+One lap on the redrawn slice sharpened the arrival a little and took 0.16 nats off the top digit; the sum's units digit did not move.
+
+SCORES of G-P1 and G-P2, read from the clock at 00:59:43 UTC, November 17 (resp77.txt; 596,132 responses of 8,000 short sums)
+G-P1 missed: at a column both operands hold, tick 0, the response's power at the answer site's pair chart comes 0.022 from the
+  aligned digit of a, 0.023 from b's, 0.041 from the other digits and 0.915 from the signs and spaces (0.95 to 0.98 at later ticks).
+  The perturbations are not of one size: a digit's nearest symbol is another digit, a space's is the letter e, the plus sign's the
+  star, the equals sign's the greater-than sign, so a separator's change is a change of kind and its response is the largest by far.
+G-P2 missed: products on the 16 leading principal coordinates of the responses remove 0.038 (five) and 0.032 (ten) of the covector at
+  the units place at tick 1 on the held half, under the chart's leading coordinates of variance (0.067) and far under the labelled
+  read (0.39). The leading response directions are the separators'.
+By distance back from the open place, the response over the place's own loudness: one site back 0.15 at tick 0 and 0.44 to 0.49 at
+ticks 2 and 3; two back 0.04 and 0.48 to 0.51; four back (an operand's last digit) 0.05 to 0.23; six to eight back 0.12 to 0.18.
+
+GUESS G-P3, fixed at 00:59:43 UTC before its read (an instrument's variant tried after a miss, said as such): each response taken as a
+direction (scaled to unit length, so a source counts once whatever the size of its perturbation), products located on the 16 leading
+principal coordinates of those directions remove 0.15 or more at the units place at tick 1 on the held half.
+
+SCORE of G-P3, read from the clock at 01:02:54 UTC, November 17 (resp77b.txt): missed. On the 16 leading coordinates of the responses
+taken as directions, products remove 0.072 (five) and 0.053 (ten) at the units place at tick 1, the chart's coordinates of variance
+0.067. Three label-free choices of a small subspace (variance, response, response as direction) each carry 0.04 to 0.13 where the ten
+coordinates fitted to the digits carry 0.39. No further variant of the subspace is tried.
+
+GUESS G-L5, fixed at 01:02:54 UTC before its read: the junction located from the covector alone on many places
+Reading: 60,000 plain sums with operands at the word problems' lengths (sums78.tsv, 140,480 places), a record a region, every value
+digit opened alone, lap 78's mean on the host (8 threads); ten products with 128-wide legs located a tick on the fit half
+(tension_ruler.py located), read on the held half by part.
+G-L5: at the units place at tick 1 the ten located products remove 0.20 or more of the covector on the held half (on 8,262 places the
+  same locator fitted 0.40 and held 0.08; the labelled ten coordinates hold 0.39). Held, a founding located from the tension alone
+  exists at this count of places and its legs are written for found-crossing; missed under 0.10, the covector does not show the
+  junction to a locator at this count either, and the deposit, which reads the same covector, is not expected to find it soon.
+
+GUESSES G-R1 and G-R2, fixed at 01:08:39 UTC, November 17 (from date -u), before the read: a digit's code by its registers
+Reading: tension_ruler.py registers on the open place's whole face (read-tension now writes faces.i64): the 8,000 short sums, lap
+78's mean, host on 8 threads. The ten digits' shares among the digits split into the bit and the five-residue; at a column both
+operands hold, the digit up to its carry and the carry's bit.
+G-R1: at the units place the bit codes at 0.68 nats or more (a register that knows nothing: 0.693) and the five-residue given the bit
+  at 1.60 or more (1.609): neither register is held.
+G-R2: at the columns both operands hold, the carry's bit given the digit up to its carry codes within 0.05 nats for columns with a
+  carry in and columns with none, and at 0.60 or more for both: the winding is not read.
+
+SCORES of G-R1 and G-R2, read from the clock at 01:11:13 UTC, November 17 (registers_short78.txt; 16,286 places of short sums, lap 78's mean)
+G-R1 held: at the units place the bit codes at 0.727 nats (a register that knows nothing: 0.693) and the five-residue given the bit at
+  1.630 (1.609). Taken the other way, the five-residue 1.638 and the bit given it 0.719. Neither register is held, and each stands a
+  little above a register that knows nothing: the face leans the other way more often than not.
+G-R2 held: at columns both operands hold, the digit up to its carry codes at 1.640 with no carry in and 1.681 with one (1.609 for a
+  register that knows nothing), and the carry's bit given that at 0.722 and 0.720. The winding is not read, and neither is the
+  redundant digit's release.
+The top digit, for comparison: its bit 0.480, its five-residue given the bit 0.808; a column one operand holds, no carry: 0.673, 1.443.

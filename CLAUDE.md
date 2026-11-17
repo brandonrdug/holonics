@@ -601,6 +601,16 @@ written here with their reasons so that no agent holds them as slogans.
   acoustic and motor input, and every message, record and brief that describes one. The built
   line's class names stay the code's where the code is cited
   ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).
+  The symbol's form may be authored as a gene, and what stays barred is a merge table (Brandon, November 16 and 17). The rings and
+  their periods, the terms of the series a family reads and where a chart reads are a form handed at founding, the same for every
+  stream, and the opening key may be lifted from the passage's own spectrum; the machine locates the assignment by deposition (atlas
+  `unicity.gene-partial-key`). Barred as before: bytes merged into units by a table at the input (UTF-8 units with a pair-merge table
+  or its kin), an authored assignment, and font rendering. Reason: he named the short form of this rule ("no authored tokenizers") as
+  redundant once genetics were authorized. It had been read as barring every authored form, which kept the symbol's line unbuilt. What
+  he refuses is the reflex of a byte code with a merge table, which rebuilds units from coordination and discards what the symbols are
+  to each other. His lens: a symbol has a resolution and an aspect, like a spectrum, and a receiver should be able to identify its
+  signature. On the objects (`agent-inferred`): resolution is the count of rings a receiver reads, aspect is a symbol's stride along the
+  passage against its key's length, and a signature is what a change of frame (a renaming, a re-rastering) leaves fixed.
 - **One law reads every stream, and nothing branches on the kind of input** (Brandon,
   November 12 and 13). A symbol and a sample are one thing: a digit of a passage, read by a
   receiver at its own clock. No law, test, guess or vocabulary takes a modality or an interface
@@ -719,6 +729,11 @@ written here with their reasons so that no agent holds them as slogans.
   minutes on one thread of this host's reference BLAS before it was read); tool calls run faster than they feel, and the first
   guess file's stamp was a minute ahead of the clock, as several of the build's had been; lap 76 took 3,154 s against lap 75's
   2,942 s with up to eighteen host threads reading beside it, the cause not separated. Scope: every ruler and every receipt.
+  A ruler's line names every index it is keyed by, and a new column is read against a figure the records already hold before it is
+  quoted (November 17). Reason: a ruler printed its tick and its head as two bare numbers; head 0's rows at ticks 1 to 3 were read as
+  heads 1 to 3, and a message to Brandon, a guess and a record's table stood on it for a quarter of an hour, while the first record's
+  link trace held the sums that would have told the rows apart
+  ([the record](research/records/2026-11-16_THE_LOCK_AND_THE_JUNCTION_ARE_ONE_SADDLE_A_CARRIED_LOCK_COSTS_UNTRAINED_TEXT_AND_THE_ARITHMETIC_TERRAIN_IS_REDRAWN_AT_THE_WORD_PROBLEMS_OWN_COUNTS_WITH_A_RECORD_ALONE_IN_ITS_REGION.md) §5).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

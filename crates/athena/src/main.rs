@@ -309,6 +309,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("next-pass") => athena::store::next_pass(args),
         Some("join-store") => athena::store::join_store(args),
         Some("move-store") => athena::store::move_store(args),
+        Some("ruler-temper") => athena::store::ruler_temper(args),
         Some("set-world") => athena::store::set_world(args),
         Some("grow-crossings") => athena::store::grow_crossings(args),
         Some("zero-triad-return") => athena::store::zero_triad_return(args),

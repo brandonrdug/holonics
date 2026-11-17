@@ -105,6 +105,8 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     let (mut chart, mut shares) = if all { (Some(create("chart.i32")?), Some(create("shares.tsv")?)) } else { (None, None) };
     // With `all`, each site's value word beside its chart (`value.i64`, `2M` entries on `2^(−16)`): what the site offers a row that meets it.
     let mut value = if all { Some(create("value.i64")?) } else { None };
+    // The open place's whole face, a record a place in the table's order (`faces.i64`, the code of each of the `A` classes on `2^(−20)` bits).
+    let mut faces = create("faces.i64")?;
     let mut written = 0usize;
     // Regions in blocks, so that what is held before it is written stays bounded; rows in the table's order.
     for block in work.chunks(1024) {
@@ -113,6 +115,9 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         for ((label, place, site, _), tension) in block.iter().zip(reads) {
             let tension = tension?;
             let code = tension.codes[*site].ok_or("an open place without a face")?;
+            for &v in tension.faces[*site].as_ref().ok_or("an open place without a face")? {
+                faces.write_all(&v.to_le_bytes())?;
+            }
             let sites = if all { 0..tension.codes.len() } else { *site..*site + 1 };
             for k in 0..ticks {
                 for s in sites.clone() {
@@ -157,7 +162,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         }
         println!("TENSION_BLOCK rows={written} ms={}", started.elapsed().as_millis());
     }
-    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products] {
+    for w in [&mut rows, &mut lambda, &mut read, &mut current, &mut products, &mut faces] {
         w.flush()?;
     }
     if let Some(c) = chart.as_mut() {

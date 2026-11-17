@@ -79,6 +79,32 @@ def table(out, key, met, far, per=None):
     print(f"TENSION_TABLE rows={len(rows)} places={sum(len(r[3].split(',')) for r in rows)}")
 
 
+def sums_table(out, key, n, weights):
+    """A table of `n` plain sums, a record a region, every value digit opened alone, the operands' lengths drawn with the given
+    weights (the lengths one, two, three, … digits), as `tools/arithmetic_world.py` draws them for the redrawn slice. Labelled `met`."""
+    weights = [int(w) for w in weights.split(",")]
+    rows = []
+    for k in range(n):
+        r = draw(f"{key}:sums", k)
+        nums = []
+        for shift in (8, 120):
+            u, length = (r >> shift) % sum(weights), 1
+            for i, w in enumerate(weights):
+                if u < w:
+                    length = i + 1
+                    break
+                u -= w
+            first = 0 if length == 1 else 10 ** (length - 1)
+            nums.append(first + (r >> (shift + 40)) % (10**length - first))
+        a, b = nums
+        run = f"{a + b}\n"
+        rows.append((f"tension:met:+:{a}:{b}:{a + b}", f"{a} + {b} = ", run.replace("\n", "\\n"), ",".join(str(j) for j, c in enumerate(run) if c.isdigit())))
+    with open(out, "x") as f:
+        for row in rows:
+            f.write("\t".join(row) + "\n")
+    print(f"TENSION_TABLE rows={len(rows)} places={sum(len(r[3].split(',')) for r in rows)}")
+
+
 def place_kind(label, place):
     """A value digit's kind: (lengths, op, k from the value's last digit, whether a carry or a borrow enters its column, a_k, b_k, the
     digit, how many of the two operands hold a digit in the column)."""
@@ -588,6 +614,119 @@ def closed_lock(d, triads=10):
                 print(f"CLOSED_LOCK {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {removed(gathered, lam, f, t):.4f} {shares[0]:.4f} {shares[1]:.4f} {shares[2]:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
 
 
+def midpoint(d, triads=10):
+    """One located midpoint (the lead, November 17; atlas `contact.row-barycentre-sum-outside-simplex`): on a `read-tension` directory,
+    how much of the aligned digits' unordered sum `s = e(a_k) + e(b_k)` the answer site's pair chart holds, and what a junction could
+    carry from it. The chart is 128 wide and a product's two legs on it are 256 numbers a product, more than a few thousand places can
+    locate; a junction needs only the ten coordinates of `s`. So `ŝ = W r̂'` is the least-squares read of `s` from the chart, fitted on one
+    half of the records, and products are located on `ŝ`'s ten coordinates (twenty numbers a product). By part and tick: the share of `s`
+    the chart holds on the held half; the covector's share removed on the held half by a linear read of `ŝ`, by `ŝ` with five and with
+    ten located products, by the true `s` with ten located products (a lock closed on the column), and by the pair's table."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    held = np.array([k[7] for k in kinds])
+    s_true = onehot(da) + np.where((held == 1)[:, None], 0.0, onehot(db))
+    s_true = np.where((held == 0)[:, None], 0.0, s_true)
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    print("TENSION_MIDPOINT scope part tick test_rows nats sum_in_chart linear_of_read read_5_products read_10_products true_sum_10_products table")
+    for scope, mask in (("met+", met & plus),):
+        for pid, pname in enumerate(PARTS):
+            for k in range(ticks):
+                sel = mask & (tick == k) & (part == pid)
+                f, t = sel & fit, sel & test
+                if t.sum() < 200 or pname == "top":
+                    continue
+                target = s_true - s_true[sel].mean(axis=0)
+                x = np.hstack([read, np.ones((len(read), 1))])
+                w = np.linalg.solve(x[f].T @ x[f] + 1e-6 * np.eye(x.shape[1]), x[f].T @ target[f])
+                s_hat = x @ w
+                present = 1.0 - ((target[t] - s_hat[t]) ** 2).sum() / (target[t] ** 2).sum()
+                out = []
+                a, b = locate(s_hat[f], lam[f], triads, sweeps=20, starts=3)
+                for j in (0, 5, triads):
+                    out.append(removed(np.hstack([s_hat, products_of(s_hat, a[:j], b[:j])]) if j else s_hat, lam, f, t))
+                a2, b2 = locate(s_true[f], lam[f], triads, sweeps=20, starts=3)
+                closed = removed(np.hstack([s_true, products_of(s_true, a2, b2)]), lam, f, t)
+                print(f"TENSION_MIDPOINT {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {present:.4f} " + " ".join(f"{v:.4f}" for v in out) + f" {closed:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
+
+
+def modes(d, triads=10):
+    """The junction located on leading modes, with no label (the lead, November 17; the Demeter record §7: "a crossing's legs founded
+    on the leading modes of the heads' gathered currents", a form for every stream that leaves the assignment to the field). On a
+    `read-tension` directory, by part and tick: the pair chart and the gathered current are each reduced to their m leading principal
+    coordinates on the fit half of the places (no digit is read), products are located on those coordinates from the covector alone
+    (2m numbers a product in place of 256), and the share they remove is read on the held half, beside the pair's table. Against
+    `midpoint`, whose ten coordinates are fitted to the digits' labels and which is a ruler's gate, never a founding."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    print("TENSION_MODES scope part tick test_rows source m linear products_5 products_all table")
+    for scope, mask in (("met+", met & plus),):
+        for pid, pname in enumerate(PARTS):
+            for k in range(ticks):
+                sel = mask & (tick == k) & (part == pid)
+                f, t = sel & fit, sel & test
+                if t.sum() < 200 or pname == "top":
+                    continue
+                for sname, x in (("chart", read), ("current", cur)):
+                    centred = x - x[f].mean(axis=0)
+                    _, _, vt = np.linalg.svd(centred[f], full_matrices=False)
+                    for m in (8, 16):
+                        z = centred @ vt[:m].T
+                        a, b = locate(z[f], lam[f], triads, sweeps=20, starts=3)
+                        out = [removed(z, lam, f, t)] + [removed(np.hstack([z, products_of(z, a[:j], b[:j])]), lam, f, t) for j in (5, triads)]
+                        print(f"TENSION_MODES {scope} {pname} {k} {t.sum()} {sname} {m} " + " ".join(f"{v:.4f}" for v in out) + f" {removed(pair, lam, f, t):.4f}", flush=True)
+
+
+def registers(d, codec):
+    """A value digit's code read by its registers (the lead, November 17; Brandon's reminder of 00:44Z on radix and registers; atlas
+    `radix.trailing-unit-rings`, `radix.carry-cascade-consumer`, `radix.carry-section-flux`). On a `read-tension` directory with
+    `faces.i64` (the open place's whole face), the ten digits' shares of the face, taken among the digits, are split as the ring of
+    ten splits: the bit (the digit modulo 2) and the five-residue given the bit, and the other way round; and, at a column both
+    operands hold, the release of the redundant digit `a_k + b_k`: the digit up to its carry (the face's share on the pair sum's
+    last digit and on the next digit together) and the carry's bit given that. Beside each stands a register that knows nothing:
+    ln 2 for a bit, ln 5 for a five-residue or for a digit up to its carry, ln 10 for the digit. By part, nats a place."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    with open(codec) as f:
+        void = int(f.readline().split()[2])
+        units = [int(x) for x in f.readline().split()]
+    cls = {b: (k if k < void else k + 1) for k, b in enumerate(units)}
+    alphabet = len(units) + 1
+    faces = np.fromfile(os.path.join(d, "faces.i64"), dtype="<i8").reshape(-1, alphabet).astype(np.float64) / 2.0**20 * np.log(2.0)
+    first = np.arange(0, len(rows), ticks)
+    assert len(first) == len(faces), (len(first), len(faces))
+    p = np.exp(-faces[:, [cls[48 + k] for k in range(10)]])
+    mass = p.sum(axis=1)
+    q = p / mass[:, None]
+    part = np.array([PARTS.index(part_of(kinds[i])) for i in first])
+    digit = np.array([kinds[i][6] for i in first])
+    da, db, held = (np.array([kinds[i][j] for i in first]) for j in (4, 5, 7))
+    carried = np.array([kinds[i][3] for i in first])
+    sel_plus = np.array([kinds[i][1] == "+" and kinds[i][0] == "met" for i in first])
+    n = np.arange(len(first))
+    same_bit = np.array([[c % 2 == dd % 2 for c in range(10)] for dd in digit])
+    same_five = np.array([[c % 5 == dd % 5 for c in range(10)] for dd in digit])
+    whole = -np.log(q[n, digit])
+    bit = -np.log((q * same_bit).sum(axis=1))
+    five = -np.log((q * same_five).sum(axis=1))
+    s = (da + db) % 10
+    upto = -np.log(q[n, s] + q[n, (s + 1) % 10])
+    print(f"TENSION_REGISTERS chance: bit {np.log(2):.3f}  five {np.log(5):.3f}  digit {np.log(10):.3f}")
+    print("TENSION_REGISTERS part places off_the_digits digit bit five_given_bit five bit_given_five")
+    for pid, pname in enumerate(PARTS):
+        m = sel_plus & (part == pid)
+        if m.sum() < 100:
+            continue
+        print(f"TENSION_REGISTERS {pname} {m.sum()} {(-np.log(mass[m])).mean():.4f} {whole[m].mean():.4f} {bit[m].mean():.4f} {(whole[m] - bit[m]).mean():.4f} {five[m].mean():.4f} {(whole[m] - five[m]).mean():.4f}")
+    print("TENSION_RELEASE columns places digit digit_up_to_its_carry carry_bit_given_that")
+    for name, m in (("both hold, no carry in", sel_plus & (held == 2) & ~carried), ("both hold, a carry in", sel_plus & (held == 2) & carried)):
+        if m.sum() < 100:
+            continue
+        print(f"TENSION_RELEASE {name.replace(' ', '_')} {m.sum()} {whole[m].mean():.4f} {upto[m].mean():.4f} {(whole[m] - upto[m]).mean():.4f}")
+
+
 def temper(d, heads=4):
     """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
     reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
@@ -637,7 +776,11 @@ def heat(d):
     under its own shares (the square of its gain times the spread of its slips: under one, the row cannot tell its sources apart), how
     far the two aligned sources' log-weights stand above the row's mean in units of that spread, and the share the two aligned sources
     would hold with the row's gain raised by 2, 4, 8 and 16 at the same keys (p ∝ p^κ). Where the cooled row closes on the aligned
-    pair the keys locate and the gain is short of its critical value; where it does not, the keys do not single the pair out."""
+    pair the keys locate and the gain is short of its critical value; where it does not, the keys do not single the pair out. The
+    power scales a row's whole log-weight: for a turned head that includes its falloff by distance, which no temperature scales, and
+    at a later tick the keys themselves move with what arrived, so the engine's own answer is a read of a ruler's state
+    (`athena … ruler-temper`). Each line names its tick and its head: on November 17 the lines of head 0 at ticks 1 to 3 were read
+    as heads 1 to 3 at tick 0, and a message and a guess stood on the mislabel until a ruler's state showed it."""
     acc, off = {}, {}
     for line in open(os.path.join(d, "shares.tsv")):
         lab, place, k, h, i, *rest = line.rstrip("\n").split("\t")
@@ -684,11 +827,11 @@ def heat(d):
     print("TENSION_HEAT lengths tick head rows entropy_nats log_sources log_weight_variance aligned_above_mean_in_spreads aligned_pair_share_at_gain_x1 x2 x4 x8 x16")
     for key in sorted(acc):
         e = acc[key]
-        print(f"TENSION_HEAT {key[0]} {key[1]} {key[2]} {e[0]} " + " ".join(f"{x / e[0]:.4f}" for x in e[1:]))
+        print(f"TENSION_HEAT {key[0]} tick={key[1]} head={key[2]} {e[0]} " + " ".join(f"{x / e[0]:.4f}" for x in e[1:]))
     print("TENSION_PLACE lengths tick head rows share_at_offset_-3_or_less -2 -1 0 +1 +2 +3_or_more other_expression_sites value_sites")
     for key in sorted(off):
         o = off[key]
-        print(f"TENSION_PLACE {key[0]} {key[1]} {key[2]} {o[0]} " + " ".join(f"{x / o[0]:.4f}" for x in o[1:]))
+        print(f"TENSION_PLACE {key[0]} tick={key[1]} head={key[2]} {o[0]} " + " ".join(f"{x / o[0]:.4f}" for x in o[1:]))
 
 
 def main():
@@ -697,6 +840,8 @@ def main():
     cmd = sys.argv[1]
     if cmd == "table":
         table(sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5]), int(sys.argv[6]) if len(sys.argv) > 6 else None)
+    elif cmd == "sums":
+        sums_table(sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5])
     elif cmd == "read":
         read_dir(sys.argv[2])
     elif cmd == "oracle":
@@ -707,6 +852,12 @@ def main():
         temper(sys.argv[2])
     elif cmd == "closed":
         closed_lock(sys.argv[2])
+    elif cmd == "midpoint":
+        midpoint(sys.argv[2])
+    elif cmd == "modes":
+        modes(sys.argv[2])
+    elif cmd == "registers":
+        registers(sys.argv[2], sys.argv[3])
     elif cmd == "heat":
         heat(sys.argv[2])
     elif cmd == "links":
