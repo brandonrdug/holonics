@@ -98,3 +98,21 @@ G-TC2 (2026-11-17T17:46:33Z). The control: the same ten passes, sections and ope
   the line feed falls as in the trial (under 0.1), the places past it within 0.15 of the trial's 1.207.
   If the control's units digit stands within 0.3 nats of the trial's 0.860, the closed face is not the cause and the trial reads only
   what concentrated passes over one table do.
+
+Scored (2026-11-17T17:58:37Z), G-TC1 and G-TC2 (trial_a.txt, trial_c.txt, writes_trial_closed.txt, writes_trial_control.txt; held half under mixed openings,
+736 units places, 639 top, 125 middle, 736 line feeds, 3,680 places past them; the same ten passes, sections and openings in both):
+                          founded   after, closed face   after, no closed characters
+  units                    2.591        0.860                 2.272
+  middle                   2.267        1.525                 1.947
+  top                      1.868        1.255                 1.255
+  line feed                0.389        0.039                 0.001
+  places past it           1.978        1.207                 1.208
+  every place              1.851        1.030                 1.211
+  sections' own code, first pass → tenth:   1.659 → 1.157 (closed face),   1.664 → 1.339 (none)
+  free release of 8 places after 96 held prompts: first line equal to the reference 11 (closed face), 1 (none), 2 (lap 94's state);
+  last digit equal 38, 8, 9.
+G-TC1: missed, far past its guess (a fall of 0.05 to 0.4 nats at units was guessed; 1.73 read); the line feed moved 0.35 (guessed under
+  0.05: missed, the passes teach the table's form in both arms); the sections' code fell as guessed.
+G-TC2: held. The control's units digit stands at 2.272 (2.0 or more guessed), its line feed under 0.1, its places past the line feed at
+  1.208 against the trial's 1.207. The units digit and the middle column fall with the closed face alone; the top column, the line feed
+  and the places past it fall alike in both.

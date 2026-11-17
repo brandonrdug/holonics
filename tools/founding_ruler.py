@@ -2,9 +2,7 @@
 """The founding law's premise, read on the engine's own rows (the lead, November 17).
 
 Usage: founding_ruler.py targets DIR
-       founding_ruler.py solve DIR CODEC OUT STEP[,STEP…] [KEY_MODULUS [KEYS_DIR]]
-       founding_ruler.py step DIR CODEC CLOSED_IN CLOSED_OUT ETA ETA_LEG
-       founding_ruler.py mixture DIR CODEC KEYS_DIR
+       founding_ruler.py mixture DIR CODEC KEYS_DIR [OUT]
        founding_ruler.py codes DIR [BEFORE_DIR]
 
 DIR is a `read-tension … all` (or `shares`) directory of short sums `a + b = v`, every answer place opened alone.
@@ -26,11 +24,12 @@ rows share its pull by `Z`.
       moved to its target, and for a row holding the aligned digits at a half each;
 and a planted control: the same reading with the sources' symbols dealt at random within each record, where no target may land.
 
-`solve` writes the closed characters for the engine (`athena found-closed`): the keys by class through CODEC (a ring member's eigenvalue at
-unit modulus on `2^(−16)`, zero off the ring) and the return `W_K = −STEP · B`, `B` the least-squares map from every head's keyed pair
-products to the covector at the open place on the fitting half (the part of the tension the products explain). The step is read, never
-set: one file a step is written, each founded state's code is read on the fitting half (`codes`), and the step that codes it lowest is
-the founding's; the held half is reported at that step.
+`mixture` reads the part as the engine holds it (`holonics_engine::closed`): each head's last-tick row gives a density over the ring,
+`R_h(x) = Σ_(s≠s′) p_s p_s′ c(u_s, u_s′, x)`, and the place's face is the field's own mixed with them, `p(x) = (1 − Σ_h w_h M_h) p_field(x)
++ Σ_h w_h R_h(x)`, the weights a face of odds. It reads the written symbol's code under the field's face, under the mixture at one odds a
+head, and at odds read from the place's last pair chart (rows fitted on the fitting half), by kind of place on the held half. With OUT
+it writes the founding's words for `athena host complete-language found-closed`: the keys by class through CODEC at unit modulus, the
+odds' rows at zero and each head's bias at its one-odds fit, in bits. `codes` reads a `read-tension` directory's codes by kind of place.
 
 A ruler: floats, labels and a table's layout, on the host, outside the machine."""
 import hashlib
@@ -209,105 +208,13 @@ def products(rows, heads, n_rows, key_of, e):
     return feats
 
 
-def write_closed(path, e, kwords, leg, bias, w):
-    out = [np.rint(leg * 2.0**24), np.rint(bias * 2.0**16), np.rint(w * 2.0**24)]
-    assert max(np.abs(o).max() for o in out) < 2**31, "a word past its 32 bits"
-    with open(path, "xb") as f:
-        f.write(np.array([e], dtype="<i4").tobytes())
-        f.write(kwords.astype("<i4").tobytes())
-        for o in out:
-            f.write(o.astype("<i4").tobytes())
-
-
-def least_squares(x, y):
-    gram = x.T @ x
-    return np.linalg.solve(gram + 1e-6 * np.trace(gram) / gram.shape[0] * np.eye(gram.shape[0]), x.T @ y).T
-
-
-def solve(d, codec, out, steps, gain=1.0, keys_dir=None):
-    """The closed characters' keys, leg and return, written for `athena found-closed` (see the module's text). `steps` is a comma list of
-    step sizes; one file `OUT.<k>.closed` is written a step. The site's leg is founded at one. The keys are closed on KEYS_DIR's rows where
-    given (a directory whose open places are a ring's symbols alone), DIR's otherwise."""
-    dw, heads, meta, lam, _, rows = open_rows(d)
-    symbols, index, keys, member = locate_keys(read_rows(keys_dir) if keys_dir else rows)
-    for ch in {c for m in meta for c in text_of(m[0])} - set(index):
-        index[ch] = len(member)
-        member = np.append(member, False)
-        keys = np.hstack([keys, np.zeros((len(keys), 1))])
-    e = len(keys)
-    feats = products(rows, heads, len(meta), lambda text, js: keys[:, [index[text[j]] for j in js]], e)
-    fit = np.array([half_of(m[0]) == 0 for m in meta])
-    b = least_squares(feats[fit], lam[fit])  # [D][heads·2E]
-    pred = feats[~fit] @ b.T
-    share = 1.0 - ((lam[~fit] - pred) ** 2).sum() / (lam[~fit] ** 2).sum()
-    print(f"SOLVE_RETURN rows={len(meta)} fit={int(fit.sum())} heads={heads} characters={e} covector_share_removed_held={share:.4f} rms_covector={np.sqrt((lam**2).mean()):.3e} rms_predicted={np.sqrt((pred**2).mean()):.3e}")
-    cls, alphabet = codec_classes(codec)
-    kw = np.zeros((alphabet, 2 * e))
-    for ch, i in index.items():
-        if member[i]:
-            kw[cls[ord(ch)], :e] = keys[:, i].real
-            kw[cls[ord(ch)], e:] = keys[:, i].imag
-    # A key at modulus `gain`: the products then stand `gain²` higher and the return's entries as much lower, inside their 32-bit words.
-    kwords = np.rint(gain * kw * 2.0**16)
-    print(f"SOLVE_KEYS ring={''.join(ch for ch, i in sorted(index.items(), key=lambda t: t[1]) if member[i])!r} classes={[cls[ord(ch)] for ch, i in sorted(index.items(), key=lambda t: t[1]) if member[i]]}")
-    cols = heads * 2 * e
-    leg, bias = np.zeros((cols, dw)), np.zeros(cols)
-    for h in range(heads):
-        bias[h * 2 * e : h * 2 * e + e] = 1.0
-    for k, step in enumerate(steps):
-        w = -step * b / gain**2
-        path = f"{out}.{k}.closed"
-        write_closed(path, e, kwords, leg, bias, w)
-        print(f"SOLVE_WRITTEN {path} step={step:g} key_modulus={gain:g} largest_return={np.abs(w).max():.4f}")
-
-
-def step(d, codec, closed_in, closed_out, eta, eta_leg):
-    """One more step of the solve: DIR is a `read-tension` directory (`all` or `shares`) of the state founded with CLOSED_IN (the ruler's
-    reverse, the closed characters' return held constant). With CLOSED_IN's own keys and leg the products `c = E γ` are formed at each open
-    row. The return moves `−ETA` times the least-squares map from `c` to the covector at the place; the leg moves `−ETA_LEG` times the
-    least-squares map from the place's opening chart to the leg's covector, `conj(E) (W_Kᵀ λ)`. Both on the fitting half."""
-    dw, heads, meta, lam, chart, rows = open_rows(d)
-    words = np.fromfile(closed_in, dtype="<i4")
-    e = int(words[0])
-    cls, alphabet = codec_classes(codec)
-    cols = heads * 2 * e
-    at = 1 + alphabet * 2 * e
-    kwords = words[1:at]
-    kw = kwords.reshape(alphabet, 2 * e).astype(np.float64) / 2.0**16
-    key = kw[:, :e] + 1j * kw[:, e:]
-    leg = words[at : at + cols * dw].reshape(cols, dw).astype(np.float64) / 2.0**24
-    bias = words[at + cols * dw : at + cols * (dw + 1)].astype(np.float64) / 2.0**16
-    w = words[at + cols * (dw + 1) :].reshape(dw, cols).astype(np.float64) / 2.0**24
-    feats = products(rows, heads, len(meta), lambda text, js: key[[cls[ord(text[j])] for j in js]].T, e)
-    fit = np.array([half_of(m[0]) == 0 for m in meta])
-    gamma = chart @ leg.T + bias  # [row][cols]
-    re = np.concatenate([np.arange(h * 2 * e, h * 2 * e + e) for h in range(heads)])
-    im = re + e
-    c = np.zeros_like(feats)
-    c[:, re] = feats[:, re] * gamma[:, re] - feats[:, im] * gamma[:, im]
-    c[:, im] = feats[:, re] * gamma[:, im] + feats[:, im] * gamma[:, re]
-    b = least_squares(c[fit], lam[fit])
-    pred = c[~fit] @ b.T
-    share = 1.0 - ((lam[~fit] - pred) ** 2).sum() / (lam[~fit] ** 2).sum()
-    dc = lam @ w  # [row][cols], the products' covector
-    dg = np.zeros_like(dc)
-    dg[:, re] = feats[:, re] * dc[:, re] + feats[:, im] * dc[:, im]
-    dg[:, im] = -feats[:, im] * dc[:, re] + feats[:, re] * dc[:, im]
-    x1 = np.hstack([chart, np.ones((len(meta), 1))])
-    bg = least_squares(x1[fit], dg[fit])  # [cols][D + 1]
-    w_new = w - eta * b
-    leg_new, bias_new = leg - eta_leg * bg[:, :dw], bias - eta_leg * bg[:, dw]
-    write_closed(closed_out, e, kwords, leg_new, bias_new, w_new)
-    print(f"STEP rows={len(meta)} fit={int(fit.sum())} covector_share_removed_held={share:.4f} rms_covector={np.sqrt((lam**2).mean()):.3e} eta={eta:g} eta_leg={eta_leg:g} largest_return={np.abs(w_new).max():.3f} rms_leg_row={np.sqrt((leg_new**2).mean()):.4f} leg_bias_mean_real={bias_new[re].mean():.3f}")
-
-
 def kind_of(label, place):
     v = label.split(":")[5]
     c = len(v) - 1 - place
     return "units" if c == 0 else ("top" if place == 0 else ("middle" if c > 0 else ("line_feed" if c == -1 else "past")))
 
 
-def mixture(d, codec, keys_dir, rounds=400, rate=0.05):
+def mixture(d, codec, keys_dir, out=None, rounds=400, rate=0.05):
     """The closed face as a mixture, read on a `read-tension … shares` directory (see the module's text): the written symbol's code under
     the field's own face, and under that face mixed with each head's ring face at odds read from the place's last pair chart, the odds'
     rows fitted on the fitting half by ascent on the written symbol's likelihood. By kind of place, held half, nats a place."""
@@ -391,7 +298,20 @@ def mixture(d, codec, keys_dir, rounds=400, rate=0.05):
         sel = (~fit) & ((kinds == kind) | (kind == "every"))
         if sel.sum():
             print(f"MIXTURE {kind} {int(sel.sum())} | {base[sel].mean():.4f} {c_bias[sel].mean():.4f} {c_full[sel].mean():.4f} | {wt_full[sel].mean():.3f} {m2[sel, 0].mean():.3f}")
-    np.save(os.path.join(d, "mixture_rows.npy"), w_full)
+    if out:
+        # The founding's words: the keys at unit modulus, the odds' rows at zero and each head's bias at its one-odds fit (in bits, the
+        # engine's odds being a face of base two).
+        kw = np.zeros((alphabet, 2 * e))
+        for i in ring:
+            kw[cls[ord(symbols[i])], :e] = keys[:, i].real
+            kw[cls[ord(symbols[i])], e:] = keys[:, i].imag
+        bias = w_bias[:, dw] / np.log(2.0)
+        with open(out, "xb") as f:
+            f.write(np.array([e], dtype="<i4").tobytes())
+            f.write(np.rint(kw * 2.0**16).astype("<i4").tobytes())
+            f.write(np.zeros(heads * dw, dtype="<i4").tobytes())
+            f.write(np.rint(bias * 2.0**16).astype("<i4").tobytes())
+        print(f"MIXTURE_WRITTEN {out} characters={e} odds_bias_bits={np.round(bias, 3).tolist()}")
 
 
 def codes(d, base=None):
@@ -425,12 +345,8 @@ def codes(d, base=None):
 
 
 def main():
-    if len(sys.argv) >= 6 and sys.argv[1] == "solve":
-        return solve(sys.argv[2], sys.argv[3], sys.argv[4], [float(v) for v in sys.argv[5].split(",")], float(sys.argv[6]) if len(sys.argv) > 6 else 1.0, sys.argv[7] if len(sys.argv) > 7 else None)
-    if len(sys.argv) == 8 and sys.argv[1] == "step":
-        return step(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5], float(sys.argv[6]), float(sys.argv[7]))
-    if len(sys.argv) == 5 and sys.argv[1] == "mixture":
-        return mixture(sys.argv[2], sys.argv[3], sys.argv[4])
+    if len(sys.argv) in (5, 6) and sys.argv[1] == "mixture":
+        return mixture(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5] if len(sys.argv) > 5 else None)
     if len(sys.argv) >= 3 and sys.argv[1] == "codes":
         return codes(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else None)
     if len(sys.argv) < 3 or sys.argv[1] != "targets":

@@ -171,18 +171,14 @@ pub struct Declaration {
     /// `α(r̂(x + W_out y))` (`agent-inferred`). Needs triads; `false` writes every head line exactly as before; `true` writes `hnn-field-v14x`,
     /// the eighteen words of `v14l` with the loudness's word written as `0` or `1`, then `1`.
     pub crossing: bool,
-    /// [definition; the lead, November 17 (the founding record); agent-inferred realization] **The closed characters**: `E` characters of a ring
-    /// whose keys were located by closing a menu of the field's own rows (atlas `key.ring-closed-from-rows-menu`). Each class holds a key, `E`
-    /// complex numbers on `2^(−16)` (a ring member's eigenvalue at unit modulus under each closed character; zero for a class off the ring), and
-    /// every head's open row gives the keyed pair product of its sources, `E_e = Y_e² − Σ_s (p_s K_e(u_s))²` with `Y_e = Σ_s p_s K_e(u_s)` over
-    /// the row's known sources: twice the sum over the row's unordered pairs of sources of their shares' product times their keys' product, the
-    /// character of the pair's composition on the ring (atlas `contact.keyed-pair-product-through-row`). It returns to the open site's state
-    /// through `W_K` (`D × heads·2E`), released once beside the current's return. Why a part of its own: a law that lives wholly in a product
-    /// of two sources has no slope where both operands are drawn and the return stands at zero (the saddle of November 16); with the keys
-    /// located, the product is a feature that stands at its founding and its return has a first-order covector. Founded by
-    /// [`Constitution::with_closed`] from a ruler's keys and return; `E = 0` writes every head line exactly as before, and `E > 0` writes
-    /// `hnn-field-v14c`: the nineteen words of `v14x` with the crossing's word written as `0` or `1`, then `E`. An attempt: its forward is the
-    /// host's alone, and a field with closed characters is refused by the reverse and by the card until both are built, so no lap trains from one.
+    /// [definition; the lead, November 17 (the founding records); agent-inferred realization] **The closed characters**: `E` characters of a
+    /// ring whose keys were located by closing a menu of the field's own rows (atlas `key.ring-closed-from-rows-menu`). Each class holds a
+    /// key, `E` complex numbers on `2^(−16)` (a ring member's eigenvalue at unit modulus under each closed character; zero for a class off the
+    /// ring), and each open site's face is the field's own mixed with what its heads' last-tick rows close to, at odds read from the chart
+    /// the readout reads ([`crate::closed`]: the law, its reverse and why it is a mixture at the face). Founded by
+    /// [`Constitution::with_closed`] from a ruler's keys and odds; `E = 0` writes every head line exactly as before, and `E > 0` writes
+    /// `hnn-field-v14c`: the nineteen words of `v14x` with the crossing's word written as `0` or `1`, then `E`. An attempt: the card
+    /// refuses a field with closed characters until its realization is built, and the keys take no deposit.
     pub closed: usize,
 }
 
@@ -465,8 +461,8 @@ impl Declaration {
         if self.crossing && self.triads == 0 {
             return refuse("a field whose triads' legs stand at the site needs triads");
         }
-        // The closed characters' families, `A × 2E` keys and `D × heads·2E`, are laid within the carrier their offsets are counted in.
-        if self.closed.checked_mul(2).and_then(|r| r.checked_mul(self.heads)).and_then(|r| r.checked_mul(self.width.saturating_add(self.alphabet))).is_none() {
+        // The closed characters' families, `A × 2E` keys and `heads × (D + 1)` odds, are laid within the carrier their offsets are counted in.
+        if self.closed.checked_mul(2).and_then(|r| r.checked_mul(self.alphabet)).is_none() {
             return refuse("a field's closed characters past the carrier their families are laid in");
         }
         // The triads' families, `6J` rows of `D`, `6J` biases and `D × 2J`, are laid within the carrier their offsets are counted in.
@@ -675,10 +671,12 @@ pub struct Loci {
     /// [definition; Brandon, November 15 02:06Z] **The face's loudness** ([`Declaration::loud`]): `κ_ℓ`, one entry a lane, then `b`, on the
     /// face's grain, so `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b`; the last family, zero long where the face does not read its sites' loudness.
     pub loud: usize,
-    /// The closed characters' keys (`A × 2E`: a class's `E` real parts, then its `E` imaginary parts, on `2^(−16)`) and their return
-    /// (`D × heads·2E`: a head's `E` real parts, then its `E` imaginary parts), zero long where the field has none ([`Declaration::closed`]).
+    /// The closed characters' keys (`A × 2E`: a class's `E` real parts, then its `E` imaginary parts, on `2^(−16)`) and the odds each head's
+    /// ring face is mixed at (`heads` rows of `D` on `2^(−24)`, then a bias a head on `2^(−16)`), zero long where the field has none
+    /// ([`Declaration::closed`]).
     pub closed_key: usize,
-    pub w_closed: usize,
+    pub closed_odds: usize,
+    pub closed_odds_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -740,7 +738,9 @@ impl Loci {
         let (junction, junction_bias) = (tail(joined * dw, MATERIAL_BITS), tail(joined, FACE_BITS));
         let mark = tail(usize::from(d.mark) * MARK_BASES, MATERIAL_BITS);
         let loud = tail(usize::from(d.loud) * (d.lanes + 1), FACE_BITS);
-        let (closed_key, w_closed) = (tail(a * 2 * d.closed, FACE_BITS), tail(dw * d.heads * 2 * d.closed, MATERIAL_BITS));
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, w_closed, len: at, families }
+        let has = usize::from(d.closed > 0);
+        let closed_key = tail(a * 2 * d.closed, FACE_BITS);
+        let (closed_odds, closed_odds_bias) = (tail(has * d.heads * dw, MATERIAL_BITS), tail(has * d.heads, FACE_BITS));
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, len: at, families }
     }
 }

@@ -24,7 +24,7 @@ impl Constitution {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, closed_blind: false, mark: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, mark: None }
     }
 
     /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
@@ -532,13 +532,13 @@ impl Constitution {
         Ok((out, from))
     }
 
-    /// [definition; the lead, November 17, the founding record] **The field with closed characters** ([`Declaration::closed`]): the keys
-    /// (`A × 2E` on `2^(−16)`) and the return (`D × heads·2E` on `2^(−24)`) appended at the end of the material from a ruler's words, every
-    /// standing entry kept at its index; no key byte is read and the draws do not move. Also the map from each new entry to the old one it
-    /// copies (`None` for the two families). A tower keeps its level as it stands (the level's ticks read no closed characters), and its
-    /// entries follow the fine field's in the material ([`Constitution::material_len`]), as the junction's growth keeps it. Refused on a field
-    /// that has closed characters, and where the words are not the two families' lengths.
-    pub fn with_closed(&self, closed: usize, keys: &[i32], ret: &[i32]) -> Result<(Self, Vec<Option<usize>>)> {
+    /// [definition; the lead, November 17, the founding records] **The field with closed characters** ([`Declaration::closed`]): the keys
+    /// (`A × 2E` on `2^(−16)`) and the odds (`heads` rows of `D` on `2^(−24)`, then a bias a head on `2^(−16)`) appended at the end of the
+    /// material from a ruler's words, every standing entry kept at its index; no key byte is read and the draws do not move. Also the map from
+    /// each new entry to the old one it copies (`None` for the families). A tower keeps its level as it stands, and its entries follow the fine
+    /// field's in the material, as the junction's growth keeps it. Refused on a field that has closed characters, and where the words are not
+    /// the families' lengths.
+    pub fn with_closed(&self, closed: usize, keys: &[i32], odds: &[i32]) -> Result<(Self, Vec<Option<usize>>)> {
         if self.declaration.closed > 0 {
             return refuse("a field that already has closed characters");
         }
@@ -548,13 +548,13 @@ impl Constitution {
         let d = Declaration { closed, ..self.declaration };
         d.admit()?;
         let layout = Loci::new(&d);
-        if self.theta.len() != layout.closed_key || keys.len() != d.alphabet * 2 * closed || ret.len() != d.width * d.heads * 2 * closed {
-            return refuse("closed characters whose keys or return are not their families' lengths, or a field whose material does not end where they begin");
+        if self.theta.len() != layout.closed_key || keys.len() != d.alphabet * 2 * closed || odds.len() != d.heads * (d.width + 1) {
+            return refuse("closed characters whose keys or odds are not their families' lengths, or a field whose material does not end where they begin");
         }
         let (fine, total) = (self.theta.len(), self.material_len());
         let mut theta = self.theta.clone();
         theta.extend_from_slice(keys);
-        theta.extend_from_slice(ret);
+        theta.extend_from_slice(odds);
         let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
         from.resize(layout.len, None);
         from.extend((fine..total).map(Some));
@@ -1042,13 +1042,14 @@ impl Learner {
 
     /// [definition; the lead, November 17, the founding record] **The learner with closed characters** ([`Constitution::with_closed`]): every
     /// standing entry keeps its moments, its remainder and its rate; the two families' moments open at zero and, where the learner carries each
-    /// entry's own rate, their entries take `rate_bits`. They are no founded part yet: the field has no reverse, so no deposit reads them. The
+    /// entry's own rate, their entries take `rate_bits`. They are no founded part: the odds step at the old entries' rate and the keys take no
+    /// covector. The
     /// draws, the laps and the pass are kept; the held step and the last section's step are dropped. Refused while a step is held.
-    pub fn with_closed(&self, closed: usize, keys: &[i32], ret: &[i32]) -> Result<Self> {
+    pub fn with_closed(&self, closed: usize, keys: &[i32], odds: &[i32]) -> Result<Self> {
         if self.held.is_some() {
             return refuse("a learner takes closed characters after its held step is read");
         }
-        let (field, from) = self.field.with_closed(closed, keys, ret)?;
+        let (field, from) = self.field.with_closed(closed, keys, odds)?;
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());

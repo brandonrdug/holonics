@@ -18,7 +18,23 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 17): the phase is reviewed and the build is a founding law
+## Where the work stands (November 17, evening): the line is stopped and the learning law is under review
+
+Brandon read the day's writes as no gain on what was already attained, and the step back agrees
+([the record](research/records/2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)).
+Athena learns structure and does not compound. What trains is a small masked-reconstruction stack changed only by a step on one
+comparison: nothing binds (a row never locks onto its sources, so a face is a blend), nothing tempers (the deposit has no leak and its
+rates never fall), a part has no receipt of its own, and a symbol is a free row. The October records had measured this design and derived
+its repair, and the November field consumed none of them ([THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine)
+holds the table). One controlled run places the fault: ten concentrated passes over 3,923 short sums leave the plain engine's held units
+digit at 2.27 nats (flat 2.30; 1 of 96 held sums written whole), and the same passes with one part's rows compared themselves, the closed
+face, bring it to 0.86 (11 of 96). Both arms' writes are poor as products.
+
+Decided: lap 94's state is frozen and the line is stopped after lap 95; no part is added to that state. The work is a tempering study on
+small worlds, many passes over little: first a leak and a cooling as states of the deposit, then every part comparing locally. Writes are
+read first at every step (the guide's method rule of November 17). The machine that follows is decided from what the study writes.
+
+### Earlier on November 17: the phase reviewed and the first founding attempt
 
 The phase from lap 71 to lap 94 (the arithmetic world, the word problems and the world's acts) trained no behaviour: no held value
 is written whole, a sum's units digit codes flat, and on prose the line codes no better than a plain count of three neighbours a

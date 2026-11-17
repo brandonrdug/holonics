@@ -51,9 +51,6 @@ pub fn shares(face: &TowerFace) -> Shares {
 /// One tick's forward temporaries over a region.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct TickCell {
-    /// [the lead, November 17] The closed characters' keyed pair products at the open sites (`[t][heads·2E]` on `2^(−16)`: a head's `E` real
-    /// parts, then its `E` imaginary parts; zero at a site that is not open); empty on a field with none ([`Declaration::closed`]).
-    pub(crate) closed: Vec<i64>,
     /// The tick's own clocks (§16.44), `None` where they are the pass's (the first tick, or a region with no blank).
     pub(crate) clock: Option<Box<TickClock>>,
     /// [theory, November 13, the junction record §7] The tick's return, where the tick has one (past the first): each site's chart read `ℓ`
@@ -377,6 +374,8 @@ pub(crate) struct Forward {
     /// Each unresolved site's lift `R r̂ + b_R` on `2^(−16)` (§16.26), which its face reads through the encoding.
     pub(crate) lift: Vec<i64>,
     pub(crate) faces: Vec<Option<TowerFace>>,
+    /// [the lead, November 17] Each site's mixture where its face is the closed face ([`crate::closed`]), kept for the reverse; `None` elsewhere.
+    pub(crate) mixes: Vec<Option<crate::closed::Mix>>,
     /// Each unresolved site's readout logits `z_t` on `2^(−16)` bits (the face is `2^(z − peak)`).
     pub(crate) logits: Vec<Option<Vec<i64>>>,
     /// The site pairs the contact met, `Σ_(h, tick, i) |S_i^h|`.
@@ -413,7 +412,6 @@ pub(crate) struct Reaches {
     pub(crate) read: u64,
     pub(crate) moment_face: u64,
     pub(crate) junction: u64,
-    pub(crate) w_closed: u64,
 }
 
 impl Constitution {
@@ -448,7 +446,13 @@ impl Constitution {
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
         let j = self.declaration.triads;
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2), junction: r(l.junction, usize::from(self.declaration.junction) * dw), w_closed: r(l.w_closed, dw * self.declaration.heads * 2 * self.declaration.closed) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2), junction: r(l.junction, usize::from(self.declaration.junction) * dw) }
+    }
+
+    /// [the lead, November 17] Each site's written class where it is known (resolved and carried as no face), the alphabet's length elsewhere:
+    /// the sources whose keys a row's closed face reads ([`crate::closed`]).
+    pub(crate) fn known_classes(region: &Region, alphabet: usize) -> Vec<usize> {
+        (0..region.classes.len()).map(|t| if !region.unresolved[t] && Self::carried(region, t).is_none() { region.classes[t] } else { alphabet }).collect()
     }
 
     /// A site's encoding row: its class, or the unresolved row.
@@ -459,7 +463,7 @@ impl Constitution {
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], known: &[usize], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell) -> Result<()> {
+    pub(crate) fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -579,8 +583,6 @@ impl Constitution {
         let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
         cell.crowds = Vec::with_capacity(heads * sites);
         cell.sums = Vec::with_capacity(heads);
-        let closed = d.closed;
-        cell.closed = vec![0i64; sites * heads * 2 * closed];
         for h in 0..heads {
             let lists = &cell.classes[h];
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
@@ -669,27 +671,6 @@ impl Constitution {
                 for (c, &share) in crowds.iter_mut().zip(&shares[row.len()..]) {
                     c.e = share;
                 }
-                // [definition; the lead, November 17, the founding record] The closed characters' keyed pair product of an open row
-                // ([`Declaration::closed`]): each known source's term `p_s K_e(u_s)` released once to `2^(−30)`, the terms and their squares
-                // summed whole, and `E_e = Y_e² − Σ_s term_s²` released once to `2^(−16)`.
-                if closed > 0 && lists.listens(i) {
-                    let key = &self.theta[l.closed_key..l.closed_key + d.alphabet * 2 * closed];
-                    let at = (i * heads + h) * 2 * closed;
-                    for e in 0..closed {
-                        let (mut yr, mut yi, mut sr, mut si) = (0i128, 0i128, 0i128, 0i128);
-                        for src in row.iter().filter(|src| known[src.j as usize] < d.alphabet) {
-                            let u = known[src.j as usize];
-                            let (kr, ki) = (key[u * 2 * closed + e] as i128, key[u * 2 * closed + closed + e] as i128);
-                            let (tr, ti) = (release(src.p as i128 * kr, SHARE_BITS + FACE_BITS - MOVE_BITS), release(src.p as i128 * ki, SHARE_BITS + FACE_BITS - MOVE_BITS));
-                            yr += tr;
-                            yi += ti;
-                            sr += tr * tr - ti * ti;
-                            si += 2 * tr * ti;
-                        }
-                        cell.closed[at + e] = fit64(release(yr * yr - yi * yi - sr, 2 * MOVE_BITS - FACE_BITS))?;
-                        cell.closed[at + closed + e] = fit64(release(2 * yr * yi - si, 2 * MOVE_BITS - FACE_BITS))?;
-                    }
-                }
                 for li in 0..n {
                     let (ur, ui) = self.frame(paces, i, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
@@ -708,16 +689,6 @@ impl Constitution {
             affine(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, &cell.y[t * m2..(t + 1) * m2], Some(&self.theta[l.out_bias..l.out_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
             for (xv, ov) in x[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
                 *xv = fit64(*xv as i128 + *ov as i128)?;
-            }
-        }
-        // [definition; the lead, November 17] The closed characters' return at each open site, `x ← x + release(W_K E, M)`, a release of its own.
-        if closed > 0 {
-            let cols = heads * 2 * closed;
-            for t in (0..sites).filter(|&t| !definite[t]) {
-                affine(&self.theta[l.w_closed..l.w_closed + dw * cols], reaches.w_closed, cols, &cell.closed[t * cols..(t + 1) * cols], None, MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
-                for (xv, ov) in x[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
-                    *xv = fit64(*xv as i128 + *ov as i128)?;
-                }
             }
         }
         // The pair contact.
@@ -878,9 +849,6 @@ impl Constitution {
         let mut x = self.open(region, &moment, marks)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
-        // [the lead, November 17] Each site's written class where it is known (resolved and carried as no face), the alphabet's length elsewhere:
-        // the sources whose keys an open row's closed characters read ([`Declaration::closed`]).
-        let known: Vec<usize> = (0..region.classes.len()).map(|t| if !region.unresolved[t] && Self::carried(region, t).is_none() { region.classes[t] } else { d.alphabet }).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
         let news = if self.scale.is_some() { self.level_news(region)? } else { Vec::new() };
         let mut out = Forward::default();
@@ -916,7 +884,7 @@ impl Constitution {
             if self.lock_carry.is_some() {
                 cell.lock_prev = std::mem::take(&mut locks);
             }
-            self.tick(&mut x, &definite, &keyed, &known, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
             if self.lock_carry.is_some() {
                 locks = cell.rows.iter().map(|row| row.iter().map(|src| (src.j, src.s)).collect()).collect();
             }
@@ -993,6 +961,8 @@ impl Constitution {
         out.scale = vec![0i128; sites * d.lanes];
         out.faces = vec![None; sites];
         out.logits = vec![None; sites];
+        out.mixes = vec![None; sites];
+        let known = Self::known_classes(region, d.alphabet);
         let l = &self.layout;
         let mut z = vec![0i64; d.alphabet];
         let (mut r, mut s) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
@@ -1016,7 +986,19 @@ impl Constitution {
                     *zc = fit64(*zc as i128 - release(echo.b as i128 * lc as i128, SHARE_BITS))?;
                 }
             }
-            out.faces[t] = Some(self.tempered(&z, 1));
+            let field = self.tempered(&z, 1);
+            // [definition; the lead, November 17] The closed face ([`crate::closed`]): the field's own face mixed with what the site's heads'
+            // last-tick rows close to; a port's places keep the field's face (their covector is their coupling's).
+            let ported = region.port.as_ref().is_some_and(|p| t >= p.start);
+            out.faces[t] = Some(match before.as_deref().filter(|_| d.closed > 0 && !ported) {
+                Some(last) => {
+                    let rows: Vec<&[Source]> = (0..d.heads).map(|h| last[h * sites + t].as_slice()).collect();
+                    let (mixed, mix) = self.closed_mix(field, &rows, &known, &r)?;
+                    out.mixes[t] = Some(mix);
+                    mixed
+                }
+                None => field,
+            });
             out.logits[t] = Some(z.clone());
             out.read[t * dw..(t + 1) * dw].copy_from_slice(&r);
             out.scale[t * d.lanes..(t + 1) * d.lanes].copy_from_slice(&s);
