@@ -702,3 +702,25 @@ return the wheel under the plus and the minus and the ring of four under the tim
 What it decides: G-SG1 and G-SG3 held, the closure reads each law of the passage under the symbol that selects it, a product's
 units among them, and the founding's form is a key a context; G-SG1 missed, three shares are too thin a menu for the rows as
 they stand, and the context has to come from the chart, not the row.
+
+SCORES of G-SG1 to G-SG3, read from the clock at 10:40:28 UTC, November 17 (context86.txt, context86_planted.txt,
+context86_presence.txt; 4,500 distinct two-operand records of the redrawn slice, 1,500 an operation, every place but the first
+opened in turn, 52,854 places, lap 86's mean, head 0; host, eight threads for the dump in 4 minutes, one a ruler in under a
+minute, beside lap 89 on the card)
+The instrument first. On the planted menu (the units digits and the record's sign) the blocks come out with no label: under
+the plus and the minus the ten digits, under the times sign two blocks, 1 3 7 9 and 2 4 6 8. Under the plus the wheel returns
+at 0.998 (j = 9) and 0.984 (j = 3), under the minus at 0.999 and 0.994, and under the times sign a ring of four on each block
+at 0.977 and 1.000 with a quadratic character beside it: the units' group under multiplication, keyed as a discrete logarithm.
+The dealt menu returns only functions of the layout's symbols.
+G-SG1 missed: on the real rows the plus as a source holds under 0.02 of the three-source menu and no wheel is returned under
+it.
+G-SG2 missed: under the minus (0.030 of the menu) the blocks come out in fragments and no line or plane returns the wheel.
+G-SG3: no wheel under the times sign, as guessed, and no ring of four either (missed): under it (0.024 of the menu) the spans
+are functions of fragments of the digits with no lattice in their phases.
+A diagnosis read after the scores (context86_presence.txt; not guessed): with the sign taken as present among a row's sources,
+whatever its share, and the menu of pairs kept, the plus returns the wheel at 0.937 (j = 1) and the minus at 0.932 (j = 3) at
+tick 0, each at the 100th percentile of its null, from blocks that hold the ten digits; the times sign returns nothing with a
+lattice.
+Decided as the guess said: three shares are too thin a menu for the rows as they stand, since head 0 gives a sign a few
+hundredths of its row. Which law a place is under is known at the place by other ways than this row's share on the sign, so a
+context has to come from the place's own chart, and a product's units law is not closed by anything read here.

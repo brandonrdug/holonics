@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | planes [planted]]
+Usage: loop_closure_ruler.py DIR [planted | release | planes [planted] | context TABLE [planted]]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -41,6 +41,16 @@ images' power its first one and two singular directions hold), and in it the fun
 such a plane is a character; that function's own phases at the symbols are the keys, and its support is the ring's membership. The
 plain closure's read of the same menu is printed beside it, and by the ruler's knowledge of the roles the menu of the value's places
 alone and of the operands' places alone.
+
+With `context TABLE`, DIR is read against the table it was written from (a label's text is its prompt and run), and the menu takes
+three sources: `T[s, u, w, x]`, every ordered triple of distinct sources weighed by the product of their three shares, with the
+symbol written. Each context symbol `s` has its own family of operators `(P_(s,u) f)(w) = E[f(x) | s, u, w]`, which is cut to a block
+of symbols read from the menu (two symbols alike where the symbols written beside them, as sources, correlate at 0.9) and closed by
+lines and planes as `planes` does. Why: a passage that holds sums, differences and products on the same symbols holds operators that
+share no plane (`w ↦ u w` against `w ↦ w + u`), so one menu of pairs cannot close on it, and the row meets the sign too.
+`CONTEXT_SPAN` gives each clean line or plane under each context with its support and the keys of its symbols in turns; the scores
+beside it (the ten digits as characters of ℤ/10; the digits 1, 3, 9, 7 and 2, 6, 8, 4 as characters of ℤ/4, a discrete logarithm's
+order) are the ruler's.
 
 Floats, counts and the knowledge of which bytes are digits are a ruler's (CLAUDE.md, a ruler is an instrument). The sums are synthetic,
 so their records are printed freely."""
@@ -211,6 +221,121 @@ def report_planes(name, tables, symbols, head=0, tick=0):
                 print(line, flush=True)
 
 
+def table_texts(table):
+    """A table's labels with their texts (prompt and run, a line feed written `\\n`)."""
+    out = {}
+    for line in open(table):
+        w = line.rstrip("\n").split("\t")
+        out[w[0]] = (w[1] + w[2]).replace("\\n", "\n")
+    return out
+
+
+def menus_context(d, texts, planted=None, head=0, seed=17):
+    """`T[tick][s, u, w, x]` for one head: every ordered triple of distinct sources of the open place's row, weighed by the product of
+    their shares, with the written symbol; and the symbols. By symbol, the triples over distinct sites are the shares' sums' product
+    less the triples that take one site twice. `planted`: "aligned" (at a units digit's place, the other two numbers' units digits and
+    the record's sign, at shares 0.4, 0.4 and 0.2) or "dealt" (the true rows, the written symbols dealt at random among the places)."""
+    import re
+
+    rng = np.random.default_rng(seed)
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    lines = [line for line in lines if int(line[3]) == head]
+    symbols = sorted({c for line in lines for c in texts[line[0]]})
+    index = {c: i for i, c in enumerate(symbols)}
+    n = len(symbols)
+    written = [texts[line[0]][int(line[4])] for line in lines]
+    if planted == "dealt":
+        places = sorted({(line[0], line[4]) for line in lines})
+        dealt = dict(zip(places, rng.permutation([texts[lab][int(site)] for lab, site in places])))
+        written = [dealt[(line[0], line[4])] for line in lines]
+    record = re.compile(r"^(\d+) ([+\-*]) (\d+) = (-?\d+)\n$")
+    out = {}
+    for line, x in zip(lines, written):
+        tick, site = int(line[2]), int(line[4])
+        text = texts[line[0]]
+        if planted == "aligned":
+            m = record.match(text)
+            ends = {"a": m.end(1) - 1, "b": m.end(3) - 1, "v": m.end(4) - 1}
+            sources = [(e, 0.4) for name, e in ends.items() if e != site] + [(m.start(2), 0.2)] if site in ends.values() else []
+        else:
+            sources = [(int(j), int(p_) / 1e6) for j, p_, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        if len(sources) < 3:
+            continue
+        us = np.array([index[text[j]] for j, _ in sources])
+        ps = np.array([p_ for _, p_ in sources])
+        q1, q2, q3 = (np.bincount(us, weights=ps**k, minlength=n) for k in (1, 2, 3))
+        eye = np.eye(n)
+        triple = np.einsum("s,u,w->suw", q1, q1, q1)
+        triple -= np.einsum("s,su,w->suw", q2, eye, q1) + np.einsum("u,uw,s->suw", q2, eye, q1) + np.einsum("s,sw,u->suw", q2, eye, q1)
+        triple += 2 * np.einsum("s,su,sw->suw", q3, eye, eye)
+        out.setdefault(tick, np.zeros((n, n, n, n)))[:, :, :, index[x]] += triple
+    return out, symbols
+
+
+def blocks_of(t, level=0.9):
+    """The blocks of a menu's symbols, read from the menu: two symbols are alike where the symbols written beside them, as sources,
+    correlate at `level` or more."""
+    ux = t.sum(axis=1)
+    ux = ux / np.maximum(ux.sum(axis=1, keepdims=True), 1e-30)
+    norm = np.sqrt(np.maximum((ux**2).sum(axis=1), 1e-30))
+    corr = (ux @ ux.T) / np.outer(norm, norm)
+    live = t.sum(axis=(1, 2)) > 0
+    found = []
+    for i in np.flatnonzero(live):
+        b = tuple(int(k) for k in np.flatnonzero((corr[i] >= level) & live))
+        if b not in found:
+            found.append(b)
+    return found
+
+
+def ring_of_four(f, symbols, order):
+    """The phases of four symbols, in a discrete logarithm's order, as characters of ℤ/4: the amplitude at a faithful character."""
+    idx = [symbols.index(c) for c in order]
+    if min(abs(f[i]) for i in idx) == 0:
+        return 0.0
+    unit = np.array([f[i] / abs(f[i]) for i in idx])
+    return max(abs(sum(unit[m_] * np.exp(-2j * np.pi * j * m_ / 4) for m_ in range(4))) / 4 for j in (1, 3))
+
+
+def report_context(name, tables, symbols, ticks=(0, 1)):
+    digits = [symbols.index(str(d)) for d in range(10)]
+    shown = {" ": "space", "\n": "feed"}
+    show = lambda i: shown.get(symbols[i], symbols[i])
+    for tick in ticks:
+        t4 = tables.get(tick)
+        if t4 is None:
+            continue
+        total = t4.sum()
+        for s_ in range(len(symbols)):
+            t = t4[s_]
+            if t.sum() < 0.02 * total:
+                continue
+            blocks = [b for b in blocks_of(t) if len(b) >= 4]
+            print(f"CONTEXT {name} tick={tick} context={show(s_)} share_of_menu={t.sum() / total:.3f} blocks: " + " | ".join(" ".join(show(i) for i in b) for b in blocks))
+            for b in blocks:
+                z = np.zeros_like(t)
+                ix = np.ix_(b, b, b)
+                z[ix] = t[ix]
+                seen = []
+                for modulus, one, two, f, flat, sup in spans(z, symbols):
+                    if two < 0.9 or flat < 0.95 or sup.sum() < 4:
+                        continue
+                    members = " ".join(show(i) for i in range(len(symbols)) if sup[i])
+                    wheel = ""
+                    if all(sup[i] for i in digits):
+                        amp, pct = characters(np.angle(f[digits]))
+                        j = 1 + int(amp[1:].argmax())
+                        wheel = f" ten: j={j} a_j={amp[j]:.3f} null_pct={pct:.3f}"
+                    four = f" four(1,3,9,7)={ring_of_four(f, symbols, '1397'):.3f} four(2,6,8,4)={ring_of_four(f, symbols, '2684'):.3f}"
+                    ref = next(i for i in range(len(symbols)) if sup[i])
+                    keys = " ".join(f"{show(i)}:{(np.angle(f[i] / f[ref]) / (2 * np.pi)) % 1:.2f}" for i in range(len(symbols)) if sup[i])
+                    sig = (members, wheel[:12], round(flat, 2), round(modulus, 2))
+                    if sig in seen:
+                        continue
+                    seen.append(sig)
+                    print(f"CONTEXT_SPAN {name} tick={tick} context={show(s_)} modulus={modulus:.3f} in_one={one:.3f} in_two={two:.3f} flatness={flat:.3f} support=[{members}]{wheel}{four} keys_in_turns={keys}", flush=True)
+
+
 def characters(phases, shuffles=2000, seed=5):
     """The ten located phases as characters of ℤ/10: `a_j`, and the percentile of the largest `a_(j≠0)` under permutations of the digits."""
     omega = np.exp(-2j * np.pi * np.outer(np.arange(10), np.arange(10)) / 10)
@@ -366,6 +491,13 @@ def main():
     d = sys.argv[1]
     if len(sys.argv) > 2 and sys.argv[2] == "release":
         release(d)
+        return
+    if len(sys.argv) > 3 and sys.argv[2] == "context":
+        texts = table_texts(sys.argv[3])
+        for planted in ("aligned", "dealt") if len(sys.argv) > 4 and sys.argv[4] == "planted" else (None,):
+            tables, symbols = menus_context(d, texts, planted)
+            print(f"CONTEXT_READ menu={planted or 'rows'} symbols={len(symbols)} ticks={sorted(tables)}")
+            report_context(planted or "rows", tables, symbols, ticks=(0,) if planted else (0, 1))
         return
     if len(sys.argv) > 2 and sys.argv[2] == "planes":
         for planted in ("aligned", "dealt") if len(sys.argv) > 3 and sys.argv[3] == "planted" else (None,):
