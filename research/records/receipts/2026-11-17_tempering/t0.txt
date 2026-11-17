@@ -1,0 +1,19 @@
+# waiting for the card's lock 18:05:49
+# passes done 18:07:56: TRIAL_DONE sections=1000 ms=52021
+TRIAL_PASSES records=200 passes=500 records_a_section=100 closed=0 threads=24
+TRIAL_PASS pass=48 sections=98 sites=845 micronats_a_place=1406955 ms=5024
+TRIAL_PASS pass=98 sections=198 sites=917 micronats_a_place=1333130 ms=10151
+TRIAL_PASS pass=148 sections=298 sites=871 micronats_a_place=1291531 ms=15361
+TRIAL_PASS pass=198 sections=398 sites=864 micronats_a_place=1270491 ms=20582
+TRIAL_PASS pass=248 sections=498 sites=972 micronats_a_place=1137473 ms=25754
+TRIAL_PASS pass=298 sections=598 sites=843 micronats_a_place=1084860 ms=30974
+TRIAL_PASS pass=348 sections=698 sites=913 micronats_a_place=981650 ms=36172
+TRIAL_PASS pass=398 sections=798 sites=955 micronats_a_place=865827 ms=41368
+TRIAL_PASS pass=448 sections=898 sites=873 micronats_a_place=793846 ms=46597
+TRIAL_PASS pass=498 sections=998 sites=896 micronats_a_place=580209 ms=51852
+== the trained 200 sums (their half is the fitting half)
+fit every nats=0.7575;fit line_feed nats=0.0030;fit middle nats=1.0910;fit past nats=0.7949;fit top nats=0.4220;fit units nats=1.5567;
+== held sums
+held every nats=1.8233;held line_feed nats=0.0359;held middle nats=2.3396;held past nats=2.1092;held top nats=0.9541;held units nats=2.8487;
+18:09:20
+RUN_EXIT 0 2026-11-17T18:09:20Z

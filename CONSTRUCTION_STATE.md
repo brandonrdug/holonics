@@ -30,9 +30,12 @@ holds the table). One controlled run places the fault: ten concentrated passes o
 digit at 2.27 nats (flat 2.30; 1 of 96 held sums written whole), and the same passes with one part's rows compared themselves, the closed
 face, bring it to 0.86 (11 of 96). Both arms' writes are poor as products.
 
-Decided: lap 94's state is frozen and the line is stopped after lap 95; no part is added to that state. The work is a tempering study on
-small worlds, many passes over little: first a leak and a cooling as states of the deposit, then every part comparing locally. Writes are
-read first at every step (the guide's method rule of November 17). The machine that follows is decided from what the study writes.
+Decided: lap 94's state is frozen and the line is stopped after lap 95; no part is added to that state. The work is a study on small
+worlds, many laps over little, of the learning law the records of October 24 and 25 already state and the November field never took: each
+block keeps its tension over a lap at a held constitution, a lap founds the face that carries it where the drop pays its
+description-length charge, the bridge is refounded exactly, and nothing is stepped (the record's §7; the stepped engine takes 200 sums
+half by rote in 500 passes and carries nothing to a held one). Its acceptance is the staircase record's, with the writes read first at
+every step (the guide's method rule of November 17). The machine that follows is decided from what the study writes.
 
 ### Earlier on November 17: the phase reviewed and the first founding attempt
 

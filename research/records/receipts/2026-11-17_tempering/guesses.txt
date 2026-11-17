@@ -10,3 +10,13 @@ release of 8 places after 96 of the trained prompts and after the 96 held prompt
 What each outcome says: a trained units digit above 2.0 says the engine cannot bind a record to its answer even by rote, the strongest form
 of "nothing binds", and a leak then has nothing to prune toward a law; a trained digit under 1.5 with the held one flat says a rote regime
 exists, and the leak's study (does a law replace the rote under the constitution's own code length) is the next read.
+
+Scored (2026-11-17T18:10:03Z), G-T0 (t0.txt, t0_writes_trained.txt, t0_writes_held.txt): 500 passes over 200 sums took 52 s on the card
+(1,000 sections; the pass's own code 1.41 nats a place at pass 48, 1.03 at 348, 0.58 at 498 and still falling).
+  The trained sums' units digit: 1.557 nats (missed by 0.06: 1.5 or under was guessed); their top column 0.422, middle 1.091.
+  The held units digit: 2.849 (held: 2.1 or more), above ten symbols flat (2.303) and above lap 94's 2.674; held top column 0.954.
+  Trained prompts written whole: 11 of 96 (held: 5 to 40), last digit equal 17. Held prompts written whole: 4 of 96 (missed by one:
+  3 or fewer), last digit equal 10.
+  Reading: a rote regime exists and is slow. After 500 passes the engine has half-taken 200 records by rote, the held units digit has
+  risen, and nothing in the writes carries to a sum it has not met. Stepping on the comparison binds a record to its answer and locates
+  no law.
