@@ -1852,6 +1852,8 @@ impl Constitution {
             products: pass.ticks.iter().map(|c| c.ct.clone()).collect(),
             codes: pass.faces.iter().enumerate().map(|(t, f)| f.as_ref().map(|f| f.code(region.classes[t]))).collect(),
             faces: pass.faces.iter().map(|f| f.as_ref().map(|f| (0..self.declaration.alphabet).map(|c| f.code(c)).collect())).collect(),
+            charge: pass.ticks.iter().map(|c| c.qm.clone()).collect(),
+            gate: pass.ticks.iter().map(|c| c.gam.clone()).collect(),
         })
     }
 }
@@ -1881,6 +1883,11 @@ pub struct CrossingTension {
     /// An open site's whole face: the code of every class there (`[site][A]`, on `2^(−20)` bits), so a ruler can read a symbol's code by
     /// its registers (a digit's bit and its five-residue; a column's sum apart from its carry). Written by `read-tension` as `faces.i64`.
     pub faces: Vec<Option<Vec<i64>>>,
+    /// Each tick's carry circles as a site meets them (`[t][2C]`, the real parts then the imaginary, empty without circles): `charge` the
+    /// charge `Qm(t) = Q(t ∓ 1)` arriving at the site on `2^(−16)`, which the site's `a` multiplies, and `gate` the site's `γ(t)` on `2^(−30)`.
+    /// Written by `read-tension` as `charge.i64` and `gate.i64`, so a ruler can read a circle's phase by harmonics its one product does not.
+    pub charge: Vec<Vec<i64>>,
+    pub gate: Vec<Vec<i64>>,
 }
 
 

@@ -482,3 +482,29 @@ returns them or its null is void.
 What it decides: all held, no circle holds a digit's phase and a harmonic face would have nothing to read today, so the wheel
 does not enter as a face on the circles as they stand and the turn itself (a pair-located advance) is the missing part; G-HC2
 missed, a circle already carries a phase its face cannot read and October's harmonic face is the first part to port.
+
+SCORES of G-HC1 to G-HC3, read from the clock at 09:41:45 UTC, November 17 (circles86.txt, circles86_planted.txt; 8,000 short sums,
+16,286 answer places, 803,724 written rows, lap 86's mean; host, eight threads for the dump in 72 s and four a ruler in 15 s,
+beside lap 87 on the card)
+The instrument first. A planted wheel is returned on the same shapes: a gate turned by 2π(3d + 2)/10 reads a_3 = 1.000 at the
+100th percentile of its permutation null, alone among the 32 circles; a charge set to the wheel digit's phase at the answer
+place is held at 0.84 by the harmonics (0.85 by that one circle's) and at 0.19 by the charges read linearly, the first
+harmonic's two ninths; and beside the chart the harmonics then remove 0.65 to 0.86 of the units place's covector by tick, the
+value's own digit removing 0.66 to 0.96.
+G-HC1 held: no circle's turn is a wheel. The largest character amplitude at j ≠ 0 is 0.22, 0.15, 0.20, 0.20 by tick, and 0, 1,
+0, 0 circles pass the 99th percentile of their null. Over the circles the median a_0 is 0.991 to 0.995: on every circle the ten
+digits turn alike.
+G-HC2 held: at the units place, last tick, the harmonics of all 32 charges hold the wheel's digit at −0.22 on the held half
+(nothing; the wide fit's own cost), the best single circle's at −0.02, the charges read linearly at −0.04. The chart holds it
+at −0.06 there, as the register read found.
+G-HC3 missed at the columns one operand holds: beside the chart the harmonics add 0.088 (clear) and 0.043 (carried into) of the
+covector's power at tick 0, of which the charges read linearly add 0.066 and 0.035; at the other ticks 0.006 to 0.024 or
+nothing. At the columns both operands hold (the units place, clear and carried columns) they add nothing at any tick.
+What else the read shows. A circle does carry which digit stood before the place: at a column one operand holds, the charges
+read linearly give that digit at 0.43 to 0.52 and one circle's harmonics alone at 0.23 to 0.44 (circles 6 and 18), above the
+two ninths a wheel's first harmonic could give; and the aligned digits' unordered sum is held by the charges at 0.32 to 0.44 at
+the units place (the chart 0.50 to 0.62). So a symbol reaches a circle through its drive, a displacement b(t) added to the
+charge, and not through its turn: the charge is a leaky sum of the symbols' displacements, a barycentre again, where a wheel is
+a product of their turns.
+Decided as the guess said: no circle holds a digit's phase, a harmonic face on the circles as they stand would have nothing to
+read at a sum's column, and the unused channel is the turn. The harmonic face is not the first part.
