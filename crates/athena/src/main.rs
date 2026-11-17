@@ -67,9 +67,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension") {
         return athena::ruler::tension::read_tension(&rest[1..]);
     }
-    // [the lead, November 17] A premise's trial on the host's threads (a ruler's state; it opens no card).
-    if mode == "host" && rest.get(1).map(String::as_str) == Some("try-closed") {
-        return athena::ruler::tension::try_closed(&rest[1..]);
+    // [the lead, November 17] Passes over a small table on the host's threads (a study's state; it opens no card).
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("try-passes") {
+        return athena::ruler::tension::try_passes(&rest[1..], &mut holonics_engine::realization::Host);
     }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension-store") {
         return athena::ruler::tension::read_tension_store(&rest[1..]);
@@ -325,6 +325,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("zero-triad-return") => athena::store::zero_triad_return(args),
         Some("found-crossing") => athena::store::found_crossing(args),
         Some("found-closed") => athena::store::found_closed(args),
+        Some("try-passes") => athena::ruler::tension::try_passes(args, realization),
         Some("restore-store") => athena::store::restore(args),
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),

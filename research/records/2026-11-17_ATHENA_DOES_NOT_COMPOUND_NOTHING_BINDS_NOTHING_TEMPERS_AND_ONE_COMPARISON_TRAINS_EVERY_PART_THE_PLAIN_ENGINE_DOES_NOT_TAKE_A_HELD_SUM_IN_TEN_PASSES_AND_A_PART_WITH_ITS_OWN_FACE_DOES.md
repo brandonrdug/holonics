@@ -109,3 +109,38 @@ been restated four times and run by no build. Today I spent a day rebuilding a f
 4. **The engine's guide carries a standing table** of the theory's laws against what the engine has in their place, so that no context
    window designs without it.
 5. The machine that follows is decided from what the study writes, not before it.
+
+## 7. Read after the decisions: the law the study builds is October's, and rote is what stepping gives
+
+Read the same evening, after §6 was written. Two things sharpen it.
+
+**The rote read** ([`receipts/2026-11-17_tempering/`](receipts/2026-11-17_tempering/), G-T0). The plain engine took 500 passes over 200
+short sums on the card (52 s). On the sums it trained on, the units digit codes 1.56 nats and 11 of 96 prompts are written whole. On held
+sums the units digit rose to 2.85 nats, above ten symbols flat, and 4 of 96 are written whole. So a rote regime exists, it is slow, and it
+carries nothing to a sum the engine has not met: stepping on the comparison binds a record to its answer and locates no law.
+
+**The learning law is already written, with its acceptance.** §6's "leak and cooling" is the October law said worse. The records of
+October 24 and 25 state it on the objects:
+
+- At every block keep the normal law's sufficient statistics over a lap at a held constitution, `H = Σ f̄ f̄ᵀ`, `B = Σ t f̄ᵀ`, `T = Σ t tᵀ`
+  (integer sums, the same bits in any order). `B` is the gradient. The tension `S = T − B H⁺ Bᵀ` is what the block cannot produce from
+  its present face, and "the step never sees it": the remainder is orthogonal to every face, so a step built from `B` carries none of it
+  and it is discarded every section. More passage then only adds discarded remainder.
+- A lap founds the face that carries the tension, from a pool of products of the present faces, where its drop `M Q⁺ Mᵀ` pays a
+  description-length charge (`½ log₂ N + log₂ |pool|`); each lap's foundings are the next lap's operands, so the reach doubles a lap.
+  That charge is the pruning, and it is where a unit is committed.
+- The bridge is then refounded exactly, with no section steps, and a lap that founds nothing deposits nothing. That is the cooling: the
+  October tower measured a founded ring's held units at 308 of 495, at 247 after one stepped lap of the readouts and at 55 after a full
+  stepped pass. A stepped pass erodes what a founding placed.
+- A conjunction with no lower part (a parity; the lock and the product together) stays dormant for a pool of pair products and founds only
+  when the pool offers it whole, so the pool's navigators matter. The closure of a menu is one: it offered the keyed pair through the row.
+- Its acceptance was fixed before its build (the staircase record, §7): held code against a foil lap, every founding predicted before it is
+  taken and retested on later laps, the laps stopping on their own, and the writing at each prompt shown whole.
+
+The November field replaced this learner with a stepped one when the line moved to the card; nothing in the law needs the host, since its
+statistics are sums of outer products the card already forms for the covector, and the solve at a lap's crossing is a slow variable.
+
+So decision 2 of §6 is restated. The study builds the lap law on the present engine's forward, on small worlds: the engine's charts,
+currents and products are the faces; each block's material moves by its bridge's solve and by foundings under the charge, and by no
+section step; the closure is a navigator of the pool. Its acceptance is the staircase record's §7, with the writes read first.
+
