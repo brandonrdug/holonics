@@ -804,3 +804,16 @@ one group.
 Decided as the guess said: grouped by their largest differences the charts tell where a place is, not which law it is under,
 and no founding is taken from such groups. Of the contexts read tonight one works with no label for the two additive laws:
 the presence of a symbol among a row's sources (G-SG's diagnosis, the wheel at 0.93 under the plus and under the minus).
+
+GUESS G-SL1, fixed at 11:02:04 UTC, November 17 (from date -u), before the read: the slice as it is drawn, under a symbol's presence
+Reading: the one context that worked with no label (a symbol present among a row's sources, G-SG's diagnosis) taken on the
+redrawn arithmetic slice as the trainer draws it: 4,000 distinct records from the head of its documents, every form (two to
+four operands, parentheses, the three operations mixed in a record), every place but the first opened in turn; lap 86's
+mean, head 0, ticks 0 and 1; the menu of pairs under each symbol's presence, cut to blocks, closed by lines and planes
+(loop_closure_ruler.py context TABLE presence).
+G-SL1: under the plus's presence the wheel is returned at 0.9 or more at a j coprime to ten at tick 0 or tick 1, from a block
+holding the ten digits. I hold this at about even odds: a record of three or four operands carries the plus beside a times
+sign, and the presence of the plus then says less.
+What it decides: held, a key's founding can be read off the machine's own arithmetic region with no label and no chosen
+specimen; missed, the founding as it stands needs records of one law, which the slice does not give it, and the context is
+still the open question.
