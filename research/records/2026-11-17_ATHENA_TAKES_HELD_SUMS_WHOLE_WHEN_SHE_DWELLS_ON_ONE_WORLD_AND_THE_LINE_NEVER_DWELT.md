@@ -310,3 +310,36 @@ stride, the choice to stay and the next piece read from her own progress (the re
 What neither gives is depth of binding: at about 1.5 nats a place she writes as a short-context model does. A law's own entries and its
 own comparison (§9), sized by what a founding saves, is the work after these two, and the chart is what makes its trials cheap.
 
+## 14. How far back she reads, against a count of the same text
+
+Two rulers on the pass-5 state, the same 1,200 held rows (`reach_and_count.txt`). Her next-place code when only the last `k` places
+stand in the region, and a count model's code by the longest context it may use (interpolated Witten-Bell, counted on the fitted text):
+
+| known places | 1 | 2 | 3 | 4 | 6 | 8 | 12 | 16 | 24 | 48 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Athena, pass 5 (nats) | 4.241 | 2.957 | 2.422 | 2.083 | 1.843 | 1.711 | 1.619 | 1.591 | 1.549 | 1.547 |
+
+| the count's longest context | 0 | 1 | 2 | 3 | 4 | 5 | 6 |
+|---|---|---|---|---|---|---|---|
+| a count model (nats) | 3.013 | 2.373 | 1.924 | 1.577 | 1.395 | 1.361 | 1.374 |
+
+She draws on about twenty-four places, and with all of them she codes what a count of three places codes. (Her short regions are states
+she was not compared on, so her left columns read high; the right columns are the fair ones.) A count of five places reads 1.36 on this
+text. So her context is wide and soft, where a word needs the last five symbols held sharply together. That is §9's reading measured:
+nothing binds. It is also what the boundary chart alone will not change, and what the work after it is for.
+
+## 15. The control: the same books under the old kind of comparison
+
+§12's reading rested on a run that changed two things at once, the state compared and the text (fifty storybooks). The control changes
+one (G-N2, `night_text.txt`): the same fifty books from the same start, read as the first dwell read its three, rows of 48 known places
+and a run of 32 with a keyed half open, for the count of compared places the night's run had made.
+
+| at equal compared places | 0.9 million | 9 million | the panel's words in the lexicon |
+|---|---|---|---|
+| each place compared as the boundary of what is known (the night's run, passes 1 and 10) | 1.732 | 1.536 | 73% at pass 10, 76% at pass 15 |
+| a keyed half of a run open (the control, passes 1 and 10) | 1.922 | 1.813 | 56% (51% by the law's writer in place order) |
+
+(The held next place on its whole left context, nats; 2.050 before either.) By eye the control writes almost-words again and the run
+writes real words in broken phrases. Both guesses of G-N2 held. So the comparison at the boundary is what text needed first, and the
+register by itself does not give it. The night's run stood at 1.527 nats at pass 15 and goes on to pass 40.
+
