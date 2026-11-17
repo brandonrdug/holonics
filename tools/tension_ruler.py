@@ -79,6 +79,32 @@ def table(out, key, met, far, per=None):
     print(f"TENSION_TABLE rows={len(rows)} places={sum(len(r[3].split(',')) for r in rows)}")
 
 
+def sums_table(out, key, n, weights):
+    """A table of `n` plain sums, a record a region, every value digit opened alone, the operands' lengths drawn with the given
+    weights (the lengths one, two, three, … digits), as `tools/arithmetic_world.py` draws them for the redrawn slice. Labelled `met`."""
+    weights = [int(w) for w in weights.split(",")]
+    rows = []
+    for k in range(n):
+        r = draw(f"{key}:sums", k)
+        nums = []
+        for shift in (8, 120):
+            u, length = (r >> shift) % sum(weights), 1
+            for i, w in enumerate(weights):
+                if u < w:
+                    length = i + 1
+                    break
+                u -= w
+            first = 0 if length == 1 else 10 ** (length - 1)
+            nums.append(first + (r >> (shift + 40)) % (10**length - first))
+        a, b = nums
+        run = f"{a + b}\n"
+        rows.append((f"tension:met:+:{a}:{b}:{a + b}", f"{a} + {b} = ", run.replace("\n", "\\n"), ",".join(str(j) for j, c in enumerate(run) if c.isdigit())))
+    with open(out, "x") as f:
+        for row in rows:
+            f.write("\t".join(row) + "\n")
+    print(f"TENSION_TABLE rows={len(rows)} places={sum(len(r[3].split(',')) for r in rows)}")
+
+
 def place_kind(label, place):
     """A value digit's kind: (lengths, op, k from the value's last digit, whether a carry or a borrow enters its column, a_k, b_k, the
     digit, how many of the two operands hold a digit in the column)."""
@@ -767,6 +793,8 @@ def main():
     cmd = sys.argv[1]
     if cmd == "table":
         table(sys.argv[2], sys.argv[3], int(sys.argv[4]), int(sys.argv[5]), int(sys.argv[6]) if len(sys.argv) > 6 else None)
+    elif cmd == "sums":
+        sums_table(sys.argv[2], sys.argv[3], int(sys.argv[4]), sys.argv[5])
     elif cmd == "read":
         read_dir(sys.argv[2])
     elif cmd == "oracle":
