@@ -720,6 +720,19 @@ def registers(d, codec):
         if m.sum() < 100:
             continue
         print(f"TENSION_REGISTERS {pname} {m.sum()} {(-np.log(mass[m])).mean():.4f} {whole[m].mean():.4f} {bit[m].mean():.4f} {(whole[m] - bit[m]).mean():.4f} {five[m].mean():.4f} {(whole[m] - five[m]).mean():.4f}")
+    # The nine-ring (the digit sum's ring, 10 ≡ 1): a digit's three-residue, and its nine-residue (0 and 9 one class). A reader that
+    # cast out nines would know an answer digit's nine-residue from the operands and the value's other digits.
+    three = -np.log(np.array([[c % 3 == dd % 3 for c in range(10)] for dd in digit]).__mul__(q).sum(axis=1))
+    nine = -np.log(np.array([[c % 9 == dd % 9 for c in range(10)] for dd in digit]).__mul__(q).sum(axis=1))
+    chance9 = -np.mean([np.log(0.2 if dd % 9 == 0 else 0.1) for dd in digit[sel_plus]])
+    print(f"TENSION_NINES part places three_residue(ln 3 = {np.log(3):.3f} less the uneven classes) nine_residue (a register that knows nothing: {chance9:.3f})")
+    for pid, pname in enumerate(PARTS):
+        m = sel_plus & (part == pid)
+        if m.sum() < 100:
+            continue
+        flat3 = -np.mean([np.log(0.4 if dd % 3 == 0 else 0.3) for dd in digit[m]])
+        flat9 = -np.mean([np.log(0.2 if dd % 9 == 0 else 0.1) for dd in digit[m]])
+        print(f"TENSION_NINES {pname} {m.sum()} {three[m].mean():.4f} ({flat3:.4f}) {nine[m].mean():.4f} ({flat9:.4f})")
     print("TENSION_RELEASE columns places digit digit_up_to_its_carry carry_bit_given_that")
     for name, m in (("both hold, no carry in", sel_plus & (held == 2) & ~carried), ("both hold, a carry in", sel_plus & (held == 2) & carried)):
         if m.sum() < 100:
