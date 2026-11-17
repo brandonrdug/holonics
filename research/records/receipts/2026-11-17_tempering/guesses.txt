@@ -155,3 +155,14 @@ middle stands near section 2,000, strictly held last digit 0.52 at section 2,000
     at equal text sections. What it decides: if the sums are never taken beside text, a single stream of mixed worlds cannot found a
     law that a dwelt world founds in five minutes, which is what the line was (one pass over seven registers, sums a tenth of each
     section); if they are taken as soon as alone, the mixing was not the line's fault and its fault is the sums' share and form there.
+
+Read (2026-11-17T19:43:37Z), the held panel written from the no-leak arm's state at pass 250 (host forward, 8 places a prompt): 63 of 96 held sums
+written whole, the last digit the reference's in 87 (lap 94's state: 2 and 9). By the reference answer's length: two digits 63 of 66
+whole; three digits 0 of 20; one digit 0 of 10; EVERY write is two digits long. The cause is the trial's rows, not the engine: a run was
+the answer, its line feed and five symbols more, so a region's extent told the answer's length (7, 8 or 9 open places), and a write's 8
+places are a two-digit answer's extent. The reads "with the whole run open" carried the same leak. The last digit open alone does not
+(its place is given, its value is not), so G-L1's read stands for the last digit, and a sum's length is unread.
+G-L1b (2026-11-17T19:43:37Z). The control again with a run of one extent (8 places: the answer, its line feed and the next record's opening to fill),
+so nothing but the operands says how long the answer is; 150 passes, read every 10, the panel written at the end (8 places).
+  The guess: the strictly held last digit under 0.1 nats by pass 100, as before; the panel at pass 150: 60 or more of the 66 two-digit
+  answers whole, 8 or more of the 10 one-digit, 10 or more of the 20 three-digit (the hundreds' carry is the later law), 78 or more of 96.
