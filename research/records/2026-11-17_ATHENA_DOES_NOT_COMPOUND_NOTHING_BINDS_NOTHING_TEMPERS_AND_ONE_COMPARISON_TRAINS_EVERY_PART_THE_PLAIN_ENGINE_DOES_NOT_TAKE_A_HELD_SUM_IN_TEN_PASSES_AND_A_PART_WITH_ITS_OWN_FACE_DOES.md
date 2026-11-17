@@ -144,3 +144,47 @@ So decision 2 of §6 is restated. The study builds the lap law on the present en
 currents and products are the faces; each block's material moves by its bridge's solve and by foundings under the charge, and by no
 section step; the closure is a navigator of the pool. Its acceptance is the staircase record's §7, with the writes read first.
 
+## 8. Lap 1 read, and the October run that founded the whole chain and stepped it away
+
+**Lap 1 of the lap law on the small world** (G-T1, `receipts/2026-11-17_tempering/t1.txt`). The closed face founded, then ten passes in
+which only the blocks it reaches move (the lock's words and temperatures, the odds, the readout) and every other family is held; a foil
+lap with the same held families and no founding; and the earlier arm in which everything was stepped. Held half, mixed openings; held
+prompts written whole and their last digit, of 96; the text table's five text slices, 9,000 places:
+
+| | units | top | middle | whole | last digit | text |
+|---|---|---|---|---|---|---|
+| lap 94's state | 2.674 | 1.850 | 2.265 | 2 | 9 | 1.181 |
+| founded, bridge only | 1.642 | 1.741 | 2.230 | 4 | 21 | 1.191 |
+| foil lap | 2.354 | 1.700 | 2.115 | 3 | 13 | 1.190 |
+| founded, everything stepped | 0.860 | 1.255 | 1.525 | 11 | 38 | 1.224 |
+
+The founding carries the units digit with only its bridge moved, at a quarter of the stepped arm's cost to text. It reaches half of that
+arm's fall (the bridge's passes had not reached their fixed point, and that arm's values and returns carried the rest), and no arm's
+writes are clean. A carried column needs what this engine does not hold: the pool of pair products of its present faces has no face of
+the lower pair's winding.
+
+**The October machine needed no carry, and it was founded whole.** The
+[strands record](2026-10-26_THE_OPERANDS_ARE_HELD_BY_LOCATED_STRANDS_AND_THE_RESULT_IS_READ_ON_THE_RING_THAT_CLOSES.md) of October 26 and 27:
+
+- A number is the residue of a running word on the rings `10^L − 1`. A digit acts on a strand by one of the rotor's three laws (turned,
+  stepped, held), every other symbol by a located key that transfers, reflects or clears a strand and sets the sheet; no key adds. The
+  sum exists only in the product of two strands' faces, and the result's next digit is the tenth of that comparison's conjugate face on
+  the ring of the result's length (§2 there).
+- The laws and keys were located from the text's own menus with no operator named (§3). On the PC's GSM8K training partition all 7,042
+  calculations of the two largest closing groups that a ring carries close, and 15,480 of 15,613 of their result digits are that tenth
+  (§6).
+- The comparison was then opened in the contacts exactly: four contacts a ring conduct the product of two strands' faces (§7, tested at
+  every cell).
+- And the towers were trained three stepped passes. §8 there: the opened comparison's share of the contacts' bilinear weight was 250
+  thousandths a ring at founding and zero on every ring of every final state. Never-met calculations at the equals stood at 18 of 876,
+  under an 8-gram's 34; met ones rose. What the stepped passes left conducted recall.
+
+So the chain that writes a sum from located keys was placed whole on October 27, and the passes that followed erased it. The lap law of
+October 25 bars exactly those passes (after a founding only the bridge is refounded, and nothing is stepped), and no run kept it. No one
+read the founded machine with its readout bridged and everything else held.
+
+**That read is the next one.** The October tree is checked out as it stood (its strands, locator and opened comparison were retired on
+November 14 with the October machine's examples), the machine is founded as `PRA` was, only its readout is bridged, and never-met
+calculations at the equals and the writes are read, the guess fixed first. It measures the rebuild's first law on the machine that
+already holds the objects: found, bridge, and never step what was founded.
+
