@@ -82,6 +82,27 @@ five is a law with an owner in October's record and, for the hand and the harmon
 port deliberately, one law at a time, never wholesale, and with October's own two failures in front: its ring dephased under the
 tower's pass, and it did not carry from the arithmetic terrain to word problems' text.
 
+**What October's road cost, and where it stopped** (read at 04:35 UTC from the same digest; the figures are the tower's record's and
+the records of October 26 to 31, cited there by line). This is the part a design must not repeat.
+
+- The 445 of 495 were written on the arithmetic terrain, by rings founded at cells a received landmark marked (a mark of where to
+  look, at each sum's units cell). Marked after the equals sign instead, the pool law kept line-mark forms: "the landmark's grain
+  decided the founding more than the law did".
+- The tens' own landmark closed on nothing, with or without the hand; the tens came from the key kept whole at 110 and from the whole
+  face. Differences reached 144 of 268 against an acceptance of 201. Products stayed at 6 of 490.
+- The same machinery on word problems failed its acceptance in every variant: calculations never met in training were written at 14
+  to 37 of 876, the level of an 8-gram (34). The wrong values were at the right size and were values heard after some equals sign
+  (97 to 100%): results as words of a vocabulary.
+- The founded ring dephased under the tower's own pass, and a lap over a founding undid part of it (308 to 247).
+- A capture navigator that did add was retired as a calculator standing in for learning, its menu naming the operators.
+- The last ring cost the held-out text in every medium but arithmetic, and Brandon asked on October 25 that arithmetic stop being the
+  road while the word problems, the images and the speech waited.
+
+So the precedent supports the moves (the pair-located turn, the hand, the harmonics, the closure) and warns against their use as a
+ring for digits on an arithmetic terrain. What this record proposes stands or falls as the symbol's own line for every stream: a
+symbol's key on shared rings with moves of the three kinds, read first on guard 9's renamed regions and on rare symbols, and held to
+October's own unpassed acceptance on the yardstick, calculations never met in training written above an 8-gram's level.
+
 ## 3. Tonight's readings in those terms
 
 - No register of a sum's digit is held, on any ring: its bit 0.727 nats (0.693 for a register that knows nothing), its five-residue
@@ -173,6 +194,8 @@ phases nine apart. The gate reads the covector by mode for that reason.
 - A renamed region reaches plain text's code and a doubled passage's second copy codes near nothing (the third record §5).
 - The text slices' held codes stay within 0.01 nats a place.
 - The move is the same law on a passage with no digit in it: its effect on the code of text is read, whichever way it falls.
+- On the yardstick, the calculations of held-out word problems whose expression was never met in training are written at their value
+  more often than an 8-gram writes them (October's acceptance, 34 of 876, never passed).
 
 ## 8. Recorded failures this could repeat
 
