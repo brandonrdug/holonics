@@ -74,3 +74,17 @@ then the side lap):
 Seven tenths of the yardstick's fall is at its marks (0.153 on 0.090 of its places), and half of the held arithmetic's rise is
 at its own marks and spaces: without the arithmetic world's drive the marks' faces move back toward the layouts the text
 and the word problems write, and away from the records' spaced one.
+
+THE CONTROL, read from the clock at 14:07:34 UTC: lap 91's mean, the line's own lap from lap 90's last state with the arithmetic
+world (3,000 sections in 3,025 s), beside the side lap's mean from the same state without it (3,000 sections in 1,510 s).
+| region | lap 91, with | side lap, without | difference |
+| code | 0.5521 | 0.5437 | −0.0084 |
+| web | 0.9013 | 0.8914 | −0.0099 |
+| science | 0.7581 | 0.7514 | −0.0067 |
+| books | 0.8619 | 0.8602 | −0.0017 |
+| wikidata | 1.0656 | 1.0577 | −0.0079 |
+| held arithmetic | 1.6172 | 1.7508 | +0.1336 |
+| GSM8K test split | 0.7570 | 0.7411 | −0.0159 |
+The GSM8K test split's marks: 2.6522 with, 2.5701 without; its letters 0.4513 and 0.4453; its digits 1.9883 and 1.9461.
+Against the control the scores stand as they were read against lap 90: G-D1 missed low for code, web, science and books (0.002
+to 0.010) and held for wikidata; G-D2 missed by a hair (0.016 where within 0.015 was guessed); G-D3 held.
