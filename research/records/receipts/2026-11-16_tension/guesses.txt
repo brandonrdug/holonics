@@ -632,3 +632,22 @@ location held 0.07 and 0.12 at the units place and 0.10 to 0.13 at the columns b
 Decided as the guess said for the units place: the rows' shares scatter too much there for a product inside one row, and the
 lock comes first. Beside it: at the columns both operands hold, a pair product on the located ring, with nothing labelled,
 already carries what the labelled read carried.
+
+GUESSES G-DH1 and G-DH2, fixed at 10:23:32 UTC, November 17 (from date -u), before the read: the closure with every place of a sum open
+Reading: the menu of G-LC taken with every place of a record opened in turn, operands' digits, signs and spaces as well as the
+value's (3,480 distinct short sums, 41,004 places, lap 86's mean, head 0 at tick 0), so that nothing chooses which places are
+composed. A place at an operand is written x = v − w: with the value's digit as the source u it is a translation composed with
+the reflection w ↦ −w, and with the other operand's digit as u a translation by −u. The sources' operators then generate the
+ring's dihedral group; they no longer commute, a character is no longer their common eigenvector, and their eigenvalues' phases
+are no longer keys. They share planes, span(χ_j, χ_(−j)), and in such a plane the two functions of flat modulus on its support
+are the characters, whose own phases at each symbol are the keys. The ruler (loop_closure_ruler.py planes) takes each
+eigenvector of a drawn combination, the span its images under every operator fill (a line or a plane, by its singular values),
+and in a plane the flattest function; it scores the ten digits' phases as before.
+G-DH1: the plain closure of G-LC degrades on this menu: its best eigenvalue keys at a j coprime to ten fall under 0.9.
+G-DH2: the plane closure returns the wheel: a flat function of an invariant plane holds the ten digits' phases at 0.9 or more
+at a j coprime to ten, past its null, with the ten digits as its support and the space and the signs outside it.
+The instrument is held to planted menus on the same records: the aligned triples alone at every digit place (sums and
+differences together) must return the wheel at one from a plane, and the written symbols dealt at random must return nothing.
+What it decides: G-DH2 held, a key is founded by closure from every place the field reads, with no choice of which places are
+composed, and the read goes on to the store's text; missed, the closure as it stands needs to be told where a composition is
+written, which the field is not, and the founding is rethought before any part.
