@@ -1,0 +1,17 @@
+10:31:10
+# lap88: exit 0 released 10:21:31
+MEASURE lap=lap88 rc=0 wall_s=444.8 peak_rss_kib=852264
+STORE_PASS role=prefix sections=407 stretches_read=72965367 ended=true
+== loud 87
+code 0.5547 20.047 -0.021;web 0.9077 20.164 -0.086;science 0.7569 20.256 -0.156;books 0.8688 20.385 -0.201;wikidata 1.0696 20.127 +0.253;arithmetic 1.6128 20.613 -0.384;words 0.7719 20.150 -0.324;all 0.8902 20.225 -0.008;
+== loud 88
+code 0.5566 20.054 -0.029;web 0.9151 20.175 -0.096;science 0.7596 20.255 -0.160;books 0.8738 20.378 -0.193;wikidata 1.0775 20.122 +0.230;arithmetic 1.6070 20.613 -0.375;words 0.7773 20.163 -0.318;all 0.8943 20.228 -0.018;
+letter 0.614 0.4611;digit 0.101 2.0454;space 0.185 0.2260;mark 0.090 2.7525;
+WRITES_BY_PLACE  met 128 0.914 0.633 0.188 0.172 0.039 0.141 0.000
+world read share 0.893
+WRITE libe 2000\nbakes = 15\nbegat = 25 # libed # takeriamay?\nfiber = 5\nmonal_fibol, ksth # 20 * # hilf ast\nmonal_sorte - 6 = lift_takefiberer * # * grobceiond\npalis = 20 - \nlibeders = ootplibed * out
+90 + 81 =  | 298\n5 - 73 = 5\n0 | 171\n
+58 - 43 =  | -67\n5 * 3813930  | 15\n
+36 * 0 =  | 90\n73 - (0 * 3)  | 0\n
+4 * 317 =  | 130\n(4 * 97) + 4 | 1268\n
+
