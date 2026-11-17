@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted] | text TABLE]
+Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted] | text TABLE | clusters TABLE [K]]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -63,6 +63,11 @@ blocks and closed by lines and planes. `TEXT_BLOCKS` lists the blocks of four sy
 of a block with its support and, for its keys, the smallest order of a lattice they sit on and how many of its residues are
 occupied (one residue is a function of constant phase, a block's own indicator and no ring). The same is printed for the menu with
 the written symbols dealt at random among the places.
+
+With `clusters TABLE [K]`, a context is read from the places' own charts: the open places are grouped by their pair charts at
+tick 1 (k-means, K groups, sixteen by default, drawn by a fixed seed, no label), and head 0's menu of pairs at tick 0 is closed
+inside each group as `planes` and `text` do. `CLUSTER` gives each group's size and, by the ruler's knowledge of the records
+(`a op b = value`), what it is made of; `CLUSTER_SPAN` each clean line or plane with its scores.
 
 Floats, counts and the knowledge of which bytes are digits are a ruler's (CLAUDE.md, a ruler is an instrument). The sums are synthetic,
 so their records are printed freely."""
@@ -425,6 +430,93 @@ def report_text(name, tables, symbols, cap=6):
                     break
 
 
+def clusters(d, texts, k=16, seed=11, rounds=25):
+    """A context from the places' charts (see the module's text)."""
+    import re
+
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tension_ruler as tr
+
+    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
+    dw, ticks = int(dims["lambda"]), int(dims["ticks"])
+    rows = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    n = len(rows)
+    read = np.fromfile(os.path.join(d, "read.i32"), dtype="<i4").reshape(n, dw).astype(np.float64) / 2.0**tr.FACE
+    tick = np.array([int(r[2]) for r in rows])
+    at1 = np.flatnonzero(tick == 1)
+    x = read[at1]
+    x = (x - x.mean(axis=0)) / np.maximum(x.std(axis=0), 1e-9)
+    rng = np.random.default_rng(seed)
+    centres = x[rng.choice(len(x), k, replace=False)]
+    for _ in range(rounds):
+        dist = (x**2).sum(axis=1, keepdims=True) - 2 * x @ centres.T + (centres**2).sum(axis=1)[None, :]
+        group = dist.argmin(axis=1)
+        centres = np.array([x[group == g].mean(axis=0) if (group == g).any() else centres[g] for g in range(k)])
+    # A place's rows stand in order, one a tick; its group is its tick-1 row's.
+    places = n // ticks
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    heads = len(lines) // n
+    symbols = sorted({c for line in lines for c in texts[line[0]]})
+    index = {c: i for i, c in enumerate(symbols)}
+    m = len(symbols)
+    record = re.compile(r"^(\d+) ([+\-*]) (\d+) = (-?\d+)\n$")
+    menus = np.zeros((k, m, m, m))
+    made = [dict() for _ in range(k)]
+    for i, line in enumerate(lines):
+        row = i // heads
+        if int(line[3]) != 0 or int(line[2]) != 0:
+            continue
+        g = int(group[row // ticks])
+        text = texts[line[0]]
+        site = int(line[4])
+        sources = [(int(j), int(p_) / 1e6) for j, p_, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        mt = record.match(text)
+        if mt:
+            role = "other"
+            for name, grp in (("a", 1), ("b", 3), ("v", 4)):
+                if mt.start(grp) <= site < mt.end(grp) and text[site].isdigit():
+                    role = ("value" if name == "v" else "operand") + (" units" if site == mt.end(grp) - 1 else "")
+            key = f"{mt[2]} {role}"
+            made[g][key] = made[g].get(key, 0) + 1
+        if len(sources) < 2:
+            continue
+        us = np.array([index[text[j]] for j, _ in sources])
+        ps = np.array([p_ for _, p_ in sources])
+        q1, q2 = np.bincount(us, weights=ps, minlength=m), np.bincount(us, weights=ps**2, minlength=m)
+        menus[g][:, :, index[text[site]]] += np.outer(q1, q1) - np.diag(q2)
+    digits = [symbols.index(str(v)) for v in range(10)]
+    shown = {" ": "space", "\n": "feed"}
+    show = lambda i: shown.get(symbols[i], symbols[i])
+    print(f"CLUSTER_READ places={places} groups={k} chart=tick1 menu=head0,tick0 seed={seed}")
+    for g in range(k):
+        size = int((group == g).sum())
+        top = sorted(made[g].items(), key=lambda kv: -kv[1])[:4]
+        print(f"CLUSTER group={g} places={size} made_of: " + "; ".join(f"{name} {count / max(size, 1):.2f}" for name, count in top))
+        t = menus[g]
+        if t.sum() <= 0:
+            continue
+        for b in [b for b in blocks_of(t) if len(b) >= 4]:
+            z = np.zeros_like(t)
+            ix = np.ix_(b, b, b)
+            z[ix] = t[ix]
+            seen = []
+            for modulus, one, two, f, flat, sup in spans(z, symbols):
+                if two < 0.9 or flat < 0.95 or sup.sum() < 4:
+                    continue
+                members = " ".join(show(i) for i in range(len(symbols)) if sup[i])
+                wheel = ""
+                if all(sup[i] for i in digits):
+                    amp, pct = characters(np.angle(f[digits]))
+                    j = 1 + int(amp[1:].argmax())
+                    wheel = f" ten: j={j} a_j={amp[j]:.3f} null_pct={pct:.3f}"
+                four = f" four(1,3,9,7)={ring_of_four(f, symbols, '1397'):.3f} four(2,6,8,4)={ring_of_four(f, symbols, '2684'):.3f}"
+                sig = (members, wheel[:14], four)
+                if sig in seen:
+                    continue
+                seen.append(sig)
+                print(f"CLUSTER_SPAN group={g} modulus={modulus:.3f} in_one={one:.3f} in_two={two:.3f} flatness={flat:.3f} support=[{members}]{wheel}{four}", flush=True)
+
+
 def characters(phases, shuffles=2000, seed=5):
     """The ten located phases as characters of ℤ/10: `a_j`, and the percentile of the largest `a_(j≠0)` under permutations of the digits."""
     omega = np.exp(-2j * np.pi * np.outer(np.arange(10), np.arange(10)) / 10)
@@ -654,6 +746,9 @@ def main():
         return
     if len(sys.argv) > 2 and sys.argv[2] == "cross":
         cross(d)
+        return
+    if len(sys.argv) > 3 and sys.argv[2] == "clusters":
+        clusters(d, table_texts(sys.argv[3]), int(sys.argv[4]) if len(sys.argv) > 4 else 16)
         return
     if len(sys.argv) > 3 and sys.argv[2] == "text":
         texts = table_texts(sys.argv[3])

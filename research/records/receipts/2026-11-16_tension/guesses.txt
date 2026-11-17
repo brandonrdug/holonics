@@ -792,3 +792,15 @@ G-CX2: at least one group's menu returns the ring of four of the units' group un
 What it decides: G-CX1 held, a founding can take its context from the field's own charts with no label, and the store's
 mixture is closable group by group; missed, the charts do not yet tell the laws apart well enough to found from, and the key
 waits on that.
+
+SCORES of G-CX1 and G-CX2, read from the clock at 10:59:08 UTC, November 17 (clusters86.txt; the three-operation records of G-SG,
+52,854 places, lap 86's mean; host, one thread, 8 s)
+G-CX1 missed: no group's menu returns the wheel. G-CX2 missed: none returns a ring of four.
+What the groups are, by the ruler's knowledge of the records: the places' charts group by the place's part in the layout and
+not by the record's law. Twelve of the sixteen groups hold the three operations at a third each (the operands' units digits;
+the value's digits; the spaces and signs by position); the others are the places of a negative value (its minus sign makes
+them the minus's alone) and two groups of operands' higher digits. A sum's value digit and a product's value digit stand in
+one group.
+Decided as the guess said: grouped by their largest differences the charts tell where a place is, not which law it is under,
+and no founding is taken from such groups. Of the contexts read tonight one works with no label for the two additive laws:
+the presence of a symbol among a row's sources (G-SG's diagnosis, the wheel at 0.93 under the plus and under the minus).
