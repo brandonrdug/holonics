@@ -391,3 +391,12 @@ G-R1: at the units place the bit codes at 0.68 nats or more (a register that kno
   at 1.60 or more (1.609): neither register is held.
 G-R2: at the columns both operands hold, the carry's bit given the digit up to its carry codes within 0.05 nats for columns with a
   carry in and columns with none, and at 0.60 or more for both: the winding is not read.
+
+SCORES of G-R1 and G-R2, read from the clock at 01:11:13 UTC, November 17 (registers_short78.txt; 16,286 places of short sums, lap 78's mean)
+G-R1 held: at the units place the bit codes at 0.727 nats (a register that knows nothing: 0.693) and the five-residue given the bit at
+  1.630 (1.609). Taken the other way, the five-residue 1.638 and the bit given it 0.719. Neither register is held, and each stands a
+  little above a register that knows nothing: the face leans the other way more often than not.
+G-R2 held: at columns both operands hold, the digit up to its carry codes at 1.640 with no carry in and 1.681 with one (1.609 for a
+  register that knows nothing), and the carry's bit given that at 0.722 and 0.720. The winding is not read, and neither is the
+  redundant digit's release.
+The top digit, for comparison: its bit 0.480, its five-residue given the bit 0.808; a column one operand holds, no carry: 0.673, 1.443.
