@@ -681,3 +681,24 @@ that it does not need the place's role: it needs a ring's members before its key
 itself shows. The store's own arithmetic holds differences and products beside sums on the same ten symbols, and
 multiplication does not share a translation's planes, so there the operator must also carry the sign its row meets (a menu of
 three sources); that read is owed before the store's text is.
+
+GUESSES G-SG1 to G-SG3, fixed at 10:32:57 UTC, November 17 (from date -u), before the read: a sign selects the law its row closes on
+Reading: the store's own arithmetic holds sums, differences and products on the same ten symbols, and a product's operators
+(w ↦ uw) do not share a translation's planes, so one menu of pairs cannot close on it. The row also meets the sign. The menu
+is taken with three sources (loop_closure_ruler.py context): T[s, u, w, x], every ordered triple of distinct sources weighed by
+the product of their three shares, with the symbol written; for each context symbol s its own family of operators
+(P_(s,u) f)(w) = E[f(x) | s, u, w] is cut to a block and closed as G-DH's diagnosis did. The specimen: 4,500 distinct
+two-operand records of the redrawn arithmetic slice as it stands, operands of one and two digits, 1,500 of each operation,
+every place but the first opened in turn (52,854 places), lap 86's mean, head 0 at tick 0. Nothing tells the ruler which
+symbols are signs or digits; the scores use that knowledge afterwards.
+G-SG1: with the plus as context the wheel is returned: a flat function of an invariant line or plane holds the ten digits'
+phases at 0.9 or more at a j coprime to ten.
+G-SG2: with the minus as context the same, from planes.
+G-SG3: with the times sign as context no wheel of ten is returned (under 0.9 at every coprime j), and a ring of four is: a
+line or plane whose support holds the digits 1, 3, 7 and 9 with their phases on quarter turns in the order of a discrete
+logarithm (1, 3, 9, 7 or its reverse) at an amplitude of 0.9 or more.
+The instrument is held to planted menus on the same records: the aligned triples with the record's own sign as context must
+return the wheel under the plus and the minus and the ring of four under the times sign, and dealt written symbols nothing.
+What it decides: G-SG1 and G-SG3 held, the closure reads each law of the passage under the symbol that selects it, a product's
+units among them, and the founding's form is a key a context; G-SG1 missed, three shares are too thin a menu for the rows as
+they stand, and the context has to come from the chart, not the row.
