@@ -353,3 +353,18 @@ G-V2 are read at lap 79's mean.
   the unordered pair in the chart at the units place, ticks 0 to 3: 0.792, 0.789, 0.629, 0.673 (0.746, 0.770, 0.656, 0.636).
   head 0's share on the aligned pair: 0.411 at tick 0 (0.405), 0.515 at tick 3 (0.470).
 One lap on the redrawn slice sharpened the arrival a little and took 0.16 nats off the top digit; the sum's units digit did not move.
+
+SCORES of G-P1 and G-P2, read from the clock at 00:59:43 UTC, November 17 (resp77.txt; 596,132 responses of 8,000 short sums)
+G-P1 missed: at a column both operands hold, tick 0, the response's power at the answer site's pair chart comes 0.022 from the
+  aligned digit of a, 0.023 from b's, 0.041 from the other digits and 0.915 from the signs and spaces (0.95 to 0.98 at later ticks).
+  The perturbations are not of one size: a digit's nearest symbol is another digit, a space's is the letter e, the plus sign's the
+  star, the equals sign's the greater-than sign, so a separator's change is a change of kind and its response is the largest by far.
+G-P2 missed: products on the 16 leading principal coordinates of the responses remove 0.038 (five) and 0.032 (ten) of the covector at
+  the units place at tick 1 on the held half, under the chart's leading coordinates of variance (0.067) and far under the labelled
+  read (0.39). The leading response directions are the separators'.
+By distance back from the open place, the response over the place's own loudness: one site back 0.15 at tick 0 and 0.44 to 0.49 at
+ticks 2 and 3; two back 0.04 and 0.48 to 0.51; four back (an operand's last digit) 0.05 to 0.23; six to eight back 0.12 to 0.18.
+
+GUESS G-P3, fixed at 00:59:43 UTC before its read (an instrument's variant tried after a miss, said as such): each response taken as a
+direction (scaled to unit length, so a source counts once whatever the size of its perturbation), products located on the 16 leading
+principal coordinates of those directions remove 0.15 or more at the units place at tick 1 on the held half.
