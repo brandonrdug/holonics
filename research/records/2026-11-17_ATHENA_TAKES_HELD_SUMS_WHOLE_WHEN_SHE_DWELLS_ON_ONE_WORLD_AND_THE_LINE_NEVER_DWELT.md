@@ -111,9 +111,8 @@ every slice.
 
 Arithmetic was a quarter of every section's places since it joined, 3.6 million pieces, and the held units digit of a short sum stood
 at 2.33 nats at lap 94. Here 240 thousand records of one world, met alone, took it. So the line's fault was not the sums' count. Brandon's
-word for it on November 17 was hot soup sloshed around and never left to settle, and the pass line says the same: nothing was ever
-dwelt on. Which of the three differences carries it (records met again, a world met alone, sections that are one world's) is G-L3's
-subject (§8).
+word for it on November 17 was hot soup sloshed around and never left to settle. Which difference carries it was G-L3's subject, and §8
+reads that it is none of the three I named (records met again, a world met alone, sections that are one world's).
 
 ## 7. The store's leak
 
@@ -137,8 +136,33 @@ Its panel at pass 100: 88 of 96 held sums written whole (one digit 10 of 10, two
 length the reference's in 95. The transition stands where the control's does. So meeting a record again is not what founds the law: a
 world met alone is. The guess held (under 0.1 nats at section 2,800).
 
-The two mixed arms are running as this is written: sections of 100 sums and of 100 text rows alternating, and 25 sums with 75 text rows
-inside each section. Their reads are scored in `guesses.txt` and added here when they end.
+The two mixed arms (`alternating.txt`, `within.txt`), each stopped once read:
+
+| strictly held last digit open alone | at about 120 thousand sums met | 160 thousand | 200 thousand | 400 thousand |
+|---|---|---|---|---|
+| the control, sums alone (passes 30, 40, 50, 100) | 2.244 | 1.911 | 0.612 | 0.081 |
+| sections of sums and of text alternating (the same passes) | 2.197 | 1.208 | 0.506 | 0.065 |
+| 25 sums and 75 text rows inside each section (the same passes) | 2.187 | 1.809 | 1.235 | |
+
+- **Alternating sections.** The sums are taken on the control's schedule, and the text beside them falls on the text-alone arm's
+  schedule (held tenths 1.782 at pass 100, where the text-alone arm read 1.786). Its panel at pass 100: 87 of 96 held sums written whole,
+  the last digit the reference's in 95; the text panel, written left to right, 75 of 133 words in the lexicon (56%). One state holds
+  both, each learned as if alone.
+- **Mixed inside each section**, where the sums are 6% of a section's places: the transition comes at about the same count of sums met,
+  a little later.
+
+So G-L3's guess for the mixed arms missed: neither a second world between the sections nor inside them stops the founding or much
+delays it. What the four arms agree on is a count: about 160 to 200 thousand records of the law, each with its operands known and its
+answer open, met in any arrangement tried.
+
+**That leaves the line unexplained by its pass alone, and §6's reading is narrowed.** The 175 MB of arithmetic the line took hold
+1,627,767 two-operand sums of one- and two-digit operands (counted in the slice), eight times the count above, and its held units digit
+stood at 2.33 nats. Two things differ there that no arm here read. The sums were about a hundredth of a section's places, five times
+thinner than the thinnest arm. And the line's trainer opens a stretch by its writer's and mask states (`passage::state_of`), in which an
+answer's place is often open while its operands, a few places to the left, are open too: a comparison with nothing to found on. The
+same holds for text there: most open places stand beyond other open places, so the field is compared on a symbol whose near left is
+unknown, which is a blend's training. Lap 94's state codes the next place on its whole left context at 2.05 nats. Neither is read as
+the cause yet; the second is what the plain-text run of the night tests (§11).
 
 ## 9. Plain text under the same dwell
 
@@ -186,13 +210,19 @@ A second, smaller: a trial's table is read for what its form gives away before a
 
 ## 11. What follows
 
-1. G-L3's mixed arms: sections of sums and of text alternating, and 25 sums with 75 text rows inside each section as the line had them.
-   They say whether a section has to be one world's, and what the pass must be.
-2. The pass's own navigation. The act that founded the law is staying, and the engine has no such act: the cut chooses before any
-   forward. The first chosen contact is the pass's (stay on a world, or leave), read from the learner's own progress there (the
-   receipt's `predicted` and `transfer`, kept as one slow store a world), drawn by odds, with a matched replay against the quota law.
-   This is Brandon's line of 16:08 UTC and Codex's crossing at the pass's grain.
-3. What text needs that a dwell does not give: a law its own entries and its own comparison. The October records own the objects (a
-   strand's residue on rings addressing shared rows; a part's own face), and the engine's table of the theory's laws against it
-   ([THE_ENGINE §11](../../docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine)) is corrected for today.
+Brandon, the same evening (20:27 UTC, in my words): the sums are a way of looking at what she learns on simple examples and are not to
+become a campaign; a worded form she was never shown is expected to fail and is no finding. The second worlds I had queued (three-digit
+sums, subtraction, `add x to y`) are not run. One pair stays as a single look at whether a founded law shortens the next (`x plus y
+equals` from the founded state and from lap 94's), and is read in `guesses.txt`.
+
+1. **Text, the main line.** A run of the night (G-N1): fifty simple narrative books as next-symbol rows, each place compared on its
+   whole left context, 40 passes, with sixteen prompts written left to right after each pass. It reads whether the states a field is
+   compared on, more than its pass, are what kept text at almost-words (§8's last paragraph).
+2. **The pass's own navigation.** The engine has no act of staying or leaving: the cut chooses before any forward. The first chosen
+   contact is the pass's, read from the learner's own progress in a world (the receipt's `predicted` and `transfer`, kept as one slow
+   store a world), drawn by odds, with a matched replay against the quota law. This is Brandon's line of 16:08 UTC and Codex's crossing at
+   the pass's grain. The arms of §8 say what it is for: not to keep worlds apart, which they do not need, but to give a law the count of
+   well-formed records it needs before the pass moves on.
+3. **What text needs that a count does not give**: a law its own entries and its own comparison (§9), if the night's run leaves
+   almost-words on the page.
 4. Every step's report opens with the panel, whole.

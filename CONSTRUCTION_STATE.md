@@ -28,19 +28,25 @@ An independent read by Codex on its own squares agrees. The trials of the same m
 and everything concluded from them is withdrawn there: that stepping cannot take a law that lives in a product, that a founding part was
 needed, and the reading of the October machine at three passes. The guide carries the rule (a learner's null is held to a length).
 
-The line's fault is read from its own pass line: 701 MB taken once through, never a stretch twice, every section a mix of all seven
-slices, arithmetic a quarter of each (3.6 million pieces), and a short sum's units digit never moved. Nothing was ever dwelt on.
+A stream in which no sum is met twice founds the law as fast (88 of 96), sections of sums and of text alternating found it on the same
+schedule while the text falls as if alone (87 of 96, one state holding both), and 25 sums among 75 text rows in every section found it
+at about the same count of sums met. So what a law needs is a count, about 160 to 200 thousand records with their operands known and
+their answer open, in any arrangement tried.
 
-Plain text does not settle the same way. The same dwell on three simple books falls slowly with no transition and still writes
-almost-words at pass 400 (the record's §9): a text is thousands of small laws that share every entry, and a dwell alone gives no law
-its own entries or its own comparison.
+The line's own failure is narrowed, not explained. Its pass read 701 MB once through, every section a mix of seven slices, and the
+arithmetic it took holds 1.6 million such short sums, yet a held units digit stood at 2.33 nats. Unread there: the sums were a hundredth
+of a section's places, and the line's trainer opens stretches so that an answer's place is often open with its operands open too. The
+same holds for its text (most open places stand beyond other open places), and lap 94's state codes the next place on its whole left
+context at 2.05 nats.
 
-Standing: lap 94's state is frozen, the line is stopped, and no part is added to that state. A stream in which no sum is met twice founds the law as fast (88 of 96 held sums whole), so it is the world met alone,
-not the records met again. In order: the two mixed arms that say what a section must be (sums and text in alternate sections, sums
-inside mixed sections as the line had them); the pass's own
-navigation (stay on a world or leave, read from the learner's own progress there, against the quota law on a matched replay); and what
-text needs that a dwell does not give. Every report opens with the panel, whole. The store's leak is a state of the learner
-(`Learner::leak`), absent from every standing state.
+Plain text under the half-open dwell has no transition and still writes almost-words at pass 400 (the record's §9).
+
+Standing: lap 94's state is frozen, the line is stopped, and no part is added to that state. The sums stay a probe of what she learns on
+simple examples and are not a campaign (Brandon, November 17 20:27Z). The work is text and the pass: a run of the night compares every
+place on its whole left context over fifty simple books, with a panel written left to right after each pass (G-N1); then the pass's own
+navigation (stay in a world or leave, read from the learner's own progress there, against the quota law on a matched replay); and, if
+almost-words remain, a law's own entries and comparison. Every report opens with the panel, whole. The store's leak is a state of the
+learner (`Learner::leak`), absent from every standing state.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 
