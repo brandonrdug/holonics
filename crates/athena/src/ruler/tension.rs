@@ -398,7 +398,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     // The read table, where one is given: each row's group, prompt, run and the place of its answer's last digit in the run.
     let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, Option<usize>, String)> = Vec::new();
     let (mut every, mut save) = (0usize, 0usize);
-    if args.len() == 18 {
+    if args.len() >= 18 {
         let feed = codec.encode(b"\n")?;
         if feed.len() != 1 {
             return Err("a codec whose line feed is not one class".into());

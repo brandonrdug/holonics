@@ -1,0 +1,21 @@
+# The long trial (G-L1), arm leak12: the run's own lines (every read; every 25th pass). Rows whose extent told the answer's length (see guesses.txt).
+TRIAL_PASSES records=3923 passes=1500 records_a_section=100 closed=0 leak=12 threads=24
+TRIAL_READ pass=0 group=fit rows=400 last_alone=2298655 last_run_open=2839445 first_alone=1801454 first_rows=353 density_at_last_milli=103
+TRIAL_READ pass=0 group=held rows=251 last_alone=2311674 last_run_open=2954067 first_alone=1794568 first_rows=210 density_at_last_milli=103
+TRIAL_READ pass=0 group=strict rows=486 last_alone=2304507 last_run_open=3152636 first_alone=1639201 first_rows=430 density_at_last_milli=106
+TRIAL_READ pass=25 group=fit rows=400 last_alone=2173989 last_run_open=2224720 first_alone=763809 first_rows=353 density_at_last_milli=125
+TRIAL_READ pass=25 group=held rows=251 last_alone=2212682 last_run_open=2269508 first_alone=768670 first_rows=210 density_at_last_milli=125
+TRIAL_READ pass=25 group=strict rows=486 last_alone=2261478 last_run_open=2266972 first_alone=732761 first_rows=430 density_at_last_milli=115
+TRIAL_READ pass=50 group=fit rows=400 last_alone=177424 last_run_open=198453 first_alone=113677 first_rows=353 density_at_last_milli=849
+TRIAL_READ pass=50 group=held rows=251 last_alone=222245 last_run_open=227665 first_alone=113086 first_rows=210 density_at_last_milli=821
+TRIAL_READ pass=50 group=strict rows=486 last_alone=275702 last_run_open=241221 first_alone=137400 first_rows=430 density_at_last_milli=804
+TRIAL_READ pass=75 group=fit rows=400 last_alone=62921 last_run_open=52925 first_alone=53189 first_rows=353 density_at_last_milli=947
+TRIAL_READ pass=75 group=held rows=251 last_alone=89470 last_run_open=75897 first_alone=68266 first_rows=210 density_at_last_milli=938
+TRIAL_READ pass=75 group=strict rows=486 last_alone=89239 last_run_open=61390 first_alone=63057 first_rows=430 density_at_last_milli=940
+TRIAL_READ pass=100 group=fit rows=400 last_alone=17247 last_run_open=19566 first_alone=24807 first_rows=353 density_at_last_milli=983
+TRIAL_READ pass=100 group=held rows=251 last_alone=20743 last_run_open=22241 first_alone=33354 first_rows=210 density_at_last_milli=980
+TRIAL_READ pass=100 group=strict rows=486 last_alone=22988 last_run_open=27854 first_alone=30225 first_rows=430 density_at_last_milli=978
+TRIAL_PASS pass=24 sections=1000 sites=15769 micronats_a_place=1009072 ms=116084
+TRIAL_PASS pass=49 sections=2000 sites=15723 micronats_a_place=662654 ms=233313
+TRIAL_PASS pass=74 sections=3000 sites=15789 micronats_a_place=631701 ms=359036
+TRIAL_PASS pass=99 sections=4000 sites=15770 micronats_a_place=610217 ms=508792

@@ -1,0 +1,17 @@
+# The long trial (G-L1), arm leak14: the run's own lines (every read; every 25th pass). Rows whose extent told the answer's length (see guesses.txt).
+TRIAL_PASSES records=3923 passes=1500 records_a_section=100 closed=0 leak=14 threads=24
+TRIAL_READ pass=0 group=fit rows=400 last_alone=2298655 last_run_open=2839445 first_alone=1801454 first_rows=353 density_at_last_milli=103
+TRIAL_READ pass=0 group=held rows=251 last_alone=2311674 last_run_open=2954067 first_alone=1794568 first_rows=210 density_at_last_milli=103
+TRIAL_READ pass=0 group=strict rows=486 last_alone=2304507 last_run_open=3152636 first_alone=1639201 first_rows=430 density_at_last_milli=106
+TRIAL_READ pass=25 group=fit rows=400 last_alone=2166204 last_run_open=2216831 first_alone=741553 first_rows=353 density_at_last_milli=126
+TRIAL_READ pass=25 group=held rows=251 last_alone=2238519 last_run_open=2261417 first_alone=781626 first_rows=210 density_at_last_milli=120
+TRIAL_READ pass=25 group=strict rows=486 last_alone=2287117 last_run_open=2292421 first_alone=731504 first_rows=430 density_at_last_milli=111
+TRIAL_READ pass=50 group=fit rows=400 last_alone=311585 last_run_open=342319 first_alone=170661 first_rows=353 density_at_last_milli=769
+TRIAL_READ pass=50 group=held rows=251 last_alone=314693 last_run_open=370186 first_alone=155016 first_rows=210 density_at_last_milli=761
+TRIAL_READ pass=50 group=strict rows=486 last_alone=374447 last_run_open=381485 first_alone=185637 first_rows=430 density_at_last_milli=734
+TRIAL_READ pass=75 group=fit rows=400 last_alone=26579 last_run_open=20235 first_alone=22803 first_rows=353 density_at_last_milli=976
+TRIAL_READ pass=75 group=held rows=251 last_alone=22774 last_run_open=34159 first_alone=21714 first_rows=210 density_at_last_milli=978
+TRIAL_READ pass=75 group=strict rows=486 last_alone=60418 last_run_open=29656 first_alone=47380 first_rows=430 density_at_last_milli=964
+TRIAL_PASS pass=24 sections=1000 sites=15769 micronats_a_place=1010976 ms=119816
+TRIAL_PASS pass=49 sections=2000 sites=15723 micronats_a_place=682211 ms=237370
+TRIAL_PASS pass=74 sections=3000 sites=15789 micronats_a_place=627064 ms=364020
