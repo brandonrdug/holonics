@@ -625,6 +625,35 @@ def midpoint(d, triads=10):
                 print(f"TENSION_MIDPOINT {scope} {pname} {k} {t.sum()} {code[t].mean():.3f} {present:.4f} " + " ".join(f"{v:.4f}" for v in out) + f" {closed:.4f} {removed(pair, lam, f, t):.4f}", flush=True)
 
 
+def modes(d, triads=10):
+    """The junction located on leading modes, with no label (the lead, November 17; the Demeter record §7: "a crossing's legs founded
+    on the leading modes of the heads' gathered currents", a form for every stream that leaves the assignment to the field). On a
+    `read-tension` directory, by part and tick: the pair chart and the gathered current are each reduced to their m leading principal
+    coordinates on the fit half of the places (no digit is read), products are located on those coordinates from the covector alone
+    (2m numbers a product in place of 256), and the share they remove is read on the held half, beside the pair's table. Against
+    `midpoint`, whose ten coordinates are fitted to the digits' labels and which is a ruler's gate, never a founding."""
+    rows, lam, read, cur, prod, ticks, kinds, tick, code, fit, test, met, plus = read_dir(d)
+    part = np.array([PARTS.index(part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    pair = (onehot(da)[:, :, None] * onehot(db)[:, None, :]).reshape(len(rows), 100)
+    print("TENSION_MODES scope part tick test_rows source m linear products_5 products_all table")
+    for scope, mask in (("met+", met & plus),):
+        for pid, pname in enumerate(PARTS):
+            for k in range(ticks):
+                sel = mask & (tick == k) & (part == pid)
+                f, t = sel & fit, sel & test
+                if t.sum() < 200 or pname == "top":
+                    continue
+                for sname, x in (("chart", read), ("current", cur)):
+                    centred = x - x[f].mean(axis=0)
+                    _, _, vt = np.linalg.svd(centred[f], full_matrices=False)
+                    for m in (8, 16):
+                        z = centred @ vt[:m].T
+                        a, b = locate(z[f], lam[f], triads, sweeps=20, starts=3)
+                        out = [removed(z, lam, f, t)] + [removed(np.hstack([z, products_of(z, a[:j], b[:j])]), lam, f, t) for j in (5, triads)]
+                        print(f"TENSION_MODES {scope} {pname} {k} {t.sum()} {sname} {m} " + " ".join(f"{v:.4f}" for v in out) + f" {removed(pair, lam, f, t):.4f}", flush=True)
+
+
 def temper(d, heads=4):
     """The premise of a row's own temperature, on a `read-tension-store` directory: each open row's temperature covector `δℓ` (as the
     reverse forms it before the rows are summed into the head's one entry) beside the row's opening chart. By head: how nearly the rows'
@@ -750,6 +779,8 @@ def main():
         closed_lock(sys.argv[2])
     elif cmd == "midpoint":
         midpoint(sys.argv[2])
+    elif cmd == "modes":
+        modes(sys.argv[2])
     elif cmd == "heat":
         heat(sys.argv[2])
     elif cmd == "links":
