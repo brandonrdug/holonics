@@ -238,3 +238,26 @@ G-H4: ten located products remove 0.20 or more of the covector at the units plac
 G-H5: each of the six text slices' held one-place codes rises by 0.05 nats a place or less.
 What it decides: H1, H2 and H4 held say the junction is locatable under a cooled turned head where a record stands alone, so the
 founding is the head's temperature and the legs together; H5 says what one temperature a head for every slice would cost text.
+
+G-H1 to G-H5: VOID, read from the clock at 00:10:42 UTC, November 17. Their premise was a mislabelled row. The heat ruler prints
+"lengths tick head", and the row quoted as head 3's at tick 0 (0.470, 0.731 at the fourth power) is head 0's at tick 3. Rightly labelled,
+at lap 77's mean on short sums the aligned pair's share is, at tick 0 by head: 0.405, 0.241, 0.066, 0.002; and for head 0 by tick: 0.405,
+0.239, 0.235, 0.470. On sums of 1 to 6 digits at lap 76's mean, at tick 0 by head: 0.332, 0.179, 0.063, 0.003; head 0 by tick: 0.332,
+0.254, 0.192, 0.256. The check that was at hand and not made: the first record's link trace already gave head 0's shares by tick
+(0.171 + 0.161, 0.106 + 0.148, 0.089 + 0.103, 0.114 + 0.142), and the rows read as heads 1 to 3 are those sums.
+What the read of head 3's listener raised two octaves did show (cool77_2000.*): its row holds nothing of the pair before or after
+(0.002, 0.000); the operands' presence at the answer's site stays where it was (0.437 and 0.476 at tick 0, 0.420 and 0.550 at tick 1,
+against 0.446, 0.516, 0.427, 0.564); the units digit codes at 2.372 (2.365); ten located products at the units place remove 0.000 on the
+held half at tick 1. The turned heads carry none of a short sum's operands; the address is the still heads', head 0 first.
+
+GUESSES G-K1 to G-K5, fixed at 00:10:42 UTC, November 17 (from date -u), before the read: head 0 cooled on short sums
+Premise, rightly labelled (heat_short77.txt): head 0's row gives the aligned pair 0.405, 0.239, 0.235 and 0.470 at ticks 0 to 3, and its
+shares raised to the fourth power give 0.450, 0.261, 0.233 and 0.731 (a still head has no falloff by distance, so the power is near what
+its temperature does at the first tick; later ticks' keys move with what arrived).
+Reading: ruler states of lap 77's mean with head 0's listener temperature raised by one octave and by two (ruler-temper), the instrument
+of G-V, ten located products at the units place, and the held passage at 100 places a slice against the same mean read fresh.
+G-K1: at two octaves head 0's share on the aligned pair is between 0.40 and 0.52 at tick 0 and 0.55 or more at tick 3.
+G-K2: the operands' presence at the answer's site at tick 3 rises to 0.42 or more for a and 0.50 or more for b (0.375 and 0.457).
+G-K3: the units digit's code moves by less than 0.05 nats either way (2.365).
+G-K4: ten located products at the units place remove 0.12 or more on the held half at some tick (0.090 at most, lap 76's mean).
+G-K5: at two octaves at least three of the six text slices' held one-place codes rise by 0.05 nats a place or more.
