@@ -1,6 +1,6 @@
 # A symbol's key is located by closing a menu of the field's own rows: the ring of ten comes out with no gradient, its pair product carries a sum's upper columns, and the units place waits on a row that holds both digits
 
-The lead, November 17, 2026, 09:33 to 11:00 UTC. Refs #404, #73, #386. Status: [measurements by host rulers on the line's saved
+The lead, November 17, 2026, 09:33 to 11:15 UTC. Refs #404, #73, #386. Status: [measurements by host rulers on the line's saved
 states, each with its guess fixed and pushed before the read and its instrument held to a planted law; §7 is a design's statement,
 `agent-inferred`, nothing built and nothing ordered]. It continues
 [the wheel's record](2026-11-17_THE_DIGITS_WHEEL_A_SYMBOLS_MOVE_ON_A_RING_IS_A_TURN_A_HALF_TURN_OR_A_COLLAPSE_THE_ENGINES_CLOCKS_ONLY_TURN_AND_A_SUM_NEEDS_THE_HAND_FLIPPED_AT_THE_EQUALS_SIGN.md),
@@ -159,7 +159,7 @@ of 0.435 was a sum over two digits it seldom holds together.
 The instrument's first form matched a row to its open place by the sum's label; the table repeats sums, so repeated sums read
 zeros and its first figures were void (`guesses.txt`). A dump is matched by order.
 
-## 6b. Reads of the closure's reach, 10:20 to 11:00 UTC
+## 6b. Reads of the closure's reach, 10:20 to 11:15 UTC
 
 Each was guessed first, and each says what the closure needs or where it stops.
 
@@ -199,6 +199,16 @@ pair charts (k-means, sixteen groups), follow the layout and not the law: twelve
 each, and no group's menu closes. Of the contexts read, one works with no label for the two additive laws: the presence of a
 symbol among a row's sources.
 
+**The slice as the trainer draws it** (G-SL1, G-SET1; `slice86_presence.txt`, `slice86_sets.txt`). 4,000 distinct records from
+the head of the redrawn slice, every form (two to four operands, parentheses, the operations mixed in a record), every place
+open, 61,119 places. Under a symbol's presence the menu does not close (G-SL1 missed, held at even odds): a record of three
+operands carries the plus beside a times sign. Under the whole set of symbols a row meets outside the digits' block it does
+not close either (G-SET1 missed, held at three in four). There the instrument shows its own weak point: at its level the block
+leaves the zero out on this slice, where a zero is written beside other things than the other digits are, and at a looser level
+the records whose only sign is the plus stand in one context of about ten thousand places whose menu still gives no keys. So the
+closure closes where a record holds one law at short operands, and on the machine's own region as it is drawn it does not, at
+this sample, under any context read here.
+
 **Products across heads** (a diagnosis, not guessed; `release86_cross.txt`, `loop_closure_ruler.py cross`). At the units
 place one row holds one aligned digit or the other. With every head's keyed barycentre and the products of two heads' barycentres
 beside head 0's own pair product, the wheel's digit is read at 0.26, 0.43 and 0.29 at ticks 0 to 2 (0.22, 0.22, 0.18 from head 0
@@ -235,8 +245,12 @@ order and whose keys are located"; it names no digit, no base and no operation.
   and its flat function. An unordered row gives a difference only up to its sign (the third record §3); two heads' rows give an
   ordered pair, which §6b's last read touches and no read has yet taken for a difference.
 - The context. Read in §6b: the rows' share on a sign is too thin to index the law, and the charts' largest groups are the
-  layout's. The presence of a symbol among a row's sources separates the two additive laws on two-operand records. Whether it
-  does on the slice as it is drawn (parentheses, three and four operands) is not read, and a product's law has no context yet.
+  layout's. The presence of a symbol among a row's sources separates the two additive laws on two-operand records of short
+  operands, and on the slice as it is drawn neither it nor the set of symbols a row meets closes the menu. A founding read off
+  the machine's own region is therefore not in hand, and a product's law has no context at all.
+- The instrument. The block's level is set by hand and moves which symbols a ring may hold (the zero). A block read from the
+  menu needs a law of its own (a level read from the menu's own spread, or a block grown from a closure outward) before the
+  closure founds anything.
 - Products. A units digit under multiplication is a monoid on ten symbols and a group on four; the instrument returns it from a
   planted menu and the real rows do not hold it. Sums and differences are 0.42 of the word problems' operations by the ruler's
   count, so an additive ring alone does not reach the yardstick.
@@ -267,7 +281,7 @@ covector closes the row on both digits. A founding that moves neither is a faile
 `receipts/2026-11-16_tension/`: `guesses.txt` (G-HC, G-J, G-LC, G-RL, each fixed and pushed before its read, with its score);
 `circles86.txt`, `circles86_planted.txt`; `junction_sums78.txt`; `oracle_short86.txt`, `heat_short86.txt`, `midpoint_short86.txt`;
 `closure86.txt`, `closure86_planted.txt`, `closure77_units_tick0.txt`; `release86.txt`, `release86_cross.txt`; `planes86.txt`, `planes86_planted.txt`,
-`planes86_block.txt`; `context86.txt`, `context86_planted.txt`, `context86_presence.txt`; `text86_closure.txt`; `clusters86.txt` (G-DH, G-SG, G-TX, G-CX). Tools:
+`planes86_block.txt`; `context86.txt`, `context86_planted.txt`, `context86_presence.txt`; `text86_closure.txt`; `clusters86.txt`; `slice86_presence.txt`, `slice86_sets.txt` (G-DH, G-SG, G-TX, G-CX, G-SL, G-SET). Tools:
 `tools/loop_closure_ruler.py` (`DIR`, `planted`, `release`, `cross`, `planes`, `context TABLE`, `text TABLE`, `clusters TABLE`), `tools/store_windows.py`, `tools/tension_ruler.py` (`circles`,
 `junction`), `athena host complete-language read-tension` (now with `charge.i64` and `gate.i64`, and `shares` for the open rows'
 shares alone), `athena train complete-language read-triads`. The reads ran on the host beside laps 87
