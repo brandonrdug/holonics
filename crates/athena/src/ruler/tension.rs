@@ -445,7 +445,8 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             OwnedRegion::plain(classes, open)
         };
         let mut groups: std::collections::BTreeMap<String, [(i128, usize); 3]> = std::collections::BTreeMap::new();
-        let mut mass: std::collections::BTreeMap<String, f64> = std::collections::BTreeMap::new();
+        // The density at the written class, each place's on 2^(−20) (a reading's width), summed a group.
+        let mut mass: std::collections::BTreeMap<String, u128> = std::collections::BTreeMap::new();
         for kind in 0..3usize {
             let regions: Vec<OwnedRegion> = read_rows.iter().map(|row| region_of(row, kind)).collect();
             let views: Vec<_> = regions.iter().map(view_of).collect();
@@ -467,7 +468,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
                     slot.0 += i128::from(holonics_engine::field::ratio_code(m, t));
                     slot.1 += 1;
                     if kind == 0 {
-                        *mass.entry(row.0.clone()).or_insert(0.0) += m as f64 / t as f64;
+                        *mass.entry(row.0.clone()).or_insert(0) += (m << 20) / t.max(1);
                     }
                 }
             }
@@ -481,7 +482,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
                 nats(sums[1]),
                 nats(sums[2]),
                 sums[2].1,
-                (1000.0 * mass.get(group).copied().unwrap_or(0.0) / sums[0].1.max(1) as f64).round() as i64
+                (mass.get(group).copied().unwrap_or(0) * 1000 / sums[0].1.max(1) as u128) >> 20
             );
         }
         Ok(())
