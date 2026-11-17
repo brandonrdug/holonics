@@ -137,3 +137,21 @@ law's keyed order and in place order.
       more and their last read within 0.02 of their lowest; held and unread prompts' words in the lexicon at or above the no-leak arm's.
   What it decides: held and unread prompts written at 70% or more in the lexicon, with no long shared run, say that dwelling on a small
   plain world is what the line's single pass withheld. A fitted code that falls while the held prompts stay near 43% says rote.
+
+Read (2026-11-17T19:31:45Z), G-L1 at pass 100 (the arms run on; scored in full below when they are stopped): the strictly held last digit open alone
+reads 2.292 nats at pass 25, 0.521 at pass 50, 0.072 at pass 75 and 0.017 at pass 100 on the arm with no leak (density at the written
+digit 0.991; with the whole run open 0.015; the first digit 0.007); the 12-bit leak 0.276, 0.089, 0.023; the 14-bit leak 0.374, 0.060
+(stopped near pass 95 to free the card). G-L1 missed: every arm passed under 0.8, by pass 75. The step back's sentence is withdrawn.
+
+G-L3 (2026-11-17T19:31:45Z). What took the sums: records met again and again, or a world dwelt on? And does a second world between the sections stop it?
+Two arms from lap 94's end state, fixed before either is launched (the concentrated arm above is their control: its transition's
+middle stands near section 2,000, strictly held last digit 0.52 at section 2,000 and 0.07 at 3,000).
+  the stream (no sum met twice: 400,000 fresh sums of the fitting half's operand law, no held pair in either order, 40 sections a
+    pass): the strictly held last digit under 0.1 nats by section 3,000, the control's place or sooner. What a miss says: repetition of
+    records carries the transition, and a stream cannot found it.
+  the interleaved arm (sections of 100 sums and sections of 100 text rows of the plain-text world alternating, 200 passes of 75
+    sections): the transition comes later than the control's in sum sections: the strictly held last digit still above 1.0 after 2,000
+    sum sections (pass 51) and under 0.5 by 7,800 (pass 200); the text's held rows' keyed half within 0.05 nats of the text-alone arm's
+    at equal text sections. What it decides: if the sums are never taken beside text, a single stream of mixed worlds cannot found a
+    law that a dwelt world founds in five minutes, which is what the line was (one pass over seven registers, sums a tenth of each
+    section); if they are taken as soon as alone, the mixing was not the line's fault and its fault is the sums' share and form there.

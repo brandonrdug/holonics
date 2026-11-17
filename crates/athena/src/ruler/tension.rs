@@ -352,10 +352,11 @@ pub fn carry_of(milli: &str) -> Result<i64> {
 /// the learner is written to `OUT.pN`. A row whose run holds no line feed past its first place is a plain row (a stretch of text): its
 /// two reads are a keyed half of its run open (the key the row's label and the place, the same at every pass) and the whole run open,
 /// each a mean over the open places; its third is the whole run open again, coded at the run's first place alone (the next place on
-/// its left context, the state a write's first place meets).
+/// its left context, the state a write's first place meets). With `ROWS` after `SAVE`, each pass takes the table's next `ROWS` rows
+/// and never a row twice: a stream, the arm that tells a world dwelt on from records repeated.
 pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
-    if args.len() != 14 && args.len() != 18 {
-        return Err("try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT [READ READ_SHA EVERY SAVE]".into());
+    if args.len() != 14 && args.len() != 18 && args.len() != 19 {
+        return Err("try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT [READ READ_SHA EVERY SAVE [ROWS]]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("try-passes")?;
@@ -368,6 +369,11 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         return Err("a state whose alphabet is not its codec's".into());
     }
     let (sweeps, records): (usize, usize) = (args[11].parse()?, args[12].parse()?);
+    // With `ROWS`, a pass takes the table's next `ROWS` rows where it would take the table whole, so no row is met twice (a stream).
+    let stride: Option<usize> = match args.get(18) {
+        Some(w) => Some(w.parse::<usize>().ok().filter(|&n| n > 0).ok_or("ROWS is a count of one or more")?),
+        None => None,
+    };
     let out = Path::new(&args[13]);
     if out.exists() || sweeps == 0 || records == 0 {
         return Err("try-passes writes a new state from one pass or more of one record or more a section".into());
@@ -384,6 +390,9 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             return Err("a forms row with an empty prompt or run".into());
         }
         rows.push((w[0].to_string(), p, r));
+    }
+    if stride.is_some_and(|n| n * sweeps > rows.len()) {
+        return Err("a stream of fewer rows than its passes take".into());
     }
     println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} leak={} threads={}", rows.len(), learner.field.declaration.closed, learner.leak.map_or("none".to_string(), |k| k.to_string()), rayon::current_num_threads());
     // The read table, where one is given: each row's group, prompt, run and the place of its answer's last digit in the run.
@@ -481,7 +490,11 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     let mut section = 0usize;
     for sweep in 0..sweeps {
         let (mut sites, mut code) = (0usize, 0i128);
-        for chunk in rows.chunks(records) {
+        let taken = match stride {
+            Some(n) => &rows[sweep * n..(sweep + 1) * n],
+            None => &rows[..],
+        };
+        for chunk in taken.chunks(records) {
             let regions: Vec<OwnedRegion> = chunk
                 .iter()
                 .map(|(label, p, r)| {
