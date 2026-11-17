@@ -63,3 +63,7 @@ tools/gsm8k/written_rules.py). The October run's trained PRA, everything stepped
   result's length selects (a product of which ring and its face), and the read of the comparison has itself to be founded from its
   tension; the founding standing unread is then the result, and the stepped passes' erasure of it is not what kept the sums from being
   written.
+
+Correction (2026-11-17T18:55Z, on Codex's audit of the same day): the openings these guesses call "mixed" or "a keyed half" took bit 17 of
+a bare FNV-1a fold, which gives adjacent places nearly the same bit: 97.8% of the regions opened one place or the whole run. Every read
+above stands as a read under that draw; the draw is repaired in the source (keyed_bit) for later runs.

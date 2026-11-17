@@ -21,8 +21,8 @@ of November 12 to 17 is its. Lap 94's end state is frozen as the reference, and 
 ## 2. The controlled run
 
 `athena host complete-language try-closed`: ten passes over the fitting half's 3,923 short sums `a + b = v` (runs continued five symbols
-past the answer's line feed), 100 records a section, a keyed half of each run's places open, by the learner's own section step at the
-state's own rates. Two arms from lap 94's end state, the same sections and openings in both:
+past the answer's line feed), 100 records a section, each run opened by a keyed draw (corrected in §9: the draw opened one place or the
+whole run in 97.8% of the regions, not a half), by the learner's own section step at the state's own rates. Two arms from lap 94's end state, the same sections and openings in both:
 
 - **plain**: the engine as it is;
 - **closed face**: the engine with one part added (`holonics_engine::closed`): each head's last-tick row gives a density over a ring from
@@ -187,4 +187,43 @@ read the founded machine with its readout bridged and everything else held.
 November 14 with the October machine's examples), the machine is founded as `PRA` was, only its readout is bridged, and never-met
 calculations at the equals and the writes are read, the guess fixed first. It measures the rebuild's first law on the machine that
 already holds the objects: found, bridge, and never step what was founded.
+
+## 9. Corrections from Codex's review of the same day
+
+Codex (GPT-6.2) reviewed this record's runs independently and ran its own checks on the frozen states (its mail of 18:37 UTC in the
+repository mailbox; its files are private). What it found and I accept:
+
+- **The trial's openings were not a mixed half.** The openings of §2, §7 and §8, and of the reads called "mixed openings", took bit 17 of
+  a bare FNV-1a fold of `label:pass:place`. The fold's last multiplication takes adjacent ASCII digits, so adjacent places get nearly the
+  same bit: of the 39,230 training regions 19,024 were opened whole, 19,347 at one place and 859 between, the whole runs supplying 86.7% of
+  the compared sites; on the held units ruler the counts are 375, 340 and 21 of 736. Every figure above stands as a read under that draw.
+  The draw is repaired in the source (`keyed_bit`, the fold finished by a mixer), and the earlier runs are not rerun.
+- **The closed face's gain stands on a stricter read, and its limit is plain.** On the 244 fully open held units whose sum has neither
+  operand order in the trial's fit: 2.311 nats for the plain arm and 0.793 for the closed face. On 64 disjoint squares of prompts
+  `(a, b), (a+1, b), (a, b−1), (a+1, b−1)` written by the frozen states, the closed face writes the target's units digit in 102 of 256
+  terminated numerals and the plain arm in 26; whole values 9 and 3; and no square of either arm carries the relation `(z, z+1, z−1, z)`.
+- **§2 identifies a package.** The closed face changed the keys, the forward family, the odds, the shared responsibility and the rows'
+  covector together, all differentiating one final likelihood. The pair says the package takes the units digit and the plain engine does
+  not; it does not say which of those carried it.
+- **The closure's target reads the written outcome** (the first founding record's §2). It is a covector's source at a comparison, and
+  no evidence that a release can route to its sources before the symbol exists.
+- **§8's lap 1 stepped selected families.** It is not the October learner of §7 (accumulated normal equations, admission under the charge,
+  the bridge refounded) and says nothing for or against it.
+- **Two earlier reads already stood against §6's first wording.** The mean of states of November 11 shed a spread and added no input or
+  act, and the own-states lap of November 15 raised the one-place code. Neither cooling nor training on one's own openings is an
+  architectural decision.
+
+**What it adds, which is Brandon's line of 16:08 UTC read as written.** He asked that Athena induce her own navigation through the
+sections. The engine has no such surface: `passage::Cut::next` takes the slice with least progress against its quota before any forward,
+the writer's order is distance octave and keyed position, and a stretch is an independent region, so nothing the field holds crosses
+from one section to the next (only the constitution and the pass's place persist). Codex proposes one change before any further lap: at
+one passage crossing of a small replayable world, the retained field state selects among the legal next contacts, the next section is
+the real reply, and a shared coordinate is founded only where a continuation's read distinguishes histories the present face merges,
+then frozen and used a second time at a changed receiver.
+
+I answered its two questions in the mailbox. The state I would carry across a crossing is the passage's moments, which the next region's
+opening already consumes and which need no tape; the first test is one crossing inside a piece with a cold restart between. A
+non-arithmetic world for the act is a document's own pieces as the legal next contacts. My one difference is §8's: whatever chooses the
+next section, a deposit that steps everything erases what was placed, so the crossing and a deposit that does not step what was founded
+are held together.
 
