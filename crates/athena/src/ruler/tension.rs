@@ -382,7 +382,8 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     let unescape = |t: &str| t.replace("\\n", "\n");
     // A row's fourth field, where it stands, names its opening: `suffix` opens the run from a keyed place to its end (the state a write
     // in place order meets: every earlier place known, every later one open); absent, a keyed half of the run's places.
-    let mut rows: Vec<(String, Vec<usize>, Vec<usize>, bool)> = Vec::new();
+    // `first` opens the row's prompt and holds its run known: a place compared on what stands to its right (the backward reader's state).
+    let mut rows: Vec<(String, Vec<usize>, Vec<usize>, u8)> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         if w.len() < 3 {
@@ -392,19 +393,20 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         if p.is_empty() || r.is_empty() {
             return Err("a forms row with an empty prompt or run".into());
         }
-        let suffix = match w.get(3).copied() {
-            None | Some("") => false,
-            Some("suffix") => true,
-            Some(_) => return Err("a forms row whose opening is not `suffix`".into()),
+        let opening = match w.get(3).copied() {
+            None | Some("") => 0u8,
+            Some("suffix") => 1,
+            Some("first") => 2,
+            Some(_) => return Err("a forms row whose opening is not `suffix` or `first`".into()),
         };
-        rows.push((w[0].to_string(), p, r, suffix));
+        rows.push((w[0].to_string(), p, r, opening));
     }
     if stride.is_some_and(|n| n * sweeps > rows.len()) {
         return Err("a stream of fewer rows than its passes take".into());
     }
     println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} leak={} threads={}", rows.len(), learner.field.declaration.closed, learner.leak.map_or("none".to_string(), |k| k.to_string()), rayon::current_num_threads());
     // The read table, where one is given: each row's group, prompt, run and the place of its answer's last digit in the run.
-    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, Option<usize>, String)> = Vec::new();
+    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, Option<usize>, String, bool)> = Vec::new();
     let (mut every, mut save) = (0usize, 0usize);
     if args.len() >= 18 {
         let feed = codec.encode(b"\n")?;
@@ -421,7 +423,9 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
                 return Err("a read row with an empty prompt or run".into());
             }
             let last = r.iter().position(|&c| c == feed[0]).filter(|&at| at > 0).map(|at| at - 1);
-            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, last, w[0].to_string()));
+            // A read row with `first` as its fourth field is read with its prompt open and its run known, at each of its three reads.
+            let first = w.get(3).copied() == Some("first");
+            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, if first { None } else { last }, w[0].to_string(), first));
         }
         (every, save) = (args[16].parse()?, args[17].parse()?);
         if every == 0 || save == 0 || read_rows.is_empty() {
@@ -433,10 +437,14 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         if read_rows.is_empty() {
             return Ok(());
         }
-        let region_of = |(_, p, r, last, label): &(String, Vec<usize>, Vec<usize>, Option<usize>, String), kind: usize| {
+        let region_of = |(_, p, r, last, label, first): &(String, Vec<usize>, Vec<usize>, Option<usize>, String, bool), kind: usize| {
             let mut classes = p.clone();
             classes.extend_from_slice(r);
             let mut open = vec![false; classes.len()];
+            if *first {
+                open[..p.len()].fill(true);
+                return OwnedRegion::plain(classes, open);
+            }
             match (kind, last) {
                 (0, Some(last)) => open[p.len() + last] = true,
                 (0, None) => {
@@ -462,6 +470,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             for ((row, face), region) in read_rows.iter().zip(&faces).zip(&regions) {
                 // A plain row sums every open place of its two reads; a sum's row reads its one place.
                 let places: Vec<usize> = match (kind, row.3) {
+                    _ if row.5 => (0..row.1.len()).collect(),
                     (2, Some(0)) => continue,
                     // A plain row's third read: its whole run open, coded at its first place alone (the next place on its left context).
                     (2, None) => vec![row.1.len()],
@@ -506,12 +515,14 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         for chunk in taken.chunks(records) {
             let regions: Vec<OwnedRegion> = chunk
                 .iter()
-                .map(|(label, p, r, suffix)| {
+                .map(|(label, p, r, opening)| {
                     let bit = |j: usize| keyed_bit(&format!("{label}:{sweep}:{j}"));
                     let mut classes = p.clone();
                     classes.extend_from_slice(r);
                     let mut open = vec![false; classes.len()];
-                    if *suffix {
+                    if *opening == 2 {
+                        open[..p.len()].fill(true);
+                    } else if *opening == 1 {
                         let from = (bit(r.len()) % r.len() as u64) as usize;
                         open[p.len() + from..].fill(true);
                     } else {

@@ -279,3 +279,20 @@ counts of compared places. Its panel: 104 of 185 words in the lexicon (56%) by t
 law's writer in place order (under 60% guessed); the night's run at pass 15: 140 of 184 (76%), held next place 1.527. By eye the
 control writes almost-words and the run writes real words in broken phrases. The comparison at the boundary is what text needed first;
 the register alone does not do it.
+
+Stopped (2026-11-17T23:08:40Z), G-N1's run, at pass 16 of 40 (held next place 1.5259, a fall of 0.0013 from pass 15), on Brandon's word of 23:06 UTC:
+an overnight bet on a reader that had shown no major coherence in two hours and had flattened by my own read, and a design that goes
+only forward with no analogue of a backward pass. Scored as far as it ran: fitted 1.42 (held: 1.50 or under), held 1.526 (missed low:
+1.60 to 1.72 guessed), unread about 1.55 (missed low), panel 76% at pass 15 (held), no long shared run (held), flattening by pass 20
+(held, sooner).
+G-B1 (2026-11-17T23:08:40Z). His lens: a forward pass has a backward pass. A second reader of the same field, compared on what stands to a place's
+RIGHT (the place the first of its region, 48 known places after it), trained beside the forward one from the forward run's pass-15
+state: sections of 400 forward rows and of 400 backward rows alternating over the fifty books (every fourth position each), 3 passes.
+Then a writer that drafts forward and passes back over its own draft: each place redrawn from the forward face (its left) times the
+backward face (its right, from the draft) over the symbol's own frequency, the forward-backward product, a few sweeps.
+  Nothing of it is read. The guess: the backward reader's held code (the place before its known right) at 1.55 to 1.70 nats after 3
+  passes, the forward reader's held code kept under 1.56; the panel after 4 sweeps at 85% or more of its words in the lexicon (the
+  forward draft about 75%), and by eye whole words where the draft has almost-words.
+  What it decides: sweeps that leave the draft's level say two soft readers multiply to a soft reader and binding is still the limit; a
+  clear rise says the backward pass is the tempering the forward reader lacked, and the engine's two-sided parts become its two one-sided
+  halves.
