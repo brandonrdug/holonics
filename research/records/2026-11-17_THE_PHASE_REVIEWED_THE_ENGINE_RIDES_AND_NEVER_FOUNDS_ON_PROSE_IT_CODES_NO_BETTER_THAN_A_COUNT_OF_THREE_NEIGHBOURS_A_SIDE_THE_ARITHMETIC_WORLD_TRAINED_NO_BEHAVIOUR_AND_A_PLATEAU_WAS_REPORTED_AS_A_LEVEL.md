@@ -42,13 +42,13 @@ one-place receiver's own question asked of a count table. One host thread, minut
 | held slice | count, 3 a side, 8 MB | 4 a side, 8 MB | 3 a side, 32 MB | 5 a side, 32 MB | the line, lap 91 | the line, lap 70 |
 |---|---|---|---|---|---|---|
 | books | 0.846 | 0.819 | 0.733 | 0.689 | 0.862 | 0.813 |
-| web | 0.951 | 0.930 | | | 0.901 | 0.849 |
+| web | 0.951 | 0.930 | 0.764 | 0.733 | 0.901 | 0.849 |
 | science | 0.923 | 0.908 | | | 0.758 | 0.698 |
 | code | 1.014 | 1.010 | | | 0.552 | 0.490 |
 
-On prose the line stands at or above a count of three neighbours a side: over it on books at any size of the count's text, and
-0.05 under the 8 MB count on web. It is well under the count on code and on science, where what a place repeats lies farther than
-three neighbours and a row can reach it. The record of November 12 read the same thing under whole masks after 0.2 GB (the store
+On prose the line codes no better than a count of three neighbours a side: at lap 91 it stands 0.13 over the 32 MB count on
+books and 0.14 over it on web (at lap 70, before the store widened, 0.08 over each). It is well under the 8 MB count on code and on
+science, where what a place repeats lies farther than three neighbours and a row can reach it. The record of November 12 read the same thing under whole masks after 0.2 GB (the store
 within 0.13 nats of a count of two a side); ten passes of a billion places each have moved that to about three a side.
 
 The rate at which it got there: from lap 18 to lap 70 the five text slices fell 0.062 nats together, 0.0012 a lap of 124 million
