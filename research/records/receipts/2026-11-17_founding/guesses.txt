@@ -28,3 +28,12 @@ G-FT2. Units, the row as it is: 0.957 nats (missed low, guessed 1.6 to 2.1; flat
   The aligned digits at a half each: 0.000 nats at units (held). Upper columns: 1.571 nats (missed high, guessed 0.7 to 1.3): with all
   nine characters the product is a point on the ring, so a carried column's written digit one step on gets nothing, and the fitted gain
   falls to 0.5. The carry needs its own term (the winding of the lower pair), as the units column needs none.
+
+G-FC1 (2026-11-17T16:46:59Z). The engine's host forward on lap 94's state (its section 2,000) founded with the closed characters: nine characters'
+keys closed from head 0's rows at tick 0 on the fitting half, every head's keyed pair product at the open rows, the return one step along
+the least-squares map from the products to the covector (it removes 0.046 of the covector's power on the held half over every tick and
+place). One-place receivers on held short sums, before: units 2.329 nats, top 1.808, middle 2.273.
+  At the step that codes the fitting half lowest: the held units digit 1.4 to 1.9 nats; the top and the middle columns within 0.1 of before.
+  The step against the covector (−8) codes the units digit above 2.33.
+What a miss would say: units above 1.9 at every step says one step along the covector does not carry the product through the chart and the
+readout, and the return then needs a solve through the readout itself.
