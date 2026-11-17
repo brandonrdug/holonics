@@ -43,11 +43,19 @@ does not close them.
 
 **Standing.** Lap 94's state is frozen and the line is stopped. Nothing is being built: the engine change announced in the evening (a
 one-sided chart, 48 times cheaper) is not started, since it is an efficiency bet on a reader that does not yet hold a unit, and three
-rulers of units as free rows were read as verdicts on their construction (§18). Owed first, as reading: the rest of the level's records
-(the landmarks' ruler of November 13, the return on the clock of news of November 15, the news clock of October 27), then what a
-comparison at a level's own grain is on the objects (an epoch's closure, and the next epoch read from the epochs before), written with
-its acceptance on the passage's clock before any part. Readings of text are stated in news and in founded grains, never in letters or
-windows of bytes (Brandon, 23:17Z). Every report opens with the panel, whole.
+rulers of units as free rows were read as verdicts on their construction (§18). Readings of text are stated in news and in founded
+grains, never in letters or windows of bytes (Brandon, 23:17Z). Every report opens with the panel, whole.
+
+**The level, read against the tree** ([the design record](research/records/2026-11-17_A_LEVEL_IS_A_CODEC_THAT_CARRIES_ITS_DECODER_AND_CLOSES_A_SCALE_SQUARE_BOTH_READ_AT_THE_RECEIVERS_FACE_THE_BUILT_LEVEL_WAS_FOUNDED_ON_A_SADDLE_HAS_NO_RECEIPT_AT_ITS_GRAIN_AND_FOLDS_A_WINDING_EPOCH.md)).
+The level's records were read before any design. A level is a codec that carries its decoder and has a transport of its own, and its
+receipt is the defect of its closure and of its scale square, each read at the symbols' face through the level's own route and summed
+over the unit; that sum is the level's news, and nothing above a level can be cut without it. The built level differs three ways: it
+was founded on a saddle (the restriction drawn, the prolongation at zero) and never entered by its tension read; it has no receipt at
+its own grain, the decision of November 3 against the cause the heading record of October 30 had named in the same words; and its chart
+folds an epoch longer than one section onto its rows. October's one attempt at a level's own comparison (a heading against the next
+span's trace among a menu of spans) cost the arrivals and was ruled a reading. Which of the three binds first is decided by two host
+readings on the night's saved state, a link trace along the level's own equation and a tension read at its locus, with guesses G-V1
+and G-V2 fixed before either. No part is ordered before they are read.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

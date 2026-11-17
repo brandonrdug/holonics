@@ -302,3 +302,34 @@ Scored (2026-11-17T23:37:16Z), G-B1's arm, started on reflex and read for its tw
 edge); the forward reader's held code 1.527 before and 1.539 after (held: under 1.56). The sweep writer is not built and that clause is
 not run: Brandon's word of 23:08 UTC was that "analogize" asked for no component, and the backward trace (the record's sections 16 to
 19) gave no reason for one.
+
+G-V1 (2026-11-17T23:54:12Z). Reading A of the level's design record (a level is a codec that carries its decoder), the link trace along the level's own
+equation on the night's pass-15 state (the fifty books, rows of 48 known places and the next open). Presence in thousandths by least
+squares, fitted on half the regions and read on the other, of three keys of a whole epoch: its leading symbol (the anchor, phase zero),
+its symbols as a bag (which symbols it holds, each counted), and the epoch as one identity among the commonest whole epochs.
+  Read before fixing: the level's read after its ticks holds 68 (first symbol), 102 (last), 171 (identity), 24 (the epoch before as an
+  identity), 43 (the symbol leading the next); the level is 64 wide and the moment is six harmonics of a 128-wide read, 768 numbers.
+  The guess. At the fine read at the split a written place's own symbol stands at 900 or more. In the moment m(j): the leading symbol
+  700 to 950, the bag 450 to 800, the identity 450 to 800. In the restricted state A m + b_A (before the level's ticks): the leading
+  symbol under 200, the bag under 250, the identity under 350, each within a factor of two of 64/768 of the moment's own figure times
+  its effective rank's share, that is, about what a drawn projection of the moment to 64 numbers keeps. A restriction of the same width
+  located from the symbols (a reduced-rank fit of the keys on the moment, rank 64) keeps 500 or more of the leading symbol and 400 or
+  more of the identity. The level's ticks change each figure by under a third. The prolonged rows at the next epoch's places hold under
+  40 of the epoch before as an identity.
+  So the first slip is at the restriction, and it is a slip of location, not of width and not first of the chart. The chart's fold is a
+  second, smaller loss: among whole epochs longer than one section, the moment's bag stands 100 to 300 under the bag of epochs within one
+  section.
+  What it decides is in the record's table (its section 6).
+
+G-V2 (2026-11-17T23:54:12Z). Reading B, the tension at the level's locus on the same state: of the covector's power at the split at compared places,
+on the held half: (1) what the level's present state removes through a refitted prolongation; (2) what a table removes, the epoch in
+progress and the epoch before it as their symbols' moments on the news phase; (3) what operands located from the tension remove, a
+restriction and prolongation of the level's own width (64) solved from the two epochs' moments.
+  Read before fixing: the fine field already holds a symbol's identity for about four nats of passage (45% within one nat, 24% at two to
+  four, 4% at four to eight, none past eight); a count with whole context writes clean words where her face does not.
+  The guess: (1) under 0.03; (2) 0.10 to 0.30; (3) half or more of (2). A planted law of the table's own form at a tenth of the
+  covector's power is recovered at 0.8 or more of itself by (2) and (3).
+  So the fine comparison holds first-order tension that a located level would relieve, and the level as founded relieves almost none of
+  it: a founding by tension is lawful and the one comparison could then move the level; the level's own face is still what a second
+  level's cut needs. A (3) under a fifth of (2) would say a linear level of this width cannot be located from the fine tension, and the
+  level's content must come from a face of its own first.
