@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted]
+Usage: loop_closure_ruler.py DIR [planted | release]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -24,6 +24,13 @@ the pair's sum modulo ten, and that or one more.
 
 With `planted`, two menus on the same records hold the instrument: one built from the aligned operand digits alone (it must return the
 wheel at one) and the true menu with the written symbols dealt at random among the places (it must return nothing past its null).
+
+With `release`, what the located key delivers through the rows as they stand: the keys (each symbol's eigenvalue on each common
+eigenvector) are located on one half of the records from one head's rows at tick 0 over every answer place; at an open place the row
+then gives, on each eigenvector, its barycentre `y = Σ_s p_s λ(u_s)` and its pair product `E = Σ_(s ≠ s′) p_s p_s′ λ(u_s) λ(u_s′)`
+(`y²` less the sources' self terms, the menu's own weighting). `RELEASE_HOLD` is the share of the written digit and of the wheel's
+digit `a_k + b_k mod 10` a least-squares read of these features gives on the held half, and `RELEASE_TENSION` what they remove of the
+covector beside the chart, by part and tick, beside the value's own digit and the pair's table. Nothing in the features is labelled.
 
 Floats, counts and the knowledge of which bytes are digits are a ruler's (CLAUDE.md, a ruler is an instrument). The sums are synthetic,
 so their records are printed freely."""
@@ -137,10 +144,102 @@ def report(name, tables, symbols):
             print(f"CLOSURE {name} scope={scope} head={head} tick={tick} eigenvector={rank} modulus={abs(value):.3f} best_j={j} a_j={amp[j]:.3f} a_0={amp[0]:.3f} null_pct={pct:.3f} digits_modulus={on:.3f} others_modulus=" + ",".join(f"{s}:{m:.2f}" for s, m in off) + f" digits_keys_in_tenths_of_a_turn={turns}", flush=True)
 
 
+def release(d, head=0, ridge=1e-3):
+    """What the located key delivers through the rows (see the module's text). The keys are located on the fitting half."""
+    import hashlib
+
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tension_ruler as tr
+
+    dims = dict(line.split("\t") for line in open(os.path.join(d, "dims.tsv")).read().splitlines())
+    dw, ticks = int(dims["lambda"]), int(dims["ticks"])
+    rows = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    n = len(rows)
+    opened = np.flatnonzero(np.array([r[5] == "1" for r in rows]))
+    lam_all = np.memmap(os.path.join(d, "lambda.i64"), dtype="<i8", mode="r", shape=(n, dw))
+    read_all = np.memmap(os.path.join(d, "read.i32"), dtype="<i4", mode="r", shape=(n, dw))
+    lam = np.asarray(lam_all[opened]).astype(np.float64) / 2.0**tr.MATERIAL
+    read = np.asarray(read_all[opened]).astype(np.float64) / 2.0**tr.FACE
+    label = [rows[i][0] for i in opened]
+    place = np.array([int(rows[i][1]) for i in opened])
+    tick = np.array([int(rows[i][2]) for i in opened])
+    half_of = lambda lab: hashlib.sha256(f"half:{lab}".encode()).digest()[0] % 2
+    fit = np.array([half_of(l) == 0 for l in label])
+    test = ~fit
+    # The keys: the closure of the fitting half's menu, one head's rows at tick 0, every answer place.
+    # A sum may stand in the table more than once, so a shares line is matched to its open row by its order (every place and tick writes
+    # one line a head, in the rows' order), never by its label.
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    heads = len(lines) // len(opened)
+    if heads * len(opened) != len(lines):
+        sys.exit("shares.tsv does not hold one line a head for every open row")
+    lines = [(i // heads, line) for i, line in enumerate(lines) if int(line[3]) == head]
+    for i, line in lines:
+        if (line[0], int(line[1]), int(line[2])) != (label[i], int(place[i]), int(tick[i])):
+            sys.exit("shares.tsv is not in the rows' order")
+    symbols = sorted({c for _, line in lines for c in text_of(line[0])})
+    index = {c: i for i, c in enumerate(symbols)}
+    m = len(symbols)
+    menu = np.zeros((m, m, m))
+    parsed = []
+    for i, line in lines:
+        lab, pl, tk, site = line[0], int(line[1]), int(line[2]), int(line[4])
+        text = text_of(lab)
+        src = [(index[text[int(j)]], int(p) / 1e6) for j, p, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        parsed.append((i, src))
+        if tk == 0 and half_of(lab) == 0:
+            xi = index[text[site]]
+            for a_, (u, p1) in enumerate(src):
+                for b_, (w, p2) in enumerate(src):
+                    if a_ != b_:
+                        menu[u, w, xi] += p1 * p2
+    found, _ = closure(menu, symbols)
+    keys = np.array([lam_u for _, lam_u in found])  # [eigenvector][symbol]
+    e = len(keys)
+    print(f"RELEASE_READ head={head} keys_on=fit_half,tick=0,every_place eigenvectors={e} places={len(opened) // ticks} ticks={ticks} ridge={ridge}")
+    y = np.zeros((len(opened), e), dtype=complex)
+    pair = np.zeros((len(opened), e), dtype=complex)
+    for i, src in parsed:
+        if not src:
+            continue
+        us = np.array([u for u, _ in src])
+        ps = np.array([p_ for _, p_ in src])
+        terms = keys[:, us] * ps[None, :]
+        y[i] = terms.sum(axis=1)
+        pair[i] = y[i] ** 2 - (terms**2).sum(axis=1)
+    f_y = np.hstack([y.real, y.imag])
+    f_pair = np.hstack([f_y, pair.real, pair.imag])
+    kinds = [tr.place_kind(l, int(p_)) for l, p_ in zip(label, place)]
+    part = np.array([tr.PARTS.index(tr.part_of(k)) for k in kinds])
+    da, db, dv = (np.array([k[i] for k in kinds]) for i in (4, 5, 6))
+    held = np.array([k[7] for k in kinds])
+    wheel = (da + np.where(held == 2, db, 0)) % 10
+    table = (tr.onehot(da)[:, :, None] * tr.onehot(db)[:, None, :]).reshape(len(opened), 100)
+    centre = lambda x, sel: x - x[sel].mean(axis=0)
+    print("RELEASE_HOLD part tick test_rows | written_digit: chart barycentre barycentre+pair | wheel_digit: chart barycentre barycentre+pair")
+    print("RELEASE_TENSION part tick test_rows | covector share: chart chart+barycentre chart+barycentre+pair value_digit table")
+    for pid, pname in enumerate(tr.PARTS):
+        for k in range(ticks):
+            sel = (tick == k) & (part == pid)
+            f, t = sel & fit, sel & test
+            if t.sum() < 200 or pname == "top":
+                continue
+            out = []
+            for target in (tr.onehot(dv), tr.onehot(wheel)):
+                tc = centre(target, sel)
+                out.append([tr.removed(x, tc, f, t, ridge) for x in (read, f_y, f_pair)])
+            print(f"RELEASE_HOLD {pname} tick={k} {t.sum()} | " + " ".join(f"{v:.4f}" for v in out[0]) + " | " + " ".join(f"{v:.4f}" for v in out[1]), flush=True)
+            shares = [tr.removed(x, lam, f, t, ridge) for x in (read, np.hstack([read, f_y]), np.hstack([read, f_pair]), tr.onehot(dv), table)]
+            print(f"RELEASE_TENSION {pname} tick={k} {t.sum()} | " + " ".join(f"{v:.4f}" for v in shares), flush=True)
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     d = sys.argv[1]
+    if len(sys.argv) > 2 and sys.argv[2] == "release":
+        release(d)
+        return
     plants = ("aligned", "dealt") if len(sys.argv) > 2 and sys.argv[2] == "planted" else (None,)
     for planted in plants:
         tables, symbols = menus(d, planted)

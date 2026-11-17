@@ -609,3 +609,26 @@ What it decides: G-RL1 and G-RL2 held, the rows as they stand already deliver th
 the located ring, with no label anywhere, and the symbol's line has its founding and its first part (a pair product on a
 located ring, read by its characters); missed, the rows' shares scatter too much for a product and the release needs the lock
 closed first.
+
+SCORES of G-RL1 to G-RL3, read from the clock at 10:15:05 UTC, November 17 (release86.txt; 8,000 short sums, lap 86's mean; host, one
+thread, 5 s)
+The instrument first: its first form matched a row's shares to its open row by the sum's label, and the table holds 3,480
+distinct sums among its 8,000, so repeated sums read zeros; its figures (0.11 at the units place) are void. As repaired the
+shares are matched by their order in the dump.
+G-RL1 missed: at the units place the features give the written digit at 0.224, 0.219, 0.178 and 0.015 by tick; 0.5 or more
+was guessed. The barycentre alone gives nothing (−0.005); all of it is the pair product.
+G-RL2 missed: beside the chart they remove 0.232 of the covector's power at the units place at tick 0, the chart alone 0.137;
+0.35 or more was guessed. By tick the gain over the chart is 0.095, 0.065, 0.078, 0.040.
+G-RL3 held at ticks 1 and 2: at a clear column both operands hold the features give the wheel's digit at 0.133, 0.485, 0.541,
+0.063 by tick, at a carried one 0.312, 0.427, 0.495, 0.050; and beside the chart they remove 0.561 and 0.596 (clear), 0.564
+and 0.551 (carried) of the covector's power at ticks 1 and 2, where the chart alone removes 0.26 to 0.30.
+Why the units place misses (a diagnosis from the same dump, head 0 at tick 0): the row holds the aligned digits at shares of
+0.228 and 0.164 on average, and both above a tenth at 0.187 of the places; the lesser of the two is under 0.03 at half of them.
+The row brings one aligned digit or the other. The menu still closes on that (a closure needs a weak excess), and a product
+inside one row has both factors at a fifth of the places.
+For scale on the same sums: the labelled read's five products with its ten coordinates remove 0.277 and 0.387 at the units
+place (ticks 0 and 1) and 0.44 to 0.50 at the columns both hold (midpoint_short86.txt); the 128-wide chart's label-free
+location held 0.07 and 0.12 at the units place and 0.10 to 0.13 at the columns both hold (G-L5, on longer sums).
+Decided as the guess said for the units place: the rows' shares scatter too much there for a product inside one row, and the
+lock comes first. Beside it: at the columns both operands hold, a pair product on the located ring, with nothing labelled,
+already carries what the labelled read carried.
