@@ -221,11 +221,14 @@ impl Constitution {
     /// from the lane has a covector from the first section on (the lane's chart times the read's covector), so the lane
     /// opens with no copy's symmetry to break (§16.37).
     ///
+    /// With triads ([`Declaration::triads`]) their charts' columns over the lane and their return's rows into it stand at zero too, so every
+    /// triad's product and every face is the one before the lane. Refused where the face reads its sites' loudness ([`Declaration::loud`]).
+    ///
     /// Returns the laned field and, for each entry, the old entry it carries (`None` for the lane's own).
     pub fn laned(&self, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.declaration.triads > 0 {
-            // [theory, November 12, the triad record §4] The triads are founded last; the lane's columns of their charts are not built.
-            return refuse("a growth in lanes of a field with triads (the triads are founded last; a growth after them is not built)");
+        if self.declaration.loud {
+            // The face's loudness holds one strength a lane ([`Loci::loud`]); a lane's strength founded beside the standing ones is not built.
+            return refuse("a growth in lanes of a field whose face reads its sites' loudness (a lane's strength beside the standing ones is not built)");
         }
         let old = self.declaration;
         let d = old.laned()?;
@@ -289,6 +292,17 @@ impl Constitution {
         }
         if d.mark {
             place(ol.mark, layout.mark, 1, MARK_BASES, MARK_BASES);
+        }
+        // [the lead, November 17] The triads' charts read the charted read as the pair drives do (their columns the face's coordinates): the
+        // lane's columns at zero, so no leg reads the lane and every product is the one before it; their biases as they were. The return
+        // `W_T` writes into the face (its rows the coordinates): the lane's rows at zero. Why this is built now: on November 12 the triads were
+        // founded last and a lane after them was refused as not built, so from lap 75 the line could not grow its face at all, and a part
+        // founded beside the triads was refused with it; the growth needs no more than the triads' three families laid as `a`, `b` and `W` are.
+        if d.triads > 0 {
+            let (j2, j6) = (2 * d.triads, 6 * d.triads);
+            place(ol.triad, layout.triad, j6, dw, dw2);
+            place(ol.triad_bias, layout.triad_bias, 1, j6, j6);
+            place(ol.w_triad, layout.w_triad, dw, j2, j2);
         }
         // The lane's founding draws.
         let mut cursor = 0usize;
@@ -425,9 +439,9 @@ impl Constitution {
     /// is kept bit for bit; at the founding only `W_T` has a covector at first order (`∇_α ℓ = 0` while `W_T = 0`, §3.2), and as `W_T` opens the
     /// three legs open with it.
     ///
-    /// Refused for a tower's levels, for a field that already has triads and for none. A growth in contacts, in circles, in lanes or by copies of a
-    /// field with triads is refused too ([`Declaration::contacted`], [`Constitution::with_carry`], [`Constitution::laned`], [`Constitution::grown`]): the triads
-    /// are founded last, and a growth after them is not built. Returns the grown field and, for each entry, the old entry it carries (`None` for
+    /// Refused for a tower's levels, for a field that already has triads and for none. A growth in contacts, in circles or by copies of a
+    /// field with triads is refused too ([`Declaration::contacted`], [`Constitution::with_carry`], [`Constitution::grown`]): those growths after
+    /// the triads are not built. A lane after them is ([`Constitution::laned`], November 17). Returns the grown field and, for each entry, the old entry it carries (`None` for
     /// the triads' own).
     pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
         self.with_triads_at(triads, keys, false)

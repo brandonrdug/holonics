@@ -2172,6 +2172,56 @@ fn a_lane_founded_beside_a_field_reads_its_faces() {
     assert_eq!(back, laned);
 }
 
+/// [definition; the lead, November 17] **A lane founded beside a field with triads keeps every face and every product**: on the drawn triad
+/// fixtures, with carry circles and without (every triad's return off zero, so every product reaches the face), the laned field reads
+/// every face the field read; the triads' charts' columns over the lane and their return's rows into it are zero and every standing entry
+/// of the three families keeps its place; the families tile the material and the text restores it; and the laned learner keeps every
+/// triad entry's moments.
+#[test]
+fn a_lane_founded_beside_triads_reads_their_faces() {
+    for field in [triad_shaped(1, TRIADS), circled_triad_shaped(1, TRIADS)] {
+        let faces = field.faces(&region()).unwrap();
+        let draws = field.declaration.lane_draws();
+        let (laned, from) = field.laned(&keys(draws)).unwrap();
+        assert_eq!(laned.faces(&region()).unwrap(), faces, "the faces before the lane");
+        let (l, o) = (laned.layout.clone(), field.layout.clone());
+        let (dw, dw2, j2, j6) = (field.declaration.width, laned.declaration.width, 2 * TRIADS, 6 * TRIADS);
+        for row in 0..j6 {
+            for c in 0..dw2 {
+                let (at, kept) = (l.triad + row * dw2 + c, c < dw);
+                assert_eq!(from[at], kept.then(|| o.triad + row * dw + c));
+                assert_eq!(laned.theta[at], if kept { field.theta[o.triad + row * dw + c] } else { 0 });
+            }
+            assert_eq!(laned.theta[l.triad_bias + row], field.theta[o.triad_bias + row]);
+        }
+        for row in 0..dw2 {
+            for c in 0..j2 {
+                let (at, kept) = (l.w_triad + row * j2 + c, row < dw);
+                assert_eq!(from[at], kept.then(|| o.w_triad + row * j2 + c));
+                assert_eq!(laned.theta[at], if kept { field.theta[o.w_triad + row * j2 + c] } else { 0 });
+            }
+        }
+        let mut at = 0;
+        for (start, len, _) in laned.families_all() {
+            assert_eq!(start, at);
+            at += len;
+        }
+        assert_eq!(at, laned.material_len());
+        assert_eq!(Constitution::from_text(&laned.to_text()).unwrap(), laned);
+        let mut learner = Learner::new(field, 4);
+        for _ in 0..2 {
+            learner.section(&[region()]).unwrap();
+        }
+        let grown = learner.laned(&keys(1 << 16)).unwrap();
+        let (l, o) = (grown.field.layout().clone(), learner.field.layout().clone());
+        assert_eq!((grown.first[l.w_triad + 3], grown.second[l.w_triad + 3]), (learner.first[o.w_triad + 3], learner.second[o.w_triad + 3]), "a return entry keeps its moments");
+        assert_eq!((grown.first[l.triad + dw2 + 2], grown.second[l.triad + dw2 + 2]), (learner.first[o.triad + dw + 2], learner.second[o.triad + dw + 2]), "a chart entry keeps its moments");
+        assert_eq!(grown.first[l.triad + dw], 0, "a chart's entry over the lane opens with no first moment");
+        let back = Learner { read_held: grown.read_held, ..Learner::from_text(&grown.to_text()).unwrap() };
+        assert_eq!(back, grown);
+    }
+}
+
 /// [definition; §16.40] **A laned field's covector agrees with its code's central difference**: on a field of two lanes
 /// with every family shaped, each family's three entries with the largest covectors (the probe law of
 /// [`covector_matches_the_codes_difference`], a probe whose step moves a site across a sheet left out and counted), so each
@@ -3343,7 +3393,7 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
             assert!(grown.with_triads(4, &keys(d.triad_draws(4))).is_err(), "a second growth by triads");
             assert!(grown.contacted(4, &keys(d.contact_draws(4))).is_err(), "a growth in contacts of a field with triads");
             assert!(grown.with_carry(2, &keys(d.carry_draws(2))).is_err(), "a growth in circles of a field with triads");
-            assert!(grown.laned(&keys(d.lane_draws())).is_err(), "a growth in lanes of a field with triads");
+            assert!(grown.laned(&keys(d.lane_draws())).is_ok(), "a lane grows beside triads (the lane's test holds its faces)");
             assert!(grown.grown(2, &keys(grown.growth_draws(2))).is_err(), "a growth by copies of a field with triads");
         }
     }

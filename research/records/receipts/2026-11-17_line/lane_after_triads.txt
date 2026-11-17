@@ -1,0 +1,11 @@
+# A lane grown beside triads, checked on the host on a copy of the line's own state (the lead, November 17, 11:18 UTC; no lap trained from it)
+# engine tests: cargo test --release -p holonics-engine: 132 passed, 0 failed, 1 ignored
+# found-lane on lap87/STATE.3000 (binary athena_tension17):
+FOUND_LANE_LINE k=0 head draws 624128 to 721920
+FOUND_LANE_LINE k=1 declaration width 128 to 160 lanes 4 to 5
+FOUND_LANE_LINE k=2 fine material 253029 words to 322277
+FOUND_LANE_LINE k=6 glue 99136 words to 123904
+FOUND_LANE_LINE k=7 moments 402805 words to 496821
+FOUND_LANE lines=11 equal=5 width=160 lanes=5 material=402805 founded_material=496821 lane_entries=94016 ms=238
+# read-forms on the host (eight threads) over the 686 held forms, both states, FORMS_ROW lines compared:
+LANE5_FACES EQUAL rows=686
