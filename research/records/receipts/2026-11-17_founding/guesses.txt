@@ -1,0 +1,13 @@
+Guesses of the founding build, each fixed and pushed before its read (the lead).
+
+G-FT1 (2026-11-17T16:34:49Z). The closure target of an open row, read by tools/founding_ruler.py targets on lap 86's short sums
+(8,000 records, every answer place opened alone; keys located on the fitting half from head 0's rows at tick 0, labels used only to score).
+On the held half, head 0 at tick 0:
+  units column: the row holds 0.30 to 0.45 of its weight on the two aligned operand digits now; its closure target holds 0.80 or more.
+  upper columns: now 0.25 to 0.45; at the target 0.60 or more (a carried column closes one step off, which the kernel takes at part weight).
+  Dealt control (each record's source symbols dealt at random): the target's mass on the aligned sites stands within 0.05 of the row's own.
+G-FT2 (2026-11-17T16:34:49Z). The written digit's code among the ring's ten symbols under the keyed pair product read back through the keys (flat 2.303 nats):
+  units column, head 0 tick 0: the row as it is 1.6 to 2.1 nats; the row at its target 1.0 or less; the aligned digits at a half each 0.3 or less.
+  upper columns: aligned halves 0.7 to 1.3 nats (the carry leaves two neighbours).
+What a miss would say: a target under 0.6 on the units column says the closure does not locate the address from the present rows, and the
+lock's founding then needs another source than the row's own weights.
