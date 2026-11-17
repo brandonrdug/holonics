@@ -1,0 +1,136 @@
+# G-L2, the plain-text dwell, no leak: the run's reads (a plain row's three reads are printed under the sum rows' names: last_alone = a keyed
+# half of the run open, last_run_open = the whole run open, first_alone = the run's first place with the whole run open), and the panels'
+# counts (score.py: written words of two letters or more in the fitting text's lexicon; the longest run shared with it). No write is filed: the text is the store's.
+TRIAL_PASSES records=3478 passes=400 records_a_section=100 closed=0 leak=none threads=24
+TRIAL_READ pass=0 group=fit rows=4901 last_alone=2048778 last_run_open=3083851 first_alone=2193862 first_rows=300 density_at_last_milli=311
+TRIAL_READ pass=0 group=held rows=6110 last_alone=2035075 last_run_open=3050797 first_alone=2042446 first_rows=380 density_at_last_milli=307
+TRIAL_READ pass=0 group=unseen rows=2392 last_alone=1973856 last_run_open=3057152 first_alone=2079208 first_rows=150 density_at_last_milli=317
+TRIAL_READ pass=10 group=fit rows=4901 last_alone=1888190 last_run_open=3035197 first_alone=1996843 first_rows=300 density_at_last_milli=330
+TRIAL_READ pass=10 group=held rows=6110 last_alone=1914539 last_run_open=3022084 first_alone=1938374 first_rows=380 density_at_last_milli=321
+TRIAL_READ pass=10 group=unseen rows=2392 last_alone=1882288 last_run_open=3015747 first_alone=1930276 first_rows=150 density_at_last_milli=327
+TRIAL_READ pass=20 group=fit rows=4901 last_alone=1837738 last_run_open=3024729 first_alone=1913334 first_rows=300 density_at_last_milli=340
+TRIAL_READ pass=20 group=held rows=6110 last_alone=1872637 last_run_open=3014134 first_alone=1893823 first_rows=380 density_at_last_milli=329
+TRIAL_READ pass=20 group=unseen rows=2392 last_alone=1873315 last_run_open=3011354 first_alone=1908275 first_rows=150 density_at_last_milli=330
+TRIAL_READ pass=30 group=fit rows=4901 last_alone=1804434 last_run_open=3020636 first_alone=1861668 first_rows=300 density_at_last_milli=340
+TRIAL_READ pass=30 group=held rows=6110 last_alone=1855829 last_run_open=3011885 first_alone=1891807 first_rows=380 density_at_last_milli=326
+TRIAL_READ pass=30 group=unseen rows=2392 last_alone=1867043 last_run_open=3009510 first_alone=1885400 first_rows=150 density_at_last_milli=325
+TRIAL_READ pass=40 group=fit rows=4901 last_alone=1774168 last_run_open=3013798 first_alone=1798311 first_rows=300 density_at_last_milli=358
+TRIAL_READ pass=40 group=held rows=6110 last_alone=1831801 last_run_open=3007390 first_alone=1881291 first_rows=380 density_at_last_milli=343
+TRIAL_READ pass=40 group=unseen rows=2392 last_alone=1863413 last_run_open=3004107 first_alone=1861303 first_rows=150 density_at_last_milli=339
+TRIAL_READ pass=50 group=fit rows=4901 last_alone=1747886 last_run_open=3007558 first_alone=1765432 first_rows=300 density_at_last_milli=362
+TRIAL_READ pass=50 group=held rows=6110 last_alone=1819041 last_run_open=3009410 first_alone=1857896 first_rows=380 density_at_last_milli=345
+TRIAL_READ pass=50 group=unseen rows=2392 last_alone=1860936 last_run_open=3008813 first_alone=1872369 first_rows=150 density_at_last_milli=339
+TRIAL_READ pass=60 group=fit rows=4901 last_alone=1728749 last_run_open=3004905 first_alone=1722235 first_rows=300 density_at_last_milli=367
+TRIAL_READ pass=60 group=held rows=6110 last_alone=1810707 last_run_open=3008143 first_alone=1854817 first_rows=380 density_at_last_milli=348
+TRIAL_READ pass=60 group=unseen rows=2392 last_alone=1859919 last_run_open=3005753 first_alone=1843370 first_rows=150 density_at_last_milli=338
+TRIAL_READ pass=70 group=fit rows=4901 last_alone=1715398 last_run_open=3003301 first_alone=1709052 first_rows=300 density_at_last_milli=363
+TRIAL_READ pass=70 group=held rows=6110 last_alone=1806158 last_run_open=3005261 first_alone=1858472 first_rows=380 density_at_last_milli=343
+TRIAL_READ pass=70 group=unseen rows=2392 last_alone=1852915 last_run_open=3004803 first_alone=1822434 first_rows=150 density_at_last_milli=333
+TRIAL_READ pass=80 group=fit rows=4901 last_alone=1702761 last_run_open=2999623 first_alone=1699131 first_rows=300 density_at_last_milli=374
+TRIAL_READ pass=80 group=held rows=6110 last_alone=1795483 last_run_open=3000301 first_alone=1853562 first_rows=380 density_at_last_milli=353
+TRIAL_READ pass=80 group=unseen rows=2392 last_alone=1854440 last_run_open=3001985 first_alone=1847551 first_rows=150 density_at_last_milli=341
+TRIAL_READ pass=90 group=fit rows=4901 last_alone=1686047 last_run_open=2994245 first_alone=1675647 first_rows=300 density_at_last_milli=377
+TRIAL_READ pass=90 group=held rows=6110 last_alone=1785180 last_run_open=3004884 first_alone=1848600 first_rows=380 density_at_last_milli=355
+TRIAL_READ pass=90 group=unseen rows=2392 last_alone=1849740 last_run_open=3002588 first_alone=1850037 first_rows=150 density_at_last_milli=343
+TRIAL_READ pass=100 group=fit rows=4901 last_alone=1666493 last_run_open=2989371 first_alone=1616419 first_rows=300 density_at_last_milli=387
+TRIAL_READ pass=100 group=held rows=6110 last_alone=1786023 last_run_open=3002227 first_alone=1836921 first_rows=380 density_at_last_milli=362
+TRIAL_READ pass=100 group=unseen rows=2392 last_alone=1849085 last_run_open=3005604 first_alone=1823635 first_rows=150 density_at_last_milli=351
+TRIAL_READ pass=110 group=fit rows=4901 last_alone=1656636 last_run_open=2992207 first_alone=1618074 first_rows=300 density_at_last_milli=386
+TRIAL_READ pass=110 group=held rows=6110 last_alone=1781594 last_run_open=3006031 first_alone=1853798 first_rows=380 density_at_last_milli=361
+TRIAL_READ pass=110 group=unseen rows=2392 last_alone=1851073 last_run_open=3007619 first_alone=1804207 first_rows=150 density_at_last_milli=349
+TRIAL_READ pass=120 group=fit rows=4901 last_alone=1646428 last_run_open=2990856 first_alone=1615764 first_rows=300 density_at_last_milli=385
+TRIAL_READ pass=120 group=held rows=6110 last_alone=1770768 last_run_open=3007401 first_alone=1847374 first_rows=380 density_at_last_milli=360
+TRIAL_READ pass=120 group=unseen rows=2392 last_alone=1860104 last_run_open=3009583 first_alone=1851103 first_rows=150 density_at_last_milli=343
+TRIAL_READ pass=130 group=fit rows=4901 last_alone=1635440 last_run_open=2990424 first_alone=1580530 first_rows=300 density_at_last_milli=393
+TRIAL_READ pass=130 group=held rows=6110 last_alone=1765963 last_run_open=3009403 first_alone=1851462 first_rows=380 density_at_last_milli=366
+TRIAL_READ pass=130 group=unseen rows=2392 last_alone=1862026 last_run_open=3010395 first_alone=1788534 first_rows=150 density_at_last_milli=350
+TRIAL_READ pass=140 group=fit rows=4901 last_alone=1629241 last_run_open=2989747 first_alone=1572476 first_rows=300 density_at_last_milli=393
+TRIAL_READ pass=140 group=held rows=6110 last_alone=1765818 last_run_open=3009555 first_alone=1846738 first_rows=380 density_at_last_milli=366
+TRIAL_READ pass=140 group=unseen rows=2392 last_alone=1856657 last_run_open=3012688 first_alone=1830657 first_rows=150 density_at_last_milli=348
+TRIAL_READ pass=150 group=fit rows=4901 last_alone=1624131 last_run_open=2991045 first_alone=1545320 first_rows=300 density_at_last_milli=391
+TRIAL_READ pass=150 group=held rows=6110 last_alone=1760236 last_run_open=3010647 first_alone=1829326 first_rows=380 density_at_last_milli=362
+TRIAL_READ pass=150 group=unseen rows=2392 last_alone=1866896 last_run_open=3013967 first_alone=1793849 first_rows=150 density_at_last_milli=344
+TRIAL_READ pass=160 group=fit rows=4901 last_alone=1615392 last_run_open=2986932 first_alone=1549532 first_rows=300 density_at_last_milli=400
+TRIAL_READ pass=160 group=held rows=6110 last_alone=1754005 last_run_open=3006220 first_alone=1844259 first_rows=380 density_at_last_milli=372
+TRIAL_READ pass=160 group=unseen rows=2392 last_alone=1864898 last_run_open=3011281 first_alone=1814184 first_rows=150 density_at_last_milli=352
+TRIAL_READ pass=170 group=fit rows=4901 last_alone=1603588 last_run_open=2983454 first_alone=1530048 first_rows=300 density_at_last_milli=401
+TRIAL_READ pass=170 group=held rows=6110 last_alone=1759361 last_run_open=3008868 first_alone=1832874 first_rows=380 density_at_last_milli=369
+TRIAL_READ pass=170 group=unseen rows=2392 last_alone=1855731 last_run_open=3014688 first_alone=1809334 first_rows=150 density_at_last_milli=349
+TRIAL_READ pass=180 group=fit rows=4901 last_alone=1601505 last_run_open=2986281 first_alone=1535528 first_rows=300 density_at_last_milli=403
+TRIAL_READ pass=180 group=held rows=6110 last_alone=1746948 last_run_open=3008619 first_alone=1836681 first_rows=380 density_at_last_milli=374
+TRIAL_READ pass=180 group=unseen rows=2392 last_alone=1872967 last_run_open=3016745 first_alone=1831961 first_rows=150 density_at_last_milli=351
+TRIAL_READ pass=190 group=fit rows=4901 last_alone=1592135 last_run_open=2980717 first_alone=1507103 first_rows=300 density_at_last_milli=403
+TRIAL_READ pass=190 group=held rows=6110 last_alone=1747019 last_run_open=3007961 first_alone=1827058 first_rows=380 density_at_last_milli=371
+TRIAL_READ pass=190 group=unseen rows=2392 last_alone=1883608 last_run_open=3012944 first_alone=1868569 first_rows=150 density_at_last_milli=347
+TRIAL_READ pass=200 group=fit rows=4901 last_alone=1585825 last_run_open=2977844 first_alone=1511589 first_rows=300 density_at_last_milli=402
+TRIAL_READ pass=200 group=held rows=6110 last_alone=1747696 last_run_open=3002524 first_alone=1837665 first_rows=380 density_at_last_milli=369
+TRIAL_READ pass=200 group=unseen rows=2392 last_alone=1871227 last_run_open=3008819 first_alone=1864433 first_rows=150 density_at_last_milli=347
+TRIAL_READ pass=210 group=fit rows=4901 last_alone=1575468 last_run_open=2979139 first_alone=1503758 first_rows=300 density_at_last_milli=410
+TRIAL_READ pass=210 group=held rows=6110 last_alone=1745546 last_run_open=3008105 first_alone=1828773 first_rows=380 density_at_last_milli=376
+TRIAL_READ pass=210 group=unseen rows=2392 last_alone=1883037 last_run_open=3016349 first_alone=1874955 first_rows=150 density_at_last_milli=353
+TRIAL_READ pass=220 group=fit rows=4901 last_alone=1573659 last_run_open=2983094 first_alone=1510441 first_rows=300 density_at_last_milli=405
+TRIAL_READ pass=220 group=held rows=6110 last_alone=1753488 last_run_open=3015525 first_alone=1844545 first_rows=380 density_at_last_milli=370
+TRIAL_READ pass=220 group=unseen rows=2392 last_alone=1891795 last_run_open=3022788 first_alone=1856831 first_rows=150 density_at_last_milli=346
+TRIAL_READ pass=230 group=fit rows=4901 last_alone=1568408 last_run_open=2979599 first_alone=1519397 first_rows=300 density_at_last_milli=411
+TRIAL_READ pass=230 group=held rows=6110 last_alone=1748338 last_run_open=3009518 first_alone=1830006 first_rows=380 density_at_last_milli=378
+TRIAL_READ pass=230 group=unseen rows=2392 last_alone=1890481 last_run_open=3014550 first_alone=1907658 first_rows=150 density_at_last_milli=353
+TRIAL_READ pass=240 group=fit rows=4901 last_alone=1561427 last_run_open=2979858 first_alone=1504022 first_rows=300 density_at_last_milli=416
+TRIAL_READ pass=240 group=held rows=6110 last_alone=1748286 last_run_open=3014515 first_alone=1834007 first_rows=380 density_at_last_milli=380
+TRIAL_READ pass=240 group=unseen rows=2392 last_alone=1900992 last_run_open=3020937 first_alone=1874251 first_rows=150 density_at_last_milli=355
+TRIAL_READ pass=250 group=fit rows=4901 last_alone=1550316 last_run_open=2979221 first_alone=1495280 first_rows=300 density_at_last_milli=415
+TRIAL_READ pass=250 group=held rows=6110 last_alone=1749584 last_run_open=3016015 first_alone=1825923 first_rows=380 density_at_last_milli=377
+TRIAL_READ pass=250 group=unseen rows=2392 last_alone=1887032 last_run_open=3018064 first_alone=1897125 first_rows=150 density_at_last_milli=354
+TRIAL_READ pass=260 group=fit rows=4901 last_alone=1548548 last_run_open=2975972 first_alone=1478341 first_rows=300 density_at_last_milli=412
+TRIAL_READ pass=260 group=held rows=6110 last_alone=1748104 last_run_open=3015927 first_alone=1843791 first_rows=380 density_at_last_milli=375
+TRIAL_READ pass=260 group=unseen rows=2392 last_alone=1881763 last_run_open=3019554 first_alone=1917559 first_rows=150 density_at_last_milli=352
+TRIAL_READ pass=270 group=fit rows=4901 last_alone=1541424 last_run_open=2971741 first_alone=1467014 first_rows=300 density_at_last_milli=417
+TRIAL_READ pass=270 group=held rows=6110 last_alone=1747877 last_run_open=3014308 first_alone=1831331 first_rows=380 density_at_last_milli=377
+TRIAL_READ pass=270 group=unseen rows=2392 last_alone=1891653 last_run_open=3025049 first_alone=1947176 first_rows=150 density_at_last_milli=353
+TRIAL_READ pass=280 group=fit rows=4901 last_alone=1536493 last_run_open=2973608 first_alone=1457881 first_rows=300 density_at_last_milli=419
+TRIAL_READ pass=280 group=held rows=6110 last_alone=1756443 last_run_open=3015339 first_alone=1856902 first_rows=380 density_at_last_milli=378
+TRIAL_READ pass=280 group=unseen rows=2392 last_alone=1894103 last_run_open=3023879 first_alone=1902580 first_rows=150 density_at_last_milli=356
+TRIAL_READ pass=290 group=fit rows=4901 last_alone=1537402 last_run_open=2968536 first_alone=1436548 first_rows=300 density_at_last_milli=415
+TRIAL_READ pass=290 group=held rows=6110 last_alone=1754152 last_run_open=3015789 first_alone=1865250 first_rows=380 density_at_last_milli=375
+TRIAL_READ pass=290 group=unseen rows=2392 last_alone=1900936 last_run_open=3019675 first_alone=1955452 first_rows=150 density_at_last_milli=351
+TRIAL_READ pass=300 group=fit rows=4901 last_alone=1532045 last_run_open=2973048 first_alone=1470121 first_rows=300 density_at_last_milli=418
+TRIAL_READ pass=300 group=held rows=6110 last_alone=1753196 last_run_open=3021795 first_alone=1861391 first_rows=380 density_at_last_milli=378
+TRIAL_READ pass=300 group=unseen rows=2392 last_alone=1907046 last_run_open=3030908 first_alone=1947437 first_rows=150 density_at_last_milli=351
+TRIAL_READ pass=310 group=fit rows=4901 last_alone=1532768 last_run_open=2968673 first_alone=1456738 first_rows=300 density_at_last_milli=415
+TRIAL_READ pass=310 group=held rows=6110 last_alone=1752553 last_run_open=3016518 first_alone=1816235 first_rows=380 density_at_last_milli=374
+TRIAL_READ pass=310 group=unseen rows=2392 last_alone=1904001 last_run_open=3024936 first_alone=1900446 first_rows=150 density_at_last_milli=349
+TRIAL_READ pass=320 group=fit rows=4901 last_alone=1523514 last_run_open=2965207 first_alone=1445333 first_rows=300 density_at_last_milli=423
+TRIAL_READ pass=320 group=held rows=6110 last_alone=1757538 last_run_open=3016110 first_alone=1853568 first_rows=380 density_at_last_milli=381
+TRIAL_READ pass=320 group=unseen rows=2392 last_alone=1905787 last_run_open=3022594 first_alone=1968482 first_rows=150 density_at_last_milli=355
+TRIAL_READ pass=330 group=fit rows=4901 last_alone=1524977 last_run_open=2966062 first_alone=1428059 first_rows=300 density_at_last_milli=420
+TRIAL_READ pass=330 group=held rows=6110 last_alone=1752129 last_run_open=3018123 first_alone=1854273 first_rows=380 density_at_last_milli=378
+TRIAL_READ pass=330 group=unseen rows=2392 last_alone=1911623 last_run_open=3026638 first_alone=1960926 first_rows=150 density_at_last_milli=351
+TRIAL_READ pass=340 group=fit rows=4901 last_alone=1523699 last_run_open=2966742 first_alone=1425079 first_rows=300 density_at_last_milli=415
+TRIAL_READ pass=340 group=held rows=6110 last_alone=1754922 last_run_open=3024017 first_alone=1846831 first_rows=380 density_at_last_milli=373
+TRIAL_READ pass=340 group=unseen rows=2392 last_alone=1923343 last_run_open=3036095 first_alone=1981086 first_rows=150 density_at_last_milli=345
+TRIAL_READ pass=350 group=fit rows=4901 last_alone=1514132 last_run_open=2961385 first_alone=1386213 first_rows=300 density_at_last_milli=426
+TRIAL_READ pass=350 group=held rows=6110 last_alone=1758330 last_run_open=3026016 first_alone=1884460 first_rows=380 density_at_last_milli=381
+TRIAL_READ pass=350 group=unseen rows=2392 last_alone=1922249 last_run_open=3040675 first_alone=1954257 first_rows=150 density_at_last_milli=356
+TRIAL_READ pass=360 group=fit rows=4901 last_alone=1505369 last_run_open=2961310 first_alone=1420784 first_rows=300 density_at_last_milli=427
+TRIAL_READ pass=360 group=held rows=6110 last_alone=1766602 last_run_open=3026418 first_alone=1869657 first_rows=380 density_at_last_milli=380
+TRIAL_READ pass=360 group=unseen rows=2392 last_alone=1930100 last_run_open=3035651 first_alone=1940334 first_rows=150 density_at_last_milli=356
+TRIAL_READ pass=370 group=fit rows=4901 last_alone=1497097 last_run_open=2959804 first_alone=1409547 first_rows=300 density_at_last_milli=433
+TRIAL_READ pass=370 group=held rows=6110 last_alone=1772917 last_run_open=3031925 first_alone=1882145 first_rows=380 density_at_last_milli=385
+TRIAL_READ pass=370 group=unseen rows=2392 last_alone=1927626 last_run_open=3042670 first_alone=1968928 first_rows=150 density_at_last_milli=360
+TRIAL_READ pass=380 group=fit rows=4901 last_alone=1499215 last_run_open=2964081 first_alone=1405519 first_rows=300 density_at_last_milli=424
+TRIAL_READ pass=380 group=held rows=6110 last_alone=1763657 last_run_open=3031938 first_alone=1863830 first_rows=380 density_at_last_milli=375
+TRIAL_READ pass=380 group=unseen rows=2392 last_alone=1923607 last_run_open=3043957 first_alone=1904346 first_rows=150 density_at_last_milli=350
+TRIAL_READ pass=390 group=fit rows=4901 last_alone=1487343 last_run_open=2958482 first_alone=1391709 first_rows=300 density_at_last_milli=431
+TRIAL_READ pass=390 group=held rows=6110 last_alone=1762591 last_run_open=3028066 first_alone=1861624 first_rows=380 density_at_last_milli=381
+TRIAL_READ pass=390 group=unseen rows=2392 last_alone=1936685 last_run_open=3045372 first_alone=1982995 first_rows=150 density_at_last_milli=355
+TRIAL_READ pass=400 group=fit rows=4901 last_alone=1493655 last_run_open=2953064 first_alone=1408255 first_rows=300 density_at_last_milli=427
+TRIAL_READ pass=400 group=held rows=6110 last_alone=1772520 last_run_open=3028244 first_alone=1870996 first_rows=380 density_at_last_milli=377
+TRIAL_READ pass=400 group=unseen rows=2392 last_alone=1934933 last_run_open=3036845 first_alone=1942026 first_rows=150 density_at_last_milli=354
+TRIAL_DONE sections=14000 ms=2484994
+w_lap94_keyed/forms.written seen: words 40 in_lexicon 13 (32%) longest_copy 11 mean_copy 8.0 held: words 44 in_lexicon 22 (50%) longest_copy 11 mean_copy 9.2 unseen: words 37 in_lexicon 13 (35%) longest_copy 9 mean_copy 8.0
+w_lap94_place/forms.written seen: words 44 in_lexicon 18 (40%) longest_copy 11 mean_copy 9.5 held: words 46 in_lexicon 22 (47%) longest_copy 11 mean_copy 8.8 unseen: words 37 in_lexicon 14 (37%) longest_copy 8 mean_copy 7.8
+w_none_p50/forms.written seen: words 40 in_lexicon 15 (37%) longest_copy 10 mean_copy 8.5 held: words 46 in_lexicon 22 (47%) longest_copy 10 mean_copy 8.2 unseen: words 46 in_lexicon 19 (41%) longest_copy 9 mean_copy 8.0
+w_none_p100/forms.written seen: words 43 in_lexicon 18 (41%) longest_copy 10 mean_copy 8.5 held: words 47 in_lexicon 21 (44%) longest_copy 10 mean_copy 9.2 unseen: words 45 in_lexicon 28 (62%) longest_copy 9 mean_copy 8.5
+w_none_p200/forms.written seen: words 44 in_lexicon 18 (40%) longest_copy 11 mean_copy 9.2 held: words 40 in_lexicon 14 (35%) longest_copy 9 mean_copy 8.0 unseen: words 48 in_lexicon 24 (50%) longest_copy 9 mean_copy 8.0
+w_none_p300/forms.written seen: words 44 in_lexicon 21 (47%) longest_copy 10 mean_copy 9.5 held: words 41 in_lexicon 19 (46%) longest_copy 11 mean_copy 8.5 unseen: words 38 in_lexicon 12 (31%) longest_copy 11 mean_copy 8.0
+w_none_end/forms.written seen: words 42 in_lexicon 15 (35%) longest_copy 9 mean_copy 7.8 held: words 44 in_lexicon 21 (47%) longest_copy 10 mean_copy 8.8 unseen: words 45 in_lexicon 20 (44%) longest_copy 8 mean_copy 8.0
+w_none_end_place/forms.written seen: words 48 in_lexicon 31 (64%) longest_copy 9 mean_copy 8.5 held: words 49 in_lexicon 28 (57%) longest_copy 11 mean_copy 9.0 unseen: words 44 in_lexicon 24 (54%) longest_copy 15 mean_copy 11.0

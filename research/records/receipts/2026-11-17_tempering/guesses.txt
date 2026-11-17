@@ -166,3 +166,23 @@ G-L1b (2026-11-17T19:43:37Z). The control again with a run of one extent (8 plac
 so nothing but the operands says how long the answer is; 150 passes, read every 10, the panel written at the end (8 places).
   The guess: the strictly held last digit under 0.1 nats by pass 100, as before; the panel at pass 150: 60 or more of the 66 two-digit
   answers whole, 8 or more of the 10 one-digit, 10 or more of the 20 three-digit (the hundreds' carry is the later law), 78 or more of 96.
+
+Scored (2026-11-17T20:11:21Z).
+G-L1 (long_none.txt, long_leak12.txt, long_leak14.txt): missed on every arm. Strictly held last digit open alone: no leak 2.292 at pass
+  25, 0.521 at 50, 0.072 at 75, 0.017 at 100, 0.016 at 250 (fitted 0.008); leak 12: 0.276 at 50, 0.023 at 100 (stopped near 105);
+  leak 14: 0.374 at 50, 0.060 at 75 (stopped near 95). No arm stood above 1.8; the leak arms did not stand above the no-leak arm
+  either. The arms were stopped once read, short of the 1,500 passes the guess named, to free the card; the read that decided is at
+  pass 75. The sentence of the step back's §10 is withdrawn, as fixed.
+G-L1b (fixed.txt): held on all four parts. Strictly held last digit 0.081 at pass 100 (0.062 at 80, 0.118 at 150). The panel at pass
+  150: 86 of 96 whole (78 guessed); two digits 60 of 66 (60), one digit 9 of 10 (8), three digits 17 of 20 (10); written length the
+  reference's in 93; 55 of the 63 prompts whose pair stands in the fit in neither order.
+G-L2 (text_none.txt), the no-leak arm at pass 400: fitting rows 1.494 (missed: 1.2 or under guessed); held rows' lowest 1.746 near pass
+  200 (held: between 1.7 and 2.0), last read 1.773, 0.027 above it (missed: 0.05 or more guessed); the unread book 1.849 at pass 100,
+  1.935 at 400. Panel in place order, words in the lexicon: fitted prompts 31 of 48 (64%, held: 60% guessed), held 28 of 49 (57%, held),
+  unread 24 of 44 (54%, held); longest shared run on a fitted prompt 9 octets (missed: 16 guessed; nothing was recited). In the law's
+  keyed order 56 of 131 (43%), as lap 94's. The leak arm was stopped at pass 12 to free the card for G-L3 and is unread. As fixed: held
+  and unread prompts stand under 70%, so the dwell alone does not settle text into words; it is not rote either.
+G-L3, the stream (stream.txt): held. Strictly held last digit 2.301 at section 1,000, 0.843 at 2,000, 0.075 at 2,800 (0.114 at 3,000,
+  0.020 at 3,800); panel at section 4,000: 88 of 96 whole, length the reference's in 95. A world met alone founds the law with no record
+  met twice. The interleaved arm and the arm mixed inside each section (G-L3's second part and its within-section form, the same fixed
+  guess: the line's condition, never taken or taken late) are running.

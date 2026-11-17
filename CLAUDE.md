@@ -443,8 +443,8 @@ Athena text milestone claimed before a test of use was retracted or retired.
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
 October 29 and November 17; the ten before the last four are from his corrections of November 12 to 16, and the
 three before those were derived from a failure, from readings of November 11 and from Brandon's lens of
-that day. The three before the last are the lead's, from the readings of November 16 (`agent-inferred`), and the last is from
-his correction of November 17. They are
+that day. The three before the last two are the lead's, from the readings of November 16 (`agent-inferred`), the one after them is from
+his correction of November 17, and the last is the lead's, from a failure of that day. They are
 written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
@@ -750,6 +750,18 @@ written here with their reasons so that no agent holds them as slogans.
   and that the decoded output is read (November 3 and 8) stood and were kept only at a lap's end. Scope: every report, record, guess and
   design on the machine's learning. The counts follow the survey's write-form ruler (`agent-inferred`)
   ([the record](research/records/2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)).
+- **A learner's null is held to a length** (the lead, November 17). Before a trial is read as "the machine does not take X", two things are
+  on record: its own pass's code has stopped falling (a trial read while its code still falls rules on nothing), and its length stands
+  against a control that does take a law of that kind on the same rows (the count of sections a taken law needed in the records, or the
+  same machine on the law with its operands handed). A trial's table is also read for what its form gives away (a region's extent, a
+  place, an order) before a held read from it is quoted. Reason: on November 17 ten passes over 3,923 short sums (400 sections) were read
+  as "the plain engine does not take a held sum"; a founding part, a day's plan and two statements to Brandon stood on it; the same
+  engine on the same rows took the sum whole between sections 1,000 and 3,000, and wrote 86 of 96 held sums. A read at 500 passes of 200
+  records had been taken with its code still falling, and two reads of the October machine at three passes carry the same fault. The
+  first long run's rows then let a region's extent tell an answer's length, and every free write came out two digits long. Scope: every
+  reading of a learner's trial that a design, a record or a statement rests on. It is the learner's side of the ruler's rule (a ruler's
+  null is held to a planted law)
+  ([the record](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md) §5, §10).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

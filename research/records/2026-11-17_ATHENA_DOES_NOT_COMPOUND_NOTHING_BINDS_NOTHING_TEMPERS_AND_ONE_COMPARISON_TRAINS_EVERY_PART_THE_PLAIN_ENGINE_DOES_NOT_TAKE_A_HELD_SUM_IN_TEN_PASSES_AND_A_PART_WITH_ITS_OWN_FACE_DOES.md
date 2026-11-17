@@ -255,3 +255,12 @@ operands are diffuse (the plain arm of §2), bound by rote (§7) or conducted ex
 itself, it was taken (§2's closed face, with §9's limits). The read of a founded face has to be founded too, from its own tension, which
 is the half of October 24's law that no run on either machine has made.
 
+## 11. Withdrawn the same night: the ten-pass trials stopped short of the transition
+
+The same engine on the same rows, run 150 passes where §2 ran ten, takes a strictly held sum's last digit from 2.29 nats to under 0.1
+between sections 1,000 and 3,000 and then writes 86 of 96 held sums whole
+([the record of the dwell](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)). Withdrawn
+here: §2's reading of the plain arm, §4 item 4 as a measured fact, §7's rote reading and its restated study, §8's and §10's claims that
+stepping does not take a law that lives in a product and that a founded face's read has to be founded, and G-O2's reading of the
+October machine at three passes. §1, §3, §4 items 1 to 3 and 5, §5 and §9 stand. This title names the withdrawn reading and is kept as
+the file's name.
