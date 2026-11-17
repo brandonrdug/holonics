@@ -591,3 +591,21 @@ Short sums at lap 86 beside laps 77 to 79 (oracle_short86.txt, the instrument of
 then 2.329 nats; a column both hold, clear 2.391, 2.420, 2.405, then 2.264, carried into 2.391, 2.416, 2.407, then 2.293; a
 column one holds, clear 2.164, 2.181, 2.122, then 1.920, carried into 2.337, 2.382, 2.361, then 2.169; the top digit 1.545,
 1.389, 1.412, then 1.412. Flat is 2.303. In seven laps the columns above the units fell 0.11 to 0.20 and the units 0.03.
+
+GUESSES G-RL1 to G-RL3, fixed at 10:11:04 UTC, November 17 (from date -u), before the read: what the located key delivers through the rows
+Reading: a ruler's capacity read with nothing labelled in its features (tools/loop_closure_ruler.py release), on the 8,000 short
+sums at lap 86's mean. The keys are the closure's own output, each symbol's eigenvalue λ_u on each common eigenvector, located on
+one half of the records from head 0's rows at tick 0 over every answer place. At an open place the row then delivers, on each
+eigenvector, its barycentre y = Σ_s p_s λ(u_s) and its pair product E = Σ_(s ≠ s') p_s p_s' λ(u_s) λ(u_s') (the menu's own
+weighting; y² less the sources' self terms). Where the aligned pair leads the row, E's phase is the sum's character, as the
+identity of the third record gives it. A least-squares read of these features, fitted on the same half and read on the other:
+how much of the written digit they give, and what they remove of the covector beside the chart. For scale, at the units place
+the chart alone holds none of the written digit (−0.06) and removes 0.14 of the covector at tick 0, a labelled read's five
+products 0.28, the pair's table 0.56.
+G-RL1: at the units place the features give the written digit (its one-hot, centred) at 0.5 or more on the held half.
+G-RL2: beside the chart they remove 0.35 or more of the covector's power at the units place at tick 0.
+G-RL3: at the columns both operands hold they give the wheel's digit (a_k + b_k modulo ten) at 0.4 or more.
+What it decides: G-RL1 and G-RL2 held, the rows as they stand already deliver the sum's digit to a release that multiplies on
+the located ring, with no label anywhere, and the symbol's line has its founding and its first part (a pair product on a
+located ring, read by its characters); missed, the rows' shares scatter too much for a product and the release needs the lock
+closed first.
