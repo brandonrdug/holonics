@@ -841,3 +841,17 @@ presence, which there is this same population, returned 0.937.
 What it decides: held, a key's founding is readable off the machine's own arithmetic region as it is drawn, with no label
 and no chosen specimen, by a context the row itself carries; missed, the slice's sums are too few or their rows too diffuse
 for a closure at this sample.
+
+SCORE of G-SET1, read from the clock at 11:13:50 UTC, November 17 (slice86_sets.txt; the dump of G-SL1, head 0; host, one thread,
+20 s)
+G-SET1 missed: no context set returns the wheel. At the block's level of 0.9 the pooled menu's largest block is the digits 1
+to 9 with the closing parenthesis, the zero apart (on this slice a zero is written beside other things than the other digits
+are: products by zero, trailing zeros), so a two-operand sum's places fall into two sets, with and without a zero met, of
+5,208 and 2,591 places, and neither menu holds the ten digits in one block.
+A diagnosis read after the score (not guessed): at a block level of 0.8 or 0.7 the zero joins the digits and one set holds
+the records whose only sign is the plus (9,767 and 11,625 places), and its menu still gives no line or plane with keys. Those
+records include sums of three and four operands and operands of up to six digits, where the two-operand records of G-SG had
+operands of one and two.
+Decided as the guess said: at this sample the slice as drawn does not close under any context read tonight. The closure's
+instrument is also not robust yet (a block level set by hand moves which symbols a ring may hold), and that is repaired
+before it is asked to found anything.
