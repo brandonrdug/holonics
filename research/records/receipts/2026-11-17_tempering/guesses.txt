@@ -84,3 +84,17 @@ their strand reads), which are held. Against the October trained PRA (never-met 
   never-met calculations whole at the equals: 25 to 70 of 876 (the ring the length selects is a product and may stay unread).
 What a miss would say: modulo ten at PRA's level with the comparison standing says the founding was never the limit in October: the
 return and readout do not come to read a face that is conducted exactly, in three stepped passes, and the read itself must be founded.
+
+Scored (2026-11-17T19:03:35Z), G-O2 (october_protected.txt): the October run repeated from PRA_STATE with only the opened comparison's entries held
+(the held ranges are printed; three stepped passes, 326 s; held-out code 1.795 bits a byte against the October PRA's 1.824).
+  Never-met calculations at the equals: 15 of 876 (missed: 25 to 70 guessed; the October PRA 18, an 8-gram 34). All 328 of 2,448 (PRA 286);
+  met 313 of 1,572 (PRA 268).
+  Numbers agreeing with the result modulo ten, all calculations: 768 of 2,060 against a foil's 593 of 2,019 (PRA 807 of 2,085 against 588
+  of 2,045): the same lead over the foil, so missed (a clear rise was guessed; the never-met line was cut from this read's print).
+  The comparison's share: 0 thousandths on every ring after training, WITH ITS ENTRIES HELD. The share is the comparison's part of the
+  level's whole bilinear weight, so it falls as the other contacts grow. The October record's "250 thousandths at founding, zero in every
+  final state" therefore reads dilution, as that record itself allowed ("erased or diluted"), and not erasure.
+  Reading, as fixed before the run: the founding was not the limit in October. With the comparison conducted as founded through all three
+  passes, the return and the readout still do not come to read it. Stepping on the one comparison leaves a conducted product unread, as
+  it leaves a diffuse one untaken (the plain arm of November 17). What I wrote to Brandon at 18:47 UTC and in the record's §8, that the
+  stepped passes erased the founded product, over-read the share and is withdrawn.

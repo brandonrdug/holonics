@@ -1,0 +1,65 @@
+18:56:27
+# train exit 0 19:01:54: HOLD opened-comparison ranges=[100864..101888, 150592..151616, 117248..117264, 166976..166992, 335782..336166, 341926..342310]
+TOWER_PASS pass=0 train_bits_a_byte=2.204 dev_bits_a_byte=1.982 dev_regions Q=1.404 P=2.489 N=0.867 M=1.990 deposits=1311/1311 pass_ms=109283 elapsed_ms=109302 train_code=8152998145871 dev_code=826344
+TOWER_PASS pass=1 train_bits_a_byte=1.875 dev_bits_a_byte=1.858 dev_regions Q=1.262 P=2.375 N=0.539 M=1.868 deposits=1311/1311 pass_ms=108512 elapsed_ms=217815 train_code=6933766291367 dev_code=774861
+TOWER_PASS pass=2 train_bits_a_byte=1.779 dev_bits_a_byte=1.795 dev_regions Q=1.165 P=2.313 N=0.543 M=1.805 deposits=1311/1311 pass_ms=108756 elapsed_ms=326571 train_code=6578567023139 dev_code=748586
+# read exit 0: TOWER_WRITTEN problems=747 calculations=2448 free_bytes=299811 prompt_units=468588 released_units=114859 most_units_a_problem=4706 agree=1 mark_agree=64 mark_cap=8 elapsed_ms=16979
+TOWER_WRITTEN_FILES free_sha256=313e1923c96b1930fbdb3ae9f91d0638134d46703b0a73e510985fc6a7c5f7cf marks_sha256=47ed045e3581782f3320b6526bd24d08dc974c41f2a00db6dc5940c67c6aad6a
+== RULES rings opened/read_PRA read_PRC
+WRITTEN dir=opened/read_PRA problems=747 a_on_problem=50 b_free_calculations=1300 b_free_right=50 c_first_calculations=666 c_from_question=23 b_equals=286/2448 met=268/1572 never_met=18/876 binary +=36/470 -=32/388 *=156/897 /=47/343
+RINGS dir=opened/read_PRA n=312 mod9=33 foil9=32 mod10=122 foil10=91 mod11=25 foil11=29 mod990=3 foil990=3 lead_length=38 foil_lead_length=28
+WRITTEN dir=read_PRC problems=747 a_on_problem=41 b_free_calculations=1246 b_free_right=95 c_first_calculations=641 c_from_question=24 b_equals=328/2448 met=313/1572 never_met=15/876 binary +=40/470
+RINGS dir=read_PRC n=312 mod9=47 foil9=31 mod10=124 foil10=83 mod11=25 foil11=34 mod990=6 foil990=4 lead_length=40 foil_lead_length=28
+== RULES heard opened/read_PRA read_PRC
+WRITTEN dir=opened/read_PRA problems=747 a_on_problem=50 b_free_calculations=1300 b_free_right=50 c_first_calculations=666 c_from_question=23 b_equals=286/2448 met=268/1572 never_met=18/876 binary +=36/470 -=32/388 *=156/897 /=47/343
+HEARD dir=opened/read_PRA 0=18/876 1=14/239 2-3=23/224 4-7=15/255 8-15=40/326 16+=176/528
+WRITTEN dir=read_PRC problems=747 a_on_problem=41 b_free_calculations=1246 b_free_right=95 c_first_calculations=641 c_from_question=24 b_equals=328/2448 met=313/1572 never_met=15/876 binary +=40/470
+HEARD dir=read_PRC 0=15/876 1=14/239 2-3=18/224 4-7=23/255 8-15=54/326 16+=204/528
+== RULES pair read_PRC opened/read_PRA
+WRITTEN dir=read_PRC problems=747 a_on_problem=41 b_free_calculations=1246 b_free_right=95 c_first_calculations=641 c_from_question=24 b_equals=328/2448 met=313/1572 never_met=15/876 binary +=40/470
+WRITTEN dir=opened/read_PRA problems=747 a_on_problem=50 b_free_calculations=1300 b_free_right=50 c_first_calculations=666 c_from_question=23 b_equals=286/2448 met=268/1572 never_met=18/876 binary +=36/470 -=32/388 *=156/897 /=47/343
+PAIRED met_only_a=154 met_only_b=109 met_both=159 never_only_a=11 never_only_b=14 never_both=4
+== RULES gaps opened/read_PRA read_PRC
+WRITTEN dir=opened/read_PRA problems=747 a_on_problem=50 b_free_calculations=1300 b_free_right=50 c_first_calculations=666 c_from_question=23 b_equals=286/2448 met=268/1572 never_met=18/876 binary +=36/470 -=32/388 *=156/897 /=47/343
+GAPS dir=opened/read_PRA set=all n=2448 right=286 wrong=2162 unfinished=21 not_number=6 unread=0 numbers=2135
+GAP_SIZE dir=opened/read_PRA set=all n=2135 x2=1104 x10=1952 tenth=70 opposite_sign=0 smaller=1196 larger=939 digits=1254 foil_digits=784/2101
+GAP_LEAD dir=opened/read_PRA set=all n=2085 lead=257 foil_lead=293/2045 lead_length=185 foil_lead_length=108/2045 one_digit=669 foil_one_digit=345/2045
+GAP_RINGS dir=opened/read_PRA set=all n=2085 mod9=168 foil9=198/2045 mod10=807 foil10=588/2045 mod11=79 foil11=158/2045 mod7=170 foil7=267/2045 mod13=76 foil13=134/2045
+GAP_FROM dir=opened/read_PRA set=all n=2135 heard_result=2081 operand=189 other_operation=83/1807
+GAP_WRITES dir=opened/read_PRA set=all written=2421 distinct=132 top10=1553 commonest=8:315:39
+GAP_LENGTH dir=opened/read_PRA set=all 1=123/485 2=125/1252 3=35/508 4=3/139 5+=0/64
+GAPS dir=opened/read_PRA set=met n=1572 right=268 wrong=1304 unfinished=4 not_number=2 unread=0 numbers=1298
+GAP_SIZE dir=opened/read_PRA set=met n=1298 x2=804 x10=1258 tenth=31 opposite_sign=0 smaller=750 larger=548 digits=843 foil_digits=489/1268
+GAP_LEAD dir=opened/read_PRA set=met n=1291 lead=127 foil_lead=158/1261 lead_length=108 foil_lead_length=65/1261 one_digit=529 foil_one_digit=267/1261
+GAP_RINGS dir=opened/read_PRA set=met n=1291 mod9=81 foil9=118/1261 mod10=494 foil10=335/1261 mod11=26 foil11=91/1261 mod7=84 foil7=174/1261 mod13=23 foil13=75/1261
+GAP_FROM dir=opened/read_PRA set=met n=1298 heard_result=1288 operand=134 other_operation=73/1228
+GAP_WRITES dir=opened/read_PRA set=met written=1566 distinct=70 top10=1162 commonest=8:239:35
+GAP_LENGTH dir=opened/read_PRA set=met 1=115/383 2=121/878 3=29/264 4=3/44 5+=0/3
+GAPS dir=opened/read_PRA set=never n=876 right=18 wrong=858 unfinished=17 not_number=4 unread=0 numbers=837
+GAP_SIZE dir=opened/read_PRA set=never n=837 x2=300 x10=694 tenth=39 opposite_sign=0 smaller=446 larger=391 digits=411 foil_digits=259/833
+GAP_LEAD dir=opened/read_PRA set=never n=794 lead=130 foil_lead=141/785 lead_length=77 foil_lead_length=38/785 one_digit=140 foil_one_digit=55/785
+GAP_RINGS dir=opened/read_PRA set=never n=794 mod9=87 foil9=74/785 mod10=313 foil10=223/785 mod11=53 foil11=59/785 mod7=86 foil7=112/785 mod13=53 foil13=63/785
+GAP_FROM dir=opened/read_PRA set=never n=837 heard_result=793 operand=55 other_operation=10/579
+GAP_WRITES dir=opened/read_PRA set=never written=855 distinct=117 top10=457 commonest=150:91:2
+GAP_LENGTH dir=opened/read_PRA set=never 1=8/102 2=4/374 3=6/244 4=0/95 5+=0/61
+WRITTEN dir=read_PRC problems=747 a_on_problem=41 b_free_calculations=1246 b_free_right=95 c_first_calculations=641 c_from_question=24 b_equals=328/2448 met=313/1572 never_met=15/876 binary +=40/470
+GAPS dir=read_PRC set=all n=2448 right=328 wrong=2120 unfinished=9 not_number=6 unread=0 numbers=2105
+GAP_SIZE dir=read_PRC set=all n=2105 x2=1138 x10=1941 tenth=79 opposite_sign=0 smaller=1022 larger=1083 digits=1294 foil_digits=836/2065
+GAP_LEAD dir=read_PRC set=all n=2059 lead=323 foil_lead=340/2018 lead_length=245 foil_lead_length=151/2018 one_digit=633 foil_one_digit=313/2018
+GAP_RINGS dir=read_PRC set=all n=2060 mod9=227 foil9=220/2019 mod10=768 foil10=593/2019 mod11=88 foil11=150/2019 mod7=176 foil7=279/2019 mod13=73 foil13=126/2019
+GAP_FROM dir=read_PRC set=all n=2105 heard_result=2068 operand=170 other_operation=54/1770
+GAP_WRITES dir=read_PRC set=all written=2433 distinct=145 top10=1391 commonest=150:338:20
+GAP_LENGTH dir=read_PRC set=all 1=127/485 2=146/1252 3=55/508 4=0/139 5+=0/64
+GAPS dir=read_PRC set=met n=1572 right=313 wrong=1259 unfinished=2 not_number=3 unread=0 numbers=1254
+GAP_SIZE dir=read_PRC set=met n=1254 x2=816 x10=1219 tenth=43 opposite_sign=0 smaller=588 larger=666 digits=857 foil_digits=495/1230
+GAP_LEAD dir=read_PRC set=met n=1247 lead=181 foil_lead=179/1223 lead_length=156 foil_lead_length=74/1223 one_digit=495 foil_one_digit=234/1223
+GAP_RINGS dir=read_PRC set=met n=1248 mod9=118 foil9=123/1224 mod10=461 foil10=330/1224 mod11=38 foil11=94/1224 mod7=84 foil7=156/1224 mod13=28 foil13=83/1224
+GAP_FROM dir=read_PRC set=met n=1254 heard_result=1249 operand=127 other_operation=48/1183
+GAP_WRITES dir=read_PRC set=met written=1567 distinct=75 top10=1017 commonest=150:201:16
+GAP_LENGTH dir=read_PRC set=met 1=122/383 2=142/878 3=49/264 4=0/44 5+=0/3
+GAPS dir=read_PRC set=never n=876 right=15 wrong=861 unfinished=7 not_number=3 unread=0 numbers=851
+GAP_SIZE dir=read_PRC set=never n=851 x2=322 x10=722 tenth=36 opposite_sign=0 smaller=434 larger=417 digits=437 foil_digits=285/842
+GAP_LEAD dir=read_PRC set=never n=812 lead=142 foil_lead=149/802 lead_length=89 foil_lead_length=46/802 one_digit=138 foil_one_digit=47/802
+TOWER_PAIR_COMPARISON level=0 (ring:thousandths/millionths) 9:0/1 99:0/1 999:0/1 9999:0/1
+19:02:27
+RUN_EXIT 0 2026-11-17T19:02:27Z
