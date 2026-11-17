@@ -1,0 +1,14 @@
+CROSS_READ heads=4 eigenvectors=9 places=16286 ridge=0.001
+CROSS part tick test_rows | the wheel's digit from: head 0's row | every head's row | with products of two heads | with products across ticks (heads 0, 1)
+CROSS units tick=0 4077 | 0.224 0.258 0.263 0.256
+CROSS units tick=1 4077 | 0.219 0.338 0.434 0.413
+CROSS units tick=2 4077 | 0.178 0.183 0.292 0.346
+CROSS units tick=3 4077 | 0.015 -0.015 -0.013 0.101
+CROSS both-clear tick=0 565 | 0.133 0.283 0.341 0.542
+CROSS both-clear tick=1 565 | 0.485 0.501 0.548 0.585
+CROSS both-clear tick=2 565 | 0.540 0.589 0.622 0.586
+CROSS both-clear tick=3 565 | 0.063 0.088 0.436 0.539
+CROSS both-carry tick=0 449 | 0.312 0.399 0.423 0.439
+CROSS both-carry tick=1 449 | 0.427 0.451 0.498 0.472
+CROSS both-carry tick=2 449 | 0.495 0.511 0.549 0.499
+CROSS both-carry tick=3 449 | 0.050 0.037 0.329 0.397

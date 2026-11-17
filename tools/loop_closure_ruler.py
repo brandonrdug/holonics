@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | planes [planted] | context TABLE [planted]]
+Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted]]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -31,6 +31,11 @@ then gives, on each eigenvector, its barycentre `y = Σ_s p_s λ(u_s)` and its p
 (`y²` less the sources' self terms, the menu's own weighting). `RELEASE_HOLD` is the share of the written digit and of the wheel's
 digit `a_k + b_k mod 10` a least-squares read of these features gives on the held half, and `RELEASE_TENSION` what they remove of the
 covector beside the chart, by part and tick, beside the value's own digit and the pair's table. Nothing in the features is labelled.
+
+With `cross`, the release's read with every head: each head's keyed barycentre and pair product, then the products of two heads'
+barycentres, then the products of a first tick's barycentres with a later tick's (heads 0 and 1), each added to the features
+before it; `CROSS` gives the share of the wheel's digit read on the held half. One row holds one aligned digit or the other at a
+units place, and this reads whether another row holds its partner.
 
 With `planes`, DIR holds every place of each record opened in turn (operands' digits, signs and spaces as well as the value's), so
 nothing chooses which places are composed. A place at an operand is written `x = v − w`: a translation composed with the reflection
@@ -485,12 +490,86 @@ def release(d, head=0, ridge=1e-3):
             print(f"RELEASE_TENSION {pname} tick={k} {t.sum()} | " + " ".join(f"{v:.4f}" for v in shares), flush=True)
 
 
+def cross(d, ridge=1e-3):
+    """The release across heads and ticks (see the module's text): keys from head 0's rows at tick 0 on the fitting half."""
+    import hashlib
+
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import tension_ruler as tr
+
+    rows = [line.split("\t") for line in open(os.path.join(d, "rows.tsv")).read().splitlines()]
+    opened = [r for r in rows if r[5] == "1"]
+    label = [r[0] for r in opened]
+    place = np.array([int(r[1]) for r in opened])
+    tick = np.array([int(r[2]) for r in opened])
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    heads = len(lines) // len(opened)
+    symbols = sorted({c for line in lines for c in text_of(line[0])})
+    index = {c: i for i, c in enumerate(symbols)}
+    m = len(symbols)
+    half_of = lambda lab: hashlib.sha256(f"half:{lab}".encode()).digest()[0] % 2
+    fit = np.array([half_of(l) == 0 for l in label])
+    test = ~fit
+    menu = np.zeros((m, m, m))
+    src_of = {}
+    for i, line in enumerate(lines):
+        o, h = i // heads, int(line[3])
+        text = text_of(line[0])
+        src = [(index[text[int(j)]], int(p) / 1e6) for j, p, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        src_of[(o, h)] = src
+        if h == 0 and int(line[2]) == 0 and half_of(line[0]) == 0:
+            xi = index[text[int(line[4])]]
+            for a_, (u, p1) in enumerate(src):
+                for b_, (w, p2) in enumerate(src):
+                    if a_ != b_:
+                        menu[u, w, xi] += p1 * p2
+    found, _ = closure(menu, symbols)
+    keys = np.array([lam for _, lam in found])
+    e, n = len(keys), len(opened)
+    y = np.zeros((n, heads, e), dtype=complex)
+    own = np.zeros((n, heads, e), dtype=complex)
+    for (o, h), src in src_of.items():
+        if not src:
+            continue
+        us = np.array([u for u, _ in src])
+        ps = np.array([p_ for _, p_ in src])
+        terms = keys[:, us] * ps[None, :]
+        y[o, h] = terms.sum(axis=1)
+        own[o, h] = (terms**2).sum(axis=1)
+    parts_of = lambda z: np.hstack([z.real, z.imag])
+    lin = parts_of(y.reshape(n, -1))
+    within = parts_of((y**2 - own).reshape(n, -1))
+    across = parts_of(np.stack([y[:, a] * y[:, b] for a in range(heads) for b in range(a + 1, heads)], axis=1).reshape(n, -1))
+    ticks = int(tick.max()) + 1
+    yt = y.reshape(n // ticks, ticks, heads, e)
+    later = np.stack([yt[:, 0, a] * yt[:, k, b] for k in range(1, ticks) for a in (0, 1) for b in (0, 1)], axis=1).reshape(n // ticks, -1)
+    later = np.repeat(parts_of(later)[:, None, :], ticks, axis=1).reshape(n, -1)
+    kinds = [tr.place_kind(l, int(p_)) for l, p_ in zip(label, place)]
+    part = np.array([tr.PARTS.index(tr.part_of(k)) for k in kinds])
+    da, db = (np.array([k[i] for k in kinds]) for i in (4, 5))
+    held = np.array([k[7] for k in kinds])
+    wheel = (da + np.where(held == 2, db, 0)) % 10
+    head0 = np.hstack([parts_of(y[:, 0]), parts_of(y[:, 0] ** 2 - own[:, 0])])
+    print(f"CROSS_READ heads={heads} eigenvectors={e} places={n // ticks} ridge={ridge}")
+    print("CROSS part tick test_rows | the wheel's digit from: head 0's row | every head's row | with products of two heads | with products across ticks (heads 0, 1)")
+    for pid in (0, 1, 2):
+        for k in range(ticks):
+            sel = (tick == k) & (part == pid)
+            f, t = sel & fit, sel & test
+            tc = tr.onehot(wheel) - tr.onehot(wheel)[sel].mean(axis=0)
+            vals = [tr.removed(x, tc, f, t, ridge) for x in (head0, np.hstack([lin, within]), np.hstack([lin, within, across]), np.hstack([lin, within, across, later]))]
+            print(f"CROSS {tr.PARTS[pid]} tick={k} {t.sum()} | " + " ".join(f"{v:.3f}" for v in vals), flush=True)
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     d = sys.argv[1]
     if len(sys.argv) > 2 and sys.argv[2] == "release":
         release(d)
+        return
+    if len(sys.argv) > 2 and sys.argv[2] == "cross":
+        cross(d)
         return
     if len(sys.argv) > 3 and sys.argv[2] == "context":
         texts = table_texts(sys.argv[3])
