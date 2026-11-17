@@ -1,6 +1,6 @@
 # A row's midpoint is in the chart and its doubling carries the sum, but only a labelled read finds it; the address is one head's, a renamed region is read by its own use, and a symbol is still a free row
 
-The lead, November 17, 2026, 00:00 to 01:05 UTC. Refs #404, #73. Status: [measurement: host readings on the line's lap 77 and lap 78
+The lead, November 17, 2026, 00:00 to 01:15 UTC. Refs #404, #73. Status: [measurement: host readings on the line's lap 77 and lap 78
 means, receipts `receipts/2026-11-16_tension/` (the guess file continues there); four lenses of Brandon's read on the objects,
 `agent-inferred` where marked; no law of the engine changed; lap 78 trained on the redrawn arithmetic slice]. It continues
 [the second record of November 16](2026-11-16_THE_LOCK_AND_THE_JUNCTION_ARE_ONE_SADDLE_A_CARRIED_LOCK_COSTS_UNTRAINED_TEXT_AND_THE_ARITHMETIC_TERRAIN_IS_REDRAWN_AT_THE_WORD_PROBLEMS_OWN_COUNTS_WITH_A_RECORD_ALONE_IN_ITS_REGION.md).
@@ -126,6 +126,37 @@ chart 0.79 (0.75), head 0's last-tick share on the pair 0.515 (0.470). The held 
 split each rose by 0.002 to 0.007 nats a place; the held arithmetic, which is the uniform draw's records, rose from 1.528 to 1.611.
 The world read 0.813 of the lap's drafts (0.605 on lap 77). One lap sharpened the arrival and left the sum's digit where it stood.
 
+### 3.8 No register of a sum's digit is held (`registers_short78.txt`; guesses G-R)
+
+At 00:44 UTC Brandon asked that the radix and register mathematics be minded: the tree's own (about seventy `radix.*` rows of
+October and November), which this work had not carried. In it a sum is a carry-free pair combination followed by one carry cascade
+(`radix.carry-cascade-consumer`); the pair combination is the redundant digit `a_k + b_k`, held unreleased
+(`radix.redundant-fibre`); the release is a quotient and a section, the digit the phase on its wheel and the carry the winding past
+the section (`radix.carry-section-flux`); the carry chain is one associative product of small matrices, the same under every
+bracketing (`radix.adder-bracketing`); and ten is two times five (`radix.trailing-unit-rings`). The midpoint of §3.2 is the redundant
+digit: the first half of the consumer's equation stands in the chart.
+
+`read-tension` now writes the open place's whole face, and `tension_ruler.py registers` splits a digit's code as the ring of ten
+splits. Short sums, lap 78's mean, nats a place, beside a register that knows nothing:
+
+| place | the digit (2.303) | its bit (0.693) | its five-residue given the bit (1.609) |
+|---|---|---|---|
+| the units digit | 2.357 | 0.727 | 1.630 |
+| a column both hold, no carry in | 2.399 | 0.693 | 1.706 |
+| a column both hold, a carry in | 2.401 | 0.690 | 1.711 |
+| a column one operand holds, no carry in | 2.116 | 0.673 | 1.443 |
+| the top digit | 1.288 | 0.480 | 0.808 |
+
+At columns both operands hold, the digit up to its carry codes at 1.640 and 1.681 (1.609), and the carry's bit given that at 0.722
+with no carry in and 0.720 with one. No register is held, the parity included, and the winding is not read. The pair combination is
+produced and nothing releases it.
+
+What this says of the build (`agent-inferred`): the crossing triad asks the field to learn, by products of blind rows, the release
+that a digit's word on its wheel gives by transport: an occurrence that advances a ring by its symbol's located advance composes
+advances, its phase is the digit and its winding the carry (the located transport of October 5, THE_MACHINE's guard 9). The reach
+that goes as the square of the presence (§3.2) is mass action for a two-body step. The symbol's own line is then the first step for
+arithmetic and not a build beside it.
+
 ## 4. The lenses on the objects
 
 **A symbol's resolution, aspect and signature** (`agent-inferred`). Resolution is the count of rings a receiver reads: the first
@@ -183,10 +214,12 @@ The subspace of §3.3 was tried in three variants after the first missed, each w
 - The symbol's line as a gene: the design of November 12 with its opening key lifted, and the three baselines above as its
   acceptance.
 - A read of the turned heads' located rates on digits and separators, for the clock in a number's frame.
+- The digit's wheel: the symbol's law of November 12 read with the radix rows, the sum as transport on a located ring with its
+  winding, designed before any further junction is founded.
 
 ## 9. Receipts
 
 `receipts/2026-11-16_tension/`: `guesses.txt` (G-H void, G-K, G-Y, G-P, G-L5, with clock stamps and scores), `cool77_head3.*`,
 `cool77h0_*`, `cooled_held77.tsv`, `midpoint_short77.txt`, `midpoint_short78.txt`, `midpoint_long75.txt`, `midpoint_cooled77.txt`,
 `modes_short77.txt`, `resp77.txt`, `resp77_directions.txt`, `symbol_geometry77.txt`, `sym77.txt`, `oracle_short78.txt`,
-`heat_short78.txt`. Host readings ran on 6 to 8 threads beside laps 78 and 79.
+`heat_short78.txt`, `registers_short78.txt`. Host readings ran on 6 to 8 threads beside laps 78 and 79.
