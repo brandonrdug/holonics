@@ -161,7 +161,7 @@ zeros and its first figures were void (`guesses.txt`). A dump is matched by orde
 
 ## 6b. Reads of the closure's reach, 10:20 to 11:00 UTC
 
-Each was guessed first; the first form of each missed, and each miss says what the closure needs.
+Each was guessed first, and each says what the closure needs or where it stops.
 
 **Every place of a sum open in turn** (G-DH; `planes86.txt`, `planes86_planted.txt`, `planes86_block.txt`). Nothing then chooses
 which places are composed: 3,480 distinct short sums, 41,004 places, an operand's digits and the signs opened as the value's are.
