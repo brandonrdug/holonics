@@ -35,3 +35,18 @@ What a miss would say: a founded lap that reads the units digit well above the e
 were carrying part of that arm's gain, and the lap law's bridge then has to reach them; text standing as high under the founded lap as
 under the stepped arm says holding families does not protect what the lock's move re-encodes, and the closed face then needs a lock of
 its own.
+
+Scored (2026-11-17T18:42:15Z), G-T1 (t1.txt, t1_writes_founded_bridge_only.txt, t1_writes_foil.txt; held half, mixed openings; the text table's five
+text slices together, 9,000 places, nats a place; the run took 27 minutes against about 12 projected, the four text reads being the excess):
+                              held units   top     middle   line feed   whole of 96   last digit of 96   text table
+  lap 94's state                2.674     1.850    2.265     0.355          2              9             1.1806
+  founded, bridge only          1.642     1.741    2.230     0.348          4             21             1.1911
+  foil lap, same held families  2.354     1.700    2.115     0.076          3             13             1.1902
+  founded, everything stepped   0.860     1.255    1.525     0.039         11             38             1.2237
+  Held units with the founding: missed (1.0 or under was guessed, 1.642 read). The foil: held (2.354). Written whole with the founding:
+  missed (8 or more guessed, 4 read). Text: the founded lap stands 0.011 above lap 94's (held, within 0.05); the everything-stepped arm
+  0.043 above (missed: 0.1 or more was guessed).
+  Reading: the founding carries the units digit with only its bridge moved (1.64 against the foil's 2.35), at a quarter of the stepped
+  arm's cost to text, and it reaches half of that arm's fall: the values and returns that arm also moved carried the rest, and the bridge's
+  own passes had not reached their fixed point (the pass's code was still falling at the tenth: 1.71, 1.59, …, 1.43, 1.41 nats a place).
+  The founded lap's writes are no cleaner than the foil's as products.
