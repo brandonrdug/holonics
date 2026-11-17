@@ -36,7 +36,7 @@ they lack.
   `β(u) = E±(u)`; two strands bring the sources on either side with opposite signs of the clock's difference; the still heads carry
   no frame. The symbol's law of November 12 (§8.8) already says that only the pace keeps the located advance's form.
 
-**October held the hand already** (added at 03:45 UTC, after the first statement; found through the output survey's note and a
+**October held the hand already** (added at 03:36 UTC, after the first statement; found through the output survey's note and a
 second reader, then read at source). This record's §4 restates a law the tree owns, and §2 as first written missed its owner:
 
 - [The tower's record of October 24](2026-10-24_THE_TOWER_HEARS_THE_HOLONICS_TEXT_AND_EVERY_LOOK_IS_READ_BY_ITS_LOCK.md), its section
