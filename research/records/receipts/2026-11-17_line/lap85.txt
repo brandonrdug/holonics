@@ -1,0 +1,18 @@
+08:11:35
+# lap85: exit 0 released 08:02:16
+MEASURE lap=lap85 rc=0 wall_s=3257.0 peak_rss_kib=854596
+STORE_PASS role=prefix sections=3000 stretches_read=70399067 ended=fal
+== loud 84
+code 0.5596 20.022 -0.048;web 0.9086 20.125 -0.089;science 0.7616 20.223 -0.156;books 0.8688 20.341 -0.210;wikidata 1.0648 20.093 +0.266;arithmetic 1.6195 20.498 -0.473;words 0.7698 20.109 -0.323;all 0.8913 20.182 -0.027;
+== loud 85
+code 0.5558 20.030 -0.051;web 0.9074 20.132 -0.106;science 0.7612 20.225 -0.170;books 0.8661 20.339 -0.221;wikidata 1.0624 20.063 +0.205;arithmetic 1.5958 20.542 -0.430;words 0.7788 20.125 -0.321;all 0.8891 20.186 -0.041;
+letter 0.614 0.4602;digit 0.101 1.9983;space 0.185 0.2320;mark 0.090 2.8163;
+WRITES_BY_PLACE  met 128 0.969 0.742 0.227 0.117 0.023 0.102 0.000
+world read share 0.884
+WRITE bolts = 4\nlabed = baked_baked / 2\nnume_plars = 2\nbolts_0/ = led_brues_3 =plars + bolisal = plars + nuars_s_plars / 2 * bolicy_plars + tobeeus_bolt =_bolts_ * noart + plaazed_bolts)\nresult = re
+90 + 81 =  | 80\n5900 + 0 = 22 | 171\n
+58 - 43 =  | 4939\n(6 * 3) * 2 | 15\n
+36 * 0 =  | 796\n(9 - 91) - 4 | 0\n
+4 * 317 =  | 10006\n0 - 1504 + | 1268\n
+
+[exited with code 0]
