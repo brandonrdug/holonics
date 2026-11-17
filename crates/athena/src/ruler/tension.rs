@@ -557,3 +557,98 @@ fn keyed_bit(key: &str) -> u64 {
     x = (x ^ (x >> 27)).wrapping_mul(0x94d049bb133111eb);
     x ^ (x >> 31)
 }
+
+/// [measurement; the lead, November 17, the night's text run] `write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN
+/// OUT STATE STATE_SHA [WINDOW]`: **a write of one place a read, each place the last of its region**: after each prompt `RUN` places are
+/// written one at a time, the place written being the single open site of a region that ends there (the prompt and what was written
+/// before it known, nothing to its right), drawn from its face over the letters by a keyed uniform (the key file's last eight bytes, the
+/// row and the place). With `WINDOW`, the region keeps the last `WINDOW` known places. It writes `OUT/forms.written` in `write-forms`'
+/// form. Why: a field compared only on the next place of a region that ends there (the trial's rows of a one-place run) is read by the
+/// law's writer in a state it was never compared on, a place with a run of open places to its right, and its first panel came out as
+/// marks (the record of the night's run); this writer meets the compared state place for place. A ruler's writer on a study's states:
+/// the release's law is unchanged.
+pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
+    if args.len() != 13 && args.len() != 14 {
+        return Err("write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [WINDOW]".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("write-next")?;
+    let units = units_of(&args[1], &args[2])?;
+    let keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let run = positive(&args[9])?;
+    let out = Path::new(&args[10]);
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let window = match args.get(13) {
+        Some(w) => Some(positive(w)?),
+        None => None,
+    };
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let escape = |b: &[u8]| String::from_utf8_lossy(b).replace('\n', "\\n").replace('\t', "\\t");
+    let mut rows: Vec<(String, Vec<u8>, Vec<usize>, Vec<u8>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, prompt, reference] = w[..] else { return Err("a forms row that is not three fields".into()) };
+        let bytes = unescape(prompt).into_bytes();
+        let classes = codec.encode(&bytes)?;
+        if classes.is_empty() {
+            return Err("a forms row with an empty prompt".into());
+        }
+        rows.push((label.to_string(), bytes, classes, unescape(reference).into_bytes()));
+    }
+    std::fs::create_dir(out)?;
+    let void = codec.void();
+    let mix = |counter: u64| -> u64 {
+        let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+        z ^ (z >> 31)
+    };
+    let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
+    for step in 0..run {
+        let regions: Vec<OwnedRegion> = rows
+            .iter()
+            .zip(&written)
+            .map(|(row, w)| {
+                let mut classes: Vec<usize> = row.2.iter().chain(w.iter()).copied().collect();
+                if let Some(n) = window {
+                    let from = classes.len().saturating_sub(n);
+                    classes.drain(..from);
+                }
+                classes.push(void);
+                let mut open = vec![false; classes.len()];
+                *open.last_mut().expect("a region of one place or more") = true;
+                OwnedRegion::plain(classes, open)
+            })
+            .collect();
+        let views: Vec<_> = regions.iter().map(view_of).collect();
+        let faces = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
+        for (k, (face, w)) in faces.iter().zip(written.iter_mut()).enumerate() {
+            let f = face.last().and_then(|f| f.as_ref()).ok_or("a written place that carries no face")?;
+            let letters = f.total - f.masses[void];
+            if letters == 0 {
+                return Err("a face with no mass on a letter".into());
+            }
+            // A keyed uniform under the letters' mass: two draws make its 128 bits.
+            let u = ((u128::from(mix(((k as u64) << 24) ^ step as u64)) << 64) | u128::from(mix(((k as u64) << 24) ^ step as u64 ^ (1 << 60)))) % letters;
+            let mut acc = 0u128;
+            let class = (0..f.masses.len()).filter(|&c| c != void).find(|&c| {
+                acc += f.masses[c];
+                acc > u
+            });
+            w.push(class.ok_or("a draw past the letters' mass")?);
+        }
+    }
+    let mut text = String::new();
+    for ((label, prompt, _, reference), w) in rows.iter().zip(&written) {
+        text.push_str(&format!("{label}\t{}\t{}\t{}\n", escape(prompt), escape(&codec.decode(w)), escape(reference)));
+    }
+    write_new(&out.join("forms.written"), text.as_bytes())?;
+    println!("NEXT_WRITE_DONE rows={} run={run} window={} ms={}", rows.len(), window.map_or("-".to_string(), |n| n.to_string()), started.elapsed().as_millis());
+    Ok(())
+}

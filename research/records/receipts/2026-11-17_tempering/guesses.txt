@@ -240,3 +240,14 @@ prompts written left to right, 64 places, after each pass.
   stands near 90%); no shared run over 20 octets. No transition is guessed: a slow fall that flattens by pass 20.
   What it decides for the next build: a held next-place code that stops near 1.6 to 1.7 with almost-words still on the page says the
   engine's binding, not its pass, limits text, and the work is a law's own entries and comparison; clean words say the pass was most of it.
+
+Scored (2026-11-17T20:53:30Z).
+G-L3's mixed arms (alternating.txt, within.txt): missed. Alternating sections: the strictly held last digit 1.208 nats at pass 40 and
+  0.506 at 50 (guessed still above 1.0 after pass 51), 0.065 at 100; panel at pass 100: 87 of 96 whole; the text's held rows 1.782 at
+  pass 100 against the text-alone arm's 1.786 (held: within 0.05). Mixed inside each section: 2.187 at pass 30, 1.809 at 40, 1.235 at 50
+  (stopped there): the same count of sums met as the control, a little later. A second world beside or inside the sections does not
+  stop the founding.
+G-W1's one pair (worded_pair.txt): from the founded state the worded form's strictly held last digit reads 0.325 at section 200 and
+  0.095 at 400 (held: under 0.1 by 1,200), 0.002 by 3,000; its panel 95 of 96 whole. From lap 94's state 2.2 to 2.3 through section
+  1,400, 0.883 at 2,000, 0.155 at 3,000 (held: not under 0.1 before 2,400). The sign form through the worded dwell: 0.37 to 1.13 nats,
+  its panel 53 of 96 after it (missed: under 0.5 guessed). About eight times sooner from the founded state.
