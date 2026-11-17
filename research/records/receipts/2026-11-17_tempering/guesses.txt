@@ -67,3 +67,20 @@ tools/gsm8k/written_rules.py). The October run's trained PRA, everything stepped
 Correction (2026-11-17T18:55Z, on Codex's audit of the same day): the openings these guesses call "mixed" or "a keyed half" took bit 17 of
 a bare FNV-1a fold, which gives adjacent places nearly the same bit: 97.8% of the regions opened one place or the whole run. Every read
 above stands as a read under that draw; the draw is repaired in the source (keyed_bit) for later runs.
+
+Scored (2026-11-17T18:54:26Z), G-O1 (.local/run/october; the receipt october_held.txt): the founded state with every family held but the readout,
+three passes. Never-met calculations at the equals: 3 of 876 (missed: 40 to 120 guessed; the October trained PRA 18, an 8-gram 34). All
+calculations 87 of 2,448 (PRA 286); 962 of 2,448 writes are no number; held-out code 2.718 bits a byte (the October trained towers
+1.78 to 1.82). The comparison's share stayed 250 thousandths on every ring, as held.
+  The guess's premise was not read first: PRA_STATE is a fresh founding (a drawn tower with the strands and the comparison placed), so
+  holding all but its readout leaves a tower that was never trained, and its readout alone cannot write the text. The read does not
+  separate "the stepped passes erased the founding" from "the comparison stands unread": it measures an untrained body.
+G-O2 (2026-11-17T18:54:26Z). The read that does separate them: the same founded state takes the October run's three passes with every family stepped
+as in that run EXCEPT the entries the opened comparison set at its founding (the sixteen opened contacts' chart rows and biases and
+their strand reads), which are held. Against the October trained PRA (never-met 18 of 876; of its 794 never-met numbers with a lead,
+313 agree with the result modulo ten against a foil's 223 of 785; the comparison's share zero after training):
+  the comparison's share stays 250 thousandths on every ring (it is held);
+  never-met numbers agreeing modulo ten: 400 or more of about 800 (the tenth of a held face is a linear read, which stepping takes);
+  never-met calculations whole at the equals: 25 to 70 of 876 (the ring the length selects is a product and may stay unread).
+What a miss would say: modulo ten at PRA's level with the comparison standing says the founding was never the limit in October: the
+return and readout do not come to read a face that is conducted exactly, in three stepped passes, and the read itself must be founded.
