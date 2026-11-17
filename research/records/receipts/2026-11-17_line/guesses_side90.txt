@@ -1,0 +1,27 @@
+GUESSES G-D1 to G-D3, fixed at 11:24:39 UTC, November 17 (from date -u), before the side lap: a lap with no arithmetic world
+The lead. Device: the RTX 4080 SUPER under .local/gpu.lock, the lap binary of the line (athena_acts); a side branch from lap
+90's last state, the line's own states untouched; lap 91 starts from lap 90's state when the side lap releases the card.
+
+What the logs already print about the premise (loud_P{N}.table at the laps' means, the one-place receiver, the same held
+places throughout): the five text slices stood at code 0.4901, web 0.8494, science 0.6979, books 0.8131, wikidata 1.0157 at
+lap 70; at lap 71, when the arithmetic world and the word problems took half of every section, they read 0.5449, 0.9061,
+0.7566, 0.8654, 1.0509, a rise of 0.035 to 0.059 inside one lap; at lap 87 they read 0.5547, 0.9077, 0.7569, 0.8688, 1.0696.
+The friction record of November 16 read the rise as their drive halving (a store held by upkeep settles to a higher balance
+under less drive, atlas store.finite-quality) and guessed it would hold; it has held for seventeen laps, and nothing held
+has fallen since lap 74 (the GSM8K test split 0.762 at lap 74, 0.772 at lap 87).
+
+The side lap: the pass moved to a store whose training prefix holds the arithmetic slice at its first 100 MB, which the pass
+has already taken, so no arithmetic stretch and no act of the world is drawn; 3,000 sections of text (two thirds of a
+section, from one half) and word problems (one third, from one quarter); then the line's two reads of its mean on the
+line's store.
+
+The theory's pick: if the rise was the drive's, the balance follows the drive back, and at about the same speed. A drive
+raised by four thirds is ln(4/3)/ln 2 = 0.415 of the halving undone.
+G-D1: each of code, web, science and books reads under lap 90's mean by 0.010 to 0.035 nats a place at the side lap's mean
+(0.415 of its rise at lap 71 is 0.023, 0.024, 0.024, 0.022), and wikidata by 0.005 to 0.025 (0.015).
+G-D2: the GSM8K test split reads within 0.015 of lap 90's (its drive rises by the same four thirds, and it has stood level
+since lap 74, so its balance is taken to be its own slice's and not the drive's).
+G-D3: the held arithmetic (the uniform draw's records) rises by 0.02 to 0.15 nats a place with no drive for one lap.
+What it decides: it prices the choice that is Brandon's (how much of a section the arithmetic world takes) in the line's own
+units, both ways: what one lap gives text back, and what it costs the arithmetic. G-D1 missed low (under 0.010), the rise
+was not the drive's alone and a share does not undo it.

@@ -2,7 +2,7 @@
 """A ruler: a ring located by loop closure on the engine's own rows and the passage (the lead, November 17; atlas
 `key.menu-loop-closure`, `hnn.contact-menu-closes`, `compression.located-transport`).
 
-Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted] | text TABLE | clusters TABLE [K]]
+Usage: loop_closure_ruler.py DIR [planted | release | cross | planes [planted] | context TABLE [planted | presence | sets] | text TABLE | clusters TABLE [K]]
 
 DIR is a `read-tension … all` directory of sums (`tools/tension_ruler.py sums`): `rows.tsv` and `shares.tsv`, the open place's row by
 tick and head, each source site with its share of the row's weight. The ruler builds a menu and closes it:
@@ -53,6 +53,11 @@ symbol written. Each context symbol `s` has its own family of operators `(P_(s,u
 of symbols read from the menu (two symbols alike where the symbols written beside them, as sources, correlate at 0.9) and closed by
 lines and planes as `planes` does. Why: a passage that holds sums, differences and products on the same symbols holds operators that
 share no plane (`w ↦ u w` against `w ↦ w + u`), so one menu of pairs cannot close on it, and the row meets the sign too.
+With `presence` the context is a symbol present among the row's sources at any share and the menu is the menu of pairs (a row's
+share on a sign is a few hundredths, and a product of three shares is too thin a menu).
+With `sets` the context is the whole set of symbols a row meets outside the largest block of the pooled menu (the digits' block,
+read with no label): a record of several signs carries each of them, so one symbol's presence does not say which law a place is
+under, and the set does. `SET` lists each context set with its places; `SET_SPAN` its clean lines and planes.
 `CONTEXT_SPAN` gives each clean line or plane under each context with its support and the keys of its symbols in turns; the scores
 beside it (the ten digits as characters of ℤ/10; the digits 1, 3, 9, 7 and 2, 6, 8, 4 as characters of ℤ/4, a discrete logarithm's
 order) are the ruler's.
@@ -245,6 +250,93 @@ def table_texts(table):
         w = line.rstrip("\n").split("\t")
         out[w[0]] = (w[1] + w[2]).replace("\\n", "\n")
     return out
+
+
+def menus_presence(d, texts, head=0, ticks=(0, 1)):
+    """`T[tick][s, u, w, x]` for one head with the context a symbol present among the row's sources: the row's menu of pairs, added
+    under every symbol the row meets."""
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    lines = [line for line in lines if int(line[3]) == head and int(line[2]) in ticks]
+    symbols = sorted({c for line in lines for c in texts[line[0]]})
+    index = {c: i for i, c in enumerate(symbols)}
+    n = len(symbols)
+    out = {}
+    for line in lines:
+        text = texts[line[0]]
+        sources = [(int(j), int(p_) / 1e6) for j, p_, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        if len(sources) < 2:
+            continue
+        us = np.array([index[text[j]] for j, _ in sources])
+        ps = np.array([p_ for _, p_ in sources])
+        q1, q2 = np.bincount(us, weights=ps, minlength=n), np.bincount(us, weights=ps**2, minlength=n)
+        pair = np.outer(q1, q1) - np.diag(q2)
+        t = out.setdefault(int(line[2]), np.zeros((n, n, n, n)))
+        xi = index[text[int(line[4])]]
+        for s_ in set(us.tolist()):
+            t[s_, :, :, xi] += pair
+    return out, symbols
+
+
+def report_sets(d, texts, head=0, ticks=(0, 1), least=2000):
+    """The closure under the set of symbols a row meets outside the pooled menu's largest block (see the module's text)."""
+    lines = [line.rstrip("\n").split("\t") for line in open(os.path.join(d, "shares.tsv"))]
+    lines = [line for line in lines if int(line[3]) == head and int(line[2]) in ticks]
+    symbols = sorted({c for line in lines for c in texts[line[0]]})
+    index = {c: i for i, c in enumerate(symbols)}
+    n = len(symbols)
+    digits = [symbols.index(str(v)) for v in range(10)]
+    shown = {" ": "space", "\n": "feed"}
+    show = lambda i: shown.get(symbols[i], symbols[i])
+    parsed = []
+    for line in lines:
+        text = texts[line[0]]
+        sources = [(index[text[int(j)]], int(p_) / 1e6) for j, p_, _ in (entry.split(":") for entry in line[5].split())] if len(line) > 5 and line[5] else []
+        if len(sources) >= 2:
+            parsed.append((int(line[2]), index[text[int(line[4])]], np.array([u for u, _ in sources]), np.array([p_ for _, p_ in sources])))
+    for tick in ticks:
+        mine = [row for row in parsed if row[0] == tick]
+        pooled = np.zeros((n, n, n))
+        pairs = []
+        for _, xi, us, ps in mine:
+            q1, q2 = np.bincount(us, weights=ps, minlength=n), np.bincount(us, weights=ps**2, minlength=n)
+            pair = np.outer(q1, q1) - np.diag(q2)
+            pooled[:, :, xi] += pair
+            pairs.append(pair)
+        block = max(blocks_of(pooled), key=len)
+        inside = set(block)
+        print(f"SET_READ tick={tick} places={len(mine)} largest_block=[{' '.join(show(i) for i in block)}]")
+        groups = {}
+        for (_, xi, us, _), pair in zip(mine, pairs):
+            key = frozenset(int(u) for u in us if int(u) not in inside)
+            groups.setdefault(key, []).append((xi, pair))
+        for key, members in sorted(groups.items(), key=lambda kv: -len(kv[1])):
+            if len(members) < least:
+                continue
+            t = np.zeros((n, n, n))
+            for xi, pair in members:
+                t[:, :, xi] += pair
+            name = " ".join(show(i) for i in sorted(key))
+            print(f"SET tick={tick} context=[{name}] places={len(members)}")
+            for b in [b for b in blocks_of(t) if len(b) >= 4]:
+                z = np.zeros_like(t)
+                ix = np.ix_(b, b, b)
+                z[ix] = t[ix]
+                seen = []
+                for modulus, one, two, f, flat, sup in spans(z, symbols):
+                    if two < 0.9 or flat < 0.95 or sup.sum() < 4:
+                        continue
+                    members_ = " ".join(show(i) for i in range(n) if sup[i])
+                    wheel = ""
+                    if all(sup[i] for i in digits):
+                        amp, pct = characters(np.angle(f[digits]))
+                        j = 1 + int(amp[1:].argmax())
+                        wheel = f" ten: j={j} a_j={amp[j]:.3f} null_pct={pct:.3f}"
+                    four = f" four(1,3,9,7)={ring_of_four(f, symbols, '1397'):.3f} four(2,6,8,4)={ring_of_four(f, symbols, '2684'):.3f}"
+                    sig = (members_, wheel[:14], four)
+                    if sig in seen:
+                        continue
+                    seen.append(sig)
+                    print(f"SET_SPAN tick={tick} context=[{name}] modulus={modulus:.3f} in_one={one:.3f} in_two={two:.3f} flatness={flat:.3f} support=[{members_}]{wheel}{four}", flush=True)
 
 
 def menus_context(d, texts, planted=None, head=0, seed=17):
@@ -759,6 +851,14 @@ def main():
         return
     if len(sys.argv) > 3 and sys.argv[2] == "context":
         texts = table_texts(sys.argv[3])
+        if len(sys.argv) > 4 and sys.argv[4] == "sets":
+            report_sets(d, texts)
+            return
+        if len(sys.argv) > 4 and sys.argv[4] == "presence":
+            tables, symbols = menus_presence(d, texts)
+            print(f"CONTEXT_READ menu=presence symbols={len(symbols)} ticks={sorted(tables)}")
+            report_context("presence", tables, symbols, ticks=(0, 1))
+            return
         for planted in ("aligned", "dealt") if len(sys.argv) > 4 and sys.argv[4] == "planted" else (None,):
             tables, symbols = menus_context(d, texts, planted)
             print(f"CONTEXT_READ menu={planted or 'rows'} symbols={len(symbols)} ticks={sorted(tables)}")

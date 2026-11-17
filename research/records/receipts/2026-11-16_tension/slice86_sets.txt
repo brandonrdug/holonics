@@ -1,0 +1,86 @@
+SET_READ tick=0 places=61119 largest_block=[) 1 2 3 4 5 6 7 8 9]
+SET tick=0 context=[feed space * =] places=8455
+SET tick=0 context=[feed space + =] places=5208
+SET_SPAN tick=0 context=[feed space + =] modulus=0.245 in_one=0.787 in_two=0.918 flatness=0.987 support=[1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.116 four(2,6,8,4)=0.166
+SET_SPAN tick=0 context=[feed space + =] modulus=0.482 in_one=0.934 in_two=0.964 flatness=0.991 support=[1 2 3 4 5 6 7] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space + =] modulus=0.632 in_one=0.868 in_two=0.921 flatness=0.989 support=[2 3 4 5 6 7 9] four(1,3,9,7)=0.135 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space + =] modulus=0.266 in_one=0.802 in_two=0.905 flatness=0.998 support=[1 3 4 9] four(1,3,9,7)=0.298 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space + =] modulus=1.065 in_one=0.993 in_two=0.998 flatness=1.000 support=[1 2 3 5 6 7 9] four(1,3,9,7)=0.015 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space + =] modulus=0.902 in_one=0.783 in_two=0.906 flatness=0.992 support=[1 2 3 5 6 7 9] four(1,3,9,7)=0.106 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space + =] modulus=0.264 in_one=0.951 in_two=0.977 flatness=0.999 support=[1 2 3 5 6 7 9] four(1,3,9,7)=0.246 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space + =] modulus=1.082 in_one=0.833 in_two=0.948 flatness=0.997 support=[2 3 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.034
+SET_SPAN tick=0 context=[feed space + =] modulus=0.365 in_one=0.871 in_two=0.922 flatness=0.993 support=[2 3 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.118
+SET_SPAN tick=0 context=[feed space + =] modulus=0.025 in_one=0.910 in_two=0.951 flatness=0.997 support=[2 3 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.174
+SET tick=0 context=[feed space * 0 =] places=5197
+SET tick=0 context=[feed space - =] places=4315
+SET_SPAN tick=0 context=[feed space - =] modulus=1.422 in_one=0.850 in_two=0.920 flatness=0.994 support=[1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.211 four(2,6,8,4)=0.182
+SET_SPAN tick=0 context=[feed space - =] modulus=1.312 in_one=0.900 in_two=0.940 flatness=0.992 support=[space 2 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.041
+SET tick=0 context=[feed space ( * 0 =] places=2944
+SET_SPAN tick=0 context=[feed space ( * 0 =] modulus=0.520 in_one=0.861 in_two=0.917 flatness=0.993 support=[1 2 3 4 5 6 7 8] four(1,3,9,7)=0.000 four(2,6,8,4)=0.159
+SET_SPAN tick=0 context=[feed space ( * 0 =] modulus=0.671 in_one=0.822 in_two=0.913 flatness=0.992 support=[0 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.173
+SET_SPAN tick=0 context=[feed space ( * 0 =] modulus=0.446 in_one=0.837 in_two=0.914 flatness=0.983 support=[0 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.154
+SET tick=0 context=[feed space ( * + 0 =] places=2892
+SET_SPAN tick=0 context=[feed space ( * + 0 =] modulus=0.481 in_one=0.789 in_two=0.956 flatness=0.989 support=[* 0 3 4 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space ( * + 0 =] modulus=0.065 in_one=0.633 in_two=0.928 flatness=0.992 support=[* 0 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space ( * + 0 =] modulus=0.680 in_one=0.659 in_two=0.967 flatness=0.989 support=[3 5 6 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=0 context=[feed space ( * + 0 =] modulus=0.432 in_one=0.813 in_two=0.924 flatness=0.994 support=[3 4 6 7 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.231
+SET_SPAN tick=0 context=[feed space ( * + 0 =] modulus=0.367 in_one=0.781 in_two=0.901 flatness=0.989 support=[3 4 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.207
+SET tick=0 context=[feed space ( * - 0 =] places=2712
+SET_SPAN tick=0 context=[feed space ( * - 0 =] modulus=0.392 in_one=0.900 in_two=0.968 flatness=0.997 support=[0 4 5 6 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET tick=0 context=[feed space ( * + =] places=2682
+SET_SPAN tick=0 context=[feed space ( * + =] modulus=0.159 in_one=0.688 in_two=0.970 flatness=0.995 support=[) 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET tick=0 context=[feed space + 0 =] places=2591
+SET tick=0 context=[feed space ( * - =] places=2369
+SET_SPAN tick=0 context=[feed space ( * - =] modulus=0.137 in_one=0.781 in_two=0.952 flatness=0.992 support=[3 5 6 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET tick=0 context=[feed space ( * =] places=2328
+SET_SPAN tick=0 context=[feed space ( * =] modulus=0.746 in_one=0.761 in_two=0.902 flatness=0.995 support=[1 2 5 6 7 8 9] four(1,3,9,7)=0.103 four(2,6,8,4)=0.195
+SET_SPAN tick=0 context=[feed space ( * =] modulus=1.106 in_one=0.576 in_two=0.967 flatness=1.000 support=[1 3 5 7 9] four(1,3,9,7)=0.047 four(2,6,8,4)=0.000
+SET_READ tick=1 places=61119 largest_block=[feed space ( ) - 0 1 2 3 4 5 6 7 8 9]
+SET tick=1 context=[* =] places=25971
+SET_SPAN tick=1 context=[* =] modulus=4.073 in_one=0.997 in_two=1.000 flatness=1.000 support=[feed space - 1 2 3 4 5 6 7] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* =] modulus=1.018 in_one=0.864 in_two=0.931 flatness=0.973 support=[feed space - 1 3] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* =] modulus=6.660 in_one=0.998 in_two=1.000 flatness=1.000 support=[feed space ( ) - 0 1 2 3 4 5 6 7 8 9] ten: j=5 a_j=0.002 null_pct=0.603 four(1,3,9,7)=0.001 four(2,6,8,4)=0.001
+SET_SPAN tick=1 context=[* =] modulus=1.163 in_one=0.776 in_two=0.945 flatness=0.993 support=[feed space ( ) - 0 3 4 6 7 8 9] four(1,3,9,7)=0.186 four(2,6,8,4)=0.091
+SET_SPAN tick=1 context=[* =] modulus=0.732 in_one=0.672 in_two=0.960 flatness=0.996 support=[( ) - 0] four(1,3,9,7)=0.074 four(2,6,8,4)=0.040
+SET_SPAN tick=1 context=[* =] modulus=0.880 in_one=0.796 in_two=0.971 flatness=1.000 support=[( ) - 0] four(1,3,9,7)=0.107 four(2,6,8,4)=0.057
+SET_SPAN tick=1 context=[* =] modulus=0.745 in_one=0.860 in_two=0.972 flatness=0.996 support=[( ) - 0 3 8] four(1,3,9,7)=0.075 four(2,6,8,4)=0.038
+SET_SPAN tick=1 context=[* =] modulus=0.856 in_one=0.796 in_two=0.975 flatness=0.996 support=[space ( ) 3] four(1,3,9,7)=0.219 four(2,6,8,4)=0.146
+SET_SPAN tick=1 context=[* =] modulus=0.459 in_one=0.845 in_two=0.940 flatness=0.975 support=[space ( ) 0 3 5 6 8 9] four(1,3,9,7)=0.013 four(2,6,8,4)=0.024
+SET_SPAN tick=1 context=[* =] modulus=4.383 in_one=0.998 in_two=1.000 flatness=1.000 support=[feed space ( - 1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.001 four(2,6,8,4)=0.001
+SET_SPAN tick=1 context=[* =] modulus=0.968 in_one=0.864 in_two=0.961 flatness=0.996 support=[feed space ( - 1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.249 four(2,6,8,4)=0.118
+SET_SPAN tick=1 context=[* =] modulus=0.919 in_one=0.864 in_two=0.934 flatness=0.978 support=[feed space ( 1 3] four(1,3,9,7)=0.110 four(2,6,8,4)=0.133
+SET_SPAN tick=1 context=[* =] modulus=5.943 in_one=0.998 in_two=1.000 flatness=1.000 support=[feed space ( ) - 0 1 2 3 4 5 6 7 8 9] ten: j=9 a_j=0.002 null_pct=0.646 four(1,3,9,7)=0.001 four(2,6,8,4)=0.001
+SET_SPAN tick=1 context=[* =] modulus=1.119 in_one=0.803 in_two=0.977 flatness=0.993 support=[feed space ( - 0 6 7 9] four(1,3,9,7)=0.091 four(2,6,8,4)=0.094
+SET_SPAN tick=1 context=[* =] modulus=0.914 in_one=0.836 in_two=0.918 flatness=0.984 support=[feed space ( ) 1] four(1,3,9,7)=0.087 four(2,6,8,4)=0.105
+SET_SPAN tick=1 context=[* =] modulus=0.658 in_one=0.770 in_two=0.962 flatness=0.999 support=[( ) - 0] four(1,3,9,7)=0.098 four(2,6,8,4)=0.056
+SET_SPAN tick=1 context=[* =] modulus=0.376 in_one=0.866 in_two=0.923 flatness=1.000 support=[( - 1 2 4] four(1,3,9,7)=0.126 four(2,6,8,4)=0.100
+SET_SPAN tick=1 context=[* =] modulus=3.683 in_one=0.993 in_two=1.000 flatness=1.000 support=[feed space - 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* =] modulus=0.174 in_one=0.864 in_two=0.985 flatness=1.000 support=[space - 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET tick=1 context=[+ =] places=13449
+SET_SPAN tick=1 context=[+ =] modulus=3.469 in_one=0.991 in_two=1.000 flatness=1.000 support=[feed space + -] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=1.804 in_one=0.797 in_two=0.971 flatness=0.998 support=[feed space ) + - 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=1.278 in_one=0.712 in_two=0.974 flatness=0.995 support=[space ) + - 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=0.514 in_one=0.858 in_two=0.965 flatness=0.997 support=[feed space ) + -] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=0.664 in_one=0.778 in_two=0.932 flatness=0.979 support=[( 0 1 2 3 4 5 7 8 9] four(1,3,9,7)=0.294 four(2,6,8,4)=0.356
+SET_SPAN tick=1 context=[+ =] modulus=1.783 in_one=0.775 in_two=0.957 flatness=0.995 support=[feed space + - 1 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=1.503 in_one=0.842 in_two=0.946 flatness=0.994 support=[feed space + 3] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=0.630 in_one=0.700 in_two=0.952 flatness=0.992 support=[space + - 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=0.513 in_one=0.880 in_two=0.968 flatness=0.977 support=[feed space + - 1] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[+ =] modulus=0.543 in_one=0.889 in_two=0.936 flatness=0.993 support=[( - 0 1 2 3 4 5] four(1,3,9,7)=0.066 four(2,6,8,4)=0.078
+SET_SPAN tick=1 context=[+ =] modulus=1.351 in_one=0.926 in_two=0.984 flatness=0.999 support=[space ( - 0 2 6 9] four(1,3,9,7)=0.054 four(2,6,8,4)=0.059
+SET_SPAN tick=1 context=[+ =] modulus=0.614 in_one=0.641 in_two=0.902 flatness=0.963 support=[( - 0 2 3 4 5 7 8 9] four(1,3,9,7)=0.630 four(2,6,8,4)=0.552
+SET_SPAN tick=1 context=[+ =] modulus=0.434 in_one=0.836 in_two=0.903 flatness=0.996 support=[( - 0 1 2 3 4 5 6 7 9] four(1,3,9,7)=0.054 four(2,6,8,4)=0.114
+SET_SPAN tick=1 context=[+ =] modulus=0.701 in_one=0.657 in_two=0.913 flatness=0.966 support=[( 0 2 3 4 5 7 8 9] four(1,3,9,7)=0.355 four(2,6,8,4)=0.315
+SET tick=1 context=[=] places=10683
+SET_SPAN tick=1 context=[=] modulus=2.758 in_one=0.996 in_two=1.000 flatness=1.000 support=[feed - 3 4 5 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[=] modulus=1.766 in_one=0.869 in_two=0.938 flatness=0.999 support=[space ) - 0 1 2] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[=] modulus=3.613 in_one=0.997 in_two=1.000 flatness=1.000 support=[feed space ( - 1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.002 four(2,6,8,4)=0.003
+SET_SPAN tick=1 context=[=] modulus=1.450 in_one=0.854 in_two=0.947 flatness=0.996 support=[feed space ( -] four(1,3,9,7)=0.051 four(2,6,8,4)=0.019
+SET_SPAN tick=1 context=[=] modulus=0.821 in_one=0.950 in_two=0.996 flatness=1.000 support=[space 0 1 2] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[=] modulus=3.638 in_one=0.997 in_two=1.000 flatness=1.000 support=[feed ( - 1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.001 four(2,6,8,4)=0.001
+SET tick=1 context=[* + =] places=7016
+SET_SPAN tick=1 context=[* + =] modulus=3.319 in_one=0.994 in_two=1.000 flatness=1.000 support=[feed space + -] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* + =] modulus=3.919 in_one=0.995 in_two=1.000 flatness=0.998 support=[feed space * + -] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* + =] modulus=3.382 in_one=0.996 in_two=1.000 flatness=0.999 support=[feed space + - 3 5] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* + =] modulus=0.675 in_one=0.873 in_two=0.971 flatness=0.989 support=[space + - 3 5] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+SET_SPAN tick=1 context=[* + =] modulus=0.782 in_one=0.848 in_two=0.917 flatness=0.992 support=[( ) - 0] four(1,3,9,7)=0.236 four(2,6,8,4)=0.186
