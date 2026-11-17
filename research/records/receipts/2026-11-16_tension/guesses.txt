@@ -541,3 +541,25 @@ Decided as the guess said: the aligned pair does not stand in a head's gathered 
 terrain's own lengths at lap 78. The chart holds more of it than the currents do, so part of what reaches the place comes by
 the strand (the circles hold the unordered pair at 0.32 to 0.44 at lap 86, G-HC's read). No founding lap is ordered from these
 legs; the lock is still the link that slips.
+
+GUESSES G-LC1 to G-LC3, fixed at 10:05:54 UTC, November 17 (from date -u), before the read: the digits' ring located by loop closure
+Reading: the Bombe's inference (atlas key.menu-loop-closure, hnn.contact-menu-closes) taken on the engine's own rows and the
+passage, by a ruler (tools/loop_closure_ruler.py). The menu: at each open place of 8,000 short sums (lap 86's mean), for a head
+and a tick, every ordered pair of the sources its row meets, weighed by the product of their shares, with the symbol written at
+the place: T[u, w, x] over symbols, no label of a sum and no knowledge of which symbols are digits. A source symbol u is then an
+operator on functions of the written symbol, (P_u f)(w) = E[f(x) | u, w]; where a group law stands under diffuse rows these
+operators commute and their common eigenvectors are its characters, P_u χ_j = α ω^(ju) χ_j, so the phase of u's eigenvalue is u's
+key on that ring and its modulus says whether u is on the ring at all. The ruler takes the leading eigenvectors of a drawn
+combination of the operators past the constant one, reads every symbol's eigenvalue on each, and scores the ten digits' located
+phases against the characters of ℤ/10 (a_j as in G-HC1, with the permutation null). Where the tension's coupling read states
+and found no ring (G-KR), this reads symbols, their rows and what the passage wrote.
+G-LC1: at the units places, head 0's rows at tick 0 return the wheel: on a leading eigenvector the ten digits' phases hold a
+character amplitude of 0.9 or more at a j coprime to ten, past the 99th percentile of the permutation null.
+G-LC2: on every answer place together (carried columns included) the same head and tick still return 0.8 or more at a j
+coprime to ten.
+G-LC3: the turned heads (heads 2 and 3) do not: under 0.6 at tick 0 at the units places.
+The instrument is held to a planted menu on the same records: one built from the aligned pairs alone returns the wheel at one,
+and the true menu with the written symbols dealt at random among the places returns nothing past its null.
+What it decides: G-LC1 held, the ring of ten is locatable today from the rows the field already forms and the text it is
+given, by closure and with no gradient, so a symbol's key has a founding source where the tension has none; missed, the rows
+are too diffuse for a menu and the lock comes first.
