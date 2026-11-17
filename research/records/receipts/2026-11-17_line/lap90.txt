@@ -1,0 +1,18 @@
+12:34:19
+# lap90: exit 0 released 12:25:28
+MEASURE lap=lap90 rc=0 wall_s=3038.7 peak_rss_kib=865296
+MAIN lane line twenty-four done 12:33:57
+STORE_PASS role=prefix sections=3000 stretches_read=75369078 ended=fal
+== loud 89
+code 0.5542 20.061 -0.032;web 0.9042 20.179 -0.091;science 0.7622 20.265 -0.164;books 0.8620 20.394 -0.210;wikidata 1.0699 20.131 +0.248;arithmetic 1.5987 20.636 -0.368;words 0.7731 20.175 -0.316;all 0.8884 20.238 -0.012;
+== loud 90
+code 0.5522 20.067 -0.000;web 0.9002 20.178 -0.089;science 0.7582 20.267 -0.165;books 0.8635 20.385 -0.215;wikidata 1.0690 20.147 +0.242;arithmetic 1.6011 20.621 -0.359;words 0.7610 20.166 -0.317;all 0.8853 20.238 -0.010;
+letter 0.614 0.4526;digit 0.101 1.9723;space 0.185 0.2200;mark 0.090 2.7234;
+WRITES_BY_PLACE  met 128 0.945 0.719 0.172 0.141 0.039 0.109 0.000
+world read share 0.892
+WRITE mibi_peer = fib_hal_peer # inval fibib_ther\nsostal_pee nusche = mibi\nfib_deers - 5\ntotol onubi cub_peer # invares 6 tensis gol + sos_peer to_che - 1 fibolt\nnotal_ber_cub_peer * gtotal_dres / t
+90 + 81 =  | 60\n50 + 07 = 79\n | 171\n
+58 - 43 =  | -20\n9 * 5 = 7\n0  | 15\n
+36 * 0 =  | 9421\n90 * (922 - | 0\n
+4 * 317 =  | 148457\n9 + 43 =  | 1268\n
+
