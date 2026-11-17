@@ -60,6 +60,28 @@ ring move with `β ≡ 0`. So the wheel has two candidate homes, and the second 
 founding from the tension's coupling of the digits. Which one is read before either is built, and a founding with its return at
 zero is not entered without an answer to the dephasing.
 
+**What October's ring was made of** (read at 04:10 UTC from a reader's digest of the tower's record, lines 1339 to 3666, its key
+equations checked at source; the digest's later parts on the tens, the hand's reads and the retirement are not yet read by the lead):
+
+1. *A move located per pair.* In its final form each pair (the byte before, the arriving byte) has its own turn, a share of a key
+   modulus. The located key for sums is modulo ten with `ψ(d) = d + 2`: the ring turns by `d + 1` tenths at the pairs `(d, +)` and
+   `(d, =)` and holds at every other pair. So the units digit is taken by the pair that ends its number, which is the collapse of §4
+   done by a pair, and the ring's phase at the value is the units digit of the sum.
+2. *The key by loop closure.* Rows `N_t θ − ψ(C_t) ≡ 0 (mod n)` over the loops between two arrivals of an origin byte; a modulus
+   exists only where the system has torsion; from the newline, 149 pair columns of rank 145 with `det M = 110`.
+3. *The ring located from the tension.* The coupling `K` of the arriving classes through what their arrivals leave, with no digit
+   named: its third mode sits on the digits and on the ring's first character and its mirror. A blind start from the unit pool finds
+   nothing; the start is a mode of `K`, and the reading cells are where a received landmark marks.
+4. *A face of harmonics.* The ring is read as `ρ = q/‖q‖` at `⌊n/2⌋` harmonics, `z += W (x̂ ⊗ ρ_h)`, since a function of a residue
+   is spanned by them and one cosine cannot part ten classes 36 degrees apart; its readout is a pair contact with the top face.
+5. *The hand*, as above.
+
+Against these the engine's carry circle has a turn and a leak that are charts of the site's state (additive in the site's own symbol
+and its neighbours', so no turn gated on a pair), no hand, a linear read `p = a · Q` (one harmonic), and no founding. Each of the
+five is a law with an owner in October's record and, for the hand and the harmonics, in Lean. The guide's rule for history applies:
+port deliberately, one law at a time, never wholesale, and with October's own two failures in front: its ring dephased under the
+tower's pass, and it did not carry from the arithmetic terrain to word problems' text.
+
 ## 3. Tonight's readings in those terms
 
 - No register of a sum's digit is held, on any ring: its bit 0.727 nats (0.693 for a register that knows nothing), its five-residue
@@ -164,6 +186,12 @@ phases nine apart. The gate reads the covector by mode for that reason.
   message to Brandon said the reflection "was never built"; it was built, formal-checked and retired. The message was edited.
 
 ## 9. Owed
+
+The order this record now points at (not ordered as work, and each step has its own read first): the rest of October's record read
+by the lead; a ruler's port of the harmonic face on the carry circles as they stand (does any circle already hold a digit's phase
+that one harmonic cannot read); the coupling `K` of the arriving classes read on the engine's own tension (does its spectrum show
+the ring of ten here as it did in October); then the hand and the pair-located turn as laws of the circle.
+
 
 The clock with a hand as a law: its composition and its adjoint (Lean beside `Geometry/AffineSwing` and `HNN/Moment`), the moment
 under a composed move (prefix products in place of prefix sums), a host reference, the card's kernels and their parity. None of it is
