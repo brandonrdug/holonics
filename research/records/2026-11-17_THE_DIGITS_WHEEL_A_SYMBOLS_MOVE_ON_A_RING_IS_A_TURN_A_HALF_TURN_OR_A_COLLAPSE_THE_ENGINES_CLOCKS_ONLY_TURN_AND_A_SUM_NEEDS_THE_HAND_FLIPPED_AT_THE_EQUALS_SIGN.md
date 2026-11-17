@@ -1,0 +1,126 @@
+# The digit's wheel: a symbol's move on a ring is a turn, a half-turn or a collapse; the engine's clocks only turn, and a sum needs the hand flipped at the equals sign
+
+The lead, November 17, 2026, 01:15 to 02:10 UTC. Refs #404, #73, #386. Status: [a design's first statement, `agent-inferred`, nothing
+built and nothing ordered; its premises are October's records read at source and four host readings of this night; its own premise
+read is named in §6 and not yet taken]. It continues
+[the third record of the night](2026-11-17_A_ROWS_MIDPOINT_IS_IN_THE_CHART_AND_ITS_DOUBLING_CARRIES_THE_SUM_BUT_ONLY_A_LABELLED_READ_FINDS_IT_THE_ADDRESS_IS_ONE_HEADS_A_RENAMED_REGION_IS_READ_BY_ITS_OWN_USE_AND_A_SYMBOL_IS_STILL_A_FREE_ROW.md).
+
+## 1. The occasion
+
+Brandon asked that the radix and register mathematics, with its graph and knot theory, be minded. Read by its registers a sum's digit
+is held in none (the third record §3.8), two laps on a terrain of short records did not move it (G-V, lap 79), and the covector alone
+shows a product junction at a tenth of the sum's columns (G-L5). The junction asks blind rows to learn by products what the tree's
+October work did by transport. This record states what a digit's own move is, what the engine's forms hold of it, and the one move
+they lack.
+
+## 2. What the tree holds, read at source
+
+- **A symbol is a located advance** ([October 5](2026-10-05_THE_LOCATED_TRANSPORT_EACH_OCCURRENCE_STEPS_THE_RINGS_BY_ITS_LOCATED_ADVANCE.md)
+  §0.1): `ℓ(k+1) = ℓ(k) + A(u_k)`, in an odometer chart with carries or a coprime-ring chart with none; "the winding is the carry".
+  Its code retired with the October machine; the law stands in THE_MACHINE's guard 9.
+- **A sum is a closure, and its keys stand at the cheap rings**
+  ([October 25](2026-10-25_THE_NEWLINE_CLOSURE_HAS_TORSION_B_TIMES_B_PLUS_ONE_A_PAIR_KEY_CARRIES_THE_UNITS_AND_CASTS_OUT_ELEVENS_AND_SPLIT_BY_LENGTH_THE_CLOSURE_IS_THE_SUM.md)
+  §5 to §9). Over the 10,000 sums of two-place operands a pair key exists at the primes of `b(b + 1)`, which is ℤ/110 in base ten: the
+  units and the elevens. Ring `b − 1`, the nines, is reached by no pair key. Its §8 gives the reason: on ring `b + 1` the place step
+  is `n ↦ b n + d ≡ d − n`, a half-turn; on ring `b − 1` it is the rotation `n ↦ n + d`, "but the result enters with the opposite
+  hand of the operands"; so "the move the closure lacks is the reflection", the dyad `U` of `⟨S, U | U² = 1, USU = S⁻¹⟩`, and "the
+  ring face's moves are complex multipliers, which only rotate". Split by the result's length each half holds the sum as an integer
+  key.
+- **The place step by ring** (atlas `radix.digit-move-place-kind`, `colour.dilation-symmetry`, `radix.trailing-unit-rings`): reading a
+  digit is `n ↦ b n + d` on every ring ℤ/m; the base is a dilation and the digit a translation.
+- **A sum's two steps** (`radix.carry-cascade-consumer`, `radix.redundant-fibre`, `radix.adder-bracketing`): a carry-free pair
+  combination, then one carry cascade, which is an associative product of small matrices and the same under every bracketing.
+- **The engine's forms** (`navigator.rs`, `moment.rs`, `declaration.rs`, `contact.rs`): a turned head's clock is `τ = Σ κ` with one
+  located rate a class a head, `κ = 1 + c_h[u]`; its modes share that clock on rings of the dyadic and triadic towers (2, 4, 8, … and
+  3, 9, 27, …); the moment is an affine move a symbol, `s_t = α(u_t) s_(t−1) + β(u_t)`, `α(u) = ζ^(−κ(u)) e^(−2π|κ(u)|/n)`,
+  `β(u) = E±(u)`; two strands bring the sources on either side with opposite signs of the clock's difference; the still heads carry
+  no frame. The symbol's law of November 12 (§8.8) already says that only the pace keeps the located advance's form.
+
+## 3. Tonight's readings in those terms
+
+- No register of a sum's digit is held, on any ring: its bit 0.727 nats (0.693 for a register that knows nothing), its five-residue
+  1.630 (1.609), its three-residue 1.109 (1.087) and its nine-residue 2.194 (2.161) at the units place; the carry's bit 0.72 with a
+  carry in and with none (`registers_short78.txt`).
+- The turned heads' located rates stride at separators and step alike on every digit (`pace_by_symbol.txt`): the ten digits 2.20 to
+  2.44 on one head and 3.29 to 3.82 on the other (the zero 2.19) with no order by value; a space 9.9 and 3.8; the equals sign 9.0 and
+  2.1; a line feed 11.6 and 16.6.
+- The redundant digit `a_k + b_k` stands in the answer site's chart at 0.78, brought by head 0's row (the third record §3.2).
+
+## 4. The law, as the records give it
+
+On a ring ℤ/m a digit `d` read in base `b` is the affine move `n ↦ λ n + d` with `λ = b mod m`. On the base's cheap rings `λ` takes
+three values, and they are three kinds of move:
+
+| ring | λ | the move | what the ring then carries of a number |
+|---|---|---|---|
+| m divides b − 1 (9, 3) | +1 | a turn by `d` | its digit sum |
+| m divides b + 1 (11) | −1 | a half-turn about `d/2` | its alternating sum |
+| m divides b (10, 5, 2) | 0 | a collapse onto `d` | its last digit |
+
+An affine move has a pivot (`motion.generator-is-modulator`): at λ = 1 the pivot is at infinity and the move is a translation; at
+λ = −1 it is the half-turn `S_a`, the Swing's one move; at λ = 0 everything before is forgotten. A separator is a move too: the
+equals sign of a sum is the hand flipped, `n ↦ −n`, after which the value's digits undo what the operands' did and the record closes
+at zero. Composition of these moves along a passage is the product of the matrices `[[λ, κ], [0, 1]]`, associative, so any bracketing
+returns it (the form of `radix.adder-bracketing`), and with a λ of −1 it is a word in the dihedral group, whose crossings are the
+knot's.
+
+The engine holds the first kind (the pace, λ = 1) and an imitation of the third (a long stride, whose skin dissipates what came
+before). It holds no second kind: a rate a class cannot flip the hand of the symbols after it. So in its forms no closure of a sum is
+linear, on any ring. That is October's finding, on the engine that trains.
+
+What the towers allow. With rings of 2 and 3 alone, transport with a hand reaches the nines and the threes: a check of a sum, and for
+a one-place receiver nearly the digit (an open digit is fixed by the record's closure on ring 9 up to its zero and nine). The units
+digit lives on ring 10 and the elevens on ring 11, and neither is a face of a tower of 2 or 3. A number below 990 is fixed by its
+residues on 9, 10 and 11, which covers the word problems' sums.
+
+## 5. The gene: what would be handed, and what located
+
+The form, the same for every stream (a gene in Demeter's sense: families, gauge and the navigators' periods are form):
+
+1. **The dyad.** A paced head's move a symbol is an element of its ring's dihedral group: a turn `κ(u)` as now, and a hand
+   `h(u) ∈ {+1, −1}`, so that the clock runs `τ_t = h(u_t) τ_(t−1) + κ(u_t)` and a source is seen through the composed move.
+2. **The collapse.** A symbol whose move forgets what came before, stated as a move and no longer imitated by a long stride.
+3. **The rings a region declares.** Periods beyond the towers of 2 and 3 where a passage's own periods ask for them (the record of
+   November 12 has a region declare the periods of its helix); which primes is a ruler's read of the passage, never a list set by
+   hand.
+
+The assignment is the machine's: which symbols turn by how much, which flip the hand, which collapse. Nothing names a digit, an
+operator or a base. A digit's rate equal to its value is a key the field locates or does not.
+
+## 6. The premise read, owed before anything is ordered
+
+A part enters by its tension read. Here the part's operands are the pace rows, and the question is whether the tension asks them to
+order by the digits' values once the hand can flip. The read, on the host: a ruler-set hand at one class (the equals sign, as
+`lock_carry` was a ruler's field) in the host's forward, the covector of each digit's rate on the triadic modes read over short sums,
+and its order against the digits' values read beside the same with no hand. If the covector orders the rates only with the hand
+flipped, the dyad is the missing move on this engine and the build is derived from there. If it orders them in neither case, the
+wheel does not enter by the pace and the design returns to the symbol's rows.
+
+## 7. Acceptance, fixed before any build
+
+- The nine-residue of an open answer digit of a short sum, read by the one-place receiver, falls from 2.19 nats to 1.1 or less; the
+  record's other registers are read beside it and none is claimed.
+- A renamed region reaches plain text's code and a doubled passage's second copy codes near nothing (the third record §5).
+- The text slices' held codes stay within 0.01 nats a place.
+- The move is the same law on a passage with no digit in it: its effect on the code of text is read, whichever way it falls.
+
+## 8. Recorded failures this could repeat
+
+- A task's law handed as machinery. Held by §5: the form names no digit, and a digit's rate is located.
+- A mechanism for one kind of input. The dyad and the collapse are moves of any symbol on any ring; the read of §7's last line is
+  taken on text.
+- One realization patched with a new law for each failure. This is the fourth part proposed for the sum since November 13. It is
+  stated from October's records and enters, if it does, by a premise read and not by a build.
+- A width set by hand. No ring is added by choice; §5 item 3 waits for a ruler.
+
+## 9. Owed
+
+The clock with a hand as a law: its composition and its adjoint (Lean beside `Geometry/AffineSwing` and `HNN/Moment`), the moment
+under a composed move (prefix products in place of prefix sums), a host reference, the card's kernels and their parity. None of it is
+started.
+
+## 10. Receipts
+
+`receipts/2026-11-16_tension/`: `registers_short78.txt` (with the nine-ring's split), `pace_by_symbol.txt`, `located_sums78.txt`,
+`oracle_short79.txt`, `midpoint_short79.txt`, `guesses.txt` (G-L5, G-V). A reader's digest of the records cited in §2 was checked
+against the sources at the passages quoted here.

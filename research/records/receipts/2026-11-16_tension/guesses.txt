@@ -400,3 +400,34 @@ G-R2 held: at columns both operands hold, the digit up to its carry codes at 1.6
   register that knows nothing), and the carry's bit given that at 0.722 and 0.720. The winding is not read, and neither is the
   redundant digit's release.
 The top digit, for comparison: its bit 0.480, its five-residue given the bit 0.808; a column one operand holds, no carry: 0.673, 1.443.
+
+SCORE of G-L5, read from the clock at 01:29:01 UTC, November 17 (located_sums78.txt; 60,000 sums, 140,480 places, lap 78's mean; ten
+products with 128-wide legs located a tick on about 69,000 places, read on about 71,000; shares of the covector left after the linear
+chart's part): missed. At the units place the located products remove 0.073 at tick 0 and 0.116 at tick 1 on the held half (0.20 or
+more was guessed), and -0.184 and -0.048 at ticks 2 and 3; at columns both operands hold past the units, 0.114, 0.105, 0.100, 0.093
+(clear) and 0.126, 0.116, 0.096, 0.100 (carried); at a column one operand holds, 0.25 to 0.31; at the top digit 0.64 to 0.74. Over
+every place the ten products fit 0.21 to 0.26 and hold 0.106, 0.146, 0.020, 0.083. The engine's standing triads remove 0.000 to
+0.007. With nine times the places the covector alone shows the junction at about a tenth of the sum's columns, a third of what the
+labelled coordinates hold: above nothing, and under the guess.
+
+A READING with no guess (pace_by_symbol.txt, 01:27 UTC): the turned heads' located clock rates by symbol, lap 78's mean. Paced head 0:
+the ten digits 2.20 to 2.44 with no order by value, a space 9.94, the signs + - * 5.68, 6.48, 6.78, the equals sign 8.99, the line
+feed 11.59, the letters a e t 1.45, 1.14, 0.99. Paced head 1: the digit 0 at 2.19 and 1 to 9 at 3.29 to 3.82, a space 3.79, + - *
+2.43, 2.79, 5.14, the equals sign 2.14, the line feed 16.56, a e t 1.22, 2.16, 1.17. The clocks stride at separators and step alike on
+every digit: no digit advances a ring by its value, and neither clock stands still on digits.
+
+SCORES of G-V1 to G-V4, read from the clock at 02:00:36 UTC, November 17 (oracle_short79.txt, heat_short79.txt, midpoint_short79.txt, the
+chain's held read loud_P79; lap 79's mean is MEAN.2000, the lap stopped at its bound after 2,878 sections)
+G-V1 missed: the units digit of a short sum codes at 2.360 nats at lap 79's mean (2.359 at lap 78's, 2.365 at lap 77's); 2.10 or less
+  and a fall from the first lap were guessed.
+G-V2 missed: the operands' presence at the answer's site, tick 0, is 0.458 and 0.520 (0.446 and 0.516 at lap 77's mean); 0.60 and 0.70
+  were guessed. The threshold was set on one digit read alone, which an unordered pair caps near a half; read as the pair it stands at
+  0.778, 0.783, 0.703, 0.683 at ticks 0 to 3 (0.746, 0.770, 0.656, 0.636 at lap 77's mean).
+G-V3 held, one slice on the line: against lap 77's mean the text slices stand at code +0.005, web +0.001, science +0.002, books
+  +0.000, wikidata +0.010 and the GSM8K test split +0.001 nats a place; the lap ran to its 3,300 s bound as lap 77 did. Lap 79's
+  sections ran at 1.146 s against lap 78's 1.044 while host readings held up to twenty threads beside it, and at 1.006 s over its
+  last 500 once they had ended: the readings cost the lap 122 sections.
+G-V4 missed: the held arithmetic (the uniform draw's records) stands at 1.611 against 1.528, a rise of 0.083; under 0.05 was guessed.
+What moved in two laps on the redrawn slice: the top digit of a short sum 1.545 to 1.412, head 0's last-tick share on the aligned pair
+0.470 to 0.561, the share of drafts the world reads 0.605 to 0.842. What did not: the sum's digit, in any register. By the guess's
+own reading the terrain was not the lever for the sum.
