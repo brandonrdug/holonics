@@ -60,6 +60,49 @@ ring move with `β ≡ 0`. So the wheel has two candidate homes, and the second 
 founding from the tension's coupling of the digits. Which one is read before either is built, and a founding with its return at
 zero is not entered without an answer to the dephasing.
 
+**What October's ring was made of** (read at 04:04 UTC from a reader's digest of the tower's record, lines 1339 to 3666, its key
+equations checked at source; the digest's later parts on the tens, the hand's reads and the retirement are not yet read by the lead):
+
+1. *A move located per pair.* In its final form each pair (the byte before, the arriving byte) has its own turn, a share of a key
+   modulus. The located key for sums is modulo ten with `ψ(d) = d + 2`: the ring turns by `d + 1` tenths at the pairs `(d, +)` and
+   `(d, =)` and holds at every other pair. So the units digit is taken by the pair that ends its number, which is the collapse of §4
+   done by a pair, and the ring's phase at the value is the units digit of the sum.
+2. *The key by loop closure.* Rows `N_t θ − ψ(C_t) ≡ 0 (mod n)` over the loops between two arrivals of an origin byte; a modulus
+   exists only where the system has torsion; from the newline, 149 pair columns of rank 145 with `det M = 110`.
+3. *The ring located from the tension.* The coupling `K` of the arriving classes through what their arrivals leave, with no digit
+   named: its third mode sits on the digits and on the ring's first character and its mirror. A blind start from the unit pool finds
+   nothing; the start is a mode of `K`, and the reading cells are where a received landmark marks.
+4. *A face of harmonics.* The ring is read as `ρ = q/‖q‖` at `⌊n/2⌋` harmonics, `z += W (x̂ ⊗ ρ_h)`, since a function of a residue
+   is spanned by them and one cosine cannot part ten classes 36 degrees apart; its readout is a pair contact with the top face.
+5. *The hand*, as above.
+
+Against these the engine's carry circle has a turn and a leak that are charts of the site's state (additive in the site's own symbol
+and its neighbours', so no turn gated on a pair), no hand, a linear read `p = a · Q` (one harmonic), and no founding. Each of the
+five is a law with an owner in October's record and, for the hand and the harmonics, in Lean. The guide's rule for history applies:
+port deliberately, one law at a time, never wholesale, and with October's own two failures in front: its ring dephased under the
+tower's pass, and it did not carry from the arithmetic terrain to word problems' text.
+
+**What October's road cost, and where it stopped** (read at 04:30 UTC from the same digest; the figures are the tower's record's and
+the records of October 26 to 31, cited there by line). This is the part a design must not repeat.
+
+- The 445 of 495 were written on the arithmetic terrain, by rings founded at cells a received landmark marked (a mark of where to
+  look, at each sum's units cell). Marked after the equals sign instead, the pool law kept line-mark forms: "the landmark's grain
+  decided the founding more than the law did".
+- The tens' own landmark closed on nothing, with or without the hand; the tens came from the key kept whole at 110 and from the whole
+  face. Differences reached 144 of 268 against an acceptance of 201. Products stayed at 6 of 490.
+- The same machinery on word problems failed its acceptance in every variant: calculations never met in training were written at 14
+  to 37 of 876, the level of an 8-gram (34). The wrong values were at the right size and were values heard after some equals sign
+  (97 to 100%): results as words of a vocabulary.
+- The founded ring dephased under the tower's own pass, and a lap over a founding undid part of it (308 to 247).
+- A capture navigator that did add was retired as a calculator standing in for learning, its menu naming the operators.
+- The last ring cost the held-out text in every medium but arithmetic, and Brandon asked on October 25 that arithmetic stop being the
+  road while the word problems, the images and the speech waited.
+
+So the precedent supports the moves (the pair-located turn, the hand, the harmonics, the closure) and warns against their use as a
+ring for digits on an arithmetic terrain. What this record proposes stands or falls as the symbol's own line for every stream: a
+symbol's key on shared rings with moves of the three kinds, read first on guard 9's renamed regions and on rare symbols, and held to
+October's own unpassed acceptance on the yardstick, calculations never met in training written above an 8-gram's level.
+
 ## 3. Tonight's readings in those terms
 
 - No register of a sum's digit is held, on any ring: its bit 0.727 nats (0.693 for a register that knows nothing), its five-residue
@@ -151,6 +194,8 @@ phases nine apart. The gate reads the covector by mode for that reason.
 - A renamed region reaches plain text's code and a doubled passage's second copy codes near nothing (the third record §5).
 - The text slices' held codes stay within 0.01 nats a place.
 - The move is the same law on a passage with no digit in it: its effect on the code of text is read, whichever way it falls.
+- On the yardstick, the calculations of held-out word problems whose expression was never met in training are written at their value
+  more often than an 8-gram writes them (October's acceptance, 34 of 876, never passed).
 
 ## 8. Recorded failures this could repeat
 
@@ -164,6 +209,12 @@ phases nine apart. The gate reads the covector by mode for that reason.
   message to Brandon said the reflection "was never built"; it was built, formal-checked and retired. The message was edited.
 
 ## 9. Owed
+
+The order this record now points at (not ordered as work, and each step has its own read first): the rest of October's record read
+by the lead; a ruler's port of the harmonic face on the carry circles as they stand (does any circle already hold a digit's phase
+that one harmonic cannot read); the coupling `K` of the arriving classes read on the engine's own tension (does its spectrum show
+the ring of ten here as it did in October); then the hand and the pair-located turn as laws of the circle.
+
 
 The clock with a hand as a law: its composition and its adjoint (Lean beside `Geometry/AffineSwing` and `HNN/Moment`), the moment
 under a composed move (prefix products in place of prefix sums), a host reference, the card's kernels and their parity. None of it is
