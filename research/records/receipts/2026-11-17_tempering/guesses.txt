@@ -186,3 +186,68 @@ G-L3, the stream (stream.txt): held. Strictly held last digit 2.301 at section 1
   0.020 at 3,800); panel at section 4,000: 88 of 96 whole, length the reference's in 95. A world met alone founds the law with no record
   met twice. The interleaved arm and the arm mixed inside each section (G-L3's second part and its within-section form, the same fixed
   guess: the line's condition, never taken or taken late) are running.
+
+G-C1 (2026-11-17T20:19:52Z). Does a founded law shorten the next one's founding, and is the first kept? Two second worlds, each a stream of fresh
+records met once (one extent, 4,000 rows a pass, 150 passes), each from two starts: the state that founded the short sums (G-L1b's end
+state) and lap 94's state, which founded nothing. w3: sums of two three-digit operands (answers of three or four digits). sub: a - b of
+operands 0 to 99 (negative answers written with their sign). Read every 5 passes (200 sections) on 486 strictly held pairs of the new
+world and on the first world's 486 strictly held sums; the panels of both worlds written at the end.
+  Nothing of these worlds is read yet. The guess:
+    w3 from the founded state: the strictly held last digit at section 0 (before any step) at or under 1.0 nats (the units law stands
+      where the operands end, whatever their length); under 0.1 by section 1,000. From lap 94's state: not under 0.1 before section
+      2,400. Panels at section 6,000: founded 60 or more of 96 whole, lap 94's at or under the founded arm's.
+    sub from lap 94's state: the strictly held last digit under 1.15 nats first between sections 1,600 and 2,600 (a sum's place). From
+      the founded state: 400 sections or more sooner.
+    the first law during the second dwell (the founded arms, its strictly held last digit): under 0.3 nats throughout w3; above 1.0 by
+      section 4,000 of sub (the operator alone tells the two apart, and nothing keeps the sums up).
+  What it decides: a second founding that comes sooner from the founded state is the compounding the line never showed; a first law
+  lost under the second says a world needs upkeep, which the alternating arm says pure sections give.
+
+G-W1 (2026-11-17T20:26:18Z). Brandon's lens of 20:25 UTC: "x plus y equals" is the same thing as "x + y =" as data, and "add x to y" is the same
+operation with its operands passed in another order, as add(x, y). Read on the state that founded the sign form (G-L1b's end state), with
+lap 94's state beside it, on the same held pairs; nothing of these forms is read as this is fixed (the zero-shot writes are running).
+  Zero-shot, the 96 held prompts written whole by the founded state: "a plus b equals" 20 or fewer; "a plus b =" and "a + b equals"
+    each more than "a plus b equals" (one marker of the two is kept); "add a to b =" and "add(a,b) =" 10 or fewer. (The lock found the
+    operands by their places beside the two marks it met; a new mark is a new address until it is met.)
+  Then each worded world dwelt on, a stream of fresh records (4,000 rows a pass, 100 passes), from the founded state and from lap 94's:
+    from the founded state the strictly held last digit passes under 0.1 nats by section 1,200, for both worded forms;
+    from lap 94's state not before section 2,400 (the first founding's place);
+    the sign form's strictly held last digit, read through the worded dwell from the founded state, stays under 0.5 nats.
+  What it decides: a worded form founded in half the sections or less from the founded state is the law carried and only its chart
+  relocated, which is his statement and is compounding; a worded form that takes as long as the first says the engine founded a string's
+  law and no operation.
+
+Read (2026-11-17T20:28:23Z), G-W1's zero-shot part (worded_zero.txt; host writes): the founded state writes whole 0 of 96 on "a plus b equals", 3 on
+"a plus b =", 2 on "a + b equals", 3 on "add a to b =", 1 on "add(a,b) ="; lap 94's state 0 or 1 on each. Held as guessed in its
+bounds; the forms that keep one mark are no better than the form that keeps none, so that clause missed in substance. Brandon's reading
+of 20:27 UTC: this is expected and no finding, since she was never shown that "plus" is "+".
+Not run, on Brandon's word of 20:27 UTC (arithmetic is a qualitative probe of what she learns on simple examples and is not to become a
+campaign): G-C1 whole (three-digit sums and subtraction as second worlds) and G-W1's "add a to b" dwell. One pair of G-W1 stays: "a plus
+b equals" dwelt on from the founded state and from lap 94's, 100 passes each, as one qualitative look at whether a founded law shortens
+the next. The arm of G-L3 mixed inside each section runs to its end.
+
+G-N1 (2026-11-17T20:32:05Z). Tonight's plain-text run, on the main line (text). The world: fifty simple narrative books of the store's books slice
+(one volume a title, ranked by clean text; 1,796,838 octets fitted, each book's last twentieth held, two books never read), as
+next-symbol rows: 48 known places and the next place open, every second position (897,205 rows), 400 rows a section, so a section is
+400 consecutive places of one book and a pass is 2,243 sections. From lap 94's end state, no leak, 40 passes on the card (about ten
+minutes a pass by the development read: 0.26 s a section). Read every pass on 2,500 held, 1,200 unread and 2,000 fitted rows; sixteen
+prompts written left to right, 64 places, after each pass.
+  Premises read first: lap 94's state codes the next place on its left context at 2.07 nats on the fitted rows, 2.05 held, 2.02 unread
+  (three development passes of ten sections). Today's 400 passes of half-open rows on 111 thousand octets left the next place at 1.41
+  fitted and 1.87 held, with 59% of written words in the fitted lexicon and no transition.
+  The guess, at pass 40: next place 1.50 nats or under on the fitted rows, 1.60 to 1.72 on the held twentieths, 1.65 to 1.80 on the
+  unread books; the panel's held and unread prompts at 65% or more of written words in the fitted lexicon (the books' own held text
+  stands near 90%); no shared run over 20 octets. No transition is guessed: a slow fall that flattens by pass 20.
+  What it decides for the next build: a held next-place code that stops near 1.6 to 1.7 with almost-words still on the page says the
+  engine's binding, not its pass, limits text, and the work is a law's own entries and comparison; clean words say the pass was most of it.
+
+Scored (2026-11-17T20:53:30Z).
+G-L3's mixed arms (alternating.txt, within.txt): missed. Alternating sections: the strictly held last digit 1.208 nats at pass 40 and
+  0.506 at 50 (guessed still above 1.0 after pass 51), 0.065 at 100; panel at pass 100: 87 of 96 whole; the text's held rows 1.782 at
+  pass 100 against the text-alone arm's 1.786 (held: within 0.05). Mixed inside each section: 2.187 at pass 30, 1.809 at 40, 1.235 at 50
+  (stopped there): the same count of sums met as the control, a little later. A second world beside or inside the sections does not
+  stop the founding.
+G-W1's one pair (worded_pair.txt): from the founded state the worded form's strictly held last digit reads 0.325 at section 200 and
+  0.095 at 400 (held: under 0.1 by 1,200), 0.002 by 3,000; its panel 95 of 96 whole. From lap 94's state 2.2 to 2.3 through section
+  1,400, 0.883 at 2,000, 0.155 at 3,000 (held: not under 0.1 before 2,400). The sign form through the worded dwell: 0.37 to 1.13 nats,
+  its panel 53 of 96 after it (missed: under 0.5 guessed). About eight times sooner from the founded state.

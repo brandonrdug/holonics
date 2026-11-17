@@ -1,0 +1,191 @@
+# G-W1, the one worded pair: 'a plus b equals' as a stream of fresh records, 100 passes of 4,000 rows, from the state that founded the
+# sign form (founded) and from lap 94's state. Each arm's reads (strict = the worded form's strictly held pairs; old = the sign form's),
+# then the founded arm's panels.
+== plus_founded
+TRIAL_PASSES records=600000 passes=100 records_a_section=100 closed=0 leak=none threads=24
+TRIAL_READ pass=0 group=old rows=486 last_alone=113302 last_run_open=302383 first_alone=38685 first_rows=430 density_at_last_milli=962
+TRIAL_READ pass=0 group=strict rows=486 last_alone=6712524 last_run_open=3934316 first_alone=2682297 first_rows=430 density_at_last_milli=110
+TRIAL_READ pass=5 group=old rows=486 last_alone=575348 last_run_open=823287 first_alone=159438 first_rows=430 density_at_last_milli=738
+TRIAL_READ pass=5 group=strict rows=486 last_alone=324878 last_run_open=421309 first_alone=199454 first_rows=430 density_at_last_milli=832
+TRIAL_READ pass=10 group=old rows=486 last_alone=643620 last_run_open=1051435 first_alone=231776 first_rows=430 density_at_last_milli=752
+TRIAL_READ pass=10 group=strict rows=486 last_alone=94989 last_run_open=217308 first_alone=127879 first_rows=430 density_at_last_milli=938
+TRIAL_READ pass=15 group=old rows=486 last_alone=468038 last_run_open=1104621 first_alone=336975 first_rows=430 density_at_last_milli=823
+TRIAL_READ pass=15 group=strict rows=486 last_alone=49053 last_run_open=160458 first_alone=70308 first_rows=430 density_at_last_milli=964
+TRIAL_READ pass=20 group=old rows=486 last_alone=651472 last_run_open=1142029 first_alone=420153 first_rows=430 density_at_last_milli=778
+TRIAL_READ pass=20 group=strict rows=486 last_alone=23498 last_run_open=137479 first_alone=60151 first_rows=430 density_at_last_milli=981
+TRIAL_READ pass=25 group=old rows=486 last_alone=450161 last_run_open=1027520 first_alone=323443 first_rows=430 density_at_last_milli=836
+TRIAL_READ pass=25 group=strict rows=486 last_alone=10934 last_run_open=52476 first_alone=214247 first_rows=430 density_at_last_milli=990
+TRIAL_READ pass=30 group=old rows=486 last_alone=519252 last_run_open=1279954 first_alone=409972 first_rows=430 density_at_last_milli=831
+TRIAL_READ pass=30 group=strict rows=486 last_alone=18307 last_run_open=19213 first_alone=98059 first_rows=430 density_at_last_milli=987
+TRIAL_READ pass=35 group=old rows=486 last_alone=535076 last_run_open=1649021 first_alone=437777 first_rows=430 density_at_last_milli=791
+TRIAL_READ pass=35 group=strict rows=486 last_alone=10018 last_run_open=170469 first_alone=39685 first_rows=430 density_at_last_milli=990
+TRIAL_READ pass=40 group=old rows=486 last_alone=597954 last_run_open=1356220 first_alone=524868 first_rows=430 density_at_last_milli=836
+TRIAL_READ pass=40 group=strict rows=486 last_alone=15647 last_run_open=269276 first_alone=56815 first_rows=430 density_at_last_milli=985
+TRIAL_READ pass=45 group=old rows=486 last_alone=371781 last_run_open=891691 first_alone=542723 first_rows=430 density_at_last_milli=902
+TRIAL_READ pass=45 group=strict rows=486 last_alone=24419 last_run_open=242861 first_alone=43035 first_rows=430 density_at_last_milli=983
+TRIAL_READ pass=50 group=old rows=486 last_alone=809542 last_run_open=1198222 first_alone=320546 first_rows=430 density_at_last_milli=741
+TRIAL_READ pass=50 group=strict rows=486 last_alone=27210 last_run_open=23269 first_alone=15542 first_rows=430 density_at_last_milli=985
+TRIAL_READ pass=55 group=old rows=486 last_alone=1133103 last_run_open=2075727 first_alone=296148 first_rows=430 density_at_last_milli=733
+TRIAL_READ pass=55 group=strict rows=486 last_alone=7137 last_run_open=8378 first_alone=50818 first_rows=430 density_at_last_milli=994
+TRIAL_READ pass=60 group=old rows=486 last_alone=363213 last_run_open=705678 first_alone=424860 first_rows=430 density_at_last_milli=873
+TRIAL_READ pass=60 group=strict rows=486 last_alone=8778 last_run_open=35854 first_alone=5841 first_rows=430 density_at_last_milli=991
+TRIAL_READ pass=65 group=old rows=486 last_alone=644679 last_run_open=1895911 first_alone=477229 first_rows=430 density_at_last_milli=851
+TRIAL_READ pass=65 group=strict rows=486 last_alone=3164 last_run_open=6762 first_alone=8837 first_rows=430 density_at_last_milli=997
+TRIAL_READ pass=70 group=old rows=486 last_alone=631468 last_run_open=1743494 first_alone=474341 first_rows=430 density_at_last_milli=833
+TRIAL_READ pass=70 group=strict rows=486 last_alone=6068 last_run_open=48934 first_alone=5391 first_rows=430 density_at_last_milli=995
+TRIAL_READ pass=75 group=old rows=486 last_alone=714645 last_run_open=2059360 first_alone=385889 first_rows=430 density_at_last_milli=857
+TRIAL_READ pass=75 group=strict rows=486 last_alone=1587 last_run_open=2120 first_alone=15814 first_rows=430 density_at_last_milli=998
+TRIAL_READ pass=80 group=old rows=486 last_alone=442669 last_run_open=511820 first_alone=466162 first_rows=430 density_at_last_milli=870
+TRIAL_READ pass=80 group=strict rows=486 last_alone=2132 last_run_open=13758 first_alone=8424 first_rows=430 density_at_last_milli=997
+TRIAL_READ pass=85 group=old rows=486 last_alone=491865 last_run_open=620087 first_alone=441915 first_rows=430 density_at_last_milli=850
+TRIAL_READ pass=85 group=strict rows=486 last_alone=2027 last_run_open=6690 first_alone=3125 first_rows=430 density_at_last_milli=998
+TRIAL_READ pass=90 group=old rows=486 last_alone=552979 last_run_open=2126861 first_alone=473370 first_rows=430 density_at_last_milli=834
+TRIAL_READ pass=90 group=strict rows=486 last_alone=30189 last_run_open=32325 first_alone=10964 first_rows=430 density_at_last_milli=986
+TRIAL_READ pass=95 group=old rows=486 last_alone=292083 last_run_open=702694 first_alone=270360 first_rows=430 density_at_last_milli=886
+TRIAL_READ pass=95 group=strict rows=486 last_alone=1353 last_run_open=40873 first_alone=24161 first_rows=430 density_at_last_milli=998
+TRIAL_READ pass=100 group=old rows=486 last_alone=816754 last_run_open=1816799 first_alone=557299 first_rows=430 density_at_last_milli=847
+TRIAL_READ pass=100 group=strict rows=486 last_alone=1693 last_run_open=16070 first_alone=22701 first_rows=430 density_at_last_milli=998
+TRIAL_DONE sections=4000 ms=661851
+== plus_lap94
+TRIAL_PASSES records=600000 passes=100 records_a_section=100 closed=0 leak=none threads=24
+TRIAL_READ pass=0 group=old rows=486 last_alone=2299273 last_run_open=3056483 first_alone=1633010 first_rows=430 density_at_last_milli=106
+TRIAL_READ pass=0 group=strict rows=486 last_alone=3222596 last_run_open=7079490 first_alone=2659465 first_rows=430 density_at_last_milli=80
+TRIAL_READ pass=5 group=old rows=486 last_alone=2309406 last_run_open=3293299 first_alone=1531427 first_rows=430 density_at_last_milli=108
+TRIAL_READ pass=5 group=strict rows=486 last_alone=2284005 last_run_open=2796262 first_alone=1531104 first_rows=430 density_at_last_milli=108
+TRIAL_READ pass=10 group=old rows=486 last_alone=2369169 last_run_open=3373332 first_alone=1635451 first_rows=430 density_at_last_milli=108
+TRIAL_READ pass=10 group=strict rows=486 last_alone=2272147 last_run_open=2854877 first_alone=1460492 first_rows=430 density_at_last_milli=107
+TRIAL_READ pass=15 group=old rows=486 last_alone=2384101 last_run_open=3270245 first_alone=1709284 first_rows=430 density_at_last_milli=111
+TRIAL_READ pass=15 group=strict rows=486 last_alone=2251212 last_run_open=2831371 first_alone=1242724 first_rows=430 density_at_last_milli=109
+TRIAL_READ pass=20 group=old rows=486 last_alone=2388457 last_run_open=3005934 first_alone=1766145 first_rows=430 density_at_last_milli=111
+TRIAL_READ pass=20 group=strict rows=486 last_alone=2274559 last_run_open=2571835 first_alone=946989 first_rows=430 density_at_last_milli=107
+TRIAL_READ pass=25 group=old rows=486 last_alone=2359347 last_run_open=2996162 first_alone=1814586 first_rows=430 density_at_last_milli=112
+TRIAL_READ pass=25 group=strict rows=486 last_alone=2199514 last_run_open=2468587 first_alone=709005 first_rows=430 density_at_last_milli=118
+TRIAL_READ pass=30 group=old rows=486 last_alone=2390411 last_run_open=3235320 first_alone=1879963 first_rows=430 density_at_last_milli=110
+TRIAL_READ pass=30 group=strict rows=486 last_alone=2201078 last_run_open=2485646 first_alone=526425 first_rows=430 density_at_last_milli=122
+TRIAL_READ pass=35 group=old rows=486 last_alone=2416821 last_run_open=3161598 first_alone=2001544 first_rows=430 density_at_last_milli=107
+TRIAL_READ pass=35 group=strict rows=486 last_alone=2169105 last_run_open=2526977 first_alone=378063 first_rows=430 density_at_last_milli=127
+TRIAL_READ pass=40 group=old rows=486 last_alone=2456984 last_run_open=3383604 first_alone=1889370 first_rows=430 density_at_last_milli=107
+TRIAL_READ pass=40 group=strict rows=486 last_alone=1994621 last_run_open=2268310 first_alone=326072 first_rows=430 density_at_last_milli=167
+TRIAL_READ pass=45 group=old rows=486 last_alone=2687202 last_run_open=3213664 first_alone=1930365 first_rows=430 density_at_last_milli=115
+TRIAL_READ pass=45 group=strict rows=486 last_alone=1498828 last_run_open=1696618 first_alone=238747 first_rows=430 density_at_last_milli=311
+TRIAL_READ pass=50 group=old rows=486 last_alone=2913041 last_run_open=3543710 first_alone=1180905 first_rows=430 density_at_last_milli=123
+TRIAL_READ pass=50 group=strict rows=486 last_alone=882935 last_run_open=1129078 first_alone=214005 first_rows=430 density_at_last_milli=509
+TRIAL_READ pass=55 group=old rows=486 last_alone=3250404 last_run_open=3297407 first_alone=1129895 first_rows=430 density_at_last_milli=125
+TRIAL_READ pass=55 group=strict rows=486 last_alone=624078 last_run_open=908755 first_alone=202673 first_rows=430 density_at_last_milli=635
+TRIAL_READ pass=60 group=old rows=486 last_alone=3638439 last_run_open=3174377 first_alone=1135546 first_rows=430 density_at_last_milli=127
+TRIAL_READ pass=60 group=strict rows=486 last_alone=413313 last_run_open=747311 first_alone=111105 first_rows=430 density_at_last_milli=726
+TRIAL_READ pass=65 group=old rows=486 last_alone=3966977 last_run_open=3277212 first_alone=1145908 first_rows=430 density_at_last_milli=137
+TRIAL_READ pass=65 group=strict rows=486 last_alone=285334 last_run_open=625419 first_alone=153124 first_rows=430 density_at_last_milli=808
+TRIAL_READ pass=70 group=old rows=486 last_alone=4926991 last_run_open=3700567 first_alone=1409946 first_rows=430 density_at_last_milli=142
+TRIAL_READ pass=70 group=strict rows=486 last_alone=205495 last_run_open=389670 first_alone=96598 first_rows=430 density_at_last_milli=865
+TRIAL_READ pass=75 group=old rows=486 last_alone=5105170 last_run_open=3481221 first_alone=1308482 first_rows=430 density_at_last_milli=143
+TRIAL_READ pass=75 group=strict rows=486 last_alone=154768 last_run_open=468620 first_alone=135640 first_rows=430 density_at_last_milli=885
+TRIAL_READ pass=80 group=old rows=486 last_alone=5677490 last_run_open=3901464 first_alone=1497012 first_rows=430 density_at_last_milli=145
+TRIAL_READ pass=80 group=strict rows=486 last_alone=93589 last_run_open=431803 first_alone=51860 first_rows=430 density_at_last_milli=934
+TRIAL_READ pass=85 group=old rows=486 last_alone=5869803 last_run_open=4049817 first_alone=1445933 first_rows=430 density_at_last_milli=152
+TRIAL_READ pass=85 group=strict rows=486 last_alone=95873 last_run_open=398441 first_alone=55181 first_rows=430 density_at_last_milli=932
+TRIAL_READ pass=90 group=old rows=486 last_alone=6481755 last_run_open=3879609 first_alone=1742363 first_rows=430 density_at_last_milli=151
+TRIAL_READ pass=90 group=strict rows=486 last_alone=72932 last_run_open=116688 first_alone=33354 first_rows=430 density_at_last_milli=949
+TRIAL_READ pass=95 group=old rows=486 last_alone=6907190 last_run_open=4003547 first_alone=1554298 first_rows=430 density_at_last_milli=136
+TRIAL_READ pass=95 group=strict rows=486 last_alone=78725 last_run_open=127925 first_alone=11990 first_rows=430 density_at_last_milli=955
+TRIAL_READ pass=100 group=old rows=486 last_alone=7715879 last_run_open=4060878 first_alone=1692793 first_rows=430 density_at_last_milli=133
+TRIAL_READ pass=100 group=strict rows=486 last_alone=51222 last_run_open=88832 first_alone=12823 first_rows=430 density_at_last_milli=959
+TRIAL_DONE sections=4000 ms=781877
+plus_founded, the worded panel: 95 of 96 held sums written whole; last digit as the reference's in 96
+42 plus 60 equals 102\n27 p
+61 plus 32 equals 93\n7 plu
+92 plus 61 equals 153\n41 p
+7 plus 36 equals 43\n77 pl
+71 plus 79 equals 150\n59 p
+9 plus 7 equals 16\n59 pl
+97 plus 9 equals 106\n71 p
+8 plus 19 equals 27\n2 plu
+81 plus 16 equals 97\n89 pl
+4 plus 97 equals 101\n97 p
+74 plus 9 equals 83\n91 pl
+1 plus 8 equals 9\n47 plu
+5 plus 44 equals 49\n3 plu
+8 plus 7 equals 15\n40 pl
+2 plus 83 equals 85\n38 pl
+7 plus 1 equals 8\n31 plu
+62 plus 51 equals 113\n0 pl
+62 plus 5 equals 67\n7 plu
+2 plus 8 equals 10\n80 pl
+38 plus 67 equals 105\n42 p
+4 plus 74 equals 78\n27 pl
+40 plus 0 equals 40\n91 pl
+1 plus 39 equals 40\n8 plu
+8 plus 62 equals 70\n26 pl
+0 plus 40 equals 40\n17 pl
+6 plus 6 equals 12\n5 plu
+31 plus 81 equals 112\n62 p
+54 plus 0 equals 54\n61 pl
+1 plus 7 equals 8\n11 plu
+28 plus 7 equals 35\n80 pl
+41 plus 3 equals 44\n6 plu
+4 plus 4 equals 8\n83 plu
+92 plus 11 equals 103\n41 p
+5 plus 9 equals 14\n56 pl
+88 plus 9 equals 97\n88 pl
+18 plus 91 equals 109\n75 p
+73 plus 3 equals 76\n27 pl
+8 plus 98 equals 106\n0 pl
+6 plus 7 equals 13\n51 pl
+2 plus 3 equals 5\n15 plu
+7 plus 67 equals 74\n18 pl
+11 plus 2 equals 13\n0 plu
+21 plus 39 equals 60\n62 pl
+4 plus 7 equals 11\n0 plu
+4 plus 98 equals 102\n37 p
+8 plus 8 equals 16\n3 plu
+33 plus 36 equals 69\n6 plu
+60 plus 8 equals 68\n12 pl
+8 plus 2 equals 10\n887 p
+6 plus 1 equals 7\n88 plu
+71 plus 15 equals 86\n61 pl
+92 plus 5 equals 97\n6 plu
+9 plus 8 equals 17\n18 pl
+52 plus 40 equals 92\n1 plu
+19 plus 2 equals 21\n95 pl
+54 plus 8 equals 62\n7 plu
+73 plus 51 equals 124\n3 pl
+70 plus 3 equals 73\n1 plu
+28 plus 89 equals 117\n84 p
+3 plus 4 equals 7\n1 plus
+58 plus 9 equals 67\n33 pl
+52 plus 22 equals 74\n5 plu
+1 plus 9 equals 10\n43 pl
+68 plus 7 equals 75\n82 pl
+9 plus 70 equals 79\n6 plu
+16 plus 67 equals 83\n77 pl
+1 plus 63 equals 64\n43 pl
+45 plus 42 equals 87\n8 plu
+2 plus 46 equals 48\n41 pl
+69 plus 2 equals 71\n4 plu
+15 plus 11 equals 26\n2 plu
+8 plus 24 equals 32\n29 pl
+6 plus 3 equals 9\n37 plu
+4 plus 9 equals 13\n16 pl
+76 plus 5 equals 81\n3 plu
+44 plus 12 equals 56\n41 pl
+19 plus 0 equals 19\n57 pl
+7 plus 10 equals 17\n23 pl
+0 plus 27 equals 27\n83 pl
+7 plus 62 equals 69\n92 pl
+8 plus 56 equals 64\n10 pl
+5 plus 7 equals 12\n2 plu
+63 plus 74 equals 137\n0 pl
+49 plus 71 equals 120\n48 p
+0 plus 0 equals 0\n2 plus
+1 plus 78 equals 79\n4 plu
+35 plus 3 equals 38\n61 pl
+96 plus 4 equals 100\n89 p
+95 plus 31 equals 126\n21 p
+70 plus 9 equals 79\n4 plu
+8 plus 53 equals 61\n89 pl
+99 plus 8 equals 107\n76 p
+58 plus 7 equals 65\n1 plu
+16 plus 29 equals 45\n77 pl
+86 plus 66 equals 152\n2 pl
+1 plus 0 equals 11\n12 pl      (reference 1)
+plus_founded, the sign form's panel after the worded dwell: 53 of 96 held sums written whole; last digit as the reference's in 73

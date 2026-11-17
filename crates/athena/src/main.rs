@@ -81,6 +81,10 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("hold-families") {
         return athena::store::hold_families(&rest[1..]);
     }
+    // [the lead, November 17] A ruler's writer of one place a read, on the host's threads beside the card's runs.
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("write-next") {
+        return athena::ruler::tension::write_next(&rest[1..], &mut holonics_engine::realization::Host);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-leak") {
         return athena::store::set_leak(&rest[1..]);
     }
@@ -333,6 +337,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-crossing") => athena::store::found_crossing(args),
         Some("found-closed") => athena::store::found_closed(args),
         Some("try-passes") => athena::ruler::tension::try_passes(args, realization),
+        Some("write-next") => athena::ruler::tension::write_next(args, realization),
         Some("restore-store") => athena::store::restore(args),
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),
