@@ -20,7 +20,7 @@ repository was reset on September 24; the pre-reset tree is
 
 ## What runs: the store line learns open text, arithmetic and word problems on the card
 
-- **The line.** One life from lap 1 to lap 83 on the RTX 4080 SUPER under `.local/gpu.lock` (lap 84 onward queued to lap 90), through
+- **The line.** One life from lap 1 to lap 87 on the RTX 4080 SUPER under `.local/gpu.lock` (laps 88 to 97 queued), through
   `holonics_engine::field` in `crates/engine`, its card realization in `crates/engine-cuda` and the
   commands in `crates/athena` ([THE_ENGINE](docs/THE_ENGINE.md)). Laps 75 and 76 trained with the
   crossing triads and lap 77 with the refined act; from lap 78 the arithmetic slice is redrawn
@@ -79,6 +79,11 @@ repository was reset on September 24; the pre-reset tree is
     The GSM8K test split rose by 0.016 over laps 79 to 82 and the whole rise stands at its marks (2.52 to 2.82 nats on 0.09 of its
     places, its letters 0.478 to 0.462, its digits 1.98 throughout): its markup writes no spaces around a sign, and the passages
     the line trains on do (`tools/cavity_by_kind.py`).
+  - Lap 87, the tenth on the redrawn slice: code 0.5547, web 0.9077, science 0.7569, books 0.8688, wikidata 1.0696, the held
+    arithmetic 1.6128 and the GSM8K test split 0.7719; every place 0.8902. Text has held within 0.006 since lap 83.
+  - A sum's upper columns have begun to fall and its units digit has not (short sums, laps 79 to 86's means): a column both
+    operands hold 2.41 to 2.26 and 2.29 nats a digit, a column one holds 2.12 to 1.92 and 2.36 to 2.17, the units digit 2.360 to
+    2.329, where a face that knows nothing codes 2.303 ([the closure's record](research/records/2026-11-17_A_SYMBOLS_KEY_IS_LOCATED_BY_CLOSING_A_MENU_OF_THE_FIELDS_OWN_ROWS_THE_RING_OF_TEN_COMES_OUT_WITH_NO_GRADIENT_ITS_PAIR_PRODUCT_CARRIES_A_SUMS_UPPER_COLUMNS_AND_THE_UNITS_PLACE_WAITS_ON_A_ROW_THAT_HOLDS_BOTH_DIGITS.md) §3).
   - What six laps on the redrawn slice moved: the share of drafts the world reads 0.61 to 0.88, the top digit of a short sum 1.55
     to 1.41 nats, the writes' form (short assignment lines closing on an answer line). What they did not: a sum's digit, held in no
     register (its bit 0.727 nats against 0.693, [the record](research/records/2026-11-17_A_ROWS_MIDPOINT_IS_IN_THE_CHART_AND_ITS_DOUBLING_CARRIES_THE_SUM_BUT_ONLY_A_LABELLED_READ_FINDS_IT_THE_ADDRESS_IS_ONE_HEADS_A_RENAMED_REGION_IS_READ_BY_ITS_OWN_USE_AND_A_SYMBOL_IS_STILL_A_FREE_ROW.md) §3.8); a held record's value is
@@ -210,7 +215,16 @@ removes, fitted on one half of the records and read on the other.
   pair-located turn, a face of harmonics and a ring founded from the tension, wrote 445 of 495 held-out sums on its own terrain
   and did not carry to word problems. The line proposed is for every stream, its form may be handed as a gene, and its bar is
   October's unpassed one: word problems' calculations never met in training written above an 8-gram's level
-  ([the wheel's record](research/records/2026-11-17_THE_DIGITS_WHEEL_A_SYMBOLS_MOVE_ON_A_RING_IS_A_TURN_A_HALF_TURN_OR_A_COLLAPSE_THE_ENGINES_CLOCKS_ONLY_TURN_AND_A_SUM_NEEDS_THE_HAND_FLIPPED_AT_THE_EQUALS_SIGN.md)). Nothing of it is built; its first host reads are owed.
+  ([the wheel's record](research/records/2026-11-17_THE_DIGITS_WHEEL_A_SYMBOLS_MOVE_ON_A_RING_IS_A_TURN_A_HALF_TURN_OR_A_COLLAPSE_THE_ENGINES_CLOCKS_ONLY_TURN_AND_A_SUM_NEEDS_THE_HAND_FLIPPED_AT_THE_EQUALS_SIGN.md)). Nothing of it is built.
+  - Its first host reads are taken ([the closure's record](research/records/2026-11-17_A_SYMBOLS_KEY_IS_LOCATED_BY_CLOSING_A_MENU_OF_THE_FIELDS_OWN_ROWS_THE_RING_OF_TEN_COMES_OUT_WITH_NO_GRADIENT_ITS_PAIR_PRODUCT_CARRIES_A_SUMS_UPPER_COLUMNS_AND_THE_UNITS_PLACE_WAITS_ON_A_ROW_THAT_HOLDS_BOTH_DIGITS.md)). No carry circle holds a
+    digit's phase, and a symbol reaches a circle as a displacement, never as a turn. The engine's tension shows no ring of ten. A
+    menu of the field's own rows does: closed on the host with no label and no gradient, it returns each digit's key at its tenth
+    of a turn, the symbols that are off the ring, and the ring's order (laps 77, 79 and 86). Through head 0's rows as they stand, a
+    pair product on that located ring carries half of a sum's digit at the columns both operands hold and a fifth at the units
+    place, where the row holds one aligned digit or the other.
+  - The part this states, unbuilt: a keyed pair product through a row, its keys founded by that closure between a lap's mean and
+    the next lap's start. Owed before it is ordered: the same closure on the store's own text, its form where a place is a
+    difference (a dihedral menu), and what it returns for products.
 - **The engine has no founding law.** Every part since November 13 entered at zero (a lane, a mark's
   strengths, the crossing's return) or with drawn operands (the crossing's legs). The founding law of
   October 24 stands in a host ruler (`tools/tension_ruler.py`) and a state tool (`found-crossing`); read
