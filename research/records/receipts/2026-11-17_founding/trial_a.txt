@@ -1,0 +1,18 @@
+17:36:49
+== founded
+CODES half=held column=every places=5916 nats=1.8510;CODES half=held column=line_feed places=736 nats=0.3892;CODES half=held column=middle places=125 nats=2.2669;CODES half=held column=past places=3680 nats=1.9782;CODES half=held column=top places=639 nats=1.8683;CODES half=held column=units places=736 nats=2.5912;
+TRIAL_DONE sections=400 ms=401103
+SWEEP 0 sections 40 nats_a_place 1.6586 deposited 40
+SWEEP 1 sections 40 nats_a_place 1.4669 deposited 40
+SWEEP 2 sections 40 nats_a_place 1.3789 deposited 40
+SWEEP 3 sections 40 nats_a_place 1.3165 deposited 40
+SWEEP 4 sections 40 nats_a_place 1.2764 deposited 40
+SWEEP 5 sections 40 nats_a_place 1.2403 deposited 40
+SWEEP 6 sections 40 nats_a_place 1.2151 deposited 40
+SWEEP 7 sections 40 nats_a_place 1.1948 deposited 40
+SWEEP 8 sections 40 nats_a_place 1.1814 deposited 40
+SWEEP 9 sections 40 nats_a_place 1.1572 deposited 40
+== after the trial
+CODES half=held column=every places=5916 nats=1.0304;CODES half=held column=line_feed places=736 nats=0.0385;CODES half=held column=middle places=125 nats=1.5252;CODES half=held column=past places=3680 nats=1.2070;CODES half=held column=top places=639 nats=1.2545;CODES half=held column=units places=736 nats=0.8603;
+17:46:00
+RUN_EXIT 0 2026-11-17T17:46:00Z

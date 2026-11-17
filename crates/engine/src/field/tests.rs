@@ -3303,36 +3303,103 @@ fn triad_shaped(still: usize, triads: usize) -> Constitution {
     drawn(grown)
 }
 
-/// [the lead, November 17, the founding record] **The closed characters** ([`Declaration::closed`]): founded with a zero return the field
-/// reads every face as before and its state reads back under `hnn-field-v14c`; with a return off zero an open site's face moves, and with
-/// every key at zero (no class on the ring) the same return reads nothing, so the faces are the ones before; the reverse refuses the field.
+/// A ring of four over the fixture's classes 0 to 3 under two characters (`K_1(a) = i^a`, `K_2(a) = (−1)^a`, at unit modulus on `2^(−16)`),
+/// class 4 off the ring.
+fn ring_of_four(alphabet: usize) -> Vec<i32> {
+    let e = 2;
+    let mut ring = vec![0i32; alphabet * 2 * e];
+    for a in 0..4 {
+        let (re, im) = [(1 << 16, 0), (0, 1 << 16), (-(1 << 16), 0), (0, -(1 << 16))][a];
+        (ring[a * 2 * e], ring[a * 2 * e + e]) = (re, im);
+        ring[a * 2 * e + 1] = if a % 2 == 0 { 1 << 16 } else { -(1 << 16) };
+    }
+    ring
+}
+
+/// [`triad_shaped`]'s field with closed characters on [`ring_of_four`], its odds' rows off zero.
+fn closed_shaped(still: usize) -> Constitution {
+    let field = triad_shaped(still, TRIADS);
+    let d = field.declaration;
+    let mut odds = vec![0i32; d.heads * (d.width + 1)];
+    for h in 0..d.heads {
+        for i in 0..d.width {
+            odds[h * d.width + i] = (((h * 31 + i * 17) % 13) as i32 - 6) << 18;
+        }
+    }
+    field.with_closed(2, &ring_of_four(d.alphabet), &odds).unwrap().0
+}
+
+/// [the lead, November 17, the founding records] **The closed face** ([`crate::closed`]): with no class on the ring every face is the
+/// field's own; on a ring the faces move; the state reads back under `hnn-field-v14c`; and a learner's section runs through the reverse.
 #[test]
-fn closed_characters_at_a_zero_return_read_the_faces_before_and_a_return_reads_only_keyed_sources() {
+fn the_closed_face_is_the_fields_own_with_no_ring_and_moves_on_one() {
     let field = triad_shaped(1, TRIADS);
     let d = field.declaration;
-    let e = 2;
     let faces = field.faces(&region()).unwrap();
-    // Every class on the ring: a key of unit modulus under each character, the classes at different phases.
-    let mut ring = vec![0i32; d.alphabet * 2 * e];
-    for a in 0..d.alphabet {
-        let (re, im) = [(1 << 16, 0), (0, 1 << 16), (-(1 << 16), 0), (0, -(1 << 16))][a % 4];
-        (ring[a * 2 * e], ring[a * 2 * e + 1], ring[a * 2 * e + e], ring[a * 2 * e + e + 1]) = (re, re, im, -im);
-    }
-    let zero = vec![0i32; d.width * d.heads * 2 * e];
-    let (closed, from) = field.with_closed(e, &ring, &zero).unwrap();
-    assert_eq!(closed.faces(&region()).unwrap(), faces, "a zero return reads the faces before");
+    let odds = vec![0i32; d.heads * (d.width + 1)];
+    let (dark, from) = field.with_closed(2, &vec![0; d.alphabet * 4], &odds).unwrap();
+    assert_eq!(dark.faces(&region()).unwrap(), faces, "with no class on the ring the faces are the field's own");
+    assert!(from[..field.material_len()].iter().enumerate().all(|(i, o)| *o == Some(i)) && from[field.material_len()..].iter().all(Option::is_none));
+    let closed = closed_shaped(1);
+    assert_ne!(closed.faces(&region()).unwrap(), faces, "on a ring the faces are mixed");
     assert!(closed.declaration.to_text().starts_with("hnn-field-v14c "));
     assert_eq!(Constitution::from_text(&closed.to_text()).unwrap(), closed);
-    assert_eq!(from.len(), closed.material_len());
-    assert!(from[..field.material_len()].iter().enumerate().all(|(i, o)| *o == Some(i)) && from[field.material_len()..].iter().all(Option::is_none));
-    let ones = vec![1 << 22; zero.len()];
-    let (moved, _) = field.with_closed(e, &ring, &ones).unwrap();
-    assert_ne!(moved.faces(&region()).unwrap(), faces, "a return off zero moves an open site's face");
-    let (dark, _) = field.with_closed(e, &vec![0; ring.len()], &ones).unwrap();
-    assert_eq!(dark.faces(&region()).unwrap(), faces, "with no class on the ring the return reads nothing");
-    assert!(field.with_closed(0, &[], &[]).is_err() && closed.with_closed(e, &ring, &zero).is_err() && field.with_closed(e, &ring[1..], &zero).is_err());
+    assert!(field.with_closed(0, &[], &[]).is_err() && closed.with_closed(2, &ring_of_four(d.alphabet), &odds).is_err() && field.with_closed(2, &ring_of_four(d.alphabet)[1..], &odds).is_err());
     let mut learner = Learner::new(closed, 4);
-    assert!(learner.section(&[region()]).is_err(), "no deposit reads a field with closed characters");
+    learner.section(&[region()]).unwrap();
+}
+
+/// [the lead, November 17, the founding records] **The closed face's covector matches its code's difference**: over every family of a
+/// field with closed characters (the odds' rows and biases among them, and the lock's material, which the mixture reaches through the
+/// last tick's rows), the reverse's covector at an entry predicts the code's change under a small step of that entry.
+#[test]
+fn the_closed_faces_covector_matches_its_codes_difference() {
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> {
+        let pass = field.pass(r, true).unwrap();
+        pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+    };
+    let (mut read, mut seams, mut odds_read, mut lock_read) = (0usize, 0usize, 0usize, 0usize);
+    for still in [0usize, 1] {
+        let field = closed_shaped(still);
+        let r = region();
+        let g = covector_of(&field, &r);
+        let l = field.layout.clone();
+        let (dw, heads) = (field.declaration.width, field.declaration.heads);
+        assert!(g[l.closed_odds..l.closed_odds + heads * dw].iter().any(|&v| v != 0), "still {still}: the odds' rows have a covector");
+        for &(start, len, grain) in field.families() {
+            // The keys take no covector. The paces are read by their own test at two steps (`the_pace_covector_matches_the_code_at_two_steps`):
+            // at one step their small covectors stand inside the code's grain here, on the plain field as on this one (a pace entry read
+            // −154 against −40 predicted with no closed characters).
+            if start == l.temper || start == l.closed_key || start == l.pace {
+                continue;
+            }
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta), &r) != sheets(&field, &r) || sheets(&moved(-delta), &r) != sheets(&field, &r);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                odds_read += usize::from(start == l.closed_odds || start == l.closed_odds_bias);
+                lock_read += usize::from(start == l.q || start == l.probe);
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("CLOSED_COVECTOR_PROBES read={read} on_a_seam={seams} odds={odds_read} lock={lock_read}");
+    assert!(odds_read >= 4 && lock_read >= 4, "the odds and the lock's words were read against the code ({odds_read}, {lock_read})");
 }
 
 /// [`four_contacts`]'s founded field grown by two carry circles and then by `triads` triads (the line's order: the triads are founded on a
@@ -3385,7 +3452,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, w_closed: old.w_closed, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 

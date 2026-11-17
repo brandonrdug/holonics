@@ -38,14 +38,19 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     // ([`holonics_engine::field::Constitution::lock_carry`]): a ruler's forward, read before the stage is a law.
     // [measurement; the lead, November 17 10:25Z] With `shares`, `shares.tsv` alone of `all`'s files is written (the open place's row by tick
     // and head), for a ruler that closes a menu of the rows on longer regions without every site's charts on disk.
-    let usage = "read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all] [shares] [carry=MILLI]";
-    if args.len() < 12 || args.len() > 15 {
+    let usage = "read-tension UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [all] [shares] [mixed] [carry=MILLI]";
+    if args.len() < 12 || args.len() > 16 {
         return Err(usage.into());
     }
     let (mut all, mut carry, mut shares_alone) = (false, None, false);
+    // [measurement; the lead, November 17] With `mixed`, each named place is opened with a keyed half of its run's other places open beside it
+    // (a place joins where the low bit of an FNV-1a hash of `label:place:other` is one), so a place is read as a release meets it, some of
+    // its run written and some not; `all` then writes every open site of the region as an open row.
+    let mut mixed = false;
     for word in &args[12..] {
         match (word.as_str(), word.strip_prefix("carry=")) {
             ("all", _) => all = true,
+            ("mixed", _) => mixed = true,
             ("shares", _) => shares_alone = true,
             (_, Some(m)) => carry = Some(crate::ruler::tension::carry_of(m)?),
             _ => return Err(usage.into()),
@@ -62,8 +67,6 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         return Err("a state whose alphabet is not its codec's".into());
     }
     learner.field.lock_carry = carry;
-    // [the lead, November 17] A ruler's reverse through closed characters, their return held constant (a founding's solve reads it).
-    learner.field.closed_blind = true;
     let out = Path::new(&args[11]);
     let unescape = |t: &str| t.replace("\\n", "\n");
     // (label, the place's index in its run, the place's site, the region)
@@ -91,6 +94,12 @@ pub fn read_tension(args: &[String]) -> Result<()> {
             }
             let mut open = vec![false; classes.len()];
             open[p.len() + j] = true;
+            if mixed {
+                for other in (0..r.len()).filter(|&o| o != j) {
+                    let hash = format!("{label}:{j}:{other}").bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ u64::from(b)).wrapping_mul(0x100000001b3));
+                    open[p.len() + other] = (hash >> 17) & 1 == 1;
+                }
+            }
             work.push((label.to_string(), j, p.len() + j, OwnedRegion::plain(classes.clone(), open)));
         }
     }
@@ -107,7 +116,8 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     println!("TENSION_TEMPER log2_on_2^-24 {}", (0..2 * d.heads).map(|k| learner.field.theta[temper + k].to_string()).collect::<Vec<_>>().join(" "));
     let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
     let (mut rows, mut lambda, mut read, mut current, mut products) = (create("rows.tsv")?, create("lambda.i64")?, create("read.i32")?, create("current.i64")?, create("products.i64")?);
-    let (mut chart, mut shares) = (if all { Some(create("chart.i32")?) } else { None }, if all || shares_alone { Some(create("shares.tsv")?) } else { None });
+    // [the lead, November 17] With `shares` the named place's opening chart is written beside its row (`chart.i32`, what the site's leg reads).
+    let (mut chart, mut shares) = (if all || shares_alone { Some(create("chart.i32")?) } else { None }, if all || shares_alone { Some(create("shares.tsv")?) } else { None });
     // With `all`, each site's value word beside its chart (`value.i64`, `2M` entries on `2^(−16)`): what the site offers a row that meets it.
     let mut value = if all { Some(create("value.i64")?) } else { None };
     // The open place's whole face, a record a place in the table's order (`faces.i64`, the code of each of the `A` classes on `2^(−20)` bits).
@@ -322,4 +332,78 @@ pub fn carry_of(milli: &str) -> Result<i64> {
         return Err("carry=MILLI stands between 0 and 1000".into());
     }
     Ok((m << 30) / 1000)
+}
+
+/// [measurement; the lead, November 17, the founding records] `try-closed UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE
+/// STATE_SHA SWEEPS RECORDS OUT`: **a premise's trial on the host**: the state's learner takes `SWEEPS` passes over a forms table
+/// (`label<TAB>prompt<TAB>run`), `RECORDS` records a section, each record a region with a keyed half of its run's places open (a place is
+/// open where the low bit of an FNV-1a hash of `label:sweep:place` is one, and one place where none is), by the learner's own section step
+/// on the host's threads, and the learner is written to `OUT`. One line a section: its sites, its code before and after on `2^(−20)` bits,
+/// and whether its step was deposited.
+///
+/// Why on the host, and what it is not: the closed face ([`holonics_engine::closed`]) has no card realization, and whether its pull on
+/// the rows closes a lock is the premise that decides whether one is built. A table of a few thousand records is read in minutes on the
+/// host's threads. The state it writes is a ruler's: it is no line's state, no lap trains from it, and what it reads is the premise on
+/// this table, never the line's learning (the learner's laps run on the card).
+pub fn try_closed(args: &[String]) -> Result<()> {
+    if args.len() != 14 {
+        return Err("try-closed UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA SWEEPS RECORDS OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("try-closed")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let (sweeps, records): (usize, usize) = (args[11].parse()?, args[12].parse()?);
+    let out = Path::new(&args[13]);
+    if out.exists() || sweeps == 0 || records == 0 {
+        return Err("try-closed writes a new state from one sweep or more of one record or more a section".into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, Vec<usize>, Vec<usize>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        if w.len() < 3 {
+            return Err("a forms row that is not label, prompt and run".into());
+        }
+        let (p, r) = (codec.encode(unescape(w[1]).as_bytes())?, codec.encode(unescape(w[2]).as_bytes())?);
+        if p.is_empty() || r.is_empty() {
+            return Err("a forms row with an empty prompt or run".into());
+        }
+        rows.push((w[0].to_string(), p, r));
+    }
+    println!("TRIAL_HOST records={} sweeps={sweeps} records_a_section={records} closed={} threads={}", rows.len(), learner.field.declaration.closed, rayon::current_num_threads());
+    let mut section = 0usize;
+    for sweep in 0..sweeps {
+        for chunk in rows.chunks(records) {
+            let regions: Vec<OwnedRegion> = chunk
+                .iter()
+                .map(|(label, p, r)| {
+                    let bit = |j: usize| format!("{label}:{sweep}:{j}").bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ u64::from(b)).wrapping_mul(0x100000001b3));
+                    let mut classes = p.clone();
+                    classes.extend_from_slice(r);
+                    let mut open = vec![false; classes.len()];
+                    for j in 0..r.len() {
+                        open[p.len() + j] = (bit(j) >> 17) & 1 == 1;
+                    }
+                    if !open.iter().any(|&o| o) {
+                        open[p.len() + (bit(r.len()) % r.len() as u64) as usize] = true;
+                    }
+                    OwnedRegion::plain(classes, open)
+                })
+                .collect();
+            let views: Vec<_> = regions.iter().map(view_of).collect();
+            let receipt = learner.section(&views).map_err(|e| e.to_string())?;
+            println!("TRIAL_SECTION sweep={sweep} section={section} sites={} code_before={} code_after={} deposited={} ms={}", receipt.sites, receipt.code_before, receipt.code_after.map_or("-".to_string(), |c| c.to_string()), receipt.deposited, started.elapsed().as_millis());
+            section += 1;
+        }
+    }
+    write_new(out, learner.to_text().as_bytes())?;
+    println!("TRIAL_DONE sections={section} ms={}", started.elapsed().as_millis());
+    Ok(())
 }

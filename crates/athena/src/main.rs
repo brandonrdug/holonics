@@ -67,6 +67,10 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension") {
         return athena::ruler::tension::read_tension(&rest[1..]);
     }
+    // [the lead, November 17] A premise's trial on the host's threads (a ruler's state; it opens no card).
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("try-closed") {
+        return athena::ruler::tension::try_closed(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-tension-store") {
         return athena::ruler::tension::read_tension_store(&rest[1..]);
     }

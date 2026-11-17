@@ -441,9 +441,10 @@ Athena text milestone claimed before a test of use was retracted or retired.
   by its measurement ("the predictor codes above flat on unseen families"), not as a missing part.
 
 [project-postulate] **Method, each rule with its reason.** These were given in conversation between
-October 29 and November 16; the ten before the last three are from his corrections of November 12 to 16, and the
+October 29 and November 17; the ten before the last four are from his corrections of November 12 to 16, and the
 three before those were derived from a failure, from readings of November 11 and from Brandon's lens of
-that day. The last three are the lead's, from the readings of November 16 (`agent-inferred`). They are
+that day. The three before the last are the lead's, from the readings of November 16 (`agent-inferred`), and the last is from
+his correction of November 17. They are
 written here with their reasons so that no agent holds them as slogans.
 - **Theory picks, and a run tests a stated prediction** (November 4). Derive which law the theory
   gives, fix its guess as a number before the read, run that one law and score the guess, a miss
@@ -734,6 +735,21 @@ written here with their reasons so that no agent holds them as slogans.
   heads 1 to 3, and a message to Brandon, a guess and a record's table stood on it for a quarter of an hour, while the first record's
   link trace held the sums that would have told the rows apart
   ([the record](research/records/2026-11-16_THE_LOCK_AND_THE_JUNCTION_ARE_ONE_SADDLE_A_CARRIED_LOCK_COSTS_UNTRAINED_TEXT_AND_THE_ARITHMETIC_TERRAIN_IS_REDRAWN_AT_THE_WORD_PROBLEMS_OWN_COUNTS_WITH_A_RECORD_ALONE_IN_ITS_REGION.md) §5).
+- **A step is judged by its writes, read first** (Brandon, November 17 17:51Z). Every report of a step, a lap or a build opens with what
+  the machine wrote: a fixed panel of held prompts, the same from step to step, written and shown whole, with the counts read off that text
+  beside it (lines written whole against their reference answers, the share of words in the register's lexicon, the share of writes that
+  loop). A code in nats is one reading beside the writes and never the claim: no step is called progress, a gain or a level on a code alone.
+  Before a design on how the machine learns, the records that own the subject are read first, the October machine's among them (the tension
+  that founds a face, October 24; the staircase, October 25; the strands and the ring that closes, October 26; learning per contact, #405),
+  with the engine guide's table of the theory's laws against the engine
+  ([THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine)), which a design keeps current. Reason: on November 17 a
+  day of laps and a founding attempt were reported in nats (a held units digit from 2.33 to 1.60) while the writes they stood for had not
+  moved or had degraded, and he read them as no gain on what was already attained; the same day the lead rebuilt in fragments what the
+  records of October 24 to 26 had derived, having read none of them, and the survey of every era's writes (the units arrive in one order
+  and stop at fragments) had stood in the project for a day unread. The rules that a product step's output is shown whole (September 29)
+  and that the decoded output is read (November 3 and 8) stood and were kept only at a lap's end. Scope: every report, record, guess and
+  design on the machine's learning. The counts follow the survey's write-form ruler (`agent-inferred`)
+  ([the record](research/records/2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and

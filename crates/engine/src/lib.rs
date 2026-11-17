@@ -16,6 +16,7 @@ pub mod face;
 pub mod field;
 pub mod founding;
 pub mod census;
+pub mod closed;
 pub mod coupling;
 pub mod learner;
 pub mod level;

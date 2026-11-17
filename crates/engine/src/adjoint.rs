@@ -106,7 +106,7 @@ impl Constitution {
     /// tower of scales reads each level's ticks through it.
     #[allow(clippy::too_many_arguments)]
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>) -> Result<()> {
+    pub(crate) fn tick_return(&self, cell: &TickCell, dx: &mut [i64], g: &mut [i128], paces: &Paces, definite: &[bool], dm: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, closed_rows: Option<&[Vec<i128>]>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, n, f, heads, lanes) = (d.width, d.complex(), d.modes, d.contacts, d.heads, d.lanes);
         let m2 = 2 * m;
@@ -364,13 +364,19 @@ impl Constitution {
                 let dyi = &dyh[i * span..(i + 1) * span];
                 let kind = usize::from(cell.classes[h].listens(i));
                 let temper = self.temper(h, kind == 1)?;
-                let dp: Vec<i128> = row
+                let mut dp: Vec<i128> = row
                     .iter()
                     .map(|src| {
                         let j = src.j as usize;
                         (0..n).map(|l| { let decay = self.pair_decay(paces, h, l, i, j); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
                     })
                     .collect();
+                // [definition; the lead, November 17] The closed face's covector on this row's shares, where the face read the row ([`crate::closed`]).
+                if let Some(extra) = closed_rows.map(|c| &c[h * sites + i]).filter(|e| !e.is_empty()) {
+                    for (slot, &v) in dp.iter_mut().zip(extra) {
+                        *slot += v;
+                    }
+                }
                 let dpc: Vec<i128> = crowd
                     .iter()
                     .map(|c| {
@@ -619,10 +625,6 @@ impl Constitution {
         let sites = region.classes.len();
         let l = &self.layout;
         let reaches = self.reaches();
-        // [the lead, November 17] The closed characters' keyed pair product has no reverse yet, so no deposit reads a field that has it.
-        if d.closed > 0 && !self.closed_blind {
-            return refuse("a field with closed characters has no reverse yet (hnn-field-v14c is the host forward's; no lap trains from it)");
-        }
         if pass.ticks.len() != d.ticks {
             return refuse("a reverse reads a forward that held every tick");
         }
@@ -637,6 +639,9 @@ impl Constitution {
         // The face, its covector weighed as the region's state in the joint code (§16.23): `release(δz · m/K)` on the
         // covector's grain, to the nearest, half away from zero.
         let mut dx = vec![0i64; sites * dw];
+        // [the lead, November 17] The closed face's covectors on the last tick's rows, `[h][t]` a value a source ([`crate::closed`]).
+        let known = Self::known_classes(region, d.alphabet);
+        let mut closed_rows: Vec<Vec<i128>> = vec![Vec::new(); if d.closed > 0 { d.heads * sites } else { 0 }];
         {
             let (wm, wk) = region.weight();
             // A port's places take their coupling's covector (§16.24), every other open site its own place's.
@@ -652,13 +657,41 @@ impl Constitution {
                 if pass.skip.get(t).copied().unwrap_or(false) {
                     continue;
                 }
+                // [definition; the lead, November 17] Where the face is the closed face ([`crate::closed`]) the comparison returns through the mixture:
+                // the field's own covector scaled by the field's responsibility for the written class, each head's odds covector into the odds'
+                // rows (`δL_h += δz_h r̂ᵀ`, `δℓ_h += δz_h`) and through them into the chart's covector, and each head's covector on its last-tick
+                // row's shares, which the last tick's reverse adds to the row's own.
+                let mix = pass.mixes.get(t).and_then(Option::as_ref);
+                let mut dr_closed: Vec<i64> = Vec::new();
                 let dz = match &ported {
                     Some((start, rows)) if t >= *start => rows[t - start].clone(),
                     _ => {
-                        let mut dz = covector(face, region.classes[t]);
+                        let mut dz = covector(mix.and_then(|m| m.field.as_ref()).unwrap_or(face), region.classes[t]);
                         if wm != wk {
                             for v in dz.iter_mut() {
                                 *v = fit64(div_nearest(*v as i128 * wm as i128, wk as i128))?;
+                            }
+                        }
+                        if let Some(m) = mix {
+                            let last = pass.ticks.last().ok_or(TowerError::Refused("a mixture's reverse reads the last tick's rows"))?;
+                            let rows: Vec<&[Source]> = (0..d.heads).map(|h| last.rows[h * sites + t].as_slice()).collect();
+                            if let Some((rho, dzo, extra)) = self.closed_back(m, face, &rows, &known, region.classes[t], wm, wk)? {
+                                for v in dz.iter_mut() {
+                                    *v = fit64(release(*v as i128 * rho, crate::closed::CLOSED_BITS))?;
+                                }
+                                let rt = &pass.read[t * dw..(t + 1) * dw];
+                                for (h, &dzh) in dzo.iter().enumerate() {
+                                    g[l.closed_odds_bias + h] += dzh as i128;
+                                    for (i, &ri) in rt.iter().enumerate() {
+                                        g[l.closed_odds + h * dw + i] += dzh as i128 * ri as i128;
+                                    }
+                                }
+                                dr_closed = vec![0i64; dw];
+                                let odds = &self.theta[l.closed_odds..l.closed_odds + d.heads * dw];
+                                transposed(odds, crate::width::reach(odds), dw, &dzo, MATERIAL_BITS, &mut dr_closed)?;
+                                for (h, e) in extra.into_iter().enumerate() {
+                                    closed_rows[h * sites + t] = e;
+                                }
                             }
                         }
                         dz
@@ -703,6 +736,9 @@ impl Constitution {
                 let rt = &pass.read[t * dw..(t + 1) * dw];
                 let mut dr = vec![0i64; dw];
                 transposed(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &dy, MATERIAL_BITS, &mut dr)?;
+                for (slot, &v) in dr.iter_mut().zip(&dr_closed) {
+                    *slot = fit64(*slot as i128 + v as i128)?;
+                }
                 let back = lane_adjoint(rt, &pass.scale[t * lanes..(t + 1) * lanes], &dr)?;
                 dx[t * dw..(t + 1) * dw].copy_from_slice(&back);
                 if sharp.is_some() {
@@ -726,7 +762,7 @@ impl Constitution {
             }
             // The return after this tick: `dx` holds `λ^(k+1)` and becomes the output's `(1 + Γ) λ^(k+1)` ([`Constitution::junction_back`]).
             let joined = if cell.jg.is_empty() { None } else { Some(self.junction_back(cell, &mut dx)?) };
-            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut(), reach.as_deref_mut())?;
+            self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut(), reach.as_deref_mut(), Some(closed_rows.as_slice()).filter(|c| !c.is_empty() && k + 1 == pass.ticks.len()))?;
             // Its chart's covector into the state this tick began from, then what the next tick's return owed that state; both before a level's
             // return, which reads the state as the tick began from it.
             let next_owed = match joined {

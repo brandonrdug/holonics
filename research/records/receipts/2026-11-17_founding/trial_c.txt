@@ -1,0 +1,17 @@
+17:46:35
+TRIAL_HOST records=3923 sweeps=10 records_a_section=100 closed=0 threads=8
+TRIAL_DONE sections=400 ms=401983
+SWEEP 0 sections 40 nats_a_place 1.664
+SWEEP 1 sections 40 nats_a_place 1.4877
+SWEEP 2 sections 40 nats_a_place 1.4453
+SWEEP 3 sections 40 nats_a_place 1.4139
+SWEEP 4 sections 40 nats_a_place 1.405
+SWEEP 5 sections 40 nats_a_place 1.386
+SWEEP 6 sections 40 nats_a_place 1.3782
+SWEEP 7 sections 40 nats_a_place 1.3684
+SWEEP 8 sections 40 nats_a_place 1.3607
+SWEEP 9 sections 40 nats_a_place 1.339
+== control after its passes
+CODES half=held column=every places=5916 nats=1.2109;CODES half=held column=line_feed places=736 nats=0.0006;CODES half=held column=middle places=125 nats=1.9465;CODES half=held column=past places=3680 nats=1.2080;CODES half=held column=top places=639 nats=1.2547;CODES half=held column=units places=736 nats=2.2724;
+17:54:32
+RUN_EXIT 0 2026-11-17T17:54:32Z

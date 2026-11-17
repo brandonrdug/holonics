@@ -1,0 +1,16 @@
+17:07:07
+# lap94: exit 0 released 16:57:57
+MEASURE lap=lap94 rc=0 wall_s=3101.6 peak_rss_kib=856384
+STORE_PASS role=prefix sections=3000 stretches_read=80177976 ended=fal
+== loud 93
+code 0.5544 20.095 -0.025;web 0.9049 20.206 -0.083;science 0.7595 20.297 -0.148;books 0.8596 20.419 -0.202;wikidata 1.0632 20.165 +0.267;arithmetic 1.6017 20.669 -0.279;words 0.7627 20.200 -0.308;all 0.8854 20.268 +0.001;
+== loud 94
+code 0.5492 20.094 -0.014;web 0.9004 20.211 -0.086;science 0.7575 20.301 -0.158;books 0.8574 20.422 -0.193;wikidata 1.0626 20.150 +0.257;arithmetic 1.5737 20.710 -0.259;words 0.7652 20.209 -0.314;all 0.8811 20.273 -0.001;
+letter 0.614 0.4476;digit 0.101 1.9793;space 0.185 0.2272;mark 0.090 2.7816;
+WRITES_BY_PLACE  met 128 0.969 0.758 0.164 0.117 0.031 0.148 0.000
+world read share 0.9
+WRITE bolts = 8\nslive = 20 take * (white)s - 0) = 2\njoicteds_p21s_pen = 4.0\nbound_leg = f_ter_ven_(white)s) = geve_live\ntake * 5 * (ound_pen_s..r) = g)\n* wf live_bovels_add*givend\nresert = 1120
+90 + 81 =  | 135\n(69 - 57) -  | 171\n
+58 - 43 =  | 63\n(8 * 22) * 7  | 15\n
+36 * 0 =  | 132\n32440 * 0 =  | 0\n
+4 * 317 =  | 1635\n8 + 84 = 40 | 1268\n
