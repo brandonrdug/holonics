@@ -1,0 +1,24 @@
+# G-B1's arm: the forward and a backward reader in alternate sections from the forward run's pass-15 state, 3 passes; the run's reads.
+# (held, unread, fit: the next place on its left; bheld, bunread: the place before its known right.)
+TRIAL_PASSES records=897202 passes=3 records_a_section=400 closed=0 leak=none threads=24
+READ pass=0 bheld=7574196
+READ pass=0 bunread=7584994
+READ pass=0 fit=1396990
+READ pass=0 held=1527158
+READ pass=0 unread=1569767
+READ pass=1 bheld=1806790
+READ pass=1 bunread=1916063
+READ pass=1 fit=1436505
+READ pass=1 held=1530107
+READ pass=1 unread=1587837
+READ pass=2 bheld=1737400
+READ pass=2 bunread=1847267
+READ pass=2 fit=1441869
+READ pass=2 held=1532847
+READ pass=2 unread=1598414
+READ pass=3 bheld=1701012
+READ pass=3 bunread=1811206
+READ pass=3 fit=1443468
+READ pass=3 held=1539257
+READ pass=3 unread=1607179
+TRIAL_DONE sections=6732 ms=1531427

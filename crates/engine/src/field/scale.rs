@@ -197,6 +197,14 @@ pub fn level_cut(news: &[i64], section: i64, harmonics: usize, pi: i128) -> Resu
     Ok(LevelCut { anchors, epoch, harmonics: out, tau })
 }
 
+/// What [`Constitution::level_trace`] reads of a region's level.
+#[derive(Clone, Debug)]
+pub struct LevelTrace {
+    pub news: Vec<i64>,
+    pub anchors: Vec<usize>,
+    pub coarse_read: Vec<i32>,
+}
+
 /// What a level's forward keeps for its reverse.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct ScalePass {
@@ -352,6 +360,19 @@ impl Constitution {
         let mut out = self.clone();
         out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue }));
         Ok((out, at))
+    }
+
+    /// [measurement; the lead, November 17, the record of the dwell §19] **A region's level as its forward left it**, for a ruler on the
+    /// host: each place's news ([`Constitution::level_news`]), the epochs' anchors, and each epoch's read after the level's last tick
+    /// (`[j][D₁]` on `2^(−16)`, what the prolongation hands back to the epoch's places). `None` on a field without a level. A reading:
+    /// the state is the same with it.
+    pub fn level_trace(&self, region: &Region) -> Result<Option<LevelTrace>> {
+        if self.scale.is_none() {
+            return Ok(None);
+        }
+        let news = self.level_news(region)?;
+        let pass = self.pass(region, true)?;
+        Ok(pass.tower.map(|t| LevelTrace { news, anchors: t.cut.anchors, coarse_read: t.coarse_read }))
     }
 
     /// The level's forward at the split: the region's cut from its `news`, `x` restricted to the epochs by the news phase, the level's

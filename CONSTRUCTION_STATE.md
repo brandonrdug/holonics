@@ -18,35 +18,36 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 17, night): Athena takes held sums whole when she dwells on one world, and the line never dwelt
+## Where the work stands (November 17, late): the units are cut and the level holds almost nothing of them
 
-The plain engine, no part added, from lap 94's end state, dwelt on 3,923 short sums for 150 passes (6,000 sections, fourteen minutes of
-the card) and then wrote 86 of 96 held sums whole, lengths included, where lap 94's state wrote 2
-([the record](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)).
-Nothing moves for about 1,000 sections; then a strictly held sum's last digit falls from 2.29 nats to under 0.1 inside the next 2,000.
-An independent read by Codex on its own squares agrees. The trials of the same morning stopped at ten passes, short of the transition,
-and everything concluded from them is withdrawn there: that stepping cannot take a law that lives in a product, that a founding part was
-needed, and the reading of the October machine at three passes. The guide carries the rule (a learner's null is held to a length).
+[The record of the day](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
+carries all of this with its receipts and scored guesses.
 
-A stream in which no sum is met twice founds the law as fast (88 of 96), sections of sums and of text alternating found it on the same
-schedule while the text falls as if alone (87 of 96, one state holding both), and 25 sums among 75 text rows in every section found it
-at about the same count of sums met. So what a law needs is a count, about 160 to 200 thousand records with their operands known and
-their answer open, in any arrangement tried.
+**A probe, closed.** The plain engine takes a law by its own descent once it has met about 160 to 200 thousand well-formed records
+of it, in any arrangement tried: 86 of 96 held short sums written whole (lap 94's state wrote 2), 88 with no sum met twice, 87 with text
+learned beside them in alternate sections. Shown `x plus y equals`, the state that had the sums took it about eight times sooner than
+the state that had nothing. The trials of the same morning stopped at ten passes, short of the transition, and everything concluded
+from them is withdrawn (the guide: a learner's null is held to a length). The sums stay a probe of what she learns on simple examples
+and are not a campaign (Brandon, 20:27Z).
 
-The line's own failure is narrowed, not explained. Its pass read 701 MB once through, every section a mix of seven slices, and the
-arithmetic it took holds 1.6 million such short sums, yet a held units digit stood at 2.33 nats. Unread there: the sums were a hundredth
-of a section's places, and the line's trainer opens stretches so that an answer's place is often open with its operands open too. The
-same holds for its text (most open places stand beyond other open places), and lap 94's state codes the next place on its whole left
-context at 2.05 nats.
+**Text.** Compared on each place as the boundary of what is known, her writing on fifty simple books went from 38% to 76% of words in
+the books' lexicon in two hours, and the same books under the line's kind of comparison reach 56% (a control, its guess held). Then it
+flattened, and the run was stopped at pass 16 on its own number.
 
-Plain text under the half-open dwell has no transition and still writes almost-words at pass 400 (the record's §9).
+**What limits her, on the passage's own clock** (the record's §17 and §19). Nine tenths of her loss stands at places that carry under
+one nat, the inside of a unit; her span is about four nats of passage, half a word; and no unit reaches a place whole at any period.
+The machine's own level cuts its epochs at landmarks of her news, about a word's worth each (8.6 places, 9.5 nats; 36% of them led by a
+word's first letter), and the level's state of an epoch holds under a tenth of any of its symbols, 17% of its identity and nothing of
+the epoch before. The level has no comparison at its own grain: nothing asks it to hold a unit or to read the next. She opens units and
+does not close them.
 
-Standing: lap 94's state is frozen, the line is stopped, and no part is added to that state. The sums stay a probe of what she learns on
-simple examples and are not a campaign (Brandon, November 17 20:27Z). The work is text and the pass: a run of the night compares every
-place on its whole left context over fifty simple books, with a panel written left to right after each pass (G-N1); then the pass's own
-navigation (stay in a world or leave, read from the learner's own progress there, against the quota law on a matched replay); and, if
-almost-words remain, a law's own entries and comparison. Every report opens with the panel, whole. The store's leak is a state of the
-learner (`Learner::leak`), absent from every standing state.
+**Standing.** Lap 94's state is frozen and the line is stopped. Nothing is being built: the engine change announced in the evening (a
+one-sided chart, 48 times cheaper) is not started, since it is an efficiency bet on a reader that does not yet hold a unit, and three
+rulers of units as free rows were read as verdicts on their construction (§18). Owed first, as reading: the rest of the level's records
+(the landmarks' ruler of November 13, the return on the clock of news of November 15, the news clock of October 27), then what a
+comparison at a level's own grain is on the objects (an epoch's closure, and the next epoch read from the epochs before), written with
+its acceptance on the passage's clock before any part. Readings of text are stated in news and in founded grains, never in letters or
+windows of bytes (Brandon, 23:17Z). Every report opens with the panel, whole.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

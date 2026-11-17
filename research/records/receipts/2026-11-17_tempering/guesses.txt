@@ -296,3 +296,9 @@ backward face (its right, from the draft) over the symbol's own frequency, the f
   What it decides: sweeps that leave the draft's level say two soft readers multiply to a soft reader and binding is still the limit; a
   clear rise says the backward pass is the tempering the forward reader lacked, and the engine's two-sided parts become its two one-sided
   halves.
+
+Scored (2026-11-17T23:37:16Z), G-B1's arm, started on reflex and read for its two codes only (forward_backward.txt): the backward reader's held code
+(a place on what stands to its right) 7.574 nats before, 1.807, 1.737 and 1.701 after passes 1 to 3 (guessed 1.55 to 1.70: at its
+edge); the forward reader's held code 1.527 before and 1.539 after (held: under 1.56). The sweep writer is not built and that clause is
+not run: Brandon's word of 23:08 UTC was that "analogize" asked for no component, and the backward trace (the record's sections 16 to
+19) gave no reason for one.

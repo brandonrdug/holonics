@@ -663,3 +663,55 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     println!("NEXT_WRITE_DONE rows={} run={run} window={} ms={}", rows.len(), window.map_or("-".to_string(), |n| n.to_string()), started.elapsed().as_millis());
     Ok(())
 }
+
+/// [measurement; the lead, November 17, the record of the dwell §19] `read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS
+/// FORMS_SHA STATE STATE_SHA OUT`: **a region's level, written out for a ruler**. Each row of `FORMS` (`label<TAB>prompt<TAB>run`) is
+/// one region, its prompt known and its run open. `OUT/level.tsv` takes a line a region: its label, its sites, the epochs' anchors and
+/// each place's news on the code's grain (`2^(−20)` bits); `OUT/coarse.i32` takes each epoch's read after the level's last tick, epoch
+/// after epoch in the regions' order (`D₁` entries on `2^(−16)`); `OUT/dims.tsv` names `D₁`. On the host's threads; the state is read,
+/// never written.
+pub fn read_level(args: &[String]) -> Result<()> {
+    if args.len() != 12 {
+        return Err("read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-level")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[11]);
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut work: Vec<(String, OwnedRegion)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        if w.len() < 3 {
+            return Err("a level row that is not label, prompt and run".into());
+        }
+        let (p, r) = (codec.encode(unescape(w[1]).as_bytes())?, codec.encode(unescape(w[2]).as_bytes())?);
+        let mut classes = p.clone();
+        classes.extend_from_slice(&r);
+        let mut open = vec![false; classes.len()];
+        open[p.len()..].fill(true);
+        work.push((w[0].to_string(), OwnedRegion::plain(classes, open)));
+    }
+    let traces: Vec<_> = work.par_iter().map(|(_, region)| learner.field.level_trace(&view_of(region)).map_err(|e| e.to_string())).collect();
+    std::fs::create_dir(out)?;
+    let (mut lines, mut coarse) = (String::new(), Vec::<u8>::new());
+    let mut width = 0usize;
+    for ((label, region), trace) in work.iter().zip(traces) {
+        let t = trace?.ok_or("a field without a level")?;
+        width = t.coarse_read.len() / t.anchors.len().max(1);
+        let list = |v: &mut dyn Iterator<Item = String>| v.collect::<Vec<_>>().join(",");
+        lines.push_str(&format!("{label}\t{}\t{}\t{}\n", region.classes.len(), list(&mut t.anchors.iter().map(usize::to_string)), list(&mut t.news.iter().map(i64::to_string))));
+        for v in &t.coarse_read {
+            coarse.extend_from_slice(&v.to_le_bytes());
+        }
+    }
+    write_new(&out.join("level.tsv"), lines.as_bytes())?;
+    write_new(&out.join("coarse.i32"), &coarse)?;
+    write_new(&out.join("dims.tsv"), format!("coarse\t{width}\n").as_bytes())?;
+    println!("LEVEL_DONE regions={} ms={}", work.len(), started.elapsed().as_millis());
+    Ok(())
+}

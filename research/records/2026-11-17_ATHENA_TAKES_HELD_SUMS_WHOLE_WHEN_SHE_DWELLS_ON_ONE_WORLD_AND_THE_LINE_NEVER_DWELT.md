@@ -463,3 +463,37 @@ reading of this record has looked at it. Its records of November 13 to 15 are re
 as §16 and §17 traced the byte path: where her epochs fall, what an epoch holds of itself, and whether anything crosses from one epoch
 to the next.
 
+## 19. Her own level, traced: the units are cut, and the level holds almost nothing of them
+
+The machine has a coarse grain of its own, built on November 13 from the record that owns it
+([the level's design](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md),
+§4.2 to §4.7): a level's sites are the landmarks of the news below it (a place no larger news stands within a section of, the section
+the flat face's code, 5.50 nats here); a place's news is read at its cavity face; an epoch has no row, its face is its moment on the
+news phase (six harmonics of its places' reads) restricted to a level state 64 wide, which ticks on its own clock and hands harmonics
+back to the epoch's places. It stands in lap 94's state and in the night's. §16 to §18 never looked at it.
+
+`Constitution::level_trace` and `athena host complete-language read-level` write it out, and `tools/level_ruler.py` reads it
+(`level_trace.txt`; the night run's pass-15 state, the 5,164 rows of §16; 32,584 epochs):
+
+- **Where her epochs fall.** A place's news at its cavity face is 1.15 nats in the mean. A whole epoch is 8.6 places and 9.5 nats on
+  average (median 7 places), about a word of this text in news. Its leading place is the first letter of a word in 36% of epochs,
+  inside a word in 55%, a space or a mark in 9%. Her landmarks stand where she is surprised, and §17 read that she is surprised inside
+  units.
+- **What the level's state of an epoch holds**, read by least squares on half the regions, in thousandths: the epoch's first symbol
+  68, its second 70, its third 47, its last 102, its size in places 164, the epoch as one identity 171; the epoch before it as one
+  identity 24; the symbol that leads the next epoch 43.
+
+So the units are cut by the theory's law and at about a word's news, and the level carries almost nothing of them: an epoch is not
+held as a symbol, the epoch before it does not cross, and the level says nothing of what follows. With §17: she loses inside units
+because nothing closes one, and the level that would hold a unit and give its interior back is nearly empty.
+
+The cause is in the source (`field/scale.rs`): the level has no comparison at its own grain. Its state is trained only through the
+prolongation's effect on the byte faces, several operands downstream, and nothing asks it to hold its epoch or to read the next. The
+objects give every receiver its own receipt, and #405 names learning per contact; the level is a receiver without one. This is §4's
+fourth fault of the step back, found at the one place where the theory's grain was built.
+
+**Where this stops.** No part follows from tonight. What is owed first is reading: the rest of the level's records (the landmarks'
+ruler, the return on the clock of news of November 15, the news clock of October 27), then what a comparison at a level's own grain
+is on the objects: the epoch's closure (its state gives its interior back, which is what would take the news out of a unit's inside)
+and the next epoch read from the epochs before. It is written before it is built, with its acceptance on the passage's clock.
+

@@ -1,0 +1,16 @@
+# The engine's own level traced (tools/level_ruler.py on a read-level dump): the night run's pass-15 state, 5,164 held and fitted rows
+# of plain octets (48 known places, the next place open); each region's epochs' anchors, each place's news at its cavity face, each
+# epoch's state after the level's last tick (64 entries).
+LEVEL regions=5164 epochs=32584; a place's news at its cavity face 1.146 nats; a whole epoch is 8.56 places and 9.48 nats on average (median 7 places); the section is 5.50 nats
+LEVEL an epoch's leading place is: inside a word 55%, the first letter of a word 36%, a space or mark 9%
+LEVEL whole epochs by size in places: 1:7% 2:8% 3:9% 4:8% 5:7% 6:7% 7:7% 8:6% 9:5% 10:5% 11:5% 12+:27%
+LEVEL present in the level's state of an epoch (thousandths, read on half the regions):
+LEVEL   the epoch's first symbol                     68   (epochs read 13718)
+LEVEL   its second symbol                            70   (epochs read 12686)
+LEVEL   its third symbol                             47   (epochs read 11668)
+LEVEL   its last symbol                             102   (epochs read 13718)
+LEVEL   its size in places                          164   (epochs read 13718)
+LEVEL   the epoch as one identity                   171   (epochs read 13718)
+LEVEL   the epoch before it, as one identity         24   (epochs read 11136)
+LEVEL   the last symbol of the epoch before it       78   (epochs read 11136)
+LEVEL   the symbol that leads the next epoch         43   (epochs read 13718)

@@ -81,6 +81,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("hold-families") {
         return athena::store::hold_families(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-level") {
+        return athena::ruler::tension::read_level(&rest[1..]);
+    }
     // [the lead, November 17] A ruler's writer of one place a read, on the host's threads beside the card's runs.
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-next") {
         return athena::ruler::tension::write_next(&rest[1..], &mut holonics_engine::realization::Host);
