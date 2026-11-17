@@ -119,6 +119,11 @@ plain text. The control stays flat, so the fall is the region's consistent use: 
 reads what followed a like context, under names no row was trained on. The guess said flat and missed. A doubled byte's second copy
 codes no better than its first: the place's twin beside it is not read as its twin.
 
+The tree states the renamed frame as a law already. THE_MACHINE's guard 9 asks that the located code length not see the labels,
+`L(field; π∘x) = L(field; x)` for every permutation of an alphabet, and the October machine's located route was tested to it. The
+row above is that law's first measurement on the engine that trains: 2.0 to 2.7 nats a place short of it, closing with the region's
+length.
+
 ### 3.7 Lap 78, the first on the redrawn slice (`oracle_short78.txt`, the chain's held read)
 
 Short sums read alone: the units digit 2.359 nats (2.365 at lap 77's mean), the top digit 1.389 (1.545), the pair present in the
