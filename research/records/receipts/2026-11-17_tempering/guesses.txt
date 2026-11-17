@@ -20,3 +20,50 @@ Scored (2026-11-17T18:10:03Z), G-T0 (t0.txt, t0_writes_trained.txt, t0_writes_he
   Reading: a rote regime exists and is slow. After 500 passes the engine has half-taken 200 records by rote, the held units digit has
   risen, and nothing in the writes carries to a sum it has not met. Stepping on the comparison binds a record to its answer and locates
   no law.
+
+G-T1 (2026-11-17T18:13:13Z). Lap 1 of the lap law on the small world: lap 94's end state founded with the closed face (keys closed by the ruler,
+each head's odds at its one-odds fit), then ten passes over the fitting half's 3,923 sums in which only the blocks the founding reaches
+are moved (the lock's words q and probe with their biases, the lock temperatures, the odds, and the readout: read, read_bias, lift_bias)
+and every other family is held (athena host complete-language hold-families). The foil lap: the same passes and the same held families
+from lap 94's state with no founding. Beside them stands the earlier arm in which everything was stepped (0.860 nats at held units,
+11 of 96 written whole).
+  Held units digit, mixed openings: 1.0 nats or under with the founding; 2.2 or more for the foil.
+  Held prompts written whole: 8 or more of 96 with the founding; 3 or fewer for the foil.
+  A text table (store windows, 5 slices, one place opened at a time; the code alone is read): the founded lap's state within 0.05 nats a
+  place of lap 94's; the everything-stepped arm 0.1 or more above lap 94's (ten passes over one table step the text's material away).
+What a miss would say: a founded lap that reads the units digit well above the everything-stepped arm says the held values and returns
+were carrying part of that arm's gain, and the lap law's bridge then has to reach them; text standing as high under the founded lap as
+under the stepped arm says holding families does not protect what the lock's move re-encodes, and the closed face then needs a lock of
+its own.
+
+Scored (2026-11-17T18:42:15Z), G-T1 (t1.txt, t1_writes_founded_bridge_only.txt, t1_writes_foil.txt; held half, mixed openings; the text table's five
+text slices together, 9,000 places, nats a place; the run took 27 minutes against about 12 projected, the four text reads being the excess):
+                              held units   top     middle   line feed   whole of 96   last digit of 96   text table
+  lap 94's state                2.674     1.850    2.265     0.355          2              9             1.1806
+  founded, bridge only          1.642     1.741    2.230     0.348          4             21             1.1911
+  foil lap, same held families  2.354     1.700    2.115     0.076          3             13             1.1902
+  founded, everything stepped   0.860     1.255    1.525     0.039         11             38             1.2237
+  Held units with the founding: missed (1.0 or under was guessed, 1.642 read). The foil: held (2.354). Written whole with the founding:
+  missed (8 or more guessed, 4 read). Text: the founded lap stands 0.011 above lap 94's (held, within 0.05); the everything-stepped arm
+  0.043 above (missed: 0.1 or more was guessed).
+  Reading: the founding carries the units digit with only its bridge moved (1.64 against the foil's 2.35), at a quarter of the stepped
+  arm's cost to text, and it reaches half of that arm's fall: the values and returns that arm also moved carried the rest, and the bridge's
+  own passes had not reached their fixed point (the pass's code was still falling at the tenth: 1.71, 1.59, …, 1.43, 1.41 nats a place).
+  The founded lap's writes are no cleaner than the foil's as products.
+
+G-O1 (2026-11-17T18:46:35Z). The October machine founded whole and never stepped: the archived state PRA_STATE of October 26 (the unit pair tower with
+the located strands and the comparison opened in its contacts, as founded, commit 7e7d89842) takes the same three passes over the same
+GSM8K training partition as the October run, with every family held but the tower's readout and its bias (the lap law's bridge alone;
+the October tree rebuilt with that hold for a unit tower), and is read as the October run was (read-unit-tower-written on dev.txt,
+tools/gsm8k/written_rules.py). The October run's trained PRA, everything stepped: 18 of 876 never-met calculations at the equals, 286 of
+2,448 of all; an 8-gram 34 of 876; the opened comparison's share 250 thousandths at founding and zero after.
+  Never-met calculations at the equals: 40 to 120 of 876 (above the 8-gram, the October acceptance), with the comparison's share where
+  it was founded.
+  What a miss would say: at or under 34, the tower's readout, linear in the state, does not read the comparison's tenth on the ring the
+  result's length selects (a product of which ring and its face), and the read of the comparison has itself to be founded from its
+  tension; the founding standing unread is then the result, and the stepped passes' erasure of it is not what kept the sums from being
+  written.
+
+Correction (2026-11-17T18:55Z, on Codex's audit of the same day): the openings these guesses call "mixed" or "a keyed half" took bit 17 of
+a bare FNV-1a fold, which gives adjacent places nearly the same bit: 97.8% of the regions opened one place or the whole run. Every read
+above stands as a read under that draw; the draw is repaired in the source (keyed_bit) for later runs.

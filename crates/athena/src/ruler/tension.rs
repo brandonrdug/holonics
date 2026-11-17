@@ -44,7 +44,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
     }
     let (mut all, mut carry, mut shares_alone) = (false, None, false);
     // [measurement; the lead, November 17] With `mixed`, each named place is opened with a keyed half of its run's other places open beside it
-    // (a place joins where the low bit of an FNV-1a hash of `label:place:other` is one), so a place is read as a release meets it, some of
+    // (a place joins where [`keyed_bit`] of `label:place:other` is odd), so a place is read as a release meets it, some of
     // its run written and some not; `all` then writes every open site of the region as an open row.
     let mut mixed = false;
     for word in &args[12..] {
@@ -96,8 +96,7 @@ pub fn read_tension(args: &[String]) -> Result<()> {
             open[p.len() + j] = true;
             if mixed {
                 for other in (0..r.len()).filter(|&o| o != j) {
-                    let hash = format!("{label}:{j}:{other}").bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ u64::from(b)).wrapping_mul(0x100000001b3));
-                    open[p.len() + other] = (hash >> 17) & 1 == 1;
+                    open[p.len() + other] = keyed_bit(&format!("{label}:{j}:{other}")) & 1 == 1;
                 }
             }
             work.push((label.to_string(), j, p.len() + j, OwnedRegion::plain(classes.clone(), open)));
@@ -337,8 +336,8 @@ pub fn carry_of(milli: &str) -> Result<i64> {
 /// [measurement; the lead, November 17, the founding records and the record of the step back] `try-passes UNITS UNITS_SHA KEYS KEYS_SHA CODEC
 /// CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA PASSES RECORDS OUT`: **passes over a small table by the learner's own section step**: the
 /// state's learner takes `PASSES` passes over a forms table (`label<TAB>prompt<TAB>run`), `RECORDS` records a section, each record a region
-/// with a keyed half of its run's places open (a place is open where bit 17 of an FNV-1a hash of `label:pass:place` is one, and one place
-/// where none is), on the realization it is called through (the card under `train`, the host's threads under `host`), and the learner is
+/// with a keyed half of its run's places open (a place is open where [`keyed_bit`] of `label:pass:place` is odd, and one place where none
+/// is), on the realization it is called through (the card under `train`, the host's threads under `host`), and the learner is
 /// written to `OUT`. One line a pass: its sections, its sites and its code in nats a place.
 ///
 /// Why: the tempering study (the record of the step back, §6) reads what many passes over little do to the machine, law by law, on tables
@@ -384,12 +383,12 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             let regions: Vec<OwnedRegion> = chunk
                 .iter()
                 .map(|(label, p, r)| {
-                    let bit = |j: usize| format!("{label}:{sweep}:{j}").bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ u64::from(b)).wrapping_mul(0x100000001b3));
+                    let bit = |j: usize| keyed_bit(&format!("{label}:{sweep}:{j}"));
                     let mut classes = p.clone();
                     classes.extend_from_slice(r);
                     let mut open = vec![false; classes.len()];
                     for j in 0..r.len() {
-                        open[p.len() + j] = (bit(j) >> 17) & 1 == 1;
+                        open[p.len() + j] = bit(j) & 1 == 1;
                     }
                     if !open.iter().any(|&o| o) {
                         open[p.len() + (bit(r.len()) % r.len() as u64) as usize] = true;
@@ -410,4 +409,16 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     write_new(out, learner.to_text().as_bytes())?;
     println!("TRIAL_DONE sections={section} ms={}", started.elapsed().as_millis());
     Ok(())
+}
+
+/// [measurement; the lead, November 17, corrected on Codex's audit of that day] **A keyed draw for a ruler's openings**: the FNV-1a fold of
+/// a key's bytes, finished by a 64-bit mixer (the SplitMix64 finalizer). Why the finish: the openings of the first trials took bit 17 of
+/// the bare fold, and a fold whose last multiplication takes adjacent ASCII digits gives adjacent places nearly the same bit, so 97.8% of
+/// the regions opened one place or the whole run where a half was meant (19,024 whole, 19,347 one place and 859 between, of 39,230; the
+/// runs of `receipts/2026-11-17_founding` and `2026-11-17_tempering` were made with that draw and are read as such).
+fn keyed_bit(key: &str) -> u64 {
+    let mut x = key.bytes().fold(0xcbf29ce484222325u64, |h, b| (h ^ u64::from(b)).wrapping_mul(0x100000001b3));
+    x = (x ^ (x >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
+    x = (x ^ (x >> 27)).wrapping_mul(0x94d049bb133111eb);
+    x ^ (x >> 31)
 }

@@ -116,3 +116,7 @@ G-TC1: missed, far past its guess (a fall of 0.05 to 0.4 nats at units was guess
 G-TC2: held. The control's units digit stands at 2.272 (2.0 or more guessed), its line feed under 0.1, its places past the line feed at
   1.208 against the trial's 1.207. The units digit and the middle column fall with the closed face alone; the top column, the line feed
   and the places past it fall alike in both.
+
+Correction (2026-11-17T18:55Z, on Codex's audit of the same day): the openings these guesses call "mixed" or "a keyed half" took bit 17 of
+a bare FNV-1a fold, which gives adjacent places nearly the same bit: 97.8% of the regions opened one place or the whole run. Every read
+above stands as a read under that draw; the draw is repaired in the source (keyed_bit) for later runs.

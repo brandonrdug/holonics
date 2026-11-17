@@ -1,0 +1,17 @@
+18:13:37
+FIELD_COMMAND hold-families ROOT/.local/wt/lead/.local/run/founding/STATE.mix0 7b85e10bdc752f01ab121b0c698eeef9a36b8169cbf191052190043e40770a87 ROOT/.loca
+HOLD_FAMILIES moving=q,q_bias,probe,probe_bias,temper,closed_odds,closed_odds_bias,read,read_bias,lift_bias entries_moving=33792 entries_held=373921 rate_bits=12
+FIELD_COMMAND hold-families ROOT/.local/wt/depth-sweep/.local/run/mark/lane/line/lap94/STATE.3000 5782cffb172487d277c16b3742c318c6e1a9263683dc6e044ace3544508ab324 /home/b/Worksp
+HOLD_FAMILIES moving=q,q_bias,probe,probe_bias,temper,read,read_bias,lift_bias entries_moving=33276 entries_held=369529 rate_bits=12
+# foil lap (card): TRIAL_DONE sections=400 ms=25734; passes: TRIAL_PASSES records=3923 passes=10 records_a_section=100 closed=0 threads=24 1715168 1594270 1578140 1554561 1547563 1532431 1527963 1512330 1514350 1497354 
+# founded lap (host): TRIAL_DONE sections=400 ms=378656; passes: TRIAL_PASSES records=3923 passes=10 records_a_section=100 closed=9 threads=8 1711818 1592173 1574311 1549245 1537512 1509714 1479345 1433469 1430244 1409783 
+== t1 held
+held every nats=1.2633;held line_feed nats=0.3483;held middle nats=2.2297;held past nats=1.2547;held top nats=1.7410;held units nats=1.6421;
+== t1f held
+held every nats=1.3083;held line_feed nats=0.0755;held middle nats=2.1149;held past nats=1.2503;held top nats=1.6996;held units nats=2.3543;
+TEXT base arithmetic=1.0953 books=1.2012 code=1.1463 science=1.1051 text_all=1.1806 web=1.0373 wikidata=1.8682 words=0.6445
+TEXT trial_a arithmetic=1.4354 books=1.2630 code=1.1686 science=1.1696 text_all=1.2237 web=1.0717 wikidata=1.9561 words=0.6857
+TEXT t1 arithmetic=1.3026 books=1.2088 code=1.1549 science=1.1165 text_all=1.1911 web=1.0477 wikidata=1.8909 words=0.6573
+TEXT t1f arithmetic=1.2705 books=1.2105 code=1.1566 science=1.1125 text_all=1.1902 web=1.0459 wikidata=1.8827 words=0.6567
+18:40:56
+RUN_EXIT 0 2026-11-17T18:40:56Z
