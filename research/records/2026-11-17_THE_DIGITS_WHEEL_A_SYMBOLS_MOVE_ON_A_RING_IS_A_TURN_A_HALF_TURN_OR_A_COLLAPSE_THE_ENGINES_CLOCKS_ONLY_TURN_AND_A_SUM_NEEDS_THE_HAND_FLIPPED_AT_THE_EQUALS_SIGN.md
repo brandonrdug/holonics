@@ -82,7 +82,7 @@ five is a law with an owner in October's record and, for the hand and the harmon
 port deliberately, one law at a time, never wholesale, and with October's own two failures in front: its ring dephased under the
 tower's pass, and it did not carry from the arithmetic terrain to word problems' text.
 
-**What October's road cost, and where it stopped** (read at 04:35 UTC from the same digest; the figures are the tower's record's and
+**What October's road cost, and where it stopped** (read at 04:30 UTC from the same digest; the figures are the tower's record's and
 the records of October 26 to 31, cited there by line). This is the part a design must not repeat.
 
 - The 445 of 495 were written on the arithmetic terrain, by rings founded at cells a received landmark marked (a mark of where to
