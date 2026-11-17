@@ -1,0 +1,46 @@
+tick 0 blocks: feed space | + | 0 1 2 3 4 5 6 7 8 | 0 1 2 3 4 5 6 7 8 9 | 1 2 3 4 5 6 7 8 9 | =
+   largest block's share of the menu 0.072
+   span modulus=2.556 in_one=0.762 in_two=0.898 flat=0.972 j=4 a_j=0.992 pct=1.000 support=10 keys=0.0 4.2 7.6 1.8 5.8 0.1 3.6 7.7 1.8 5.8
+   span modulus=2.477 in_one=0.938 in_two=0.958 flat=0.973 j=5 a_j=0.997 pct=0.987 support=10 keys=0.0 4.9 0.2 5.1 0.2 5.0 0.1 5.0 0.2 4.9
+   span modulus=1.751 in_one=0.849 in_two=0.961 flat=0.983 j=9 a_j=0.963 pct=1.000 support=9 keys=0.0 7.6 7.5 5.8 4.9 4.3 3.6 2.5 1.7 0.9
+   span modulus=1.343 in_one=0.745 in_two=0.871 flat=0.971 j=8 a_j=0.847 pct=1.000 support=6 keys=0.0 8.6 7.7 6.6 1.7 0.5 8.8 7.3 5.7 1.7
+   span modulus=1.122 in_one=0.765 in_two=0.878 flat=0.966 j=7 a_j=0.916 pct=1.000 support=9 keys=0.0 7.6 3.5 2.4 8.4 5.5 2.9 8.4 7.5 3.5
+   span modulus=0.895 in_one=0.773 in_two=0.864 flat=0.982 j=1 a_j=0.657 pct=0.869 support=7 keys=0.0 3.6 6.4 8.3 8.5 0.5 0.9 3.0 3.7 3.5
+   span modulus=0.594 in_one=0.375 in_two=0.635 flat=0.984 j=4 a_j=0.482 pct=0.176 support=8 keys=0.0 5.8 2.1 7.6 7.7 4.1 6.4 0.3 4.8 4.9
+   span modulus=0.456 in_one=0.335 in_two=0.568 flat=0.975 j=1 a_j=0.840 pct=0.993 support=8 keys=10.0 1.2 4.4 5.7 5.6 5.2 6.2 8.7 9.5 9.8
+   span modulus=0.094 in_one=0.474 in_two=0.805 flat=0.987 j=1 a_j=0.557 pct=0.538 support=8 keys=0.0 5.0 5.3 8.2 7.6 5.2 8.4 0.1 3.3 2.7
+tick 1 blocks: feed space | feed space + | space + | 0 1 2 3 4 5 6 7 8 9 | =
+   largest block's share of the menu 0.134
+   span modulus=1.908 in_one=0.625 in_two=0.939 flat=0.989 j=6 a_j=0.995 pct=1.000 support=9 keys=0.0 5.6 1.7 7.8 3.9 9.9 6.0 2.2 7.8 3.8
+   span modulus=1.877 in_one=0.738 in_two=0.857 flat=0.991 j=2 a_j=0.964 pct=1.000 support=8 keys=0.0 1.2 2.9 5.5 7.5 8.6 1.8 4.0 5.6 7.3
+   span modulus=1.876 in_one=0.959 in_two=0.974 flat=0.983 j=5 a_j=0.971 pct=1.000 support=10 keys=0.0 5.3 9.9 5.8 9.7 5.4 9.8 5.3 9.5 5.5
+   span modulus=1.500 in_one=0.704 in_two=0.954 flat=0.967 j=9 a_j=0.966 pct=1.000 support=9 keys=0.0 8.4 7.9 5.8 4.8 4.1 3.6 2.8 1.9 0.7
+   span modulus=1.221 in_one=0.628 in_two=0.808 flat=0.958 j=8 a_j=0.595 pct=0.681 support=8 keys=0.0 9.9 6.1 5.1 3.5 2.0 1.5 6.8 7.0 8.8
+   span modulus=0.986 in_one=0.613 in_two=0.906 flat=0.973 j=3 a_j=0.978 pct=1.000 support=9 keys=0.0 3.0 5.2 8.7 1.2 4.6 7.6 0.5 4.2 6.3
+   span modulus=0.782 in_one=0.706 in_two=0.805 flat=0.978 j=9 a_j=0.664 pct=0.883 support=9 keys=0.0 5.1 6.0 6.8 5.2 4.6 0.3 0.8 1.9 0.5
+   span modulus=0.225 in_one=0.420 in_two=0.689 flat=0.966 j=3 a_j=0.697 pct=0.940 support=7 keys=0.0 1.7 4.9 7.3 1.0 2.0 8.1 8.9 6.5 5.7
+   span modulus=0.198 in_one=0.509 in_two=0.675 flat=0.944 j=4 a_j=0.560 pct=0.968 support=8 keys=0.0 1.7 7.9 1.2 3.7 0.2 0.5 7.6 0.4 9.7
+tick 2 blocks: feed 0 1 2 3 4 5 6 7 8 9 | space | + | =
+   largest block's share of the menu 0.233
+   span modulus=3.384 in_one=0.990 in_two=1.000 flat=1.000 j=9 a_j=0.002 pct=0.179 support=1 keys=10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0 10.0
+   span modulus=0.661 in_one=0.594 in_two=0.862 flat=0.990 j=2 a_j=0.339 pct=0.944 support=7 keys=0.0 1.3 2.1 1.2 9.6 9.7 0.8 1.7 1.1 0.0
+   span modulus=0.547 in_one=0.520 in_two=0.736 flat=0.979 j=4 a_j=0.375 pct=0.681 support=8 keys=0.0 6.1 7.0 8.9 7.1 9.0 7.5 8.0 9.0 7.9
+   span modulus=0.506 in_one=0.594 in_two=0.870 flat=0.993 j=9 a_j=0.800 pct=1.000 support=7 keys=0.0 8.2 8.6 4.1 3.9 3.3 2.4 2.0 1.5 1.1
+   span modulus=0.475 in_one=0.908 in_two=0.979 flat=1.000 j=4 a_j=0.120 pct=0.176 support=1 keys=0.0 1.0 0.8 0.8 1.1 0.5 1.4 0.3 0.8 0.1
+   span modulus=0.458 in_one=0.733 in_two=0.912 flat=0.998 j=5 a_j=0.546 pct=0.987 support=11 keys=0.0 1.5 0.2 2.0 0.3 2.2 0.1 2.3 0.3 2.3
+   span modulus=0.277 in_one=0.695 in_two=0.897 flat=0.992 j=9 a_j=0.210 pct=0.898 support=10 keys=0.0 9.9 0.1 0.1 0.3 9.8 9.2 9.0 8.6 9.1
+   span modulus=0.195 in_one=0.643 in_two=0.845 flat=0.982 j=9 a_j=0.274 pct=0.732 support=9 keys=0.0 8.9 0.8 1.0 1.0 0.5 9.6 9.7 8.7 9.7
+   span modulus=0.180 in_one=0.397 in_two=0.714 flat=0.979 j=1 a_j=0.464 pct=0.861 support=7 keys=0.0 1.0 1.2 0.5 7.5 7.9 9.4 8.4 7.8 9.7
+   span modulus=0.157 in_one=0.548 in_two=0.699 flat=1.000 j=7 a_j=0.841 pct=0.987 support=3 keys=0.0 6.5 4.9 0.4 9.4 5.3 0.9 9.6 6.6 5.1
+   span modulus=0.156 in_one=0.356 in_two=0.616 flat=0.991 j=9 a_j=0.347 pct=0.944 support=8 keys=0.0 2.6 0.5 10.0 0.6 9.4 9.2 8.8 9.2 9.4
+tick 3 blocks: feed | space | + | 0 1 2 3 4 5 6 7 8 9 | =
+   largest block's share of the menu 0.279
+   span modulus=1.126 in_one=0.776 in_two=0.921 flat=0.988 j=4 a_j=0.971 pct=1.000 support=9 keys=0.0 4.8 7.4 2.1 5.8 9.8 3.9 7.4 1.9 5.7
+   span modulus=1.076 in_one=0.926 in_two=0.966 flat=0.982 j=4 a_j=0.349 pct=0.572 support=10 keys=0.0 6.8 8.7 9.4 6.9 9.3 7.8 9.4 7.2 8.9
+   span modulus=0.678 in_one=0.802 in_two=0.916 flat=0.987 j=9 a_j=0.957 pct=1.000 support=10 keys=0.0 8.0 7.6 6.7 5.8 3.5 2.8 2.2 1.5 0.9
+   span modulus=0.620 in_one=0.792 in_two=0.883 flat=0.974 j=4 a_j=0.244 pct=0.164 support=8 keys=0.0 8.5 7.6 8.5 7.6 9.0 6.8 8.1 8.9 8.4
+   span modulus=0.596 in_one=0.746 in_two=0.860 flat=0.970 j=3 a_j=0.994 pct=1.000 support=10 keys=0.0 2.8 5.5 8.6 2.0 4.5 7.7 0.9 3.7 6.6
+   span modulus=0.338 in_one=0.802 in_two=0.874 flat=0.973 j=8 a_j=0.954 pct=1.000 support=9 keys=0.0 8.1 6.4 4.3 2.4 9.3 9.3 6.9 4.4 2.2
+   span modulus=0.240 in_one=0.380 in_two=0.627 flat=0.987 j=4 a_j=0.631 pct=0.874 support=4 keys=0.0 7.3 2.5 8.5 8.7 3.1 8.3 1.7 6.9 0.7
+   span modulus=0.119 in_one=0.587 in_two=0.776 flat=0.953 j=7 a_j=0.601 pct=0.802 support=9 keys=0.0 4.1 3.2 7.1 7.2 3.8 3.7 7.9 3.7 3.6
+   span modulus=0.108 in_one=0.537 in_two=0.782 flat=1.000 j=1 a_j=0.752 pct=0.985 support=5 keys=0.0 0.2 4.6 5.2 5.6 6.0 6.8 0.1 0.6 0.2

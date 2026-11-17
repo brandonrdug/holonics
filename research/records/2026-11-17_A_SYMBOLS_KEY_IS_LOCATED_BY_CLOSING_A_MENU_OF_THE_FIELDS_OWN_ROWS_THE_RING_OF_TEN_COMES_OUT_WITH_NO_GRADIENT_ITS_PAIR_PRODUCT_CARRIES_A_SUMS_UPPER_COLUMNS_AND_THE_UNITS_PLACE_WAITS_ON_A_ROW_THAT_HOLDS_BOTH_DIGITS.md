@@ -1,6 +1,6 @@
 # A symbol's key is located by closing a menu of the field's own rows: the ring of ten comes out with no gradient, its pair product carries a sum's upper columns, and the units place waits on a row that holds both digits
 
-The lead, November 17, 2026, 09:33 to 10:20 UTC. Refs #404, #73, #386. Status: [measurements by host rulers on the line's saved
+The lead, November 17, 2026, 09:33 to 11:00 UTC. Refs #404, #73, #386. Status: [measurements by host rulers on the line's saved
 states, each with its guess fixed and pushed before the read and its instrument held to a planted law; §7 is a design's statement,
 `agent-inferred`, nothing built and nothing ordered]. It continues
 [the wheel's record](2026-11-17_THE_DIGITS_WHEEL_A_SYMBOLS_MOVE_ON_A_RING_IS_A_TURN_A_HALF_TURN_OR_A_COLLAPSE_THE_ENGINES_CLOCKS_ONLY_TURN_AND_A_SUM_NEEDS_THE_HAND_FLIPPED_AT_THE_EQUALS_SIGN.md),
@@ -159,6 +159,52 @@ of 0.435 was a sum over two digits it seldom holds together.
 The instrument's first form matched a row to its open place by the sum's label; the table repeats sums, so repeated sums read
 zeros and its first figures were void (`guesses.txt`). A dump is matched by order.
 
+## 6b. Reads of the closure's reach, 10:20 to 11:00 UTC
+
+Each was guessed first, and each says what the closure needs or where it stops.
+
+**Every place of a sum open in turn** (G-DH; `planes86.txt`, `planes86_planted.txt`, `planes86_block.txt`). Nothing then chooses
+which places are composed: 3,480 distinct short sums, 41,004 places, an operand's digits and the signs opened as the value's are.
+A place at an operand is written `x = v − w`, a translation composed with the reflection `w ↦ −w`, so the operators generate the
+ring's dihedral group and share planes `span(χ_j, χ_(−j))` in place of lines. The planted menu shows exactly that: at the value's
+places lines, at the operands' places planes (half of an eigenvector's images' power along it, 0.98 to 0.995 in two directions)
+whose flat functions are the characters at 0.996 to 1.000, where the eigenvalues' phases fall to 0.80 and are no longer keys.
+On the real rows the pooled menu does not close as stated (G-DH2 missed: its leading spans are functions of the layout's own
+symbols, the feed, the equals sign, the plus; the nearest ring's is at 0.88). By the ruler's knowledge of the roles the ring is at
+both kinds of place (0.996 at the value's, planes at 0.996 to 0.998 at the operands'). The repair needs no role: the menu is cut
+first to a block of symbols, two symbols being alike where the symbols written beside them, as sources, correlate at 0.9. That
+gives the ten digits as one block at ticks 0, 1 and 3, the space, the signs and the feed apart, and inside it the pooled menu
+returns the wheel at 0.96 to 0.99. A ring's members are read before its keys, and the menu shows both.
+
+**Sums, differences and products together** (G-SG; `context86.txt`, `context86_planted.txt`, `context86_presence.txt`). The
+store's own arithmetic holds all three on the same ten symbols (4,500 distinct two-operand records of the redrawn slice, 1,500 an
+operation, every place open), and `w ↦ u w` shares no plane with `w ↦ w + u`. The row meets the sign too, so the menu was taken
+with three sources and closed under each context symbol. Planted, the instrument returns the wheel under the plus and the minus
+and, under the times sign, two blocks found with no label, `1 3 7 9` and `2 4 6 8`, each with a ring of four at 0.98 to 1.000:
+the units' group under multiplication, keyed as a discrete logarithm. On the real rows all three guesses missed: head 0 gives a
+sign a few hundredths of its row, and a product of three shares is too thin a menu. With the sign taken as present among the
+sources, whatever its share, the wheel returns under the plus at 0.937 and under the minus at 0.932; under the times sign
+nothing with a lattice returns. Which law a place is under has to come from the place's chart, not from this row's share on the
+sign, and a product's units law is not closed by anything read here.
+
+**The store's own windows** (G-TX; `text86_closure.txt`). On 2,300 windows of the training documents over all seven slices
+(13,800 places) the menu's blocks are the passage's own classes, with no label: the four signs, the consonants, the vowels with a
+few liquids, the layout's marks, and the digits 1 to 9 with the zero apart. No block of digits gives a clean line or plane, in the
+pooled menu or in the arithmetic windows alone (2,400 places of three operations, parentheses and up to four operands), so no
+wheel is read off the store's mixture as the closure stands; and no block of six or more letters gives keys on a lattice, so this
+closure finds no ring in text (as guessed, both).
+
+**A context from the places' charts** (G-CX; `clusters86.txt`). The places of the three-operation records, grouped by their own
+pair charts (k-means, sixteen groups), follow the layout and not the law: twelve groups hold the three operations at a third
+each, and no group's menu closes. Of the contexts read, one works with no label for the two additive laws: the presence of a
+symbol among a row's sources.
+
+**Products across heads** (a diagnosis, not guessed; `release86_cross.txt`, `loop_closure_ruler.py cross`). At the units
+place one row holds one aligned digit or the other. With every head's keyed barycentre and the products of two heads' barycentres
+beside head 0's own pair product, the wheel's digit is read at 0.26, 0.43 and 0.29 at ticks 0 to 2 (0.22, 0.22, 0.18 from head 0
+alone) and at 0.50 to 0.62 at the columns both operands hold (ticks 1 and 2): part of the pair that one row lacks stands in
+another head's row.
+
 ## 7. What follows for the machine: a design's statement
 
 Not built, not ordered. Stated so that its premises can be read.
@@ -182,15 +228,18 @@ order and whose keys are located"; it names no digit, no base and no operation.
 
 **What is owed before it is ordered**, each a host read with its guess first:
 
-- The store's own text. The specimen is sums alone. On a menu gathered over every slice, does the ring still close amid text,
-  ranked by how well each eigenvector closes on every operator and not by its size; and does text hold any ring of its own (if it
-  holds none, the part is silent there and its cost on text is the read of §7's last line in the wheel's record).
-- The hand. A place at an operand is written `x = v − w`, a translation composed with a reflection; with such places in the menu
-  the operators generate the ring's dihedral group and share planes, not lines. The closure's form for that is a common invariant
-  plane with a rotation's angle as the key; and an unordered row gives a difference only up to its sign (the third record §3), so
-  the hand's own part stays the wheel's record's.
-- Products. A units digit under multiplication is a monoid on ten symbols, a group on four of them. What the closure returns
-  there is not known.
+- The store's own text. Read in §6b: the digits' block comes out amid text without its zero, the pooled menu does not close on
+  it, and this closure finds no ring among letters. So the part would be silent on text (its cost there is still the read of
+  §7's last line in the wheel's record), and its founding cannot be read off the store's pooled menu.
+- The hand. Read in §6b: with operands' places in the menu the operators share planes, and the closure's form is a block, a plane
+  and its flat function. An unordered row gives a difference only up to its sign (the third record §3); two heads' rows give an
+  ordered pair, which §6b's last read touches and no read has yet taken for a difference.
+- The context. Read in §6b: the rows' share on a sign is too thin to index the law, and the charts' largest groups are the
+  layout's. The presence of a symbol among a row's sources separates the two additive laws on two-operand records. Whether it
+  does on the slice as it is drawn (parentheses, three and four operands) is not read, and a product's law has no context yet.
+- Products. A units digit under multiplication is a monoid on ten symbols and a group on four; the instrument returns it from a
+  planted menu and the real rows do not hold it. Sums and differences are 0.42 of the word problems' operations by the ruler's
+  count, so an additive ring alone does not reach the yardstick.
 - The carry. In the closure it is a gauge; in a release it is a section (the wheel's record §4), and no part here takes it.
 - The realization: the row's loop on the card gains `2E` accumulators a head, and the reverse a term a source. Its count is read
   against the card before any projection (a rate is judged against the card).
@@ -217,7 +266,9 @@ covector closes the row on both digits. A founding that moves neither is a faile
 
 `receipts/2026-11-16_tension/`: `guesses.txt` (G-HC, G-J, G-LC, G-RL, each fixed and pushed before its read, with its score);
 `circles86.txt`, `circles86_planted.txt`; `junction_sums78.txt`; `oracle_short86.txt`, `heat_short86.txt`, `midpoint_short86.txt`;
-`closure86.txt`, `closure86_planted.txt`, `closure77_units_tick0.txt`; `release86.txt`. Tools: `tools/loop_closure_ruler.py`
-(`DIR`, `planted`, `release`), `tools/tension_ruler.py` (`circles`, `junction`), `athena host complete-language read-tension`
-(now with `charge.i64` and `gate.i64`), `athena train complete-language read-triads`. The reads ran on the host beside laps 87
+`closure86.txt`, `closure86_planted.txt`, `closure77_units_tick0.txt`; `release86.txt`, `release86_cross.txt`; `planes86.txt`, `planes86_planted.txt`,
+`planes86_block.txt`; `context86.txt`, `context86_planted.txt`, `context86_presence.txt`; `text86_closure.txt`; `clusters86.txt` (G-DH, G-SG, G-TX, G-CX). Tools:
+`tools/loop_closure_ruler.py` (`DIR`, `planted`, `release`, `cross`, `planes`, `context TABLE`, `text TABLE`, `clusters TABLE`), `tools/store_windows.py`, `tools/tension_ruler.py` (`circles`,
+`junction`), `athena host complete-language read-tension` (now with `charge.i64` and `gate.i64`, and `shares` for the open rows'
+shares alone), `athena train complete-language read-triads`. The reads ran on the host beside laps 87
 and 88, eight threads at most; lap 87 took 3,154 s, inside the laps' usual 3,121 to 3,257 s.

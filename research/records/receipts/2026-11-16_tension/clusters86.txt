@@ -1,0 +1,39 @@
+CLUSTER_READ places=52854 groups=16 chart=tick1 menu=head0,tick0 seed=11
+CLUSTER group=0 places=1639 made_of: + operand units 0.33; * operand units 0.33; - operand units 0.33
+CLUSTER_SPAN group=0 modulus=0.973 in_one=0.835 in_two=0.935 flatness=0.996 support=[1 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.198 four(2,6,8,4)=0.197
+CLUSTER group=1 places=2250 made_of: - other 0.67; - value 0.27; - value units 0.06
+CLUSTER group=2 places=4500 made_of: + other 0.33; * other 0.33; - other 0.33
+CLUSTER group=3 places=4490 made_of: + value 0.32; * value 0.31; - other 0.17; - value 0.14
+CLUSTER_SPAN group=3 modulus=3.565 in_one=0.999 in_two=1.000 flatness=1.000 support=[- 1 2 3 4 5 7 8 9] four(1,3,9,7)=0.003 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=3 modulus=1.893 in_one=0.864 in_two=0.948 flatness=0.984 support=[- 1 2 3 4 5 7 8 9] four(1,3,9,7)=0.216 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=3 modulus=2.509 in_one=0.925 in_two=0.976 flatness=0.993 support=[2 3 4 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=3 modulus=1.591 in_one=0.833 in_two=0.925 flatness=0.969 support=[1 2 3 4 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=3 modulus=1.604 in_one=0.934 in_two=0.984 flatness=0.999 support=[1 2 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=3 modulus=1.127 in_one=0.937 in_two=0.981 flatness=0.996 support=[1 3 4 5] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=3 modulus=0.456 in_one=0.888 in_two=0.956 flatness=0.999 support=[1 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER group=4 places=5696 made_of: * operand units 0.33; - operand units 0.33; + operand units 0.33
+CLUSTER_SPAN group=4 modulus=2.361 in_one=0.874 in_two=0.927 flatness=0.993 support=[0 1 2 3 4 5 6 7 8] four(1,3,9,7)=0.017 four(2,6,8,4)=0.054
+CLUSTER group=5 places=5908 made_of: * value 0.26; + value units 0.24; * value units 0.23; - value units 0.21
+CLUSTER_SPAN group=5 modulus=1.929 in_one=0.691 in_two=0.922 flatness=0.982 support=[0 1 2 3 4 5 6 7 8 9] ten: j=5 a_j=0.171 null_pct=0.913 four(1,3,9,7)=0.117 four(2,6,8,4)=0.179
+CLUSTER_SPAN group=5 modulus=2.555 in_one=0.965 in_two=0.987 flatness=0.999 support=[0 1 2 4 6 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.010
+CLUSTER_SPAN group=5 modulus=1.902 in_one=0.852 in_two=0.960 flatness=0.998 support=[0 1 6 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.059
+CLUSTER_SPAN group=5 modulus=1.306 in_one=0.799 in_two=0.915 flatness=0.996 support=[0 1 2 4 6 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.235
+CLUSTER_SPAN group=5 modulus=1.139 in_one=0.747 in_two=0.905 flatness=0.976 support=[0 1 2 4 6 8] four(1,3,9,7)=0.000 four(2,6,8,4)=0.105
+CLUSTER_SPAN group=5 modulus=0.139 in_one=0.791 in_two=0.902 flatness=0.989 support=[1 2 3 4 7 8 9] four(1,3,9,7)=0.434 four(2,6,8,4)=0.361
+CLUSTER group=6 places=3798 made_of: - other 0.34; * other 0.33; + other 0.33
+CLUSTER group=7 places=3000 made_of: + other 0.50; * other 0.50
+CLUSTER group=8 places=750 made_of: - other 1.00
+CLUSTER group=9 places=884 made_of: - operand 1.00
+CLUSTER group=10 places=917 made_of: + operand 0.59; * operand 0.32; - operand 0.08; + value 0.01
+CLUSTER_SPAN group=10 modulus=7.400 in_one=0.996 in_two=1.000 flatness=1.000 support=[- 1 2 3 6 7 8 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=10 modulus=1.709 in_one=0.754 in_two=0.901 flatness=0.997 support=[2 3 4 6 7] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER group=11 places=4500 made_of: + other 0.33; * other 0.33; - other 0.33
+CLUSTER group=12 places=702 made_of: + other 0.35; * other 0.35; - other 0.30
+CLUSTER group=13 places=3750 made_of: + other 0.40; * other 0.40; - other 0.20
+CLUSTER group=14 places=9000 made_of: + other 0.33; * other 0.33; - other 0.33
+CLUSTER group=15 places=1070 made_of: * operand 0.62; + operand 0.38
+CLUSTER_SPAN group=15 modulus=2.463 in_one=0.863 in_two=0.945 flatness=0.991 support=[2 3 4 5] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=15 modulus=1.944 in_one=0.801 in_two=0.903 flatness=0.995 support=[1 2 3 4 5] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=15 modulus=1.638 in_one=0.857 in_two=0.927 flatness=0.991 support=[1 2 3 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=15 modulus=1.367 in_one=0.872 in_two=0.951 flatness=0.998 support=[1 2 5 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000
+CLUSTER_SPAN group=15 modulus=1.722 in_one=0.992 in_two=0.997 flatness=0.999 support=[1 2 3 4] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000

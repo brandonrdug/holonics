@@ -223,8 +223,12 @@ removes, fitted on one half of the records and read on the other.
     pair product on that located ring carries half of a sum's digit at the columns both operands hold and a fifth at the units
     place, where the row holds one aligned digit or the other.
   - The part this states, unbuilt: a keyed pair product through a row, its keys founded by that closure between a lap's mean and
-    the next lap's start. Owed before it is ordered: the same closure on the store's own text, its form where a place is a
-    difference (a dihedral menu), and what it returns for products.
+    the next lap's start. It is not ordered. The closure's reach was read the same night (the record's §6b): with every place of
+    a sum open it closes once the menu is cut to the ring's own members, which the menu shows with no label; where sums,
+    differences and products stand together it needs a context, and the presence of a sign among a row's sources serves the two
+    additive laws; a product's units law does not close; and the store's own windows give the digits' block without its zero
+    and no wheel from the pooled menu. Sums and differences are 0.42 of the word problems' operations. What is owed before any
+    part: a context for the slice as it is drawn, and a law for products.
 - **The engine has no founding law.** Every part since November 13 entered at zero (a lane, a mark's
   strengths, the crossing's return) or with drawn operands (the crossing's legs). The founding law of
   October 24 stands in a host ruler (`tools/tension_ruler.py`) and a state tool (`found-crossing`); read

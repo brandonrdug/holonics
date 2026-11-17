@@ -632,3 +632,175 @@ location held 0.07 and 0.12 at the units place and 0.10 to 0.13 at the columns b
 Decided as the guess said for the units place: the rows' shares scatter too much there for a product inside one row, and the
 lock comes first. Beside it: at the columns both operands hold, a pair product on the located ring, with nothing labelled,
 already carries what the labelled read carried.
+
+GUESSES G-DH1 and G-DH2, fixed at 10:23:32 UTC, November 17 (from date -u), before the read: the closure with every place of a sum open
+Reading: the menu of G-LC taken with every place of a record opened in turn, operands' digits, signs and spaces as well as the
+value's (3,480 distinct short sums, 41,004 places, lap 86's mean, head 0 at tick 0), so that nothing chooses which places are
+composed. A place at an operand is written x = v − w: with the value's digit as the source u it is a translation composed with
+the reflection w ↦ −w, and with the other operand's digit as u a translation by −u. The sources' operators then generate the
+ring's dihedral group; they no longer commute, a character is no longer their common eigenvector, and their eigenvalues' phases
+are no longer keys. They share planes, span(χ_j, χ_(−j)), and in such a plane the two functions of flat modulus on its support
+are the characters, whose own phases at each symbol are the keys. The ruler (loop_closure_ruler.py planes) takes each
+eigenvector of a drawn combination, the span its images under every operator fill (a line or a plane, by its singular values),
+and in a plane the flattest function; it scores the ten digits' phases as before.
+G-DH1: the plain closure of G-LC degrades on this menu: its best eigenvalue keys at a j coprime to ten fall under 0.9.
+G-DH2: the plane closure returns the wheel: a flat function of an invariant plane holds the ten digits' phases at 0.9 or more
+at a j coprime to ten, past its null, with the ten digits as its support and the space and the signs outside it.
+The instrument is held to planted menus on the same records: the aligned triples alone at every digit place (sums and
+differences together) must return the wheel at one from a plane, and the written symbols dealt at random must return nothing.
+What it decides: G-DH2 held, a key is founded by closure from every place the field reads, with no choice of which places are
+composed, and the read goes on to the store's text; missed, the closure as it stands needs to be told where a composition is
+written, which the field is not, and the founding is rethought before any part.
+
+SCORES of G-DH1 and G-DH2, read from the clock at 10:31:03 UTC, November 17 (planes86.txt, planes86_planted.txt, planes86_block.txt;
+3,480 distinct short sums, every place but a record's first opened in turn, 41,004 places, lap 86's mean; host, eight threads
+for the dump in 206 s, one for each ruler in under a minute, beside lap 88 on the card)
+The instrument first. The first form took a line wherever nine tenths of an eigenvector's images lay along it; under a mixture
+of translations and reflections an eigenvector is nearly kept and is still no character, and that form returned partial
+supports at 0.67 to 0.89 from the planted menu. As repaired the plane is searched unless the line is clean. The planted menu
+of aligned triples at every digit's place then returns the wheel from planes at 0.997 (j = 9), 0.986 (j = 3) and 0.998
+(j = 7), with the ten digits as support. By role it shows the theory's form: at the value's places lines, the plain closure at
+1.000; at the operands' places planes (half of an eigenvector's images' power along it, 0.98 to 0.995 in two directions)
+whose flat functions are the characters at 0.996 to 1.000, where the plain closure's eigenvalue keys fall to 0.796. The menu
+with the written symbols dealt at random returns no line or plane with keys.
+G-DH1 missed: on the real rows the plain closure's eigenvalue keys hold 0.926 at tick 0 and 0.923 at tick 1 at a j coprime to
+ten (the digits' modulus 0.28 and 0.26); under 0.9 was guessed. They fall to 0.761 and 0.634 at ticks 2 and 3.
+G-DH2 missed: on the pooled menu of every place no invariant line or plane returns the wheel at 0.9. The leading spans are
+functions of the layout's own symbols (the line feed, the equals sign, the plus); the nearest ring's are the ring of five at
+0.994 on a span holding 0.89 of its images (tick 1) and a j = 9 at 0.881 on one holding 0.86 (tick 0).
+By the ruler's knowledge of the roles the ring is there at both kinds of place: the value's places return the plain closure at
+0.996, and the operands' places return planes, the ring of five at 0.998 (tick 0) and the wheel at j = 3 at 0.996 (tick 1).
+A diagnosis read after the scores (planes86_block.txt; not guessed): the pooled menu closes once it is cut to a block of
+symbols, and the block is read from the menu with no label. Two symbols are taken as alike where the symbols written beside
+them, as sources, correlate at 0.9; at ticks 0, 1 and 3 that gives the ten digits as one block and the space, the signs and
+the feed apart (at tick 2 the feed joins the digits and nothing closes). Inside the digits' block, which holds 0.07 to 0.28 of
+the menu's weight, every place pooled, the plane closure returns j = 9 at 0.963, 0.966 and 0.957 (ticks 0, 1, 3), j = 3 at
+0.978 and 0.994 (ticks 1, 3) and j = 7 at 0.916 (tick 0), each at the 100th percentile of its null.
+Decided: as fixed, the closure as G-LC stated it needs to be told where a composition is written. What the diagnosis adds is
+that it does not need the place's role: it needs a ring's members before its keys, and the members are a block the menu
+itself shows. The store's own arithmetic holds differences and products beside sums on the same ten symbols, and
+multiplication does not share a translation's planes, so there the operator must also carry the sign its row meets (a menu of
+three sources); that read is owed before the store's text is.
+
+GUESSES G-SG1 to G-SG3, fixed at 10:32:57 UTC, November 17 (from date -u), before the read: a sign selects the law its row closes on
+Reading: the store's own arithmetic holds sums, differences and products on the same ten symbols, and a product's operators
+(w ↦ uw) do not share a translation's planes, so one menu of pairs cannot close on it. The row also meets the sign. The menu
+is taken with three sources (loop_closure_ruler.py context): T[s, u, w, x], every ordered triple of distinct sources weighed by
+the product of their three shares, with the symbol written; for each context symbol s its own family of operators
+(P_(s,u) f)(w) = E[f(x) | s, u, w] is cut to a block and closed as G-DH's diagnosis did. The specimen: 4,500 distinct
+two-operand records of the redrawn arithmetic slice as it stands, operands of one and two digits, 1,500 of each operation,
+every place but the first opened in turn (52,854 places), lap 86's mean, head 0 at tick 0. Nothing tells the ruler which
+symbols are signs or digits; the scores use that knowledge afterwards.
+G-SG1: with the plus as context the wheel is returned: a flat function of an invariant line or plane holds the ten digits'
+phases at 0.9 or more at a j coprime to ten.
+G-SG2: with the minus as context the same, from planes.
+G-SG3: with the times sign as context no wheel of ten is returned (under 0.9 at every coprime j), and a ring of four is: a
+line or plane whose support holds the digits 1, 3, 7 and 9 with their phases on quarter turns in the order of a discrete
+logarithm (1, 3, 9, 7 or its reverse) at an amplitude of 0.9 or more.
+The instrument is held to planted menus on the same records: the aligned triples with the record's own sign as context must
+return the wheel under the plus and the minus and the ring of four under the times sign, and dealt written symbols nothing.
+What it decides: G-SG1 and G-SG3 held, the closure reads each law of the passage under the symbol that selects it, a product's
+units among them, and the founding's form is a key a context; G-SG1 missed, three shares are too thin a menu for the rows as
+they stand, and the context has to come from the chart, not the row.
+
+SCORES of G-SG1 to G-SG3, read from the clock at 10:40:28 UTC, November 17 (context86.txt, context86_planted.txt,
+context86_presence.txt; 4,500 distinct two-operand records of the redrawn slice, 1,500 an operation, every place but the first
+opened in turn, 52,854 places, lap 86's mean, head 0; host, eight threads for the dump in 4 minutes, one a ruler in under a
+minute, beside lap 89 on the card)
+The instrument first. On the planted menu (the units digits and the record's sign) the blocks come out with no label: under
+the plus and the minus the ten digits, under the times sign two blocks, 1 3 7 9 and 2 4 6 8. Under the plus the wheel returns
+at 0.998 (j = 9) and 0.984 (j = 3), under the minus at 0.999 and 0.994, and under the times sign a ring of four on each block
+at 0.977 and 1.000 with a quadratic character beside it: the units' group under multiplication, keyed as a discrete logarithm.
+The dealt menu returns only functions of the layout's symbols.
+G-SG1 missed: on the real rows the plus as a source holds under 0.02 of the three-source menu and no wheel is returned under
+it.
+G-SG2 missed: under the minus (0.030 of the menu) the blocks come out in fragments and no line or plane returns the wheel.
+G-SG3: no wheel under the times sign, as guessed, and no ring of four either (missed): under it (0.024 of the menu) the spans
+are functions of fragments of the digits with no lattice in their phases.
+A diagnosis read after the scores (context86_presence.txt; not guessed): with the sign taken as present among a row's sources,
+whatever its share, and the menu of pairs kept, the plus returns the wheel at 0.937 (j = 1) and the minus at 0.932 (j = 3) at
+tick 0, each at the 100th percentile of its null, from blocks that hold the ten digits; the times sign returns nothing with a
+lattice.
+Decided as the guess said: three shares are too thin a menu for the rows as they stand, since head 0 gives a sign a few
+hundredths of its row. Which law a place is under is known at the place by other ways than this row's share on the sign, so a
+context has to come from the place's own chart, and a product's units law is not closed by anything read here.
+
+GUESSES G-TX1 to G-TX3, fixed at 10:45:01 UTC, November 17 (from date -u), before the read: the closure on the store's own text
+Reading: the block and plane closure of G-DH's diagnosis on a menu gathered over the store's own mixture
+(tools/store_windows.py: 2,300 windows of 40 octets from the training documents, 600 of code, 300 of web, 300 of science, 180
+of books, 120 of wikidata, 400 of the redrawn arithmetic slice and 400 of the word problems; six places a window drawn by key
+and opened alone, 13,800 places; lap 86's mean, head 0 at ticks 0 and 1; loop_closure_ruler.py text). The arithmetic windows
+hold sums, differences and products as the slice draws them, and the text holds numerals of its own (dates, counts, code).
+G-TX1: the ten digits come out as one block, read from the pooled menu with no label (other symbols may join it).
+G-TX2: inside that block the pooled menu does not return the wheel: under 0.9 at every j coprime to ten at both ticks,
+because products and the text's numerals share the digits with the sums. The windows of the arithmetic slice alone do not
+return it either.
+G-TX3: text holds no ring of its own that this closure finds: no block of six or more letters gives a clean line or plane
+(0.9 of its images' power, flatness 0.95) whose keys sit on a lattice of order 3 to 12 at 0.9 with three residues or more
+occupied.
+The instrument's planted checks are those of G-DH and G-SG (the same functions); here the dealt menu is read beside the rows
+for the letters' null.
+What it decides: G-TX2 held, a founding cannot be read off the store's pooled menu, and a key's founding waits on a context
+read from the place; missed, the ring is in the store's own menu and a founding is ready to state. G-TX3 missed would be a
+find: a law of composition among letters that nobody handed the ruler.
+
+GUESSES G-TX1 to G-TX3, fixed at 10:45:17 UTC, November 17 (from date -u), before the read: the closure on the store's own text
+Reading: the block and plane closure of G-DH's diagnosis on a menu gathered over the store's own mixture
+(tools/store_windows.py: 2,300 windows of 40 octets from the training documents, 600 of code, 300 of web, 300 of science, 180
+of books, 120 of wikidata, 400 of the redrawn arithmetic slice and 400 of the word problems; six places a window drawn by key
+and opened alone, 13,800 places; lap 86's mean, head 0 at ticks 0 and 1; loop_closure_ruler.py text). The arithmetic windows
+hold sums, differences and products as the slice draws them, and the text holds numerals of its own (dates, counts, code).
+G-TX1: the ten digits come out as one block, read from the pooled menu with no label (other symbols may join it).
+G-TX2: inside that block the pooled menu does not return the wheel: under 0.9 at every j coprime to ten at both ticks,
+because products and the text's numerals share the digits with the sums. The windows of the arithmetic slice alone do not
+return it either.
+G-TX3: text holds no ring of its own that this closure finds: no block of six or more letters gives a clean line or plane
+(0.9 of its images' power, flatness 0.95) whose keys sit on a lattice of order 3 to 12 at 0.9 with three residues or more
+occupied.
+The instrument's planted checks are those of G-DH and G-SG (the same functions); here the dealt menu is read beside the rows
+for the letters' null.
+What it decides: G-TX2 held, a founding cannot be read off the store's pooled menu, and a key's founding waits on a context
+read from the place; missed, the ring is in the store's own menu and a founding is ready to state. G-TX3 missed would be a
+find: a law of composition among letters that nobody handed the ruler.
+
+SCORES of G-TX1 to G-TX3, read from the clock at 10:57:54 UTC, November 17 (text86_closure.txt; 2,300 windows of the store's
+training documents, 13,800 places, lap 86's mean, head 0; the dump 277 s on eight host threads as run text86, the ruler 7
+minutes on one, beside lap 89 on the card)
+G-TX1 missed by one symbol: the pooled menu's blocks hold the digits 1 to 9 together at both ticks and the zero apart. The
+blocks are otherwise the passage's own classes with no label: the four signs * + - =, the consonants (b c d f g h k l m n p r
+s t v w y, with S and C), the vowels with a few liquids (a e g i l n o u z), and at tick 1 the layout's marks.
+G-TX2 held: no block of digits gives a clean line or plane in the pooled menu or in the arithmetic windows alone, so no wheel
+is returned from the store's own mixture. The arithmetic windows are 2,400 places of the slice as it draws them (three
+operations, parentheses, two to four operands), where the specimen reads had 41,000 to 53,000 places of one or three laws.
+G-TX3 held: no block of six or more letters gives a line or plane with keys on a lattice. Seven spans of four or five symbols
+sit on a lattice of order 4 to 12 with three residues occupied (C c d p; g l n z; : ; j {), which four points do easily; the
+dealt menu gives none, and none is claimed as a ring.
+Decided as the guess said: a founding cannot be read off the store's pooled menu as the closure stands. Where one law of
+composition stands the menu closes on it; the store mixes several on the same symbols, and the context that tells them apart
+has to be read first.
+
+GUESSES G-CX1 and G-CX2, fixed at 10:57:54 UTC, November 17 (from date -u), before the read: a context read from the place's own chart
+Reading: on the three-operation records of G-SG (4,500 distinct, every place open, 52,854 places, lap 86's mean), the places
+are grouped by their own pair charts at tick 1 (k-means, sixteen groups, no label), and head 0's menu of pairs at tick 0 is
+closed inside each group, cut to blocks, by lines and planes (loop_closure_ruler.py clusters). The reason: the row's share on
+a sign was too thin to pick the law, and the place's chart has gathered its record by then; if it tells a sum's place from a
+product's, a group of like charts is a context nobody labelled.
+G-CX1: at least one group's menu returns the wheel at 0.9 or more at a j coprime to ten from a block that holds the ten
+digits.
+G-CX2: at least one group's menu returns the ring of four of the units' group under multiplication (the digits 1, 3, 9, 7 or
+2, 6, 8, 4 on quarter turns at 0.9 or more), from a group made mostly of products' places.
+What it decides: G-CX1 held, a founding can take its context from the field's own charts with no label, and the store's
+mixture is closable group by group; missed, the charts do not yet tell the laws apart well enough to found from, and the key
+waits on that.
+
+SCORES of G-CX1 and G-CX2, read from the clock at 10:59:08 UTC, November 17 (clusters86.txt; the three-operation records of G-SG,
+52,854 places, lap 86's mean; host, one thread, 8 s)
+G-CX1 missed: no group's menu returns the wheel. G-CX2 missed: none returns a ring of four.
+What the groups are, by the ruler's knowledge of the records: the places' charts group by the place's part in the layout and
+not by the record's law. Twelve of the sixteen groups hold the three operations at a third each (the operands' units digits;
+the value's digits; the spaces and signs by position); the others are the places of a negative value (its minus sign makes
+them the minus's alone) and two groups of operands' higher digits. A sum's value digit and a product's value digit stand in
+one group.
+Decided as the guess said: grouped by their largest differences the charts tell where a place is, not which law it is under,
+and no founding is taken from such groups. Of the contexts read tonight one works with no label for the two additive laws:
+the presence of a symbol among a row's sources (G-SG's diagnosis, the wheel at 0.93 under the plus and under the minus).

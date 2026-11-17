@@ -1,0 +1,39 @@
+CONTEXT_READ menu=aligned symbols=16 ticks=[0, 1, 2, 3]
+CONTEXT aligned tick=0 context=* share_of_menu=0.111 blocks: 1 3 7 9 | 2 4 6 8
+CONTEXT_SPAN aligned tick=0 context=* modulus=1.931 in_one=1.000 in_two=1.000 flatness=1.000 support=[1 3 7 9] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000 keys_in_turns=1:0.00 3:0.50 7:0.50 9:0.00
+CONTEXT_SPAN aligned tick=0 context=* modulus=1.721 in_one=0.941 in_two=0.998 flatness=0.996 support=[1 3 7 9] four(1,3,9,7)=0.943 four(2,6,8,4)=0.000 keys_in_turns=1:0.00 3:0.14 7:0.64 9:0.49
+CONTEXT_SPAN aligned tick=0 context=* modulus=0.738 in_one=0.735 in_two=0.997 flatness=0.999 support=[1 3 7 9] four(1,3,9,7)=0.977 four(2,6,8,4)=0.000 keys_in_turns=1:0.00 3:0.32 7:0.82 9:0.50
+CONTEXT_SPAN aligned tick=0 context=* modulus=3.877 in_one=1.000 in_two=1.000 flatness=1.000 support=[2 4 6 8] four(1,3,9,7)=0.000 four(2,6,8,4)=0.000 keys_in_turns=2:0.00 4:0.50 6:0.50 8:1.00
+CONTEXT_SPAN aligned tick=0 context=* modulus=3.707 in_one=0.950 in_two=0.999 flatness=0.963 support=[2 4 6 8] four(1,3,9,7)=0.000 four(2,6,8,4)=1.000 keys_in_turns=2:0.00 4:0.26 6:0.76 8:0.50
+CONTEXT_SPAN aligned tick=0 context=* modulus=1.351 in_one=0.701 in_two=0.987 flatness=0.996 support=[2 4 6 8] four(1,3,9,7)=0.000 four(2,6,8,4)=1.000 keys_in_turns=2:0.00 4:0.24 6:0.74 8:0.50
+CONTEXT aligned tick=0 context=+ share_of_menu=0.111 blocks: 0 1 2 3 4 5 6 7 8 9
+CONTEXT_SPAN aligned tick=0 context=+ modulus=5.962 in_one=1.000 in_two=1.000 flatness=1.000 support=[0 1 2 3 4 5 6 7 8 9] ten: j=5 a_j=1.000 null_pct=0.987 four(1,3,9,7)=0.000 four(2,6,8,4)=0.000 keys_in_turns=0:0.00 1:0.50 2:0.00 3:0.50 4:1.00 5:0.50 6:0.00 7:0.50 8:0.00 9:0.50
+CONTEXT_SPAN aligned tick=0 context=+ modulus=5.418 in_one=0.945 in_two=0.988 flatness=0.989 support=[0 1 2 3 4 5 6 7 8 9] ten: j=9 a_j=0.998 null_pct=1.000 four(1,3,9,7)=0.592 four(2,6,8,4)=0.569 keys_in_turns=0:1.00 1:0.91 2:0.81 3:0.73 4:0.62 5:0.51 6:0.41 7:0.34 8:0.21 9:0.13
+CONTEXT_SPAN aligned tick=0 context=+ modulus=3.657 in_one=0.877 in_two=0.949 flatness=0.987 support=[0 1 2 3 4 5 6 7 8 9] ten: j=4 a_j=0.288 null_pct=0.968 four(1,3,9,7)=0.095 four(2,6,8,4)=0.048 keys_in_turns=0:0.00 1:0.16 2:0.06 3:0.04 4:0.16 5:0.00 6:0.14 7:0.06 8:0.05 9:0.20
+CONTEXT_SPAN aligned tick=0 context=+ modulus=3.619 in_one=0.946 in_two=0.987 flatness=0.984 support=[0 1 2 3 4 5 6 7 8 9] ten: j=2 a_j=0.997 null_pct=1.000 four(1,3,9,7)=0.559 four(2,6,8,4)=0.590 keys_in_turns=0:0.00 1:0.18 2:0.39 3:0.59 4:0.76 5:0.99 6:0.18 7:0.38 8:0.58 9:0.80
+CONTEXT_SPAN aligned tick=0 context=+ modulus=1.992 in_one=0.965 in_two=0.982 flatness=0.989 support=[0 2 3 4 5 6 7 8 9] four(1,3,9,7)=0.586 four(2,6,8,4)=0.567 keys_in_turns=0:0.00 2:0.63 3:0.96 4:0.26 5:0.55 6:0.83 7:0.15 8:0.45 9:0.71
+CONTEXT_SPAN aligned tick=0 context=+ modulus=1.862 in_one=0.686 in_two=0.914 flatness=0.992 support=[0 1 2 3 4 5 6 7 8 9] ten: j=9 a_j=0.996 null_pct=1.000 four(1,3,9,7)=0.541 four(2,6,8,4)=0.551 keys_in_turns=0:0.00 1:0.94 2:0.83 3:0.72 4:0.61 5:0.54 6:0.43 7:0.35 8:0.22 9:0.13
+CONTEXT_SPAN aligned tick=0 context=+ modulus=1.625 in_one=0.876 in_two=0.931 flatness=0.974 support=[0 1 2 3 4 5 6 7 8 9] ten: j=2 a_j=0.976 null_pct=1.000 four(1,3,9,7)=0.533 four(2,6,8,4)=0.573 keys_in_turns=0:0.00 1:0.11 2:0.40 3:0.58 4:0.77 5:0.99 6:0.10 7:0.36 8:0.58 9:0.81
+CONTEXT_SPAN aligned tick=0 context=+ modulus=1.612 in_one=0.959 in_two=0.980 flatness=0.975 support=[0 1 2 3 4 5 6 7 8 9] ten: j=3 a_j=0.984 null_pct=1.000 four(1,3,9,7)=0.585 four(2,6,8,4)=0.676 keys_in_turns=0:0.00 1:0.27 2:0.61 3:0.85 4:0.23 5:0.45 6:0.83 7:0.08 8:0.36 9:0.67
+CONTEXT_SPAN aligned tick=0 context=+ modulus=1.307 in_one=0.876 in_two=0.918 flatness=0.976 support=[0 1 2 3 4 5 6 7 8 9] ten: j=4 a_j=0.983 null_pct=1.000 four(1,3,9,7)=0.576 four(2,6,8,4)=0.594 keys_in_turns=0:0.00 1:0.45 2:0.81 3:0.26 4:0.65 5:0.09 6:0.43 7:0.87 8:0.26 9:0.60
+CONTEXT aligned tick=0 context=- share_of_menu=0.111 blocks: 0 1 2 3 4 5 6 7 8 9
+CONTEXT_SPAN aligned tick=0 context=- modulus=5.962 in_one=1.000 in_two=1.000 flatness=1.000 support=[0 1 2 3 4 5 6 7 8 9] ten: j=5 a_j=1.000 null_pct=0.987 four(1,3,9,7)=0.000 four(2,6,8,4)=0.000 keys_in_turns=0:0.00 1:0.50 2:1.00 3:0.50 4:1.00 5:0.50 6:1.00 7:0.50 8:0.00 9:0.50
+CONTEXT_SPAN aligned tick=0 context=- modulus=5.381 in_one=0.930 in_two=0.997 flatness=0.996 support=[0 1 2 3 4 5 6 7 8 9] ten: j=9 a_j=0.999 null_pct=1.000 four(1,3,9,7)=0.562 four(2,6,8,4)=0.567 keys_in_turns=0:0.00 1:0.91 2:0.81 3:0.70 4:0.59 5:0.49 6:0.40 7:0.30 8:0.20 9:0.10
+CONTEXT_SPAN aligned tick=0 context=- modulus=3.716 in_one=0.844 in_two=0.944 flatness=0.996 support=[0 1 2 3 4 5 6 7 8 9] ten: j=6 a_j=0.045 null_pct=0.961 four(1,3,9,7)=0.043 four(2,6,8,4)=0.037 keys_in_turns=0:0.00 1:0.97 2:1.00 3:0.99 4:0.99 5:1.00 6:0.97 7:0.01 8:0.99 9:0.99
+CONTEXT_SPAN aligned tick=0 context=- modulus=3.561 in_one=0.915 in_two=0.980 flatness=0.997 support=[0 1 2 3 4 5 6 7 8 9] ten: j=2 a_j=0.988 null_pct=1.000 four(1,3,9,7)=0.515 four(2,6,8,4)=0.527 keys_in_turns=0:0.00 1:0.22 2:0.46 3:0.61 4:0.85 5:0.01 6:0.24 7:0.46 8:0.62 9:0.87
+CONTEXT_SPAN aligned tick=0 context=- modulus=2.137 in_one=0.834 in_two=0.930 flatness=0.979 support=[0 1 2 3 5 6 7 8] four(1,3,9,7)=0.531 four(2,6,8,4)=0.520 keys_in_turns=0:1.00 1:0.13 2:0.55 3:0.57 5:1.00 6:0.13 7:0.54 8:0.57
+CONTEXT_SPAN aligned tick=0 context=- modulus=2.018 in_one=0.740 in_two=0.962 flatness=0.992 support=[0 1 2 3 4 5 6 7 8 9] ten: j=1 a_j=0.994 null_pct=1.000 four(1,3,9,7)=0.622 four(2,6,8,4)=0.617 keys_in_turns=0:0.00 1:0.10 2:0.20 3:0.31 4:0.43 5:0.53 6:0.64 7:0.73 8:0.81 9:0.88
+CONTEXT_SPAN aligned tick=0 context=- modulus=1.662 in_one=0.951 in_two=0.991 flatness=0.991 support=[0 1 2 3 4 5 6 7 8 9] ten: j=3 a_j=0.985 null_pct=1.000 four(1,3,9,7)=0.497 four(2,6,8,4)=0.540 keys_in_turns=0:0.00 1:0.29 2:0.55 3:0.90 4:0.15 5:0.49 6:0.76 7:0.04 8:0.38 9:0.62
+CONTEXT_SPAN aligned tick=0 context=- modulus=1.511 in_one=0.957 in_two=0.991 flatness=0.985 support=[0 1 2 3 4 5 6 7 8 9] ten: j=3 a_j=0.987 null_pct=1.000 four(1,3,9,7)=0.502 four(2,6,8,4)=0.526 keys_in_turns=0:1.00 1:0.37 2:0.59 3:0.95 4:0.22 5:0.52 6:0.85 7:0.10 8:0.45 9:0.71
+CONTEXT_SPAN aligned tick=0 context=- modulus=1.407 in_one=0.868 in_two=0.920 flatness=0.998 support=[0 1 2 3 5 6 7 8] four(1,3,9,7)=0.485 four(2,6,8,4)=0.437 keys_in_turns=0:0.00 1:0.59 2:0.08 3:0.42 5:0.04 6:0.62 7:0.06 8:0.41
+CONTEXT aligned tick=0 context=0 share_of_menu=0.078 blocks: 
+CONTEXT aligned tick=0 context=1 share_of_menu=0.064 blocks: 
+CONTEXT aligned tick=0 context=2 share_of_menu=0.066 blocks: 
+CONTEXT aligned tick=0 context=3 share_of_menu=0.062 blocks: 
+CONTEXT aligned tick=0 context=4 share_of_menu=0.066 blocks: 
+CONTEXT aligned tick=0 context=5 share_of_menu=0.068 blocks: 
+CONTEXT aligned tick=0 context=6 share_of_menu=0.065 blocks: 
+CONTEXT aligned tick=0 context=7 share_of_menu=0.062 blocks: 
+CONTEXT aligned tick=0 context=8 share_of_menu=0.071 blocks: 
+CONTEXT aligned tick=0 context=9 share_of_menu=0.064 blocks: 
+CONTEXT_READ menu=dealt symbols=16 ticks=[0, 1, 2, 3]
