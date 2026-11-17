@@ -25,3 +25,32 @@ G-D3: the held arithmetic (the uniform draw's records) rises by 0.02 to 0.15 nat
 What it decides: it prices the choice that is Brandon's (how much of a section the arithmetic world takes) in the line's own
 units, both ways: what one lap gives text back, and what it costs the arithmetic. G-D1 missed low (under 0.010), the rise
 was not the drive's alone and a share does not undo it.
+
+SCORES of G-D1 to G-D3, read from the clock at 13:08:27 UTC, November 17 (side90.txt; the side lap's mean against lap 90's mean,
+the same held places, the one-place receiver; nats a place)
+How it ran. The first form of the run asked for the card's lock while lap 90 held it; the forms watcher asks for it the same
+way and holds it through a lap's reads, so the two would have starved or raced each other. It was stopped before lap 90 ended
+and run again to ask for the lock only after lap 90's reads and writes, with the line's next chain (chain 26, chain 25's laps
+unchanged) started by its last line. The side lap took the lock at 12:34:14 UTC and released it at 13:07:43; lap 91 took it
+one second later from lap 90's state.
+The side lap: 3,000 sections in 1,510 s, where lap 90's 3,000 took 3,039 s. A section without the arithmetic world runs in
+0.52 s against 1.07 s: the world's acts are half of a lap's card time.
+
+| region | lap 90 | side lap | change |
+| code | 0.5522 | 0.5437 | −0.0085 |
+| web | 0.9002 | 0.8914 | −0.0088 |
+| science | 0.7582 | 0.7514 | −0.0068 |
+| books | 0.8635 | 0.8602 | −0.0033 |
+| wikidata | 1.0690 | 1.0577 | −0.0113 |
+| held arithmetic | 1.6011 | 1.7508 | +0.1497 |
+| GSM8K test split | 0.7610 | 0.7411 | −0.0199 |
+
+G-D1 missed low for code, web, science and books (0.003 to 0.009 where 0.010 to 0.035 was guessed) and held for wikidata
+(0.011). A drive raised by four thirds gave back about a third of what the drive's law predicted, and about a sixth of the
+rise at lap 71. So, as the guess fixed it: the rise was not the drive's alone, or the balance comes back more slowly than it
+left; one lap does not tell the two apart, and the word problems stayed in the side lap at a third of a section.
+G-D2 missed: the GSM8K test split fell by 0.020, the largest move of the yardstick in one lap since lap 74. Its drive rose by
+the same four thirds and it followed.
+G-D3 held at its upper edge: the held arithmetic rose 0.150 in one lap with no drive.
+The control still owed: lap 91's mean, the line's own lap from the same state with the arithmetic world, read beside the
+side lap's when it lands.
