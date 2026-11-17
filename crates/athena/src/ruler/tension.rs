@@ -382,7 +382,8 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     let unescape = |t: &str| t.replace("\\n", "\n");
     // A row's fourth field, where it stands, names its opening: `suffix` opens the run from a keyed place to its end (the state a write
     // in place order meets: every earlier place known, every later one open); absent, a keyed half of the run's places.
-    let mut rows: Vec<(String, Vec<usize>, Vec<usize>, bool)> = Vec::new();
+    // `first` opens the row's prompt and holds its run known: a place compared on what stands to its right (the backward reader's state).
+    let mut rows: Vec<(String, Vec<usize>, Vec<usize>, u8)> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         if w.len() < 3 {
@@ -392,19 +393,20 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         if p.is_empty() || r.is_empty() {
             return Err("a forms row with an empty prompt or run".into());
         }
-        let suffix = match w.get(3).copied() {
-            None | Some("") => false,
-            Some("suffix") => true,
-            Some(_) => return Err("a forms row whose opening is not `suffix`".into()),
+        let opening = match w.get(3).copied() {
+            None | Some("") => 0u8,
+            Some("suffix") => 1,
+            Some("first") => 2,
+            Some(_) => return Err("a forms row whose opening is not `suffix` or `first`".into()),
         };
-        rows.push((w[0].to_string(), p, r, suffix));
+        rows.push((w[0].to_string(), p, r, opening));
     }
     if stride.is_some_and(|n| n * sweeps > rows.len()) {
         return Err("a stream of fewer rows than its passes take".into());
     }
     println!("TRIAL_PASSES records={} passes={sweeps} records_a_section={records} closed={} leak={} threads={}", rows.len(), learner.field.declaration.closed, learner.leak.map_or("none".to_string(), |k| k.to_string()), rayon::current_num_threads());
     // The read table, where one is given: each row's group, prompt, run and the place of its answer's last digit in the run.
-    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, Option<usize>, String)> = Vec::new();
+    let mut read_rows: Vec<(String, Vec<usize>, Vec<usize>, Option<usize>, String, bool)> = Vec::new();
     let (mut every, mut save) = (0usize, 0usize);
     if args.len() >= 18 {
         let feed = codec.encode(b"\n")?;
@@ -421,7 +423,9 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
                 return Err("a read row with an empty prompt or run".into());
             }
             let last = r.iter().position(|&c| c == feed[0]).filter(|&at| at > 0).map(|at| at - 1);
-            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, last, w[0].to_string()));
+            // A read row with `first` as its fourth field is read with its prompt open and its run known, at each of its three reads.
+            let first = w.get(3).copied() == Some("first");
+            read_rows.push((w[0].split(':').next().unwrap_or("").to_string(), p, r, if first { None } else { last }, w[0].to_string(), first));
         }
         (every, save) = (args[16].parse()?, args[17].parse()?);
         if every == 0 || save == 0 || read_rows.is_empty() {
@@ -433,10 +437,14 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         if read_rows.is_empty() {
             return Ok(());
         }
-        let region_of = |(_, p, r, last, label): &(String, Vec<usize>, Vec<usize>, Option<usize>, String), kind: usize| {
+        let region_of = |(_, p, r, last, label, first): &(String, Vec<usize>, Vec<usize>, Option<usize>, String, bool), kind: usize| {
             let mut classes = p.clone();
             classes.extend_from_slice(r);
             let mut open = vec![false; classes.len()];
+            if *first {
+                open[..p.len()].fill(true);
+                return OwnedRegion::plain(classes, open);
+            }
             match (kind, last) {
                 (0, Some(last)) => open[p.len() + last] = true,
                 (0, None) => {
@@ -462,6 +470,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             for ((row, face), region) in read_rows.iter().zip(&faces).zip(&regions) {
                 // A plain row sums every open place of its two reads; a sum's row reads its one place.
                 let places: Vec<usize> = match (kind, row.3) {
+                    _ if row.5 => (0..row.1.len()).collect(),
                     (2, Some(0)) => continue,
                     // A plain row's third read: its whole run open, coded at its first place alone (the next place on its left context).
                     (2, None) => vec![row.1.len()],
@@ -506,12 +515,14 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
         for chunk in taken.chunks(records) {
             let regions: Vec<OwnedRegion> = chunk
                 .iter()
-                .map(|(label, p, r, suffix)| {
+                .map(|(label, p, r, opening)| {
                     let bit = |j: usize| keyed_bit(&format!("{label}:{sweep}:{j}"));
                     let mut classes = p.clone();
                     classes.extend_from_slice(r);
                     let mut open = vec![false; classes.len()];
-                    if *suffix {
+                    if *opening == 2 {
+                        open[..p.len()].fill(true);
+                    } else if *opening == 1 {
                         let from = (bit(r.len()) % r.len() as u64) as usize;
                         open[p.len() + from..].fill(true);
                     } else {
@@ -650,5 +661,57 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
     println!("NEXT_WRITE_DONE rows={} run={run} window={} ms={}", rows.len(), window.map_or("-".to_string(), |n| n.to_string()), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; the lead, November 17, the record of the dwell §19] `read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS
+/// FORMS_SHA STATE STATE_SHA OUT`: **a region's level, written out for a ruler**. Each row of `FORMS` (`label<TAB>prompt<TAB>run`) is
+/// one region, its prompt known and its run open. `OUT/level.tsv` takes a line a region: its label, its sites, the epochs' anchors and
+/// each place's news on the code's grain (`2^(−20)` bits); `OUT/coarse.i32` takes each epoch's read after the level's last tick, epoch
+/// after epoch in the regions' order (`D₁` entries on `2^(−16)`); `OUT/dims.tsv` names `D₁`. On the host's threads; the state is read,
+/// never written.
+pub fn read_level(args: &[String]) -> Result<()> {
+    if args.len() != 12 {
+        return Err("read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-level")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[11]);
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut work: Vec<(String, OwnedRegion)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        if w.len() < 3 {
+            return Err("a level row that is not label, prompt and run".into());
+        }
+        let (p, r) = (codec.encode(unescape(w[1]).as_bytes())?, codec.encode(unescape(w[2]).as_bytes())?);
+        let mut classes = p.clone();
+        classes.extend_from_slice(&r);
+        let mut open = vec![false; classes.len()];
+        open[p.len()..].fill(true);
+        work.push((w[0].to_string(), OwnedRegion::plain(classes, open)));
+    }
+    let traces: Vec<_> = work.par_iter().map(|(_, region)| learner.field.level_trace(&view_of(region)).map_err(|e| e.to_string())).collect();
+    std::fs::create_dir(out)?;
+    let (mut lines, mut coarse) = (String::new(), Vec::<u8>::new());
+    let mut width = 0usize;
+    for ((label, region), trace) in work.iter().zip(traces) {
+        let t = trace?.ok_or("a field without a level")?;
+        width = t.coarse_read.len() / t.anchors.len().max(1);
+        let list = |v: &mut dyn Iterator<Item = String>| v.collect::<Vec<_>>().join(",");
+        lines.push_str(&format!("{label}\t{}\t{}\t{}\n", region.classes.len(), list(&mut t.anchors.iter().map(usize::to_string)), list(&mut t.news.iter().map(i64::to_string))));
+        for v in &t.coarse_read {
+            coarse.extend_from_slice(&v.to_le_bytes());
+        }
+    }
+    write_new(&out.join("level.tsv"), lines.as_bytes())?;
+    write_new(&out.join("coarse.i32"), &coarse)?;
+    write_new(&out.join("dims.tsv"), format!("coarse\t{width}\n").as_bytes())?;
+    println!("LEVEL_DONE regions={} ms={}", work.len(), started.elapsed().as_millis());
     Ok(())
 }

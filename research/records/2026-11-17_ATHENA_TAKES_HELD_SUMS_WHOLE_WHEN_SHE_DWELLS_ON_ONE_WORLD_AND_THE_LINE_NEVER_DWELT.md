@@ -343,3 +343,157 @@ and a run of 32 with a keyed half open, for the count of compared places the nig
 writes real words in broken phrases. Both guesses of G-N2 held. So the comparison at the boundary is what text needed first, and the
 register by itself does not give it. The night's run stood at 1.527 nats at pass 15 and goes on to pass 40.
 
+## 16. The backward trace: of the letters that go in, about one and a half come back
+
+Brandon, 23:06 UTC (in my words): the run of the night was a heavy bet on a reader that showed no coherence in two hours, and I go
+forward without analogizing the backward pass. The run was stopped at pass 16 on its own number (the held code fell 0.0013 nats in
+that pass), and §13's build is not started: a chart 48 times cheaper is an efficiency bet on a reader that does not yet bind, and the
+trial's tool already gives a pass in ten minutes.
+
+The analogy, taken as one. A forward pass gathers from the sources to a place. The backward pass carries the comparison back through
+the same contacts to what caused it. The two are a round trip, and what survives it is what the path keeps. So the question §14 left
+(she draws on 24 places and codes like a count of three) is asked backward: of the symbols that went in, which can be read back out of
+her state at the place? This is the guide's own rule of November 16 (a premise is a presence at the consumer, read link by link before
+a build), which I had not applied to text.
+
+`tools/trace_ruler.py` on the pass-15 state (`backward_trace.txt`): 5,164 held rows, the place's charts at each tick read by least
+squares for each earlier symbol's identity, fitted on half the rows and read on the other. Share of the symbol's identity present, in
+thousandths:
+
+| the symbol | at the opening | after tick 1 | tick 2 | tick 3 | tick 4 (what the face reads) |
+|---|---|---|---|---|---|
+| 1 place back | 981 | 964 | 903 | 746 | 664 |
+| 2 back | 360 | 374 | 537 | 413 | 355 |
+| 3 back | 126 | 151 | 212 | 195 | 171 |
+| 4 back | 46 | 59 | 107 | 77 | 67 |
+| 5 back | 0 | 7 | 35 | 12 | 10 |
+| 6 and farther | 0 | 0 | 0 | 0 | 0 |
+| the pair before the place, jointly | 334 | 299 | 368 | 303 | 264 |
+| the triple, jointly | 169 | 170 | 213 | 203 | 195 |
+
+- The opening gives one symbol whole, the one before the place (its strand contact's row). The moment's chart brings a third of the
+  second, an eighth of the third and a twentieth of the fourth.
+- The ticks add little: the second symbol gains eighteen points at tick 2 and loses them again, and the nearest symbol fades from 98%
+  to 66% as the ticks write over the place.
+- The rows that do the gathering are soft. Two heads keep three quarters of each row on sources eleven places away or more; the other
+  two spread theirs over the five nearest places, a tenth to a third on each, their largest single share 0.2 to 0.6.
+
+So at the place where her face is read, about one and a third symbols of the last five are there (0.66 + 0.36 + 0.17 + 0.07 + 0.01),
+the rest of her 24 places being diffuse (register, the shape of the word), and the fourth and fifth symbol never arrive at all. §14
+called the limit binding. The trace puts it one link earlier: there is nothing at the place to bind. The carriers are narrow (a
+moment of 32 complex modes for the whole past, a head's current of 16 numbers) and the lock that would address "the source three back"
+does not close, the same link that slipped on the sums on November 16.
+
+What it changes. More passes of this reader, or a cheaper way to make them, cannot give words, because five symbols do not reach the
+place by any path it has. The object the theory holds for exactly this is the strand: the residue of a running word on a few coprime
+rings keeps the last several symbols whole and in order, as one address (the located transport of October 5; the strands of October
+26), and rows met at that address are a law's own entries. The next reading is that premise on this text, before any part: what a
+strand's residue of the last five symbols carries to the place, against the count ruler's 1.36 nats.
+
+## 17. The trace on the passage's own clock: she opens units and does not close them, and nothing coarse-grains
+
+Brandon, 23:17 UTC (in my words): why is this quantified by letters; where is he losing me on the coarse graining and the tokenization.
+§14 and §16 are stated at the codec's grain, a byte as the unit and an offset as the distance, and so were the 48-place rows and the
+ruler I had begun for §16's last paragraph (windows of bytes and a word boundary I authored). That is the recorded failure of a design
+thought in offsets and windows. The theory's units were already in the guide and the atlas: a byte is a digit of the passage and a
+symbol a length (its news); the passage's clock is its running news `S`; a reader of period `σ` begins a unit where `S` carries
+(`deposition.return-on-news-clock`, `helical.closure-remainder-held-by-the-locale`); a completed unit is one symbol of the next ring;
+and the past is a word in that radix. The same dump, read in them (`tools/news_ruler.py`, `news_trace.txt`; a place's news is its code
+length under a count model of the fitted text, a ruler's stand-in for her own):
+
+**Where her cost is.** The arriving place's news under the ruler, her code there, nats:
+
+| the arriving place's news | places | the ruler | her | her excess | share of her whole excess |
+|---|---|---|---|---|---|
+| under 0.25 (the passage has nearly decided it) | 34% | 0.065 | 0.340 | +0.275 | 48% |
+| 0.25 to 1 | 23% | 0.567 | 0.958 | +0.391 | 45% |
+| 1 to 2 | 18% | 1.474 | 1.829 | +0.355 | 32% |
+| 2 to 4 | 20% | 2.789 | 2.874 | +0.085 | 9% |
+| over 4 (a landmark) | 5% | 6.152 | 4.833 | −1.319 | −34% |
+
+Nine tenths of her excess stands at places that carry under one nat, the inside of a unit, and at the landmarks she codes 1.3 nats
+under the ruler. She opens units and does not close them.
+
+**What she holds, against distance in nats of passage.** A symbol's identity present in her state where her face reads: 446
+thousandths within 1 nat before the place, 353 at 1 to 2, 242 at 2 to 4, 38 at 4 to 8, none past 8. Her span is about four nats; a
+word of this text is eight to ten.
+
+**What carries.** The unit in progress, as one identity, present where her face reads, by the reader's period: 200 thousandths at 2
+nats, 106 at 4, 7 at 8, none at 16; the unit before it, none at any period. (The identity read is starved for long units at 2,582
+fitted rows, so the figures at 8 and 16 are floors.)
+
+So nothing coarse-grains: no unit reaches a place whole and no completed unit crosses to the next. Everything she holds is on the
+fine ring and spans half a word. The engine's grain diverges from the theory's at exactly this: one site a byte at every scale, a level
+whose sites are landmarks of news but which hands down mixtures and commits no unit, and a comparison counted a byte. §16's "the
+fourth and fifth symbol never arrive" is this reading at the wrong grain, and its last paragraph's premise is restated: what the unit
+in progress and the completed units before it, each one address and cut by news with nothing authored, let a place code and write.
+
+## 18. Rulers for the other side, and what they are worth
+
+After §17 I priced the theory's side with rulers outside the machine on the fifty books, three in an hour
+(`rulers_whole_context.txt`; each a count reader's kin with rows shared on two coprime rings; counts and codes only).
+
+- **Windows of symbols** (the codec's grain; a yardstick). The last one to six symbols as nested addresses: held next place 2.43, 2.00,
+  1.70, 1.50, 1.43, 1.40 nats; its panel 90% of words in the lexicon, written in a minute of the host. What a place writes when its
+  context arrives whole is plain.
+- **Units cut at landmarks of news as addresses for the next symbol.** One period at a time: 1.95, 1.83, 2.03 nats; six periods at
+  once: 1.63 and 76%, her own level.
+- **Two levels**, the record of November 12 read as written (a site of the level above is an epoch of the clock of news; a composite
+  is a prime of higher rank whose own length is shorter than its bytes' added): units cut at landmarks of a three-symbol reader's
+  news, each completed unit one symbol of a count reader of units, the held text coded as units against the same bytes one by one:
+
+| mean unit | distinct units | bytes one by one | units as symbols | units met before | a unit shorter than its bytes added | longest run shared with the books |
+|---|---|---|---|---|---|---|
+| 2.1 symbols | 4,750 | 1.430 | 1.508 | 100% | 49% | 19 octets |
+| 2.8 | 14,136 | 1.430 | 1.550 | 99% | 48% | 26 |
+| 3.8 | 41,465 | 1.430 | 1.606 | 95% | 41% | 49 |
+| 5.8 | 82,448 | 1.430 | 1.577 | 81% | 34% | 64 |
+
+  Written a unit at a time the words are real (81% to 88%), and at the larger units it is recitation: a panel line of 64 octets copied
+  whole.
+
+These do not show the theory's coarse graining paying on this text, and they are a verdict on my constructions. Each unit there is a
+free row addressed by its content, the index of contexts the lessons refuse, which recites as it grows; in the theory a unit shares
+its rings with its kind (the record of November 12, §10: a key factors as its family and its member; rows shared along the ladder) and
+a level is a receiver compared at its own grain. I built neither, and I built three rulers at the speed Brandon had named the same
+hour. None becomes a part.
+
+What follows is slower. The machine has a level whose sites are landmarks of her own news, in lap 94's state and in tonight's, and no
+reading of this record has looked at it. Its records of November 13 to 15 are read first, then that level is traced on tonight's state
+as §16 and §17 traced the byte path: where her epochs fall, what an epoch holds of itself, and whether anything crosses from one epoch
+to the next.
+
+## 19. Her own level, traced: the units are cut, and the level holds almost nothing of them
+
+The machine has a coarse grain of its own, built on November 13 from the record that owns it
+([the level's design](2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md),
+§4.2 to §4.7): a level's sites are the landmarks of the news below it (a place no larger news stands within a section of, the section
+the flat face's code, 5.50 nats here); a place's news is read at its cavity face; an epoch has no row, its face is its moment on the
+news phase (six harmonics of its places' reads) restricted to a level state 64 wide, which ticks on its own clock and hands harmonics
+back to the epoch's places. It stands in lap 94's state and in the night's. §16 to §18 never looked at it.
+
+`Constitution::level_trace` and `athena host complete-language read-level` write it out, and `tools/level_ruler.py` reads it
+(`level_trace.txt`; the night run's pass-15 state, the 5,164 rows of §16; 32,584 epochs):
+
+- **Where her epochs fall.** A place's news at its cavity face is 1.15 nats in the mean. A whole epoch is 8.6 places and 9.5 nats on
+  average (median 7 places), about a word of this text in news. Its leading place is the first letter of a word in 36% of epochs,
+  inside a word in 55%, a space or a mark in 9%. Her landmarks stand where she is surprised, and §17 read that she is surprised inside
+  units.
+- **What the level's state of an epoch holds**, read by least squares on half the regions, in thousandths: the epoch's first symbol
+  68, its second 70, its third 47, its last 102, its size in places 164, the epoch as one identity 171; the epoch before it as one
+  identity 24; the symbol that leads the next epoch 43.
+
+So the units are cut by the theory's law and at about a word's news, and the level carries almost nothing of them: an epoch is not
+held as a symbol, the epoch before it does not cross, and the level says nothing of what follows. With §17: she loses inside units
+because nothing closes one, and the level that would hold a unit and give its interior back is nearly empty.
+
+The cause is in the source (`field/scale.rs`): the level has no comparison at its own grain. Its state is trained only through the
+prolongation's effect on the byte faces, several operands downstream, and nothing asks it to hold its epoch or to read the next. The
+objects give every receiver its own receipt, and #405 names learning per contact; the level is a receiver without one. This is §4's
+fourth fault of the step back, found at the one place where the theory's grain was built.
+
+**Where this stops.** No part follows from tonight. What is owed first is reading: the rest of the level's records (the landmarks'
+ruler, the return on the clock of news of November 15, the news clock of October 27), then what a comparison at a level's own grain
+is on the objects: the epoch's closure (its state gives its interior back, which is what would take the news out of a unit's inside)
+and the next epoch read from the epochs before. It is written before it is built, with its acceptance on the passage's clock.
+

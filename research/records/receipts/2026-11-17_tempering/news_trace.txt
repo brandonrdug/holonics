@@ -1,0 +1,18 @@
+# The backward trace re-read on the passage's own clock (tools/news_ruler.py): the same dump as backward_trace.txt, a place's news its
+# code length under a count model of the fitted text (orders 0 to 5), a unit begun where the running news carries past the reader's period.
+NEWS places=5164 mean news a place (count ruler) 1.298 nats; the arriving place: ruler 1.282, her 1.479
+NEWS (a) arriving place's news 0-0.25 nats: places 1779 (34%), ruler 0.065, her 0.340, her excess +0.275, share of her whole excess 48%
+NEWS (a) arriving place's news 0.25-1 nats: places 1169 (23%), ruler 0.567, her 0.958, her excess +0.391, share of her whole excess 45%
+NEWS (a) arriving place's news 1-2 nats: places 925 (18%), ruler 1.474, her 1.829, her excess +0.355, share of her whole excess 32%
+NEWS (a) arriving place's news 2-4 nats: places 1030 (20%), ruler 2.789, her 2.874, her excess +0.085, share of her whole excess 9%
+NEWS (a) arriving place's news 4-99 nats: places 261 (5%), ruler 6.152, her 4.833, her excess -1.319, share of her whole excess -34%
+NEWS (b) period 2 nats: a unit is 2.0 symbols in progress on average; present where her face reads: the unit in progress 200, the unit before it -1; the unit in progress at the opening 326 (thousandths)
+NEWS (b) period 4 nats: a unit is 2.7 symbols in progress on average; present where her face reads: the unit in progress 106, the unit before it -29; the unit in progress at the opening 186 (thousandths)
+NEWS (b) period 8 nats: a unit is 4.3 symbols in progress on average; present where her face reads: the unit in progress 7, the unit before it -178; the unit in progress at the opening 57 (thousandths)
+NEWS (b) period 16 nats: a unit is 7.7 symbols in progress on average; present where her face reads: the unit in progress -58, the unit before it -468; the unit in progress at the opening -25 (thousandths)
+NEWS (c) a symbol 0-1 nats of passage before the place: present 446 thousandths (symbols read 2726)
+NEWS (c) a symbol 1-2 nats of passage before the place: present 353 thousandths (symbols read 1725)
+NEWS (c) a symbol 2-4 nats of passage before the place: present 242 thousandths (symbols read 4021)
+NEWS (c) a symbol 4-8 nats of passage before the place: present 38 thousandths (symbols read 8059)
+NEWS (c) a symbol 8-16 nats of passage before the place: present -40 thousandths (symbols read 11429)
+NEWS (c) a symbol 16-99 nats of passage before the place: present -47 thousandths (symbols read 3024)
