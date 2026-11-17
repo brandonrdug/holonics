@@ -261,3 +261,16 @@ G-K2: the operands' presence at the answer's site at tick 3 rises to 0.42 or mor
 G-K3: the units digit's code moves by less than 0.05 nats either way (2.365).
 G-K4: ten located products at the units place remove 0.12 or more on the held half at some tick (0.090 at most, lap 76's mean).
 G-K5: at two octaves at least three of the six text slices' held one-place codes rise by 0.05 nats a place or more.
+
+GUESSES G-Y0 to G-Y2, fixed at 00:26:49 UTC, November 17 (from date -u), before the read: a passage under two changes of frame
+Reading: tools/symbol_frame_ruler.py: windows of 32 to 512 places of the held books (ASCII windows; 164 of them), eight places a window
+opened alone, at lap 77's mean on the host (8 threads): plain; renamed (its letters through one fixed permutation, both cases alike);
+doubled (every byte written twice, windows to 256 places, both copies of each place opened in turn).
+G-Y0: plain, the code stands between 0.6 and 1.0 nats a place at every window length.
+G-Y1: renamed, the code stands at 2.5 nats a place or more at every window length, and the 512-place windows code within 0.3 nats
+  of the 64-place windows: the region's length buys nothing, since a symbol is its row and no key is located inside a region.
+G-Y2: doubled, each copy codes at 2.0 nats a place or more, and the 256-place windows within 0.3 nats of the 64-place windows: the
+  clock is one site a byte, and a place's twin beside it is not read as its twin.
+What it decides: held, the two figures are the baseline of the symbol's line's acceptance (the code falls along a renamed region; a
+re-rastered passage keeps its crossings). A fall with the window's length in either frame would say the engine locates a key inside a
+region past what its rows hold.
