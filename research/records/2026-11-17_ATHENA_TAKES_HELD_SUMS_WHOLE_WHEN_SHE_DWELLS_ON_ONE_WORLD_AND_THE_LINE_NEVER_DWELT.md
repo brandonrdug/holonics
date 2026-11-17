@@ -390,3 +390,41 @@ rings keeps the last several symbols whole and in order, as one address (the loc
 26), and rows met at that address are a law's own entries. The next reading is that premise on this text, before any part: what a
 strand's residue of the last five symbols carries to the place, against the count ruler's 1.36 nats.
 
+## 17. The trace on the passage's own clock: she opens units and does not close them, and nothing coarse-grains
+
+Brandon, 23:17 UTC (in my words): why is this quantified by letters; where is he losing me on the coarse graining and the tokenization.
+§14 and §16 are stated at the codec's grain, a byte as the unit and an offset as the distance, and so were the 48-place rows and the
+ruler I had begun for §16's last paragraph (windows of bytes and a word boundary I authored). That is the recorded failure of a design
+thought in offsets and windows. The theory's units were already in the guide and the atlas: a byte is a digit of the passage and a
+symbol a length (its news); the passage's clock is its running news `S`; a reader of period `σ` begins a unit where `S` carries
+(`deposition.return-on-news-clock`, `helical.closure-remainder-held-by-the-locale`); a completed unit is one symbol of the next ring;
+and the past is a word in that radix. The same dump, read in them (`tools/news_ruler.py`, `news_trace.txt`; a place's news is its code
+length under a count model of the fitted text, a ruler's stand-in for her own):
+
+**Where her cost is.** The arriving place's news under the ruler, her code there, nats:
+
+| the arriving place's news | places | the ruler | her | her excess | share of her whole excess |
+|---|---|---|---|---|---|
+| under 0.25 (the passage has nearly decided it) | 34% | 0.065 | 0.340 | +0.275 | 48% |
+| 0.25 to 1 | 23% | 0.567 | 0.958 | +0.391 | 45% |
+| 1 to 2 | 18% | 1.474 | 1.829 | +0.355 | 32% |
+| 2 to 4 | 20% | 2.789 | 2.874 | +0.085 | 9% |
+| over 4 (a landmark) | 5% | 6.152 | 4.833 | −1.319 | −34% |
+
+Nine tenths of her excess stands at places that carry under one nat, the inside of a unit, and at the landmarks she codes 1.3 nats
+under the ruler. She opens units and does not close them.
+
+**What she holds, against distance in nats of passage.** A symbol's identity present in her state where her face reads: 446
+thousandths within 1 nat before the place, 353 at 1 to 2, 242 at 2 to 4, 38 at 4 to 8, none past 8. Her span is about four nats; a
+word of this text is eight to ten.
+
+**What carries.** The unit in progress, as one identity, present where her face reads, by the reader's period: 200 thousandths at 2
+nats, 106 at 4, 7 at 8, none at 16; the unit before it, none at any period. (The identity read is starved for long units at 2,582
+fitted rows, so the figures at 8 and 16 are floors.)
+
+So nothing coarse-grains: no unit reaches a place whole and no completed unit crosses to the next. Everything she holds is on the
+fine ring and spans half a word. The engine's grain diverges from the theory's at exactly this: one site a byte at every scale, a level
+whose sites are landmarks of news but which hands down mixtures and commits no unit, and a comparison counted a byte. §16's "the
+fourth and fifth symbol never arrive" is this reading at the wrong grain, and its last paragraph's premise is restated: what the unit
+in progress and the completed units before it, each one address and cut by news with nothing authored, let a place code and write.
+
