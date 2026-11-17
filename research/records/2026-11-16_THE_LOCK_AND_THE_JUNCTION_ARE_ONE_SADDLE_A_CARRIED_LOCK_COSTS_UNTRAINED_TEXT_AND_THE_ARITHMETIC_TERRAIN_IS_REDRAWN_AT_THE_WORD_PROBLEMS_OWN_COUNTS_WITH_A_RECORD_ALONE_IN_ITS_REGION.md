@@ -165,33 +165,44 @@ returned HTTP 403 to this thread and was not read. His message reached this thre
   the paper points at is the difference between successive ticks' rows, a ratio's logarithmic derivative (`agent-inferred`; not built).
 
 **The row's heat, read after the answer** (`heat76.txt`, `tension_ruler.py heat`; 1,588 both-column places of met sums, lap 76's
-mean, tick 0). The row's entropy beside the logarithm of its count of sources, the variance of its log-weights under its own shares,
-the aligned pair's share, and that share with the row's gain raised at the same keys (`p ∝ p^κ`):
+mean). The row's entropy beside the logarithm of its count of sources, the variance of its log-weights under its own shares, the
+aligned pair's share, and that share with the row's whole log-weight scaled at the same keys (`p ∝ p^κ`):
 
-| head | entropy of ln 17.4 = 2.85 nats | log-weight variance | aligned pair | gain ×2 | ×4 | ×16 |
+| row | entropy of ln 17.4 = 2.85 nats | log-weight variance | aligned pair | ×2 | ×4 | ×16 |
 |---|---|---|---|---|---|---|
-| 0 | 1.56 | 1.21 | 0.332 | 0.388 | 0.408 | 0.411 |
-| 1 | 2.08 | 1.01 | 0.254 | 0.319 | 0.351 | 0.364 |
-| 2 | 2.49 | 0.66 | 0.192 | 0.238 | 0.263 | 0.275 |
-| 3 | 2.06 | 0.98 | 0.256 | 0.299 | 0.307 | 0.303 |
+| head 0, tick 0 | 1.56 | 1.21 | 0.332 | 0.388 | 0.408 | 0.411 |
+| head 1, tick 0 | 2.32 | 0.68 | 0.179 | 0.189 | 0.185 | 0.176 |
+| head 2, tick 0 (turned) | 2.44 | 0.77 | 0.063 | 0.029 | 0.007 | 0.000 |
+| head 3, tick 0 (turned) | 1.32 | 1.09 | 0.003 | 0.000 | 0.000 | 0.000 |
+| head 0, tick 1 | 2.08 | 1.01 | 0.254 | 0.319 | 0.351 | 0.364 |
+| head 0, tick 2 | 2.49 | 0.66 | 0.192 | 0.238 | 0.263 | 0.275 |
+| head 0, tick 3 | 2.06 | 0.98 | 0.256 | 0.299 | 0.307 | 0.303 |
 
-Head 0's row has left its centroid: it holds the weight of about five sources of seventeen. Cooling it at its present keys takes the
-aligned pair from 0.33 to 0.41 and no further, so in six tenths of its weight the row's heaviest source is some other site. Where its
-weight stands at tick 0: the aligned column 0.332, the operands' neighbouring places 0.055 (one lower) and 0.075 (one higher), the
-places two or more away 0.099, the expression's spaces and signs 0.164, and the value's own known digits 0.275. At ticks 2 and 3 the
-aligned pair holds 0.063 and 0.003. The lock is short in its keys and not in its gain: the place is known at both ends (0.73 to 0.89,
-the first record), and the row still gives two thirds of its weight to sources that serve the head's other work. The answer sent at
-23:49 gave the centroid's symmetry as the cause of §3.1's null; this reading gives the keys, and the next message to Brandon says so.
+The address is head 0's. The turned heads hold nothing of the aligned pair, and head 1 a sixth. Head 0's row has left its centroid: it
+holds the weight of about five sources of seventeen. Scaled at its present keys it takes the aligned pair from 0.33 to 0.41 and no
+further, so in six tenths of its weight the row's heaviest source is some other site. Where its weight stands at tick 0: the aligned
+column 0.332, the operands' neighbouring places 0.055 (one lower) and 0.075 (one higher), the places two or more away 0.099, the
+expression's spaces and signs 0.164, and the value's own known digits 0.275. The lock is short in its keys and not in its gain: the
+place is known at both ends (0.73 to 0.89, the first record), and the row still gives two thirds of its weight to sources that serve
+the head's other work. The answer sent at 23:49 gave the centroid's symmetry as the cause of §3.1's null; this reading gives the keys.
 
-On sums of one- and two-digit operands at lap 77's mean (10,038 such places, `heat_short77.txt`) head 0 holds 0.405 of its row on the
-aligned pair and cools to 0.451. Head 3, a turned head, holds 0.470 and cools to 0.764: a short record's operands stand at nearly fixed
-distances, and a head that weighs by distance has keys that find them. What that head is short of there is gain, and a head's
-temperature is one entry for every slice (`Loci::temper`).
+On sums of one- and two-digit operands at lap 77's mean (10,038 such places, `heat_short77.txt`) the aligned pair's share at tick 0 is
+0.405, 0.241, 0.066 and 0.002 for heads 0 to 3, and for head 0 at ticks 0 to 3 it is 0.405, 0.239, 0.235 and 0.470, scaled to 0.451,
+0.256, 0.195 and 0.764. At its last tick on a short record head 0's keys single the pair out in three quarters of its weight.
+
+**A mislabel, and its correction.** This table first stood with head 0's rows at ticks 1 to 3 labelled as heads 1 to 3 at tick 0 (the
+ruler printed its tick and head as bare numbers), and the short sums' last-tick row was reported to Brandon at 23:56 as a turned head's.
+A guess (G-H) was fixed on it and a ruler's state built: head 3's listener raised two octaves (`ruler-temper`, `cool77_2000.*`). That
+read showed head 3 holds nothing of the pair before or after, and that the operands' presence and the units digit's code do not move
+when it is cooled, which is how the mislabel was found, at 00:09 UTC on November 17. The figure that would have caught it was at hand:
+the first record's link trace gives head 0's shares by tick, and their sums are the rows misread. The message was edited, G-H was
+voided with its cause, the ruler now names its tick and head on every line, and the guide's rule on rulers gained a clause.
 
 **What follows as tests.** One located midpoint: a row whose two aligned sources hold equal shares, squared by a triad whose two legs
 read the same arrival, against the table's share at the units place of a short sum. A discriminator: the covector on the difference of
 a row's weight one place above and one place below, which has a slope where the weight at the aligned place has none. Neither is
-ordered before the redrawn slice's two laps are read.
+ordered before the redrawn slice's two laps are read. A third is read at once, since it needs no build: head 0 cooled in the engine's own forward
+on short sums (guesses G-K1 to G-K5; §9).
 
 ## 6. The guesses
 
@@ -204,6 +215,7 @@ sums is next; both missed says the terrain was not the lever.
 ## 7. Failures recorded
 
 - The crowd read was sized for the code's reading and not for the presence ruler, and its result reads the ruler (§3.6).
+- A ruler's rows were quoted under the wrong head (§5), in a message, a guess and this record's first form.
 - The temperature read of §3.1 was taken without the atlas's row on a row's splitting temperature (November 15), and the first answer
   to the lens of §5 named a cause the row's own reading did not bear out. Both are the rule "recover before implementing".
 - G-C5 was fixed after its read was dispatched and before any of its output was read; the guess file says so.

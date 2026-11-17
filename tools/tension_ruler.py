@@ -637,7 +637,11 @@ def heat(d):
     under its own shares (the square of its gain times the spread of its slips: under one, the row cannot tell its sources apart), how
     far the two aligned sources' log-weights stand above the row's mean in units of that spread, and the share the two aligned sources
     would hold with the row's gain raised by 2, 4, 8 and 16 at the same keys (p ∝ p^κ). Where the cooled row closes on the aligned
-    pair the keys locate and the gain is short of its critical value; where it does not, the keys do not single the pair out."""
+    pair the keys locate and the gain is short of its critical value; where it does not, the keys do not single the pair out. The
+    power scales a row's whole log-weight: for a turned head that includes its falloff by distance, which no temperature scales, and
+    at a later tick the keys themselves move with what arrived, so the engine's own answer is a read of a ruler's state
+    (`athena … ruler-temper`). Each line names its tick and its head: on November 17 the lines of head 0 at ticks 1 to 3 were read
+    as heads 1 to 3 at tick 0, and a message and a guess stood on the mislabel until a ruler's state showed it."""
     acc, off = {}, {}
     for line in open(os.path.join(d, "shares.tsv")):
         lab, place, k, h, i, *rest = line.rstrip("\n").split("\t")
@@ -684,11 +688,11 @@ def heat(d):
     print("TENSION_HEAT lengths tick head rows entropy_nats log_sources log_weight_variance aligned_above_mean_in_spreads aligned_pair_share_at_gain_x1 x2 x4 x8 x16")
     for key in sorted(acc):
         e = acc[key]
-        print(f"TENSION_HEAT {key[0]} {key[1]} {key[2]} {e[0]} " + " ".join(f"{x / e[0]:.4f}" for x in e[1:]))
+        print(f"TENSION_HEAT {key[0]} tick={key[1]} head={key[2]} {e[0]} " + " ".join(f"{x / e[0]:.4f}" for x in e[1:]))
     print("TENSION_PLACE lengths tick head rows share_at_offset_-3_or_less -2 -1 0 +1 +2 +3_or_more other_expression_sites value_sites")
     for key in sorted(off):
         o = off[key]
-        print(f"TENSION_PLACE {key[0]} {key[1]} {key[2]} {o[0]} " + " ".join(f"{x / o[0]:.4f}" for x in o[1:]))
+        print(f"TENSION_PLACE {key[0]} tick={key[1]} head={key[2]} {o[0]} " + " ".join(f"{x / o[0]:.4f}" for x in o[1:]))
 
 
 def main():

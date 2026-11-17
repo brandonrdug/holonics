@@ -719,6 +719,11 @@ written here with their reasons so that no agent holds them as slogans.
   minutes on one thread of this host's reference BLAS before it was read); tool calls run faster than they feel, and the first
   guess file's stamp was a minute ahead of the clock, as several of the build's had been; lap 76 took 3,154 s against lap 75's
   2,942 s with up to eighteen host threads reading beside it, the cause not separated. Scope: every ruler and every receipt.
+  A ruler's line names every index it is keyed by, and a new column is read against a figure the records already hold before it is
+  quoted (November 17). Reason: a ruler printed its tick and its head as two bare numbers; head 0's rows at ticks 1 to 3 were read as
+  heads 1 to 3, and a message to Brandon, a guess and a record's table stood on it for a quarter of an hour, while the first record's
+  link trace held the sums that would have told the rows apart
+  ([the record](research/records/2026-11-16_THE_LOCK_AND_THE_JUNCTION_ARE_ONE_SADDLE_A_CARRIED_LOCK_COSTS_UNTRAINED_TEXT_AND_THE_ARITHMETIC_TERRAIN_IS_REDRAWN_AT_THE_WORD_PROBLEMS_OWN_COUNTS_WITH_A_RECORD_ALONE_IN_ITS_REGION.md) §5).
 
 [project-postulate] **GPU first, and the design fixes the workload** (Brandon, October 27;
 [the record](research/records/2026-10-27_THE_LEARNER_RUNS_ON_THE_CARD_AND_ITS_WORKLOAD_IS_NEVER_TRADED_FOR_TIME.md)). The RTX 4080 SUPER is a consumer card, and
