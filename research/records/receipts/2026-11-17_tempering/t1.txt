@@ -1,7 +1,7 @@
 18:13:37
 FIELD_COMMAND hold-families ROOT/.local/wt/lead/.local/run/founding/STATE.mix0 7b85e10bdc752f01ab121b0c698eeef9a36b8169cbf191052190043e40770a87 ROOT/.loca
 HOLD_FAMILIES moving=q,q_bias,probe,probe_bias,temper,closed_odds,closed_odds_bias,read,read_bias,lift_bias entries_moving=33792 entries_held=373921 rate_bits=12
-FIELD_COMMAND hold-families ROOT/.local/wt/depth-sweep/.local/run/mark/lane/line/lap94/STATE.3000 5782cffb172487d277c16b3742c318c6e1a9263683dc6e044ace3544508ab324 /home/b/Worksp
+FIELD_COMMAND hold-families ROOT/.local/wt/depth-sweep/.local/run/mark/lane/line/lap94/STATE.3000 5782cffb172487d277c16b3742c318c6e1a9263683dc6e044ace3544508ab324 ROOT…
 HOLD_FAMILIES moving=q,q_bias,probe,probe_bias,temper,read,read_bias,lift_bias entries_moving=33276 entries_held=369529 rate_bits=12
 # foil lap (card): TRIAL_DONE sections=400 ms=25734; passes: TRIAL_PASSES records=3923 passes=10 records_a_section=100 closed=0 threads=24 1715168 1594270 1578140 1554561 1547563 1532431 1527963 1512330 1514350 1497354 
 # founded lap (host): TRIAL_DONE sections=400 ms=378656; passes: TRIAL_PASSES records=3923 passes=10 records_a_section=100 closed=9 threads=8 1711818 1592173 1574311 1549245 1537512 1509714 1479345 1433469 1430244 1409783 
