@@ -74,7 +74,15 @@ def locate_keys(rows, head=0, tick=0):
                     menu[index[text[j1]], index[text[j2]], xi] += p1 * p2
     found, _ = lc.closure(menu, symbols)
     keys = np.array([lam for _, lam in found])
-    return symbols, index, keys
+    # The ring's members: the two-means split of the symbols' mean modulus (a diffuse row dilutes every member's eigenvalue, so the
+    # moduli say who is on the ring by their gap and never by their size); a member's key is its eigenvalue at unit modulus.
+    mod = np.abs(keys).mean(axis=0)
+    lo, hi = mod.min(), mod.max()
+    for _ in range(50):
+        member = np.abs(mod - hi) < np.abs(mod - lo)
+        lo, hi = mod[~member].mean(), mod[member].mean()
+    keys = np.where(member[None, :], keys / np.maximum(np.abs(keys), 1e-12), 0.0)
+    return symbols, index, keys, member
 
 
 def nats(logits, x):
@@ -84,16 +92,15 @@ def nats(logits, x):
 
 def targets(d, deal=False, seed=5):
     rows = read_rows(d)
-    symbols, index, keys = locate_keys(rows)
+    symbols, index, keys, member = locate_keys(rows)
     e = len(keys)
-    member = np.abs(keys).mean(axis=0) > 0.5
     ring = [i for i in range(len(symbols)) if member[i]]
     print(f"FOUND_KEYS eigenvectors={e} ring={''.join(symbols[i] for i in ring)!r} dealt={deal}")
     rng = np.random.default_rng(seed)
     kernel = lambda u, w, x: (1.0 + (keys[:, u] * keys[:, w] * np.conj(keys[:, x])).real.sum()) / (e + 1) if member[u] and member[w] and member[x] else 0.0
     acc = {}
     feats = {}
-    for lab, place, tk, h, site, src in rows:
+    for lab, _, tk, h, site, src in rows:
         al = aligned(lab, site)
         if al is None or not src:
             continue
