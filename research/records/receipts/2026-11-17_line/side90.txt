@@ -1,0 +1,25 @@
+# The side lap's lines (run side-ninety-b; the lead, November 17). Paths under ROOT are the PC's.
+# side: lap 90's reads and writes have ended 12:34:14
+# side: lock taken 12:34:14
+# side: MOVE_STORE stretches=75369078 store_before=8f879c5c97d9f4bf33a014997d231467076d51fdf8d3cc4e707ac3f147028935 store_after=472560f9094218f25187f5b0d3a18cca401d4d0223516cc4e2bdb87bee508825 slice=arithmetic pieces=2084330 taken=58338397 piece_before=1215732 cursor_before=242 piece_after=1215733 piece_offset=58338411 lines=11 differing_line=11
+# side lap: begun 12:34:15 from .local/wt/depth-sweep/.local/run/mark/lane/line/lap90/STATE.3000 on store-2026-11-16c
+# side lap: exit 0 12:59:25
+STORE_PASS role=prefix sections=3000 stretches_read=76056644 ended=false code_pieces=18746 web_pieces=10619 science_pieces=6378 books_pieces=581 wikidata_pieces=2326 arithmetic_pieces=1215733 words_pieces=292663 ms=1509722
+MEASURE lap=side90 rc=0 wall_s=1510.2 peak_rss_kib=525056
+CAVITY_DONE ms=284103
+MEASURE lap=Pside rc=0 wall_s=284.5 peak_rss_kib=550020
+# side reads: 13:07:43 on side90/lap/MEAN.3000
+LOUDNESS region=code places=20124 nats_a_place=0.5437 loudness_octaves=20.072 spearman_loud_code=-0.018
+LOUDNESS region=web places=20043 nats_a_place=0.8914 loudness_octaves=20.180 spearman_loud_code=-0.086
+LOUDNESS region=science places=20088 nats_a_place=0.7514 loudness_octaves=20.267 spearman_loud_code=-0.164
+LOUDNESS region=books places=20028 nats_a_place=0.8602 loudness_octaves=20.388 spearman_loud_code=-0.217
+LOUDNESS region=wikidata places=20225 nats_a_place=1.0577 loudness_octaves=20.133 spearman_loud_code=+0.252
+LOUDNESS region=arithmetic places=11493 nats_a_place=1.7508 loudness_octaves=20.111 spearman_loud_code=-0.527
+LOUDNESS region=words places=20496 nats_a_place=0.7411 loudness_octaves=20.176 spearman_loud_code=-0.317
+LOUDNESS region=all places=132497 nats_a_place=0.8893 loudness_octaves=20.194 spearman_loud_code=-0.122
+# side: lock released 13:07:43
+MAIN side ninety done 13:07:43
+RUN_EXIT 0 2026-11-17T13:07:43Z
+# two of its sections beside one of lap 90's:
+STORE_SECTION n=20 regions=239 sites=41396 domain=21632 squared=13337732 open=11025 code=60 web=31 science=27 books=13 wikidata=7 arithmetic=0 words=101 stretches=75373819 before=2940640 after=- deposited=true transfer=-8243 external=-8243 rate=12 opening=2983229 opening_places=41396 regions_ms=2 deposit_ms=527 ms=530
+STORE_SECTION n=20 regions=408 sites=39752 domain=23032 squared=10397382 open=12615 code=42 web=19 science=23 books=11 wikidata=6 arithmetic=231 words=76 stretches=74176983 before=3088307 after=- deposited=true transfer=-1759 external=-1759 rate=12 opening=2853018 opening_places=39752 regions_ms=555 deposit_ms=510 ms=1065

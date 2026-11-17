@@ -25,3 +25,66 @@ G-D3: the held arithmetic (the uniform draw's records) rises by 0.02 to 0.15 nat
 What it decides: it prices the choice that is Brandon's (how much of a section the arithmetic world takes) in the line's own
 units, both ways: what one lap gives text back, and what it costs the arithmetic. G-D1 missed low (under 0.010), the rise
 was not the drive's alone and a share does not undo it.
+
+SCORES of G-D1 to G-D3, read from the clock at 13:08:27 UTC, November 17 (side90.txt; the side lap's mean against lap 90's mean,
+the same held places, the one-place receiver; nats a place)
+How it ran. The first form of the run asked for the card's lock while lap 90 held it; the forms watcher asks for it the same
+way and holds it through a lap's reads, so the two would have starved or raced each other. It was stopped before lap 90 ended
+and run again to ask for the lock only after lap 90's reads and writes, with the line's next chain (chain 26, chain 25's laps
+unchanged) started by its last line. The side lap took the lock at 12:34:14 UTC and released it at 13:07:43; lap 91 took it
+one second later from lap 90's state.
+The side lap: 3,000 sections in 1,510 s, where lap 90's 3,000 took 3,039 s. A section without the arithmetic world runs in
+0.52 s against 1.07 s: the world's acts are half of a lap's card time.
+
+| region | lap 90 | side lap | change |
+| code | 0.5522 | 0.5437 | −0.0085 |
+| web | 0.9002 | 0.8914 | −0.0088 |
+| science | 0.7582 | 0.7514 | −0.0068 |
+| books | 0.8635 | 0.8602 | −0.0033 |
+| wikidata | 1.0690 | 1.0577 | −0.0113 |
+| held arithmetic | 1.6011 | 1.7508 | +0.1497 |
+| GSM8K test split | 0.7610 | 0.7411 | −0.0199 |
+
+G-D1 missed low for code, web, science and books (0.003 to 0.009 where 0.010 to 0.035 was guessed) and held for wikidata
+(0.011). A drive raised by four thirds gave back about a third of what the drive's law predicted, and about a sixth of the
+rise at lap 71. So, as the guess fixed it: the rise was not the drive's alone, or the balance comes back more slowly than it
+left; one lap does not tell the two apart, and the word problems stayed in the side lap at a third of a section.
+G-D2 missed: the GSM8K test split fell by 0.020, the largest move of the yardstick in one lap since lap 74. Its drive rose by
+the same four thirds and it followed.
+G-D3 held at its upper edge: the held arithmetic rose 0.150 in one lap with no drive.
+The control still owed: lap 91's mean, the line's own lap from the same state with the arithmetic world, read beside the
+side lap's when it lands.
+
+By kind of symbol (tools/cavity_by_kind.py on each read's cavity.tsv; a slice's share of places, then nats a place, lap 90
+then the side lap):
+| slice | kind | share | lap 90 | side lap |
+| GSM8K test | letter | 0.614 | 0.4526 | 0.4453 |
+| GSM8K test | digit | 0.101 | 1.9723 | 1.9461 |
+| GSM8K test | space | 0.185 | 0.2200 | 0.2252 |
+| GSM8K test | mark | 0.090 | 2.7234 | 2.5701 |
+| held arithmetic | digit | 0.594 | 2.5556 | 2.6648 |
+| held arithmetic | space | 0.156 | 0.0106 | 0.0648 |
+| held arithmetic | mark | 0.116 | 0.6934 | 1.3506 |
+| code | letter | 0.604 | 0.5460 | 0.5368 |
+| code | mark | 0.163 | 0.9536 | 0.9416 |
+| web | letter | 0.633 | 0.8905 | 0.8842 |
+| web | mark | 0.098 | 1.4300 | 1.3802 |
+| books | letter | 0.795 | 0.9985 | 0.9958 |
+| books | mark | 0.029 | 1.4877 | 1.4376 |
+Seven tenths of the yardstick's fall is at its marks (0.153 on 0.090 of its places), and half of the held arithmetic's rise is
+at its own marks and spaces: without the arithmetic world's drive the marks' faces move back toward the layouts the text
+and the word problems write, and away from the records' spaced one.
+
+THE CONTROL, read from the clock at 14:07:34 UTC: lap 91's mean, the line's own lap from lap 90's last state with the arithmetic
+world (3,000 sections in 3,025 s), beside the side lap's mean from the same state without it (3,000 sections in 1,510 s).
+| region | lap 91, with | side lap, without | difference |
+| code | 0.5521 | 0.5437 | −0.0084 |
+| web | 0.9013 | 0.8914 | −0.0099 |
+| science | 0.7581 | 0.7514 | −0.0067 |
+| books | 0.8619 | 0.8602 | −0.0017 |
+| wikidata | 1.0656 | 1.0577 | −0.0079 |
+| held arithmetic | 1.6172 | 1.7508 | +0.1336 |
+| GSM8K test split | 0.7570 | 0.7411 | −0.0159 |
+The GSM8K test split's marks: 2.6522 with, 2.5701 without; its letters 0.4513 and 0.4453; its digits 1.9883 and 1.9461.
+Against the control the scores stand as they were read against lap 90: G-D1 missed low for code, web, science and books (0.002
+to 0.010) and held for wikidata; G-D2 missed by a hair (0.016 where within 0.015 was guessed); G-D3 held.
