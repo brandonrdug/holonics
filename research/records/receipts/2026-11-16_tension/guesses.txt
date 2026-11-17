@@ -456,3 +456,29 @@ G-KR1 held: the leading mode of the digits' coupling holds 0.18 of its power on 
 G-KR2 held: the first three modes hold at most 0.46 on one character (0.18, 0.40, 0.46 on the first; the fourth 0.49).
 The engine's tension at lap 79 does not show the ring of ten that October's arithmetic tower showed (0.84 and 0.78). A key located
 from this tension would not be a ring. It agrees with the register read: nothing downstream yet asks the digits for their sum.
+
+GUESSES G-HC1 to G-HC3, fixed at 09:36:27 UTC, November 17 (from date -u), before the read: a digit's phase on the carry circles
+Reading: the engine's 32 carry circles as a site meets them (read-tension now writes each row's arriving charge Qm and gate γ,
+charge.i64 and gate.i64), on 8,000 short sums with every site written, lap 86's mean, by a ruler (tension_ruler.py circles). The
+circles' one face is the product a(t)·Qm(t), linear in the charge, so a phase of 2πd/10 on a circle would reach it only through
+its first harmonic, two of the nine coordinates that tell ten digits apart. Three reads: (1) the gate's turn at a written digit's
+site by the digit, as the characters of ℤ/10 of the ten mean turns (amplitudes a_j, Σ a_j² = 1; a wheel is one a_j near one at
+j ≠ 0, digits turning alike is a_0 near one, ten unrelated turns give about 0.3 each), with a permutation of the digits as its
+null; (2) at an open answer place, the share of the value's digit, of the wheel's digit (a_k + b_k mod 10) and of the aligned
+digits' unordered sum that a linear read of the 32 charges gives on the held half, and that their phases' five harmonics give
+(all circles, and the one circle that reads best on the fitting half); (3) what the charges, and their harmonics, add to the
+chart's share of the covector's power. The premise in the logs: no lap prints the circles on this line; the coupling read found
+no ring in the tension (G-KR) and the registers hold no sum (G-R), so nothing has asked a circle to turn by a digit.
+G-HC1: no circle's turn is a wheel. On every circle and tick the largest character amplitude at j ≠ 0 stays under 0.6, and no
+more than three of the 32 circles pass the 99th percentile of their own permutation null at any one tick.
+G-HC2: at the units place of a short sum, last tick, the harmonics of all 32 charges hold the wheel's digit at under 0.20 on the
+held half, and the best single circle's harmonics under 0.05; the harmonics hold it by no more than 0.05 above the linear read
+of the same charges.
+G-HC3: the charges' harmonics beside the chart remove no more than 0.03 above the chart alone of the covector's power, at every
+part with 200 held rows or more.
+The instrument is held to a planted wheel on the same shapes in the same run: one circle's gate turned by 2π(3d + 2)/10 at the
+digits' sites, and one circle's charge set to the phase of the wheel's digit at the answer place, each with noise; the read
+returns them or its null is void.
+What it decides: all held, no circle holds a digit's phase and a harmonic face would have nothing to read today, so the wheel
+does not enter as a face on the circles as they stand and the turn itself (a pair-located advance) is the missing part; G-HC2
+missed, a circle already carries a phase its face cannot read and October's harmonic face is the first part to port.
