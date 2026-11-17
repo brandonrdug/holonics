@@ -73,6 +73,10 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-acts") {
         return athena::store::write_acts(&rest[1..], &mut holonics_engine::realization::Host);
     }
+    // [the lead, November 17] A founding from a ruler's words reads and writes states alone, so it opens no card.
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("found-closed") {
+        return athena::store::found_closed(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("write-forms") {
         return athena::store::write_forms(&rest[1..], &mut holonics_engine::realization::Host);
     }
@@ -286,7 +290,7 @@ fn reserve(args: &[String]) -> Result<()> {
     use holonics_engine_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
-    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false, crossing: false };
+    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
     let f = |s: usize| read_octets(&d, true, false, s);
     let (f1, f2, f3) = (f(1), f(2), f(3));
     let pair = (f3 + f1 - 2 * f2) / 2;
@@ -316,6 +320,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("grow-crossings") => athena::store::grow_crossings(args),
         Some("zero-triad-return") => athena::store::zero_triad_return(args),
         Some("found-crossing") => athena::store::found_crossing(args),
+        Some("found-closed") => athena::store::found_closed(args),
         Some("restore-store") => athena::store::restore(args),
         Some("own-states") => athena::store::own_states(args),
         Some("read-open-rows") => athena::store::read_open_rows(args),

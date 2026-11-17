@@ -171,6 +171,19 @@ pub struct Declaration {
     /// `α(r̂(x + W_out y))` (`agent-inferred`). Needs triads; `false` writes every head line exactly as before; `true` writes `hnn-field-v14x`,
     /// the eighteen words of `v14l` with the loudness's word written as `0` or `1`, then `1`.
     pub crossing: bool,
+    /// [definition; the lead, November 17 (the founding record); agent-inferred realization] **The closed characters**: `E` characters of a ring
+    /// whose keys were located by closing a menu of the field's own rows (atlas `key.ring-closed-from-rows-menu`). Each class holds a key, `E`
+    /// complex numbers on `2^(−16)` (a ring member's eigenvalue at unit modulus under each closed character; zero for a class off the ring), and
+    /// every head's open row gives the keyed pair product of its sources, `E_e = Y_e² − Σ_s (p_s K_e(u_s))²` with `Y_e = Σ_s p_s K_e(u_s)` over
+    /// the row's known sources: twice the sum over the row's unordered pairs of sources of their shares' product times their keys' product, the
+    /// character of the pair's composition on the ring (atlas `contact.keyed-pair-product-through-row`). It returns to the open site's state
+    /// through `W_K` (`D × heads·2E`), released once beside the current's return. Why a part of its own: a law that lives wholly in a product
+    /// of two sources has no slope where both operands are drawn and the return stands at zero (the saddle of November 16); with the keys
+    /// located, the product is a feature that stands at its founding and its return has a first-order covector. Founded by
+    /// [`Constitution::with_closed`] from a ruler's keys and return; `E = 0` writes every head line exactly as before, and `E > 0` writes
+    /// `hnn-field-v14c`: the nineteen words of `v14x` with the crossing's word written as `0` or `1`, then `E`. An attempt: its forward is the
+    /// host's alone, and a field with closed characters is refused by the reverse and by the card until both are built, so no lap trains from one.
+    pub closed: usize,
 }
 
 impl Declaration {
@@ -452,6 +465,10 @@ impl Declaration {
         if self.crossing && self.triads == 0 {
             return refuse("a field whose triads' legs stand at the site needs triads");
         }
+        // The closed characters' families, `A × 2E` keys and `D × heads·2E`, are laid within the carrier their offsets are counted in.
+        if self.closed.checked_mul(2).and_then(|r| r.checked_mul(self.heads)).and_then(|r| r.checked_mul(self.width.saturating_add(self.alphabet))).is_none() {
+            return refuse("a field's closed characters past the carrier their families are laid in");
+        }
         // The triads' families, `6J` rows of `D`, `6J` biases and `D × 2J`, are laid within the carrier their offsets are counted in.
         if self.triads.checked_mul(6).and_then(|r| r.checked_mul(self.width.saturating_add(1))).is_none() {
             return refuse("a field's triads past the carrier their families are laid in");
@@ -467,7 +484,9 @@ impl Declaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.crossing {
+        let head = if self.closed > 0 {
+            "hnn-field-v14c"
+        } else if self.crossing {
             "hnn-field-v14x"
         } else if self.loud {
             "hnn-field-v14l"
@@ -484,7 +503,9 @@ impl Declaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.crossing {
+        let tail = if self.closed > 0 {
+            format!(" {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed)
+        } else if self.crossing {
             format!(" {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud))
         } else if self.loud {
             format!(" {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark))
@@ -510,8 +531,22 @@ impl Declaration {
         let n = |w: &str| w.parse::<usize>().map_err(|_| TowerError::Refused("a field's declaration that is not a count"));
         // [theory, November 16 19:10Z] The crossing's word is read from `v14x` alone; every older head line is a field whose triads, if any, are the
         // strand's.
-        let crossing = words.first().copied() == Some("hnn-field-v14x");
+        // [the lead, November 17] The closed characters' count is read from `v14c` alone, whose crossing word is zero or one.
+        let closed_line = words.first().copied() == Some("hnn-field-v14c") && words.len() == 20;
+        let crossing = words.first().copied() == Some("hnn-field-v14x") || (closed_line && words[18] == "1");
+        let closed = if closed_line {
+            match n(words[19])? {
+                0 => return refuse("an hnn-field-v14c head line with no closed characters (a field without them writes the line before it)"),
+                e => e,
+            }
+        } else {
+            0
+        };
         let (depth_word, carry, triads, opening, junction, mark, loud) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14c"), 20) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
+                (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 0 | 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
+                _ => return refuse("an hnn-field-v14c head line whose opening, junction, mark, loudness or crossing word is not zero or one"),
+            },
             // [theory, November 16 19:10Z] The words of `v14l` with the loudness's word zero or one, then the crossing's word, one.
             (Some("hnn-field-v14x"), 19) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
                 (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
@@ -555,7 +590,7 @@ impl Declaration {
             (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed };
         d.admit()?;
         Ok(d)
     }
@@ -640,6 +675,10 @@ pub struct Loci {
     /// [definition; Brandon, November 15 02:06Z] **The face's loudness** ([`Declaration::loud`]): `κ_ℓ`, one entry a lane, then `b`, on the
     /// face's grain, so `β = 2^16 + release(Σ_ℓ κ_ℓ λ_ℓ, 16) + b`; the last family, zero long where the face does not read its sites' loudness.
     pub loud: usize,
+    /// The closed characters' keys (`A × 2E`: a class's `E` real parts, then its `E` imaginary parts, on `2^(−16)`) and their return
+    /// (`D × heads·2E`: a head's `E` real parts, then its `E` imaginary parts), zero long where the field has none ([`Declaration::closed`]).
+    pub closed_key: usize,
+    pub w_closed: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -701,6 +740,7 @@ impl Loci {
         let (junction, junction_bias) = (tail(joined * dw, MATERIAL_BITS), tail(joined, FACE_BITS));
         let mark = tail(usize::from(d.mark) * MARK_BASES, MATERIAL_BITS);
         let loud = tail(usize::from(d.loud) * (d.lanes + 1), FACE_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, len: at, families }
+        let (closed_key, w_closed) = (tail(a * 2 * d.closed, FACE_BITS), tail(dw * d.heads * 2 * d.closed, MATERIAL_BITS));
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, w_closed, len: at, families }
     }
 }

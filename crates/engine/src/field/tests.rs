@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -2019,7 +2019,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3303,6 +3303,38 @@ fn triad_shaped(still: usize, triads: usize) -> Constitution {
     drawn(grown)
 }
 
+/// [the lead, November 17, the founding record] **The closed characters** ([`Declaration::closed`]): founded with a zero return the field
+/// reads every face as before and its state reads back under `hnn-field-v14c`; with a return off zero an open site's face moves, and with
+/// every key at zero (no class on the ring) the same return reads nothing, so the faces are the ones before; the reverse refuses the field.
+#[test]
+fn closed_characters_at_a_zero_return_read_the_faces_before_and_a_return_reads_only_keyed_sources() {
+    let field = triad_shaped(1, TRIADS);
+    let d = field.declaration;
+    let e = 2;
+    let faces = field.faces(&region()).unwrap();
+    // Every class on the ring: a key of unit modulus under each character, the classes at different phases.
+    let mut ring = vec![0i32; d.alphabet * 2 * e];
+    for a in 0..d.alphabet {
+        let (re, im) = [(1 << 16, 0), (0, 1 << 16), (-(1 << 16), 0), (0, -(1 << 16))][a % 4];
+        (ring[a * 2 * e], ring[a * 2 * e + 1], ring[a * 2 * e + e], ring[a * 2 * e + e + 1]) = (re, re, im, -im);
+    }
+    let zero = vec![0i32; d.width * d.heads * 2 * e];
+    let (closed, from) = field.with_closed(e, &ring, &zero).unwrap();
+    assert_eq!(closed.faces(&region()).unwrap(), faces, "a zero return reads the faces before");
+    assert!(closed.declaration.to_text().starts_with("hnn-field-v14c "));
+    assert_eq!(Constitution::from_text(&closed.to_text()).unwrap(), closed);
+    assert_eq!(from.len(), closed.material_len());
+    assert!(from[..field.material_len()].iter().enumerate().all(|(i, o)| *o == Some(i)) && from[field.material_len()..].iter().all(Option::is_none));
+    let ones = vec![1 << 22; zero.len()];
+    let (moved, _) = field.with_closed(e, &ring, &ones).unwrap();
+    assert_ne!(moved.faces(&region()).unwrap(), faces, "a return off zero moves an open site's face");
+    let (dark, _) = field.with_closed(e, &vec![0; ring.len()], &ones).unwrap();
+    assert_eq!(dark.faces(&region()).unwrap(), faces, "with no class on the ring the return reads nothing");
+    assert!(field.with_closed(0, &[], &[]).is_err() && closed.with_closed(e, &ring, &zero).is_err() && field.with_closed(e, &ring[1..], &zero).is_err());
+    let mut learner = Learner::new(closed, 4);
+    assert!(learner.section(&[region()]).is_err(), "no deposit reads a field with closed characters");
+}
+
 /// [`four_contacts`]'s founded field grown by two carry circles and then by `triads` triads (the line's order: the triads are founded on a
 /// circle line's end), every family drawn, with the circles' leak rows and leak biases set back to zero (`ℓ = 0`, the friction at its founding at
 /// every site, far from its floor of one grain).
@@ -3353,7 +3385,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, w_closed: old.w_closed, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 

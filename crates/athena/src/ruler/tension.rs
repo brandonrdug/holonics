@@ -62,6 +62,8 @@ pub fn read_tension(args: &[String]) -> Result<()> {
         return Err("a state whose alphabet is not its codec's".into());
     }
     learner.field.lock_carry = carry;
+    // [the lead, November 17] A ruler's reverse through closed characters, their return held constant (a founding's solve reads it).
+    learner.field.closed_blind = true;
     let out = Path::new(&args[11]);
     let unescape = |t: &str| t.replace("\\n", "\n");
     // (label, the place's index in its run, the place's site, the region)

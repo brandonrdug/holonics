@@ -1441,6 +1441,45 @@ pub fn found_crossing(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 17, the founding record] `found-closed STATE STATE_SHA CLOSED CLOSED_SHA OUT`: **the closed characters
+/// founded from a ruler's words** ([`Learner::with_closed`]). `CLOSED` is little-endian 32-bit words: `E`, then the keys (`A × 2E` on
+/// `2^(−16)`: a class's `E` real parts, then its `E` imaginary parts), then the return (`D × heads·2E` on `2^(−24)`). The founded state is
+/// the host forward's: the reverse and the card refuse it, so it is read and written from and never trained from.
+pub fn found_closed(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("found-closed STATE STATE_SHA CLOSED CLOSED_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let bytes = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    if bytes.len() % 4 != 0 || bytes.len() < 4 {
+        return Err("a closed characters' file that is not whole 32-bit words".into());
+    }
+    let words: Vec<i32> = bytes.chunks_exact(4).map(|w| i32::from_le_bytes([w[0], w[1], w[2], w[3]])).collect();
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let d = learner.field.declaration;
+    let closed = usize::try_from(words[0]).map_err(|_| "a count of closed characters below zero")?;
+    let keys_len = d.alphabet * 2 * closed;
+    if words.len() != 1 + keys_len + d.width * d.heads * 2 * closed {
+        return Err("a closed characters' file that is not its count, its keys and its return".into());
+    }
+    let founded = learner.with_closed(closed, &words[1..1 + keys_len], &words[1 + keys_len..]).map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.to_text() != written || back.field != founded.field || back.pass != learner.pass {
+        return Err("a founded learner that does not read back as itself with its pass".into());
+    }
+    std::fs::write(out, &written)?;
+    let l = founded.field.layout().clone();
+    let on_ring = (0..d.alphabet).filter(|a| founded.field.theta[l.closed_key + a * 2 * closed..l.closed_key + (a + 1) * 2 * closed].iter().any(|&v| v != 0)).count();
+    let standing = founded.field.theta[l.w_closed..l.w_closed + d.width * d.heads * 2 * closed].iter().filter(|&&v| v != 0).count();
+    println!("FOUND_CLOSED closed={closed} classes_on_ring={on_ring} return_entries={} return_nonzero={standing} material_before={} material_after={}", d.width * d.heads * 2 * closed, learner.field.material_len(), founded.field.material_len());
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored

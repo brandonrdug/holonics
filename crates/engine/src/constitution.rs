@@ -53,6 +53,11 @@ pub struct Constitution {
     /// `z = T S − falloff`. A reading at a set `γ` of what a row that keeps its evidence does, before the stage is a law: not part of the
     /// state, and no reverse reads it.
     pub lock_carry: Option<i64>,
+    /// [measurement; the lead, November 17, the founding record] Where set, **a ruler's reverse reads through a field with closed characters**
+    /// ([`Declaration::closed`]), their return held as a constant of the forward: the covector each tick's state receives then omits the
+    /// path through the closed characters' own operands (the rows' shares). A reading for a founding's solve on the host: not part of the
+    /// state, and no deposit is read with it.
+    pub closed_blind: bool,
     /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
     /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
     /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Constitution::opening_term`]), and stays silent

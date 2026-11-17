@@ -29,6 +29,16 @@ navigation of its passage by where its menus close, each loop ending in a readin
 host forward on a state founded by the ruler, with the held sums it writes. The engine's rate is read against the card before
 anything grows ([the review](research/records/2026-11-17_THE_PHASE_REVIEWED_THE_ENGINE_RIDES_AND_NEVER_FOUNDS_ON_PROSE_IT_CODES_NO_BETTER_THAN_A_COUNT_OF_THREE_NEIGHBOURS_A_SIDE_THE_ARITHMETIC_WORLD_TRAINED_NO_BEHAVIOUR_AND_A_PLATEAU_WAS_REPORTED_AS_A_LEVEL.md)). The sections below describe the line as it stood through lap 94.
 
+The first attempt at it is read ([its record](research/records/2026-11-17_THE_KEYED_PAIR_PRODUCT_STANDS_IN_THE_ENGINES_HOST_FORWARD_AND_LOWERS_A_HELD_UNITS_DIGIT_TO_1_60_NATS_A_FREE_RELEASE_DERAILS_BECAUSE_THE_PRODUCT_HAS_NO_LEG_AT_THE_RECEIVING_SITE.md)). Keys closed from the engine's own rows and a keyed pair
+product at the open rows stand in the engine's host forward (`Declaration::closed`, `hnn-field-v14c`; the reverse and the card refuse
+it, so no lap trains from it). With the return solved on the host, a held short sum's units digit falls from 2.33 to 1.60 nats at a
+one-place receiver, and every column falls. A free release derails with it (1 of 96 held sums written whole, 2 of 96 before): the
+product has no leg at the receiving site, so it returns at every open place that hears two digits, and its return was solved on
+one-place receivers only. The closure also gives each row a target (0.98 of a units row on its two aligned operand digits, 0.39 as
+the rows stand), a covector for the lock that no reverse deposits yet. The build's order from here: the site's leg, the part's
+reverse with the closure's covector on the lock, the card realization and its parity, then the deposit under the trainer's own
+openings on plain sums beside text.
+
 ## What runs: the store line learns open text, arithmetic and word problems on the card
 
 - **The line.** One life from lap 1 to lap 87 on the RTX 4080 SUPER under `.local/gpu.lock` (laps 88 to 97 queued), through

@@ -1,0 +1,32 @@
+SOLVE_RETURN rows=65144 fit=32096 heads=4 characters=9 covector_share_removed_held=0.0456 rms_covector=1.624e-02 rms_predicted=4.007e-03
+SOLVE_KEYS ring='0123456789' classes=[20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+SOLVE_WRITTEN ROOT/.local/wt/lead/.local/run/founding/c94a.0.closed step=-8 largest_return=26.8200 rms_move=3.2198e-02
+SOLVE_WRITTEN ROOT/.local/wt/lead/.local/run/founding/c94a.1.closed step=1 largest_return=3.3525 rms_move=4.0248e-03
+SOLVE_WRITTEN ROOT/.local/wt/lead/.local/run/founding/c94a.2.closed step=4 largest_return=13.4100 rms_move=1.6099e-02
+SOLVE_WRITTEN ROOT/.local/wt/lead/.local/run/founding/c94a.3.closed step=16 largest_return=53.6399 rms_move=6.4397e-02
+SOLVE_WRITTEN ROOT/.local/wt/lead/.local/run/founding/c94a.4.closed step=32 largest_return=107.2799 rms_move=1.2879e-01
+FOUND_CLOSED closed=9 classes_on_ring=10 return_entries=9216 return_nonzero=9216 material_before=402805 material_after=416413
+== step -8
+CODES half=held column=middle places=181 nats=2.3218
+CODES half=held column=top places=895 nats=1.8736
+CODES half=held column=units places=1045 nats=2.3561
+FOUND_CLOSED closed=9 classes_on_ring=10 return_entries=9216 return_nonzero=9216 material_before=402805 material_after=416413
+== step 1
+CODES half=held column=middle places=181 nats=2.2505
+CODES half=held column=top places=895 nats=1.8042
+CODES half=held column=units places=1045 nats=2.3080
+FOUND_CLOSED closed=9 classes_on_ring=10 return_entries=9216 return_nonzero=9216 material_before=402805 material_after=416413
+== step 4
+CODES half=held column=middle places=181 nats=2.2273
+CODES half=held column=top places=895 nats=1.7848
+CODES half=held column=units places=1045 nats=2.2922
+FOUND_CLOSED closed=9 classes_on_ring=10 return_entries=9216 return_nonzero=9216 material_before=402805 material_after=416413
+== step 16
+CODES half=held column=middle places=181 nats=2.1355
+CODES half=held column=top places=895 nats=1.7294
+CODES half=held column=units places=1045 nats=2.2319
+FOUND_CLOSED closed=9 classes_on_ring=10 return_entries=9216 return_nonzero=9216 material_before=402805 material_after=416413
+== step 32
+CODES half=held column=middle places=181 nats=2.0322
+CODES half=held column=top places=895 nats=1.6964
+CODES half=held column=units places=1045 nats=2.1570

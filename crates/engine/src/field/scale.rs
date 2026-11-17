@@ -65,7 +65,7 @@ fn glue_layout(harmonics: usize, fine: usize, coarse: usize) -> (usize, usize, u
 /// the fine field has after its split (`d.ticks / 2` of them, the split [`level_split`]). Its reach is the fine field's: a region's
 /// epochs are at most its places.
 pub fn level_declaration(d: &Declaration) -> Declaration {
-    Declaration { alphabet: 2, triads: 0, carry: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, ticks: d.ticks - level_split(d), ..*d }
+    Declaration { alphabet: 2, triads: 0, carry: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, ticks: d.ticks - level_split(d), ..*d }
 }
 
 /// The fine ticks before a level's restriction: half the fine field's, at least one.
@@ -383,7 +383,7 @@ impl Constitution {
         let reaches = s.coarse.reaches();
         for _ in 0..s.coarse.declaration.ticks {
             let mut cell = TickCell::default();
-            s.coarse.tick(&mut x1, &out.definite, &keyed1, &out.paces, &moment, &reaches, None, &mut cell)?;
+            s.coarse.tick(&mut x1, &out.definite, &keyed1, &[], &out.paces, &moment, &reaches, None, &mut cell)?;
             if keep {
                 out.ticks.push(cell);
             }
