@@ -225,3 +225,18 @@ Not run, on Brandon's word of 20:27 UTC (arithmetic is a qualitative probe of wh
 campaign): G-C1 whole (three-digit sums and subtraction as second worlds) and G-W1's "add a to b" dwell. One pair of G-W1 stays: "a plus
 b equals" dwelt on from the founded state and from lap 94's, 100 passes each, as one qualitative look at whether a founded law shortens
 the next. The arm of G-L3 mixed inside each section runs to its end.
+
+G-N1 (2026-11-17T20:32:05Z). Tonight's plain-text run, on the main line (text). The world: fifty simple narrative books of the store's books slice
+(one volume a title, ranked by clean text; 1,796,838 octets fitted, each book's last twentieth held, two books never read), as
+next-symbol rows: 48 known places and the next place open, every second position (897,205 rows), 400 rows a section, so a section is
+400 consecutive places of one book and a pass is 2,243 sections. From lap 94's end state, no leak, 40 passes on the card (about ten
+minutes a pass by the development read: 0.26 s a section). Read every pass on 2,500 held, 1,200 unread and 2,000 fitted rows; sixteen
+prompts written left to right, 64 places, after each pass.
+  Premises read first: lap 94's state codes the next place on its left context at 2.07 nats on the fitted rows, 2.05 held, 2.02 unread
+  (three development passes of ten sections). Today's 400 passes of half-open rows on 111 thousand octets left the next place at 1.41
+  fitted and 1.87 held, with 59% of written words in the fitted lexicon and no transition.
+  The guess, at pass 40: next place 1.50 nats or under on the fitted rows, 1.60 to 1.72 on the held twentieths, 1.65 to 1.80 on the
+  unread books; the panel's held and unread prompts at 65% or more of written words in the fitted lexicon (the books' own held text
+  stands near 90%); no shared run over 20 octets. No transition is guessed: a slow fall that flattens by pass 20.
+  What it decides for the next build: a held next-place code that stops near 1.6 to 1.7 with almost-words still on the page says the
+  engine's binding, not its pass, limits text, and the work is a law's own entries and comparison; clean words say the pass was most of it.
