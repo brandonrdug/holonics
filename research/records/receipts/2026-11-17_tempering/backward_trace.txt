@@ -1,0 +1,38 @@
+# The backward trace of a next-place read (tools/trace_ruler.py on a read-tension dump with shares): the night run's pass-15 state,
+# 5,164 held and fitted rows of plain octets (48 known places, the next place open). The exact-context line is starved at this count
+# of rows (2,582 fitted) past a pair and is no yardstick; the count ruler of reach_and_count.txt is.
+TENSION_LAW places=5164 ticks=4 width=128 current=64 products=20 circles=32 carry=- threads=12 ms=75
+TENSION_DONE rows=20656 places=5164 ms=102062
+TRACE places=5164 fit=2582 read=2582 width=128 ticks=4
+TRACE held share explained (thousandths) | opening chart, tick 1 | pair chart, tick 1 | pair chart, tick 2 | pair chart, tick 3 | pair chart, tick 4 | every tick's charts together
+TRACE symbol 1 back                |    981 |    964 |    903 |    746 |    664 |    986
+TRACE symbol 2 back                |    360 |    374 |    537 |    413 |    355 |    689
+TRACE symbol 3 back                |    126 |    151 |    212 |    195 |    171 |    325
+TRACE symbol 4 back                |     46 |     59 |    107 |     77 |     67 |     94
+TRACE symbol 5 back                |     -7 |      7 |     35 |     12 |     10 |    -26
+TRACE symbol 6 back                |      2 |      4 |      6 |    -17 |    -27 |    -78
+TRACE symbol 7 back                |     -0 |      3 |     -7 |    -29 |    -41 |   -101
+TRACE symbol 8 back                |    -22 |    -16 |    -32 |    -39 |    -46 |   -156
+TRACE the pair before the place    |    334 |    299 |    368 |    303 |    264 |    539
+TRACE the pair two back            |    106 |    123 |    167 |    143 |    124 |    230
+TRACE the triple before the place  |    169 |    170 |    213 |    203 |    195 |    283
+TRACE the four before the place    |     95 |     83 |    117 |    112 |    110 |    115
+TRACE the symbol that arrives      |    140 |    126 |    140 |    151 |    197 |    126
+TRACE the arriving symbol explained by the exact context (thousandths): one symbol back 82, the pair 95, the triple 11, the four 7
+TRACE a row's share by its source's distance from the place (thousandths of the row), and its largest single share
+TRACE tick 1 head 0: 1:21 2:20 3:26 4-5:48 6-10:111 11+:772 | largest 293
+TRACE tick 1 head 1: 1:27 2:19 3:21 4-5:40 6-10:102 11+:789 | largest 220
+TRACE tick 1 head 2: 1:120 2:96 3:79 4-5:61 6-10:112 11+:529 | largest 258
+TRACE tick 1 head 3: 1:100 2:128 3:96 4-5:67 6-10:103 11+:504 | largest 317
+TRACE tick 2 head 0: 1:20 2:18 3:23 4-5:39 6-10:111 11+:788 | largest 414
+TRACE tick 2 head 1: 1:31 2:29 3:20 4-5:45 6-10:103 11+:769 | largest 311
+TRACE tick 2 head 2: 1:105 2:100 3:91 4-5:70 6-10:91 11+:541 | largest 360
+TRACE tick 2 head 3: 1:282 2:157 3:122 4-5:99 6-10:83 11+:254 | largest 530
+TRACE tick 3 head 0: 1:37 2:30 3:25 4-5:42 6-10:103 11+:759 | largest 377
+TRACE tick 3 head 1: 1:60 2:32 3:24 4-5:50 6-10:113 11+:718 | largest 308
+TRACE tick 3 head 2: 1:114 2:115 3:69 4-5:59 6-10:96 11+:544 | largest 347
+TRACE tick 3 head 3: 1:323 2:161 3:119 4-5:103 6-10:95 11+:196 | largest 616
+TRACE tick 4 head 0: 1:46 2:29 3:26 4-5:39 6-10:96 11+:762 | largest 448
+TRACE tick 4 head 1: 1:48 2:27 3:25 4-5:46 6-10:104 11+:745 | largest 383
+TRACE tick 4 head 2: 1:240 2:142 3:84 4-5:74 6-10:107 11+:351 | largest 478
+TRACE tick 4 head 3: 1:325 2:147 3:122 4-5:108 6-10:120 11+:175 | largest 624

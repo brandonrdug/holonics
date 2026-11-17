@@ -343,3 +343,50 @@ and a run of 32 with a keyed half open, for the count of compared places the nig
 writes real words in broken phrases. Both guesses of G-N2 held. So the comparison at the boundary is what text needed first, and the
 register by itself does not give it. The night's run stood at 1.527 nats at pass 15 and goes on to pass 40.
 
+## 16. The backward trace: of the letters that go in, about one and a half come back
+
+Brandon, 23:06 UTC (in my words): the run of the night was a heavy bet on a reader that showed no coherence in two hours, and I go
+forward without analogizing the backward pass. The run was stopped at pass 16 on its own number (the held code fell 0.0013 nats in
+that pass), and §13's build is not started: a chart 48 times cheaper is an efficiency bet on a reader that does not yet bind, and the
+trial's tool already gives a pass in ten minutes.
+
+The analogy, taken as one. A forward pass gathers from the sources to a place. The backward pass carries the comparison back through
+the same contacts to what caused it. The two are a round trip, and what survives it is what the path keeps. So the question §14 left
+(she draws on 24 places and codes like a count of three) is asked backward: of the symbols that went in, which can be read back out of
+her state at the place? This is the guide's own rule of November 16 (a premise is a presence at the consumer, read link by link before
+a build), which I had not applied to text.
+
+`tools/trace_ruler.py` on the pass-15 state (`backward_trace.txt`): 5,164 held rows, the place's charts at each tick read by least
+squares for each earlier symbol's identity, fitted on half the rows and read on the other. Share of the symbol's identity present, in
+thousandths:
+
+| the symbol | at the opening | after tick 1 | tick 2 | tick 3 | tick 4 (what the face reads) |
+|---|---|---|---|---|---|
+| 1 place back | 981 | 964 | 903 | 746 | 664 |
+| 2 back | 360 | 374 | 537 | 413 | 355 |
+| 3 back | 126 | 151 | 212 | 195 | 171 |
+| 4 back | 46 | 59 | 107 | 77 | 67 |
+| 5 back | 0 | 7 | 35 | 12 | 10 |
+| 6 and farther | 0 | 0 | 0 | 0 | 0 |
+| the pair before the place, jointly | 334 | 299 | 368 | 303 | 264 |
+| the triple, jointly | 169 | 170 | 213 | 203 | 195 |
+
+- The opening gives one symbol whole, the one before the place (its strand contact's row). The moment's chart brings a third of the
+  second, an eighth of the third and a twentieth of the fourth.
+- The ticks add little: the second symbol gains eighteen points at tick 2 and loses them again, and the nearest symbol fades from 98%
+  to 66% as the ticks write over the place.
+- The rows that do the gathering are soft. Two heads keep three quarters of each row on sources eleven places away or more; the other
+  two spread theirs over the five nearest places, a tenth to a third on each, their largest single share 0.2 to 0.6.
+
+So at the place where her face is read, about one and a third symbols of the last five are there (0.66 + 0.36 + 0.17 + 0.07 + 0.01),
+the rest of her 24 places being diffuse (register, the shape of the word), and the fourth and fifth symbol never arrive at all. §14
+called the limit binding. The trace puts it one link earlier: there is nothing at the place to bind. The carriers are narrow (a
+moment of 32 complex modes for the whole past, a head's current of 16 numbers) and the lock that would address "the source three back"
+does not close, the same link that slipped on the sums on November 16.
+
+What it changes. More passes of this reader, or a cheaper way to make them, cannot give words, because five symbols do not reach the
+place by any path it has. The object the theory holds for exactly this is the strand: the residue of a running word on a few coprime
+rings keeps the last several symbols whole and in order, as one address (the located transport of October 5; the strands of October
+26), and rows met at that address are a law's own entries. The next reading is that premise on this text, before any part: what a
+strand's residue of the last five symbols carries to the place, against the count ruler's 1.36 nats.
+
