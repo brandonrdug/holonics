@@ -4,7 +4,7 @@
 Usage: store_windows.py STORE OUT KEY WIDTH PLACES SLICE:COUNT [SLICE:COUNT …]
 
 For each named slice of STORE (`DOCS_<slice>.bin`, the training documents; never a held file) it draws COUNT windows by KEY: an
-offset from SHA-256 of `KEY:<slice>:<n>`, moved to the start of the next line, WIDTH octets long. A window is kept where it is
+offset from SHA-256 of `KEY:<slice>:<n>`, moved past the next space or line feed, WIDTH octets long. A window is kept where it is
 printable ASCII with line feeds and holds no backslash and no tab (the table writes a line feed as a backslash and an `n`, and its
 fields are tab-separated), and the draw goes on until COUNT are kept. Each row is `win:<slice>:<n>`, the window's first symbol as the
 prompt, the rest as the run, and PLACES of the run's places drawn by the key, each to be opened alone.
@@ -30,11 +30,14 @@ def main():
             while kept < int(count):
                 seed = int.from_bytes(hashlib.sha256(f"{key}:{name}:{n}".encode()).digest(), "big")
                 n += 1
-                start = data.find(b"\n", seed % (len(data) - 4 * width))
-                if start < 0:
-                    continue
+                # A window starts after the next space or line feed within 200 octets of the drawn offset (a slice may hold documents
+                # with no line feed at all, so a search for one is bounded).
+                at = seed % (len(data) - 300 - width)
+                near = data[at : at + 200]
+                cuts = [k for k in (near.find(b" "), near.find(b"\n")) if k >= 0]
+                start = at + (min(cuts) if cuts else -1)
                 window = data[start + 1 : start + 1 + width]
-                if len(window) < width or any((c < 0x20 or c > 0x7E) and c != 0x0A for c in window) or b"\\" in window or window[0] == 0x0A:
+                if len(window) < width or any((c < 0x20 or c > 0x7E) and c != 0x0A for c in window) or b"\\" in window or window[0] in (0x0A, 0x20):
                     continue
                 text = window.decode("ascii")
                 order = sorted(range(width - 1), key=lambda j: hashlib.sha256(f"{key}:{name}:{n}:place:{j}".encode()).digest())
