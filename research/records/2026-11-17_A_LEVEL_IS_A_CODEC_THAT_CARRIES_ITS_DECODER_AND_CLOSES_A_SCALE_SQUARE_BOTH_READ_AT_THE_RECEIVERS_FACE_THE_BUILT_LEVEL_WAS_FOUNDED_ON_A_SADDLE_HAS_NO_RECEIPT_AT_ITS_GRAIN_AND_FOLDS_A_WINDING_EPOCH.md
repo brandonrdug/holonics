@@ -456,10 +456,10 @@ wherever a pass opens it, so nothing here says its ticks are untrained. What a l
 therefore a reading still to make, on the written places' own states, before the receipt law (the objects' §10) or the
 learning law (#73) is brought to it. (An earlier wording named #405, which asks how much each contact with data teaches.)
 
-## 13. The night's state against the line's own (November 18, 01:22 to 01:42 UTC)
+## 13. The night's state against the line's own (November 18, 01:22 to 02:02 UTC)
 
-`measurement` for the figures (the two receipts' last blocks), `agent-inferred` for the reading. Two guesses, each fixed and
-pushed before its read: G-V6 missed and G-V7 held.
+`measurement` for the figures (the two receipts' last blocks), `agent-inferred` for the reading. Four guesses, each fixed and
+pushed before its read: G-V6 missed, G-V7 and G-V8 held, G-V9 held in two parts of four.
 
 **The night's state has lost its two-sided reading.** One place opened alone in the middle of a row, 24 known places on
 each side, on the night's pass-15 state: her own face codes it at 2.921 nats a place, where the symbols' frequencies
@@ -489,6 +489,16 @@ among known neighbours, and its level readings were taken on a state whose two-s
   epoch before's bag at 163, as much as the fine read at the next leading place holds (168): on the line the level does
   carry the unit before across, where the night's state had let that go (75 against 112). And the restriction holds the
   symbol that leads the next epoch at 95 against a drawn one's 41, the one key on which it stands clear of a draw.
-- **Unread on the line:** the tension at the level's locus (reading B) and what a place among known neighbours holds by
-  the split at lap 94. Both need the line's own rows.
+- **The tension at the level's locus, on the line** (G-V8, held; 02:01 UTC). Every share of the covector's power at the
+  split stands under 0.006 on lap 94's mean: the place's own read 0.0009 over all places and 0.0032 at the open ones, the
+  level's present state through a refitted prolongation −0.0030 and 0.0024, the table −0.0106 and 0.0006, operands of
+  width 64 located from the moments −0.0083 and 0.0050. The planted law is recovered whole. §9's reading B holds where the
+  level was trained.
+- **A place among known neighbours, on the line** (G-V9, two parts held and two missed). One place opened alone mid-row
+  codes at 0.920 nats a place at her face on these books; a face fitted at its opening reads 0.992, and after one, two
+  and three ticks 1.036, 1.067 and 0.960. With both neighbours known a place holds its reading from its opening on, and
+  the four ticks are worth 0.07 nats. They are worth 0.55 at the boundary (2.03 to 1.48, the night's state) and 0.28
+  under the line's masks (2.94 to 2.65), where a place's neighbours are not known. So the written places a level's moment
+  sums are settled in the two-sided sense well before the split; the sentence §11 first carried about them was wrong the
+  other way round.
 

@@ -96,8 +96,10 @@ her face is a count of the last four symbols, and a compared place binds at its 
 alone, has lost its two-sided reading: a place opened alone among known neighbours codes at 2.921 nats at her face where a linear face
 of its own opening reads 1.129. It is a specimen for the boundary only. Read again on the line's own state, lap 94's mean, the level's
 restriction is still about a draw (1.26 of a drawn one's bag, 0.74 of its order), a located one keeps the bag and not the order, and
-the fold costs order; there the level does carry the unit before across (163 thousandths beside the fine read's 168). Unread on the
-line: the tension at the level's locus, and what a place among known neighbours holds by the split.
+the fold costs order; there the level does carry the unit before across (163 thousandths beside the fine read's 168). The tension at
+the level's locus reads nothing on the line either (every share under 0.006, the plant recovered whole). And a place opened alone among
+known neighbours codes at 0.920 nats at her face, 0.992 at a linear face of its opening: with both neighbours known the four ticks are
+worth 0.07 nats a place, where they are worth 0.55 at the boundary and 0.28 under the line's masks.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

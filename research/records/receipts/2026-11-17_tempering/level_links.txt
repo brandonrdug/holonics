@@ -99,3 +99,15 @@ LINKS   the fold, in the moment, key its symbols by sixth of a turn   within a s
 LINKS   the fold, in the moment, key its leading symbol               within a section   666   winding past it   484   (read 9652, 8253)
 LINKS   the fold, in the moment, key its last symbol                  within a section   667   winding past it   393   (read 9652, 8253)
 LINKS done in 64 s (reading A alone)
+
+== Reading B on the line's own state (G-V8): lap 94's mean, the links94 dump; 871 s in one process beside the dump below ==
+LINKS reading B: the covector's power at the split: at the open place 65.9% of it (5164 places), elsewhere 34.1% (247872 places)
+LINKS   by places before the open one (0 the open place): 0:65.9% 1:23.5% 2:6.3% 3:1.6% 4:0.4% 5:0.1% 6:0.1% 7:0.1% 8:0.1%
+LINKS   share of the covector's power removed on the held half (all places | the open places alone):
+LINKS   (0) the place's own read at the split                               0.0009 |  0.0032
+LINKS   (1) the level's present state, prolongation refitted               -0.0030 |  0.0024
+LINKS   (2) the table: two epochs' symbols on the news phase (top 20)      -0.0106 |  0.0006
+LINKS   (3) operands of width 64 located from the two epochs' moments      -0.0083 |  0.0050
+LINKS   (3') the same moments at full rank                                 -0.0138 |  0.0052
+LINKS   the planted law (the epoch before's symbols on the news phase through a drawn map, a tenth of the power): recovered 1.000 by the table from the planted covector; with it the table removes 0.0802 of the planted covector's power; operands located for the plain covector hold 0.213 of the plant
+LINKS   the planted law, operands of width 64 located for it from the moments: recovered 0.601

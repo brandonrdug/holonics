@@ -51,3 +51,15 @@ TICKS   stage tick 1 begins (after 1 ticks)        held 1.378   aside 1.410   fi
 TICKS   stage tick 2 begins (after 2 ticks)        held 1.399   aside 1.394   fitted 1.205 (at half its steps 1.218)   [181 s]
 TICKS   stage tick 3 begins (after 3 ticks)        held 1.343   aside 1.342   fitted 1.144 (at half its steps 1.157)   [241 s]
 TICKS done in 241 s on this host's numpy (one process)
+
+== One place opened alone mid-row on the line's own state (G-V9): lap 94's mean, the same rows as G-V6 (84 s and 675 s at 18 host
+   threads beside the ruler above); the ruler 245 s ==
+TICKS fit rows 36640 (a tenth kept aside: 4071), read rows 5164 (held), symbols 89, held symbols the fit never met 0; ticks 4
+TICKS the machine's own face after its last tick: held 0.920 nats a place; on the fitted rows 0.938
+TICKS a face of the symbols' frequencies alone: held 3.040
+TICKS a face fitted at each stage of the open place, nats a place (stage: the state a tick begins from, then the state inside it after its contact):
+TICKS   stage tick 0 begins (after 0 ticks)        held 0.992   aside 1.031   fitted 0.831 (at half its steps 0.842)   [62 s]
+TICKS   stage tick 1 begins (after 1 ticks)        held 1.036   aside 1.078   fitted 0.883 (at half its steps 0.894)   [124 s]
+TICKS   stage tick 2 begins (after 2 ticks)        held 1.067   aside 1.115   fitted 0.904 (at half its steps 0.916)   [185 s]
+TICKS   stage tick 3 begins (after 3 ticks)        held 0.960   aside 0.980   fitted 0.793 (at half its steps 0.805)   [245 s]
+TICKS done in 245 s on this host's numpy (one process)
