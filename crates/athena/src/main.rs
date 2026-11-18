@@ -113,6 +113,10 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("open-level") {
         return athena::store::open_level(&rest[1..]);
     }
+    // [the lead, November 18] A growth in carry circles reads and writes states alone, so it opens no card.
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("grow-carry") {
+        return athena::store::grow_carry(&rest[1..]);
+    }
     // [the lead, November 17] A founding from a ruler's words reads and writes states alone, so it opens no card.
     if mode == "host" && rest.get(1).map(String::as_str) == Some("found-closed") {
         return athena::store::found_closed(&rest[1..]);

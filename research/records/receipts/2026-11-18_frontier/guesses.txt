@@ -509,3 +509,22 @@ stride at zero and a modulus of 4/5, and opened closed (strides within 0.06 of a
   and the arm read first is the small one: a stride of its own a symbol added to the circles' turn, founded at zero so every face
   is kept, beside the line. The closed opening within 0.05 of one advance: the opening decides, and the arm founds new circles with
   drawn strides at their founding reach.
+
+  G-1118-22 scored (21:51 UTC). At the places a count of five settles: (a) opened at zero strides: books 0.580, web 0.456 (0.54 to 0.60 and 0.42 to 0.48: held); (b) opened closed: books 0.587, web 0.463 (0.50 to 0.59 and 0.38 to 0.47: held), but its mean modulus stayed at 0.404 and 0.423 (guessed over 0.55: missed) and its strides spread by 0.116 and 0.134 of a turn (guessed over 0.200: missed); the reader opened at zero came to strides spread by 0.095 and 0.113 at moduli of 0.663 and 0.627. Both openings read within 0.012 of the drawn one (0.590, 0.468). The rule's branches both assumed the line's circles are held back where they stand; the closed reader read as well as the drawn one while staying closed and at small strides, so on 32 circles that standing is where a free fit of this reader also comes to rest, and no arm that only frees the circles is ordered. What the readings leave is the circles' extent: 0.477 at 32 circles and 0.652 at 128 (G-1118-21).
+
+G-1118-23 (2026-11-18T22:01:30Z). More carry circles on the line (grow-carry 96: the circles from 32 to 128 by their own founding law, drawn turn rows
+at the founded friction, their W columns at zero so every face is kept; 98,880 new entries on 442,425): two laps (arms C17, C18) from
+arm L16's end with the circles grown, beside the line's own L17 and L18 from the same state (the control). One change.
+  What is on record. At the places a count of five settles the line gives the arriving symbol 0.650 of its mass and a count of five
+  0.909; a carried product with a stride a symbol, alone on the host, gives 0.477 on 32 circles and 0.652 on 128 after three passes of
+  8 MB (24 million places), and holds nothing of the far (§18). A reader opened where the line's circles stand comes to rest there and
+  reads as a drawn one (G-1118-22), so the circles' extent is what the readings left to grow. A lap compares about 39 million open
+  places. Parts of this size took their gain in two to four laps here: the level's block 0.010, 0.0215, 0.0268, 0.0305 under its
+  control over four reads; the contacts facing the past 0.013 and 0.031.
+  The guess. (a) Rows S at the mean of a lap's last 1,000 sections: arm C17 between 0.005 above and 0.015 under arm L17's; arm C18
+  between 0.000 and 0.030 under arm L18's. (b) At the places a count of five settles, arm C18 gives the arriving symbol 0.003 to
+  0.025 more of its mass than arm L18. (c) Under the law one place open reads within 0.01 of the control's. (d) A section takes 330
+  to 420 ms (the line's 307 to 324). (e) The long panel from a lap's mean stays within 9 points of the control's.
+  What it decides. Arm C18 at least 0.010 under arm L18: the line takes the circles. Under that with its gap at least 0.003 wider at
+  the second lap than at the first: two more laps and the same rule there. Otherwise the circles leave the line and the growth stays
+  in the tree with the reading.

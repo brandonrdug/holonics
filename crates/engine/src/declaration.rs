@@ -387,6 +387,28 @@ impl Declaration {
         self.contact_draws(2 * circles) + circles * self.width
     }
 
+    /// [definition; the lead, November 18, the record of the two streams §19] The declaration with `circles` more carry circles
+    /// ([`Constitution::more_carry`]): the contact count grows by `2 circles` and the carry circles by `circles`, and nothing else. The new
+    /// circles follow the standing ones as the last complex contacts, so every standing contact and circle keeps its complex index and its
+    /// strand side. Refused for a field with no circles (its first are founded by [`Constitution::with_carry`]), for one with triads (a
+    /// growth after them is not built) and for an odd count (as many scan from each side). The draws it reads are
+    /// [`Declaration::carry_draws`]'s.
+    pub fn more_carry(&self, circles: usize) -> Result<Self> {
+        if self.carry == 0 {
+            return refuse("a growth in carry circles of a field with none (its first circles are founded as a field takes them)");
+        }
+        if self.triads > 0 {
+            return refuse("a growth in carry circles of a field with triads (the triads are founded last; a growth after them is not built)");
+        }
+        if circles == 0 || circles % 2 != 0 {
+            return refuse("a growth in carry circles adds an even count (as many scan from each side)");
+        }
+        let contacts = self.contacts.checked_add(2 * circles).ok_or(TowerError::Refused("a contact count outgrew its carrier"))?;
+        let d = Self { contacts, carry: self.carry + circles, ..*self };
+        d.admit()?;
+        Ok(d)
+    }
+
     /// The key draws a growth by `triads` triads reads ([`Constitution::with_triads`]): the triads' charts, `6 J` rows of `D` (`A`, then `B`, then `G`),
     /// as a growth in contacts draws its drives' rows.
     pub fn triad_draws(&self, triads: usize) -> usize {

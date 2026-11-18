@@ -418,7 +418,12 @@ impl Constitution {
         let layout = Loci::new(&d);
         let dw = d.width;
         let mut theta = contacted.theta;
-        debug_assert_eq!(theta.len(), layout.carry);
+        // [the lead, November 18] The circles' charts are laid after every family this founding knows. A field that already holds a later
+        // family (the opening's lift, the junction, the mark, the loudness, closed characters) would have those entries read as the circles'
+        // charts: refused here, where a debug assertion alone held it (a release build laid the charts over them; found by a test's fixture).
+        if theta.len() != layout.carry {
+            return refuse("a first growth in carry circles of a field that holds a family laid after the circles' (not built)");
+        }
         theta.resize(layout.len, 0);
         from.resize(layout.len, None);
         let (num, den) = chart_scale(dw);
@@ -432,6 +437,117 @@ impl Constitution {
         debug_assert_eq!(cursor, 4 * self.declaration.carry_draws(circles));
         let mut out = Self::with_theta(d, theta);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; the lead, November 18, the record of the two streams §19] **The field with `circles` more carry circles**
+    /// ([`Declaration::more_carry`]), founded as its first were ([`Constitution::with_carry`]): `2 circles` pair contacts after the standing
+    /// ones in each half (real parts, then imaginary), their drives `a` and `b` drawn uniform on `±√(3/D)` at the material's grain from `keys`
+    /// (four bytes a draw, the new rows in order, `a` then `b`), their biases and their columns of `W` at zero; then the new circles' turn
+    /// rows drawn the same way, their leak rows and both their biases at zero, so each opens as a turn of about a radian set by its site's
+    /// read at the founded friction `d₀ = 1/4`, `|γ| = 4/5`. Every standing entry keeps its value: a contact its complex index and strand
+    /// side, a circle its number (circle `k` stays circle `k`; the new ones are circles `C..C + circles`), a circle's turn row its row and
+    /// its leak row the same row of the leak's half. Every sum the forward forms into the face is the old sum (the new circles' `W` columns
+    /// are zero), so every face is kept bit for bit, and the new circles' return has a covector from the first section on. A tower keeps
+    /// its level as it stands (the level reads the fine field's width, which a growth in contacts does not change).
+    ///
+    /// Why: on November 18 a carried product with a stride of its own a symbol, read alone on the host, gave the arriving symbol 0.477 of
+    /// its mass on 32 circles and 0.652 on 128 at the places five places settle, where the line read 0.650; a reader opened where the
+    /// line's 32 circles stand came to rest there and read as the drawn one (`navigator.content-stride-on-open-text`), so what the readings
+    /// left to grow is the circles' extent.
+    ///
+    /// Returns the grown field and, for each entry of its material, the old entry it carries (`None` for a new contact's and a new
+    /// circle's own).
+    pub fn more_carry(&self, circles: usize, keys: &[u8]) -> Result<(Self, Vec<Option<usize>>)> {
+        let old = self.declaration;
+        let d = old.more_carry(circles)?;
+        let layout = Loci::new(&d);
+        let ol = &self.layout;
+        let (dw, fc, f2, c0, c1, added) = (old.width, old.contacts, d.contacts, old.carry, d.carry, 2 * circles);
+        if ol.families.len() != layout.families.len() {
+            return refuse("a growth in carry circles that changes the families");
+        }
+        let mut new = vec![0i32; layout.len];
+        let mut from: Vec<Option<usize>> = vec![None; layout.len];
+        // A standing contact at its index in the grown set (a real part keeps its place, an imaginary part moves past the new real
+        // parts); new contact `k` (of `added`) follows its half's standing contacts ([`Constitution::contacted`]).
+        let kept = |e: usize| if e < fc / 2 { e } else { f2 / 2 + e - fc / 2 };
+        let fresh = |k: usize| if k < added / 2 { fc / 2 + k } else { f2 / 2 + fc / 2 + k - added / 2 };
+        let drives = [(ol.a, layout.a), (ol.b, layout.b)];
+        for (&(os, ol_len, _), &(ns, nl_len, _)) in ol.families.iter().zip(&layout.families) {
+            let mut carry = |o: usize, n: usize| {
+                new[n] = self.theta[o];
+                from[n] = Some(o);
+            };
+            if let Some(&(_, ns)) = drives.iter().find(|&&(o, _)| o == os) {
+                for e in 0..fc {
+                    for j in 0..dw {
+                        carry(os + e * dw + j, ns + kept(e) * dw + j);
+                    }
+                }
+            } else if os == ol.a_bias || os == ol.b_bias {
+                for e in 0..fc {
+                    carry(os + e, ns + kept(e));
+                }
+            } else if os == ol.w {
+                for r in 0..dw {
+                    for e in 0..fc {
+                        carry(os + r * fc + e, ns + r * f2 + kept(e));
+                    }
+                }
+            } else if os == ol.carry {
+                // The turn rows `0..C`, then the leak rows: each half's standing rows first in the grown half.
+                for half in 0..2 {
+                    for k in 0..c0 {
+                        for j in 0..dw {
+                            carry(os + (half * c0 + k) * dw + j, ns + (half * c1 + k) * dw + j);
+                        }
+                    }
+                }
+            } else if os == ol.carry_bias {
+                for half in 0..2 {
+                    for k in 0..c0 {
+                        carry(os + half * c0 + k, ns + half * c1 + k);
+                    }
+                }
+            } else {
+                if ol_len != nl_len {
+                    return refuse("a family that changes its length with the carry circles but is not one they index");
+                }
+                for i in 0..ol_len {
+                    carry(os + i, ns + i);
+                }
+            }
+        }
+        if from.iter().flatten().count() != self.theta.len() {
+            return refuse("a growth in carry circles that did not carry every standing entry once");
+        }
+        // The draws: the new contacts' drives (`a` then `b`), then the new circles' turn rows.
+        let (num, den) = chart_scale(dw);
+        let mut cursor = 0usize;
+        let draw = |cursor: &mut usize| -> Result<i32> {
+            let word = keys.get(*cursor..*cursor + 4).ok_or(TowerError::Refused("fewer key bytes than the new carry circles' founding reads"))?;
+            *cursor += 4;
+            let k = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i128;
+            fit32((k * ((num << MATERIAL_BITS) / den) as i128) >> 31, "a new carry circle's founded value outgrew its 32-bit carrier")
+        };
+        for start in [layout.a, layout.b] {
+            for k in 0..added {
+                for j in 0..dw {
+                    new[start + fresh(k) * dw + j] = draw(&mut cursor)?;
+                }
+            }
+        }
+        for v in new[layout.carry + c0 * dw..layout.carry + c1 * dw].iter_mut() {
+            *v = draw(&mut cursor)?;
+        }
+        debug_assert_eq!(cursor, 4 * old.carry_draws(circles));
+        let mut out = Self::with_theta(d, new);
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        // A tower's level follows the fine field's entries in the material, each entry as it stood.
+        out.scale = self.scale.clone();
+        let level = self.material_len() - self.theta.len();
+        from.extend((0..level).map(|j| Some(self.theta.len() + j)));
         Ok((out, from))
     }
 
@@ -903,6 +1019,37 @@ impl Learner {
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
         Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 18, the record of the two streams §19] **The learner with `circles` more carry circles**
+    /// ([`Constitution::more_carry`]), the draws read from the founding key stream past every draw read before. Every standing entry keeps
+    /// its moments; a new contact's and a new circle's entries open as a growth opens them ([`Learner::with_carry`]): the first moments at
+    /// zero, the second at the mean of their family's standing second moments (the circles' charts have standing entries now, so a new
+    /// circle's turn row steps at its family's own scale). An entry's own rate, where the state carries them, is kept and a new entry
+    /// opens at the base rate; the parts' rates are kept; the held step and the last section's step, of the old layout, are dropped.
+    pub fn more_carry(&self, circles: usize, keys: &[u8]) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner grows its carry circles after its held step is read");
+        }
+        let rest = keys.get(self.drawn..).ok_or(TowerError::Refused("fewer key bytes than the new carry circles' draws"))?;
+        let (field, from) = self.field.more_carry(circles, rest)?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        for &(start, len, _) in field.families_all().iter() {
+            let old: Vec<i128> = (start..start + len).filter_map(|k| from[k].map(|i| self.second[i])).collect();
+            if old.len() == len || old.is_empty() {
+                continue;
+            }
+            // The mean term by term (each second moment is under `2^126`, so a family's sum is not formed).
+            let n = old.len() as i128;
+            let mean = old.iter().map(|v| v / n).sum::<i128>() + old.iter().map(|v| v % n).sum::<i128>() / n;
+            for k in (start..start + len).filter(|&k| from[k].is_none()) {
+                second[k] = mean;
+            }
+        }
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
+        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Constitution::with_triads`]), the triads' draws read
