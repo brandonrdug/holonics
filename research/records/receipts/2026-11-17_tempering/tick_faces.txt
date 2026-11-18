@@ -39,3 +39,15 @@ TICKS   stage tick 1 begins (after 1 ticks)        held 2.978   aside 2.685   fi
 TICKS   stage tick 2 begins (after 2 ticks)        held 2.936   aside 2.652   fitted 2.477 (at half its steps 2.494)   by slice: arithmetic 1.755 books 3.519 code 3.378 science 3.488 web 3.127 wikidata 4.170 words 2.781   [305 s]
 TICKS   stage tick 3 begins (after 3 ticks)        held 2.837   aside 2.586   fitted 2.430 (at half its steps 2.445)   by slice: arithmetic 1.726 books 3.475 code 3.255 science 3.291 web 3.060 wikidata 3.952 words 2.675   [406 s]
 TICKS done in 406 s on this host's numpy (one process)
+
+== One place opened alone mid-row, 24 known places a side (G-V6), on the night's pass-15 state: the trace's 5,164 held rows read (75 s at
+   20 host threads), 40,711 rows of the training passage fitted (594 s); the ruler 241 s. The stages a tick begins from only. ==
+TICKS fit rows 36640 (a tenth kept aside: 4071), read rows 5164 (held), symbols 89, held symbols the fit never met 0; ticks 4
+TICKS the machine's own face after its last tick: held 2.921 nats a place; on the fitted rows 2.927
+TICKS a face of the symbols' frequencies alone: held 3.040
+TICKS a face fitted at each stage of the open place, nats a place (stage: the state a tick begins from, then the state inside it after its contact):
+TICKS   stage tick 0 begins (after 0 ticks)        held 1.129   aside 1.143   fitted 0.955 (at half its steps 0.964)   [61 s]
+TICKS   stage tick 1 begins (after 1 ticks)        held 1.378   aside 1.410   fitted 1.211 (at half its steps 1.224)   [121 s]
+TICKS   stage tick 2 begins (after 2 ticks)        held 1.399   aside 1.394   fitted 1.205 (at half its steps 1.218)   [181 s]
+TICKS   stage tick 3 begins (after 3 ticks)        held 1.343   aside 1.342   fitted 1.144 (at half its steps 1.157)   [241 s]
+TICKS done in 241 s on this host's numpy (one process)

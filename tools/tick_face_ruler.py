@@ -22,14 +22,14 @@ def load(d, table):
     D, ticks = int(dims['read']), int(dims['ticks'])
     labels, code = [], []
     for i, l in enumerate(open(d + '/rows.tsv', encoding='utf-8')):
-        lab, _, tick, c = l.rstrip('\n').split('\t')[:4]
+        lab, place, tick, c = l.rstrip('\n').split('\t')[:4]
         assert int(tick) == i % ticks
         if int(tick) == 0:
-            labels.append(lab); code.append(int(c) / G * LN2)
+            labels.append((lab, int(place))); code.append(int(c) / G * LN2)      # the compared place is the run's place of that index
     n = len(labels)
     chart = np.fromfile(d + '/chart.i32', dtype=np.int32).reshape(n, ticks, D).astype(np.float64) / 65536
     read = np.fromfile(d + '/read.i32', dtype=np.int32).reshape(n, ticks, D).astype(np.float64) / 65536
-    return [sym[l] for l in labels], np.array(code), chart, read, ticks, None
+    return [sym[l][j] for l, j in labels], np.array(code), chart, read, ticks, None
 
 def load_store(d, sections):
     """A `read-tension-store` dump: the compared (open) sites of the named sections, each with its class, its code, and its charts by tick;
