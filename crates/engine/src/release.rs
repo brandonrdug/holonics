@@ -361,7 +361,7 @@ impl Constitution {
                 (classes, open)
             })
             .collect();
-        let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).collect();
+        let regions: Vec<Region> = owned.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false }).collect();
         let faces = if regions.is_empty() { Vec::new() } else { realization.read_faces(self, &regions)? };
         let mut out: Vec<Vec<TowerFace>> = ks.iter().map(|_| Vec::new()).collect();
         let at: std::collections::BTreeMap<usize, usize> = ks.iter().enumerate().map(|(n, &k)| (k, n)).collect();
@@ -411,7 +411,7 @@ impl Constitution {
                 _ => len,
             }
         };
-        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k][..cut(k)], unresolved: &open[k][..cut(k)], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).collect();
+        let regions: Vec<Region> = active.iter().map(|&k| Region { classes: &classes[k][..cut(k)], unresolved: &open[k][..cut(k)], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false }).collect();
         let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); classes.len()];
         if regions.is_empty() {
             return Ok(faces);

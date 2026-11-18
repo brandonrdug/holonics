@@ -111,7 +111,7 @@ impl<'c> Resident<'c> {
             owned.push((vec![0usize; epochs], unres, faces));
         }
         off.push(fine.sites as u32);
-        let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None, before: false }).collect();
+        let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None, before: false, strand: false }).collect();
         let st = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords)?;
         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
         let trips = self.timed(Kind::Alloc, || self.take_zeroed::<i128>(sites.max(1))).map_err(device)?;

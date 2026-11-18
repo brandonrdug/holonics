@@ -468,6 +468,9 @@ pub(crate) struct Forward {
     pub(crate) moment: Vec<i64>,
     /// A tower's forward at its split, for the reverse.
     pub(crate) tower: Option<crate::field::scale::ScalePass>,
+    /// [the lead, November 18] The two streams' forward, where the region is a passage read by two streams ([`Region::strand`]): its
+    /// faces are the open places', and its return is the strand's ([`Constitution::strand_returned`]).
+    pub(crate) strand: Option<Box<StrandForward>>,
     /// [measurement; theory, November 11 04:48, G39] The sites whose face covector a return leaves zero (empty: none), a reading of where the deposit's mass lies.
     pub(crate) skip: Vec<bool>,
     /// [definition; agent-inferred, November 14, the ring record §4] The marks this read opened its silent sites on ([`Declaration::mark`]):
@@ -915,6 +918,17 @@ impl Constitution {
     /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`Declaration::mark`]), the first read is this one
     /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
     pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
+        // [definition; the lead, November 18] A passage read by two streams ([`Region::strand`]): the forward is the strand's, its faces the
+        // open places' (none at the first place, which has nothing before it).
+        if region.strand {
+            if region.unresolved.iter().any(|&u| u) || region.faces.iter().any(Option::is_some) || region.locked.iter().any(|&l| l) || region.echo.iter().any(Option::is_some) || region.port.is_some() {
+                return refuse("a passage read by two streams whose sites are not all known, or that has a port");
+            }
+            self.admit_region(region)?;
+            let mut strand = self.strand_pass(region.classes, keep)?;
+            let faces: Vec<Option<TowerFace>> = std::mem::take(&mut strand.faces).into_iter().enumerate().map(|(t, f)| (t > 0).then_some(f)).collect();
+            return Ok(Forward { faces, strand: Some(Box::new(strand)), ..Forward::default() });
+        }
         // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read, and so is a known stream's ([`Region::before`]).
         if !self.declaration.mark || matches!(self.ruler_far, 3..=5) || region.before {
             return self.pass_with(region, keep, None);
@@ -1154,7 +1168,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false };
         // The known stream, its ticks kept: the forward a ruler reads at `3`.
         let mut stream = self.clone();
         stream.ruler_far = 3;
@@ -1214,7 +1228,7 @@ impl Constitution {
         }
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false };
         self.admit_region(&region)?;
         let (dw, m2) = (d.width, 2 * d.complex());
         let reaches = self.reaches();

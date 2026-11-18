@@ -87,6 +87,14 @@ impl Constitution {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     pub(crate) fn returned(&self, region: &Region, pass: &Forward, g: &mut [i128]) -> Result<()> {
+        // [definition; the lead, November 18] A passage read by two streams returns through the strand's own reverse; read once, its return
+        // stands for both reads where the field reads twice (as a known stream's does, below).
+        if let Some(strand) = pass.strand.as_deref() {
+            for _ in 0..if self.declaration.mark { 2 } else { 1 } {
+                self.strand_returned(region.classes, strand, g)?;
+            }
+            return Ok(());
+        }
         self.returned_with(region, pass, g, None, None, None, None, None, None, None)?;
         // [definition; agent-inferred, November 14, G180] Where the field reads twice both reads are compared: the first read's own return is
         // added beside the second's, and the consumer halves the section's sum once ([`Constitution::read_and_return`]), so the comparison is the two
@@ -674,7 +682,8 @@ impl Constitution {
         let l = &self.layout;
         let reaches = self.reaches();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
+        // (the known stream's region: sided, so the opening's comparison below is the retarded one)
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
@@ -743,6 +752,12 @@ impl Constitution {
             }
         }
         self.strand_clock_return(&region, &paces, pass, 0, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+        // [definition; the lead, November 18] Where the field compares its opening, the strand compares the retarded one at every place (the
+        // opening an open place begins from, [`Constitution::opening_compare_return`] on the known stream's region); its clocks' covectors
+        // join the known stream's, folded into the strides below.
+        if d.opening {
+            self.opening_compare_return(&region, &paces, 0..n, g, &mut whole.gtau, &mut whole.gsig)?;
+        }
         // The known stream's moments (no after row) and its clocks, to its strides and their classes' paces.
         for (k, slot) in whole.dm.iter_mut().enumerate() {
             if !moment_modes[(k % m2) % m] {
