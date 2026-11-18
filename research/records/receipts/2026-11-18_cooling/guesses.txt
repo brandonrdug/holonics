@@ -44,7 +44,7 @@ the panel at 56%. Tonight's cooling arms: a cooler deposit does not move the lev
 Scored (2026-11-18T05:38:49Z), G-1118-1 (arms.txt).
   (a) The sections' training code, paired with A, nats a compared place by third of the lap: D -0.0047, -0.0104, -0.0111 (0.005 to 0.030
       under A over the last third, and under it over the first: held, though D stood above A for its first 270 sections); C -0.0067,
-      -0.0103, -0.0105, which is 0.94 of D's last third [these six figures corrected at 05:58 UTC: a section's line prints millionths of
+      -0.0103, -0.0105, which is 0.94 of D's last third [these six figures corrected at 05:48 UTC: a section's line prints millionths of
       a bit a place and the ruler had read it on 2^-20 bits, 4.6% low; the scores stand] (a half to nine tenths guessed: at its edge, over); B +0.0000, +0.0001, +0.0000
       (within 0.002: held).
   (b) The end against the mean, one place open: A's end reads 0.0174 above A's mean (0.004 to 0.012 guessed: missed, the spread costs
