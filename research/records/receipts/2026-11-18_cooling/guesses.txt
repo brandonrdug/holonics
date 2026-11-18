@@ -42,9 +42,10 @@ the panel at 56%. Tonight's cooling arms: a cooler deposit does not move the lev
   alone, and they need loci of their own.
 
 Scored (2026-11-18T05:38:49Z), G-1118-1 (arms.txt).
-  (a) The sections' training code, paired with A, nats a compared place by third of the lap: D -0.0045, -0.0099, -0.0106 (0.005 to 0.030
-      under A over the last third, and under it over the first: held, though D stood above A for its first 270 sections); C -0.0064,
-      -0.0098, -0.0100, which is 0.94 of D's last third (a half to nine tenths guessed: at its edge, over); B +0.0000, +0.0001, +0.0000
+  (a) The sections' training code, paired with A, nats a compared place by third of the lap: D -0.0047, -0.0104, -0.0111 (0.005 to 0.030
+      under A over the last third, and under it over the first: held, though D stood above A for its first 270 sections); C -0.0067,
+      -0.0103, -0.0105, which is 0.94 of D's last third [these six figures corrected at 05:48 UTC: a section's line prints millionths of
+      a bit a place and the ruler had read it on 2^-20 bits, 4.6% low; the scores stand] (a half to nine tenths guessed: at its edge, over); B +0.0000, +0.0001, +0.0000
       (within 0.002: held).
   (b) The end against the mean, one place open: A's end reads 0.0174 above A's mean (0.004 to 0.012 guessed: missed, the spread costs
       more than I had it); D's end reads 0.0000 from D's mean (within 0.002: held). C's end reads 0.0033 above C's mean.
@@ -81,3 +82,26 @@ neighbours. I had fixed the guess from the columns' names. At pass 0 they read 2
   boundary-only state at pass 10 by this read: 2.3 to 3.0 nats a place (its fifteenth pass read 2.921 on a dump of the store's
   sections); for the half-open-only state: within 0.15 of the opening state's.
   The hh columns are reported as what they are and carry no guess.
+
+Scored (2026-11-18T07:32:16Z), G-1118-2 (mixed.txt).
+  The next place at the boundary, held, at pass 10: 1.505 (1.55 to 1.66 guessed: missed, lower than guessed). It reads under the
+  boundary rows alone at every pass they share: 1.700 for 1.732, 1.619 for 1.645, 1.547 for 1.569, 1.505 for 1.536 (the mixed table was
+  shuffled and the night's was not, so the half-open rows and the order are not told apart here). The fitted rows read 1.448.
+  The place between known neighbours, by the line's held read as amended, one place open over the held passage's seven slices: the
+  opening state 0.8968; the mixed diet 2.0425 at pass 5 and 2.4884 at pass 10 (no more than 0.10 above guessed: missed by 1.59). On the
+  books slice, the diet's own kind of text: 0.8727, then 1.0931 and 1.1813 (+0.2204, +0.3086, still rising). Whole masks on books:
+  2.1415, 2.1436, 2.1608 (held, within their error).
+  The night's states by the same read: boundary rows alone at pass 10, 3.6446 (2.3 to 3.0 guessed: missed high; on books +1.9741, whole
+  masks on books +3.6772); half-open rows alone at pass 10, 1.1497 (within 0.15 of the opening state's guessed: missed, +0.2529; on
+  books +0.0251 and whole masks on books -0.0308).
+  The panel written one place a read: 157 of 192 words in the lexicon, 82% (68% or more guessed: held), where the control lap's end
+  from lap 70 writes 52 of 142 (37%) and boundary rows alone reached 76% at pass 15. The longest run a write shares with the fitting
+  text is 15 places.
+  What it says. (1) Every one of these diets was fifty books, and what a diet does not hold up it loses: half-open rows alone cost the
+  other slices a quarter of a nat and books nothing; with the boundary rows beside them the other slices lost 1.2 to 2.7 nats (code 0.56
+  to 3.27). The boundary's comparison pulls hard on rows the other readings share, and only what is compared beside it stands. (2) On
+  the diet's own text, half-open rows at an equal count of compared places hold whole masks under that pull and do not hold one place
+  open: it rises 0.31 and is still rising. No row of the diet was one place open in a long known stretch, so what is decided is
+  narrower than the guess's own rule: this upkeep was not that reading's. The line's keyed masks (drawn at tau = u^2, most of a place's
+  neighbours known) are the upkeep read next, on all five text slices, in G-1118-3 (b). (3) The writes moved further than any state
+  before them, and they are a specimen of fifty books: the claim waits on the store's lap.

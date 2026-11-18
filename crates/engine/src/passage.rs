@@ -272,11 +272,16 @@ pub struct Drawn {
     pub a: u64,
     pub ends: bool,
     pub done: bool,
+    /// Read at the frontier ([`frontier_cut_of`]): its context and the one place after it, a true end's first void where one follows.
+    pub frontier: bool,
 }
 
 impl Drawn {
-    /// The stretch's sites: its context, its run and the near tail where a true end follows.
+    /// The stretch's sites: its context, its run and the near tail where a true end follows; at the frontier, its context and one place.
     pub fn sites(&self) -> u64 {
+        if self.frontier {
+            return self.q + 1;
+        }
         self.q + self.a + if self.ends { NEAR as u64 } else { 0 }
     }
 }
@@ -302,12 +307,54 @@ pub fn cut_of(seed: u64, d: u64, rest: u64, closes: bool, least: u64, octaves: u
     (q, rest - q, closes, true)
 }
 
-/// The kind of a stretch's one keyed state, as the port names it.
+/// [definition; agent-inferred, the lead, November 18, the audit of that day §1.4] **The frontier's cut**: the stretch at a cursor with
+/// `rest` places left, read at the frontier. Its context is the stretch's own draw of one ([`lengths_of`], so a context's length keeps the
+/// pass's octaves and no scale of it is privileged), and its run is the one place after it: `(q, 1)` where the piece goes on past it by
+/// the least context or more. Else it takes the rest of the piece: where the piece closes its document, every place left is known and the
+/// one open place is the true end's first void (`(rest, 0)`, an end follows), so the field is compared on where a document stops as a
+/// writer must place it; where the piece does not close, the last place left is the open one (`(rest − 1, 1)`). Returns the context, the
+/// places of the run that are the passage's (one or none), whether a true end follows, and whether the piece is done.
+pub fn frontier_cut_of(seed: u64, d: u64, rest: u64, closes: bool, least: u64, octaves: u64) -> (u64, u64, bool, bool) {
+    let (q, _) = lengths_of(seed, d, least, octaves);
+    if rest > q + least {
+        return (q, 1, false, false);
+    }
+    if closes {
+        (rest, 0, true, true)
+    } else {
+        (rest - 1, 1, false, true)
+    }
+}
+
+/// Whether the pass's `d`th stretch is read at the frontier: a keyed draw of eight against the pass's share ([`StorePass::frontier`]).
+pub fn frontier_here(seed: u64, d: u64, share: u64) -> bool {
+    share > 0 && mix(seed, d | 9 << 60) % 8 < share
+}
+
+/// [definition; agent-inferred, the lead, November 18, the audit of that day §1.4] **A stretch's frontier state**: every place known but
+/// the last, which alone is open, and the region ends there (`classes` is the context and the open place; a true end's void is given as
+/// `void` and stands as the open place). It is the state a writer in place order meets at each place it writes: everything before the
+/// place bound, nothing after it. One place is compared for the region's `m` sites, so its weight in the code is `m` over one
+/// ([`crate::field::Region::weight`]): its domain is the region, which keeps a section's comparison weight following the sites it reads
+/// across its kinds of state. Why a region that ends at its open place and not a run left open behind it: an open place is no source
+/// to the contact (`field.rs`'s first lines, §16.20), so a tail of open places would cost their sites and bring the compared place
+/// nothing the contact gathers; and it is the state the night's text run of November 17 compared and wrote from.
+pub fn frontier_state_of(mut classes: Vec<usize>, void: Option<usize>) -> Stretch {
+    if let Some(v) = void {
+        classes.push(v);
+    }
+    let n = classes.len();
+    let unresolved: Vec<bool> = (0..n).map(|t| t + 1 == n).collect();
+    Stretch { region: OwnedRegion { domain: Some(n), ..OwnedRegion::plain(classes, unresolved) }, kind: Kind::Frontier, counted: n, q: n - 1 }
+}
+
+/// The kind of a stretch's one keyed state, as the port names it; `Frontier` is the lead's of November 18 ([`frontier_state_of`]).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
     MaskWhole,
     MaskRun,
     Writer,
+    Frontier,
 }
 
 /// [definition; the record §4 item 2; the port's `state_of`] **A stretch's one keyed state**, from `head = mix(seed, d)`: bit 17 set, the
@@ -394,8 +441,14 @@ impl Cut {
         let at = &self.pass.slices[slice];
         let piece = self.slices[slice].pieces[at.piece as usize];
         let d = self.pass.stretches + 1;
-        let (q, a, ends, done) = cut_of(self.seed, d, piece.places() - at.cursor, piece.closes, self.pass.least, self.pass.octaves);
-        Some(Drawn { slice, d, q, a, ends, done })
+        let rest = piece.places() - at.cursor;
+        let frontier = frontier_here(self.seed, d, self.pass.frontier);
+        let (q, a, ends, done) = if frontier {
+            frontier_cut_of(self.seed, d, rest, piece.closes, self.pass.least, self.pass.octaves)
+        } else {
+            cut_of(self.seed, d, rest, piece.closes, self.pass.least, self.pass.octaves)
+        };
+        Some(Drawn { slice, d, q, a, ends, done, frontier })
     }
 
     /// The drawn stretch taken: its region read from its slice's file, and the pass moved past it.
@@ -406,11 +459,17 @@ impl Cut {
         if classes.len() != bytes.len() {
             return Err("a stretch whose bytes are not one class each".into());
         }
-        if drawn.ends {
+        if drawn.ends && !drawn.frontier {
             classes.resize(classes.len() + NEAR, codec.void());
         }
         let (q, a) = (drawn.q as usize, drawn.a as usize);
-        let region = if self.pass.own { own_state_of(drawn.d, classes, q, a) } else { state_of(self.seed, drawn.d, classes, q, a) };
+        let region = if drawn.frontier {
+            frontier_state_of(classes, drawn.ends.then(|| codec.void()))
+        } else if self.pass.own {
+            own_state_of(drawn.d, classes, q, a)
+        } else {
+            state_of(self.seed, drawn.d, classes, q, a)
+        };
         let place = &mut self.pass.slices[drawn.slice];
         place.taken += drawn.q + drawn.a;
         if drawn.done {

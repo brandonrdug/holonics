@@ -4076,7 +4076,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0 });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4127,6 +4127,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         own: false,
         slices: ["code", "web", "science", "books", "wikidata"].iter().enumerate().map(|(k, n)| PassSlice { name: n.to_string(), piece: k as u64, cursor: 3 * k as u64, taken: 100 * k as u64 }).collect(),
         world: None,
+        frontier: 0,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -4166,6 +4167,75 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     }
     let named_world = StorePass { slices: vec![PassSlice { name: "world".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
     assert!(StorePass::from_line(&named_world.to_line()).is_err(), "a slice named `world` is refused");
+    // [the lead, November 18] The frontier's clause stands as the line's last two words only where set; with `own`, with a world or
+    // without, it reads back as itself; a share of zero or past eight, or a slice named `frontier`, is refused.
+    let frontier = StorePass { frontier: 6, ..pass.clone() };
+    assert_eq!(frontier.to_line(), format!("{} frontier 6", pass.to_line()));
+    assert!(!pass.to_line().contains(" frontier"));
+    for p in [frontier.clone(), StorePass { own: true, ..frontier.clone() }, StorePass { frontier: 8, ..world.clone() }, StorePass { frontier: 1, ..refined.clone() }, StorePass { frontier: 3, ..world_own.clone() }] {
+        assert_eq!(StorePass::from_line(&p.to_line()).unwrap(), p, "{}", p.to_line());
+    }
+    for bad in [format!("{} frontier 0", pass.to_line()), format!("{} frontier 9", pass.to_line()), format!("{} frontier x", pass.to_line())] {
+        assert!(StorePass::from_line(&bad).is_err(), "{bad}");
+    }
+    let named_frontier = StorePass { slices: vec![PassSlice { name: "frontier".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
+    assert!(StorePass::from_line(&named_frontier.to_line()).is_err(), "a slice named `frontier` is refused");
+    learner.pass = Some(frontier.clone());
+    let with = learner.to_text();
+    assert_eq!(with, format!("{plain}{}\n", frontier.to_line()));
+    assert_eq!(Learner::from_text(&with).unwrap().to_text(), with, "a learner whose pass has a frontier reads and writes byte for byte");
+}
+
+/// [definition; the lead, November 18, the audit of that day §1.4] **A stretch read at the frontier is its context and the one place after
+/// it**: the cut takes the stretch's own draw of a context and one place while the piece goes on by the least context or more; at a piece's
+/// end it takes every place left, the open place the true end's first void where the piece closes its document and the piece's last place
+/// where it does not; a piece walked by the frontier's cut alone is consumed whole, one compared place a stretch. The state has every place
+/// known but its last, its domain its sites. The keyed share takes none at zero, all at eight, and about its eighths between.
+#[test]
+fn a_stretch_at_the_frontier_is_its_context_and_the_next_place_alone() {
+    use crate::passage::{frontier_cut_of, frontier_here, frontier_state_of, lengths_of, Kind};
+    let (seed, least, octaves) = (0xABCD_u64, 4u64, 7u64);
+    for closes in [false, true] {
+        for places in [1u64, 2, 5, 9, 100, 1000, 4321] {
+            let (mut cursor, mut d, mut compared, mut done) = (0u64, 0u64, 0u64, false);
+            while !done {
+                d += 1;
+                let rest = places - cursor;
+                let (q0, _) = lengths_of(seed, d, least, octaves);
+                let (q, a, ends, last) = frontier_cut_of(seed, d, rest, closes, least, octaves);
+                if rest > q0 + least {
+                    assert_eq!((q, a, ends, last), (q0, 1, false, false), "the stretch's own context and one place");
+                    assert!(rest - (q + a) >= least, "the piece goes on by the least context or more");
+                } else if closes {
+                    assert_eq!((q, a, ends, last), (rest, 0, true, true), "every place left known, the end's void open");
+                } else {
+                    assert_eq!((q, a, ends, last), (rest - 1, 1, false, true), "the piece's last place open");
+                }
+                cursor += q + a;
+                compared += 1;
+                done = last;
+            }
+            assert_eq!(cursor, places, "the piece is consumed whole");
+            assert_eq!(compared, d);
+        }
+    }
+    let classes: Vec<usize> = (0..9).collect();
+    let s = frontier_state_of(classes.clone(), None);
+    assert_eq!((s.kind, s.counted, s.q, s.region.domain), (Kind::Frontier, 9, 8, Some(9)));
+    assert_eq!(s.region.classes, classes);
+    assert_eq!(s.region.unresolved, (0..9).map(|t| t == 8).collect::<Vec<_>>(), "the last place alone is open");
+    assert_eq!(crate::region::view_of(&s.region).weight(), (9, 1), "one place compared for the region's sites");
+    let e = frontier_state_of(classes.clone(), Some(77));
+    assert_eq!((e.counted, e.q, e.region.classes.last().copied(), e.region.unresolved.iter().filter(|&&u| u).count()), (10, 9, Some(77), 1), "a true end's void is the open place");
+    assert!(*e.region.unresolved.last().unwrap());
+    let lone = frontier_state_of(vec![5], None);
+    assert_eq!((lone.counted, lone.q, lone.region.unresolved.clone()), (1, 0, vec![true]));
+    assert!((1..=4096u64).all(|d| !frontier_here(seed, d, 0)) && (1..=4096u64).all(|d| frontier_here(seed, d, 8)));
+    for share in 1..8u64 {
+        let n = (1..=8192u64).filter(|&d| frontier_here(seed, d, share)).count() as u64;
+        assert!(n.abs_diff(1024 * share) < 160, "share {share}: {n} of 8192");
+        assert!((1..=8192u64).all(|d| !frontier_here(seed, d, share) || frontier_here(seed, d, share + 1)), "a larger share keeps a smaller one's stretches");
+    }
 }
 
 /// [definition; theory, November 13, the record of the landmarks §5 and the design record §4.9] **A level's sites are the landmarks of its

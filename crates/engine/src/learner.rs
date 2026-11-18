@@ -5,7 +5,8 @@
 //!
 //! Kind: chain over the sections. Kernels: the realization's (above).
 //! Lean: `Foundation/Standing`.
-//! Atlas: `tower.field-completion-covector`, `tower.field-deposit`, `tower.field-own-states`, `tower.field-step-price`, `tower.store-stretch-cut`.
+//! Atlas: `tower.field-completion-covector`, `tower.field-deposit`, `tower.field-own-states`, `tower.field-step-price`, `tower.store-stretch-cut`,
+//! `tower.store-frontier-state`.
 //! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-15_THE_OWN_STATES…`. The derivations' history is in the records; the items below keep
 //! their reasons.
 
@@ -264,6 +265,16 @@ pub struct StorePass {
     /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC] The world that answers the field's act, where one
     /// is joined ([`PassWorld`]).
     pub world: Option<PassWorld>,
+    /// [definition; agent-inferred, the lead, November 18, the audit of that day §1.4 and the night's text run] **The frontier's share**: of
+    /// every eight stretches, keyed by the stretch's count, this many are read at the frontier ([`crate::passage::frontier_cut_of`],
+    /// [`crate::passage::frontier_state_of`]): the context known and the next place alone open, the region ending there, which is the
+    /// state a writer in place order meets at every place it writes. Zero where the pass has none. Written as the line's last two words,
+    /// `frontier E`, and only where set, so every state of the line reads and writes byte for byte as before. Why in the state: which
+    /// states a field trains on is law (CLAUDE.md, November 8). Why the share: from lap 1 to lap 94 the line compared a place at the
+    /// writer's frontier only among a writer state's open places, about 92% of which lie past it (the audit's count from the law, §1.4);
+    /// fifteen passes compared there alone took the panel written one place a read from 38% to 76% of its words in the lexicon (the
+    /// level's design record of November 17, §12).
+    pub frontier: u64,
 }
 
 /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC, the friction record §3 and §5] **A world joined at the
@@ -305,12 +316,25 @@ impl StorePass {
             let refine = if w.refine > 0 { format!(" {}", w.refine) } else { String::new() };
             format!(" world {} {} {} {}{refine}", w.slice, w.every, w.records, w.run)
         });
-        format!("pass {} {} {} {} {} {} {}{own}{slices}{world}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
+        let frontier = if self.frontier > 0 { format!(" frontier {}", self.frontier) } else { String::new() };
+        format!("pass {} {} {} {} {} {} {}{own}{slices}{world}{frontier}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
     }
 
     /// The pass read from its line ([`StorePass::to_line`]).
     pub fn from_line(line: &str) -> Result<Self> {
-        let all: Vec<&str> = line.split(' ').collect();
+        let mut all: Vec<&str> = line.split(' ').collect();
+        // The frontier's clause, where set, is the line's last two words, opened by the word `frontier` (no slice is named `frontier`, and
+        // the word before a line's last is otherwise a count).
+        let frontier = if all.len() >= 10 && all[all.len() - 2] == "frontier" {
+            let share = all[all.len() - 1].parse::<u64>().map_err(|_| TowerError::Refused("a frontier's share that is not a count"))?;
+            if share == 0 || share > 8 {
+                return refuse("a frontier's share that is not one to eight of every eight stretches");
+            }
+            all.truncate(all.len() - 2);
+            share
+        } else {
+            0
+        };
         // The world's clause, where set, is the line's last five words, opened by the word `world` (no slice is named `world`).
         let (words, world_words) = if all.len() >= 13 && all[all.len() - 5] == "world" {
             (&all[..all.len() - 5], Some(&all[all.len() - 4..]))
@@ -332,8 +356,8 @@ impl StorePass {
             return refuse("a pass's store that is not a SHA-256");
         }
         let slices = words[from..].chunks(4).map(|c| Ok(PassSlice { name: word(c[0])?, piece: n(c[1])?, cursor: n(c[2])?, taken: n(c[3])? })).collect::<Result<Vec<_>>>()?;
-        if slices.iter().any(|s| s.name == "world") {
-            return refuse("a pass with a slice named `world`, the word of the world's clause");
+        if slices.iter().any(|s| s.name == "world" || s.name == "frontier") {
+            return refuse("a pass with a slice named `world` or `frontier`, the words of the pass's clauses");
         }
         let world = match world_words {
             Some(w) => Some(PassWorld { slice: word(w[0])?, every: n(w[1])?, records: n(w[2])?, run: n(w[3])?, refine: w.get(4).map(|r| n(r)).transpose()?.unwrap_or(0) }),
@@ -344,7 +368,7 @@ impl StorePass {
                 return refuse("a world whose share, records or run is zero, or whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }

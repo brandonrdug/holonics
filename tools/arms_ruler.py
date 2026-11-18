@@ -24,7 +24,8 @@ def sections(n):
     for line in open(path, errors='replace'):
         if line.startswith('STORE_SECTION '):
             f = kv(line)
-            out[int(f['n'])] = (int(f['before']) / G * LN2, int(f['domain']), int(f['opening']) / G * LN2 if f.get('opening', '-') != '-' else float('nan'), int(f.get('opening_places', 0)))
+            # a section's line prints its codes in millionths of a bit a place (`micro` in the store trainer), where a cavity's rows are on 2^-20 bits
+            out[int(f['n'])] = (int(f['before']) / 1e6 * LN2, int(f['domain']), int(f['opening']) / 1e6 * LN2 if f.get('opening', '-') != '-' else float('nan'), int(f.get('opening_places', 0)))
     return out
 
 def paired_sections(a, b, name):
@@ -33,7 +34,7 @@ def paired_sections(a, b, name):
     n = len(common); thirds = [common[: n // 3], common[n // 3: 2 * n // 3], common[2 * n // 3:]]
     parts = []
     for part in thirds + [common]:
-        # a section's line gives its code a compared place already (on 2^-20 bits); the pairs are unweighed
+        # a section's line gives its code a compared place already; the pairs are unweighed
         da = np.array([a[k][0] for k in part]); db = np.array([b[k][0] for k in part])
         diff = db - da
         parts.append(f"{diff.mean():+.4f} (±{diff.std(ddof=1) / math.sqrt(len(diff)):.4f}; the control {da.mean():.4f})")

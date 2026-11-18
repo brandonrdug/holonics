@@ -44,7 +44,7 @@ sections.
 
 Paired place by place with A's mean, one place open: C −0.0031 (±0.0004), D −0.0013 (±0.0005), B +0.0000 (±0.0001). At whole masks:
 C −0.0004 (±0.0018), D +0.0057 (±0.0024). The sections' own training code, paired section by section with A over the lap's last
-third: C −0.0100, D −0.0106, B +0.0000 nats a compared place.
+third: C −0.0105, D −0.0111, B +0.0000 nats a compared place (corrected at 05:48 UTC: a section's line prints millionths of a bit, and the ruler had read it on 2^-20 bits, 4.6% low; no reading changes).
 
 The panel (the fifty books' sixteen held prompts, 64 places each, by the law's writer): 48% of its words in the lexicon from A's end
 state, 46% from A's mean, 47% from D's end.

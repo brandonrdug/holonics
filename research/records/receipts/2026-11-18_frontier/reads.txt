@@ -1,0 +1,43 @@
+The frontier lap (G-1118-3): from lap 70's end state on the store of November 12 at rate 12, one lap of 3,000 sections with six of every
+eight stretches read at the frontier (arm F; 1,699 s on the card, projection 1,300 to 1,700 s; 935,979 stretches, about 234 frontier
+regions of 312 a section), beside the control lap from the same state (arm A of the cooling laps; 1,445 s). The build's entry: 24
+sections from lap 69's end state with no share, their lines equal to lap 70's own but for the times (0 differing lines).
+The held read (read-cavity with its frontier rows, 20,000 places a slice; about 320 s a read), by tools/frontier_ruler.py, the control's
+mean first; nats a place; a row's count of known places is its place in its stretch. Codes and counts only.
+
+FRONTIER A_mean; one place open: all 0.7727 (100508 places) | books 0.8123 code 0.4912 science 0.6977 web 0.8521 wikidata 1.0094
+FRONTIER A_mean; whole masks: all 2.2089 (3717 places) | books 2.0736 code 2.0973 science 2.0736 web 2.3894 wikidata 2.4372
+FRONTIER A_mean; the frontier: all 2.0574 (99844 places) | books 2.0047 code 1.8150 science 2.0328 web 2.2017 wikidata 2.2322
+FRONTIER A_mean; the frontier by places known: 1: 3.937 (514) | 2 to 3: 3.017 (1028) | 4 to 7: 2.662 (2056) | 8 to 15: 2.484 (4069) | 16 to 31: 2.330 (7378) | 32 to 63: 2.175 (12360) | 64 to 127: 2.019 (19523) | 128 to 255: 1.937 (26570) | 256 to 511: 1.887 (24110) | 512 to 1023: 1.904 (2236)
+FRONTIER F_mean; one place open: all 0.8735 (100508 places) | books 0.9125 code 0.5873 science 0.8075 web 0.9525 wikidata 1.1071 || less the control's, paired: +0.1008 (±0.0018) | books +0.1003 code +0.0961 science +0.1099 web +0.1004 wikidata +0.0977
+FRONTIER F_mean; whole masks: all 2.2866 (3717 places) | books 2.1452 code 2.2132 science 2.1647 web 2.4335 wikidata 2.5033 || less the control's, paired: +0.0778 (±0.0076) | books +0.0716 code +0.1160 science +0.0911 web +0.0441 wikidata +0.0661
+FRONTIER F_mean; the frontier: all 1.8971 (99844 places) | books 1.8840 code 1.6368 science 1.8820 web 2.0602 wikidata 2.0224 || less the control's, paired: -0.1603 (±0.0021) | books -0.1207 code -0.1782 science -0.1508 web -0.1415 wikidata -0.2099
+FRONTIER F_mean; the frontier by places known (less the control's): 1: 3.882 (-0.055) | 2 to 3: 2.914 (-0.102) | 4 to 7: 2.533 (-0.129) | 8 to 15: 2.372 (-0.111) | 16 to 31: 2.205 (-0.125) | 32 to 63: 2.045 (-0.130) | 64 to 127: 1.871 (-0.148) | 128 to 255: 1.763 (-0.174) | 256 to 511: 1.693 (-0.194) | 512 to 1023: 1.703 (-0.201)
+FRONTIER A_end; one place open: all 0.7901 (100508 places) | books 0.8330 code 0.5035 science 0.7146 web 0.8701 wikidata 1.0285 || less the control's, paired: +0.0174 (±0.0008) | books +0.0208 code +0.0123 science +0.0169 web +0.0179 wikidata +0.0191
+FRONTIER A_end; whole masks: all 2.2239 (3717 places) | books 2.0831 code 2.1055 science 2.0806 web 2.4128 wikidata 2.4654 || less the control's, paired: +0.0150 (±0.0038) | books +0.0095 code +0.0083 science +0.0070 web +0.0235 wikidata +0.0282
+FRONTIER A_end; the frontier: all 2.0771 (99844 places) | books 2.0298 code 1.8353 science 2.0515 web 2.2192 wikidata 2.2492 || less the control's, paired: +0.0197 (±0.0009) | books +0.0251 code +0.0203 science +0.0187 web +0.0175 wikidata +0.0170
+FRONTIER A_end; the frontier by places known (less the control's): 1: 3.978 (+0.041) | 2 to 3: 3.040 (+0.024) | 4 to 7: 2.686 (+0.024) | 8 to 15: 2.498 (+0.014) | 16 to 31: 2.347 (+0.017) | 32 to 63: 2.194 (+0.019) | 64 to 127: 2.038 (+0.019) | 128 to 255: 1.957 (+0.020) | 256 to 511: 1.908 (+0.021) | 512 to 1023: 1.926 (+0.022)
+FRONTIER F_end; one place open: all 0.9027 (100508 places) | books 0.9530 code 0.6105 science 0.8367 web 0.9812 wikidata 1.1316 || less the control's, paired: +0.1300 (±0.0019) | books +0.1408 code +0.1193 science +0.1390 web +0.1290 wikidata +0.1222
+FRONTIER F_end; whole masks: all 2.3130 (3717 places) | books 2.1516 code 2.2453 science 2.1962 web 2.4613 wikidata 2.5390 || less the control's, paired: +0.1042 (±0.0085) | books +0.0780 code +0.1481 science +0.1226 web +0.0719 wikidata +0.1017
+FRONTIER F_end; the frontier: all 1.9306 (99844 places) | books 1.9244 code 1.6718 science 1.9108 web 2.0908 wikidata 2.0550 || less the control's, paired: -0.1268 (±0.0023) | books -0.0803 code -0.1432 science -0.1220 web -0.1109 wikidata -0.1772
+FRONTIER F_end; the frontier by places known (less the control's): 1: 3.916 (-0.021) | 2 to 3: 2.921 (-0.096) | 4 to 7: 2.550 (-0.112) | 8 to 15: 2.398 (-0.085) | 16 to 31: 2.233 (-0.098) | 32 to 63: 2.081 (-0.095) | 64 to 127: 1.905 (-0.114) | 128 to 255: 1.797 (-0.140) | 256 to 511: 1.728 (-0.159) | 512 to 1023: 1.760 (-0.144)
+
+End against end (the control's end first):
+FRONTIER F_end; one place open: all 0.9027 (100508 places) | books 0.9530 code 0.6105 science 0.8367 web 0.9812 wikidata 1.1316 || less the control's, paired: +0.1127 (±0.0020) | books +0.1200 code +0.1070 science +0.1222 web +0.1111 wikidata +0.1031
+FRONTIER F_end; whole masks: all 2.3130 (3717 places) | books 2.1516 code 2.2453 science 2.1962 web 2.4613 wikidata 2.5390 || less the control's, paired: +0.0892 (±0.0090) | books +0.0685 code +0.1398 science +0.1156 web +0.0484 wikidata +0.0735
+FRONTIER F_end; the frontier: all 1.9306 (99844 places) | books 1.9244 code 1.6718 science 1.9108 web 2.0908 wikidata 2.0550 || less the control's, paired: -0.1465 (±0.0023) | books -0.1055 code -0.1636 science -0.1406 web -0.1283 wikidata -0.1941
+FRONTIER F_end; the frontier by places known (less the control's): 1: 3.916 (-0.062) | 2 to 3: 2.921 (-0.120) | 4 to 7: 2.550 (-0.136) | 8 to 15: 2.398 (-0.100) | 16 to 31: 2.233 (-0.114) | 32 to 63: 2.081 (-0.113) | 64 to 127: 1.905 (-0.133) | 128 to 255: 1.797 (-0.160) | 256 to 511: 1.728 (-0.179) | 512 to 1023: 1.760 (-0.167)
+
+A section's card time over both arms' 6,000 sections (deposit_ms, least squares): 18.5 + 0.565 a region + 0.00455 a site + 17.16 a million
+pairs of sites - 0.0069 an open place, ms (rms residual 29.4). Arm A: 195 regions, 40,754 sites, 14.94 million pairs, 478 ms; arm F:
+312 regions, 41,333 sites, 12.56 million pairs, 562 ms. A frontier region of 110 sites costs about 1.3 ms for its one compared place.
+
+The fifty books' panel written one place a read (48 known), words of two letters or more in the fitting text's lexicon:
+the control's end 52 of 142 (37%); arm F's end 75 of 162 (46%); arm F's mean 79 of 163 (48%); longest run shared with the fitting text 14, 11, 12.
+
+The long panel (the store's held documents, four a slice; 384 places known and 96 written one place a read, the whole region known
+before the place; on the card, about 5 s a state), words of two letters or more that stand in the lexicon of their slice's training
+text (the words met five times or more in its first 16 MB), by a private scorer:
+the control's end: 88 of 255 (34%) | code 20/50 web 19/51 science 15/52 books 25/54 wikidata 9/48; 1 of 20 writes loops.
+arm F's end: 90 of 244 (36%) | code 18/46 web 17/53 science 13/40 books 32/58 wikidata 10/47; 1 of 20 loops.
+arm F's mean: 109 of 269 (40%) | code 19/48 web 23/55 science 15/51 books 36/64 wikidata 16/51; none loops.
