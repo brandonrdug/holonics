@@ -1,7 +1,7 @@
 # A level is a codec that carries its decoder and closes a scale square, both read at the receiver's face; the built level was founded on a saddle, has no receipt at its own grain and folds a winding epoch onto itself
 
 November 17, 2026, 23:40 to 23:55 UTC. Refs #404 #405 #406 #410. Status: [design; `agent-inferred` throughout; no part is
-built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order]. The lead's reading of the tree, written before any part, after
+built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11]. The lead's reading of the tree, written before any part, after
 [the trace of the engine's own level](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
 (§19 there). Two host readings are named in §6 with their guesses fixed in
 [the guess file](receipts/2026-11-17_tempering/guesses.txt) before either is read.
@@ -361,4 +361,46 @@ about one more bound symbol a tick. The same reading on the night's state at the
 and after each tick against the counts of one to four symbols, says whether a place binds one symbol a tick. If it does,
 the place level's binding order is its count of ticks, and the theory's question becomes how a place binds farther
 without paying a tick at every place, which is where the clock of news and the level enter.
+
+## 11. Where a place binds: a pair at the opening and one symbol at each tick after the split (November 18, 00:38 to 00:58 UTC)
+
+`measurement` for the figures ([`tick_faces.txt`](receipts/2026-11-17_tempering/tick_faces.txt)), `agent-inferred` for the
+reading. The guess G-V4 was fixed and pushed at 00:38 UTC, before the dump. A face is fitted by the ruler at each stage of
+the open place (a linear readout of the place's chart to the symbols, a softmax fitted on 36,943 boundary rows sampled from
+the training passage and read on the trace's 5,164 held rows; `tools/tick_face_ruler.py`), and the night's count ruler is
+read again on those same held rows. Nats a place, held:
+
+| the compared place's state | a face fitted there | a count of the last `k` symbols bound in order |
+|---|---|---|
+| the opening | 2.028 | `k = 1`: 2.400;  `k = 2`: 1.984 |
+| after one tick | 2.039 | |
+| after two ticks, the split, the level's prolongation added | 1.965 | `k = 2`: 1.984 |
+| after three ticks | 1.687 | `k = 3`: 1.670 |
+| after the fourth, her own face | 1.479 | `k = 4`: 1.478 |
+| | | `k = 5`: 1.408;  `k = 6`: 1.367;  five with the word and the word before: 1.364 |
+
+- **The guess's staircase missed.** It had every tick add one bound symbol. The first two ticks move the compared
+  place's code by 0.06 together, where the counts fall by 0.42 and 0.31.
+- **Her face is a count of the last four symbols**, 1.479 beside 1.478 on the same rows.
+- **The opening codes like a count of two.** Its terms are additive, the strand's nearest row and the moment of every
+  source, and a linear face of them reads 2.028 beside the bound pair's 1.984.
+- **A place binds at the ticks after the split, one symbol a tick.** 1.965, 1.687 and 1.479 stand beside the counts of
+  two, three and four symbols, 1.984, 1.670 and 1.478, each within 0.02. Her order of four is a pair at the opening and
+  two late ticks.
+- **The ticks before the split do not bind at the compared place.** What they do for the written places that the late
+  ticks then read is not separated here; on the masked line of November 13 every tick moved the fitted face, the first
+  two the most, so this profile is the boundary regime's and the night's state's.
+- **The level is fed and read at the split, where a place holds a pair.** Its moment is taken from states that have
+  bound nothing past the opening, and what it prolongs enters before the only two ticks that bind. The record's §9 read
+  the level's content as an additive term; this is where that comes from.
+- **Limits.** One specimen and one state. A linear face understates a state whose content is not linear in it. The fit
+  is on states of fitted text and the read on held text (the faces read 0.02 to 0.05 higher held than on rows kept aside
+  from the fit).
+
+**What it leaves for the theory.** At the place grain a tick binds one symbol, so a place that is to hold a unit of eight
+or nine places bound would pay a tick for each, at every place. The tree's answer to that cost is a change of grain: a
+level whose sites are units the level below has committed, so that a tick there binds a unit. The built level does not
+read committed units. It reads at the split, before the place level has bound, and returns before the ticks that bind.
+What a level should read, and where it should return, is the next statement to derive from the tree; it is a reading
+and no part.
 

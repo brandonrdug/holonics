@@ -74,9 +74,16 @@ interior, and her place level binds about four symbols (her 1.527 nats beside a 
 read 1.433 and 1.395, the whole prize of bound context on the fifty books 0.14 nats a place and words in the lexicon from 76% to about
 90%). So the level's own face is what a second level's cut needs and is not what her writes wait on, and it is not ordered.
 
-**The next reading, not a part.** Whether her bound window is her depth: a face fitted at the opening and after each tick, beside the
-counts of one to four bound symbols (on the masked line of November 13 the ticks read 2.50, 1.93, 1.54, 1.36, 1.31). If a place binds
-one symbol a tick, the question for the theory is how a place binds farther without a tick paid at every place.
+**Where a place binds (the design record's §11; its guess's staircase missed).** On the same held rows her face reads 1.479 nats a
+place and a count of the last four symbols bound in order reads 1.478. A face fitted at each tick shows how she gets there: the opening
+codes like a count of two (2.028 beside 1.984), the two ticks before the split move the compared place's code by 0.06, and the two
+ticks after it add one bound symbol each (1.965, 1.687, 1.479 beside the counts of two, three and four, 1.984, 1.670, 1.478). Five and
+six symbols read 1.408 and 1.367. So at the place grain a tick binds one symbol and only the late ticks bind, and the level is fed and
+read at the split, where a place holds a pair and nothing is yet bound; that is why what it carries is one more additive term.
+
+**Standing, and what is owed.** Nothing is running and no part is ordered. Owed as a reading of the tree: what a level should read and
+where it should return, if its sites are to be units the level below has committed, so that a tick binds a unit where a place-level
+tick binds a symbol.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

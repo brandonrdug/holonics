@@ -1,0 +1,28 @@
+A face fitted at each tick of the open place (G-V4; the level's design record, its section 11).
+State: the night's pass-15 state on the fifty books. Fit: 40,783 boundary rows sampled from the training passage (every 22nd), dumped by
+athena host complete-language read-tension ... shares, 623 s at 20 host threads (TENSION_DONE rows=164188 places=41047 ms=622839; rows of 48
+known places, the next open). Read: the trace's 5,164 held rows. The ruler: tools/tick_face_ruler.py, 536 s in one process.
+Codes and counts only; no text of the books is here.
+
+TICKS fit rows 36943 (a tenth kept aside: 4104), read rows 5164 (held), symbols 97, held symbols the fit never met 0; ticks 4
+TICKS the machine's own face after its last tick: held 1.479 nats a place; on the fitted rows 1.415
+TICKS a face of the symbols' frequencies alone: held 3.042
+TICKS a face fitted at each stage of the open place, nats a place (stage: the state a tick begins from, then the state inside it after its contact):
+TICKS   stage tick 0 begins (after 0 ticks)        held 2.028   aside 2.005   fitted 1.887 (at half its steps 1.896)   [69 s]
+TICKS   stage inside tick 0, after its contact     held 2.099   aside 2.056   fitted 1.931 (at half its steps 1.942)   [137 s]
+TICKS   stage tick 1 begins (after 1 ticks)        held 2.039   aside 2.015   fitted 1.874 (at half its steps 1.887)   [203 s]
+TICKS   stage inside tick 1, after its contact     held 2.017   aside 1.988   fitted 1.858 (at half its steps 1.870)   [270 s]
+TICKS   stage tick 2 begins (after 2 ticks)        held 1.965   aside 1.917   fitted 1.783 (at half its steps 1.795)   [336 s]
+TICKS   stage inside tick 2, after its contact     held 1.925   aside 1.888   fitted 1.749 (at half its steps 1.761)   [403 s]
+TICKS   stage tick 3 begins (after 3 ticks)        held 1.687   aside 1.639   fitted 1.487 (at half its steps 1.498)   [469 s]
+TICKS   stage inside tick 3, after its contact     held 1.679   aside 1.632   fitted 1.475 (at half its steps 1.486)   [536 s]
+TICKS done in 536 s on this host's numpy (one process)
+
+== The night's count ruler read on the same 5,164 held rows (the last k symbols bound in order; the unread and fit groups are empty here) ==
+STRAND_READ strands=1 held=2.400
+STRAND_READ strands=1+2 held=1.984
+STRAND_READ strands=1+2+3 held=1.670
+STRAND_READ strands=1+2+3+4 held=1.478
+STRAND_READ strands=1+2+3+4+5 held=1.408
+STRAND_READ strands=1+2+3+4+5+6 held=1.367
+STRAND_READ strands=1+2+3+4+5+word+word before held=1.364
