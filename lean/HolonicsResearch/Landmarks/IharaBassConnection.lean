@@ -66,8 +66,8 @@ darts `E ⊕ E`, reversal `Sum.swap`; loops and parallel contacts allowed), and 
 **What this does not state.**  No Euler product, `det (1 − u B_g) = ∏ (1 − hol(P) u^len P)`, is
 proved, so the holonomy is displayed only by the gauge theorem and the closed chain.  The
 connection is abelian (values in a commutative ring, one scalar a dart); a connection with values
-in matrices, and Artin's factorization for a cover with more than two sheets or a non-abelian
-group, are not here.  The converse of the gauge theorem (two connections with equal holonomies
+in matrices, and Artin's factorization for a non-abelian group, are not here; the cover of any
+number of sheets with abelian voltages is `Landmarks/IharaAbelianCover`.  The converse of the gauge theorem (two connections with equal holonomies
 differ by a gauge) is not stated.  Nothing spectral is said.
 
 Every theorem is discharged and none depends on `sorryAx`.

@@ -134,11 +134,12 @@ every positive state (`coherentFeed_work_pos`, `constantState_not_conservative`)
 ## What this does not state
 
 Nothing here is the Clay statement. The module constructs no solution of the fluid's equation or
-of its truncations: a truncation is a hypothesis, given on `[0, ∞)`. It does not prove that the
-fluid's feed conserves the second count in two dimensions: `WeightedConservative` is a hypothesis. It makes no limit of
-truncations and says nothing of infinitely many modes, of uniqueness, or of data with
-`X 0 ≥ ν`. It does not prove that the fluid's own feed is conservative (that needs the mode set
-closed under `k ↦ -k` with the reality condition, and is not assembled here). For projections
+of its truncations here: a truncation is a hypothesis, given on `[0, ∞)` (`Fluid/NavierStokesTruncatedGlobal`
+constructs one, unique, from every real divergence-free opening state). Here `Conservative` and
+`WeightedConservative` are hypotheses; `Fluid/NavierStokesTriadConservation` proves that the
+fluid's own feed is conservative on a mode set closed under `k ↦ -k` with the reality condition,
+and that in two dimensions it conserves the second count. This module makes no limit of
+truncations and says nothing of infinitely many modes or of data with `X 0 ≥ ν`. For projections
 other than Leray's the incompressible condition is a hypothesis at every time. G3's states are
 comb systems and not fluids; they bound what the comb's count alone can decide and say nothing of
 whether a fluid above the threshold stays regular.
