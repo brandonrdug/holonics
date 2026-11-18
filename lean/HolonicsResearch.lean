@@ -754,7 +754,6 @@ import Holonics.Geometry.Horizon
 import HolonicsResearch.Mathematics.EuclideanSqrtTwo
 import HolonicsResearch.Gauge.CurvatureAndGap
 import HolonicsResearch.EllipticCurve.LatticeCount
-import HolonicsResearch.Geometry.AngleExcess
 import HolonicsResearch.EllipticCurve.CanonicalHeight
 import HolonicsResearch.Geometry.Deviation
 import Holonics.Physics.Ellipse
