@@ -4186,6 +4186,32 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     assert_eq!(Learner::from_text(&with).unwrap().to_text(), with, "a learner whose pass has a frontier reads and writes byte for byte");
 }
 
+/// [definition; the lead, November 17 and 18, the boundary chart (the record of the dwell §13, acceptance (b))] **A passage read at its
+/// boundary reads nothing at or past a place**: under [`Constitution::chart_faces`] a place's face is the same bits when any symbol at it or
+/// after it is changed, on fields with a still head and without, with circles scanned from both ends and paces off their rest; and a
+/// changed symbol is read by places after it.
+#[test]
+fn the_boundary_charts_face_reads_nothing_at_or_past_its_place() {
+    for (name, field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1))] {
+        let a = field.declaration.alphabet;
+        let sites = 14;
+        let base = drawn_classes(0xB0, sites, a);
+        let faces = field.chart_faces(&base).unwrap();
+        assert_eq!(faces.len(), sites);
+        let mut read_after = 0;
+        for p in 0..sites {
+            let mut other = base.clone();
+            other[p] = (other[p] + 1 + p % (a - 1)) % a;
+            let changed = field.chart_faces(&other).unwrap();
+            for t in 0..=p {
+                assert_eq!(changed[t], faces[t], "{name}: place {t} read the symbol at place {p}");
+            }
+            read_after += usize::from((p + 1..sites).any(|t| changed[t] != faces[t]));
+        }
+        assert!(read_after >= sites - 2, "{name}: a changed symbol is read after it ({read_after} of {} places)", sites - 1);
+    }
+}
+
 /// [definition; the lead, November 18, the audit of that day §1.4] **A stretch read at the frontier is its context and the one place after
 /// it**: the cut takes the stretch's own draw of a context and one place while the piece goes on by the least context or more; at a piece's
 /// end it takes every place left, the open place the true end's first void where the piece closes its document and the piece's last place

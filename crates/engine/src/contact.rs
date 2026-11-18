@@ -115,6 +115,15 @@ pub(crate) struct TickCell {
     pub(crate) lock_prev: Vec<Vec<(u32, i64)>>,
 }
 
+/// Which side of a receiver its sources stand on ([`Constitution::tick`]): both (the field's law); before it alone with each site
+/// keeping its kind (a ruler's); or the boundary chart's, with the receivers' clocks.
+#[derive(Clone, Copy)]
+pub(crate) enum Sided<'a> {
+    Both,
+    Before,
+    Chart(&'a Paces),
+}
+
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
 /// dispersing field's §2.2, §6 and §12): each site's class `B_h(t) = Σ_l 3^l (s_l + 1)`, `s_l` the
 /// shell trit of its unframed word's mode `l` ([`shell`]), and the lists by one stable counting sort:
@@ -160,6 +169,13 @@ pub struct ClassLists {
     pub probes: Vec<Vec<u32>>,
     /// What an open receiver hears far where a ruler reads it ([`Constitution::ruler_far`]); `0` is the law.
     pub far: u8,
+    /// [definition; the lead, November 17 and 18, the boundary chart] **The lists of a passage read at its boundary**
+    /// ([`Constitution::chart_faces`]): every site is a receiver that listens (an open place at its own time) and a source to the sites
+    /// after it, and a receiver's support is the sites before it alone, its near field's and, past it, every one sharply; no crowd.
+    pub one_sided: bool,
+    /// Whether every site listens as an open place does (the boundary chart). Unset with `one_sided` set, the lists are a ruler's
+    /// ([`Constitution::ruler_far`] at `3`): each receiver keeps its kind and hears only what stands before it.
+    pub all_listen: bool,
 }
 
 impl ClassLists {
@@ -182,7 +198,7 @@ impl ClassLists {
         let probes = vec![Vec::new(); class.len()];
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
-        Self { class, probe_class, definite, keyed, off, members, probes, far: 0 }
+        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, all_listen: false }
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -205,26 +221,41 @@ impl ClassLists {
     /// support is directional: only definite sources are heard far.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
-        let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().filter(move |&j| self.keyed[j]);
+        // A passage read at its boundary hears only what stands before the receiver.
+        let before = move |j: usize| !self.one_sided || j < i;
+        let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().filter(move |&j| self.keyed[j] && before(j));
         // The law: an open receiver hears every definite site, a definite one its classes. A ruler's `far` gives an open receiver a
         // definite one's far field (`1`) or none (`2`).
-        let open = !self.definite[i];
-        let (sharp, classed) = (open && self.far == 0, !open || self.far == 1);
+        let open = self.listens(i);
+        let ruled = !self.all_listen && (self.far == 1 || self.far == 2);
+        let (sharp, classed) = (open && !ruled, !open || (self.far == 1 && !self.all_listen));
         let runs = std::iter::once(self.probe_class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| classed);
-        let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
-        let listened = (0..sites).filter(move |&j| sharp && self.definite[j] && j.abs_diff(i) >= NEAR);
+        let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR && before(j)));
+        let listened = (0..sites).filter(move |&j| sharp && self.definite[j] && j.abs_diff(i) >= NEAR && before(j));
         near.chain(far).chain(listened)
     }
 
-    /// Whether receiver `i` listens to every definite site (it is open, §15.9).
+    /// Whether receiver `i` listens to every definite site (it is open, §15.9; every site of a passage read at its boundary).
     pub fn listens(&self, i: usize) -> bool {
-        !self.definite[i]
+        !self.definite[i] || self.all_listen
     }
 
     /// Whether receiver `i` hears each octave's crowd of definite sources at its mean word: a definite receiver by the law (§14.10), and
-    /// an open one only where a ruler gives it a definite receiver's far field ([`Constitution::ruler_far`] at `1`).
+    /// an open one only where a ruler gives it a definite receiver's far field ([`Constitution::ruler_far`] at `1`). None at a boundary.
     pub fn crowded(&self, i: usize) -> bool {
-        self.definite[i] || self.far == 1
+        !self.all_listen && (self.definite[i] || self.far == 1)
+    }
+
+    /// The definite sites of `j`'s class a receiver at `i` shares the class's face among (§16.38): all of them, or at a boundary those
+    /// before the receiver (a site after it has not arrived, and its count would tell the receiver of it).
+    pub fn class_count(&self, j: usize, i: usize) -> usize {
+        let c = self.class[j] as usize;
+        let all = &self.members[self.off[2 * c] as usize..self.off[2 * c + 1] as usize];
+        if self.one_sided {
+            all.partition_point(|&m| (m as usize) < i)
+        } else {
+            all.len()
+        }
     }
 }
 
@@ -474,7 +505,18 @@ impl Constitution {
     /// One tick of the constitution over the region's faces `x` (`[t][D]`), its temporaries
     /// written to `cell`.
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell) -> Result<()> {
+    /// [the boundary chart] `sided`: under [`Sided::Chart`] the passage is read at its boundary ([`Constitution::chart_faces`]): each site
+    /// receives on the clock it holds before its own symbol arrives (the receivers' clocks given; `paces` are the sources'), hears only
+    /// what stands before it, and its strand contacts and circles are the ones that come from before it. Under [`Sided::Before`], a
+    /// ruler's ([`Constitution::ruler_far`] at `3`), each site keeps its kind and its clock and hears only what stands before it.
+    #[allow(clippy::too_many_arguments, reason = "the tick's declared operands")]
+    pub(crate) fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell, sided: Sided) -> Result<()> {
+        let (one_sided, boundary) = match sided {
+            Sided::Both => (false, None),
+            Sided::Before => (true, None),
+            Sided::Chart(rx) => (true, Some(rx)),
+        };
+        let receiving = boundary.unwrap_or(paces);
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
@@ -519,7 +561,7 @@ impl Constitution {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
                 let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
                 let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists { far: self.ruler_far, ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
+                ClassLists { far: self.ruler_far, one_sided, all_listen: boundary.is_some(), ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
             })
             .collect();
         cell.word = q.clone();
@@ -565,7 +607,7 @@ impl Constitution {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(paces, t, h, li);
+                    let (ur, ui) = self.frame(receiving, t, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (pr[t * m2 + c] as i128, pr[t * m2 + m + c] as i128);
                     cell.pq[at + li] = fit64(release(ur * qr - ui * qi, MOVE_BITS))?;
@@ -606,16 +648,21 @@ impl Constitution {
             // weighed by its face's multiplicity and not by its distance; the octave of distance is a turned head's, which
             // reads place.
             let shared = !d.carries_moment(h);
-            let falloff = |gap: usize, j: usize| -> i128 {
+            let falloff = |gap: usize, j: usize, i: usize| -> i128 {
                 if !shared {
                     return octave(gap) as i128;
                 }
-                let c = lists.class[j] as usize;
-                octave(((lists.off[2 * c + 1] - lists.off[2 * c]) as usize).max(1)) as i128
+                octave(lists.class_count(j, i).max(1)) as i128
             };
             for i in 0..sites {
                 // [E] A receiver outside every window of a cut room meets no source this tick: its current is zero.
                 if window.is_some_and(|w| !w[i]) {
+                    cell.rows.push(Vec::new());
+                    cell.crowds.push(Vec::new());
+                    continue;
+                }
+                // [the boundary chart] The passage's first site has nothing before it: it meets no source, and its current is zero.
+                if one_sided && i == 0 {
                     cell.rows.push(Vec::new());
                     cell.crowds.push(Vec::new());
                     continue;
@@ -635,7 +682,10 @@ impl Constitution {
                     let mut s = 0i128;
                     let mut value = vec![0i128; span];
                     for li in 0..n {
-                        let decay = self.pair_decay(paces, h, li, i, j);
+                        let decay = match boundary {
+                            Some(rx) => self.pair_decay_between(rx, i, paces, j, h, li),
+                            None => self.pair_decay(paces, h, li, i, j),
+                        };
                         s = carried(s.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?))?;
                         (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
                     }
@@ -648,7 +698,7 @@ impl Constitution {
                         }
                         _ => base,
                     };
-                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (falloff(d, j) << FACE_BITS))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (falloff(d, j, i) << FACE_BITS))?;
                     series.push(self.face(z), one, one, &value);
                     row.push(Source { j: j as u32, p: 0, s: base });
                 }
@@ -657,7 +707,7 @@ impl Constitution {
                 // term is its decayed value sum, its mass term `|C|` times its face.
                 let mut crowds: Vec<Crowd> = Vec::new();
                 // An open receiver hears every definite source sharply (§15.9), so no crowd of them.
-                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|_| lists.crowded(i)) {
+                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|&(lo, _, _)| lists.crowded(i) && (!one_sided || lo < i)) {
                     let count = sums.count(lo, hi_);
                     if count == 0 {
                         continue;
@@ -683,7 +733,7 @@ impl Constitution {
                     c.e = share;
                 }
                 for li in 0..n {
-                    let (ur, ui) = self.frame(paces, i, h, li);
+                    let (ur, ui) = self.frame(receiving, i, h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (yr, yi) = (fit64(framed[li])? as i128, fit64(framed[n + li])? as i128);
                     let c = h * n + li;
@@ -725,7 +775,8 @@ impl Constitution {
         for t in 0..sites {
             for e in 0..plain {
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
-                let (br, bi) = match strand_mate(t, e, sites) {
+                // [the boundary chart] At a boundary an odd contact's mate, the site after, has not arrived.
+                let (br, bi) = match strand_mate(t, e, sites).filter(|_| !one_sided || e % 2 == 0) {
                     Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
                     None => (0, 0),
                 };
@@ -759,7 +810,8 @@ impl Constitution {
                     cell.kb[t * c2 + circles + k] = carry_drive(kappa, cell.b[t * f + half + e])?;
                 }
             }
-            for k in 0..circles {
+            // [the boundary chart] At a boundary a circle scanned from the right brings what has not arrived: it stays at rest.
+            for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
                 let e = plain + k;
                 let (mut qr, mut qi) = (0i128, 0i128);
                 for step in 0..sites {
@@ -808,7 +860,8 @@ impl Constitution {
     /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`Declaration::mark`]), the first read is this one
     /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
     pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
-        if !self.declaration.mark {
+        // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read.
+        if !self.declaration.mark || self.ruler_far >= 3 {
             return self.pass_with(region, keep, None);
         }
         let first = self.pass_with(region, keep, None)?;
@@ -856,12 +909,15 @@ impl Constitution {
         let dw = d.width;
         let reaches = self.reaches();
         let paces = self.paces(region)?;
-        let moment = self.moments_of(region, &paces)?;
-        let mut x = self.open(region, &moment, marks)?;
+        // [measurement] A ruler's forward ([`Constitution::ruler_far`]): at `3` the moments and the opening read only what stands before a
+        // site; at `3` and `4` the level is not heard.
+        let (after, levelled) = (self.ruler_far != 3, self.scale.is_some() && self.ruler_far < 3);
+        let moment = self.moments_sided(region, &paces, after)?;
+        let mut x = self.open_sided(region, &moment, marks, after)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
-        let news = if self.scale.is_some() { self.level_news(region)? } else { Vec::new() };
+        let news = if levelled { self.level_news(region)? } else { Vec::new() };
         let mut out = Forward::default();
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
@@ -878,7 +934,7 @@ impl Constitution {
         // [measurement] The open rows' locks carried from the tick before, where read ([`Constitution::lock_carry`]).
         let mut locks: Vec<Vec<(u32, i64)>> = Vec::new();
         for k in 0..d.ticks {
-            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
+            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && levelled) {
                 out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep)?);
             }
             let own = clock.take();
@@ -895,7 +951,7 @@ impl Constitution {
             if self.lock_carry.is_some() {
                 cell.lock_prev = std::mem::take(&mut locks);
             }
-            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell)?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, if self.ruler_far == 3 { Sided::Before } else { Sided::Both })?;
             if self.lock_carry.is_some() {
                 locks = cell.rows.iter().map(|row| row.iter().map(|src| (src.j, src.s)).collect()).collect();
             }
@@ -951,7 +1007,7 @@ impl Constitution {
                 let reads = (0..sites).map(|t| (Self::silent(region, t) && t < read_to).then(|| self.face_of(&x[t * dw..(t + 1) * dw], &reaches)).transpose()).collect::<Result<Vec<_>>>()?;
                 let blank: Vec<Option<Shares>> = reads.iter().map(|r| r.as_ref().map(|r| shares(&r.face))).collect();
                 let next = self.paces_with(region, &blank)?;
-                let moment = self.moments_of(region, &next)?;
+                let moment = self.moments_sided(region, &next, after)?;
                 clock = Some(Box::new(TickClock { paces: next, moment, blank, reads }));
             }
             out.pairs += cell.rows.iter().map(|r| r.len() as u64).sum::<u64>();
