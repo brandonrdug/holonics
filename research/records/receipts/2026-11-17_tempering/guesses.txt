@@ -450,3 +450,16 @@ books 3.479), and the fitted faces read 2.936 at the opening, 2.978, 2.936 and 2
   linear face reads, as at the boundary. So the late binding is not the boundary state's alone; the front-loaded profile belongs to a
   place whose neighbours are all known. The level's place at the split is as in section 11 wherever a place is compared among unknown
   neighbours.
+
+G-V6 (2026-11-18T01:22:38Z). What a place among known neighbours holds by the split, on the night's pass-15 state: the same fitted faces with one place
+opened alone in the middle of a row (24 known places on each side), the regime of November 13's G132, fitted on a sample of the
+training passage's rows and read on the trace's held rows.
+  Read before fixing: on November 13 (the line's state C, one place open) the fitted faces read 2.50, 1.93, 1.54, 1.36 and 1.31, the
+  first two ticks carrying 81% of the fall; tonight at the boundary they carry 11%, and under lap 94's masks nothing. The night's state
+  is lap 94's after fifteen passes compared at the boundary only, so its two-sided skill may have loosened.
+  The guess: her own face at such a place 0.9 to 1.5 nats; the first two ticks carry 55% or more of the fall from the opening's fitted
+  face to her own.
+  What it decides: whether the written places the level's moment sums are mostly settled by the split (a place among known neighbours
+  is the nearest reading of one). If the first two ticks carry most of the fall, the level's moment is taken from settled states and its
+  emptiness is the restriction's and the slope's (sections 9), not its inputs'. If they carry little here too, a place binds late in
+  every regime on this state.
