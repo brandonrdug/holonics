@@ -467,3 +467,31 @@ carry_turn_ruler.py; the 800 frontier rows read whole by two streams with the wo
 
   G-1118-19 scored (20:18 UTC). (a) at the fifth of places a count of five settles the rows of five places read 0.306 (guessed 0.62 to 0.78: missed, low), the rows of two 0.247 (0.47 to 0.57: missed), of three 0.280 (0.55 to 0.66: missed). (b) over all places the rows of five code 2.546 (1.95 to 2.15: missed, above). (c) their writes hold 36% lexicon words (45% to 60%: missed, below). The rule: under 0.80, so rows of single places cannot close what five places settle; the growth after the second place's row is a binding of the carried places.
   G-1118-20 scored (20:18 UTC). (a) one turn at every site reads 0.893, 0.850, 0.790, 0.792 at ticks 1 to 4 (0.90 or over: missed). (b) the symbols' mean turns spread by 0.056 to 0.064 of a turn (under 0.030: missed). (c) a pair less one turn reads 0.102 to 0.141 (under 0.05: missed). Neither branch of the rule holds as written: the circles stand between a fixed advance and a stride a symbol, and their mean modulus reads 0.38 to 0.40, a reach of 1.6 places, which the guess did not ask. What is read next is the content-stride reader on the host (the record's §17).
+
+  G-1118-16 scored (20:23 UTC), the second lap. (a) arm L14's rows S read 1.7444 at the mean of its states, 0.0215 under arm P14's (±0.0006; between 0.005 above and 0.045 under: held), under it in every slice (books 0.0105, code 0.0161, science 0.0172, web 0.0188, wikidata 0.0450) and by 0.020 to 0.025 from sixteen places known up. (b) under the law one place open reads 0.0018 under the control's and whole masks 0.0008 under (within 0.02: held). (c) a section took 324 ms and the lap 975 s (270 to 340 ms, 810 to 1,020 s: held; the lap ran beside host readings of up to eighteen threads from 20:04 UTC, so its time is no clean reading, and the first lap's 307 ms stands). (d) the long panel: pending its write. The rule: 0.015 or more under, so the line takes the block; its next lap is L15 from arm L14's end. At the places a count of five settles a draw agrees 0.649 of the time against arm P14's 0.640 and arm P15's 0.650: the block is worth a lap and more at every bin and nothing more at the settled places.
+
+G-1118-21 (2026-11-18T20:26:56Z). What a carried product reaches with a stride of its own a symbol (tools/content_stride_ruler.py; host, floats, a
+ruler): the reader of navigator.content-stride-moment, m ← α(u) m + β(u) on C circles with a linear face, fitted on 8 MB a slice
+(three passes, a window of eight places, strides drawn over the turn, moduli opened at 4/5), at C = 32 (the engine's circles) and
+128, with the fixed advance at 32 as its control; read on the frontier's places in the excess ruler's bins, and its writes.
+  What is on record. At the fifth of places a count of five settles: rows of five single places 0.306, the line 0.650, counts of
+  three, four and five places 0.635, 0.843, 0.909 (§17). The line's carry circles stand at a mean modulus of 0.38 to 0.40 with strides
+  spread by 0.06 of a turn. On November 10 a stride a letter held 0.79 and 0.65 of the joint term of three and four letters on 64
+  circles. The instrument's planted law (the sum of three places modulo twelve, nine in ten; source 0.526 nats): a stride a symbol
+  0.553 after four passes, one advance 2.103.
+  The guess. At that fifth of places, the mean mass on the arriving symbol: (a) the fixed advance at 32 circles 0.22 to 0.31 (at or
+  under the rows of five); (b) strides at 32 circles 0.40 to 0.50; (c) strides at 128 circles 0.50 to 0.62. (d) The fitted moduli:
+  the fixed advance comes to a mean under 0.55 and the strides stay over 0.60 (the inference of §17: a longer product of one advance
+  blurs, a product of strides does not). (e) Over all places strides at 128 code 2.05 to 2.25 nats, and their writes hold 45% to
+  58% lexicon words.
+  What it decides. Strides at 128 circles at 0.60 or over at that fifth: a carried product with located strides is worth, by
+  itself and on a fraction of her entries, what all her binding is there, and the arm is ordered: carry circles founded with the
+  fit's strides and their reach reopened, beside the line. Under 0.45: circles of this extent do not close the settled places, and
+  the composite's rows at located addresses are read next. Between: the arm is sized by the two sizes' difference before it is
+  ordered. Clause (d) decides §17's inference either way.
+
+  G-1118-16 (d) scored (20:47 UTC). The long panel from arm L14's lap mean holds 141 of 270 written words in the lexicon (52%; code 34/51, web 34/57, science 19/54, books 45/64, wikidata 9/44), 4 of 20 writes loop; arm P14's 109 of 249 (43%), 2 loop. Nine points over the control's where the clause held it within eight: missed by a point, upward; panels of 20 writes scatter by that much (arm P15's mean 51%, its end 54%).
+
+  G-1118-17 scored so far (21:14 UTC), the first lap. (a) arm R15's rows S read 1.8042 at the mean of its states, 0.0514 above arm P15's (±0.0015; between 0.030 above and 0.030 under: missed, above), above it in every slice (books 0.036, code 0.057, science 0.062, web 0.054, wikidata 0.048) and from four places known up. (c) under the law one place open reads 0.0425 above the control's (0.00 to 0.06 above: held) and whole masks 0.0355 above. (d) a section took 262 ms (arm P16's 265: within 3%, held). The rule is fixed on the second lap, arm R16 against arm P16.
+
+  G-1118-21 scored (21:25 UTC), pooled over the five slices by places. At the fifth of places a count of five settles: (a) one advance at 32 circles 0.293 (0.22 to 0.31: held); (b) strides at 32 circles 0.477 (0.40 to 0.50: held); (c) strides at 128 circles 0.652 (0.50 to 0.62: missed, above), where the line reads 0.650. (d) fitted moduli: strides 0.60 to 0.67 at 32 circles and 0.67 to 0.73 at 128 (over 0.60: held); one advance 0.535, 0.585, 0.574, 0.547, 0.671 by slice (under 0.55: held on two of five, missed). (e) strides at 128 over all places 2.132 nats (2.05 to 2.25: held); their writes 55% lexicon words (45% to 58%: held). The held code was still falling at the third pass. The rule: 0.60 or over, so the arm is ordered.
