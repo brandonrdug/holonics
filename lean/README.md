@@ -81,9 +81,18 @@ descents it alone consumes.
 ## Targets and proof scope
 
 [definition] `lake build HolonicsResearch` builds every module under `HolonicsResearch/` (the
-library declares the glob `HolonicsResearch.*`), including the modules the import face below does
-not import. `HolonicsResearch.lean` is the research import face: `Holonics.Framework` plus the
-subject owners the targets (RH, Hodge, complex Euler/Navier–Stokes, BSD) use. The targets are
+library declares the glob `HolonicsResearch.*`). `HolonicsResearch.lean` is the research import
+face: `Holonics.Framework` plus every research module, the subject owners the targets (RH, Hodge,
+complex Euler/Navier–Stokes, BSD) use among them, so its build reads them beside each other.
+
+[definition] Every `.lean` file is built by a target beside its library's root. A module added
+under `Holonics/` is imported by an owner that `Holonics.Framework` reaches (the subject entry
+points under `Holonics/Framework/`, or an umbrella such as `Holonics/HNN.lean`), and a module added
+under `HolonicsResearch/` is imported by `HolonicsResearch.lean` or by a module it reaches, in the
+same change. `python3 tools/lean_census.py` reads this from the text and runs in gate 1. Reason
+(November 18): twelve modules under `Holonics/` stood outside the foundation's closure, so no
+target built them while five atlas rows were graded `formal-checked` on them, and ten research
+modules were built by the glob alone, never beside the rest. The targets are
 instances of Holonic Compression and landmark discovery
 ([the line](../docs/THE_MACHINE.md#the-line-the-rebuild-serves)), not a separate category,
 so their Lean is filed by subject:
