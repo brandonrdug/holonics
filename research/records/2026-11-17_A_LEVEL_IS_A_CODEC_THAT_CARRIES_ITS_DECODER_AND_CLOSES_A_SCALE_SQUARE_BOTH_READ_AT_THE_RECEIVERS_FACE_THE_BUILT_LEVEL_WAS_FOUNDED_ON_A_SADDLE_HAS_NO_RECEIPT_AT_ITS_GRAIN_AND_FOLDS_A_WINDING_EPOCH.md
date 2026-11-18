@@ -1,7 +1,7 @@
 # A level is a codec that carries its decoder and closes a scale square, both read at the receiver's face; the built level was founded on a saddle, has no receipt at its own grain and folds a winding epoch onto itself
 
 November 17, 2026, 23:40 to 23:55 UTC. Refs #404 #405 #406 #410. Status: [design; `agent-inferred` throughout; no part is
-built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11, and the tree's answer to what §11 leaves in §12]. The lead's reading of the tree, written before any part, after
+built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11, and the tree's answer to what §11 leaves in §12; §13 reads the night's state against the line's own]. The lead's reading of the tree, written before any part, after
 [the trace of the engine's own level](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
 (§19 there). Two host readings are named in §6 with their guesses fixed in
 [the guess file](receipts/2026-11-17_tempering/guesses.txt) before either is read.
@@ -455,4 +455,40 @@ compared in a pass where it is written (the design record of November 13, §4.8)
 wherever a pass opens it, so nothing here says its ticks are untrained. What a level would find at a unit's boundary is
 therefore a reading still to make, on the written places' own states, before the receipt law (the objects' §10) or the
 learning law (#73) is brought to it. (An earlier wording named #405, which asks how much each contact with data teaches.)
+
+## 13. The night's state against the line's own (November 18, 01:22 to 01:42 UTC)
+
+`measurement` for the figures (the two receipts' last blocks), `agent-inferred` for the reading. Two guesses, each fixed and
+pushed before its read: G-V6 missed and G-V7 held.
+
+**The night's state has lost its two-sided reading.** One place opened alone in the middle of a row, 24 known places on
+each side, on the night's pass-15 state: her own face codes it at 2.921 nats a place, where the symbols' frequencies
+alone code 3.040. A face fitted at that place's opening reads 1.129, and after one, two and three ticks 1.378, 1.399 and
+1.343. The opening holds both neighbours and the moment, and its own comparison is trained at every place; the level's
+cut runs on that news (1.15 nats a place in the level's trace). The ticks and the readout, compared for fifteen passes at
+the boundary alone, now read a place among known neighbours worse than its opening does. A form that is not kept up
+loosens, as the sums did (the dwell record). So the night's state is a specimen for the boundary and not for a place
+among known neighbours, and its level readings were taken on a state whose two-sided ticks had loosened.
+
+**The level's links on the line's own state** (lap 94's mean, the same held rows; thousandths, the columns as in §9):
+
+| key of a whole epoch | the fine read at its leading place | the moment | the built restriction | a drawn restriction | a located restriction | the level's read after its ticks | the prolonged rows |
+|---|---|---|---|---|---|---|---|
+| its leading symbol | 743 | 564 | 237 | 191 | 542 | 132 | 145 |
+| its symbols as a bag | 246 | 780 | 526 | 416 | 743 | 417 | 438 |
+| its symbols by sixth of a turn | 167 | 581 | 175 | 238 | 243 | 115 | 183 |
+| the epoch as one identity | 77 | 370 | 265 | 230 | 314 | 168 | 244 |
+| the epoch before's symbols as a bag | 168 | 163 | 71 | 46 | 41 | 163 | 169 |
+| the symbol that leads the next | 28 | 281 | 95 | 41 | 52 | 74 | 80 |
+
+- **§9's reading of the restriction holds on the line.** The built restriction keeps 1.26 of a drawn one's bag, 1.24 of
+  its leading symbol, 1.15 of its identity and 0.74 of its symbols by sixth of a turn. A located one of the same width
+  keeps the bag, the leading symbol and the identity nearly whole and the order at 243 of 581. The fold costs order here
+  too: the leading symbol 666 within a section and 484 past it, the last symbol 667 and 393, the bag 813 and 803.
+- **Where the line's state differs.** An epoch is 6.60 places and 9.65 nats. The level's read after its ticks holds the
+  epoch before's bag at 163, as much as the fine read at the next leading place holds (168): on the line the level does
+  carry the unit before across, where the night's state had let that go (75 against 112). And the restriction holds the
+  symbol that leads the next epoch at 95 against a drawn one's 41, the one key on which it stands clear of a draw.
+- **Unread on the line:** the tension at the level's locus (reading B) and what a place among known neighbours holds by
+  the split at lap 94. Both need the line's own rows.
 

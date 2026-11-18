@@ -78,3 +78,24 @@ LINKS reading C, a level's state read at each place's phase, state = the moment,
 LINKS   (a) its own symbol, places of a nat or more             322   (places read 32499)
 LINKS   (b) its own symbol, places under a nat                  188   (places read 71381)
 LINKS   (c) the unit's leading symbol, at its other places      300   (places read 103880)
+
+== Reading A alone on the line's own state (G-V7): lap 94's mean, the same 5,164 held rows of the fifty books; the dump 76 s at 20 host
+   threads (LEVEL_DONE regions=5164 links=true threads=20 ms=76349), the ruler 64 s ==
+LINKS regions=5164 places=253036 epochs=40978 D0=128 D1=64 H=6
+LINKS a whole epoch: 6.60 places, 9.65 nats (median 8.94); whole epochs 35814
+LINKS the located restriction: rank 64 of the keys' fit on the moment, the singular values' share kept 95%
+LINKS reading A, present at each link, thousandths, read on half the regions (rows a key, columns a link):
+LINKS   links: 0: the fine read at the leading place | 1: the moment m(j), 768 numbers | 2: the restricted state A m + b | 3: a drawn restriction of the same width (mean of three) | 4: a restriction of the same width located from the keys | 5: the level's read after its ticks | 6: the prolonged rows (leading place, epoch's mean)
+LINKS   key its leading symbol                   link0=  743 link1=  564 link2=  237 link3=  191 link4=  542 link5=  132 link6=  145   (epochs 35814)
+LINKS   key its symbols as a bag                 link0=  246 link1=  780 link2=  526 link3=  416 link4=  743 link5=  417 link6=  438   (epochs 35814)
+LINKS   key its symbols by sixth of a turn       link0=  167 link1=  581 link2=  175 link3=  238 link4=  243 link5=  115 link6=  183   (epochs 35814)
+LINKS   key the epoch before's symbols as a bag  link0=  168 link1=  163 link2=   71 link3=   46 link4=   41 link5=  163 link6=  169   (epochs 30650)
+LINKS   key the epoch as one identity            link0=   77 link1=  370 link2=  265 link3=  230 link4=  314 link5=  168 link6=  244   (epochs 35814)
+LINKS   key the epoch before, as one identity    link0=   65 link1=   53 link2=   21 link3=   15 link4=   19 link5=   66 link6=   74   (epochs 30650)
+LINKS   key the symbol that leads the next       link0=   28 link1=  281 link2=   95 link3=   41 link4=   52 link5=   74 link6=   80   (epochs 35814)
+LINKS the fold: σ = 5.50 nats; whole epochs whose interior stays within a section 19403 (54%), winding past it 16411
+LINKS   the fold, in the moment, key its symbols as a bag             within a section   813   winding past it   803   (read 9652, 8253)
+LINKS   the fold, in the moment, key its symbols by sixth of a turn   within a section   648   winding past it   580   (read 9652, 8253)
+LINKS   the fold, in the moment, key its leading symbol               within a section   666   winding past it   484   (read 9652, 8253)
+LINKS   the fold, in the moment, key its last symbol                  within a section   667   winding past it   393   (read 9652, 8253)
+LINKS done in 64 s (reading A alone)

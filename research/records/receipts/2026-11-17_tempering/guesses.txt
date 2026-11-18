@@ -485,3 +485,14 @@ was trained.
   The guess: on lap 94's mean the moment holds the bag at 650 or more and the symbols by sixth at 450 or more; the built restriction
   stands between 0.9 and 1.4 of a drawn one on the bag and between 0.6 and 1.3 on the symbols by sixth, so it is still about a draw.
   What it decides: whether "the restriction keeps what a drawn one keeps" is the line's level or only the night's state.
+
+Scored (2026-11-18T01:42:20Z), G-V7 (level_links.txt, its last block): held on its four parts. On lap 94's mean the moment holds the bag at 780 (650 or
+more guessed) and the symbols by sixth of a turn at 581 (450 or more); the built restriction keeps 526 and 175 against a drawn one's
+416 and 238, 1.26 and 0.74 of it (0.9 to 1.4 and 0.6 to 1.3 guessed). The leading symbol 237 against 191, the identity 265 against
+230; a located restriction of the same width 542, 743, 243 and 314 of the moment's 564, 780, 581 and 370. So on the line's own state
+too the restriction is about a draw, the width passes the bag and not the order, and the fold costs order (the leading symbol 666
+within a section and 484 past it, the last symbol 667 and 393).
+  Where the line's state differs from the night's: its epochs are 6.60 places and 9.65 nats (8.56 and 9.48); the level's read after its
+  ticks holds the epoch before's bag at 163, as much as the fine read at the next leading place (168) and the moment (163), where the
+  night's held 75 against 112; and the restriction holds the symbol that leads the next epoch at 95 against a drawn one's 41, the one
+  key on which it stands well clear of a draw.
