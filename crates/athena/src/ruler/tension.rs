@@ -688,8 +688,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// hear far (every site before it, or a few crowds) sets the read's cost, and this reads it before the read is built.
 pub fn read_far(args: &[String]) -> Result<()> {
     let only = args.len() == 12 && args[11] == "strand";
-    if args.len() != 11 && !only {
-        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA [strand]".into());
+    let level = args.len() == 12 && args[11] == "level";
+    if args.len() != 11 && !only && !level {
+        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA [strand | level]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-far")?;
@@ -726,10 +727,17 @@ pub fn read_far(args: &[String]) -> Result<()> {
     // [the lead, November 18] The lines far=7 and far=8 read the known stream with its carry circles at rest and with its plain strand
     // contacts unmet: what the strand's own contacts carry to the frontier. The line far=9 reads it with its odd contacts and its circles
     // from the right facing the past (`Region::past`). A last word `strand` reads these three and the known stream alone.
-    for setting in if only { vec![3u8, 7, 8, 9] } else { vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 10, 13] } {
+    // [the lead, November 18] A last word `level` reads by which path the level reaches the frontier ([`Constitution::ruler_level`]): the
+    // law's hearing in one read without the level and with it (far=4, far=5); with no open place taking a prolonged row (far=21), every
+    // place reading the epoch before its own (far=22), the open places alone doing so (far=23); the known stream (far=3), with the level
+    // made one-sided as designed (far=24) and with the law's level over its ticks (far=25).
+    for setting in if only { vec![3u8, 7, 8, 9] } else if level { vec![4u8, 5, 21, 22, 23, 3, 24, 25] } else { vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 10, 13] } {
         let far = setting;
-        learner.field.ruler_far = setting % 10;
-        learner.field.bare_stretch = setting >= 10;
+        (learner.field.ruler_far, learner.field.ruler_level, learner.field.bare_stretch) = match setting {
+            21..=23 => (5, setting - 20, false),
+            24 | 25 => (3, setting - 20, false),
+            s => (s % 10, 0, s >= 10),
+        };
         let mut groups: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         // (a few hundred regions a call, so no call holds every region's forward at once)
         for chunk in rows.chunks(256) {

@@ -313,9 +313,9 @@ impl Constitution {
     }
 
     /// Whether `region`'s forward hears the level: a field with one, read under the law or a ruler's forward at `5`, the region no known
-    /// stream.
+    /// stream; or a ruler's known stream that hears a level ([`Constitution::ruler_level`] at `4` or `5`).
     pub(crate) fn levelled(&self, region: &Region) -> bool {
-        self.scale.is_some() && (self.ruler_far < 3 || self.ruler_far == 5) && !region.before && !region.strand
+        self.scale.is_some() && !region.before && !region.strand && (self.ruler_far < 3 || self.ruler_far == 5 || (self.ruler_far == 3 && self.ruler_level >= 4))
     }
 
     pub(crate) fn admit_region(&self, region: &Region) -> Result<()> {

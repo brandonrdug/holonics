@@ -67,6 +67,18 @@ pub struct Constitution {
     /// `8`, as `3` with every plain strand contact unmet. Forwards only. And `9`, as `3` with the strand's odd contacts facing the past
     /// ([`crate::field::Region::past`]), the forward a card's batch of such regions runs under.
     pub ruler_far: u8,
+    /// [measurement; the lead, November 18, the record of the two streams §10] **How a ruler's forward hears the level**, to read by which
+    /// path the level reaches a place at the frontier before the level is made one-sided: `0`, as the law or [`Constitution::ruler_far`]
+    /// has it. Under the law's hearing in one read with the level heard (`ruler_far` at `5`): `1`, no open place takes a prolonged row
+    /// (the level reaches it through the known places' states alone); `2`, every place reads the epoch before its own, the first epoch's
+    /// places none (the delay a one-sided level has, by itself); `3`, the open places alone read the epoch before their own. Under a
+    /// known stream (`ruler_far` at `3`): `4`, **the level made one-sided, as designed**: the news is the retarded opening's, a place is
+    /// a site where no earlier place within a section of news carries news as large ([`crate::field::level_anchors_before`]), the
+    /// level's ticks hear only the epochs before, and every place reads the epoch before its own; `5`, the law's level (its cut and
+    /// each place's own epoch) over the known stream's ticks, which no stream could run (a known place then reads places after it
+    /// through its epoch) and which bounds what a one-sided level can hand the frontier on the state read. Forwards only: no reverse
+    /// reads it, and it is not part of the state.
+    pub ruler_level: u8,
     /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
     /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
     /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Constitution::opening_term`]), and stays silent
