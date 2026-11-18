@@ -57,10 +57,11 @@ axis of the move) and `Geometry/Motion` (`multiplier_trace_det` on the Möbius n
 
 Limits. The module proves that `A ↦ lorentz A` is a map from the moves of determinant one into the proper maps of
 `ℝ⁴` that keep the Minkowski pairing and the future cone, injective on the quotient by `±1`. That every such map is
-reached (surjectivity, the other half of `PSL(2, ℂ) ≅ SO⁺(1, 3)`) is not proved here. The construction that closes it:
-a proper map keeping the form and the future cone is a turn followed by a boost (its polar decomposition), and
-`boostZ` and `turnZ` with their conjugates by turns reach every boost and every turn. The boost and the turn are shown
-on the `z` axis only. With the move written `Aᴴ X A` the map reverses products, so the homomorphism of groups is
+reached (surjectivity, the other half of `PSL(2, ℂ) ≅ SO⁺(1, 3)`) is proved in `Physics/Spacetime/LorentzOnto`
+(`lorentz_onto`, `image_lorentz`, `restricted_two_moves`): a proper map keeping the form and the direction of time is
+a unitary move followed by a positive Hermitian one (`lorentz_polar`), the Hermitian factor the closed-form root of the
+image of the time axis and the unitary one a half-turn about a bisector followed by a turn about an axis. Here the
+boost and the turn are shown on the `z` axis only. With the move written `Aᴴ X A` the map reverses products, so the homomorphism of groups is
 `A ↦ lorentz A⁻¹` or the map into the opposite group; neither is packaged as a `MonoidHom`. The reading of a receiver's
 four dimensions from a complex pair is the record's and is not a statement of this file.
 

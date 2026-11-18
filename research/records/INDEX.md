@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,688 records from July 2026 to November 2026. 378 receipts directories: 219 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,689 records from July 2026 to November 2026. 378 receipts directories: 219 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 87 | 94 |
+| [November 2026](#november-2026) | 88 | 94 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -24,6 +24,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-18 [A number is the homology of its places a law of composition is its characters a symbols word obeys kraft and a return maps necklaces are counted in Lean](2026-11-18_A_NUMBER_IS_THE_HOMOLOGY_OF_ITS_PLACES_A_LAW_OF_COMPOSITION_IS_ITS_CHARACTERS_A_SYMBOLS_WORD_OBEYS_KRAFT_AND_A_RETURN_MAPS_NECKLACES_ARE_COUNTED_IN_LEAN.md)
 - 2026-11-18 [Cooling was measured on November 4 and retired the lines level is traded by its mix an open place is never a source and a change to a line runs beside a control](2026-11-18_COOLING_WAS_MEASURED_ON_NOVEMBER_4_AND_RETIRED_THE_LINES_LEVEL_IS_TRADED_BY_ITS_MIX_AN_OPEN_PLACE_IS_NEVER_A_SOURCE_AND_A_CHANGE_TO_A_LINE_RUNS_BESIDE_A_CONTROL.md)
 - 2026-11-18 [Every place of a passage is compared at its frontier in one forward on the card a one sided context recovers in a lap and what it lacks is the level](2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
+- 2026-11-18 [Every proper lorentz map is a pairs move three distances hold at every real rate recurrence is a ledger with a deadline and a levels sites are read from isolation in Lean](2026-11-18_EVERY_PROPER_LORENTZ_MAP_IS_A_PAIRS_MOVE_THREE_DISTANCES_HOLD_AT_EVERY_REAL_RATE_RECURRENCE_IS_A_LEDGER_WITH_A_DEADLINE_AND_A_LEVELS_SITES_ARE_READ_FROM_ISOLATION_IN_LEAN.md)
 - 2026-11-18 [The line flails because a fixed rate deposit tracks an unshuffled moving terrain parts are added and never removed and past configurations were barred by name](2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md)
 - 2026-11-18 [The method rules the card rule and the waiting standard with their occasions as the guide held them before it kept each rules bar reason scope and link](2026-11-18_THE_METHOD_RULES_THE_CARD_RULE_AND_THE_WAITING_STANDARD_WITH_THEIR_OCCASIONS_AS_THE_GUIDE_HELD_THEM_BEFORE_IT_KEPT_EACH_RULES_BAR_REASON_SCOPE_AND_LINK.md)
 - 2026-11-18 [The theorys core stated in Lean rings close at their lcm and carries at their product identity is the modes shared readings and a proof is the orbit of a finite map](2026-11-18_THE_THEORYS_CORE_STATED_IN_LEAN_RINGS_CLOSE_AT_THEIR_LCM_AND_CARRIES_AT_THEIR_PRODUCT_IDENTITY_IS_THE_MODES_SHARED_READINGS_AND_A_PROOF_IS_THE_ORBIT_OF_A_FINITE_MAP.md)
