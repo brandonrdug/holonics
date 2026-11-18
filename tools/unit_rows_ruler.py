@@ -6,8 +6,10 @@ that sharpness is spread over contexts: a count of at most BASE places before is
 the longer contexts (BASE + 1 to KMAX places before) only the N met most often in the fitted text keep their rows, at each length;
 a place whose longer context holds no row backs off to the longest one that does. For each N the held code is read over all places
 and at the places of little news (under a quarter of a nat, and a quarter to one, under the whole count at KMAX): the interior of a
-unit. So a row here is a context with the symbols met after it, and the reading is how the interior's code falls as rows are added
-from the most met.
+unit. So a row here is a context with the symbols met after it, and the reading is how the code falls as rows are added from the
+most met. CAUTION (November 18): the bins of little news are by the whole count's code of the symbol that arrived, which selects
+the places where the count was right; those columns lean the count's way and are no sizes. The column over all places is not
+selected, and is the one to quote.
 
 Fitted on the first TRAIN octets of a slice's training documents (Witten-Bell backing off), read on about HELD_PLACES of its held
 octets with SKIP or more places before each. A host instrument: a count table enters no law, and a row a context is the form the

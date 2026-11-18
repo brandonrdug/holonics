@@ -12,7 +12,8 @@ symbols the symbols whose least count is not zero. The count of two places befor
 the longer lengths back off Witten-Bell onto it.
 
 For each budget of ROWS a length (the rings' periods are the J primes just under ROWS / J), the held code is read over all places and
-at the places of little news under the whole count, so the two rulers stand side by side at equal rows.
+at the places of little news under the whole count, so the two rulers stand side by side at equal rows. CAUTION (November 18): as
+in `unit_rows_ruler.py` the bins of little news are selected by the symbol that arrived; quote the column over all places.
 
 Fitted on the first TRAIN octets of a slice's training documents, read on about HELD_PLACES of its held octets. A host instrument:
 its address is a fixed residue of the octets, a ruler's and never the machine's (the machine locates a symbol's key); a count table

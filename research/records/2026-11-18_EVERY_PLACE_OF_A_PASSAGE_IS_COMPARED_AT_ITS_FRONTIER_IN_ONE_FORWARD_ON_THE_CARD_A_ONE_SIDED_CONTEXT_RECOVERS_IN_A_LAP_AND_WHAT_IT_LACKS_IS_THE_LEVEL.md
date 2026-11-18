@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §15 added the same day, to 18:55 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §15 added the same day, to 19:40 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -263,41 +263,38 @@ places that stand in that epoch), the level's words carry the known stream's wor
 (`field_level_chart32_spans`, `field_level_chart64_spans`, `LEVEL_NONE`). Its parity against the host and the first laps with it are
 this record's continuation.
 
-## 12. Where the frontier's nats stand: inside units
+## 12. Where the frontier's nats stand against a count: corrected the same day
 
-A ruler (`tools/frontier_excess_ruler.py`): each held stretch is rebuilt as octets from the held read's one-place rows, and a
-place's news is its code under a count of at most five places before it within its stretch (fitted on 8 MB of the slice's training
-documents), a stand-in for a reader's own surprise. The frontier's rows are set beside the count's at the same 99,814 places, by the
-place's news under the count, with the count's code at every `k` beside them:
+*Corrected at 19:40 UTC.* This section first read "inside units, 0.39 to 0.41 nats of all places". That size was wrong. Its ruler
+binned each place by the count's code of the symbol that arrived, which puts in the bins of little news the places where the count
+was right and in the bins of much news the places where it was not: each bin's comparison was selected by its own outcome. The
+Codex thread's letter of November 18 named it. The ruler now bins a place by the entropy of the count's face there, the news the
+count expects, which depends only on what stands before the place (`tools/frontier_excess_ruler.py`). The codes over all places
+were never touched. A sentence to the project's owner carried the wrong size and was corrected the same hour.
 
-| the place's news under the count | share of places | count, `k` = 2 | `k` = 3 | `k` = 4 | `k` = 5 | the plain line (arm F7) | two streams (arm S11) | facing the past (arm P11) |
+The reading, corrected. Each held stretch is rebuilt as octets from the held read's one-place rows; the count is of at most five
+places before a place within its stretch, fitted on 8 MB of the slice's training documents; 99,814 frontier places:
+
+| news the count expects | share of places | count, `k` = 3 | `k` = 4 | `k` = 5 | the plain line (arm F7) | two streams (arm S12) | facing the past (arm P12) | its next pass (arm P14) |
 |---|---|---|---|---|---|---|---|---|
-| under 0.25 nats | 33.3% | 1.332 | 0.645 | 0.226 | 0.066 | 0.827 | 0.876 | 0.849 |
-| 0.25 to 1 | 17.6% | 1.699 | 1.202 | 0.815 | 0.569 | 1.354 | 1.369 | 1.355 |
-| 1 to 2 | 14.1% | 2.224 | 1.853 | 1.614 | 1.471 | 1.954 | 1.963 | 1.950 |
-| 2 to 4 | 19.0% | 2.953 | 2.793 | 2.790 | 2.871 | 2.627 | 2.646 | 2.641 |
-| over 4 | 15.9% | 4.660 | 5.537 | 6.602 | 7.288 | 3.228 | 3.306 | 3.313 |
-| all | | 2.362 | 2.102 | 2.030 | 2.038 | 1.804 | 1.841 | 1.827 |
+| under 0.25 nats | 20.4% | 0.876 | 0.591 | 0.627 | 0.956 | 0.982 | 0.930 | 0.880 |
+| 0.25 to 0.5 | 9.0% | 1.437 | 1.359 | 1.315 | 1.156 | 1.198 | 1.162 | 1.123 |
+| 0.5 to 1 | 20.5% | 1.772 | 1.699 | 1.665 | 1.434 | 1.456 | 1.419 | 1.391 |
+| 1 to 2 | 30.1% | 2.490 | 2.495 | 2.490 | 2.029 | 2.060 | 2.033 | 2.008 |
+| over 2 | 20.0% | 3.403 | 3.434 | 3.502 | 3.001 | 2.993 | 2.983 | 2.969 |
+| all | | 2.102 | 2.030 | 2.038 | 1.804 | 1.826 | 1.794 | 1.765 |
 
-A third of all places stand inside a unit, where the five places before nearly give the symbol (0.066 nats). The machine pays 0.83
-to 0.88 there. In each of the three bins of little news it stands between the count of two places and the count of three, about
-two and three quarters: inside a unit it binds about three places in order. Its excess over the count of five in the first two
-bins is 0.39 nats of all places on the plain line and 0.41 on the two-stream line, of 1.80 and 1.84. At the places of much news,
-the starts of units and what a few places cannot give, it stands under every count, by 0.65 nats of all places in the last bin.
-The store line reads as the fifty books' state did on November 17 (atlas `deposition.excess-inside-units`): it opens units and
-does not close them, and the writes say the same (words begun and not finished, 45% to 51% of them in the lexicon).
+- In four bins of five the machine stands under the count of five, by 0.19 to 0.52 nats a place.
+- At the fifth of places where the count is most sure, the machine pays 0.88 to 0.98 where the count pays 0.63 (and expects far
+  less: the count is poorly calibrated where it is sure). There the machine stands where a count of three places stands (0.876).
+  Its excess over the count of five in that bin is 0.05 to 0.07 nats of all places, which is the size of this gap, not 0.4.
+- The line's steps move that bin most: 0.982 (two streams), 0.930 (the contacts facing the past, two laps), 0.880 (its next pass).
+- By slice the count is a different instrument: on books it reads 1.443 over these stretches where the machine reads 1.78 to 1.84
+  (the held read's book stretches resemble the fitted prefix), and on web and wikidata it reads far above the machine.
 
-What the day's parts do there. The level cannot address the interior of a unit (its chart advances with the news, and a place of
-no news moves no phase: atlas `tower.news-phase-chart-blind-to-dark-order`), and its worth, 0.24, is small beside 0.4. The odd
-contacts facing the past (§9) bind the second place before directly: in their first lap (arm P11 beside arm S11, lap means) the
-frontier reads 0.0131 lower, 0.027 lower at the places of least news and nothing at the places of much, while under the law the
-same state's one-place reading rises 0.073 (the contacts' material serves two relations and the strands take it). So a contact at
-one more place before moves the right bin and moves it little. A second lap of both is running.
-
-What closes a unit is therefore the place level's own: binding four and five places in order as sharply as it binds three. The
-count that does it on one register holds 1.3 million entries at four places and 2.9 million at five; the constitution holds
-392,505 for five registers, 16.4 thousand of them a block of its width squared. Whether the binding is short of entries, of ticks
-(a place meets one more place a tick through its mate) or of a sharper lock is the next reading, before a part.
+So the machine closes a unit less sharply than a count of four or five places does where such a count is sure, it binds there about
+as a count of three does, and against this count that is a small gap. What keeps her writes from holding is not sized by this
+ruler: a count of five on 8 MB is under her nearly everywhere and writes no sentence either.
 
 ## 13. What the repository already held on this wall, read late
 
@@ -320,9 +317,13 @@ names: the one-sided level of §11 was built before the level's own rows in the 
   one keeps; the fine comparison gives the level no slope; a chart on the news phase cannot tell apart the places of a unit's
   interior, where the excess stands; and a level's receipt at its own grain is a design, not ordered.
 
-What §12 adds: the same wall on the store line, on both the plain line and the two-stream line, at 0.39 to 0.41 nats of all places,
-with the machine's binding inside a unit set against counts of every order (between two and three places), and one part read
-against it (a contact at the second place before: 0.027 at the places of least news in a lap).
+What §12 adds, as corrected: on the store line the machine stands where a count of three places stands at the places the count is
+most sure of, on the plain line and the two-stream line alike, and its excess over a count of five there is 0.05 to 0.07 nats of
+all places; the first form of the reading gave 0.39 to 0.41 by a selection of its own bins.
+
+*Corrected with §12:* the paragraph below was written on the first sizing. The composite's remainder stays a candidate the repository holds a form
+for; §12 as corrected no longer sizes it at 0.4 nats, and it is judged by an arm beside the line like any part. The atlas row of November 17
+(`deposition.excess-inside-units`) binned by the arriving symbol's code as well and carries the same caution now.
 
 So what is owed is the composite's remainder: rows that a strand in progress reaches by an address its symbols compose in order,
 deposited by the covector that reaches them and kept by upkeep, at the place level (the unit in progress closes its own interior;
@@ -340,6 +341,14 @@ handed to the places that follow, where a unit predicted ahead is compared with 
 it is not expected to move the frontier without that receipt.
 
 ## 14. How many rows closing a unit needs
+
+*Corrected at 19:40 UTC.* The two rulers of this section bin a place by the whole count's code of the symbol that arrived, the
+selection §12 was corrected for, so their "interior" columns lean the count's way and are not sizes. Their columns over all places
+are not selected and are what stands: on books two places before alone read 2.199, four thousand rows a length 1.850, sixteen
+thousand 1.772 and every context 1.779, so the two-stream line's books code (1.78 to 1.84) is level with a count that keeps four
+to sixteen thousand of the most met contexts at each length past two; and rows shared on three fixed rings read 2.846, 2.450,
+2.037 and 1.860 at four to two hundred and fifty-six thousand rows a length, above the unshared rows at every budget. "About what
+the thousand most met contexts hold" and "0.15 to 0.25 nats on prose" below are the selected bins' and are withdrawn.
 
 A ruler (`tools/unit_rows_ruler.py`): a count of the two places before a place is kept whole, which is about what the machine binds
 inside a unit, and of the longer contexts (three, four and five places before) only the `N` met most often in the fitted text keep

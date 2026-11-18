@@ -1,14 +1,17 @@
 #!/usr/bin/env -S python3 -I
-"""A ruler: where the frontier's excess over a count of the places before stands, by the arriving place's news (the lead, November 18;
-the store line's form of the reading of November 17, atlas `deposition.excess-inside-units`).
+"""A ruler: where the frontier's excess over a count of the places before stands, by how open the place is under the count (the lead,
+November 18; the store line's form of the reading of November 17, atlas `deposition.excess-inside-units`).
 
 Each held stretch of a `read-cavity` output is rebuilt as octets from its one-place rows (`P` rows of `cavity.tsv`, a class an octet by
-the codec). A place's news is its code under a Witten-Bell count of at most KMAX places before it within its stretch, fitted on the
-first TRAIN octets of the slice's training documents: a ruler's stand-in for a reader's own surprise. The frontier rows of KIND (`F`
-the law's, `K` a known stream's, `S` two streams') of each named read are set beside the count's at the same places, by the place's
-news under the count: the interior of a unit (little news) against its landmark (much). Beside them, at the same places, the count's
-code at every k from 0 (the count of octets) to KMAX, so a read's code in a bin can be set against the order of count that stands
-level with it there. Nats a place; codes and counts only.
+the codec). A Witten-Bell count of at most KMAX places before a place within its stretch, fitted on the first TRAIN octets of the
+slice's training documents, gives each place a face over the octets. A place's bin is that face's entropy, the news the count
+expects there: a property of what stands before the place alone. (The first form of this ruler binned a place by the count's code of
+the symbol that arrived. That selects, in the bins of little news, the places where the count was right, and in the bins of much
+news the places where it was not, so each bin's comparison leaned the count's way or the machine's by its own selection; the
+caution is the Codex thread's letter of November 18. The codes over all places were never touched by it.) The frontier rows of
+KIND (`F` the law's, `K` a known stream's, `S` two streams') of each named read are set beside the count's code at the same places,
+bin by bin, with the count's code at every k from 0 (the count of octets) to KMAX, so a read's code in a bin can be set against the
+order of count that stands level with it there. Nats a place; codes and counts only.
 
 A cavity's codes are on 2^-20 bits. Outside the machine; a count table enters no law.
 
@@ -17,8 +20,8 @@ import math, sys
 
 G = float(1 << 20)
 LN2 = math.log(2)
-EDGES = [0.25, 1.0, 2.0, 4.0]
-NAMES = ["under 0.25", "0.25 to 1", "1 to 2", "2 to 4", "over 4"]
+EDGES = [0.25, 0.5, 1.0, 2.0]
+NAMES = ["under 0.25", "0.25 to 0.5", "0.5 to 1", "1 to 2", "over 2"]
 
 def fit(train, kmax):
     uni = [0] * 256
@@ -42,17 +45,20 @@ def fit(train, kmax):
     return uni, counts, totals
 
 def news(model, seq, i, kmax):
-    """The place's code under the count of at most k places before, for every k from 0 to kmax."""
+    """The place's code under the count of at most k places before, for every k from 0 to kmax, and the entropy of the count's face
+    at kmax (the news the count expects at the place, whatever arrives)."""
     uni, counts, totals = model
     tot, seen = sum(uni), sum(1 for v in uni if v)
-    p = (uni[seq[i]] + seen / 256.0) / (tot + seen)
-    out = [-math.log(p)]
+    face = [(u + seen / 256.0) / (tot + seen) for u in uni]
+    c = seq[i]
+    out = [-math.log(face[c])]
     for k in range(1, kmax + 1):
         t = totals[k].get(seq[i - k:i]) if k <= i else None
         if t is not None:
-            p = (counts[k].get(seq[i - k:i + 1], 0) + t[1] * p) / (t[0] + t[1])
-        out.append(-math.log(p))
-    return out
+            ctx, cn, scale = seq[i - k:i], counts[k], 1.0 / (t[0] + t[1])
+            face = [(cn.get(ctx + bytes((a,)), 0) + t[1] * face[a]) * scale for a in range(256)]
+        out.append(-math.log(face[c]))
+    return out, -sum(q * math.log(q) for q in face if q > 0)
 
 def main():
     store, codec, train_n, kmax, kind = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5]
@@ -92,8 +98,8 @@ def main():
                 key = (sl, stretch, t)
                 if seq[t] is None or any(key not in rows for rows in codes):
                     continue
-                by_k = news(model, raw, t, kmax)
-                b = sum(1 for e in EDGES if by_k[kmax] >= e)
+                by_k, expected = news(model, raw, t, kmax)
+                b = sum(1 for e in EDGES if expected >= e)
                 bins[b][0] += 1
                 for k, c in enumerate(by_k):
                     bins[b][1 + k] += c
@@ -116,7 +122,7 @@ def report(sl, bins, count, reads, kind, train_n, kmax):
     for name, b in zip(NAMES, bins):
         if b[0] == 0:
             continue
-        print(f"EXCESS slice={sl} news={name!r} share={b[0] / count:.3f} count={b[at] / b[0]:.3f} " + " ".join(f"{n}={b[at + 1 + r] / b[0]:.3f}" for r, (n, _) in enumerate(reads))
+        print(f"EXCESS slice={sl} expected_news={name!r} share={b[0] / count:.3f} count={b[at] / b[0]:.3f} " + " ".join(f"{n}={b[at + 1 + r] / b[0]:.3f}" for r, (n, _) in enumerate(reads))
               + " excess_of_all_places: " + " ".join(f"{n}={(b[at + 1 + r] - b[at]) / count:+.4f}" for r, (n, _) in enumerate(reads))
               + " counts_by_k: " + " ".join(f"{k}={b[1 + k] / b[0]:.3f}" for k in range(kmax + 1)), flush=True)
 

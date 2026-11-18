@@ -5,10 +5,15 @@
 last tick and each open place's read after every tick. This reads, by least squares, how much of the symbol standing `k` places
 before a place is present in the read at the place: for a known site `k` from 0 (its own symbol, the reading's own check: a site
 holds its symbol) and for the open place at a place `k` from 1 (the place before, which its opening names). A symbol's identity is
-its indicator among the TOP commonest classes (a place whose symbol is rarer is left out of that `k`). Fitted on the passages of
-even index and read on the odd ones: the share of the indicators' variance the fitted read removes there, in thousandths.
+its indicator among the TOP commonest classes of the fitted half (a place whose symbol is rarer is left out of that `k`). Fitted on
+half the passages and read on the other half: the share of the indicators' variance the fitted read removes there, in thousandths.
 
-Outside the machine; shares only. Usage: strand_presence_ruler.py DUMP [KMAX] [TOP]"""
+The halves. With ROWS (the table the dump was read from, `label<TAB>...`, a label `group:known:source`) the passages are split by
+their source: the table's passages are nested prefixes of the same sources at several lengths, and a split by the passage's index
+puts one source's text on both sides (the Codex thread's caution of November 18). Every length then stands in both halves. Without
+ROWS the split is by the passage's index.
+
+Outside the machine; shares only. Usage: strand_presence_ruler.py DUMP [KMAX] [TOP] [ROWS]"""
 import sys
 import numpy as np
 
@@ -27,10 +32,20 @@ def main():
     load = lambda name: np.fromfile(d + "/" + name, dtype="<i4").reshape(n, width).astype(np.float64) / 65536.0
     known = load("known.i32")
     opens = [load(f"open_{k}.i32") for k in range(ticks)]
-    common = np.argsort(-np.bincount(classes))[:top]
+    if len(sys.argv) > 4:
+        # A passage's source: its group's first word and the last field of its label; the sources of each group alternate halves.
+        labels = [l.split("\t")[0].split(":") for l in open(sys.argv[4], encoding="utf-8", errors="replace") if l.strip()]
+        keys = [(lab[0], lab[-1]) for lab in labels]
+        order = {key: i for i, key in enumerate(sorted(set(keys)))}
+        side = np.array([order[key] % 2 == 0 for key in keys])
+        fit_half = side[rows]
+        split = f"by source ({len(order)} sources)"
+    else:
+        fit_half = rows % 2 == 0
+        split = "by passage"
+    common = np.argsort(-np.bincount(classes[fit_half], minlength=classes.max() + 1))[:top]
     index = -np.ones(classes.max() + 1, dtype=int)
     index[common] = np.arange(len(common))
-    fit_half = rows % 2 == 0
 
     def presence(x, k):
         """The share of the indicator of the symbol k places before, removed on the held half by a read fitted on the other."""
@@ -60,7 +75,7 @@ def main():
             out.append(f"{k}={'-' if share is None else round(1000 * share)}")
         print(f"PRESENCE read={name} places_back: " + " ".join(out), flush=True)
 
-    print(f"PRESENCE passages={len(set(rows.tolist()))} places={n} width={width} ticks={ticks} top={top} (thousandths, held half)")
+    print(f"PRESENCE passages={len(set(rows.tolist()))} places={n} width={width} ticks={ticks} top={top} split={split!r} (thousandths, held half)")
     report("known_site_last_tick", known, range(0, kmax + 1))
     for k in range(ticks):
         report(f"open_place_tick_{k + 1}", opens[k], range(1, kmax + 1))
