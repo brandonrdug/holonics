@@ -19,7 +19,7 @@ The fit prints its held code after every pass over the fitted text, so a reader 
 in floats: a fitted table enters no law, and the additive reader is no part of the machine. Codes, masses and counts only.
 
 Usage: additive_rows_ruler.py STORE CODEC SLICE TRAIN_OCTETS KMAX PASSES KIND NAME=DIR [NAME=DIR ...] [-- LEXICON PANEL PLACES DRAWS]"""
-import math, os, pickle, random, re, sys
+import os, pickle, random, re, sys
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §16 added the same day, to 19:59 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §17 added the same day, to 20:18 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -513,3 +513,60 @@ between a count of two and a count of five. So an arm is read on two more lines 
 symbol at the places the count settles, and its panel's share of lexicon words against the count writers' table. The arms in
 flight carry nearer places to the open place (the row of the second place before, G-1118-17) and are read there first. The
 letter's section-choice test is ordered from the Codex thread as host work, with the guess G-1118-18 fixed before its read.
+
+## 17. What closes the settled places: rows of single places do not, and the carried product reaches under two places
+
+*Written at 20:18 UTC.* Two host readings taken before any build on §16, each with its guess fixed first (G-1118-19, G-1118-20).
+
+**A ladder for rows of single places** (`tools/additive_rows_ruler.py`). The most a face can make of a row for each of the `K`
+places before a place, with nothing binding them, is the reader whose face's logarithm is a sum of one row a place. Fitted on 8 MB a
+slice (four passes, the held code flat from the second), read on the 99,814 frontier places beside the count that binds the same
+`K` places; at the fifth of places a count of five settles, the mean mass on the arriving symbol and the code:
+
+| places before | rows of single places | the count that binds them |
+|---|---|---|
+| 1 | 0.187 (2.245) | 0.187 (2.245) |
+| 2 | 0.247 (1.988) | 0.365 (1.539) |
+| 3 | 0.280 (1.854) | 0.635 (0.877) |
+| 4 | 0.295 (1.806) | 0.843 (0.592) |
+| 5 | 0.306 (1.772) | 0.909 (0.627) |
+| the line (arms S12, P14, P15) | | 0.600, 0.640, 0.650 (0.982, 0.881, 0.856) |
+
+Over all places the rows of five code 2.546 where the count of five codes 2.038 and arm P15 1.751, and writing from the panel's
+prompts they hold 36% lexicon words at every `K` from 2 to 5 (the rows of one 30%; the counts 42% to 85%; her 44% to 51%).
+The guess missed on every clause and the same way: rows of five were guessed at 0.62 to 0.78 and read 0.306. A sum of one-place
+terms holds almost nothing of what places settle together. She stands far above that ladder already, level with a count of three
+at these places in both measures (0.650 against 0.635; 0.856 against 0.877), so what she lacks there is the fourth and fifth place
+bound in order, and a row for each farther place is not the growth that gives it. G-1118-17's follow-on clause is read with this.
+
+**The carried product on the line's state** (`read-strand-states`' `gates_K`, `tools/carry_turn_ruler.py`; arm P15's lap mean,
+the 800 frontier rows read whole by two streams with the word past, 139,998 known sites, 32 circles). A carry circle carries
+`Q_t = κ_t b_t + γ_t Q_(t−1)`; it holds the places before in their order where its turn is each symbol's own stride
+(`navigator.content-stride-moment`), and a sum of one-place terms where its advance is fixed. Mean over the circles (least and
+greatest circle):
+
+| tick | one turn at every site | within a symbol | within a pair | the symbols' strides spread | mean \|γ\| |
+|---|---|---|---|---|---|
+| 1 | 0.893 (0.705 to 0.994) | 0.961 | 0.995 | 0.058 of a turn (0.011 to 0.122) | 0.382 (0.209 to 0.725) |
+| 2 | 0.850 | 0.919 | 0.969 | 0.059 | 0.396 |
+| 3 | 0.790 | 0.865 | 0.931 | 0.064 | 0.395 |
+| 4 | 0.792 (0.596 to 0.955) | 0.849 | 0.911 | 0.056 | 0.399 (0.181 to 0.650) |
+| planted: one turn | 1.000 | 1.000 | 1.000 | | |
+| planted: a drawn stride a symbol | 0.210 | 1.000 | 1.000 | 0.287 | |
+
+The guess (a fixed advance: one turn at 0.90 or over, strides spread under 0.030, a pair adding under 0.05) missed on each clause
+by a little: the turn is nearly a function of the site's symbol and the one before it, and the symbols' own strides spread by a
+twentieth of a turn where a full stride spreads by three tenths. The larger reading is the modulus. Founded at `|γ| = 4/5`, a reach
+of five places, the circles stand at a mean of 0.38 to 0.40: a reach `1/(1 − |γ|)` of 1.6 places on the mean of the circles and
+3.6 on the longest. By site the gate runs from 0.05 to 0.86 between its first and ninety-ninth hundredth (median 0.36 to 0.38), and
+3% to 6% of sites hold it at its founding or over. The deposit raised the friction: the machine's one carrier of places in their
+order forgets in under two places, which is what §15's presence and §16's ladder read from outside (three places' identities; a
+count of three at the settled places).
+
+Why the friction rose is a statement for a test (`agent-inferred`): where the strides are small, a longer product is a running
+mean of one-place terms, which blurs the nearest place the face reads most from, so descent shortens the reach; a product whose
+turn is each symbol's own stride keeps its places apart and has no such price. What follows is one more reading before a build:
+the reader of `navigator.content-stride-moment` fitted on the host (a stride and a deposit a symbol on `C` circles, a linear
+face), read at the settled places for several `C`, which says what the carried product can reach when its strides are located
+and sizes its circles (the November 10 ruler held 0.79 and 0.65 of the joint term of three and four letters on 64 circles). The
+arm that follows it founds the circles' strides from that fit and runs beside the line.
