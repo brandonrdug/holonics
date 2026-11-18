@@ -393,7 +393,14 @@ read again on those same held rows. Nats a place, held:
 - **The level is fed and read at the split, where a place holds a pair.** Its moment is taken from states that have
   bound nothing past the opening, and what it prolongs enters before the only two ticks that bind. The record's §9 read
   the level's content as an additive term; this is where that comes from.
-- **Limits.** One specimen and one state. A linear face understates a state whose content is not linear in it. The fit
+- **The line's own state, read after** (G-V5, fixed at 01:07 UTC and missed; the receipt's last block). On lap 94's mean
+  under the pass's own masks, the compared places of the store's next sections code 2.652 nats at her own face, and faces
+  fitted at the opening and after one, two and three ticks read 2.936, 2.978, 2.936 and 2.837. The read is weak (43,366
+  fitted rows across seven slices, the faces 0.23 higher on the read sections than on rows kept aside, no chart after the
+  last tick), and its firmer part is the same: the first two ticks move a compared place's code by nothing. The profile
+  of November 13, where the first two ticks carried four fifths, was read with one place open and every other known. So
+  a place compared among unknown neighbours binds late, at the boundary and under the line's masks alike.
+- **Limits.** Two states, each in one regime. A linear face understates a state whose content is not linear in it. The fit
   is on states of fitted text and the read on held text (the faces read 0.02 to 0.05 higher held than on rows kept aside
   from the fit).
 
@@ -404,7 +411,7 @@ read committed units. It reads at the split, before the place level has bound, a
 What a level should read, and where it should return, is the next statement to derive from the tree; it is a reading
 and no part.
 
-## 12. What a level reads and where it returns: the tree's answer (November 18, 01:00 to 01:15 UTC)
+## 12. What a level reads and where it returns: the tree's answer (November 18, 00:59 to 01:04 UTC)
 
 `tree` for each item, `agent-inferred` for the join. A reading; no part is designed here.
 
@@ -426,7 +433,7 @@ and no part.
   never the state its own modes already hold.
 - **A lap founds only what the last lap made readable** (October 25): the units arrive in one order, each on the one
   before. The tower compounds from below in the time of learning as well as in the forward.
-- **Every receiver has its own receipt** (the objects; #405; the first row of the engine guide's table).
+- **Every receiver has its own receipt** (the objects' §10; the first row of the engine guide's table).
 
 **The join.** A level reads a unit at its section, after the unit's interior has settled: the committed states of the
 places at its boundary, with the stride its clock inherits. It returns at that section, and the interior then extends
@@ -443,5 +450,8 @@ bound symbol a tick, late. Whether a written place's state holds a bound stretch
 none, is not separated by the night's readings: the open place's own state holds the pair before it at about 300
 thousandths and the triple at about 200 at every tick while its code falls, so a count of identities does not see where
 the binding is kept. The receiver's law says where to look: a place that is asked for nothing commits to nothing. What a
-written place's receipt is, at its own grain and in its own frame, is #405's question, and it comes before a level's.
+written place's receipt is, at its own grain and in its own frame, is the question of the objects' receipt law (a region's
+deposition answers only to action that reached its interface, in its frame) and of the learning law (#73), and it comes
+before a level's. (This sentence first named #405, which asks how much each contact with data teaches; corrected the same
+hour.)
 

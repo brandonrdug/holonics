@@ -88,7 +88,8 @@ interior place at the split, before anything is bound, and returns before the ti
 
 **Standing, and what is owed.** Nothing is running and no part is ordered. The places a level would read have committed to nothing: a
 written place is compared nowhere after its opening, so its ticks are trained through one comparison two ticks and a product away.
-Owed, as #405's question and before any level: what a written place's receipt is at its own grain.
+Owed before any level, as the question of the objects' receipt law and the learning law (#73): what a written place's receipt is at
+its own grain.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

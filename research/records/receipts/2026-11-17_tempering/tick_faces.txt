@@ -26,3 +26,16 @@ STRAND_READ strands=1+2+3+4 held=1.478
 STRAND_READ strands=1+2+3+4+5 held=1.408
 STRAND_READ strands=1+2+3+4+5+6 held=1.367
 STRAND_READ strands=1+2+3+4+5+word+word before held=1.364
+
+== The same ruler on the line's own state (G-V5): lap 94's mean, the store's next six sections under the pass's own masks, every compared
+   site; read-tension-store, 219 s at 20 host threads (TENSION_DONE rows=297000 sections=6 ms=218512); faces fitted on sections 0 to 3
+   and read on 4 and 5; 407 s in one process. A held symbol the fit never met is charged the flat face's code and five nats. ==
+TICKS fit rows 43366 (a tenth kept aside: 4818), read rows 23782 (held), symbols 125, held symbols the fit never met 147; ticks 4
+TICKS the machine's own face after its last tick: held 2.652 nats a place; on the fitted rows 2.550   by slice: arithmetic 1.610 (5024) books 3.479 (2073) code 3.009 (5284) science 3.112 (2621) web 2.995 (2525) wikidata 2.917 (1022) words 2.515 (5233)
+TICKS a face of the symbols' frequencies alone: held 3.629
+TICKS a face fitted at each stage of the open place, nats a place (stage: the state a tick begins from, then the state inside it after its contact):
+TICKS   stage tick 0 begins (after 0 ticks)        held 2.936   aside 2.709   fitted 2.546 (at half its steps 2.562)   by slice: arithmetic 1.753 books 3.527 code 3.373 science 3.395 web 3.126 wikidata 4.209 words 2.826   [103 s]
+TICKS   stage tick 1 begins (after 1 ticks)        held 2.978   aside 2.685   fitted 2.513 (at half its steps 2.529)   by slice: arithmetic 1.768 books 3.565 code 3.397 science 3.535 web 3.142 wikidata 4.292 words 2.870   [204 s]
+TICKS   stage tick 2 begins (after 2 ticks)        held 2.936   aside 2.652   fitted 2.477 (at half its steps 2.494)   by slice: arithmetic 1.755 books 3.519 code 3.378 science 3.488 web 3.127 wikidata 4.170 words 2.781   [305 s]
+TICKS   stage tick 3 begins (after 3 ticks)        held 2.837   aside 2.586   fitted 2.430 (at half its steps 2.445)   by slice: arithmetic 1.726 books 3.475 code 3.255 science 3.291 web 3.060 wikidata 3.952 words 2.675   [406 s]
+TICKS done in 406 s on this host's numpy (one process)
