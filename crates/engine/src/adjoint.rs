@@ -95,6 +95,11 @@ impl Constitution {
         // the field leaned on its marks; the field's own placement is kept its honest placement by the passage's comparison.
         if let Some(first) = pass.first.as_deref() {
             self.returned_with(region, first, g, None, None, None, None, None, None, None)?;
+        } else if self.declaration.mark && region.before {
+            // [definition; the lead, November 18; `agent-inferred`] A known stream is read once ([`Region::before`]). In a field that reads twice
+            // its one read stands for both: its return enters the section's sum twice, so the mean the consumer takes is its own covector
+            // at the weight every other region's has. (A ruler's forward at `3` or `4` returns once and is halved with the rest: a reading.)
+            self.returned_with(region, pass, g, None, None, None, None, None, None, None)?;
         }
         Ok(())
     }
@@ -669,7 +674,7 @@ impl Constitution {
         let l = &self.layout;
         let reaches = self.reaches();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
@@ -990,7 +995,8 @@ impl Constitution {
                 }
             }
             owed = next_owed;
-            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
+            // [measurement] A forward that did not hear the level (a ruler's at `3` or `4`, a known stream's) returns nothing to it.
+            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && self.ruler_far < 3 && !region.before) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 // [measurement; the lead, November 17] The covector at the level's locus, of the state the prolongation wrote, where read.
                 if let Some(out) = at_scale.as_deref_mut() {
@@ -1048,7 +1054,7 @@ impl Constitution {
                 self.opening_return(region, l.before, t - 1, dxt, g, pass.marks.as_deref());
             }
             // [measurement] Under a ruler's `3` the opening read no row of the site after ([`Constitution::open_sided`]).
-            if self.ruler_far != 3 && t + 1 < sites {
+            if !self.sided(region) && t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g, pass.marks.as_deref());
             }
         }

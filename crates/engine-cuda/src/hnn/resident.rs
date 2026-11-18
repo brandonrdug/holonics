@@ -244,6 +244,9 @@ pub(crate) struct Words {
     // first read).
     pub(crate) mark_at: u64,
     pub(crate) mark_share: u64,
+    // [measurement; the lead, November 18, the frontier record §6] The known stream (`FieldWords::before`): one where every site of the batch
+    // hears only what stands before it (the host's ruler at `3`, `Constitution::ruler_far`), zero under the law.
+    pub(crate) before: u64,
 }
 
 pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
@@ -931,6 +934,7 @@ impl<'c> Resident<'c> {
             bare_stretch: u64::from(field.bare_stretch),
             // [the ring record §4] The strengths `α_b`, read from the uploaded material at the second read (`run` sets the shares there).
             mark_at: l.mark as u64,
+            before: u64::from(field.ruler_far == 3),
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -950,7 +954,81 @@ impl<'c> Resident<'c> {
     /// over the regions; with `keep`, the still heads' last-tick weight rows of those sites of the one
     /// region read ([`Realization::read_landmarks`]).
     #[allow(clippy::type_complexity)]
+    /// A run of regions through the card: each region's faces and readings and, where it returns, the section's covector (both reads' mean
+    /// where the field reads twice, [`Constitution::both_reads_mean`]).
+    ///
+    /// [definition; the lead, November 18, the frontier record §6; `agent-inferred`] **A section holding known streams** ([`Region::before`]): its
+    /// regions of the law run as they did, and its known streams run as a second group under the known stream's forward (`FieldWords::before`: one
+    /// read, the level unheard), which is a batch's word, so the groups are a schedule and every sum meets at the covector's grain. Where the
+    /// field reads twice a known stream's one read stands for both (the host's `Constitution::returned`): its covector enters the sum twice
+    /// before the mean. The faces and the training path's words stand in the regions' own order. A ruler's forward and the readings take
+    /// regions of one kind.
+    #[allow(clippy::type_complexity)]
     pub(crate) fn run(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
+        if !regions.iter().any(|r| r.before) {
+            let (faces, read_logits, g, rows, echoes) = self.run_one(field, regions, returning, logits, keep)?;
+            return Ok((faces, read_logits, field.both_reads_mean(g), rows, echoes));
+        }
+        if field.ruler_far != 0 || logits || keep.is_some() {
+            return Err(TowerError::Refused("a section holding known streams is read and returned under the law; a ruler's forward and the readings take regions of one kind"));
+        }
+        let n = regions.len();
+        let law: Vec<usize> = (0..n).filter(|&r| !regions[r].before).collect();
+        let known: Vec<usize> = (0..n).filter(|&r| regions[r].before).collect();
+        let law_regions: Vec<Region> = law.iter().map(|&r| regions[r]).collect();
+        let known_regions: Vec<Region> = known.iter().map(|&r| Region { before: false, ..regions[r] }).collect();
+        let mut ruled = field.clone();
+        ruled.ruler_far = 3;
+        let (narrow_from, opening_from) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
+        let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); n];
+        let mut rows: Rows = vec![Vec::new(); n];
+        let mut echoes: Vec<Vec<u64>> = vec![Vec::new(); n];
+        let mut g = if returning { vec![0i128; field.material_len()] } else { Vec::new() };
+        let times: i128 = if field.declaration.mark { 2 } else { 1 };
+        for (group, at, f, weight) in [(&law_regions, &law, field, 1i128), (&known_regions, &known, &ruled, times)] {
+            if group.is_empty() {
+                continue;
+            }
+            let (gf, _, gg, gr, ge) = self.run_one(f, group, returning, false, None)?;
+            for (k, face) in gf.into_iter().enumerate() {
+                faces[at[k]] = face;
+            }
+            if gr.len() == group.len() {
+                for (k, row) in gr.into_iter().enumerate() {
+                    rows[at[k]] = row;
+                }
+            }
+            if ge.len() == group.len() {
+                for (k, echo) in ge.into_iter().enumerate() {
+                    echoes[at[k]] = echo;
+                }
+            }
+            for (x, &y) in g.iter_mut().zip(&gg) {
+                *x += weight * y;
+            }
+        }
+        // The training path's words by region (`narrow_out`, `opening_out`) were gathered group by group: set in the regions' order.
+        let order: Vec<usize> = law.iter().chain(&known).copied().collect();
+        fn placed<T: Default>(out: &std::cell::RefCell<Vec<T>>, from: usize, order: &[usize]) {
+            let mut out = out.borrow_mut();
+            if out.len() != from + order.len() {
+                return;
+            }
+            let gathered: Vec<T> = out.drain(from..).collect();
+            let mut set: Vec<T> = (0..order.len()).map(|_| T::default()).collect();
+            for (k, item) in gathered.into_iter().enumerate() {
+                set[order[k]] = item;
+            }
+            out.extend(set);
+        }
+        placed(&self.narrow_out, narrow_from, &order);
+        placed(&self.opening_out, opening_from, &order);
+        Ok((faces, Vec::new(), field.both_reads_mean(g), rows, echoes))
+    }
+
+    /// One group's run ([`Resident::run`]): regions of one kind, the covector as the reads returned it (the mean is the caller's).
+    #[allow(clippy::type_complexity)]
+    fn run_one(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
         let d = field.declaration;
         for region in regions {
             if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
@@ -977,6 +1055,22 @@ impl<'c> Resident<'c> {
             if region.echo.iter().flatten().any(|e| e.logits.len() != d.alphabet) {
                 return Err(TowerError::Refused("an echo whose logits are not one a class"));
             }
+        }
+        // [measurement; the lead, November 18, the frontier record §6] **A ruler's forward on the card** (the host's `Constitution::ruler_far`). At `3`
+        // (the known stream: every site hears only what stands before it, `FieldWords::before`) and at `4` the level is not heard and the field reads
+        // once, as the host's `Constitution::pass` does; the level's material takes no covector, so the run is the unlevelled field's and its covector
+        // stands over the level's material as zeros. The far fields at `1` and `2` are the host's alone.
+        if field.ruler_far == 1 || field.ruler_far == 2 || field.ruler_far > 4 {
+            return Err(TowerError::Refused("a ruler's far field at 1 or 2 is a host reading, with no card realization"));
+        }
+        if field.ruler_far >= 3 && field.scale.is_some() {
+            let mut unlevelled = field.clone();
+            unlevelled.scale = None;
+            let (faces, read_logits, mut g, rows, echoes) = self.run_one(&unlevelled, regions, returning, logits, keep)?;
+            if returning {
+                g.resize(field.material_len(), 0);
+            }
+            return Ok((faces, read_logits, g, rows, echoes));
         }
         self.mark("outside_the_card");
         let card = self.card;
@@ -1054,7 +1148,8 @@ impl<'c> Resident<'c> {
             // marks are its own first read's, so the two reads run batch by batch. [realization; agent-inferred, November 14] Both stand on one base
             // (`batch_base`): what comes before the opening is formed once a batch.
             let mut base = self.batch_base(field, &regions[batch.clone()], &mut words, tower.as_mut(), returning)?;
-            let (f, z, r, e) = if d.mark {
+            // [measurement] A ruler's forward at `3` or `4` is one read (the host's `Constitution::pass`).
+            let (f, z, r, e) = if d.mark && field.ruler_far < 3 {
                 let mut shares = None;
                 self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, g.as_deref(), false, None, tower.as_mut(), Some(&mut shares))?;
                 let shares = shares.ok_or(TowerError::Refused("a field's first read that left no shares for its marks"))?;
@@ -1089,8 +1184,7 @@ impl<'c> Resident<'c> {
         }
         // [definition; agent-inferred, November 14, G180] Where the field reads twice, the run's covector is both reads' over every batch, released
         // by one bit once, the host's own law (`Constitution::both_reads_mean`), so it is the two reads' mean on any partition; unchanged for a field that
-        // reads once.
-        let g = field.both_reads_mean(g);
+        // reads once. The release is the caller's (`Resident::run`), once over every group of the section.
         let met_by_head = self.timed(Kind::Copy, || card.fetch_range(met, 0, heads)).map_err(device)?;
         let met = met_by_head.iter().map(|&m| u128::from(m)).sum::<u128>();
         if keep.is_some() {
@@ -1146,7 +1240,10 @@ impl<'c> Resident<'c> {
                 (0..s).map(move |t| u8::from(silent(t) && t < read_to))
             })
             .collect();
-        let computed: Vec<u8> = if windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t])))).collect() } else { Vec::new() };
+        // [the known stream] A region's first site has nothing before it: it meets no source and its current is zero (the host's tick under
+        // `Sided::Before`), which is a row not computed.
+        let before = words.before != 0;
+        let computed: Vec<u8> = if before || windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t]) && !(before && t == 0)))).collect() } else { Vec::new() };
         // One region's lists: its sites' rows, its definite sites and its open ones by place (§15.9: an open receiver hears every definite
         // site, and a definite source is heard by every open one), its echoes (§15.3) and its carried mixtures, `mix_off` counted from the
         // region's own first mixture.

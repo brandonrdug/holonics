@@ -463,7 +463,8 @@ impl<'c> Resident<'c> {
         };
         let own: Vec<(usize, u32, u32)> = (0..sites).flat_map(|t| terms(t, t as u32)).collect();
         let before: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| site_pos[t] > 0).flat_map(|t| terms(t - 1, t as u32)).collect();
-        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
+        // [the known stream] No after row was read (`FieldWords::before`), and none takes a covector.
+        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| words.before == 0 && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
         for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
             let (rows_sites, rows_shares, segments) = encoding_partition(&rows, a + 1);
             let count = (segments.len() / 3) as u32;

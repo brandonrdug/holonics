@@ -577,7 +577,8 @@ fn keyed_bit(key: &str) -> u64 {
 /// form. Why: a field compared only on the next place of a region that ends there (the trial's rows of a one-place run) is read by the
 /// law's writer in a state it was never compared on, a place with a run of open places to its right, and its first panel came out as
 /// marks (the record of the night's run); this writer meets the compared state place for place. A ruler's writer on a study's states:
-/// the release's law is unchanged.
+/// the release's law is unchanged. [the lead, November 18] A state whose pass reads its frontier as known streams
+/// ([`holonics_engine::field::StorePass::before`]) is written so: each region's known places hear only what stands before them.
 pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
     if args.len() != 13 && args.len() != 14 {
         return Err("write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [WINDOW]".into());
@@ -620,6 +621,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
         z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
         z ^ (z >> 31)
     };
+    let known = learner.pass.as_ref().is_some_and(|p| p.before);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
@@ -634,7 +636,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
                 classes.push(void);
                 let mut open = vec![false; classes.len()];
                 *open.last_mut().expect("a region of one place or more") = true;
-                OwnedRegion::plain(classes, open)
+                OwnedRegion { before: known, ..OwnedRegion::plain(classes, open) }
             })
             .collect();
         let views: Vec<_> = regions.iter().map(view_of).collect();

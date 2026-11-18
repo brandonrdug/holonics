@@ -22,7 +22,7 @@ pub(crate) struct HeldStretch {
 #[allow(clippy::too_many_arguments, reason = "the cut's declared inputs, each a pinned file's reading or the pass's law")]
 pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &Codec, places: usize) -> Result<Vec<HeldStretch>> {
     let slice = open_slice(store, role, name, counts)?;
-    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0 };
+    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false };
     let mut cut = Cut { seed, slices: vec![slice], pass };
     let mut out = Vec::new();
     let mut taken = 0usize;
@@ -57,6 +57,13 @@ pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std:
 pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     // [measurement; the lead, November 16 23:10Z] A last word `carry=MILLI` reads the held passage with every open row carrying its lock along
     // the ticks ([`holonics_engine::field::Constitution::lock_carry`]): a ruler's forward on the host's realization, before the stage is a law.
+    // [measurement; the lead, November 18, the frontier record §6] A last word `known` reads the frontier's rows a second time with each region
+    // a known stream ([`holonics_engine::field::Region::before`]: every known place hears only what stands before it), rows `K` of
+    // `OUT/frontier.tsv` and a line of their own; a state whose pass reads its frontier so is read so without the word.
+    let (args, known_word) = match args.last().map(String::as_str) {
+        Some("known") => (&args[..args.len() - 1], true),
+        _ => (args, false),
+    };
     let (args, carry) = match args.last().and_then(|w| w.strip_prefix("carry=")) {
         Some(m) => (&args[..args.len() - 1], Some(crate::ruler::tension::carry_of(m)?)),
         None => (args, None),
@@ -289,34 +296,46 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
         let frontier_start = std::time::Instant::now();
         // (from a stretch's second place: a region is two sites or more, so a place with nothing known before it is no frontier row)
         let fjobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, (_, bytes, ends))| (1..bytes.len() + usize::from(*ends)).map(move |t| (k, t))).collect();
-        let (mut f_at, mut f_batches) = (0usize, 0usize);
-        while f_at < fjobs.len() {
-            let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, f_at);
-            while end < fjobs.len() {
-                let s = fjobs[end].1 as u64 + 1;
-                if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
-                    break;
+        // The rows `F` as the law reads any region; then, where asked or where the state's pass reads its frontier so, the rows `K` with each
+        // region a known stream.
+        for (row, before) in [("F", false), ("K", true)] {
+            if before && !(known_word || law.before) {
+                continue;
+            }
+            let kind_start = std::time::Instant::now();
+            let (mut f_at, mut f_batches) = (0usize, 0usize);
+            while f_at < fjobs.len() {
+                let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, f_at);
+                while end < fjobs.len() {
+                    let s = fjobs[end].1 as u64 + 1;
+                    if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                        break;
+                    }
+                    (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
                 }
-                (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+                let regions: Vec<OwnedRegion> = fjobs[f_at..end]
+                    .iter()
+                    .map(|&(k, t)| {
+                        let mut mask = vec![false; t + 1];
+                        mask[t] = true;
+                        OwnedRegion { before, ..OwnedRegion::plain(stretches[k].0[..=t].to_vec(), mask) }
+                    })
+                    .collect();
+                let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+                for (&(k, t), f) in fjobs[f_at..end].iter().zip(&faces) {
+                    let class = stretches[k].0[t];
+                    let face = f[t].as_ref().ok_or("a frontier place without a face")?;
+                    writeln!(frontier_tsv, "{row}\t{name}\t{k}\t{t}\t{class}\t{}", holonics_engine::field::ratio_code(face.masses[class], face.total))?;
+                }
+                f_batches += 1;
+                f_at = end;
             }
-            let regions: Vec<OwnedRegion> = fjobs[f_at..end]
-                .iter()
-                .map(|&(k, t)| {
-                    let mut mask = vec![false; t + 1];
-                    mask[t] = true;
-                    OwnedRegion::plain(stretches[k].0[..=t].to_vec(), mask)
-                })
-                .collect();
-            let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
-            for (&(k, t), f) in fjobs[f_at..end].iter().zip(&faces) {
-                let class = stretches[k].0[t];
-                let face = f[t].as_ref().ok_or("a frontier place without a face")?;
-                writeln!(frontier_tsv, "F\t{name}\t{k}\t{t}\t{class}\t{}", holonics_engine::field::ratio_code(face.masses[class], face.total))?;
+            if before {
+                println!("CAVITY_KNOWN slice={name} places={} batches={f_batches} ms={}", fjobs.len(), kind_start.elapsed().as_millis());
+            } else {
+                println!("CAVITY_FRONTIER slice={name} places={} batches={f_batches} ms={}", fjobs.len(), frontier_start.elapsed().as_millis());
             }
-            f_batches += 1;
-            f_at = end;
         }
-        println!("CAVITY_FRONTIER slice={name} places={} batches={f_batches} ms={}", fjobs.len(), frontier_start.elapsed().as_millis());
         // The code slice's copies: each line's leading spaces doubled, c0 on the host at every place of the copy.
         let mut copy_places = 0usize;
         let copy_start = std::time::Instant::now();

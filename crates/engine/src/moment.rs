@@ -382,7 +382,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
         self.admit_region(&region)?;
         let dw = d.width;
         let reaches = self.reaches();
@@ -443,7 +443,8 @@ impl Constitution {
         let (x, _) = {
             self.admit_region(region)?;
             let paces = self.paces(region)?;
-            self.cavity_forward(region, &paces)?
+            // [the known stream] Under a ruler's `3` ([`Constitution::ruler_far`]) the opening is the retarded one: what stands before the place.
+            self.cavity_forward_sided(region, &paces, !self.sided(region))?
         };
         let l = &self.layout;
         let reach_o = reach(&self.theta[l.opening..l.opening + dw * dw]);
@@ -481,7 +482,11 @@ impl Constitution {
         let l = &self.layout;
         let reaches = self.reaches();
         let reach_o = reach(&self.theta[l.opening..l.opening + dw * dw]);
-        let (x, moment) = self.cavity_forward(region, paces)?;
+        // [the known stream] Under a ruler's `3` ([`Constitution::ruler_far`]) the compared opening is the retarded one (the opening an open place
+        // of the strand's second stream begins from, [`Constitution::cavity_forward_sided`]): no row and no moment term of a site after the place
+        // is read, and none is returned to.
+        let after = !self.sided(region);
+        let (x, moment) = self.cavity_forward_sided(region, paces, after)?;
         let mut dx = vec![0i64; sites * dw];
         let (mut ys, mut rs): (Vec<Vec<i64>>, Vec<Vec<i32>>) = (Vec::new(), Vec::new());
         for t in places.clone() {
@@ -530,7 +535,7 @@ impl Constitution {
             if t > 0 {
                 self.opening_return(region, l.before, t - 1, dxt, g, None);
             }
-            if t + 1 < sites {
+            if after && t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g, None);
             }
             transposed(&self.theta[mf..mf + dw * m2], reaches.moment_face, m2, dxt, MATERIAL_BITS, &mut back)?;
@@ -538,13 +543,17 @@ impl Constitution {
                 *slot += b as i128;
             }
         }
-        self.cavity_moments_return(region, paces, &dm, g, gtau, gsig)
+        self.cavity_moments_return(region, paces, &dm, g, gtau, gsig, after)
     }
 
     /// [definition; theory, November 13, P60 item 1e] **The cavity moments' return** ([`moment::cavity_moments_return`]): the cavity moments'
     /// covector `dm` (`[t][2M]` on `2^(−24)`) back to the strands' moment encodings of the places that brought each term, and on a paced head to
     /// their clocks ([`moment::cavity_pace_return`]), added into `gtau`, `gsig`.
-    pub(crate) fn cavity_moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>]) -> Result<()> {
+    ///
+    /// With `after` unset, the return of cavity moments that read no after row ([`Constitution::cavity_moments_sided`]): the after rows read as
+    /// zero and take no covector.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn cavity_moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], after: bool) -> Result<()> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         if tm == 0 {
@@ -552,7 +561,7 @@ impl Constitution {
         }
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
-        let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
+        let (eb, ea) = (rows(l.moment_before), if after { rows(l.moment_after) } else { vec![vec![0i64; 2 * tm]; sites] });
         let (mut db, mut da) = (vec![vec![0i128; 2 * tm]; sites], vec![vec![0i128; 2 * tm]; sites]);
         let side = |v: Vec<(i128, i128)>| -> Result<Vec<(i64, i64)>> { v.into_iter().map(|(re, im)| Ok((fit64(release(re, moment::COEFFICIENT_BITS))?, fit64(release(im, moment::COEFFICIENT_BITS))?))).collect() };
         for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
@@ -586,7 +595,9 @@ impl Constitution {
         }
         for t in 0..sites {
             self.strand_return(region, l.moment_before, 2 * tm, t, &db[t], g);
-            self.strand_return(region, l.moment_after, 2 * tm, t, &da[t], g);
+            if after {
+                self.strand_return(region, l.moment_after, 2 * tm, t, &da[t], g);
+            }
         }
         Ok(())
     }
@@ -619,7 +630,7 @@ impl Constitution {
     /// over the ticks, `dm` (`[t][2M]` on `2^(−24)`), back to the strands' encodings.
     pub(crate) fn moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>]) -> Result<()> {
         // [measurement] Under a ruler's `3` the moments read no after row ([`Constitution::moments_sided`]).
-        self.moments_return_sided(region, paces, dm, g, gtau, gsig, self.ruler_far != 3)
+        self.moments_return_sided(region, paces, dm, g, gtau, gsig, !self.sided(region))
     }
 
     /// [`Constitution::moments_return`], or with `after` unset the return of moments that read no after row: none is read here, and

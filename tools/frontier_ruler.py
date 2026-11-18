@@ -6,7 +6,9 @@ For each named read (NAME=DIR, DIR a `read-cavity` output directory; the first i
 - the frontier (`F` rows of `frontier.tsv`: every place before the place known, the place alone open, the region ending there), over
   all places and by slice, paired the same way;
 - the frontier by how many places are known, in octaves (0, 1, 2 to 3, 4 to 7, and so on), with each octave's count of places, so a
-  reader sees how far before the place the field's reading still gains.
+  reader sees how far before the place the field's reading still gains;
+- where a read holds them, the frontier with each region a known stream (`K` rows: every known place hears only what stands before it),
+  paired with the control's and with the same state's rows under the law.
 
 A cavity's codes are on 2^-20 bits. Outside the machine; codes and counts only.
 Usage: python3 -I frontier_ruler.py CONTROL=DIR NAME=DIR [NAME=DIR ...]"""
@@ -45,13 +47,30 @@ def line(tag, r, base, kind, label):
 control = None
 for name, d in reads:
     cav = rows(f"{d}/cavity.tsv", ('P', 'W'), 6)
-    fr = rows(f"{d}/frontier.tsv", ('F',), 5)
+    fr = rows(f"{d}/frontier.tsv", ('F', 'K'), 5)
     if not cav and not fr:
         print(f"FRONTIER {name}: no read at {os.path.basename(d)}"); continue
     base_c, base_f = (None, None) if control is None else control
     line(name, cav, base_c, 'P', 'one place open')
     line(name, cav, base_c, 'W', 'whole masks')
     line(name, fr, base_f, 'F', 'the frontier')
+    # The frontier read with each region a known stream (rows K, where the read holds them), paired with the control's own K rows where it
+    # holds them and with its F rows otherwise (the control's level under the law), which the line says.
+    kr = {k: v for k, v in fr.items() if k[0] == 'K'}
+    if kr:
+        base_k = None
+        if base_f is not None:
+            own = {k: v for k, v in base_f.items() if k[0] == 'K'}
+            base_k = own if own else {('K',) + k[1:]: v for k, v in base_f.items() if k[0] == 'F'}
+        line(name, kr, base_k, 'K', 'the frontier, each region a known stream' + ('' if base_f is None else (" (against the control's known-stream rows)" if any(k[0] == 'K' for k in base_f) else " (against the control's rows under the law)")))
+        law_rows = {('K',) + k[1:]: v for k, v in fr.items() if k[0] == 'F'}
+        common = [k for k in kr if k in law_rows]
+        if common:
+            d_ = np.array([kr[k] - law_rows[k] for k in common])
+            print(f"FRONTIER {name}; a known stream less the law's reading of the same state, paired: {d_.mean():+.4f} (±{d_.std(ddof=1) / math.sqrt(len(d_)):.4f}) over {len(common)} places")
+    fr = {k: v for k, v in fr.items() if k[0] == 'F'}
+    if base_f is not None:
+        base_f = {k: v for k, v in base_f.items() if k[0] == 'F'}
     if fr:
         by = {}
         for k, v in fr.items():
@@ -66,4 +85,4 @@ for name, d in reads:
                 parts.append(f"{span(o)}: {own:.3f} ({np.mean(d_):+.3f})")
         print(f"FRONTIER {name}; the frontier by places known" + ("" if base_f is None else " (less the control's)") + ": " + " | ".join(parts))
     if control is None:
-        control = (cav, fr)
+        control = (cav, {**fr, **kr})

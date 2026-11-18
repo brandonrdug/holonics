@@ -65,7 +65,7 @@ const CLASSES: [usize; 7] = [1, 4, 0, 2, 2, 3, 1];
 const OPEN: [bool; 7] = [false, true, false, true, false, false, true];
 
 fn region() -> Region<'static> {
-    Region { classes: &CLASSES, unresolved: &OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None }
+    Region { classes: &CLASSES, unresolved: &OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }
 }
 
 /// The most halvings of a probe's step that seek a step crossing no seam (`2^(grain − 9)` down to
@@ -130,8 +130,8 @@ fn a_region_past_the_reach_is_refused() {
     let field = shaped(1);
     let classes = [1usize; 17];
     let open = [true; 17];
-    assert!(field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).is_err());
-    assert!(field.faces(&Region { classes: &classes[..16], unresolved: &open[..16], faces: &[], locked: &[], echo: &[], domain: None, port: None }).is_ok());
+    assert!(field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).is_err());
+    assert!(field.faces(&Region { classes: &classes[..16], unresolved: &open[..16], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).is_ok());
 }
 
 /// With flat weights (no chart reads) and silent strand contacts, a still field's current is the
@@ -154,7 +154,7 @@ fn the_current_carries_place_when_the_weights_are_flat() {
         let classes = [2usize; 6];
         let open = [true; 6];
         let carried: Vec<Option<Shares>> = vec![Some(vec![(2, 1 << STATE_BITS)]); 6];
-        let faces = field.faces(&Region { classes: &classes, unresolved: &open, faces: &carried, locked: &[], echo: &[], domain: None, port: None }).unwrap();
+        let faces = field.faces(&Region { classes: &classes, unresolved: &open, faces: &carried, locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
         let alike = faces[1..5].iter().all(|f| f == &faces[1]);
         assert_eq!(alike, !framed, "still {still}");
     }
@@ -233,7 +233,7 @@ fn covector_matches_the_codes_difference() {
     // skin, no moment).
     // [the unified-theory reading of November 6, 10:31] And under the bare stretch (`Constitution::bare_stretch`: past the last arrival
     // a silent place runs at the bare rate and returns nothing), declared beside the one-rate stretch.
-    for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded) }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(lettered) })].map(|(still, r)| (still, depth, bare, r))) {
+    for (still, depth, bare, r) in [(0usize, 0usize, false), (1, 0, false), (2, 0, false), (0, 1, false), (1, 1, false), (0, 0, true), (1, 0, true)].into_iter().flat_map(|(still, depth, bare)| [(still, region()), (still, Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None, before: false }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port), before: false }), (still, Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded), before: false }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(bounded), before: false }), (still, Region { classes: &CLASSES, unresolved: &PATH, faces: &[], locked: &[], echo: &[], domain: None, port: Some(lettered), before: false })].map(|(still, r)| (still, depth, bare, r))) {
         let mut field = shaped_with(Declaration { depth, ..tiny_declaration(still) });
         field.bare_stretch = bare;
         let g = covector_of(&field, &r);
@@ -318,7 +318,7 @@ fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
         }
         let classes = [1usize, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2];
         let open = [false; 12];
-        let pass = field.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
+        let pass = field.pass(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }, true).unwrap();
         for cell in &pass.ticks {
             for (hi, row) in cell.rows.iter().enumerate() {
                 let i = hi % classes.len();
@@ -332,7 +332,7 @@ fn the_falloff_weighs_a_source_by_the_octave_of_its_distance() {
         let order = [3usize, 0, 6, 1, 5, 2, 4];
         let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
         let open: Vec<bool> = order.iter().map(|&t| OPEN[t]).collect();
-        let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+        let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
         assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]), "still {still}: the field reads order");
     }
     assert_eq!([1usize, 2, 3, 4, 5, 7, 8, 1000].map(octave), [0, 1, 1, 2, 2, 2, 3, 9]);
@@ -433,7 +433,7 @@ fn the_strand_contacts_read_order_without_frames() {
     let order = [3usize, 0, 6, 1, 5, 2, 4];
     let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
     let open: Vec<bool> = order.iter().map(|&t| OPEN[t]).collect();
-    let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+    let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
     assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]));
 }
 
@@ -445,7 +445,7 @@ fn framed_field_reads_place() {
     let order = [3usize, 0, 6, 1, 5, 2, 4];
     let classes: Vec<usize> = order.iter().map(|&t| CLASSES[t]).collect();
     let open: Vec<bool> = order.iter().map(|&t| OPEN[t]).collect();
-    let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+    let permuted = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
     assert!(order.iter().enumerate().any(|(n, &t)| permuted[n] != faces[t]));
 }
 
@@ -457,7 +457,7 @@ fn fluxing_deposits_lower_the_code() {
     let mut learner = Learner::new(field, 6);
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
-    let regions = [region(), Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let regions = [region(), Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }];
     let opening: i64 = regions.iter().map(|r| learner.field.code(r).unwrap().0).sum();
     let mut deposited = 0;
     for _ in 0..12 {
@@ -477,7 +477,7 @@ fn regions_sum_in_any_order() {
     let field = shaped(1);
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
-    let regions = [region(), Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let regions = [region(), Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }];
     let (_, g) = field.read_and_return(&regions).unwrap();
     let a = reversed_of(&field, &regions[0]);
     let b = reversed_of(&field, &regions[1]);
@@ -549,22 +549,22 @@ fn a_carried_face_of_one_class_opens_as_that_class() {
         let mut locked = [false; 7];
         locked[2] = true;
         locked[5] = true;
-        let as_faces = Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &locked, echo: &[], domain: None, port: None };
+        let as_faces = Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &locked, echo: &[], domain: None, port: None, before: false };
         assert_eq!(field.faces(&as_faces).unwrap(), field.faces(&r).unwrap(), "still {still}");
-        assert!(field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &[], locked: &locked, echo: &[], domain: None, port: None }).is_err(), "a lock on a site that carries no face");
+        assert!(field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &[], locked: &locked, echo: &[], domain: None, port: None, before: false }).is_err(), "a lock on a site that carries no face");
         // An unresolved site carried as one class, locked, opens on it and is still read.
         let mut at_open = carried.clone();
         at_open[1] = Some(vec![(4, 1 << STATE_BITS)]);
         locked[1] = true;
         let mut resolved_open = OPEN;
         resolved_open[1] = false;
-        let read = field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &at_open, locked: &locked, echo: &[], domain: None, port: None }).unwrap();
-        let resolved = field.faces(&Region { classes: &CLASSES, unresolved: &resolved_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+        let read = field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &at_open, locked: &locked, echo: &[], domain: None, port: None, before: false }).unwrap();
+        let resolved = field.faces(&Region { classes: &CLASSES, unresolved: &resolved_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
         assert!(read[1].is_some());
         for t in (0..CLASSES.len()).filter(|&t| t != 1) {
             assert_eq!(read[t], resolved[t], "still {still} site {t}");
         }
-        assert!(field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried[..3], locked: &[], echo: &[], domain: None, port: None }).is_err(), "one carried face a site or none");
+        assert!(field.faces(&Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried[..3], locked: &[], echo: &[], domain: None, port: None, before: false }).is_err(), "one carried face a site or none");
     }
 }
 
@@ -670,7 +670,7 @@ fn a_held_step_is_read_on_the_next_section() {
     learner.read_held = true;
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
-    let second = Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let second = Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let (mut read, mut halved) = (0, 0);
     // Twenty-four sections: with the face's covector alone (§16.19) the first twelve stand every step at its size.
     for k in 0..24 {
@@ -806,7 +806,7 @@ fn no_site_meets_itself() {
         }
     }
     let one = [1usize];
-    assert!(shaped(1).faces(&Region { classes: &one, unresolved: &[true], faces: &[], locked: &[], echo: &[], domain: None, port: None }).is_err(), "a lone site has no site to meet");
+    assert!(shaped(1).faces(&Region { classes: &one, unresolved: &[true], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).is_err(), "a lone site has no site to meet");
 }
 
 /// The contact's gain covers the falloff: the largest shift, negative where it amplifies, at which a
@@ -880,7 +880,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
     let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
-    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let sheets = |field: &Constitution| -> Vec<Vec<u32>> { field.pass(&r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     let (mut read, mut seams, mut far, mut halvings) = (0usize, 0usize, 0usize, 0u32);
     for still in [0usize, 1, 2] {
@@ -970,7 +970,7 @@ fn a_listener_s_founding_row_keeps_its_near_field() {
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
     let open: Vec<bool> = (0..sites).map(|t| t >= sites - 40 && t % 2 == 0).collect();
-    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let read = |field: &Constitution| -> (u128, u128) {
         let pass = field.pass(&r, true).unwrap();
         let (mut near, mut peak) = (0u128, 0u128);
@@ -1026,7 +1026,7 @@ fn the_pace_covector_matches_the_code_at_two_steps() {
             let grain = field.layout.families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&k)).unwrap().2;
             *v = (((i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i64) << grain) >> 32) as i32;
         }
-        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }, Region { classes: &long, unresolved: &stretch_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
+        for r in [region(), Region { classes: &long, unresolved: &long_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }, Region { classes: &long, unresolved: &stretch_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }] {
             let pass = field.pass(&r, true).unwrap();
             assert!(pass.paces.plain.iter().all(|&p| !p), "the shaped clocks are no byte place");
             let g = covector_of(&field, &r);
@@ -1095,7 +1095,7 @@ fn a_blank_place_runs_at_its_expected_duration() {
     // unified-theory reading of November 6, 08:16] a face past the stretch's first place is read by no clock and is not read.
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
-    let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let stretch = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     assert_eq!(Constitution::silent_stretch(&stretch), 7);
     let mut between = false;
     for cell in &field.pass(&stretch, true).unwrap().ticks[1..] {
@@ -1158,7 +1158,7 @@ fn the_covector_s_far_share_is_zero_at_the_founding_and_read_where_the_returns_m
     let founded = Constitution::found(tiny_declaration(1), &keys(1 << 14)).unwrap();
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t % 3 == 1).collect();
-    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     assert!(founded.covector_shares(&[r]).unwrap().iter().all(|&[near, far]| near == 0 && far == 0));
     let shaped = shaped(1);
     let shares = shaped.covector_shares(&[r]).unwrap();
@@ -1184,7 +1184,7 @@ fn silent_moment_face(mut field: Constitution) -> Constitution {
 fn a_site_opens_on_its_moment() {
     const WORDS: [usize; 11] = [1, 1, 2, 3, 4, 0, 0, 2, 3, 4, 1];
     const KNOWN: [bool; 11] = [false; 11];
-    let r = Region { classes: &WORDS, unresolved: &KNOWN, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let r = Region { classes: &WORDS, unresolved: &KNOWN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let (a, b) = (3usize, 8usize);
     for still in [0usize, 1, 2] {
         let field = shaped(still);
@@ -1220,8 +1220,8 @@ fn a_place_s_cavity_opening_is_its_masked_opening() {
     const LONG_OPEN: [bool; 16] = [false, false, true, false, false, false, true, true, false, false, false, true, false, false, false, true];
     let regions = [
         ("seven places, three open", region()),
-        ("eleven places, all written", Region { classes: &WORDS, unresolved: &KNOWN, faces: &[], locked: &[], echo: &[], domain: None, port: None }),
-        ("sixteen places, five open", Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None }),
+        ("eleven places, all written", Region { classes: &WORDS, unresolved: &KNOWN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }),
+        ("sixteen places, five open", Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }),
     ];
     for still in [0usize, 1, 2] {
         let field = shaped(still);
@@ -1278,13 +1278,27 @@ const LONG_OPEN: [bool; 16] = [false, false, true, false, false, false, true, tr
 /// compared with the covector's prediction, as [`covector_matches_the_codes_difference`] reads the last tick's: the encoding's rows and bias
 /// through `tied`, the lift and its bias, the unresolved row, the neighbours' strand rows, the moment's chart and bias, the moment encodings
 /// (the others' terms) and the paces (their clocks). The opening's read crosses no sheet (the lane chart is smooth), so every probe is read.
+/// [the lead, November 18, the frontier record §6] Read again under the known stream (a ruler's forward at `3`), where the compared opening is
+/// the retarded one: the same families are reached but the two after rows, which take no covector there.
 #[test]
 fn the_opening_comparison_s_covector_matches_its_codes_difference() {
+    for far in [0u8, 3] {
     let (mut read, mut seams, mut halvings) = (0usize, 0usize, 0u32);
     let mut reached = std::collections::BTreeSet::new();
     for still in [0usize, 1] {
-        let field = opened(still);
-        for r in [region(), Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None }] {
+        let mut field = opened(still);
+        field.ruler_far = far;
+        if far == 3 {
+            let (l, d) = (field.layout.clone(), field.declaration);
+            let r = Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
+            let g = opening_covector_of(&field, &r, 0..r.classes.len());
+            assert!(g[l.after..l.after + (d.alphabet + 1) * d.width].iter().all(|&v| v == 0), "still {still}: the retarded opening's after rows take no covector");
+            assert!(g[l.moment_after..l.moment_after + (d.alphabet + 1) * 2 * d.moment_modes()].iter().all(|&v| v == 0), "still {still}: the retarded moments' after rows take none");
+            let mut law = field.clone();
+            law.ruler_far = 0;
+            assert_ne!(opening_code(&field, &r), opening_code(&law, &r), "still {still}: the retarded opening's code is not the law's");
+        }
+        for r in [region(), Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }] {
             let g = opening_covector_of(&field, &r, 0..r.classes.len());
             let places = r.classes.len() as i128;
             for &(start, len, grain) in field.families() {
@@ -1318,11 +1332,13 @@ fn the_opening_comparison_s_covector_matches_its_codes_difference() {
     }
     let l = opened(0).layout;
     let named = [("enc", l.enc), ("before", l.before), ("after", l.after), ("read_bias", l.read_bias), ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("pace", l.pace), ("moment_face", l.moment_face), ("moment_face_bias", l.moment_face_bias), ("opening", l.opening), ("opening_bias", l.opening_bias)];
-    eprintln!("OPENING_PROBES read={read} halvings={halvings} on_a_seam={seams} families_reached={}", named.iter().filter(|(_, s)| reached.contains(s)).map(|(n, _)| *n).collect::<Vec<_>>().join(","));
+    eprintln!("OPENING_PROBES far={far} read={read} halvings={halvings} on_a_seam={seams} families_reached={}", named.iter().filter(|(_, s)| reached.contains(s)).map(|(n, _)| *n).collect::<Vec<_>>().join(","));
     for (name, start) in named {
-        assert!(reached.contains(&start), "the opening's covector was read against its code in family {name}");
+        let sided_out = far == 3 && (name == "after" || name == "moment_after");
+        assert!(reached.contains(&start) != sided_out, "at {far}: the opening's covector was read against its code in family {name}, or reached a family the retarded opening does not read");
     }
     assert!(16 * seams <= read, "read {read} probes, {seams} on a seam at the smallest step");
+    }
 }
 
 /// [theory, November 13, P60 items 1b and 1h] **A place's own row, own moment term and own stride are no operand of its comparison**: on the
@@ -1343,7 +1359,7 @@ fn a_place_s_comparison_reaches_nothing_of_its_own() {
         let bound = row_sum.div_ceil(1 << 24) + 1;
         let (mut worst, mut changes) = (0u64, 0usize);
         for (classes, open) in [(&CLASSES[..], &OPEN[..]), (&LONG[..], &LONG_OPEN[..])] {
-            let r = Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let r = Region { classes, unresolved: open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
             let x = field.cavity_openings(&r).unwrap();
             for t in 0..classes.len() {
                 for c in 0..a {
@@ -1475,7 +1491,7 @@ fn a_port_is_read_through_its_coupling() {
     let field = shaped(1);
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None, window: false, letters: false }) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(Port { start: 4, void: 0, target: &target, boundary: false, stop: None, heard: None, window: false, letters: false }), before: false };
     let faces = field.faces(&r).unwrap();
     let place = faces[1].as_ref().unwrap().code(CLASSES[1]);
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
@@ -1496,7 +1512,7 @@ fn a_port_at_its_boundary_codes_only_the_end() {
     const PORTED: [bool; 7] = [false, true, false, false, true, true, true];
     let target = [2usize, 3];
     let port = Port { start: 4, void: 0, target: &target, boundary: true, stop: None, heard: None, window: false, letters: false };
-    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port) };
+    let r = Region { classes: &CLASSES, unresolved: &PORTED, faces: &[], locked: &[], echo: &[], domain: None, port: Some(port), before: false };
     let faces = field.faces(&r).unwrap();
     let at: Vec<(&[u128], u128)> = faces[4..].iter().map(|f| { let f = f.as_ref().unwrap(); (f.masses.as_slice(), f.total) }).collect();
     let (rows, code) = port_reading(&at, &port).unwrap();
@@ -1537,7 +1553,7 @@ fn an_open_stretch_leaves_the_other_sites_faces_as_they_were() {
             let mut open = OPEN.to_vec();
             classes.extend(std::iter::repeat_n(0usize, extra));
             open.extend(std::iter::repeat_n(true, extra));
-            let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
             field.faces(&r).unwrap()[..CLASSES.len()].to_vec()
         };
         assert_eq!(stretched(ticks + 2), stretched(ticks + 5), "still {still}");
@@ -1664,8 +1680,8 @@ fn the_room_past_the_front_is_heard_only_through_the_near_field() {
             let mut classes: Vec<usize> = q.to_vec();
             classes.extend((0..room).map(|d| if d + 1 < (1 << front) { truth[d % truth.len()] } else { 0 }));
             let open: Vec<bool> = (0..classes.len()).map(|t| t >= q.len() && t + 1 - q.len() >= (1 << front)).collect();
-            let full = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
-            let short = field.faces(&Region { classes: &classes[..cut], unresolved: &open[..cut], faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap();
+            let full = field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
+            let short = field.faces(&Region { classes: &classes[..cut], unresolved: &open[..cut], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap();
             let unequal = (0..kept_faces).filter(|&t| full[t] != short[t]).count();
             eprintln!("ROOM_CUT still={still} front={front} margin={margin} kept={kept_faces} read={cut} room={} unequal={unequal}", classes.len());
             if margin == NEAR - 1 {
@@ -1685,7 +1701,7 @@ fn past_the_last_arrival_a_place_runs_at_the_bare_rate() {
     field.bare_stretch = true;
     let long: Vec<usize> = (0..14).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..14).map(|t| t == 2 || t >= 7).collect();
-    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let r = Region { classes: &long, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     assert_eq!(Constitution::silent_stretch(&r), 7);
     let one = 1i64 << PACE_BITS;
     let mut between = false;
@@ -1730,7 +1746,7 @@ fn a_cut_room_reads_and_returns_the_whole_rooms_bits() {
                 locked: &[],
                 echo: &[],
                 domain: None,
-                port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }),
+                port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }), before: false
             };
             let (whole, cut) = (region(false), region(true));
             let kept = cut.window(ticks).unwrap();
@@ -1928,7 +1944,7 @@ fn the_writer_reads_its_region_to_the_near_field_past_its_void() {
         classes[t] = c;
         open[t] = false;
     }
-    let whole = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let whole = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut Host).unwrap().remove(0);
     assert_eq!(read, field.faces(&whole).unwrap(), "before any void the region is read whole");
     let end = 8;
@@ -1937,13 +1953,13 @@ fn the_writer_reads_its_region_to_the_near_field_past_its_void() {
         open[t] = false;
     }
     let read = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, true, &mut Host).unwrap().remove(0);
-    let cut = Region { classes: &classes[..end + NEAR], unresolved: &open[..end + NEAR], faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let cut = Region { classes: &classes[..end + NEAR], unresolved: &open[..end + NEAR], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let short = field.faces(&cut).unwrap();
     assert_eq!(read.len(), classes.len());
     assert_eq!(&read[..end + NEAR], &short[..], "the faces are the cut region's");
     assert!(read[end + NEAR..].iter().all(Option::is_none), "no face past the cut");
     let room = field.read_active(&[q.len()], std::slice::from_ref(&classes), std::slice::from_ref(&open), &[0], 0, false, &mut Host).unwrap().remove(0);
-    assert_eq!(room, field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None }).unwrap(), "the whole room, declared");
+    assert_eq!(room, field.faces(&Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).unwrap(), "the whole room, declared");
 }
 
 /// [definition; §16.47] **The answer is released by octaves of distance**: at every read of the sweeps, while a place at
@@ -2422,7 +2438,7 @@ fn a_steps_predicted_change_is_its_codes_change_in_the_small() {
 fn a_steps_transfer_is_the_next_sections_change_in_the_small() {
     let second_classes = [2usize, 2, 3, 1, 0, 4, 4];
     let second_open = [true, false, false, true, true, false, false];
-    let second = [Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None }];
+    let second = [Region { classes: &second_classes, unresolved: &second_open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }];
     let code_on = |field: &Constitution| code_of(&compared(&[field.faces(&second[0]).unwrap()], &second).unwrap(), &spans_of(&second));
     let mut read = 0;
     for still in [0usize, 1, 2] {
@@ -2992,7 +3008,7 @@ fn the_carry_circles_scan_is_the_law_site_by_site() {
         u[11] = true;
         u
     };
-    let pass = |c: &[usize]| base.pass(&Region { classes: c, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None }, true).unwrap();
+    let pass = |c: &[usize]| base.pass(&Region { classes: c, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }, true).unwrap();
     let t = 7usize;
     let c0 = pass(&classes);
     let mut left = classes.clone();
@@ -3387,7 +3403,7 @@ fn a_field_with_carry_circles_keeps_every_room_whole() {
             locked: &[],
             echo: &[],
             domain: None,
-            port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }),
+            port: Some(Port { start: q.len(), void: 0, target: &target, boundary: true, stop: None, heard: Some(&heard), window, letters: false }), before: false
         };
         let (whole, cut) = (region(false), region(true));
         assert!(cut.window(ticks).is_some() && field.declaration.room_window(&cut).is_none(), "ticks {ticks}: the region cuts, the field keeps it whole");
@@ -3716,7 +3732,7 @@ fn the_quarter_turn_gauge_leaves_every_face_and_the_code() {
         assert!(field.theta[l.w_triad..l.len].iter().any(|&v| v != 0), "a nonzero W_T");
         let turned = gauge(&field, 1, -1);
         assert_ne!(turned.theta, field.theta);
-        for r in [region(), Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None }] {
+        for r in [region(), Region { classes: &CLASSES, unresolved: &OPEN, faces: &carried, locked: &[], echo: &[], domain: None, port: None, before: false }] {
             assert_eq!(turned.faces(&r).unwrap(), field.faces(&r).unwrap(), "still {still} circled {circled}: every face");
             assert_eq!(turned.code(&r).unwrap(), field.code(&r).unwrap(), "still {still} circled {circled}: the code");
             let (a, b) = (field.pass(&r, true).unwrap(), turned.pass(&r, true).unwrap());
@@ -3861,7 +3877,7 @@ fn the_crossing_triads_are_the_law_at_every_site() {
         }
     }
     let (two, open) = ([1usize, 3], [false, true]);
-    let small = Region { classes: &two, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let small = Region { classes: &two, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     assert!(field.pass(&small, true).unwrap().ticks.iter().any(|c| c.ct.iter().any(|&v| v != 0)), "a region of two sites holds crossing triads");
     // One scale covector across each triad's legs and its return, as the strand's.
     let g = covector_of(&field, &region());
@@ -3946,7 +3962,7 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
     }
     // A region of two sites: no place has both of its strand mates.
     let (two, open) = ([1usize, 3], [false, true]);
-    let small = Region { classes: &two, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let small = Region { classes: &two, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let pass = field.pass(&small, true).unwrap();
     assert!(pass.ticks.iter().all(|c| c.tp.iter().chain(&c.ct).all(|&v| v == 0)), "no triad in a region of two sites");
     let g = covector_of(&field, &small);
@@ -4076,7 +4092,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0 });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4128,6 +4144,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         slices: ["code", "web", "science", "books", "wikidata"].iter().enumerate().map(|(k, n)| PassSlice { name: n.to_string(), piece: k as u64, cursor: 3 * k as u64, taken: 100 * k as u64 }).collect(),
         world: None,
         frontier: 0,
+        before: false,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -4184,6 +4201,20 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     let with = learner.to_text();
     assert_eq!(with, format!("{plain}{}\n", frontier.to_line()));
     assert_eq!(Learner::from_text(&with).unwrap().to_text(), with, "a learner whose pass has a frontier reads and writes byte for byte");
+    // [the lead, November 18] The known streams' word stands after the frontier's share, only where set; it reads back as itself with
+    // `own` and with a world; without a frontier's clause before it, or as a slice's name, it is refused.
+    let known = StorePass { before: true, ..frontier.clone() };
+    assert_eq!(known.to_line(), format!("{} frontier 6 before", pass.to_line()));
+    assert!(!frontier.to_line().contains(" before"));
+    for p in [known.clone(), StorePass { own: true, ..known.clone() }, StorePass { frontier: 8, before: true, ..world.clone() }, StorePass { frontier: 1, before: true, ..refined.clone() }] {
+        assert_eq!(StorePass::from_line(&p.to_line()).unwrap(), p, "{}", p.to_line());
+    }
+    assert!(StorePass::from_line(&format!("{} before", pass.to_line())).is_err(), "the word without a frontier's clause");
+    let named_before = StorePass { slices: vec![PassSlice { name: "before".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
+    assert!(StorePass::from_line(&named_before.to_line()).is_err(), "a slice named `before` is refused");
+    learner.pass = Some(known.clone());
+    let with = learner.to_text();
+    assert_eq!(Learner::from_text(&with).unwrap().to_text(), with, "a learner whose frontier is read as known streams reads and writes byte for byte");
 }
 
 /// [definition; the lead, November 17 and 18, the boundary chart (the record of the dwell §13, acceptance (b))] **A passage read at its
@@ -4239,7 +4270,7 @@ fn the_strands_covector_matches_the_codes_difference() {
         let mut reference = vec![0i128; field.theta.len()];
         for t in 1..sites {
             let open: Vec<bool> = (0..=t).map(|k| k == t).collect();
-            let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
             let fwd = ruled.pass(&region, true).unwrap();
             ruled.returned(&region, &fwd, &mut reference).unwrap();
         }
@@ -4317,7 +4348,7 @@ fn the_strands_two_streams_in_one_tick_are_the_second_ticks_bits() {
 fn the_covector_under_the_known_stream_matches_the_codes_difference() {
     let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
     const LAST: [bool; 7] = [false, false, false, false, false, false, true];
-    let r = Region { classes: &CLASSES, unresolved: &LAST, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let r = Region { classes: &CLASSES, unresolved: &LAST, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
     let (mut read, mut seams) = (0usize, 0usize);
     for (name, mut field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1))] {
         field.ruler_far = 3;
@@ -4365,6 +4396,52 @@ fn the_covector_under_the_known_stream_matches_the_codes_difference() {
     assert!(read >= 60 && 8 * seams <= read, "read {read} probes, {seams} on a seam");
 }
 
+/// [definition; the lead, November 18, the frontier record §6] **A region read as a known stream is the ruler's forward at three, as the
+/// region's own word** ([`Region::before`]): on fields with circles, with the opening compared, with a level and with a level reading twice,
+/// a region carrying the word reads under the law the faces the same region reads under a ruler's forward at `3`, which are not the law's
+/// faces; its covector in a section is that forward's own return at the weight of any region's (in a field that reads twice the one read
+/// stands for both, so the section's mean leaves it whole); a section holding it beside a region of the law is the sum of the two; and the
+/// level's material takes nothing from it.
+#[test]
+fn a_region_read_as_a_known_stream_is_the_rulers_forward_at_three() {
+    const LAST: [bool; 7] = [false, false, false, false, false, false, true];
+    let marked = {
+        let (mut f, _) = towered_live(1).with_mark().unwrap();
+        let l = f.layout.clone();
+        f.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&[1 << 22, 1 << 21, 3 << 20]);
+        f
+    };
+    for (name, field) in [("circles", circled_shaped(1)), ("opened", opened(1)), ("tower", towered_live(1)), ("marked tower", marked)] {
+        let mut ruled = field.clone();
+        ruled.ruler_far = 3;
+        let len = field.material_len();
+        let raw = |f: &Constitution, r: &Region| -> Vec<i128> {
+            let pass = f.pass(r, true).unwrap();
+            let mut g = vec![0i128; len];
+            f.returned(r, &pass, &mut g).unwrap();
+            g
+        };
+        // The fixtures' level holds a region of seven places' epochs, so the long region is read on the fields without one.
+        let long = Region { classes: &LONG, unresolved: &LONG_OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
+        let masked = Region { classes: &CLASSES, unresolved: &OPEN, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
+        let frontier = Region { classes: &CLASSES, unresolved: &LAST, faces: &[], locked: &[], echo: &[], domain: Some(7), port: None, before: false };
+        for r in [if field.scale.is_some() { masked } else { long }, frontier] {
+            let word = Region { before: true, ..r };
+            let (faces, g) = field.read_and_return(&[word]).unwrap();
+            assert_eq!(faces[0], ruled.faces(&r).unwrap(), "{name}: the word's faces are the ruler's");
+            assert_ne!(faces[0], field.faces(&r).unwrap(), "{name}: and not the law's");
+            let once = raw(&ruled, &r);
+            assert!(once.iter().any(|&v| v != 0) && once[field.theta.len()..].iter().all(|&v| v == 0), "{name}: the forward returns, and nothing to the level");
+            assert_eq!(g, once, "{name}: the word's covector in a section is the forward's own return");
+            let (both_faces, both) = field.read_and_return(&[r, word]).unwrap();
+            assert_eq!(both_faces[1], faces[0], "{name}: a region's reading stands beside another's");
+            let times = if field.declaration.mark { 2 } else { 1 };
+            let sum: Vec<i128> = raw(&field, &r).iter().zip(&once).map(|(&a, &b)| a + times * b).collect();
+            assert_eq!(both, field.both_reads_mean(sum), "{name}: a section is its regions' sum");
+        }
+    }
+}
+
 /// [definition; the lead, November 18, the frontier record §6] **The strand's open place is its frontier region's**: under
 /// [`Constitution::strand_faces`] the face at place `t` is the same bits as the open last place of the region `[0, t]` read with every known
 /// place hearing only what stands before it (a ruler's forward at `3`), at every place, on fields with a still head and without, with
@@ -4381,7 +4458,7 @@ fn the_strands_open_place_is_its_frontier_regions() {
         ruled.ruler_far = 3;
         for t in 1..sites {
             let open: Vec<bool> = (0..=t).map(|k| k == t).collect();
-            let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
             let law = ruled.faces(&region).unwrap()[t].clone().unwrap();
             assert_eq!(faces[t], law, "{name}: place {t}");
         }

@@ -106,7 +106,7 @@ pub fn weighed_domain(m: usize, mask: &[bool]) -> usize {
 /// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
 pub fn held_out(field: &Constitution, codec: &Codec, problems: &Problems, realization: &mut dyn Realization) -> Result<[(i64, usize); 3]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false }).collect();
     let mut out = [(0i64, 0usize); 3];
     let mut opening = 0usize;
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {
@@ -464,7 +464,10 @@ impl Cut {
         }
         let (q, a) = (drawn.q as usize, drawn.a as usize);
         let region = if drawn.frontier {
-            frontier_state_of(classes, drawn.ends.then(|| codec.void()))
+            // The pass's word: the stretch at the frontier is read as a known stream ([`StorePass::before`]).
+            let mut state = frontier_state_of(classes, drawn.ends.then(|| codec.void()));
+            state.region.before = self.pass.before;
+            state
         } else if self.pass.own {
             own_state_of(drawn.d, classes, q, a)
         } else {

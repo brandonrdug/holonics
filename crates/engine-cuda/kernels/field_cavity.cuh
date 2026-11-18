@@ -142,7 +142,8 @@ extern "C" __global__ void field_cavity_open(FieldWords w, int64_t *cx) {
         if (w.site_pos[t] > 0) {
             x += opening_term(w, w.enc_before, t - 1, i);
         }
-        if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
+        // [the known stream] The site after has not arrived (the host's `Constitution::cavity_forward_sided`).
+        if (!w.before && t + 1 < w.T && w.site_pos[t + 1] > 0) {
             x += opening_term(w, w.enc_after, t + 1, i);
         }
         cx[c] = x;

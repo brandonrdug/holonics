@@ -239,12 +239,24 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
     tick written for the open places (`Constitution::strand_faces`) is kept as the joined tick's oracle, and the chart's single
     stream of veiled sources (`Constitution::chart_faces`) as a reading (two and a half nats from the state as trained; the two
     streams half a nat).
-  - owed, in order: the card's realization and its parity; the mode as a region's own word in place of the ruler's setting, with a
-    word of the pass for stretches read this way and the learner's section taking such a region; the held read; then the level and
-    the second read's mark made one-sided, which the two streams leave out and which are worth 0.16 nats at the frontier's place.
-  - the card's form (read in the kernels, November 18; `agent-inferred` until its parity holds): a passage is two regions of the
-    batch. The known region's sites hear only what stands before them (a mode of the region: the support's and the crowds' side, the
-    class counts, the moments' and the opening's after rows, the strand's odd contacts and the circles from the right). Its open
+  - built on the card, its first step (November 18, 13:20 UTC): the known stream. It is a batch's word (`FieldWords::before`): a support
+    entry and a crowd on the after side meet no site, a still head shares a class's face among its members before the receiver, the
+    opening and the moments read no after row, an odd strand contact has no mate, a circle scanned from the right stays at rest, and a
+    region's first site is a row not computed; the level is unheard and the field reads once. It is the host's forward under a ruler at
+    `3` and, as a region's own word (`Region::before`, atlas `tower.region-known-stream`), a law of the region: a section's known
+    streams run as a second group on the card, each one's return standing for both reads where the field reads twice, and the faces
+    and the training path's words stand in the regions' order. The opening is compared there as the retarded one (the opening an open
+    place of the second stream begins from). Card against host, bit for bit, on four fields read once and twice, under the ruler at
+    `3` and `4` and in sections of the law holding known streams (`the_known_stream_on_the_card_reads_the_hosts_bits`, 24 cases). The
+    pass carries it for the frontier's stretches (`frontier E before`, `StorePass::before`, set by `set-frontier … before`), the held
+    read writes the frontier's rows read so (`K` rows, where the pass says so or on the word `known`), and the one-place writer writes a
+    state whose pass says so in that regime.
+  - owed, in order: the open places as the batch's second region and its return, bit for bit against `Constitution::strand_pass` and
+    `strand_returned`; a word of the pass for stretches read by two streams and the learner's section taking them; the held read; then
+    the level and the second read's mark made one-sided, which the known stream leaves out and which are worth 0.16 nats at the
+    frontier's place.
+  - the card's form for the second stream (read in the kernels, November 18; `agent-inferred` until its parity holds): a passage is
+    two regions of the batch. The known region's sites hear only what stands before them (built, above). Its open
     places are a second region of as many open sites whose source side is the known region's (its keys, values and class lists, its
     mate's `b` at the place before, its circle as it stands at the place), heard by no one. A site's position stays its place in both
     regions, and a region's block of scores stays its square, so a passage costs two regions' pairs where the host's joined batch

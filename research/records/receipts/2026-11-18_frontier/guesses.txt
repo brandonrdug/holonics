@@ -233,3 +233,23 @@ from an end state; the log law gives one more plain lap 0.007 at the mean.
   What it decides. If the cooled end reads 0.02 or more under the plain end at the frontier and its mean no worse than 0.006, the line
   with the share trains at rate 14 with the remainder carried: the state a writer writes from then stands on its mean. If not, the rate
   stays and the writes are made from a lap's mean.
+
+G-1118-11 (2026-11-18T13:22:22Z). The known stream at the frontier: does a context that hears only what stands before it carry the
+frontier's reading. Read before fixing: under a ruler at 3 the lap-70 line's trained state read the frontier 0.52 nats above the law's
+reading at 448 known places on fifty book stretches, and 0.16 of the rest is the level and the mark left out (the far read, reads.txt);
+the first lap with the frontier's share took 0.16 of the frontier's level in a lap by changing only which states are compared; the
+frontier's fall then follows 0.0458 ln(sections). The card's known stream holds the host's bits (24 cases, 13:19 UTC).
+  The trial. From arm F6's end state (lap 70 and six laps with the share): one lap with the frontier's stretches read as known streams
+  (`frontier 6 before`, arm K7), beside the plain lap from the same state that the rate trial runs (arm F7). Arm K7 is read at its
+  end and its lap mean on the frontier's rows both ways (under the law, rows F; each region a known stream, rows K), arm F6's mean is
+  read both ways for the level before any training in the regime, and arm K7 is written on both panels from its end as a known
+  stream.
+  The guess. (a) Before training: arm F6's mean reads the frontier 0.45 to 0.75 nats higher as known streams than under the law, over
+  all held places, more where more places are known. (b) After the lap, at lap means: arm K7's known-stream rows stand 0.10 to 0.25
+  above arm F7's rows under the law (so the lap takes back between a half and four fifths of (a)). (c) Arm K7's rows under the law
+  stand 0.05 to 0.20 above arm F7's (the state leaves the two-sided reading). (d) The panels written as known streams: 35% to 47% of
+  words in the lexicon on each (arm F6's end as the law reads it wrote 49% and 49%). (e) The lap's card time within 15% of arm F7's.
+  What it decides. If (b) reads 0.15 or less, a one-sided context carries the frontier's reading at this size and the second stream
+  is built on it. Between 0.15 and 0.35, a second lap is read for the slope before the second stream is built. Above 0.35, the
+  one-sided context loses what the two-sided one holds, and where it loses it (by places known, by slice) is read before any build.
+  A rule's reading is an inference: the reads are reported as they come.

@@ -915,8 +915,8 @@ impl Constitution {
     /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`Declaration::mark`]), the first read is this one
     /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
     pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
-        // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read.
-        if !self.declaration.mark || self.ruler_far >= 3 {
+        // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read, and so is a known stream's ([`Region::before`]).
+        if !self.declaration.mark || self.ruler_far >= 3 || region.before {
             return self.pass_with(region, keep, None);
         }
         let first = self.pass_with(region, keep, None)?;
@@ -966,7 +966,7 @@ impl Constitution {
         let paces = self.paces(region)?;
         // [measurement] A ruler's forward ([`Constitution::ruler_far`]): at `3` the moments and the opening read only what stands before a
         // site; at `3` and `4` the level is not heard.
-        let (after, levelled) = (self.ruler_far != 3, self.scale.is_some() && self.ruler_far < 3);
+        let (after, levelled) = (!self.sided(region), self.scale.is_some() && self.ruler_far < 3 && !region.before);
         let moment = self.moments_sided(region, &paces, after)?;
         let mut x = self.open_sided(region, &moment, marks, after)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
@@ -1006,7 +1006,7 @@ impl Constitution {
             if self.lock_carry.is_some() {
                 cell.lock_prev = std::mem::take(&mut locks);
             }
-            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, if self.ruler_far == 3 { Sided::Before } else { Sided::Both })?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, if self.sided(region) { Sided::Before } else { Sided::Both })?;
             if self.lock_carry.is_some() {
                 locks = cell.rows.iter().map(|row| row.iter().map(|src| (src.j, src.s)).collect()).collect();
             }
@@ -1154,7 +1154,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
         // The known stream, its ticks kept: the forward a ruler reads at `3`.
         let mut stream = self.clone();
         stream.ruler_far = 3;
@@ -1214,7 +1214,7 @@ impl Constitution {
         }
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false };
         self.admit_region(&region)?;
         let (dw, m2) = (d.width, 2 * d.complex());
         let reaches = self.reaches();

@@ -180,7 +180,8 @@ impl<'c> Resident<'c> {
         let compared = |t: usize| mask[t] != 0;
         let own: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| compared(t)).map(|t| (a, t as u32, 1 << STATE_BITS)).collect();
         let before: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| compared(t) && site_pos[t] > 0).flat_map(|t| terms(t - 1, t as u32)).collect();
-        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| compared(t) && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
+        // [the known stream] No after row was read (`FieldWords::before`), and none takes a covector.
+        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| words.before == 0 && compared(t) && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
         for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
             let (rows_sites, rows_shares, segments) = encoding_partition(&rows, a + 1);
             let count = (segments.len() / 3) as u32;

@@ -23,18 +23,20 @@ pub struct OwnedRegion {
     pub window: bool,
     /// Whether its port compares its open places on their letters off the void ([`holonics::hnn::tower::field::Port::letters`]).
     pub letters: bool,
+    /// Whether it is read as a known stream ([`Region::before`]).
+    pub before: bool,
 }
 
 impl OwnedRegion {
     /// A region carrying no face and no lock.
     pub fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, before: false }
     }
 }
 
 /// A region as the field reads it.
 pub fn view_of(region: &OwnedRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }), before: region.before }
 }
 
 /// The regions as the field reads them.
@@ -81,6 +83,15 @@ pub struct Region<'a> {
     /// cells, never the void) by the coupling at temperature one ([`crate::coupling::coupling_code`]), an
     /// unused place writing `void`. `None` where every open site is compared at its own place.
     pub port: Option<Port<'a>>,
+    /// [definition; the lead, November 18, the frontier record §6; `agent-inferred`] **A region read as a known stream**: every site hears only
+    /// what stands before it (the tick under [`crate::contact::Sided::Before`]: the support's and the crowds' side, a still head's class count,
+    /// the opening's and the moments' after rows, the odd strand contacts, the circles from the right; the region's first site meets no
+    /// source), the level is not heard, the field reads it once, and its opening is compared as the retarded one
+    /// ([`Constitution::cavity_forward_sided`]). A site's state is then a function of the symbols up to its own place, so a place's reading
+    /// stands whatever follows it: the regime a writer is in at its frontier, and the known stream of a passage read by two streams
+    /// ([`Constitution::strand_pass`]). Where the field reads twice, the one read stands for both in the section's mean
+    /// ([`Constitution::returned`]). Unset is the law as it stood.
+    pub before: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
@@ -269,9 +280,19 @@ pub struct Echo {
 
 impl Constitution {
 
+    /// Whether `region` is read with every site hearing only what stands before it: its own word ([`Region::before`]), or a ruler's forward
+    /// at `3` ([`Constitution::ruler_far`]).
+    pub(crate) fn sided(&self, region: &Region) -> bool {
+        region.before || self.ruler_far == 3
+    }
+
     pub(crate) fn admit_region(&self, region: &Region) -> Result<()> {
         if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
             return refuse("a region needs one class and one resolution a site, and two sites to meet");
+        }
+        // A triad's third leg is read at the site after (`triad_products`), which a known stream's site has not met; no one-sided triad is built.
+        if self.sided(region) && self.declaration.triads > 0 {
+            return refuse("a known stream on a field with triads, whose third leg is the site after");
         }
         if region.classes.len() > self.declaration.reach {
             return refuse("a region past the field's reach, where its frames would repeat");
