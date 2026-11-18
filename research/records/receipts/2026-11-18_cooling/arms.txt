@@ -1,0 +1,42 @@
+The cooling laps (G-1118-1): one lap of 3,000 sections each from lap 70's end state on the store of November 12, the same sections for
+every arm. A: rate 12, the line's law. B: rate 12 with the step's remainder carried. C: rate 14 with it. D: rate 16 with it.
+The card (RTX 4080 SUPER) under its lock, one run at a time: laps 1,445 s (A), 1,439 s (D), 1,440 s (C), 1,400 s (B); a read-cavity 216 to
+236 s. Readers: tools/arms_ruler.py (paired with A), text/score.py for the panel. Codes and counts only; no text is here.
+MEAN.3000 is the mean of the states of a lap's last 1,000 sections.
+
+ARMS held, one place open, arm A at its mean: all 0.7727 (100508 places) | books 0.8123 code 0.4912 science 0.6977 web 0.8521 wikidata 1.0094
+ARMS held, whole masks, arm A at its mean: all 2.2089 (3717 places) | books 2.0736 code 2.0973 science 2.0736 web 2.3894 wikidata 2.4372
+ARMS held, one place open, arm A at its end: all 0.7901 (100508 places) | books 0.8330 code 0.5035 science 0.7146 web 0.8701 wikidata 1.0285 || less the control's mean, paired: +0.0174 (±0.0008) | books +0.0208 code +0.0123 science +0.0169 web +0.0179 wikidata +0.0191
+ARMS held, whole masks, arm A at its end: all 2.2239 (3717 places) | books 2.0831 code 2.1055 science 2.0806 web 2.4128 wikidata 2.4654 || less the control's mean, paired: +0.0150 (±0.0038) | books +0.0095 code +0.0083 science +0.0070 web +0.0235 wikidata +0.0282
+ARMS travel, arm A: a 1,000-section move over the state's size 0.02032, 0.01947, 0.02029; the lap's whole move 0.02926; cosines of successive moves -0.195, -0.171; the push at its end, mean |m|/(sqrt(v)+1) 0.189 over 378165 entries
+ARMS sections paired with A, arm B, 3000 sections; the training code a compared place, arm less control, nats, by third then whole: +0.0000 (±0.0000; the control 2.2856) | +0.0001 (±0.0000; the control 2.2804) | +0.0000 (±0.0000; the control 2.2824) | +0.0000 (±0.0000; the control 2.2828) || the opening's code a place, arm less control, whole: +0.0000
+ARMS held, one place open, arm B at its mean: all 0.7727 (100508 places) | books 0.8125 code 0.4912 science 0.6977 web 0.8523 wikidata 1.0091 || less the control's mean, paired: +0.0000 (±0.0001) | books +0.0002 code +0.0000 science +0.0000 web +0.0002 wikidata -0.0002
+ARMS held, whole masks, arm B at its mean: all 2.2089 (3717 places) | books 2.0731 code 2.0972 science 2.0746 web 2.3917 wikidata 2.4343 || less the control's mean, paired: +0.0001 (±0.0007) | books -0.0004 code -0.0001 science +0.0011 web +0.0023 wikidata -0.0029
+ARMS held, one place open, arm B at its end: all 0.7898 (100508 places) | books 0.8330 code 0.5031 science 0.7143 web 0.8698 wikidata 1.0279 || less the control's mean, paired: +0.0171 (±0.0008) | books +0.0207 code +0.0119 science +0.0166 web +0.0176 wikidata +0.0185
+ARMS held, whole masks, arm B at its end: all 2.2243 (3717 places) | books 2.0825 code 2.1068 science 2.0802 web 2.4129 wikidata 2.4674 || less the control's mean, paired: +0.0154 (±0.0038) | books +0.0089 code +0.0095 science +0.0066 web +0.0235 wikidata +0.0301
+ARMS travel, arm B: a 1,000-section move over the state's size 0.02032, 0.01947, 0.02029; the lap's whole move 0.02927; cosines of successive moves -0.194, -0.171; the push at its end, mean |m|/(sqrt(v)+1) 0.189 over 378171 entries
+ARMS sections paired with A, arm C, 3000 sections; the training code a compared place, arm less control, nats, by third then whole: -0.0064 (±0.0003; the control 2.2856) | -0.0098 (±0.0003; the control 2.2804) | -0.0100 (±0.0003; the control 2.2824) | -0.0087 (±0.0002; the control 2.2828) || the opening's code a place, arm less control, whole: -0.0034
+ARMS held, one place open, arm C at its mean: all 0.7696 (100508 places) | books 0.8089 code 0.4882 science 0.6938 web 0.8504 wikidata 1.0059 || less the control's mean, paired: -0.0031 (±0.0004) | books -0.0033 code -0.0030 science -0.0039 web -0.0017 wikidata -0.0035
+ARMS held, whole masks, arm C at its mean: all 2.2085 (3717 places) | books 2.0660 code 2.0977 science 2.0710 web 2.3940 wikidata 2.4412 || less the control's mean, paired: -0.0004 (±0.0018) | books -0.0076 code +0.0005 science -0.0026 web +0.0046 wikidata +0.0039
+ARMS held, one place open, arm C at its end: all 0.7729 (100508 places) | books 0.8113 code 0.4904 science 0.6966 web 0.8540 wikidata 1.0114 || less the control's mean, paired: +0.0002 (±0.0005) | books -0.0009 code -0.0008 science -0.0011 web +0.0018 wikidata +0.0021
+ARMS held, whole masks, arm C at its end: all 2.2125 (3717 places) | books 2.0689 code 2.0992 science 2.0788 web 2.4016 wikidata 2.4407 || less the control's mean, paired: +0.0036 (±0.0025) | books -0.0047 code +0.0020 science +0.0052 web +0.0122 wikidata +0.0035
+ARMS travel, arm C: a 1,000-section move over the state's size 0.00784, 0.00645, 0.00670; the lap's whole move 0.01204; cosines of successive moves +0.006, -0.052; the push at its end, mean |m|/(sqrt(v)+1) 0.190 over 378053 entries
+ARMS sections paired with A, arm D, 3000 sections; the training code a compared place, arm less control, nats, by third then whole: -0.0045 (±0.0006; the control 2.2856) | -0.0099 (±0.0004; the control 2.2804) | -0.0106 (±0.0004; the control 2.2824) | -0.0083 (±0.0003; the control 2.2828) || the opening's code a place, arm less control, whole: -0.0024
+ARMS held, one place open, arm D at its mean: all 0.7714 (100508 places) | books 0.8106 code 0.4898 science 0.6950 web 0.8517 wikidata 1.0091 || less the control's mean, paired: -0.0013 (±0.0005) | books -0.0016 code -0.0014 science -0.0027 web -0.0004 wikidata -0.0003
+ARMS held, whole masks, arm D at its mean: all 2.2146 (3717 places) | books 2.0740 code 2.1070 science 2.0731 web 2.3989 wikidata 2.4476 || less the control's mean, paired: +0.0057 (±0.0024) | books +0.0004 code +0.0097 science -0.0005 web +0.0095 wikidata +0.0104
+ARMS held, one place open, arm D at its end: all 0.7714 (100508 places) | books 0.8111 code 0.4909 science 0.6956 web 0.8516 wikidata 1.0072 || less the control's mean, paired: -0.0013 (±0.0005) | books -0.0012 code -0.0003 science -0.0021 web -0.0006 wikidata -0.0022
+ARMS held, whole masks, arm D at its end: all 2.2146 (3717 places) | books 2.0738 code 2.1070 science 2.0740 web 2.3985 wikidata 2.4470 || less the control's mean, paired: +0.0057 (±0.0025) | books +0.0003 code +0.0098 science +0.0004 web +0.0091 wikidata +0.0098
+ARMS travel, arm D: a 1,000-section move over the state's size 0.00320, 0.00218, 0.00219; the lap's whole move 0.00511; cosines of successive moves +0.227, +0.130; the push at its end, mean |m|/(sqrt(v)+1) 0.189 over 378060 entries
+
+== The panel: the fifty books' sixteen held prompts, 64 places each, by the law's writer in place order (host, six threads, about 114 s a state) ==
+PANEL A_end 04:28:22 w_A_end/forms.written seen: words 43 in_lexicon 20 (46%) longest_copy 9 held: words 56 in_lexicon 25 (44%) longest_copy 11 unread: words 59 in_lexicon 31 (52%) longest_copy 10 
+PANEL A_mean 04:30:15 w_A_mean/forms.written seen: words 42 in_lexicon 19 (45%) longest_copy 10 held: words 71 in_lexicon 34 (47%) longest_copy 11 unread: words 67 in_lexicon 30 (44%) longest_copy 11 
+PANEL D_end 04:32:11 w_D_end/forms.written seen: words 43 in_lexicon 23 (53%) longest_copy 11 held: words 60 in_lexicon 29 (48%) longest_copy 12 unread: words 57 in_lexicon 23 (40%) longest_copy 14 
+PANEL_ALL_DONE 04:32:12
+
+== The level's worth: its prolongation (B and b_B, 49,920 entries) set to zero on a lap's mean, read as the lap's own mean was (read-cavity,
+   216 s and 290 s), paired place by place with that lap's own read ==
+LEVEL lap 70's mean, the level's return zeroed, one place open: with the level 0.7734, without 0.9264, the difference +0.1529 (±0.0022; 100508 places) | books +0.1553 code +0.1136 science +0.1230 web +0.1383 wikidata +0.2341
+LEVEL lap 70's mean, the level's return zeroed, whole masks: with the level 2.2127, without 2.4384, the difference +0.2257 (±0.0122; 3717 places) | books +0.2090 code +0.2442 science +0.2151 web +0.1734 wikidata +0.2954
+LEVEL lap 94's mean, the level's return zeroed, one place open: with the level 0.8811, without 1.0933, the difference +0.2121 (±0.0022; 132497 places) | arithmetic +0.4567 books +0.1758 code +0.1510 science +0.1271 web +0.1959 wikidata +0.2504 words +0.2321
+LEVEL lap 94's mean, the level's return zeroed, whole masks: with the level 2.2672, without 2.5557, the difference +0.2885 (±0.0140; 5477 places) | arithmetic +0.5787 books +0.1995 code +0.2339 science +0.2053 web +0.2057 wikidata +0.3121 words +0.2487

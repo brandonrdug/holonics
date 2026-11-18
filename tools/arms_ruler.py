@@ -2,8 +2,8 @@
 
 It reads, for a control arm and each other arm in a directory DIR (files as `cool.sh` leaves them: `arm_N.log`, `arm_N/STATE.k`,
 `arm_N/MEAN.k`, `OPEN.N`, `out_mean_N/cavity.tsv`, `out_end_N/cavity.tsv`):
-- the sections' own training codes, paired section by section with the control (the code of a section's compared places before its
-  step, over its domain), by thirds of the lap, in nats a compared place, with the paired difference's standard error;
+- the sections' own training codes, paired section by section with the control (a section's code a compared place before its
+  step, as its line prints it), by thirds of the lap, in nats a compared place, with the paired difference's standard error;
 - the held read at each arm's mean and end, one place open and whole masks, by slice, each paired place by place with the control's
   mean, in nats a place;
 - each arm's travel: the size of its moves between saves against the state's own size, and the cosine between successive moves;
@@ -33,11 +33,11 @@ def paired_sections(a, b, name):
     n = len(common); thirds = [common[: n // 3], common[n // 3: 2 * n // 3], common[2 * n // 3:]]
     parts = []
     for part in thirds + [common]:
-        # a section's code a compared place; the pair's difference weighed by the control's domain
-        da = np.array([a[k][0] / a[k][1] for k in part]); db = np.array([b[k][0] / b[k][1] for k in part])
+        # a section's line gives its code a compared place already (on 2^-20 bits); the pairs are unweighed
+        da = np.array([a[k][0] for k in part]); db = np.array([b[k][0] for k in part])
         diff = db - da
         parts.append(f"{diff.mean():+.4f} (±{diff.std(ddof=1) / math.sqrt(len(diff)):.4f}; the control {da.mean():.4f})")
-    oa = np.array([a[k][2] / max(a[k][3], 1) for k in common]); ob = np.array([b[k][2] / max(b[k][3], 1) for k in common])
+    oa = np.array([a[k][2] for k in common]); ob = np.array([b[k][2] for k in common])
     print(f"ARMS sections paired with {control}, arm {name}, {n} sections; the training code a compared place, arm less control, nats, by third then whole: " + " | ".join(parts)
           + f" || the opening's code a place, arm less control, whole: {np.nanmean(ob - oa):+.4f}")
 

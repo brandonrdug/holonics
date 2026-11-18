@@ -40,3 +40,30 @@ the panel at 56%. Tonight's cooling arms: a cooler deposit does not move the lev
   What it decides. If both hold, the line's diet takes the boundary regime as a declared share beside its masks, and the build is the
   store trainer's state law. If the place between known neighbours is lost anyway, the two regimes cannot share these rows by upkeep
   alone, and they need loci of their own.
+
+Scored (2026-11-18T05:38:49Z), G-1118-1 (arms.txt).
+  (a) The sections' training code, paired with A, nats a compared place by third of the lap: D -0.0045, -0.0099, -0.0106 (0.005 to 0.030
+      under A over the last third, and under it over the first: held, though D stood above A for its first 270 sections); C -0.0064,
+      -0.0098, -0.0100, which is 0.94 of D's last third (a half to nine tenths guessed: at its edge, over); B +0.0000, +0.0001, +0.0000
+      (within 0.002: held).
+  (b) The end against the mean, one place open: A's end reads 0.0174 above A's mean (0.004 to 0.012 guessed: missed, the spread costs
+      more than I had it); D's end reads 0.0000 from D's mean (within 0.002: held). C's end reads 0.0033 above C's mean.
+  (c) The means, one place open, paired with A's: D -0.0013 (within 0.004: held), C -0.0031, B +0.0000. At whole masks: D +0.0057
+      (within 0.010: held), C -0.0004, B +0.0001.
+  (d) Travel: the cosines between A's successive 1,000-section moves are -0.195 and -0.171 (under -0.10: held); D's are +0.227 and
+      +0.130 (above zero: held); C's are +0.006 and -0.052. A 1,000-section move over the state's size: A 0.020, C 0.007, D 0.002 to 0.003.
+  (e) The panel's words in the lexicon: A at its end 76 of 158 (48%), A at its mean 83 of 180 (46%), D at its end 75 of 160 (47%)
+      (within five points: held).
+  The audit thread's guesses (receipts/2026-11-18_audit-levels/README.md), fixed for arms without the remainder and scored here on arms
+  with it: G-A1, the control one place open 0.7710 to 0.7750 and whole masks 2.206 to 2.218: held (0.7727, 2.2089). G-A2, rate 14 under
+  the control by 0.006 to 0.016 one place open and 0.003 to 0.015 at whole masks: missed (0.0031, 0.0004). G-A3, rate 16 under by 0.007
+  to 0.020 and no more than 0.006 under rate 14's: missed on the first (0.0013), and rate 16 stands above rate 14. G-A4, the move over
+  the lap at rate 14 at 0.20 to 0.35 of the control's: 0.41 over the whole state. Its own rule: "a fall under 0.004 at both cooler rates
+  says the standing spread is not what holds this line's level, and the form is."
+  What it says: the fixed rate is why the state walks and why its end stands 0.017 above its own mean. It is not why the level stands:
+  read at the mean, as the line has been read since November 11, a cooler deposit buys 0.003 at most with one place open and nothing
+  at whole masks, and the writes do not change. The truncated step buys nothing at rate 12.
+
+The level's worth, read without a guess (the audit's "decide the level": if the code does not move with the level's prolongation
+zeroed, the level is out). It moves: lap 70's mean reads 0.7734 with the level and 0.9264 without it with one place open, 2.2127 and
+2.4384 at whole masks; lap 94's 0.8811 and 1.0933, 2.2672 and 2.5557. The level stays.
