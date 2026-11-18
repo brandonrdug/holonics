@@ -268,3 +268,21 @@ its rule sends a reading of (b) between 0.15 and 0.35 to a second lap, which thi
   What it decides. Nothing about the build's order: the second stream is built on the known stream either way, since the first lap
   already stands at the two-sided reading without the level. It sizes what laps in the regime buy before every place is compared, and
   it says whether the reading under the law keeps leaving. A fall of 0.10 or more would say the regime is still in its transient.
+
+G-1118-13 (2026-11-18T15:10:47Z). Every place compared: the first lap of passages read by two streams. Read before fixing: the card holds the host's
+bits (16 cases); arm K8's sections hold 312 regions of which 234 are stretches at the frontier, one comparison each, in 366 ms; a
+stretch read by two streams compares every place past its first and stands on the card as twice its sites, so by the pass's bounds a
+section holds about half as many stretches and compares on the order of ten thousand places at the frontier; the deposit's step is
+normalized (rate 12), so more comparisons a section lower the step's noise and do not lengthen it, and the cooled lap of this morning
+bought 0.013 at its mean, so noise is a small part of what a lap's mean leaves; the open places run on the bare clock, 0.004 to 0.013
+from the known stream's reading before any training in it.
+  The trial. From arm K8's end state (two laps as known streams): the pass's word set to frontier 6 strand, a development read of 150
+  sections for the lap's projection, then one lap of 3,000 sections (arm S9), read at its end and its lap mean on the held places (rows
+  F under the law, K as known streams, S by two streams) and written on both panels from its end by two streams.
+  The guess. (a) A section takes 300 to 600 ms. (b) At lap means arm S9's rows S stand 0.04 to 0.14 nats under arm K8's rows K.
+  (c) Arm S9's end stands within 0.015 of its own mean on rows S. (d) Its rows under the law stand within 0.08 of arm K8's; one place
+  open and whole masks stand 0.00 to 0.06 above arm K8's. (e) The panels written by two streams: 40% to 56% of words in the lexicon.
+  What it decides. If (b) reads 0.10 or more, every place compared is the lever at the rate the line holds and the line takes the two
+  streams; the one-sided level is then the next build. Between 0.04 and 0.10 the gain is the noise's share, and the step's rate with
+  every place compared is read before more laps. Under 0.04 the frontier's comparisons are not what binds at this rate, and the step
+  is read next. A rule's reading is an inference: the reads are reported as they come.

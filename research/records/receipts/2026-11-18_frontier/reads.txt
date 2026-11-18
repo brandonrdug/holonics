@@ -193,3 +193,24 @@ The open place's clock, read again from its own face or left bare (written 2026-
   FRONTIER K7_mean; the frontier, each region a known stream (against the control's rows under the law): all 2.0857 (99844 places) | books 2.0469 code 1.8183 science 2.1178 web 2.2396 wikidata 2.2059 || less the control's, paired: +0.2736 (±0.0027) | books +0.2181 code +0.2874 science +0.3338 web +0.2645 wikidata +0.2643
   FRONTIER K7_mean; a known stream less the law's reading of the same state, paired: +0.1106 (±0.0029) over 99844 places
   FRONTIER K7_mean; the frontier by places known (less the control's): 1: 4.150 (-0.037) | 2 to 3: 2.893 (-0.007) | 4 to 7: 2.558 (+0.092) | 8 to 15: 2.403 (+0.099) | 16 to 31: 2.259 (+0.129) | 32 to 63: 2.106 (+0.146) | 64 to 127: 1.941 (+0.160) | 128 to 255: 1.850 (+0.180) | 256 to 511: 1.796 (+0.193) | 512 to 1023: 1.788 (+0.185)
+
+The card's second stream and the trials' reads of 14:40 to 15:10 UTC (written 2026-11-18T15:10:47Z; build 2529e2baa; nats a place).
+- Card against host: a_passage_read_by_two_streams_on_the_card_reads_the_hosts_bits passed at 15:07:03 UTC on its first run (89 s, in a
+  gap of the card's queue): four fields (plain, carry circles, the opening compared, a level), each read once and grown to read twice,
+  passages of 2, 3, 7, 64 and 300 places read by two streams, alone (5 regions, 371 places compared) and in a section beside regions
+  of the law and known streams (10 regions): 16 lines, every open place's face and every covector entry equal, the faces of a read
+  that does not return and the training path's words with the opening's codes equal. The known stream's test passed again on the same
+  binary (24 cases, 37 s). Gate 1 passes; the host suite 144 pass, 1 ignored.
+- Arm F7 (the plain lap beside arm C7, from arm F6's end; 1,661 s with host rulers reading beside it) at its END, and arm C7's end
+  against it:
+  FRONTIER F7_end; one place open: all 0.9416 (100508 places) | books 0.9935 code 0.6409 science 0.8893 web 1.0263 wikidata 1.1572
+  FRONTIER F7_end; whole masks: all 2.3518 (3717 places) | books 2.1937 code 2.2604 science 2.2663 web 2.4759 wikidata 2.5906
+  FRONTIER F7_end; the frontier: all 1.8463 (99844 places) | books 1.8726 code 1.5618 science 1.8150 web 2.0140 wikidata 1.9679
+  FRONTIER C7_end; one place open: all 0.9041 (100508 places) | books 0.9524 code 0.6075 science 0.8487 web 0.9865 wikidata 1.1247 || less the control's, paired: -0.0375 (±0.0011) | books -0.0411 code -0.0334 science -0.0406 web -0.0398 wikidata -0.0325
+  FRONTIER C7_end; whole masks: all 2.3254 (3717 places) | books 2.1729 code 2.2485 science 2.2352 web 2.4622 wikidata 2.5336 || less the control's, paired: -0.0264 (±0.0047) | books -0.0208 code -0.0119 science -0.0311 web -0.0138 wikidata -0.0570
+  FRONTIER C7_end; the frontier: all 1.8058 (99844 places) | books 1.8295 code 1.5208 science 1.7741 web 1.9709 wikidata 1.9337 || less the control's, paired: -0.0405 (±0.0011) | books -0.0431 code -0.0410 science -0.0409 web -0.0431 wikidata -0.0342
+- Arm F6's lap mean read as known streams (rows K: the level before any training in the regime), against its rows under the law:
+  FRONTIER F6k; the frontier, each region a known stream (against the control's rows under the law): all 2.8948 (99844 places) | books 2.8134 code 2.8194 science 2.8869 web 2.9646 wikidata 2.9890 || less the control's, paired: +1.0827 (±0.0046) | books +0.9846 code +1.2885 science +1.1029 web +0.9896 wikidata +1.0474
+  FRONTIER F6k; each region a known stream, less the law's reading of the same state, paired: +1.0827 (±0.0046) over 99844 places
+  So before any training as known streams the frontier read 1.0827 above the law's reading on the held places; arm K7's lap left
+  0.2736 of it at lap means.
