@@ -398,3 +398,17 @@ held), (c) 346 (300 to 420: held). The moment's 300 leading directions: (a) 322 
 so the claim's direction holds; the bright figure missed because the dark places after a bright one stand in its sixth, and a decoder at
 that phase gives their mixture. A level on the news phase hands a place its unit's strand by sixths and not the place's own turn.
 
+
+G-V4 (2026-11-18T00:37:59Z). Whether her bound span is her count of ticks, on the night's pass-15 state at the boundary (48 known places, the next open).
+A face fitted by the ruler (a linear readout to the symbols, a softmax fitted on a sample of the training passage's rows and read on the
+5,164 held rows) on the open place's chart at the opening and after one, two and three ticks, in nats a place, beside her own face
+after the fourth tick and the night's counts of the last k symbols bound in order.
+  Read before fixing: her face 1.527 held; the counts 2.428, 2.003, 1.698, 1.502, 1.433, 1.395 for k = 1 to 6; on the masked line of
+  November 13 the fitted faces read 2.50, 1.93, 1.54, 1.36 and 1.31 from the opening to the last tick (G132). The opening holds the
+  strand's nearest row and the moment, an additive term of every source; the level's prolongation enters before the third tick.
+  The guess: the opening 2.20 to 2.45; after one tick 1.90 to 2.10; after two 1.68 to 1.82; after three 1.55 to 1.66. Each tick's fall
+  stands within 0.08 of the fall between the counts of k and k + 1 symbols (0.43, 0.30, 0.20).
+  What it decides: if the ticks track the counts, a place binds one symbol a tick and her binding order is her depth; the place level
+  then cannot make a unit's interior dark past about its count of ticks, and the theory's question is how a place binds farther without
+  a tick paid at every place. If the first tick already reads within 0.1 of her face, depth is not what bounds her and the cause is
+  looked for in what a tick's contact can lock.
