@@ -67,3 +67,17 @@ Scored (2026-11-18T05:38:49Z), G-1118-1 (arms.txt).
 The level's worth, read without a guess (the audit's "decide the level": if the code does not move with the level's prolongation
 zeroed, the level is out). It moves: lap 70's mean reads 0.7734 with the level and 0.9264 without it with one place open, 2.2127 and
 2.4384 at whole masks; lap 94's 0.8811 and 1.0933, 2.2672 and 2.5557. The level stays.
+
+Amended (2026-11-18T05:43:55Z), G-1118-2, after its read at pass 0 and before any later read. The trial's reader does not make the read the guess's
+second part names. Read in its source (crates/athena/src/ruler/tension.rs, the read table of try-passes): for a held row of 48 known
+places and a run of 32, its three columns are the run half open at keyed places and coded over its open places (`last_alone`), the
+whole run open and coded over all of it (`last_run_open`), and the whole run open and coded at its first place alone
+(`first_alone`, the next place at the boundary with 32 open places after it). None of them is one place open between known
+neighbours. I had fixed the guess from the columns' names. At pass 0 they read 2.001, 3.086 and 2.004 nats a place.
+  The second part is read instead by the line's own held read (read-cavity on the store's held passage, its rows with one place open),
+  on the trial's opening state (lap 94's end), on the mixed diet's state at pass 5 and pass 10, and beside them on the night's states
+  after ten passes of boundary rows alone and ten of half-open rows alone. Its bound stands as fixed: at pass 10 of the mixed diet
+  one place open reads no more than 0.10 nats above the opening state's by the same read. Fixed beside it, for the night's
+  boundary-only state at pass 10 by this read: 2.3 to 3.0 nats a place (its fifteenth pass read 2.921 on a dump of the store's
+  sections); for the half-open-only state: within 0.15 of the opening state's.
+  The hh columns are reported as what they are and carry no guess.
