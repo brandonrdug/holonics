@@ -1,0 +1,27 @@
+The cooling laps: guesses, each fixed and pushed before its read. Ids carry the date so that none repeats an earlier one.
+
+G-1118-1 (2026-11-18T03:22:29Z). The audits of November 18 rank first that the deposit runs at one fixed rate (2^-12 on every entry, laps 1 to 94) and
+that the state is a walk at its own noise floor. Read before fixing, by me, on the line's saved states: at lap 70 the mean of
+|m| / sqrt(v) over the entries is 0.22 where a covector with no consistent sign gives 0.20; the field's material moves 1.8% of its own
+size a lap and successive laps' moves have cosines -0.158 and -0.149 (laps 67 to 70); lap 70's held read at its mean is 0.7734 nats a
+place with one place open (code 0.4901, web 0.8494, science 0.6979, books 0.8131, wikidata 1.0157) and 2.2127 at whole masks (3,717
+places). On November 4 a smaller field's code stood at a fixed step and fell 0.043 nats at once when cooled from 2^-11 to 2^-16. On
+November 11 the line's lap ends read 0.0055 to 0.0107 above their laps' means. A step at a cool rate truncates to nothing on the
+face-grain entries (at 2^-16 on every one of them), so the cool arms carry the step's remainder (Learner::remainder, built for this and
+tested; the build reproduces lap 70's first 24 sections from lap 69's state line for line with no remainder in the state).
+  The trial. From lap 70's end state on the store of November 12 (text only, the last state before the terrain changed), one lap of
+  3,000 sections each, the same sections for every arm: A, the line's law at rate 12; B, rate 12 with the remainder carried; C, rate 14
+  with the remainder; D, rate 16 with the remainder. Each read at its lap's mean and at its end, one place open and whole masks, paired
+  place by place with A; the sections' own training codes paired section by section with A; the panel written.
+  The guess.
+  (a) The sections' training code, paired with A: D stands under A by 0.005 to 0.030 nats a compared place over the lap's last third,
+      and is already under it over the first third; C by a half to nine tenths of D's gap; B within 0.002 of A.
+  (b) The end against the mean, one place open: A's end reads 0.004 to 0.012 above A's mean; D's end reads within 0.002 of D's mean.
+  (c) The means, one place open: D's mean stands within 0.004 of A's mean either way, because a mean of states already sheds the
+      spread. At whole masks, paired, within 0.010.
+  (d) Travel: the cosine between A's successive 1,000-section moves is under -0.10; D's is above zero.
+  (e) The panel's share of words in the lexicon moves by under five points between arms.
+  What it decides. (a) and (b) size the temperature the line has trained at. If they hold, the deposit's rate becomes a state with a
+  law (it cools where an entry's own push stands at the noise level), and whether a cooled state then compounds is read over further
+  laps against A continued, since one lap cannot show it. If D's training code does not fall under A's, the fixed rate is not what
+  holds the line and the first cause of both audits is wrong as stated.

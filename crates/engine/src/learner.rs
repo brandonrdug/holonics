@@ -218,6 +218,15 @@ pub struct Learner {
     /// growth. Its value is a trial's bracket until a law gives it (`agent-inferred`: the deposit's own rate is the candidate, the
     /// balance of a store's noise against its dissipation).
     pub leak: Option<u32>,
+    /// [definition; the lead, November 18, the audit of that day §1.8; the precision law (a term is released only by partition, its
+    /// remainder accounted)] **The step's carried remainder**, one an entry, on [`REMAINDER_BITS`] bits under the entry's own grain. Where
+    /// it is carried, a section's step is formed at that finer grain, `((m ≪ (grain + REMAINDER_BITS)) ≫ rate) / (⌊√v⌋ + 1)`, added to the
+    /// entry's remainder, and released to the entry's grain by its whole part (the floor), the rest staying in the remainder for the next
+    /// section. Without it the step is the truncated quotient, so an entry whose ratio `m / (⌊√v⌋ + 1)` times `2^(grain − rate)` stands
+    /// under one takes no step at all: on the line 38 to 47% of the encodings' entries a section at rate 12, and every one of them at a
+    /// rate of 16, which is what bars a cooler deposit from being read. Carried in the learner's text as a trailing `remainder` line after
+    /// the leak's and only where present; a state without the line has the truncating step.
+    pub remainder: Option<Vec<i64>>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`Receipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -349,7 +358,7 @@ impl Learner {
     pub fn new(field: Constitution, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None, remainder: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -492,8 +501,25 @@ impl Learner {
         mark(8);
         let (first, second) = (&self.first, &self.second);
         let mut step = vec![0i128; g.len()];
-        for &(start, len, grain) in &families {
-            step[start..start + len].par_iter_mut().enumerate().for_each(|(k, slot)| *slot = deposit_step(first[start + k], second[start + k], grain, rates[start + k]));
+        match self.remainder.as_mut() {
+            None => {
+                for &(start, len, grain) in &families {
+                    step[start..start + len].par_iter_mut().enumerate().for_each(|(k, slot)| *slot = deposit_step(first[start + k], second[start + k], grain, rates[start + k]));
+                }
+            }
+            // The step formed under the entry's grain, its whole part released and the rest carried ([`Learner::remainder`]). Each entry
+            // reads only its own moments, rate and remainder, so the order is free.
+            Some(remainder) => {
+                for &(start, len, grain) in &families {
+                    step[start..start + len].par_iter_mut().zip(remainder[start..start + len].par_iter_mut()).enumerate().for_each(|(k, (slot, carried))| {
+                        let fine = deposit_step(first[start + k], second[start + k], grain + REMAINDER_BITS, rates[start + k]);
+                        let sum = i128::from(*carried) + fine;
+                        let whole = sum >> REMAINDER_BITS;
+                        *carried = (sum - (whole << REMAINDER_BITS)) as i64;
+                        *slot = whole;
+                    });
+                }
+            }
         }
         mark(9);
         let predicted = predicted_change(&self.field, &raw, &step, 0);
@@ -558,7 +584,9 @@ impl Learner {
             let pass = self.pass.as_ref().map_or(String::new(), |p| format!("{}\n", p.to_line()));
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
             let leak = self.leak.map_or(String::new(), |k| format!("leak {k}\n"));
-            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+            // [definition; the lead, November 18] The step's carried remainders, a trailing line after the leak's and only where carried.
+            let remainder = self.remainder.as_ref().map_or(String::new(), |r| format!("remainder {}\n", r.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{remainder}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
 
@@ -662,11 +690,26 @@ impl Learner {
             }
             _ => None,
         };
+        // [definition; the lead, November 18] The step's carried remainders, a trailing line after the leak's (`remainder r₀ … r_(n−1)`):
+        // one an entry, each inside one grain.
+        let remainder = match lines.peek() {
+            Some(l) if l.starts_with("remainder ") => {
+                let v = read_numbers::<i64>(lines.next().and_then(|l| l.strip_prefix("remainder ")))?;
+                if v.len() != field.material_len() {
+                    return refuse("a learner's remainders that are not one an entry");
+                }
+                if v.iter().any(|&r| !(0..1i64 << REMAINDER_BITS).contains(&r)) {
+                    return refuse("a carried remainder outside one grain");
+                }
+                Some(v)
+            }
+            _ => None,
+        };
         // [definition; theory, November 12] The pass's place over a store, the text's last line where present ([`StorePass`]).
         let pass = match lines.peek() {
             Some(l) if l.starts_with("pass ") => Some(StorePass::from_line(lines.next().unwrap_or(""))?),
             _ => None,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, last: None, pass })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, last: None, pass })
     }
 }

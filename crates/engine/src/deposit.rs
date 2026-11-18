@@ -488,6 +488,11 @@ pub const HELD_RATE: u32 = 64;
 
 pub const SECOND_RATE: u32 = 8;
 
+/// [definition; the lead, November 18] **The bits a step's carried remainder holds under its entry's grain** ([`crate::learner::Learner::remainder`]):
+/// sixteen, so a face-grain entry's step is resolved to `2^(−32)`, the grain its first moment is carried on, and a rate of up to 28 bits
+/// still moves it.
+pub const REMAINDER_BITS: u32 = 16;
+
 /// A covector entry on the deposit's grain `2^(−32)` from its family's natural grain: a material
 /// family's `Σ δz x` on `2^(−40)` is released, a face family's `Σ δz` on `2^(−24)` raised. The moves
 /// step through their chart ([`Tower::to_move_chart`]) and are not read here.
