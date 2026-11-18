@@ -327,7 +327,12 @@ is rebased, factored or re-represented with its decoder and residual. The [helic
 relation: the known source family, the admitted controls, the participating receiver, and the
 requested consequence. It refines a joint field and releases its boundary, not a sequence of
 tokens. Text, image, acoustic and motor releases are applications of that relation. Robotics is an
-intended HNN capability, and its motor chart is serial screw words.
+intended HNN capability, and its motor chart is serial screw words. The order in which a boundary's
+places are released is the release's realization: a writer that opens one place at a time and draws
+it from the field's own face (the engine's `write-next`) is a release of this kind, and what the
+sentence bars is an emitter that reads counts or a seen context in place of the field's own state
+(`agent-inferred`, November 18, with THE_MACHINE's guard 18: the sentence can be read as a bar on
+writing in place order, and the line was first compared where it writes that day).
 
 [definition] **Languages are applications.** Lean, and every programming or natural language, is
 data to the HNN. No Lean parser, kernel call, theorem emitter, template or verdict enters the HNN.
