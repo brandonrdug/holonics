@@ -412,3 +412,14 @@ after the fourth tick and the night's counts of the last k symbols bound in orde
   then cannot make a unit's interior dark past about its count of ticks, and the theory's question is how a place binds farther without
   a tick paid at every place. If the first tick already reads within 0.1 of her face, depth is not what bounds her and the cause is
   looked for in what a tick's contact can lock.
+
+Scored (2026-11-18T00:58:29Z), G-V4 (tick_faces.txt; the fit on 36,943 training rows with a tenth aside, the read on the 5,164 held rows). The fitted
+faces, held, nats a place: the opening 2.028 (2.20 to 2.45 guessed: missed low); after one tick 2.039 (1.90 to 2.10: held); after two
+1.965 (1.68 to 1.82: missed high); after three 1.687 (1.55 to 1.66: missed high by 0.03); her own face after the fourth 1.479. The
+falls a tick are -0.011, 0.074, 0.278 and 0.208 against the counts' 0.416, 0.314 and 0.192 on the same rows (2.400, 1.984, 1.670,
+1.478 for one to four symbols): the first two are nowhere near, so the staircase as guessed missed.
+  What the read says instead. Her face codes these rows as a count of the last four bound symbols does (1.479 and 1.478). The opening
+  already reads like a bound pair (2.028 beside 1.984). The two ticks before the split move the compared place's code by 0.06. The two
+  ticks after it each add one bound symbol: 1.965, 1.687, 1.479 beside the counts of two, three and four, 1.984, 1.670, 1.478. So at
+  the compared place a tick binds one symbol and only the ticks after the split bind there; her order of four is a pair at the opening
+  and two late ticks. The level restricts and prolongs at the split, where a place holds a pair.
