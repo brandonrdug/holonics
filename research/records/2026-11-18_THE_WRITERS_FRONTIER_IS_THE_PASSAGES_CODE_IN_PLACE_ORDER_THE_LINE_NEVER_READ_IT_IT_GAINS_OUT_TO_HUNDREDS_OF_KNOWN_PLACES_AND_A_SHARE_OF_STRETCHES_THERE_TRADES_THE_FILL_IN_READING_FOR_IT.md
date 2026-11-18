@@ -148,8 +148,32 @@ before their receiver, the strand's mate before it) a site's state is a function
 source for every later one and a receiver of its own symbol at once, and one forward compares every place at its own frontier. Its
 acceptance was fixed there. I announced it that evening and spent the night on the level. Tonight's readings are its case and its
 sizes: the frontier's code is the passage's; a comparison there costs a region's read today; and a site of the chart hears as the
-frontier's place hears (every site before it sharply, the law's row for an open receiver, one side of it). It is taken up as written,
-on the host first with its two acceptance tests on the bits, then on the card.
+frontier's place hears (every site before it sharply, the law's row for an open receiver, one side of it). It is taken up, on the host first with its acceptance tests on the bits, then on the card.
+
+**Two one-sided forms, read before the build chose one (G-1118-7).** The chart as written veils every site to itself: a source
+carries no row of its own symbol. Its forward is in the tree (`Constitution::chart_faces`) with its test on the bits (a place's
+face is the same whatever stands at or after it). Read on the control's lap mean with 448 places known, nats a place at the frontier's
+place:
+
+| the law | one read, the level unheard | the same, every known place hearing only what stands before it | the chart's veiled sources |
+|---|---|---|---|
+| 1.930 | 2.094 | 2.610 | 4.362 |
+
+The level and the second read are worth 0.16 there. A known stream that keeps its own symbols and loses its after side stands half a
+nat from the state as trained; veiled sources stand two and a half. So the build is two streams: the known stream, every site hearing
+only what stands before it, and an open place at every place of it, which is the frontier's place of the region that ends there.
+Nothing hears an open place, so the second stream's places do not meet, and one forward of a passage reads what a region a place reads
+today. Its host forward is `Constitution::strand_faces`, and its oracle holds on the bits: at every place its face is the open last
+place's of the region `[0, t]` (`the_strands_open_place_is_its_frontier_regions`, with circles from both ends, paces off rest and a
+blank's clock read from its own face). Owed, in order: the return through both streams, the card's realization and its parity, a
+word of the pass for stretches read this way, and the held read.
+
+**The share** (G-1118-4). Every stretch at the frontier gains 0.022 nats more there in a lap than six of eight (0.1827 for 0.1603
+under the control) and loses 0.16 more at each two-sided reading. The share stays six of eight. The frontier's fall is not in
+proportion to the places compared: 1.6 times the comparisons bought a seventh more, and on the fifty books the first pass took 0.35
+nats and nine more took 0.19. The first comparisons at the frontier teach the state; what remains falls slowly at this size, so the
+second stream makes the store's five kinds of text meet in a lap what they would meet in fourteen, and it does not by itself lower
+where the fall rests.
 
 ## 7. What runs, and what is owed
 
