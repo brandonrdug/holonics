@@ -413,27 +413,6 @@ pub fn strand_mate(t: usize, e: usize, sites: usize) -> Option<usize> {
 
 impl Constitution {
 
-    /// [measurement; theory, November 11 17:25] **The carry circles' gates over a read pair chart** (`TickRead::pair_read`, `[t][D]`): at every site
-    /// and carry circle the gate `γ` of `q = Q r̂ + q_b`, `ℓ = L r̂ + ℓ_b` ([`carry_gate`]), `[t][C]` on `2^(−30)`, a reading (the forward's own
-    /// arithmetic on the chart the realization read).
-    pub fn carry_gammas(&self, pair_read: &[i32]) -> Result<Vec<(i64, i64)>> {
-        let d = &self.declaration;
-        if d.carry == 0 {
-            return refuse("a field without carry circles has no gate");
-        }
-        let (dw, circles) = (d.width, d.carry);
-        let (l, reach) = (&self.layout, self.reaches().carry);
-        let mut qh = vec![0i64; 2 * circles];
-        let mut out = Vec::with_capacity(pair_read.len() / dw * circles);
-        for rt in pair_read.chunks_exact(dw) {
-            affine(&self.theta[l.carry..l.carry + 2 * circles * dw], reach, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + 2 * circles]), MATERIAL_BITS, MATERIAL_BITS, &mut qh)?;
-            for k in 0..circles {
-                out.push(carry_gate(&self.exponential, qh[k] as i128, qh[circles + k] as i128)?.0);
-            }
-        }
-        Ok(out)
-    }
-
     /// [measurement; theory, November 12, G90's first branch] **The carry circles' leaks and charges over a read pair chart**
     /// (`TickRead::pair_read`, `[t][D]`), from the forward's own arithmetic on the chart the realization read: at every site and carry circle
     /// the leak read `ℓ = L r̂ + ℓ_b` on `2^(−16)` (the `ℓ` of [`carry_gate`]), and the circle's charge after the site, `|Q(t)|` on `2^(−16)`

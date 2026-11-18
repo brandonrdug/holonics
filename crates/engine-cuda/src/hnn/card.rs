@@ -1,65 +1,35 @@
-//! **The card: one context owning its module, stream and buffers, its census, and the launches
-//! derived from it** (the hardware law; #15).
+//! **The card: one context owning its stream and buffers, and its census** (the hardware law; #15).
 //!
 //! [definition] **Common context ownership (#15).** A [`Card`] owns one driver context and, inside
-//! it, the HNN's loaded image and one ordered stream. Every buffer is a [`CardBuffer`] that borrows
+//! it, one ordered stream. Every buffer is a [`CardBuffer`] that borrows
 //! its card, so it cannot outlive the context that allocated it, and every launch and transfer
 //! refuses a buffer of another card ([`CardError::ForeignBuffer`]): a cross-context use is
 //! unrepresentable past the card's life and refused within it. The card makes its context current
-//! before each driver call and before its buffers and module are released, so an owner on another
+//! before each driver call and before its buffers are released, so an owner on another
 //! context in the same thread never receives this card's work.
 //!
-//! [definition] **The census** ([`DeviceCensus`], [`EntryCensus`]): the device's capacity read
-//! through the driver (multiprocessors, warp, threads and blocks per block and per multiprocessor,
-//! the grid, shared memory and registers per block and per multiprocessor, memory), and each
-//! entry's lowered limits (its thread ceiling, registers, static shared and local octets). **No
-//! bound is authored:** every layout below is derived from these readings and the shape it
-//! covers, and a shape the census cannot carry is refused ([`CardError::Launch`]).
-//!
-//! [definition] **The partition is certified before the launch** (CLAUDE.md, hardware law):
-//! co-present blocks and threads commute when their reads and writes do.
-//! - The lattice read ([`read_layout`]): every block reads the shared immutable locus and operand
-//!   and writes only its own output entry and status; within a block, the threads' partial sums are
-//!   joined by the ring's addition and the certificate's saturated addition, both associative and
-//!   commutative, so the tree's order changes no value and no refusal (Lean
-//!   `HNN/LatticeWord.{certify_assoc, certify_comm, Reduction.order_free}`).
-//! - The moment ingest ([`ingest_layout`]): one block, so no two blocks share the moment; within
-//!   it, the counts are atomic integer additions (commutative), and each tile's scans are ordered
-//!   by barriers.
-//! - The inverse residual and refinement ([`read_layout`] over rows × columns): every block reads
-//!   the immutable operator, chart and residual and writes only its own entry (the refinement into
-//!   the other chart buffer). The certificate ([`certificate_layout`]): one block per chart, whose
-//!   row sums are joined by a tree of maxima (associative and commutative).
-//!
-//! Each [`Layout`] carries its [`Realization`], the report the hardware law asks for.
-
-use core::ffi::c_void;
-use core::marker::PhantomData;
+//! [definition] **The census** ([`DeviceCensus`]): the device's capacity read through the driver
+//! (multiprocessors, warp, threads and blocks per block and per multiprocessor, the grid, shared
+//! memory and registers per block and per multiprocessor, memory). **No bound is authored:** what a
+//! launch takes of the device (its multiprocessors, its memory) it reads here.
 
 use crate::cuda::{
     self, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, DeviceZeroable, Dim3,
-    MemoryInfo, Module, Stream,
+    MemoryInfo, Stream,
 };
 use crate::ffi::CUdeviceptr;
 
-/// [definition; November 14, C3 of #603] **The card's refusals**: the driver's, an absent image, the census, a foreign buffer, a launch
-/// the census cannot carry and a shape. They were cases of the October `DeviceError`, which converts from them case for case
-/// (`crate::hnn::DeviceError`); the card and the field's realization return only these.
+/// [definition; November 14, C3 of #603] **The card's refusals**: the driver's, the census, a foreign buffer and a
+/// shape. They were cases of the October `DeviceError` (retired with its crate, C8 of #603); the card and the field's
+/// realization return only these.
 #[derive(Debug, thiserror::Error)]
 pub enum CardError {
     #[error("the CUDA driver refused: {0}")]
     Driver(Box<CudaError>),
-    #[error("the HNN kernels are not built ({reason})")]
-    NoKernels { reason: &'static str },
     #[error("the driver reported {what} = {value}; a census extent is positive")]
     Census { what: &'static str, value: i32 },
     #[error("a buffer of another card was offered; a card's launches read only its own buffers")]
     ForeignBuffer,
-    #[error("{entry}: the census cannot carry the launch: {clause}")]
-    Launch {
-        entry: &'static str,
-        clause: &'static str,
-    },
     #[error("{what}: expected {expected}, found {found}")]
     Shape {
         what: &'static str,
@@ -167,423 +137,16 @@ impl DeviceCensus {
     }
 }
 
-/// [definition] **One entry's lowered limits**, read after the driver lowered the PTX for this
-/// card.
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct EntryCensus {
-    pub name: &'static str,
-    pub max_threads_per_block: u32,
-    pub registers: u32,
-    pub static_shared: u32,
-    pub local_octets: usize,
-}
-
-// -------------------------------------------------------------------------------------------
-// layouts
-
-/// [definition] **The realization a launch enacts** (the hardware law's report: which index is a
-/// block, which a thread, and what a thread loops over).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum Realization {
-    /// All `blocks` are simultaneously resident. Threads visit flat work items by whole-grid
-    /// stride for at most `rounds` rounds; every thread participates in each grid barrier, even
-    /// when its current work index is outside the surface. Occupancy is read for this function,
-    /// thread extent and dynamic shared surface, not estimated from device ceilings.
-    CooperativeGrid {
-        work_items: u64,
-        blocks: u32,
-        threads: u32,
-        rounds: u64,
-        resident_blocks: u64,
-    },
-    /// Each block is one output entry `(row, vector)` of a read; its `threads` divide the row's
-    /// columns, each looping over at most `per_thread` of them (`j ≡ t mod threads`), and the
-    /// block reduces their ring words and certificates by a shared-memory tree. `entries` blocks;
-    /// no thread loops over rows.
-    EntryPerBlock {
-        entries: u64,
-        threads: u32,
-        per_thread: u32,
-    },
-    /// One block carries the whole cell sequence: each thread is one cell of a tile of `threads`
-    /// cells, and the block loops over at most `tiles` tiles in order, carrying the rings' phases
-    /// between them; within a tile each ring's advances are one block scan, in carry order.
-    OneBlockScan { threads: u32, tiles: u64 },
-    /// Each block is one chart of `charts`: its `threads` divide the chart's rows (`i ≡ t mod
-    /// threads`), each thread looping over at most `rows_per_thread` rows and, within each, over
-    /// the row's columns; the block keeps the largest row sum by a shared-memory tree of maxima.
-    ChartPerBlock {
-        charts: u64,
-        threads: u32,
-        rows_per_thread: u32,
-    },
-    /// One block carries a whole word (`hnn_word_forward`, `hnn_word_reverse`): its `threads`
-    /// divide each stage's rows (`row ≡ t mod threads`), each looping over at most
-    /// `rows_per_thread` rows of the widest stage; the stages are ordered by the block's barriers.
-    WordPerBlock { threads: u32, rows_per_thread: u32 },
-    /// Each block is one copy of `copies`; its `threads` stride the copy's words.
-    CopyPerBlock { copies: u64, threads: u32 },
-    /// Each block is one entry `(i, j)` of a normal law's map update (campaign 2,
-    /// `hnn_prox_update`): its `threads` divide the window's samples (`t ≡ τ mod threads`), each
-    /// looping over at most `per_thread` samples, and the block reduces their ring words and
-    /// certificates by a shared-memory tree; thread 0 carries the entry's budgeted split.
-    EntryOverSamples {
-        entries: u64,
-        threads: u32,
-        per_thread: u32,
-    },
-}
-
-/// [definition] **A launch derived from the census**: its grid, block, dynamic shared octets and
-/// realization.
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Layout {
-    pub grid: Dim3,
-    pub block: Dim3,
-    pub shared: u32,
-    pub realization: Realization,
-}
-
-/// Admit a one-dimensional cooperative surface from a measured function occupancy. Kept pure
-/// so the admission and its refusal boundaries can be checked without a card.
-fn cooperative_grid(
-    name: &'static str,
-    work_items: u64,
-    threads: u32,
-    shared: u32,
-    resident_blocks: u64,
-    max_grid_x: u32,
-) -> Result<Layout, CardError> {
-    if work_items == 0 || threads == 0 || resident_blocks == 0 || max_grid_x == 0 {
-        return Err(CardError::Launch {
-            entry: name,
-            clause: "a cooperative grid has positive work, threads and resident block capacity",
-        });
-    }
-    let blocks = work_items
-        .div_ceil(u64::from(threads))
-        .min(resident_blocks)
-        .min(u64::from(max_grid_x)) as u32;
-    Ok(Layout {
-        grid: Dim3::x(blocks),
-        block: Dim3::x(threads),
-        shared,
-        realization: Realization::CooperativeGrid {
-            work_items,
-            blocks,
-            threads,
-            rounds: work_items.div_ceil(u64::from(blocks) * u64::from(threads)),
-            resident_blocks,
-        },
-    })
-}
-
-/// The greatest power of two at most `value` (`value ≥ 1`).
-fn floor_power_of_two(value: u32) -> u32 {
-    1 << value.ilog2()
-}
-
-/// The threads a block may carry for an entry: the entry's and the device's ceilings.
-fn thread_ceiling(census: &DeviceCensus, entry: &EntryCensus) -> u32 {
-    entry
-        .max_threads_per_block
-        .min(census.max_threads_per_block)
-}
-
-/// The dynamic shared octets a block may declare beside the entry's static shared.
-fn shared_ceiling(census: &DeviceCensus, entry: &EntryCensus) -> u32 {
-    census.shared_per_block.saturating_sub(entry.static_shared)
-}
-
-/// The shared octets per thread of the lattice read: its ring word and its certificate.
-pub const READ_SHARED_PER_THREAD: u32 = 2 * core::mem::size_of::<i128>() as u32;
-
-/// [definition] **The lattice read's layout** for `vectors` operands of a `rows × columns` locus:
-/// one block per output entry; the block's width is the least power of two covering the row (at
-/// least one warp), bounded by the entry's and the device's thread ceilings and by the shared
-/// octets two 16-octet words per thread need; a row wider than the block is split over its
-/// threads, each looping over `⌈columns/threads⌉` of its entries. The grid is `(rows, vectors)`,
-/// refused past the device's grid.
-pub fn read_layout(
-    census: &DeviceCensus,
-    entry: &EntryCensus,
-    rows: usize,
-    columns: usize,
-    vectors: usize,
-) -> Result<Layout, CardError> {
-    if rows == 0 || columns == 0 || vectors == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "a read covers at least one row, column and vector",
-        });
-    }
-    let (Ok(rows), Ok(columns), Ok(vectors)) = (
-        u32::try_from(rows),
-        u32::try_from(columns),
-        u32::try_from(vectors),
-    ) else {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "a read's extents fit the kernel's 32-bit wire",
-        });
-    };
-    if rows > census.max_grid.x || vectors > census.max_grid.y {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the rows fit the grid's X extent and the vectors its Y extent",
-        });
-    }
-    let shared_threads = shared_ceiling(census, entry) / READ_SHARED_PER_THREAD;
-    let ceiling = thread_ceiling(census, entry).min(shared_threads);
-    if ceiling == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the block carries at least one thread and its shared words",
-        });
-    }
-    // Both are powers of two, so the least is one.
-    let cover = columns
-        .max(census.warp)
-        .checked_next_power_of_two()
-        .unwrap_or(u32::MAX);
-    let threads = floor_power_of_two(ceiling).min(cover);
-    Ok(Layout {
-        grid: Dim3 {
-            x: rows,
-            y: vectors,
-            z: 1,
-        },
-        block: Dim3::x(threads),
-        shared: threads * READ_SHARED_PER_THREAD,
-        realization: Realization::EntryPerBlock {
-            entries: u64::from(rows) * u64::from(vectors),
-            threads,
-            per_thread: columns.div_ceil(threads),
-        },
-    })
-}
-
-/// The shared octets per thread of the inverse certificate: its largest row sum.
-pub const CERTIFICATE_SHARED_PER_THREAD: u32 = core::mem::size_of::<u128>() as u32;
-
-/// [definition] **The inverse certificate's layout** for `charts` charts of at most `width` rows:
-/// one block per chart, as wide as the least power of two covering the widest chart's rows (at
-/// least one warp), bounded by the entry's and the device's thread ceilings and by the shared
-/// octets of one 16-octet word per thread; a chart with more rows than threads is split over them,
-/// each looping over `⌈width/threads⌉` rows. The grid is `charts` blocks, refused past the
-/// device's grid.
-pub fn certificate_layout(
-    census: &DeviceCensus,
-    entry: &EntryCensus,
-    charts: usize,
-    width: usize,
-) -> Result<Layout, CardError> {
-    if charts == 0 || width == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "a certificate covers at least one chart of at least one row",
-        });
-    }
-    let (Ok(charts), Ok(width)) = (u32::try_from(charts), u32::try_from(width)) else {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the charts and their rows fit the kernel's 32-bit wire",
-        });
-    };
-    if charts > census.max_grid.x {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the charts fit the grid's X extent",
-        });
-    }
-    let shared_threads = shared_ceiling(census, entry) / CERTIFICATE_SHARED_PER_THREAD;
-    let ceiling = thread_ceiling(census, entry).min(shared_threads);
-    if ceiling == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the block carries at least one thread and its shared word",
-        });
-    }
-    let cover = width
-        .max(census.warp)
-        .checked_next_power_of_two()
-        .unwrap_or(u32::MAX);
-    let threads = floor_power_of_two(ceiling).min(cover);
-    Ok(Layout {
-        grid: Dim3::x(charts),
-        block: Dim3::x(threads),
-        shared: threads * CERTIFICATE_SHARED_PER_THREAD,
-        realization: Realization::ChartPerBlock {
-            charts: u64::from(charts),
-            threads,
-            rows_per_thread: width.div_ceil(threads),
-        },
-    })
-}
-
-/// [definition] **The word's layout** (`hnn_word_forward`, `hnn_word_reverse`) for a word whose
-/// widest stage has `rows` rows: one block, as wide as the least power of two covering those rows
-/// (at least one warp), bounded by the entry's and the device's thread ceilings; a wider stage is
-/// split over the threads, each looping over `⌈rows/threads⌉` of its rows. The block declares no
-/// dynamic shared octets (its two shared words are static).
-pub fn word_layout(
-    census: &DeviceCensus,
-    entry: &EntryCensus,
-    rows: usize,
-) -> Result<Layout, CardError> {
-    let Ok(rows) = u32::try_from(rows.max(1)) else {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "a word's rows fit the kernel's 32-bit wire",
-        });
-    };
-    let ceiling = thread_ceiling(census, entry);
-    if ceiling == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the block carries at least one thread",
-        });
-    }
-    let cover = rows
-        .max(census.warp)
-        .checked_next_power_of_two()
-        .unwrap_or(u32::MAX);
-    let threads = floor_power_of_two(ceiling).min(cover);
-    Ok(Layout {
-        grid: Dim3::x(1),
-        block: Dim3::x(threads),
-        shared: 0,
-        realization: Realization::WordPerBlock {
-            threads,
-            rows_per_thread: rows.div_ceil(threads),
-        },
-    })
-}
-
-/// [definition] **The copies' layout** (`hnn_copy_words`) for `copies` copies of at most `words`
-/// words: one block per copy, as wide as the least power of two covering its words (at least one
-/// warp), bounded by the entry's and the device's thread ceilings.
-pub fn copy_layout(
-    census: &DeviceCensus,
-    entry: &EntryCensus,
-    copies: usize,
-    words: usize,
-) -> Result<Layout, CardError> {
-    let (Ok(copies), Ok(words)) = (u32::try_from(copies), u32::try_from(words.max(1))) else {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the copies fit the kernel's 32-bit wire",
-        });
-    };
-    if copies == 0 || copies > census.max_grid.x {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "at least one copy, within the grid's X extent",
-        });
-    }
-    let ceiling = thread_ceiling(census, entry);
-    if ceiling == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the block carries at least one thread",
-        });
-    }
-    let cover = words
-        .max(census.warp)
-        .checked_next_power_of_two()
-        .unwrap_or(u32::MAX);
-    let threads = floor_power_of_two(ceiling).min(cover);
-    Ok(Layout {
-        grid: Dim3::x(copies),
-        block: Dim3::x(threads),
-        shared: 0,
-        realization: Realization::CopyPerBlock {
-            copies: u64::from(copies),
-            threads,
-        },
-    })
-}
-
-/// The ingest's shared octets: `rings` 8-octet advance totals and 4-octet phases, and one 8-octet
-/// scan word per ring and thread.
-pub fn ingest_shared(rings: u32, threads: u32) -> Option<u32> {
-    rings
-        .checked_mul(12)?
-        .checked_add(rings.checked_mul(threads)?.checked_mul(8)?)
-}
-
-/// [definition] **The moment ingest's layout** for `rings` rings and `cells` cells: one block, as
-/// wide as the greatest power of two the entry's and the device's thread ceilings and the shared
-/// octets of its `rings` scans admit; `lanes`, when given, narrows the block further (a
-/// realization choice, which changes no value: the parity test crosses tiles with it).
-pub fn ingest_layout(
-    census: &DeviceCensus,
-    entry: &EntryCensus,
-    rings: usize,
-    cells: usize,
-    lanes: Option<u32>,
-) -> Result<Layout, CardError> {
-    let Ok(rings) = u32::try_from(rings) else {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the rings fit the kernel's 32-bit wire",
-        });
-    };
-    if rings == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "an ingest steps at least one ring",
-        });
-    }
-    let available = shared_ceiling(census, entry);
-    let fixed = rings.checked_mul(12).ok_or(CardError::Launch {
-        entry: entry.name,
-        clause: "the ingest's fixed shared octets fit a 32-bit extent",
-    })?;
-    let per_thread = rings.checked_mul(8).ok_or(CardError::Launch {
-        entry: entry.name,
-        clause: "the ingest's per-thread shared octets fit a 32-bit extent",
-    })?;
-    let shared_threads = available.saturating_sub(fixed) / per_thread;
-    let mut ceiling = thread_ceiling(census, entry).min(shared_threads);
-    if let Some(lanes) = lanes {
-        ceiling = ceiling.min(lanes);
-    }
-    if ceiling == 0 {
-        return Err(CardError::Launch {
-            entry: entry.name,
-            clause: "the block carries at least one cell and its rings' scans",
-        });
-    }
-    let threads = floor_power_of_two(ceiling);
-    let shared = ingest_shared(rings, threads).ok_or(CardError::Launch {
-        entry: entry.name,
-        clause: "the ingest's shared octets fit a 32-bit extent",
-    })?;
-    Ok(Layout {
-        grid: Dim3::x(1),
-        block: Dim3::x(threads),
-        shared,
-        realization: Realization::OneBlockScan {
-            threads,
-            tiles: (cells as u64).div_ceil(u64::from(threads)),
-        },
-    })
-}
-
 // -------------------------------------------------------------------------------------------
 // the card
 
-/// [definition] **The card**: one context, one ordered stream in it and its census, and the image
-/// its opener gave it, if any. See the module header.
+/// [definition] **The card**: one context, one ordered stream in it and its census. See the module
+/// header.
 ///
 /// [realization; November 14, C3 of #603] A card opens with no image ([`Card::open`]): an owner that
-/// launches from its own image loads it (the field's, `Resident::open`), and the owners that launch
-/// from the card's open it with theirs ([`Card::open_with_image`]; the October owners' is
-/// `crate::hnn::open_hnn`). Before, every open loaded `hnn.ptx`, which the field never launches.
+/// launches from its own image loads it (the field's, `Resident::open`).
 pub struct Card {
-    // Fields drop in declaration order: the image and the stream before the context.
-    module: Option<Module>,
+    // Fields drop in declaration order: the stream before the context.
     stream: Stream,
     census: DeviceCensus,
     context: Context,
@@ -591,132 +154,29 @@ pub struct Card {
 
 impl Drop for Card {
     fn drop(&mut self) {
-        // The image and the stream are released in this card's context.
+        // The stream is released in this card's context.
         let _ = self.context.make_current();
     }
 }
 
 impl Card {
-    /// Derive a resident cooperative grid for a flat work surface. A kernel must grid-stride
-    /// that surface and keep every thread at every grid barrier, including idle lanes.
-    pub fn cooperative_layout(
-        &self,
-        name: &'static str,
-        work_items: usize,
-        threads: Option<u32>,
-        shared: u32,
-    ) -> Result<Layout, CardError> {
-        if !self.census.cooperative_launch {
-            return Err(CardError::Launch {
-                entry: name,
-                clause: "the device supports cooperative launch",
-            });
-        }
-        self.current()?;
-        let entry = self.entry(name)?;
-        let ceiling = thread_ceiling(&self.census, &entry);
-        let threads = threads.unwrap_or(self.census.warp.min(ceiling));
-        if threads == 0
-            || threads > ceiling
-            || entry
-                .static_shared
-                .checked_add(shared)
-                .is_none_or(|total| total > self.census.shared_per_block)
-        {
-            return Err(CardError::Launch {
-                entry: name,
-                clause: "the function and device carry the block and its static plus dynamic shared surface",
-            });
-        }
-        let function = self.module()?.function(name)?;
-        let active = function.active_blocks_per_multiprocessor(threads, shared)?;
-        cooperative_grid(
-            name,
-            u64::try_from(work_items).map_err(|_| CardError::Launch {
-                entry: name,
-                clause: "the cooperative work extent fits its 64-bit wire",
-            })?,
-            threads,
-            shared,
-            u64::from(active) * u64::from(self.census.multiprocessors),
-            self.census.max_grid.x,
-        )
-    }
-
-    /// Launch only the exact geometry re-admitted against this function's current driver
-    /// occupancy. Like `launch`, the caller admits argument buffers and their kernel-wire shape.
-    pub fn launch_cooperative(
-        &self,
-        name: &'static str,
-        layout: &Layout,
-        params: &mut [*mut c_void],
-    ) -> Result<(), CardError> {
-        let Realization::CooperativeGrid {
-            work_items,
-            threads,
-            ..
-        } = layout.realization
-        else {
-            return Err(CardError::Launch {
-                entry: name,
-                clause: "a cooperative launch carries a cooperative realization",
-            });
-        };
-        let work_items = usize::try_from(work_items).map_err(|_| CardError::Launch {
-            entry: name,
-            clause: "the cooperative work extent fits this host",
-        })?;
-        let admitted = self.cooperative_layout(name, work_items, Some(threads), layout.shared)?;
-        if &admitted != layout {
-            return Err(CardError::Launch {
-                entry: name,
-                clause: "the cooperative geometry and report equal the function's admitted resident grid",
-            });
-        }
-        self.module()?.function(name)?.launch_cooperative_on_shared(
-            &self.stream,
-            layout.grid,
-            layout.block,
-            layout.shared,
-            params,
-        )?;
-        Ok(())
-    }
-
     /// **Open the card at a device ordinal**: a context, the census and a stream, with no image.
     pub fn open(ordinal: i32) -> Result<Self, CardError> {
-        Self::opened(ordinal, None)
+        Self::opened(ordinal)
     }
 
-    /// **Open the card with an image** for the entries launched from the card itself
-    /// ([`Card::launch`], [`Card::entry`]). Refused with [`CardError::NoKernels`], naming
-    /// `kernels`, when the build had no `nvcc` and the image is empty.
-    pub fn open_with_image(ordinal: i32, image: &'static [u8], kernels: &'static str) -> Result<Self, CardError> {
-        if image.is_empty() {
-            return Err(CardError::NoKernels { reason: kernels });
-        }
-        Self::opened(ordinal, Some(image))
-    }
-
-    fn opened(ordinal: i32, image: Option<&'static [u8]>) -> Result<Self, CardError> {
+    fn opened(ordinal: i32) -> Result<Self, CardError> {
         cuda::init()?;
         let device = Device::get(ordinal)?;
         let context = Context::create(&device)?;
         context.make_current()?;
         let census = DeviceCensus::read(&device, context.memory_info()?)?;
-        let module = image.map(Module::load_ptx).transpose()?;
         let stream = Stream::create()?;
         Ok(Self {
-            module,
             stream,
             census,
             context,
         })
-    }
-
-    /// The image the card was opened with.
-    fn module(&self) -> Result<&Module, CardError> {
-        self.module.as_ref().ok_or(CardError::NoKernels { reason: "a card opened with no image launches no entry of its own" })
     }
 
     pub fn census(&self) -> &DeviceCensus {
@@ -731,19 +191,6 @@ impl Card {
     /// card's order (so [`Card::write`] and [`Card::fetch`] wait for them).
     pub fn stream(&self) -> &Stream {
         &self.stream
-    }
-
-    /// An entry's lowered limits.
-    pub fn entry(&self, name: &'static str) -> Result<EntryCensus, CardError> {
-        self.current()?;
-        let function = self.module()?.function(name)?;
-        Ok(EntryCensus {
-            name,
-            max_threads_per_block: function.max_threads_per_block()?,
-            registers: function.num_regs()?,
-            static_shared: function.static_shared_bytes()?,
-            local_octets: function.local_size_bytes()?,
-        })
     }
 
     /// Refuse a buffer of another card.
@@ -835,37 +282,6 @@ impl Card {
         )?)
     }
 
-    /// **Copy `len` elements of one resident buffer into another**, from `from` to `to`, ordered on
-    /// the card's stream: nothing crosses the bus.
-    pub fn copy_within<T: Copy>(
-        &self,
-        source: &CardBuffer<'_, T>,
-        from: usize,
-        target: &CardBuffer<'_, T>,
-        to: usize,
-        len: usize,
-    ) -> Result<(), CardError> {
-        self.owns(source)?;
-        self.owns(target)?;
-        if from + len > source.len || to + len > target.len {
-            return Err(CardError::Shape {
-                what: "a resident copy within its buffers",
-                expected: source.len.min(target.len),
-                found: (from + len).max(to + len),
-            });
-        }
-        if len == 0 {
-            return Ok(());
-        }
-        let size = core::mem::size_of::<T>();
-        self.current()?;
-        Ok(self.stream.copy_device_to_device_async(
-            target.device_ptr() + (to * size) as CUdeviceptr,
-            source.device_ptr() + (from * size) as CUdeviceptr,
-            len * size,
-        )?)
-    }
-
     /// **Read a buffer back** after every launch ordered before it (a transfer across the bus).
     pub fn fetch<T: Copy + Default>(
         &self,
@@ -899,26 +315,6 @@ impl Card {
         Ok(values)
     }
 
-    /// Launch an entry on the card's stream at a derived layout. `params` point at each argument
-    /// in declared order; the caller has checked every buffer with [`Card::owns`].
-    pub fn launch(
-        &self,
-        entry: &'static str,
-        layout: &Layout,
-        params: &mut [*mut c_void],
-    ) -> Result<(), CardError> {
-        self.current()?;
-        let function = self.module()?.function(entry)?;
-        function.launch_on_shared(
-            &self.stream,
-            layout.grid,
-            layout.block,
-            layout.shared,
-            params,
-        )?;
-        Ok(())
-    }
-
     /// Wait until every launch on the card's stream has completed.
     pub fn synchronize(&self) -> Result<(), CardError> {
         Ok(self.stream.synchronize()?)
@@ -947,11 +343,6 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
         self.len
     }
 
-    /// The card that owns it.
-    pub fn card(&self) -> &'c Card {
-        self.card
-    }
-
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
@@ -961,95 +352,8 @@ impl<'c, T: Copy> CardBuffer<'c, T> {
     }
 }
 
-/// [definition] **A borrowed view of a resident operand**: `vectors` rows of `width` signed 64-bit
-/// words at the lattice exponent `exponent` (a vector's value is its words times `2^(−exponent)`),
-/// in a buffer of one card. It borrows the buffer, so the operand outlives every read of it.
-#[derive(Clone, Copy)]
-pub struct Operand<'a> {
-    pub card: &'a Card,
-    pub pointer: CUdeviceptr,
-    pub vectors: usize,
-    pub width: usize,
-    pub exponent: u32,
-    pub _borrow: PhantomData<&'a ()>,
-}
-
-impl Operand<'_> {
-    pub fn vectors(&self) -> usize {
-        self.vectors
-    }
-
-    pub fn width(&self) -> usize {
-        self.width
-    }
-
-    pub fn exponent(&self) -> u32 {
-        self.exponent
-    }
-}
-
 impl From<CudaError> for CardError {
     fn from(error: CudaError) -> Self {
         CardError::Driver(Box::new(error))
-    }
-}
-
-#[cfg(test)]
-mod cooperative_tests {
-    use super::*;
-
-    #[test]
-    fn cooperative_grid_covers_each_work_item_once_with_resident_blocks() {
-        for (work, threads, resident, grid_limit) in [
-            (1, 32, 80, 1000),
-            (257, 7, 3, 1000),
-            (257, 32, 80, 2),
-            (8193, 128, 40, 1000),
-        ] {
-            let layout =
-                cooperative_grid("fixture", work, threads, 16, resident, grid_limit).unwrap();
-            let Realization::CooperativeGrid { blocks, rounds, .. } = layout.realization else {
-                panic!("expected a cooperative realization");
-            };
-            assert!(u64::from(blocks) <= resident);
-            assert!(blocks <= grid_limit);
-            let stride = u64::from(blocks) * u64::from(threads);
-            let mut visits = vec![0; work as usize];
-            // This is the kernel's whole-grid traversal, compared to the serial index set.
-            for round in 0..rounds {
-                for rank in 0..stride {
-                    let at = round * stride + rank;
-                    if at < work {
-                        visits[at as usize] += 1;
-                    }
-                }
-            }
-            assert!(visits.iter().all(|&count| count == 1));
-            assert!((rounds - 1) * stride < work);
-        }
-    }
-
-    #[test]
-    fn cooperative_grid_refuses_empty_capacity_and_retains_wide_work_extent() {
-        for (work, threads, resident, grid) in [
-            (0, 32, 80, 100),
-            (1, 0, 80, 100),
-            (1, 32, 0, 100),
-            (1, 32, 80, 0),
-        ] {
-            assert!(cooperative_grid("fixture", work, threads, 0, resident, grid).is_err());
-        }
-        let layout = cooperative_grid("fixture", u64::MAX, 32, 0, 80, 100).unwrap();
-        assert_eq!(layout.grid, Dim3::x(80));
-        assert_eq!(
-            layout.realization,
-            Realization::CooperativeGrid {
-                work_items: u64::MAX,
-                blocks: 80,
-                threads: 32,
-                rounds: u64::MAX.div_ceil(2560),
-                resident_blocks: 80,
-            }
-        );
     }
 }

@@ -78,11 +78,6 @@ impl Codec {
         self.used.len() + 1
     }
 
-    /// The units the codec holds, in class order with the void's index skipped.
-    pub fn used(&self) -> &[u32] {
-        &self.used
-    }
-
     /// A class's unit (none for the void).
     fn unit_of(&self, class: usize) -> Option<u32> {
         match class.cmp(&self.void) {

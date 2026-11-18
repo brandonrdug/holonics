@@ -175,12 +175,6 @@ impl Constitution {
         temperature_of(self.theta[self.layout.temper + 2 * h + usize::from(listens)], &self.fine)
     }
 
-    /// Every head's two temperatures on `2^(−24)`, `[h][kind]` flat, refused past their carrier: the reference the
-    /// card's own face (`temper_of` in `field.cu`) is checked against.
-    pub fn temperatures(&self) -> Result<Vec<i128>> {
-        (0..2 * self.declaration.heads).map(|k| temperature_of(self.theta[self.layout.temper + k], &self.fine)).collect()
-    }
-
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a
     /// realization's resident face).
     pub fn decays(&self) -> &[Vec<i64>] {
