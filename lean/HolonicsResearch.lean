@@ -1294,3 +1294,12 @@ import HolonicsResearch.Physics.Spacetime.LorentzCover
 import HolonicsResearch.Physics.Thermal.ManyCell
 import HolonicsResearch.Physics.Wave.GraphCone
 import HolonicsResearch.HNN.HeldStep
+import HolonicsResearch.Foundation.InformationUpdate
+import HolonicsResearch.Compression.SternBrocotCode
+import HolonicsResearch.Compression.Landmark.AffineLandmark
+import HolonicsResearch.Physics.Spacetime.LorentzOnto
+import HolonicsResearch.Compression.Landmark.SiteIsolation
+import HolonicsResearch.HNN.PhaseChart
+import HolonicsResearch.Aeon.Clock.ThreeDistance
+import HolonicsResearch.Aeon.Clock.SturmianComplexity
+import HolonicsResearch.Aeon.Production.Recurrence
