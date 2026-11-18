@@ -545,3 +545,13 @@ places at a time, and redraws it from her face by a keyed draw; four sweeps.
   What it decides: whether her two-sided reading, the stronger of her two, repairs a draft written at the boundary. If it does, the
   writer the readings point to is the theory's own (a joint field refined, its boundary released), with both comparisons kept up in one
   state. If the share stands or falls, a reading between known neighbours does not carry to neighbours she wrote herself.
+
+Scored (2026-11-18T02:11:36Z), G-V10 (refine.txt): missed. The draft has 140 of 184 words in the lexicon (76%). After sweeps one to four: 114 of 186
+(61%), 130 of 188 (69%), 118 of 184 (64%) and 105 of 184 (57%), where 84% or more was guessed and no fall of more than two points. Each
+sweep redraws 38 to 41% of the places to another symbol, and the standing symbol's code under her face before its redraw stays at 1.16
+to 1.20 nats from the first sweep to the fourth. The longest run shared with the fitting text stays at 12 to 15 symbols (under 30:
+held). By eye the refined runs are word-shaped and hold fewer words.
+  What it says: redrawing each place from her two-sided face at her own temperature is a chain whose resting text is her two-sided
+  field's own writing, and that writing holds fewer words than the boundary's (the line's writer wrote 51 to 56% on these books).
+  A reading of 0.92 nats between true neighbours does not carry to neighbours she wrote: between her own neighbours a standing symbol
+  codes at 1.18. The stronger reader is the weaker writer.

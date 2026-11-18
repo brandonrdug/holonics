@@ -67,6 +67,11 @@ stands for what the opening alone holds):
 - The level's own face, designed in the record's §3, is what a second level's cut needs. It is not what her writes wait on, and it is
   not ordered.
 
+**The stronger reader is the weaker writer (the design record's §14; its guess missed).** A ruler's writer refined the night's boundary
+draft with lap 94's two-sided reading, each place reopened alone between its drafted neighbours and redrawn at her own temperature.
+The draft's 76% of words in the lexicon fell to 61, 69, 64 and 57% over four sweeps, two fifths of the places changing at each. Between
+neighbours she wrote, a standing symbol codes at 1.18 nats where true neighbours give 0.92.
+
 **Withdrawn in the night, each within the hour and each in the record:** that the level holds almost nothing of its units (its key was
 a free row's); that the level's own face comes first; that the level reads places that have bound nothing; that a written place commits
 to nothing.
