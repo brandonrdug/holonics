@@ -391,3 +391,10 @@ harmonics read the phase, so the chart cannot tell the order of dark places, and
   under 120, (b) under 60, (c) under 100.
   What it decides: a level charted on the news phase can hand a place its unit's bright strand and cannot hand a dark place its own
   turn in the unit. If (b) reads near (a), the claim is wrong and the chart does resolve the interior.
+
+Scored (2026-11-18T00:35:57Z), G-V3 (level_links.txt, reading C; 196 s). Located at width 64: (a) 152 (300 to 550: missed low), (b) 77 (under 150:
+held), (c) 346 (300 to 420: held). The moment's 300 leading directions: (a) 322 (450 to 700: missed low), (b) 188 (under 250: held),
+(c) 300. The present read: 44, 38, 52 (under 120, 60 and 100: held). A dark place is handed its own symbol half as well as a bright one,
+so the claim's direction holds; the bright figure missed because the dark places after a bright one stand in its sixth, and a decoder at
+that phase gives their mixture. A level on the news phase hands a place its unit's strand by sixths and not the place's own turn.
+

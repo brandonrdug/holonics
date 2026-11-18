@@ -137,6 +137,38 @@ R_loc = Wh @ U[:, :D1]                                             # the located
 X_l = (X_m - mu) @ R_loc
 print(f"LINKS the located restriction: rank {D1} of the keys' fit on the moment, the singular values' share kept {100 * (sv[:D1] ** 2).sum() / (sv ** 2).sum():.0f}%")
 
+# ---- Reading C: what a level hands each place of its unit, through the prolongation's form (harmonics times a state) ----
+if len(sys.argv) > 3 and sys.argv[3] == 'places':
+    written = ~P_open
+    inside = np.zeros(places, bool); first = np.zeros(places, bool); lead_sym = np.empty(places, dtype=P_sym.dtype); news_at = np.zeros(places)
+    r0 = 0
+    for (lab, sites, anc, news) in regions:
+        news_at[r0:r0 + sites] = news; r0 += sites
+    for (ri, st, pv, nx, whole, a, b, nws, span) in E:
+        if whole:
+            inside[a:b] = True; first[a] = True; lead_sym[a:b] = st[0]
+    fitP = infit[P_region]
+    csym = top((c for c in P_sym[fitP & written]), 30)
+    Yown = onehot(list(P_sym), csym); Ylead = onehot([c if ok else '' for c, ok in zip(lead_sym, inside)], csym)
+    kron = lambda hh, g: (hh[:, :, None] * g[:, None, :]).reshape(len(hh), -1)
+    def hands(state, name):
+        F = np.hstack([kron(h, state[P_epoch]), h])
+        out = []
+        for label, rows, Yk in [("(a) its own symbol, places of a nat or more", inside & written & ~first & (news_at >= 1.0), Yown),
+                                ("(b) its own symbol, places under a nat", inside & written & ~first & (news_at < 1.0), Yown),
+                                ("(c) the unit's leading symbol, at its other places", inside & written & ~first, Ylead)]:
+            fit, test = rows & fitP, rows & ~fitP
+            W = ridge(F[fit], Yk[fit])
+            out.append((label, 1000 * (1 - ((Yk[test] - F[test] @ W) ** 2).sum() / ((Yk[test] - Yk[fit].mean(0)) ** 2).sum()), int(test.sum())))
+        print(f"LINKS reading C, a level's state read at each place's phase, state = {name}:")
+        for label, v, n in out: print(f"LINKS   {label:52s} {v:6.0f}   (places read {n})")
+    hands(X_l, f"a restriction of width {D1} located from the keys")
+    hands(X_c, "the level's present read after its ticks")
+    fitEp = np.array([infit[e[0]] for e in E])
+    mfit = X_m[fitEp].mean(0); Cm = (X_m[fitEp] - mfit).T @ (X_m[fitEp] - mfit); wm, vm = np.linalg.eigh(Cm)
+    hands((X_m - mfit) @ vm[:, -300:], "the moment, its 300 leading directions (a stand-in for full rank)")
+    print(f"LINKS done in {time.time() - t0:.0f} s"); sys.exit(0)
+
 links = [("the fine read at the leading place", X_read), ("the moment m(j), 768 numbers", X_m), ("the restricted state A m + b", X_r),
          ("a drawn restriction of the same width (mean of three)", X_d), ("a restriction of the same width located from the keys", X_l),
          ("the level's read after its ticks", X_c), ("the prolonged rows (leading place, epoch's mean)", X_p)]

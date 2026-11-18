@@ -57,3 +57,24 @@ LINKS   (3') the same moments at full rank                                 -0.01
 LINKS   the planted law (the epoch before's symbols on the news phase through a drawn map, a tenth of the power): recovered 1.000 by the table from the planted covector; with it the table removes 0.0787 of the planted covector's power; operands located for the plain covector hold 0.210 of the plant
 LINKS   the planted law, operands of width 64 located for it from the moments: recovered 0.539
 LINKS done in 563 s on this host's numpy (one process)
+
+== The order of dark places on the news phase (a count on the same dump) ==
+places inside whole epochs after the anchor: 207199; in the same sixth of a turn as the place before: 51.7%
+  of those under one nat of news (68.9% of them): 75.1% share the sixth with the place before; of those of a nat or more: 0.0%
+a place's advance of phase: median 0.073 turn, mean 0.141; a sixth is 0.167
+places per occupied sixth of a turn (wrapped) in an epoch: mean 2.34; sixths holding two or more places 55.0%, holding three or more 30.5%
+share of an epoch's places that stand alone in their wrapped sixth: 19.2%
+
+== Reading C (G-V3): what a level's state hands each place of its unit, read at the place's phase, 196 s ==
+LINKS reading C, a level's state read at each place's phase, state = a restriction of width 64 located from the keys:
+LINKS   (a) its own symbol, places of a nat or more             152   (places read 32499)
+LINKS   (b) its own symbol, places under a nat                   77   (places read 71381)
+LINKS   (c) the unit's leading symbol, at its other places      346   (places read 103880)
+LINKS reading C, a level's state read at each place's phase, state = the level's present read after its ticks:
+LINKS   (a) its own symbol, places of a nat or more              44   (places read 32499)
+LINKS   (b) its own symbol, places under a nat                   38   (places read 71381)
+LINKS   (c) the unit's leading symbol, at its other places       52   (places read 103880)
+LINKS reading C, a level's state read at each place's phase, state = the moment, its 300 leading directions (a stand-in for full rank):
+LINKS   (a) its own symbol, places of a nat or more             322   (places read 32499)
+LINKS   (b) its own symbol, places under a nat                  188   (places read 71381)
+LINKS   (c) the unit's leading symbol, at its other places      300   (places read 103880)
