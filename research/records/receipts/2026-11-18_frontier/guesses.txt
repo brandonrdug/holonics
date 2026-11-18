@@ -286,3 +286,23 @@ from the known stream's reading before any training in it.
   streams; the one-sided level is then the next build. Between 0.04 and 0.10 the gain is the noise's share, and the step's rate with
   every place compared is read before more laps. Under 0.04 the frontier's comparisons are not what binds at this rate, and the step
   is read next. A rule's reading is an inference: the reads are reported as they come.
+
+Scored (2026-11-18T15:19:53Z), G-1118-10, G-1118-11 and the first part of G-1118-12 (reads.txt).
+  G-1118-10. At the ends arm C7's frontier rows read 1.8058 against arm F7's 1.8463, 0.0405 under (0.020 to 0.040 guessed: missed by
+  half a thousandth, at the upper edge); at lap means 1.7994 against 1.8044, 0.0050 under (within 0.006 guessed: held); arm C7's end
+  stands 0.0064 above its own mean (within 0.008: held) where arm F7's end stands 0.0419 above its. One place open at lap means 0.0138
+  under, whole masks 0.0063 under. Arm C7's panels 53% and 49% (arm F7's are not written yet).
+  What it decides, by the rule fixed before the read: the cooled end reads 0.02 or more under the plain end and its mean is no worse,
+  so the line trains at rate 14 with the remainder carried from its next lap.
+  G-1118-11. (a) Before any training as known streams arm F6's mean reads the frontier 1.0827 above its reading under the law (0.45 to
+  0.75 guessed: missed, half again as much). (b) After the lap, arm K7's known-stream rows stand 0.2813 above arm F7's rows under the
+  law at lap means (0.10 to 0.25 guessed: missed by 0.03). (c) Arm K7's rows under the law stand 0.1708 above arm F7's (0.05 to 0.20:
+  held). (d) Panels written as known streams 32% and 40% (35% to 47% guessed on each: the short one missed low, the long one held).
+  (e) The lap took 1,097 s against 1,600 to 1,661 s for a plain lap (within 15% guessed: missed, it is a third shorter: a known stream
+  is read once and hears no level).
+  What it says. One lap as known streams took back 0.81 of the 1.08 nats the one-sided reading cost before any training. By the rule
+  (b) sends the reading to a second lap, which is arm K8. The host ruler of 14:15 UTC reads what the rule could not: on its 800 rows
+  the known stream after one lap stands level with the two-sided reading without the level, and 0.205 above the law's, where the
+  level is worth 0.214. The writes are below the line's so far.
+  G-1118-12, at the lap means. Arm K8's known-stream rows stand 0.0590 under arm K7's (0.03 to 0.08 guessed: held); its rows under the
+  law stand 0.0322 above arm K7's (within 0.05: held). The ruler rows and the panels are not read yet.
