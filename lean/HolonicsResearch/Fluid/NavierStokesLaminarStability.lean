@@ -98,8 +98,9 @@ size of the data; above the threshold what is not bounded is the constant, throu
 ## What this does not state
 
 Nothing here is the Clay statement. The module constructs no solution: a `Solution`, like a
-`Truncation`, is a hypothesis given on `[0, ∞)`, so existence is not stated for the comb, for a
-truncation or for the fluid. It makes no limit of truncations and says nothing of infinitely many
+`Truncation`, is a hypothesis given on `[0, ∞)`, so existence is not stated here for the comb or
+for the fluid; for a truncation it is `Fluid/NavierStokesTruncatedGlobal` (`exists_truncation`,
+and `exists_truncation_laminar` with S6's decay). It makes no limit of truncations and says nothing of infinitely many
 modes; the constants not naming `ι` is what such a limit would use, and the limit is not made. At
 or above the threshold (`c * X 0 ≥ ν`) it states only S5's uniqueness and its bound through
 `∫ (A u + A v) ^ 2`, which is not bounded here; it gives no stability constant and no decay there.
