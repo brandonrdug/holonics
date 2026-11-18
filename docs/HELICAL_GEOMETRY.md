@@ -43,7 +43,7 @@ axis offset, aperture, retained winding and material all affect the receiver. Th
 translational components of **one** generator, the two **objects**, and the two factors of a
 split algebra are three different decompositions. None substitutes for another.
 
-[established-bounded; source-inspected] `RatVec3`, `RatMat3` and `AffineMap3` in `holonics::geometry` own these coordinate/frame operations. The
+[established-bounded; source-inspected] `RatVec3`, `RatMat3` and `AffineMap3` in `holonics::geometry` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/mod.rs)) owned these coordinate/frame operations. The
 [`screw`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs) specialization uses them for a generator,
 its orbit jets and paired quadrance; it adds no new frame system or protein codec. The formal
 companion is
@@ -245,7 +245,7 @@ carry cocycle behind the winding (`Geometry/PhaseCarry`), a lock as the zero-pow
 its Farey address and mediant cost (`Geometry/PairResonance`), the determinant, trace sequence
 and transfer determinant that phase carriage conserves (`Transport/NavigatorTraceFaces`), and
 the holonomy of a cell with harmonic standing relative to node/cell receivers (`Transport/CellHolonomy`).
-`holonics::geometry::winding` (phase, carry, odometer, cell holonomy) and `holonics::navigator::{address,trace}` (lock addresses, trace faces) are their Rust owners.
+`holonics::geometry::winding` (phase, carry, odometer, cell holonomy) and `holonics::navigator::{address,trace}` (lock addresses, trace faces) were their Rust owners, retired at `d5ed4adc1` ([`winding.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/winding.rs), [`address.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/navigator/address.rs), [`trace.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/navigator/trace.rs)).
 
 [established-bounded; implemented-exact] **The prototype's Rust consumers** (history; rebuild
 step 1 ports them to `holon::contact`). At `13f8c734`,
@@ -303,7 +303,7 @@ the action and metric needed for each extension.
 | Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to algebraic faces |
 | π/e as normalized generating constraints | `PiIterationConstraint`, `Compression/Landmark/ConstraintIdentity`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
 | Named critical parameter | The actual `CopsonDeBruijn*` or `Zeta/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
-| Inferred navigator/factor family | `NavigatorInference`, `NavigatorFactorization`, `NavigatorObservationScope`, `holonics::ratio::linear` factor owners (the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
+| Inferred navigator/factor family | `NavigatorInference`, `NavigatorFactorization`, `NavigatorObservationScope`, `holonics::ratio::linear` factor owners (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear.rs); the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
 | Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `NavigatorModeQuotient`, `JointReceiverDescent`, the retired [receiver factorization](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs); preserve `E T_g=U_g E` and the decoder, not merely a present rank |
 | Cost, mass and tolerance | `ReceiverCodeCost`, `AttentionModeCompression`, `AccumulatedReceiverDefect`; retain encoding/decoder work, complete class mass and transported residuals |
 
@@ -363,7 +363,7 @@ the packets meant to replace it. The constant-navigator closure is the reusable
 specialization that closes without remainder; changing material, noncommuting contacts and nonlinear refinement retain their
 source equations and residuals through the same unit.
 
-[established-bounded; source-inspected] `holonics::geometry::screw` holds the Euclidean screw
+[established-bounded; source-inspected] `holonics::geometry::screw` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs)) held the Euclidean screw
 generator, the local pair differential and the frame/degeneration controls. They do not claim a
 trained conversation return, a calibrated molecular force law, all curved-space motor
 actions, or a global closure of every nonlinear field. Those boundaries identify further

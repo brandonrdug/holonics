@@ -56,7 +56,9 @@ medium in two charts, checked with zero residual in
 ## The media in the repository
 
 Each row is one medium; the columns are its four faces. Where a face is absent the medium does not
-carry it yet.
+carry it yet. A Rust owner in the last column (`physics::…`, `holon::…`, `hnn::…`) is the October
+library's, which retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics/src):
+it stands there at the path its module name gives, and the Lean owner beside it holds the law.
 
 | Medium | Register | Free energy | Polarity | Contact and friction | Owner |
 |---|---|---|---|---|---|
@@ -69,7 +71,7 @@ carry it yet.
 | parametron ring | modes `Kv = ω²Cv` | pump work | pump `−p cos(2θ − ψ)`, locked sheets | the ring's ports | `holon::parametron`, `hnn::ring` |
 | pair contact | its Farey lock address | dissipated slip | the Cayley joint chart | `P(u) = ⟨Ju, wDJu⟩ ≥ 0` | `holon::contact`, `hnn::contact` |
 | solenoidal cascade | LC modes `ω² = 1/(LC)`, Foster tanks | none | the pump | pair contacts | `physics::solenoidal` |
-| Athena's tower | modes `λ = ρe^(iφ)` on octaves of friction | the code, in bits | turned and pumped modes | friction `1 − ρ`, push `γ`, rectifying contacts | `hnn::tower` |
+| Athena's tower | modes `λ = ρe^(iφ)` on octaves of friction | the code, in bits | turned and pumped modes | friction `1 − ρ`, push `γ`, rectifying contacts | `hnn::tower`, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn/tower.rs); its field is the engine's, `holonics_engine::field` |
 | deposition | `Q` itself changes | `½⟨x⁺, (Q⁺ − Q)x⁺⟩` | the learned `L` | adaptive conductance `Θ′ = Θ + Γ(j, dφ)` | `holon::deposition`; Lean `Objects/Deposition` |
 
 ## One law, many names

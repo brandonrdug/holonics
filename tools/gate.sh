@@ -43,4 +43,6 @@ run tension-ruler-controls python3 tools/test_tension_ruler.py
 run mailbox-controls python3 tools/test_agent_mailbox.py
 run copy-length-controls python3 tools/test_copy_length.py
 run human-messages-controls python3 tools/test_human_messages.py
+run link-check-controls python3 tools/test_link_check.py
+run records-index-controls python3 tools/test_records_index.py
 exit $status
