@@ -1,0 +1,72 @@
+The mixed diet (G-1118-2): ten passes over the fifty books' boundary rows (897,205: 48 known places, the next open) and half-open rows
+(56,051: 48 known and a run of 32 open at keyed places), shuffled into one table, 400 rows a section, from lap 94's end state at rate 12,
+on the card (5,267 s; projection 7,200 s). Counts and codes only; the rows and the writes are private.
+
+The trial's own read by pass, nats a place (its line prints millionths of a nat). Columns as the reader makes them: for the held
+boundary rows the three are the one open place; for the rows of 48 known and a run of 32 (hh), the run half open at keyed places
+coded over its open places, the whole run open coded over all of it, and the whole run open coded at its first place alone.
+pass 0 group fit places 2001: 2.068 2.130 2.093
+pass 0 group held places 2503: 2.050 2.112 2.076
+pass 0 group hh places 18564: 2.001 3.086 2.004
+pass 0 group unread places 1200: 2.020 2.020 2.020
+pass 1 group fit places 2001: 1.689 1.725 1.706
+pass 1 group held places 2503: 1.700 1.718 1.711
+pass 1 group hh places 18564: 1.844 3.039 1.741
+pass 1 group unread places 1200: 1.705 1.705 1.705
+pass 2 group fit places 2001: 1.609 1.642 1.625
+pass 2 group held places 2503: 1.619 1.625 1.625
+pass 2 group hh places 18564: 1.821 3.035 1.688
+pass 2 group unread places 1200: 1.636 1.636 1.636
+pass 3 group fit places 2001: 1.563 1.593 1.578
+pass 3 group held places 2503: 1.589 1.590 1.594
+pass 3 group hh places 18564: 1.803 3.028 1.662
+pass 3 group unread places 1200: 1.609 1.609 1.609
+pass 4 group fit places 2001: 1.546 1.565 1.556
+pass 4 group held places 2503: 1.574 1.568 1.576
+pass 4 group hh places 18564: 1.800 3.037 1.667
+pass 4 group unread places 1200: 1.615 1.615 1.615
+pass 5 group fit places 2001: 1.526 1.544 1.536
+pass 5 group held places 2503: 1.547 1.540 1.549
+pass 5 group hh places 18564: 1.789 3.035 1.643
+pass 5 group unread places 1200: 1.582 1.582 1.582
+pass 6 group fit places 2001: 1.502 1.519 1.512
+pass 6 group held places 2503: 1.527 1.521 1.530
+pass 6 group hh places 18564: 1.786 3.029 1.629
+pass 6 group unread places 1200: 1.572 1.572 1.572
+pass 7 group fit places 2001: 1.484 1.504 1.495
+pass 7 group held places 2503: 1.524 1.521 1.527
+pass 7 group hh places 18564: 1.777 3.026 1.617
+pass 7 group unread places 1200: 1.578 1.578 1.578
+pass 8 group fit places 2001: 1.476 1.493 1.486
+pass 8 group held places 2503: 1.519 1.514 1.522
+pass 8 group hh places 18564: 1.770 3.030 1.614
+pass 8 group unread places 1200: 1.569 1.569 1.569
+pass 9 group fit places 2001: 1.458 1.475 1.468
+pass 9 group held places 2503: 1.512 1.507 1.514
+pass 9 group hh places 18564: 1.770 3.025 1.597
+pass 9 group unread places 1200: 1.563 1.563 1.563
+pass 10 group fit places 2001: 1.448 1.459 1.455
+pass 10 group held places 2503: 1.505 1.498 1.507
+pass 10 group hh places 18564: 1.767 3.028 1.605
+pass 10 group unread places 1200: 1.569 1.569 1.569
+
+The night's single diets by the same read, the held boundary rows' open place: boundary rows alone 1.732, 1.645, 1.569, 1.536, 1.527
+at passes 1, 2, 5, 10, 15; half-open rows alone 1.854 at pass 5 and 1.813 at pass 10.
+
+MIXREAD the line's held read (the store of November 16's held passage, seven slices), nats a place; each state's read, then paired place by place with lap 94's end
+MIXREAD lap 94's end, the trials' opening state; one place open: all 0.8968 (132497 places) | arithmetic 1.5968 books 0.8727 code 0.5599 science 0.7703 web 0.9168 wikidata 1.0829 words 0.7796 || less lap 94's end +0.0000 (±0.0000), on books +0.0000 (±0.0000)
+MIXREAD lap 94's end, the trials' opening state; whole masks: all 2.2825 (5477 places) | arithmetic 2.3529 books 2.1415 code 2.1443 science 2.1497 web 2.4250 wikidata 2.4636 words 2.3060 || less lap 94's end +0.0000 (±0.0000), on books +0.0000 (±0.0000)
+MIXREAD ten passes of boundary rows alone; one place open: all 3.6446 (132497 places) | arithmetic 3.2634 books 2.8468 code 3.6228 science 3.2894 web 3.7320 wikidata 5.1676 words 3.4194 || less lap 94's end +2.7478 (±0.0094), on books +1.9741 (±0.0187)
+MIXREAD ten passes of boundary rows alone; whole masks: all 5.5544 (5477 places) | arithmetic 4.6388 books 5.8186 code 5.6233 science 6.1203 web 5.6047 wikidata 5.9584 words 5.3264 || less lap 94's end +3.2719 (±0.0507), on books +3.6772 (±0.1426)
+MIXREAD ten passes of half-open rows alone; one place open: all 1.1497 (132497 places) | arithmetic 1.6643 books 0.8978 code 0.9120 science 1.0466 web 1.2907 wikidata 1.3878 words 1.0691 || less lap 94's end +0.2529 (±0.0024), on books +0.0251 (±0.0050)
+MIXREAD ten passes of half-open rows alone; whole masks: all 2.5337 (5477 places) | arithmetic 2.4106 books 2.1107 code 2.6885 science 2.4009 web 2.7004 wikidata 2.8341 words 2.6442 || less lap 94's end +0.2513 (±0.0131), on books -0.0308 (±0.0246)
+MIXREAD the mixed diet, pass 5; one place open: all 2.0425 (132497 places) | arithmetic 2.3915 books 1.0931 code 2.5307 science 1.6574 web 2.2498 wikidata 2.8254 words 1.6972 || less lap 94's end +1.1456 (±0.0062), on books +0.2204 (±0.0067)
+MIXREAD the mixed diet, pass 5; whole masks: all 3.0916 (5477 places) | arithmetic 3.2645 books 2.1436 code 3.9127 science 2.7431 web 3.0919 wikidata 3.5462 words 3.0308 || less lap 94's end +0.8091 (±0.0318), on books +0.0021 (±0.0264)
+MIXREAD the mixed diet, pass 10; one place open: all 2.4884 (132497 places) | arithmetic 3.0153 books 1.1813 code 3.2669 science 1.8777 web 2.6701 wikidata 3.6363 words 1.9940 || less lap 94's end +1.5916 (±0.0081), on books +0.3086 (±0.0075)
+MIXREAD the mixed diet, pass 10; whole masks: all 3.4110 (5477 places) | arithmetic 4.2394 books 2.1608 code 4.3670 science 2.8510 web 3.2293 wikidata 3.8205 words 3.2275 || less lap 94's end +1.1285 (±0.0404), on books +0.0193 (±0.0298)
+
+The fifty books' panel (sixteen held prompts, 64 places each) written one place a read, each place the last of its region with 48
+known (write-next), words of two letters or more that stand in the fitting text's lexicon, and the longest run a write shares with it:
+lap 70's control lap's end (arm A of the cooling laps): 52 of 142 words (37%), longest shared run 14.
+the mixed diet's pass 10: 157 of 192 words (82%), longest shared run 15.
+(the night's: lap 94's end 38%; boundary rows alone at pass 15, 76%.)
