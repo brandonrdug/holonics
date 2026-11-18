@@ -18,88 +18,62 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 17, late): the units are cut and the level holds almost nothing of them
+## Where the work stands (November 18, 02:00 UTC): what she reads in each regime, and what the level is
 
-[The record of the day](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
-carries all of this with its receipts and scored guesses.
+Two records carry this with their receipts and scored guesses: [the record of the dwell](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md) (the sums, the
+text at the boundary, the traces on the passage's clock) and [the level's design record](research/records/2026-11-17_A_LEVEL_IS_A_CODEC_THAT_CARRIES_ITS_DECODER_AND_CLOSES_A_SCALE_SQUARE_BOTH_READ_AT_THE_RECEIVERS_FACE_THE_BUILT_LEVEL_WAS_FOUNDED_ON_A_SADDLE_HAS_NO_RECEIPT_AT_ITS_GRAIN_AND_FOLDS_A_WINDING_EPOCH.md)
+(the level read against the tree, and nine readings G-V1 to G-V9, each with its guess fixed first; most of the guesses missed). This
+section's text of the night, written reading by reading with its corrections, is held at
+[`696336851`](https://github.com/brandonrdug/holonics/blob/696336851/CONSTRUCTION_STATE.md).
+
+**Standing.** Nothing is running and no part is ordered. Lap 94's state is frozen and the line is stopped. The one-sided chart
+announced on the evening of November 17 is not started.
 
 **A probe, closed.** The plain engine takes a law by its own descent once it has met about 160 to 200 thousand well-formed records
 of it, in any arrangement tried: 86 of 96 held short sums written whole (lap 94's state wrote 2), 88 with no sum met twice, 87 with text
-learned beside them in alternate sections. Shown `x plus y equals`, the state that had the sums took it about eight times sooner than
-the state that had nothing. The trials of the same morning stopped at ten passes, short of the transition, and everything concluded
-from them is withdrawn (the guide: a learner's null is held to a length). The sums stay a probe of what she learns on simple examples
-and are not a campaign (Brandon, 20:27Z).
+learned beside them in alternate sections. A founded form transfers (`x plus y equals` taken about eight times sooner), and a form that
+is not kept up loosens. The sums stay a probe of what she learns on simple examples and are not a campaign (Brandon, 20:27Z).
 
-**Text.** Compared on each place as the boundary of what is known, her writing on fifty simple books went from 38% to 76% of words in
-the books' lexicon in two hours, and the same books under the line's kind of comparison reach 56% (a control, its guess held). Then it
-flattened, and the run was stopped at pass 16 on its own number.
+**What she reads, by regime** (nats a place on held rows of the fifty books; a linear face fitted to the compared place's opening
+stands for what the opening alone holds):
 
-**What limits her, on the passage's own clock** (the record's §17 and §19). Nine tenths of her loss stands at places that carry under
-one nat, the inside of a unit; her span is about four nats of passage, half a word; and no unit reaches a place whole at any period.
-The machine's own level cuts its epochs at landmarks of her news, about a word's worth each (8.6 places, 9.5 nats; 36% of them led by a
-word's first letter), and the level's state of an epoch holds under a tenth of any of its symbols, 17% of its identity and nothing of
-the epoch before. The level has no comparison at its own grain: nothing asks it to hold a unit or to read the next. She opens units and
-does not close them.
+| regime | state | her face | the opening alone | what the four ticks add |
+|---|---|---|---|---|
+| one place open among known neighbours | lap 94's mean | 0.920 | 0.992 | 0.07 |
+| the boundary: 48 known places, the next open | the night's pass 15 | 1.479 | 2.028 | 0.55, at the two ticks after the split, one bound symbol each |
+| the line's own masks, the store's next sections | lap 94's mean | 2.652 | 2.936 | 0.28, late (a weak read) |
 
-**Standing.** Lap 94's state is frozen and the line is stopped. Nothing is being built: the engine change announced in the evening (a
-one-sided chart, 48 times cheaper) is not started, since it is an efficiency bet on a reader that does not yet hold a unit, and three
-rulers of units as free rows were read as verdicts on their construction (§18). Readings of text are stated in news and in founded
-grains, never in letters or windows of bytes (Brandon, 23:17Z). Every report opens with the panel, whole.
+- At the boundary her face is a count of the last four symbols bound in order (1.478 on the same rows; one to six symbols read 2.400,
+  1.984, 1.670, 1.478, 1.408 and 1.367, the tables of five and six holding about a hundred times her entries). Her additive use of far
+  context is spent.
+- With both neighbours known a place holds its reading from its opening on.
+- Compared at the boundary alone for fifteen passes, the night's state wrote 76% of its words in the books' lexicon (38% before; 56%
+  under the line's kind of comparison) and lost its two-sided reading: a place among known neighbours codes at 2.921 nats there, where
+  its own opening holds 1.129. A regime that needs both comparisons has to keep both up.
 
-**The level, read against the tree** ([the design record](research/records/2026-11-17_A_LEVEL_IS_A_CODEC_THAT_CARRIES_ITS_DECODER_AND_CLOSES_A_SCALE_SQUARE_BOTH_READ_AT_THE_RECEIVERS_FACE_THE_BUILT_LEVEL_WAS_FOUNDED_ON_A_SADDLE_HAS_NO_RECEIPT_AT_ITS_GRAIN_AND_FOLDS_A_WINDING_EPOCH.md)).
-The level's records were read before any design. A level is a codec that carries its decoder and has a transport of its own, and its
-receipt is the defect of its closure and of its scale square, each read at the symbols' face through the level's own route and summed
-over the unit; that sum is the level's news, and nothing above a level can be cut without it. The built level differs three ways: it
-was founded on a saddle (the restriction drawn, the prolongation at zero) and never entered by its tension read; it has no receipt at
-its own grain, the decision of November 3 against the cause the heading record of October 30 had named in the same words; and its chart
-folds an epoch longer than one section onto its rows. October's one attempt at a level's own comparison (a heading against the next
-span's trace among a menu of spans) cost the arrivals and was ruled a reading.
+**The level** (the design record's §3 for what it is, §9 to §13 for the readings).
 
-**The two readings, read (November 18; the design record's §9).** Most of their guesses missed. Read link by link on the night's saved
-state, the level's moment holds a unit as a strand (which symbols it has at 721 thousandths, which stand where in its turn at 522); the
-built restriction keeps what a drawn one keeps (480 and 169 against 410 and 218), so after every lap since November 13 it has not left
-its founding draw; a restriction of the same width located from the symbols keeps the bag whole (699) and less than half the order
-(217), so the level's width, a copy of half the fine width, binds the order; the level's ticks lose a third more; and across units the
-level carries less of the unit before (75) than the fine read already holds (112). The chart's fold costs order in the 47% of epochs
-that wind past a section. At the level's locus nothing linear in the units' symbols relieves the fine comparison (every share at or
-under zero, a planted law of that form recovered whole): the fine field already has the additive use of far context, and the one
-comparison gives a level no slope. "The level holds almost nothing of its units" overstated the evening's trace, whose key (a unit as
-one identity) was a free row's: it holds a third of which symbols and a tenth of their order.
+- By the tree a level is a codec that carries its decoder and has a transport of its own. Its receipt is the defect of its closure and
+  of its scale square, each read at the symbols' face through the level's own route and summed over the unit. A restriction eliminates
+  a settled interior, and what crosses is the boundary's response, an inherited clock and a heat.
+- The built level's restriction keeps about what a drawn projection keeps, on the night's state and on lap 94's mean (there 1.26 of a
+  drawn one's bag and 0.74 of its order). A restriction of the same width located from the symbols keeps which symbols a unit has and
+  less than half of their order. The chart folds the order of an epoch that winds past one section.
+- At the level's locus nothing linear in a unit's symbols, the unit before or their moments relieves the fine comparison, on either
+  state, with a planted law of that form recovered whole. The one comparison gives a level no first-order slope.
+- The chart addresses a place by its news phase, so a unit's predicted places have no address: three quarters of the places under one
+  nat share their sixth of a turn with the place before. Nine tenths of her excess over a count stands at such places.
+- On the line the level does carry the unit before across (163 thousandths beside the fine read's 168).
+- The level's own face, designed in the record's §3, is what a second level's cut needs. It is not what her writes wait on, and it is
+  not ordered.
 
-**Where her excess stands, the level's chart is blind (the design record's §10).** The level's chart addresses a place by its news
-phase, so a unit's predicted places have no address of their own: three quarters of the places under one nat stand in the same sixth of
-a turn as the place before them, and a level located by the ruler hands a dark place its own symbol half as well as a bright one. Nine
-tenths of her excess stands at dark places. A tower compounds from below: an epoch lengthens only as the level below predicts its
-interior, and her place level binds about four symbols (her 1.527 nats beside a count of the last four symbols' 1.502; five and six
-read 1.433 and 1.395, the whole prize of bound context on the fifty books 0.14 nats a place and words in the lexicon from 76% to about
-90%). So the level's own face is what a second level's cut needs and is not what her writes wait on, and it is not ordered.
+**Withdrawn in the night, each within the hour and each in the record:** that the level holds almost nothing of its units (its key was
+a free row's); that the level's own face comes first; that the level reads places that have bound nothing; that a written place commits
+to nothing.
 
-**Where a place binds (the design record's §11; its guess's staircase missed).** On the same held rows her face reads 1.479 nats a
-place and a count of the last four symbols bound in order reads 1.478. A face fitted at each tick shows how she gets there: the opening
-codes like a count of two (2.028 beside 1.984), the two ticks before the split move the compared place's code by 0.06, and the two
-ticks after it add one bound symbol each (1.965, 1.687, 1.479 beside the counts of two, three and four, 1.984, 1.670, 1.478). Five and
-six symbols read 1.408 and 1.367. So at a compared place a tick binds one symbol and only the late ticks bind, at the boundary and,
-on a weaker read, under the line's own masks; and what the level prolongs enters before those ticks.
-
-**What a level reads, by the tree (the design record's §12).** A restriction eliminates a balanced interior; what crosses a quotient
-is the boundary's response, an inherited clock and a heat; a level's width is its section's. So a level reads a unit at its section
-after the interior has settled, the committed states at its boundary, and returns there. The built level reads a moment of every
-interior place at the split and returns before the ticks that bind at a compared place.
-
-**Standing, and what is owed.** Nothing is running and no part is ordered. Three statements of the night went past their readings and
-were withdrawn within the hour, each in the record: that the level holds almost nothing of its units, that the level's own face comes
-first, and that the places a level reads have bound nothing. What stands is what was read: the restriction keeps what a drawn one
-keeps; nothing linear at the level's locus relieves the fine comparison; the news-phase chart gives a unit's dark places no address;
-her face is a count of the last four symbols, and a compared place binds at its late ticks.
-
-**The night's state against the line's own (the design record's §13).** The night's state, compared for fifteen passes at the boundary
-alone, has lost its two-sided reading: a place opened alone among known neighbours codes at 2.921 nats at her face where a linear face
-of its own opening reads 1.129. It is a specimen for the boundary only. Read again on the line's own state, lap 94's mean, the level's
-restriction is still about a draw (1.26 of a drawn one's bag, 0.74 of its order), a located one keeps the bag and not the order, and
-the fold costs order; there the level does carry the unit before across (163 thousandths beside the fine read's 168). The tension at
-the level's locus reads nothing on the line either (every share under 0.006, the plant recovered whole). And a place opened alone among
-known neighbours codes at 0.920 nats at her face, 0.992 at a linear face of its opening: with both neighbours known the four ticks are
-worth 0.07 nats a place, where they are worth 0.55 at the boundary and 0.28 under the line's masks.
+**Not decided.** What follows for the product. The readings say where a compared place with unknown neighbours gets its code (its late
+ticks, a symbol each) and that a level as built and as charted does not add to it. They do not say what to build. Readings of text are
+stated in news and in founded grains (Brandon, 23:17Z), and every report of a step opens with the panel, whole.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 
