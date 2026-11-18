@@ -61,11 +61,15 @@ counts the closed words of `n` epochs. Its **transfer determinant** is Mathlib's
 (`NavigatorTraceFaces.identityTwo_and_unipotentTwo_are_separated_by_source_receiver`), so the
 zeta is a face of the return map, not the map.
 
-[open] Owed in #62: the equality `h = log ρ(M) = limsup (1/n) log N_n` for nonnegative `M`, the
-radius of convergence of `ζ` and the location of its first pole at `T = e^(−h)` need the
-Perron–Frobenius theorem (existence of the Perron vector at the spectral radius, and a lower bound
-on `N_n`), which Mathlib does not carry; only the upper bound is proved here. The flow zeta `∏_c (1 − e^(−s·t(c)))⁻¹` and the trace formula
-are not treated. [proved-standard, not proved here] Where the word series converges at a point `T`
+[proved-derived; formal-checked] The equality `h = log ρ(M) = lim (1/n) log N_n` for nonnegative
+`M`, with `N_n` the word count `1ᵀMⁿ1`, is proved in `HolonicsResearch/Aeon/Production/GrowthRate`:
+by Gelfand's formula with no eigenvector (`tendsto_wordCount_rpow_spectralRadius`), and with a
+positive eigenvector by the two-sided law `c·λⁿ ≤ N_n ≤ C·λⁿ` (`wordCount_two_sided`), which also
+places the word series' radius of convergence at `1/λ` and a zero of the transfer determinant there
+with none inside (`summable_wordCount_iff`, `transferDet_zero_at_inv`,
+`transferDet_ne_zero_of_lt`). The Perron vector's existence for an irreducible matrix is that
+module's hypothesis; for the cycle counts `tr Mⁿ` only the upper bound here holds at every `n`. The
+flow zeta `∏_c (1 − e^(−s·t(c)))⁻¹` and the trace formula are not treated. [proved-standard, not proved here] Where the word series converges at a point `T`
 it is the polynomial `aᵀ adj(1 − T·M) b` over `det(1 − T·M)`, so the poles of its continuation lie
 among the zeros of the transfer determinant; this analytic statement, and its reading at
 `T = r^s` in `Foundation/FractalString`, is owed in #62.
