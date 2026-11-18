@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 19:40 UTC): the line reads every place at its frontier and stands under the plain line
+## Where the work stands (November 18, 19:59 UTC): the line reads every place at its frontier and stands under the plain line
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -31,6 +31,13 @@ five places before fitted on 8 MB she stands under it at four fifths of the fron
 2.04). At the fifth of places where that count is most sure she pays 0.88 to 0.98 where it pays 0.63, about where a count of
 three places stands; that gap is 0.05 to 0.07 nats of all places. The first form of the reading sized it at 0.4 by binning each
 place on the symbol that arrived, and is withdrawn (the Codex thread's caution).
+
+**Her writes in their own measure** (§16; `tools/count_writer_ruler.py`, the `draw_agrees` line of the excess ruler). Her writes
+hold words as a count of two places' writes do (44% of written words in the lexicon; counts of 2, 3, 4, 5 places writing by draws
+42%, 58%, 73%, 85%; the reference 80%), flat along a write's length. At the fifth of places five places settle, a draw from her face
+writes the passage's symbol two times in three (0.650 at arm P15, about 0.01 more a lap) where the count's does nine in ten; where a
+nat or more is expected she gives the arriving symbol more than the count. So an arm is read on its code, on that mass at the
+settled places and on its panel against the count writers' table.
 
 **What a strand's state carries** (§15; `tools/strand_presence_ruler.py`, halves split by source). An open place holds the place
 before it at nine tenths as it opens, the second before at a half, the third at a fifth, the fourth at a tenth, and the ticks carry

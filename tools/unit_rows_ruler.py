@@ -8,7 +8,7 @@ a place whose longer context holds no row backs off to the longest one that does
 and at the places of little news (under a quarter of a nat, and a quarter to one, under the whole count at KMAX): the interior of a
 unit. So a row here is a context with the symbols met after it, and the reading is how the code falls as rows are added from the
 most met. CAUTION (November 18): the bins of little news are by the whole count's code of the symbol that arrived, which selects
-the places where the count was right; those columns lean the count's way and are no sizes. The column over all places is not
+the places where the count gave the arriving symbol most of its mass; those columns lean the count's way and are no sizes. The column over all places is not
 selected, and is the one to quote.
 
 Fitted on the first TRAIN octets of a slice's training documents (Witten-Bell backing off), read on about HELD_PLACES of its held
