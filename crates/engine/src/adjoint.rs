@@ -148,11 +148,13 @@ impl Constitution {
         let half = f / 2;
         let (plain, circles) = (d.carry_first(), d.carry);
         let c2 = 2 * circles;
+        let one_sided = cell.classes.first().is_some_and(|lists| lists.one_sided);
         // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s` (§16.34); each site's `b`
         // is one mate's, so each `δb_s` is one term.
         for t in 0..sites {
             for e in 0..plain {
-                let Some(s) = strand_mate(t, e, sites) else { continue };
+                // [the strand's known stream] Where every site hears only what stands before it, an odd contact met no mate.
+                let Some(s) = strand_mate(t, e, sites).filter(|_| !one_sided || e % 2 == 0) else { continue };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
@@ -168,7 +170,8 @@ impl Constitution {
         // `δγ(t) = conj(Qm(t)) u` released at the face's grain, `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u`; then off the chain the gate's and the
         // coupling's covectors `δq`, `δℓ` and the drive's `δb(t) = κ(t) u` ([`carry_gate_return`]).
         let mut dqh = vec![0i64; sites * c2];
-        for k in 0..circles {
+        // [the strand's known stream] A circle scanned from the right stood at rest there, and returns nothing.
+        for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
             let e = plain + k;
             let (mut xr, mut xi) = (0i128, 0i128);
             for step in 0..sites {
@@ -838,7 +841,8 @@ impl Constitution {
             if t > 0 {
                 self.opening_return(region, l.before, t - 1, dxt, g, pass.marks.as_deref());
             }
-            if t + 1 < sites {
+            // [measurement] Under a ruler's `3` the opening read no row of the site after ([`Constitution::open_sided`]).
+            if self.ruler_far != 3 && t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g, pass.marks.as_deref());
             }
         }

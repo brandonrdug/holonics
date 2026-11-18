@@ -4212,6 +4212,63 @@ fn the_boundary_charts_face_reads_nothing_at_or_past_its_place() {
     }
 }
 
+/// [definition; the lead, November 18, the frontier record §6] **The return under the strand's known stream**: on a region whose places
+/// are known but its last, read with every known place hearing only what stands before it (a ruler's forward at `3`), the covector
+/// matches the code's difference, family by family at its largest entries, as [`covector_matches_the_codes_difference`] reads the law's
+/// (a probe that moves a site across a sheet crosses a seam the covector does not read and is counted apart). The rows the forward left
+/// out take none: the opening's and the moments' after rows.
+#[test]
+fn the_covector_under_the_known_stream_matches_the_codes_difference() {
+    let sheets = |field: &Constitution, r: &Region| -> Vec<Vec<u32>> { field.pass(r, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    const LAST: [bool; 7] = [false, false, false, false, false, false, true];
+    let r = Region { classes: &CLASSES, unresolved: &LAST, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+    let (mut read, mut seams) = (0usize, 0usize);
+    for (name, mut field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1))] {
+        field.ruler_far = 3;
+        let g = covector_of(&field, &r);
+        let l = field.layout.clone();
+        let dw = field.declaration.width;
+        let rows = (field.declaration.alphabet + 1) * dw;
+        assert!(g[l.after..l.after + rows].iter().all(|&v| v == 0), "{name}: the opening's after rows take no covector");
+        let tm2 = 2 * field.declaration.moment_modes();
+        assert!(g[l.moment_after..l.moment_after + (field.declaration.alphabet + 1) * tm2].iter().all(|&v| v == 0), "{name}: the moments' after rows take none");
+        for &(start, len, grain) in field.families() {
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let straddles = |delta: i32| {
+                    let (mut plus, mut minus) = (field.clone(), field.clone());
+                    plus.theta[i] += delta;
+                    minus.theta[i] -= delta;
+                    sheets(&plus, &r) != sheets(&field, &r) || sheets(&minus, &r) != sheets(&field, &r)
+                };
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let measured = if start == l.temper {
+                    let at = |k: i32| { let mut f = field.clone(); f.theta[i] += k * (delta / 8); f.code(&r).unwrap().0 as i128 };
+                    let weighted: i128 = (-8..=8).map(|k| k as i128 * at(k)).sum();
+                    div_nearest(16 * weighted, 408) as i64
+                } else {
+                    let (mut plus, mut minus) = (field.clone(), field.clone());
+                    plus.theta[i] += delta;
+                    minus.theta[i] -= delta;
+                    plus.code(&r).unwrap().0 - minus.code(&r).unwrap().0
+                };
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "{name}: family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("KNOWN_STREAM_COVECTOR_PROBES read={read} on_a_seam={seams}");
+    assert!(read >= 60 && 8 * seams <= read, "read {read} probes, {seams} on a seam");
+}
+
 /// [definition; the lead, November 18, the frontier record §6] **The strand's open place is its frontier region's**: under
 /// [`Constitution::strand_faces`] the face at place `t` is the same bits as the open last place of the region `[0, t]` read with every known
 /// place hearing only what stands before it (a ruler's forward at `3`), at every place, on fields with a still head and without, with
