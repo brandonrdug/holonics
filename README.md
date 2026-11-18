@@ -98,7 +98,8 @@ read through them), and no float is stored inside the machinery:
 - values are stored as series, numerators grouped over shared denominators, so terms cancel and
   a carrier is as wide as its surviving terms need: dynamic precision, never an arbitrary fixed
   width, and a term is released only at a declared tolerance with its remainder carried;
-- integer sums are associative, so co-present cells deposit in parallel with identical bits.
+- a sum whose terms meet at one declared grain, with nothing released between them, gives the same
+  bits in any order, so co-present cells deposit in parallel.
 
 **Mathematics is terrain.** The Riemann hypothesis, the Hodge conjecture, complex Euler and
 Navier–Stokes, and Birch–Swinnerton-Dyer are targets for the same compression and landmark
@@ -114,6 +115,14 @@ Eros (the collective formative organization) and Hephaestus (a planned solver an
 application) carry no machinery.
 
 ## What exists now
+
+**November 18, 2026.** The machine that trains is the engine: its law and host reference in
+[`crates/engine`](crates/engine), its card realization in [`crates/engine-cuda`](crates/engine-cuda)
+and its commands in [`crates/athena`](crates/athena), with [THE_ENGINE](docs/THE_ENGINE.md) as its
+guide. It trains lap by lap on one consumer card over a store of whole documents (open text, an
+arithmetic world and word problems). The October library and its card crate, which the table below
+describes, retired on November 15 and are held in history. [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md)
+gives the position with its readings and what the machine writes; Athena's acceptance has not passed.
 
 The source and receipt snapshot below is **October 8, 2026**, read at published main
 [`4323ed14`](https://github.com/brandonrdug/holonics/commit/4323ed146bc186baa1b749ee3c3ac38877796437).
@@ -177,6 +186,11 @@ symmetric quartic component establishes neither as a generic adaptive HNN consum
 | Physical repair: producing chart, source clock and receiver decoding | [#73](https://github.com/brandonrdug/holonics/issues/73), product acceptance [#148](https://github.com/brandonrdug/holonics/issues/148); show the learned physical output and its receipt. |
 | Targets and equation extraction | [Equation extraction #146](https://github.com/brandonrdug/holonics/issues/146), [Hodge spectrum #20](https://github.com/brandonrdug/holonics/issues/20), [Weierstrass division #22](https://github.com/brandonrdug/holonics/issues/22), [Israel junction #23](https://github.com/brandonrdug/holonics/issues/23), [neck sources #32](https://github.com/brandonrdug/holonics/issues/32); the formal scope stays in [#62](https://github.com/brandonrdug/holonics/issues/62). |
 
+Since this snapshot, #62 and #63 closed on October 22 (every owed formal statement is one box in
+[#410](https://github.com/brandonrdug/holonics/issues/410)) and #76 closed on November 15 with the
+October card crate. [THE_REBUILD](docs/plans/THE_REBUILD.md)'s table names the issue that carries
+each step today.
+
 RH, Hodge, complex Euler/Navier–Stokes and BSD remain attached to the same construction, and none
 is solved here. The [comma/ghost record](research/records/2026-10-05_THE_GHOST_LIVES_IN_THE_GAP_THE_JOINTS_OF_THE_LENS.md)
 joins the comma's nonclosure and turn/boost normality with six explicitly owed statements. Recursive
@@ -214,6 +228,8 @@ Failures are published with the same care as results.
 | Guide | Subject |
 |---|---|
 | [THE_MACHINE](docs/THE_MACHINE.md) | The HNN in its geometry and its law; start here |
+| [THE_ENGINE](docs/THE_ENGINE.md) | The engine that trains: its pipeline phase by phase, its declaration, its saved state, its commands and its guards |
+| [THE_MEDIUM](docs/THE_MEDIUM.md) | One step and four faces: how every modelled medium is a choice of storage, turn, friction and ports |
 | [ELEMENTARY_OBJECTS](docs/ELEMENTARY_OBJECTS.md) | The vocabulary and the operator contract: each operation with its owner |
 | [HOLON](docs/HOLON.md), [HNN_FORMULA](docs/HNN_FORMULA.md) | The computational Holon; the full law the HNN implements, including the source and release contract |
 | [RECEIVER_HOLARCHY](docs/RECEIVER_HOLARCHY.md) | Receivers, receipts, perspective, flux and compression; probability as a receiver's geometry |
@@ -243,11 +259,14 @@ Failures are published with the same care as results.
   [`field.rs`](crates/engine/src/field.rs) states its equations and re-exports its modules, cut by
   object. Its card realization is [`crates/engine-cuda`](crates/engine-cuda) with
   [`kernels/field.cu`](crates/engine-cuda/kernels/field.cu). Its commands are the binary `athena`
-  ([`crates/athena`](crates/athena)): `train-store`, `write-store`, `found-lane` and `next-pass`
-  in [`store.rs`](crates/athena/src/store.rs), the line's reading `read-cavity` in
-  [`ruler/cavity.rs`](crates/athena/src/ruler/cavity.rs), and the card's parity against the host
-  in [`parity.rs`](crates/athena/src/parity.rs). The consolidation (#603) moved it there; its
-  later steps update this entry.
+  ([`crates/athena`](crates/athena)): the trainer `train-store`, the writer `write-store` and the
+  state tools in [`store.rs`](crates/athena/src/store.rs), the world that answers an act in
+  [`world.rs`](crates/athena/src/world.rs), the readings in
+  [`ruler/`](crates/athena/src/ruler) (`read-cavity`, `read-loudness`, `read-tension`), the card's
+  parity against the host in [`parity.rs`](crates/athena/src/parity.rs) and the exterior's reads
+  and writes in [`exterior.rs`](crates/athena/src/exterior.rs).
+  [THE_ENGINE](docs/THE_ENGINE.md) is its guide and lists every command
+  ([§7](docs/THE_ENGINE.md#7-the-commands)). The consolidation (#603) moved it there.
 - The October library [`crates/holonics`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics) (`holon`, `ratio`, `geometry`, `navigator`, `receiver`,
   `holarchy`, `aeon`, `compression`, `physics` and `hnn`) retired with C8c of #603. Its laws stand in the guides, Lean and
   the atlas, whose rows name its files at that commit.
@@ -316,13 +335,13 @@ git grep -n 'NormalizedKernel' 13f8c734            # the pre-reset tree
 - **Checks.** A change passes the gate (`bash tools/gate.sh`: the workspace check, the guard lints
   and the guards' doctests), then the tests of the laws it touched. A kernel change also runs the
   GPU suite alone on an idle card, and a Lean change runs the Lean build.
-- **Execution.** Builds and native validations are admitted through one queue against declared
-  thread and memory ceilings. Reuse receipts for unchanged checked inputs; project changed work from
-  measured cost, fix the deadline once, and report an overrun as incomplete rather than raising it.
+- **Execution.** Learning runs on the card, and a run is dispatched to outlive the agent that
+  launched it. Project a run from a measured read, fix its deadline once, and report an overrun as
+  incomplete rather than raising it ([CLAUDE.md](CLAUDE.md#work-practice) holds the standard).
   The [waiting audit](research/records/2026-09-30_AUDIT_WAITING_DEADLINES_AND_CONCURRENCY_THE_WORKERS_BLOCKED_ON_THEIR_OWN_RUNS.md)
   records the repeated waiting and raised-limit failures this practice addresses.
 - **Formal counterparts.** A new law lands with its Lean counterpart, or names the obligation it
-  leaves in #62.
+  leaves in #410.
 - **What we have learned about working this way.** The
   [workflow record](research/records/2026-09-27_THE_WORK_READ_FROM_ITS_CONVERSATIONS_AND_HISTORY_CONVERGES_WHERE_ACCEPTANCE_IS_FIXED_BEFORE_THE_CLAIM.md)
   reads our conversations and history: what went wrong on the way to a product, what worked, and
@@ -364,7 +383,7 @@ reports that its kernels are absent and refuses to open a card.
 
 ```bash
 bash tools/gate.sh                             # the workspace check, guard lints and guard doctests
-cargo test -p holonics                         # the host laws
+cargo test -p holonics-engine                  # the engine's host laws
 mkdir -p .local                                # the GPU lock lives here
 flock .local/gpu.lock cargo test -p holonics-engine-cuda -- --include-ignored --test-threads=1  # alone, on an idle NVIDIA card
 bash tools/lean_check.sh                       # the Lean foundation, Holonics

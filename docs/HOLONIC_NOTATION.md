@@ -64,7 +64,7 @@ here; it is not supplied by the spelling of a Boolean or by a machine-word size.
 A sign may also be the resulting state face. Composition retains the actual path, frame and
 winding rather than identifying a full turn history with its final binary face. Positivity
 retains its declared split and choice of hand; the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs) and
-`holonics::ratio::linear::inertia` own the corresponding winding and signature readings. [Binary phase and coupled energy](../lean/Holonics/Physics/PhaseCarrier.lean).
+`holonics::ratio::linear::inertia` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear/inertia.rs)) owned the corresponding winding and signature readings. [Binary phase and coupled energy](../lean/Holonics/Physics/PhaseCarrier.lean).
 
 [definition] A one-axis binary reading is an admitted face of a framed source. It need not
 identify the full source. An operation using relative quadrature, phase or further directional
