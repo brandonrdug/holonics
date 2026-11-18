@@ -296,5 +296,5 @@ one more place before moves the right bin and moves it little. A second lap of b
 
 What closes a unit is therefore the place level's own: binding four and five places in order as sharply as it binds three. The
 count that does it on one register holds 1.3 million entries at four places and 2.9 million at five; the constitution holds
-392,505 for five registers, 16.5 thousand of them a block of its width squared. Whether the binding is short of entries, of ticks
+392,505 for five registers, 16.4 thousand of them a block of its width squared. Whether the binding is short of entries, of ticks
 (a place meets one more place a tick through its mate) or of a sharper lock is the next reading, before a part.
