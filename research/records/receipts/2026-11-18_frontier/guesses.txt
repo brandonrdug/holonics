@@ -1,0 +1,29 @@
+Guesses fixed before their reads, each stamped from the clock. Refs #404 #73.
+
+G-1118-3 (2026-11-18T06:02:37Z). The frontier's share on the line. Read before fixing: the audit of November 18 §1.4 (a writer state's compared places
+lie past the frontier, about 92% of them by its count from the law); the night of November 17 (fifteen passes compared at the frontier
+alone, 48 known places and the next open, took the panel written one place a read from 38% to 76% of its words in the lexicon and the
+held next place from 2.050 to 1.527 nats); the mixed diet running as this is fixed (G-1118-2: the held next place 2.050, 1.700, 1.619
+at passes 0, 1 and 2, boundary rows and half-open rows together); the cooling laps (a cooler deposit leaves the level and the writes).
+  The build. A stretch read at the frontier (crates/engine/src/passage.rs, frontier_cut_of and frontier_state_of): its own draw of a
+  context, known, and the one place after it open, the region ending there; a true end's first void where a document closes. Its code
+  is weighed by the region's sites. The share is a word of the pass line (frontier E, of every eight stretches by a keyed draw), set by
+  a state tool. The held read gains the same state on held text: every place of a held stretch read with all before it known and the
+  region ending at it (frontier.tsv), so its code is read by how many places are known.
+  What it resembles and what differs. The front regions retired on November 3 were the states of a release that locked a place where one
+  class held a majority and moved past locked places; this state locks nothing and reads no majority: one place's whole density is
+  compared with everything before it known, and its writer draws each place from that density in place order.
+  The trial. From lap 70's end state on the store of November 12 at the line's rate (12, no remainder: one change), one lap of 3,000
+  sections with six of every eight stretches at the frontier (arm F), beside the control lap from the same state (arm A of the cooling
+  laps). Each read at its lap's mean and its end by the held read with its frontier rows, and the fifty books' panel written one place
+  a read (48 known) from each arm's end.
+  The guess, at lap means, nats a place on the held passage's five slices:
+  (a) the frontier rows, the control: 1.75 to 2.15. Arm F: 0.15 to 0.40 under the control's, every slice under it.
+  (b) one place open: arm F 0.005 to 0.05 above the control's 0.7727. Whole masks: within 0.02 under to 0.04 over the control's 2.2089.
+  (c) by how many places are known, in both arms: the frontier rows with 64 known or more read within 0.06 of the rows with 8 to 15
+      known (her frontier reads a few bound symbols and no farther).
+  (d) the panel written one place a read: the control's end 33 to 45% of its words in the lexicon; arm F's end 48 to 62%.
+  What it decides. If (a) and (d) hold and (b)'s cost is under 0.05, the share enters the line: its next laps run with it from lap 70 on
+  the text store, and the panel is written one place a read. If the frontier rows do not fall by 0.05, the difference from the night's
+  rows is the store's contexts or the weight, and the frontier rows by known places say which. (c) is the measure of what the next
+  lever is: if a long context buys nothing at the frontier, what is owed there is reach (the audit §1.7) and room (§1.9), not diet.

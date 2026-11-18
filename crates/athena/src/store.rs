@@ -276,7 +276,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0 });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -344,10 +344,12 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let mut regions: Vec<OwnedRegion> = Vec::new();
         let (mut tally, mut by_slice) = (Tally::default(), vec![0u64; cut.slices.len()]);
         let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        // The section's stretches read at the frontier (the pass's share, [`holonics_engine::field::StorePass::frontier`]).
+        let mut at_frontier = 0u64;
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
         let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
         while let Some(drawn) = cut.next() {
-            let act = cut.pass.world.as_ref().filter(|w| cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
+            let act = cut.pass.world.as_ref().filter(|w| !drawn.frontier && cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
             let n = drawn.sites() + act.map_or(0, |run| run + REACTION_BOUND);
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
@@ -361,6 +363,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 None => None,
             };
             let slice = drawn.slice;
+            at_frontier += u64::from(drawn.frontier);
             let Stretch { region, counted, .. } = cut.take(drawn, &codec)?;
             by_slice[slice] += 1;
             (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
@@ -438,8 +441,11 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let (code, places) = receipt.opening.iter().fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             format!(" opening={} opening_places={places}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) })
         };
+        // The count of the section's regions read at the frontier, on the line only where the pass declares a share, so a line without one
+        // is the line as before.
+        let frontier = if cut.pass.frontier > 0 { format!(" frontier={at_frontier}") } else { String::new() };
         println!(
-            "STORE_SECTION n={done} {} {} stretches={} before={} after={} deposited={} transfer={} external={} rate={}{opening} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
+            "STORE_SECTION n={done} {} {} stretches={} before={} after={} deposited={} transfer={} external={} rate={}{opening}{frontier} regions_ms={regions_ms} deposit_ms={deposit_ms} ms={}",
             tally.text(),
             cut.slices.iter().zip(&by_slice).map(|(s, n)| format!("{}={n}", s.name)).collect::<Vec<_>>().join(" "),
             cut.pass.stretches,
@@ -1552,6 +1558,35 @@ pub fn set_rate(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 18, the audit of that day §1.4] `set-frontier STATE STATE_SHA EIGHTHS OUT`: **a learner whose pass reads
+/// a share of its stretches at the frontier** ([`holonics_engine::field::StorePass::frontier`]): `EIGHTHS` of every eight stretches, keyed by
+/// the stretch's count, are the context known and the next place alone open ([`holonics_engine::passage::frontier_state_of`]), the state
+/// a writer in place order meets; zero takes the share off. Every other line byte for byte, read back and checked. The share is law and
+/// is carried in the learner's state. It writes a new state.
+pub fn set_frontier(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("set-frontier STATE STATE_SHA EIGHTHS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let share: u64 = args[3].parse()?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    if share > 8 {
+        return Err("a frontier's share past eight of every eight stretches".into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.frontier == share {
+        return Err("a state whose frontier share is already that".into());
+    }
+    let (written, lines, differing) = with_pass(&text, &learner, StorePass { frontier: share, ..before.clone() })?;
+    std::fs::write(out, &written)?;
+    println!("SET_FRONTIER share={share} before={} stretches={} slices={} lines={lines} differing_line={differing}", before.frontier, before.stretches, slices_text(&before));
+    Ok(())
+}
+
 /// [measurement; the lead, November 18, the audit of that day (decide the level)] `zero-level-return STATE STATE_SHA OUT`: **a control for
 /// the level**: the state with its level's prolongation, `B` and `b_B`, set to zero (every other entry, moment and line as it stands), so a
 /// reading of it is the field's faces with the level unheard. A ruler's state: never trained from. Refused on a state with no level.
@@ -2392,6 +2427,7 @@ mod tests {
                     assert_eq!(region.domain, Some(((4 * (q + a + NEAR - from) * open) as u128).isqrt() as usize));
                     assert_eq!(Some(counted), region.domain);
                 }
+                Kind::Frontier => panic!("a keyed state is never the frontier's: the cut draws that one"),
             }
         }
         assert!(writers > 100 && masks > 100, "{writers} {masks}");

@@ -94,6 +94,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-rate") {
         return athena::store::set_rate(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("set-frontier") {
+        return athena::store::set_frontier(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("zero-level-return") {
         return athena::store::zero_level_return(&rest[1..]);
     }
