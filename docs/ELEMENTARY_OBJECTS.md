@@ -123,8 +123,9 @@ never assumed: learned or nonlocal relations enter with their actual power term.
 diffusion, Maxwell (Stokes–Dirac on the de Rham complex) and Euler/Navier–Stokes (Lie–Poisson plus
 viscous resistance) are specializations; the occurrence Holon of `Foundation/Holon.lean` is its event
 chart. The Lean foundation is `Holonics.Framework.HolonObject` (`Holon/{Port,Dirac,Complex,Element,
-Navigator,Restriction,Law,Conformance}`); the Rust core `holonics` mirrors it facet by facet, and every
-later owner implements or charts it.
+Navigator,Restriction,Law,Conformance}`); the October library `holonics` mirrored it facet by facet (held at
+[`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/mod.rs)), the engine's modules are set
+against the contract's rows [below](#the-rust-owners-after-the-consolidation), and every owner implements or charts it.
 
 <a id="operator-contract"></a>
 [definition] **Operator contract** (September 24, [the rebuild](plans/THE_REBUILD.md); the
@@ -179,6 +180,13 @@ certified by the analogy.
 | **Retain and continue:** an admitted future factors through the quotient; a boundary crossing carries its current interior, clock and residual into the next interaction. | Memory, state reduction, continuation. [Information atlas](atlas/information.tsv): `info.standing-quotient`, `retention.action-sufficient-quotient`; [objects atlas](atlas/objects.tsv): `hnn.reception-cut`, `hnn.reception-carry`; `Word::open_received`, `Reference::mount_continued`. Their quotient and carry obligations differ. |
 | **Locate keys and compose navigators:** contacts constrain producing configurations; restrictions preserve the admitted faces; located relations support further navigation and converging landmarks. | Source identification, resonant composition, generative relationships. [Objects atlas](atlas/objects.tsv): `key.menu-loop-closure`, `key.consistent-fibre`, `key.gauge-orbit`, `compression.encoder-decoder-square`; `compression::keys::{Menu,Gauge}` and the declared navigator transports. A new domain supplies its chart and acceptance. |
 
+The Rust names in the table's second column (`Holon::interconnect`, `Holarchy::whole`, `geometry::motion`, `Encoded`,
+`Field::selective_step`, `SourceMoment::ingest`, `HolonRatio::covector`, `Constitution::deposited`, `Word::open_received`,
+`Reference::mount_continued`, `compression::keys`) are the October library's, held at
+[`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src). The engine's `Constitution` is another
+type (`holonics_engine::constitution`), and [the Rust owners after the consolidation](#the-rust-owners-after-the-consolidation)
+gives the engine's module for each row.
+
 [source-audit] **Types and roles as read at** public
 [`3c67beee`](https://github.com/brandonrdug/holonics/commit/3c67beee7f656798f912c974f12c482ea12c5e42).
 This is a map of that realization, not a prescribed final type hierarchy:
@@ -202,6 +210,7 @@ continuation or host/device join it actually affects. A changed law receives its
 acceptance. The unchanged historical receipt remains history. A moved, added or retired source
 owner updates this contract and its atlas rows in the same change.
 
+<a id="the-rust-owners-after-the-consolidation"></a>
 [source-audit] **The Rust owners after the consolidation** (C8 of #603, November 15). The Rust this
 table names under `holonics::…` is the October library's, which retired whole. Each owner stands in
 history at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src) at the path its module name gives (`holonics::ratio::linear` is

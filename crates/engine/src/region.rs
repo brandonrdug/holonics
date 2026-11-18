@@ -1,5 +1,21 @@
-//! **A region the trainer owns** (`OwnedRegion`): its classes, its open places, its domain and its port, and the views the field reads of it.
-//! Moved from the store line's harness (`complete_language/field_train.rs`) by C4 of #603, each item's text as it stood but for its visibility.
+//! **A region: its support and its ports.**
+//!
+//! a site is known (resolved, carrying nothing), carried as a face (it opens on `Σ_a w_a E(a)`, its shares on `2^(−16)`) or open, and an
+//! open site carrying nothing is silent on the strand; only definite sites (known or locked) are heard past the near field; a state of `K`
+//! open sites among the `m` of its domain weighs its code `Σ_open −log₂ p̂` by `m/K`; a port `[s, n)` is read through its coupling (its
+//! code on `2^(−20)` bits, each place's covector `p̂_i − r_i` on `2^(−24)`), at its boundary (`−log₂(1 − p̂_∅)` and `r_a = p̂_a/(1 − p̂_∅)`
+//! at a letter place, `−log₂ p̂_∅` past the target) or on its letters off the void (`−log₂(m_a/(T − m_∅))`); a carried site's read leaves
+//! its own echo out, `z ← z − B ℓ`, `B` on `2^(−63)`; a region read as a known stream hears at every site only what stands before it
+//!
+//! Kind: gate, a site (a region's admission, its weight and its port's rows). Kernels: none of its own; the echo's are the contact's and
+//! the moment's (`field_echo_trips`, `field_echo_apply`), and a port's rows are read on the host from the faces the card fetches
+//! (`hnn/resident.rs`).
+//! Lean: `HNN/SynchronousTwoCycle` (the echo).
+//! Atlas: `tower.field-joint-code`, `tower.field-opening-boundary`; with owners in other modules, `tower.field-answer-port`,
+//! `tower.field-echo`, `tower.field-room-cut`, `tower.region-known-stream`, `tower.region-past`, `tower.region-second`, `tower.region-strand`.
+//! Records: `2026-11-01_THE_FIELD_DISPERSES…`, `2026-11-02_THE_COMPARISON_IS…`, `2026-11-18_THE_WRITERS_FRONTIER_IS…`,
+//! `2026-11-18_EVERY_PLACE_OF_A_PASSAGE…`, `2026-11-18_THE_CODEC_THE_REGION…` (the first lines this header replaced). The derivations'
+//! history is in the records; the items below keep their reasons.
 
 use crate::codec::Codec;
 use crate::field::Shares;
@@ -19,9 +35,9 @@ pub struct OwnedRegion {
     /// Its answer port (§16.24, [`Region::port`]): the first place, the void, the cells, and whether it is compared at
     /// its boundary (§16.47) rather than through its coupling.
     pub port: Option<(usize, usize, Vec<usize>, bool, Option<usize>, Option<Vec<bool>>)>,
-    /// Whether its port cuts the room to its windows ([`holonics::hnn::tower::field::Port::window`]).
+    /// Whether its port cuts the room to its windows ([`Port::window`]).
     pub window: bool,
-    /// Whether its port compares its open places on their letters off the void ([`holonics::hnn::tower::field::Port::letters`]).
+    /// Whether its port compares its open places on their letters off the void ([`Port::letters`]).
     pub letters: bool,
     /// Whether it is read as a known stream ([`Region::before`]).
     pub before: bool,

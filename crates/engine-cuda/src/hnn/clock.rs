@@ -1,4 +1,6 @@
-//! The card realization's clock (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **Rings, clocks and paces, on the card.** The launches of the host's rings and of the open places' clocks
+//! (`crates/engine/src/navigator.rs`, whose first lines state the equations, the kind and the Lean and atlas owners). THE_ENGINE §3 lists
+//! each kernel beside the phase it serves, and the host is the reference these bits are read against (`athena parity`).
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;

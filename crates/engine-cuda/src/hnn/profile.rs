@@ -1,4 +1,7 @@
-//! The card realization's profile (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **The card's readings of itself: times, launches and yardsticks.** No law's quantity stands here: the card's time on the field
+//! (`FieldTimes`), each launch, transfer and allocation timed by entry with the maps' occupied bits (`FieldProfile`), and the
+//! yardsticks (`Yardsticks`; the ruler builds are the features `ruler-rows-reads` and `ruler-bits`, which no learner's build enables).
+//! The host's readings are `crates/engine/src/ruler.rs`; THE_ENGINE §6 states where a section's time goes.
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;
