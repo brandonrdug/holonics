@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §12 added the same day, to 17:33 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §13 added the same day, to 17:37 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -298,3 +298,43 @@ What closes a unit is therefore the place level's own: binding four and five pla
 count that does it on one register holds 1.3 million entries at four places and 2.9 million at five; the constitution holds
 392,505 for five registers, 16.4 thousand of them a block of its width squared. Whether the binding is short of entries, of ticks
 (a place meets one more place a tick through its mate) or of a sharper lock is the next reading, before a part.
+
+## 13. What the repository already held on this wall, read late
+
+The reading of §12 is the third of one wall. I read the earlier two only after it, which is the miss "recover before implementing"
+names: the one-sided level of §11 was built before the level's own rows in the atlas were read.
+
+- **November 12** ([the symbol's record](2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md)
+  §4, §8.4, §9). A dark place is the interior of a composite. A composite's word is its factors' strand with a remainder,
+  `E(c) = Σ_k Ĝ(k)⁻¹ E(u_k) + ρ(c)`, the remainder founded at zero and kept where the factors miss (the conjunction a sum of its
+  places does not hold), in rows a composite reaches by its located address. A count ruler on composites founded by count read
+  the prize: at 1,024 composites two symbols back read 0.23 to 0.34 nats a byte under three bytes back on four slices. The design
+  was marked unbuilt.
+- **November 13 and 14.** The level was built as that record's "a site of the level above is an epoch", without the remainder: an
+  epoch has no rows of its own, and the level has no comparison at its own grain.
+- **November 17** (atlas `deposition.excess-inside-units`, `tower.level-holds-no-unit`). On the fifty books' state the reader's
+  excess over a count of five stands inside units, nine tenths of it at places of under a nat; the level holds its unit as a bag
+  at a third and a tenth of its order.
+- **November 18, before this record** (atlas `tower.level-restriction-is-its-draw`, `deposition.no-linear-tension-at-the-levels-locus`,
+  `tower.news-phase-chart-blind-to-dark-order`, `tower.level-receipt-codec-and-square`). The level's restriction keeps what a drawn
+  one keeps; the fine comparison gives the level no slope; a chart on the news phase cannot tell apart the places of a unit's
+  interior, where the excess stands; and a level's receipt at its own grain is a design, not ordered.
+
+What §12 adds: the same wall on the store line, on both the plain line and the two-stream line, at 0.39 to 0.41 nats of all places,
+with the machine's binding inside a unit set against counts of every order (between two and three places), and one part read
+against it (a contact at the second place before: 0.027 at the places of least news in a lap).
+
+So what is owed is the composite's remainder: rows that a strand in progress reaches by an address its symbols compose in order,
+deposited by the covector that reaches them and kept by upkeep, at the place level (the unit in progress closes its own interior;
+the level above then has units to cut). The forms the repository holds for it: the located transport's lift, each occurrence
+stepping the rings by its symbol's located advance (October 5; an order-free sum as written, an ordered address once a symbol's
+move is affine, which a paced moment's already is: atlas `navigator.content-stride-moment`, `navigator.unit-composite-move`), and
+the series of rows on coprime rings (the symbol's record §8.1). By the stores' test it is a store where its rows are few against
+the contexts that reach them, charged and leaking, shared across every strand at a residue, and a cache where it is a row a
+context. Its sizing is read against the count's own on the five registers at 8 MB each: 0.55 million entries through two places
+before, 2.4 million through three, 6.4 million through four, 13 million through five, where the constitution's 392,505 stand between
+two places and three.
+
+The one-sided level (§11) is kept as built: it is the carrier a level's own receipt needs in a one-sided stream (the epoch before
+handed to the places that follow, where a unit predicted ahead is compared with the symbols that arrive), and by the rows above
+it is not expected to move the frontier without that receipt.
