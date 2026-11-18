@@ -1,4 +1,4 @@
-//! **The field's card realization** (`holonics::hnn::tower::field`, #404, #407; records
+//! **The field's card realization** (`holonics_engine::field`, lifted from `hnn::tower::field` by C3 of #603; #404, #407; records
 //! `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`,
 //! §7, and `2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP`,
 //! §6).

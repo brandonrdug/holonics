@@ -1,0 +1,9 @@
+Guesses of the third ruler, fixed in its source (the PREDICTIONS dict of third_ruler.py) before its
+first run; the passing run started at 23:32:09 UTC on November 18, 2026 (date -u). Scored in the
+record's section 9.
+
+A. the cover's dart determinant equals the product over characters to 1e-9 relative at every sampled u; the m-cycle gives (1-u^m)^2; a wrong character set misses
+B. mixing, Cheeger, Hoffman, relaxation and entropy hold on every sampled tempered specimen; two disjoint copies break mixing at mu = 2 sqrt q
+C. |n N_n - sum mu(n/d) q^d| stays inside the P1 bound for n <= 16 on tempered specimens; an untempered specimen leaves it
+D. the triads' work is zero to 1e-12 relative in 2 and 3 dimensions, the plane's enstrophy work too; in 3 dimensions the enstrophy work is not zero; a truncation set without -k does work
+E. RK4 on a plane truncation keeps the energy equality to 1e-6 and the norm never rises

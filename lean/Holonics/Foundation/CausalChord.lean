@@ -91,6 +91,9 @@ theorem for skew-adjoint operators transported through `G^{1/2}`: one must build
 square root of `G`, conjugate by it to obtain a skew-Hermitian matrix, and invoke unitary
 diagonalizability. None of that is rate algebra, and stating it without the construction would be
 exactly the dropped hypothesis this file exists to name.
+That direction and the biconditionals it closes are proved, from `G = C*C` and the Hermitian
+spectral theorem, in `HolonicsResearch/Coupling/MovingMetricSpectral` (`diagonalizable_of_gSkew`,
+`gSkew_iff_imaginary_chart`, `seam_iff_half_chart`; November 18).
 
 [proved-derived; formal-checked] **The atlas.** `spectrum_does_not_determine_response` exhibits two
 linearizations over `ℚ` with the same characteristic polynomial `X²` and different numerators: this

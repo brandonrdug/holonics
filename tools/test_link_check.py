@@ -131,6 +131,22 @@ def main():
         assert link_check.split_owner("my_engine::field::lock") == ("my_engine::field::lock", None, "")
         assert link_check.split_owner("crates/k/x.cuh::kernel (a note)") == ("crates/k/x.cuh", ["kernel"], "")
         passed += 1
+
+        # The grades: the synthetic rows above are all `definition`; three more rows are one declared (`measured`), one dated status
+        # beside an owner in history, and one status with no such owner, which is the planted failure.
+        graded = os.path.join(tmp, "graded")
+        marks = [("m.row", "N:a-record.md", "measured"), ("h.row", "H:crates/old/src/a.rs@abc; L:A:b", "implemented; tests pending"), ("p.row", "L:A:b", "formal-checked; import check pending")]
+        os.makedirs(os.path.join(graded, "docs/atlas"))
+        open(os.path.join(graded, "docs/atlas/objects.tsv"), "w", encoding="utf-8").write("\n".join("\t".join([name, "holon", "x = x", "reads", "", owners, grade, ""]) for name, owners, grade in marks) + "\n")
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            declared, dated, broken = link_check.grades(graded)
+        assert (declared, dated) == (1, 1) and broken == [("docs/atlas/objects.tsv", 3, "p.row", "formal-checked; import check pending")], (declared, dated, broken)
+        assert "BROKEN_GRADE docs/atlas/objects.tsv:3 p.row" in buf.getvalue() and "ATLAS_GRADES declared=1 dated=1 broken=1" in buf.getvalue(), buf.getvalue()
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            assert link_check.grades(root) == (1 + len(BAD), 0, [])
+        passed += 1
     print(f"link_check controls: {passed} passed")
 
 

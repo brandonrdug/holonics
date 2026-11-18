@@ -1,0 +1,27 @@
+== A. The one-sided count bound and the Li numbers
+  Petersen: q = 2, 10 cells, nontrivial modes 9, on the circle: True
+    remainder against tr(B^l) to length 24, largest difference over q^l 1.89e-15
+    first length outside the two-sided bound: None; outside the one-sided bound: None
+    first Li number below zero: None; smallest Li number to n = 400: 0.005640
+  prism of two rings of 21: q = 2, 42 cells, nontrivial modes 41, on the circle: False
+    remainder against tr(B^l) to length 24, largest difference over q^l 4.26e-14
+    first length outside the two-sided bound: 10; outside the one-sided bound: 10
+    first Li number below zero: 10; smallest Li number to n = 60: -539629240.074084
+== B. Negative squares of the norm form
+  Petersen: negative squares 1 = modes with lambda^2 > 4q 1; positive 19 = cells 10 + modes inside 9; null 0 = modes at the edge 0
+  K4: negative squares 1 = modes with lambda^2 > 4q 1; positive 7 = cells 4 + modes inside 3; null 0 = modes at the edge 0
+  prism of two rings of 21: negative squares 5 = modes with lambda^2 > 4q 5; positive 79 = cells 42 + modes inside 37; null 0 = modes at the edge 0
+  planted (q + 3 in the form, q in the count): negative squares 0 against 5
+== C. Prime cycles: enumeration, Moebius inversion and the product to a horizon
+  K4: prime cycles at lengths 1 to 8: by Moebius [0, 0, 8, 6, 0, 12, 24, 18]; by enumeration [0, 0, 8, 6, 0, 12, 24, 18]
+    det(1 - uB) and the product to horizon 8 agree through u^8; the first differing power is u^9
+    (1 - u^2)^|V| * product and det(1 - uA + u^2(D - 1)) * (1 - u^2)^|E| agree through u^8
+  Petersen: prime cycles at lengths 1 to 9: by Moebius [0, 0, 0, 0, 24, 20, 0, 30, 40]; by enumeration [0, 0, 0, 0, 24, 20, 0, 30, 40]
+    det(1 - uB) and the product to horizon 9 agree through u^9; the first differing power is u^10
+    (1 - u^2)^|V| * product and det(1 - uA + u^2(D - 1)) * (1 - u^2)^|E| agree through u^9
+  planted (backtracking allowed, K4): necklaces [0, 6, 8, 18, 48, 116]; the three faces first differ at u^2
+== D. The moving metric: a positive form for a semisimple imaginary generator, none for a Jordan block
+  semisimple imaginary generator: least eigenvalue of G 0.0483, largest entry of A*G + GA 6.66e-16
+  Jordan block at zero: the conserved Hermitian forms span 2 dimensions, and every one vanishes on the block's first vector (largest corner entry 0.00e+00), so none is positive definite
+  planted (a diagonal imaginary generator): conserved forms span 2 dimensions, the identity among them
+all checks pass

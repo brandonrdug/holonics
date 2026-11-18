@@ -1,4 +1,7 @@
-//! The card realization's carry (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **The strand's triads, on the card.** The words pointed at a tick's triads' carriers; the pair's, the circle's and the triad's
+//! launches stand with the contact's (`hnn/contact.rs`), and the host's strand is `crates/engine/src/carry.rs`, whose first lines state
+//! the equations, the kind and the Lean and atlas owners. THE_ENGINE §3 lists each kernel beside the phase it serves, and the host is
+//! the reference these bits are read against (`athena parity`).
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;

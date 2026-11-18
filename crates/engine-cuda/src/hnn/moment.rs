@@ -1,4 +1,7 @@
-//! The card realization's moment (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **The source moment and the opening's cavity, on the card.** The launches of the host's moments and of the cavity opening
+//! (`crates/engine/src/moment.rs` and `field/moment.rs`, whose first lines state the equations, the kind and the Lean and atlas
+//! owners), with the moment kernels' words, one a mode. THE_ENGINE §3 lists each kernel beside the phase it serves, and the host is the
+//! reference these bits are read against (`athena parity`).
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;

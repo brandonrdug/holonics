@@ -1,0 +1,7 @@
+Guesses fixed before the ruler ran (date -u at fixing below).
+G1. On the prism of two rings of 21 (q = 2, not tempered) the one-sided count bound rem(l) <= 2*N*q^(l/2) first fails at length 10, the same length at which the first record's two-sided bound first failed.
+G2. On that prism the first Li number with negative real part is at n = 10 as well.
+G3. On the Petersen complex every Li number to n = 400 is nonnegative and the smallest is above 1.
+G4. Prime cycles of K4 by direct enumeration of primitive closed non-backtracking walks: 8 at length 3, 6 at length 4, 0 at length 5, and the truncated product to horizon 8 agrees with det(1 - uB) through u^8.
+G5. Negative squares of the norm form on the prism of 21: equal to the number of modes with lambda^2 > 8 counted with the trivial mode, which I put at 9.
+Wed Nov 18 23:02:42 UTC 2026
