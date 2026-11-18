@@ -190,6 +190,9 @@ for kname, kf, topn, bag in [("its symbols as a bag", None, 40, True), ("its sym
     vs, ns = presence(X_m, short, kf, topn, bag); vl, nl = presence(X_m, long_, kf, topn, bag)
     print(f"LINKS   the fold, in the moment, key {kname:32s} within a section {vs:5.0f}   winding past it {vl:5.0f}   (read {ns}, {nl})")
 
+if len(sys.argv) > 3 and sys.argv[3] == 'links':
+    print(f"LINKS done in {time.time() - t0:.0f} s (reading A alone)"); sys.exit(0)
+
 # ---- Reading B: the tension at the level's locus ----
 Y = np.asarray(covector, np.float64) / float(1 << 24)
 pw = (Y ** 2).sum(1)

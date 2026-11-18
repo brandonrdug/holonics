@@ -450,3 +450,49 @@ books 3.479), and the fitted faces read 2.936 at the opening, 2.978, 2.936 and 2
   linear face reads, as at the boundary. So the late binding is not the boundary state's alone; the front-loaded profile belongs to a
   place whose neighbours are all known. The level's place at the split is as in section 11 wherever a place is compared among unknown
   neighbours.
+
+G-V6 (2026-11-18T01:22:38Z). What a place among known neighbours holds by the split, on the night's pass-15 state: the same fitted faces with one place
+opened alone in the middle of a row (24 known places on each side), the regime of November 13's G132, fitted on a sample of the
+training passage's rows and read on the trace's held rows.
+  Read before fixing: on November 13 (the line's state C, one place open) the fitted faces read 2.50, 1.93, 1.54, 1.36 and 1.31, the
+  first two ticks carrying 81% of the fall; tonight at the boundary they carry 11%, and under lap 94's masks nothing. The night's state
+  is lap 94's after fifteen passes compared at the boundary only, so its two-sided skill may have loosened.
+  The guess: her own face at such a place 0.9 to 1.5 nats; the first two ticks carry 55% or more of the fall from the opening's fitted
+  face to her own.
+  What it decides: whether the written places the level's moment sums are mostly settled by the split (a place among known neighbours
+  is the nearest reading of one). If the first two ticks carry most of the fall, the level's moment is taken from settled states and its
+  emptiness is the restriction's and the slope's (sections 9), not its inputs'. If they carry little here too, a place binds late in
+  every regime on this state.
+
+Scored (2026-11-18T01:38:51Z), G-V6 (tick_faces.txt, its last block): missed on both parts, and the read says something the guess did not ask. With one
+place open in the middle of a row and 24 known places on each side, the night's state codes it at 2.921 nats at her own face (0.9 to
+1.5 guessed), where the symbols' frequencies alone code 3.040. A face fitted at the opening reads 1.129, and after one, two and three
+ticks 1.378, 1.399 and 1.343: there is no fall from the opening to her face to apportion.
+  What it says. The opening holds both neighbours and the moment, and its own comparison (the opening's block) is trained at every
+  place: a linear face of it codes the place at 1.13 nats, which is the cavity news the level's cut runs on (1.15 in the level's
+  trace). The ticks and the readout of this state then read a place among known neighbours worse than its opening does. Fifteen passes
+  compared at the boundary alone left the state's two-sided reading loose, as the sums loosened when their upkeep stopped (the dwell
+  record). So the night's state is no specimen for what a written place among known neighbours holds; that reading belongs on the
+  line's own state. It also bounds the night's level readings: they were taken on a state whose two-sided ticks had loosened.
+
+G-V7 (2026-11-18T01:39:13Z). The level's links (reading A alone) on the line's own state, lap 94's mean, on the same 5,164 held rows of the fifty books
+(prose the line has not met; the rows of 48 known places and the next open). The night's level readings were taken on a state whose
+two-sided ticks had loosened (G-V6), so the statement that the restriction keeps what a drawn one keeps is read again where the level
+was trained.
+  Read before fixing: on the night's state the built restriction keeps 152, 480, 169 and 255 thousandths (leading symbol, bag, by
+  sixth of a turn, identity) against a drawn one's 119, 410, 218 and 221, the moment holding 424, 721, 522 and 310. The level trained
+  about eighty laps on the line and led it by 0.012 and then 0.019 nats a place in its first two.
+  The guess: on lap 94's mean the moment holds the bag at 650 or more and the symbols by sixth at 450 or more; the built restriction
+  stands between 0.9 and 1.4 of a drawn one on the bag and between 0.6 and 1.3 on the symbols by sixth, so it is still about a draw.
+  What it decides: whether "the restriction keeps what a drawn one keeps" is the line's level or only the night's state.
+
+Scored (2026-11-18T01:42:20Z), G-V7 (level_links.txt, its last block): held on its four parts. On lap 94's mean the moment holds the bag at 780 (650 or
+more guessed) and the symbols by sixth of a turn at 581 (450 or more); the built restriction keeps 526 and 175 against a drawn one's
+416 and 238, 1.26 and 0.74 of it (0.9 to 1.4 and 0.6 to 1.3 guessed). The leading symbol 237 against 191, the identity 265 against
+230; a located restriction of the same width 542, 743, 243 and 314 of the moment's 564, 780, 581 and 370. So on the line's own state
+too the restriction is about a draw, the width passes the bag and not the order, and the fold costs order (the leading symbol 666
+within a section and 484 past it, the last symbol 667 and 393).
+  Where the line's state differs from the night's: its epochs are 6.60 places and 9.65 nats (8.56 and 9.48); the level's read after its
+  ticks holds the epoch before's bag at 163, as much as the fine read at the next leading place (168) and the moment (163), where the
+  night's held 75 against 112; and the restriction holds the symbol that leads the next epoch at 95 against a drawn one's 41, the one
+  key on which it stands well clear of a draw.
