@@ -6,6 +6,7 @@ same script with one read taken out prints that read's rule and no other. A scri
 """
 import os
 import sys
+import tempfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lap_check  # noqa: E402
@@ -60,7 +61,18 @@ def main():
     assert lap_check.notes(READS_ONLY) == []
     decoys = sorted(r for r, _ in lap_check.notes(DECOYS))
     assert decoys == [1, 4, 4, 5, 6, 7], decoys
-    print(f"lap check: the whole script prints nothing, {len(PLANTED)} planted omissions are each found alone, the decoys are not read")
+    # The loudness read by a companion script: the lap script reads none and names the companion in a comment. The note is quiet
+    # where the companion stands beside it and calls the read, and prints where it is missing or only mentions the read in a comment.
+    alone = WHOLE.replace("loud mean_L14 $mean_s; ", "").replace("loud() { card timeout 1800 $BIN train complete-language read-loudness $U0 $S $K $C $2 $D/loud_$1 > $D/loud_$1.log; }\n", "")
+    assert [r for r, _ in lap_check.notes(alone)] == [7]
+    named = alone.replace("set -u", "# loudness: loud.sh reads this lap's mean.\nset -u")
+    with tempfile.TemporaryDirectory() as tmp:
+        assert [r for r, _ in lap_check.notes(named, tmp)] == [7], "a companion that is not there"
+        open(os.path.join(tmp, "loud.sh"), "w").write("# read-loudness is run elsewhere\n")
+        assert [r for r, _ in lap_check.notes(named, tmp)] == [7], "a companion that calls no read"
+        open(os.path.join(tmp, "loud.sh"), "w").write("card timeout 1800 $BIN train complete-language read-loudness $U0 $S $K $C $M $D/loud\n")
+        assert lap_check.notes(named, tmp) == []
+    print(f"lap check: the whole script prints nothing, {len(PLANTED)} planted omissions are each found alone, the decoys are not read, a companion's loudness is read where it stands")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 //! **A site carries its helical moment** (the dispersing field's §15.1): the superposition of
 //! every source of a strand at its skin, none selected; the contact is the filter. Its card image
-//! is `crates/holonics-cuda/kernels/field_moment.cuh`.
+//! is `crates/engine-cuda/kernels/field_moment.cuh`.
 //!
 //! [definition; agent-inferred, November 1] Of the winding guide's six objects this module touches
 //! the **helix** (a ring's phase carried with its whole winding: `ζ^r`, `r` an integer place),

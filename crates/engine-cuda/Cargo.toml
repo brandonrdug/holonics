@@ -6,8 +6,7 @@ license.workspace = true
 publish = false
 
 # The engine's card realization (docs/plans/THE_CONSOLIDATION.md, D1 and §6): the driver, the card and the field's resident
-# realization, with the field's kernels. It depends on the engine and on nothing in `crates/holonics` or `crates/holonics-cuda`,
-# which imports it (C3 of #603).
+# realization, with the field's kernels. It depends on the engine alone, and the commands depend on it (C3 and C6 of #603).
 [lib]
 name = "holonics_engine_cuda"
 path = "src/lib.rs"
@@ -17,7 +16,7 @@ holonics-engine = { path = "../engine" }
 thiserror = { workspace = true }
 rayon = "1.12"
 
-# Ruler builds of the profile example (moved from `crates/holonics-cuda`, which forwards its features of the same names):
+# Ruler builds of the profile (`hnn/profile.rs`; `athena` forwards its features of the same names):
 # [measurement; theory, November 12, P53 item 1 (G120)] the contact's rows with their memory and without their arithmetic
 # (`field_yard_rows`), immediately before the entry, its stores into scratch; [P54 item 1] the words' occupied bits by array and
 # clock (`field_yard_bits_*`). No learner's build enables them.
