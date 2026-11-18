@@ -389,3 +389,18 @@ level's field take a slope from the strands only once the block has left zero.
   What it decides. Arm L14 at least 0.015 under arm P14 at lap means: the line takes the block. Otherwise the block leaves the line
   and stays in the tree as the carrier a level's own receipt needs, with the reading. The founding itself is not read on the card
   (the host's and the card's tests hold that it keeps every face).
+
+G-1118-17 (2026-11-18T19:08:12Z). The row of the site after reading the second site before (frontier 6 strand past second): two laps (arms R15, R16)
+from arm P14's end, beside the line's own P15 and P16 from the same state (the control). Read before fixing: an open place holds the
+place before it at 896 thousandths as it opens (the opening's row of the site before), the second place before at 486 and the third
+at 176, and no tick carries a farther place in (the presence reading of the same day); the frontier binds about three places. The
+rows this word puts to work were deposited under the law for the site after, and the law's regions (two stretches of eight) still
+read them so: as with the odd contacts, they open mismatched and serve two relations. The odd contacts facing the past read 0.013
+under their control after one lap and 0.031 after two, and cost the one-place reading under the law 0.07.
+  The guess. (a) Rows S at lap means: arm R15 between 0.030 above and 0.030 under arm P15's; arm R16 between 0.000 and 0.060 under
+  arm P16's. (b) At the places of least news (under a quarter of a nat under the count) arm R16 reads 0.02 or more under arm P16.
+  (c) Under the law the same states read one place open between 0.00 and 0.06 above the control's. (d) A section's time stands
+  within 3% of the line's. (e) The long panel from a lap's mean stays within 8 points of the control's.
+  What it decides. Arm R16 at least 0.015 under arm P16 at lap means: the line takes the word, and a row for each of the third to
+  fifth places before is the growth that follows, sized by the presence reading taken again on its state. Otherwise the word
+  leaves the line and stays a region's word in the tree, with the reading.
