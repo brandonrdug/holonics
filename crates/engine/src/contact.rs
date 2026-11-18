@@ -1226,6 +1226,26 @@ impl Constitution {
         y.chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect()
     }
 
+    /// [measurement; the lead, November 18, the record of the two streams §14] **A strand's reads, for a ruler on the host**: each known
+    /// site's read after the last tick (`[n][D]`, the lane chart of its state on `2^(−16)`), and each open place's read after every tick
+    /// (`[ticks][n][D]`), as [`Constitution::strand_pass`] left them. What a place's state carries of the places before it is read
+    /// from these outside the machine. A reading: the state is the same with it.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_reads(&self, classes: &[usize], past: bool) -> Result<(Vec<i32>, Vec<Vec<i32>>)> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let (dw, n) = (self.declaration.width, classes.len());
+        let chart = |x: &[i64]| -> Result<Vec<i32>> {
+            let (mut read, mut scale) = (Vec::with_capacity(x.len()), Vec::new());
+            for xt in x.chunks_exact(dw) {
+                lane_chart(xt, self.declaration.lanes, &mut read, &mut scale)?;
+            }
+            Ok(read)
+        };
+        let known = chart(&pass.last[..n * dw])?;
+        let open = pass.ticks.iter().map(|cell| chart(&cell.after[n * dw..])).collect::<Result<_>>()?;
+        Ok((known, open))
+    }
+
     /// [definition; the lead, November 18, the frontier record §6] **The strand's two streams read by one tick**: the known stream's
     /// sites and its open places are one batch of sites, the open places after the known ones, each at the place of the known site of
     /// its index ([`Sided::Strand`], [`ClassLists::twins_from`]). A site's near field, its falloff, its skin on a plain pace, its

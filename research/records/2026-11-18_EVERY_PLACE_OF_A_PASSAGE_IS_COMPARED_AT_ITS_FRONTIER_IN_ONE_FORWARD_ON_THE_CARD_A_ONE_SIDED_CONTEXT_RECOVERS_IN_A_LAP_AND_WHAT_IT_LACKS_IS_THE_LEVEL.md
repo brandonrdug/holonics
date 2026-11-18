@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §14 added the same day, to 18:24 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §15 added the same day, to 18:55 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -398,3 +398,36 @@ holds 32, half of them at rest in a one-sided stream until `past`. Putting that 
 the store line's two-stream states, by distance in places and by tick, with and without the word; and the first candidates are
 the strand's own carriers (circles and mates at more places before, sized by that reading), ahead of any store of rows. A growth
 in circles on a tower that already holds circles is not built (`Constitution::with_carry` refuses both).
+
+## 15. What a strand's state carries: about three places, and the ticks add none
+
+The reading §14 named, taken (`athena host complete-language read-strand-states`, `tools/strand_presence_ruler.py`). The 800 frontier
+rows are read whole as passages by two streams (140,798 places). By least squares, fitted on the even passages and read on the odd:
+the share of the indicator of the symbol standing `k` places before a place (among the 48 commonest classes) that the read at the
+place removes, in thousandths. The two-stream line's fourth lap mean (arm S12), and in brackets the line with the word `past`
+(arm P12):
+
+| read | 1 back | 2 back | 3 back | 4 back | 5 back | 6 back | 8 back |
+|---|---|---|---|---|---|---|---|
+| the open place after tick 1 | 896 (877) | 486 (488) | 176 (225) | 101 (106) | 68 (69) | 54 (53) | 26 (25) |
+| after tick 2 | 818 (789) | 439 (440) | 219 (241) | 96 (106) | 56 (62) | 47 (45) | 21 (22) |
+| after tick 3 | 739 (699) | 385 (386) | 204 (221) | 97 (103) | 47 (50) | 28 (27) | 13 (13) |
+| after tick 4 | 685 (631) | 359 (357) | 201 (212) | 96 (102) | 47 (49) | 25 (25) | 12 (11) |
+
+A known site's read after the last tick holds its own symbol at 592 (552) and the places before it at 626, 319, 176, 83, 44.
+
+- The open place holds the place before it at nine tenths as it opens: that is the opening's own row of the site before
+  (`E₋`). Two places before it holds a half, three a fifth, four a tenth: each place back about half the one nearer, which is what
+  an ordered sum in one moment gives (the retarded cavity moment, every earlier place's row turned by its distance and laid over
+  the others).
+- The ticks carry no farther place in. From the first tick to the fourth every column but the third falls, as the state turns
+  toward the symbol to come. The window does not follow the count of ticks.
+- The word `past` raises the third place back by a quarter at the first tick (176 to 225: the second mate holds its own
+  predecessor) and nothing else. Its 0.031 nats (§12) came by binding through the second mate's contacts, more than by a place
+  carried.
+
+So the frontier binds about three places (§12) because a strand's state carries about three. What is owed first is a carrier,
+and the repository holds one idle: in a one-sided stream the row of the site after (`E₊`, as many entries as `E₋`) reads no
+site, as the odd contacts read none before the word `past`. Facing the past it is the row of the second place before, the place
+the open place now holds at a half. Past it, a row for each of the third to fifth places before is a growth of one family a place
+(the alphabet by the width, 31 thousand entries), sized by this reading taken again. Then what binds them (§14).

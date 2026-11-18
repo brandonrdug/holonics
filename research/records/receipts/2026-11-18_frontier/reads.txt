@@ -519,3 +519,21 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   RING_ROWS slice=web rows=64000 periods=21323x21319x21317 under_0.25=0.6347 0.25_to_1=1.2355 over_1=3.6518 all=2.2380
   RING_ROWS slice=web rows=256000 periods=85331x85313x85303 under_0.25=0.2015 0.25_to_1=0.7627 over_1=3.6367 all=2.0034
   RING_ROWS slice=web whole_count under_0.25=0.0656 0.25_to_1=0.5774 over_1=3.5486 all=1.8816
+- How many places' identities a strand's state carries (athena host read-strand-states on the 800 frontier rows, each read whole
+  as a passage by two streams, 140,798 places; tools/strand_presence_ruler.py: the indicator of the symbol k places before among
+  the 48 commonest classes, least squares fitted on the even passages and read on the odd, thousandths; read 18:55 Z at the latest).
+  Arm S12's lap mean (the odd contacts at rest), then arm P12's (the word past):
+  STRAND_STATES rows=800 places=140798 past=false ms=142456
+  STATES S12 PRESENCE passages=800 places=140798 width=128 ticks=4 top=48 (thousandths, held half)
+  STATES S12 PRESENCE read=known_site_last_tick places_back: 0=592 1=626 2=319 3=176 4=83 5=44 6=28 7=21 8=14
+  STATES S12 PRESENCE read=open_place_tick_1 places_back: 1=896 2=486 3=176 4=101 5=68 6=54 7=42 8=26
+  STATES S12 PRESENCE read=open_place_tick_2 places_back: 1=818 2=439 3=219 4=96 5=56 6=47 7=35 8=21
+  STATES S12 PRESENCE read=open_place_tick_3 places_back: 1=739 2=385 3=204 4=97 5=47 6=28 7=19 8=13
+  STATES S12 PRESENCE read=open_place_tick_4 places_back: 1=685 2=359 3=201 4=96 5=47 6=25 7=18 8=12
+  STRAND_STATES rows=800 places=140798 past=true ms=117233
+  STATES P12 PRESENCE passages=800 places=140798 width=128 ticks=4 top=48 (thousandths, held half)
+  STATES P12 PRESENCE read=known_site_last_tick places_back: 0=552 1=566 2=317 3=185 4=91 5=50 6=27 7=20 8=13
+  STATES P12 PRESENCE read=open_place_tick_1 places_back: 1=877 2=488 3=225 4=106 5=69 6=53 7=40 8=25
+  STATES P12 PRESENCE read=open_place_tick_2 places_back: 1=789 2=440 3=241 4=106 5=62 6=45 7=33 8=22
+  STATES P12 PRESENCE read=open_place_tick_3 places_back: 1=699 2=386 3=221 4=103 5=50 6=27 7=19 8=13
+  STATES P12 PRESENCE read=open_place_tick_4 places_back: 1=631 2=357 3=212 4=102 5=49 6=25 7=18 8=11
