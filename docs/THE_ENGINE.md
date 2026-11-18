@@ -239,10 +239,22 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
     tick written for the open places (`Constitution::strand_faces`) is kept as the joined tick's oracle, and the chart's single
     stream of veiled sources (`Constitution::chart_faces`) as a reading (two and a half nats from the state as trained; the two
     streams half a nat).
-  - owed, in order: the card's realization and its parity (the kernels given each site's place, as the host's tick was); the mode
-    as a region's own word in place of the ruler's setting, with a word of the pass for stretches read this way and the learner's
-    section taking such a region; the held read; then the level and the second read's mark made one-sided, which the two streams
-    leave out and which are worth 0.16 nats at the frontier's place.
+  - owed, in order: the card's realization and its parity; the mode as a region's own word in place of the ruler's setting, with a
+    word of the pass for stretches read this way and the learner's section taking such a region; the held read; then the level and
+    the second read's mark made one-sided, which the two streams leave out and which are worth 0.16 nats at the frontier's place.
+  - the card's form (read in the kernels, November 18; `agent-inferred` until its parity holds): a passage is two regions of the
+    batch. The known region's sites hear only what stands before them (a mode of the region: the support's and the crowds' side, the
+    class counts, the moments' and the opening's after rows, the strand's odd contacts and the circles from the right). Its open
+    places are a second region of as many open sites whose source side is the known region's (its keys, values and class lists, its
+    mate's `b` at the place before, its circle as it stands at the place), heard by no one. A site's position stays its place in both
+    regions, and a region's block of scores stays its square, so a passage costs two regions' pairs where the host's joined batch
+    would cost four. The open places' covectors on what they heard land on the known region's sites, and a circle's covector takes
+    the open place's term beside the known site's. The open places' clocks, read from their faces after each tick, and their retarded
+    moments on those clocks are the cavity kernels' with no after rows. The host's joined tick is its reference: a row is one
+    receiver's, and a row's sum is the same bits in either layout.
+  - why it is the next build: the frontier's fall under the control is 0.1603 + 0.0458 ln(sections / 3,000) over six laps with
+    the share, a fifth lane of 32 buys nothing there in its first lap, and a frontier comparison costs a region's whole read today
+    (the frontier record §5 and §7).
 
 - **A founding law, and a lock that closes** (November 16, [the record](../research/records/2026-11-16_THE_LINK_THAT_SLIPS_IS_THE_LOCK_A_FAR_DIGIT_ARRIVES_AT_A_TENTH_OF_ITSELF_THE_SUMS_LAW_SITS_IN_A_PRODUCT_NO_READING_REACHES_UNTIL_THE_LOCK_CLOSES_AND_A_PART_ENTERS_BY_A_TENSION_READ_ALONG_ITS_CONSUMERS_EQUATION.md)). Every part
   of the engine enters at zero or with drawn operands; the founding law of October 24 (`contact.pool-founding`) stands in a host ruler
