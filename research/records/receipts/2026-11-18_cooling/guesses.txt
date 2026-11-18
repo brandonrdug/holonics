@@ -25,3 +25,18 @@ tested; the build reproduces lap 70's first 24 sections from lap 69's state line
   law (it cools where an entry's own push stands at the noise level), and whether a cooled state then compounds is read over further
   laps against A continued, since one lap cannot show it. If D's training code does not fall under A's, the fixed rate is not what
   holds the line and the first cause of both audits is wrong as stated.
+
+G-1118-2 (2026-11-18T04:53:45Z). Whether both regimes hold when both are kept up. Read before fixing: from lap 94's end state at rate 12, fifteen passes
+compared at the boundary alone (48 known places, the next open) took the held next place from 2.050 to 1.536 at pass 10 and 1.527 at
+pass 15 and the panel (one place a read) to 76% of its words in the lexicon, and left a place between known neighbours at 2.921 nats
+where lap 94's mean reads it at 0.920; ten passes of half-open rows alone from the same state left the held next place at 1.813 and
+the panel at 56%. Tonight's cooling arms: a cooler deposit does not move the level, so the regimes' fight is not the temperature's.
+  The trial. From the same state at the same rate, ten passes over one table that holds both kinds of row shuffled together: the
+  897,205 boundary rows and the 56,051 half-open rows (about as many compared places of each a pass), 400 rows a section. Read every
+  pass on held rows: the next place at the boundary; and on held rows of 48 known places and a run of 32, the run's first place open
+  alone (a place between known neighbours), its last place open alone, and its last place with the whole run open.
+  The guess, at pass 10, held: the next place at the boundary 1.55 to 1.66; the place between known neighbours no more than 0.10 nats
+  above what the same read gives before any pass; the panel written one place a read at 68% or more of its words in the lexicon.
+  What it decides. If both hold, the line's diet takes the boundary regime as a declared share beside its masks, and the build is the
+  store trainer's state law. If the place between known neighbours is lost anyway, the two regimes cannot share these rows by upkeep
+  alone, and they need loci of their own.
