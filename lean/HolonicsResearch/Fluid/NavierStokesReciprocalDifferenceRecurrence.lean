@@ -167,7 +167,7 @@ inductive QuadraticDenominatorFace
 /-- The separable quadratic denominator has exactly seven candidate faces before any product
 estimate is taken. -/
 theorem quadraticDenominatorFace_card : Fintype.card QuadraticDenominatorFace = 7 := by
-  native_decide
+  decide
 
 /-- Cross-coordinate first differences of the genuine frequency denominator vanish exactly. -/
 theorem frequencySquared_crossDifference_eq_zero

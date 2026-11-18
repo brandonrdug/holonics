@@ -88,9 +88,15 @@ touches the helix (circle + carry), the pair (torus with a modular address; a cy
 faces and placement (the window face) and the tube (the strip); cell holonomy and the tower thread
 stay attached and are not used here (the Odometer's tower of epochs is `Epoch.odometer_tower`).
 
-[open] Owed, not proved here: the three-distance theorem (Sós, Świerczkowski, Surányi 1958) and
-Sturmian factor complexity `n + 1` (Morse–Hedlund 1940); which receiver hears the projected point
-set (the regular-model-set diffraction of Hof 1995) is not proved here.
+[proved-standard; formal-checked] Beside this module: the three-distance theorem (Sós,
+Świerczkowski, Surányi 1958) in its three-value form, for every real rate, on a finite ring and in
+the ratio chart, is `HolonicsResearch/Aeon/Clock/ThreeDistance` (`three_distance`,
+`three_distance_ring`, `three_ratios`), and Sturmian factor complexity `n + 1` (Morse–Hedlund 1940)
+is `HolonicsResearch/Aeon/Clock/SturmianComplexity` (`ncard_factors_eq`). The gap lengths as
+continued-fraction residues are not in Lean.
+
+[open] Which receiver hears the projected point set (the regular-model-set diffraction of Hof
+1995) is not proved here.
 
 No `axiom`, no `sorry`, no `native_decide`.
 -/

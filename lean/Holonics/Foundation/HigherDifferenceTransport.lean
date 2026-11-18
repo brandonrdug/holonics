@@ -576,7 +576,7 @@ def secondOrderAllocationReceiver (face : ProductFace Generator State R) :
 /-- The commuting `(2,2,2)` receiver has exactly `3^3 = 27` allocation faces. -/
 theorem threeAxisSecondOrderAllocation_card :
     Fintype.card ThreeAxisSecondOrderAllocation = 27 := by
-  native_decide
+  simp [ThreeAxisSecondOrderAllocation]
 
 end Holonics.HigherDifferenceTransport
 
