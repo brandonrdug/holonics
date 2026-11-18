@@ -1,6 +1,9 @@
 # The consolidation
 
-**Status: November 14.** This plan is the order of one campaign: the repository is reduced to the
+**Status: November 18.** C1 to C4, C6 and C8 (a to d) are read and merged. C5 keeps the kernels' headers. C7 keeps the headers of
+`codec`, `region`, `passage`, `units` and the card's modules, and the dated reasoning in the comments. C8 keeps the timing read of
+`vendor/num-bigint` and `hnn::overture`'s line in #146. C9 was taken on November 18 (its notes under the step). C10 is the PC's, with
+the sizes restated under it. This plan is the order of one campaign: the repository is reduced to the
 machine that runs, the engine gets one owner cut by object, and its laws are stated once.
 [#603](https://github.com/brandonrdug/holonics/issues/603) carries its boxes, and every commit and
 pull request of the campaign cites it with `Refs #603`. [THE_REBUILD](THE_REBUILD.md) keeps the
@@ -593,10 +596,41 @@ holds with the reads' lines.
   test runs in gate 1.
 - Done when the README's map, the guides and the position agree with the tree, checked by a link
   test over the root guides, `docs/` and the records' README.
+- The position, the method rules and the issues, read November 18 (#991):
+  - `CONSTRUCTION_STATE.md` keeps its newest section and a dated list of the four layers that stood under it, held at `8314281c5`
+    (54 KB to 17 KB). A new position goes on top and the one under it joins the list.
+  - CLAUDE.md's method rules, the card rule and the waiting standard keep their bar, a reason in a sentence, their scope and their
+    link, grouped as a design, a line's lap (numbered 1 to 11 in a lap's order) and a reading and its telling. Their text as the
+    guide held it stands word for word in
+    [the method rules' record](../../research/records/2026-11-18_THE_METHOD_RULES_THE_CARD_RULE_AND_THE_WAITING_STANDARD_WITH_THEIR_OCCASIONS_AS_THE_GUIDE_HELD_THEM_BEFORE_IT_KEPT_EACH_RULES_BAR_REASON_SCOPE_AND_LINK.md).
+    A second reader compared the two rule by rule and seven dropped clauses were restored. A fact the plan missed: the bars and
+    scopes are most of the text, so the guide went from 113.6 KB to 108.7 KB. A shorter guide is fewer rules, and that is a
+    decision about the rules, never a step of this campaign.
+  - `tools/lap_check.py` reads a lap's run script against the lap's rules and `tools/runs.py start` prints its notes; its controls
+    run in gate 1. It is the one new tool of the step, and its reason is that no lap script of November 18 called `read-loudness`.
+  - CLAUDE.md's issue list and its `crates/athena` row describe the tree, and the status lines of #404 to #407 are current. #405 to
+    #407 still carry boxes written on the October route; restating them is the lead's.
 
 **C10. The close.** C1's reading is run again and its receipt set beside the first; the sizes of §1
 are restated by part; `python3 tools/repo_census.py` reads clean on the PC; #603 is closed by hand
 with the commits.
+- The sizes, read November 18 on `main` at `c50e4612` (lines of tracked files, each with its part; §1's figures of November 14 beside):
+
+  | Part | November 14 | November 18 |
+  |---|---|---|
+  | All tracked lines | 6,636,715 | 6,280,323 in 13,579 files |
+  | Rust and CUDA under `crates/` | about 458,000 | 46,378: `crates/engine` 22,658, `crates/engine-cuda` 18,733 (`kernels/field.cu` 7,711 of them), `crates/athena` 5,062 |
+  | `vendor/num-bigint` | | 17,034 |
+  | `lean/` | about 641,000 | 617,650 |
+  | `tools/` | | 15,143 in 79 files |
+  | Guides under `docs/`, the atlas aside | | 27,259 |
+  | Records, receipts and papers under `research/` | 71% of the tree | 5,550,480, which is 88% of the tree: receipts 3,618,707, records 1,193,654, the rest 738,119 |
+  | `CLAUDE.md` and `AGENTS.md` | 85.7 KB each | 108.7 KB and 3.9 KB |
+
+- The PC's trunk, read November 18 through a mount, which reads and never changes: 68 worktrees stand under `.local/wt`, 35 with a
+  `target/`. The line's run scripts read their keys, units and codec from the untracked `.local/` of four of them (`store-trainer`,
+  `section-edge`, `field-card`, `depth-sweep`), so those four are kept by name in any sweep, or the line's inputs are first copied
+  under the main checkout's `.local/`. The census and the sweep are the host's (the trunk contract).
 
 ## 10. Declared extents that stand in for laws
 
