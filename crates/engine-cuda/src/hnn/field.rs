@@ -1175,7 +1175,26 @@ mod tests {
         let mixed: Vec<Region> = others.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
-        for (name, learner) in mark_cases() {
+        // [the record of the two streams §11] A fifth field: the tower opened to one-sided streams (`Learner::level_before`), its block
+        // drawn (the law's prolongation's words in another order), so a strand hears the level: each place the epoch before its own.
+        let mut cases = mark_cases();
+        {
+            let tower = cases.iter().find(|(name, _)| *name == "tower").map(|(_, l)| l.clone()).expect("the tower among the cases");
+            let mut level = tower.level_before().unwrap();
+            let width = level.field.declaration.width;
+            let s = level.field.scale.as_deref_mut().unwrap();
+            let (_, _, b, bb, len) = s.glue_offsets(width);
+            let (b2, bb2, end) = s.before_offsets(width).unwrap();
+            for k in 0..bb - b {
+                s.glue[b2 + k] = s.glue[b + (bb - b - 1 - k)];
+            }
+            for k in 0..len - bb {
+                s.glue[bb2 + k] = s.glue[bb + (len - bb - 1 - k)];
+            }
+            assert_eq!(end, s.glue.len());
+            cases.push(("level", level));
+        }
+        for (name, learner) in cases {
             let marked = {
                 let mut m = learner.clone().with_mark().unwrap();
                 let l = m.field.layout().clone();
@@ -1203,6 +1222,63 @@ mod tests {
                     assert!(host_ng == card_ng && card_ng == card_g, "{name}, {grown}, {section}: the training path's covector");
                     assert_eq!(host_codes, card_codes, "{name}, {grown}, {section}: the opening's codes");
                     println!("STRAND_PARITY field={name} grown={grown:?} section={section} regions={} places_compared={} covector_entries={} faces_equal=1 covector_equal=1", regions.len(), regions.iter().filter(|r| r.strand).map(|r| r.classes.len() - 1).sum::<usize>(), card_g.len());
+                }
+            }
+        }
+    }
+
+    /// [definition; the lead, November 18, the record of the two streams §11] **The level a strand hears, on the card, step by step**
+    /// (needs the card): the tower with its one-sided block at its founding and drawn, one passage of 2, 3, 7 and 64 places at a time,
+    /// with and without the odd contacts facing the past: the forward alone and then the return, each the host's bits and none refused.
+    /// (Its first runs were refused at random with a released value past its carrier: the news was read at the open places, whose rows
+    /// of the opening's face are not formed. `field_level_news_strand` reads the known sites alone.)
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_level_a_strand_hears_on_the_card_step_by_step() {
+        use holonics_engine::field::{Realization, Host};
+        let tower = mark_cases().into_iter().find(|(name, _)| *name == "tower").map(|(_, l)| l).expect("the tower among the cases");
+        let founded = tower.level_before().unwrap();
+        let mut live = founded.clone();
+        {
+            let width = live.field.declaration.width;
+            let s = live.field.scale.as_deref_mut().unwrap();
+            let (_, _, b, bb, len) = s.glue_offsets(width);
+            let (b2, bb2, _) = s.before_offsets(width).unwrap();
+            for k in 0..bb - b {
+                s.glue[b2 + k] = s.glue[b + (bb - b - 1 - k)];
+            }
+            for k in 0..len - bb {
+                s.glue[bb2 + k] = s.glue[bb + (len - bb - 1 - k)];
+            }
+        }
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        for (state, learner) in [("founded", &founded), ("live", &live)] {
+            let field = &learner.field;
+            for n in [2usize, 3, 7, 64] {
+                let classes: Vec<usize> = (0..n).map(|t| (t * 53 + 5) % 120).collect();
+                let known = vec![false; n];
+                for past in [false, true] {
+                    let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past }];
+                    let host_faces = Host.read_faces(field, &regions).unwrap();
+                    let forward = card_field.read_faces(field, &regions);
+                    let forward_line = match &forward {
+                        Ok(f) => format!("ok equal={} first_apart={:?}", *f == host_faces, (0..n).find(|&t| f[0].get(t) != host_faces[0].get(t))),
+                        Err(e) => format!("refused: {e}"),
+                    };
+                    let (_, host_g) = field.read_and_return(&regions).unwrap();
+                    let returned = card_field.read_and_return(field, &regions);
+                    let return_line = match &returned {
+                        Ok((f, g)) => {
+                            let unequal: Vec<usize> = (0..host_g.len().max(g.len())).filter(|&i| host_g.get(i) != g.get(i)).collect();
+                            let families: std::collections::BTreeSet<Option<usize>> = unequal.iter().map(|&i| field.families_all().iter().position(|&(s, len, _)| (s..s + len).contains(&i))).collect();
+                            format!("ok faces_equal={} covector_apart={} families={:?} of {}", *f == host_faces, unequal.len(), families, field.families_all().len())
+                        }
+                        Err(e) => format!("refused: {e}"),
+                    };
+                    println!("LEVEL_STEP state={state} places={n} past={past} forward: {forward_line} | return: {return_line}");
+                    assert!(matches!(&forward, Ok(f) if *f == host_faces), "{state}, {n} places, past {past}: the forward's faces are the host's");
+                    assert!(matches!(&returned, Ok((f, g)) if *f == host_faces && *g == host_g), "{state}, {n} places, past {past}: the return's faces and covector are the host's");
                 }
             }
         }

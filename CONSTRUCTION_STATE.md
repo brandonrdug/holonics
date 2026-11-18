@@ -18,7 +18,46 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 15:58 UTC): every place of a stretch is compared at its frontier, on the card
+## Where the work stands (November 18, 17:39 UTC): the wall is inside units
+
+[The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
+§9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
+
+**What she writes.** Word-shaped strings in the register of each prompt, 45% to 51% of them words of the lexicon on the long
+panel, and no sentence that holds, on the plain line and on the two-stream line alike.
+
+**Where her nats stand** (`tools/frontier_excess_ruler.py`, §12). A third of all frontier places stand inside a unit, where a
+count of the five places before nearly gives the symbol (0.066 nats). She pays 0.83 to 0.88 there, between a count of two places
+and a count of three. That bin and the next hold 0.39 to 0.41 nats of all places, of 1.80 (the plain line) and 1.84 (two streams'
+third lap). At the starts of units she stands under every count. She opens units and does not close them. The repository named
+this wall on November 12 (a dark place is the interior of a composite), on November 17 and on the morning of November 18 (§13);
+the level, built between, holds no unit and cannot address a unit's interior.
+
+**What closing a unit needs** (`tools/unit_rows_ruler.py`, §14). Past two places she holds about what the thousand most met
+contexts of each length hold. Twelve thousand rows a register take the interior most of the way and fifty thousand to within
+0.2 nats of the whole count: 0.15 to 0.25 nats of all places on prose. The constitution's every block together is 392,505 entries.
+
+**The lines.**
+- The two-stream line (every place of a frontier stretch compared in one forward, six stretches of eight; main since #986): three
+  laps of 13 minutes fell 0.103, 0.054 and 0.028 at the frontier and stand 0.038 above the plain line's seventh lap, without the
+  level. A fourth lap is training.
+- The strand's odd contacts facing the past (`Region::past`, main since #986): two laps beside the control from the same state
+  read 0.013 and then 0.031 lower at the frontier (1.796, under the plain line's 1.804), 0.055 lower at the places of least news,
+  and 0.070 higher on the one-place reading under the law. By G-1118-15's rule the line takes the word; its pass over the store's
+  prefix ended and its next pass is training.
+- The level as a strand hears it (`Constitution::scale_forward_before`; the epoch before, through a block founded at zero): on the
+  host and on the card, bit for bit (30 cases). By §13 it is the carrier a level's own receipt needs and is not expected to move
+  the frontier without one; its arm beside the line is G-1118-16.
+
+**What is owed, in order.** Closing a unit at the place level (§13, §14). First a reading: how many places' identities a strand's
+state carries at the frontier on the store line, by distance and by tick (two to three on the fifty books' state). Then the
+strand's own carriers sized by it (the carry circles' scan, mates at more places before: the half of them `past` put to work is
+the one part that moved the interior). Then the composite's remainder: rows a strand in progress reaches by a located address
+(a scramble's rows need sixteen times as many), deposited by the covector that reaches them and kept by upkeep, its law derived
+from the symbol's record of November 12 (§8) and the located transport of October 5. Then the level's own receipt, which gives
+the level units to hold. A writer that keeps the known stream's states.
+
+## Where the work stood on November 18 at 15:58 UTC: every place of a stretch is compared at its frontier, on the card
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 carries it, with its receipts and five guesses fixed before their reads.

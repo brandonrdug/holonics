@@ -1152,7 +1152,10 @@ impl<'c> Resident<'c> {
         if !matches!(field.ruler_far, 0 | 3 | 4 | 9) {
             return Err(TowerError::Refused("a ruler's forward other than the known stream's (3, 9) and the unlevelled one (4) is a host reading, with no card realization"));
         }
-        if field.ruler_far >= 3 && field.scale.is_some() {
+        // [the record of the two streams §11] A run of passages read by two streams on a tower that carries its one-sided block hears the
+        // level (the host's `Constitution::scale_forward_before`): the level stays, its words under the known stream's.
+        let strand_level = !self.strand_run.borrow().is_empty() && field.scale.as_deref().is_some_and(|s| s.before_offsets(d.width).is_some());
+        if field.ruler_far >= 3 && field.scale.is_some() && !strand_level {
             let mut unlevelled = field.clone();
             unlevelled.scale = None;
             let (faces, read_logits, mut g, rows, echoes) = self.run_one(&unlevelled, regions, returning, logits, keep)?;
@@ -1170,7 +1173,7 @@ impl<'c> Resident<'c> {
         self.mark("material_upload");
         // A tower's packets' level, uploaded beside the fine field once a run.
         let mut tower = match field.scale.as_deref() {
-            Some(s) => Some(self.tower_run(field, s, words.face, returning)?),
+            Some(s) => Some(self.tower_run(field, s, words.face, returning, if strand_level { words.before } else { 0 })?),
             None => None,
         };
         let met = &upload.met;
@@ -1625,14 +1628,25 @@ impl<'c> Resident<'c> {
         }
         // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Constitution::level_news`), read to the
         // host, which cuts each region's epochs (`level_cut`, a kind of work placed on the host; its bits are the host's own function's).
-        let news = match (opening.as_ref(), field.scale.is_some()) {
+        // [the record of the two streams §11] A strand's level reads each known site's news and its place's expected news (an open place's
+        // news is the expected code of the retarded opening's face of its place), and nothing at the open places, whose own rows of the
+        // face are not formed (`field_level_news_strand`, the host's `Constitution::strand_news`).
+        let strand_level = tower.as_ref().is_some_and(|tr| tr.before.is_some());
+        let (news, open_news) = match (opening.as_ref(), field.scale.is_some()) {
+            (Some(op), true) if strand_level => {
+                let out = self.timed(Kind::Alloc, || self.take::<i64>(sites.max(1))).map_err(device)?;
+                let expected = self.timed(Kind::Alloc, || self.take::<i64>(sites.max(1))).map_err(device)?;
+                let (mut mp, mut tp, mut np, mut ep) = (op.masses.device_ptr(), op.totals.device_ptr(), out.device_ptr(), expected.device_ptr());
+                self.launch("field_level_news_strand", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut np), arg(&mut ep)])?;
+                (Some(self.timed(Kind::Copy, || card.fetch_range(&out, 0, sites)).map_err(device)?), Some(self.timed(Kind::Copy, || card.fetch_range(&expected, 0, sites)).map_err(device)?))
+            }
             (Some(op), true) => {
                 let out = self.timed(Kind::Alloc, || self.take::<i64>(sites.max(1))).map_err(device)?;
                 let (mut mp, mut tp, mut np) = (op.masses.device_ptr(), op.totals.device_ptr(), out.device_ptr());
                 self.launch("field_level_news", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut np)])?;
-                Some(self.timed(Kind::Copy, || card.fetch_range(&out, 0, sites)).map_err(device)?)
+                (Some(self.timed(Kind::Copy, || card.fetch_range(&out, 0, sites)).map_err(device)?), None)
             }
-            _ => None,
+            _ => (None, None),
         };
         // The opening's forward ends here where no read compares it (a strand batch keeps the cavity's part of it for its reverse or its ticks).
         let opening = match opening {
@@ -1644,7 +1658,7 @@ impl<'c> Resident<'c> {
             other => other.filter(|_| compared),
         };
         let tb = match tower {
-            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?)?),
+            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?, open_news.as_deref())?),
             None => None,
         };
         self.mark("batch_base");
