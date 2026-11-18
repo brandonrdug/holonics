@@ -335,8 +335,12 @@ winding `w`, and compatible transverse residues `z_i`. The circle face is
 also keeps the longitudinal lift `w+s`. Equal finite faces do not erase different windings.
 A supplied finer continuation must restrict to the retained section; it is not guessed.
 Negative motion uses Euclidean floor rather than truncation. The finite chart contains no
-occurrence archive. Its Rust controls check these equations and genuine incompatible inputs;
-a Lean proof of this joined operator remains owed in #62.
+occurrence archive. Its Rust controls check these equations and genuine incompatible inputs.
+Lean `Geometry/SolenoidChart` (November 18) proves the joined operator: `lift_advance` (the lift
+`w+s` advances by `a`), `advance_advance` (an action of the rationals), `charge_advance` (`z-w` is
+kept), `restrict_advance` and `restrict_add` (restriction commutes with advance and addition),
+`Compatible.advance`, `face_returns_iff` (the face `(s,z)` returns exactly when `a` is a whole
+multiple of `N`, with `w` advanced by it) and `same_face_different_winding`.
 
 [proved-standard] The additive universal solenoid uses all positive moduli indexed by
 **divisibility**: for `m|n`, `[x]_(nZ)` maps to `[x]_(mZ)`. In unit-circle coordinates this is
@@ -349,7 +353,9 @@ chart with a retained longitudinal lift, not an implementation of the completed 
 
 [proved-derived] The natural translation flow on that full additive solenoid has no nonzero
 return period: return at time `t` means `t in nZ` for every positive integer `n`; the level
-`n=1` makes `t` integral, and choosing `n>|t|` forces `t=0`. Thus `log(p)` is not a primitive
+`n=1` makes `t` integral, and choosing `n>|t|` forces `t=0` (Lean `Geometry/SolenoidChart`:
+`no_return_of_unbounded` and `flow_eq_self_iff`, over the reals for any unbounded set of moduli,
+a prime-power chain included; atlas `solenoid.no-return-period`). Thus `log(p)` is not a primitive
 closed-orbit period of this particular flow. Prime-power terms in an explicit formula require
 a different specified carrier/action, archimedean and pole terms, and convergence conditions.
 The noncommutative adele-class trace constructions are substantial existing mathematics;
@@ -388,9 +394,17 @@ accepts no assertion that these coordinates are zeros of a function. Existing Le
 The equal-angular reflection and the analytic `rho -> 1-rho` pairing need their conjugation
 symmetry map before they are identified.
 
-[conditional] Simultaneous primitive ring ticks close at their LCM; product is valid under
-pairwise coprimality. For `[7,11,33]` the LCM is `231`, whereas the product is `2541`;
-`11` divides `33`, so these periods are not pairwise coprime. An HNN's carried clock cascade
+[formal-checked] Simultaneous primitive ring ticks close at their LCM, and the product is the
+closing length exactly when the positive periods are pairwise coprime (Lean
+`Geometry/RingClosure`: `nsmul_diag_eq_zero_iff`, `closing_eq_prod_iff`,
+`zmultiples_diag_eq_top_iff`; atlas `lock.rings-close-at-lcm`). For `[7,11,33]` the LCM is
+`231`, whereas the product is `2541`; `11` divides `33`, so these periods are not pairwise
+coprime. The same three rings chained by carries return only at the product
+(`digits_eq_iff`, `cascade_231_2541`): the two numbers belong to the two tick laws, and the
+residue word and the digit word separate the same counts exactly when the periods are pairwise
+coprime (`same_reading_iff`).
+
+[conditional] An HNN's carried clock cascade
 must be read through its actual tick/carry law rather than ticking every ring once per cell.
 A mounted pump does not by itself certify attraction, stable lock or invariance across cuts:
 consume its executed monodromy/Floquet bound and nonlinear lock domain. Linear pump
