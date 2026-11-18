@@ -158,6 +158,8 @@ pub struct ClassLists {
     pub members: Vec<u32>,
     /// Each receiver's other probed classes (§15.2's multi-probe, [`probes`]), empty where none.
     pub probes: Vec<Vec<u32>>,
+    /// What an open receiver hears far where a ruler reads it ([`Constitution::ruler_far`]); `0` is the law.
+    pub far: u8,
 }
 
 impl ClassLists {
@@ -180,7 +182,7 @@ impl ClassLists {
         let probes = vec![Vec::new(); class.len()];
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
-        Self { class, probe_class, definite, keyed, off, members, probes }
+        Self { class, probe_class, definite, keyed, off, members, probes, far: 0 }
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -204,16 +206,25 @@ impl ClassLists {
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
         let sites = self.class.len();
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().filter(move |&j| self.keyed[j]);
+        // The law: an open receiver hears every definite site, a definite one its classes. A ruler's `far` gives an open receiver a
+        // definite one's far field (`1`) or none (`2`).
         let open = !self.definite[i];
-        let runs = std::iter::once(self.probe_class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| !open);
+        let (sharp, classed) = (open && self.far == 0, !open || self.far == 1);
+        let runs = std::iter::once(self.probe_class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| classed);
         let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR));
-        let listened = (0..sites).filter(move |&j| open && self.definite[j] && j.abs_diff(i) >= NEAR);
+        let listened = (0..sites).filter(move |&j| sharp && self.definite[j] && j.abs_diff(i) >= NEAR);
         near.chain(far).chain(listened)
     }
 
     /// Whether receiver `i` listens to every definite site (it is open, §15.9).
     pub fn listens(&self, i: usize) -> bool {
         !self.definite[i]
+    }
+
+    /// Whether receiver `i` hears each octave's crowd of definite sources at its mean word: a definite receiver by the law (§14.10), and
+    /// an open one only where a ruler gives it a definite receiver's far field ([`Constitution::ruler_far`] at `1`).
+    pub fn crowded(&self, i: usize) -> bool {
+        self.definite[i] || self.far == 1
     }
 }
 
@@ -508,7 +519,7 @@ impl Constitution {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
                 let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
                 let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec())
+                ClassLists { far: self.ruler_far, ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
             })
             .collect();
         cell.word = q.clone();
@@ -646,7 +657,7 @@ impl Constitution {
                 // term is its decayed value sum, its mass term `|C|` times its face.
                 let mut crowds: Vec<Crowd> = Vec::new();
                 // An open receiver hears every definite source sharply (§15.9), so no crowd of them.
-                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|_| !lists.listens(i)) {
+                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|_| lists.crowded(i)) {
                     let count = sums.count(lo, hi_);
                     if count == 0 {
                         continue;

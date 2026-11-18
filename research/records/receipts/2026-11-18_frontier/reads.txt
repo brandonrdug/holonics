@@ -41,3 +41,16 @@ text (the words met five times or more in its first 16 MB), by a private scorer:
 the control's end: 88 of 255 (34%) | code 20/50 web 19/51 science 15/52 books 25/54 wikidata 9/48; 1 of 20 writes loops.
 arm F's end: 90 of 244 (36%) | code 18/46 web 17/53 science 13/40 books 32/58 wikidata 10/47; 1 of 20 loops.
 arm F's mean: 109 of 269 (40%) | code 19/48 web 23/55 science 15/51 books 36/64 wikidata 16/51; none loops.
+
+What a place at the frontier takes from far (G-1118-6; athena host complete-language read-far, 16 host threads beside the card's lap,
+about 61 s a setting): 800 rows from the store's held documents, forty next places a slice, each read with 12, 48, 192 and 448 places
+known before it. Nats a place over the five slices' 200 rows: the law | a definite receiver's far field in its place (less the law) |
+the near field alone (less the law).
+the control's lap mean, 12 known: 2.493 | 2.490 (-0.003) | 2.629 (+0.136)
+the control's lap mean, 48 known: 2.297 | 2.354 (+0.056) | 2.743 (+0.445)
+the control's lap mean, 192 known: 2.048 | 2.185 (+0.137) | 2.981 (+0.933)
+the control's lap mean, 448 known: 1.930 | 2.161 (+0.231) | 3.090 (+1.161)
+arm F's lap mean, 12 known: 2.346 | 2.357 (+0.011) | 2.486 (+0.140)
+arm F's lap mean, 48 known: 2.152 | 2.184 (+0.032) | 2.594 (+0.442)
+arm F's lap mean, 192 known: 1.849 | 1.962 (+0.113) | 2.784 (+0.935)
+arm F's lap mean, 448 known: 1.704 | 1.933 (+0.229) | 2.909 (+1.205)
