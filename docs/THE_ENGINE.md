@@ -273,6 +273,14 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
       (`read-far` at `8` and `7`), and half of each stood idle. Card against host on the same four fields, first run: the strands'
       test with a section of strands facing the past (24 cases) and the known stream at `9`. Whether the line carries the word is
       G-1118-15's read.
+    - The row of the site after reading the second site before (`Region::second`, atlas `tower.region-second`; the record of the two
+      streams §15; the second bit of the batch's word; the pass's `frontier E strand past second`): in a one-sided region a site's
+      opening, and the open place's at each place, take the row `E₊` of the second place before, where `E₊` read no site there. Why:
+      an open place holds the place before it at nine tenths as it opens (the row `E₋`), the second at a half and the third at a
+      fifth, no tick carries a farther place in, and the frontier binds about three places. Host: 220 probes of the covector match
+      the code's difference and a place's face is the same bits in the passage cut after it. Card against host, bit for bit, on its
+      first run: the strands' test with a section mixed with the second row (40 cases). Whether the line carries the word is
+      G-1118-17's read.
     - The level as a strand hears it (atlas `tower.level-before`; the record of the two streams §10 and §11): on a tower whose glue
       carries the block `B⁻`, `b_B⁻` (`Constitution::level_before`, `athena host complete-language open-level`; founded at zero, carried
       in the learner's state), a passage read by two streams cuts its known stream where a one-sided stream can name a site (no

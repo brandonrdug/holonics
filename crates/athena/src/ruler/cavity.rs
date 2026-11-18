@@ -22,7 +22,7 @@ pub(crate) struct HeldStretch {
 #[allow(clippy::too_many_arguments, reason = "the cut's declared inputs, each a pinned file's reading or the pass's law")]
 pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &Codec, places: usize) -> Result<Vec<HeldStretch>> {
     let slice = open_slice(store, role, name, counts)?;
-    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false, strand: false, past: false };
+    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false };
     let mut cut = Cut { seed, slices: vec![slice], pass };
     let mut out = Vec::new();
     let mut taken = 0usize;
@@ -318,7 +318,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
                     .map(|&(k, t)| {
                         let mut mask = vec![false; t + 1];
                         mask[t] = true;
-                        OwnedRegion { before, past: before && law.past, ..OwnedRegion::plain(stretches[k].0[..=t].to_vec(), mask) }
+                        OwnedRegion { before, past: before && law.past, second: before && law.second, ..OwnedRegion::plain(stretches[k].0[..=t].to_vec(), mask) }
                     })
                     .collect();
                 let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
@@ -356,7 +356,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
                     .iter()
                     .map(|(classes, bytes, ends)| {
                         let n = bytes.len() + usize::from(*ends);
-                        OwnedRegion { strand: true, past: law.past, ..OwnedRegion::plain(classes[..n].to_vec(), vec![false; n]) }
+                        OwnedRegion { strand: true, past: law.past, second: law.second, ..OwnedRegion::plain(classes[..n].to_vec(), vec![false; n]) }
                     })
                     .collect();
                 let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;

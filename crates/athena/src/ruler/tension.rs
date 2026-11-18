@@ -627,6 +627,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     // stands before it), and the face read is the open place's at that last place, which hears every known place.
     let strand = learner.pass.as_ref().is_some_and(|p| p.strand);
     let past = learner.pass.as_ref().is_some_and(|p| p.past);
+    let second = learner.pass.as_ref().is_some_and(|p| p.second);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
@@ -643,9 +644,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
                 *open.last_mut().expect("a region of one place or more") = true;
                 if strand {
                     let n = classes.len();
-                    return OwnedRegion { strand: true, past, ..OwnedRegion::plain(classes, vec![false; n]) };
+                    return OwnedRegion { strand: true, past, second, ..OwnedRegion::plain(classes, vec![false; n]) };
                 }
-                OwnedRegion { before: known, past: known && past, ..OwnedRegion::plain(classes, open) }
+                OwnedRegion { before: known, past: known && past, second: known && second, ..OwnedRegion::plain(classes, open) }
             })
             .collect();
         let views: Vec<_> = regions.iter().map(view_of).collect();

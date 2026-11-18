@@ -575,6 +575,16 @@ __device__ __forceinline__ bool twin_site(const FieldWords &w, uint64_t g) {
     return w.site_pos[g] >= w.region_heard[w.site_region[g]];
 }
 
+// [the record of the two streams §9 and §15] The known stream's word (`FieldWords::before`) is one more than its two bits: the strand's
+// odd contacts facing the past (the first), and the row of the site after reading the second site before (the second).
+__device__ __forceinline__ bool before_past(const FieldWords &w) {
+    return w.before != 0 && ((w.before - 1) & 1) != 0;
+}
+
+__device__ __forceinline__ bool before_second(const FieldWords &w) {
+    return w.before != 0 && ((w.before - 1) & 2) != 0;
+}
+
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Constitution::paces`): the heads that carry a moment
 // (a turned ring set) in order, `−1` for the rest.
 __device__ __forceinline__ int32_t paced_index(const FieldWords &w, uint32_t h) {
@@ -1167,6 +1177,17 @@ extern "C" __global__ void field_open(FieldWords w) {
         // [the known stream] The site after has not arrived: its row is not read.
         if (!w.before && t + 1 < w.T && w.site_pos[t + 1] > 0) {
             x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 2, t + 1, i);
+        }
+        // [the record of the two streams §15] With the word, the row of the site after reads the second site before: a known site's the
+        // site two before it, an open place's the known site two before its place (the host's `open_sided`, `cavity_forward_sided`).
+        if (before_second(w)) {
+            if (twin_site(w, t)) {
+                if (place_of(w, t) >= 2) {
+                    x += opening_term(w, w.enc_after, t - w.region_heard[w.site_region[t]] - 2, i);
+                }
+            } else if (w.site_pos[t] >= 2) {
+                x += opening_term(w, w.enc_after, t - 2, i);
+            }
         }
         w.x[c] = x;
     }
@@ -4160,7 +4181,7 @@ extern "C" __global__ void field_pair(FieldWords w) {
         const uint64_t re = t * w.f + e, im = re + half;
         // [the known stream] An odd contact's mate, the site after, has not arrived (the host's tick under `Sided::Before`); where the odd
         // contacts face the past its mate is the second site before.
-        const uint64_t s = w.before && e % 2 == 1 ? (w.before == 2 ? strand_mate_back2(w, t) : UINT64_MAX) : strand_mate(w, t, e);
+        const uint64_t s = w.before && e % 2 == 1 ? (before_past(w) ? strand_mate_back2(w, t) : UINT64_MAX) : strand_mate(w, t, e);
         const wide ar = w.pa[re], ai = w.pa[im];
         const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
         w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
@@ -4194,7 +4215,7 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
         // [the known stream] A circle scanned from the right brings what has not arrived: it stays at rest (the host's tick under `Sided::Before`),
         // its operand zero at every site, so its face and every covector through it are zero. Where the odd contacts face the past it is
         // scanned from the left instead.
-        if (w.before == 1 && e % 2 == 1) {
+        if (w.before && !before_past(w) && e % 2 == 1) {
             for (uint64_t t = 0; t < all; ++t) {
                 const uint64_t gr = (first + t) * c2 + k;
                 w.pqm[gr] = 0;
@@ -4368,7 +4389,7 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
         }
         // [the known stream] A circle from the right stayed at rest: its drive takes no covector (the host's `tick_return`), and with `u` zero the gate's
         // reverse writes zero for its gate and its leak.
-        if (w.before == 1 && e % 2 == 1) {
+        if (w.before && !before_past(w) && e % 2 == 1) {
             for (uint64_t step = 0; step < sites; ++step) {
                 const uint64_t re = at(step) * w.f + e;
                 db[re] = 0;
@@ -4778,8 +4799,8 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
         const uint64_t re = t * w.f + e, im = re + half;
         // [the known stream] An odd contact met no mate, and returns to none; where the odd contacts face the past its mate is the second
         // site before, and a known site is the mate of the known site and of the open place two after it.
-        const bool odd_back = w.before == 2 && e % 2 == 1;
-        const bool unmet = w.before == 1 && e % 2 == 1;
+        const bool odd_back = before_past(w) && e % 2 == 1;
+        const bool unmet = w.before && !before_past(w) && e % 2 == 1;
         const uint64_t s = unmet ? UINT64_MAX : (odd_back ? strand_mate_back2(w, t) : strand_mate(w, t, e));
         if (s == UINT64_MAX) {
             da[re] = 0;

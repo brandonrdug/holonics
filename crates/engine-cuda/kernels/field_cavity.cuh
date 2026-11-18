@@ -147,6 +147,11 @@ extern "C" __global__ void field_cavity_open(FieldWords w, int64_t *cx) {
         if (!w.before && t + 1 < w.T && w.site_pos[t + 1] > 0) {
             x += opening_term(w, w.enc_after, t + 1, i);
         }
+        // [the record of the two streams §15] With the word, the row of the second site before the place (a known site's place: an open
+        // place's row of the cavity's buffer is not read).
+        if (before_second(w) && !twin_site(w, t) && w.site_pos[t] >= 2) {
+            x += opening_term(w, w.enc_after, t - 2, i);
+        }
         cx[c] = x;
     }
 }

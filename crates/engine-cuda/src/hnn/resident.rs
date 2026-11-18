@@ -546,6 +546,9 @@ pub struct Resident<'c> {
     pub(crate) strand_heard: std::cell::RefCell<Vec<u32>>,
     /// The same counts over every region of the run being made (`Resident::run`'s group of strands), from which each batch takes its own.
     pub(crate) strand_run: std::cell::RefCell<Vec<u32>>,
+    /// [the record of the two streams §15] Whether the group a run reads takes the row of the second site before (`Region::second`): the
+    /// second bit of the known stream's word (`FieldWords::before`), set by [`Resident::run`] for the run of that group.
+    pub(crate) second_run: std::cell::Cell<bool>,
     /// The cavity's kept forward of the strand batch being read (the standing moments' operands, the cavity moments and their two sides),
     /// which the batch's reverse returns the open places' moments through; taken when the batch ends.
     pub(crate) strand_cavity: std::cell::RefCell<Option<StrandBase<'c>>>,
@@ -561,7 +564,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -956,10 +959,11 @@ impl<'c> Resident<'c> {
             bare_stretch: u64::from(field.bare_stretch),
             // [the ring record §4] The strengths `α_b`, read from the uploaded material at the second read (`run` sets the shares there).
             mark_at: l.mark as u64,
-            // (one where every site hears only what stands before it, two where the strand's odd contacts also face the past)
+            // (one more than two bits where every site hears only what stands before it: the strand's odd contacts also facing the past,
+            // and the row of the site after reading the second site before, the run's group's word, `Resident::second_run`)
             before: match field.ruler_far {
-                3 => 1,
-                9 => 2,
+                3 => 1 + 2 * u64::from(self.second_run.get()),
+                9 => 2 + 2 * u64::from(self.second_run.get()),
                 _ => 0,
             },
             ..Words::default()
@@ -1003,54 +1007,73 @@ impl<'c> Resident<'c> {
         // [the record of the two streams §9] The one-sided groups are cut again by the word `past` (`Region::past`): its regions run under the
         // forward whose odd strand contacts face the past (`FieldWords::before` at two, the host's ruler at `9`).
         let law: Vec<usize> = (0..n).filter(|&r| !regions[r].before && !regions[r].strand).collect();
-        let known_of = |past: bool| -> Vec<usize> { (0..n).filter(|&r| regions[r].before && !regions[r].strand && regions[r].past == past).collect() };
-        let strand_of = |past: bool| -> Vec<usize> { (0..n).filter(|&r| regions[r].strand && regions[r].past == past).collect() };
-        let (known, known_past, strand, strand_past) = (known_of(false), known_of(true), strand_of(false), strand_of(true));
-        let law_regions: Vec<Region> = law.iter().map(|&r| regions[r]).collect();
-        let plain = |at: &[usize]| -> Vec<Region> { at.iter().map(|&r| Region { before: false, past: false, ..regions[r] }).collect() };
-        let (known_regions, known_past_regions) = (plain(&known), plain(&known_past));
         // [definition; the lead, November 18, the frontier record §6] **A passage read by two streams on the card** (`Region::strand`, the host's
         // `Constitution::strand_pass`): staged as its known stream's sites and then as many open places, each carrying the class it is compared
         // with, under the known stream's forward (`FieldWords::before`, `site_place`, `region_heard`). Its faces are the open places', none at
         // the first place.
-        if strand.iter().chain(&strand_past).any(|&r| regions[r].unresolved.iter().any(|&u| u) || regions[r].faces.iter().any(Option::is_some) || regions[r].locked.iter().any(|&l| l) || regions[r].echo.iter().any(Option::is_some) || regions[r].port.is_some()) {
+        if (0..n).any(|r| regions[r].strand && (regions[r].unresolved.iter().any(|&u| u) || regions[r].faces.iter().any(Option::is_some) || regions[r].locked.iter().any(|&l| l) || regions[r].echo.iter().any(Option::is_some) || regions[r].port.is_some())) {
             return Err(TowerError::Refused("a passage read by two streams whose sites are not all known, or that has a port"));
         }
-        let stage_of = |at: &[usize]| -> Vec<(Vec<usize>, Vec<bool>)> { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].classes).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() };
-        let (staged, staged_past) = (stage_of(&strand), stage_of(&strand_past));
-        // (the staged regions borrow `staged`, which outlives the runs below)
-        let strand_regions: Vec<Region> = staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false }).collect();
-        let strand_past_regions: Vec<Region> = staged_past.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false }).collect();
-        let heard_of = |at: &[usize]| -> Vec<u32> { at.iter().map(|&r| regions[r].classes.len() as u32).collect() };
-        let (heard_plain, heard_past) = (heard_of(&strand), heard_of(&strand_past));
-        let mut ruled = field.clone();
-        ruled.ruler_far = 3;
-        let mut ruled_past = field.clone();
-        ruled_past.ruler_far = 9;
-        let none: Vec<u32> = Vec::new();
+        // [the record of the two streams §9 and §15] The one-sided regions are cut by their words into groups, each run under the known
+        // stream's forward with its own word (`FieldWords::before`: the odd contacts facing the past, the host's ruler at `9`; the row of
+        // the site after reading the second site before, `Resident::second_run`): known streams, then passages read by two streams.
+        struct Group {
+            at: Vec<usize>,
+            strand: bool,
+            past: bool,
+            second: bool,
+            staged: Vec<(Vec<usize>, Vec<bool>)>,
+        }
+        let mut groups: Vec<Group> = Vec::new();
+        for strand in [false, true] {
+            for past in [false, true] {
+                for second in [false, true] {
+                    let at: Vec<usize> = (0..n).filter(|&r| (if strand { regions[r].strand } else { regions[r].before && !regions[r].strand }) && regions[r].past == past && regions[r].second == second).collect();
+                    if at.is_empty() {
+                        continue;
+                    }
+                    let staged = if strand { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].classes).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() } else { Vec::new() };
+                    groups.push(Group { at, strand, past, second, staged });
+                }
+            }
+        }
+        let law_regions: Vec<Region> = law.iter().map(|&r| regions[r]).collect();
         let (narrow_from, opening_from) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
         let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); n];
         let mut rows: Rows = vec![Vec::new(); n];
         let mut echoes: Vec<Vec<u64>> = vec![Vec::new(); n];
         let mut g = if returning { vec![0i128; field.material_len()] } else { Vec::new() };
         let times: i128 = if field.declaration.mark { 2 } else { 1 };
-        for (group, at, f, weight, heard) in [
-            (&law_regions, &law, field, 1i128, &none),
-            (&known_regions, &known, &ruled, times, &none),
-            (&known_past_regions, &known_past, &ruled_past, times, &none),
-            (&strand_regions, &strand, &ruled, times, &heard_plain),
-            (&strand_past_regions, &strand_past, &ruled_past, times, &heard_past),
-        ] {
-            if group.is_empty() {
+        let mut order: Vec<usize> = Vec::with_capacity(n);
+        for k in 0..=groups.len() {
+            // (the law's regions first, then each one-sided group)
+            let group = k.checked_sub(1).map(|k| &groups[k]);
+            let at: &[usize] = group.map_or(&law, |gr| &gr.at);
+            if at.is_empty() {
                 continue;
             }
+            order.extend_from_slice(at);
+            let views: Vec<Region> = match group {
+                None => law_regions.clone(),
+                Some(gr) if gr.strand => gr.staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect(),
+                Some(gr) => gr.at.iter().map(|&r| Region { before: false, past: false, second: false, ..regions[r] }).collect(),
+            };
+            let heard: Vec<u32> = group.filter(|gr| gr.strand).map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].classes.len() as u32).collect());
+            let ruled = group.map(|gr| {
+                let mut f = field.clone();
+                f.ruler_far = if gr.past { 9 } else { 3 };
+                f
+            });
+            let (f, weight) = (ruled.as_ref().unwrap_or(field), if group.is_some() { times } else { 1 });
             let two = !heard.is_empty();
             let (narrow_group, opening_group) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
             if two {
                 *self.strand_run.borrow_mut() = heard.clone();
             }
-            let ran = self.run_one(f, group, returning, false, None);
+            self.second_run.set(group.is_some_and(|gr| gr.second));
+            let ran = self.run_one(f, &views, returning, false, None);
             self.strand_run.borrow_mut().clear();
+            self.second_run.set(false);
             let (mut gf, _, gg, gr, ge) = ran?;
             if two {
                 // An open place stands `heard` sites past the known site of its place: a region's faces and the training path's words are
@@ -1060,14 +1083,14 @@ impl<'c> Resident<'c> {
                     *face = (0..h).map(|t| if t == 0 { None } else { face[h + t].take() }).collect();
                 }
                 let mut narrow = self.narrow_out.borrow_mut();
-                if narrow.len() == narrow_group + group.len() {
+                if narrow.len() == narrow_group + views.len() {
                     for (k, row) in narrow[narrow_group..].iter_mut().enumerate() {
                         let h = heard[k] as usize;
                         *row = (0..h).map(|t| if t == 0 { None } else { row[h + t] }).collect();
                     }
                 }
                 let mut opening = self.opening_out.borrow_mut();
-                if opening.len() == opening_group + group.len() {
+                if opening.len() == opening_group + views.len() {
                     for (k, row) in opening[opening_group..].iter_mut().enumerate() {
                         row.truncate(heard[k] as usize);
                     }
@@ -1076,12 +1099,12 @@ impl<'c> Resident<'c> {
             for (k, face) in gf.into_iter().enumerate() {
                 faces[at[k]] = face;
             }
-            if gr.len() == group.len() {
+            if gr.len() == views.len() {
                 for (k, row) in gr.into_iter().enumerate() {
                     rows[at[k]] = row;
                 }
             }
-            if ge.len() == group.len() {
+            if ge.len() == views.len() {
                 for (k, echo) in ge.into_iter().enumerate() {
                     echoes[at[k]] = echo;
                 }
@@ -1091,7 +1114,6 @@ impl<'c> Resident<'c> {
             }
         }
         // The training path's words by region (`narrow_out`, `opening_out`) were gathered group by group: set in the regions' order.
-        let order: Vec<usize> = law.iter().chain(&known).chain(&known_past).chain(&strand).chain(&strand_past).copied().collect();
         fn placed<T: Default>(out: &std::cell::RefCell<Vec<T>>, from: usize, order: &[usize]) {
             let mut out = out.borrow_mut();
             if out.len() != from + order.len() {

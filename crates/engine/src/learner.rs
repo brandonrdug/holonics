@@ -301,6 +301,10 @@ pub struct StorePass {
     /// [the lead, November 18] **Their odd strand contacts face the past** ([`crate::field::Region::past`]): the word `past` after
     /// `before` or `strand` (`frontier E strand past`), only where set.
     pub past: bool,
+    /// [the lead, November 18, the record of the two streams §15] **Their row of the site after reads the second site before**
+    /// ([`crate::field::Region::second`]): the word `second` last, after `before` or `strand` and after `past` where that stands
+    /// (`frontier E strand past second`), only where set.
+    pub second: bool,
 }
 
 /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC, the friction record §3 and §5] **A world joined at the
@@ -342,7 +346,7 @@ impl StorePass {
             let refine = if w.refine > 0 { format!(" {}", w.refine) } else { String::new() };
             format!(" world {} {} {} {}{refine}", w.slice, w.every, w.records, w.run)
         });
-        let frontier = if self.frontier > 0 { format!(" frontier {}{}", self.frontier, if self.strand { " strand" } else if self.before { " before" } else { "" }) + if self.past { " past" } else { "" } } else { String::new() };
+        let frontier = if self.frontier > 0 { format!(" frontier {}{}", self.frontier, if self.strand { " strand" } else if self.before { " before" } else { "" }) + if self.past { " past" } else { "" } + if self.second { " second" } else { "" } } else { String::new() };
         format!("pass {} {} {} {} {} {} {}{own}{slices}{world}{frontier}", self.role, self.store, self.stretches, self.least, self.octaves, self.pairs, self.sites)
     }
 
@@ -350,7 +354,11 @@ impl StorePass {
     pub fn from_line(line: &str) -> Result<Self> {
         let mut all: Vec<&str> = line.split(' ').collect();
         // The known streams' word, where set, is the line's last, after the frontier's clause (a line's last word is otherwise a count).
-        // The word `past`, where set, stands last, after the frontier's reading.
+        // The word `second`, where set, stands last; the word `past`, where set, last before it, after the frontier's reading.
+        let second = all.len() >= 12 && all[all.len() - 1] == "second" && (all[all.len() - 4] == "frontier" || (all.len() >= 13 && all[all.len() - 2] == "past" && all[all.len() - 5] == "frontier"));
+        if second {
+            all.truncate(all.len() - 1);
+        }
         let past = all.len() >= 12 && all[all.len() - 1] == "past" && all[all.len() - 4] == "frontier";
         if past {
             all.truncate(all.len() - 1);
@@ -360,8 +368,8 @@ impl StorePass {
         if before || strand {
             all.truncate(all.len() - 1);
         }
-        if past && !before && !strand {
-            return refuse("a pass whose word `past` follows no one-sided reading of the frontier");
+        if (past || second) && !before && !strand {
+            return refuse("a pass whose word `past` or `second` follows no one-sided reading of the frontier");
         }
         // The frontier's clause, where set, is the line's last two words, opened by the word `frontier` (no slice is named `frontier`, and
         // the word before a line's last is otherwise a count).
@@ -396,8 +404,8 @@ impl StorePass {
             return refuse("a pass's store that is not a SHA-256");
         }
         let slices = words[from..].chunks(4).map(|c| Ok(PassSlice { name: word(c[0])?, piece: n(c[1])?, cursor: n(c[2])?, taken: n(c[3])? })).collect::<Result<Vec<_>>>()?;
-        if slices.iter().any(|s| s.name == "world" || s.name == "frontier" || s.name == "before" || s.name == "strand" || s.name == "past") {
-            return refuse("a pass with a slice named `world`, `frontier`, `before`, `strand` or `past`, the words of the pass's clauses");
+        if slices.iter().any(|s| s.name == "world" || s.name == "frontier" || s.name == "before" || s.name == "strand" || s.name == "past" || s.name == "second") {
+            return refuse("a pass with a slice named `world`, `frontier`, `before`, `strand`, `past` or `second`, the words of the pass's clauses");
         }
         let world = match world_words {
             Some(w) => Some(PassWorld { slice: word(w[0])?, every: n(w[1])?, records: n(w[2])?, run: n(w[3])?, refine: w.get(4).map(|r| n(r)).transpose()?.unwrap_or(0) }),
@@ -408,7 +416,7 @@ impl StorePass {
                 return refuse("a world whose share, records or run is zero, or whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
