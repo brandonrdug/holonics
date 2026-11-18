@@ -1026,7 +1026,9 @@ impl Learner {
     /// its moments; a new contact's and a new circle's entries open as a growth opens them ([`Learner::with_carry`]): the first moments at
     /// zero, the second at the mean of their family's standing second moments (the circles' charts have standing entries now, so a new
     /// circle's turn row steps at its family's own scale). An entry's own rate, where the state carries them, is kept and a new entry
-    /// opens at the base rate; the parts' rates are kept; the held step and the last section's step, of the old layout, are dropped.
+    /// opens at the base rate; the parts' rates are kept; the held step and the last section's step, of the old layout, are dropped,
+    /// and the step's remainder, where the state carries one, opens at zero over the new length (as every founding here opens it:
+    /// no standing entry's remainder is carried).
     pub fn more_carry(&self, circles: usize, keys: &[u8]) -> Result<Self> {
         if self.held.is_some() {
             return refuse("a learner grows its carry circles after its held step is read");
