@@ -78,18 +78,20 @@ read 1.433 and 1.395, the whole prize of bound context on the fifty books 0.14 n
 place and a count of the last four symbols bound in order reads 1.478. A face fitted at each tick shows how she gets there: the opening
 codes like a count of two (2.028 beside 1.984), the two ticks before the split move the compared place's code by 0.06, and the two
 ticks after it add one bound symbol each (1.965, 1.687, 1.479 beside the counts of two, three and four, 1.984, 1.670, 1.478). Five and
-six symbols read 1.408 and 1.367. So at the place grain a tick binds one symbol and only the late ticks bind, and the level is fed and
-read at the split, where a place holds a pair and nothing is yet bound; that is why what it carries is one more additive term.
+six symbols read 1.408 and 1.367. So at a compared place a tick binds one symbol and only the late ticks bind, at the boundary and,
+on a weaker read, under the line's own masks; and what the level prolongs enters before those ticks.
 
 **What a level reads, by the tree (the design record's §12).** A restriction eliminates a balanced interior; what crosses a quotient
 is the boundary's response, an inherited clock and a heat; a level's width is its section's. So a level reads a unit at its section
 after the interior has settled, the committed states at its boundary, and returns there. The built level reads a moment of every
-interior place at the split, before anything is bound, and returns before the ticks that bind.
+interior place at the split and returns before the ticks that bind at a compared place.
 
-**Standing, and what is owed.** Nothing is running and no part is ordered. The places a level would read have committed to nothing: a
-written place is compared nowhere after its opening, so its ticks are trained through one comparison two ticks and a product away.
-Owed before any level, as the question of the objects' receipt law and the learning law (#73): what a written place's receipt is at
-its own grain.
+**Standing, and what is owed.** Nothing is running and no part is ordered. Three statements of the night went past their readings and
+were withdrawn within the hour, each in the record: that the level holds almost nothing of its units, that the level's own face comes
+first, and that the places a level reads have bound nothing. What stands is what was read: the restriction keeps what a drawn one
+keeps; nothing linear at the level's locus relieves the fine comparison; the news-phase chart gives a unit's dark places no address;
+her face is a count of the last four symbols, and a compared place binds at its late ticks. Owed as a reading: what a written place
+holds of the stretch around it, at the split and after its ticks.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

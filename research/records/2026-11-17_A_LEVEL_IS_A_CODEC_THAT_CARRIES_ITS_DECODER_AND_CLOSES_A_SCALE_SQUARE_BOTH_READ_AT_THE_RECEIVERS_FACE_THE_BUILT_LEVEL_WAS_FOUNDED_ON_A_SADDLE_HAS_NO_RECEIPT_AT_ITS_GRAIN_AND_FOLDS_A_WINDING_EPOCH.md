@@ -390,9 +390,11 @@ read again on those same held rows. Nats a place, held:
 - **The ticks before the split do not bind at the compared place.** What they do for the written places that the late
   ticks then read is not separated here; on the masked line of November 13 every tick moved the fitted face, the first
   two the most, so this profile is the boundary regime's and the night's state's.
-- **The level is fed and read at the split, where a place holds a pair.** Its moment is taken from states that have
-  bound nothing past the opening, and what it prolongs enters before the only two ticks that bind. The record's §9 read
-  the level's content as an additive term; this is where that comes from.
+- **What the level prolongs enters before the only two ticks that bind at the compared place.** That much was read.
+  This item first said more, that the level's moment is taken from states that have bound nothing; that was not read
+  and is withdrawn (01:21 UTC). The by-tick faces are the compared place's. The moment is a sum over an epoch's places,
+  nearly all of them written, and what a written place among known neighbours holds at the split was not read here (on
+  the line of November 13 a place among known neighbours had four fifths of its code by then).
 - **The line's own state, read after** (G-V5, fixed at 01:07 UTC and missed; the receipt's last block). On lap 94's mean
   under the pass's own masks, the compared places of the store's next sections code 2.652 nats at her own face, and faces
   fitted at the opening and after one, two and three ticks read 2.936, 2.978, 2.936 and 2.837. The read is weak (43,366
@@ -439,19 +441,18 @@ and no part.
 places at its boundary, with the stride its clock inherits. It returns at that section, and the interior then extends
 inward from it. Its width is the section's.
 
-**Against that, the built level.** It reads a moment of every interior place, at the split, where §11 finds that a place
-has bound nothing past its opening; and it returns before the two ticks that bind. It is sized at half the fine width,
-where §9 finds that a unit's strand with its phases does not pass 64 numbers. It reads no boundary and no settled state.
+**Against that, the built level.** It reads a moment of every interior place at the split, half the place level's ticks
+in, and returns before the two ticks that bind at a compared place (§11). It is sized at half the fine width, where §9
+finds that a unit's strand with its phases does not pass 64 numbers. It reads no boundary. Whether the written places it
+reads are settled by the split is unread.
 
-**What §11 adds, and the question it leaves open.** The places a level would read have themselves committed to nothing.
-A written place is compared nowhere after its opening (the design record of November 13, §4.8), so its ticks are trained
-only through the one comparison at the open place, two ticks and a product away. At that place the code falls by one
-bound symbol a tick, late. Whether a written place's state holds a bound stretch that an open row fails to fetch, or holds
-none, is not separated by the night's readings: the open place's own state holds the pair before it at about 300
-thousandths and the triple at about 200 at every tick while its code falls, so a count of identities does not see where
-the binding is kept. The receiver's law says where to look: a place that is asked for nothing commits to nothing. What a
-written place's receipt is, at its own grain and in its own frame, is the question of the objects' receipt law (a region's
-deposition answers only to action that reached its interface, in its frame) and of the learning law (#73), and it comes
-before a level's. (This sentence first named #405, which asks how much each contact with data teaches; corrected the same
-hour.)
+**What is not established** (rewritten at 01:21 UTC; this paragraph first said that the places a level would read have
+committed to nothing, which no reading of the night supports). The night read the compared place: its code falls by one
+bound symbol at each late tick, and its own state holds the pair before it at about 300 thousandths and the triple at
+about 200 at every tick while its code falls, so a count of identities does not see where the binding is kept. It did not
+read what a written place holds, at the split or after its ticks, of the stretch around it. A written place is not
+compared in a pass where it is written (the design record of November 13, §4.8), and the same material is compared
+wherever a pass opens it, so nothing here says its ticks are untrained. What a level would find at a unit's boundary is
+therefore a reading still to make, on the written places' own states, before the receipt law (the objects' §10) or the
+learning law (#73) is brought to it. (An earlier wording named #405, which asks how much each contact with data teaches.)
 
