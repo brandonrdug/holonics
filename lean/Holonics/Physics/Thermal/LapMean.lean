@@ -8,7 +8,9 @@ read at the mean of each lap of `n` steps, `M k = (1/n) Σ_{j<n} X (k n + j + 1)
 `holonics::hnn::tower::field::MaterialMean` takes of a deposit's material (atlas
 `tower.field-lap-mean`).
 
-[proved-standard] The chart, cited and not formalized here (the reindexing is owed in #410).
+[proved-standard; formal-checked] The chart, proved in `HolonicsResearch/Physics/Thermal/MeanOfStates` (the
+reindexing `lapMean_succ_sub`; the two moments `lap_second_moment` and `lap_shared_moment`, for increments
+uncorrelated about zero under a linear mean).
 - The difference of two successive lap means is a weighted sum of the increments of the two laps
   it spans: `n (M (k+1) − M k) = Σ_{i<n} i · ε (k n + i) + Σ_{i<n} (n − i) · ε ((k+1) n + i)`.
 - For increments that are uncorrelated and of one variance `v`, that difference has the variance
