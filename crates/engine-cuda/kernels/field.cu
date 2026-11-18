@@ -7121,6 +7121,41 @@ extern "C" __global__ void field_level_news(FieldWords w, const uint64_t *masses
     }
 }
 
+// [definition; the lead, November 18, the record of the two streams §11] **A strand's news** (the host's `Constitution::strand_news`):
+// at each known site of a passage read by two streams, from the retarded opening's face of its place (`masses[t][a]`, `totals[t]`),
+// the code of its class (`news[t]`) and the face's expected code (`expected[t]`, the news of the open place at that place). An open
+// place's own row of the face is not formed (the opening is compared at the known sites), so nothing is read there and both words
+// are written zero. One warp a site.
+extern "C" __global__ void field_level_news_strand(FieldWords w, const uint64_t *masses, const wide *totals, int64_t *news, int64_t *expected) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    for (uint64_t t = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; t < w.T; t += warps) {
+        if (twin_site(w, t)) {
+            if (lane == 0) {
+                news[t] = 0;
+                expected[t] = 0;
+            }
+            continue;
+        }
+        const uwide total = (uwide)totals[t];
+        const uint64_t *m = masses + t * w.A;
+        wide sum = 0;
+        for (uint32_t a = lane; a < w.A; a += 32) {
+            sum += (wide)m[a] * (wide)level_face_code(m[a], total);
+        }
+        for (int o = 16; o > 0; o >>= 1) {
+            const uwide u = (uwide)sum;
+            const uint64_t lo = __shfl_down_sync(0xffffffffu, (uint64_t)u, o);
+            const uint64_t hi = __shfl_down_sync(0xffffffffu, (uint64_t)(u >> 64), o);
+            sum += (wide)(((uwide)hi << 64) | lo);
+        }
+        if (lane == 0) {
+            news[t] = level_face_code(m[w.classes[t]], total);
+            expected[t] = fit64(div_nearest(sum, (wide)total), w.status);
+        }
+    }
+}
+
 // [definition; theory, November 13, the design record §4.9] **An epoch's harmonics of its places' rows** (the host's `charted`):
 // `out[e][k W + c] = release(Σ_(t∈e) h[t][k] rows[t][c], 30)`, epoch `e`'s places `off[e]..off[e + 1]` of the fine strand, `h` each
 // place's `H` harmonics on `2^(−30)`. One thread an entry.
@@ -7146,13 +7181,54 @@ extern "C" __global__ void field_level_chart64(FieldWords w, const int64_t *rows
     level_chart<int64_t>(rows, h, off, epochs, H, width, out, w.status);
 }
 
+// [definition; the lead, November 18, the record of the two streams §11] **An epoch's harmonics of the rows of two runs of sites** (the host's
+// `scale_forward_before` and `scale_return_before`): `out[e][k W + c] = release(Σ_t h[t][k] rows[t][c], 30)` over the sites `lo[e]..hi[e]` and,
+// where `lo2` is given, `lo2[e]..hi2[e]`. In a passage read by two streams an epoch's known sites are one run (the restriction), and the
+// sites that read an epoch are two (the known sites of the epoch after it and the open places that stand in that epoch). An integer
+// sum released once, so the runs' order is free. One thread an entry.
+template <typename V>
+__device__ void level_chart_spans(const V *rows, const int64_t *h, const uint32_t *lo, const uint32_t *hi, const uint32_t *lo2, const uint32_t *hi2, uint64_t epochs, uint32_t H, uint32_t width, int64_t *out, uint32_t *status) {
+    const uint64_t per = (uint64_t)H * width;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < epochs * per; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t e = c / per, kc = c % per;
+        const uint32_t k = kc / width, i = kc % width;
+        wide sum = 0;
+        for (uint32_t t = lo[e]; t < hi[e]; t++) {
+            sum += (wide)h[(uint64_t)t * H + k] * (wide)rows[(uint64_t)t * width + i];
+        }
+        if (lo2) {
+            for (uint32_t t = lo2[e]; t < hi2[e]; t++) {
+                sum += (wide)h[(uint64_t)t * H + k] * (wide)rows[(uint64_t)t * width + i];
+            }
+        }
+        out[c] = fit64(rel(sum, MOVE_BITS), status);
+    }
+}
+
+extern "C" __global__ void field_level_chart32_spans(FieldWords w, const int32_t *rows, const int64_t *h, const uint32_t *lo, const uint32_t *hi, const uint32_t *lo2, const uint32_t *hi2, uint64_t epochs, uint32_t H, uint32_t width, int64_t *out) {
+    level_chart_spans<int32_t>(rows, h, lo, hi, lo2, hi2, epochs, H, width, out, w.status);
+}
+
+extern "C" __global__ void field_level_chart64_spans(FieldWords w, const int64_t *rows, const int64_t *h, const uint32_t *lo, const uint32_t *hi, const uint32_t *lo2, const uint32_t *hi2, uint64_t epochs, uint32_t H, uint32_t width, int64_t *out) {
+    level_chart_spans<int64_t>(rows, h, lo, hi, lo2, hi2, epochs, H, width, out, w.status);
+}
+
 // [definition; theory, November 13, the design record §4.9] **Each place's row from its epoch's harmonic blocks** (the host's
 // `uncharted`): `release(Σ_k h[t][k] v[e(t)][k W + c], 30)`, added into `dst[t][c]` (`add`) or written there. One thread an entry.
+// [the record of the two streams §11] A site that reads no epoch (`LEVEL_NONE`: in a passage read by two streams, a site of the first
+// epoch, or an open place whose epoch is the first) takes nothing: its row is left as it stands (`add`) or written zero.
+#define LEVEL_NONE 0xFFFFFFFFu
 extern "C" __global__ void field_level_unchart(FieldWords w, const int64_t *v, const int64_t *h, const uint32_t *epoch, uint32_t H, uint32_t width, int64_t *dst, uint32_t add) {
     const uint64_t cells = (uint64_t)w.T * width;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / width;
         const uint32_t i = c % width;
+        if (epoch[t] == LEVEL_NONE) {
+            if (!add) {
+                dst[c] = 0;
+            }
+            continue;
+        }
         const int64_t *vt = v + (uint64_t)epoch[t] * H * width;
         wide sum = 0;
         for (uint32_t k = 0; k < H; k++) {

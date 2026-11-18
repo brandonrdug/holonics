@@ -238,6 +238,44 @@ pub fn level_cut_sided(news: &[i64], section: i64, harmonics: usize, pi: i128, b
     Ok(LevelCut { anchors, epoch, harmonics: out, tau })
 }
 
+/// A strand's cut for the level ([`strand_level_cut`]): the known stream's cut, each open place's harmonics `[n][H]` on `2^(−30)`, and
+/// the epoch each of the `2n` sites reads (the known sites, then the open places; `None` where a site reads none).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct StrandCut {
+    pub cut: LevelCut,
+    pub open_harmonics: Vec<i64>,
+    pub source: Vec<Option<usize>>,
+}
+
+/// [definition; the lead, November 18, the record of the two streams §11] **A strand's cut** from its places' news
+/// ([`Constitution::scale_forward_before`]): the known stream cut where a one-sided stream can name a site ([`level_anchors_before`]);
+/// a known site of epoch `j` reads epoch `j − 1`; the open place at place `t ≥ 1` stands in the epoch of the place before it, at the
+/// phase `(S_(t−1) + ĉ_t − S_(a))/σ` its expected news `ĉ_t` (`open_news`) carries it to, and reads the same epoch before. Data: one
+/// function for the host's law and a card's batch.
+pub fn strand_level_cut(known_news: &[i64], open_news: &[i64], section: i64, harmonics: usize, pi: i128) -> Result<StrandCut> {
+    let n = known_news.len();
+    if open_news.len() != n {
+        return refuse("a strand's cut needs each place's news and its expected news");
+    }
+    let cut = level_cut_sided(known_news, section, harmonics, pi, true)?;
+    let mut sum = vec![0i128; n + 1];
+    for (t, &c) in known_news.iter().enumerate() {
+        sum[t + 1] = sum[t] + c as i128;
+    }
+    let mut open_harmonics = vec![0i64; n * harmonics];
+    let mut source: Vec<Option<usize>> = (0..n).map(|t| cut.epoch[t].checked_sub(1)).collect();
+    if n > 0 {
+        source.push(None);
+    }
+    for t in 1..n {
+        let e = cut.epoch[t - 1];
+        let phi = div_nearest((sum[t] + open_news[t].max(0) as i128 - sum[cut.anchors[e] + 1]) << PACE_BITS, section as i128);
+        phase_harmonics(phi, &mut open_harmonics[t * harmonics..(t + 1) * harmonics], pi);
+        source.push(e.checked_sub(1));
+    }
+    Ok(StrandCut { cut, open_harmonics, source })
+}
+
 /// The harmonics of a news phase `phi` (on the pace grain), on the turn's grain: `1`, then a cosine and a sine a whole turn.
 fn phase_harmonics(phi: i128, h: &mut [i64], pi: i128) {
     h[0] = 1i64 << MOVE_BITS;
@@ -588,28 +626,13 @@ impl Constitution {
         let Some((b2, bb2, _)) = s.before_offsets(d0) else {
             return refuse("a strand's level on a tower without its one-sided block");
         };
-        let section = level_section(self.declaration.alphabet);
-        let cut = level_cut_sided(known_news, section, h, self.pi, true)?;
+        let StrandCut { cut, open_harmonics, source } = strand_level_cut(known_news, open_news, level_section(self.declaration.alphabet), h, self.pi)?;
         let epochs = cut.anchors.len();
         let (a, ab, _, _, _) = glue_layout(h, d0, d1);
         let g = &s.glue;
-        let mut out = ScalePass::default();
+        let mut out = ScalePass { open_harmonics, source, ..Default::default() };
         for xt in x[..n * d0].chunks_exact(d0) {
             lane_chart(xt, self.declaration.lanes, &mut out.read, &mut out.scale)?;
-        }
-        // Each open place: the epoch of the place before it, at the phase its expected news carries it to.
-        let mut sum = vec![0i128; n + 1];
-        for (t, &c) in known_news.iter().enumerate() {
-            sum[t + 1] = sum[t] + c as i128;
-        }
-        out.open_harmonics = vec![0i64; n * h];
-        out.source = (0..n).map(|t| cut.epoch[t].checked_sub(1)).collect();
-        out.source.push(None);
-        for t in 1..n {
-            let e = cut.epoch[t - 1];
-            let phi = div_nearest((sum[t] + open_news[t].max(0) as i128 - sum[cut.anchors[e] + 1]) << PACE_BITS, section as i128);
-            phase_harmonics(phi, &mut out.open_harmonics[t * h..(t + 1) * h], self.pi);
-            out.source.push(e.checked_sub(1));
         }
         // The restriction over the known sites, through `A`.
         out.restricted = charted(&cut, h, &out.read, d0)?;

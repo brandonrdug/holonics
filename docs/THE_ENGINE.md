@@ -273,9 +273,22 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
       (`read-far` at `8` and `7`), and half of each stood idle. Card against host on the same four fields, first run: the strands'
       test with a section of strands facing the past (24 cases) and the known stream at `9`. Whether the line carries the word is
       G-1118-15's read.
-  - owed, in order: the level made one-sided (a known stream hears none, and on the line's state of November 18 the level is worth
-    0.21 nats at the frontier where the second read is worth 0.001: `read-far`'s settings `4` and `5`); a writer that keeps the known
-    stream's states and reads one new place a symbol; the second read's mark is left out for good unless a reading asks for it.
+    - The level as a strand hears it (atlas `tower.level-before`; the record of the two streams §10 and §11): on a tower whose glue
+      carries the block `B⁻`, `b_B⁻` (`Constitution::level_before`, `athena host complete-language open-level`; founded at zero, carried
+      in the learner's state), a passage read by two streams cuts its known stream where a one-sided stream can name a site (no
+      earlier place within a section of news carries news as large), restricts each epoch over its known sites through the law's
+      `A`, runs the level's field with each epoch hearing only the epochs before it, and hands every known site, and the open place
+      at every place, the epoch before its own through the block (`scale_forward_before`, `scale_return_before`, `strand_level_cut`).
+      On the card the host cuts the batch from the news the card reads at the known sites (`field_level_news_strand`), an epoch's
+      known sites are one run and the sites that read an epoch two (`field_level_chart32_spans`, `field_level_chart64_spans`), a
+      site that reads no epoch takes nothing (`LEVEL_NONE`), and the level's words carry the known stream's word. Card against host,
+      bit for bit: the strands' test on a fifth field, the tower with the block drawn (30 cases), and sixteen small cases forward
+      and returned (`the_level_a_strand_hears_on_the_card_step_by_step`). It is the carrier a level's own receipt needs; by the
+      level's rows in the atlas it is not expected to move the frontier without one.
+  - owed, in order: the composite's remainder at the place level (the record of the two streams §12 to §14: the frontier's excess
+    stands inside units, 0.4 nats of all places, and about twelve thousand rows a register close most of it); the level's own
+    receipt; a writer that keeps the known stream's states and reads one new place a symbol; the second read's mark is left out for
+    good unless a reading asks for it.
   - why it was built: the frontier's fall under the control is 0.1603 + 0.0458 ln(sections / 3,000) over six laps with the share, a
     fifth lane of 32 buys nothing there in its first lap, and a frontier comparison cost a region's whole read (the frontier record
     §5 and §7).
