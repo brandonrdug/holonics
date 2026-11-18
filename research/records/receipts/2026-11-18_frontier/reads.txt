@@ -102,3 +102,21 @@ the control's end: 52 of 142 (37%); 88 of 255 (34%), 1 loops.
 lap 1: 75 of 162 (46%); 90 of 244 (36%), 1.   lap 2: 91 of 165 (55%); 142 of 299 (47%), 1.   lap 3: 70 of 152 (46%); 125 of 267 (46%), 2.
 lap 4: 75 of 161 (47%); 112 of 269 (42%), 4.   lap 5: 85 of 176 (48%); 148 of 283 (52%), 0.
 the full share's lap (arm G): 66 of 144 (46%); 108 of 250 (43%), 2.
+
+The frontier's price in cells and the sixth lap (G-1118-8, G-1118-9): from arm F5's end state, a fifth lane of 32 founded at zero
+(found-lane: width 128 to 160, 392,505 entries to 483,961, a factor 1.233) and one lap (arm L, 1,779 s, 591 ms a section where the
+plain line takes 555), beside the same state one more lap as it is (arm F6, 1,675 s). At lap means:
+FRONTIER F6_mean; one place open: all 0.9134 (100508 places) | books 0.9525 code 0.6146 science 0.8563 web 0.9878 wikidata 1.1551 || less the control's, paired: +0.1407 (±0.0022) | books +0.1402 code +0.1234 science +0.1586 web +0.1356 wikidata +0.1457
+FRONTIER F6_mean; whole masks: all 2.3313 (3717 places) | books 2.1530 code 2.2663 science 2.2432 web 2.4527 wikidata 2.5709 || less the control's, paired: +0.1224 (±0.0089) | books +0.0795 code +0.1690 science +0.1696 web +0.0633 wikidata +0.1337
+FRONTIER F6_mean; the frontier: all 1.8121 (99844 places) | books 1.8288 code 1.5308 science 1.7841 web 1.9751 wikidata 1.9416 || less the control's, paired: -0.2453 (±0.0025) | books -0.1758 code -0.2841 science -0.2488 web -0.2266 wikidata -0.2906
+FRONTIER F6_mean; the frontier by places known (less the control's): 1: 4.186 (+0.249) | 2 to 3: 2.900 (-0.116) | 4 to 7: 2.466 (-0.196) | 8 to 15: 2.304 (-0.179) | 16 to 31: 2.131 (-0.200) | 32 to 63: 1.960 (-0.215) | 64 to 127: 1.781 (-0.238) | 128 to 255: 1.671 (-0.266) | 256 to 511: 1.603 (-0.284) | 512 to 1023: 1.602 (-0.302)
+Arm L against arm F6 (F6 first):
+FRONTIER L_mean; one place open: all 0.9164 (100508 places) | books 0.9548 code 0.6194 science 0.8629 web 0.9917 wikidata 1.1523 || less the control's, paired: +0.0029 (±0.0007) | books +0.0023 code +0.0048 science +0.0065 web +0.0039 wikidata -0.0028
+FRONTIER L_mean; whole masks: all 2.3313 (3717 places) | books 2.1543 code 2.2608 science 2.2477 web 2.4553 wikidata 2.5670 || less the control's, paired: -0.0000 (±0.0027) | books +0.0013 code -0.0055 science +0.0045 web +0.0027 wikidata -0.0039
+FRONTIER L_mean; the frontier: all 1.8145 (99844 places) | books 1.8305 code 1.5299 science 1.7883 web 1.9778 wikidata 1.9459 || less the control's, paired: +0.0024 (±0.0006) | books +0.0017 code -0.0009 science +0.0043 web +0.0027 wikidata +0.0042
+FRONTIER L_mean; the frontier by places known (less the control's): 1: 4.189 (+0.003) | 2 to 3: 2.893 (-0.007) | 4 to 7: 2.463 (-0.003) | 8 to 15: 2.302 (-0.002) | 16 to 31: 2.134 (+0.004) | 32 to 63: 1.964 (+0.004) | 64 to 127: 1.784 (+0.003) | 128 to 255: 1.672 (+0.001) | 256 to 511: 1.606 (+0.003) | 512 to 1023: 1.614 (+0.011)
+Arm L's end: the books' panel 85 of 172 (49%), the long panel 126 of 273 (46%), 2 of 20 loop.
+
+The frontier's fall under the control against the sections trained with the share (3,000, 6,000, 9,540, 12,540, 15,540, 18,540):
+0.1603, 0.1912, 0.2147, 0.2261, 0.2347, 0.2453. Fitted on the first five: 0.1603 + 0.0458 ln(sections / 3,000), residuals within
+0.0014 (root mean square 0.0009); it gave the sixth at 0.2437 before its read, which read 0.2453.
