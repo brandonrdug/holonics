@@ -618,30 +618,46 @@ pub fn cavity_moments_return(ds: &[(i64, i64)], ring: &[(i64, i64)], n: usize, d
 /// return's `δE±`. No place's own stride is read, so nothing returns to it but its sources' and receivers' shares of the others' turns.
 #[allow(clippy::too_many_arguments)]
 pub fn cavity_pace_return(before: &[(i64, i64)], after: &[(i64, i64)], s_before: &[(i64, i64)], s_after: &[(i64, i64)], ds: &[(i64, i64)], back_before: &[(i128, i128)], back_after: &[(i128, i128)], ring: &[(i64, i64)], n: usize, decay: &[i64], pace: &Pace, tau_c: &[i64], sigma_c: &[i64], b: i128) -> Result<(Vec<i128>, Vec<i128>)> {
+    let (dtau, dsig, _, _) = cavity_pace_return_split(before, after, s_before, s_after, ds, back_before, back_after, ring, n, decay, pace, tau_c, sigma_c, b)?;
+    Ok((dtau, dsig))
+}
+
+/// [`cavity_pace_return`], with each place's own share set beside it [the strand's second stream]: `(δτ, δσ, δτ_c, δσ_c)`, where `δτ_c(t)`
+/// and `δσ_c(t)` are the covectors of the clock place `t` received its before side on (`τ_c(t)`, `σ_c(t)`), the terms the first two hold at
+/// `t − 1` for a cavity clock one bare stride past it. A place whose receiving clock is `τ_(t−1)` and a stride of its own (a blank's, read
+/// from its face) owes that stride the same covector.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+pub fn cavity_pace_return_split(before: &[(i64, i64)], after: &[(i64, i64)], s_before: &[(i64, i64)], s_after: &[(i64, i64)], ds: &[(i64, i64)], back_before: &[(i128, i128)], back_after: &[(i128, i128)], ring: &[(i64, i64)], n: usize, decay: &[i64], pace: &Pace, tau_c: &[i64], sigma_c: &[i64], b: i128) -> Result<(Vec<i128>, Vec<i128>, Vec<i128>, Vec<i128>)> {
     let sites = before.len();
     if [after.len(), s_before.len(), s_after.len(), ds.len(), back_before.len(), back_after.len(), tau_c.len(), sigma_c.len()].iter().any(|&l| l != sites) {
         return refuse("a strand's cavity clock covector over parts of different lengths");
     }
     let (mut dtau, mut dsig) = (vec![0i128; sites], vec![0i128; sites]);
+    let (mut rx_tau, mut rx_sig) = (vec![0i128; sites], vec![0i128; sites]);
     if sites == 0 {
-        return Ok((dtau, dsig));
+        return Ok((dtau, dsig, rx_tau, rx_sig));
     }
     let law = Law::new(sites, ring, n, decay, Some(pace))?;
     let sign = |x: i64| -> i128 { x.signum() as i128 };
     for t in 0..sites {
         if t > 0 {
-            dtau[t - 1] = sub(dtau[t - 1], scaled(cross(wide(ds[t]), wide(s_before[t]))?, b, MOVE_BITS + FACE_BITS)?)?;
+            let turn = scaled(cross(wide(ds[t]), wide(s_before[t]))?, b, MOVE_BITS + FACE_BITS)?;
+            dtau[t - 1] = sub(dtau[t - 1], turn)?;
+            rx_tau[t] = sub(rx_tau[t], turn)?;
         }
         dtau[t] = sub(dtau[t], scaled(cross(wide(ds[t]), wide(s_after[t]))?, b, MOVE_BITS + FACE_BITS)?)?;
         dtau[t] = add(dtau[t], scaled(add(cross(back_before[t], wide(before[t]))?, cross(back_after[t], wide(after[t]))?)?, b, MOVE_BITS + FACE_BITS)?)?;
     }
     // The skins: one term a pair or an octave, its share of `σ` at its two ends; a receiver's end on its before side is `t − 1`'s clock.
-    let mut skin = |rt: usize, sr: i64, k: usize, d: i128, inner: i128| -> Result<()> {
+    let mut skin = |rt: usize, sr: i64, k: usize, d: i128, inner: i128, receiver: Option<usize>| -> Result<()> {
         let at = scaled(scaled(inner, d, MOVE_BITS)?, b, MOVE_BITS)?;
         let term = release(at, MOVE_BITS + FACE_BITS);
         let sgn = sign(sr - pace.sigma[k]);
         dsig[rt] = sub(dsig[rt], mul(sgn, term)?)?;
         dsig[k] = add(dsig[k], mul(sgn, term)?)?;
+        if let Some(t) = receiver {
+            rx_sig[t] = sub(rx_sig[t], mul(sgn, term)?)?;
+        }
         Ok(())
     };
     let re = |a: Gauss, z: Gauss| -> Result<i128> { add(mul(a.0, z.0)?, mul(a.1, z.1)?) };
@@ -651,27 +667,27 @@ pub fn cavity_pace_return(before: &[(i64, i64)], after: &[(i64, i64)], s_before:
             let k = t - d;
             let face = wide((pace.turn)(pace.tau[k] as i128 - tau_c[t] as i128));
             let between = (pace.skin)(sigma_c[t] as i128 - pace.sigma[k] as i128) as i128;
-            skin(t - 1, sigma_c[t], k, between, re(wide(ds[t]), cmul(face, wide(before[k]))?)?)?;
+            skin(t - 1, sigma_c[t], k, between, re(wide(ds[t]), cmul(face, wide(before[k]))?)?, Some(t))?;
         }
         for d in 1..NEAR.min(sites - t) {
             let k = t + d;
-            skin(t, pace.sigma[t], k, law.between(t, k), re(wide(ds[t]), cmul(law.phase(t, k)?, wide(after[k]))?)?)?;
+            skin(t, pace.sigma[t], k, law.between(t, k), re(wide(ds[t]), cmul(law.phase(t, k)?, wide(after[k]))?)?, None)?;
         }
         for (lo, hi, level) in crowd_ranges(t, sites) {
             if hi > t {
                 let (fr, fi) = cmul(conj(law.absolute(t)), csub(down[hi + 1], down[lo])?)?;
                 let face = (release(fr, MOVE_BITS), release(fi, MOVE_BITS));
-                skin(t, pace.sigma[t], t + (1 << level), law.octave(t, level, true), re(wide(ds[t]), face)?)?;
+                skin(t, pace.sigma[t], t + (1 << level), law.octave(t, level, true), re(wide(ds[t]), face)?, None)?;
             } else {
                 let k = t - (1 << level);
                 let (fr, fi) = cmul(conj(wide((pace.turn)(tau_c[t] as i128))), csub(up[hi + 1], up[lo])?)?;
                 let face = (release(fr, MOVE_BITS), release(fi, MOVE_BITS));
                 let octave = (pace.skin)(sigma_c[t] as i128 - pace.sigma[k] as i128) as i128;
-                skin(t - 1, sigma_c[t], k, octave, re(wide(ds[t]), face)?)?;
+                skin(t - 1, sigma_c[t], k, octave, re(wide(ds[t]), face)?, Some(t))?;
             }
         }
     }
-    Ok((dtau, dsig))
+    Ok((dtau, dsig, rx_tau, rx_sig))
 }
 
 /// **The cavity moments** on `2^(−16)`: [`cavity_moment_exact`] released once, to the nearest numerator, as [`moments`] releases.

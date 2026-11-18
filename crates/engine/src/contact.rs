@@ -122,6 +122,24 @@ pub(crate) enum Sided<'a> {
     Both,
     Before,
     Chart(&'a Paces),
+    /// The strand's two streams in one tick ([`Constitution::strand_pass`]): the first `known` sites are the known stream, each hearing
+    /// only what stands before it; the sites after them are its open places, site `known + t` at place `t`.
+    Strand { known: usize },
+}
+
+/// [`Constitution::strand_pass`]'s forward: the open places' faces (one a place), and where kept for the return each tick's cell over
+/// the joined sites, the clocks, moments and the open places' clocks it ran on, the faces a later tick's clocks were read from, and the
+/// last states.
+#[derive(Clone, Debug, Default)]
+pub(crate) struct StrandForward {
+    pub(crate) known: usize,
+    pub(crate) faces: Vec<TowerFace>,
+    pub(crate) ticks: Vec<TickCell>,
+    pub(crate) paces: Vec<Paces>,
+    pub(crate) moments: Vec<Vec<i64>>,
+    pub(crate) clocks: Vec<Vec<(Vec<i64>, Vec<i64>)>>,
+    pub(crate) reads: Vec<Vec<BlankRead>>,
+    pub(crate) last: Vec<i64>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -176,6 +194,10 @@ pub struct ClassLists {
     /// Whether every site listens as an open place does (the boundary chart). Unset with `one_sided` set, the lists are a ruler's
     /// ([`Constitution::ruler_far`] at `3`): each receiver keeps its kind and hears only what stands before it.
     pub all_listen: bool,
+    /// [the strand's two streams, [`Constitution::strand_pass`]] The first site of the strand's open places, where the lists hold them
+    /// beside the known stream (the sites before it): site `i ≥ twins_from` stands at place `i − twins_from`, the place of the known
+    /// site of that index, hears the known sites before that place and is heard by no one. The count of sites where there are none.
+    pub twins_from: usize,
 }
 
 impl ClassLists {
@@ -198,7 +220,8 @@ impl ClassLists {
         let probes = vec![Vec::new(); class.len()];
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
-        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, all_listen: false }
+        let twins_from = class.len();
+        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, all_listen: false, twins_from }
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -220,16 +243,20 @@ impl ClassLists {
     /// and of the classes it probes across its seams, an open receiver (not definite) every definite site. The
     /// support is directional: only definite sources are heard far.
     pub fn support(&self, i: usize) -> impl Iterator<Item = usize> + '_ {
-        let sites = self.class.len();
+        let receiver_listens = self.listens(i);
+        let probe_site = i;
+        // The sites a receiver can hear are the known ones (every site, where the lists hold no open places of a strand), and it stands at
+        // its place among them.
+        let (sites, i) = (self.twins_from, self.place(i));
         // A passage read at its boundary hears only what stands before the receiver.
         let before = move |j: usize| !self.one_sided || j < i;
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().filter(move |&j| self.keyed[j] && before(j));
         // The law: an open receiver hears every definite site, a definite one its classes. A ruler's `far` gives an open receiver a
         // definite one's far field (`1`) or none (`2`).
-        let open = self.listens(i);
+        let open = receiver_listens;
         let ruled = !self.all_listen && (self.far == 1 || self.far == 2);
         let (sharp, classed) = (open && !ruled, !open || (self.far == 1 && !self.all_listen));
-        let runs = std::iter::once(self.probe_class[i]).chain(self.probes.get(i).into_iter().flatten().copied()).filter(move |_| classed);
+        let runs = std::iter::once(self.probe_class[probe_site]).chain(self.probes.get(probe_site).into_iter().flatten().copied()).filter(move |_| classed);
         let far = runs.flat_map(move |c| self.members[self.off[2 * c as usize] as usize..self.off[2 * c as usize + 1] as usize].iter().map(|&j| j as usize).filter(move |&j| j.abs_diff(i) >= NEAR && before(j)));
         let listened = (0..sites).filter(move |&j| sharp && self.definite[j] && j.abs_diff(i) >= NEAR && before(j));
         near.chain(far).chain(listened)
@@ -252,9 +279,20 @@ impl ClassLists {
         let c = self.class[j] as usize;
         let all = &self.members[self.off[2 * c] as usize..self.off[2 * c + 1] as usize];
         if self.one_sided {
-            all.partition_point(|&m| (m as usize) < i)
+            let at = self.place(i);
+            all.partition_point(|&m| (m as usize) < at)
         } else {
             all.len()
+        }
+    }
+
+    /// Site `i`'s place on the strand: its index, or for an open place of a strand's second stream the place of the known site it
+    /// stands at ([`ClassLists::twins_from`]).
+    pub fn place(&self, i: usize) -> usize {
+        if i >= self.twins_from {
+            i - self.twins_from
+        } else {
+            i
         }
     }
 }
@@ -511,16 +549,21 @@ impl Constitution {
     /// ruler's ([`Constitution::ruler_far`] at `3`), each site keeps its kind and its clock and hears only what stands before it.
     #[allow(clippy::too_many_arguments, reason = "the tick's declared operands")]
     pub(crate) fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell, sided: Sided) -> Result<()> {
-        let (one_sided, boundary) = match sided {
-            Sided::Both => (false, None),
-            Sided::Before => (true, None),
-            Sided::Chart(rx) => (true, Some(rx)),
+        let (one_sided, boundary, twins_from) = match sided {
+            Sided::Both => (false, None, None),
+            Sided::Before => (true, None, None),
+            Sided::Chart(rx) => (true, Some(rx), None),
+            Sided::Strand { known } => (true, None, Some(known)),
         };
         let receiving = boundary.unwrap_or(paces);
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let m2 = 2 * m;
         let sites = x.len() / dw;
+        // [the strand's two streams] The sites that can be heard (the known stream's; every site where there is no second stream) and a
+        // site's place among them.
+        let heard = twins_from.unwrap_or(sites);
+        let place = |t: usize| if t >= heard { t - heard } else { t };
         let l = &self.layout;
         let (trits, buckets) = (d.class_trits(), d.classes());
         // The chart, lane by lane.
@@ -561,7 +604,7 @@ impl Constitution {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
                 let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
                 let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists { far: self.ruler_far, one_sided, all_listen: boundary.is_some(), ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
+                ClassLists { far: self.ruler_far, one_sided, all_listen: boundary.is_some(), twins_from: heard, ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
             })
             .collect();
         cell.word = q.clone();
@@ -576,7 +619,7 @@ impl Constitution {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(paces, t, h, li);
+                    let (ur, ui) = self.frame_placed(paces, t, place(t), h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (q[t * m2 + c] as i128, q[t * m2 + m + c] as i128);
                     let (vr, vi) = (v[t * m2 + c] as i128, v[t * m2 + m + c] as i128);
@@ -607,7 +650,7 @@ impl Constitution {
                 let at = (h * sites + t) * span;
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(receiving, t, h, li);
+                    let (ur, ui) = self.frame_placed(receiving, t, place(t), h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (qr, qi) = (pr[t * m2 + c] as i128, pr[t * m2 + m + c] as i128);
                     cell.pq[at + li] = fit64(release(ur * qr - ui * qi, MOVE_BITS))?;
@@ -662,7 +705,7 @@ impl Constitution {
                     continue;
                 }
                 // [the boundary chart] The passage's first site has nothing before it: it meets no source, and its current is zero.
-                if one_sided && i == 0 {
+                if one_sided && place(i) == 0 {
                     cell.rows.push(Vec::new());
                     cell.crowds.push(Vec::new());
                     continue;
@@ -678,13 +721,13 @@ impl Constitution {
                     let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
                     // Each mode's lock carried by its skin decay across the pair's distance, summed
                     // whole and released once (a still head's `D = 1` reads the bare lock exactly).
-                    let d = i.abs_diff(j);
+                    let d = place(i).abs_diff(j);
                     let mut s = 0i128;
                     let mut value = vec![0i128; span];
                     for li in 0..n {
                         let decay = match boundary {
                             Some(rx) => self.pair_decay_between(rx, i, paces, j, h, li),
-                            None => self.pair_decay(paces, h, li, i, j),
+                            None => self.pair_decay_placed(paces, h, li, i, j, d),
                         };
                         s = carried(s.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?))?;
                         (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
@@ -707,7 +750,7 @@ impl Constitution {
                 // term is its decayed value sum, its mass term `|C|` times its face.
                 let mut crowds: Vec<Crowd> = Vec::new();
                 // An open receiver hears every definite source sharply (§15.9), so no crowd of them.
-                for (lo, hi_, level) in crowd_ranges(i, sites).into_iter().filter(|&(lo, _, _)| lists.crowded(i) && (!one_sided || lo < i)) {
+                for (lo, hi_, level) in crowd_ranges(place(i), heard).into_iter().filter(|&(lo, _, _)| lists.crowded(i) && (!one_sided || lo < i)) {
                     let count = sums.count(lo, hi_);
                     if count == 0 {
                         continue;
@@ -733,7 +776,7 @@ impl Constitution {
                     c.e = share;
                 }
                 for li in 0..n {
-                    let (ur, ui) = self.frame(receiving, i, h, li);
+                    let (ur, ui) = self.frame_placed(receiving, i, place(i), h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (yr, yi) = (fit64(framed[li])? as i128, fit64(framed[n + li])? as i128);
                     let c = h * n + li;
@@ -776,7 +819,9 @@ impl Constitution {
             for e in 0..plain {
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 // [the boundary chart] At a boundary an odd contact's mate, the site after, has not arrived.
-                let (br, bi) = match strand_mate(t, e, sites).filter(|_| !one_sided || e % 2 == 0) {
+                // [the strand's two streams] An open place's mate is the known site before its place; a known site's is among the known.
+                let mate = if t >= heard { place(t).checked_sub(1).filter(|_| e % 2 == 0) } else { strand_mate(t, e, heard).filter(|_| !one_sided || e % 2 == 0) };
+                let (br, bi) = match mate {
                     Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
                     None => (0, 0),
                 };
@@ -814,8 +859,8 @@ impl Constitution {
             for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
                 let e = plain + k;
                 let (mut qr, mut qi) = (0i128, 0i128);
-                for step in 0..sites {
-                    let t = if e % 2 == 0 { step } else { sites - 1 - step };
+                for step in 0..heard {
+                    let t = if e % 2 == 0 { step } else { heard - 1 - step };
                     cell.qm[t * c2 + k] = fit64(qr)?;
                     cell.qm[t * c2 + circles + k] = fit64(qi)?;
                     let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
@@ -825,6 +870,16 @@ impl Constitution {
                     let next_r = cell.kb[t * c2 + k] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
                     let next_i = cell.kb[t * c2 + circles + k] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
                     (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));
+                }
+                // [the strand's two streams] An open place reads the circle as it stands before its place, and drives nothing.
+                for t in heard..sites {
+                    let at = place(t);
+                    let (qr, qi) = (cell.qm[at * c2 + k] as i128, cell.qm[at * c2 + circles + k] as i128);
+                    cell.qm[t * c2 + k] = cell.qm[at * c2 + k];
+                    cell.qm[t * c2 + circles + k] = cell.qm[at * c2 + circles + k];
+                    let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
+                    cell.c[t * f + e] = fit64(release(ar * qr - ai * qi, FACE_BITS))?;
+                    cell.c[t * f + half + e] = fit64(release(ar * qi + ai * qr, FACE_BITS))?;
                 }
             }
         }
@@ -1143,6 +1198,105 @@ impl Constitution {
             }
         }
         y.chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect()
+    }
+
+    /// [definition; the lead, November 18, the frontier record §6] **The strand's two streams read by one tick**: the known stream's
+    /// sites and its open places are one batch of sites, the open places after the known ones, each at the place of the known site of
+    /// its index ([`Sided::Strand`], [`ClassLists::twins_from`]). A site's near field, its falloff, its skin on a plain pace, its
+    /// strand mate and the circle it reads are taken by its place; an open place is heard by no one and drives no circle. The same law
+    /// as [`Constitution::strand_faces`], whose second tick it replaces: the faces are the same bits
+    /// (`the_strands_two_streams_in_one_tick_are_the_second_ticks_bits`), so one tick and one return serve both streams, on the host and
+    /// on the card. `keep` holds each tick's cell for the return.
+    pub(crate) fn strand_pass(&self, classes: &[usize], keep: bool) -> Result<StrandForward> {
+        let d = &self.declaration;
+        if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 {
+            return refuse("a passage read at its boundary on a field with triads, a junction, depth rings or a closed face");
+        }
+        let n = classes.len();
+        let known = vec![false; n];
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        self.admit_region(&region)?;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let reaches = self.reaches();
+        // The known stream's clocks, moments and opening: what stands before each site, its own row in its opening.
+        let paces = self.paces(&region)?;
+        let known_moment = self.moments_sided(&region, &paces, false)?;
+        let mut x = self.open_sided(&region, &known_moment, None, false)?;
+        // The open places: the retarded opening on the clock each holds before its symbol arrives (its stride bare).
+        let bare: Vec<(Vec<i64>, Vec<i64>)> = (0..d.heads).map(|h| Self::cavity_clocks(&paces, h, n)).collect();
+        let (open_x, open_moment) = self.cavity_forward_sided(&region, &paces, false)?;
+        x.extend_from_slice(&open_x);
+        let one = 1i128 << PACE_BITS;
+        // The joined clocks: the known sites' own, then the open places'.
+        let joined = |clocks: &[(Vec<i64>, Vec<i64>)], strides: &[Vec<i64>]| -> Paces {
+            let mut out = paces.clone();
+            for h in 0..d.heads {
+                if let Some(p) = paces.row.get(h).copied().flatten() {
+                    out.tau[p].extend_from_slice(&clocks[h].0);
+                    out.sigma[p].extend_from_slice(&clocks[h].1);
+                    out.kappa[p].extend_from_slice(&strides[h]);
+                }
+            }
+            out
+        };
+        let bare_strides: Vec<Vec<i64>> = (0..d.heads).map(|_| vec![one as i64; n]).collect();
+        let mut clocks = bare.clone();
+        let mut tick_paces = joined(&bare, &bare_strides);
+        let mut moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
+        let definite: Vec<bool> = (0..2 * n).map(|t| t < n).collect();
+        let rereads = !paces.kappa.is_empty() && (!self.bare_stretch || self.per_blank_clock);
+        let width = d.alphabet + 1;
+        let mut out = StrandForward { known: n, ..Default::default() };
+        for k in 0..d.ticks {
+            let mut cell = TickCell::default();
+            if keep {
+                cell.before = x.clone();
+            }
+            self.tick(&mut x, &definite, &definite, &tick_paces, &moment, &reaches, None, &mut cell, Sided::Strand { known: n })?;
+            if keep {
+                cell.after = x.clone();
+                out.paces.push(tick_paces.clone());
+                out.moments.push(moment.clone());
+                out.clocks.push(clocks.clone());
+            }
+            if rereads && k + 1 < d.ticks {
+                // Each open place's clock from its own face (§16.44), as a blank's is.
+                clocks = bare.clone();
+                let mut strides = bare_strides.clone();
+                let mut reads = Vec::with_capacity(n);
+                for t in 0..n {
+                    let read = self.face_of(&x[(n + t) * dw..(n + t + 1) * dw], &reaches)?;
+                    if t > 0 {
+                        let face = shares(&read.face);
+                        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+                            let Some(p) = paces.row.get(h).copied().flatten() else { continue };
+                            let base = self.layout.pace + p * width;
+                            let rate = release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS);
+                            let stride = one + rate;
+                            strides[h][t] = fit64(stride)?;
+                            clocks[h].0[t] = fit64(paces.tau[p][t - 1] as i128 + stride)?;
+                            clocks[h].1[t] = fit64(paces.sigma[p][t - 1] as i128 + stride.abs())?;
+                        }
+                    }
+                    reads.push(read);
+                }
+                tick_paces = joined(&clocks, &strides);
+                let open_moment = self.retarded_moments_at(&region, &paces, &clocks)?;
+                moment = known_moment.iter().chain(&open_moment).copied().collect();
+                if keep {
+                    out.reads.push(reads);
+                }
+            }
+            if keep {
+                out.ticks.push(cell);
+            }
+        }
+        out.faces = x[n * dw..].chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect::<Result<_>>()?;
+        if keep {
+            out.last = x;
+        }
+        let _ = m2;
+        Ok(out)
     }
 
     /// One tick of the strand's second stream ([`Constitution::strand_faces`]): each open place's move against the known stream's tick

@@ -359,6 +359,12 @@ impl Constitution {
     /// The frame of local mode `l` of head `h` at site `t`, on `2^(−30)`: the identity in a head of
     /// a still ring set, the mode's ring in a turned one.
     pub(crate) fn frame(&self, paces: &Paces, t: usize, h: usize, l: usize) -> (i64, i64) {
+        self.frame_placed(paces, t, t, h, l)
+    }
+
+    /// [`Constitution::frame`] of the site whose clock is `paces`' at `t` and whose place on the strand is `place` (its index, but for an
+    /// open place of a strand's second stream, [`crate::contact::ClassLists::twins_from`]): a plain pace's frame is the place's.
+    pub(crate) fn frame_placed(&self, paces: &Paces, t: usize, place: usize, h: usize, l: usize) -> (i64, i64) {
         let d = &self.declaration;
         let set = h % d.frames;
         if set < d.still {
@@ -369,7 +375,7 @@ impl Constitution {
         // A turned head's frame is its own clock's (§16, Law 1): the byte place where its pace is plain.
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] || d.is_depth(h) => self.turn(slot, paces.tau[p][t] as i128),
-            _ => ring[t % n],
+            _ => ring[place % n],
         }
     }
 
