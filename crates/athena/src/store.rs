@@ -1519,6 +1519,62 @@ pub fn set_leak(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 18, the audit of that day §1.1 and §1.8] `set-rate STATE STATE_SHA BITS OUT [remainder]`: **a learner
+/// with the deposit's rate set** to `2^(−BITS)` (every moment, entry and line as it stands; the moments are the covector's and do not
+/// read the rate), and with the word `remainder` its steps' remainders carried from zero ([`Learner::remainder`]), without which a cooler
+/// rate's step truncates to nothing on the face-grain entries. The rate and the remainder are law and are carried in the learner's state.
+/// It writes a new state.
+pub fn set_rate(args: &[String]) -> Result<()> {
+    if args.len() != 5 && !(args.len() == 6 && args[5] == "remainder") {
+        return Err("set-rate STATE STATE_SHA BITS OUT [remainder]".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let bits: u32 = args[3].parse()?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    if bits == 0 || bits >= 32 {
+        return Err("a rate under one bit or past thirty-one".into());
+    }
+    let before = learner.rate_bits;
+    learner.rate_bits = bits;
+    if args.len() == 6 && learner.remainder.is_none() {
+        learner.remainder = Some(vec![0; learner.field.material_len()]);
+    }
+    let written = learner.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_RATE rate_bits={bits} before={before} remainder={} entries={}", learner.remainder.is_some(), learner.field.material_len());
+    Ok(())
+}
+
+/// [measurement; the lead, November 18, the audit of that day (decide the level)] `zero-level-return STATE STATE_SHA OUT`: **a control for
+/// the level**: the state with its level's prolongation, `B` and `b_B`, set to zero (every other entry, moment and line as it stands), so a
+/// reading of it is the field's faces with the level unheard. A ruler's state: never trained from. Refused on a state with no level.
+pub fn zero_level_return(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("zero-level-return STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let width = learner.field.declaration.width;
+    let scale = learner.field.scale.as_deref_mut().ok_or("a state with no level")?;
+    let (_, _, b, _, len) = scale.glue_offsets(width);
+    let moved = scale.glue[b..len].iter().filter(|&&v| v != 0).count();
+    scale.glue[b..len].fill(0);
+    std::fs::write(out, learner.to_text())?;
+    println!("ZERO_LEVEL_RETURN entries={} nonzero_before={moved}", len - b);
+    Ok(())
+}
+
 /// [definition; the lead, November 17, the founding records] `found-closed STATE STATE_SHA CLOSED CLOSED_SHA OUT`: **the closed characters
 /// founded from a ruler's words** ([`Learner::with_closed`]). `CLOSED` is little-endian 32-bit words: `E`, then the keys (`A × 2E` on
 /// `2^(−16)`: a class's `E` real parts, then its `E` imaginary parts), then the odds (`heads` rows of `D` on `2^(−24)`, then a bias a head

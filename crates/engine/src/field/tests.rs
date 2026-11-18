@@ -2160,6 +2160,54 @@ fn the_stores_leak_relaxes_each_entry_after_its_step_and_is_carried_in_the_text(
     }
 }
 
+/// [definition; the lead, November 18] **The step's carried remainder** ([`Learner::remainder`]): at a rate where the truncated step
+/// leaves a face-grain entry where it stands, the learner that carries its remainders moves it; over the sections the released steps and
+/// the remainder left sum to the finer steps with nothing lost; from one state the moments read the covector alone; and the remainders are carried in the
+/// learner's text, a state without the line has none, and a remainder outside one grain is refused.
+#[test]
+fn the_steps_remainder_is_carried_so_a_cool_rate_still_moves_an_entry_and_nothing_is_dropped() {
+    let cool = 20;
+    let mut plain = Learner::new(towered_live(1), cool);
+    let mut carried = plain.clone();
+    carried.remainder = Some(vec![0; carried.field.material_len()]);
+    let families = carried.field.families_all();
+    let start: Vec<i128> = carried.field.material().map(|&v| i128::from(v)).collect();
+    let mut fine_sum = vec![0i128; start.len()];
+    for section in 0..6 {
+        plain.section(&[region()]).unwrap();
+        carried.section(&[region()]).unwrap();
+        if section == 0 {
+            assert_eq!((&carried.first, &carried.second), (&plain.first, &plain.second), "the moments read the covector alone");
+        }
+        let rates = carried.entry_rates();
+        for &(at, len, grain) in &families {
+            for i in at..at + len {
+                fine_sum[i] += deposit_step(carried.first[i], carried.second[i], grain + REMAINDER_BITS, rates[i]);
+            }
+        }
+    }
+    let remainder = carried.remainder.as_ref().unwrap();
+    let (mut moved_carried, mut moved_plain) = (0, 0);
+    for (i, ((&c, &p), &s)) in carried.field.material().zip(plain.field.material()).zip(&start).enumerate() {
+        // The field's step is taken off the entry: what was released and what is still carried are the finer steps' sum.
+        assert_eq!(((s - i128::from(c)) << REMAINDER_BITS) + i128::from(remainder[i]), fine_sum[i], "entry {i}");
+        assert!((0..1i64 << REMAINDER_BITS).contains(&remainder[i]));
+        moved_carried += usize::from(i128::from(c) != s);
+        moved_plain += usize::from(i128::from(p) != s);
+    }
+    assert!(moved_carried > moved_plain, "the carried remainder moved {moved_carried} entries, the truncated step {moved_plain}");
+    let text = carried.to_text();
+    assert!(text.contains("\nremainder "));
+    assert_eq!(Learner::from_text(&text).unwrap(), Learner { last: None, ..carried.clone() });
+    assert!(!plain.to_text().contains("remainder"));
+    assert_eq!(Learner::from_text(&plain.to_text()).unwrap().remainder, None);
+    let line = text.lines().find(|l| l.starts_with("remainder ")).unwrap();
+    let short = line.rsplit_once(' ').unwrap().0;
+    assert!(Learner::from_text(&text.replace(line, short)).is_err(), "a remainder short of an entry");
+    let outside = format!("remainder {} {}", 1i64 << REMAINDER_BITS, line.strip_prefix("remainder ").unwrap().split_once(' ').unwrap().1);
+    assert!(Learner::from_text(&text.replace(line, &outside)).is_err(), "a remainder outside one grain");
+}
+
 /// [definition; the tower record, D1] **The tower's covector agrees with its code's central difference** on the packets'
 /// field's families and the glue's: each family's three entries with the largest covectors, moved by `±δ` (the probe law of
 /// [`covector_matches_the_codes_difference`], a probe whose step moves a site or a packet across a sheet left out and
