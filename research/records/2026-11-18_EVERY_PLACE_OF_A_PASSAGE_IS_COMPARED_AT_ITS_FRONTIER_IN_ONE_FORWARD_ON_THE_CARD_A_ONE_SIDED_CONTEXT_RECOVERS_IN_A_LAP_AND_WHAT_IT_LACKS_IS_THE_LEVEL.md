@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §17 added the same day, to 20:18 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §18 added the same day, to 21:25 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -570,3 +570,43 @@ the reader of `navigator.content-stride-moment` fitted on the host (a stride and
 face), read at the settled places for several `C`, which says what the carried product can reach when its strides are located
 and sizes its circles (the November 10 ruler held 0.79 and 0.65 of the joint term of three and four letters on 64 circles). The
 arm that follows it founds the circles' strides from that fit and runs beside the line.
+
+## 18. A carried product with a stride of its own a symbol: on 128 circles it stands where the line stands at the settled places
+
+*Written at 21:25 UTC.* The reading §17 named (G-1118-21, `tools/content_stride_ruler.py`): the reader of
+`navigator.content-stride-moment`, `m ← α(u) m + β(u)` on `C` circles with a linear face, fitted by descent on 8 MB a slice
+(three passes, a window of eight places, the strides drawn over the whole turn, the moduli opened at 4/5), beside the same reader
+with one advance for every symbol. The instrument's planted law first (the sum of three places modulo twelve, nine times in ten;
+the source codes 0.526 nats and a blind reader 2.485): a stride a symbol reads 0.553 after four passes and one advance 2.103, so
+descent from drawn strides finds an ordered product where there is one.
+
+On the 99,814 frontier places, the mean mass on the arriving symbol (code), by the news the count of five expects:
+
+| | under 0.25 nats | 0.25 to 0.5 | 0.5 to 1 | 1 to 2 | over 2 | all | words in the lexicon |
+|---|---|---|---|---|---|---|---|
+| one advance, 32 circles | 0.293 (1.828) | 0.268 | 0.251 | 0.143 | 0.065 | 0.191 (2.548) | 34% |
+| rows of five single places (§17) | 0.306 (1.772) | 0.273 | 0.253 | 0.143 | 0.065 | 0.195 (2.546) | 36% |
+| a stride a symbol, 32 circles | 0.477 (1.312) | 0.393 | 0.348 | 0.182 | 0.069 | 0.273 (2.272) | 43% |
+| a stride a symbol, 128 circles | 0.652 (0.873) | 0.497 | 0.406 | 0.211 | 0.076 | 0.340 (2.132) | 55% |
+| the line (arm P15; arm L14 within 0.002) | 0.650 (0.856) | 0.579 | 0.492 | 0.307 | 0.137 | 0.405 (1.751) | 44% to 52% |
+| a count of five places | 0.909 (0.627) | 0.709 | 0.546 | 0.271 | 0.095 | 0.462 (2.038) | 85% |
+
+- One advance on 32 circles reads as the rows of five single places do, at every bin: a carried product with a fixed advance is a
+  sum of one-place terms, as the atlas row says, now read on open text.
+- A stride a symbol on the same 32 circles gives 0.477 at the settled places, and on 128 circles 0.652: by itself, with about
+  197,000 parameters (four rows of 128 a symbol and a face of 256 by 256) against the constitution's 442,425 entries, it stands
+  where the whole line stands there, and its writes hold 55% lexicon words. Its held code was still falling at the third pass
+  (books 1.776, 1.752, 1.736; code 1.870, 1.831, 1.809), so the reading is what three passes reach and no ceiling. On books it
+  codes every place at 1.736 where the line codes 1.759 to 1.769.
+- It holds nothing of the far: where a nat or more is expected the line gives the arriving symbol half again what the stride
+  reader gives (0.307 against 0.211, 0.137 against 0.076). The two hold different things, which is the case for a part.
+- The moduli the fits came to: one advance 0.54 to 0.67 by slice (a reach of 2.2 to 3.0 places), a stride a symbol 0.60 to 0.67 on
+  32 circles and 0.67 to 0.73 on 128 (3.0 to 3.7 places). §17's inference holds in direction and is small in size: a fixed
+  advance shortens its reach more than strides do, and neither comes near the line's own circles' 0.38 to 0.40. Why the line's
+  stand so short is not explained by this reading.
+
+The guess: (a) one advance at 0.22 to 0.31: held (0.293). (b) strides on 32 circles at 0.40 to 0.50: held (0.477). (c) strides on
+128 at 0.50 to 0.62: missed, above (0.652). (d) the moduli: the strides over 0.60 held, the fixed advance under 0.55 held on two
+slices of five. (e) 2.05 to 2.25 nats over all places and 45% to 58% lexicon words: held (2.132, 55%). The rule: 0.60 or over at
+the settled places, so the arm is ordered: carry circles whose turn is a stride of the site's symbol, founded with drawn strides
+and their reach at its founding, beside the line with the level.

@@ -795,3 +795,98 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   CARRY_TURN tick=3: one_turn 0.790 (0.544 to 0.960) | by_symbol 0.865 (0.780 to 0.968) | by_pair 0.931 (0.863 to 0.983) | symbols_share 0.317 (0.162 to 0.539) | stride_spread 63.998 (21.681 to 139.354) | modulus 0.395 (0.239 to 0.616)
   CARRY_TURN tick=4: one_turn 0.792 (0.596 to 0.955) | by_symbol 0.849 (0.744 to 0.964) | by_pair 0.911 (0.830 to 0.978) | symbols_share 0.245 (0.123 to 0.465) | stride_spread 56.329 (18.931 to 119.625) | modulus 0.399 (0.181 to 0.650)
   |γ| at tick 1: max 0.9948 min 0.0029, hundredths 1/10/50/90/99: 0.047 0.138 0.364 0.651 0.860, share over 0.8: 0.0280; at tick 4: max 0.9994, 0.029 0.107 0.375 0.730 0.925, share over 0.8: 0.0581.
+
+# 20:23 UTC. Arm L14 (the level as a strand hears it, second lap) at its lap mean against arm P14's:
+  FRONTIER L14_mean; one place open: all 0.9851 (100508 places) | books 1.0771 code 0.6754 science 0.9622 web 1.0712 wikidata 1.1395 || less the control's, paired: -0.0018 (±0.0004) | books -0.0013 code -0.0027 science -0.0028 web -0.0024 wikidata +0.0001
+  FRONTIER L14_mean; whole masks: all 2.3478 (3717 places) | books 2.1977 code 2.2336 science 2.2665 web 2.5113 wikidata 2.5532 || less the control's, paired: -0.0008 (±0.0019) | books +0.0037 code -0.0001 science -0.0060 web +0.0014 wikidata -0.0032
+  FRONTIER L14_mean; the frontier: all 2.0702 (99844 places) | books 2.0063 code 1.8090 science 2.0511 web 2.2189 wikidata 2.2652 || less the control's, paired: -0.0025 (±0.0005) | books -0.0040 code -0.0045 science -0.0048 web -0.0042 wikidata +0.0050
+  FRONTIER L14_mean; the frontier, each region a known stream (against the control's rows of the kind): all 1.7974 (99844 places) | books 1.8243 code 1.4739 science 1.7533 web 1.9429 wikidata 1.9922 || less the control's, paired: +0.0140 (±0.0005) | books +0.0176 code +0.0074 science +0.0105 web +0.0090 wikidata +0.0254
+  FRONTIER L14_mean; each region a known stream, less the law's reading of the same state, paired: -0.2728 (±0.0030) over 99844 places
+  FRONTIER L14_mean; each region a known stream, by places known (less the control's): 1: 2.994 (-0.001) | 2 to 3: 2.693 (-0.002) | 4 to 7: 2.433 (+0.004) | 8 to 15: 2.231 (+0.007) | 16 to 31: 2.121 (+0.013) | 32 to 63: 1.960 (+0.012) | 64 to 127: 1.781 (+0.013) | 128 to 255: 1.665 (+0.017) | 256 to 511: 1.600 (+0.015) | 512 to 1023: 1.609 (+0.017)
+  FRONTIER L14_mean; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.7444 (99844 places) | books 1.7726 code 1.4327 science 1.6956 web 1.9036 wikidata 1.9173 || less the control's, paired: -0.0215 (±0.0006) | books -0.0105 code -0.0161 science -0.0172 web -0.0188 wikidata -0.0450
+  FRONTIER L14_mean; each stretch read by two streams, less the law's reading of the same state, paired: -0.3258 (±0.0030) over 99844 places
+  FRONTIER L14_mean; each stretch read by two streams, by places known (less the control's): 1: 2.934 (+0.000) | 2 to 3: 2.664 (-0.007) | 4 to 7: 2.399 (-0.008) | 8 to 15: 2.199 (-0.005) | 16 to 31: 2.063 (-0.020) | 32 to 63: 1.912 (-0.020) | 64 to 127: 1.726 (-0.025) | 128 to 255: 1.608 (-0.025) | 256 to 511: 1.547 (-0.022) | 512 to 1023: 1.556 (-0.019)
+  FRONTIER L14_mean; two streams less the known stream's reading of the same state, paired: -0.0530 (±0.0010) over 99844 places
+  FRONTIER L14_mean; the frontier by places known (less the control's): 1: 3.086 (-0.006) | 2 to 3: 2.822 (-0.007) | 4 to 7: 2.582 (-0.007) | 8 to 15: 2.426 (-0.007) | 16 to 31: 2.311 (-0.005) | 32 to 63: 2.188 (+0.001) | 64 to 127: 2.043 (-0.002) | 128 to 255: 1.966 (-0.002) | 256 to 511: 1.927 (-0.002) | 512 to 1023: 1.951 (-0.008)
+  EXCESS slice=all kind=S places=99814 train_octets=8000000 k=5 count=2.0379 P14=1.7645 L14=1.7430 P15=1.7513 draw_agrees: count=0.462 P14=0.400 L14=0.406 P15=0.405
+  EXCESS slice=all expected_news='under 0.25' draw_agrees: count=0.909 P14=0.640 L14=0.649 P15=0.650
+  EXCESS slice=all expected_news='under 0.25' share=0.204 count=0.627 P14=0.880 L14=0.856 P15=0.855 excess_of_all_places: P14=+0.0516 L14=+0.0467 P15=+0.0466
+  EXCESS slice=all expected_news='0.25 to 0.5' draw_agrees: count=0.709 P14=0.571 L14=0.579 P15=0.578
+  EXCESS slice=all expected_news='0.25 to 0.5' share=0.090 count=1.315 P14=1.123 L14=1.098 P15=1.107 excess_of_all_places: P14=-0.0172 L14=-0.0195 P15=-0.0186
+  EXCESS slice=all expected_news='0.5 to 1' draw_agrees: count=0.546 P14=0.486 L14=0.492 P15=0.491
+  EXCESS slice=all expected_news='0.5 to 1' share=0.205 count=1.665 P14=1.391 L14=1.372 P15=1.381 excess_of_all_places: P14=-0.0563 L14=-0.0601 P15=-0.0584
+  EXCESS slice=all expected_news='1 to 2' draw_agrees: count=0.271 P14=0.304 L14=0.309 P15=0.307
+  EXCESS slice=all expected_news='1 to 2' share=0.301 count=2.490 P14=2.008 L14=1.988 P15=2.000 excess_of_all_places: P14=-0.1447 L14=-0.1507 P15=-0.1472
+  EXCESS slice=all expected_news='over 2' draw_agrees: count=0.095 P14=0.135 L14=0.140 P15=0.137
+  EXCESS slice=all expected_news='over 2' share=0.200 count=3.502 P14=2.969 L14=2.946 P15=2.958 excess_of_all_places: P14=-0.1068 L14=-0.1113 P15=-0.1089
+
+# 21:21 UTC. Lap means, rows S over 99,844 places: arm P16 1.7386 (0.0142 under arm P15's, ±0.0007); arm R15 (the word second, first lap) 1.8042 (0.0514 above arm P15's, ±0.0015), one place open under the law 1.0290 (0.0425 above), long panel 116 of 250 words (46%), 4 of 20 loop; arm L15 (the line with the level) 1.7260 (0.0268 under arm P15's, ±0.0008: books 0.0102 code 0.0200 science 0.0237 web 0.0232 wikidata 0.0566; 0.0184 under arm L14's), one place open 0.9844; arm L14's end panel 141 of 274 (51%), 2 of 20 loop.
+
+# 21:25 UTC. G-1118-21 read: content_stride_ruler.py planted, then STORE CODEC SLICE 8000000 3 8 S 32,128 P15 L14 -- LEXICON PANEL 96 16 (five host processes of one thread beside the card's laps, 20:26:57 to 21:23:49 UTC):
+  STRIDE planted (the sum of three places modulo twelve, nine in ten; the source's code 0.526, a blind reader's 2.485) a stride a symbol, 32 circles: held code after each pass 0.619 0.570 0.558 0.553
+  STRIDE planted, one advance, 32 circles: held code after each pass 2.109 2.105 2.104 2.103
+  STRIDE slice=books kind=S places=19931 train_octets=8000000 passes=3 window=8 shares: 'under 0.25'=0.150 '0.25 to 0.5'=0.090 '0.5 to 1'=0.190 '1 to 2'=0.335 'over 2'=0.235
+  STRIDE slice=books count_of_5_places: 'under 0.25' code=0.157 draw_agrees=0.960 | '0.25 to 0.5' code=0.382 draw_agrees=0.847 | '0.5 to 1' code=0.877 draw_agrees=0.611 | '1 to 2' code=1.668 draw_agrees=0.319 | 'over 2' code=2.807 draw_agrees=0.110 | 'all' code=1.442 draw_agrees=0.469
+  STRIDE slice=books read=P15: 'under 0.25' code=0.610 draw_agrees=0.715 | '0.25 to 0.5' code=0.876 draw_agrees=0.629 | '0.5 to 1' code=1.314 draw_agrees=0.470 | '1 to 2' code=1.964 draw_agrees=0.262 | 'over 2' code=2.943 draw_agrees=0.091 | 'all' code=1.769 draw_agrees=0.362
+  STRIDE slice=books read=L14: 'under 0.25' code=0.626 draw_agrees=0.707 | '0.25 to 0.5' code=0.886 draw_agrees=0.624 | '0.5 to 1' code=1.316 draw_agrees=0.465 | '1 to 2' code=1.960 draw_agrees=0.260 | 'over 2' code=2.948 draw_agrees=0.089 | 'all' code=1.773 draw_agrees=0.359
+  STRIDE slice=books strides_32_circles the fit's held code after each pass: 1.9331 1.9094 1.9032 | mean modulus 0.639 | the symbols' strides spread 353 thousandths of a turn
+  STRIDE slice=books strides_32_circles: 'under 0.25' code=0.897 draw_agrees=0.590 | '0.25 to 0.5' code=1.060 draw_agrees=0.527 | '0.5 to 1' code=1.478 draw_agrees=0.386 | '1 to 2' code=2.080 draw_agrees=0.221 | 'over 2' code=2.962 draw_agrees=0.086 | 'all' code=1.903 draw_agrees=0.304
+  STRIDE slice=books fixed_32_circles the fit's held code after each pass: 2.2098 2.2069 2.2020 | mean modulus 0.535 | the symbols' strides spread 0 thousandths of a turn
+  STRIDE slice=books fixed_32_circles: 'under 0.25' code=1.392 draw_agrees=0.401 | '0.25 to 0.5' code=1.490 draw_agrees=0.367 | '0.5 to 1' code=1.847 draw_agrees=0.269 | '1 to 2' code=2.330 draw_agrees=0.168 | 'over 2' code=3.098 draw_agrees=0.080 | 'all' code=2.202 draw_agrees=0.219
+  STRIDE slice=books strides_128_circles the fit's held code after each pass: 1.7758 1.7521 1.7360 | mean modulus 0.702 | the symbols' strides spread 371 thousandths of a turn
+  STRIDE slice=books strides_128_circles: 'under 0.25' code=0.514 draw_agrees=0.733 | '0.25 to 0.5' code=0.855 draw_agrees=0.620 | '0.5 to 1' code=1.264 draw_agrees=0.451 | '1 to 2' code=1.937 draw_agrees=0.250 | 'over 2' code=2.950 draw_agrees=0.092 | 'all' code=1.736 draw_agrees=0.357
+  STRIDE_WRITER slice=books prompts=4 draws=16 places=96 strides_32_circles: 611/1019(59%)
+  STRIDE_WRITER slice=books prompts=4 draws=16 places=96 fixed_32_circles: 468/1008(46%)
+  STRIDE_WRITER slice=books prompts=4 draws=16 places=96 strides_128_circles: 640/1009(63%)
+  STRIDE slice=code kind=S places=19951 train_octets=8000000 passes=3 window=8 shares: 'under 0.25'=0.267 '0.25 to 0.5'=0.085 '0.5 to 1'=0.231 '1 to 2'=0.240 'over 2'=0.177
+  STRIDE slice=code count_of_5_places: 'under 0.25' code=0.379 draw_agrees=0.941 | '0.25 to 0.5' code=1.094 draw_agrees=0.747 | '0.5 to 1' code=1.294 draw_agrees=0.593 | '1 to 2' code=2.489 draw_agrees=0.280 | 'over 2' code=3.473 draw_agrees=0.107 | 'all' code=1.705 draw_agrees=0.538
+  STRIDE slice=code read=P15: 'under 0.25' code=0.550 draw_agrees=0.754 | '0.25 to 0.5' code=0.982 draw_agrees=0.627 | '0.5 to 1' code=1.029 draw_agrees=0.618 | '1 to 2' code=1.905 draw_agrees=0.360 | 'over 2' code=2.857 draw_agrees=0.188 | 'all' code=1.431 draw_agrees=0.517
+  STRIDE slice=code read=L14: 'under 0.25' code=0.555 draw_agrees=0.754 | '0.25 to 0.5' code=0.978 draw_agrees=0.630 | '0.5 to 1' code=1.036 draw_agrees=0.616 | '1 to 2' code=1.907 draw_agrees=0.362 | 'over 2' code=2.844 draw_agrees=0.192 | 'all' code=1.431 draw_agrees=0.518
+  STRIDE slice=code strides_32_circles the fit's held code after each pass: 2.1527 2.1265 2.1043 | mean modulus 0.596 | the symbols' strides spread 334 thousandths of a turn
+  STRIDE slice=code strides_32_circles: 'under 0.25' code=1.111 draw_agrees=0.537 | '0.25 to 0.5' code=1.669 draw_agrees=0.411 | '0.5 to 1' code=1.645 draw_agrees=0.438 | '1 to 2' code=2.650 draw_agrees=0.185 | 'over 2' code=3.672 draw_agrees=0.065 | 'all' code=2.104 draw_agrees=0.335
+  STRIDE slice=code fixed_32_circles the fit's held code after each pass: 2.4333 2.4318 2.4243 | mean modulus 0.585 | the symbols' strides spread 0 thousandths of a turn
+  STRIDE slice=code fixed_32_circles: 'under 0.25' code=1.680 draw_agrees=0.336 | '0.25 to 0.5' code=1.952 draw_agrees=0.295 | '0.5 to 1' code=1.882 draw_agrees=0.363 | '1 to 2' code=2.876 draw_agrees=0.150 | 'over 2' code=3.870 draw_agrees=0.062 | 'all' code=2.424 draw_agrees=0.246
+  STRIDE slice=code strides_128_circles the fit's held code after each pass: 1.8703 1.8314 1.8087 | mean modulus 0.672 | the symbols' strides spread 359 thousandths of a turn
+  STRIDE slice=code strides_128_circles: 'under 0.25' code=0.633 draw_agrees=0.716 | '0.25 to 0.5' code=1.359 draw_agrees=0.518 | '0.5 to 1' code=1.404 draw_agrees=0.498 | '1 to 2' code=2.425 draw_agrees=0.227 | 'over 2' code=3.494 draw_agrees=0.087 | 'all' code=1.809 draw_agrees=0.420
+  STRIDE_WRITER slice=code prompts=4 draws=16 places=96 strides_32_circles: 189/596(31%)
+  STRIDE_WRITER slice=code prompts=4 draws=16 places=96 fixed_32_circles: 126/528(23%)
+  STRIDE_WRITER slice=code prompts=4 draws=16 places=96 strides_128_circles: 298/575(51%)
+  STRIDE slice=science kind=S places=19990 train_octets=8000000 passes=3 window=8 shares: 'under 0.25'=0.206 '0.25 to 0.5'=0.097 '0.5 to 1'=0.207 '1 to 2'=0.286 'over 2'=0.203
+  STRIDE slice=science count_of_5_places: 'under 0.25' code=0.155 draw_agrees=0.966 | '0.25 to 0.5' code=0.561 draw_agrees=0.815 | '0.5 to 1' code=1.016 draw_agrees=0.595 | '1 to 2' code=2.028 draw_agrees=0.308 | 'over 2' code=3.153 draw_agrees=0.093 | 'all' code=1.519 draw_agrees=0.509
+  STRIDE slice=science read=P15: 'under 0.25' code=0.682 draw_agrees=0.678 | '0.25 to 0.5' code=0.900 draw_agrees=0.633 | '0.5 to 1' code=1.308 draw_agrees=0.479 | '1 to 2' code=2.004 draw_agrees=0.271 | 'over 2' code=3.096 draw_agrees=0.089 | 'all' code=1.702 draw_agrees=0.396
+  STRIDE slice=science read=L14: 'under 0.25' code=0.679 draw_agrees=0.676 | '0.25 to 0.5' code=0.895 draw_agrees=0.632 | '0.5 to 1' code=1.300 draw_agrees=0.480 | '1 to 2' code=2.005 draw_agrees=0.270 | 'over 2' code=3.076 draw_agrees=0.090 | 'all' code=1.696 draw_agrees=0.396
+  STRIDE slice=science strides_32_circles the fit's held code after each pass: 2.0556 2.0290 2.0284 | mean modulus 0.635 | the symbols' strides spread 343 thousandths of a turn
+  STRIDE slice=science strides_32_circles: 'under 0.25' code=1.138 draw_agrees=0.471 | '0.25 to 0.5' code=1.231 draw_agrees=0.487 | '0.5 to 1' code=1.582 draw_agrees=0.370 | '1 to 2' code=2.341 draw_agrees=0.200 | 'over 2' code=3.327 draw_agrees=0.069 | 'all' code=2.028 draw_agrees=0.292
+  STRIDE slice=science fixed_32_circles the fit's held code after each pass: 2.3618 2.3523 2.3523 | mean modulus 0.574 | the symbols' strides spread 0 thousandths of a turn
+  STRIDE slice=science fixed_32_circles: 'under 0.25' code=1.798 draw_agrees=0.270 | '0.25 to 0.5' code=1.653 draw_agrees=0.313 | '0.5 to 1' code=2.012 draw_agrees=0.232 | '1 to 2' code=2.512 draw_agrees=0.157 | 'over 2' code=3.370 draw_agrees=0.065 | 'all' code=2.352 draw_agrees=0.192
+  STRIDE slice=science strides_128_circles the fit's held code after each pass: 1.7861 1.7558 1.7360 | mean modulus 0.704 | the symbols' strides spread 369 thousandths of a turn
+  STRIDE slice=science strides_128_circles: 'under 0.25' code=0.533 draw_agrees=0.717 | '0.25 to 0.5' code=0.847 draw_agrees=0.630 | '0.5 to 1' code=1.305 draw_agrees=0.458 | '1 to 2' code=2.110 draw_agrees=0.244 | 'over 2' code=3.293 draw_agrees=0.073 | 'all' code=1.736 draw_agrees=0.389
+  STRIDE_WRITER slice=science prompts=4 draws=16 places=96 strides_32_circles: 374/876(42%)
+  STRIDE_WRITER slice=science prompts=4 draws=16 places=96 fixed_32_circles: 305/850(35%)
+  STRIDE_WRITER slice=science prompts=4 draws=16 places=96 strides_128_circles: 480/835(57%)
+  STRIDE slice=web kind=S places=19879 train_octets=8000000 passes=3 window=8 shares: 'under 0.25'=0.156 '0.25 to 0.5'=0.073 '0.5 to 1'=0.187 '1 to 2'=0.326 'over 2'=0.258
+  STRIDE slice=web count_of_5_places: 'under 0.25' code=0.703 draw_agrees=0.905 | '0.25 to 0.5' code=1.274 draw_agrees=0.741 | '0.5 to 1' code=1.645 draw_agrees=0.552 | '1 to 2' code=2.676 draw_agrees=0.265 | 'over 2' code=3.690 draw_agrees=0.093 | 'all' code=2.334 draw_agrees=0.409
+  STRIDE slice=web read=P15: 'under 0.25' code=0.749 draw_agrees=0.699 | '0.25 to 0.5' code=1.171 draw_agrees=0.571 | '0.5 to 1' code=1.447 draw_agrees=0.486 | '1 to 2' code=2.055 draw_agrees=0.297 | 'over 2' code=2.955 draw_agrees=0.155 | 'all' code=1.905 draw_agrees=0.378
+  STRIDE slice=web read=L14: 'under 0.25' code=0.758 draw_agrees=0.696 | '0.25 to 0.5' code=1.173 draw_agrees=0.563 | '0.5 to 1' code=1.451 draw_agrees=0.479 | '1 to 2' code=2.040 draw_agrees=0.298 | 'over 2' code=2.950 draw_agrees=0.155 | 'all' code=1.901 draw_agrees=0.377
+  STRIDE slice=web strides_32_circles the fit's held code after each pass: 2.5734 2.5341 2.5173 | mean modulus 0.599 | the symbols' strides spread 342 thousandths of a turn
+  STRIDE slice=web strides_32_circles: 'under 0.25' code=1.358 draw_agrees=0.468 | '0.25 to 0.5' code=1.763 draw_agrees=0.396 | '0.5 to 1' code=1.917 draw_agrees=0.354 | '1 to 2' code=2.692 draw_agrees=0.184 | 'over 2' code=3.646 draw_agrees=0.070 | 'all' code=2.517 draw_agrees=0.246
+  STRIDE slice=web fixed_32_circles the fit's held code after each pass: 2.8418 2.8350 2.8362 | mean modulus 0.547 | the symbols' strides spread 0 thousandths of a turn
+  STRIDE slice=web fixed_32_circles: 'under 0.25' code=1.970 draw_agrees=0.257 | '0.25 to 0.5' code=2.247 draw_agrees=0.230 | '0.5 to 1' code=2.299 draw_agrees=0.227 | '1 to 2' code=2.971 draw_agrees=0.130 | 'over 2' code=3.746 draw_agrees=0.067 | 'all' code=2.836 draw_agrees=0.159
+  STRIDE slice=web strides_128_circles the fit's held code after each pass: 2.4101 2.3709 2.3509 | mean modulus 0.672 | the symbols' strides spread 366 thousandths of a turn
+  STRIDE slice=web strides_128_circles: 'under 0.25' code=0.896 draw_agrees=0.654 | '0.25 to 0.5' code=1.491 draw_agrees=0.513 | '0.5 to 1' code=1.758 draw_agrees=0.413 | '1 to 2' code=2.604 draw_agrees=0.206 | 'over 2' code=3.584 draw_agrees=0.076 | 'all' code=2.351 draw_agrees=0.303
+  STRIDE_WRITER slice=web prompts=4 draws=16 places=96 strides_32_circles: 386/885(43%)
+  STRIDE_WRITER slice=web prompts=4 draws=16 places=96 fixed_32_circles: 305/808(37%)
+  STRIDE_WRITER slice=web prompts=4 draws=16 places=96 strides_128_circles: 549/924(59%)
+  STRIDE slice=wikidata kind=S places=20063 train_octets=8000000 passes=3 window=8 shares: 'under 0.25'=0.240 '0.25 to 0.5'=0.104 '0.5 to 1'=0.211 '1 to 2'=0.316 'over 2'=0.130
+  STRIDE slice=wikidata count_of_5_places: 'under 0.25' code=1.549 draw_agrees=0.796 | '0.25 to 0.5' code=3.030 draw_agrees=0.438 | '0.5 to 1' code=3.428 draw_agrees=0.383 | '1 to 2' code=3.582 draw_agrees=0.186 | 'over 2' code=4.966 draw_agrees=0.056 | 'all' code=3.184 draw_agrees=0.383
+  STRIDE slice=wikidata read=P15: 'under 0.25' code=1.563 draw_agrees=0.441 | '0.25 to 0.5' code=1.557 draw_agrees=0.451 | '0.5 to 1' code=1.837 draw_agrees=0.391 | '1 to 2' code=2.049 draw_agrees=0.355 | 'over 2' code=2.914 draw_agrees=0.190 | 'all' code=1.949 draw_agrees=0.372
+  STRIDE slice=wikidata read=L14: 'under 0.25' code=1.548 draw_agrees=0.441 | '0.25 to 0.5' code=1.513 draw_agrees=0.462 | '0.5 to 1' code=1.792 draw_agrees=0.404 | '1 to 2' code=2.011 draw_agrees=0.365 | 'over 2' code=2.870 draw_agrees=0.207 | 'all' code=1.913 draw_agrees=0.381
+  STRIDE slice=wikidata strides_32_circles the fit's held code after each pass: 2.7705 2.8171 2.8059 | mean modulus 0.668 | the symbols' strides spread 317 thousandths of a turn
+  STRIDE slice=wikidata strides_32_circles: 'under 0.25' code=1.911 draw_agrees=0.351 | '0.25 to 0.5' code=2.887 draw_agrees=0.174 | '0.5 to 1' code=2.577 draw_agrees=0.187 | '1 to 2' code=3.082 draw_agrees=0.121 | 'over 2' code=4.098 draw_agrees=0.043 | 'all' code=2.806 draw_agrees=0.186
+  STRIDE slice=wikidata fixed_32_circles the fit's held code after each pass: 2.8737 2.9119 2.9264 | mean modulus 0.671 | the symbols' strides spread 0 thousandths of a turn
+  STRIDE slice=wikidata fixed_32_circles: 'under 0.25' code=2.197 draw_agrees=0.221 | '0.25 to 0.5' code=2.658 draw_agrees=0.147 | '0.5 to 1' code=2.660 draw_agrees=0.152 | '1 to 2' code=3.188 draw_agrees=0.114 | 'over 2' code=4.287 draw_agrees=0.037 | 'all' code=2.926 draw_agrees=0.141
+  STRIDE slice=wikidata strides_128_circles the fit's held code after each pass: 2.9585 3.0039 3.0224 | mean modulus 0.733 | the symbols' strides spread 358 thousandths of a turn
+  STRIDE slice=wikidata strides_128_circles: 'under 0.25' code=1.639 draw_agrees=0.476 | '0.25 to 0.5' code=2.736 draw_agrees=0.240 | '0.5 to 1' code=3.018 draw_agrees=0.211 | '1 to 2' code=3.524 draw_agrees=0.131 | 'over 2' code=4.596 draw_agrees=0.039 | 'all' code=3.022 draw_agrees=0.230
+  STRIDE_WRITER slice=wikidata prompts=4 draws=16 places=96 strides_32_circles: 211/701(30%)
+  STRIDE_WRITER slice=wikidata prompts=4 draws=16 places=96 fixed_32_circles: 156/721(21%)
+  STRIDE_WRITER slice=wikidata prompts=4 draws=16 places=96 strides_128_circles: 270/662(40%)
