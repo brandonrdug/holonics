@@ -68,3 +68,19 @@ G-1118-5 (2026-11-18T08:14:12Z). The frontier arm continued. Arm F (6 of 8) trai
   the store's five slices need tens of laps to meet what the fifty books met in ten passes. If the frontier rows keep falling at these
   rates, the count that binds is comparisons a site, and the realization that compares every place of a region at its frontier in one
   read is the next build; if they stall inside three laps, room is what binds and the read of that comes first.
+
+Scored (2026-11-18T08:23:51Z), G-1118-3 (reads.txt).
+  (a) The frontier rows at lap means: the control 2.0574 (1.75 to 2.15 guessed: held). Arm F 1.8971, paired 0.1603 under it (±0.0021;
+      0.15 to 0.40 guessed: held, at its low edge), every slice under the control's: held.
+  (b) One place open: arm F 0.1008 above the control (0.005 to 0.05 guessed: missed, twice the bound, as the lap of November 15
+      warned). Whole masks 0.0778 above (0.02 under to 0.04 over guessed: missed).
+  (c) By places known: missed in both arms, and it is the reading of the lap. The control's frontier reads 2.484 with 8 to 15 places
+      known and 2.019, 1.937 and 1.887 with 64 to 127, 128 to 255 and 256 to 511: each octave of known places buys 0.05 to 0.16 nats,
+      out to hundreds. Her frontier does not read a few bound symbols; I had taken a level's coincidence at 48 known places on the
+      fifty books (her 1.479 beside a four-symbol count's 1.478) for the form of her reading. Arm F's gain grows with the places
+      known: 0.111 under the control with 8 to 15, 0.148 with 64 to 127, 0.194 with 256 to 511.
+  (d) The panel one place a read, 48 known: the control's end 37% (33 to 45% guessed: held); arm F's end 46% (48 to 62% guessed:
+      missed, two points under), its mean 48%.
+  The ends: the frontier 2.0771 and 1.9306 (arm F 0.1465 under); one place open 0.7901 and 0.9027; whole masks 2.2239 and 2.3130.
+  By the guess's own rule the share as built does not enter the line on this read: (b)'s cost is past 0.05, and the share and the
+  weights are what is read next (G-1118-4, fixed before this score from the lap means alone).
