@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 16:00 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
