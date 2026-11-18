@@ -669,7 +669,8 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// (`group:known:n<TAB>known text<TAB>next symbol`) is a region whose places are known but its last, the next symbol's, which alone is
 /// open (the frontier's state, [`holonics_engine::passage::frontier_state_of`]). The rows are read three times on the host's realization:
 /// with the law (an open receiver hears every definite site past its near field), with a definite receiver's far field in its place
-/// (its probe's classes sharply and each octave's crowd), and with the near field alone
+/// (its probe's classes sharply and each octave's crowd), and with the near field alone; then with the law's hearing in one read and the
+/// level unheard (`4`), and the same with every known place hearing only what stands before it (`3`)
 /// ([`holonics_engine::field::Constitution::ruler_far`]). One line a setting and a group (the label up to its second colon): the rows and
 /// the written symbol's code in millionths of a nat a place. A ruler's forward: the state is read, never written, and nothing is returned.
 /// Why: a read that compares every place of a region at its own frontier needs a second, open place at every place; what that place must
@@ -708,7 +709,7 @@ pub fn read_far(args: &[String]) -> Result<()> {
         return Err("no row".into());
     }
     let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
-    for far in 0..3u8 {
+    for far in 0..5u8 {
         learner.field.ruler_far = far;
         let mut groups: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         // (a few hundred regions a call, so no call holds every region's forward at once)
@@ -729,6 +730,87 @@ pub fn read_far(args: &[String]) -> Result<()> {
         let (code, n) = groups.values().fold((0i128, 0usize), |(c, k), &(gc, gn)| (c + gc, k + gn));
         println!("FAR far={far} group=all rows={n} code={} ms={}", nats(code, n), started.elapsed().as_millis());
     }
+    Ok(())
+}
+
+/// [measurement; the lead, November 18, the boundary chart] `read-chart UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE
+/// STATE_SHA [KNOWN]`: **a passage read at its boundary, every place at once** ([`holonics_engine::field::Constitution::chart_faces`]).
+/// Each row of `ROWS` (`group:known:n<TAB>known text<TAB>next symbol`, [`read_far`]'s table) whose `known` is `KNOWN` (448 where none is
+/// given) is one passage, its known text and its next symbol; the chart's forward reads the density at every place from what stands
+/// before it. One line a group and an octave of places known (the written symbol's code in millionths of a nat a place, and the places),
+/// and one a group for the passage's last place alone, the place [`read_far`] reads as a frontier's region. On the host's threads; the
+/// state is read, never written. Why: before anything is compared under the chart, this is what a state compared two-sidedly and at
+/// the frontier reads through it, the level a first pass under it starts from.
+pub fn read_chart(args: &[String]) -> Result<()> {
+    if args.len() != 11 && args.len() != 12 {
+        return Err("read-chart UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA [KNOWN]".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-chart")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let known = args.get(11).map_or("448", String::as_str);
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, Vec<usize>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, text, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let parts: Vec<&str> = label.splitn(3, ':').collect();
+        if parts.get(1).copied() != Some(known) {
+            continue;
+        }
+        let mut classes = codec.encode(unescape(text).as_bytes())?;
+        classes.push(*codec.encode(unescape(next).as_bytes())?.first().ok_or("a row with no next symbol")?);
+        rows.push((parts[0].to_string(), classes));
+    }
+    if rows.is_empty() {
+        return Err("no row of that count of known places".into());
+    }
+    use rayon::prelude::*;
+    let field = &learner.field;
+    // Each passage's codes by place, on the host's threads (a reading; each passage its own forward).
+    let codes: Vec<std::result::Result<Vec<i64>, String>> = rows
+        .par_iter()
+        .map(|(_, classes)| {
+            let faces = field.chart_faces(classes).map_err(|e| e.to_string())?;
+            Ok(faces.iter().zip(classes).map(|(f, &c)| holonics_engine::field::ratio_code(f.masses[c], f.total)).collect())
+        })
+        .collect();
+    let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
+    let octave = |t: usize| if t == 0 { 0 } else { usize::BITS - t.leading_zeros() };
+    let mut by: std::collections::BTreeMap<(String, u32), (i128, usize)> = std::collections::BTreeMap::new();
+    let mut last: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
+    for ((group, _), row) in rows.iter().zip(codes) {
+        let row = row?;
+        for (t, &c) in row.iter().enumerate() {
+            for g in [group.as_str(), "all"] {
+                let slot = by.entry((g.to_string(), octave(t))).or_insert((0, 0));
+                (slot.0, slot.1) = (slot.0 + i128::from(c), slot.1 + 1);
+            }
+        }
+        for g in [group.as_str(), "all"] {
+            let slot = last.entry(g.to_string()).or_insert((0, 0));
+            (slot.0, slot.1) = (slot.0 + i128::from(*row.last().expect("a passage of a place or more")), slot.1 + 1);
+        }
+    }
+    for ((group, o), &(code, n)) in &by {
+        let span = match *o {
+            0 => "0".to_string(),
+            1 => "1".to_string(),
+            o => format!("{}-{}", 1usize << (o - 1), (1usize << o) - 1),
+        };
+        println!("CHART group={group} known={span} places={n} code={}", nats(code, n));
+    }
+    for (group, &(code, n)) in &last {
+        println!("CHART_LAST group={group} known={known} rows={n} code={}", nats(code, n));
+    }
+    println!("CHART_DONE passages={} ms={}", rows.len(), started.elapsed().as_millis());
     Ok(())
 }
 

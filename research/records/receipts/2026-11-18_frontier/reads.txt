@@ -54,3 +54,13 @@ arm F's lap mean, 12 known: 2.346 | 2.357 (+0.011) | 2.486 (+0.140)
 arm F's lap mean, 48 known: 2.152 | 2.184 (+0.032) | 2.594 (+0.442)
 arm F's lap mean, 192 known: 1.849 | 1.962 (+0.113) | 2.784 (+0.935)
 arm F's lap mean, 448 known: 1.704 | 1.933 (+0.229) | 2.909 (+1.205)
+
+Two one-sided forms on the same rows (G-1118-7; read-far's settings 4 and 3 and read-chart, 16 host threads), the control's lap mean,
+nats a place: the law | one read with the level unheard (less the law) | the same with every known place hearing only what stands
+before it (less that baseline).
+12 known: 2.493 | 2.744 (+0.251) | 3.326 (+0.582)
+48 known: 2.297 | 2.442 (+0.145) | 2.901 (+0.458)
+192 known: 2.048 | 2.167 (+0.119) | 2.670 (+0.503)
+448 known: 1.930 | 2.094 (+0.164) | 2.610 (+0.516)
+The boundary chart's own forward (every site veiled to itself and a source to the sites after it), 200 passages of 449 places, by
+places known: 0: 6.089 | 1: 5.584 | 2-3: 7.344 | 4-7: 5.730 | 8-15: 5.074 | 16-31: 4.631 | 32-63: 4.430 | 64-127: 4.405 | 128-255: 4.371 | 256-511: 4.393; at the passages' last place 4.362.

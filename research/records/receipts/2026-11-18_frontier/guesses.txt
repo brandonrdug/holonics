@@ -125,3 +125,12 @@ G-1118-7 (2026-11-18T08:52:09Z), fixed while its read runs on the host and befor
   its own symbols and hears only before it is a short way from the state as trained, and the build is that stream with an open place
   read at every place of it (two streams). If (3) reads as the chart does, one-sidedness itself leaves the trained regime and the
   simpler single stream of the chart is taken, compared from near the flat face.
+
+Scored (2026-11-18T08:58:30Z), G-1118-7 (reads.txt), on the control's lap mean (arm F's read is still on the host).
+  With 448 known: one read with the level unheard reads 0.164 above the law (0.10 to 0.35 guessed: held); with every known place
+  hearing only what stands before it, 0.516 above that baseline (0.4 to 1.2 guessed: held), 2.610 nats a place, and it still falls with
+  the places known (3.326, 2.901, 2.670, 2.610). The chart's own forward reads 6.09 to 5.07 up to 15 known and 4.63 to 4.37 past it
+  (above 5 at every octave guessed: missed past 15 known), 4.362 at the last place.
+  By the guess's rule the build takes the first form: a known stream that keeps its own symbols and hears only what stands before
+  it, half a nat from the state as trained, with an open place read at every place of it. The chart's single stream of veiled
+  sources stands two and a half nats off and is kept as a reading (its forward and its test stay in the tree).

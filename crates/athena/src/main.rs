@@ -98,6 +98,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-far") {
         return athena::ruler::tension::read_far(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-chart") {
+        return athena::ruler::tension::read_chart(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-frontier") {
         return athena::store::set_frontier(&rest[1..]);
     }

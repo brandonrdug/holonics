@@ -137,6 +137,12 @@ impl Constitution {
     /// the strands' moment encodings `E⁺`, `E⁻` (a site's class row or its carried mixture; nothing from a silent
     /// open site, §16.28) on its own ring and skin.
     pub(crate) fn moments_of(&self, region: &Region, paces: &Paces) -> Result<Vec<i64>> {
+        self.moments_sided(region, paces, true)
+    }
+
+    /// [`Constitution::moments_of`], or with `after` unset the moments of what stands before each site alone (the after rows read as
+    /// zero), a ruler's forward ([`Constitution::ruler_far`] at `3`).
+    pub(crate) fn moments_sided(&self, region: &Region, paces: &Paces, after: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         let mut out = vec![0i64; sites * 2 * m];
@@ -145,7 +151,7 @@ impl Constitution {
         }
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
-        let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
+        let (eb, ea) = (rows(l.moment_before), if after { rows(l.moment_after) } else { vec![vec![0i64; 2 * tm]; sites] });
         for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             for li in 0..n {
                 let idx = d.moment_index(h) + li;
@@ -169,6 +175,13 @@ impl Constitution {
     /// own stride bare (`κ_t = 1`, the rate of a silent place, §16.28), from the region's standing sums: the strands' rows as the region holds
     /// them, and on a paced head `t`'s cavity clock `τ_(t−1) + 1`, `σ_(t−1) + 1` (zero at the region's first place, whose clock is zero either way).
     pub(crate) fn cavity_moments_of(&self, region: &Region, paces: &Paces) -> Result<Vec<i64>> {
+        self.cavity_moments_sided(region, paces, true)
+    }
+
+    /// [`Constitution::cavity_moments_of`], or with `after` unset the **retarded** moment [the boundary chart, the record of the dwell
+    /// §13]: `s_t = Σ_(k<t) ζ^(k−t) D(t−k) E₋(u_k)` on the place's cavity clock, the strand's past at the place and nothing of what
+    /// stands at it or after it (the after rows read as zero, so every term they carry is absent).
+    pub(crate) fn cavity_moments_sided(&self, region: &Region, paces: &Paces, after: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         let mut out = vec![0i64; sites * 2 * m];
@@ -177,7 +190,7 @@ impl Constitution {
         }
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
-        let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
+        let (eb, ea) = (rows(l.moment_before), if after { rows(l.moment_after) } else { vec![vec![0i64; 2 * tm]; sites] });
         for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             let (tau_c, sigma_c) = Self::cavity_clocks(paces, h, sites);
             for li in 0..n {
@@ -222,10 +235,17 @@ impl Constitution {
 
     /// The cavity openings ([`Constitution::cavity_openings`]) and the cavity moments they read, on the region's clocks `paces`.
     pub(crate) fn cavity_forward(&self, region: &Region, paces: &Paces) -> Result<(Vec<i64>, Vec<i64>)> {
+        self.cavity_forward_sided(region, paces, true)
+    }
+
+    /// [`Constitution::cavity_forward`], or with `after` unset the **boundary's openings** [the boundary chart, the record of the dwell
+    /// §13]: `x⁰_t = E(∗) + E₋(u_(t−1)) + release(C s_t + b_s, 24)` on the retarded moment, no row of the place's own symbol and none of
+    /// the next.
+    pub(crate) fn cavity_forward_sided(&self, region: &Region, paces: &Paces, after: bool) -> Result<(Vec<i64>, Vec<i64>)> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
-        let moment = self.cavity_moments_of(region, paces)?;
+        let moment = self.cavity_moments_sided(region, paces, after)?;
         let l = &self.layout;
         let reach_c = reach(&self.theta[l.moment_face..l.moment_face + dw * m2]);
         let unresolved = l.enc + d.alphabet * dw;
@@ -238,7 +258,7 @@ impl Constitution {
             if t > 0 {
                 self.opening_term(region, l.before, t - 1, xt, None);
             }
-            if t + 1 < sites {
+            if after && t + 1 < sites {
                 self.opening_term(region, l.after, t + 1, xt, None);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
@@ -247,6 +267,58 @@ impl Constitution {
             }
         }
         Ok((x, moment))
+    }
+
+    /// [definition; the lead, November 17 (the record of the dwell §13, where its acceptance is fixed) and November 18 (the frontier
+    /// record §6)] **The boundary chart's forward: a passage read at its boundary.** A passage being read has a boundary, its next place.
+    /// The receiver at place `t` holds the passage's current up to `t − 1`, and its face is the density of the symbol that arrives at
+    /// `t`. Every place of a known passage is such a boundary at its own time, and one forward reads them all when the transport is
+    /// one-sided:
+    ///
+    /// ```text
+    /// clock      a receiver's: τ_(t−1) + 1, σ_(t−1) + 1 (its own stride bare); a source's: its own, its symbol's pace in it
+    /// moment     s_t = Σ_(k<t) ζ^(k−t) D(t−k) E₋(u_k)                       the retarded moment: the strand's past at the place
+    /// open       x⁰_t = E(∗) + E₋(u_(t−1)) + C s_t + b_s                    no row of the site's own symbol, none of the next
+    /// support    S_i = { j < i }: its near field, and past it every site sharply (the open receiver's row, one side of it)
+    /// strand     the pair's mate t − 1; the circles scanned in the passage's direction
+    /// face       at every site, the density of the symbol that arrives there
+    /// ```
+    ///
+    /// By induction over the ticks a site's state is a function of `u_(<t)` alone, so a site is a source for every later site and a
+    /// receiver of its own symbol at once, and no site is veiled: `faces[t]` does not change when any symbol at or past `t` changes
+    /// (`the_boundary_charts_face_reads_nothing_at_or_past_its_place`). Why: a region read at its frontier compares one place for its
+    /// whole read (the frontier record §5); this forward reads every place of a region at its own frontier.
+    ///
+    /// The parts not yet read one-sidedly are left out of this forward and named: the level, the second read's mark, a blank's clock
+    /// (no place here is a blank: each runs its bare stride), and it is refused on a field with triads, a junction or depth rings. A
+    /// reading on the host: no state changes, nothing is returned through it yet, and the card has no realization of it.
+    pub fn chart_faces(&self, classes: &[usize]) -> Result<Vec<TowerFace>> {
+        let d = &self.declaration;
+        if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 {
+            return refuse("a passage read at its boundary on a field with triads, a junction, depth rings or a closed face");
+        }
+        let sites = classes.len();
+        let known = vec![false; sites];
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        self.admit_region(&region)?;
+        let dw = d.width;
+        let reaches = self.reaches();
+        // The sources' clocks are the passage's own; a receiver's is the one it holds before its own symbol arrives.
+        let paces = self.paces(&region)?;
+        let mut receiving = paces.clone();
+        for h in 0..d.heads {
+            if let Some(p) = paces.row.get(h).copied().flatten() {
+                (receiving.tau[p], receiving.sigma[p]) = Self::cavity_clocks(&paces, h, sites);
+            }
+        }
+        let (mut x, moment) = self.cavity_forward_sided(&region, &paces, false)?;
+        // Every site is a source to the sites after it (definite, keyed); the lists make every site a listener.
+        let (definite, keyed) = (vec![true; sites], vec![true; sites]);
+        for _ in 0..d.ticks {
+            let mut cell = TickCell::default();
+            self.tick(&mut x, &definite, &keyed, &paces, &moment, &reaches, None, &mut cell, crate::contact::Sided::Chart(&receiving))?;
+        }
+        x.chunks_exact(dw).map(|xt| self.readout_face(xt, &reaches)).collect()
     }
 
     /// [definition; theory, November 13, P60 item 1d] **The places the opening compares**: every place of the region before its port (a port's places
@@ -511,6 +583,12 @@ impl Constitution {
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b, 24)` (§16.22; a region's first site has no
     /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Constitution::moments_of`]).
     pub(crate) fn open(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>) -> Result<Vec<i64>> {
+        self.open_sided(region, moment, marks, true)
+    }
+
+    /// [`Constitution::open`], or with `after` unset without the row of the site after (a ruler's forward,
+    /// [`Constitution::ruler_far`] at `3`).
+    pub(crate) fn open_sided(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>, after: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
@@ -523,7 +601,7 @@ impl Constitution {
             if t > 0 {
                 self.opening_term(region, l.before, t - 1, xt, marks);
             }
-            if t + 1 < sites {
+            if after && t + 1 < sites {
                 self.opening_term(region, l.after, t + 1, xt, marks);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;

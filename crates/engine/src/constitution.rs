@@ -55,7 +55,9 @@ pub struct Constitution {
     pub lock_carry: Option<i64>,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
-    /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone. A reading of
+    /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the
+    /// law's hearing in one read with the level unheard; `3`, as `4` with every site hearing only what stands before it (the moments' and
+    /// the opening's after rows absent, the support, the crowds and the strand's contacts one side), each site keeping its kind. A reading of
     /// which sources carry what a place at the frontier takes from many known places, before a read that compares every place at its
     /// frontier is built: not part of the state, and no reverse reads it (a forward under `1` or `2` is never returned).
     pub ruler_far: u8,
@@ -187,6 +189,15 @@ impl Constitution {
     pub(crate) fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
+            _ => self.decay(h, l, i.abs_diff(j)),
+        }
+    }
+
+    /// [the boundary chart] The skin across a pair whose receiver `i` stands on the clock it holds before its own symbol arrives (`rx`) and
+    /// whose source `j` stands on its own (`paces`): [`Constitution::pair_decay`] between the two clocks.
+    pub(crate) fn pair_decay_between(&self, rx: &Paces, i: usize, paces: &Paces, j: usize, h: usize, l: usize) -> (i128, u32) {
+        match paces.row.get(h).copied().flatten() {
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), rx.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
             _ => self.decay(h, l, i.abs_diff(j)),
         }
     }
