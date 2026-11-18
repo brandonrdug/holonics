@@ -392,7 +392,7 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
     receipt; a writer that keeps the known stream's states and reads one new place a symbol; the second read's mark is left out for
     good unless a reading asks for it.
   - why it was built: the frontier's fall under the control is 0.1603 + 0.0458 ln(sections / 3,000) over six laps with the share, a
-    fifth lane of 32 buys nothing there in its first lap, and a frontier comparison cost a region's whole read (the frontier record
+    fifth lane of 32 buys nothing there in its first lap (one lap, which is no null on the lane), and a frontier comparison cost a region's whole read (the frontier record
     §5 and §7).
 
 - **A founding law, and a lock that closes** (November 16, [the record](../research/records/2026-11-16_THE_LINK_THAT_SLIPS_IS_THE_LOCK_A_FAR_DIGIT_ARRIVES_AT_A_TENTH_OF_ITSELF_THE_SUMS_LAW_SITS_IN_A_PRODUCT_NO_READING_REACHES_UNTIL_THE_LOCK_CLOSES_AND_A_PART_ENTERS_BY_A_TENSION_READ_ALONG_ITS_CONSUMERS_EQUATION.md)). Every part
@@ -402,7 +402,8 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 
 - **The cut's second part** (C5): the kernels' headers (one header a phase). The October items stand in their objects' modules. The renames stand (`Constitution`, `Declaration`, `Loci`, `Learner`, `Realization`, `Host`, `Resident`,
   `Codec`, `Forward`, `ReadLogits`, `Next`, `Receipt`, `OwnedRegion`); the module paths `field` and `hnn::field` stay.
-- **The headers** (C7): every module and kernel header in §5's form (object, equations, kind and index, kernels, Lean,
+- **The headers** (C7): every module and kernel header in the form of
+  [THE_CONSOLIDATION §5](plans/THE_CONSOLIDATION.md#5-the-engines-cut-by-object) (object, equations, kind and index, kernels, Lean,
   atlas, records), its dated reasoning moved to the records. Most of the cut modules still open with a line naming
   the cut; this guide's §3 is their map until then.
 - **The engine line's builds** ([THE_CONSOLIDATION §11](plans/THE_CONSOLIDATION.md#11-what-the-campaign-leaves-to-the-engines-line)):

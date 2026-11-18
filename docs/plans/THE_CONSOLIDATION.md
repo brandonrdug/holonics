@@ -610,6 +610,24 @@ holds with the reads' lines.
     run in gate 1. It is the one new tool of the step, and its reason is that no lap script of November 18 called `read-loudness`.
   - CLAUDE.md's issue list and its `crates/athena` row describe the tree, and the status lines of #404 to #407 are current. #405 to
     #407 still carry boxes written on the October route; restating them is the lead's.
+- The guides against the tree, the link test and the index, read November 18 (the second pull request of that day):
+  - `docs/THE_ENGINE.md` §1 to §9 were read against the code: nine card-module cells of the pipeline corrected and all 118 kernels
+    placed, the declaration's words and the saved state's lines brought to what `declaration.rs` and `learner.rs` write, and 19
+    command words that `athena` routes added to §7's table. §6 stays lap 17's reading and says so.
+  - 241 places in the README, `crates/README.md`, THE_REBUILD and nine guides that named an October owner as current name the
+    engine's owner or a commit; THE_REBUILD's §3 describes the store line.
+  - `tools/link_check.py links` reads every relative link of the root guides, `docs/` and the records' README (75 files, 1,585
+    links, none broken), and `link_check.py atlas` reads every atlas owner that names the tree (12,322 owners; 203 were repaired,
+    136 of them October owners now pinned at their commit). Both run in gate 1 with their controls.
+  - `tools/records_index.py write` writes `research/records/INDEX.md` from the file names (1,685 records by month), and gate 1
+    fails while the index is behind them. A change that adds a record regenerates it.
+  - Bars that outlived the audit of November 18 outside CLAUDE.md read as dated readings: RETRACTIONS, THE_MACHINE's guard 18, the
+    canon's README, the records' README (with October's set-aside pieces routed by subject), the lessons of September 29, the
+    record of the stores of October 26, AGENTS.md's executor clause, HNN_FORMULA, HOLON and HNN_ATHENA_FOUNDATION.
+  - Still C7's: `docs/THE_MACHINE.md` (20 places) and `docs/plans/HNN_ATHENA_FOUNDATION.md` (14) name October owners in text kept
+    as the record of its date; the headers of `athena`'s `main.rs`, `engine-cuda`'s `lib.rs` and `hnn/field.rs`, and
+    `kernels/field_moment.cuh` name `holonics::hnn::tower::field` (a kernel header's comment changes its digest, so it goes with a
+    parity read); about a hundred atlas rows carry a grade outside the README's seven.
 
 **C10. The close.** C1's reading is run again and its receipt set beside the first; the sizes of §1
 are restated by part; `python3 tools/repo_census.py` reads clean on the PC; #603 is closed by hand

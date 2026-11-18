@@ -48,9 +48,12 @@ source/current/material/receiver construction.
 `crates/holonics-cuda/src/hnn/` and its constitutive field under
 `crates/holonics-cuda/src/native_ecology/constitutive_fibre/field/`; the
 [lessons record](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)
-keeps what it did and did not achieve. Step 4 ports its equations one law at a time, never its
-per-occurrence tape, frozen-cut replay, update journals, slot/session wires, byte or nibble
-codecs, or whole foreign Q/K/V graphs ([rules](plans/THE_REBUILD.md#4-rules-of-the-rebuild)).
+keeps what it did and did not achieve. Step 4 ports its equations one law at a time. A port that
+holds its per-occurrence tape, frozen-cut replay, update journals, slot/session wires, byte or
+nibble codecs, or a whole foreign Q/K/V graph states how that mechanism passes the law it failed
+(retention, stores and caches, the codec is not the architecture, equation extraction) and then
+proceeds: the list is those laws' test, never a list of pieces barred by name
+([rules](plans/THE_REBUILD.md#4-rules-of-the-rebuild); amended November 18).
 
 [definition] A Transformer is also executable generating mathematics. Its architecture supplies
 compositions of contractions, attention, reactions and normalizations; its parameters and

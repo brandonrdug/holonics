@@ -1065,8 +1065,12 @@ paths. Dataset roles and provenance are exterior codec information, not native s
 Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
 `PATH=/opt/cuda/bin:$PATH`. The gates, lowest first:
 
-1. any code change: `bash tools/gate.sh` (the workspace check, THE_MACHINE's guard lints and the
-   guards' `compile_fail` doctests; a guard that is not run does not hold);
+1. any code change: `bash tools/gate.sh` (the workspace check, the guard lints on the engine and on
+   athena, the engine's host tests and doctests, and the tools' controls; a guard that is not run
+   does not hold). Its last lines read the text against the tree: the guides' relative links
+   (`tools/link_check.py links`), the atlas's owners (`link_check.py atlas`) and the records' index.
+   A change that adds or renames a record runs `python3 tools/records_index.py write` and commits
+   `research/records/INDEX.md` with it, or gate 1 says the index is behind;
 2. once per step or PR: the tests of the laws that step wrote or changed. Inherited tests count
    only after rebuild step 1 has audited them.
 3. at the end of a step that changes HNN behaviour or a kernel: the GPU suite, alone on an idle

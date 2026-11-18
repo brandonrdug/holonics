@@ -2,7 +2,8 @@
 
 Use these routes to recover the construction behind a term before selecting an implementation.
 Each starts with a maintained guide, then a few source records and the owners they connect.
-They are reading paths, not phases or an inventory of every file. The
+They are reading paths, not phases or an inventory of every file; [INDEX.md](INDEX.md) lists every
+dated record by month, written from the file names by `python3 tools/records_index.py write`. The
 [machine](../../docs/THE_MACHINE.md), the [elementary objects](../../docs/ELEMENTARY_OBJECTS.md),
 [the rebuild](../../docs/plans/THE_REBUILD.md) and the [current state](../../CONSTRUCTION_STATE.md)
 give the overall object and active operation.

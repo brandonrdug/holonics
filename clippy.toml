@@ -1,6 +1,7 @@
-# The HNN's guards 7 and 12 (docs/THE_MACHINE.md, "Guards that make the rejected forms impossible"): no float and no file
-# system or process inside the machinery. `hnn` denies both lints; the rest of the crate is clean
-# of them and warns. An exterior boundary (a notebook reading a file) allows them where it reads.
+# Guards 7 and 12 (docs/THE_ENGINE.md §9; their constructions in docs/THE_MACHINE.md): no float and no file system or
+# process inside the machinery. Gate 1 denies both lints on `crates/engine` and on `crates/athena` (tools/gate.sh); athena is
+# the exterior and allows files and processes where it reads and writes them. The card crate's yardsticks still owe their
+# float lints (THE_CONSOLIDATION, C3).
 disallowed-types = [
     { path = "f32", reason = "exact arithmetic: no float inside a law (guard 12)" },
     { path = "f64", reason = "exact arithmetic: no float inside a law (guard 12)" },

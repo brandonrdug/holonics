@@ -482,7 +482,10 @@ returned body, with defects and insufficiency retained; an unsupported local rea
 actual construction, not a universal fallback executor. The prototype recovered a configured Gemma
 text realization, 1,275 operations over 719 coefficient populations
 ([history](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/holonic_intelligence)). Rebuild step 6 rebuilds extraction
-on the library; foreign forward graphs and Q/K/V caches are not ported whole.
+on the library. A foreign forward graph is read as equations and its coefficients seed the engine's
+opening; it is never served or run as the model, which is the bar and its whole reach
+([CLAUDE.md](../CLAUDE.md), equation extraction; amended November 18, where this sentence had said
+that foreign forward graphs and Q/K/V caches "are not ported whole").
 
 ## What exists now
 

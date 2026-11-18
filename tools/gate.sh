@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Gate 1 for any code change (CLAUDE.md, AGENTS.md): the workspace check, THE_MACHINE's guard lints
+# Gate 1 for any code change (CLAUDE.md): the workspace check, the guard lints of THE_ENGINE §9
 # (no floats, no disallowed types or methods: guards 7 and 12) on the engine and on athena, and the engine's
 # doctests. A guard that is not run does not hold: the lint receipt had failed unnoticed since October 1
 # because gate 1 was `cargo check` alone. The October library's constructions (guards 2, 3, 10, 16, 18, 20
@@ -44,5 +44,10 @@ run mailbox-controls python3 tools/test_agent_mailbox.py
 run copy-length-controls python3 tools/test_copy_length.py
 run human-messages-controls python3 tools/test_human_messages.py
 run link-check-controls python3 tools/test_link_check.py
+# The text against the tree (C9 of #603): every relative link of the root guides, docs/ and the records' README resolves, and
+# every atlas owner that names the tree stands in it. A link test that nothing runs does not hold.
+run guide-links python3 tools/link_check.py links
+run atlas-owners python3 tools/link_check.py atlas
+# The records' index is what the file names give today; where it is behind: python3 tools/records_index.py write
 run records-index-controls python3 tools/test_records_index.py
 exit $status
