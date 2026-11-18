@@ -60,7 +60,11 @@ the first-step equations have no solution.
 per-word entropy `Σ_(y∈A) π_A(y) H(W_y)` (the entropy rate of the Markov chain of words, whose
 conditional word law depends only on the returning state), and Abramov's formula
 `h(T_A) = h(T)/μ(A)` for a general ergodic measure-preserving map. What is proved is the finite
-Markov form: the exact ledger at every truncation and its limit.
+Markov form: the exact ledger at every truncation and its limit. Kac's lemma itself for a
+measure-preserving map of a finite measure space, with the same ledger at every truncation, its
+deadline on the return and the chain of a map as this module's instance, is
+`HolonicsResearch/Aeon/Production/Recurrence` (`ledger`, `rate`, `kac`, `kac_ergodic`,
+`survival_detKernel`).
 
 Scope: finite state spaces. No `axiom`, no `sorry`.
 -/

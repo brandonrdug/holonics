@@ -34,7 +34,10 @@ is where the navigator's words converge.
    fixed-point chart `w = (z − z₁)/(z − z₂)` the navigator is the scaling `w ↦ (μ₂/μ₁) w`
    (`chart_conjugates`), so **every path converges to the attracting fixed point**: for
    `|μ₂| < |μ₁|` and any start `z ≠ z₂` whose orbit avoids the pole, `mⁿ z → z₁`
-   (`iterate_tendsto_fixed`), over any Archimedean ordered field.
+   (`iterate_tendsto_fixed`), over any Archimedean ordered field. The affine case `c = 0`, whose
+   second fixed point is at infinity with multipliers `a/d` and `d/a`, is
+   `HolonicsResearch/Compression/Landmark/AffineLandmark`; with both fixed points taken finite at
+   `c = 0` the navigator is the identity and the equivalence fails (`finite_form_fails` there).
 4. **Velocity addition.** `u ↦ (u + v)/(1 + uv)` is the Möbius navigator `[[1, v],[v, 1]]`
    (`velocity_act`), a boost site for `0 < |v| < 1` whose projective trace face is the Lorentz
    factor, `tr²/(4 det) = 1/(1 − v²)` (`velocity_is_boost`). It fixes `±1`

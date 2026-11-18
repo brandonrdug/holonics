@@ -1,0 +1,59 @@
+== A. IHARA-BASS, plain and with a connection ==
+  plain: 12 random multigraphs with loops and repeated contacts, identity holds as polynomials in u
+  planted: the operator with backtracking allowed fails the identity, as it must
+  with a connection (rational weights, g(reversed) = 1/g): identity holds on 8 multigraphs; a change of gauge conjugates the dart operator
+  with a connection (unitary weights, g(reversed) = 1/g): identity holds on 8 multigraphs; a change of gauge conjugates the dart operator
+  a single closed chain of n contacts with holonomy h: det(1 - u B_g) = (1 - h u^n)(1 - u^n/h), n = 1, 2, 3, 5
+== B. THE REGULAR COMPLEX: lift, area, norm form, index ==
+  petersen  q=2 cells=10 contacts=15 every nontrivial mode on the circle; negative squares of the norm form 0 = modes with lambda^2 > 4q 0; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 0.9316
+  K4        q=2 cells=4 contacts=6 every nontrivial mode on the circle; negative squares of the norm form 0 = modes with lambda^2 > 4q 0; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 0.9999
+  K5        q=3 cells=5 contacts=10 every nontrivial mode on the circle; negative squares of the norm form 0 = modes with lambda^2 > 4q 0; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 0.9943
+  cube      q=2 cells=8 contacts=12 every nontrivial mode on the circle; negative squares of the norm form 0 = modes with lambda^2 > 4q 0; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 0.9756
+  ladder7   q=2 cells=14 contacts=21 every nontrivial mode on the circle; negative squares of the norm form 0 = modes with lambda^2 > 4q 0; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 0.4913
+  ladder21  q=2 cells=42 contacts=63 modes off the circle; negative squares of the norm form 4 = modes with lambda^2 > 4q 4; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 65.2523
+  loopy     q=3 cells=2 contacts=4 every nontrivial mode on the circle; negative squares of the norm form 0 = modes with lambda^2 > 4q 0; max |count - smooth| / (2(n-1) q^(l/2)), l <= 24: 1.0000
+  the five identities hold on every specimen in rational arithmetic; the index theorem holds on all seven
+== C. THE COUNT'S REMAINDER AS A POSITIVE-DEFINITE SEQUENCE (Toeplitz) ==
+  petersen  lowest eigenvalue over sizes 1..30, over c_0: -2.70e-15; positive semidefinite at every size
+  K4        lowest eigenvalue over sizes 1..30, over c_0: -4.24e-15; positive semidefinite at every size
+  K5        lowest eigenvalue over sizes 1..30, over c_0: -5.91e-15; positive semidefinite at every size
+  cube      lowest eigenvalue over sizes 1..30, over c_0: -2.33e-15; positive semidefinite at every size
+  ladder7   lowest eigenvalue over sizes 1..30, over c_0: -7.25e-16; positive semidefinite at every size
+  ladder21  lowest eigenvalue over sizes 1..30, over c_0: -6.00e+02; first negative at size 10
+  loopy     lowest eigenvalue over sizes 1..30, over c_0: -5.02e-15; positive semidefinite at every size
+== D. THE REVERSAL'S OWN FORM (Krein) on symplectic similitudes ==
+  20 random similitudes of a 4-dimensional area form: the form is symmetric and scaled by q; wherever it is definite every mode has |alpha|^2 = q
+  turns of opposite sense at different rates: modes on the circle, the first form indefinite, a member of the pencil definite;
+  at the same rate (a collision of opposite signatures) no member of the pencil a1 B + a2 B^2 + a3 B^3 is definite (9261 tried)
+  the cell [[0,-1],[q,l]]: area and norm form scaled by q for every l; det of the norm form = q - l^2/4 (turn, shear, boost)
+== E. HODGE ON A PRODUCT OF TWO TORI (lattice chart) ==
+  no complex multiplication (tau of degree 6): rank 3, the intersection form has signature (1, 2)
+  tau = i: rank 4, the intersection form has signature (1, 3)
+  tau = (1+sqrt(-7))/2: rank 4, the intersection form has signature (1, 3)
+  det of a holomorphic lattice map = the norm of its multiplier (50 draws at two CM points)
+== F. HODGE CLASSES ON THE n-TH POWER: divisors generate, rank over a prime field ==
+  n=1 without complex multiplication: ranks by degree [1, 1] = the count of invariants; total 2 = Catalan(2)
+  n=2 without complex multiplication: ranks by degree [1, 3, 1] = the count of invariants; total 5 = Catalan(3)
+  n=3 without complex multiplication: ranks by degree [1, 6, 6, 1] = the count of invariants; total 14 = Catalan(4)
+  n=4 without complex multiplication: ranks by degree [1, 10, 20, 10, 1] = the count of invariants; total 42 = Catalan(5)
+  n=5 without complex multiplication: ranks by degree [1, 15, 50, 50, 15, 1] = the count of invariants; total 132 = Catalan(6)
+  n=6 without complex multiplication: ranks by degree [1, 21, 105, 175, 105, 21, 1] = the count of invariants; total 429 = Catalan(7)
+  n=1 at tau = i: ranks by degree [1, 1] = C(n,k)^2; total 2 = C(2,1)
+  n=2 at tau = i: ranks by degree [1, 4, 1] = C(n,k)^2; total 6 = C(4,2)
+  n=3 at tau = i: ranks by degree [1, 9, 9, 1] = C(n,k)^2; total 20 = C(6,3)
+  n=4 at tau = i: ranks by degree [1, 16, 36, 16, 1] = C(n,k)^2; total 70 = C(8,4)
+  n=5 at tau = i: ranks by degree [1, 25, 100, 100, 25, 1] = C(n,k)^2; total 252 = C(10,5)
+  planted: the fibre classes alone span [1, 3, 3, 1] at n=3 against [1, 6, 6, 1]; the shortfall is seen
+== G. THE LAMINAR CLASS: a critical reading that never rises below Reynolds one ==
+  a specimen (Burgers' equation on a circle, 32 modes a side, nu = 0.05, c = 1/2): c X(0)/nu = 0.900, X(t)/X(0) at t = 12: 0.2391, never rising; (nu - cX(0)) * integral of Y = 0.00706 <= X(0) - X(t) = 0.06848
+  5 random starts at c X(0) = 0.9 nu: X(t) nonincreasing at every step and the dissipation integral inside its bound
+  planted: one mode at c X(0) = 20 nu: X rises to 1.185 X(0) before the comb's damping takes it; the ruler sees a rise
+  the logistic comb at X(0) = 0.8 nu: X decays to 0.0262; the closed form reads 0.0262
+  the logistic comb at X(0) = 1.25 nu: X = 10.3 X(0) at 0.95 of the blow-up time t* = log(X0/(X0 - nu))/(nu w^2) = 1.6094; the closed form reads 10.4
+== H. COUPLED LOCKS (Lee-Yang): zeros in the common fugacity ==
+  30 random symmetric couplings in [-1, 1], 2 to 8 locks: every zero within 1.8e-15 of the unit circle; planted couplings of 2.5 put zeros off it
+== I. A DRIVEN CHAIN (Jarzynski): the mean of exp(-beta W) ==
+  3 states, 4 ticks, 243 paths: mean of exp(-beta W) = 0.440595833497 = Z_n/Z_0 = 0.440595833497; mean work 1.7940 >= free energy change 0.6305; planted kernels without the stationary weight read 1.6698
+== J. THE HALF ON THE LINE AND ON THE CIRCLE (Hermite-Biehler, Schur-Cohn) ==
+  40 draws each, degree 1 to 7: the factor inequality holds at 4000 random places; zeros of P + eps P* within 5.5e-16 of the real line (relative), of P + eps P# within 4.9e-15 of the unit circle; a planted root on the other side puts zeros off the line
+ALL SECTIONS PASSED

@@ -40,11 +40,14 @@ cycles, `exp(Σ_n N_n Tⁿ/n) · ∏_d (1 − T^d)^(p_d) = 1`, i.e. `ζ(T) = ∏
 has `N_1 = −1`, so the Möbius inversion would give `1 · p_1 = −1`: no map of occurrences has these
 counts (`signed_map_has_no_primitive_cycles`).
 
-[open] Owed in #62: for a general nonnegative integer matrix (a multigraph's return map) the
-Möbius-inverted `p_d` are the numbers of primitive closed walks up to rotation (necklace counts,
-e.g. `[[2]]`: `2, 1, 2, 3, 6, …`), and the Euler product is infinite; the necklace integrality and
-the infinite product are not formalized here. The prime-number case (`ζ(s) = ∏_p (1 − p^(−s))⁻¹`
-as the zeta of the scaling flow) is an analogy of the same form, not a theorem of this module.
+[proved-derived; formal-checked] For a general matrix of natural numbers (a multigraph's return
+map) the Möbius-inverted `p_d` are the numbers of primitive closed walks up to rotation (necklace
+counts, e.g. `[[2]]`: `2, 1, 2, 3, 6, …`), and the Euler product is infinite. Both are proved in
+`HolonicsResearch/Compression/Landmark/NecklaceIntegrality`, by applying this module's counts to
+the rotation of closed walks (`trace_pow_eq_sum_necklace`, `necklace_integrality`; the product
+coefficient by coefficient, `euler_product_coeff`). The prime-number case
+(`ζ(s) = ∏_p (1 − p^(−s))⁻¹` as the zeta of the scaling flow) is an analogy of the same form, not a
+theorem of this module.
 
 No `axiom`, no `sorry`.
 -/

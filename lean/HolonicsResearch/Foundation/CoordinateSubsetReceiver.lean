@@ -90,7 +90,7 @@ theorem threeDimensionalMassExponent_pair
 @[simp]
 theorem threeDimensionalMassExponent_univ :
     threeDimensionalMassExponent (Finset.univ : CoordinateFace 3) = -3 := by
-  native_decide
+  decide
 
 /-- The near-window volume exponent and the far Abel-denominator exponent cancel the subset-mass
 exponent exactly. -/
