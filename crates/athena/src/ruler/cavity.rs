@@ -283,11 +283,12 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
         // [measurement; the lead, November 18, the audit of that day §1.4] The frontier: each place of a stretch read with every place before
         // it known, itself alone open and the region ending there (the trainer's frontier state on held text,
         // [`holonics_engine::passage::frontier_state_of`], and the state a writer in place order meets), a true end's first void among them.
-        // One row a place to `OUT/frontier.tsv` (`F`, the slice, the stretch, the place, which is also its count of known places, its class
+        // One row a place from the stretch's second to `OUT/frontier.tsv` (`F`, the slice, the stretch, the place, which is also its count of known places, its class
         // and its face's code after the declared ticks on `2^(−20)` bits), and a line a slice of its own, so the read's other lines and rows
         // are as before.
         let frontier_start = std::time::Instant::now();
-        let fjobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, (_, bytes, ends))| (0..bytes.len() + usize::from(*ends)).map(move |t| (k, t))).collect();
+        // (from a stretch's second place: a region is two sites or more, so a place with nothing known before it is no frontier row)
+        let fjobs: Vec<(usize, usize)> = stretches.iter().enumerate().flat_map(|(k, (_, bytes, ends))| (1..bytes.len() + usize::from(*ends)).map(move |t| (k, t))).collect();
         let (mut f_at, mut f_batches) = (0usize, 0usize);
         while f_at < fjobs.len() {
             let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, f_at);
