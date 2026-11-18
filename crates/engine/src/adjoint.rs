@@ -112,6 +112,11 @@ impl Constitution {
         let m2 = 2 * m;
         let span = 2 * n;
         let sites = definite.len();
+        // [the strand's two streams] Where the cell holds a strand's open places beside its known stream ([`ClassLists::twins_from`]), a
+        // site's place is the known site's of its index, and a pair's distance is its places'.
+        let heard = cell.classes.first().map_or(sites, |lists| lists.twins_from);
+        let place = |t: usize| if t >= heard { t - heard } else { t };
+        let pd = |h: usize, l: usize, i: usize, j: usize| self.pair_decay_placed(paces, h, l, i, j, place(i).abs_diff(place(j)));
         let l = &self.layout;
         let reaches = self.reaches();
         let ln2 = ln2_face();
@@ -154,14 +159,17 @@ impl Constitution {
         for t in 0..sites {
             for e in 0..plain {
                 // [the strand's known stream] Where every site hears only what stands before it, an odd contact met no mate.
-                let Some(s) = strand_mate(t, e, sites).filter(|_| !one_sided || e % 2 == 0) else { continue };
+                // [the strand's two streams] An open place's mate is the known site before its place, which is then two sites' mate: its
+                // `δb` is the sum of both terms (each released as it stands alone).
+                let mate = if t >= heard { place(t).checked_sub(1).filter(|_| e % 2 == 0) } else { strand_mate(t, e, heard).filter(|_| !one_sided || e % 2 == 0) };
+                let Some(s) = mate else { continue };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 let (br, bi) = (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128);
                 da[t * f + e] = fit64(release(br * gr + bi * gi, FACE_BITS))?;
                 da[t * f + half + e] = fit64(release(br * gi - bi * gr, FACE_BITS))?;
-                db[s * f + e] = fit64(release(ar * gr + ai * gi, FACE_BITS))?;
-                db[s * f + half + e] = fit64(release(ar * gi - ai * gr, FACE_BITS))?;
+                db[s * f + e] = fit64(db[s * f + e] as i128 + release(ar * gr + ai * gi, FACE_BITS))?;
+                db[s * f + half + e] = fit64(db[s * f + half + e] as i128 + release(ar * gi - ai * gr, FACE_BITS))?;
             }
         }
         // [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' reverse**, with the producing operands (`a`, `b`,
@@ -174,8 +182,8 @@ impl Constitution {
         for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
             let e = plain + k;
             let (mut xr, mut xi) = (0i128, 0i128);
-            for step in 0..sites {
-                let t = if e % 2 == 0 { sites - 1 - step } else { step };
+            for step in 0..heard {
+                let t = if e % 2 == 0 { heard - 1 - step } else { step };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 let (qr, qi) = (cell.qm[t * c2 + k] as i128, cell.qm[t * c2 + circles + k] as i128);
@@ -185,8 +193,19 @@ impl Constitution {
                 da[t * f + e] = fit64(release(qr * gr + qi * gi, FACE_BITS))?;
                 da[t * f + half + e] = fit64(release(qr * gi - qi * gr, FACE_BITS))?;
                 let dgamma = (fit64(release(qr * ur + qi * ui, FACE_BITS))?, fit64(release(qr * ui - qi * ur, FACE_BITS))?);
-                xr = i128::from(fit64(release(ar * gr + ai * gi, FACE_BITS) + release(yr * ur + yi * ui, GAMMA_BITS))?);
-                xi = i128::from(fit64(release(ar * gi - ai * gr, FACE_BITS) + release(yr * ui - yi * ur, GAMMA_BITS))?);
+                // [the strand's two streams] The open place at this place read the same `Qm(t)`: its own `δa`, and its term of the
+                // covector of `Qm(t)` beside the known site's, each released as it stands alone.
+                let (mut tr, mut ti) = (0i128, 0i128);
+                if heard + t < sites {
+                    let o = heard + t;
+                    let (ogr, ogi) = (dc[o * f + e] as i128, dc[o * f + half + e] as i128);
+                    let (oar, oai) = (cell.a[o * f + e] as i128, cell.a[o * f + half + e] as i128);
+                    da[o * f + e] = fit64(release(qr * ogr + qi * ogi, FACE_BITS))?;
+                    da[o * f + half + e] = fit64(release(qr * ogi - qi * ogr, FACE_BITS))?;
+                    (tr, ti) = (release(oar * ogr + oai * ogi, FACE_BITS), release(oar * ogi - oai * ogr, FACE_BITS));
+                }
+                xr = i128::from(fit64(release(ar * gr + ai * gi, FACE_BITS) + tr + release(yr * ur + yi * ui, GAMMA_BITS))?);
+                xi = i128::from(fit64(release(ar * gi - ai * gr, FACE_BITS) + ti + release(yr * ui - yi * ur, GAMMA_BITS))?);
                 let drive = (cell.b[t * f + e], cell.b[t * f + half + e]);
                 let ((dq, dl), (dbr, dbi)) = carry_gate_return(&self.exponential, (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]), dgamma, drive, du, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
                 db[t * f + e] = dbr;
@@ -292,7 +311,7 @@ impl Constitution {
             for t in 0..sites {
                 for li in 0..n {
                     let c = h * n + li;
-                    let (ur, ui) = self.frame(paces, t, h, li);
+                    let (ur, ui) = self.frame_placed(paces, t, place(t), h, li);
                     let (ur, ui) = (ur as i128, ui as i128);
                     let (gr, gi) = (dy[t * m2 + c] as i128, dy[t * m2 + m + c] as i128);
                     dyh[t * span + li] = fit64(release(ur * gr - ui * gi, MOVE_BITS))?;
@@ -324,7 +343,7 @@ impl Constitution {
                 for src in &rows[i] {
                     let j = src.j as usize;
                     for r in 0..span {
-                        sv[j * span + r] += src.p as i128 * decayed(self.pair_decay(paces, h, r % n, i, j), dyh[i * span + r]);
+                        sv[j * span + r] += src.p as i128 * decayed(pd(h, r % n, i, j), dyh[i * span + r]);
                     }
                 }
                 for c in &crowds[i] {
@@ -371,7 +390,7 @@ impl Constitution {
                     .iter()
                     .map(|src| {
                         let j = src.j as usize;
-                        (0..n).map(|l| { let decay = self.pair_decay(paces, h, l, i, j); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
+                        (0..n).map(|l| { let decay = pd(h, l, i, j); dyi[l] as i128 * decayed(decay, vh[j * span + l]) + dyi[n + l] as i128 * decayed(decay, vh[j * span + n + l]) }).sum()
                     })
                     .collect();
                 // [definition; the lead, November 17] The closed face's covector on this row's shares, where the face read the row ([`crate::closed`]).
@@ -424,7 +443,7 @@ impl Constitution {
                 g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
                 if let Some(sh) = shares.as_deref_mut() {
                     for (src, &v) in row.iter().zip(&out) {
-                        sh[2 * h + usize::from(i.abs_diff(src.j as usize) >= NEAR)] += v.unsigned_abs();
+                        sh[2 * h + usize::from(place(i).abs_diff(src.j as usize) >= NEAR)] += v.unsigned_abs();
                     }
                     sh[2 * h + 1] += outc.iter().map(|v| v.unsigned_abs()).sum::<u128>();
                 }
@@ -453,7 +472,7 @@ impl Constitution {
                             continue;
                         }
                         for l in 0..n {
-                            let (dec, g_) = self.pair_decay(paces, h, l, i, j);
+                            let (dec, g_) = pd(h, l, i, j);
                             let inner = dyh[i * span + l] as i128 * vh[j * span + l] as i128 + dyh[i * span + n + l] as i128 * vh[j * span + n + l] as i128;
                             let value = release(src.p as i128 * inner, SHARE_BITS);
                             let (wr, wi, kr, ki) = (probe_of(i, l) as i128, probe_of(i, n + l) as i128, qh[j * span + l] as i128, qh[j * span + n + l] as i128);
@@ -498,7 +517,7 @@ impl Constitution {
                 for (k, src) in rows[i].iter().enumerate() {
                     let j = src.j as usize;
                     for r in 0..span {
-                        let (dec, g) = self.pair_decay(paces, h, r % n, i, j);
+                        let (dec, g) = pd(h, r % n, i, j);
                         // The key's bracket `D ŵ_i − D² ŵ_j` released by the skin's bits once (a
                         // declared crossing, as the probe's `D ŵ` is), so it stands on the probe's grain.
                         let bracket = release(((dec * probe_of(i, r) as i128) << g) - dec * dec * qh[j * span + r] as i128, g);
@@ -519,7 +538,7 @@ impl Constitution {
             let spread_w = prefixed(&crowd_w);
             for i in 0..sites {
                 for r in 0..span {
-                    let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k] * self.pair_decay(paces, h, r % n, i, src.j as usize).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
+                    let sq: i128 = rows[i].iter().enumerate().map(|(k, src)| ds[i][k] * pd(h, r % n, i, src.j as usize).0 * qh[src.j as usize * span + r] as i128).sum::<i128>()
                         + crowds[i].iter().enumerate().map(|(k, c)| div_nearest(dsc[i][k] * self.octave_decay(paces, h, r % n, i, c.level, c.lo > i).0 * (sums.words[(c.hi + 1) * span + r] - sums.words[c.lo * span + r]), c.count as i128)).sum::<i128>();
                     // Held in the framed chart until the frame is undone below.
                     let c = h * n + r % n;
@@ -565,7 +584,7 @@ impl Constitution {
         // Undo the frame: δw = conj(U) δw̃, and so for the values.
         for t in 0..sites {
             for c in 0..m {
-                let (ur, ui) = self.frame(paces, t, c / n, c % n);
+                let (ur, ui) = self.frame_placed(paces, t, place(t), c / n, c % n);
                 let (ur, ui) = (ur as i128, ui as i128);
                 for chart in [&mut dq, &mut dv, &mut dp] {
                     let (gr, gi) = (chart[t * m2 + c] as i128, chart[t * m2 + m + c] as i128);
@@ -614,6 +633,193 @@ impl Constitution {
             let back = lane_adjoint(reads[t], &cell.scale[t * lanes..(t + 1) * lanes], &dr_all[t * dw..(t + 1) * dw])?;
             for i in 0..dw {
                 dx[t * dw + i] = fit64(dmid[t * dw + i] as i128 + back[i] as i128)?;
+            }
+        }
+        Ok(())
+    }
+
+    /// [definition; the lead, November 18, the frontier record §6] **The strand's return**: the exact reverse of
+    /// [`Constitution::strand_pass`] against the symbol at every place from the second, the code `Σ_(t≥1) −log₂ p̂_t(u_t)` of the passage
+    /// in place order, its covector added into `g` on each family's natural grain. One return serves both streams:
+    ///
+    /// - each open place's face returns through the readout into its last state;
+    /// - the ticks return in reverse through [`Constitution::tick_return`] over the joined sites, an open place's covectors on the keys,
+    ///   values, strand contacts and circles it heard landing on the known sites it heard them from;
+    /// - a tick's moments and clocks return as it ends: an open place's moment through the retarded moments' return on the clock it ran
+    ///   on; its clock, one stride past the known site before it, to that site's clock and (from the second tick) to its stride, which it
+    ///   read from its own face a tick earlier, so the stride's covector returns through that face into the state it was read off
+    ///   ([`Constitution::blank_return`]) and into the paces' rows by the face's shares;
+    /// - the known stream's moments and clocks, the same at every tick, return once at the end (no after row), its clocks to its strides
+    ///   and their classes' paces; then the opening: the moment's chart, each known site's own row and the row of the site before it,
+    ///   and each open place's unresolved row and the row of the site before it.
+    ///
+    /// Refused on a loud face and where the forward kept no ticks. A place is compared at weight one.
+    pub(crate) fn strand_returned(&self, classes: &[usize], pass: &StrandForward, g: &mut [i128]) -> Result<()> {
+        let d = &self.declaration;
+        if d.loud {
+            return refuse("a strand's return on a loud face");
+        }
+        let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
+        let m2 = 2 * m;
+        let n = pass.known;
+        let sites = 2 * n;
+        if pass.ticks.len() != d.ticks || pass.last.len() != sites * dw || classes.len() != n {
+            return refuse("a strand's reverse reads a forward of the same passage that held every tick");
+        }
+        let l = &self.layout;
+        let reaches = self.reaches();
+        let known = vec![false; n];
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let paces = self.paces(&region)?;
+        let paced = paces.kappa.len();
+        let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
+        let width = d.alphabet + 1;
+        let moment_modes: Vec<bool> = (0..m).map(|c| d.carries_moment(c / d.modes) && !d.is_depth(c / d.modes)).collect();
+        // Each open place's face against its symbol, through the readout into its last state.
+        let mut dx = vec![0i64; sites * dw];
+        {
+            let reads: Vec<BlankRead> = (1..n).map(|t| self.face_of(&pass.last[(n + t) * dw..(n + t + 1) * dw], &reaches)).collect::<Result<_>>()?;
+            let mut ys: Vec<Vec<i64>> = Vec::with_capacity(reads.len());
+            for (t, read) in (1..n).zip(&reads) {
+                let dz = covector(&read.face, classes[t]);
+                for (o, &dzo) in dz.iter().enumerate() {
+                    g[l.read_bias + o] += dzo as i128;
+                }
+                let mut dy = vec![0i64; dw];
+                for (i, slot) in dy.iter_mut().enumerate() {
+                    let sum: i128 = dz.iter().enumerate().map(|(c, &dzc)| dzc as i128 * self.theta[l.enc + c * dw + i] as i128).sum();
+                    *slot = fit64(release(sum, STATE_BITS))?;
+                }
+                for (c, &dzc) in dz.iter().enumerate() {
+                    for (i, &yi) in read.lift.iter().enumerate() {
+                        g[l.enc + c * dw + i] += release(dzc as i128 * yi as i128, STATE_BITS);
+                    }
+                }
+                for (i, &dyi) in dy.iter().enumerate() {
+                    g[l.lift_bias + i] += dyi as i128;
+                }
+                let mut dr = vec![0i64; dw];
+                transposed(&self.theta[l.read..l.read + dw * dw], reaches.read, dw, &dy, MATERIAL_BITS, &mut dr)?;
+                let back = lane_adjoint(&read.read, &read.scale[..lanes], &dr)?;
+                dx[(n + t) * dw..(n + t + 1) * dw].copy_from_slice(&back);
+                ys.push(dy);
+            }
+            let xs: Vec<&[i32]> = reads.iter().map(|r| r.read.as_slice()).collect();
+            outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
+        }
+        // The known stream's own clocks and moments take every tick's covectors and return once, at the end.
+        let mut whole = ClockReturn::new(paced, n, m2);
+        let mut ended: Option<ClockReturn> = None;
+        for (k, cell) in pass.ticks.iter().enumerate().rev() {
+            let mut r = ClockReturn::new(paced, sites, m2);
+            self.tick_return(cell, &mut dx, g, &pass.paces[k], &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, None, None, None, None)?;
+            if k > 0 {
+                self.strand_clock_return(&region, &paces, pass, k, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+            } else {
+                ended = Some(r);
+            }
+        }
+        let mut r = ended.ok_or(TowerError::Refused("a strand's reverse with no tick"))?;
+        // The moment's chart into the opening (§16.22), over the known sites and the open places alike, on the first tick's moments.
+        {
+            let (mf, mfb) = (l.moment_face, l.moment_face_bias);
+            let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
+            let ss: Vec<&[i64]> = pass.moments[0].chunks_exact(m2).collect();
+            outer_sum(&mut g[mf..mf + dw * m2], m2, &dxs, &ss)?;
+            let mut back = vec![0i64; m2];
+            for t in 0..sites {
+                for (o, &v) in dxs[t].iter().enumerate() {
+                    g[mfb + o] += v as i128;
+                }
+                transposed(&self.theta[mf..mf + dw * m2], reaches.moment_face, m2, dxs[t], MATERIAL_BITS, &mut back)?;
+                for (slot, &b) in r.dm[t * m2..(t + 1) * m2].iter_mut().zip(&back) {
+                    *slot += b as i128;
+                }
+            }
+        }
+        self.strand_clock_return(&region, &paces, pass, 0, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+        // The known stream's moments (no after row) and its clocks, to its strides and their classes' paces.
+        for (k, slot) in whole.dm.iter_mut().enumerate() {
+            if !moment_modes[(k % m2) % m] {
+                *slot = 0;
+            }
+        }
+        self.moments_return_sided(&region, &paces, &whole.dm, g, &mut whole.gtau, &mut whole.gsig, false)?;
+        for p in 0..paced {
+            let base = l.pace + p * width;
+            let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
+            for k in (1..n).rev() {
+                tail_tau += whole.gtau[p][k];
+                tail_sig += whole.gsig[p][k];
+                let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+                if dk != 0 {
+                    g[base + self.row(&region, k)] += dk << STATE_BITS;
+                }
+            }
+        }
+        // The openings' rows.
+        let unresolved = l.enc + d.alphabet * dw;
+        for t in 0..n {
+            let (dk, dopen) = (&dx[t * dw..(t + 1) * dw], &dx[(n + t) * dw..(n + t + 1) * dw]);
+            self.opening_return(&region, l.enc, t, dk, g, None);
+            for (i, &v) in dopen.iter().enumerate() {
+                g[unresolved + i] += v as i128;
+            }
+            if t > 0 {
+                self.opening_return(&region, l.before, t - 1, dk, g, None);
+                self.opening_return(&region, l.before, t - 1, dopen, g, None);
+            }
+        }
+        Ok(())
+    }
+
+    /// One tick's moments and clocks in the strand's return ([`Constitution::strand_returned`]): `r` holds tick `k`'s covectors over the
+    /// joined sites. The known sites' halves join `whole`. The open places' moments return on the clocks tick `k` ran them on; each open
+    /// place's clock returns to the known site before it and, where the tick's clock was read from the place's face (`k > 0`), to its
+    /// stride, whose covector goes to the paces' rows by the face's shares and through the face into `dx`, the covector of the state the
+    /// face was read off.
+    #[allow(clippy::too_many_arguments)]
+    fn strand_clock_return(&self, region: &Region, paces: &Paces, pass: &StrandForward, k: usize, r: &ClockReturn, whole: &mut ClockReturn, dx: &mut [i64], g: &mut [i128], moment_modes: &[bool], width: usize) -> Result<()> {
+        let d = &self.declaration;
+        let (dw, m) = (d.width, d.complex());
+        let m2 = 2 * m;
+        let n = pass.known;
+        let paced = paces.kappa.len();
+        let l = &self.layout;
+        for (slot, &v) in whole.dm.iter_mut().zip(&r.dm[..n * m2]) {
+            *slot += v;
+        }
+        let open_dm: Vec<i128> = r.dm[n * m2..].iter().enumerate().map(|(i, &v)| if moment_modes[(i % m2) % m] { v } else { 0 }).collect();
+        let (mut rx_tau, mut rx_sig) = (vec![vec![0i128; n]; paced], vec![vec![0i128; n]; paced]);
+        self.retarded_moments_return_at(region, paces, &pass.clocks[k], &open_dm, g, &mut whole.gtau, &mut whole.gsig, &mut rx_tau, &mut rx_sig)?;
+        let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if k > 0 { n } else { 0 }];
+        for p in 0..paced {
+            let base = l.pace + p * width;
+            for t in 0..n {
+                whole.gtau[p][t] += r.gtau[p][t];
+                whole.gsig[p][t] += r.gsig[p][t];
+            }
+            // An open place's clock is the clock of the site before it and its own stride.
+            for t in 1..n {
+                let (own_tau, own_sig) = (r.gtau[p][n + t], r.gsig[p][n + t]);
+                whole.gtau[p][t - 1] += own_tau;
+                whole.gsig[p][t - 1] += own_sig;
+                if k > 0 && !pass.reads.is_empty() {
+                    let stride = pass.paces[k].kappa[p][n + t];
+                    let dk = own_tau + rx_tau[p][t] + stride.signum() as i128 * (own_sig + rx_sig[p][t]);
+                    if dk != 0 {
+                        for &(c, w) in &shares(&pass.reads[k - 1][t].face) {
+                            g[base + c as usize] += dk * w as i128;
+                        }
+                        rates[t].push((base, dk));
+                    }
+                }
+            }
+        }
+        if k > 0 && !pass.reads.is_empty() {
+            let reaches = self.reaches();
+            for (t, rt) in rates.iter().enumerate().filter(|(_, rt)| !rt.is_empty()) {
+                self.blank_return(&pass.reads[k - 1][t], rt, &reaches, g, &mut dx[(n + t) * dw..(n + t + 1) * dw])?;
             }
         }
         Ok(())

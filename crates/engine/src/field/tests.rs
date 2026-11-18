@@ -4212,6 +4212,82 @@ fn the_boundary_charts_face_reads_nothing_at_or_past_its_place() {
     }
 }
 
+/// [definition; the lead, November 18, the frontier record §6] **The strand's covector matches its code's difference, and the sum of its
+/// frontier regions' covectors.** The code is the passage's in place order, `Σ_(t≥1) −log₂ p̂_t(u_t)` over the open places of
+/// [`Constitution::strand_pass`]; [`Constitution::strand_returned`] is its reverse. Family by family at its largest entries the covector
+/// matches the code's difference (a probe that moves a site across a sheet is counted apart, as in
+/// [`covector_matches_the_codes_difference`]); and it stands beside the sum, over the passage's places, of the covectors of the regions
+/// that end there read with every known place hearing only what stands before it (a ruler's forward at `3`): the same law returned a
+/// region a place, whose releases fall elsewhere, so the two agree to a part in a thousand of the reference's size, family by family
+/// (read November 18: 18 millionths at the farthest family).
+#[test]
+fn the_strands_covector_matches_the_codes_difference() {
+    let code = |field: &Constitution, classes: &[usize]| -> i64 { field.strand_pass(classes, false).unwrap().faces.iter().zip(classes).skip(1).map(|(f, &c)| crate::field::ratio_code(f.masses[c], f.total)).sum() };
+    let sheets = |field: &Constitution, classes: &[usize]| -> Vec<Vec<u32>> { field.strand_pass(classes, true).unwrap().ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect() };
+    let (mut read, mut seams) = (0usize, 0usize);
+    let mut worst = 0u128;
+    for (name, field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1))] {
+        let a = field.declaration.alphabet;
+        let sites = 9;
+        let classes = drawn_classes(0xB4, sites, a);
+        let pass = field.strand_pass(&classes, true).unwrap();
+        let mut g = vec![0i128; field.theta.len()];
+        field.strand_returned(&classes, &pass, &mut g).unwrap();
+        // The reference: a region a place, each returned under the known stream.
+        let mut ruled = field.clone();
+        ruled.ruler_far = 3;
+        let mut reference = vec![0i128; field.theta.len()];
+        for t in 1..sites {
+            let open: Vec<bool> = (0..=t).map(|k| k == t).collect();
+            let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let fwd = ruled.pass(&region, true).unwrap();
+            ruled.returned(&region, &fwd, &mut reference).unwrap();
+        }
+        for &(start, len, _) in field.families() {
+            let (size, apart): (u128, u128) = (start..start + len).fold((0, 0), |(s, d), i| (s + reference[i].unsigned_abs(), d + (g[i] - reference[i]).unsigned_abs()));
+            assert!(1000 * apart <= size + 1000 * 64 * len as u128, "{name}: family at {start}: the strand's covector stands {apart} from the regions' sum of size {size}");
+            if size > 0 {
+                worst = worst.max(apart * 1_000_000 / size);
+            }
+        }
+        for &(start, len, grain) in field.families() {
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let straddles = |delta: i32| {
+                    let (mut plus, mut minus) = (field.clone(), field.clone());
+                    plus.theta[i] += delta;
+                    minus.theta[i] -= delta;
+                    sheets(&plus, &classes) != sheets(&field, &classes) || sheets(&minus, &classes) != sheets(&field, &classes)
+                };
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let l = field.layout.clone();
+                let measured = if start == l.temper {
+                    let at = |k: i32| { let mut f = field.clone(); f.theta[i] += k * (delta / 8); code(&f, &classes) as i128 };
+                    let weighted: i128 = (-8..=8).map(|k| k as i128 * at(k)).sum();
+                    div_nearest(16 * weighted, 408) as i64
+                } else {
+                    let (mut plus, mut minus) = (field.clone(), field.clone());
+                    plus.theta[i] += delta;
+                    minus.theta[i] -= delta;
+                    code(&plus, &classes) - code(&minus, &classes)
+                };
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + ((64 * (sites as i128 - 1)) << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "{name}: family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("STRAND_COVECTOR_PROBES read={read} on_a_seam={seams} farthest_family_from_the_regions_sum_millionths={worst}");
+    assert!(read >= 60 && 8 * seams <= read, "read {read} probes, {seams} on a seam");
+}
+
 /// [definition; the lead, November 18, the frontier record §6] **The strand's two streams in one tick are the second tick's bits**: the
 /// faces of [`Constitution::strand_pass`] (the open places as sites of the known stream's batch, read by their places) are those of
 /// [`Constitution::strand_faces`] (a second tick written for them) at every place, on fields with a still head and without, with

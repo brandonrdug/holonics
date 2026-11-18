@@ -301,6 +301,57 @@ impl Constitution {
         Ok(out)
     }
 
+    /// **The return of the retarded moments on given receiving clocks** ([`Constitution::retarded_moments_at`]): `dm` the covector of the
+    /// open places' moments `[t][2M]`. The before rows take their covector into `g`; the sources' clocks (the passage's own) take theirs
+    /// into `gtau` and `gsig`, where each place's share of its receiving clock is also set at the site before it (the clock it is one
+    /// stride past); and that share alone is set at the place itself in `rx_tau` and `rx_sig`, for the stride it owes it.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn retarded_moments_return_at(&self, region: &Region, paces: &Paces, clocks: &[(Vec<i64>, Vec<i64>)], dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], rx_tau: &mut [Vec<i128>], rx_sig: &mut [Vec<i128>]) -> Result<()> {
+        let d = &self.declaration;
+        let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
+        if tm == 0 {
+            return Ok(());
+        }
+        let l = &self.layout;
+        let eb: Vec<Vec<i64>> = (0..sites).map(|t| self.strand_row(region, l.moment_before, 2 * tm, t)).collect();
+        let none = vec![(0i64, 0i64); sites];
+        let mut db = vec![vec![0i128; 2 * tm]; sites];
+        let side = |v: Vec<(i128, i128)>| -> Result<Vec<(i64, i64)>> { v.into_iter().map(|(re, im)| Ok((fit64(release(re, moment::COEFFICIENT_BITS))?, fit64(release(im, moment::COEFFICIENT_BITS))?))).collect() };
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
+            let (tau_c, sigma_c) = &clocks[h];
+            for li in 0..n {
+                let idx = d.moment_index(h) + li;
+                let slot = self.slot(h, li);
+                let (period, ring) = &self.rings[slot];
+                let ds: Vec<(i64, i64)> = (0..sites).map(|t| Ok((fit64(dm[t * 2 * m + h * n + li])?, fit64(dm[t * 2 * m + m + h * n + li])?))).collect::<Result<_>>()?;
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let pace = self.pace_of(paces, h, &turn, &skin);
+                let (back_b, back_a) = moment::cavity_moments_return(&ds, ring, *period, &self.decays[slot], pace.as_ref(), tau_c, sigma_c)?;
+                if let Some(p) = paces.row[h] {
+                    let full = moment::Pace { tau: &paces.tau[p], sigma: &paces.sigma[p], turn: &turn, skin: &skin };
+                    let before: Vec<(i64, i64)> = eb.iter().map(|r| (r[idx], r[tm + idx])).collect();
+                    let parts = moment::cavity_moment_parts_exact(&before, &none, ring, *period, &self.decays[slot], pace.as_ref(), tau_c, sigma_c)?;
+                    let (sb, sa): (Vec<_>, Vec<_>) = parts.into_iter().unzip();
+                    let (sb, sa) = (side(sb)?, side(sa)?);
+                    let (dt, dsg, rt, rs) = moment::cavity_pace_return_split(&before, &none, &sb, &sa, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, tau_c, sigma_c, self.turn_rate(slot))?;
+                    for t in 0..sites {
+                        gtau[p][t] += dt[t];
+                        gsig[p][t] += dsg[t];
+                        rx_tau[p][t] += rt[t];
+                        rx_sig[p][t] += rs[t];
+                    }
+                }
+                for t in 0..sites {
+                    (db[t][idx], db[t][tm + idx]) = back_b[t];
+                }
+            }
+        }
+        for t in 0..sites {
+            self.strand_return(region, l.moment_before, 2 * tm, t, &db[t], g);
+        }
+        Ok(())
+    }
+
     /// [definition; the lead, November 17 (the record of the dwell §13, where its acceptance is fixed) and November 18 (the frontier
     /// record §6)] **The boundary chart's forward: a passage read at its boundary.** A passage being read has a boundary, its next place.
     /// The receiver at place `t` holds the passage's current up to `t − 1`, and its face is the density of the symbol that arrives at
@@ -567,6 +618,14 @@ impl Constitution {
     /// The moments' return (§15.1, [`moment::moments_return`]): each moment mode's value covector summed
     /// over the ticks, `dm` (`[t][2M]` on `2^(−24)`), back to the strands' encodings.
     pub(crate) fn moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>]) -> Result<()> {
+        // [measurement] Under a ruler's `3` the moments read no after row ([`Constitution::moments_sided`]).
+        self.moments_return_sided(region, paces, dm, g, gtau, gsig, self.ruler_far != 3)
+    }
+
+    /// [`Constitution::moments_return`], or with `after` unset the return of moments that read no after row: none is read here, and
+    /// none takes a covector.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn moments_return_sided(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], after: bool) -> Result<()> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         if tm == 0 {
@@ -574,9 +633,6 @@ impl Constitution {
         }
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
-        // [measurement] Under a ruler's `3` the moments read no after row ([`Constitution::moments_sided`]): none is read here, and none takes
-        // a covector.
-        let after = self.ruler_far != 3;
         let (eb, ea) = (rows(l.moment_before), if after { rows(l.moment_after) } else { vec![vec![0i64; 2 * tm]; sites] });
         let (mut db, mut da) = (vec![vec![0i128; 2 * tm]; sites], vec![vec![0i128; 2 * tm]; sites]);
         for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
