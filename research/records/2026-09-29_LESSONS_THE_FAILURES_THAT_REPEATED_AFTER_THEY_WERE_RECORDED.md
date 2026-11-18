@@ -117,6 +117,15 @@ Two independent reviews read today's code; they agree.
 
 ## 3. The lessons
 
+**Amended November 18** ([CLAUDE.md, a past configuration is an instruction](../../CLAUDE.md#past-configurations)).
+Lesson 1's last sentence is read as CLAUDE.md now states it: a choice is refused only where it
+repeats a failure's mechanism under that failure's conditions, by the test of the law it broke,
+never for resembling one. Lesson 4's "a store addressed by content is an index whatever it
+overwrites" is read by the test of November 9 (stores and caches in CLAUDE.md): a held quantity
+that obeys a balance over time and costs a flux through a port to read is a store, whatever it is
+addressed by; a table with no dynamics of its own and no coupling between its entries is the cache
+this lesson refuses.
+
 1. **Read the lessons before designing.** Before any design, brief or build: read this record and
    the September 24 lessons, and name which recorded failure each choice could repeat. A choice that
    repeats one is refused before it is built.

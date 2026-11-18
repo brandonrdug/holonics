@@ -6,7 +6,7 @@ followed the deepest match's last visit. An audit made at Brandon's request foun
 `0934a25ff` retired it ([the
 retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
 The measurements below stand only as measurements of that machinery, never as progress of the
-learner, and nothing here is a design to resume.
+learner, and any piece of it may be taken up again as an attempt (CLAUDE.md, a past configuration is an instruction; November 18).
 
 Refs #405 #404. Follows [the released ratio opens the whole GSM8K partition](2026-10-23_THE_RELEASED_RATIO_OPENS_THE_WHOLE_GSM8K_PARTITION.md)
 and the mathematics thread's located equality, §8 of its contacts record in
