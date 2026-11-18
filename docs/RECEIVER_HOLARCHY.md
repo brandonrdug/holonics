@@ -190,7 +190,7 @@ The first term is supplied port work. `Σ_G` measures the source-free change of 
 carry positive, negative and null directions at once; a discrete transport has `T*G_next T − G`.
 Under a constant invertible chart `Σ_G` transforms by congruence (`CausalChord.rateForm_congruence`),
 so its signature, not the eigenvalues of `A`, is the invariant content; `holonics::ratio::linear::inertia`
-(`inertia`, `congruence`; the pullback bound is in [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/inertia.rs)) reads it in rationals. Integrating, differentiating,
+(`inertia`, `congruence`, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear/inertia.rs); the pullback bound is in [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/inertia.rs)) reads it in rationals. Integrating, differentiating,
 concentrating, maintaining, exploring and releasing are situated roles of one current at a declared
 metric, source, receiver and clock, not intrinsic capacities. A rise in a receiver intensity or in
 coarse entropy is not heat: physical homeostasis also owes storage, incoming and outgoing power and

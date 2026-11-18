@@ -1,11 +1,20 @@
-# HNN formula: the law `holonics::hnn` implements
+# HNN formula: the HNN's law
 
-[project-postulate] This guide states the HNN law. `holonics::hnn` implements it over aeons
-(#73), and `holonics-cuda::hnn` realizes it on the card (#76). The current owners are the
-[operator contract](ELEMENTARY_OBJECTS.md#operator-contract)'s HNN row: the word, deposition and
+[project-postulate] This guide states the HNN law. The attempt that trains is the engine,
+`holonics_engine::field` with its card realization `holonics_engine_cuda::hnn::field`
+([THE_ENGINE](THE_ENGINE.md), whose [§11](THE_ENGINE.md#11-the-theorys-laws-against-the-engine) sets
+the theory's laws against it). The October machine implemented this law over aeons as
+`holonics::hnn` (#73) and realized it on the card as `holonics-cuda::hnn` (#76); it retired with C8 of
+#603, the library held at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn) and the card crate at
+[`d6bbd1644`](https://github.com/brandonrdug/holonics/tree/d6bbd1644/crates/holonics-cuda/src/hnn). The
+owners this guide names as `hnn::…`, `holonics::…`, `compression::…`, `receiver::…`, `aeon::…`, `Field`,
+`Word` and `Reference` are that machine's and stand in history at those commits, at the path the module
+name gives (the [operator contract](ELEMENTARY_OBJECTS.md#operator-contract) states the rule and the
+engine's modules by object); Lean and the atlas hold their laws. That machine's owners were the
+contract's HNN row: the word, deposition and
 the collapse of campaigns 1–2 and the loaded resonator (`hnn::ring`); a loaded ring's mode quotient
 (campaign 3's first construction) is Lean's `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
-Holonic Encoding's founding law on declared transports is `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's native form is `hnn::prediction`, the receiving bank's lock iteration, with learning as key location then deposition (`hnn::keys`, `hnn::executed::pair_deposit`; the release's own comparison and its descent move retired October 5, the library spine's S2) (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
+Holonic Encoding's founding law on declared transports was `hnn::encoding` (Lean `HNN/Encoding`, [below](#holonic-encoding)); joint prediction's native form was `hnn::prediction`, the receiving bank's lock iteration, with learning as key location then deposition (`hnn::keys`, `hnn::executed::pair_deposit`; the release's own comparison and its descent move retired October 5, the library spine's S2) (U6, [below](#generation-as-field-refinement-and-boundary-radiation)); release through modes has no owner yet. [THE_MACHINE](THE_MACHINE.md) states the object,
 [THE_REBUILD](plans/THE_REBUILD.md) the order and [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) the
 position; the [elementary objects](ELEMENTARY_OBJECTS.md) own the vocabulary.
 The HNN is the compression machine at scale ([the line](THE_MACHINE.md#the-line-the-rebuild-serves)):
@@ -39,9 +48,12 @@ source/current/material/receiver construction.
 `crates/holonics-cuda/src/hnn/` and its constitutive field under
 `crates/holonics-cuda/src/native_ecology/constitutive_fibre/field/`; the
 [lessons record](../research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md)
-keeps what it did and did not achieve. Step 4 ports its equations one law at a time, never its
-per-occurrence tape, frozen-cut replay, update journals, slot/session wires, byte or nibble
-codecs, or whole foreign Q/K/V graphs ([rules](plans/THE_REBUILD.md#4-rules-of-the-rebuild)).
+keeps what it did and did not achieve. Step 4 ports its equations one law at a time. A port that
+holds its per-occurrence tape, frozen-cut replay, update journals, slot/session wires, byte or
+nibble codecs, or a whole foreign Q/K/V graph states how that mechanism passes the law it failed
+(retention, stores and caches, the codec is not the architecture, equation extraction) and then
+proceeds: the list is those laws' test, never a list of pieces barred by name
+([rules](plans/THE_REBUILD.md#4-rules-of-the-rebuild); amended November 18).
 
 [definition] A Transformer is also executable generating mathematics. Its architecture supplies
 compositions of contractions, attention, reactions and normalizations; its parameters and
@@ -361,7 +373,7 @@ maps a geometric passage into current transport `U_(F←G)`; a configuration cha
 resident state into the spatial pair receiver. The field difference `Δ_i=U_i q_i−q_r` and the
 spatial separation `Δ=x_a−x_b` keep those chart maps explicit. Participation consumes the full
 pair face and its complete differential: `PairQuadranceJet::pullback`
-(`holonics::geometry::screw`) supplies the scalar-`Q` parameter term, and the feature
+(`holonics::geometry::screw`, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs)) supplied the scalar-`Q` parameter term, and the feature
 `(Δ,Q,DQ)`, chart, material and clock variations add their own. The group return `A⁻¹FA` agrees
 with an inverse/adjoint only under the declared isometry; the field keeps its actual derivative
 adjoint.
@@ -390,7 +402,7 @@ its locus's one step. The port waits for its located source
 [definition] The [helical elementary realization](HELICAL_GEOMETRY.md) makes one geometric
 instance explicit: Lie generators and initial points, frame transport, the pair contact
 differential, its geometric second variation, and a quadratic receiver that factors through the
-moment owner. `holonics::geometry::screw` supplies it in rationals; it is an instance, not a
+moment owner. `holonics::geometry::screw` ([`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs)) supplied it in rationals; it is an instance, not a
 replacement architecture. The constant-navigator case supplies a finite reusable receiver
 recurrence when the descent equation holds; changing navigators keep the `ChangingReceiver`
 defect instead of deleting the interior.
@@ -450,7 +462,7 @@ event.
 integration, separation, retention and release are read from the actual navigator, source and
 receiver, and can coexist in this field. The discrete rate form `T*G_next T−G`, or the continuous
 form `A*G+GA+Ġ`, ties that reading to its metric and clock. Both forms are Hermitian, so their
-content is a signature under congruence (`holonics::ratio::linear::inertia::{inertia, congruence}`), not an
+content is a signature under congruence (`holonics::ratio::linear::inertia::{inertia, congruence}`, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear/inertia.rs)), not an
 eigenvalue or a score. One navigator can contract one direction of the field while expanding
 another, and a chart change carries that reading without loss.
 
@@ -642,7 +654,7 @@ Holon; a layer diagram is an execution chart, not a set of physically separated 
 restrictions do not close dynamically, keep the coupling, interior modes and residual.
 
 [definition] The carrier can have toroidal cycles, curved transport tubes and overlapping domains,
-with higher cells recording their joints. `holonics::geometry::complex` validates cell complexes with their
+with higher cells recording their joints. `holonics::geometry::complex` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/complex.rs)) validated cell complexes with their
 connection incidence and curvature; connection/holonomy owners transport current around actual
 paths. A torus is not a generic hypersphere, and an aggregate intensity isosurface does not expose
 all of its constituent cycles. Interlinked cores, intersecting support domains and actual
@@ -1079,7 +1091,7 @@ winner. In the loss, `p−q` is the real codec-chart part of the Holon ratio's c
 [`Computation/HolonicAdjointNormalization`](../lean/Holonics/Computation/HolonicAdjointNormalization.lean)
 (`face_add_common`, `laplacianReturn`, `quadratic_laplacianReturn`,
 `sigmoid_is_binary_normalized_exponential`); Rust `holonics::ratio::exponentiated::RatioFamily`
-carries the cocycle and the unrounded normalization in its symbolic-log domain.
+(retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/exponentiated.rs)) carried the cocycle and the unrounded normalization in its symbolic-log domain.
 
 [proved-derived; formal-checked] **Gibbs, MDL and MAP.** A code objective `J` over declared
 candidates gives `Π(g)=2^(−J(g))/Z`. MDL and MAP share the minimizing predicate on the feasible
@@ -1230,7 +1242,7 @@ dynamics. Owner: [ReflectedBoundaryMemory](../lean/Holonics/Physics/ReflectedBou
 
 [proved-derived; formal-checked] With `x_next=A x+B z+f`, eliminating arbitrary `z` in the next
 boundary encoding loses nothing precisely when `E_next A=U E` and `E_next B=0`. The receiver
-factorization of `E_next[A B]` through `[E 0]` in `holonics::ratio::linear` constructs it; a
+factorization of `E_next[A B]` through `[E 0]` in `holonics::ratio::linear` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear.rs)) constructs it; a
 returned null-space separator identifies an omitted influence. With a constrained `z`-family,
 factor only that family. The same condition at each step yields the reduced recurrence by
 induction.

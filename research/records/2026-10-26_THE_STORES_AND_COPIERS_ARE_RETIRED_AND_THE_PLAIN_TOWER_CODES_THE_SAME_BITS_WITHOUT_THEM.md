@@ -4,6 +4,18 @@
 deletion is commit `0934a25ff`, merged beside the pumped towers in the same branch. The receipts
 are below.
 
+**How this record is read since November 18**
+([CLAUDE.md, a past configuration is an instruction](../../CLAUDE.md#past-configurations) and
+[stores and caches](../../CLAUDE.md#stores-and-caches)). It is the reading of October 26 and the
+deletion that followed. Two of its sentences are read as dated: "none is a design to resume"
+(under "The records") and "The rule this leaves", which refuses a design by its forms. Any of the
+four pieces may be taken up again as an attempt, and each is put to the store test of November 9:
+a held quantity that obeys a balance over time and is read by a flux through a port is a store,
+whatever it is addressed by. What the rule's reason reaches is a table of seen contexts with no
+dynamics of its own and no coupling between its entries, read in place of propagation, and a
+lookup benchmark standing as an acceptance. The pieces' own readings are routed by subject in
+[the records README](README.md#configurations-set-aside-by-subject).
+
 ## Why
 
 At Brandon's request on October 26 the design asked whether database architecture had crept into

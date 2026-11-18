@@ -868,8 +868,11 @@ Streamlining follows existing owners, not a new foundational library. Preserve e
 in Lean or its owning guide, with its consuming Rust path and atlas rows. Before any deletion,
 inspect imports, exports, callers, fixtures and the source that keeps its unformalized law.
 Remove an unconsumed superseded realization together with those registrations; retain failed
-attempts and receipts needed by the present audit. Do not use compatibility aliases to reopen
-retired saves or wholesale restore pre-reset crates. The separate cleanup work owns actual
+attempts and receipts needed by the present audit. Compatibility aliases are not used to reopen
+retired saves. A whole configuration from history is restored as an attempt beside the one that
+stands, to be read, and never as a silent replacement of it
+([CLAUDE.md, a past configuration is an instruction](../../CLAUDE.md#past-configurations); amended
+November 18, where this sentence had barred a wholesale restore of pre-reset crates). The separate cleanup work owns actual
 retirement patches; this foundation adds no parallel Rust learner, new proof axiom or code owner.
 
 The October 3 cleanup audit supplies a concrete keep/adapt/remove boundary. All 216 Rust source

@@ -124,14 +124,18 @@ today are the engine's ([THE_ENGINE](docs/THE_ENGINE.md)).
 Each is a measured result the next design keeps, with its record. Each is a reading under its
 conditions, and none bars taking a configuration or a piece of it up again
 ([CLAUDE.md, a past configuration is an instruction](CLAUDE.md#past-configurations)).
-- **Stores and copiers are retired.** The binding bank, the reset clock, the passage tree with its
-  node lock, the letters copy and the keyed-modes trainer were deleted on October 26, and the plain
-  tower coded the same bits without them
+- **The stores and copiers of October 26 were deleted as one species.** The binding bank, the reset
+  clock, the passage tree with its node lock, the letters copy and the keyed-modes trainer were
+  deleted that day, and the plain tower coded the same bits without them
   ([record](research/records/2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
-- **Text through the byte residue chart located nothing** (October 5); guard 9 refuses it, and a
-  source enters only through its founded encoding.
-- **Numeral copying is not a target.** The crib line was retired as contamination
-  (the running record, §16.19).
+  A design that takes one up puts it to the store test of November 9
+  ([CLAUDE.md, stores and caches](CLAUDE.md#stores-and-caches)).
+- **Text through the byte residue chart located nothing** (October 5). Guard 9 keeps the reading as
+  "the codec is not the architecture" ([THE_ENGINE §9](docs/THE_ENGINE.md#9-the-guards)): what it bars
+  is a codec's sheet standing as the machine, never a chart whose keys the machine locates.
+- **The crib line's numeral matcher was retired on November 2** as a matcher handed to the machine
+  (the running record of November 1, §16.19). The bar is on that matcher and on an acceptance that
+  counts copied numerals, by the law against catered machinery.
 - **The question must reach the answer.** On GSM8K the field's answers coded no better beside their
   own question than beside a foil (November 1 and 2), because its comparison counted a lock only at
   the same place ([review](research/records/2026-11-02_THE_COMPARISON_IS_THE_COUPLINGS_FREE_ENERGY_THE_QUESTION_IS_READ_BY_A_JOINT_CODE_AND_THE_RELEASE_RUNS_THE_TRAINING_CLOCK_BACKWARDS.md)).

@@ -93,7 +93,7 @@ the requested receiver: a Lie generator `ξ` **with an initial configuration**, 
 
 [definition] The computational object of this construction is the **helical pair interaction**:
 an interaction (`Transport/HolonicInteraction`) whose declared rate ports carry the parameter rates
-of a `holonics::geometry::screw::ScrewPair` and whose contact slip map is that pair's relative velocity.
+of a `holonics::geometry::screw::ScrewPair` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs)) and whose contact slip map is that pair's relative velocity.
 Its configuration, storage state and rate ports retain their explicit chart maps. The
 [design record](../research/records/2026-09-21_THE_HELICAL_PAIR_INTERACTION_IS_THE_HNN_SITE_AND_PHASE_CARRIES_CONTEXT.md)
 gives the source audit; the [helical guide](HELICAL_GEOMETRY.md#the-pair-is-a-holonic-interaction-contact)
@@ -124,7 +124,7 @@ the checked contact and interaction from the pair, an explicit rate port `C`, PS
 positive weight, a clock and frame/parameter units, and its unit-storage, zero-skew specialization
 exposed both material-null and kinematic kernels. It and the
 [serial chain](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs) are the port sources for
-`holonics::holon::contact` (rebuild step 1). The
+`holonics::holon::contact` (rebuild step 1; retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/contact.rs)). The
 [construction return](../research/records/2026-09-21_PAIR_CONTACT_SERIAL_KINEMATICS_AND_THE_RESIDENT_QUADRANCE_RETURN.md)
 records the feature pullback, serial consumer and resident quadrance primitive.
 
@@ -155,7 +155,8 @@ standing law below. The [winding guide](WINDING_CARRY_AND_PLACEMENT.md) states t
 objects this unit continues into (carry, lock address, conserved faces, cell holonomy and the
 receiver-relative harmonic class, tube, continuation) with their checked laws. The prototype's
 [machine contract](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/THE_ATHENA_ALPHA_CULTIVATES_GENERAL_CONVERSATION_THROUGH_NATIVE_CONTEXTUAL_TRANSPORT.md#situated-generator-and-receiving-composition)
-is in history; rebuild step 4 rebuilds the machine in `holonics::hnn`.
+is in history; rebuild step 4 rebuilt the machine as `holonics::hnn`, the October machine, which retired at
+[`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/hnn). The attempt that trains is the engine ([THE_ENGINE](THE_ENGINE.md)).
 
 [definition] Let z carry the interacting Holons, their material, incidence, clocks and relevant
 environment, and let `F_o={z:O(z)=o}` be the compatible source family. Let a specify a complete
@@ -212,7 +213,7 @@ Stability additionally concerns the response to perturbations under stated mater
 driving conditions. A single return, phase arithmetic in rationals or a conserved norm alone does
 not establish attraction, robustness or periodic closure.
 
-[proved-derived] The medium (`holonics::holon::PortHolon::medium` with no active block;
+[proved-derived] The medium (`holonics::holon::PortHolon::medium` with no active block, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/mod.rs);
 `Transport/HolonicInteraction.port_storage_rate`, `Holon/Conformance.medium_rate_agrees`) gives a
 concrete flux law. With fixed real `G=Gᵀ`, `Ωᵀ=−Ω`, `M_contact⪰0`, supplied input B u and
 `q̇=(Ω−M_contact)Gq+B u`, the storage `V=½qᵀGq` obeys
@@ -262,7 +263,8 @@ exterior readings: an imported float is the dyadic rational its stored bits deno
 one, and the chart declares its calibration and quantization residual. The inspected Isaac Sim
 interface (source observation, action face, timing, reset, receiving consequence) is tabled in
 [history](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/HARDWARE_AND_MODALITY_BOUNDARIES.md#robotics-and-simulation-boundary). Owners:
-Lean `Transport/SerialScrewChain`; Rust `holonics::geometry::screw::{SituatedScrew,ScrewGenerator}`, `holonics::holon::contact::SerialChain`; the
+Lean `Transport/SerialScrewChain`; Rust `holonics::geometry::screw::{SituatedScrew,ScrewGenerator}` and `holonics::holon::contact::SerialChain`, retired at `d5ed4adc1`
+([`screw.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs), [`contact.rs`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/contact.rs)); the
 chain's port source is the prototype [`serial.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_chain/serial.rs).
 
 ## High-level Holonic Interactions
@@ -308,7 +310,7 @@ It includes the two direct currents and their interaction term. This is an actua
 signature, not a statement that all Holons are bilinear regressions. Higher interactions
 compose suitable tensor/contraction operators or the model's nonlinear constitutive map.
 The prototype realized it on the device (`advance_bilinear_contact`, `bilinear_features`, in
-history); `holonics::ratio::linear` exposes factorization and factor reuse. A helper around
+history); `holonics::ratio::linear` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear.rs)) exposed factorization and factor reuse. A helper around
 a fitter would not establish a more general Holon algebra by itself.
 
 [definition] The [connected tensor computation](HNN_FORMULA.md#one-connected-tensor-computation)
@@ -363,7 +365,8 @@ computational interface; tensors are not confined to exterior codecs.
 
 [definition] The following is the shared operational synopsis. Physical, geometric and
 probabilistic structure enters with its stated hypotheses, rather than being attributed to
-every elementary carrier.
+every elementary carrier. The Rust owners in the last column (`holonics::…`) are the October library's, which
+retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics/src): each stands there at the path its module name gives.
 
 | Characteristic | Mathematical content | Formal / executable owner |
 |---|---|---|
@@ -419,7 +422,7 @@ those properties. An operator must carry what its equation uses.
   representations of those operations, rather than labels that replace them.
 
 [established-bounded; source-inspected] Tensor lenses (`Foundation/HolonTensorLens`), linear
-algebra in rationals (`holonics::ratio::linear`) and the boundary operators supply these constructions in
+algebra in rationals (`holonics::ratio::linear`, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear.rs)) and the boundary operators supply these constructions in
 their declared source families. The summary specifies their use in one Holon algebra; it
 does not assert that all nonlinear operators have finite modal closures without remainder.
 
@@ -479,18 +482,25 @@ returned body, with defects and insufficiency retained; an unsupported local rea
 actual construction, not a universal fallback executor. The prototype recovered a configured Gemma
 text realization, 1,275 operations over 719 coefficient populations
 ([history](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/holonic_intelligence)). Rebuild step 6 rebuilds extraction
-on the library; foreign forward graphs and Q/K/V caches are not ported whole.
+on the library. A foreign forward graph is read as equations and its coefficients seed the engine's
+opening; it is never served or run as the model, which is the bar and its whole reach
+([CLAUDE.md](../CLAUDE.md), equation extraction; amended November 18, where this sentence had said
+that foreign forward graphs and Q/K/V caches "are not ported whole").
 
 ## What exists now
 
 [established-bounded; source-inspected] The computational Holon's code owners are listed once, in
-the [operator contract](ELEMENTARY_OBJECTS.md#operator-contract), each current owner beside its
-target. The map of the crates:
-- `crates/holonics`, in rationals (`Rat`) and integers at declared widths, with no floats, in the ten modules its `lib.rs` names: `ratio`,
-  `geometry`, `holon`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `hnn` and
-  `physics`.
-- `crates/holonics-cuda`: the CUDA driver and the resident HNN (`holonics_cuda::hnn::Resident`),
-  checked in lockstep against the host reference (`hnn/port_tests.rs`).
+the [operator contract](ELEMENTARY_OBJECTS.md#operator-contract), each owner beside its
+target. The map of the crates ([`crates/README.md`](../crates/README.md)):
+- `crates/engine`, `crates/engine-cuda` and `crates/athena`: the engine (the field's law and its host reference, in
+  integers at declared widths, with no floats), its card realization and the commands
+  ([THE_ENGINE](THE_ENGINE.md)).
+- The October library `crates/holonics`, in rationals (`Rat`) and integers at declared widths, in the ten modules its
+  `lib.rs` named (`ratio`, `geometry`, `holon`, `navigator`, `receiver`, `holarchy`, `aeon`, `compression`, `hnn` and
+  `physics`), retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics). The computational Holon's Rust owners this guide names
+  (`holonics::…`) stand there.
+- The October card crate `crates/holonics-cuda` (the CUDA driver and the resident HNN, `holonics_cuda::hnn::Resident`,
+  checked in lockstep against the host reference in `hnn/port_tests.rs`) retired at [`d6bbd1644`](https://github.com/brandonrdug/holonics/tree/d6bbd1644/crates/holonics-cuda).
 - The prototype's resident sections, operative field, coupled body and its wrappers are in
   history ([`hnn`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/hnn),
   [`native_ecology`](https://github.com/brandonrdug/holonics/tree/13f8c734/crates/holonics-cuda/src/native_ecology)).
@@ -504,7 +514,7 @@ reconstruction needs an actual decoder.
 [project-postulate] The primitive contract for HNN assembly is the complete situated operation.
 Share, factor and rechart numerical sections while carrying the interface and law the consuming
 operation requires, and consolidate those joins in the model owner. A universal record of
-unrelated optional fields would not establish them; `holonics::holon::Holon` is the law and its ports,
+unrelated optional fields would not establish them; `holonics::holon::Holon` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/mod.rs)) is the law and its ports,
 not such a record. A wire or display result that omits internal incidence is an
 exterior projection; an algorithm that needs the omitted structure consumes its owner.
 
