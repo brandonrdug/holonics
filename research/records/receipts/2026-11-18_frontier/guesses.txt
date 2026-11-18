@@ -149,3 +149,10 @@ Read (2026-11-18T09:07:40Z), G-1118-4's panels and end state: the panel one plac
 46% (48 to 58% guessed: missed, two points under; arm F's end reads 46% too). The long panel (384 known, the whole region known):
 108 of 250, 43%, where the control's end reads 34% and arm F's 36%; 2 of 20 writes loop, and the longest run shared with a prompt
 is 28 places.
+
+Noted (2026-11-18T09:44:44Z), G-1118-5 while it runs. Lap 2 (arm F2, 1,696 s) at its mean against the control's: the frontier rows 0.1912 under (0.21
+within 0.03 guessed: held, at its near edge), one place open 0.1115 above, whole masks 0.0908 above; the panel one place a read
+(48 known) from its end 91 of 165 words in the lexicon, 55%; the long panel 142 of 299, 47% (the control's end 34%, lap 1's 36%).
+The third lap's run ended its pass over the store's documents after 540 sections (the pass's own end, as the line's passes end);
+its state took a new pass (next-pass, every other line the same) and the lap goes on for 3,000 sections of it, so the third lap is
+read 3,540 sections past the second. Laps 4 and 5 follow it.
