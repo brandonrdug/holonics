@@ -4283,9 +4283,10 @@ fn the_strands_covector_matches_the_codes_difference() {
             let open: Vec<bool> = (0..sites).map(|t| t == 3).collect();
             assert!(field.pass(&Region { unresolved: &open, ..region }, false).is_err(), "{name}: a strand whose site is open is refused");
         }
-        // The reference: a region a place, each returned under the known stream.
+        // The reference: a region a place, each returned under the known stream with its open place on the bare clock, as the strand's are.
         let mut ruled = field.clone();
         ruled.ruler_far = 3;
+        ruled.bare_stretch = true;
         let mut reference = vec![0i128; field.theta.len()];
         for t in 1..sites {
             let open: Vec<bool> = (0..=t).map(|k| k == t).collect();
@@ -4464,8 +4465,9 @@ fn a_region_read_as_a_known_stream_is_the_rulers_forward_at_three() {
 
 /// [definition; the lead, November 18, the frontier record §6] **The strand's open place is its frontier region's**: under
 /// [`Constitution::strand_faces`] the face at place `t` is the same bits as the open last place of the region `[0, t]` read with every known
-/// place hearing only what stands before it (a ruler's forward at `3`), at every place, on fields with a still head and without, with
-/// circles and paces off their rest. One forward of a passage reads what a region a place reads.
+/// place hearing only what stands before it (a ruler's forward at `3`) and its open place on the bare clock (`bare_stretch`: the strand's
+/// open places are not read again by a clock), at every place, on fields with a still head and without, with circles and paces off their
+/// rest. One forward of a passage reads what a region a place reads.
 #[test]
 fn the_strands_open_place_is_its_frontier_regions() {
     for (name, field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1))] {
@@ -4474,8 +4476,10 @@ fn the_strands_open_place_is_its_frontier_regions() {
         let classes = drawn_classes(0xB1, sites, a);
         let faces = field.strand_faces(&classes).unwrap();
         assert_eq!(faces.len(), sites);
+        // (an open place of the strand runs on the bare clock at every tick, as the region's open last place does where the stretch runs bare)
         let mut ruled = field.clone();
         ruled.ruler_far = 3;
+        ruled.bare_stretch = true;
         for t in 1..sites {
             let open: Vec<bool> = (0..=t).map(|k| k == t).collect();
             let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false };

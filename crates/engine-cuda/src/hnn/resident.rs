@@ -247,6 +247,10 @@ pub(crate) struct Words {
     // [measurement; the lead, November 18, the frontier record §6] The known stream (`FieldWords::before`): one where every site of the batch
     // hears only what stands before it (the host's ruler at `3`, `Constitution::ruler_far`), zero under the law.
     pub(crate) before: u64,
+    // [the lead, November 18] A passage read by two streams (`FieldWords::site_place`, `region_heard`): each site's place and each region's
+    // count of sites that can be heard, zero (null) where the batch holds no strand.
+    pub(crate) site_place: u64,
+    pub(crate) region_heard: u64,
 }
 
 pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
@@ -527,6 +531,10 @@ pub struct Resident<'c> {
     /// ([`Realization::read_and_return_opening`]): set, and each region's opening code at every compared place.
     pub(crate) opening_wanted: std::cell::Cell<bool>,
     pub(crate) opening_out: std::cell::RefCell<Vec<Vec<Option<i64>>>>,
+    /// [the lead, November 18] The batch being staged holds passages read by two streams (`Region::strand`, staged as their known stream's
+    /// sites and then as many open places): each of its regions' count of sites that can be heard, its known stream's. Empty where the
+    /// batch holds none; set by the run for the batch it stages ([`Resident::run`]).
+    pub(crate) strand_heard: std::cell::RefCell<Vec<u32>>,
 }
 
 impl<'c> Resident<'c> {
@@ -539,7 +547,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1243,7 +1251,15 @@ impl<'c> Resident<'c> {
         // [the known stream] A region's first site has nothing before it: it meets no source and its current is zero (the host's tick under
         // `Sided::Before`), which is a row not computed.
         let before = words.before != 0;
-        let computed: Vec<u8> = if before || windows.iter().any(Option::is_some) { regions.iter().zip(&windows).flat_map(|(r, w)| (0..r.classes.len()).map(move |t| u8::from(w.as_ref().is_none_or(|w| w[t]) && !(before && t == 0)))).collect() } else { Vec::new() };
+        // [the strand's two streams] The batch's passages read by two streams (`Resident::strand_heard`): a region staged as `heard` known
+        // sites and then as many open places, each at the place of the known site of its index less `heard`. An open place at the first
+        // place has nothing before it, as the known stream's first site: its row is not computed, and it is not compared (weight zero).
+        let heard: Vec<u32> = {
+            let h = self.strand_heard.borrow();
+            if h.len() == regions.len() { h.clone() } else { Vec::new() }
+        };
+        let first_place = |r: usize, t: usize| t == 0 || heard.get(r).is_some_and(|&n| t == n as usize);
+        let computed: Vec<u8> = if before || windows.iter().any(Option::is_some) { regions.iter().zip(&windows).enumerate().flat_map(|(k, (r, w))| (0..r.classes.len()).map(move |t| (k, t, w))).map(|(k, t, w)| u8::from(w.as_ref().is_none_or(|w| w[t]) && !(before && first_place(k, t)))).collect() } else { Vec::new() };
         // One region's lists: its sites' rows, its definite sites and its open ones by place (§15.9: an open receiver hears every definite
         // site, and a definite source is heard by every open one), its echoes (§15.3) and its carried mixtures, `mix_off` counted from the
         // region's own first mixture.
@@ -1328,7 +1344,7 @@ impl<'c> Resident<'c> {
         for (r, (region, l)) in regions.iter().zip(parts).enumerate() {
             let s = region.classes.len();
             let weight = region.weight();
-            site_weight.extend(std::iter::repeat_n(weight, s));
+            site_weight.extend((0..s).map(|t| if heard.get(r).is_some_and(|&n| t == n as usize) { (0, 1) } else { weight }));
             region_eoff.push(pairs as u64);
             pairs += s * s;
             region_soff.push(skin_entries as u64);
@@ -1389,6 +1405,11 @@ impl<'c> Resident<'c> {
         let mix_share_at = pack.put(&mix_share_up);
         let (dlist_at, dstart_at, olist_at, ostart_at) = (pack.put(&dlist), pack.put(&dstart), pack.put(&olist), pack.put(&ostart));
         let region_soff_at = pack.put(&region_soff);
+        // [the strand's two streams] Each site's place and each region's heard sites, where the batch holds a strand.
+        let strand_at = (!heard.is_empty()).then(|| {
+            let place: Vec<u32> = regions.iter().zip(&heard).flat_map(|(r, &n)| (0..r.classes.len() as u32).map(move |t| if t >= n { t - n } else { t })).collect();
+            (pack.put(&place), pack.put(&heard))
+        });
         // [theory, November 12, P50 step 2] The moment modes' map (the moment kernels' `cmap`, `moment_modes`), for the clock's fill.
         let d = declaration;
         let mcmap: Vec<u32> = (0..d.heads).filter(|&h| d.carries_moment(h)).flat_map(|h| (0..d.modes).map(move |li| (h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 })).collect();
@@ -1417,6 +1438,7 @@ impl<'c> Resident<'c> {
         words.mix_class = base + mix_class_at;
         words.mix_share = base + mix_share_at;
         words.region_soff = base + region_soff_at;
+        (words.site_place, words.region_heard) = strand_at.map_or((0, 0), |(p, h)| (base + p, base + h));
         (words.mcmap, words.tm) = (base + mcmap_at, mcmap.len() as u64);
         words.skin_entries = skin_entries as u64;
         words.dlist = base + dlist_at;

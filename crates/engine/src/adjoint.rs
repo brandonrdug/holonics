@@ -723,12 +723,15 @@ impl Constitution {
         }
         // The known stream's own clocks and moments take every tick's covectors and return once, at the end.
         let mut whole = ClockReturn::new(paced, n, m2);
+        // The open places' moments are read on one clock at every tick (the bare one), so their covectors are summed over the ticks and
+        // return once, as the known stream's do.
+        let mut open_dm = vec![0i128; n * m2];
         let mut ended: Option<ClockReturn> = None;
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let mut r = ClockReturn::new(paced, sites, m2);
             self.tick_return(cell, &mut dx, g, &pass.paces[k], &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, None, None, None, None)?;
             if k > 0 {
-                self.strand_clock_return(&region, &paces, pass, k, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+                self.strand_clock_return(pass, &r, &mut whole, &mut open_dm);
             } else {
                 ended = Some(r);
             }
@@ -751,7 +754,10 @@ impl Constitution {
                 }
             }
         }
-        self.strand_clock_return(&region, &paces, pass, 0, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+        self.strand_clock_return(pass, &r, &mut whole, &mut open_dm);
+        // The open places' moments: the retarded cavity moments of the known stream on its cavity clocks ([`Constitution::cavity_moments_sided`]),
+        // returned once to the strands' rows before each place and to the clocks.
+        self.cavity_moments_return(&region, &paces, &open_dm, g, &mut whole.gtau, &mut whole.gsig, false)?;
         // [definition; the lead, November 18] Where the field compares its opening, the strand compares the retarded one at every place (the
         // opening an open place begins from, [`Constitution::opening_compare_return`] on the known stream's region); its clocks' covectors
         // join the known stream's, folded into the strides below.
@@ -793,56 +799,29 @@ impl Constitution {
         Ok(())
     }
 
-    /// One tick's moments and clocks in the strand's return ([`Constitution::strand_returned`]): `r` holds tick `k`'s covectors over the
-    /// joined sites. The known sites' halves join `whole`. The open places' moments return on the clocks tick `k` ran them on; each open
-    /// place's clock returns to the known site before it and, where the tick's clock was read from the place's face (`k > 0`), to its
-    /// stride, whose covector goes to the paces' rows by the face's shares and through the face into `dx`, the covector of the state the
-    /// face was read off.
-    #[allow(clippy::too_many_arguments)]
-    fn strand_clock_return(&self, region: &Region, paces: &Paces, pass: &StrandForward, k: usize, r: &ClockReturn, whole: &mut ClockReturn, dx: &mut [i64], g: &mut [i128], moment_modes: &[bool], width: usize) -> Result<()> {
-        let d = &self.declaration;
-        let (dw, m) = (d.width, d.complex());
-        let m2 = 2 * m;
+    /// One tick's moments and clocks in the strand's return ([`Constitution::strand_returned`]): `r` holds a tick's covectors over the joined
+    /// sites. The known sites' halves join `whole`; the open places' moments' covectors join `open_dm` (they return once, on the one clock
+    /// every tick read them on); and each open place's clock, the clock of the known site before it and one bare stride, returns to that
+    /// site.
+    fn strand_clock_return(&self, pass: &StrandForward, r: &ClockReturn, whole: &mut ClockReturn, open_dm: &mut [i128]) {
+        let m2 = 2 * self.declaration.complex();
         let n = pass.known;
-        let paced = paces.kappa.len();
-        let l = &self.layout;
         for (slot, &v) in whole.dm.iter_mut().zip(&r.dm[..n * m2]) {
             *slot += v;
         }
-        let open_dm: Vec<i128> = r.dm[n * m2..].iter().enumerate().map(|(i, &v)| if moment_modes[(i % m2) % m] { v } else { 0 }).collect();
-        let (mut rx_tau, mut rx_sig) = (vec![vec![0i128; n]; paced], vec![vec![0i128; n]; paced]);
-        self.retarded_moments_return_at(region, paces, &pass.clocks[k], &open_dm, g, &mut whole.gtau, &mut whole.gsig, &mut rx_tau, &mut rx_sig)?;
-        let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if k > 0 { n } else { 0 }];
-        for p in 0..paced {
-            let base = l.pace + p * width;
+        for (slot, &v) in open_dm.iter_mut().zip(&r.dm[n * m2..]) {
+            *slot += v;
+        }
+        for p in 0..whole.gtau.len() {
             for t in 0..n {
                 whole.gtau[p][t] += r.gtau[p][t];
                 whole.gsig[p][t] += r.gsig[p][t];
             }
-            // An open place's clock is the clock of the site before it and its own stride.
             for t in 1..n {
-                let (own_tau, own_sig) = (r.gtau[p][n + t], r.gsig[p][n + t]);
-                whole.gtau[p][t - 1] += own_tau;
-                whole.gsig[p][t - 1] += own_sig;
-                if k > 0 && !pass.reads.is_empty() {
-                    let stride = pass.paces[k].kappa[p][n + t];
-                    let dk = own_tau + rx_tau[p][t] + stride.signum() as i128 * (own_sig + rx_sig[p][t]);
-                    if dk != 0 {
-                        for &(c, w) in &shares(&pass.reads[k - 1][t].face) {
-                            g[base + c as usize] += dk * w as i128;
-                        }
-                        rates[t].push((base, dk));
-                    }
-                }
+                whole.gtau[p][t - 1] += r.gtau[p][n + t];
+                whole.gsig[p][t - 1] += r.gsig[p][n + t];
             }
         }
-        if k > 0 && !pass.reads.is_empty() {
-            let reaches = self.reaches();
-            for (t, rt) in rates.iter().enumerate().filter(|(_, rt)| !rt.is_empty()) {
-                self.blank_return(&pass.reads[k - 1][t], rt, &reaches, g, &mut dx[(n + t) * dw..(n + t + 1) * dw])?;
-            }
-        }
-        Ok(())
     }
 
     /// [`Constitution::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`

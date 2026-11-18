@@ -711,8 +711,12 @@ pub fn read_far(args: &[String]) -> Result<()> {
         return Err("no row".into());
     }
     let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
-    for far in 0..7u8 {
-        learner.field.ruler_far = far;
+    // [the lead, November 18] A last pair of lines reads the law (printed as far=10) and the known stream (far=13) with the open place's
+    // clock left bare at every tick (`Constitution::bare_stretch`): what its re-read from its own face is worth at the frontier.
+    for setting in [0u8, 1, 2, 3, 4, 5, 6, 10, 13] {
+        let far = setting;
+        learner.field.ruler_far = setting % 10;
+        learner.field.bare_stretch = setting >= 10;
         let mut groups: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         // (a few hundred regions a call, so no call holds every region's forward at once)
         for chunk in rows.chunks(256) {

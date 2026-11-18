@@ -128,8 +128,8 @@ pub(crate) enum Sided<'a> {
 }
 
 /// [`Constitution::strand_pass`]'s forward: the open places' faces (one a place), and where kept for the return each tick's cell over
-/// the joined sites, the clocks, moments and the open places' clocks it ran on, the faces a later tick's clocks were read from, and the
-/// last states.
+/// the joined sites, the clocks, moments and the open places' clocks it ran on (the same at every tick: an open place's clock is bare),
+/// and the last states.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct StrandForward {
     pub(crate) known: usize,
@@ -138,7 +138,6 @@ pub(crate) struct StrandForward {
     pub(crate) paces: Vec<Paces>,
     pub(crate) moments: Vec<Vec<i64>>,
     pub(crate) clocks: Vec<Vec<(Vec<i64>, Vec<i64>)>>,
-    pub(crate) reads: Vec<Vec<BlankRead>>,
     pub(crate) last: Vec<i64>,
 }
 
@@ -1186,30 +1185,14 @@ impl Constitution {
             }
             rx
         };
-        let mut receiving = on(&bare);
-        let (mut y, mut moment) = self.cavity_forward_sided(&region, paces, false)?;
-        // A blank's clock reads its face after each tick but the last (§16.44), unless the stretch's first place runs bare.
-        let rereads = !paces.kappa.is_empty() && (!self.bare_stretch || self.per_blank_clock);
-        let one = 1i128 << PACE_BITS;
-        let width = d.alphabet + 1;
+        let receiving = on(&bare);
+        let (mut y, moment) = self.cavity_forward_sided(&region, paces, false)?;
+        // [definition; the lead, November 18, the readings of 14:30 UTC] An open place runs on the bare clock at every tick: its clock is not
+        // read again from its own face (a blank's is, §16.44). Why: on the line's state trained a lap as known streams the re-read is worth
+        // 0.011 nats at the frontier (the far ruler's 800 rows), and without it the open places' clocks and moments are the cavity's own
+        // at every tick, so the second stream reuses the opening's forward and return whole.
         for k in 0..d.ticks {
             self.twin_tick(&mut y, &fwd.ticks[k], paces, &receiving, &moment, &reaches)?;
-            if rereads && k + 1 < d.ticks {
-                let mut clocks = bare.clone();
-                for t in 1..sites {
-                    let face = shares(&self.face_of(&y[t * dw..(t + 1) * dw], &reaches)?.face);
-                    for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
-                        let Some(p) = paces.row.get(h).copied().flatten() else { continue };
-                        let base = self.layout.pace + p * width;
-                        let rate = release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS);
-                        let stride = one + rate;
-                        clocks[h].0[t] = fit64(paces.tau[p][t - 1] as i128 + stride)?;
-                        clocks[h].1[t] = fit64(paces.sigma[p][t - 1] as i128 + stride.abs())?;
-                    }
-                }
-                receiving = on(&clocks);
-                moment = self.retarded_moments_at(&region, paces, &clocks)?;
-            }
         }
         y.chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect()
     }
@@ -1254,14 +1237,12 @@ impl Constitution {
             out
         };
         let bare_strides: Vec<Vec<i64>> = (0..d.heads).map(|_| vec![one as i64; n]).collect();
-        let mut clocks = bare.clone();
-        let mut tick_paces = joined(&bare, &bare_strides);
-        let mut moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
+        let clocks = bare.clone();
+        let tick_paces = joined(&bare, &bare_strides);
+        let moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
         let definite: Vec<bool> = (0..2 * n).map(|t| t < n).collect();
-        let rereads = !paces.kappa.is_empty() && (!self.bare_stretch || self.per_blank_clock);
-        let width = d.alphabet + 1;
         let mut out = StrandForward { known: n, ..Default::default() };
-        for k in 0..d.ticks {
+        for _ in 0..d.ticks {
             let mut cell = TickCell::default();
             if keep {
                 cell.before = x.clone();
@@ -1272,34 +1253,6 @@ impl Constitution {
                 out.paces.push(tick_paces.clone());
                 out.moments.push(moment.clone());
                 out.clocks.push(clocks.clone());
-            }
-            if rereads && k + 1 < d.ticks {
-                // Each open place's clock from its own face (§16.44), as a blank's is.
-                clocks = bare.clone();
-                let mut strides = bare_strides.clone();
-                let mut reads = Vec::with_capacity(n);
-                for t in 0..n {
-                    let read = self.face_of(&x[(n + t) * dw..(n + t + 1) * dw], &reaches)?;
-                    if t > 0 {
-                        let face = shares(&read.face);
-                        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
-                            let Some(p) = paces.row.get(h).copied().flatten() else { continue };
-                            let base = self.layout.pace + p * width;
-                            let rate = release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS);
-                            let stride = one + rate;
-                            strides[h][t] = fit64(stride)?;
-                            clocks[h].0[t] = fit64(paces.tau[p][t - 1] as i128 + stride)?;
-                            clocks[h].1[t] = fit64(paces.sigma[p][t - 1] as i128 + stride.abs())?;
-                        }
-                    }
-                    reads.push(read);
-                }
-                tick_paces = joined(&clocks, &strides);
-                let open_moment = self.retarded_moments_at(&region, &paces, &clocks)?;
-                moment = known_moment.iter().chain(&open_moment).copied().collect();
-                if keep {
-                    out.reads.push(reads);
-                }
             }
             if keep {
                 out.ticks.push(cell);
