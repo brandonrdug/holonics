@@ -487,10 +487,14 @@ Athena text milestone claimed before a test of use was retracted or retired.
 
 [project-postulate] **Method.** The rules of practice. Each keeps what it bars or requires, its reason in a sentence with its date or
 measurement, its scope and its record. Most are Brandon's corrections of October 29 to November 18, given in conversation; a rule
-marked "the lead" was derived by the lead from a failure or a reading of that day. Each rule's occasion, told in full as this guide
-held it until November 18, stands in [the method rules' record](research/records/2026-11-18_THE_METHOD_RULES_THE_CARD_RULE_AND_THE_WAITING_STANDARD_WITH_THEIR_OCCASIONS_AS_THE_GUIDE_HELD_THEM_BEFORE_IT_KEPT_EACH_RULES_BAR_REASON_SCOPE_AND_LINK.md)
+marked "the lead" was derived by the lead from a failure or a reading of that day, and the lead's rules of November 16 are
+`agent-inferred`. Each rule's occasion, told in full as this guide held it until November 18, stands in [the method rules' record](research/records/2026-11-18_THE_METHOD_RULES_THE_CARD_RULE_AND_THE_WAITING_STANDARD_WITH_THEIR_OCCASIONS_AS_THE_GUIDE_HELD_THEM_BEFORE_IT_KEPT_EACH_RULES_BAR_REASON_SCOPE_AND_LINK.md)
 under an anchor of the rule's name (C9 of #603). Where a sentence here is not enough to judge a case, that account is the reason in
-full, and the rule is applied by it. The rules are grouped by when they bind: a design, a line's lap, a reading and its telling.
+full, and the rule is applied by it. The rules are grouped in the order a piece of work meets them: a design, a line's lap, a
+reading and its telling. The grouping is an order of reading and never a scope: each rule binds wherever its own scope and reason
+reach, and a rule with no scope clause binds every design, run and reading. Four sentences are this arrangement's own and are no
+correction of Brandon's: what a line and an arm are, "an arm differs from its control by one change", the pointer from the PC rule
+to the waiting standard, and the closing paragraph of the lap's list.
 
 **A design**
 
@@ -515,9 +519,10 @@ full, and the rule is applied by it. The rules are grouped by when they bind: a 
   part's need (atlas `radix.register-composition`), never a copy, a factor or a pad to a power of two. Three things are kept apart:
   the constitution (the store and its loci), a region's current, and a receiver's locale (its support, frame, clock and width);
   "the field" names none of them, and the batch a card computes together is a schedule. A figure from another thread or a summary
-  line is read at its source before it is repeated. Reason: on November 12 a plan gave the machine "width 64" taking 10.6 of the
-  card's 12 GB, where the width was one integer copied into every block's row length and took 2.5%. Scope: every message, record,
-  brief, guess and design that sizes a part; the module's name `field` stays where the code is cited
+  line is read at its source or its receipt before it is repeated. Reason: on November 12 a plan gave the machine "width 64" taking
+  10.6 of the card's 12 GB, where the width was one integer copied into every block's row length and took 2.5%, and the state's
+  175,104 was its count of key draws where its entries were 80,182. Scope: every message, record, brief and guess, and every design
+  that sizes a part; the module's name `field` (then `hnn::tower::field`) stays the code's where the code is cited
   ([the record](research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md) §4.1).
 - **A symbol is a word, never a class index with free rows** (Brandon, November 12; the gene, November 16 and 17). A symbol is
   stated and designed as its word: its key on a few coprime rings, located by the machine; the rows its rings hold, shared by every
@@ -537,8 +542,8 @@ full, and the rule is applied by it. The rules are grouped by when they bind: a 
   Reason: the store's alphabet of November 12 gave each of 244 byte classes 259 entries of its own (0.54 of the constitution), so no
   two symbols shared an entry, while the tree already held the word (the located transport of October 5, guard 9 of THE_MACHINE);
   and the short form "no authored tokenizers" was read as barring every authored form, which kept the symbol's line unbuilt. Scope:
-  every codec, encoding, alphabet and chart, for text, image, acoustic and motor input; the built line's class names stay the code's
-  where the code is cited ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).
+  every codec, encoding, alphabet and chart, for text, image, acoustic and motor input, and every message, record and brief that
+  describes one; the built line's class names stay the code's where the code is cited ([the record](research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md) §5 to §9).
 - **One law reads every stream, and nothing branches on the kind of input** (Brandon, November 12 and 13). A symbol and a sample are
   one thing: a digit of a passage, read by a receiver at its own clock. No law, test, guess or vocabulary takes a modality or an
   interface as a category with mechanics of its own, and no clock or frame length is privileged. A specimen (a text, an image, a
@@ -552,10 +557,11 @@ full, and the rule is applied by it. The rules are grouped by when they bind: a 
   reading, guess or design sets a temperature, a pump or a sharpness by hand. A temperature named in a design is the state of a named
   store with its balance: the lock temperatures the constitution deposits, a deposit's rate (whose standing spread is a temperature),
   or a heat the release's own flux charges and leaks (atlas `parametron.pump-inverse-temperature`,
-  `deposition.rate-temperature-standing-spread`). The deterministic limit is a store at rest, which no store is: a reading of the
-  field's own face is its face at the temperature the field holds, and a limit read beside it is named a ruler. A deposit's rate is
-  such a store: a law that lowers it from the store's own travel or price is its dynamics and is owed, and this rule never bars a
-  cooling law or a read of one. Reasons: a heat set from outside answers the runaway for the field instead of letting its own
+  `deposition.rate-temperature-standing-spread`). The deterministic limit is not a mode of the machine: it is a store at rest,
+  which no store is. A reading of the field's own face is its face at the temperature the field holds, and a limit read beside it is
+  named a ruler. A deposit's rate is such a store: a law that lowers it from the store's own travel or price is its dynamics and is
+  owed. This rule bars a temperature passed by hand to a release or a reading, and it never bars a cooling law or a read of one.
+  Reasons (the wording `agent-inferred`): a heat set from outside answers the runaway for the field instead of letting its own
   surprise answer it (G169 drew the release "at temperature one and zero";
   [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md) §5);
   and on November 4 cooling released 0.043 nats a place and was retired that day because its price read empty, after which the store
@@ -582,20 +588,25 @@ full, and the rule is applied by it. The rules are grouped by when they bind: a 
   `tools/tension_ruler.py`): what the present faces remove, what the law's table removes (the ceiling), and what the part's own
   operands, located from the tension, remove (the founding law of October 24, atlas `contact.pool-founding`,
   `contact.tension-founds-face`). The read is a founding's instrument and never a gate: a part founded at zero or with drawn operands
-  is lawful, and it is read at a length a taken law needed. Reason: the founding law was restated four times between November 13 and
-  16 and no build ran it; and the earlier clause, that a part "enters with located operands or waits", stood on a saddle premise the
-  record of the dwell withdrew and turned the night of November 17 into ten readings and no build (`agent-inferred`). Scope: a growth
+  is lawful, and it is read at a length a taken law needed (a learner's null, rule 10 below). Reason: the founding law was restated four times between November 13 and
+  16 and no build ran it; and the earlier clauses, that a part "enters with located operands or waits" and that "the reading is the
+  result" where nothing locates, stood on a saddle premise the record of the dwell withdrew and turned the night of November 17 into ten readings and no build (`agent-inferred`). Scope: a growth
   or a founding whose operands a read can locate; the engine holds no founding law yet, so the read is offered beside a part, never
   in front of it.
 - **A ruler is an instrument** (November 10). A count table, a renaming, a parser or a float may be used on the host to measure what
   the machine holds, and is named a ruler. Reason: a measurement needs something outside the machine, and the refusal of authored
   routines is of machinery. Equal codes do not mean equal knowledge: before saying the field "holds" a ruler's law, multiply the
   faces into the ruler and read the product.
+- **The records that own a subject are read before a design on how the machine learns.** Rule 6 of a line's lap, below, holds this
+  requirement with its reason and its list of records.
 
 <a id="the-lap-procedure"></a>
-**A line's lap.** A line is one state trained lap after lap on the card. An arm is a lap, or a few, run beside the line from one of
-its saved states. The rules below are numbered in the order a lap meets them, and together they are the procedure for a lap: the
-guess, one change beside its control, the build's entry, the projection, the run, the read, the report and the score.
+**A line's lap.** A line is one state trained lap after lap on the card. An arm is a run of laps from one of the line's saved
+states that carries one change; its control is the same laps from the same state without it. The rules below are numbered in the
+order a lap meets them, and read in that order they are the procedure for a lap: the guess and its score with one change beside its
+control (1), the build's entry (2), the projection (3), the run (4), the read (5), the report (6 to 9) and what a null is held to
+(10, 11). Several reach past a lap, each by its own scope: rule 1 binds every run, rule 4 every build and gate, rules 8 to 11 every
+reading, and rule 6's second requirement every design on how the machine learns.
 
 1. **Theory picks, and a run tests a stated prediction** (November 4; the premise, the lead, November 11; the control, November 18).
    Derive which law the theory gives, read what the logs and the records already print about the guess's premise, fix the guess as a
@@ -603,24 +614,26 @@ guess, one change beside its control, the build's entry, the projection, the run
    prediction. A change to a running line (its store, its states, a part, a rate, an act) is such a comparison:
    - it runs as an arm beside a control from the same saved state;
    - an arm differs from its control by one change, and two changes are two arms (`agent-inferred` from the reason below);
-   - both are read at their saved means over a count of laps whose gain stands over the scatter between laps;
-   - the change leaves the line when its guess misses.
+   - both are read at their saved means over a count of laps whose gain stands over the scatter between laps, however many laps
+     that takes;
+   - the line takes the change by its guess's own rule, and a change that is in the line leaves it when its guess misses.
 
    Reasons: arms cost card time, and a winner picked by a short reading carries no reason; a guess on a premise a log has settled
    tests the guesser's memory ([the record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)).
    From lap 71 to lap 78 of the store line five changes entered one live state inside six and a half hours with no control: a lap's
    own gain stood under the scatter between laps (0.5 against 1.2 to 1.4 thousandths of a nat a place), every guess missed or was
    never opened, all five were still in the state at lap 94, and the control that would have separated them was "not run: it costs a
-   lap" ([the record](research/records/2026-11-18_COOLING_WAS_MEASURED_ON_NOVEMBER_4_AND_RETIRED_THE_LINES_LEVEL_IS_TRADED_BY_ITS_MIX_AN_OPEN_PLACE_IS_NEVER_A_SOURCE_AND_A_CHANGE_TO_A_LINE_RUNS_BESIDE_A_CONTROL.md) §2, §6).
+   lap", which is this rule's first reason read against its second sentence: an arm's cost never excuses the control ([the record](research/records/2026-11-18_COOLING_WAS_MEASURED_ON_NOVEMBER_4_AND_RETIRED_THE_LINES_LEVEL_IS_TRADED_BY_ITS_MIX_AN_OPEN_PLACE_IS_NEVER_A_SOURCE_AND_A_CHANGE_TO_A_LINE_RUNS_BESIDE_A_CONTROL.md) §2, §6).
 2. **A build enters a line by reproducing it** (the lead, November 11). Before a new build trains or reads for a running line, it
    trains from the line's last saved state with its new law off, and its section lines (timings aside) equal the line's own lap's on
-   every section read; a build that replaces the binary a line's laps are read with prints, from the lap's saved state, that lap's
-   own read lines (gate 3, `tools/gate_engine.sh`). A commit described as a reading or a realization carries that receipt in the same
+   every section read; a build that replaces the binary a line's laps are read with prints, from the lap's saved state, the lines
+   of that lap's own read logs, timings aside (as built, gate 3: `tools/gate_engine.sh`). A commit described as a reading or a realization carries that receipt in the same
    change. A state that a tool wrote is checked for every line the law reads before a lap trains from it. A reading that a live
    line's read script calls is consumed code, and a port carries it. Reason: a tree's parity of card against host cannot see a
    difference of law between two trees; on November 11 a scan's first lap differed from its control by the scan, by a commit
    described as a reading that had changed a training comparison, and by a state tool that left every part training at the base
-   rate. Scope: every build whose laps or reads enter a line's score; a first build of a new line has no lap to reproduce
+   rate; and that day's port of the training line set aside, as readings to bring back later, three reads that scored every lap of
+   both running lines. Scope: every build whose laps or reads enter a line's score; a first build of a new line has no lap to reproduce
    ([the record](research/records/2026-11-11_A_BUILD_ENTERS_A_LINE_BY_REPRODUCING_THE_LINES_OWN_LAP_A_COMMIT_CALLED_A_READING_HAD_CHANGED_THE_TRAINING_COMPARISON_AND_A_ONCE_A_SITE_PART_NEEDS_ITS_OWN_GRID.md);
    [the port's record](research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
 3. **A rate is judged against the card, and a long projection is the realization's defect first** (Brandon, October 29 to
@@ -634,9 +647,9 @@ guess, one change beside its control, the build's entry, the projection, the run
    still never cut to fit (GPU first, below), and a long run stays lawful once the realization stands near its count.
 4. **Builds, gates and learner runs happen on the PC** (October 29). Reason (`agent-inferred`): the card, the CUDA toolchain, the
    Lean cache and the private passages are there, and a cloud container's build measures the container. Scope: `cargo`, CUDA, Lean
-   and learner runs. Reading, writing, git and arithmetic on public material are done wherever the agent is. The run itself follows
-   the waiting standard below: a development read projects the lap and fixes its one deadline, the run is dispatched to outlive its
-   agent and saves a state at least each hour, and it takes the card's lock.
+   and learner runs. Reading, writing, git and arithmetic on public material are done wherever the agent is. A lap's run follows the
+   waiting standard below: a development read projects the lap and fixes its one deadline, the run is dispatched to outlive its
+   agent and saves a state at least each hour, and a line's lap takes the card's lock (a gate, a parity and a reading take none).
 5. **A line's level is read at its lap's mean** (the lead, November 11). A held code, an opening code or an information a place
    quoted for a line is read from the saved mean of the lap's states (`MEAN.{k}`, atlas `tower.field-lap-mean`), and a figure read
    from a lap's end state says that it is one. Two lines, or two laps of one line, are compared at lap means. As built, `train-store`
@@ -685,8 +698,9 @@ guess, one change beside its control, the build's entry, the projection, the run
     operands handed). A trial's table is also read for what its form gives away (a region's extent, a place, an order) before a held
     read from it is quoted. Reason: on November 17 ten passes over 3,923 short sums (400 sections) were read as "the plain engine
     does not take a held sum", and a founding part and a day's plan stood on it; the same engine on the same rows took the sum whole
-    between sections 1,000 and 3,000 and wrote 86 of 96 held sums. Scope: every reading of a learner's trial that a design, a record
-    or a statement rests on ([the record](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md) §5, §10).
+    between sections 1,000 and 3,000 and wrote 86 of 96 held sums; and the first long run's rows let a region's extent tell an
+    answer's length, so every free write came out two digits long. Scope: every reading of a learner's trial that a design, a record
+    or a statement rests on; it is the learner's side of rule 11 ([the record](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md) §5, §10).
 11. **A ruler's null is held to a planted law, its stamps are read from the clock, and its threads are counted** (the lead,
     November 16 and 17). A ruler that reports that nothing was found has recovered a planted instance on the same shapes in the same
     run. A time written into a guess or a record is read from `date -u`. A reading beside a lap states its host threads, and the
@@ -698,7 +712,11 @@ guess, one change beside its control, the build's entry, the projection, the run
 
 Two builds' times are compared only inside one balanced hold of the card (the waiting standard, below). The deposit's rate is a
 state of the learner (`set-rate`) and changes as an arm like any other change; the law that rests it is owed, and the readings of
-November 4 and 18 stand in [THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine).
+November 4 and 18 stand in [THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine). `python3 tools/lap_check.py
+SCRIPT` reads a lap's run script for what rules 1 and 4 to 7 ask of it (a named guess, the deadline and the lock, the read at the
+mean, the panel, the loudness), and `tools/runs.py start` prints its notes at dispatch; it refuses nothing. Reason: none of the
+twenty lap scripts of November 18 called `read-loudness`, so no lap record of that day carries rule 7's reading, and a rule that
+nothing runs does not hold.
 
 **A reading and its telling**
 
@@ -730,7 +748,8 @@ November 4 and 18 stand in [THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-l
   online ingestion with retained deposition, a cold restart, answers from the retained state with their provenance, readable text,
   GSM8K the yardstick), and its decoded writes are read and shown beside the nats and the loudness. Where the counters a mission step
   already reads show a clear, cheap gain that keeps every bit, it is taken in the same loop; sub-percent section gains are not run as
-  a campaign of their own, and a realization standing far over its count is not left to stand either. Reason: on November 16 the
+  a campaign of their own, and a realization standing far over its count is not left to stand either (a line's lap, rule 3).
+  Reason: on November 16 the
   work ran for about nine hours as kernel holds for gains of 0.1 to 1.4% a section while the line's writes went unread from
   November 14 05:38, and on November 15 a 40-minute lap had stood until he named it. Scope: every loop, plan and brief.
 
@@ -770,7 +789,7 @@ architecture and data were given up. (The occasions of this postulate and the ne
   alone on November 7, a host lane taking about 234 times the card's time a region
   ([the record](research/records/2026-11-11_A_FLOCK_OF_UNLIKE_MEMBERS_JOINS_A_ROUND_ONLY_AT_ITS_OWN_GRAIN_A_PAIRS_TELESCOPING_PART_IS_TAKEN_ONCE_A_SITE_AND_A_GROUP_DETECTS_THROUGH_ITS_CONTACTS.md)).
   A device's rate is stated from a run's own counters (units, wall time, threads, splits), never from a summary row, and two devices
-  are compared on one unit of work run on both: on November 11 a summary row was misread twice, and a host lane was priced at 91
+  are compared on one unit of work run on both (the same section), never across counters that share a name: on November 11 a summary row was misread twice, and a host lane was priced at 91
   times the card across two counts both printed as sites where the section itself gives about 480. Reason for the scope (the
   direction is Brandon's; the wording `agent-inferred`): a sum whose releases are quotients, or sections that stand once, gives the
   same bits on any partition of any device, so placement is a realization, and a rule that keeps a kind of work off a device makes
