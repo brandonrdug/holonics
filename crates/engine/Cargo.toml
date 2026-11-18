@@ -5,13 +5,13 @@ edition.workspace = true
 license.workspace = true
 publish = false
 
-# The engine: the law that trains and its host reference (docs/plans/THE_CONSOLIDATION.md, D1). It depends on nothing in
-# `crates/holonics`; the library imports it (C3 of #603).
+# The engine: the law that trains and its host reference (docs/plans/THE_CONSOLIDATION.md, D1). It depends on no crate of the
+# workspace; the card crate and the commands depend on it (C3 and C6 of #603).
 [lib]
 name = "holonics_engine"
 path = "src/lib.rs"
 
-# The certificate's acceptance read (`face`'s `fewer_bits`), forwarded from the library's feature of the same name.
+# The certificate's acceptance read (`face`'s `fewer_bits`).
 [features]
 certificate-check = []
 

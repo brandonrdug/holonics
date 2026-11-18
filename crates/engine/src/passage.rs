@@ -1,8 +1,21 @@
-//! **The passage's cut and a pass's place**: the problems of a passage of records, the masks a stretch is read with, the store's slices and
-//! pieces, the draws of a stretch's context and run, its one keyed state, and the cut that interleaves the slices by their quotas, the pass's
-//! place carried in the learner's state (`StorePass`). Moved from the store line's harness (`complete_language/field_train.rs` and
-//! `store_train.rs`) by C4 of #603, each item's text as it stood but for its visibility. A slice reads its bytes through [`PieceBytes`]; the
-//! store's file is the harness's source.
+//! **The passage's cut and a pass's place.**
+//!
+//! stretch `d` of a pass draws its context `q = least·2^(o_q) + u_q` and its run `a = least·2^(o_a) + u_a`, each `o` keyed on the pass's
+//! octaves and each `u` within its octave (`mix(seed, d | …)`), and takes the rest of its piece where `rest < q + a + least`; its one
+//! keyed state is a mask (density `τ = u²`, `u` on `2^(−16)`, weighed back by its domain `⌊2√(mK)⌋`), the writer's (the run's first `k`
+//! places resolved, by octaves of their distance from the context) or, at the frontier, every place known but the last (weight `m` over
+//! one); its own state resolves `k = 2^o − 1`, `o = d mod (⌊log₂ a⌋ + 1)`; the cut takes the slice with least `taken_s/quota_s` (the
+//! earlier at a tie), its pieces in order from a cursor
+//!
+//! Kind: chain over a pass's stretches, its place carried in the learner's state (`StorePass`); gate, a site, inside a stretch. Kernels:
+//! none; the cut is drawn on the host before any forward. A slice reads its bytes through [`PieceBytes`], and the store's file is the
+//! commands' source (`athena::store`).
+//! Lean: none yet.
+//! Atlas: `passage.cut-reads-each-stretch-once`, `tower.field-own-states`, `tower.field-states-name-their-receivers`,
+//! `tower.store-frontier-state`, `tower.store-stretch-cut`; with owners in other modules, `tower.field-growth-by-copies`.
+//! Records: `2026-11-12_A_LAPS_CARD_TIME_STANDS…` (§4: the cut, the keyed state), `2026-11-15_THE_STATES_A_FIELD_TRAINS_ON…`,
+//! `2026-11-18_THE_WRITERS_FRONTIER_IS…`, `2026-11-18_THE_CODEC_THE_REGION…` (the first lines this header replaced). The derivations'
+//! history is in the records; the items below keep their reasons.
 
 use crate::codec::{question_text, Codec, RECORD, UNIT};
 use crate::field::{octave_of, Constitution, Realization, Region, StorePass, NEAR};
@@ -212,7 +225,7 @@ impl Piece {
 }
 
 /// [realization; November 14, C4 of #603] **Where a slice's bytes come from**: `out.len()` bytes from `at`. The cut reads its slices
-/// through it, so the passage's law (pieces, places, draws, stretches) holds no file: the store's file is one source ([`SliceFile`]).
+/// through it, so the passage's law (pieces, places, draws, stretches) holds no file: the store's file is one source (`SliceFile` in `athena::store`).
 pub trait PieceBytes {
     fn read_at(&mut self, at: u64, out: &mut [u8]) -> Result<()>;
 }

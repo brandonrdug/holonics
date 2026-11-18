@@ -1,4 +1,7 @@
-//! The card realization's level (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **A level on its news, on the card.** The launches of the host's level (`crates/engine/src/level.rs` and `field/scale.rs`, whose
+//! first lines state the equations, the kind and the Lean and atlas owners); the host cuts the epochs from the news the card reads.
+//! THE_ENGINE §3 lists each kernel beside the phase it serves, and the host is the reference these bits are read against
+//! (`athena parity`).
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;
