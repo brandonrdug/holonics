@@ -5,7 +5,8 @@
 //!
 //! Kind: chain over the sections. Kernels: the realization's (above).
 //! Lean: `Foundation/Standing`.
-//! Atlas: `tower.field-completion-covector`, `tower.field-deposit`, `tower.field-own-states`, `tower.field-step-price`, `tower.store-stretch-cut`.
+//! Atlas: `tower.field-completion-covector`, `tower.field-deposit`, `tower.field-own-states`, `tower.field-step-price`, `tower.store-stretch-cut`,
+//! `tower.store-frontier-state`.
 //! Records: `2026-11-01_THE_PROBLEM_IS_ONE_FIELD…`, `2026-11-15_THE_OWN_STATES…`. The derivations' history is in the records; the items below keep
 //! their reasons.
 
