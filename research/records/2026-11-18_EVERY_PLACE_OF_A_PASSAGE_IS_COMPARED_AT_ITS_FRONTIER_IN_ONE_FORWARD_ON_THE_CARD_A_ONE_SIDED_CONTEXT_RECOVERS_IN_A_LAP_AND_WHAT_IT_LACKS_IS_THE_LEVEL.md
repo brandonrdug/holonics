@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §13 added the same day, to 17:37 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §14 added the same day, to 17:39 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -338,3 +338,33 @@ two places and three.
 The one-sided level (§11) is kept as built: it is the carrier a level's own receipt needs in a one-sided stream (the epoch before
 handed to the places that follow, where a unit predicted ahead is compared with the symbols that arrive), and by the rows above
 it is not expected to move the frontier without that receipt.
+
+## 14. How many rows closing a unit needs
+
+A ruler (`tools/unit_rows_ruler.py`): a count of the two places before a place is kept whole, which is about what the machine binds
+inside a unit, and of the longer contexts (three, four and five places before) only the `N` met most often in the fitted text keep
+their rows, at each length; a place whose longer context holds no row backs off. So a row is a context with the symbols met after
+it, and the reading is how the interior's code falls as rows are added from the most met. Nats a place on the held text at the
+places of least news (under a quarter of a nat under the whole count, 29% to 43% of a slice's places), and over all places:
+
+| rows kept at each of three lengths | books, interior | books, all | web, interior | web, all | code, interior | code, all |
+|---|---|---|---|---|---|---|
+| none (two places before alone) | 1.125 | 2.199 | 1.393 | 2.377 | 1.092 | 2.264 |
+| 1,000 | 0.727 | 1.986 | 0.921 | 2.132 | 0.761 | 2.052 |
+| 4,000 | 0.436 | 1.850 | 0.575 | 1.967 | 0.503 | 1.923 |
+| 16,000 | 0.235 | 1.772 | 0.309 | 1.875 | 0.277 | 1.852 |
+| 64,000 | 0.124 | 1.754 | 0.156 | 1.855 | 0.146 | 1.863 |
+| 256,000 | 0.083 | 1.768 | 0.080 | 1.867 | 0.070 | 1.890 |
+| every context met (0.9 to 1.0 million at five places) | 0.077 | 1.779 | 0.066 | 1.882 | 0.059 | 1.910 |
+
+The two-stream line's third lap codes the books' interior at 0.742 (§12's ruler, by slice), level with a thousand rows a length:
+past two places it holds about what the thousand most met contexts of each length hold. Four thousand rows a length take the
+interior to 0.44, sixteen thousand to 0.24, and past sixty-four thousand the whole code stops falling (the rare contexts' rows
+cost at the places of much news what they buy inside). So closing a register's units to within 0.2 nats of the whole count is a
+matter of about fifty thousand rows, and most of the way is twelve thousand. Against the machine on books that is 0.15 nats of
+all places at four thousand rows a length and 0.25 at sixteen thousand, on a code of 1.85.
+
+A row here is a context's own, the form the stores' law calls a cache, and the count is a ruler. What it sizes is the store the
+composite's remainder needs (§13): of the order of ten thousand to a hundred thousand rows a register reached by a strand in
+progress, before any sharing across residues, against a constitution whose every block together is 392,505 entries. Wikidata's
+interior needs the long tail (0.58 at sixteen thousand rows, 0.21 at sixty-four thousand): its units are names.
