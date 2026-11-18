@@ -496,3 +496,37 @@ within a section and 484 past it, the last symbol 667 and 393).
   ticks holds the epoch before's bag at 163, as much as the fine read at the next leading place (168) and the moment (163), where the
   night's held 75 against 112; and the restriction holds the symbol that leads the next epoch at 95 against a drawn one's 41, the one
   key on which it stands well clear of a draw.
+
+G-V8 (2026-11-18T01:44:31Z). The tension at the level's locus (reading B) on the line's own state, lap 94's mean, the same held rows: the shares of the
+covector's power at the split removed on the held half by the level's present state through a refitted prolongation, by the table of
+the two epochs' symbols on the news phase, and by operands of width 64 located from the two epochs' moments; with the planted law.
+  Read before fixing: on the night's state every share stood at or under zero (-0.0099, -0.0111, -0.0111) and the plant was recovered
+  whole by the table; the night's two-sided ticks had loosened, lap 94's have not, and on lap 94 the level does carry the unit before.
+  The guess: every share under 0.01 on lap 94 too, and the plant recovered at 0.95 or more by the table. The fine comparison gives a
+  level no first-order slope on the line either.
+
+G-V9 (2026-11-18T01:44:31Z). A place opened alone in the middle of a row (24 known places a side) on lap 94's mean, the same rows as G-V6: her own face
+and the faces fitted at the opening and after one, two and three ticks.
+  Read before fixing: on the night's state her face reads 2.921 and the opening's fitted face 1.129 (the two-sided reading loosened);
+  the opening's own comparison is trained at every place on the line (a cavity news of 1.15 nats a place on its own text); on
+  November 13, before the opening was compared, the fitted faces fell from 2.50 to 1.31.
+  The guess: on lap 94's mean her face reads 1.15 to 1.60 nats on these books; the opening's fitted face stands within 0.35 above it;
+  the faces after one, two and three ticks stand between the two, none above the opening's by more than 0.05.
+  What it decides: what the four ticks add for a place whose neighbours are known, now that the opening is compared: little, if the
+  guess holds, and then a written place holds most of its two-sided reading from its opening on.
+
+Scored (2026-11-18T02:02:01Z), G-V8 (level_links.txt, its last block): held. On lap 94's mean the shares of the covector's power removed on the held
+half are, over all places and over the open places alone: the place's own read 0.0009 and 0.0032; the level's present state through a
+refitted prolongation -0.0030 and 0.0024; the table -0.0106 and 0.0006; operands of width 64 located from the moments -0.0083 and
+0.0050; the moments at full rank -0.0138 and 0.0052 (every share under 0.01 guessed). The plant is recovered at 1.000 by the table,
+which then removes 0.0802 of the planted covector's power (0.95 or more guessed). The power stands at the open place (65.9%) and the
+three before it (23.5, 6.3, 1.6%). The fine comparison gives a level no first-order slope on the line either.
+
+Scored (2026-11-18T02:02:01Z), G-V9 (tick_faces.txt, its last block): two parts held, two missed. On lap 94's mean a place opened alone among known
+neighbours codes at 0.920 nats at her face on these books (1.15 to 1.60 guessed: missed low, she reads them better than I guessed).
+The opening's fitted face reads 0.992, within 0.35 above it (held). After one, two and three ticks the fitted faces read 1.036, 1.067
+and 0.960: the second stands 0.075 above the opening's (none above it by more than 0.05 guessed: missed), the third between (held).
+  What it says: with both neighbours known, a linear face of a place's opening codes it at 0.99 nats and her four ticks bring it to
+  0.92. The ticks are worth 0.07 nats a place there. They are worth 0.55 at the boundary (2.03 to 1.48 on the night's state) and 0.28
+  under the line's masks (2.94 to 2.65), where a place's neighbours are not known. A written place among known neighbours holds its
+  two-sided reading from its opening on.
