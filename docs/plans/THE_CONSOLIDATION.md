@@ -1,7 +1,7 @@
 # The consolidation
 
-**Status: November 18.** C1 to C4, C6 and C8 (a to d) are read and merged. C5 keeps the kernels' headers. C7 keeps the headers of
-`codec`, `region`, `passage`, `units` and the card's modules, and the dated reasoning in the comments. C8 keeps the timing read of
+**Status: November 18.** C1 to C4, C6 and C8 (a to d) are read and merged. C5 keeps the kernels' headers. C7 keeps the dated reasoning in the items' comments; every Rust module
+of the two engine crates opens in §5's form since November 18. C8 keeps the timing read of
 `vendor/num-bigint` and `hnn::overture`'s line in #146; its part e (#995) retired 175 items inside the engine and the card crate. C9 was taken on November 18 (its notes under the step). C10 is the PC's, with
 the sizes restated under it. This plan is the order of one campaign: the repository is reduced to the
 machine that runs, the engine gets one owner cut by object, and its laws are stated once.
@@ -538,6 +538,15 @@ holds with the reads' lines.
   stand in it alone, and its records. The items' own dated reasons stay where they stand. Rust comments only; no kernel changed. Owed:
   the kernels' headers with the kernels' cut (C5), and `codec`, `region`, `passage`, `units` and the card's modules, which kept their
   own first lines.
+- The rest of the headers, read November 18: `codec`, `region`, `passage` and `units` open in §5's form, each fact read from the items
+  below it, and nine modules of `crates/engine-cuda/src/hnn` name their object, the host module that states their equations and
+  THE_ENGINE §3, whose table of kernels by card module was read against the code that day and holds. The first lines they held stand
+  word for word in [the record of the move](../../research/records/2026-11-18_THE_CODEC_THE_REGION_THE_PASSAGE_AND_THE_UNITS_OPEN_IN_THE_CONSOLIDATIONS_FORM_AND_THEIR_FIRST_LINES_STAND_HERE_AS_THEY_WERE.md),
+  with five comments that named owners gone from the tree. Rust comments and two manifests' comments only: no kernel and no build
+  script changed, so no digest moved. Gate 1 ran in the cloud container on it (`tools/gate_nocard.sh`, below).
+- Gate 1 with no card, November 18: `bash tools/gate_nocard.sh` runs `tools/gate.sh` in a container against a stand-in for the
+  driver library (the one tie gate 1 has to a card is the link of athena's test binary). It reads no kernel, so it gates a change
+  that leaves every crate's compiled tokens as they were and is a read before the PC's gate 1 for any other.
 
 **C8. The October machine retires** (the PC; several pull requests, leaf first).
 - In order: the card's October modules and kernels, then `crates/holonics-cuda` whole; the examples
