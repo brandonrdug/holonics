@@ -499,6 +499,14 @@ written here with their reasons so that no agent holds them as slogans.
   November 11 a guess of four parts spent two on the rank of a travel whose end the record of the
   day before had printed, and a guess on a premise a log has settled tests the guesser's memory
   ([the record](research/records/2026-11-11_THE_ADDED_CONTACTS_TRAVEL_EACH_ITS_OWN_DIRECTION_SO_NO_FOUNDING_IS_BUILT_THEY_TOOK_THEIR_CHARGE_IN_FOUR_PART_RATE_LAPS_AND_A_GUESSES_PREMISE_IS_READ_FROM_THE_LOGS_FIRST.md)).
+  A change to a running line (its store, its states, a part, a rate, an act) is such a comparison (November 18): it runs beside a
+  control from the same saved state, both are read at their saved means over a count of laps whose gain stands over the scatter
+  between laps, and the change leaves the line when its guess misses. Reason: from lap 71 to lap 78 of the store line five changes
+  entered one live state inside six and a half hours with no control, a lap's own gain stood under the scatter between laps (0.5
+  against 1.2 to 1.4 thousandths of a nat a place from lap 50), each guess on what a change would buy missed or was never opened, and
+  all five were still in the state at lap 94; the control that would have isolated the acts was "not run: it costs a lap", which is
+  this rule's first reason read against its second sentence
+  ([the record](research/records/2026-11-18_COOLING_WAS_MEASURED_ON_NOVEMBER_4_AND_RETIRED_THE_LINES_LEVEL_IS_TRADED_BY_ITS_MIX_AN_OPEN_PLACE_IS_NEVER_A_SOURCE_AND_A_CHANGE_TO_A_LINE_RUNS_BESIDE_A_CONTROL.md) §2, §6).
 - **A build is one attempt** (November 9). A realization is named as an attempt with its receipt,
   never as "the field" or "the law"; "law" names the theory's statements. When a build fails, first
   check whether the built object is the theory's object, then step back and abstract. Reason: from
@@ -688,6 +696,12 @@ written here with their reasons so that no agent holds them as slogans.
   release, reading, guess and design; a reading of the field's own face is its face at the temperature the
   field holds, and a limit read beside it is named a ruler
   ([the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md) §5).
+  A deposit's rate is such a store, and a law that lowers it from the store's own travel or price is its dynamics and is owed: this
+  rule bars a temperature passed by hand to a release or a reading, and it never bars a cooling law or a read of one (November 18).
+  Reason: on November 4 a constant step's floor read 0.032 to 0.053 nats a place and cooling released 0.043 at once; the law was
+  retired that day because its price read empty, the store line then ran at `2^(−12)` for 94 laps with its state a walk at that
+  step's noise, and THE_ENGINE recorded "No cooling" beside this rule as if the rule asked for it
+  ([the record](research/records/2026-11-18_COOLING_WAS_MEASURED_ON_NOVEMBER_4_AND_RETIRED_THE_LINES_LEVEL_IS_TRADED_BY_ITS_MIX_AN_OPEN_PLACE_IS_NEVER_A_SOURCE_AND_A_CHANGE_TO_A_LINE_RUNS_BESIDE_A_CONTROL.md) §4).
 - **A comparison is an agreement at a receiver; nothing a release does is wrong** (Brandon, November 14 02:04Z).
   No reading, guess, record, brief or message calls a release, a face, a write or a draw right, wrong, correct or
   incorrect. A comparison measures agreement with a named passage at a named receiver, and its descent is a deposit
