@@ -498,7 +498,7 @@ among known neighbours, and its level readings were taken on a state whose two-s
   codes at 0.920 nats a place at her face on these books; a face fitted at its opening reads 0.992, and after one, two
   and three ticks 1.036, 1.067 and 0.960. With both neighbours known a place holds its reading from its opening on, and
   the four ticks are worth 0.07 nats. They are worth 0.55 at the boundary (2.03 to 1.48, the night's state) and 0.28
-  under the line's masks (2.94 to 2.65), where a place's neighbours are not known. So the written places a level's moment
-  sums are settled in the two-sided sense well before the split; the sentence §11 first carried about them was wrong the
-  other way round.
+  under the line's masks (2.94 to 2.65), where a place's neighbours are not known. A place opened alone among known
+  neighbours is the nearest reading there is of a written one; by it, the written places a level's moment sums hold their
+  two-sided reading from the opening on, and the sentence §11 first carried about them was wrong the other way round.
 
