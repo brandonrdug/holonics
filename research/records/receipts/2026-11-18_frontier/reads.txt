@@ -502,3 +502,20 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   wikidata 34%), 2 of 20 loop; from its end: short 69 of 150 (46%); long 128 of 258 (49%), 5 of 20 loop. Arm P12 from its lap
   mean: short 84 of 153 (55%); long 128 of 252 (50%: code 52%, web 65%, science 33%, books 60%, wikidata 38%), 4 of 20 loop; from
   its end: short 74 of 153 (48%); long 111 of 261 (42%), 1 of 20 loops. Arm P11 from its end: short 91 of 153 (59%).
+- What rows shared on fixed rings hold of a unit's interior (tools/ring_rows_ruler.py; a context of three to five places as a word
+  in radix 256 read as a residue on three coprime rings, a row a residue shared by every context that reaches it, a symbol's count
+  the least its three rows hold; 8 MB a slice; read 18:24 Z at the latest):
+  RING_ROWS slice=books train_octets=8000000 held_places=100273 base=2 kmax=5 rings=3 shares: under_0.25=0.290 0.25_to_1=0.201 over_1=0.509
+  RING_ROWS slice=books base_2_alone under_0.25=1.1245 0.25_to_1=1.5936 over_1=3.0480 all=2.1985
+  RING_ROWS slice=books rows=4000 periods=1327x1321x1319 under_0.25=1.8902 0.25_to_1=2.3431 over_1=3.5879 all=2.8460
+  RING_ROWS slice=books rows=16000 periods=5323x5309x5303 under_0.25=1.1652 0.25_to_1=1.7227 over_1=3.4683 all=2.4503
+  RING_ROWS slice=books rows=64000 periods=21323x21319x21317 under_0.25=0.5062 0.25_to_1=1.0632 over_1=3.2916 all=2.0369
+  RING_ROWS slice=books rows=256000 periods=85331x85313x85303 under_0.25=0.1739 0.25_to_1=0.7007 over_1=3.2760 all=1.8598
+  RING_ROWS slice=books whole_count under_0.25=0.0774 0.25_to_1=0.5789 over_1=3.2194 all=1.7786
+  RING_ROWS slice=web train_octets=8000000 held_places=122669 base=2 kmax=5 rings=3 shares: under_0.25=0.315 0.25_to_1=0.191 over_1=0.493
+  RING_ROWS slice=web base_2_alone under_0.25=1.3925 0.25_to_1=1.6908 over_1=3.2727 all=2.3770
+  RING_ROWS slice=web rows=4000 periods=1327x1321x1319 under_0.25=2.1705 0.25_to_1=2.5482 over_1=3.8443 all=3.0684
+  RING_ROWS slice=web rows=16000 periods=5323x5309x5303 under_0.25=1.3992 0.25_to_1=1.9523 over_1=3.7762 all=2.6776
+  RING_ROWS slice=web rows=64000 periods=21323x21319x21317 under_0.25=0.6347 0.25_to_1=1.2355 over_1=3.6518 all=2.2380
+  RING_ROWS slice=web rows=256000 periods=85331x85313x85303 under_0.25=0.2015 0.25_to_1=0.7627 over_1=3.6367 all=2.0034
+  RING_ROWS slice=web whole_count under_0.25=0.0656 0.25_to_1=0.5774 over_1=3.5486 all=1.8816

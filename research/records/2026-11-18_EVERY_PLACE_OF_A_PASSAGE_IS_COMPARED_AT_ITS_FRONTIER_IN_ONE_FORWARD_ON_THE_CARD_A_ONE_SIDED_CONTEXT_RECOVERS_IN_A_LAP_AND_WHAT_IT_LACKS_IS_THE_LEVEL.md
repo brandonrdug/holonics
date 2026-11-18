@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §14 added the same day, to 17:39 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §14 added the same day, to 18:24 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -368,3 +368,22 @@ A row here is a context's own, the form the stores' law calls a cache, and the c
 composite's remainder needs (§13): of the order of ten thousand to a hundred thousand rows a register reached by a strand in
 progress, before any sharing across residues, against a constitution whose every block together is 392,505 entries. Wikidata's
 interior needs the long tail (0.58 at sixteen thousand rows, 0.21 at sixty-four thousand): its units are names.
+
+**Rows shared on fixed rings** (`tools/ring_rows_ruler.py`). The same reading with the form the repository holds for a store: a
+context of three to five places is a word in radix 256, read as a residue on three coprime rings, each ring holding a row a
+residue that every context at the residue shares; a symbol's count is the least its three rows hold. The address here is a fixed
+residue of the octets, a ruler's scramble. Books' interior, at equal rows a length:
+
+| rows a length | the most met contexts, a row each | rows shared on three fixed rings |
+|---|---|---|
+| 4,000 | 0.436 | 1.890 |
+| 16,000 | 0.235 | 1.165 |
+| 64,000 | 0.124 | 0.506 |
+| 256,000 | 0.083 | 0.174 |
+
+With two places before alone the interior reads 1.125, so under sixteen thousand rows a length the shared rows cost more than
+they give, and they need about sixteen times the rows of the most met contexts to read the same (web the same). Sharing by a
+scramble buys nothing: a row shared by contexts that continue differently holds none of them. So the store's rows are few only
+where the address is located, contexts that continue alike standing at one residue (which is the retained quotient: differences no
+admitted future tells apart are merged), or where the deposit itself keeps rows for the contexts that carry the flux. Which of the
+two the machine's law gives is the design's first question.
