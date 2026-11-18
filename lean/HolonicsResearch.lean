@@ -1257,3 +1257,13 @@ import HolonicsResearch.HNN.EffectiveTension
 import HolonicsResearch.HNN.ReadsTwice
 import HolonicsResearch.HNN.SynchronousTwoCycle
 import HolonicsResearch.HNN.FoundingAtZero
+import HolonicsResearch.Foundation.SharedModes
+import HolonicsResearch.Physics.TwoWayField
+import HolonicsResearch.Physics.ContextCycle
+import HolonicsResearch.Mathematics.Chord
+import HolonicsResearch.Geometry.SolenoidChart
+import HolonicsResearch.Geometry.RingClosure
+import HolonicsResearch.Compression.CipherCode
+import HolonicsResearch.Compression.FaithfulModes
+import HolonicsResearch.Foundation.FiniteKey
+import HolonicsResearch.Foundation.HankelKey

@@ -168,6 +168,11 @@ this lesson refuses.
 
 ## 4. Corrections to the current state
 
+**Read as dated (November 18).** The list under "Retire from the native text path" is the code
+audit of September 29 on that day's builds: each piece with the fault read in it then. It names no
+piece that may not be taken up again where the fault is answered
+([CLAUDE.md, a past configuration is an instruction](../../CLAUDE.md#past-configurations)).
+
 - **Credit.** The measured text compression (`3 + 1/16 + ε` bits a cell held out on the standing cut)
   is the landmark tree's, a count register of the contexts met; the field's own share is between
   `−17` and `−13` bits of about 5,460 held-out bits. CONSTRUCTION_STATE says so.

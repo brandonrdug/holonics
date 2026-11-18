@@ -29,7 +29,9 @@ and Astra) executes bounded work from Claude's written orders, and reviews.
 - Where an order is silent, Codex stops at that point and writes the question to the mailbox. It
   does not extend the plan, change a law, an acceptance or a fixed guess, add a run switch, or
   choose between laws by running them. Reason: the method rules of CLAUDE.md, and a plan extended
-  by its executor is a second plan.
+  by its executor is a second plan. What the last clause bars is a choice made by a short reading
+  with no guess fixed before it; a comparison an order names, with its guess fixed first, tests a
+  stated prediction and is carried out as written (CLAUDE.md, Method, "Theory picks").
 - A review or letter from Codex is for thinking together: predictions, hypotheses,
   counterexamples. It is never a gate, and nothing waits on it (November 8).
 - An author merges its own pull request when the gates of its change pass (the trunk contract in

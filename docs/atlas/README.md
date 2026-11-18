@@ -43,7 +43,7 @@ ratios `R=Ĝ_(T←H)`. Plain ASCII such as `->`, `<=` and `sum_k` is allowed whe
 | 3 | `expr` | The expression in full: an equation, identity, inequality, map, or construction. No floats; integers keep their factorization. |
 | 4 | `reads` | What it says, in one clause, in current vocabulary. |
 | 5 | `scope` | The hypotheses and domain, tersely (`finite complex`, `PSD M`, `σ∈(0,1)`, `n≥1`). Empty only if none. |
-| 6 | `owner` | Where it lives. Several owners are separated by `; `. Lean: `L:<Dir>/<File>:<decl>`, with the path relative to the library root (`lean/Holonics/` or `lean/HolonicsResearch/`) and no namespace, so moving a module between the libraries does not break it. Rust: `R:<crate>::<path>::<item>`. Guide: `D:<file>#<anchor>`. Record: `N:<record filename>`. Paper: `P:<path under research/papers/source/>`. History: `H:<path>` at `13f8c734`, or `H:<path>@<commit>` for an owner retired later (the last commit that held it). |
+| 6 | `owner` | Where it lives. Several owners are separated by `; `. Lean: `L:<Dir>/<File>:<decl>`, with the path relative to the library root (`lean/Holonics/` or `lean/HolonicsResearch/`) and no namespace, so moving a module between the libraries does not break it. Rust: `R:<crate>::<path>::<item>`, the crate as Rust writes it (`holonics_engine`, `holonics_engine_cuda`, `athena`), or `R:<path>:<item>` for a Rust file no crate builds (the notebook's harnesses). A host tool or a test: `T:<path>` or `T:<path>:<name>`. A kernel source: `K:<path>` or `K:<path>::<kernel>`. Guide: `D:<file>#<anchor>`. Record: `N:<record filename>`, with its `.md`. Paper: `P:<path under research/papers/source/>`. History: `H:<path>` at `13f8c734`, or `H:<path>@<commit>` (with the item where it helps, `H:<path>:<item>@<commit>`) for an owner retired later (the last commit that held it): `d5ed4adc1` holds the October library `crates/holonics`, `d6bbd1644` its card crate `crates/holonics-cuda`, and `8a77b7755` the library's examples. A note may follow an owner after a space. |
 | 7 | `grade` | One of `definition`, `proved-derived`, `proved-standard`, `formal-checked`, `counterexample`, `interpretation`, `open`. |
 | 8 | `rel` | Related ids, as `kind:id`, comma-separated, read from this row to the target. Kinds: `uses` (this row consumes the target), `instance-of` (this row is a case of the target's construction), `specializes` / `generalizes` (this row's law is a special case of the target's / contains it as a case), `equiv` (the same law in another chart or shard), `face-of` (a reading of the target), `dual-of`, `obstructs` (a counterexample or barrier to the target). No other kind is used. |
 
@@ -54,4 +54,11 @@ law has one row where the rows are literally the same statement; two charts of o
 rows and join them with `equiv`, and a case of a general row names it with `specializes`. When two
 rows merge, the surviving id keeps the union of owners and relations, and every `rel` to the
 retired id is repointed. A module moving between `Holonics` and `HolonicsResearch` rewrites no
-`L:` rows, because the paths are relative to the library root. A retired Rust owner becomes `H:`.
+`L:` rows, because the paths are relative to the library root. A retired Rust owner, test or kernel
+becomes `H:` with its commit, and an owner that stands in the tree is never written as `H:`.
+
+`python3 tools/link_check.py atlas` reads every owner against the tree: an `R:`, `T:` or `K:` owner
+resolves to a tracked file and a name declared in it, an `L:`, `D:`, `N:` or `P:` owner to its file
+(with its declaration's name or its anchor), and an `H:` owner with no commit names no path of the
+tree. It prints one line an owner that does not resolve. Run it after a change that moves or retires
+an owner.

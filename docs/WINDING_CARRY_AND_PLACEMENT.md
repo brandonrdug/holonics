@@ -12,7 +12,8 @@ the source recovery behind this synthesis, and [THE_REBUILD](plans/THE_REBUILD.m
 **navigator** is the object with an initial configuration, its own clock and carry, and address
 words ([elementary objects §3](ELEMENTARY_OBJECTS.md#3-navigator)); **generator** here keeps its
 algebraic senses (a group generator, the Lie generator of a helix). The navigator's owners carry
-its name (`Transport/NavigatorTraceFaces`, `holonics::navigator`).
+its name (`Transport/NavigatorTraceFaces`; in Rust `holonics_engine::navigator`, and the October library's
+`holonics::navigator`, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/navigator/mod.rs)).
 
 [project-postulate] These objects are one picture. A design or a worker brief states which of
 them it touches and keeps the others attached: phase with its carry, a pair with its address,
@@ -110,7 +111,7 @@ The modular step/inversion representation and a finite rotor step/reflector each
 ordered group actions; identifying them requires a homomorphism respecting their relations.
 An arbitrary reflector is not a modular inversion merely because both are involutive. The
 Farey determinant also gives the tangency law of Ford circles (`a/b`, `c/d` tangent iff
-`|ad−bc|=1`), read by `Foundation/FractalPacking` as packing by mediants. Rust owner: `holonics::navigator::address::LockAddress`.
+`|ad−bc|=1`), read by `Foundation/FractalPacking` as packing by mediants. Rust owner, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/navigator/address.rs): `holonics::navigator::address::LockAddress`.
 
 [interpretation] Mode-locking staircases provide an analytic instance for specified driven
 circle-map families ([Alsedà–Borrós-Cullell](https://arxiv.org/abs/2012.03340)); transferring that
@@ -140,13 +141,13 @@ machine_trace_sequence                               tr((⊕M_g)ᵏ) = Σ tr(M_g
 ℝ to a rotation scaled by `√q` in an adapted metric; `TraceSequence.theRootHasSquaredModulusQ`
 and `LocalFactor.companion_preserves_scaled_metric` own these readings. `a²=4q` permits a
 nontrivial Jordan shear; `a²>4q` gives distinct real eigenvalues, including negative or zero
-ones when admitted. `holonics::navigator::trace::SiteKind` names these branches (the sign of `q` first: `Reflection`,
+ones when admitted. `holonics::navigator::trace::SiteKind` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/navigator/trace.rs)) named these branches (the sign of `q` first: `Reflection`,
 `Degenerate`; then `Rotation`, `Null`, `Boost` by the discriminant), not a universal Euclidean polar decomposition. A `SituatedScrew` does not determine
 a `SiteFactor`: the model must supply the represented two-dimensional material block. Larger
 or coupled blocks retain their own operator and faces.
 
 [proved-derived; formal-checked] For **block-diagonal** sites, the transfer determinant is the
-product of their factors and the trace sequence is the sum of theirs. Rust owner:
+product of their factors and the trace sequence is the sum of theirs. Rust owner, retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/navigator/trace.rs):
 `holonics::navigator::trace::{SiteFactor,Machine}`. Trace powers count weighted closed walks
 when the material is an adjacency representation; for a general matrix they are trace readings.
 Newton's identities check spectral consistency. They do not prove source/receiver equivalence:
@@ -192,7 +193,7 @@ is why a matrix is the natural unit of a face. For proper rigid edge transports 
 those need not be rigid screws. `burgers_step` returns the translation only when the linear
 part is identity. For a rotating affine holonomy `(R,t)`, closure of a based point is
 `(R−I)x+t=0`; closure of the whole frame is `R=I, t=0`. Translation alone is not the test.
-The `followed_by` convention of `holonics::geometry` applies maps left to right, whereas standard column
+The `followed_by` convention of `holonics::geometry` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/mod.rs)) applies maps left to right, whereas standard column
 matrices/permutations multiply right to left. Its formal realization uses the opposite group
 or reverses the represented word; a noncommuting triangle checks the convention.
 Faraday induction additionally supplies the constitutive/time law and orientation
@@ -335,8 +336,12 @@ winding `w`, and compatible transverse residues `z_i`. The circle face is
 also keeps the longitudinal lift `w+s`. Equal finite faces do not erase different windings.
 A supplied finer continuation must restrict to the retained section; it is not guessed.
 Negative motion uses Euclidean floor rather than truncation. The finite chart contains no
-occurrence archive. Its Rust controls check these equations and genuine incompatible inputs;
-a Lean proof of this joined operator remains owed in #62.
+occurrence archive. Its Rust controls check these equations and genuine incompatible inputs.
+Lean `Geometry/SolenoidChart` (November 18) proves the joined operator: `lift_advance` (the lift
+`w+s` advances by `a`), `advance_advance` (an action of the rationals), `charge_advance` (`z-w` is
+kept), `restrict_advance` and `restrict_add` (restriction commutes with advance and addition),
+`Compatible.advance`, `face_returns_iff` (the face `(s,z)` returns exactly when `a` is a whole
+multiple of `N`, with `w` advanced by it) and `same_face_different_winding`.
 
 [proved-standard] The additive universal solenoid uses all positive moduli indexed by
 **divisibility**: for `m|n`, `[x]_(nZ)` maps to `[x]_(mZ)`. In unit-circle coordinates this is
@@ -349,7 +354,9 @@ chart with a retained longitudinal lift, not an implementation of the completed 
 
 [proved-derived] The natural translation flow on that full additive solenoid has no nonzero
 return period: return at time `t` means `t in nZ` for every positive integer `n`; the level
-`n=1` makes `t` integral, and choosing `n>|t|` forces `t=0`. Thus `log(p)` is not a primitive
+`n=1` makes `t` integral, and choosing `n>|t|` forces `t=0` (Lean `Geometry/SolenoidChart`:
+`no_return_of_unbounded` and `flow_eq_self_iff`, over the reals for any unbounded set of moduli,
+a prime-power chain included; atlas `solenoid.no-return-period`). Thus `log(p)` is not a primitive
 closed-orbit period of this particular flow. Prime-power terms in an explicit formula require
 a different specified carrier/action, archimedean and pole terms, and convergence conditions.
 The noncommutative adele-class trace constructions are substantial existing mathematics;
@@ -388,9 +395,17 @@ accepts no assertion that these coordinates are zeros of a function. Existing Le
 The equal-angular reflection and the analytic `rho -> 1-rho` pairing need their conjugation
 symmetry map before they are identified.
 
-[conditional] Simultaneous primitive ring ticks close at their LCM; product is valid under
-pairwise coprimality. For `[7,11,33]` the LCM is `231`, whereas the product is `2541`;
-`11` divides `33`, so these periods are not pairwise coprime. An HNN's carried clock cascade
+[formal-checked] Simultaneous primitive ring ticks close at their LCM, and the product is the
+closing length exactly when the positive periods are pairwise coprime (Lean
+`Geometry/RingClosure`: `nsmul_diag_eq_zero_iff`, `closing_eq_prod_iff`,
+`zmultiples_diag_eq_top_iff`; atlas `lock.rings-close-at-lcm`). For `[7,11,33]` the LCM is
+`231`, whereas the product is `2541`; `11` divides `33`, so these periods are not pairwise
+coprime. The same three rings chained by carries return only at the product
+(`digits_eq_iff`, `cascade_231_2541`): the two numbers belong to the two tick laws, and the
+residue word and the digit word separate the same counts exactly when the periods are pairwise
+coprime (`same_reading_iff`).
+
+[conditional] An HNN's carried clock cascade
 must be read through its actual tick/carry law rather than ticking every ring once per cell.
 A mounted pump does not by itself certify attraction, stable lock or invariance across cuts:
 consume its executed monodromy/Floquet bound and nonlinear lock domain. Linear pump
@@ -524,7 +539,8 @@ is neutral, and a mathematical refusal restages receiving only. Physical-factor
 displacements still refuse; an executor fault remains a fault. The probe is transient inside
 the transaction. Direct normal close still needs its once-linear receiving witness.
 
-The exterior `solenoidal_alpha` consumer uses the existing ArrivalContext per-cell finite
+The exterior `solenoidal_alpha` consumer (the October harness, retired with the examples at
+[`8a77b7755`](https://github.com/brandonrdug/holonics/tree/8a77b7755/crates/holonics/examples/solenoidal_alpha)) used the existing ArrivalContext per-cell finite
 comparison law for all cells, preserving ordinary continuation at arbitrary source cuts. It
 reports that law's actual strict/neutral receipts and halving count separately from the new
 grouped probe. Its unplaced closing-crib codec joins the complete native ContinuingState for
