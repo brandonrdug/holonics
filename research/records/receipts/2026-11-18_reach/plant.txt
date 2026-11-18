@@ -1,0 +1,17 @@
+The reach read's null held to two planted items (November 18, 23:28 UTC; main 874f4714 + 98e510b80 + 6e21ba6a9).
+
+merged_reach.py REPO plant, then appended to plant/src/holonics_engine/units.rs (never in the tree):
+
+  pub(crate) fn planted_unreached() -> u32 { 7 }
+  pub(crate) fn planted_test_only() -> u32 { 9 }
+  #[cfg(test)]
+  mod planted_reach { #[test] fn planted() { assert_eq!(super::planted_test_only(), 9); } }
+
+cargo check --offline --all-features --message-format=json           dead_code items 145 (the read's 143 and both planted)
+  units.rs:510 function `planted_unreached` is never used
+  units.rs:511 function `planted_test_only` is never used
+cargo check --offline --all-features --tests --message-format=json   dead_code items 58 (the read's 57 and planted_unreached)
+  units.rs:510 function `planted_unreached` is never used
+
+So the item nothing calls is read in both checks, and the item a test calls is read in the first alone: the two classes of the
+record are recovered on a planted instance of each, on the same layout in the same run.
