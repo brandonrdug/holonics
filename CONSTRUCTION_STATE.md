@@ -41,17 +41,21 @@ contexts of each length hold. Twelve thousand rows a register take the interior 
 - The two-stream line (every place of a frontier stretch compared in one forward, six stretches of eight; main since #986): three
   laps of 13 minutes fell 0.103, 0.054 and 0.028 at the frontier and stand 0.038 above the plain line's seventh lap, without the
   level. A fourth lap is training.
-- The strand's odd contacts facing the past (`Region::past`, main since #986): the first lap beside the control from the same
-  state reads 0.013 lower at the frontier, 0.027 lower at the places of least news, and 0.073 higher on the one-place reading
-  under the law. Its second lap decides by the rule fixed with G-1118-15.
+- The strand's odd contacts facing the past (`Region::past`, main since #986): two laps beside the control from the same state
+  read 0.013 and then 0.031 lower at the frontier (1.796, under the plain line's 1.804), 0.055 lower at the places of least news,
+  and 0.070 higher on the one-place reading under the law. By G-1118-15's rule the line takes the word; its pass over the store's
+  prefix ended and its next pass is training.
 - The level as a strand hears it (`Constitution::scale_forward_before`; the epoch before, through a block founded at zero): on the
-  host, tested; its card realization is written and its parity fails on its own field. By §13 it is the carrier a level's own
-  receipt needs and is not expected to move the frontier without one.
+  host and on the card, bit for bit (30 cases). By §13 it is the carrier a level's own receipt needs and is not expected to move
+  the frontier without one; its arm beside the line is G-1118-16.
 
-**What is owed, in order.** The composite's remainder at the place level (§13): rows a strand in progress reaches by an address
-its symbols compose in order, deposited by the covector that reaches them and kept by upkeep, sized by §14; its law is to be
-derived from the symbol's record of November 12 (§8) and the located transport of October 5 before any part. Then the level's own
-receipt, which gives the level units to hold. The one-sided level's card parity. A writer that keeps the known stream's states.
+**What is owed, in order.** Closing a unit at the place level (§13, §14). First a reading: how many places' identities a strand's
+state carries at the frontier on the store line, by distance and by tick (two to three on the fifty books' state). Then the
+strand's own carriers sized by it (the carry circles' scan, mates at more places before: the half of them `past` put to work is
+the one part that moved the interior). Then the composite's remainder: rows a strand in progress reaches by a located address
+(a scramble's rows need sixteen times as many), deposited by the covector that reaches them and kept by upkeep, its law derived
+from the symbol's record of November 12 (§8) and the located transport of October 5. Then the level's own receipt, which gives
+the level units to hold. A writer that keeps the known stream's states.
 
 ## Where the work stood on November 18 at 15:58 UTC: every place of a stretch is compared at its frontier, on the card
 

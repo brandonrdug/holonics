@@ -387,3 +387,14 @@ scramble buys nothing: a row shared by contexts that continue differently holds 
 where the address is located, contexts that continue alike standing at one residue (which is the retained quotient: differences no
 admitted future tells apart are merged), or where the deposit itself keeps rows for the contexts that carry the flux. Which of the
 two the machine's law gives is the design's first question.
+
+**Carrying comes before rows.** A row a strand reaches by an address can bind only what the strand's state carries, and on the
+fifty books' state a symbol's identity was present in the reader's state at 446 thousandths within a nat of passage, 242 at two to
+four nats and 38 at four to eight (atlas `deposition.excess-inside-units`): two to three places, which is where the frontier's
+binding stands (§12). What carries a strand's places in order along a one-sided stream is its own contacts: the mates (the place
+before, and with the word `past` the second before) and the carry circles, a gated scan from the left of which the store line
+holds 32, half of them at rest in a one-sided stream until `past`. Putting that half to work moved the interior and nothing else
+(§9, §12: 0.055 a place at the places of least news in two laps). So the first reading of the next loop is the same presence on
+the store line's two-stream states, by distance in places and by tick, with and without the word; and the first candidates are
+the strand's own carriers (circles and mates at more places before, sized by that reading), ahead of any store of rows. A growth
+in circles on a tower that already holds circles is not built (`Constitution::with_carry` refuses both).
