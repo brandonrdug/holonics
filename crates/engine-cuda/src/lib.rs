@@ -8,7 +8,6 @@ pub mod ffi;
 pub mod hnn;
 
 pub use cuda::{
-    BorrowedContext, Context, CudaError, Device, DeviceAttribute, DeviceBuffer, Dim3, Event,
-    Function, Graph, GraphCensus, GraphExec, LinearLaunch, MemoryInfo, Module, PinnedHost, Result,
-    Stream,
+    Context, CudaError, Device, DeviceAttribute, DeviceBuffer, Dim3, Function, MemoryInfo, Module,
+    Result, Stream,
 };

@@ -324,28 +324,6 @@ impl Constitution {
         &self.fine
     }
 
-    /// [measurement] The rates of a region's paced heads (§16): their least and greatest `κ` on `2^(−24)`, a reading
-    /// for the receipts (`None` where the field reads no pace).
-    pub fn pace_range(&self, region: &Region) -> Result<Option<(i64, i64)>> {
-        self.admit_region(region)?;
-        let paces = self.paces(region)?;
-        let all = paces.kappa.iter().flatten().copied();
-        Ok(all.clone().min().zip(all.max()))
-    }
-
-    /// [measurement] Each paced head's rates `κ` over a region on `2^(−24)` (§16), a reading for the receipts.
-    pub fn pace_rates(&self, region: &Region) -> Result<Vec<(usize, Vec<i64>)>> {
-        self.admit_region(region)?;
-        let paces = self.paces(region)?;
-        Ok((0..self.declaration.heads).filter_map(|h| paces.row[h].map(|p| (h, paces.kappa[p].clone()))).collect())
-    }
-
-    /// The turn's face `e^(2πi ρ/n)` on `2^(−30)` at a clock `ρ` on `2^(−24)` ([`turn_phasor`]), for a reading's or a
-    /// fixture's hand-set charts.
-    pub fn turn_face(&self, rho: i128, n: usize) -> (i64, i64) {
-        turn_phasor(rho, n, self.pi)
-    }
-
     /// The half turn on `2^(−46)`, the turn's faces' navigator (§16; the card reads it).
     pub fn half_turn(&self) -> i128 {
         self.pi

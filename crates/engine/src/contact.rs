@@ -59,10 +59,8 @@ pub(crate) struct TickCell {
     pub(crate) jg: Vec<i64>,
     pub(crate) jd: Vec<i64>,
     /// [measurement; theory, November 13, the junction record §13.8] The state after the tick (`x^(k+1)`, `[t][D]`), kept where the pass keeps
-    /// its ticks, for the reader's reaction's reading ([`Constitution::reaction_covectors`]).
+    /// its ticks, for the readings of what a tick left ([`Constitution::mirror_route`], [`Constitution::tick_news`]).
     pub(crate) after: Vec<i64>,
-    /// [measurement; G162] The state the tick hands on (after the mirror's stage where it is read), kept where the pass keeps its ticks.
-    pub(crate) handed: Vec<i64>,
     /// [measurement; theory, November 15 20:38Z] The state the tick began from (`x^k`, `[t][D]`), kept where the pass keeps its ticks, for the
     /// reading of what each site's tick moves ([`Constitution::tick_news`]).
     pub(crate) before: Vec<i64>,
@@ -414,19 +412,6 @@ pub struct Crowd {
     pub e: u64,
     /// Its lock at unit gain on `2^(−16)` (before the temperature, §15.10).
     pub s: i64,
-}
-
-/// [measurement] Rows read by where their mass lies ([`Constitution::row_shares`]): `[0]` the open receivers,
-/// `[1]` the definite ones.
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
-pub struct RowShares {
-    pub rows: [u64; 2],
-    pub far_sources: [u64; 2],
-    pub near: [u128; 2],
-    pub far: [u128; 2],
-    pub crowd: [u128; 2],
-    /// Each row's largest share summed (its peak), on `2^(−63)`.
-    pub peak: [u128; 2],
 }
 
 /// A met source of a receiver's row: its place and its share of the row on `2^(−63)`.
@@ -1091,9 +1076,6 @@ impl Constitution {
                 for (xv, st) in x.iter_mut().zip(&step) {
                     *xv = fit64(i128::from(*xv) - st)?;
                 }
-            }
-            if keep {
-                cell.handed = x.clone();
             }
             cell.clock = own;
             if blanks && k + 1 < d.ticks {
