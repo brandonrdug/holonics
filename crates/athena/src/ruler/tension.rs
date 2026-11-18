@@ -681,8 +681,10 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// table: `label<TAB>known text<TAB>next symbol`) is read whole as a passage by two streams, every place known
 /// ([`holonics_engine::field::Constitution::strand_reads`]), with the word `past` its odd contacts facing the past. `OUT/rows.tsv` takes a
 /// line a place (`row`, `group`, `place`, `class`); `OUT/known.i32` each known site's read after the last tick and `OUT/open_K.i32`
-/// each open place's read after tick `K` (little-endian, `D` words a place, in the lines' order); `OUT/dims.tsv` names `D` and the
-/// ticks. On the host's threads; the state is read, never written. The directory is private: its rows are the passage's places.
+/// each open place's read after tick `K` (little-endian, `D` words a place, in the lines' order); `OUT/gates_K.i64` each known site's
+/// gate on every carry circle at tick `K` (`2C` words a place, real parts then imaginary, on `2^(−30)`;
+/// [`holonics_engine::field::Constitution::strand_gates`]); `OUT/dims.tsv` names `D`, the ticks and the carry circles. On the host's
+/// threads; the state is read, never written. The directory is private: its rows are the passage's places.
 pub fn read_strand_states(args: &[String]) -> Result<()> {
     let past = args.len() == 13 && args[12] == "past";
     if args.len() != 12 && !past {
@@ -716,6 +718,7 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
     }
     let field = &learner.field;
     let reads: Vec<(Vec<i32>, Vec<Vec<i32>>)> = rows.par_iter().map(|(_, classes)| field.strand_reads(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+    let gates: Vec<Vec<Vec<i64>>> = rows.par_iter().map(|(_, classes)| field.strand_gates(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
     std::fs::create_dir_all(out)?;
     let ticks = field.declaration.ticks;
     let mut lines = String::new();
@@ -735,7 +738,11 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
     for (tick, bytes) in open.iter().enumerate() {
         write_new(&out.join(format!("open_{tick}.i32")), bytes)?;
     }
-    write_new(&out.join("dims.tsv"), format!("read\t{}\nticks\t{ticks}\n", field.declaration.width).as_bytes())?;
+    for tick in 0..ticks {
+        let bytes: Vec<u8> = gates.iter().flat_map(|g| g[tick].iter().flat_map(|v| v.to_le_bytes())).collect();
+        write_new(&out.join(format!("gates_{tick}.i64")), &bytes)?;
+    }
+    write_new(&out.join("dims.tsv"), format!("read\t{}\nticks\t{ticks}\ncircles\t{}\n", field.declaration.width, field.declaration.carry).as_bytes())?;
     println!("STRAND_STATES rows={} places={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), started.elapsed().as_millis());
     Ok(())
 }
