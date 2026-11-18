@@ -1,6 +1,6 @@
 # No command grows a part, moves a rate, settles a release or reads a coupling: 97 engine items only tests call and 46 nothing calls
 
-November 18, 2026, 23:30 UTC. Refs #603 (D6's test: every operator has a caller in the live learner and an acceptance that vanishes
+November 18, 2026, 23:27 UTC. Refs #603 (D6's test: every operator has a caller in the live learner and an acceptance that vanishes
 when it is removed). This record is a census, not a derivation and not a retirement. It reads which items of `crates/engine` and
 `crates/engine-cuda` no command of `athena` reaches after #995, sorts them by what they are, and hands the laws among them to the line
 as candidates to wire. A past configuration is an instruction (CLAUDE.md): nothing here says an item should go, and the laws below
