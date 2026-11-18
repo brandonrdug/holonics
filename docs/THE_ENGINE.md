@@ -21,8 +21,9 @@ deposits it. The state it carries is its constitution, the deposit's two moments
 over its store ([§5](#5-the-learners-state)).
 
 Every value is a word at a declared grain. Faces, charts and currents stand on `2^(−16)`, material on `2^(−24)`, frames and skins on
-`2^(−30)`, a series row's exponential faces on `2^(−62)` with its shares on `2^(−63)`, covectors on `2^(−24)` and
-the contact's on `2^(−40)` ([`width.rs`](../crates/engine/src/width.rs)). Every product's remainder below its grain
+`2^(−30)`, a series row's exponential faces on `2^(−62)` with its shares on `2^(−63)`, covectors on `2^(−24)`,
+the contact's on `2^(−40)` and the deposit's on `2^(−32)`, and a code's reading on `2^(−20)` bits
+([`width.rs`](../crates/engine/src/width.rs)). Every product's remainder below its grain
 is released to the nearest numerator before the product enters a sum, and every sum keeps its terms, so the host
 and any partition of the card give the same bits (CLAUDE.md, the precision law). The chains (the carry circles' scan,
 the ticks) release at every step and run in their declared order, which is the law's
@@ -61,32 +62,37 @@ is a function of one site alone (a lock's exponent, a carry's `γ` and `κ`), re
 ## 3. The pipeline
 
 The phases in the order a section runs them. The equations are `field.rs`'s first lines, which state the whole
-forward; each module's own first lines carry its derivation. Kernels are named as `kernels/field.cu` names them.
-The card module is under [`crates/engine-cuda/src/hnn/`](../crates/engine-cuda/src/hnn/mod.rs).
+forward; each module's own first lines carry its derivation. Kernels are named as the kernel sources name them. Every
+kernel stands in `kernels/field.cu` but the cavity's six, which stand in `kernels/field_cavity.cuh`;
+`kernels/field_moment.cuh` holds the moment kernels' helpers; `field.cu` includes both headers, and the build compiles
+one image. The card module named before a kernel is the file under
+[`crates/engine-cuda/src/hnn/`](../crates/engine-cuda/src/hnn/mod.rs) that launches it, and a trailing `*` stands for
+every kernel of that stem.
 
 | Phase | Object and equation | Host module | Card module and kernels | Kind |
 |---|---|---|---|---|
 | cut | a stretch of the store's passage and its one state: a keyed draw (`state_of`), the release's own state at a crossing of its octaves (`own_state_of`, the pass's word `own`), or the frontier's (`frontier_state_of`, the pass's words `frontier E`: the context known and the next place alone open, the region ending there; atlas `tower.store-frontier-state`) | [`passage.rs`](../crates/engine/src/passage.rs), [`region.rs`](../crates/engine/src/region.rs), [`codec.rs`](../crates/engine/src/codec.rs) | host only | |
-| rings | turned ring sets on the solenoid's periods, `U_(t,m) = e^(2πi (t mod n_m)/n_m)`; still sets `U = 1`; paces and blank clocks | [`navigator.rs`](../crates/engine/src/navigator.rs) | `clock.rs`: `field_paces`, `field_skin_addresses`, `field_pframes`, `field_clock_fill`, `field_blank_*` | gate, a site |
-| moment | `s_t = Σ_k ζ^(k−t) D(\|t−k\|) E±(u_k)` at a turned mode: the source enters as phase-carried moments | [`moment.rs`](../crates/engine/src/moment.rs), [`field/moment.rs`](../crates/engine/src/field/moment.rs) | `moment.rs`: `field_moment*`, `field_cavity_*`; `kernels/field_moment.cuh`, `kernels/field_cavity.cuh` | sum over a site's strand |
-| open | `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b_s`; an open site opens on its moment, a marked site with its mark on the second read | [`moment.rs`](../crates/engine/src/moment.rs) | `resident.rs`: `field_open`, `field_echo_apply` | gate, a site |
-| chart | `r̂_t = x_t/‖x_t‖_rms`, `k_t = W_k r̂_t + b_k`, `p_t = W_p r̂_t + b_p`, `v_t = V r̂_t + b_v`; framed `k̃ = U ⊙ k` | [`contact.rs`](../crates/engine/src/contact.rs), [`navigator.rs`](../crates/engine/src/navigator.rs) | `contact.rs`: `field_chart`, `field_affine_two_*`, `field_unit*`, `field_frame*` | gate, a site |
+| rings | turned ring sets on the solenoid's periods, `U_(t,m) = e^(2πi (t mod n_m)/n_m)`; still sets `U = 1`; paces and blank clocks | [`navigator.rs`](../crates/engine/src/navigator.rs) | `resident.rs` (a batch's base): `field_paces`, `field_twin_clocks` (the open places of a second stream), `field_skin_addresses`, `field_pframes`; `clock.rs`: `field_clock_fill`, `field_skin_fill`, `field_blank_rates` | gate, a site |
+| moment | `s_t = Σ_k ζ^(k−t) D(\|t−k\|) E±(u_k)` at a turned mode: the source enters as phase-carried moments | [`moment.rs`](../crates/engine/src/moment.rs), [`field/moment.rs`](../crates/engine/src/field/moment.rs) | `moment.rs`: `field_moment_strands_all`, `field_moment_admit_paced_all`, `field_moment_prefix_paced_all`, `field_moment_paced_all`, `field_moment_scatter_all`, `field_cavity_moment_all`; `resident.rs`: `field_twin_moment`; `contact.rs`: `field_moment_add*` (a tick's values take their site's moment) | sum over a site's strand |
+| open | `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + C s_t + b_s`; an open site opens on its moment, a marked site with its mark on the second read; where the opening is compared, the cavity opening through its own lift | [`moment.rs`](../crates/engine/src/moment.rs) | `resident.rs`: `field_open`, `field_echo_apply`, `field_mark_shares`; `moment.rs`: `field_cavity_open` | gate, a site |
+| chart | `r̂_t = x_t/‖x_t‖_rms`, `k_t = W_k r̂_t + b_k`, `p_t = W_p r̂_t + b_p`, `v_t = V r̂_t + b_v`; framed `k̃ = U ⊙ k` | [`contact.rs`](../crates/engine/src/contact.rs), [`navigator.rs`](../crates/engine/src/navigator.rs) | `contact.rs`: `field_chart`, `field_affine_tiled_*`, `field_affine_two_*`, `field_unit`, `field_unit_probe`, `field_frame`, `field_frame_probe` | gate, a site |
 | classes and support | a key's and a probe's shells `Σ_l 3^l σ_l`; `S_i^h` the near field `0 < \|i−j\| < 6` and the far sources whose key's class meets the probe | [`contact.rs`](../crates/engine/src/contact.rs) | `contact.rs`: `field_classes`, `field_sums` | gate, a site |
-| contact | `z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² \|k̃_jm\|²/2] − ⌊log₂ \|i−j\|⌋`, `e_ij = 2^(z_ij)`, `y_i = conj(U_i) ⊙ Σ e_ij D ṽ_j / Σ e_ij`, `x ← x + O y + b_o` | [`contact.rs`](../crates/engine/src/contact.rs), [`ratio.rs`](../crates/engine/src/ratio.rs) | `contact.rs`: `field_exponential`, `field_row_currents`, `field_held_rows`, `field_mark_shares`, `field_spread` | gate (the lock), then sum over the sources; sum over the ticks |
-| strand | the pair `x_t ← x_t + W_c (a_t · b_(s(t))) + b_c`; the carry circles `Q_t = κ_t b_t + γ_t Q_(t∓1)`, `γ = γ̂(q)/(1 + d)`; the triad | [`carry.rs`](../crates/engine/src/carry.rs) | `carry.rs`: `field_pair`, `field_pair_gamma`, `field_carry_gates_read`, `field_pair_scan`, `field_triad` | gate, then chain along the strand |
-| level | a level on its news: epochs led by sites, the landmarks of the news below (`ρ_t ≥ σ`), run on their own clock | [`level.rs`](../crates/engine/src/level.rs), [`field/scale.rs`](../crates/engine/src/field/scale.rs) | `level.rs`: `field_level_news`, `field_level_chart32`, `field_level_chart64`, `field_level_unchart` | gate, then sum over an epoch |
-| face | `z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a`, `p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)` at the open sites; the loud face where declared | [`face.rs`](../crates/engine/src/face.rs) | `resident.rs`: `field_face*`, `field_tied_face*` (the tile form), `field_loud_beta`, `field_gather_rows32` | gate, an open site |
+| contact | `z_ij = 2^(−β) Σ_m [D_m Re(conj(p̃_im) k̃_jm) − D_m² \|k̃_jm\|²/2] − ⌊log₂ \|i−j\|⌋`, `e_ij = 2^(z_ij)`, `y_i = conj(U_i) ⊙ Σ e_ij D ṽ_j / Σ e_ij`, `x ← x + O y + b_o` | [`contact.rs`](../crates/engine/src/contact.rs), [`ratio.rs`](../crates/engine/src/ratio.rs) | `contact.rs`: `field_exposure` (a row's carrier, read before the launch), `field_contact_l3` to `field_contact_l20` (the contact, one kernel a count of the row's limbs), `field_echo_trips`; `resident.rs`: `field_exponential` (the exponential's resident face, once at the upload) and the rows' readings `field_row_currents`, `field_held_rows` | gate (the lock), then sum over the sources; sum over the ticks |
+| strand | the pair `x_t ← x_t + W_c (a_t · b_(s(t))) + b_c`; the carry circles `Q_t = κ_t b_t + γ_t Q_(t∓1)`, `γ = γ̂(q)/(1 + d)`; the triad, on the strand's mates `p_k(t) = α_k(t) β_k(t−1)`, `c^T_k(t) = p_k(t) γ_k(t+1)`, or with the declaration's crossing word every leg at the site, `p_k(t) = α_k(t) β_k(t)`, `c^T_k(t) = p_k(t) γ_k(t)` (`triad_products`) | [`carry.rs`](../crates/engine/src/carry.rs) | `contact.rs`: `field_pair`, `field_pair_gamma`, `field_pair_scan`, `field_pair_scan_face`, `field_triad`; `resident.rs`: `field_carry_gates_read` (a reading). The card's `carry.rs` points a tick's words at the triads' carriers and launches nothing | gate, then chain along the strand |
+| level | a level on its news: epochs led by sites, the landmarks of the news below (`ρ_t ≥ σ`), run on their own clock | [`level.rs`](../crates/engine/src/level.rs), [`field/scale.rs`](../crates/engine/src/field/scale.rs) | `resident.rs`: `field_level_news`, `field_level_news_strand` (the news the host cuts the epochs from); `level.rs`: `field_level_chart32`, `field_level_chart32_spans`, `field_level_unchart` | gate, then sum over an epoch |
+| face | `z_t(a) = ⟨E(a), R r̂(x^K_t) + b_R⟩ + c_a`, `p̂_t(a) = 2^(z_a) / Σ_b 2^(z_b)` at the open sites; the loud face where declared | [`face.rs`](../crates/engine/src/face.rs) | `resident.rs`: `field_tied_face_tiled`, `field_tied_face_sharp`, `field_face`, `field_face_at_class`, `field_loud_beta`, `field_gather_rows32` (a reading's gather) | gate, an open site |
 | comparison | the joint code `(m/K) Σ −log₂ p̂_t(u_t)` over a state's `K` open sites among `m`; a port compared through its coupling | [`face.rs`](../crates/engine/src/face.rs), [`region.rs`](../crates/engine/src/region.rs) | `adjoint.rs`: `field_face_covector`, `field_face_weigh`, `field_face_set` | sum over the open sites |
-| return | the covector `p̂ − q` returned through the `K` ticks by the operands that produced each carrier | [`adjoint.rs`](../crates/engine/src/adjoint.rs) | `adjoint.rs`: `field_ratio_adjoint`, `field_current_back`, `field_pair_back`, `field_pair_scan_back`, `field_pair_gate_back`, `field_triad_back`, `field_unit_back*`, `field_unframe`, `field_tied_back_*`, `field_loud_back`, `field_mark_back`, `field_outer_bound_*`, `field_wide_add`, `field_add`; the moments' and paces' returns | the forward's kinds, reversed |
-| deposit | the two moments of the covector at `2^(−3)` and `2^(−8)`, each entry's step at its own rate, `m/(⌊√v⌋ + 1)` at `2^(−rate)` | [`deposit.rs`](../crates/engine/src/deposit.rs), [`learner.rs`](../crates/engine/src/learner.rs) | host, beside the card | chain over the sections |
-| mean | the lap's mean of states, the state a line's level is read from | [`deposit.rs`](../crates/engine/src/deposit.rs) (`MaterialMean`) | host | sum over a lap |
+| return | the covector `p̂ − q` returned through the `K` ticks by the operands that produced each carrier | [`adjoint.rs`](../crates/engine/src/adjoint.rs) | `adjoint.rs`: `field_ratio_adjoint`, `field_current_back`, `field_pace_current_back`, `field_contact_rows`, `field_contact_columns`, `field_spread`, `field_pair_back`, `field_pair_scan_pre`, `field_pair_scan_back`, `field_pair_gate_back`, `field_triad_back`, `field_unit_back`, `field_unit_back_probe`, `field_unframe`, `field_pace_frame_back`, `field_pace_skin_back`, `field_pace_kappa_back`, `field_pace_c_back`, `field_tied_back_e`, `field_tied_back_y_tiled`, `field_loud_back`, `field_mark_back`, `field_mark_rows`, `field_encoding`, `field_moment_accumulate`, `field_twin_take_wide`, `field_twin_clock_back`, `field_add`; `contact.rs`: `field_transposed`, `field_outer_*`, `field_outer_bound_*` (the material's covector); `resident.rs`: `field_wide_add`; `moment.rs`: `field_moment_ds_all`, `field_moment_skinned_all`, `field_moment_return_paced_all`, `field_moment_strand_return_all`, `field_moment_pace_back_all`, `field_cavity_terms_all`, `field_cavity_scan_all`, `field_cavity_return_paced_all`, `field_cavity_pace_back_all`; `clock.rs`: `field_blank_dz`, `field_blank_live_scan`, `field_blank_bias_enc`, `field_blank_dy`, `field_blank_lift_read`, `field_blank_dx`; `level.rs`: `field_level_chart64`, `field_level_chart64_spans`, `field_level_unchart` | the forward's kinds, reversed |
+| deposit | the two moments of the covector at `2^(−3)` and `2^(−8)`, then each entry's step `m/(⌊√v⌋ + 1)` at `2^(−rate)`. The rate is the learner's one `rate_bits`, unless its state carries a `parts` line (a founded part's octaves under it) or a `rates` line (an entry's own); no command and no law moves a part's octave (`RateParts::updated` and `part_travel` are called by tests alone). Where the state carries them, a step's remainder under the entry's grain is kept for the next section (`remainder`) and each entry relaxes by `2^(−leak)` of itself after its step (`leak`) | [`deposit.rs`](../crates/engine/src/deposit.rs), [`learner.rs`](../crates/engine/src/learner.rs) | host, beside the card | chain over the sections |
+| mean | the mean of the states after each section since the last save, the state a line's level is read from (`MEAN.k`) | [`deposit.rs`](../crates/engine/src/deposit.rs) (`MaterialMean`) | host | sum over a lap |
 | release | the writer: every answer place opened beside the known prompt, resolved by octaves of distance from it, each drawn from its face on the read of the region as it stands | [`release.rs`](../crates/engine/src/release.rs) | the forward's kernels, one read a place | chain over the reads |
 
 The card's resident realization ([`resident.rs`](../crates/engine-cuda/src/hnn/resident.rs)) opens a region batch,
 uploads it, holds the pools and implements `Realization`; [`card.rs`](../crates/engine-cuda/src/hnn/card.rs)
 owns the context, the module, the stream and the census; [`profile.rs`](../crates/engine-cuda/src/hnn/profile.rs)
-holds the launch records and the yardsticks (`field_yard_*`). A ruler ([`ruler.rs`](../crates/engine/src/ruler.rs))
-reads the machine without changing what the state carries or the deposit consumes.
+holds the launch records and the yardsticks (`field_yard_*`, `field_series_check`). A ruler
+([`ruler.rs`](../crates/engine/src/ruler.rs)) reads the machine without changing what the state carries or the deposit
+consumes.
 
 The Lean owners of the phases stand under `lean/Holonics/HNN/`: `Moment`, `RangedMoment` and `ReframedMoment` (the
 moment), `Contact` and `ContactBreak` (the contact), `CarryGate` (the carry circle's passivity), `TriadGauge` (the
@@ -95,36 +101,67 @@ triad), `TickBlocks`, `TickFamily` and `TickStanding` (the ticks), `ReleaseRun` 
 
 ## 4. The declaration
 
-The declaration is the field's head line, read by [`declaration.rs`](../crates/engine/src/declaration.rs). The line
-that trains declares `hnn-field-v14m 244 128 4 8 2 128 4 4 3771 4 0 32 0 1 0 1` (lap 17's mean). Each word with the
-part it sizes (CLAUDE.md, Method: a size belongs to its part). From lap 75 the store line's state declares
-`hnn-field-v14x 244 128 4 8 2 128 4 4 3771 4 0 32 10 1 0 1 0 1`: ten crossing triads, and 402,805 entries with the level and the glue
-(253,029, 50,640 and 99,136 at lap 94). Since November 18 the laps that train start again from lap 70's state, the first line above
-with no triad (392,505 entries with the level and the glue), with the frontier's share in its pass (§10). This section's table and §5
-and §6 below still describe lap 17:
+The declaration is the field's head line, written and read by `Declaration::to_text` and `from_text`
+([`declaration.rs`](../crates/engine/src/declaration.rs)). Its head word names the last part the field declares, and
+each head word's line is the line before it with one word more:
+
+| Head word | Words after it | The word it adds |
+|---|---|---|
+| `hnn-field-v14` | 11 | alphabet, width, heads, modes, still, contacts, ticks, frames, reach, lanes, depth |
+| `hnn-field-v14e` | 12 | carry `C`, more than zero |
+| `hnn-field-v14f` | 13 | triads `J`, more than zero; `C` is written even at zero from here on |
+| `hnn-field-v14g` | 14 | the opening's word, `1` |
+| `hnn-field-v14j` | 15 | the junction's word, `1`; the opening's is `0` or `1` from here on, as each later line writes the flags before its own |
+| `hnn-field-v14m` | 16 | the mark's word, `1` |
+| `hnn-field-v14l` | 17 | the loudness's word, `1` |
+| `hnn-field-v14x` | 18 | the crossing's word, `1`; it needs triads |
+| `hnn-field-v14c` | 19 | closed `E`, more than zero; the crossing's word is `0` or `1` |
+
+A field writes the first of these lines that holds everything it declares. `hnn-field-v13` (ten words, no depth) is
+read as a field with no depth ring. `hnn-field-v14k` and `hnn-field-v14t` are refused: their states are receipts.
+
+Each word with the part it sizes (CLAUDE.md, Method: a size belongs to its part). The value is the store line's, in
+the state its laps start from since November 18 (lap 70's): `hnn-field-v14m 244 128 4 8 2 128 4 4 3771 4 0 32 0 1 0 1`.
 
 | Word | Value | What it sizes |
 |---|---|---|
-| alphabet | 244 | the codec's classes, the rows of the encodings `E`, `E₋`, `E₊` and the face's classes |
-| width | 128 | one row length every block shares: four lanes of 32, each added by a copy ([THE_CONSOLIDATION §10](plans/THE_CONSOLIDATION.md#10-declared-extents-that-stand-in-for-laws)) |
-| heads | 4 | the contact's heads |
-| modes | 8 | the complex modes of a head's chart |
-| still | 2 | the still ring sets among the heads (`U = 1`); the rest turn |
-| contacts | 128 | the strand's contacts, half of them complex pairs |
+| alphabet | 244 | `A`, the face's classes; each encoding (`E`, `E₋`, `E₊`) carries one row more, the open place's |
+| width | 128 | `D`, one row length every block shares, read in `lanes` registers of `D/lanes`; reached by copies ([THE_CONSOLIDATION §10](plans/THE_CONSOLIDATION.md#10-declared-extents-that-stand-in-for-laws)) |
+| heads | 4 | `H`, the contact's heads; head `h` is of ring set `h mod frames` |
+| modes | 8 | `n`, the complex modes of a head's chart |
+| still | 2 | the first ring sets, which are still (`U = 1`); the rest are turned, and a head of a turned set carries a moment and a pace |
+| contacts | 128 | `f`, the strand's pair contacts, real: `f/2` complex contacts, as many toward each strand mate |
 | ticks | 4 | `K`, the applications of the constitution (five states `x⁰` to `x⁴`) |
-| frames | 4 | the ring frames a turned head reads |
-| reach | 3771 | the longest region a declaration admits, which sets the contact's gain `β` and the class trits |
-| lanes | 4 | the lanes of 32 |
-| depth | 0 | the depth rings, which turn by located increments alone |
-| carry | 32 | `C`, the carry circles among the complex contacts |
-| triads | 0 | `J`, the triad junctions |
-| opening | 1 | the opening's comparison |
-| junction | 0 | the junction's word |
-| mark | 1 | the second read, which marks the engine's own placements |
+| frames | 4 | the ring sets, the founding's heads; every grown head copies the set of its index |
+| reach | 3771 | the most sites a region may span, which sets the contact's gain `β`, the listener's shift, the class trits and a row's carrier |
+| lanes | 4 | the registers the width is read in, each a ratio to its own power (here 32 coordinates each) |
+| depth | 0 | the last turned ring sets that turn by located increments alone |
+| carry | 32 | `C`, the carry circles, the last `C` of the complex contacts; even, as many scanned from each side |
+| triads | 0 | `J`, the complex triads |
+| opening | 1 | the cavity opening compared through a lift of its own, `R⁰` |
+| junction | 0 | a tick's return of the state two ticks before, `x^(k+1) = v^k + Γ^k (v^k − x^(k−1))` |
+| mark | 1 | the second read, which marks the field's own placements (one strength an encoding) |
+| loud | (not written) | the face reads its site's lane powers as its sharpness (`κ` a lane and `b`) |
+| crossing | (not written) | the triads' three legs stand at the site ([§3](#3-the-pipeline), the strand) |
+| closed | (not written) | `E` closed characters with a key a class; an attempt, which the card refuses and whose keys take no deposit |
 
-The loud face writes `hnn-field-v14l` with one word more. The level is declared on a line of its own (`level 6 2`:
-six harmonics, the split after two ticks), followed by its own field's head line. Four extents stand in for laws the theory gives (depth from settling,
-width from the capacity price, reads until agreement, a size belonging to its part); the table of
+The material this declaration lays (`Loci::new`, in the state's order) is 242,729 entries: the three encodings 94,080;
+the key, value and probe charts 8,256 each with their biases; the contact's return 8,320; the pair's two charts 16,512
+each and its return 16,512; the readout's lift and the class bias 16,628; the moments' two encodings 15,680; the locks'
+temperatures 8; the paces 490; the moment's chart 8,320; the lift's bias 128; the carry circles' charts 8,256; the
+opening's lift 16,512; and the mark's strengths 3. Ten triads add 10,300 (their three charts, biases and return).
+
+A level is declared on a line of its own after the field's material (`level 6 2`: six harmonics of the news phase, the
+split after two ticks), followed by its own field's head line (`hnn-field-v14 2 64 4 8 2 128 2 4 3771 2 0`: by `level_declaration`
+an alphabet of two, no carry circle, triad or opening, and the ticks the field has after its split; its width of 64 in
+two lanes is the width its founding met, and `found-lane` grows the field's lanes and keeps the level), that field's
+material (50,640 entries) and the glue between the two (99,136: `A`, `b_A`, `B`, `b_B`). With them the line's state
+holds 392,505 entries. From lap 75 to lap 94 the line's states declared
+`hnn-field-v14x 244 128 4 8 2 128 4 4 3771 4 0 32 10 1 0 1 0 1`, ten crossing triads, and 402,805 entries (253,029,
+50,640 and 99,136).
+
+Four extents stand in for laws the theory gives (depth from settling, width from the capacity price, reads until
+agreement, a size belonging to its part); the table of
 [THE_CONSOLIDATION §10](plans/THE_CONSOLIDATION.md#10-declared-extents-that-stand-in-for-laws) names each with the law
 and where the tree already holds it.
 
@@ -132,57 +169,114 @@ and where the tree already holds it.
 
 A saved state is text, written and read by `Learner::to_text` and `from_text`
 ([`learner.rs`](../crates/engine/src/learner.rs)) and `Constitution::to_text`
-([`constitution.rs`](../crates/engine/src/constitution.rs)). Lap 17's end state reads, line by line:
+([`constitution.rs`](../crates/engine/src/constitution.rs)). Its lines, in the order the code writes them, with the
+counts of the store line's state ([§4](#4-the-declaration)):
 
-1. the learner's line: `hnn-field-learner-v3`, the rate bits, the count of key draws, the laps and the held step;
+1. the learner's line, `hnn-field-learner-v3 RATE DRAWN LAPS HELD`: the deposit's rate in bits, the key bytes drawn
+   (four a draw), the laps, and the held step's halvings or `-`;
 2. the field's head line ([§4](#4-the-declaration));
 3. the field's material, 242,729 entries;
-4. `level 6 2`, the level's harmonics and split;
-5. the level's own head line (`hnn-field-v14 2 64 4 8 2 128 2 4 3771 2 0`);
+4. where the field has a level, `level 6 2`, the level's harmonics and split;
+5. the level's own head line;
 6. the level's material, 50,640 entries;
-7. the glue between the level and the field, 99,136 entries;
-8. and 9. the deposit's first and second moments, one entry each for the 392,505 above;
-10. the parts' rates (`parts`), where they are founded, and each entry's own rate (`rates`) where it is;
-11. where they are carried, the leak (`leak`) and the steps' carried remainders (`remainder`, one an entry on `2^(−16)` of its grain,
-    November 18: without it a rate cooler than 12 truncates a face-grain step to nothing);
-12. the pass line ([`StorePass`](../crates/engine/src/learner.rs)): `pass ROLE STORE STRETCHES LEAST OCTAVES PAIRS
-    SITES [own]`, four words a slice (its name, piece, cursor and places taken), and where set the world's clause and, last, the
-    frontier's share (`frontier E`, of every eight stretches). A section is the unit a deposit consumes, so its two bounds
-(pairs of sites and sites) are law and are carried here. A state is never an archive of what crossed it (CLAUDE.md,
-retention is a quotient). A tool that writes a state judges every line it does not mean to change (`next-pass`,
-`own-states`, `found-lane`, `found-loud`).
+7. the glue between the level and the field, 99,136 entries, and after them, where `open-level` founded it, the block a
+   one-sided stream reads the level through (49,920 more);
+8. the deposit's first moment and
+9. its second, one entry each for the 392,505 above;
+10. the held step, only where the learner's line names one;
+11. `parts`, the contact count the founded parts are told from and each part's octaves, where they are founded;
+12. `rates`, each entry's own rate, where the state carries them;
+13. `leak K`, where the leak is set;
+14. `remainder`, the steps' carried remainders, one an entry on `2^(−16)` of its grain, where they are carried: without
+    the line a step that stands under one grain of its entry is dropped (`Learner::remainder` gives the line's counts),
+    and a founding sets a carried remainder back to zero;
+15. the pass line ([`StorePass`](../crates/engine/src/learner.rs)), last: `pass ROLE STORE STRETCHES LEAST OCTAVES PAIRS
+    SITES`, the word `own` where the training states are the field's own, four words a slice (its name, piece, cursor
+    and places taken), where set the world's clause (`world SLICE EVERY RECORDS RUN`, and a fifth word where each
+    draft is redrawn) and, last, the frontier's share (`frontier E` of every eight stretches, then `before` or `strand`
+    where the frontier's stretches are read as known streams or by two streams, then `past` and `second` where those
+    are set).
+
+A section is the unit a deposit consumes, so its two bounds (pairs of sites and sites) are law and are carried in the
+pass line. A state is never an archive of what crossed it (CLAUDE.md, retention is a quotient). Every line from the
+tenth on is written only where the learner carries it, so a state without one reads and writes byte for byte as
+before, and `train-store` refuses a state that does not write back as it was read. A tool that writes a state judges
+every line it does not mean to change ([§7](#7-the-commands)).
 
 ## 6. Where a section's time goes
 
-Read from lap 17's own lines (3,000 sections in 2,009 s on the RTX 4080 SUPER under `.local/gpu.lock`): a section
+A reading of lap 17, from its own lines (3,000 sections in 2,009 s on the RTX 4080 SUPER under `.local/gpu.lock`): a section
 of about 41,000 sites in about 200 regions takes about 0.66 s, of which the cut and its regions take 2 to 6 ms on the
 host and the card's run with the deposit about 650 ms (`regions_ms`, `deposit_ms` on each `STORE_SECTION` line). A
 read of the held passage at a lap's mean (100,508 places one open, 3,717 whole masks) takes about 262 s. `FIELD_PHASES`
-and `FIELD_PROFILE` print the host's part by phase and the card's launches; a timing difference between builds is read
+and `FIELD_PROFILE` print the host's part by phase (`STORE_HOST`, `STORE_DEPOSIT_PARTS`) and the card's launches; a timing difference between builds is read
 only inside one balanced hold of the card (CLAUDE.md, waiting).
 
 ## 7. The commands
 
-`athena train complete-language WORD …` ([`main.rs`](../crates/athena/src/main.rs)); every command pins its inputs by
-SHA-256 and prints one line a unit of work.
+`athena MODE complete-language WORD …` ([`main.rs`](../crates/athena/src/main.rs)). The mode is `train` (the card is
+opened and the command runs through it), `host` (no card is opened; a command that reads runs through the host
+realization on the host's threads) or `parity`. Every command pins its inputs by SHA-256, prints `FIELD_COMMAND` with
+its words and one line a unit of work, and a run that opens the card prints `FIELD_CARD_OPEN`, `FIELD_CARD` and
+`FIELD_SKIN`. The variables `FIELD_PROFILE`, `FIELD_PHASES`, `FIELD_TRACE` and `FIELD_BLANK_LIVE` are readings (their lines
+begin with those names); the trainer, the writers and the readings refuse every other variable named `FIELD_…`. The
+pass's tools and the foundings that judge their lines (`next-pass`, `join-store`, `move-store`, `own-states`,
+`set-world`, `set-frontier`, `found-lane`, `found-loud`, `open-level`) read the written state back and refuse a line
+they did not mean to change.
 
-| Word | What it does | Its lines |
-|---|---|---|
-| `train-store` | trains sections over the store from a state, saving states and means | `STORE_SECTION`, `STORE_PASS`, `STORE_STOPPED`, `FIELD_CARD`, `FIELD_SKIN` |
-| `read-cavity` | reads the held passage at a state: one place open (`P` rows), whole masks (`W` rows), and each place at the frontier, every place before it known and the region ending there (`F` rows of `frontier.tsv`, its place the count of places known) | `cavity.tsv`, `frontier.tsv`, `CAVITY_LAW`, `CAVITY_SLICE`, `CAVITY_FRONTIER`, `CAVITY_DONE` |
-| `read-loudness` | the loudness of each region's places beside their surprise (`tools/loudness_table.py` reads it) | `LOUDNESS_LAW`, `LOUDNESS_SLICE`, `LOUDNESS_DONE` |
-| `write-store` | the release from held prompts | `STORE_WRITE`, `STORE_WRITE_DONE` |
-| `found-lane`, `found-loud` | found a part at zero on a state, every other line judged | `FOUND_LANE`, `FOUND_LOUD` and a verdict a line |
-| `next-pass`, `own-states` | a state's next pass; a state whose training states are its own | `NEXT_PASS`, `OWN_STATES` |
-| `set-frontier`, `set-rate`, `zero-level-return` (under `host`) | a state whose pass reads a share of its stretches at the frontier; a state with the deposit's rate set and, on request, its steps' remainders carried; a ruler's state with the level's prolongation at zero | `SET_FRONTIER`, `SET_RATE`, `ZERO_LEVEL_RETURN` |
-| `parity-store` | every read asked of the card and of the host, compared whole | `STORE_PARITY_DONE` |
-| `read-tension`, `read-tension-store` (host) | the covector at the strand's return beside the pair chart, the gathered current and the triads' products, by tick: at the places a forms table names (with `all`, every site, the tick's opening chart and the open row's sources, shares and locks at unit gain), or over the sections a lap meets next (`tools/tension_ruler.py` reads them) | `TENSION_LAW`, `TENSION_TEMPER`, `TENSION_BLOCK`, `TENSION_SECTION`, `TENSION_DONE` |
-| `grow-crossings`, `zero-triad-return`, `found-crossing` | crossing triads grown with drawn legs and a zero return; a ruler's state with the return zeroed; the triads' legs set from a ruler's located file, the return at zero (a founding) or the ruler's (a ruler's state) | `GROW_CROSSINGS`, `ZERO_TRIAD_RETURN`, `FOUND_CROSSING` |
-| `try-passes` and `write-next` (under `train`, the card; under `host` beside it), `read-level` (with `links`, every link of the level's equation and the covector at its locus, for `tools/level_links_ruler.py`), `set-leak`, `hold-families`, `found-closed` (under `host`) | passes over a small forms table by the learner's own section step, each run a keyed half open, with reads of a second table every few passes (a sum's last digit open alone, with its whole run open, its first digit; a plain row's keyed half, whole run and next place), saves, and a stream word under which no row is met twice (`ruler/tension.rs`; the long trial of November 17); a ruler's writer of one place a read, each place the last of its region, for a field compared on the next place alone; a region's level written out for a ruler (its epochs' anchors, each place's news, each epoch's state); a learner with the store's leak set ([`Learner::leak`](../crates/engine/src/learner.rs)); a learner whose deposit moves named families alone; the closed face founded from a ruler's words (`crates/engine/src/closed.rs`, an attempt whose reason was withdrawn the same day, refused by the card). A study's states: no line's lap trains from one | `TRIAL_PASSES`, `TRIAL_PASS`, `TRIAL_READ`, `TRIAL_DONE`, `SET_LEAK`, `HOLD_FAMILIES`, `FOUND_CLOSED` |
-| `move-store` | a state's pass moved to a store whose slice was redrawn: the slice set to the first piece at or past the places the pass has taken of it, its cursor zero, every other line of the state byte for byte (`join-store` adds slices at a new pass and sets every slice back) | `MOVE_STORE` |
+**The line's commands.**
+
+| Word | Mode | What it does | Its lines |
+|---|---|---|---|
+| `train-store` | `train` | trains sections over the store from a state, saving `STATE.k` and `MEAN.k` every so many sections and at the last, and `STATE.stopped` past its stop time; a learner with no pass crosses first (the codec extended by the store's fresh bytes, the pass set at the store's start, `STATE.0`) | `STORE_STATE_TEXT`, `STORE_DECLARATION`, `STORE_PASS_AT`, `STORE_SECTION` a section, `STORE_WORLD` where the pass has a world, `STORE_SAVE` a save, `STORE_STOPPED`, `STORE_PASS`; at a crossing `STORE_YARDSTICK`, `STORE_BYTES`, `STORE_LETTERS`, `STORE_CROSSING`; under a reading `STORE_HOST`, `STORE_DEPOSIT_PARTS` |
+| `read-cavity` | `train`, `host` | reads the held passage at a state: one place open (`P` rows), whole masks (`W` rows), and each place at the frontier, every place before it known and the region ending there (`F` rows of `frontier.tsv`, its place the count of places known; `K` and `S` rows where the frontier is read as known streams or by two streams, on the word `known` or where the state's pass says so) | `cavity.tsv`, `frontier.tsv`, `CAVITY_LAW`, `CAVITY_SLICE`, `CAVITY_FRONTIER`, `CAVITY_KNOWN`, `CAVITY_STRAND`, `CAVITY_DONE` |
+| `read-loudness` | `train` | the loudness of each region's places beside their surprise (`tools/loudness_table.py` reads it) | `LOUDNESS_LAW`, `LOUDNESS_SLICE`, `LOUDNESS_DONE` |
+| `write-store` | `train` | the release from held prompts | `STORE_WRITE_LAW`, `STORE_WRITE`, `STORE_WRITE_DONE` |
+| `parity-store` | `parity` | every read asked of the card and of the host, compared whole | `STORE_PARITY`, `STORE_PARITY_DONE` |
+| `restore-store` | `train` | a saved state read in a fresh process and written back, its bytes compared with the file's; it writes nothing | `STORE_RESTORE` |
 
 Gate 3 for the engine is `bash tools/gate_engine.sh LINE BIN OUT`: parity on 3 of the line's sections, 24 sections
 reproduced, and the lap's read byte for byte (CLAUDE.md, the gates).
+
+**The commands that write a state.** Each writes a new state and leaves its source as it was.
+
+| Word | Mode | The state it writes | Its lines |
+|---|---|---|---|
+| `next-pass` | `train` | the state's next pass over its role: every slice set back to its first piece, the count of stretches kept | `NEXT_PASS` |
+| `join-store` | `train` | the pass joined to a grown store at a new pass: the store's slices, each at its first piece | `JOIN_STORE` |
+| `move-store` | `train` | the pass moved to a store whose slice was redrawn: the slice set to the first piece at or past the places the pass has taken of it, its cursor zero | `MOVE_STORE` |
+| `own-states` | `train` | the pass's word `own` set: each stretch's training state is the release's own | `OWN_STATES` |
+| `set-world` | `train` | the pass's world clause set: one stretch in so many of a slice is an act the world answers | `SET_WORLD` |
+| `set-frontier` | `host` | the pass reads a share of its stretches at the frontier, in eighths, with its reading's words | `SET_FRONTIER` |
+| `set-rate` | `host` | the deposit's rate set and, on request, its steps' remainders carried | `SET_RATE` |
+| `set-leak` | `host` | the store's leak set ([`Learner::leak`](../crates/engine/src/learner.rs)) | `SET_LEAK` |
+| `hold-families` | `host` | a learner whose deposit moves named families alone | `HOLD_FAMILIES` |
+| `found-lane`, `found-loud` | `train` | a part founded at zero: one more lane; the loud face | `FOUND_LANE_LINE` and `FOUND_LANE`; `FOUND_LOUD_LINE` and `FOUND_LOUD` |
+| `grow-crossings`, `found-crossing` | `train` | crossing triads grown with drawn legs and a zero return; the triads' legs set from a ruler's located file, the return at zero (a founding) or the ruler's (a ruler's state) | `GROW_CROSSINGS`, `FOUND_CROSSING` |
+| `open-level` | `host` | the level opened to one-sided streams: the block a passage read by two streams takes the epoch before each place through, at zero | `OPEN_LEVEL` |
+| `found-closed` | `train`, `host` | the closed face founded from a ruler's words (`crates/engine/src/closed.rs`), an attempt the card refuses | `FOUND_CLOSED` |
+| `zero-triad-return`, `zero-level-return`, `ruler-temper` | `train`; `host`; `train` | a ruler's state, never trained from: the triads' return at zero; the level's prolongation at zero; one head's listener temperature moved | `ZERO_TRIAD_RETURN`, `ZERO_LEVEL_RETURN`, `RULER_TEMPER` |
+
+The state tools routed under `train` open the card before they run, though they read no realization.
+
+**The readings and a study's writers.** Each reads a state and writes none; a study's states train no line's lap.
+
+| Word | Mode | What it reads or writes | Its lines |
+|---|---|---|---|
+| `read-open-rows` | `train` (it opens no card) | the open rows' shares over the sections a line would train next, by slice, head and tick | `OPEN_ROWS*`, `OPEN_CROWDS*`, and with its further words `CARRIED*`, `BYTICK*`, `HALVES*`, `HELD*`, `TICK_NEWS*`, `FAR_JITTER` |
+| `read-prompt`, `read-writes` | `train` | a held continuation coded beside its own prompt and beside a foil; a write's code beside its reference's | `PROMPT_LAW`, `PROMPT`, `PROMPT_SLICE`, `PROMPT_DONE`; `WRITES_LAW`, `WRITES_SLICE`, `WRITES_DONE` |
+| `read-forms`, `write-forms`, `write-acts` | `train`, `host` | a forms table's runs coded after their prompts; the writer after each prompt (`forms.written`); the trainer's acts off the line, each draft with the world's reaction | `FORMS_LAW`, `FORMS_ROW`, `FORMS_DONE`; `FORMS_WRITE_LAW`, `FORMS_WRITE_DONE`; `ACT`, `ACTS_DONE` |
+| `read-tension`, `read-tension-store` | `host` | the covector at the strand's return beside the pair chart, the gathered current and the triads' products, by tick: at the places a forms table names (with `all`, every site, the tick's opening chart and the open row's sources, shares and locks at unit gain), or over the sections a lap meets next (`tools/tension_ruler.py` reads them) | `TENSION_LAW`, `TENSION_TEMPER`, `TENSION_BLOCK`, `TENSION_SECTION`, `TENSION_DONE` |
+| `try-passes` | `train`, `host` | passes over a small forms table by the learner's own section step, each run a keyed half open, with reads of a second table every few passes, saves, and a stream word under which no row is met twice (`ruler/tension.rs`) | `TRIAL_PASSES`, `TRIAL_PASS`, `TRIAL_READ`, `TRIAL_DONE` |
+| `write-next` | `train`, `host` | a ruler's writer of one place a read, each place the last of its region, for a field compared on the next place alone | `NEXT_WRITE_DONE` |
+| `read-level` | `host` | a region's level written out for a ruler (its epochs' anchors, each place's news, each epoch's state; with `links`, every link of the level's equation and the covector at its locus, for `tools/level_links_ruler.py`) | `LEVEL_DONE` |
+| `read-junction` | `host` | where an answer digit's contact weight goes among the operands' digits, by tick and head | `JUNCTION_LAW`, `JUNCTION_HEAD`, `JUNCTION_DONE` |
+| `read-far`, `read-chart`, `read-strand-states` | `host` | what a place at the frontier takes from the far field, by what it hears there; a passage read at its boundary, every place at once; what a strand's sites hold, written out for a ruler | `FAR`; `CHART`, `CHART_LAST`, `CHART_DONE`; `STRAND_STATES` |
+| `read-pace`, `read-triads` | `train` | the turned heads' located rates by symbol; the triads' material by triad | `PACE_RINGS`, `PACE_HEAD`, `PACE`; `TRIADS`, `TRIAD` |
+
+Three modes take no command word: `athena yardstick` times the card's products, stores and gathers (`YARDSTICK`),
+`athena reserve KEY=VALUE…` prints the octets a declaration reserves a pair, a site and a region (`RESERVE`), and
+`athena attributes` prints the card's census (`CARD_ATTRIBUTE`).
 
 ## 8. A reading route
 
@@ -209,12 +303,12 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 | 4. No journal | practice rule | CLAUDE.md, retention is a quotient: the learner's state holds its constitution and moments, no list of deposits |
 | 5. Retention only by the collapse, at aeon boundaries | retires with its object (`close_aeon`) | the aeon's law in ELEMENTARY_OBJECTS and Lean |
 | 6. No clock outside the lift point and the hop clock | retires with its object; the time words stay a practice rule | CLAUDE.md: aeon, epoch and cycle, and no program counter called one |
-| 7. No Lean, no file system or process in the pipeline | holds on the engine as a lint | gate 1's guard lints on `holonics-engine` (`disallowed_types`, `disallowed_methods`); `athena` is the exterior and allows them by name |
+| 7. No Lean, no file system or process in the pipeline | holds on the engine as a lint | gate 1's guard lints on `holonics-engine` and `athena` (`disallowed_types`, `disallowed_methods`, the lists in `clippy.toml`); `athena` is the exterior and allows them by name; gate 1 does not lint the card crate |
 | 8. No templates | practice rule | CLAUDE.md, no catered machinery |
 | 9. The codec is not the architecture | practice rule, with its repair owed | CLAUDE.md, a symbol is a word and one law reads every stream; the engine's codec is the codec's sheet until the symbol's line replaces it (`codec.rs`'s first lines) |
 | 10. No scalar operand | retires with its object (`Word::pull_back`) | CLAUDE.md, loss is the logarithm of a ratio of Holons |
 | 11. Learning is locating keys and depositing covectors | practice rule | CLAUDE.md, keys and navigation; learning uses the covector of a declared comparison |
-| 12. No floats | holds on the engine as a lint | gate 1's guard lints on `holonics-engine` (`float_arithmetic`, `f32`/`f64` disallowed); a reading printed at the exterior allows it where it writes |
+| 12. No floats | holds on the engine as a lint | gate 1's guard lints on `holonics-engine` and `athena` (`float_arithmetic`, `f32`/`f64` disallowed); a reading printed at the exterior allows it where it writes; the card crate denies `float_arithmetic` in `hnn/mod.rs` and is not linted by gate 1, its yardsticks owing theirs |
 | 13. No compatibility | practice rule | CLAUDE.md, ownership and retirement |
 | 14. No global solve | retires with its object (`propagation.rs`) | the atlas rows of junction-local solves, repinned to their files |
 | 15. Declared charts and residuals; no free tolerance; budgets refuse | practice rule | CLAUDE.md, the precision law |
