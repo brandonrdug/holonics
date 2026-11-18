@@ -10,7 +10,8 @@ but Colab can reclaim it (lap 12's first run was lost that way overnight), so a 
 Each run has a registry entry `.local/dispatch/<name>.json`, its output `<cwd>/<name>.out`, and on exit `.local/dispatch/<name>.exit`
 (`<code> <UTC time>`; a Colab run's exit file lives on the VM). A run that is gone with no exit file was killed.
 
-  runs.py start NAME SCRIPT [--log FILE] [--progress REGEX]   launch `bash SCRIPT` in its own directory as a service
+  runs.py start NAME SCRIPT [--log FILE] [--progress REGEX]   launch `bash SCRIPT` in its own directory as a service;
+                                                               a script that trains first gets `lap_check.py`'s notes
   runs.py adopt NAME UNIT --out FILE [--log FILE]              register a service already running
   runs.py colab NAME SCRIPT --session S [--log FILE]           upload SCRIPT and run it detached on a Colab session
   runs.py status [NAME ...]                                    one line a run: state, elapsed, last progress line
@@ -135,9 +136,23 @@ def line(e, st):
     return f"{e['name']} [{e['backend']}] {s}{'' if ext == '-' else ' (' + ext + ')'} elapsed {el // 3600}h{el % 3600 // 60:02d}m  {short}"
 
 
+def lap_notes(script):
+    """The lap procedure's notes on a run script (`lap_check.py`; CLAUDE.md, Method, "A line's lap"): lines to print at dispatch.
+
+    A note never refuses a run, and a failure to read the script is itself one printed line: the dispatch does not depend on it.
+    """
+    try:
+        import lap_check
+        return lap_check.report(script)
+    except Exception as e:  # the check is a reading beside the dispatch
+        return [f"LAP_CHECK not read: {type(e).__name__}: {e}"]
+
+
 def cmd_start(a):
     script = Path(a.script).resolve()
     cwd = script.parent
+    for note in lap_notes(script):
+        print(note)
     out = cwd / f"{a.name}.out"
     unit = f"holonics-run-{a.name}"
     if unit_active(unit):
