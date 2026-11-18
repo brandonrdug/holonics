@@ -1267,3 +1267,11 @@ import HolonicsResearch.Compression.CipherCode
 import HolonicsResearch.Compression.FaithfulModes
 import HolonicsResearch.Foundation.FiniteKey
 import HolonicsResearch.Foundation.HankelKey
+import HolonicsResearch.Physics.Thermal.MeanOfStates
+import HolonicsResearch.Compression.ReceiverRelease
+import HolonicsResearch.Mathematics.PlaceComplex
+import HolonicsResearch.Physics.CochainCount
+import HolonicsResearch.Mathematics.CharacterTriad
+import HolonicsResearch.Compression.SymbolWord
+import HolonicsResearch.HNN.NearestQuotient
+import HolonicsResearch.Compression.Landmark.NecklaceIntegrality
