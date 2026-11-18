@@ -711,7 +711,7 @@ pub fn read_far(args: &[String]) -> Result<()> {
         return Err("no row".into());
     }
     let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
-    for far in 0..5u8 {
+    for far in 0..7u8 {
         learner.field.ruler_far = far;
         let mut groups: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         // (a few hundred regions a call, so no call holds every region's forward at once)

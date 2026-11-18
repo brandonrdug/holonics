@@ -129,3 +129,53 @@ GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
 GATE_READ cavity.tsv EQUAL
 GATE_ENGINE EQUAL
+
+The card's known stream and the trials of 13:00 to 14:15 UTC (written 2026-11-18T14:16:02Z; build 5b6a645db; nats a place).
+- Card against host: the_known_stream_on_the_card_reads_the_hosts_bits passed at 13:19:33 UTC in the gap after arm C7's lap (42 s): four
+  fields (plain, carry circles, the opening compared, a level), each read once and grown to read twice, under a ruler at 3 and at 4 and
+  in a section of the law holding known streams (6 of 9 regions): 24 lines, every face and every covector entry equal. Beside a lap
+  the test is refused (the exponential's resident face passes the card's batch budget), so it waits for the lock.
+- The build enters the line: gate_engine against lap 70 with the new binary, GATE_ENGINE EQUAL at 13:33 UTC (parity 189.7 s, the
+  reproduction 13.4 s, the lap's read 304.4 s, cavity.tsv equal).
+- Arm C7 (rate 14 with the remainder carried, one lap from arm F6's end; 1,600 s) against arm F6's lap mean, then its end:
+  FRONTIER F6_mean; one place open: all 0.9134 (100508 places) | books 0.9525 code 0.6146 science 0.8563 web 0.9878 wikidata 1.1551
+  FRONTIER F6_mean; whole masks: all 2.3313 (3717 places) | books 2.1530 code 2.2663 science 2.2432 web 2.4527 wikidata 2.5709
+  FRONTIER F6_mean; the frontier: all 1.8121 (99844 places) | books 1.8288 code 1.5308 science 1.7841 web 1.9751 wikidata 1.9416
+  FRONTIER C7_mean; one place open: all 0.9029 (100508 places) | books 0.9472 code 0.6065 science 0.8473 web 0.9811 wikidata 1.1317 || less the control's, paired: -0.0105 (±0.0008) | books -0.0053 code -0.0081 science -0.0091 web -0.0067 wikidata -0.0233
+  FRONTIER C7_mean; whole masks: all 2.3228 (3717 places) | books 2.1605 code 2.2517 science 2.2364 web 2.4459 wikidata 2.5469 || less the control's, paired: -0.0085 (±0.0034) | books +0.0075 code -0.0146 science -0.0068 web -0.0068 wikidata -0.0240
+  FRONTIER C7_mean; the frontier: all 1.7994 (99844 places) | books 1.8187 code 1.5166 science 1.7714 web 1.9658 wikidata 1.9244 || less the control's, paired: -0.0127 (±0.0008) | books -0.0101 code -0.0143 science -0.0127 web -0.0092 wikidata -0.0173
+  FRONTIER C7_mean; the frontier by places known (less the control's): 1: 4.232 (+0.045) | 2 to 3: 2.915 (+0.014) | 4 to 7: 2.461 (-0.005) | 8 to 15: 2.287 (-0.017) | 16 to 31: 2.108 (-0.023) | 32 to 63: 1.950 (-0.010) | 64 to 127: 1.766 (-0.015) | 128 to 255: 1.657 (-0.014) | 256 to 511: 1.592 (-0.012) | 512 to 1023: 1.602 (-0.000)
+  FRONTIER C7_end; one place open: all 0.9041 (100508 places) | books 0.9524 code 0.6075 science 0.8487 web 0.9865 wikidata 1.1247 || less the control's, paired: -0.0093 (±0.0009) | books -0.0001 code -0.0071 science -0.0076 web -0.0013 wikidata -0.0304
+  FRONTIER C7_end; whole masks: all 2.3254 (3717 places) | books 2.1729 code 2.2485 science 2.2352 web 2.4622 wikidata 2.5336 || less the control's, paired: -0.0059 (±0.0040) | books +0.0199 code -0.0178 science -0.0080 web +0.0095 wikidata -0.0373
+  FRONTIER C7_end; the frontier: all 1.8058 (99844 places) | books 1.8295 code 1.5208 science 1.7741 web 1.9709 wikidata 1.9337 || less the control's, paired: -0.0063 (±0.0009) | books +0.0007 code -0.0100 science -0.0099 web -0.0042 wikidata -0.0080
+  FRONTIER C7_end; the frontier by places known (less the control's): 1: 4.288 (+0.102) | 2 to 3: 2.923 (+0.022) | 4 to 7: 2.464 (-0.002) | 8 to 15: 2.300 (-0.005) | 16 to 31: 2.115 (-0.016) | 32 to 63: 1.959 (-0.002) | 64 to 127: 1.775 (-0.006) | 128 to 255: 1.662 (-0.009) | 256 to 511: 1.595 (-0.008) | 512 to 1023: 1.605 (+0.003)
+  Panels from arm C7's end: short, 88 of 165 words in the lexicon (53%: seen 46%, held 65%, unread 45%); long, 139 of 280 (49%),
+  3 of 20 writes loop.
+- Arm K7 (frontier 6 before: the frontier's stretches read as known streams, one lap from arm F6's end; 1,097 s where a plain lap
+  takes about 1,600 s) at its END, against arm C7's end (rows F under the law; rows K each region a known stream):
+  FRONTIER K7_end; one place open: all 0.8993 (100508 places) | books 0.9605 code 0.6025 science 0.8559 web 0.9813 wikidata 1.0958 || less the control's, paired: -0.0048 (±0.0020) | books +0.0081 code -0.0050 science +0.0072 web -0.0052 wikidata -0.0289
+  FRONTIER K7_end; whole masks: all 2.3353 (3717 places) | books 2.1796 code 2.2563 science 2.2232 web 2.4711 wikidata 2.5752 || less the control's, paired: +0.0098 (±0.0083) | books +0.0067 code +0.0078 science -0.0120 web +0.0089 wikidata +0.0416
+  FRONTIER K7_end; the frontier: all 2.0118 (99844 places) | books 1.9690 code 1.7650 science 1.9849 web 2.1908 wikidata 2.1494 || less the control's, paired: +0.2060 (±0.0023) | books +0.1395 code +0.2442 science +0.2107 web +0.2198 wikidata +0.2157
+  FRONTIER K7_end; the frontier, each region a known stream (against the control's rows under the law): all 2.0963 (99844 places) | books 2.0632 code 1.8348 science 2.1246 web 2.2553 wikidata 2.2034 || less the control's, paired: +0.2905 (±0.0028) | books +0.2337 code +0.3139 science +0.3505 web +0.2843 wikidata +0.2697
+  FRONTIER K7_end; a known stream less the law's reading of the same state, paired: +0.0844 (±0.0029) over 99844 places
+  FRONTIER K7_end; the frontier by places known (less the control's): 1: 4.159 (-0.129) | 2 to 3: 2.906 (-0.016) | 4 to 7: 2.583 (+0.119) | 8 to 15: 2.430 (+0.130) | 16 to 31: 2.293 (+0.178) | 32 to 63: 2.145 (+0.186) | 64 to 127: 1.977 (+0.203) | 128 to 255: 1.888 (+0.226) | 256 to 511: 1.835 (+0.240) | 512 to 1023: 1.841 (+0.236)
+- The host ruler read-far with seven settings on the 800 frontier rows (five slices, 12, 48, 192 and 448 known places, 40 rows each; 12
+  host threads beside the card's runs; millionths of a nat a place over the 800):
+  FAR3_DONE F6_mean 14:09:40 far=0 code=1949396 far=1 code=2028632 far=2 code=2629332 far=3 code=2835643 far=4 code=2163957 far=5 code=1950132 far=6 code=2835968 
+  FAR3_DONE K7_mean 14:14:48 far=0 code=2127209 far=1 code=2224266 far=2 code=2894183 far=3 code=2154140 far=4 code=2313062 far=5 code=2128767 far=6 code=2158046 
+  FAR3_ALL_DONE 14:14:48
+  RUN_EXIT 0 2026-11-18T14:14:48Z
+  By places known (law | known stream | one read with the level unheard | one read with the level heard | known stream with the
+  second read kept):
+  F6_mean known=12: law 2.281 | known stream 3.215 | one read, level unheard 2.592 | one read, level heard 2.285 | known stream, second read kept 3.214
+  F6_mean known=48: law 2.101 | known stream 2.899 | one read, level unheard 2.315 | one read, level heard 2.098 | known stream, second read kept 2.900
+  F6_mean known=192: law 1.806 | known stream 2.674 | one read, level unheard 1.996 | one read, level heard 1.806 | known stream, second read kept 2.675
+  F6_mean known=448: law 1.610 | known stream 2.555 | one read, level unheard 1.753 | one read, level heard 1.613 | known stream, second read kept 2.555
+  K7_mean known=12: law 2.414 | known stream 2.555 | one read, level unheard 2.678 | one read, level heard 2.412 | known stream, second read kept 2.556
+  K7_mean known=48: law 2.252 | known stream 2.288 | one read, level unheard 2.465 | one read, level heard 2.252 | known stream, second read kept 2.291
+  K7_mean known=192: law 2.000 | known stream 1.993 | one read, level unheard 2.134 | one read, level heard 2.001 | known stream, second read kept 1.998
+  K7_mean known=448: law 1.843 | known stream 1.781 | one read, level unheard 1.976 | one read, level heard 1.850 | known stream, second read kept 1.786
+  Read: on arm F6's mean the second read is worth 0.001 at the frontier and the level 0.214 (settings 5 and 4 against the law); the
+  known stream read 0.887 above the law before any training in it, 0.672 above the reading with the level unheard. After arm K7's lap
+  the known stream reads 2.154: 0.682 under its reading before the lap, 0.010 under arm F6's two-sided reading with the level unheard,
+  and 0.205 above arm F6's reading under the law. Keeping the second read changes the known stream's reading by 0.004 or less.

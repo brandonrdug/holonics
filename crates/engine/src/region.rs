@@ -283,7 +283,13 @@ impl Constitution {
     /// Whether `region` is read with every site hearing only what stands before it: its own word ([`Region::before`]), or a ruler's forward
     /// at `3` ([`Constitution::ruler_far`]).
     pub(crate) fn sided(&self, region: &Region) -> bool {
-        region.before || self.ruler_far == 3
+        region.before || self.ruler_far == 3 || self.ruler_far == 6
+    }
+
+    /// Whether `region`'s forward hears the level: a field with one, read under the law or a ruler's forward at `5`, the region no known
+    /// stream.
+    pub(crate) fn levelled(&self, region: &Region) -> bool {
+        self.scale.is_some() && (self.ruler_far < 3 || self.ruler_far == 5) && !region.before
     }
 
     pub(crate) fn admit_region(&self, region: &Region) -> Result<()> {

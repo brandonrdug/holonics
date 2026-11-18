@@ -253,3 +253,18 @@ frontier's fall then follows 0.0458 ln(sections). The card's known stream holds 
   is built on it. Between 0.15 and 0.35, a second lap is read for the slope before the second stream is built. Above 0.35, the
   one-sided context loses what the two-sided one holds, and where it loses it (by places known, by slice) is read before any build.
   A rule's reading is an inference: the reads are reported as they come.
+
+G-1118-12 (2026-11-18T14:16:02Z). The known stream's second lap. Read before fixing (reads.txt, the entry of this hour): arm K7's end reads the
+frontier as known streams 2.0963 on the held places, 0.29 above arm C7's end under the law, and its own rows under the law 2.0118; on
+the 800 ruler rows arm K7's mean reads 2.154 as a known stream, level with arm F6's two-sided reading with the level unheard (2.164)
+and 0.205 above its reading under the law, where the level is worth 0.214 and the second read 0.001. So what the first lap left
+between the known stream and the law's reading is about the level's size. G-1118-11's lap means are not all read yet (arm F7 trains);
+its rule sends a reading of (b) between 0.15 and 0.35 to a second lap, which this is.
+  The trial. One more lap from arm K7's end with the same pass (arm K8), read at its lap mean on the held places (rows F and K) and on
+  the ruler rows, and written on both panels from its end.
+  The guess. Arm K8's known-stream rows at its lap mean stand 0.03 to 0.08 under arm K7's at its lap mean on the held places (a first
+  lap's transient is over, and a lap then buys what the frontier's log law gives or a little more); on the ruler rows its known
+  stream reads 2.08 to 2.13. Its rows under the law stand within 0.05 of arm K7's. The panels within eight points of arm K7's.
+  What it decides. Nothing about the build's order: the second stream is built on the known stream either way, since the first lap
+  already stands at the two-sided reading without the level. It sizes what laps in the regime buy before every place is compared, and
+  it says whether the reading under the law keeps leaving. A fall of 0.10 or more would say the regime is still in its transient.

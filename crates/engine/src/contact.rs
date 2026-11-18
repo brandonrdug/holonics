@@ -916,7 +916,7 @@ impl Constitution {
     /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
     pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
         // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read, and so is a known stream's ([`Region::before`]).
-        if !self.declaration.mark || self.ruler_far >= 3 || region.before {
+        if !self.declaration.mark || matches!(self.ruler_far, 3..=5) || region.before {
             return self.pass_with(region, keep, None);
         }
         let first = self.pass_with(region, keep, None)?;
@@ -966,7 +966,7 @@ impl Constitution {
         let paces = self.paces(region)?;
         // [measurement] A ruler's forward ([`Constitution::ruler_far`]): at `3` the moments and the opening read only what stands before a
         // site; at `3` and `4` the level is not heard.
-        let (after, levelled) = (!self.sided(region), self.scale.is_some() && self.ruler_far < 3 && !region.before);
+        let (after, levelled) = (!self.sided(region), self.levelled(region));
         let moment = self.moments_sided(region, &paces, after)?;
         let mut x = self.open_sided(region, &moment, marks, after)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();

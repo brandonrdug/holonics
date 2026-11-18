@@ -996,7 +996,7 @@ impl Constitution {
             }
             owed = next_owed;
             // [measurement] A forward that did not hear the level (a ruler's at `3` or `4`, a known stream's) returns nothing to it.
-            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && self.ruler_far < 3 && !region.before) {
+            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && self.levelled(region)) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 // [measurement; the lead, November 17] The covector at the level's locus, of the state the prolongation wrote, where read.
                 if let Some(out) = at_scale.as_deref_mut() {

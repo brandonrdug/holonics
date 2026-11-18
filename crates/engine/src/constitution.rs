@@ -60,6 +60,10 @@ pub struct Constitution {
     /// the opening's after rows absent, the support, the crowds and the strand's contacts one side), each site keeping its kind. A reading of
     /// which sources carry what a place at the frontier takes from many known places, before a read that compares every place at its
     /// frontier is built: not part of the state, and no reverse reads it (a forward under `1` or `2` is never returned).
+    /// [November 18, the known stream's trial] Two more split what `3` leaves out: `5`, the law's hearing in one read with the level heard
+    /// (so `4` less `5` is the level's part and `5` less the law the second read's); `6`, as `3` with the field's second read kept (each
+    /// silent site opened on the shares of the face its first read gave it, which under one-sided hearing changes the open places alone).
+    /// Forwards only.
     pub ruler_far: u8,
     /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
     /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
