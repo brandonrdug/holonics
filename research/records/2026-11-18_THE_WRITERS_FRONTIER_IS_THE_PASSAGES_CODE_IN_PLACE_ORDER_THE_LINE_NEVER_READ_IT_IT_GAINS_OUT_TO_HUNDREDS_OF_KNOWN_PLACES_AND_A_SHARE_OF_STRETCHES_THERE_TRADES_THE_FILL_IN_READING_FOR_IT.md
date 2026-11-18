@@ -122,14 +122,42 @@ Every slice's frontier fell (books −0.121, code −0.178, science −0.151, we
   same card time by that fit (a projection from the fit at two reads a region, not a reading). It is the realization the method rule asks for before a long run (a rate is judged against the card),
   and it is the next build; it is a change of the forward and its kernels and is not begun.
 
-## 6. What runs, and what is owed
+## 6. What a place at the frontier takes from far (G-1118-6), and the build it sizes
+
+Read on the host before any build (`athena host complete-language read-far`, a ruler's forward: `Constitution::ruler_far`): 800 rows
+from the store's held documents, forty next places a slice, each read with 12, 48, 192 and 448 places known before it, three times:
+with the law (an open receiver hears every definite site past its near field sharply), with a definite receiver's far field in its
+place (its probe's classes sharply and each octave's crowd at its mean word), and with the near field alone. Nats a place on the
+control's lap mean (arm F's reads the same differences):
+
+| places known | the law | a definite receiver's far field | the near field alone |
+|---|---|---|---|
+| 12 | 2.493 | 2.490 | 2.629 |
+| 48 | 2.297 | 2.354 | 2.743 |
+| 192 | 2.048 | 2.185 | 2.981 |
+| 448 | 1.930 | 2.161 | 3.090 |
+
+- With the far field cut, more known places read worse, so all of what many known places give the frontier's place, and more, comes
+  through its far rows; the moments and the near places' own states do not carry it.
+- A definite receiver's far field, which no open receiver was ever compared with, already holds four fifths of it at 448 known and
+  all but 0.03 to 0.06 at 48. The sharp rows keep the rest.
+
+**The build was already written.** On November 17 the record of the dwell (§13) derived the boundary chart: a passage being read has a
+boundary, its next place; with a one-sided transport (the retarded moment, an opening without the site's own row or the next, sources
+before their receiver, the strand's mate before it) a site's state is a function of what stands before it alone, so every site is a
+source for every later one and a receiver of its own symbol at once, and one forward compares every place at its own frontier. Its
+acceptance was fixed there. I announced it that evening and spent the night on the level. Tonight's readings are its case and its
+sizes: the frontier's code is the passage's; a comparison there costs a region's read today; and a site of the chart hears as the
+frontier's place hears (every site before it sharply, the law's row for an open receiver, one side of it). It is taken up as written,
+on the host first with its two acceptance tests on the bits, then on the card.
+
+## 7. What runs, and what is owed
 
 - On the card through the night (G-1118-4, G-1118-5): one lap from lap 70 with every stretch at the frontier, read as arm F was; then
   arm F continued four laps, each read at its mean and written on both panels. The long run is stated against the method rule: the
   card would stand idle beside the next build's host work, and the laps give the projection that build needs (how the frontier falls
   with comparisons on the whole store).
-- The causal read's design, with its consumer's equation and its premise read on the host first (whether known places that hear
-  only what stands before them cost the frontier's place anything).
+- The boundary chart of November 17 (§6), host first.
 - From the audit, still owed: the comparison's weights by declaration (the opening is compared at every place of every region), the
   residue in the tree, and the guides brought to the line as trained. The stream's order is not run: the cooled arms bound what
   stopping the whole walk buys at the mean (0.003), and the order is one part of that walk.
