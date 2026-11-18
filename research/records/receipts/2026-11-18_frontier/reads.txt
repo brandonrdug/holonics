@@ -987,3 +987,33 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   LOUDNESS_WHOLE region=science places=776 nats_a_place=2.2747 loudness_octaves=20.599
   LOUDNESS_WHOLE region=books places=776 nats_a_place=2.2016 loudness_octaves=20.710
   LOUDNESS_WHOLE region=wikidata places=677 nats_a_place=2.5382 loudness_octaves=20.338
+
+# 23:05 UTC. The circles arm's receipts before a lap (binary built at a1975e419's source; card steps under the card lock):
+  GROW_CARRY circles_before=32 circles_after=128 contacts_before=128 contacts_after=320 material_before=442425 material_after=541305 fine_before=242729 fine_after=341609 drawn_before=593408 drawn_after=839168 new_entries=98880
+  the build against today's line (lap L16 from arm L15's end): STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=1049 host_ms=117717; STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL; GATE_REPRO sections=3 equal=3; GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL; the held read of L16's mean with the word known: cavity.tsv and frontier.tsv equal byte for byte (22:17:39 UTC).
+  the founding's faces: the held read (known) of grow-carry 96 on L16's mean against the line's own read of that mean: cavity.tsv and frontier.tsv equal byte for byte, CAVITY_DONE ms=389063 (22:39:51 UTC).
+  the grown state's parity: STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=896 host_ms=95893; STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL (22:56:34 UTC).
+# 23:05 UTC. Lap L17 (the line with the level) at the mean of its last 1,000 sections, rows S over 99,844 places: 1.6992 (0.0089 under arm L16's, ±0.0007); one place open under the law 0.9839. Long panels: arm L16 mean 121 of 249 words (48%), 3 of 20 loop; arm L16 end 157 of 261 (60%); arm R16 mean and end 51% (140 of 274 at the end).
+# 23:05 UTC. The loudness reading beside laps L16 and L17 (the pieces' lines left out):
+  L16 LOUDNESS region=all places=100508 nats_a_place=0.9831 loudness_octaves=19.964 spearman_loud_code=+0.152
+  L16   by surprise fifth (q1 least surprised): q1 nats=0.006 loud=19.894  q2 nats=0.049 loud=19.942  q3 nats=0.273 loud=19.976  q4 nats=1.110 loud=20.016  q5 nats=3.477 loud=19.990
+  L16   by the written symbol's rank: rank 1: share=0.729 loud=19.950 nats=0.256  rank 2-3: share=0.137 loud=20.015 nats=1.938  rank 4-10: share=0.093 loud=19.988 nats=3.280  rank 11+: share=0.042 loud=19.973 nats=5.446
+  L16   temperature (energy over the region's mean, a nat): +0.0233   rank-1 share: loudest fifth 0.695, quietest fifth 0.799
+  L16   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.8491  spearman loud~color=+0.248  color~code=-0.146  by surprise fifth: q1=0.8748 q2=0.8569 q3=0.8456 q4=0.8396 q5=0.8288
+  L16   a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 61575 loud=20.004 nats=1.077 color=0.8640  2nd: 8156 loud=19.932 nats=0.914 color=0.8436  3rd+: 1044 loud=19.904 nats=0.853 color=0.8572
+  L16   places by their word's length: len 1-3: places=14150 loud=20.080 nats=0.994  len 4-6: places=23697 loud=19.994 nats=1.049  len 7-9: places=20505 loud=19.977 nats=1.088  len 10+: places=12423 loud=19.923 nats=1.079
+  L16   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1889 against 2240.5 for an order that carries nothing (ratio 0.843); at them nats=5.072 loud=20.047 color=0.8299 rank-1 share=0.05
+  L16   by lane (octaves): lane0=21.143  lane1=19.479  lane2=19.544  lane3=19.688
+  L16 LOUDNESS_WHOLE region=code places=730 nats_a_place=2.2509 loudness_octaves=20.316
+  L16 LOUDNESS_WHOLE region=web places=758 nats_a_place=2.5056 loudness_octaves=20.512
+  L17 LOUDNESS region=all places=100508 nats_a_place=0.9839 loudness_octaves=19.964 spearman_loud_code=+0.141
+  L17   by surprise fifth (q1 least surprised): q1 nats=0.006 loud=19.897  q2 nats=0.048 loud=19.946  q3 nats=0.269 loud=19.977  q4 nats=1.107 loud=20.013  q5 nats=3.489 loud=19.988
+  L17   by the written symbol's rank: rank 1: share=0.729 loud=19.952 nats=0.256  rank 2-3: share=0.136 loud=20.013 nats=1.941  rank 4-10: share=0.092 loud=19.986 nats=3.288  rank 11+: share=0.042 loud=19.971 nats=5.466
+  L17   temperature (energy over the region's mean, a nat): +0.0206   rank-1 share: loudest fifth 0.706, quietest fifth 0.799
+  L17   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.8543  spearman loud~color=+0.256  color~code=-0.149  by surprise fifth: q1=0.8809 q2=0.8604 q3=0.8510 q4=0.8451 q5=0.8340
+  L17   a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 61575 loud=20.004 nats=1.079 color=0.8689  2nd: 8156 loud=19.934 nats=0.915 color=0.8463  3rd+: 1044 loud=19.906 nats=0.874 color=0.8621
+  L17   places by their word's length: len 1-3: places=14150 loud=20.082 nats=1.002  len 4-6: places=23697 loud=19.995 nats=1.049  len 7-9: places=20505 loud=19.977 nats=1.090  len 10+: places=12423 loud=19.922 nats=1.080
+  L17   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1904 against 2240.5 for an order that carries nothing (ratio 0.850); at them nats=5.108 loud=20.039 color=0.8354 rank-1 share=0.05
+  L17   by lane (octaves): lane0=21.137  lane1=19.469  lane2=19.556  lane3=19.695
+  L17 LOUDNESS_WHOLE region=code places=730 nats_a_place=2.2632 loudness_octaves=20.316
+  L17 LOUDNESS_WHOLE region=web places=758 nats_a_place=2.4929 loudness_octaves=20.508

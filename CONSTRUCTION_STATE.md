@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 19:59 UTC): the line reads every place at its frontier and stands under the plain line
+## Where the work stands (November 18, 23:05 UTC): the line reads every place at its frontier with the level, and an arm grows its carry circles
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -39,6 +39,15 @@ writes the passage's symbol two times in three (0.650 at arm P15, about 0.01 mor
 nat or more is expected she gives the arriving symbol more than the count. So an arm is read on its code, on that mass at the
 settled places and on its panel against the count writers' table.
 
+**The line** (§19). Two streams, the odd contacts facing the past, and the level as a strand hears it (taken on G-1118-16): 1.7444,
+1.7260, 1.7082, 1.6992 nats a place at the frontier over laps L14 to L17, each the mean of a lap's last 1,000 sections, with the
+loudness reading beside each lap from L15. The row of the second place before left (G-1118-17).
+
+**The arm in flight** (§17 to §19; G-1118-23). Rows of single places cannot close what places settle together (0.306 where a count
+of five gives 0.909 and the line 0.650); a carried product with a stride a symbol, alone on the host, gives 0.477 on 32 circles
+and 0.652 on 128; the line's 32 circles rest where a free fit of 32 rests. So the arm grows the circles to 128 by their own
+founding law (`grow-carry`, every face kept, receipts taken) and runs two laps beside the line.
+
 **What a strand's state carries** (§15; `tools/strand_presence_ruler.py`, halves split by source). An open place holds the place
 before it at nine tenths as it opens, the second before at a half, the third at a fifth, the fourth at a tenth, and the ticks carry
 no farther place in.
@@ -55,11 +64,9 @@ no farther place in.
   host and on the card, bit for bit (30 cases). By §13 it is the carrier a level's own receipt needs and is not expected to move
   the frontier without one; its arm beside the line is G-1118-16.
 
-**What is owed, in order.** The arms in flight, each beside the line from one state: the row of the second place before
-(G-1118-17) and the level's second lap (G-1118-16). Then the reading that this section lacks: what keeps her writes from holding,
-which a count of five does not size (it writes no sentence either). Carriers of farther places and a store of rows for a strand in
-progress (§13 to §15) stay candidates, each judged by its arm, not by §12's first sizing. A writer that keeps the known stream's
-states.
+**What is owed, in order.** The arm's two laps and its score (G-1118-23). The Codex thread's section-choice test on the host
+(G-1118-18). Then, by what the arm reads: a larger extent, or the composite's rows at located addresses (§13), each as an arm. A
+writer that keeps the known stream's states.
 
 ## Earlier positions
 

@@ -254,6 +254,7 @@ reproduced, and the lap's read byte for byte (CLAUDE.md, the gates).
 | `found-lane`, `found-loud` | `train` | a part founded at zero: one more lane; the loud face | `FOUND_LANE_LINE` and `FOUND_LANE`; `FOUND_LOUD_LINE` and `FOUND_LOUD` |
 | `grow-crossings`, `found-crossing` | `train` | crossing triads grown with drawn legs and a zero return; the triads' legs set from a ruler's located file, the return at zero (a founding) or the ruler's (a ruler's state) | `GROW_CROSSINGS`, `FOUND_CROSSING` |
 | `open-level` | `host` | the level opened to one-sided streams: the block a passage read by two streams takes the epoch before each place through, at zero | `OPEN_LEVEL` |
+| `grow-carry` | `host` | more carry circles on a field that has some, founded as its first were (drawn drives and turn rows, the leak at its founding, `W` columns at zero: every face kept, a tower's level kept) | `GROW_CARRY` |
 | `found-closed` | `train`, `host` | the closed face founded from a ruler's words (`crates/engine/src/closed.rs`), an attempt the card refuses | `FOUND_CLOSED` |
 | `zero-triad-return`, `zero-level-return`, `ruler-temper` | `train`; `host`; `train` | a ruler's state, never trained from: the triads' return at zero; the level's prolongation at zero; one head's listener temperature moved | `ZERO_TRIAD_RETURN`, `ZERO_LEVEL_RETURN`, `RULER_TEMPER` |
 

@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §18 added the same day, to 21:25 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -610,3 +610,63 @@ The guess: (a) one advance at 0.22 to 0.31: held (0.293). (b) strides on 32 circ
 slices of five. (e) 2.05 to 2.25 nats over all places and 45% to 58% lexicon words: held (2.132, 55%). The rule: 0.60 or over at
 the settled places, so the arm is ordered: carry circles whose turn is a stride of the site's symbol, founded with drawn strides
 and their reach at its founding, beside the line with the level.
+
+## 19. The arm the readings left: more carry circles, by their own founding law
+
+*Written at 23:05 UTC.* §18's rule ordered an arm on the carry circles. Two more readings fixed its form before it was built, an arm
+in flight was scored, and the build took its receipts.
+
+**A reader opened where the line's circles stand comes to rest there** (G-1118-22; `content_stride_ruler.py`, sizes `32z` and
+`32c`, books and web). The stride reader on 32 circles opened with every stride at zero reads 0.580 and 0.456 at the settled
+places; opened closed, as the line's circles stand (strides within 0.06 of a turn, a modulus of 0.39), it reads 0.587 and 0.463;
+opened with strides drawn over the turn at 4/5 it read 0.590 and 0.468. The closed reader stayed closed: its modulus ended at 0.40
+and 0.42 and its strides spread by 0.12 and 0.13 of a turn. So the guess's reads held and its account did not: nothing holds the
+line's circles back where they stand, because a free fit of this reader on 32 circles rests in the same place and reads the same.
+§17's sentence that the circles' short reach is what keeps the line at three places is withdrawn with it: at this extent a reach
+of under two places with small strides is what the fit itself chooses.
+
+**The line's circles over its laps.** The same gates read on the means of laps S9, S12, P12, P14, P15 and L15: the symbols'
+strides spread by 0.049, 0.053, 0.054, 0.057, 0.058 and 0.058 of a turn at the first tick, the turn's resultant over all sites
+0.917 down to 0.893, the mean modulus between 0.380 and 0.398 throughout. Seven laps of reading every place at its frontier move
+the circles a little toward strides and leave their reach where it was; the level does not change them.
+
+**So the extent is what is left.** By itself a stride reader gives 0.477 at the settled places on 32 circles and 0.652 on 128
+(§18). The line has 32.
+
+**The row of the second place before leaves the line** (G-1118-17). Arm R15 read 0.0514 nats above its control at the frontier
+and arm R16 0.0320 above (the rule asked 0.015 under); under the law one place open stands 0.038 above; at the settled places the
+arm gives the arriving symbol 0.641 of its mass where its control gives 0.657. A row for a single farther place, taken from rows
+the law's regions still read another way, costs for two laps what §17's ladder said it could not repay. The word stays a region's
+word in the tree.
+
+**The founding** (`Constitution::more_carry`, `Learner::more_carry`, `athena host complete-language grow-carry`; atlas
+`contact.more-carry-circles`). New circles follow the standing ones as the last complex contacts, founded as the first were:
+their drives `a` and `b` and their turn rows drawn uniform on `±√(3/D)`, their leak rows and biases at zero (a turn of about a
+radian set by the site's read at the founded friction, `|γ| = 4/5`), their columns of `W` at zero. Every standing contact and
+circle keeps its complex index and its strand side, every sum the forward forms into the face is the old sum, and a tower keeps
+its level. The first founding, `with_carry`, laid the circles' charts over any family laid after them in a release build, held
+by a debug assertion alone; it refuses that case now.
+
+On the line: 96 more circles (32 to 128), 192 more pair contacts (128 to 320), 98,880 new entries (the material from 442,425 to
+541,305). Receipts before a lap, on the card:
+
+| receipt | reading |
+|---|---|
+| the build reproduces today's line (lap L16 from arm L15's end) | parity on 3 sections: 3 calls, 0 unequal (card 1.0 s, host 118 s); 24 of 24 sections' lines equal; the held read with the frontier's rows equal byte for byte |
+| the founding keeps every face on the card | the grown mean state's held read, its cavity and frontier tables, equal to the line's own byte for byte (389 s against the line's 387 s) |
+| the grown state's card realization against the host | parity on 3 sections: 3 calls, 0 unequal (card 0.9 s, host 96 s) |
+| the host's test | `more_carry_circles_keep_every_face_every_standing_circle_and_a_towers_level`: the law's region, a strand, a tower with its one-sided block, the learner's moments and text |
+
+The arm (G-1118-23) runs two laps, C17 and C18, from arm L16's end with the circles grown, beside the line's own L17 and L18. Its
+rule: 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening by
+0.003 or more, two more laps; otherwise the circles leave.
+
+**The line, and its loudness.** With the level the line reads 1.7444, 1.7260, 1.7082 and 1.6992 nats a place at the frontier over
+laps L14 to L17 (each the mean of a lap's last 1,000 sections), 0.0215, 0.0268 and 0.0305 under the plain arm's laps 14 to 16.
+Beside laps L15, L16 and L17, with one place open (100,508 places): 0.984, 0.983 and 0.984 nats a place; loudness 19.96 octaves at
+each; the rank correlation of loudness with the code +0.14 to +0.15 (the loud places are a little the more surprised: no dense
+basin), 19.90 octaves in the least surprised fifth against 20.01 in the fourth; an energy of +0.021 to +0.023 of the mean a nat;
+the written symbol the face's loudest at 0.73 of places, at 0.70 of the loudest fifth and 0.80 of the quietest; the lanes'
+spectrum whitening lap over lap (0.841, 0.849, 0.854 nats of ln 4), whiter where surprise is least; ceilings broken at 0.81, 0.84
+and 0.85 of what an order that carries nothing gives; the first lane at 21.14 octaves and the other three at 19.47 to 19.70. This
+reading was missing from every lap of this record before L15; it is taken with each lap from here.
