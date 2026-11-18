@@ -306,3 +306,31 @@ Scored (2026-11-18T15:19:53Z), G-1118-10, G-1118-11 and the first part of G-1118
   level is worth 0.214. The writes are below the line's so far.
   G-1118-12, at the lap means. Arm K8's known-stream rows stand 0.0590 under arm K7's (0.03 to 0.08 guessed: held); its rows under the
   law stand 0.0322 above arm K7's (within 0.05: held). The ruler rows and the panels are not read yet.
+
+Scored (2026-11-18T15:55:18Z), G-1118-12's rest and G-1118-13 (reads.txt).
+  G-1118-12, the rest. On the ruler rows arm K8's mean reads 2.105 as a known stream (2.08 to 2.13 guessed: held), under its own
+  reading by the law (2.148). Its panels 38% and 37% against arm K7's 32% and 40% (within eight points: held).
+  G-1118-13. (a) A section took 258 ms over the lap, 269 in the development read (300 to 600 guessed: missed, it is shorter), with
+  14,300 places compared at the frontier where a known-stream section compared 234; the lap 775 s. (b) At lap means arm S9's rows S
+  read 1.9238 against arm K8's rows K 2.0267: 0.1029 under (0.04 to 0.14 guessed: held). (c) Arm S9's end stands 0.0233 above its mean
+  on rows S (within 0.015 guessed: missed; a plain lap's end stood 0.042 above its mean). (d) Its rows under the law stand 0.029 above
+  arm K8's (within 0.08: held); one place open 0.019 above and whole masks 0.001 above (0.00 to 0.06 above: held). (e) Panels written
+  by two streams from the end: short 49% (held), long 35% (40% to 56% guessed: missed low).
+  What it decides, by the rule fixed before the read: (b) reads 0.10, so the line takes the two streams and the one-sided level is the
+  next build. What the rule cannot say: the long panel's writes did not follow the code (35%, where the plain line's seventh lap wrote
+  52% and the known stream's second lap 37%).
+  The rate. G-1118-10's rule gives the line rate 14 with the remainder from its next lap. It was fixed on the line with the frontier's
+  share at its seventh lap, where a lap's mean moves 0.008; the two-stream line moved 0.10 in its first lap, so a step a quarter the
+  size would be read against a mean still travelling. Its reason (a state that walks about a mean that stands) does not reach this lap:
+  the next laps keep rate 12, their writes are made from the lap's mean beside its end, and the rate is cooled where a lap's fall
+  comes under its end's distance from its mean.
+
+G-1118-14 (2026-11-18T15:55:18Z). Three more laps of two streams at rate 12 (arms S10 to S12), each read at its lap mean. Read before fixing: arm S9's
+first lap fell 0.103 on rows S; the plain line's frontier fell 0.160 in its first lap with the share and then 0.0458 ln(sections)
+(0.031, 0.024, 0.011 a lap); the known stream fell 0.81 in its first lap and 0.059 in its second.
+  The guess. Rows S at lap means: arm S10 0.030 to 0.070 under arm S9, arm S11 0.015 to 0.045 under arm S10, arm S12 0.010 to 0.035
+  under arm S11, so arm S12 stands at 1.79 to 1.87 where the plain line's seventh lap reads 1.804 under the law. The long panel
+  written from a lap's mean stands above the same lap's written from its end, and by arm S12 reads 40% or more.
+  What it decides. If arm S12's rows S stand under 1.85 the one-sided reading without the level has reached the plain line's with it
+  inside five laps of the regime, and the level then adds to a line already level with it. If the laps stall above 1.90, what the
+  level holds is what is missing and the laps wait for it.

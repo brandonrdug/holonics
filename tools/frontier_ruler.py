@@ -74,6 +74,10 @@ for name, d in reads:
         if common:
             d_ = np.array([kr[k] - law_rows[k] for k in common])
             print(f"FRONTIER {name}; {label}, less the law's reading of the same state, paired: {d_.mean():+.4f} (±{d_.std(ddof=1) / math.sqrt(len(d_)):.4f}) over {len(common)} places")
+        by_k = {}
+        for k, v in kr.items():
+            by_k.setdefault(octave(int(k[3])), []).append((k, v))
+        print(f"FRONTIER {name}; {label}, by places known" + ("" if base_k is None else " (less the control's)") + ": " + " | ".join(f"{span(o)}: {np.mean([v for _, v in by_k[o]]):.3f}" + ("" if base_k is None else f" ({np.mean([v - base_k[k] for k, v in by_k[o] if k in base_k]):+.3f})") for o in sorted(by_k)))
         if kind == 'S':
             known_rows = {('S',) + k[1:]: v for k, v in fr.items() if k[0] == 'K'}
             common = [k for k in kr if k in known_rows]
