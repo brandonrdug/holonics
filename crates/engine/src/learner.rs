@@ -85,13 +85,15 @@ pub(crate) fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> 
 
 /// Each region's run of compared sites before its port and its weight in the joint code, `(K, m, K)`
 /// ([`Region::weight`], §16.23), in the order [`compared`] reads them.
-/// [the lead, November 18] A passage read by two streams ([`Region::strand`]) compares every place past its first at weight one.
+/// [the lead, November 18] A passage read by two streams ([`Region::strand`]) compares every place past its first at weight one: its
+/// compared places are its domain.
 pub(crate) fn spans_of(regions: &[Region]) -> Vec<(usize, u64, u64)> {
     regions
         .iter()
         .map(|r| {
             if r.strand {
-                return (r.classes.len().saturating_sub(1), 1, 1);
+                let places = r.classes.len().saturating_sub(1);
+                return (places, places as u64, places as u64);
             }
             let (m, k) = r.weight();
             (r.unresolved[..r.port.map_or(r.unresolved.len(), |p| p.start)].iter().filter(|&&u| u).count(), m, k)

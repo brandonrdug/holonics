@@ -472,6 +472,7 @@ impl Cut {
                 // first compared at weight one, so it declares no domain.
                 state.region.unresolved.fill(false);
                 (state.region.domain, state.region.strand) = (None, true);
+                state.counted -= 1;
             }
             state
         } else if self.pass.own {
