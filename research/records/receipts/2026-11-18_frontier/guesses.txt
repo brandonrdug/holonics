@@ -432,3 +432,22 @@ query's 32-class suffix in one strand and the next target is scored under both b
   What it decides. An exchange gain of 0.02 or more with its interval off zero: a header rule is taken up as an arm of the
   passage's cut (a place to stay or leave by her own score). Under that: her score does not choose her reads yet, the cut keeps its
   quota, and the selector waits for a carrier of farther identity; (a) and (b) stand as the size of what a read is worth to her.
+
+G-1118-19 (2026-11-18T20:04:17Z). A ladder for the rows of single places (tools/additive_rows_ruler.py; host, floats, a ruler): the reader whose
+face's logarithm is a sum of one row for each of the K places before a place, fitted on 8 MB a slice, read on the frontier's places
+in the excess ruler's bins beside the count that binds the same K places, K from 1 to 5; and its writes from the long panel's prompts.
+  What is on record. At the fifth of places where a count of five expects under a quarter of a nat, a draw from the count writes the
+  passage's symbol 0.909 of the time and one from the line's face 0.650 (arm P15); the line's writes hold 44% to 51% lexicon words
+  where counts of 2, 3, 4 and 5 places hold 42%, 58%, 73% and 85%. An open place holds the place before at 0.90, the second at 0.48,
+  the third at 0.17 (§15). The arm in flight adds a row for the second place before (G-1118-17), and its rule names rows for the
+  third to fifth places as the growth that follows.
+  What the theory says. A sum of rows holds each place's vote and no conjunction of places (the symbol's record of November 12: the
+  conjunction a sum of its places does not hold is the composite's remainder), and what five places settle is mostly settled by
+  their conjunction: a word's interior.
+  The guess. (a) At that fifth of places the rows of five places reach a draw agreement between 0.62 and 0.78 (the count 0.909),
+  the rows of two 0.47 to 0.57, of three 0.55 to 0.66. (b) Over all frontier places the rows of five code between 1.95 and 2.15
+  nats (the count of five 2.04). (c) Their writes hold 45% to 60% lexicon words.
+  What it decides. Rows of five places under 0.80 at that fifth: rows of single places cannot close what five places settle, and
+  the growth after the second place's row is a binding of the carried places (the pair contact's product taken along the places
+  carried, or the composite's remainder), ordered as an arm; G-1118-17's follow-on clause is read with this. At 0.80 or over: the
+  rows of the third to fifth places are the growth, as that clause says.
