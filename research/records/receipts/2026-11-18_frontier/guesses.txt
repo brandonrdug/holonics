@@ -27,3 +27,17 @@ at passes 0, 1 and 2, boundary rows and half-open rows together); the cooling la
   the text store, and the panel is written one place a read. If the frontier rows do not fall by 0.05, the difference from the night's
   rows is the store's contexts or the weight, and the frontier rows by known places say which. (c) is the measure of what the next
   lever is: if a long context buys nothing at the frontier, what is owed there is reach (the audit §1.7) and room (§1.9), not diet.
+
+Added (2026-11-18T06:04:23Z), before any read of G-1118-3: a record I had not read when I fixed it. On November 15 the line ran one lap with every
+stretch's state the release's own at a crossing of its octaves and no mask state (the pass word `own`, G199, the record of the own
+states' lap). One place open rose 0.2523 nats a place in that lap (0.8394 to 1.0917, every slice), whole masks 2.2453 to 2.4110, and the
+writes by the octave release with its refine lost words and ran away on one symbol at 512 places. Its reading: a field serves the
+receivers its states name, and a form not kept up loosens in one lap.
+  What this build shares with it: most stretches are taken from the masks and given to a writer's state. What differs: a quarter of the
+  stretches (about two fifths of the sites) stay with the line's keyed states; the state is one place at the place-order frontier with
+  the region ending there, where that lap's states left a whole run open and compared all of it; and the writer it is read by is the one
+  that meets that state (one place a read, in place order, no refine), where that lap's writes ran through a refine whose states it
+  had stopped training.
+  What it does to the guess: part (b) stands as fixed (0.005 to 0.05 above the control with one place open), and that record's lap is
+  the reason it may miss high. A cost past 0.05 means the share as built takes more from the two-sided reading than upkeep at a quarter
+  of the stretches returns, and the share or the weights are then what is read next, never the frontier's own gain.
