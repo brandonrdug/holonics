@@ -1,7 +1,7 @@
 # A level is a codec that carries its decoder and closes a scale square, both read at the receiver's face; the built level was founded on a saddle, has no receipt at its own grain and folds a winding epoch onto itself
 
 November 17, 2026, 23:40 to 23:55 UTC. Refs #404 #405 #406 #410. Status: [design; `agent-inferred` throughout; no part is
-built; the two readings of §6 were read on November 18 and are in §9, a measurement]. The lead's reading of the tree, written before any part, after
+built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order]. The lead's reading of the tree, written before any part, after
 [the trace of the engine's own level](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
 (§19 there). Two host readings are named in §6 with their guesses fixed in
 [the guess file](receipts/2026-11-17_tempering/guesses.txt) before either is read.
@@ -308,5 +308,57 @@ recover 0.539 of it. So a law of the table's form at about a fiftieth of the pow
 3. The chart and the width are sized from the unit's strand before either: a winding epoch's order, and a width a
    strand with its phases passes.
 
-None of the three is built. The part's law, its cost on the card and its guess are written before it is ordered.
+None of the three is built. §10 reads what such a level could hand a place before any of them is ordered, and withdraws
+this order for her writes.
+
+## 10. What a level on the news phase can hand a place, and where her excess stands (November 18, 00:27 to 00:34 UTC)
+
+`measurement` for the figures (the same receipt, its last two blocks), `agent-inferred` for the reading. The guess G-V3 was
+fixed and pushed at 00:30 UTC, before the ruler's third reading.
+
+**The chart cannot tell the order of dark places.** A place advances the news phase by its own news over the section, a
+median of 0.073 of a turn, where a sixth of a turn is what six harmonics resolve. Inside whole epochs, 51.7% of places stand
+in the same sixth as the place before them: 75.1% of the places under one nat, and none of the places of a nat or more. A
+fifth of an epoch's places (19.2%) stand alone in their sixth, and an occupied sixth holds 2.34 places. This is the law of
+sites working as written (a place of no news moves no site and no phase), carried into the interior's chart, where it means
+that a unit's predicted places have no address of their own.
+
+**What a located level hands each place of its unit** (reading C: a level state read at the place's own phase, the
+prolongation's form, a least-squares decoder fitted on half the regions; thousandths):
+
+| the level's state | the place's own symbol, places of a nat or more | the same, places under a nat | the unit's leading symbol, at its other places |
+|---|---|---|---|
+| a restriction of width 64 located from the keys | 152 | 77 | 346 |
+| the moment, its 300 leading directions | 322 | 188 | 300 |
+| the level's present read | 44 | 38 | 52 |
+
+A dark place is handed its own symbol about half as well as a bright one, the direction the guess fixed. Two of its figures
+missed low: a bright place is handed its own symbol at 152 and 322 where 300 to 550 and 450 to 700 were guessed, because the
+dark places that follow a bright one stand in its sixth and a decoder at that phase can only give their mixture. What a
+level charted this way can hand a place is its unit's strand by sixths, the unit's leading symbol at 346 where 52 arrives
+today. It cannot hand a place its own turn among the places of its sixth.
+
+**Where her excess stands is where this chart is blind.** Nine tenths of her excess over a count stands at places under one
+nat (the dwell record's §17), and at the landmarks she codes better than the count. A level on the news phase is strongest
+at a unit's bright places and across units, and the order of a unit's dark places is the place level's own.
+
+**The prize on this specimen, from the night's count rulers** (the dwell record's §18; held text, nats a place). A count of
+the last `k` symbols bound in their order reads 2.428, 2.003, 1.698, 1.502, 1.433 and 1.395 for `k` from 1 to 6, and 1.390
+with the word in progress and the word before it added to five. Her face reads 1.527, a bound window of about four symbols.
+So everything bound context holds past her window is worth 0.14 nats a place on the fifty books, most of it in the fifth
+and sixth symbols, and the word and the word before add 0.005 to six. The count reader's panel has 89 to 92% of its words
+in the lexicon where hers has 76%.
+
+**What this corrects.** §9 ended by putting the level's own face first. On these two readings that order does not hold
+for her writes. A tower compounds from below: under a flat face every place is a site, and an epoch lengthens only as the
+level below predicts its interior. Her place level binds about four symbols, the interiors of her units are not yet
+dark, and the level above is blind to them by its own law. The level's face is still what a second level's cut needs,
+and it is not what her excess waits on. Nothing of §9's three items is ordered.
+
+**The next reading, not a part.** Whether her bound window is her depth. Read on the masked line on November 13, a face
+fitted at each tick coded 2.50, 1.93, 1.54, 1.36 and 1.31, beside which the counts above read 2.43, 2.00, 1.70 and 1.50:
+about one more bound symbol a tick. The same reading on the night's state at the boundary, a face fitted at the opening
+and after each tick against the counts of one to four symbols, says whether a place binds one symbol a tick. If it does,
+the place level's binding order is its count of ticks, and the theory's question becomes how a place binds farther
+without paying a tick at every place, which is where the clock of news and the level enter.
 

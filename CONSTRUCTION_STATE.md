@@ -66,9 +66,17 @@ under zero, a planted law of that form recovered whole): the fine field already 
 comparison gives a level no slope. "The level holds almost nothing of its units" overstated the evening's trace, whose key (a unit as
 one identity) was a free row's: it holds a third of which symbols and a tenth of their order.
 
-**What follows, not built.** The level's own face first (its closure and its square, deposited in the level's own material), a founding
-from located operands, and a chart and a width sized from a unit's strand. The part's law, its cost on the card and its guess are
-written before it is ordered.
+**Where her excess stands, the level's chart is blind (the design record's §10).** The level's chart addresses a place by its news
+phase, so a unit's predicted places have no address of their own: three quarters of the places under one nat stand in the same sixth of
+a turn as the place before them, and a level located by the ruler hands a dark place its own symbol half as well as a bright one. Nine
+tenths of her excess stands at dark places. A tower compounds from below: an epoch lengthens only as the level below predicts its
+interior, and her place level binds about four symbols (her 1.527 nats beside a count of the last four symbols' 1.502; five and six
+read 1.433 and 1.395, the whole prize of bound context on the fifty books 0.14 nats a place and words in the lexicon from 76% to about
+90%). So the level's own face is what a second level's cut needs and is not what her writes wait on, and it is not ordered.
+
+**The next reading, not a part.** Whether her bound window is her depth: a face fitted at the opening and after each tick, beside the
+counts of one to four bound symbols (on the masked line of November 13 the ticks read 2.50, 1.93, 1.54, 1.36, 1.31). If a place binds
+one symbol a tick, the question for the theory is how a place binds farther without a tick paid at every place.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

@@ -378,3 +378,23 @@ fixed for it; it is a reading.
   power removed, of 0.0909 planted), 0.539 by operands of width 64 located for it from the moments.
   G-V1's reading of its misses stands with two corrections: the identity does not grow through the level's ticks (255 to 171), and the
   fold does cost order, which the bag could not see.
+
+G-V3 (2026-11-18T00:30:19Z). What a located level hands each place of its unit, read by the ruler on the same dump (no part, no state changed). Read
+before fixing: inside whole epochs 51.7% of places stand in the same sixth of a turn of the news phase as the place before them, 75.1% of
+the places under one nat and none of the places of a nat or more; a fifth of an epoch's places stand alone in their sixth. The six
+harmonics read the phase, so the chart cannot tell the order of dark places, and nine tenths of her excess stands at dark places.
+  The reading: from a level state of width 64 located from the keys (reading A's), read at each written place's own phase (the
+  prolongation's form, harmonics times state, a least-squares decoder fitted on half the regions), the presence in thousandths of (a)
+  the place's own symbol at places of a nat or more, (b) the place's own symbol at places under a nat, (c) the unit's leading symbol at
+  its other places; and the same from the moment at full rank, and from the level's present read.
+  The guess: located, (a) 300 to 550, (b) under 150, (c) 300 to 420; at full rank (a) 450 to 700, (b) under 250; the present read (a)
+  under 120, (b) under 60, (c) under 100.
+  What it decides: a level charted on the news phase can hand a place its unit's bright strand and cannot hand a dark place its own
+  turn in the unit. If (b) reads near (a), the claim is wrong and the chart does resolve the interior.
+
+Scored (2026-11-18T00:35:57Z), G-V3 (level_links.txt, reading C; 196 s). Located at width 64: (a) 152 (300 to 550: missed low), (b) 77 (under 150:
+held), (c) 346 (300 to 420: held). The moment's 300 leading directions: (a) 322 (450 to 700: missed low), (b) 188 (under 250: held),
+(c) 300. The present read: 44, 38, 52 (under 120, 60 and 100: held). A dark place is handed its own symbol half as well as a bright one,
+so the claim's direction holds; the bright figure missed because the dark places after a bright one stand in its sixth, and a decoder at
+that phase gives their mixture. A level on the news phase hands a place its unit's strand by sixths and not the place's own turn.
+
