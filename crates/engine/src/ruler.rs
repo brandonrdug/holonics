@@ -854,7 +854,7 @@ impl Constitution {
         for region in regions {
             let pass = self.pass(region, true)?;
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None, None, None, None)?;
+            self.returned_with(region, &pass, &mut g, Some(&mut out), None, None, None, None, None, None)?;
         }
         Ok(out.chunks_exact(2).map(|c| [c[0], c[1]]).collect())
     }
@@ -870,7 +870,7 @@ impl Constitution {
         let mut covectors: Vec<Vec<i64>> = Vec::new();
         if returning {
             let mut g = vec![0i128; self.material_len()];
-            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None, None, None, None)?;
+            self.returned_with(region, &pass, &mut g, None, Some(&mut covectors), None, None, None, None, None)?;
             covectors.reverse();
         }
         let mut out = Vec::new();
@@ -1021,7 +1021,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut dx = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, None, Some(&mut dx))?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, None, Some(&mut dx), None)?;
         let (dw, sites, a) = (self.declaration.width, region.classes.len(), self.declaration.alphabet);
         let l = &self.layout;
         let delta = |base: usize, s: usize| -> Option<Vec<i64>> {
@@ -1047,7 +1047,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let (sites, dw, heads) = (region.classes.len(), self.declaration.width, self.declaration.heads);
         let definite: Vec<bool> = (0..sites).map(|t| Self::definite(region, t)).collect();
@@ -1183,7 +1183,7 @@ impl Constitution {
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
         let mut currents: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         currents.reverse();
         let (sites, dw, heads, span) = (region.classes.len(), self.declaration.width, self.declaration.heads, 2 * self.declaration.modes);
@@ -1234,7 +1234,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let d = &self.declaration;
         let (sites, dw, lanes, ticks) = (region.classes.len(), d.width, d.lanes, pass.ticks.len());
@@ -1288,7 +1288,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
         let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
@@ -1317,7 +1317,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
         let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
@@ -1343,7 +1343,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let (sites, dw, ticks) = (region.classes.len(), self.declaration.width, pass.ticks.len());
         let code = |f: &Forward| -> i128 { f.faces.iter().zip(region.classes).filter_map(|(face, &c)| face.as_ref().map(|x| i128::from(x.code(c)))).sum() };
@@ -1373,7 +1373,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let d = &self.declaration;
         let (sites, dw, heads, lanes) = (region.classes.len(), d.width, d.heads, d.lanes);
@@ -1430,7 +1430,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambdas: Vec<Vec<i64>> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, None, Some(&mut lambdas), None, None)?;
         lambdas.reverse();
         let d = &self.declaration;
         let (sites, dw, heads, n, m, lanes) = (region.classes.len(), d.width, d.heads, d.modes, d.complex(), d.lanes);
@@ -1616,7 +1616,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut flat: Vec<[ReachSums; 2]> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, None, Some(&mut flat), None, None)?;
+        self.returned_with(region, &pass, &mut g, None, None, None, Some(&mut flat), None, None, None)?;
         let heads = self.declaration.heads;
         let mut by_tick: Vec<Vec<[ReachSums; 2]>> = flat.chunks(heads).map(<[_]>::to_vec).collect();
         by_tick.reverse();
@@ -1635,7 +1635,7 @@ impl Constitution {
         let pass = self.pass(region, true)?;
         let mut g = vec![0i128; self.material_len()];
         let mut by_tick: Vec<(usize, Vec<i64>)> = Vec::new();
-        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick), None, None, None)?;
+        self.returned_with(region, &pass, &mut g, None, None, Some(&mut by_tick), None, None, None, None)?;
         by_tick.reverse();
         Ok((by_tick.into_iter().map(|(k, dl)| (k, dl, pass.ticks[k].read.clone())).collect(), g))
     }
@@ -1803,7 +1803,7 @@ impl Constitution {
         let mut lambda: Vec<Vec<i64>> = Vec::new();
         let mut currents: Vec<Vec<i64>> = Vec::new();
         let (sites, heads) = (region.classes.len(), self.declaration.heads);
-        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambda), None)?;
+        self.returned_with(region, &pass, &mut g, None, Some(&mut currents), None, None, Some(&mut lambda), None, None)?;
         lambda.reverse();
         currents.reverse();
         // Each open row's temperature covector, as the reverse forms it before it sums the rows into the head's one entry: with the current's

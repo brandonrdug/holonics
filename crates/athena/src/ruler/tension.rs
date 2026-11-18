@@ -665,15 +665,24 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 }
 
 /// [measurement; the lead, November 17, the record of the dwell §19] `read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS
-/// FORMS_SHA STATE STATE_SHA OUT`: **a region's level, written out for a ruler**. Each row of `FORMS` (`label<TAB>prompt<TAB>run`) is
+/// FORMS_SHA STATE STATE_SHA OUT [links]`: **a region's level, written out for a ruler**. Each row of `FORMS` (`label<TAB>prompt<TAB>run`) is
 /// one region, its prompt known and its run open. `OUT/level.tsv` takes a line a region: its label, its sites, the epochs' anchors and
 /// each place's news on the code's grain (`2^(−20)` bits); `OUT/coarse.i32` takes each epoch's read after the level's last tick, epoch
 /// after epoch in the regions' order (`D₁` entries on `2^(−16)`); `OUT/dims.tsv` names `D₁`. On the host's threads; the state is read,
 /// never written.
+///
+/// [measurement; the lead, November 17, the level's design record §6] With `links`, every link of the level's own equation is written
+/// beside them ([`holonics_engine::field::Constitution::level_links`]), place after place and epoch after epoch in the regions' order:
+/// `phase.i64` (`H` a place, on `2^(−30)`), `read.i32` (the place's read at the split, `D₀` on `2^(−16)`), `moment.i64` (`H D₀` an epoch),
+/// `restricted.i64` (`D₁` an epoch, before the level's ticks), `prolonged.i64` (`D₀` a place) and `covector.i64` (`D₀` a place on
+/// `2^(−24)`, what the region's reverse holds at the level's locus); `dims.tsv` then names `H` and `D₀` too.
 pub fn read_level(args: &[String]) -> Result<()> {
-    if args.len() != 12 {
-        return Err("read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT".into());
-    }
+    let usage = "read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA STATE STATE_SHA OUT [links]";
+    let links = match args.len() {
+        12 => false,
+        13 if args[12] == "links" => true,
+        _ => return Err(usage.into()),
+    };
     let started = std::time::Instant::now();
     refuse_variables("read-level")?;
     let units = units_of(&args[1], &args[2])?;
@@ -696,22 +705,64 @@ pub fn read_level(args: &[String]) -> Result<()> {
         open[p.len()..].fill(true);
         work.push((w[0].to_string(), OwnedRegion::plain(classes, open)));
     }
-    let traces: Vec<_> = work.par_iter().map(|(_, region)| learner.field.level_trace(&view_of(region)).map_err(|e| e.to_string())).collect();
     std::fs::create_dir(out)?;
-    let (mut lines, mut coarse) = (String::new(), Vec::<u8>::new());
-    let mut width = 0usize;
-    for ((label, region), trace) in work.iter().zip(traces) {
-        let t = trace?.ok_or("a field without a level")?;
-        width = t.coarse_read.len() / t.anchors.len().max(1);
-        let list = |v: &mut dyn Iterator<Item = String>| v.collect::<Vec<_>>().join(",");
-        lines.push_str(&format!("{label}\t{}\t{}\t{}\n", region.classes.len(), list(&mut t.anchors.iter().map(usize::to_string)), list(&mut t.news.iter().map(i64::to_string))));
-        for v in &t.coarse_read {
-            coarse.extend_from_slice(&v.to_le_bytes());
+    let create = |name: &str| -> Result<std::io::BufWriter<std::fs::File>> { Ok(std::io::BufWriter::new(std::fs::OpenOptions::new().write(true).create_new(true).open(out.join(name))?)) };
+    let (mut lines, mut coarse) = (create("level.tsv")?, create("coarse.i32")?);
+    let mut link_files = if links { Some((create("phase.i64")?, create("read.i32")?, create("moment.i64")?, create("restricted.i64")?, create("prolonged.i64")?, create("covector.i64")?)) } else { None };
+    let (mut width, mut harmonics, mut fine) = (0usize, 0usize, 0usize);
+    // Regions in blocks, so that what is held before it is written stays bounded; rows in the table's order.
+    for block in work.chunks(2048) {
+        let traces: Vec<_> = block
+            .par_iter()
+            .map(|(_, region)| if links { learner.field.level_links(&view_of(region)) } else { learner.field.level_trace(&view_of(region)) }.map_err(|e| e.to_string()))
+            .collect();
+        for ((label, region), trace) in block.iter().zip(traces) {
+            let t = trace?.ok_or("a field without a level")?;
+            let (sites, epochs) = (region.classes.len(), t.anchors.len().max(1));
+            width = t.coarse_read.len() / epochs;
+            let list = |v: &mut dyn Iterator<Item = String>| v.collect::<Vec<_>>().join(",");
+            writeln!(lines, "{label}\t{sites}\t{}\t{}", list(&mut t.anchors.iter().map(usize::to_string)), list(&mut t.news.iter().map(i64::to_string)))?;
+            for v in &t.coarse_read {
+                coarse.write_all(&v.to_le_bytes())?;
+            }
+            if let Some((phase, read, moment, restricted, prolonged, covector)) = link_files.as_mut() {
+                harmonics = t.phase.len() / sites;
+                fine = t.read.len() / sites;
+                if t.covector.len() != sites * fine || t.prolonged.len() != sites * fine || t.moment.len() != epochs * harmonics * fine || t.restricted.len() != epochs * width {
+                    return Err("a level's links of another shape than its region".into());
+                }
+                for v in &t.phase {
+                    phase.write_all(&v.to_le_bytes())?;
+                }
+                for v in &t.read {
+                    read.write_all(&v.to_le_bytes())?;
+                }
+                for v in &t.moment {
+                    moment.write_all(&v.to_le_bytes())?;
+                }
+                for v in &t.restricted {
+                    restricted.write_all(&v.to_le_bytes())?;
+                }
+                for v in &t.prolonged {
+                    prolonged.write_all(&v.to_le_bytes())?;
+                }
+                for v in &t.covector {
+                    covector.write_all(&v.to_le_bytes())?;
+                }
+            }
         }
     }
-    write_new(&out.join("level.tsv"), lines.as_bytes())?;
-    write_new(&out.join("coarse.i32"), &coarse)?;
-    write_new(&out.join("dims.tsv"), format!("coarse\t{width}\n").as_bytes())?;
-    println!("LEVEL_DONE regions={} ms={}", work.len(), started.elapsed().as_millis());
+    lines.flush()?;
+    coarse.flush()?;
+    if let Some((mut a, mut b, mut c, mut d, mut e, mut f)) = link_files {
+        a.flush()?;
+        b.flush()?;
+        c.flush()?;
+        d.flush()?;
+        e.flush()?;
+        f.flush()?;
+    }
+    write_new(&out.join("dims.tsv"), if links { format!("coarse\t{width}\nharmonics\t{harmonics}\nfine\t{fine}\n") } else { format!("coarse\t{width}\n") }.as_bytes())?;
+    println!("LEVEL_DONE regions={} links={links} threads={} ms={}", work.len(), rayon::current_num_threads(), started.elapsed().as_millis());
     Ok(())
 }

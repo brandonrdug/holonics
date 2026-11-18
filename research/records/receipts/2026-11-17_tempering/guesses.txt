@@ -333,3 +333,48 @@ restriction and prolongation of the level's own width (64) solved from the two e
   it: a founding by tension is lawful and the one comparison could then move the level; the level's own face is still what a second
   level's cut needs. A (3) under a fifth of (2) would say a linear level of this width cannot be located from the fine tension, and the
   level's content must come from a face of its own first.
+
+Scored (2026-11-18T00:11:50Z), G-V1, on the ruler's first read (level_links.txt; 5,164 held regions, 253,036 places, 32,584 epochs, 27,420 whole; the
+dump 82 s at 16 host threads, the ruler 482 s in one process). Thousandths, by link (the fine read at the leading place, the moment, the
+restricted state, a restriction of width 64 located from the keys, the level's read after its ticks, the prolonged rows):
+  the leading symbol 628, 422, 111, 421, 68, 76; the bag 153, 840, 584, 816, 360, 387; the epoch as one identity 55, 127, 46, 141,
+  171, 244; the epoch before as one identity 37, -26, -123, 3, 24, 22; the symbol leading the next 13, 102, 26, 29, 43, 48.
+  The fine read's own symbol: 628 (900 or more guessed: missed). The moment: leading symbol 422 (700 to 950: missed low), bag 840 (450
+  to 800: missed high), identity 127 (450 to 800: missed low by far). The restricted state: leading symbol 111 (under 200: held), bag
+  584 (under 250: missed high), identity 46 (under 350: held, emptily). The located restriction: leading symbol 421 (500 or more:
+  missed, the moment holding no more), identity 141 (400 or more: missed). The level's ticks: the bag and the leading symbol fall by
+  0.38 and 0.39 and the identity rises from 46 to 171 (each under a third: missed). The prolonged rows hold 22 of the epoch before
+  (under 40: held). The fold: the bag reads 811 within a section and 822 past it (100 to 300 lower past it: missed; a bag does not see
+  an order, so the key could not see a fold).
+  What the misses say. I had guessed the moment held a unit as an identity and the restriction lost it. The moment holds a unit as a
+  bag of its symbols (840) and not as one identity (127), which is the tree's own statement of a unit (its factors' strand, no row a
+  unit), and my key of the evening, the epoch as one identity, was a free row's key. For what the moment does hold, the slip is the
+  restriction: a located one of the same width keeps 421 and 816 where the built one keeps 111 and 584, so the width is not what
+  loses it. The level's ticks then lose a third more of the bag and are the one link where the identity grows.
+
+Scored (2026-11-18T00:11:50Z), G-V2, on the same read. The covector's power at the split stands at the open place (50.7%) and the four places before it
+(29.0, 11.7, 4.7, 2.0%). Shares of it removed on the held half, all places (the open places alone): the place's own read -0.0008
+(0.0005); the level's present state through a refitted prolongation -0.0099 (-0.0014); the table of the two epochs' symbols on the news
+phase -0.0111 (-0.0005); operands of width 64 located from the two epochs' moments -0.0090 (-0.0002), the moments at full rank -0.0139.
+  (1) under 0.03: held. (2) 0.10 to 0.30: missed, it removes nothing. (3) half or more of (2): empty, there is nothing to halve. The
+  planted law: 0.588 by the table (0.8 or more: missed); my plant gave the epoch before's leading symbol alone, which the table holds
+  only summed with its epoch's other symbols, so the plant was not of the table's form and the figure is the ruler's fault. It is
+  planted again in the table's own span before the null is quoted.
+  What it says, as far as a first-order read on a trained state can: nothing linear in the unit's symbols, in the unit before or in
+  their moments relieves the fine comparison at the level's locus. The fine comparison has no slope to give a level, located or not,
+  which is the saddle the level was founded on read from the other side, and what October 30 read when the coarse modes the arrivals
+  train carried no heading. A founding by the fine tension has nothing to locate.
+
+Read again (2026-11-18T00:23:36Z), the ruler repaired in four places and run on the same dump (level_links.txt, the repaired read): each row read on its
+own scale as a chart reads it (the first read's rows were raw, and a few long epochs' sums drove the restricted state's figures: its
+identity 46 and the epoch before's -123 were that fault); a drawn restriction of the same width beside the built one; a key that sees
+order (the symbols by sixth of a turn) and the epoch before's bag; and the planted law drawn in the table's own span. No guess was
+fixed for it; it is a reading.
+  The moment: leading symbol 424, bag 721, by sixth of a turn 522, identity 310. The built restriction 152, 480, 169, 255 against a
+  drawn one's 119, 410, 218, 221: it keeps what a draw keeps. A located one 420, 699, 217, 299. After the ticks 68, 360, 104, 171. The
+  epoch before's bag: 112 in the fine read at the next leading place, 75 in the level's read, 80 in the prolonged rows. The fold, within
+  a section and past it: bag 729 and 734, by sixth 562 and 510, leading symbol 507 and 329, last symbol 518 and 223.
+  The tension: every share at or under zero as before; the plant recovered at 1.000 by the table (0.0787 of the planted covector's
+  power removed, of 0.0909 planted), 0.539 by operands of width 64 located for it from the moments.
+  G-V1's reading of its misses stands with two corrections: the identity does not grow through the level's ticks (255 to 171), and the
+  fold does cost order, which the bag could not see.
