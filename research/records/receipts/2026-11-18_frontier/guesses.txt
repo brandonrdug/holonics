@@ -156,3 +156,25 @@ within 0.03 guessed: held, at its near edge), one place open 0.1115 above, whole
 The third lap's run ended its pass over the store's documents after 540 sections (the pass's own end, as the line's passes end);
 its state took a new pass (next-pass, every other line the same) and the lap goes on for 3,000 sections of it, so the third lap is
 read 3,540 sections past the second. Laps 4 and 5 follow it.
+
+Noted (2026-11-18T11:16:18Z), G-1118-5 while its last lap runs. At lap means against the control's, the frontier rows read 0.1603, 0.1912, 0.2147 and
+0.2261 under at laps 1 to 4 (the third 3,540 sections past the second): each lap adds 0.031, 0.024, 0.011. Guessed 0.21, 0.25, 0.28
+at laps 2 to 4, each within 0.03: lap 2 held, laps 3 and 4 missed (the fall slows sooner than I had it). One place open stands 0.1008,
+0.1115, 0.1233, 0.1236 above and whole masks 0.0778, 0.0908, 0.1116, 0.1015: the two-sided readings' cost has stopped growing. The
+panels from each lap's end: one place a read with 48 known, 46%, 55%, 46%, 47% of words in the lexicon (the control's end 37%); the
+long panel 36%, 47%, 47%, 42% (the control's 34%); a panel's read from a lap's end scatters by several points.
+By the guess's own rule (the frontier rows stall inside three laps: room is what binds, and the read of that comes first), the next
+read is the frontier's price in cells, ahead of the card's realization of the read that compares every place.
+
+G-1118-8 (2026-11-18T11:16:18Z). The frontier's capacity price (atlas code.capacity-price: the fall of the code a nat of cells). Read before fixing: the
+third lane's price read 0.040 and the fourth's 0.025 with one place open (G188, G189; THE_CONSOLIDATION §10); a specimen that gave all
+its room to fifty books at the frontier reads their next place 0.34 nats under what the line's state with a frontier share reads on
+its books slice.
+  The trial. From arm F5's end state, a fifth lane of 32 founded at zero and one lap with the frontier share (arm L), beside the same
+  state one more lap as it is (arm F6). Both read at their lap means.
+  The guess: arm L's frontier rows read 0.010 to 0.040 nats under arm F6's (a lane opens at zero and takes its charge within its
+  first lap, as the third did); one place open 0.005 to 0.030 under F6's; the panels within their scatter.
+  What it decides. The price says what room buys at the frontier: at 0.03 a lane, the fall to a specimen's level is tens of lanes, and
+  width by copies is not the growth that writes sentences; the room then has to come from what a founding locates (a level that carries
+  units to the frontier; the bank's distant read), and the read that compares every place is what makes those trials cheap. At 0.10
+  or more a lane, width is worth sizing from this price at once.
