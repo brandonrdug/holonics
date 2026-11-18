@@ -134,7 +134,8 @@ repeating their measurement ledger. Each receipt keeps its own source pin. The
 pairs each original commit of the integration with its published counterpart, so a receipt that
 cites an original integration commit resolves. A receipt citing a commit outside the integration
 identifies its source by file hashes. The [records README](research/records/README.md) routes the
-later records, and each states its own scope.
+later records, and each states its own scope. The [records index](research/records/INDEX.md) lists
+every record by date, generated from the file names by `tools/records_index.py`.
 
 The table's first rows name the October library's constructions; they retired with C8c of #603 and are held at
 `d5ed4adc1`, their laws in the guides, Lean and the atlas.
