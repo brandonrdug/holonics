@@ -109,3 +109,19 @@ Scored (2026-11-18T08:40:17Z), G-1118-6 (reads.txt).
   By the guess's rule the crowds are not within 0.05 of the law past 48 known, so the sharp rows keep a part untrained crowds do not:
   a read that compares every place at its frontier is sized with both in view (crowds for the far octaves at a few terms a head, sharp
   rows for the near ones), and what a crowd-hearing holds once it is compared is read when that read exists.
+
+G-1118-7 (2026-11-18T08:52:09Z), fixed while its read runs on the host and before any line of it is seen. Two one-sided forms, read before a build.
+  Seen before fixing, on twenty rows of 12 known places only: the boundary chart's own forward (every site veiled to itself and a source
+  to the sites after it; crates/engine/src/moment.rs, chart_faces, whose face at a place is the same bits whatever stands at or after
+  the place) reads 5.5 to 7.7 nats a place on the control's mean, at the flat face's 5.50 and above: no state was ever compared
+  with veiled sources.
+  The read: read-far's rows again with two more settings. (4) the law's hearing in one read with the level unheard, the baseline;
+  (3) the same with every known place hearing only what stands before it (its moment's and its opening's after rows absent, its
+  support, crowds and strand contacts one side), the frontier's place as the law has it. And the chart's forward on the 448-known rows.
+  The guess, on both states with 448 known: (4) reads 0.10 to 0.35 above the law (what the level and the second read give the
+  frontier's place); (3) reads 0.4 to 1.2 above (4) (known places that lose their right side are out of the regime they were compared
+  in, and still carry their own symbols); the chart's forward reads above 5 at every octave of known places.
+  What it decides. Which one-sided form the build takes. If (3) stands within about a nat of its baseline, a known stream that keeps
+  its own symbols and hears only before it is a short way from the state as trained, and the build is that stream with an open place
+  read at every place of it (two streams). If (3) reads as the chart does, one-sidedness itself leaves the trained regime and the
+  simpler single stream of the chart is taken, compared from near the flat face.
