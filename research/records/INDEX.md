@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,692 records from July 2026 to November 2026. 380 receipts directories: 221 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,693 records from July 2026 to November 2026. 381 receipts directories: 222 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 91 | 96 |
+| [November 2026](#november-2026) | 92 | 97 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-18 [An abelian cover factors through its characters a tempered complex mixes at its half the fluids triads do no work so every truncation flows for all time and hard lefschetz is a positive commutator](2026-11-18_AN_ABELIAN_COVER_FACTORS_THROUGH_ITS_CHARACTERS_A_TEMPERED_COMPLEX_MIXES_AT_ITS_HALF_THE_FLUIDS_TRIADS_DO_NO_WORK_SO_EVERY_TRUNCATION_FLOWS_FOR_ALL_TIME_AND_HARD_LEFSCHETZ_IS_A_POSITIVE_COMMUTATOR.md)
 - 2026-11-18 [A cooler deposit stops the states walk and leaves the level and the writes where they were and the level is worth a sixth of a nat where the writes are](2026-11-18_A_COOLER_DEPOSIT_STOPS_THE_STATES_WALK_AND_LEAVES_THE_LEVEL_AND_THE_WRITES_WHERE_THEY_WERE_AND_THE_LEVEL_IS_WORTH_A_SIXTH_OF_A_NAT_WHERE_THE_WRITES_ARE.md)
 - 2026-11-18 [A number is the homology of its places a law of composition is its characters a symbols word obeys kraft and a return maps necklaces are counted in Lean](2026-11-18_A_NUMBER_IS_THE_HOMOLOGY_OF_ITS_PLACES_A_LAW_OF_COMPOSITION_IS_ITS_CHARACTERS_A_SYMBOLS_WORD_OBEYS_KRAFT_AND_A_RETURN_MAPS_NECKLACES_ARE_COUNTED_IN_LEAN.md)
 - 2026-11-18 [A regular complexs own half is one chain of five readings a kept positive form exists where the modes are semisimple on the locus and the second law starts from any density](2026-11-18_A_REGULAR_COMPLEXS_OWN_HALF_IS_ONE_CHAIN_OF_FIVE_READINGS_A_KEPT_POSITIVE_FORM_EXISTS_WHERE_THE_MODES_ARE_SEMISIMPLE_ON_THE_LOCUS_AND_THE_SECOND_LAW_STARTS_FROM_ANY_DENSITY.md)
