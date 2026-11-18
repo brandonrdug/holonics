@@ -120,3 +120,12 @@ Arm L's end: the books' panel 85 of 172 (49%), the long panel 126 of 273 (46%), 
 The frontier's fall under the control against the sections trained with the share (3,000, 6,000, 9,540, 12,540, 15,540, 18,540):
 0.1603, 0.1912, 0.2147, 0.2261, 0.2347, 0.2453. Fitted on the first five: 0.1603 + 0.0458 ln(sections / 3,000), residuals within
 0.0014 (root mean square 0.0009); it gave the sixth at 0.2437 before its read, which read 0.2453.
+
+Gate 3 for the engine (bash tools/gate_engine.sh, the line's lap 70 from lap 69's end state; the card free, 12:41 to 12:50 UTC) on
+main 24b213e90, after the host's tick and its return were made to read each site's place, the cut gained its frontier state and
+the held read its frontier rows:
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
