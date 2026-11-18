@@ -423,3 +423,15 @@ falls a tick are -0.011, 0.074, 0.278 and 0.208 against the counts' 0.416, 0.314
   ticks after it each add one bound symbol: 1.965, 1.687, 1.479 beside the counts of two, three and four, 1.984, 1.670, 1.478. So at
   the compared place a tick binds one symbol and only the ticks after the split bind there; her order of four is a pair at the opening
   and two late ticks. The level restricts and prolongs at the split, where a place holds a pair.
+
+G-V5 (2026-11-18T01:07:05Z). Whether the by-tick profile of G-V4 is the engine's or the boundary state's: the same fitted faces on the line's own state
+(lap 94's mean) in the line's own regime (the store's next six sections under the pass's own masks, the compared places), fitted on four
+sections and read on two.
+  Read before fixing: on the night's boundary state the fall from the opening's fitted face to her own face (0.549 nats) is carried
+  -2%, 13%, 51% and 38% by ticks one to four; on the masked line of November 13 (one place open, state C) the fall of 1.189 was carried
+  48%, 33%, 15% and 4% (G132). The night's state is lap 94's after fifteen passes compared at the boundary.
+  The guess: on lap 94's mean in its own regime the first two ticks carry 60% or more of the fall and the last tick under 15%, as on
+  November 13. So the late binding of G-V4 belongs to the boundary regime (a place with nothing known to its right), and on the line a
+  place is mostly settled by the split.
+  What it decides: if it holds, the design record's section 11 is the boundary's and its sentence on the level (fed where nothing is
+  bound) does not carry to the line; if the line is back-loaded too, it is the engine's.

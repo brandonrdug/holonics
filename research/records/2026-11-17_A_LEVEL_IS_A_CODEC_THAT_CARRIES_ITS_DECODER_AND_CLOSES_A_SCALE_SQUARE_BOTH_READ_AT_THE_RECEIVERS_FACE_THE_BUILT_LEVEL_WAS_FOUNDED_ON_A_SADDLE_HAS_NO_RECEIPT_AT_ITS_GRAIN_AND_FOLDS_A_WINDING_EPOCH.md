@@ -404,7 +404,7 @@ read committed units. It reads at the split, before the place level has bound, a
 What a level should read, and where it should return, is the next statement to derive from the tree; it is a reading
 and no part.
 
-## 12. What a level reads and where it returns: the tree's answer (November 18, 01:00 to 01:15 UTC)
+## 12. What a level reads and where it returns: the tree's answer (November 18, 00:59 to 01:04 UTC)
 
 `tree` for each item, `agent-inferred` for the join. A reading; no part is designed here.
 
