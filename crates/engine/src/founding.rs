@@ -338,6 +338,10 @@ impl Constitution {
         // the fine face (`A`'s columns of each harmonic, `B`'s rows and `b_B` of each harmonic) take the lane at zero, so the restriction reads no
         // lane coordinate and the prolongation writes none, and every face is kept. Each block is harmonic-major (`k D₀ + c`, [`charted`]).
         if let Some(sc) = &self.scale {
+            // (the one-sided block's rows of the fine face would take the lane at zero as `B`'s do; owed with the first lane grown beside it)
+            if sc.before_offsets(dw).is_some() {
+                return refuse("a lane beside a tower that carries its one-sided block");
+            }
             let (h, d1) = (sc.harmonics, sc.coarse.declaration.width);
             let (a0, ab0, b0, bb0, len0) = sc.glue_offsets(dw);
             let (a1, ab1, b1, bb1, len1) = sc.glue_offsets(dw2);
@@ -1214,5 +1218,28 @@ impl Learner {
             out
         });
         Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 18, the record of the two streams §11] **The learner whose level is opened to one-sided streams**
+    /// ([`Constitution::level_before`]): the block `B⁻`, `b_B⁻` at zero after the glue, the material's last entries; its moments open at
+    /// zero there and every other entry, moment, rate and line is kept (an entry's own rate, where the state carries them, opens at
+    /// the base rate; the step's remainder, where carried, keeps its entries and opens at zero).
+    pub fn level_before(&self) -> Result<Self> {
+        let field = self.field.level_before()?;
+        let len = field.material_len();
+        let (mut first, mut second) = (self.first.clone(), self.second.clone());
+        first.resize(len, 0);
+        second.resize(len, 0);
+        let own_rates = self.own_rates.as_ref().map(|own| {
+            let mut out = own.clone();
+            out.resize(len, self.rate_bits);
+            out
+        });
+        let remainder = self.remainder.as_ref().map(|r| {
+            let mut out = r.clone();
+            out.resize(len, 0);
+            out
+        });
+        Ok(Self { remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 }

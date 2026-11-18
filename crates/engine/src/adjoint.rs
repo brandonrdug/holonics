@@ -732,6 +732,10 @@ impl Constitution {
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let mut r = ClockReturn::new(paced, sites, m2);
             self.tick_return(cell, &mut dx, g, &pass.paces[k], &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, None, None, None, None)?;
+            // The level, where the strand heard it before this tick ([`Constitution::scale_return_before`]).
+            if let (Some(s), Some(sp)) = (self.scale.as_deref().filter(|s| s.split == k), pass.tower.as_ref()) {
+                self.scale_return_before(s, sp, &mut dx, g)?;
+            }
             if k > 0 {
                 self.strand_clock_return(pass, &r, &mut whole, &mut open_dm);
             } else {

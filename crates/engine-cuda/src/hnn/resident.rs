@@ -1006,6 +1006,11 @@ impl<'c> Resident<'c> {
         let known_of = |past: bool| -> Vec<usize> { (0..n).filter(|&r| regions[r].before && !regions[r].strand && regions[r].past == past).collect() };
         let strand_of = |past: bool| -> Vec<usize> { (0..n).filter(|&r| regions[r].strand && regions[r].past == past).collect() };
         let (known, known_past, strand, strand_past) = (known_of(false), known_of(true), strand_of(false), strand_of(true));
+        // [the record of the two streams §11] The level a strand hears (the host's `Constitution::scale_forward_before`) has no card realization
+        // yet: a state that carries its block is refused here, so no lap runs a law the card does not hold.
+        if !(strand.is_empty() && strand_past.is_empty()) && field.scale.as_deref().is_some_and(|s| s.before_offsets(field.declaration.width).is_some()) {
+            return Err(TowerError::Refused("a passage read by two streams on a tower that carries its one-sided block: the card's realization of the level a strand hears is owed"));
+        }
         let law_regions: Vec<Region> = law.iter().map(|&r| regions[r]).collect();
         let plain = |at: &[usize]| -> Vec<Region> { at.iter().map(|&r| Region { before: false, past: false, ..regions[r] }).collect() };
         let (known_regions, known_past_regions) = (plain(&known), plain(&known_past));

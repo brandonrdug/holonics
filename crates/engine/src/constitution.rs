@@ -284,7 +284,8 @@ impl Constitution {
             let coarse = Self::from_lines(lines)?;
             let glue = read_numbers::<i32>(lines.next())?;
             let (.., len) = crate::field::scale::glue_len(harmonics, field.declaration.width, coarse.declaration.width);
-            if glue.len() != len || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
+            let before = crate::field::scale::glue_before_len(harmonics, field.declaration.width, coarse.declaration.width);
+            if (glue.len() != len && glue.len() != len + before) || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
                 return refuse("a level's glue that is not its declaration's length, a split outside the ticks, or a field without the opening's block");
             }
             field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue }));

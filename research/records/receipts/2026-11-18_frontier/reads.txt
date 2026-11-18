@@ -316,3 +316,9 @@ The first lap of two streams and the second known-stream lap's last reads (writt
 - The host ruler on arm S10's mean (read-far with the word strand, 800 rows, 16:23:42Z), millionths of a nat a place: the known
   stream 2001753; its circles at rest 2482300; its plain strand contacts unmet 3004971; its odd contacts facing the past 2734871
   (0.733 above the known stream before any training in the relation).
+- By which path the level reaches the frontier (read-far with the word level, 800 rows, 10 host threads, read 16:39:15 Z at the latest),
+  millionths of a nat a place. The plain line's seventh lap mean (arm F7): the law's hearing in one read with the level unheard
+  2165305 and heard 1925204; with no open place taking a prolonged row 1988779; with every place reading the epoch before its own
+  2002718; with the open places alone reading the epoch before 1961536; as a known stream 2795250, with the level made one-sided
+  as designed 2840436, with the law's level over the stream's ticks 2794564. The two-stream line's second lap mean (arm S10), in
+  the same order: 2344137, 2180035; 2164911; 2216638; 2203663; 2001753, 2260170, 2239708.

@@ -1601,6 +1601,59 @@ pub fn set_frontier(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 18, the record of the two streams §11] `open-level STATE STATE_SHA OUT`: **the learner whose level is
+/// opened to one-sided streams** ([`Learner::level_before`]): the block a passage read by two streams takes the epoch before each place
+/// through, at zero, so every face reads as before. Before it writes, the founded text is read back as itself, and its lines are judged:
+/// the glue's line and the lines that hold a word an entry (the two moments', and where the state carries them the entries' rates and the
+/// step's remainder) each keep every standing word and end in the block's zeros (the rates' in the base rate); every other line is
+/// equal. Anything else is refused and nothing is written. The block is law and is carried in the learner's state.
+pub fn open_level(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("open-level STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    if learner.to_text() != text {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let founded = learner.level_before().map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a founded learner that does not read back as itself".into());
+    }
+    let (old_m, new_m) = (learner.field.material_len(), founded.field.material_len());
+    let block = new_m - old_m;
+    let (la, lb): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let (mut grown, mut equal) = (0usize, 0usize);
+    for (n, (x, y)) in la.iter().zip(&lb).enumerate() {
+        if x == y {
+            equal += 1;
+            continue;
+        }
+        // A grown line: the standing words, then the block's words, each the same (zero, or the base rate on the rates' line).
+        let rest = y.strip_prefix(x).ok_or_else(|| format!("line {}: a founded line that does not keep its standing words", n + 1))?;
+        let added: Vec<&str> = rest.split(' ').filter(|w| !w.is_empty()).collect();
+        let rate = learner.rate_bits.to_string();
+        if added.len() != block || !(added.iter().all(|w| *w == "0") || added.iter().all(|w| *w == rate)) {
+            return Err(format!("line {}: a founded line that grew by {} words where the block holds {block}, or by words that are not its opening", n + 1, added.len()).into());
+        }
+        grown += 1;
+    }
+    if grown < 3 {
+        return Err(format!("a founding that grew {grown} lines: the glue's and the two moments' are three").into());
+    }
+    std::fs::write(out, &written)?;
+    println!("OPEN_LEVEL entries_before={old_m} entries={new_m} block={block} lines={} grown={grown} equal={equal}", la.len());
+    Ok(())
+}
+
 /// [measurement; the lead, November 18, the audit of that day (decide the level)] `zero-level-return STATE STATE_SHA OUT`: **a control for
 /// the level**: the state with its level's prolongation, `B` and `b_B`, set to zero (every other entry, moment and line as it stands), so a
 /// reading of it is the field's faces with the level unheard. A ruler's state: never trained from. Refused on a state with no level.

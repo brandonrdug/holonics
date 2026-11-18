@@ -4364,6 +4364,152 @@ fn the_strands_covector_matches_the_codes_difference() {
     }
 }
 
+/// [`towered_live`] opened to one-sided streams ([`Constitution::level_before`]) with the block's every entry drawn, so a strand's level
+/// carries a covector on every path.
+fn towered_before_live(still: usize) -> Constitution {
+    let founded = towered_far_live(still);
+    let from = founded.material_len();
+    let mut field = founded.level_before().unwrap();
+    draw_from(&mut field, from);
+    field
+}
+
+/// [`towered_live`] with a level's field that reaches as many epochs as a strand of the fixtures has places (a one-sided stream
+/// names a site wherever no earlier place within a section carries news as large, so a passage's epochs can be its places).
+fn towered_far_live(still: usize) -> Constitution {
+    let fine = opened(still);
+    let offset = 4 * fine.declaration.founding_draws();
+    let mut field = fine.scaled_up(6, 1, Declaration { reach: 16, ..coarse_declaration() }, &keys(1 << 16), offset).unwrap().0;
+    let base = field.theta.len();
+    draw_from(&mut field, base);
+    field
+}
+
+/// Every material entry from `from` on drawn from the fixtures' keys at its family's grain.
+fn draw_from(field: &mut Constitution, from: usize) {
+    let stream = keys(1 << 17);
+    let families = field.families_all();
+    for (n, v) in field.material_mut().enumerate().skip(from) {
+        let word = &stream[4 * n..4 * n + 4];
+        let k = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) as i64;
+        let grain = families.iter().find(|(s, l, _)| (*s..*s + *l).contains(&n)).unwrap().2;
+        *v = ((k << grain) >> 32) as i32;
+    }
+}
+
+/// [definition; the lead, November 18, the record of the two streams §11] **The level as a passage read by two streams hears it**
+/// ([`Constitution::scale_forward_before`]). At its founding ([`Constitution::level_before`]) every face of a strand is the face the
+/// tower's strand read without the block, the families tile the material and the text restores it. With the block drawn: the level
+/// moves some face; a place's face is the same bits in the passage cut after it (nothing at or after a place is read through the
+/// level either); the law's own prolongation takes no covector from a strand; and the covector of every family the level reaches
+/// (the level's field's, the restriction's, the block's, and the fine field's) matches the code's central difference.
+#[test]
+fn the_level_a_strand_hears_is_the_epoch_before_and_its_covector_matches_the_codes_difference() {
+    let code = |field: &Constitution, classes: &[usize], past: bool| -> i64 {
+        let places: i64 = field.strand_pass(classes, false, past).unwrap().faces.iter().zip(classes).skip(1).map(|(f, &c)| crate::field::ratio_code(f.masses[c], f.total)).sum();
+        let known = vec![false; classes.len()];
+        places + opening_code(field, &Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past })
+    };
+    let sheets = |field: &Constitution, classes: &[usize], past: bool| -> Vec<Vec<u32>> {
+        let pass = field.strand_pass(classes, true, past).unwrap();
+        let coarse = pass.tower.iter().flat_map(|t| t.ticks().iter());
+        let mut out: Vec<Vec<u32>> = pass.ticks.iter().chain(coarse).flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().chain(l.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect();
+        // (the cut is data: a probe that moves an anchor is a seam too)
+        out.push(pass.tower.iter().flat_map(|t| t.cut().anchors.iter().map(|&a| a as u32)).collect());
+        out
+    };
+    // The news phases a strand's level read: data by the level's law (nothing returns to the news), so a probe that moves one reads a
+    // difference the covector does not hold, and is left out and counted.
+    let phases = |field: &Constitution, classes: &[usize], past: bool| -> Vec<i64> {
+        let pass = field.strand_pass(classes, true, past).unwrap();
+        pass.tower.iter().flat_map(|t| t.cut().harmonics.iter().chain(t.open_harmonics()).copied()).collect()
+    };
+    let (mut read, mut seams, mut news_moved, mut fine_read, mut epochs_read) = (0usize, 0usize, 0usize, 0usize, 0usize);
+    for (still, past) in [(0usize, false), (1, false), (1, true), (2, true)] {
+        let founded = towered_far_live(still);
+        let a = founded.declaration.alphabet;
+        let sites = 13;
+        let classes = drawn_classes(0xD5, sites, a);
+        // The founding keeps every face, tiles the material and is restored by its text.
+        let opened = founded.level_before().unwrap();
+        assert!(opened.level_before().is_err(), "a level opened twice is refused");
+        assert_eq!(opened.strand_pass(&classes, false, past).unwrap().faces, founded.strand_pass(&classes, false, past).unwrap().faces, "still {still}: the founding keeps every face of a strand");
+        assert_eq!(opened.faces(&region()).unwrap(), founded.faces(&region()).unwrap(), "still {still}: and every face of the law");
+        let mut at = 0;
+        for (start, len, _) in opened.families_all() {
+            assert_eq!(start, at);
+            at += len;
+        }
+        assert_eq!(at, opened.material_len());
+        assert_eq!(Constitution::from_text(&opened.to_text()).unwrap(), opened);
+        // The live block.
+        let field = towered_before_live(still);
+        let pass = field.strand_pass(&classes, true, past).unwrap();
+        let tower = pass.tower.as_ref().expect("a strand of a tower with the block hears its level");
+        let epochs = tower.cut().anchors.len();
+        assert!(epochs >= 3, "still {still}: the passage holds {epochs} epochs");
+        epochs_read += epochs;
+        assert_ne!(pass.faces, opened.strand_pass(&classes, false, past).unwrap().faces, "still {still}: the level moves some face");
+        for t in 1..sites {
+            let cut = field.strand_pass(&classes[..=t], false, past).unwrap().faces;
+            assert_eq!(cut[t], pass.faces[t], "still {still}, past {past}: place {t} reads the passage cut after it as it reads the whole");
+        }
+        let mut g = vec![0i128; field.material_len()];
+        field.strand_returned(&classes, &pass, &mut g).unwrap();
+        // The region's own word reads the same forward and returns the same covector.
+        {
+            let known = vec![false; sites];
+            let region = Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past };
+            let (faces, section) = field.read_and_return(&[region]).unwrap();
+            assert!(faces[0][0].is_none() && faces[0][1..].iter().zip(&pass.faces[1..]).all(|(a, b)| a.as_ref() == Some(b)), "still {still}: a strand region's faces are the open places'");
+            assert_eq!(section, g, "still {still}: a strand region's covector in a section is the strand's return");
+        }
+        // The law's own prolongation is no operand of a strand.
+        let base = field.theta.len();
+        let sc = field.scale.as_deref().unwrap();
+        let glue_at = base + sc.coarse.theta.len();
+        let (_, _, b, _, len) = sc.glue_offsets(field.declaration.width);
+        assert!(g[glue_at + b..glue_at + len].iter().all(|&v| v == 0), "still {still}: the law's prolongation takes nothing from a strand");
+        let (b2, _, end) = sc.before_offsets(field.declaration.width).unwrap();
+        assert!(g[glue_at + b2..glue_at + end].iter().any(|&v| v != 0), "still {still}: the block takes a covector");
+        for (start, len, grain) in field.families_all() {
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            // (the fine field's families are probed once an entry, the level's and the glue's three)
+            for i in entries.into_iter().take(if start >= base { 3 } else { 1 }).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    *f.material_mut().nth(i).unwrap() += delta;
+                    f
+                };
+                // (the lock's temperature is read through a smoother difference in the strand's own test; it is left to that test here)
+                if start == field.layout.temper {
+                    continue;
+                }
+                if start < base && phases(&moved(1 << grain.saturating_sub(8)), &classes, past) != phases(&field, &classes, past) {
+                    news_moved += 1;
+                    continue;
+                }
+                let straddles = |delta: i32| sheets(&moved(delta), &classes, past) != sheets(&field, &classes, past) || sheets(&moved(-delta), &classes, past) != sheets(&field, &classes, past);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                fine_read += usize::from(start < base);
+                let measured = code(&moved(delta), &classes, past) - code(&moved(-delta), &classes, past);
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + ((64 * (sites as i128 - 1)) << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still}, past {past}: family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("STRAND_LEVEL_COVECTOR_PROBES read={read} of_the_fine_field={fine_read} on_a_seam={seams} moved_the_news={news_moved} epochs={epochs_read}");
+    assert!(read >= 60 && fine_read >= 12 && 4 * seams <= read, "read {read} probes ({fine_read} of the fine field), {seams} on a seam");
+}
+
 /// [definition; the lead, November 18, the record of the two streams §9] **A strand's place reads nothing at or after it**: the face of the
 /// open place at place `t` of a passage read by two streams is the same bits as the last face of the passage cut after place `t`, at
 /// every place, with the strand's odd contacts at rest and facing the past, on fields with circles, with plain contacts and with the

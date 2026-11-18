@@ -156,6 +156,8 @@ pub(crate) struct StrandForward {
     pub(crate) moments: Vec<Vec<i64>>,
     pub(crate) clocks: Vec<Vec<(Vec<i64>, Vec<i64>)>>,
     pub(crate) last: Vec<i64>,
+    /// The level as the strand heard it at the split, where the tower carries its one-sided block ([`Constitution::scale_forward_before`]).
+    pub(crate) tower: Option<crate::field::scale::ScalePass>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -1269,7 +1271,17 @@ impl Constitution {
         let moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
         let definite: Vec<bool> = (0..2 * n).map(|t| t < n).collect();
         let mut out = StrandForward { known: n, ..Default::default() };
-        for _ in 0..d.ticks {
+        // [the lead, November 18, the record of the two streams §11] The level, where the tower carries its one-sided block: each place
+        // takes the epoch before its own at the split, the news the retarded opening's.
+        let level = self.scale.as_deref().filter(|s| s.before_offsets(dw).is_some());
+        let news = match level {
+            Some(_) => Some(self.strand_news(classes, &open_x)?),
+            None => None,
+        };
+        for k in 0..d.ticks {
+            if let (Some(s), Some((known_news, open_news))) = (level.filter(|s| s.split == k), news.as_ref()) {
+                out.tower = Some(self.scale_forward_before(s, &mut x, n, known_news, open_news, past, keep)?);
+            }
             let mut cell = TickCell::default();
             if keep {
                 cell.before = x.clone();
