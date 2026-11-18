@@ -96,3 +96,16 @@ G-1118-6 (2026-11-18T08:32:57Z), fixed while its read runs on the host and befor
   What it decides. The second stream of a read that compares every place at its frontier. If the crowds read within 0.05 of the law,
   the open place at every place costs a few terms a head and the read costs about two plain reads; if only the sharp rows hold the
   gain, it costs a row of every site before it, a triangle of pairs a region, and the build is sized for that.
+
+Scored (2026-11-18T08:40:17Z), G-1118-6 (reads.txt).
+  With 448 known: the near field alone reads 1.161 above the law on the control's mean and 1.205 on arm F's (0.25 to 0.45 guessed:
+  missed, three times the guess); a definite receiver's far field in its place reads 0.231 and 0.229 above the law (0.10 to 0.25
+  guessed: held). With 12 known: the crowds within 0.011 of the law (held) and the near field alone 0.136 and 0.140 above it (within
+  0.05 guessed: missed).
+  With the far field cut, more known places read worse (2.629, 2.743, 2.981, 3.090 on the control from 12 to 448 known), so all of what
+  many known places give a place at the frontier, and more, comes through its far rows: the moments and the near places' own states do
+  not carry it. A definite receiver's far field (its probe's classes and each octave's crowd), which no open receiver was ever
+  compared with, already holds four fifths of it at 448 known (0.23 of 1.16 lost) and all but 0.03 to 0.06 at 48.
+  By the guess's rule the crowds are not within 0.05 of the law past 48 known, so the sharp rows keep a part untrained crowds do not:
+  a read that compares every place at its frontier is sized with both in view (crowds for the far octaves at a few terms a head, sharp
+  rows for the near ones), and what a crowd-hearing holds once it is compared is read when that read exists.
