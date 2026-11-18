@@ -622,6 +622,10 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
         z ^ (z >> 31)
     };
     let known = learner.pass.as_ref().is_some_and(|p| p.before);
+    // [the lead, November 18] A state whose pass reads its frontier by two streams ([`holonics_engine::field::StorePass::strand`]) is
+    // written by them: the region is the known places and one more site holding the void (heard by no one: a known site hears only what
+    // stands before it), and the face read is the open place's at that last place, which hears every known place.
+    let strand = learner.pass.as_ref().is_some_and(|p| p.strand);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
@@ -636,6 +640,10 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
                 classes.push(void);
                 let mut open = vec![false; classes.len()];
                 *open.last_mut().expect("a region of one place or more") = true;
+                if strand {
+                    let n = classes.len();
+                    return OwnedRegion { strand: true, ..OwnedRegion::plain(classes, vec![false; n]) };
+                }
                 OwnedRegion { before: known, ..OwnedRegion::plain(classes, open) }
             })
             .collect();

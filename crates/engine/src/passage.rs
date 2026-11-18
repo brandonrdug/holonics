@@ -467,6 +467,12 @@ impl Cut {
             // The pass's word: the stretch at the frontier is read as a known stream ([`StorePass::before`]).
             let mut state = frontier_state_of(classes, drawn.ends.then(|| codec.void()));
             state.region.before = self.pass.before;
+            if self.pass.strand {
+                // The pass's word: the stretch is read by two streams ([`StorePass::strand`]): every site known, every place past the
+                // first compared at weight one, so it declares no domain.
+                state.region.unresolved.fill(false);
+                (state.region.domain, state.region.strand) = (None, true);
+            }
             state
         } else if self.pass.own {
             own_state_of(drawn.d, classes, q, a)

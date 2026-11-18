@@ -58,7 +58,8 @@ extern "C" __global__ void field_cavity_moment_all(const MomentWords *ws, const 
     const uint32_t cm = cmap[u] & 0x7FFFFFFFu;
     for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = w.site_region[g], t = w.site_pos[g];
-        if (!w.ok[r] || dead) {
+        // [the strand's two streams] The cavity moments are the known stream's places'; none is formed at an open place.
+        if (!w.ok[r] || dead || twin_site(fw, g)) {
             sb_out[2 * g] = sb_out[2 * g + 1] = sa_out[2 * g] = sa_out[2 * g + 1] = 0;
             cmoment[g * fw.M2 + cm] = 0;
             cmoment[g * fw.M2 + fw.M + cm] = 0;

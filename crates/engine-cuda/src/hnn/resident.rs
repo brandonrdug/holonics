@@ -319,6 +319,15 @@ pub(crate) struct BatchBase<'c> {
     pub(crate) reads: usize,
 }
 
+/// [the lead, November 18] **The cavity's kept forward of a strand batch** ([`Resident::strand_cavity`]): the standing moments' kept operands
+/// (none on a field with no moment mode), the cavity moments `[t][2M]` the open places read and their two sides.
+pub(crate) struct StrandBase<'c> {
+    pub(crate) keep: Option<MomentKeep<'c>>,
+    pub(crate) cmoment: Pooled<'c, i64>,
+    pub(crate) sb: Pooled<'c, i64>,
+    pub(crate) sa: Pooled<'c, i64>,
+}
+
 impl BatchBase<'_> {
     /// The words of the base clock, in [`set_clock`]'s order.
     pub(crate) fn clock(&self) -> [u64; 7] {
@@ -535,6 +544,11 @@ pub struct Resident<'c> {
     /// sites and then as many open places): each of its regions' count of sites that can be heard, its known stream's. Empty where the
     /// batch holds none; set by the run for the batch it stages ([`Resident::run`]).
     pub(crate) strand_heard: std::cell::RefCell<Vec<u32>>,
+    /// The same counts over every region of the run being made (`Resident::run`'s group of strands), from which each batch takes its own.
+    pub(crate) strand_run: std::cell::RefCell<Vec<u32>>,
+    /// The cavity's kept forward of the strand batch being read (the standing moments' operands, the cavity moments and their two sides),
+    /// which the batch's reverse returns the open places' moments through; taken when the batch ends.
+    pub(crate) strand_cavity: std::cell::RefCell<Option<StrandBase<'c>>>,
 }
 
 impl<'c> Resident<'c> {
@@ -547,7 +561,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, strand_heard: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -973,7 +987,7 @@ impl<'c> Resident<'c> {
     /// regions of one kind.
     #[allow(clippy::type_complexity)]
     pub(crate) fn run(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
-        if !regions.iter().any(|r| r.before) {
+        if !regions.iter().any(|r| r.before || r.strand) {
             let (faces, read_logits, g, rows, echoes) = self.run_one(field, regions, returning, logits, keep)?;
             return Ok((faces, read_logits, field.both_reads_mean(g), rows, echoes));
         }
@@ -981,10 +995,21 @@ impl<'c> Resident<'c> {
             return Err(TowerError::Refused("a section holding known streams is read and returned under the law; a ruler's forward and the readings take regions of one kind"));
         }
         let n = regions.len();
-        let law: Vec<usize> = (0..n).filter(|&r| !regions[r].before).collect();
-        let known: Vec<usize> = (0..n).filter(|&r| regions[r].before).collect();
+        let law: Vec<usize> = (0..n).filter(|&r| !regions[r].before && !regions[r].strand).collect();
+        let known: Vec<usize> = (0..n).filter(|&r| regions[r].before && !regions[r].strand).collect();
+        let strand: Vec<usize> = (0..n).filter(|&r| regions[r].strand).collect();
         let law_regions: Vec<Region> = law.iter().map(|&r| regions[r]).collect();
         let known_regions: Vec<Region> = known.iter().map(|&r| Region { before: false, ..regions[r] }).collect();
+        // [definition; the lead, November 18, the frontier record §6] **A passage read by two streams on the card** (`Region::strand`, the host's
+        // `Constitution::strand_pass`): staged as its known stream's sites and then as many open places, each carrying the class it is compared
+        // with, under the known stream's forward (`FieldWords::before`, `site_place`, `region_heard`). Its faces are the open places', none at
+        // the first place.
+        if strand.iter().any(|&r| regions[r].unresolved.iter().any(|&u| u) || regions[r].faces.iter().any(Option::is_some) || regions[r].locked.iter().any(|&l| l) || regions[r].echo.iter().any(Option::is_some) || regions[r].port.is_some()) {
+            return Err(TowerError::Refused("a passage read by two streams whose sites are not all known, or that has a port"));
+        }
+        let staged: Vec<(Vec<usize>, Vec<bool>)> = strand.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].classes).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect();
+        let strand_regions: Vec<Region> = staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false }).collect();
+        let heard: Vec<u32> = strand.iter().map(|&r| regions[r].classes.len() as u32).collect();
         let mut ruled = field.clone();
         ruled.ruler_far = 3;
         let (narrow_from, opening_from) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
@@ -993,11 +1018,38 @@ impl<'c> Resident<'c> {
         let mut echoes: Vec<Vec<u64>> = vec![Vec::new(); n];
         let mut g = if returning { vec![0i128; field.material_len()] } else { Vec::new() };
         let times: i128 = if field.declaration.mark { 2 } else { 1 };
-        for (group, at, f, weight) in [(&law_regions, &law, field, 1i128), (&known_regions, &known, &ruled, times)] {
+        for (group, at, f, weight, two) in [(&law_regions, &law, field, 1i128, false), (&known_regions, &known, &ruled, times, false), (&strand_regions, &strand, &ruled, times, true)] {
             if group.is_empty() {
                 continue;
             }
-            let (gf, _, gg, gr, ge) = self.run_one(f, group, returning, false, None)?;
+            let (narrow_group, opening_group) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
+            if two {
+                *self.strand_run.borrow_mut() = heard.clone();
+            }
+            let ran = self.run_one(f, group, returning, false, None);
+            self.strand_run.borrow_mut().clear();
+            let (mut gf, _, gg, gr, ge) = ran?;
+            if two {
+                // An open place stands `heard` sites past the known site of its place: a region's faces and the training path's words are
+                // its open places', one a place and none at the first; the opening's codes are the known stream's places'.
+                for (k, face) in gf.iter_mut().enumerate() {
+                    let h = heard[k] as usize;
+                    *face = (0..h).map(|t| if t == 0 { None } else { face[h + t].take() }).collect();
+                }
+                let mut narrow = self.narrow_out.borrow_mut();
+                if narrow.len() == narrow_group + group.len() {
+                    for (k, row) in narrow[narrow_group..].iter_mut().enumerate() {
+                        let h = heard[k] as usize;
+                        *row = (0..h).map(|t| if t == 0 { None } else { row[h + t] }).collect();
+                    }
+                }
+                let mut opening = self.opening_out.borrow_mut();
+                if opening.len() == opening_group + group.len() {
+                    for (k, row) in opening[opening_group..].iter_mut().enumerate() {
+                        row.truncate(heard[k] as usize);
+                    }
+                }
+            }
             for (k, face) in gf.into_iter().enumerate() {
                 faces[at[k]] = face;
             }
@@ -1016,7 +1068,7 @@ impl<'c> Resident<'c> {
             }
         }
         // The training path's words by region (`narrow_out`, `opening_out`) were gathered group by group: set in the regions' order.
-        let order: Vec<usize> = law.iter().chain(&known).copied().collect();
+        let order: Vec<usize> = law.iter().chain(&known).chain(&strand).copied().collect();
         fn placed<T: Default>(out: &std::cell::RefCell<Vec<T>>, from: usize, order: &[usize]) {
             let mut out = out.borrow_mut();
             if out.len() != from + order.len() {
@@ -1038,11 +1090,17 @@ impl<'c> Resident<'c> {
     #[allow(clippy::type_complexity)]
     fn run_one(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
         let d = field.declaration;
-        for region in regions {
+        // [the strand's two streams] The run's passages read by two streams, each staged as its known stream's sites and then as many open
+        // places (`Resident::strand_run`): a place is a known site's, so the reach is asked of the passage.
+        let strands: Vec<u32> = {
+            let s = self.strand_run.borrow();
+            if s.len() == regions.len() { s.clone() } else { Vec::new() }
+        };
+        for (k, region) in regions.iter().enumerate() {
             if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
                 return Err(TowerError::Refused("a region needs one class and one resolution a site, and two sites to meet"));
             }
-            if region.classes.len() > d.reach {
+            if strands.get(k).map_or(region.classes.len(), |&n| n as usize) > d.reach {
                 return Err(TowerError::Refused("a region past the field's reach, where its frames would repeat"));
             }
             if region.classes.iter().any(|&c| c >= d.alphabet) {
@@ -1148,6 +1206,7 @@ impl<'c> Resident<'c> {
                 (t.skin_peak_entries, t.skin_peak_pairs) = (entries, dense);
             }
             self.times.batches += 1;
+            *self.strand_heard.borrow_mut() = if strands.is_empty() { Vec::new() } else { strands[batch.clone()].to_vec() };
             self.mark("run_setup");
             // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Constitution::pass`): the batch's
             // first read is the built read with no readings, and leaves each silent site's shares of its face on the card (`field_mark_shares`);
@@ -1171,6 +1230,8 @@ impl<'c> Resident<'c> {
                 self.batch(field, &regions[batch.clone()], batch.start, &mut words, &mut base, g.as_deref(), logits, keep, tower.as_mut(), None)?
             };
             drop(base);
+            self.strand_heard.borrow_mut().clear();
+            self.strand_cavity.borrow_mut().take();
             self.mark("batch_drop_and_collect");
             faces.extend(f);
             read_logits.extend(z);
@@ -1503,8 +1564,14 @@ impl<'c> Resident<'c> {
         words.pframe = pframe.device_ptr();
         // [measurement; theory, November 13, P56 item 4] The batch's clocks' takes.
         self.mark("batch_takes");
+        // [the strand's two streams] A batch of passages read by two streams (the stage's `region_heard`).
+        let strand = words.region_heard != 0;
         if paced > 0 {
             self.launch("field_paces", ((paced * regions.len()) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words)])?;
+            if strand {
+                // The open places' clocks: the clock of the known site before each and one bare stride, at every tick.
+                self.launch("field_twin_clocks", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words)])?;
+            }
             self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(words)])?;
         }
@@ -1513,8 +1580,26 @@ impl<'c> Resident<'c> {
         // [theory, November 13, the design record §4.9] A level reads the opening's news in every pass, so the opening's forward runs
         // wherever a level stands; its comparison and return only where the pass returns.
         let opened = d.opening && (returning || field.scale.is_some());
-        let kept_moments = self.moments(field, words, regions.len(), sites, opened)?;
-        let opening = if opened { Some(self.opening_forward(field, words, regions, &st, kept_moments)?) } else { None };
+        let kept_moments = self.moments(field, words, regions.len(), sites, opened || strand)?;
+        // [the strand's two streams] The open places read the known stream's retarded cavity moments (`field_twin_moment`): the opening's
+        // forward formed them where the opening is compared; where it is not, the cavity's forward alone forms them, kept for the reverse.
+        let opening = if opened {
+            Some(self.opening_forward(field, words, regions, &st, kept_moments)?)
+        } else {
+            if strand {
+                let (cmoment, sb, sa) = self.cavity_forward(field, words, regions.len(), sites, kept_moments.as_ref())?;
+                *self.strand_cavity.borrow_mut() = Some(StrandBase { keep: kept_moments, cmoment, sb, sa });
+            }
+            None
+        };
+        if strand {
+            let mut cp = match (opening.as_ref(), self.strand_cavity.borrow().as_ref()) {
+                (Some(op), _) => op.cmoment.device_ptr(),
+                (None, Some(c)) => c.cmoment.device_ptr(),
+                (None, None) => return Err(TowerError::Refused("a strand batch with no cavity moments")),
+            };
+            self.launch("field_twin_moment", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
+        }
         // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Constitution::level_news`), read to the
         // host, which cuts each region's epochs (`level_cut`, a kind of work placed on the host; its bits are the host's own function's).
         let news = match (opening.as_ref(), field.scale.is_some()) {
@@ -1526,8 +1611,15 @@ impl<'c> Resident<'c> {
             }
             _ => None,
         };
-        // The opening's forward ends here where no read compares it.
-        let opening = opening.filter(|_| compared);
+        // The opening's forward ends here where no read compares it (a strand batch keeps the cavity's part of it for its reverse or its ticks).
+        let opening = match opening {
+            Some(op) if !compared && strand => {
+                let Opening { keep, cmoment, sb, sa, .. } = op;
+                *self.strand_cavity.borrow_mut() = Some(StrandBase { keep, cmoment, sb, sa });
+                None
+            }
+            other => other.filter(|_| compared),
+        };
         let tb = match tower {
             Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?)?),
             None => None,
@@ -1656,7 +1748,13 @@ impl<'c> Resident<'c> {
                     stream.copy_device_to_device_async(sig2.device_ptr(), gsig.device_ptr(), 16 * words128).map_err(|e| device(e.into()))?;
                     base.early = Some((tau2, sig2));
                 }
-                drop(op);
+                // [the strand's two streams] The cavity's part of the opening's forward stays for the open places' return.
+                if words.region_heard != 0 {
+                    let Opening { keep, cmoment, sb, sa, .. } = op;
+                    *self.strand_cavity.borrow_mut() = Some(StrandBase { keep, cmoment, sb, sa });
+                } else {
+                    drop(op);
+                }
                 Some((gtau, gsig))
             }
             // [G180] The second read's base clock covectors from the opening's comparison, as the first read's gave them.
@@ -1670,7 +1768,8 @@ impl<'c> Resident<'c> {
         self.mark("batch_setup");
         // [§16.44] The blanks run at the bare rate in the first tick, and each later tick at the faces the tick before
         // gave them (the host's `pass`).
-        let blanks = paced > 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
+        // [the strand's two streams] An open place of a strand runs on the bare clock at every tick: no clock is read again there.
+        let blanks = paced > 0 && words.region_heard == 0 && (0..sites).any(|t| unresolved[t] != 0 && st.mix_off[t] == st.mix_off[t + 1]);
         let mut clocks: Vec<Option<CardClock<'c>>> = vec![None];
         // [measurement; part P2] The carry circles' gates, where read: one accumulator a batch, added into after each tick's forward from that tick's
         // own gate and leak reads, fetched once the ticks end.

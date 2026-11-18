@@ -1152,7 +1152,14 @@ extern "C" __global__ void field_open(FieldWords w) {
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
         int64_t x = opening_term(w, w.enc, t, i) + mark_term(w, w.enc, 0, t, i);
-        if (w.site_pos[t] > 0) {
+        if (twin_site(w, t)) {
+            // [the strand's two streams] An open place's opening is the retarded cavity opening `E(∗) + E₋(u_(place − 1))`: the row of the
+            // known site before its place (the host's `Constitution::cavity_forward_sided`); the moment's chart joins it on the place's
+            // retarded moment (`field_twin_moment`).
+            if (place_of(w, t) > 0) {
+                x += opening_term(w, w.enc_before, t - w.region_heard[w.site_region[t]] - 1, i);
+            }
+        } else if (w.site_pos[t] > 0) {
             x += opening_term(w, w.enc_before, t - 1, i) + mark_term(w, w.enc_before, 1, t - 1, i);
         }
         // [the known stream] The site after has not arrived: its row is not read.
@@ -1160,6 +1167,83 @@ extern "C" __global__ void field_open(FieldWords w) {
             x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 2, t + 1, i);
         }
         w.x[c] = x;
+    }
+}
+
+// [definition; the lead, November 18, the frontier record §6] **The open places' clocks** (the host's `Constitution::cavity_clocks`, the clocks
+// `Constitution::strand_pass` runs its second stream on at every tick): at an open place of a strand's second stream the rate is one bare
+// stride and the clock is the clock of the known site before its place and that stride, `τ = τ_(place − 1) + 1`, `σ = σ_(place − 1) + 1`,
+// zero at the first place. Launched after `field_paces` (which scans the known stream's sites, the region's first) and before the frames,
+// the skins' addresses and the clock's fills. One thread a paced head and site; a site that is no open place is left as it stands.
+extern "C" __global__ void field_twin_clocks(FieldWords w) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    const wide one = (wide)1 << PACE_BITS;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t g = c % w.T;
+        if (!twin_site(w, g)) {
+            continue;
+        }
+        const uint64_t at = c;
+        w.kappa[at] = (int64_t)one;
+        if (place_of(w, g) == 0) {
+            w.tau[at] = 0;
+            w.sigma[at] = 0;
+        } else {
+            const uint64_t from = at - w.region_heard[w.site_region[g]] - 1;
+            w.tau[at] = fit64((wide)w.tau[from] + one, w.status);
+            w.sigma[at] = fit64((wide)w.sigma[from] + one, w.status);
+        }
+    }
+}
+
+// [definition; the lead, November 18, the frontier record §6] **The open places' moments**: an open place reads the retarded cavity moment of
+// its place (the known stream's cavity moment there, formed with no after row: `field_cavity_moment_all` under `FieldWords::before`), in the
+// pass's moments `[t][2M]` where its opening's chart and its ticks read it. One thread a word; a site that is no open place is left.
+extern "C" __global__ void field_twin_moment(FieldWords w, const int64_t *cmoment) {
+    const uint64_t cells = (uint64_t)w.T * w.M2;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.M2;
+        if (!twin_site(w, t)) {
+            continue;
+        }
+        w.moment[c] = cmoment[c - (uint64_t)w.region_heard[w.site_region[t]] * w.M2];
+    }
+}
+
+// [definition; the lead, November 18] **The open places' moment covectors, taken to their places**: `dst[known site of the place] += src[open
+// place]` over `stride` words a site, and the open place's words set to zero, so what stays in `src` is the known stream's own. One thread a
+// word; each known site's word is written by the one open place at its place.
+extern "C" __global__ void field_twin_take_wide(FieldWords w, wide *src, wide *dst, uint32_t stride) {
+    const uint64_t cells = (uint64_t)w.T * stride;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / stride;
+        if (!twin_site(w, t)) {
+            continue;
+        }
+        const uint64_t to = c - (uint64_t)w.region_heard[w.site_region[t]] * stride;
+        dst[to] += src[c];
+        src[c] = 0;
+    }
+}
+
+// [definition; the lead, November 18] **An open place's clock returns to the known site before it** (the host's `strand_clock_return`): its
+// clock is that site's and one bare stride, so its covectors `gtau`, `gsig` (`[p][T]`, 128 bits) are added at that site and set to zero at
+// the open place; an open place at the first place has no site before it and its clock is zero, so its covector is dropped. One thread a
+// paced head and site; each known site's word is written by the one open place after it.
+extern "C" __global__ void field_twin_clock_back(FieldWords w, wide *gtau, wide *gsig) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t g = c % w.T;
+        if (!twin_site(w, g)) {
+            continue;
+        }
+        if (place_of(w, g) > 0) {
+            const uint64_t to = c - w.region_heard[w.site_region[g]] - 1;
+            gtau[to] += gtau[c];
+            gsig[to] += gsig[c];
+        }
+        gtau[c] = 0;
+        gsig[c] = 0;
     }
 }
 
@@ -6399,7 +6483,9 @@ extern "C" __global__ void field_moment_paced_all(const MomentWords *ws, const u
     down += (uint64_t)u * pre_stride;
     for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = w.site_region[g], t = w.site_pos[g];
-        if (!w.ok[r]) {
+        // [the strand's two streams] An open place reads no standing moment (its own is the retarded cavity moment of its place,
+        // `field_twin_moment`): none is formed there.
+        if (!w.ok[r] || twin_site(fw, g)) {
             s[2 * g] = 0;
             s[2 * g + 1] = 0;
             continue;

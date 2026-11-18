@@ -1151,6 +1151,60 @@ mod tests {
         }
     }
 
+    /// [definition; the lead, November 18, the frontier record §6] **A passage read by two streams on the card reads the host's bits** (needs
+    /// the card): on each of [`mark_cases`], and each grown to read twice with its strengths at [`MARK_STRENGTHS`], passages of 2, 3, 7, 64
+    /// and 300 places carrying the word (`Region::strand`: the known stream and an open place at every place, each on the bare clock and
+    /// reading the retarded cavity moment of its place), alone and in a section beside regions of the law and known streams, read and
+    /// returned through the host (`Constitution::strand_pass`, `strand_returned`) and through the card: every open place's face, every
+    /// covector entry, the faces of a read that does not return and the training path's words with the opening's codes equal, and a
+    /// passage's faces are one a place with none at the first.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_passage_read_by_two_streams_on_the_card_reads_the_hosts_bits() {
+        use holonics_engine::field::{Realization, Host, MARK_BASES};
+        let lengths = [2usize, 3, 7, 64, 300];
+        let passages: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
+        let known: Vec<Vec<bool>> = lengths.iter().map(|&n| vec![false; n]).collect();
+        let strands: Vec<Region> = passages.iter().zip(&known).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true }).collect();
+        let (classes, open, carried, domains) = mark_regions();
+        let others: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: r % 2 == 1, strand: false }).collect();
+        // A section of the law's regions, known streams and passages read by two streams, interleaved.
+        let mixed: Vec<Region> = others.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        for (name, learner) in mark_cases() {
+            let marked = {
+                let mut m = learner.clone().with_mark().unwrap();
+                let l = m.field.layout().clone();
+                m.field.theta[l.mark..l.mark + MARK_BASES].copy_from_slice(&MARK_STRENGTHS);
+                m
+            };
+            for (grown, field) in [("read once", &learner.field), ("read twice", &marked.field)] {
+                for (section, regions) in [("strands", &strands), ("mixed", &mixed)] {
+                    let (host_faces, host_g) = field.read_and_return(regions).unwrap();
+                    let (card_faces, card_g) = card_field.read_and_return(field, regions).unwrap();
+                    for (r, region) in regions.iter().enumerate().filter(|(_, region)| region.strand) {
+                        assert!(host_faces[r].len() == region.classes.len() && host_faces[r][0].is_none() && host_faces[r][1..].iter().all(Option::is_some), "{name}, {grown}, {section}: region {r} has a face a place past the first");
+                    }
+                    let (hf, cf) = (&host_faces, &card_faces);
+                    let apart: Vec<(usize, usize)> = (0..regions.len()).flat_map(|r| (0..hf[r].len().max(cf[r].len())).filter(move |&t| hf[r].get(t) != cf[r].get(t)).map(move |t| (r, t))).collect();
+                    assert!(apart.is_empty(), "{name}, {grown}, {section}: {} faces differ, the first at region and place {:?} (the region a strand: {:?})", apart.len(), apart.first(), apart.first().map(|&(r, _)| regions[r].strand));
+                    let unequal: Vec<usize> = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).collect();
+                    let family = |i: usize| field.families_all().iter().position(|&(s, n, _)| (s..s + n).contains(&i));
+                    let families: std::collections::BTreeSet<Option<usize>> = unequal.iter().map(|&i| family(i)).collect();
+                    assert!(unequal.is_empty(), "{name}, {grown}, {section}: {} covector entries differ, the first at {:?} (the families {:?}; the fine material ends at {})", unequal.len(), unequal.first(), families, field.theta.len());
+                    assert_eq!(Host.read_faces(field, regions).unwrap(), card_field.read_faces(field, regions).unwrap(), "{name}, {grown}, {section}: a read that does not return");
+                    let (host_at, host_ng, host_codes) = Host.read_and_return_opening(field, regions).unwrap();
+                    let (card_at, card_ng, card_codes) = card_field.read_and_return_opening(field, regions).unwrap();
+                    assert_eq!(host_at, card_at, "{name}, {grown}, {section}: the training path's words");
+                    assert!(host_ng == card_ng && card_ng == card_g, "{name}, {grown}, {section}: the training path's covector");
+                    assert_eq!(host_codes, card_codes, "{name}, {grown}, {section}: the opening's codes");
+                    println!("STRAND_PARITY field={name} grown={grown:?} section={section} regions={} places_compared={} covector_entries={} faces_equal=1 covector_equal=1", regions.len(), regions.iter().filter(|r| r.strand).map(|r| r.classes.len() - 1).sum::<usize>(), card_g.len());
+                }
+            }
+        }
+    }
+
     /// [definition; agent-inferred, November 14, the ring record §4] **A marked learner's sections on the card read the host's bits** (needs the
     /// card): each of [`mark_cases`] and the lettered learner grown to read twice, its strengths at [`MARK_STRENGTHS`], takes two sections on
     /// [`mark_regions`] (the lettered one on its own stretches) through the host ([`holonics_engine::field::Host`]) and through the card:

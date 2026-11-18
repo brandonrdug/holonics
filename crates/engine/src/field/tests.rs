@@ -4092,7 +4092,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4145,6 +4145,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         world: None,
         frontier: 0,
         before: false,
+        strand: false,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -4215,6 +4216,18 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     learner.pass = Some(known.clone());
     let with = learner.to_text();
     assert_eq!(Learner::from_text(&with).unwrap().to_text(), with, "a learner whose frontier is read as known streams reads and writes byte for byte");
+    // [the lead, November 18] The two streams' word stands in the same place, `frontier E strand`, and reads back as itself.
+    let strand = StorePass { strand: true, ..frontier.clone() };
+    assert_eq!(strand.to_line(), format!("{} frontier 6 strand", pass.to_line()));
+    for p in [strand.clone(), StorePass { own: true, ..strand.clone() }, StorePass { frontier: 8, strand: true, ..world.clone() }] {
+        assert_eq!(StorePass::from_line(&p.to_line()).unwrap(), p, "{}", p.to_line());
+    }
+    assert!(StorePass::from_line(&format!("{} strand", pass.to_line())).is_err(), "the word without a frontier's clause");
+    let named_strand = StorePass { slices: vec![PassSlice { name: "strand".into(), piece: 1, cursor: 2, taken: 3 }], ..pass.clone() };
+    assert!(StorePass::from_line(&named_strand.to_line()).is_err(), "a slice named `strand` is refused");
+    learner.pass = Some(strand);
+    let with = learner.to_text();
+    assert_eq!(Learner::from_text(&with).unwrap().to_text(), with, "a learner whose frontier is read by two streams reads and writes byte for byte");
 }
 
 /// [definition; the lead, November 17 and 18, the boundary chart (the record of the dwell §13, acceptance (b))] **A passage read at its

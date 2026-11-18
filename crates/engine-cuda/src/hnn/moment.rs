@@ -86,27 +86,42 @@ impl<'c> Resident<'c> {
     /// the face through the encoding and its masses, by the field's own entries with the words' open-site mask set to the compared places. Every
     /// word a later kernel reads is written first: the cavity moment is zeroed (its still modes stay zero), the chart, the lift and the face are read
     /// at the compared places alone. Launches a batch: one, two and the moment's chart's, then the chart, the lift, `tied` and the face.
-    pub(crate) fn opening_forward(&self, field: &Constitution, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>) -> Result<Opening<'c>> {
+    /// [realization; theory, November 13, P60 item 2; cut out on November 18 for the strand's second stream] **The cavity moments' forward**
+    /// (`field_cavity_moment_all`): the cavity moments `[t][2M]` (zeroed, their still modes stay zero) and their two sides `[u][t]`, from the
+    /// standing moments' kept operands; zero moments where none were kept (a field with no moment mode).
+    #[allow(clippy::type_complexity)]
+    pub(crate) fn cavity_forward(&self, field: &Constitution, words: &Words, regions: usize, sites: usize, keep: Option<&MomentKeep<'c>>) -> Result<(Pooled<'c, i64>, Pooled<'c, i64>, Pooled<'c, i64>)> {
         let d = field.declaration;
-        let (dw, m2, a, sites, tm, lanes) = (d.width, 2 * d.complex(), d.alphabet, st.sites, d.moment_modes(), d.lanes);
-        let l = field.layout();
-        let mut mask = vec![0u8; sites.max(1)];
-        for (r, region) in regions.iter().enumerate() {
-            let first = st.region_off[r] as usize;
-            let end = region.port.map_or(region.classes.len(), |p| p.start);
-            mask[first..first + end].fill(1);
-        }
-        let mask = self.timed(Kind::Copy, || self.take_up(&mask)).map_err(device)?;
+        let (m2, tm) = (2 * d.complex(), d.moment_modes());
         let cmoment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let (sb, sa) = (alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?);
-        if let Some(k) = keep.as_ref() {
+        if let Some(k) = keep {
             let (mut wsp, mut cmp, mut fw) = (k.ws.device_ptr(), k.cmap.device_ptr(), *words);
             let (mut bp, mut ap, mut upp, mut dnp) = (k.before.device_ptr(), k.after.device_ptr(), k.up.device_ptr(), k.down.device_ptr());
             let (mut sbp, mut sap, mut cp) = (sb.device_ptr(), sa.device_ptr(), cmoment.device_ptr());
-            let (mut stride, mut pre_stride) = ((2 * sites) as u64, (2 * (sites + regions.len())) as u64);
+            let (mut stride, mut pre_stride) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
             self.launch_grid("field_cavity_moment_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut upp), arg(&mut dnp), arg(&mut sbp), arg(&mut sap), arg(&mut cp), arg(&mut stride), arg(&mut pre_stride)])?;
         }
+        Ok((cmoment, sb, sa))
+    }
+
+    pub(crate) fn opening_forward(&self, field: &Constitution, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>) -> Result<Opening<'c>> {
+        let d = field.declaration;
+        let (dw, m2, a, sites, tm, lanes) = (d.width, 2 * d.complex(), d.alphabet, st.sites, d.moment_modes(), d.lanes);
+        let _ = tm;
+        let l = field.layout();
+        // [the strand's two streams] In a passage read by two streams the compared places are the known stream's (`Resident::strand_heard`).
+        let heard = self.strand_heard.borrow().clone();
+        let mut mask = vec![0u8; sites.max(1)];
+        for (r, region) in regions.iter().enumerate() {
+            let first = st.region_off[r] as usize;
+            let end = heard.get(r).map_or(region.port.map_or(region.classes.len(), |p| p.start), |&n| n as usize);
+            mask[first..first + end].fill(1);
+        }
+        let mask = self.timed(Kind::Copy, || self.take_up(&mask)).map_err(device)?;
+        let (cmoment, sb, sa) = self.cavity_forward(field, words, regions.len(), sites, keep.as_ref())?;
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let cx = alloc64(sites * dw)?;
         let mut cxp = cx.device_ptr();
         self.launch("field_cavity_open", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut cxp)])?;
@@ -205,8 +220,26 @@ impl<'c> Resident<'c> {
         let dm = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
-        // The cavity moments' return: each moment mode's covector, admitted by the return's certificate, its released prefix and the cavity's far
-        // prefixes, the return at every site into the strands' rows, then the clocks' covector.
+        self.cavity_back(field, words, k, &op.sb, &op.sa, &dm, g, sites)?;
+        self.mark("opening_back");
+        Ok(())
+    }
+
+    /// [realization; theory, November 13, P60 item 2; cut out on November 18 for the strand's second stream] **The cavity moments' return**
+    /// (the host's `Constitution::cavity_moments_return`): from the cavity moments' covector `dm` (`[t][2M]`, 128 bits), each moment mode's
+    /// covector, admitted by the return's certificate, its released prefix and the cavity's far prefixes, the return at every site into the
+    /// strands' rows (`g`), then the clocks' covector (the words' `gtau`, `gsig`), on the forward's kept operands and the cavity moments'
+    /// two sides.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn cavity_back(&self, field: &Constitution, words: &Words, k: &MomentKeep<'c>, sb: &CardBuffer<'c, i64>, sa: &CardBuffer<'c, i64>, dm: &CardBuffer<'c, i128>, g: &CardBuffer<'c, i128>, sites: usize) -> Result<()> {
+        let d = field.declaration;
+        let tm = d.moment_modes();
+        if tm == 0 {
+            return Ok(());
+        }
+        let l = field.layout();
+        let regions = words.r as usize;
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
         let ds = alloc64(tm * 2 * sites)?;
         let q = self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;
@@ -240,10 +273,9 @@ impl<'c> Resident<'c> {
         }
         self.launch("field_moment_strand_return_all", Self::cells((sites * tm) as u64), THREADS, &mut [arg(&mut w2), arg(&mut base_b), arg(&mut base_a), arg(&mut tm32), arg(&mut dbp), arg(&mut dap), arg(&mut gp)])?;
         let (mut bp, mut ap, mut upp, mut dnp) = (k.before.device_ptr(), k.after.device_ptr(), k.up.device_ptr(), k.down.device_ptr());
-        let (mut sbp, mut sap) = (op.sb.device_ptr(), op.sa.device_ptr());
+        let (mut sbp, mut sap) = (sb.device_ptr(), sa.device_ptr());
         self.launch_grid("field_cavity_pace_back_all", Dim3 { x: Self::cells(sites as u64), y: tm as u32, z: 1 }, THREADS, 0, &mut [arg(&mut wsp), arg(&mut cmp), arg(&mut fw), arg(&mut bp), arg(&mut ap), arg(&mut sbp), arg(&mut sap), arg(&mut dsp), arg(&mut dbp), arg(&mut dap), arg(&mut upp), arg(&mut dnp), arg(&mut stride), arg(&mut pre_stride)])?;
         let _ = &mut none;
-        self.mark("opening_back");
         Ok(())
     }
 

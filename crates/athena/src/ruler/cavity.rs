@@ -22,7 +22,7 @@ pub(crate) struct HeldStretch {
 #[allow(clippy::too_many_arguments, reason = "the cut's declared inputs, each a pinned file's reading or the pass's law")]
 pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &Codec, places: usize) -> Result<Vec<HeldStretch>> {
     let slice = open_slice(store, role, name, counts)?;
-    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false };
+    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false, strand: false };
     let mut cut = Cut { seed, slices: vec![slice], pass };
     let mut out = Vec::new();
     let mut taken = 0usize;
@@ -335,6 +335,43 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
             } else {
                 println!("CAVITY_FRONTIER slice={name} places={} batches={f_batches} ms={}", fjobs.len(), frontier_start.elapsed().as_millis());
             }
+        }
+        // [measurement; the lead, November 18, the frontier record §6] The same places read by two streams, where asked (the word `known`)
+        // or where the state's pass reads its frontier so: each stretch one region carrying the word
+        // ([`holonics_engine::field::Region::strand`]), whose face at a place is the open place's there. Rows `S` of `OUT/frontier.tsv`
+        // (the columns of `F`) and a line of their own.
+        if known_word || law.strand {
+            let strand_start = std::time::Instant::now();
+            let (mut s_at, mut s_batches, mut s_places) = (0usize, 0usize, 0usize);
+            while s_at < stretches.len() {
+                let (mut in_pairs, mut in_sites, mut end) = (0u64, 0u64, s_at);
+                while end < stretches.len() {
+                    let s = 2 * (stretches[end].1.len() as u64 + u64::from(stretches[end].2));
+                    if in_sites > 0 && (in_pairs + s * s > law.pairs || in_sites + s > law.sites) {
+                        break;
+                    }
+                    (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
+                }
+                let regions: Vec<OwnedRegion> = stretches[s_at..end]
+                    .iter()
+                    .map(|(classes, bytes, ends)| {
+                        let n = bytes.len() + usize::from(*ends);
+                        OwnedRegion { strand: true, ..OwnedRegion::plain(classes[..n].to_vec(), vec![false; n]) }
+                    })
+                    .collect();
+                let faces = realization.read_faces(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
+                for (k, f) in (s_at..end).zip(&faces) {
+                    for (t, face) in f.iter().enumerate().skip(1) {
+                        let class = stretches[k].0[t];
+                        let face = face.as_ref().ok_or("a strand's place without a face")?;
+                        writeln!(frontier_tsv, "S\t{name}\t{k}\t{t}\t{class}\t{}", holonics_engine::field::ratio_code(face.masses[class], face.total))?;
+                        s_places += 1;
+                    }
+                }
+                s_batches += 1;
+                s_at = end;
+            }
+            println!("CAVITY_STRAND slice={name} places={s_places} batches={s_batches} ms={}", strand_start.elapsed().as_millis());
         }
         // The code slice's copies: each line's leading spaces doubled, c0 on the host at every place of the copy.
         let mut copy_places = 0usize;
