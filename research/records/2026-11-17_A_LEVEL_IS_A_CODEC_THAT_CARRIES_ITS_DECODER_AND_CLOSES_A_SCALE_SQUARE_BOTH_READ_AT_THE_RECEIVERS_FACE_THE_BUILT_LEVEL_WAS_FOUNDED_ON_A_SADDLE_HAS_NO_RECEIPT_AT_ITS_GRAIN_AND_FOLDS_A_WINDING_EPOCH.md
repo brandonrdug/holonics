@@ -1,7 +1,7 @@
 # A level is a codec that carries its decoder and closes a scale square, both read at the receiver's face; the built level was founded on a saddle, has no receipt at its own grain and folds a winding epoch onto itself
 
 November 17, 2026, 23:40 to 23:55 UTC. Refs #404 #405 #406 #410. Status: [design; `agent-inferred` throughout; no part is
-built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11, and the tree's answer to what §11 leaves in §12; §13 reads the night's state against the line's own]. The lead's reading of the tree, written before any part, after
+built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11, and the tree's answer to what §11 leaves in §12; §13 reads the night's state against the line's own, and §14 a ruler's writer]. The lead's reading of the tree, written before any part, after
 [the trace of the engine's own level](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
 (§19 there). Two host readings are named in §6 with their guesses fixed in
 [the guess file](receipts/2026-11-17_tempering/guesses.txt) before either is read.
@@ -501,4 +501,31 @@ among known neighbours, and its level readings were taken on a state whose two-s
   under the line's masks (2.94 to 2.65), where a place's neighbours are not known. A place opened alone among known
   neighbours is the nearest reading there is of a written one; by it, the written places a level's moment sums hold their
   two-sided reading from the opening on, and the sentence §11 first carried about them was wrong the other way round.
+
+## 14. The stronger reader is the weaker writer (November 18, 02:06 to 02:12 UTC)
+
+`measurement` for the counts ([`refine.txt`](receipts/2026-11-17_tempering/refine.txt)), `agent-inferred` for the reading.
+The guess G-V10 was fixed and pushed at 02:06 UTC and missed. A ruler's writer, no part and no training
+(`tools/refine_ruler.py`): the night's panel draft, written at the boundary by the pass-15 state, is refined by the line's
+own state, lap 94's mean, whose reading of a place between known neighbours is the stronger of her two (0.920 nats a place
+against 1.479 at the boundary). A sweep reopens every place of a written run alone, its neighbours as the draft has
+them, a quarter of the places at a time, and redraws it from her face by a keyed draw, at the field's own temperature.
+
+| | words in the books' lexicon | places redrawn to another symbol | the standing symbol's code under her face |
+|---|---|---|---|
+| the draft | 140 of 184 (76%) | | |
+| after one sweep | 114 of 186 (61%) | 38.3% | 1.184 |
+| after two | 130 of 188 (69%) | 39.6% | 1.160 |
+| after three | 118 of 184 (64%) | 38.8% | 1.168 |
+| after four | 105 of 184 (57%) | 41.1% | 1.199 |
+
+- The guess had the share rise to 84% or more. It falls, and it does not settle: two fifths of the places change at every
+  sweep, and the standing symbol's code does not come down.
+- Redrawing each place from the two-sided face is a chain whose resting text is her two-sided field's own writing. A
+  state trained on these books under the line's kind of comparison wrote 51 to 56% (the dwell record's control), and
+  the refined drafts come to rest near there. The boundary's draft held more words than the field that reads better.
+- A reading of 0.92 nats between true neighbours is 1.18 between neighbours she wrote. What a comparison on true text
+  teaches about a place does not carry to a place whose neighbours are her own draws; the record of November 13 on the
+  field ringing under its own release read the same thing from the release's side.
+- The writes are private and are shown to Brandon in the thread only.
 

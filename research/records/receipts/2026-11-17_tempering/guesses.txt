@@ -530,3 +530,29 @@ and 0.960: the second stands 0.075 above the opening's (none above it by more th
   0.92. The ticks are worth 0.07 nats a place there. They are worth 0.55 at the boundary (2.03 to 1.48 on the night's state) and 0.28
   under the line's masks (2.94 to 2.65), where a place's neighbours are not known. A written place among known neighbours holds its
   two-sided reading from its opening on.
+
+G-V10 (2026-11-18T02:06:23Z). A ruler's writer, no part and no training: the night's panel draft (written at the boundary by the pass-15 state, 140 of
+184 words in the books' lexicon, 76%) refined by the line's own state, lap 94's mean, whose reading of a place between known neighbours
+is 0.920 nats on these books. A sweep reopens every place of a written run alone, its neighbours as the draft has them, a quarter of the
+places at a time, and redraws it from her face by a keyed draw; four sweeps.
+  Read before fixing: at the boundary her face is a count of the last four symbols (1.479); between known neighbours a place holds its
+  reading from its opening on (0.992, and 0.920 after her ticks); on November 3 refinement passes on the line raised written words
+  that are words from 45% to 65%; on November 13 the field rang under its own release (a place hearing itself flipped each pass). The
+  drafts' neighbours are the machine's own writing, which lap 94's state never met.
+  The guess: after four sweeps 84% or more of the panel's words stand in the lexicon, no sweep lowers the share by more than two
+  points, and the longest run shared with the fitting text stays under 30 symbols. By eye: whole words where the draft has near-words,
+  and no more sense than the draft.
+  What it decides: whether her two-sided reading, the stronger of her two, repairs a draft written at the boundary. If it does, the
+  writer the readings point to is the theory's own (a joint field refined, its boundary released), with both comparisons kept up in one
+  state. If the share stands or falls, a reading between known neighbours does not carry to neighbours she wrote herself.
+
+Scored (2026-11-18T02:11:36Z), G-V10 (refine.txt): missed. The draft has 140 of 184 words in the lexicon (76%). After sweeps one to four: 114 of 186
+(61%), 130 of 188 (69%), 118 of 184 (64%) and 105 of 184 (57%), where 84% or more was guessed and no fall of more than two points. Each
+sweep redraws 38 to 41% of the places to another symbol, and the standing symbol's code under her face before its redraw stays at 1.16
+to 1.20 nats from the first sweep to the fourth. The longest run shared with the fitting text stays at 12 to 15 symbols (under 30:
+held). By eye the refined runs are word-shaped and hold fewer words.
+  What it says: redrawing each place from her two-sided face at her own temperature is a chain whose resting text is her two-sided
+  field's own writing, and that writing holds fewer words than the boundary's (a state trained on these books under the line's kind of
+  comparison wrote 51 to 56%, the dwell record's control).
+  A reading of 0.92 nats between true neighbours does not carry to neighbours she wrote: between her own neighbours a standing symbol
+  codes at 1.18. The stronger reader is the weaker writer.

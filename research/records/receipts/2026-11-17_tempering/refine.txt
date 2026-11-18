@@ -1,0 +1,19 @@
+A boundary draft refined by the line's two-sided reading (G-V10; the level's design record, its section 14). A ruler's writer.
+The draft: the night's panel at pass 15 (16 prompts, 64 places each, written at the boundary by the pass-15 state). The reader: lap 94's
+mean through athena host complete-language read-tension, each place opened alone with its neighbours as the draft has them; four
+sweeps, a quarter of the places at a time, each redrawn from her face by a keyed draw. tools/refine_ruler.py, 223 s at 20 host threads.
+Counts only; the writes derive from private text and are not here.
+
+REFINE symbols mapped 67 of an alphabet of 244
+REFINE sweep=1 places=1024 redrawn_to_another_symbol=392 (38.3%) the standing symbol's code before its redraw 1.184 nats  mass on mapped symbols 0.9953
+REFINE sweep=2 places=1024 redrawn_to_another_symbol=405 (39.6%) the standing symbol's code before its redraw 1.160 nats  mass on mapped symbols 0.9963
+REFINE sweep=3 places=1024 redrawn_to_another_symbol=397 (38.8%) the standing symbol's code before its redraw 1.168 nats  mass on mapped symbols 0.9952
+REFINE sweep=4 places=1024 redrawn_to_another_symbol=421 (41.1%) the standing symbol's code before its redraw 1.199 nats  mass on mapped symbols 0.9952
+REFINE done sweeps=4 colours=4
+
+== words of two letters or more in the fitting text's lexicon, and the longest run shared with it (text/score.py) ==
+the draft         seen: words 44 in_lexicon 30 (68%) longest_copy 14 held: words 69 in_lexicon 54 (78%) longest_copy 16 unread: words 71 in_lexicon 56 (78%) longest_copy 14 
+sweep_1.written seen: words 47 in_lexicon 29 (61%) longest_copy 14 held: words 69 in_lexicon 41 (59%) longest_copy 12 unread: words 70 in_lexicon 44 (62%) longest_copy 15 
+sweep_2.written seen: words 48 in_lexicon 32 (66%) longest_copy 14 held: words 67 in_lexicon 45 (67%) longest_copy 15 unread: words 73 in_lexicon 53 (72%) longest_copy 13 
+sweep_3.written seen: words 46 in_lexicon 28 (60%) longest_copy 13 held: words 67 in_lexicon 41 (61%) longest_copy 12 unread: words 71 in_lexicon 49 (69%) longest_copy 14 
+sweep_4.written seen: words 46 in_lexicon 26 (56%) longest_copy 14 held: words 69 in_lexicon 37 (53%) longest_copy 12 unread: words 69 in_lexicon 42 (60%) longest_copy 14 
