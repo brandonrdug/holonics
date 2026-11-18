@@ -754,7 +754,6 @@ import Holonics.Geometry.Horizon
 import HolonicsResearch.Mathematics.EuclideanSqrtTwo
 import HolonicsResearch.Gauge.CurvatureAndGap
 import HolonicsResearch.EllipticCurve.LatticeCount
-import HolonicsResearch.Geometry.AngleExcess
 import HolonicsResearch.EllipticCurve.CanonicalHeight
 import HolonicsResearch.Geometry.Deviation
 import Holonics.Physics.Ellipse
@@ -1319,3 +1318,10 @@ import HolonicsResearch.Fluid.DissipativeGlobalFlow
 import HolonicsResearch.Fluid.NavierStokesTruncatedGlobal
 import HolonicsResearch.Hodge.LefschetzFromPositivity
 import HolonicsResearch.Hodge.HodgeEllipticPower
+import HolonicsResearch.EllipticCurve.TernaryReducedCount
+import HolonicsResearch.Geometry.ModularFreeProduct
+import HolonicsResearch.Geometry.LockAddress
+import HolonicsResearch.Holon.LoopCurvature
+import HolonicsResearch.Compression.KTNodeSplit
+import HolonicsResearch.HNN.JointStepCovector
+import HolonicsResearch.HNN.RestitutionFamily

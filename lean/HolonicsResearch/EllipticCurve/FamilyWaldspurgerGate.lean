@@ -115,16 +115,15 @@ theorem rankClause_of_waldspurgerTunnellDefect_eq_zero
   FamilyRatio.theRankClauseHoldsOnTheThreeModEightBranch hp8
     (latticeCountDatumOfWaldspurgerTunnellDefectEqZero hp8 hzero)
 
-set_option maxRecDepth 8000 in
-example : canonicalBranchCount 3 = 1 := by
-  native_decide
+/-- [proved-derived; formal-checked] The orbit-normalized count at the first three primes of the
+three-mod-eight branch, read by the kernel on the tight box (`⌊√3⌋ = 1`, `⌊√11⌋ = 3`, `⌊√43⌋ = 6`). -/
+theorem canonicalBranchCount_three : canonicalBranchCount 3 = 1 := by
+  decide +kernel
 
-set_option maxRecDepth 40000 in
-example : canonicalBranchCount 11 = -1 := by
-  native_decide
+theorem canonicalBranchCount_eleven : canonicalBranchCount 11 = -1 := by
+  decide +kernel
 
-set_option maxRecDepth 200000 in
-example : canonicalBranchCount 43 = 3 := by
-  native_decide
+theorem canonicalBranchCount_fortyThree : canonicalBranchCount 43 = 3 := by
+  decide +kernel
 
 end Holonics.EllipticCurve.FamilyWaldspurgerGate
