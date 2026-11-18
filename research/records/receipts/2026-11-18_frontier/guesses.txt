@@ -194,3 +194,18 @@ Scored (2026-11-18T11:30:50Z), G-1118-5 (reads.txt).
   The writes rose ten points and stayed there. By the guess's rule the count of places compared is not what binds past the first laps
   at this size; the price of room at the frontier is read next (G-1118-8, on the card as this is written), ahead of the card's
   realization of the read that compares every place.
+
+G-1118-9 (2026-11-18T12:06:51Z), fixed while arm F6 trains and before its read. The frontier's fall follows the logarithm of the places compared.
+  Read before fixing. Arm L's lap mean (the fifth lane's first lap) against arm F5's: the frontier rows 0.0082 under, one place open
+  0.0099 above, whole masks 0.0157 above; its panels 49% and 46%. And a fit, not seen until the five laps were in: the frontier's fall
+  under the control at laps 1 to 5 (cumulative sections 3,000, 6,000, 9,540, 12,540, 15,540) is 0.1603 + 0.0458 ln(sections / 3,000)
+  with a root mean square residual of 0.0009 nats over the five reads. On the fifty books the held next place falls as 0.364 + 0.083
+  ln(passes) over ten passes of the mixed diet (residual 0.008) and 0.338 + 0.075 ln(passes) over fifteen of boundary rows alone.
+  The guess. Arm F6's frontier rows at its lap mean read 1.8137 (0.2437 under the control), within 0.003. Arm L's frontier rows read
+  within 0.004 of arm F6's: the fifth lane buys nothing there in its first lap (G-1118-8 guessed 0.010 to 0.040 under).
+  What it says if both hold. The fall a lap slows because laps add and the fall goes with the logarithm: what binds the frontier at
+  this size is the count of places compared there, as the frontier record's §5 had it before I read the slowing as room. A lane of
+  32 more is not the room that pays. By the store's own law a lap that compared every site at its frontier (177 times a lap's
+  comparisons today) would stand about 0.40 nats under the control after one lap where five laps stand 0.23 under; that is an
+  extension of a law read over five laps to a hundred times their count, and the two-stream read starts from half a nat off the
+  trained state, so it is a projection to be read and no figure to build on.
