@@ -11,10 +11,8 @@
 //!
 //! with `w` the face of the odds `(0, z_1 … z_H)`, `z_h = L_h r̂ + ℓ_h` read from the chart the readout reads. A mixture's harm at a place
 //! where no pair closes is bounded by its weight, and its covector on the row's shares, `−(w_h / (p ln 2)) (∂R_h(x*) − p_field(x*) ∂M_h)`,
-//! is the closure's pull: it draws the row to the pairs that close with the written symbol (atlas `key.closure-target-of-a-row`). The
-//! premise it was built on, that the comparison of the field's own face cannot do this while the product has no reader (the saddle of
-//! November 16), was read on ten passes and is withdrawn: the plain engine takes the sum's pair law by its own descent near section
-//! 2,000 of one world (the dwell record of November 17, §5).
+//! is the closure's pull: it draws the row to the pairs that close with the written symbol (atlas `key.closure-target-of-a-row`), which
+//! the comparison of the field's own face cannot do while the product has no reader (the saddle of November 16).
 //!
 //! Why this form and not a return into the site's state: read on November 17, a product returned into the state lowered a one-place
 //! receiver's digits and harmed every place where no pair closes once a run extended past its answer (the places past a line feed from
