@@ -19,6 +19,9 @@ docs/plans/THE_CONSOLIDATION.md). A host instrument: it reads tracked files and 
         L: D: N: P: a Lean file under lean/Holonics or lean/HolonicsResearch with its declaration's last name, a guide with its
                     anchor, a record under research/records, a paper source under research/papers/source.
       Prints one `BROKEN_OWNER` line an owner that does not resolve, the counts by kind, and exits 1 on any.
+      Field 7 is read with them: a grade the atlas's README declares, or, on a row with an owner in history, the dated status the row
+      was written with. Any other grade prints one `BROKEN_GRADE` line. Reason (November 18): 20 rows whose Lean owners stand in the
+      library carried a validation queue's status of October in the field, and nothing read it.
 
 ROOT defaults to the directory above this file. The tracked paths are git's index, or every file under ROOT where it is no repository.
 """
@@ -33,6 +36,7 @@ LINK_FILES = ("README.md", "CLAUDE.md", "AGENTS.md", "CONSTRUCTION_STATE.md", "c
 LINK_TREES = ("docs/",)
 LEAN_ROOTS = ("lean/Holonics/", "lean/HolonicsResearch/")
 SOURCE = (".rs", ".py", ".cu", ".cuh", ".sh", ".lean", ".toml", ".md", ".h", ".tsv", ".json")
+GRADES = ("definition", "proved-derived", "proved-standard", "formal-checked", "counterexample", "interpretation", "open", "measured")
 
 
 def tracked_paths(root):
@@ -351,12 +355,35 @@ def atlas(root):
     return rows, kinds, broken
 
 
+def grades(root):
+    """Field 7 of every atlas row: (declared, dated, broken). A row is dated when it has an owner in history (`H:`)."""
+    tree = Tree(root)
+    declared, dated, broken = 0, 0, []
+    for shard in sorted(p for p in tree.tracked if re.fullmatch(r"docs/atlas/[^/]+\.tsv", p)):
+        for n, line in enumerate((tree.text(shard) or "").split("\n"), 1):
+            fields = line.split("\t")
+            if len(fields) < 7:
+                continue
+            grade = fields[6].strip()
+            if grade in GRADES:
+                declared += 1
+            elif any(owner.strip().startswith("H:") for owner in fields[5].split(";")):
+                dated += 1
+            else:
+                broken.append((shard, n, fields[0], grade))
+    for shard, n, row, grade in broken:
+        print(f"BROKEN_GRADE {shard}:{n} {row} `{grade}` (no grade the atlas declares, and no owner in history to date it)")
+    print(f"ATLAS_GRADES declared={declared} dated={dated} broken={len(broken)}")
+    return declared, dated, broken
+
+
 def main(argv):
     root = argv[2] if len(argv) == 3 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     if len(argv) in (2, 3) and argv[1] == "links":
         sys.exit(1 if links(root)[2] else 0)
     elif len(argv) in (2, 3) and argv[1] == "atlas":
-        sys.exit(1 if atlas(root)[2] else 0)
+        owners, marks = atlas(root)[2], grades(root)[2]
+        sys.exit(1 if owners or marks else 0)
     else:
         sys.exit(__doc__)
 

@@ -1188,22 +1188,6 @@ pub(crate) fn lane_adjoint(read: &[i32], scales: &[i128], cov: &[i64]) -> Result
     Ok(out)
 }
 
-/// [measurement; theory, November 11 04:48, G39] **A section's return split by news** ([`Constitution::read_and_return_split`]): the covector of the whole section, and of its quiet places alone.
-#[derive(Clone, Debug, Default)]
-pub struct SplitReturn {
-    /// `G`: the section's deposit covector (the regions' returns summed), each family on its natural grain.
-    pub total: Vec<i128>,
-    /// `G_quiet`: the same return with the loud places' face covector zeroed (a place is loud where its news mass is at or above `2^(−bits)`).
-    pub quiet: Vec<i128>,
-    /// The places read (an open site with a face) that are loud, and that are quiet.
-    pub loud: u64,
-    pub quiet_places: u64,
-    /// The CPU time each phase took summed over the regions (ns; the regions run on the host's threads in parallel): the forward, the return of `G`, the return of `G_quiet`.
-    pub forward_ns: u128,
-    pub return_ns: u128,
-    pub quiet_return_ns: u128,
-}
-
 // The items this object owns that stood in the October tower until C5 (#603), each as it stood.
 
 /// The covector a face returns when it is compared with `target`: `dz_c = p̂(c) − [c = target]` on

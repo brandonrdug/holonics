@@ -18,7 +18,9 @@ does not, and nothing is executed; a word inside a quoted string reads as code, 
   rule 4   the training command stands under an outer `timeout` and the card's lock (`flock` on `gpu.lock`)
   rule 5   `read-cavity` is called, and a saved mean (`MEAN.k`) is among the states read
   rule 6   a panel is written (`write-next` or `write-store`)
-  rule 7   `read-loudness` is called
+  rule 7   `read-loudness` is called, or a comment names the companion script that calls it for this lap (`loudness: loud.sh`,
+           a file beside the script; November 18: the line's laps L15 to L17 took their loudness from one companion script, and a
+           note that prints on a lap that has its reading teaches its reader to pass over it)
 
   lap_check.py SCRIPT [SCRIPT ...]     print the notes; exit 0 always
 """
@@ -27,6 +29,7 @@ import sys
 from pathlib import Path
 
 TRAIN = re.compile(r"\btrain-store\b")
+COMPANION = re.compile(r"\bloudness:\s*([\w./-]+\.sh)\b")
 GUESS = re.compile(r"\bG(?:\d{1,4}|-[0-9A-Z]{1,6}(?:-[0-9A-Z]{1,6})*)\b")
 
 
@@ -58,8 +61,18 @@ def split_comment(line):
     return line, ""
 
 
-def notes(text):
-    """The notes for one script's text: a list of (rule, sentence). Empty when the script trains nothing."""
+def companion_reads(name, beside):
+    """Whether the companion script `name`, a file under the directory `beside`, calls `read-loudness` in its code."""
+    try:
+        text = (Path(beside) / name).read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return any(re.search(r"\bread-loudness\b", split_comment(l)[0]) for l in logical_lines(text))
+
+
+def notes(text, beside=None):
+    """The notes for one script's text: a list of (rule, sentence). Empty when the script trains nothing. `beside` is the script's
+    directory, where a companion named in a comment is read."""
     lines = logical_lines(text)
     parts = [split_comment(l) for l in lines]
     code = [c for c, _ in parts]
@@ -83,14 +96,18 @@ def notes(text):
     if not re.search(r"\bwrite-(next|store)\b", body):
         found.append((6, "no panel is written (`write-next` or `write-store`): a report opens with what the machine wrote"))
     if not re.search(r"\bread-loudness\b", body):
-        found.append((7, "no `read-loudness`: a lap is reported with its loudness beside its nats"))
+        named = COMPANION.search(comments)
+        if not named:
+            found.append((7, "no `read-loudness`: a lap is reported with its loudness beside its nats"))
+        elif beside is not None and not companion_reads(named.group(1), beside):
+            found.append((7, f"the companion named for the loudness (`{named.group(1)}`) is not beside the script or calls no `read-loudness`"))
     return found
 
 
 def report(path):
     """The printed lines for one script."""
     text = Path(path).read_text(encoding="utf-8", errors="replace")
-    return [f"LAP_CHECK {Path(path).name} rule={rule}: {sentence}" for rule, sentence in notes(text)]
+    return [f"LAP_CHECK {Path(path).name} rule={rule}: {sentence}" for rule, sentence in notes(text, Path(path).parent)]
 
 
 def main():

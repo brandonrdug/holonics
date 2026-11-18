@@ -1,15 +1,4 @@
-//! **Units founded by their code length: adjacent units merge when the whole code falls** (#405,
-//! #404).
-//!
-//! [definition; agent-inferred, October 23] Why it is built. The moment tower read GSM8K at the
-//! codec's byte classes and its releases spell letter by letter: after three passes over all 6,726
-//! problems it codes 2.3 bits a byte and its continuations of a question are strings of misspelt
-//! fragments. A unit above the byte lets the tower release a founded piece of the passage whole,
-//! and lets each of its modes span several times the text a byte-clocked mode spans. The units are
-//! the passage's own: they are founded from the passage by the merge law of
-//! `receiver::population::merge` (Lean `Compression/Landmark/Context/Merge.merge_cost_mass_iff`):
-//! **a merge is accepted exactly when it lowers the complete code**, the description of the units
-//! plus the code of the passage read in them. Frequency only proposes; the price accepts.
+//! **Units founded by their code length: adjacent units merge when the whole code falls.**
 //!
 //! ```text
 //! units      V = {bytes} ∪ {z_i = (a_i, b_i)},  D(z_i) = D(a_i) D(b_i)        founded in order
@@ -23,33 +12,17 @@
 //! parse      a passage is read by replaying the founded merges in order (decode(parse(x)) = x)
 //! ```
 //!
-//! [definition; agent-inferred] **Why order one.** Under an order-zero receiver every frequent
-//! co-occurrence pays, and the units grow toward every repeated word. Under order one a pair pays
-//! only by what the unit before it does not already predict, and each new unit raises the
-//! alphabet every context pays for (`growth`), so the founding reaches its own equilibrium: it
-//! ends when no proposed pair lowers the complete code. The receiver that reads the units (the
-//! tower) is richer than order one, so this price is a declared, cheaper receiver's, recorded as
-//! such.
+//! the code's grain is `2^(−32)` bits; pairs are proposed in the order of their adjacent count and each is priced and accepted or refused,
+//! a refused pair priced again when its count changes; a price inside the table's enclosure (one grain a recurrence step it spans) is
+//! refused and counted as undecided; the founding ends when every pair standing has been refused at its count; the parse is one path of
+//! the segmentation lattice, so its code under any receiver bounds the lattice's from above
 //!
-//! [definition; agent-inferred] **The parse is one path of the segmentation lattice.** A passage
-//! is read in the units by replaying the founded merges; its code under any receiver bounds from
-//! above the code of the lattice of all parses (Lean `segmentation_code_le`), so a reading in
-//! bits a byte is honest, never better than the lattice. The lattice read is owed (#410).
-//!
-//! [definition; agent-inferred] **Proposal and acceptance.** Pairs are proposed in the order of
-//! their adjacent count; each is priced exactly and accepted or refused. A refused pair is priced
-//! again when its count changes. The founding ends when every pair standing has been refused at
-//! its count. The code's grain is `2^(−32)` bits; the table's enclosure is one grain a recurrence
-//! step it spans, and a merge whose price lies inside its enclosure is refused and counted as
-//! undecided.
-//!
-//! [definition] The computational object is the helical pair interaction, read here as the
-//! passage's adjacent pairs and the units they found. Of the winding guide's six general objects
-//! this owner touches the **pair** (each merge prices one adjacent pair), **faces and placement**
-//! (the order-one faces the price reads) and the **tower thread** (a unit restricts to its two
-//! constituents and decodes to its bytes); the helix, the cell holonomy and the tube stay attached
-//! through the tower that reads the units. Nothing here is text-specific: the founding reads any
-//! passage of byte classes (an acoustic or motor code's classes alike).
+//! Kind: chain over the proposed merges (each priced over its pair's occurrences, a sum); the parse, a chain over the founded merges.
+//! Kernels: none; the units are founded and parsed on the host.
+//! Lean: `Compression/Landmark/Context/Merge` (`merge_cost_mass_iff`, `segmentation_code_le`).
+//! Atlas: `hnn.founded-units`.
+//! Records: `2026-10-23_UNITS_FOUNDED_BY_CODE_LENGTH…`, `2026-11-18_THE_CODEC_THE_REGION…` (the first lines this header replaced, with
+//! why the receiver is order one). The derivations' history is in the records; the items below keep their reasons.
 
 use std::collections::{BinaryHeap, HashMap};
 

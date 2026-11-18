@@ -1,0 +1,29 @@
+A. Artin's factorization over a cyclic cover
+  base |V|=2 |E|=4, m=4: worst relative gap 2.62e-15
+  base |V|=2 |E|=4, m=2: worst relative gap 5.53e-16
+  base |V|=4 |E|=4, m=2: worst relative gap 4.22e-16
+  base |V|=3 |E|=6, m=5: worst relative gap 4.79e-15
+  base |V|=3 |E|=3, m=5: worst relative gap 6.67e-16
+  base |V|=2 |E|=4, m=3: worst relative gap 3.62e-15
+  planted wrong character set: gap 7.800 (seen)
+  the m-cycle: det(1 - uB) = (1 - u^m)^2 at m = 3, 4, 5, 7
+B. The density law of a tempered complex
+  n=40 d=4: second mode 3.397 against 2 sqrt q = 3.464 (tempered: True); trace floor sqrt 1.922
+  n=60 d=6: second mode 4.416 against 2 sqrt q = 4.472 (tempered: True); trace floor sqrt 2.343
+  n=80 d=4: second mode 3.498 against 2 sqrt q = 3.464 (tempered: False); trace floor sqrt 1.962
+  n=100 d=6: second mode 4.369 against 2 sqrt q = 4.472 (tempered: True); trace floor sqrt 2.387
+  planted two disjoint copies at mu = 2 sqrt q: one copy's own edges deviate 60.0 > bound 51.96 (seen)
+C. The prime cycle theorem at the half
+  Petersen: inside P1 to n = 16, largest ratio to the bound 0.850
+  K4: inside P1 to n = 16, largest ratio to the bound 0.972
+  planted untempered prism on 42 cells: leaves P1, largest ratio 4.96 (seen)
+D. The truncated fluid's triads do no work
+  dimension 2, 28 wave vectors: energy work / scale 5.7e-17, enstrophy work / scale 7.3e-18
+  dimension 3, 32 wave vectors: energy work / scale 2.3e-17, enstrophy work / scale 1.8e-02
+  reading: one wave vector dropped, its -k kept: work / scale 1.8e-17 (the guess said this does work)
+  planted truncation on a random subset of 18 of 32 (not closed under -k): work / scale 2.7e-03 (seen)
+  planted non-real field on the closed set: work / scale 2.7e-02 (seen)
+E. A plane truncation flows with its energy equality
+  28 wave vectors, 1500 steps: energy equality residual 1.2e-07 of E(0), norm rises 0
+  planted field x' = x^2 (not dissipative): leaves 10^6 by t = 1.010 (seen)
+all sections pass; 8.9 s

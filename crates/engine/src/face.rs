@@ -256,12 +256,6 @@ impl TowerFace {
     pub fn covector(&self, target: usize) -> Vec<i64> {
         covector(self, target)
     }
-
-    /// The class's rank on the face: how many classes carry more mass than it (0 when none does).
-    pub fn rank(&self, class: usize) -> usize {
-        let m = self.masses[class];
-        self.masses.iter().filter(|&&x| x > m).count()
-    }
 }
 
 /// A class's code read off its mass and the face's total, `−log₂(mass/total)` on `2^(−20)` bits

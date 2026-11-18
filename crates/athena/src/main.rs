@@ -1,12 +1,12 @@
-//! The field's commands on the card (`holonics::hnn::tower::field`, `holonics_cuda::hnn::Resident`;
-//! record `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`).
+//! The engine's commands (`holonics_engine::field`, `holonics_engine_cuda::hnn::Resident`; record
+//! `2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN`). The binary is
+//! `athena`; its words are the retired `field_pass`'s, and `docs/THE_ENGINE.md` §7 lists every one with the line it prints.
 //!
-//! - `field_pass parity complete-language parity-field ARGS…`: the host's field against the card's on
-//!   `train-field`'s sections, read for read (faces, covectors, learners) and write for write.
-//! - `field_pass time complete-language time-field ARGS…`: the card alone on the opening sections and
-//!   writes, and a lap and the held problems' writes projected from them.
-//! - `field_pass train complete-language train-field ARGS…` and `sample-field ARGS…`: the commands with every read and
-//!   return on the card.
+//! - `athena parity complete-language parity-store ARGS…`: the host's field against the card's on the store line's
+//!   sections, every read asked of both and compared whole.
+//! - `athena train complete-language WORD ARGS…`: the commands with every read and return on the card (`train-store`,
+//!   `read-cavity`, `read-loudness`, `write-store`, `write-next` and the rest of §7's table).
+//! - `athena host complete-language WORD ARGS…`: the readings and the state tools that open no card.
 //!
 //! Each run prints `FIELD_CARD` with the card's reads, returns, their time, the site pairs met, the landmark reads and the
 //! largest batch's allocations, and the card's free memory at the open and its batch budget; with
