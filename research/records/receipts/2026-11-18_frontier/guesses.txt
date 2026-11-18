@@ -495,3 +495,17 @@ ruler): the reader of navigator.content-stride-moment, m ← α(u) m + β(u) on 
   G-1118-17 scored so far (21:14 UTC), the first lap. (a) arm R15's rows S read 1.8042 at the mean of its states, 0.0514 above arm P15's (±0.0015; between 0.030 above and 0.030 under: missed, above), above it in every slice (books 0.036, code 0.057, science 0.062, web 0.054, wikidata 0.048) and from four places known up. (c) under the law one place open reads 0.0425 above the control's (0.00 to 0.06 above: held) and whole masks 0.0355 above. (d) a section took 262 ms (arm P16's 265: within 3%, held). The rule is fixed on the second lap, arm R16 against arm P16.
 
   G-1118-21 scored (21:25 UTC), pooled over the five slices by places. At the fifth of places a count of five settles: (a) one advance at 32 circles 0.293 (0.22 to 0.31: held); (b) strides at 32 circles 0.477 (0.40 to 0.50: held); (c) strides at 128 circles 0.652 (0.50 to 0.62: missed, above), where the line reads 0.650. (d) fitted moduli: strides 0.60 to 0.67 at 32 circles and 0.67 to 0.73 at 128 (over 0.60: held); one advance 0.535, 0.585, 0.574, 0.547, 0.671 by slice (under 0.55: held on two of five, missed). (e) strides at 128 over all places 2.132 nats (2.05 to 2.25: held); their writes 55% lexicon words (45% to 58%: held). The held code was still falling at the third pass. The rule: 0.60 or over, so the arm is ordered.
+
+G-1118-22 (2026-11-18T21:30:43Z). Whether descent reaches a stride a symbol from where the line's circles stand (tools/content_stride_ruler.py with
+the sizes 32z and 32c; books and web, 8 MB, three passes, a window of eight; host): the stride reader on 32 circles opened with every
+stride at zero and a modulus of 4/5, and opened closed (strides within 0.06 of a turn, modulus 0.39, the line's circles' reading).
+  What is on record. Opened with strides drawn over the turn at 4/5 the reader gives the arriving symbol 0.590 (books) and 0.468 (web)
+  of its mass at the places a count of five settles; one advance for every symbol 0.401 and 0.257. Zero strides are no stationary
+  point of this reader by any symmetry: a stride's slope is the product's own.
+  The guess. (a) Opened at zero: 0.54 to 0.60 on books and 0.42 to 0.48 on web. (b) Opened closed: 0.50 to 0.59 on books and 0.38 to
+  0.47 on web, its mean modulus risen over 0.55 and its strides spread over 200 thousandths of a turn.
+  What it decides. Both within 0.06 of the drawn opening: descent reaches the strides from where the line's circles stand, so what
+  holds the line's circles is the engine's form of them (a turn charted from a read that mixes the site's context) or its regime,
+  and the arm read first is the small one: a stride of its own a symbol added to the circles' turn, founded at zero so every face
+  is kept, beside the line. The closed opening within 0.05 of one advance: the opening decides, and the arm founds new circles with
+  drawn strides at their founding reach.
