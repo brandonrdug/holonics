@@ -180,6 +180,9 @@ step and no founding. That is one mechanism, seen twice.
 1. **Make the deposit's temperature a state.** Act on the line search the trainer already computes, or run the octave law with a floor
    below the base, and read each block's `|m|/√v` against 0.206 as the deposit's own measure of signal. Train from the lap's mean as well
    as reading it. Take up the lap law's sufficient statistics and the certified step (§2.1, §2.3) as the attempt beside it.
+   [Added the same hour by the second audit: the line search is the transfer law of November 4, whose price read empty and which
+   prints `octave=1`, the step doubled, at every save; that day's own reading is that cooling pays when it is read directly (0.043
+   nats a place at once). The direct read and its guesses are in [the companion record](2026-11-18_COOLING_WAS_MEASURED_ON_NOVEMBER_4_AND_RETIRED_THE_LINES_LEVEL_IS_TRADED_BY_ITS_MIX_AN_OPEN_PLACE_IS_NEVER_A_SOURCE_AND_A_CHANGE_TO_A_LINE_RUNS_BESIDE_A_CONTROL.md) §4.]
 2. **Shuffle the stream.** Draw stretches keyed across a slice's pieces within a pass (the key stream exists), and price a step's
    transfer on a section drawn from other documents.
 3. **Hold one terrain for a declared number of laps.** Re-pin the held arithmetic and the forms to the draw that trains, or drop the
