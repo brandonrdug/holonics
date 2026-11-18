@@ -18,7 +18,40 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 02:00 UTC): what she reads in each regime, and what the level is
+## Where the work stands (November 18, 08:30 UTC): the line is compared where it writes
+
+Acting on [the audit of November 18](research/records/2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md),
+one change at a time beside a control from lap 70 on the text store (the last state before the terrain changed). Two records carry it:
+[the cooling laps](research/records/2026-11-18_A_COOLER_DEPOSIT_STOPS_THE_STATES_WALK_AND_LEAVES_THE_LEVEL_AND_THE_WRITES_WHERE_THEY_WERE_AND_THE_LEVEL_IS_WORTH_A_SIXTH_OF_A_NAT_WHERE_THE_WRITES_ARE.md) and [the writer's frontier](research/records/2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md).
+
+**Her writes.** The fifty books' panel written one place a read (48 known): the line's state 37% of its words in the books' lexicon;
+after one lap of the store with six of eight stretches compared at the frontier, 46 to 48%; a specimen fed fifty books alone at the
+frontier and at half-open runs, 82% (and it lost the other kinds of text). On the store's own held documents with 384 places known,
+34% and then 36 to 40%. No state writes a sentence that holds.
+
+**What is read, and what each reading is** (nats a place on the store's held passage, lap means):
+
+| reading | what it is | lap 70's control lap | after one frontier lap |
+|---|---|---|---|
+| the frontier (every place before it known, nothing after) | the passage's code in place order, and the state a writer meets | 2.0574 | 1.8971 |
+| whole masks | the code averaged over reading orders | 2.2089 | 2.2866 |
+| one place open | a place's news with every other place known; no code of the passage, and the reading the line was scored by | 0.7727 | 0.8735 |
+
+The frontier's code falls with every octave of known places out to hundreds (2.48 with 8 to 15 known, 1.89 with 256 to 511, on the
+control). The readings trade room: a share at the frontier lowers its code and raises the other two.
+
+**Settled by a control.** A cooler deposit stops the state's walk and does not move the level at the mean or the writes (rate 14 is
+where its travel rests; upkeep, not a lever). The level stays: with its return zeroed the line's means read 0.15 to 0.29 nats higher.
+The step's carried remainder changes nothing at rate 12.
+
+**What binds, by its measurement.** A frontier comparison costs a whole region's read, about 1.3 ms of card; a lap compares about
+700,000 places there over five kinds of text where the fifty books met 900,000 a pass. The next build is the read that compares every
+place of a region at its own frontier in one pass; its design and its premise's host read come first.
+
+**What runs** (guesses G-1118-4 and G-1118-5, `research/records/receipts/2026-11-18_frontier/`): one lap from lap 70 with every
+stretch at the frontier, then the frontier arm continued four laps, each read and written on both panels.
+
+## Where the work stood on November 18 at 02:00 UTC: what she reads in each regime, and what the level is
 
 Two records carry this with their receipts and scored guesses: [the record of the dwell](research/records/2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md) (the sums, the
 text at the boundary, the traces on the passage's clock) and [the level's design record](research/records/2026-11-17_A_LEVEL_IS_A_CODEC_THAT_CARRIES_ITS_DECODER_AND_CLOSES_A_SCALE_SQUARE_BOTH_READ_AT_THE_RECEIVERS_FACE_THE_BUILT_LEVEL_WAS_FOUNDED_ON_A_SADDLE_HAS_NO_RECEIPT_AT_ITS_GRAIN_AND_FOLDS_A_WINDING_EPOCH.md)
