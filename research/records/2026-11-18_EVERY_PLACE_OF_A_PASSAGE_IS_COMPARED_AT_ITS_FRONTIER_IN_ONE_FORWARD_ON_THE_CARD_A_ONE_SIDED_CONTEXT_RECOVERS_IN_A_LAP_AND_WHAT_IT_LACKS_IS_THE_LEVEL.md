@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §12 added the same day, to 17:33 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -164,3 +164,137 @@ also made from a lap's mean, and the rate is cooled where a lap's fall comes und
   added after them.
 - From the audit, still owed: the comparison's weights by declaration, the residue in the tree, and the guides brought to the line as
   trained (THE_ENGINE §5 and §6 describe lap 17).
+
+## 9. The strand's odd contacts face the past
+
+Read on the two-stream line's second lap mean (arm S10) by the host ruler's 800 rows: the known stream reads 2.002; with every carry
+circle at rest 2.482; with every plain strand contact unmet 3.005. So in a one-sided stream the circles scanned from the left carry
+0.48 nats to the frontier and the even plain contacts 1.00 (on arm S9's mean 0.46 and 0.99), and half of each stood idle: an odd
+plain contact's mate is the site after, which has not arrived, and a circle of odd contact is scanned from the right.
+
+The word `past` (`Region::past`, atlas `tower.region-past`; the pass's `frontier E strand past`): in a region read one-sided an odd
+plain contact's mate is the known site two before the place, so a site's two mates are the two nearest places that have arrived, as
+the sites before and after are under the law; a circle of odd contact is scanned from the left with its own gate and drive. The open
+place at a place takes the same two mates among the known sites, and on the return a known site's drive takes the covector of
+every site and open place whose mate it is. On the host the strand's covector test runs with and without the word, and a place's
+face is the same bits in the passage cut after it (`a_strands_place_reads_nothing_at_or_after_it`). On the card it is the batch's
+word at two (`FieldWords::before`): card against host, bit for bit, on its first run (the strands' test with a section of strands
+facing the past, 24 cases; the known stream at `9`).
+
+The odd contacts' material was deposited under the law for the site after, so it opens mismatched in the new relation: the ruler
+reads the known stream facing the past at 2.735 on arm S10's mean, 0.733 above the known stream, before any training in it
+(G-1118-15 guessed 0.25 to 1.20). A section with the word takes 259 ms, the two-stream line's 258 (guessed 270 to 340). Two laps
+with the word run from arm S10's end beside the line's own third and fourth laps from the same state; whether the line carries the
+word is that read, by the rule fixed with the guess.
+
+## 10. Two yardsticks: a count of the places before, and the level's paths to the frontier
+
+**A count of the places before** (`tools/frontier_count_ruler.py`): a Witten-Bell count of the `k` places before a place, fitted on
+the first octets of a slice's training documents and read on about 100,000 of its held places, each with 64 or more places before
+it. It is the frontier's own question asked of a count table, as the count of neighbours a side asks the one-place receiver's (the
+review of November 17, §3). Nats a place, the best `k` of each fit, beside the machine's frontier rows with 64 or more places known
+(72,439 places):
+
+| held slice | count, 8 MB | its `k` | count, 32 MB (`k` = 5) | the plain line (arm F7, under the law) | two streams (arm S10) |
+|---|---|---|---|---|---|
+| books | 1.779 | 5 | 1.677 | 1.779 | 1.839 |
+| web | 1.882 | 5 | 1.693 | 1.844 | 1.919 |
+| science | 1.848 | 5 | | 1.707 | 1.793 |
+| code | 1.874 | 4 | | 1.345 | 1.401 |
+| wikidata | 2.606 | 3 | | 1.651 | 1.755 |
+
+On prose the frontier stands level with a count of the five places before fitted on 8 MB, and 0.10 to 0.15 above the 32 MB count.
+On code, science and wikidata it stands well under the counts, where what a place repeats lies farther back than five places and a
+row reaches it. The books table through `k = 5` on 8 MB holds 2.9 million entries for the one register; the constitution holds
+392,505 for five. So per entry the machine is far denser than a table, and its level on prose is the level of five places of
+context: a word's worth. What a sentence needs lies past that, in units longer than a place, which in this machine is the level's
+work.
+
+**By which path the level reaches the frontier** (`Constitution::ruler_level`, `read-far` with the word `level`; 800 rows, forwards
+only):
+
+| Reading | Arm F7's mean (the plain line) | Arm S10's mean (two streams) |
+|---|---|---|
+| the law's hearing in one read, the level unheard | 2.165 | 2.344 |
+| the same with the level heard | 1.925 | 2.180 |
+| the level heard, no open place taking a prolonged row | 1.989 | 2.165 |
+| the level heard, every place reading the epoch before its own | 2.003 | 2.217 |
+| the level heard, the open places alone reading the epoch before | 1.962 | 2.204 |
+| the known stream | 2.795 | 2.002 |
+| the known stream with the law's level over its ticks | 2.795 | 2.240 |
+| the known stream with the level made one-sided through the law's own block | 2.840 | 2.260 |
+
+On the plain line the level is worth 0.240 at the frontier. Three quarters of it (0.176) arrives through the known places' states and
+a quarter through the open place's own prolonged row. With every place reading the epoch before its own, which is the delay a
+one-sided level has, two thirds of it (0.162) survive before any training in that relation. On the two-stream line's state the
+law's own block handed to a known stream costs 0.24 to 0.26: that stream never heard it, and the block was deposited to hand an
+epoch to its own places.
+
+## 11. The level as a passage read by two streams hears it
+
+From §10: the known places must hear the level, a place can only hear epochs that ended before its own began, and the law's block
+cannot be the one a one-sided stream reads through. The law, as built on the host (`Constitution::scale_forward_before`,
+`scale_return_before`, `strand_level_cut`):
+
+- the news of a place is the code of its symbol at the retarded opening's face, and an open place's is that face's expected code;
+- a place is a site where no earlier place within a section of news carries news at least its own (`level_anchors_before`): what
+  stands after a place has not arrived, so only the left half of the law's isolation is asked;
+- the restriction is the law's, over each epoch's known sites, through the law's own `A`; an open place is restricted by no one;
+- the level's field runs on its own clock with each epoch hearing only the epochs before it;
+- a known site of an epoch past the first takes the epoch before its own, at its own news phase, through a block of its own, `B⁻`
+  and `b_B⁻`, founded at zero after the glue (`Constitution::level_before`, `athena host complete-language open-level`); the open
+  place at a place stands in the epoch of the place before it, at the phase its expected news carries it to, and takes the same
+  epoch before.
+
+A known site's state stays a function of the symbols up to its own, and an open place's of the symbols before its place. The cut and
+the phases are data, as in the law: nothing returns to the news. The block is carried in the learner's state, so a state without it
+reads as before and a state with it hears the level in its strands.
+
+Host test (`the_level_a_strand_hears_is_the_epoch_before_and_its_covector_matches_the_codes_difference`): the founding keeps every
+face of a strand and of the law, tiles the material and restores from its text; with the block drawn the level moves some face; a
+place's face is the same bits in the passage cut after it; the law's own prolongation takes no covector from a strand; and 283
+probes of the covector match the code's central difference (63 of the fine field's entries, 220 of the level's field's, the
+restriction's and the block's), one on a seam, with 33 fine probes left out because they move the news, which the level's law holds
+as data.
+
+The card's form: a strand batch's level is cut on the host from the news the card reads (each place's code and its expected code),
+an epoch's known sites are one run and the sites that read an epoch are two (the known sites of the epoch after it, and the open
+places that stand in that epoch), the level's words carry the known stream's word, and a site that reads no epoch takes nothing
+(`field_level_chart32_spans`, `field_level_chart64_spans`, `LEVEL_NONE`). Its parity against the host and the first laps with it are
+this record's continuation.
+
+## 12. Where the frontier's nats stand: inside units
+
+A ruler (`tools/frontier_excess_ruler.py`): each held stretch is rebuilt as octets from the held read's one-place rows, and a
+place's news is its code under a count of at most five places before it within its stretch (fitted on 8 MB of the slice's training
+documents), a stand-in for a reader's own surprise. The frontier's rows are set beside the count's at the same 99,814 places, by the
+place's news under the count, with the count's code at every `k` beside them:
+
+| the place's news under the count | share of places | count, `k` = 2 | `k` = 3 | `k` = 4 | `k` = 5 | the plain line (arm F7) | two streams (arm S11) | facing the past (arm P11) |
+|---|---|---|---|---|---|---|---|---|
+| under 0.25 nats | 33.3% | 1.332 | 0.645 | 0.226 | 0.066 | 0.827 | 0.876 | 0.849 |
+| 0.25 to 1 | 17.6% | 1.699 | 1.202 | 0.815 | 0.569 | 1.354 | 1.369 | 1.355 |
+| 1 to 2 | 14.1% | 2.224 | 1.853 | 1.614 | 1.471 | 1.954 | 1.963 | 1.950 |
+| 2 to 4 | 19.0% | 2.953 | 2.793 | 2.790 | 2.871 | 2.627 | 2.646 | 2.641 |
+| over 4 | 15.9% | 4.660 | 5.537 | 6.602 | 7.288 | 3.228 | 3.306 | 3.313 |
+| all | | 2.362 | 2.102 | 2.030 | 2.038 | 1.804 | 1.841 | 1.827 |
+
+A third of all places stand inside a unit, where the five places before nearly give the symbol (0.066 nats). The machine pays 0.83
+to 0.88 there. In each of the three bins of little news it stands between the count of two places and the count of three, about
+two and three quarters: inside a unit it binds about three places in order. Its excess over the count of five in the first two
+bins is 0.39 nats of all places on the plain line and 0.41 on the two-stream line, of 1.80 and 1.84. At the places of much news,
+the starts of units and what a few places cannot give, it stands under every count, by 0.65 nats of all places in the last bin.
+The store line reads as the fifty books' state did on November 17 (atlas `deposition.excess-inside-units`): it opens units and
+does not close them, and the writes say the same (words begun and not finished, 45% to 51% of them in the lexicon).
+
+What the day's parts do there. The level cannot address the interior of a unit (its chart advances with the news, and a place of
+no news moves no phase: atlas `tower.news-phase-chart-blind-to-dark-order`), and its worth, 0.24, is small beside 0.4. The odd
+contacts facing the past (§9) bind the second place before directly: in their first lap (arm P11 beside arm S11, lap means) the
+frontier reads 0.0131 lower, 0.027 lower at the places of least news and nothing at the places of much, while under the law the
+same state's one-place reading rises 0.073 (the contacts' material serves two relations and the strands take it). So a contact at
+one more place before moves the right bin and moves it little. A second lap of both is running.
+
+What closes a unit is therefore the place level's own: binding four and five places in order as sharply as it binds three. The
+count that does it on one register holds 1.3 million entries at four places and 2.9 million at five; the constitution holds
+392,505 for five registers, 16.5 thousand of them a block of its width squared. Whether the binding is short of entries, of ticks
+(a place meets one more place a tick through its mate) or of a sharper lock is the next reading, before a part.

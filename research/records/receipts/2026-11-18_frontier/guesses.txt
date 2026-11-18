@@ -349,3 +349,14 @@ in the second. Arm S10's rows S read 1.8703 at its lap mean (0.0535 under arm S9
   What it decides. Arm P12 at least 0.015 under arm S12 at lap means: the line takes the word. Closer than that with the gap closing by
   0.03 or more from the first lap to the second: one more lap of both. Otherwise the word leaves the line and stays a region's word in
   the tree, with the reading.
+  Scored so far (17:33 UTC). G-1118-14: arm S10's rows S read 1.8703 at its lap mean, 0.0535 under arm S9 (0.030 to 0.070 guessed: held);
+  arm S11's 1.8419, 0.0283 under arm S10 (0.015 to 0.045: held), 0.0375 above the plain line's seventh lap under the law. The long
+  panel from a lap's mean: 45% (arm S10) and 51% (arm S11), each above the same lap's from its end (41%, 45%: held so far). The
+  falls halve a lap (0.103, 0.054, 0.028).
+  G-1118-15: (a) the ruler reads the known stream facing the past 0.733 above the known stream on arm S10's mean (0.25 to 1.20:
+  held). (b) arm P11's rows S read 1.8288 at its lap mean, 0.0131 under arm S11's (between 0.06 above and 0.04 under: held), under
+  it in every slice and at every count of known places. (c) a section took 259 ms in the development read and the lap 823 s (270
+  to 340 ms guessed: missed low; 810 to 1,020 s: held). (d) the long panel from the lap's mean reads 47% against arm S11's 51%
+  (within 8 points, under 50%: held). What the guess did not name: under the law the same state reads one place open at 0.9818
+  against arm S11's 0.9087 (0.073 above) and whole masks 0.036 above. The odd contacts' material serves the site after under the
+  law and the second site before in a strand, and the strands, six stretches of eight with every place compared, take it.
