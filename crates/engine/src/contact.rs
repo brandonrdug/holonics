@@ -1248,6 +1248,17 @@ impl Constitution {
         Ok((known, open))
     }
 
+    /// [measurement; the lead, November 18, the record of the two streams §17] **A strand's carry gates, for a ruler on the host**: each
+    /// known site's gate `γ` on every carry circle at every tick (`[ticks][n][2C]`, real parts then imaginary, on `2^(−30)`), as
+    /// [`Constitution::strand_pass`] formed them. Whether a circle's turn follows the site's symbol (a stride of its own a symbol,
+    /// `navigator.content-stride-moment`) or stands the same at every site (a fixed advance) is read from these outside the machine.
+    /// A reading: the state is the same with it.
+    pub fn strand_gates(&self, classes: &[usize], past: bool) -> Result<Vec<Vec<i64>>> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let (c2, n) = (2 * self.declaration.carry, classes.len());
+        Ok(pass.ticks.iter().map(|cell| cell.gam[..n * c2].to_vec()).collect())
+    }
+
     /// [definition; the lead, November 18, the frontier record §6] **The strand's two streams read by one tick**: the known stream's
     /// sites and its open places are one batch of sites, the open places after the known ones, each at the place of the known site of
     /// its index ([`Sided::Strand`], [`ClassLists::twins_from`]). A site's near field, its falloff, its skin on a plain pace, its

@@ -451,3 +451,16 @@ in the excess ruler's bins beside the count that binds the same K places, K from
   the growth after the second place's row is a binding of the carried places (the pair contact's product taken along the places
   carried, or the composite's remainder), ordered as an arm; G-1118-17's follow-on clause is read with this. At 0.80 or over: the
   rows of the third to fifth places are the growth, as that clause says.
+
+G-1118-20 (2026-11-18T20:09:53Z). Whether the carry circles' turn follows the site's symbol on the line's state (read-strand-states' gates_K, tools/
+carry_turn_ruler.py; the 800 frontier rows read whole by two streams with the word past, arm P15's lap mean; host).
+  What is on record. A moment whose advance is each letter's own stride holds products of every order of the letters, and with a fixed
+  advance a linear reading holds a sum of one-place terms (atlas navigator.content-stride-moment, November 10). The carry circle's gate
+  is γ̂(q)/(1 + d) with q a chart of the site's read, so the build lets the turn follow the site. On the store line's laps 77 to 86 no
+  carry circle held a digit's phase and a symbol reached a circle as a displacement, never as a turn (the closure's record, November 17).
+  The guess. (a) one_turn stands at 0.90 or over on the mean of the circles at every tick: the turn is nearly the same at every site.
+  (b) The symbols' mean turns spread under 30 thousandths of a turn. (c) by_pair less one_turn stands under 0.05.
+  What it decides. As guessed: the carried product stands at its fixed advance, its circles hold one-place terms, and the build the
+  ladder of G-1118-19 points to is a stride of its own a symbol on the circles, founded from the passage, as an arm beside the line.
+  one_turn under 0.70 with by_symbol over 0.85: the circles stride by symbol already, and what is read next is their extent (32
+  circles) against what five places settle.
