@@ -25,3 +25,59 @@ tested; the build reproduces lap 70's first 24 sections from lap 69's state line
   law (it cools where an entry's own push stands at the noise level), and whether a cooled state then compounds is read over further
   laps against A continued, since one lap cannot show it. If D's training code does not fall under A's, the fixed rate is not what
   holds the line and the first cause of both audits is wrong as stated.
+
+G-1118-2 (2026-11-18T04:53:45Z). Whether both regimes hold when both are kept up. Read before fixing: from lap 94's end state at rate 12, fifteen passes
+compared at the boundary alone (48 known places, the next open) took the held next place from 2.050 to 1.536 at pass 10 and 1.527 at
+pass 15 and the panel (one place a read) to 76% of its words in the lexicon, and left a place between known neighbours at 2.921 nats
+where lap 94's mean reads it at 0.920; ten passes of half-open rows alone from the same state left the held next place at 1.813 and
+the panel at 56%. Tonight's cooling arms: a cooler deposit does not move the level, so the regimes' fight is not the temperature's.
+  The trial. From the same state at the same rate, ten passes over one table that holds both kinds of row shuffled together: the
+  897,205 boundary rows and the 56,051 half-open rows (about as many compared places of each a pass), 400 rows a section. Read every
+  pass on held rows: the next place at the boundary; and on held rows of 48 known places and a run of 32, the run's first place open
+  alone (a place between known neighbours), its last place open alone, and its last place with the whole run open.
+  The guess, at pass 10, held: the next place at the boundary 1.55 to 1.66; the place between known neighbours no more than 0.10 nats
+  above what the same read gives before any pass; the panel written one place a read at 68% or more of its words in the lexicon.
+  What it decides. If both hold, the line's diet takes the boundary regime as a declared share beside its masks, and the build is the
+  store trainer's state law. If the place between known neighbours is lost anyway, the two regimes cannot share these rows by upkeep
+  alone, and they need loci of their own.
+
+Scored (2026-11-18T05:38:49Z), G-1118-1 (arms.txt).
+  (a) The sections' training code, paired with A, nats a compared place by third of the lap: D -0.0045, -0.0099, -0.0106 (0.005 to 0.030
+      under A over the last third, and under it over the first: held, though D stood above A for its first 270 sections); C -0.0064,
+      -0.0098, -0.0100, which is 0.94 of D's last third (a half to nine tenths guessed: at its edge, over); B +0.0000, +0.0001, +0.0000
+      (within 0.002: held).
+  (b) The end against the mean, one place open: A's end reads 0.0174 above A's mean (0.004 to 0.012 guessed: missed, the spread costs
+      more than I had it); D's end reads 0.0000 from D's mean (within 0.002: held). C's end reads 0.0033 above C's mean.
+  (c) The means, one place open, paired with A's: D -0.0013 (within 0.004: held), C -0.0031, B +0.0000. At whole masks: D +0.0057
+      (within 0.010: held), C -0.0004, B +0.0001.
+  (d) Travel: the cosines between A's successive 1,000-section moves are -0.195 and -0.171 (under -0.10: held); D's are +0.227 and
+      +0.130 (above zero: held); C's are +0.006 and -0.052. A 1,000-section move over the state's size: A 0.020, C 0.007, D 0.002 to 0.003.
+  (e) The panel's words in the lexicon: A at its end 76 of 158 (48%), A at its mean 83 of 180 (46%), D at its end 75 of 160 (47%)
+      (within five points: held).
+  The audit thread's guesses (receipts/2026-11-18_audit-levels/README.md), fixed for arms without the remainder and scored here on arms
+  with it: G-A1, the control one place open 0.7710 to 0.7750 and whole masks 2.206 to 2.218: held (0.7727, 2.2089). G-A2, rate 14 under
+  the control by 0.006 to 0.016 one place open and 0.003 to 0.015 at whole masks: missed (0.0031, 0.0004). G-A3, rate 16 under by 0.007
+  to 0.020 and no more than 0.006 under rate 14's: missed on the first (0.0013), and rate 16 stands above rate 14. G-A4, the move over
+  the lap at rate 14 at 0.20 to 0.35 of the control's: 0.41 over the whole state. Its own rule: "a fall under 0.004 at both cooler rates
+  says the standing spread is not what holds this line's level, and the form is."
+  What it says: the fixed rate is why the state walks and why its end stands 0.017 above its own mean. It is not why the level stands:
+  read at the mean, as the line has been read since November 11, a cooler deposit buys 0.003 at most with one place open and nothing
+  at whole masks, and the writes do not change. The truncated step buys nothing at rate 12.
+
+The level's worth, read without a guess (the audit's "decide the level": if the code does not move with the level's prolongation
+zeroed, the level is out). It moves: lap 70's mean reads 0.7734 with the level and 0.9264 without it with one place open, 2.2127 and
+2.4384 at whole masks; lap 94's 0.8811 and 1.0933, 2.2672 and 2.5557. The level stays.
+
+Amended (2026-11-18T05:43:55Z), G-1118-2, after its read at pass 0 and before any later read. The trial's reader does not make the read the guess's
+second part names. Read in its source (crates/athena/src/ruler/tension.rs, the read table of try-passes): for a held row of 48 known
+places and a run of 32, its three columns are the run half open at keyed places and coded over its open places (`last_alone`), the
+whole run open and coded over all of it (`last_run_open`), and the whole run open and coded at its first place alone
+(`first_alone`, the next place at the boundary with 32 open places after it). None of them is one place open between known
+neighbours. I had fixed the guess from the columns' names. At pass 0 they read 2.001, 3.086 and 2.004 nats a place.
+  The second part is read instead by the line's own held read (read-cavity on the store's held passage, its rows with one place open),
+  on the trial's opening state (lap 94's end), on the mixed diet's state at pass 5 and pass 10, and beside them on the night's states
+  after ten passes of boundary rows alone and ten of half-open rows alone. Its bound stands as fixed: at pass 10 of the mixed diet
+  one place open reads no more than 0.10 nats above the opening state's by the same read. Fixed beside it, for the night's
+  boundary-only state at pass 10 by this read: 2.3 to 3.0 nats a place (its fifteenth pass read 2.921 on a dump of the store's
+  sections); for the half-open-only state: within 0.15 of the opening state's.
+  The hh columns are reported as what they are and carry no guess.
