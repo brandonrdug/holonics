@@ -53,9 +53,22 @@ over the unit; that sum is the level's news, and nothing above a level can be cu
 was founded on a saddle (the restriction drawn, the prolongation at zero) and never entered by its tension read; it has no receipt at
 its own grain, the decision of November 3 against the cause the heading record of October 30 had named in the same words; and its chart
 folds an epoch longer than one section onto its rows. October's one attempt at a level's own comparison (a heading against the next
-span's trace among a menu of spans) cost the arrivals and was ruled a reading. Which of the three binds first is decided by two host
-readings on the night's saved state, a link trace along the level's own equation and a tension read at its locus, with guesses G-V1
-and G-V2 fixed before either. No part is ordered before they are read.
+span's trace among a menu of spans) cost the arrivals and was ruled a reading.
+
+**The two readings, read (November 18; the design record's §9).** Most of their guesses missed. Read link by link on the night's saved
+state, the level's moment holds a unit as a strand (which symbols it has at 721 thousandths, which stand where in its turn at 522); the
+built restriction keeps what a drawn one keeps (480 and 169 against 410 and 218), so after every lap since November 13 it has not left
+its founding draw; a restriction of the same width located from the symbols keeps the bag whole (699) and less than half the order
+(217), so the level's width, a copy of half the fine width, binds the order; the level's ticks lose a third more; and across units the
+level carries less of the unit before (75) than the fine read already holds (112). The chart's fold costs order in the 47% of epochs
+that wind past a section. At the level's locus nothing linear in the units' symbols relieves the fine comparison (every share at or
+under zero, a planted law of that form recovered whole): the fine field already has the additive use of far context, and the one
+comparison gives a level no slope. "The level holds almost nothing of its units" overstated the evening's trace, whose key (a unit as
+one identity) was a free row's: it holds a third of which symbols and a tenth of their order.
+
+**What follows, not built.** The level's own face first (its closure and its square, deposited in the level's own material), a founding
+from located operands, and a chart and a width sized from a unit's strand. The part's law, its cost on the card and its guess are
+written before it is ordered.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

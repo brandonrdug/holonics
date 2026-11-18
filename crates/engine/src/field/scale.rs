@@ -203,6 +203,17 @@ pub struct LevelTrace {
     pub news: Vec<i64>,
     pub anchors: Vec<usize>,
     pub coarse_read: Vec<i32>,
+    /// The links of the level's own equation, where [`Constitution::level_links`] read them (empty from [`Constitution::level_trace`]):
+    /// each place's harmonics of its news phase (`[t][H]` on `2^(−30)`), each place's read at the split (`[t][D₀]` on `2^(−16)`), each
+    /// epoch's moment (`[j][H D₀]`, the chart's sums on the read's grain), each epoch's restricted state before the level's ticks
+    /// (`[j][D₁]` on `2^(−16)`), each place's prolonged row (`[t][D₀]` on `2^(−16)`), and the covector the reverse holds at the level's
+    /// locus, of the state the prolongation wrote (`[t][D₀]` on the covector's grain `2^(−24)`).
+    pub phase: Vec<i64>,
+    pub read: Vec<i32>,
+    pub moment: Vec<i64>,
+    pub restricted: Vec<i64>,
+    pub prolonged: Vec<i64>,
+    pub covector: Vec<i64>,
 }
 
 /// What a level's forward keeps for its reverse.
@@ -220,6 +231,10 @@ pub(crate) struct ScalePass {
     coarse_scale: Vec<i128>,
     definite: Vec<bool>,
     paces: Paces,
+    /// Where the forward keeps for a reading: each epoch's restricted state before the level's ticks `[j][D₁]`, and each place's
+    /// prolonged row `[t][D₀]`.
+    before_ticks: Vec<i64>,
+    prolonged: Vec<i64>,
 }
 
 impl ScalePass {
@@ -372,7 +387,23 @@ impl Constitution {
         }
         let news = self.level_news(region)?;
         let pass = self.pass(region, true)?;
-        Ok(pass.tower.map(|t| LevelTrace { news, anchors: t.cut.anchors, coarse_read: t.coarse_read }))
+        Ok(pass.tower.map(|t| LevelTrace { news, anchors: t.cut.anchors, coarse_read: t.coarse_read, phase: Vec::new(), read: Vec::new(), moment: Vec::new(), restricted: Vec::new(), prolonged: Vec::new(), covector: Vec::new() }))
+    }
+
+    /// [measurement; the lead, November 17, the level's design record §6] **A region's level link by link**, for a ruler on the host:
+    /// [`Constitution::level_trace`] with every link of the level's equation as the forward left it (the places' phases and reads at
+    /// the split, the epochs' moments, their restricted states before the level's ticks, the prolonged rows) and the covector the
+    /// region's reverse holds at the level's locus. `None` on a field without a level. A reading: the state is the same with it.
+    pub fn level_links(&self, region: &Region) -> Result<Option<LevelTrace>> {
+        if self.scale.is_none() {
+            return Ok(None);
+        }
+        let news = self.level_news(region)?;
+        let pass = self.pass(region, true)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut covector = Vec::new();
+        self.returned_with(region, &pass, &mut g, None, None, None, None, None, None, Some(&mut covector))?;
+        Ok(pass.tower.map(|t| LevelTrace { news, anchors: t.cut.anchors, coarse_read: t.coarse_read, phase: t.cut.harmonics, read: t.read, moment: t.restricted, restricted: t.before_ticks, prolonged: t.prolonged, covector }))
     }
 
     /// The level's forward at the split: the region's cut from its `news`, `x` restricted to the epochs by the news phase, the level's
@@ -400,6 +431,9 @@ impl Constitution {
         out.definite = (0..epochs).map(|j| span(j).all(|t| definite[t])).collect();
         let keyed1: Vec<bool> = (0..epochs).map(|j| span(j).any(|t| keyed[t])).collect();
         out.paces = level_paces(&s.coarse.declaration, &cut)?;
+        if keep {
+            out.before_ticks = x1.clone();
+        }
         let moment = vec![0i64; epochs * 2 * s.coarse.declaration.complex()];
         let reaches = s.coarse.reaches();
         for _ in 0..s.coarse.declaration.ticks {
@@ -416,12 +450,18 @@ impl Constitution {
         let reach_b = reach(&g[b..bb]);
         let mut v = vec![0i64; h * d0];
         let mut row = vec![0i64; d0];
+        if keep {
+            out.prolonged = vec![0i64; sites * d0];
+        }
         for j in 0..epochs {
             affine(&g[b..bb], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], Some(&g[bb..bb + h * d0]), MATERIAL_BITS, MATERIAL_BITS, &mut v)?;
             for t in span(j) {
                 uncharted(&cut.harmonics[t * h..(t + 1) * h], &v, d0, &mut row)?;
                 for (xv, &r) in x[t * d0..(t + 1) * d0].iter_mut().zip(&row) {
                     *xv = fit64(*xv as i128 + r as i128)?;
+                }
+                if keep {
+                    out.prolonged[t * d0..(t + 1) * d0].copy_from_slice(&row);
                 }
             }
         }

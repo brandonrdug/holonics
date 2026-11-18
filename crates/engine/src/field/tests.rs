@@ -2054,6 +2054,46 @@ fn tower_covector(field: &Constitution, region: &Region) -> Vec<i128> {
     field.both_reads_mean(g)
 }
 
+/// [measurement; the lead, November 17, the level's design record §6] **The level's links are its forward's own, and the covector
+/// read at its locus is the one its return consumes**: [`Constitution::level_links`] gives [`Constitution::level_trace`]'s reading
+/// with every link in its shape; at the founding the prolonged rows are zero; and on a live tower the prolongation's bias takes the
+/// chart of that covector, epoch by epoch (`δb_B = Σ_j release(Σ_(t∈e_j) h_k(φ_t) δx_t, 30)`), as the reverse deposits it.
+#[test]
+fn the_levels_links_are_its_forwards_own_and_its_locus_covector_is_the_one_its_return_consumes() {
+    let region = region();
+    let sites = region.classes.len();
+    let founded = towered(1);
+    let at_founding = founded.level_links(&region).unwrap().unwrap();
+    assert!(at_founding.prolonged.iter().all(|&v| v == 0));
+    let field = towered_live(1);
+    let before = field.to_text();
+    let links = field.level_links(&region).unwrap().unwrap();
+    let trace = field.level_trace(&region).unwrap().unwrap();
+    assert_eq!((&links.news, &links.anchors, &links.coarse_read), (&trace.news, &trace.anchors, &trace.coarse_read));
+    assert_eq!(field.to_text(), before);
+    let scale = field.scale.as_deref().unwrap();
+    let (d0, d1, h, epochs) = (field.declaration.width, scale.coarse.declaration.width, scale.harmonics, links.anchors.len());
+    assert_eq!((links.phase.len(), links.read.len(), links.prolonged.len(), links.covector.len()), (sites * h, sites * d0, sites * d0, sites * d0));
+    assert_eq!((links.moment.len(), links.restricted.len(), links.coarse_read.len()), (epochs * h * d0, epochs * d1, epochs * d1));
+    assert!(links.prolonged.iter().any(|&v| v != 0) && links.covector.iter().any(|&v| v != 0));
+    let pass = field.pass(&region, true).unwrap();
+    let mut g = vec![0i128; field.material_len()];
+    field.returned(&region, &pass, &mut g).unwrap();
+    let (_, _, _, bb, _) = scale.glue_offsets(d0);
+    let base = field.theta.len() + scale.coarse.theta.len() + bb;
+    for k in 0..h {
+        for c in 0..d0 {
+            let mut want = 0i128;
+            for j in 0..epochs {
+                let end = links.anchors.get(j + 1).copied().unwrap_or(sites);
+                let sum: i128 = (links.anchors[j]..end).map(|t| i128::from(links.phase[t * h + k]) * i128::from(links.covector[t * d0 + c])).sum();
+                want += release(sum, 30);
+            }
+            assert_eq!(g[base + k * d0 + c], want, "harmonic {k}, entry {c}");
+        }
+    }
+}
+
 /// [definition; the tower record, D1] **Growth in scale keeps every face**: a tower founded on a field (its prolongation
 /// at zero) reads every face the field read, its families tile its material, and its text restores it exactly.
 #[test]

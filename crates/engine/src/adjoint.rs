@@ -87,14 +87,14 @@ impl Constitution {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     pub(crate) fn returned(&self, region: &Region, pass: &Forward, g: &mut [i128]) -> Result<()> {
-        self.returned_with(region, pass, g, None, None, None, None, None, None)?;
+        self.returned_with(region, pass, g, None, None, None, None, None, None, None)?;
         // [definition; agent-inferred, November 14, G180] Where the field reads twice both reads are compared: the first read's own return is
         // added beside the second's, and the consumer halves the section's sum once ([`Constitution::read_and_return`]), so the comparison is the two
         // reads' mean and at the founding (the reads equal) it is the one read's, bit for bit. Why: G180 read the first read, which no
         // comparison reached, drifting off its agreement with the passage (0.012 nats a place at one-place masks, 0.060 at whole masks) while
         // the field leaned on its marks; the field's own placement is kept its honest placement by the passage's comparison.
         if let Some(first) = pass.first.as_deref() {
-            self.returned_with(region, first, g, None, None, None, None, None, None)?;
+            self.returned_with(region, first, g, None, None, None, None, None, None, None)?;
         }
         Ok(())
     }
@@ -618,7 +618,7 @@ impl Constitution {
 
     /// [`Constitution::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
     /// (`[h][near, far]`, [`Constitution::covector_shares`]) where given.
-    pub(crate) fn returned_with(&self, region: &Region, pass: &Forward, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, mut lambdas: Option<&mut Vec<Vec<i64>>>, opening: Option<&mut Vec<i64>>) -> Result<()> {
+    pub(crate) fn returned_with(&self, region: &Region, pass: &Forward, g: &mut [i128], mut shares: Option<&mut [u128]>, mut currents: Option<&mut Vec<Vec<i64>>>, mut junction: Option<&mut Vec<(usize, Vec<i64>)>>, mut reach: Option<&mut Vec<[ReachSums; 2]>>, mut lambdas: Option<&mut Vec<Vec<i64>>>, opening: Option<&mut Vec<i64>>, mut at_scale: Option<&mut Vec<i64>>) -> Result<()> {
         let d = &self.declaration;
         let (dw, m, lanes) = (d.width, d.complex(), d.lanes);
         let m2 = 2 * m;
@@ -783,6 +783,10 @@ impl Constitution {
             owed = next_owed;
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
+                // [measurement; the lead, November 17] The covector at the level's locus, of the state the prolongation wrote, where read.
+                if let Some(out) = at_scale.as_deref_mut() {
+                    *out = dx.clone();
+                }
                 self.scale_return(s, sp, &mut dx, g)?;
             }
             // [§16.44] A tick's own clock was read off the state this tick began from: its moments and rates return now,

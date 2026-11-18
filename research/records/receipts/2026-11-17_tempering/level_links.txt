@@ -1,0 +1,59 @@
+The level read link by link, and the tension at its locus (G-V1, G-V2; the level's design record, its sections 6 and 9).
+State: the night's pass-15 state on the fifty books. Rows: 5,164 held regions of 48 known places and the next place open.
+The dump: athena host complete-language read-level ... links, 82 s at 16 host threads (LEVEL_DONE regions=5164 links=true threads=16 ms=82227).
+The ruler: tools/level_links_ruler.py, one process of this host's numpy. Shares and counts only; no text of the books is here.
+
+== The first read (the one the guesses were scored on; rows read raw, a plant outside the table's span), 482 s ==
+LINKS regions=5164 places=253036 epochs=32584 D0=128 D1=64 H=6
+LINKS a whole epoch: 8.56 places, 9.48 nats (median 8.88); whole epochs 27420
+LINKS the located restriction: rank 64 of the keys' fit on the moment, the singular values' share kept 97%
+LINKS reading A, present at each link, thousandths, read on half the regions (rows a key, columns a link):
+LINKS   links: 0: the fine read at the leading place | 1: the moment m(j), 768 numbers | 2: the restricted state A m + b | 3: a located restriction of the same width | 4: the level's read after its ticks | 5: the prolonged rows (leading place, epoch's mean)
+LINKS   key its leading symbol                   link0=  628 link1=  422 link2=  111 link3=  421 link4=   68 link5=   76   (epochs 27420)
+LINKS   key its symbols as a bag                 link0=  153 link1=  840 link2=  584 link3=  816 link4=  360 link5=  387   (epochs 27420)
+LINKS   key the epoch as one identity            link0=   55 link1=  127 link2=   46 link3=  141 link4=  171 link5=  244   (epochs 27420)
+LINKS   key the epoch before, as one identity    link0=   37 link1=  -26 link2= -123 link3=    3 link4=   24 link5=   22   (epochs 22256)
+LINKS   key the symbol that leads the next       link0=   13 link1=  102 link2=   26 link3=   29 link4=   43 link5=   48   (epochs 27420)
+LINKS the fold: σ = 5.50 nats; whole epochs whose interior stays within a section 14484 (53%), winding past it 12936; the bag in the moment 811 within, 822 past (read 7161, 6557)
+LINKS reading B: the covector's power at the split: at the open place 50.7% of it (5164 places), elsewhere 49.3% (247872 places)
+LINKS   by places before the open one (0 the open place): 0:50.7% 1:29.0% 2:11.7% 3:4.7% 4:2.0% 5:0.7% 6:0.3% 7:0.1% 8:0.1%
+LINKS   share of the covector's power removed on the held half (all places | the open places alone):
+LINKS   (0) the place's own read at the split                              -0.0008 |  0.0005
+LINKS   (1) the level's present state, prolongation refitted               -0.0099 | -0.0014
+LINKS   (2) the table: two epochs' symbols on the news phase (top 20)      -0.0111 | -0.0005
+LINKS   (3) operands of width 64 located from the two epochs' moments      -0.0090 | -0.0002
+LINKS   (3') the same moments at full rank                                 -0.0139 | -0.0003
+LINKS   the planted law (the epoch before's leading symbol through the place's phase, a tenth of the power): recovered 0.588 by the table, 0.184 by operands located for the covector
+LINKS   the planted law, operands of width 64 located for it from the moments: recovered 0.335
+LINKS done in 482 s on this host's numpy (one process)
+
+== The repaired read (each row on its own scale as a chart reads it, a drawn restriction beside the built one, a key that sees order,
+   the epoch before's bag, the planted law in the table's own span), 563 s ==
+LINKS regions=5164 places=253036 epochs=32584 D0=128 D1=64 H=6
+LINKS a whole epoch: 8.56 places, 9.48 nats (median 8.88); whole epochs 27420
+LINKS the located restriction: rank 64 of the keys' fit on the moment, the singular values' share kept 95%
+LINKS reading A, present at each link, thousandths, read on half the regions (rows a key, columns a link):
+LINKS   links: 0: the fine read at the leading place | 1: the moment m(j), 768 numbers | 2: the restricted state A m + b | 3: a drawn restriction of the same width (mean of three) | 4: a restriction of the same width located from the keys | 5: the level's read after its ticks | 6: the prolonged rows (leading place, epoch's mean)
+LINKS   key its leading symbol                   link0=  628 link1=  424 link2=  152 link3=  119 link4=  420 link5=   68 link6=   76   (epochs 27420)
+LINKS   key its symbols as a bag                 link0=  153 link1=  721 link2=  480 link3=  410 link4=  699 link5=  360 link6=  387   (epochs 27420)
+LINKS   key its symbols by sixth of a turn       link0=  112 link1=  522 link2=  169 link3=  218 link4=  217 link5=  104 link6=  190   (epochs 27420)
+LINKS   key the epoch before's symbols as a bag  link0=  112 link1=   78 link2=   40 link3=   27 link4=   28 link5=   75 link6=   80   (epochs 22256)
+LINKS   key the epoch as one identity            link0=   55 link1=  310 link2=  255 link3=  221 link4=  299 link5=  171 link6=  244   (epochs 27420)
+LINKS   key the epoch before, as one identity    link0=   37 link1=  -20 link2=    2 link3=    1 link4=    4 link5=   24 link6=   22   (epochs 22256)
+LINKS   key the symbol that leads the next       link0=   13 link1=  152 link2=   49 link3=   25 link4=   35 link5=   43 link6=   48   (epochs 27420)
+LINKS the fold: σ = 5.50 nats; whole epochs whose interior stays within a section 14484 (53%), winding past it 12936
+LINKS   the fold, in the moment, key its symbols as a bag             within a section   729   winding past it   734   (read 7161, 6557)
+LINKS   the fold, in the moment, key its symbols by sixth of a turn   within a section   562   winding past it   510   (read 7161, 6557)
+LINKS   the fold, in the moment, key its leading symbol               within a section   507   winding past it   329   (read 7161, 6557)
+LINKS   the fold, in the moment, key its last symbol                  within a section   518   winding past it   223   (read 7161, 6557)
+LINKS reading B: the covector's power at the split: at the open place 50.7% of it (5164 places), elsewhere 49.3% (247872 places)
+LINKS   by places before the open one (0 the open place): 0:50.7% 1:29.0% 2:11.7% 3:4.7% 4:2.0% 5:0.7% 6:0.3% 7:0.1% 8:0.1%
+LINKS   share of the covector's power removed on the held half (all places | the open places alone):
+LINKS   (0) the place's own read at the split                              -0.0008 |  0.0005
+LINKS   (1) the level's present state, prolongation refitted               -0.0099 | -0.0014
+LINKS   (2) the table: two epochs' symbols on the news phase (top 20)      -0.0111 | -0.0005
+LINKS   (3) operands of width 64 located from the two epochs' moments      -0.0111 |  0.0004
+LINKS   (3') the same moments at full rank                                 -0.0181 |  0.0001
+LINKS   the planted law (the epoch before's symbols on the news phase through a drawn map, a tenth of the power): recovered 1.000 by the table from the planted covector; with it the table removes 0.0787 of the planted covector's power; operands located for the plain covector hold 0.210 of the plant
+LINKS   the planted law, operands of width 64 located for it from the moments: recovered 0.539
+LINKS done in 563 s on this host's numpy (one process)
