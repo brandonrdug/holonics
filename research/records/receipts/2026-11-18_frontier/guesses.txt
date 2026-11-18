@@ -404,3 +404,9 @@ under their control after one lap and 0.031 after two, and cost the one-place re
   What it decides. Arm R16 at least 0.015 under arm P16 at lap means: the line takes the word, and a row for each of the third to
   fifth places before is the growth that follows, sized by the presence reading taken again on its state. Otherwise the word
   leaves the line and stays a region's word in the tree, with the reading.
+
+  G-1118-16 scored so far (19:24 UTC). The pass over the store's prefix ended 1,174 sections into both arms, so the first lap of each
+  is that long. (a) arm L13's rows S read 1.7803 at the mean of its states, 0.0103 under arm P13's (between 0.010 above and 0.030
+  under: held), under it in every slice and more with more places known (0.012 with 64 to 127). (b) under the law one place open
+  reads 0.0005 under the control's and whole masks 0.0015 above (within 0.02: held). (c) a section took 311 ms in the development
+  read and 307 over the lap (270 to 340: held). The rule is fixed on the second lap, which follows the next pass's opening.
