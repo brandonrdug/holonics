@@ -1,4 +1,7 @@
-//! The card realization's contact (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **The chart, the contact and the tick, on the card.** The launches of the host's chart, classes and support, contact and strand
+//! (`crates/engine/src/contact.rs` and `carry.rs`, whose first lines state the equations, the kind and the Lean and atlas owners), with
+//! the affine every phase's rows go through (`Resident::affine`). THE_ENGINE §3 lists each kernel beside the phase it serves, and the
+//! host is the reference these bits are read against (`athena parity`).
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;

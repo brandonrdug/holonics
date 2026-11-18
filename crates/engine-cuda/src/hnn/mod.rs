@@ -1,4 +1,6 @@
-//! The card and the field's resident realization, moved from `holonics_cuda::hnn` by C3 of #603.
+//! **The card and the field's resident realization**: the card (`card`); the realization's state and schedule (`resident`) and its
+//! phases by object (`clock`, `moment`, `contact`, `carry`, `level`, `adjoint`); the card's readings of itself (`profile`); and the
+//! module that re-exports them with the card suite's tests (`field`).
 
 #![deny(clippy::float_arithmetic)]
 

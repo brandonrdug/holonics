@@ -1,9 +1,18 @@
-//! **The boundary chart** (`Codec`): a passage's units read as the classes a region's sites carry, and back. Moved from the store line's
-//! harness (`complete_language/field_train.rs`) by C4 of the consolidation (#603), each item's text as it stood but for its visibility.
+//! **The boundary chart: a passage's units read as the classes a region's sites carry, and back.**
 //!
-//! [definition; Brandon, November 12] The table of classes stands until the symbol's word replaces it: a symbol is its key on a few coprime
-//! rings, located by the machine, never a class index with free rows (CLAUDE.md, Method, "A symbol is a word"). Its replacement is a law
-//! build of the engine's line (THE_CONSOLIDATION §11), not a move.
+//! `class(u_i) = i` for `i < ∅` and `i + 1` past it, over the used units in class order (`∅` the void's class); `alphabet = |used| + 1`;
+//! `decode(encode x) = x` on a text whose units the codec holds, and `decode` ends at the first void; extended at a crossing, every class
+//! keeps its index, the void its own, and the fresh units take the classes after the last (`field-codec-v3`)
+//!
+//! Kind: gate, a unit (one table read each way), after the units' parse. Kernels: none; the boundary is read on the host.
+//! Lean: none yet.
+//! Atlas: none of its own; `hnn.founded-units` owns the units it reads.
+//! Records: `2026-11-12_A_LAPS_CARD_TIME_STANDS…` (§4, item 4: the void at a kept index), `2026-11-18_THE_CODEC_THE_REGION…` (the first
+//! lines this header replaced). The derivations' history is in the records; the items below keep their reasons.
+//!
+//! The table of classes stands until the symbol's word replaces it: a symbol is its key on a few coprime rings, located by the machine,
+//! never a class index with free rows (CLAUDE.md, Method, "A symbol is a word"). Its replacement is a law build of the engine's line
+//! (THE_CONSOLIDATION §11), not a move.
 
 use crate::units::Units;
 use std::collections::HashMap;

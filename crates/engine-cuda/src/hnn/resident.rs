@@ -1,4 +1,8 @@
-//! The card realization's resident (C5 of #603: cut from `hnn/field.rs` by object, each item's text as it stood but for its visibility).
+//! **The resident realization: a batch's state on the card and the schedule of its phases.** `Resident` implements the host's
+//! `Realization` (`crates/engine/src/realization.rs`): the constitution uploaded whole, a section's regions packed into batches that fit
+//! the card's measured memory, the forward's ticks and the reverse run over them, and the faces, logits and covectors fetched back. Its
+//! own launches are the batch's base, the opening, the faces and the readings' gathers. THE_ENGINE §3 lists each kernel beside the
+//! phase it serves, and the host is the reference these bits are read against (`athena parity`).
 
 #[allow(unused_imports)]
 use crate::hnn::field::*;
