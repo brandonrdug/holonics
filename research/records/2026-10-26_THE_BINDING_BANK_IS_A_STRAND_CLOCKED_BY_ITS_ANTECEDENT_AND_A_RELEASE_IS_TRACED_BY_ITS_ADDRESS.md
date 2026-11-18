@@ -6,7 +6,7 @@ accepted on a lookup benchmark (MQAR). An audit made at Brandon's request found 
 `0934a25ff` retired it ([the
 retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
 The measurements below stand only as measurements of that machinery, never as progress of the
-learner, and nothing here is a design to resume.
+learner, and any piece of it may be taken up again as an attempt (CLAUDE.md, a past configuration is an instruction; November 18).
 
 **Date:** 2026-10-26. Refs #404 #405 #406 #386 #410. Written for the design thread's build of
 Athena alpha, as two specifications it can implement in `hnn::tower`, each with its acceptance fixed

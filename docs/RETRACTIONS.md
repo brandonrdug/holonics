@@ -100,8 +100,11 @@ the corrected native-material development and attribution
 The old retraction must not be read as withdrawing that different, explicitly grounded passage.
 
 [historical; source-inspected] Each entry below was returned, graded, and then narrowed or
-withdrawn by the repository's own audit. Re-proposing a retracted mechanism without citing its
-retraction is a contamination. Dates are record dates under `research/records/`.
+withdrawn by the repository's own audit. A retracted mechanism may be proposed again; the proposal
+cites its retraction, so the old reading and its conditions are read beside the new one, and the
+retraction never bars it ([CLAUDE.md, a past configuration is an instruction](../CLAUDE.md#past-configurations);
+the earlier sentence called re-proposing without a citation "a contamination" and was read as a
+ban, November 18). Dates are record dates under `research/records/`.
 
 - 2026-07-29: the first readable generation returned six outputs and 135 tokens, every completion
   a contiguous inherited span (`docs/canon/THE_RECOVERED_LAW.md` §6).

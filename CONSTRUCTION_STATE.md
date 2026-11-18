@@ -364,7 +364,9 @@ today are the engine's ([THE_ENGINE](docs/THE_ENGINE.md)).
 
 ## What the October lines left
 
-Each is a measured result the next design keeps, with its record.
+Each is a measured result the next design keeps, with its record. Each is a reading under its
+conditions, and none bars taking a configuration or a piece of it up again
+([CLAUDE.md, a past configuration is an instruction](CLAUDE.md#past-configurations)).
 - **Stores and copiers are retired.** The binding bank, the reset clock, the passage tree with its
   node lock, the letters copy and the keyed-modes trainer were deleted on October 26, and the plain
   tower coded the same bits without them
@@ -382,6 +384,8 @@ Each is a measured result the next design keeps, with its record.
   (audited October 3).
 
 ## What the November lines left
+
+As above, each is a reading under its conditions, never a bar on a port.
 
 - **The code-passage line (November 5 to 13) is history.** Its carry circles, strand triads, level on
   its news, opening comparison, mark and added lanes entered the engine, and its measurement tables,

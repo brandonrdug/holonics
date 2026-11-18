@@ -6,7 +6,7 @@ accepted on a lookup benchmark (MQAR). An audit made at Brandon's request found 
 `0934a25ff` retired it ([the
 retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
 The measurements below stand only as measurements of that machinery, never as progress of the
-learner, and nothing here is a design to resume.
+learner, and any piece of it may be taken up again as an attempt (CLAUDE.md, a past configuration is an instruction; November 18).
 
 October 26. Refs #404, #405, #386. The bank's address trace, spec 2's trace (b)
 ([spec record §4.2](2026-10-26_THE_BINDING_BANK_IS_A_STRAND_CLOCKED_BY_ITS_ANTECEDENT_AND_A_RELEASE_IS_TRACED_BY_ITS_ADDRESS.md#42-the-trace-law-agent-inferred)),

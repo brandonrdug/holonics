@@ -31,8 +31,41 @@ failure it prevents, with its date or measurement, or the law it follows from) a
   from Brandon's messages and write it beside the rule, or retire the rule. It is never obeyed
   blind and never dropped silently.
 - A reason an agent reconstructed is marked `agent-inferred` until a record or a message carries it.
-- Brandon's corrections have ontological reasons even when they arrive as one line. The reason is
-  recorded with the rule, in the agent's words, the same day.
+- Brandon's corrections have ontological reasons even when they arrive as one line. A correction
+  changes the work it corrects first (the part, the run, the reading, the plan), and that change is
+  its receipt. It becomes a standing rule here only when it states a law or a practice that recurs
+  beyond the work it corrected; otherwise its reason is written, in the agent's words and the same
+  day, in the dated record of the work. Reason ([the audit of November 18](research/records/2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md) §1.10): from October 5 to
+  November 17 this guide grew from 35 KB to 107 KB as each correction became a rule, while the
+  corrected practice itself (the kernel campaign, reports in nats alone, the arithmetic world) took
+  20 to 30 hours to stop; a rule written in place of a change leaves the work as it was.
+
+<a id="past-configurations"></a>
+[project-postulate] **A past configuration is an instruction, never a verdict** (Brandon,
+November 17, and November 18 02:38Z). Every configuration the repository has built (a commit, a
+part, a law, a schedule, a declaration, a whole machine) is a set of instructions that ran under its
+conditions and returned its readings. A withdrawal, a retirement, a "set aside", a banner or a
+lessons entry records that reading and its conditions. It never bars taking the configuration up
+again, whole or in part, alone or meshed with what stands: partial pieces mesh.
+- No guide, plan, record, brief or memory note says that a configuration is never to be resumed,
+  ported, re-proposed or re-adopted. Where an older text says so, it reads as the dated reading it
+  records.
+- A design that resembles a recorded failure names that failure, states what differs (the mechanism
+  under the law's own test, the conditions, the length of the trial) and proceeds. Resemblance is
+  never a refusal. The governing laws (precision, retention, no catered machinery, stores and
+  caches) bar mechanisms by their reasons, and they are applied to a configuration's mechanism by
+  the test their reason gives, never by its name or its history.
+- A piece that worked inside a retired configuration is evidence for that piece, read with its
+  sample counts, and it is recovered from git and the records as freely as any owner in the tree.
+- Reason: the rebuild's "do not port" list, the banner "nothing here is a design to resume" on 21
+  records of October 23 to 26, the retractions index's "re-proposing a retracted mechanism … is a
+  contamination" and the lessons' "a choice that repeats one is refused before it is built" turned
+  dated readings into a blacklist. Pieces that held readings were set aside by name (the
+  pool-founded clock and the coupled bank of October 26, the lap law's sufficient statistics of
+  October 24 and 25), and the November engine rebuilt in
+  fragments what they had measured while consuming none of those records (the step back of
+  November 17; [the audit of November 18](research/records/2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md) §2). Scope: every guide, plan, record, brief, memory note and
+  message, and every design.
 
 Read [THE_MACHINE](docs/THE_MACHINE.md), the [elementary objects](docs/ELEMENTARY_OBJECTS.md),
 [CONSTRUCTION_STATE](CONSTRUCTION_STATE.md) and [THE_REBUILD](docs/plans/THE_REBUILD.md) once per
@@ -48,8 +81,12 @@ campaign experiments, census documents and superseded guides.
 - Worktree and branch leftovers are on `archive/leftovers-2026-09-24`.
 - Brandon's Metal port is on `codex/apple-silicon`.
 
-Port from history deliberately, one law or kernel at a time, when a rebuild step needs it. Never
-restore wholesale. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
+Port from history when a step needs it: a law, a kernel, a part or a whole configuration, read
+against the objects and tested by the law it implements. A whole configuration may be restored as
+an attempt beside the one that stands when its readings are the best evidence for what is missing
+([a past configuration is an instruction](#past-configurations)). The reset's "never restore
+wholesale" kept the tree to what functions on September 24; it does not reach an attempt that
+restores a configuration to be read. [THE_REBUILD](docs/plans/THE_REBUILD.md) gives the order.
 
 | Path | Role |
 |---|---|
@@ -307,7 +344,10 @@ terrain may generate its truth with authored routines at declared widths, the ma
 its own, and a declared family may be a navigator of the machine's own kind whose keys are located;
 no receiver computes a
 task's answer by an authored routine. A result that is perfect because it was authored is a failed
-build. A precompute or normalization table is lawful as a navigator's resident face: series
+build. The list names routines that stood in for learning. A mechanism that shares one of those
+names but whose quantities the machine locates or deposits (a count face whose odds are learned, a
+reach that is a navigator's, a coupled store with its upkeep) is judged by this reason, never by the name (November 18; the audit found the names applied
+to such mechanisms). A precompute or normalization table is lawful as a navigator's resident face: series
 coefficients held while the argument flows through, normalizations as systolic reductions over
 carried exponentials, values generated by active navigation at a declared grain, never a frozen
 float table or an authored table of answers ([systolic flow](research/records/2026-09-29_SYSTOLIC_FLOW_THE_WORD_IS_A_SYSTOLIC_PULSE_AND_A_TABLE_IS_A_NAVIGATORS_RESIDENT_FACE.md)).
@@ -399,7 +439,12 @@ that keeps the disciplines apart either cannot pivot on a lens or imports its fu
 [project-postulate] **Read the lessons before designing** ([the failures that repeated](research/records/2026-09-29_LESSONS_THE_FAILURES_THAT_REPEATED_AFTER_THEY_WERE_RECORDED.md);
 [the prototypes' lessons](research/records/2026-09-24_LESSONS_FROM_THE_WORKBENCH_AND_ATHENA_PROTOTYPES.md);
 [the failures that recurred after them](research/records/2026-10-09_LESSONS_THE_FAILURES_THAT_RECURRED_FROM_SEPTEMBER_30_TO_OCTOBER_9.md)). Before any design, brief or build, name which recorded failure
-each choice could repeat; a choice that repeats one is refused before it is built. The most repeated:
+each choice could repeat and what differs this time. A choice is refused only where it repeats a
+failure's mechanism under that failure's conditions, read by the test of the law the failure broke;
+a choice that only resembles one, or reuses a configuration the failure was found in, proceeds
+([a past configuration is an instruction](#past-configurations); the earlier wording, "a choice that
+repeats one is refused before it is built", was read as a ban by resemblance and is retired on
+November 18). The most repeated:
 an authored routine standing in for learning; recitation or an index of contexts counted as
 generation (eight times, the last a key/value cache passed as a Holonics key); text run on its
 codec's grain as the exception (every design is checked against text,
@@ -714,15 +759,18 @@ written here with their reasons so that no agent holds them as slogans.
 - **A part enters by its tension read** (the lead, November 16; the founding law of October 24, atlas `contact.pool-founding`,
   `contact.tension-founds-face`). Before a part is ordered, three shares of the covector's power are read at its locus on a held
   half (`athena host complete-language read-tension`, `tools/tension_ruler.py`): what the present faces remove, what the law's
-  table removes (the ceiling), and what the part's own operands, located from the tension, remove. A part whose founding is a
-  saddle (its operands' covectors vanish while its return stands at zero) enters with located operands or waits; where nothing
-  locates, the reading is the result and no lap is spent waiting. A part with a slope at its founding (a lane, a return whose
-  operands already carry the law) may still be founded at zero. Reason: the founding law was restated four times between
+  table removes (the ceiling), and what the part's own operands, located from the tension, remove. The read is a founding's
+  instrument and never a gate: a part founded at zero or with drawn operands is lawful, and it is read at a length a taken law
+  needed (a learner's null is held to a length, below). The earlier clause, that a part founded on a saddle "enters with located
+  operands or waits" and that "the reading is the result" where nothing locates, is retired on November 18: its saddle premise was
+  withdrawn by the record of the dwell (the plain engine took the sum's pair law by its own descent in about 2,000 sections once
+  one world was dwelt on), and as a gate it turned the night of November 17 into ten readings and no build (`agent-inferred`). Reason for the read: the founding law was restated four times between
   November 13 and 16 ("the machine locates a character instead of waiting") and no build ran it; every part of those days entered
   at zero or with drawn operands and was waited for, each buying one to three hundredths of a nat where it bought anything; and
   the same reading that found nothing to locate at the junction (−0.0026 on a held section) showed five located products carrying
-  the sum's law once the lock is closed (0.72 to 0.93, the table's own share). Scope: every growth and every founding. The engine
-  itself holds no founding law yet; until it does, the ruler's read stands in front of every part.
+  the sum's law once the lock is closed (0.72 to 0.93, the table's own share). Scope: a growth or a founding whose operands a read
+  can locate. The engine itself holds no founding law yet; until it does, the ruler's read is offered beside a part, never in
+  front of it.
 - **A ruler's null is held to a planted law, its stamps are read from the clock, and its threads are counted** (the lead,
   November 16). A ruler that reports that nothing was found has recovered a planted instance on the same shapes in the same run.
   A time written into a guess or a record is read from `date -u`. A reading beside a lap states its host threads, and the lap's

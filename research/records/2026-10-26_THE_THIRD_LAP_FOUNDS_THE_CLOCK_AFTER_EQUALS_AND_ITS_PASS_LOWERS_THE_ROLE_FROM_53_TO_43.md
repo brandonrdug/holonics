@@ -5,7 +5,7 @@ holds the unit that arrived after a chosen class and raises that unit's logit at
 audit made at Brandon's request found it, and commit `0934a25ff` retired it ([the
 retirement](2026-10-26_THE_STORES_AND_COPIERS_ARE_RETIRED_AND_THE_PLAIN_TOWER_CODES_THE_SAME_BITS_WITHOUT_THEM.md)).
 The measurements below stand only as measurements of that machinery, never as progress of the
-learner, and nothing here is a design to resume.
+learner, and any piece of it may be taken up again as an attempt (CLAUDE.md, a past configuration is an instruction; November 18).
 
 October 26. Refs #404, #405, #386. The third lap's acceptance, fixed before it ran
 ([record](2026-10-26_THE_SECOND_LAP_FOUNDS_THE_BLANK_LINES_CLOCK_AND_THE_ROLE_IS_READ_IN_53_OF_97_WHILE_JOHN_STAYS_UNANSWERED.md)

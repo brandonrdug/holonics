@@ -243,18 +243,25 @@ references and no write is yet ordered text.
 - **Build forward from the elementary objects.** Each new owner states which object and law it
   implements ([operator contract](../ELEMENTARY_OBJECTS.md#operator-contract)) and which part of the
   line it serves.
-- **Port deliberately.** A law or kernel is ported from history (`13f8c734`) when a step needs it:
-  read, rewritten against the current objects, and tested by the law it implements. Nothing is
-  restored wholesale or kept for compatibility.
+- **Port when a step needs it.** A law, a kernel, a part or a whole configuration is ported from
+  history (`13f8c734`, the October machine at `d5ed4adc1` and `d6bbd1644`, any commit) when a step
+  needs it: read, rewritten against the current objects, and tested by the law it implements. A
+  whole configuration may be restored as an attempt to be read beside the one that stands; nothing
+  is kept for compatibility ([CLAUDE.md, a past configuration is an instruction](../../CLAUDE.md#past-configurations)).
   - The census at `13f8c734` locates history's owners
     ([`RUST_R0.tsv`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/census/RUST_R0.tsv),
     [`LEAN_R0.tsv`](https://github.com/brandonrdug/holonics/blob/13f8c734/docs/plans/census/LEAN_R0.tsv)),
     and so does the manifest on `archive/leftovers-2026-09-24`.
   - Each port is recorded in its step's issue as history path, new owner, law and test.
-- **Do not port** what the retention audit and the lessons retired: the per-occurrence tape and
-  frozen-cut replay; `returns` journals and archives of completed updates; slot, session and episode
-  wires; byte and nibble codecs; key/value stores, context indexes and copiers; foreign forward
-  graphs taken whole; any Lean inside the HNN; floats inside a law.
+- **What a port answers.** The retention audit and the lessons found these mechanisms failing a
+  law: the per-occurrence tape and frozen-cut replay (retention); `returns` journals and archives of
+  completed updates (retention); slot, session and episode wires (the aeon's clock); byte and nibble
+  codecs run as the architecture (guard 9); key/value tables, context indexes and copiers with no
+  dynamics of their own (stores and caches); foreign forward graphs served whole (equation
+  extraction); Lean inside the HNN (languages are applications); floats inside a law (precision). A
+  port of a configuration that held one of them states how its mechanism passes that law's test, and
+  then proceeds. The list is the laws' test, never a list of configurations barred by name (the
+  earlier heading was "Do not port", retired on November 18).
 - **Precision is the bit widths of graphs** (CLAUDE.md and AGENTS.md, the governing laws). No float
   is stored or consumed inside a law or the machine. Each term has a declared width, a carrier widens
   at a declared crossing, and a term is released only at a declared tolerance with its remainder
