@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 08:30 UTC): the line is compared where it writes
+## Where the work stands (November 18, 11:30 UTC): the line is compared where it writes
 
 Acting on [the audit of November 18](research/records/2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md),
 one change at a time beside a control from lap 70 on the text store (the last state before the terrain changed). Two records carry it:
@@ -44,12 +44,21 @@ control). The readings trade room: a share at the frontier lowers its code and r
 where its travel rests; upkeep, not a lever). The level stays: with its return zeroed the line's means read 0.15 to 0.29 nats higher.
 The step's carried remainder changes nothing at rate 12.
 
-**What binds, by its measurement.** A frontier comparison costs a whole region's read, about 1.3 ms of card; a lap compares about
-700,000 places there over five kinds of text where the fifty books met 900,000 a pass. The next build is the read that compares every
-place of a region at its own frontier in one pass; its design and its premise's host read come first.
+**Five laps with the share** (November 18, 11:30 UTC). The frontier's code reads 0.16, 0.19, 0.21, 0.23 and 0.23 nats under the
+control at laps 1 to 5 (1.8227 at the fifth), the two-sided readings 0.13 and 0.11 above it, and the panels about ten points over the
+control (48% and 52% of words in the lexicon at the fifth lap's end). Every stretch at the frontier gains 0.02 more than six of
+eight and loses 0.16 more elsewhere, so the share is six of eight. The fall is in the first lap; what remains is slow at this size.
 
-**What runs** (guesses G-1118-4 and G-1118-5, `research/records/receipts/2026-11-18_frontier/`): one lap from lap 70 with every
-stretch at the frontier, then the frontier arm continued four laps, each read and written on both panels.
+**The read that compares every place at its frontier** is built and checked on the host, forward and return (THE_ENGINE §10): a
+known stream in which every site hears only what stands before it, with an open place at every place, as sites of one batch. Its
+faces are the same bits as the regions it replaces; its covector matches the code's difference. The card's realization is owed.
+
+**What binds, by its measurement.** A frontier comparison costs a whole region's read (about 1.3 ms of card), and the two-stream read
+removes that. But the store's laps say the count of comparisons is not what holds the frontier past its first laps: room is. Its
+price is being read.
+
+**What runs** (G-1118-8, `research/records/receipts/2026-11-18_frontier/`): a fifth lane of 32 founded at zero on the fifth lap's end
+state, one lap, beside the same state one more lap as it is.
 
 ## Where the work stood on November 18 at 02:00 UTC: what she reads in each regime, and what the level is
 

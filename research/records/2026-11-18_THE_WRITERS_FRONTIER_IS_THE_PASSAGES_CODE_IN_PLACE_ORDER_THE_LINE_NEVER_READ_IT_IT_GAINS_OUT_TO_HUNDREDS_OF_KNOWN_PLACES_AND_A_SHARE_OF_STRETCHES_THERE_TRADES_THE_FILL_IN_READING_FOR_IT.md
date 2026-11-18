@@ -175,13 +175,39 @@ nats and nine more took 0.19. The first comparisons at the frontier teach the st
 second stream makes the store's five kinds of text meet in a lap what they would meet in fourteen, and it does not by itself lower
 where the fall rests.
 
-## 7. What runs, and what is owed
+## 7. Five laps of the store with the frontier's share (G-1118-5)
 
-- On the card through the night (G-1118-4, G-1118-5): one lap from lap 70 with every stretch at the frontier, read as arm F was; then
-  arm F continued four laps, each read at its mean and written on both panels. The long run is stated against the method rule: the
-  card would stand idle beside the next build's host work, and the laps give the projection that build needs (how the frontier falls
-  with comparisons on the whole store).
-- The boundary chart of November 17 (§6), host first.
+Arm F trained on from its own end state, four more laps (its third 3,540 sections past its second: the pass over the store's
+documents ended inside it and was renewed). At lap means against the control's lap from the same state, nats a place:
+
+| lap | the frontier | under the control | one place open, above it | whole masks, above it | the books' panel, the long panel (words in the lexicon, from the lap's end) |
+|---|---|---|---|---|---|
+| control | 2.0574 | | | | 37%, 34% |
+| 1 | 1.8971 | 0.1603 | 0.1008 | 0.0778 | 46%, 36% |
+| 2 | 1.8662 | 0.1912 | 0.1115 | 0.0908 | 55%, 47% |
+| 3 | 1.8427 | 0.2147 | 0.1233 | 0.1116 | 46%, 46% |
+| 4 | 1.8313 | 0.2261 | 0.1236 | 0.1015 | 47%, 42% |
+| 5 | 1.8227 | 0.2347 | 0.1338 | 0.1067 | 48%, 52% |
+
+- The frontier's fall is its first lap and a tail: 0.16 nats, then 0.03, 0.02, 0.01, 0.01. The writes rose about ten points over the
+  control and stayed there (a panel written from a lap's end scatters by several points). After five laps the long panel's writes keep
+  their register, begin where the prompt's word left off, copy names from the prompt, and hold no sentence.
+- The cost at the two-sided readings rose with the first laps and flattens near 0.13 and 0.11.
+- The fifth lap's end state reads the frontier 0.036 above its lap's mean: the rate's spread, which the cooling laps measured, stands
+  on the state the writes are made from.
+- The guess had the fall holding 0.03 to 0.04 a lap through lap 5; it missed from lap 3. By its own rule, the count of places compared
+  is not what binds past the first laps at this size, and the price of room at the frontier is read before the card's realization of
+  the two-stream read: a fifth lane of 32 founded at zero on the fifth lap's end state (392,505 entries to 483,961), one lap, beside
+  the same state one more lap as it is (G-1118-8, running as this is written).
+
+## 8. What runs, and what is owed
+
+- On the card (G-1118-8): the frontier's price in cells, a fifth lane's lap beside one more plain lap.
+- The two-stream read (§6) is complete on the host, forward and return (`Constitution::strand_pass`, `strand_returned`; THE_ENGINE
+  §10): its card realization, a word of the pass, and the held read are owed, and they wait on the price of room, which says what the
+  denser comparison would be spent on.
+- The rate: the state a lap ends in stands off its mean (0.036 at the frontier after five laps). A law that rests the rate where its
+  travel's cosine is zero (the cooling record) is owed as upkeep, and the writes are made from that state.
 - From the audit, still owed: the comparison's weights by declaration (the opening is compared at every place of every region), the
   residue in the tree, and the guides brought to the line as trained. The stream's order is not run: the cooled arms bound what
   stopping the whole walk buys at the mean (0.003), and the order is one part of that walk.
