@@ -221,3 +221,15 @@ Scored (2026-11-18T12:39:34Z), G-1118-9 and G-1118-8 (reads.txt).
   there, and the law fitted on five laps placed the sixth within 0.002. So what binds the frontier at this size is the count of
   places compared, and the realization that compares every place of a region is the lever the readings point at; the sentence I
   wrote after lap 4, that room is what binds, was my rule's inference and this read does not bear it.
+
+G-1118-10 (2026-11-18T12:51:50Z). The deposit's rate as upkeep on the line with the frontier's share. Read before fixing: the cooling laps (from lap
+70, the rate-12 end state read one place open 0.017 above its lap's mean, the rate-14 end 0.003 above, the rate-16 end on it; a cooler
+rate did not move the lap's mean; the panel did not move); arm F5's end read the frontier 0.036 above its lap's mean; a writer writes
+from an end state; the log law gives one more plain lap 0.007 at the mean.
+  The trial. From arm F6's end state: one lap at rate 14 with the step's remainder carried (arm C7), beside one more lap as it is at
+  rate 12 (arm F7). Each read at its end and at its lap's mean, and written on both panels from its end.
+  The guess. At the ends, arm C7's frontier rows read 0.020 to 0.040 nats under arm F7's; at the lap means the two stand within 0.006
+  of each other; arm C7's end stands within 0.008 of its own mean. The panels within their scatter (eight points).
+  What it decides. If the cooled end reads 0.02 or more under the plain end at the frontier and its mean no worse than 0.006, the line
+  with the share trains at rate 14 with the remainder carried: the state a writer writes from then stands on its mean. If not, the rate
+  stays and the writes are made from a lap's mean.
