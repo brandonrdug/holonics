@@ -334,3 +334,18 @@ first lap fell 0.103 on rows S; the plain line's frontier fell 0.160 in its firs
   What it decides. If arm S12's rows S stand under 1.85 the one-sided reading without the level has reached the plain line's with it
   inside five laps of the regime, and the level then adds to a line already level with it. If the laps stall above 1.90, what the
   level holds is what is missing and the laps wait for it.
+
+G-1118-15 (2026-11-18T16:18:43Z). The strand's odd contacts facing the past (frontier 6 strand past): two laps (arms P11, P12) from arm S10's end,
+beside arms S11 and S12 from the same state (the control). Read before fixing: on arm S9's mean the host ruler reads the known stream
+at 2.040, with its circles at rest 2.504 and with its plain strand contacts unmet 3.027 (800 rows), so the circles from the left carry
+0.46 to the frontier and the even plain contacts 0.99; in a one-sided stream an odd contact has no mate and a circle from the right
+rests, so half of each stands idle. Their material was deposited under the law for the site after, so in the new relation (the second
+site before) it opens mismatched. The known stream opened 1.08 above the law's reading and took 0.81 of it back in one lap, 0.059 more
+in the second. Arm S10's rows S read 1.8703 at its lap mean (0.0535 under arm S9's).
+  The guess. (a) On arm S10's mean the host ruler reads the known stream facing the past 0.25 to 1.20 above the known stream (the
+  mismatch before any training in it). (b) Rows S at lap means: arm P11 between 0.06 above and 0.04 under arm S11's; arm P12 between
+  0.01 above and 0.07 under arm S12's. (c) A section takes 270 to 340 ms (arm S9's 258) and a lap 810 to 1,020 s. (d) The long panel
+  written from a lap's mean stays within 8 points of the S arm's of the same lap and does not reach 50%.
+  What it decides. Arm P12 at least 0.015 under arm S12 at lap means: the line takes the word. Closer than that with the gap closing by
+  0.03 or more from the first lap to the second: one more lap of both. Otherwise the word leaves the line and stays a region's word in
+  the tree, with the reading.
