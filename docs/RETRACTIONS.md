@@ -8,6 +8,17 @@ by the September 24 reset (readable at [`13f8c734`](https://github.com/brandonrd
 or earlier). Entries keep the vocabulary of their date: "generator" for the object now called a
 navigator, "session" and "episode" for what are now aeons and epochs.
 
+[project-postulate] **How an entry is read** (November 18). Every entry here records a reading
+under its conditions: what was built, what it returned, and why the claim was narrowed or
+withdrawn. No entry bars the configuration it names. A piece of a withdrawn configuration that
+held a reading is evidence for that piece, and any of them may be taken up again, whole or in
+part, as an attempt read by the law its withdrawal cites
+([CLAUDE.md, a past configuration is an instruction](../CLAUDE.md#past-configurations)). Where
+an entry says "contamination", "rejected" or "the same class", the mechanism it names is the one
+a governing law bars by its reason (an authored routine standing in for learning, a table of seen
+contexts read as generation, a language's parser inside the machine), and a later design is put
+to that law's test, never matched against the entry's name.
+
 ## Capability and retraction record
 
 [historical; source-inspected] September 15: the R16 two-theorem kernel/dependency result at
@@ -114,7 +125,9 @@ ban, November 18). Dates are record dates under `research/records/`.
   from exposure at every scale and the faces are a return
   (`2026-08-17_THE_LADDER_CLIMBS_AND_THE_CODEC_ENDS_AT_THE_CHARACTER.md`,
   `archive/plans/THE_CODEC_IS_RECOVERED_AT_EVERY_SCALE_AND_THE_FACES_ARE_A_RETURN.md`). Any parser,
-  grammar, or renderer authored per language is the same class.
+  grammar, or renderer authored per language is the same class: an authored routine standing in
+  for what the machine locates ([CLAUDE.md](../CLAUDE.md), no catered machinery; languages are
+  applications).
 - 2026-08-18: the verbatim emission was a longest-match filter in `causal_language.rs`
   (`2026-08-18_THE_GATE_WAS_THE_MECHANISM_AND_THE_EMISSION_COMPOSES_ONCE_IT_IS_A_COORDINATE.md`).
 - 2026-08-20: the Phoenix P1 lift covered 64 of 2,560 hidden coordinates and P3's held-out change
@@ -141,7 +154,9 @@ ban, November 18). Dates are record dates under `research/records/`.
   (a mouth typed on a Lean parser), `lean_mathematics::candidates` (a per-language template
   emitter, moved from the July `ecology.rs` render), the Lean-typed face adapter in
   `route_return.rs`, and the WRD4 driver's Lean-file product were contamination under the ruling
-  above and under the 2026-08-17 supersession of authored grammars. The junction, route-deposit,
+  of that day that languages are applications (it stood above this index while the index was part
+  of AGENTS.md, and stands now in [CLAUDE.md](../CLAUDE.md), "Languages are applications") and
+  under the 2026-08-17 supersession of authored grammars. The junction, route-deposit,
   and termination laws, `HolonicWorldReturnDeposit.lean`, and the measured kernel faces stand.
   The July `lean_mathematics` parser and kernel caller exit the interior as an application
   (`2026-09-02_THE_LEAN_BINDING_OF_THE_WORLD_RETURN_IS_RETRACTED_AND_LANGUAGES_ARE_APPLICATIONS.md`).

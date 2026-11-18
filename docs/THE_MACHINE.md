@@ -542,6 +542,11 @@ it holds on the engine as a lint gate 1 runs, it holds as a practice rule CLAUDE
 with its object and the law it guarded stands in a guide, Lean or an atlas row. The table of ends is the engine guide's
 ([THE_ENGINE §9](THE_ENGINE.md#9-the-guards)); the text below stays as the record of the constructions.
 
+**How a guard is read** (November 18). A guard bars a mechanism, and its text carries the reason and the test. A design
+that resembles a "rejected form" is put to that test: it is never refused on the resemblance, on a name the guard uses or
+on the configuration a failure was found in ([CLAUDE.md, a past configuration is an instruction](../CLAUDE.md#past-configurations)).
+Where a guard's object retired, its text is the dated record of that construction and of what it was read against.
+
 [definition] Each rejected form is excluded by a construction. A type construction is proved by a
 rustdoc `compile_fail` doctest, which needs no new dependency. Lints are enforced by
 `#![deny(clippy::float_arithmetic, clippy::disallowed_types, clippy::disallowed_methods)]` in
@@ -807,9 +812,15 @@ tests can comb through anything valuable").
     moment's `open_parts`, `repair_by_field` and `ReceivingPhases::read` take the material alone,
     so the release cannot read the tree's counts or a seen context. This is structural: two
     `compile_fail` doctests (E0599) on `FieldMaterial` show it, the tree and the population, and a
-    third doctest shows the decoder's read compiles. A release is a joint refinement of its open stations. No
-    class is drawn and fed back as the next source cell: an emitter of one cell at a time over the
-    combined face is the recitation form.
+    third doctest shows the decoder's read compiles. A release is a joint refinement of its open stations. The
+    emitter read on October 5 (Codex's unapplied `receive_class`) drew one class from the combined
+    wave-and-tree face and fed it back as the next source cell: it read the tree's counts, and that
+    read is the recitation this guard bars. The bar is on a release that reads counts or a seen
+    context, never on the order in which places are released (amended November 18; the earlier
+    sentence, "an emitter of one cell at a time over the combined face is the recitation form",
+    read as a bar on the form). A writer that opens one place a read and draws it from the field's
+    own face reads the field alone; the engine's `write-next` of November 18 is one
+    ([THE_ENGINE §11](THE_ENGINE.md#11-the-theorys-laws-against-the-engine)).
 19. **One release per request, shown whole.** There is no search, rerank, retry or selection
     among releases, and nothing compares a release with reference text before it is shown. Every
     text release shown carries its copy length, the longest run it shares with the admitted
