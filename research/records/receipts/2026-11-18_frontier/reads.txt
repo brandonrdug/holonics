@@ -519,3 +519,152 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   RING_ROWS slice=web rows=64000 periods=21323x21319x21317 under_0.25=0.6347 0.25_to_1=1.2355 over_1=3.6518 all=2.2380
   RING_ROWS slice=web rows=256000 periods=85331x85313x85303 under_0.25=0.2015 0.25_to_1=0.7627 over_1=3.6367 all=2.0034
   RING_ROWS slice=web whole_count under_0.25=0.0656 0.25_to_1=0.5774 over_1=3.5486 all=1.8816
+- How many places' identities a strand's state carries (athena host read-strand-states on the 800 frontier rows, each read whole
+  as a passage by two streams, 140,798 places; tools/strand_presence_ruler.py: the indicator of the symbol k places before among
+  the 48 commonest classes, least squares fitted on the even passages and read on the odd, thousandths; read 18:55 Z at the latest).
+  Arm S12's lap mean (the odd contacts at rest), then arm P12's (the word past):
+  STRAND_STATES rows=800 places=140798 past=false ms=142456
+  STATES S12 PRESENCE passages=800 places=140798 width=128 ticks=4 top=48 (thousandths, held half)
+  STATES S12 PRESENCE read=known_site_last_tick places_back: 0=592 1=626 2=319 3=176 4=83 5=44 6=28 7=21 8=14
+  STATES S12 PRESENCE read=open_place_tick_1 places_back: 1=896 2=486 3=176 4=101 5=68 6=54 7=42 8=26
+  STATES S12 PRESENCE read=open_place_tick_2 places_back: 1=818 2=439 3=219 4=96 5=56 6=47 7=35 8=21
+  STATES S12 PRESENCE read=open_place_tick_3 places_back: 1=739 2=385 3=204 4=97 5=47 6=28 7=19 8=13
+  STATES S12 PRESENCE read=open_place_tick_4 places_back: 1=685 2=359 3=201 4=96 5=47 6=25 7=18 8=12
+  STRAND_STATES rows=800 places=140798 past=true ms=117233
+  STATES P12 PRESENCE passages=800 places=140798 width=128 ticks=4 top=48 (thousandths, held half)
+  STATES P12 PRESENCE read=known_site_last_tick places_back: 0=552 1=566 2=317 3=185 4=91 5=50 6=27 7=20 8=13
+  STATES P12 PRESENCE read=open_place_tick_1 places_back: 1=877 2=488 3=225 4=106 5=69 6=53 7=40 8=25
+  STATES P12 PRESENCE read=open_place_tick_2 places_back: 1=789 2=440 3=241 4=106 5=62 6=45 7=33 8=22
+  STATES P12 PRESENCE read=open_place_tick_3 places_back: 1=699 2=386 3=221 4=103 5=50 6=27 7=19 8=13
+  STATES P12 PRESENCE read=open_place_tick_4 places_back: 1=631 2=357 3=212 4=102 5=49 6=25 7=18 8=11
+- Arm P13 (the line with the word past, from arm P12's end; the pass over the store's prefix ended at its section 1,174; lock taken
+  18:17:37Z, 304 s), read at the mean of the states it trained, paired with arm P12's mean:
+  FRONTIER P13_mean; one place open: all 0.9943 (100508 places) | books 1.0901 code 0.6828 science 0.9675 web 1.0838 wikidata 1.1475 || less the control's, paired: +0.0115 (±0.0009) | books +0.0101 code +0.0147 science +0.0130 web +0.0168 wikidata +0.0028
+  FRONTIER P13_mean; whole masks: all 2.3529 (3717 places) | books 2.2073 code 2.2434 science 2.2895 web 2.5129 wikidata 2.5315 || less the control's, paired: +0.0117 (±0.0038) | books -0.0002 code +0.0192 science +0.0285 web +0.0312 wikidata -0.0239
+  FRONTIER P13_mean; the frontier: all 2.0700 (99844 places) | books 2.0139 code 1.8107 science 2.0517 web 2.2215 wikidata 2.2518 || less the control's, paired: +0.0136 (±0.0009) | books +0.0050 code +0.0164 science +0.0130 web +0.0142 wikidata +0.0195
+  FRONTIER P13_mean; the frontier, each region a known stream (against the control's rows of the kind): all 1.8070 (99844 places) | books 1.8297 code 1.4868 science 1.7712 web 1.9619 wikidata 1.9852 || less the control's, paired: -0.0040 (±0.0007) | books -0.0027 code -0.0043 science -0.0014 web +0.0015 wikidata -0.0129
+  FRONTIER P13_mean; each region a known stream, less the law's reading of the same state, paired: -0.2630 (±0.0029) over 99844 places
+  FRONTIER P13_mean; each region a known stream, by places known (less the control's): 1: 3.004 (-0.012) | 2 to 3: 2.708 (-0.004) | 4 to 7: 2.451 (-0.003) | 8 to 15: 2.248 (-0.009) | 16 to 31: 2.131 (-0.009) | 32 to 63: 1.975 (-0.006) | 64 to 127: 1.794 (-0.002) | 128 to 255: 1.671 (-0.003) | 256 to 511: 1.606 (-0.004) | 512 to 1023: 1.620 (+0.001)
+  FRONTIER P13_mean; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.7906 (99844 places) | books 1.8081 code 1.4696 science 1.7423 web 1.9526 wikidata 1.9800 || less the control's, paired: -0.0052 (±0.0007) | books -0.0035 code -0.0054 science -0.0026 web +0.0014 wikidata -0.0158
+  FRONTIER P13_mean; each stretch read by two streams, less the law's reading of the same state, paired: -0.2794 (±0.0029) over 99844 places
+  FRONTIER P13_mean; each stretch read by two streams, by places known (less the control's): 1: 2.943 (-0.010) | 2 to 3: 2.687 (-0.005) | 4 to 7: 2.431 (-0.003) | 8 to 15: 2.228 (-0.009) | 16 to 31: 2.106 (-0.012) | 32 to 63: 1.960 (-0.007) | 64 to 127: 1.778 (-0.004) | 128 to 255: 1.656 (-0.003) | 256 to 511: 1.592 (-0.005) | 512 to 1023: 1.604 (-0.001)
+  FRONTIER P13_mean; two streams less the known stream's reading of the same state, paired: -0.0164 (±0.0006) over 99844 places
+  FRONTIER P13_mean; the frontier by places known (less the control's): 1: 3.117 (-0.008) | 2 to 3: 2.832 (+0.018) | 4 to 7: 2.583 (+0.008) | 8 to 15: 2.432 (+0.014) | 16 to 31: 2.313 (+0.006) | 32 to 63: 2.183 (+0.011) | 64 to 127: 2.042 (+0.014) | 128 to 255: 1.965 (+0.014) | 256 to 511: 1.928 (+0.018) | 512 to 1023: 1.943 (+0.013)
+- Arm P14 (the first lap of the line's next pass: next-pass on arm P13's end, 3,000 sections; lock taken 18:33:28Z, 778 s), read at
+  its lap mean, paired with arm P12's mean:
+  FRONTIER P14_mean; one place open: all 0.9869 (100508 places) | books 1.0785 code 0.6781 science 0.9650 web 1.0736 wikidata 1.1394 || less the control's, paired: +0.0041 (±0.0010) | books -0.0015 code +0.0101 science +0.0106 web +0.0066 wikidata -0.0053
+  FRONTIER P14_mean; whole masks: all 2.3486 (3717 places) | books 2.1941 code 2.2337 science 2.2725 web 2.5099 wikidata 2.5564 || less the control's, paired: +0.0074 (±0.0041) | books -0.0134 code +0.0095 science +0.0116 web +0.0282 wikidata +0.0010
+  FRONTIER P14_mean; the frontier: all 2.0727 (99844 places) | books 2.0102 code 1.8136 science 2.0559 web 2.2230 wikidata 2.2602 || less the control's, paired: +0.0163 (±0.0010) | books +0.0013 code +0.0192 science +0.0171 web +0.0158 wikidata +0.0280
+  FRONTIER P14_mean; the frontier, each region a known stream (against the control's rows of the kind): all 1.7834 (99844 places) | books 1.8066 code 1.4666 science 1.7428 web 1.9339 wikidata 1.9668 || less the control's, paired: -0.0276 (±0.0008) | books -0.0257 code -0.0245 science -0.0298 web -0.0266 wikidata -0.0312
+  FRONTIER P14_mean; each region a known stream, less the law's reading of the same state, paired: -0.2893 (±0.0029) over 99844 places
+  FRONTIER P14_mean; each region a known stream, by places known (less the control's): 1: 2.995 (-0.021) | 2 to 3: 2.695 (-0.017) | 4 to 7: 2.429 (-0.025) | 8 to 15: 2.225 (-0.032) | 16 to 31: 2.107 (-0.033) | 32 to 63: 1.948 (-0.033) | 64 to 127: 1.768 (-0.028) | 128 to 255: 1.648 (-0.025) | 256 to 511: 1.585 (-0.025) | 512 to 1023: 1.592 (-0.027)
+  FRONTIER P14_mean; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.7659 (99844 places) | books 1.7830 code 1.4487 science 1.7128 web 1.9224 wikidata 1.9623 || less the control's, paired: -0.0299 (±0.0008) | books -0.0286 code -0.0262 science -0.0322 web -0.0288 wikidata -0.0336
+  FRONTIER P14_mean; each stretch read by two streams, less the law's reading of the same state, paired: -0.3068 (±0.0030) over 99844 places
+  FRONTIER P14_mean; each stretch read by two streams, by places known (less the control's): 1: 2.934 (-0.019) | 2 to 3: 2.671 (-0.021) | 4 to 7: 2.407 (-0.028) | 8 to 15: 2.203 (-0.034) | 16 to 31: 2.083 (-0.035) | 32 to 63: 1.932 (-0.036) | 64 to 127: 1.751 (-0.030) | 128 to 255: 1.632 (-0.027) | 256 to 511: 1.569 (-0.028) | 512 to 1023: 1.575 (-0.030)
+  FRONTIER P14_mean; two streams less the known stream's reading of the same state, paired: -0.0175 (±0.0006) over 99844 places
+  FRONTIER P14_mean; the frontier by places known (less the control's): 1: 3.093 (-0.032) | 2 to 3: 2.829 (+0.015) | 4 to 7: 2.589 (+0.014) | 8 to 15: 2.433 (+0.016) | 16 to 31: 2.316 (+0.009) | 32 to 63: 2.188 (+0.016) | 64 to 127: 2.044 (+0.016) | 128 to 255: 1.968 (+0.017) | 256 to 511: 1.929 (+0.018) | 512 to 1023: 1.958 (+0.029)
+  Its rows S stand 0.0385 under the plain line's seventh lap under the law (arm F7's mean, 1.8044): books 1.7830 against 1.8279,
+  code 1.4487 against 1.5189, science 1.7128 against 1.7742, web 1.9224 against 1.9740, wikidata 1.9623 against 1.9270.
+- Panels. Arm P13 from the mean of its states: short 98 of 162 (60%); long 139 of 273 (50%). Arm P14 from its lap mean: short 83
+  of 153 (54%); long 109 of 249 (43%: code 47%, web 53%, science 20%, books 58%, wikidata 35%), 2 of 20 loop.
+- Arm L13 (G-1118-16: the level as a strand hears it, from arm P12's end by open-level: entries 392,505 to 442,425, the block
+  49,920; the development read's sections 311 ms; the lap ran to the pass's end, 1,174 sections, lock taken 19:02:18Z, 360 s against
+  arm P13's 304 s), read at the mean of its states, paired with arm P13's (the control over the same 1,174 sections):
+  FRONTIER L13_mean; one place open: all 0.9938 (100508 places) | books 1.0898 code 0.6817 science 0.9652 web 1.0822 wikidata 1.1500 || less the control's, paired: -0.0005 (±0.0003) | books -0.0002 code -0.0010 science -0.0022 web -0.0016 wikidata +0.0025
+  FRONTIER L13_mean; whole masks: all 2.3544 (3717 places) | books 2.2052 code 2.2419 science 2.2907 web 2.5188 wikidata 2.5358 || less the control's, paired: +0.0015 (±0.0013) | books -0.0021 code -0.0015 science +0.0013 web +0.0059 wikidata +0.0043
+  FRONTIER L13_mean; the frontier: all 2.0714 (99844 places) | books 2.0122 code 1.8131 science 2.0488 web 2.2188 wikidata 2.2636 || less the control's, paired: +0.0014 (±0.0004) | books -0.0017 code +0.0024 science -0.0029 web -0.0027 wikidata +0.0118
+  FRONTIER L13_mean; the frontier, each region a known stream (against the control's rows of the kind): all 1.8130 (99844 places) | books 1.8381 code 1.4865 science 1.7753 web 1.9638 wikidata 2.0011 || less the control's, paired: +0.0060 (±0.0003) | books +0.0084 code -0.0002 science +0.0041 web +0.0020 wikidata +0.0159
+  FRONTIER L13_mean; each region a known stream, less the law's reading of the same state, paired: -0.2584 (±0.0029) over 99844 places
+  FRONTIER L13_mean; each region a known stream, by places known (less the control's): 1: 3.005 (+0.002) | 2 to 3: 2.708 (+0.000) | 4 to 7: 2.455 (+0.004) | 8 to 15: 2.253 (+0.004) | 16 to 31: 2.137 (+0.006) | 32 to 63: 1.980 (+0.005) | 64 to 127: 1.799 (+0.005) | 128 to 255: 1.678 (+0.008) | 256 to 511: 1.612 (+0.006) | 512 to 1023: 1.628 (+0.007)
+  FRONTIER L13_mean; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.7803 (99844 places) | books 1.8039 code 1.4635 science 1.7343 web 1.9410 wikidata 1.9583 || less the control's, paired: -0.0103 (±0.0005) | books -0.0042 code -0.0061 science -0.0080 web -0.0116 wikidata -0.0217
+  FRONTIER L13_mean; each stretch read by two streams, less the law's reading of the same state, paired: -0.2911 (±0.0029) over 99844 places
+  FRONTIER L13_mean; each stretch read by two streams, by places known (less the control's): 1: 2.943 (+0.001) | 2 to 3: 2.683 (-0.004) | 4 to 7: 2.428 (-0.003) | 8 to 15: 2.226 (-0.002) | 16 to 31: 2.099 (-0.008) | 32 to 63: 1.954 (-0.006) | 64 to 127: 1.765 (-0.012) | 128 to 255: 1.643 (-0.013) | 256 to 511: 1.581 (-0.011) | 512 to 1023: 1.595 (-0.009)
+  FRONTIER L13_mean; two streams less the known stream's reading of the same state, paired: -0.0328 (±0.0008) over 99844 places
+  FRONTIER L13_mean; the frontier by places known (less the control's): 1: 3.122 (+0.005) | 2 to 3: 2.831 (-0.000) | 4 to 7: 2.584 (+0.002) | 8 to 15: 2.430 (-0.001) | 16 to 31: 2.313 (-0.000) | 32 to 63: 2.186 (+0.003) | 64 to 127: 2.045 (+0.003) | 128 to 255: 1.966 (+0.001) | 256 to 511: 1.929 (+0.001) | 512 to 1023: 1.942 (-0.000)
+
+# 19:43 UTC, November 18. The excess ruler rebinned by the news the count expects (the entropy of its face), after the Codex thread's caution that a bin by the arriving symbol's code is selected by its outcome. frontier_excess_ruler.py STORE CODEC 8000000 5 {F|S} ..., all slices. This replaces the reads of the first form above (bins by the count's code of the symbol that arrived), whose per-bin excesses are withdrawn; the codes over all places are the same.
+  EXCESS slice=all kind=S places=99814 train_octets=8000000 k=5 count=2.0379 S12=1.8258 P12=1.7943 P14=1.7645 counts_by_k: 0=3.482 1=2.765 2=2.362 3=2.102 4=2.030 5=2.038
+  EXCESS slice=all expected_news='under 0.25' share=0.204 count=0.627 S12=0.982 P12=0.930 P14=0.880 excess_of_all_places: S12=+0.0724 P12=+0.0618 P14=+0.0516 counts_by_k: 0=3.255 1=2.245 2=1.539 3=0.876 4=0.591 5=0.627
+  EXCESS slice=all expected_news='0.25 to 0.5' share=0.090 count=1.315 S12=1.198 P12=1.162 P14=1.123 excess_of_all_places: S12=-0.0105 P12=-0.0137 P14=-0.0172 counts_by_k: 0=3.134 1=2.286 2=1.802 3=1.437 4=1.359 5=1.315
+  EXCESS slice=all expected_news='0.5 to 1' share=0.205 count=1.665 S12=1.456 P12=1.419 P14=1.391 excess_of_all_places: S12=-0.0431 P12=-0.0506 P14=-0.0563 counts_by_k: 0=3.186 1=2.412 2=2.001 3=1.772 4=1.699 5=1.665
+  EXCESS slice=all expected_news='1 to 2' share=0.301 count=2.490 S12=2.060 P12=2.033 P14=2.008 excess_of_all_places: S12=-0.1290 P12=-0.1372 P14=-0.1447 counts_by_k: 0=3.506 1=2.889 2=2.609 3=2.490 4=2.495 5=2.490
+  EXCESS slice=all expected_news='over 2' share=0.200 count=3.502 S12=2.993 P12=2.983 P14=2.969 excess_of_all_places: S12=-0.1019 P12=-0.1039 P14=-0.1068 counts_by_k: 0=4.134 1=3.686 2=3.448 3=3.403 4=3.434 5=3.502
+  EXCESS slice=all kind=F places=99814 train_octets=8000000 k=5 count=2.0379 F7=1.8044 counts_by_k: 0=3.482 1=2.765 2=2.362 3=2.102 4=2.030 5=2.038
+  EXCESS slice=all expected_news='under 0.25' share=0.204 count=0.627 F7=0.956 excess_of_all_places: F7=+0.0671 counts_by_k: 0=3.255 1=2.245 2=1.539 3=0.876 4=0.591 5=0.627
+  EXCESS slice=all expected_news='0.25 to 0.5' share=0.090 count=1.315 F7=1.156 excess_of_all_places: F7=-0.0143 counts_by_k: 0=3.134 1=2.286 2=1.802 3=1.437 4=1.359 5=1.315
+  EXCESS slice=all expected_news='0.5 to 1' share=0.205 count=1.665 F7=1.434 excess_of_all_places: F7=-0.0475 counts_by_k: 0=3.186 1=2.412 2=2.001 3=1.772 4=1.699 5=1.665
+  EXCESS slice=all expected_news='1 to 2' share=0.301 count=2.490 F7=2.029 excess_of_all_places: F7=-0.1383 counts_by_k: 0=3.506 1=2.889 2=2.609 3=2.490 4=2.495 5=2.490
+  EXCESS slice=all expected_news='over 2' share=0.200 count=3.502 F7=3.001 excess_of_all_places: F7=-0.1004 counts_by_k: 0=4.134 1=3.686 2=3.448 3=3.403 4=3.434 5=3.502
+  EXCESS slice=books kind=S places=19931 train_octets=8000000 k=5 count=1.4425 S12=1.8406 P12=1.8116 P14=1.7830 counts_by_k: 0=3.090 1=2.445 2=2.045 3=1.703 4=1.506 5=1.442
+  EXCESS slice=books expected_news='under 0.25' share=0.150 count=0.157 S12=0.748 P12=0.691 P14=0.638 excess_of_all_places: S12=+0.0889 P12=+0.0802 P14=+0.0724 counts_by_k: 0=2.699 1=1.749 2=1.203 3=0.570 4=0.214 5=0.157
+  EXCESS slice=books expected_news='0.25 to 0.5' share=0.090 count=0.382 S12=0.959 P12=0.928 P14=0.896 excess_of_all_places: S12=+0.0518 P12=+0.0490 P14=+0.0462 counts_by_k: 0=2.784 1=1.868 2=1.330 3=0.841 4=0.496 5=0.382
+  EXCESS slice=books expected_news='0.5 to 1' share=0.190 count=0.877 S12=1.389 P12=1.353 P14=1.327 excess_of_all_places: S12=+0.0972 P12=+0.0903 P14=+0.0855 counts_by_k: 0=2.902 1=2.150 2=1.659 3=1.239 4=1.002 5=0.877
+  EXCESS slice=books expected_news='1 to 2' share=0.335 count=1.668 S12=2.029 P12=2.002 P14=1.973 excess_of_all_places: S12=+0.1210 P12=+0.1118 P14=+0.1024 counts_by_k: 0=3.083 1=2.532 2=2.180 3=1.899 4=1.734 5=1.668
+  EXCESS slice=books expected_news='over 2' share=0.235 count=2.807 S12=2.974 P12=2.968 P14=2.952 excess_of_all_places: S12=+0.0392 P12=+0.0378 P14=+0.0342 counts_by_k: 0=3.620 1=3.226 2=2.976 3=2.852 4=2.804 5=2.807
+# 19:43 UTC. The presence ruler with halves split by source (170 sources; strand_presence_ruler.py DUMP 8 48 ROWS), state S12: open place tick 1: 896 481 171 95 61 thousandths at 1 to 5 places back; tick 4: 681 353 196 90 40. Split by passage it read 896 486 176 101 68 and 685 359 201 96 47: the reading stands.
+
+# 19:59 UTC. The excess ruler's draw_agrees lines (the mean mass a face gives the arriving symbol), all slices, kinds S and F:
+  EXCESS slice=all kind=S places=99814 train_octets=8000000 k=5 count=2.0379 S12=1.8258 P12=1.7943 P13=1.7891 L13=1.7787 P14=1.7645 P15=1.7513 draw_agrees: count=0.462 S12=0.382 P12=0.392 P13=0.395 L13=0.398 P14=0.400 P15=0.405
+  EXCESS slice=all expected_news='under 0.25' draw_agrees: count=0.909 S12=0.601 P12=0.621 P13=0.627 L13=0.631 P14=0.640 P15=0.650
+  EXCESS slice=all expected_news='0.25 to 0.5' draw_agrees: count=0.709 S12=0.545 P12=0.559 P13=0.564 L13=0.567 P14=0.571 P15=0.578
+  EXCESS slice=all expected_news='0.5 to 1' draw_agrees: count=0.546 S12=0.469 P12=0.480 P13=0.482 L13=0.485 P14=0.486 P15=0.491
+  EXCESS slice=all expected_news='1 to 2' draw_agrees: count=0.271 S12=0.293 P12=0.299 P13=0.303 L13=0.305 P14=0.304 P15=0.307
+  EXCESS slice=all expected_news='over 2' draw_agrees: count=0.095 S12=0.133 P12=0.133 P13=0.132 L13=0.135 P14=0.135 P15=0.137
+  EXCESS slice=all kind=F places=99814 train_octets=8000000 k=5 count=2.0379 F7=1.8044 draw_agrees: count=0.462 F7=0.390
+  EXCESS slice=all expected_news='under 0.25' draw_agrees: count=0.909 F7=0.610
+  EXCESS slice=all expected_news='0.25 to 0.5' draw_agrees: count=0.709 F7=0.553
+  EXCESS slice=all expected_news='0.5 to 1' draw_agrees: count=0.546 F7=0.475
+  EXCESS slice=all expected_news='1 to 2' draw_agrees: count=0.271 F7=0.299
+  EXCESS slice=all expected_news='over 2' draw_agrees: count=0.095 F7=0.139
+# 19:59 UTC. The spread of a read's code at the places the count of five expects under 0.25 nats and 1 to 2 nats (a private one-off on the same rows):
+  SPREAD kind=S set='expects under 0.25' places=20362 read=count5: code under 0.1: 0.921 | 0.1 to 0.5: 0.000 | 0.5 to 1.5: 0.000 | over 1.5: 0.079 | mean mass on the arriving symbol 0.909
+  SPREAD kind=S set='expects under 0.25' places=20362 read=S12: code under 0.1: 0.323 | 0.1 to 0.5: 0.238 | 0.5 to 1.5: 0.199 | over 1.5: 0.240 | mean mass on the arriving symbol 0.601
+  SPREAD kind=S set='expects under 0.25' places=20362 read=P12: code under 0.1: 0.357 | 0.1 to 0.5: 0.232 | 0.5 to 1.5: 0.182 | over 1.5: 0.229 | mean mass on the arriving symbol 0.621
+  SPREAD kind=S set='expects under 0.25' places=20362 read=P14: code under 0.1: 0.382 | 0.1 to 0.5: 0.229 | 0.5 to 1.5: 0.177 | over 1.5: 0.212 | mean mass on the arriving symbol 0.640
+  SPREAD kind=S set='expects under 0.25' places=20362 read=P15: code under 0.1: 0.398 | 0.1 to 0.5: 0.223 | 0.5 to 1.5: 0.176 | over 1.5: 0.203 | mean mass on the arriving symbol 0.650
+  SPREAD kind=S set='expects under 0.25' places=20362 read=L13: code under 0.1: 0.370 | 0.1 to 0.5: 0.228 | 0.5 to 1.5: 0.183 | over 1.5: 0.220 | mean mass on the arriving symbol 0.631
+  SPREAD kind=S set='expects 1 to 2' places=30002 read=count5: code under 0.1: 0.000 | 0.1 to 0.5: 0.110 | 0.5 to 1.5: 0.394 | over 1.5: 0.496 | mean mass on the arriving symbol 0.271
+  SPREAD kind=S set='expects 1 to 2' places=30002 read=S12: code under 0.1: 0.041 | 0.1 to 0.5: 0.145 | 0.5 to 1.5: 0.261 | over 1.5: 0.552 | mean mass on the arriving symbol 0.293
+  SPREAD kind=S set='expects 1 to 2' places=30002 read=P12: code under 0.1: 0.046 | 0.1 to 0.5: 0.148 | 0.5 to 1.5: 0.261 | over 1.5: 0.545 | mean mass on the arriving symbol 0.299
+  SPREAD kind=S set='expects 1 to 2' places=30002 read=P14: code under 0.1: 0.045 | 0.1 to 0.5: 0.155 | 0.5 to 1.5: 0.264 | over 1.5: 0.537 | mean mass on the arriving symbol 0.304
+  SPREAD kind=S set='expects 1 to 2' places=30002 read=P15: code under 0.1: 0.047 | 0.1 to 0.5: 0.154 | 0.5 to 1.5: 0.263 | over 1.5: 0.535 | mean mass on the arriving symbol 0.307
+  SPREAD kind=S set='expects 1 to 2' places=30002 read=L13: code under 0.1: 0.048 | 0.1 to 0.5: 0.152 | 0.5 to 1.5: 0.261 | over 1.5: 0.538 | mean mass on the arriving symbol 0.305
+# 19:59 UTC. count_writer_ruler.py STORE LEXICON PANEL SLICE 8000000 5 96 16, the long panel of arm P14's lap mean (counts only):
+  COUNT_WRITER slice=books prompts=4 the_reference: all=47/58(81%) q1=14/17(82%) q2=11/13(84%) q3=10/14(71%) q4=12/14(85%)
+  COUNT_WRITER slice=books prompts=4 the_panels_write: all=34/58(58%) q1=11/18(61%) q2=9/14(64%) q3=9/15(60%) q4=5/11(45%)
+  COUNT_WRITER slice=books prompts=4 draws=16 places=96 train_octets=8000000 k=1: all=367/866(42%) q1=98/237(41%) q2=105/224(46%) q3=78/211(36%) q4=86/194(44%)
+  COUNT_WRITER slice=books prompts=4 draws=16 places=96 train_octets=8000000 k=2: all=584/1021(57%) q1=152/281(54%) q2=147/254(57%) q3=138/248(55%) q4=147/238(61%)
+  COUNT_WRITER slice=books prompts=4 draws=16 places=96 train_octets=8000000 k=3: all=712/1032(68%) q1=177/274(64%) q2=173/257(67%) q3=188/256(73%) q4=174/245(71%)
+  COUNT_WRITER slice=books prompts=4 draws=16 places=96 train_octets=8000000 k=4: all=797/1027(77%) q1=215/288(74%) q2=190/243(78%) q3=186/240(77%) q4=206/256(80%)
+  COUNT_WRITER slice=books prompts=4 draws=16 places=96 train_octets=8000000 k=5: all=951/1072(88%) q1=247/297(83%) q2=232/260(89%) q3=236/257(91%) q4=236/258(91%)
+  COUNT_WRITER slice=code prompts=4 the_reference: all=47/49(95%) q1=16/17(94%) q2=12/12(100%) q3=12/12(100%) q4=7/8(87%)
+  COUNT_WRITER slice=code prompts=4 the_panels_write: all=17/36(47%) q1=4/9(44%) q2=5/10(50%) q3=2/8(25%) q4=6/9(66%)
+  COUNT_WRITER slice=code prompts=4 draws=16 places=96 train_octets=8000000 k=1: all=121/532(22%) q1=38/162(23%) q2=32/135(23%) q3=17/116(14%) q4=34/119(28%)
+  COUNT_WRITER slice=code prompts=4 draws=16 places=96 train_octets=8000000 k=2: all=180/551(32%) q1=48/156(30%) q2=41/129(31%) q3=47/123(38%) q4=44/143(30%)
+  COUNT_WRITER slice=code prompts=4 draws=16 places=96 train_octets=8000000 k=3: all=359/625(57%) q1=95/175(54%) q2=96/158(60%) q3=88/150(58%) q4=80/142(56%)
+  COUNT_WRITER slice=code prompts=4 draws=16 places=96 train_octets=8000000 k=4: all=406/576(70%) q1=105/162(64%) q2=76/120(63%) q3=122/156(78%) q4=103/138(74%)
+  COUNT_WRITER slice=code prompts=4 draws=16 places=96 train_octets=8000000 k=5: all=495/617(80%) q1=133/170(78%) q2=121/156(77%) q3=137/158(86%) q4=104/133(78%)
+  COUNT_WRITER slice=science prompts=4 the_reference: all=37/48(77%) q1=11/14(78%) q2=10/14(71%) q3=7/9(77%) q4=9/11(81%)
+  COUNT_WRITER slice=science prompts=4 the_panels_write: all=9/44(20%) q1=1/13(7%) q2=3/10(30%) q3=4/13(30%) q4=1/8(12%)
+  COUNT_WRITER slice=science prompts=4 draws=16 places=96 train_octets=8000000 k=1: all=246/768(32%) q1=70/220(31%) q2=58/176(32%) q3=58/194(29%) q4=60/178(33%)
+  COUNT_WRITER slice=science prompts=4 draws=16 places=96 train_octets=8000000 k=2: all=368/834(44%) q1=107/243(44%) q2=88/209(42%) q3=80/196(40%) q4=93/186(50%)
+  COUNT_WRITER slice=science prompts=4 draws=16 places=96 train_octets=8000000 k=3: all=476/854(55%) q1=136/253(53%) q2=117/204(57%) q3=119/206(57%) q4=104/191(54%)
+  COUNT_WRITER slice=science prompts=4 draws=16 places=96 train_octets=8000000 k=4: all=598/841(71%) q1=141/232(60%) q2=164/216(75%) q3=145/198(73%) q4=148/195(75%)
+  COUNT_WRITER slice=science prompts=4 draws=16 places=96 train_octets=8000000 k=5: all=751/875(85%) q1=208/251(82%) q2=196/223(87%) q3=181/205(88%) q4=166/196(84%)
+  COUNT_WRITER slice=web prompts=4 the_reference: all=34/50(68%) q1=11/16(68%) q2=8/12(66%) q3=8/11(72%) q4=7/11(63%)
+  COUNT_WRITER slice=web prompts=4 the_panels_write: all=29/54(53%) q1=6/12(50%) q2=8/14(57%) q3=7/14(50%) q4=8/14(57%)
+  COUNT_WRITER slice=web prompts=4 draws=16 places=96 train_octets=8000000 k=1: all=249/781(31%) q1=64/224(28%) q2=62/185(33%) q3=62/193(32%) q4=61/179(34%)
+  COUNT_WRITER slice=web prompts=4 draws=16 places=96 train_octets=8000000 k=2: all=346/881(39%) q1=92/248(37%) q2=75/210(35%) q3=91/211(43%) q4=88/212(41%)
+  COUNT_WRITER slice=web prompts=4 draws=16 places=96 train_octets=8000000 k=3: all=523/902(57%) q1=126/245(51%) q2=123/218(56%) q3=128/220(58%) q4=146/219(66%)
+  COUNT_WRITER slice=web prompts=4 draws=16 places=96 train_octets=8000000 k=4: all=685/905(75%) q1=185/260(71%) q2=171/217(78%) q3=170/218(77%) q4=159/210(75%)
+  COUNT_WRITER slice=web prompts=4 draws=16 places=96 train_octets=8000000 k=5: all=716/871(82%) q1=178/242(73%) q2=195/221(88%) q3=185/216(85%) q4=158/192(82%)
+  COUNT_WRITER slice=wikidata prompts=4 the_reference: all=33/44(75%) q1=9/14(64%) q2=9/13(69%) q3=10/11(90%) q4=5/6(83%)
+  COUNT_WRITER slice=wikidata prompts=4 the_panels_write: all=20/57(35%) q1=9/18(50%) q2=4/12(33%) q3=4/15(26%) q4=3/12(25%)
+  COUNT_WRITER slice=wikidata prompts=4 draws=16 places=96 train_octets=8000000 k=1: all=166/611(27%) q1=54/185(29%) q2=41/137(29%) q3=27/141(19%) q4=44/148(29%)
+  COUNT_WRITER slice=wikidata prompts=4 draws=16 places=96 train_octets=8000000 k=2: all=180/664(27%) q1=39/188(20%) q2=42/168(25%) q3=49/160(30%) q4=50/148(33%)
+  COUNT_WRITER slice=wikidata prompts=4 draws=16 places=96 train_octets=8000000 k=3: all=300/695(43%) q1=75/202(37%) q2=72/166(43%) q3=76/165(46%) q4=77/162(47%)
+  COUNT_WRITER slice=wikidata prompts=4 draws=16 places=96 train_octets=8000000 k=4: all=488/721(67%) q1=145/223(65%) q2=120/170(70%) q3=114/171(66%) q4=109/157(69%)
+  COUNT_WRITER slice=wikidata prompts=4 draws=16 places=96 train_octets=8000000 k=5: all=631/733(86%) q1=174/220(79%) q2=164/182(90%) q3=150/168(89%) q4=143/163(87%)
+# 19:59 UTC. Lexicon share by quarter of a write's places, long panel, pooled (a private one-off): two-stream lap means (8 states) 300/613 228/479 246/512 233/478; their references 488/624 400/512 376/456 320/400; two-stream lap ends (6 states) 204/439 182/374 177/380 152/338; the plain line (10 states) 349/772 293/660 282/658 305/622.
+# 19:59 UTC. Lap P15 (the line with the word past) at its lap mean, rows S: 1.7528 over 99,844 places (0.0131 under arm P14's, ±0.0007; books 1.7691 code 1.4321 science 1.7022 web 1.9077 wikidata 1.9525); one place open under the law 0.9865.
+# After the reboot (driver 620.70.06): the card suite at fe02f8a84's tree, 31 passed, 0 failed, 368.85 s, alone under the card lock (19:35:45 to 19:41:53 UTC). gate_engine against the line, binary athena_second: STORE_PARITY calls=3 unequal=0 (card 1,622 ms, host 193,153 ms); GATE_REPRO sections=3 equal=3; GATE_REPRO sections=24 equal=24; GATE_READ cavity.tsv EQUAL; GATE_ENGINE EQUAL (19:48:08 to 19:56:49 UTC).

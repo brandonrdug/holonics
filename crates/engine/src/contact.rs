@@ -158,6 +158,8 @@ pub(crate) struct StrandForward {
     pub(crate) last: Vec<i64>,
     /// The level as the strand heard it at the split, where the tower carries its one-sided block ([`Constitution::scale_forward_before`]).
     pub(crate) tower: Option<crate::field::scale::ScalePass>,
+    /// Whether the openings took the row of the second place before ([`crate::field::Region::second`]).
+    pub(crate) second: bool,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -953,7 +955,7 @@ impl Constitution {
                 return refuse("a passage read by two streams whose sites are not all known, or that has a port");
             }
             self.admit_region(region)?;
-            let mut strand = self.strand_pass(region.classes, keep, self.past(region))?;
+            let mut strand = self.strand_pass_with(region.classes, keep, self.past(region), self.second(region))?;
             let faces: Vec<Option<TowerFace>> = std::mem::take(&mut strand.faces).into_iter().enumerate().map(|(t, f)| (t > 0).then_some(f)).collect();
             return Ok(Forward { faces, strand: Some(Box::new(strand)), ..Forward::default() });
         }
@@ -1010,7 +1012,7 @@ impl Constitution {
         // site; at `3` and `4` the level is not heard.
         let (after, levelled) = (!self.sided(region), self.levelled(region));
         let moment = self.moments_sided(region, &paces, after)?;
-        let mut x = self.open_sided(region, &moment, marks, after)?;
+        let mut x = self.open_sided(region, &moment, marks, after, self.second(region))?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
@@ -1196,7 +1198,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
         // The known stream, its ticks kept: the forward a ruler reads at `3`.
         let mut stream = self.clone();
         stream.ruler_far = 3;
@@ -1215,7 +1217,7 @@ impl Constitution {
             rx
         };
         let receiving = on(&bare);
-        let (mut y, moment) = self.cavity_forward_sided(&region, paces, false)?;
+        let (mut y, moment) = self.cavity_forward_sided(&region, paces, false, false)?;
         // [definition; the lead, November 18, the readings of 14:30 UTC] An open place runs on the bare clock at every tick: its clock is not
         // read again from its own face (a blank's is, §16.44). Why: on the line's state trained a lap as known streams the re-read is worth
         // 0.011 nats at the frontier (the far ruler's 800 rows), and without it the open places' clocks and moments are the cavity's own
@@ -1226,6 +1228,26 @@ impl Constitution {
         y.chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect()
     }
 
+    /// [measurement; the lead, November 18, the record of the two streams §14] **A strand's reads, for a ruler on the host**: each known
+    /// site's read after the last tick (`[n][D]`, the lane chart of its state on `2^(−16)`), and each open place's read after every tick
+    /// (`[ticks][n][D]`), as [`Constitution::strand_pass`] left them. What a place's state carries of the places before it is read
+    /// from these outside the machine. A reading: the state is the same with it.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_reads(&self, classes: &[usize], past: bool) -> Result<(Vec<i32>, Vec<Vec<i32>>)> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let (dw, n) = (self.declaration.width, classes.len());
+        let chart = |x: &[i64]| -> Result<Vec<i32>> {
+            let (mut read, mut scale) = (Vec::with_capacity(x.len()), Vec::new());
+            for xt in x.chunks_exact(dw) {
+                lane_chart(xt, self.declaration.lanes, &mut read, &mut scale)?;
+            }
+            Ok(read)
+        };
+        let known = chart(&pass.last[..n * dw])?;
+        let open = pass.ticks.iter().map(|cell| chart(&cell.after[n * dw..])).collect::<Result<_>>()?;
+        Ok((known, open))
+    }
+
     /// [definition; the lead, November 18, the frontier record §6] **The strand's two streams read by one tick**: the known stream's
     /// sites and its open places are one batch of sites, the open places after the known ones, each at the place of the known site of
     /// its index ([`Sided::Strand`], [`ClassLists::twins_from`]). A site's near field, its falloff, its skin on a plain pace, its
@@ -1234,23 +1256,29 @@ impl Constitution {
     /// (`the_strands_two_streams_in_one_tick_are_the_second_ticks_bits`), so one tick and one return serve both streams, on the host and
     /// on the card. `keep` holds each tick's cell for the return.
     pub(crate) fn strand_pass(&self, classes: &[usize], keep: bool, past: bool) -> Result<StrandForward> {
+        self.strand_pass_with(classes, keep, past, false)
+    }
+
+    /// [`Constitution::strand_pass`], with `second` each site's and each open place's row of the second place before
+    /// ([`Region::second`]).
+    pub(crate) fn strand_pass_with(&self, classes: &[usize], keep: bool, past: bool, second: bool) -> Result<StrandForward> {
         let d = &self.declaration;
         if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 {
             return refuse("a passage read at its boundary on a field with triads, a junction, depth rings or a closed face");
         }
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
         self.admit_region(&region)?;
         let (dw, m2) = (d.width, 2 * d.complex());
         let reaches = self.reaches();
         // The known stream's clocks, moments and opening: what stands before each site, its own row in its opening.
         let paces = self.paces(&region)?;
         let known_moment = self.moments_sided(&region, &paces, false)?;
-        let mut x = self.open_sided(&region, &known_moment, None, false)?;
+        let mut x = self.open_sided(&region, &known_moment, None, false, second)?;
         // The open places: the retarded opening on the clock each holds before its symbol arrives (its stride bare).
         let bare: Vec<(Vec<i64>, Vec<i64>)> = (0..d.heads).map(|h| Self::cavity_clocks(&paces, h, n)).collect();
-        let (open_x, open_moment) = self.cavity_forward_sided(&region, &paces, false)?;
+        let (open_x, open_moment) = self.cavity_forward_sided(&region, &paces, false, second)?;
         x.extend_from_slice(&open_x);
         let one = 1i128 << PACE_BITS;
         // The joined clocks: the known sites' own, then the open places'.
@@ -1270,7 +1298,7 @@ impl Constitution {
         let tick_paces = joined(&bare, &bare_strides);
         let moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
         let definite: Vec<bool> = (0..2 * n).map(|t| t < n).collect();
-        let mut out = StrandForward { known: n, ..Default::default() };
+        let mut out = StrandForward { known: n, second, ..Default::default() };
         // [the lead, November 18, the record of the two streams §11] The level, where the tower carries its one-sided block: each place
         // takes the epoch before its own at the split, the news the retarded opening's.
         let level = self.scale.as_deref().filter(|s| s.before_offsets(dw).is_some());

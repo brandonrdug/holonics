@@ -506,7 +506,19 @@ impl<'c> Resident<'c> {
         };
         let before: Vec<(usize, u32, u32)> = (0..sites).filter_map(|t| prev(t).map(|s| (s, t))).flat_map(|(s, t)| terms(s, t as u32)).collect();
         // [the known stream] No after row was read (`FieldWords::before`), and none takes a covector.
-        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| words.before == 0 && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
+        // [the record of the two streams §15] With the word (the second bit of `FieldWords::before`) the row of the site after was read at the
+        // second site before: a known site's the site two before it, an open place's the known site two before its place.
+        let second = |t: usize| -> Option<usize> {
+            match heard.get(region_of[t]) {
+                Some(&n) if site_pos[t] >= n => (site_pos[t] >= n + 2).then(|| t - n as usize - 2),
+                _ => (site_pos[t] >= 2).then(|| t - 2),
+            }
+        };
+        let after: Vec<(usize, u32, u32)> = if words.before >= 3 {
+            (0..sites).filter_map(|t| second(t).map(|s| (s, t))).flat_map(|(s, t)| terms(s, t as u32)).collect()
+        } else {
+            (0..sites).filter(|&t| words.before == 0 && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect()
+        };
         for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
             let (rows_sites, rows_shares, segments) = encoding_partition(&rows, a + 1);
             let count = (segments.len() / 3) as u32;

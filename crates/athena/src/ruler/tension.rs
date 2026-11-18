@@ -627,6 +627,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     // stands before it), and the face read is the open place's at that last place, which hears every known place.
     let strand = learner.pass.as_ref().is_some_and(|p| p.strand);
     let past = learner.pass.as_ref().is_some_and(|p| p.past);
+    let second = learner.pass.as_ref().is_some_and(|p| p.second);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
@@ -643,9 +644,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
                 *open.last_mut().expect("a region of one place or more") = true;
                 if strand {
                     let n = classes.len();
-                    return OwnedRegion { strand: true, past, ..OwnedRegion::plain(classes, vec![false; n]) };
+                    return OwnedRegion { strand: true, past, second, ..OwnedRegion::plain(classes, vec![false; n]) };
                 }
-                OwnedRegion { before: known, past: known && past, ..OwnedRegion::plain(classes, open) }
+                OwnedRegion { before: known, past: known && past, second: known && second, ..OwnedRegion::plain(classes, open) }
             })
             .collect();
         let views: Vec<_> = regions.iter().map(view_of).collect();
@@ -672,6 +673,70 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
     println!("NEXT_WRITE_DONE rows={} run={run} window={} ms={}", rows.len(), window.map_or("-".to_string(), |n| n.to_string()), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; the lead, November 18, the record of the two streams §14] `read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA
+/// ROWS ROWS_SHA STATE STATE_SHA OUT [past]`: **what a strand's sites hold, written out for a ruler**. Each row of `ROWS` (`read-far`'s
+/// table: `label<TAB>known text<TAB>next symbol`) is read whole as a passage by two streams, every place known
+/// ([`holonics_engine::field::Constitution::strand_reads`]), with the word `past` its odd contacts facing the past. `OUT/rows.tsv` takes a
+/// line a place (`row`, `group`, `place`, `class`); `OUT/known.i32` each known site's read after the last tick and `OUT/open_K.i32`
+/// each open place's read after tick `K` (little-endian, `D` words a place, in the lines' order); `OUT/dims.tsv` names `D` and the
+/// ticks. On the host's threads; the state is read, never written. The directory is private: its rows are the passage's places.
+pub fn read_strand_states(args: &[String]) -> Result<()> {
+    let past = args.len() == 13 && args[12] == "past";
+    if args.len() != 12 && !past {
+        return Err("read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past]".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-strand-states")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[11]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, Vec<usize>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(unescape(known).as_bytes())?;
+        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        if classes.len() < 2 {
+            return Err("a row of fewer than two places".into());
+        }
+        rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
+    }
+    let field = &learner.field;
+    let reads: Vec<(Vec<i32>, Vec<Vec<i32>>)> = rows.par_iter().map(|(_, classes)| field.strand_reads(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+    std::fs::create_dir_all(out)?;
+    let ticks = field.declaration.ticks;
+    let mut lines = String::new();
+    let mut known: Vec<u8> = Vec::new();
+    let mut open: Vec<Vec<u8>> = vec![Vec::new(); ticks];
+    for (r, ((group, classes), (k, o))) in rows.iter().zip(&reads).enumerate() {
+        for (t, class) in classes.iter().enumerate() {
+            lines.push_str(&format!("{r}\t{group}\t{t}\t{class}\n"));
+        }
+        known.extend(k.iter().flat_map(|v| v.to_le_bytes()));
+        for (tick, slot) in open.iter_mut().enumerate() {
+            slot.extend(o[tick].iter().flat_map(|v| v.to_le_bytes()));
+        }
+    }
+    write_new(&out.join("rows.tsv"), lines.as_bytes())?;
+    write_new(&out.join("known.i32"), &known)?;
+    for (tick, bytes) in open.iter().enumerate() {
+        write_new(&out.join(format!("open_{tick}.i32")), bytes)?;
+    }
+    write_new(&out.join("dims.tsv"), format!("read\t{}\nticks\t{ticks}\n", field.declaration.width).as_bytes())?;
+    println!("STRAND_STATES rows={} places={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), started.elapsed().as_millis());
     Ok(())
 }
 

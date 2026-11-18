@@ -685,7 +685,7 @@ impl Constitution {
         let reaches = self.reaches();
         let known = vec![false; n];
         // (the known stream's region: sided, so the opening's comparison below is the retarded one)
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
@@ -800,6 +800,11 @@ impl Constitution {
             if t > 0 {
                 self.opening_return(&region, l.before, t - 1, dk, g, None);
                 self.opening_return(&region, l.before, t - 1, dopen, g, None);
+            }
+            // [the record of the two streams §15] The row of the second place before, where the openings took it.
+            if pass.second && t >= 2 {
+                self.opening_return(&region, l.after, t - 2, dk, g, None);
+                self.opening_return(&region, l.after, t - 2, dopen, g, None);
             }
         }
         Ok(())
@@ -1056,6 +1061,10 @@ impl Constitution {
             // [measurement] Under a ruler's `3` the opening read no row of the site after ([`Constitution::open_sided`]).
             if !self.sided(region) && t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g, pass.marks.as_deref());
+            }
+            // [the record of the two streams §15] In a one-sided stream with the word, the opening read the row of the second site before.
+            if self.second(region) && t >= 2 {
+                self.opening_return(region, l.after, t - 2, dxt, g, pass.marks.as_deref());
             }
         }
         Ok(())

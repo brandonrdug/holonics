@@ -235,13 +235,15 @@ impl Constitution {
 
     /// The cavity openings ([`Constitution::cavity_openings`]) and the cavity moments they read, on the region's clocks `paces`.
     pub(crate) fn cavity_forward(&self, region: &Region, paces: &Paces) -> Result<(Vec<i64>, Vec<i64>)> {
-        self.cavity_forward_sided(region, paces, true)
+        self.cavity_forward_sided(region, paces, true, false)
     }
 
     /// [`Constitution::cavity_forward`], or with `after` unset the **boundary's openings** [the boundary chart, the record of the dwell
     /// §13]: `x⁰_t = E(∗) + E₋(u_(t−1)) + release(C s_t + b_s, 24)` on the retarded moment, no row of the place's own symbol and none of
     /// the next.
-    pub(crate) fn cavity_forward_sided(&self, region: &Region, paces: &Paces, after: bool) -> Result<(Vec<i64>, Vec<i64>)> {
+    /// [the record of the two streams §15] With `second` (a one-sided stream's word, [`Region::second`]) the row `E₊` of the second site
+    /// before the place is added, `E₊(u_(t−2))`.
+    pub(crate) fn cavity_forward_sided(&self, region: &Region, paces: &Paces, after: bool, second: bool) -> Result<(Vec<i64>, Vec<i64>)> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
@@ -260,6 +262,9 @@ impl Constitution {
             }
             if after && t + 1 < sites {
                 self.opening_term(region, l.after, t + 1, xt, None);
+            }
+            if second && t >= 2 {
+                self.opening_term(region, l.after, t - 2, xt, None);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
@@ -299,7 +304,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
         self.admit_region(&region)?;
         let dw = d.width;
         let reaches = self.reaches();
@@ -311,7 +316,7 @@ impl Constitution {
                 (receiving.tau[p], receiving.sigma[p]) = Self::cavity_clocks(&paces, h, sites);
             }
         }
-        let (mut x, moment) = self.cavity_forward_sided(&region, &paces, false)?;
+        let (mut x, moment) = self.cavity_forward_sided(&region, &paces, false, false)?;
         // Every site is a source to the sites after it (definite, keyed); the lists make every site a listener.
         let (definite, keyed) = (vec![true; sites], vec![true; sites]);
         for _ in 0..d.ticks {
@@ -361,7 +366,7 @@ impl Constitution {
             self.admit_region(region)?;
             let paces = self.paces(region)?;
             // [the known stream] Under a ruler's `3` ([`Constitution::ruler_far`]) the opening is the retarded one: what stands before the place.
-            self.cavity_forward_sided(region, &paces, !self.sided(region))?
+            self.cavity_forward_sided(region, &paces, !self.sided(region), self.second(region))?
         };
         let l = &self.layout;
         let reach_o = reach(&self.theta[l.opening..l.opening + dw * dw]);
@@ -403,7 +408,8 @@ impl Constitution {
         // of the strand's second stream begins from, [`Constitution::cavity_forward_sided`]): no row and no moment term of a site after the place
         // is read, and none is returned to.
         let after = !self.sided(region);
-        let (x, moment) = self.cavity_forward_sided(region, paces, after)?;
+        let second = self.second(region);
+        let (x, moment) = self.cavity_forward_sided(region, paces, after, second)?;
         let mut dx = vec![0i64; sites * dw];
         let (mut ys, mut rs): (Vec<Vec<i64>>, Vec<Vec<i32>>) = (Vec::new(), Vec::new());
         for t in places.clone() {
@@ -454,6 +460,9 @@ impl Constitution {
             }
             if after && t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g, None);
+            }
+            if second && t >= 2 {
+                self.opening_return(region, l.after, t - 2, dxt, g, None);
             }
             transposed(&self.theta[mf..mf + dw * m2], reaches.moment_face, m2, dxt, MATERIAL_BITS, &mut back)?;
             for (slot, &b) in dm[t * m2..(t + 1) * m2].iter_mut().zip(&back) {
@@ -604,12 +613,13 @@ impl Constitution {
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b, 24)` (§16.22; a region's first site has no
     /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Constitution::moments_of`]).
     pub(crate) fn open(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>) -> Result<Vec<i64>> {
-        self.open_sided(region, moment, marks, true)
+        self.open_sided(region, moment, marks, true, false)
     }
 
     /// [`Constitution::open`], or with `after` unset without the row of the site after (a ruler's forward,
     /// [`Constitution::ruler_far`] at `3`).
-    pub(crate) fn open_sided(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>, after: bool) -> Result<Vec<i64>> {
+    /// [the record of the two streams §15] With `second` ([`Region::second`]) each site takes the row `E₊` of the second site before it.
+    pub(crate) fn open_sided(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>, after: bool, second: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
@@ -624,6 +634,9 @@ impl Constitution {
             }
             if after && t + 1 < sites {
                 self.opening_term(region, l.after, t + 1, xt, marks);
+            }
+            if second && t >= 2 {
+                self.opening_term(region, l.after, t - 2, xt, marks);
             }
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
