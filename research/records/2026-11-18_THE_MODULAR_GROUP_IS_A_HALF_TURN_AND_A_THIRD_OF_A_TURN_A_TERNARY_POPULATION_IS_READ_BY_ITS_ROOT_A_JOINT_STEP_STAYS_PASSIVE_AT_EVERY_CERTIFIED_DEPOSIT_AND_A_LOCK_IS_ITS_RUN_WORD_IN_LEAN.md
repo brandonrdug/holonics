@@ -92,5 +92,5 @@ status. The research library's aggregator imports the seven modules.
 Three workers on disjoint owner paths wrote six of the modules (the free product; the loop curvature and the KT
 split; the joint step, the restitution family and the lock address), and the lead wrote the reduced count and
 the seven replacements. A restart of the host stopped the workers at 23:32; their files were re-checked by the
-lead from the tree (five elaborated clean; two proofs of `LockAddress`, `mediant_gaps` and `lock_kernel`, were
+lead from the tree (four elaborated clean; two proofs of `LockAddress`, `mediant_gaps` and `lock_kernel`, were
 repaired by the lead), and every `L:` owner added to the atlas was read against its module's declarations.
