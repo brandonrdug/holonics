@@ -79,7 +79,12 @@ the tori `C₄ □ C₄` and `C₅ □ C₅`; of "Monodromy as a group of moves"
 ## 4. Receipt
 
 Gate 4, `bash tools/lean_check.sh` on the seven modules by name with the four this change edits
-(`FamilyTunnellShimuraLift`, `FamilyTunnellHeckeIntertwining`, `FamilyWaldspurgerGate`, `EggModular`): RESULT.
+(`FamilyTunnellShimuraLift`, `FamilyTunnellHeckeIntertwining`, `FamilyWaldspurgerGate`, `EggModular`):
+`Build completed successfully (8916 jobs)`, exit 0, no declaration elaborated with `sorry`. Projected under 15
+minutes from the single-file checks, deadline 30 minutes, measured 56 s of wall time on four cores beside two
+workers' checks; peak resident set not read. The restart had emptied the host's file cache, and the first
+single-file checks after it waited about six minutes on reading Mathlib's build from disk (6 GB at 6 to 15 MB/s
+by `vmstat`); a sequential read of every `.olean` into the cache took 37 s and the checks then ran in seconds.
 Single-file checks of each module at the package's pinned toolchain (`leanprover/lean4:v4.33.0`) and Mathlib
 revision on a cloud host, for the reason the first pass's record gives (`agent-inferred`), each read by its exit
 status. The research library's aggregator imports the seven modules.
@@ -87,4 +92,5 @@ status. The research library's aggregator imports the seven modules.
 Three workers on disjoint owner paths wrote six of the modules (the free product; the loop curvature and the KT
 split; the joint step, the restitution family and the lock address), and the lead wrote the reduced count and
 the seven replacements. A restart of the host stopped the workers at 23:32; their files were re-checked by the
-lead from the tree, and every `L:` owner added to the atlas was read against its module's declarations.
+lead from the tree (five elaborated clean; two proofs of `LockAddress`, `mediant_gaps` and `lock_kernel`, were
+repaired by the lead), and every `L:` owner added to the atlas was read against its module's declarations.
