@@ -1275,3 +1275,9 @@ import HolonicsResearch.Mathematics.CharacterTriad
 import HolonicsResearch.Compression.SymbolWord
 import HolonicsResearch.HNN.NearestQuotient
 import HolonicsResearch.Compression.Landmark.NecklaceIntegrality
+import HolonicsResearch.Foundation.MarkovSeparation
+import HolonicsResearch.Aeon.Production.GrowthRate
+import HolonicsResearch.Physics.Spacetime.LorentzCover
+import HolonicsResearch.Physics.Thermal.ManyCell
+import HolonicsResearch.Physics.Wave.GraphCone
+import HolonicsResearch.HNN.HeldStep

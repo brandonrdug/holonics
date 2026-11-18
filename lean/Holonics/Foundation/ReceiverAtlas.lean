@@ -847,9 +847,13 @@ time one suffices at every dimension. The `2n` bound belongs to the **declared-p
 realization up to similarity. What this file proves about that case is
 `markov_truncation`: two generators that already share a characteristic polynomial and whose
 Markov parameters agree at every time below `n` agree at every time — the Cayley–Hamilton
-truncation, with the sharper bound `n`. The full declared-port statement at `2n`, without the
-shared-characteristic hypothesis, is stated as the open `MarkovTwoNSuffices` and is **not** proved:
-it needs the Hankel-matrix rank argument and the Kalman decomposition, neither of which is here.
+truncation, with the sharper bound `n`. The declared-port statement at `2n`, without the
+shared-characteristic hypothesis, is stated here as the `Prop` `MarkovTwoNSuffices` and proved in
+`HolonicsResearch/Foundation/MarkovSeparation` (`markovTwoNSuffices`): the product of the two
+characteristic polynomials annihilates both generators, so one division and Cayley–Hamilton
+suffice, and neither the Hankel rank nor the Kalman decomposition is needed for it. That two
+systems with one response have similar minimal realizations is the stronger statement; it does
+need them and is not proved.
 -/
 
 /-- [definition] An atlas **separates** a declared class when no two distinct members of that class
@@ -997,13 +1001,15 @@ theorem markov_truncation {A A' : Matrix (Fin n) (Fin n) K}
   refine Finset.sum_congr rfl fun i hi => ?_
   rw [h i (Finset.mem_range.mp hi)]
 
-/-- [definition] **Open.** The declared-port statement of realization theory at its classical bound:
-the first `2 n` Markov parameters of two systems of dimension at most `n` determine every later
-one — equivalently, two atlas-indistinguishable systems have similar minimal realizations. It is
-stated here as a `Prop` and **not proved**: it needs the rank of the block Hankel matrix of the
-Markov parameters and the Kalman controllable/observable decomposition, and neither is in this
-file. `markov_truncation` is what *is* proved, under the extra hypothesis of a shared
-characteristic polynomial and with the sharper bound `n`. -/
+/-- [definition; proved in `HolonicsResearch/Foundation/MarkovSeparation`] The declared-port
+statement of realization theory at its classical bound: the first `2 n` Markov parameters of two
+systems of dimension `n` determine every later one. It is stated here as a `Prop`;
+`MarkovSeparation.markovTwoNSuffices` proves it over every field and at every `n`, from the product
+of the two characteristic polynomials, and `two_n_is_least` shows over `ℚ` that `2 n − 1` parameters
+do not suffice at any dimension. `markov_truncation` is the same argument under a shared characteristic
+polynomial, with the sharper bound `n`. The stronger reading, that two systems with one response
+have similar minimal realizations, needs the rank of the block Hankel matrix and the Kalman
+controllable/observable decomposition and is not proved. -/
 def MarkovTwoNSuffices (K : Type) [Field K] (n : ℕ) : Prop :=
   ∀ (m p : ℕ) (L L' : Linearization K n m p),
     (∀ k, k < 2 * n → linearizationMarkov L k = linearizationMarkov L' k) →
