@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,685 records from July 2026 to November 2026. 378 receipts directories: 219 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,686 records from July 2026 to November 2026. 378 receipts directories: 219 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 84 | 94 |
+| [November 2026](#november-2026) | 85 | 94 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -25,6 +25,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-18 [Every place of a passage is compared at its frontier in one forward on the card a one sided context recovers in a lap and what it lacks is the level](2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 - 2026-11-18 [The line flails because a fixed rate deposit tracks an unshuffled moving terrain parts are added and never removed and past configurations were barred by name](2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md)
 - 2026-11-18 [The method rules the card rule and the waiting standard with their occasions as the guide held them before it kept each rules bar reason scope and link](2026-11-18_THE_METHOD_RULES_THE_CARD_RULE_AND_THE_WAITING_STANDARD_WITH_THEIR_OCCASIONS_AS_THE_GUIDE_HELD_THEM_BEFORE_IT_KEPT_EACH_RULES_BAR_REASON_SCOPE_AND_LINK.md)
+- 2026-11-18 [The theorys core stated in Lean rings close at their lcm and carries at their product identity is the modes shared readings and a proof is the orbit of a finite map](2026-11-18_THE_THEORYS_CORE_STATED_IN_LEAN_RINGS_CLOSE_AT_THEIR_LCM_AND_CARRIES_AT_THEIR_PRODUCT_IDENTITY_IS_THE_MODES_SHARED_READINGS_AND_A_PROOF_IS_THE_ORBIT_OF_A_FINITE_MAP.md)
 - 2026-11-18 [The writers frontier is the passages code in place order the line never read it it gains out to hundreds of known places and a share of stretches there trades the fill in reading for it](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md)
 - 2026-11-17 [Athena does not compound nothing binds nothing tempers and one comparison trains every part the plain engine does not take a held sum in ten passes and a part with its own face does](2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)
 - 2026-11-17 [Athena takes held sums whole when she dwells on one world and the line never dwelt](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)

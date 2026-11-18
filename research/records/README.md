@@ -621,6 +621,7 @@ open consequences.
 Read [helical geometry](../../docs/HELICAL_GEOMETRY.md), [the Holon](../../docs/HOLON.md) and, in
 history, [the intrinsic geometric field](https://github.com/brandonrdug/holonics/blob/13f8c734/research/experiments/intrinsic_holonic_flow/README.md).
 
+- [The theory's core stated in Lean (November 18)](2026-11-18_THE_THEORYS_CORE_STATED_IN_LEAN_RINGS_CLOSE_AT_THEIR_LCM_AND_CARRIES_AT_THEIR_PRODUCT_IDENTITY_IS_THE_MODES_SHARED_READINGS_AND_A_PROOF_IS_THE_ORBIT_OF_A_FINITE_MAP.md): ten modules with their atlas rows and the #410 boxes each answers. Rings ticked together close at their least common multiple and a carried cascade at its product (`231` against `2541`), the solenoid chart and its missing return period, identity as the modes' shared relative readings, a code without its key as fair bits, proofs as orbits of a finite map with a finite Hankel rank, the two-way field, four contexts on a cycle, and a temperament's kernel.
 - [Winding, carry, faces and placement generalize the helical pair](2026-09-21_WINDING_CARRY_FACES_AND_PLACEMENT_GENERALIZE_THE_HELICAL_PAIR.md): the general objects behind the unit.
 - [The helical-pair question](2026-09-19_THE_TRIGONOMETRY_OF_A_HELICAL_PAIR_IS_TRIGONOMETRY_OVER_A_TWO_SIDED_ANGLE.md): original synthesis with its later elementary corrections.
 - [The geometric field refines and returns its complete paired current](2026-09-20_THE_GEOMETRIC_FIELD_REFINES_AND_RETURNS_ITS_COMPLETE_PAIRED_CURRENT.md): the prototype's geometric field consumer and its situated-pair moment/phase reuse.
