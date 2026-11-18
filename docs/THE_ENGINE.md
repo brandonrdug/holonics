@@ -226,6 +226,24 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 
 ## 10. What is owed
 
+- **A passage read at its boundary by two streams** (November 18, [the frontier record](../research/records/2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md) §6; the record of the dwell §13). The frontier's code is the passage's code in place order, and a
+  frontier region compares one place for its whole read (atlas `tower.store-frontier-state`). The build that compares every place of
+  a passage at its own frontier in one forward stands so far on the host alone:
+  - built: the known stream (`Sided::Before` in the tick: every site hears only what stands before it; a ruler's forward at `3`,
+    `Constitution::ruler_far`) and its return, checked by the code's difference; the second stream, an open place at every place
+    (`Constitution::strand_faces`), the same bits at every place as the open last place of the region that ends there; the chart's
+    single stream of veiled sources (`Constitution::chart_faces`), kept as a reading (it stands two and a half nats from the state as
+    trained, the two streams half a nat).
+  - owed, in order: the return through both streams as one computation (its references: the code's difference, and the sum over a
+    passage's places of the frontier regions' returns under the known stream); the card's realization and its parity; the mode as a
+    region's own word in place of the ruler's setting, with a word of the pass for stretches read this way; the held read; then the
+    level and the second read's mark made one-sided, which the two streams leave out and which are worth 0.16 nats at the frontier's
+    place.
+  - a choice left open for the return and the card: a second tick written for the open places (the host forward's form), or the
+    tick and its return given each site's place and stream, so the open places are sites of the same batch that share a place with
+    a known site (near field, falloff, skin, strand mate and the circles' scan read by place; the open places heard by no one). The
+    second keeps one tick and one return on both surfaces.
+
 - **A founding law, and a lock that closes** (November 16, [the record](../research/records/2026-11-16_THE_LINK_THAT_SLIPS_IS_THE_LOCK_A_FAR_DIGIT_ARRIVES_AT_A_TENTH_OF_ITSELF_THE_SUMS_LAW_SITS_IN_A_PRODUCT_NO_READING_REACHES_UNTIL_THE_LOCK_CLOSES_AND_A_PART_ENTERS_BY_A_TENSION_READ_ALONG_ITS_CONSUMERS_EQUATION.md)). Every part
   of the engine enters at zero or with drawn operands; the founding law of October 24 (`contact.pool-founding`) stands in a host ruler
   (`tools/tension_ruler.py`) and in `found-crossing`, unused. A lock's temperature is one entry a head and receiver kind (`Loci::temper`),
