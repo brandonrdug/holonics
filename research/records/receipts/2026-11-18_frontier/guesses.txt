@@ -41,3 +41,30 @@ receivers its states name, and a form not kept up loosens in one lap.
   What it does to the guess: part (b) stands as fixed (0.005 to 0.05 above the control with one place open), and that record's lap is
   the reason it may miss high. A cost past 0.05 means the share as built takes more from the two-sided reading than upkeep at a quarter
   of the stretches returns, and the share or the weights are then what is read next, never the frontier's own gain.
+
+Read at 2026-11-18T08:14:12Z, before the next guesses: G-1118-3's lap means (arm F's mean and the control's; the two end states' reads are still on the card).
+  The frontier rows: the control 2.0574, arm F 1.8971, paired -0.1603 (±0.0021), every slice under the control's (books -0.121, code
+  -0.178, science -0.151, web -0.142, wikidata -0.210). One place open: arm F 0.8735 for 0.7727, +0.1008. Whole masks 2.2866 for
+  2.2089, +0.0778. By places known, the control: 2.484 with 8 to 15 known, 2.175 with 32 to 63, 2.019 with 64 to 127, 1.937 with 128 to
+  255, 1.887 with 256 to 511; arm F under it by 0.111, 0.130, 0.148, 0.174, 0.194. The panel one place a read (48 known): the control's
+  end 37%, arm F's end 46%, its mean 48%. The scores are written once the end states are read.
+
+G-1118-4 (2026-11-18T08:14:12Z). The frontier at a full share. From lap 70's end state at rate 12, one lap with every stretch at the frontier (8 of 8),
+read as G-1118-3 was. The lap compares about 377 places a section at the frontier where arm F compared 235.
+  The guess, at the lap's mean against the control's mean: the frontier rows 0.19 to 0.27 under (arm F's 0.16 scaled by less than the
+  count of comparisons); one place open 0.4 to 1.0 above; whole masks 0.4 to 1.2 above. The panel one place a read, 48 known, from its
+  end: 48 to 58% of its words in the lexicon.
+  What it decides. The share. If the full share's frontier gain over arm F's is under 0.03, the keyed states cost the frontier nothing
+  at a quarter of the stretches and they stay; if it is 0.06 or more, the line's laps take the full share and the two-sided readings are
+  read as rulers only.
+
+G-1118-5 (2026-11-18T08:14:12Z). The frontier arm continued. Arm F (6 of 8) trained four more laps from its own end state, each read at its mean.
+  The guess, against the control's lap mean (the control is not continued: its one place open fell 0.0005 a lap from lap 60 to 70):
+  the frontier rows at laps 2, 3, 4, 5: 0.21, 0.25, 0.28, 0.31 under, each within 0.03 (the fall slows as the fifty books' did, a store's
+  lap being about a sixth of a books' pass a slice); one place open at lap 5: 0.14 to 0.24 above; the panel one place a read, 48 known,
+  at lap 5's end: 50 to 60%. The long panel (the store's held documents, 384 known, the whole region known): at every lap its share of
+  words in its slices' lexicons stands above the control's by 8 points or more.
+  What it decides. The projection for the causal read. A frontier comparison costs a region's whole read today (1.3 ms of card), and
+  the store's five slices need tens of laps to meet what the fifty books met in ten passes. If the frontier rows keep falling at these
+  rates, the count that binds is comparisons a site, and the realization that compares every place of a region at its frontier in one
+  read is the next build; if they stall inside three laps, room is what binds and the read of that comes first.
