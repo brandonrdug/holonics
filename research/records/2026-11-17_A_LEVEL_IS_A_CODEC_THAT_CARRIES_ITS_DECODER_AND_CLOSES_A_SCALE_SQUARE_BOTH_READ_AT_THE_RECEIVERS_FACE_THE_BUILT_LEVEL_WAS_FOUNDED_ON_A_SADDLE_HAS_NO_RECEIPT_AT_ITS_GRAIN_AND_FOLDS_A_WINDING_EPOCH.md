@@ -521,9 +521,9 @@ them, a quarter of the places at a time, and redraws it from her face by a keyed
 
 - The guess had the share rise to 84% or more. It falls, and it does not settle: two fifths of the places change at every
   sweep, and the standing symbol's code does not come down.
-- Redrawing each place from the two-sided face is a chain whose resting text is her two-sided field's own writing. The
-  line's writer wrote 51 to 56% on these books, and the refined drafts come to rest there. The boundary's draft held
-  more words than the field that reads better.
+- Redrawing each place from the two-sided face is a chain whose resting text is her two-sided field's own writing. A
+  state trained on these books under the line's kind of comparison wrote 51 to 56% (the dwell record's control), and
+  the refined drafts come to rest near there. The boundary's draft held more words than the field that reads better.
 - A reading of 0.92 nats between true neighbours is 1.18 between neighbours she wrote. What a comparison on true text
   teaches about a place does not carry to a place whose neighbours are her own draws; the record of November 13 on the
   field ringing under its own release read the same thing from the release's side.
