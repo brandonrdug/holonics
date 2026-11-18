@@ -2,7 +2,7 @@
 
 **Status: November 18.** C1 to C4, C6 and C8 (a to d) are read and merged. C5 keeps the kernels' headers. C7 keeps the headers of
 `codec`, `region`, `passage`, `units` and the card's modules, and the dated reasoning in the comments. C8 keeps the timing read of
-`vendor/num-bigint` and `hnn::overture`'s line in #146. C9 was taken on November 18 (its notes under the step). C10 is the PC's, with
+`vendor/num-bigint` and `hnn::overture`'s line in #146; its part e (#995) retired 175 items inside the engine and the card crate. C9 was taken on November 18 (its notes under the step). C10 is the PC's, with
 the sizes restated under it. This plan is the order of one campaign: the repository is reduced to the
 machine that runs, the engine gets one owner cut by object, and its laws are stated once.
 [#603](https://github.com/brandonrdug/holonics/issues/603) carries its boxes, and every commit and
@@ -484,7 +484,8 @@ type is named "Field", and parity, reproduction and timing hold after each.
   step and rates are in `deposit`. The receiver's coupling at temperature one and the width census are objects of their own, so they
   are the modules `coupling` and `census` (agent-inferred: the plan's table put the coupling in `face`, but one file holds one object).
   The keyed modes' copy of the unit grain went with them, `width` holding the one. Gate 1 passed, and gate 3 on lap 17 is equal. Timing was not
-  re-read: the items moved within one crate with their bodies unchanged. Owed to C5: the kernels' headers.
+  re-read: the items moved within one crate with their bodies unchanged. Owed to C5: the kernels' headers. Two types of the card's
+  profile still carry the old word (`FieldTimes`, `FieldProfile` in `hnn/profile.rs`; read November 18), which C5's done condition names.
 
 **C6. The commands** (the PC). `crates/athena` with the live commands by §7's rule; the dispatch,
 `train-field`, its switches and the retired readings leave; `field_pass` leaves. Done when
@@ -583,6 +584,20 @@ holds with the reads' lines.
   passage the line reads, and `holonics_text_terrain.py` with `arithmetic_terrain.py`, the terrain of the Holonics text, the product's
   first subject. The standing tools' tests that gate 1 did not run join it where they read only what they write (the mailbox, the copy
   length, the human messages' fixtures); `test_corpus_passage.py` needs `pyarrow`, which the PC's Python lacks, and stays out of the gate.
+- C8e, read November 18 (#995): D6's test inside the three crates. 175 items that no command, test or kernel reached retired, held at
+  `867430ea6` (2,861 lines): the October driver in `cuda.rs` and `ffi.rs` (121 items), the October launch layouts and the card's own
+  image path in `hnn/card.rs` (29), and 25 readings of scored guesses in the engine, most in `ruler.rs`. They were read two ways, a
+  static inventory and rustc's dead-code analysis of the three crates merged into one binary under athena's `main`. Five atlas owners
+  name them at that commit. The card's `Layout` and `Realization`, which C5's renames were chosen around, left with them; the names
+  chosen then stay (D5). Read beside it, with nothing to retire:
+  - the kernels: every entry of `kernels/field.cu` and `field_cavity.cuh` (117 written out and the eighteen the contact macro makes)
+    is launched by name from a module of the resident;
+  - the commands: the 48 words `athena`'s `main.rs` routes are the words of the engine guide's §7, and §7 names no word that
+    nothing routes;
+  - the tools (C8's last item, read again): 77 files, of which 55 are named by a gate, a guide, a crate or a standing tool. The other
+    22 are host rulers written from November 16 to 18. Ten are called by a run script of the last two days on the PC, ten more are
+    named by the record that used them, and two by neither (`arms_ruler.py`, `frontier_ruler.py`). None is October's, and none
+    retires while its line runs. No guide lists them, so a design finds them by `ls tools/` and their docstrings.
 
 **C9. Position, order and data** (the cloud or the PC; text only).
 - `CONSTRUCTION_STATE.md` holds the position: each line that trains, its commit, its state, its
@@ -625,9 +640,14 @@ holds with the reads' lines.
     canon's README, the records' README (with October's set-aside pieces routed by subject), the lessons of September 29, the
     record of the stores of October 26, AGENTS.md's executor clause, HNN_FORMULA, HOLON and HNN_ATHENA_FOUNDATION.
   - Still C7's: `docs/THE_MACHINE.md` (20 places) and `docs/plans/HNN_ATHENA_FOUNDATION.md` (14) name October owners in text kept
-    as the record of its date; the headers of `athena`'s `main.rs`, `engine-cuda`'s `lib.rs` and `hnn/field.rs`, and
-    `kernels/field_moment.cuh` name `holonics::hnn::tower::field` (a kernel header's comment changes its digest, so it goes with a
-    parity read); about a hundred atlas rows carry a grade outside the README's seven.
+    as the record of its date; `kernels/field_moment.cuh` names `holonics::hnn::tower::field` (a kernel header's comment changes its
+    digest, so it goes with a parity read). The headers of `athena`'s `main.rs`, `engine-cuda`'s `lib.rs` and `hnn/field.rs` were
+    brought to the tree with #995.
+  - The atlas's grades, read November 18: 110 rows carried a grade outside the README's seven. 27 are `measured`, readings of the
+    machine with their record, and the README now declares that grade. 20 carried a status of the October validation queue on Lean
+    owners that stand in the library, and are `formal-checked`. 63 rows of the September and October machines, each with an owner in
+    history, keep the dated status they were written with. `link_check.py atlas` reads the field in gate 1
+    (`ATLAS_GRADES declared=3884 dated=63 broken=0`).
 
 **C10. The close.** C1's reading is run again and its receipt set beside the first; the sizes of §1
 are restated by part; `python3 tools/repo_census.py` reads clean on the PC; #603 is closed by hand
