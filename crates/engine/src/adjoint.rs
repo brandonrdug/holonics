@@ -87,6 +87,14 @@ impl Constitution {
     /// into `g` on each family's natural grain (a face family's `Σ δz` on `2^(−24)`, a material family's `Σ δz x` on
     /// `2^(−40)`), which the reverse's law tests read against the code's difference.
     pub(crate) fn returned(&self, region: &Region, pass: &Forward, g: &mut [i128]) -> Result<()> {
+        // [definition; the lead, November 18] A passage read by two streams returns through the strand's own reverse; read once, its return
+        // stands for both reads where the field reads twice (as a known stream's does, below).
+        if let Some(strand) = pass.strand.as_deref() {
+            for _ in 0..if self.declaration.mark { 2 } else { 1 } {
+                self.strand_returned(region.classes, strand, g)?;
+            }
+            return Ok(());
+        }
         self.returned_with(region, pass, g, None, None, None, None, None, None, None)?;
         // [definition; agent-inferred, November 14, G180] Where the field reads twice both reads are compared: the first read's own return is
         // added beside the second's, and the consumer halves the section's sum once ([`Constitution::read_and_return`]), so the comparison is the two
@@ -95,6 +103,11 @@ impl Constitution {
         // the field leaned on its marks; the field's own placement is kept its honest placement by the passage's comparison.
         if let Some(first) = pass.first.as_deref() {
             self.returned_with(region, first, g, None, None, None, None, None, None, None)?;
+        } else if self.declaration.mark && region.before {
+            // [definition; the lead, November 18; `agent-inferred`] A known stream is read once ([`Region::before`]). In a field that reads twice
+            // its one read stands for both: its return enters the section's sum twice, so the mean the consumer takes is its own covector
+            // at the weight every other region's has. (A ruler's forward at `3` or `4` returns once and is halved with the rest: a reading.)
+            self.returned_with(region, pass, g, None, None, None, None, None, None, None)?;
         }
         Ok(())
     }
@@ -154,6 +167,7 @@ impl Constitution {
         let (plain, circles) = (d.carry_first(), d.carry);
         let c2 = 2 * circles;
         let one_sided = cell.classes.first().is_some_and(|lists| lists.one_sided);
+        let past = cell.classes.first().is_some_and(|lists| lists.past);
         // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s` (§16.34); each site's `b`
         // is one mate's, so each `δb_s` is one term.
         for t in 0..sites {
@@ -161,7 +175,7 @@ impl Constitution {
                 // [the strand's known stream] Where every site hears only what stands before it, an odd contact met no mate.
                 // [the strand's two streams] An open place's mate is the known site before its place, which is then two sites' mate: its
                 // `δb` is the sum of both terms (each released as it stands alone).
-                let mate = if t >= heard { place(t).checked_sub(1).filter(|_| e % 2 == 0) } else { strand_mate(t, e, heard).filter(|_| !one_sided || e % 2 == 0) };
+                let mate = crate::contact::sided_mate(t, e, heard, one_sided, past);
                 let Some(s) = mate else { continue };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
@@ -179,11 +193,12 @@ impl Constitution {
         // coupling's covectors `δq`, `δℓ` and the drive's `δb(t) = κ(t) u` ([`carry_gate_return`]).
         let mut dqh = vec![0i64; sites * c2];
         // [the strand's known stream] A circle scanned from the right stood at rest there, and returns nothing.
-        for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
+        for k in (0..circles).filter(|&k| !one_sided || past || (plain + k) % 2 == 0) {
             let e = plain + k;
             let (mut xr, mut xi) = (0i128, 0i128);
             for step in 0..heard {
-                let t = if e % 2 == 0 { heard - 1 - step } else { step };
+                // (a one-sided stream scans every circle from the left, so its reverse runs from the right)
+                let t = if e % 2 == 0 || one_sided { heard - 1 - step } else { step };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 let (qr, qi) = (cell.qm[t * c2 + k] as i128, cell.qm[t * c2 + circles + k] as i128);
@@ -669,7 +684,8 @@ impl Constitution {
         let l = &self.layout;
         let reaches = self.reaches();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        // (the known stream's region: sided, so the opening's comparison below is the retarded one)
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
@@ -709,12 +725,15 @@ impl Constitution {
         }
         // The known stream's own clocks and moments take every tick's covectors and return once, at the end.
         let mut whole = ClockReturn::new(paced, n, m2);
+        // The open places' moments are read on one clock at every tick (the bare one), so their covectors are summed over the ticks and
+        // return once, as the known stream's do.
+        let mut open_dm = vec![0i128; n * m2];
         let mut ended: Option<ClockReturn> = None;
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let mut r = ClockReturn::new(paced, sites, m2);
             self.tick_return(cell, &mut dx, g, &pass.paces[k], &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, None, None, None, None)?;
             if k > 0 {
-                self.strand_clock_return(&region, &paces, pass, k, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+                self.strand_clock_return(pass, &r, &mut whole, &mut open_dm);
             } else {
                 ended = Some(r);
             }
@@ -737,7 +756,16 @@ impl Constitution {
                 }
             }
         }
-        self.strand_clock_return(&region, &paces, pass, 0, &r, &mut whole, &mut dx, g, &moment_modes, width)?;
+        self.strand_clock_return(pass, &r, &mut whole, &mut open_dm);
+        // The open places' moments: the retarded cavity moments of the known stream on its cavity clocks ([`Constitution::cavity_moments_sided`]),
+        // returned once to the strands' rows before each place and to the clocks.
+        self.cavity_moments_return(&region, &paces, &open_dm, g, &mut whole.gtau, &mut whole.gsig, false)?;
+        // [definition; the lead, November 18] Where the field compares its opening, the strand compares the retarded one at every place (the
+        // opening an open place begins from, [`Constitution::opening_compare_return`] on the known stream's region); its clocks' covectors
+        // join the known stream's, folded into the strides below.
+        if d.opening {
+            self.opening_compare_return(&region, &paces, 0..n, g, &mut whole.gtau, &mut whole.gsig)?;
+        }
         // The known stream's moments (no after row) and its clocks, to its strides and their classes' paces.
         for (k, slot) in whole.dm.iter_mut().enumerate() {
             if !moment_modes[(k % m2) % m] {
@@ -773,56 +801,29 @@ impl Constitution {
         Ok(())
     }
 
-    /// One tick's moments and clocks in the strand's return ([`Constitution::strand_returned`]): `r` holds tick `k`'s covectors over the
-    /// joined sites. The known sites' halves join `whole`. The open places' moments return on the clocks tick `k` ran them on; each open
-    /// place's clock returns to the known site before it and, where the tick's clock was read from the place's face (`k > 0`), to its
-    /// stride, whose covector goes to the paces' rows by the face's shares and through the face into `dx`, the covector of the state the
-    /// face was read off.
-    #[allow(clippy::too_many_arguments)]
-    fn strand_clock_return(&self, region: &Region, paces: &Paces, pass: &StrandForward, k: usize, r: &ClockReturn, whole: &mut ClockReturn, dx: &mut [i64], g: &mut [i128], moment_modes: &[bool], width: usize) -> Result<()> {
-        let d = &self.declaration;
-        let (dw, m) = (d.width, d.complex());
-        let m2 = 2 * m;
+    /// One tick's moments and clocks in the strand's return ([`Constitution::strand_returned`]): `r` holds a tick's covectors over the joined
+    /// sites. The known sites' halves join `whole`; the open places' moments' covectors join `open_dm` (they return once, on the one clock
+    /// every tick read them on); and each open place's clock, the clock of the known site before it and one bare stride, returns to that
+    /// site.
+    fn strand_clock_return(&self, pass: &StrandForward, r: &ClockReturn, whole: &mut ClockReturn, open_dm: &mut [i128]) {
+        let m2 = 2 * self.declaration.complex();
         let n = pass.known;
-        let paced = paces.kappa.len();
-        let l = &self.layout;
         for (slot, &v) in whole.dm.iter_mut().zip(&r.dm[..n * m2]) {
             *slot += v;
         }
-        let open_dm: Vec<i128> = r.dm[n * m2..].iter().enumerate().map(|(i, &v)| if moment_modes[(i % m2) % m] { v } else { 0 }).collect();
-        let (mut rx_tau, mut rx_sig) = (vec![vec![0i128; n]; paced], vec![vec![0i128; n]; paced]);
-        self.retarded_moments_return_at(region, paces, &pass.clocks[k], &open_dm, g, &mut whole.gtau, &mut whole.gsig, &mut rx_tau, &mut rx_sig)?;
-        let mut rates: Vec<Vec<(usize, i128)>> = vec![Vec::new(); if k > 0 { n } else { 0 }];
-        for p in 0..paced {
-            let base = l.pace + p * width;
+        for (slot, &v) in open_dm.iter_mut().zip(&r.dm[n * m2..]) {
+            *slot += v;
+        }
+        for p in 0..whole.gtau.len() {
             for t in 0..n {
                 whole.gtau[p][t] += r.gtau[p][t];
                 whole.gsig[p][t] += r.gsig[p][t];
             }
-            // An open place's clock is the clock of the site before it and its own stride.
             for t in 1..n {
-                let (own_tau, own_sig) = (r.gtau[p][n + t], r.gsig[p][n + t]);
-                whole.gtau[p][t - 1] += own_tau;
-                whole.gsig[p][t - 1] += own_sig;
-                if k > 0 && !pass.reads.is_empty() {
-                    let stride = pass.paces[k].kappa[p][n + t];
-                    let dk = own_tau + rx_tau[p][t] + stride.signum() as i128 * (own_sig + rx_sig[p][t]);
-                    if dk != 0 {
-                        for &(c, w) in &shares(&pass.reads[k - 1][t].face) {
-                            g[base + c as usize] += dk * w as i128;
-                        }
-                        rates[t].push((base, dk));
-                    }
-                }
+                whole.gtau[p][t - 1] += r.gtau[p][n + t];
+                whole.gsig[p][t - 1] += r.gsig[p][n + t];
             }
         }
-        if k > 0 && !pass.reads.is_empty() {
-            let reaches = self.reaches();
-            for (t, rt) in rates.iter().enumerate().filter(|(_, rt)| !rt.is_empty()) {
-                self.blank_return(&pass.reads[k - 1][t], rt, &reaches, g, &mut dx[(n + t) * dw..(n + t + 1) * dw])?;
-            }
-        }
-        Ok(())
     }
 
     /// [`Constitution::returned`], with the contact covector's magnitude by where its pairs lie added into `shares`
@@ -990,7 +991,8 @@ impl Constitution {
                 }
             }
             owed = next_owed;
-            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k) {
+            // [measurement] A forward that did not hear the level (a ruler's at `3` or `4`, a known stream's) returns nothing to it.
+            if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && self.levelled(region)) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;
                 // [measurement; the lead, November 17] The covector at the level's locus, of the state the prolongation wrote, where read.
                 if let Some(out) = at_scale.as_deref_mut() {
@@ -1048,7 +1050,7 @@ impl Constitution {
                 self.opening_return(region, l.before, t - 1, dxt, g, pass.marks.as_deref());
             }
             // [measurement] Under a ruler's `3` the opening read no row of the site after ([`Constitution::open_sided`]).
-            if self.ruler_far != 3 && t + 1 < sites {
+            if !self.sided(region) && t + 1 < sites {
                 self.opening_return(region, l.after, t + 1, dxt, g, pass.marks.as_deref());
             }
         }

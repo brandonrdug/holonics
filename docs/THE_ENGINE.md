@@ -99,7 +99,9 @@ The declaration is the field's head line, read by [`declaration.rs`](../crates/e
 that trains declares `hnn-field-v14m 244 128 4 8 2 128 4 4 3771 4 0 32 0 1 0 1` (lap 17's mean). Each word with the
 part it sizes (CLAUDE.md, Method: a size belongs to its part). From lap 75 the store line's state declares
 `hnn-field-v14x 244 128 4 8 2 128 4 4 3771 4 0 32 10 1 0 1 0 1`: ten crossing triads, and 402,805 entries with the level and the glue
-(253,029, 50,640 and 99,136 at lap 94); this section's table and §5 and §6 below still describe lap 17:
+(253,029, 50,640 and 99,136 at lap 94). Since November 18 the laps that train start again from lap 70's state, the first line above
+with no triad (392,505 entries with the level and the glue), with the frontier's share in its pass (§10). This section's table and §5
+and §6 below still describe lap 17:
 
 | Word | Value | What it sizes |
 |---|---|---|
@@ -228,7 +230,7 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
 
 - **A passage read at its boundary by two streams** (November 18, [the frontier record](../research/records/2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md) §6; the record of the dwell §13). The frontier's code is the passage's code in place order, and a
   frontier region compares one place for its whole read (atlas `tower.store-frontier-state`). The build that compares every place of
-  a passage at its own frontier in one forward stands so far on the host alone:
+  a passage at its own frontier in one forward stands on the host and, since November 18, on the card:
   - built on the host: the known stream (`Sided::Before` in the tick: every site hears only what stands before it; a ruler's forward
     at `3`, `Constitution::ruler_far`) and its return, checked by the code's difference; the two streams read by one tick
     (`Constitution::strand_pass`, `Sided::Strand`: the open places are sites of the known stream's batch, each at the place of the
@@ -239,22 +241,44 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
     tick written for the open places (`Constitution::strand_faces`) is kept as the joined tick's oracle, and the chart's single
     stream of veiled sources (`Constitution::chart_faces`) as a reading (two and a half nats from the state as trained; the two
     streams half a nat).
-  - owed, in order: the card's realization and its parity; the mode as a region's own word in place of the ruler's setting, with a
-    word of the pass for stretches read this way and the learner's section taking such a region; the held read; then the level and
-    the second read's mark made one-sided, which the two streams leave out and which are worth 0.16 nats at the frontier's place.
-  - the card's form (read in the kernels, November 18; `agent-inferred` until its parity holds): a passage is two regions of the
-    batch. The known region's sites hear only what stands before them (a mode of the region: the support's and the crowds' side, the
-    class counts, the moments' and the opening's after rows, the strand's odd contacts and the circles from the right). Its open
-    places are a second region of as many open sites whose source side is the known region's (its keys, values and class lists, its
-    mate's `b` at the place before, its circle as it stands at the place), heard by no one. A site's position stays its place in both
-    regions, and a region's block of scores stays its square, so a passage costs two regions' pairs where the host's joined batch
-    would cost four. The open places' covectors on what they heard land on the known region's sites, and a circle's covector takes
-    the open place's term beside the known site's. The open places' clocks, read from their faces after each tick, and their retarded
-    moments on those clocks are the cavity kernels' with no after rows. The host's joined tick is its reference: a row is one
-    receiver's, and a row's sum is the same bits in either layout.
-  - why it is the next build: the frontier's fall under the control is 0.1603 + 0.0458 ln(sections / 3,000) over six laps with
-    the share, a fifth lane of 32 buys nothing there in its first lap, and a frontier comparison costs a region's whole read today
-    (the frontier record §5 and §7).
+  - built on the card (November 18): the known stream, then the second stream.
+    - The known stream is a batch's word (`FieldWords::before`): a support entry and a crowd on the after side meet no site, a still
+      head shares a class's face among its members before the receiver, the opening and the moments read no after row, an odd strand
+      contact has no mate, a circle scanned from the right stays at rest, and a region's first site is a row not computed; the level
+      is unheard and the field reads once. It is the host's forward under a ruler at `3` and, as a region's own word
+      (`Region::before`, atlas `tower.region-known-stream`), a law of the region: a section's known streams run as a second group on
+      the card, each one's return standing for both reads where the field reads twice, and the faces and the training path's words
+      stand in the regions' order. The opening is compared there as the retarded one. Card against host, bit for bit, on four fields
+      read once and twice (`the_known_stream_on_the_card_reads_the_hosts_bits`, 24 cases).
+    - The second stream (`Region::strand`, atlas `tower.region-strand`): a passage is staged as its known stream's sites and then as
+      many open places (`site_place`, `region_heard`), each open place at the place of the known site of its index. A site's near
+      field, falloff, plain frame, strand mate and circle are read by its place; an open place hears the known sites before its place
+      and is heard by no one; its opening is the retarded cavity opening and its moment the known stream's retarded cavity moment of
+      its place, so the cavity's forward and return (cut out of the opening's comparison) serve it whole; its clock is the clock of
+      the known site before it and one bare stride at every tick, never read again from its own face (worth 0.004 to 0.013 nats at
+      the frontier on the ruler's 800 rows, which is what the simpler form costs). Its moments' covectors are summed over the ticks
+      and returned once, its clock's covector goes to the site before it, a known site's drive takes both of its mates' terms, and a
+      circle's covector takes the open place's term beside the known site's. Card against host (`Constitution::strand_pass`,
+      `strand_returned`), bit for bit, on four fields read once and twice, passages of 2 to 300 places alone and in sections beside
+      regions of the law and known streams (`a_passage_read_by_two_streams_on_the_card_reads_the_hosts_bits`, 16 cases, first run).
+    - The pass carries either for the frontier's stretches (`frontier E before`, `frontier E strand`; `StorePass::before`,
+      `StorePass::strand`, set by `set-frontier`); a stretch read by two streams counts its card sites in the section's bounds. The held
+      read writes the frontier's rows read each way (`K` and `S` rows, where the pass says so or on the word `known`), and the
+      one-place writer writes a state in the regime its pass names (by two streams: the known places and one more site, the face read
+      at the open place of that last place).
+    - The strand's odd contacts facing the past (`Region::past`, atlas `tower.region-past`; the batch's word `FieldWords::before = 2`;
+      the pass's words `frontier E strand past` and `frontier E before past`): in a one-sided region an odd plain contact's mate is the
+      known site two before the place and a circle of odd contact is scanned from the left, where unset the one has no mate and the
+      other rests. Why: on the two-stream line's state the plain contacts carry 0.99 nats to the frontier and the circles 0.46
+      (`read-far` at `8` and `7`), and half of each stood idle. Card against host on the same four fields, first run: the strands'
+      test with a section of strands facing the past (24 cases) and the known stream at `9`. Whether the line carries the word is
+      G-1118-15's read.
+  - owed, in order: the level made one-sided (a known stream hears none, and on the line's state of November 18 the level is worth
+    0.21 nats at the frontier where the second read is worth 0.001: `read-far`'s settings `4` and `5`); a writer that keeps the known
+    stream's states and reads one new place a symbol; the second read's mark is left out for good unless a reading asks for it.
+  - why it was built: the frontier's fall under the control is 0.1603 + 0.0458 ln(sections / 3,000) over six laps with the share, a
+    fifth lane of 32 buys nothing there in its first lap, and a frontier comparison cost a region's whole read (the frontier record
+    §5 and §7).
 
 - **A founding law, and a lock that closes** (November 16, [the record](../research/records/2026-11-16_THE_LINK_THAT_SLIPS_IS_THE_LOCK_A_FAR_DIGIT_ARRIVES_AT_A_TENTH_OF_ITSELF_THE_SUMS_LAW_SITS_IN_A_PRODUCT_NO_READING_REACHES_UNTIL_THE_LOCK_CLOSES_AND_A_PART_ENTERS_BY_A_TENSION_READ_ALONG_ITS_CONSUMERS_EQUATION.md)). Every part
   of the engine enters at zero or with drawn operands; the founding law of October 24 (`contact.pool-founding`) stands in a host ruler

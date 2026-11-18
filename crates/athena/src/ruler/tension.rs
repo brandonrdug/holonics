@@ -577,7 +577,8 @@ fn keyed_bit(key: &str) -> u64 {
 /// form. Why: a field compared only on the next place of a region that ends there (the trial's rows of a one-place run) is read by the
 /// law's writer in a state it was never compared on, a place with a run of open places to its right, and its first panel came out as
 /// marks (the record of the night's run); this writer meets the compared state place for place. A ruler's writer on a study's states:
-/// the release's law is unchanged.
+/// the release's law is unchanged. [the lead, November 18] A state whose pass reads its frontier as known streams
+/// ([`holonics_engine::field::StorePass::before`]) is written so: each region's known places hear only what stands before them.
 pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
     if args.len() != 13 && args.len() != 14 {
         return Err("write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [WINDOW]".into());
@@ -620,6 +621,12 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
         z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
         z ^ (z >> 31)
     };
+    let known = learner.pass.as_ref().is_some_and(|p| p.before);
+    // [the lead, November 18] A state whose pass reads its frontier by two streams ([`holonics_engine::field::StorePass::strand`]) is
+    // written by them: the region is the known places and one more site holding the void (heard by no one: a known site hears only what
+    // stands before it), and the face read is the open place's at that last place, which hears every known place.
+    let strand = learner.pass.as_ref().is_some_and(|p| p.strand);
+    let past = learner.pass.as_ref().is_some_and(|p| p.past);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
@@ -634,7 +641,11 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
                 classes.push(void);
                 let mut open = vec![false; classes.len()];
                 *open.last_mut().expect("a region of one place or more") = true;
-                OwnedRegion::plain(classes, open)
+                if strand {
+                    let n = classes.len();
+                    return OwnedRegion { strand: true, past, ..OwnedRegion::plain(classes, vec![false; n]) };
+                }
+                OwnedRegion { before: known, past: known && past, ..OwnedRegion::plain(classes, open) }
             })
             .collect();
         let views: Vec<_> = regions.iter().map(view_of).collect();
@@ -676,8 +687,10 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// Why: a read that compares every place of a region at its own frontier needs a second, open place at every place; what that place must
 /// hear far (every site before it, or a few crowds) sets the read's cost, and this reads it before the read is built.
 pub fn read_far(args: &[String]) -> Result<()> {
-    if args.len() != 11 {
-        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA".into());
+    let only = args.len() == 12 && args[11] == "strand";
+    let level = args.len() == 12 && args[11] == "level";
+    if args.len() != 11 && !only && !level {
+        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA [strand | level]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-far")?;
@@ -709,8 +722,22 @@ pub fn read_far(args: &[String]) -> Result<()> {
         return Err("no row".into());
     }
     let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
-    for far in 0..5u8 {
-        learner.field.ruler_far = far;
+    // [the lead, November 18] A last pair of lines reads the law (printed as far=10) and the known stream (far=13) with the open place's
+    // clock left bare at every tick (`Constitution::bare_stretch`): what its re-read from its own face is worth at the frontier.
+    // [the lead, November 18] The lines far=7 and far=8 read the known stream with its carry circles at rest and with its plain strand
+    // contacts unmet: what the strand's own contacts carry to the frontier. The line far=9 reads it with its odd contacts and its circles
+    // from the right facing the past (`Region::past`). A last word `strand` reads these three and the known stream alone.
+    // [the lead, November 18] A last word `level` reads by which path the level reaches the frontier ([`Constitution::ruler_level`]): the
+    // law's hearing in one read without the level and with it (far=4, far=5); with no open place taking a prolonged row (far=21), every
+    // place reading the epoch before its own (far=22), the open places alone doing so (far=23); the known stream (far=3), with the level
+    // made one-sided as designed (far=24) and with the law's level over its ticks (far=25).
+    for setting in if only { vec![3u8, 7, 8, 9] } else if level { vec![4u8, 5, 21, 22, 23, 3, 24, 25] } else { vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 10, 13] } {
+        let far = setting;
+        (learner.field.ruler_far, learner.field.ruler_level, learner.field.bare_stretch) = match setting {
+            21..=23 => (5, setting - 20, false),
+            24 | 25 => (3, setting - 20, false),
+            s => (s % 10, 0, s >= 10),
+        };
         let mut groups: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         // (a few hundred regions a call, so no call holds every region's forward at once)
         for chunk in rows.chunks(256) {

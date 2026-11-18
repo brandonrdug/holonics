@@ -23,18 +23,24 @@ pub struct OwnedRegion {
     pub window: bool,
     /// Whether its port compares its open places on their letters off the void ([`holonics::hnn::tower::field::Port::letters`]).
     pub letters: bool,
+    /// Whether it is read as a known stream ([`Region::before`]).
+    pub before: bool,
+    /// Whether it is read by two streams ([`Region::strand`]).
+    pub strand: bool,
+    /// Whether its odd strand contacts and its circles from the right face the past ([`Region::past`]).
+    pub past: bool,
 }
 
 impl OwnedRegion {
     /// A region carrying no face and no lock.
     pub fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, before: false, strand: false, past: false }
     }
 }
 
 /// A region as the field reads it.
 pub fn view_of(region: &OwnedRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }) }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }), before: region.before, strand: region.strand, past: region.past }
 }
 
 /// The regions as the field reads them.
@@ -81,6 +87,31 @@ pub struct Region<'a> {
     /// cells, never the void) by the coupling at temperature one ([`crate::coupling::coupling_code`]), an
     /// unused place writing `void`. `None` where every open site is compared at its own place.
     pub port: Option<Port<'a>>,
+    /// [definition; the lead, November 18, the frontier record §6; `agent-inferred`] **A region read as a known stream**: every site hears only
+    /// what stands before it (the tick under [`crate::contact::Sided::Before`]: the support's and the crowds' side, a still head's class count,
+    /// the opening's and the moments' after rows, the odd strand contacts, the circles from the right; the region's first site meets no
+    /// source), the level is not heard, the field reads it once, and its opening is compared as the retarded one
+    /// ([`Constitution::cavity_forward_sided`]). A site's state is then a function of the symbols up to its own place, so a place's reading
+    /// stands whatever follows it: the regime a writer is in at its frontier, and the known stream of a passage read by two streams
+    /// ([`Constitution::strand_pass`]). Where the field reads twice, the one read stands for both in the section's mean
+    /// ([`Constitution::returned`]). Unset is the law as it stood.
+    pub before: bool,
+    /// [definition; the lead, November 18, the frontier record §6; `agent-inferred`] **A passage read by two streams**
+    /// ([`Constitution::strand_pass`]): the region's sites, every one known, are the known stream (each hearing only what stands before
+    /// it, as under [`Region::before`]), and at every place past the first an open place of a second stream reads what stands before it
+    /// and is compared with the symbol there at weight one. Its faces are the open places', one a place (none at the first), so one
+    /// forward compares every place of the passage at its own frontier: the same bits, place for place, as the open last place of the
+    /// region that ends there read as a known stream. The level is not heard and the field reads it once, its return standing for both
+    /// reads where the field reads twice; the opening is compared as the retarded one. Refused where a site is open or carried, or the
+    /// region has a port.
+    pub strand: bool,
+    /// [definition; the lead, November 18, the record of the two streams §9; `agent-inferred`] **The strand's odd contacts face the past**:
+    /// in a region read one-sided ([`Region::before`], [`Region::strand`]) an odd plain contact's mate is the second site before (the two
+    /// nearest places that have arrived are then a site's two mates, as the sites before and after are under the law), and a circle of
+    /// odd contact is scanned from the left with its own gate and drive. Unset, an odd contact has no mate in such a region and its
+    /// circle stays at rest. Why: on the two-stream line's state the plain contacts carry 0.99 nats to the frontier and the circles
+    /// 0.46 (`read-far`'s settings `8` and `7`), and half of each stood idle in a one-sided stream. No meaning on a region of the law.
+    pub past: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
@@ -269,9 +300,31 @@ pub struct Echo {
 
 impl Constitution {
 
+    /// Whether `region` is read with every site hearing only what stands before it: its own word ([`Region::before`]), or a ruler's forward
+    /// at `3` ([`Constitution::ruler_far`]).
+    pub(crate) fn sided(&self, region: &Region) -> bool {
+        region.before || region.strand || matches!(self.ruler_far, 3 | 6 | 7 | 8 | 9)
+    }
+
+    /// Whether `region`'s odd strand contacts and its circles from the right face the past ([`Region::past`]): its own word on a region
+    /// read one-sided, or a ruler's forward at `9`.
+    pub(crate) fn past(&self, region: &Region) -> bool {
+        (region.past && (region.before || region.strand)) || self.ruler_far == 9
+    }
+
+    /// Whether `region`'s forward hears the level: a field with one, read under the law or a ruler's forward at `5`, the region no known
+    /// stream; or a ruler's known stream that hears a level ([`Constitution::ruler_level`] at `4` or `5`).
+    pub(crate) fn levelled(&self, region: &Region) -> bool {
+        self.scale.is_some() && !region.before && !region.strand && (self.ruler_far < 3 || self.ruler_far == 5 || (self.ruler_far == 3 && self.ruler_level >= 4))
+    }
+
     pub(crate) fn admit_region(&self, region: &Region) -> Result<()> {
         if region.classes.len() != region.unresolved.len() || region.classes.len() < 2 {
             return refuse("a region needs one class and one resolution a site, and two sites to meet");
+        }
+        // A triad's third leg is read at the site after (`triad_products`), which a known stream's site has not met; no one-sided triad is built.
+        if self.sided(region) && self.declaration.triads > 0 {
+            return refuse("a known stream on a field with triads, whose third leg is the site after");
         }
         if region.classes.len() > self.declaration.reach {
             return refuse("a region past the field's reach, where its frames would repeat");

@@ -431,6 +431,20 @@ impl<'c> Resident<'c> {
         self.transposed(words, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, false)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+        // [definition; the lead, November 18, the frontier record §6] **The open places' moments return** (the host's `strand_returned`): an
+        // open place read the known stream's retarded cavity moment of its place at every tick and in its opening, so its moments' covector,
+        // summed over them, is that cavity moment's: taken to the place's known site in a buffer of its own (`field_twin_take_wide`, which
+        // leaves the known stream's own covector in `dm`), returned once through the cavity's return on the forward the batch kept
+        // (`Resident::strand_cavity`), into `g` and the base clock's covectors.
+        let strand_cavity = self.strand_cavity.borrow_mut().take();
+        let twin_dm = if words.region_heard != 0 {
+            let taken = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+            let (mut sp, mut tp, mut stride) = (dm.device_ptr(), taken.device_ptr(), m2 as u32);
+            self.launch("field_twin_take_wide", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut tp), arg(&mut stride)])?;
+            Some(taken)
+        } else {
+            None
+        };
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks that read one clock,
         // through the strands to the families on that clock (the host's `moments_return`); then the clocks return to
         // their paces (§16, §16.16): `δκ` by suffix sums, then `δc[u] += Σ_(u_t = u) δκ_t` on the class sheet, a blank's by
@@ -440,6 +454,17 @@ impl<'c> Resident<'c> {
             set_clock(words, None, base_clock);
             (words.gtau, words.gsig) = (gtp, gsp);
             self.moments_return_at(field, words, g, dmp, regions, sites)?;
+            if let Some(taken) = twin_dm.as_ref() {
+                let cavity = strand_cavity.as_ref().ok_or(TowerError::Refused("a strand batch's reverse without its cavity's forward"))?;
+                if let Some(k) = cavity.keep.as_ref() {
+                    self.cavity_back(field, words, k, &cavity.sb, &cavity.sa, taken, g, sites)?;
+                }
+                // An open place's clock is the clock of the known site before it and one bare stride: its covector is that site's.
+                if paced > 0 {
+                    let (mut tp, mut sp) = (gtp, gsp);
+                    self.launch("field_twin_clock_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut tp), arg(&mut sp)])?;
+                }
+            }
             if paced > 0 {
                 // [P58 item 2] Unzeroed, as each tick's: `field_pace_kappa_back` writes every word before `field_pace_c_back` reads it.
                 let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
@@ -462,8 +487,26 @@ impl<'c> Resident<'c> {
             (from..to).map(|k| (mix_class[k] as usize, t, mix_share[k])).collect()
         };
         let own: Vec<(usize, u32, u32)> = (0..sites).flat_map(|t| terms(t, t as u32)).collect();
-        let before: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| site_pos[t] > 0).flat_map(|t| terms(t - 1, t as u32)).collect();
-        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
+        // [the strand's two streams] The site whose row an opening's `E₋` read: the site before it, and for an open place of a strand's second
+        // stream the known site before its place (`field_open`); none at a region's first site or the first place.
+        let heard = self.strand_heard.borrow().clone();
+        let mut region_of = Vec::with_capacity(sites);
+        let mut at_region = usize::MAX;
+        for &p in site_pos.iter().take(sites) {
+            if p == 0 {
+                at_region = at_region.wrapping_add(1);
+            }
+            region_of.push(at_region);
+        }
+        let prev = |t: usize| -> Option<usize> {
+            match heard.get(region_of[t]) {
+                Some(&n) if site_pos[t] >= n => (site_pos[t] > n).then(|| t - n as usize - 1),
+                _ => (site_pos[t] > 0).then(|| t - 1),
+            }
+        };
+        let before: Vec<(usize, u32, u32)> = (0..sites).filter_map(|t| prev(t).map(|s| (s, t))).flat_map(|(s, t)| terms(s, t as u32)).collect();
+        // [the known stream] No after row was read (`FieldWords::before`), and none takes a covector.
+        let after: Vec<(usize, u32, u32)> = (0..sites).filter(|&t| words.before == 0 && t + 1 < sites && site_pos[t + 1] > 0).flat_map(|t| terms(t + 1, t as u32)).collect();
         for (base, rows) in [(words.enc, own), (words.enc_before, before), (words.enc_after, after)] {
             let (rows_sites, rows_shares, segments) = encoding_partition(&rows, a + 1);
             let count = (segments.len() / 3) as u32;

@@ -18,6 +18,38 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
+## Where the work stands (November 18, 15:58 UTC): every place of a stretch is compared at its frontier, on the card
+
+[The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
+carries it, with its receipts and five guesses fixed before their reads.
+
+**Her writes.** On the long panel (384 held places known, 96 written): the plain line's seventh lap with the frontier's share 52% of
+its words in the lexicon; two laps as known streams 37%; the first lap of two streams 35% from its end and 44% from its lap's mean. On
+the short panel 58%, 38%, 49% and 46%. No state writes a sentence that holds, and the one-sided states write fewer whole words than
+the plain line so far.
+
+**What was built.** A region can be read as a known stream (every site hears only what stands before it) and a passage by two
+streams (the known stream and an open place at every place), as words of the region and of the pass (`frontier E before`,
+`frontier E strand`), on the host and on the card, each held bit for bit against the host (24 and 16 cases). One forward of a stretch
+then compares every place at its own frontier: about 14,300 places a section where a section compared 234, in 258 ms where it took
+366. The held read's rows by two streams take 0.08 s a slice.
+
+**What was read** (nats a place on the held frontier places, at lap means; the plain line's seventh lap reads 1.8044 under the law):
+- as known streams the plain line's state read 1.08 above its own reading under the law; one lap in the regime left 0.28 and a second
+  0.22, and neither cost the fill-in readings;
+- a host ruler prices what the one-sided reading leaves out: the level 0.214, the field's second read 0.001, the open place's clock
+  read again from its face 0.004 to 0.013; after one lap the one-sided reading stands level with the two-sided one without the level;
+- the first lap of two streams fell 0.103 in 775 s, to 1.9238, 0.12 above the plain line, where the known-stream lap before it fell
+  0.059 in 1,099 s;
+- a lap at rate 14 with the step's remainder carried ends 0.040 under a plain lap's end and 0.006 above its own mean, its mean 0.005
+  under the plain one's: the plain line takes it; the two-stream laps keep rate 12 while a lap moves 0.10.
+
+**What runs.** Three more laps of two streams, each read at its mean and written from its mean and its end (G-1118-14).
+
+**What is owed, by its measurement.** The level made one-sided (0.21 at the frontier, which no known stream hears). A writer that
+keeps the known stream's states and reads one new place a symbol. From the audit: the comparison's weights by declaration, the residue
+in the tree, the guides brought to the line as trained.
+
 ## Where the work stands (November 18, 12:45 UTC): the line is compared where it writes
 
 Acting on [the audit of November 18](research/records/2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md),

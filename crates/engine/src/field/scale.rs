@@ -146,6 +146,35 @@ pub fn level_anchors(news: &[i64], section: i64) -> Vec<usize> {
     out
 }
 
+/// [measurement; the lead, November 18, the record of the two streams §10] **The anchors a one-sided stream can name**: a place is a
+/// site where no earlier place within a section of news carries news at least its own (the left half of [`level_isolation`]; what
+/// stands after a place has not arrived). Increasing, the first `0`. A ruler's cut ([`Constitution::ruler_level`] at `4`).
+pub fn level_anchors_before(news: &[i64], section: i64) -> Vec<usize> {
+    if news.is_empty() {
+        return Vec::new();
+    }
+    let mut sum = vec![0i128; news.len() + 1];
+    for (t, &c) in news.iter().enumerate() {
+        sum[t + 1] = sum[t] + c as i128;
+    }
+    let mut out = vec![0usize];
+    let mut stack: Vec<usize> = Vec::new();
+    for t in 0..news.len() {
+        while let Some(&u) = stack.last() {
+            if news[u] >= news[t] {
+                break;
+            }
+            stack.pop();
+        }
+        let left = stack.last().map(|&u| sum[t + 1] - sum[u + 1]);
+        stack.push(t);
+        if t > 0 && left.is_none_or(|r| r >= section as i128) {
+            out.push(t);
+        }
+    }
+    out
+}
+
 /// A region's cut for the level: its epochs' anchors, each place's epoch, each place's harmonics `[t][H]` on `2^(−30)` and the level's
 /// clock on its epochs.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -162,10 +191,15 @@ pub struct LevelCut {
 /// of one turn at `k φ_t`), and the level's clock `τ¹_j = (S_(a_j) − S_(a_0))/σ` on the pace grain, each a nearest quotient of the news's
 /// integer sums by the section (released there, at the pace grain).
 pub fn level_cut(news: &[i64], section: i64, harmonics: usize, pi: i128) -> Result<LevelCut> {
+    level_cut_sided(news, section, harmonics, pi, false)
+}
+
+/// [`level_cut`], or with `before` the cut a one-sided stream can name ([`level_anchors_before`]).
+pub fn level_cut_sided(news: &[i64], section: i64, harmonics: usize, pi: i128, before: bool) -> Result<LevelCut> {
     if section <= 0 || harmonics == 0 {
         return refuse("a level's cut needs a positive section and a harmonic");
     }
-    let anchors = level_anchors(news, section);
+    let anchors = if before { level_anchors_before(news, section) } else { level_anchors(news, section) };
     let n = news.len();
     let mut sum = vec![0i128; n + 1];
     for (t, &c) in news.iter().enumerate() {
@@ -411,7 +445,10 @@ impl Constitution {
     pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let sites = definite.len();
-        let cut = level_cut(news, level_section(self.declaration.alphabet), h, self.pi)?;
+        // [measurement] A ruler's forward ([`Constitution::ruler_level`]): at `4` the cut a one-sided stream can name, the level's ticks
+        // one-sided and every place reading the epoch before its own; at `1` to `3` the prolongation's source alone changes.
+        let rl = self.ruler_level;
+        let cut = level_cut_sided(news, level_section(self.declaration.alphabet), h, self.pi, rl == 4)?;
         let epochs = cut.anchors.len();
         let (a, ab, b, bb, _) = glue_layout(h, d0, d1);
         let g = &s.glue;
@@ -438,7 +475,7 @@ impl Constitution {
         let reaches = s.coarse.reaches();
         for _ in 0..s.coarse.declaration.ticks {
             let mut cell = TickCell::default();
-            s.coarse.tick(&mut x1, &out.definite, &keyed1, &out.paces, &moment, &reaches, None, &mut cell, crate::contact::Sided::Both)?;
+            s.coarse.tick(&mut x1, &out.definite, &keyed1, &out.paces, &moment, &reaches, None, &mut cell, if rl == 4 { crate::contact::Sided::Before { past: false } } else { crate::contact::Sided::Both })?;
             if keep {
                 out.ticks.push(cell);
             }
@@ -453,9 +490,16 @@ impl Constitution {
         if keep {
             out.prolonged = vec![0i64; sites * d0];
         }
+        // The epoch a place reads: its own, or under a ruler the one before it or none ([`Constitution::ruler_level`]).
+        let source = |t: usize, j: usize| match rl {
+            1 if !definite[t] => None,
+            3 if !definite[t] => j.checked_sub(1),
+            2 | 4 => j.checked_sub(1),
+            _ => Some(j),
+        };
         for j in 0..epochs {
             affine(&g[b..bb], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], Some(&g[bb..bb + h * d0]), MATERIAL_BITS, MATERIAL_BITS, &mut v)?;
-            for t in span(j) {
+            for t in (0..sites).filter(|&t| source(t, cut.epoch[t]) == Some(j)) {
                 uncharted(&cut.harmonics[t * h..(t + 1) * h], &v, d0, &mut row)?;
                 for (xv, &r) in x[t * d0..(t + 1) * d0].iter_mut().zip(&row) {
                     *xv = fit64(*xv as i128 + r as i128)?;

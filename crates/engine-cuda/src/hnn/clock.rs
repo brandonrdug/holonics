@@ -259,7 +259,7 @@ impl<'c> Resident<'c> {
 
     /// [definition; theory, November 12, P50 step 1 (G116 a)] **The clock's skins, formed once** (`field_skin_fill`): after the clock is set, every
     /// support pair's and crowd edge's skin of the paced heads where their pace is not plain, read by the lock, the numerators, the rows, the columns
-    /// and the skin's return. The test build first writes `SKIN_UNFILLED` over the store, so a reader of a word no fill formed is refused
+    /// and the skin's return. A debug build, and a test build whose fill is withheld, first writes `SKIN_UNFILLED` over the store, so a reader of a word no fill formed is refused
     /// (`REFUSED_UNFILLED`); a level with no store (no paced head, the packets' plain clocks) forms none.
     pub(crate) fn skin_fill(&self, field: &Constitution, words: &mut Words, sites: usize) -> Result<()> {
         let d = field.declaration;
@@ -267,14 +267,18 @@ impl<'c> Resident<'c> {
         if paced == 0 || words.skin == 0 {
             return Ok(());
         }
-        if cfg!(debug_assertions) {
+        #[cfg(test)]
+        let withheld = self.unfilled.get();
+        #[cfg(not(test))]
+        let withheld = false;
+        // The planted word is written wherever the fill is withheld, whatever the build's profile: a release test build holds the control too.
+        if cfg!(debug_assertions) || withheld {
             let n = d.modes;
             let pair_words = paced * words.skin_entries as usize * n;
             let stream = self.card.stream();
             stream.memset_u32_async(words.skin, u32::MAX, pair_words.max(1)).map_err(|e| device(e.into()))?;
         }
-        #[cfg(test)]
-        if self.unfilled.get() {
+        if withheld {
             return Ok(());
         }
         let mut pc = paced as u32;
@@ -283,7 +287,7 @@ impl<'c> Resident<'c> {
 
     /// [definition; theory, November 12, P50 step 2 (G116 b)] **The clock's phases and skins, formed once** (`field_clock_fill`): after a clock is set,
     /// every moment mode's near phases and skins at every site of a paced head, and its far skins into the crowd edges' store, read by the moments, the
-    /// skinned prefixes, the moments' return and the clocks' covector, and by the contact's crowds. The test build first writes `PHASE_UNFILLED` and
+    /// skinned prefixes, the moments' return and the clocks' covector, and by the contact's crowds. A debug build, and a test build whose fill is withheld, first writes `PHASE_UNFILLED` and
     /// `SKIN_UNFILLED` over the stores, so a reader of a word no fill formed is refused (`REFUSED_UNFILLED`).
     pub(crate) fn clock_fill(&self, field: &Constitution, words: &Words, sites: usize) -> Result<()> {
         let d = field.declaration;
@@ -291,15 +295,18 @@ impl<'c> Resident<'c> {
         if tm == 0 || words.mphase == 0 || words.cskin == 0 {
             return Ok(());
         }
-        if cfg!(debug_assertions) {
+        #[cfg(test)]
+        let withheld = self.unfilled.get();
+        #[cfg(not(test))]
+        let withheld = false;
+        if cfg!(debug_assertions) || withheld {
             let stream = self.card.stream();
             let near = tm * sites * CLOCK_NEAR;
             stream.memset_u32_async(words.mphase, 0x8000_0000, 2 * near).map_err(|e| device(e.into()))?;
             stream.memset_u32_async(words.mskin, u32::MAX, near).map_err(|e| device(e.into()))?;
             stream.memset_u32_async(words.cskin, u32::MAX, (d.paced_heads() * sites * words.slots as usize * d.modes).max(1)).map_err(|e| device(e.into()))?;
         }
-        #[cfg(test)]
-        if self.unfilled.get() {
+        if withheld {
             return Ok(());
         }
         let mut fw = *words;

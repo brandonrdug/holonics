@@ -115,21 +115,38 @@ pub(crate) struct TickCell {
     pub(crate) lock_prev: Vec<Vec<(u32, i64)>>,
 }
 
+/// [§16.34; the strand's two streams; the strand's odd contacts face the past] **A site's mate at plain contact `e`** among `heard` known
+/// sites (site `t ≥ heard` is the open place at place `t − heard`). Under the law ([`strand_mate`]) the site before at an even `e` and the
+/// one after at an odd. In a one-sided stream the site after has not arrived: an even contact's mate is the known site before the place,
+/// and an odd contact's is none, or with `past` the known site two before it (the two nearest places that have arrived).
+pub(crate) fn sided_mate(t: usize, e: usize, heard: usize, one_sided: bool, past: bool) -> Option<usize> {
+    if !one_sided {
+        return if t >= heard { None } else { strand_mate(t, e, heard) };
+    }
+    let back = match (e % 2 == 0, past) {
+        (true, _) => 1,
+        (false, true) => 2,
+        (false, false) => return None,
+    };
+    (if t >= heard { t - heard } else { t }).checked_sub(back)
+}
+
 /// Which side of a receiver its sources stand on ([`Constitution::tick`]): both (the field's law); before it alone with each site
 /// keeping its kind (a ruler's); or the boundary chart's, with the receivers' clocks.
 #[derive(Clone, Copy)]
 pub(crate) enum Sided<'a> {
     Both,
-    Before,
+    /// `past`: the strand's odd contacts and its circles from the right face the past ([`crate::field::Region::past`]).
+    Before { past: bool },
     Chart(&'a Paces),
     /// The strand's two streams in one tick ([`Constitution::strand_pass`]): the first `known` sites are the known stream, each hearing
-    /// only what stands before it; the sites after them are its open places, site `known + t` at place `t`.
-    Strand { known: usize },
+    /// only what stands before it; the sites after them are its open places, site `known + t` at place `t`. `past` as under `Before`.
+    Strand { known: usize, past: bool },
 }
 
 /// [`Constitution::strand_pass`]'s forward: the open places' faces (one a place), and where kept for the return each tick's cell over
-/// the joined sites, the clocks, moments and the open places' clocks it ran on, the faces a later tick's clocks were read from, and the
-/// last states.
+/// the joined sites, the clocks, moments and the open places' clocks it ran on (the same at every tick: an open place's clock is bare),
+/// and the last states.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct StrandForward {
     pub(crate) known: usize,
@@ -138,7 +155,6 @@ pub(crate) struct StrandForward {
     pub(crate) paces: Vec<Paces>,
     pub(crate) moments: Vec<Vec<i64>>,
     pub(crate) clocks: Vec<Vec<(Vec<i64>, Vec<i64>)>>,
-    pub(crate) reads: Vec<Vec<BlankRead>>,
     pub(crate) last: Vec<i64>,
 }
 
@@ -191,6 +207,11 @@ pub struct ClassLists {
     /// ([`Constitution::chart_faces`]): every site is a receiver that listens (an open place at its own time) and a source to the sites
     /// after it, and a receiver's support is the sites before it alone, its near field's and, past it, every one sharply; no crowd.
     pub one_sided: bool,
+    /// [definition; the lead, November 18, the record of the two streams §9] **The strand's odd contacts face the past** in a one-sided
+    /// stream ([`crate::field::Region::past`]): an odd plain contact's mate is the second site before (an even one's the first), and a
+    /// circle of odd contact is scanned from the left as an even one's is. Unset, an odd contact has no mate there and its circle stays
+    /// at rest. Kept with the lists so a tick's return reads what its forward read.
+    pub past: bool,
     /// Whether every site listens as an open place does (the boundary chart). Unset with `one_sided` set, the lists are a ruler's
     /// ([`Constitution::ruler_far`] at `3`): each receiver keeps its kind and hears only what stands before it.
     pub all_listen: bool,
@@ -221,7 +242,7 @@ impl ClassLists {
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
         let twins_from = class.len();
-        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, all_listen: false, twins_from }
+        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, past: false, all_listen: false, twins_from }
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -468,6 +489,9 @@ pub(crate) struct Forward {
     pub(crate) moment: Vec<i64>,
     /// A tower's forward at its split, for the reverse.
     pub(crate) tower: Option<crate::field::scale::ScalePass>,
+    /// [the lead, November 18] The two streams' forward, where the region is a passage read by two streams ([`Region::strand`]): its
+    /// faces are the open places', and its return is the strand's ([`Constitution::strand_returned`]).
+    pub(crate) strand: Option<Box<StrandForward>>,
     /// [measurement; theory, November 11 04:48, G39] The sites whose face covector a return leaves zero (empty: none), a reading of where the deposit's mass lies.
     pub(crate) skip: Vec<bool>,
     /// [definition; agent-inferred, November 14, the ring record §4] The marks this read opened its silent sites on ([`Declaration::mark`]):
@@ -551,10 +575,11 @@ impl Constitution {
     pub(crate) fn tick(&self, x: &mut [i64], definite: &[bool], keyed: &[bool], paces: &Paces, moment: &[i64], reaches: &Reaches, window: Option<&[bool]>, cell: &mut TickCell, sided: Sided) -> Result<()> {
         let (one_sided, boundary, twins_from) = match sided {
             Sided::Both => (false, None, None),
-            Sided::Before => (true, None, None),
+            Sided::Before { .. } => (true, None, None),
             Sided::Chart(rx) => (true, Some(rx), None),
-            Sided::Strand { known } => (true, None, Some(known)),
+            Sided::Strand { known, .. } => (true, None, Some(known)),
         };
+        let past = matches!(sided, Sided::Before { past: true } | Sided::Strand { past: true, .. });
         let receiving = boundary.unwrap_or(paces);
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
@@ -604,7 +629,7 @@ impl Constitution {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
                 let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
                 let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists { far: self.ruler_far, one_sided, all_listen: boundary.is_some(), twins_from: heard, ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
+                ClassLists { far: self.ruler_far, one_sided, past, all_listen: boundary.is_some(), twins_from: heard, ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
             })
             .collect();
         cell.word = q.clone();
@@ -820,7 +845,9 @@ impl Constitution {
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 // [the boundary chart] At a boundary an odd contact's mate, the site after, has not arrived.
                 // [the strand's two streams] An open place's mate is the known site before its place; a known site's is among the known.
-                let mate = if t >= heard { place(t).checked_sub(1).filter(|_| e % 2 == 0) } else { strand_mate(t, e, heard).filter(|_| !one_sided || e % 2 == 0) };
+                let mate = sided_mate(t, e, heard, one_sided, past);
+                // [measurement] A ruler's forward at `8`: no plain contact meets its mate.
+                let mate = mate.filter(|_| self.ruler_far != 8);
                 let (br, bi) = match mate {
                     Some(s) => (cell.b[s * f + e] as i128, cell.b[s * f + half + e] as i128),
                     None => (0, 0),
@@ -856,11 +883,13 @@ impl Constitution {
                 }
             }
             // [the boundary chart] At a boundary a circle scanned from the right brings what has not arrived: it stays at rest.
-            for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
+            // [measurement] A ruler's forward at `7`: every circle stays at rest.
+            for k in (0..circles).filter(|&k| (!one_sided || past || (plain + k) % 2 == 0) && self.ruler_far != 7) {
                 let e = plain + k;
                 let (mut qr, mut qi) = (0i128, 0i128);
                 for step in 0..heard {
-                    let t = if e % 2 == 0 { step } else { heard - 1 - step };
+                    // [the strand's odd contacts face the past] Every circle of a one-sided stream that is scanned is scanned from the left.
+                    let t = if e % 2 == 0 || one_sided { step } else { heard - 1 - step };
                     cell.qm[t * c2 + k] = fit64(qr)?;
                     cell.qm[t * c2 + circles + k] = fit64(qi)?;
                     let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
@@ -915,8 +944,19 @@ impl Constitution {
     /// temporaries for the reverse. [the ring record §4] Where the field reads twice ([`Declaration::mark`]), the first read is this one
     /// with no marks, and the forward returned is the second, each silent site opened on the shares of the face the first gave it.
     pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
-        // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read.
-        if !self.declaration.mark || self.ruler_far >= 3 {
+        // [definition; the lead, November 18] A passage read by two streams ([`Region::strand`]): the forward is the strand's, its faces the
+        // open places' (none at the first place, which has nothing before it).
+        if region.strand {
+            if region.unresolved.iter().any(|&u| u) || region.faces.iter().any(Option::is_some) || region.locked.iter().any(|&l| l) || region.echo.iter().any(Option::is_some) || region.port.is_some() {
+                return refuse("a passage read by two streams whose sites are not all known, or that has a port");
+            }
+            self.admit_region(region)?;
+            let mut strand = self.strand_pass(region.classes, keep, self.past(region))?;
+            let faces: Vec<Option<TowerFace>> = std::mem::take(&mut strand.faces).into_iter().enumerate().map(|(t, f)| (t > 0).then_some(f)).collect();
+            return Ok(Forward { faces, strand: Some(Box::new(strand)), ..Forward::default() });
+        }
+        // [measurement] A ruler's forward at `3` or `4` ([`Constitution::ruler_far`]) is one read, and so is a known stream's ([`Region::before`]).
+        if !self.declaration.mark || matches!(self.ruler_far, 3..=5 | 7..=9) || region.before {
             return self.pass_with(region, keep, None);
         }
         let first = self.pass_with(region, keep, None)?;
@@ -966,7 +1006,7 @@ impl Constitution {
         let paces = self.paces(region)?;
         // [measurement] A ruler's forward ([`Constitution::ruler_far`]): at `3` the moments and the opening read only what stands before a
         // site; at `3` and `4` the level is not heard.
-        let (after, levelled) = (self.ruler_far != 3, self.scale.is_some() && self.ruler_far < 3);
+        let (after, levelled) = (!self.sided(region), self.levelled(region));
         let moment = self.moments_sided(region, &paces, after)?;
         let mut x = self.open_sided(region, &moment, marks, after)?;
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
@@ -1006,7 +1046,7 @@ impl Constitution {
             if self.lock_carry.is_some() {
                 cell.lock_prev = std::mem::take(&mut locks);
             }
-            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, if self.ruler_far == 3 { Sided::Before } else { Sided::Both })?;
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, if self.sided(region) { Sided::Before { past: self.past(region) } } else { Sided::Both })?;
             if self.lock_carry.is_some() {
                 locks = cell.rows.iter().map(|row| row.iter().map(|src| (src.j, src.s)).collect()).collect();
             }
@@ -1154,7 +1194,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false };
         // The known stream, its ticks kept: the forward a ruler reads at `3`.
         let mut stream = self.clone();
         stream.ruler_far = 3;
@@ -1172,30 +1212,14 @@ impl Constitution {
             }
             rx
         };
-        let mut receiving = on(&bare);
-        let (mut y, mut moment) = self.cavity_forward_sided(&region, paces, false)?;
-        // A blank's clock reads its face after each tick but the last (§16.44), unless the stretch's first place runs bare.
-        let rereads = !paces.kappa.is_empty() && (!self.bare_stretch || self.per_blank_clock);
-        let one = 1i128 << PACE_BITS;
-        let width = d.alphabet + 1;
+        let receiving = on(&bare);
+        let (mut y, moment) = self.cavity_forward_sided(&region, paces, false)?;
+        // [definition; the lead, November 18, the readings of 14:30 UTC] An open place runs on the bare clock at every tick: its clock is not
+        // read again from its own face (a blank's is, §16.44). Why: on the line's state trained a lap as known streams the re-read is worth
+        // 0.011 nats at the frontier (the far ruler's 800 rows), and without it the open places' clocks and moments are the cavity's own
+        // at every tick, so the second stream reuses the opening's forward and return whole.
         for k in 0..d.ticks {
             self.twin_tick(&mut y, &fwd.ticks[k], paces, &receiving, &moment, &reaches)?;
-            if rereads && k + 1 < d.ticks {
-                let mut clocks = bare.clone();
-                for t in 1..sites {
-                    let face = shares(&self.face_of(&y[t * dw..(t + 1) * dw], &reaches)?.face);
-                    for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
-                        let Some(p) = paces.row.get(h).copied().flatten() else { continue };
-                        let base = self.layout.pace + p * width;
-                        let rate = release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS);
-                        let stride = one + rate;
-                        clocks[h].0[t] = fit64(paces.tau[p][t - 1] as i128 + stride)?;
-                        clocks[h].1[t] = fit64(paces.sigma[p][t - 1] as i128 + stride.abs())?;
-                    }
-                }
-                receiving = on(&clocks);
-                moment = self.retarded_moments_at(&region, paces, &clocks)?;
-            }
         }
         y.chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect()
     }
@@ -1207,14 +1231,14 @@ impl Constitution {
     /// as [`Constitution::strand_faces`], whose second tick it replaces: the faces are the same bits
     /// (`the_strands_two_streams_in_one_tick_are_the_second_ticks_bits`), so one tick and one return serve both streams, on the host and
     /// on the card. `keep` holds each tick's cell for the return.
-    pub(crate) fn strand_pass(&self, classes: &[usize], keep: bool) -> Result<StrandForward> {
+    pub(crate) fn strand_pass(&self, classes: &[usize], keep: bool, past: bool) -> Result<StrandForward> {
         let d = &self.declaration;
         if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 {
             return refuse("a passage read at its boundary on a field with triads, a junction, depth rings or a closed face");
         }
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false };
         self.admit_region(&region)?;
         let (dw, m2) = (d.width, 2 * d.complex());
         let reaches = self.reaches();
@@ -1240,52 +1264,22 @@ impl Constitution {
             out
         };
         let bare_strides: Vec<Vec<i64>> = (0..d.heads).map(|_| vec![one as i64; n]).collect();
-        let mut clocks = bare.clone();
-        let mut tick_paces = joined(&bare, &bare_strides);
-        let mut moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
+        let clocks = bare.clone();
+        let tick_paces = joined(&bare, &bare_strides);
+        let moment: Vec<i64> = known_moment.iter().chain(&open_moment).copied().collect();
         let definite: Vec<bool> = (0..2 * n).map(|t| t < n).collect();
-        let rereads = !paces.kappa.is_empty() && (!self.bare_stretch || self.per_blank_clock);
-        let width = d.alphabet + 1;
         let mut out = StrandForward { known: n, ..Default::default() };
-        for k in 0..d.ticks {
+        for _ in 0..d.ticks {
             let mut cell = TickCell::default();
             if keep {
                 cell.before = x.clone();
             }
-            self.tick(&mut x, &definite, &definite, &tick_paces, &moment, &reaches, None, &mut cell, Sided::Strand { known: n })?;
+            self.tick(&mut x, &definite, &definite, &tick_paces, &moment, &reaches, None, &mut cell, Sided::Strand { known: n, past })?;
             if keep {
                 cell.after = x.clone();
                 out.paces.push(tick_paces.clone());
                 out.moments.push(moment.clone());
                 out.clocks.push(clocks.clone());
-            }
-            if rereads && k + 1 < d.ticks {
-                // Each open place's clock from its own face (§16.44), as a blank's is.
-                clocks = bare.clone();
-                let mut strides = bare_strides.clone();
-                let mut reads = Vec::with_capacity(n);
-                for t in 0..n {
-                    let read = self.face_of(&x[(n + t) * dw..(n + t + 1) * dw], &reaches)?;
-                    if t > 0 {
-                        let face = shares(&read.face);
-                        for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
-                            let Some(p) = paces.row.get(h).copied().flatten() else { continue };
-                            let base = self.layout.pace + p * width;
-                            let rate = release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS);
-                            let stride = one + rate;
-                            strides[h][t] = fit64(stride)?;
-                            clocks[h].0[t] = fit64(paces.tau[p][t - 1] as i128 + stride)?;
-                            clocks[h].1[t] = fit64(paces.sigma[p][t - 1] as i128 + stride.abs())?;
-                        }
-                    }
-                    reads.push(read);
-                }
-                tick_paces = joined(&clocks, &strides);
-                let open_moment = self.retarded_moments_at(&region, &paces, &clocks)?;
-                moment = known_moment.iter().chain(&open_moment).copied().collect();
-                if keep {
-                    out.reads.push(reads);
-                }
             }
             if keep {
                 out.ticks.push(cell);

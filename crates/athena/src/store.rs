@@ -108,12 +108,14 @@ struct Tally {
 
 impl Tally {
     fn take(&mut self, region: &OwnedRegion, counted: usize) {
-        let n = region.classes.len() as u64;
+        // [the lead, November 18] A passage read by two streams stands on the card as its known stream's sites and as many open places, and
+        // compares every place past its first.
+        let n = region.classes.len() as u64 * if region.strand { 2 } else { 1 };
         self.regions += 1;
         self.sites += n;
         self.domain += counted as u64;
         self.squared += n * n;
-        self.open += region.unresolved.iter().filter(|&&u| u).count() as u64;
+        self.open += if region.strand { region.classes.len().saturating_sub(1) as u64 } else { region.unresolved.iter().filter(|&&u| u).count() as u64 };
     }
 
     fn text(&self) -> String {
@@ -276,7 +278,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0 });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -351,6 +353,8 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         while let Some(drawn) = cut.next() {
             let act = cut.pass.world.as_ref().filter(|w| !drawn.frontier && cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
             let n = drawn.sites() + act.map_or(0, |run| run + REACTION_BOUND);
+            // A stretch read by two streams is staged as its known stream's sites and as many open places: the section's bounds are the card's.
+            let n = if drawn.frontier && cut.pass.strand { 2 * n } else { n };
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
             }
@@ -1564,8 +1568,15 @@ pub fn set_rate(args: &[String]) -> Result<()> {
 /// a writer in place order meets; zero takes the share off. Every other line byte for byte, read back and checked. The share is law and
 /// is carried in the learner's state. It writes a new state.
 pub fn set_frontier(args: &[String]) -> Result<()> {
-    if args.len() != 5 {
-        return Err("set-frontier STATE STATE_SHA EIGHTHS OUT".into());
+    // [the lead, November 18, the frontier record §6] With the word `before` last, the frontier's stretches are read as known streams
+    // ([`holonics_engine::field::StorePass::before`]); without it they are read as the law reads any region.
+    // With the word `strand` last they are read by two streams ([`holonics_engine::field::StorePass::strand`]): every place compared.
+    // A last word `past` after either: their odd strand contacts face the past ([`holonics_engine::field::StorePass::past`]).
+    let past = args.len() == 7 && args[6] == "past";
+    let reading = if args.len() == 6 || past { args.get(5).map(String::as_str) } else { None };
+    let (known, strand) = (reading == Some("before"), reading == Some("strand"));
+    if args.len() != 5 && !known && !strand {
+        return Err("set-frontier STATE STATE_SHA EIGHTHS OUT [before | strand [past]]".into());
     }
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let share: u64 = args[3].parse()?;
@@ -1578,12 +1589,15 @@ pub fn set_frontier(args: &[String]) -> Result<()> {
     }
     let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
     let before = learner.pass.clone().ok_or("a state with no pass line")?;
-    if before.frontier == share {
-        return Err("a state whose frontier share is already that".into());
+    if before.frontier == share && before.before == known && before.strand == strand && before.past == past {
+        return Err("a state whose frontier share and reading are already those".into());
     }
-    let (written, lines, differing) = with_pass(&text, &learner, StorePass { frontier: share, ..before.clone() })?;
+    if (known || strand) && share == 0 {
+        return Err("known streams and two streams read the frontier's stretches: a share of zero has none".into());
+    }
+    let (written, lines, differing) = with_pass(&text, &learner, StorePass { frontier: share, before: known, strand, past, ..before.clone() })?;
     std::fs::write(out, &written)?;
-    println!("SET_FRONTIER share={share} before={} stretches={} slices={} lines={lines} differing_line={differing}", before.frontier, before.stretches, slices_text(&before));
+    println!("SET_FRONTIER share={share} known_streams={known} two_streams={strand} past={past} before={} before_known_streams={} before_two_streams={} stretches={} slices={} lines={lines} differing_line={differing}", before.frontier, before.before, before.strand, before.stretches, slices_text(&before));
     Ok(())
 }
 

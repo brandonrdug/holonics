@@ -540,7 +540,40 @@ struct FieldWords {
     // every site that is not silent; `field_mark_shares`). Null on a first read and on a field that reads once, where no kernel reads a mark.
     uint64_t mark_at;
     const uint32_t *mark_share;
+    // [measurement; the lead, November 18, the frontier record §6] **The known stream** (the host's `Sided::Before`, a ruler's forward at `3`,
+    // `Constitution::ruler_far`): where set, every site of the batch hears only what stands before it. A support entry and a crowd on the after
+    // side meet no site, a still head shares a class's face among its members before the receiver, the opening and the moments read no after
+    // row, a strand contact with the site after has no mate and a circle scanned from the right stays at rest; a region's first site meets no
+    // source (the batch's `computed`). Zero is the law. [the record of the two streams §9] At `2` the strand's odd contacts face the past (the
+    // host's `Region::past`, a ruler's forward at `9`): an odd plain contact's mate is the second site before, and a circle of odd contact is
+    // scanned from the left as an even one's is.
+    uint64_t before;
+    // [definition; the lead, November 18, the frontier record §6] **A passage read by two streams** (the host's `Sided::Strand`, `Region::strand`): a
+    // strand region's sites are its known stream's (the first `region_heard[r]` of them, every one known) and then as many open places, each at
+    // the place of the known site of its index less that count. `site_place[g]` is each site's place (its position where the batch holds no
+    // strand); a site's near field, falloff, plain frame, strand mate and circle are read by its place, an open place hears the known sites
+    // before its place and is heard by no one. Null where the batch holds no strand: then a place is a position and every site is heard.
+    const uint32_t *site_place;
+    const uint32_t *region_heard;
 };
+
+// [the strand's two streams] Site `g`'s place on its passage (`FieldWords::site_place`), its position where the batch holds no strand.
+__device__ __forceinline__ uint32_t place_of(const FieldWords &w, uint64_t g) {
+    return w.site_place ? w.site_place[g] : w.site_pos[g];
+}
+
+// [the strand's two streams] The sites of region `r` that can be heard: its known stream's, every one of its `sites` where it is no strand.
+__device__ __forceinline__ uint32_t heard_of(const FieldWords &w, uint32_t r, uint32_t sites) {
+    return w.region_heard ? w.region_heard[r] : sites;
+}
+
+// [the strand's two streams] An open place of a strand's second stream: a site past its region's known stream.
+__device__ __forceinline__ bool twin_site(const FieldWords &w, uint64_t g) {
+    if (!w.region_heard) {
+        return false;
+    }
+    return w.site_pos[g] >= w.region_heard[w.site_region[g]];
+}
 
 // [definition; agent-inferred, November 2] **A head's pace index** (§16, `Constitution::paces`): the heads that carry a moment
 // (a turned ring set) in order, `−1` for the rest.
@@ -577,7 +610,7 @@ __device__ __forceinline__ void frame_of(const FieldWords &w, uint64_t g, uint32
         *ui = w.pframe[2 * at + 1];
         return;
     }
-    const uint32_t place = w.site_pos[g];
+    const uint32_t place = place_of(w, g);
     const uint32_t slot = l * (w.frames - w.still) + set - w.still;
     const uint64_t at = w.ring_off[slot] + place % w.ring_n[slot];
     *ur = w.phasor[2 * at];
@@ -609,6 +642,7 @@ __device__ __forceinline__ bool skipped_row(const FieldWords &w, uint64_t g) {
 __device__ __forceinline__ bool definite_site(const FieldWords &w, uint64_t g) {
     return w.definite[g] != 0;
 }
+
 
 // A head of a still ring set (its modes unframed): carrying no skin (`Constitution::decay` is `(1, 0)`).
 __device__ __forceinline__ bool still_head(const FieldWords &w, uint32_t h) {
@@ -1120,13 +1154,98 @@ extern "C" __global__ void field_open(FieldWords w) {
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / w.D, i = c % w.D;
         int64_t x = opening_term(w, w.enc, t, i) + mark_term(w, w.enc, 0, t, i);
-        if (w.site_pos[t] > 0) {
+        if (twin_site(w, t)) {
+            // [the strand's two streams] An open place's opening is the retarded cavity opening `E(∗) + E₋(u_(place − 1))`: the row of the
+            // known site before its place (the host's `Constitution::cavity_forward_sided`); the moment's chart joins it on the place's
+            // retarded moment (`field_twin_moment`).
+            if (place_of(w, t) > 0) {
+                x += opening_term(w, w.enc_before, t - w.region_heard[w.site_region[t]] - 1, i);
+            }
+        } else if (w.site_pos[t] > 0) {
             x += opening_term(w, w.enc_before, t - 1, i) + mark_term(w, w.enc_before, 1, t - 1, i);
         }
-        if (t + 1 < w.T && w.site_pos[t + 1] > 0) {
+        // [the known stream] The site after has not arrived: its row is not read.
+        if (!w.before && t + 1 < w.T && w.site_pos[t + 1] > 0) {
             x += opening_term(w, w.enc_after, t + 1, i) + mark_term(w, w.enc_after, 2, t + 1, i);
         }
         w.x[c] = x;
+    }
+}
+
+// [definition; the lead, November 18, the frontier record §6] **The open places' clocks** (the host's `Constitution::cavity_clocks`, the clocks
+// `Constitution::strand_pass` runs its second stream on at every tick): at an open place of a strand's second stream the rate is one bare
+// stride and the clock is the clock of the known site before its place and that stride, `τ = τ_(place − 1) + 1`, `σ = σ_(place − 1) + 1`,
+// zero at the first place. Launched after `field_paces` (which scans the known stream's sites, the region's first) and before the frames,
+// the skins' addresses and the clock's fills. One thread a paced head and site; a site that is no open place is left as it stands.
+extern "C" __global__ void field_twin_clocks(FieldWords w) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    const wide one = (wide)1 << PACE_BITS;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t g = c % w.T;
+        if (!twin_site(w, g)) {
+            continue;
+        }
+        const uint64_t at = c;
+        w.kappa[at] = (int64_t)one;
+        if (place_of(w, g) == 0) {
+            w.tau[at] = 0;
+            w.sigma[at] = 0;
+        } else {
+            const uint64_t from = at - w.region_heard[w.site_region[g]] - 1;
+            w.tau[at] = fit64((wide)w.tau[from] + one, w.status);
+            w.sigma[at] = fit64((wide)w.sigma[from] + one, w.status);
+        }
+    }
+}
+
+// [definition; the lead, November 18, the frontier record §6] **The open places' moments**: an open place reads the retarded cavity moment of
+// its place (the known stream's cavity moment there, formed with no after row: `field_cavity_moment_all` under `FieldWords::before`), in the
+// pass's moments `[t][2M]` where its opening's chart and its ticks read it. One thread a word; a site that is no open place is left.
+extern "C" __global__ void field_twin_moment(FieldWords w, const int64_t *cmoment) {
+    const uint64_t cells = (uint64_t)w.T * w.M2;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / w.M2;
+        if (!twin_site(w, t)) {
+            continue;
+        }
+        w.moment[c] = cmoment[c - (uint64_t)w.region_heard[w.site_region[t]] * w.M2];
+    }
+}
+
+// [definition; the lead, November 18] **The open places' moment covectors, taken to their places**: `dst[known site of the place] += src[open
+// place]` over `stride` words a site, and the open place's words set to zero, so what stays in `src` is the known stream's own. One thread a
+// word; each known site's word is written by the one open place at its place.
+extern "C" __global__ void field_twin_take_wide(FieldWords w, wide *src, wide *dst, uint32_t stride) {
+    const uint64_t cells = (uint64_t)w.T * stride;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t t = c / stride;
+        if (!twin_site(w, t)) {
+            continue;
+        }
+        const uint64_t to = c - (uint64_t)w.region_heard[w.site_region[t]] * stride;
+        dst[to] += src[c];
+        src[c] = 0;
+    }
+}
+
+// [definition; the lead, November 18] **An open place's clock returns to the known site before it** (the host's `strand_clock_return`): its
+// clock is that site's and one bare stride, so its covectors `gtau`, `gsig` (`[p][T]`, 128 bits) are added at that site and set to zero at
+// the open place; an open place at the first place has no site before it and its clock is zero, so its covector is dropped. One thread a
+// paced head and site; each known site's word is written by the one open place after it.
+extern "C" __global__ void field_twin_clock_back(FieldWords w, wide *gtau, wide *gsig) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint64_t g = c % w.T;
+        if (!twin_site(w, g)) {
+            continue;
+        }
+        if (place_of(w, g) > 0) {
+            const uint64_t to = c - w.region_heard[w.site_region[g]] - 1;
+            gtau[to] += gtau[c];
+            gsig[to] += gsig[c];
+        }
+        gtau[c] = 0;
+        gsig[c] = 0;
     }
 }
 
@@ -2683,6 +2802,8 @@ struct RowCls {
     // is keyed, known or carrying a face (§16.20).
     const uint8_t *unres;
     const uint32_t *mixo;
+    // [the known stream] The receiver hears only what stands before it (`FieldWords::before`): an entry whose source stands after it meets no site.
+    uint32_t before;
 };
 
 // A keyed site (§16.20): known, or carrying a face. A site that carries neither has no word to be met by and is
@@ -2703,6 +2824,7 @@ __device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg
         rc.dl = w.dlist + w.dstart[r];
         rc.unres = w.unresolved + w.region_off[r];
         rc.mixo = w.mix_off + w.region_off[r];
+        rc.before = w.before ? 1 : 0;
         const uint32_t pstride = probe_stride(w);
         rc.nc = rc.open ? 0 : w.pn[hg];
         for (uint32_t k = 0; k < rc.nc; k++) {
@@ -2726,12 +2848,16 @@ __device__ __forceinline__ uint32_t row_prepare(const FieldWords &w, uint64_t hg
 __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const uint32_t *off, const RowCls &rc, uint32_t i, uint32_t sites, uint32_t k) {
     if (k < NEAR_SLOTS) {
         const uint32_t d = k / 2 + 1;
-        const uint32_t j = k % 2 == 0 ? (i >= d ? i - d : UINT32_MAX) : (i + d < sites ? i + d : UINT32_MAX);
+        // [the known stream] An odd near entry is the place after the receiver, which has not arrived.
+        const uint32_t j = k % 2 == 0 ? (i >= d ? i - d : UINT32_MAX) : (!rc.before && i + d < sites ? i + d : UINT32_MAX);
         return j != UINT32_MAX && (rc.unres[j] == 0 || rc.mixo[j] != rc.mixo[j + 1]) ? j : UINT32_MAX;
     }
     const uint32_t e = k - NEAR_SLOTS;
     if (rc.open) {
         const uint32_t j = rc.dl[e];
+        if (rc.before && j > i) {
+            return UINT32_MAX;
+        }
         const uint32_t gap = j > i ? j - i : i - j;
         return gap >= NEAR ? j : UINT32_MAX;
     }
@@ -2740,6 +2866,9 @@ __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const ui
         q++;
     }
     const uint32_t j = members[off[2 * rc.cl[q]] + (e - rc.cum[q])];
+    if (rc.before && j > i) {
+        return UINT32_MAX;
+    }
     const uint32_t gap = j > i ? j - i : i - j;
     return gap >= NEAR ? j : UINT32_MAX;
 }
@@ -2750,9 +2879,11 @@ __device__ __forceinline__ uint32_t support_at(const uint32_t *members, const ui
 // `NEAR_SLOTS` plus the runs of its probed classes before `j`'s class (its `pcls` in order; the classes are distinct, so `j`'s class stands once) plus
 // `j`'s rank in its class's run (the definite members in ascending place, `field_classes`, found by bisection). A pair outside the support is refused.
 __device__ __forceinline__ uint32_t support_entry(const FieldWords &w, uint32_t h, uint32_t r, uint64_t first, const uint32_t *members, const uint32_t *off, uint32_t i, uint32_t j) {
-    const uint32_t gap = j > i ? j - i : i - j;
+    // [the strand's two streams] The receiver's near field is read by its place (`place_of`), its own row by its position `i`.
+    const uint32_t ip = place_of(w, first + i);
+    const uint32_t gap = j > ip ? j - ip : ip - j;
     if (gap < NEAR) {
-        return 2 * (gap - 1) + (j > i ? 1u : 0u);
+        return 2 * (gap - 1) + (j > ip ? 1u : 0u);
     }
     if (!definite_site(w, first + i)) {
         const uint64_t rows1 = (uint64_t)w.T + w.R;
@@ -2787,7 +2918,10 @@ __device__ __forceinline__ uint32_t support_entry(const FieldWords &w, uint32_t 
 // support holds it past the near field (the receivers that probe its key's class, their own probe's class
 // among them, §16.19) and every open site of the region (§15.9: an open receiver hears every definite site). The support is
 // directional: `j` is in `S_i` exactly when `j` is near `i`, or definite and heard by `i`.
-__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, const uint32_t *pmem, const uint32_t *poff, const uint32_t *olist, uint32_t c, uint32_t j, uint32_t sites, uint32_t k) {
+// [the strand's two streams] `sites` are the sites that can be heard (`heard_of`): a near receiver is one of them. An open place of a strand's
+// second stream (a position at or past them) is among the region's open sites, and receives `j` exactly where its place stands after `j`,
+// its near field's places among them (`place_at` gives a position's place; null where the batch holds no strand).
+__device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const uint32_t *off, const uint32_t *pmem, const uint32_t *poff, const uint32_t *olist, uint32_t c, uint32_t j, uint32_t sites, uint32_t k, const uint32_t *place_at) {
     if (k < NEAR_SLOTS) {
         const uint32_t d = k / 2 + 1;
         if (k % 2 == 0) {
@@ -2798,6 +2932,9 @@ __device__ __forceinline__ uint32_t receiver_at(const uint32_t *members, const u
     const uint32_t e = k - NEAR_SLOTS;
     const uint32_t probed = poff[c + 1] - poff[c];
     const uint32_t i = e < probed ? pmem[poff[c] + e] : olist[e - probed];
+    if (place_at != nullptr && i >= sites) {
+        return place_at[i] > j ? i : UINT32_MAX;
+    }
     const uint32_t gap = j > i ? j - i : i - j;
     return gap >= NEAR ? i : UINT32_MAX;
 }
@@ -2809,9 +2946,10 @@ __device__ __forceinline__ uint32_t receiver_len(const uint32_t *off, const uint
 // Receiver `i`'s crowd `slot` in a region of `sites` (the host's `crowd_ranges`, §14.10): octave
 // `level = 2 + ⌊slot/2⌋`, the nearer side first (even slots before `i`, odd after), the places
 // `|i − j| ∈ [max(2^level, NEAR), 2^(level+1) − 1]` within the region. False where the crowd is absent.
-__device__ __forceinline__ bool crowd_at(uint32_t i, uint32_t sites, uint32_t slot, uint32_t *lo, uint32_t *hi, uint32_t *level) {
+// [the known stream] Under `FieldWords::before` a crowd on the after side (an odd slot) has not arrived and is absent.
+__device__ __forceinline__ bool crowd_at(const FieldWords &w, uint32_t i, uint32_t sites, uint32_t slot, uint32_t *lo, uint32_t *hi, uint32_t *level) {
     const uint32_t lv = 2 + slot / 2;
-    if (lv >= 31 || ((uint32_t)1 << lv) >= sites) {
+    if (lv >= 31 || ((uint32_t)1 << lv) >= sites || (w.before && slot % 2 == 1)) {
         return false;
     }
     const uint32_t near = max((uint32_t)1 << lv, (uint32_t)NEAR), far = ((uint32_t)2 << lv) - 1;
@@ -3195,6 +3333,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
@@ -3205,7 +3345,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
         const uint64_t prow0 = (uint64_t)h * rows1 + first + r;
         const wide *swp = w.sw + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
         // The pairs' scores are kept at the region block's dense address `[i][j]` for the contact, which reads
         // them there (a score is computed once; the entries outside the support are never read). On a return
@@ -3228,9 +3368,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
             }
         }
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j != UINT32_MAX) {
-                const uint32_t gap = j > i ? j - i : i - j;
+                const uint32_t gap = j > ip ? j - ip : ip - j;
                 const uint64_t entry = support_row(w, r, i) + k;
                 const int64_t base = eight ? pair_base8(w, h, ai, rows32 + (uint64_t)j * 4, g, entry, gap) : pair_base(w, h, wi, words + (uint64_t)j * S, g, entry, gap);
                 // Conservation of faces (§16.38): a still head reads content at any distance, so its source shares its face's
@@ -3239,7 +3379,22 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
                 uint32_t falloff = (uint32_t)octave(gap);
                 if (still_head(w, h)) {
                     const uint32_t cj = w.cls[(uint64_t)h * w.T + first + j];
-                    const uint32_t count = off[2 * cj + 1] - off[2 * cj];
+                    uint32_t count = off[2 * cj + 1] - off[2 * cj];
+                    if (w.before) {
+                        // [the known stream] The class's face is shared among its definite members before the receiver (the host's
+                        // `ClassLists::class_count`): a site after it has not arrived, and its count would tell the receiver of it. The members
+                        // stand in ascending place, so the count is the partition point at the receiver's place.
+                        uint32_t lo_ = off[2 * cj], hi2 = off[2 * cj + 1];
+                        while (lo_ < hi2) {
+                            const uint32_t mid = (lo_ + hi2) / 2;
+                            if (members[mid] < ip) {
+                                lo_ = mid + 1;
+                            } else {
+                                hi2 = mid;
+                            }
+                        }
+                        count = lo_ - off[2 * cj];
+                    }
                     falloff = (uint32_t)octave(count > 1 ? count : 1);
                 }
                 const int64_t z = scored(w, temper, base, falloff);
@@ -3253,10 +3408,10 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
             }
         }
         uint32_t lo, hi_, lv;
-        if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+        if (lane < nslots && crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
             const uint64_t count = scp[hi_ + 1] - scp[lo];
             if (count != 0) {
-                const int64_t a = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper, g, lo > i) >> FACE_BITS;
+                const int64_t a = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper, g, lo > ip) >> FACE_BITS;
                 amin = a < amin ? a : amin;
                 amax = a > amax ? a : amax;
             }
@@ -3299,13 +3454,15 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_skin_fill(
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         const uint32_t set = h % w.frames - w.still, sets = w.frames - w.still;
         uint32_t *row = w.skin + ((uint64_t)p * w.E2 + support_row(w, r, i)) * n;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j == UINT32_MAX) {
                 continue;
             }
@@ -3417,6 +3574,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
@@ -3428,7 +3587,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
         const int64_t amin = w.amin[hg];
         uint64_t *erow = w.e + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
@@ -3478,7 +3637,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                     // multiplications of both are in flight together; they are then added in rank order.
                     const auto product = [&](uint32_t pos, uint64_t *w0, uint64_t *w1, uint64_t *w2, uint32_t *negative) {
                         const uint32_t j = stj[warp][pos];
-                        const uint32_t gap = j > i ? j - i : i - j;
+                        const uint32_t gap = j > ip ? j - ip : ip - j;
                         const int64_t raw = values[(uint64_t)j * S + entry];
                         // (a head of eight modes reads its skin from the vector table: the eight modes of a gap stand together)
                         const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)pair_skin_word(w, ph, srow + stk[warp][pos], m), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
@@ -3539,12 +3698,12 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
                 Big<L> p;
                 bool neg;
                 if (!crowd) {
-                    const wide v = carried_ij_at(w, h, m, g, srow + stk[warp][jj], j > i ? j - i : i - j, values[(uint64_t)j * S + entry]);
+                    const wide v = carried_ij_at(w, h, m, g, srow + stk[warp][jj], j > ip ? j - ip : ip - j, values[(uint64_t)j * S + entry]);
                     neg = v < 0;
                     p = big_mul<L, false>(cf, mag64((int64_t)v), 0);
                 } else {
                     const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                    const wide v = crowd_carried_wide_ij(w, h, m, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
+                    const wide v = crowd_carried_wide_ij(w, h, m, g, lv, lo > ip, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
                     neg = v < 0;
                     const uwide mag = (uwide)(neg ? -v : v);
                     p = big_mul<L, true>(cf, (uint64_t)mag, (uint64_t)(mag >> 64));
@@ -3562,7 +3721,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         };
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], ip, heard, k) : UINT32_MAX;
             Coef cf = {0, 0, 0};
             uint32_t s = 0;
             uint64_t face = 0;
@@ -3619,11 +3778,11 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         {
             Coef cf = {0, 0, 0};
             uint32_t s = 0, slot = UINT32_MAX, lo = 0, hi_ = 0, lv = 0, sx = 0;
-            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+            if (lane < nslots && crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
                 const uint64_t count = scp[hi_ + 1] - scp[lo];
                 if (count != 0) {
                     slot = lane;
-                    const int64_t z = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper, g, lo > i);
+                    const int64_t z = crowd_score(w, h, wi, swp + (uint64_t)lo * S, swp + (uint64_t)(hi_ + 1) * S, count, lv, temper, g, lo > ip);
                     int64_t a;
                     uint64_t face;
                     term_of(w, z, &a, &face);
@@ -3706,7 +3865,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
         // Pass three: each term's share of the row's mass, once, a lane a term.
         if (store) {
             for (uint32_t k = lane; k < K; k += 32) {
-                const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+                const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
                 if (j != UINT32_MAX) {
                     int64_t a;
                     uint64_t face;
@@ -3793,7 +3952,8 @@ extern "C" __global__ void field_moment_strands_all(FieldWords w, uint64_t base_
         const uint32_t u = c / w.T;
         for (uint32_t part = 0; part < 2; part++) {
             before[(uint64_t)u * 2 * w.T + 2 * t + part] = moment_strand(w, base_before, tm, u, t, part);
-            after[(uint64_t)u * 2 * w.T + 2 * t + part] = moment_strand(w, base_after, tm, u, t, part);
+            // [the known stream] The after rows read as zero (the host's `Constitution::moments_sided`), so every term they carry is absent.
+            after[(uint64_t)u * 2 * w.T + 2 * t + part] = w.before ? 0 : moment_strand(w, base_after, tm, u, t, part);
         }
     }
 }
@@ -3858,7 +4018,8 @@ extern "C" __global__ void field_moment_strand_return_all(FieldWords w, uint64_t
         const uint64_t t = c % w.T;
         const uint32_t u = c / w.T;
         const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
-        for (uint32_t side = 0; side < 2; side++) {
+        // [the known stream] No after row was read, and none takes a covector (the host's `Constitution::moments_return_sided`).
+        for (uint32_t side = 0; side < (w.before ? 1u : 2u); side++) {
             const uint64_t base = side == 0 ? base_before : base_after;
             const wide *d = side == 0 ? d_before : d_after;
             for (uint32_t part = 0; part < 2; part++) {
@@ -3896,6 +4057,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_echo_trips
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
@@ -3903,7 +4066,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_echo_trips
         const uint64_t base = (uint64_t)h * w.E + w.region_eoff[r];
         uwide sum = 0;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j != UINT32_MAX) {
                 const uwide p = w.e[base + (uint64_t)i * sites + j], back = w.e_prev[base + (uint64_t)j * sites + i];
                 sum += (p * back + ((uwide)1 << (SHARE_BITS - 1))) >> SHARE_BITS;
@@ -3937,13 +4100,54 @@ extern "C" __global__ void field_echo_apply(FieldWords w, int64_t *z) {
 // other declaration).
 // [§16.34] Site `g`'s strand mate for pair contact `e` (the host's `strand_mate`): the site before it at an even `e`, the
 // one after at an odd, within its region; `UINT64_MAX` past the region's ends.
+// [the strand's two streams] An open place's mate is the known site before its place (an even `e`; none at an odd), and a known site's is
+// among the known (the host's tick under `Sided::Strand`).
 __device__ __forceinline__ uint64_t strand_mate(const FieldWords &w, uint64_t g, uint64_t e) {
     const uint32_t r = w.site_region[g];
     const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    const uint32_t heard = heard_of(w, r, sites);
+    if (i >= heard) {
+        return e % 2 == 0 && i > heard ? g - heard - 1 : UINT64_MAX;
+    }
     if (e % 2 == 0) {
         return i > 0 ? g - 1 : UINT64_MAX;
     }
-    return i + 1 < sites ? g + 1 : UINT64_MAX;
+    return i + 1 < heard ? g + 1 : UINT64_MAX;
+}
+
+// [the strand's two streams] The open place whose mate known site `g` is at an even contact (the host's `tick_return`: a known site is then
+// two sites' mate): the open place at the place after it, `UINT64_MAX` where the batch holds no strand, `g` is no known site of one, or no
+// place stands after it.
+__device__ __forceinline__ uint64_t strand_twin_after(const FieldWords &w, uint64_t g) {
+    if (!w.region_heard) {
+        return UINT64_MAX;
+    }
+    const uint32_t r = w.site_region[g];
+    const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    const uint32_t heard = w.region_heard[r];
+    return i < heard && heard + i + 1 < sites ? g + heard + 1 : UINT64_MAX;
+}
+
+// [the strand's odd contacts face the past] Site `g`'s mate at an odd contact where the batch's word is `2` (the host's `sided_mate`): the
+// known site two before its place, `UINT64_MAX` where fewer than two stand before it.
+__device__ __forceinline__ uint64_t strand_mate_back2(const FieldWords &w, uint64_t g) {
+    const uint32_t r = w.site_region[g];
+    const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    const uint32_t heard = heard_of(w, r, sites);
+    if (i >= heard) {
+        return i >= heard + 2 ? g - heard - 2 : UINT64_MAX;
+    }
+    return i >= 2 ? g - 2 : UINT64_MAX;
+}
+
+// [the strand's odd contacts face the past] The sites whose odd mate known site `g` is where the batch's word is `2`: the known site two
+// after it (`*p`) and the open place two places after it (`*q`), each `UINT64_MAX` where there is none; an open place is no one's mate.
+__device__ __forceinline__ void strand_after2(const FieldWords &w, uint64_t g, uint64_t *p, uint64_t *q) {
+    const uint32_t r = w.site_region[g];
+    const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    const uint32_t heard = heard_of(w, r, sites);
+    *p = i < heard && i + 2 < heard ? g + 2 : UINT64_MAX;
+    *q = i < heard && heard < sites && heard + i + 2 < sites ? g + heard + 2 : UINT64_MAX;
 }
 
 // The pair contact along the strand (§16.34, the host's tick): `c_g = a_g · b_mate`, zero without a mate, on the plain contacts (the first
@@ -3954,7 +4158,9 @@ extern "C" __global__ void field_pair(FieldWords w) {
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / plain, e = c % plain;
         const uint64_t re = t * w.f + e, im = re + half;
-        const uint64_t s = strand_mate(w, t, e);
+        // [the known stream] An odd contact's mate, the site after, has not arrived (the host's tick under `Sided::Before`); where the odd
+        // contacts face the past its mate is the second site before.
+        const uint64_t s = w.before && e % 2 == 1 ? (w.before == 2 ? strand_mate_back2(w, t) : UINT64_MAX) : strand_mate(w, t, e);
         const wide ar = w.pa[re], ai = w.pa[im];
         const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
         w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
@@ -3974,12 +4180,28 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
     for (uint64_t j = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; j < jobs; j += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = (uint32_t)(j / C);
         const uint64_t k = j % C, e = plain + k;
-        const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
+        const uint64_t first = w.region_off[r], all = w.region_off[r + 1] - first;
+        // [the strand's two streams] The circle is scanned over the known stream's sites; an open place reads it as it stands at its place and
+        // drives nothing (the host's tick under `Sided::Strand`). `sites` are the scanned ones, every site where the region is no strand.
+        const uint64_t sites = heard_of(w, r, (uint32_t)all);
         // [realization; theory, November 16 05:40Z] The chain carries `Q` alone. The face's read `p = a Q(t∓1)` is never read back on it, so it is
         // formed after the scan from the operand kept a step (`field_pair_scan_face`), and the step's gate and drive are read a step ahead, so the
         // chain's loads stand in flight behind its products. The same terms on the same operands, the refusals an OR.
         wide qr = 0, qi = 0;
-        const auto at = [&](uint64_t step) -> uint64_t { return first + ((e % 2 == 0) ? step : sites - 1 - step); };
+        // (a one-sided stream scans every circle it scans from the left)
+        const bool left = e % 2 == 0 || w.before != 0;
+        const auto at = [&](uint64_t step) -> uint64_t { return first + (left ? step : sites - 1 - step); };
+        // [the known stream] A circle scanned from the right brings what has not arrived: it stays at rest (the host's tick under `Sided::Before`),
+        // its operand zero at every site, so its face and every covector through it are zero. Where the odd contacts face the past it is
+        // scanned from the left instead.
+        if (w.before == 1 && e % 2 == 1) {
+            for (uint64_t t = 0; t < all; ++t) {
+                const uint64_t gr = (first + t) * c2 + k;
+                w.pqm[gr] = 0;
+                w.pqm[gr + C] = 0;
+            }
+            continue;
+        }
         int64_t yr = 0, yi = 0, kr = 0, ki = 0;
         if (sites != 0) {
             const uint64_t gr = at(0) * c2 + k;
@@ -4004,6 +4226,12 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
             const wide ni = cki + rel(cyr * qi + cyi * qr, MOVE_BITS);
             qr = fit64(nr, w.status);
             qi = fit64(ni, w.status);
+        }
+        // The open places: the operand the known site of their place kept.
+        for (uint64_t t = sites; t < all; ++t) {
+            const uint64_t gr = (first + t) * c2 + k, from = (first + t - sites) * c2 + k;
+            w.pqm[gr] = w.pqm[from];
+            w.pqm[gr + C] = w.pqm[from + C];
         }
     }
 }
@@ -4115,15 +4343,45 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
     for (uint64_t j = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; j < jobs; j += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = (uint32_t)(j / C);
         const uint64_t k = j % C, e = plain + k;
-        const uint64_t first = w.region_off[r], sites = w.region_off[r + 1] - first;
-        const auto at = [&](uint64_t step) -> uint64_t { return first + ((e % 2 == 0) ? sites - 1 - step : step); };
+        const uint64_t first = w.region_off[r], all = w.region_off[r + 1] - first;
+        // [the strand's two streams] The chain runs over the known stream's sites; the open place at a place read the same `Qm(t)`, so its term
+        // of that operand's covector stands beside the known site's (each released as it stands alone, `field_pair_scan_pre`), and it drives
+        // nothing: its drive's covector is zero (the host's `tick_return`).
+        const uint64_t sites = heard_of(w, r, (uint32_t)all);
+        const bool left = e % 2 == 0 || w.before != 0;
+        const auto at = [&](uint64_t step) -> uint64_t { return first + (left ? sites - 1 - step : step); };
+        // The pair's part of `Qm`'s covector at a known site: its own and, where an open place stands at its place, that place's.
+        const auto part = [&](uint64_t site, wide *pr, wide *pi) {
+            const uint64_t gr = site * c2 + k;
+            *pr = dh[gr];
+            *pi = dh[gr + C];
+            if (site - first + sites < all) {
+                const uint64_t tw = (site + sites) * c2 + k;
+                *pr += dh[tw];
+                *pi += dh[tw + C];
+            }
+        };
+        for (uint64_t t = sites; t < all; ++t) {
+            const uint64_t re = (first + t) * w.f + e;
+            db[re] = 0;
+            db[re + half] = 0;
+        }
+        // [the known stream] A circle from the right stayed at rest: its drive takes no covector (the host's `tick_return`), and with `u` zero the gate's
+        // reverse writes zero for its gate and its leak.
+        if (w.before == 1 && e % 2 == 1) {
+            for (uint64_t step = 0; step < sites; ++step) {
+                const uint64_t re = at(step) * w.f + e;
+                db[re] = 0;
+                db[re + half] = 0;
+            }
+            continue;
+        }
         wide xr = 0, xi = 0;
         wide hr = 0, hi = 0;
         int64_t yr = 0, yi = 0;
         if (sites != 0) {
             const uint64_t gr = at(0) * c2 + k;
-            hr = dh[gr];
-            hi = dh[gr + C];
+            part(at(0), &hr, &hi);
             yr = w.pgam[gr];
             yi = w.pgam[gr + C];
         }
@@ -4133,8 +4391,7 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
             const wide chr = hr, chi = hi, cyr = yr, cyi = yi;
             if (step + 1 < sites) {
                 const uint64_t nr = at(step + 1) * c2 + k;
-                hr = dh[nr];
-                hi = dh[nr + C];
+                part(at(step + 1), &hr, &hi);
                 yr = w.pgam[nr];
                 yi = w.pgam[nr + C];
             }
@@ -4519,7 +4776,11 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / plain, e = c % plain;
         const uint64_t re = t * w.f + e, im = re + half;
-        const uint64_t s = strand_mate(w, t, e);
+        // [the known stream] An odd contact met no mate, and returns to none; where the odd contacts face the past its mate is the second
+        // site before, and a known site is the mate of the known site and of the open place two after it.
+        const bool odd_back = w.before == 2 && e % 2 == 1;
+        const bool unmet = w.before == 1 && e % 2 == 1;
+        const uint64_t s = unmet ? UINT64_MAX : (odd_back ? strand_mate_back2(w, t) : strand_mate(w, t, e));
         if (s == UINT64_MAX) {
             da[re] = 0;
             da[im] = 0;
@@ -4530,17 +4791,32 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
             da[im] = fit64(rel(br * gi - bi * gr, FACE_BITS), w.status);
         }
         // The site whose mate `t` is: its mate on the other side of `t`, read from `t` itself.
-        const uint64_t p = strand_mate(w, t, e ^ 1);
-        if (p == UINT64_MAX) {
-            db[re] = 0;
-            db[im] = 0;
-        } else {
+        // [the strand's two streams] A known site is also the mate of the open place after it: its `δb` is the sum of both terms, each
+        // released as it stands alone.
+        uint64_t p = UINT64_MAX, q = UINT64_MAX;
+        if (odd_back) {
+            strand_after2(w, t, &p, &q);
+        } else if (!unmet) {
+            p = twin_site(w, t) ? UINT64_MAX : strand_mate(w, t, e ^ 1);
+            q = e % 2 == 1 ? UINT64_MAX : strand_twin_after(w, t);
+        }
+        wide dbr = 0, dbi = 0;
+        if (p != UINT64_MAX) {
             const uint64_t pre = p * w.f + e, pim = pre + half;
             const wide gr = dc[pre], gi = dc[pim];
             const wide ar = w.pa[pre], ai = w.pa[pim];
-            db[re] = fit64(rel(ar * gr + ai * gi, FACE_BITS), w.status);
-            db[im] = fit64(rel(ar * gi - ai * gr, FACE_BITS), w.status);
+            dbr = rel(ar * gr + ai * gi, FACE_BITS);
+            dbi = rel(ar * gi - ai * gr, FACE_BITS);
         }
+        if (q != UINT64_MAX) {
+            const uint64_t qre = q * w.f + e, qim = qre + half;
+            const wide gr = dc[qre], gi = dc[qim];
+            const wide ar = w.pa[qre], ai = w.pa[qim];
+            dbr = fit64(dbr, w.status) + rel(ar * gr + ai * gi, FACE_BITS);
+            dbi = fit64(dbi, w.status) + rel(ar * gi - ai * gr, FACE_BITS);
+        }
+        db[re] = fit64(dbr, w.status);
+        db[im] = fit64(dbi, w.status);
     }
 }
 
@@ -4709,6 +4985,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         const uint32_t i = w.site_pos[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t c = w.cls[hg];
@@ -4725,7 +5003,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
         const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         // The pair's covector `⟨δỹ_i, D ṽ_j⟩` on `2^(−40)`.
@@ -4771,7 +5049,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         {
             uint64_t count = 0;
             uint32_t lo = 0, hi_ = 0, lv = 0;
-            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+            if (lane < nslots && crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
                 count = scp[hi_ + 1] - scp[lo];
             }
             cnts[warp][lane] = count;
@@ -4787,12 +5065,12 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         // Pass A: the weighted sum of the pairs' and crowds' covectors.
         wide weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j == UINT32_MAX) {
                 continue;
             }
             const wide p = (wide)e[j];
-            const uint32_t gap = j > i ? j - i : i - j;
+            const uint32_t gap = j > ip ? j - ip : ip - j;
             const wide dpj = eight ? pair_dp8(j, k, gap) : pair_dp(j, k, gap);
             dpr[j] = dpj;
             weighted += p * dpj;
@@ -4810,7 +5088,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                 wide term = 0;
                 if (active && jj < nslots && cnts[warp][jj] != 0) {
                     const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                    term = (wide)dye * crowd_carried_wide_hs(w, hs, m, g, lv, lo > i, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
+                    term = (wide)dye * crowd_carried_wide_hs(w, hs, m, g, lv, lo > ip, svp[(uint64_t)(hi_ + 1) * S + entry] - svp[(uint64_t)lo * S + entry]);
                 }
                 term = entries_sum(term, S, parts);
                 if (active && entry == 0 && jj < nslots) {
@@ -4837,7 +5115,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         wide near_ds = 0, far_ds = 0;
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], ip, heard, k) : UINT32_MAX;
             int64_t dsv = 0;
             if (j != UINT32_MAX) {
                 const wide dzj = compare((wide)e[j], dpr[j]);
@@ -4849,7 +5127,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                 dsv = (int64_t)dz;
                 dsr[j] = dsv;
                 const wide mag = dz < 0 ? -dz : dz;
-                if ((j > i ? j - i : i - j) < NEAR) {
+                if ((j > ip ? j - ip : ip - j) < NEAR) {
                     near_ds += mag;
                 } else {
                     far_ds += mag;
@@ -4874,7 +5152,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                         const uint32_t jx = stj[warp][jj];
                         if (jx != UINT32_MAX) {
                             // [P54 step 4] `δs (D ŵ_j)`: the skin and the unit word on 32 bits (their product under `2^61`), then 64 by 64.
-                            sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx), (int64_t)ws[(jj - half) * S + entry]));
+                            sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g, srow + stk[warp][jj], jx > ip ? jx - ip : ip - jx), (int64_t)ws[(jj - half) * S + entry]));
                         }
                     }
                 }
@@ -4886,7 +5164,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         if (cnts[warp][lane] != 0) {
             const wide dzc = compare((wide)w.ce[hg * w.slots + lane], dpcs[warp][lane]);
             const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
-            const int64_t cs = crowd_base_narrow(w, h, w.pq + ((uint64_t)h * w.T + g) * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > i);
+            const int64_t cs = crowd_base_narrow(w, h, w.pq + ((uint64_t)h * w.T + g) * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > ip);
             tacc += rel(dzc * (wide)cs, FACE_BITS);
             const wide dz = rel(temper * dzc, MATERIAL_BITS);
             if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
@@ -4919,7 +5197,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                     continue;
                 }
                 const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                const wide d = crowd_skin_raw_hs(w, hs, m, g, lv, lo > i);
+                const wide d = crowd_skin_raw_hs(w, hs, m, g, lv, lo > ip);
                 const wide dsk = dsks[warp][jj];
                 const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t)lo * S + entry];
                 // [P54 step 4] Where the crowd's summed word is under `2^31`: `D W`, `D ŵ_i` and `D²` on 32 bits (under `2^61`), their
@@ -4940,7 +5218,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
                 }
                 const wide pw = div_nearest_by(prod, cdiv2[warp][jj]);
                 // [P54 step 4] The carried covector `release(D δỹ, 30)` on 64 bits (`carry_d`, under `2^63`), its share's product unsigned by signed.
-                const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_hs(w, hs, m, g, lv, lo > i), dyi[entry]);
+                const int64_t cy = still ? dyi[entry] : carry_d((uint64_t)crowd_skin_hs(w, hs, m, g, lv, lo > ip), dyi[entry]);
                 const wide pv = div_nearest_by(mulu64_128(w.ce[hg * w.slots + jj], cy), cdiv[warp][jj]);
                 // [realization; November 16] The crowd's four ring sums into the difference arrays at its two ends: the four low words first,
                 // so their round trips stand together (the returned low word held 0.077 of the rows' stall samples when each waited alone).
@@ -5018,8 +5296,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 int64_t dsv = 0;
                 uint64_t ev = 0;
                 if (k < K) {
-                    const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, sites, k);
-                    if (i != UINT32_MAX && !skipped_row(w, first + i)) {
+                    const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, heard_of(w, r, sites), k, w.site_place ? w.site_place + first : nullptr);
+                    // [the known stream] A receiver before the source does not hear it (`support_at`): its row holds no entry for it.
+                    if (i != UINT32_MAX && !(w.before && i < j) && !skipped_row(w, first + i)) {
                         const uint64_t at = (uint64_t)i * sites;
                         iv = i;
                         dsv = dsc[at];
@@ -5042,7 +5321,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 // which waited on the probe, held 0.255 of the kernel's stall samples. The same integers in the same order.
                 const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
                 const int64_t dy_i = dyr[(uint64_t)i * S + entry];
-                const uint32_t gap = j > i ? j - i : i - j;
+                // (the pair's distance by the receiver's place: an open place of a strand's second stream stands at its place)
+                const uint32_t ipl = place_of(w, first + i);
+                const uint32_t gap = j > ipl ? j - ipl : ipl - j;
                 // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
                 // whose pace is not plain there, the one row that reads the store.
                 const uint64_t sentry = paced_c && paced_hs(w, hs, first + i) ? support_row(w, r, i) + support_entry(w, h, r, first, members, off, i, j) : 0;
@@ -6238,7 +6519,9 @@ extern "C" __global__ void field_moment_paced_all(const MomentWords *ws, const u
     down += (uint64_t)u * pre_stride;
     for (uint64_t g = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; g < w.T; g += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = w.site_region[g], t = w.site_pos[g];
-        if (!w.ok[r]) {
+        // [the strand's two streams] An open place reads no standing moment (its own is the retarded cavity moment of its place,
+        // `field_twin_moment`): none is formed there.
+        if (!w.ok[r] || twin_site(fw, g)) {
             s[2 * g] = 0;
             s[2 * g + 1] = 0;
             continue;
@@ -6558,6 +6841,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
         const uint32_t r = w.site_region[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first, i = w.site_pos[g];
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
@@ -6574,13 +6859,13 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         // [realization; November 16, the return's source counters] Whether the head's skins read its clock over the receiver's region is the
         // row's (`paced_at(w, h, g)`), so it is read once a row, not at every pair's every mode; the skins are the same words.
         const bool pg = paced_hs(w, hs, g);
         wide own = 0;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j == UINT32_MAX) {
                 continue;
             }
@@ -6589,7 +6874,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
             if (sgn == 0) {
                 continue;
             }
-            const uint32_t gap = j > i ? j - i : i - j;
+            const uint32_t gap = j > ip ? j - ip : ip - j;
             wide at = 0;
             // [P55 step 5] The modes' sums to the source's covector, added on the lane and summed once (a ring sum on `Z/2^128`: the same bits).
             uwide to_source = 0;
@@ -6620,9 +6905,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
         }
         if (lane < nslots) {
             uint32_t lo, hi_, lv;
-            if (crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+            if (crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
                 const uint64_t count = scp[hi_ + 1] - scp[lo];
-                const bool right = lo > i;
+                const bool right = lo > ip;
                 const uint64_t ge = octave_edge(g, lv, right);
                 const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
                 if (count != 0 && sgn != 0) {
@@ -7032,6 +7317,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         const uint32_t i = w.site_pos[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
@@ -7046,7 +7333,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         const wide *swp = w.sw + prow0 * S;
         const wide *svp = w.sv + prow0 * S;
         const uint64_t *scp = w.sc + prow0;
-        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+        const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         const int64_t *sbr = w.sb + (uint64_t)h * w.E + w.region_eoff[r] + (uint64_t)i * sites;
         const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
         // The pair's value row and its skins (pair_dp8's loads), folded.
@@ -7077,7 +7364,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         {
             uint64_t count = 0;
             uint32_t lo = 0, hi_ = 0, lv = 0;
-            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+            if (lane < nslots && crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
                 count = scp[hi_ + 1] ^ scp[lo];
             }
             cnts[warp][lane] = count;
@@ -7089,12 +7376,12 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         // Pass A.
         uint64_t weighted = 0;
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j == UINT32_MAX) {
                 continue;
             }
             const uint64_t p = e[j];
-            const uint32_t gap = j > i ? j - i : i - j;
+            const uint32_t gap = j > ip ? j - ip : ip - j;
             const uint64_t dpj = pair_dp8(j, k, gap);
             dpr[j] = (wide)(dpj ^ p);
             weighted ^= p ^ dpj;
@@ -7103,7 +7390,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
             const uint32_t lo = crlo[warp][lane], hi_ = crhi[warp][lane], lv = crlv[warp][lane];
             uint64_t x = 0;
             for (uint32_t s = 0; s < S; s++) {
-                const wide d = still_h ? (wide)1 : crowd_skin_ij(w, h, s % n, g, lv, lo > i);
+                const wide d = still_h ? (wide)1 : crowd_skin_ij(w, h, s % n, g, lv, lo > ip);
                 x ^= (uint64_t)dyi[s] ^ xw(svp[(uint64_t)(hi_ + 1) * S + s]) ^ xw(svp[(uint64_t)lo * S + s]) ^ (uint64_t)d;
             }
             dpcs[warp][lane] = x;
@@ -7117,7 +7404,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
         uint64_t sum = 0, tacc = 0;
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             const uint32_t k = k0 + lane;
-            const uint32_t j = k < K ? support_at(members, off, rcs[warp], i, sites, k) : UINT32_MAX;
+            const uint32_t j = k < K ? support_at(members, off, rcs[warp], ip, heard, k) : UINT32_MAX;
             int64_t dsv = 0;
             if (j != UINT32_MAX) {
                 const uint64_t x = e[j] ^ xw(dpr[j]) ^ mean;
@@ -7133,7 +7420,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
                 for (uint32_t jj = part; jj < 32; jj += parts) {
                     const uint32_t jx = stj[warp][jj];
                     if (jx != UINT32_MAX) {
-                        sum ^= (uint64_t)dss[warp][jj] ^ (uint64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > i ? jx - i : i - jx) ^ (uint64_t)words[(uint64_t)jx * S + entry];
+                        sum ^= (uint64_t)dss[warp][jj] ^ (uint64_t)skin_raw_at(w, h, m, g, srow + stk[warp][jj], jx > ip ? jx - ip : ip - jx) ^ (uint64_t)words[(uint64_t)jx * S + entry];
                     }
                 }
             }
@@ -7145,7 +7432,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
             const int64_t *wi = w.pq + ((uint64_t)h * w.T + g) * S;
             uint64_t x = w.ce[hg * w.slots + lane] ^ dpcs[warp][lane];
             for (uint32_t l = 0; l < n; l++) {
-                x ^= (uint64_t)wi[l] ^ (uint64_t)wi[n + l] ^ xw(swp[(uint64_t)(chi + 1) * S + l]) ^ xw(swp[(uint64_t)clo * S + l]) ^ xw(swp[(uint64_t)(chi + 1) * S + n + l]) ^ xw(swp[(uint64_t)clo * S + n + l]) ^ (uint64_t)crowd_skin_raw(w, h, l, g, clv, clo > i);
+                x ^= (uint64_t)wi[l] ^ (uint64_t)wi[n + l] ^ xw(swp[(uint64_t)(chi + 1) * S + l]) ^ xw(swp[(uint64_t)clo * S + l]) ^ xw(swp[(uint64_t)(chi + 1) * S + n + l]) ^ xw(swp[(uint64_t)clo * S + n + l]) ^ (uint64_t)crowd_skin_raw(w, h, l, g, clv, clo > ip);
             }
             tacc ^= x;
             dsks[warp][lane] = (int64_t)x;
@@ -7167,13 +7454,13 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 6) field_yard_rows(F
                     continue;
                 }
                 const uint32_t lo = crlo[warp][jj], hi_ = crhi[warp][jj], lv = crlv[warp][jj];
-                const uint64_t d = (uint64_t)crowd_skin_raw(w, h, m, g, lv, lo > i);
+                const uint64_t d = (uint64_t)crowd_skin_raw(w, h, m, g, lv, lo > ip);
                 const uint64_t wsum = xw(swp[(uint64_t)(hi_ + 1) * S + entry]) ^ xw(swp[(uint64_t)lo * S + entry]);
                 const uint64_t pw = (uint64_t)dsks[warp][jj] ^ d ^ wsum ^ (uint64_t)w.pq[((uint64_t)h * w.T + g) * S + entry] ^ count;
                 sum ^= pw;
                 add_wide(cws + (first + r + lo) * S + entry, (wide)pw);
                 add_wide(cws + (first + r + hi_ + 1) * S + entry, -(wide)pw);
-                const uint64_t pv = w.ce[hg * w.slots + jj] ^ (still ? (uint64_t)dyi[entry] : (uint64_t)crowd_carried_ij(w, h, m, g, lv, lo > i, dyi[entry]));
+                const uint64_t pv = w.ce[hg * w.slots + jj] ^ (still ? (uint64_t)dyi[entry] : (uint64_t)crowd_carried_ij(w, h, m, g, lv, lo > ip, dyi[entry]));
                 add_wide(cvs + (first + r + lo) * S + entry, (wide)pv);
                 add_wide(cvs + (first + r + hi_ + 1) * S + entry, -(wide)pv);
             }
@@ -7223,13 +7510,15 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_
         const uint32_t r = w.site_region[g], i = w.site_pos[g];
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
+        // [the strand's two streams] The receiver's place and the sites it can hear (its position and every site where the batch holds no strand).
+        const uint32_t ip = place_of(w, g), heard = heard_of(w, r, sites);
         const uint32_t *members = w.members + (uint64_t)h * w.T + first;
         const uint32_t *off = w.class_off + ((uint64_t)h * w.R + r) * (2 * classes + 1);
         const uint32_t K = row_prepare(w, hg, off, rcs[warp], lane);
         if (kind == 5) {
-            const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(sites);
+            const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
             uint32_t lo, hi_, lv;
-            if (lane < nslots && crowd_at(i, sites, lane, &lo, &hi_, &lv)) {
+            if (lane < nslots && crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
                 const uint64_t v = ((const uint64_t *)arr)[hg * w.slots + lane];
                 atomicAdd(&local[v ? 64 - __clzll((long long)v) : 0], 1u);
             }
@@ -7241,7 +7530,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_yard_bits_
         const uint64_t at = w.region_eoff[r] + (uint64_t)i * sites;
         const uint64_t srow = support_row(w, r, i);
         for (uint32_t k = lane; k < K; k += 32) {
-            const uint32_t j = support_at(members, off, rcs[warp], i, sites, k);
+            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
             if (j == UINT32_MAX) {
                 continue;
             }

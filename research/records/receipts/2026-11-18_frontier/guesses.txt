@@ -221,3 +221,131 @@ Scored (2026-11-18T12:39:34Z), G-1118-9 and G-1118-8 (reads.txt).
   there, and the law fitted on five laps placed the sixth within 0.002. So what binds the frontier at this size is the count of
   places compared, and the realization that compares every place of a region is the lever the readings point at; the sentence I
   wrote after lap 4, that room is what binds, was my rule's inference and this read does not bear it.
+
+G-1118-10 (2026-11-18T12:51:50Z). The deposit's rate as upkeep on the line with the frontier's share. Read before fixing: the cooling laps (from lap
+70, the rate-12 end state read one place open 0.017 above its lap's mean, the rate-14 end 0.003 above, the rate-16 end on it; a cooler
+rate did not move the lap's mean; the panel did not move); arm F5's end read the frontier 0.036 above its lap's mean; a writer writes
+from an end state; the log law gives one more plain lap 0.007 at the mean.
+  The trial. From arm F6's end state: one lap at rate 14 with the step's remainder carried (arm C7), beside one more lap as it is at
+  rate 12 (arm F7). Each read at its end and at its lap's mean, and written on both panels from its end.
+  The guess. At the ends, arm C7's frontier rows read 0.020 to 0.040 nats under arm F7's; at the lap means the two stand within 0.006
+  of each other; arm C7's end stands within 0.008 of its own mean. The panels within their scatter (eight points).
+  What it decides. If the cooled end reads 0.02 or more under the plain end at the frontier and its mean no worse than 0.006, the line
+  with the share trains at rate 14 with the remainder carried: the state a writer writes from then stands on its mean. If not, the rate
+  stays and the writes are made from a lap's mean.
+
+G-1118-11 (2026-11-18T13:22:22Z). The known stream at the frontier: does a context that hears only what stands before it carry the
+frontier's reading. Read before fixing: under a ruler at 3 the lap-70 line's trained state read the frontier 0.52 nats above the law's
+reading at 448 known places on fifty book stretches, and 0.16 of the rest is the level and the mark left out (the far read, reads.txt);
+the first lap with the frontier's share took 0.16 of the frontier's level in a lap by changing only which states are compared; the
+frontier's fall then follows 0.0458 ln(sections). The card's known stream holds the host's bits (24 cases, 13:19 UTC).
+  The trial. From arm F6's end state (lap 70 and six laps with the share): one lap with the frontier's stretches read as known streams
+  (`frontier 6 before`, arm K7), beside the plain lap from the same state that the rate trial runs (arm F7). Arm K7 is read at its
+  end and its lap mean on the frontier's rows both ways (under the law, rows F; each region a known stream, rows K), arm F6's mean is
+  read both ways for the level before any training in the regime, and arm K7 is written on both panels from its end as a known
+  stream.
+  The guess. (a) Before training: arm F6's mean reads the frontier 0.45 to 0.75 nats higher as known streams than under the law, over
+  all held places, more where more places are known. (b) After the lap, at lap means: arm K7's known-stream rows stand 0.10 to 0.25
+  above arm F7's rows under the law (so the lap takes back between a half and four fifths of (a)). (c) Arm K7's rows under the law
+  stand 0.05 to 0.20 above arm F7's (the state leaves the two-sided reading). (d) The panels written as known streams: 35% to 47% of
+  words in the lexicon on each (arm F6's end as the law reads it wrote 49% and 49%). (e) The lap's card time within 15% of arm F7's.
+  What it decides. If (b) reads 0.15 or less, a one-sided context carries the frontier's reading at this size and the second stream
+  is built on it. Between 0.15 and 0.35, a second lap is read for the slope before the second stream is built. Above 0.35, the
+  one-sided context loses what the two-sided one holds, and where it loses it (by places known, by slice) is read before any build.
+  A rule's reading is an inference: the reads are reported as they come.
+
+G-1118-12 (2026-11-18T14:16:02Z). The known stream's second lap. Read before fixing (reads.txt, the entry of this hour): arm K7's end reads the
+frontier as known streams 2.0963 on the held places, 0.29 above arm C7's end under the law, and its own rows under the law 2.0118; on
+the 800 ruler rows arm K7's mean reads 2.154 as a known stream, level with arm F6's two-sided reading with the level unheard (2.164)
+and 0.205 above its reading under the law, where the level is worth 0.214 and the second read 0.001. So what the first lap left
+between the known stream and the law's reading is about the level's size. G-1118-11's lap means are not all read yet (arm F7 trains);
+its rule sends a reading of (b) between 0.15 and 0.35 to a second lap, which this is.
+  The trial. One more lap from arm K7's end with the same pass (arm K8), read at its lap mean on the held places (rows F and K) and on
+  the ruler rows, and written on both panels from its end.
+  The guess. Arm K8's known-stream rows at its lap mean stand 0.03 to 0.08 under arm K7's at its lap mean on the held places (a first
+  lap's transient is over, and a lap then buys what the frontier's log law gives or a little more); on the ruler rows its known
+  stream reads 2.08 to 2.13. Its rows under the law stand within 0.05 of arm K7's. The panels within eight points of arm K7's.
+  What it decides. Nothing about the build's order: the second stream is built on the known stream either way, since the first lap
+  already stands at the two-sided reading without the level. It sizes what laps in the regime buy before every place is compared, and
+  it says whether the reading under the law keeps leaving. A fall of 0.10 or more would say the regime is still in its transient.
+
+G-1118-13 (2026-11-18T15:10:47Z). Every place compared: the first lap of passages read by two streams. Read before fixing: the card holds the host's
+bits (16 cases); arm K8's sections hold 312 regions of which 234 are stretches at the frontier, one comparison each, in 366 ms; a
+stretch read by two streams compares every place past its first and stands on the card as twice its sites, so by the pass's bounds a
+section holds about half as many stretches and compares on the order of ten thousand places at the frontier; the deposit's step is
+normalized (rate 12), so more comparisons a section lower the step's noise and do not lengthen it, and the cooled lap of this morning
+bought 0.013 at its mean, so noise is a small part of what a lap's mean leaves; the open places run on the bare clock, 0.004 to 0.013
+from the known stream's reading before any training in it.
+  The trial. From arm K8's end state (two laps as known streams): the pass's word set to frontier 6 strand, a development read of 150
+  sections for the lap's projection, then one lap of 3,000 sections (arm S9), read at its end and its lap mean on the held places (rows
+  F under the law, K as known streams, S by two streams) and written on both panels from its end by two streams.
+  The guess. (a) A section takes 300 to 600 ms. (b) At lap means arm S9's rows S stand 0.04 to 0.14 nats under arm K8's rows K.
+  (c) Arm S9's end stands within 0.015 of its own mean on rows S. (d) Its rows under the law stand within 0.08 of arm K8's; one place
+  open and whole masks stand 0.00 to 0.06 above arm K8's. (e) The panels written by two streams: 40% to 56% of words in the lexicon.
+  What it decides. If (b) reads 0.10 or more, every place compared is the lever at the rate the line holds and the line takes the two
+  streams; the one-sided level is then the next build. Between 0.04 and 0.10 the gain is the noise's share, and the step's rate with
+  every place compared is read before more laps. Under 0.04 the frontier's comparisons are not what binds at this rate, and the step
+  is read next. A rule's reading is an inference: the reads are reported as they come.
+
+Scored (2026-11-18T15:19:53Z), G-1118-10, G-1118-11 and the first part of G-1118-12 (reads.txt).
+  G-1118-10. At the ends arm C7's frontier rows read 1.8058 against arm F7's 1.8463, 0.0405 under (0.020 to 0.040 guessed: missed by
+  half a thousandth, at the upper edge); at lap means 1.7994 against 1.8044, 0.0050 under (within 0.006 guessed: held); arm C7's end
+  stands 0.0064 above its own mean (within 0.008: held) where arm F7's end stands 0.0419 above its. One place open at lap means 0.0138
+  under, whole masks 0.0063 under. Arm C7's panels 53% and 49% (arm F7's are not written yet).
+  What it decides, by the rule fixed before the read: the cooled end reads 0.02 or more under the plain end and its mean is no worse,
+  so the line trains at rate 14 with the remainder carried from its next lap.
+  G-1118-11. (a) Before any training as known streams arm F6's mean reads the frontier 1.0827 above its reading under the law (0.45 to
+  0.75 guessed: missed, half again as much). (b) After the lap, arm K7's known-stream rows stand 0.2813 above arm F7's rows under the
+  law at lap means (0.10 to 0.25 guessed: missed by 0.03). (c) Arm K7's rows under the law stand 0.1708 above arm F7's (0.05 to 0.20:
+  held). (d) Panels written as known streams 32% and 40% (35% to 47% guessed on each: the short one missed low, the long one held).
+  (e) The lap took 1,097 s against 1,600 to 1,661 s for a plain lap (within 15% guessed: missed, it is a third shorter: a known stream
+  is read once and hears no level).
+  What it says. One lap as known streams took back 0.81 of the 1.08 nats the one-sided reading cost before any training. By the rule
+  (b) sends the reading to a second lap, which is arm K8. The host ruler of 14:15 UTC reads what the rule could not: on its 800 rows
+  the known stream after one lap stands level with the two-sided reading without the level, and 0.205 above the law's, where the
+  level is worth 0.214. The writes are below the line's so far.
+  G-1118-12, at the lap means. Arm K8's known-stream rows stand 0.0590 under arm K7's (0.03 to 0.08 guessed: held); its rows under the
+  law stand 0.0322 above arm K7's (within 0.05: held). The ruler rows and the panels are not read yet.
+
+Scored (2026-11-18T15:55:18Z), G-1118-12's rest and G-1118-13 (reads.txt).
+  G-1118-12, the rest. On the ruler rows arm K8's mean reads 2.105 as a known stream (2.08 to 2.13 guessed: held), under its own
+  reading by the law (2.148). Its panels 38% and 37% against arm K7's 32% and 40% (within eight points: held).
+  G-1118-13. (a) A section took 258 ms over the lap, 269 in the development read (300 to 600 guessed: missed, it is shorter), with
+  14,300 places compared at the frontier where a known-stream section compared 234; the lap 775 s. (b) At lap means arm S9's rows S
+  read 1.9238 against arm K8's rows K 2.0267: 0.1029 under (0.04 to 0.14 guessed: held). (c) Arm S9's end stands 0.0233 above its mean
+  on rows S (within 0.015 guessed: missed; a plain lap's end stood 0.042 above its mean). (d) Its rows under the law stand 0.029 above
+  arm K8's (within 0.08: held); one place open 0.019 above and whole masks 0.001 above (0.00 to 0.06 above: held). (e) Panels written
+  by two streams from the end: short 49% (held), long 35% (40% to 56% guessed: missed low).
+  What it decides, by the rule fixed before the read: (b) reads 0.10, so the line takes the two streams and the one-sided level is the
+  next build. What the rule cannot say: the long panel's writes did not follow the code (35%, where the plain line's seventh lap wrote
+  52% and the known stream's second lap 37%).
+  The rate. G-1118-10's rule gives the line rate 14 with the remainder from its next lap. It was fixed on the line with the frontier's
+  share at its seventh lap, where a lap's mean moves 0.008; the two-stream line moved 0.10 in its first lap, so a step a quarter the
+  size would be read against a mean still travelling. Its reason (a state that walks about a mean that stands) does not reach this lap:
+  the next laps keep rate 12, their writes are made from the lap's mean beside its end, and the rate is cooled where a lap's fall
+  comes under its end's distance from its mean.
+
+G-1118-14 (2026-11-18T15:55:18Z). Three more laps of two streams at rate 12 (arms S10 to S12), each read at its lap mean. Read before fixing: arm S9's
+first lap fell 0.103 on rows S; the plain line's frontier fell 0.160 in its first lap with the share and then 0.0458 ln(sections)
+(0.031, 0.024, 0.011 a lap); the known stream fell 0.81 in its first lap and 0.059 in its second.
+  The guess. Rows S at lap means: arm S10 0.030 to 0.070 under arm S9, arm S11 0.015 to 0.045 under arm S10, arm S12 0.010 to 0.035
+  under arm S11, so arm S12 stands at 1.79 to 1.87 where the plain line's seventh lap reads 1.804 under the law. The long panel
+  written from a lap's mean stands above the same lap's written from its end, and by arm S12 reads 40% or more.
+  What it decides. If arm S12's rows S stand under 1.85 the one-sided reading without the level has reached the plain line's with it
+  inside five laps of the regime, and the level then adds to a line already level with it. If the laps stall above 1.90, what the
+  level holds is what is missing and the laps wait for it.
+
+G-1118-15 (2026-11-18T16:18:43Z). The strand's odd contacts facing the past (frontier 6 strand past): two laps (arms P11, P12) from arm S10's end,
+beside arms S11 and S12 from the same state (the control). Read before fixing: on arm S9's mean the host ruler reads the known stream
+at 2.040, with its circles at rest 2.504 and with its plain strand contacts unmet 3.027 (800 rows), so the circles from the left carry
+0.46 to the frontier and the even plain contacts 0.99; in a one-sided stream an odd contact has no mate and a circle from the right
+rests, so half of each stands idle. Their material was deposited under the law for the site after, so in the new relation (the second
+site before) it opens mismatched. The known stream opened 1.08 above the law's reading and took 0.81 of it back in one lap, 0.059 more
+in the second. Arm S10's rows S read 1.8703 at its lap mean (0.0535 under arm S9's).
+  The guess. (a) On arm S10's mean the host ruler reads the known stream facing the past 0.25 to 1.20 above the known stream (the
+  mismatch before any training in it). (b) Rows S at lap means: arm P11 between 0.06 above and 0.04 under arm S11's; arm P12 between
+  0.01 above and 0.07 under arm S12's. (c) A section takes 270 to 340 ms (arm S9's 258) and a lap 810 to 1,020 s. (d) The long panel
+  written from a lap's mean stays within 8 points of the S arm's of the same lap and does not reach 50%.
+  What it decides. Arm P12 at least 0.015 under arm S12 at lap means: the line takes the word. Closer than that with the gap closing by
+  0.03 or more from the first lap to the second: one more lap of both. Otherwise the word leaves the line and stays a region's word in
+  the tree, with the reading.
