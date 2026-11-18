@@ -64,3 +64,10 @@ before it (less that baseline).
 448 known: 1.930 | 2.094 (+0.164) | 2.610 (+0.516)
 The boundary chart's own forward (every site veiled to itself and a source to the sites after it), 200 passages of 449 places, by
 places known: 0: 6.089 | 1: 5.584 | 2-3: 7.344 | 4-7: 5.730 | 8-15: 5.074 | 16-31: 4.631 | 32-63: 4.430 | 64-127: 4.405 | 128-255: 4.371 | 256-511: 4.393; at the passages' last place 4.362.
+
+The full share (G-1118-4): from lap 70's end state, one lap with every stretch at the frontier (arm G; 1,668 s; about 377 frontier
+regions a section), read at its lap mean beside the control's and arm F's:
+FRONTIER G_mean; one place open: all 1.0358 (100508 places) | books 1.1033 code 0.7520 science 0.9815 web 1.1360 wikidata 1.2060 || less the control's, paired: +0.2631 (±0.0025) | books +0.2911 code +0.2608 science +0.2838 web +0.2839 wikidata +0.1966
+FRONTIER G_mean; whole masks: all 2.4510 (3717 places) | books 2.2939 code 2.4315 science 2.3434 web 2.5752 wikidata 2.6366 || less the control's, paired: +0.2422 (±0.0118) | books +0.2204 code +0.3342 science +0.2698 web +0.1858 wikidata +0.1993
+FRONTIER G_mean; the frontier: all 1.8747 (99844 places) | books 1.8748 code 1.6082 science 1.8602 web 2.0405 wikidata 1.9897 || less the control's, paired: -0.1827 (±0.0023) | books -0.1299 code -0.2068 science -0.1726 web -0.1612 wikidata -0.2425
+FRONTIER G_mean; the frontier by places known (less the control's): 1: 3.914 (-0.023) | 2 to 3: 2.891 (-0.125) | 4 to 7: 2.519 (-0.143) | 8 to 15: 2.353 (-0.131) | 16 to 31: 2.194 (-0.136) | 32 to 63: 2.034 (-0.141) | 64 to 127: 1.848 (-0.171) | 128 to 255: 1.737 (-0.200) | 256 to 511: 1.665 (-0.222) | 512 to 1023: 1.678 (-0.226)

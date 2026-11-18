@@ -134,3 +134,13 @@ Scored (2026-11-18T08:58:30Z), G-1118-7 (reads.txt), on the control's lap mean (
   By the guess's rule the build takes the first form: a known stream that keeps its own symbols and hears only what stands before
   it, half a nat from the state as trained, with an open place read at every place of it. The chart's single stream of veiled
   sources stands two and a half nats off and is kept as a reading (its forward and its test stay in the tree).
+
+Scored (2026-11-18T08:59:17Z), G-1118-4 (reads.txt), at the lap's mean against the control's.
+  The frontier rows: 0.1827 under (0.19 to 0.27 guessed: missed, just short). One place open 0.2631 above (0.4 to 1.0 guessed: missed,
+  it lost less); whole masks 0.2422 above (0.4 to 1.2 guessed: missed, less). The panel is scored with the night's others.
+  The full share compares 1.6 times the places at the frontier that arm F does and gains 0.0224 nats more there (0.1827 for 0.1603),
+  for 0.16 more lost at each of the two-sided readings. By the guess's rule (under 0.03) the keyed states cost the frontier nothing
+  at a quarter of the stretches and they stay: the share is six of eight, and arm F continued is the line.
+  It also says the frontier's fall is not in proportion to the places compared there: 1.6 times the comparisons bought a seventh more.
+  On the fifty books the first pass took 0.35 nats and nine more took 0.19. The first comparisons at the frontier teach the state, and
+  what remains falls slowly at this size.
