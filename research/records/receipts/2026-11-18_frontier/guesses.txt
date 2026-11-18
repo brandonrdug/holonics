@@ -372,3 +372,20 @@ in the second. Arm S10's rows S read 1.8703 at its lap mean (0.0535 under arm S9
   reach 50%": it reads 128 of 252, 50.8%, missed by a word). What it decides, by the rule: 0.015 or more under at lap means, so
   the line takes the word. What the rule does not see, read beside it: under the law the same state reads one place open at
   0.9828 against arm S12's 0.9127 (0.070 above, as after the first lap) and whole masks 0.036 above.
+
+G-1118-16 (2026-11-18T18:18:56Z). The level as a strand hears it (the block B-, b_B- founded at zero; each place takes the epoch before its own): two
+laps (arms L13, L14) from arm P12's end, beside the line's own P13 and P14 from the same state (the control). Read before fixing: under
+the law's hearing the level is worth 0.240 at the frontier on the plain line and 0.164 on the two-stream line's state, three quarters
+of it through the known places' states, and two thirds survive every place reading the epoch before its own before any training
+(read-far, the word level). Against that: the level's restriction keeps what a drawn one keeps, the fine comparison gives the level no
+slope at first order, and its chart cannot address a unit's interior, where the frontier's excess stands (the atlas's rows of November
+17 and 18); and the two-stream line reached the plain line's frontier reading without any level in four laps. The block opens at
+zero and its own slope is immediate (an epoch's read against the covector of the sites that read it); the restriction and the
+level's field take a slope from the strands only once the block has left zero.
+  The guess. (a) Rows S at lap means: arm L13 between 0.010 above and 0.030 under arm P13's; arm L14 between 0.005 above and 0.045
+  under arm P14's. (b) Under the law the same states read one place open within 0.02 of the control's at each lap (the strands'
+  covectors now reach the restriction and the level's field, which the law's regions share). (c) A section takes 270 to 340 ms
+  (the line's 259) and a lap 810 to 1,020 s. (d) The long panel from a lap's mean stays within 8 points of the control's.
+  What it decides. Arm L14 at least 0.015 under arm P14 at lap means: the line takes the block. Otherwise the block leaves the line
+  and stays in the tree as the carrier a level's own receipt needs, with the reading. The founding itself is not read on the card
+  (the host's and the card's tests hold that it keeps every face).
