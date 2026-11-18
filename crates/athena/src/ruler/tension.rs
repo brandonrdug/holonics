@@ -664,6 +664,74 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     Ok(())
 }
 
+/// [measurement; the lead, November 18, the frontier record §5] `read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE
+/// STATE_SHA`: **what a place at the frontier takes from the far field, by what it hears there**. Each row of `ROWS`
+/// (`group:known:n<TAB>known text<TAB>next symbol`) is a region whose places are known but its last, the next symbol's, which alone is
+/// open (the frontier's state, [`holonics_engine::passage::frontier_state_of`]). The rows are read three times on the host's realization:
+/// with the law (an open receiver hears every definite site past its near field), with a definite receiver's far field in its place
+/// (its probe's classes sharply and each octave's crowd), and with the near field alone
+/// ([`holonics_engine::field::Constitution::ruler_far`]). One line a setting and a group (the label up to its second colon): the rows and
+/// the written symbol's code in millionths of a nat a place. A ruler's forward: the state is read, never written, and nothing is returned.
+/// Why: a read that compares every place of a region at its own frontier needs a second, open place at every place; what that place must
+/// hear far (every site before it, or a few crowds) sets the read's cost, and this reads it before the read is built.
+pub fn read_far(args: &[String]) -> Result<()> {
+    if args.len() != 11 {
+        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-far")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, OwnedRegion)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(unescape(known).as_bytes())?;
+        let target = codec.encode(unescape(next).as_bytes())?;
+        if classes.is_empty() || target.is_empty() {
+            return Err("a row with no known place or no next symbol".into());
+        }
+        classes.push(target[0]);
+        let mut open = vec![false; classes.len()];
+        *open.last_mut().expect("a region of two places or more") = true;
+        let group: String = label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":");
+        rows.push((group, OwnedRegion::plain(classes, open)));
+    }
+    if rows.is_empty() {
+        return Err("no row".into());
+    }
+    let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
+    for far in 0..3u8 {
+        learner.field.ruler_far = far;
+        let mut groups: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
+        // (a few hundred regions a call, so no call holds every region's forward at once)
+        for chunk in rows.chunks(256) {
+            let views: Vec<_> = chunk.iter().map(|(_, r)| view_of(r)).collect();
+            let faces = holonics_engine::realization::Realization::read_faces(&mut holonics_engine::realization::Host, &learner.field, &views).map_err(|e| e.to_string())?;
+            for ((group, region), face) in chunk.iter().zip(&faces) {
+                let at = region.classes.len() - 1;
+                let f = face[at].as_ref().ok_or("a frontier place that carries no face")?;
+                let slot = groups.entry(group.clone()).or_insert((0, 0));
+                slot.0 += i128::from(holonics_engine::field::ratio_code(f.masses[region.classes[at]], f.total));
+                slot.1 += 1;
+            }
+        }
+        for (group, &(code, n)) in &groups {
+            println!("FAR far={far} group={group} rows={n} code={}", nats(code, n));
+        }
+        let (code, n) = groups.values().fold((0i128, 0usize), |(c, k), &(gc, gn)| (c + gc, k + gn));
+        println!("FAR far={far} group=all rows={n} code={} ms={}", nats(code, n), started.elapsed().as_millis());
+    }
+    Ok(())
+}
+
 /// [measurement; the lead, November 17, the record of the dwell §19] `read-level UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS
 /// FORMS_SHA STATE STATE_SHA OUT [links]`: **a region's level, written out for a ruler**. Each row of `FORMS` (`label<TAB>prompt<TAB>run`) is
 /// one region, its prompt known and its run open. `OUT/level.tsv` takes a line a region: its label, its sites, the epochs' anchors and

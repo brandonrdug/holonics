@@ -53,6 +53,12 @@ pub struct Constitution {
     /// `z = T S − falloff`. A reading at a set `γ` of what a row that keeps its evidence does, before the stage is a law: not part of the
     /// state, and no reverse reads it.
     pub lock_carry: Option<i64>,
+    /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
+    /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
+    /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone. A reading of
+    /// which sources carry what a place at the frontier takes from many known places, before a read that compares every place at its
+    /// frontier is built: not part of the state, and no reverse reads it (a forward under `1` or `2` is never returned).
+    pub ruler_far: u8,
     /// [measurement; agent-inferred, November 13, G176; the ring record's §4] Where set, **the release marked in the opening at strength**
     /// `α` on `2^(−16)`: an open, silent site `s` with `marks[s]` (the face a read before gave it, its shares) opens on `E(∗) +
     /// release(α (release(Σ_c w_c E(c), 16) − E(∗)), 16)` in each encoding its row enters ([`Constitution::opening_term`]), and stays silent
