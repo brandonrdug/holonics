@@ -195,17 +195,25 @@ documents ended inside it and was renewed). At lap means against the control's l
 - The cost at the two-sided readings rose with the first laps and flattens near 0.13 and 0.11.
 - The fifth lap's end state reads the frontier 0.036 above its lap's mean: the rate's spread, which the cooling laps measured, stands
   on the state the writes are made from.
-- The guess had the fall holding 0.03 to 0.04 a lap through lap 5; it missed from lap 3. By its own rule, the count of places compared
-  is not what binds past the first laps at this size, and the price of room at the frontier is read before the card's realization of
-  the two-stream read: a fifth lane of 32 founded at zero on the fifth lap's end state (392,505 entries to 483,961), one lap, beside
-  the same state one more lap as it is (G-1118-8, running as this is written).
+- The guess had the fall holding 0.03 to 0.04 a lap through lap 5; it missed from lap 3, and its own rule then read the slowing as
+  room. That reading is withdrawn by the two that followed it:
+  - **The fall is the logarithm of the sections compared.** Under the control it reads 0.1603 + 0.0458 ln(sections / 3,000) over the
+    five laps, with residuals within 0.0014 nats; fixed before the sixth lap's read (G-1118-9), the law gave 0.2437 and the lap read
+    0.2453. On the fifty books the held next place falls as 0.36 + 0.083 ln(passes). A lap slows because laps add and the fall goes
+    with the logarithm.
+  - **A fifth lane buys nothing in its first lap** (G-1118-8). Founded at zero on the fifth lap's end state (392,505 entries to
+    483,961, a factor 1.233) and trained one lap beside the same state's plain sixth lap, it reads 0.0024 above it at the frontier,
+    0.0029 above with one place open and equal at whole masks, at every count of known places, for 6% more card time a section. The
+    third lane had bought 0.027 by its second lap; this one may still open, and one lap is what was read.
+  So what binds the frontier at this size is the count of places compared there, as §5 had it. By the store's own law a lap that
+  compared every site at its frontier, 177 times a lap's comparisons today, would stand about 0.40 nats under the control after one
+  lap where six laps stand 0.245 under. That extends a law read over six laps to a hundred times their count, and the two-stream read
+  starts half a nat off the trained state (§6), so it is a projection to be read by the build and no figure to stand on.
 
 ## 8. What runs, and what is owed
 
-- On the card (G-1118-8): the frontier's price in cells, a fifth lane's lap beside one more plain lap.
 - The two-stream read (§6) is complete on the host, forward and return (`Constitution::strand_pass`, `strand_returned`; THE_ENGINE
-  §10): its card realization, a word of the pass, and the held read are owed, and they wait on the price of room, which says what the
-  denser comparison would be spent on.
+  §10). Its card realization is the next build, then a word of the pass and the held read.
 - The rate: the state a lap ends in stands off its mean (0.036 at the frontier after five laps). A law that rests the rate where its
   travel's cosine is zero (the cooling record) is owed as upkeep, and the writes are made from that state.
 - From the audit, still owed: the comparison's weights by declaration (the opening is compared at every place of every region), the

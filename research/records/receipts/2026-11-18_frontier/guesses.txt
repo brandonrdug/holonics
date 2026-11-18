@@ -209,3 +209,15 @@ G-1118-9 (2026-11-18T12:06:51Z), fixed while arm F6 trains and before its read. 
   comparisons today) would stand about 0.40 nats under the control after one lap where five laps stand 0.23 under; that is an
   extension of a law read over five laps to a hundred times their count, and the two-stream read starts from half a nat off the
   trained state, so it is a projection to be read and no figure to build on.
+
+Scored (2026-11-18T12:39:34Z), G-1118-9 and G-1118-8 (reads.txt).
+  G-1118-9. Arm F6's frontier rows at its lap mean read 1.8121, 0.2453 under the control (1.8137 within 0.003 guessed: held, 0.0016
+  off). Arm L's read 0.0024 above arm F6's (within 0.004 guessed: held).
+  G-1118-8. The fifth lane's first lap: the frontier rows 0.0024 above arm F6's (0.010 to 0.040 under guessed: missed); one place
+  open 0.0029 above (0.005 to 0.030 under guessed: missed); whole masks equal; the panels within their scatter (held).
+  What it says. A fifth lane of 32, a factor 1.233 of the cells, buys nothing at the frontier in its first lap, at any count of known
+  places, and costs 6% of a section's card time. The third lane had bought 0.009 to 0.013 in its first thousand sections and 0.027 a
+  lap later; this one may still open, and one lap is what was read. The frontier's fall is the logarithm of the sections compared
+  there, and the law fitted on five laps placed the sixth within 0.002. So what binds the frontier at this size is the count of
+  places compared, and the realization that compares every place of a region is the lever the readings point at; the sentence I
+  wrote after lap 4, that room is what binds, was my rule's inference and this read does not bear it.

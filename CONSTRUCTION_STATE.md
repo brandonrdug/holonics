@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 11:30 UTC): the line is compared where it writes
+## Where the work stands (November 18, 12:45 UTC): the line is compared where it writes
 
 Acting on [the audit of November 18](research/records/2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md),
 one change at a time beside a control from lap 70 on the text store (the last state before the terrain changed). Two records carry it:
@@ -53,12 +53,12 @@ eight and loses 0.16 more elsewhere, so the share is six of eight. The fall is i
 known stream in which every site hears only what stands before it, with an open place at every place, as sites of one batch. Its
 faces are the same bits as the regions it replaces; its covector matches the code's difference. The card's realization is owed.
 
-**What binds, by its measurement.** A frontier comparison costs a whole region's read (about 1.3 ms of card), and the two-stream read
-removes that. But the store's laps say the count of comparisons is not what holds the frontier past its first laps: room is. Its
-price is being read.
+**What binds, by its measurement.** The frontier's fall is the logarithm of the sections compared there: 0.1603 + 0.0458
+ln(sections / 3,000) under the control over five laps, and the law gave the sixth lap within 0.002 before its read. A fifth lane of 32
+(a factor 1.233 of the cells) buys nothing there in its first lap. A frontier comparison costs a whole region's read today (about 1.3
+ms of card), so the count that binds is the one the two-stream read raises about a hundredfold.
 
-**What runs** (G-1118-8, `research/records/receipts/2026-11-18_frontier/`): a fifth lane of 32 founded at zero on the fifth lap's end
-state, one lap, beside the same state one more lap as it is.
+**What runs.** Nothing on the card (12:45 UTC). The next build is the two-stream read's card realization and its parity with the host.
 
 ## Where the work stood on November 18 at 02:00 UTC: what she reads in each regime, and what the level is
 
