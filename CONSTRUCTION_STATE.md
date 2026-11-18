@@ -81,9 +81,14 @@ ticks after it add one bound symbol each (1.965, 1.687, 1.479 beside the counts 
 six symbols read 1.408 and 1.367. So at the place grain a tick binds one symbol and only the late ticks bind, and the level is fed and
 read at the split, where a place holds a pair and nothing is yet bound; that is why what it carries is one more additive term.
 
-**Standing, and what is owed.** Nothing is running and no part is ordered. Owed as a reading of the tree: what a level should read and
-where it should return, if its sites are to be units the level below has committed, so that a tick binds a unit where a place-level
-tick binds a symbol.
+**What a level reads, by the tree (the design record's §12).** A restriction eliminates a balanced interior; what crosses a quotient
+is the boundary's response, an inherited clock and a heat; a level's width is its section's. So a level reads a unit at its section
+after the interior has settled, the committed states at its boundary, and returns there. The built level reads a moment of every
+interior place at the split, before anything is bound, and returns before the ticks that bind.
+
+**Standing, and what is owed.** Nothing is running and no part is ordered. The places a level would read have committed to nothing: a
+written place is compared nowhere after its opening, so its ticks are trained through one comparison two ticks and a product away.
+Owed, as #405's question and before any level: what a written place's receipt is at its own grain.
 
 ### Earlier on November 17 (evening): the step back's first reading, corrected above
 

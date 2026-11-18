@@ -1,7 +1,7 @@
 # A level is a codec that carries its decoder and closes a scale square, both read at the receiver's face; the built level was founded on a saddle, has no receipt at its own grain and folds a winding epoch onto itself
 
 November 17, 2026, 23:40 to 23:55 UTC. Refs #404 #405 #406 #410. Status: [design; `agent-inferred` throughout; no part is
-built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11]. The lead's reading of the tree, written before any part, after
+built; the two readings of §6 were read on November 18 and are in §9, and a third in §10, which corrects §9's order; the reading §10 names is in §11, and the tree's answer to what §11 leaves in §12]. The lead's reading of the tree, written before any part, after
 [the trace of the engine's own level](2026-11-17_ATHENA_TAKES_HELD_SUMS_WHOLE_WHEN_SHE_DWELLS_ON_ONE_WORLD_AND_THE_LINE_NEVER_DWELT.md)
 (§19 there). Two host readings are named in §6 with their guesses fixed in
 [the guess file](receipts/2026-11-17_tempering/guesses.txt) before either is read.
@@ -403,4 +403,45 @@ level whose sites are units the level below has committed, so that a tick there 
 read committed units. It reads at the split, before the place level has bound, and returns before the ticks that bind.
 What a level should read, and where it should return, is the next statement to derive from the tree; it is a reading
 and no part.
+
+## 12. What a level reads and where it returns: the tree's answer (November 18, 01:00 to 01:15 UTC)
+
+`tree` for each item, `agent-inferred` for the join. A reading; no part is designed here.
+
+**What the tree holds.**
+
+- **A restriction eliminates a balanced interior.** The Schur complement on a boundary is the reading of an interior in
+  balance, `(Lu)_I = 0`, and under that hypothesis the boundary keeps the full power and every boundary state extends
+  inward (`tube.dn-elimination`, `tube.kron-exact`, formal-checked). An interior that has not settled has no such
+  reading: what it would hand its boundary is not yet its own.
+- **What crosses a quotient is three things** ([the record of the change of scale](2026-11-15_A_CHANGE_OF_SCALE_IS_A_STRETCH_OR_A_QUOTIENT_A_STRETCH_KEEPS_A_COUNT_A_QUOTIENT_MOVES_IT_TO_THE_SECTION_A_JUNCTION_IS_A_BOOST_AND_A_DELAY_A_TURN_AND_A_HORIZON_IS_WHERE_A_STRETCH_BECOMES_A_QUOTIENT.md),
+  §3.2 and §10): the boundary's response, an inherited capacity (its clock) and one number for how many interiors fit
+  (its heat). The rest is the exterior's kernel. That record's first reading for the machine says it in the engine's
+  terms: a composite replaced by another with the same end faces and the same count of places leaves the coarser
+  level's faces where they were. And its sizing: a level's width is read from the section it reads through, the
+  contacts that cross its sites' boundaries, never from the count of places under a site.
+- **A level between two others helps only through its delay** (the same record's §6): with no delay a chain of levels is
+  one step of the whole ratio.
+- **A clocked level hears what its clock closed** (October 30): the fine level's motion since the level's last tick,
+  never the state its own modes already hold.
+- **A lap founds only what the last lap made readable** (October 25): the units arrive in one order, each on the one
+  before. The tower compounds from below in the time of learning as well as in the forward.
+- **Every receiver has its own receipt** (the objects; #405; the first row of the engine guide's table).
+
+**The join.** A level reads a unit at its section, after the unit's interior has settled: the committed states of the
+places at its boundary, with the stride its clock inherits. It returns at that section, and the interior then extends
+inward from it. Its width is the section's.
+
+**Against that, the built level.** It reads a moment of every interior place, at the split, where §11 finds that a place
+has bound nothing past its opening; and it returns before the two ticks that bind. It is sized at half the fine width,
+where §9 finds that a unit's strand with its phases does not pass 64 numbers. It reads no boundary and no settled state.
+
+**What §11 adds, and the question it leaves open.** The places a level would read have themselves committed to nothing.
+A written place is compared nowhere after its opening (the design record of November 13, §4.8), so its ticks are trained
+only through the one comparison at the open place, two ticks and a product away. At that place the code falls by one
+bound symbol a tick, late. Whether a written place's state holds a bound stretch that an open row fails to fetch, or holds
+none, is not separated by the night's readings: the open place's own state holds the pair before it at about 300
+thousandths and the triple at about 200 at every tick while its code falls, so a count of identities does not see where
+the binding is kept. The receiver's law says where to look: a place that is asked for nothing commits to nothing. What a
+written place's receipt is, at its own grain and in its own frame, is #405's question, and it comes before a level's.
 
