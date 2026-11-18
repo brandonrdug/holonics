@@ -4212,6 +4212,29 @@ fn the_boundary_charts_face_reads_nothing_at_or_past_its_place() {
     }
 }
 
+/// [definition; the lead, November 18, the frontier record §6] **The strand's open place is its frontier region's**: under
+/// [`Constitution::strand_faces`] the face at place `t` is the same bits as the open last place of the region `[0, t]` read with every known
+/// place hearing only what stands before it (a ruler's forward at `3`), at every place, on fields with a still head and without, with
+/// circles and paces off their rest. One forward of a passage reads what a region a place reads.
+#[test]
+fn the_strands_open_place_is_its_frontier_regions() {
+    for (name, field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1))] {
+        let a = field.declaration.alphabet;
+        let sites = 14;
+        let classes = drawn_classes(0xB1, sites, a);
+        let faces = field.strand_faces(&classes).unwrap();
+        assert_eq!(faces.len(), sites);
+        let mut ruled = field.clone();
+        ruled.ruler_far = 3;
+        for t in 1..sites {
+            let open: Vec<bool> = (0..=t).map(|k| k == t).collect();
+            let region = Region { classes: &classes[..=t], unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+            let law = ruled.faces(&region).unwrap()[t].clone().unwrap();
+            assert_eq!(faces[t], law, "{name}: place {t}");
+        }
+    }
+}
+
 /// [definition; the lead, November 18, the audit of that day §1.4] **A stretch read at the frontier is its context and the one place after
 /// it**: the cut takes the stretch's own draw of a context and one place while the piece goes on by the least context or more; at a piece's
 /// end it takes every place left, the open place the true end's first void where the piece closes its document and the piece's last place

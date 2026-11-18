@@ -269,6 +269,38 @@ impl Constitution {
         Ok((x, moment))
     }
 
+    /// **The retarded moments on given receiving clocks** [the strand's second stream, [`Constitution::strand_faces`]]: at each site the
+    /// moment of what stands before it ([`Constitution::cavity_moments_sided`] with no after rows), turned and decayed by the clock the
+    /// site receives on, `clocks[h] = (τ, σ)` a paced head (empty where the head reads no pace).
+    pub(crate) fn retarded_moments_at(&self, region: &Region, paces: &Paces, clocks: &[(Vec<i64>, Vec<i64>)]) -> Result<Vec<i64>> {
+        let d = &self.declaration;
+        let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
+        let mut out = vec![0i64; sites * 2 * m];
+        if tm == 0 {
+            return Ok(out);
+        }
+        let l = &self.layout;
+        let eb: Vec<Vec<i64>> = (0..sites).map(|t| self.strand_row(region, l.moment_before, 2 * tm, t)).collect();
+        let none = vec![(0i64, 0i64); sites];
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
+            let (tau_c, sigma_c) = &clocks[h];
+            for li in 0..n {
+                let idx = d.moment_index(h) + li;
+                let slot = self.slot(h, li);
+                let (period, ring) = &self.rings[slot];
+                let before: Vec<(i64, i64)> = eb.iter().map(|r| (r[idx], r[tm + idx])).collect();
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let pace = self.pace_of(paces, h, &turn, &skin);
+                let s = moment::cavity_moments(&before, &none, ring, *period, &self.decays[slot], pace.as_ref(), tau_c, sigma_c)?;
+                for (t, &(re, im)) in s.iter().enumerate() {
+                    out[t * 2 * m + h * n + li] = re;
+                    out[t * 2 * m + m + h * n + li] = im;
+                }
+            }
+        }
+        Ok(out)
+    }
+
     /// [definition; the lead, November 17 (the record of the dwell §13, where its acceptance is fixed) and November 18 (the frontier
     /// record §6)] **The boundary chart's forward: a passage read at its boundary.** A passage being read has a boundary, its next place.
     /// The receiver at place `t` holds the passage's current up to `t − 1`, and its face is the density of the symbol that arrives at

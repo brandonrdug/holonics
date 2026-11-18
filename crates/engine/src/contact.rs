@@ -1074,6 +1074,182 @@ impl Constitution {
     }
 }
 
+impl Constitution {
+    /// [definition; the lead, November 18, the frontier record §6 and G-1118-7] **A passage read at its boundary by two streams.** The
+    /// known stream is the passage with every place's symbol in its own row and every site hearing only what stands before it (the
+    /// forward under [`Sided::Before`], one read, the level unheard), so a site's state is a function of the symbols up to its own. The
+    /// second stream is an open place at every place: at place `t` the frontier's place of the region `[0, t]`, opened on the retarded
+    /// moment with no row of its own symbol, on the clock it holds before its symbol arrives (its stride bare at the first tick, then its
+    /// expected duration from its own face, as a blank's is), hearing every known site before it sharply against the known stream's
+    /// keys and values of the same tick, its strand contact's mate the known site before it and its circles the known stream's as they
+    /// stand before it. Nothing hears an open place, so the places of the second stream do not meet.
+    ///
+    /// `faces[t]`, `t ≥ 1`, is the same bits as the open last place of the region `[0, t]` read with every known place hearing only
+    /// what stands before it (`the_strands_open_place_is_its_frontier_regions`): one forward of the passage reads what a region a place
+    /// reads today. Why this form and not the chart's single stream of veiled sources ([`Constitution::chart_faces`]): read on the
+    /// line's states, known places that keep their symbols and lose their after side stand half a nat from the state as trained, and
+    /// veiled sources two and a half (G-1118-7).
+    ///
+    /// Refused on a field with triads, a junction, depth rings or a closed face; the level and the second read's mark are not in it.
+    /// A reading on the host: no state changes, nothing is returned through it yet, and the card has no realization of it.
+    pub fn strand_faces(&self, classes: &[usize]) -> Result<Vec<TowerFace>> {
+        let d = &self.declaration;
+        if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 {
+            return refuse("a passage read at its boundary on a field with triads, a junction, depth rings or a closed face");
+        }
+        let sites = classes.len();
+        let known = vec![false; sites];
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None };
+        // The known stream, its ticks kept: the forward a ruler reads at `3`.
+        let mut stream = self.clone();
+        stream.ruler_far = 3;
+        let fwd = stream.pass_with(&region, true, None)?;
+        let dw = d.width;
+        let reaches = self.reaches();
+        let paces = &fwd.paces;
+        let bare: Vec<(Vec<i64>, Vec<i64>)> = (0..d.heads).map(|h| Self::cavity_clocks(paces, h, sites)).collect();
+        let on = |clocks: &[(Vec<i64>, Vec<i64>)]| -> Paces {
+            let mut rx = paces.clone();
+            for h in 0..d.heads {
+                if let Some(p) = paces.row.get(h).copied().flatten() {
+                    (rx.tau[p], rx.sigma[p]) = clocks[h].clone();
+                }
+            }
+            rx
+        };
+        let mut receiving = on(&bare);
+        let (mut y, mut moment) = self.cavity_forward_sided(&region, paces, false)?;
+        // A blank's clock reads its face after each tick but the last (§16.44), unless the stretch's first place runs bare.
+        let rereads = !paces.kappa.is_empty() && (!self.bare_stretch || self.per_blank_clock);
+        let one = 1i128 << PACE_BITS;
+        let width = d.alphabet + 1;
+        for k in 0..d.ticks {
+            self.twin_tick(&mut y, &fwd.ticks[k], paces, &receiving, &moment, &reaches)?;
+            if rereads && k + 1 < d.ticks {
+                let mut clocks = bare.clone();
+                for t in 1..sites {
+                    let face = shares(&self.face_of(&y[t * dw..(t + 1) * dw], &reaches)?.face);
+                    for h in (0..d.heads).filter(|&h| d.carries_moment(h)) {
+                        let Some(p) = paces.row.get(h).copied().flatten() else { continue };
+                        let base = self.layout.pace + p * width;
+                        let rate = release(face.iter().map(|&(c, w)| w as i128 * self.theta[base + c as usize] as i128).sum(), STATE_BITS);
+                        let stride = one + rate;
+                        clocks[h].0[t] = fit64(paces.tau[p][t - 1] as i128 + stride)?;
+                        clocks[h].1[t] = fit64(paces.sigma[p][t - 1] as i128 + stride.abs())?;
+                    }
+                }
+                receiving = on(&clocks);
+                moment = self.retarded_moments_at(&region, paces, &clocks)?;
+            }
+        }
+        y.chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect()
+    }
+
+    /// One tick of the strand's second stream ([`Constitution::strand_faces`]): each open place's move against the known stream's tick
+    /// `known`, as [`Constitution::tick`] moves an open last place of a region under [`Sided::Before`]. `paces` are the known stream's
+    /// clocks, `rx` the open places', `moment` their retarded moments.
+    fn twin_tick(&self, y: &mut [i64], known: &TickCell, paces: &Paces, rx: &Paces, moment: &[i64], reaches: &Reaches) -> Result<()> {
+        let d = &self.declaration;
+        let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
+        let (m2, span) = (2 * m, 2 * n);
+        let sites = y.len() / dw;
+        let l = &self.layout;
+        let one = 1u128 << WEIGHT_BITS;
+        let carried = |v: Option<i128>| v.ok_or(TowerError::Refused("a lock past its 128-bit carrier"));
+        let mut current = vec![0i64; sites * m2];
+        for t in 1..sites {
+            let (mut r, mut sc) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
+            lane_chart(&y[t * dw..(t + 1) * dw], d.lanes, &mut r, &mut sc)?;
+            let mut pr = vec![0i64; m2];
+            affine(&self.theta[l.probe..l.probe + m2 * dw], reaches.probe, dw, &r, Some(&self.theta[l.probe_bias..l.probe_bias + m2]), MATERIAL_BITS, MATERIAL_BITS, &mut pr)?;
+            for (pp, &mv) in pr.iter_mut().zip(&moment[t * m2..(t + 1) * m2]) {
+                *pp = fit64(*pp as i128 + mv as i128)?;
+            }
+            for h in 0..heads {
+                // The probe framed on the place's own clock, at unit power.
+                let mut wi = vec![0i64; span];
+                for li in 0..n {
+                    let c = h * n + li;
+                    let (ur, ui) = self.frame(rx, t, h, li);
+                    let (ur, ui) = (ur as i128, ui as i128);
+                    let (qr, qi) = (pr[c] as i128, pr[m + c] as i128);
+                    wi[li] = fit64(release(ur * qr - ui * qi, MOVE_BITS))?;
+                    wi[n + li] = fit64(release(ui * qr + ur * qi, MOVE_BITS))?;
+                }
+                let (unit, _) = ratio_to_power(&wi)?;
+                let wi: Vec<i64> = unit.into_iter().map(|v| v as i64).collect();
+                let lists = &known.classes[h];
+                let shared = !d.carries_moment(h);
+                let temper = self.temper(h, true)?;
+                let mut series = SeriesRow::new(span);
+                // Its near field before it, nearest first, then every known site past it (an open receiver's row, one side of it).
+                let near = (1..NEAR).filter_map(|gap| t.checked_sub(gap));
+                for j in near.chain(0..(t + 1).saturating_sub(NEAR)) {
+                    let wj = &known.q[(h * sites + j) * span..(h * sites + j + 1) * span];
+                    let vj = &known.v[(h * sites + j) * span..(h * sites + j + 1) * span];
+                    let gap = t - j;
+                    let mut s = 0i128;
+                    let mut value = vec![0i128; span];
+                    for li in 0..n {
+                        let decay = self.pair_decay_between(rx, t, paces, j, h, li);
+                        s = carried(s.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (wj[li] as i128, wj[n + li] as i128), 1, decay)?))?;
+                        (value[li], value[n + li]) = (decayed(decay, vj[li]), decayed(decay, vj[n + li]));
+                    }
+                    let base = fit64(release(s, FACE_BITS + 2 * self.decay(h, 0, gap).1 + 1))?;
+                    let fall = if shared { octave(lists.class_count(j, t).max(1)) as i128 } else { octave(gap) as i128 };
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (fall << FACE_BITS))?;
+                    series.push(self.face(z), one, one, &value);
+                }
+                let (framed, _) = series.release();
+                for li in 0..n {
+                    let (ur, ui) = self.frame(rx, t, h, li);
+                    let (ur, ui) = (ur as i128, ui as i128);
+                    let (yr, yi) = (fit64(framed[li])? as i128, fit64(framed[n + li])? as i128);
+                    let c = h * n + li;
+                    current[t * m2 + c] = fit64(release(ur * yr + ui * yi, MOVE_BITS))?;
+                    current[t * m2 + m + c] = fit64(release(ur * yi - ui * yr, MOVE_BITS))?;
+                }
+            }
+        }
+        let mut o = vec![0i64; dw];
+        for t in 0..sites {
+            affine(&self.theta[l.out..l.out + dw * m2], reaches.out, m2, &current[t * m2..(t + 1) * m2], Some(&self.theta[l.out_bias..l.out_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
+            for (yv, ov) in y[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
+                *yv = fit64(*yv as i128 + *ov as i128)?;
+            }
+        }
+        // The strand: the place's own `a` against the known site before it (the even contacts) and the circles as they stand before it.
+        let (half, plain, circles) = (f / 2, d.carry_first(), d.carry);
+        let c2 = 2 * circles;
+        for t in 0..sites {
+            let (mut r, mut sc) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
+            lane_chart(&y[t * dw..(t + 1) * dw], d.lanes, &mut r, &mut sc)?;
+            let mut a = vec![0i64; f];
+            affine(&self.theta[l.a..l.a + f * dw], reaches.a, dw, &r, Some(&self.theta[l.a_bias..l.a_bias + f]), MATERIAL_BITS, MATERIAL_BITS, &mut a)?;
+            let mut c = vec![0i64; f];
+            for e in (0..plain + circles).filter(|e| e % 2 == 0) {
+                let (ar, ai) = (a[e] as i128, a[half + e] as i128);
+                let (br, bi) = if e < plain {
+                    match t.checked_sub(1) {
+                        Some(s) => (known.b[s * f + e] as i128, known.b[s * f + half + e] as i128),
+                        None => (0, 0),
+                    }
+                } else {
+                    let k = e - plain;
+                    (known.qm[t * c2 + k] as i128, known.qm[t * c2 + circles + k] as i128)
+                };
+                c[e] = fit64(release(ar * br - ai * bi, FACE_BITS))?;
+                c[half + e] = fit64(release(ar * bi + ai * br, FACE_BITS))?;
+            }
+            affine(&self.theta[l.w..l.w + dw * f], reaches.w, f, &c, Some(&self.theta[l.w_bias..l.w_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut o)?;
+            for (yv, ov) in y[t * dw..(t + 1) * dw].iter_mut().zip(&o) {
+                *yv = fit64(*yv as i128 + *ov as i128)?;
+            }
+        }
+        Ok(())
+    }
+}
+
 /// [definition; agent-inferred, November 4, §16.40] **The chart by lanes** (the tower record, D2): a site's face of `L`
 /// lanes is read lane by lane, each lane's `W = D/L` coordinates a ratio to its own power, `r̂_ℓ = r_ℓ / ‖r_ℓ‖_rms`, its
 /// scale `‖r_ℓ‖_rms` pushed after the lanes before it; one lane is the chart over the whole width. Why lanes: a lane

@@ -144,3 +144,8 @@ Scored (2026-11-18T08:59:17Z), G-1118-4 (reads.txt), at the lap's mean against t
   It also says the frontier's fall is not in proportion to the places compared there: 1.6 times the comparisons bought a seventh more.
   On the fifty books the first pass took 0.35 nats and nine more took 0.19. The first comparisons at the frontier teach the state, and
   what remains falls slowly at this size.
+
+Read (2026-11-18T09:07:40Z), G-1118-4's panels and end state: the panel one place a read, 48 known, from arm G's end: 66 of 144 words in the lexicon,
+46% (48 to 58% guessed: missed, two points under; arm F's end reads 46% too). The long panel (384 known, the whole region known):
+108 of 250, 43%, where the control's end reads 34% and arm F's 36%; 2 of 20 writes loop, and the longest run shared with a prompt
+is 28 places.
