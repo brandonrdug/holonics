@@ -266,6 +266,13 @@ retired, the law it guarded stands in the guide, Lean or the atlas row named; TH
       read writes the frontier's rows read each way (`K` and `S` rows, where the pass says so or on the word `known`), and the
       one-place writer writes a state in the regime its pass names (by two streams: the known places and one more site, the face read
       at the open place of that last place).
+    - The strand's odd contacts facing the past (`Region::past`, atlas `tower.region-past`; the batch's word `FieldWords::before = 2`;
+      the pass's words `frontier E strand past` and `frontier E before past`): in a one-sided region an odd plain contact's mate is the
+      known site two before the place and a circle of odd contact is scanned from the left, where unset the one has no mate and the
+      other rests. Why: on the two-stream line's state the plain contacts carry 0.99 nats to the frontier and the circles 0.46
+      (`read-far` at `8` and `7`), and half of each stood idle. Card against host on the same four fields, first run: the strands'
+      test with a section of strands facing the past (24 cases) and the known stream at `9`. Whether the line carries the word is
+      G-1118-15's read.
   - owed, in order: the level made one-sided (a known stream hears none, and on the line's state of November 18 the level is worth
     0.21 nats at the frontier where the second read is worth 0.001: `read-far`'s settings `4` and `5`); a writer that keeps the known
     stream's states and reads one new place a symbol; the second read's mark is left out for good unless a reading asks for it.

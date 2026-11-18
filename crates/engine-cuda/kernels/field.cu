@@ -544,7 +544,9 @@ struct FieldWords {
     // `Constitution::ruler_far`): where set, every site of the batch hears only what stands before it. A support entry and a crowd on the after
     // side meet no site, a still head shares a class's face among its members before the receiver, the opening and the moments read no after
     // row, a strand contact with the site after has no mate and a circle scanned from the right stays at rest; a region's first site meets no
-    // source (the batch's `computed`). Zero is the law.
+    // source (the batch's `computed`). Zero is the law. [the record of the two streams §9] At `2` the strand's odd contacts face the past (the
+    // host's `Region::past`, a ruler's forward at `9`): an odd plain contact's mate is the second site before, and a circle of odd contact is
+    // scanned from the left as an even one's is.
     uint64_t before;
     // [definition; the lead, November 18, the frontier record §6] **A passage read by two streams** (the host's `Sided::Strand`, `Region::strand`): a
     // strand region's sites are its known stream's (the first `region_heard[r]` of them, every one known) and then as many open places, each at
@@ -4126,6 +4128,28 @@ __device__ __forceinline__ uint64_t strand_twin_after(const FieldWords &w, uint6
     return i < heard && heard + i + 1 < sites ? g + heard + 1 : UINT64_MAX;
 }
 
+// [the strand's odd contacts face the past] Site `g`'s mate at an odd contact where the batch's word is `2` (the host's `sided_mate`): the
+// known site two before its place, `UINT64_MAX` where fewer than two stand before it.
+__device__ __forceinline__ uint64_t strand_mate_back2(const FieldWords &w, uint64_t g) {
+    const uint32_t r = w.site_region[g];
+    const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    const uint32_t heard = heard_of(w, r, sites);
+    if (i >= heard) {
+        return i >= heard + 2 ? g - heard - 2 : UINT64_MAX;
+    }
+    return i >= 2 ? g - 2 : UINT64_MAX;
+}
+
+// [the strand's odd contacts face the past] The sites whose odd mate known site `g` is where the batch's word is `2`: the known site two
+// after it (`*p`) and the open place two places after it (`*q`), each `UINT64_MAX` where there is none; an open place is no one's mate.
+__device__ __forceinline__ void strand_after2(const FieldWords &w, uint64_t g, uint64_t *p, uint64_t *q) {
+    const uint32_t r = w.site_region[g];
+    const uint32_t sites = w.region_off[r + 1] - w.region_off[r], i = w.site_pos[g];
+    const uint32_t heard = heard_of(w, r, sites);
+    *p = i < heard && i + 2 < heard ? g + 2 : UINT64_MAX;
+    *q = i < heard && heard < sites && heard + i + 2 < sites ? g + heard + 2 : UINT64_MAX;
+}
+
 // The pair contact along the strand (§16.34, the host's tick): `c_g = a_g · b_mate`, zero without a mate, on the plain contacts (the first
 // `f/2 − C`; the carry circles are the scan's).
 extern "C" __global__ void field_pair(FieldWords w) {
@@ -4134,8 +4158,9 @@ extern "C" __global__ void field_pair(FieldWords w) {
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / plain, e = c % plain;
         const uint64_t re = t * w.f + e, im = re + half;
-        // [the known stream] An odd contact's mate, the site after, has not arrived (the host's tick under `Sided::Before`).
-        const uint64_t s = w.before && e % 2 == 1 ? UINT64_MAX : strand_mate(w, t, e);
+        // [the known stream] An odd contact's mate, the site after, has not arrived (the host's tick under `Sided::Before`); where the odd
+        // contacts face the past its mate is the second site before.
+        const uint64_t s = w.before && e % 2 == 1 ? (w.before == 2 ? strand_mate_back2(w, t) : UINT64_MAX) : strand_mate(w, t, e);
         const wide ar = w.pa[re], ai = w.pa[im];
         const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
         w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
@@ -4163,10 +4188,13 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
         // formed after the scan from the operand kept a step (`field_pair_scan_face`), and the step's gate and drive are read a step ahead, so the
         // chain's loads stand in flight behind its products. The same terms on the same operands, the refusals an OR.
         wide qr = 0, qi = 0;
-        const auto at = [&](uint64_t step) -> uint64_t { return first + ((e % 2 == 0) ? step : sites - 1 - step); };
+        // (a one-sided stream scans every circle it scans from the left)
+        const bool left = e % 2 == 0 || w.before != 0;
+        const auto at = [&](uint64_t step) -> uint64_t { return first + (left ? step : sites - 1 - step); };
         // [the known stream] A circle scanned from the right brings what has not arrived: it stays at rest (the host's tick under `Sided::Before`),
-        // its operand zero at every site, so its face and every covector through it are zero.
-        if (w.before && e % 2 == 1) {
+        // its operand zero at every site, so its face and every covector through it are zero. Where the odd contacts face the past it is
+        // scanned from the left instead.
+        if (w.before == 1 && e % 2 == 1) {
             for (uint64_t t = 0; t < all; ++t) {
                 const uint64_t gr = (first + t) * c2 + k;
                 w.pqm[gr] = 0;
@@ -4320,7 +4348,8 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
         // of that operand's covector stands beside the known site's (each released as it stands alone, `field_pair_scan_pre`), and it drives
         // nothing: its drive's covector is zero (the host's `tick_return`).
         const uint64_t sites = heard_of(w, r, (uint32_t)all);
-        const auto at = [&](uint64_t step) -> uint64_t { return first + ((e % 2 == 0) ? sites - 1 - step : step); };
+        const bool left = e % 2 == 0 || w.before != 0;
+        const auto at = [&](uint64_t step) -> uint64_t { return first + (left ? sites - 1 - step : step); };
         // The pair's part of `Qm`'s covector at a known site: its own and, where an open place stands at its place, that place's.
         const auto part = [&](uint64_t site, wide *pr, wide *pi) {
             const uint64_t gr = site * c2 + k;
@@ -4339,7 +4368,7 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
         }
         // [the known stream] A circle from the right stayed at rest: its drive takes no covector (the host's `tick_return`), and with `u` zero the gate's
         // reverse writes zero for its gate and its leak.
-        if (w.before && e % 2 == 1) {
+        if (w.before == 1 && e % 2 == 1) {
             for (uint64_t step = 0; step < sites; ++step) {
                 const uint64_t re = at(step) * w.f + e;
                 db[re] = 0;
@@ -4747,9 +4776,11 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / plain, e = c % plain;
         const uint64_t re = t * w.f + e, im = re + half;
-        // [the known stream] An odd contact met no mate, and returns to none.
-        const bool unmet = w.before && e % 2 == 1;
-        const uint64_t s = unmet ? UINT64_MAX : strand_mate(w, t, e);
+        // [the known stream] An odd contact met no mate, and returns to none; where the odd contacts face the past its mate is the second
+        // site before, and a known site is the mate of the known site and of the open place two after it.
+        const bool odd_back = w.before == 2 && e % 2 == 1;
+        const bool unmet = w.before == 1 && e % 2 == 1;
+        const uint64_t s = unmet ? UINT64_MAX : (odd_back ? strand_mate_back2(w, t) : strand_mate(w, t, e));
         if (s == UINT64_MAX) {
             da[re] = 0;
             da[im] = 0;
@@ -4760,10 +4791,15 @@ extern "C" __global__ void field_pair_back(FieldWords w, const int64_t *dc, int6
             da[im] = fit64(rel(br * gi - bi * gr, FACE_BITS), w.status);
         }
         // The site whose mate `t` is: its mate on the other side of `t`, read from `t` itself.
-        const uint64_t p = unmet ? UINT64_MAX : strand_mate(w, t, e ^ 1);
         // [the strand's two streams] A known site is also the mate of the open place after it: its `δb` is the sum of both terms, each
         // released as it stands alone.
-        const uint64_t q = unmet || e % 2 == 1 ? UINT64_MAX : strand_twin_after(w, t);
+        uint64_t p = UINT64_MAX, q = UINT64_MAX;
+        if (odd_back) {
+            strand_after2(w, t, &p, &q);
+        } else if (!unmet) {
+            p = twin_site(w, t) ? UINT64_MAX : strand_mate(w, t, e ^ 1);
+            q = e % 2 == 1 ? UINT64_MAX : strand_twin_after(w, t);
+        }
         wide dbr = 0, dbi = 0;
         if (p != UINT64_MAX) {
             const uint64_t pre = p * w.f + e, pim = pre + half;

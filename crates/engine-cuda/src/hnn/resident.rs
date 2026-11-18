@@ -956,7 +956,12 @@ impl<'c> Resident<'c> {
             bare_stretch: u64::from(field.bare_stretch),
             // [the ring record §4] The strengths `α_b`, read from the uploaded material at the second read (`run` sets the shares there).
             mark_at: l.mark as u64,
-            before: u64::from(field.ruler_far == 3),
+            // (one where every site hears only what stands before it, two where the strand's odd contacts also face the past)
+            before: match field.ruler_far {
+                3 => 1,
+                9 => 2,
+                _ => 0,
+            },
             ..Words::default()
         };
         // The exponential's resident face, read once by its own loop on the card (a tower's packets read the fine field's).
@@ -995,33 +1000,51 @@ impl<'c> Resident<'c> {
             return Err(TowerError::Refused("a section holding known streams is read and returned under the law; a ruler's forward and the readings take regions of one kind"));
         }
         let n = regions.len();
+        // [the record of the two streams §9] The one-sided groups are cut again by the word `past` (`Region::past`): its regions run under the
+        // forward whose odd strand contacts face the past (`FieldWords::before` at two, the host's ruler at `9`).
         let law: Vec<usize> = (0..n).filter(|&r| !regions[r].before && !regions[r].strand).collect();
-        let known: Vec<usize> = (0..n).filter(|&r| regions[r].before && !regions[r].strand).collect();
-        let strand: Vec<usize> = (0..n).filter(|&r| regions[r].strand).collect();
+        let known_of = |past: bool| -> Vec<usize> { (0..n).filter(|&r| regions[r].before && !regions[r].strand && regions[r].past == past).collect() };
+        let strand_of = |past: bool| -> Vec<usize> { (0..n).filter(|&r| regions[r].strand && regions[r].past == past).collect() };
+        let (known, known_past, strand, strand_past) = (known_of(false), known_of(true), strand_of(false), strand_of(true));
         let law_regions: Vec<Region> = law.iter().map(|&r| regions[r]).collect();
-        let known_regions: Vec<Region> = known.iter().map(|&r| Region { before: false, ..regions[r] }).collect();
+        let plain = |at: &[usize]| -> Vec<Region> { at.iter().map(|&r| Region { before: false, past: false, ..regions[r] }).collect() };
+        let (known_regions, known_past_regions) = (plain(&known), plain(&known_past));
         // [definition; the lead, November 18, the frontier record §6] **A passage read by two streams on the card** (`Region::strand`, the host's
         // `Constitution::strand_pass`): staged as its known stream's sites and then as many open places, each carrying the class it is compared
         // with, under the known stream's forward (`FieldWords::before`, `site_place`, `region_heard`). Its faces are the open places', none at
         // the first place.
-        if strand.iter().any(|&r| regions[r].unresolved.iter().any(|&u| u) || regions[r].faces.iter().any(Option::is_some) || regions[r].locked.iter().any(|&l| l) || regions[r].echo.iter().any(Option::is_some) || regions[r].port.is_some()) {
+        if strand.iter().chain(&strand_past).any(|&r| regions[r].unresolved.iter().any(|&u| u) || regions[r].faces.iter().any(Option::is_some) || regions[r].locked.iter().any(|&l| l) || regions[r].echo.iter().any(Option::is_some) || regions[r].port.is_some()) {
             return Err(TowerError::Refused("a passage read by two streams whose sites are not all known, or that has a port"));
         }
-        let staged: Vec<(Vec<usize>, Vec<bool>)> = strand.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].classes).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect();
-        let strand_regions: Vec<Region> = staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false }).collect();
-        let heard: Vec<u32> = strand.iter().map(|&r| regions[r].classes.len() as u32).collect();
+        let stage_of = |at: &[usize]| -> Vec<(Vec<usize>, Vec<bool>)> { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].classes).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() };
+        let (staged, staged_past) = (stage_of(&strand), stage_of(&strand_past));
+        // (the staged regions borrow `staged`, which outlives the runs below)
+        let strand_regions: Vec<Region> = staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false }).collect();
+        let strand_past_regions: Vec<Region> = staged_past.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false }).collect();
+        let heard_of = |at: &[usize]| -> Vec<u32> { at.iter().map(|&r| regions[r].classes.len() as u32).collect() };
+        let (heard_plain, heard_past) = (heard_of(&strand), heard_of(&strand_past));
         let mut ruled = field.clone();
         ruled.ruler_far = 3;
+        let mut ruled_past = field.clone();
+        ruled_past.ruler_far = 9;
+        let none: Vec<u32> = Vec::new();
         let (narrow_from, opening_from) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
         let mut faces: Vec<Vec<Option<TowerFace>>> = vec![Vec::new(); n];
         let mut rows: Rows = vec![Vec::new(); n];
         let mut echoes: Vec<Vec<u64>> = vec![Vec::new(); n];
         let mut g = if returning { vec![0i128; field.material_len()] } else { Vec::new() };
         let times: i128 = if field.declaration.mark { 2 } else { 1 };
-        for (group, at, f, weight, two) in [(&law_regions, &law, field, 1i128, false), (&known_regions, &known, &ruled, times, false), (&strand_regions, &strand, &ruled, times, true)] {
+        for (group, at, f, weight, heard) in [
+            (&law_regions, &law, field, 1i128, &none),
+            (&known_regions, &known, &ruled, times, &none),
+            (&known_past_regions, &known_past, &ruled_past, times, &none),
+            (&strand_regions, &strand, &ruled, times, &heard_plain),
+            (&strand_past_regions, &strand_past, &ruled_past, times, &heard_past),
+        ] {
             if group.is_empty() {
                 continue;
             }
+            let two = !heard.is_empty();
             let (narrow_group, opening_group) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
             if two {
                 *self.strand_run.borrow_mut() = heard.clone();
@@ -1068,7 +1091,7 @@ impl<'c> Resident<'c> {
             }
         }
         // The training path's words by region (`narrow_out`, `opening_out`) were gathered group by group: set in the regions' order.
-        let order: Vec<usize> = law.iter().chain(&known).chain(&strand).copied().collect();
+        let order: Vec<usize> = law.iter().chain(&known).chain(&known_past).chain(&strand).chain(&strand_past).copied().collect();
         fn placed<T: Default>(out: &std::cell::RefCell<Vec<T>>, from: usize, order: &[usize]) {
             let mut out = out.borrow_mut();
             if out.len() != from + order.len() {
@@ -1126,8 +1149,8 @@ impl<'c> Resident<'c> {
         // (the known stream: every site hears only what stands before it, `FieldWords::before`) and at `4` the level is not heard and the field reads
         // once, as the host's `Constitution::pass` does; the level's material takes no covector, so the run is the unlevelled field's and its covector
         // stands over the level's material as zeros. The far fields at `1` and `2` are the host's alone.
-        if field.ruler_far == 1 || field.ruler_far == 2 || field.ruler_far > 4 {
-            return Err(TowerError::Refused("a ruler's far field at 1 or 2 is a host reading, with no card realization"));
+        if !matches!(field.ruler_far, 0 | 3 | 4 | 9) {
+            return Err(TowerError::Refused("a ruler's forward other than the known stream's (3, 9) and the unlevelled one (4) is a host reading, with no card realization"));
         }
         if field.ruler_far >= 3 && field.scale.is_some() {
             let mut unlevelled = field.clone();

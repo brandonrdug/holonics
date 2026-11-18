@@ -299,7 +299,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false };
         self.admit_region(&region)?;
         let dw = d.width;
         let reaches = self.reaches();

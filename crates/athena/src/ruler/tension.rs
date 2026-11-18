@@ -626,6 +626,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     // written by them: the region is the known places and one more site holding the void (heard by no one: a known site hears only what
     // stands before it), and the face read is the open place's at that last place, which hears every known place.
     let strand = learner.pass.as_ref().is_some_and(|p| p.strand);
+    let past = learner.pass.as_ref().is_some_and(|p| p.past);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
@@ -642,9 +643,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
                 *open.last_mut().expect("a region of one place or more") = true;
                 if strand {
                     let n = classes.len();
-                    return OwnedRegion { strand: true, ..OwnedRegion::plain(classes, vec![false; n]) };
+                    return OwnedRegion { strand: true, past, ..OwnedRegion::plain(classes, vec![false; n]) };
                 }
-                OwnedRegion { before: known, ..OwnedRegion::plain(classes, open) }
+                OwnedRegion { before: known, past: known && past, ..OwnedRegion::plain(classes, open) }
             })
             .collect();
         let views: Vec<_> = regions.iter().map(view_of).collect();
@@ -686,8 +687,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// Why: a read that compares every place of a region at its own frontier needs a second, open place at every place; what that place must
 /// hear far (every site before it, or a few crowds) sets the read's cost, and this reads it before the read is built.
 pub fn read_far(args: &[String]) -> Result<()> {
-    if args.len() != 11 {
-        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA".into());
+    let only = args.len() == 12 && args[11] == "strand";
+    if args.len() != 11 && !only {
+        return Err("read-far UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA [strand]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-far")?;
@@ -721,7 +723,10 @@ pub fn read_far(args: &[String]) -> Result<()> {
     let nats = |code: i128, n: usize| ((code * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / n.max(1) as i128;
     // [the lead, November 18] A last pair of lines reads the law (printed as far=10) and the known stream (far=13) with the open place's
     // clock left bare at every tick (`Constitution::bare_stretch`): what its re-read from its own face is worth at the frontier.
-    for setting in [0u8, 1, 2, 3, 4, 5, 6, 10, 13] {
+    // [the lead, November 18] The lines far=7 and far=8 read the known stream with its carry circles at rest and with its plain strand
+    // contacts unmet: what the strand's own contacts carry to the frontier. The line far=9 reads it with its odd contacts and its circles
+    // from the right facing the past (`Region::past`). A last word `strand` reads these three and the known stream alone.
+    for setting in if only { vec![3u8, 7, 8, 9] } else { vec![0u8, 1, 2, 3, 4, 5, 6, 7, 8, 10, 13] } {
         let far = setting;
         learner.field.ruler_far = setting % 10;
         learner.field.bare_stretch = setting >= 10;

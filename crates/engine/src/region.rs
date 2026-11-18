@@ -27,18 +27,20 @@ pub struct OwnedRegion {
     pub before: bool,
     /// Whether it is read by two streams ([`Region::strand`]).
     pub strand: bool,
+    /// Whether its odd strand contacts and its circles from the right face the past ([`Region::past`]).
+    pub past: bool,
 }
 
 impl OwnedRegion {
     /// A region carrying no face and no lock.
     pub fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, before: false, strand: false }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, before: false, strand: false, past: false }
     }
 }
 
 /// A region as the field reads it.
 pub fn view_of(region: &OwnedRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }), before: region.before, strand: region.strand }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }), before: region.before, strand: region.strand, past: region.past }
 }
 
 /// The regions as the field reads them.
@@ -103,6 +105,13 @@ pub struct Region<'a> {
     /// reads where the field reads twice; the opening is compared as the retarded one. Refused where a site is open or carried, or the
     /// region has a port.
     pub strand: bool,
+    /// [definition; the lead, November 18, the record of the two streams §9; `agent-inferred`] **The strand's odd contacts face the past**:
+    /// in a region read one-sided ([`Region::before`], [`Region::strand`]) an odd plain contact's mate is the second site before (the two
+    /// nearest places that have arrived are then a site's two mates, as the sites before and after are under the law), and a circle of
+    /// odd contact is scanned from the left with its own gate and drive. Unset, an odd contact has no mate in such a region and its
+    /// circle stays at rest. Why: on the two-stream line's state the plain contacts carry 0.99 nats to the frontier and the circles
+    /// 0.46 (`read-far`'s settings `8` and `7`), and half of each stood idle in a one-sided stream. No meaning on a region of the law.
+    pub past: bool,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand
@@ -294,7 +303,13 @@ impl Constitution {
     /// Whether `region` is read with every site hearing only what stands before it: its own word ([`Region::before`]), or a ruler's forward
     /// at `3` ([`Constitution::ruler_far`]).
     pub(crate) fn sided(&self, region: &Region) -> bool {
-        region.before || region.strand || self.ruler_far == 3 || self.ruler_far == 6
+        region.before || region.strand || matches!(self.ruler_far, 3 | 6 | 7 | 8 | 9)
+    }
+
+    /// Whether `region`'s odd strand contacts and its circles from the right face the past ([`Region::past`]): its own word on a region
+    /// read one-sided, or a ruler's forward at `9`.
+    pub(crate) fn past(&self, region: &Region) -> bool {
+        (region.past && (region.before || region.strand)) || self.ruler_far == 9
     }
 
     /// Whether `region`'s forward hears the level: a field with one, read under the law or a ruler's forward at `5`, the region no known

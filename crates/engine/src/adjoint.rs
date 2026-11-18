@@ -167,6 +167,7 @@ impl Constitution {
         let (plain, circles) = (d.carry_first(), d.carry);
         let c2 = 2 * circles;
         let one_sided = cell.classes.first().is_some_and(|lists| lists.one_sided);
+        let past = cell.classes.first().is_some_and(|lists| lists.past);
         // `δa_t = conj(b_s) δc_t`, `δb_s = conj(a_t) δc_t` for the complex product of site `t` and its strand mate `s` (§16.34); each site's `b`
         // is one mate's, so each `δb_s` is one term.
         for t in 0..sites {
@@ -174,7 +175,7 @@ impl Constitution {
                 // [the strand's known stream] Where every site hears only what stands before it, an odd contact met no mate.
                 // [the strand's two streams] An open place's mate is the known site before its place, which is then two sites' mate: its
                 // `δb` is the sum of both terms (each released as it stands alone).
-                let mate = if t >= heard { place(t).checked_sub(1).filter(|_| e % 2 == 0) } else { strand_mate(t, e, heard).filter(|_| !one_sided || e % 2 == 0) };
+                let mate = crate::contact::sided_mate(t, e, heard, one_sided, past);
                 let Some(s) = mate else { continue };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
@@ -192,11 +193,12 @@ impl Constitution {
         // coupling's covectors `δq`, `δℓ` and the drive's `δb(t) = κ(t) u` ([`carry_gate_return`]).
         let mut dqh = vec![0i64; sites * c2];
         // [the strand's known stream] A circle scanned from the right stood at rest there, and returns nothing.
-        for k in (0..circles).filter(|&k| !one_sided || (plain + k) % 2 == 0) {
+        for k in (0..circles).filter(|&k| !one_sided || past || (plain + k) % 2 == 0) {
             let e = plain + k;
             let (mut xr, mut xi) = (0i128, 0i128);
             for step in 0..heard {
-                let t = if e % 2 == 0 { heard - 1 - step } else { step };
+                // (a one-sided stream scans every circle from the left, so its reverse runs from the right)
+                let t = if e % 2 == 0 || one_sided { heard - 1 - step } else { step };
                 let (gr, gi) = (dc[t * f + e] as i128, dc[t * f + half + e] as i128);
                 let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
                 let (qr, qi) = (cell.qm[t * c2 + k] as i128, cell.qm[t * c2 + circles + k] as i128);
@@ -683,7 +685,7 @@ impl Constitution {
         let reaches = self.reaches();
         let known = vec![false; n];
         // (the known stream's region: sided, so the opening's comparison below is the retarded one)
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
