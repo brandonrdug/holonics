@@ -187,9 +187,15 @@ impl Constitution {
     /// `h` between sites `i` and `j`, `e^(−2π |σ_h(i) − σ_h(j)|/n)` on a head that reads a pace (its byte distance's
     /// [`Constitution::decay`] where the pace is plain), the exact `1` on a still head.
     pub(crate) fn pair_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize) -> (i128, u32) {
+        self.pair_decay_placed(paces, h, l, i, j, i.abs_diff(j))
+    }
+
+    /// [`Constitution::pair_decay`] of a pair whose clocks are `paces`' at `i` and `j` and whose places stand `gap` apart (their
+    /// indices' distance, but for an open place of a strand's second stream).
+    pub(crate) fn pair_decay_placed(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize, gap: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
             Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
-            _ => self.decay(h, l, i.abs_diff(j)),
+            _ => self.decay(h, l, gap),
         }
     }
 

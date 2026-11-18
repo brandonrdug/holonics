@@ -4212,6 +4212,26 @@ fn the_boundary_charts_face_reads_nothing_at_or_past_its_place() {
     }
 }
 
+/// [definition; the lead, November 18, the frontier record §6] **The strand's two streams in one tick are the second tick's bits**: the
+/// faces of [`Constitution::strand_pass`] (the open places as sites of the known stream's batch, read by their places) are those of
+/// [`Constitution::strand_faces`] (a second tick written for them) at every place, on fields with a still head and without, with
+/// circles and paces off their rest.
+#[test]
+fn the_strands_two_streams_in_one_tick_are_the_second_ticks_bits() {
+    for (name, field) in [("circles, one still head", circled_shaped(1)), ("circles, turned heads", circled_shaped(0)), ("plain contacts", shaped(1)), ("no still head, plain contacts", shaped(0))] {
+        let a = field.declaration.alphabet;
+        for (seed, sites) in [(0xB1u64, 14usize), (0xB2, 9), (0xB3, 2)] {
+            let classes = drawn_classes(seed, sites, a);
+            let second = field.strand_faces(&classes).unwrap();
+            let joined = field.strand_pass(&classes, false).unwrap().faces;
+            assert_eq!(joined.len(), sites);
+            for t in 0..sites {
+                assert_eq!(joined[t], second[t], "{name}: {sites} places, place {t}");
+            }
+        }
+    }
+}
+
 /// [definition; the lead, November 18, the frontier record §6] **The return under the strand's known stream**: on a region whose places
 /// are known but its last, read with every known place hearing only what stands before it (a ruler's forward at `3`), the covector
 /// matches the code's difference, family by family at its largest entries, as [`covector_matches_the_codes_difference`] reads the law's
