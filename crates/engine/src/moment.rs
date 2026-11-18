@@ -574,7 +574,10 @@ impl Constitution {
         }
         let l = &self.layout;
         let rows = |base: usize| -> Vec<Vec<i64>> { (0..sites).map(|t| self.strand_row(region, base, 2 * tm, t)).collect() };
-        let (eb, ea) = (rows(l.moment_before), rows(l.moment_after));
+        // [measurement] Under a ruler's `3` the moments read no after row ([`Constitution::moments_sided`]): none is read here, and none takes
+        // a covector.
+        let after = self.ruler_far != 3;
+        let (eb, ea) = (rows(l.moment_before), if after { rows(l.moment_after) } else { vec![vec![0i64; 2 * tm]; sites] });
         let (mut db, mut da) = (vec![vec![0i128; 2 * tm]; sites], vec![vec![0i128; 2 * tm]; sites]);
         for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
             for li in 0..n {
@@ -605,7 +608,9 @@ impl Constitution {
         }
         for t in 0..sites {
             self.strand_return(region, l.moment_before, 2 * tm, t, &db[t], g);
-            self.strand_return(region, l.moment_after, 2 * tm, t, &da[t], g);
+            if after {
+                self.strand_return(region, l.moment_after, 2 * tm, t, &da[t], g);
+            }
         }
         Ok(())
     }
