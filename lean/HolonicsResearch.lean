@@ -1303,3 +1303,10 @@ import HolonicsResearch.HNN.PhaseChart
 import HolonicsResearch.Aeon.Clock.ThreeDistance
 import HolonicsResearch.Aeon.Clock.SturmianComplexity
 import HolonicsResearch.Aeon.Production.Recurrence
+import HolonicsResearch.EllipticCurve.TernaryReducedCount
+import HolonicsResearch.Geometry.ModularFreeProduct
+import HolonicsResearch.Geometry.LockAddress
+import HolonicsResearch.Holon.LoopCurvature
+import HolonicsResearch.Compression.KTNodeSplit
+import HolonicsResearch.HNN.JointStepCovector
+import HolonicsResearch.HNN.RestitutionFamily
