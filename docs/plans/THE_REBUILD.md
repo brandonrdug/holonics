@@ -1,6 +1,6 @@
 # The rebuild
 
-**Status: November 11.** This plan is the construction's one order: the steps with their issues and
+**Status: November 18.** This plan is the construction's one order: the steps with their issues and
 done conditions, the campaign under way, and the rules every step keeps. The laws live in their
 guides and owners ([the elementary objects](../ELEMENTARY_OBJECTS.md), [THE_MACHINE](../THE_MACHINE.md)),
 [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) is the position, and dated records hold the
@@ -10,7 +10,12 @@ The plan was rewritten on November 7 as the current order, at Brandon's word tha
 documents are the agents' to redo. Section 3 was rewritten on November 11, when the training line
 became `main`'s field and the energy field of November 6 to 9 left the tree
 ([the record](../../research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+Section 3 was rewritten again on November 18 as the store line, the line that trains since November 12
+(C9 of [THE_CONSOLIDATION](THE_CONSOLIDATION.md), #603).
 What it replaced is history:
+- section 3 as it stood from November 11 to 18 (the code passage's campaign, its readings of November 11
+  and the order within step 8 as it grew to November 14) is at
+  [`23344ac23`](https://github.com/brandonrdug/holonics/blob/23344ac237ca3c044d79d2858bea3a1e6c1ec1f3/docs/plans/THE_REBUILD.md#3-the-campaign-under-way-athena-alpha-on-a-code-passage);
 - section 3 as it stood from November 7 to 11 (the energy field as the campaign under way) is at
   [`b6ff1f795`](https://github.com/brandonrdug/holonics/blob/b6ff1f795/docs/plans/THE_REBUILD.md);
 - the plan of September 28 to November 7 (the unified plan U0 to U8, the issue order of October 9,
@@ -42,7 +47,7 @@ The milestones are the steps; each issue body holds its dated status line and it
 | 4–5. The HNN learning law and its card realization | #73, #76; the helical code #386 (critical); the contact and chain laws #408 | the HNN learns through its own deposition, a reached comparison changing located material, on the card with host parity for each law (#73, #76); the helical code's and the contact laws' boxes (#386, #408) | campaigns 1 and 2 built; the field learner of step 8 runs on the card at parity with its host reference; campaign 2's criterion and learned physical repair stay open (#73) |
 | 6. Equation extraction | #146 | a foreign realization's operators and coefficients are read as native element relations, interconnection and navigators; inherited coefficients seed the engine's initial configuration (the overture) and are never served | unparked October 29; SmolLM2's layer 0 founded a participating level on the host (retired with the October library at `d5ed4adc1`); from November 16 the route is **Demeter** ([record](../../research/records/2026-11-16_DEMETER_A_GENE_IS_A_PARTIAL_KEY_THE_FORM_IS_AUTHORED_OR_LIFTED_THE_FIELD_LOCATES_THE_REST_AND_A_PLANTED_CROSSING_TELLS_CAPACITY_FROM_THE_SADDLES_DELAY.md)): a lift is a genotype (spectra and form, founded once, priced by a native twin), never content, and no source is ever run; its first construction is the planted crossing |
 | 7. Lean curation | #147; every owed statement is one box in #410 | #147's boxes | the first pass, the renames and U0's owner consolidation are done |
-| 8. Athena alpha | #404 with #405, #406, #407, and the November 2 review's #601, #602, #603 | #404's boxes: real text learned online through the native route, kept by retained deposition, a cold restart, a question answered from the retained state with its sources, readable text shown whole | the field on a code passage, learning lap by lap on the card (§3) |
+| 8. Athena alpha | #404 with #405, #406, #407, and the November 2 review's #601, #602, #603 | #404's boxes: real text learned online through the native route, kept by retained deposition, a cold restart, a question answered from the retained state with its sources, readable text shown whole | the store line: open text, arithmetic and word problems, learning lap by lap on the card (§3) |
 | Parked | #409 | the target laws #20, #22, #23, #32 and the contact terms #30, #31 | closed until their work starts |
 
 **The consolidation** (#603, from November 14) runs beside the steps and changes no law. The
@@ -51,192 +56,71 @@ repository is reduced to the machine that runs, the engine gets one owner cut by
 once. Its order, its decisions and its receipts are in [THE_CONSOLIDATION](THE_CONSOLIDATION.md);
 its first step is a coverage reading of the live line on the PC.
 
-## 3. The campaign under way: Athena alpha on a code passage
+## 3. The campaign under way: Athena alpha on the store line
 
-**The terrain.** Since November 5, at Brandon's request, the field learns Python code
-([the passage record](../../research/records/2026-11-05_THE_FIELD_MOVES_TO_A_CODE_PASSAGE_WHOSE_CLOSURES_ARE_BRACKETS_STRINGS_AND_BLOCKS.md)):
-`flytech/python-codes-25k`, converted at the exterior boundary into records `question US answer RS`,
-every byte as the row holds it. 128 problems are held, chosen in a keyed order among the rows whose
-instruction and output stand in no other row, so no held question or answer is met in training. One
-problem is one field: the question's sites are known, the answer's sites are open, and the answer is
-refined and released whole ([the one-field record](../../research/records/2026-11-01_THE_PROBLEM_IS_ONE_FIELD_EVERY_SITE_READS_EVERY_OTHER_AND_THE_ANSWER_IS_REFINED_NOT_SPOKEN.md)).
+**The terrain.** Since November 12 the line reads a store of whole documents
+([the passage record](../../research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md)),
+and since November 16 the store has seven slices: code, web, science, books and wikidata (open text, a
+prefix of whole documents with held documents a slice), the arithmetic world (keyed records
+`EXPR = VALUE`) and word problems. A section mixes the slices, each stretch of a document one region.
+GSM8K's test split is the held yardstick and is never trained. The code passage of November 5 was the
+line before it.
 
-**The field's law** (`hnn::tower::field`, whose module text states it; the card's realization is
-`holonics-cuda`'s `hnn::field`, at parity with the host).
-- One constitution is iterated four ticks over all of a problem's sites. In a tick each head gathers
-  a current through its lock: a receiver's probe meets the sources whose key sits in its class of
-  shells or in its near field, at the octave falloff; a still head's modes read content at any
-  distance its class reaches, and a turned head's modes carry the ring phasors, their skin and the
-  site's moment.
-- The strand's pair contact then multiplies a site's read by its strand mate's. With the carry its
-  second operand is a running sum along the strand with its own gate, so a unit runs to its stop
-  inside one tick.
-- A place's face is read from its state after the last tick through the encoding.
-- The derivations are in the
-  [dispersing field record](../../research/records/2026-11-01_THE_FIELD_DISPERSES_A_SITE_MEETS_ITS_RESONANCE_CLASS_AT_ITS_FALLOFF_AND_THE_ANSWER_LOCKS_UNDER_THE_PUMP.md)
-  through the reading of November 6 at 10:31 inside its §16.47, and the records of November 10 and
-  11. That record's later parts, from the stored-energy reading of November 6 at 22:52, are the
-  energy field's: one attempt of November 6 to 9 that left the tree on November 11
-  ([the port's record](../../research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
+**The engine.** The line trains through `holonics_engine::field` in `crates/engine`, its card
+realization `holonics_engine_cuda::hnn::field` in `crates/engine-cuda` and the commands of
+`crates/athena` (the binary `athena`). [THE_ENGINE](../THE_ENGINE.md) is its guide: the pipeline
+phase by phase, the declaration word by word, the saved state line by line and the commands with
+the lines they print. Its [§11](../THE_ENGINE.md#11-the-theorys-laws-against-the-engine) sets the
+theory's laws against what the engine holds, and a design on how the machine learns reads it first.
 
-**The learner** (`FieldLearner`; the trainer is `train-store`, [`crates/athena/src/store.rs`](../../crates/athena/src/store.rs); the code line's
-`field_train.rs` retired with `train-field` at C6 of #603).
-- The comparison is completion read as a joint code: a region is drawn as a state of open places
-  among the answer's, and its covector returns through the ticks by the operands that produced each
-  carrier.
-- A section's step is the covector's first moment over the root of its second. It deposits at its
-  size with no reread of its own section (it fluxes: a reread that keeps only the steps that lower
-  the code discards what an expansion measures, November 5), and the next section's covector prices
-  it at first order, a printed reading. The read of a held step on the next section stays as a
-  declared comparison.
-- Each founded part of the material steps at its own rate, carried in the state and set from the
-  part's own displacements between laps (atlas `deposition.lap-cosine-drift-over-noise`).
+**The learner** (`Learner`; the trainer is `train-store`,
+[`crates/athena/src/store.rs`](../../crates/athena/src/store.rs)).
+- A stretch takes one state: a keyed draw of open places, the release's own state, or the
+  frontier's (the context known and the next place alone open), the last a share of the pass that
+  the state carries. Where the pass says so, a stretch at the frontier is read by two streams,
+  every place compared at its own frontier in one forward
+  ([THE_ENGINE §5](../THE_ENGINE.md#5-the-learners-state) gives the pass line's words).
+- The comparison is the joint code at a state's open places, with the opening compared through its
+  own lift, and its covector returns through the ticks by the operands that produced each carrier.
+- A section's step is the covector's first moment over the root of its second, deposited at the
+  rate the state carries. It deposits at its size with no reread of its own section.
+- The pass's place over the store, its bounds and its share at the frontier are law and are carried
+  in the learner's state, never in a run's switch.
 
-**The loop.** A lap walks the training passage's 1,535 sections on the RTX 4080 SUPER. Each lap's
-law is fixed before launch, the guesses are written down as numbers before the read and scored, a
-miss included, and the lap ends in its receipt. A lap is read by its held joint code and by its
-structure: the release's stages on held problems, the locked code, the transmission by written
-letter and the carry's gate. A build enters a line by reproducing the line's own lap, its reads
-included. An iteration between saved states stays within one hour on the card (Brandon,
-November 6); a run that would pass it is a design change, not a longer run.
+**The loop.** A lap is a count of sections on the RTX 4080 SUPER, saved as states and as the mean
+of its states. Each lap's law is fixed before launch, the guesses are written down as numbers
+before the read and scored, a miss included, and the lap ends in its receipt.
+- A build enters the line by reproducing the line's own lap, its reads included (gate 3,
+  `tools/gate_engine.sh`).
+- A change to the line runs beside a control from the same saved state, both read at their lap
+  means, and leaves the line when its guess misses (CLAUDE.md, Method).
+- A report opens with what the line wrote from its fixed panel of held prompts, with the code in
+  nats and the loudness beside it.
+- An iteration between saved states stays within one hour on the card (Brandon, November 6); a run
+  that would pass it is a design change, not a longer run.
 
-**Where it stands, by measurement (November 11).** The held answers' joint code is 1.7248 nats a
-place at the mean of the part-rate line's eighteenth lap (1.7314 at that lap's end), and the line
-still cools at this law: its lap means fell 0.0008, 0.0033, 0.0020, 0.0013, 0.0003 and 0.0016 over
-laps 13 to 18. A line's level is read at its lap's mean: a lap's end is
-one draw of the spread its rates hold. Section to
-section the line is at rest (sections' deposits agree at a cosine of 0.08); lap over lap its young
-parts still charge: the second lane's reading charts and lift lengthen 1.5 to 2 percent a lap and
-the added contacts' columns 1.2 percent. The carry's four laps hold 0.005 to 0.007 under their
-controls and pass no letter past the second any better: as built, founded at zero, it gives a term
-of three sites. The added contacts carry the place's two-sided closure and not the third letter.
-The field lacks 0.233 nats a place of the joint law of two letters each side and passes little past
-two written letters. The release rests above the
-references and no write is yet ordered text.
-[CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) holds the table and the records.
+**Where it stands.** [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) holds the position: each
+line that trains, its state, its readings by region and what is owed, in order. This plan restates
+none of its readings.
 
 **The order within step 8.**
-1. Read what the present body still learns, from its saved states. Two readings are done
-   (November 11). The added contacts travel each its own direction, so no founding from the
-   deposit's pair tensor is built (`tools/state_travel.py rank`; guess G57, scored). The trend
-   rule's raised rates sped up travel that is real and across its parts, and its laps read hotter,
-   on the trained sections as on the held ones (`tools/state_travel.py scale`; guesses G58 and G59,
-   both missed and scored). A lap cosine reads only the travel that survives a lap, never the
-   spread a rate costs within it. The spread is now read
-   ([the heat record](../../research/records/2026-11-11_A_DEPOSITS_RATE_IS_A_TEMPERATURE_ITS_STANDING_SPREAD_IS_SHED_BY_A_MEAN_OF_STATES_AND_LAP_ENDS_ARE_DRAWS_THAT_DO_NOT_REMEMBER_EACH_OTHER.md)):
-   a rate is a temperature, its spread is shed by a lap's mean, and one pair of laps read at their
-   means puts the raised lap 0.0009 under the lap at the old rate, where their ends put it 0.0041
-   above. So levels are read at lap means. Read there, the raised pair ended (G68), a rate rule on means
-   has no rest position (G69), the release reads at lap ends (G70), and the whole machine at four
-   times the rate travelled 4.7 times as far for no level (G76): no rate is the subject, while the
-   line still cools at its base rate (G82)
-   ([the follow-up record](../../research/records/2026-11-11_RAISED_RATES_BUY_NO_LEVEL_THE_ADDED_CONTACTS_CLOSE_A_PLACE_BETWEEN_ITS_WRITTEN_NEIGHBOURS_AND_THE_THIRD_LETTER_IS_OWED_A_CARRY_FOUNDED_AS_A_TURN.md)).
-   The added contacts carry the place's two-sided closure and not the third letter (G80). The
-   carry's failed acceptance (no third or fourth letter) makes its founding the next loop's subject
-   for that law, never its rate: founded as a turn, on circles of its own whose return is founded
-   at zero, its gate charted as a turn and a friction apart (Lean `HNN/CarryGate`). The stride
-   ruler passes the third letter at 0.136 to 0.363 on 8 to 64 circles, its gain a doubling still
-   rising at 64 (G81); the first attempt is at 16 circles a mate, its laps paired with the line's
-   on the same sections (G83).
-   Growth follows where a reading certifies it, with its guess fixed first.
-2. On the card, a region's share store takes its stride from the pairs that meet (atlas
-   `tower.field-support-stride`), so a return rides one batch; then the next section's tables are
-   staged on the host under the card's stroke. The tensor cores are not used yet, and a limb
-   realization is ordered only from a profile that names its entries.
-3. The release writes ordered text, judged by its structure and shown whole as it comes out.
-4. #404's remaining boxes follow on that learner: retention across passages, a cold restart on the
-   card, and a question answered from the retained state with its sources.
-5. **The passage widens, and a width belongs to its part** (Brandon, November 12;
-   [the passage record](../../research/records/2026-11-12_THE_PASSAGE_WIDENS_TO_FIVE_REGISTERS_OF_OPEN_TEXT_THE_CONSTITUTIONS_SIZE_AND_THE_ENGINES_RATE_BIND_BEFORE_THE_DATA_A_WIDTH_BELONGS_TO_ITS_PART_AND_A_REGION_DECLARES_THE_PERIODS_OF_ITS_OWN_HELIX.md)).
-   In order, each step with its receipt: the census of directions by block from the line's saved
-   lap means (scored November 12: both parts missed, every block's travel fills the directions it
-   has, and it sizes no lane); the fetch of the wider passage as a store of whole documents (done
-   November 12: five slices of Common Corpus, 8 GB with a prefix of 1 GB, held documents from the
-   far end of the shard order); the count of a lap's regions by kind of state (done November 12,
-   [the record on the opening's room](../../research/records/2026-11-12_A_LAPS_CARD_TIME_STANDS_IN_THE_OPENINGS_EMPTY_ROOM_A_LAP_LINES_SITES_ARE_WEIGHED_DOMAINS_A_STRETCH_OF_A_DOCUMENT_TAKES_ONE_KEYED_STATE_AND_EVERY_EXTENT_OF_THE_DECLARATION_IS_GIVEN_ITS_PART.md)):
-   0.704 of the sites the card computes on the code line stand in the openings' whole rooms, so
-   the trainer's regions come before the contact's arithmetic; the store's trainer (a read by
-   stretches, one keyed state a stretch, a section bounded in the learner's state to one batch of
-   the card, the letters founded at the crossing, no law read from the environment), a new line
-   whose binary reproduces te7's lap with the old trainer untouched and whose lines are held to
-   the cut's reference port, its rate fixed as G115 before its build (done November 12: built and
-   merged, 10.4 µs a computed site, the pass stopped after one leg of 3,000 sections); **the
-   engine**, ordered from the trainer's own profile by entry against a count of a section's
-   arithmetic on the card's lanes
-   ([the engine's record](../../research/records/2026-11-12_A_SITES_ARITHMETIC_IS_COUNTED_AGAINST_THE_CARDS_LANES_THE_STORE_TRAINER_RUNS_AT_ONE_FORTIETH_OF_THEM_A_PAIRS_SKIN_IS_FORMED_ONCE_A_CLOCK_AND_COST_FOLLOWS_SURPRISE.md),
-   §6; the trainer stands at 17.8 times the sum of the count's floors on the card's measured
-   yardsticks, 19 on published figures): first the realizations that
-   keep every bit, each entering by reproducing the line and timed inside one hold (a profile by
-   head and two measured yardsticks of the card, done November 12; a pair's skin once a clock,
-   its store on the row's support, done November 12 at 0.948 of its control with its time guess
-   missed, the contact family read as bound by the octets it gathers and that reading's test
-   ordered before the series; a turn's phases and
-   the moments' skins once a clock, done November 12 at 0.959 of its control; the phase series
-   on narrow words, done November 12 at 0.936 of its control, 387.9 ms a section, G116 (b) held
-   and (c) missed; then, since the contact family's distinct words brought once a launch cost
-   129 ms a section against a bar of 40.7, two loops ahead of any further step of this kind:
-   the rows' products at the widths their bounds prove (the ablation of G120 read the entry's
-   memory alone at 0.507 of its time, so half is 128-bit arithmetic), then the pair store's
-   layout (a pair's words as one record in the order its support is walked, the forward's
-   entries as one launch and the return's as one; forecast from source at 27.5 ms a section
-   for the family's floor), each with its guess fixed first; the site's maps fused by
-   chart; a batch's launches fused), their rates fixed as G116, then the laws at declared widths
-   (a covector released under a declared grain so that the return's cost follows surprise; a row's
-   carrier anchored at its peak; the pair store on its support, item 2, where the card holds 280
-   octets a pair of sites against 71,486 a site); beside the engine, short reads of the three
-   states the line has (the crossing, 2,001 and 5,001 sections): the held code by slice and kind,
-   the count of compared places by octave of surprise, and writes from held prompts by slice
-   (done November 12,
-   [the record](../../research/records/2026-11-12_THE_STORE_CODES_HELD_TEXT_AT_THE_LEVEL_OF_TWO_KNOWN_NEIGHBOURS_A_SIDE_A_SYMBOL_IS_A_WORD_ON_LOCATED_RINGS_AND_A_DARK_PLACE_IS_THE_INTERIOR_OF_A_COMPOSITE.md):
-   the store codes held text at the level of a count of two known neighbours a side, the share
-   of places under a sixteenth of a bit is 0.009 to 0.041 and does not move, and no state writes
-   language); **the symbol's word** (the same record, §8; atlas `code.symbol-word-located-rings`):
-   a symbol's rows as a series on a key of coprime rings that the machine locates, composites
-   composed by the machine where a place is dark given its neighbour (epochs of a paced clock as
-   the sites of the level above, never a table of merges), the codec's release the identity on
-   bytes; a repair of the located transport of October 5 and guard 9, beside which the tower's
-   codec entered (the record's §8.8); its first reading G118 (the store's trained paces by class
-   and where their carries fall on held text; read November 12,
-   [the record of the symbol's length](../../research/records/2026-11-12_A_SYMBOL_IS_A_LENGTH_A_BYTE_IS_A_DIGIT_OF_THE_PASSAGE_A_TEXTS_PRIMES_ARE_ITS_PRIMITIVE_CYCLES_AND_A_STRIDE_IS_READ_AT_ITS_PLACE_AS_THE_NEWS_CLOCK_OF_OCTOBER_HELD.md):
-   the trained carries fall nearly blind to the text's news, a place's own code length puts the
-   news on the places that carry, and that clock is the October tower's clock of news), then its
-   design record, which joins the November tower to that clock and takes as its acceptance an
-   invariance (a held passage and its re-timed copy open the same epochs, atlas
-   `code.news-clock-proper-time`; no loss under a stretch by a unit of a ring and the merged
-   residues under a factor sharing its prime, `code.stretch-unit-orbit`), with its guess
-   fixed before its build, which comes ahead of any long pass (written November 13,
-   [the design record](../../research/records/2026-11-13_A_LEVELS_SITES_ARE_THE_EPOCHS_OF_ITS_NEWS_BEGUN_AGAIN_AT_EACH_OPENING_ITS_CLOCK_IS_THE_NEWS_BETWEEN_THEM_A_PLACES_NEWS_IS_READ_AT_ITS_CAVITY_FACE_AND_EACH_NAVIGATOR_KEEPS_ITS_LOCATED_CLOCK.md):
-   each navigator keeps its located clock; a level's sites are the epochs of its places' news
-   under a carry that begins again at each opening, `code.epoch-restarting-carry`, which a
-   count ruler read keeping 0.996 of its sites under a doubled indentation and 0.9997 under a
-   changed start at a section of 8 bits, where October's carry on a running sum keeps 0.70 and
-   0.61; a place's news is read at its cavity face, `code.place-news-cavity-face`; its readings, the opening's comparison at every place
-   (G139) and the level itself are built, and the level is the line (November 13, G145 and G147: two laps
-   beside the line, 0.0194 nats a place under it at one-place masks and 0.0137 at whole masks at lap
-   means, every slice); **next**, from the readings that followed it: a turned head's reach on its own
-   located clock, where it now falls off by the count of places and a place's influence follows that
-   count and not the news (G148), and the pump that would carry a mode past the parametron's
-   bifurcation, since the trained field rung past its depth relaxes and dissipates what the places
-   hold (G149; no pump across ticks is built, and a triad is a product along the strand inside one
-   tick, so the triads are judged on their own law and are not that pump; a pump needs a mode with
-   two energies, and the part owed first is a reader's reaction on its source, atlas
-   `tower.field-read-free-fall`, with a site's carried rate `tower.field-tick-return` beside it), each
-   with its guess fixed before its build; one
-   continuous pass over tier A (1 GB), ordered once the engine stands near its count and judged by
-   what it writes from held prompts by slice; the face as a composition of
-   lanes, each block reading its own (moved ahead of the rest on November 14: a third lane of 32 founded at zero bought 0.0086
-   and 0.0129 nats a place at equal card time where five laps had bought nothing at whole masks, G188), entering at `(32, 32, 32)` by
-   reproducing the laned line; then a lane's width read from the count of directions its readers' travel fills (the census
-   of November 12 drawn on the third lane), fixed as a guess before its build ([the record](../../research/records/2026-11-14_THE_LINES_PLATEAU_WAS_THE_FACES_WIDTH_ONE_LANE_FOUNDED_AT_ZERO_BOUGHT_MORE_IN_A_THOUSAND_SECTIONS_THAN_FIVE_LAPS_AND_A_LANES_WIDTH_IS_READ_FROM_ITS_TRAVEL.md) §4). No extent is sized by a
-   factor or padded to a power of two. A tier's pass is ordered only after its projection is read
-   against the count (the guides' method rule of November 12); the rate is stated in two parts,
-   the forward a site and the return a unit of surprise, by slice, and never as one mean a byte.
-   The bar before tier B (8 GB) is 1 µs a computed site, 1.70 times the sum of the floors the
-   card's measured yardsticks give.
-6. **More than one medium** (the same record, §6 to §11): the region's helix in
-   `hnn::tower::field` and on the card, a text region reproducing the line's lap; the rank page and
-   MNIST's sections paired both ways with their labels; the acoustic chart with its remainder; then
-   the test at equal text bytes with and without the other media's sections.
+1. The loops CONSTRUCTION_STATE lists as owed, each with its guess fixed first and its arm beside
+   the line.
+2. The release writes ordered text, judged by its writes, shown whole as they come out.
+3. #404's remaining boxes follow on that learner: retention across passages, a cold restart on the
+   card (the instrument at hand is `restore-store`, which reads a saved state in a fresh process
+   and compares its bytes), and a question answered from the retained state with its sources.
+4. The engine line's builds that the consolidation leaves
+   ([THE_CONSOLIDATION §11](THE_CONSOLIDATION.md#11-what-the-campaign-leaves-to-the-engines-line)):
+   a symbol's word on located rings in place of the codec's table of classes (atlas
+   `code.symbol-word-located-rings`), the declared extents read from their laws (depth from
+   settling, width from the capacity price, reads until agreement), one family of sum and scan
+   kernels, and the deposit realized on the card. No extent is
+   sized by a factor or padded to a power of two, and a tier's pass is ordered only after its
+   projection is read against the card's count (CLAUDE.md, Method).
+5. More than one medium (the passage record, §6 to §11): a region's helix declared by the region,
+   image and acoustic charts with their remainders, then the test at equal text bytes with and
+   without the other media's sections.
 
 ## 4. Rules of the rebuild
 
@@ -266,10 +150,10 @@ references and no write is yet ordered text.
   is stored or consumed inside a law or the machine. Each term has a declared width, a carrier widens
   at a declared crossing, and a term is released only at a declared tolerance with its remainder
   carried.
-- **One library for the laws, one backend for the card.** `holonics` builds without CUDA, and
-  `holonics-cuda` depends on it and realizes its operations. Brandon's `codex/apple-silicon` becomes
-  `holonics-apple`, implementing the execution port only after the host reference exists, with parity
-  for each law.
+- **One library for the laws, one backend for the card.** `holonics-engine` builds without CUDA, and
+  `holonics-engine-cuda` depends on it alone and realizes its operations. Brandon's `codex/apple-silicon`
+  becomes a second realization of the same port (`Realization`), only after the host reference exists,
+  with parity for each law.
 - **Learning runs on the card** (CLAUDE.md, "GPU first"). A part enters a learner run with its card
   realization and its parity against the host; the host realization is the reference that checks the
   card's bits.

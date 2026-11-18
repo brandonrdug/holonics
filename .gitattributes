@@ -15,3 +15,7 @@ research/papers/source/** -whitespace
 # (docs/plans/THE_CONSOLIDATION.md, decision D7).
 research/** linguist-documentation
 docs/canon/** linguist-documentation
+
+# The records' index is written by tools/records_index.py from the file names, so a pull request's
+# diff folds it.
+research/records/INDEX.md linguist-generated

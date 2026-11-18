@@ -327,7 +327,12 @@ is rebased, factored or re-represented with its decoder and residual. The [helic
 relation: the known source family, the admitted controls, the participating receiver, and the
 requested consequence. It refines a joint field and releases its boundary, not a sequence of
 tokens. Text, image, acoustic and motor releases are applications of that relation. Robotics is an
-intended HNN capability, and its motor chart is serial screw words.
+intended HNN capability, and its motor chart is serial screw words. The order in which a boundary's
+places are released is the release's realization: a writer that opens one place at a time and draws
+it from the field's own face (the engine's `write-next`) is a release of this kind, and what the
+sentence bars is an emitter that reads counts or a seen context in place of the field's own state
+(`agent-inferred`, November 18, with THE_MACHINE's guard 18: the sentence can be read as a bar on
+writing in place order, and the line was first compared where it writes that day).
 
 [definition] **Languages are applications.** Lean, and every programming or natural language, is
 data to the HNN. No Lean parser, kernel call, theorem emitter, template or verdict enters the HNN.
@@ -1060,8 +1065,12 @@ paths. Dataset roles and provenance are exterior codec information, not native s
 Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
 `PATH=/opt/cuda/bin:$PATH`. The gates, lowest first:
 
-1. any code change: `bash tools/gate.sh` (the workspace check, THE_MACHINE's guard lints and the
-   guards' `compile_fail` doctests; a guard that is not run does not hold);
+1. any code change: `bash tools/gate.sh` (the workspace check, the guard lints on the engine and on
+   athena, the engine's host tests and doctests, and the tools' controls; a guard that is not run
+   does not hold). Its last lines read the text against the tree: the guides' relative links
+   (`tools/link_check.py links`), the atlas's owners (`link_check.py atlas`) and the records' index.
+   A change that adds or renames a record runs `python3 tools/records_index.py write` and commits
+   `research/records/INDEX.md` with it, or gate 1 says the index is behind;
 2. once per step or PR: the tests of the laws that step wrote or changed. Inherited tests count
    only after rebuild step 1 has audited them.
 3. at the end of a step that changes HNN behaviour or a kernel: the GPU suite, alone on an idle

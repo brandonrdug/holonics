@@ -44,7 +44,7 @@ GR-derived models are identified by their actual equations and approximation dom
 generator, frame, contact and receiving variation: two screw generators act on two initial
 configurations; their pair quadrance has a source-derived gradient and full geometric Hessian.
 `Framework.Geometry` imports `Geometry/ScrewGeometry`, whose moment specialization consumes
-`HolonicQuadraticMomentCondensation`. `holonics::geometry::screw` shares the rational vector/affine
+`HolonicQuadraticMomentCondensation`. `holonics::geometry::screw` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/screw.rs)) shared the rational vector/affine
 objects; the prototype's identity atlas consumed it through its screw Gram map. The guide keeps
 the proper-frame/axis Rust tests separate from the checked Lean bracket/translation/jet scope.
 It also reconnects the existing landmark, normalized-mode, inference and future-receiver
@@ -490,9 +490,9 @@ physical interpretation requires it.
 [definition] Its `WorldTube` composes addressed membrane contact, constitutive current, outward
 restriction and returned difference. Its outward radical is relative to the specified receiver.
 A silent boundary can contain active interior current.
-[`holonics::holon::restriction::tube`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/restriction/tube.rs) supplies the continuing
+[`holonics::holon::restriction::tube`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/holon/restriction/tube.rs) (the October library's, retired at that commit) supplied the continuing
 tube's commuting squares, circuit holonomy and wormhole receipt in its declared executable scope;
-it is not the definition of all smooth physical tubes.
+it was not the definition of all smooth physical tubes.
 
 [interpretation] A space-time tube network uses local sections as interiors, addressed contacts
 as interfaces, and compatible transports as its connecting geometry. A smooth manifold chart,

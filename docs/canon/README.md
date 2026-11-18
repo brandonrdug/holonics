@@ -8,8 +8,8 @@ repaired, with deleted guides and retired code now pointing to history at
 
 [project-postulate] **The [elementary objects](../ELEMENTARY_OBJECTS.md) govern its wording.**
 Read a canon passage through them. Where the two differ, the objects govern and the canon is the
-older spelling. [CLAUDE.md](../../CLAUDE.md) and [AGENTS.md](../../AGENTS.md) list the retired
-phrasings (section "The elementary objects"). The canon still uses them, for example:
+older spelling. [CLAUDE.md](../../CLAUDE.md) lists the retired phrasings (section "The elementary
+objects"). The canon still uses them, for example:
 
 | Canon phrasing | Read it as |
 |---|---|
@@ -19,11 +19,25 @@ phrasings (section "The elementary objects"). The canon still uses them, for exa
 | "generator" for the object with an initial configuration, clock, carry and address words | A **navigator** ([objects §3](../ELEMENTARY_OBJECTS.md#3-navigator)). The algebraic senses stay: a group generator, the Lie generator `ξ` of a helix, a generating function. |
 | bare "standing" for the constitution; a tape, journal, frozen cut or replay as retention; a single scalar of progress | The constitution; the future-sufficient quotient; a receipt, which is a field of readings over a partition. |
 
+[project-postulate] **Its bans are dated readings** (November 18). The canon states many refusals:
+"banned by name" lists ([THE_DIALECT](THE_DIALECT.md), A6), the frozen laboratory's bans
+([THE_RECOVERED_LAW](THE_RECOVERED_LAW.md)), contaminant species
+([THE_CONTAMINANT_PROTOCOL](THE_CONTAMINANT_PROTOCOL.md)), authored levels
+([THE_AUTHORED_LEVEL](THE_AUTHORED_LEVEL.md)) and what each tablet refuses. Each records what was
+read in the body of its date and the condition that identified it. None bars a configuration, a
+part or a word by its name or its history. Where a governing law of [CLAUDE.md](../../CLAUDE.md)
+states the same refusal with its reason (precision, retention, no catered machinery, stores and
+caches), that law governs and is applied by its test; where none does, the passage is evidence,
+and what it names may be taken up again as an attempt
+([a past configuration is an instruction](../../CLAUDE.md#past-configurations)). The canon said
+as much of itself: a ban is on the jurisdiction, never on the word
+([TABLET_THE_RESONANCE](TABLET_THE_RESONANCE.md), [THE_HOLOBROCHOS_SPINE](THE_HOLOBROCHOS_SPINE.md)).
+
 [definition] Code paths in the canon (`crates/holonic-engine`, `holonics-hna`, `examples/`,
 `archive/`, `formal/`) name owners at their date. Most are retired and live in history. Canon
 sentences that name THE_ROADMAP, ARCHITECTURE_MAP or REPOSITORY as current authority are
 superseded by the homes below. [EPISTEMIC_GRADES](EPISTEMIC_GRADES.md) remains the grading
-standard in force; CLAUDE.md and AGENTS.md cite it.
+standard in force; CLAUDE.md cites it.
 
 ## Where the current laws live
 
@@ -36,7 +50,7 @@ standard in force; CLAUDE.md and AGENTS.md cite it.
 | Constraint modes, fluids, mass–energy and the formal framework | [CONSTRAINT_MODES_AND_RECEIVER_FACES](../CONSTRAINT_MODES_AND_RECEIVER_FACES.md), [HOLONIC_FLUID_CONSTRUCTION](../HOLONIC_FLUID_CONSTRUCTION.md), [FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS](../FLUID_REFLECTION_AND_CONCENTRATED_INTERIORS.md), [MASS_ENERGY_AND_CAUSAL_TRANSPORT](../MASS_ENERGY_AND_CAUSAL_TRANSPORT.md), [FORMAL_FRAMEWORK](../FORMAL_FRAMEWORK.md) |
 | The line and the order of work; the current position | [THE_REBUILD](../plans/THE_REBUILD.md); [CONSTRUCTION_STATE](../../CONSTRUCTION_STATE.md) |
 | Formal statements | [`lean/`](../../lean/README.md): `Holonics.Framework` and the research umbrella |
-| Executable law | `crates/holonics` (host), `crates/holonics-cuda` (device) |
+| Executable law | `crates/engine` (the law and its host reference), `crates/engine-cuda` (the card), `crates/athena` (the commands); [THE_ENGINE](../THE_ENGINE.md) |
 | Research routes and withdrawn claims | [records README](../../research/records/README.md); [RETRACTIONS](../RETRACTIONS.md) |
 
 ## The files
