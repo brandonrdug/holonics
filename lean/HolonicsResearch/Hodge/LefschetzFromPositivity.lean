@@ -54,7 +54,8 @@ manifold, no harmonic theory.
 
 **What this does not state.**  The triple is given: no Kähler manifold, no Kähler identities and
 no harmonic representatives are constructed, so this is not hard Lefschetz for any variety until
-such a triple is built on its cohomology with `⟪·,·⟫` positive.  The signs of the Hodge–Riemann
+such a triple is built on its cohomology with `⟪·,·⟫` positive.  Its first instance, the flat
+torus's exterior algebra with `L = ω ∧`, is `Hodge/TorusLefschetzTriple` (`torusTriple`).  The signs of the Hodge–Riemann
 bilinear relations on a variety (`(−1)^(k(k−1)/2) i^(p−q)` on the primitive `(p, q)` part, against
 the intersection pairing, which is not positive) are not stated: here the pairing is an inner
 product from the start.  The Lefschetz decomposition is given as its count and its orthogonality,
