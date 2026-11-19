@@ -114,19 +114,23 @@ field's tide is `+∂_i∂_jΦ`, Newton's tidal tensor. The second jet's **linea
 
 What is not claimed. The full Riemann tensor of a 2-jet whose first jet does not vanish is defined
 and split (`K` plus a part quadratic in the first jet), but its symmetries, its Ricci tensor and its
-tide are not read there, and the size of the quadratic part as a perturbation shrinks (the
-continuity of `g⁻¹` at `η`) is not stated: "linearized" means the term of first order in the scale
-`t`, and the weak field's and the point mass's statements are about `K(∂∂h)`, not the full
-curvature of `η + h`, whose first jet `∂Φ` does not vanish at `(r, 0, 0)`. The jets live at one
+tide are not read here (`Physics/Spacetime/FriedmannFluid` reads the Ricci tensor and the tide of the
+flat Friedmann–Lemaître–Robertson–Walker jet, whose first jet does not vanish), and the size of
+the quadratic part as a perturbation shrinks (the continuity of `g⁻¹` at `η`) is not stated:
+"linearized" means the term of first order in the scale `t`, and the weak field's and the point
+mass's statements are about `K(∂∂h)`, not the full curvature of `η + h`, whose first jet `∂Φ` does
+not vanish at `(r, 0, 0)`. The jets live at one
 point: no metric field on a manifold, no change of coordinates (the tensor character of `R`) and no
 construction of normal coordinates (the vanishing first jet is a hypothesis, or read off the plane
 wave at its origin); that a second jet is symmetric (Schwarz's theorem for a `C²` metric) is the
 hypothesis `JetSymm`. The point mass's Hessian is given as numbers at `(r, 0, 0)` (the classical
 `∂_i∂_j(−M/r) = M(δ_ij − 3x_ix_j/r²)/r³`), not derived from `Φ` by Mathlib's derivatives. The
-deviation equation `J″ = −RJ` along a geodesic stays owed: the tide is read at a point, and
-`Raychaudhuri` still takes the deviation equation as a hypothesis. The Bianchi identity `∇R = 0`
-(it needs the 3-jet), a fluid-plus-thermal constitution solving `G + Λg = κT` (the weak field meets
-only dust's trace-reversed equation, at first order) and the Regge construction are not stated. No
+deviation equation `J″ = −RJ` along a general geodesic stays owed: the tide is read at a point, and
+`Raychaudhuri` takes the deviation equation as a hypothesis (on the comoving congruence of the flat
+Friedmann–Lemaître–Robertson–Walker metric it is proved, `FriedmannFluid.comoving_deviation`). The
+Bianchi identity `∇R = 0` (it needs the 3-jet) and the Regge construction are not stated; the weak
+field here meets only dust's trace-reversed equation, at first order, and a fluid-plus-thermal
+constitution solving `G + Λg = κT` stands in `FriedmannFluid`. No
 metric of type I, II or III is built. Another sign convention flips the sign of `R` or of the Ricci
 tensor.
 

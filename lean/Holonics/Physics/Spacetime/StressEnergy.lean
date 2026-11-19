@@ -23,7 +23,7 @@ viscous stress negatively. No coefficient is chosen here: every entry is the K3 
 
 * **Symmetry and the perfect-fluid face.** `T` is symmetric (`sourceMap_symmetric`), its rest
   observer reads `ε` (`sourceMap_restReading`, through `restObserver_contraction_eq_density`), and
-  without viscosity or heat flux it is exactly the owner's `perfectFluidTensor ε p`
+  without viscosity or heat flux it is the owner's `perfectFluidTensor ε p`
   (`sourceMap_perfect`). Its spatial trace is `3p − (2μ + 3λ) tr G`, the bulk-viscous pressure
   (`sourceMap_spatialTrace`).
 * **A boosted observer mixes energy, heat and stress.** The owner's boosted observer
@@ -148,7 +148,7 @@ theorem sourceMap_restReading (s : ConstitutedState) :
   rfl
 
 /-- [proved-derived; formal-checked] **The perfect-fluid face.** Without viscosity or heat flux
-the source map is exactly the owner's `perfectFluidTensor ε p`. -/
+the source map is the owner's `perfectFluidTensor ε p`. -/
 theorem sourceMap_perfect (s : ConstitutedState) (hμ : s.shear = 0) (hbulk : s.bulk = 0)
     (hq : s.heatFlux = 0) :
     sourceMap s = perfectFluidTensor (s.energyDensity : ℝ) (s.pressure : ℝ) := by

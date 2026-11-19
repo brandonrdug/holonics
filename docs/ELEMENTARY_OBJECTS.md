@@ -730,11 +730,12 @@ Owners: Lean `Objects/{Parametron,ParametronLock}`, `HNN/{Ring,Floquet,FloquetPa
 [`complex_parametron.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/cuda_refine/complex_parametron.rs),
 is a port source). `Objects/Parametron` joins the LC and generalized-mode exchange, the ring's
 crossings as `RationalClockPassage` ticks (`d ≥ 2`), and the threshold unit as the
-energy-minimizing locked sheet. [open] The rotating pump's tongue boundaries and its subharmonic
+energy-minimizing locked sheet; `HolonicsResearch/Objects/ContinuousCrossing` reads the continuous
+crossings of `A cos(ωt + φ)`, sampled `d` times a period, as the micro-step ring's (the owner's
+`Crossing` records for `d ≥ 2`). [open] The rotating pump's tongue boundaries and its subharmonic
 multiplier below `−1`; a saturation (the law is linear, so a locked amplitude grows until a
-certified step or a declared saturation bounds it); the continuous crossing of `A cos(ωt + φ)` as
-the micro-step ring; the executed law's second order through a passage (the kicked chart's is
-proved); the covector of the lock's decision reaching the members' pumps (reaching the placement's
+certified step or a declared saturation bounds it); the executed law's second order through a
+passage (the kicked chart's is proved); the covector of the lock's decision reaching the members' pumps (reaching the placement's
 `E` it was `hnn::executed`'s, September 30, retired with the descent move October 5 at
 `9078f103`; the bank's face, which read the decision at a declared temperature, is retired, batch
 H).

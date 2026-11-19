@@ -20,7 +20,7 @@ of them of length `3^(−(n+1))` at depth `n`: `cantor_gap_length`, `cantor_dept
 states Lapidus–Pomerance's direct theorem for a Minkowski measurable string and, as standard, that lattice ratios give
 persistent oscillation while nonlattice ratios give Minkowski measurability (Lapidus–van Frankenhuijsen, *Fractal
 Geometry, Complex Dimensions and Zeta Functions*, 2nd ed., Springer 2013, Ch. 8). Atlas rows read:
-`fractal.cantor-gap-zeta` (its scope line: the exhaustion of the Cantor complement is not proved),
+`fractal.cantor-gap-zeta` (the exhaustion of the Cantor complement, since placed in `CantorStringSpectrum`),
 `fractal.self-similar-zeta`, `fractal.string-counts`, `fractal.minkowski-spectral-asymptotic` (the direct theorem,
 which assumes measurability) and `rh.inverse-spectral-fractal-string`. The Cantor string is the lattice string the
 tree holds, and here its tube volume is read directly: the content does not exist, because the normalized tube volume
@@ -80,16 +80,17 @@ spacing, `log 3 = 2π/(2π/log 3)`. The real part `D` is the exponent that norma
 What is not claimed.
 - Lapidus–Pomerance's direct spectral theorem `N_ν(x) = |Ω|x − c_D·M·x^D + o(x^D)` and its Tauberian machinery
   (atlas `fractal.minkowski-spectral-asymptotic`), and their criterion that a string is Minkowski measurable if and
-  only if `ℓ_j ∼ L·j^(−1/D)`.
+  only if `ℓ_j ∼ L·j^(−1/D)`. The Cantor string's own spectral count, its Weyl term and its second term of order
+  `x^D` that oscillates, stand in `HolonicsResearch/Foundation/CantorStringSpectrum`.
 - The measurability of nonlattice self-similar strings (renewal theory; the owner's golden string,
   `goldenStringZeta_eq`) and the lattice criterion for general self-similar strings: only the Cantor string is read.
 - Lapidus–Maier's inverse spectral problem `(ISP)_D` and its failure at `½` (atlas
   `rh.inverse-spectral-fractal-string`), Herichi–Lapidus's weighted shift and spectral operator, and Makarov's
   theorem (1985). They stay owed in the box.
-- The tube volume is the string's formula `Σ_j min(2ε, ℓ_j)`. That it is the Lebesgue measure of the inner
-  `ε`-neighbourhood of the boundary of the Cantor set's complement in `[0, 1]` needs the holes placed as disjoint open
-  intervals that exhaust that complement (the scope line of `fractal.cantor-gap-zeta`) and countable additivity over
-  them; only the one-hole law (`volume_hole_tube`) is proved.
+- The tube volume here is the string's formula `Σ_j min(2ε, ℓ_j)`, with the one-hole law (`volume_hole_tube`) as
+  its local form. That it is the Lebesgue measure of the Cantor set's inner `ε`-neighbourhood in its complement, the
+  holes placed as disjoint open intervals that exhaust that complement, stands in
+  `HolonicsResearch/Foundation/CantorStringSpectrum` (`volume_innerTube`).
 - The explicit tube formula, with the residues at the complex dimensions as the Fourier coefficients of `f`'s
   periodic part, and the closed form `g((1 − D)/D) = 2^(1−D)·D^(−D)·(1 − D)^(D−1)` of the lower content.
 - The Minkowski dimension is read here as `1 − lim log V(ε)/log ε`; its definition through the upper and lower
