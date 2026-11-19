@@ -17,7 +17,10 @@ harmonic cochain.
 
 [established-bounded; formal-checked] Scope: group identities on one triangular cell, matrix
 class functions, and the existing finite weighted complex over ℚ. Continuum connections,
-curvature forms and characteristic classes are outside this module. No `axiom`, no `sorry`.
+curvature forms and characteristic classes are outside this module. The word `g₀₁ g₁₂ g₂₀` is
+written along the boundary and acts right to left, `g₂₀` first; its opposite-group reading, the
+additive cochain as the holonomy's first order at the identity, and a based point's closure
+against the frame's are in `HolonicsResearch/Transport/MoveConventions`. No `axiom`, no `sorry`.
 -/
 
 open scoped BigOperators Matrix

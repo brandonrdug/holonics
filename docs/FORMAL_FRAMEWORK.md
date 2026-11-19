@@ -104,8 +104,10 @@ adds `pairFeatureReturn_adjoint`, `pairQuadranceHessian_quad`, the rate-port con
 PSD/null laws, and the finite quadrance score remainder. `Geometry/ScrewGeometry` adds
 translation-rechart composition. `Transport/SerialScrewChain`, imported by Dynamics, checks
 finite affine/Cayley/translation algebra and the local-joint product, including the prototype
-chain's fold correspondence. General proper-rotation cross-product covariance and continuous chain
-Jacobian correspondence retain their #62 obligations. The integrated Framework check passes
+chain's fold correspondence. General proper-rotation cross-product covariance and the axis are
+`Geometry/Motion` (`proper_mulVec_cross`, `proper_has_axis`); the continuous chain Jacobian (the
+Cayley rate `2/(1 + (u·u)t²)`, the spatial columns as `Ad` of the prefix, the recharted twists of
+the prototype's loop) is `HolonicsResearch/Transport/SerialChainJacobian`. The integrated Framework check passes
 at 9,207 jobs; added statements use standard axioms only.
 
 [open] #62 owns the actual remaining joins: proper-rotation recharting/axis extraction;

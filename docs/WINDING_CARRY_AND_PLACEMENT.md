@@ -164,7 +164,8 @@ signature `(p,q)`, the Pontryagin arm (realized by the prototype's `StructuralPl
 [`holonic_interaction.rs`](https://github.com/brandonrdug/holonics/blob/13f8c734/crates/holonics-cuda/src/holonic_interaction.rs)) requires
 `A*G+GA=0` and bounds open-right-half-plane modes by `min(p,q)`; its spectral symmetry is
 `λ ↦ −conj λ`. `Hodge/HodgeIndex` and `Coupling/ReflectedPositivity` give related signature
-constructions, and #54 owns the corresponding Lean lift. A general dissipative
+constructions, and the Lean lift is `HolonicsResearch/Transport/PontryaginBound` (`pontryagin_bound`,
+`gSkew_eigen_reflect`, `onAxis_finrank_ge`). A general dissipative
 `A=(Ω−M_contact)G` does not satisfy that equality. Signature alone neither makes it a rotation
 nor transfers the conservative bound to all of its off-axis modes. The rate identity
 `A*G+GA=−2G M_contact G` selects the applicable arm.
@@ -192,10 +193,15 @@ is why a matrix is the natural unit of a face. For proper rigid edge transports 
 `winding::triangle_holonomy` accepts general affine maps, including shear and singular maps;
 those need not be rigid screws. `burgers_step` returns the translation only when the linear
 part is identity. For a rotating affine holonomy `(R,t)`, closure of a based point is
-`(R−I)x+t=0`; closure of the whole frame is `R=I, t=0`. Translation alone is not the test.
+`(R−I)x+t=0`; closure of the whole frame is `R=I, t=0`. For `R≠I` translation alone is not
+the test; for `R=I` it decides, every point closing or none (`HolonicsResearch/Transport/MoveConventions`,
+`translation_is_not_the_test`, `flat_closes_all_or_none`).
 The `followed_by` convention of `holonics::geometry` (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/mod.rs)) applies maps left to right, whereas standard column
 matrices/permutations multiply right to left. Its formal realization uses the opposite group
-or reverses the represented word; a noncommuting triangle checks the convention.
+or reverses the represented word; a noncommuting triangle checks the convention. In the tree the
+left-to-right composition is `Transport/SerialScrewChain`'s `compose` (Motion's `move_comp` composes
+right to left), and `HolonicsResearch/Transport/MoveConventions` states the opposite-group isomorphism, the column
+matrices' reversed product and the triangle whose two readings differ by the carry `2e₂`.
 Faraday induction additionally supplies the constitutive/time law and orientation
 `circulation(E)=−∂_t flux(B)`; the spatial cochain identity alone is not that evolution. `Foundation/HodgeReceiver` already proves the full
 decomposition of an edge field into a potential part, a circulation part and a harmonic part.
@@ -206,7 +212,10 @@ representative for the declared positive metric. General `Foundation/Standing` a
 nonharmonic directions whenever an admitted future distinguishes them. The HNN binding must
 state its present receivers, future separator and transport; silence alone does not select the
 harmonic quotient. Multiplicative nonabelian holonomy and the additive Hodge complex require
-their declared representation/linearization before their fields can be identified.
+their declared representation/linearization before their fields can be identified: they agree on
+a commutative carrier and at first order at the identity, and part at second order by the
+commutators (`HolonicsResearch/Transport/MoveConventions`, `holonomy_first_order`, `holonomy_second_order`,
+`heisenberg_cell_holonomy_ne_one`); the linearization itself is not built.
 
 [proved-standard] An integral flux class is the first Chern class of a line bundle; the divisor
 of a section is its zero locus, and local section winding around the divisor is related to curvature by the Poincaré–Lelong
@@ -251,7 +260,12 @@ their own hypotheses. A germ continues along admissible paths; singularities or 
 boundary can obstruct extension, and monodromy records path dependence where continuation
 exists. Slice data has a unique development only for the specified well-posed equation and
 boundary/gauge conditions. A coherent thread through a tower lifts level by level, uniquely
-when the required lifting condition holds (Hensel; `EllipticCurve/FamilyTunnellBrandtPadicHensel`, `Foundation/ContinuingTower`).
+when the required lifting condition holds (Hensel; `EllipticCurve/FamilyTunnellBrandtPadicHensel` for one correction,
+`HolonicsResearch/Foundation/CarryTower` for the thread: a simple root modulo `pᵏ` is the face of exactly one root in
+`ℤ_[p]`, `hensel_thread_unique`, `hensel_padic_root_unique`, while where the condition fails a root lifts twice or not
+at all; `Foundation/ContinuingTower` gives existence under surjective restriction). The finite carry charts are that
+tower's faces: words of `n` digits with their adder are `ZMod (bⁿ)`, the top carry released, and over a face at level
+`m` the lifts at level `n` are the `bⁿ⁻ᵐ` free upper digits (`chartEquiv_addCarry`, `fibre_card`).
 Holon : tensor : matrix is a section with its navigator : its value in a chart : its components
 in a frame. An admitted [D-finite function](https://math.mit.edu/~rstan/pubs/pubfiles/45.pdf) is an algorithmic instance: a navigator (an annihilating
 operator) with finite initial data, closed under sum, product and integral, with a supplied annihilator and sufficient unrounded initial data deciding equality on the
