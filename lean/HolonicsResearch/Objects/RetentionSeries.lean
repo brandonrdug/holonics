@@ -88,13 +88,14 @@ What is proved.
 
 What is not claimed.
 
-- Graphs with several independent cycles that do not share their two ends (a wheel, a grid, two
-  triangles on one edge) and cycles of four or more edges: the triangle's argument uses its
-  spanning-tree sum and its explicit unit fluxes, and no statement for a general graph is made. The
-  box stays part done.
+- A general graph with several independent cycles (a wheel, a grid, a complete graph): the
+  triangle's argument uses its spanning-tree sum and its explicit unit fluxes. Every cycle of three
+  or more nodes and the diamond (two triangles on one edge), under the square and Joule laws, stand
+  in `HolonicsResearch/Objects/RetentionCycles`, through an abstract lemma of which this module's
+  triangle is an instance; there the classes are again the constitutions. The box stays part done.
 - Deposition laws other than the square and Joule laws, beyond item 2's reduction (every law that
-  deposits on each bundle's edges as that bundle's law); the Joule law on the triangle is not
-  computed.
+  deposits on each bundle's edges as that bundle's law); the Joule law on the triangle, whose
+  classes are the constitutions, is `RetentionCycles`'.
 - Series of three or more bundles, or bundles in series with a pendant, are not written, though
   item 1 applies part by part.
 - Convergence or the long-run orbit of repeated deposition.

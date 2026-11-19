@@ -96,7 +96,9 @@ What is not claimed.
   orbit structure of square-law deposition on projective classes is not computed. The triangle,
   where the constitution is the minimal retention, and two bundles in series, whose classes are the
   product of the two bundles', each driven by the series current, stand in
-  `HolonicsResearch/Objects/RetentionSeries`. The box stays part done.
+  `HolonicsResearch/Objects/RetentionSeries`; every cycle of three or more nodes and the diamond,
+  under the square and Joule laws, where the constitution is again minimal, stand in
+  `HolonicsResearch/Objects/RetentionCycles`. The box stays part done.
 - Deposition laws other than the square and Joule laws, beyond what item 1 (every law on a forest)
   and item 5's reduction (every law pair on the pendant composite) say.
 - Convergence or the long-run orbit of repeated deposition, and the existence of a solve on a

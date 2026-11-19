@@ -100,11 +100,12 @@ What is not claimed. The existence of geodesics and of a parallel frame is a hyp
 ordinary differential equation is solved. A family is given by its partial derivatives at a point,
 with the agreement of mixed partials built into the shared `w` and `β`; it is not derived from a
 `C³` family by Schwarz's theorem, and a family whose data hold at every point gives the hypotheses
-at each point. No metric enters the derivation: metric compatibility, the symmetries of `R` beyond
-`R^a_bcd = −R^a_bdc`, and the symmetry of the frame's tidal matrix `𝓡` (which the owner's
-`rotation_law` asks) are not derived; the matrix `J` carries all `n` frame directions, the
-geodesic's own included (`R(u, u)u = 0` empties that column), and the reduction to the screen
-orthogonal to a timelike `u` with `⟨u, u⟩ = −1` is not made. The derivation holds for any
+at each point. No metric enters the derivation here: metric compatibility, the symmetries of `R`
+beyond `R^a_bcd = −R^a_bdc`, the symmetry of the frame's tidal matrix `𝓡` (which the owner's
+`rotation_law` asks) and the reduction to the screen orthogonal to a timelike `u` stand in
+`TidalScreen`, for a connection that is a metric's at the base point and a frame adapted there; the
+matrix `J` carries all `n` frame directions, the geodesic's own included (`R(u, u)u = 0` empties
+that column). The derivation holds for any
 torsion-free connection, the Levi-Civita connection of a Lorentzian metric among them, but no
 Lorentzian instance is built here (`FriedmannFluid` holds the comoving one). Coordinates are those
 of `ℝⁿ`: no manifold, no change of coordinates. Conjugate points, the Morse index and the sphere's

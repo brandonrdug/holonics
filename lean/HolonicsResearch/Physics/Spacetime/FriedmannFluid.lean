@@ -92,17 +92,18 @@ jet is the owner's zero residual `frwResidual = einsteinResidual G g T Λ κ = 0
    `H·1` (no shear, no rotation) and the expansion `θ = 3H` has the rate `raychaudhuriRate = 3(a″/a − H²)`,
    the rate `hubble_rate` gives.
 
-What is not claimed. Spatial curvature `k ≠ 0`, perturbations and their growth, viscous or heat-conducting
-fluids on this metric, inflation, and the Regge construction are not stated. The Bianchi identity for a general
-metric (it needs the 3-jet) is not stated, and the continuity equation is derived from the two Friedmann
-equations, not as an instance of `conservation_return`: no covariant divergence of tensor fields is built as a
-linear map. The jets are read along coordinate lines of one chart: no manifold, no change of coordinates (the
-tensor character of `R`), and the frame join reads components, not a transformation law. The full Riemann
-tensor of this jet is used through its Ricci contraction and its tide; its symmetries are not stated. The radiation
-witness is read at each `t > 0`, where `√` is smooth; the degenerate section `t = 0` is not treated. The
-Stefan–Boltzmann constant `σ` is a parameter and `s = (4/3)σ𝒯³` the constitution's entropy density: neither is
-derived from Planck's law or a partition function. No statement is made about horizons, the age of the
-expansion or observed values of `Λ`, `κ` or `σ`.
+What is not claimed. Spatial curvature `k ≠ 0` stands in `CurvedFriedmann` (the slice of curvature `k` at a chart's
+centre, Friedmann's equations with `k/A²`, and the static, Milne and closed de Sitter solutions). Perturbations and
+their growth, viscous or heat-conducting fluids on this metric, inflation, and the Regge construction are not
+stated. The Bianchi identity for a general metric (it needs the 3-jet) is not stated, and the continuity equation is
+derived from the two Friedmann equations, not as an instance of `conservation_return`: no covariant divergence of
+tensor fields is built as a linear map. The jets are read along coordinate lines of one chart: no manifold, no
+change of coordinates (the tensor character of `R`), and the frame join reads components, not a transformation law.
+The full Riemann tensor of this jet is used here through its Ricci contraction and its tide; its closed form stands
+in `CurvedFriedmann` and its symmetries in `TidalScreen`. The radiation witness is read at each `t > 0`, where `√`
+is smooth; the degenerate section `t = 0` is not treated. The Stefan–Boltzmann constant `σ` is a parameter and
+`s = (4/3)σ𝒯³` the constitution's entropy density: neither is derived from Planck's law or a partition function.
+No statement is made about horizons, the age of the expansion or observed values of `Λ`, `κ` or `σ`.
 
 Read on the passage. The thermal instance keeps its constitutive equations (`p = wρ`, `ρ = σ𝒯⁴`,
 `s = (4/3)σ𝒯³`), its clock (the comoving time `x₀`, along which `H = a′/a` is the log-rate of the scale), its
