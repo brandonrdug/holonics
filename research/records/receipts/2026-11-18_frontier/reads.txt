@@ -1409,3 +1409,23 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   PGAM_TIME run=7 build=NEW sections=60 ms_mean=466.8 batches=180 peak_store=10754765848
   PGAM_TIME run=8 build=OLD sections=60 ms_mean=474.9 batches=180 peak_store=10758087224
   read: the ceiling 461.8 ms a section on the mean of its four runs against the control's 464.1 (spread 461.1 to 470.0); the carry gate in 32 bits 462.1 against 466.6 (spread 459.6 to 474.9): neither difference stands outside its control's spread. A section stays three batches under either budget.
+
+# 20:21 UTC November 19. G-1119-6 read: tools/pumped_carry_control.py (numpy, one host thread; its gradients against finite differences: 2.4e-7 commuting, 5.8e-8 pumped), 261 s for depth 6 and about 2 minutes each for depth 3 and the low-capacity reading:
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=0 depth=6 length=64 steps=3000 train_loss=0.9637 agree=0.989 sure=0.978 by_depth: d1=0.985 d2=0.983 d3=0.988 d4=0.991 d5=0.996 d6=0.998
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=1 depth=6 length=64 steps=3000 train_loss=0.9740 agree=0.996 sure=0.997 by_depth: d1=0.992 d2=0.995 d3=0.997 d4=0.998 d5=0.999 d6=1.000
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=2 depth=6 length=64 steps=3000 train_loss=0.9454 agree=0.991 sure=0.987 by_depth: d1=0.990 d2=0.989 d3=0.991 d4=0.991 d5=0.994 d6=0.997
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=0 depth=6 length=64 steps=3000 train_loss=0.9911 agree=0.981 sure=0.947 by_depth: d1=0.973 d2=0.974 d3=0.975 d4=0.986 d5=0.991 d6=0.997
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=1 depth=6 length=64 steps=3000 train_loss=0.9916 agree=0.978 sure=0.934 by_depth: d1=0.969 d2=0.974 d3=0.971 d4=0.980 d5=0.987 d6=0.998
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=2 depth=6 length=64 steps=3000 train_loss=0.9770 agree=0.984 sure=0.958 by_depth: d1=0.982 d2=0.987 d3=0.977 d4=0.983 d5=0.984 d6=0.996
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=0 depth=3 length=32 steps=3000 train_loss=0.7955 agree=0.997 sure=1.000 by_depth: d1=0.996 d2=0.997 d3=0.999
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=1 depth=3 length=32 steps=3000 train_loss=0.7939 agree=0.999 sure=1.000 by_depth: d1=0.998 d2=0.999 d3=1.000
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=2 depth=3 length=32 steps=3000 train_loss=0.8014 agree=0.998 sure=0.999 by_depth: d1=0.996 d2=0.999 d3=1.000
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=0 depth=3 length=32 steps=3000 train_loss=0.8031 agree=0.998 sure=0.999 by_depth: d1=0.997 d2=0.999 d3=0.999
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=1 depth=3 length=32 steps=3000 train_loss=0.8062 agree=0.998 sure=1.000 by_depth: d1=0.996 d2=0.998 d3=0.999
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=2 depth=3 length=32 steps=3000 train_loss=0.8007 agree=0.999 sure=1.000 by_depth: d1=0.998 d2=0.999 d3=0.999
+  PUMPED_CONTROL carry=commuting circles=4 params_a_symbol=16 seed=0 depth=8 length=64 steps=3000 train_loss=1.0362 agree=0.969 sure=0.916 by_depth: d1=0.943 d2=0.968 d3=0.972 d4=0.974 d5=0.977 d6=0.984 d7=0.979 d8=0.982
+  PUMPED_CONTROL carry=commuting circles=4 params_a_symbol=16 seed=1 depth=8 length=64 steps=3000 train_loss=1.0305 agree=0.968 sure=0.929 by_depth: d1=0.957 d2=0.966 d3=0.972 d4=0.976 d5=0.978 d6=0.983 d7=0.987 d8=0.922
+  PUMPED_CONTROL carry=commuting circles=4 params_a_symbol=16 seed=2 depth=8 length=64 steps=3000 train_loss=1.0399 agree=0.954 sure=0.871 by_depth: d1=0.941 d2=0.948 d3=0.953 d4=0.960 d5=0.962 d6=0.959 d7=0.963 d8=0.969
+  PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=0 depth=8 length=64 steps=3000 train_loss=1.1126 agree=0.867 sure=0.736 by_depth: d1=0.836 d2=0.839 d3=0.852 d4=0.846 d5=0.843 d6=0.841 d7=0.994 d8=1.000
+  PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=1 depth=8 length=64 steps=3000 train_loss=1.1035 agree=0.883 sure=0.762 by_depth: d1=0.861 d2=0.860 d3=0.852 d4=0.863 d5=0.862 d6=0.898 d7=0.985 d8=1.000
+  PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=2 depth=8 length=64 steps=3000 train_loss=1.0981 agree=0.889 sure=0.729 by_depth: d1=0.864 d2=0.866 d3=0.872 d4=0.875 d5=0.892 d6=0.912 d7=0.954 d8=0.981
