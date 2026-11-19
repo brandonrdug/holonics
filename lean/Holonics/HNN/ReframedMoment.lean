@@ -28,7 +28,7 @@ namespace SourceDecl
 
 variable {A : Type*} (D : SourceDecl A)
 
-/-- The exact interval of lift representatives with winding in `[W, W + M]`.
+/-- The interval of lift representatives with winding in `[W, W + M]`.
 The residue is free in `[0, period - 1]`. -/
 def windingWindow (D : SourceDecl A) (d W M : ℕ) : Finset ℕ :=
   Finset.Icc (d * W) (d * (W + M) + (d - 1))
@@ -98,7 +98,9 @@ def reframedBox [Fintype A] [DecidableEq A]
 
 /-- The consumer's separate checks place the shared current, source-local
 profile and original source partition in the joint box. In particular, the
-source partition still uses its original `n` and opening. -/
+source partition still uses its original `n` and opening. For a run of the
+source's own cells and re-keys, `HolonicsResearch/HNN/RekeyedCapacity`
+(`rekeyed_mem_reframedBox`) discharges `hcurrent` at `M = n` and `hsource`. -/
 theorem reframed_mem_box [Fintype A] [DecidableEq A]
     [hne : ∀ g, NeZero (D.period g)]
     (G : ℕ) (W : Fin G → ℕ) (M n : ℕ) (rate : ℕ → ℕ)
@@ -111,7 +113,7 @@ theorem reframed_mem_box [Fintype A] [DecidableEq A]
   exact Finset.mem_product.mpr
     ⟨Finset.mem_product.mpr ⟨Fintype.mem_piFinset.mpr hcurrent, hprofile⟩, hsource⟩
 
-/-- The exact count of the ambient lift factor. -/
+/-- The count of the ambient lift factor. -/
 theorem card_reframedLiftBox [Fintype A] [DecidableEq A]
     [hne : ∀ g, NeZero (D.period g)] (G : ℕ)
     (W : Fin G → ℕ) (M : ℕ) :
@@ -145,7 +147,7 @@ theorem card_reframedBox_le [Fintype A] [DecidableEq A]
           (D.boxWith D.period (fun _ => 0) 0 n).card := by ring
     _ ≤ _ := Nat.mul_le_mul_left _ (D.card_boxWith_le D.period (fun _ => 0) 0 n)
 
-/-- Leaky coordinates multiply the reframed source-state count by their exact
+/-- Leaky coordinates multiply the reframed source-state count by their
 `(n U + 1)` box factors. -/
 theorem card_reframedBox_withCoordinates_le [Fintype A] [DecidableEq A]
     [hne : ∀ g, NeZero (D.period g)] [Nonempty A]

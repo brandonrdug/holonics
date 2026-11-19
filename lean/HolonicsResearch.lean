@@ -1437,3 +1437,6 @@ import HolonicsResearch.Aeon.Production.PortHamiltonian
 import HolonicsResearch.Foundation.FractalStringTube
 import HolonicsResearch.Aeon.Production.ContinuumHodgeTime
 import HolonicsResearch.HNN.WordSensitivity
+import HolonicsResearch.Physics.Spacetime.PetrovTypes
+import HolonicsResearch.Objects.RetentionClasses
+import HolonicsResearch.HNN.RekeyedCapacity

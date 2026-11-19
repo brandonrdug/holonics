@@ -98,7 +98,7 @@ field of characteristic zero; items 2 and 3, the rates of item 4, and item 5 ove
    `Physics/Spacetime/StressEnergy` on a perfect sector, taken here as a hypothesis), `−tr R` is
    that sector's `expansionContribution`.
 
-What is not claimed. Petrov's classification (the eigenvalue types of `E + iH`) is not stated. The
+What is not claimed. Petrov's classification (the eigenvalue types of `E + iH`) is stated in `PetrovTypes`. The
 deviation equation is a hypothesis: neither `J″ = −RJ` nor `R_ij = R_(i a j b) u^a u^b` is derived
 from a Lorentzian metric and its connection, and the tidal matrix's symmetry is assumed where it is
 used. No `C` with the curvature symmetries is built from a metric, no nonzero instance of
