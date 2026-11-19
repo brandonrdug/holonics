@@ -491,7 +491,7 @@ struct FieldWords {
     uint64_t wgb;
     uint64_t rg;
     int64_t *pg;
-    int64_t *pgam;
+    int32_t *pgam;  // [realization; November 19, Neon's note §1b] |γ| < 1 on 2^(−30): every word fits 32 bits, half the store and its traffic
     int64_t *pqm;
     int64_t *pkb;
     // [definition; theory, November 11 04:14, step S] **The skin's exponent from site addresses**: `2π σ_x = q_x k + r_x`, `0 ≤ r_x < k`, `k = (n ln 2) << 24` of the
@@ -4319,8 +4319,8 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
         }
         const wide turn = ((wide)1 << 34) + q * q;
         const wide den = turn * (((wide)1 << 16) + d);
-        w.pgam[gr] = fit64(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
-        w.pgam[gi] = fit64(div_nearest(q << 64, den), w.status);
+        w.pgam[gr] = fit32(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
+        w.pgam[gi] = fit32(div_nearest(q << 64, den), w.status);
         const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, ((wide)1 << FACE_BITS) + d);
         const uint64_t re = t * w.f + plain + k, im = re + half;
         w.pkb[gr] = fit64(rel(kappa * (wide)w.pb[re], MOVE_BITS), w.status);

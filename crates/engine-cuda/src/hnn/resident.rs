@@ -38,8 +38,9 @@ pub(crate) const PACE_SCAN_THREADS: u32 = 256;
 /// [realization; November 15] The block of `field_blank_dz`, one block a site (the kernel's `BLANK_DZ_THREADS`).
 pub(crate) const BLANK_DZ_THREADS: u32 = 256;
 
-/// The device octets the runs keep to (the board's, the desktop included).
-pub(crate) const BOARD_CEILING: u64 = 12 << 30;
+/// The device octets the runs keep to (the board's, the desktop included): 14.5 GiB of the 4080 SUPER's 16, about 1.5 GiB left to the
+/// desktop (Brandon, November 19 19:24 UTC; 12 GiB before, under which a section of the store line was cut into three batches).
+pub(crate) const BOARD_CEILING: u64 = 29 << 29;
 
 /// Octets kept free beside a batch's counted allocations for the driver, the material and the
 /// allocator's grain.

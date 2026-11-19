@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §26 on November 19, to 16:09 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §27 on November 19, to 19:26 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -855,3 +855,27 @@ fitted on a sample cannot reach and which a store that would reach them is the c
 places). That is the cache the stores' law refuses unless its rows are shared by contexts that continue alike, and no address read
 today shares them (§25, this section). The next part is therefore not a store of rows of this size; what moves the rare contexts is
 the passage itself, read again, which raised her surety at the excess ruler's settled places from 0.579 to 0.667 over one pass (§24).
+
+## 27. Where a lap's time goes, and a correction on devices
+
+*Written at 19:26 UTC, November 19.* Brandon asked (18:55 UTC) whether, with the gains now coming from reading, each lap can be
+made faster, and whether Colab's cards would help. A profile of 60 sections from lap L41's end (receipts 19:15 UTC): a section takes
+455 ms, of which the host's cut and regions take 2 ms and the card the rest; the card is 87% to 99% busy at 235 to 260 W and 10.1 GB;
+the process holds 434 MB of host memory and 1.5 cores. A section is three memory batches (the batch cut 8.4 GB, under the board ceiling
+of 12 GB the runs kept to), about 2,700 launches over 96 kernels, most of them small grids at 70 to 380 µs a launch; the matrix kernels
+(`field_transposed`, `field_affine_tiled`, `field_outer`) take about 40% of the profiled time, the contact rows and columns 13%.
+
+**The correction** (Brandon, 19:24 UTC). I answered that a Colab A100 would not shorten a lap because "our kernels are integer" and an
+A100 does no more integer arithmetic than the 4080 SUPER. That reasoning set the realization's present choice (64- and 128-bit words on
+the plain cores) where the law's terms belong, against this guide's own statement that a device's units are widths and a term split
+into narrow limbs whose products and sums fit their accumulator (a tensor core's, for one) gives the same bits; a float is a word
+carrying its locale in its exponent, and a 53-bit mantissa holds a 26-bit limb product, so fp64 tensor units carry the same integer
+law. Read on those terms: the matrix kernels' terms can be cut into 8-bit limbs on this card's int8 tensor cores with exact 32-bit
+accumulation, or onto fp64 tensor units on an A100 (about 19.5 TFLOPS exact against about 0.8 TFLOPS of fp64 here) or an H100 (about
+67); an A100 or H100 also has 2 to 4.5 times this card's memory bandwidth, and 40 to 80 GB, which fits a section in one batch. These
+are the devices' published figures, not measurements here; the comparison is measured before it is claimed (a Colab read of 150
+sections of the present build, then of a limb realization), and the limb realization of the matrix kernels is the first speed loop.
+
+**The ceiling.** Brandon allows the board 14.5 GB (19:24 UTC). Raising `BOARD_CEILING` from 12 GiB lets a section's batches be cut
+larger; a batch is a schedule, so the build enters the line by reproducing its sections bit for bit before any lap runs on it, and is
+timed against the present build inside one balanced hold of the card.

@@ -1345,3 +1345,109 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   READROWS address=planted_alone set=all places=44781 code=2.6134 mass=0.286 sure=0.011
   READROWS address=planted_alone set=settled places=4482 code=0.7842 mass=0.607 sure=0.022
   READROWS fit_places=767888 held_places=88879 with_her_code=88424 settled=8802
+
+# 17:32 UTC November 19. The line's laps L37 to L40 with 512 circles on its second pass, from L36's end (binary gatecarry/bin/athena):
+  lap L37: 3000 sections, 390 ms a section on the mean, 543 at most
+  FRONTIER L37; one place open: all 0.7763 (100508 places) | books 0.8276 code 0.5021 science 0.7094 web 0.8561 wikidata 0.9857 || less the control's, paired: -0.1157 (±0.0019) | books -0.1440 code -0.0990 science -0.1420 web -0.1235 wikidata -0.0704
+  FRONTIER L37; the frontier, each stretch read by two streams : all 1.4206 (99844 places) | books 1.4746 code 1.1074 science 1.3292 web 1.6331 wikidata 1.5592 || less the control's, paired: -0.1139 (±0.0018) | books -0.1097 code -0.1230 science -0.1281 web -0.0919 wikidata -0.1169
+  L37 wide panel: LONG L37: all words 2209 in lexicon 1504 (68%) writes that loop 22 of 160 longest run shared with its prompt 57 | code 320/396 (80%) web 328/438 (74%) science 288/457 (63%) books 377/511 (73%) wikidata 191/407 (46%)
+  lap L38: 3000 sections, 392 ms a section on the mean, 546 at most
+  FRONTIER L38; one place open: all 0.7735 (100508 places) | books 0.8236 code 0.4981 science 0.7066 web 0.8546 wikidata 0.9836 || less the control's, paired: -0.1185 (±0.0019) | books -0.1480 code -0.1030 science -0.1448 web -0.1249 wikidata -0.0725
+  FRONTIER L38; the frontier, each stretch read by two streams : all 1.4166 (99844 places) | books 1.4799 code 1.1006 science 1.3240 web 1.6242 wikidata 1.5545 || less the control's, paired: -0.1180 (±0.0018) | books -0.1045 code -0.1299 science -0.1333 web -0.1007 wikidata -0.1216
+  L38 wide panel: LONG L38: all words 2119 in lexicon 1430 (67%) writes that loop 19 of 160 longest run shared with its prompt 72 | code 294/363 (80%) web 325/440 (73%) science 245/427 (57%) books 370/498 (74%) wikidata 196/391 (50%)
+  lap L39: 3000 sections, 396 ms a section on the mean, 541 at most
+  FRONTIER L39; one place open: all 0.7709 (100508 places) | books 0.8176 code 0.5012 science 0.6969 web 0.8548 wikidata 0.9834 || less the control's, paired: -0.1211 (±0.0019) | books -0.1540 code -0.0999 science -0.1545 web -0.1248 wikidata -0.0727
+  FRONTIER L39; the frontier, each stretch read by two streams : all 1.4132 (99844 places) | books 1.4776 code 1.1026 science 1.3207 web 1.6296 wikidata 1.5355 || less the control's, paired: -0.1214 (±0.0018) | books -0.1067 code -0.1278 science -0.1366 web -0.0953 wikidata -0.1406
+  L39 wide panel: LONG L39: all words 2173 in lexicon 1479 (68%) writes that loop 23 of 160 longest run shared with its prompt 75 | code 325/389 (83%) web 328/430 (76%) science 262/432 (60%) books 366/499 (73%) wikidata 198/423 (46%)
+  lap L40: 3000 sections, 416 ms a section on the mean, 564 at most
+  FRONTIER L40; one place open: all 0.7664 (100508 places) | books 0.8108 code 0.4947 science 0.6947 web 0.8504 wikidata 0.9809 || less the control's, paired: -0.1256 (±0.0019) | books -0.1608 code -0.1065 science -0.1567 web -0.1292 wikidata -0.0753
+  FRONTIER L40; the frontier, each stretch read by two streams : all 1.4110 (99844 places) | books 1.4696 code 1.0898 science 1.3212 web 1.6293 wikidata 1.5453 || less the control's, paired: -0.1236 (±0.0019) | books -0.1147 code -0.1406 science -0.1362 web -0.0956 wikidata -0.1308
+  L40 wide panel: LONG L40: all words 2210 in lexicon 1548 (70%) writes that loop 23 of 160 longest run shared with its prompt 76 | code 315/380 (82%) web 348/450 (77%) science 268/433 (61%) books 426/527 (80%) wikidata 191/420 (45%)
+
+# 19:15 UTC November 19. A profile of the line's section (.local/run/profile/profile.sh): 60 sections of train-store from lap L41's end, plain and with FIELD_PROFILE (every launch timed alone), each under the card lock; binary gatecarry/bin/athena:
+  plain: 60 sections, 455 ms a section (deposit 452, regions 2.1), 31334 sites a section
+  profile: 60 sections, 589 ms a section (deposit 587, regions 1.0), 31334 sites a section
+  FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15468396544 total=16769024000 batch_budget=10510532608
+  FIELD_CARD reads=0 read_ms=0 returns=120 return_ms=32578 pairs=2758799200 batches=180 peak_store=8407394048 landmarks=0 landmark_ms=0 elapsed_ms=36032
+  FIELD_PROFILE_SPLIT kernels_ms=28675 copies=13020 copies_ms=688 allocations=88801 allocations_ms=691 elapsed_ms=36037
+  launches a section 2,736 over 96 kernels; the ten largest by time:
+    FIELD_PROFILE entry=field_transposed launches=12720 ms=2325 us_a_launch=182 grid_threads=1257958144 mean_grid_threads=98896
+    FIELD_PROFILE entry=field_affine_tiled_x32 launches=10620 ms=2026 us_a_launch=190 grid_threads=2150569984 mean_grid_threads=202501
+    FIELD_PROFILE entry=field_contact_rows launches=5760 ms=1872 us_a_launch=325 grid_threads=1307612160 mean_grid_threads=227016
+    FIELD_PROFILE entry=field_outer_x32 launches=9240 ms=1782 us_a_launch=192 grid_threads=655566848 mean_grid_threads=70948
+    FIELD_PROFILE entry=field_contact_columns launches=5760 ms=1764 us_a_launch=306 grid_threads=1307612160 mean_grid_threads=227016
+    FIELD_PROFILE entry=field_pace_skin_back launches=2880 ms=1092 us_a_launch=379 grid_threads=653806080 mean_grid_threads=227016
+    FIELD_PROFILE entry=field_contact_l4 launches=939 ms=1086 us_a_launch=1156 grid_threads=1174277632 mean_grid_threads=1250561
+    FIELD_PROFILE entry=field_pair_gate_back launches=960 ms=973 us_a_launch=1014 grid_threads=4844535808 mean_grid_threads=5046391
+    FIELD_PROFILE entry=field_pair_scan_back launches=960 ms=823 us_a_launch=858 grid_threads=22702080 mean_grid_threads=23648
+    FIELD_PROFILE entry=field_pair_scan_pre launches=960 ms=816 us_a_launch=850 grid_threads=4844535808 mean_grid_threads=5046391
+  the card during a lap (nvidia-smi, 11 s at 1 s): 87% to 99% busy, 35% to 47% of memory bandwidth, 235 to 260 W, 2,790 MHz, 10.1 GB used; athena on the host: 152% of a core, 434 MB resident.
+
+# 19:15 UTC November 19. Her composition on the wide panel (word pairs and triples of her writes, each in a slice's first 16 MB of training text): L17 pairs 1,513 attested 0.17, triples 1,126 attested 0.02; L41 pairs 1,540 attested 0.33, triples 1,147 attested 0.09; the reference continuations' first 96 octets pairs 155 attested 0.55, triples 110 attested 0.36. Her words split (L41): 0.31 in its own prompt, 0.45 other lexicon words, 0.24 not words (L17: 0.24, 0.33, 0.43; the references 0.39, 0.46, 0.15).
+
+# 19:15 UTC November 19. A probe of patterned prompts (front/pattern/pattern.sh; Brandon 19:00 UTC; 12 prompts drawn 8 times, 32 places; L17 and L42): the writes that begin with the reference continuation, of 8 a prompt: L17 brackets 3, repeat 1, every other 0; L42 sums 1, every other 0. The format of each pattern holds (numbers in commas, lists of pairs, 'a + b = c' lines) and its rule does not.
+
+# 20:12 UTC November 19. The board ceiling at 14.5 GiB (ceiling/ceiling.sh) and the carry gate in 32 bits (pgam/pgam.sh), each entered by 24 sections of lap L43 from L42's end against the lap's own log and parity on 3 sections, then timed in one hold of the card lock (a warm-up of 20 sections, then 60 sections a run, control, build, build, control, control, build, build, control):
+  CEILING_REPRO 19:45:28 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15373238272 total=16769024000 batch_budget=13099728896
+  CEILING_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+  CEILING_TIME run=1 build=OLD sections=60 ms_mean=470.0 batches=180 peak_store=8609741192
+  CEILING_TIME run=2 build=NEW sections=60 ms_mean=461.4 batches=180 peak_store=10758087224
+  CEILING_TIME run=3 build=NEW sections=60 ms_mean=460.8 batches=180 peak_store=10758087224
+  CEILING_TIME run=4 build=OLD sections=60 ms_mean=463.9 batches=180 peak_store=8609741192
+  CEILING_TIME run=5 build=OLD sections=60 ms_mean=461.1 batches=180 peak_store=8609741192
+  CEILING_TIME run=6 build=NEW sections=60 ms_mean=459.2 batches=180 peak_store=10754765848
+  CEILING_TIME run=7 build=NEW sections=60 ms_mean=465.6 batches=180 peak_store=10754765848
+  CEILING_TIME run=8 build=OLD sections=60 ms_mean=461.2 batches=180 peak_store=8609741192
+  PGAM_REPRO 20:06:54 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15720710144 total=16769024000 batch_budget=13447200768
+  PGAM_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+  PGAM_TIME run=1 build=OLD sections=60 ms_mean=463.0 batches=180 peak_store=10754765848
+  PGAM_TIME run=2 build=NEW sections=60 ms_mean=457.4 batches=180 peak_store=10754765848
+  PGAM_TIME run=3 build=NEW sections=60 ms_mean=457.2 batches=180 peak_store=10754765848
+  PGAM_TIME run=4 build=OLD sections=60 ms_mean=459.6 batches=180 peak_store=10754765848
+  PGAM_TIME run=5 build=OLD sections=60 ms_mean=468.9 batches=180 peak_store=10754765848
+  PGAM_TIME run=6 build=NEW sections=60 ms_mean=467.1 batches=180 peak_store=10754765848
+  PGAM_TIME run=7 build=NEW sections=60 ms_mean=466.8 batches=180 peak_store=10754765848
+  PGAM_TIME run=8 build=OLD sections=60 ms_mean=474.9 batches=180 peak_store=10758087224
+  read: the ceiling 461.8 ms a section on the mean of its four runs against the control's 464.1 (spread 461.1 to 470.0); the carry gate in 32 bits 462.1 against 466.6 (spread 459.6 to 474.9): neither difference stands outside its control's spread. A section stays three batches under either budget.
+
+# 20:21 UTC November 19. G-1119-6 read: tools/pumped_carry_control.py (numpy, one host thread; its gradients against finite differences: 2.4e-7 commuting, 5.8e-8 pumped), 261 s for depth 6 and about 2 minutes each for depth 3 and the low-capacity reading:
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=0 depth=6 length=64 steps=3000 train_loss=0.9637 agree=0.989 sure=0.978 by_depth: d1=0.985 d2=0.983 d3=0.988 d4=0.991 d5=0.996 d6=0.998
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=1 depth=6 length=64 steps=3000 train_loss=0.9740 agree=0.996 sure=0.997 by_depth: d1=0.992 d2=0.995 d3=0.997 d4=0.998 d5=0.999 d6=1.000
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=2 depth=6 length=64 steps=3000 train_loss=0.9454 agree=0.991 sure=0.987 by_depth: d1=0.990 d2=0.989 d3=0.991 d4=0.991 d5=0.994 d6=0.997
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=0 depth=6 length=64 steps=3000 train_loss=0.9911 agree=0.981 sure=0.947 by_depth: d1=0.973 d2=0.974 d3=0.975 d4=0.986 d5=0.991 d6=0.997
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=1 depth=6 length=64 steps=3000 train_loss=0.9916 agree=0.978 sure=0.934 by_depth: d1=0.969 d2=0.974 d3=0.971 d4=0.980 d5=0.987 d6=0.998
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=2 depth=6 length=64 steps=3000 train_loss=0.9770 agree=0.984 sure=0.958 by_depth: d1=0.982 d2=0.987 d3=0.977 d4=0.983 d5=0.984 d6=0.996
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=0 depth=3 length=32 steps=3000 train_loss=0.7955 agree=0.997 sure=1.000 by_depth: d1=0.996 d2=0.997 d3=0.999
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=1 depth=3 length=32 steps=3000 train_loss=0.7939 agree=0.999 sure=1.000 by_depth: d1=0.998 d2=0.999 d3=1.000
+  PUMPED_CONTROL carry=commuting circles=16 params_a_symbol=64 seed=2 depth=3 length=32 steps=3000 train_loss=0.8014 agree=0.998 sure=0.999 by_depth: d1=0.996 d2=0.999 d3=1.000
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=0 depth=3 length=32 steps=3000 train_loss=0.8031 agree=0.998 sure=0.999 by_depth: d1=0.997 d2=0.999 d3=0.999
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=1 depth=3 length=32 steps=3000 train_loss=0.8062 agree=0.998 sure=1.000 by_depth: d1=0.996 d2=0.998 d3=0.999
+  PUMPED_CONTROL carry=pumped circles=8 params_a_symbol=56 seed=2 depth=3 length=32 steps=3000 train_loss=0.8007 agree=0.999 sure=1.000 by_depth: d1=0.998 d2=0.999 d3=0.999
+  PUMPED_CONTROL carry=commuting circles=4 params_a_symbol=16 seed=0 depth=8 length=64 steps=3000 train_loss=1.0362 agree=0.969 sure=0.916 by_depth: d1=0.943 d2=0.968 d3=0.972 d4=0.974 d5=0.977 d6=0.984 d7=0.979 d8=0.982
+  PUMPED_CONTROL carry=commuting circles=4 params_a_symbol=16 seed=1 depth=8 length=64 steps=3000 train_loss=1.0305 agree=0.968 sure=0.929 by_depth: d1=0.957 d2=0.966 d3=0.972 d4=0.976 d5=0.978 d6=0.983 d7=0.987 d8=0.922
+  PUMPED_CONTROL carry=commuting circles=4 params_a_symbol=16 seed=2 depth=8 length=64 steps=3000 train_loss=1.0399 agree=0.954 sure=0.871 by_depth: d1=0.941 d2=0.948 d3=0.953 d4=0.960 d5=0.962 d6=0.959 d7=0.963 d8=0.969
+  PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=0 depth=8 length=64 steps=3000 train_loss=1.1126 agree=0.867 sure=0.736 by_depth: d1=0.836 d2=0.839 d3=0.852 d4=0.846 d5=0.843 d6=0.841 d7=0.994 d8=1.000
+  PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=1 depth=8 length=64 steps=3000 train_loss=1.1035 agree=0.883 sure=0.762 by_depth: d1=0.861 d2=0.860 d3=0.852 d4=0.863 d5=0.862 d6=0.898 d7=0.985 d8=1.000
+  PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=2 depth=8 length=64 steps=3000 train_loss=1.0981 agree=0.889 sure=0.729 by_depth: d1=0.864 d2=0.866 d3=0.872 d4=0.875 d5=0.892 d6=0.912 d7=0.954 d8=0.981
+
+# 20:36 UTC November 19. What bounds the section's largest kernels (ncu/ncu.sh: Nsight Compute 2025.2.1 from /opt/cuda-12.9, speed of light, occupancy, launch statistics and memory workload on 40 launches of the named kernels, 3 sections of train-store from lap L44's end, under the lock; durations in µs, throughputs in percent of peak):
+  field_affine_tiled_x32: dram=23.7 us=245.2 compute=50.0 grid=1337.0 registers=128.0 waves=8.4 theoretical=33.3 occupancy=30.6
+  field_contact_l4: dram=20.4 us=1656.6 compute=49.3 grid=12191.0 registers=80.0 waves=25.4 theoretical=50.0 occupancy=41.8
+  field_outer_x32: dram=36.5 us=227.3 compute=46.5 grid=401.1 registers=128.0 waves=2.5 theoretical=33.3 occupancy=30.2
+  field_transposed: dram=41.5 us=255.7 compute=55.2 grid=649.4 registers=124.0 waves=4.1 theoretical=33.3 occupancy=30.5
+  field_pair_scan_pre: dram=85.5 us=958.3 compute=9.9 grid=24382.0 registers=40.0 waves=50.8 theoretical=100.0 occupancy=78.5
+  field_pair_scan_back: dram=68.9 us=1283.1 compute=4.3 grid=112.0 registers=70.0 waves=0.5 theoretical=50.0 occupancy=20.7
+  field_pair_gate_back: dram=90.0 us=1002.0 compute=69.2 grid=24382.0 registers=66.0 waves=101.6 theoretical=50.0 occupancy=47.2
+  field_contact_rows: dram=26.0 us=589.3 compute=36.6 grid=3048.0 registers=128.0 waves=9.5 theoretical=33.3 occupancy=27.5
+  field_contact_columns: dram=20.2 us=401.5 compute=44.1 grid=3048.0 registers=72.0 waves=5.4 theoretical=58.3 occupancy=40.1
+  field_pace_skin_back: dram=18.6 us=608.4 compute=50.1 grid=3048.0 registers=96.0 waves=7.6 theoretical=41.7 occupancy=33.4
+
+# 21:22 UTC November 19. Gates 1 and 3 on the branch's build at 85a769509 (the carry gate in 32 bits, the 14.5 GiB ceiling, the strand carries' dump), gatepgam/gatepgam.sh:
+  GATEPGAM head 85a769509 0 changed files
+  GATEPGAM gate1 exit=0 20:14:39 28 gates ok; test result: ok. 143 passed; 0 failed; 1 ignored; 0 measured; 5 filtered out; finished in  
+  GATEPGAM build athena=0 card_tests=0 20:15:24 warnings=0 
+  GATEPGAM suite 20:41:33 test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 367.80s 
+  GATEPGAM gate_engine 21:02:37 STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL GATE_READ cavity.tsv EQUAL GATE_ENGINE EQUAL 
+  GATEPGAM todays_line L43 21:06:57 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+  GATEPGAM read_L43 21:21:45 EQUAL
+  GATEPGAM_ALL_DONE 21:21:45
