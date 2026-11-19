@@ -60,8 +60,14 @@ five real site kinds; the classification needs the complex discriminant. The kin
 positive rescaling of the clock (`flowKind_smul`) and by reversing it (`λ ↦ −λ` keeps `D`), but not
 by a complex one: `iλ` exchanges boost and rotation (`quarter_turn_exchanges`).
 
-[open] The streamline orbits are identified through the positive rescaling; the time
-reparametrization `dt = 2π|W|² dτ` and the Norbury torus-to-sphere family are not formalized.
+The time reparametrization `dt = 2π|W|² dτ`, under which a re-timed orbit moves at `conj F′` and is
+a particle path, and Hill's spherical vortex, the sphere end of Norbury's family, built as a steady
+axisymmetric Euler flow whose meridian cores are rotation sites, stand in
+`HolonicsResearch/Physics/Fluid/HillVortex`.
+
+[open] Owed in #410: Norbury's family between its ends, from the thin-cored torus to Hill's
+sphere, which Norbury computed numerically, and the clock built as the integral of `2π|W|²` along
+an orbit.
 -/
 
 noncomputable section

@@ -24,7 +24,7 @@ motion to `A`, and one **coarse epoch** runs from a crossing of `A` to the next.
 
 [proved-derived; formal-checked] What is proved.
 
-1. **Kac's ledger, exact at every truncation, over any commutative ring.** For a stationary
+1. **Kac's ledger at every truncation, over any commutative ring.** For a stationary
    measure `π`, `Σ_(y∈A) π y · E_y[min(τ_A, N)] = Σ_y π y − Σ_y π y · P_y(τ_A > N)`
    (`kac_ledger`). Only stationarity is used.
 2. **Kac's lemma for observables** (`kac_observable`): if `m` solves the first-step equations of
@@ -37,15 +37,15 @@ motion to `A`, and one **coarse epoch** runs from a crossing of `A` to the next.
    (`firstReturn_existsUnique`), by a maximum principle (`avoid_fixed_eq_zero`). The mean first
    return is at least one (`one_le_meanReturn`).
 4. **Kac's lemma as a series** (`kac_hasSum`): for a stochastic irreducible chain with stationary
-   law `π` of total mass one, `Σ_n P_x(τ_x > n) = 1/π x`, a `HasSum` in `ℝ` of exact rationals
+   law `π` of total mass one, `Σ_n P_x(τ_x > n) = 1/π x`, a `HasSum` in `ℝ` of rationals
    (`meanReturn_hasSum` identifies the solution of the equations with the series).
 5. **Abramov's formula for the induced chain.** One coarse epoch's **word** (the path until the
-   return to `A`, stopped at `N` fine epochs) has an exact rational law (`wordLaw`, of total mass one
+   return to `A`, stopped at `N` fine epochs) has a rational law (`wordLaw`, of total mass one
    for a stochastic chain: `wordLaw_mass`). Its entropy obeys the chain rule along the excursion,
    `H_(N+1) = h + avoid H_N` with `h y = −Σ_z P y z log P y z` (`wordEntropy_succ`), so
-   `H_N = Σ_(n<N) avoidⁿ h` (`wordEntropy_eq_sum`): the truncation of the first-step solution of
-   `h`. Kac's ledger for an observable (`kac_ledger_observable`) then gives **Abramov's ledger**,
-   exact at every truncation: `Σ_(y∈A) π y H_N(y) = Σ_y π y h(y) − Σ_y π y (avoidᴺ h)(y)`
+   `H_N = Σ_(n<N) avoidⁿ h` (`wordEntropy_eq_sum`): the truncation of the series `Σ_n avoidⁿ h`.
+   Kac's ledger for an observable (`kac_ledger_observable`) then gives **Abramov's ledger**,
+   at every truncation: `Σ_(y∈A) π y H_N(y) = Σ_y π y h(y) − Σ_y π y (avoidᴺ h)(y)`
    (`abramov_ledger`). For a stochastic irreducible chain, a nonnegative stationary law and a
    section of nonzero stationary mass the tail vanishes and the entropy of the coarse epoch's word
    from the section's normalized law is `Σ π h / π(A)` (`abramov`): with `Σ π = 1`,
@@ -56,11 +56,13 @@ identity chain on two states with the stationary law `(1/2, 1/2)` returns to `0`
 epoch, so `π 0 · E_0[τ_0] = 1/2 ≠ 1`; the ledger's residue stays `1/2` at every truncation, and
 the first-step equations have no solution.
 
-[open] Owed in #62: the identification of the induced shift's Kolmogorov–Sinai entropy with the
-per-word entropy `Σ_(y∈A) π_A(y) H(W_y)` (the entropy rate of the Markov chain of words, whose
-conditional word law depends only on the returning state), and Abramov's formula
-`h(T_A) = h(T)/μ(A)` for a general ergodic measure-preserving map. What is proved is the finite
-Markov form: the exact ledger at every truncation and its limit. Kac's lemma itself for a
+The finite Markov side of the induced shift, the induced chain on the section with `π_A`
+stationary for it and the entropy rate of its words `Σ_(y∈A) π_A(y) H(W_y) = Σ π h / π(A)` in the
+limit, with the pointwise limit of `H_N`, stands in `HolonicsResearch/Aeon/Production/InducedWords`.
+[open] Owed in #410: the identification of the induced shift's Kolmogorov–Sinai entropy (a
+supremum over partitions) with that entropy rate, and Abramov's formula `h(T_A) = h(T)/μ(A)` for a
+general ergodic measure-preserving map. What is proved here is the finite Markov form: the ledger
+at every truncation and its limit. Kac's lemma itself for a
 measure-preserving map of a finite measure space, with the same ledger at every truncation, its
 deadline on the return and the chain of a map as this module's instance, is
 `HolonicsResearch/Aeon/Production/Recurrence` (`ledger`, `rate`, `kac`, `kac_ergodic`,
@@ -134,7 +136,7 @@ theorem stationary_avoid_sum {P : S → S → R} {π : S → R} (hπ : Stationar
   rw [← hπ z, sum_mul]
   exact sum_congr rfl fun y _ => by ring
 
-/-- [proved-derived; formal-checked] **Kac's ledger, exact at every truncation.**
+/-- [proved-derived; formal-checked] **Kac's ledger at every truncation.**
 `Σ_(y∈A) π y · E_y[min(τ_A, N)] = Σ π − Σ_y π y · P_y(τ_A > N)`: the mass that has crossed is the
 mass that entered minus the mass still avoiding. -/
 theorem kac_ledger {P : S → S → R} {π : S → R} (hπ : Stationary P π) (A : Finset S) (N : ℕ) :
@@ -350,7 +352,7 @@ theorem meanReturn_split {P : S → S → ℚ} {A : Finset S} {m : S → ℚ}
     ring
 
 /-- [proved-derived; formal-checked] **The solution of the first-step equations is the mean first
-return**, `Σ_n P_y(τ_A > n)`, as a convergent series of exact rationals. -/
+return**, `Σ_n P_y(τ_A > n)`, as a convergent series of rationals. -/
 theorem meanReturn_hasSum {P : S → S → ℚ} (hP : Stochastic P) {A : Finset S} {m : S → ℚ}
     (hm : FirstReturnEquations P A (fun _ => 1) m) (y : S) :
     HasSum (fun n => ((survival P A n y : ℚ) : ℝ)) (m y : ℝ) := by
@@ -420,7 +422,7 @@ open Real (negMulLog negMulLog_zero negMulLog_one negMulLog_mul negMulLog_nonneg
 /-- [definition] **The word of one coarse epoch, stopped at `N` fine epochs**: the law of the path
 `x₁ … x_k`, `k = min(τ_A, N)`, from `y`. At horizon `N + 1` the first step to `z` is taken with
 `P y z`; the word ends on reaching the section, and otherwise continues from `z` at horizon `N`.
-Exact rationals. -/
+Its masses are rationals. -/
 def wordLaw (P : S → S → ℚ) (A : Finset S) : ℕ → S → List S → ℚ
   | 0, _, w => if w = [] then 1 else 0
   | _ + 1, _, [] => 0
@@ -465,7 +467,7 @@ theorem wordLaw_mass {P : S → S → ℚ} (hrow : ∀ x, ∑ y, P x y = 1) (A :
     exact hrow y
 
 /-- [definition] **The entropy of one fine epoch** from `y`: `h y = −Σ_z P y z log P y z`, of the
-exact rational law, the logarithm being the only real quantity. -/
+rational law, the logarithm being the only real quantity. -/
 def epochEntropy (P : S → S → ℚ) (y : S) : ℝ := ∑ z, negMulLog (P y z : ℝ)
 
 /-- [definition] **The entropy of the coarse epoch's word**, stopped at `N` fine epochs. -/
@@ -515,7 +517,7 @@ theorem wordEntropy_succ {P : S → S → ℚ} (hrow : ∀ x, ∑ y, P x y = 1) 
   ring
 
 /-- [proved-derived; formal-checked] **The stopped word's entropy is the accumulated fine
-entropy**: `H_N = Σ_(n<N) avoidⁿ h`, the truncation of the first-step solution. -/
+entropy**: `H_N = Σ_(n<N) avoidⁿ h`, the truncation of the series `Σ_n avoidⁿ h`. -/
 theorem wordEntropy_eq_sum {P : S → S → ℚ} (hrow : ∀ x, ∑ y, P x y = 1) (A : Finset S) :
     ∀ N, wordEntropy P A N =
       ∑ n ∈ range N, (avoid (realKernel P) A)^[n] (epochEntropy P)
@@ -535,7 +537,7 @@ theorem wordEntropy_eq_sum {P : S → S → ℚ} (hrow : ∀ x, ∑ y, P x y = 1
       Function.iterate_zero_apply]
     ring
 
-/-- [proved-derived; formal-checked] **Kac's ledger for an observable, exact at every truncation.**
+/-- [proved-derived; formal-checked] **Kac's ledger for an observable, at every truncation.**
 `Σ_(y∈A) π y Σ_(n<N) (avoidⁿ f) y = Σ_y π y f y − Σ_y π y (avoidᴺ f) y`. -/
 theorem kac_ledger_observable {R : Type*} [CommRing R] {P : S → S → R} {π : S → R}
     (hπ : Stationary P π) (A : Finset S) (f : S → R) (N : ℕ) :
@@ -555,7 +557,7 @@ theorem kac_ledger_observable {R : Type*} [CommRing R] {P : S → S → R} {π :
 /-- [definition] The stationary weights restricted to the section, over `ℝ`. -/
 def sectionWeight (π : S → ℚ) (A : Finset S) : S → ℝ := fun y => if y ∈ A then (π y : ℝ) else 0
 
-/-- [proved-derived; formal-checked] **Abramov's ledger, exact at every truncation.** Read from the
+/-- [proved-derived; formal-checked] **Abramov's ledger at every truncation.** Read from the
 stationary law on the section, the entropy of the coarse epoch's word stopped at `N` fine epochs is
 the fine entropy of `π` minus the entropy still avoiding the section:
 `Σ_(y∈A) π y H_N(y) = Σ_y π y h(y) − Σ_y π y (avoidᴺ h)(y)`. Only stationarity and stochastic rows
@@ -616,7 +618,7 @@ stochastic, irreducible chain with a nonnegative stationary law `π` and a secti
 stationary mass `π(A) ≠ 0`, the entropy of one coarse epoch's word read from the section's
 normalized stationary law `π|_A / π(A)` is `Σ_y π y h(y) / π(A)`: with `Σ π = 1`, the fine entropy
 rate `h` divided by the section's measure, `h(T_A) = h(T)/μ(A)`. The word is stopped at `N` fine
-epochs and the formula holds in the limit `N → ∞` of the exact ledger (`abramov_ledger`), the
+epochs and the formula holds in the limit `N → ∞` of the ledger (`abramov_ledger`), the
 tail vanishing because the chain crosses the section (`meanReturn_hasSum`). -/
 theorem abramov {P : S → S → ℚ} (hP : Stochastic P) (hirr : Irreducible P) {π : S → ℚ}
     (hπ : Stationary P π) (hπpos : ∀ y, 0 ≤ π y) {A : Finset S}
