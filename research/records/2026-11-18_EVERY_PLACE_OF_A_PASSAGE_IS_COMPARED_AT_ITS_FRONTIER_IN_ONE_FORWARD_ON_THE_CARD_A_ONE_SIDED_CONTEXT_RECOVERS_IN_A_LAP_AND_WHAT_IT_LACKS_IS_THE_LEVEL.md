@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §25 on November 19, to 15:55 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §26 on November 19, to 16:09 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -797,9 +797,9 @@ strides now are (§19's spread of strides, read again on E22's state before the 
 
 ## 24. A second pass and a fourth doubling: the pass gives surety, the circles stop paying
 
-*Written at 15:25 UTC, November 19.* The line ran laps L23 to L30 with 512 circles until lap L30 ended the pass over the store's
+*Written at 15:15 UTC, November 19 (stamp corrected from 15:25, which was not read from the clock).* The line ran laps L23 to L30 with 512 circles until lap L30 ended the pass over the store's
 prefix (73.5 million stretches), opened the next pass by `next-pass` and ran laps L31 to L34; then G-1119-3 grew the circles to
-1024 beside laps L35 and L36 (receipts `reads.txt`, 08:20 to 15:20 UTC).
+1024 beside laps L35 and L36 (receipts `reads.txt`, 08:20 to 15:14 UTC).
 
 **What she wrote.** On the wide panel: 62%, 64%, 64%, 65% over laps L23 to L26, 65%, 66%, 69%, 66% over L27 to L30, then 68%, 68%,
 68%, 69% on the second pass and 68%, 69% at L35 and L36. Her words climbed from 61% to about 68% over the first pass's last eight
@@ -821,8 +821,8 @@ compose, is now the next arm with nothing ahead of it.
 
 ## 25. The circles' phase is no address
 
-*Written at 15:55 UTC, November 19.* §23's premise, read before the build (G-1119-4; `read-strand-states ... past carries`,
-`tools/residue_rows_ruler.py`; receipts 15:50 UTC). Rows fitted at a residue on the fitting half (768 thousand places of training text
+*Written at 15:38 UTC, November 19 (stamp corrected from 15:55, which was not read from the clock).* §23's premise, read before the build (G-1119-4; `read-strand-states ... past carries`,
+`tools/residue_rows_ruler.py`; receipts 15:36 UTC). Rows fitted at a residue on the fitting half (768 thousand places of training text
 past the line's first 8 MB a slice) and read on the held half, at the settled places, 4 rings of about a thousand rows each:
 
 | address | mass on the arriving symbol | code (nats) |
@@ -840,3 +840,18 @@ circle's phase, and no small set's direction, is a place where contexts that con
 circles compose) is withdrawn by its own rule; the store of rows §13 names still needs an address that is located, and the one this
 reading does not test is the frontier's own read, the operand the face is linear in, whose directions are the face's by construction
 (`agent-inferred`); its read must be set against her own face at the place, not against a count's back-off.
+
+## 26. No store of rows adds to her face at the places a count is sure of
+
+*Written at 16:09 UTC, November 19.* The address §25 left, her own read at the frontier, read against her face
+(G-1119-5; `tools/read_rows_ruler.py`). At the places where a count of five, fitted on 8 MB, has met the five places before often enough
+to be sure (4,482 of the odd held stretches' 44,781 places) her face already gives the arriving symbol 0.907 of its mass and is sure
+at 82% of them, about as much as the count of five gives on the excess ruler's wider set (0.909; its mass on this set is not read here). Rows of 4,096 entries fitted on 768 thousand places add nothing there at any address: at her
+read's direction and at a scramble the mix keeps none of them (λ = 0), and even the planted address, located by construction, costs
+0.006 (λ = 0.02). On their own those rows read 0.189, 0.160 and 0.607. So at the contexts a count meets often she has what the count
+has; what §21's spread found her short of (sure at 0.667 of the excess ruler's settled places, against the count's 0.921) stands at
+the five-place contexts met rarely, where the count is sure on a few counts each: the long tail of names and spellings, which rows
+fitted on a sample cannot reach and which a store that would reach them is the count's own size (§14: 13 million entries through five
+places). That is the cache the stores' law refuses unless its rows are shared by contexts that continue alike, and no address read
+today shares them (§25, this section). The next part is therefore not a store of rows of this size; what moves the rare contexts is
+the passage itself, read again, which raised her surety at the excess ruler's settled places from 0.579 to 0.667 over one pass (§24).
