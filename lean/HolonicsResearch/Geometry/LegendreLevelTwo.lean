@@ -28,7 +28,10 @@ freeness on `[[1, 2], [0, 1]]` and `[[1, 0], [2, 1]]` modulo `±1`. This file pr
 
 Limits. That `Γ(2)` is the monodromy of Legendre's family `y² = x(x − 1)(x − λ)` (the periods' continuation round
 `λ = 0` and `λ = 1`) is not proved here, nor the Schwarz map of the `(½, ⅓, 0)` triangle or `K(√λ)`; this file
-gives the group that monodromy is claimed to be, as a free group on the two loops' moves `A` and `B`. The ping-pong
+gives the group that monodromy is claimed to be, as a free group on the two loops' moves `A` and `B`. The local
+data that fix it (Riemann's scheme, the logarithm at the double exponent, and the rigidity that conjugates any
+pair with those data to `(A, B⁻¹)`) stand in `Geometry/HypergeometricMonodromy`, with the periods' continuation
+cited. The ping-pong
 is played on the integer plane by the two open cones `|x| < |y|` and `|y| < |x|`, not on the real projective line.
 
 The computational object is the helical pair interaction: `A` is the carry `z ↦ z + 2` round one puncture and `B`

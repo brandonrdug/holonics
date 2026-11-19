@@ -1443,3 +1443,6 @@ import HolonicsResearch.HNN.RekeyedCapacity
 import HolonicsResearch.Physics.Spacetime.CurvatureJets
 import HolonicsResearch.HNN.GroupKeys
 import HolonicsResearch.Mathematics.CertifiedCapture
+import HolonicsResearch.Geometry.HypergeometricMonodromy
+import HolonicsResearch.Objects.RetentionSeries
+import HolonicsResearch.Physics.HarperChain

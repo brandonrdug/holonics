@@ -60,7 +60,8 @@ future-sufficient quotient in general (#410, "the minimal retention quotient").
 (`Objects/Retention`'s open item): item 4 characterizes them as constitution future agreement and
 computes them on the parallel pair; `HolonicsResearch/Objects/RetentionClasses` computes them on
 every forest, on the `m`-edge parallel bundle (with the Joule law's projective classes) and on the
-bundle with a pendant edge.
+bundle with a pendant edge; `HolonicsResearch/Objects/RetentionSeries` on two bundles in series and
+on the triangle.
 
 The computational object is the helical pair interaction read by its admitted futures: a receiver
 reads a contact after an ordered word of navigator moves, and the minimal retention keeps exactly
