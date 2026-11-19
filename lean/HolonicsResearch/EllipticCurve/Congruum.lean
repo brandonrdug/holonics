@@ -31,8 +31,9 @@ the realized side's descent law are one mechanism.**
 Summits: `theCongruumNeverForms` (the descent), `theHalfTurnPrimesAreNotCongruent`
 (no rational right triangle has area `p`, for every prime `p ≡ 3 mod 8`), and the instances
 at three, eleven, and nineteen.  Every `theorem` is discharged and none depends on
-`sorryAx`.  **Boundary**: primes `p ≡ 5 (mod 8)` (also classically non-congruent) need the
-minus-two character and a different branch pattern, not carried here; nothing about ranks,
+`sorryAx`.  **Boundary**: primes `p ≡ 5 (mod 8)` are classically congruent (Heegner;
+Monsky, 1990; `FiveRank` proves rank one at five), so no descent of this kind refuses
+them, and they are not carried here; nothing about ranks,
 Selmer structure, or the Birch–Swinnerton-Dyer conjecture is claimed — this is the realized
 side of infinitely many twists, closed.
 -/
