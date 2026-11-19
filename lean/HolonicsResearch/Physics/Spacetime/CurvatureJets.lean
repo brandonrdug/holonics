@@ -125,9 +125,10 @@ construction of normal coordinates (the vanishing first jet is a hypothesis, or 
 wave at its origin); that a second jet is symmetric (Schwarz's theorem for a `C²` metric) is the
 hypothesis `JetSymm`. The point mass's Hessian is given as numbers at `(r, 0, 0)` (the classical
 `∂_i∂_j(−M/r) = M(δ_ij − 3x_ix_j/r²)/r³`), not derived from `Φ` by Mathlib's derivatives. The
-deviation equation `J″ = −RJ` along a general geodesic stays owed: the tide is read at a point, and
-`Raychaudhuri` takes the deviation equation as a hypothesis (on the comoving congruence of the flat
-Friedmann–Lemaître–Robertson–Walker metric it is proved, `FriedmannFluid.comoving_deviation`). The
+tide is read here at a point; the deviation equation `J″ = −RJ` along a general geodesic of a
+torsion-free connection, in a parallel frame, with this module's `riemann` as its curvature, stands in
+`GeodesicDeviation` (on the comoving congruence of the flat Friedmann–Lemaître–Robertson–Walker
+metric it is also `FriedmannFluid.comoving_deviation`). The
 Bianchi identity `∇R = 0` (it needs the 3-jet) and the Regge construction are not stated; the weak
 field here meets only dust's trace-reversed equation, at first order, and a fluid-plus-thermal
 constitution solving `G + Λg = κT` stands in `FriedmannFluid`. No

@@ -70,8 +70,11 @@ heat chart      companion(2γ, γ²+(σ−½)²)  roots γ ∓ i(σ−½)     di
 [counterexample; formal-checked] The tank of the rational zero `ρ′ = ½ + i` (off the seam, off the
 axis) has no real determinant face (`tank_off_axis_not_real`), so the ordered trichotomy cannot be
 applied to the tank chart without the seam; the advance chart is the one that classifies every
-generator of the strip. The height hypothesis `γ ≠ 0` of the join is load-bearing: the real zero
-`ρ = 1` has a real tank, a reflection of determinant `−¼` (`tank_real_zero_is_reflection`).
+generator of the strip. Paired with its conjugate, an off-seam zero's tank has a real chart again,
+`companion(2σ′, |ρ′|²)`, whose trace is the zero's distance from the seam and whose quarter turn is
+the heat chart (`Landmarks/CharacterSites`). The height hypothesis `γ ≠ 0` of the join is
+load-bearing: the real zero `ρ = 1` has a real tank, a reflection of determinant `−¼`
+(`tank_real_zero_is_reflection`).
 
 [established-bounded; formal-checked] Scope: one reflected pair of rational generators, and the
 algebraic locus only. Nothing here locates a zero of any function, and nothing is claimed about

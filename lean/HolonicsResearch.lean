@@ -1455,3 +1455,6 @@ import HolonicsResearch.Zeta.MellinPlancherel
 import HolonicsResearch.HNN.DrivenRingSupply
 import HolonicsResearch.Zeta.FosterReturn
 import HolonicsResearch.Physics.Thermal.RelativisticHeat
+import HolonicsResearch.Landmarks.CharacterSites
+import HolonicsResearch.Physics.HarperChambers
+import HolonicsResearch.Physics.Spacetime.GeodesicDeviation
