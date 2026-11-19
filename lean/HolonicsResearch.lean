@@ -1464,3 +1464,6 @@ import HolonicsResearch.Mathematics.ZetaJets
 import HolonicsResearch.Physics.Spacetime.TidalScreen
 import HolonicsResearch.Objects.RetentionCycles
 import HolonicsResearch.Physics.Spacetime.CurvedFriedmann
+import HolonicsResearch.Physics.Fluid.HillVortex
+import HolonicsResearch.Physics.Spacetime.ReggeDeficit
+import HolonicsResearch.Aeon.Production.InducedWords
