@@ -31,11 +31,16 @@ on any vertical line off the seam.
   adjoint `2c − ∂_c` and `‖∂_c f‖ = ‖(2c − ∂_c) f‖`; and Hearing's `F(∂_c)`, the averaged shift
   `∫ e^{τu²}Φ(u) e^{(∂_c−½)u} du`, is multiplication by the flowed `ξ` on the line, vanishing
   nowhere exactly when `VerticalZeroFree τ c` holds.
-- [open; #410] The closure of `∂_c` and the normality of the closed operator, its spectrum
-  `c + iℝ`, the identification of its spectral truncations with the coordinate model as a
-  `⋆`-algebra map (only the coordinate `c + iy` is matched), and the unbounded functional calculus
-  are not constructed. Mathlib has the continuous functional calculus for bounded normal elements
-  only.
+- [proved-derived; formal-checked] The ear on the whole line is in
+  `HolonicsResearch/Zeta/CayleyEar`: `F(∂_c)` is a bounded normal operator on all of
+  `L²(ℝ, e^{−2cx}dx)`, the continuous functional calculus of the Cayley unitary of `∂_c − c`
+  (which the Schwartz core determines), and at every `τ` and `c` it is not invertible, because its
+  multiplier tends to `0` along the line. So the truncations of this file are the criterion, and
+  invertibility on the whole line is not one.
+- [open; #410] The closure of `∂_c` as an object, its spectrum `c + iℝ` stated for that closure,
+  the identification of its spectral truncations with the coordinate model as a `⋆`-algebra map
+  (only the coordinate `c + iy` is matched), and the unbounded functional calculus are not
+  constructed. Mathlib has the continuous functional calculus for bounded normal elements only.
 -/
 
 noncomputable section

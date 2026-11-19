@@ -92,7 +92,11 @@ elements). The identification of the spectral truncations, multiplication by `c 
 matched. The `L²` membership of an averaged shift (Young's inequality) is a hypothesis of
 `coeFn_mellinPlancherel_average`, not proved. The unitary lands on `L²(dξ)`; read on `L²(dy)`
 the line transform multiplies norms by `√(2π)` (`plancherel_line`), and is unitary onto
-`L²(dy/2π)`. The zeta side (zero-freeness, the threshold) is `Hearing`'s.
+`L²(dy/2π)`. The zeta side (zero-freeness, the threshold) is `Hearing`'s. `Zeta/CayleyEar`
+builds on this file by bounded operators: the multiplication operators on `L²(dξ)` with their
+spectrum, the Cayley unitary of `∂ − c` (which the core determines, `(∂ − c) ± 1` having dense
+range on it) and `F(∂)` on the whole space as a function of that unitary; the closure as an object
+and the unbounded calculus stay as stated above.
 
 Computational object: the helical pair interaction read on the scale line. The symbol `c + iy`
 is the logarithmic rate of a swing, a boost `c` (the weight `e^{−cx}`, the receiver's frame) plus
