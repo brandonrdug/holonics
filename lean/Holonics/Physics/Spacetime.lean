@@ -49,6 +49,7 @@ with a perfect fluid and its Stefan–Boltzmann bath solving `G + Λg = κT`, is
 `HolonicsResearch/Physics/Spacetime/CurvatureJets`.
 
 [open] Owed in #410: the Regge construction of the discrete Einstein side (`G` the boundary of the
-moment of rotation of a simplicial metric); the relativistic (finite-speed) heat law of the thermal
-port.
+moment of rotation of a simplicial metric). The relativistic (finite-speed) heat law of the thermal
+port, read on modes with its causality condition `D ≤ τc²`, and Tolman–Ehrenfest's equilibrium from
+Eckart's heat flux in a static field stand in `HolonicsResearch/Physics/Thermal/RelativisticHeat`.
 -/

@@ -17,17 +17,17 @@ caloric law, `−a log a` reads a mass).
 
 [proved-derived; formal-checked] What is proved.
 
-1. **First law, by construction of the update** (`first_law`, exact over `ℚ`): the tick moves the
-   heat `q` out of one cell and into the other (`next₁`, `next₂`), so the stored energy changes by
-   exactly the port work, `ΔU₁ + ΔU₂ = h (W₁ + W₂)`. This is bookkeeping of the update, not a
+1. **First law, by construction of the update** (`first_law`, an identity over `ℚ`): the tick
+   moves the heat `q` out of one cell and into the other (`next₁`, `next₂`), so the stored energy
+   changes by the port work, `ΔU₁ + ΔU₂ = h (W₁ + W₂)`. This is bookkeeping of the update, not a
    derived conservation law.
-2. **The production rate is an exact rational of certified sign.** The Clausius production of the
+2. **The production rate is a rational of certified sign.** The Clausius production of the
    contact, heat current times the inverse-temperature drop, is
    `κ (T₁ − T₂)(1/T₂ − 1/T₁) = κ (T₁ − T₂)²/(T₁ T₂)` (`productionRate_eq`), nonnegative
    (`productionRate_nonneg`) and zero exactly at equal temperatures (`productionRate_eq_zero_iff`).
    In continuous time it is the derivative of `C₁ log U₁ + C₂ log U₂` along the exchange, with the
    port productions `W₁/T₁ + W₂/T₂` added (`hasDerivAt_entropy`).
-3. **The finite tick is enclosed by two exact Clausius readings.** For one cell,
+3. **The finite tick is enclosed by two rational Clausius readings.** For one cell,
    `ΔU · C/U' ≤ C log(U'/U) ≤ ΔU · C/U` (`cell_entropy_enclosure`); for the exchange,
    `q (1/T₂' − 1/T₁') ≤ ΔS ≤ q (1/T₂ − 1/T₁)` (`exchange_entropy_enclosure`). The temperature
    gap after the tick is the gap before times `1 − hκ(1/C₁ + 1/C₂)` (`gap_after_tick`), so the lower
@@ -41,12 +41,16 @@ caloric law, `−a log a` reads a mass).
 `U₁' = 1/2`, `U₂' = 7/2`, and the entropy of the tick is `log(7/12) < 0`
 (`overshoot_destroys_entropy`).
 
+The statements are over `ℚ` and have no bath. A cell against a bath at a fixed temperature, at real
+heats and temperatures, with this exchange as its rational face and the bath as the second cell's
+capacity grown without bound, stands in `HolonicsResearch/Physics/Thermal/RelativisticHeat`.
+
 No `axiom`, no `sorry`.
 -/
 
 namespace Holonics.Physics.Thermal.Exchange
 
-/-! ## 1. The first law and the exact production rate -/
+/-! ## 1. The first law and the rational production rate -/
 
 /-- [definition] **The temperature** of a cell under the caloric law `U = C T`. -/
 def temperature (C U : ℚ) : ℚ := U / C
@@ -142,7 +146,7 @@ theorem energy_conserved_of_equal_capacity (κ C : ℝ) (U₁ U₂ : ℝ → ℝ
 
 /-! ## 3. The finite tick: the Clausius enclosure -/
 
-/-- [proved-derived; formal-checked] **One cell's entropy over a tick is enclosed by two exact
+/-- [proved-derived; formal-checked] **One cell's entropy over a tick is enclosed by two
 Clausius readings**: `ΔU · C/U' ≤ C log(U'/U) ≤ ΔU · C/U`. -/
 theorem cell_entropy_enclosure {C U U' : ℝ} (hC : 0 ≤ C) (hU : 0 < U) (hU' : 0 < U') :
     (U' - U) * (C / U') ≤ C * Real.log (U' / U) ∧ C * Real.log (U' / U) ≤ (U' - U) * (C / U) := by
@@ -193,7 +197,7 @@ theorem gap_after_tick {κ h C₁ U₁ C₂ U₂ : ℚ} (hC₁ : C₁ ≠ 0) (hC
   field_simp
   ring
 
-/-- [proved-derived; formal-checked] **The lower Clausius reading of the tick, exactly**:
+/-- [proved-derived; formal-checked] **The lower Clausius reading of the tick**:
 `q (1/T₂' − 1/T₁') = hκ (T₁ − T₂)² (1 − hκ(1/C₁ + 1/C₂)) / (T₁' T₂')`. -/
 theorem lower_reading_eq {κ h C₁ U₁ C₂ U₂ : ℚ} (hC₁ : C₁ ≠ 0) (hC₂ : C₂ ≠ 0)
     (h₁ : next₁ κ h C₁ U₁ C₂ U₂ 0 ≠ 0) (h₂ : next₂ κ h C₁ U₁ C₂ U₂ 0 ≠ 0) :
