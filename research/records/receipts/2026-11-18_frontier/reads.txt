@@ -1236,3 +1236,21 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   L26 LOUDNESS region=all places=100508 nats_a_place=0.8378 loudness_octaves=20.468 spearman_loud_code=+0.129
   L26   temperature (energy over the region's mean, a nat): +0.0143   rank-1 share: loudest fifth 0.753, quietest fifth 0.818
   L26   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9779  spearman loud~color=+0.179  color~code=-0.126  by surprise fifth: q1=0.9924 q2=0.9897 q3=0.9799 q4=0.9696 q5=0.
+
+# 10:10 UTC November 19. The line's laps L27 to L30 with 512 circles (binary gatecarry/bin/athena). Lap L30 ended the pass over the store's prefix at its section 2,871 (STORE_PASS ended=true, 73,450,726 stretches read); its mean MEAN.2871 covers sections 2,001 to 2,871, and lap L31 opens the next pass at the store's start:
+  lap L27: 3000 sections, 424 ms a section on the mean, 570 at most
+  FRONTIER L27; one place open: all 0.8281 (100508 places) | books 0.8995 code 0.5504 science 0.7685 web 0.9132 wikidata 1.0084 || less the control's, paired: -0.0639 (±0.0014) | books -0.0721 code -0.0508 science -0.0829 web -0.0663 wikidata -0.0477
+  FRONTIER L27; the frontier, each stretch read by two streams : all 1.4649 (99844 places) | books 1.5236 code 1.1624 science 1.3725 web 1.6677 wikidata 1.5988 || less the control's, paired: -0.0696 (±0.0014) | books -0.0607 code -0.0681 science -0.0848 web -0.0572 wikidata -0.0773
+  L27 wide panel: LONG L27: all words 2187 in lexicon 1430 (65%) writes that loop 22 of 160 longest run shared with its prompt 76 | code 276/361 (76%) web 335/444 (75%) science 247/447 (55%) books 390/515 (75%) wikidata 182/420 (43%)
+  lap L28: 3000 sections, 415 ms a section on the mean, 576 at most
+  FRONTIER L28; one place open: all 0.8195 (100508 places) | books 0.8862 code 0.5396 science 0.7600 web 0.9061 wikidata 1.0054 || less the control's, paired: -0.0725 (±0.0015) | books -0.0854 code -0.0615 science -0.0913 web -0.0735 wikidata -0.0507
+  FRONTIER L28; the frontier, each stretch read by two streams : all 1.4611 (99844 places) | books 1.5186 code 1.1504 science 1.3664 web 1.6688 wikidata 1.6014 || less the control's, paired: -0.0735 (±0.0015) | books -0.0657 code -0.0800 science -0.0910 web -0.0561 wikidata -0.0747
+  L28 wide panel: LONG L28: all words 2165 in lexicon 1429 (66%) writes that loop 25 of 160 longest run shared with its prompt 74 | code 262/346 (75%) web 347/459 (75%) science 241/433 (55%) books 396/516 (76%) wikidata 183/411 (44%)
+  lap L29: 3000 sections, 437 ms a section on the mean, 619 at most
+  FRONTIER L29; one place open: all 0.8113 (100508 places) | books 0.8747 code 0.5381 science 0.7481 web 0.8962 wikidata 0.9993 || less the control's, paired: -0.0806 (±0.0015) | books -0.0969 code -0.0631 science -0.1032 web -0.0834 wikidata -0.0569
+  FRONTIER L29; the frontier, each stretch read by two streams : all 1.4529 (99844 places) | books 1.5138 code 1.1460 science 1.3580 web 1.6599 wikidata 1.5870 || less the control's, paired: -0.0817 (±0.0015) | books -0.0705 code -0.0845 science -0.0993 web -0.0650 wikidata -0.0891
+  L29 wide panel: LONG L29: all words 2160 in lexicon 1499 (69%) writes that loop 18 of 160 longest run shared with its prompt 70 | code 314/385 (81%) web 350/452 (77%) science 242/418 (57%) books 392/498 (78%) wikidata 201/407 (49%)
+  lap L30: 2871 sections, 385 ms a section on the mean, 560 at most
+  FRONTIER L30; one place open: all 0.8084 (100508 places) | books 0.8715 code 0.5340 science 0.7405 web 0.8966 wikidata 0.9991 || less the control's, paired: -0.0836 (±0.0016) | books -0.1001 code -0.0672 science -0.1109 web -0.0829 wikidata -0.0570
+  FRONTIER L30; the frontier, each stretch read by two streams : all 1.4546 (99844 places) | books 1.5192 code 1.1442 science 1.3547 web 1.6621 wikidata 1.5932 || less the control's, paired: -0.0800 (±0.0016) | books -0.0652 code -0.0862 science -0.1027 web -0.0628 wikidata -0.0829
+  L30 wide panel: LONG L30: all words 2178 in lexicon 1458 (66%) writes that loop 16 of 160 longest run shared with its prompt 76 | code 307/393 (78%) web 351/461 (76%) science 230/410 (56%) books 398/514 (77%) wikidata 172/400 (43%)
