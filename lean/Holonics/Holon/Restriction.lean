@@ -3,7 +3,7 @@ import Holonics.Holon.Dirac
 import Holonics.Objects.Membrane
 
 /-!
-# Holon.Restriction: morphisms, the scale square and exact Kron reduction
+# Holon.Restriction: morphisms, the scale square and Kron reduction
 
 [definition] The restriction facet `π`. A port map `P` pushes flows forward and pulls efforts
 back (`pushforward`); a **morphism** lands the pushed structure inside the target one
@@ -151,7 +151,7 @@ def boundaryBond (L : Matrix (I ⊕ B) (I ⊕ B) K) (u : I ⊕ B → K) : Bond K
   ((L *ᵥ u) ∘ Sum.inr, u ∘ Sum.inr)
 
 omit [DecidableEq B] in
-/-- [proved-derived; formal-checked] **Kron reduction is exact.** For every interior-balanced
+/-- [proved-derived; formal-checked] **Kron reduction preserves power.** For every interior-balanced
 state the boundary bond lies on the graph of `Λ_DN` (`MembraneJoin.interior_elimination`), the
 boundary power equals the network's full power `⟨u, L u⟩` (`MembraneJoin.energy_on_boundary`), and
 every boundary potential has an interior-balanced extension. -/
