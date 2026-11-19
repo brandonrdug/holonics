@@ -1470,3 +1470,9 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   A100, main's ceiling (14.5 GiB): 697.7 ms a section, 3 batches a section, peak store 11.2 GB
   RTX 4080 SUPER, main's build: 452.1 ms a section, 3 batches a section, peak store 10.6 GB
   read: the A100 runs this realization 1.54 times slower than the PC's card at the same batches, and 1.47 times slower with a section in two batches; one batch fewer buys 4.5% there. The A100's bandwidth (2.7 times) does not answer its lower clock for these kernels (1.41 GHz against 2.79, the matrix maps at a third occupancy and the carry streams memory-bound on the PC).
+
+# 22:16 UTC November 19. G-1119-7, the dihedral separator (Neon's task: a word over the group of order six, the running product read at every place), tools/pumped_carry_control.py d3 2 16 16 48 3000 3, one host thread, 42 s:
+  commuting 16 circles (454 parameters): at 16 0.5730 0.5952 0.5930, at 48 0.4287 0.2718 0.3700, training loss 0.794 to 0.818
+  commuting 2 circles (62 parameters): at 16 0.5256 0.5510 0.5686, at 48 0.3520 0.3835 0.3044, training loss 0.790 to 0.873
+  pumped 2 circles (86 parameters): at 16 1.0000 on every seed, at 48 0.9945 1.0000 0.9947, training loss 0.0001 to 0.0007
+  read: the pumped carry holds the product at three times its trained length; the commuting carry fits it at neither length, and eight times its circles buy it 0.010 at 48. Neon's run (0.585 and 0.404 against 1.000 and 1.000) is reproduced within its seeds.

@@ -677,3 +677,9 @@ depth-limited brackets, and G-1119-6 gave it twice the state and the readout. He
   0.55.
   What it decides. Pumped 0.25 or more over commuting on 16 at length 48: the carry that turns and reflects is built on the engine and the
   card as an arm beside the line (the separator says what a commuting carry cannot hold; the line's arm says whether text needs it).
+  Scored (22:16 UTC, .local/run/pumped/d3sep.txt, 42 s on one host thread). At length 48 on the mean of three seeds: pumped on 2 circles
+  0.9964 (0.9945, 1.0000, 0.9947); commuting on 16 0.3568 (0.4287, 0.2718, 0.3700); commuting on 2 0.3466 (0.3520, 0.3835, 0.3044); chance
+  is 1/6. At the trained length 16: pumped 1.0000 on every seed, commuting on 16 0.5871, commuting on 2 0.5484, and the commuting carry's
+  training loss stands at 0.79 to 0.87 against the pumped's 0.0001 to 0.0007: it does not fit the product even where it trained. All three
+  parts held. The gap at 48 is 0.640, over the 0.25 the guess named: the carry that turns and reflects is built on the engine and the card
+  as an arm beside the line. Eight times the circles bought the commuting carry 0.010 at 48, as the embedding says it cannot buy the product.
