@@ -271,7 +271,6 @@ pub(crate) struct Upload<'c> {
 
 /// A batch's staged tables ([`Resident::stage`]).
 pub(crate) struct Staged<'c> {
-    pub(crate) site_region: Vec<u32>,
     pub(crate) site_pos: Vec<u32>,
     pub(crate) region_off: Vec<u32>,
     pub(crate) classes: Vec<u32>,
@@ -288,7 +287,8 @@ pub(crate) struct Staged<'c> {
     pub(crate) sites: usize,
     pub(crate) _tables: Pooled<'c, u8>,
     pub(crate) status: Pooled<'c, u32>,
-    pub(crate) x: Pooled<'c, i64>,
+    /// Read through `words.x`; held here for its memory.
+    pub(crate) _x: Pooled<'c, i64>,
 }
 
 /// [realization; agent-inferred, November 14, the ring record §4] **What a batch's reads stand on** ([`Resident::batch_base`]): everything a
@@ -1339,12 +1339,10 @@ impl<'c> Resident<'c> {
     /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
     /// that read them (the host's tables kept beside them for the reverse and the readings).
     pub(crate) fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &Declaration, words: &mut Words) -> Result<Staged<'c>> {
-        let ticks = declaration.ticks;
         // The batch's sites, region by region, and the carried mixtures as one list a site.
         // [realization; November 15, Brandon 15:19 "40 minutes a lap is a lot"] Each region's lists are built on its own core and then
         // joined in region order, so every list is the regions' lists one after another, the same words as the one-thread walk; only the
         // offsets (`region_off`, `region_eoff`, `region_soff`, `dstart`, `ostart`, `mix_off`) are prefixes over the regions before.
-        let ticks = declaration.ticks;
         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
         // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
         // circles (the host's `Declaration::room_window`, the one owner of the cut's admission).
@@ -1560,7 +1558,7 @@ impl<'c> Resident<'c> {
         words.ostart = base + ostart_at;
         words.status = status.device_ptr();
         words.x = x.device_ptr();
-        Ok(Staged { site_region, site_pos, region_off, classes, unresolved, definite, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, skin_entries, sites, _tables: tables, status, x })
+        Ok(Staged { site_pos, region_off, classes, unresolved, definite, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, skin_entries, sites, _tables: tables, status, _x: x })
     }
 
     /// [realization; agent-inferred, November 14, the ring record §4] **A batch's base** ([`BatchBase`]): the regions staged, the base clock formed
@@ -1711,14 +1709,13 @@ impl<'c> Resident<'c> {
         }
         let card = self.card;
         let d = field.declaration;
-        let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
+        let (dw, m, n, a, heads) = (d.width, d.complex(), d.modes, d.alphabet, d.heads);
         let m2 = 2 * m;
-        let span = 2 * n;
         let st = &base.st;
         let (sites, pairs) = (st.sites, st.pairs);
-        let (site_region, site_pos, region_off, classes, unresolved, definite) = (&st.site_region, &st.site_pos, &st.region_off, &st.classes, &st.unresolved, &st.definite);
+        let (site_pos, region_off, classes, unresolved) = (&st.site_pos, &st.region_off, &st.classes, &st.unresolved);
         let (echo_has, mix_off, mix_class, mix_share, site_weight) = (&st.echo_has, &st.mix_off, &st.mix_class, &st.mix_share, &st.site_weight);
-        let (status, x) = (&st.status, &st.x);
+        let status = &st.status;
         let returning = g.is_some();
         // The shares are stored for a return's reverse, for the rows `keep` reads, and for a logits read's
         // echo (§15.3: the round trips of consecutive ticks, so every tick is kept).
@@ -1745,8 +1742,6 @@ impl<'c> Resident<'c> {
         let t64 = sites as u64;
         // [measurement; theory, November 13, P56 item 4] The read's ticks' takes.
         self.mark("batch_takes");
-        // The class lists' shared words: the buckets `2·3^b`, and a chunk's keys `[32][2^b]` and counts.
-        let buckets = 4 * 3 * d.classes() as u32;
         self.launch("field_open", Self::cells(t64 * dw as u64), THREADS, &mut [arg(words)])?;
         // [realization; agent-inferred, November 14] A read after the first forms the base clock's phases and skins again (`clock_fill`, as the base's
         // moments did): the first read's blanks formed their own clocks' in the same stores, and the crowds and the moments read the clock's.

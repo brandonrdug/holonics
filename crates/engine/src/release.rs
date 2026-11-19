@@ -613,7 +613,7 @@ impl Constitution {
             let last = done + 1 == sweeps || !sweep(done, sweeps);
             let active: Vec<usize> = (0..problems.len()).filter(|&k| open[k].iter().any(|&u| u)).collect();
             let faces = self.read_active(&starts, &classes, &open, &active, void, near_tail, realization)?;
-            let (mut bound, mut passed) = (0i128, 0usize);
+            let (mut bound, passed) = (0i128, 0usize);
             let mut runs: Vec<Vec<usize>> = Vec::with_capacity(problems.len());
             for (k, &(q, n)) in problems.iter().enumerate() {
                 let count = if last { n } else { (done + 1) * n / sweeps - done * n / sweeps };

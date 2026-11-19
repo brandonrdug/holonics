@@ -1720,6 +1720,72 @@ pub fn found_closed(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 18, the record of the two streams §19] `grow-carry STATE STATE_SHA KEYS KEYS_SHA CIRCLES OUT`: **a state
+/// with `CIRCLES` more carry circles** ([`holonics_engine::field::Learner::more_carry`]), founded as its first were, the draws read from
+/// the key stream past every draw the learner has read. The state is read and must write back byte for byte; the founded learner must read
+/// back as itself with the passage's place, the parts' rates, the laps and the rate it stood at; every standing entry of the material is
+/// carried once with its value (checked here against the field's own founding). Its line `GROW_CARRY` gives the circles, the contacts, the
+/// material's entries and the drawn key bytes before and after. On the host: it opens no card and trains nothing. That the founding keeps
+/// every face is the engine's test's (`more_carry_circles_keep_every_face_every_standing_circle_and_a_towers_level`) and, on a line's
+/// state, a held read of the founded state set against the same state's read before it.
+pub fn grow_carry(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("grow-carry STATE STATE_SHA KEYS KEYS_SHA CIRCLES OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let keys = pinned_read(&args[3], &args[4], STATE_BUDGET)?;
+    let circles: usize = args[5].parse().map_err(|_| "a count of carry circles that is no number")?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.more_carry(circles, &keys).map_err(|e| e.to_string())?;
+    let rest = keys.get(learner.drawn..).ok_or("fewer key bytes than the learner has drawn")?;
+    let (field, from) = learner.field.more_carry(circles, rest).map_err(|e| e.to_string())?;
+    if field != founded.field {
+        return Err("the learner's founding and the field's differ".into());
+    }
+    let (old_all, new_all): (Vec<i32>, Vec<i32>) = (learner.field.material().copied().collect(), founded.field.material().copied().collect());
+    let mut carried = vec![0u8; old_all.len()];
+    for (k, o) in from.iter().enumerate() {
+        if let Some(i) = *o {
+            if new_all[k] != old_all[i] {
+                return Err("a standing entry that the founding did not carry with its value".into());
+            }
+            carried[i] = carried[i].saturating_add(1);
+        }
+    }
+    if from.len() != new_all.len() || carried.iter().any(|&n| n != 1) {
+        return Err("a founding that did not carry every standing entry once".into());
+    }
+    let written = founded.to_text();
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.to_text() != written || back.field != founded.field || back.pass != learner.pass || back.rate_parts != learner.rate_parts || back.laps != learner.laps || back.rate_bits != learner.rate_bits {
+        return Err("a founded learner that does not read back as itself with its pass, its parts' rates, its laps and its rate".into());
+    }
+    std::fs::write(out, &written)?;
+    let (od, nd) = (learner.field.declaration, founded.field.declaration);
+    println!(
+        "GROW_CARRY circles_before={} circles_after={} contacts_before={} contacts_after={} material_before={} material_after={} fine_before={} fine_after={} drawn_before={} drawn_after={} new_entries={}",
+        od.carry,
+        nd.carry,
+        od.contacts,
+        nd.contacts,
+        old_all.len(),
+        new_all.len(),
+        learner.field.theta.len(),
+        founded.field.theta.len(),
+        learner.drawn,
+        founded.drawn,
+        from.iter().filter(|o| o.is_none()).count()
+    );
+    Ok(())
+}
+
 /// [definition; agent-inferred, November 16, Athena alpha's cold-restart box (#404)] `restore-store STATE STATE_SHA`: **a saved state restored
 /// cold**: the state read into a learner in a fresh process and written back as text, its bytes compared with the file's. A reading: it writes
 /// nothing. Its line `STORE_RESTORE` gives the state's octets, its learner's laps, drawn keys and material entries, and whether the restored

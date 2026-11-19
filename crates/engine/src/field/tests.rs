@@ -2002,7 +2002,7 @@ fn refinement_moves_the_end_one_place_a_read() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     let mut reads = 0;
     for seed in 11..19 {
-        let mut last: Option<Vec<usize>> = None;
+        let mut last: Option<Vec<usize>>;
         for refine in [3] {
         last = None;
         field
@@ -2921,6 +2921,100 @@ fn the_drive_is_charged_through_the_leak() {
             }
         }
     }
+}
+
+/// [definition; the lead, November 18, the record of the two streams §19] **More carry circles keep every face, every standing circle and a
+/// tower's level** ([`Constitution::more_carry`]): on a field with circles and every family drawn, two more circles follow the standing ones
+/// as the last complex contacts; every face of the law and of a strand is kept bit for bit; a standing circle keeps its number, its turn
+/// row, its leak row and its gates; the new circles' `W` columns, leak rows and biases stand at zero and their turn rows are drawn; the new
+/// `W` columns have a covector; the map carries every standing entry once. On a tower with its one-sided block the level's entries are
+/// carried as they stood and a strand's faces are kept. A field with no circles, an odd count and a field with triads are refused. The
+/// learner keeps every standing moment, opens the new entries as a growth opens them and round-trips through its text.
+#[test]
+fn more_carry_circles_keep_every_face_every_standing_circle_and_a_towers_level() {
+    for still in [0usize, 1, 2] {
+        let field = circled_shaped(still);
+        let old = field.declaration;
+        let (grown, from) = field.more_carry(2, &keys(old.carry_draws(2))).unwrap();
+        let (d, l, ol) = (grown.declaration, grown.layout.clone(), field.layout.clone());
+        assert_eq!((d.contacts, d.carry, d.carry_first()), (old.contacts + 4, old.carry + 2, old.carry_first()), "the standing circles keep their complex indices");
+        assert_eq!(grown.faces(&region()).unwrap(), field.faces(&region()).unwrap(), "still {still}: every face of the law kept");
+        let classes = drawn_classes(0xC1, 11, d.alphabet);
+        for past in [false, true] {
+            assert_eq!(grown.strand_pass(&classes, false, past).unwrap().faces, field.strand_pass(&classes, false, past).unwrap().faces, "still {still}: every face of a strand kept");
+        }
+        assert_eq!(from.len(), grown.theta.len());
+        let mut seen = vec![0u8; field.theta.len()];
+        for o in from.iter().flatten() {
+            seen[*o] += 1;
+        }
+        assert!(seen.iter().all(|&n| n == 1), "every standing entry carried once");
+        assert!(from.iter().zip(&grown.theta).all(|(o, &v)| o.is_none_or(|i| field.theta[i] == v)), "each with its value");
+        let (dw, f, c0, c1) = (d.width, d.contacts, old.carry, d.carry);
+        // A standing circle's rows: turn row k at k, leak row k at C' + k; its biases the same way.
+        for k in 0..c0 {
+            assert_eq!(grown.theta[l.carry + k * dw..l.carry + (k + 1) * dw], field.theta[ol.carry + k * dw..ol.carry + (k + 1) * dw]);
+            assert_eq!(grown.theta[l.carry + (c1 + k) * dw..l.carry + (c1 + k + 1) * dw], field.theta[ol.carry + (c0 + k) * dw..ol.carry + (c0 + k + 1) * dw]);
+            assert_eq!((grown.theta[l.carry_bias + k], grown.theta[l.carry_bias + c1 + k]), (field.theta[ol.carry_bias + k], field.theta[ol.carry_bias + c0 + k]));
+        }
+        // The new circles: complex contacts f_old/2 .. f_old/2 + 2, circles C..C'.
+        let fresh: Vec<usize> = (old.contacts / 2..old.contacts / 2 + 2).flat_map(|e| [e, f / 2 + e]).collect();
+        assert!(fresh.iter().all(|&e| (0..dw).all(|r| grown.theta[l.w + r * f + e] == 0)), "the new circles' W columns at zero");
+        assert!(fresh.iter().all(|&e| grown.theta[l.a_bias + e] == 0 && grown.theta[l.b_bias + e] == 0), "their drives' biases at zero");
+        assert!(fresh.iter().all(|&e| grown.theta[l.a + e * dw..l.a + (e + 1) * dw].iter().any(|&v| v != 0) && grown.theta[l.b + e * dw..l.b + (e + 1) * dw].iter().any(|&v| v != 0)), "their drives drawn");
+        assert!(grown.theta[l.carry + c0 * dw..l.carry + c1 * dw].iter().any(|&v| v != 0), "the new turn rows drawn");
+        assert!(grown.theta[l.carry + (c1 + c0) * dw..l.carry + 2 * c1 * dw].iter().all(|&v| v == 0), "the new leak rows at zero");
+        assert!((c0..c1).all(|k| grown.theta[l.carry_bias + k] == 0 && grown.theta[l.carry_bias + c1 + k] == 0), "the new biases at zero");
+        // The standing circles' gates are the ones before the growth; the new ones stand at their founding friction.
+        let (before, after) = (field.carry_gates_of(&region()).unwrap(), grown.carry_gates_of(&region()).unwrap());
+        assert_eq!((after.reads, &after.modulus[..c0], &after.friction[..c0]), (before.reads, &before.modulus[..], &before.friction[..]));
+        assert!(after.friction[c0..].iter().all(|&n| n == after.reads), "a new circle's leak reads zero at every site: the founded friction");
+        let g = covector_of(&grown, &region());
+        assert!(fresh.iter().any(|&e| (0..dw).any(|r| g[l.w + r * f + e] != 0)), "still {still}: the new circles' W columns have a covector");
+        assert!(grown.more_carry(3, &keys(d.carry_draws(3))).is_err(), "an odd count of circles");
+    }
+    assert!(shaped_with(four_contacts(1)).more_carry(2, &keys(1 << 12)).is_err(), "a field with no circles takes its first by with_carry");
+    // A tower with its one-sided block: the level's entries carried as they stood, a strand's faces kept.
+    for (still, past) in [(1usize, false), (2, true)] {
+        // The fine field as the line's was grown: its circles first, then the opening's lift (the level reads the opening's news).
+        let fine = Constitution::found(four_contacts(still), &keys(1 << 14)).unwrap();
+        let (fine, _) = fine.with_carry(2, &keys(fine.declaration.carry_draws(2))).unwrap();
+        let fine = drawn(fine.with_opening().unwrap().0);
+        let offset = 4 * (fine.declaration.founding_draws() + fine.declaration.carry_draws(2));
+        let mut tower = fine.scaled_up(6, 1, Declaration { reach: 16, ..coarse_declaration() }, &keys(1 << 16), offset).unwrap().0;
+        let base = tower.theta.len();
+        draw_from(&mut tower, base);
+        let before_block = tower.material_len();
+        let mut tower = tower.level_before().unwrap();
+        draw_from(&mut tower, before_block);
+        let (grown, from) = tower.more_carry(2, &keys(tower.declaration.carry_draws(2))).unwrap();
+        assert_eq!(from.len(), grown.material_len());
+        assert_eq!(grown.material_len() - grown.theta.len(), tower.material_len() - tower.theta.len(), "the level's material keeps its length");
+        let (old_all, new_all): (Vec<i32>, Vec<i32>) = (tower.material().copied().collect(), grown.material().copied().collect());
+        assert!((grown.theta.len()..grown.material_len()).all(|k| from[k] == Some(tower.theta.len() + k - grown.theta.len()) && new_all[k] == old_all[from[k].unwrap()]), "the level's entries carried as they stood");
+        let classes = drawn_classes(0xD5, 13, grown.declaration.alphabet);
+        assert_eq!(grown.strand_pass(&classes, false, past).unwrap().faces, tower.strand_pass(&classes, false, past).unwrap().faces, "still {still}: every face of a strand on the tower kept");
+        assert_eq!(grown.faces(&region()).unwrap(), tower.faces(&region()).unwrap(), "still {still}: and every face of the law");
+    }
+    // The learner.
+    let mut learner = Learner::new(circled_shaped(1), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    learner.rate_parts = Some(RateParts { contacts_before: 8, octaves: [0; PARTS] });
+    let draws = learner.field.declaration.carry_draws(2);
+    let stream = keys(learner.drawn / 4 + draws + 8);
+    let grown = learner.more_carry(2, &stream).unwrap();
+    assert_eq!(grown.drawn, learner.drawn + 4 * draws);
+    let (_, from) = learner.field.more_carry(2, &stream[learner.drawn..]).unwrap();
+    assert!(from.iter().enumerate().all(|(k, o)| o.is_none_or(|i| grown.first[k] == learner.first[i] && grown.second[k] == learner.second[i])), "every standing entry keeps its moments");
+    assert!(from.iter().enumerate().filter(|(_, o)| o.is_none()).all(|(k, _)| grown.first[k] == 0), "a new entry's first moment at zero");
+    let l = grown.field.layout.clone();
+    let (dw, c0, c1) = (grown.field.declaration.width, learner.field.declaration.carry, grown.field.declaration.carry);
+    assert!((l.carry + c0 * dw..l.carry + c1 * dw).all(|k| grown.second[k] > 0), "a new turn row opens on its family's standing scale");
+    assert_eq!(grown.rate_parts, learner.rate_parts);
+    let text = grown.to_text();
+    let back = Learner::from_text(&text).unwrap();
+    assert!(back.to_text() == text && back.field == grown.field, "the grown learner reads back as itself");
 }
 
 /// [definition; theory, November 11 17:25] **A growth by carry circles keeps every face and returns through its circles**: on a field with every

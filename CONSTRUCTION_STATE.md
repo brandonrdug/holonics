@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 18, 19:59 UTC): the line reads every place at its frontier and stands under the plain line
+## Where the work stands (November 19, 00:50 UTC): the line takes 128 carry circles, and an arm grows them to 256
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -39,6 +39,17 @@ writes the passage's symbol two times in three (0.650 at arm P15, about 0.01 mor
 nat or more is expected she gives the arriving symbol more than the count. So an arm is read on its code, on that mass at the
 settled places and on its panel against the count writers' table.
 
+**The line** (§19). Two streams, the odd contacts facing the past, and the level as a strand hears it (taken on G-1118-16): 1.7444,
+1.7260, 1.7082, 1.6992 nats a place at the frontier over laps L14 to L17, each the mean of a lap's last 1,000 sections, with the
+loudness reading beside each lap from L15. The row of the second place before left (G-1118-17).
+
+**The carry circles** (§17 to §20; G-1118-23, G-1119-1). Rows of single places cannot close what places settle together (0.306
+where a count of five gives 0.909); a carried product with a stride a symbol, alone on the host, gives 0.477 on 32 circles and 0.652
+on 128. Grown to 128 by their own founding law (`grow-carry`, every face kept), the circles read 0.015 and then 0.040 nats a place
+under the line at the frontier over two laps (1.6495 at C18), most where 4 to 31 places stand before the place; a draw writes the
+settled symbol 0.704 of the time against 0.680; her long panel did not move (53% against 56%). The line took them. The arm in
+flight grows them to 256 beside the line's laps L19 and L20.
+
 **What a strand's state carries** (§15; `tools/strand_presence_ruler.py`, halves split by source). An open place holds the place
 before it at nine tenths as it opens, the second before at a half, the third at a fifth, the fourth at a tenth, and the ticks carry
 no farther place in.
@@ -55,11 +66,10 @@ no farther place in.
   host and on the card, bit for bit (30 cases). By §13 it is the carrier a level's own receipt needs and is not expected to move
   the frontier without one; its arm beside the line is G-1118-16.
 
-**What is owed, in order.** The arms in flight, each beside the line from one state: the row of the second place before
-(G-1118-17) and the level's second lap (G-1118-16). Then the reading that this section lacks: what keeps her writes from holding,
-which a count of five does not size (it writes no sentence either). Carriers of farther places and a store of rows for a strand in
-progress (§13 to §15) stay candidates, each judged by its arm, not by §12's first sizing. A writer that keeps the known stream's
-states.
+**What is owed, in order.** The 256-circle arm's two laps and its score (G-1119-1). The Codex thread's section-choice test on the
+host (G-1118-18). What keeps her writes from holding though the code falls: two laps of 0.040 moved no count of her words, so the
+next reading is of the writes themselves (where a written word breaks, against the settled mass at that place). The composite's rows
+at located addresses (§13) as an arm. A writer that keeps the known stream's states.
 
 ## Earlier positions
 
