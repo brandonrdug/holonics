@@ -646,3 +646,14 @@ stricter set than the excess ruler's back-off chain; there her mass is about the
 read's direction take λ = 0 on the even stretches and add nothing (0.907): (b) held at its low end. The planted address takes λ = 0.02
 and reads 0.901, 0.006 under her face: (c) missed. By its rule rows of this budget (4,096 rows fitted on 768 thousand places) add
 nothing to her face at any address, and the next part is not a store of rows of this size.
+
+G-1119-6 (2026-11-19T20:15:11Z). The pumped carry's host control (Neon's note §2; `tools/pumped_carry_control.py`, its gradients checked against finite
+differences to 2.4e-7): a carry on real planes, commuting (a turn and a scale: today's carry) on 2C circles against pumped (a turn and a
+reflection, `α z + β z̄`) on C, the same parameters a symbol within an eighth, trained alike on Dyck-2 next-symbol prediction; read at the
+places where the next symbol must close: the right closer's share of the two closers' mass, by depth.
+  What is on record. A 200-step smoke at depth 3 and length 24: commuting 0.941, pumped 0.959. Abelian scans count and smooth (the
+  November 16 and 17 records on Barrington); the store line's circles locate no context by their phase (§25).
+  The guess. At C = 8, depth 6, length 64, 3,000 steps, three seeds: the pumped carry's share at the closing places 0.05 or more over the
+  commuting one's on the mean of the seeds, the gap widest at the deepest places; at depth 3 and length 32 the two within 0.03.
+  What it decides. The gap at 0.05 or more: the pumped carry is built on the engine and the card as an arm beside the line, judged by
+  the sure share at the settled places and the wide panel. Under 0.02: it is not built now.
