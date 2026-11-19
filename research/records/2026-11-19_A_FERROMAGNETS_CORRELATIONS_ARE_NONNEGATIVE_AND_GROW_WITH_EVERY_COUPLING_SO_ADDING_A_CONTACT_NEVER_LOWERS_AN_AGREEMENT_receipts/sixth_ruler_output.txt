@@ -1,0 +1,15 @@
+A. Griffiths' first and second inequalities on many-body ferromagnets
+  n=3: 4 families, first and second inequalities hold
+  n=4: 4 families, first and second inequalities hold
+  n=5: 4 families, first and second inequalities hold
+  n=6: 4 families, first and second inequalities hold
+  n=7: 4 families, first and second inequalities hold
+  least <s^B> = -1.684e-16; least <s^B s^C> - <s^B><s^C> = -2.818e-16
+  planted antiferromagnet, two sites at J = -1: <s0 s1> = -0.761594 < 0 (seen)
+B. The monomial's spin sum and the derivative along a segment
+  50 exponent vectors: sum equals prod_i (1 + (-1)^k_i)
+  12 segments: formula against central difference, worst relative gap 1.56e-09 where the derivative is above 1e-8
+C. The correlations grow along a segment of couplings
+  20 ferromagnets, every B, 21 points: no decrease (least step -5.55e-16)
+  planted frustrated triangle J12 = J23 = -2: <s1 s2> at J13 = 0, 1, 2 reads -0.964028, -0.994401, -0.998659 (falls; seen)
+all sections pass; 2.4 s

@@ -567,6 +567,8 @@ import HolonicsResearch.Mathematics.AlgebraicGNS
 import HolonicsResearch.Coupling.LorentzianPerp
 import HolonicsResearch.Coupling.KreinForm
 import HolonicsResearch.Coupling.LeeYangCircle
+import HolonicsResearch.Coupling.LeeYangIsing
+import HolonicsResearch.Coupling.GriffithsInequalities
 import HolonicsResearch.Geometry.Shadows
 import HolonicsResearch.Landmarks.LandmarksAndModuli
 import HolonicsResearch.Landmarks.IharaBass
@@ -1358,4 +1360,12 @@ import HolonicsResearch.Compression.OneFaceLaw
 import HolonicsResearch.Geometry.QuaternionFreePair
 import HolonicsResearch.Compression.FacesOnCycles
 import HolonicsResearch.Physics.Fluid.FrictionKeepsHarmonic
+import HolonicsResearch.HNN.StrandsComparisonChart
+import HolonicsResearch.Mathematics.PolynomialDeRham
+import HolonicsResearch.Mathematics.LevelLaws
+import HolonicsResearch.Compression.KTPartitionInvariant
+import HolonicsResearch.HNN.FoundingCapacityPeriod
+import HolonicsResearch.Aeon.Clock.OwnClockCarry
+import HolonicsResearch.HNN.ReadingLeverage
+import HolonicsResearch.HNN.LapsByComposition
 import HolonicsResearch.Foundation.FoldStanding
