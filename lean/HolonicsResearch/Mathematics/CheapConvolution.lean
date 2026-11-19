@@ -33,8 +33,8 @@ fold `x ↦ b x + d`. #410 owes these; this file proves them over any commutativ
    (`BaseAction.digitMove`) from `a` gives `a bⁿ + Σ_k d_k bᵏ`; from `0` it is the word's value,
    and on `ℤ/q` it is `n mod q` for the base-`b` digits of `n`.
 
-Owed (#410): the chain-rule statement that a held face's gain `I(W; q | F)` is the same in every
-reading order of the places.
+The chain-rule statement that a held face's gain `I(W; q | F)` is the same in every reading order of
+the places is `Compression/HeldFaceOrder` (`condEntropy_eq_sum_any_order`, `gain_any_order`).
 
 The computational object is the helical pair interaction: the convolution pairs digit `i` with digit
 `j` at place `i + j`, and on a cheap ring every pair lands in phase. Of the winding guide's six

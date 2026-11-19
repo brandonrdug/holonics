@@ -167,7 +167,7 @@ are kept here, so that an owner which needs the chord can re-enter them:
     (`ratio::linear::ExactRatMatrix::minimal_polynomial`). The semisimple realification has a
     positive definite conserving receiver (`AᵀG + GA = 0`) and the defective one has none (Lean
     `semisimple_imaginary_has_conserving_receiver`, `jordan_has_no_conserving_receiver`). The
-    converse is owed in #62.
+    converse is `HolonicsResearch/Coupling/MovingMetricSpectral` (`real_gSkew_iff_imaginary_chart`, #1000).
 - [counterexample; measured] **A cospectral pair the response atlas separates.**
   - The two graphs on six vertices have the contacts `(0,2) (0,3) (0,4) (0,5) (1,4) (1,5) (2,3)`
     and `(0,2) (0,4) (0,5) (1,2) (1,4) (1,5) (2,3)`. Their degree sequences, `(4,2,2,2,2,2)` and
@@ -212,9 +212,11 @@ condition (`D_t = Dᵀ`, `K = I + DDᵀ`), not a consequence of an arbitrary `D`
 seam `Σ_G = 0` (`CausalChord.seam_iff_gSkew`). For positive definite `G` a `G`-skew operator has
 purely imaginary spectrum, so every eigenvalue of `L` has `Re λ = ½`
 (`gSkew_eigenvalue_re_eq_zero`, `seam_eigenvalue_re_eq_half`). An indefinite conserving form does
-not give that placement. [proved-standard] The converse needs semisimplicity: a positive definite
-`G` making `A` `G`-skew exists exactly when `A` is semisimple with purely imaginary spectrum. The
-remaining obstruction to a seam theorem is the absent spectral realization, not the rate algebra.
+not give that placement. [proved-derived; formal-checked] The converse needs semisimplicity: a positive definite
+`G` making `A` `G`-skew exists exactly when `A` is semisimple with purely imaginary spectrum
+(`gSkew_iff_imaginary_chart`), and a positive definite `G` with `L*G + GL = G` exists exactly when
+`L` is semisimple with every `Re λ = ½` (`seam_iff_half_chart`), both over ℂ in
+`HolonicsResearch/Coupling/MovingMetricSpectral` (#1000), which builds the spectral realization.
 
 [established-bounded; formal-checked] The atlas's other receivers are Lean owners: Hodge
 (`Foundation/HodgeReceiver`), rigidity (`Foundation/RigidityReceiver`), topology

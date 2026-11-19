@@ -16,12 +16,15 @@ docs/plans/THE_CONSOLIDATION.md). A host instrument: it reads tracked files and 
                     declared in it). A name the form does not let it read (free text after a space) is left alone.
         H:          an owner in history. With `@<commit>` it is pinned and not read. Without one it names the pre-reset tree, so a
                     path that stands in the tree today is a live owner written as history.
-        L: D: N: P: a Lean file under lean/Holonics or lean/HolonicsResearch with its declaration's last name, a guide with its
-                    anchor, a record under research/records, a paper source under research/papers/source.
+        L: D: N: P: a Lean file under lean/Holonics or lean/HolonicsResearch with its declaration's last name declared in it
+                    outside its comments (a declaration's head, a constructor or a structure field), a guide with its anchor, a record
+                    under research/records, a paper source under research/papers/source.
       Prints one `BROKEN_OWNER` line an owner that does not resolve, the counts by kind, and exits 1 on any.
       Field 7 is read with them: a grade the atlas's README declares, or, on a row with an owner in history, the dated status the row
       was written with. Any other grade prints one `BROKEN_GRADE` line. Reason (November 18): 20 rows whose Lean owners stand in the
-      library carried a validation queue's status of October in the field, and nothing read it.
+      library carried a validation queue's status of October in the field, and nothing read it. A `formal-checked` row has at
+      least one L: owner, so the kernel's acceptance it claims is one a target of the package rebuilds (November 19: six rows rested
+      on a retired module or on a receipt's frozen source, and an L: owner's name passed where it stood only in a comment).
 
 ROOT defaults to the directory above this file. The tracked paths are git's index, or every file under ROOT where it is no repository.
 """
@@ -226,6 +229,50 @@ def member(name, text):
     return re.search(rf"\b(?:fn|const|type)\s+{n}\b|^\s*(?:pub(?:\([^)]*\))?\s+)?{n}\s*[:,({{]|^\s*{n}\s*$", text, re.M) is not None
 
 
+LEAN_KEYWORD = r"(?:theorem|lemma|def|abbrev|instance|structure|inductive|class|opaque|axiom)"
+
+
+def lean_code(text):
+    """A Lean file's text with its comments blanked: `/- ... -/` (nested, docstrings included) and `-- ...` to the line's end."""
+    out, i, depth, n = [], 0, 0, len(text)
+    while i < n:
+        if text.startswith("/-", i):
+            depth, i = depth + 1, i + 2
+            out.append("  ")
+        elif depth and text.startswith("-/", i):
+            depth, i = depth - 1, i + 2
+            out.append("  ")
+        elif depth:
+            out.append("\n" if text[i] == "\n" else " ")
+            i += 1
+        elif text.startswith("--", i):
+            j = text.find("\n", i)
+            j = n if j < 0 else j
+            out.append(" " * (j - i))
+            i = j
+        else:
+            out.append(text[i])
+            i += 1
+    return "".join(out)
+
+
+def lean_declared(name, text):
+    """None where `name` is declared in the Lean text outside its comments (a declaration's head, possibly namespaced, a
+    constructor `| name`, a structure field `name :` or a constructor `name ::`), else the reason."""
+    n = re.escape(name)
+    code = lean_code(text)
+    head = rf"\b{LEAN_KEYWORD}\s+(?:[\w'.]*\.)?{n}(?![\w'])"
+    member = rf"^\s*\|\s*{n}(?![\w'])|^\s*{n}\s*(?:\{{[^}}]*\}}\s*)?(?:\([^)]*\)\s*)*:(?!=)|^\s*{n}\s*::"
+    if re.search(head, code) or re.search(member, code, re.M):
+        return None
+    word = rf"(?<![\w']){n}(?![\w'])"
+    if re.search(word, code):
+        return f"`{name}` is used in the file but declared in none of its lines"
+    if re.search(word, text):
+        return f"`{name}` is only in a comment of the file"
+    return f"`{name}` is not in the file"
+
+
 def packages(tree):
     """Each crate's name as Rust writes it, with its directory."""
     found = {}
@@ -300,8 +347,8 @@ def owner_reason(tree, crates, kind, body):
             for candidate in (lean_root + file, lean_root + file + ".lean"):
                 if candidate in tree.tracked:
                     name = decl.split(".")[-1]
-                    if name and re.search(rf"(?<![\w']){re.escape(name)}(?![\w'])", tree.text(candidate) or "") is None:
-                        return f"`{name}` is not in the file", True
+                    if name:
+                        return lean_declared(name, tree.text(candidate) or ""), True
                     return None, True
         return "no tracked Lean file", True
     if kind == "D":
@@ -365,14 +412,18 @@ def grades(root):
             if len(fields) < 7:
                 continue
             grade = fields[6].strip()
-            if grade in GRADES:
+            if grade == "formal-checked" and not any(owner.strip().startswith("L:") for owner in fields[5].split(";")):
+                broken.append((shard, n, fields[0], grade))
+            elif grade in GRADES:
                 declared += 1
             elif any(owner.strip().startswith("H:") for owner in fields[5].split(";")):
                 dated += 1
             else:
                 broken.append((shard, n, fields[0], grade))
     for shard, n, row, grade in broken:
-        print(f"BROKEN_GRADE {shard}:{n} {row} `{grade}` (no grade the atlas declares, and no owner in history to date it)")
+        why = ("a kernel's acceptance with no Lean owner the package builds" if grade == "formal-checked"
+               else "no grade the atlas declares, and no owner in history to date it")
+        print(f"BROKEN_GRADE {shard}:{n} {row} `{grade}` ({why})")
     print(f"ATLAS_GRADES declared={declared} dated={dated} broken={len(broken)}")
     return declared, dated, broken
 

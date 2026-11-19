@@ -2,6 +2,7 @@ import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Chebyshev.Basic
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Nat.Choose.Factorization
+import Mathlib.Data.Nat.Choose.Lucas
 import Mathlib.Data.Nat.Nth
 import Mathlib.Data.ZMod.Basic
 import Mathlib.NumberTheory.ArithmeticFunction.Moebius
@@ -32,9 +33,11 @@ numbers.
 
 **What is imported as a named `Prop` with its status, and proved nowhere here.**  Legendre's
 conjecture and Cramér's conjecture, both **OPEN**; Baker–Harman–Pintz, a theorem; the gap bound the
-Riemann Hypothesis delivers; the square-root cancellation of the Möbius walk, equivalent to RH; and
-Lucas' congruence, a theorem mathlib does not carry.  Each is a real statement — none is `True`
-wearing a name — and none is claimed to be established by this file.
+Riemann Hypothesis delivers; and the square-root cancellation of the Möbius walk, equivalent to RH.
+Each is a real statement — none is `True` wearing a name — and none is claimed to be established by
+this file.  Lucas' congruence was named here beside them as a theorem mathlib did not carry; mathlib
+carries it (`Choose.choose_modEq_choose_mod_mul_choose_div_nat`), and `lucasCongruence_holds` reads it
+in `ZMod p`.
 
 **The square root recurs and it is the same one.**  The sieve needs landmarks to `√x`; the
 repetitions `p^k, k ≥ 2` are counted by `π(√x)` to leading order; RH's gap bound is `√p log p`; the
@@ -162,7 +165,7 @@ def MertensSquareRootBound : Prop :=
   ∀ ε : ℝ, 0 < ε → ∃ C : ℝ, ∀ x : ℕ, 1 ≤ x → |(mertens x : ℝ)| ≤ C * (x : ℝ) ^ (1 / 2 + ε)
 
 /-- **Lucas' congruence** — the binomial coefficient factorizes over base-`p` digits, recursively.
-A theorem (Lucas, 1878); mathlib does not carry it, and it is stated here as imported. -/
+A theorem (Lucas, 1878), held by `lucasCongruence_holds` below from mathlib's form. -/
 def LucasCongruence : Prop :=
   ∀ p : ℕ, p.Prime → ∀ m n : ℕ,
     ((Nat.choose m n : ZMod p)) =
@@ -174,6 +177,16 @@ theorem theLucasInstance :
     ((Nat.choose 5 2 : ZMod 3)) =
       (Nat.choose (5 / 3) (2 / 3) : ZMod 3) * (Nat.choose (5 % 3) (2 % 3) : ZMod 3) := by
   decide
+
+/-- [proved-standard; formal-checked] **Lucas' congruence holds**: mathlib's
+`Choose.choose_modEq_choose_mod_mul_choose_div_nat`, `C(m, n) ≡ C(m mod p, n mod p)·C(m/p, n/p)`
+(mod `p`), read in `ZMod p`. -/
+theorem lucasCongruence_holds : LucasCongruence := by
+  intro p hp m n
+  haveI : Fact p.Prime := ⟨hp⟩
+  have h := (ZMod.natCast_eq_natCast_iff _ _ p).mpr
+    (Choose.choose_modEq_choose_mod_mul_choose_div_nat (n := m) (k := n) (p := p))
+  rw [h, Nat.cast_mul, mul_comm]
 
 /-- **The Möbius sign is the half-turn character on squarefree numbers.**  Mathlib's own statement:
 `moebius n = (−1)^Ω(n)` where the exponent counts prime factors with multiplicity. -/

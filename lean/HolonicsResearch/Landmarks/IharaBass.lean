@@ -48,8 +48,8 @@ reversal is `Sum.swap`, an involution with no fixed dart.
   operator over the target ring, which is how the polynomial form is read from `ihara_bass`).
 
 **What this does not state.**  The Euler product over primitive closed walks,
-`det (1 − u B) = ∏ (1 − u^len P)`, is the dynamical side of `trace.ihara-zeta` and is not proved
-here; this owner is the determinant side alone.  No spectral statement is made: that a regular
+`det (1 − u B) = ∏ (1 − u^len P)`, is the dynamical side of `trace.ihara-zeta`, stated coefficient by
+coefficient in `Landmarks/IharaEulerProduct`; this owner is the determinant side alone.  No spectral statement is made: that a regular
 complex's nontrivial zeros stand on `|u| = q^(−1/2)` when every other mode of `A` has `λ² ≤ 4q`
 needs the spectral theorem for `A` and the quadratic cell, which are other owners'.  The
 `m − n` of the classical statement appears as the two powers on the two sides, so no connectivity
