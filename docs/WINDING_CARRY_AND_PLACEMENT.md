@@ -328,7 +328,7 @@ Each Rust packet lands with the Lean statement of the law it adds under the matc
 ## 9. Finite solenoidal charts and their physical consumer
 
 [definition; implemented-exact] `geometry::solenoid::{FiniteSolenoidalTower,SolenoidalChart}`
-joins the existing `Tower`/`CompatibleSection` restriction law to the longitudinal carry.
+(retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/solenoid.rs)) joined the October library's `Tower`/`CompatibleSection` restriction law to the longitudinal carry.
 The caller declares positive moduli `N_i | N_(i+1)`, a normalized rational phase `s`, signed
 winding `w`, and compatible transverse residues `z_i`. The circle face is
 `theta_i=(s+z_i)/N_i`. Advance by `a` uses `c=floor(s+a)` and publishes
@@ -336,7 +336,7 @@ winding `w`, and compatible transverse residues `z_i`. The circle face is
 also keeps the longitudinal lift `w+s`. Equal finite faces do not erase different windings.
 A supplied finer continuation must restrict to the retained section; it is not guessed.
 Negative motion uses Euclidean floor rather than truncation. The finite chart contains no
-occurrence archive. Its Rust controls check these equations and genuine incompatible inputs.
+occurrence archive. Its Rust controls checked these equations and genuine incompatible inputs.
 Lean `Geometry/SolenoidChart` (November 18) proves the joined operator: `lift_advance` (the lift
 `w+s` advances by `a`), `advance_advance` (an action of the rationals), `charge_advance` (`z-w` is
 kept), `restrict_advance` and `restrict_add` (restriction commutes with advance and addition),
@@ -429,7 +429,7 @@ law is inferred from product-one.
 ## 10. Actual HNN clock faces and plural holding contacts
 
 [definition; implemented-exact, combined acceptance pending] `geometry::solenoid::field`
-reads the existing `Field`, `Current::step` and `Odometer`. Only the ordered Lock rings enter
+(retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/solenoid/field.rs)) read the October `Field`, `Current::step` and `Odometer`. Only the ordered Lock rings enter
 its mixed-radix face; Own rings remain individual leaves. For radices `r_i`, the Lock modulus
 is their product, and class increment is derived from the actual field fits and native carry
 law. It is not an independent simultaneous-tick model and its modulus is not an LCM.
@@ -458,7 +458,7 @@ locating keys or deposition. Historical logs lacking actual anchor currents admi
 coupling reads but do not establish either strand's absolute winding or phase path.
 
 [definition; implemented-exact, combined acceptance pending] `geometry::solenoid::pump`
-reads the actual `ResonatorOperands` and displacement through `ring::sheets`. Each node
+(retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/geometry/solenoid/pump.rs)) read the October `ResonatorOperands` and displacement through `ring::sheets`. Each node
 returns its own half-turn bit and projection; zero in-phase projection keeps both fibre
 digits unresolved. A common instantaneous sheet is reported only when all node projections
 are nonzero and agree. Absent or zero-strength pump leaves the base clock alone. The actual

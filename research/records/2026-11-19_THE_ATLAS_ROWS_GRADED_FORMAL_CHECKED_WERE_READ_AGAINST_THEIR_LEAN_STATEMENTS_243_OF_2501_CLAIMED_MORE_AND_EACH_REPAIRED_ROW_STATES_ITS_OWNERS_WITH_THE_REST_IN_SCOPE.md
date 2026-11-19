@@ -50,10 +50,11 @@ dropped: it stands under the status it has. No grade was lowered by the repair b
 states the central claim. `apply.py` replaces whole fields by id, only where the field at the head equals the field the repair was
 read from, and keeps every existing owner in order.
 
-Applied in this change: **176 rows** (174 repaired, 2 needing none), 380 field lines, 93 rows gaining owners, 106 clauses moved under
-`not in Lean`; with the five CM rows of §1 and the two repaired first (the gamma segment, the finite nonboundary
-reduction), 183 of the 243. The 60 remaining findings, all on Navier–Stokes rows, follow in a
-second change.
+Applied in this change: **236 rows** (234 repaired, 2 needing none), 492 field lines, 144 rows gaining owners, 119 clauses moved under
+`not in Lean`; with the five CM rows of §1 and the two repaired first (the gamma segment, the finite nonboundary reduction), all 243.
+The Navier–Stokes rows were the last 74 (`D2a`, `D2b`, `D2c`): every one of their findings held at least in part, and 24 of them were
+repaired by owners alone, among them three where the reader had proposed narrowing and the tree held the clause (the forced enstrophy
+form, the velocity-level heat-minus-Duhamel identity, the parabolic rebase).
 
 The findings that changed what a row reads, beyond its wording:
 
@@ -73,6 +74,10 @@ The findings that changed what a row reads, beyond its wording:
 - **A statement the row read as proved that its module names open.** The ζ(5) series identity (the module proves its convergence
   skeleton), Sturm's count (`TheReadingEqualsThePopulation`, named open), the hairy ball (Poincaré–Hopf is not formalized), the
   quartic form of the Yang–Mills energy along its direction (the proof's route, unstated).
+- **A hypothesis read the other way.** The rescaled energy exponent's Lean takes the rescaled energy bounded below (`≥ δ > 0` eventually),
+  not bounded, and concludes `2α ≤ 3β`; the open enstrophy bound holds on `[a, T)` under `OpenAccumulatedJacobianControl`, whose
+  budget field is assumed; the weighted pressure's coefficient gives `2πik·p̂_k = (Leray − unprojected)(k)`, the sign the row had
+  reversed, and its uniqueness, which the module's header names, is no declaration's and stays in scope.
 - **A direction.** The theta row at one listed `≠ 0` where the row read `> 0`; `theCentralValueIsThePositiveThetaIntegral` states it
   and is added. Where an owner proves one direction of a row's `⇔`, the row states that direction and keeps the converse in scope.
 
@@ -95,7 +100,24 @@ rotating pump's subharmonic resonance), the text keeps that part.
 (`Choose.choose_modEq_choose_mod_mul_choose_div_nat`), and `lucasCongruence_holds` now reads it in `ZMod p` (atlas
 `coupling.lucas-congruence`). The touched modules build in this container.
 
+## 5. Four definitions read for a second home
+
+Solenoid, locale, loudness and founding were searched across the guides for a definition stated twice or two that diverge. The
+first three have one home each: the finite solenoidal chart in [WINDING §9](../../docs/WINDING_CARRY_AND_PLACEMENT.md#9-finite-solenoidal-charts-and-their-physical-consumer)
+(Lean `Geometry/SolenoidChart`), a locale in the precision law and the size rule of CLAUDE.md, the loudness in CLAUDE.md's rule 7 and
+the reading it names; the other uses cite them. Founding was read at four places that never named each other: the birth closure of
+the objects guide, the contact's tension (`contact.tension-founds-face`), the pool's reduced-rank face (`contact.pool-founding`) and
+the two-part code that decides whether a coordinate pays (`code.rank-one-founding`, with its instances `hnn.pair-contact-split` and
+`hnn.sparse-binding`). The [objects guide](../../docs/ELEMENTARY_OBJECTS.md#emanation-and-resonance) now states them as one law, what a
+founding reads, what it founds and whether it pays, and says where the engine's growths stand beside it: a part founded at zero or with
+drawn operands so that every face reads as before, with the residual law in a host ruler and `found-crossing`, unused.
+
+The same search found two guides still naming the October library's Rust as what runs: THE_MACHINE's opening named
+`holonics::hnn`, `holonics-cuda::hnn` and `hnn::ring` as implementing the field, and WINDING §9 and §10 named
+`geometry::solenoid::{…, field, pump}` in the present tense. Both now name the engine (`holonics_engine::field`,
+`holonics_engine_cuda::hnn::field`) and cite the retired owners at `d5ed4adc1`.
+
 ## Receipts
 
 [`receipts/2026-11-19_atlas-lean-read/`](receipts/2026-11-19_atlas-lean-read/): the two briefs, the extractor and the join, the nine
-findings files, the five applied fix files, `apply.py`, and the stale-text brief with its two findings files.
+findings files, the seven applied fix files, `apply.py`, and the stale-text brief with its two findings files.

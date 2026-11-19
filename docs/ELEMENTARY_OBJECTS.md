@@ -1502,6 +1502,29 @@ energy. The physical floors are Landauer (erasure only), Margolus–Levitin (ope
 energy) and Bekenstein (stored bits per energy × radius). They are floors, not an exchange rate,
 and the repository refuses a fixed mass per bit.
 
+[interpretation; `agent-inferred`, November 19] **Founding is one law read at four places.** A
+founding adds a constituent where the held ones leave a residual of the comparison's covector, and
+each owner that founds reads that residual at one place:
+- *What it founds on*: the covector the held forms do not contain. A reached covector already in
+  their span founds nothing (`birth.opening-dimension`, `Context/Birth.opening_finrank`). At a
+  contact the residual is the tension the present faces leave, the Schur complement of the face's
+  partial regression (`contact.tension-founds-face`, `HNN/EffectiveTension`).
+- *What it founds*: where the residual is a form the chart reads, its closure under the admitted
+  adjoints, with the chart of the family born (birth, under [keys, locks and
+  navigation](#keys-locks-and-navigation); `birth.separator-transport-closure`), which is also how an
+  encoding is founded (`HNN/Encoding`). Where the face is drawn from a pool of operands, it is the
+  reduced-rank regression of the residual on the pool, its leading generalized eigenvectors
+  (`contact.pool-founding`, `HNN/PoolFaceKyFan`).
+- *Whether it pays*: the two-part code of the new coordinate, `found ⇔ g²/(τ(1 + r)) > ln(1 + r)`,
+  with `g = a*Sy` its coupling to the whitened residual, the same test pruning in reverse, and a
+  coordinate no flux reaches costing nothing (`code.rank-one-founding`, proved-derived without Lean;
+  its instances `hnn.pair-contact-split`, `hnn.sparse-binding`).
+
+The engine's growths (`crates/engine/src/founding.rs`) found a part at zero or with drawn operands
+so that every face reads as before, and which entries they open is the realization's choice; the
+residual law above stands in a host ruler (`tools/tension_ruler.py`) and in `found-crossing`,
+unused ([THE_ENGINE §10](THE_ENGINE.md#10-what-is-owed)).
+
 [definition] π and `e` are constraint identities; the identity is the navigator and carries no
 error. Digits are a receiver face (`RadixWindowReceiver`), and error enters only in how a face is
 attained. π's base-16 digits are its address word under `x↦16x mod 1`, the same address map as the
