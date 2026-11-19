@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,715 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,716 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 114 | 102 |
+| [November 2026](#november-2026) | 115 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -23,6 +23,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-19 [A congruences rate is a boost and a turn and focuses within N over its expansion a circulants inertia is read by its windings and an action closes on a kernels modes or returns its separating direction in Lean](2026-11-19_A_CONGRUENCES_RATE_IS_A_BOOST_AND_A_TURN_AND_FOCUSES_WITHIN_N_OVER_ITS_EXPANSION_A_CIRCULANTS_INERTIA_IS_READ_BY_ITS_WINDINGS_AND_AN_ACTION_CLOSES_ON_A_KERNELS_MODES_OR_RETURNS_ITS_SEPARATING_DIRECTION_IN_LEAN.md)
 - 2026-11-19 [A ferromagnets correlations are nonnegative and grow with every coupling so adding a contact never lowers an agreement](2026-11-19_A_FERROMAGNETS_CORRELATIONS_ARE_NONNEGATIVE_AND_GROW_WITH_EVERY_COUPLING_SO_ADDING_A_CONTACT_NEVER_LOWERS_AN_AGREEMENT.md)
 - 2026-11-19 [A load moves a line by its weight on the mode the magnitude cannot see the basins it reflects the stable core is the first round and a lossless period reads hills kinds by its trace in Lean](2026-11-19_A_LOAD_MOVES_A_LINE_BY_ITS_WEIGHT_ON_THE_MODE_THE_MAGNITUDE_CANNOT_SEE_THE_BASINS_IT_REFLECTS_THE_STABLE_CORE_IS_THE_FIRST_ROUND_AND_A_LOSSLESS_PERIOD_READS_HILLS_KINDS_BY_ITS_TRACE_IN_LEAN.md)
+- 2026-11-19 [A parts address on a span is read from its last cells a complex relation is made passive by a clip averaged over the quarter turn and an enclosure shares the word every value in it reads in Lean](2026-11-19_A_PARTS_ADDRESS_ON_A_SPAN_IS_READ_FROM_ITS_LAST_CELLS_A_COMPLEX_RELATION_IS_MADE_PASSIVE_BY_A_CLIP_AVERAGED_OVER_THE_QUARTER_TURN_AND_AN_ENCLOSURE_SHARES_THE_WORD_EVERY_VALUE_IN_IT_READS_IN_LEAN.md)
 - 2026-11-19 [A pools best face is its leading eigenvectors level two is free on two carries a softmax release falls by the entropy two passes apart and a conserved face is a congruence in Lean](2026-11-19_A_POOLS_BEST_FACE_IS_ITS_LEADING_EIGENVECTORS_LEVEL_TWO_IS_FREE_ON_TWO_CARRIES_A_SOFTMAX_RELEASE_FALLS_BY_THE_ENTROPY_TWO_PASSES_APART_AND_A_CONSERVED_FACE_IS_A_CONGRUENCE_IN_LEAN.md)
 - 2026-11-19 [A ring paths log ratio is its lifts entropy reading and its mean carry is the current an interconnection carries its step its restriction and joint reception and a retention counts its active Gram modes in Lean](2026-11-19_A_RING_PATHS_LOG_RATIO_IS_ITS_LIFTS_ENTROPY_READING_AND_ITS_MEAN_CARRY_IS_THE_CURRENT_AN_INTERCONNECTION_CARRIES_ITS_STEP_ITS_RESTRICTION_AND_JOINT_RECEPTION_AND_A_RETENTION_COUNTS_ITS_ACTIVE_GRAM_MODES_IN_LEAN.md)
 - 2026-11-19 [Maxwell keeps Gauss along every motion heat on a partition raises entropy by half its Fisher information a readings leverage is a series over its pivots and the rank falls where a prime divides every minor in Lean](2026-11-19_MAXWELL_KEEPS_GAUSS_ALONG_EVERY_MOTION_HEAT_ON_A_PARTITION_RAISES_ENTROPY_BY_HALF_ITS_FISHER_INFORMATION_A_READINGS_LEVERAGE_IS_A_SERIES_OVER_ITS_PIVOTS_AND_THE_RANK_FALLS_WHERE_A_PRIME_DIVIDES_EVERY_MINOR_IN_LEAN.md)

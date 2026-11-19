@@ -683,7 +683,9 @@ binds that recursion to a holomorphic source: `f_s v=−f`, its enclosed release
 the complete preimage equation and certified receiving neighbourhoods. For a changing source the
 law is `F_s v=−F−u̇ F_u`; backward heat joins it to the RH zero motion.
 `Mathematics/AnalyticReceiving` binds the operation to `Holon` and clocked first arrivals;
-The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) supplied the certified enclosure and capture operations. These realize field
+The retired [`geometry::exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs) supplied the certified enclosure and capture operations. Its enclosures of `log`, `exp`, `sin`, `cos`
+and `cis` at a declared term count, and the continued-fraction word an enclosure shares, are Lean
+`Mathematics/ConstantNavigators`; the capture and the Euler–Maclaurin `ζ`, `η` are owed in #410. These realize field
 refinement without making Newton dynamics every HNN's constitution; their logarithmic one-form
 and contour periods connect potential/phase circulation to the Hodge owners.
 
@@ -902,27 +904,35 @@ word, taken at its sheet-class operands.
 `holon::reaction`, had no consumer and is retired; it is at
 [`2d34b819`](https://github.com/brandonrdug/holonics/tree/2d34b819/crates/holonics/src/holon/reaction.rs). Lean `Holon/Reaction` keeps the
 skew projection `skewPart W = ½(W − Wᴴ)` (`skewPart_orthogonal`, `skewPart_of_skew`). Three laws it
-realized are not in Lean, and are kept here:
-- `[agent-inferred]` **The complex passive projection averages over `J`.** Let `L` be the
-  realification of a complex relation `W`, `J` multiplication by `i` (orthogonal, with
-  `Jᵀ(sym L)J = sym L` because `L` is complex-linear), and `R ⪰ 0` with `sym(L − R) ⪯ 0` (the
-  certified congruence clip, `Holon/Deposition.projectPassiveCongruence_passive`). Then
-  `R̄ = ½(R + JᵀRJ)` is positive semidefinite and complex-linear, and `sym(L − R̄) ⪯ 0`, since
-  `⟨e,(L − R̄)e⟩ = ½⟨e,(L − R)e⟩ + ½⟨Je,(L − R)Je⟩ ≤ 0` for every `e`.
-- `[agent-inferred]` **The grain correction.** At a grain `2^(−g)` in `n` complex dimensions,
-  rounding `R̄` Hermitian-symmetrically errs by at most half a unit in each real coordinate, so the
-  error `E` has `‖E‖₂ ≤ ‖E‖_F ≤ n` units; removing `round(R̄) + n·I` keeps `sym ⪯ 0`, and the result
-  is re-certified by inertia in rationals. A passive relation is fixed. The skew projection at the grain
-  rounds the strict upper triangle and completes it by `A_ji = −conj(A_ij)`, `A_ii ∈ iℤ`: skew-Hermitian,
-  within half a unit per real coordinate of `skewPart W`.
-- `[measured]` **The scalar shift against the congruence clip.** The least grain integer `τ` with
-  `herm W − τI ⪯ 0` (inertia bisection in rationals below the Gershgorin bound) is also certified passive,
-  keeps the skew part, and removes `τ ≤ λ_max(herm W)₊ + 1` unit, bounded by the active part. The
-  congruence clip removes `P⁻ᵀ max(D, 0) P⁻¹`, which depends on the elimination order and is unbounded
-  relative to `λ_max(herm W)` under an ill-conditioned congruence; on learned native reaction blocks
-  it removed far more than the block.
-
-The averaging lemma and the grain correction are owed in Lean (#62).
+realized are proved in Lean `HolonicsResearch/Holon/ReactionProjection`:
+- `[proved-derived; formal-checked]` **The complex passive projection averages over `J`.** Let `L`
+  be the realification of a complex relation `W`, `J = realify(i·1)` multiplication by `i`
+  (`Jᵀ J = 1`, `J J = −1`; `L` commutes with it, so `Jᵀ(sym L)J = sym L`), and `R ⪰ 0` with
+  `L − R` passive (the certified congruence clip, `Holon/Deposition.projectPassiveCongruence_passive`).
+  Then `R̄ = ½(R + JᵀRJ)` is positive semidefinite and complex-linear, and `L − R̄` is passive, since
+  `⟨e,(L − R̄)e⟩ = ½⟨e,(L − R)e⟩ + ½⟨Je,(L − R)Je⟩ ≤ 0` for every `e` (`average_psd`,
+  `average_commute`, `realify_commute`, `averaging_identity`, `average_passive`,
+  `averaged_clip_passive`).
+- `[proved-derived; formal-checked]` **The grain correction.** At a grain `u = 2^(−g)` in `n` complex
+  dimensions, rounding `R̄` to the grain errs by at most `u/2` in each of the `2n` real coordinates,
+  so the error `E` has `|⟨e, E e⟩| ≤ n u |e|²` (`quad_abs_le_of_entry`, by `(Σ|e_i|)² ≤ 2n Σ e_i²`);
+  removing `round(R̄) + n u·1` keeps the relation passive and removes a positive semidefinite part
+  (`grain_passive`, `passive_complex_at_grain`, `passive_complex_at_grain_removed_psd`). The owner
+  re-certified the result by inertia in rationals and returned a relation with no positive inertia
+  unchanged; the formula alone removes the shift `n u·1` from a passive relation
+  (`grain_removed_of_passive`). The skew projection at the grain rounds the strict upper triangle and
+  completes it by `A_ji = −conj(A_ij)`, `A_ii ∈ iℤ`: skew-Hermitian, within half a unit per real
+  coordinate of `skewPart W`; it is not stated in Lean.
+- `[proved-derived; formal-checked]` **The scalar shift against the congruence clip.** The least
+  grain integer `τ` with `herm W − τu·1 ⪯ 0` (found by inertia bisection in rationals below the
+  Gershgorin bound, `gershgorin_quad`) leaves a passive relation, keeps the skew part, and is
+  `τ* = ⌈λ_max(herm W)/u⌉₊`, so it removes `τ* u < λ_max(herm W)₊ + u`, bounded by the active part
+  (`leastShift_passive`, `shift_keeps_skew`, `leastShift_eq_ceil_lamMax`, `leastShift_lt`,
+  `grainShift_eq_ceil`). The congruence clip removes `P⁻ᵀ max(D, 0) P⁻¹`, which depends on the
+  congruence: for `S = [[0, 1], [1, 0]]` every `P_t = [[t, t], [t⁻¹, −t⁻¹]]` gives `diag(2, −2)`,
+  and the removed part's trace `(t² + t⁻²)/2` exceeds every bound, while the shift removes `1·1`
+  (`clip_removed_unbounded`, `clip_vs_shift_witness`). `[measured]` On learned native reaction
+  blocks it removed far more than the block.
 
 [proved-derived] **The return** runs the word's ticks in reverse over the word's own per-tick waves,
 or over its checkpoints. No inverse is claimed: `Holon/Cayley.cayley_bijective` makes each step
