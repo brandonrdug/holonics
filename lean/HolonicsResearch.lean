@@ -1369,3 +1369,9 @@ import HolonicsResearch.Aeon.Clock.OwnClockCarry
 import HolonicsResearch.HNN.ReadingLeverage
 import HolonicsResearch.HNN.LapsByComposition
 import HolonicsResearch.Foundation.FoldStanding
+import HolonicsResearch.Zeta.HandCountDeficit
+import HolonicsResearch.Landmarks.IharaTwoFrames
+import HolonicsResearch.Transport.RepairCodec
+import HolonicsResearch.Transport.JetAtStep
+import HolonicsResearch.HNN.FoundingVille
+import HolonicsResearch.HNN.FinestGrain
