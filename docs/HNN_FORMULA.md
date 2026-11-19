@@ -1259,7 +1259,9 @@ period lift reads the admitted future, one chart for every phase releases at mos
 family's kernel, the descended ring returns the same wave, the release stores nothing, the learning
 covector factors through the chart exactly when each gain family's variation vanishes on the
 release, and the descended block keeps the full ring's balance. Lean `HNN/ModeQuotient` owns those
-laws. Its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was retired at U2: the state it
+laws, and Lean `HNN/ModeQuotientRing` reads them on the ring itself: the four maps are the blocks
+of `HNN/LoadedRing`'s tick, the quotient's run is the ring's word, and a release lies in
+`ker K_t × ker C` at every phase. Its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was retired at U2: the state it
 quotients leaves at every word's end, so the aeon's retention contract
 ([objects §8](ELEMENTARY_OBJECTS.md#the-retention-contract)) has nothing of it to collapse, and it
 had no library caller. It returns with a consumer when the wave and resonator states persist between
