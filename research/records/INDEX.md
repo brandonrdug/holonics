@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,724 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,725 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 123 | 102 |
+| [November 2026](#november-2026) | 124 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-19 [An L function is a cycle machine whose prime sites carry their own clocks chambers identity holds for every period and free fall deviates by the tide of any torsion free connection in Lean](2026-11-19_AN_L_FUNCTION_IS_A_CYCLE_MACHINE_WHOSE_PRIME_SITES_CARRY_THEIR_OWN_CLOCKS_CHAMBERS_IDENTITY_HOLDS_FOR_EVERY_PERIOD_AND_FREE_FALL_DEVIATES_BY_THE_TIDE_OF_ANY_TORSION_FREE_CONNECTION_IN_LEAN.md)
 - 2026-11-19 [A congruences rate is a boost and a turn and focuses within N over its expansion a circulants inertia is read by its windings and an action closes on a kernels modes or returns its separating direction in Lean](2026-11-19_A_CONGRUENCES_RATE_IS_A_BOOST_AND_A_TURN_AND_FOCUSES_WITHIN_N_OVER_ITS_EXPANSION_A_CIRCULANTS_INERTIA_IS_READ_BY_ITS_WINDINGS_AND_AN_ACTION_CLOSES_ON_A_KERNELS_MODES_OR_RETURNS_ITS_SEPARATING_DIRECTION_IN_LEAN.md)
 - 2026-11-19 [A declared dimension is certified by its eliminants lock and key deposited on both sides meet at the matched pair nearest their opening and a port Hamiltonian aeon produces what its resistance dissipates in Lean](2026-11-19_A_DECLARED_DIMENSION_IS_CERTIFIED_BY_ITS_ELIMINANTS_LOCK_AND_KEY_DEPOSITED_ON_BOTH_SIDES_MEET_AT_THE_MATCHED_PAIR_NEAREST_THEIR_OPENING_AND_A_PORT_HAMILTONIAN_AEON_PRODUCES_WHAT_ITS_RESISTANCE_DISSIPATES_IN_LEAN.md)
 - 2026-11-19 [A driven rings energy is its growth plus its ports supply a zeros tank is positive real only on the seam and heat runs below a finite front and holds a gradient in a potential in Lean](2026-11-19_A_DRIVEN_RINGS_ENERGY_IS_ITS_GROWTH_PLUS_ITS_PORTS_SUPPLY_A_ZEROS_TANK_IS_POSITIVE_REAL_ONLY_ON_THE_SEAM_AND_HEAT_RUNS_BELOW_A_FINITE_FRONT_AND_HOLDS_A_GRADIENT_IN_A_POTENTIAL_IN_LEAN.md)

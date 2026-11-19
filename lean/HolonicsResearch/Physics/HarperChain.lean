@@ -102,10 +102,10 @@ What is proved.
 
 What is not claimed.
 
-- Chambers' polynomial identity `det(E − H(k)) = Δ(E) − 2cos k` for general `q`: it is proved at
-  `q = 2` and `q = 3`; for every `q` the two polynomials have the same roots (item 4), but their
-  multiplicities, and so the identity of the two monic polynomials of degree `q`, are not
-  written.
+- Chambers' polynomial identity `det(E − H(k)) = Δ(E) − 2cos k` for general `q`: here it is proved
+  at `q = 2` and `q = 3`, and for every `q` the two polynomials have the same roots (item 4); the
+  identity for every `q ≥ 1`, its polynomial form and the multiplicities stand in
+  `Physics/HarperChambers`.
 - The spectrum's form: the Cantor spectrum at irrational `α` (Avila–Jitomirskaya, the Ten Martini
   problem), and that the gap with label `t` is open (Avila, You and Zhou away from critical
   coupling).
