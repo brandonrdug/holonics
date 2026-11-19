@@ -1358,3 +1358,11 @@ import HolonicsResearch.Compression.OneFaceLaw
 import HolonicsResearch.Geometry.QuaternionFreePair
 import HolonicsResearch.Compression.FacesOnCycles
 import HolonicsResearch.Physics.Fluid.FrictionKeepsHarmonic
+import HolonicsResearch.HNN.StrandsComparisonChart
+import HolonicsResearch.Mathematics.PolynomialDeRham
+import HolonicsResearch.Mathematics.LevelLaws
+import HolonicsResearch.Compression.KTPartitionInvariant
+import HolonicsResearch.HNN.FoundingCapacityPeriod
+import HolonicsResearch.Aeon.Clock.OwnClockCarry
+import HolonicsResearch.HNN.ReadingLeverage
+import HolonicsResearch.HNN.LapsByComposition
