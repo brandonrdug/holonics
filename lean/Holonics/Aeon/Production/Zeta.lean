@@ -69,10 +69,11 @@ places the word series' radius of convergence at `1/λ` and a zero of the transf
 with none inside (`summable_wordCount_iff`, `transferDet_zero_at_inv`,
 `transferDet_ne_zero_of_lt`). The Perron vector's existence for an irreducible matrix is that
 module's hypothesis; for the cycle counts `tr Mⁿ` only the upper bound here holds at every `n`. The
-flow zeta `∏_c (1 − e^(−s·t(c)))⁻¹` and the trace formula are not treated. [proved-standard, not proved here] Where the word series converges at a point `T`
-it is the polynomial `aᵀ adj(1 − T·M) b` over `det(1 − T·M)`, so the poles of its continuation lie
-among the zeros of the transfer determinant; this analytic statement, and its reading at
-`T = r^s` in `Foundation/FractalString`, is owed in #62.
+flow zeta `∏_c (1 − e^(−s·t(c)))⁻¹` and the trace formula are not treated. Where `‖T·M‖ < 1` the
+word series is the polynomial `aᵀ adj(1 − T·M) b` over `det(1 − T·M)`, so the poles of its
+continuation lie among the zeros of the transfer determinant; its reading at `T = r^s` is
+`HolonicsResearch/Zeta/GraphDirectedDimensions` (`resolvent_entries`, `graphDirectedZeta_eq_div`,
+`scaleDet_eq_zero_of_not_differentiableAt`).
 
 No `axiom`, no `sorry`.
 -/
@@ -506,9 +507,9 @@ theorem card_returnWord_oneState (N k : ℕ) :
 polynomial** (formal power series). For a return map `M` over a commutative ring, start weights
 `a` and end weights `b`, `det(1 − T·M) · Σ_k (aᵀ Mᵏ b) Tᵏ = aᵀ adj(1 − T·M) b`: the resolvent
 identity `adj(1 − T·M) = det(1 − T·M)·Σ_k Tᵏ Mᵏ` (`adjugate_transfer`) paired with `a` and `b`.
-[proved-standard, not proved here] Where the series converges at a point `T` it equals that
-polynomial over the transfer determinant, so the poles of its continuation lie among the zeros of
-`det(1 − T·M)`; the analytic statement is owed in #62. -/
+Where `‖T·M‖ < 1` it equals that polynomial over the transfer determinant, so the poles of its
+continuation lie among the zeros of `det(1 − T·M)` (`HolonicsResearch/Zeta/GraphDirectedDimensions`,
+`resolvent_entries` and, at `T = r^s`, `graphDirectedZeta_eq_div`). -/
 theorem transferDet_mul_wordSeries (M : Matrix n n R) (a b : n → R) :
     (M.charpolyRev : PowerSeries R) *
         PowerSeries.mk (fun k => ∑ i, ∑ j, a i * (M ^ k) i j * b j) =
