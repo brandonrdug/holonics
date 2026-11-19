@@ -530,3 +530,26 @@ arm L16's end with the circles grown, beside the line's own L17 and L18 from the
   in the tree with the reading.
 
   G-1118-17 scored (22:08 UTC), the second lap. (a) arm R16's rows S read 1.7706 at the mean of its last 1,000 sections, 0.0320 above arm P16's (±0.0014; between 0.000 and 0.060 under: missed, above), above it in every slice; the first lap's 0.0514 above closed by 0.019. (b) at the places of least news: in the corrected ruler's first bin (the count expects under a quarter of a nat) arm R16 codes 0.878 where arm P16 codes 0.840, and gives the arriving symbol 0.641 of its mass where arm P16 gives 0.657 (0.02 or more under: missed). (c) under the law one place open reads 0.0382 above the control's (0.00 to 0.06 above: held), whole masks 0.0257 above. (d) a section took 262 ms (the control's 265: held). (e) long panels: arm R15's mean 46% and end 55% lexicon words, arm P15's 51% and 54% (within 8 points: held on the first lap). The rule: not 0.015 under, so the word leaves the line and stays a region's word in the tree with this reading. What it reads: a row of the opening for the second place before, taken from rows the law's regions still read as the site after, costs both readings for two laps; with the ladder of G-1118-19 (rows of single places stop gaining after two) it is no growth.
+
+G-1118-23 scored (2026-11-19T00:27Z). Rows S at the lap means: C17 1.6844 against L17's 1.6992, 0.0148 under (±0.0005): (a) held at
+its edge; C18 1.6495 against L18's 1.6899, 0.0404 under (±0.0009): (a) missed, a larger gain than guessed. (b) At the places a count of
+five settles C18 gives the arriving symbol 0.704 of its mass and L18 0.680, 0.024 more: held. (c) One place open under the law: C17
+0.0060 under its control, held; C18 0.0176 under, missed (guessed within 0.01). (d) Sections 342 ms (C17) and 330 ms (C18), mean over
+3,000, the line's 312 and 298: held. (e) Long panels: C17 187 of 286 words in the lexicon (65%) against L17's 164 of 280 (58%); C18
+142 of 263 (53%) against L18's 153 of 272 (56%): held (within 9 points). The rule: 0.010 or more under at the second lap, so the line
+takes the 128 circles and continues from arm C18's end.
+
+G-1119-1 (2026-11-19T00:27:33Z). The carry circles from 128 to 256 (grow-carry 128: 128 more circles by their own founding law,
+every face kept, about 131,840 new entries on 541,305): two laps (arms D19, D20) from arm C18's end with the circles grown, beside the
+line's own L19 and L20 from the same state (the control). One change. Binary: the lead branch at 7a280248f, entered by its gate's
+reproduction of lap C18.
+  What is on record. The 96 circles of G-1118-23 read 0.0148 and then 0.0404 under their control, the gap still widening at the
+  second lap; at the settled places 0.704 against 0.680. On the host a stride reader alone gives 0.477 at the settled places on 32
+  circles and 0.652 on 128 (G-1118-21), so about 0.09 a doubling there, and no larger extent was read; the count of five gives
+  0.909. Each doubling costs about 15 ms a section on the card (312 to 342 ms for 32 to 128 circles).
+  The guess. (a) Rows S at the mean of a lap's last 1,000 sections: D19 between 0.003 above and 0.015 under L19's; D20 between 0.005
+  and 0.030 under L20's. (b) At the places a count of five settles, D20 gives the arriving symbol 0.000 to 0.020 more of its mass than
+  L20. (c) One place open under the law: D20 within 0.015 of L20. (d) A section takes 350 to 430 ms. (e) The long panel from each
+  lap's mean stays within 9 points of the control's.
+  The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
+  by 0.003 or more, two more laps; otherwise the line continues from L20 and the circles stay at 128.
