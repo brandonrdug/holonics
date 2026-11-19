@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §25 on November 19, to 15:55 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §25 on November 19, to 15:38 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -797,9 +797,9 @@ strides now are (§19's spread of strides, read again on E22's state before the 
 
 ## 24. A second pass and a fourth doubling: the pass gives surety, the circles stop paying
 
-*Written at 15:25 UTC, November 19.* The line ran laps L23 to L30 with 512 circles until lap L30 ended the pass over the store's
+*Written at 15:15 UTC, November 19 (stamp corrected from 15:25, which was not read from the clock).* The line ran laps L23 to L30 with 512 circles until lap L30 ended the pass over the store's
 prefix (73.5 million stretches), opened the next pass by `next-pass` and ran laps L31 to L34; then G-1119-3 grew the circles to
-1024 beside laps L35 and L36 (receipts `reads.txt`, 08:20 to 15:20 UTC).
+1024 beside laps L35 and L36 (receipts `reads.txt`, 08:20 to 15:14 UTC).
 
 **What she wrote.** On the wide panel: 62%, 64%, 64%, 65% over laps L23 to L26, 65%, 66%, 69%, 66% over L27 to L30, then 68%, 68%,
 68%, 69% on the second pass and 68%, 69% at L35 and L36. Her words climbed from 61% to about 68% over the first pass's last eight
@@ -821,8 +821,8 @@ compose, is now the next arm with nothing ahead of it.
 
 ## 25. The circles' phase is no address
 
-*Written at 15:55 UTC, November 19.* §23's premise, read before the build (G-1119-4; `read-strand-states ... past carries`,
-`tools/residue_rows_ruler.py`; receipts 15:50 UTC). Rows fitted at a residue on the fitting half (768 thousand places of training text
+*Written at 15:38 UTC, November 19 (stamp corrected from 15:55, which was not read from the clock).* §23's premise, read before the build (G-1119-4; `read-strand-states ... past carries`,
+`tools/residue_rows_ruler.py`; receipts 15:36 UTC). Rows fitted at a residue on the fitting half (768 thousand places of training text
 past the line's first 8 MB a slice) and read on the held half, at the settled places, 4 rings of about a thousand rows each:
 
 | address | mass on the arriving symbol | code (nats) |

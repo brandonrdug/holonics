@@ -688,7 +688,8 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// frontier record §23] With the word `carries` (after `past` where both are given) it writes, in place of the gates and the open places'
 /// reads (at 512 circles they are 4 KB a place a tick), `OUT/carries.i32`: each known site's carried product before it at the last tick
 /// on every sixteenth circle (`k = 0, 16, 32, …`), real parts then imaginary, on `2^(−16)`
-/// ([`holonics_engine::field::Constitution::strand_carries`]), and `dims.tsv` names the circles written.
+/// ([`holonics_engine::field::Constitution::strand_carries`]), `OUT/open_last.i32` each open place's read after the last tick (`D` words
+/// a place, the operand its face is linear in), and `dims.tsv` names the circles written and `D`.
 pub fn read_strand_states(args: &[String]) -> Result<()> {
     let words: Vec<&str> = args.iter().skip(12).map(String::as_str).collect();
     let (past, carries) = (words.contains(&"past"), words.contains(&"carries"));
@@ -726,6 +727,8 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
         let circles = field.declaration.carry;
         let every: Vec<usize> = (0..circles).step_by(16).collect();
         let products: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| field.strand_carries(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let opens: Vec<Vec<i32>> = rows.par_iter().map(|(_, classes)| field.strand_reads(classes, past).map(|(_, o)| o.last().cloned().unwrap_or_default()).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let open_bytes: Vec<u8> = opens.iter().flat_map(|o| o.iter().flat_map(|v| v.to_le_bytes())).collect();
         std::fs::create_dir_all(out)?;
         let mut lines = String::new();
         let mut bytes: Vec<u8> = Vec::new();
@@ -742,7 +745,8 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
         }
         write_new(&out.join("rows.tsv"), lines.as_bytes())?;
         write_new(&out.join("carries.i32"), &bytes)?;
-        write_new(&out.join("dims.tsv"), format!("circles\t{circles}\nwritten\t{}\nevery\t16\n", every.len()).as_bytes())?;
+        write_new(&out.join("open_last.i32"), &open_bytes)?;
+        write_new(&out.join("dims.tsv"), format!("circles\t{circles}\nwritten\t{}\nevery\t16\nread\t{}\n", every.len(), field.declaration.width).as_bytes())?;
         println!("STRAND_CARRIES rows={} places={} circles_written={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), every.len(), started.elapsed().as_millis());
         return Ok(());
     }

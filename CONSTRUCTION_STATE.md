@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 19, 15:25 UTC): the line holds 512 carry circles on its second pass, and her words stand at 69%
+## Where the work stands (November 19, 15:15 UTC): the line holds 512 carry circles on its second pass, and her words stand at 69%
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.

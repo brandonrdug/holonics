@@ -1274,7 +1274,7 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   FRONTIER L34; the frontier, each stretch read by two streams : all 1.4311 (99844 places) | books 1.4974 code 1.1295 science 1.3308 web 1.6464 wikidata 1.5516 || less the control's, paired: -0.1035 (±0.0017) | books -0.0869 code -0.1010 science -0.1265 web -0.0785 wikidata -0.1244
   L34 wide panel: LONG L34: all words 2231 in lexicon 1551 (69%) writes that loop 16 of 160 longest run shared with its prompt 74 | code 308/371 (83%) web 358/457 (78%) science 288/463 (62%) books 395/524 (75%) wikidata 202/416 (48%)
 
-# 15:20 UTC November 19. G-1119-3's laps from lap L34's end (binary gatecarry/bin/athena):
+# 15:14 UTC November 19 (stamp corrected from 15:20). G-1119-3's laps from lap L34's end (binary gatecarry/bin/athena):
   lap L35: 3000 sections, 384 ms a section on the mean, 531 at most
   lap F35: 3000 sections, 544 ms a section on the mean, 782 at most
   lap L36: 3000 sections, 384 ms a section on the mean, 522 at most
@@ -1314,7 +1314,7 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   L36 wide panel: LONG L36: all words 2175 in lexicon 1511 (69%) writes that loop 21 of 160 longest run shared with its prompt 75 | code 298/363 (82%) web 336/431 (77%) science 248/431 (57%) books 416/528 (78%) wikidata 213/422 (50%)
   F36 wide panel: LONG F36: all words 2146 in lexicon 1485 (69%) writes that loop 24 of 160 longest run shared with its prompt 76 | code 280/339 (82%) web 351/443 (79%) science 273/443 (61%) books 374/504 (74%) wikidata 207/417 (49%)
 
-# 15:50 UTC November 19. G-1119-4 read: read-strand-states ... past carries at lap L36's mean (fitting half: 3,000 windows of 256 octets of the training documents past their first 8 MB, 767,888 places, 687 s on 8 host threads beside the line's lap L37; reading half: 1,000 windows of the held documents, 255,980 places, 233 s), then tools/residue_rows_ruler.py at 4 rings of periods 1009 to 1021 (one host thread, 25 s):
+# 15:36 UTC November 19 (stamp corrected from 15:50). G-1119-4 read: read-strand-states ... past carries at lap L36's mean (fitting half: 3,000 windows of 256 octets of the training documents past their first 8 MB, 767,888 places, 687 s on 8 host threads beside the line's lap L37; reading half: 1,000 windows of the held documents, 255,980 places, 233 s), then tools/residue_rows_ruler.py at 4 rings of periods 1009 to 1021 (one host thread, 25 s):
   RESIDUE address=two_places_alone set=all places=250980 code=2.5126 mass=0.205 sure=0.013
   RESIDUE address=two_places_alone set=settled places=26083 code=1.6780 mass=0.304 sure=0.037
   RESIDUE circles_read=0,10,21,31 of 32 written; fit places=767888 read places=255980 settled=26083
