@@ -212,7 +212,7 @@ quadrance is `|r_a e^{iα}−r_b e^{iβ}|²+(b_a s−b_b t+c)²`, the periodic a
 together; a general pair reads both through the same `Δ` with its axis offset and inclination.
 `RationalPhase` carries a rational Cayley half-angle and `extra_turns`; its coordinate is
 not a rational turn rate. `lifted_winding` and `closes_after` check a supplied finite period,
-which a general rational Cayley point need not possess. Order and distance along a source passage are read through the advance, not
+which a rational Cayley point has only at `q ∈ {0, ±1}` (`HolonicsResearch/Geometry/CayleyTurnClock`). Order and distance along a source passage are read through the advance, not
 through a separate site per occurrence.
 
 [proved-derived; formal-checked] **Phase-carried material.** In any group, fixed material `P`

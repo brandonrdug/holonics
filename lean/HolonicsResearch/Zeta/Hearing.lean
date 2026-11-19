@@ -24,11 +24,18 @@ on any vertical line off the seam.
   (`quasiInvertible_iff_verticalZeroFree`, Herichi–Lapidus's argument), and the threshold is the
   least sharpening at which every off-seam `F(∂_c)` is quasi-invertible
   (`threshold_eq_quasiInvertibleInf`).
-- [open; #62] The unbounded operator `∂_c` on `L²(ℝ, e^{−2cx}dx)`, its normality, the
-  Mellin–Plancherel unitary carrying it to multiplication by `c + iy` on `L²(ℝ, dy)`, the
-  identification of its spectral truncations with the coordinate model, and the Bochner identity
-  `F(∂_c) = ∫ e^{τu²}Φ(u) e^{(∂_c−½)u} du` are not constructed. Mathlib has the continuous
-  functional calculus for bounded normal elements only.
+- **Operator level, on the core** [proved-standard; formal-checked], in
+  `HolonicsResearch/Zeta/MellinPlancherel`: the weight `e^{−cx}` and the `L²` Fourier transform
+  compose to the Mellin–Plancherel unitary `L²(ℝ, e^{−2cx}dx) ≃ L²(dξ)`, onto `L²(dy/2π)` at
+  `y = 2πξ`; on the Schwartz core it carries `∂_c` to multiplication by `c + iy`, with formal
+  adjoint `2c − ∂_c` and `‖∂_c f‖ = ‖(2c − ∂_c) f‖`; and Hearing's `F(∂_c)`, the averaged shift
+  `∫ e^{τu²}Φ(u) e^{(∂_c−½)u} du`, is multiplication by the flowed `ξ` on the line, vanishing
+  nowhere exactly when `VerticalZeroFree τ c` holds.
+- [open; #410] The closure of `∂_c` and the normality of the closed operator, its spectrum
+  `c + iℝ`, the identification of its spectral truncations with the coordinate model as a
+  `⋆`-algebra map (only the coordinate `c + iy` is matched), and the unbounded functional calculus
+  are not constructed. Mathlib has the continuous functional calculus for bounded normal elements
+  only.
 -/
 
 noncomputable section
