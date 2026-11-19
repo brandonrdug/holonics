@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,728 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,729 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 127 | 102 |
+| [November 2026](#november-2026) | 128 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -35,6 +35,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-19 [A ring paths log ratio is its lifts entropy reading and its mean carry is the current an interconnection carries its step its restriction and joint reception and a retention counts its active Gram modes in Lean](2026-11-19_A_RING_PATHS_LOG_RATIO_IS_ITS_LIFTS_ENTROPY_READING_AND_ITS_MEAN_CARRY_IS_THE_CURRENT_AN_INTERCONNECTION_CARRIES_ITS_STEP_ITS_RESTRICTION_AND_JOINT_RECEPTION_AND_A_RETENTION_COUNTS_ITS_ACTIVE_GRAM_MODES_IN_LEAN.md)
 - 2026-11-19 [Legendres local moves fix gamma two by rigidity two bundles in series retain the product a triangle retains its whole constitution and a ring chain is harpers operator in Lean](2026-11-19_LEGENDRES_LOCAL_MOVES_FIX_GAMMA_TWO_BY_RIGIDITY_TWO_BUNDLES_IN_SERIES_RETAIN_THE_PRODUCT_A_TRIANGLE_RETAINS_ITS_WHOLE_CONSTITUTION_AND_A_RING_CHAIN_IS_HARPERS_OPERATOR_IN_LEAN.md)
 - 2026-11-19 [Maxwell keeps Gauss along every motion heat on a partition raises entropy by half its Fisher information a readings leverage is a series over its pivots and the rank falls where a prime divides every minor in Lean](2026-11-19_MAXWELL_KEEPS_GAUSS_ALONG_EVERY_MOTION_HEAT_ON_A_PARTITION_RAISES_ENTROPY_BY_HALF_ITS_FISHER_INFORMATION_A_READINGS_LEVERAGE_IS_A_SERIES_OVER_ITS_PIVOTS_AND_THE_RANK_FALLS_WHERE_A_PRIME_DIVIDES_EVERY_MINOR_IN_LEAN.md)
+- 2026-11-19 [One cell carries the pass band of a tree a curve and a junction a pumped carry locks past its detuning the heat clock keeps two positivities in opposite directions and the whole line ear is never invertible in Lean](2026-11-19_ONE_CELL_CARRIES_THE_PASS_BAND_OF_A_TREE_A_CURVE_AND_A_JUNCTION_A_PUMPED_CARRY_LOCKS_PAST_ITS_DETUNING_THE_HEAT_CLOCK_KEEPS_TWO_POSITIVITIES_IN_OPPOSITE_DIRECTIONS_AND_THE_WHOLE_LINE_EAR_IS_NEVER_INVERTIBLE_IN_LEAN.md)
 - 2026-11-19 [Petrovs types place the eigenvalues of the tide joined to the frame dragging a forest retains nothing a parallel bundle forgets only its uniform total and the moment stays lossy across re keys in Lean](2026-11-19_PETROVS_TYPES_PLACE_THE_EIGENVALUES_OF_THE_TIDE_JOINED_TO_THE_FRAME_DRAGGING_A_FOREST_RETAINS_NOTHING_A_PARALLEL_BUNDLE_FORGETS_ONLY_ITS_UNIFORM_TOTAL_AND_THE_MOMENT_STAYS_LOSSY_ACROSS_RE_KEYS_IN_LEAN.md)
 - 2026-11-19 [Polar factors carry one root as its constraint a chases capture and viability stand by the terrains size and an interior eliminates in stages along a tube and a tower in Lean](2026-11-19_POLAR_FACTORS_CARRY_ONE_ROOT_AS_ITS_CONSTRAINT_A_CHASES_CAPTURE_AND_VIABILITY_STAND_BY_THE_TERRAINS_SIZE_AND_AN_INTERIOR_ELIMINATES_IN_STAGES_ALONG_A_TUBE_AND_A_TOWER_IN_LEAN.md)
 - 2026-11-19 [Routes between frames agree where their cycles are flat the loaded rings tick is the mode quotients system and a wide face is read on its mantissa with a one sided widening in Lean](2026-11-19_ROUTES_BETWEEN_FRAMES_AGREE_WHERE_THEIR_CYCLES_ARE_FLAT_THE_LOADED_RINGS_TICK_IS_THE_MODE_QUOTIENTS_SYSTEM_AND_A_WIDE_FACE_IS_READ_ON_ITS_MANTISSA_WITH_A_ONE_SIDED_WIDENING_IN_LEAN.md)
