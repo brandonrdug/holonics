@@ -44,7 +44,9 @@ A span is not read: `[x](gone/in/a/span.md)`. A footnote is not a link.[^1]
     "research/notes.md": "[not a file the check reads](gone.md)\n",
     "research/records/2026-01-01_A_RECORD.md": "# A record\n",
     "research/papers/source/p.typ": "",
-    "lean/Holonics/HNN/Ring.lean": "theorem Ring.turn_closes : True := trivial\n",
+    "lean/Holonics/HNN/Ring.lean": ("/-- `turn_named` is named in this docstring only. -/\ntheorem Ring.turn_closes : True := trivial\n"
+                                    "-- turn_said in a line comment\nstructure Ring.Gear where\n  teeth : Nat\n"
+                                    "theorem Ring.uses : Ring.borrowed = 1 := rfl\n"),
     "tools/ruler.py": "def read():\n    pass\n",
     "crates/eng/Cargo.toml": '[package]\nname = "my-engine"\n',
     "crates/eng/kernels/k.cu": 'extern "C" __global__ void field_open(int a) {}\n',
@@ -55,7 +57,7 @@ A span is not read: `[x](gone/in/a/span.md)`. A footnote is not a link.[^1]
 
 GOOD = ("R:my_engine::field::Constitution::tick; R:my_engine::field::Constitution::width; R:my_engine::field::moment::moments; "
         "R:my_engine::field::lock (a note after a space); R:my_engine::field; T:tools/ruler.py:read; T:tools/ruler.py; "
-        "K:crates/eng/kernels/k.cu::field_open; L:HNN/Ring:Ring.turn_closes; L:HNN/Ring; D:docs/a.md#notes-1; D:a.md; "
+        "K:crates/eng/kernels/k.cu::field_open; L:HNN/Ring:Ring.turn_closes; L:HNN/Ring:Ring.Gear.teeth; L:HNN/Ring; D:docs/a.md#notes-1; D:a.md; "
         "N:2026-01-01_A_RECORD.md; P:p.typ; H:crates/old/src/x.rs:Item@abc1234; H:crates/old/src/y.rs")
 BAD = [
     ("R:other::field::lock", "no crate of that name"),
@@ -66,6 +68,9 @@ BAD = [
     ("K:crates/eng/kernels/k.cu::field_shut", "`field_shut` is not declared in the file"),
     ("H:crates/eng/src/field.rs:lock", "a path of the tree written as history"),
     ("L:HNN/Ring:turn_opens", "`turn_opens` is not in the file"),
+    ("L:HNN/Ring:turn_named", "`turn_named` is only in a comment of the file"),
+    ("L:HNN/Ring:turn_said", "`turn_said` is only in a comment of the file"),
+    ("L:HNN/Ring:Ring.borrowed", "`borrowed` is used in the file but declared in none of its lines"),
     ("L:HNN/Gone:x", "no tracked Lean file"),
     ("D:docs/a.md#no-such-heading", "no such anchor"),
     ("N:2026-01-01_A_RECORD", "no tracked record"),
@@ -121,28 +126,34 @@ def main():
             rows, kinds, broken = link_check.atlas(root)
         assert rows == 1 + len(BAD) and [(b[3], b[4]) for b in broken] == BAD, [(b[3], b[4]) for b in broken]
         passed += 1
-        assert kinds["R"] == [9, 9, 4] and kinds["H"] == [3, 2, 1] and kinds["L"] == [4, 4, 2] and kinds["?"] == [1, 1, 1], kinds
+        assert kinds["R"] == [9, 9, 4] and kinds["H"] == [3, 2, 1] and kinds["L"] == [8, 8, 5] and kinds["?"] == [1, 1, 1], kinds
         passed += 1
         out = buf.getvalue()
         assert "BROKEN_OWNER docs/atlas/objects.tsv:2 bad.row-0 R:other::field::lock (no crate of that name)" in out, out
-        assert f"ATLAS_OWNERS shards=1 rows={1 + len(BAD)} read={15 + len(BAD)} broken={len(BAD)}" in out, out
+        assert f"ATLAS_OWNERS shards=1 rows={1 + len(BAD)} read={16 + len(BAD)} broken={len(BAD)}" in out, out
         passed += 1
         assert link_check.split_owner("crates/a/src/b.rs:Item::sub@abc") == ("crates/a/src/b.rs", ["Item", "sub"], "abc")
         assert link_check.split_owner("my_engine::field::lock") == ("my_engine::field::lock", None, "")
         assert link_check.split_owner("crates/k/x.cuh::kernel (a note)") == ("crates/k/x.cuh", ["kernel"], "")
         passed += 1
 
-        # The grades: the synthetic rows above are all `definition`; three more rows are one declared (`measured`), one dated status
-        # beside an owner in history, and one status with no such owner, which is the planted failure.
+        # The grades: the synthetic rows above are all `definition`; five more rows are one declared (`measured`), one dated status
+        # beside an owner in history, one status with no such owner, one `formal-checked` with a Lean owner, and one `formal-checked`
+        # whose only owner is a receipt's source (the CM rows of November 19), the two planted failures.
         graded = os.path.join(tmp, "graded")
-        marks = [("m.row", "N:a-record.md", "measured"), ("h.row", "H:crates/old/src/a.rs@abc; L:A:b", "implemented; tests pending"), ("p.row", "L:A:b", "formal-checked; import check pending")]
+        marks = [("m.row", "N:a-record.md", "measured"), ("h.row", "H:crates/old/src/a.rs@abc; L:A:b", "implemented; tests pending"),
+                 ("p.row", "L:A:b", "formal-checked; import check pending"), ("f.row", "L:A:b; D:research/r.md", "formal-checked"),
+                 ("r.row", "D:research/records/receipts/x/A.lean", "formal-checked")]
         os.makedirs(os.path.join(graded, "docs/atlas"))
         open(os.path.join(graded, "docs/atlas/objects.tsv"), "w", encoding="utf-8").write("\n".join("\t".join([name, "holon", "x = x", "reads", "", owners, grade, ""]) for name, owners, grade in marks) + "\n")
         buf = io.StringIO()
         with redirect_stdout(buf):
             declared, dated, broken = link_check.grades(graded)
-        assert (declared, dated) == (1, 1) and broken == [("docs/atlas/objects.tsv", 3, "p.row", "formal-checked; import check pending")], (declared, dated, broken)
-        assert "BROKEN_GRADE docs/atlas/objects.tsv:3 p.row" in buf.getvalue() and "ATLAS_GRADES declared=1 dated=1 broken=1" in buf.getvalue(), buf.getvalue()
+        assert (declared, dated) == (2, 1) and broken == [("docs/atlas/objects.tsv", 3, "p.row", "formal-checked; import check pending"),
+                                                       ("docs/atlas/objects.tsv", 5, "r.row", "formal-checked")], (declared, dated, broken)
+        out = buf.getvalue()
+        assert "BROKEN_GRADE docs/atlas/objects.tsv:3 p.row" in out and "ATLAS_GRADES declared=2 dated=1 broken=2" in out, out
+        assert "BROKEN_GRADE docs/atlas/objects.tsv:5 r.row `formal-checked` (a kernel's acceptance with no Lean owner the package builds)" in out, out
         buf = io.StringIO()
         with redirect_stdout(buf):
             assert link_check.grades(root) == (1 + len(BAD), 0, [])
