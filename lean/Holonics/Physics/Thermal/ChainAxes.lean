@@ -58,13 +58,15 @@ step against a junction of positive irreversibility reads `−a < 0`
 (`PathReversal.production_nonneg_of_support`, `production_eq_mul`: `σₙ = nσ ≥ 0`) and, on the
 lift, the helix along the orientation when every `a ≥ 0` (`helix_monotone`).
 
-[open] Finite chains only. Owed (#62): the identification of the lift's `entropyForm` with the
-path log-ratio, `wordReading (entropyForm a) (lift γ) = Σ_i affinity P (γ i) (γ (i+1))` for a
-positive ring path `γ` lifted to `ℤ` with `a z = affinity P (z mod N) (z+1 mod N)`
-(`Aeon/Production/PathReversal.pathLogRatio_split`); and the mean signed crossing of the carry
-section under the stationary path law as the current,
-`E_π[forward − backward crossings of the carry section over n steps] = n · J`. The Rust owner
-`holonics::physics::thermal` checks both exactly. No `axiom`, no `sorry`.
+[proved-derived; formal-checked, elsewhere] The lift's `entropyForm` read along a ring path is the
+path's affinity sum, `wordReading (entropyForm a) (lift γ) = Σ_i affinity P (γ i) (γ (i+1))` with
+`a z = affinity P (z mod N) (z+1 mod N)`, so a positive path's log-ratio
+(`Aeon/Production/PathReversal.pathLogRatio_split`) is its state term plus `entropy_reading`; and
+under a stationary path law the mean signed crossing of the carry section over `n` steps is `n · J`.
+Both are `HolonicsResearch/Physics/Thermal/ChainPathJoin` (`wordReading_liftWord`,
+`pathLogRatio_eq_entropy_reading`, `mean_carryCount_eq_current`, `mean_carryTerm_eq_production`).
+[open] Finite chains only; that the mean carry term is the path law's production `σₙ = nσ` on
+every ring is read there on a witness. No `axiom`, no `sorry`.
 -/
 
 namespace Holonics.Physics.Thermal.ChainAxes

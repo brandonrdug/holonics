@@ -2,7 +2,7 @@ import Mathlib.LinearAlgebra.Pi
 import Mathlib.Tactic
 
 /-!
-# An exact two-face constitutive reduction
+# A two-face constitutive reduction
 
 The current is presented in four cut coordinates and two active face coordinates:
 
@@ -13,7 +13,7 @@ active face receiver (`Dᵀ r = 0`) and, when a cut reading is claimed, to the
 cut receiver as well.  The material law is the finite rational law
 `j_after + τ D M Dᵀ j_after = j_before + J u + D f`.
 
-This file proves the exact compact update and an explicit plus/minus decoder.
+This file proves the compact update and an explicit plus/minus decoder.
 The decoder is supplied with the maps and their identities. For a fixed complete
 source and forcing, the fine response is unique under the positive modal denominators;
 distinct source fibres are still retained.

@@ -187,8 +187,10 @@ square through ordered words without enumerating histories.
 [established-bounded; source-inspected] The
 [clocked torus](../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
 shows derived grain: four cut and two face coordinates give `j=Jq+Dz+r`, `Cr=Dᵀr=0`; the grain
-six is the rank of `[J D]`, and the active Gram modes `3` and `5` are the eigenvalues of
-`DᵀD=[[4,1],[1,4]]`. It prescribes neither six universal channels nor a byte-derived grain. [proved-derived] A
+six is the rank of `[J D]`, and the active Gram modes `(1,1)` and `(1,−1)` of
+`DᵀD=[[4,1],[1,4]]` carry its eigenvalues `5` and `3`; the retention's dimension is the count of
+active Gram modes (`HolonicsResearch/Compression/FaceMapPower`, `retention_dim_eq_card_active_gram_modes`,
+`ClockedTorus.gram_modes`). It prescribes neither six universal channels nor a byte-derived grain. [proved-derived] A
 participating receiver reads `y=ρ(x_S,x_R,t)`, so `ẏ=D_Sρ F_S+D_Rρ F_R+∂_tρ`.
 
 ### Holonic Encoding

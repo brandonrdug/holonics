@@ -64,6 +64,13 @@ distinguishes after any word.
 [proved-standard; formal-checked] `0 → ker F → X → faces → coker F → 0` is exact
 (`exact_sequence`), as for every linear map (Mathlib).
 
+[proved-derived; formal-checked, elsewhere] With a port Holon's midpoint step as the navigator and
+its port effort as the receiver, two states in one kernel class take the same supplied energy and
+the same balance of stored change and dissipation under every common supply, and a released
+difference receives no port power; the retention's dimension is the count of active modes of the
+face map's Gram (`HolonicsResearch/Compression/FaceMapPower`: `supplied_energy_descends`,
+`released_difference_dissipates`, `retention_dim_eq_card_active_gram_modes`).
+
 [counterexample; formal-checked] **The ramp** (`Ramp`): terrain `(a, b, c)`, one navigator
 `(a, b, c) ↦ (a + b, b, c)`, one receiver reading `a`. After `n` steps the face is `a + n b`.
 - `c` is released: it spans the relevance kernel (`Ramp.relevanceKernel_eq_span`), and

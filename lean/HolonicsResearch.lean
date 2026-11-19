@@ -1416,3 +1416,6 @@ import HolonicsResearch.Foundation.CarryTower
 import HolonicsResearch.Geometry.PolarConstraint
 import HolonicsResearch.Geometry.ChaseConsumer
 import HolonicsResearch.Holon.DtNTubeTower
+import HolonicsResearch.Physics.Thermal.ChainPathJoin
+import HolonicsResearch.Holon.InterconnectionJoin
+import HolonicsResearch.Compression.FaceMapPower
