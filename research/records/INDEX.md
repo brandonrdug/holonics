@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,701 records from July 2026 to November 2026. 384 receipts directories: 224 beside the records and 160 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,702 records from July 2026 to November 2026. 385 receipts directories: 225 beside the records and 160 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 100 | 100 |
+| [November 2026](#november-2026) | 101 | 101 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-19 [A ferromagnets correlations are nonnegative and grow with every coupling so adding a contact never lowers an agreement](2026-11-19_A_FERROMAGNETS_CORRELATIONS_ARE_NONNEGATIVE_AND_GROW_WITH_EVERY_COUPLING_SO_ADDING_A_CONTACT_NEVER_LOWERS_AN_AGREEMENT.md)
 - 2026-11-19 [A load moves a line by its weight on the mode the magnitude cannot see the basins it reflects the stable core is the first round and a lossless period reads hills kinds by its trace in Lean](2026-11-19_A_LOAD_MOVES_A_LINE_BY_ITS_WEIGHT_ON_THE_MODE_THE_MAGNITUDE_CANNOT_SEE_THE_BASINS_IT_REFLECTS_THE_STABLE_CORE_IS_THE_FIRST_ROUND_AND_A_LOSSLESS_PERIOD_READS_HILLS_KINDS_BY_ITS_TRACE_IN_LEAN.md)
 - 2026-11-19 [A pools best face is its leading eigenvectors level two is free on two carries a softmax release falls by the entropy two passes apart and a conserved face is a congruence in Lean](2026-11-19_A_POOLS_BEST_FACE_IS_ITS_LEADING_EIGENVECTORS_LEVEL_TWO_IS_FREE_ON_TWO_CARRIES_A_SOFTMAX_RELEASE_FALLS_BY_THE_ENTROPY_TWO_PASSES_APART_AND_A_CONSERVED_FACE_IS_A_CONGRUENCE_IN_LEAN.md)
 - 2026-11-19 [The ising partition function is the lock polynomial so a ferromagnets zeros in the field lie on the imaginary axis and an antiferromagnets do not](2026-11-19_THE_ISING_PARTITION_FUNCTION_IS_THE_LOCK_POLYNOMIAL_SO_A_FERROMAGNETS_ZEROS_IN_THE_FIELD_LIE_ON_THE_IMAGINARY_AXIS_AND_AN_ANTIFERROMAGNETS_DO_NOT.md)

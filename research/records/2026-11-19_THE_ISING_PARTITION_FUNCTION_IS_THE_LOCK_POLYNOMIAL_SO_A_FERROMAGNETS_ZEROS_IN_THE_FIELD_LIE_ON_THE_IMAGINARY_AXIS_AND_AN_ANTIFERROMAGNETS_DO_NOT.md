@@ -38,6 +38,11 @@ Fisher's zeros, the extensions of Griffiths, Simon–Griffiths and Newman); the 
 stability preservers); and experiment, where Lee–Yang zeros were observed through the coherence of a probe spin
 coupled to a spin bath (Peng and others, Physical Review Letters, 2015).
 
+Prior formal work, read on the web after this record merged (the sixth record of November 19, §1): the Lean 4
+project [phasetr/ising-model](https://phasetr.github.io/ising-model/coverage/chapters-2-10.html) lists the Lee–Yang
+circle theorem for the Ising model, and the infinite-volume analyticity of the free energy off the circle, as done.
+This module is not a first formalization; it joins the theorem to the tree's lock polynomial.
+
 ## 2. What the tree held
 
 `tree`. `Coupling/LeeYangCircle` holds the circle theorem (`lockPoly_zero_on_circle`), the two half-planes
