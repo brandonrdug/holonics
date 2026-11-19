@@ -23,26 +23,6 @@ use crate::hnn::card::{Card, CardBuffer, CardError};
 /// The threads a moment scan's block carries (a power of two, `kernels/field_moment.cuh`).
 pub(crate) const MOMENT_BLOCK: u32 = 256;
 
-/// The moment kernels' words (`MomentWords` in `kernels/field_moment.cuh`, field for field): the batch's
-/// regions and the one ring slot a launch reads.
-#[repr(C)]
-#[derive(Clone, Copy, Default)]
-pub(crate) struct MomentWords {
-    pub(crate) r: u32,
-    pub(crate) t: u32,
-    pub(crate) region_off: u64,
-    pub(crate) site_region: u64,
-    pub(crate) site_pos: u64,
-    pub(crate) ring: u64,
-    pub(crate) n: u64,
-    pub(crate) ring_len: u64,
-    pub(crate) decay: u64,
-    pub(crate) dreach: u64,
-    pub(crate) ok: u64,
-    pub(crate) status: u64,
-}
-
-/// A kernel argument: the address of a value the launch copies.
 /// The moment's chart into the face (§16.22, [`holonics_engine::field::Loci::moment_face`]): its offset in
 /// the material, its bias's, and its reach `max |C|` (the affine's carrier bound).
 pub(crate) fn moment_face(field: &Constitution) -> (u64, u64, u64) {
@@ -162,7 +142,6 @@ impl<'c> Resident<'c> {
         let d = field.declaration;
         let (dw, m2, a, tm) = (d.width, 2 * d.complex(), d.alphabet, d.moment_modes());
         let l = field.layout();
-        let regions = words.r as usize;
         let mut cw = *words;
         cw.unresolved = op.mask.device_ptr();
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
@@ -299,7 +278,7 @@ impl<'c> Resident<'c> {
         if tm == 0 {
             return Ok(None);
         }
-        let (n, l, card) = (d.modes, field.layout(), self.card);
+        let (n, l) = (d.modes, field.layout());
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let (before, after, s) = (alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?, alloc64(tm * 2 * sites)?);
@@ -340,7 +319,8 @@ impl<'c> Resident<'c> {
                 let offset: usize = field.rings()[..slot].iter().map(|(_, ring)| ring.len()).sum();
                 let (period, ring) = &field.rings()[slot];
                 let u = d.moment_index(h) + li;
-                // `MomentWords`: `R, T` (two words of 32 bits), then the pointers and counts, 8 octets each.
+                // `MomentWords` of `kernels/field_moment.cuh`, field for field (88 octets): `R, T` (two words of 32 bits), then
+                // `region_off`, `site_region`, `site_pos`, `ring`, `n`, `ring_len`, `decay`, `dreach`, `ok`, `status`, 8 octets each.
                 packed.extend([
                     regions as u64 | (sites as u64) << 32,
                     words.region_off,
@@ -358,27 +338,21 @@ impl<'c> Resident<'c> {
                 cmap.push((h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 });
             }
         }
-        let card = self.card;
         Ok((self.timed(Kind::Copy, || self.take_up(&packed)).map_err(device)?, self.timed(Kind::Copy, || self.take_up(&cmap)).map_err(device)?))
     }
 
-    /// [definition; agent-inferred, November 1] **The moments' return** (the host's `Constitution::moments_return`,
+    /// [definition; agent-inferred, November 1] **The moments' return** of the covector at `dm` (§16.44: one a clock; the host's `Constitution::moments_return`,
     /// the released law of §15.1): every moment mode's covector `dm` at its value (fit to 64 bits), admitted by
     /// the return's certificate, the prefix of the covector turned and released once a term, the return at
     /// every site, and the strands' encodings' rows (or a carried site's classes by their shares) added into
     /// `g`; all modes in the same launches.
-    pub(crate) fn moments_return(&self, field: &Constitution, words: &Words, g: &CardBuffer<'c, i128>, dm: &CardBuffer<'c, i128>, regions: usize, sites: usize) -> Result<()> {
-        self.moments_return_at(field, words, g, dm.device_ptr(), regions, sites)
-    }
-
-    /// [`Resident::moments_return`] of the moments' covector at `dm` (§16.44: one a clock).
     pub(crate) fn moments_return_at(&self, field: &Constitution, words: &Words, g: &CardBuffer<'c, i128>, dm: u64, regions: usize, sites: usize) -> Result<()> {
         let d = field.declaration;
         let tm = d.moment_modes();
         if tm == 0 {
             return Ok(());
         }
-        let (l, card) = (field.layout(), self.card);
+        let l = field.layout();
         let (strand, prefix) = ((2 * sites) as u64, (2 * (sites + regions)) as u64);
         let ds = self.timed(Kind::Alloc, || self.take::<i64>((tm * 2 * sites).max(1))).map_err(device)?;
         let q = self.timed(Kind::Alloc, || self.take::<i128>((tm * 2 * (sites + regions)).max(1))).map_err(device)?;

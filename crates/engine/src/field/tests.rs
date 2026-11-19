@@ -2002,7 +2002,7 @@ fn refinement_moves_the_end_one_place_a_read() {
     let problems: Vec<(&[usize], usize)> = questions.iter().zip([9usize, 8]).map(|(q, a)| (*q, a)).collect();
     let mut reads = 0;
     for seed in 11..19 {
-        let mut last: Option<Vec<usize>> = None;
+        let mut last: Option<Vec<usize>>;
         for refine in [3] {
         last = None;
         field
