@@ -1458,3 +1458,6 @@ import HolonicsResearch.Physics.Thermal.RelativisticHeat
 import HolonicsResearch.Landmarks.CharacterSites
 import HolonicsResearch.Physics.HarperChambers
 import HolonicsResearch.Physics.Spacetime.GeodesicDeviation
+import HolonicsResearch.Physics.InformationPort
+import HolonicsResearch.EllipticCurve.EggPeriod
+import HolonicsResearch.Mathematics.ZetaJets

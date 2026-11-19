@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,725 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,726 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 124 | 102 |
+| [November 2026](#november-2026) | 125 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -43,6 +43,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-19 [The innovation toward a targets code face descends the scored face a floored mixture returns a dormant member at K plus log M bits and a pair deposits certified step keeps three quarters of its lines decrease in Lean](2026-11-19_THE_INNOVATION_TOWARD_A_TARGETS_CODE_FACE_DESCENDS_THE_SCORED_FACE_A_FLOORED_MIXTURE_RETURNS_A_DORMANT_MEMBER_AT_K_PLUS_LOG_M_BITS_AND_A_PAIR_DEPOSITS_CERTIFIED_STEP_KEEPS_THREE_QUARTERS_OF_ITS_LINES_DECREASE_IN_LEAN.md)
 - 2026-11-19 [The ising partition function is the lock polynomial so a ferromagnets zeros in the field lie on the imaginary axis and an antiferromagnets do not](2026-11-19_THE_ISING_PARTITION_FUNCTION_IS_THE_LOCK_POLYNOMIAL_SO_A_FERROMAGNETS_ZEROS_IN_THE_FIELD_LIE_ON_THE_IMAGINARY_AXIS_AND_AN_ANTIFERROMAGNETS_DO_NOT.md)
 - 2026-11-19 [The pontryagin bound places a skew generators modes a reversed carrier passes the trace faces a revolute joint moves at its cayley rate left to right is the opposite group and the carry tower is the B adic tower in Lean](2026-11-19_THE_PONTRYAGIN_BOUND_PLACES_A_SKEW_GENERATORS_MODES_A_REVERSED_CARRIER_PASSES_THE_TRACE_FACES_A_REVOLUTE_JOINT_MOVES_AT_ITS_CAYLEY_RATE_LEFT_TO_RIGHT_IS_THE_OPPOSITE_GROUP_AND_THE_CARRY_TOWER_IS_THE_B_ADIC_TOWER_IN_LEAN.md)
+- 2026-11-19 [The restoring legs zero production is the limit of finite legs zetas jets bound a capture square and the eggs period is its ovals integral in Lean](2026-11-19_THE_RESTORING_LEGS_ZERO_PRODUCTION_IS_THE_LIMIT_OF_FINITE_LEGS_ZETAS_JETS_BOUND_A_CAPTURE_SQUARE_AND_THE_EGGS_PERIOD_IS_ITS_OVALS_INTEGRAL_IN_LEAN.md)
 - 2026-11-19 [The ring is the sampled oscillator an expanding metric meets a fluid and its bath and the cantor strings holes are placed and heard in Lean](2026-11-19_THE_RING_IS_THE_SAMPLED_OSCILLATOR_AN_EXPANDING_METRIC_MEETS_A_FLUID_AND_ITS_BATH_AND_THE_CANTOR_STRINGS_HOLES_ARE_PLACED_AND_HEARD_IN_LEAN.md)
 - 2026-11-19 [The sieve tower is a law of any multiplicative recurrence one chart certifies an irreducible curve friction prices a held mode a solved charts bits follow the Hadamard bound and frame dragging is a flux in Lean](2026-11-19_THE_SIEVE_TOWER_IS_A_LAW_OF_ANY_MULTIPLICATIVE_RECURRENCE_ONE_CHART_CERTIFIES_AN_IRREDUCIBLE_CURVE_FRICTION_PRICES_A_HELD_MODE_A_SOLVED_CHARTS_BITS_FOLLOW_THE_HADAMARD_BOUND_AND_FRAME_DRAGGING_IS_A_FLUX_IN_LEAN.md)
 - 2026-11-19 [The strands hold the sum only in their comparison each polynomial kernel is the image before it a number keeps its lower level and a reading is bounded by its leverage in Lean](2026-11-19_THE_STRANDS_HOLD_THE_SUM_ONLY_IN_THEIR_COMPARISON_EACH_POLYNOMIAL_KERNEL_IS_THE_IMAGE_BEFORE_IT_A_NUMBER_KEEPS_ITS_LOWER_LEVEL_AND_A_READING_IS_BOUNDED_BY_ITS_LEVERAGE_IN_LEAN.md)
