@@ -1347,4 +1347,15 @@ import HolonicsResearch.HNN.HillFloquetKinds
 import HolonicsResearch.Hodge.TorusLefschetzTriple
 import HolonicsResearch.Landmarks.IharaCoverChebotarev
 import HolonicsResearch.Landmarks.TreeWalkFloor
+import HolonicsResearch.HNN.PoolFaceKyFan
+import HolonicsResearch.Geometry.LegendreLevelTwo
+import HolonicsResearch.Geometry.CompleteEllipticSeries
+import HolonicsResearch.Physics.Wave.TelegrapherLimit
+import HolonicsResearch.HNN.SoftmaxTwoCycle
+import HolonicsResearch.HNN.HalfPumpMonodromy
+import HolonicsResearch.HNN.SheetConjunction
+import HolonicsResearch.Compression.OneFaceLaw
+import HolonicsResearch.Geometry.QuaternionFreePair
+import HolonicsResearch.Compression.FacesOnCycles
+import HolonicsResearch.Physics.Fluid.FrictionKeepsHarmonic
 import HolonicsResearch.Foundation.FoldStanding

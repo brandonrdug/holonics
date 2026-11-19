@@ -63,9 +63,10 @@ is a matrix whose columns are the cells (`A : Matrix n ι ℝ`), and `moment A Z
    `L(H|T) + L(T|H) = L(H) + L(T) − Σ_c (ℓ_H + ℓ_T) + 2 L(c)`, and at one unit per cell with
    `L(c) = 0` it is `|H| + |T| − 2|c|`, the lock's `F*` at a longest coupling.
 
-Not proved here: that the best rank-`k` face read from a pool removes the sum of the `k` leading
-generalized eigenvalues of `(Mᵀ M, Q)` (a Ky Fan maximum principle, not in Mathlib); the record's
-worked numbers stay checked by its receipts.
+That the best rank-`k` face read from a pool removes the sum of the `k` leading generalized
+eigenvalues of `(Mᵀ M, Q)`, the Ky Fan maximum principle, is proved in `HNN/PoolFaceKyFan`
+(`pool_face_removal_le`, `exists_pool_face_removal_eq`) from `tension_fromRows_pool` here; the
+record's worked numbers stay checked by its receipts.
 
 The computational object is the helical pair interaction: the face and the covector meet at a pair
 contact, and the tension is what that contact leaves unresolved. Of the winding guide's six general
