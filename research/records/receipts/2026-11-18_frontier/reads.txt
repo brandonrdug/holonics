@@ -1476,3 +1476,8 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   commuting 2 circles (62 parameters): at 16 0.5256 0.5510 0.5686, at 48 0.3520 0.3835 0.3044, training loss 0.790 to 0.873
   pumped 2 circles (86 parameters): at 16 1.0000 on every seed, at 48 0.9945 1.0000 0.9947, training loss 0.0001 to 0.0007
   read: the pumped carry holds the product at three times its trained length; the commuting carry fits it at neither length, and eight times its circles buy it 0.010 at 48. Neon's run (0.585 and 0.404 against 1.000 and 1.000) is reproduced within its seeds.
+
+# 22:41 UTC November 19. The maps at three blocks a multiprocessor (`__launch_bounds__(256, 3)` on map_tile, the source edit reverted, the build kept as occ/bin/athena_occ; occ/occ.sh): entered bit for bit, then timed in one hold of the card lock (22:37:44 to 22:41:42) against the line's binary:
+  OCC_REPRO GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL; OCC_PARITY STORE_PARITY_DONE calls=3 unequal=0 EQUAL
+  OCC_TIME control 450.1 453.4 452.3 464.0 (mean 455.0); build 446.2 461.9 457.5 446.8 (mean 453.1) ms a section, 60 sections each, balanced order
+  read: 0.996 of the control's time, inside the control's own spread (450.1 to 464.0): no difference, and the edit stays out of the tree. The hold did not have the host to itself: the pump's builds ended near its warm-up and the frontier ruler (numpy, one to four threads) ran beside its runs 5 to 8, so the spread of this hold is wider than an idle host's (the tensor attempt's hold at 21:24 UTC read its control at 454.8 to 460.4).

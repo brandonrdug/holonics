@@ -147,6 +147,9 @@ pub(crate) struct Tick<'c> {
     pub(crate) pgam: Pooled<'c, i32>,
     pub(crate) pqm: Pooled<'c, i64>,
     pub(crate) pkb: Pooled<'c, i64>,
+    /// [the lead, November 19] The pump chart's read `p` `[t][2C]` and the pump `η` `[t][2C]`, none where the circles are not pumped.
+    pub(crate) pp: Option<Pooled<'c, i64>>,
+    pub(crate) peta: Option<Pooled<'c, i32>>,
     pub(crate) pb: Pooled<'c, i64>,
     pub(crate) pc: Pooled<'c, i64>,
     /// [theory, November 12; the triad record §3 and §4] The triads' chart read `abg` `[t][6J]`, their products `p` `[t][2J]` and `c^T` `[t][2J]`, kept
@@ -214,6 +217,8 @@ impl<'c> Resident<'c> {
             pgam: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
             pqm: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pkb: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+            pp: if field.declaration.pump { Some(alloc64(sites * 2 * field.declaration.carry)?) } else { None },
+            peta: if field.declaration.pump { Some(self.timed(Kind::Alloc, || self.take::<i32>(sites * 2 * field.declaration.carry)).map_err(device)?) } else { None },
             pb: alloc64(sites * f)?,
             pc: alloc64(sites * f)?,
             pabg: triad(6)?,
@@ -330,6 +335,10 @@ impl<'c> Resident<'c> {
             // two divisions and the drive's coupling through the leak off the chain on the pair's grid (one thread a site and circle, as
             // tower.field-scan-gate-once-a-site moved the root out), then the chain, one thread a (region, circle) in strand order.
             self.affine("field_affine_x32", words, words.wg, words.wgb, words.rg, 2 * circles, dw, tick.read2.device_ptr(), dw, tick.pg.device_ptr(), 2 * circles, 0, false)?;
+            // [the lead, November 19] The pump's chart beside the turn's and the leak's (`Declaration::pump`): one affine with its bias at the same grains.
+            if words.pump != 0 {
+                self.affine("field_affine_x32", words, words.wp, words.wpb, words.rp, 2 * circles, dw, tick.read2.device_ptr(), dw, words.pp, 2 * circles, 0, false)?;
+            }
             self.launch("field_pair_gamma", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words)])?;
             self.launch("field_pair_scan", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words)])?;
             // [realization; theory, November 16 05:40Z] The circles' faces `p = a Q(t∓1)` off the chain, from the operand the scan kept.

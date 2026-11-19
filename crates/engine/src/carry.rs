@@ -197,6 +197,82 @@ pub(crate) fn carry_gate_return(exponential: &Exponential, gamma: (i64, i64), dg
     Ok(((fit64(dq)?, fit64(dl)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?)))
 }
 
+/// The pump's chart's bound: each part of `p` (on `2^(−16)`) under `2^39`, as the turn's chart is bounded ([`CARRY_TURN_ROOT`]), so the leak's
+/// budget `n = |p_re| + |p_im|` stays under `2^40` and `2^16 + d + n` under `2^48`.
+pub(crate) const CARRY_PUMP_ROOT: u128 = 1 << 39;
+
+/// [definition; the lead, November 19 (G-1119-7); `CarryGate.lean`, `pumped_charge_step_le`] **The pumped circle's gate** ([`Declaration::pump`]):
+/// from `q`, `ℓ` and the pump's chart `p = (p_re, p_im)` on `2^(−16)`, the friction `d` on the leak's log chart ([`carry_friction`]) and the pump's
+/// budget `n = |p_re| + |p_im|`, with `one = 2^16 + d + n` and `den = (2^34 + q²) one`, on `2^(−30)` each by one division to the nearest:
+///
+/// ```text
+/// γ_re = (2^34 − q²) 2^46 / den,   γ_im = q 2^64 / den,   η = p 2^30 / one,   κ = (N₀ d) 2^30 / one,
+/// ```
+///
+/// which is `γ = γ̂(q)/(1 + d + n)`, `η = p/(1 + d + n)` and `κ = N₀ d/(1 + d + n)`, so `|γ| + |η| + κ/N₀ ≤ (1 + n + d)/(1 + d + n) = 1`. At `p = 0`,
+/// `n = 0` and every term is [`carry_gate`]'s and [`carry_coupling`]'s in integers. Refused, typed, where the turn's chart refuses
+/// ([`carry_gate`]), where a part of `p` reaches `2^39`, or where the friction's chart refuses. Returns `(γ_re, γ_im)`, `(η_re, η_im)`, `d`, `n`
+/// and `κ`.
+#[allow(clippy::type_complexity)]
+pub(crate) fn carry_gate_pumped(exponential: &Exponential, q: i128, l: i128, p: (i128, i128)) -> Result<((i64, i64), (i64, i64), i128, i128, i128)> {
+    if q.unsigned_abs() >= CARRY_TURN_ROOT || (1i128 << 34) + q * q >= CARRY_TURN_BOUND {
+        return refuse("a carry circle's turn or friction past its 128-bit carrier");
+    }
+    if p.0.unsigned_abs() >= CARRY_PUMP_ROOT || p.1.unsigned_abs() >= CARRY_PUMP_ROOT {
+        return refuse("a carry circle's pump past its carrier");
+    }
+    let (d, _, _) = carry_friction(exponential, l)?;
+    let n = p.0.abs() + p.1.abs();
+    let one = (1i128 << FACE_BITS) + d + n;
+    let turn = (1i128 << 34) + q * q;
+    let den = turn * one;
+    let re = div_nearest(((1i128 << 34) - q * q) << 46, den);
+    let im = div_nearest(q << 64, den);
+    let eta = (div_nearest(p.0 << GAMMA_BITS, one), div_nearest(p.1 << GAMMA_BITS, one));
+    let kappa = div_nearest((i128::from(CARRY_GROUP_FOUNDING) * d) << GAMMA_BITS, one);
+    Ok(((fit64(re)?, fit64(im)?), (fit64(eta.0)?, fit64(eta.1)?), d, n, kappa))
+}
+
+/// [definition; the lead, November 19 (G-1119-7)] **The pumped gate's covectors** ([`carry_gate_pumped`]): from `δγ = conj(Qm) u` and `δη = u Qm`
+/// (each on the covector's grain, as the scan's reverse writes them), the drive `b` before its coupling, the covector `u` of the circle's charge,
+/// the producing `γ`, `η`, `q`, `ℓ` and `p`: `re = Re(conj(γ) δγ) + Re(conj(η) δη)` and `im = Im(conj(γ) δγ)`, each part one release from
+/// `2^(−30)`; `δq = im 2^34 / (2^34 + q²)`; with `one = 2^16 + d + n`, the friction's covectors `δd = −re 2^16 / one` and
+/// `δd_κ = N₀ w (2^16 + n) 2^16 / one²` (`w = Re(conj(b) u)` released from the face's grain), lifted into `δℓ` through the leak chart's
+/// derivative as [`carry_gate_return`] lifts them; the budget's covector `δn = δd + δn_κ` with `δn_κ = −(N₀ w 2^16 / one) d / one`, two
+/// divisions to the nearest; and the pump's `δp = δη 2^16 / one + sgn(p) δn`, each part (`sgn 0 = 0`). The drive's covector is `δb = κ u`.
+/// Returns `(δq, δℓ)`, `(δp_re, δp_im)` and `δb`. At `p = 0` (so `η = 0`, `δη`'s pairing zero and `n = 0`), `δq`, `δℓ` and `δb` are
+/// [`carry_gate_return`]'s in integers. Why: `∂γ/∂d = ∂γ/∂n = −γ/(1 + d + n)`, `∂η/∂d = ∂η/∂n = −η/(1 + d + n)`, `∂η/∂p = 1/(1 + d + n)`,
+/// `∂κ/∂d = N₀ (1 + n)/(1 + d + n)²`, `∂κ/∂n = −N₀ d/(1 + d + n)²` and `∂n/∂p_re = sgn(p_re)`; `Q = γ Qm + η conj(Qm) + κ b` gives `∂Q/∂γ = Qm`
+/// (read through `conj`) and `∂Q/∂η = conj(Qm)`, so `η`'s covector is `u Qm`.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+pub(crate) fn carry_gate_return_pumped(exponential: &Exponential, gamma: (i64, i64), dgamma: (i64, i64), eta: (i64, i64), deta: (i64, i64), drive: (i64, i64), du: (i64, i64), q: i128, l: i128, p: (i128, i128)) -> Result<((i64, i64), (i64, i64), (i64, i64))> {
+    let ((yr, yi), (dr, di)) = ((i128::from(gamma.0), i128::from(gamma.1)), (i128::from(dgamma.0), i128::from(dgamma.1)));
+    let ((er, ei), (fr, fi)) = ((i128::from(eta.0), i128::from(eta.1)), (i128::from(deta.0), i128::from(deta.1)));
+    let im = release(yr * di - yi * dr, GAMMA_BITS);
+    let re = release(yr * dr + yi * di, GAMMA_BITS) + release(er * fr + ei * fi, GAMMA_BITS);
+    let dq = div_nearest(im << 34, (1i128 << 34) + q * q);
+    let (d, whole, v) = carry_friction(exponential, l)?;
+    let n = p.0.abs() + p.1.abs();
+    let one = (1i128 << FACE_BITS) + d + n;
+    let dd = -div_nearest(re << 16, one);
+    let w = fit64(release(i128::from(drive.0) * i128::from(du.0) + i128::from(drive.1) * i128::from(du.1), FACE_BITS))?;
+    let nw = i128::from(CARRY_GROUP_FOUNDING) * i128::from(w);
+    // `N₀ w < 2^67` and `2^16 + n < 2^41`: the product under `2^108`, shifted 16 under `2^124`; `one² < 2^96`.
+    let ddk = fit64(div_nearest((nw * ((1i128 << FACE_BITS) + n)) << FACE_BITS, one * one))?;
+    let shift = 62 - whole;
+    let lift = |x: i128| -> i128 {
+        let product = release(x * ln2_face(), LN2_FACE_BITS) * i128::from(CARRY_LEAK_FOUNDING) * release(v as i128, 15);
+        if shift > 126 { 0 } else { release(product, shift as u32) }
+    };
+    let dl = lift(dd) + lift(i128::from(ddk));
+    // `|N₀ w 2^16 / one| ≤ N₀ w`, and its product with `d` stays under `N₀ w 2^16 < 2^83` (`d < one`).
+    let m = div_nearest(nw << FACE_BITS, one);
+    let dn = dd - div_nearest(m * d, one);
+    let dp = |f: i128, part: i128| -> Result<i64> { fit64(div_nearest(f << FACE_BITS, one) + part.signum() * dn) };
+    let kappa = div_nearest((i128::from(CARRY_GROUP_FOUNDING) * d) << GAMMA_BITS, one);
+    Ok(((fit64(dq)?, fit64(dl)?), (dp(fr, p.0)?, dp(fi, p.1)?), (carry_drive(kappa, du.0)?, carry_drive(kappa, du.1)?)))
+}
+
 /// [definition; theory, November 12, the triad record §3 and §4] **The triads' products** ([`Declaration::triads`]): from the charts' reads
 /// `abg` (`[t][6J]` on `2^(−16)`: `α`'s real parts, then imaginary, then `β`'s, then `γ`'s), at each site with both strand mates in the region
 /// (`1 ≤ t ≤ sites − 2`) and each triad `k`,
@@ -426,6 +502,10 @@ impl Constitution {
         let d = &self.declaration;
         if d.carry == 0 {
             return refuse("a field without carry circles has no leak");
+        }
+        // [the lead, November 19] This ruler scans the unpumped move; a pumped circle's charge it would misread.
+        if d.pump {
+            return refuse("a reading of the carry's leaks on a field whose circles are pumped (the ruler scans the unpumped move)");
         }
         let (dw, f, circles) = (d.width, d.contacts, d.carry);
         let (half, plain, c2) = (f / 2, d.carry_first(), 2 * circles);

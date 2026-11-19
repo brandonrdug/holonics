@@ -192,6 +192,9 @@ impl Constitution {
         // `δγ(t) = conj(Qm(t)) u` released at the face's grain, `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u`; then off the chain the gate's and the
         // coupling's covectors `δq`, `δℓ` and the drive's `δb(t) = κ(t) u` ([`carry_gate_return`]).
         let mut dqh = vec![0i64; sites * c2];
+        // [the lead, November 19] The pump chart's covector where the circles are pumped ([`Declaration::pump`]).
+        let pumped = d.pump;
+        let mut dph = vec![0i64; if pumped { sites * c2 } else { 0 }];
         // [the strand's known stream] A circle scanned from the right stood at rest there, and returns nothing.
         for k in (0..circles).filter(|&k| !one_sided || past || (plain + k) % 2 == 0) {
             let e = plain + k;
@@ -219,10 +222,25 @@ impl Constitution {
                     da[o * f + half + e] = fit64(release(qr * ogi - qi * ogr, FACE_BITS))?;
                     (tr, ti) = (release(oar * ogr + oai * ogi, FACE_BITS), release(oar * ogi - oai * ogr, FACE_BITS));
                 }
-                xr = i128::from(fit64(release(ar * gr + ai * gi, FACE_BITS) + tr + release(yr * ur + yi * ui, GAMMA_BITS))?);
-                xi = i128::from(fit64(release(ar * gi - ai * gr, FACE_BITS) + ti + release(yr * ui - yi * ur, GAMMA_BITS))?);
+                // [the lead, November 19] The pump's reflection returns `η conj(u)` beside the turn's `conj(γ) u`, in the turn's one release
+                // ([`Declaration::pump`]); zero where the circles are not pumped.
+                let (er, ei) = if pumped { (cell.eta[t * c2 + k] as i128, cell.eta[t * c2 + circles + k] as i128) } else { (0, 0) };
+                xr = i128::from(fit64(release(ar * gr + ai * gi, FACE_BITS) + tr + release(yr * ur + yi * ui + er * ur + ei * ui, GAMMA_BITS))?);
+                xi = i128::from(fit64(release(ar * gi - ai * gr, FACE_BITS) + ti + release(yr * ui - yi * ur + ei * ur - er * ui, GAMMA_BITS))?);
                 let drive = (cell.b[t * f + e], cell.b[t * f + half + e]);
-                let ((dq, dl), (dbr, dbi)) = carry_gate_return(&self.exponential, (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]), dgamma, drive, du, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
+                let (q, lk) = (cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128);
+                let gamma = (cell.gam[t * c2 + k], cell.gam[t * c2 + circles + k]);
+                let ((dq, dl), (dbr, dbi)) = if pumped {
+                    // `δη = u Qm`, released at the face's grain as `δγ` is.
+                    let deta = (fit64(release(qr * ur - qi * ui, FACE_BITS))?, fit64(release(qr * ui + qi * ur, FACE_BITS))?);
+                    let p = (cell.ph[t * c2 + k] as i128, cell.ph[t * c2 + circles + k] as i128);
+                    let (dqdl, (dpr, dpi), dbs) = carry_gate_return_pumped(&self.exponential, gamma, dgamma, (er as i64, ei as i64), deta, drive, du, q, lk, p)?;
+                    dph[t * c2 + k] = dpr;
+                    dph[t * c2 + circles + k] = dpi;
+                    (dqdl, dbs)
+                } else {
+                    carry_gate_return(&self.exponential, gamma, dgamma, drive, du, q, lk)?
+                };
                 db[t * f + e] = dbr;
                 db[t * f + half + e] = dbi;
                 dqh[t * c2 + k] = dq;
@@ -241,6 +259,16 @@ impl Constitution {
             for row in &dqhs {
                 for (j, &v) in row.iter().enumerate() {
                     g[l.carry_bias + j] += v as i128;
+                }
+            }
+            if pumped {
+                // [the lead, November 19] The pump's chart: `Σ_t δp(t) r̂(t)ᵀ` into `P`, and `Σ_t δp(t)` into its bias.
+                let dphs: Vec<&[i64]> = dph.chunks_exact(c2).collect();
+                outer_sum(&mut g[l.pump..l.pump + c2 * dw], dw, &dphs, &r2s)?;
+                for row in &dphs {
+                    for (j, &v) in row.iter().enumerate() {
+                        g[l.pump_bias + j] += v as i128;
+                    }
                 }
             }
         }
@@ -272,6 +300,14 @@ impl Constitution {
             if circles > 0 {
                 // The carry circles' charts read the pair chart as `a` and `b` do, so their transposed product joins the read's covector.
                 transposed(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, &dqh[t * c2..(t + 1) * c2], MATERIAL_BITS, &mut rg)?;
+                if pumped {
+                    // [the lead, November 19] So does the pump's chart, into the same slot (an accumulating transposed read, as the card's).
+                    let mut rp = vec![0i64; dw];
+                    transposed(&self.theta[l.pump..l.pump + c2 * dw], reaches.pump, dw, &dph[t * c2..(t + 1) * c2], MATERIAL_BITS, &mut rp)?;
+                    for (slot, &v) in rg.iter_mut().zip(&rp) {
+                        *slot += v;
+                    }
+                }
             }
             let mut dr: Vec<i64> = if circles > 0 { ra.iter().zip(&rb).zip(&rg).map(|((&p, &q), &r)| p + q + r).collect() } else { ra.iter().zip(&rb).map(|(&p, &q)| p + q).collect() };
             if triads > 0 {

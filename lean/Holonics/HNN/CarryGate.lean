@@ -60,6 +60,14 @@ carry lap was refused, G83); on the linear chart `d = max(0, h)` the friction sw
 10. **The coupling's derivatives** (`coupling_hasDerivAt`, `coupling_leak_hasDerivAt`):
    `∂κ/∂d = 5/(1 + d)²`, and on the leak's chart `∂κ/∂ℓ = ln 2 · κ/(1 + d)`, the second part of
    the leak's covector beside the gate's.
+11. **The pumped circle shares one leak** (`pumpedTurn`, `pump`, `pumpedCoupling`,
+   `pumpedTurn_zero`, `pump_zero`, `pumpedCoupling_zero`, `pumped_step_le`, `pumpedCharge`,
+   `pumpedCharge_le`, `reflection_turn_ne`; the lead, November 19, G-1119-7): where the circles
+   are pumped (`Declaration::pump`) the move also reflects, `z ↦ γ z + η conj z + κ b`, with
+   `γ = γ̂(q)/(1 + d + n)`, `η = p/(1 + d + n)`, `κ = 5 d/(1 + d + n)` and a budget `n ≥ ‖p‖`
+   (the realization's `|p_re| + |p_im|`). At `n = 0` (and `p = 0`) every part is the unpumped
+   gate's; at every pump the charge stays within five places' drive; and a reflection and a turn
+   need not commute, which no product of turns can hold.
 
 The host's adjoint probes check the realization's integers.
 -/
@@ -347,5 +355,119 @@ theorem coupling_leak_hasDerivAt (l : ℝ) :
   unfold coupling
   field_simp
   ring
+
+/-! ## The pumped circle
+
+[definition; the lead, November 19 (G-1119-7)] Where the circles are pumped each move also reflects:
+the parametron's degenerate pump couples a circle's two quadratures through `conj`, so a site's move
+is a real-linear map of the plane. The turn, the pump and the coupling share one leak. -/
+
+/-- [definition] **The pumped turn** `γ̂(q)/(1 + d + n)`. -/
+noncomputable def pumpedTurn (q d n : ℝ) : ℂ := carryTurn q * ((1 / (1 + d + n) : ℝ) : ℂ)
+
+/-- [definition] **The pump** `η = p/(1 + d + n)`. -/
+noncomputable def pump (p : ℂ) (d n : ℝ) : ℂ := p * ((1 / (1 + d + n) : ℝ) : ℂ)
+
+/-- [definition] **The pumped coupling** `κ = 5 d/(1 + d + n)`. -/
+noncomputable def pumpedCoupling (d n : ℝ) : ℝ := 5 * d / (1 + d + n)
+
+/-- [proved-derived; formal-checked] **With no budget the pumped turn is the gate.** -/
+theorem pumpedTurn_zero (q d : ℝ) (hd : 0 ≤ d) : pumpedTurn q d 0 = carryGate q d := by
+  have h4 : (4 + q ^ 2 : ℝ) ≠ 0 := four_add_sq_ne_zero q
+  have h1 : (1 + d : ℝ) ≠ 0 := by linarith
+  apply Complex.ext
+  · simp only [pumpedTurn, carryGate, carryTurn, Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im,
+      mul_zero, sub_zero, add_zero]
+    field_simp
+  · simp only [pumpedTurn, carryGate, carryTurn, Complex.mul_im, Complex.ofReal_re, Complex.ofReal_im,
+      mul_zero, add_zero]
+    field_simp
+    ring
+
+/-- [proved-derived; formal-checked] **No pump reflects nothing.** -/
+theorem pump_zero (d n : ℝ) : pump 0 d n = 0 := by simp [pump]
+
+/-- [proved-derived; formal-checked] **With no budget the pumped coupling is the coupling.** -/
+theorem pumpedCoupling_zero (d : ℝ) : pumpedCoupling d 0 = coupling d := by
+  simp [pumpedCoupling, coupling]
+
+/-- [proved-derived; formal-checked] **The turn keeps the circle, as a norm**: `‖γ̂(q)‖ = 1`. -/
+theorem carryTurn_norm (q : ℝ) : ‖carryTurn q‖ = 1 := by
+  have h := carryTurn_normSq q
+  rw [Complex.normSq_eq_norm_sq] at h
+  have hn := norm_nonneg (carryTurn q)
+  nlinarith
+
+/-- [proved-derived; formal-checked] **One pumped step keeps the charge within the level**: if
+`‖p‖ ≤ n`, `‖z‖ ≤ M` and `5 ‖b‖ ≤ M`, then `‖γ z + η conj z + κ b‖ ≤ M` for every turn `q`,
+friction `d ≥ 0` and pump `p`: `‖γ‖ + ‖η‖ + κ/5 ≤ (1 + n + d)/(1 + d + n) = 1`. -/
+theorem pumped_step_le (q d n M : ℝ) (p z b : ℂ) (hd : 0 ≤ d) (hp : ‖p‖ ≤ n) (hz : ‖z‖ ≤ M)
+    (hb : 5 * ‖b‖ ≤ M) :
+    ‖pumpedTurn q d n * z + pump p d n * (starRingEnd ℂ) z + (pumpedCoupling d n : ℂ) * b‖ ≤ M := by
+  have hn : 0 ≤ n := le_trans (norm_nonneg p) hp
+  have hD : 0 < 1 + d + n := by linarith
+  have hT : ‖pumpedTurn q d n‖ = 1 / (1 + d + n) := by
+    rw [pumpedTurn, norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity), carryTurn_norm,
+      one_mul]
+  have hP : ‖pump p d n‖ ≤ n / (1 + d + n) := by
+    rw [pump, norm_mul, Complex.norm_real, Real.norm_of_nonneg (by positivity), div_eq_mul_one_div n]
+    exact mul_le_mul_of_nonneg_right hp (by positivity)
+  have hk0 : 0 ≤ pumpedCoupling d n := by unfold pumpedCoupling; positivity
+  have hK : ‖(pumpedCoupling d n : ℂ)‖ = pumpedCoupling d n := by
+    rw [Complex.norm_real, Real.norm_of_nonneg hk0]
+  have h1 : ‖pumpedTurn q d n‖ * ‖z‖ ≤ 1 / (1 + d + n) * M := by
+    rw [hT]
+    exact mul_le_mul_of_nonneg_left hz (by positivity)
+  have h2 : ‖pump p d n‖ * ‖z‖ ≤ n / (1 + d + n) * M :=
+    (mul_le_mul_of_nonneg_right hP (norm_nonneg z)).trans
+      (mul_le_mul_of_nonneg_left hz (by positivity))
+  have h3 : pumpedCoupling d n * ‖b‖ ≤ d / (1 + d + n) * M := by
+    have he : pumpedCoupling d n * ‖b‖ = d / (1 + d + n) * (5 * ‖b‖) := by
+      unfold pumpedCoupling
+      ring
+    rw [he]
+    exact mul_le_mul_of_nonneg_left hb (by positivity)
+  have hsum : 1 / (1 + d + n) * M + n / (1 + d + n) * M + d / (1 + d + n) * M = M := by
+    field_simp
+    ring
+  calc ‖pumpedTurn q d n * z + pump p d n * (starRingEnd ℂ) z + (pumpedCoupling d n : ℂ) * b‖
+      ≤ ‖pumpedTurn q d n * z‖ + ‖pump p d n * (starRingEnd ℂ) z‖ + ‖(pumpedCoupling d n : ℂ) * b‖ :=
+        norm_add₃_le
+    _ = ‖pumpedTurn q d n‖ * ‖z‖ + ‖pump p d n‖ * ‖z‖ + pumpedCoupling d n * ‖b‖ := by
+        rw [norm_mul, norm_mul, norm_mul, hK, Complex.norm_conj]
+    _ ≤ M := by linarith
+
+/-- [definition] **A pumped circle's charge along its strand**: `Q 0 = 0` and
+`Q (k + 1) = γ Q k + η conj (Q k) + κ b k`, each part read at site `k`. -/
+noncomputable def pumpedCharge (q d n : ℕ → ℝ) (p b : ℕ → ℂ) : ℕ → ℂ
+  | 0 => 0
+  | k + 1 => pumpedTurn (q k) (d k) (n k) * pumpedCharge q d n p b k +
+      pump (p k) (d k) (n k) * (starRingEnd ℂ) (pumpedCharge q d n p b k) +
+      (pumpedCoupling (d k) (n k) : ℂ) * b k
+
+/-- [proved-derived; formal-checked] **A pumped charge stays within five places' drive**: with every
+friction `d k ≥ 0`, every pump within its budget `‖p k‖ ≤ n k` and every drive `‖b k‖ ≤ B`,
+`‖Q k‖ ≤ 5 B` at every site, whatever the turns, the pumps' axes and the order of the moves. -/
+theorem pumpedCharge_le (q d n : ℕ → ℝ) (p b : ℕ → ℂ) (B : ℝ) (hd : ∀ k, 0 ≤ d k)
+    (hp : ∀ k, ‖p k‖ ≤ n k) (hb : ∀ k, ‖b k‖ ≤ B) (hB : 0 ≤ B) :
+    ∀ k, ‖pumpedCharge q d n p b k‖ ≤ 5 * B := by
+  intro k
+  induction k with
+  | zero =>
+    simp only [pumpedCharge, norm_zero]
+    linarith
+  | succ k ih =>
+    simp only [pumpedCharge]
+    exact pumped_step_le (q k) (d k) (n k) (5 * B) (p k) (pumpedCharge q d n p b k) (b k) (hd k) (hp k)
+      ih (by linarith [hb k])
+
+/-- [proved-derived; formal-checked] **A reflection and a quarter-turn do not commute**: `i · conj 1 = i`
+while `conj (i · 1) = −i`, so the order of a pumped circle's moves is read in its charge, which no
+product of turns (complex multiplications, commuting) can hold. -/
+theorem reflection_turn_ne : Complex.I * (starRingEnd ℂ) 1 ≠ (starRingEnd ℂ) (Complex.I * 1) := by
+  intro h
+  have := congrArg Complex.im h
+  simp at this
+  norm_num at this
 
 end Holonics.HNN.CarryGate

@@ -23,4 +23,6 @@ use crate::hnn::card::{Card, CardBuffer, CardError};
 /// [theory, November 12; the triad record §4] Point the words at a tick's triads' carriers (`abg`, `p`, `c^T`), none where the field has no triads.
 pub(crate) fn set_triads(w: &mut Words, tick: &Tick) {
     (w.pabg, w.ptp, w.pct) = (held_at(&tick.pabg), held_at(&tick.ptp), held_at(&tick.pct));
+    // [the lead, November 19] And at the pump's chart read and its `η`, none where the circles are not pumped (`Declaration::pump`).
+    (w.pp, w.peta) = (held_at(&tick.pp), tick.peta.as_ref().map_or(0, |b| b.device_ptr()));
 }

@@ -58,7 +58,7 @@ mod tests {
     use holonics_engine::contact::WEIGHT_BITS;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> Declaration {
-        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }
+        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -72,7 +72,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
+        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
         let describe = |name: &str, d: Declaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics_engine::field::Constitution::found(d, &vec![7u8; draws]).expect("founded");
@@ -252,6 +252,70 @@ mod tests {
         let (host_sf, host_scales) = holonics_engine::field::Host.read_tick_scales(&field, &regions).unwrap();
         assert!(card_sf == host_sf && card_scales == host_scales, "the lanes' powers by stage");
         println!("LOUD_PARITY covector_entries={} loud_covector={:?} faces_equal=1 covector_equal=1", card_g.len(), &card_g[l.loud..l.loud + d.lanes + 1]);
+    }
+
+    /// [definition; the lead, November 19 (G-1119-7)] **The pumped circles on the card read the host's bits** (needs the card): a field of
+    /// `declaration(32, 4, 32)` grown by four carry circles and pumped ([`holonics_engine::field::Learner::with_pump`]), its readout, current and
+    /// pair returns and the pump's chart and bias moved off zero from a keyed stream's tail (so every circle reflects at every site and the faces
+    /// have a covector), read and returned through the host and through the card on regions of the law of 2, 3, 5, 64 and 257 sites, on passages
+    /// read by two streams of 2, 3, 7, 64 and 300 places (their odd contacts facing the past on every second one), and on a section of both
+    /// interleaved: every face and every covector entry equal, the pump's chart and bias with a covector, and a read that does not return equal.
+    /// At the founding (the chart at zero) the card's faces and covector are the unpumped field's on every standing entry.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_pumped_circles_on_the_card_read_the_hosts_bits() {
+        use holonics_engine::field::{Host, Learner, Realization};
+        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(3).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 13)).to_be_bytes()).collect();
+        let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
+        let circled = Learner::new(founded, 12).with_carry(4, &keys).unwrap();
+        let pumped = circled.with_pump().unwrap();
+        let mut field = pumped.field.clone();
+        let d = field.declaration;
+        let (l, dw, f, m2, c2) = (field.layout().clone(), d.width, d.contacts, 2 * d.complex(), 2 * d.carry);
+        assert!(d.pump && d.carry == 4);
+        let lengths = [2usize, 3, 5, 64, 257];
+        let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
+        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let strand_lengths = [2usize, 3, 7, 64, 300];
+        let passages: Vec<Vec<usize>> = strand_lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
+        let known: Vec<Vec<bool>> = strand_lengths.iter().map(|&n| vec![false; n]).collect();
+        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false }).collect();
+        let mixed: Vec<Region> = law.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        // At the founding: the card's pumped field is the unpumped field on every standing entry.
+        for regions in [&law, &strands] {
+            let (zero_faces, zero_g) = card_field.read_and_return(&field, regions).unwrap();
+            let (plain_faces, plain_g) = card_field.read_and_return(&circled.field, regions).unwrap();
+            assert_eq!(zero_faces, plain_faces, "at the founding every face is the unpumped field's");
+            assert_eq!(zero_g[..circled.field.theta.len()], plain_g[..circled.field.theta.len()], "and every standing entry's covector");
+        }
+        // Each moved entry with its shift: the material's families on `2^(−24)`, the pump's bias on the face's grain, eight bits coarser.
+        let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw)
+            .map(|i| (i, 14))
+            .chain((l.out..l.out + dw * m2).map(|i| (i, 14)))
+            .chain((l.w..l.w + dw * f).map(|i| (i, 14)))
+            .chain((l.pump..l.pump + c2 * dw).map(|i| (i, 8)))
+            .chain((l.pump_bias..l.pump_bias + c2).map(|i| (i, 16)))
+            .collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &(i, shift)) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        for (section, regions) in [("law", &law), ("strands", &strands), ("mixed", &mixed)] {
+            let (host_faces, host_g) = field.read_and_return(regions).unwrap();
+            let (card_faces, card_g) = card_field.read_and_return(&field, regions).unwrap();
+            let (hf, cf) = (&host_faces, &card_faces);
+            let apart: Vec<(usize, usize)> = (0..regions.len()).flat_map(|r| (0..hf[r].len().max(cf[r].len())).filter(move |&t| hf[r].get(t) != cf[r].get(t)).map(move |t| (r, t))).collect();
+            assert!(apart.is_empty(), "{section}: {} faces differ, the first at region and place {:?}", apart.len(), apart.first());
+            let unequal: Vec<usize> = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).collect();
+            assert!(unequal.is_empty(), "{section}: {} covector entries differ, the first at {:?} (pump at {}, pump_bias at {}, carry at {})", unequal.len(), unequal.first(), l.pump, l.pump_bias, l.carry);
+            assert!(host_g[l.pump..l.pump + c2 * dw].iter().any(|&v| v != 0) && host_g[l.pump_bias..l.pump_bias + c2].iter().any(|&v| v != 0), "{section}: the pump's chart and bias take a covector");
+            assert_eq!(Host.read_faces(&field, regions).unwrap(), card_field.read_faces(&field, regions).unwrap(), "{section}: a read that does not return");
+            println!("PUMP_PARITY section={section} regions={} covector_entries={} pump_covector_nonzero={} faces_equal=1 covector_equal=1", regions.len(), card_g.len(), host_g[l.pump..l.pump_bias + c2].iter().filter(|&&v| v != 0).count());
+        }
     }
 
     /// [measurement; theory, November 12; the triad record §4] **The triads on the card read the host's bits** (needs the card): a field of

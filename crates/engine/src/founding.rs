@@ -764,6 +764,33 @@ impl Constitution {
         Ok((out, from))
     }
 
+    /// [definition; the lead, November 19 (G-1119-7)] **The field whose carry circles are pumped** ([`Declaration::pump`]): the pump's chart
+    /// `P` and `p_b` appended at the end of the fine field's material, founded at zero, every standing entry kept; no key is read and the draws do
+    /// not move. At `p = 0` every circle's gate, coupling and move is the unpumped one's in integers ([`carry_gate_pumped`]), so every face is the
+    /// source's bit for bit. A tower keeps its level as it stands. Also the map over the whole material from each new entry to the old one it
+    /// copies (`None` for the chart). Refused on a field with no carry circles or whose circles are pumped.
+    pub fn with_pump(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.pump {
+            return refuse("a field whose carry circles are already pumped");
+        }
+        let d = Declaration { pump: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.pump {
+            return refuse("a field whose material does not end where the pump's chart begins");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
     /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
     /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
@@ -1244,6 +1271,36 @@ impl Learner {
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 19 (G-1119-7)] **The learner whose carry circles are pumped** ([`Constitution::with_pump`]), the pump's chart
+    /// founded at zero. Every standing entry keeps its moments, its remainder and its rate. The chart's first moments open at zero and its second at
+    /// the mean of the circles' own charts' standing second moments (`Q`'s and `L`'s rows for `P`, their biases for `p_b`), as the junction's chart
+    /// opens beside them ([`Learner::with_junction`]): `P` reads the site's pair chart into a circle as `Q` and `L` do. Its rate: the chart is the
+    /// circles' gate's third chart, so its entries are the `carry` part's ([`Constitution::founded_parts`]) and step at that part's octave
+    /// (agent-inferred: one gate, one family); where the learner carries each entry's own rate, the chart's entries take `rate_bits`. The draws,
+    /// the laps and the pass are kept; the held step and the last section's step are dropped. Refused while a step is held.
+    pub fn with_pump(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner pumps its carry circles after its held step is read");
+        }
+        let (field, from) = self.field.with_pump()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let mut second: Vec<i128> = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let (old, new, d) = (&self.field.layout, &field.layout, self.field.declaration);
+        let (dw, c2) = (d.width, 2 * d.carry);
+        let mean = |start: usize, len: usize| -> i128 {
+            let values = &self.second[start..start + len];
+            if values.is_empty() {
+                return 0;
+            }
+            let n = values.len() as i128;
+            values.iter().map(|v| v / n).sum::<i128>() + values.iter().map(|v| v % n).sum::<i128>() / n
+        };
+        second[new.pump..new.pump + c2 * dw].fill(mean(old.carry, c2 * dw));
+        second[new.pump_bias..new.pump_bias + c2].fill(mean(old.carry_bias, c2));
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Constitution::with_mark`]), its strengths

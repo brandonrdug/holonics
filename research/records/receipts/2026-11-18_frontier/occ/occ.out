@@ -1,0 +1,16 @@
+# gate: lock taken 22:25:14
+# gate: released 22:28:09
+OCC_REPRO 22:28:09 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15470821376 total=16769024000 batch_budget=13197312000
+OCC_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+# hold: lock taken 22:37:44 0 other runs on the card
+OCC_TIME run=1 build=OLD sections=60 ms_mean=450.1 batches=180 peak_store=10587518544
+OCC_TIME run=2 build=NEW sections=60 ms_mean=446.2 batches=180 peak_store=10587518544
+OCC_TIME run=3 build=NEW sections=60 ms_mean=461.9 batches=180 peak_store=10587518544
+OCC_TIME run=4 build=OLD sections=60 ms_mean=453.4 batches=180 peak_store=10618117216
+OCC_TIME run=5 build=OLD sections=60 ms_mean=452.3 batches=180 peak_store=10605530552
+OCC_TIME run=6 build=NEW sections=60 ms_mean=457.5 batches=180 peak_store=10605530552
+OCC_TIME run=7 build=NEW sections=60 ms_mean=446.8 batches=180 peak_store=10603943232
+OCC_TIME run=8 build=OLD sections=60 ms_mean=464.0 batches=180 peak_store=10587518544
+# hold: released 22:41:42
+OCC_ALL_DONE 22:41:42
+RUN_EXIT 0 2026-11-19T22:41:42Z

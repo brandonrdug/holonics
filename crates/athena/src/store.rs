@@ -1072,6 +1072,80 @@ pub fn found_loud(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 19 (G-1119-7)] **`found-pump STATE STATE_SHA OUT`**: the learner `STATE` whose carry circles are pumped
+/// ([`Learner::with_pump`]: the pump's chart `P` and `p_b` appended at zero, so every face is the source's), written to `OUT`. Before it
+/// writes, every line is judged (`FOUND_PUMP_LINE`): the fine field's declaration only its head line's pump (read back as the source's with
+/// the pump on, the eleven counts kept); the fine field's material and the first moments keep every standing word at the place the founding's
+/// map gives it, the new words zero; the second moments the same, the new words at most two values (the means the chart's rows and its bias
+/// open at); every other line equal (the parts line among them: the chart is the `carry` part's). Anything else is refused and nothing is
+/// written. Reads no realization: that every face is kept is read on the card by the line's own held read of the founded state.
+pub fn found_pump(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-pump STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.with_pump().map_err(|e| e.to_string())?;
+    let (field, from) = learner.field.with_pump().map_err(|e| e.to_string())?;
+    if field != founded.field {
+        return Err("the learner's founding and the field's differ".into());
+    }
+    let old_d = learner.field.declaration;
+    let (old_m, new_m) = (learner.field.material_len(), founded.field.material_len());
+    let (old_fine, new_fine) = (learner.field.theta.len(), founded.field.theta.len());
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    // Every standing word at its mapped place; the new words zero, or (`opened`) at most two values.
+    let mapped = |wx: &[&str], wy: &[&str], opened: bool| -> bool {
+        let mut fresh = std::collections::BTreeSet::new();
+        let kept = wy.iter().enumerate().all(|(n, w)| match from[n] {
+            Some(o) => o < wx.len() && *w == wx[o],
+            None => {
+                fresh.insert(*w);
+                opened || *w == "0"
+            }
+        });
+        kept && fresh.len() <= 2
+    };
+    let mut judged = [0usize; 4];
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        let verdict = if x == y {
+            judged[0] += 1;
+            "equal".to_string()
+        } else if k == 1 && wy[0] == "hnn-field-v14p" && wx.len() >= 12 && wy.len() == 21 && wx[1..12] == wy[1..12] && wy[20] == "1" && founded.field.declaration == (holonics_engine::field::Declaration { pump: true, ..old_d }) {
+            judged[1] += 1;
+            format!("declaration {} to {}", wx[0], wy[0])
+        } else if wx.len() == old_fine && wy.len() == new_fine && mapped(&wx, &wy, false) {
+            judged[2] += 1;
+            format!("fine material {old_fine} words to {new_fine}")
+        } else if wx.len() == old_m && wy.len() == new_m && mapped(&wx, &wy, true) {
+            judged[3] += 1;
+            format!("moments {old_m} words to {new_m}")
+        } else {
+            return Err(format!("line {k}: a change the pump's founding does not make").into());
+        };
+        println!("FOUND_PUMP_LINE k={k} {verdict}");
+    }
+    if judged[1] != 1 || judged[2] != 1 || judged[3] != 2 {
+        return Err(format!("a founding whose lines were judged {judged:?}").into());
+    }
+    std::fs::write(out, b.as_bytes())?;
+    println!("FOUND_PUMP lines={} equal={} material={old_m} founded_material={new_m} pump_entries={} ms={}", la.len(), judged[0], from.iter().filter(|o| o.is_none()).count(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// A state's text with its pass line replaced by `pass`'s, every other line byte for byte: the written text, its count of lines and the one
 /// line that differs (counted from 1), read back and checked (its field the source's, its count of stretches kept). Refused where any other
 /// line would differ. The one tool under [`next_pass`] and [`own_states`].
