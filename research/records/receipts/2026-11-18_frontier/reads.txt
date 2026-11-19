@@ -1441,3 +1441,13 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   field_contact_rows: dram=26.0 us=589.3 compute=36.6 grid=3048.0 registers=128.0 waves=9.5 theoretical=33.3 occupancy=27.5
   field_contact_columns: dram=20.2 us=401.5 compute=44.1 grid=3048.0 registers=72.0 waves=5.4 theoretical=58.3 occupancy=40.1
   field_pace_skin_back: dram=18.6 us=608.4 compute=50.1 grid=3048.0 registers=96.0 waves=7.6 theoretical=41.7 occupancy=33.4
+
+# 21:22 UTC November 19. Gates 1 and 3 on the branch's build at 85a769509 (the carry gate in 32 bits, the 14.5 GiB ceiling, the strand carries' dump), gatepgam/gatepgam.sh:
+  GATEPGAM head 85a769509 0 changed files
+  GATEPGAM gate1 exit=0 20:14:39 28 gates ok; test result: ok. 143 passed; 0 failed; 1 ignored; 0 measured; 5 filtered out; finished in  
+  GATEPGAM build athena=0 card_tests=0 20:15:24 warnings=0 
+  GATEPGAM suite 20:41:33 test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 367.80s 
+  GATEPGAM gate_engine 21:02:37 STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL GATE_READ cavity.tsv EQUAL GATE_ENGINE EQUAL 
+  GATEPGAM todays_line L43 21:06:57 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+  GATEPGAM read_L43 21:21:45 EQUAL
+  GATEPGAM_ALL_DONE 21:21:45
