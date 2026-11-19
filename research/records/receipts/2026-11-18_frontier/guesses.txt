@@ -595,3 +595,10 @@ G-1119-2's. The fallback §23 names while the rows at the circles' residue are b
   stands between 1 point under and 5 points over L36's.
   The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
   by 0.003 or more, two more laps; otherwise the line continues from L36 with 512.
+
+G-1119-3 scored (2026-11-19T15:15:24Z). Rows S at the lap means: F35 1.4257 against L35's 1.4271, 0.0014 under (±0.0002): (a) held; F36 1.4156
+against L36's 1.4198, 0.0042 under (±0.0003): (a) missed, under the 0.006 guessed. (b) At the settled places F36 gives the arriving
+symbol 0.818 of its mass and L36 0.815, 0.003 more: held. (c) One place open: F36 0.0039 under L36: missed by a little (0.004 to 0.020
+guessed). (d) 544 ms a section on the mean (the line's 382 to 384): held. (e) The wide panel: F36 1,485 of 2,146 (69%) against L36's
+1,511 of 2,175 (69%): held. The rule: under 0.010 at the second lap and the gap widened by 0.0028 (under 0.003), so the 1024 circles
+leave and the line continues from L36 with 512.
