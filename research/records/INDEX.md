@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,714 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,715 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 113 | 102 |
+| [November 2026](#november-2026) | 114 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -31,6 +31,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-19 [The atlas rows graded formal checked were read against their Lean statements 243 of 2501 claimed more and each repaired row states its owners with the rest in scope](2026-11-19_THE_ATLAS_ROWS_GRADED_FORMAL_CHECKED_WERE_READ_AGAINST_THEIR_LEAN_STATEMENTS_243_OF_2501_CLAIMED_MORE_AND_EACH_REPAIRED_ROW_STATES_ITS_OWNERS_WITH_THE_REST_IN_SCOPE.md)
 - 2026-11-19 [The carry chains law is eulerian a scope reads neutral only where it holds a repeated primes fibre a source upstream of an equal sink closes its body and the minors gcd is the invariants product in Lean](2026-11-19_THE_CARRY_CHAINS_LAW_IS_EULERIAN_A_SCOPE_READS_NEUTRAL_ONLY_WHERE_IT_HOLDS_A_REPEATED_PRIMES_FIBRE_A_SOURCE_UPSTREAM_OF_AN_EQUAL_SINK_CLOSES_ITS_BODY_AND_THE_MINORS_GCD_IS_THE_INVARIANTS_PRODUCT_IN_LEAN.md)
 - 2026-11-19 [The hands saving is sandwiched by its square a map and its dual share one ihara factor the repairs patches are a prefix code differences are jets at any step and founding obeys ville at every horizon in Lean](2026-11-19_THE_HANDS_SAVING_IS_SANDWICHED_BY_ITS_SQUARE_A_MAP_AND_ITS_DUAL_SHARE_ONE_IHARA_FACTOR_THE_REPAIRS_PATCHES_ARE_A_PREFIX_CODE_DIFFERENCES_ARE_JETS_AT_ANY_STEP_AND_FOUNDING_OBEYS_VILLE_AT_EVERY_HORIZON_IN_LEAN.md)
+- 2026-11-19 [The innovation toward a targets code face descends the scored face a floored mixture returns a dormant member at K plus log M bits and a pair deposits certified step keeps three quarters of its lines decrease in Lean](2026-11-19_THE_INNOVATION_TOWARD_A_TARGETS_CODE_FACE_DESCENDS_THE_SCORED_FACE_A_FLOORED_MIXTURE_RETURNS_A_DORMANT_MEMBER_AT_K_PLUS_LOG_M_BITS_AND_A_PAIR_DEPOSITS_CERTIFIED_STEP_KEEPS_THREE_QUARTERS_OF_ITS_LINES_DECREASE_IN_LEAN.md)
 - 2026-11-19 [The ising partition function is the lock polynomial so a ferromagnets zeros in the field lie on the imaginary axis and an antiferromagnets do not](2026-11-19_THE_ISING_PARTITION_FUNCTION_IS_THE_LOCK_POLYNOMIAL_SO_A_FERROMAGNETS_ZEROS_IN_THE_FIELD_LIE_ON_THE_IMAGINARY_AXIS_AND_AN_ANTIFERROMAGNETS_DO_NOT.md)
 - 2026-11-19 [The pontryagin bound places a skew generators modes a reversed carrier passes the trace faces a revolute joint moves at its cayley rate left to right is the opposite group and the carry tower is the B adic tower in Lean](2026-11-19_THE_PONTRYAGIN_BOUND_PLACES_A_SKEW_GENERATORS_MODES_A_REVERSED_CARRIER_PASSES_THE_TRACE_FACES_A_REVOLUTE_JOINT_MOVES_AT_ITS_CAYLEY_RATE_LEFT_TO_RIGHT_IS_THE_OPPOSITE_GROUP_AND_THE_CARRY_TOWER_IS_THE_B_ADIC_TOWER_IN_LEAN.md)
 - 2026-11-19 [The sieve tower is a law of any multiplicative recurrence one chart certifies an irreducible curve friction prices a held mode a solved charts bits follow the Hadamard bound and frame dragging is a flux in Lean](2026-11-19_THE_SIEVE_TOWER_IS_A_LAW_OF_ANY_MULTIPLICATIVE_RECURRENCE_ONE_CHART_CERTIFIES_AN_IRREDUCIBLE_CURVE_FRICTION_PRICES_A_HELD_MODE_A_SOLVED_CHARTS_BITS_FOLLOW_THE_HADAMARD_BOUND_AND_FRAME_DRAGGING_IS_A_FLUX_IN_LEAN.md)
