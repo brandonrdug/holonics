@@ -31,8 +31,9 @@ file proves both, reusing that module's coefficient algebra.
    `ordinaryHypergeometric` over `ℝ`, not a series of this file's.
 
 Limits. Only `0 ≤ λ < 1` is stated (negative `λ` down to `−1` is the same argument with an alternating dominating
-series and is not written). The continuation of `K` round `λ = 0` and `λ = 1`, which is the monodromy `Γ(2)` of
-`Geometry/LegendreLevelTwo`, and the Schwarz map of the `(½, ⅓, 0)` triangle are not proved here; nor is the second
+series and is not written). The continuation of `K` round `λ = 0` and `λ = 1`, whose moves are claimed to generate
+`Γ(2)/±1` (`Geometry/LegendreLevelTwo`; the local data and their rigidity are `Geometry/HypergeometricMonodromy`'s),
+and the Schwarz map of the `(½, ⅓, 0)` triangle are not proved here; nor is the second
 period `K′(√λ) = K(√(1 − λ))` or Legendre's relation between the two.
 
 The computational object is the helical pair interaction: `K` is the quarter period of the pendulum in units of

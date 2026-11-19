@@ -91,11 +91,12 @@ What is proved.
 
 What is not claimed.
 
-- The classes on a general weighted graph whose cycles do not all share their two ends (a cycle of
-  three edges, a wheel, a grid): there the solve couples the split of one cycle to the conductances
-  of the others, and the orbit structure of square-law deposition on projective classes is not
-  computed. Two bundles joined in series are not written either; the expected classes are the
-  product of the two bundles', each driven by the series current. The box stays part done.
+- The classes on a general weighted graph whose cycles do not all share their two ends (a wheel, a
+  grid): there the solve couples the split of one cycle to the conductances of the others, and the
+  orbit structure of square-law deposition on projective classes is not computed. The triangle,
+  where the constitution is the minimal retention, and two bundles in series, whose classes are the
+  product of the two bundles', each driven by the series current, stand in
+  `HolonicsResearch/Objects/RetentionSeries`. The box stays part done.
 - Deposition laws other than the square and Joule laws, beyond what item 1 (every law on a forest)
   and item 5's reduction (every law pair on the pendant composite) say.
 - Convergence or the long-run orbit of repeated deposition, and the existence of a solve on a
