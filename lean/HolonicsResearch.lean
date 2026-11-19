@@ -1335,3 +1335,6 @@ import HolonicsResearch.Holon.LoopCurvature
 import HolonicsResearch.Compression.KTNodeSplit
 import HolonicsResearch.HNN.JointStepCovector
 import HolonicsResearch.HNN.RestitutionFamily
+import HolonicsResearch.Transport.InformationSpectroscopy
+import HolonicsResearch.Holon.SheafLaplacian
+import HolonicsResearch.HNN.LossPhase

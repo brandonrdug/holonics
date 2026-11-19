@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,695 records from July 2026 to November 2026. 382 receipts directories: 222 beside the records and 160 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,696 records from July 2026 to November 2026. 382 receipts directories: 222 beside the records and 160 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 94 | 98 |
+| [November 2026](#november-2026) | 95 | 98 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -29,6 +29,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-18 [Every proper lorentz map is a pairs move three distances hold at every real rate recurrence is a ledger with a deadline and a levels sites are read from isolation in Lean](2026-11-18_EVERY_PROPER_LORENTZ_MAP_IS_A_PAIRS_MOVE_THREE_DISTANCES_HOLD_AT_EVERY_REAL_RATE_RECURRENCE_IS_A_LEDGER_WITH_A_DEADLINE_AND_A_LEVELS_SITES_ARE_READ_FROM_ISOLATION_IN_LEAN.md)
 - 2026-11-18 [No command grows a part moves a rate settles a release or reads a coupling 97 engine items only tests call and 46 nothing calls](2026-11-18_NO_COMMAND_GROWS_A_PART_MOVES_A_RATE_SETTLES_A_RELEASE_OR_READS_A_COUPLING_97_ENGINE_ITEMS_ONLY_TESTS_CALL_AND_46_NOTHING_CALLS.md)
 - 2026-11-18 [The codec the region the passage and the units open in the consolidations form and their first lines stand here as they were](2026-11-18_THE_CODEC_THE_REGION_THE_PASSAGE_AND_THE_UNITS_OPEN_IN_THE_CONSOLIDATIONS_FORM_AND_THEIR_FIRST_LINES_STAND_HERE_AS_THEY_WERE.md)
+- 2026-11-18 [The contact material is a sheaf Laplacian the loss covector reads the relative phase on every branch and a basins delay on the ring is its doppler face in Lean](2026-11-18_THE_CONTACT_MATERIAL_IS_A_SHEAF_LAPLACIAN_THE_LOSS_COVECTOR_READS_THE_RELATIVE_PHASE_ON_EVERY_BRANCH_AND_A_BASINS_DELAY_ON_THE_RING_IS_ITS_DOPPLER_FACE_IN_LEAN.md)
 - 2026-11-18 [The half is the positivity of the reversals own form a finite complex has its zeros and count in Lean coupled locks keep the circle two toris index theorem is a norm and below reynolds one the count decides](2026-11-18_THE_HALF_IS_THE_POSITIVITY_OF_THE_REVERSALS_OWN_FORM_A_FINITE_COMPLEX_HAS_ITS_ZEROS_AND_COUNT_IN_LEAN_COUPLED_LOCKS_KEEP_THE_CIRCLE_TWO_TORIS_INDEX_THEOREM_IS_A_NORM_AND_BELOW_REYNOLDS_ONE_THE_COUNT_DECIDES.md)
 - 2026-11-18 [The line flails because a fixed rate deposit tracks an unshuffled moving terrain parts are added and never removed and past configurations were barred by name](2026-11-18_THE_LINE_FLAILS_BECAUSE_A_FIXED_RATE_DEPOSIT_TRACKS_AN_UNSHUFFLED_MOVING_TERRAIN_PARTS_ARE_ADDED_AND_NEVER_REMOVED_AND_PAST_CONFIGURATIONS_WERE_BARRED_BY_NAME.md)
 - 2026-11-18 [The method rules the card rule and the waiting standard with their occasions as the guide held them before it kept each rules bar reason scope and link](2026-11-18_THE_METHOD_RULES_THE_CARD_RULE_AND_THE_WAITING_STANDARD_WITH_THEIR_OCCASIONS_AS_THE_GUIDE_HELD_THEM_BEFORE_IT_KEPT_EACH_RULES_BAR_REASON_SCOPE_AND_LINK.md)
