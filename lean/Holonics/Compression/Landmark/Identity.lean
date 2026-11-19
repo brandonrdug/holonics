@@ -70,8 +70,10 @@ coordinate certifies a finite set of points, not one point (`finite_iff_coordina
   and initial data. The retired Rust consumer (`holonics::compression::landmark::identity`, at
   commit `2d34b819`) searched polynomial identities on one-parameter rational charts only; a
   holonomic search is owed with this item.
-- **A curve's dimension certificate** by a nonzero generator in every pair of coordinates, and
-  density for curves in more variables or for reducible curves read component by component.
+- **Density for curves in more variables**, or for reducible curves read component by component.
+  A curve's dimension certificate by a nonzero generator in every pair of coordinates, and the
+  general eliminant certificate bounding the transcendence degree, stand in
+  `HolonicsResearch/Compression/Landmark/EliminantCertificate`.
 
 No `axiom`, no `sorry`.
 -/

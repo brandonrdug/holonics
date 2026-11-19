@@ -43,8 +43,10 @@ consistent keys are the fibre of the loop-closure map (`Compression/Core/Keys`).
 
 The converse of `survivor_closes_walks` stands in `HolonicsResearch/HNN/SurvivorsCycleFibre`: over a truth
 that fits every edge, the survivors of `propagate` are the fibre of the component's fundamental-cycle menu
-cut by the traversal tree's injectivity (`survivors_eq_cycle_fibre`, `survives_iff_fundamental`). Key
-location for continuous keys is #410's.
+cut by the traversal tree's injectivity (`survivors_eq_cycle_fibre`, `survives_iff_fundamental`). For a
+menu of linear contacts the continuous keys are an affine fibre gauged by the readings' kernel, and two-sided
+deposition locates the one nearest its opening (`HolonicsResearch/HNN/ContactFixedPoint`); nonlinear
+continuous keys are #410's.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

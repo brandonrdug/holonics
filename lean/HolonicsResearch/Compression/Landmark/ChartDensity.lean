@@ -77,11 +77,12 @@ certified Hilbert bound) is not formalized, nor is Buchberger's criterion (S-pol
 zero); item 5 states the halting for any sequence of leading monomials, the property the loop's
 termination rests on, and no monomial order or division algorithm is modelled. The density of item 2
 is stated in the plane, for one irreducible `f`; a curve in more variables, a reducible curve taken
-component by component, and a curve's dimension certificate by every pair of coordinates are not
-stated. Item 3's nonconstancy is stated on the polynomials (`p − c·q ≠ 0` for every `c`), which for
-`q ≠ 0` says that `p/q` is no constant of `K(t)`; that reading in `K(t)` is not written. The circle's
-irreducibility is proved over `ℚ` (by the specialization at `x₀ = 2`); over any field of
-characteristic other than 2 it holds by the degree of `1 − x₀²`, which is not written.
+component by component are not stated (a curve's dimension certificate by every pair of coordinates
+is `Compression/Landmark/EliminantCertificate`'s). Item 3's nonconstancy is stated on the
+polynomials (`p − c·q ≠ 0` for every `c`), which for `q ≠ 0` says that `p/q` is no constant of
+`K(t)`; that reading in `K(t)` is not written. The circle's irreducibility is proved over `ℚ` (by the
+specialization at `x₀ = 2`); over any field of characteristic other than 2 it holds by the degree of
+`1 − x₀²`, which is not written.
 
 The computational object is the helical pair interaction: a chart is a navigator's path into a
 configuration, one parameter carried into the configuration's points (the circle's chart is the
