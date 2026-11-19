@@ -46,13 +46,15 @@ pub(crate) struct Back<'c> {
     pub(crate) dv: Pooled<'c, i64>,
     pub(crate) dp: Pooled<'c, i64>,
     pub(crate) ds: Pooled<'c, i64>,
-    pub(crate) dpb: Pooled<'c, i128>,
+    /// Read through `words.dpb`; held here for its memory.
+    pub(crate) _dpb: Pooled<'c, i128>,
     pub(crate) cv: Pooled<'c, i128>,
     pub(crate) cw: Pooled<'c, i128>,
     pub(crate) dm: Pooled<'c, i128>,
     pub(crate) gtau: Pooled<'c, i128>,
     pub(crate) gsig: Pooled<'c, i128>,
-    pub(crate) cds: Pooled<'c, i64>,
+    /// Read through `words.cds`; held here for its memory.
+    pub(crate) _cds: Pooled<'c, i64>,
     pub(crate) pr_back: Pooled<'c, i64>,
 }
 
@@ -317,21 +319,20 @@ impl<'c> Resident<'c> {
         words.gtau = gtau.device_ptr();
         words.gsig = gsig.device_ptr();
         words.cds = cds.device_ptr();
-        Ok(Back { dx, dr, dc, da, db, dg, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, dpb, cv, cw, dm, gtau, gsig, cds, pr_back })
+        Ok(Back { dx, dr, dc, da, db, dg, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, _dpb: dpb, cv, cw, dm, gtau, gsig, _cds: cds, pr_back })
     }
 
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn reverse(&self, field: &Constitution, words: &mut Words, ticks: &[Tick<'c>], (clocks, base_clock): (&[Option<CardClock<'c>>], [u64; 7]), g: &CardBuffer<'c, i128>, fread: &CardBuffer<'c, i32>, fscale: &CardBuffer<'c, i128>, lift: &CardBuffer<'c, i64>, masses: &CardBuffer<'c, u64>, totals: &CardBuffer<'c, i128>, classes: &[u32], unresolved: &[u8], site_pos: &[u32], mix_off: &[u32], mix_class: &[u32], mix_share: &[u32], site_weight: &[(u64, u64)], ported: &(Vec<u32>, Vec<i64>), sites: usize, pairs: usize, mut tower: Option<(&mut TowerRun<'c>, &TowerBatch<'c>)>, early_clocks: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>, loud: Option<(&CardBuffer<'c, i128>, &CardBuffer<'c, i64>, &CardBuffer<'c, i64>)>) -> Result<()> {
-        let card = self.card;
         let d = field.declaration;
-        let (dw, m, n, f, a, heads) = (d.width, d.complex(), d.modes, d.contacts, d.alphabet, d.heads);
-        let (m2, span) = (2 * m, 2 * n);
+        let (dw, m, a) = (d.width, d.complex(), d.alphabet);
+        let m2 = 2 * m;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let dz = alloc64(sites * a)?;
+        // The kernels read the other pass buffers through `words`' pointers; `back` holds their memory until the reverse ends.
         let back = self.back_buffers(field, words, sites, pairs, early_clocks)?;
-        let Back { dx, dr, dc, da, db, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, dm, gtau, gsig, cds, pr_back, .. } = &back;
+        let Back { dx, dr, dq, dm, gtau, gsig, .. } = &back;
         let regions = words.r as usize;
-        let rows = sites + regions;
         let paced = d.paced_heads();
         // The face.
         let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());

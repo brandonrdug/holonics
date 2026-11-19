@@ -495,3 +495,61 @@ ruler): the reader of navigator.content-stride-moment, m ← α(u) m + β(u) on 
   G-1118-17 scored so far (21:14 UTC), the first lap. (a) arm R15's rows S read 1.8042 at the mean of its states, 0.0514 above arm P15's (±0.0015; between 0.030 above and 0.030 under: missed, above), above it in every slice (books 0.036, code 0.057, science 0.062, web 0.054, wikidata 0.048) and from four places known up. (c) under the law one place open reads 0.0425 above the control's (0.00 to 0.06 above: held) and whole masks 0.0355 above. (d) a section took 262 ms (arm P16's 265: within 3%, held). The rule is fixed on the second lap, arm R16 against arm P16.
 
   G-1118-21 scored (21:25 UTC), pooled over the five slices by places. At the fifth of places a count of five settles: (a) one advance at 32 circles 0.293 (0.22 to 0.31: held); (b) strides at 32 circles 0.477 (0.40 to 0.50: held); (c) strides at 128 circles 0.652 (0.50 to 0.62: missed, above), where the line reads 0.650. (d) fitted moduli: strides 0.60 to 0.67 at 32 circles and 0.67 to 0.73 at 128 (over 0.60: held); one advance 0.535, 0.585, 0.574, 0.547, 0.671 by slice (under 0.55: held on two of five, missed). (e) strides at 128 over all places 2.132 nats (2.05 to 2.25: held); their writes 55% lexicon words (45% to 58%: held). The held code was still falling at the third pass. The rule: 0.60 or over, so the arm is ordered.
+
+G-1118-22 (2026-11-18T21:30:43Z). Whether descent reaches a stride a symbol from where the line's circles stand (tools/content_stride_ruler.py with
+the sizes 32z and 32c; books and web, 8 MB, three passes, a window of eight; host): the stride reader on 32 circles opened with every
+stride at zero and a modulus of 4/5, and opened closed (strides within 0.06 of a turn, modulus 0.39, the line's circles' reading).
+  What is on record. Opened with strides drawn over the turn at 4/5 the reader gives the arriving symbol 0.590 (books) and 0.468 (web)
+  of its mass at the places a count of five settles; one advance for every symbol 0.401 and 0.257. Zero strides are no stationary
+  point of this reader by any symmetry: a stride's slope is the product's own.
+  The guess. (a) Opened at zero: 0.54 to 0.60 on books and 0.42 to 0.48 on web. (b) Opened closed: 0.50 to 0.59 on books and 0.38 to
+  0.47 on web, its mean modulus risen over 0.55 and its strides spread over 200 thousandths of a turn.
+  What it decides. Both within 0.06 of the drawn opening: descent reaches the strides from where the line's circles stand, so what
+  holds the line's circles is the engine's form of them (a turn charted from a read that mixes the site's context) or its regime,
+  and the arm read first is the small one: a stride of its own a symbol added to the circles' turn, founded at zero so every face
+  is kept, beside the line. The closed opening within 0.05 of one advance: the opening decides, and the arm founds new circles with
+  drawn strides at their founding reach.
+
+  G-1118-22 scored (21:51 UTC). At the places a count of five settles: (a) opened at zero strides: books 0.580, web 0.456 (0.54 to 0.60 and 0.42 to 0.48: held); (b) opened closed: books 0.587, web 0.463 (0.50 to 0.59 and 0.38 to 0.47: held), but its mean modulus stayed at 0.404 and 0.423 (guessed over 0.55: missed) and its strides spread by 0.116 and 0.134 of a turn (guessed over 0.200: missed); the reader opened at zero came to strides spread by 0.095 and 0.113 at moduli of 0.663 and 0.627. Both openings read within 0.012 of the drawn one (0.590, 0.468). The rule's branches both assumed the line's circles are held back where they stand; the closed reader read as well as the drawn one while staying closed and at small strides, so on 32 circles that standing is where a free fit of this reader also comes to rest, and no arm that only frees the circles is ordered. What the readings leave is the circles' extent: 0.477 at 32 circles and 0.652 at 128 (G-1118-21).
+
+G-1118-23 (2026-11-18T22:01:30Z). More carry circles on the line (grow-carry 96: the circles from 32 to 128 by their own founding law, drawn turn rows
+at the founded friction, their W columns at zero so every face is kept; 98,880 new entries on 442,425): two laps (arms C17, C18) from
+arm L16's end with the circles grown, beside the line's own L17 and L18 from the same state (the control). One change.
+  What is on record. At the places a count of five settles the line gives the arriving symbol 0.650 of its mass and a count of five
+  0.909; a carried product with a stride a symbol, alone on the host, gives 0.477 on 32 circles and 0.652 on 128 after three passes of
+  8 MB (24 million places), and holds nothing of the far (§18). A reader opened where the line's circles stand comes to rest there and
+  reads as a drawn one (G-1118-22), so the circles' extent is what the readings left to grow. A lap compares about 39 million open
+  places. Parts of this size took their gain in two to four laps here: the level's block 0.010, 0.0215, 0.0268, 0.0305 under its
+  control over four reads; the contacts facing the past 0.013 and 0.031.
+  The guess. (a) Rows S at the mean of a lap's last 1,000 sections: arm C17 between 0.005 above and 0.015 under arm L17's; arm C18
+  between 0.000 and 0.030 under arm L18's. (b) At the places a count of five settles, arm C18 gives the arriving symbol 0.003 to
+  0.025 more of its mass than arm L18. (c) Under the law one place open reads within 0.01 of the control's. (d) A section takes 330
+  to 420 ms (the line's 307 to 324). (e) The long panel from a lap's mean stays within 9 points of the control's.
+  What it decides. Arm C18 at least 0.010 under arm L18: the line takes the circles. Under that with its gap at least 0.003 wider at
+  the second lap than at the first: two more laps and the same rule there. Otherwise the circles leave the line and the growth stays
+  in the tree with the reading.
+
+  G-1118-17 scored (22:08 UTC), the second lap. (a) arm R16's rows S read 1.7706 at the mean of its last 1,000 sections, 0.0320 above arm P16's (±0.0014; between 0.000 and 0.060 under: missed, above), above it in every slice; the first lap's 0.0514 above closed by 0.019. (b) at the places of least news: in the corrected ruler's first bin (the count expects under a quarter of a nat) arm R16 codes 0.878 where arm P16 codes 0.840, and gives the arriving symbol 0.641 of its mass where arm P16 gives 0.657 (0.02 or more under: missed). (c) under the law one place open reads 0.0382 above the control's (0.00 to 0.06 above: held), whole masks 0.0257 above. (d) a section took 262 ms (the control's 265: held). (e) long panels: arm R15's mean 46% and end 55% lexicon words, arm P15's 51% and 54% (within 8 points: held on the first lap). The rule: not 0.015 under, so the word leaves the line and stays a region's word in the tree with this reading. What it reads: a row of the opening for the second place before, taken from rows the law's regions still read as the site after, costs both readings for two laps; with the ladder of G-1118-19 (rows of single places stop gaining after two) it is no growth.
+
+G-1118-23 scored (2026-11-19T00:27Z). Rows S at the lap means: C17 1.6844 against L17's 1.6992, 0.0148 under (±0.0005): (a) held at
+its edge; C18 1.6495 against L18's 1.6899, 0.0404 under (±0.0009): (a) missed, a larger gain than guessed. (b) At the places a count of
+five settles C18 gives the arriving symbol 0.704 of its mass and L18 0.680, 0.024 more: held. (c) One place open under the law: C17
+0.0060 under its control, held; C18 0.0176 under, missed (guessed within 0.01). (d) Sections 342 ms (C17) and 330 ms (C18), mean over
+3,000, the line's 312 and 298: held. (e) Long panels: C17 187 of 286 words in the lexicon (65%) against L17's 164 of 280 (58%); C18
+142 of 263 (53%) against L18's 153 of 272 (56%): held (within 9 points). The rule: 0.010 or more under at the second lap, so the line
+takes the 128 circles and continues from arm C18's end.
+
+G-1119-1 (2026-11-19T00:27:33Z). The carry circles from 128 to 256 (grow-carry 128: 128 more circles by their own founding law,
+every face kept, about 131,840 new entries on 541,305): two laps (arms D19, D20) from arm C18's end with the circles grown, beside the
+line's own L19 and L20 from the same state (the control). One change. Binary: the lead branch at 7a280248f, entered by its gate's
+reproduction of lap C18.
+  What is on record. The 96 circles of G-1118-23 read 0.0148 and then 0.0404 under their control, the gap still widening at the
+  second lap; at the settled places 0.704 against 0.680. On the host a stride reader alone gives 0.477 at the settled places on 32
+  circles and 0.652 on 128 (G-1118-21), so about 0.09 a doubling there, and no larger extent was read; the count of five gives
+  0.909. Each doubling costs about 15 ms a section on the card (312 to 342 ms for 32 to 128 circles).
+  The guess. (a) Rows S at the mean of a lap's last 1,000 sections: D19 between 0.003 above and 0.015 under L19's; D20 between 0.005
+  and 0.030 under L20's. (b) At the places a count of five settles, D20 gives the arriving symbol 0.000 to 0.020 more of its mass than
+  L20. (c) One place open under the law: D20 within 0.015 of L20. (d) A section takes 350 to 430 ms. (e) The long panel from each
+  lap's mean stays within 9 points of the control's.
+  The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
+  by 0.003 or more, two more laps; otherwise the line continues from L20 and the circles stay at 128.
