@@ -1355,3 +1355,6 @@ import HolonicsResearch.HNN.SoftmaxTwoCycle
 import HolonicsResearch.HNN.HalfPumpMonodromy
 import HolonicsResearch.HNN.SheetConjunction
 import HolonicsResearch.Compression.OneFaceLaw
+import HolonicsResearch.Geometry.QuaternionFreePair
+import HolonicsResearch.Compression.FacesOnCycles
+import HolonicsResearch.Physics.Fluid.FrictionKeepsHarmonic
