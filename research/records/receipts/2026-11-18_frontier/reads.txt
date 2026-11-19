@@ -1429,3 +1429,15 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=0 depth=8 length=64 steps=3000 train_loss=1.1126 agree=0.867 sure=0.736 by_depth: d1=0.836 d2=0.839 d3=0.852 d4=0.846 d5=0.843 d6=0.841 d7=0.994 d8=1.000
   PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=1 depth=8 length=64 steps=3000 train_loss=1.1035 agree=0.883 sure=0.762 by_depth: d1=0.861 d2=0.860 d3=0.852 d4=0.863 d5=0.862 d6=0.898 d7=0.985 d8=1.000
   PUMPED_CONTROL carry=pumped circles=2 params_a_symbol=14 seed=2 depth=8 length=64 steps=3000 train_loss=1.0981 agree=0.889 sure=0.729 by_depth: d1=0.864 d2=0.866 d3=0.872 d4=0.875 d5=0.892 d6=0.912 d7=0.954 d8=0.981
+
+# 20:36 UTC November 19. What bounds the section's largest kernels (ncu/ncu.sh: Nsight Compute 2025.2.1 from /opt/cuda-12.9, speed of light, occupancy, launch statistics and memory workload on 40 launches of the named kernels, 3 sections of train-store from lap L44's end, under the lock; durations in µs, throughputs in percent of peak):
+  field_affine_tiled_x32: dram=23.7 us=245.2 compute=50.0 grid=1337.0 registers=128.0 waves=8.4 theoretical=33.3 occupancy=30.6
+  field_contact_l4: dram=20.4 us=1656.6 compute=49.3 grid=12191.0 registers=80.0 waves=25.4 theoretical=50.0 occupancy=41.8
+  field_outer_x32: dram=36.5 us=227.3 compute=46.5 grid=401.1 registers=128.0 waves=2.5 theoretical=33.3 occupancy=30.2
+  field_transposed: dram=41.5 us=255.7 compute=55.2 grid=649.4 registers=124.0 waves=4.1 theoretical=33.3 occupancy=30.5
+  field_pair_scan_pre: dram=85.5 us=958.3 compute=9.9 grid=24382.0 registers=40.0 waves=50.8 theoretical=100.0 occupancy=78.5
+  field_pair_scan_back: dram=68.9 us=1283.1 compute=4.3 grid=112.0 registers=70.0 waves=0.5 theoretical=50.0 occupancy=20.7
+  field_pair_gate_back: dram=90.0 us=1002.0 compute=69.2 grid=24382.0 registers=66.0 waves=101.6 theoretical=50.0 occupancy=47.2
+  field_contact_rows: dram=26.0 us=589.3 compute=36.6 grid=3048.0 registers=128.0 waves=9.5 theoretical=33.3 occupancy=27.5
+  field_contact_columns: dram=20.2 us=401.5 compute=44.1 grid=3048.0 registers=72.0 waves=5.4 theoretical=58.3 occupancy=40.1
+  field_pace_skin_back: dram=18.6 us=608.4 compute=50.1 grid=3048.0 registers=96.0 waves=7.6 theoretical=41.7 occupancy=33.4
