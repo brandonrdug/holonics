@@ -1452,3 +1452,6 @@ import HolonicsResearch.Foundation.CantorStringSpectrum
 import HolonicsResearch.Geometry.CayleyTurnClock
 import HolonicsResearch.HNN.AnchorGradient
 import HolonicsResearch.Zeta.MellinPlancherel
+import HolonicsResearch.HNN.DrivenRingSupply
+import HolonicsResearch.Zeta.FosterReturn
+import HolonicsResearch.Physics.Thermal.RelativisticHeat

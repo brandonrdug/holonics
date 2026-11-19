@@ -106,10 +106,11 @@ code enclosure as the realized score's (`ExactInterval` code lengths read as the
 score); a declared boost's growth bound (its signed stiffness stores indefinite energy, so no gain is
 certified through it; a step through it is refused); and ("The certified step reads the Floquet
 reach", September 29) the pumped ring's loop within a span: §10 composes the ring's undriven reach
-with the medium's ticks as a factorization of the span's transport, and the driven ring's
-supply-rate certificate `E_G(x′) ≤ σ²E_G(x) + supply(e, s′)` that would discharge that
-factorization through the field's return into the ring is owed, with the reach along a ring's own
-gain ray (a tube of monodromies) and a modulated pump's passage-dependent schedule.
+with the medium's ticks as a factorization of the span's transport; the driven ring's
+supply-rate certificate `E_G(x′) ≤ σ²E_G(x) + supply(x, e)`, its span and its discharge of that
+factorization through the field's return into the ring stand in
+`HolonicsResearch/HNN/DrivenRingSupply`, and the reach along a ring's own gain ray (a tube of
+monodromies) and a modulated pump's passage-dependent schedule are owed.
 -/
 
 noncomputable section
