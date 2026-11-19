@@ -45,7 +45,8 @@ Consumers: the atlas row `hnn.propagation-edge-fibre` and `HNN/Keys`' `[open]` p
 What stands beside it: the turn menu's fibre (`HNN/TurnMenuFibre`), whose cycles are these loops with the rotor's turn
 as their stage; the cycle space of a graph has the fundamental cycles of any spanning tree as a basis, which is
 why closing them suffices; the board's injectivity is a separate condition the cycles do not see, and stays a
-hypothesis of its own (`TreeInjective`); key location for continuous keys stays with #410.
+hypothesis of its own (`TreeInjective`); continuous keys of linear contacts
+are `HNN/ContactFixedPoint`'s, and nonlinear ones stay with #410.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
