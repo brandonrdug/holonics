@@ -48,6 +48,10 @@ run link-check-controls python3 tools/test_link_check.py
 # every atlas owner that names the tree stands in it. A link test that nothing runs does not hold.
 run guide-links python3 tools/link_check.py links
 run atlas-owners python3 tools/link_check.py atlas
+# The Lean package's files against the targets that build them (lean/lakefile.toml), read from the text: a file no target builds is
+# checked by nothing. November 18: twelve modules stood outside the foundation's closure with six atlas rows on them.
+run lean-census-controls python3 tools/test_lean_census.py
+run lean-census python3 tools/lean_census.py
 # The records' index is what the file names give today; where it is behind: python3 tools/records_index.py write
 run records-index-controls python3 tools/test_records_index.py
 exit $status

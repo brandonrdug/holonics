@@ -1,5 +1,6 @@
 import Mathlib.Algebra.Order.Field.Rat
 import Mathlib.Data.Nat.Log
+import Mathlib.Data.ZMod.Basic
 import Mathlib.Tactic
 
 /-!
@@ -42,13 +43,22 @@ block's digit `k`, read from the most significant end. This file proves it on `�
    `S/9999 = 7S/9 + 8S/11 + 50S/101 − 2S`, so modulo whole turns the phase on the joined ring is the
    seventh power of the phase on 9 times the eighth on 11 times the fiftieth on 101: the digit is
    read on the joined ring, whose phase the pair contact takes as a product of the rings' phases.
+8. **The strands' release** (`strand_digit`, `allTop_is_ring_zero`, `inside_first_tenth_past_length`,
+   `outside_first_tenth_at_length`, `length_is_largest_ring_outside`, `zero_inside_every_ring`; the
+   strands record of October 26, §2 and §4, atlas `hnn.tower-strands`): on the ring of the result's length,
+   with `k` digits written, the comparison `c ≡ −bᵏ s_k` carries the unwritten remainder `s_k` turned to the
+   top of the block, so the `b`-th of its conjugate face `(−c) mod q` is the next digit at every `k < L`; the
+   result whose digits are all `b − 1` is the ring's zero and is excluded; for a positive result the length
+   is the largest ring whose face at the start reads outside the first tenth (rings past it read inside), and
+   `0` reads inside on every ring.
 
 The computational object is the helical pair interaction: the residue is the phase of a ring, and
 each turn is one winding of the helix whose carry is the emitted digit. Of the winding guide's six
 general objects this touches the helix (the turn by `b`) and faces and placement (the digit read
 as the turn's quotient); the pair, the cell holonomy, the tube and the tower thread stay attached.
 
-Consumers: the atlas row `radix.itinerary-release` and the record's §5.
+Consumers: the atlas rows `radix.itinerary-release` and `hnn.tower-strands`, and the records' §5 (October 26,
+the operation) and §2, §4 (October 26, the strands).
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -215,6 +225,122 @@ theorem digits_zero_iff {b S : ℕ} (hb : 1 < b) : (∀ m, S / b ^ m % b = 0) �
       (Nat.lt_pow_succ_log_self hb S) (h (Nat.log b S))
   · rintro rfl m
     simp
+
+/-! ## The strands' release: the digit is the tenth of the conjugate face on the result's ring -/
+
+/-- [proved-derived; formal-checked] **The strands' digit** (the strands record, §2 and §4; atlas
+`hnn.tower-strands`). On the ring of the result's length, `q + 1 = b^L`, let `k < L` digits of the result
+`S < q` be written, `S = p_k b^(L−k) + s_k` with `s_k = S mod b^(L−k)`, and let the strands' comparison be
+`c ≡ −bᵏ s_k (mod q)`. Then the `b`-th of the conjugate face, `⌊b · ((−c) mod q) / q⌋`, is the next digit
+`⌊S / b^(L−k−1)⌋ mod b`, at every `k < L`: the release reads all `L` digits, none stopping where the face's
+itinerary first returns. The comparison already holds the written prefix, so its face is the unwritten
+remainder turned to the top of the block, `bᵏ s_k < q`. `S < q` excludes the result whose digits are all
+`b − 1`, which is `q` itself, the ring's zero (`allTop_is_ring_zero`). -/
+theorem strand_digit {b q L k S : ℕ} (hb : 1 < b) (hq : q + 1 = b ^ L) (hk : k < L) (hS : S < q)
+    (c : ZMod q) (hc : c = -((b ^ k * (S % b ^ (L - k)) : ℕ) : ZMod q)) :
+    b * (-c).val / q = S / b ^ (L - k - 1) % b := by
+  have hb0 : 0 < b := by omega
+  obtain ⟨m, hm⟩ : ∃ m, L = k + 1 + m := ⟨L - k - 1, by omega⟩
+  have hLk : L - k = m + 1 := by omega
+  have hLk1 : L - k - 1 = m := by omega
+  rw [hLk] at hc
+  rw [hLk1]
+  have hBpos : 0 < b ^ m := pow_pos hb0 m
+  set s := S % b ^ (m + 1) with hsdef
+  have hs : s < b ^ (m + 1) := Nat.mod_lt S (pow_pos hb0 _)
+  -- the comparison's face is the unwritten remainder turned to the top
+  have hlt : b ^ k * s < q := by
+    rcases Nat.eq_zero_or_pos k with hk0 | hk0
+    · subst hk0
+      have hsS : s = S := by
+        rw [hsdef]
+        apply Nat.mod_eq_of_lt
+        have : S < b ^ L := by omega
+        rwa [hm, Nat.zero_add, Nat.add_comm] at this
+      rw [pow_zero, one_mul, hsS]
+      exact hS
+    · have hbk : 2 ≤ b ^ k := by
+        calc 2 ≤ b := hb
+          _ = b ^ 1 := (pow_one b).symm
+          _ ≤ b ^ k := Nat.pow_le_pow_right hb0 hk0
+      have h1 : b ^ k * (s + 1) ≤ b ^ k * b ^ (m + 1) := Nat.mul_le_mul_left _ hs
+      have h2 : b ^ k * b ^ (m + 1) = q + 1 := by
+        rw [hq, hm, ← pow_add]
+        ring_nf
+      nlinarith
+  rw [hc, neg_neg, ZMod.val_natCast, Nat.mod_eq_of_lt hlt]
+  -- the leading digit of the remainder
+  set t := s / b ^ m with htdef
+  set r := s % b ^ m with hrdef
+  have hstr : t * b ^ m + r = s := Nat.div_add_mod' s (b ^ m)
+  have ht : t < b := by
+    rw [htdef, Nat.div_lt_iff_lt_mul hBpos]
+    calc s < b ^ (m + 1) := hs
+      _ = b * b ^ m := by ring
+  have hr : r < b ^ m := Nat.mod_lt s hBpos
+  have hqB : q + 1 = b * (b ^ m * b ^ k) := by
+    rw [hq, hm]
+    ring
+  have hD : b ^ k * s = t * (b ^ m * b ^ k) + r * b ^ k := by
+    rw [← hstr]
+    ring
+  have hlow : r * b ^ k < b ^ m * b ^ k := Nat.mul_lt_mul_of_pos_right hr (pow_pos hb0 k)
+  have hturn := (turn_reads_digit hqB ht hlow (by rw [← hD]; exact hlt)).1
+  rw [hD, hturn, htdef, hsdef, pow_succ, Nat.mod_mul_right_div_self]
+
+/-- [proved-standard; formal-checked] The result whose `L` digits are all `b − 1` is `q = b^L − 1` itself,
+the zero of its own ring, which is why `strand_digit` excludes it. -/
+theorem allTop_is_ring_zero (q : ℕ) : ((q : ℕ) : ZMod q) = 0 := ZMod.natCast_self q
+
+/-- [proved-derived; formal-checked] **Rings past the length read inside the first tenth:** for
+`S < b^L` and a ring `q′ = b^(L′) − 1` with `L < L′`, the comparison's face at the start, `S mod q′ = S`,
+reads `⌊b S / q′⌋ = 0`. -/
+theorem inside_first_tenth_past_length {b L L' S : ℕ} (hb : 1 < b) (hS : S < b ^ L) (hL : L < L') :
+    b * (S % (b ^ L' - 1)) / (b ^ L' - 1) = 0 := by
+  have hb0 : 0 < b := by omega
+  have hpow : b ^ (L + 1) ≤ b ^ L' := Nat.pow_le_pow_right hb0 hL
+  have hpowL : b ^ (L + 1) = b * b ^ L := by ring
+  have hSq : S < b ^ L' - 1 := by
+    have : b ^ L < b ^ (L + 1) := Nat.pow_lt_pow_right hb (Nat.lt_succ_self L)
+    omega
+  rw [Nat.mod_eq_of_lt hSq]
+  apply Nat.div_eq_of_lt
+  have h1 : b * (S + 1) ≤ b * b ^ L := Nat.mul_le_mul_left b hS
+  rw [Nat.mul_succ] at h1
+  omega
+
+/-- [proved-derived; formal-checked] **The result's own ring reads outside the first tenth:** for
+`b^(L−1) ≤ S < b^L − 1`, `⌊b S / (b^L − 1)⌋ ≥ 1`. -/
+theorem outside_first_tenth_at_length {b L S : ℕ} (hb : 1 < b) (hL : 0 < L) (hlo : b ^ (L - 1) ≤ S)
+    (hS : S < b ^ L - 1) : 0 < b * (S % (b ^ L - 1)) / (b ^ L - 1) := by
+  have hb0 : 0 < b := by omega
+  rw [Nat.mod_eq_of_lt hS]
+  have hq : 0 < b ^ L - 1 := by omega
+  apply Nat.div_pos _ hq
+  have hpow : b ^ L = b * b ^ (L - 1) := by
+    rw [← pow_succ']
+    congr 1
+    omega
+  have h1 : b * b ^ (L - 1) ≤ b * S := Nat.mul_le_mul_left b hlo
+  omega
+
+/-- [proved-derived; formal-checked] **The size is the largest ring outside the first tenth** (the strands
+record, §2): for a positive result `S` of `L` digits, not all `b − 1`, the length `L` is the greatest ring
+`L′` on which the comparison's face at the start reads outside the first tenth, `⌊b (S mod q′) / q′⌋ ≠ 0`. -/
+theorem length_is_largest_ring_outside {b L S : ℕ} (hb : 1 < b) (hL : 0 < L) (hlo : b ^ (L - 1) ≤ S)
+    (hS : S < b ^ L - 1) :
+    IsGreatest {L' : ℕ | 0 < b * (S % (b ^ L' - 1)) / (b ^ L' - 1)} L := by
+  refine ⟨outside_first_tenth_at_length hb hL hlo hS, fun L' hL' => ?_⟩
+  by_contra hlt
+  push Not at hlt
+  have h0 := inside_first_tenth_past_length hb (by omega : S < b ^ L) hlt
+  have hL'' : 0 < b * (S % (b ^ L' - 1)) / (b ^ L' - 1) := hL'
+  omega
+
+/-- [proved-standard; formal-checked] **Zero is its own case:** the result `0` reads inside the first tenth
+on every ring. -/
+theorem zero_inside_every_ring (b L' : ℕ) : b * (0 % (b ^ L' - 1)) / (b ^ L' - 1) = 0 := by
+  simp
 
 /-- [proved-standard; formal-checked] **The residue's fibre:** `S` and `S + q` have the same
 itinerary point at every turn, so the ring alone never separates them. -/

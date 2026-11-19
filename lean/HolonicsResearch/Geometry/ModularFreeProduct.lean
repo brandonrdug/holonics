@@ -46,8 +46,8 @@ word in a half-turn and a third of a turn, and no reduced word is trivial.
    (`range_reduceTwo`, `mem_residueRepresentatives`, `card_residueRepresentatives`).
 
 Limits. The box's later clauses are not proved here: the Schwarz map of the `(½, ⅓, 0)` triangle and the
-identification of its monodromy with this group, `Γ(2)` as the monodromy of Legendre's family and its freeness on
-`[[1, 2], [0, 1]]` and `[[1, 0], [2, 1]]` modulo `±1` (only its index and its sign are proved), and
+identification of its monodromy with this group, `Γ(2)` as the monodromy of Legendre's family (its freeness on
+`[[1, 2], [0, 1]]` and `[[1, 0], [2, 1]]` modulo `±1` is `Geometry/LegendreLevelTwo.gammaTwoFree`), and
 `K(√λ) = (π/2) ₂F₁(½, ½; 1; λ)`. The
 action of `PSL(2, ℤ)` on `ℍ` is a local instance of this file (`pslAction`), not a global one. The ping-pong is
 played on the two open halves of `ℍ` by real part, not on the irrationals of the real line. That the positive words

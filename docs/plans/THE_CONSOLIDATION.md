@@ -244,7 +244,7 @@ deposit consumes is a ruler.
 | `level.rs` | a level on its news | `landmarks`, `landmarks_of`; `field/scale.rs` (`level_declaration`, `level_split`, `LEVEL_HARMONICS`) | |
 | `realization.rs` | the port a realization implements | `FieldRealization`, `HostField`, `FieldRead`, `FieldNext`, `FieldReceipt`, `RealizationCounters` | |
 | `learner.rs` | a section: read, return, deposit | `FieldLearner`, `section_realized` | |
-| `ruler.rs` | readings no law consumes | `ReachSums`, `ReactionSums`, `MirrorSums`, `RingStage` and the covectors' readings | |
+| `ruler.rs` | readings no law consumes | `HeldRead`, `TickRead`, `HeldRows`, `OpenRows`, `ReachSums`, `TickNews`, `CrossingTension`, `letter_balance`, `entropy` (the reaction and mirror readings retired with #995, held at `867430ea6`) | |
 
 **A module's first lines** state, in this order: the object; its equations in the present tense, at
 their declared widths; its kind of computation and its index set; the kernels that realize it; its

@@ -651,9 +651,13 @@ reading, and rule 6's second requirement every design on how the machine learns.
    `agent-inferred`; the direction is his). Scope: every projection of a learner run and every guess of a rate; the workload is
    still never cut to fit (GPU first, below), and a long run stays lawful once the realization stands near its count.
 4. **Builds, gates and learner runs happen on the PC** (October 29). Reason (`agent-inferred`): the card, the CUDA toolchain, the
-   Lean cache and the private passages are there, and a cloud container's build measures the container. Scope: `cargo`, CUDA, Lean
-   and learner runs. Reading, writing, git and arithmetic on public material are done wherever the agent is, and so is gate 1 of a
-   change that leaves every crate's compiled tokens as they were (`tools/gate_nocard.sh`; the gates, below). A lap's run follows the
+   Lean cache and the private passages are there, and a cloud container's build measures the container. Scope: `cargo`, CUDA and
+   learner runs. Reading, writing, git and arithmetic on public material are done wherever the agent is, and so is gate 1 of a
+   change that leaves every crate's compiled tokens as they were (`tools/gate_nocard.sh`; the gates, below), and so is gate 4: a
+   Lean check is the kernel's acceptance at the toolchain and the Mathlib the package pins, which no machine changes, and Mathlib's
+   built cache is fetched in minutes (`lake exe cache get`), so the reason reaches neither (`agent-inferred`, November 18: #996 to
+   #998 and the twelve modules no target built were checked in cloud containers, each pull request stating the inference apart).
+   A lap's run follows the
    waiting standard below: a development read projects the lap and fixes its one deadline, the run is dispatched to outlive its
    agent and saves a state at least each hour, and a line's lap takes the card's lock (a gate, a parity and a reading take none).
 5. **A line's level is read at its lap's mean** (the lead, November 11). A held code, an opening code or an information a place
@@ -1069,7 +1073,9 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
 1. any code change: `bash tools/gate.sh` (the workspace check, the guard lints on the engine and on
    athena, the engine's host tests and doctests, and the tools' controls; a guard that is not run
    does not hold). Its last lines read the text against the tree: the guides' relative links
-   (`tools/link_check.py links`), the atlas's owners (`link_check.py atlas`) and the records' index.
+   (`tools/link_check.py links`), the atlas's owners (`link_check.py atlas`), the records' index and
+   the Lean package's files against the targets that build them (`tools/lean_census.py`: a module is
+   imported by its library's root, or by an owner the root reaches, in the change that adds it).
    A change that adds or renames a record runs `python3 tools/records_index.py write` and commits
    `research/records/INDEX.md` with it, or gate 1 says the index is behind. On a machine with no card,
    `bash tools/gate_nocard.sh` runs it against a stand-in for the driver library. It reads no kernel
@@ -1087,7 +1093,9 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
    line's declaration, and on November 14 a change to the deposit's divisor passed parity and the
    first 3 reproduced sections and first differed at section 10
    ([the receipt](research/records/receipts/2026-11-14_engine-gates/README.md));
-4. when Lean changes: the library build, `bash tools/lean_check.sh`.
+4. when Lean changes: the library build, `bash tools/lean_check.sh`, on the changed modules and on
+   the library they join (`bash tools/lean_check.sh HolonicsResearch` for a research module, so its
+   names are read beside the rest; it runs wherever the agent is, rule 4).
 
 Record one verification receipt per step, in its PR or issue. A timeout is incomplete evidence. A
 change that adds or changes a mathematical law lands with its Lean counterpart, or names the

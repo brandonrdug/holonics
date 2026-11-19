@@ -69,9 +69,10 @@ one-sided and lower forms), and at the tempered value `μ = 2√q` of `walkCount
 
 * No converse of mixing: that a complex whose contacts mix within `μ√(|S||T|)` has its modes
   within a multiple of `μ` (Bilu and Linial) is not proved.
-* No Alon–Boppana limit: the floor here is the trace's, `μ² ≥ (q + 1)(n − q − 1)/(n − 1)`, which
-  tends to `q + 1`, not to `4q`.  The limit `2√q − o(1)` for the second mode needs walks on the
-  covering tree and is not formalized.
+* No Alon–Boppana limit here: the floor here is the trace's, `μ² ≥ (q + 1)(n − q − 1)/(n − 1)`,
+  which tends to `q + 1`, not to `4q`.  The floor at `2√q` from walks on the covering tree is
+  `Landmarks/TreeWalkFloor` (`alon_boppana`: below `μ² < 4q`, every large enough complex has a
+  mode other than the count past `μ`).
 * No hard side of Cheeger: only the bound of the boundary from below by the gap.
 * The bridge asks `λ² ≤ μ²` of every mode but one, so a second component (another mode at `q + 1`)
   or two sides (a mode at `−(q + 1)`) put `μ ≥ q + 1` and the statements, though true, say little.
