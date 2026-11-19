@@ -70,7 +70,8 @@ no farther place in.
   the frontier without one; its arm beside the line is G-1118-16.
 
 **What is owed, in order.** A part judged by the sure share at the settled places (§21), which is what her words follow, as an
-arm beside the line (a fourth doubling of the circles is the fallback: about 0.010 at its taper for 80 ms more a section). The Codex
+arm beside the line: its form is §23, rows at the residue the circles compose (the composite's remainder of §13 at a located
+address) (a fourth doubling of the circles is the fallback: about 0.010 at its taper for 80 ms more a section). The Codex
 thread's section-choice test on the host (G-1118-18). The composite's rows
 at located addresses (§13) as an arm. A writer that keeps the known stream's states.
 
