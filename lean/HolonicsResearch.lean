@@ -1428,3 +1428,6 @@ import HolonicsResearch.Compression.WideFaceReading
 import HolonicsResearch.HNN.TargetFaceDescent
 import HolonicsResearch.Compression.Landmark.FlooredSwitching
 import HolonicsResearch.HNN.PairDepositStep
+import HolonicsResearch.Compression.Landmark.SpanSuffix
+import HolonicsResearch.Holon.ReactionProjection
+import HolonicsResearch.Mathematics.ConstantNavigators

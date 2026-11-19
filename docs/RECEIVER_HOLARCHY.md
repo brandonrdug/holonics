@@ -319,6 +319,12 @@ clock's sentence counter (`boundary`), and the copy stage with its located span 
 - [definition] **The planned incidence and the present retention** (a request's relation planned
   before its target part, a port's run held in its aeon) were the admitted receivers' plumbing and
   leave with them. Dataset roles stay exterior codec information (the notebook's `exterior.rs`).
+- [proved-derived; formal-checked] **The located span** (`context::spans`), as mathematics: a part's
+  address on a span is its longest recurring suffix followed by a cell, the latest among the
+  longest; it continues one cell at a time while the next cell is the span's, and the part's last
+  `|span| − 1` cells are a future-sufficient state for every later address (Lean
+  `Compression/Landmark/SpanSuffix.{located_eq_some_iff, located_concat_of_continues,
+  future_equivalent, read_eq}`). The copy stage that consumed it stays retired.
 
 The atlas keeps each expression with its history owner (`receiver.population-*`,
 `context.span-located`, `receiver.native-standing-checkpoint`, `receiver.text-boundary-square`).
