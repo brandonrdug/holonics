@@ -55,8 +55,10 @@ target `T` with its lifts `θ` is the observed Holon. Convention as in `Objects/
    `2πiℤ`); this supplies the differentiability hypothesis of `Ratio.lift_deriv_eq_logDeriv`,
    whose value it agrees with (`continuous_lift_deriv_agrees`).
 
-[open] Lifts over higher-dimensional parameter domains (needing simple connectivity of the domain
-and returning the monodromy otherwise), and a piecewise-`C¹` integral formula
+Lifts over a convex parameter domain in a normed space, unique up to one whole turn and carrying
+`R⁻¹DR` in every direction at once, stand in `HolonicsResearch/HNN/AnchorGradient`
+(`continuous_lift_anchor_space`). [open] Lifts over other simply connected domains, the monodromy
+where the domain is not simply connected, and a piecewise-`C¹` integral formula
 `L(t) = L(a) + ∫ R'/R`, are not proved here.
 
 No `sorry`, no `axiom`, no `native_decide`; the audit block prints the axioms.

@@ -1449,3 +1449,6 @@ import HolonicsResearch.Physics.HarperChain
 import HolonicsResearch.Objects.ContinuousCrossing
 import HolonicsResearch.Physics.Spacetime.FriedmannFluid
 import HolonicsResearch.Foundation.CantorStringSpectrum
+import HolonicsResearch.Geometry.CayleyTurnClock
+import HolonicsResearch.HNN.AnchorGradient
+import HolonicsResearch.Zeta.MellinPlancherel

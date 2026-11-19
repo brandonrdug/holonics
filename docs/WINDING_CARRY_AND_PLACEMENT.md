@@ -49,7 +49,9 @@ with that material, while the state retains the winding: the torus chart of the 
 `RationalPhase { parameter, extra_turns }` retains a rational Cayley circle point and extra turns
 per passage: `parameter` is a tangent half-angle, not a turn count or rational angular rate.
 Its `chart_winding`/`lifted_winding` require a separately checked finite closure. A rational
-Cayley point need not close at any finite period. `winding::Odometer` is the mixed-radix cascade
+Cayley point closes at a positive period only at `q ∈ {0, ±1}`, by Niven's values; every other
+rational parameter never closes (`HolonicsResearch/Geometry/CayleyTurnClock`, which states the
+checked lifted winding and the joint closure at the least common multiple). `winding::Odometer` is the mixed-radix cascade
 for declared finite levels; a nonclosing phase retains its rational transport or enclosure and
 unreduced lift instead of acquiring an invented radix. `Foundation/IwasawaTower` owns the
 compatible-section tower over a prime and `Geometry/PlaceLedger` the product over places. A screw dislocation is the same
