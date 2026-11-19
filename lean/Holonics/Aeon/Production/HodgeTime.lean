@@ -56,10 +56,12 @@ The existing Hodge owner splits every time form uniquely (`TimeSplit`, from
   which bounds the face.
 
 [agent-inferred; not formalized] The record reads an aeon as relatively complete for a clock
-exactly when that clock reads exactly on it. That reading is not stated here.
+exactly when that clock reads without remainder on it. That reading is not stated here.
 
-Scope: finite complexes over `ℚ` with declared positive weights. The smooth Hodge theorem and the
-continuum clock forms of the record are outside this module. No `axiom`, no `sorry`.
+Scope: finite complexes over `ℚ` with declared positive weights. The continuum clock forms (the
+circle and the flat torus, the split at a declared Fourier width, Green on a rectangle) are
+`HolonicsResearch/Aeon/Production/ContinuumHodgeTime`'s; the smooth Hodge theorem for every form
+is outside both. No `axiom`, no `sorry`.
 -/
 
 noncomputable section
