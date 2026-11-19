@@ -3,7 +3,7 @@ import Holonics.Holon.Dirac
 import Holonics.Objects.Membrane
 
 /-!
-# Holon.Restriction: morphisms, the scale square and exact Kron reduction
+# Holon.Restriction: morphisms, the scale square and Kron reduction
 
 [definition] The restriction facet `π`. A port map `P` pushes flows forward and pulls efforts
 back (`pushforward`); a **morphism** lands the pushed structure inside the target one
@@ -16,7 +16,7 @@ effort-negated source (`pushforwardD_isDirac`, `mem_pushforwardD`; witness: the 
 along a projection gives the passive coholon, `gyrator_projection_witness`); a scale square `π A_fine = A_coarse π` propagates to every horizon
 (`scale_square_pow`); the shift read on one coordinate has defect `1` for every coarse generator
 (`shift_has_no_coarse_generator`) while a diagonal generator closes exactly (`diagonal_square`).
-Kron/Schur elimination of a network's interior is an exact restriction: interior-balanced states
+Kron/Schur elimination of a network's interior is a restriction that preserves power: interior-balanced states
 have boundary bonds on the graph of `Λ_DN` with the full power preserved, and every boundary value
 extends (`kron_exact`, composing `Objects/Membrane`); witness the series path
 (`MembraneJoin.series_path_dtn`). The pointwise square is the operator defect read at a state
@@ -136,7 +136,7 @@ theorem affineFibre_mem (A : Matrix κ ι 𝕜) (particular : ι → 𝕜) (radi
 
 end AffineFibre
 
-/-! ## 3. Kron/Schur elimination is an exact restriction with reading `Λ_DN` -/
+/-! ## 3. Kron/Schur elimination is a power-preserving restriction with reading `Λ_DN` -/
 
 section Kron
 
@@ -151,7 +151,7 @@ def boundaryBond (L : Matrix (I ⊕ B) (I ⊕ B) K) (u : I ⊕ B → K) : Bond K
   ((L *ᵥ u) ∘ Sum.inr, u ∘ Sum.inr)
 
 omit [DecidableEq B] in
-/-- [proved-derived; formal-checked] **Kron reduction is exact.** For every interior-balanced
+/-- [proved-derived; formal-checked] **Kron reduction preserves power.** For every interior-balanced
 state the boundary bond lies on the graph of `Λ_DN` (`MembraneJoin.interior_elimination`), the
 boundary power equals the network's full power `⟨u, L u⟩` (`MembraneJoin.energy_on_boundary`), and
 every boundary potential has an interior-balanced extension. -/

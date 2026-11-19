@@ -187,8 +187,10 @@ square through ordered words without enumerating histories.
 [established-bounded; source-inspected] The
 [clocked torus](../research/records/2026-09-08_CLOCKED_TORUS_CURRENTS_CONTINUE_THROUGH_A_RETAINED_FIBRE.md)
 shows derived grain: four cut and two face coordinates give `j=Jq+Dz+r`, `Cr=Dᵀr=0`; the grain
-six is the rank of `[J D]`, and the active Gram modes `3` and `5` are the eigenvalues of
-`DᵀD=[[4,1],[1,4]]`. It prescribes neither six universal channels nor a byte-derived grain. [proved-derived] A
+six is the rank of `[J D]`, and the active Gram modes `(1,1)` and `(1,−1)` of
+`DᵀD=[[4,1],[1,4]]` carry its eigenvalues `5` and `3`; the retention's dimension is the count of
+active Gram modes (`HolonicsResearch/Compression/FaceMapPower`, `retention_dim_eq_card_active_gram_modes`,
+`ClockedTorus.gram_modes`). It prescribes neither six universal channels nor a byte-derived grain. [proved-derived] A
 participating receiver reads `y=ρ(x_S,x_R,t)`, so `ẏ=D_Sρ F_S+D_Rρ F_R+∂_tρ`.
 
 ### Holonic Encoding
@@ -1049,7 +1051,8 @@ owns the law. The prototype's
 [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)
 constructed a rational finite factorization, transported its signed current columns and tested action
 closure, or returned the source-null separator. It is retired: Lean `Compression/Core/FaceMap`
-owns the face map's kernel and its quotient, and no HNN execution consumes it; a loaded ring's
+owns the face map's kernel and its quotient, Lean `Compression/KernelModes` states the factorization,
+the closure test and its separator, and no HNN execution consumes it; a loaded ring's
 future quotient is Lean `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
 
 [definition] Convolution shares the transport kernel by relative position; sparse graph transport
@@ -1256,7 +1259,9 @@ period lift reads the admitted future, one chart for every phase releases at mos
 family's kernel, the descended ring returns the same wave, the release stores nothing, the learning
 covector factors through the chart exactly when each gain family's variation vanishes on the
 release, and the descended block keeps the full ring's balance. Lean `HNN/ModeQuotient` owns those
-laws. Its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was retired at U2: the state it
+laws, and Lean `HNN/ModeQuotientRing` reads them on the ring itself: the four maps are the blocks
+of `HNN/LoadedRing`'s tick, the quotient's run is the ring's word, and a release lies in
+`ker K_t × ker C` at every phase. Its Rust realization (`hnn::modes`, at commit `1bdacc8f`) was retired at U2: the state it
 quotients leaves at every word's end, so the aeon's retention contract
 ([objects §8](ELEMENTARY_OBJECTS.md#the-retention-contract)) has nothing of it to collapse, and it
 had no library caller. It returns with a consumer when the wave and resonator states persist between

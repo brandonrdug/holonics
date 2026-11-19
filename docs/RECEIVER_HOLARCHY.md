@@ -620,7 +620,9 @@ receiver's material response and their encoding consumers remain owed.
 [established-bounded; implemented-exact; history] **The retired optical control.** The retired [`geometry::projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) exposed
 `project_receiver_point_rate` for its four projections and `project_point_with_motion` through the
 declared source→receiver route. The latter computes `p_R=Lp+b`, `ṗ_R=Lṗ+L̇p+ḃ`, then the actual
-projection derivative. The chart rates are supplied kinematic operands; two frame snapshots alone
+projection derivative. Lean `Geometry/FrameRoutes` states the four projections' rates, their refusal
+at the focal plane and the pole plane, and transport along a declared route, route-independent
+exactly where every closed route carries no holonomy. The chart rates are supplied kinematic operands; two frame snapshots alone
 do not determine them. The receiver object there is a spatial chart; the full participating
 material and current belong to its containing construction.
 

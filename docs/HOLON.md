@@ -195,7 +195,7 @@ reusable generating law; keeping a copy of its latest produced word is not what 
 that later reading. For example, `ρ(x,h)=x` and `T_u(x,h)=(x+u h,h)` give the same present face
 for `(0,1)` and `(0,-1)`, but different faces after `u=1`. This is the existing
 [future-agreement/standing law](../lean/Holonics/Foundation/Standing.lean),
-with executable separators in history ([`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)).
+with executable separators in history ([`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)); Lean `Compression/KernelModes` states both separators (`closes_xor_separates`, `lift_xor_obstruction`).
 
 [definition] Continuing compression retains `D E=ρ` and `E_next T_a=U_a E` for its declared
 action and receiver family. For state-dependent actions it also retains their domain/incidence:
@@ -287,7 +287,7 @@ operations on Holons, with familiar vector/tensor realizations where applicable.
 | Generate | \|X(τ)⟩=𝓤_(Θ,K)^(τ←τ₀)(\|Ξ⟩;h), then ⟨r\|b_H(X(τ))⟩; the whole field evolves | `holon::law::HolonLaw::advance`; Lean `Foundation/Holon.ofEvolution`; the field law is rebuild step 4 |
 | Recur / change scale | F^∘n(\|H⟩), or a recursive family H=union_i F_i(H); retain its scale maps and branch constraints | `holon::restriction` (scale square, tube, tower); Lean `Foundation/FractalPacking` |
 | Apply an analytic generator | exp(tA), phase exp(iθ), logarithmic scale and Gamma recurrence with their actual domains and remainders | `navigator::Clock` (Cayley step); the prototype's [`exact_analysis`](https://github.com/brandonrdug/holonics/tree/551d6c5d/crates/holonics/src/geometry/exact_analysis) |
-| Encode/reopen | \|ξ⟩=Ê\|H⟩; a decoder and residual reconstruct the requested field/face, with Ê_next T=U Ê | Lean `Physics/ReflectedBoundaryMemory`; the prototype's [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) and [`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), ported in rebuild step 3 |
+| Encode/reopen | \|ξ⟩=Ê\|H⟩; a decoder and residual reconstruct the requested field/face, with Ê_next T=U Ê | Lean `Physics/ReflectedBoundaryMemory`; the prototype's [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) and [`ContextualFactorization`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs), ported in rebuild step 3; their laws are Lean `Compression/KernelModes` |
 
 [established-bounded; implemented-exact] The prototype's factorized bilinear library
 ([`bilinear.rs`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs), retired in rebuild step 1) exposed `differential`,
@@ -377,12 +377,12 @@ retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/
 | Joint composition | Cartesian products introduce independent degrees of freedom; a diagonal shares one occurrence | `Holon.cartesian`, `diagonal`, `offDiagonal`; history [`JointBilinearSystem`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/joint_bilinear.rs) |
 | Identity and associativity | Identity does no transformation; associativity uses canonical reassociation of joined populations | addressed-span and relational composition |
 | Frame/parameter transport | Move interfaces, occurrence and reading through commuting maps; a rebase is invertible at its scope | `Holon.Rebase`, `CausalNaturalHolon`; `holonics::geometry` frame transport |
-| Geometry and incidence | Actual contact determines interaction; a projected crossing does not add an edge | `AddressedBoundary`; `holonics::geometry::complex`; history [`projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) crossings |
+| Geometry and incidence | Actual contact determines interaction; a projected crossing does not add an edge | `AddressedBoundary`; `holonics::geometry::complex`; Lean `Geometry/FrameRoutes`; history [`projection`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/projection.rs) crossings |
 | Constitutive response | Material relates arriving current, stored modes, geometry and outgoing field | `CoupledIncidence`, `PortEnergyHeat`; `holonics::holon::element` |
 | Differential and adjoint | Differentiate the transformation, including material/chart motion; compose its adjoints | `Holon/Law.pullback_law`; `HolonLaw::pullback`, bilinear `pullback` |
 | Recursion and generation | Evolve a field/family and read its generated boundary at any nested scope | `Holon.ofEvolution`; `HolonLaw::advance` |
 | Inference in rationals | Solve for coefficients, factors, modes or compatible realizations | preimage and factorization in rationals; `holonics::ratio::linear` |
-| Compression/refinement | `E_next T=U E`, `D E=ρ`, or an explicit transported error; retain newly relevant modes | `ReceiverHistoryCompression`, `ReflectedBoundaryMemory`; history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) |
+| Compression/refinement | `E_next T=U E`, `D E=ρ`, or an explicit transported error; retain newly relevant modes | `ReceiverHistoryCompression`, `ReflectedBoundaryMemory`, `Compression/KernelModes`; history [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs) |
 | Conservation/dissipation | A supplied law accounts for flux, storage and heat | `BoundaryHolon`, `Holon/Law`; `holonics::holon::law::EnergyBalance` |
 | Information and measure | Declared measures yield entropy/loss; oriented current precedes scalar readings | `InformationDifference`, `ReceiverCodeCost`; `holonics::ratio::surprisal` |
 | Scale and locality | Restriction/prolongation and boundary summaries relate grains and local clocks | `WorldTube`, `ContinuingTower`; `holonics::holon::restriction` |

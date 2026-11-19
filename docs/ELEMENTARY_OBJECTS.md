@@ -564,7 +564,10 @@ numeral, would join them ([record](../research/records/2026-09-25_THE_MUSIC_IS_I
   free: the diffusion is reversible exactly when that turn vanishes
   (`heat.linear-diffusion-turn-boost`).
 - **Einstein.** Free fall is the geodesic; two boosts leave a turn (`Physics/Spacetime/Wigner`); tidal
-  curvature and frame dragging are the Weyl tensor's strain and rotation parts.
+  curvature and frame dragging are the Weyl tensor's electric and magnetic parts, both symmetric and
+  traceless and so boosts: the tide strains a congruence and the magnetic part drives its rotation. A
+  congruence's own rate splits into expansion, shear and rotation, the strain focusing it and the
+  rotation resisting (`Physics/Spacetime/Raychaudhuri`).
 - **The quantum.** Unitary evolution is a turn and imaginary time a boost
   (`quantum.evolution-kinds`); the Wick rotation exchanges them; energy is a turn rate, `E = ħω`.
 - **Transcendentals are constraints.** A move is carried by its algebraic data; `e^(2πi) = 1` is the
@@ -864,7 +867,9 @@ refining the receiver removes completeness. Approximate recurrence is
 return's deadline, Kac's lemma for an ergodic motion) with Dirichlet's bound for one clock; a torus of several clocks is not stated
 there. `Objects/Membrane` joins `β` to the membrane's faces (`membraneFace_gauge`,
 `linearGlobe_boundary_is_membrane_face`) and eliminates an interior as `Λ_DN` (`interior_elimination`,
-`solves_boundary_is_dtn`); `Λ_DN` read along a tube's stations and a tower's levels is owed in #410.
+`solves_boundary_is_dtn`); `HolonicsResearch/Holon/DtNTubeTower` reads `Λ_DN` along a tube's stations (staged
+elimination in any order, edges in series) and a tower's levels (restriction by elimination, power preserved), with
+Dirichlet's principle and Rayleigh's monotonicity (`staged_elimination`, `eliminationTower`, `dirichlet_principle`).
 
 [open] The **relative completeness theorem** is to be derived by pairing the Einstein lifts
 (`HolonicCurvedArcEinstein`, `Ricci`, `HolonicFieldTheoryPassage`, `CurvatureAndGap`) with the

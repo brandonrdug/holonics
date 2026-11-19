@@ -17,7 +17,7 @@ it and executes the exogenous step at its certified chart (§3):
 
 ```text
 face        p_c = 2^(f_c) / Σ_d 2^(f_d) > 0 for every finite f      (no finite f is one-hot)
-margin      (2^m + |A| − 1)^(L_R) ≤ 2^(m L_R + 1)  ⟺  −log₂ p_t ≤ 1/L_R      (exact integers)
+margin      (2^m + |A| − 1)^(L_R) ≤ 2^(m L_R + 1)  ⟺  −log₂ p_t ≤ 1/L_R      (in integers)
 statistic   H' = H + F ,  B' = B + T ,  F = Σ w f fᵀ ,  T = Σ w χ_R(T) fᵀ
 exogenous   B' H'⁻¹ = W + (T − W F) H'⁻¹ ,   W H = B
 chart       W' = W + (T − W F) X̂ ,  W' H' − B' = −(T − W F)(1 − X̂ H')
@@ -52,17 +52,20 @@ an exterior target. It is kept, unrenamed, for the internal loci.
    `HNN/LatticeWord`'s `rowNorm`): the executed chart step leaves exactly the chart's left
    residual. `exogenousDeposit_solves`: the receiving locus's deposit on what reached it is solved.
    `prior_weight_identity`, `prior_decay_fixed_target`, `prior_weight_eigen`: the prior's weight
-   is `W_0 H_0 H_n⁻¹`; under a fixed exact target it is the whole deviation; at `H_0 = 1` it is
+   is `W_0 H_0 H_n⁻¹`; under a target one map reproduces it is the whole deviation; at `H_0 = 1` it is
    `1/(1 + λ)` along an eigen-direction of eigenvalue `λ ≥ 0`.
    `normal_statistic_future_sufficient`: the next map is a function of `(H, B)` and what reaches
    the locus, and `W` alone is not sufficient (`W = 0`, `B = 0`, `H = 1` versus `H = 2`, one
    sample `f = y = 1`: `1/2` versus `1/3`).
 
-[open] Descent of the scored cross-entropy face is **not** claimed. The quadratic objective this
-law minimizes is the squared additive-chart log ratio against the declared code face, named as
-such. A descent statement needs a relation between `χ_R(T) − W f` and the reached covector
-`q − p̃`, which no law here provides; the exposure's exact ordering of code lengths decides the
-repair (Decision 26). Owed in #62 ("Step 4 (#73) owed").
+Descent of the scored cross-entropy face is not claimed here. The quadratic objective this law
+minimizes is the squared additive-chart log ratio against the declared code face, named as such.
+The relation between `χ_R(T) − W f` and the reached covector `q − p̃` is stated in
+`HolonicsResearch/HNN/TargetFaceDescent` (#410): the pairing is the margin's shortfall weighed by
+the face, one reached sample's exogenous step descends the scored face whenever the face codes the
+target in more than one grain, and a window's step can rise at first order. Decision 27 of the same
+record retired this law's exogenous target in campaign 1 (the count face holds the marginal); the
+statements stand as stated.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -155,7 +158,7 @@ def codeFace {Index 𝕜 : Type*} [DecidableEq Index] [AddMonoidWithOne 𝕜] (m
     Index → 𝕜 :=
   Pi.single t (m : 𝕜)
 
-/-- [definition] **The margin law** in exact integers: `(2^m + (|A| − 1))^L ≤ 2^(m L + 1)`. At
+/-- [definition] **The margin law** in integers: `(2^m + (|A| − 1))^L ≤ 2^(m L + 1)`. At
 `L = L_R` it says the code face with margin `m` codes the target within one grain,
 `−log₂ p_t ≤ 1/L_R` (`margin_rule_codeLength`). -/
 def MarginCodes (A L m : ℕ) : Prop := (2 ^ m + (A - 1)) ^ L ≤ 2 ^ (m * L + 1)
@@ -372,7 +375,7 @@ theorem exogenous_normal_step {W : Matrix τ σ 𝕜} {H : Matrix σ σ 𝕜} {B
   · rw [← h1, ← h, Matrix.mul_nonsing_inv_cancel_right _ _ hunit]
   · rw [h, ← h1, Matrix.mul_assoc, Matrix.nonsing_inv_mul _ hunit, Matrix.mul_one]
 
-/-- [proved-derived; formal-checked] **The exogenous step at a chart keeps an exact receipt.** At a
+/-- [proved-derived; formal-checked] **The exogenous step at a chart keeps its receipt.** At a
 solved locus `W H = B`, the step executed through any chart `X̂` of `H'⁻¹`,
 `W' = W + (T − W F) X̂`, leaves `W' H' − B' = −(T − W F)(1 − X̂ H')`: the chart's left residual
 (`HNN/LatticeWord`, Decision 24), released and reported with the deposit. -/
@@ -386,7 +389,7 @@ theorem exogenous_chart_residual {W : Matrix τ σ 𝕜} {H : Matrix σ σ 𝕜}
   abel
 
 /-- [proved-derived; formal-checked] **The exogenous step's certificate** over `ℚ`:
-`‖W'H' − B'‖∞ ≤ ‖T − W F‖∞ · ‖1 − X̂H'‖∞`, in `HNN/LatticeWord`'s exact `rowNorm`. -/
+`‖W'H' − B'‖∞ ≤ ‖T − W F‖∞ · ‖1 − X̂H'‖∞`, in `HNN/LatticeWord`'s `rowNorm` over `ℚ`. -/
 theorem exogenous_chart_certificate [Fintype τ] {W : Matrix τ σ ℚ} {H : Matrix σ σ ℚ}
     {B : Matrix τ σ ℚ} (hsolve : W * H = B) (F : Matrix σ σ ℚ) (T : Matrix τ σ ℚ)
     (Xh : Matrix σ σ ℚ) :
@@ -412,7 +415,7 @@ def targetWindow (m : ℕ) (data : List (𝕜 × (σ → 𝕜) × τ)) [Decidabl
   data.map fun d => (d.1, d.2.1, codeFace m d.2.2)
 
 /-- [definition] **The receiving locus's exogenous deposit**: the statistic sums over what reached
-it, `(H, B) ← (H + F, B + T)`, and the map is the exogenous step at the exact inverse. The executed
+it, `(H, B) ← (H + F, B + T)`, and the map is the exogenous step at the inverse. The executed
 form replaces `(H + F)⁻¹` by the certified chart (`exogenous_chart_residual`). -/
 def exogenousDeposit (θ : LocusState 𝕜 σ τ) (data : Window 𝕜 σ τ) : LocusState 𝕜 σ τ where
   map := exogenousStep θ.map (windowGram data) (windowCovector data)
@@ -442,8 +445,8 @@ theorem prior_weight_identity {W0 : Matrix τ σ 𝕜} {H0 : Matrix σ σ 𝕜} 
         (Matrix.mul_nonsing_inv_cancel_right _ _ hunit).symm
     _ = _ := by rw [hn, h0, Matrix.add_mul]
 
-/-- [proved-derived; formal-checked] **Under a fixed exact target the prior is the whole
-deviation.** If every reached comparison is coded by one map, `T_n = W_* F_n`, then
+/-- [proved-derived; formal-checked] **Under a target one map reproduces the prior is the
+whole deviation.** If every reached comparison is coded by one map, `T_n = W_* F_n`, then
 `W_n − W_* = (W_0 − W_*) H_0 H_n⁻¹`: the solved map leaves `W_*` only by the prior's weight. -/
 theorem prior_decay_fixed_target {W0 : Matrix τ σ 𝕜} {H0 : Matrix σ σ 𝕜}
     {B0 Wn Wstar : Matrix τ σ 𝕜} {Fn : Matrix σ σ 𝕜} (h0 : B0 = W0 * H0)
@@ -460,7 +463,7 @@ declared prior Gram `H_0 = 1`, let `v` be an eigenvector of the reached Gram, `F
 `λ ≥ 0`, and `H_n = 1 + F_n` invertible. Then:
 * `H_n⁻¹ v = (1 + λ)⁻¹ v`;
 * the prior's term reads `(W_0 H_0 H_n⁻¹) v = (1 + λ)⁻¹ W_0 v`;
-* under a fixed exact target `T_n = W_* F_n`, `(W_n − W_*) v = (1 + λ)⁻¹ (W_0 − W_*) v`.
+* under a target one map reproduces, `T_n = W_* F_n`, `(W_n − W_*) v = (1 + λ)⁻¹ (W_0 − W_*) v`.
 
 So the prior's weight in that direction is exactly `1/(1 + λ)`; fourfold growth of that
 direction's Gram contribution makes it `1/(1 + 4λ)`. Growth of the total feature energy alone
