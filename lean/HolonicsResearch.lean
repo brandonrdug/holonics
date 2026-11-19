@@ -1302,6 +1302,16 @@ import HolonicsResearch.HNN.PhaseChart
 import HolonicsResearch.Aeon.Clock.ThreeDistance
 import HolonicsResearch.Aeon.Clock.SturmianComplexity
 import HolonicsResearch.Aeon.Production.Recurrence
+import HolonicsResearch.HNN.HeldDeposition
+import HolonicsResearch.HNN.MoveDirection
+import HolonicsResearch.HNN.OrderTemperature
+import HolonicsResearch.HNN.ThrowEnergy
+import HolonicsResearch.Zeta.ActualFractionalPartZetaSource
+import HolonicsResearch.Zeta.ActualFiniteBeurlingReceiver
+import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinDomain
+import HolonicsResearch.Zeta.ActualFiniteBeurlingMellinValue
+import HolonicsResearch.Zeta.ActualBeurlingTailEnergy
+import HolonicsResearch.Zeta.ActualBeurlingCompensatedTail
 import HolonicsResearch.Coupling.MovingMetricSpectral
 import HolonicsResearch.Holon.InertiaCount
 import HolonicsResearch.Zeta.FiniteLiCriterion
@@ -1334,3 +1344,6 @@ import HolonicsResearch.Holon.TorusMetricDimension
 import HolonicsResearch.Compression.HeldFaceOrder
 import HolonicsResearch.Compression.Landmark.ReleaseHealth
 import HolonicsResearch.HNN.HillFloquetKinds
+import HolonicsResearch.Hodge.TorusLefschetzTriple
+import HolonicsResearch.Landmarks.IharaCoverChebotarev
+import HolonicsResearch.Landmarks.TreeWalkFloor
