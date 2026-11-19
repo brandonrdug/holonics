@@ -1422,3 +1422,6 @@ import HolonicsResearch.Compression.FaceMapPower
 import HolonicsResearch.Physics.Spacetime.Raychaudhuri
 import HolonicsResearch.Mathematics.CirculantInertia
 import HolonicsResearch.Compression.KernelModes
+import HolonicsResearch.Geometry.FrameRoutes
+import HolonicsResearch.HNN.ModeQuotientRing
+import HolonicsResearch.Compression.WideFaceReading
