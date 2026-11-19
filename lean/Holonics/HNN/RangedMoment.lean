@@ -17,7 +17,8 @@ map on the declared alphabet's full `A^n`, not a restricted terrain family.
 
 One opening, no re-key, a fixed alphabet and closing source rings. A stopping ingest
 consumes a prefix: the count uses that prefix's length, never the requested suffix.
-Formal checking of this new leaf is pending in the implementation receipt.
+Across re-keys and aeons the count at `rate = period` bounds every run of cells and re-keys
+(`HolonicsResearch/HNN/RekeyedCapacity`).
 -/
 
 noncomputable section
