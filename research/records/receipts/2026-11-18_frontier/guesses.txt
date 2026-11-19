@@ -642,7 +642,7 @@ stretches and read on the odd ones, beside a scramble of the four octets before 
 G-1119-5 scored (2026-11-19T16:09:31Z). At the 4,482 settled places of the odd held stretches (of 44,781 places), her face gives the arriving symbol 0.907
 of its mass (code 0.208, sure at 0.821): (a) missed, over the 0.78 to 0.84 guessed: the ruler's settled places (a count of five whose
 face, with its escape to the 256 octets, holds under a quarter of a nat) are the five-place contexts met often in the first 8 MB, a
-stricter set than the excess ruler's back-off chain, and there she stands with the count (0.909 on the excess ruler's set). Rows at her
+stricter set than the excess ruler's back-off chain; there her mass is about the count of five's on the wider set (0.909), the count's own on this set not read. Rows at her
 read's direction take λ = 0 on the even stretches and add nothing (0.907): (b) held at its low end. The planted address takes λ = 0.02
 and reads 0.901, 0.006 under her face: (c) missed. By its rule rows of this budget (4,096 rows fitted on 768 thousand places) add
 nothing to her face at any address, and the next part is not a store of rows of this size.

@@ -846,7 +846,7 @@ reading does not test is the frontier's own read, the operand the face is linear
 *Written at 16:09 UTC, November 19.* The address §25 left, her own read at the frontier, read against her face
 (G-1119-5; `tools/read_rows_ruler.py`). At the places where a count of five, fitted on 8 MB, has met the five places before often enough
 to be sure (4,482 of the odd held stretches' 44,781 places) her face already gives the arriving symbol 0.907 of its mass and is sure
-at 82% of them, level with the count. Rows of 4,096 entries fitted on 768 thousand places add nothing there at any address: at her
+at 82% of them, about as much as the count of five gives on the excess ruler's wider set (0.909; its mass on this set is not read here). Rows of 4,096 entries fitted on 768 thousand places add nothing there at any address: at her
 read's direction and at a scramble the mix keeps none of them (λ = 0), and even the planted address, located by construction, costs
 0.006 (λ = 0.02). On their own those rows read 0.189, 0.160 and 0.607. So at the contexts a count meets often she has what the count
 has; what §21's spread found her short of (sure at 0.667 of the excess ruler's settled places, against the count's 0.921) stands at
