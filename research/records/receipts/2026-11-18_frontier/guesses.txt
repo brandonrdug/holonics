@@ -602,3 +602,18 @@ symbol 0.818 of its mass and L36 0.815, 0.003 more: held. (c) One place open: F3
 guessed). (d) 544 ms a section on the mean (the line's 382 to 384): held. (e) The wide panel: F36 1,485 of 2,146 (69%) against L36's
 1,511 of 2,175 (69%): held. The rule: under 0.010 at the second lap and the gap widened by 0.0028 (under 0.003), so the 1024 circles
 leave and the line continues from L36 with 512.
+
+G-1119-4 (2026-11-19T15:22:40Z). The premise read of §23 (a ruler, no lap): rows at the residue the circles compose, against a scramble at equal rows.
+`read-strand-states ... past carries` at lap L36's mean on 3,000 windows of 256 octets of the training documents past their first 8 MB
+(fitting half) and 1,000 of the held documents (reading half); `tools/residue_rows_ruler.py` with 4 rings of periods 1009 to 1021
+(4,062 rows) on written circles spread over the 512, read at the settled places (a count of five on the first 8 MB expects under a
+quarter of a nat) and over all places.
+  What is on record. §14: rows shared by a scramble on three rings read 1.890 at the books' interior with 4,000 rows a length against
+  1.125 for two places before alone, so a scramble's shared rows cost more than they give at that budget. The line's circles hold
+  products of the places before in their order at strides deposited by the line (§19, §22).
+  The guess. (a) The planted address (each four octets' most met continuation) gives the arriving symbol 0.03 or more more mass at the
+  settled places than the scramble (the instrument tells a located address from a scramble). (b) The circles' residue gives it between
+  0.50 and 0.62 of its mass there, where two places alone give 0.45 to 0.52 and the scramble 0.55 to 0.70.
+  What it decides. The circles' residue at or over the scramble's mass at the settled places: the premise holds and the part is built
+  at that address. Between two places alone and the scramble: the residue locates in part, and a joint address of more circles is read
+  before the build. At or under two places alone: the circles' phase is no located address, and §23's form changes.
