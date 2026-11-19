@@ -1386,3 +1386,26 @@ The first lap of two streams and the second known-stream lap's last reads (writt
 # 19:15 UTC November 19. Her composition on the wide panel (word pairs and triples of her writes, each in a slice's first 16 MB of training text): L17 pairs 1,513 attested 0.17, triples 1,126 attested 0.02; L41 pairs 1,540 attested 0.33, triples 1,147 attested 0.09; the reference continuations' first 96 octets pairs 155 attested 0.55, triples 110 attested 0.36. Her words split (L41): 0.31 in its own prompt, 0.45 other lexicon words, 0.24 not words (L17: 0.24, 0.33, 0.43; the references 0.39, 0.46, 0.15).
 
 # 19:15 UTC November 19. A probe of patterned prompts (front/pattern/pattern.sh; Brandon 19:00 UTC; 12 prompts drawn 8 times, 32 places; L17 and L42): the writes that begin with the reference continuation, of 8 a prompt: L17 brackets 3, repeat 1, every other 0; L42 sums 1, every other 0. The format of each pattern holds (numbers in commas, lists of pairs, 'a + b = c' lines) and its rule does not.
+
+# 20:12 UTC November 19. The board ceiling at 14.5 GiB (ceiling/ceiling.sh) and the carry gate in 32 bits (pgam/pgam.sh), each entered by 24 sections of lap L43 from L42's end against the lap's own log and parity on 3 sections, then timed in one hold of the card lock (a warm-up of 20 sections, then 60 sections a run, control, build, build, control, control, build, build, control):
+  CEILING_REPRO 19:45:28 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15373238272 total=16769024000 batch_budget=13099728896
+  CEILING_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+  CEILING_TIME run=1 build=OLD sections=60 ms_mean=470.0 batches=180 peak_store=8609741192
+  CEILING_TIME run=2 build=NEW sections=60 ms_mean=461.4 batches=180 peak_store=10758087224
+  CEILING_TIME run=3 build=NEW sections=60 ms_mean=460.8 batches=180 peak_store=10758087224
+  CEILING_TIME run=4 build=OLD sections=60 ms_mean=463.9 batches=180 peak_store=8609741192
+  CEILING_TIME run=5 build=OLD sections=60 ms_mean=461.1 batches=180 peak_store=8609741192
+  CEILING_TIME run=6 build=NEW sections=60 ms_mean=459.2 batches=180 peak_store=10754765848
+  CEILING_TIME run=7 build=NEW sections=60 ms_mean=465.6 batches=180 peak_store=10754765848
+  CEILING_TIME run=8 build=OLD sections=60 ms_mean=461.2 batches=180 peak_store=8609741192
+  PGAM_REPRO 20:06:54 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15720710144 total=16769024000 batch_budget=13447200768
+  PGAM_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+  PGAM_TIME run=1 build=OLD sections=60 ms_mean=463.0 batches=180 peak_store=10754765848
+  PGAM_TIME run=2 build=NEW sections=60 ms_mean=457.4 batches=180 peak_store=10754765848
+  PGAM_TIME run=3 build=NEW sections=60 ms_mean=457.2 batches=180 peak_store=10754765848
+  PGAM_TIME run=4 build=OLD sections=60 ms_mean=459.6 batches=180 peak_store=10754765848
+  PGAM_TIME run=5 build=OLD sections=60 ms_mean=468.9 batches=180 peak_store=10754765848
+  PGAM_TIME run=6 build=NEW sections=60 ms_mean=467.1 batches=180 peak_store=10754765848
+  PGAM_TIME run=7 build=NEW sections=60 ms_mean=466.8 batches=180 peak_store=10754765848
+  PGAM_TIME run=8 build=OLD sections=60 ms_mean=474.9 batches=180 peak_store=10758087224
+  read: the ceiling 461.8 ms a section on the mean of its four runs against the control's 464.1 (spread 461.1 to 470.0); the carry gate in 32 bits 462.1 against 466.6 (spread 459.6 to 474.9): neither difference stands outside its control's spread. A section stays three batches under either budget.
