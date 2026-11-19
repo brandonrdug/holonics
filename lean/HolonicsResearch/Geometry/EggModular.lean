@@ -46,7 +46,8 @@ displacement `w` carries the Legendre parameter `λ = ((a − w)/(a + w))²`; wi
 [open] Mathlib has no complete elliptic integral `K`, so the analytic join
 `K(√λ) = (π/2) ₂F₁(½, ½; 1; λ)` (the termwise integration of the binomial series) is stated here
 only term by term. The Schwarz map of the `(½, ⅓, 0)` triangle whose inverse is `1728/j` and the
-identification of its monodromy with `PSL(2, ℤ)` remain named analytic obligations in #62.
+identification of its monodromy with `PSL(2, ℤ)` remain named analytic obligations in #410 (its box on
+monodromy as a group of moves); the group itself, `PSL(2, ℤ) ≅ ℤ/2 ∗ ℤ/3`, is `Geometry/ModularFreeProduct`.
 -/
 
 namespace Holonics.Geometry.EggModular

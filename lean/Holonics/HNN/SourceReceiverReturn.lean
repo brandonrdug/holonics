@@ -6,7 +6,7 @@ import Mathlib.LinearAlgebra.Dual.Defs
 /-!
 # SourceReceiverReturn: a received covector reaches the actual source opening
 
-Refs #62, #73. [agent-inferred; kernel-check pending]
+Refs #62, #73. [agent-inferred]
 
 `TickFamily.sweepAt_pairing` already owns the tick-indexed paired return. The missing consumer
 was the entire boundary chain: source injection, the ordered producing word, the receiving
@@ -31,7 +31,8 @@ failures avoided: dropping the phase/clock in a new consumer; retaining an autho
 using an independently varied pair endpoint; assuming unseen truth from a model's constant
 face; using a static pump tick or resetting the entered interior.
 
-No axiom, sorry or native_decide. No compiler or scientific job was launched by this owner.
+No axiom, sorry or native_decide. The foundation's build checks this owner since November 18
+(`Holonics/HNN.lean` imports it).
 -/
 
 noncomputable section

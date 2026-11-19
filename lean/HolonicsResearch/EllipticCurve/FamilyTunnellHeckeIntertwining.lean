@@ -35,6 +35,7 @@ namespace Holonics.EllipticCurve.FamilyTunnellHeckeIntertwining
 open NumberTheorySymbols
 open Holonics.EllipticCurve.FamilyTunnellShimuraLift
 open Holonics.EllipticCurve.FamilyTunnellThetaCarrier
+open Holonics.EllipticCurve.TernaryReducedCount
 
 /-! ## 1. The actual weight-three-halves prime operator -/
 
@@ -288,16 +289,33 @@ def tunnellHalfIntegralHeckeDefect (p n : ℕ) : ℚ :=
     (Holonics.EllipticCurve.HeckeTheta.heckeCoeff p : ℚ) *
       normalizedTunnellCoefficient n
 
+/-- The Hecke eigenvalue at the first inert prime is zero. -/
+theorem heckeCoeff_three : Holonics.EllipticCurve.HeckeTheta.heckeCoeff 3 = 0 := by
+  decide
+
+/-- The Hecke eigenvalue at the first split prime is `−2`. -/
+theorem heckeCoeff_five : Holonics.EllipticCurve.HeckeTheta.heckeCoeff 5 = -2 := by
+  decide
+
 /-- The exact source law is verified at the first odd prime across a nontrivial
-square-orbit aperture. -/
+square-orbit aperture.  The source's values at `1, 9, 81, 729` are read by the kernel in
+`TernaryReducedCount`; the Jacobi symbols by `norm_num`. -/
 theorem tunnellHalfIntegralHeckeDefect_three_first_orbit :
     ∀ n ∈ ({1, 9, 81} : Finset ℕ), tunnellHalfIntegralHeckeDefect 3 n = 0 := by
-  native_decide
+  simp only [Finset.mem_insert, Finset.mem_singleton, forall_eq_or_imp, forall_eq]
+  refine ⟨?_, ?_, ?_⟩ <;>
+    norm_num [tunnellHalfIntegralHeckeDefect, halfIntegralHeckeCoefficient,
+      exactQuotientCoefficient, normalizedTunnellCoefficient, heckeCoeff_three,
+      fullTunnell_at_small_squares, fullTunnell_at_81, fullTunnell_at_729]
 
-/-- The same source law at the first split prime. -/
+/-- The same source law at the first split prime, through `5⁶ = 15625`. -/
 theorem tunnellHalfIntegralHeckeDefect_five_first_orbit :
     ∀ n ∈ ({1, 25, 625} : Finset ℕ), tunnellHalfIntegralHeckeDefect 5 n = 0 := by
-  native_decide
+  simp only [Finset.mem_insert, Finset.mem_singleton, forall_eq_or_imp, forall_eq]
+  refine ⟨?_, ?_, ?_⟩ <;>
+    norm_num [tunnellHalfIntegralHeckeDefect, halfIntegralHeckeCoefficient,
+      exactQuotientCoefficient, normalizedTunnellCoefficient, heckeCoeff_five,
+      fullTunnell_at_small_squares, fullTunnell_at_625, fullTunnell_at_15625]
 
 #print axioms localShimuraCurrent_succ
 #print axioms localShimuraCurrent_one_eq

@@ -1,4 +1,5 @@
 import HolonicsResearch.EllipticCurve.FamilyTunnellThetaCarrier
+import HolonicsResearch.EllipticCurve.TernaryReducedCount
 import HolonicsResearch.EllipticCurve.HeckeWitness
 import Mathlib.NumberTheory.LegendreSymbol.JacobiSymbol
 import Mathlib.NumberTheory.Divisors
@@ -29,6 +30,7 @@ namespace Holonics.EllipticCurve.FamilyTunnellShimuraLift
 open NumberTheorySymbols
 open Holonics.EllipticCurve.FamilyThetaWaldspurgerBridge
 open Holonics.EllipticCurve.FamilyTunnellThetaCarrier
+open Holonics.EllipticCurve.TernaryReducedCount
 
 /-! ## 1. The exact quadratic twist on divisor occurrences -/
 
@@ -109,9 +111,11 @@ theorem shimuraCoefficient_smul (c : ℚ) (source : ℕ → ℚ) (t m : ℕ) :
 def tunnellShimuraLift (t : ℕ) : PowerSeries ℚ :=
   shimuraLiftQExpansion normalizedTunnellCoefficient t
 
-/-- The coefficient at one of the integral Tunnell carrier is two. -/
+/-- The coefficient at one of the integral Tunnell carrier is two, read by the kernel through the
+reduced count of `TernaryReducedCount`. -/
 theorem tunnellThetaCoefficient_one : tunnellThetaCoefficient 1 = 2 := by
-  native_decide
+  rw [← fullTunnellThetaCoefficient_eq_tunnellThetaCoefficient_of_odd (by decide)]
+  exact fullTunnell_at_small_squares.1
 
 theorem fullTunnellThetaCoefficient_one : fullTunnellThetaCoefficient 1 = 2 := by
   rw [fullTunnellThetaCoefficient_eq_tunnellThetaCoefficient_of_odd (by decide),
@@ -155,10 +159,20 @@ theorem shimuraHeckeDifference_one : shimuraHeckeDifference 1 = 0 := by
 
 /-- The complete level-corrected source makes the two explicit coefficient systems
 agree through the weight-two level-32 Sturm aperture.  The uniform conclusion still
-requires the modularity and Sturm passage; this theorem is its exact finite input. -/
+requires the modularity and Sturm passage; this theorem is its exact finite input.  The source is
+read through `TernaryReducedCount.reducedFullTunnell` (the populations as double sums of square
+fibres), so the kernel checks the eight coefficients without `native_decide`. -/
 theorem shimuraHeckeDifference_zero_through_sturm_aperture :
     ∀ m ∈ Finset.Icc 1 8, shimuraHeckeCoefficientDifference m = 0 := by
-  native_decide
+  have hsrc : ∀ n, normalizedTunnellCoefficient n = (reducedFullTunnell n : ℚ) / 2 := fun n => by
+    rw [normalizedTunnellCoefficient, fullTunnellThetaCoefficient_eq_reduced]
+  have key : ∀ m ∈ Finset.Icc 1 8,
+      shimuraCoefficient (fun n => (reducedFullTunnell n : ℚ) / 2) 1 m -
+        (HeckeTheta.heckeCoeff m : ℚ) = 0 := by
+    decide +kernel
+  intro m hm
+  rw [shimuraHeckeCoefficientDifference, shimuraCoefficient_congr hsrc]
+  exact key m hm
 
 /-- Vanishing of the explicit difference at every coefficient is exactly equality of
 the constructed Shimura `q`-expansion with the rationalized Hecke coefficient series. -/
