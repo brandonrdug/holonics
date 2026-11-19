@@ -22,7 +22,10 @@ held to that line.
 
 A host instrument, in floats: nothing here enters a law, and neither reader is a part of the machine. Codes, masses, counts only.
 
-Usage: content_stride_ruler.py STORE CODEC SLICE TRAIN_OCTETS PASSES WINDOW KIND C[,C...] NAME=DIR [NAME=DIR ...] [-- LEXICON PANEL PLACES DRAWS]
+A size `C` may carry a letter: `Cz` opens every stride at zero, and `Cc` opens the strides within 0.06 of a turn at a modulus of
+0.39, where the line's own carry circles stand; both ask whether descent reaches the strides from there.
+
+Usage: content_stride_ruler.py STORE CODEC SLICE TRAIN_OCTETS PASSES WINDOW KIND C[z|c][,C...] NAME=DIR [NAME=DIR ...] [-- LEXICON PANEL PLACES DRAWS]
        content_stride_ruler.py planted"""
 import os, pickle, random, re, sys
 import numpy as np
@@ -43,13 +46,17 @@ def window_of(seq, at, n):
     return np.stack(cols, axis=1)
 
 class Reader:
-    def __init__(self, circles, strides, unigram, rng):
+    def __init__(self, circles, strides, unigram, rng, opening="drawn"):
         c = circles
         self.c, self.strides = c, strides
         rows = 257 if strides else 1
+        # The opening: strides drawn over the whole turn with ρ = 4/5 (`drawn`); every stride at zero with ρ = 4/5 (`zero`); or
+        # strides drawn within 0.06 of a turn with ρ = 0.39 (`closed`: where the line's own circles stand, the record's §17).
+        turn = {"drawn": 1.0, "zero": 0.0, "closed": 0.12}[opening]
+        rho0 = 0.39 if opening == "closed" else 0.8
         self.p = {
-            "theta": (2 * np.pi * rng.random((rows, c))).astype(np.float32),
-            "r": np.full((rows, c), np.log(4.0), dtype=np.float32),          # ρ = 4/5
+            "theta": (2 * np.pi * turn * (rng.random((rows, c)) - 0.5)).astype(np.float32),
+            "r": np.full((rows, c), np.log(rho0 / (1.0 - rho0)), dtype=np.float32),
             "br": (0.5 * rng.standard_normal((257, c))).astype(np.float32),
             "bi": (0.5 * rng.standard_normal((257, c))).astype(np.float32),
             "a": np.zeros((256, 2 * c), dtype=np.float32),
@@ -124,9 +131,9 @@ class Reader:
         r = np.abs(np.exp(1j * self.p["theta"][:256]).mean(axis=0))
         return float(rho[:256].mean()), float((np.sqrt(-2.0 * np.log(np.maximum(r, 1e-12))) / (2 * np.pi) * 1000.0).mean())
 
-def fit_reader(seq, circles, strides, passes, n, held_win, held_y, rng, rate=0.01):
+def fit_reader(seq, circles, strides, passes, n, held_win, held_y, rng, rate=0.01, opening="drawn"):
     counts = np.bincount(seq, minlength=256).astype(np.float64) + 1.0
-    reader = Reader(circles, strides, counts / counts.sum(), rng)
+    reader = Reader(circles, strides, counts / counts.sum(), rng, opening)
     trace = []
     for _ in range(passes):
         order = rng.permutation(np.arange(1, len(seq)))
@@ -170,7 +177,8 @@ def main():
         args = args[:args.index("--")]
     store, codec, name = args[0], args[1], args[2]
     train_n, passes, n, kind = int(args[3]), int(args[4]), int(args[5]), args[6]
-    sizes = [int(w) for w in args[7].split(",")]
+    # A size is a count of circles; `z` after it opens the strides at zero and `c` opens them closed (see `Reader`).
+    sizes = [(int(w.rstrip("zc")), {"z": "zero", "c": "closed"}.get(w[-1], "drawn")) for w in args[7].split(",")]
     reads = [a.split("=", 1) for a in args[8:]]
     head, used = open(codec).read().split("\n")[:2]
     void = int(head.split(" ")[2])
@@ -219,12 +227,12 @@ def main():
     seq = np.frombuffer(train, dtype=np.uint8).astype(np.int64)
     rng = np.random.default_rng(20261118)
     fitted = []
-    for c in sizes:
-        # The fixed advance is the control, read at the first size alone.
-        for label, strides in (("strides", True), ("fixed", False)) if c == sizes[0] else (("strides", True),):
-            reader, trace = fit_reader(seq, c, strides, passes, n, held_win, held_y, rng)
+    for c, opening in sizes:
+        # The fixed advance is the control, read at the first size alone (where that size opens drawn).
+        for label, strides in (("strides", True), ("fixed", False)) if (c, opening) == sizes[0] and opening == "drawn" else (("strides", True),):
+            reader, trace = fit_reader(seq, c, strides, passes, n, held_win, held_y, rng, opening=opening)
             rho, spread = reader.shape()
-            tag = f"{label}_{c}_circles"
+            tag = f"{label}_{c}_circles" + ("" if opening == "drawn" else f"_opened_{opening}")
             fitted.append((tag, reader))
             print(f"STRIDE slice={name} {tag} the fit's held code after each pass: " + " ".join(f"{v:.4f}" for v in trace)
                   + f" | mean modulus {rho:.3f} | the symbols' strides spread {spread:.0f} thousandths of a turn", flush=True)

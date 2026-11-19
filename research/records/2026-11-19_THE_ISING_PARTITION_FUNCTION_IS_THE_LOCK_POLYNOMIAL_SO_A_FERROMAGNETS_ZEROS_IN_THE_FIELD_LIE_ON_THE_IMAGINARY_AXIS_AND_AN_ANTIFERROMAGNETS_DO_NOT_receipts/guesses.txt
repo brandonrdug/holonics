@@ -1,0 +1,8 @@
+Guesses of the fifth ruler, fixed in its source (the PREDICTIONS dict of fifth_ruler.py) before its
+first run; the first run started at 00:44:59 UTC and the passing run at 00:45:08 UTC on November 19, 2026
+(date -u). Between them only the instrument's form of one root changed (see the record's section 5).
+Scored in the record's section 5.
+
+A. on n = 2..7 sites with random symmetric real J (either sign, diagonal included), random beta in (0.1, 2) and random complex fields h_i, the partition function summed over the 2^n spin configurations equals exp(beta/2 sum J - beta sum h) * lockPoly(exp(-2 beta J), exp(2 beta h)) to 1e-10 relative on every sample; an asymmetric J (the planted instance) misses the identity
+B. for random ferromagnets (J >= 0) on n = 2..10 sites in one common field, every root of the partition function in the fugacity z = exp(2 beta h) has |z| = 1 to 1e-7, and the coefficients are palindromic; random antiferromagnets (J <= 0, the planted instance) have a root off the circle on most samples; the two-site exchange -K at beta has real roots -y +- sqrt(y^2 - 1), y = exp(2 beta K), and h = log(zeta)/(2 beta) has nonzero real part
+C. on the Curie-Weiss ferromagnet (J = 1/n off the diagonal), the least angle of a zero from z = 1 at beta = 2 (ordered) shrinks from n = 4 to n = 14 by more than a factor 2, and at beta = 0.5 (disordered) it keeps more than half its n = 4 value (the Yang-Lee edge gap)

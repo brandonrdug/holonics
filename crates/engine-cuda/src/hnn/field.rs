@@ -43,12 +43,12 @@ use crate::cuda::{Dim3, Module};
 use crate::hnn::card::{Card, CardBuffer, CardError};
 
 pub use crate::hnn::resident::*;
-pub use crate::hnn::moment::*;
+pub(crate) use crate::hnn::moment::*;
 pub use crate::hnn::contact::*;
-pub use crate::hnn::carry::*;
+pub(crate) use crate::hnn::carry::*;
 pub use crate::hnn::clock::*;
-pub use crate::hnn::adjoint::*;
-pub use crate::hnn::level::*;
+pub(crate) use crate::hnn::adjoint::*;
+pub(crate) use crate::hnn::level::*;
 pub use crate::hnn::profile::*;
 
 
@@ -124,7 +124,6 @@ mod tests {
         let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(1).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 17)).to_be_bytes()).collect();
         let field = Constitution::found(d, &keys).unwrap();
         // The gain is read from the largest temperature the material holds (§15.10).
-        let l = field.layout();
         let bound = field.row_gain().unwrap() + (usize::BITS - 1 - d.reach.leading_zeros()) as u64 + 2;
         // The card weighs a source by one where the host weighs it by `2^62`, so its carrier is the bound less those bits; the
         // refusal stays the host's, at its own need.

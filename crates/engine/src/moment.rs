@@ -174,6 +174,8 @@ impl Constitution {
     /// ([`moment::cavity_moments`]): the moment the region's other places bring to `t` at their standing phases, `t`'s own terms absent and its
     /// own stride bare (`κ_t = 1`, the rate of a silent place, §16.28), from the region's standing sums: the strands' rows as the region holds
     /// them, and on a paced head `t`'s cavity clock `τ_(t−1) + 1`, `σ_(t−1) + 1` (zero at the region's first place, whose clock is zero either way).
+    // Read by the host's tests alone (the reach census of November 18, PR #1001): a law with no command yet, kept to be wired.
+    #[cfg_attr(not(test), allow(dead_code))]
     pub(crate) fn cavity_moments_of(&self, region: &Region, paces: &Paces) -> Result<Vec<i64>> {
         self.cavity_moments_sided(region, paces, true)
     }
