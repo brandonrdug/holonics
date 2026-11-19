@@ -1434,3 +1434,6 @@ import HolonicsResearch.Mathematics.ConstantNavigators
 import HolonicsResearch.Compression.Landmark.EliminantCertificate
 import HolonicsResearch.HNN.ContactFixedPoint
 import HolonicsResearch.Aeon.Production.PortHamiltonian
+import HolonicsResearch.Foundation.FractalStringTube
+import HolonicsResearch.Aeon.Production.ContinuumHodgeTime
+import HolonicsResearch.HNN.WordSensitivity

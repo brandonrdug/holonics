@@ -49,7 +49,11 @@ lattice-valued operands; no float enters. Brandon may override this choice.
 [open] The pre-rebuild precedent, `Objects/CommitRebase.commit_chain_residual`, is the
 counterfactual bound: how far the carried trajectory is from the one whose updates are computed at
 the exact (never rounded) operands, `Σ_(i<n) K^(n−1−i) r_i` for a Lipschitz bound `K` of the deposit
-map. No such `K` is stated for the HNN's deposit, so that bound remains owed. What is proved here is
+map. No such `K` is stated for the HNN's deposit. For maps of gain at most one the bound is
+`HolonicsResearch/HNN/WordSensitivity`'s: a trajectory whose residuals are an entry's releases stays
+within `u/2` of the never-rounded one at every length (`carried_trajectory_within_half_unit`), and
+the lattice certificate across loci is stated there; the gain of the HNN's own deposit map stays a
+hypothesis. What is proved here is
 the accounting against the updates that actually reached the locus; the pre-reset rebase dropped a
 radius at every commit with no carry, and its "sum of dropped radii" was no trajectory bound
 (history's `IncidentRebaseResidual`). Here the remainder is carried and the released radii sum

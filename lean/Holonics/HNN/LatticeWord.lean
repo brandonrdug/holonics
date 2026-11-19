@@ -120,8 +120,10 @@ The balance of the full element with its passive part and contrast port at an ex
 `HNN/Word.field_executed_balance_with_defects`.
 
 [open] Owed in #62 ("Step 4 (#73) owed"): the counterfactual bound of the carried transient
-against the exact word's trajectory, which needs a sensitivity bound of the tick map (as
-`Objects/CommitRebase.commit_chain_residual` does for commits).
+against the unrounded word's trajectory, which needs a sensitivity bound of the tick map (as
+`Objects/CommitRebase.commit_chain_residual` does for commits). For a word of passive Cayley steps
+the sensitivity is `Σ_i h_i‖dK_i‖` at every length and the trajectory bound is stated in
+`HolonicsResearch/HNN/WordSensitivity`; the tick map's own sensitivity stays open.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
