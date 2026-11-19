@@ -12,7 +12,8 @@ is weighed by the couplings its cut crosses and by the fugacities of its raised 
 For two locks with `a 0 1 = y` and a common fugacity `ζ` this is `1 + 2 y ζ + ζ²`
 (`lockPoly_two`), the coupled-sheet polynomial of `Objects/ParametronLock`
 (atlas `parametron.coupled-locks-lee-yang`).  For a ferromagnet, `a i j = exp (−2 β J i j)` with
-`β J i j ≥ 0`, it is the partition function in the fugacity `ζ = exp (−2 β h)`, up to a monomial.
+`β J i j ≥ 0`, it is the Ising partition function in the fugacities `z i = exp (2 β h i)` of the
+up sites, up to a nonvanishing prefactor (`Coupling/LeeYangIsing.isingZ_eq_lockPoly`).
 
 [proved-standard; formal-checked] What is proved here (Lee and Yang 1952; the proof is Asano's
 contraction, 1970, in the form Ruelle gave it, 1971).  Throughout `−1 ≤ a i j ≤ 1` and
@@ -56,7 +57,8 @@ a contraction place the zeros on the fixed circle of the reversal, which is the 
 `a = exp (−2 β J)` it covers `β J ≥ 0` (and the limit `a = 0`).  An antiferromagnetic contact,
 `a > 1`, is outside it, as the counterexample shows.  Nothing is said about where on the circle
 the zeros sit, their density, or a limit of many locks; the statement is for a finite family.  The
-identity of `lockPoly` with a partition function is stated in this header only, and the join to
+identity of `lockPoly` with the Ising partition function, and the Lee–Yang theorem read in the
+field, are proved in `Coupling/LeeYangIsing`; the join to
 `Objects/ParametronLock` is by the polynomial `ζ² + 2 y ζ + 1`, which this module restates and
 does not import.
 

@@ -567,6 +567,7 @@ import HolonicsResearch.Mathematics.AlgebraicGNS
 import HolonicsResearch.Coupling.LorentzianPerp
 import HolonicsResearch.Coupling.KreinForm
 import HolonicsResearch.Coupling.LeeYangCircle
+import HolonicsResearch.Coupling.LeeYangIsing
 import HolonicsResearch.Geometry.Shadows
 import HolonicsResearch.Landmarks.LandmarksAndModuli
 import HolonicsResearch.Landmarks.IharaBass
