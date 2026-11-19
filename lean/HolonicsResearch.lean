@@ -1425,3 +1425,6 @@ import HolonicsResearch.Compression.KernelModes
 import HolonicsResearch.Geometry.FrameRoutes
 import HolonicsResearch.HNN.ModeQuotientRing
 import HolonicsResearch.Compression.WideFaceReading
+import HolonicsResearch.HNN.TargetFaceDescent
+import HolonicsResearch.Compression.Landmark.FlooredSwitching
+import HolonicsResearch.HNN.PairDepositStep
