@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §24 on November 19, to 15:25 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §25 on November 19, to 15:55 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -818,3 +818,25 @@ on this passage.
 **What that leaves.** Her surety at the settled places rose from 0.525 (D20) to 0.667 (L36) while her words rose from 59% to 69%:
 the two still move together, and a count of five, sure at 0.921, writes 85%. The part of §23, rows at the residue the 512 circles
 compose, is now the next arm with nothing ahead of it.
+
+## 25. The circles' phase is no address
+
+*Written at 15:55 UTC, November 19.* §23's premise, read before the build (G-1119-4; `read-strand-states ... past carries`,
+`tools/residue_rows_ruler.py`; receipts 15:50 UTC). Rows fitted at a residue on the fitting half (768 thousand places of training text
+past the line's first 8 MB a slice) and read on the held half, at the settled places, 4 rings of about a thousand rows each:
+
+| address | mass on the arriving symbol | code (nats) |
+|---|---|---|
+| a planted address (each four octets' most met continuation) | 0.655 | 0.678 |
+| two places before alone (the back-off) | 0.304 | 1.678 |
+| a scramble of the four octets before | 0.247 | 1.810 |
+| the half-planes of ten circles' carried products a ring | 0.150 | 2.347 |
+| one circle's phase a ring | 0.097 | 2.685 |
+
+The instrument separates a located address from a scramble by 0.41 of the mass. The circles' residue reads under the scramble and
+under the back-off it sits on: contexts at one residue of a circle's phase, or of ten circles' directions, continue no more alike than
+contexts a scramble joins. So what the 512 circles hold is spread across them and read by the linear face over all of them; no single
+circle's phase, and no small set's direction, is a place where contexts that continue alike meet. §23's form (rows at the residue the
+circles compose) is withdrawn by its own rule; the store of rows §13 names still needs an address that is located, and the one this
+reading does not test is the frontier's own read, the operand the face is linear in, whose directions are the face's by construction
+(`agent-inferred`); its read must be set against her own face at the place, not against a count's back-off.

@@ -1241,6 +1241,17 @@ impl Constitution {
         Ok(pass.ticks.iter().map(|cell| cell.gam[..n * c2].to_vec()).collect())
     }
 
+    /// [measurement; the lead, November 19, the frontier record §23] **A strand's carried products, for a ruler on the host**: each known
+    /// site's scan value before it on every carry circle at the last tick, `Q(t − 1)` (`[n][2C]`, real parts then imaginary, on
+    /// `2^(−16)`), as [`Constitution::strand_pass`] formed it: the unit's move the places before the site compose on each circle
+    /// (`navigator.unit-composite-move`). Whether contexts that continue alike stand at one residue of that phase, the premise of rows at
+    /// the residue the circles compose, is read from these outside the machine. A reading: the state is the same with it.
+    pub fn strand_carries(&self, classes: &[usize], past: bool) -> Result<Vec<i64>> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let (c2, n) = (2 * self.declaration.carry, classes.len());
+        Ok(pass.ticks.last().map(|cell| cell.qm[..n * c2].to_vec()).unwrap_or_default())
+    }
+
     /// [definition; the lead, November 18, the frontier record §6] **The strand's two streams read by one tick**: the known stream's
     /// sites and its open places are one batch of sites, the open places after the known ones, each at the place of the known site of
     /// its index ([`Sided::Strand`], [`ClassLists::twins_from`]). A site's near field, its falloff, its skin on a plain pace, its
