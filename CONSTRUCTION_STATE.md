@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 19, 05:55 UTC): the line takes 512 carry circles, and her words move with them
+## Where the work stands (November 19, 15:25 UTC): the line holds 512 carry circles on its second pass, and her words stand at 69%
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -43,10 +43,10 @@ settled places and on its panel against the count writers' table.
 1.7260, 1.7082, 1.6992 nats a place at the frontier over laps L14 to L17, each the mean of a lap's last 1,000 sections, with the
 loudness reading beside each lap from L15. The row of the second place before left (G-1118-17).
 
-**The carry circles** (§17 to §22; G-1118-23, G-1119-1, G-1119-2). Grown by their own founding law (`grow-carry`, every face
-kept), 32 to 128 circles read 0.040 nats a place under the line at the second lap, 128 to 256 0.020 and 256 to 512 0.015 (1.5346 at
-E22); the line took each. At 512 her words moved with them: 65% in the lexicon on the wide panel against the control's 61%, ten
-points over last night's 55%. A section costs 409 to 454 ms. The line's laps L23 to L26 train with no arm beside them.
+**The carry circles** (§17 to §24; G-1118-23, G-1119-1 to G-1119-3). Grown by their own founding law (`grow-carry`, every face
+kept), each doubling's second-lap gain was 0.040 (two doublings), 0.020, 0.015 and then 0.004 at 1024, which left: the line holds 512.
+It ended its first pass over the store at lap L30 and is on its second (laps from L31, opened by `next-pass`): 1.4198 nats a place at
+the frontier at L36, her words 68% to 69% on the wide panel, she is sure at 0.667 of the settled places (a count of five at 0.921).
 
 **Where her words are decided** (§21; the excess ruler's spread column). At the places a count of five settles her code is level with
 the count's (0.644 against 0.627) while her draws agree 0.737 against 0.909: the count is sure at 92% of them, she at 52.5%, and she
@@ -70,8 +70,8 @@ no farther place in.
   the frontier without one; its arm beside the line is G-1118-16.
 
 **What is owed, in order.** A part judged by the sure share at the settled places (§21), which is what her words follow, as an
-arm beside the line: its form is §23, rows at the residue the circles compose (the composite's remainder of §13 at a located
-address) (a fourth doubling of the circles is the fallback: about 0.010 at its taper for 80 ms more a section). The Codex
+arm beside the line: its form is §23, rows at the residue the 512 circles compose (the composite's remainder of §13 at a located
+address). The circles' extent is spent (§24). The Codex
 thread's section-choice test on the host (G-1118-18). The composite's rows
 at located addresses (§13) as an arm. A writer that keeps the known stream's states.
 

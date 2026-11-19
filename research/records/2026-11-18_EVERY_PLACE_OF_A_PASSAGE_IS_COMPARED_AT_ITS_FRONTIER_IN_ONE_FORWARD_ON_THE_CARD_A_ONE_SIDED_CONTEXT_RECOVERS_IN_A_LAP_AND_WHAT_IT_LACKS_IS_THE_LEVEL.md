@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §23 on November 19, to 06:10 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §24 on November 19, to 15:25 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -794,3 +794,27 @@ adds to.
 beside them. What it could repeat: a cache (a row a context) where the periods are wide against the contexts that reach them, which
 the period's choice against §14's counts guards; a scramble where the circles' phases are not yet located, which the circles' own
 strides now are (§19's spread of strides, read again on E22's state before the build).
+
+## 24. A second pass and a fourth doubling: the pass gives surety, the circles stop paying
+
+*Written at 15:25 UTC, November 19.* The line ran laps L23 to L30 with 512 circles until lap L30 ended the pass over the store's
+prefix (73.5 million stretches), opened the next pass by `next-pass` and ran laps L31 to L34; then G-1119-3 grew the circles to
+1024 beside laps L35 and L36 (receipts `reads.txt`, 08:20 to 15:20 UTC).
+
+**What she wrote.** On the wide panel: 62%, 64%, 64%, 65% over laps L23 to L26, 65%, 66%, 69%, 66% over L27 to L30, then 68%, 68%,
+68%, 69% on the second pass and 68%, 69% at L35 and L36. Her words climbed from 61% to about 68% over the first pass's last eight
+laps and stand there on the second. Code reads 77% to 84%, books 74% to 78%, web 72% to 79%, science 53% to 62%, wikidata 42% to 54%.
+
+**The code.** Rows S at the frontier: 1.5346 at E22, 1.4802 at L26, 1.4546 at L30, 1.4436 to 1.4311 over L31 to L34, 1.4198 at L36:
+the second pass falls a fifth as fast as the first's last laps. At the places a count of five settles she is now sure at 0.667 (L36)
+where she was at 0.579 (E22), and a draw writes the settled symbol 0.815 of the time; the pass's second reading of the same text raised
+her surety more than any part of the day did, and her words did not follow it past 69%.
+
+**The fourth doubling** (G-1119-3). 1024 circles read 0.0014 and then 0.0042 under their control (1.4156 against 1.4198), the gap
+widening by 0.0028, under its rule's 0.003: the circles leave, and the line continues from L36 with 512. A section cost 544 ms against
+the line's 383. The taper of the second lap's gain a doubling, 0.020, 0.020, 0.015, 0.004, says the circles' extent is spent at 512
+on this passage.
+
+**What that leaves.** Her surety at the settled places rose from 0.525 (D20) to 0.667 (L36) while her words rose from 59% to 69%:
+the two still move together, and a count of five, sure at 0.921, writes 85%. The part of §23, rows at the residue the 512 circles
+compose, is now the next arm with nothing ahead of it.

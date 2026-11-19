@@ -582,3 +582,23 @@ G-1119-2 scored (2026-11-19T05:46:56Z). Rows S at the lap means (sections 2,001 
 open: E22 0.0135 under L22: held. (d) 454 and 409 ms a section on the mean: held. (e) The wide panel: E22 1,425 of 2,186 words in the
 lexicon (65%) against L22's 1,278 of 2,091 (61%): missed, 4 points more than its control where within 2 were guessed (E21 63% against
 L21's 62%). The rule: 0.010 or more under at the second lap, so the line takes the 512 circles and continues from arm E22's end.
+
+G-1119-3 (2026-11-19T12:08:49Z). The carry circles from 512 to 1024 (grow-carry 512 by their own founding law, every face kept): two laps (arms F35,
+F36) from lap L34's end (the second pass over the store), beside the line's own L35 and L36 from the same state. One change. Binary as
+G-1119-2's. The fallback §23 names while the rows at the circles' residue are built.
+  What is on record. The second lap's gain a doubling: 0.020 (each of 32 to 128's two), 0.020 (128 to 256), 0.015 (256 to 512); the
+  first lap's 0.0074 a doubling, 0.0068, 0.0047. At the settled places the mass on the arriving symbol rose 0.012 and 0.008 for the
+  last two doublings; the wide panel moved 1 and then 4 points. A section on the second pass takes 382 to 384 ms with 512 circles.
+  The guess. (a) Rows S at the mean of a lap's last 1,000 sections: F35 between 0.000 and 0.008 under L35's; F36 between 0.006 and
+  0.018 under L36's. (b) At the settled places F36 gives the arriving symbol 0.002 to 0.012 more of its mass than L36. (c) One place
+  open under the law: F36 between 0.004 and 0.020 under L36. (d) A section takes 450 to 580 ms. (e) The wide panel from F36's mean
+  stands between 1 point under and 5 points over L36's.
+  The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
+  by 0.003 or more, two more laps; otherwise the line continues from L36 with 512.
+
+G-1119-3 scored (2026-11-19T15:15:24Z). Rows S at the lap means: F35 1.4257 against L35's 1.4271, 0.0014 under (±0.0002): (a) held; F36 1.4156
+against L36's 1.4198, 0.0042 under (±0.0003): (a) missed, under the 0.006 guessed. (b) At the settled places F36 gives the arriving
+symbol 0.818 of its mass and L36 0.815, 0.003 more: held. (c) One place open: F36 0.0039 under L36: missed by a little (0.004 to 0.020
+guessed). (d) 544 ms a section on the mean (the line's 382 to 384): held. (e) The wide panel: F36 1,485 of 2,146 (69%) against L36's
+1,511 of 2,175 (69%): held. The rule: under 0.010 at the second lap and the gap widened by 0.0028 (under 0.003), so the 1024 circles
+leave and the line continues from L36 with 512.

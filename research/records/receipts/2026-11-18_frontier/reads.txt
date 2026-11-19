@@ -1236,3 +1236,80 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   L26 LOUDNESS region=all places=100508 nats_a_place=0.8378 loudness_octaves=20.468 spearman_loud_code=+0.129
   L26   temperature (energy over the region's mean, a nat): +0.0143   rank-1 share: loudest fifth 0.753, quietest fifth 0.818
   L26   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9779  spearman loud~color=+0.179  color~code=-0.126  by surprise fifth: q1=0.9924 q2=0.9897 q3=0.9799 q4=0.9696 q5=0.
+
+# 10:10 UTC November 19. The line's laps L27 to L30 with 512 circles (binary gatecarry/bin/athena). Lap L30 ended the pass over the store's prefix at its section 2,871 (STORE_PASS ended=true, 73,450,726 stretches read); its mean MEAN.2871 covers sections 2,001 to 2,871, and lap L31 opens the next pass at the store's start:
+  lap L27: 3000 sections, 424 ms a section on the mean, 570 at most
+  FRONTIER L27; one place open: all 0.8281 (100508 places) | books 0.8995 code 0.5504 science 0.7685 web 0.9132 wikidata 1.0084 || less the control's, paired: -0.0639 (±0.0014) | books -0.0721 code -0.0508 science -0.0829 web -0.0663 wikidata -0.0477
+  FRONTIER L27; the frontier, each stretch read by two streams : all 1.4649 (99844 places) | books 1.5236 code 1.1624 science 1.3725 web 1.6677 wikidata 1.5988 || less the control's, paired: -0.0696 (±0.0014) | books -0.0607 code -0.0681 science -0.0848 web -0.0572 wikidata -0.0773
+  L27 wide panel: LONG L27: all words 2187 in lexicon 1430 (65%) writes that loop 22 of 160 longest run shared with its prompt 76 | code 276/361 (76%) web 335/444 (75%) science 247/447 (55%) books 390/515 (75%) wikidata 182/420 (43%)
+  lap L28: 3000 sections, 415 ms a section on the mean, 576 at most
+  FRONTIER L28; one place open: all 0.8195 (100508 places) | books 0.8862 code 0.5396 science 0.7600 web 0.9061 wikidata 1.0054 || less the control's, paired: -0.0725 (±0.0015) | books -0.0854 code -0.0615 science -0.0913 web -0.0735 wikidata -0.0507
+  FRONTIER L28; the frontier, each stretch read by two streams : all 1.4611 (99844 places) | books 1.5186 code 1.1504 science 1.3664 web 1.6688 wikidata 1.6014 || less the control's, paired: -0.0735 (±0.0015) | books -0.0657 code -0.0800 science -0.0910 web -0.0561 wikidata -0.0747
+  L28 wide panel: LONG L28: all words 2165 in lexicon 1429 (66%) writes that loop 25 of 160 longest run shared with its prompt 74 | code 262/346 (75%) web 347/459 (75%) science 241/433 (55%) books 396/516 (76%) wikidata 183/411 (44%)
+  lap L29: 3000 sections, 437 ms a section on the mean, 619 at most
+  FRONTIER L29; one place open: all 0.8113 (100508 places) | books 0.8747 code 0.5381 science 0.7481 web 0.8962 wikidata 0.9993 || less the control's, paired: -0.0806 (±0.0015) | books -0.0969 code -0.0631 science -0.1032 web -0.0834 wikidata -0.0569
+  FRONTIER L29; the frontier, each stretch read by two streams : all 1.4529 (99844 places) | books 1.5138 code 1.1460 science 1.3580 web 1.6599 wikidata 1.5870 || less the control's, paired: -0.0817 (±0.0015) | books -0.0705 code -0.0845 science -0.0993 web -0.0650 wikidata -0.0891
+  L29 wide panel: LONG L29: all words 2160 in lexicon 1499 (69%) writes that loop 18 of 160 longest run shared with its prompt 70 | code 314/385 (81%) web 350/452 (77%) science 242/418 (57%) books 392/498 (78%) wikidata 201/407 (49%)
+  lap L30: 2871 sections, 385 ms a section on the mean, 560 at most
+  FRONTIER L30; one place open: all 0.8084 (100508 places) | books 0.8715 code 0.5340 science 0.7405 web 0.8966 wikidata 0.9991 || less the control's, paired: -0.0836 (±0.0016) | books -0.1001 code -0.0672 science -0.1109 web -0.0829 wikidata -0.0570
+  FRONTIER L30; the frontier, each stretch read by two streams : all 1.4546 (99844 places) | books 1.5192 code 1.1442 science 1.3547 web 1.6621 wikidata 1.5932 || less the control's, paired: -0.0800 (±0.0016) | books -0.0652 code -0.0862 science -0.1027 web -0.0628 wikidata -0.0829
+  L30 wide panel: LONG L30: all words 2178 in lexicon 1458 (66%) writes that loop 16 of 160 longest run shared with its prompt 76 | code 307/393 (78%) web 351/461 (76%) science 230/410 (56%) books 398/514 (77%) wikidata 172/400 (43%)
+
+# 12:25 UTC November 19. The second pass over the store's prefix: next-pass on lap L30's STATE.2871 (OPEN.L31; a first try from STATE.2871 itself read no section, arm_L31_empty.log), then laps L31 to L34 with 512 circles:
+  NEXT_PASS stretches=73450726 before=code:93724:401252381,web:51617:200696610,science:32808:200471217,books:2960:120246875,wikidata:12446:80362154 after=code:0:0,web:0:0,science:0:0,books:0:0,wikidata:
+  lap L31: 3000 sections, 384 ms a section on the mean, 513 at most
+  FRONTIER L31; one place open: all 0.8001 (100508 places) | books 0.8624 code 0.5280 science 0.7336 web 0.8781 wikidata 0.9977 || less the control's, paired: -0.0919 (±0.0016) | books -0.1092 code -0.0731 science -0.1178 web -0.1014 wikidata -0.0584
+  FRONTIER L31; the frontier, each stretch read by two streams : all 1.4436 (99844 places) | books 1.5038 code 1.1332 science 1.3455 web 1.6483 wikidata 1.5875 || less the control's, paired: -0.0910 (±0.0016) | books -0.0805 code -0.0973 science -0.1118 web -0.0766 wikidata -0.0886
+  L31 wide panel: LONG L31: all words 2151 in lexicon 1479 (68%) writes that loop 22 of 160 longest run shared with its prompt 61 | code 303/375 (80%) web 336/439 (76%) science 274/439 (62%) books 390/501 (77%) wikidata 176/397 (44%)
+  lap L32: 3000 sections, 382 ms a section on the mean, 545 at most
+  FRONTIER L32; one place open: all 0.7944 (100508 places) | books 0.8556 code 0.5214 science 0.7284 web 0.8777 wikidata 0.9884 || less the control's, paired: -0.0976 (±0.0017) | books -0.1160 code -0.0797 science -0.1230 web -0.1019 wikidata -0.0677
+  FRONTIER L32; the frontier, each stretch read by two streams : all 1.4380 (99844 places) | books 1.4964 code 1.1277 science 1.3426 web 1.6506 wikidata 1.5729 || less the control's, paired: -0.0966 (±0.0017) | books -0.0879 code -0.1028 science -0.1148 web -0.0743 wikidata -0.1031
+  L32 wide panel: LONG L32: all words 2169 in lexicon 1486 (68%) writes that loop 20 of 160 longest run shared with its prompt 74 | code 289/375 (77%) web 338/452 (74%) science 248/428 (57%) books 402/504 (79%) wikidata 209/410 (50%)
+  lap L33: 3000 sections, 382 ms a section on the mean, 531 at most
+  FRONTIER L33; one place open: all 0.7884 (100508 places) | books 0.8459 code 0.5179 science 0.7219 web 0.8722 wikidata 0.9838 || less the control's, paired: -0.1036 (±0.0017) | books -0.1257 code -0.0833 science -0.1295 web -0.1074 wikidata -0.0723
+  FRONTIER L33; the frontier, each stretch read by two streams : all 1.4325 (99844 places) | books 1.4964 code 1.1202 science 1.3392 web 1.6462 wikidata 1.5611 || less the control's, paired: -0.1020 (±0.0017) | books -0.0880 code -0.1103 science -0.1182 web -0.0787 wikidata -0.1149
+  L33 wide panel: LONG L33: all words 2158 in lexicon 1480 (68%) writes that loop 20 of 160 longest run shared with its prompt 69 | code 297/364 (81%) web 340/463 (73%) science 256/427 (59%) books 387/499 (77%) wikidata 200/405 (49%)
+  lap L34: 3000 sections, 383 ms a section on the mean, 503 at most
+  FRONTIER L34; one place open: all 0.7882 (100508 places) | books 0.8452 code 0.5180 science 0.7151 web 0.8723 wikidata 0.9898 || less the control's, paired: -0.1038 (±0.0018) | books -0.1264 code -0.0831 science -0.1363 web -0.1072 wikidata -0.0663
+  FRONTIER L34; the frontier, each stretch read by two streams : all 1.4311 (99844 places) | books 1.4974 code 1.1295 science 1.3308 web 1.6464 wikidata 1.5516 || less the control's, paired: -0.1035 (±0.0017) | books -0.0869 code -0.1010 science -0.1265 web -0.0785 wikidata -0.1244
+  L34 wide panel: LONG L34: all words 2231 in lexicon 1551 (69%) writes that loop 16 of 160 longest run shared with its prompt 74 | code 308/371 (83%) web 358/457 (78%) science 288/463 (62%) books 395/524 (75%) wikidata 202/416 (48%)
+
+# 15:20 UTC November 19. G-1119-3's laps from lap L34's end (binary gatecarry/bin/athena):
+  lap L35: 3000 sections, 384 ms a section on the mean, 531 at most
+  lap F35: 3000 sections, 544 ms a section on the mean, 782 at most
+  lap L36: 3000 sections, 384 ms a section on the mean, 522 at most
+  lap F36: 3000 sections, 544 ms a section on the mean, 739 at most
+  GROW_CARRY circles_before=512 circles_after=1024 contacts_before=1088 contacts_after=2112 material_before=936825 material_after=1464185 fine_before=737129 fine_after=1264489 drawn_before=1822208 drawn_after=3132928 new_entries=527360
+  NEXT3_FACES 12:33:26 the grown mean's held read against L34's own: EQUAL CAVITY_DONE ms=663741
+  GROW_CARRY circles_before=512 circles_after=1024 contacts_before=1088 contacts_after=2112 material_before=936825 material_after=1464185 fine_before=737129 fine_after=1264489 drawn_before=1822208 drawn_after=3132928 new_entries=527360
+  NEXT3_PARITY 12:35:29 STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL 
+  NEXT3_DEV section_ms_mean=548 section_ms_max=717 regions=151 compared_places=14457
+  NEXT3_PROJECTION lap_s=1644 deadline_s=2271
+  FRONTIER F35; one place open: all 0.7825 (100508 places) | books 0.8379 code 0.5123 science 0.7134 web 0.8672 wikidata 0.9813 || less the control's, paired: -0.0012 (±0.0002) | books -0.0010 code -0.0019 science -0.0016 web -0.0008 wikidata -0.0005
+  FRONTIER F35; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.4257 (99844 places) | books 1.4881 code 1.1094 science 1.3357 web 1.6413 wikidata 1.5542 || less the control's, paired: -0.0014 (±0.0002) | books -0.0018 code -0.0021 science -0.0003 web -0.0011 wikidata -0.0018
+  FRONTIER L36; one place open: all 0.7780 (100508 places) | books 0.8346 code 0.5014 science 0.7077 web 0.8630 wikidata 0.9826
+  FRONTIER L36; the frontier, each stretch read by two streams: all 1.4198 (99844 places) | books 1.4856 code 1.0995 science 1.3311 web 1.6359 wikidata 1.5472
+  FRONTIER L36; each stretch read by two streams, by places known: 1: 2.873 | 2 to 3: 2.484 | 4 to 7: 2.012 | 8 to 15: 1.850 | 16 to 31: 1.708 | 32 to 63: 1.564 | 64 to 127: 1.375 | 128 to 255: 1.298 | 256 to 511: 1.245 | 512 to 1023: 1.245
+  FRONTIER F36; one place open: all 0.7740 (100508 places) | books 0.8296 code 0.4966 science 0.7020 web 0.8599 wikidata 0.9816 || less the control's, paired: -0.0039 (±0.0003) | books -0.0051 code -0.0048 science -0.0057 web -0.0031 wikidata -0.0010
+  FRONTIER F36; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.4156 (99844 places) | books 1.4814 code 1.0942 science 1.3272 web 1.6307 wikidata 1.5449 || less the control's, paired: -0.0042 (±0.0003) | books -0.0042 code -0.0053 science -0.0039 web -0.0052 wikidata -0.0023
+  FRONTIER F36; each stretch read by two streams, by places known (less the control's): 1: 2.872 (-0.001) | 2 to 3: 2.480 (-0.004) | 4 to 7: 2.006 (-0.007) | 8 to 15: 1.847 (-0.002) | 16 to 31: 1.704 (-0.004) | 32 to 63: 1.561 (-0.003) | 64 to 127: 1.370 (-0.005) | 128 to 255: 1.294 (-0.004) | 256 to 511: 1.240 (-0.005) | 512 to 1023: 1.240 (-0.005)
+  EXCESS slice=all kind=S places=99814 train_octets=8000000 k=5 count=2.0379 L35=1.4258 F35=1.4243 L36=1.4185 F36=1.4143 draw_agrees: count=0.462 L35=0.501 F35=0.502 L36=0.503 F36=0.505 counts_by_k: 0=3.482 1=2.765 2=2.362 3=2.102 4=2.030 5=2.038
+  EXCESS slice=all expected_news='under 0.25' draw_agrees: count=0.909 L35=0.814 F35=0.815 L36=0.815 F36=0.818
+  EXCESS slice=all expected_news='under 0.25' spread (shares of the bin's places paying under 0.1 / 0.1 to 0.5 / 0.5 to 1.5 / over 1.5 nats): count=0.921/0.000/0.000/0.079 L35=0.668/0.146/0.082/0.103 F35=0.670/0.145/0.082/0.103 L36=0.667/0.150/0.082/0.101 F36=0.673/0.146/0.080/0.100
+  EXCESS slice=all expected_news='under 0.25' share=0.204 count=0.627 L35=0.462 F35=0.461 L36=0.457 F36=0.451 excess_of_all_places: L35=-0.0337 F35=-0.0339 L36=-0.0347 F36=-0.0358 counts_by_k: 0=3.255 1=2.245 2=1.539 3=0.876 4=0.591 5=0.627
+  EXCESS slice=all expected_news='0.25 to 0.5' draw_agrees: count=0.709 L35=0.699 F35=0.700 L36=0.704 F36=0.705
+  EXCESS slice=all expected_news='0.25 to 0.5' spread (shares of the bin's places paying under 0.1 / 0.1 to 0.5 / 0.5 to 1.5 / over 1.5 nats): count=0.510/0.260/0.000/0.231 L35=0.460/0.241/0.114/0.185 F35=0.462/0.241/0.114/0.183 L36=0.468/0.242/0.109/0.181 F36=0.473/0.238/0.108/0.181
+  EXCESS slice=all expected_news='0.25 to 0.5' share=0.090 count=1.315 L35=0.777 F35=0.774 L36=0.764 F36=0.759 excess_of_all_places: L35=-0.0483 F35=-0.0485 L36=-0.0495 F36=-0.0499 counts_by_k: 0=3.134 1=2.286 2=1.802 3=1.437 4=1.359 5=1.315
+  EXCESS slice=all expected_news='0.5 to 1' draw_agrees: count=0.546 L35=0.595 F35=0.596 L36=0.596 F36=0.598
+  EXCESS slice=all expected_news='0.5 to 1' spread (shares of the bin's places paying under 0.1 / 0.1 to 0.5 / 0.5 to 1.5 / over 1.5 nats): count=0.004/0.587/0.148/0.262 L35=0.279/0.292/0.187/0.241 F35=0.280/0.292/0.187/0.241 L36=0.279/0.293/0.189/0.239 F36=0.281/0.295/0.187/0.237
+  EXCESS slice=all expected_news='0.5 to 1' share=0.205 count=1.665 L35=1.037 F35=1.034 L36=1.029 F36=1.025 excess_of_all_places: L35=-0.1291 F35=-0.1296 L36=-0.1306 F36=-0.1315 counts_by_k: 0=3.186 1=2.412 2=2.001 3=1.772 4=1.699 5=1.665
+  EXCESS slice=all expected_news='1 to 2' draw_agrees: count=0.271 L35=0.383 F35=0.384 L36=0.386 F36=0.387
+  EXCESS slice=all expected_news='1 to 2' spread (shares of the bin's places paying under 0.1 / 0.1 to 0.5 / 0.5 to 1.5 / over 1.5 nats): count=0.000/0.110/0.394/0.496 L35=0.107/0.173/0.286/0.434 F35=0.108/0.173/0.284/0.434 L36=0.114/0.169/0.285/0.433 F36=0.114/0.170/0.286/0.430
+  EXCESS slice=all expected_news='1 to 2' share=0.301 count=2.490 L35=1.670 F35=1.670 L36=1.664 F36=1.661 excess_of_all_places: L35=-0.2462 F35=-0.2464 L36=-0.2482 F36=-0.2492 counts_by_k: 0=3.506 1=2.889 2=2.609 3=2.490 4=2.495 5=2.490
+  EXCESS slice=all expected_news='over 2' draw_agrees: count=0.095 L35=0.175 F35=0.175 L36=0.176 F36=0.176
+  EXCESS slice=all expected_news='over 2' spread (shares of the bin's places paying under 0.1 / 0.1 to 0.5 / 0.5 to 1.5 / over 1.5 nats): count=0.000/0.000/0.127/0.873 L35=0.027/0.065/0.142/0.766 F35=0.027/0.064/0.143/0.766 L36=0.029/0.063/0.141/0.766 F36=0.030/0.062/0.144/0.764
+  EXCESS slice=all expected_news='over 2' share=0.200 count=3.502 L35=2.729 F35=2.728 L36=2.721 F36=2.717 excess_of_all_places: L35=-0.1549 F35=-0.1550 L36=-0.1565 F36=-0.1572 counts_by_k: 0=4.134 1=3.686 2=3.448 3=3.403 4=3.434 5=3.502
+  L35 wide panel: LONG L35: all words 2189 in lexicon 1499 (68%) writes that loop 18 of 160 longest run shared with its prompt 76 | code 333/395 (84%) web 335/432 (77%) science 229/426 (53%) books 400/519 (77%) wikidata 202/417 (48%)
+  F35 wide panel: LONG F35: all words 2162 in lexicon 1520 (70%) writes that loop 24 of 160 longest run shared with its prompt 64 | code 307/376 (81%) web 338/441 (76%) science 251/414 (60%) books 397/513 (77%) wikidata 227/418 (54%)
+  L36 wide panel: LONG L36: all words 2175 in lexicon 1511 (69%) writes that loop 21 of 160 longest run shared with its prompt 75 | code 298/363 (82%) web 336/431 (77%) science 248/431 (57%) books 416/528 (78%) wikidata 213/422 (50%)
+  F36 wide panel: LONG F36: all words 2146 in lexicon 1485 (69%) writes that loop 24 of 160 longest run shared with its prompt 76 | code 280/339 (82%) web 351/443 (79%) science 273/443 (61%) books 374/504 (74%) wikidata 207/417 (49%)
