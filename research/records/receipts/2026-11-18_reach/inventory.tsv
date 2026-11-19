@@ -1,0 +1,150 @@
+path	line	item	compiler	reached_by
+crates/engine/src/carry.rs	425	carry_leaks	methods `carry_leaks` and `carry_gates_of`	tests
+crates/engine/src/carry.rs	471	carry_gates_of	methods `carry_leaks` and `carry_gates_of`	tests
+crates/engine/src/carry.rs	498	CarryGates	struct `CarryGates`	tests
+crates/engine/src/carry.rs	505	new	associated items `new` and `add`	tests
+crates/engine/src/carry.rs	510	add	associated items `new` and `add`	nothing
+crates/engine/src/census.rs	39	Reading	struct `Reading`	nothing
+crates/engine/src/census.rs	75	enable	function `enable`	nothing
+crates/engine/src/census.rs	131	tally	function `tally`	nothing
+crates/engine/src/census.rs	139	report	function `report`	nothing
+crates/engine/src/codec.rs	48	found	associated function `found`	nothing
+crates/engine/src/constitution.rs	101	found	associated items `found`, `families`, and `from_text`	tests
+crates/engine/src/constitution.rs	236	families	associated items `found`, `families`, and `from_text`	tests
+crates/engine/src/constitution.rs	258	from_text	associated items `found`, `families`, and `from_text`	tests
+crates/engine/src/contact.rs	1176	strand_faces	methods `strand_faces` and `twin_tick`	tests
+crates/engine/src/contact.rs	1332	twin_tick	methods `strand_faces` and `twin_tick`	tests
+crates/engine/src/coupling.rs	8	Strand	enum `Strand`	nothing
+crates/engine/src/coupling.rs	15	CouplingRefusal	enum `CouplingRefusal`	nothing
+crates/engine/src/coupling.rs	47	PhaseDefect	enum `PhaseDefect`	nothing
+crates/engine/src/coupling.rs	61	OptimalContact	struct `OptimalContact`	nothing
+crates/engine/src/coupling.rs	69	Plateau	struct `Plateau`	nothing
+crates/engine/src/coupling.rs	78	Coupling	struct `Coupling`	nothing
+crates/engine/src/coupling.rs	96	workspace	function `workspace`	nothing
+crates/engine/src/coupling.rs	107	coupling	function `coupling`	nothing
+crates/engine/src/declaration.rs	244	listen_shift	multiple methods	tests
+crates/engine/src/declaration.rs	298	row_bits	multiple methods	nothing
+crates/engine/src/declaration.rs	314	founding_draws	multiple methods	tests
+crates/engine/src/declaration.rs	321	growth_draws	multiple methods	tests
+crates/engine/src/declaration.rs	331	grown	multiple methods	tests
+crates/engine/src/declaration.rs	353	contacted	multiple methods	tests
+crates/engine/src/declaration.rs	380	contact_draws	multiple methods	tests
+crates/engine/src/declaration.rs	386	carry_draws	multiple methods	tests
+crates/engine/src/deposit.rs	133	PartTravel	struct `PartTravel`	tests
+crates/engine/src/deposit.rs	144	against_half	methods `against_half` and `cosine_micro`	tests
+crates/engine/src/deposit.rs	153	cosine_micro	methods `against_half` and `cosine_micro`	tests
+crates/engine/src/deposit.rs	166	part_travel	function `part_travel`	tests
+crates/engine/src/deposit.rs	186	updated	method `updated`	tests
+crates/engine/src/face.rs	62	logits	methods `logits` and `code`	tests
+crates/engine/src/face.rs	78	code	methods `logits` and `code`	tests
+crates/engine/src/face.rs	175	face_of_read	method `face_of_read`	tests
+crates/engine/src/face.rs	256	covector	method `covector`	tests
+crates/engine/src/field/moment.rs	132	MOMENT_BITS	constant `MOMENT_BITS`	nothing
+crates/engine/src/field/scale.rs	81	level_declaration	function `level_declaration`	tests
+crates/engine/src/field/scale.rs	86	level_split	function `level_split`	tests
+crates/engine/src/field/scale.rs	92	LEVEL_HARMONICS	constant `LEVEL_HARMONICS`	tests
+crates/engine/src/field/scale.rs	479	scaled_up	method `scaled_up`	tests
+crates/engine/src/founding.rs	33	with_depth	method `with_depth`	nothing
+crates/engine/src/founding.rs	54	growth_draws	methods `growth_draws` and `grown`	tests
+crates/engine/src/founding.rs	71	grown	methods `growth_draws` and `grown`	tests
+crates/engine/src/founding.rs	401	with_carry	methods `with_carry`, `with_opening`, `with_junction`, `with_mark`, and `contacted`	tests
+crates/engine/src/founding.rs	517	with_opening	methods `with_carry`, `with_opening`, `with_junction`, `with_mark`, and `contacted`	tests
+crates/engine/src/founding.rs	576	with_junction	methods `with_carry`, `with_opening`, `with_junction`, `with_mark`, and `contacted`	tests
+crates/engine/src/founding.rs	603	with_mark	methods `with_carry`, `with_opening`, `with_junction`, `with_mark`, and `contacted`	tests
+crates/engine/src/founding.rs	742	contacted	methods `with_carry`, `with_opening`, `with_junction`, `with_mark`, and `contacted`	tests
+crates/engine/src/founding.rs	821	widened	multiple methods	tests
+crates/engine/src/founding.rs	884	with_carry	multiple methods	tests
+crates/engine/src/founding.rs	920	with_triads	multiple methods	tests
+crates/engine/src/founding.rs	1016	with_opening	multiple methods	tests
+crates/engine/src/founding.rs	1071	with_junction	multiple methods	nothing
+crates/engine/src/founding.rs	1107	with_mark	multiple methods	tests
+crates/engine/src/founding.rs	1179	contacted	multiple methods	tests
+crates/engine/src/founding.rs	1207	scaled_up	multiple methods	tests
+crates/engine/src/learner.rs	430	new	associated items `new`, `holds_step`, `read_step_on`, and `section`	tests
+crates/engine/src/learner.rs	437	holds_step	associated items `new`, `holds_step`, `read_step_on`, and `section`	tests
+crates/engine/src/learner.rs	443	read_step_on	associated items `new`, `holds_step`, `read_step_on`, and `section`	tests
+crates/engine/src/learner.rs	499	section	associated items `new`, `holds_step`, `read_step_on`, and `section`	tests
+crates/engine/src/level.rs	23	landmarks	method `landmarks`	nothing
+crates/engine/src/level.rs	43	landmarks_of	function `landmarks_of`	nothing
+crates/engine/src/moment.rs	177	cavity_moments_of	methods `cavity_moments_of`, `cavity_openings`, `cavity_forward`, and `cavity_check`	tests
+crates/engine/src/moment.rs	230	cavity_openings	methods `cavity_moments_of`, `cavity_openings`, `cavity_forward`, and `cavity_check`	tests
+crates/engine/src/moment.rs	237	cavity_forward	methods `cavity_moments_of`, `cavity_openings`, `cavity_forward`, and `cavity_check`	tests
+crates/engine/src/moment.rs	527	cavity_check	methods `cavity_moments_of`, `cavity_openings`, `cavity_forward`, and `cavity_check`	tests
+crates/engine/src/passage.rs	431	q	field `q`	tests
+crates/engine/src/realization.rs	25	ReadLogits	struct `ReadLogits`	tests
+crates/engine/src/realization.rs	54	read_logits	multiple methods	tests
+crates/engine/src/realization.rs	56	read_landmarks	multiple methods	nothing
+crates/engine/src/realization.rs	58	met_pairs	multiple methods	nothing
+crates/engine/src/realization.rs	68	read_row_shares	multiple methods	nothing
+crates/engine/src/realization.rs	72	read_covector_shares	multiple methods	nothing
+crates/engine/src/realization.rs	77	read_row_currents	multiple methods	nothing
+crates/engine/src/realization.rs	81	read_ticks	multiple methods	nothing
+crates/engine/src/realization.rs	98	read_faces_gated	multiple methods	nothing
+crates/engine/src/realization.rs	107	read_near_offsets	multiple methods	nothing
+crates/engine/src/realization.rs	111	read_blank_clocks	multiple methods	nothing
+crates/engine/src/release.rs	22	read	multiple fields	nothing
+crates/engine/src/release.rs	23	pass	multiple fields	tests
+crates/engine/src/release.rs	24	classes	multiple fields	tests
+crates/engine/src/release.rs	25	open	multiple fields	tests
+crates/engine/src/release.rs	26	faces	multiple fields	nothing
+crates/engine/src/release.rs	31	bound	multiple fields	nothing
+crates/engine/src/release.rs	32	passed	multiple fields	nothing
+crates/engine/src/release.rs	97	settle	multiple methods	tests
+crates/engine/src/release.rs	113	redraw_lensed	multiple methods	tests
+crates/engine/src/release.rs	125	redraw	multiple methods	tests
+crates/engine/src/release.rs	141	certified_passes	multiple methods	tests
+crates/engine/src/release.rs	347	locked_faces	multiple methods	tests
+crates/engine/src/release.rs	375	read_logits	multiple methods	tests
+crates/engine/src/release.rs	392	sample_realized	multiple methods	tests
+crates/engine/src/release.rs	501	sample_observed	multiple methods	tests
+crates/engine/src/release.rs	873	SettlePass	struct `SettlePass`	tests
+crates/engine/src/release.rs	900	exchange_proposals	function `exchange_proposals`	tests
+crates/engine/src/release.rs	935	redraw_proposals	function `redraw_proposals`	tests
+crates/engine/src/release.rs	966	CertifiedRecord	struct `CertifiedRecord`	tests
+crates/engine/src/release.rs	983	SettleRecord	struct `SettleRecord`	tests
+crates/engine/src/release.rs	996	ExchangeMove	struct `ExchangeMove`	tests
+crates/engine/src/release.rs	1007	root_charge	function `root_charge`	tests
+crates/engine/src/release.rs	1023	CertifiedMove	struct `CertifiedMove`	tests
+crates/engine/src/ruler.rs	31	HeldRows	struct `HeldRows`	nothing
+crates/engine/src/ruler.rs	679	held_rows	multiple methods	nothing
+crates/engine/src/ruler.rs	727	covector_shares	multiple methods	tests
+crates/engine/src/ruler.rs	742	row_currents	multiple methods	nothing
+crates/engine/src/ruler.rs	777	held_rows_all	multiple methods	nothing
+crates/engine/src/ruler.rs	799	met_pairs	multiple methods	tests
+crates/engine/src/ruler.rs	810	carried_slopes	multiple methods	tests
+crates/engine/src/ruler.rs	1130	junction_covectors	multiple methods	tests
+crates/engine/src/ruler.rs	1145	blank_clocks	multiple methods	nothing
+crates/engine/src/ruler.rs	1166	near_offsets	multiple methods	nothing
+crates/engine/src/ruler.rs	1233	tick_reads	method `tick_reads`	tests
+crates/engine/src/ruler.rs	1343	step_coherence	method `step_coherence`	nothing
+crates/engine/src/ruler.rs	1358	letter_balance	function `letter_balance`	tests
+crates/engine/src/units.rs	32	CODE_BITS	constant `CODE_BITS`	tests
+crates/engine/src/units.rs	34	UNIT_BITS	constant `UNIT_BITS`	tests
+crates/engine/src/units.rs	50	log2_int	function `log2_int`	tests
+crates/engine/src/units.rs	59	GammaTable	struct `GammaTable`	tests
+crates/engine/src/units.rs	64	at	methods `at`, `context`, and `cell`	tests
+crates/engine/src/units.rs	80	context	methods `at`, `context`, and `cell`	tests
+crates/engine/src/units.rs	85	cell	methods `at`, `context`, and `cell`	tests
+crates/engine/src/units.rs	94	pair	function `pair`	tests
+crates/engine/src/units.rs	108	FoundingReceipt	struct `FoundingReceipt`	tests
+crates/engine/src/units.rs	169	changes	method `changes`	tests
+crates/engine/src/units.rs	234	order_one_code	function `order_one_code`	tests
+crates/engine/src/units.rs	256	is_empty	associated items `is_empty`, `found`, `decode`, and `to_text`	nothing
+crates/engine/src/units.rs	281	found	associated items `is_empty`, `found`, `decode`, and `to_text`	tests
+crates/engine/src/units.rs	384	decode	associated items `is_empty`, `found`, `decode`, and `to_text`	tests
+crates/engine/src/units.rs	389	to_text	associated items `is_empty`, `found`, `decode`, and `to_text`	tests
+crates/engine-cuda/src/cuda.rs	131	CONCURRENT_KERNELS	associated constants `CONCURRENT_KERNELS` and `VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED`	nothing
+crates/engine-cuda/src/cuda.rs	140	VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED	associated constants `CONCURRENT_KERNELS` and `VIRTUAL_MEMORY_MANAGEMENT_SUPPORTED`	tests
+crates/engine-cuda/src/hnn/adjoint.rs	49	dpb	field `dpb`	nothing
+crates/engine-cuda/src/hnn/card.rs	346	is_empty	method `is_empty`	nothing
+crates/engine-cuda/src/hnn/moment.rs	30	MomentWords	struct `MomentWords`	nothing
+crates/engine-cuda/src/hnn/moment.rs	370	moments_return	method `moments_return`	nothing
+crates/engine-cuda/src/hnn/profile.rs	425	series_check	method `series_check`	tests
+crates/engine-cuda/src/hnn/resident.rs	2253	region_octets	function `region_octets`	tests
+crates/engine-cuda/src/hnn/resident.rs	2342	batches	function `batches`	tests
+crates/engine-cuda/src/cuda.rs	632	DeviceZeroable	trait `DeviceZeroable`	features only (ruler-rows-reads, ruler-bits)
+crates/engine-cuda/src/cuda.rs	639	device_dword_count	function `device_dword_count`	features only (ruler-rows-reads, ruler-bits)
+crates/engine-cuda/src/hnn/card.rs	216	zeroed	method `zeroed`	features only (ruler-rows-reads, ruler-bits)
+crates/engine-cuda/src/hnn/profile.rs	59	BITS_NAMES	constant `BITS_NAMES`	features only (ruler-rows-reads, ruler-bits)
+crates/engine-cuda/src/hnn/profile.rs	64	BITS_TICKS	constant `BITS_TICKS`	features only (ruler-rows-reads, ruler-bits)
+crates/engine-cuda/src/hnn/profile.rs	66	BITS_BINS	constant `BITS_BINS`	features only (ruler-rows-reads, ruler-bits)
