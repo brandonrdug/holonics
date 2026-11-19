@@ -1440,3 +1440,6 @@ import HolonicsResearch.HNN.WordSensitivity
 import HolonicsResearch.Physics.Spacetime.PetrovTypes
 import HolonicsResearch.Objects.RetentionClasses
 import HolonicsResearch.HNN.RekeyedCapacity
+import HolonicsResearch.Physics.Spacetime.CurvatureJets
+import HolonicsResearch.HNN.GroupKeys
+import HolonicsResearch.Mathematics.CertifiedCapture
