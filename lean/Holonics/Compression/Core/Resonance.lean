@@ -35,9 +35,12 @@ The parametron join (`Node → ℝ`, the owners' `diagonalStorage`, `diagonalRes
    and the stored energy changes at exactly the power of that effort:
    `dE/dt = ⟨f(t), ẋ(t)⟩` (`hasDerivAt_modeEnergy`). This is what *work* means here: the time
    integral of the port power, which by the balance is the change of stored energy.
-6. **RIDE is free.** Driving within the eigenspace keeps a generalized mode at the same frequency,
-   its energy is conserved (`Parametron.modeEnergy_conserved`) and the holding effort is zero at
-   every time (`resonant_drive_rides`).
+6. **RIDE is free** on this lossless constitution. Driving within the eigenspace keeps a
+   generalized mode at the same frequency, its energy is conserved
+   (`Parametron.modeEnergy_conserved`) and the holding effort is zero at every time
+   (`resonant_drive_rides`). With a dissipation `D` the hold costs the quadrature effort
+   `−ω sin(ωt) D d` and `2πω S_D(d)` a period
+   (`HolonicsResearch/Compression/Core/ResonanceFriction.ride_against_friction`, `damped_work_period`).
 7. **FOUND needs effort.** A nonzero emanating part needs a nonzero holding effort
    (`emanating_drive_needs_effort`), and the work it exchanges over `[0, t]` is
    `sin²(ωt)·(ω² S_C(e) − S_K(e))`, independent of the resonating part (`work_ledger`). A nonzero

@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,708 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,709 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 107 | 102 |
+| [November 2026](#november-2026) | 108 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -28,6 +28,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-19 [The carry chains law is eulerian a scope reads neutral only where it holds a repeated primes fibre a source upstream of an equal sink closes its body and the minors gcd is the invariants product in Lean](2026-11-19_THE_CARRY_CHAINS_LAW_IS_EULERIAN_A_SCOPE_READS_NEUTRAL_ONLY_WHERE_IT_HOLDS_A_REPEATED_PRIMES_FIBRE_A_SOURCE_UPSTREAM_OF_AN_EQUAL_SINK_CLOSES_ITS_BODY_AND_THE_MINORS_GCD_IS_THE_INVARIANTS_PRODUCT_IN_LEAN.md)
 - 2026-11-19 [The hands saving is sandwiched by its square a map and its dual share one ihara factor the repairs patches are a prefix code differences are jets at any step and founding obeys ville at every horizon in Lean](2026-11-19_THE_HANDS_SAVING_IS_SANDWICHED_BY_ITS_SQUARE_A_MAP_AND_ITS_DUAL_SHARE_ONE_IHARA_FACTOR_THE_REPAIRS_PATCHES_ARE_A_PREFIX_CODE_DIFFERENCES_ARE_JETS_AT_ANY_STEP_AND_FOUNDING_OBEYS_VILLE_AT_EVERY_HORIZON_IN_LEAN.md)
 - 2026-11-19 [The ising partition function is the lock polynomial so a ferromagnets zeros in the field lie on the imaginary axis and an antiferromagnets do not](2026-11-19_THE_ISING_PARTITION_FUNCTION_IS_THE_LOCK_POLYNOMIAL_SO_A_FERROMAGNETS_ZEROS_IN_THE_FIELD_LIE_ON_THE_IMAGINARY_AXIS_AND_AN_ANTIFERROMAGNETS_DO_NOT.md)
+- 2026-11-19 [The sieve tower is a law of any multiplicative recurrence one chart certifies an irreducible curve friction prices a held mode a solved charts bits follow the Hadamard bound and frame dragging is a flux in Lean](2026-11-19_THE_SIEVE_TOWER_IS_A_LAW_OF_ANY_MULTIPLICATIVE_RECURRENCE_ONE_CHART_CERTIFIES_AN_IRREDUCIBLE_CURVE_FRICTION_PRICES_A_HELD_MODE_A_SOLVED_CHARTS_BITS_FOLLOW_THE_HADAMARD_BOUND_AND_FRAME_DRAGGING_IS_A_FLUX_IN_LEAN.md)
 - 2026-11-19 [The strands hold the sum only in their comparison each polynomial kernel is the image before it a number keeps its lower level and a reading is bounded by its leverage in Lean](2026-11-19_THE_STRANDS_HOLD_THE_SUM_ONLY_IN_THEIR_COMPARISON_EACH_POLYNOMIAL_KERNEL_IS_THE_IMAGE_BEFORE_IT_A_NUMBER_KEEPS_ITS_LOWER_LEVEL_AND_A_READING_IS_BOUNDED_BY_ITS_LEVERAGE_IN_LEAN.md)
 - 2026-11-19 [The strength is three times the free functions of three variables sheets do not coarsen where a word crosses back the survivors are the cycle fibre and a keys move is the derivative of the code in Lean](2026-11-19_THE_STRENGTH_IS_THREE_TIMES_THE_FREE_FUNCTIONS_OF_THREE_VARIABLES_SHEETS_DO_NOT_COARSEN_WHERE_A_WORD_CROSSES_BACK_THE_SURVIVORS_ARE_THE_CYCLE_FIBRE_AND_A_KEYS_MOVE_IS_THE_DERIVATIVE_OF_THE_CODE_IN_LEAN.md)
 - 2026-11-19 [Two coupled planes turns are free the carry is a class of order N and friction keeps only the harmonic part in Lean](2026-11-19_TWO_COUPLED_PLANES_TURNS_ARE_FREE_THE_CARRY_IS_A_CLASS_OF_ORDER_N_AND_FRICTION_KEEPS_ONLY_THE_HARMONIC_PART_IN_LEAN.md)

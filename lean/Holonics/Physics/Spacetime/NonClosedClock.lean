@@ -36,11 +36,17 @@ The carrier is the oriented square `0 → 1 → 2 → 3 → 0` with one face (`s
   nonzero lapse it is admitted (not `(0 : 0)`) and projectively the lapse ratio `(N₁ : N₂)`
   (`redshift_rate`).
 
-[interpretation] Frame dragging would be the same law for a stationary non-static clock
-`ω = N dt − A`, whose cycle reading is the flux of `dA`
-(`HodgeTime.cell_boundary_reading_is_curvature_flux`); only the Sagnac case `A = Ω(x dy − y dx)`
-is stated here, first order in `Ω` (the passage values are the first-order synchronization gaps).
-`[open]` A frame-dragging clock of a stationary spacetime is owed (#62).
+[proved-standard; formal-checked, elsewhere] Frame dragging is the same law for a stationary
+non-static metric: Einstein synchronization sets the gap `a(v) = −g₀ᵢvⁱ/g₀₀` along a passage, and a
+loop reads in coordinate time the flux of `da`
+(`HolonicsResearch/Physics/Spacetime/FrameDraggingClock.{einstein_offset, syncClock_cell_reading,
+syncClock_closed_iff}`). Only the Sagnac case `A = Ω(x dy − y dx)` is stated here, first order in
+`Ω`, and it is that clock read at the passages' midpoints (`sagnac_is_syncClock`); to all orders the
+rotating circle reads `2ΩA/(1 − Ω²r²)` (`rotating_circle_reading`), and the Lense–Thirring circle
+`−4πJ/(r − 2M)`, closed by the chart turning at the zero-angular-momentum rate `ω = 2J/r³`
+(`lenseThirring_reading_eq`, `zamo_closes`). The static observer's proper-time form is
+`N(dt − a)`, so an earlier reading here of the clock as `ω = N dt − A` with cycle reading the flux
+of `dA` holds with `A = N a` only where the lapse is uniform, as in the first-order Sagnac case.
 -/
 
 noncomputable section

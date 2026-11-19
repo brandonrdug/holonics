@@ -102,8 +102,15 @@ running map is the prox step at the carried Gram (`normal_prox_step`), and the s
 the exact accumulation every carried value stays within one lattice unit of
 (`within_one_unit_since_founding`), not the carried state itself.
 
-[open] Owed in #62 ("Step 4 (#73) owed"): the bits of the solved charts `H⁻¹`, which follow the
-Hadamard bound of the carried Grams, and the word-level certificate of the lattice rule.
+[proved-standard; formal-checked, elsewhere] The bits of the solved chart `H⁻¹` follow Hadamard's
+bound of the lattice Gram `N = 2^L H`: each reduced entry of `N⁻¹` has numerator and denominator at
+most `Π N_kk`, the carried chart's numerators take `L` bits more, and the lattice rule alone makes
+a symmetric carried Gram's real cast positive definite
+(`HolonicsResearch/HNN/SolvedChartBits.{det_le_prod_diag, solved_chart_bits,
+lattice_solved_chart_bits, carried_lattice_solved_chart_bits}`), with prime images verified over ℚ
+and the pivots of a factored `L D Lᵀ` (`solved_chart_of_prime_images`, `ldl_pivot_num_den_le`).
+
+[open] Owed in #410: the word-level certificate of the lattice rule.
 -/
 
 noncomputable section

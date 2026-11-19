@@ -25,8 +25,12 @@ RadixWindowReceiver}`, `Physics/CompositeMassEnergy`, `Aeon/Production/Zeta`).
 | `Landmark/PrimitiveCycle` | `tr(M_fⁿ) = Σ_(d∣n) d·p_d`, Möbius inversion, and `det(1 − T·M_f) = ∏_d (1 − T^d)^(p_d)`: the dynamical zeta is the Euler product over primitive cycles |
 | `Landmark/Context` | the shift navigator's landmarks, the receiving tree: context-tree weighting over typed addresses, each pruned tree a candidate standing and the weight their mixture under the stop prior, each node's arrivals the epochs of its section and its register capped by a carry, stored where paths part, on declared carriers (its own table) |
 
-[open] Owed in #62: Gröbner completion and the face-kernel equality, Richardson undecidability,
-the first-arrival sieve tower as a general law, and the Lefschetz count of torus periodic points.
+[open] Owed in #410: Buchberger's criterion and the face-kernel equality, and Richardson
+undecidability. Buchberger's halting, the chart's density and the coordinate certificate are
+`HolonicsResearch/Compression/Landmark/ChartDensity`; the first-arrival sieve tower as a general
+law is `HolonicsResearch/Compression/Landmark/SieveTower` (its ℕ case is
+`HolonicsResearch/Landmarks/Sieve`); the Lefschetz count of torus periodic points is
+`HolonicsResearch/Geometry/TorusPeriodic`.
 The necklace integrality and Euler product of a general nonnegative integer return map are
 `HolonicsResearch/Compression/Landmark/NecklaceIntegrality` (the 0/1 case stands here).
 The identity-atlas search, navigator inference by loop closure and the landmark search's
