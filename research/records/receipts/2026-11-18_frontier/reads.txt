@@ -1363,3 +1363,26 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   FRONTIER L40; one place open: all 0.7664 (100508 places) | books 0.8108 code 0.4947 science 0.6947 web 0.8504 wikidata 0.9809 || less the control's, paired: -0.1256 (±0.0019) | books -0.1608 code -0.1065 science -0.1567 web -0.1292 wikidata -0.0753
   FRONTIER L40; the frontier, each stretch read by two streams : all 1.4110 (99844 places) | books 1.4696 code 1.0898 science 1.3212 web 1.6293 wikidata 1.5453 || less the control's, paired: -0.1236 (±0.0019) | books -0.1147 code -0.1406 science -0.1362 web -0.0956 wikidata -0.1308
   L40 wide panel: LONG L40: all words 2210 in lexicon 1548 (70%) writes that loop 23 of 160 longest run shared with its prompt 76 | code 315/380 (82%) web 348/450 (77%) science 268/433 (61%) books 426/527 (80%) wikidata 191/420 (45%)
+
+# 19:15 UTC November 19. A profile of the line's section (.local/run/profile/profile.sh): 60 sections of train-store from lap L41's end, plain and with FIELD_PROFILE (every launch timed alone), each under the card lock; binary gatecarry/bin/athena:
+  plain: 60 sections, 455 ms a section (deposit 452, regions 2.1), 31334 sites a section
+  profile: 60 sections, 589 ms a section (deposit 587, regions 1.0), 31334 sites a section
+  FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15468396544 total=16769024000 batch_budget=10510532608
+  FIELD_CARD reads=0 read_ms=0 returns=120 return_ms=32578 pairs=2758799200 batches=180 peak_store=8407394048 landmarks=0 landmark_ms=0 elapsed_ms=36032
+  FIELD_PROFILE_SPLIT kernels_ms=28675 copies=13020 copies_ms=688 allocations=88801 allocations_ms=691 elapsed_ms=36037
+  launches a section 2,736 over 96 kernels; the ten largest by time:
+    FIELD_PROFILE entry=field_transposed launches=12720 ms=2325 us_a_launch=182 grid_threads=1257958144 mean_grid_threads=98896
+    FIELD_PROFILE entry=field_affine_tiled_x32 launches=10620 ms=2026 us_a_launch=190 grid_threads=2150569984 mean_grid_threads=202501
+    FIELD_PROFILE entry=field_contact_rows launches=5760 ms=1872 us_a_launch=325 grid_threads=1307612160 mean_grid_threads=227016
+    FIELD_PROFILE entry=field_outer_x32 launches=9240 ms=1782 us_a_launch=192 grid_threads=655566848 mean_grid_threads=70948
+    FIELD_PROFILE entry=field_contact_columns launches=5760 ms=1764 us_a_launch=306 grid_threads=1307612160 mean_grid_threads=227016
+    FIELD_PROFILE entry=field_pace_skin_back launches=2880 ms=1092 us_a_launch=379 grid_threads=653806080 mean_grid_threads=227016
+    FIELD_PROFILE entry=field_contact_l4 launches=939 ms=1086 us_a_launch=1156 grid_threads=1174277632 mean_grid_threads=1250561
+    FIELD_PROFILE entry=field_pair_gate_back launches=960 ms=973 us_a_launch=1014 grid_threads=4844535808 mean_grid_threads=5046391
+    FIELD_PROFILE entry=field_pair_scan_back launches=960 ms=823 us_a_launch=858 grid_threads=22702080 mean_grid_threads=23648
+    FIELD_PROFILE entry=field_pair_scan_pre launches=960 ms=816 us_a_launch=850 grid_threads=4844535808 mean_grid_threads=5046391
+  the card during a lap (nvidia-smi, 11 s at 1 s): 87% to 99% busy, 35% to 47% of memory bandwidth, 235 to 260 W, 2,790 MHz, 10.1 GB used; athena on the host: 152% of a core, 434 MB resident.
+
+# 19:15 UTC November 19. Her composition on the wide panel (word pairs and triples of her writes, each in a slice's first 16 MB of training text): L17 pairs 1,513 attested 0.17, triples 1,126 attested 0.02; L41 pairs 1,540 attested 0.33, triples 1,147 attested 0.09; the reference continuations' first 96 octets pairs 155 attested 0.55, triples 110 attested 0.36. Her words split (L41): 0.31 in its own prompt, 0.45 other lexicon words, 0.24 not words (L17: 0.24, 0.33, 0.43; the references 0.39, 0.46, 0.15).
+
+# 19:15 UTC November 19. A probe of patterned prompts (front/pattern/pattern.sh; Brandon 19:00 UTC; 12 prompts drawn 8 times, 32 places; L17 and L42): the writes that begin with the reference continuation, of 8 a prompt: L17 brackets 3, repeat 1, every other 0; L42 sums 1, every other 0. The format of each pattern holds (numbers in commas, lists of pairs, 'a + b = c' lines) and its rule does not.
