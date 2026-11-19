@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,710 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,711 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 109 | 102 |
+| [November 2026](#november-2026) | 110 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -24,6 +24,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-19 [A load moves a line by its weight on the mode the magnitude cannot see the basins it reflects the stable core is the first round and a lossless period reads hills kinds by its trace in Lean](2026-11-19_A_LOAD_MOVES_A_LINE_BY_ITS_WEIGHT_ON_THE_MODE_THE_MAGNITUDE_CANNOT_SEE_THE_BASINS_IT_REFLECTS_THE_STABLE_CORE_IS_THE_FIRST_ROUND_AND_A_LOSSLESS_PERIOD_READS_HILLS_KINDS_BY_ITS_TRACE_IN_LEAN.md)
 - 2026-11-19 [A pools best face is its leading eigenvectors level two is free on two carries a softmax release falls by the entropy two passes apart and a conserved face is a congruence in Lean](2026-11-19_A_POOLS_BEST_FACE_IS_ITS_LEADING_EIGENVECTORS_LEVEL_TWO_IS_FREE_ON_TWO_CARRIES_A_SOFTMAX_RELEASE_FALLS_BY_THE_ENTROPY_TWO_PASSES_APART_AND_A_CONSERVED_FACE_IS_A_CONGRUENCE_IN_LEAN.md)
 - 2026-11-19 [Maxwell keeps Gauss along every motion heat on a partition raises entropy by half its Fisher information a readings leverage is a series over its pivots and the rank falls where a prime divides every minor in Lean](2026-11-19_MAXWELL_KEEPS_GAUSS_ALONG_EVERY_MOTION_HEAT_ON_A_PARTITION_RAISES_ENTROPY_BY_HALF_ITS_FISHER_INFORMATION_A_READINGS_LEVERAGE_IS_A_SERIES_OVER_ITS_PIVOTS_AND_THE_RANK_FALLS_WHERE_A_PRIME_DIVIDES_EVERY_MINOR_IN_LEAN.md)
+- 2026-11-19 [Polar factors carry one root as its constraint a chases capture and viability stand by the terrains size and an interior eliminates in stages along a tube and a tower in Lean](2026-11-19_POLAR_FACTORS_CARRY_ONE_ROOT_AS_ITS_CONSTRAINT_A_CHASES_CAPTURE_AND_VIABILITY_STAND_BY_THE_TERRAINS_SIZE_AND_AN_INTERIOR_ELIMINATES_IN_STAGES_ALONG_A_TUBE_AND_A_TOWER_IN_LEAN.md)
 - 2026-11-19 [The atlas rows graded formal checked were read against their Lean statements 243 of 2501 claimed more and each repaired row states its owners with the rest in scope](2026-11-19_THE_ATLAS_ROWS_GRADED_FORMAL_CHECKED_WERE_READ_AGAINST_THEIR_LEAN_STATEMENTS_243_OF_2501_CLAIMED_MORE_AND_EACH_REPAIRED_ROW_STATES_ITS_OWNERS_WITH_THE_REST_IN_SCOPE.md)
 - 2026-11-19 [The carry chains law is eulerian a scope reads neutral only where it holds a repeated primes fibre a source upstream of an equal sink closes its body and the minors gcd is the invariants product in Lean](2026-11-19_THE_CARRY_CHAINS_LAW_IS_EULERIAN_A_SCOPE_READS_NEUTRAL_ONLY_WHERE_IT_HOLDS_A_REPEATED_PRIMES_FIBRE_A_SOURCE_UPSTREAM_OF_AN_EQUAL_SINK_CLOSES_ITS_BODY_AND_THE_MINORS_GCD_IS_THE_INVARIANTS_PRODUCT_IN_LEAN.md)
 - 2026-11-19 [The hands saving is sandwiched by its square a map and its dual share one ihara factor the repairs patches are a prefix code differences are jets at any step and founding obeys ville at every horizon in Lean](2026-11-19_THE_HANDS_SAVING_IS_SANDWICHED_BY_ITS_SQUARE_A_MAP_AND_ITS_DUAL_SHARE_ONE_IHARA_FACTOR_THE_REPAIRS_PATCHES_ARE_A_PREFIX_CODE_DIFFERENCES_ARE_JETS_AT_ANY_STEP_AND_FOUNDING_OBEYS_VILLE_AT_EVERY_HORIZON_IN_LEAN.md)

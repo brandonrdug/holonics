@@ -1413,3 +1413,6 @@ import HolonicsResearch.Transport.TraceFacesGeneral
 import HolonicsResearch.Transport.SerialChainJacobian
 import HolonicsResearch.Transport.MoveConventions
 import HolonicsResearch.Foundation.CarryTower
+import HolonicsResearch.Geometry.PolarConstraint
+import HolonicsResearch.Geometry.ChaseConsumer
+import HolonicsResearch.Holon.DtNTubeTower
