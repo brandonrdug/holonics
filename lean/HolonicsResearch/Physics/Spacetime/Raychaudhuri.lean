@@ -102,8 +102,9 @@ What is not claimed. Petrov's classification (the eigenvalue types of `E + iH`) 
 deviation equation is a hypothesis here; `GeodesicDeviation` derives `J″ = −RJ` for the frame
 components of a family of geodesics of any torsion-free connection, with `R = E⁻¹R(·, u)u E` in a
 parallel frame, and meets this premise. The reduction to the screen orthogonal to a timelike `u` and
-the tidal matrix's symmetry from metric compatibility are not derived, and that symmetry is assumed
-where it is used. A `C` with the curvature symmetries built from a metric's 2-jet, the first nonzero instance of
+the tidal matrix's symmetry from metric compatibility stand in `TidalScreen`, which meets
+`rotation_law`'s symmetry premise for a metric's connection; here that symmetry is assumed where it
+is used. A `C` with the curvature symmetries built from a metric's 2-jet, the first nonzero instance of
 `WeylSymmetries` (a plane wave), and the vacuum's tidal matrix as `E` stand in `CurvatureJets`, at
 one point; here they are read, not derived. The null (Sachs) form, with its two-dimensional screen and
 `−θ²/2`, is not stated; nor is an accelerated congruence. A caustic is not exhibited as a point

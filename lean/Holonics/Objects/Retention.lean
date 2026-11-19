@@ -35,9 +35,12 @@ identical futures (`constitution_is_not_minimal`). This module finds the minimal
 of deposition beyond the families `HolonicsResearch/Objects/RetentionClasses` computes: every
 forest, where it is a point under every law; the `m`-edge parallel bundle, where the square law
 keeps every constitution but the uniform class and the Joule law keeps the projective class; the
-bundle with a pendant edge, whose pendant is forgotten) and `HolonicsResearch/Objects/RetentionSeries`
+bundle with a pendant edge, whose pendant is forgotten), `HolonicsResearch/Objects/RetentionSeries`
 computes (two bundles in series, the product of their classes; the triangle, where the
-constitution is minimal), and for other deposition laws.
+constitution is minimal) and `HolonicsResearch/Objects/RetentionCycles` computes (every cycle of
+three or more nodes and the diamond, where the constitution is minimal under the square and Joule
+laws, through a lemma that reduces a graph's classes to two tests on its incidence), and for
+deposition laws other than the square and Joule laws.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
