@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §22 on November 19, to 05:55 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §23 on November 19, to 06:10 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -766,3 +766,31 @@ is sure at 0.579 of them (the count at 0.921), and a draw writes the settled sym
 its rule the line takes the 512 circles and continues from E22's end. The line's laps L23 to L26 run with no arm beside them, each
 read whole (held read, both panels, loudness, wide panel), while the next part is designed: one judged by the sure share at the
 settled places (§21), since a fourth doubling at its taper (about 0.010 at the second lap) costs about 80 ms more a section.
+
+## 23. The next part's form: rows at the residue the circles compose
+
+*Written at 06:10 UTC, November 19; `agent-inferred` throughout, a design to be built and run as an arm.* Three doublings of the
+circles took the line from where a count of three places stands at the settled places to under the count of five's code there, and
+moved her words ten points; the fourth would give about 0.010 at its taper for 80 ms more a section. What the circles do not give is
+surety: she is sure at 58% of the settled places where the count is at 92% (§21, §22).
+
+**What the records already settle.** §13 named the composite's remainder: rows a strand in progress reaches by an address its symbols
+compose in order, deposited by the covector that reaches them and kept by upkeep. §14 read that rows shared by a scramble buy nothing
+(a row shared by contexts that continue differently holds none of them), so rows are few only where the address is located, contexts
+that continue alike standing at one residue; and that carrying comes before rows. The carriers are now grown: 512 circles whose turns
+are deposited strides, so each circle's phase after a strand is the unit's own move `m(w)` (atlas `navigator.unit-composite-move`)
+at a located place on the circle.
+
+**The form.** On a few of the circles, each read as a ring of its own period (the periods coprime, a gene's choice: atlas
+`unicity.gene-partial-key`), a strand's phase gives a residue, and the residue reaches a row; the rows of the rings it reaches are
+summed into the read beside the circles' own linear face. The address is located by the circles' deposited strides, never a scramble
+of the symbols, so contexts the circles already place together share a row, which is §14's retained quotient. The rows are founded at
+zero (every face kept), charged by the covector that reaches the residue, and leak at the deposit's rate: by the stores' test a store,
+since few rows are reached by many contexts and each holds by its balance. Sizing from §14: ten to a hundred thousand rows a register
+before sharing; a ring of period about a thousand on each of sixteen circles is sixteen thousand rows, each the width of the read it
+adds to.
+
+**Its receipt.** An arm beside the line, read first on the wide panel and on the sure share at the settled places (§21), the code
+beside them. What it could repeat: a cache (a row a context) where the periods are wide against the contexts that reach them, which
+the period's choice against §14's counts guards; a scramble where the circles' phases are not yet located, which the circles' own
+strides now are (§19's spread of strides, read again on E22's state before the build).
