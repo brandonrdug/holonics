@@ -624,3 +624,17 @@ G-1119-4 scored (2026-11-19T15:38:09Z). At the 26,083 settled places of the read
 the scramble 0.247: (b) missed, the residue reads under both (guessed 0.50 to 0.62, with two places alone at 0.45 to 0.52: the fitting
 half's 768 thousand places hold less than the 8 MB the guess's figures were read on). By its rule the circles' phase is no located
 address, and §23's form changes.
+
+G-1119-5 (2026-11-19T15:43:55Z). The second address read (§25; a ruler, no lap): rows addressed by the frontier's own read, mixed with her face.
+`read-strand-states ... past carries` at lap L36's mean writes each open place's last read on the fitting half (3,000 windows of the
+training text) and on the 455 held stretches of L36's frontier read that are whole UTF-8; `tools/read_rows_ruler.py` with 4 rings of
+2^10 rows (the half-planes of ten fixed projections of the read), each address's rows mixed with her face at a λ chosen on the even
+stretches and read on the odd ones, beside a scramble of the four octets before and a planted address at the same rows.
+  What is on record. At L36's mean a draw from her face writes the settled symbol 0.815 of the time (the excess ruler on all held
+  places); §25: rows at the circles' residue read under a scramble; the planted address reads 0.655 alone with a two-place back-off.
+  The guess. (a) Her face alone at the settled places of the odd stretches: mass 0.78 to 0.84. (b) Rows at her read's direction, mixed:
+  0.000 to 0.010 more mass there than her face, at λ of 0.1 or less. (c) The planted address, mixed: 0.005 to 0.040 more.
+  What it decides. Rows at her read adding 0.010 or more and more than the scramble's: the store is built at her read's direction.
+  The planted adding and her read not: the store needs an address the symbols themselves locate (§13's composite at an address its
+  symbols compose), and her read is not one. Neither adding: rows of this budget do not add to her face, and the next part is not a
+  store of rows.
