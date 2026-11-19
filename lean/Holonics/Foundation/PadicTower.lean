@@ -5,7 +5,8 @@ import Mathlib.Data.ZMod.Basic
 namespace Holonics.Foundation.ContinuingTower
 variable (p : ℕ) [Fact p.Prime]
 
-/-- [definition] The `ℤ/p^n` tower under the canonical cast maps. -/
+/-- [definition] The `ℤ/p^n` tower under the canonical cast maps. The definition takes no primality, so
+`padicTower b` is the `b`-adic tower of every base (`HolonicsResearch/Foundation/CarryTower` reads it so). -/
 def padicTower : Tower.{0, 0} ℕ where
   Face := fun n => ZMod (p ^ n)
   restrict := fun {m _} h x => ZMod.castHom (pow_dvd_pow p h) (ZMod (p ^ m)) x

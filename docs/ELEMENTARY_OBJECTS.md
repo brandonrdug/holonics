@@ -799,13 +799,19 @@ the jet ladder that reading uses, and the spline families were the prototype's
 [proved-derived; formal-checked] **Placement.** With `Ω = e^{iπ/2}H`, `H` Hermitian, the chain's
 infinitesimal generator is `A = (e^{iπ/2}H + e^{iπ}M)G`. For `G ≻ 0`, `M = M* ⪰ 0` the conservative
 part places spectrum on the imaginary axis and the dissipative part on the nonpositive real line, a
-quarter-turn apart; their sum lies in the closed left half-plane. [interpretation] A `G`-skew
-operator has spectrum symmetric under `λ ↦ −λ̄`, the finite form of `ξ(s)=ξ(1−s)`; a lossless chain
-is a Foster reactance, and turning `M` on is the finite analogue of the de Bruijn–Newman flow (`Zeta/FosterTanks`).
-[proved-standard] For indefinite nondegenerate `G` with `κ` negative squares, at most
-`min(κ, n−κ)` eigenvalues of a `G`-skew operator lie in the open right half-plane (Pontryagin;
-`G=diag(1,−1)`, `A=[[0,1],[1,0]]` attains it; Lean lift #54). This conservative bound is not
-asserted for an arbitrary mixed dissipative generator with indefinite storage. [interpretation] **`M_contact` and Hodge:** `M_contact = Σ w_f J_fᵀD_fJ_f` is the upper
+quarter-turn apart; their sum lies in the closed left half-plane. [proved-standard; formal-checked] A
+`G`-skew operator with `G` nondegenerate has spectrum symmetric under `λ ↦ −λ̄`
+(`HolonicsResearch/Transport/PontryaginBound.gSkew_eigen_reflect`). [interpretation] That symmetry is
+the finite form of `ξ(s)=ξ(1−s)`; a lossless chain is a Foster reactance, and turning `M` on is the
+finite analogue of the de Bruijn–Newman flow (`Zeta/FosterTanks`).
+[proved-standard; formal-checked] For nondegenerate Hermitian `G` with `κ` negative squares, at most
+`min(κ, n−κ)` eigenvalues of a `G`-skew operator, counted with algebraic multiplicity, lie in the
+open right half-plane, as many in the left, so at least `n − 2 min(κ, n−κ)` dimensions of modes sit
+on the imaginary axis (Pontryagin; `G=diag(1,−1)`, `A=[[0,1],[1,0]]` attains it;
+`HolonicsResearch/Transport/PontryaginBound.{pontryagin_bound_roots, onAxis_finrank_ge,
+swap_attains}`, with the lossless chain `ΩG` meeting its hypotheses, `chain_pontryagin_bound`). This
+conservative bound is not asserted for an arbitrary mixed dissipative generator with indefinite
+storage, whose rate form is `−2GMG` (`chain_rateForm`). [interpretation] **`M_contact` and Hodge:** `M_contact = Σ w_f J_fᵀD_fJ_f` is the upper
 term `d*⋆d` when the slips are the coboundary; harmonic classes also need `d_{k−1}d_{k−1}*`, so a
 rigidity kernel is not by itself homology.
 
@@ -856,7 +862,9 @@ decaying (Ricci-type) interior, a fully observable interior, an open tube and a 
 refining the receiver removes completeness. Approximate recurrence is
 `HolonicsResearch/Aeon/Production/Recurrence` for any kept finite measure (Poincaré recurrence, the
 return's deadline, Kac's lemma for an ergodic motion) with Dirichlet's bound for one clock; a torus of several clocks is not stated
-there. Open: the join of `β` to the membrane's faces, and the Λ_DN join.
+there. `Objects/Membrane` joins `β` to the membrane's faces (`membraneFace_gauge`,
+`linearGlobe_boundary_is_membrane_face`) and eliminates an interior as `Λ_DN` (`interior_elimination`,
+`solves_boundary_is_dtn`); `Λ_DN` read along a tube's stations and a tower's levels is owed in #410.
 
 [open] The **relative completeness theorem** is to be derived by pairing the Einstein lifts
 (`HolonicCurvedArcEinstein`, `Ricci`, `HolonicFieldTheoryPassage`, `CurvatureAndGap`) with the

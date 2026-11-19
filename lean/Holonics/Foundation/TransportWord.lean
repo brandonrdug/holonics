@@ -6,7 +6,7 @@ import Lean.Elab.Tactic.Omega
 # Ordered transport words and endpoint order blindness
 
 This file owns the generic list action used by the holonic framework.  A transport word retains the
-ordered sequence of generator entries, and equivariance extends to that exact sequence.
+ordered sequence of generator entries, and equivariance extends to that same sequence.
 An entry need not itself encode a complete occurrence identity; addressed passage owners retain
 that additional lineage.  The
 `OrderBlind` predicate is only an endpoint-action property: when it holds, permuting a word does not
@@ -34,7 +34,7 @@ def transportWord (T : ι → X → X) : List ι → X → X
 
 /-- Equivariance on the generators extends to every ordered transport word.
 
-This is the exact local-to-composite bridge used by a geometric action: if `f` intertwines each
+This is the local-to-composite bridge used by a geometric action: if `f` intertwines each
 declared generator `T i` with `S i`, it intertwines the chronology they generate, with its order
 retained. The theorem does not claim that the actions or the intertwiner were recovered from
 material; those are exterior hypotheses. -/
@@ -152,7 +152,7 @@ open Holonics.Foundation.Chronology
 
 /-! ## Generic order, additive, and group-valued word transport
 
-These declarations are the group-action realization of the exact list word above. Their physical
+These declarations are the group-action realization of the list word above. Their physical
 and geometric instances remain with their consuming Research constructions. -/
 
 /-- Endpoint order-blindness is exactly pairwise commutation of the endpoint actions. -/
@@ -160,7 +160,7 @@ theorem chronology_discard_iff_commuting {I X : Type*} (T : I → X → X) :
     OrderBlind T ↔ ∀ i j x, T i (T j x) = T j (T i x) :=
   orderBlind_iff_commute
 
-/-- Exact translation of an additive fibre. This is the abelian connection action used by
+/-- Translation of an additive fibre. This is the abelian connection action used by
 cellular circulation and phase transport; no metric or constitutive law is inserted. -/
 def additiveTranslation {A : Type*} [AddGroup A] (increment : A) : Equiv.Perm A where
   toFun state := state + increment
@@ -187,7 +187,7 @@ def parallelTransport {X : Type*} : List (Equiv.Perm X) → Equiv.Perm X
 @[simp] theorem parallelTransport_nil {X : Type*} :
     parallelTransport ([] : List (Equiv.Perm X)) = 1 := rfl
 
-/-- Abelian connection holonomy is translation by the exact sum of the retained increments. -/
+/-- Abelian connection holonomy is translation by the sum of the retained increments. -/
 theorem parallelTransport_additiveTranslation {A : Type*} [AddCommGroup A]
     (increments : List A) :
   parallelTransport (increments.map additiveTranslation) =
