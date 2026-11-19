@@ -41,9 +41,10 @@ consistent keys are the fibre of the loop-closure map (`Compression/Core/Keys`).
    class and keeps its winding, and leaves the open moment's counts, offset counts and held cells
    untouched (`rekey_keeps_winding`).
 
-[open] That the survivors of `propagate` equal the fibre of the component's fundamental-cycle menu
-(the converse of `survivor_closes_walks`: a candidate closing every fundamental cycle satisfies
-every edge) is not proved here; nor is key location for continuous keys (#62).
+The converse of `survivor_closes_walks` stands in `HolonicsResearch/HNN/SurvivorsCycleFibre`: over a truth
+that fits every edge, the survivors of `propagate` are the fibre of the component's fundamental-cycle menu
+cut by the traversal tree's injectivity (`survivors_eq_cycle_fibre`, `survives_iff_fundamental`). Key
+location for continuous keys is #410's.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

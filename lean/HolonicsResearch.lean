@@ -1375,3 +1375,14 @@ import HolonicsResearch.Transport.RepairCodec
 import HolonicsResearch.Transport.JetAtStep
 import HolonicsResearch.HNN.FoundingVille
 import HolonicsResearch.HNN.FinestGrain
+import HolonicsResearch.Physics.Spacetime.StrengthFreeData
+import HolonicsResearch.Aeon.Clock.SheetCoarsening
+import HolonicsResearch.HNN.SurvivorsCycleFibre
+import HolonicsResearch.HNN.TurnMenuFibre
+import HolonicsResearch.HNN.ResidentPairFace
+import HolonicsResearch.Landmarks.SmithCokernel
+import HolonicsResearch.Compression.KeyMove
+import HolonicsResearch.HNN.ReceivingPrecision
+import HolonicsResearch.HNN.SoftmaxTwoCycleSettles
+import HolonicsResearch.Compression.LocatedRelabelling
+import HolonicsResearch.HNN.FoundedUnitsPrice

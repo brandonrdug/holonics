@@ -41,8 +41,8 @@ turns `u ↦ u + 1`. The one-class passage `0` costs `1` bit and its turned pass
 (`residue_codeLength_moves`); its dyadic mass moves from `1/2` to `1/4` (`residue_mass_moves`);
 so the constant coder of the residue chart is not carried (`residue_not_carried`).
 
-Owed in #62: that the located route's survivors on `π∘x` are those on `x` carried by `π` (the
-hypothesis `Carried` for `TransportLocation` itself), which needs the location's law stated in Lean.
+The hypothesis `Carried` for `TransportLocation` itself, that the located route's survivors on `π∘x` are those on
+`x` carried by `π`, is discharged in `Compression/LocatedRelabelling` (`survivors_relabel`, `advanceCoder_carried`).
 -/
 
 namespace Holonics.Compression.Relabelling
