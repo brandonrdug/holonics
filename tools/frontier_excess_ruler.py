@@ -24,6 +24,9 @@ import math, sys
 G = float(1 << 20)
 LN2 = math.log(2)
 EDGES = [0.25, 0.5, 1.0, 2.0]
+# [the lead, November 19] The spread of a code within a bin: its places by the code paid, the shares under 0.1 nats, 0.1 to 0.5, 0.5 to
+# 1.5 and over 1.5 (the column a one-off of November 18 19:59 UTC read first, kept here so every read of the bins carries it).
+SPREAD = [0.1, 0.5, 1.5]
 NAMES = ["under 0.25", "0.25 to 0.5", "0.5 to 1", "1 to 2", "over 2"]
 
 def fit(train, kmax):
@@ -88,10 +91,12 @@ def main():
     # A bin: its places, the count's code at each k from 0 to kmax, then each read's code.
     total = [[0] + [0.0] * (kmax + 1 + len(reads)) for _ in NAMES]
     total_mass = [[0.0] * (1 + len(reads)) for _ in NAMES]
+    total_spread = [[[0] * 4 for _ in range(1 + len(reads))] for _ in NAMES]
     for sl in slices:
         model = fit(open(f"{store}/DOCS_{sl}.bin", "rb").read(train_n), kmax)
         bins = [[0] + [0.0] * (kmax + 1 + len(reads)) for _ in NAMES]
         mass = [[0.0] * (1 + len(reads)) for _ in NAMES]
+        spread = [[[0] * 4 for _ in range(1 + len(reads))] for _ in NAMES]
         for (s, stretch), st in places.items():
             if s != sl:
                 continue
@@ -109,9 +114,11 @@ def main():
                 for k, c in enumerate(by_k):
                     bins[b][1 + k] += c
                 mass[b][0] += math.exp(-by_k[kmax])
+                spread[b][0][sum(1 for e in SPREAD if by_k[kmax] >= e)] += 1
                 for r, rows in enumerate(codes):
                     bins[b][2 + kmax + r] += rows[key]
                     mass[b][1 + r] += math.exp(-rows[key])
+                    spread[b][1 + r][sum(1 for e in SPREAD if rows[key] >= e)] += 1
         count = sum(b[0] for b in bins)
         if count == 0:
             continue
@@ -121,10 +128,14 @@ def main():
         for m, tm in zip(mass, total_mass):
             for i, v in enumerate(m):
                 tm[i] += v
-        report(sl, bins, mass, count, reads, kind, train_n, kmax)
-    report("all", total, total_mass, sum(b[0] for b in total), reads, kind, train_n, kmax)
+        for sp, tsp in zip(spread, total_spread):
+            for r in range(len(sp)):
+                for j in range(4):
+                    tsp[r][j] += sp[r][j]
+        report(sl, bins, mass, count, reads, kind, train_n, kmax, spread)
+    report("all", total, total_mass, sum(b[0] for b in total), reads, kind, train_n, kmax, total_spread)
 
-def report(sl, bins, mass, count, reads, kind, train_n, kmax):
+def report(sl, bins, mass, count, reads, kind, train_n, kmax, spread):
     at = 1 + kmax
     whole = [sum(b[i] for b in bins) / count for i in range(1, 2 + kmax + len(reads))]
     agrees = [sum(m[i] for m in mass) / count for i in range(1 + len(reads))]
@@ -135,6 +146,9 @@ def report(sl, bins, mass, count, reads, kind, train_n, kmax):
         if b[0] == 0:
             continue
         print(f"EXCESS slice={sl} expected_news={name!r} draw_agrees: count={m[0] / b[0]:.3f} " + " ".join(f"{n}={m[1 + r] / b[0]:.3f}" for r, (n, _) in enumerate(reads)), flush=True)
+        sp = spread[NAMES.index(name)]
+        print(f"EXCESS slice={sl} expected_news={name!r} spread (shares of the bin's places paying under 0.1 / 0.1 to 0.5 / 0.5 to 1.5 / over 1.5 nats): "
+              + " ".join(f"{n}=" + "/".join(f"{v / b[0]:.3f}" for v in sp[r]) for r, n in enumerate(["count"] + [n for n, _ in reads])), flush=True)
         print(f"EXCESS slice={sl} expected_news={name!r} share={b[0] / count:.3f} count={b[at] / b[0]:.3f} " + " ".join(f"{n}={b[at + 1 + r] / b[0]:.3f}" for r, (n, _) in enumerate(reads))
               + " excess_of_all_places: " + " ".join(f"{n}={(b[at + 1 + r] - b[at]) / count:+.4f}" for r, (n, _) in enumerate(reads))
               + " counts_by_k: " + " ".join(f"{k}={b[1 + k] / b[0]:.3f}" for k in range(kmax + 1)), flush=True)
