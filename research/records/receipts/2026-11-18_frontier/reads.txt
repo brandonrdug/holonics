@@ -1325,3 +1325,23 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   RESIDUE address=planted rings=4 periods=1009/1013/1019/1021 rows=4062 set=all places=250980 code=2.4168 mass=0.324 sure=0.018
   RESIDUE address=planted rings=4 periods=1009/1013/1019/1021 rows=4062 set=settled places=26083 code=0.6776 mass=0.655 sure=0.050
   the joint address (the half-planes of ten written circles drawn for each ring), the same run's settled places: mass=0.150 code=2.3466 sure=0.000
+
+# 16:09 UTC November 19. G-1119-5 read: read-strand-states ... past carries at lap L36's mean with the open places' last read (fitting half 767,888 places, 1,360 s on 8 host threads beside the line's laps L37 and L38; the 455 held stretches of L36's frontier read that are whole UTF-8, 88,879 places, 208 s), then tools/read_rows_ruler.py at 4 rings of 2^10 rows (one host thread, 9 s):
+  READROWS address=her_face set=all places=44781 code=1.4313 mass=0.498 sure=0.270
+  READROWS address=her_face set=settled places=4482 code=0.2084 mass=0.907 sure=0.821
+  READROWS address=read rings=4 rows=4096 lambda=0.0
+  READROWS address=read_mixed set=all places=44781 code=1.4313 mass=0.498 sure=0.270
+  READROWS address=read_mixed set=settled places=4482 code=0.2084 mass=0.907 sure=0.821
+  READROWS address=read_alone set=all places=44781 code=2.8315 mass=0.146 sure=0.002
+  READROWS address=read_alone set=settled places=4482 code=2.3274 mass=0.189 sure=0.005
+  READROWS address=scramble4 rings=4 rows=4096 lambda=0.0
+  READROWS address=scramble4_mixed set=all places=44781 code=1.4313 mass=0.498 sure=0.270
+  READROWS address=scramble4_mixed set=settled places=4482 code=0.2084 mass=0.907 sure=0.821
+  READROWS address=scramble4_alone set=all places=44781 code=3.2039 mass=0.107 sure=0.000
+  READROWS address=scramble4_alone set=settled places=4482 code=2.2859 mass=0.160 sure=0.000
+  READROWS address=planted rings=4 rows=4096 lambda=0.02
+  READROWS address=planted_mixed set=all places=44781 code=1.4302 mass=0.494 sure=0.260
+  READROWS address=planted_mixed set=settled places=4482 code=0.2101 mass=0.901 sure=0.816
+  READROWS address=planted_alone set=all places=44781 code=2.6134 mass=0.286 sure=0.011
+  READROWS address=planted_alone set=settled places=4482 code=0.7842 mass=0.607 sure=0.022
+  READROWS fit_places=767888 held_places=88879 with_her_code=88424 settled=8802
