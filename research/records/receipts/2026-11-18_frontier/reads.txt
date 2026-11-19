@@ -1141,3 +1141,9 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   D20   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.8961  spearman loud~color=+0.248  color~code=-0.149  by surprise fifth: q1=0.9214 q2=0.9025 q3=0.8941 q4=0.8877 q5=0.8747
   D20   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1857 against 2240.5 for an order that carries nothing (ratio 0.829); at them nats=5.068 loud=20.185 color=0.8778 rank-1 share=0.05
   D20   by lane (octaves): lane0=21.237  lane1=19.606  lane2=19.747  lane3=19.896
+
+# 03:25 UTC November 19. Her writes against their reference continuations and the training documents (tools/write_recall_ruler.py; one host thread beside the arm's lap, 81 s for the training read):
+  REF n_L20: writes=160 bytes=15367 mean_common_prefix=1.7 bytes (none at the first byte: 73) | bytes inside a run of 8+ shared with the reference: 0.046, of 16+: 0.011 | longest shared run: median 5, max 18
+  REF n_D20: writes=160 bytes=15364 mean_common_prefix=1.5 bytes (none at the first byte: 73) | bytes inside a run of 8+ shared with the reference: 0.032, of 16+: 0.008 | longest shared run: median 5, max 27
+  REF n_D20_mean: writes=20 bytes=1920 mean_common_prefix=1.8 bytes (none at the first byte: 10) | bytes inside a run of 8+ shared with the reference: 0.031, of 16+: 0.020 | longest shared run: median 5, max 21
+  TRAIN k=16: 192/1920 bytes (0.100) of her writes lie in 16-byte windows (taken every 8 bytes) met in the training documents; held passages found in training: 3 of 20; references' openings found in training: 5 of 20
