@@ -256,6 +256,15 @@ pub(crate) struct Words {
     // count of sites that can be heard, zero (null) where the batch holds no strand.
     pub(crate) site_place: u64,
     pub(crate) region_heard: u64,
+    // [the lead, November 19 (G-1119-7)] The pumped circles (`FieldWords::pump`): one where the circles are pumped (`Declaration::pump`), the pump
+    // chart's and its bias's offsets in the material (`Loci::pump`, `pump_bias`) and its reach, and (set per tick) the chart's read `p` `[t][2C]` and
+    // the pump `η` `[t][2C]`. Zero where the circles are not pumped.
+    pub(crate) pump: u64,
+    pub(crate) wp: u64,
+    pub(crate) wpb: u64,
+    pub(crate) rp: u64,
+    pub(crate) pp: u64,
+    pub(crate) peta: u64,
 }
 
 pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
@@ -930,6 +939,11 @@ impl<'c> Resident<'c> {
             wg: l.carry as u64,
             wgb: l.carry_bias as u64,
             carry: d.carry as u64,
+            // [the lead, November 19] The pump's chart (`2C` rows of `D`, zero long and so zero where the circles are not pumped).
+            pump: u64::from(d.pump),
+            wp: l.pump as u64,
+            wpb: l.pump_bias as u64,
+            rp: reach(l.pump, 2 * d.carry * usize::from(d.pump) * dw),
             // [theory, November 12; the triad record §4] The triads' chart (`6J` rows of `D`) and return (`D` rows of `2J`), their reaches over the
             // families as the host's `Reaches` reads them (zero long, and so zero, where `J = 0`).
             triads: d.triads as u64,
@@ -2265,6 +2279,9 @@ pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -
     let lanes = d.lanes as u64;
     // [theory, November 11 17:25] The carry circles' charts' reads, gate and scan operand, `[t][2C]` each.
     let carry_site = 48 * d.carry as u64;
+    // [the lead, November 19] The pump's chart read `[t][2C]` (64 bits) and its `η` `[t][2C]` (32 bits) a tick, and its covector `[t][2C]` on the return.
+    let pump_site = if d.pump { 24 * d.carry as u64 } else { 0 };
+    let carry_site = carry_site + pump_site;
     // [theory, November 12; the triad record §4] The triads' chart read `[t][6J]` and their products `p` and `c^T` `[t][2J]` each, kept a tick.
     let triad_site = 8 * 10 * d.triads as u64;
     let tick_site = triad_site + carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
@@ -2282,7 +2299,7 @@ pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -
     let moment_site = moment_site + address_site;
     // The reverse adds its covectors (the triads' `δc^T` `[t][2J]` and `δabg` `[t][6J]` among them), the values' sum over the ticks and the
     // moments' return, and the crowds' two difference arrays.
-    let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + if d.pump { 16 * d.carry as u64 } else { 0 } + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     // [the ring record §4] A field that reads twice holds its first read's shares `[t][A]` through the second read, and its return the marked
     // sites' list and `release(α_b dx, 24)` in each of the three encodings (`[3][t][D]` at most). [G180] Where both reads return, the first
     // leaves the base clock's two covectors from the opening's comparison (`[p][t]` on 128 bits each) for the second; the reads' own carriers

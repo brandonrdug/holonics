@@ -257,6 +257,11 @@ impl Constitution {
         if d.carry > 0 {
             parts[l.carry..l.carry + 2 * d.carry * dw].fill(15);
             parts[l.carry_bias..l.carry_bias + 2 * d.carry].fill(15);
+            // [the lead, November 19] The pump's chart is the circles' gate's third chart: the `carry` part's ([`Declaration::pump`]).
+            if d.pump {
+                parts[l.pump..l.pump + 2 * d.carry * dw].fill(15);
+                parts[l.pump_bias..l.pump_bias + 2 * d.carry].fill(15);
+            }
             for e in (d.carry_first()..f / 2).flat_map(|e| [e, f / 2 + e]) {
                 for r in 0..dw {
                     parts[l.w + r * f + e] = 16;

@@ -555,6 +555,16 @@ struct FieldWords {
     // before its place and is heard by no one. Null where the batch holds no strand: then a place is a position and every site is heard.
     const uint32_t *site_place;
     const uint32_t *region_heard;
+    // [definition; the lead, November 19 (G-1119-7)] **The pumped circles** (the host's `Declaration::pump`): one where each circle's move also
+    // reflects, `Q = κ b + γ Qm + η conj(Qm)`; the pump chart's and its bias's offsets in the material (`Loci::pump`, `pump_bias`) and the chart's
+    // reach; and (set per tick) the chart's read `p` `[t][2C]` on `2^(−16)` and the pump `η` `[t][2C]` on `2^(−30)` (`|η| < 1`, so 32 bits). Zero
+    // (null) where the circles are not pumped, where no kernel reads them.
+    uint64_t pump;
+    uint64_t wp;
+    uint64_t wpb;
+    uint64_t rp;
+    int64_t *pp;
+    int32_t *peta;
 };
 
 // [the strand's two streams] Site `g`'s place on its passage (`FieldWords::site_place`), its position where the batch holds no strand.
@@ -4223,28 +4233,45 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
             }
             continue;
         }
-        int64_t yr = 0, yi = 0, kr = 0, ki = 0;
+        // [the lead, November 19] The pump's reflection `η conj(Qm)` joins the turn's term in its one release (the host's tick under
+        // `Declaration::pump`), its gate read a step ahead with the turn's; zero where the circles are not pumped, so the sum is the unpumped one's.
+        const bool pumped = w.pump != 0;
+        int64_t yr = 0, yi = 0, kr = 0, ki = 0, er = 0, ei = 0;
         if (sites != 0) {
             const uint64_t gr = at(0) * c2 + k;
             yr = w.pgam[gr];
             yi = w.pgam[gr + C];
             kr = w.pkb[gr];
             ki = w.pkb[gr + C];
+            if (pumped) {
+                er = w.peta[gr];
+                ei = w.peta[gr + C];
+            }
         }
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t gr = at(step) * c2 + k, gi = gr + C;
-            const wide cyr = yr, cyi = yi, ckr = kr, cki = ki;
+            const wide cyr = yr, cyi = yi, ckr = kr, cki = ki, cer = er, cei = ei;
             if (step + 1 < sites) {
                 const uint64_t nr = at(step + 1) * c2 + k;
                 yr = w.pgam[nr];
                 yi = w.pgam[nr + C];
                 kr = w.pkb[nr];
                 ki = w.pkb[nr + C];
+                if (pumped) {
+                    er = w.peta[nr];
+                    ei = w.peta[nr + C];
+                }
             }
             w.pqm[gr] = fit64(qr, w.status);
             w.pqm[gi] = fit64(qi, w.status);
-            const wide nr = ckr + rel(cyr * qr - cyi * qi, MOVE_BITS);
-            const wide ni = cki + rel(cyr * qi + cyi * qr, MOVE_BITS);
+            wide nr, ni;
+            if (pumped) {
+                nr = ckr + rel(cyr * qr - cyi * qi + cer * qr + cei * qi, MOVE_BITS);
+                ni = cki + rel(cyr * qi + cyi * qr + cei * qr - cer * qi, MOVE_BITS);
+            } else {
+                nr = ckr + rel(cyr * qr - cyi * qi, MOVE_BITS);
+                ni = cki + rel(cyr * qi + cyi * qr, MOVE_BITS);
+            }
             qr = fit64(nr, w.status);
             qi = fit64(ni, w.status);
         }
@@ -4317,11 +4344,27 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
+        // [the lead, November 19] The pump's budget `n = |p_re| + |p_im|` shares the leak (the host's `carry_gate_pumped`): `one = 2^16 + d + n`, refused
+        // where a part of `p` reaches `2^39`; zero where the circles are not pumped, so every term is the unpumped gate's.
+        wide pr = 0, pi = 0;
+        if (w.pump) {
+            pr = w.pp[gr];
+            pi = w.pp[gi];
+            if ((uwide)(pr >= 0 ? pr : -pr) >= ((uwide)1 << 39) || (uwide)(pi >= 0 ? pi : -pi) >= ((uwide)1 << 39)) {
+                atomicOr(w.status, REFUSED_CARRIER);
+                continue;
+            }
+        }
+        const wide one = ((wide)1 << FACE_BITS) + d + (pr >= 0 ? pr : -pr) + (pi >= 0 ? pi : -pi);
         const wide turn = ((wide)1 << 34) + q * q;
-        const wide den = turn * (((wide)1 << 16) + d);
+        const wide den = turn * one;
         w.pgam[gr] = fit32(div_nearest((((wide)1 << 34) - q * q) << 46, den), w.status);
         w.pgam[gi] = fit32(div_nearest(q << 64, den), w.status);
-        const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, ((wide)1 << FACE_BITS) + d);
+        if (w.pump) {
+            w.peta[gr] = fit32(div_nearest(pr << MOVE_BITS, one), w.status);
+            w.peta[gi] = fit32(div_nearest(pi << MOVE_BITS, one), w.status);
+        }
+        const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, one);
         const uint64_t re = t * w.f + plain + k, im = re + half;
         w.pkb[gr] = fit64(rel(kappa * (wide)w.pb[re], MOVE_BITS), w.status);
         w.pkb[gi] = fit64(rel(kappa * (wide)w.pb[im], MOVE_BITS), w.status);
@@ -4397,30 +4440,46 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
             }
             continue;
         }
+        // [the lead, November 19] The pump's reflection returns `η conj(u)` beside the turn's `conj(γ) u`, in the turn's one release (the host's
+        // `tick_return` under `Declaration::pump`); zero where the circles are not pumped.
+        const bool pumped = w.pump != 0;
         wide xr = 0, xi = 0;
         wide hr = 0, hi = 0;
-        int64_t yr = 0, yi = 0;
+        int64_t yr = 0, yi = 0, er = 0, ei = 0;
         if (sites != 0) {
             const uint64_t gr = at(0) * c2 + k;
             part(at(0), &hr, &hi);
             yr = w.pgam[gr];
             yi = w.pgam[gr + C];
+            if (pumped) {
+                er = w.peta[gr];
+                ei = w.peta[gr + C];
+            }
         }
         for (uint64_t step = 0; step < sites; ++step) {
             const uint64_t t = at(step);
             const uint64_t re = t * w.f + e, im = re + half;
-            const wide chr = hr, chi = hi, cyr = yr, cyi = yi;
+            const wide chr = hr, chi = hi, cyr = yr, cyi = yi, cer = er, cei = ei;
             if (step + 1 < sites) {
                 const uint64_t nr = at(step + 1) * c2 + k;
                 part(at(step + 1), &hr, &hi);
                 yr = w.pgam[nr];
                 yi = w.pgam[nr + C];
+                if (pumped) {
+                    er = w.peta[nr];
+                    ei = w.peta[nr + C];
+                }
             }
             const wide ur = xr, ui = xi;
             db[re] = fit64(ur, w.status);
             db[im] = fit64(ui, w.status);
-            xr = fit64(chr + rel(cyr * ur + cyi * ui, MOVE_BITS), w.status);
-            xi = fit64(chi + rel(cyr * ui - cyi * ur, MOVE_BITS), w.status);
+            if (pumped) {
+                xr = fit64(chr + rel(cyr * ur + cyi * ui + cer * ur + cei * ui, MOVE_BITS), w.status);
+                xi = fit64(chi + rel(cyr * ui - cyi * ur + cei * ur - cer * ui, MOVE_BITS), w.status);
+            } else {
+                xr = fit64(chr + rel(cyr * ur + cyi * ui, MOVE_BITS), w.status);
+                xi = fit64(chi + rel(cyr * ui - cyi * ur, MOVE_BITS), w.status);
+            }
         }
     }
 }
@@ -4434,7 +4493,11 @@ extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, in
 // chart's face (`v` released 15 bits): `rel(rel(δd ln 2, 30) d₀ rel(v, 15), 62 − a)`, under `2^126` before the release, nothing past a release of 126 bits,
 // the two added into `δℓ`. Written over `δγ` in place (`δq` at the real part's slot, `δℓ` at the imaginary's: the circles' charts' row order), and the
 // drive's covector `δb = rel(κ u, 30)` over `u` in `db`.
-extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64_t *db) {
+// [the lead, November 19] Where the circles are pumped (the host's `carry_gate_return_pumped`): `δη = u Qm` released at the face's grain, `re` gains
+// `Re(conj(η) δη)` (its own release), `one = 2^16 + d + n` stands where `2^16 + d` stood, the coupling's `δd_κ = N₀ w (2^16 + n) 2^16 / one²` (the
+// unpumped term's integers at `n = 0`), and the pump's covector `δp = δη 2^16 / one + sgn(p) δn` with `δn = δd − (N₀ w 2^16 / one) d / one` is
+// written to `dp` `[t][2C]` (null where the circles are not pumped).
+extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64_t *db, int64_t *dp) {
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t cells = (uint64_t)w.T * C;
@@ -4452,7 +4515,19 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
             dg[gi] = fit64(rel(qr * ui - qi * ur, FACE_BITS), w.status);
         }
         const wide yr = w.pgam[gr], yi = w.pgam[gi], dr = dg[gr], di = dg[gi];
-        const wide im = rel(yr * di - yi * dr, MOVE_BITS), re = rel(yr * dr + yi * di, MOVE_BITS);
+        const wide im = rel(yr * di - yi * dr, MOVE_BITS);
+        wide re = rel(yr * dr + yi * di, MOVE_BITS);
+        // [the lead, November 19] The pump's covector `δη = u Qm` and its pairing with `η`, where the circles are pumped.
+        wide pr = 0, pi = 0, fr = 0, fi = 0, n = 0;
+        if (w.pump) {
+            const wide qr = w.pqm[gr], qi = w.pqm[gi];
+            fr = fit64(rel(qr * ur - qi * ui, FACE_BITS), w.status);
+            fi = fit64(rel(qr * ui + qi * ur, FACE_BITS), w.status);
+            re += rel((wide)w.peta[gr] * fr + (wide)w.peta[gi] * fi, MOVE_BITS);
+            pr = w.pp[gr];
+            pi = w.pp[gi];
+            n = (pr >= 0 ? pr : -pr) + (pi >= 0 ? pi : -pi);
+        }
         const wide q = w.pg[gr];
         const wide dq = div_nearest(im << 34, ((wide)1 << 34) + q * q);
         wide d;
@@ -4462,10 +4537,19 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
             atomicOr(w.status, REFUSED_CARRIER);
             continue;
         }
-        const wide one = ((wide)1 << FACE_BITS) + d;
+        const wide one = ((wide)1 << FACE_BITS) + d + n;
         const wide dd = -div_nearest(re << 16, one);
         const wide cw = fit64(rel((wide)w.pb[bre] * ur + (wide)w.pb[bim] * ui, FACE_BITS), w.status);
-        const wide ddk = fit64(div_nearest((CARRY_GROUP_FOUNDING * cw) << (2 * FACE_BITS), one * one), w.status);
+        // `N₀ w (2^16 + n) 2^16`: at `n = 0` the unpumped `N₀ w 2^32` in integers.
+        const wide nw = CARRY_GROUP_FOUNDING * cw;
+        const wide ddk = fit64(div_nearest((nw * (((wide)1 << FACE_BITS) + n)) << FACE_BITS, one * one), w.status);
+        if (w.pump) {
+            const wide m = div_nearest(nw << FACE_BITS, one);
+            const wide dn = dd - div_nearest(m * d, one);
+            const wide sr = pr > 0 ? 1 : (pr < 0 ? -1 : 0), si = pi > 0 ? 1 : (pi < 0 ? -1 : 0);
+            dp[gr] = fit64(div_nearest(fr << FACE_BITS, one) + sr * dn, w.status);
+            dp[gi] = fit64(div_nearest(fi << FACE_BITS, one) + si * dn, w.status);
+        }
         const int64_t shift = 62 - a;
         const wide lift = rel(dd * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);
         const wide liftk = rel(ddk * ln2, LN2_FACE_BITS) * CARRY_LEAK_FOUNDING * rel((wide)v, 15);

@@ -30,6 +30,8 @@ pub(crate) struct Back<'c> {
     /// [theory, November 11 17:25] The carry circles' covector `[t][2C]` (one slot without them): the scan's reverse writes `δγ`, and the gate's
     /// reverse writes `δq`, `δℓ` over it in place, the circles' charts' row order.
     pub(crate) dg: Pooled<'c, i64>,
+    /// [the lead, November 19] The pump chart's covector `δp` `[t][2C]`, none where the circles are not pumped (`Declaration::pump`).
+    pub(crate) dpump: Option<Pooled<'c, i64>>,
     /// [realization; theory, November 16 05:40Z] The circles' pair part `h = conj(a) δp` `[t][2C]` (one slot without them), formed off the chain on
     /// 128 bits by `field_pair_scan_pre` and read by the scan's reverse, where it meets the chain's sum before that sum's one fit.
     pub(crate) dh: Pooled<'c, i128>,
@@ -77,7 +79,7 @@ impl<'c> Resident<'c> {
         let regions = words.r as usize;
         let rows = sites + regions;
         let paced = d.paced_heads();
-        let Back { dx, dr, dc, da, db, dg, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
+        let Back { dx, dr, dc, da, db, dg, dpump, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
         words.qf = tick.qf.device_ptr();
         words.qf32 = tick.qf32.device_ptr();
         words.pq = tick.pq.device_ptr();
@@ -135,13 +137,17 @@ impl<'c> Resident<'c> {
             let mut dhp = dh.device_ptr();
             self.launch("field_pair_scan_pre", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dcp), arg(&mut dap), arg(&mut dhp)])?;
             self.launch("field_pair_scan_back", Self::cells((words.r as usize * circles) as u64), THREADS, &mut [arg(words), arg(&mut dhp), arg(&mut dbp)])?;
-            let (mut dgp, mut dbp) = (dg.device_ptr(), db.device_ptr());
-            self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp), arg(&mut dbp)])?;
+            let (mut dgp, mut dbp, mut dpp) = (dg.device_ptr(), db.device_ptr(), held_at(dpump));
+            self.launch("field_pair_gate_back", Self::cells((sites * circles) as u64), THREADS, &mut [arg(words), arg(&mut dgp), arg(&mut dbp), arg(&mut dpp)])?;
         }
         self.outer_biased(words, g, words.wa, words.a_bias, f, dw, da.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         self.outer_biased(words, g, words.wb, words.b_bias, f, dw, db.device_ptr(), f, tick.read2.device_ptr(), dw, false, false)?;
         if circles > 0 {
             self.outer_biased(words, g, words.wg, words.wgb, 2 * circles, dw, dg.device_ptr(), 2 * circles, tick.read2.device_ptr(), dw, false, false)?;
+            // [the lead, November 19] The pump's chart: `Σ_t δp(t) r̂(t)ᵀ` into `P`, and `Σ_t δp(t)` into its bias.
+            if let Some(du) = dpump {
+                self.outer_biased(words, g, words.wp, words.wpb, 2 * circles, dw, du.device_ptr(), 2 * circles, tick.read2.device_ptr(), dw, false, false)?;
+            }
         }
         if triads > 0 {
             // The triads' chart: `Σ_t δabg(t) r̂(t)ᵀ` into `A`, `B` and `G`, and `Σ_t δabg(t)` into their biases.
@@ -151,6 +157,10 @@ impl<'c> Resident<'c> {
         self.transposed(words, words.wb, f, dw, db.device_ptr(), f, rb.device_ptr(), false, false)?;
         if circles > 0 {
             self.transposed(words, words.wg, 2 * circles, dw, dg.device_ptr(), 2 * circles, rb.device_ptr(), true, false)?;
+            // [the lead, November 19] So does the pump's chart, accumulated into the same slot.
+            if let Some(du) = dpump {
+                self.transposed(words, words.wp, 2 * circles, dw, du.device_ptr(), 2 * circles, rb.device_ptr(), true, false)?;
+            }
         }
         if triads > 0 {
             // The triads' chart reads the pair chart as `a`, `b` and the circles' do, so its transposed product joins the read's covector.
@@ -277,6 +287,8 @@ impl<'c> Resident<'c> {
         let db = alloc64(sites * f)?;
         let dg = alloc64(if d.carry > 0 { sites * 2 * d.carry } else { 1 })?;
         let dh = self.timed(Kind::Alloc, || self.take::<i128>(if d.carry > 0 { sites * 2 * d.carry } else { 1 })).map_err(device)?;
+        // [the lead, November 19] The pump chart's covector `δp` `[t][2C]`, none where the circles are not pumped.
+        let dpump = if d.pump { Some(alloc64(sites * 2 * d.carry)?) } else { None };
         // [theory, November 12; the triad record §4] The triads' covectors, `δc^T` `[t][2J]` and `δabg` `[t][6J]`, none without triads.
         let triad = |rows: usize| if d.triads > 0 { alloc64(sites * rows * d.triads).map(Some) } else { Ok(None) };
         let (dct, dabg) = (triad(2)?, triad(6)?);
@@ -319,7 +331,7 @@ impl<'c> Resident<'c> {
         words.gtau = gtau.device_ptr();
         words.gsig = gsig.device_ptr();
         words.cds = cds.device_ptr();
-        Ok(Back { dx, dr, dc, da, db, dg, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, _dpb: dpb, cv, cw, dm, gtau, gsig, _cds: cds, pr_back })
+        Ok(Back { dx, dr, dc, da, db, dg, dpump, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, _dpb: dpb, cv, cw, dm, gtau, gsig, _cds: cds, pr_back })
     }
 
     #[allow(clippy::too_many_arguments)]

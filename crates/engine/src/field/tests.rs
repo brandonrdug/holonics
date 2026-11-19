@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -2035,7 +2035,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0 }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3213,6 +3213,145 @@ fn the_carry_circles_covector_matches_its_codes_difference() {
     assert!(read > 0 && 16 * seams <= read && charts_read > 0 && biases_read > 0, "read {read} probes, {seams} on a seam, {charts_read} of the charts, {biases_read} of the biases");
 }
 
+/// [definition; the lead, November 19 (G-1119-7); `CarryGate.lean`, `pumped_charge_step_le`] **The pumped gate at zero is the unpumped gate,
+/// and its leak is shared**: over a sweep of `q` and `ℓ`, at `p = 0` the pumped gate, its pump, its friction and its coupling are
+/// [`carry_gate`]'s and [`carry_coupling`]'s in integers, and its return (whatever `δη`) is [`carry_gate_return`]'s; over a sweep of `p` the
+/// turn, the pump and the coupling share one leak, `|γ| + |η| + κ/N₀ ≤ 1` within three grains, and the pump stands at `p/(1 + d + n)`;
+/// a part of `p` past `2^39` is refused.
+#[test]
+fn the_pumped_gate_at_zero_is_the_unpumped_gate_and_its_leak_is_shared() {
+    let exp = Exponential::new(FACE_BITS);
+    let qs = [0i128, 1 << 16, -(1 << 16), 3 << 15, 123_456, -78_901, 1 << 30];
+    let ls = [-(1i128 << 22), -(15 << 16), -1, 0, 1, 1 << 16, 7 << 16, 123_457];
+    for &q in &qs {
+        for &l in &ls {
+            let (gamma, d) = carry_gate(&exp, q, l).unwrap();
+            let (pg, eta, pd, n, kappa) = carry_gate_pumped(&exp, q, l, (0, 0)).unwrap();
+            assert_eq!((pg, eta, pd, n, kappa), (gamma, (0, 0), d, 0, carry_coupling(d)), "q {q} ℓ {l}: at p = 0 the unpumped gate in integers");
+            for (dgamma, deta, drive, du) in [((3i64 << 40, -(5i64 << 38)), (7i64 << 39, 1i64 << 33), (7i64 << 30, -(3i64 << 30)), (5i64 << 36, 11i64 << 34)), ((-(9i64 << 33), 2i64 << 37), (-(1i64 << 41), -(3i64 << 35)), (-(1i64 << 28), 1i64 << 31), (-(9i64 << 33), 2i64 << 37))] {
+                let plain = carry_gate_return(&exp, gamma, dgamma, drive, du, q, l).unwrap();
+                let (dqdl, _, db) = carry_gate_return_pumped(&exp, gamma, dgamma, (0, 0), deta, drive, du, q, l, (0, 0)).unwrap();
+                assert_eq!((dqdl, db), plain, "q {q} ℓ {l}: at p = 0 the unpumped gate's return in integers");
+            }
+            for p in [(1i128 << 16, 0i128), (0, -(1 << 14)), (3 << 15, -(5 << 15)), (-(123_456), 98_765), (1 << 30, 1 << 29), ((1 << 39) - 1, 0)] {
+                let ((yr, yi), (er, ei), d, n, kappa) = carry_gate_pumped(&exp, q, l, p).unwrap();
+                assert_eq!(n, p.0.abs() + p.1.abs());
+                let modulus = |a: i64, b: i64| ((i128::from(a) * i128::from(a) + i128::from(b) * i128::from(b)) as u128).isqrt() as i128;
+                let total = modulus(yr, yi) + modulus(er, ei) + kappa / i128::from(CARRY_GROUP_FOUNDING);
+                assert!(total <= (1 << 30) + 3, "q {q} ℓ {l} p {p:?}: |γ| + |η| + κ/N₀ = {total} within three grains of one");
+                let one = (1i128 << 16) + d + n;
+                assert_eq!((i128::from(er), i128::from(ei)), (div_nearest(p.0 << 30, one), div_nearest(p.1 << 30, one)), "the pump is p/(1 + d + n)");
+            }
+        }
+    }
+    assert!(carry_gate_pumped(&exp, 0, 0, (1 << 39, 0)).is_err() && carry_gate_pumped(&exp, 0, 0, (0, -(1 << 39))).is_err(), "the pump's carrier");
+}
+
+/// [`circled_shaped`]'s field with its circles pumped and every family drawn again ([`drawn`] draws by entry, so every standing entry keeps
+/// its draw and the pump's chart is drawn off zero).
+fn pumped_shaped(still: usize) -> Constitution {
+    drawn(circled_shaped(still).with_pump().unwrap().0)
+}
+
+/// [definition; the lead, November 19] **A field pumped at zero keeps every face and returns through its pump**: [`Constitution::with_pump`]
+/// appends the pump's chart at zero; every face of the law and of a strand is the source's bit for bit and every standing entry's covector is
+/// the source's; the chart has a covector (`η`'s, `u Qm`, stands at `p = 0`); its head line is `hnn-field-v14p` and round-trips; a second pump
+/// and a field with no circles are refused; the chart is the `carry` part's; the learner keeps every standing moment, opens the chart's second
+/// moments on the circles' charts' scale and round-trips through its text.
+#[test]
+fn a_field_pumped_at_zero_keeps_every_face_and_returns_through_its_pump() {
+    for still in [0usize, 1, 2] {
+        let field = circled_shaped(still);
+        let (pumped, from) = field.with_pump().unwrap();
+        let (d, l) = (pumped.declaration, pumped.layout.clone());
+        assert!(d.pump && pumped.theta[l.pump..].iter().all(|&v| v == 0));
+        assert_eq!(pumped.faces(&region()).unwrap(), field.faces(&region()).unwrap(), "still {still}: every face of the law kept");
+        let classes = drawn_classes(0xE7, 11, d.alphabet);
+        for past in [false, true] {
+            assert_eq!(pumped.strand_pass(&classes, false, past).unwrap().faces, field.strand_pass(&classes, false, past).unwrap().faces, "still {still}: every face of a strand kept");
+        }
+        assert!(from.iter().enumerate().all(|(k, o)| o.is_none_or(|i| pumped.theta[k] == field.theta[i])));
+        let (g, g0) = (covector_of(&pumped, &region()), covector_of(&field, &region()));
+        assert_eq!(&g[..field.theta.len()], &g0[..], "still {still}: every standing entry's covector kept");
+        assert!(g[l.pump..l.pump + 2 * d.carry * d.width].iter().any(|&v| v != 0), "still {still}: the pump's chart has a covector at zero");
+        let text = d.to_text();
+        assert!(text.starts_with("hnn-field-v14p ") && text.split(' ').count() == 21 && text.ends_with(" 1"));
+        assert_eq!(Declaration::from_text(&text).unwrap(), d);
+        assert!(Declaration::from_text(&format!("{} 0", &text[..text.len() - 2])).is_err(), "a v14p head whose pump word is not one");
+        assert!(pumped.with_pump().is_err(), "a second pump");
+        let parts = pumped.founded_parts(8);
+        assert!(parts[l.pump..l.pump + 2 * d.carry * (d.width + 1)].iter().all(|&p| p == 15), "the pump's chart is the carry part's");
+    }
+    assert!(shaped_with(four_contacts(1)).with_pump().is_err(), "a field with no circles");
+    assert!(Declaration { pump: true, ..four_contacts(1) }.admit().is_err());
+    // The learner.
+    let mut learner = Learner::new(circled_shaped(1), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    let pumped = learner.with_pump().unwrap();
+    let (_, from) = learner.field.with_pump().unwrap();
+    assert!(from.iter().enumerate().all(|(k, o)| o.is_none_or(|i| pumped.first[k] == learner.first[i] && pumped.second[k] == learner.second[i])), "every standing entry keeps its moments");
+    let l = pumped.field.layout.clone();
+    assert!((l.pump..pumped.field.theta.len()).all(|k| pumped.first[k] == 0), "the chart's first moments at zero");
+    assert!((l.pump..pumped.field.theta.len()).any(|k| pumped.second[k] > 0), "the chart opens on the circles' charts' scale");
+    let text = pumped.to_text();
+    let back = Learner::from_text(&text).unwrap();
+    assert!(back.to_text() == text && back.field == pumped.field, "the pumped learner reads back as itself");
+}
+
+/// [definition; the lead, November 19] **The pumped circles' adjoint agrees with its code's central difference**, as the unpumped circles' does
+/// ([`the_carry_circles_covector_matches_its_codes_difference`]): on [`pumped_shaped`]'s fields (the pump's chart drawn, so `η` stands off zero at
+/// every site), each family's three entries with the largest covectors against the code's difference, the pump's chart and its bias read at
+/// least once each. The pump's budget `n = |p_re| + |p_im|` has a seam where a part of `p` crosses zero; no probe of this fixture moves one
+/// across it (checked: every read part of `p` stands at least 64 grains off zero).
+#[test]
+fn the_pumped_circles_covector_matches_its_codes_difference() {
+    let (mut read, mut pump_read, mut pump_bias_read) = (0usize, 0usize, 0usize);
+    for still in [0usize, 1, 2] {
+        let field = pumped_shaped(still);
+        let r = region();
+        let c2 = 2 * field.declaration.carry;
+        let pass = field.pass(&r, true).unwrap();
+        assert!(pass.ticks.iter().all(|cell| cell.ph[..CLASSES.len() * c2].iter().all(|&p| p.abs() >= 64)), "still {still}: every part of p off its seam");
+        assert!(pass.ticks.iter().any(|cell| cell.eta.iter().any(|&e| e != 0)), "still {still}: the pump stands off zero");
+        let g = covector_of(&field, &r);
+        let l = field.layout.clone();
+        for &(start, len, grain) in field.families() {
+            if start == l.temper {
+                continue;
+            }
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+                    let pass = f.pass(&r, true).unwrap();
+                    pass.ticks.iter().flat_map(|c| c.classes.iter().map(|l| l.off.iter().chain(&l.members).copied().collect())).collect()
+                };
+                let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    continue;
+                };
+                read += 1;
+                pump_read += usize::from(start == l.pump);
+                pump_bias_read += usize::from(start == l.pump_bias);
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("PUMP_COVECTOR_PROBES read={read} pump={pump_read} pump_bias={pump_bias_read}");
+    assert!(read > 0 && pump_read > 0 && pump_bias_read > 0, "read {read} probes, {pump_read} of the pump's chart, {pump_bias_read} of its bias");
+}
+
 /// [definition; theory, November 11 17:25] **The carry circles are founded parts of their own**: the circles' charts and biases (part 15), their
 /// `W` columns (16) and their `a` and `b` rows with the drives' biases (17, 18), over the new contacts' marks, so a field grown by circles alone
 /// has no new plain contact.
@@ -3693,7 +3832,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 

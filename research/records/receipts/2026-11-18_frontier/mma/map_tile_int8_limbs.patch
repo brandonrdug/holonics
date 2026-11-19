@@ -1,0 +1,225 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index b5a7503c3..1ad82b3c0 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -1346,6 +1346,19 @@ extern "C" __global__ void field_chart(FieldWords w, const int64_t *x, int32_t *
+ #define MAP_PAD 4
+ // The lanes of a tile's block (`THREADS`) and the words each stages a chunk (both operands' chunks are `MAP_KC` by 64).
+ #define MAP_THREADS 256
++// [realization; November 19] The maps' narrow sums on the int8 tensor cores (`map_tile`), and the most limbs a narrow word (under 2^31) takes.
++#define MAP_MMA 1
++#define MAP_LIMBS 5
++// The signed base-256 limbs a magnitude `m` takes: the least `L` with `127 (256^L − 1) / 255 ≥ m` (a negative word reaches one further).
++__device__ __forceinline__ uint32_t map_limbs(uint64_t m) {
++    uint64_t cap = 127;
++    uint32_t l = 1;
++    while (cap < m && l < MAP_LIMBS) {
++        cap = cap * 256 + 127;
++        l++;
++    }
++    return l;
++}
+ #define MAP_STAGE (MAP_KC * MAP_TO / MAP_THREADS)
+ __device__ __forceinline__ void map_stage(uint32_t c, uint32_t *kc, uint32_t *row) {
+     const uint32_t g = c >> 5;
+@@ -1427,6 +1440,10 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+     __shared__ __align__(16) int32_t bs[MAP_KC][MAP_TS + MAP_PAD];
+     __shared__ uint64_t smax[MAP_TS];
+     __shared__ unsigned long long cm[2][2];
++#if MAP_MMA
++    __shared__ __align__(16) int8_t asl[MAP_LIMBS][MAP_TO][MAP_KC + 4];
++    __shared__ __align__(16) int8_t bsl[MAP_LIMBS][MAP_TS][MAP_KC + 4];
++#endif
+     const uint32_t outs = TRANSPOSED ? cols : rows, terms = TRANSPOSED ? rows : cols;
+     const uint32_t to = threadIdx.x % 16, ts = threadIdx.x / 16;
+     const uint64_t otiles = (outs + MAP_TO - 1) / MAP_TO, stiles = ((uint64_t)w.T + MAP_TS - 1) / MAP_TS;
+@@ -1480,6 +1497,41 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+                 }
+             }
+         };
++        // [MAP_MMA] One output at a tile place (`ol` the output, `sl` the site, both in the tile): the site's narrow liveness, the zeros
++        // `ZERO_SKIPPED` writes for a skipped site, else `emit`'s body.
++        const auto emit_at = [&](uint32_t ol, uint32_t sl, wide sum) {
++            const uint64_t t = t0 + sl;
++            const uint32_t o = o0 + ol;
++            if (o >= outs || t >= w.T) {
++                return;
++            }
++            if (only_unresolved && !w.unresolved[t]) {
++                if (ZERO_SKIPPED) {
++                    if (TRANSPOSED) {
++                        out[t * cols + o] = 0;
++                    } else {
++                        out[t * out_stride + o] = 0;
++                    }
++                }
++                return;
++            }
++            if (!TRANSPOSED && !BIAS_AFTER && bias != NO_BIAS) {
++                sum += (wide)w.theta[bias + o] << RELEASE;
++            }
++            wide released = rel(sum, RELEASE);
++            if (!TRANSPOSED && BIAS_AFTER && bias != NO_BIAS) {
++                released += (wide)w.theta[bias + o];
++            }
++            const int64_t v = fit64(released, w.status);
++            if (TRANSPOSED) {
++                const uint64_t c = t * cols + o;
++                out[c] = accumulate ? fit64((wide)out[c] + (wide)v, w.status) : v;
++            } else if (add) {
++                add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
++            } else {
++                out[t * out_stride + o] = v;
++            }
++        };
+         const auto live = [&](int b, bool refusable) -> bool {
+             const uint64_t t = t0 + 4 * ts + b;
+             if (t >= w.T || (only_unresolved && !w.unresolved[t])) {
+@@ -1495,6 +1547,21 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+         // where it does not (a weight bound past any 32-bit weight), the tile takes the wide form, which reads each site's largest input.
+         bool narrow = TRANSPOSED || (uwide)wmax * ((uwide)1 << 31) * (uwide)(cols + 1) < ((uwide)1 << 126);
+         if (narrow) {
++#if MAP_MMA
++            // [realization; November 19, the lead with Neon's note §1a] The narrow sums on the int8 tensor cores: each word cut into signed
++            // base-256 limbs (as many as the chunk's largest magnitude needs), each limb pair's dot product summed exactly in 32 bits by
++            // `mma.sync.m16n8k32.s32.s8.s8.s32` (a chunk's 32 terms of products under 2^14 each), the limb pairs of one weight `2^(8(a + b))`
++            // summed in 32 bits and folded into the 64-bit sums once a chunk. Every partial stands under the narrow proof's bound, so the sums
++            // are the scalar form's to the bit. A warp holds one block of 16 outputs and four of 8 sites (`acc[j][i]`, the fragment's order).
++            int64_t acc[4][4];
++#pragma unroll
++            for (int j = 0; j < 4; j++) {
++#pragma unroll
++                for (int i = 0; i < 4; i++) {
++                    acc[j][i] = 0;
++                }
++            }
++#else
+             int64_t acc[4][4];
+ #pragma unroll
+             for (int a = 0; a < 4; a++) {
+@@ -1503,6 +1570,7 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+                     acc[a][b] = 0;
+                 }
+             }
++#endif
+             uwide bound = 0;
+             uint32_t parity = 0;
+             // [realization; November 16, the next kernels' source counters] **The next chunk's words in flight behind this chunk's
+@@ -1575,7 +1643,14 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+                     narrow = false;
+                 } else {
+                     bound += (uwide)chunk * (uwide)ca * (uwide)cb;
++#if MAP_MMA
++                    // A limb pair's partial sums (one weight `2^(8(a + b))`) can stand over the word's own product by the signed digits'
++                    // spread, under sixteen times the chunks' bound: the tensor form keeps four bits of room, and a tile past it takes the wide
++                    // form, which gives the same sums.
++                    narrow = bound < ((uwide)1 << 59);
++#else
+                     narrow = bound < ((uwide)1 << 63);
++#endif
+                 }
+                 if (!narrow) {
+                     __syncthreads();
+@@ -1584,6 +1659,70 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+                 if (k0 + MAP_KC < terms) {
+                     fetch(k0 + MAP_KC);
+                 }
++#if MAP_MMA
++                {
++                    // The chunk's limb planes: `asl[l][o][k]` and `bsl[l][s][k]`, the term fastest, so a fragment's four terms are one word.
++                    const uint32_t la = map_limbs(ca), lb = map_limbs(cb);
++                    for (uint32_t e = threadIdx.x; e < MAP_KC * MAP_TO; e += MAP_THREADS) {
++                        const uint32_t kc = e / MAP_TO, o = e % MAP_TO;
++                        int64_t r = as[kc][o];
++                        for (uint32_t l = 0; l < la; l++) {
++                            int32_t d = (int32_t)(r & 0xff);
++                            d -= d > 127 ? 256 : 0;
++                            asl[l][o][kc] = (int8_t)d;
++                            r = (r - d) >> 8;
++                        }
++                    }
++                    for (uint32_t e = threadIdx.x; e < MAP_KC * MAP_TS; e += MAP_THREADS) {
++                        const uint32_t kc = e / MAP_TS, so = e % MAP_TS;
++                        int64_t r = bs[kc][so];
++                        for (uint32_t l = 0; l < lb; l++) {
++                            int32_t d = (int32_t)(r & 0xff);
++                            d -= d > 127 ? 256 : 0;
++                            bsl[l][so][kc] = (int8_t)d;
++                            r = (r - d) >> 8;
++                        }
++                    }
++                    __syncthreads();
++                    const uint32_t lane = threadIdx.x & 31, warp = threadIdx.x >> 5, g = lane >> 2, q = lane & 3;
++                    const uint32_t m0 = 16 * (warp & 3), n0 = 32 * (warp >> 2);
++                    for (uint32_t sh = 0; sh + 1 < la + lb; sh++) {
++                        int32_t c[4][4];
++#pragma unroll
++                        for (int j = 0; j < 4; j++) {
++#pragma unroll
++                            for (int i = 0; i < 4; i++) {
++                                c[j][i] = 0;
++                            }
++                        }
++                        for (uint32_t a = 0; a < la; a++) {
++                            if (sh < a || sh - a >= lb) {
++                                continue;
++                            }
++                            const uint32_t b = sh - a;
++                            const uint32_t a0 = *reinterpret_cast<const uint32_t *>(&asl[a][m0 + g][4 * q]);
++                            const uint32_t a1 = *reinterpret_cast<const uint32_t *>(&asl[a][m0 + g + 8][4 * q]);
++                            const uint32_t a2 = *reinterpret_cast<const uint32_t *>(&asl[a][m0 + g][16 + 4 * q]);
++                            const uint32_t a3 = *reinterpret_cast<const uint32_t *>(&asl[a][m0 + g + 8][16 + 4 * q]);
++#pragma unroll
++                            for (int j = 0; j < 4; j++) {
++                                const uint32_t b0 = *reinterpret_cast<const uint32_t *>(&bsl[b][n0 + 8 * j + g][4 * q]);
++                                const uint32_t b1 = *reinterpret_cast<const uint32_t *>(&bsl[b][n0 + 8 * j + g][16 + 4 * q]);
++                                asm volatile("mma.sync.aligned.m16n8k32.row.col.s32.s8.s8.s32 {%0,%1,%2,%3}, {%4,%5,%6,%7}, {%8,%9}, {%0,%1,%2,%3};\n"
++                                             : "+r"(c[j][0]), "+r"(c[j][1]), "+r"(c[j][2]), "+r"(c[j][3])
++                                             : "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(b0), "r"(b1));
++                            }
++                        }
++#pragma unroll
++                        for (int j = 0; j < 4; j++) {
++#pragma unroll
++                            for (int i = 0; i < 4; i++) {
++                                acc[j][i] += (int64_t)c[j][i] << (8 * sh);
++                            }
++                        }
++                    }
++                }
++#else
+                 for (uint32_t kc = 0; kc < chunk; kc++) {
+                     const int4 av = *reinterpret_cast<const int4 *>(&as[kc][4 * to]);
+                     const int4 bv = *reinterpret_cast<const int4 *>(&bs[kc][4 * ts]);
+@@ -1596,9 +1735,23 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+                         }
+                     }
+                 }
++#endif
+                 __syncthreads();
+             }
+             if (narrow) {
++#if MAP_MMA
++                // The fragment's order: `acc[j][i]` is output `m0 + g + 8 (i / 2)`, site `n0 + 8 j + 2 q + i % 2` of the tile.
++                const uint32_t lane = threadIdx.x & 31, warp = threadIdx.x >> 5, g = lane >> 2, q = lane & 3;
++                const uint32_t m0 = 16 * (warp & 3), n0 = 32 * (warp >> 2);
++#pragma unroll
++                for (int j = 0; j < 4; j++) {
++#pragma unroll
++                    for (int i = 0; i < 4; i++) {
++                        const uint32_t ol = m0 + g + 8 * (i / 2), sl = n0 + 8 * j + 2 * q + (i % 2);
++                        emit_at(ol, sl, (wide)acc[j][i]);
++                    }
++                }
++#else
+ #pragma unroll
+                 for (int b = 0; b < 4; b++) {
+                     if (live(b, false)) {
+@@ -1610,6 +1763,7 @@ __device__ void map_tile(const FieldWords &w, uint64_t weight, uint64_t bias, ui
+                         skip(b);
+                     }
+                 }
++#endif
+             }
+         }
+         if (!narrow) {

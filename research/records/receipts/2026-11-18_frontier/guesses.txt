@@ -664,3 +664,40 @@ pumped carry 0.011 under, missed (guessed 0.05 or more over). At depth 3 and len
 capacity (no rule fixed on it): depth 8, the commuting carry on 4 circles 0.969, 0.968, 0.954, the pumped on 2 circles 0.867, 0.883,
 0.889. By its rule the pumped carry is not built now: on this control, at the same parameters a symbol, the commuting carry holds
 bracket order as well or better.
+
+G-1119-7 (2026-11-19T22:14:38Z). The pumped carry behind the separator Gemini 4 Neon proposed (its second letter of November 19): a word over the dihedral
+group of order six (R+, R-, S, I), read at every place as the running product; `tools/pumped_carry_control.py d3` (its gradients on the
+task checked to 1.4e-6). Neon's critique of G-1119-6 stands: the commuting carry is affine, its commutator is not zero, decay alone holds
+depth-limited brackets, and G-1119-6 gave it twice the state and the readout. Here: commuting on 16 circles (Neon's control), commuting on
+2, pumped on 2, trained at length 16 for 3,000 steps, read at 16 and at 48, three seeds.
+  What is on record. Neon's run: commuting 16 circles 0.585 at 16 and 0.404 at 48, pumped 2 circles 1.000 and 1.000. No finite
+  non-abelian group embeds in the affine maps of the line (their finite subgroups are abelian), so a commuting carry cannot hold the
+  product exactly at any width.
+  The guess. Pumped on 2 circles 0.95 or more at length 48 on the mean of the seeds; commuting on 16 under 0.70 at 48; commuting on 2 under
+  0.55.
+  What it decides. Pumped 0.25 or more over commuting on 16 at length 48: the carry that turns and reflects is built on the engine and the
+  card as an arm beside the line (the separator says what a commuting carry cannot hold; the line's arm says whether text needs it).
+  Scored (22:16 UTC, .local/run/pumped/d3sep.txt, 42 s on one host thread). At length 48 on the mean of three seeds: pumped on 2 circles
+  0.9964 (0.9945, 1.0000, 0.9947); commuting on 16 0.3568 (0.4287, 0.2718, 0.3700); commuting on 2 0.3466 (0.3520, 0.3835, 0.3044); chance
+  is 1/6. At the trained length 16: pumped 1.0000 on every seed, commuting on 16 0.5871, commuting on 2 0.5484, and the commuting carry's
+  training loss stands at 0.79 to 0.87 against the pumped's 0.0001 to 0.0007: it does not fit the product even where it trained. All three
+  parts held. The gap at 48 is 0.640, over the 0.25 the guess named: the carry that turns and reflects is built on the engine and the card
+  as an arm beside the line. Eight times the circles bought the commuting carry 0.010 at 48, as the embedding says it cannot buy the product.
+
+G-1119-8 (2026-11-19T22:42:45Z). The pumped carry on text: an arm beside the line (G-1119-7's decision). From OPEN.L48 (lap L47's end, the third pass opened
+by next-pass), the arm P48 is the same state with its 512 circles pumped at zero (found-pump: the chart P and p_b at zero, in the carry
+part, its second moments opened on the circles' charts' scale; every face the source's bit for bit), trained 3,000 sections of train-store
+on the line's own sections; its control is the line's lap L48 from the same state. One change: the pump. Both read at their means
+(MEAN.3000, sections 2,001 to 3,000) by the line's own reads: the held read with known (rows S, the frontier by two streams), the wide
+panel (20 prompts, 8 draws, 96 places) and the loudness.
+  What is on record. The line's rows S from L40 to L47: 1.4110, 1.4088, 1.4081, 1.4089, 1.3994, 1.3996, 1.3982, 1.4031 (L47's mean over
+  sections 2,001 to 2,881 only, at a pass's end): about 0.002 nats a place a lap, scattering by up to 0.009 between laps; a paired
+  difference of two states on the same rows reads to about 0.001 to 0.002 (the ruler's standard errors). Doubling the circles from 256 to
+  512 bought rows S 0.015 in its first lap (G-1119-2), with the new circles' turn rows drawn; the pump is founded at zero and grows from
+  its own covector, first order at zero (u Qm).
+  The guess. The arm less L48 on rows S at their means, paired place by place: -0.004 or lower. The wide panel's share of words in the
+  lexicon within two points of L48's, and its share of writes that loop no higher than L48's by more than two in 160. The pump opens: at
+  the arm's end the pump's rows hold at least a tenth of the turn rows' root mean square (a presence read on the state, a ruler).
+  What it decides. Rows S paired under minus two standard errors: the line takes the pump from L49 (the arm's state continues as the
+  line). Within two standard errors: the arm runs two more laps beside L49 and L50 before it is judged (rule 10, a null held to a length).
+  Above plus two standard errors: the pump leaves the line's path, its reading recorded.

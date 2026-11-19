@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §27 on November 19, to 19:26 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §28 on November 19, to 22:13 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -879,3 +879,53 @@ sections of the present build, then of a limb realization), and the limb realiza
 **The ceiling.** Brandon allows the board 14.5 GB (19:24 UTC). Raising `BOARD_CEILING` from 12 GiB lets a section's batches be cut
 larger; a batch is a schedule, so the build enters the line by reproducing its sections bit for bit before any lap runs on it, and is
 timed against the present build inside one balanced hold of the card.
+
+## 28. A lap's work is a flock, not a chain
+
+*Written at 22:13 UTC, November 19.* The same 150 sections ran 1.54 times slower on a Colab A100 than on the PC's card (receipts
+22:05 UTC), and I read that as "the PC's card is the fastest device we have", as if a lap could only be timed as one card running one
+schedule. Brandon (22:11 UTC) named the failure: the operations inside a lap commute, associate and distribute, so a second device is
+not a rival to the first but another member of the flock, the way a pack triangulates on its target and a body's cells divide its
+work. On the objects (`agent-inferred`): within a section each region's forward and return stands apart from every other region's
+until their covectors meet in one sum, and that sum is schedule-free by the precision law (terms at one grain, released once), so a
+section's regions may be split across devices and joined to the same bits; across the work, an arm is independent of the line, so a
+second device that runs the arms while the card runs the line cuts the hours the line spent waiting for them by about half whatever its
+own rate; and across time, a member may compute against a state a few sections old and join at a declared crossing, which is a law with
+its delay carried in the state, entered by an arm. The exact join's price is the summed covector (about 15 MB a section) and the deposit
+carried back; over the link from the PC to Colab (about 3 MB/s measured on the uploads) it stands at seconds a section, so the exact
+join pays between devices on one machine or one fast network, and the delayed join is the form for the PC and a rented card together.
+The next arm runs on the A100 beside the line, and its first receipt is the A100's own bits against the line's lap: the same sections
+from the same state, line for line.
+
+## 29. The circle that turns and reflects: the separator, and the pump built at zero
+
+*Written at 22:40 UTC, November 19.* G-1119-6's control was unfair (Gemini 4 Neon, its second letter of the day): the commuting carry had
+twice the state and the readout, and a Dyck word of bounded depth is held by decay alone. Neon's separator replaces it: a word over the
+dihedral group of order six (two rotations, a reflection and the identity), the running product read at every place. No finite
+non-abelian group embeds in the affine maps of the line (their finite subgroups are abelian), so a carry whose moves are complex
+multiplications cannot hold the product at any width; a carry whose move is `α z + β z̄` can, with two circles. G-1119-7 was fixed before
+the read and scored at 22:16 UTC (receipts `guesses.txt`, `reads.txt`): at three times the trained length the pumped carry on 2 circles
+read 0.9964 on the mean of three seeds, the commuting carry 0.3568 on 16 circles and 0.3466 on 2 (chance 1/6), and the commuting carry
+fitted the product at neither length (0.587 at the trained length, a training loss of 0.79 to 0.87 against the pumped 0.0001 to 0.0007).
+Eight times the circles bought it 0.010.
+
+What it is on the objects. The parametron's pump is a periodic modulation of its constitution, and the degenerate pump couples a
+circle's two quadratures: the term `η z̄` boosts the in-phase axis and turns the quadrature, and with `|η| > |γ|` the move reflects.
+A site's move is then a real-linear map of the plane that need not commute with the next site's, so the circle's charge holds the order
+of what crossed it (who did what to whom), where a product of turns holds only their sum. Built as the engine's law
+(`Declaration::pump`, head line `hnn-field-v14p`; atlas `contact.pumped-carry`): a site reads a third chart `p = P r̂ + p_b` beside the
+turn's and the leak's, and the three share one leak, `γ = γ̂(q)/(1 + d + n)`, `η = p/(1 + d + n)`, `κ = N₀ d/(1 + d + n)` with the
+budget `n = |p_re| + |p_im|`, so `|γ| + |η| + κ/N₀ ≤ 1` and the charge stays within five places' drive at every pump and every order of
+moves (`CarryGate.pumpedCharge_le`, proved). Why the budget is the sum of the parts' magnitudes (`agent-inferred`): it bounds `|p|` from
+above with no root, so the leak's budget stays in integers on both surfaces; it charges a reflection whose axis lies between the chart's
+axes up to `√2` more than one on an axis. At `p = 0` every term is the unpumped gate's in integers, so a learner pumped at zero
+(`found-pump`, the chart in the `carry` part, its second moments opened on the circles' charts' scale) reads every face of its source
+bit for bit, and `p`'s covector stands there at first order (`η`'s is `u Qm`).
+
+Receipts of the build. Host: at `p = 0` the pumped gate and its return are the unpumped ones in integers over a sweep of `q` and `ℓ`, the
+three parts sum within three grains of one over a sweep of `p`, a field pumped at zero keeps every face of the law and of a strand and
+every standing entry's covector, and the pumped circles' covector agrees with its code's central difference on 249 probes (18 on the
+pump's chart and bias). Lean: `HNN/CarryGate` builds with the pumped turn, pump and coupling, their values at zero, `pumped_step_le`,
+`pumpedCharge_le` and `reflection_turn_ne`. The card's realization, its parity against the host and the line's lap reproduced with the
+new build are the next receipts; then the arm, the pump founded at zero on the state lap L48 trains from (`OPEN.L48`), beside L48 as its
+control.

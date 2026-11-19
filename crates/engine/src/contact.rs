@@ -102,6 +102,10 @@ pub(crate) struct TickCell {
     pub(crate) gam: Vec<i64>,
     pub(crate) kb: Vec<i64>,
     pub(crate) qm: Vec<i64>,
+    /// [definition; the lead, November 19] The pump's operands where the circles are pumped ([`Declaration::pump`]; empty otherwise), each
+    /// `[t][2C]`, real parts then imaginary: `ph` the pump chart's read `p` on `2^(−16)` and `eta` the pump `η` on `2^(−30)`.
+    pub(crate) ph: Vec<i64>,
+    pub(crate) eta: Vec<i64>,
     /// [definition; theory, November 12, the triad record §4] The triads' operands (empty without them), what the reverse reads: `abg` the charts'
     /// reads `[t][6J]` on `2^(−16)` (`α`'s real parts, then imaginary, then `β`'s, then `γ`'s), `tp` the product `p = α(t) β(t − 1)` and `ct` the
     /// triad `c^T = p γ(t + 1)`, each `[t][2J]`, real parts then imaginary, on `2^(−16)`, zero at the region's two ends.
@@ -505,6 +509,7 @@ pub(crate) struct Reaches {
     pub(crate) read: u64,
     pub(crate) moment_face: u64,
     pub(crate) junction: u64,
+    pub(crate) pump: u64,
 }
 
 impl Constitution {
@@ -539,7 +544,7 @@ impl Constitution {
         let l = &self.layout;
         let r = |start: usize, len: usize| reach(&self.theta[start..start + len]);
         let j = self.declaration.triads;
-        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2), junction: r(l.junction, usize::from(self.declaration.junction) * dw) }
+        Reaches { probe: r(l.probe, m2 * dw), q: r(l.q, m2 * dw), v: r(l.v, m2 * dw), out: r(l.out, dw * m2), a: r(l.a, f * dw), b: r(l.b, f * dw), w: r(l.w, dw * f), carry: r(l.carry, 2 * self.declaration.carry * dw), triad: r(l.triad, 6 * j * dw), w_triad: r(l.w_triad, dw * 2 * j), read: r(l.read, dw * dw), moment_face: r(l.moment_face, dw * m2), junction: r(l.junction, usize::from(self.declaration.junction) * dw), pump: r(l.pump, 2 * self.declaration.carry * usize::from(self.declaration.pump) * dw) }
     }
 
     /// [the lead, November 17] Each site's written class where it is known (resolved and carried as no face), the alphabet's length elsewhere:
@@ -859,14 +864,33 @@ impl Constitution {
             cell.gam = vec![0i64; sites * c2];
             cell.kb = vec![0i64; sites * c2];
             cell.qm = vec![0i64; sites * c2];
+            // [definition; the lead, November 19] The pump's chart beside the turn's and the leak's, where the circles are pumped
+            // ([`Declaration::pump`], [`carry_gate_pumped`]): `p = P r̂ + p_b`, one affine at the same grains.
+            let pumped = d.pump;
+            if pumped {
+                cell.ph = vec![0i64; sites * c2];
+                cell.eta = vec![0i64; sites * c2];
+            }
             for t in 0..sites {
                 let rt = &cell.read2[t * dw..(t + 1) * dw];
                 affine(&self.theta[l.carry..l.carry + c2 * dw], reaches.carry, dw, rt, Some(&self.theta[l.carry_bias..l.carry_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.qh[t * c2..(t + 1) * c2])?;
+                if pumped {
+                    affine(&self.theta[l.pump..l.pump + c2 * dw], reaches.pump, dw, rt, Some(&self.theta[l.pump_bias..l.pump_bias + c2]), MATERIAL_BITS, MATERIAL_BITS, &mut cell.ph[t * c2..(t + 1) * c2])?;
+                }
                 for k in 0..circles {
-                    let ((yr, yi), friction) = carry_gate(&self.exponential, cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128)?;
+                    let (q, lk) = (cell.qh[t * c2 + k] as i128, cell.qh[t * c2 + circles + k] as i128);
+                    let ((yr, yi), kappa) = if pumped {
+                        let ((yr, yi), (er, ei), _, _, kappa) = carry_gate_pumped(&self.exponential, q, lk, (cell.ph[t * c2 + k] as i128, cell.ph[t * c2 + circles + k] as i128))?;
+                        cell.eta[t * c2 + k] = er;
+                        cell.eta[t * c2 + circles + k] = ei;
+                        ((yr, yi), kappa)
+                    } else {
+                        let (gate, friction) = carry_gate(&self.exponential, q, lk)?;
+                        (gate, carry_coupling(friction))
+                    };
                     cell.gam[t * c2 + k] = yr;
                     cell.gam[t * c2 + circles + k] = yi;
-                    let (kappa, e) = (carry_coupling(friction), plain + k);
+                    let e = plain + k;
                     cell.kb[t * c2 + k] = carry_drive(kappa, cell.b[t * f + e])?;
                     cell.kb[t * c2 + circles + k] = carry_drive(kappa, cell.b[t * f + half + e])?;
                 }
@@ -885,8 +909,11 @@ impl Constitution {
                     cell.c[t * f + e] = fit64(release(ar * qr - ai * qi, FACE_BITS))?;
                     cell.c[t * f + half + e] = fit64(release(ar * qi + ai * qr, FACE_BITS))?;
                     let (yr, yi) = (i128::from(cell.gam[t * c2 + k]), i128::from(cell.gam[t * c2 + circles + k]));
-                    let next_r = cell.kb[t * c2 + k] as i128 + release(yr * qr - yi * qi, GAMMA_BITS);
-                    let next_i = cell.kb[t * c2 + circles + k] as i128 + release(yr * qi + yi * qr, GAMMA_BITS);
+                    // [the lead, November 19] The pump's reflection `η conj(Qm)` joins the turn's term in its one release ([`Declaration::pump`]); zero
+                    // where the circles are not pumped, so the sum is the unpumped one's.
+                    let (er, ei) = if pumped { (i128::from(cell.eta[t * c2 + k]), i128::from(cell.eta[t * c2 + circles + k])) } else { (0, 0) };
+                    let next_r = cell.kb[t * c2 + k] as i128 + release(yr * qr - yi * qi + er * qr + ei * qi, GAMMA_BITS);
+                    let next_i = cell.kb[t * c2 + circles + k] as i128 + release(yr * qi + yi * qr + ei * qr - er * qi, GAMMA_BITS);
                     (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));
                 }
                 // [the strand's two streams] An open place reads the circle as it stands before its place, and drives nothing.

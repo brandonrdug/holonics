@@ -180,6 +180,24 @@ pub struct Declaration {
     /// `hnn-field-v14c`: the nineteen words of `v14x` with the crossing's word written as `0` or `1`, then `E`. An attempt: the card
     /// refuses a field with closed characters until its realization is built, and the keys take no deposit.
     pub closed: usize,
+    /// [definition; the lead, November 19 (G-1119-7, after Gemini 4 Neon's dihedral separator); `lean/Holonics/HNN/CarryGate.lean`, `pumped_charge_step_le`]
+    /// **The carry circles are pumped**: each circle's move turns, leaks and reflects, `Q(t) = κ(t) b(t) + γ(t) Qm(t) + η(t) conj(Qm(t))`, the
+    /// parametron's degenerate pump on its circle (the `z̄` term couples the circle's two quadratures, so a site's move is a real-linear map of
+    /// the plane that need not commute with the next site's). A site reads the pump's chart `p = P r̂ + p_b` (complex, on `2^(−16)`, [`Loci::pump`])
+    /// beside `q` and `ℓ`, and the three share one leak: with `n = |p_re| + |p_im|` on `2^(−16)`, `γ = γ̂(q)/(1 + d + n)`, `η = p/(1 + d + n)` and
+    /// `κ = N₀ d/(1 + d + n)` ([`carry_gate_pumped`]), so `|γ| + |η| + κ/N₀ ≤ 1` and the charge stays within `N₀ max |b|` at every site, as
+    /// the unpumped circle's does (`charge_le`). At `p = 0` every term is the unpumped gate's in integers, so a field founded with the pump at zero
+    /// ([`Constitution::with_pump`]) reads every face of its source bit for bit, and `p`'s covector stands there at first order (`η`'s is `u Qm`).
+    ///
+    /// Why (the separator record, receipts `2026-11-18_frontier`, G-1119-7): a commuting carry's moves are complex multiplications, whose products
+    /// do not depend on their order, and no finite non-abelian group embeds in the affine maps of the line; on a word over the dihedral group of
+    /// order six the commuting carry fitted the running product at 0.587 on 16 circles at its trained length and 0.357 at three times it, where
+    /// the pumped carry on 2 circles read 1.000 and 0.996. The order of what crossed a circle (who did what to whom) is a law of composition
+    /// that does not commute. Why `n` is the sum of the two parts' magnitudes (agent-inferred): it bounds `|p|` from above with no root, so
+    /// the leak's budget is kept in integers on both surfaces; it charges a reflection whose axis stands between the chart's axes up to `√2`
+    /// more than one on an axis. `false` writes every head line exactly as before; `true` writes `hnn-field-v14p`, the twenty words of `v14c`
+    /// with the closed characters' count written even at zero, then `1`. Needs carry circles.
+    pub pump: bool,
 }
 
 impl Declaration {
@@ -400,6 +418,9 @@ impl Declaration {
         if self.triads > 0 {
             return refuse("a growth in carry circles of a field with triads (the triads are founded last; a growth after them is not built)");
         }
+        if self.pump {
+            return refuse("a growth in carry circles of a pumped field (the pump's chart is founded last; a growth after it is not built)");
+        }
         if circles == 0 || circles % 2 != 0 {
             return refuse("a growth in carry circles adds an even count (as many scan from each side)");
         }
@@ -483,6 +504,9 @@ impl Declaration {
         if self.crossing && self.triads == 0 {
             return refuse("a field whose triads' legs stand at the site needs triads");
         }
+        if self.pump && self.carry == 0 {
+            return refuse("a field whose carry circles are pumped needs carry circles");
+        }
         // The closed characters' families, `A × 2E` keys and `heads × (D + 1)` odds, are laid within the carrier their offsets are counted in.
         if self.closed.checked_mul(2).and_then(|r| r.checked_mul(self.alphabet)).is_none() {
             return refuse("a field's closed characters past the carrier their families are laid in");
@@ -502,7 +526,9 @@ impl Declaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.closed > 0 {
+        let head = if self.pump {
+            "hnn-field-v14p"
+        } else if self.closed > 0 {
             "hnn-field-v14c"
         } else if self.crossing {
             "hnn-field-v14x"
@@ -521,7 +547,9 @@ impl Declaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.closed > 0 {
+        let tail = if self.pump {
+            format!(" {} {} {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed)
+        } else if self.closed > 0 {
             format!(" {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed)
         } else if self.crossing {
             format!(" {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud))
@@ -550,17 +578,29 @@ impl Declaration {
         // [theory, November 16 19:10Z] The crossing's word is read from `v14x` alone; every older head line is a field whose triads, if any, are the
         // strand's.
         // [the lead, November 17] The closed characters' count is read from `v14c` alone, whose crossing word is zero or one.
+        // [the lead, November 19] The pump's word is read from `v14p` alone: the twenty words of `v14c`, the closed characters' count zero or more,
+        // then one.
+        let pump = words.first().copied() == Some("hnn-field-v14p") && words.len() == 21;
+        if pump && words[20] != "1" {
+            return refuse("an hnn-field-v14p head line whose pump word is not one (a field without the pump writes the line before it)");
+        }
         let closed_line = words.first().copied() == Some("hnn-field-v14c") && words.len() == 20;
-        let crossing = words.first().copied() == Some("hnn-field-v14x") || (closed_line && words[18] == "1");
+        let crossing = words.first().copied() == Some("hnn-field-v14x") || ((closed_line || pump) && words[18] == "1");
         let closed = if closed_line {
             match n(words[19])? {
                 0 => return refuse("an hnn-field-v14c head line with no closed characters (a field without them writes the line before it)"),
                 e => e,
             }
+        } else if pump {
+            n(words[19])?
         } else {
             0
         };
         let (depth_word, carry, triads, opening, junction, mark, loud) = match (words.first().copied(), words.len()) {
+            (Some("hnn-field-v14p"), 21) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
+                (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 0 | 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
+                _ => return refuse("an hnn-field-v14p head line whose opening, junction, mark, loudness or crossing word is not zero or one"),
+            },
             (Some("hnn-field-v14c"), 20) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
                 (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 0 | 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
                 _ => return refuse("an hnn-field-v14c head line whose opening, junction, mark, loudness or crossing word is not zero or one"),
@@ -608,7 +648,7 @@ impl Declaration {
             (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump };
         d.admit()?;
         Ok(d)
     }
@@ -699,6 +739,12 @@ pub struct Loci {
     pub closed_key: usize,
     pub closed_odds: usize,
     pub closed_odds_bias: usize,
+    /// [definition; the lead, November 19] **The pump's chart** ([`Declaration::pump`]): `pump`, `2C` rows of `D` on the material's grain, rows
+    /// `0..C` the real parts and `C..2C` the imaginary parts of `P`, row `k` (and `C + k`) carry circle `k`, as the circles' own charts are laid;
+    /// `pump_bias`, `2C` on the face's grain. A site reads `p = P r̂ + p_b` on `2^(−16)` from its pair chart, at the grains `a` and `b` are read
+    /// at. The last families, zero long where the circles are not pumped.
+    pub pump: usize,
+    pub pump_bias: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -763,6 +809,8 @@ impl Loci {
         let has = usize::from(d.closed > 0);
         let closed_key = tail(a * 2 * d.closed, FACE_BITS);
         let (closed_odds, closed_odds_bias) = (tail(has * d.heads * dw, MATERIAL_BITS), tail(has * d.heads, FACE_BITS));
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, len: at, families }
+        let pumped = 2 * d.carry * usize::from(d.pump);
+        let (pump, pump_bias) = (tail(pumped * dw, MATERIAL_BITS), tail(pumped, FACE_BITS));
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, len: at, families }
     }
 }
