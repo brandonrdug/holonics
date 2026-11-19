@@ -1492,9 +1492,12 @@ are in #62.
 
 [proved-derived; formal-checked] A drive splits uniquely and `C`-orthogonally into its component in
 the constitution's mode space at the drive's eigenvalue and the complement
-(`Compression/Core/Resonance`). The resonating part (RIDE) needs zero effort and keeps the mode
-energy's exchange law (`modeEnergy_conserved`). The emanating part (FOUND: off-resonance, or founding
-a new mode) always needs nonzero effort, but the work it exchanges, `dE/dt = ⟨f, ẋ⟩`, can be zero:
+(`Compression/Core/Resonance`). On a lossless constitution the resonating part (RIDE) needs zero
+effort and keeps the mode energy's exchange law (`modeEnergy_conserved`). With a dissipation `D`
+holding a mode costs the quadrature effort `−ω sin(ωt) D d`, zero exactly when `D d = 0`, and
+`2πω S_D(d)` of work a period, so its quality is `ω S_C(d)/S_D(d)`
+(`HolonicsResearch/Compression/Core/ResonanceFriction`). The emanating part (FOUND: off-resonance,
+or founding a new mode) always needs nonzero effort, but the work it exchanges, `dE/dt = ⟨f, ẋ⟩`, can be zero:
 a clamp holds without exchanging energy. "Emanating costs effort" is the law; a fixed work price is
 not. Stored energy in the constitution is stored (held, not propagating), with inertia `E/c²`;
 propagating current is emanation; the LC exchange converts one into the other while conserving

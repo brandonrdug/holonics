@@ -43,7 +43,8 @@ What is proved.
    `p = q = 0` (`add_mul_sqrt_eq_zero_iff`). Rulers: `3 − 2√2 > 0`, `−7 + 5√2 > 0`, `1 − √2 < 0`
    (`ruler_signs`), and the convergents `8/5 < (1 + √5)/2 < 13/8` of the golden landmark (`ruler_golden`).
 
-Limits. The first-arrival sieve tower beyond Eratosthenes, which #410 names in the same box, is not here. Infinity is
+Limits. The first-arrival sieve tower beyond Eratosthenes, which #410 names in the same box, is
+`Compression/Landmark/SieveTower` (any multiplicative recurrence with a size, no unique factorization). Infinity is
 read through the chart `w = 1/z`; no projective line is built as a type. The sign law is of one quadratic surd over
 an ordered field's rationals or integers; sums of surds of different `D` are not treated. The integers of the law are
 unbounded: the width `p² − D q²` needs (about twice the operands' places plus `D`'s) is the consumer's to declare.
