@@ -564,7 +564,10 @@ numeral, would join them ([record](../research/records/2026-09-25_THE_MUSIC_IS_I
   free: the diffusion is reversible exactly when that turn vanishes
   (`heat.linear-diffusion-turn-boost`).
 - **Einstein.** Free fall is the geodesic; two boosts leave a turn (`Physics/Spacetime/Wigner`); tidal
-  curvature and frame dragging are the Weyl tensor's strain and rotation parts.
+  curvature and frame dragging are the Weyl tensor's electric and magnetic parts, both symmetric and
+  traceless and so boosts: the tide strains a congruence and the magnetic part drives its rotation. A
+  congruence's own rate splits into expansion, shear and rotation, the strain focusing it and the
+  rotation resisting (`Physics/Spacetime/Raychaudhuri`).
 - **The quantum.** Unitary evolution is a turn and imaginary time a boost
   (`quantum.evolution-kinds`); the Wick rotation exchanges them; energy is a turn rate, `E = ħω`.
 - **Transcendentals are constraints.** A move is carried by its algebraic data; `e^(2πi) = 1` is the

@@ -1419,3 +1419,6 @@ import HolonicsResearch.Holon.DtNTubeTower
 import HolonicsResearch.Physics.Thermal.ChainPathJoin
 import HolonicsResearch.Holon.InterconnectionJoin
 import HolonicsResearch.Compression.FaceMapPower
+import HolonicsResearch.Physics.Spacetime.Raychaudhuri
+import HolonicsResearch.Mathematics.CirculantInertia
+import HolonicsResearch.Compression.KernelModes

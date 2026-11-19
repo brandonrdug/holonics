@@ -1051,7 +1051,8 @@ owns the law. The prototype's
 [`KernelModeReduction`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/kernel_modes.rs)
 constructed a rational finite factorization, transported its signed current columns and tested action
 closure, or returned the source-null separator. It is retired: Lean `Compression/Core/FaceMap`
-owns the face map's kernel and its quotient, and no HNN execution consumes it; a loaded ring's
+owns the face map's kernel and its quotient, Lean `Compression/KernelModes` states the factorization,
+the closure test and its separator, and no HNN execution consumes it; a loaded ring's
 future quotient is Lean `HNN/ModeQuotient` ([§4](#the-loaded-rings-mode-quotient)).
 
 [definition] Convolution shares the transport kernel by relative position; sparse graph transport
