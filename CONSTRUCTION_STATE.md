@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 19, 15:25 UTC): the line holds 512 carry circles on its second pass, and her words stand at 69%
+## Where the work stands (November 19, 15:15 UTC): the line holds 512 carry circles on its second pass, and her words stand at 69%
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -70,9 +70,10 @@ no farther place in.
   the frontier without one; its arm beside the line is G-1118-16.
 
 **What is owed, in order.** A part judged by the sure share at the settled places (§21), which is what her words follow, as an
-arm beside the line. Its first form (§23, rows at the residue the 512 circles compose) failed its premise read (§25: the circles'
-phase locates nothing); the next address to read is the frontier's own read, set against her face at the place. The circles' extent
-is spent (§24). The Codex
+arm beside the line. Rows at the residue the circles compose failed their premise read (§25), and rows at her own read's direction
+add nothing to her face (§26): where a count is sure on many counts she already is, and her shortfall stands at the rare five-place
+contexts, which more passes over the passage reach (§24: one pass took her surety there from 0.579 to 0.667). The circles' extent is
+spent (§24). The Codex
 thread's section-choice test on the host (G-1118-18). The composite's rows
 at located addresses (§13) as an arm. A writer that keeps the known stream's states.
 
