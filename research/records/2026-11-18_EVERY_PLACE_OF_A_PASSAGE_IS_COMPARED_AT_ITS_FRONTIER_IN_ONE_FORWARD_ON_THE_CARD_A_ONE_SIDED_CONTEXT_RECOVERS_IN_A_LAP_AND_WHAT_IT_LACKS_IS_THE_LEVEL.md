@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 at 00:50 UTC, November 19. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 and §21 on November 19, to 03:15 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -709,3 +709,30 @@ crates: bindings the kernels read through the words' pointers, buffers held only
 described where they are packed) passed gate 1 (143 host tests), the card suite alone (26 of 26), `gate_engine.sh` against the store
 line's lap 70 (parity, 3 and 24 sections, the held read: equal), and today's line: 24 sections of laps C18 and L18 each equal to
 the laps' own logs.
+
+## 21. The line takes 256 circles, and where her words are decided
+
+*Written at 03:15 UTC, November 19.* G-1119-1's two laps beside the line's own from arm C18's end (receipts `reads.txt`, 03:10 UTC).
+
+**What she wrote.** On the wide panel (the long panel's 20 prompts drawn eight times each: about 2,200 words a read) arm D20 wrote
+1,304 of 2,202 words in the lexicon (59%) where its control L20 wrote 1,298 of 2,212 (58%). Over the laps of the line the same
+panel reads 55% (L17), 56% (L18), 57% (C18), 58% (L20) and 59% (D20): her words rise about half a point a lap, and the circles have
+not changed that rate. Still no sentence holds.
+
+**The code.** Rows S: D19 0.0068 under L19 (±0.0004) and D20 0.0196 under L20 (1.5901 against 1.6098, ±0.0006), under it in every
+slice and at every count of places known (0.016 to 0.026 from two places out). One doubling of the circles gave at the second lap
+what each of the two doublings of §20 gave, about 0.020. One place open under the law 0.016 under. By G-1119-1's rule the line takes
+the 256 circles; the arm of 512 (G-1119-2) runs beside the line's laps L21 and L22.
+
+**Where her words are decided** (the excess ruler's spread column, kind S, at the fifth of places where a count of five places expects
+under 0.25 nats). Her code there is now level with the count's (0.644 against 0.627 at D20), while a draw from her face writes the
+passage's symbol 0.737 of the time against the count's 0.909. The spread says why the two readings part: the count pays under 0.1 nats
+at 92.1% of these places and over 1.5 at the other 7.9%, nothing between; she pays under 0.1 at 52.5%, 0.1 to 1.5 at 32.7% and over
+1.5 at 14.8%. Equal codes are spent differently: the count is sure or lost, and its rare losses are dear; she hedges at a third of
+the places. A word holds only if each of its settled places is drawn as the passage has it, so her words follow the share she is sure
+at, not her code. That share has risen lap by lap (0.398 at P15, 0.435 at L18, 0.473 at C18, 0.507 at L20, 0.525 at D20), each
+doubling of the circles adding about two points (0.038 for two doublings at C18, 0.018 for one at D20) beside the line's own
+one to two a lap (0.473 at C18 to 0.507 at L20 over two laps), and her lost share falls with it (0.203 to
+0.148). A count's surety at those places is an exact match of the five places before: the binding of the nearest places' identities
+that the circles grow (§17 to §20). So the circles are the right part for her words and too slow at this rate; the reading names
+what any part that is to move her words must move: the sure share at the settled places, not the code there.
