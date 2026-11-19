@@ -1206,3 +1206,33 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   E22   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9231  spearman loud~color=+0.208  color~code=-0.130  by surprise fifth: q1=0.9440 q2=0.9302 q3=0.9230 q4=0.9151 q5=0.9034
   E22   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1847 against 2240.5 for an order that carries nothing (ratio 0.824); at them nats=5.121 loud=20.305 color=0.9061 rank-1 share=0.06
   E22   by lane (octaves): lane0=21.319  lane1=19.729  lane2=19.877  lane3=20.040
+
+# 08:20 UTC November 19. The line's laps L23 to L26 with 512 circles, from arm E22's end, no arm beside them (binary gatecarry/bin/athena):
+  lap L23: 3000 sections, 429 ms a section on the mean, 603 at most
+  FRONTIER L23; one place open: all 0.8749 (100508 places) | books 0.9461 code 0.5890 science 0.8257 web 0.9656 wikidata 1.0479 || less the control's, paired: -0.0171 (±0.0009) | books -0.0255 code -0.0121 science -0.0256 web -0.0139 wikidata -0.0082
+  FRONTIER L23; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.5144 (99844 places) | books 1.5593 code 1.2044 science 1.4389 web 1.7095 wikidata 1.6598 || less the control's, paired: -0.0202 (±0.0009) | books -0.0250 code -0.0260 science -0.0184 web -0.0154 wikidata -0.0162
+  L23 wide panel: LONG L23: all words 2186 in lexicon 1373 (62%) writes that loop 23 of 160 longest run shared with its prompt 54 | code 273/366 (74%) web 305/441 (69%) science 230/446 (51%) books 382/520 (73%) wikidata 183/413 (44%)
+  L23 LOUDNESS region=all places=100508 nats_a_place=0.8749 loudness_octaves=20.315 spearman_loud_code=+0.133
+  L23   temperature (energy over the region's mean, a nat): +0.0149   rank-1 share: loudest fifth 0.746, quietest fifth 0.815
+  L23   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9358  spearman loud~color=+0.213  color~code=-0.124  by surprise fifth: q1=0.9528 q2=0.9455 q3=0.9364 q4=0.9275 q5=0.
+  lap L24: 3000 sections, 427 ms a section on the mean, 598 at most
+  FRONTIER L24; one place open: all 0.8583 (100508 places) | books 0.9273 code 0.5710 science 0.8102 web 0.9438 wikidata 1.0391 || less the control's, paired: -0.0337 (±0.0011) | books -0.0443 code -0.0302 science -0.0412 web -0.0357 wikidata -0.0170
+  FRONTIER L24; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.4974 (99844 places) | books 1.5468 code 1.1906 science 1.4157 web 1.6865 wikidata 1.6476 || less the control's, paired: -0.0372 (±0.0011) | books -0.0375 code -0.0399 science -0.0417 web -0.0384 wikidata -0.0284
+  L24 wide panel: LONG L24: all words 2159 in lexicon 1392 (64%) writes that loop 28 of 160 longest run shared with its prompt 65 | code 266/358 (74%) web 346/462 (74%) science 239/437 (54%) books 345/479 (72%) wikidata 196/423 (46%)
+  L24 LOUDNESS region=all places=100508 nats_a_place=0.8583 loudness_octaves=20.354 spearman_loud_code=+0.134
+  L24   temperature (energy over the region's mean, a nat): +0.0150   rank-1 share: loudest fifth 0.751, quietest fifth 0.816
+  L24   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9503  spearman loud~color=+0.190  color~code=-0.127  by surprise fifth: q1=0.9672 q2=0.9605 q3=0.9513 q4=0.9418 q5=0.
+  lap L25: 3000 sections, 428 ms a section on the mean, 554 at most
+  FRONTIER L25; one place open: all 0.8483 (100508 places) | books 0.9192 code 0.5641 science 0.7966 web 0.9317 wikidata 1.0296 || less the control's, paired: -0.0437 (±0.0012) | books -0.0524 code -0.0370 science -0.0548 web -0.0479 wikidata -0.0266
+  FRONTIER L25; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.4880 (99844 places) | books 1.5458 code 1.1807 science 1.3980 web 1.6786 wikidata 1.6370 || less the control's, paired: -0.0466 (±0.0012) | books -0.0385 code -0.0498 science -0.0593 web -0.0463 wikidata -0.0390
+  L25 wide panel: LONG L25: all words 2127 in lexicon 1364 (64%) writes that loop 21 of 160 longest run shared with its prompt 76 | code 260/353 (73%) web 331/451 (73%) science 251/439 (57%) books 352/485 (72%) wikidata 170/399 (42%)
+  L25 LOUDNESS region=all places=100508 nats_a_place=0.8483 loudness_octaves=20.419 spearman_loud_code=+0.131
+  L25   temperature (energy over the region's mean, a nat): +0.0131   rank-1 share: loudest fifth 0.757, quietest fifth 0.817
+  L25   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9645  spearman loud~color=+0.178  color~code=-0.121  by surprise fifth: q1=0.9788 q2=0.9768 q3=0.9652 q4=0.9568 q5=0.
+  lap L26: 3000 sections, 424 ms a section on the mean, 560 at most
+  FRONTIER L26; one place open: all 0.8378 (100508 places) | books 0.9129 code 0.5556 science 0.7827 web 0.9219 wikidata 1.0155 || less the control's, paired: -0.0542 (±0.0013) | books -0.0587 code -0.0455 science -0.0687 web -0.0576 wikidata -0.0406
+  FRONTIER L26; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.4802 (99844 places) | books 1.5351 code 1.1768 science 1.3878 web 1.6809 wikidata 1.6206 || less the control's, paired: -0.0544 (±0.0013) | books -0.0492 code -0.0537 science -0.0695 web -0.0440 wikidata -0.0555
+  L26 wide panel: LONG L26: all words 2146 in lexicon 1413 (65%) writes that loop 19 of 160 longest run shared with its prompt 74 | code 309/392 (78%) web 308/426 (72%) science 240/425 (56%) books 368/504 (73%) wikidata 188/399 (47%)
+  L26 LOUDNESS region=all places=100508 nats_a_place=0.8378 loudness_octaves=20.468 spearman_loud_code=+0.129
+  L26   temperature (energy over the region's mean, a nat): +0.0143   rank-1 share: loudest fifth 0.753, quietest fifth 0.818
+  L26   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.9779  spearman loud~color=+0.179  color~code=-0.126  by surprise fifth: q1=0.9924 q2=0.9897 q3=0.9799 q4=0.9696 q5=0.
