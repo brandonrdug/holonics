@@ -26,8 +26,10 @@ Rust owners `holonics::physics::information` and `holonics::aeon::join_axes`.
   reads trivially, otherwise the cycle is its defect; the two-parameter flow square commutes or
   returns its commutator, and a non-commuting square changes the cross-entropy return.
 
-[open] Owed in #62: a moving support (one-sided or measure transport of the aperture); a port that
-receives the covector's phase face; the HNN's `R⁻¹dR` covector (`HNN/Ratio`) joined to this port;
-the finite-step quasi-static limit (the restoring leg as `N` quench-and-relax steps whose production
-`Σ D(qₖ‖qₖ₊₁)` vanishes as `N → ∞`), which the restoring leg's zero production here presupposes.
+The finite-step quasi-static limit (the restoring leg as `N` quench-and-relax steps whose production
+`Σ D(qₖ‖qₖ₊₁)` is at most `(b − a)²/(8Nθ²)` and tends to the restoring leg's zero), a moving support
+(edge transport of the aperture, an entrance's one-sided rates), a ring port that receives the
+covector's phase face, and `R⁻¹dR` read at the two ports stand in
+`HolonicsResearch/Physics/InformationPort` (#410). The Rust consumer `physics::information::apply`
+retired with `crates/holonics` (C8 of #603).
 -/

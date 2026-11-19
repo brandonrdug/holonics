@@ -108,12 +108,13 @@ stands once, outward.
    `ConstantNavigators.log_two_enclosure`, whose four atanh terms hold `log 2` within `1/78732`, the
    alternating navigator's stated remainder reaches that width only from `N = 78731` terms on.
 
-What is not claimed. The jets of `analytic.euler-maclaurin-eta` (the first and second derivatives
-in `s` of ζ and η, the owner's `ComplexJet2` and `HeadJet`, and their uniform derivative bounds);
-complex `s` off the real line (the owner's `ComplexReceiverBox` and its rising-product remainder);
-the Euler–Maclaurin terms of higher order with their Bernoulli numbers, and the start `N` derived
-from a declared grain (`derive_euler_maclaurin_start`); and the propagation of enclosures through
-sums, products and reciprocals as interval arithmetic, beyond the rounding of item 4. The relaxed
+What is not claimed here. ζ's jets in `s` with their uniform derivative bounds on `Re s ≥ σ₀ > 1`,
+η's first jet at real `s`, ζ and η's paired series at complex `s` (the complex receiver box), the
+`B₂` Euler–Maclaurin term and the start `N` derived from a declared grain stand in
+`Mathematics/ZetaJets`; η's jets at complex `s`, the owner's `ComplexJet2` and `HeadJet` as data,
+its rising-product remainder and the Euler–Maclaurin terms past `B₂` are left there. Also not
+claimed: the propagation of enclosures through sums, products and reciprocals as interval
+arithmetic, beyond the rounding of item 4. The relaxed
 release is stated on the points a face encloses; the owner's rational evaluation of a source over
 a box, which supplies `M`, `q` and `β`, is the caller's. The guide's contraction (with `q < 1`, a
 unique fixed point, a zero of the source when `λ ≠ 0`) is not proved; the self-map needs only

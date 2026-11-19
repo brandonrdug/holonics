@@ -79,9 +79,12 @@ the Legendre model, sixteen times the cubic's discriminant `(a − w)⁴ (a + w)
 of the rational model (the twist by `−1`); the monic model of the twist by `d` itself has `d⁶ Δ`.
 
 What is not claimed. The identity `∫_egg ω = (2/(b(a + w))) K(√(1 − λ))` (the substitution on the oval) is not
-proved: `egg_period_neck` is about the record's closed form. The monodromies `[[1, 4], [0, 1]]` at the neck and
-`[[1, 2], [0, 1]]` at the ellipse, Kodaira's types `I₄` and `I₂`, the resolution of the total surface and the Legendre
-fibre `I₂*` at `∞` are out of scope; only the discriminant's orders 2 and 4 with `c₄ ≠ 0` are proved. The group
+proved here: `egg_period_neck` is about the record's closed form, and the identity on the oval stands in
+`EllipticCurve/EggPeriod` (`ovalPeriod_eq`, with the neck's growth read on the oval, `ovalPeriod_neck_log`). The null
+monodromies, `[[1, 4], [0, 1]]` at the neck in the basis at `λ = 0` and a move conjugate to `[[1, 2], [0, 1]]` at the
+ellipse, stand there too, as the owner's formal continuation shifted by the lifts' gains (`neck_move`, `ellipse_move`).
+Kodaira's types `I₄` and `I₂`, the resolution of the total surface and the Legendre fibre `I₂*` at `∞` are out of
+scope; only the discriminant's orders 2 and 4 with `c₄ ≠ 0` are proved. The group
 `E(ℝ) ≅ S¹ × ℤ/2` and the exchange of the two real parts by translation are not proved, and the unbounded part is not
 shown connected (affinely its arcs `y > 0` and `y < 0` meet only through the points at infinity). Nothing is claimed
 on ranks or Mordell–Weil groups of rational eggs beyond the four two-torsion points (`EggSource` holds a rank bound
@@ -1097,8 +1100,8 @@ theorem ellipticK_neck :
 
 /-- [proved-derived; formal-checked] **The egg's period grows as the logarithm of the modulus.** The record's
 closed form `(2/(b(a + w))) K(√(1 − λ))` for the period of `ω = dx/F_y` round the oval (its identification with the
-oval's integral is not proved here) satisfies `(2/(b(a + w))) K(√(1 − λ)) − (1/(2ab)) log(1/λ) → 2 log 2/(ab)` as
-`w → a⁻`. -/
+oval's integral is `EggPeriod.ovalPeriod_eq`) satisfies
+`(2/(b(a + w))) K(√(1 − λ)) − (1/(2ab)) log(1/λ) → 2 log 2/(ab)` as `w → a⁻`. -/
 theorem egg_period_neck {a b : ℝ} (ha : 0 < a) (hb : b ≠ 0) :
     Tendsto (fun w => 2 / (b * (a + w)) * ellipticK (√(1 - branchA a w / branchB a w)) -
       log (branchA a w / branchB a w)⁻¹ / (2 * a * b)) (𝓝[<] a) (𝓝 (2 * log 2 / (a * b))) := by
