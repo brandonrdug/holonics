@@ -12,7 +12,11 @@ The task: Dyck-2 (two bracket kinds, depth at most D), next-symbol prediction. R
 mass the face gives the right closer among the two closers (`agree`), and its share over 0.9 (`sure`), by depth; a planted readout
 (the true stack) reads 1.0. Trained by full backpropagation through time with Adam, the same steps and seeds for both.
 
-Usage: pumped_carry_control.py CIRCLES DEPTH LENGTH STEPS [SEEDS]"""
+Usage: pumped_carry_control.py CIRCLES DEPTH LENGTH STEPS [SEEDS]
+       pumped_carry_control.py d3 CIRCLES_PUMPED CIRCLES_COMMUTING LENGTH TEST_LENGTH STEPS [SEEDS]
+  [Gemini 4 Neon, November 19, second letter] The d3 task: a word over the dihedral group of order six (R+ and R- the turns, S the
+  reflection, I the identity), read at every place as the running product (six classes). No commuting carry holds it (a finite subgroup
+  of the affine maps of the line is abelian); trained at LENGTH, read at LENGTH and at TEST_LENGTH."""
 import sys, math, numpy as np
 
 OPEN, CLOSE = (0, 1), (2, 3)    # ( [ ) ]
@@ -39,12 +43,25 @@ def batch(rng, b, n, depth):
         X[i, :len(x)] = x
     return X    # 4 is the end, read as a fifth symbol
 
+def d3_batch(rng, b, n):
+    X = rng.integers(0, 4, (b, n))            # 0 R+, 1 R-, 2 S, 3 I
+    Y = np.empty((b, n), int)
+    k = np.zeros(b, int); f = np.zeros(b, int)  # the running product r^k s^f
+    for t in range(n):
+        u = X[:, t]
+        # left-multiply by u: r r^k s^f = r^(k+1) s^f; s r^k s^f = r^(-k) s^(f+1)
+        k = np.where(u == 0, (k + 1) % 3, np.where(u == 1, (k + 2) % 3, np.where(u == 2, (-k) % 3, k)))
+        f = np.where(u == 2, 1 - f, f)
+        Y[:, t] = k + 3 * f
+    return X, Y
+
 class Model:
-    def __init__(self, rng, C, pumped):
-        self.C, self.pumped, A = C, pumped, 5
+    def __init__(self, rng, C, pumped, A=5, O=None):
+        self.C, self.pumped = C, pumped
+        self.O = O if O is not None else A
         s = 0.5
         self.p = {"a": rng.normal(0, s, (A, C)), "th": rng.uniform(-math.pi, math.pi, (A, C)), "v": rng.normal(0, s, (A, C, 2)),
-                  "W": rng.normal(0, 1 / math.sqrt(2 * C), (2 * C, A)), "c": np.zeros(A)}
+                  "W": rng.normal(0, 1 / math.sqrt(2 * C), (2 * C, self.O)), "c": np.zeros(self.O)}
         if pumped:
             self.p["b"] = rng.normal(0, s, (A, C)); self.p["ph"] = rng.uniform(-math.pi, math.pi, (A, C)); self.p["r"] = np.zeros((A, C))
         self.m = {k: np.zeros_like(v) for k, v in self.p.items()}; self.s2 = {k: np.zeros_like(v) for k, v in self.p.items()}; self.t = 0
@@ -76,7 +93,9 @@ class Model:
         z = Q.reshape(B, L, -1) @ self.p["W"] + self.p["c"]
         return z, Q, Ms
 
-    def loss_grad(self, X):
+    def loss_grad(self, X, Y=None):
+        if Y is not None:
+            return self.loss_grad_targets(X, Y)
         B, L = X.shape
         z, Q, Ms = self.forward(X[:, :-1])
         y = X[:, 1:]
@@ -99,7 +118,10 @@ class Model:
             dMt = np.einsum("bci,bcj->bcij", dq, qprev)    # dL/dM
             dM.append((t, dMt))
             dq = np.einsum("bcij,bci->bcj", Ms[t], dq)
-        # the matrices' parameters
+        self._matrix_grads(X, dM, g)
+        return loss, g
+
+    def _matrix_grads(self, X, dM, g):
         for t, dMt in dM:
             u = X[:, t]
             p = self.p
@@ -123,6 +145,27 @@ class Model:
                 np.add.at(g["a"], u, de[..., 0]); np.add.at(g["b"], u, de[..., 1]); np.add.at(g["r"], u, de[..., 2])
             else:
                 np.add.at(g["a"], u, dR * 0.98 * s_ * (1 - s_))
+
+    def loss_grad_targets(self, X, Y):
+        # every place read against its own target: the same backward, the whole word read and every place compared
+        B, L = X.shape
+        z, Q, Ms = self.forward(X)
+        z = z - z.max(-1, keepdims=True); pz = np.exp(z); pz /= pz.sum(-1, keepdims=True)
+        n = B * L
+        loss = -np.log(pz[np.arange(B)[:, None], np.arange(L)[None], Y] + 1e-12).sum() / n
+        dz = pz.copy(); dz[np.arange(B)[:, None], np.arange(L)[None], Y] -= 1; dz /= n
+        g = {k: np.zeros_like(v) for k, v in self.p.items()}
+        g["W"] = np.einsum("bti,bto->io", Q.reshape(B, L, -1), dz); g["c"] = dz.sum((0, 1))
+        dQ = (dz @ self.p["W"].T).reshape(B, L, self.C, 2)
+        dq = np.zeros((B, self.C, 2)); dM = []
+        for t in range(L - 1, -1, -1):
+            dq = dq + dQ[:, t]
+            u = X[:, t]
+            np.add.at(g["v"], u, dq)
+            qprev = Q[:, t - 1] if t > 0 else np.zeros((B, self.C, 2))
+            dM.append((t, np.einsum("bci,bcj->bcij", dq, qprev)))
+            dq = np.einsum("bcij,bci->bcj", Ms[t], dq)
+        self._matrix_grads(X, dM, g)
         return loss, g
 
     def step(self, g, lr=0.01):
@@ -151,7 +194,28 @@ def read(model, X):
     agree, depths = np.array(agree), np.array(depths)
     return agree, depths
 
+def d3_main():
+    cp, cc, n, n2, steps = (int(x) for x in sys.argv[2:7])
+    seeds = int(sys.argv[7]) if len(sys.argv) > 7 else 3
+    for pumped, C in ((False, cc), (False, cp), (True, cp)):
+        for seed in range(seeds):
+            rng = np.random.default_rng(seed)
+            model = Model(rng, C, pumped, A=4, O=6)
+            for it in range(steps):
+                X, Y = d3_batch(rng, 32, n)
+                loss, g = model.loss_grad(X, Y)
+                model.step(g)
+            acc = []
+            for L in (n, n2):
+                X, Y = d3_batch(np.random.default_rng(1000 + seed), 256, L)
+                z, _, _ = model.forward(X)
+                acc.append((z.argmax(-1) == Y).mean())
+            params = sum(v.size for v in model.p.values())
+            print(f"D3_CONTROL carry={'pumped' if pumped else 'commuting'} circles={C} params={params} seed={seed} length={n} steps={steps} train_loss={loss:.4f} acc_L{n}={acc[0]:.4f} acc_L{n2}={acc[1]:.4f}", flush=True)
+
 def main():
+    if sys.argv[1] == "d3":
+        return d3_main()
     C, depth, n, steps = int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]), int(sys.argv[4])
     seeds = int(sys.argv[5]) if len(sys.argv) > 5 else 2
     for pumped in (False, True):

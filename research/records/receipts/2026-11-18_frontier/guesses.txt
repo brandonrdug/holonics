@@ -664,3 +664,16 @@ pumped carry 0.011 under, missed (guessed 0.05 or more over). At depth 3 and len
 capacity (no rule fixed on it): depth 8, the commuting carry on 4 circles 0.969, 0.968, 0.954, the pumped on 2 circles 0.867, 0.883,
 0.889. By its rule the pumped carry is not built now: on this control, at the same parameters a symbol, the commuting carry holds
 bracket order as well or better.
+
+G-1119-7 (2026-11-19T22:14:38Z). The pumped carry behind the separator Gemini 4 Neon proposed (its second letter of November 19): a word over the dihedral
+group of order six (R+, R-, S, I), read at every place as the running product; `tools/pumped_carry_control.py d3` (its gradients on the
+task checked to 1.4e-6). Neon's critique of G-1119-6 stands: the commuting carry is affine, its commutator is not zero, decay alone holds
+depth-limited brackets, and G-1119-6 gave it twice the state and the readout. Here: commuting on 16 circles (Neon's control), commuting on
+2, pumped on 2, trained at length 16 for 3,000 steps, read at 16 and at 48, three seeds.
+  What is on record. Neon's run: commuting 16 circles 0.585 at 16 and 0.404 at 48, pumped 2 circles 1.000 and 1.000. No finite
+  non-abelian group embeds in the affine maps of the line (their finite subgroups are abelian), so a commuting carry cannot hold the
+  product exactly at any width.
+  The guess. Pumped on 2 circles 0.95 or more at length 48 on the mean of the seeds; commuting on 16 under 0.70 at 48; commuting on 2 under
+  0.55.
+  What it decides. Pumped 0.25 or more over commuting on 16 at length 48: the carry that turns and reflects is built on the engine and the
+  card as an arm beside the line (the separator says what a commuting carry cannot hold; the line's arm says whether text needs it).
