@@ -39,6 +39,12 @@ Dirichlet-to-Neumann map. This module supplies both joins.
    row (`reflection_row_is_schur`). Witness: the path `b₀ —1— i —2— b₁` eliminates to the series
    conductance `2/3` (`series_path_dtn`).
 
+[proved-derived; formal-checked, elsewhere] Staged elimination (the quotient formula), a tube's
+stations eliminated in any order and its edges in series (resistances add), the tower whose
+restrictions eliminate the top sites, Dirichlet's principle, Rayleigh's monotonicity and the neck
+block are `HolonicsResearch/Holon/DtNTubeTower` (`staged_elimination`, `path_eliminates_in_series`,
+`eliminationTower`, `dirichlet_principle`, `rayleigh_monotone`, `neck_rank`).
+
 [open] The join of `Λ_DN` to a `Region`'s dynamics (a time-extended interior with its own clock
 whose boundary receiver is `Λ_DN`), a continuum DtN operator, and a membrane of a general
 `HodgeReceiver.WeightedComplex` beyond grade 0/1.
