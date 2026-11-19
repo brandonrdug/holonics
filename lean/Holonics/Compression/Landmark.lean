@@ -26,8 +26,9 @@ RadixWindowReceiver}`, `Physics/CompositeMassEnergy`, `Aeon/Production/Zeta`).
 | `Landmark/Context` | the shift navigator's landmarks, the receiving tree: context-tree weighting over typed addresses, each pruned tree a candidate standing and the weight their mixture under the stop prior, each node's arrivals the epochs of its section and its register capped by a carry, stored where paths part, on declared carriers (its own table) |
 
 [open] Owed in #62: Gröbner completion and the face-kernel equality, Richardson undecidability,
-the necklace integrality and infinite Euler product of a general nonnegative integer return map,
 the first-arrival sieve tower as a general law, and the Lefschetz count of torus periodic points.
+The necklace integrality and Euler product of a general nonnegative integer return map are
+`HolonicsResearch/Compression/Landmark/NecklaceIntegrality` (the 0/1 case stands here).
 The identity-atlas search, navigator inference by loop closure and the landmark search's
 coverage check are the Rust consumers (`holonics::compression`).
 -/

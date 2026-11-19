@@ -37,5 +37,6 @@ contract, "Physical instances" (`thermal exchange/diffuse/entropy_production`). 
   rest.
 
 The retired `holonics-cuda` diffusion receipt: its energy balance is carried by
-`Thermal/Exchange.first_law` (two cells); many-cell diffusion is owed (#62).
+`Thermal/Exchange.first_law` (two cells); many-cell diffusion, with a chain's rates read as heat, is
+`HolonicsResearch/Physics/Thermal/ManyCell`.
 -/
