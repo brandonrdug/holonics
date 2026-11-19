@@ -575,3 +575,10 @@ E22) from arm D20's end with the circles grown, beside the line's own L21 and L2
   stands within 2 points of L22's.
   The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
   by 0.003 or more, two more laps; otherwise the line continues from L22 with 256.
+
+G-1119-2 scored (2026-11-19T05:46:56Z). Rows S at the lap means (sections 2,001 to 3,000): E21 1.5621 against L21's 1.5668, 0.0047 under (±0.0003):
+(a) held; E22 1.5346 against L22's 1.5494, 0.0148 under (±0.0006): (a) held. (b) At the settled places E22 gives the arriving symbol
+0.766 of its mass and L22 0.758, 0.008 more: held; sure there (under 0.1 nats) at 0.579 of them against L22's 0.565. (c) One place
+open: E22 0.0135 under L22: held. (d) 454 and 409 ms a section on the mean: held. (e) The wide panel: E22 1,425 of 2,186 words in the
+lexicon (65%) against L22's 1,278 of 2,091 (61%): missed, 4 points more than its control where within 2 were guessed (E21 63% against
+L21's 62%). The rule: 0.010 or more under at the second lap, so the line takes the 512 circles and continues from arm E22's end.

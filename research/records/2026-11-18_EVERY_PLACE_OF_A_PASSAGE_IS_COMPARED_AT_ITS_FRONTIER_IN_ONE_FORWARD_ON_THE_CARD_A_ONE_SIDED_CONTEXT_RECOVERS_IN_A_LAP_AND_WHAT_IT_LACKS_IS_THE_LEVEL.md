@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 and §21 on November 19, to 03:15 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §22 on November 19, to 05:55 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -746,3 +746,23 @@ language is learning, mimicry develops, and this is babbling. On the objects (`a
 what holds at its section, first the register (the prompt's word shapes, spacing and marks, which her writes keep), then words
 held whole (which the sure share at the settled places governs, above), then their composition; so her writes are read stage by stage
 by what holds in them, and the stage she is in is the one between the first and the second.
+
+## 22. The line takes 512 circles, and her words move with them
+
+*Written at 05:55 UTC, November 19.* G-1119-2's two laps beside the line's own from arm D20's end (receipts `reads.txt`, 05:50 UTC).
+
+**What she wrote.** On the wide panel arm E22 wrote 1,425 of 2,186 words in the lexicon (65%) where its control L22 wrote 1,278 of
+2,091 (61%), the first difference between an arm and its control that stands over the panel's scatter (E21 63% against L21's 62%).
+Over the line the panel reads 55% (L17), 57% (C18), 59% (D20), 62% (L21) and 61% (L22); with E22's 65% her words have gained ten
+points since last night, most in the registers that repeat (code 77%, books 76%, web 74%) and least in wikidata (43%). No sentence
+holds; the register and word shapes of each prompt hold, and more of the words.
+
+**The code.** Rows S: E21 0.0047 under L21 (±0.0003) and E22 0.0148 under L22 (1.5346 against 1.5494, ±0.0006), under it in every
+slice and at every count of places known past two (0.011 to 0.024). The second lap's gain a doubling: 0.020, 0.020, 0.015; a section
+costs 409 to 454 ms against the line's 372. At the settled places her code is now under the count of five's (0.579 against 0.627), she
+is sure at 0.579 of them (the count at 0.921), and a draw writes the settled symbol 0.766 of the time.
+
+**The guess and the rule** (G-1119-2). (a) to (d) held; (e) missed, her words moved four points where within two were guessed. By
+its rule the line takes the 512 circles and continues from E22's end. The line's laps L23 to L26 run with no arm beside them, each
+read whole (held read, both panels, loudness, wide panel), while the next part is designed: one judged by the sure share at the
+settled places (§21), since a fourth doubling at its taper (about 0.010 at the second lap) costs about 80 ms more a section.
