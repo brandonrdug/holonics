@@ -46,9 +46,10 @@ This module joins them; it founds no second energy, mode or clock.
 [open] The pump's locking is the pumped ring's Floquet growth (`HNN/Floquet`: past the bifurcation
 the two sheets are the rays of the growing Floquet mode, chosen by the seed's growing coordinate);
 this module takes its locked sheets as given, and `Objects/ParametronLock` reads the lock as an
-Ising site. The linear law holds no saturated amplitude (#62). The oscillator here is the exact
-ring micro-step; the continuous section crossing of `A cos(ωt + φ)` is not identified with it by
-a theorem. No damping or hardware law is asserted.
+Ising site. The linear law holds no saturated amplitude (#62). The oscillator here is the ring
+micro-step; that the upward zeros of `A cos(ωt + φ)`, sampled `d` times a period, are its
+crossings (the owner's `Crossing` records for `d ≥ 2`) stands in
+`HolonicsResearch/Objects/ContinuousCrossing`. No damping or hardware law is asserted.
 
 No `sorry`, no `axiom`, no `native_decide`; the audit block at the end prints the axioms.
 -/
@@ -322,7 +323,7 @@ open Holonics.Geometry.HolonicClockedPantographicSwing
 
 variable {ClockAddress : Type*}
 
-/-- [definition] The ring of a rational clock passage `n/d`: its micro-state is the exact integer
+/-- [definition] The ring of a rational clock passage `n/d`: its micro-state is the integer
 potential `a` (phase `a/d` of a turn), each micro-step advances `1/d` of a turn, the cycle count
 is the completed turns `a / d`, the phase face is the carrier `e^{2πi a/d}`, and the section is
 phase `0`. One source tick is `n` micro-steps. -/

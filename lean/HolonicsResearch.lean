@@ -1446,3 +1446,6 @@ import HolonicsResearch.Mathematics.CertifiedCapture
 import HolonicsResearch.Geometry.HypergeometricMonodromy
 import HolonicsResearch.Objects.RetentionSeries
 import HolonicsResearch.Physics.HarperChain
+import HolonicsResearch.Objects.ContinuousCrossing
+import HolonicsResearch.Physics.Spacetime.FriedmannFluid
+import HolonicsResearch.Foundation.CantorStringSpectrum
