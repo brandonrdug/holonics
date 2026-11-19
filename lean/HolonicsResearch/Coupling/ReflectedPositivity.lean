@@ -241,8 +241,8 @@ theorem theCrossPairingIsItsOwnNegative {a b : V} (ha : a ∈ R.fixedFace)
 Two is invertible in the *values* even though it is not invertible in the carrier, which is why
 this is available here while the halved eigenprojectors are not.
 
-An exact numerical check of this statement already runs in the Rust body — the θ-isometric metric
-pairing there returns the cross term as exactly zero.  This is that check as a theorem. -/
+A numerical check of this statement ran in the Rust body of its day, whose θ-isometric metric
+pairing returned a zero cross term on its instances.  This is that check as a theorem. -/
 theorem theCrossPairingVanishes {a b : V} (ha : a ∈ R.fixedFace)
     (hb : b ∈ R.antiFixedFace) : R.form a b = 0 := by
   have h := R.theCrossPairingIsItsOwnNegative ha hb

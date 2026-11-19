@@ -46,10 +46,13 @@ Friedmann–Lemaître–Robertson–Walker metric with a perfect fluid and its S
 whose `einsteinResidual` vanishes. The curvature of a metric's connection at a point, from its
 2-jet, and the weak-field limit `R₀₀ = ∇²Φ` stand in
 `HolonicsResearch/Physics/Spacetime/CurvatureJets`; the flat vacuum of
-`Geometry/HolonicCurvedArcEinstein` and the discrete field here supply neither. [open] The Regge
-construction of the discrete Einstein side, that `G` is the boundary of the moment of rotation
-`F` of a simplicial metric's deficit angles (Misner–Thorne–Wheeler §15.4), is owed (#410): here
-the field `F` is supplied, not built from a metric.
+`Geometry/HolonicCurvedArcEinstein` and the discrete field here supply neither. A simplicial
+metric's deficit angles built from its edge lengths, two-dimensional Gauss–Bonnet for every length
+assignment and the three-dimensional hinge deficit stand in
+`HolonicsResearch/Physics/Spacetime/ReggeDeficit`. [open] The Regge construction of the discrete
+Einstein side, that `G` is the boundary of the moment of rotation `F` of a simplicial metric's
+deficit angles (Misner–Thorne–Wheeler §15.4), is owed (#410): here the field `F` is supplied, not
+built from a metric.
 -/
 
 noncomputable section

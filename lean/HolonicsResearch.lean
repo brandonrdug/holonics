@@ -1464,3 +1464,12 @@ import HolonicsResearch.Mathematics.ZetaJets
 import HolonicsResearch.Physics.Spacetime.TidalScreen
 import HolonicsResearch.Objects.RetentionCycles
 import HolonicsResearch.Physics.Spacetime.CurvedFriedmann
+import HolonicsResearch.Physics.Fluid.HillVortex
+import HolonicsResearch.Physics.Spacetime.ReggeDeficit
+import HolonicsResearch.Aeon.Production.InducedWords
+import HolonicsResearch.Geometry.CellPassBand
+import HolonicsResearch.HNN.PumpedCarry
+import HolonicsResearch.Landmarks.HasseBand
+import HolonicsResearch.Coupling.HeatArrow
+import HolonicsResearch.Zeta.PaletteReflection
+import HolonicsResearch.Zeta.CayleyEar
