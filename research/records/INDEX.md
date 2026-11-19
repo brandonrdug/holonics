@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,695 records from July 2026 to November 2026. 381 receipts directories: 222 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,696 records from July 2026 to November 2026. 381 receipts directories: 222 beside the records and 159 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 94 | 97 |
+| [November 2026](#november-2026) | 95 | 97 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-19 [A load moves a line by its weight on the mode the magnitude cannot see the basins it reflects the stable core is the first round and a lossless period reads hills kinds by its trace in Lean](2026-11-19_A_LOAD_MOVES_A_LINE_BY_ITS_WEIGHT_ON_THE_MODE_THE_MAGNITUDE_CANNOT_SEE_THE_BASINS_IT_REFLECTS_THE_STABLE_CORE_IS_THE_FIRST_ROUND_AND_A_LOSSLESS_PERIOD_READS_HILLS_KINDS_BY_ITS_TRACE_IN_LEAN.md)
 - 2026-11-18 [An abelian cover factors through its characters a tempered complex mixes at its half the fluids triads do no work so every truncation flows for all time and hard lefschetz is a positive commutator](2026-11-18_AN_ABELIAN_COVER_FACTORS_THROUGH_ITS_CHARACTERS_A_TEMPERED_COMPLEX_MIXES_AT_ITS_HALF_THE_FLUIDS_TRIADS_DO_NO_WORK_SO_EVERY_TRUNCATION_FLOWS_FOR_ALL_TIME_AND_HARD_LEFSCHETZ_IS_A_POSITIVE_COMMUTATOR.md)
 - 2026-11-18 [A cooler deposit stops the states walk and leaves the level and the writes where they were and the level is worth a sixth of a nat where the writes are](2026-11-18_A_COOLER_DEPOSIT_STOPS_THE_STATES_WALK_AND_LEAVES_THE_LEVEL_AND_THE_WRITES_WHERE_THEY_WERE_AND_THE_LEVEL_IS_WORTH_A_SIXTH_OF_A_NAT_WHERE_THE_WRITES_ARE.md)
 - 2026-11-18 [A number is the homology of its places a law of composition is its characters a symbols word obeys kraft and a return maps necklaces are counted in Lean](2026-11-18_A_NUMBER_IS_THE_HOMOLOGY_OF_ITS_PLACES_A_LAW_OF_COMPOSITION_IS_ITS_CHARACTERS_A_SYMBOLS_WORD_OBEYS_KRAFT_AND_A_RETURN_MAPS_NECKLACES_ARE_COUNTED_IN_LEAN.md)
