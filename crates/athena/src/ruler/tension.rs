@@ -684,11 +684,16 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// each open place's read after tick `K` (little-endian, `D` words a place, in the lines' order); `OUT/gates_K.i64` each known site's
 /// gate on every carry circle at tick `K` (`2C` words a place, real parts then imaginary, on `2^(−30)`;
 /// [`holonics_engine::field::Constitution::strand_gates`]); `OUT/dims.tsv` names `D`, the ticks and the carry circles. On the host's
-/// threads; the state is read, never written. The directory is private: its rows are the passage's places.
+/// threads; the state is read, never written. The directory is private: its rows are the passage's places. [the lead, November 19, the
+/// frontier record §23] With the word `carries` (after `past` where both are given) it writes, in place of the gates and the open places'
+/// reads (at 512 circles they are 4 KB a place a tick), `OUT/carries.i32`: each known site's carried product before it at the last tick
+/// on every sixteenth circle (`k = 0, 16, 32, …`), real parts then imaginary, on `2^(−16)`
+/// ([`holonics_engine::field::Constitution::strand_carries`]), and `dims.tsv` names the circles written.
 pub fn read_strand_states(args: &[String]) -> Result<()> {
-    let past = args.len() == 13 && args[12] == "past";
-    if args.len() != 12 && !past {
-        return Err("read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past]".into());
+    let words: Vec<&str> = args.iter().skip(12).map(String::as_str).collect();
+    let (past, carries) = (words.contains(&"past"), words.contains(&"carries"));
+    if args.len() < 12 || words.len() != usize::from(past) + usize::from(carries) || (past && carries && words != ["past", "carries"]) {
+        return Err("read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past] [carries]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-strand-states")?;
@@ -717,6 +722,30 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
         rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
     }
     let field = &learner.field;
+    if carries {
+        let circles = field.declaration.carry;
+        let every: Vec<usize> = (0..circles).step_by(16).collect();
+        let products: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| field.strand_carries(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        std::fs::create_dir_all(out)?;
+        let mut lines = String::new();
+        let mut bytes: Vec<u8> = Vec::new();
+        for (r, ((group, classes), q)) in rows.iter().zip(&products).enumerate() {
+            for (t, class) in classes.iter().enumerate() {
+                lines.push_str(&format!("{r}\t{group}\t{t}\t{class}\n"));
+                for part in 0..2 {
+                    for &k in &every {
+                        let v = i32::try_from(q[t * 2 * circles + part * circles + k]).map_err(|_| "a carried product past 32 bits")?;
+                        bytes.extend(v.to_le_bytes());
+                    }
+                }
+            }
+        }
+        write_new(&out.join("rows.tsv"), lines.as_bytes())?;
+        write_new(&out.join("carries.i32"), &bytes)?;
+        write_new(&out.join("dims.tsv"), format!("circles\t{circles}\nwritten\t{}\nevery\t16\n", every.len()).as_bytes())?;
+        println!("STRAND_CARRIES rows={} places={} circles_written={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), every.len(), started.elapsed().as_millis());
+        return Ok(());
+    }
     let reads: Vec<(Vec<i32>, Vec<Vec<i32>>)> = rows.par_iter().map(|(_, classes)| field.strand_reads(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
     let gates: Vec<Vec<Vec<i64>>> = rows.par_iter().map(|(_, classes)| field.strand_gates(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
     std::fs::create_dir_all(out)?;

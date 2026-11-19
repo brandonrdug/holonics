@@ -70,8 +70,9 @@ no farther place in.
   the frontier without one; its arm beside the line is G-1118-16.
 
 **What is owed, in order.** A part judged by the sure share at the settled places (§21), which is what her words follow, as an
-arm beside the line: its form is §23, rows at the residue the 512 circles compose (the composite's remainder of §13 at a located
-address). The circles' extent is spent (§24). The Codex
+arm beside the line. Its first form (§23, rows at the residue the 512 circles compose) failed its premise read (§25: the circles'
+phase locates nothing); the next address to read is the frontier's own read, set against her face at the place. The circles' extent
+is spent (§24). The Codex
 thread's section-choice test on the host (G-1118-18). The composite's rows
 at located addresses (§13) as an arm. A writer that keeps the known stream's states.
 
