@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §27 on November 19, to 19:26 UTC. Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 to §28 on November 19, to 22:13 UTC. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -879,3 +879,20 @@ sections of the present build, then of a limb realization), and the limb realiza
 **The ceiling.** Brandon allows the board 14.5 GB (19:24 UTC). Raising `BOARD_CEILING` from 12 GiB lets a section's batches be cut
 larger; a batch is a schedule, so the build enters the line by reproducing its sections bit for bit before any lap runs on it, and is
 timed against the present build inside one balanced hold of the card.
+
+## 28. A lap's work is a flock, not a chain
+
+*Written at 22:13 UTC, November 19.* The same 150 sections ran 1.54 times slower on a Colab A100 than on the PC's card (receipts
+22:05 UTC), and I read that as "the PC's card is the fastest device we have", as if a lap could only be timed as one card running one
+schedule. Brandon (22:11 UTC) named the failure: the operations inside a lap commute, associate and distribute, so a second device is
+not a rival to the first but another member of the flock, the way a pack triangulates on its target and a body's cells divide its
+work. On the objects (`agent-inferred`): within a section each region's forward and return stands apart from every other region's
+until their covectors meet in one sum, and that sum is schedule-free by the precision law (terms at one grain, released once), so a
+section's regions may be split across devices and joined to the same bits; across the work, an arm is independent of the line, so a
+second device that runs the arms while the card runs the line cuts the hours the line spent waiting for them by about half whatever its
+own rate; and across time, a member may compute against a state a few sections old and join at a declared crossing, which is a law with
+its delay carried in the state, entered by an arm. The exact join's price is the summed covector (about 15 MB a section) and the deposit
+carried back; over the link from the PC to Colab (about 3 MB/s measured on the uploads) it stands at seconds a section, so the exact
+join pays between devices on one machine or one fast network, and the delayed join is the form for the PC and a rented card together.
+The next arm runs on the A100 beside the line, and its first receipt is the A100's own bits against the line's lap: the same sections
+from the same state, line for line.
