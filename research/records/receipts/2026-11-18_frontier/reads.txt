@@ -1064,3 +1064,14 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   C18   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.8707  spearman loud~color=+0.267  color~code=-0.143  by surprise fifth: q1=0.8956 q2=0.8769 q3=0.8685 q4=0.8627 q5=0.8499
   C18   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1873 against 2240.5 for an order that carries nothing (ratio 0.836); at them nats=5.123 loud=20.091 color=0.8505 rank-1 share=0.05
   C18   by lane (octaves): lane0=21.165  lane1=19.519  lane2=19.615  lane3=19.760
+
+# 00:45 UTC November 19. Gates 1 and 3 on the branch's build at 7a280248f (.local/run/gatecarry/gatecarry.sh):
+  GATECARRY head 7a280248f 0 changed files
+  GATECARRY gate1 exit=0 00:18:52 26 gates ok; test result: ok. 143 passed; 0 failed; 1 ignored; 0 measured; 5 filtered out; finished in  
+  GATECARRY build athena=0 card_tests=0 00:19:36 warnings=0 
+  GATECARRY suite 00:26:28 test result: ok. 26 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 365.84s 
+  GATECARRY gate_engine 00:35:03 STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL GATE_READ cavity.tsv EQUAL GATE_ENGINE EQUAL 
+  GATECARRY todays_line C18 00:38:28 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+  GATECARRY todays_line L18 00:38:36 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+  GATECARRY read_C18 00:44:55 EQUAL
+  GATECARRY_ALL_DONE 00:44:55
