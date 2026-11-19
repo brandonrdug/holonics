@@ -71,16 +71,18 @@ What is proved.
    `0 − 0 = 0`.
 
 What is not claimed.
-- The Smith-invariant form of item 2: that the product of a Smith form's nonzero invariants is the gcd of the
-  maximal minors, so that `p` drops the rank iff it divides that product. Mathlib's `Basis.SmithNormalForm` carries
-  no determinantal divisors (the scope of `Landmarks/SmithCokernel`).
+- The Smith-invariant form of item 2 is `Landmarks/SmithMinors`: through Cauchy–Binet the gcd of the maximal minors
+  is the product of a Smith form's nonzero invariants up to sign, and `p` drops the rank iff it divides that product
+  (`SmithMinors.gcd_maxMinors_smith_eq`, `SmithMinors.modRank_lt_ratRank_iff_smith`).
 - The reduction of the rational kernel as a subspace (the integral saturation of `ker_ℚ`, which reduces to a subspace
   of width `dim ker_ℚ`): item 2 compares the two kernels' widths.
 - The torsion of a general pair key, every pair its own move: the record's minors' gcds `b(b + 1)`, `2b` and
   `b(b − 1)` and its rank falls are computations over the finite line sets (bases 3 to 10 and 12). Items 5 to 7 are
   for keys linear in the digit values, which is how the record derives them.
-- Operands below `b³` (§6: the torsion primes those of `2b`), and the rest of §11: differences with `−` reflecting
-  (no torsion), and sums and differences in one menu with `−` reflecting and `=` restarting (`q ∣ b(b + 1)`).
+- Operands below `b³` (§6), and the rest of §11: differences with `−` reflecting and the mixed menus. These are
+  `Landmarks/ClosureKeyMenus` (operands below `b³` admit a key modulo `q` iff `q ∣ b·gcd(2, b + 1)`, which for a
+  prime is `p ∣ 2b`; differences with `−` reflecting have no torsion; one menu with `−` reflecting and `=`
+  restarting has `q ∣ b(b + 1)`).
 - That a closure is read from a line's bytes: `closure` is the pair sum read by the line's shape, as §5 reads it, and
   a reader checks it against the loop's pairs.
 

@@ -34,14 +34,17 @@ columns `(t, x, y)`), the boost of Doppler ratio `k` along `x` is `boostX k` and
   `S² cos θ = S² sin(α + β)` and `S² sin θ = −σ S² cos(α + β)` (`wigner_angle_is_defect`):
   `θ = −σ(π − (π/2 + α + β))`, the rotation by the angle defect of the triangle, opposite to the
   loop's orientation (Thomas precession is retrograde).
-* **A finite exact instance.** At `k₁ = 2`, `k₂ = 3` the rotation is `(cos θ, sin θ) =
+* **A finite instance.** At `k₁ = 2`, `k₂ = 3` the rotation is `(cos θ, sin θ) =
   (35/37, −12/37)` (`wigner_two_three`), nontrivial.
 
-[proved-standard] The defect of a hyperbolic triangle of curvature `−1` is its area
-(Gauss–Bonnet); `[open]` its formal statement over the velocity hyperboloid, and the general
-non-perpendicular composition, are owed (#62). `[open]` The gyration reading of the same return
-(`Geometry/HolonicCurvedArcEinstein.gyrationCurvatureReturn`) is not joined to this module; the
-join is owed (#62).
+[proved-standard; formal-checked, elsewhere] The defect of a hyperbolic triangle of curvature `−1`
+is its area (Gauss–Bonnet), the general non-perpendicular composition, and the gyration reading of
+the same return are `HolonicsResearch/Physics/Spacetime/WignerGeneral`: the right triangle's polar
+area `∫₀^α ∫₀^ρ(θ) sinh r dr dθ = π/2 − α − β` and the turn by that area (`gauss_bonnet`,
+`wigner_rotation_turns_by_area`), any two boosts composed in the disk chart (`disk_composition`,
+`general_decomposition`), and `Geometry/HolonicCurvedArcEinstein.gyrationCurvatureReturn` acting
+on the hyperboloid as the general turn through a Möbius gyrogroup on the velocity disk
+(`gyrationCurvatureReturn_is_wigner`).
 -/
 
 noncomputable section

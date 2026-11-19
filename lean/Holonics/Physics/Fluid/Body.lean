@@ -52,10 +52,14 @@ through the covering `exp` (`siteLift`, Mathlib `IsCoveringMap.liftPath` over
   divergence `2`, and that membrane bounds nothing (`tube_encloses_emission`, composing
   `tubeMembrane_escapes`).
 
-[open] **Sufficiency** (zero net strength gives a closed dividing streamline, the Rankine oval) is
-not formalized. The join to relative completeness is clause (3) only: a flux-only exterior receiver
-reads a closed body's monopole as zero, so clause (1) would need a receiver of its dipole moment
-(the doublet), and clause (2) an interior motion; neither is stated here (#62).
+[proved-standard; formal-checked, elsewhere] **Sufficiency for the Rankine oval**: a source and an
+equal sink on the stream's axis, the source upstream, have a closed dividing streamline through the
+two stagnation points, winding once about each site
+(`HolonicsResearch/Physics/Fluid/RankineOval.rankine_oval_closes`, `rankine_oval_net_zero`); a
+general arrangement of zero net strength is not stated. The join to relative completeness is
+clause (3) only: a flux-only exterior receiver reads a closed body's monopole as zero, so clause (1)
+would need a receiver of its dipole moment (the doublet), and clause (2) an interior motion; neither
+is stated here (#62).
 -/
 
 noncomputable section
