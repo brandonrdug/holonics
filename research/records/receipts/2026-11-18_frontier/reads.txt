@@ -1451,3 +1451,16 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   GATEPGAM todays_line L43 21:06:57 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
   GATEPGAM read_L43 21:21:45 EQUAL
   GATEPGAM_ALL_DONE 21:21:45
+
+# 21:24 UTC November 19. The maps' narrow sums on the int8 tensor cores (MAP_MMA; the attempt's diff kept beside these receipts as mma/map_tile_int8_limbs.patch, and withdrawn from the tree): each word cut into signed base-256 limbs as its chunk's largest magnitude needs (up to five), each limb pair by mma.sync m16n8k32 s8 with 32-bit sums, the pairs of one weight folded into 64 bits once a chunk, tiles past 2^59 to the wide form. Entered bit for bit (mma/mma.sh):
+  MMA_REPRO 20:53:50 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL FIELD_CARD_OPEN card=NVIDIA GeForce RTX 4080 SUPER free=15594094592 total=16769024000 batch_budget=13320585216
+  MMA_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+  MMA_TIME run=1 build=OLD sections=60 ms_mean=460.4 batches=180 peak_store=10661599424
+  MMA_TIME run=2 build=NEW sections=60 ms_mean=466.0 batches=180 peak_store=10633611584
+  MMA_TIME run=3 build=NEW sections=60 ms_mean=467.1 batches=180 peak_store=10661599424
+  MMA_TIME run=4 build=OLD sections=60 ms_mean=457.4 batches=180 peak_store=10655671432
+  MMA_TIME run=5 build=OLD sections=60 ms_mean=455.4 batches=180 peak_store=10619431832
+  MMA_TIME run=6 build=NEW sections=60 ms_mean=468.9 batches=180 peak_store=10674529744
+  MMA_TIME run=7 build=NEW sections=60 ms_mean=466.1 batches=180 peak_store=10661599424
+  MMA_TIME run=8 build=OLD sections=60 ms_mean=454.8 batches=180 peak_store=10674529744
+  read: 467.0 ms a section on the mean of the tensor build's four runs against the control's 457.0 (spread 454.8 to 460.4): slower by 2%. Kernel by kernel (mma/prof.sh, FIELD_PROFILE, 60 sections each): field_transposed 187 → 226 µs a launch, field_affine_tiled_x32 202 → 216, field_affine_tiled_x64 231 → 263; every other kernel the same. At the line's word widths a word takes four or five limbs, so a product takes 16 to 25 limb-pair products and the planes' conversion through shared memory, where the scalar form takes one 32-by-32 multiply into 64 bits; the maps stand at half the card's compute and a third of its occupancy (ncu), so the tensor units' rate is not what holds them.
