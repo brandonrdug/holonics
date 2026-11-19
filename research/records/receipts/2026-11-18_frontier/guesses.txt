@@ -553,3 +553,25 @@ reproduction of lap C18.
   lap's mean stays within 9 points of the control's.
   The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
   by 0.003 or more, two more laps; otherwise the line continues from L20 and the circles stay at 128.
+
+G-1119-1 scored (2026-11-19T02:53:41Z). Rows S at the lap means (sections 2,001 to 3,000): D19 1.6151 against L19's 1.6219, 0.0068 under (±0.0004):
+(a) held; D20 1.5901 against L20's 1.6098, 0.0196 under (±0.0006): (a) held. (b) At the places a count of five settles D20 gives the
+arriving symbol 0.737 of its mass and L20 0.725, 0.012 more: held; its code there 0.644 against L20's 0.671 and the count's 0.627.
+(c) One place open under the law: D20 0.9324 against L20's 0.9481, 0.0157 under: missed by a little (guessed within 0.015). (d) 372 and
+367 ms a section on the mean (the line's 331): held. (e) Long panels: D19 175 of 296 (59%) against L19's 142 of 263 (53%); D20 153 of
+273 (56%) against L20's 161 of 276 (58%): held. The rule: 0.010 or more under at the second lap, so the line takes the 256 circles
+and continues from arm D20's end.
+
+G-1119-2 (2026-11-19T02:53:41Z). The carry circles from 256 to 512 (grow-carry 256 by their own founding law, every face kept): two laps (arms E21,
+E22) from arm D20's end with the circles grown, beside the line's own L21 and L22 from the same state. One change. Binary as G-1119-1's.
+  What is on record. Two doublings (32 to 128) read 0.0148 and 0.0404 under their control over two laps; one doubling (128 to 256)
+  0.0068 and 0.0196, the gap widening at the second lap both times: about 0.020 a doubling at the second lap, with no sign yet of
+  less. At the settled places the mass on the arriving symbol rose 0.024 for two doublings and 0.012 for one; the code there now
+  stands 0.017 over the count of five's. A doubling costs about 40 ms a section (331 to 372 for 128 to 256). The wide panel (eight
+  draws a prompt) moved 1 point for two doublings (56% to 57%).
+  The guess. (a) Rows S at the mean of a lap's last 1,000 sections: E21 between 0.000 and 0.012 under L21's; E22 between 0.010 and
+  0.028 under L22's. (b) At the settled places E22 gives the arriving symbol 0.004 to 0.020 more of its mass than L22. (c) One place
+  open under the law: E22 between 0.005 and 0.025 under L22. (d) A section takes 400 to 480 ms. (e) The wide panel from E22's mean
+  stands within 2 points of L22's.
+  The rule. 0.010 nats or more under the control at the second lap and the line takes the circles; under that with the gap widening
+  by 0.003 or more, two more laps; otherwise the line continues from L22 with 256.
