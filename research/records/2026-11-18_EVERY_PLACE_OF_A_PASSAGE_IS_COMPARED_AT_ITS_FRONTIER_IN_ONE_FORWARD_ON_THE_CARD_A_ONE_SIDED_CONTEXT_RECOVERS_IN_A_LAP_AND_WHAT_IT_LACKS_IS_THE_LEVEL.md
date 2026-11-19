@@ -736,3 +736,13 @@ one to two a lap (0.473 at C18 to 0.507 at L20 over two laps), and her lost shar
 0.148). A count's surety at those places is an exact match of the five places before: the binding of the nearest places' identities
 that the circles grow (§17 to §20). So the circles are the right part for her words and too slow at this rate; the reading names
 what any part that is to move her words must move: the sure share at the settled places, not the code there.
+
+**Her writes are her own, and they babble** (03:25 and 04:12 UTC). Against their reference continuations 3% of her written bytes lie in
+runs of eight or more the reference holds, she shares 1.5 bytes with it on average before she parts from it, and her longest shared
+run is 5 bytes at the median (27 at most); against the 8 GB of training documents 10% of her bytes lie in 16-byte windows met
+somewhere in them, about half of that one run of spaces in a comment box (`tools/write_recall_ruler.py`; receipts 03:25 UTC). Three
+of the twenty held passages also stand in the training documents and she does not recite them. Brandon's lens of 04:12 UTC: feigning
+language is learning, mimicry develops, and this is babbling. On the objects (`agent-inferred`): a receiver's stages are named by
+what holds at its section, first the register (the prompt's word shapes, spacing and marks, which her writes keep), then words
+held whole (which the sure share at the settled places governs, above), then their composition; so her writes are read stage by stage
+by what holds in them, and the stage she is in is the one between the first and the second.
