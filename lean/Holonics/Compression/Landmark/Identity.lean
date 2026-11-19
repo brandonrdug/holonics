@@ -50,21 +50,28 @@ Likewise a polynomial in one variable certified on the natural numbers vanishes 
 (`polynomial_density_suffices`). For polynomial receivers a Zariski-dense chart suffices, which is
 the identity atlas's coverage/density certificate (I1).
 
-[open] Owed in #62, not proved here.
-- **Gröbner completion and the kernel equality.** Buchberger's algorithm halts on a supplied finite
-  presentation (Dickson's lemma) and certifies a Gröbner basis *of the ideal supplied*; an
-  all-degree claim additionally owes `J = ker(face)` (elimination with saturation, or a certified
-  Hilbert bound). Neither Buchberger's termination nor that equality is formalized.
+[proved-standard; formal-checked, elsewhere] `HolonicsResearch/Compression/Landmark/ChartDensity`
+holds three of the identity atlas's standard steps. **The chart's density:** over an infinite field
+an infinite subset of the zeros of an irreducible `f` in two variables has identity ideal `(f)`
+(`identityIdeal_eq_span_of_infinite`), so a nonconstant rational chart landing in the curve
+certifies exactly its identities (`rationalChart_certifies`; the circle's chart,
+`circleChart_image_ideal`). **The dimension certificate:** a nonzero generator in every single
+coordinate certifies a finite set of points, not one point (`finite_iff_coordinate_certificates`).
+**Buchberger's halting:** by Dickson's lemma only finitely many new leading monomials arrive
+(`dickson`, `buchberger_halts`, `monomial_chain_stabilizes`).
+
+[open] Owed in #410, not proved here.
+- **Buchberger's criterion and the kernel equality.** Buchberger's algorithm certifies a Gröbner
+  basis *of the ideal supplied*; an all-degree claim additionally owes `J = ker(face)`
+  (elimination with saturation, or a certified Hilbert bound). Neither the S-polynomial criterion
+  nor that equality is formalized.
 - **Richardson undecidability.** Identity of general expressions in `exp`, `sin`, `|·|`, `π` is
   undecidable; the holonomic (D-finite) class is where equality is certified by an annihilator
-  and initial data. The retired Rust consumer (`holonics::compression::landmark::identity`, at commit `2d34b819`) searched
-  polynomial identities on one-parameter rational charts only; a holonomic search is owed in #62
-  with this item.
-- **The chart's density and the dimension certificate.** The retired Rust consumer covered a declared
-  irreducible curve by one nonconstant chart landing in it (an infinite subset of an irreducible
-  curve is Zariski dense in it) and certified each component's declared dimension by a nonzero
-  generator in every single coordinate (a point) or every pair of coordinates (a curve). Both are
-  standard and neither is stated here.
+  and initial data. The retired Rust consumer (`holonics::compression::landmark::identity`, at
+  commit `2d34b819`) searched polynomial identities on one-parameter rational charts only; a
+  holonomic search is owed with this item.
+- **A curve's dimension certificate** by a nonzero generator in every pair of coordinates, and
+  density for curves in more variables or for reducible curves read component by component.
 
 No `axiom`, no `sorry`.
 -/

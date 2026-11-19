@@ -1,0 +1,8 @@
+Guesses of the sixth ruler, fixed in its source (the PREDICTIONS dict of sixth_ruler.py) before its
+first run; the first run started at 00:59:52 UTC and the passing run at 01:00:02 UTC on November 19, 2026
+(date -u). Between them only section B's tolerance changed, where a derivative vanishes (the record's section 5).
+Scored in the record's section 5.
+
+A. on n = 3..7 sites with random families of 4 to 10 interactions on sets of 1 to 4 sites and couplings J >= 0, corr(B) >= 0 for every set B, and corr(B) corr(C) <= Z corr2(B, C) for every pair (B, C) (all pairs for n <= 5, 400 random pairs above), each to 1e-12 relative; one negative coupling (two sites at J = -1, the planted instance) makes corr({0, 1}) negative
+B. the spin sum of a monomial equals prod_i (1 + (-1)^k_i) on 50 random exponent vectors; the derivative of <s^B> along J + t delta equals sum_a delta_a (corr2(B, A_a) Z - corr(B) corr(A_a)) / Z^2 against a central difference to 1e-6 relative
+C. along a segment 0 <= J <= J' sampled at 21 points, <s^B> never decreases for every B on 20 random ferromagnets; on the frustrated triangle J12 = J23 = -2 (the planted instance), raising J13 from 0 to 2 lowers <s1 s2>

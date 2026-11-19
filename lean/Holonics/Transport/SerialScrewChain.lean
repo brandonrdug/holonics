@@ -3,18 +3,26 @@ import Mathlib.LinearAlgebra.Matrix.Notation
 import Mathlib.Tactic
 
 /-!
-# Finite exact affine charts for an ordered screw chain
+# Finite rational affine charts for an ordered screw chain
 
 This owner formalizes the finite part of the serial campaign. An affine chart is a rational
 linear map followed by a rational translation; composition is ordered and acts on points. A
-finite Cayley z chart and a translation chart are supplied as exact matrices. The chain law is
+finite Cayley z chart and a translation chart are supplied as rational matrices. The chain law is
 the prefix/product law for these finite actions. No finite chart is silently identified with an
 exponential of an infinitesimal screw, and no Jacobian theorem is claimed without a supplied
 parameter differential.
 
-[established-bounded; formal-checked] Scope: exact rational affine algebra over `Fin 3`, ordered
-finite composition, and translation recharting. General proper-rotation cross-product covariance
-and continuous chain derivatives remain the concrete remainder for #62.
+[established-bounded; formal-checked] Scope: rational affine algebra over `Fin 3`, ordered finite
+composition, and translation recharting. General proper-rotation cross-product covariance and the
+axis are `Geometry/Motion` (`proper_mulVec_cross`, `proper_has_axis`).
+
+[proved-standard; formal-checked, elsewhere] The continuous chain derivative is
+`HolonicsResearch/Transport/SerialChainJacobian`: the Cayley rotation about any axis `u` is proper,
+composes by half-angle addition and moves at the angular rate `2/(1 + (u·u)t²)`, `C′ = ω[u]× C`
+(`cayleyRot_proper`, `cayleyRot_mul`, `hasDerivAt_cayleyRot`), the `z` chart here among them
+(`cayleyRot_z`); a chain's spatial column is `Ad` of its prefix applied to the joint's twist
+(`chain_spatial_column`, `cayley_chain_column`); and the prototype's loop of recharted twists is
+`zipWith rechart` over the prefixes (`rechart_compose`, `spatialColumns_eq_zipWith`).
 -/
 
 open scoped BigOperators Matrix
@@ -26,7 +34,7 @@ open Holonics.Geometry.ScrewGeometry
 
 abbrev Mat3 := Matrix (Fin 3) (Fin 3) ℚ
 
-/-- A finite exact affine action in the shared rational frame. -/
+/-- A finite affine action in the shared rational frame. -/
 structure AffineMap3 where
   linear : Mat3
   translation : Vec
@@ -104,7 +112,7 @@ theorem cayleyCos_sq_add_sin_sq (q : ℚ) :
   field_simp
   ring
 
-/-- An exact rational rotation about the shared z axis. -/
+/-- A rational rotation about the shared z axis. -/
 def cayleyZChart (q : ℚ) : AffineMap3 where
   linear := !![cayleyCos q, -cayleySin q, 0;
                cayleySin q, cayleyCos q, 0;
@@ -211,7 +219,7 @@ def serialPrefixes : AffineMap3 → List AffineMap3 → List AffineMap3
   | acc, [] => [acc]
   | acc, f :: fs => acc :: serialPrefixes (f.compose acc) fs
 
-/-- [proved-derived; formal-checked] One local-joint prefix step retains the exact affine product
+/-- [proved-derived; formal-checked] One local-joint prefix step retains the affine product
 and its action order. -/
 theorem serialPrefixes_succ (acc f : AffineMap3) (fs : List AffineMap3) :
     serialPrefixes acc (f :: fs) = acc :: serialPrefixes (f.compose acc) fs := rfl

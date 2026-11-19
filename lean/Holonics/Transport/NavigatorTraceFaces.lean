@@ -15,9 +15,19 @@ pair: trace `a` and determinant `q`, with `det(1 − T·M) = 1 − aT + qT²`. A
 independent sites is their block-diagonal material: its transfer determinant is the product of
 the site factors and its closed-word count is the sum of the site trace sequences.
 
-[established-bounded; formal-checked] Scope: matrices over a commutative ring and invertible
-carriers. Coupled sites, convergence of a product over infinitely many sites and any statement
-about where the zeros of such a product lie are outside this module. No `axiom`, no `sorry`.
+[established-bounded; formal-checked] Scope: matrices over a commutative ring, with unit carriers
+and unit material (`phaseTransport` lives in a group), and two-by-two sites for the machine.
+Coupled sites, convergence of a product over infinitely many sites and any statement about where
+the zeros of such a product lie are outside this module. No `axiom`, no `sorry`.
+
+[proved-standard; formal-checked, elsewhere] Material of any kind under a unit carrier, a carrier
+that is not invertible (`det(1 − T·AB) = det(1 − T·BA)` and the trace sequence from the first
+power), reset carriers with the counterexamples where the determinant and an intertwiner fail,
+Newton's identities on every coefficient domain with the condition under which the traces decide
+the characteristic polynomial, and block products for sites of any size are
+`HolonicsResearch/Transport/TraceFacesGeneral` (`carry_conserves_charpoly`,
+`transfer_determinant_mul_comm`, `singular_intertwiner_breaks_trace`, `newton_charpoly`,
+`charpoly_eq_of_trace_eq`, `zmod_charpolys_differ`, `transfer_determinant_blockDiagonal'`).
 -/
 
 open scoped BigOperators Matrix

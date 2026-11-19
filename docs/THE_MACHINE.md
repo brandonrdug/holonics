@@ -5,10 +5,12 @@ It states the object, the equations its implementation preserves, and their owne
 [model formula](HNN_FORMULA.md) gives the full law; [THE_REBUILD](plans/THE_REBUILD.md) orders the
 construction; [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) records the position; the
 [research routes](../research/records/README.md) recover the derivations. Existing code is what is
-in `crates/` and `lean/` today. The host `holonics::hnn` and resident `holonics-cuda::hnn` implement the
-field. The landmark tree and the population of families that reads it supply the measured
-compression; the loaded resonator (`hnn::ring`) connects the resonator's returned wave and adjoint to
-the field. [THE_REBUILD](plans/THE_REBUILD.md) orders the joins that remain, and
+in `crates/` and `lean/` today. The engine implements the field: `holonics_engine::field` on the host
+and `holonics_engine_cuda::hnn::field` on the card, with the store line's commands in `crates/athena`
+([THE_ENGINE](THE_ENGINE.md)). The landmark tree, the population of families that read it and the
+loaded resonator (`hnn::ring`) retired with the October library at
+[`d5ed4adc1`](https://github.com/brandonrdug/holonics/tree/d5ed4adc1/crates/holonics); their laws stand
+in the guides, Lean and the atlas. [THE_REBUILD](plans/THE_REBUILD.md) orders the joins that remain, and
 [CONSTRUCTION_STATE](../CONSTRUCTION_STATE.md) distinguishes measured results from them.
 
 ## The top: a Holarchy and its aeons

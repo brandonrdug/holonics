@@ -46,10 +46,13 @@ This file owns the exact counting and zeta laws of that object.
   `golden_transfer_determinant`). For a graph-directed navigator what is proved is an identity of
   formal power series: the transfer determinant times the graph-directed zeta series is a
   polynomial (`transferDet_mul_graphDirected_zeta`, from `Zeta.transferDet_mul_wordSeries` and the
-  resolvent identity `Zeta.adjugate_transfer`). [proved-standard, not proved here] Where the series
-  converges at `T = r^s` it is that polynomial over `det(1 − r^s·M)`, so the poles of its
-  continuation, the complex dimensions, lie among the zeros of the transfer determinant; the
-  analytic statement at `T = r^s` is owed in #62.
+  resolvent identity `Zeta.adjugate_transfer`). [proved-standard; formal-checked, elsewhere] On the
+  disc `‖r^s‖·C < 1`, `C` a bound on `M`'s row sums, the series converges to that polynomial over
+  `det(1 − r^s·M)`, the quotient is differentiable wherever the determinant is not zero, so the
+  complex dimensions lie among the zeros of the transfer determinant
+  (`HolonicsResearch/Zeta/GraphDirectedDimensions`: `graphDirectedZeta_eq_div`,
+  `scaleDet_eq_zero_of_not_differentiableAt`); a zero can cancel, and the series can converge at
+  one.
 * **The Cantor string.**  `Foundation/FractalPacking` supplies the holes: the sibling gap of each
   addressed cell (`cantorGap`), of length `3^(−(n+1))` at depth `n` (`cantor_gap_length`), `2^n` of
   them (`cantor_depth_gaps`, from `length_words`).  It is the self-similar string with ratios
@@ -488,10 +491,10 @@ series is a polynomial (formal power series).** In the scale chart `T = r^s` the
 `Σ_n (Σ_(i∈S) Σ_j Σ_w gap_j^s) Tⁿ` (the depth-`n` face is its `n`-th term,
 `graphDirected_depth_face`) times `det(1 − T·M)` is the polynomial `1_Sᵀ adj(1 − T·M) γ`,
 `γ_j = gap_j^s`, as formal power series in `T` (`Zeta.sum_returnWord`,
-`Zeta.transferDet_mul_wordSeries`). [proved-standard, not proved here] Where the series converges
-at `T = r^s` it is that polynomial over `det(1 − r^s·M)`, so the complex dimensions of the
-graph-directed lattice string, the poles of its continuation, lie among the zeros of the transfer
-determinant; the analytic statement at `T = r^s` is owed in #62. -/
+`Zeta.transferDet_mul_wordSeries`). On the disc `‖r^s‖·C < 1` the series is that polynomial over
+`det(1 − r^s·M)`, and the complex dimensions lie among the zeros of the transfer determinant
+(`HolonicsResearch/Zeta/GraphDirectedDimensions.graphDirectedZeta_eq_div`,
+`scaleDet_eq_zero_of_not_differentiableAt`). -/
 theorem transferDet_mul_graphDirected_zeta (M : Matrix σ σ ℕ) (S : Finset σ) (gap : σ → ℝ)
     (s : ℂ) :
     ((M.map (Nat.cast : ℕ → ℂ)).charpolyRev : PowerSeries ℂ) *

@@ -12,7 +12,7 @@ The explicit main part of the Gamma factor is
 `ℓ'(s) = 1/(2s) − 1/(2s²) − 1/(s − 1)²`.
 
 **Returned.** For `Re w ≥ 2` and `‖ζ‖ ≤ ‖w‖/8`:
-`g(w + ζ) = g(w) exp(ζ ℓ(w) + ζ² ℓ'(w)/2 + R)` with `‖R‖ ≤ 37 ‖ζ‖³/‖w‖²`, by two applications of the
+`g(w + ζ) = g(w) exp(ζ ℓ(w) + ζ² ℓ'(w)/2 + R)` with `‖R‖ ≤ 402 ‖ζ‖³/‖w‖²` (`g_expansion`), by two applications of the
 fundamental theorem along the segment (first for `g`, then for `ℓ`); with the vertical choice
 `ζ = iy` this is the expansion RT3 (iii) integrates against the Gaussian, and with a real `ζ` it is
 the horizontal ratio RT4 needs.

@@ -110,10 +110,15 @@ has refined to, and one entry's tails sum below half a unit since the locus's fo
 remainders' bits are bounded by the clock (`remainder_rat_bits_bounded`, `O(L + 2 log₂ m)`) and the
 lattice entries' by their magnitudes (`lattice_bits_bounded`).
 
-[open] Owed in #62 ("Step 4 (#73) owed"): the solved charts `H⁻¹` of the carried Grams, whose bits
-follow the Hadamard bound as the Grams fill in; the word-level certificate of the lattice rule,
-`Σ_ℓ K_ℓ 2^(−L_ℓ) < 1/(2L_R)`; the value-level kernel of a frozen aeon (a collapse below the loci,
-campaign 3's). The locus map named above is `HNN/LocusMap`; its own open items (the tick-indexed
+[proved-standard; formal-checked, elsewhere] The solved charts `H⁻¹` of the carried Grams have bits
+bounded by Hadamard's bound of the lattice Gram `N = 2^L H`, which grows with the self-pairings
+`N_kk` and with `n·L`; off-diagonal fill only lowers `det N` beneath it
+(`HolonicsResearch/HNN/SolvedChartBits.carried_lattice_solved_chart_bits`; `HNN/Normal` says more).
+
+[open] Owed in #410: the word-level certificate of the lattice rule, `Σ_ℓ K_ℓ 2^(−L_ℓ) < 1/(2L_R)`.
+The value-level kernel of a frozen aeon (a collapse below the loci) was campaign 3's reading of the
+October machine's contact loop (the exposures of October 2), not a Lean statement, and #410 holds
+no box for it. The locus map named above is `HNN/LocusMap`; its own open items (the tick-indexed
 family and the loci with no medium operand) are listed there.
 
 No `sorry`, no `axiom`, no `native_decide`.

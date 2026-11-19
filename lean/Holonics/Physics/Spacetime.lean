@@ -33,12 +33,18 @@ clocks. Rust owner `holonics::physics::spacetime`.
   owner's Hodge split (`Aeon/Production/HodgeTime`) on a cycle bounding a cell; the redshift as the
   owner's rate of two static clocks.
 
-[open] Owed in #62: a nontrivial continuum Einstein realization (Lorentzian metric, connection,
+[proved-standard; formal-checked, elsewhere] The hyperbolic Gauss–Bonnet identification of the
+Wigner defect with the velocity triangle's area (the right triangle's), the non-perpendicular
+composition and the join to the gyration reading
+`Geometry/HolonicCurvedArcEinstein.gyrationCurvatureReturn` are
+`HolonicsResearch/Physics/Spacetime/WignerGeneral` (`gauss_bonnet`, `general_decomposition`,
+`gyrationCurvatureReturn_is_wigner`; `Spacetime/Wigner` says which). A frame-dragging clock of a
+stationary spacetime, the loop reading of Einstein synchronization as the flux of `da` with its
+rotating and Lense–Thirring circles, is `HolonicsResearch/Physics/Spacetime/FrameDraggingClock`
+(`Spacetime/NonClosedClock` says which).
+
+[open] Owed in #410: a nontrivial continuum Einstein realization (Lorentzian metric, connection,
 curvature and a fluid-plus-thermal constitution); the weak static limit `R₀₀ = ∇²Φ`; the Regge
 construction of the discrete Einstein side (`G` the boundary of the moment of rotation of a
-simplicial metric); the hyperbolic Gauss–Bonnet identification of the Wigner defect with the
-velocity triangle's area, the non-perpendicular composition and the join to the gyration reading
-`Geometry/HolonicCurvedArcEinstein.gyrationCurvatureReturn`; a frame-dragging clock of a stationary
-spacetime (only Sagnac's first-order case is stated); the relativistic (finite-speed) heat law of
-the thermal port.
+simplicial metric); the relativistic (finite-speed) heat law of the thermal port.
 -/

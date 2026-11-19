@@ -335,7 +335,8 @@ theorem storage_rate_neg_of_active_slip (Omega M G : Matrix (Fin n) (Fin n) ℚ)
 definite or not. This is the algebraic half of the real-spectrum licence: it says `(G A, G)` is a
 pair of symmetric forms, and the spectral half — that such a pair with `G ≻ 0` is simultaneously
 diagonalizable by congruence, so `A = G⁻¹(G A)` has real spectrum — is `[proved-standard]`
-(Horn & Johnson, *Matrix Analysis*, 2nd ed., Theorem 4.5.15) and is cited, not lifted. -/
+(Horn & Johnson, *Matrix Analysis*, 2nd ed., Theorem 4.5.15), stated over ℂ in
+`HolonicsResearch/Coupling/MovingMetricSpectral` (`gSelfAdjoint_iff_real_chart`). -/
 theorem selfAdjoint_of_no_structure (M G : Matrix (Fin n) (Fin n) ℚ) (hG : Gᵀ = G) (hM : Mᵀ = M) :
     (portGenerator 0 M G)ᵀ * G = G * portGenerator 0 M G := by
   have adjoint : (portGenerator 0 M G)ᵀ = G * (-M) := by

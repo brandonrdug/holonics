@@ -24,7 +24,7 @@ and **storage plus outflow equals the source** cell by cell.
 * **Gauss on the cell** (grid metric, volume one): the transported normals close,
   `Σ_f ∂_f N_f = 0` (`closed_surface`), and their first moment is the identity,
   `Σ_f ∂_f N_f ⊗ x_f = 1` (`first_moment`).
-* **The face returns are exact for an affine field** `u(x) = u₀ + G x` read at face centroids:
+* **The face returns leave no remainder for an affine field** `u(x) = u₀ + G x` read at face centroids:
   the mass outflow is `ρ tr G` (`massOutflow_eq`), the momentum outflow is
   `ρ (G u_c + (tr G) u_c)`, i.e. `div(ρ u ⊗ u)` at the centre (`momentumOutflow_eq`), a uniform
   stress has no net traction (`tractionOutflow_eq_zero`), and the traction power is `σ : G`
@@ -39,7 +39,7 @@ and **storage plus outflow equals the source** cell by cell.
   splits into pressure work and dissipation, `σ : G = −p tr G + Φ` (`stress_power_split`), with
   `Φ = 2μ |Def u|² + λ (tr G)²` (`dissipation_eq`). Reversing the motion flips the pressure work
   and keeps `Φ` (`dissipation_even`, `stress_power_reversal`): `Φ` is the irreversible part, the
-  **viscous heat handed to the thermal instance** (`viscousHeat`, a signed exact quantity), and
+  **viscous heat handed to the thermal instance** (`viscousHeat`, a signed rational), and
   `Φ ≥ 0` when `μ ≥ 0` and `nλ + 2μ ≥ 0` (`dissipation_nonneg`). On a cell the heat port receives
   exactly the traction power less the pressure work (`cell_heat_port`).
 * **The coholon reading** (ELEMENTARY_OBJECTS, "The targets"): on a Holarchy cell complex the
@@ -53,7 +53,7 @@ and **storage plus outflow equals the source** cell by cell.
   circulation along a material loop in time), which is open. The Lamb term is the cross-current: the
   advection `G u` splits into the exact Bernoulli part `Gᵀu` and `(G − Gᵀ)u`
   (`advection_split`), which is `ω × u` in three dimensions (`lamb_eq_cross`) and does no work
-  (`lamb_no_work`); the Bernoulli part is the exact difference of kinetic energy
+  (`lamb_no_work`); the Bernoulli part is the difference of kinetic energy
   (`kinetic_difference`).
 
 [counterexample; formal-checked]
@@ -69,12 +69,17 @@ and **storage plus outflow equals the source** cell by cell.
 
 [open] The balances are read at one instant with uniform density and an affine velocity in the
 cell, and `Balances` relates a storage rate supplied by the caller: no storage rate `ρ̇V` is
-computed here independently of the outflow. Owed (#62): the exact time advance of the cell
-(storage `ρ̇V` and the kinetic-energy change from a tick of the momentum balance, so that the
-mechanical debit of the viscous heat is computed rather than supplied), the pressure solve
-(incompressibility `tr G = 0` enforced by a projection whose multiplier is `p`), Kelvin's
-conservation of circulation along a material loop, the discretization defect of a non-affine
-field, and a native source-conforming fluid solver. The continuum cell balance with its analytic
+computed here independently of the outflow. The time advance is
+`HolonicsResearch/Physics/Fluid/TimeAdvanceKelvin` ([proved-standard; formal-checked, elsewhere]):
+on a complex with metric `M ≻ 0` the pressure solve is the `M`-orthogonal projection onto the
+divergence-free velocities, its multiplier `p` solving `d₀ᵀ M d₀ p = d₀ᵀ M u` and unique up to
+`ker d₀`, keeping vorticity and every cycle's circulation (`exists_pressure`, `project_nearest`,
+`coholon_circulation_project`); a tick `P(u + Δt(f − D u))` changes the kinetic energy by the
+forcing work less the viscous debit `Δt⟨u, M D u⟩`, computed from the tick, less the projection's
+loss, plus the `Δt²` term (`tick_ledger`); and Kelvin's conservation of circulation along a material
+loop of a `C¹` Euler flow (`kelvin`). Owed (#410): advection in the tick (so a discrete material
+loop), variable density and its storage `ρ̇V`, the discretization defect of a non-affine field,
+and a native source-conforming fluid solver. The continuum cell balance with its analytic
 trace is `HolonicsResearch/Fluid/NavierStokesLambCurrentCell` (not imported: research closure).
 -/
 
@@ -228,7 +233,7 @@ theorem mulVec_unit_apply (G : Matrix (Fin n) (Fin n) ℚ) (i a : Fin n) :
   simp [unit, mulVec_single]
 
 /-- [proved-derived; formal-checked] **The mass outflow of an affine field is `ρ tr G`** on the
-unit cell: the face-centroid return is exact. -/
+unit cell: the face-centroid return leaves no remainder. -/
 theorem massOutflow_eq (ρ : ℚ) (u₀ : Point n) (G : Matrix (Fin n) (Fin n) ℚ) (v : Point n) :
     faceRead (massFlux ρ u₀ G) (faces (v, Finset.univ)) = ρ * trace G := by
   rw [faceRead_faces]
@@ -316,7 +321,7 @@ theorem outflow_join {M : Type*} [AddCommGroup M] [Module ℚ M] (φ : Cell n �
       faceRead φ (faces cube) + faceRead φ (faces (neighbour i)) := by
   rw [map_add, boundary_cell, boundary_cell, map_add]
 
-/-- [proved-derived; formal-checked] **The shared face's return cancels exactly**: two per-face
+/-- [proved-derived; formal-checked] **The shared face's return cancels**: two per-face
 returns that agree off the shared face give the same joined outflow, whatever each places on the
 shared face (`Cells.join_cancels`). -/
 theorem outflow_join_ignores_sharedFace {M : Type*} [AddCommGroup M] [Module ℚ M]
@@ -376,7 +381,7 @@ def stress (p μ lam : ℚ) (G : Matrix (Fin n) (Fin n) ℚ) : Matrix (Fin n) (F
 def dissipation (μ lam : ℚ) (G : Matrix (Fin n) (Fin n) ℚ) : ℚ := frob (viscousStress μ lam G) G
 
 /-- [definition] **The viscous heat handed to the thermal port** of a cell of volume `V`: the
-signed exact quantity `V Φ`. -/
+signed rational `V Φ`. -/
 def viscousHeat (μ lam V : ℚ) (G : Matrix (Fin n) (Fin n) ℚ) : ℚ := V * dissipation μ lam G
 
 theorem frob_one (G : Matrix (Fin n) (Fin n) ℚ) : frob 1 G = trace G := by
@@ -563,7 +568,7 @@ theorem lamb_eq_cross (G : Matrix (Fin 3) (Fin 3) ℚ) (u : Fin 3 → ℚ) :
   fin_cases a <;>
     simp [cross_apply, curl, mulVec, dotProduct, Fin.sum_univ_three] <;> ring
 
-/-- [proved-derived; formal-checked] **The Bernoulli part is the exact kinetic-energy difference**:
+/-- [proved-derived; formal-checked] **The Bernoulli part is the kinetic-energy difference**:
 for `u(x) = u₀ + G x`, `½|u(x+h)|² − ½|u(x)|² = (Gᵀ u(x))·h + ½|G h|²`. -/
 theorem kinetic_difference (u₀ : Point n) (G : Matrix (Fin n) (Fin n) ℚ) (x h : Point n) :
     (1 / 2 : ℚ) * (affine u₀ G (x + h) ⬝ᵥ affine u₀ G (x + h)) -

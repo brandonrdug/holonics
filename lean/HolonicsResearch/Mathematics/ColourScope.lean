@@ -38,7 +38,7 @@ cycles already held, and a coarser scope reads the same colour differently.
    kernel) reads `Tr_H(ζ_n) = ∑_(h ∈ H) ζ_n^h = 0`: right multiplication by `g` moves each `h` along
    its fibre inside `H`, and each fibre's `p` colours cancel. `scope_cube_root` is the case
    `n = 12`, `p = 2`, `m = 6`, `H = {1, 7}`. The converse, that a neutral reading forces such a
-   fibre, is checked for `n ≤ 200` and owed to #410 (p).
+   fibre, is `Mathematics/NeutralCriterion.scopeReading_eq_zero_iff` (through Gauss sums).
 
 Consumers: the atlas rows `colour.scope-reading` and `colour.neutral-fibre`.
 -/
@@ -262,7 +262,7 @@ theorem fibre_generator_mem_ker {n m : ℕ} (hmn : m ∣ n) {g : (ZMod n)ˣ}
 
 /-- [proved-standard; formal-checked] **A scope that holds the kernel of `(ℤ/n)ˣ → (ℤ/m)ˣ` reads
 neutral**, when `n = p·m` with `p` prime and `p ∣ m`. This is the `⇐` half of the neutral
-criterion; its converse is owed to #410 (p). -/
+criterion; its converse is `NeutralCriterion.scopeReading_eq_zero_iff`. -/
 theorem scopeReading_eq_zero_of_ker_le {n p m : ℕ} [NeZero n] (hp : p.Prime) (hn : n = p * m)
     (hpm : p ∣ m) {ζ : ℂ} (hζ : IsPrimitiveRoot ζ n) (H : Subgroup (ZMod n)ˣ)
     [DecidablePred (· ∈ H)] (hK : (ZMod.unitsMap (Dvd.intro_left p hn.symm)).ker ≤ H) :

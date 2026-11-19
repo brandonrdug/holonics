@@ -162,8 +162,11 @@ statement (`½` is `⅟2`, so characteristic two is excluded by hypothesis, neve
 
 [interpretation] The words grip, push, free fall and sling are the record's readings of these
 identities; the split's dependence on the receiver (a different metric for the same motion moves
-it; a rechart does not) is the record's §3.2 and is not a further theorem here. Owed and cited in the record, not proved here:
-`PSL(2, ℂ) ≅ SO⁺(1, 3)` and the polar decomposition over an exact field with square roots.
+it; a rechart does not) is the record's §3.2 and is not a further theorem here. `PSL(2, ℂ) ≅ SO⁺(1, 3)`, as
+`SL(2, ℂ)/±1 → SO⁺(1, 3)` onto with kernel `±1` and its polar factors over ℂ, is
+`HolonicsResearch/Physics/Spacetime/{LorentzCover,LorentzOnto}` (`lorentz_eq_iff`, `lorentz_onto`,
+`lorentz_polar`). Cited in the record, not proved here: the polar decomposition over an exact field with
+square roots.
 -/
 
 noncomputable section
