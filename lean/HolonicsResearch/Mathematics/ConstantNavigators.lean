@@ -78,11 +78,12 @@ released tail is the remainder, and the enclosure is the face.
    (`pi_cfDigit`), and `GenContFract.of π` has head `3` and partial denominators `7, 15, 1, 292`
    (`of_pi_head`).
 
-What is not claimed. `analytic.certified-capture` (relaxed release of a complex source box into a
-capture square, with mean-value inclusion) and `analytic.euler-maclaurin-eta` (ζ and η with their
-Euler–Maclaurin remainders and jets) stay owed in #410. The owner's rounding of each enclosure out
-to a bit grain, and the propagation of enclosures through squaring, doubling and the sum
-`k log 2 + log y` as interval arithmetic, are not formalized; the identities they rest on are.
+What is not claimed here. `analytic.certified-capture` (relaxed release of a complex source box
+into a capture square, with mean-value inclusion), `analytic.euler-maclaurin-eta` at real `s` (ζ
+and η with their remainders) and the rounding of each enclosure out to a bit grain stand in
+`HolonicsResearch/Mathematics/CertifiedCapture`; ζ's and η's jets stay owed in #410. The
+propagation of enclosures through squaring, doubling and the sum `k log 2 + log y` as interval
+arithmetic is not formalized; the identities it rests on are.
 The sine's and cosine's remainders here are the exponential's at `2N` terms, not the sharper
 alternating bounds `|x|^(2N)/(2N)!` and `|x|^(2N+1)/(2N+1)!` the owner's small-argument loop used.
 The atlas row's reading, that the word is the Farey address the enclosure cannot leave

@@ -41,7 +41,9 @@ return (`stressEnergy_conserved`). This module consumes that owner.
 
 [open] A nontrivial continuum realization (a Lorentzian metric, its connection and curvature,
 and a fluid-plus-thermal constitution solving `G + Λg = κT`) is owed (#62); the flat vacuum of
-`Geometry/HolonicCurvedArcEinstein` and the discrete field here do not supply it. The Regge
+`Geometry/HolonicCurvedArcEinstein` and the discrete field here do not supply it. The curvature of
+a metric's connection at a point, from its 2-jet, and the weak-field limit `R₀₀ = ∇²Φ` stand in
+`HolonicsResearch/Physics/Spacetime/CurvatureJets`. The Regge
 construction of the discrete Einstein side, that `G` is the boundary of the moment of rotation
 `F` of a simplicial metric's deficit angles (Misner–Thorne–Wheeler §15.4), is owed (#62): here the
 field `F` is supplied, not built from a metric.

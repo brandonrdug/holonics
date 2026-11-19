@@ -43,7 +43,8 @@ viscous stress negatively. No coefficient is chosen here: every entry is the K3 
   (`sourceMap_traceReversed`), `(ε + 3p)/2` on the perfect fluid and `ε/2` on dust. So at
   `κ = 8πG` a dust source has `R₀₀ = 4πGρ` (`dust_newtonian_source`), and the source map has
   `R₀₀ = 4πG(ε + 3p − (2μ + 3λ) tr G)` (`sourceMap_newtonian_source`). [proved-standard] In the weak
-  static field `R₀₀ = ∇²Φ`, so this is Poisson's `∇²Φ = 4πGρ`; that limit is not formalized here.
+  static field `R₀₀ = ∇²Φ`, so this is Poisson's `∇²Φ = 4πGρ`; that limit, at first order in the
+  perturbation, is `HolonicsResearch/Physics/Spacetime/CurvatureJets` (`weakField_poisson`).
 * **The observer's deformation term is the K3 heat port.** The spatial block contracted with the
   velocity gradient is `p tr G − Φ` (`sourceMap_spatialPower`, from `stress_power_split`). For the
   comoving receiver `u_ν = (−1, 0, 0, 0)` with `∂ᵢu_ⱼ = Gⱼᵢ`, the divergence of its current

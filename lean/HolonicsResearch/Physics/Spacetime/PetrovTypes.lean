@@ -86,11 +86,11 @@ of the observer acting on `(E, H)` as a complex rotation `Q ↦ OQOᵀ`, `O ∈ 
 The principal null directions and their multiplicities, the Bel–Debever criteria and the
 Newman–Penrose scalars `Ψ₀ … Ψ₄` (whose invariants are normalized otherwise) are not stated. That
 every complex symmetric traceless `Q` is the `Q` of some tensor with the Weyl symmetries is not
-stated, and no witness is exhibited as `weylQ C` of a built `C`: the owner exhibits no nonzero
-instance of `WeylSymmetries`, and the Schwarzschild tide `μ·diag(−2, 1, 1)` (with `μ` standing for
-the mass over the cube of the radius, up to the sign convention) is read, not derived from a metric.
-The box's other part stays owed: the deviation equation `J″ = −RJ` and the tide
-`R_ij = R_(i a j b) u^a u^b` from a Lorentzian metric's connection.
+stated. The witnesses here are given as matrices; `Physics/Spacetime/CurvatureJets` builds `C` from
+a metric's 2-jet, a plane wave of type N (`wave_classify`) and the point mass's weak field, whose
+tide is `μ·diag(−2, 1, 1)` with `μ = M/r³` under its sign convention (`pointMass_classify`). The
+box's other part stays owed: the deviation equation `J″ = −RJ` along a geodesic (the tide
+`R_ij = R_(i0j0)` from a metric's connection at a point is `CurvatureJets`').
 
 Read on the Swing. In Motion's split a rate against a receiver's metric is a skew turn plus a
 self-adjoint boost. The tide `E` is the strain, a self-adjoint boost of the deviation (the owner
