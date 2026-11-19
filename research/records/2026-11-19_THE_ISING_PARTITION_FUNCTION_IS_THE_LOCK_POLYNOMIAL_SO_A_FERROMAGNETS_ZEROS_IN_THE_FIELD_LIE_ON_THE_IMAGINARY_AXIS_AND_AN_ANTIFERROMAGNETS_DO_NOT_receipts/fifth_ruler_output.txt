@@ -1,0 +1,20 @@
+A. The partition function is the lock polynomial
+  n=2: 6 samples, identity holds
+  n=3: 6 samples, identity holds
+  n=4: 6 samples, identity holds
+  n=5: 6 samples, identity holds
+  n=6: 6 samples, identity holds
+  n=7: 6 samples, identity holds
+  worst relative gap over 36 samples: 4.43e-15
+  planted asymmetric J: the identity misses by 12.407 relative (seen)
+B. The zeros in one common field
+  ferromagnets n = 2..10, 36 samples: every root on |z| = 1, worst deviation 4.00e-15; coefficients palindromic
+  planted antiferromagnets n = 2..8: 28 of 28 samples have a root off the circle (largest | |z| - 1 | = 144904945024.755) (seen)
+  two sites, exchange -0.5 at beta 1.0: zeta = -0.190624, |zeta| != 1, h = -0.828727 + 1.570796 i, Z(h)/Z(0) = 1.6e-16
+  two sites, exchange -1.0 at beta 0.3: zeta = -0.298926, |zeta| != 1, h = -2.012600 + 5.235988 i, Z(h)/Z(0) = 7.1e-17
+  two sites, exchange -2.0 at beta 2.0: zeta = -0.000168, |zeta| != 1, h = -2.173287 + 0.785398 i, Z(h)/Z(0) = 8.3e-16
+C. The least zero angle on the Curie-Weiss ferromagnet
+  beta = 2.0: n=4: 0.8771, n=6: 0.5807, n=8: 0.4307, n=10: 0.3412, n=12: 0.2822, n=14: 0.2405
+  beta = 0.5: n=4: 1.6293, n=6: 1.3860, n=8: 1.2478, n=10: 1.1569, n=12: 1.0916, n=14: 1.0422
+  ratio n=14 / n=4: ordered 0.274, disordered 0.640
+all sections pass; 0.1 s
