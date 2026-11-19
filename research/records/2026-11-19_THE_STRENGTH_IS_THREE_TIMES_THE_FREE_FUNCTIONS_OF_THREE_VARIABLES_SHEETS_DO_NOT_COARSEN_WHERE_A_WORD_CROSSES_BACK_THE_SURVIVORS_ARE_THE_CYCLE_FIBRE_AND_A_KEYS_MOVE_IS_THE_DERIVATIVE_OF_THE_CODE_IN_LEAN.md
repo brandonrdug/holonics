@@ -29,7 +29,8 @@ ledger over ℤ"; "The first-order identity of a key's move"; "Survivors are the
 "The synchronous two-cycle of a place hearing its own release" (its last owed part); "The count of free data `z(n)`";
 the six boxes of receiving precision (#393); the two of the resident pair face (#399); "The located route's survivors
 carried under relabelling"; "The release over a union of fibre members is sound"; "The turn menu's fibre law"; "The
-founded units' price"; "The units' lattice read". Eighteen boxes in all.
+founded units' price"; "The units' lattice read". Nineteen boxes in all (this record read eighteen until
+the seventh set's record corrected the count).
 
 ## 2. What the pass corrected
 
