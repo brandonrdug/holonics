@@ -168,7 +168,6 @@ impl<'c> Resident<'c> {
         let classes = d.classes();
         // A receiver's probed classes: its probe's own and the `2^b − 1` across its seams (§16.19).
         let probe_stride = 1usize << d.class_trits();
-        let card = self.card;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let alloc32 = |len: usize| self.timed(Kind::Alloc, || self.take::<u32>(len.max(1))).map_err(device);
         // [theory, November 12; the triad record §4] A triads' carrier `[t][rows J]`, none where the field has no triads.
@@ -231,7 +230,6 @@ impl<'c> Resident<'c> {
         let card = self.card;
         let d = field.declaration;
         let (dw, m2, f, n, heads) = (d.width, 2 * d.complex(), d.contacts, d.modes, d.heads);
-        let span = 2 * n;
         let buckets = 4 * 3 * d.classes() as u32;
         let tick = &ticks[if kept { k } else { 0 }];
         set_tick(words, tick, returning);
