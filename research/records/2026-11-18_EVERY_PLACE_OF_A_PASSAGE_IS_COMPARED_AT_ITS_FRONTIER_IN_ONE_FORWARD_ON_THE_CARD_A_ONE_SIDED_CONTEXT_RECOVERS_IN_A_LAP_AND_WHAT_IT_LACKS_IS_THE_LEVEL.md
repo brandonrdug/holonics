@@ -1,6 +1,6 @@
 # Every place of a passage is compared at its frontier in one forward, on the card; a one-sided context recovers in a lap, and what it lacks is the level
 
-November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40). Refs #404 #407 #73. It continues
+November 18, 2026, 12:50 to 15:58 UTC; §9 to §19 added the same day, to 23:05 UTC (§12 and §14 corrected at 19:40); §20 at 00:50 UTC, November 19. Refs #404 #407 #73. It continues
 [the writer's frontier](2026-11-18_THE_WRITERS_FRONTIER_IS_THE_PASSAGES_CODE_IN_PLACE_ORDER_THE_LINE_NEVER_READ_IT_IT_GAINS_OUT_TO_HUNDREDS_OF_KNOWN_PLACES_AND_A_SHARE_OF_STRETCHES_THERE_TRADES_THE_FILL_IN_READING_FOR_IT.md),
 whose §6 sized the build and whose §7 read that the frontier's fall follows the logarithm of the places compared there.
 `measurement` for every figure (receipts [`reads.txt`](receipts/2026-11-18_frontier/reads.txt)); `agent-inferred` for the readings and
@@ -670,3 +670,42 @@ the written symbol the face's loudest at 0.73 of places, at 0.70 of the loudest 
 spectrum whitening lap over lap (0.841, 0.849, 0.854 nats of ln 4), whiter where surprise is least; ceilings broken at 0.81, 0.84
 and 0.85 of what an order that carries nothing gives; the first lane at 21.14 octaves and the other three at 19.47 to 19.70. This
 reading was missing from every lap of this record before L15; it is taken with each lap from here.
+
+## 20. The line takes 128 carry circles
+
+*Written at 00:50 UTC, November 19.* G-1118-23's two laps, each read at the mean of its last 1,000 sections (`MEAN.3000`: sections
+2,001 to 3,000 of the lap), beside the line's own laps from the same state (receipts `reads.txt`, 00:45 UTC).
+
+**What she wrote.** On the long panel (20 held prompts, 96 bytes each, drawn from the lap's mean) arm C17 wrote 187 of 286 words in
+the lexicon (65%) where its control wrote 164 of 280 (58%), and arm C18 142 of 263 (53%) where its control wrote 153 of 272 (56%);
+writes that loop 2 and 4 of 20 against 1 and 3. Word-shaped fragments in each prompt's register, and no sentence that holds, on
+either side. The 96 circles do not show in her words at two laps: the two laps' differences have opposite signs and both stand
+inside the panel's scatter from lap to lap (48% to 60% on the line's own laps L16 to L18).
+
+**The code.** Rows S over the held passage's 99,844 frontier places: C17 1.6844 against L17's 1.6992 (0.0148 under, ±0.0005), C18
+1.6495 against L18's 1.6899 (0.0404 under, ±0.0009), under the control in every slice (code 0.042, books 0.041, science 0.050, web
+0.036, wikidata 0.034 at C18) and at every count of places known past the first (0.025 to 0.055). The gain is the carried product's
+own kind: it is 0.043 to 0.055 where 4 to 31 places stand before the place, 0.038 to 0.042 farther out, 0.025 at two or three
+and 0.009 at one place known. One place open under the law: 0.9680 against 0.9856, 0.018 under.
+
+**At the settled places** (`frontier_excess_ruler.py`, kind S, the fifth of places where a count of five places expects under 0.25
+nats). A draw from C18's face writes the passage's symbol 0.704 of the time against L18's 0.680 and the count's 0.909; its code
+there is 0.720 against 0.779 and the count's 0.627, so the excess over the count at those places falls from 0.031 to 0.019 nats of
+all places. In every other bin she stands further under the count than before.
+
+**The loudness** (lap means, one place open, 100,508 places). C18 is louder at every surprise fifth by 0.05 octaves (20.015 against
+19.963 over all), with the same rank correlation of loudness with the code (+0.138 against +0.142: the loud places are a little the
+more surprised, no dense basin), a whiter spectrum (0.871 against 0.862 nats of ln 4) and a little fewer ceilings broken (0.836
+against 0.848 of an order that carries nothing). Every lane rose by 0.04 to 0.06 octaves.
+
+**The guess and the rule** (G-1118-23). (a) held at C17 and missed at C18, the gain larger than guessed; (b) held (+0.024); (c) held at
+C17 and missed at C18 (0.018 under); (d) held (342 and 330 ms a section against the line's 312 and 298); (e) held. By its rule (0.010
+or more under at the second lap) the line takes the circles and continues from arm C18's end. The gap widened from 0.015 to 0.040
+between the laps, so the 96 new circles were still taking their charge at the second lap; the extent that the readings left (§19)
+is still what the frontier pays for, and the next arm grows it again (G-1119-1: 256 circles beside the line's laps L19 and L20).
+
+**The build.** The branch's build at `7a280248f` (the founding, this record, and the compiler's 47 unused items cleared from the three
+crates: bindings the kernels read through the words' pointers, buffers held only for their memory named so, the moment kernels' words
+described where they are packed) passed gate 1 (143 host tests), the card suite alone (26 of 26), `gate_engine.sh` against the store
+line's lap 70 (parity, 3 and 24 sections, the held read: equal), and today's line: 24 sections of laps C18 and L18 each equal to
+the laps' own logs.

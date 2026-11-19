@@ -1017,3 +1017,50 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   L17   by lane (octaves): lane0=21.137  lane1=19.469  lane2=19.556  lane3=19.695
   L17 LOUDNESS_WHOLE region=code places=730 nats_a_place=2.2632 loudness_octaves=20.316
   L17 LOUDNESS_WHOLE region=web places=758 nats_a_place=2.4929 loudness_octaves=20.508
+
+# 00:45 UTC November 19. G-1118-23's laps (binary bin/athena_carry, built at a1975e419's source; card steps under the card lock; the line's laps with bin/athena_level):
+  lap L17: 3000 sections, 312 ms a section on the mean, 875 at most
+  lap C17: 3000 sections, 342 ms a section on the mean, 439 at most
+  lap L18: 3000 sections, 298 ms a section on the mean, 379 at most
+  lap C18: 3000 sections, 330 ms a section on the mean, 441 at most
+  FRONTIER C17; one place open: all 0.9779 (100508 places) | books 1.0704 code 0.6742 science 0.9540 web 1.0648 wikidata 1.1260 || less the control's, paired: -0.0060 (±0.0004) | books -0.0068 code -0.0059 science -0.0070 web -0.0081 wikidata -0.0022
+  FRONTIER C17; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.6844 (99844 places) | books 1.7246 code 1.3794 science 1.6258 web 1.8459 wikidata 1.8464 || less the control's, paired: -0.0148 (±0.0005) | books -0.0153 code -0.0145 science -0.0191 web -0.0143 wikidata -0.0109
+  FRONTIER L18; one place open: all 0.9856 (100508 places) | books 1.0771 code 0.6748 science 0.9711 web 1.0771 wikidata 1.1281
+  FRONTIER L18; the frontier, each region a known stream: all 1.7800 (99844 places) | books 1.8154 code 1.4471 science 1.7249 web 1.9192 wikidata 1.9928
+  FRONTIER L18; the frontier, each stretch read by two streams: all 1.6899 (99844 places) | books 1.7331 code 1.3791 science 1.6399 web 1.8528 wikidata 1.8444
+  FRONTIER L18; each stretch read by two streams, by places known: 1: 2.929 | 2 to 3: 2.638 | 4 to 7: 2.330 | 8 to 15: 2.135 | 16 to 31: 2.006 | 32 to 63: 1.851 | 64 to 127: 1.667 | 128 to 255: 1.554 | 256 to 511: 1.498 | 512 to 1023: 1.524
+  FRONTIER L18; the frontier by places known: 1: 3.160 (514) | 2 to 3: 2.828 (1028) | 4 to 7: 2.587 (2056) | 8 to 15: 2.444 (4069) | 16 to 31: 2.325 (7378) | 32 to 63: 2.203 (12360) | 64 to 127: 2.064 (19523) | 128 to 255: 1.982 (26570) | 256 to 511: 1.944 (24110) | 512 to 1023: 1.970 (2236)
+  FRONTIER C18; one place open: all 0.9680 (100508 places) | books 1.0584 code 0.6636 science 0.9464 web 1.0543 wikidata 1.1172 || less the control's, paired: -0.0176 (±0.0008) | books -0.0187 code -0.0112 science -0.0247 web -0.0228 wikidata -0.0108
+  FRONTIER C18; the frontier, each region a known stream (against the control's rows of the kind): all 1.7330 (99844 places) | books 1.7673 code 1.4012 science 1.6696 web 1.8761 wikidata 1.9503 || less the control's, paired: -0.0470 (±0.0010) | books -0.0481 code -0.0459 science -0.0554 web -0.0431 wikidata -0.0425
+  FRONTIER C18; the frontier, each stretch read by two streams (against the control's rows of the kind): all 1.6495 (99844 places) | books 1.6923 code 1.3370 science 1.5901 web 1.8169 wikidata 1.8108 || less the control's, paired: -0.0404 (±0.0009) | books -0.0407 code -0.0420 science -0.0498 web -0.0359 wikidata -0.0336
+  FRONTIER C18; each stretch read by two streams, by places known (less the control's): 1: 2.920 (-0.009) | 2 to 3: 2.613 (-0.025) | 4 to 7: 2.275 (-0.055) | 8 to 15: 2.092 (-0.043) | 16 to 31: 1.955 (-0.051) | 32 to 63: 1.809 (-0.042) | 64 to 127: 1.628 (-0.039) | 128 to 255: 1.516 (-0.038) | 256 to 511: 1.458 (-0.040) | 512 to 1023: 1.488 (-0.036)
+  FRONTIER C18; the frontier by places known (less the control's): 1: 3.160 (-0.001) | 2 to 3: 2.816 (-0.012) | 4 to 7: 2.573 (-0.013) | 8 to 15: 2.430 (-0.014) | 16 to 31: 2.313 (-0.013) | 32 to 63: 2.186 (-0.016) | 64 to 127: 2.044 (-0.020) | 128 to 255: 1.962 (-0.020) | 256 to 511: 1.921 (-0.023) | 512 to 1023: 1.956 (-0.013)
+  EXCESS slice=all kind=S places=99814 train_octets=8000000 k=5 count=2.0379 L17=1.6978 C17=1.6830 L18=1.6885 C18=1.6480 draw_agrees: count=0.462 L17=0.421 C17=0.425 L18=0.423 C18=0.435 counts_by_k: 0=3.482 1=2.765 2=2.362 3=2.102 4=2.030 5=2.038
+  EXCESS slice=all expected_news='under 0.25' draw_agrees: count=0.909 L17=0.674 C17=0.682 L18=0.680 C18=0.704
+  EXCESS slice=all expected_news='under 0.25' share=0.204 count=0.627 L17=0.797 C17=0.777 L18=0.779 C18=0.720 excess_of_all_places: L17=+0.0347 C17=+0.0305 L18=+0.0311 C18=+0.0190 counts_by_k: 0=3.255 1=2.245 2=1.539 3=0.876 4=0.591 5=0.627
+  EXCESS slice=all expected_news='0.25 to 0.5' draw_agrees: count=0.709 L17=0.597 C17=0.602 L18=0.600 C18=0.615
+  EXCESS slice=all expected_news='0.25 to 0.5' share=0.090 count=1.315 L17=1.047 C17=1.035 L18=1.043 C18=1.004 excess_of_all_places: L17=-0.0240 C17=-0.0251 L18=-0.0244 C18=-0.0279 counts_by_k: 0=3.134 1=2.286 2=1.802 3=1.437 4=1.359 5=1.315
+  EXCESS slice=all expected_news='0.5 to 1' draw_agrees: count=0.546 L17=0.506 C17=0.510 L18=0.508 C18=0.520
+  EXCESS slice=all expected_news='0.5 to 1' share=0.205 count=1.665 L17=1.335 C17=1.320 L18=1.326 C18=1.285 excess_of_all_places: L17=-0.0679 C17=-0.0708 L18=-0.0697 C18=-0.0780 counts_by_k: 0=3.186 1=2.412 2=2.001 3=1.772 4=1.699 5=1.665
+  EXCESS slice=all expected_news='1 to 2' draw_agrees: count=0.271 L17=0.320 C17=0.324 L18=0.322 C18=0.330
+  EXCESS slice=all expected_news='1 to 2' share=0.301 count=2.490 L17=1.944 C17=1.929 L18=1.933 C18=1.895 excess_of_all_places: L17=-0.1641 C17=-0.1684 L18=-0.1674 C18=-0.1787 counts_by_k: 0=3.506 1=2.889 2=2.609 3=2.490 4=2.495 5=2.490
+  EXCESS slice=all expected_news='over 2' draw_agrees: count=0.095 L17=0.148 C17=0.149 L18=0.146 C18=0.151
+  EXCESS slice=all expected_news='over 2' share=0.200 count=3.502 L17=2.909 C17=2.897 L18=2.908 C18=2.881 excess_of_all_places: L17=-0.1187 C17=-0.1211 L18=-0.1189 C18=-0.1243 counts_by_k: 0=4.134 1=3.686 2=3.448 3=3.403 4=3.434 5=3.502
+  L17 long panel: LONG L17_mean: all words 280 in lexicon 164 (58%) writes that loop 1 of 20 longest run shared with its prompt 60 | code 42/54 (77%) web 38/60 (63%) science 24/51 (47%) books 39/60 (65%) wikidata 21/55 (38%)
+  C17 long panel: LONG C17_mean: all words 286 in lexicon 187 (65%) writes that loop 2 of 20 longest run shared with its prompt 20 | code 38/48 (79%) web 45/65 (69%) science 28/50 (56%) books 51/67 (76%) wikidata 25/56 (44%)
+  L18 long panel: LONG L18_mean: all words 272 in lexicon 153 (56%) writes that loop 3 of 20 longest run shared with its prompt 28 | code 30/49 (61%) web 38/53 (71%) science 21/54 (38%) books 44/69 (63%) wikidata 20/47 (42%)
+  C18 long panel: LONG C18_mean: all words 263 in lexicon 142 (53%) writes that loop 4 of 20 longest run shared with its prompt 56 | code 25/41 (60%) web 38/56 (67%) science 20/53 (37%) books 38/61 (62%) wikidata 21/52 (40%)
+  L18 LOUDNESS region=all places=100508 nats_a_place=0.9856 loudness_octaves=19.963 spearman_loud_code=+0.142
+  L18   by surprise fifth (q1 least surprised): q1 nats=0.006 loud=19.899  q2 nats=0.049 loud=19.943  q3 nats=0.277 loud=19.974  q4 nats=1.118 loud=20.011  q5 nats=3.479 loud=19.988
+  L18   by the written symbol's rank: rank 1: share=0.729 loud=19.950 nats=0.259  rank 2-3: share=0.136 loud=20.015 nats=1.938  rank 4-10: share=0.093 loud=19.983 nats=3.280  rank 11+: share=0.042 loud=19.972 nats=5.449
+  L18   temperature (energy over the region's mean, a nat): +0.0218   rank-1 share: loudest fifth 0.699, quietest fifth 0.801
+  L18   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.8615  spearman loud~color=+0.278  color~code=-0.145  by surprise fifth: q1=0.8863 q2=0.8689 q3=0.8591 q4=0.8524 q5=0.8406
+  L18   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1900 against 2240.5 for an order that carries nothing (ratio 0.848); at them nats=5.086 loud=20.040 color=0.8402 rank-1 share=0.06
+  L18   by lane (octaves): lane0=21.126  lane1=19.467  lane2=19.562  lane3=19.698
+  C18 LOUDNESS region=all places=100508 nats_a_place=0.9680 loudness_octaves=20.015 spearman_loud_code=+0.138
+  C18   by surprise fifth (q1 least surprised): q1 nats=0.005 loud=19.953  q2 nats=0.045 loud=19.996  q3 nats=0.257 loud=20.024  q4 nats=1.077 loud=20.061  q5 nats=3.456 loud=20.038
+  C18   by the written symbol's rank: rank 1: share=0.734 loud=20.002 nats=0.253  rank 2-3: share=0.135 loud=20.065 nats=1.945  rank 4-10: share=0.090 loud=20.036 nats=3.285  rank 11+: share=0.041 loud=20.022 nats=5.454
+  C18   temperature (energy over the region's mean, a nat): +0.0205   rank-1 share: loudest fifth 0.708, quietest fifth 0.804
+  C18   color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=0.8707  spearman loud~color=+0.267  color~code=-0.143  by surprise fifth: q1=0.8956 q2=0.8769 q3=0.8685 q4=0.8627 q5=0.8499
+  C18   ceilings broken (a place's code above every earlier place's in its stretch, past the first): 1873 against 2240.5 for an order that carries nothing (ratio 0.836); at them nats=5.123 loud=20.091 color=0.8505 rank-1 share=0.05
+  C18   by lane (octaves): lane0=21.165  lane1=19.519  lane2=19.615  lane3=19.760
