@@ -1,5 +1,6 @@
 import Holonics.Objects.Ratio
 import Holonics.Physics.PhaseCarrier
+import Holonics.Physics.Fluid.Singularity
 import Mathlib.Algebra.GCDMonoid.Finset
 import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
 import Mathlib.Data.ZMod.Basic
@@ -42,11 +43,20 @@ of a singularity. #410 owes those laws; this file proves them.
    and the imaginary part `2π`. Every lift of the ratio `R = c / w` moves by `R⁻¹dR = −dw/w`
    (`loss_lift_deriv`, through `Objects/Ratio.lift_deriv_eq_logDeriv`), so these are the learning
    covector's two parts.
+5. **The loss is the pair potential** (`loss_is_pair_potential`, `loss_covector_pair`,
+   `loss_pair_kinds`, `loss_lifts_differ_by_laps`; §2's last clause, joined to
+   `Physics/Fluid/Singularity`): where both amplitudes move along one coordinate, `z_T = z − z₁` and
+   `z_H = z − z₂`, the loss's principal chart `log(z_T / z_H)` is a lift of the undivided ratio and is
+   the pair potential at the real strength `2π` (and `−iℓ` at the imaginary strength `−2πi`); its
+   covector along the coordinate is the pair's clock `1/W`; read with real strength it is a source–sink
+   pair, the boost, and with imaginary strength a vortex pair, the turn; and every lift differs from the
+   principal chart by whole laps `2πi n`.
 
 The computational object is the helical pair interaction: a release is read at a ring's pair
 contact, looking again reads it at another ring's contact, and the look is the direct and reflected
 passage through one contact. Of the winding guide's six general objects this touches faces and
-placement (the residue faces and the release window) and the cell holonomy (the lap's circulation);
+placement (the residue faces and the release window) and the cell holonomy (the lap's circulation and
+the pair's two zeros);
 the helix, the pair, the tube and the tower thread stay attached.
 
 Consumers: the atlas rows `arith.check-loop-laps`, `phase.look-fixed-point`,
@@ -290,5 +300,75 @@ theorem loss_lift_deriv {c : ℂ} (hc : c ≠ 0) {L : ℝ → ℂ}
   ring
 
 end Covector
+
+/-! ## The join to the pair potential -/
+
+section Pair
+
+open Holonics.Physics.Fluid.Singularity ComplexConjugate
+open Holonics.Objects.Ratio (holonRatio logFibre)
+
+/-- [proved-derived; formal-checked] **Both amplitudes on one coordinate, the loss is the pair potential** (§2's
+last clause). With the target amplitude `z_T = z − z₁` and the produced amplitude `z_H = z − z₂`, the loss's
+principal chart `ℓ = log(z_T / z_H)` is a lift of the undivided ratio `(z_T : z_H)`; it is the pair potential of
+`Physics/Fluid/Singularity` at the real strength `2π`, a source at the target's zero and a sink at the produced
+amplitude's, and `−iℓ` is the pair potential at the imaginary strength `−2πi`. -/
+theorem loss_is_pair_potential {z₁ z₂ z : ℂ} (h1 : z ≠ z₁) (h2 : z ≠ z₂) :
+    Complex.log ((z - z₁) / (z - z₂)) ∈ logFibre (holonRatio (z - z₁) (z - z₂)) ∧
+      potential (2 * Real.pi) z₁ z₂ z = Complex.log ((z - z₁) / (z - z₂)) ∧
+      potential (-(2 * Real.pi) * Complex.I) z₁ z₂ z =
+        -Complex.I * Complex.log ((z - z₁) / (z - z₂)) := by
+  have hpi := two_pi_ne_zero
+  refine ⟨principal_mem_logFibre h1 h2, ?_, ?_⟩
+  · unfold potential
+    rw [div_self hpi, one_mul]
+  · unfold potential
+    rw [show -(2 * (Real.pi : ℂ)) * Complex.I / (2 * Real.pi) = -Complex.I by field_simp]
+
+/-- [proved-derived; formal-checked] **The loss's covector along the coordinate is the pair's clock:**
+`d/dz log(z_T / z_H) = 1/W`, `W = (z − z₁)(z − z₂)/(z₁ − z₂)` (`hasDerivAt_potential` at strength `2π`), so
+along an orbit of the pair's generator at rate `λ` the loss advances at `λ` (`logRatio_is_clock`). -/
+theorem loss_covector_pair {z₁ z₂ z : ℂ} (h12 : z₁ ≠ z₂) (h1 : z ≠ z₁) (h2 : z ≠ z₂)
+    (hslit : (z - z₁) / (z - z₂) ∈ Complex.slitPlane) :
+    HasDerivAt (fun x => Complex.log ((x - z₁) / (x - z₂))) (W z₁ z₂ z)⁻¹ z := by
+  have hpi := two_pi_ne_zero
+  have hW : W z₁ z₂ z ≠ 0 := by
+    unfold W
+    exact div_ne_zero (mul_ne_zero (sub_ne_zero.mpr h1) (sub_ne_zero.mpr h2)) (sub_ne_zero.mpr h12)
+  have h := hasDerivAt_potential (2 * Real.pi) h12 h1 h2 hslit
+  have hfun : potential (2 * Real.pi) z₁ z₂ = fun x => Complex.log ((x - z₁) / (x - z₂)) := by
+    funext x
+    unfold potential
+    rw [div_self hpi, one_mul]
+  rw [hfun] at h
+  convert h using 1
+  field_simp
+
+/-- [proved-derived; formal-checked] **Read with real strength the loss is a source–sink pair, a boost; read with
+imaginary strength, a vortex pair, a turn** (§2): the pair's generator at rate `conj(2π)` has the boost kind
+and at rate `conj(−2πi)` the rotation kind, wherever the two zeros sit (`pair_kind_boost`,
+`pair_kind_rotation`). -/
+theorem loss_pair_kinds {z₁ z₂ : ℂ} (h12 : z₁ ≠ z₂) :
+    flowKind (discriminant (generator (conj (((2 * Real.pi : ℝ) : ℂ) + ((0 : ℝ) : ℂ) * Complex.I))
+        z₁ z₂)) = .site .boost ∧
+      flowKind (discriminant (generator (conj (((0 : ℝ) : ℂ) + ((-(2 * Real.pi) : ℝ) : ℂ) * Complex.I))
+        z₁ z₂)) = .site .rotation := by
+  have hpi := Real.pi_pos
+  exact ⟨pair_kind_boost h12 (by positivity) rfl, pair_kind_rotation h12 rfl (by linarith)⟩
+
+/-- [proved-derived; formal-checked] **Every lift of the loss differs by whole laps:** a lift `ℓ` of the ratio
+`(z_T : z_H)` differs from the principal chart by `2πi n` (`potential_jump` at strength `2π`): the loss's
+circulation is `2π` a lap round the produced amplitude's zero, which is the branch of its log. -/
+theorem loss_lifts_differ_by_laps {z₁ z₂ z ℓ : ℂ} (h1 : z ≠ z₁) (h2 : z ≠ z₂)
+    (hℓ : ℓ ∈ logFibre (holonRatio (z - z₁) (z - z₂))) :
+    ∃ n : ℤ, ℓ - Complex.log ((z - z₁) / (z - z₂)) = 2 * Real.pi * Complex.I * n := by
+  have hpi := two_pi_ne_zero
+  obtain ⟨n, hn⟩ := potential_jump (2 * Real.pi) (sub_ne_zero.mpr h2) (principal_mem_logFibre h1 h2) hℓ
+  refine ⟨n, ?_⟩
+  rw [div_self hpi, one_mul, one_mul] at hn
+  rw [hn]
+  ring
+
+end Pair
 
 end Holonics.Mathematics.CheckLoop

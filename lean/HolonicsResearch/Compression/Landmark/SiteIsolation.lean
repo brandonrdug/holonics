@@ -38,8 +38,13 @@ What is proved. News is nonnegative wherever a hypothesis `hc` says so, and noth
 8. **Reach** (statement 4; `site_congr`, `site_congr_iff`): whether `t ∈ P(σ)` is decided by the places within a
    section of `t`: two passages in which the places that reach `t` are the same places, with the same news and at
    the same distance from `t`, agree on it.
-9. **The stable core, one direction** (statement 5; `stable_core`): a site of `P(σ)` is a site of the claim of
-   every passage that agrees with this one within a section of it.
+9. **The stable core** (statement 5; `stable_core`, `stable_core_converse`, `stable_core_iff`): with nonnegative
+   news, `t ∈ P(σ)` exactly when `t` lies in the claim of every passage that agrees with this one within a section
+   of `t`. One direction: a site of `P(σ)` is a site of every such claim. The other: where a greater place reaches
+   `t`, the passage cut to `t`'s section (`cutNews`: the news before it silenced, the places after it removed)
+   agrees with this one there, its greatest place within the section is a site and reaches `t`, so `t` is outside
+   its claim. The record gives the earlier places less news than that greatest place and the first later place a
+   section; silence and the cut serve at every grain, an integer one included.
 10. **A stretch that repeats is dark** (statement 7; `repeat_is_dark`, `period_news`, `sites_of_repeating_stretch`,
     `site_near_start_of_repeat`): where a place's news equals the news one period earlier and the period carries
     less than a section, the place is no site; all periods of a repeating stretch carry the same news; so a site
@@ -52,10 +57,8 @@ What is proved. News is nonnegative wherever a hypothesis `hc` says so, and noth
     `2` are the places `0, 2, 5, 7` and at the section `5` the places `2, 7`.
 
 Limits. One passage of one region: the built cut begins again at each region's opening, which is this law on each
-region. The stable core's other direction (a place some greater place reaches is no site of the claim in a passage
-built to agree within the section) is not here: its passage is constructed in the record and is stated there for
-news in `ℝ`; at an integer grain the record's "less news than `u`" has no positive value when `c_u` is one unit.
-Statement 6's bound of three sections on a stride of `G` and statement 8's scaling are not here. Agreement of two
+region. Agreement within a section is read one way, as `stable_core` reads it: every place that reaches `t` in the
+other passage is a place of this one with the same news and distance. Statement 6's bound of three sections on a stride of `G` and statement 8's scaling are not here. Agreement of two
 passages is stated at the same indices; a passage with places inserted before `t` is the same statement after a
 shift of indices, which is not modelled. The level's clock `τ_j` and its strides are in `HNN/PhaseChart`.
 
@@ -502,6 +505,7 @@ theorem stable_core {c c' : ℕ → K} {N N' t : ℕ} {σ : K} {G' : ℕ → Pro
     (hG' : IsClaim c' N' σ G') : G' t :=
   site_subset_claim hG' (site_congr ht' hct h hs)
 
+
 /-! ## Repeats and silence -/
 
 /-- [proved-derived] **A repeat is dark** (statement 7): a place whose news equals the news one period earlier,
@@ -571,6 +575,171 @@ theorem zero_news_not_greater {c : ℕ → K} {z t : ℕ} (hz : c z = 0) (ht : 0
     exact lt_asymm h ht
   · rw [hz] at h
     exact ht.ne h
+
+/-! ## The stable core, the other direction -/
+
+/-- [definition] A passage cut at `L`: the news before `L` is silenced. -/
+def cutNews (c : ℕ → K) (L w : ℕ) : K := if w < L then 0 else c w
+
+omit [LinearOrder K] [IsStrictOrderedRing K] in
+/-- [proved-standard] From the place before the cut on, a cut passage arrives at the whole passage's arrival less
+the news it silenced. -/
+theorem arrival_cutNews (c : ℕ → K) {L a : ℕ} (h : L ≤ a + 1) :
+    arrival (cutNews c L) a = arrival c a - ∑ v ∈ range L, c v := by
+  unfold arrival cutNews
+  have hf : (range (a + 1)).filter (fun v => v < L) = range L := by
+    ext v
+    simp only [mem_filter, mem_range]
+    omega
+  rw [eq_sub_iff_add_eq, Finset.sum_ite, Finset.sum_const_zero, zero_add, ← hf,
+    Finset.sum_filter_not_add_sum_filter]
+
+/-- [proved-derived] **The stable core, the other direction** (statement 5): a place that some greater place
+reaches is outside the claim of a passage that agrees with this one within a section of it. The passage is this
+one with the news before the section silenced and the places after it removed. There the greatest place within the
+section is a site, since a silenced place is greater than no place of positive news and a greatest place of no news
+stands at the section's start, and it reaches `t`. The record gives the earlier places less news than that place;
+silence serves at every grain, an integer one included. -/
+theorem stable_core_converse {c : ℕ → K} (hc : ∀ v, 0 ≤ c v) {N t : ℕ} {σ : K} (ht : t < N)
+    (hns : ¬ Site c N σ t) :
+    ∃ (c' : ℕ → K) (N' : ℕ), (∀ v, 0 ≤ c' v) ∧ t < N' ∧ c' t = c t ∧
+      (∀ u < N', Reaches c' σ u t →
+        u < N ∧ c u = c' u ∧ arrival c u - arrival c t = arrival c' u - arrival c' t) ∧
+      ∀ G' : ℕ → Prop, IsClaim c' N' σ G' → ¬ G' t := by
+  have hex : ∃ v < N, Greater c v t ∧ Reaches c σ v t := by
+    by_contra hcon
+    exact hns ⟨ht, fun u hu hg hr => hcon ⟨u, hu, hg, hr⟩⟩
+  obtain ⟨v, hvN, hvg, hvr⟩ := hex
+  have hσ : 0 < σ := lt_of_le_of_lt (abs_nonneg _) hvr
+  -- the places within a section of `t`
+  set R := (range N).filter (fun w => Reaches c σ w t) with hR
+  have htR : t ∈ R := mem_filter.mpr ⟨mem_range.mpr ht, by simp [Reaches, hσ]⟩
+  have hvR : v ∈ R := mem_filter.mpr ⟨mem_range.mpr hvN, hvr⟩
+  -- the greatest of them
+  obtain ⟨u, huR, humin⟩ := R.exists_min_image (rank c N) ⟨t, htR⟩
+  have huN : u < N := mem_range.mp (mem_filter.mp huR).1
+  have hur : Reaches c σ u t := (mem_filter.mp huR).2
+  have hmax : ∀ w ∈ R, ¬ Greater c w u := fun w hw hg =>
+    absurd (humin w hw) (not_le.mpr (rank_lt c (mem_range.mp (mem_filter.mp hw).1) hg))
+  have hut : Greater c u t := by
+    have hne : u ≠ t := by
+      rintro rfl
+      exact absurd (humin v hvR) (not_le.mpr (rank_lt c hvN hvg))
+    rcases greater_total c hne with h | h
+    · exact h
+    · exact absurd h (hmax t htR)
+  -- the section's first and last places
+  set L := R.min' ⟨t, htR⟩ with hL
+  set M := R.max' ⟨t, htR⟩ with hM
+  have hLR : L ∈ R := Finset.min'_mem _ _
+  have hMR : M ∈ R := Finset.max'_mem _ _
+  have hLt : L ≤ t := Finset.min'_le R t htR
+  have htM : t ≤ M := Finset.le_max' R t htR
+  have hLu : L ≤ u := Finset.min'_le R u huR
+  have huM : u ≤ M := Finset.le_max' R u huR
+  have hMN : M < N := mem_range.mp (mem_filter.mp hMR).1
+  have hint : ∀ w, L ≤ w → w ≤ M → Reaches c σ w t := by
+    intro w hLw hwM
+    have hrL := (mem_filter.mp hLR).2
+    have hrM := (mem_filter.mp hMR).2
+    unfold Reaches at hrL hrM ⊢
+    rw [abs_sub_lt_iff] at hrL hrM ⊢
+    have h1 := arrival_mono hc hLw
+    have h2 := arrival_mono hc hwM
+    constructor <;> linarith [hrL.1, hrL.2, hrM.1, hrM.2]
+  have hbelow : ∀ w, w < L → ¬ Reaches c σ w t := by
+    intro w hwL hr
+    have hwR : w ∈ R := mem_filter.mpr ⟨mem_range.mpr (by omega), hr⟩
+    exact absurd (Finset.min'_le R w hwR) (by omega)
+  -- the cut passage
+  have hc' : ∀ w, 0 ≤ cutNews c L w := by
+    intro w
+    unfold cutNews
+    split_ifs
+    · exact le_rfl
+    · exact hc w
+  have hcut : ∀ w, L ≤ w → cutNews c L w = c w := by
+    intro w hw
+    unfold cutNews
+    rw [if_neg (by omega)]
+  have hdist : ∀ a b, L ≤ a + 1 → L ≤ b + 1 →
+      arrival (cutNews c L) a - arrival (cutNews c L) b = arrival c a - arrival c b := by
+    intro a b ha hb
+    rw [arrival_cutNews c ha, arrival_cutNews c hb]
+    ring
+  -- in the cut passage only the section's places reach `t`
+  have hreach' : ∀ w, Reaches (cutNews c L) σ w t → L ≤ w := by
+    intro w hr
+    by_contra hlt
+    push Not at hlt
+    have hnr := hbelow (L - 1) (by omega)
+    unfold Reaches at hnr hr
+    rw [dist_of_le hc (by omega : L - 1 ≤ t)] at hnr
+    rw [dist_of_le hc' (by omega : w ≤ t)] at hr
+    have h1 : arrival (cutNews c L) w ≤ arrival (cutNews c L) (L - 1) := arrival_mono hc' (by omega)
+    have h2 := hdist t (L - 1) (by omega) (by omega)
+    exact hnr (by linarith)
+  refine ⟨cutNews c L, M + 1, hc', by omega, hcut t hLt, ?_, ?_⟩
+  · intro w hw hr
+    have hLw := hreach' w hr
+    exact ⟨by omega, (hcut w hLw).symm, (hdist w t (by omega) (by omega)).symm⟩
+  · intro G' hG' hGt
+    have hsite : Site (cutNews c L) (M + 1) σ u := by
+      refine ⟨by omega, fun w hw hg _ => ?_⟩
+      by_cases hLw : L ≤ w
+      · apply hmax w (mem_filter.mpr ⟨mem_range.mpr (by omega), hint w hLw (by omega)⟩)
+        unfold Greater at hg ⊢
+        rw [hcut w hLw, hcut u hLu] at hg
+        exact hg
+      · push Not at hLw
+        have hcw : cutNews c L w = 0 := by
+          unfold cutNews
+          rw [if_pos hLw]
+        rcases (hc u).lt_or_eq with hpos | hzero
+        · exact zero_news_not_greater hcw (by rw [hcut u hLu]; exact hpos) hg
+        · -- a greatest place of no news: the section's first place carries none, so the place before it
+          -- would reach `t`
+          have hcL : c L = 0 := by
+            have hng := hmax L hLR
+            unfold Greater at hng
+            have h1 := not_lt.mp (not_or.mp hng).1
+            linarith [hc L]
+          have hL1 : 1 ≤ L := by omega
+          have hS : arrival c L = arrival c (L - 1) + c L := by
+            have h := arrival_succ c (L - 1)
+            rwa [Nat.sub_add_cancel hL1] at h
+          have hnr := hbelow (L - 1) (by omega)
+          have hrL := (mem_filter.mp hLR).2
+          unfold Reaches at hnr hrL
+          rw [dist_of_le hc (by omega : L - 1 ≤ t)] at hnr
+          rw [dist_of_le hc hLt] at hrL
+          exact hnr (by linarith)
+    have huG : G' u := site_subset_claim hG' hsite
+    have hgr : Greater (cutNews c L) u t := by
+      unfold Greater
+      rw [hcut u hLu, hcut t hLt]
+      exact hut
+    have hrr : Reaches (cutNews c L) σ u t := by
+      unfold Reaches
+      rw [hdist u t (by omega) (by omega)]
+      exact hur
+    exact ((hG' t).mp hGt).2 u (by omega) huG hgr hrr
+
+/-- [proved-derived] **The stable core is the first round** (statement 5, both directions): with nonnegative news,
+`t` is a site of `P(σ)` exactly when it lies in the claim of every passage that agrees with this one within a section
+of `t`. -/
+theorem stable_core_iff {c : ℕ → K} (hc : ∀ v, 0 ≤ c v) {N t : ℕ} {σ : K} (ht : t < N) :
+    Site c N σ t ↔ ∀ (c' : ℕ → K) (N' : ℕ) (G' : ℕ → Prop), t < N' → c' t = c t →
+      (∀ u < N', Reaches c' σ u t →
+        u < N ∧ c u = c' u ∧ arrival c u - arrival c t = arrival c' u - arrival c' t) →
+      IsClaim c' N' σ G' → G' t := by
+  constructor
+  · intro hs c' N' G' ht' hct h hG'
+    exact stable_core hs ht' hct h hG'
+  · intro hall
+    by_contra hns
+    obtain ⟨c', N', -, ht', hct, h, hnot⟩ := stable_core_converse hc ht hns
+    exact hnot _ (claim_isClaim c' N' σ) (hall c' N' _ ht' hct h (claim_isClaim c' N' σ))
 
 end Law
 

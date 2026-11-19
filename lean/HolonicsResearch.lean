@@ -1338,4 +1338,13 @@ import HolonicsResearch.HNN.RestitutionFamily
 import HolonicsResearch.Transport.InformationSpectroscopy
 import HolonicsResearch.Holon.SheafLaplacian
 import HolonicsResearch.HNN.LossPhase
+import HolonicsResearch.Transport.SpectralLineShift
+import HolonicsResearch.Transport.MinimumPhase
+import HolonicsResearch.Holon.TorusMetricDimension
+import HolonicsResearch.Compression.HeldFaceOrder
+import HolonicsResearch.Compression.Landmark.ReleaseHealth
+import HolonicsResearch.HNN.HillFloquetKinds
+import HolonicsResearch.Hodge.TorusLefschetzTriple
+import HolonicsResearch.Landmarks.IharaCoverChebotarev
+import HolonicsResearch.Landmarks.TreeWalkFloor
 import HolonicsResearch.Foundation.FoldStanding

@@ -54,10 +54,11 @@ They were checked only by `research/notebook/motion/loop_curvature_checks.py`.
 * The zero-reduced-cost lemma is proved for finite walks that reach the goal; the termination rule
   against zero-cost cycles the record names is the walk's finiteness here, and no search procedure
   is built.
-* The tori `C₄ □ C₄` (4) and `C₅ □ C₅` (3) are not checked here: their refusals run over triples
-  or over 625 pairs, past this file's budget, and an enumeration by `Finset.powersetCard` ran the
-  kernel out of memory on the grid. The distance tables are certified by their Bellman equation,
-  not joined to Mathlib's `SimpleGraph.dist`.
+* The tori `C₄ □ C₄` (4) and `C₅ □ C₅` (3) are checked in `Holon/TorusMetricDimension`, whose
+  refusals are read through the torus's translations on the triples and pairs that hold `0`; here
+  their refusals over every triple or 625 pairs ran past this file's budget, and an enumeration by
+  `Finset.powersetCard` ran the kernel out of memory on the grid. The distance tables are certified
+  by their Bellman equation, not joined to Mathlib's `SimpleGraph.dist`.
 
 The computational object is the helical pair interaction; of the winding guide's six objects this
 touches cell holonomy (the face as a cycle and its Betti count), keeping the helix, the pair, faces

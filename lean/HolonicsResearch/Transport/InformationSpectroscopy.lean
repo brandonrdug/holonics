@@ -42,10 +42,10 @@ the clock a boost; and a receiver has a mass along each reading, the inverse of 
    prediction along `v` of the solution of `G′w′ = b + yv` moves from that of `Gw = b` by `h′` of the residual,
    `vᵀw′ − vᵀw = h′(y − vᵀw)`. No symmetry of `G` is used. The record's witness `h = 215/209` gives `h′ = 215/424`.
 
-Limits. The first-order line shift `δs = −vᵀ(s²ΔC + sΔD + ΔK)v / vᵀ(2sC + D)v` at a simple line (record §1) is not proved
-here; it needs the derivative of a simple root of `det P_ε` in `ε`. Neither is the inner–outer factorization of record §5
-(for a rational causal stable `H`, `H = H_min B` with `|H| = |H_min|` on the circle and `B` a finite Blaschke product
-whose degree is the winding deficit), nor the count of basins as a winding (record §4, the argument principle). The viscous
+Limits. The first-order line shift at a simple line (record §1) is `Transport/SpectralLineShift.line_shift`, wherever a
+differentiable branch of the line exists; the factorization `H = H_min B` of record §5, `|H| = |H_min|` on the circle, and
+the count of basins as a winding with `deg B` the winding deficit (record §4 and §5, the argument principle for a factored
+response) are `Transport/MinimumPhase`. The viscous
 clause of record §2 (with `D` held, a mass load multiplies each loss invariant by `1/μ`) and the first-order ratio shift
 `δ log(s₁/s₂)` are not stated. The off-range reading (record §6, share one where `v ∉ range G`) is outside these theorems,
 which take `G` invertible. The ring sum is stated over Mathlib's `Polynomial.nthRootsFinset N 1` and, through any

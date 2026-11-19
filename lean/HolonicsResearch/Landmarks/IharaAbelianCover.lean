@@ -17,13 +17,16 @@ enters `tgt d` on sheet `s + σ d`.  The characters are read through one primiti
 character `ψ : AddChar G K` into a domain in which `#G` is not zero: the `k`-th character is
 `x ↦ ψ (k * x)`, and these are all of them (`AddChar.sum_mulShift` is their orthogonality).
 
-* [definition] `coverHashimoto σ`: the cover's dart operator in the base's model; `fourier ψ`: the
+* [definition] `coverHashimoto σ`: the cover's dart operator in the base's model; `charFrame ψ`: the
   matrix `1 ⊗ (ψ (s * k))_{s,k}` that carries a function of the sheets to its characters;
   `twist ψ σ k`: the connection `d ↦ ψ (k * σ d)`.
-* [proved-derived; formal-checked] the intertwining `cover_mul_fourier`:
+* [proved-derived; formal-checked] the intertwining `cover_mul_charFrame`:
   `(1 − u B_Y) · W = W · blockDiag (k ↦ 1 − u · diag (twist k) · B)`, with no division; and
-  `fourier_det_ne_zero` (`W` is invertible because the characters are orthogonal,
-  `charTableInv_mul_charTable`: `W̄ W = #G`).
+  `charFrame_det_ne_zero` (`W` is invertible because the characters are orthogonal on both sides,
+  `charTableInv_mul_charTable` and `charTable_mul_charTableInv`, so the reversed frame
+  `charFrameInv ψ` is a two-sided inverse up to `#G`: `charFrameInv_mul_charFrame`,
+  `charFrame_mul_charFrameInv`).  The frame is named `charFrame` and not `fourier`, which
+  Mathlib's Fourier basis on `AddCircle` holds under `open`.
 * [proved-derived; formal-checked] **`artin_abelian_cover`** (A1): for every voltage and every `u`,
   `det (1 − u B_Y) = ∏_k det (1 − u B_{twist k})`, the twisted dart operators of
   `Landmarks/IharaBassConnection`.
@@ -57,7 +60,8 @@ spectra (the factorization of determinants says it for the dart operator's chara
 roots, read through `det (1 − u B)`; no statement about eigenvectors is made).  Non-abelian covers
 (an irreducible representation of degree above one in each factor) are not here.  No Euler
 product is used, so the splitting of a prime cycle in the cover by the order of its holonomy is
-not stated.
+not stated; the closed walks sorted by holonomy class, read through the twisted traces, are
+`Landmarks/IharaCoverChebotarev`.
 
 **Computational object.**  The helical pair interaction: the voltage is a pair contact's carry
 between sheets, the characters are the cover's own frames, and the factorization is the
@@ -109,9 +113,14 @@ def charTableInv (ψ : AddChar G K) : Matrix G G K := Matrix.of fun k s => ψ (-
 
 /-- [definition] The frame change of the cover's darts: on each base dart, the character table of
 the sheets. -/
-def fourier (D : Type*) [Fintype D] [DecidableEq D] (ψ : AddChar G K) :
+def charFrame (D : Type*) [Fintype D] [DecidableEq D] (ψ : AddChar G K) :
     Matrix (D × G) (D × G) K :=
   (1 : Matrix D D K) ⊗ₖ charTable ψ
+
+/-- [definition] The reversed frame change: on each base dart, the reversed character table. -/
+def charFrameInv (D : Type*) [Fintype D] [DecidableEq D] (ψ : AddChar G K) :
+    Matrix (D × G) (D × G) K :=
+  (1 : Matrix D D K) ⊗ₖ charTableInv ψ
 
 /-- [definition] The `k`-th twist of the voltage: the connection `d ↦ ψ (k * σ d)`. -/
 def twist (ψ : AddChar G K) (σ : E ⊕ E → G) (k : G) : E ⊕ E → K := fun d => ψ (k * σ d)
@@ -153,10 +162,44 @@ theorem charTable_det_ne_zero {ψ : AddChar G K} (hψ : ψ.IsPrimitive)
   exact pow_ne_zero _ hG h1.symm
 
 /-- [proved-derived; formal-checked] The frame change of the cover's darts is invertible. -/
-theorem fourier_det_ne_zero (D : Type*) [Fintype D] [DecidableEq D] {ψ : AddChar G K}
-    (hψ : ψ.IsPrimitive) (hG : (Fintype.card G : K) ≠ 0) : (fourier D ψ).det ≠ 0 := by
-  rw [fourier, Matrix.det_kronecker, Matrix.det_one, one_pow, one_mul]
+theorem charFrame_det_ne_zero (D : Type*) [Fintype D] [DecidableEq D] {ψ : AddChar G K}
+    (hψ : ψ.IsPrimitive) (hG : (Fintype.card G : K) ≠ 0) : (charFrame D ψ).det ≠ 0 := by
+  rw [charFrame, Matrix.det_kronecker, Matrix.det_one, one_pow, one_mul]
   exact pow_ne_zero _ (charTable_det_ne_zero hψ hG)
+
+/-- [proved-derived; formal-checked] The other side of the characters' orthogonality:
+`F F' = #G`. -/
+theorem charTable_mul_charTableInv {ψ : AddChar G K} (hψ : ψ.IsPrimitive) :
+    charTable ψ * charTableInv ψ = (Fintype.card G : K) • (1 : Matrix G G K) := by
+  ext s s'
+  simp only [Matrix.mul_apply, charTableInv, charTable, Matrix.of_apply, Matrix.smul_apply,
+    Matrix.one_apply, smul_eq_mul]
+  have h : ∀ k : G, ψ (s * k) * ψ (-(k * s')) = ψ (k * (s - s')) := by
+    intro k
+    rw [← AddChar.map_add_eq_mul]
+    congr 1
+    ring
+  simp_rw [h]
+  rw [AddChar.sum_mulShift (s - s') hψ]
+  by_cases hs : s = s'
+  · subst hs
+    simp
+  · have : s - s' ≠ 0 := sub_ne_zero.mpr hs
+    simp [this, hs]
+
+/-- [proved-derived; formal-checked] `W' W = #G` on the cover's darts. -/
+theorem charFrameInv_mul_charFrame (D : Type*) [Fintype D] [DecidableEq D]
+    {ψ : AddChar G K} (hψ : ψ.IsPrimitive) :
+    charFrameInv D ψ * charFrame D ψ = (Fintype.card G : K) • (1 : Matrix (D × G) (D × G) K) := by
+  rw [charFrameInv, charFrame, ← Matrix.mul_kronecker_mul, Matrix.mul_one,
+    charTableInv_mul_charTable hψ, Matrix.kronecker_smul, Matrix.one_kronecker_one]
+
+/-- [proved-derived; formal-checked] `W W' = #G` on the cover's darts. -/
+theorem charFrame_mul_charFrameInv (D : Type*) [Fintype D] [DecidableEq D]
+    {ψ : AddChar G K} (hψ : ψ.IsPrimitive) :
+    charFrame D ψ * charFrameInv D ψ = (Fintype.card G : K) • (1 : Matrix (D × G) (D × G) K) := by
+  rw [charFrameInv, charFrame, ← Matrix.mul_kronecker_mul, Matrix.mul_one,
+    charTable_mul_charTableInv hψ, Matrix.kronecker_smul, Matrix.one_kronecker_one]
 
 end Orthogonality
 
@@ -167,13 +210,13 @@ section Factorization
 omit [Fintype V] in
 /-- [proved-derived; formal-checked] The cover's operator in the characters' frame:
 `B_Y · W = W · blockDiag (k ↦ diag (twist k) · B)`. -/
-theorem coverHashimoto_mul_fourier (ψ : AddChar G K) (σ : E ⊕ E → G) :
-    coverHashimoto K a b σ * fourier (E ⊕ E) ψ =
-      fourier (E ⊕ E) ψ * Matrix.blockDiagonal fun k =>
+theorem coverHashimoto_mul_charFrame (ψ : AddChar G K) (σ : E ⊕ E → G) :
+    coverHashimoto K a b σ * charFrame (E ⊕ E) ψ =
+      charFrame (E ⊕ E) ψ * Matrix.blockDiagonal fun k =>
         Matrix.diagonal (twist ψ σ k) * hashimoto K a b := by
   ext ⟨d, s⟩ ⟨f, k⟩
   rw [Matrix.mul_apply, Matrix.mul_apply, Fintype.sum_prod_type, Fintype.sum_prod_type]
-  simp only [fourier, Matrix.kroneckerMap_apply, charTable, Matrix.of_apply, Matrix.one_apply,
+  simp only [charFrame, Matrix.kroneckerMap_apply, charTable, Matrix.of_apply, Matrix.one_apply,
     Matrix.blockDiagonal_apply, coverHashimoto, Matrix.diagonal_mul, hashimoto_apply, twist,
     ite_mul, one_mul, zero_mul, mul_ite, mul_zero, ite_and]
   simp only [Finset.sum_ite_irrel, Finset.sum_ite_eq', Finset.mem_univ, if_true,
@@ -185,16 +228,16 @@ omit [Fintype V] in
 /-- [proved-derived; formal-checked] **The intertwining.**  The frame change carries `1 − u B_Y` to
 the block diagonal of the twisted operators:
 `(1 − u B_Y) · W = W · blockDiag (k ↦ 1 − u · diag (twist k) · B)`.  No division is used. -/
-theorem cover_mul_fourier (ψ : AddChar G K) (σ : E ⊕ E → G) (u : K) :
-    (1 - u • coverHashimoto K a b σ) * fourier (E ⊕ E) ψ =
-      fourier (E ⊕ E) ψ * Matrix.blockDiagonal fun k =>
+theorem cover_mul_charFrame (ψ : AddChar G K) (σ : E ⊕ E → G) (u : K) :
+    (1 - u • coverHashimoto K a b σ) * charFrame (E ⊕ E) ψ =
+      charFrame (E ⊕ E) ψ * Matrix.blockDiagonal fun k =>
         (1 - u • (Matrix.diagonal (twist ψ σ k) * hashimoto K a b)) := by
   have hbd : (Matrix.blockDiagonal fun k =>
       (1 - u • (Matrix.diagonal (twist ψ σ k) * hashimoto K a b))) =
       1 - u • Matrix.blockDiagonal fun k => Matrix.diagonal (twist ψ σ k) * hashimoto K a b := by
     rw [← Matrix.blockDiagonal_smul, ← Matrix.blockDiagonal_one, ← Matrix.blockDiagonal_sub]
     rfl
-  rw [hbd, Matrix.sub_mul, Matrix.one_mul, Matrix.smul_mul, coverHashimoto_mul_fourier,
+  rw [hbd, Matrix.sub_mul, Matrix.one_mul, Matrix.smul_mul, coverHashimoto_mul_charFrame,
     Matrix.mul_sub, Matrix.mul_one, Matrix.mul_smul]
 
 omit [Fintype V] in
@@ -214,8 +257,8 @@ theorem artin_abelian_cover [IsDomain K] {ψ : AddChar G K} (hψ : ψ.IsPrimitiv
     (hG : (Fintype.card G : K) ≠ 0) (σ : E ⊕ E → G) (u : K) :
     (1 - u • coverHashimoto K a b σ).det =
       ∏ k, (1 - u • hashimotoC a b (twist ψ σ k)).det := by
-  have hW := fourier_det_ne_zero (E ⊕ E) hψ hG
-  have h := congrArg Matrix.det (cover_mul_fourier a b ψ σ u)
+  have hW := charFrame_det_ne_zero (E ⊕ E) hψ hG
+  have h := congrArg Matrix.det (cover_mul_charFrame a b ψ σ u)
   rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_blockDiagonal, mul_comm] at h
   refine (mul_left_cancel₀ hW h).trans ?_
   exact Finset.prod_congr rfl fun k _ => det_one_sub_diagonal_mul_hashimoto a b _ u
@@ -473,9 +516,12 @@ end Cycle
 section Audit
 
 #print axioms charTableInv_mul_charTable
-#print axioms fourier_det_ne_zero
-#print axioms coverHashimoto_mul_fourier
-#print axioms cover_mul_fourier
+#print axioms charFrame_det_ne_zero
+#print axioms charTable_mul_charTableInv
+#print axioms charFrameInv_mul_charFrame
+#print axioms charFrame_mul_charFrameInv
+#print axioms coverHashimoto_mul_charFrame
+#print axioms cover_mul_charFrame
 #print axioms artin_abelian_cover
 #print axioms twist_connection
 #print axioms artin_abelian_cover_ihara_bass

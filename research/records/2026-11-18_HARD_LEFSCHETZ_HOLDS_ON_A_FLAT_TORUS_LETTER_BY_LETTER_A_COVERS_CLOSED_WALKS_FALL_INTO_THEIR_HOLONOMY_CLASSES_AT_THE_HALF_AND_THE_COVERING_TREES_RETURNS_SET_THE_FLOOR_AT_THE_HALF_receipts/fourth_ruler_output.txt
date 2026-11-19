@@ -1,0 +1,17 @@
+A. The Kahler triple of a flat torus
+  n=1: 4^n = 4 words, triple laws in integers, least singular value of L^k / k! = 1.000000, 1.000000
+  n=2: 4^n = 16 words, triple laws in integers, least singular value of L^k / k! = 1.000000, 1.000000, 1.000000
+  n=3: 4^n = 64 words, triple laws in integers, least singular value of L^k / k! = 1.000000, 1.000000, 1.000000, 1.000000
+  n=4: 4^n = 256 words, triple laws in integers, least singular value of L^k / k! = 1.000000, 1.000000, 1.000000, 1.000000, 1.000000
+  planted H = degree: [H, U] = +2U, not -2U (seen)
+B. Closed walks of an abelian cover by holonomy class
+  base |V|=2 |E|=4: identity, total and deviation bound at m = 2, 3, 5, lengths 3 to 6
+  base |V|=3 |E|=5: identity, total and deviation bound at m = 2, 3, 5, lengths 3 to 6
+  base |V|=4 |E|=6: identity, total and deviation bound at m = 2, 3, 5, lengths 3 to 6
+  planted characters of order m + 1 (not characters of Z/m): the identity misses by 425.469 (seen)
+C. The floor from the covering tree's walks
+  n=30 d=4: least (A^2k)_vv / (C_k q^k) over k <= 8 is 1.333; second mode 3.346 against 2 sqrt q = 3.464
+  n=50 d=6: least (A^2k)_vv / (C_k q^k) over k <= 8 is 1.200; second mode 4.526 against 2 sqrt q = 4.472
+  n=64 d=4: least (A^2k)_vv / (C_k q^k) over k <= 8 is 1.333; second mode 3.476 against 2 sqrt q = 3.464
+  Petersen: 15 closed walks of length 4 at every cell, the tree's count; C_2 q^2 = 8; planted C_2 (q+1)^2 = 18 fails (seen)
+all sections pass; 0.2 s
