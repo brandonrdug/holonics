@@ -212,7 +212,7 @@ quadrance is `|r_a e^{iα}−r_b e^{iβ}|²+(b_a s−b_b t+c)²`, the periodic a
 together; a general pair reads both through the same `Δ` with its axis offset and inclination.
 `RationalPhase` carries a rational Cayley half-angle and `extra_turns`; its coordinate is
 not a rational turn rate. `lifted_winding` and `closes_after` check a supplied finite period,
-which a general rational Cayley point need not possess. Order and distance along a source passage are read through the advance, not
+which a rational Cayley point has only at `q ∈ {0, ±1}` (`HolonicsResearch/Geometry/CayleyTurnClock`). Order and distance along a source passage are read through the advance, not
 through a separate site per occurrence.
 
 [proved-derived; formal-checked] **Phase-carried material.** In any group, fixed material `P`
@@ -301,7 +301,7 @@ the action and metric needed for each extension.
 | Required relation | Existing owner and consuming use |
 |---|---|
 | Phase closure, windings and arithmetic landmarks | `LandmarksAndModuli`, `Farey`, `Polarity`, the retired [`winding_inertia`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/winding_inertia.rs); period/modulus and doubled-angle relations already connect finite navigators to algebraic faces |
-| π/e as normalized generating constraints | `PiIterationConstraint`, `Compression/Landmark/ConstraintIdentity`, the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
+| π/e as normalized generating constraints | `PiIterationConstraint`, `Compression/Landmark/ConstraintIdentity`, `Mathematics/ConstantNavigators` (the atanh, exponential and `cis` enclosures with their named remainders, and the continued-fraction word an enclosure shares), the retired [`exact_analysis`](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/geometry/exact_analysis.rs); [September 11 recovery](../research/records/2026-09-11_PI_AND_E_CONSTRAINT_IDENTITIES_HAVE_ORIENTED_GENERATOR_FACES.md) retains branch, winding, independent navigators and remainder |
 | Named critical parameter | The actual `CopsonDeBruijn*` or `Zeta/DeBruijn*` source family; [the maintained distinction](CONSTRAINT_MODES_AND_RECEIVER_FACES.md) prevents conflating the two constants |
 | Inferred navigator/factor family | `NavigatorInference`, `NavigatorFactorization`, `NavigatorObservationScope`, `holonics::ratio::linear` factor owners (retired at [`d5ed4adc1`](https://github.com/brandonrdug/holonics/blob/d5ed4adc1/crates/holonics/src/ratio/linear.rs); the bilinear owner is [history](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/bilinear.rs)); supplied navigators and inferred parameters are stated separately |
 | Lossless continuation at the admitted receivers | `ReceiverHistoryCompression`, `NavigatorModeQuotient`, `JointReceiverDescent`, the retired [receiver factorization](https://github.com/brandonrdug/holonics/blob/551d6c5d/crates/holonics/src/exact_linear/contextual.rs); preserve `E T_g=U_g E` and the decoder, not merely a present rank |

@@ -43,8 +43,13 @@ stationary spacetime, the loop reading of Einstein synchronization as the flux o
 rotating and Lense–Thirring circles, is `HolonicsResearch/Physics/Spacetime/FrameDraggingClock`
 (`Spacetime/NonClosedClock` says which).
 
-[open] Owed in #410: a nontrivial continuum Einstein realization (Lorentzian metric, connection,
-curvature and a fluid-plus-thermal constitution); the weak static limit `R₀₀ = ∇²Φ`; the Regge
-construction of the discrete Einstein side (`G` the boundary of the moment of rotation of a
-simplicial metric); the relativistic (finite-speed) heat law of the thermal port.
+A continuum Einstein realization, the spatially flat Friedmann–Lemaître–Robertson–Walker metric
+with a perfect fluid and its Stefan–Boltzmann bath solving `G + Λg = κT`, is
+`HolonicsResearch/Physics/Spacetime/FriedmannFluid`, and the weak static limit `R₀₀ = ∇²Φ` is
+`HolonicsResearch/Physics/Spacetime/CurvatureJets`.
+
+[open] Owed in #410: the Regge construction of the discrete Einstein side (`G` the boundary of the
+moment of rotation of a simplicial metric). The relativistic (finite-speed) heat law of the thermal
+port, read on modes with its causality condition `D ≤ τc²`, and Tolman–Ehrenfest's equilibrium from
+Eckart's heat flux in a static field stand in `HolonicsResearch/Physics/Thermal/RelativisticHeat`.
 -/

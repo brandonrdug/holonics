@@ -52,7 +52,8 @@ yet their efforts differ, so no function of the scalar returns the effort
 (`equal_face_different_effort`, through `InformationDifference.no_current_factor_of_equal_crossEntropy`).
 
 The phase face of the covector (direction and winding, `InformationDifference.liftedCrossEntropy`)
-is not consumed by this port; it is retained for a port that receives phase.
+is not consumed by this port; a ring port that receives it, with the two ports read from one
+`R⁻¹dR`, stands in `HolonicsResearch/Physics/InformationPort`.
 -/
 
 noncomputable section

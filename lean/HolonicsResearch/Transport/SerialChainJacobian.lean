@@ -120,7 +120,8 @@ its inverse reading `vee`, the axis quadrance `n = u·u`, the chart denominator 
 
 What is not claimed. No exponential of a twist is identified with a finite chart. The product
 `C(s) C(t)` at `nst = 1`, where the half-angle sum leaves the finite chart, is not stated, and the
-lifted winding (the Rust `RationalPhase`'s `extra_turns`) is not carried here. The prismatic and general
+lifted winding (the Rust `RationalPhase`'s `extra_turns`) is carried on the plane of one turn in
+`Geometry/CayleyTurnClock`, not here. The prismatic and general
 screw joints' rows are not stated beyond the general `spatial_column`. The box's "configuration,
 rate, storage and current chart maps at the HNN consumer" are not found in the tree and stay
 owed; the pair-rate congruence `faceForm (J C) = Cᵀ faceForm J C` is already

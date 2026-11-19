@@ -23,7 +23,7 @@ viscous stress negatively. No coefficient is chosen here: every entry is the K3 
 
 * **Symmetry and the perfect-fluid face.** `T` is symmetric (`sourceMap_symmetric`), its rest
   observer reads `ε` (`sourceMap_restReading`, through `restObserver_contraction_eq_density`), and
-  without viscosity or heat flux it is exactly the owner's `perfectFluidTensor ε p`
+  without viscosity or heat flux it is the owner's `perfectFluidTensor ε p`
   (`sourceMap_perfect`). Its spatial trace is `3p − (2μ + 3λ) tr G`, the bulk-viscous pressure
   (`sourceMap_spatialTrace`).
 * **A boosted observer mixes energy, heat and stress.** The owner's boosted observer
@@ -43,7 +43,8 @@ viscous stress negatively. No coefficient is chosen here: every entry is the K3 
   (`sourceMap_traceReversed`), `(ε + 3p)/2` on the perfect fluid and `ε/2` on dust. So at
   `κ = 8πG` a dust source has `R₀₀ = 4πGρ` (`dust_newtonian_source`), and the source map has
   `R₀₀ = 4πG(ε + 3p − (2μ + 3λ) tr G)` (`sourceMap_newtonian_source`). [proved-standard] In the weak
-  static field `R₀₀ = ∇²Φ`, so this is Poisson's `∇²Φ = 4πGρ`; that limit is not formalized here.
+  static field `R₀₀ = ∇²Φ`, so this is Poisson's `∇²Φ = 4πGρ`; that limit, at first order in the
+  perturbation, is `HolonicsResearch/Physics/Spacetime/CurvatureJets` (`weakField_poisson`).
 * **The observer's deformation term is the K3 heat port.** The spatial block contracted with the
   velocity gradient is `p tr G − Φ` (`sourceMap_spatialPower`, from `stress_power_split`). For the
   comoving receiver `u_ν = (−1, 0, 0, 0)` with `∂ᵢu_ⱼ = Gⱼᵢ`, the divergence of its current
@@ -147,7 +148,7 @@ theorem sourceMap_restReading (s : ConstitutedState) :
   rfl
 
 /-- [proved-derived; formal-checked] **The perfect-fluid face.** Without viscosity or heat flux
-the source map is exactly the owner's `perfectFluidTensor ε p`. -/
+the source map is the owner's `perfectFluidTensor ε p`. -/
 theorem sourceMap_perfect (s : ConstitutedState) (hμ : s.shear = 0) (hbulk : s.bulk = 0)
     (hq : s.heatFlux = 0) :
     sourceMap s = perfectFluidTensor (s.energyDensity : ℝ) (s.pressure : ℝ) := by

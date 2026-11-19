@@ -18,16 +18,16 @@ intervals — the holes — of a compact subset of an interval.  Each hole is th
 ring of circumference `2ℓ_j`; its Dirichlet modes are that ring's reflection-reversing modes, whose
 windings `k = 1, 2, …` sound at the normalized frequencies `k·ℓ_j⁻¹`.
 
-This file owns the exact counting and zeta laws of that object.
+This file owns the counting and zeta laws of that object.
 
 * **The two counts.**  At scale `x` a receiver counts the holes of length at least `1/x`
   (`geometricCount`, the holes' face) and the harmonics of frequency at most `x` (`spectralCount`,
   what the receiver hears).  An infinite string has only finitely many holes of length at least
   `1/x`, so every count of it at scale `x` is the count of a finite family `J`; no infinite-string
   construction enters.
-* **Hearing is exact** (`spectralCount_eq_sum_geometricCount`): `N_ν(x) = Σ_(k≥1) N_ℒ(x/k)`, the
+* **Hearing is an identity** (`spectralCount_eq_sum_geometricCount`): `N_ν(x) = Σ_(k≥1) N_ℒ(x/k)`, the
   geometric count carried round every winding.
-* **Listening is exact** (`geometricCount_eq_sum_moebius_spectralCount`):
+* **Listening is an identity** (`geometricCount_eq_sum_moebius_spectralCount`):
   `N_ℒ(x) = Σ_(k≥1) μ(k)·N_ν(x/k)`.  Division by ζ is Möbius inversion, `1/ζ = Σ μ(n)·n^(−s)`, here
   in its finite real-variable form (`sum_moebius_smul_sum_mul`).
 * **Hearing multiplies by ζ** (`spectralZeta_eq_riemannZeta_mul_geometricZeta`):
@@ -61,7 +61,10 @@ This file owns the exact counting and zeta laws of that object.
   with `D = log 2/log 3` (`cantor_complex_dimensions`, `cantor_moran_dimension`). They are the
   zeros of the transfer determinant of the two-hand return map `[2]` at `T = 3^(−s)`
   (`cantor_transfer_determinant`, `cantor_complex_dimensions_transfer`), the same determinant whose
-  reciprocal is that return map's dynamical zeta (`cantor_returnMap_zeta`).
+  reciprocal is that return map's dynamical zeta (`cantor_returnMap_zeta`). Its tube volume
+  scales as `ε^(1−D)`, and its normalized tube volume oscillates with period `log 3` between two
+  Minkowski contents, so the string has dimension `D` and no content
+  (`HolonicsResearch/Foundation/FractalStringTube`).
 
 **Winding-guide objects touched.**  The helix: a hole's harmonics are its windings and hearing sums
 the geometric count over them.  Faces and placement: the geometric zeta is the holes' face, and a
@@ -69,8 +72,8 @@ complex dimension is a dilation exponent `D` plus a rotation of period `2π/log 
 The tower thread: the self-similar restriction of `FractalPacking`, one level per hand.  The pair,
 cell holonomy and tube stay attached and are not used here.
 
-Every count is an exact natural number and every identity is exact; the reals are Lean's exact
-reals, and `ζ` enters only through its Dirichlet series on `Re s > 1`.
+Every count is a natural number and every identity holds in Lean's reals, and `ζ` enters only
+through its Dirichlet series on `Re s > 1`.
 -/
 
 namespace Holonics.Foundation.FractalString
@@ -126,7 +129,7 @@ theorem spectralCount_eq_card_pairs (J : Finset ι) (ℓ : ι → ℝ) {x : ℝ}
   refine sum_congr rfl fun j hj => ?_
   rw [floor_eq_card_windings (hK j hj), card_filter]
 
-/-- [proved-derived; formal-checked] **Hearing is exact.**  For any window `K` with
+/-- [proved-derived; formal-checked] **Hearing is an identity.**  For any window `K` with
 `x·ℓ_j < K + 1` on `J`, `N_ν(x) = Σ_(k=1)^K N_ℒ(x/k)`: the `k`-th harmonic of hole `j` sounds at
 or below `x` exactly when hole `j` is at least `1/(x/k)` long, so the spectrum is the geometric
 count carried round every winding.  Neither the sign of `x` nor of the lengths is needed. -/
@@ -229,10 +232,10 @@ theorem sum_moebius_smul_sum_mul {R : Type*} [AddCommGroup R] (K : ℕ) (f : ℕ
         · rfl
         · exact (hf 1 (by simp at h; omega)).symm
 
-/-- [proved-derived; formal-checked] **Listening is exact.**  For any window `K` with
+/-- [proved-derived; formal-checked] **Listening is an identity.**  For any window `K` with
 `x·ℓ_j < K + 1` on `J`, `N_ℒ(x) = Σ_(k=1)^K μ(k)·N_ν(x/k)`.  At full resolution the geometric count,
 hence the length multiset (not the placement), is recovered exactly by finite Möbius inversion:
-division by ζ.  The exact count has no nullity on the length multiset; every coarser receiver,
+division by ζ.  The full count has no nullity on the length multiset; every coarser receiver,
 asymptotic or finite-resolution, has its own kernel. -/
 theorem geometricCount_eq_sum_moebius_spectralCount (J : Finset ι) (ℓ : ι → ℝ) {x : ℝ} {K : ℕ}
     (hK : ∀ j ∈ J, x * ℓ j < K + 1) :

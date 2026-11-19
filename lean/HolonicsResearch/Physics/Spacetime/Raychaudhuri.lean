@@ -98,12 +98,14 @@ field of characteristic zero; items 2 and 3, the rates of item 4, and item 5 ove
    `Physics/Spacetime/StressEnergy` on a perfect sector, taken here as a hypothesis), `−tr R` is
    that sector's `expansionContribution`.
 
-What is not claimed. Petrov's classification (the eigenvalue types of `E + iH`) is not stated. The
-deviation equation is a hypothesis: neither `J″ = −RJ` nor `R_ij = R_(i a j b) u^a u^b` is derived
-from a Lorentzian metric and its connection, and the tidal matrix's symmetry is assumed where it is
-used. No `C` with the curvature symmetries is built from a metric, no nonzero instance of
-`WeylSymmetries` is exhibited, and that the vacuum's tidal matrix is `E` (Riemann is Weyl where the
-Ricci tensor vanishes) is read, not derived. The null (Sachs) form, with its two-dimensional screen and
+What is not claimed. Petrov's classification (the eigenvalue types of `E + iH`) is stated in `PetrovTypes`. The
+deviation equation is a hypothesis here; `GeodesicDeviation` derives `J″ = −RJ` for the frame
+components of a family of geodesics of any torsion-free connection, with `R = E⁻¹R(·, u)u E` in a
+parallel frame, and meets this premise. The reduction to the screen orthogonal to a timelike `u` and
+the tidal matrix's symmetry from metric compatibility are not derived, and that symmetry is assumed
+where it is used. A `C` with the curvature symmetries built from a metric's 2-jet, the first nonzero instance of
+`WeylSymmetries` (a plane wave), and the vacuum's tidal matrix as `E` stand in `CurvatureJets`, at
+one point; here they are read, not derived. The null (Sachs) form, with its two-dimensional screen and
 `−θ²/2`, is not stated; nor is an accelerated congruence. A caustic is not exhibited as a point
 of a manifold: the statement is that no solution with `θ` negative on `[0, T]` exists past
 `n/|θ₀|`. That `ω` vanishing at one instant vanishes along the congruence needs uniqueness for the

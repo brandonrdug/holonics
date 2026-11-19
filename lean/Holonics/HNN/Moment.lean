@@ -57,7 +57,9 @@ every period is at least `2`, `carryIn_le_one`). On a closing ring (`P^d = 1`) t
    ∏_(δ∈Δ) C(n − δ + d_g|A|² − 1, d_g|A|² − 1)]` values; where `N(n) < |A|^n` the source → state
    map on `A^n` is not injective (`moment_capacity`), and once that holds at a crossover `n*` past
    `max Δ` it holds at every later `n`, because `N` is log-concave there
-   (`capacityBound_logConcave`, `capacity_persists`).
+   (`capacityBound_logConcave`, `capacity_persists`). Across aeons and re-keys each lift factor
+   widens to `d_g(n + 1)`, and the count, the pigeonhole and the crossover's persistence hold with
+   it (`HolonicsResearch/HNN/RekeyedCapacity`).
 6. **The directed-contrast law** moved from the retired `Transport/GeneratorSourceEpisode`
    (review B5, F6): kinds and multiplicity are kept (`pooledContrast_zero_of_absent_kind`,
    `repeated_contact_doubles_its_contrast`), and the pullback is the genuine incidence adjoint of

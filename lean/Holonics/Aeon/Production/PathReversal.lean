@@ -68,7 +68,8 @@ The converse of Kolmogorov's criterion (every cycle's ratio product one ⇒ deta
 read along a spanning tree) is proved in the ratio chart in `HolonicsResearch`
 (`Aeon/Production/Kolmogorov`), which is not imported here. Scope: finite state spaces; the
 positivity and support hypotheses are stated where used.
-The continuous-time and port-Hamiltonian forms of production (`⟨Jv, DJv⟩/T`) are not treated here.
+The continuous-time and port-Hamiltonian forms of production (`⟨Jv, DJv⟩/T`) stand in
+`HolonicsResearch/Aeon/Production/PortHamiltonian`.
 No `axiom`, no `sorry`.
 -/
 

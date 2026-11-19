@@ -11,7 +11,7 @@ identical futures (`constitution_is_not_minimal`). This module finds the minimal
 
 [proved-derived; formal-checked] What is proved.
 
-1. **The exact future-agreement relation on the parallel pair.** Under the square law
+1. **The future-agreement relation on the parallel pair.** Under the square law
    `Γ_e = j_e²`, two presents have identical admitted futures, for every solver, **iff** their
    constitutions are equal or both symmetric (`parallel_futureAgreement_iff`). The separation is
    explicit: unequal shares `Θ₀/(Θ₀+Θ₁)` are separated by one unit source; equal shares `r ≠ 1/2`
@@ -32,7 +32,12 @@ identical futures (`constitution_is_not_minimal`). This module finds the minimal
    (`projective_class_is_not_a_retention`), because the square law does not commute with scaling.
 
 [open] The minimal retention for the square law on a general weighted graph (the orbit structure
-of deposition on projective classes beyond two parallel edges), and for other deposition laws.
+of deposition beyond the families `HolonicsResearch/Objects/RetentionClasses` computes: every
+forest, where it is a point under every law; the `m`-edge parallel bundle, where the square law
+keeps every constitution but the uniform class and the Joule law keeps the projective class; the
+bundle with a pendant edge, whose pendant is forgotten) and `HolonicsResearch/Objects/RetentionSeries`
+computes (two bundles in series, the product of their classes; the triangle, where the
+constitution is minimal), and for other deposition laws.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/

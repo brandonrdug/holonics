@@ -39,8 +39,8 @@ The two terms are the infinitesimal forms of the first law of learning
 (`Aeon/Production/FirstLaw.exchange`, `deposition`): `−Σ ṗ log q` is the source's exchange through
 the unchanged receiver, `−Σ p q̇/q` the receiver's deposition at the arrived source.
 
-Scope: fixed finite support with positive masses. A moving support needs a one-sided or measure
-transport, owed (#62).
+Scope: fixed finite support with positive masses. A moving support, read by transport on edges
+with an entrance's one-sided rates, stands in `HolonicsResearch/Physics/InformationPort`.
 -/
 
 noncomputable section

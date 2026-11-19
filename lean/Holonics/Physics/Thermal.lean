@@ -13,7 +13,7 @@ contract, "Physical instances" (`thermal exchange/diffuse/entropy_production`). 
 `holonics::physics::thermal`.
 
 - `Thermal/Exchange`: two cells under the caloric law `U = CT` with a Fourier contact: the first
-  law of a tick, the exact production rate `κ(T₁ − T₂)²/(T₁T₂) ≥ 0`, and the tick's entropy
+  law of a tick, the rational production rate `κ(T₁ − T₂)²/(T₁T₂) ≥ 0`, and the tick's entropy
   enclosed by two rational Clausius readings, nonnegative under the tick condition.
 - `Thermal/ViscousPort`: the fluid's viscous-work port: the fluid control volume produces the
   admitted work (`ViscousWork.ofFluid`, `cell_port_join`), which enters internal energy through
@@ -38,5 +38,7 @@ contract, "Physical instances" (`thermal exchange/diffuse/entropy_production`). 
 
 The retired `holonics-cuda` diffusion receipt: its energy balance is carried by
 `Thermal/Exchange.first_law` (two cells); many-cell diffusion, with a chain's rates read as heat, is
-`HolonicsResearch/Physics/Thermal/ManyCell`.
+`HolonicsResearch/Physics/Thermal/ManyCell`. A cell against a bath at real heats and temperatures,
+the finite-speed (Cattaneo–Vernotte) heat law on modes and Tolman–Ehrenfest's equilibrium from
+Eckart's heat flux are `HolonicsResearch/Physics/Thermal/RelativisticHeat`.
 -/
