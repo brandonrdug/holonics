@@ -144,7 +144,7 @@ pub(crate) struct Tick<'c> {
     /// [theory, November 11 17:25 and November 12 (G98)] The carry circles' charts' reads `q`, `ℓ` `[t][2C]`, their gate `γ` `[t][2C]`, the scan's operand
     /// `[t][2C]` and the coupled drive `κ b` `[t][2C]` (one slot each without them).
     pub(crate) pg: Pooled<'c, i64>,
-    pub(crate) pgam: Pooled<'c, i64>,
+    pub(crate) pgam: Pooled<'c, i32>,
     pub(crate) pqm: Pooled<'c, i64>,
     pub(crate) pkb: Pooled<'c, i64>,
     pub(crate) pb: Pooled<'c, i64>,
@@ -211,7 +211,7 @@ impl<'c> Resident<'c> {
             scale2: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
             pa: alloc64(sites * f)?,
             pg: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
-            pgam: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+            pgam: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
             pqm: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pkb: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pb: alloc64(sites * f)?,
