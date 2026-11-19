@@ -1338,3 +1338,6 @@ import HolonicsResearch.HNN.RestitutionFamily
 import HolonicsResearch.Transport.InformationSpectroscopy
 import HolonicsResearch.Holon.SheafLaplacian
 import HolonicsResearch.HNN.LossPhase
+import HolonicsResearch.Hodge.TorusLefschetzTriple
+import HolonicsResearch.Landmarks.IharaCoverChebotarev
+import HolonicsResearch.Landmarks.TreeWalkFloor

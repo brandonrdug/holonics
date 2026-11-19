@@ -1,6 +1,6 @@
 # Hard Lefschetz holds on a flat torus letter by letter, a cover's closed walks fall into their holonomy classes at the half, and the covering tree's returns set the floor at the half
 
-November 18, 2026, 23:44 UTC, to November 19, 00:40 UTC. Derivations with their Lean proofs and a host ruler, the
+November 18, 2026, 23:44 UTC, to November 19, 00:16 UTC. Derivations with their Lean proofs and a host ruler, the
 fourth set of the evening. Nothing ran on a learner or on the card, and no line was touched. Each paragraph carries
 its grade: `tree` (read in this repository), `from training` (a result of the literature, named) or `agent-inferred`
 (this record's join). A statement cited as Lean names its module and theorem; every such module builds with no
@@ -219,7 +219,8 @@ Mathlib's `fourier` on the additive circle, and it now holds the second side of 
 `Hodge/LefschetzFromPositivity` (its first instance now points to `TorusLefschetzTriple.torusTriple`) gain pointers.
 Where it was checked: in this thread's cloud container with the project's pinned toolchain and Mathlib's cached build,
 each file by `lake env lean`, and the three with the four changed modules by `bash tools/lean_check.sh` on their module
-names (gate 4, §7.4). The root `HolonicsResearch.lean` gains the three imports.
+names (gate 4: 8,740 jobs, exit 0, 00:12:40 to 00:13:11 UTC on November 19, after a merge of `main`). The census
+(`tools/lean_census.py`) reads no unbuilt and no unrooted module. The root `HolonicsResearch.lean` gains the three imports.
 
 **7.2 Atlas.** Three rows enter: `hodge.torus-kahler-triple` (targets; an instance of
 `hodge.hard-lefschetz-positivity`), `trace.cover-holonomy-equidistribution` and `trace.tree-walk-floor` (geometry).
