@@ -731,3 +731,8 @@ MEAN.3000 by the line's reads, writes first.
   section against the pumped width-128 line's 726 there (1.13 times). By the rule's own reading, a gain a lap set against the line's own
   lap gain (0.0023) in the time the lane costs (0.13 of a lap, 0.0003): the first lap's -0.0013 is a level; whether the lane buys a gain
   a lap is read on the second lap, W61 beside L61, before the line takes it.
+  The second lap (09:47 UTC; lane/laneread2.sh). W61 less L61, paired: rows S -0.0022 (±0.0005), one place open -0.0047 (±0.0005), the
+  frontier under the law -0.0071 (±0.0006): the gap grows by 0.0009 a lap on rows S and 0.0033 on one place open, three times the 0.0003
+  the line's own lap buys in the time the lane costs. Wide panel 1,597 of 2,206 (72.4%) against L61's 1,623 of 2,198 (73.8%), loops 20
+  against 19; pairs attested 0.323 against 0.341; both within the bounds. The A100 ran W61 at 822.8 ms a section. The line takes the
+  lane from the arm's third lap W62 (trained on the A100 from W61's end beside L62) and continues from W62's end on the PC.
