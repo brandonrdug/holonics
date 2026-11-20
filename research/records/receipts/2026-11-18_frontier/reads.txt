@@ -1534,3 +1534,9 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   read: the lane buys a level in its first lap and a gain a lap in its second; the writes stand where they stood. The line takes it from W62.
 
 # 09:55 UTC November 20. The A100 session `lane` (standard shape, 40 GB) was reclaimed by Colab near 09:50 UTC with the arm's third lap W62 about 42 minutes into its 3,000 sections; its files went with it (W60's and W61's states had been downloaded and their reads taken). 83.37 units at 22:51 UTC November 19 stood at 53.35 at 09:52 UTC November 20. The line takes the lane from W61's end on the PC instead: its lap W62 trains here (front/line62w.sh, lanebin/athena) beside L62 (width 128, from L61's end, the same sections); the width-128 chain's L63, started at 09:52:57, was stopped and set aside (arm_L63_unlaned_aside). A new session (`lane2`, standard A100) takes the second lane's arm G-1120-2 from W62's end.
+
+# 10:36 UTC November 20. The line's first lap at width 160 on the PC, W62 from W61's end (front/line62w.sh, lanebin/athena), against L62 at width 128 from L61's end, both at MEAN.3000:
+  W62 less L62, paired: rows S 1.3566, -0.0062 (±0.0005) | one place open 0.7074, -0.0082 (±0.0006) | the frontier 1.8744, -0.0102 (±0.0007)
+  wide panel W62 1577/2194 (71.9%), loops 24 of 160 (L62 1540/2158, 71.4%, loops 21); long panel W62 274 words, 188 in lexicon (68%)
+  the PC's card at width 160: 491.8 ms a section on the mean over W62's first 2,104 sections, 697 at most (the pumped width 128, 442.9 and 589 on L53): 1.11 times
+  read: the lane's gap over the line at width 128 grows lap by lap, -0.0013, -0.0022, -0.0062 on rows S over its three laps (W60 and W61 on the A100, W62 on the PC); the writes stand at 71% to 72%.
