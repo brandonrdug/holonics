@@ -1510,3 +1510,10 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   L49 pairs 2163 attested 0.301, triples 2005 attested 0.066 | P49 pairs 2274 attested 0.336, triples 2115 attested 0.079
   the reference continuations' first 96 octets: pairs 1960 attested 0.490, triples 1800 attested 0.249
   read: no change the panel's draws resolve: the unpumped laps move 0.028 between L48 and L49 on the same measure, the pumped ones as far either way. Her words compose at two thirds of the reference's pair rate and a third of its triple rate.
+
+# 03:33 UTC November 20. The pumped line's laps L50 to L53 on the PC from P49's end (front/line50.sh, the pump's build; 1,340 to 1,370 s a lap, L53 442.9 ms a section on the mean and 589 at most; the pump's sections cost the card about 14% over the unpumped L49's at the same sections, 463.9 against 406.3 ms on L50's first 118), each at its mean:
+  rows S (two streams): P48 1.3937, P49 1.3895, L50 1.3843, L51 1.3836, L52 1.3838, L53 1.3807 (the unpumped L47 1.4031 at a pass's end, L48 1.3954, L49 1.3931)
+  one place open: P48 0.7477, P49 0.7401, L50 0.7382, L51 0.7386, L52 0.7341, L53 0.7298
+  wide panel words in the lexicon: L50 1540/2179 (70%), L51 1588/2203 (72%), L52 1551/2206 (70%), L53 1520/2161 (70%); loops 20, 22, 21, 25 of 160
+  presence: the pump's rows at L51's end 0.1916 of the turn rows, L53's 0.2353
+  read: the pumped line falls about 0.002 nats a place a lap on rows S and 0.003 on one place open, as the unpumped line did before it, from the level the pump lowered; the pump's rows keep growing by about a fifth a lap; her words hold at 70% to 72%.
