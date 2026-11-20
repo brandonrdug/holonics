@@ -753,3 +753,8 @@ on the A100 beside the line's own lap L63 on the PC from the same state. One cha
   pairs attested 0.330 against 0.341: within the bounds. The A100 ran X63 at 856.3 ms a section (1,063 at most), 1.04 times width 160 there.
   By the rule, rows S within two standard errors: two more laps, X64 beside L64 (ended at the third pass's end, 2,885 sections, as L64)
   and X65 beside L65.
+  The second lap (13:15 UTC; lane/laneread4.sh, both at MEAN.2885, the third pass's end). X64 less L64, paired: rows S -0.0017 (±0.0004),
+  one place open -0.0031 (±0.0005), the frontier under the law -0.0057 (±0.0006): the gap grows by 0.0014 a lap on rows S and 0.0019 on one
+  place open, where the second lane costs the A100 1.04 times a section (0.0001 of the line's lap gain). Wide panel 1,588 of 2,212 (71.8%)
+  against L64's 1,586 of 2,211 (71.7%), loops 19 against 20; pairs attested 0.325 against 0.317. By G-1120-1's rule the line takes the
+  second lane from X65's end (the third lap, trained beside L65); X65's read against L65 is recorded when it lands.
