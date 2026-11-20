@@ -5538,3 +5538,252 @@ fn the_loudness_covector_matches_its_codes_difference() {
     eprintln!("LOUD_COVECTOR_PROBES read={read} on_a_seam={seams} loudness={loud_read}");
     assert!(read > 0 && 16 * seams <= read && loud_read > 0, "read {read} probes, {seams} on a seam, {loud_read} of the loudness");
 }
+
+/// The serial passes [`deposit_pass`] replaced (the section's deposit as it stood until November 20), the reference its bits are read against.
+#[allow(clippy::too_many_arguments)]
+fn deposit_serial(field: &Constitution, g: &[i128], first: &mut [i128], second: &mut [i128], rates: &[u32], remainder: Option<&mut [i64]>, last: Option<&HeldStep>, parts: &[u8]) -> DepositPass {
+    let raw = g.to_vec();
+    let mut g = g.to_vec();
+    let transfer = last.and_then(|s| predicted_change(field, &raw, &s.step, s.halvings));
+    let families = field.families_all();
+    let mut external_step = vec![0i128; g.len()];
+    for &(start, len, grain) in &families {
+        for k in start..start + len {
+            external_step[k] = deposit_step(first[k], second[k], grain, rates[k]);
+        }
+    }
+    let external = predicted_change(field, &raw, &external_step, 0);
+    for &(start, len, grain) in &families {
+        for v in &mut g[start..start + len] {
+            *v = on_step_grain(grain, *v);
+        }
+    }
+    for ((m, v), gv) in first.iter_mut().zip(second.iter_mut()).zip(&g) {
+        let square = gv.checked_mul(*gv).unwrap();
+        if *m == 0 && *v == 0 {
+            (*m, *v) = (*gv, square);
+        } else {
+            *m = toward(*m, *gv, FIRST_RATE);
+            *v = toward(*v, square, SECOND_RATE);
+        }
+    }
+    let mut step = vec![0i128; g.len()];
+    match remainder {
+        None => {
+            for &(start, len, grain) in &families {
+                for k in start..start + len {
+                    step[k] = deposit_step(first[k], second[k], grain, rates[k]);
+                }
+            }
+        }
+        Some(remainder) => {
+            for &(start, len, grain) in &families {
+                for k in start..start + len {
+                    let fine = deposit_step(first[k], second[k], grain + REMAINDER_BITS, rates[k]);
+                    let sum = i128::from(remainder[k]) + fine;
+                    let whole = sum >> REMAINDER_BITS;
+                    remainder[k] = (sum - (whole << REMAINDER_BITS)) as i64;
+                    step[k] = whole;
+                }
+            }
+        }
+    }
+    let predicted = predicted_change(field, &raw, &step, 0);
+    let parts = predicted_parts(field, &raw, &step, 0, parts);
+    DepositPass { step, transfer, external, predicted, parts }
+}
+
+/// [realization; the lead, November 20] **The deposit in one pass is the serial passes bit for bit**: on a grown learner (a lane and four new
+/// contacts, so the founded parts gather unlike entries) whose moments are open, with a covector drawn near the line's scale (some entries
+/// zero, so a coordinate opens), the one-pass deposit ([`deposit_pass`]) forms the same step, moments, carried remainders and four prices as
+/// the serial passes it replaced, with and without a step before to transfer and a remainder carried, and at entry rates that differ.
+#[test]
+fn the_deposit_in_one_pass_is_the_serial_passes_bit_for_bit() {
+    let learner = grown_learner();
+    let field = &learner.field;
+    let n = field.material_len();
+    let mut seed = 0x9e37_79b9_7f4a_7c15u64;
+    let mut draw = move |bits: u32| -> i128 {
+        seed ^= seed << 13;
+        seed ^= seed >> 7;
+        seed ^= seed << 17;
+        let v = (seed >> (64 - bits)) as i128;
+        if seed & 1 == 0 { -v } else { v }
+    };
+    let parts = learner.reading_parts();
+    assert!(parts.iter().any(|&p| p != OLD_PART), "the grown learner holds founded parts");
+    let mut read = 0;
+    for (with_last, with_remainder) in [(false, false), (true, false), (false, true), (true, true)] {
+        let g: Vec<i128> = (0..n).map(|k| if k % 11 == 3 { 0 } else { draw(44) }).collect();
+        let rates: Vec<u32> = (0..n).map(|k| 6 + (k % 5) as u32).collect();
+        let last = with_last.then(|| HeldStep { step: (0..n).map(|_| draw(20)).collect(), halvings: 1 });
+        let mut first = learner.first.clone();
+        let mut second = learner.second.clone();
+        for k in (0..n).step_by(17) {
+            (first[k], second[k]) = (0, 0);
+        }
+        let mut remainder: Vec<i64> = (0..n).map(|_| (draw(15) as i64).rem_euclid(1 << REMAINDER_BITS)).collect();
+        let (mut f1, mut s1, mut r1) = (first.clone(), second.clone(), remainder.clone());
+        let serial = deposit_serial(field, &g, &mut f1, &mut s1, &rates, with_remainder.then_some(&mut r1[..]), last.as_ref(), &parts);
+        let pass = deposit_pass(&field.families_all(), &g, &mut first, &mut second, &rates, with_remainder.then_some(&mut remainder[..]), last.as_ref(), &parts).unwrap();
+        assert_eq!(pass, serial, "last {with_last}, remainder {with_remainder}: the step and the prices");
+        assert_eq!((first, second), (f1, s1), "last {with_last}, remainder {with_remainder}: the moments");
+        assert_eq!(remainder, r1, "last {with_last}, remainder {with_remainder}: the remainders");
+        assert!(pass.predicted.is_some() && pass.external.is_some() && pass.parts.is_some() && pass.transfer.is_some() == with_last);
+        assert!(pass.step.iter().any(|&s| s != 0));
+        read += 1;
+    }
+    eprintln!("DEPOSIT_PASS entries={n} read={read}");
+    assert_eq!(read, 4);
+}
+
+/// [measurement; the lead, November 20] **The one-pass deposit on a line's saved state**: the learner at `DEPOSIT_STATE` (a store line's
+/// state), a covector drawn at the line's scale, the serial passes and the one pass each timed three times, every bit compared. A reading on
+/// the host; run with `DEPOSIT_STATE=… cargo test --release -p holonics-engine -- --ignored the_deposit_pass_on_a_lines_state`.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+fn the_deposit_pass_on_a_lines_state() {
+    let path = std::env::var("DEPOSIT_STATE").expect("DEPOSIT_STATE names a learner's saved state");
+    let learner = Learner::from_text(&std::fs::read_to_string(path).unwrap()).unwrap();
+    let field = &learner.field;
+    let n = field.material_len();
+    let mut seed = 0x2545_f491_4f6c_dd1du64;
+    let g: Vec<i128> = (0..n)
+        .map(|_| {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            let v = (seed >> 20) as i128;
+            if seed & 1 == 0 { -v } else { v }
+        })
+        .collect();
+    let rates = learner.entry_rates();
+    let parts = learner.reading_parts();
+    let families = field.families_all();
+    let last = HeldStep { step: learner.first.iter().map(|&m| m >> 40).collect(), halvings: 0 };
+    let (mut serial_us, mut pass_us) = (Vec::new(), Vec::new());
+    for _ in 0..3 {
+        let (mut f1, mut s1, mut r1) = (learner.first.clone(), learner.second.clone(), learner.remainder.clone());
+        let t = std::time::Instant::now();
+        let serial = deposit_serial(field, &g, &mut f1, &mut s1, &rates, r1.as_deref_mut(), Some(&last), &parts);
+        serial_us.push(t.elapsed().as_micros());
+        let (mut f2, mut s2, mut r2) = (learner.first.clone(), learner.second.clone(), learner.remainder.clone());
+        let t = std::time::Instant::now();
+        let pass = deposit_pass(&families, &g, &mut f2, &mut s2, &rates, r2.as_deref_mut(), Some(&last), &parts).unwrap();
+        pass_us.push(t.elapsed().as_micros());
+        assert_eq!(pass, serial);
+        assert_eq!((f1, s1, r1), (f2, s2, r2));
+    }
+    eprintln!("DEPOSIT_PASS_STATE entries={n} families={} remainder={} threads={} serial_us={serial_us:?} pass_us={pass_us:?}", families.len(), learner.remainder.is_some(), rayon::current_num_threads());
+}
+
+/// [measurement; the lead, November 20, the engineering report's item A5] **A census of the material's carriers**: on the learner at
+/// `DEPOSIT_STATE`, each family of the layout (start, entries, grain) with the bits its largest entry needs and the bits at which 50%, 99%
+/// and 99.9% of its entries stand (an entry's bits: the length of its magnitude, sign apart). A ruler on the host; no state changes. Run with
+/// `DEPOSIT_STATE=… cargo test --release -p holonics-engine -- --ignored a_census_of_the_materials_carriers --nocapture`.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+fn a_census_of_the_materials_carriers() {
+    let path = std::env::var("DEPOSIT_STATE").expect("DEPOSIT_STATE names a learner's saved state");
+    let learner = Learner::from_text(&std::fs::read_to_string(path).unwrap()).unwrap();
+    let field = &learner.field;
+    let l = field.layout();
+    let named = [("enc", l.enc), ("before", l.before), ("after", l.after), ("q", l.q), ("v", l.v), ("out", l.out), ("a", l.a), ("b", l.b), ("w", l.w), ("read", l.read), ("probe", l.probe), ("carry", l.carry), ("pump", l.pump), ("pace", l.pace), ("temper", l.temper), ("moment_before", l.moment_before), ("moment_after", l.moment_after), ("moment_face", l.moment_face)];
+    let theta: Vec<i32> = field.material().copied().collect();
+    let mut hist_all = [0u64; 33];
+    for &(start, len, grain) in &field.families_all() {
+        let mut hist = [0u64; 33];
+        for &v in &theta[start..start + len] {
+            hist[(32 - v.unsigned_abs().leading_zeros()) as usize] += 1;
+        }
+        for (a, h) in hist_all.iter_mut().zip(hist) {
+            *a += h;
+        }
+        let at = |milli: u64| {
+            let mut acc = 0u64;
+            (0..33).find(|&b| {
+                acc += hist[b];
+                1000 * acc >= milli * len as u64
+            }).unwrap_or(32)
+        };
+        let max = (0..33).rev().find(|&b| hist[b] > 0).unwrap_or(0);
+        let name = named.iter().filter(|(_, at)| *at <= start).max_by_key(|(_, at)| *at).map_or("-", |(n, _)| n);
+        eprintln!("CARRIER family_at={start} near={name} entries={len} grain={grain} max_bits={max} p50_bits={} p99_bits={} p999_bits={}", at(500), at(990), at(999));
+    }
+    let total: u64 = hist_all.iter().sum();
+    let mut acc = 0u64;
+    let cumulative: Vec<String> = (0..33).filter(|&b| hist_all[b] > 0).map(|b| {
+        acc += hist_all[b];
+        format!("{b}:{}/10000", acc * 10_000 / total)
+    }).collect();
+    eprintln!("CARRIER_ALL entries={total} cumulative_share_by_bits={}", cumulative.join(" "));
+}
+
+/// The bits each entry of `v` needs (its magnitude's length, sign apart): `(entries, max, p50, p99, p999)`.
+fn census_bits<T: Copy + Into<i128>>(v: &[T]) -> (usize, u32, u32, u32, u32) {
+    let mut hist = [0usize; 129];
+    for &x in v {
+        hist[(128 - x.into().unsigned_abs().leading_zeros()) as usize] += 1;
+    }
+    let n = v.len();
+    let at = |milli: usize| {
+        let mut acc = 0usize;
+        (0..129u32).find(|&b| {
+            acc += hist[b as usize];
+            1000 * acc >= milli * n
+        }).unwrap_or(128)
+    };
+    (n, (0..129u32).rev().find(|&b| hist[b as usize] > 0).unwrap_or(0), at(500), at(990), at(999))
+}
+
+/// [measurement; the lead, November 20, the engineering report's item A5, its operands] **A census of a pass's carriers**: the learner at
+/// `DEPOSIT_STATE` reads one region of `CARRIER_SITES` sites cut from `CARRIER_TEXT` through the codec `CARRIER_CODEC` over the units
+/// `CARRIER_UNITS`, about five places in eleven open, every tick kept; each carrier the card keeps a tick, the chart's read, the words, the
+/// current, the contacts' operands, the carry circles' and the pump's, with the bits its entries need (the length of a magnitude). A ruler on
+/// the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+fn a_census_of_a_passes_carriers() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let units = crate::units::Units::from_text(&std::fs::read_to_string(var("CARRIER_UNITS")).unwrap()).unwrap();
+    let codec = crate::codec::Codec::from_text(&std::fs::read_to_string(var("CARRIER_CODEC")).unwrap(), units).unwrap();
+    let sites: usize = var("CARRIER_SITES").parse().unwrap();
+    let text = std::fs::read(var("CARRIER_TEXT")).unwrap();
+    let mut classes = Vec::new();
+    for line in text.split(|&b| b == b'\n') {
+        let mut l = line.to_vec();
+        l.push(b'\n');
+        if let Ok(c) = codec.encode(&l) {
+            classes.extend(c);
+        }
+        if classes.len() >= sites {
+            break;
+        }
+    }
+    classes.truncate(sites);
+    let unresolved: Vec<bool> = (0..classes.len()).map(|t| (t * 7) % 11 < 5).collect();
+    let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+    let forward = learner.field.pass(&region, true).unwrap();
+    let show = |name: &str, c: (usize, u32, u32, u32, u32)| eprintln!("PASS_CARRIER {name} entries={} max_bits={} p50_bits={} p99_bits={} p999_bits={}", c.0, c.1, c.2, c.3, c.4);
+    show("read", census_bits(&forward.read));
+    show("scale", census_bits(&forward.scale));
+    show("lift", census_bits(&forward.lift));
+    show("moment", census_bits(&forward.moment));
+    for (k, tick) in forward.ticks.iter().enumerate() {
+        let named: [(&str, &[i64]); 17] = [("before", &tick.before), ("after", &tick.after), ("word", &tick.word), ("vword", &tick.vword), ("probe", &tick.probe), ("q", &tick.q), ("v", &tick.v), ("pq", &tick.pq), ("y", &tick.y), ("a", &tick.a), ("b", &tick.b), ("c", &tick.c), ("qh", &tick.qh), ("gam", &tick.gam), ("kb", &tick.kb), ("qm", &tick.qm), ("ph", &tick.ph)];
+        for (name, v) in named {
+            if !v.is_empty() {
+                show(&format!("tick{k}.{name}"), census_bits(v));
+            }
+        }
+        show(&format!("tick{k}.eta"), census_bits(&tick.eta));
+        show(&format!("tick{k}.read"), census_bits(&tick.read));
+        show(&format!("tick{k}.read2"), census_bits(&tick.read2));
+        show(&format!("tick{k}.scale"), census_bits(&tick.scale));
+    }
+    eprintln!("PASS_CARRIERS sites={} open={}", classes.len(), unresolved.iter().filter(|&&u| u).count());
+}

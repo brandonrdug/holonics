@@ -1,0 +1,226 @@
+diff --git a/crates/engine-cuda/src/hnn/level.rs b/crates/engine-cuda/src/hnn/level.rs
+index b402eaed3..04c316d76 100644
+--- a/crates/engine-cuda/src/hnn/level.rs
++++ b/crates/engine-cuda/src/hnn/level.rs
+@@ -195,7 +195,7 @@ impl<'c> Resident<'c> {
+         let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+         // (the level's regions are epochs, no passage read by two streams: the fine batch's known places stand aside while they are staged)
+         let fine_heard = std::mem::take(&mut *self.strand_heard.borrow_mut());
+-        let staged = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords);
++        let staged = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords, None);
+         *self.strand_heard.borrow_mut() = fine_heard;
+         let st = staged?;
+         let (sites, m2, n) = (st.sites, 2 * cd.complex(), cd.modes);
+diff --git a/crates/engine-cuda/src/hnn/resident.rs b/crates/engine-cuda/src/hnn/resident.rs
+index 9698a18c8..acab1ec94 100644
+--- a/crates/engine-cuda/src/hnn/resident.rs
++++ b/crates/engine-cuda/src/hnn/resident.rs
+@@ -280,6 +280,30 @@ pub(crate) struct Upload<'c> {
+ }
+ 
+ /// A batch's staged tables ([`Resident::stage`]).
++/// A batch's lists and tables packed on the host ([`Resident::stage_lists`]): the octets of one transfer, each table's offset in it, and the
++/// host's tables a batch keeps beside the card's.
++pub(crate) struct StageLists {
++    pub(crate) bytes: Vec<u8>,
++    pub(crate) at: [u64; 20],
++    pub(crate) computed_at: Option<u64>,
++    pub(crate) strand_at: Option<(u64, u64)>,
++    pub(crate) mcmap_len: usize,
++    pub(crate) regions: usize,
++    pub(crate) site_pos: Vec<u32>,
++    pub(crate) region_off: Vec<u32>,
++    pub(crate) classes: Vec<u32>,
++    pub(crate) unresolved: Vec<u8>,
++    pub(crate) definite: Vec<u8>,
++    pub(crate) echo_has: Vec<u8>,
++    pub(crate) mix_off: Vec<u32>,
++    pub(crate) mix_class: Vec<u32>,
++    pub(crate) mix_share: Vec<u32>,
++    pub(crate) site_weight: Vec<(u64, u64)>,
++    pub(crate) pairs: usize,
++    pub(crate) skin_entries: usize,
++    pub(crate) sites: usize,
++}
++
+ pub(crate) struct Staged<'c> {
+     pub(crate) site_pos: Vec<u32>,
+     pub(crate) region_off: Vec<u32>,
+@@ -1256,10 +1280,25 @@ impl<'c> Resident<'c> {
+         let mut read_logits: Vec<Vec<Option<Vec<i64>>>> = Vec::new();
+         let mut echoes: Vec<Vec<u64>> = Vec::new();
+         let mut rows = Rows::new();
++        // [realization; the lead, November 20, the engineering report's batch edges] Each batch's lists are packed on a host thread from its
++        // regions alone ([`Resident::stage_lists`]), one batch ahead of the card: the card read the batch before while the host built the next
++        // one's lists, where it had stood idle between batches (19.5 ms a section on the store line's trace of November 20). The same octets.
++        let batches: Vec<std::ops::Range<usize>> = batches.into_iter().filter(|b| !b.is_empty()).collect();
++        let (per_blank, bare, before) = (words.per_blank != 0, words.bare_stretch != 0, words.before != 0);
++        std::thread::scope(|scope| -> Result<()> {
++        let (tx, rx) = std::sync::mpsc::sync_channel::<StageLists>(1);
++        {
++            let (ahead, strands) = (batches.clone(), &strands);
++            scope.spawn(move || {
++                for b in ahead {
++                    let heard: &[u32] = if strands.is_empty() { &[] } else { &strands[b.clone()] };
++                    if tx.send(Self::stage_lists(&regions[b], d.alphabet, &d, per_blank, bare, before, heard)).is_err() {
++                        return;
++                    }
++                }
++            });
++        }
+         for batch in batches {
+-            if batch.is_empty() {
+-                continue;
+-            }
+             let peak = needs[batch.clone()].iter().sum::<u64>();
+             self.times.peak_store = self.times.peak_store.max(peak);
+             let store = skins[batch.clone()].iter().sum::<u64>();
+@@ -1281,7 +1320,7 @@ impl<'c> Resident<'c> {
+             // returns, both reads return into the one covector (the host's `Constitution::returned` with `Forward::first`), halved once below. A region's
+             // marks are its own first read's, so the two reads run batch by batch. [realization; agent-inferred, November 14] Both stand on one base
+             // (`batch_base`): what comes before the opening is formed once a batch.
+-            let mut base = self.batch_base(field, &regions[batch.clone()], &mut words, tower.as_mut(), returning)?;
++            let mut base = self.batch_base(field, &regions[batch.clone()], &mut words, tower.as_mut(), returning, rx.recv().ok())?;
+             // [measurement] A ruler's forward at `3` or `4` is one read (the host's `Constitution::pass`).
+             let (f, z, r, e) = if d.mark && field.ruler_far < 3 {
+                 let mut shares = None;
+@@ -1305,6 +1344,8 @@ impl<'c> Resident<'c> {
+             rows.extend(r);
+             echoes.extend(e);
+         }
++        Ok(())
++        })?;
+         let mut g = match g {
+             Some(g) => self.timed(Kind::Copy, || card.fetch_range(&g, 0, l.len)).map_err(device)?,
+             None => Vec::new(),
+@@ -1351,18 +1392,15 @@ impl<'c> Resident<'c> {
+         Ok((faces, read_logits, g, rows, echoes))
+     }
+ 
+-    /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
+-    /// that read them (the host's tables kept beside them for the reverse and the readings).
+-    pub(crate) fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &Declaration, words: &mut Words) -> Result<Staged<'c>> {
+-        // The batch's sites, region by region, and the carried mixtures as one list a site.
+-        // [realization; November 15, Brandon 15:19 "40 minutes a lap is a lot"] Each region's lists are built on its own core and then
+-        // joined in region order, so every list is the regions' lists one after another, the same words as the one-thread walk; only the
+-        // offsets (`region_off`, `region_eoff`, `region_soff`, `dstart`, `ostart`, `mix_off`) are prefixes over the regions before.
++    /// [realization; the lead, November 20, the engineering report's batch edges] **A batch's lists and tables, packed** ([`Resident::stage`]'s host
++    /// part): built from its regions, the declaration and the run's words (`per_blank`, `bare`, `before`, and the strand's `heard` where the batch
++    /// holds one) alone, so a run's later batches are packed on a host thread while the card reads the batch before ([`Resident::run_one`]); the
++    /// same octets as the walk inline.
++    pub(crate) fn stage_lists(regions: &[Region], a: usize, declaration: &Declaration, per_blank: bool, bare: bool, before: bool, heard: &[u32]) -> StageLists {
+         let any_echo = regions.iter().any(|r| r.echo.iter().any(Option::is_some));
+         // [E] The cut rooms' windows, each site's row computed or not (every site of an uncut region); kept whole where the field has carry
+         // circles (the host's `Declaration::room_window`, the one owner of the cut's admission).
+         let windows: Vec<Option<Vec<bool>>> = regions.iter().map(|r| declaration.room_window(r)).collect();
+-        let (per_blank, bare) = (words.per_blank != 0, words.bare_stretch != 0);
+         let blank_read: Vec<u8> = regions
+             .iter()
+             .flat_map(|r| {
+@@ -1376,14 +1414,10 @@ impl<'c> Resident<'c> {
+             .collect();
+         // [the known stream] A region's first site has nothing before it: it meets no source and its current is zero (the host's tick under
+         // `Sided::Before`), which is a row not computed.
+-        let before = words.before != 0;
+         // [the strand's two streams] The batch's passages read by two streams (`Resident::strand_heard`): a region staged as `heard` known
+         // sites and then as many open places, each at the place of the known site of its index less `heard`. An open place at the first
+         // place has nothing before it, as the known stream's first site: its row is not computed, and it is not compared (weight zero).
+-        let heard: Vec<u32> = {
+-            let h = self.strand_heard.borrow();
+-            if h.len() == regions.len() { h.clone() } else { Vec::new() }
+-        };
++        let heard: Vec<u32> = if heard.len() == regions.len() { heard.to_vec() } else { Vec::new() };
+         let first_place = |r: usize, t: usize| t == 0 || heard.get(r).is_some_and(|&n| t == n as usize);
+         let computed: Vec<u8> = if before || windows.iter().any(Option::is_some) { regions.iter().zip(&windows).enumerate().flat_map(|(k, (r, w))| (0..r.classes.len()).map(move |t| (k, t, w))).map(|(k, t, w)| u8::from(w.as_ref().is_none_or(|w| w[t]) && !(before && first_place(k, t)))).collect() } else { Vec::new() };
+         // One region's lists: its sites' rows, its definite sites and its open ones by place (§15.9: an open receiver hears every definite
+@@ -1511,8 +1545,6 @@ impl<'c> Resident<'c> {
+         // A batch with no carried site still uploads one word, so every buffer has an address.
+         let (mix_class_up, mix_share_up) = if mix_class.is_empty() { (vec![0u32], vec![0u32]) } else { (mix_class.clone(), mix_share.clone()) };
+         // The batch's site and region tables go up in one transfer.
+-        // [measurement; theory, November 13, P56 item 4] The batch's lists and tables, built from its regions and the declaration alone.
+-        self.mark("stage_lists");
+         let mut pack = Packed::default();
+         let site_region_at = pack.put(&site_region);
+         let site_pos_at = pack.put(&site_pos);
+@@ -1540,7 +1572,45 @@ impl<'c> Resident<'c> {
+         let d = declaration;
+         let mcmap: Vec<u32> = (0..d.heads).filter(|&h| d.carries_moment(h)).flat_map(|h| (0..d.modes).map(move |li| (h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 })).collect();
+         let mcmap_at = pack.put(if mcmap.is_empty() { &[0u32][..] } else { &mcmap[..] });
+-        let tables = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
++        StageLists {
++            bytes: pack.bytes,
++            at: [site_region_at, site_pos_at, region_off_at, region_eoff_at, classes_at, unresolved_at, definite_at, blank_read_at, echo_has_at, echo_b_at, echo_logits_at, mix_off_at, mix_class_at, mix_share_at, dlist_at, dstart_at, olist_at, ostart_at, region_soff_at, mcmap_at],
++            computed_at,
++            strand_at,
++            mcmap_len: mcmap.len(),
++            regions: regions.len(),
++            site_pos,
++            region_off,
++            classes,
++            unresolved,
++            definite,
++            echo_has,
++            mix_off,
++            mix_class,
++            mix_share,
++            site_weight,
++            pairs,
++            skin_entries,
++            sites,
++        }
++    }
++
++    /// A batch's site and region tables uploaded in one transfer, its status word and its faces' buffer, and the words
++    /// that read them (the host's tables kept beside them for the reverse and the readings); `pre`, the batch's lists packed before
++    /// ([`Resident::stage_lists`]), or packed here.
++    pub(crate) fn stage(&self, regions: &[Region], a: usize, dw: usize, declaration: &Declaration, words: &mut Words, pre: Option<StageLists>) -> Result<Staged<'c>> {
++        let l = match pre {
++            Some(l) if l.regions == regions.len() => l,
++            _ => {
++                let heard = self.strand_heard.borrow().clone();
++                Self::stage_lists(regions, a, declaration, words.per_blank != 0, words.bare_stretch != 0, words.before != 0, &heard)
++            }
++        };
++        // [measurement; theory, November 13, P56 item 4] The batch's lists and tables, built from its regions and the declaration alone.
++        self.mark("stage_lists");
++        let [site_region_at, site_pos_at, region_off_at, region_eoff_at, classes_at, unresolved_at, definite_at, blank_read_at, echo_has_at, echo_b_at, echo_logits_at, mix_off_at, mix_class_at, mix_share_at, dlist_at, dstart_at, olist_at, ostart_at, region_soff_at, mcmap_at] = l.at;
++        let (computed_at, strand_at, sites, pairs, skin_entries) = (l.computed_at, l.strand_at, l.sites, l.pairs, l.skin_entries);
++        let tables = self.timed(Kind::Copy, || self.take_up(&l.bytes)).map_err(device)?;
+         self.mark("stage_pack_upload");
+         let base = tables.device_ptr();
+         let status = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(1)).map_err(device)?;
+@@ -1565,7 +1635,7 @@ impl<'c> Resident<'c> {
+         words.mix_share = base + mix_share_at;
+         words.region_soff = base + region_soff_at;
+         (words.site_place, words.region_heard) = strand_at.map_or((0, 0), |(p, h)| (base + p, base + h));
+-        (words.mcmap, words.tm) = (base + mcmap_at, mcmap.len() as u64);
++        (words.mcmap, words.tm) = (base + mcmap_at, l.mcmap_len as u64);
+         words.skin_entries = skin_entries as u64;
+         words.dlist = base + dlist_at;
+         words.dstart = base + dstart_at;
+@@ -1573,14 +1643,14 @@ impl<'c> Resident<'c> {
+         words.ostart = base + ostart_at;
+         words.status = status.device_ptr();
+         words.x = x.device_ptr();
+-        Ok(Staged { site_pos, region_off, classes, unresolved, definite, echo_has, mix_off, mix_class, mix_share, site_weight, pairs, skin_entries, sites, _tables: tables, status, _x: x })
++        Ok(Staged { site_pos: l.site_pos, region_off: l.region_off, classes: l.classes, unresolved: l.unresolved, definite: l.definite, echo_has: l.echo_has, mix_off: l.mix_off, mix_class: l.mix_class, mix_share: l.mix_share, site_weight: l.site_weight, pairs, skin_entries, sites, _tables: tables, status, _x: x })
+     }
+ 
+     /// [realization; agent-inferred, November 14, the ring record §4] **A batch's base** ([`BatchBase`]): the regions staged, the base clock formed
+     /// (its paces, skin addresses and frames), the site moments on it, the opening's comparison's forward wherever a read of the batch reads it
+     /// (`returning`: the batch's last read returns; a level reads its news in every read), the level's news fetched and its cut staged. The
+     /// opening's forward is kept only where the last read compares it (it returns through it before its ticks), and dropped here otherwise.
+-    pub(crate) fn batch_base(&self, field: &Constitution, regions: &[Region], words: &mut Words, tower: Option<&mut TowerRun<'c>>, returning: bool) -> Result<BatchBase<'c>> {
++    pub(crate) fn batch_base(&self, field: &Constitution, regions: &[Region], words: &mut Words, tower: Option<&mut TowerRun<'c>>, returning: bool, pre: Option<StageLists>) -> Result<BatchBase<'c>> {
+         if field.scale.is_some() != tower.is_some() {
+             return Err(TowerError::Refused("a tower is read with its packets' level"));
+         }
+@@ -1588,7 +1658,7 @@ impl<'c> Resident<'c> {
+         let d = field.declaration;
+         let (dw, n, a) = (d.width, d.modes, d.alphabet);
+         let m2 = 2 * d.complex();
+-        let st = self.stage(regions, a, dw, &d, words)?;
++        let st = self.stage(regions, a, dw, &d, words, pre)?;
+         let sites = st.sites;
+         // The site moments (§15.1), once for the pass, added into every tick's values.
+         let moment = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
