@@ -1563,3 +1563,7 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   Y69 less L69: rows S 1.3372, -0.0019 (±0.0004) | one place open 0.6793, -0.0022 (±0.0005) | the frontier 1.8519, -0.0009 (±0.0006); wide 1566/2119 (73.9%) against 1587/2191 (72.4%), loops 25 against 22; pairs attested 0.359 against 0.344; long panel Y69 262 words, 200 in lexicon (76%)
   the PC at width 224: 531.8 ms a section on the mean, 717 at most (width 192: 507.5 and 714)
   read: the third lane buys a level that grows a lap, as the first two did (rows S +0.0002 then -0.0019), at 1.05 times a section. The line takes it from Y69's end (front/line70y.sh: Y70 on lap 70's sections beside L70, then L71 on); the width-192 L71 started at 18:07 was stopped and set aside (arm_L71_width192_aside).
+
+# 19:17 UTC November 20. The line's first lap at width 224 on the PC, Y70 from Y69's end (front/line70y.sh), against L70 (width 192, from L69's end), both at MEAN.3000:
+  Y70 less L70, paired: rows S 1.3303, -0.0028 (±0.0005) | one place open 0.6711, -0.0028 (±0.0005) | the frontier 1.8379, -0.0061 (±0.0006); wide 1575/2177 (72.3%) against L70's 1584/2196 (72.1%)
+  read: the third lane's gap over width 192 grows a third lap (+0.0002, -0.0019, -0.0028 on rows S). Brandon (19:08 UTC) stopped Colab; the fourth lane's arm planned there was not started, and the lanes stand as a stopgap.
