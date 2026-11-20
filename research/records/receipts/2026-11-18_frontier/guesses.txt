@@ -701,3 +701,11 @@ panel (20 prompts, 8 draws, 96 places) and the loudness.
   What it decides. Rows S paired under minus two standard errors: the line takes the pump from L49 (the arm's state continues as the
   line). Within two standard errors: the arm runs two more laps beside L49 and L50 before it is judged (rule 10, a null held to a length).
   Above plus two standard errors: the pump leaves the line's path, its reading recorded.
+  Scored (00:35 UTC November 20; pump/armread.sh, the frontier ruler pairing P48 with L48). Rows S, paired: -0.0017 (±0.0004), the guess's
+  -0.004 missed (the gain stands at four of its standard errors, under half the size guessed); one place open -0.0040 (±0.0004); the
+  frontier under the law -0.0052 (±0.0004); each region a known stream -0.0011 (±0.0005); on rows S the gain stands where 4 to 63 places are
+  known (-0.009 at 4 to 7, -0.004 at 8 to 31) and nothing at one place known. The wide panel: 1,528 of 2,173 words in the lexicon (70.3%)
+  against L48's 1,514 of 2,149 (70.5%), within the two points; loops 23 of 160 against 22, within the two. The pump's rows at the arm's
+  end hold 0.092 of the turn rows' root mean square (0.080 at the mean), the tenth guessed missed narrowly; every entry but one is off
+  zero. What it decides, by its own rule: rows S under minus two standard errors, so the line takes the pump from the arm's second lap,
+  P49 (trained on the A100 beside L49 from P48's end), and continues from P49's end.
