@@ -1540,3 +1540,12 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   wide panel W62 1577/2194 (71.9%), loops 24 of 160 (L62 1540/2158, 71.4%, loops 21); long panel W62 274 words, 188 in lexicon (68%)
   the PC's card at width 160: 491.8 ms a section on the mean over W62's first 2,104 sections, 697 at most (the pumped width 128, 442.9 and 589 on L53): 1.11 times
   read: the lane's gap over the line at width 128 grows lap by lap, -0.0013, -0.0022, -0.0062 on rows S over its three laps (W60 and W61 on the A100, W62 on the PC); the writes stand at 71% to 72%.
+
+# 14:10 UTC November 20. G-1120-2, the second lane (width 192, six lanes) beside the line at width 160, both at their means by the line's reads (lane/laneread3.sh to laneread5.sh; X63 to X65 on a second Colab A100-SXM4-40GB session, `lane2`, from W62's end):
+  the A100's reproduction from W62's end with no new lane against the PC's L63: GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL (lane/a100b/repro.log); FOUND_LANE width=192 lanes=6 material=1328505 founded_material=1592185
+  X63 less L63: rows S 1.3562, -0.0003 (±0.0004) | one place open 0.7036, -0.0012 (±0.0004) | the frontier 1.8666, -0.0039 (±0.0005); wide 1545/2147 (72.0%) against 1625/2210 (73.5%); pairs attested 0.330 against 0.341
+  X64 less L64 (both ending the third pass at 2,885 sections, means over 2,001 to 2,885): rows S 1.3570, -0.0017 (±0.0004) | one place open 0.7007, -0.0031 (±0.0005) | the frontier 1.8665, -0.0057 (±0.0006); wide 1588/2212 (71.8%) against 1586/2211 (71.7%); pairs 0.325 against 0.317
+  X65 less L65 (the fourth pass opened by next-pass on each lap's end): rows S 1.3442, -0.0029 (±0.0005) | one place open 0.6929, -0.0054 (±0.0005) | the frontier 1.8583, -0.0097 (±0.0006); wide 1491/2150 (69.3%) against 1502/2150 (69.9%); pairs 0.315 against 0.316
+  the A100: X63 856.3 ms a section (1,063 at most), X64 846.1 (1,060), X65 862.1 (1,097), 1.04 times width 160 there; the PC at width 192 (L66 from X65's end): 507.5 ms on the mean, 714 at most, 1.03 times width 160's 491.2
+  the second session's cost: 53.35 compute units at 09:52 UTC to 35.18 at 12:39 UTC, about 6.6 an hour
+  read: the second lane, like the first, buys a level that grows lap by lap (-0.0003, -0.0017, -0.0029 on rows S), at 3% to 4% a section; the writes stand at 69% to 73% in the lexicon with pairs at 0.31 to 0.34 whatever the width. The line takes the second lane from X65's end (L66 on, front/line66x.sh).
