@@ -1,0 +1,5 @@
+# tc4: lock taken 22:32:29 other runs: 0
+TC4 suite 22:38:36 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 366.30s 
+# tc4: released 22:38:36
+TC4_ALL_DONE 22:38:36
+RUN_EXIT 0 2026-11-20T22:38:36Z

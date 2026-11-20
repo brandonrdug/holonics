@@ -1,0 +1,18 @@
+# tc1: lock taken 21:52:33 other runs: 0
+test hnn::field::tests::the_site_maps_at_width_224_on_the_tensor_units ... MAPS224 forward 1088x224 tc_us_least=562.5 tc_us_median=780.8 tile_us_least=649.0 tile_us_median=887.5 tc_products_a_second=4.333e12 tile_products_a_second=3.755e12
+MAPS224 forward 1024x224 tc_us_least=564.3 tc_us_median=785.9 tile_us_least=623.9 tile_us_median=861.5 tc_products_a_second=4.065e12 tile_products_a_second=3.676e12
+MAPS224 forward 64x224 tc_us_least=53.1 tc_us_median=55.9 tile_us_least=60.6 tile_us_median=64.3 tc_products_a_second=2.699e12 tile_products_a_second=2.364e12
+MAPS224 forward 224x64 tc_us_least=75.9 tc_us_median=84.0 tile_us_least=77.4 tile_us_median=84.1 tc_products_a_second=1.889e12 tile_products_a_second=1.853e12
+MAPS224 transposed 1088x224 tc_us_least=534.0 tc_us_median=766.3 tile_us_least=687.2 tile_us_median=899.1 tc_products_a_second=4.564e12 tile_products_a_second=3.546e12
+MAPS224 transposed 1024x224 tc_us_least=529.1 tc_us_median=750.4 tile_us_least=634.9 tile_us_median=875.8 tc_products_a_second=4.335e12 tile_products_a_second=3.613e12
+MAPS224 transposed 64x224 tc_us_least=72.8 tc_us_median=77.8 tile_us_least=77.7 tile_us_median=86.6 tc_products_a_second=1.968e12 tile_products_a_second=1.844e12
+MAPS224 transposed 224x64 tc_us_least=50.4 tc_us_median=54.6 tile_us_least=61.9 tile_us_median=69.3 tc_products_a_second=2.846e12 tile_products_a_second=2.315e12
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.89s
+TC1 repro_L71 21:52:50 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+TC1 hold 1 old 21:53:16 last30 ms_mean=604.8 return_ms=22610
+TC1 hold 2 new 21:53:41 last30 ms_mean=586.5 return_ms=21865
+TC1 hold 3 new 21:54:06 last30 ms_mean=586.7 return_ms=21919
+TC1 hold 4 old 21:54:32 last30 ms_mean=604.4 return_ms=22543
+# tc1: released 21:54:32
+TC1_ALL_DONE 21:54:32
+RUN_EXIT 0 2026-11-20T21:54:32Z

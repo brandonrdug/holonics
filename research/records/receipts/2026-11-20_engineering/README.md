@@ -86,3 +86,38 @@ tower's level, whose staging follows its cut (`level_cut`) of the news the card 
 that no host thread can run ahead of. The batch edges' gap (19.5 ms a section) is the level's cut on the host and the first staging of
 each run; its lever is the cut on the card, or a run of the section's two groups as one. The patch is kept as an instruction for that
 build, which will need it.
+
+## The card's eight-bit tensor products (`imma_yardstick.cu`)
+
+A yardstick of `mma.sync.aligned.m16n8k32.row.col.s32.s8.s8.s32` with each thread's fragments in registers, beside `dp4a` on the CUDA
+cores, alone on the card under the lock (three runs): 1.963 to 1.970 × 10¹⁴ eight-bit products a second on the tensor units (94% of the
+card's published dense rate), 4.07 to 4.14 × 10¹³ by `dp4a`. Against the CUDA-core yardstick of November 12 (5.19 × 10¹² narrow products
+of 32 bits), a 32-bit product cut into four digits a side is sixteen eight-bit products, so 1.23 × 10¹³ such products a second, 2.4 times.
+
+## The third change: the site maps on the tensor units (`field.cu` `map_tile_tc`, `contact.rs` `affine`, `transposed`, `tc_planes`)
+
+A word under 2,139,062,144 in magnitude is its four signed digits of eight bits; each digit pair's products over 32 terms are one
+`mma.sync.m16n8k32.s8.s8.s32`, the four pairs of a place summed in one 32-bit word, the seven places joined on 128 bits before the bias
+and the one release. Integer sums with no release between them, so the tile form's integers in any order; a tile with a word past the
+digits (or a map of 2¹⁵ terms or more) is summed in the wide form. The weights are cut into digit planes once a launch
+(`field_tc_planes`); the forward map's 32-bit sites too, and the transposed map's 64-bit covector is cut as each chunk is staged.
+
+Its variants, each alone on the card at the width-224 line's shapes (10,000 sites; `the_site_maps_at_width_224_on_the_tensor_units`,
+`tc_bench_v2.txt`, `tc1_v3.txt`, `tc2_v4.txt`), in µs a launch, the least of 60:
+
+| map | tile form | v2: planes, in place | v3: staged, outputs through shared memory | v4: planes, through shared memory | v5: planes forward, staged transposed, in place |
+|---|---|---|---|---|---|
+| forward 1088 × 224 | 640 to 649 | 390 | 563 | 497 | 479 (beside gate 1) |
+| transposed 1088 × 224 | 660 to 687 | 551 | 534 | 704 | 533 (beside gate 1) |
+
+The forward map at the large shapes stands near its octets: 10,000 sites by 1,088 outputs of 64 bits is 87 MB written a launch, 170 µs at
+the card's write rate, where its products at the tensor units' rate take 200. So the next lever on the maps is the width of their
+carriers, not their products.
+
+Every variant reads the definitions' integers in all 96 cases of `a_sites_maps_in_the_tile_form_read_the_definitions_integers` (the
+wide fallback forced by words past the digits, a refused site, masks, `add`, `accumulate`), every route's outputs equal word for word in
+the bench, and v3, v4 and v5 reproduce 24 sections of lap L71 from Y70's end (`GATE_REPRO … EQUAL`). The section, in balanced holds of
+40 sections against the merged build (control, build, build, control): v3 586.6 against 604.6 (−18.0; this hold and the earlier ones of
+the day ran beside the line's reads, about 90 ms a section slower than alone); v4 492.4 against 510.4 (−18.0, alone); v5 514.1 against
+542.9 (−28.8, with gate 1 running on the host beside it, so read as incomplete); its clean repeat is `tc5.txt`. Guesses: v3 30 to 50 ms
+(missed), v4 25 to 40 (missed), v5 20 to 35 (`tc5.txt`).

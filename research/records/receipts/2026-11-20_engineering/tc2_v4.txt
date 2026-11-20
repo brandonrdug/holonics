@@ -1,0 +1,18 @@
+# tc2: lock taken 22:00:56 other runs: 0
+test hnn::field::tests::the_site_maps_at_width_224_on_the_tensor_units ... MAPS224 forward 1088x224 tc_us_least=496.7 tc_us_median=503.5 staged_us_least=555.7 tile_us_least=641.5 tile_us_median=653.5 tc_products_a_second=4.907e12 tile_products_a_second=3.799e12
+MAPS224 forward 1024x224 tc_us_least=483.6 tc_us_median=487.7 staged_us_least=561.2 tile_us_least=613.1 tile_us_median=624.1 tc_products_a_second=4.744e12 tile_products_a_second=3.741e12
+MAPS224 forward 64x224 tc_us_least=56.6 tc_us_median=60.4 staged_us_least=50.7 tile_us_least=59.7 tile_us_median=62.9 tc_products_a_second=2.533e12 tile_products_a_second=2.400e12
+MAPS224 forward 224x64 tc_us_least=76.3 tc_us_median=79.8 staged_us_least=76.6 tile_us_least=76.7 tile_us_median=80.4 tc_products_a_second=1.879e12 tile_products_a_second=1.869e12
+MAPS224 transposed 1088x224 tc_us_least=532.0 tc_us_median=534.2 planes_us_least=703.6 tile_us_least=660.5 tile_us_median=666.8 tc_products_a_second=4.581e12 tile_products_a_second=3.690e12
+MAPS224 transposed 1024x224 tc_us_least=518.4 tc_us_median=521.0 planes_us_least=736.3 tile_us_least=625.8 tile_us_median=633.9 tc_products_a_second=4.425e12 tile_products_a_second=3.666e12
+MAPS224 transposed 64x224 tc_us_least=72.9 tc_us_median=76.9 planes_us_least=73.4 tile_us_least=76.3 tile_us_median=79.3 tc_products_a_second=1.966e12 tile_products_a_second=1.879e12
+MAPS224 transposed 224x64 tc_us_least=50.0 tc_us_median=53.8 planes_us_least=54.9 tile_us_least=61.2 tile_us_median=64.9 tc_products_a_second=2.868e12 tile_products_a_second=2.343e12
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.94s
+TC2 repro_L71 22:01:11 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+TC2 hold 1 old 22:01:33 last30 ms_mean=509.2 return_ms=18909
+TC2 hold 2 new 22:01:55 last30 ms_mean=493.8 return_ms=18095
+TC2 hold 3 new 22:02:16 last30 ms_mean=490.9 return_ms=18068
+TC2 hold 4 old 22:02:38 last30 ms_mean=511.6 return_ms=18765
+# tc2: released 22:02:38
+TC2_ALL_DONE 22:02:38
+RUN_EXIT 0 2026-11-20T22:02:38Z
