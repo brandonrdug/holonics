@@ -942,8 +942,8 @@ panel's draws resolve.
 
 What that says (`agent-inferred`). A write draws each place from her face at the temperature the field holds, so a write is a sample of
 her code: at 1.34 nats a place on rows S (about 1.9 bits an octet) a sample holds words and the shapes of phrases and loses their sense
-within a few words, which is what a reader of a model at that code finds in any chart. Her writes moved from 55% to 70% while rows S fell
-from about 1.7 to 1.41 (laps L17 to L40) and have stood since while it fell to 1.34: the lexicon share saturates toward the reference's 80%
+within a few words, which is what a reader of a model at that code finds in any chart. Her writes moved from 58% to 70% while rows S fell
+from 1.61 to 1.41 (laps L20 to L40) and have stood since while it fell to 1.34: the lexicon share saturates toward the reference's 80%
 and the pair share moves with codes far lower than these. So the writes are not stuck on a defect of the writer; they wait on the code, and
 a gain of a few thousandths a lap is not one they can show. The parts that lower the code by price (the lanes) and the passes over the
 passage are the path; the measure of the writes that moves with them is owed (the pair share by place along a write, against the code the
