@@ -5787,3 +5787,51 @@ fn a_census_of_a_passes_carriers() {
     }
     eprintln!("PASS_CARRIERS sites={} open={}", classes.len(), unresolved.iter().filter(|&&u| u).count());
 }
+
+/// [measurement; the lead, November 20, the hardware record §8's premise] **The trained tick's residual by tick**: the learner at
+/// `DEPOSIT_STATE` with its ticks raised to `CARRIER_TICKS` reads one region of `CARRIER_SITES` sites cut from `CARRIER_TEXT` (as the census
+/// of a pass's carriers cuts it), every tick kept; for each tick `k`, over the region's sites, the state's step `‖x^(k+1) − x^k‖` against
+/// `‖x^k‖`, and the chart's step `‖r^(k+1) − r^k‖` (each site's chart, its lanes read as ratios to their powers) against `‖r^k‖`, each a sum of
+/// squares over the sites (millionths), and the ratio of successive steps. A contraction shows steps falling by a steady factor under one; the
+/// running mean (`tower.field-tick-running-mean`) shows `(k − 1)/(k + 1)`. A ruler on the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+fn the_trained_ticks_residual_by_tick() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let mut learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let units = crate::units::Units::from_text(&std::fs::read_to_string(var("CARRIER_UNITS")).unwrap()).unwrap();
+    let codec = crate::codec::Codec::from_text(&std::fs::read_to_string(var("CARRIER_CODEC")).unwrap(), units).unwrap();
+    let sites: usize = var("CARRIER_SITES").parse().unwrap();
+    let ticks: usize = var("CARRIER_TICKS").parse().unwrap();
+    let text = std::fs::read(var("CARRIER_TEXT")).unwrap();
+    let mut classes = Vec::new();
+    for line in text.split(|&b| b == b'\n') {
+        let mut l = line.to_vec();
+        l.push(b'\n');
+        if let Ok(c) = codec.encode(&l) {
+            classes.extend(c);
+        }
+        if classes.len() >= sites {
+            break;
+        }
+    }
+    classes.truncate(sites);
+    let unresolved: Vec<bool> = (0..classes.len()).map(|t| (t * 7) % 11 < 5).collect();
+    let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+    learner.field.declaration.ticks = ticks;
+    let forward = learner.field.pass(&region, true).unwrap();
+    let sq = |v: &[i64]| -> u128 { v.iter().map(|&x| (x as i128 * x as i128) as u128).sum() };
+    let diff = |a: &[i64], b: &[i64]| -> u128 { a.iter().zip(b).map(|(&x, &y)| { let d = x as i128 - y as i128; (d * d) as u128 }).sum() };
+    let (mut prev_state, mut prev_chart) = (0u128, 0u128);
+    for (k, tick) in forward.ticks.iter().enumerate() {
+        let (step, norm) = (diff(&tick.after, &tick.before), sq(&tick.before).max(1));
+        let chart_now: Vec<i64> = tick.read.iter().map(|&v| i64::from(v)).collect();
+        let chart_next: Option<Vec<i64>> = forward.ticks.get(k + 1).map(|n| n.read.iter().map(|&v| i64::from(v)).collect());
+        let (cstep, cnorm) = chart_next.as_ref().map_or((0, 1), |n| (diff(n, &chart_now), sq(&chart_now).max(1)));
+        let ratio = |now: u128, before: u128| if before == 0 { "-".to_string() } else { format!("{}", now * 1000 / before) };
+        eprintln!("TICK_RESIDUAL k={k} state_step_over_state_micro={} state_step_ratio_milli={} chart_step_over_chart_micro={} chart_step_ratio_milli={}", step * 1_000_000 / norm, ratio(step, prev_state), cstep * 1_000_000 / cnorm, ratio(cstep, prev_chart));
+        (prev_state, prev_chart) = (step, cstep);
+    }
+    eprintln!("TICK_RESIDUALS sites={} open={} ticks={ticks}", classes.len(), unresolved.iter().filter(|&&u| u).count());
+}
