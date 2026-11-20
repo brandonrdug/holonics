@@ -3279,6 +3279,15 @@ fn a_field_pumped_at_zero_keeps_every_face_and_returns_through_its_pump() {
         assert_eq!(Declaration::from_text(&text).unwrap(), d);
         assert!(Declaration::from_text(&format!("{} 0", &text[..text.len() - 2])).is_err(), "a v14p head whose pump word is not one");
         assert!(pumped.with_pump().is_err(), "a second pump");
+        // A lane on the pumped field keeps every face, with the pump's chart drawn so the lane's zero columns are read.
+        let drawn_pump = pumped_shaped(still);
+        let (laned, _) = drawn_pump.laned(&keys(drawn_pump.declaration.lane_draws())).unwrap();
+        assert_eq!(laned.faces(&region()).unwrap(), drawn_pump.faces(&region()).unwrap(), "still {still}: a lane on the pumped field keeps every face");
+        let (ll, dw2) = (laned.layout.clone(), laned.declaration.width);
+        for row in 0..2 * d.carry {
+            assert_eq!(laned.theta[ll.pump + row * dw2..ll.pump + row * dw2 + d.width], drawn_pump.theta[l.pump + row * d.width..l.pump + (row + 1) * d.width]);
+            assert!(laned.theta[ll.pump + row * dw2 + d.width..ll.pump + (row + 1) * dw2].iter().all(|&v| v == 0), "the lane's columns of the pump's chart at zero");
+        }
         let parts = pumped.founded_parts(8);
         assert!(parts[l.pump..l.pump + 2 * d.carry * (d.width + 1)].iter().all(|&p| p == 15), "the pump's chart is the carry part's");
     }
@@ -3297,6 +3306,40 @@ fn a_field_pumped_at_zero_keeps_every_face_and_returns_through_its_pump() {
     let text = pumped.to_text();
     let back = Learner::from_text(&text).unwrap();
     assert!(back.to_text() == text && back.field == pumped.field, "the pumped learner reads back as itself");
+}
+
+/// [definition; the lead, November 20] **A lane beside a tower's one-sided block keeps every face**: on a tower with its one-sided block drawn
+/// ([`Constitution::level_before`]) over a fine field with circles, pumped and drawn, and the opening's lift, [`Constitution::laned`] grows the
+/// fine level by one lane, the block's rows of the fine face taking the lane at zero as `B`'s do; every face of the law and of a strand (with and
+/// without the odd contacts facing the past) is the tower's before the lane, and every standing entry is carried once with its value.
+#[test]
+fn a_lane_beside_a_towers_one_sided_block_keeps_every_face() {
+    for (still, past) in [(1usize, false), (2, true)] {
+        let fine = Constitution::found(four_contacts(still), &keys(1 << 14)).unwrap();
+        let (fine, _) = fine.with_carry(2, &keys(fine.declaration.carry_draws(2))).unwrap();
+        let fine = drawn(fine.with_opening().unwrap().0.with_pump().unwrap().0);
+        let offset = 4 * (fine.declaration.founding_draws() + fine.declaration.carry_draws(2));
+        let mut tower = fine.scaled_up(6, 1, Declaration { reach: 16, ..coarse_declaration() }, &keys(1 << 16), offset).unwrap().0;
+        let base = tower.theta.len();
+        draw_from(&mut tower, base);
+        let before_block = tower.material_len();
+        let mut tower = tower.level_before().unwrap();
+        draw_from(&mut tower, before_block);
+        let (laned, from) = tower.laned(&keys(tower.declaration.lane_draws())).unwrap();
+        assert_eq!(from.len(), laned.material_len());
+        let (old_all, new_all): (Vec<i32>, Vec<i32>) = (tower.material().copied().collect(), laned.material().copied().collect());
+        let mut seen = vec![0u8; old_all.len()];
+        for (k, o) in from.iter().enumerate() {
+            if let Some(i) = o {
+                seen[*i] += 1;
+                assert_eq!(new_all[k], old_all[*i], "entry {k} carries {i} with its value");
+            }
+        }
+        assert!(seen.iter().all(|&n| n == 1), "every standing entry carried once");
+        let classes = drawn_classes(0xA7, 13, laned.declaration.alphabet);
+        assert_eq!(laned.strand_pass(&classes, false, past).unwrap().faces, tower.strand_pass(&classes, false, past).unwrap().faces, "still {still}: every face of a strand kept");
+        assert_eq!(laned.faces(&region()).unwrap(), tower.faces(&region()).unwrap(), "still {still}: and every face of the law");
+    }
 }
 
 /// [definition; the lead, November 19] **The pumped circles' adjoint agrees with its code's central difference**, as the unpumped circles' does

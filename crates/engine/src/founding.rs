@@ -304,6 +304,12 @@ impl Constitution {
             place(ol.triad_bias, layout.triad_bias, 1, j6, j6);
             place(ol.w_triad, layout.w_triad, dw, j2, j2);
         }
+        // [the lead, November 20] The pump's chart reads the charted read as the circles' own charts do (its columns the face's coordinates): the
+        // lane's columns at zero, so no circle's pump reads the lane; its bias as it was.
+        if d.pump {
+            place(ol.pump, layout.pump, 2 * d.carry, dw, dw2);
+            place(ol.pump_bias, layout.pump_bias, 1, 2 * d.carry, 2 * d.carry);
+        }
         // The lane's founding draws.
         let mut cursor = 0usize;
         let mut draw = |num: u128, den: u128, bits: u32| -> Result<i32> {
@@ -338,18 +344,18 @@ impl Constitution {
         // the fine face (`A`'s columns of each harmonic, `B`'s rows and `b_B` of each harmonic) take the lane at zero, so the restriction reads no
         // lane coordinate and the prolongation writes none, and every face is kept. Each block is harmonic-major (`k D₀ + c`, [`charted`]).
         if let Some(sc) = &self.scale {
-            // (the one-sided block's rows of the fine face would take the lane at zero as `B`'s do; owed with the first lane grown beside it)
-            if sc.before_offsets(dw).is_some() {
-                return refuse("a lane beside a tower that carries its one-sided block");
-            }
+            // [the lead, November 20] The one-sided block's rows of the fine face (`B⁻`, `b_B⁻`, [`Scale::before_offsets`]) take the lane at
+            // zero as `B`'s do, laid after the law's glue as before.
+            let before = sc.before_offsets(dw);
             let (h, d1) = (sc.harmonics, sc.coarse.declaration.width);
             let (a0, ab0, b0, bb0, len0) = sc.glue_offsets(dw);
             let (a1, ab1, b1, bb1, len1) = sc.glue_offsets(dw2);
             let (old_fine, new_fine, coarse) = (self.theta.len(), layout.len, sc.coarse.theta.len());
-            let mut glue = vec![0i32; len1];
+            let total1 = if before.is_some() { len1 + crate::field::scale::glue_before_len(h, dw2, d1) } else { len1 };
+            let mut glue = vec![0i32; total1];
             from.resize(new_fine, None);
             from.extend((0..coarse).map(|k| Some(old_fine + k)));
-            let mut gfrom: Vec<Option<usize>> = vec![None; len1];
+            let mut gfrom: Vec<Option<usize>> = vec![None; total1];
             let (og, ng) = (old_fine + coarse, new_fine + coarse);
             let mut copy = |o: usize, n: usize| {
                 glue[n] = sc.glue[o];
@@ -373,7 +379,18 @@ impl Constitution {
                     copy(bb0 + k * dw + c, bb1 + k * dw2 + c);
                 }
             }
-            debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, len1));
+            if let Some((b2, bb2, _)) = before {
+                let (nb2, nbb2) = (len1, len1 + h * dw2 * d1);
+                for k in 0..h {
+                    for c in 0..dw {
+                        for col in 0..d1 {
+                            copy(b2 + (k * dw + c) * d1 + col, nb2 + (k * dw2 + c) * d1 + col);
+                        }
+                        copy(bb2 + k * dw + c, nbb2 + k * dw2 + c);
+                    }
+                }
+            }
+            debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, total1));
             debug_assert_eq!(ng, from.len());
             from.extend(gfrom);
             out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue }));
