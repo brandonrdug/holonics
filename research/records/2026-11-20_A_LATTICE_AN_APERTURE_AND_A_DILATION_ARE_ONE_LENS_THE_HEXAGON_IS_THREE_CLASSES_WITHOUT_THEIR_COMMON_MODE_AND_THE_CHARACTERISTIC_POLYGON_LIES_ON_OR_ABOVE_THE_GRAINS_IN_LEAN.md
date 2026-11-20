@@ -1,6 +1,6 @@
 # A lattice, an aperture and a dilation are one lens: the hexagon is three classes without their common mode, and the characteristic polygon lies on or above the grains' (in Lean)
 
-November 20, 2026, 23:06 to 24:00 UTC. A short addendum to
+November 20, 2026, 23:06 to 23:37 UTC. A short addendum to
 [the failure-group record](2026-11-20_HODGE_ASKS_THAT_EACH_VARIETYS_FAILURE_GROUP_BE_FINITE_A_CLASS_OF_GRAIN_K_CLOSES_AFTER_K_TURNS_ONE_OBJECT_REFUTES_WHERE_A_CAUSE_COMPLETES_AND_A_CHART_OF_ONE_PERIOD_REACHES_NO_DECAYING_FUNCTION_IN_LEAN.md),
 on a lens of the same evening. Refs #410, #404. Nothing ran on a learner or on the card. One Lean module enters
 (§5). Each paragraph carries its grade: `tree` (read in this repository), `from training` (a result of the
