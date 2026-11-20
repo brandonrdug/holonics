@@ -248,10 +248,20 @@ reading "exact" in this sense, in code, guides or records.
   the mathematics. This is what lets many cells deposit as one flow, and it holds for any limb layout: a term split into
   narrow limbs whose products and sums fit their accumulator (a tensor core's, for one) gives the
   same bits. A device's units are widths; which limbs a kernel uses is the realization's choice,
-  never the law's. A card is a surface of many slow lanes (Brandon, November 7: "the GPU is just a
-  surface with a lot of thread potentials"): a realization disperses narrow terms across lanes at
-  once rather than running one wide word per lane, so terms are cut as narrow as their information
-  allows to keep the most lanes busy.
+  never the law's. A card is a surface of many slow threads (Brandon, November 7: "the GPU is just a
+  surface with a lot of thread potentials"): a realization disperses narrow terms across threads at
+  once rather than running one wide word per thread, so terms are cut as narrow as their information
+  allows to keep the most threads busy.
+- **Lane, thread, width: one word each** (the engineering report of November 20, §3; Brandon asked
+  that day what "lanes" were, and the repository used the word for six things). A **face lane** (the
+  engine's `lanes`, `Declaration::lanes`) is a block of the face's coordinates read as a ratio to its
+  own power, a register of the state; a **thread** is a GPU warp position or a CPU hardware thread; a
+  **core** is a CPU core; a **PCIe lane** is a pair of wires to the card; the **memory interface**
+  (the 4080 SUPER's 256 bits) is the card's bus to its memory. Widths are named the same way: the
+  **face width** `D` (coordinates a place holds), the **carrier width** (bits a term is held in) and
+  the **register width** (bits of one hardware register). A message, record or brief that says
+  "lane" or "width" bare names which. Scope: every guide, record, brief and message; the code's
+  identifiers stay as they are where cited.
 - Foreign data that arrives as floats is converted at the exterior boundary where it arrives.
   Nothing inside a law, an owner or the HNN stores or consumes a float.
 - A margin, score or reading the machine builds from contributions keeps its series, the winding

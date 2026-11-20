@@ -134,7 +134,7 @@ the state its laps start from since November 18 (lap 70's): `hnn-field-v14m 244 
 | ticks | 4 | `K`, the applications of the constitution (five states `x⁰` to `x⁴`) |
 | frames | 4 | the ring sets, the founding's heads; every grown head copies the set of its index |
 | reach | 3771 | the most sites a region may span, which sets the contact's gain `β`, the listener's shift, the class trits and a row's carrier |
-| lanes | 4 | the registers the width is read in, each a ratio to its own power (here 32 coordinates each) |
+| lanes | 4 | the face lanes: the registers the face width is read in, each a ratio to its own power (here 32 coordinates each); never a GPU thread, a CPU core or a PCIe lane (CLAUDE.md, "Lane, thread, width") |
 | depth | 0 | the last turned ring sets that turn by located increments alone |
 | carry | 32 | `C`, the carry circles, the last `C` of the complex contacts; even, as many scanned from each side |
 | triads | 0 | `J`, the complex triads |
