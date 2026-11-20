@@ -1,0 +1,15 @@
+# sk1: lock taken 23:12:08 other runs: 1
+SK1 suite 23:18:14 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 366.34s 
+SK1 repro_L71 23:18:28 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+SK1 warm-up 23:18:50 55.44, 2805 MHz
+SK1 hold 1 old 23:19:12 last30 ms_mean=515.0 55.08, 2805 MHz
+SK1 hold 2 new 23:19:34 last30 ms_mean=517.3 55.17, 2805 MHz
+SK1 hold 3 new 23:19:56 last30 ms_mean=515.4 55.14, 2805 MHz
+SK1 hold 4 old 23:20:19 last30 ms_mean=514.0 55.47, 2805 MHz
+SK1 hold 5 old 23:20:41 last30 ms_mean=513.0 55.36, 2805 MHz
+SK1 hold 6 new 23:21:03 last30 ms_mean=516.1 55.83, 2805 MHz
+SK1 hold 7 new 23:21:25 last30 ms_mean=515.6 56.05, 2805 MHz
+SK1 hold 8 old 23:21:47 last30 ms_mean=513.9 56.30, 2805 MHz
+# sk1: released 23:21:47
+SK1_ALL_DONE 23:21:47
+RUN_EXIT 0 2026-11-20T23:21:47Z
