@@ -724,3 +724,10 @@ MEAN.3000 by the line's reads, writes first.
   What it decides. Rows S under minus two standard errors: the lane is read for its time on the PC (a section's cost against its gain),
   and the line takes it if the gain a lap stands over the gain the line's own lap buys in the time it costs. Within two standard errors:
   two more laps beside L61 and L62 (rule 10). Above: the lane leaves.
+  Scored on the first lap (09:21 UTC; lane/laneread.sh). W60 less L60, paired: rows S -0.0013 (±0.0004), the guess's -0.004 missed (a
+  third of it); one place open -0.0014 (±0.0004); the frontier under the law -0.0055 (±0.0005); on rows S by places known nothing over
+  a third of a hundredth anywhere (4 to 7: -0.005). The wide panel 1,524 of 2,138 words in the lexicon (71.3%) against L60's 1,574 of
+  2,206 (71.4%), loops 24 against 22; pairs attested 0.330 against 0.337. Both within the guess's bounds. The A100 ran W60 at 822.5 ms a
+  section against the pumped width-128 line's 726 there (1.13 times). By the rule's own reading, a gain a lap set against the line's own
+  lap gain (0.0023) in the time the lane costs (0.13 of a lap, 0.0003): the first lap's -0.0013 is a level; whether the lane buys a gain
+  a lap is read on the second lap, W61 beside L61, before the line takes it.
