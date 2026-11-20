@@ -5,7 +5,7 @@ For each named panel (NAME=FORMS, FORMS a `write-next` output's `forms.written`:
 escaped), a write's words are its maximal runs of ASCII letters, lowercased; its pairs and triples are consecutive words. A pair or triple is
 attested when it stands, as whole words, in the first 16 MB of its slice's training documents (`DOCS_<slice>.bin` of the store, the label's
 first field naming the slice), read as one stream of lowercased words. The reference continuations are read the same way, over their first
-96 octets, as the receiver's scale. Outside the machine; counts only. Usage: python3 -I write_composition_ruler.py STORE NAME=FORMS [...]"""
+96 octets, as the receiver's scale; and by place, the share of the k-th pair attested along each write and reference. Outside the machine; counts only. Usage: python3 -I write_composition_ruler.py STORE NAME=FORMS [...]"""
 import sys, os, re
 store = sys.argv[1]
 WORD = re.compile(rb'[A-Za-z]+')
@@ -25,6 +25,16 @@ def rows(path):
         if len(f) >= 4:
             un = lambda b: b.replace(b'\\n', b'\n').replace(b'\\t', b'\t')
             yield f[0].decode().split(':')[0], un(f[2]), un(f[3])
+def by_place(name, path, field, places=8):
+    """The share of a write's k-th word pair attested, k = 1 to PLACES (the k-th pair after the prompt), so a reader sees whether a write
+    holds its sense as it goes or loses it: a share that falls along the write is a drift of the writer's own context."""
+    hits, tots = [0] * places, [0] * places
+    for slice_, write, ref in rows(path):
+        text = write if field == 'write' else ref
+        s = stream(slice_)
+        for k, g in enumerate(grams(text, 2)[:places]):
+            tots[k] += 1; hits[k] += g in s
+    print(f"COMPOSITION_BY_PLACE {name} {field}: " + ' '.join(f"{k + 1}:{hits[k] / max(1, tots[k]):.3f}({tots[k]})" for k in range(places)), flush=True)
 def read(name, path, field):
     counts = {}
     for slice_, write, ref in rows(path):
@@ -43,4 +53,6 @@ def read(name, path, field):
 args = [a.split('=', 1) for a in sys.argv[2:]]
 for name, path in args:
     read(name, path, 'write')
+    by_place(name, path, 'write')
 read('reference', args[0][1], 'reference')
+by_place('reference', args[0][1], 'reference')

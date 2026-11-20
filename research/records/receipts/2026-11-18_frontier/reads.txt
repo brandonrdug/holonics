@@ -1549,3 +1549,8 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   the A100: X63 856.3 ms a section (1,063 at most), X64 846.1 (1,060), X65 862.1 (1,097), 1.04 times width 160 there; the PC at width 192 (L66 from X65's end): 507.5 ms on the mean, 714 at most, 1.03 times width 160's 491.2
   the second session's cost: 53.35 compute units at 09:52 UTC to 35.18 at 12:39 UTC, about 6.6 an hour
   read: the second lane, like the first, buys a level that grows lap by lap (-0.0003, -0.0017, -0.0029 on rows S), at 3% to 4% a section; the writes stand at 69% to 73% in the lexicon with pairs at 0.31 to 0.34 whatever the width. The line takes the second lane from X65's end (L66 on, front/line66x.sh).
+
+# 15:00 UTC November 20. Her composition over the line's laps on the same wide panel (tools/write_composition_ruler.py, now with each write's k-th word pair by place; lane/composition_trend.txt): word pairs attested in the slice's first 16 MB of training text, and triples, and the mean of places 2 to 8:
+  L20 0.229 / 0.023 / 0.237 | L25 0.253 / 0.039 / 0.244 | L30 0.277 / 0.048 / 0.270 | L35 0.288 / 0.066 / 0.281 | L40 0.308 / 0.068 / 0.275 | L45 0.323 / 0.084 / 0.314 | L50 0.310 / 0.066 / 0.297 | L55 0.319 / 0.071 / 0.295 | L60 0.337 / 0.086 / 0.322 | L63 0.341 / 0.082 / 0.339 | L66 0.345 / 0.101 / 0.339
+  the reference continuations: pairs 0.490, triples 0.249; by place 0.200 (the first, a fragment of the prompt's last word), then 0.600 0.600 0.500 0.450 0.600 0.579 0.474
+  read: her composition rises lap by lap with her codes (pairs half a hundredth a few laps, triples fourfold since L20), and does not fall along a write; an arm's one-lap panel scatters by about 0.02, which is why each arm read level beside its control.

@@ -945,6 +945,13 @@ her code: at 1.34 nats a place on rows S (about 1.9 bits an octet) a sample hold
 within a few words, which is what a reader of a model at that code finds in any chart. Her writes moved from 58% to 70% while rows S fell
 from 1.61 to 1.41 (laps L20 to L40) and have stood since while it fell to 1.34: the lexicon share saturates toward the reference's 80%
 and the pair share moves with codes far lower than these. So the writes are not stuck on a defect of the writer; they wait on the code, and
-a gain of a few thousandths a lap is not one they can show. The parts that lower the code by price (the lanes) and the passes over the
-passage are the path; the measure of the writes that moves with them is owed (the pair share by place along a write, against the code the
-face paid there).
+a gain of a few thousandths a lap is not one an arm's single panel can show. The parts that lower the code by price (the lanes) and the
+passes over the passage are the path.
+
+*Corrected at 14:54 UTC.* "Her writes stand where they stood" holds only for one lap beside its control, whose panels scatter by
+about 0.02 in the pair share. Read over the line's laps on the same wide panel (`tools/write_composition_ruler.py`, receipts `reads.txt`
+14:54 UTC), her composition rises with her codes: word pairs attested in the training text 0.229 at L20, 0.277 at L30, 0.308
+at L40, 0.310 at L50, 0.337 at L60, 0.345 at L66 (the references 0.490), and word triples 0.023, 0.048, 0.068, 0.066, 0.086, 0.101 (the
+references 0.249): the triples four times over in 46 laps. Along a write the pair share does not fall (places 2 to 8 at L66: 0.32 to 0.37,
+no drift of her own context); it stands lower than the reference's at every place. So her writes follow her code, slowly, and the
+lexicon share is the measure that saturated, not the writes.
