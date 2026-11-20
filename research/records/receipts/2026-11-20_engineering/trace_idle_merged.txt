@@ -1,0 +1,7 @@
+# trace: lock taken 22:59:40 0 other runs
+# trace: exit 0 released 23:00:07
+TRACE kernels 136560 copies_and_sets 50683
+TRACE_IDLE window_ms=15553.2 busy_ms=12746.5 kernels_sum_ms=12565.5 idle_share=0.1805 overlap_of_kernels=-0.0116
+TRACE_GAPS count=140423 median_us=0.6 p99_us=111.1 sum_ms=2806.6 over_50us=2275 their_ms=2515.9
+TRACE_SECTIONS last30 ms_mean=519.3
+TRACE_ALL_DONE 23:00:08

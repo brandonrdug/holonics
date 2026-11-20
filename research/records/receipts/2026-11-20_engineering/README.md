@@ -119,5 +119,33 @@ wide fallback forced by words past the digits, a refused site, masks, `add`, `ac
 the bench, and v3, v4 and v5 reproduce 24 sections of lap L71 from Y70's end (`GATE_REPRO … EQUAL`). The section, in balanced holds of
 40 sections against the merged build (control, build, build, control): v3 586.6 against 604.6 (−18.0; this hold and the earlier ones of
 the day ran beside the line's reads, about 90 ms a section slower than alone); v4 492.4 against 510.4 (−18.0, alone); v5 514.1 against
-542.9 (−28.8, with gate 1 running on the host beside it, so read as incomplete); its clean repeat is `tc5.txt`. Guesses: v3 30 to 50 ms
-(missed), v4 25 to 40 (missed), v5 20 to 35 (`tc5.txt`).
+542.9 (−28.8, with gate 1 running on the host beside it, so read as incomplete); v5 again alone (`tc5_v5_drift.txt`): its four runs
+drifted 523.1, 487.4, 517.5, 564.3 with the host idle and the card heating from rest, a control spread of 41 ms that resolves nothing. The
+hold that decides (`tc6_v5_warmed.txt`, `tc6.sh`): a warm-up of 40 sections not read, then the guide's eight runs in balanced order, the
+card at 57 to 58 °C and 2,805 MHz throughout: the control 530.9, 531.8, 531.6, 534.4 (532.2, spread 3.5), the build 512.7, 512.2, 512.6,
+512.4 (512.5, spread 0.5), so 19.7 ms (3.7%) shorter. Guesses: v3 30 to 50 ms (missed), v4 25 to 40 (missed), v5 20 to 35 (missed at its
+lower edge). The holds of the day before this one had no warm-up; their differences stand inside one hold, their levels do not.
+
+The merged build's trace (`trace_idle_merged.txt`, `engine_count_merged.txt`, `trace_merged.sh`): the card idle 18.1% of the window (21.9%
+before the two changes), the kernels 414 ms a section (468 before) over 3,414 launches (the digit planes add about 600), the site maps 156.7
+ms a section at 1.7 times their floor (196.3 and 2.2 before), the other families as before within the card's state (the contact 98.6 ms,
+the carry scans 74.6, the moments and clocks 36.5).
+
+## The tick's premise: the trained tick does not contract (`tick_residual_L71.txt`)
+
+The hardware record's §8 asks, before any build, whether the trained tick contracts, so that a series could be released at a tolerance and
+the return's tape kept once instead of each tick. `the_trained_ticks_residual_by_tick` reads L71's end state with its ticks raised from 4
+to 12 over the same 240 sites of public text as the carriers' census: for each tick, the state's step against the state and the chart's
+step (the ray every reader reads) against the chart, as sums of squares over the sites.
+
+- The state's step stays at 0.96 to 0.996 of the step before from the fifth tick on: the state grows by a near-constant step, as a held
+  source does, and never settles.
+- The chart's step falls 1.41, 1.11, 0.75, 0.11, 0.013, 0.0030, 0.0011, 0.00049, 0.00026, 0.00015, 0.00009 of the chart's energy (its
+  root: the chart moves 11% at the fourth tick, 5.5% at the fifth, 1.6% at the eighth, 1.0% at the tenth), and the ratio of successive
+  steps climbs from 0.11 at the fifth tick to 0.62 at the eleventh. A contraction would hold that ratio under a steady factor; a climb
+  toward one is the running mean's harmonic falloff (`tower.field-tick-running-mean`).
+
+So at the built tick's form no tolerance releases the tape: the first link that slips is the tick's form, as §8 says it would be where the
+trained tick does not contract, and its candidate is an averaged step with the maps' gains bounded in the lanes' metric, a change of law
+read as an arm (`agent-inferred`: one region of public text on one saved state; the line's own passages and the largest gain by power
+iteration are the next reads).

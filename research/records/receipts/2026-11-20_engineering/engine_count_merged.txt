@@ -1,0 +1,16 @@
+ENGINE_COUNT log_sections=3000 sites=31529 open=14287 pair_terms=2.237e+07 batches_a_section=3.00 section_ms=586.1
+ENGINE_PARTS alphabet=244 face_width=224 face_lanes=7 heads=4 paced=2 modes=8 words_a_site=64 contacts=1088 carry_reals=1024 pump_rows=1024 ticks=4
+family | unit | units a section | products a unit | products a section | octets a section | floor ms (products, octets) | card ms a section | over the larger floor
+site maps | site and tick | 1.261e+05 | 3756032 | 4.737e+11 | 2.024e+10 | 91.25, 35.36 | 156.7 | 1.7
+carry scans | site and tick | 1.261e+05 | 36864 | 4.649e+09 | 1.033e+10 | 0.90, 18.05 | 74.6 | 4.1
+site kernels, small | site and tick | 1.261e+05 | 2112 | 2.664e+08 | 5.812e+08 | 0.05, 1.02 | 23.4 | 23.1
+moments and clocks | site | 3.153e+04 | 46080 | 1.453e+09 | 2.099e+08 | 0.28, 0.37 | 36.5 | 99.4
+face and blanks | open site and tick | 5.715e+04 | 238565 | 1.363e+10 | 1.284e+09 | 2.63, 2.24 | 20.8 | 7.9
+contact and crowds | pair-term | 3.448e+07 | 282 | 9.722e+09 | 1.931e+09 | 1.87, 3.37 | 98.6 | 29.2
+other kernels | - | - | - | - | - | - | 3.4 | -
+ENGINE_TOTAL products_a_section=5.034e+11 products_a_site=15966885 octets_a_section=3.458e+10 floor_products_ms=97.0 floor_octets_ms=60.4 floor_sum_ms=157.4
+ENGINE_RATIO section_ms=586.1 over_products=6.0 over_octets=9.7 over_sum=3.7
+ENGINE_TRACE kernels_ms_a_section=414.0 launches_a_section=3414 kernels_over_sum_of_floors=2.6
+ENGINE_COPIES host_to_card count_a_section=182 mb_a_section=24.63 ms_a_section=1.34
+ENGINE_COPIES card_to_host count_a_section=59 mb_a_section=61.50 ms_a_section=3.22
+ENGINE_COPIES card_to_card count_a_section=2 mb_a_section=0.44 ms_a_section=0.00
