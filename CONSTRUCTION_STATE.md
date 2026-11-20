@@ -18,7 +18,20 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 20, 18:30 UTC): the line's face is 224 wide with its circles pumped, on its fourth pass, and her composition rises with her codes
+## Where the work stands (November 20, 23:05 UTC): the line rests at lap 74 while the engineering list is worked, and the card's section is 3.7% shorter than at noon twice over
+
+**The engineering** (Brandon, 19:41 UTC: the main thread takes the engineering first; the list is §11 of the engineering report; receipts
+under `research/records/receipts/2026-11-20_engineering/`). Two realizations are merged, each every bit kept and reproducing 24 sections
+of lap L71: the section's deposit in one pass a family (#1056; 2.7% a section) and the site maps on the card's integer tensor units, a
+word as four digits of eight bits (#1058; 3.7% a section in a warmed eight-run hold, 512.5 against 532.2 ms). The floor at today's
+declaration is 157 ms against a lap's 586 (`tools/engine_count.py`); the card stands idle 18% of a section (22% before); the material and
+the carriers hold 19 to 26 bits in 64-bit words, which is where the maps now stand bound. The tick's premise is read: the trained tick
+does not contract (its chart settles by a running mean's falloff, not a factor), so no tolerance releases its tape at this form. The
+order from here, each a realization of a law the formal records state (the thread's message of 22:37 UTC): carriers narrowed to their
+information, the tick's gains read on the line's passages, a register founded from the modes a tick cannot release, then the coupled
+carry and the fork ruler as arms on the line. The line takes no lap meanwhile: its runs are provisional until the engineering lands.
+
+### The line at lap 74: the face is 224 wide with its circles pumped, on its fourth pass, and her composition rises with her codes
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -110,6 +123,8 @@ The layers this file held under the section above stand at
 November 18 (C9 of #603), because a position that keeps every position before it reads as five, and the oldest still had the line
 at lap 87 with ten laps queued. Each is a dated reading with its record:
 
+- **November 20, 18:30 UTC**: the line's face is 224 wide with its circles pumped, on its fourth pass, and her composition rises with
+  her codes ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §30; held below as the line's own section).
 - **November 20, 14:15 UTC**: the line's face is 192 wide with its circles pumped, on its fourth pass, and her words stand at 70%
   ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §30).
 - **November 20, 00:45 UTC**: the line's 512 carry circles are pumped, on its third pass, and her words stand at 70%

@@ -1,0 +1,17 @@
+# tc3b: lock taken 22:57:54 other runs: 0
+test hnn::field::tests::the_site_maps_at_width_224_on_the_tensor_units ... MAPS224 forward 1088x224 tc_us_least=520.3 tc_us_median=5347.8 staged_us_least=578.1 tile_us_least=691.9 tile_us_median=701.6 tc_products_a_second=4.684e12 tile_products_a_second=3.522e12
+MAPS224 forward 1024x224 tc_us_least=502.0 tc_us_median=511.1 staged_us_least=532.6 tile_us_least=662.8 tile_us_median=670.5 tc_products_a_second=4.569e12 tile_products_a_second=3.461e12
+MAPS224 forward 64x224 tc_us_least=56.6 tc_us_median=62.5 staged_us_least=40.6 tile_us_least=65.5 tile_us_median=69.2 tc_products_a_second=2.532e12 tile_products_a_second=2.190e12
+MAPS224 forward 224x64 tc_us_least=79.1 tc_us_median=84.0 staged_us_least=79.5 tile_us_least=82.5 tile_us_median=86.5 tc_products_a_second=1.812e12 tile_products_a_second=1.739e12
+MAPS224 transposed 1088x224 tc_us_least=537.6 tc_us_median=540.1 planes_us_least=725.0 tile_us_least=666.3 tile_us_median=671.4 tc_products_a_second=4.533e12 tile_products_a_second=3.657e12
+MAPS224 transposed 1024x224 tc_us_least=515.4 tc_us_median=520.8 planes_us_least=750.2 tile_us_least=622.8 tile_us_median=628.0 tc_products_a_second=4.451e12 tile_products_a_second=3.683e12
+MAPS224 transposed 64x224 tc_us_least=69.6 tc_us_median=74.2 planes_us_least=71.3 tile_us_least=74.7 tile_us_median=80.9 tc_products_a_second=2.059e12 tile_products_a_second=1.919e12
+MAPS224 transposed 224x64 tc_us_least=49.8 tc_us_median=53.4 planes_us_least=57.4 tile_us_least=61.9 tile_us_median=66.2 tc_products_a_second=2.877e12 tile_products_a_second=2.314e12
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 1.28s
+TC5 repro_L71 22:58:09 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+TC5 hold 1 old 22:58:32 last30 ms_mean=523.1 return_ms=19344
+TC5 hold 2 new 22:58:53 last30 ms_mean=487.4 return_ms=17917
+TC5 hold 3 new 22:59:15 last30 ms_mean=517.5 return_ms=18809
+TC5 hold 4 old 22:59:40 last30 ms_mean=564.3 return_ms=20894
+# tc3b: released 22:59:40
+TC5_ALL_DONE 22:59:40

@@ -1,0 +1,13 @@
+# tc6: lock taken 23:00:20 other runs: 0
+TC6 warm-up 23:00:43 56.71, 2805 MHz
+TC6 hold 1 old 23:01:06 last30 ms_mean=530.9 57.57, 2805 MHz
+TC6 hold 2 new 23:01:28 last30 ms_mean=512.7 57.82, 2805 MHz
+TC6 hold 3 new 23:01:50 last30 ms_mean=512.2 57.51, 2805 MHz
+TC6 hold 4 old 23:02:13 last30 ms_mean=531.8 57.95, 2805 MHz
+TC6 hold 5 old 23:02:36 last30 ms_mean=531.6 57.95, 2805 MHz
+TC6 hold 6 new 23:02:58 last30 ms_mean=512.6 57.48, 2805 MHz
+TC6 hold 7 new 23:03:20 last30 ms_mean=512.4 57.73, 2805 MHz
+TC6 hold 8 old 23:03:43 last30 ms_mean=534.4 58.01, 2805 MHz
+# tc6: released 23:03:43
+TC6_ALL_DONE 23:03:43
+RUN_EXIT 0 2026-11-20T23:03:43Z
