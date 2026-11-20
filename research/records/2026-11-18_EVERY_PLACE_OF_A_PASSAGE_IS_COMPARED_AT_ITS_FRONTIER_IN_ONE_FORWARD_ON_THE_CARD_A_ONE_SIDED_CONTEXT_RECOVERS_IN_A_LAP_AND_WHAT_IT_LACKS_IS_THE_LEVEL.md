@@ -929,3 +929,22 @@ pump's chart and bias). Lean: `HNN/CarryGate` builds with the pumped turn, pump 
 `pumpedCharge_le` and `reflection_turn_ne`. The card's realization, its parity against the host and the line's lap reproduced with the
 new build are the next receipts; then the arm, the pump founded at zero on the state lap L48 trains from (`OPEN.L48`), beside L48 as its
 control.
+
+## 30. The face grows by price, and her writes stand where her codes put them
+
+*Written at 14:11 UTC, November 20.* The pump's laps lowered every held read and left her writes where they stood, and so did two lanes
+of the face (G-1120-1, G-1120-2; receipts `reads.txt` 09:48 and 14:10 UTC). Each lane was read as the width rule asks, a capacity price
+beside the line from the same state: the first lane's gap on rows S grew -0.0013, -0.0022, -0.0062 over three laps at 1.11 times a section,
+the second's -0.0003, -0.0017, -0.0029 at 1.03 to 1.04, so each buys a level that keeps growing at a small price, and the line holds both
+(width 192, rows S 1.3442 at X65). Her writes over the same laps: 69% to 73% of their words in the lexicon (the reference continuations
+80%), word pairs attested in the training text 0.31 to 0.34 (the references 0.49), with no difference between arm and control that the
+panel's draws resolve.
+
+What that says (`agent-inferred`). A write draws each place from her face at the temperature the field holds, so a write is a sample of
+her code: at 1.34 nats a place on rows S (about 1.9 bits an octet) a sample holds words and the shapes of phrases and loses their sense
+within a few words, which is what a reader of a model at that code finds in any chart. Her writes moved from 55% to 70% while rows S fell
+from about 1.7 to 1.41 (laps L17 to L40) and have stood since while it fell to 1.34: the lexicon share saturates toward the reference's 80%
+and the pair share moves with codes far lower than these. So the writes are not stuck on a defect of the writer; they wait on the code, and
+a gain of a few thousandths a lap is not one they can show. The parts that lower the code by price (the lanes) and the passes over the
+passage are the path; the measure of the writes that moves with them is owed (the pair share by place along a write, against the code the
+face paid there).
