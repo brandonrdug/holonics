@@ -251,17 +251,21 @@ reading "exact" in this sense, in code, guides or records.
   never the law's. A card is a surface of many slow threads (Brandon, November 7: "the GPU is just a
   surface with a lot of thread potentials"): a realization disperses narrow terms across threads at
   once rather than running one wide word per thread, so terms are cut as narrow as their information
-  allows to keep the most threads busy.
-- **Lane, thread, width: one word each** (the engineering report of November 20, §3; Brandon asked
-  that day what "lanes" were, and the repository used the word for six things). A **face lane** (the
-  engine's `lanes`, `Declaration::lanes`) is a block of the face's coordinates read as a ratio to its
-  own power, a register of the state; a **thread** is a GPU warp position or a CPU hardware thread; a
-  **core** is a CPU core; a **PCIe lane** is a pair of wires to the card; the **memory interface**
-  (the 4080 SUPER's 256 bits) is the card's bus to its memory. Widths are named the same way: the
-  **face width** `D` (coordinates a place holds), the **carrier width** (bits a term is held in) and
-  the **register width** (bits of one hardware register). A message, record or brief that says
-  "lane" or "width" bare names which. Scope: every guide, record, brief and message; the code's
-  identifiers stay as they are where cited.
+  allows to keep the most threads busy. The card states this as a capacity: a multiprocessor's register
+  file is shared by its resident threads, so a thread that holds fewer bits leaves room for more threads
+  (atlas `holarchy.register-file-resident-threads`), and a kernel that streams finishes no sooner than
+  its octets over the bus's rate (the octet floor of `tower.field-engine-count`).
+- **The word "lane" is qualified** (November 20). A *face lane* is the engine's: a block of a place's
+  face read as a ratio to its own power, a register of the face (`Declaration::lanes`). A device's
+  parallel unit is a *thread* (on the card, one position of a warp) or a *core*, a field of bits inside
+  a word is a *bit lane*, and the motherboard's are *PCIe lanes*. The card's "256-bit" is its memory
+  interface, the count of data wires to its memory, and no width of arithmetic. Reason: until that day
+  this guide called the card's threads lanes ("a surface of many slow lanes") beside the engine's
+  `lanes`, a report that the line had widened by three lanes was read as a statement about the card's
+  threads, its PCIe lanes or its bus, and inside `field_chart` one variable named `lane` is a warp
+  position beside `w.lanes`, the face's ([the record](research/records/2026-11-20_A_LANE_IS_A_REGISTER_OF_THE_FACE_AND_NEVER_A_THREAD_THE_CARDS_REGISTER_FILE_IS_THE_PRECISION_LAW_AS_CAPACITY_HEAT_FOLLOWS_EVERY_MERGE_AND_ORDER_ONLY_A_SECTION_AND_A_SERIES_RELEASES_ONLY_WHERE_ITS_TICK_CONTRACTS.md)).
+  Scope: every guide, record, brief and message; the atlas rows and records written before that day
+  keep their wording, where a card's or a host's lane is a thread.
 - Foreign data that arrives as floats is converted at the exterior boundary where it arrives.
   Nothing inside a law, an owner or the HNN stores or consumes a float.
 - A margin, score or reading the machine builds from contributions keeps its series, the winding
@@ -525,7 +529,7 @@ to the waiting standard, and the closing paragraph of the lap's list.
   switch outside the law does not hold, and two machines then share one name.
 - **Width is never a dial** (October 31). A width follows from a partition of branches or of information, never from doubling until
   a reading improves. Reason: the precision law above, and a width tuned to a reading is fitted to that reading. The reason does not
-  reach a part's width read from its capacity price beside a control (atlas `code.capacity-price`; the lanes of November 14,
+  reach a part's width read from its capacity price beside a control (atlas `code.capacity-price`; the face lanes of November 14,
   [THE_CONSOLIDATION §10](docs/plans/THE_CONSOLIDATION.md#10-declared-extents-that-stand-in-for-laws)): that read is the partition's
   instrument (`agent-inferred`).
 - **A size belongs to its part, and the store is not "the field"** (Brandon, November 12). No extent of a realization (a width, a
@@ -653,7 +657,7 @@ reading, and rule 6's second requirement every design on how the machine learns.
    [the port's record](research/records/2026-11-11_THE_TRAINING_LINE_BECOMES_THE_TRUNKS_FIELD_THE_ENERGY_ATTEMPT_LEAVES_THE_TREE_AND_A_READING_A_LINE_IS_SCORED_BY_IS_CONSUMED_CODE.md)).
 3. **A rate is judged against the card, and a long projection is the realization's defect first** (Brandon, October 29 to
    November 5 and November 12). A projection of an hour or more for a learner run is read, before the run is ordered, against a
-   count of the law's arithmetic a unit (the terms a site computes, at the widths their information needs) over the lanes the card
+   count of the law's arithmetic a unit (the terms a site computes, at the widths their information needs) over the threads the card
    has, and the ratio is stated beside the projection. Where the realization stands well under that count, the realization is the
    next loop and the long run waits. A guess of a rate is fixed from that count, never from the rate of the build before it. Reason:
    on November 12 a three-hour pass over 1 GB was sent ahead of the kernels' repair while that morning's profile showed a batch of
@@ -697,8 +701,8 @@ reading, and rule 6's second requirement every design on how the machine learns.
    (`agent-inferred`) ([the record](research/records/2026-11-17_ATHENA_DOES_NOT_COMPOUND_NOTHING_BINDS_NOTHING_TEMPERS_AND_ONE_COMPARISON_TRAINS_EVERY_PART_THE_PLAIN_ENGINE_DOES_NOT_TAKE_A_HELD_SUM_IN_TEN_PASSES_AND_A_PART_WITH_ITS_OWN_FACE_DOES.md)).
 7. **A lap is reported with its loudness beside its nats** (Brandon, November 15). Every report of a lap of a line carries, beside
    the code in nats a place, the loudness reading (`athena train complete-language read-loudness` on the lap's mean, read by
-   `tools/loudness_table.py`): each region's loudness (its places' lane powers) against its surprise, by surprise fifth and by the
-   rank of the written symbol in its face, the energy a nat, the color (the lanes' spectrum) and the commonest pieces a place ends.
+   `tools/loudness_table.py`): each region's loudness (its places' face-lane powers) against its surprise, by surprise fifth and by the
+   rank of the written symbol in its face, the energy a nat, the color (the face lanes' spectrum) and the commonest pieces a place ends.
    Reason: the code says how many nats a place costs, and only the power beside it says what they cost, whether a quiet place was
    thinned, stretched or absorbed, and whether the loud places are the ones the field codes cheaply, which is what a dense basin is.
    Scope: every report, record and guess on a line's level.
@@ -805,11 +809,11 @@ architecture and data were given up. (The occasions of this postulate and the ne
 
   A join on wall time is barred, because the bits would then follow the schedule. A receipt that shows one surface waiting on the
   other names the wait, and a standing wait is the next loop's subject. The split is by kind of work, and a member joins a round
-  only when one of its lanes finishes one unit inside it: the same kind of work split across both surfaces read 0.998 times the card
-  alone on November 7, a host lane taking about 234 times the card's time a region
+  only when one of its threads finishes one unit inside it: the same kind of work split across both surfaces read 0.998 times the card
+  alone on November 7, a host thread taking about 234 times the card's time a region
   ([the record](research/records/2026-11-11_A_FLOCK_OF_UNLIKE_MEMBERS_JOINS_A_ROUND_ONLY_AT_ITS_OWN_GRAIN_A_PAIRS_TELESCOPING_PART_IS_TAKEN_ONCE_A_SITE_AND_A_GROUP_DETECTS_THROUGH_ITS_CONTACTS.md)).
   A device's rate is stated from a run's own counters (units, wall time, threads, splits), never from a summary row, and two devices
-  are compared on one unit of work run on both (the same section), never across counters that share a name: on November 11 a summary row was misread twice, and a host lane was priced at 91
+  are compared on one unit of work run on both (the same section), never across counters that share a name: on November 11 a summary row was misread twice, and a host thread was priced at 91
   times the card across two counts both printed as sites where the section itself gives about 480. Reason for the scope (the
   direction is Brandon's; the wording `agent-inferred`): a sum whose releases are quotients, or sections that stand once, gives the
   same bits on any partition of any device, so placement is a realization, and a rule that keeps a kind of work off a device makes
