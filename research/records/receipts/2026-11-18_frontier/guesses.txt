@@ -758,3 +758,14 @@ on the A100 beside the line's own lap L63 on the PC from the same state. One cha
   place open, where the second lane costs the A100 1.04 times a section (0.0001 of the line's lap gain). Wide panel 1,588 of 2,212 (71.8%)
   against L64's 1,586 of 2,211 (71.7%), loops 19 against 20; pairs attested 0.325 against 0.317. By G-1120-1's rule the line takes the
   second lane from X65's end (the third lap, trained beside L65); X65's read against L65 is recorded when it lands.
+
+G-1120-3 (2026-11-20T14:12:07Z). A third lane's price (as G-1120-1 and G-1120-2). From lap L67's end (the line at width 192), the arm Y68 is the same state
+grown by one more lane (found-lane on the A100: width 192 to 224, lanes 6 to 7), trained on a Colab A100 beside the line's own lap L68 on
+the PC from the same state, two laps (Y68, Y69 beside L68, L69) and a third where the rule asks it. One change: the third lane.
+  What is on record. The first lane's gap on rows S over its laps -0.0013, -0.0022, -0.0062 at 1.11 times a section; the second's -0.0003,
+  -0.0017, -0.0029 at 1.03 to 1.04. A capacity price falls as the reader grows.
+  The guess. Y68 less L68 on rows S, paired: between +0.0002 and -0.0008 in the first lap; Y69 less L69 under Y68's by 0.0005 or more (the
+  gap grows a lap); one place open under minus two standard errors by the second lap. The wide panel within two points and pairs attested
+  within 0.03 at each lap.
+  What it decides. As G-1120-2: the line takes the lane when the gap grows a lap by more than the line's own lap gain (about 0.003 on rows S
+  at width 192) in the time the lane costs; otherwise, after the third lap, the lane leaves and the face stands at 192.
