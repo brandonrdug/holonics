@@ -193,33 +193,44 @@ at 0.957, 0.977, 0.985, 0.990, 0.993, 0.994 and 0.996 of the step before at the 
 the chart's step against the chart falls with a ratio that climbs from 0.11 to 0.62, so there is no steady factor
 under one. On the polygons (an inference from the form, nothing read): a reader that divides by the norm fixes
 the ray, so the tick's linear part has the eigenvalue one along every filled ray, and across it `1 + ν_j/‖x‖`
-with `‖x‖` growing as the tick count, where `ν_j` are the rates at which the current answers a change of the
+with `‖x‖`, counted in one tick's current, growing as the tick count, where `ν_j` are the rates at which the current answers a change of the
 ray. A difference across the ray then falls as `k^ν`, a power and no geometric rate: every slope on the tick's
 clock is zero, and the rates `ν` live on the clock `ln k` (the row's logarithmic clock). In the swing's words the
 tick is a shear, a move whose two pivots coincide and whose multiplier is one
 (`motion.mobius-multiplier-cross-ratio`), and a shear approaches its pivot as a power of `1/k`.
 
-What the polygons add is the condition and the place. The condition: the two polygons share their ends, so the slopes
-sum to the logarithm of the determinant, and the built tick's determinant, `∏ (1 + ν_j/‖x‖)`, tends to one as the site
-fills. On it a part leaves a width of `w` places only after a count of ticks that grows as `2^(w/|ν|)`, so its tape is
-as long as a power of the tolerance asks. A tick whose multiplier stays away from one has slopes: a part at slope `s`
-leaves a width of `w` places after `⌈w/s⌉` ticks, and a part at slope zero is never released and is the tick's
-retention (the unit-root part). The place: the form the theory already uses along the strand and across a lap, a leak
-(`Q_t = κ_t b_t + γ_t Q_(t∓1)` on the carry circles, `1 − 2^(−r)` on a lap's sections), which at a site is the news
-written in place of the current, `x ← x + (y − P x)` with `P x` what the site already holds of what arrives. Its
-slopes are `−log |1 − μ_j|` over the eigenvalues `μ_j` of `P`: zero on what the reading does not see, which stays
-retained, and positive where `0 < μ_j < 2`. The specimens of §5 say what a turn inside such a tick does: with the same
-grains, a tick that keeps its places apart holds one and releases the other, and a tick that swaps them releases both
-at half the rate.
+The engineering thread's receipts of the same evening reach the form from the reading
+([receipts](receipts/2026-11-20_engineering/README.md), its last section, `agent-inferred` there): the built tick is
+an integrator whose gains stand near one, and the tick that contracts is a store of finite quality, a leak `λ` on the
+tick's state founded at `λ = 0` and deposited as a store's own state, with `K = ln(τ/r₀)/ln ρ` ticks to a tolerance.
+This record does not restate that as its own. What the polygons add is four things.
 
-The read before any build: on the host reference at saved states, the eigenvalues of the tick's reading-then-
-writing map by finite differences at a sample of sites, sorted, with their polygon. The guess to fix: on the
-built tick, at every site read, one eigenvalue a filled lane stands at one, and the others' distances from one
-fall as `1/(k + a)` from tick 4 to tick 16, halving between ticks 7 and 15, with the exponents `ν_j` spread over
-more than a factor of four. A leak is a change of law: it is founded at `γ = 1`, where the built tick
-is reproduced bit for bit, its value is a deposited state as the carry circle's is, and it runs as an arm beside
-a control from one saved state. Resembles: the cooling of November 4 and a rate set by hand. Differs: nothing is
-set; the part is founded at the built tick and deposition moves it.
+- **The end.** The two polygons share their ends, so the slopes sum to the logarithm of the determinant, and the built
+  tick's determinant, `∏ (1 + ν_j/‖x‖)`, tends to one as the site fills. On it a part leaves a width of `w` places
+  only after a count of ticks that grows as `2^(w/|ν|)`. A tick whose multiplier stays away from one has slopes: a
+  part at slope `s` leaves a width of `w` places after `⌈w/s⌉` ticks.
+- **The split is readable on the built tick.** The receipts say the count of modes of gain one asks for a tick that
+  contracts. On the form above the rates on the logarithm's clock are `ν_j = (eigenvalue_j − 1)·‖x‖`, a gain's
+  distance from one times the site's fill, so the modes the tick keeps (`ν_j = 0`: the ray, and whatever a symmetry or
+  a class holds) and the modes it releases (`ν_j < 0`) can be told apart before a leak is built.
+- **Two leaks differ in what they retain.** A uniform leak, `x ← (1 − λ)x + g(x)`, has the eigenvalue `1 − λ` along
+  the ray and `1 − λ(1 − ν_j)` across it at its settled state: no slope is zero, and everything of a pass, its
+  opening included, is forgotten in about `1/λ` ticks. The news written in place of the current, `x ← x + (y − P x)`
+  with `P x` what the site already holds of what arrives, has the slopes `−log |1 − μ_j|` over the eigenvalues `μ_j`
+  of `P`: positive where `0 < μ_j < 2`, and zero on what the reading does not see, a slope-zero segment as long as
+  that kernel, which is the pass's retention (the unit-root part). The first is a store of finite quality on every
+  mode and the second on the seen modes alone.
+- **A turn inside the tick shares the release.** The specimens of §5: with the same grains, a tick that keeps its
+  places apart holds one and releases the other, and a tick that swaps them releases both at half the rate.
+
+The read before any build: on the host reference at saved states, the eigenvalues of the tick's reading-then-writing
+map by finite differences at a sample of sites and at ticks 4, 8 and 16, each multiplied by the site's fill, sorted,
+with their polygon. The guess to fix: at every site read one eigenvalue a filled lane stands at one, the others'
+distances from one fall as `1/(k + a)` (halving between ticks 7 and 15), and the exponents `ν_j` so read agree across
+the three ticks within a quarter of their size and are spread over more than a factor of four. Which leak, its
+founding and its parity are the engineering thread's; either is a change of law and runs as an arm beside a control
+from one saved state. Resembles: the cooling of November 4 and a rate set by hand. Differs: the read sets nothing, and
+the part it informs is founded at the built tick.
 
 **6.2 A part's registers are the segments of its polygon.** For a part's transport read on saved states, sort the
 logarithms of its one-step gains (the grains: singular values, or the invariant factors at a prime where the part is
