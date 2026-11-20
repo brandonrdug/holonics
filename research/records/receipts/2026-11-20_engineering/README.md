@@ -165,3 +165,16 @@ same bits: the card suite 28 passed, the 24 sections of L71 reproduced) read 516
 warmed eight-run hold (spreads 1.9 and 2.0; OBS ran on the card beside it throughout, steady). The guess (5 to 12 ms shorter) missed, and
 the patch is set aside with this reading: the kernel's time is not its idle lanes' (its per-row preparation and its 128-bit chains stand
 whole on every lane that spreads them).
+
+## What the tick's premise says for the order (`agent-inferred`)
+
+The state's step held at 0.96 to 0.996 of the step before over twelve ticks: the built tick is an integrator, `x^(k+1) = x^k + g(x^k)` with
+`g` nearly the same from tick to tick, so its Jacobian stands near the identity in almost every direction and a read of its gains would
+find nearly every mode at gain one. The ray settles only because the state grows, by the running mean's `1/k`. Two consequences. The count
+of modes of gain one (the formal record's register size, §6.2 of the face-functor record) is not read off this tick: it asks for a tick
+that contracts, and only then separates the modes kept by a symmetry or a class from the ones the tick releases. And the tick that
+contracts is a store with a finite quality: a leak `λ` on the tick's state, `x^(k+1) = (1 − λ) x^k + g(x^k)`, settles at `g/λ` with
+`ρ = 1 − λ` (`store.finite-quality`, the store law of November 11), founded at `λ = 0` (every bit of the built tick) and deposited as a
+store's own state, never set as a dial. With it the forward's ticks follow a tolerance, `K = ln(τ/r₀)/ln ρ`, and the return can be the
+covector's series at the settled state (the hardware record's §8), which keeps one tick's operands where it keeps four. It changes the
+law, so it is built as an arm with its guess fixed first, after the realizations that keep every bit.
