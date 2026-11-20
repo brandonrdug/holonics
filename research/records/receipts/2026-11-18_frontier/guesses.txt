@@ -709,3 +709,18 @@ panel (20 prompts, 8 draws, 96 places) and the loudness.
   end hold 0.092 of the turn rows' root mean square (0.080 at the mean), the tenth guessed missed narrowly; every entry but one is off
   zero. What it decides, by its own rule: rows S under minus two standard errors, so the line takes the pump from the arm's second lap,
   P49 (trained on the A100 beside L49 from P48's end), and continues from P49's end.
+
+G-1120-1 (2026-11-20T07:27:18Z). The face's width as a capacity price (atlas code.capacity-price; the width rule's own scope: a part's width read from its price
+beside a control). From lap L59's end, the arm W60 is the same state grown by one lane (found-lane: width 128 to 160, lanes 4 to 5, the
+material 1,068,921 to 1,328,505 entries, the lane's encodings drawn and every read of it at zero so every face is the source's), trained
+3,000 sections on a Colab A100 (40 GB) beside the line's own lap L60 on the PC from the same state. One change: the lane. Both read at
+MEAN.3000 by the line's reads, writes first.
+  What is on record. The pumped line falls 0.0023 nats a place a lap on rows S (L53 1.3807 to L57 1.3716) with her words at 70% to 72% for
+  twenty laps; the circles' doubling 512 to 1,024 (a quarter more material) bought 0.004 in its second lap; the pump's first lap 0.0017,
+  its second 0.0036. Her composition: word pairs attested 0.31 to 0.34 against the reference's 0.49.
+  The guess. W60 less L60 on rows S, paired: -0.004 or lower (the lane's encodings are drawn, so its reads open at first order, and a
+  fifth more face buys about what a quarter more circles bought). The wide panel's words within two points of L60's, and her pairs
+  attested no lower than L60's by more than 0.03.
+  What it decides. Rows S under minus two standard errors: the lane is read for its time on the PC (a section's cost against its gain),
+  and the line takes it if the gain a lap stands over the gain the line's own lap buys in the time it costs. Within two standard errors:
+  two more laps beside L61 and L62 (rule 10). Above: the lane leaves.
