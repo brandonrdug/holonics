@@ -709,3 +709,30 @@ panel (20 prompts, 8 draws, 96 places) and the loudness.
   end hold 0.092 of the turn rows' root mean square (0.080 at the mean), the tenth guessed missed narrowly; every entry but one is off
   zero. What it decides, by its own rule: rows S under minus two standard errors, so the line takes the pump from the arm's second lap,
   P49 (trained on the A100 beside L49 from P48's end), and continues from P49's end.
+
+G-1120-1 (2026-11-20T07:27:18Z). The face's width as a capacity price (atlas code.capacity-price; the width rule's own scope: a part's width read from its price
+beside a control). From lap L59's end, the arm W60 is the same state grown by one lane (found-lane: width 128 to 160, lanes 4 to 5, the
+material 1,068,921 to 1,328,505 entries, the lane's encodings drawn and every read of it at zero so every face is the source's), trained
+3,000 sections on a Colab A100 (40 GB) beside the line's own lap L60 on the PC from the same state. One change: the lane. Both read at
+MEAN.3000 by the line's reads, writes first.
+  What is on record. The pumped line falls 0.0023 nats a place a lap on rows S (L53 1.3807 to L57 1.3716) with her words at 70% to 72% for
+  twenty laps; the circles' doubling 512 to 1,024 (a quarter more material) bought 0.004 in its second lap; the pump's first lap 0.0017,
+  its second 0.0036. Her composition: word pairs attested 0.31 to 0.34 against the reference's 0.49.
+  The guess. W60 less L60 on rows S, paired: -0.004 or lower (the lane's encodings are drawn, so its reads open at first order, and a
+  fifth more face buys about what a quarter more circles bought). The wide panel's words within two points of L60's, and her pairs
+  attested no lower than L60's by more than 0.03.
+  What it decides. Rows S under minus two standard errors: the lane is read for its time on the PC (a section's cost against its gain),
+  and the line takes it if the gain a lap stands over the gain the line's own lap buys in the time it costs. Within two standard errors:
+  two more laps beside L61 and L62 (rule 10). Above: the lane leaves.
+  Scored on the first lap (09:21 UTC; lane/laneread.sh). W60 less L60, paired: rows S -0.0013 (±0.0004), the guess's -0.004 missed (a
+  third of it); one place open -0.0014 (±0.0004); the frontier under the law -0.0055 (±0.0005); on rows S by places known nothing over
+  a third of a hundredth anywhere (4 to 7: -0.005). The wide panel 1,524 of 2,138 words in the lexicon (71.3%) against L60's 1,574 of
+  2,206 (71.4%), loops 24 against 22; pairs attested 0.330 against 0.337. Both within the guess's bounds. The A100 ran W60 at 822.5 ms a
+  section against the pumped width-128 line's 726 there (1.13 times). By the rule's own reading, a gain a lap set against the line's own
+  lap gain (0.0023) in the time the lane costs (0.13 of a lap, 0.0003): the first lap's -0.0013 is a level; whether the lane buys a gain
+  a lap is read on the second lap, W61 beside L61, before the line takes it.
+  The second lap (09:47 UTC; lane/laneread2.sh). W61 less L61, paired: rows S -0.0022 (±0.0005), one place open -0.0047 (±0.0005), the
+  frontier under the law -0.0071 (±0.0006): the gap grows by 0.0009 a lap on rows S and 0.0033 on one place open, three times the 0.0003
+  the line's own lap buys in the time the lane costs. Wide panel 1,597 of 2,206 (72.4%) against L61's 1,623 of 2,198 (73.8%), loops 20
+  against 19; pairs attested 0.323 against 0.341; both within the bounds. The A100 ran W61 at 822.8 ms a section. The line takes the
+  lane from the arm's third lap W62 (trained on the A100 from W61's end beside L62) and continues from W62's end on the PC.
