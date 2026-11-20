@@ -1532,3 +1532,20 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   W61 less L61 (W60's end against L60's): rows S 1.3601, -0.0022 (±0.0005) | one place open 0.7124, -0.0047 (±0.0005) | the frontier 1.8736, -0.0071 (±0.0006); wide 1597/2206 (72.4%) against 1623/2198 (73.8%), loops 20 against 19; pairs attested 0.323 against 0.341; long panel W61 272 words, 202 in lexicon (74%)
   the A100 (40 GB, session lane): W60 822.5 ms a section on the mean, 1,005 at most; W61 822.8 and 1,009 (the pumped width 128 ran 726 on the 80 GB A100)
   read: the lane buys a level in its first lap and a gain a lap in its second; the writes stand where they stood. The line takes it from W62.
+
+# 09:55 UTC November 20. The A100 session `lane` (standard shape, 40 GB) was reclaimed by Colab near 09:50 UTC with the arm's third lap W62 about 42 minutes into its 3,000 sections; its files went with it (W60's and W61's states had been downloaded and their reads taken). 83.37 units at 22:51 UTC November 19 stood at 53.35 at 09:52 UTC November 20. The line takes the lane from W61's end on the PC instead: its lap W62 trains here (front/line62w.sh, lanebin/athena) beside L62 (width 128, from L61's end, the same sections); the width-128 chain's L63, started at 09:52:57, was stopped and set aside (arm_L63_unlaned_aside). A new session (`lane2`, standard A100) takes the second lane's arm G-1120-2 from W62's end.
+
+# 10:36 UTC November 20. The line's first lap at width 160 on the PC, W62 from W61's end (front/line62w.sh, lanebin/athena), against L62 at width 128 from L61's end, both at MEAN.3000:
+  W62 less L62, paired: rows S 1.3566, -0.0062 (±0.0005) | one place open 0.7074, -0.0082 (±0.0006) | the frontier 1.8744, -0.0102 (±0.0007)
+  wide panel W62 1577/2194 (71.9%), loops 24 of 160 (L62 1540/2158, 71.4%, loops 21); long panel W62 274 words, 188 in lexicon (68%)
+  the PC's card at width 160: 491.8 ms a section on the mean over W62's first 2,104 sections, 697 at most (the pumped width 128, 442.9 and 589 on L53): 1.11 times
+  read: the lane's gap over the line at width 128 grows lap by lap, -0.0013, -0.0022, -0.0062 on rows S over its three laps (W60 and W61 on the A100, W62 on the PC); the writes stand at 71% to 72%.
+
+# 14:10 UTC November 20. G-1120-2, the second lane (width 192, six lanes) beside the line at width 160, both at their means by the line's reads (lane/laneread3.sh to laneread5.sh; X63 to X65 on a second Colab A100-SXM4-40GB session, `lane2`, from W62's end):
+  the A100's reproduction from W62's end with no new lane against the PC's L63: GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL (lane/a100b/repro.log); FOUND_LANE width=192 lanes=6 material=1328505 founded_material=1592185
+  X63 less L63: rows S 1.3562, -0.0003 (±0.0004) | one place open 0.7036, -0.0012 (±0.0004) | the frontier 1.8666, -0.0039 (±0.0005); wide 1545/2147 (72.0%) against 1625/2210 (73.5%); pairs attested 0.330 against 0.341
+  X64 less L64 (both ending the third pass at 2,885 sections, means over 2,001 to 2,885): rows S 1.3570, -0.0017 (±0.0004) | one place open 0.7007, -0.0031 (±0.0005) | the frontier 1.8665, -0.0057 (±0.0006); wide 1588/2212 (71.8%) against 1586/2211 (71.7%); pairs 0.325 against 0.317
+  X65 less L65 (the fourth pass opened by next-pass on each lap's end): rows S 1.3442, -0.0029 (±0.0005) | one place open 0.6929, -0.0054 (±0.0005) | the frontier 1.8583, -0.0097 (±0.0006); wide 1491/2150 (69.3%) against 1502/2150 (69.9%); pairs 0.315 against 0.316
+  the A100: X63 856.3 ms a section (1,063 at most), X64 846.1 (1,060), X65 862.1 (1,097), 1.04 times width 160 there; the PC at width 192 (L66 from X65's end): 507.5 ms on the mean, 714 at most, 1.03 times width 160's 491.2
+  the second session's cost: 53.35 compute units at 09:52 UTC to 35.18 at 12:39 UTC, about 6.6 an hour
+  read: the second lane, like the first, buys a level that grows lap by lap (-0.0003, -0.0017, -0.0029 on rows S), at 3% to 4% a section; the writes stand at 69% to 73% in the lexicon with pairs at 0.31 to 0.34 whatever the width. The line takes the second lane from X65's end (L66 on, front/line66x.sh).
