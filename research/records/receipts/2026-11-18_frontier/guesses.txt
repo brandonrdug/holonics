@@ -769,3 +769,6 @@ the PC from the same state, two laps (Y68, Y69 beside L68, L69) and a third wher
   within 0.03 at each lap.
   What it decides. As G-1120-2: the line takes the lane when the gap grows a lap by more than the line's own lap gain (about 0.003 on rows S
   at width 192) in the time the lane costs; otherwise, after the third lap, the lane leaves and the face stands at 192.
+  Scored on the first lap (16:56 UTC; lane/laneread6.sh). Y68 less L68 on rows S +0.0002 (±0.0004): inside the guessed +0.0002 to -0.0008,
+  at its edge; one place open -0.0008 (±0.0004); the frontier under the law -0.0031 (±0.0005). Wide panel 71.5% against 73.5% (at the
+  bound), pairs 0.338 against 0.338. Its second lap Y69 runs on the PC (the A100 session was reclaimed) beside L69.
