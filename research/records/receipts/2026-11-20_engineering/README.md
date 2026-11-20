@@ -172,9 +172,15 @@ The state's step held at 0.96 to 0.996 of the step before over twelve ticks: the
 `g` nearly the same from tick to tick, so its Jacobian stands near the identity in almost every direction and a read of its gains would
 find nearly every mode at gain one. The ray settles only because the state grows, by the running mean's `1/k`. Two consequences. The count
 of modes of gain one (the formal record's register size, §6.2 of the face-functor record) is not read off this tick: it asks for a tick
-that contracts, and only then separates the modes kept by a symmetry or a class from the ones the tick releases. And the tick that
-contracts is a store with a finite quality: a leak `λ` on the tick's state, `x^(k+1) = (1 − λ) x^k + g(x^k)`, settles at `g/λ` with
-`ρ = 1 − λ` (`store.finite-quality`, the store law of November 11), founded at `λ = 0` (every bit of the built tick) and deposited as a
-store's own state, never set as a dial. With it the forward's ticks follow a tolerance, `K = ln(τ/r₀)/ln ρ`, and the return can be the
-covector's series at the settled state (the hardware record's §8), which keeps one tick's operands where it keeps four. It changes the
-law, so it is built as an arm with its guess fixed first, after the realizations that keep every bit.
+that contracts, and only then separates the modes kept by a symmetry or a class from the ones the tick releases. The tick that contracts
+is a store with a finite quality (`store.finite-quality`, the store law of November 11), and two forms of it retain different things
+(the formal thread's note of 23:37 UTC on these receipts): a uniform leak, `x^(k+1) = (1 − λ) x^k + g(x^k)`, settles at `g/λ` with
+`ρ = 1 − λ` and has no mode at slope zero, so a pass forgets its opening within about `1/λ` ticks; a write of the news at a writing site,
+`x ← x + γ (y − P x)`, contracts only what the reading `P` sees and keeps a block at slope zero as large as `P`'s kernel, which is the
+pass's retention. The second is the one the retention law asks for (retention is the quotient sufficient for the admitted future, never a
+forgetting of the opening), founded where it reads every bit of the built tick and its gain moved by deposition, never set as a dial. With
+it the forward's ticks follow a tolerance on what the reading sees, `K = ln(τ/r₀)/ln ρ`, and the return can be the covector's series at
+the settled state (the hardware record's §8), which keeps one tick's operands where it keeps four. Before it, the split can be read on
+the built tick: `ν_j = (gain_j − 1)` times a site's fill in ticks, at ticks 4, 8 and 16, agreeing across the three, separates the kept
+modes (`ν = 0`) from the released (`ν < 0`). It changes the law, so it is built as an arm with its guess fixed on that difference
+(what the news write keeps that a uniform leak forgets), after the realizations that keep every bit.
