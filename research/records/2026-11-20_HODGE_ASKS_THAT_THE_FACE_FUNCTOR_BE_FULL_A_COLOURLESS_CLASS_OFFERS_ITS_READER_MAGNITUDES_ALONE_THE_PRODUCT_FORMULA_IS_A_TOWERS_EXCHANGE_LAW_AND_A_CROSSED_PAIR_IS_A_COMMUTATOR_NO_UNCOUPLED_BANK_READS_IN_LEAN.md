@@ -44,7 +44,14 @@ exchange law here. He asks for the takeaways that bear on the engineering of Ath
 So this record does not introduce the flags. It states each as one sentence with its hypotheses, says which part
 is a theorem and which a figure of speech, and draws what follows for the machine.
 
-## 3. Why no finite object settles Hodge
+## 3. Why the day's automated work brought no claim on Hodge
+
+Corrected November 20, 21:20 UTC. This section was headed "Why no finite object settles Hodge" and its first
+paragraph closed on the sentence that no single finite object settles it either way. That gave one receiver's view,
+the proof-checker's, as the only one, and on the refuting side it contradicted a theorem the tree holds
+(`Foundation/FiniteKey.refuted_by_one_reading`). The paragraph now says what one object does and what a cause does;
+[the record of the correction](2026-11-20_HODGE_ASKS_THAT_EACH_VARIETYS_FAILURE_GROUP_BE_FINITE_A_CLASS_OF_GRAIN_K_CLOSES_AFTER_K_TURNS_ONE_OBJECT_REFUTES_WHERE_A_CAUSE_COMPLETES_AND_A_CHART_OF_ONE_PERIOD_REACHES_NO_DECAYING_FUNCTION_IN_LEAN.md)
+holds the reasons, the finite object variety by variety, and what follows.
 
 `agent-inferred`, on facts `from training`. The reason is mostly in the statement's shape, and it is the lens's own
 second flag.
@@ -52,10 +59,15 @@ second flag.
 - **The shape.** The Riemann hypothesis is a statement over an unending family that one computation refutes (a zero
   off the line), and the day's proof is a chain of positive counts. The fluid proofs are one constructed object and a
   theorem that the object is stable. The Hodge conjecture says: for every smooth projective variety and every
-  rational class of type `(p,p)`, a cycle exists. A refutation would be a class with no cycle of any degree, which is
-  itself a statement over an unending search and needs an invariant nobody has: the known obstructions (Atiyah and
-  Hirzebruch 1962; Kollár 1992) refute the integral form and say nothing of the rational one. A proof needs a
-  construction that works on every variety. No single finite object settles it either way.
+  rational class of type `(p,p)`, a cycle exists. One object would refute it: a variety with a class the turn keeps
+  that no multiple of any cycle carries, shown by an invariant every cycle obeys and the class does not. Both
+  neighbours of the statement fell to one object each (integer coefficients: Atiyah and Hirzebruch 1962, Kollár
+  1992; no polarization: Voisin 2002), and neither invariant reaches the rational, polarized statement. Variety by
+  variety the question is one finitely generated group, the integer classes the turn keeps modulo the carried ones,
+  and the conjecture says that group is finite. What completes the statement over every variety is a cause, a
+  construction from class to carrier, and no count of instances stands in for it. So an automated result on Hodge
+  is either that group computed for a named variety, a finite answer, or the construction, and the day showed
+  neither.
 - **The hypothesis is an equality.** That a class is of type `(p,p)` is the vanishing of period integrals,
   transcendental numbers. An enclosure by intervals certifies an inequality, as it does for a zero's sign change or a
   fluid profile's coercive bound, and it never certifies an equality. The class has no spectrum for a computation to
@@ -321,7 +333,8 @@ commutes with a turn is shown to be the face of a contact.
 
 Nine rows enter with this record or its module as owner.
 
-- `hodge.face-functor-full`, `hodge.no-finite-witness`, `hodge.mumford-tate-one-group` (`interpretation`): §5.4,
+- `hodge.face-functor-full`, `hodge.one-object-refutes-a-cause-completes` (entered as `hodge.no-finite-witness`,
+  corrected and renamed that evening), `hodge.mumford-tate-one-group` (`interpretation`): §5.4,
   §3 and §5.1.
 - `tower.product-formula-exchange` (`interpretation`): §5.3.
 - `parametron.crossed-pair-is-a-commutator`, `code.nested-share-of-balanced`,

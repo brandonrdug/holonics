@@ -1479,3 +1479,6 @@ import HolonicsResearch.Landmarks.IharaBassMatrix
 import HolonicsResearch.Coupling.MeanFieldHeatClock
 import HolonicsResearch.HNN.LoopPacking
 import HolonicsResearch.Foundation.SectionGauge
+import HolonicsResearch.Landmarks.GrainPeriod
+import HolonicsResearch.Zeta.PeriodicChartLimit
+import HolonicsResearch.Compression.JoinReadsSupport
