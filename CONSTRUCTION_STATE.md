@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 20, 00:45 UTC): the line's 512 carry circles are pumped, on its third pass, and her words stand at 70%
+## Where the work stands (November 20, 14:15 UTC): the line's face is 192 wide with its circles pumped, on its fourth pass, and her words stand at 70%
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -77,11 +77,18 @@ frontier read, rows S by 0.0017 (±0.0004) nats a place and one place open by 0.
 the writes' lexicon where it stood (70%); the pump's rows stood at a tenth of the turn rows. The line takes it from P49 and continues
 on the PC from lap L50.
 
+**The face's width** (G-1120-1, G-1120-2; #1050). A lane grows beside the pump's chart and the tower's one-sided block with every face
+kept. Each lane was read as a capacity price beside the line from the same states: the first (width 128 to 160) lowered rows S by
+0.0013, 0.0022 and 0.0062 over its three laps and cost the card 1.11 times a section; the second (160 to 192) by 0.0003, 0.0017 and
+0.0029 at 1.03 to 1.04 times. The line takes both: rows S 1.3442 at X65, one place open 0.6929. Her writes did not follow: 69% to 73% of
+words in the lexicon and word pairs attested 0.31 to 0.34 (the reference 0.49) at every width.
+
 **Devices** (§27, §28). A float is a word with its locale in its exponent, and a lap's regions commute and join exactly, so a second
 device is a member of the flock: an A100 runs this realization 1.54 times slower than the PC's card on one section, gives the same
 bits (24 sections of L48 equal), and runs the arms beside the line. It costs about eight compute units an hour.
 
-**What is owed, in order.** The pump read over laps (its rows still growing at P49, 0.134 of the turn rows). A part judged by the sure share at the settled places (§21), which is what her words follow, as an
+**What is owed, in order.** Why her writes do not follow her codes: where a write leaves real text and what her face held there. The
+pump and the lanes read over laps. A part judged by the sure share at the settled places (§21), which is what her words follow, as an
 arm beside the line. Rows at the residue the circles compose failed their premise read (§25), and rows at her own read's direction
 add nothing to her face (§26): where a count is sure on many counts she already is, and her shortfall stands at the rare five-place
 contexts, which more passes over the passage reach (§24: one pass took her surety there from 0.579 to 0.667). The circles' extent is
@@ -96,6 +103,8 @@ The layers this file held under the section above stand at
 November 18 (C9 of #603), because a position that keeps every position before it reads as five, and the oldest still had the line
 at lap 87 with ten laps queued. Each is a dated reading with its record:
 
+- **November 20, 00:45 UTC**: the line's 512 carry circles are pumped, on its third pass, and her words stand at 70%
+  ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §29).
 - **November 19, 15:15 UTC**: the line holds 512 carry circles on its second pass, and her words stand at 69%
   ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §19 to §26).
 - **November 18, 15:58 UTC**: every place of a stretch is compared at its frontier, on the card
