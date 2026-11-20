@@ -360,6 +360,19 @@ impl<'c> Resident<'c> {
         Ok(())
     }
 
+    /// [realization; the lead, November 20] **A map's operand as digit planes** (`field_tc_planes`): `(kind, src, base, stride, rows, terms)` (kinds
+    /// as the kernel reads them: 0 and 1 the weight's rows and columns at `base`, 2 and 3 a 32-bit and a 64-bit operand at `src`) written as four
+    /// planes of eight-bit digits, `8 ⌈terms/32⌉` words a row, beside a flag a row.
+    #[allow(clippy::type_complexity)]
+    pub(crate) fn tc_planes(&self, words: &mut Words, (kind, src, base, stride, rows, terms): (u32, u64, u64, u64, usize, usize)) -> Result<(Pooled<'c, u32>, Pooled<'c, u32>, u32)> {
+        let kw = terms.div_ceil(32) * 8;
+        let planes = self.timed(Kind::Alloc, || self.take::<u32>((4 * rows * kw).max(1))).map_err(device)?;
+        let flags = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(rows.max(1))).map_err(device)?;
+        let (mut kind, mut src, mut base, mut stride, mut r32, mut k32, mut kw32, mut pp, mut fp) = (kind, src, base, stride, rows as u32, terms as u32, kw as u32, planes.device_ptr(), flags.device_ptr());
+        self.launch("field_tc_planes", Self::cells((rows * kw) as u64), THREADS, &mut [arg(words), arg(&mut kind), arg(&mut src), arg(&mut base), arg(&mut stride), arg(&mut r32), arg(&mut k32), arg(&mut kw32), arg(&mut pp), arg(&mut fp)])?;
+        Ok((planes, flags, kw as u32))
+    }
+
     pub(crate) fn chart(&self, words: &mut Words, x: u64, read: &CardBuffer<'c, i32>, scale: &CardBuffer<'c, i128>, only_unresolved: bool) -> Result<()> {
         let (mut x, mut rp, mut sp, mut u) = (x, read.device_ptr(), scale.device_ptr(), u32::from(only_unresolved));
         self.launch("field_chart", Self::warps(words.t as u64), THREADS, &mut [arg(words), arg(&mut x), arg(&mut rp), arg(&mut sp), arg(&mut u)])
@@ -372,9 +385,19 @@ impl<'c> Resident<'c> {
         // [realization; P61 item 4] Every forward map in the tile form (`map_tile` in `kernels/field.cu`): a block a tile of 64 outputs by 64
         // sites, whatever the map's shape; the cell map and its tiling are retired with it.
         let x64 = entry.ends_with("x64");
-        let launched = if x64 { "field_affine_tiled_x64" } else { "field_affine_tiled_x32" };
         let grid = (rows as u64).div_ceil(64).saturating_mul((words.t as u64).div_ceil(64)).clamp(1, 65_535) as u32;
-        self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])?;
+        // [realization; the lead, November 20, the engineering report's site maps] A map on 32-bit inputs on the card's integer tensor units
+        // (`map_tile_tc`: each operand's words as four digit planes of eight bits, a tile of 64 outputs by 64 sites), the same integers as the
+        // tile form.
+        let launched = if x64 { "field_affine_tiled_x64" } else { "field_affine_tiled_tc_x32" };
+        if x64 {
+            self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])?;
+        } else {
+            let (planes, flags, kw) = self.tc_planes(words, (0, 0, weight, cols as u64, rows, cols))?;
+            let (site_planes, site_flags, _) = self.tc_planes(words, (2, x, 0, x_stride as u64, words.t as usize, cols))?;
+            let (mut pa, mut fa, mut pb, mut fb, mut kw) = (planes.device_ptr(), flags.device_ptr(), site_planes.device_ptr(), site_flags.device_ptr(), kw);
+            self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)])?;
+        }
         self.map_record((launched, rows32, cols32, u != 0, add != 0), words, Some(cols), Some(wmax), None, &[(x, x64, xs as usize, cols)])
     }
 
@@ -404,9 +427,15 @@ impl<'c> Resident<'c> {
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn transposed(&self, words: &mut Words, weight: u64, rows: usize, cols: usize, y: u64, y_stride: usize, out: u64, accumulate: bool, only_unresolved: bool) -> Result<()> {
         let (mut weight, mut rows32, mut cols32, mut y, mut ys, mut out, mut acc, mut u) = (weight, rows as u32, cols as u32, y, y_stride as u64, out, u32::from(accumulate), u32::from(only_unresolved));
+        // [realization; the lead, November 20] On the card's integer tensor units (`map_tile_tc`: the weight's columns and the covector's rows as
+        // digit planes), the same integers as the tile form.
         let grid = (cols as u64).div_ceil(64).saturating_mul((words.t as u64).div_ceil(64)).clamp(1, 65_535) as u32;
-        self.launch("field_transposed", grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut out), arg(&mut acc), arg(&mut u)])?;
-        self.map_record(("field_transposed", rows32, cols32, u != 0, acc != 0), words, Some(rows), None, Some((weight, rows * cols)), &[(y, true, ys as usize, rows)])
+        // The covector's digits are cut as each chunk is staged (`field_transposed_tcs`): its 64-bit words, read whole to write their planes,
+        // would cost the map's own time again.
+        let (planes, flags, kw) = self.tc_planes(words, (1, 0, weight, cols as u64, cols, rows))?;
+        let (mut pa, mut fa, mut pb, mut fb, mut kw) = (planes.device_ptr(), flags.device_ptr(), 0u64, 0u64, kw);
+        self.launch("field_transposed_tcs", grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut out), arg(&mut acc), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)])?;
+        self.map_record(("field_transposed_tcs", rows32, cols32, u != 0, acc != 0), words, Some(rows), None, Some((weight, rows * cols)), &[(y, true, ys as usize, rows)])
     }
 
     /// A family's covector `g[at..] += Σ_t y_t ⊗ x_t` (or the bias's `Σ_t y_t` when `x` is zero), with

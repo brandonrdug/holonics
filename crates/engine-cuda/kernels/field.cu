@@ -1710,6 +1710,300 @@ extern "C" __global__ void __launch_bounds__(256, 2) field_affine_tiled_x64(Fiel
     map_tile<int64_t, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved);
 }
 
+// [realization; the lead, November 20, the engineering report's site maps] **The site maps on the card's integer tensor units** (`map_tile`'s law,
+// the forward map on 32-bit inputs and the transposed map on 64-bit covectors). A word `v` under `TC_WORD` in magnitude is its four signed
+// digits of eight bits, `v = d₀ + 2⁸ d₁ + 2¹⁶ d₂ + 2²⁴ d₃` with each `d ∈ [−128, 127]` (`tc_digits`): the word read in base 256, kept as four
+// digit planes (the weights' by `field_tc_planes` once a launch, a row's terms padded with zero digits to a chunk of 32; the sites' cut as each
+// chunk is staged in shared memory). A sum
+// `Σ_k W[o][k] x[t][k]` is then `Σ_s 2^(8s) Σ_(a+b=s) Σ_k d_a(W[o][k]) d_b(x[t][k])`: each digit pair's products over a chunk of 32 terms are
+// one `mma.sync.m16n8k32.s8.s8.s32` (sixteen outputs by eight sites), the four pairs of a place `s` summed in one 32-bit word
+// (`|Σ| ≤ 4 · terms · 2^14 < 2^31` for `terms < 2^15`), and the seven places joined on 128 bits once, before the bias and the one release
+// `emit` applies. Integer sums with no release between them: the same integers as `map_tile`'s narrow and wide forms, in any order. A tile
+// with a row the planes flag (a word at or past `TC_WORD`), or a map of `2^15` terms or more, is summed whole in the wide form from the card's
+// memory, each output on 128 bits, with the forward map's refusal read at each site's largest input as `map_tile` reads it. Why (the
+// receipts of November 20): the site maps took 196 ms of a 586 ms section at 46% of the CUDA-core yardstick, their words stand within 19 to
+// 28 bits, and this card's eight-bit tensor products run at 1.97 × 10¹⁴ a second, 38 times that yardstick. Blocks of 256 threads, a tile of
+// 64 outputs by 64 sites; a warp holds sixteen outputs by 32 sites, seven places by four tiles of eight sites.
+#define TC_TO 64
+#define TC_TS 64
+// The words four signed digits of eight bits hold: `|v| ≤ 127 · (1 + 2⁸ + 2¹⁶ + 2²⁴) = 2,139,062,143` (the negative side reaches −2,155,905,152).
+#define TC_WORD 2139062144ull
+// Whether the tensor units' route is compiled (compute capability 8.0 and over); below it every tile takes the wide form.
+__device__ __forceinline__ constexpr bool defined_tc_arch() {
+#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 800
+    return true;
+#else
+    return false;
+#endif
+}
+__device__ __forceinline__ uint32_t tc_digits(int64_t v, uint32_t *d1, uint32_t *d2, uint32_t *d3) {
+    int64_t r = v;
+    const int32_t a0 = (int32_t)(int8_t)(r & 0xff);
+    r = (r - a0) >> 8;
+    const int32_t a1 = (int32_t)(int8_t)(r & 0xff);
+    r = (r - a1) >> 8;
+    const int32_t a2 = (int32_t)(int8_t)(r & 0xff);
+    r = (r - a2) >> 8;
+    *d1 = (uint32_t)(uint8_t)(int8_t)a1;
+    *d2 = (uint32_t)(uint8_t)(int8_t)a2;
+    *d3 = (uint32_t)(uint8_t)(int8_t)r;
+    return (uint32_t)(uint8_t)(int8_t)a0;
+}
+
+// An operand's four digit planes `planes[d][r][kw]` (a word four consecutive terms' digits, `kw = 8 ⌈K/32⌉` words a row, past `K` zero) and a
+// row's flag (`flags[r] = 1` where a word of the row is at or past `TC_WORD`; the flags are zeroed by the caller). `kind`: 0 the weight's rows
+// (`θ[base + r · stride + k]`), 1 its columns (`θ[base + k · stride + r]`, lanes along the rows), 2 a 32-bit operand's rows, 3 a 64-bit one's
+// (`src[r · stride + k]`).
+extern "C" __global__ void field_tc_planes(FieldWords w, uint32_t kind, uint64_t src, uint64_t base, uint64_t stride, uint32_t R, uint32_t K, uint32_t kw, uint32_t *planes, uint32_t *flags) {
+    const uint64_t cells = (uint64_t)R * kw;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t r = kind == 1 ? (uint32_t)(c % R) : (uint32_t)(c / kw), g = kind == 1 ? (uint32_t)(c / R) : (uint32_t)(c % kw);
+        uint32_t p0 = 0, p1 = 0, p2 = 0, p3 = 0;
+        bool big = false;
+#pragma unroll
+        for (uint32_t i = 0; i < 4; i++) {
+            const uint32_t k = 4 * g + i;
+            int64_t v = 0;
+            if (k < K) {
+                if (kind == 0) {
+                    v = w.theta[base + (uint64_t)r * stride + k];
+                } else if (kind == 1) {
+                    v = w.theta[base + (uint64_t)k * stride + r];
+                } else if (kind == 2) {
+                    v = reinterpret_cast<const int32_t *>(src)[(uint64_t)r * stride + k];
+                } else {
+                    v = reinterpret_cast<const int64_t *>(src)[(uint64_t)r * stride + k];
+                }
+            }
+            big |= mag64(v) >= TC_WORD;
+            uint32_t e1, e2, e3;
+            const uint32_t e0 = tc_digits(v, &e1, &e2, &e3);
+            p0 |= e0 << (8 * i);
+            p1 |= e1 << (8 * i);
+            p2 |= e2 << (8 * i);
+            p3 |= e3 << (8 * i);
+        }
+        const uint64_t plane = (uint64_t)R * kw, at = (uint64_t)r * kw + g;
+        planes[at] = p0;
+        planes[plane + at] = p1;
+        planes[2 * plane + at] = p2;
+        planes[3 * plane + at] = p3;
+        if (big) {
+            flags[r] = 1;
+        }
+    }
+}
+
+template <typename X, bool TRANSPOSED, bool B_PLANES>
+__device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+    // The sites' digit planes of a chunk where they are staged, `bp[d][site][word]` (a row of 32 octets padded to 48, so a fragment's eight rows
+    // fall on distinct banks), cut from the operand as it is staged. (Staging the tile's released words to write them along the outputs read
+    // 497 µs against 391 written in place, in one hold of November 20: the second barrier and pass cost more than the scattered stores.)
+    __shared__ __align__(16) uint32_t bp[B_PLANES ? 1 : 4][TC_TS][12];
+    __shared__ uint32_t wide_tile;
+    const uint32_t outs = TRANSPOSED ? cols : rows, terms = TRANSPOSED ? rows : cols;
+    const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31, gid = lane >> 2, tg = lane & 3;
+    const uint32_t wo = (warp & 3) * 16, ws = (warp >> 2) * 32;
+    const uint64_t otiles = (outs + TC_TO - 1) / TC_TO, stiles = ((uint64_t)w.T + TC_TS - 1) / TC_TS;
+    const uint64_t aplane = (uint64_t)outs * kw, bplane = (uint64_t)w.T * kw;
+    const auto weight_at = [&](uint32_t term, uint32_t output) -> int64_t {
+        return (int64_t)w.theta[weight + (TRANSPOSED ? (uint64_t)term * cols + output : (uint64_t)output * cols + term)];
+    };
+    const auto live = [&](uint64_t t) -> bool { return t < w.T && !(only_unresolved && !w.unresolved[t]); };
+    // A released word written where its map writes it: the transposed map's `out[t][o]` (added with `accumulate`), the forward map's
+    // `add[t][o]` added or `out[t][o]` set.
+    const auto put = [&](uint32_t o, uint64_t t, int64_t v) {
+        if (TRANSPOSED) {
+            const uint64_t c = t * cols + o;
+            out[c] = accumulate ? fit64((wide)out[c] + (wide)v, w.status) : v;
+        } else if (add) {
+            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+        } else {
+            out[t * out_stride + o] = v;
+        }
+    };
+    const auto released = [&](uint32_t o, wide sum) -> int64_t {
+        if (!TRANSPOSED && bias != NO_BIAS) {
+            sum += (wide)w.theta[bias + o] << MATERIAL_BITS;
+        }
+        return fit64(rel(sum, MATERIAL_BITS), w.status);
+    };
+    for (uint64_t blk = blockIdx.x; blk < otiles * stiles; blk += gridDim.x) {
+        const uint32_t o0 = (uint32_t)(blk % otiles) * TC_TO;
+        const uint64_t t0 = (blk / otiles) * TC_TS;
+        // A tile is summed on the tensor units unless an output's weight row is flagged or a site's word passes `TC_WORD` as it is staged.
+        bool big = terms >= (1u << 15);
+        if (threadIdx.x < TC_TO) {
+            const uint32_t o = o0 + threadIdx.x;
+            big |= o < outs && fa[o] != 0;
+        } else if (B_PLANES && threadIdx.x < TC_TO + TC_TS) {
+            const uint64_t t = t0 + threadIdx.x - TC_TO;
+            big |= t < w.T && fb[t] != 0;
+        }
+        if (threadIdx.x == 0) {
+            wide_tile = 0;
+        }
+        __syncthreads();
+        if (big) {
+            wide_tile = 1;
+        }
+        __syncthreads();
+#if defined(__CUDA_ARCH__) && __CUDA_ARCH__ >= 800
+        if (!wide_tile) {
+            int32_t acc[7][4][4];
+#pragma unroll
+            for (int s = 0; s < 7; s++) {
+#pragma unroll
+                for (int j = 0; j < 4; j++) {
+#pragma unroll
+                    for (int c = 0; c < 4; c++) {
+                        acc[s][j][c] = 0;
+                    }
+                }
+            }
+            const uint32_t oa = o0 + wo + gid, ob = oa + 8;
+            for (uint32_t c0 = 0; c0 < kw; c0 += 8) {
+                uint32_t bf[4][4][2];
+                if (B_PLANES) {
+                    // The sites' digits read from their planes (`field_tc_planes`).
+#pragma unroll
+                    for (int j = 0; j < 4; j++) {
+                        const uint64_t ts = t0 + ws + 8 * j + gid;
+                        const bool in = ts < w.T;
+#pragma unroll
+                        for (int b = 0; b < 4; b++) {
+                            const uint32_t *row = pb + b * bplane + ts * kw + c0;
+                            bf[b][j][0] = in ? __ldg(row + tg) : 0u;
+                            bf[b][j][1] = in ? __ldg(row + 4 + tg) : 0u;
+                        }
+                    }
+                } else {
+                // The sites' chunk: 64 sites by 32 terms, a thread two tasks of four consecutive terms of one site, its digits packed a word
+                // a plane.
+                bool over = false;
+#pragma unroll
+                for (uint32_t q = 0; q < 2; q++) {
+                    const uint32_t task = threadIdx.x + q * blockDim.x, s = task / 8, g = task % 8;
+                    const uint64_t t = t0 + s;
+                    uint32_t p0 = 0, p1 = 0, p2 = 0, p3 = 0;
+#pragma unroll
+                    for (uint32_t i = 0; i < 4; i++) {
+                        const uint32_t term = 4 * (c0 + g) + i;
+                        const int64_t v = (t < w.T && term < terms) ? (int64_t)x[t * x_stride + term] : 0;
+                        over |= mag64(v) >= TC_WORD;
+                        uint32_t e1, e2, e3;
+                        const uint32_t e0 = tc_digits(v, &e1, &e2, &e3);
+                        p0 |= e0 << (8 * i);
+                        p1 |= e1 << (8 * i);
+                        p2 |= e2 << (8 * i);
+                        p3 |= e3 << (8 * i);
+                    }
+                    bp[0][s][g] = p0;
+                    bp[1][s][g] = p1;
+                    bp[2][s][g] = p2;
+                    bp[3][s][g] = p3;
+                }
+                if (__syncthreads_or(over)) {
+                    if (threadIdx.x == 0) {
+                        wide_tile = 1;
+                    }
+                    __syncthreads();
+                    break;
+                }
+#pragma unroll
+                for (int j = 0; j < 4; j++) {
+#pragma unroll
+                    for (int b = 0; b < 4; b++) {
+                        bf[b][j][0] = bp[b][ws + 8 * j + gid][tg];
+                        bf[b][j][1] = bp[b][ws + 8 * j + gid][4 + tg];
+                    }
+                }
+                }
+#pragma unroll
+                for (int a = 0; a < 4; a++) {
+                    const uint32_t *ra = pa + a * aplane + (uint64_t)oa * kw + c0, *rb = pa + a * aplane + (uint64_t)ob * kw + c0;
+                    const uint32_t a0 = oa < outs ? __ldg(ra + tg) : 0u, a1 = ob < outs ? __ldg(rb + tg) : 0u;
+                    const uint32_t a2 = oa < outs ? __ldg(ra + 4 + tg) : 0u, a3 = ob < outs ? __ldg(rb + 4 + tg) : 0u;
+#pragma unroll
+                    for (int b = 0; b < 4; b++) {
+#pragma unroll
+                        for (int j = 0; j < 4; j++) {
+                            int32_t *c = acc[a + b][j];
+                            asm volatile("mma.sync.aligned.m16n8k32.row.col.s32.s8.s8.s32 {%0,%1,%2,%3}, {%4,%5,%6,%7}, {%8,%9}, {%0,%1,%2,%3};\n"
+                                         : "+r"(c[0]), "+r"(c[1]), "+r"(c[2]), "+r"(c[3])
+                                         : "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(bf[b][j][0]), "r"(bf[b][j][1]));
+                        }
+                    }
+                }
+                __syncthreads();
+            }
+            if (!wide_tile) {
+                // The seven places joined once on 128 bits and released, each written where its map writes it (a fragment's `c₀, c₁` stand at
+                // output `gid`, sites `2 tg` and `2 tg + 1` of its eight; `c₂, c₃` at output `gid + 8`).
+#pragma unroll
+                for (int j = 0; j < 4; j++) {
+#pragma unroll
+                    for (int c = 0; c < 4; c++) {
+                        const uint32_t o = c >= 2 ? ob : oa;
+                        const uint64_t ts = t0 + ws + 8 * j + 2 * tg + (c & 1);
+                        if (o < outs && live(ts)) {
+                            wide sum = 0;
+#pragma unroll
+                            for (int s = 0; s < 7; s++) {
+                                sum += (wide)acc[s][j][c] << (8 * s);
+                            }
+                            put(o, ts, released(o, sum));
+                        }
+                    }
+                }
+            }
+        }
+#endif
+        if (wide_tile || !(defined_tc_arch())) {
+            // The wide form, every output of the tile summed whole on 128 bits from the card's memory; the forward map refuses a site whose
+            // carrier bound `wmax · xmax · (cols + 1)` reaches `2^126`, its largest input read over every term (as `map_tile`'s wide form).
+            for (uint32_t c = threadIdx.x; c < TC_TO * TC_TS; c += blockDim.x) {
+                const uint32_t o = o0 + c % TC_TO;
+                const uint64_t t = t0 + c / TC_TO;
+                if (o >= outs || !live(t)) {
+                    continue;
+                }
+                wide sum = 0;
+                uint64_t xmax = 0;
+                for (uint32_t k = 0; k < terms; k++) {
+                    const int64_t xv = (int64_t)x[t * x_stride + k];
+                    const uint64_t g = mag64(xv);
+                    xmax = g > xmax ? g : xmax;
+                    sum += (wide)weight_at(k, o) * (wide)xv;
+                }
+                if (!TRANSPOSED && (uwide)wmax * (uwide)xmax * (uwide)(cols + 1) >= ((uwide)1 << 126)) {
+                    atomicOr(w.status, REFUSED_CARRIER);
+                    continue;
+                }
+                put(o, t, released(o, sum));
+            }
+        }
+        __syncthreads();
+    }
+}
+
+extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tc_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+    map_tile_tc<int32_t, false, true>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw);
+}
+
+// The same map with the sites' digits cut as each chunk is staged (no planes of the sites; `pb` and `fb` unread).
+extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tcs_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+    map_tile_tc<int32_t, false, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw);
+}
+
+extern "C" __global__ void __launch_bounds__(256, 1) field_transposed_tc(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+    map_tile_tc<int64_t, true, true>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved, pa, fa, pb, fb, kw);
+}
+
+extern "C" __global__ void __launch_bounds__(256, 1) field_transposed_tcs(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+    map_tile_tc<int64_t, true, false>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved, pa, fa, pb, fb, kw);
+}
+
 // `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)` (`transposed`), the weight `rows × cols`; with `accumulate` it is added to `out[t][i]` (each
 // addition checked as the host's `fit64`).
 extern "C" __global__ void __launch_bounds__(256, 2) field_transposed(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved) {

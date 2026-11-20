@@ -793,6 +793,97 @@ mod tests {
         assert_eq!(card.fetch(&status_buf).unwrap()[0], 0, "no word of the bench is refused");
     }
 
+    /// [measurement; the lead, November 20] **The site maps at width 224 on the tensor units and on the CUDA cores** (needs the card): the forward
+    /// map on 32-bit inputs and the transposed map at the shapes the store line's width-224 declaration launches most (1,088 contacts, 1,024 carry
+    /// rows, 64 words; `D = 224`), 10,000 sites, words of the widths the carriers' census read (weights 25 bits, inputs 19, covectors 26); each
+    /// entry timed alone between synchronizations, the least and the median of `FIELD_MAPS_LAUNCHES` rounds (default 30), the tensor-core
+    /// route (`affine`, `transposed`) beside the tile form's kernels launched directly. The outputs of the two routes are compared word for word.
+    #[test]
+    #[ignore = "needs the CUDA card; a timing, run alone with --include-ignored --test-threads=1 --nocapture"]
+    #[allow(clippy::float_arithmetic, reason = "a reading written at the exterior: printed millionths of a second and rates")]
+    fn the_site_maps_at_width_224_on_the_tensor_units() {
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let cf = Resident::open(&card).unwrap();
+        let sites = 10_000usize;
+        let launches: u32 = std::env::var("FIELD_MAPS_LAUNCHES").ok().and_then(|v| v.parse().ok()).unwrap_or(30);
+        let mut state = 0x243F_6A88_85A3_08D3u64;
+        let mut word = move |bits: u32| -> i64 {
+            state ^= state << 13;
+            state ^= state >> 7;
+            state ^= state << 17;
+            let v = (state >> (64 - bits)) as i64;
+            if state & 1 == 1 { -v } else { v }
+        };
+        let regions: Vec<u32> = (0..=sites as u32).step_by(203).chain(std::iter::once(sites as u32)).collect::<std::collections::BTreeSet<_>>().into_iter().collect();
+        let unresolved = vec![1u8; sites];
+        let (unresolved_buf, region_buf) = (card.upload(&unresolved).unwrap(), card.upload(&regions).unwrap());
+        let theta: Vec<i32> = (0..1088 * 224 + 1088).map(|_| word(25) as i32).collect();
+        let wmax = theta.iter().map(|v| v.unsigned_abs() as u64).max().unwrap();
+        let theta_buf = card.upload(&theta).unwrap();
+        let status_buf = card.zeroed::<u32>(1).unwrap();
+        let x32: Vec<i32> = (0..sites * 1088).map(|_| word(19) as i32).collect();
+        let y: Vec<i64> = (0..sites * 1088).map(|_| word(26)).collect();
+        let (x32_buf, y_buf) = (card.upload(&x32).unwrap(), card.upload(&y).unwrap());
+        let (out_a, out_b) = (card.zeroed::<i64>(sites * 1088).unwrap(), card.zeroed::<i64>(sites * 1088).unwrap());
+        let base = Words { t: sites as u32, r: (regions.len() - 1) as u32, unresolved: unresolved_buf.device_ptr(), region_off: region_buf.device_ptr(), theta: theta_buf.device_ptr(), status: status_buf.device_ptr(), ..Default::default() };
+        let time = |run: &mut dyn FnMut()| -> (f64, f64) {
+            let mut took = Vec::new();
+            for round in 0..=launches {
+                card.synchronize().unwrap();
+                let started = Instant::now();
+                run();
+                card.synchronize().unwrap();
+                if round > 0 {
+                    took.push(started.elapsed().as_secs_f64() * 1e6);
+                }
+            }
+            took.sort_by(f64::total_cmp);
+            (took[0], took[took.len() / 2])
+        };
+        for &(rows, cols) in &[(1088usize, 224usize), (1024, 224), (64, 224), (224, 64)] {
+            let products = (sites * rows * cols) as f64;
+            let mut words = base;
+            let (tc_least, tc_median) = time(&mut || cf.affine("field_affine_x32", &mut words, 0, (rows * cols) as u64, wmax, rows, cols, x32_buf.device_ptr(), cols, out_a.device_ptr(), rows, 0, false).unwrap());
+            let grid = (rows as u64).div_ceil(64).saturating_mul((sites as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+            let (mut w2, mut weight, mut bias, mut wm, mut r32, mut c32, mut xp, mut xs, mut op, mut os, mut ap, mut u) = (base, 0u64, (rows * cols) as u64, wmax, rows as u32, cols as u32, x32_buf.device_ptr(), cols as u64, out_b.device_ptr(), rows as u64, 0u64, 0u32);
+            let (old_least, old_median) = time(&mut || cf.launch("field_affine_tiled_x32", grid, THREADS, &mut [arg(&mut w2), arg(&mut weight), arg(&mut bias), arg(&mut wm), arg(&mut r32), arg(&mut c32), arg(&mut xp), arg(&mut xs), arg(&mut op), arg(&mut os), arg(&mut ap), arg(&mut u)]).unwrap());
+            let (a, b) = (card.fetch(&out_a).unwrap(), card.fetch(&out_b).unwrap());
+            assert!(a[..sites * rows] == b[..sites * rows], "forward {rows}x{cols}: the two routes differ");
+            // The staged variant: the sites' digits cut in the kernel.
+            let mut w3 = base;
+            let (st_least, _) = time(&mut || {
+                let (pl, fl, kw) = cf.tc_planes(&mut w3, (0, 0, 0, cols as u64, rows, cols)).unwrap();
+                let (mut weight, mut bias, mut wm, mut r32, mut c32, mut xp, mut xs, mut op, mut os, mut ap, mut u, mut pa, mut fa, mut pb, mut fb, mut kw) = (0u64, (rows * cols) as u64, wmax, rows as u32, cols as u32, x32_buf.device_ptr(), cols as u64, out_b.device_ptr(), rows as u64, 0u64, 0u32, pl.device_ptr(), fl.device_ptr(), 0u64, 0u64, kw);
+                cf.launch("field_affine_tiled_tcs_x32", grid, THREADS, &mut [arg(&mut w3), arg(&mut weight), arg(&mut bias), arg(&mut wm), arg(&mut r32), arg(&mut c32), arg(&mut xp), arg(&mut xs), arg(&mut op), arg(&mut os), arg(&mut ap), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)]).unwrap();
+            });
+            let b = card.fetch(&out_b).unwrap();
+            assert!(a[..sites * rows] == b[..sites * rows], "forward {rows}x{cols}: the staged route differs");
+            println!("MAPS224 forward {rows}x{cols} tc_us_least={tc_least:.1} tc_us_median={tc_median:.1} staged_us_least={st_least:.1} tile_us_least={old_least:.1} tile_us_median={old_median:.1} tc_products_a_second={:.3e} tile_products_a_second={:.3e}", products / (tc_least * 1e-6), products / (old_least * 1e-6));
+        }
+        for &(rows, cols) in &[(1088usize, 224usize), (1024, 224), (64, 224), (224, 64)] {
+            let products = (sites * rows * cols) as f64;
+            let mut words = base;
+            let (tc_least, tc_median) = time(&mut || cf.transposed(&mut words, 0, rows, cols, y_buf.device_ptr(), rows, out_a.device_ptr(), false, false).unwrap());
+            let grid = (cols as u64).div_ceil(64).saturating_mul((sites as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+            let (mut w2, mut weight, mut r32, mut c32, mut yp, mut ys, mut op, mut a0, mut u) = (base, 0u64, rows as u32, cols as u32, y_buf.device_ptr(), rows as u64, out_b.device_ptr(), 0u32, 0u32);
+            let (old_least, old_median) = time(&mut || cf.launch("field_transposed", grid, THREADS, &mut [arg(&mut w2), arg(&mut weight), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ys), arg(&mut op), arg(&mut a0), arg(&mut u)]).unwrap());
+            let (a, b) = (card.fetch(&out_a).unwrap(), card.fetch(&out_b).unwrap());
+            assert!(a[..sites * cols] == b[..sites * cols], "transposed {rows}x{cols}: the two routes differ");
+            // The planes variant: the covector's digits written as planes first.
+            let mut w3 = base;
+            let (pl_least, _) = time(&mut || {
+                let (pl, fl, kw) = cf.tc_planes(&mut w3, (1, 0, 0, cols as u64, cols, rows)).unwrap();
+                let (sp, sf, _) = cf.tc_planes(&mut w3, (3, y_buf.device_ptr(), 0, rows as u64, sites, rows)).unwrap();
+                let (mut weight, mut r32, mut c32, mut yp, mut ys, mut op, mut a0, mut u, mut pa, mut fa, mut pb, mut fb, mut kw) = (0u64, rows as u32, cols as u32, y_buf.device_ptr(), rows as u64, out_b.device_ptr(), 0u32, 0u32, pl.device_ptr(), fl.device_ptr(), sp.device_ptr(), sf.device_ptr(), kw);
+                cf.launch("field_transposed_tc", grid, THREADS, &mut [arg(&mut w3), arg(&mut weight), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ys), arg(&mut op), arg(&mut a0), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)]).unwrap();
+            });
+            let b = card.fetch(&out_b).unwrap();
+            assert!(a[..sites * cols] == b[..sites * cols], "transposed {rows}x{cols}: the planes route differs");
+            println!("MAPS224 transposed {rows}x{cols} tc_us_least={tc_least:.1} tc_us_median={tc_median:.1} planes_us_least={pl_least:.1} tile_us_least={old_least:.1} tile_us_median={old_median:.1} tc_products_a_second={:.3e} tile_products_a_second={:.3e}", products / (tc_least * 1e-6), products / (old_least * 1e-6));
+        }
+        assert_eq!(card.fetch(&status_buf).unwrap()[0], 0, "no word of the bench is refused");
+    }
+
     /// [measurement; theory, November 13, P60 item 2] **The opening's comparison on the card reads the host's bits** (needs the card): a field of
     /// two carry circles with the opening's lift, its readout, current, pair return and the lift moved off zero from a keyed stream's tail and its
     /// paces moved off zero (so the paced heads' clocks are not plain and the cavity clocks differ from the standing ones), read and returned on

@@ -1,0 +1,22 @@
+# bench: lock taken 21:40:04 other runs: 0
+test hnn::field::tests::the_site_maps_at_width_224_on_the_tensor_units ... MAPS224 forward 1088x224 tc_us_least=390.7 tc_us_median=515.9 tile_us_least=646.0 tile_us_median=878.4 tc_products_a_second=6.238e12 tile_products_a_second=3.773e12
+MAPS224 forward 1024x224 tc_us_least=375.6 tc_us_median=505.7 tile_us_least=612.9 tile_us_median=811.8 tc_products_a_second=6.107e12 tile_products_a_second=3.742e12
+MAPS224 forward 64x224 tc_us_least=50.1 tc_us_median=55.6 tile_us_least=60.8 tile_us_median=62.7 tc_products_a_second=2.859e12 tile_products_a_second=2.359e12
+MAPS224 forward 224x64 tc_us_least=69.0 tc_us_median=73.1 tile_us_least=77.5 tile_us_median=81.4 tc_products_a_second=2.076e12 tile_products_a_second=1.849e12
+MAPS224 transposed 1088x224 tc_us_least=550.5 tc_us_median=732.6 tile_us_least=665.6 tile_us_median=867.0 tc_products_a_second=4.427e12 tile_products_a_second=3.661e12
+MAPS224 transposed 1024x224 tc_us_least=555.6 tc_us_median=756.7 tile_us_least=632.9 tile_us_median=815.0 tc_products_a_second=4.129e12 tile_products_a_second=3.624e12
+MAPS224 transposed 64x224 tc_us_least=66.5 tc_us_median=70.2 tile_us_least=75.6 tile_us_median=79.0 tc_products_a_second=2.157e12 tile_products_a_second=1.897e12
+MAPS224 transposed 224x64 tc_us_least=49.6 tc_us_median=53.7 tile_us_least=61.4 tile_us_median=65.8 tc_products_a_second=2.888e12 tile_products_a_second=2.336e12
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.80s
+test hnn::field::tests::the_site_maps_at_width_224_on_the_tensor_units ... MAPS224 forward 1088x224 tc_us_least=389.6 tc_us_median=521.5 tile_us_least=639.8 tile_us_median=882.4 tc_products_a_second=6.255e12 tile_products_a_second=3.809e12
+MAPS224 forward 1024x224 tc_us_least=377.3 tc_us_median=501.2 tile_us_least=611.2 tile_us_median=817.5 tc_products_a_second=6.079e12 tile_products_a_second=3.753e12
+MAPS224 forward 64x224 tc_us_least=50.0 tc_us_median=54.0 tile_us_least=59.2 tile_us_median=62.7 tc_products_a_second=2.865e12 tile_products_a_second=2.420e12
+MAPS224 forward 224x64 tc_us_least=68.7 tc_us_median=73.0 tile_us_least=76.4 tile_us_median=80.9 tc_products_a_second=2.086e12 tile_products_a_second=1.875e12
+MAPS224 transposed 1088x224 tc_us_least=551.6 tc_us_median=730.5 tile_us_least=661.7 tile_us_median=863.1 tc_products_a_second=4.418e12 tile_products_a_second=3.683e12
+MAPS224 transposed 1024x224 tc_us_least=552.2 tc_us_median=750.7 tile_us_least=629.3 tile_us_median=821.1 tc_products_a_second=4.154e12 tile_products_a_second=3.645e12
+MAPS224 transposed 64x224 tc_us_least=65.8 tc_us_median=69.2 tile_us_least=75.7 tile_us_median=79.6 tc_products_a_second=2.179e12 tile_products_a_second=1.893e12
+MAPS224 transposed 224x64 tc_us_least=50.4 tc_us_median=53.6 tile_us_least=59.3 tile_us_median=65.9 tc_products_a_second=2.846e12 tile_products_a_second=2.416e12
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 27 filtered out; finished in 0.78s
+# bench: released 21:40:06
+BENCH1_ALL_DONE 21:40:06
+RUN_EXIT 0 2026-11-20T21:40:06Z
