@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,732 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,733 records from July 2026 to November 2026. 386 receipts directories: 225 beside the records and 161 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 131 | 102 |
+| [November 2026](#november-2026) | 132 | 102 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-20 [A lane is a register of the face and never a thread the cards register file is the precision law as capacity heat follows every merge and order only a section and a series releases only where its tick contracts](2026-11-20_A_LANE_IS_A_REGISTER_OF_THE_FACE_AND_NEVER_A_THREAD_THE_CARDS_REGISTER_FILE_IS_THE_PRECISION_LAW_AS_CAPACITY_HEAT_FOLLOWS_EVERY_MERGE_AND_ORDER_ONLY_A_SECTION_AND_A_SERIES_RELEASES_ONLY_WHERE_ITS_TICK_CONTRACTS.md)
 - 2026-11-20 [A published Lean archive claims the Riemann hypothesis for zeta and every dirichlet character its statement is mathlibs its text adds no axiom and its key is multiplicity as a carry count won by a chain of theta lifts](2026-11-20_A_PUBLISHED_LEAN_ARCHIVE_CLAIMS_THE_RIEMANN_HYPOTHESIS_FOR_ZETA_AND_EVERY_DIRICHLET_CHARACTER_ITS_STATEMENT_IS_MATHLIBS_ITS_TEXT_ADDS_NO_AXIOM_AND_ITS_KEY_IS_MULTIPLICITY_AS_A_CARRY_COUNT_WON_BY_A_CHAIN_OF_THETA_LIFTS.md)
 - 2026-11-20 [Unforced blow up is claimed for Euler with a whole Lean proof and for Navier Stokes as an implication from unposted data the Navier Stokes profile is a cycle of the scale flow closed by a screw and a dyad](2026-11-20_UNFORCED_BLOW_UP_IS_CLAIMED_FOR_EULER_WITH_A_WHOLE_LEAN_PROOF_AND_FOR_NAVIER_STOKES_AS_AN_IMPLICATION_FROM_UNPOSTED_DATA_THE_NAVIER_STOKES_PROFILE_IS_A_CYCLE_OF_THE_SCALE_FLOW_CLOSED_BY_A_SCREW_AND_A_DYAD.md)
 - 2026-11-19 [An L function is a cycle machine whose prime sites carry their own clocks chambers identity holds for every period and free fall deviates by the tide of any torsion free connection in Lean](2026-11-19_AN_L_FUNCTION_IS_A_CYCLE_MACHINE_WHOSE_PRIME_SITES_CARRY_THEIR_OWN_CLOCKS_CHAMBERS_IDENTITY_HOLDS_FOR_EVERY_PERIOD_AND_FREE_FALL_DEVIATES_BY_THE_TIDE_OF_ANY_TORSION_FREE_CONNECTION_IN_LEAN.md)
