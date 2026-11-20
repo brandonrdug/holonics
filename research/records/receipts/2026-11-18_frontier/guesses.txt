@@ -747,3 +747,9 @@ on the A100 beside the line's own lap L63 on the PC from the same state. One cha
   some); one place open -0.0010 or lower. The wide panel within two points of L63's and pairs attested within 0.03.
   What it decides. As G-1120-1: under minus two standard errors, the second lap is run and the line takes the lane if the gain grows a lap
   by more than the line's own lap gain in the time the lane costs; within two standard errors, two more laps; above, the lane leaves.
+  Scored on the first lap (12:10 UTC; lane/laneread3.sh). X63 less L63, paired: rows S -0.0003 (±0.0004), outside the guessed -0.0005
+  to -0.0013 (the second lane buys under a quarter of the first's first lap there); one place open -0.0012 (±0.0004), the guess held; the
+  frontier under the law -0.0039 (±0.0005). Wide panel 1,545 of 2,147 (72.0%) against L63's 1,625 of 2,210 (73.5%), loops 25 against 24;
+  pairs attested 0.330 against 0.341: within the bounds. The A100 ran X63 at 856.3 ms a section (1,063 at most), 1.04 times width 160 there.
+  By the rule, rows S within two standard errors: two more laps, X64 beside L64 (ended at the third pass's end, 2,885 sections, as L64)
+  and X65 beside L65.
