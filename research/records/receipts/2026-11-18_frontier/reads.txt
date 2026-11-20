@@ -1497,3 +1497,4 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   long panel (20 writes): P48 269 words, 196 in lexicon (72%), code 53/55; L48 242 words, 147 (60%), code 18/28
   presence (pump/presence.py): P48's end rms_P/rms_Q 0.0923, its mean 0.0801; 131,071 of 131,072 entries of P off zero
   read: the pump's first lap buys a small, sure fall on every frontier read, largest where four to sixty places are known, and leaves the writes' lexicon where it stood; the line takes it from P49.
+  the A100 session `pump` (22:51 to 00:41 UTC: uploads, build, the reproduction, P48 and P49): 83.37 compute units to 68.03, 15.3 units in 1 h 50 min, about 8.3 an hour; P49's states downloaded and their hashes read equal to the VM's before it was released (STATE.3000 162ee441…, MEAN.3000 6e653f51…).
