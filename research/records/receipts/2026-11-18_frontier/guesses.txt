@@ -772,3 +772,9 @@ the PC from the same state, two laps (Y68, Y69 beside L68, L69) and a third wher
   Scored on the first lap (16:56 UTC; lane/laneread6.sh). Y68 less L68 on rows S +0.0002 (±0.0004): inside the guessed +0.0002 to -0.0008,
   at its edge; one place open -0.0008 (±0.0004); the frontier under the law -0.0031 (±0.0005). Wide panel 71.5% against 73.5% (at the
   bound), pairs 0.338 against 0.338. Its second lap Y69 runs on the PC (the A100 session was reclaimed) beside L69.
+  The second lap (18:29 UTC; lane/lanepc69.sh, Y69 on the PC from Y68's end). Y69 less L69, paired: rows S -0.0019 (±0.0004), under Y68's
+  by 0.0021 (the guess's 0.0005 held); one place open -0.0022 (±0.0005), under minus two standard errors (held); the frontier under the
+  law -0.0009 (±0.0006). Wide panel 1,566 of 2,119 (73.9%) against L69's 1,587 of 2,191 (72.4%), loops 25 against 22; pairs attested 0.359
+  against 0.344: within the bounds. The PC ran Y69 at 531.8 ms a section, 717 at most, 1.05 times width 192's 507.5: the lane's cost is
+  0.05 of a lap, about 0.00015 of the line's own lap gain, under its 0.0021. The line takes the third lane from Y69's end: Y70 on lap 70's
+  sections beside L70, then L71 on (front/line70y.sh). The width-192 chain's started L71 was stopped at 18:07 so Y69's panel could read.
