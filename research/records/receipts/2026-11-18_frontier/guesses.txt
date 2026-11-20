@@ -778,3 +778,13 @@ the PC from the same state, two laps (Y68, Y69 beside L68, L69) and a third wher
   against 0.344: within the bounds. The PC ran Y69 at 531.8 ms a section, 717 at most, 1.05 times width 192's 507.5: the lane's cost is
   0.05 of a lap, about 0.00015 of the line's own lap gain, under its 0.0021. The line takes the third lane from Y69's end: Y70 on lap 70's
   sections beside L70, then L71 on (front/line70y.sh). The width-192 chain's started L71 was stopped at 18:07 so Y69's panel could read.
+
+G-1120-4 (2026-11-20T18:57:55Z). A fourth lane's price (as G-1120-1 to G-1120-3). From lap L71's end (the line at width 224), the arm Z72 is the same state
+grown by one more lane (found-lane: width 224 to 256, lanes 7 to 8), trained on a Colab A100 beside the line's lap L72 on the PC from the same
+state, and its second lap Z73 beside L73; each lap's states downloaded as it lands (two sessions were reclaimed mid-lap on November 20).
+  What is on record. The three lanes' gaps on rows S over their first two laps: -0.0013, -0.0022; -0.0003, -0.0017; +0.0002, -0.0019; at
+  1.11, 1.04 and 1.05 times a section.
+  The guess. Z72 less L72 on rows S between +0.0004 and -0.0006 in the first lap; Z73 less L73 under Z72's by 0.0010 or more; the wide
+  panel within two points and pairs attested within 0.03 at each lap.
+  What it decides. As G-1120-3: the line takes the lane if the gap grows a lap by more than the line's own lap gain in the time the lane
+  costs; otherwise the face stands at 224.
