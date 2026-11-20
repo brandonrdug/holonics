@@ -736,3 +736,14 @@ MEAN.3000 by the line's reads, writes first.
   the line's own lap buys in the time the lane costs. Wide panel 1,597 of 2,206 (72.4%) against L61's 1,623 of 2,198 (73.8%), loops 20
   against 19; pairs attested 0.323 against 0.341; both within the bounds. The A100 ran W61 at 822.8 ms a section. The line takes the
   lane from the arm's third lap W62 (trained on the A100 from W61's end beside L62) and continues from W62's end on the PC.
+
+G-1120-2 (2026-11-20T09:52:25Z). A second lane's price (the width rule's own scope, as G-1120-1). From W62's end (the line at width 160 from this lap
+on), the arm X63 is the same state grown by one more lane (found-lane on the A100: width 160 to 192, lanes 5 to 6), trained 3,000 sections
+on the A100 beside the line's own lap L63 on the PC from the same state. One change: the second lane. Both read at MEAN.3000, writes first.
+  What is on record. The first lane: -0.0013 on rows S in its first lap, -0.0022 in its second (one place open -0.0014, -0.0047); it cost
+  the A100 1.13 times a section. A capacity price falls as the reader grows (atlas code.capacity-price): the circles' doublings bought
+  0.040, 0.040, 0.020, 0.015, 0.004.
+  The guess. X63 less L63 on rows S, paired: between -0.0005 and -0.0013 in the first lap (a second lane buys less than the first, and
+  some); one place open -0.0010 or lower. The wide panel within two points of L63's and pairs attested within 0.03.
+  What it decides. As G-1120-1: under minus two standard errors, the second lap is run and the line takes the lane if the gain grows a lap
+  by more than the line's own lap gain in the time the lane costs; within two standard errors, two more laps; above, the lane leaves.
