@@ -929,3 +929,29 @@ pump's chart and bias). Lean: `HNN/CarryGate` builds with the pumped turn, pump 
 `pumpedCharge_le` and `reflection_turn_ne`. The card's realization, its parity against the host and the line's lap reproduced with the
 new build are the next receipts; then the arm, the pump founded at zero on the state lap L48 trains from (`OPEN.L48`), beside L48 as its
 control.
+
+## 30. The face grows by price, and her writes stand where her codes put them
+
+*Written at 14:11 UTC, November 20.* The pump's laps lowered every held read and left her writes where they stood, and so did two lanes
+of the face (G-1120-1, G-1120-2; receipts `reads.txt` 09:48 and 14:10 UTC). Each lane was read as the width rule asks, a capacity price
+beside the line from the same state: the first lane's gap on rows S grew -0.0013, -0.0022, -0.0062 over three laps at 1.11 times a section,
+the second's -0.0003, -0.0017, -0.0029 at 1.03 to 1.04, so each buys a level that keeps growing at a small price, and the line holds both
+(width 192, rows S 1.3442 at X65). Her writes over the same laps: 69% to 73% of their words in the lexicon (the reference continuations
+80%), word pairs attested in the training text 0.31 to 0.34 (the references 0.49), with no difference between arm and control that the
+panel's draws resolve.
+
+What that says (`agent-inferred`). A write draws each place from her face at the temperature the field holds, so a write is a sample of
+her code: at 1.34 nats a place on rows S (about 1.9 bits an octet) a sample holds words and the shapes of phrases and loses their sense
+within a few words, which is what a reader of a model at that code finds in any chart. Her writes moved from 58% to 70% while rows S fell
+from 1.61 to 1.41 (laps L20 to L40) and have stood since while it fell to 1.34: the lexicon share saturates toward the reference's 80%
+and the pair share moves with codes far lower than these. So the writes are not stuck on a defect of the writer; they wait on the code, and
+a gain of a few thousandths a lap is not one an arm's single panel can show. The parts that lower the code by price (the lanes) and the
+passes over the passage are the path.
+
+*Corrected at 14:54 UTC.* "Her writes stand where they stood" holds only for one lap beside its control, whose panels scatter by
+about 0.02 in the pair share. Read over the line's laps on the same wide panel (`tools/write_composition_ruler.py`, receipts `reads.txt`
+14:54 UTC), her composition rises with her codes: word pairs attested in the training text 0.229 at L20, 0.277 at L30, 0.308
+at L40, 0.310 at L50, 0.337 at L60, 0.345 at L66 (the references 0.490), and word triples 0.023, 0.048, 0.068, 0.066, 0.086, 0.101 (the
+references 0.249): the triples four times over in 46 laps. Along a write the pair share does not fall (places 2 to 8 at L66: 0.32 to 0.37,
+no drift of her own context); it stands lower than the reference's at every place. So her writes follow her code, slowly, and the
+lexicon share is the measure that saturated, not the writes.

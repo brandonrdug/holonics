@@ -758,3 +758,23 @@ on the A100 beside the line's own lap L63 on the PC from the same state. One cha
   place open, where the second lane costs the A100 1.04 times a section (0.0001 of the line's lap gain). Wide panel 1,588 of 2,212 (71.8%)
   against L64's 1,586 of 2,211 (71.7%), loops 19 against 20; pairs attested 0.325 against 0.317. By G-1120-1's rule the line takes the
   second lane from X65's end (the third lap, trained beside L65); X65's read against L65 is recorded when it lands.
+
+G-1120-3 (2026-11-20T14:12:07Z). A third lane's price (as G-1120-1 and G-1120-2). From lap L67's end (the line at width 192), the arm Y68 is the same state
+grown by one more lane (found-lane on the A100: width 192 to 224, lanes 6 to 7), trained on a Colab A100 beside the line's own lap L68 on
+the PC from the same state, two laps (Y68, Y69 beside L68, L69) and a third where the rule asks it. One change: the third lane.
+  What is on record. The first lane's gap on rows S over its laps -0.0013, -0.0022, -0.0062 at 1.11 times a section; the second's -0.0003,
+  -0.0017, -0.0029 at 1.03 to 1.04. A capacity price falls as the reader grows.
+  The guess. Y68 less L68 on rows S, paired: between +0.0002 and -0.0008 in the first lap; Y69 less L69 under Y68's by 0.0005 or more (the
+  gap grows a lap); one place open under minus two standard errors by the second lap. The wide panel within two points and pairs attested
+  within 0.03 at each lap.
+  What it decides. As G-1120-2: the line takes the lane when the gap grows a lap by more than the line's own lap gain (about 0.003 on rows S
+  at width 192) in the time the lane costs; otherwise, after the third lap, the lane leaves and the face stands at 192.
+  Scored on the first lap (16:56 UTC; lane/laneread6.sh). Y68 less L68 on rows S +0.0002 (±0.0004): inside the guessed +0.0002 to -0.0008,
+  at its edge; one place open -0.0008 (±0.0004); the frontier under the law -0.0031 (±0.0005). Wide panel 71.5% against 73.5% (at the
+  bound), pairs 0.338 against 0.338. Its second lap Y69 runs on the PC (the A100 session was reclaimed) beside L69.
+  The second lap (18:29 UTC; lane/lanepc69.sh, Y69 on the PC from Y68's end). Y69 less L69, paired: rows S -0.0019 (±0.0004), under Y68's
+  by 0.0021 (the guess's 0.0005 held); one place open -0.0022 (±0.0005), under minus two standard errors (held); the frontier under the
+  law -0.0009 (±0.0006). Wide panel 1,566 of 2,119 (73.9%) against L69's 1,587 of 2,191 (72.4%), loops 25 against 22; pairs attested 0.359
+  against 0.344: within the bounds. The PC ran Y69 at 531.8 ms a section, 717 at most, 1.05 times width 192's 507.5: the lane's cost is
+  0.05 of a lap, about 0.00015 of the line's own lap gain, under its 0.0021. The line takes the third lane from Y69's end: Y70 on lap 70's
+  sections beside L70, then L71 on (front/line70y.sh). The width-192 chain's started L71 was stopped at 18:07 so Y69's panel could read.
