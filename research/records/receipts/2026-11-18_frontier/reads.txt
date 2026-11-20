@@ -1517,3 +1517,9 @@ The first lap of two streams and the second known-stream lap's last reads (writt
   wide panel words in the lexicon: L50 1540/2179 (70%), L51 1588/2203 (72%), L52 1551/2206 (70%), L53 1520/2161 (70%); loops 20, 22, 21, 25 of 160
   presence: the pump's rows at L51's end 0.1916 of the turn rows, L53's 0.2353
   read: the pumped line falls about 0.002 nats a place a lap on rows S and 0.003 on one place open, as the unpumped line did before it, from the level the pump lowered; the pump's rows keep growing by about a fifth a lap; her words hold at 70% to 72%.
+
+# 06:07 UTC November 20. The pumped line's laps L54 to L57 (front/line54.sh), each at its mean:
+  rows S: L54 1.3801, L55 1.3765, L56 1.3740, L57 1.3716 | one place open: 0.7298, 0.7266, 0.7248, 0.7216 | the frontier: 1.8906, 1.8941, 1.8872, 1.8854
+  wide panel words in the lexicon: 1563/2192 (71%), 1546/2174 (71%), 1522/2164 (70%), 1535/2183 (70%); loops 22, 20, 23, 20 of 160
+  presence at L57's end: the pump's rows 0.3023 of the turn rows
+  read: rows S falls 0.0023 a lap over the four laps (0.0091 from L53), one place open 0.0021; her words hold at 70% to 71%.
