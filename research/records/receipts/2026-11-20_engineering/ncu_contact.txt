@@ -1,0 +1,8 @@
+# ncu: lock taken 23:08:09 other runs: 0
+NCU field_contact_rows 23:08:15  Memory Throughput % 34.75; DRAM Throughput % 25.54; Duration us 295.39; Compute (SM) Throughput % 33.15; Memory Throughput Gbyte/s 183.70; L1/TEX Hit Rate % 41.71; L2 Hit Rate % 90.09; Achieved Occupancy % 27.80;
+NCU field_contact_l4 23:08:26  Memory Throughput % 40.06; DRAM Throughput % 18.10; Duration ms 1.39; Compute (SM) Throughput % 52.46; Memory Throughput Gbyte/s 130.21; L1/TEX Hit Rate % 25.03; L2 Hit Rate % 93.72; Achieved Occupancy % 45.32;
+NCU field_contact_columns 23:08:32  Memory Throughput % 15.40; DRAM Throughput % 15.40; Duration us 186.82; Compute (SM) Throughput % 39.24; Memory Throughput Gbyte/s 110.73; L1/TEX Hit Rate % 40.54; L2 Hit Rate % 85.02; Achieved Occupancy % 35.84;
+NCU field_pace_skin_back 23:08:42  Memory Throughput % 9.11; DRAM Throughput % 5.97; Duration us 74.37; Compute (SM) Throughput % 35.24; Memory Throughput Gbyte/s 42.87; L1/TEX Hit Rate % 75.68; L2 Hit Rate % 77.42; Achieved Occupancy % 27.03;
+# ncu: released 23:08:42
+NCU_ALL_DONE 23:08:42
+RUN_EXIT 0 2026-11-20T23:08:42Z

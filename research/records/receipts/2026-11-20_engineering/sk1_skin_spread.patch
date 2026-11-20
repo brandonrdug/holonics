@@ -1,0 +1,252 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index 36209e419..6d2540f2c 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -7263,64 +7263,121 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
+         // row's (`paced_at(w, h, g)`), so it is read once a row, not at every pair's every mode; the skins are the same words.
+         const bool pg = paced_hs(w, hs, g);
+         wide own = 0;
+-        for (uint32_t k = lane; k < K; k += 32) {
+-            const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
+-            if (j == UINT32_MAX) {
+-                continue;
+-            }
+-            const uint64_t gj = first + j;
+-            const wide sgn = sigma[g] > sigma[gj] ? 1 : sigma[g] < sigma[gj] ? -1 : 0;
+-            if (sgn == 0) {
+-                continue;
+-            }
+-            const uint32_t gap = j > ip ? j - ip : ip - j;
+-            wide at = 0;
+-            // [P55 step 5] The modes' sums to the source's covector, added on the lane and summed once (a ring sum on `Z/2^128`: the same bits).
+-            uwide to_source = 0;
+-            for (uint32_t l = 0; l < n; l++) {
+-                const wide dec = pg ? pair_skin_word(w, p, srow + k, l) : decay_hs(w, hs, l, gap);
+-                // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
+-                const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
+-                wide value = 0;
+-                if (!mul_fits_w64(e[j], false, inner, &value)) {
+-                    atomicOr(w.status, REFUSED_CARRIER);
++        // [realization; the lead, November 20, the contact kernels' profile] **Lanes over a support entry and a mode.** A lane was a support
++        // entry with its modes walked in turn, so a row of six entries held six of a warp's 32 lanes (Nsight Compute read 6.09 active lanes a
++        // warp): where the modes are a power of two up to 16, the lanes are `32/n` entries of `n` modes each, a mode's term on its own lane,
++        // and an entry's terms to its source summed over its `n` lanes by shuffles before the one atomic add. Ring sums on `Z/2^128` in any
++        // bracketing: the same bits.
++        const bool spread = n <= 16 && (n & (n - 1)) == 0;
++        const uint32_t groups = spread ? 32 / n : 1, q = spread ? lane / n : 0, l = spread ? lane % n : 0;
++        if (spread) {
++            for (uint32_t k0 = 0; k0 < K; k0 += groups) {
++                const uint32_t k = k0 + q;
++                uwide to_source = 0;
++                uint64_t target = UINT64_MAX;
++                if (k < K) {
++                    const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
++                    if (j != UINT32_MAX) {
++                        const uint64_t gj = first + j;
++                        const wide sgn = sigma[g] > sigma[gj] ? 1 : sigma[g] < sigma[gj] ? -1 : 0;
++                        if (sgn != 0) {
++                            const uint32_t gap = j > ip ? j - ip : ip - j;
++                            wide at = 0;
++                            const wide dec = pg ? pair_skin_word(w, p, srow + k, l) : decay_hs(w, hs, l, gap);
++                            // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
++                            const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
++                            wide value = 0;
++                            if (!mul_fits_w64(e[j], false, inner, &value)) {
++                                atomicOr(w.status, REFUSED_CARRIER);
++                            }
++                            value = rel(value, SHARE_BITS);
++                            // [P54 step 4] The lock's pairing `w·k` and power `|k|²` from 32-bit products (unit words), `2 D |k|²` as 64 by 64 unsigned.
++                            const int64_t kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
++                            const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], ki);
++                            const uint64_t power = (uint64_t)mul32(kr, kr) + (uint64_t)mul32(ki, ki);
++                            const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec);
++                            wide lock = 0;
++                            if (!mul_fits_w64(mag64(dsr[j]), dsr[j] < 0, bracket, &lock)) {
++                                atomicOr(w.status, REFUSED_KEY);
++                            }
++                            lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
++                            at = skin_back_proved(turn_b[l], dec, value + lock);
++                            own -= sgn * at;
++                            to_source = (uwide)(sgn * at);
++                            target = gj;
++                        }
++                    }
+                 }
+-                value = rel(value, SHARE_BITS);
+-                // [P54 step 4] The lock's pairing `w·k` and power `|k|²` from 32-bit products (unit words), `2 D |k|²` as 64 by 64 unsigned.
+-                const int64_t kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
+-                const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], ki);
+-                const uint64_t power = (uint64_t)mul32(kr, kr) + (uint64_t)mul32(ki, ki);
+-                const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec);
+-                wide lock = 0;
+-                if (!mul_fits_w64(mag64(dsr[j]), dsr[j] < 0, bracket, &lock)) {
+-                    atomicOr(w.status, REFUSED_KEY);
++                for (uint32_t o = n / 2; o > 0; o >>= 1) {
++                    to_source += shfl_wide(to_source, o);
++                }
++                if (l == 0 && target != UINT64_MAX) {
++                    add_wide(w.gsig + (uint64_t)p * w.T + target, (wide)to_source);
+                 }
+-                lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
+-                at = skin_back_proved(turn_b[l], dec, value + lock);
+-                own -= sgn * at;
+-                to_source += (uwide)(sgn * at);
+             }
+-            add_wide(w.gsig + (uint64_t)p * w.T + gj, (wide)to_source);
+-        }
+-        if (lane < nslots) {
+-            uint32_t lo, hi_, lv;
+-            if (crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
+-                const uint64_t count = scp[hi_ + 1] - scp[lo];
+-                const bool right = lo > ip;
+-                const uint64_t ge = octave_edge(g, lv, right);
+-                const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
+-                if (count != 0 && sgn != 0) {
+-                    const wide cnt = (wide)count;
+-                    // [P55 step 5] The quotients by the count and its square (a mode's value and bracket) by divisors read once a crowd
+-                    // (`div_nearest_by`, the same integer: `⌊(|x| + ⌊k/2⌋)/k⌋` either way; `count < 2^32`, so `count² < 2^64`), and the modes' sums to
+-                    // the edge's covector added on the lane and summed once.
+-                    const Divisor qc = divisor_of(count), qc2 = divisor_of(count * count);
+-                    uwide to_edge = 0;
+-                    for (uint32_t l = 0; l < n; l++) {
++        } else {
++            for (uint32_t k = lane; k < K; k += 32) {
++                const uint32_t j = support_at(members, off, rcs[warp], ip, heard, k);
++                if (j == UINT32_MAX) {
++                    continue;
++                }
++                const uint64_t gj = first + j;
++                const wide sgn = sigma[g] > sigma[gj] ? 1 : sigma[g] < sigma[gj] ? -1 : 0;
++                if (sgn == 0) {
++                    continue;
++                }
++                const uint32_t gap = j > ip ? j - ip : ip - j;
++                wide at = 0;
++                // [P55 step 5] The modes' sums to the source's covector, added on the lane and summed once (a ring sum on `Z/2^128`: the same bits).
++                uwide to_source = 0;
++                for (uint32_t l = 0; l < n; l++) {
++                    const wide dec = pg ? pair_skin_word(w, p, srow + k, l) : decay_hs(w, hs, l, gap);
++                    // [P54 step 4] `Re(conj(δỹ) ṽ)` as two 64 by 64 products (each under `2^126`, their sum under `2^127`).
++                    const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mul64_128(dyi[n + l], values[(uint64_t)j * S + n + l]);
++                    wide value = 0;
++                    if (!mul_fits_w64(e[j], false, inner, &value)) {
++                        atomicOr(w.status, REFUSED_CARRIER);
++                    }
++                    value = rel(value, SHARE_BITS);
++                    // [P54 step 4] The lock's pairing `w·k` and power `|k|²` from 32-bit products (unit words), `2 D |k|²` as 64 by 64 unsigned.
++                    const int64_t kr = words[(uint64_t)j * S + l], ki = words[(uint64_t)j * S + n + l];
++                    const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], ki);
++                    const uint64_t power = (uint64_t)mul32(kr, kr) + (uint64_t)mul32(ki, ki);
++                    const wide bracket = (pairing << (MOVE_BITS + 1)) - (wide)mulu64(power, 2 * (uint64_t)dec);
++                    wide lock = 0;
++                    if (!mul_fits_w64(mag64(dsr[j]), dsr[j] < 0, bracket, &lock)) {
++                        atomicOr(w.status, REFUSED_KEY);
++                    }
++                    lock = rel(lock, 2 * FACE_BITS + 1 + 2 * MOVE_BITS - MOVE_BITS);
++                    at = skin_back_proved(turn_b[l], dec, value + lock);
++                    own -= sgn * at;
++                    to_source += (uwide)(sgn * at);
++                }
++                add_wide(w.gsig + (uint64_t)p * w.T + gj, (wide)to_source);
++            }
++        }
++        if (spread) {
++            // The crowds alike: `32/n` crowd slots of `n` modes a pass, a slot's terms to its edge summed over its lanes before the one add.
++            for (uint32_t c0 = 0; c0 < nslots; c0 += groups) {
++                const uint32_t cs = c0 + q;
++                uwide to_edge = 0;
++                uint64_t target = UINT64_MAX;
++                uint32_t lo, hi_, lv;
++                if (cs < nslots && crowd_at(w, ip, heard, cs, &lo, &hi_, &lv)) {
++                    const uint64_t count = scp[hi_ + 1] - scp[lo];
++                    const bool right = lo > ip;
++                    const uint64_t ge = octave_edge(g, lv, right);
++                    const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
++                    if (count != 0 && sgn != 0) {
++                        const wide cnt = (wide)count;
++                        // [P55 step 5] The quotients by the count and its square (a mode's value and bracket) by divisors read once a crowd
++                        // (`div_nearest_by`, the same integer: `⌊(|x| + ⌊k/2⌋)/k⌋` either way; `count < 2^32`, so `count² < 2^64`), and the modes' sums to
++                        // the edge's covector added on the lane and summed once.
++                        const Divisor qc = divisor_of(count), qc2 = divisor_of(count * count);
+                         const wide dec = pg ? crowd_skin_word(w, p, g, lv, right, l) : decay_hs(w, hs, l, (uint32_t)1 << lv);
+                         const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(uint64_t)(hi_ + 1) * S + n + l] - svp[(uint64_t)lo * S + n + l];
+                         wide x = 0, y = 0, value = 0;
+-                        if (!mul_fits_w64(mag64(dyi[l]), dyi[l] < 0, vr, &x) || !mul_fits_w64(mag64(dyi[n + l]), dyi[n + l] < 0, vi, &y) || !mul_fits_w64(w.ce[hg * w.slots + lane], false, x + y, &value)) {
++                        if (!mul_fits_w64(mag64(dyi[l]), dyi[l] < 0, vr, &x) || !mul_fits_w64(mag64(dyi[n + l]), dyi[n + l] < 0, vi, &y) || !mul_fits_w64(w.ce[hg * w.slots + cs], false, x + y, &value)) {
+                             atomicOr(w.status, REFUSED_CARRIER);
+                         }
+                         value = div_nearest_by(rel(value, SHARE_BITS), qc);
+@@ -7338,15 +7395,70 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
+                             bracket = div_nearest_by(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), qc2);
+                         }
+                         wide lock = 0;
+-                        if (!mul_fits_w64(mag64(w.cds[hg * w.slots + lane]), w.cds[hg * w.slots + lane] < 0, bracket, &lock)) {
++                        if (!mul_fits_w64(mag64(w.cds[hg * w.slots + cs]), w.cds[hg * w.slots + cs] < 0, bracket, &lock)) {
+                             atomicOr(w.status, REFUSED_KEY);
+                         }
+                         lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
+                         const wide at = skin_back_proved(turn_b[l], dec, value + lock);
+                         own -= sgn * at;
+-                        to_edge += (uwide)(sgn * at);
++                        to_edge = (uwide)(sgn * at);
++                        target = ge;
++                    }
++                }
++                for (uint32_t o = n / 2; o > 0; o >>= 1) {
++                    to_edge += shfl_wide(to_edge, o);
++                }
++                if (l == 0 && target != UINT64_MAX) {
++                    add_wide(w.gsig + (uint64_t)p * w.T + target, (wide)to_edge);
++                }
++            }
++        } else {
++            if (lane < nslots) {
++                uint32_t lo, hi_, lv;
++                if (crowd_at(w, ip, heard, lane, &lo, &hi_, &lv)) {
++                    const uint64_t count = scp[hi_ + 1] - scp[lo];
++                    const bool right = lo > ip;
++                    const uint64_t ge = octave_edge(g, lv, right);
++                    const wide sgn = sigma[g] > sigma[ge] ? 1 : sigma[g] < sigma[ge] ? -1 : 0;
++                    if (count != 0 && sgn != 0) {
++                        const wide cnt = (wide)count;
++                        // [P55 step 5] The quotients by the count and its square (a mode's value and bracket) by divisors read once a crowd
++                        // (`div_nearest_by`, the same integer: `⌊(|x| + ⌊k/2⌋)/k⌋` either way; `count < 2^32`, so `count² < 2^64`), and the modes' sums to
++                        // the edge's covector added on the lane and summed once.
++                        const Divisor qc = divisor_of(count), qc2 = divisor_of(count * count);
++                        uwide to_edge = 0;
++                        for (uint32_t l = 0; l < n; l++) {
++                            const wide dec = pg ? crowd_skin_word(w, p, g, lv, right, l) : decay_hs(w, hs, l, (uint32_t)1 << lv);
++                            const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * S + l], vi = svp[(uint64_t)(hi_ + 1) * S + n + l] - svp[(uint64_t)lo * S + n + l];
++                            wide x = 0, y = 0, value = 0;
++                            if (!mul_fits_w64(mag64(dyi[l]), dyi[l] < 0, vr, &x) || !mul_fits_w64(mag64(dyi[n + l]), dyi[n + l] < 0, vi, &y) || !mul_fits_w64(w.ce[hg * w.slots + lane], false, x + y, &value)) {
++                                atomicOr(w.status, REFUSED_CARRIER);
++                            }
++                            value = div_nearest_by(rel(value, SHARE_BITS), qc);
++                            const wide wr = wi[l], wim = wi[n + l];
++                            const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * S + l], mi = swp[(uint64_t)(hi_ + 1) * S + n + l] - swp[(uint64_t)lo * S + n + l];
++                            // [P54 step 4] Where the crowd's summed words are under `2^31`: its pairing and power from 32-bit products (sums under
++                            // `2^63`), their products by `2|C|` and `2D` as 64 by 64; otherwise the wide forms.
++                            int32_t mr32, mi32;
++                            wide bracket;
++                            if (narrow31(mr, &mr32) & narrow31(mi, &mi32)) {
++                                const int64_t pairing = mul32(wi[l], mr32) + mul32(wi[n + l], mi32);
++                                const int64_t power = mul32(mr32, mr32) + mul32(mi32, mi32);
++                                bracket = div_nearest_by((mul64_128(pairing, 2 * (int64_t)count) << MOVE_BITS) - mul64_128(power, 2 * (int64_t)dec), qc2);
++                            } else {
++                                bracket = div_nearest_by(((2 * cnt * (wr * mr + wim * mi)) << MOVE_BITS) - 2 * dec * (mr * mr + mi * mi), qc2);
++                            }
++                            wide lock = 0;
++                            if (!mul_fits_w64(mag64(w.cds[hg * w.slots + lane]), w.cds[hg * w.slots + lane] < 0, bracket, &lock)) {
++                                atomicOr(w.status, REFUSED_KEY);
++                            }
++                            lock = rel(lock, 2 * FACE_BITS + 1 + MOVE_BITS);
++                            const wide at = skin_back_proved(turn_b[l], dec, value + lock);
++                            own -= sgn * at;
++                            to_edge += (uwide)(sgn * at);
++                        }
++                        add_wide(w.gsig + (uint64_t)p * w.T + ge, (wide)to_edge);
+                     }
+-                    add_wide(w.gsig + (uint64_t)p * w.T + ge, (wide)to_edge);
+                 }
+             }
+         }

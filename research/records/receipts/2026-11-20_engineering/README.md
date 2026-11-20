@@ -149,3 +149,32 @@ So at the built tick's form no tolerance releases the tape: the first link that 
 trained tick does not contract, and its candidate is an averaged step with the maps' gains bounded in the lanes' metric, a change of law
 read as an arm (`agent-inferred`: one region of public text on one saved state; the line's own passages and the largest gain by power
 iteration are the next reads).
+
+## The contact kernels are bound by latency, and lanes alone do not buy it back (`ncu_contact.txt`, `sk1.txt`, `sk1_skin_spread.patch`)
+
+Nsight Compute on one launch each of the merged build, alone on the card: `field_contact_rows` at 35% of the memory system's peak and 33%
+of the multiprocessors', `field_contact_l4` at 40% and 52%, `field_contact_columns` at 15% and 39%, `field_pace_skin_back` at 9% and 35%;
+L2 hit rates 77 to 94%. None is bound by its bus or its arithmetic: each waits on latency, with its occupancy capped by its registers
+(theoretical 33, 50, 58 and 42%; achieved 28, 45, 36 and 27%) at 8 to 10 cycles a issued instruction. So narrowing the gathered values to
+32 bits, which halves octets, is not their lever (`agent-inferred` from these sections); the registers a thread holds are (the hardware
+record's register-file inequality: a 128-bit sum is four registers).
+
+`field_pace_skin_back` showed 6.09 active lanes of 32 a warp (a lane a support entry, its modes walked in turn). A build that spread its
+pairs and crowds over entry and mode lanes (`sk1_skin_spread.patch`; each entry's terms summed over its lanes by shuffles, ring sums, the
+same bits: the card suite 28 passed, the 24 sections of L71 reproduced) read 516.1 ms a section against the merged build's 514.0 in a
+warmed eight-run hold (spreads 1.9 and 2.0; OBS ran on the card beside it throughout, steady). The guess (5 to 12 ms shorter) missed, and
+the patch is set aside with this reading: the kernel's time is not its idle lanes' (its per-row preparation and its 128-bit chains stand
+whole on every lane that spreads them).
+
+## What the tick's premise says for the order (`agent-inferred`)
+
+The state's step held at 0.96 to 0.996 of the step before over twelve ticks: the built tick is an integrator, `x^(k+1) = x^k + g(x^k)` with
+`g` nearly the same from tick to tick, so its Jacobian stands near the identity in almost every direction and a read of its gains would
+find nearly every mode at gain one. The ray settles only because the state grows, by the running mean's `1/k`. Two consequences. The count
+of modes of gain one (the formal record's register size, §6.2 of the face-functor record) is not read off this tick: it asks for a tick
+that contracts, and only then separates the modes kept by a symmetry or a class from the ones the tick releases. And the tick that
+contracts is a store with a finite quality: a leak `λ` on the tick's state, `x^(k+1) = (1 − λ) x^k + g(x^k)`, settles at `g/λ` with
+`ρ = 1 − λ` (`store.finite-quality`, the store law of November 11), founded at `λ = 0` (every bit of the built tick) and deposited as a
+store's own state, never set as a dial. With it the forward's ticks follow a tolerance, `K = ln(τ/r₀)/ln ρ`, and the return can be the
+covector's series at the settled state (the hardware record's §8), which keeps one tick's operands where it keeps four. It changes the
+law, so it is built as an arm with its guess fixed first, after the realizations that keep every bit.
