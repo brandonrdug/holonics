@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,735 records from July 2026 to November 2026. 387 receipts directories: 225 beside the records and 162 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,736 records from July 2026 to November 2026. 387 receipts directories: 225 beside the records and 162 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 134 | 103 |
+| [November 2026](#november-2026) | 135 | 103 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,7 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-20 [A lane is a register of the face and never a thread the cards register file is the precision law as capacity heat follows every merge and order only a section and a series releases only where its tick contracts](2026-11-20_A_LANE_IS_A_REGISTER_OF_THE_FACE_AND_NEVER_A_THREAD_THE_CARDS_REGISTER_FILE_IS_THE_PRECISION_LAW_AS_CAPACITY_HEAT_FOLLOWS_EVERY_MERGE_AND_ORDER_ONLY_A_SECTION_AND_A_SERIES_RELEASES_ONLY_WHERE_ITS_TICK_CONTRACTS.md)
+- 2026-11-20 [A lattice an aperture and a dilation are one lens the hexagon is three classes without their common mode and the characteristic polygon lies on or above the grains in Lean](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)
 - 2026-11-20 [A published Lean archive claims the Riemann hypothesis for zeta and every dirichlet character its statement is mathlibs its text adds no axiom and its key is multiplicity as a carry count won by a chain of theta lifts](2026-11-20_A_PUBLISHED_LEAN_ARCHIVE_CLAIMS_THE_RIEMANN_HYPOTHESIS_FOR_ZETA_AND_EVERY_DIRICHLET_CHARACTER_ITS_STATEMENT_IS_MATHLIBS_ITS_TEXT_ADDS_NO_AXIOM_AND_ITS_KEY_IS_MULTIPLICITY_AS_A_CARRY_COUNT_WON_BY_A_CHAIN_OF_THETA_LIFTS.md)
 - 2026-11-20 [Hodge asks that each varietys failure group be finite a class of grain K closes after K turns one object refutes where a cause completes and a chart of one period reaches no decaying function in Lean](2026-11-20_HODGE_ASKS_THAT_EACH_VARIETYS_FAILURE_GROUP_BE_FINITE_A_CLASS_OF_GRAIN_K_CLOSES_AFTER_K_TURNS_ONE_OBJECT_REFUTES_WHERE_A_CAUSE_COMPLETES_AND_A_CHART_OF_ONE_PERIOD_REACHES_NO_DECAYING_FUNCTION_IN_LEAN.md)
 - 2026-11-20 [Hodge asks that the face functor be full a colourless class offers its reader magnitudes alone the product formula is a towers exchange law and a crossed pair is a commutator no uncoupled bank reads in Lean](2026-11-20_HODGE_ASKS_THAT_THE_FACE_FUNCTOR_BE_FULL_A_COLOURLESS_CLASS_OFFERS_ITS_READER_MAGNITUDES_ALONE_THE_PRODUCT_FORMULA_IS_A_TOWERS_EXCHANGE_LAW_AND_A_CROSSED_PAIR_IS_A_COMMUTATOR_NO_UNCOUPLED_BANK_READS_IN_LEAN.md)
