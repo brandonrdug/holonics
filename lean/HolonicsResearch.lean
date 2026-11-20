@@ -1474,6 +1474,7 @@ import HolonicsResearch.Coupling.HeatArrow
 import HolonicsResearch.Zeta.PaletteReflection
 import HolonicsResearch.Zeta.CayleyEar
 import HolonicsResearch.HNN.CarryGroupTracking
+import HolonicsResearch.HNN.NestedPairs
 import HolonicsResearch.Landmarks.IharaBassMatrix
 import HolonicsResearch.Coupling.MeanFieldHeatClock
 import HolonicsResearch.HNN.LoopPacking
