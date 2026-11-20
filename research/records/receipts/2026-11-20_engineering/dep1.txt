@@ -1,0 +1,11 @@
+DEP1 head c83598c92 2 changed files 20:13:37
+DEP1 build=0 20:13:59 warnings=0 
+# hold: lock taken 20:38:13 other runs: 0
+DEP1 repro_L71 20:38:29 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+DEP1 hold 1 old 20:38:54 last30 ms_mean=597.7 deposit_ms_mean=593.4 STORE_DEPOSIT_PARTS sections=40 read_and_return_ms=21993.4 compared_and_code_ms=93.0 covector_clone_ms=58.9 transfer_price_ms=153.5 entry_rates_ms=49.7 external_step_ms=242.7 external_price_ms=161.6 covector_grains_ms=121.1 moments_ms=101.0 step_ms=259.4 step_price_ms=162.0 reading_parts_ms=8.1 parts_price_ms=205.6 stepped_ms=135.0 rest_ms=0.3
+DEP1 hold 2 new 20:39:19 last30 ms_mean=578.7 deposit_ms_mean=576.1 STORE_DEPOSIT_PARTS sections=40 read_and_return_ms=21987.5 compared_and_code_ms=94.2 covector_clone_ms=0.0 transfer_price_ms=0.0 entry_rates_ms=48.3 external_step_ms=0.0 external_price_ms=0.0 covector_grains_ms=0.0 deposit_pass_ms=780.6 step_ms=0.0 step_price_ms=0.0 reading_parts_ms=6.9 parts_price_ms=0.0 stepped_ms=136.5 rest_ms=0.4
+DEP1 hold 3 new 20:39:44 last30 ms_mean=579.9 deposit_ms_mean=577.2 STORE_DEPOSIT_PARTS sections=40 read_and_return_ms=22043.5 compared_and_code_ms=93.6 covector_clone_ms=0.0 transfer_price_ms=0.0 entry_rates_ms=47.5 external_step_ms=0.0 external_price_ms=0.0 covector_grains_ms=0.0 deposit_pass_ms=781.3 step_ms=0.0 step_price_ms=0.0 reading_parts_ms=6.6 parts_price_ms=0.0 stepped_ms=134.3 rest_ms=0.3
+DEP1 hold 4 old 20:40:09 last30 ms_mean=592.9 deposit_ms_mean=590.2 STORE_DEPOSIT_PARTS sections=40 read_and_return_ms=21892.6 compared_and_code_ms=92.7 covector_clone_ms=58.4 transfer_price_ms=153.6 entry_rates_ms=47.8 external_step_ms=242.9 external_price_ms=163.1 covector_grains_ms=119.5 moments_ms=98.6 step_ms=248.1 step_price_ms=161.1 reading_parts_ms=7.8 parts_price_ms=204.3 stepped_ms=133.4 rest_ms=0.3
+# hold: released 20:40:09
+DEP1_ALL_DONE 20:40:09
+RUN_EXIT 0 2026-11-20T20:40:09Z

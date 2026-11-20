@@ -1,0 +1,22 @@
+STORE_DEPOSIT_PARTS sections=40 read_and_return_ms=22326.7 compared_and_code_ms=120.8 covector_clone_ms=67.0 transfer_price_ms=180.9 entry_rates_ms=52.4 external_step_ms=397.1 external_price_ms=197.1 covector_grains_ms=168.6 moments_ms=129.5 step_ms=403.3 step_price_ms=194.3 reading_parts_ms=8.6 parts_price_ms=228.6 stepped_ms=156.0 rest_ms=0.5
+STORE_HOST sections=40 cut_ms=159.9 views_ms=0.1 realized_ms=24632.3 mean_ms=58.5 lines_ms=0.9 pass_ms=0.1 saves_ms=503.7 elapsed_ms=26190
+FIELD_PHASE name=batch_base marks=120 ms=84 us_a_mark=703 card_ms=0 host_ms=84
+FIELD_PHASE name=batch_drop_and_collect marks=120 ms=32 us_a_mark=267 card_ms=0 host_ms=32
+FIELD_PHASE name=batch_setup marks=160 ms=9 us_a_mark=61 card_ms=0 host_ms=9
+FIELD_PHASE name=batch_takes marks=280 ms=97 us_a_mark=349 card_ms=0 host_ms=97
+FIELD_PHASE name=covector_fetch marks=80 ms=178 us_a_mark=2229 card_ms=0 host_ms=178
+FIELD_PHASE name=face_launch marks=160 ms=6 us_a_mark=43 card_ms=0 host_ms=6
+FIELD_PHASE name=mark_first_read marks=40 ms=0 us_a_mark=8 card_ms=0 host_ms=0
+FIELD_PHASE name=material_upload marks=80 ms=126 us_a_mark=1585 card_ms=0 host_ms=126
+FIELD_PHASE name=opening_back marks=120 ms=472 us_a_mark=3940 card_ms=0 host_ms=472
+FIELD_PHASE name=opening_forward marks=120 ms=128 us_a_mark=1073 card_ms=0 host_ms=128
+FIELD_PHASE name=outside_the_card marks=80 ms=3763 us_a_mark=47043 card_ms=0 host_ms=3763
+FIELD_PHASE name=reverse_launch marks=160 ms=13835 us_a_mark=86471 card_ms=0 host_ms=13835
+FIELD_PHASE name=run_end marks=80 ms=265 us_a_mark=3324 card_ms=0 host_ms=265
+FIELD_PHASE name=run_setup marks=120 ms=55 us_a_mark=460 card_ms=0 host_ms=55
+FIELD_PHASE name=stage_lists marks=240 ms=1071 us_a_mark=4466 card_ms=0 host_ms=1071
+FIELD_PHASE name=stage_pack_upload marks=240 ms=26 us_a_mark=109 card_ms=0 host_ms=26
+FIELD_PHASE name=status_wait marks=160 ms=67 us_a_mark=423 card_ms=0 host_ms=67
+FIELD_PHASE name=tick_exposure_wait marks=960 ms=3804 us_a_mark=3962 card_ms=0 host_ms=3804
+FIELD_PHASE name=tick_launch_post marks=960 ms=26 us_a_mark=27 card_ms=0 host_ms=26
+FIELD_PHASE name=tick_launch_pre marks=960 ms=1578 us_a_mark=1644 card_ms=0 host_ms=1578

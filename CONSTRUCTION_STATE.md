@@ -89,7 +89,10 @@ laps her composition rises with her codes: word pairs attested in the training t
 device is a member of the flock: an A100 runs this realization 1.54 times slower than the PC's card on one section, gives the same
 bits (24 sections of L48, L60, L63 and L68 equal), and runs the arms beside the line. It costs about seven to eight compute units an
 hour, and a standard session was reclaimed about two and a half hours into a run twice (09:50 and 16:20 UTC November 20), its files with it:
-an arm on Colab downloads each lap's states as it lands (24 units stood at 16:50 UTC).
+an arm on Colab downloads each lap's states as it lands (24 units stood at 16:50 UTC). Brandon (19:08 UTC November 20): no more Colab
+(the units run out and the reclaimed sessions destroy work); every run stays on his PC, the Ryzen 9 7900X and its RAM among the surfaces to
+use. He also asked that "lanes" (blocks of 32 coordinates of the face's width, `Declaration::lanes`) not stand in for the radix and graph
+width a register should be located at: the three lanes taken are a hand-chosen uniform widening, read by price, and stand as a stopgap.
 
 **What is owed, in order.** The face's width read further by price (a fourth lane), and the pump and the lanes read over laps; the
 composition ruler read each few laps beside the codes. A part judged by the sure share at the settled places (§21), which is what her words follow, as an

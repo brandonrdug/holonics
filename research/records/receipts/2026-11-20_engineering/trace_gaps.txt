@@ -1,0 +1,8 @@
+79 gaps, 63.92 ms a section: copy2:tiny -> copy1:7356448
+120 gaps, 19.45 ms a section: copy2:small -> copy1:small
+80 gaps, 8.42 ms a section: copy2:810240 -> copy2:4172800
+15 gaps, 2.42 ms a section: set:tiny -> set:tiny
+10 gaps, 1.58 ms a section: field_face -> set:5242880
+49 gaps, 1.47 ms a section: copy2:4172800 -> copy2:tiny
+14 gaps, 0.88 ms a section: field_moment_prefix_paced_all -> field_moment_skinned_all
+2 gaps, 0.19 ms a section: copy1:small -> set:tiny

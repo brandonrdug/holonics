@@ -29,7 +29,7 @@ pub const SECTION_PART_NAMES: [&str; 15] = [
     "external_step",
     "external_price",
     "covector_grains",
-    "moments",
+    "deposit_pass",
     "step",
     "step_price",
     "reading_parts",
@@ -118,6 +118,7 @@ pub(crate) fn fewer(old: &Compared, new: &Compared, spans: &[(usize, u64, u64)])
 /// passes its carrier. At the full step it is the first coefficient `a` of the section's own parabola `e(μ) = aμ + bμ²`; no
 /// reread reads the second since the step fluxes (November 5), so `b` is unread on the section itself. With the next
 /// section's covector and the step at the halvings it stood at, it is the step's transfer ([`Receipt::transfer`]).
+#[cfg_attr(not(test), allow(dead_code))]
 pub(crate) fn predicted_change(field: &Constitution, g: &[i128], step: &[i128], halvings: u32) -> Option<i64> {
     let mut total = 0i128;
     for &(start, len, grain) in &field.families_all() {
@@ -139,6 +140,7 @@ pub(crate) fn predicted_change(field: &Constitution, g: &[i128], step: &[i128], 
 /// predicted price is a total over every part, and a reading names its partition beside its total (the guide's rule of November
 /// 11); on tp5 that price burst a hundredfold before the card refused a sum, and which part's covector burst is the question
 /// G96's rule asks before eight times returns.
+#[cfg_attr(not(test), allow(dead_code))]
 pub(crate) fn predicted_parts(field: &Constitution, g: &[i128], step: &[i128], halvings: u32, parts: &[u8]) -> Option<[i64; PARTS + 1]> {
     let mut by = [0i128; PARTS + 1];
     for &(start, len, grain) in &field.families_all() {
@@ -157,6 +159,183 @@ pub(crate) fn predicted_parts(field: &Constitution, g: &[i128], step: &[i128], h
         *o = i64::try_from(b).ok()?;
     }
     Some(out)
+}
+
+/// What one section's deposit pass returns ([`deposit_pass`]): the step, and the four first-order prices a section's receipt carries
+/// ([`Receipt`]: the transfer of the step before, the external price, the step's own and its parts').
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(crate) struct DepositPass {
+    pub(crate) step: Vec<i128>,
+    pub(crate) transfer: Option<i64>,
+    pub(crate) external: Option<i64>,
+    pub(crate) predicted: Option<i64>,
+    pub(crate) parts: Option<[i64; PARTS + 1]>,
+}
+
+/// A chunk's sums of the four prices on their families' grains, each `None` once a product or a sum passed its carrier.
+#[derive(Clone, Copy)]
+struct PriceSums {
+    transfer: Option<i128>,
+    external: Option<i128>,
+    predicted: Option<i128>,
+    parts: Option<[i128; PARTS + 1]>,
+}
+
+impl PriceSums {
+    fn zero(transfer: bool) -> Self {
+        Self { transfer: transfer.then_some(0), external: Some(0), predicted: Some(0), parts: Some([0; PARTS + 1]) }
+    }
+
+    fn join(self, o: Self) -> Self {
+        let add = |a: Option<i128>, b: Option<i128>| a.zip(b).and_then(|(a, b)| a.checked_add(b));
+        let parts = self.parts.zip(o.parts).and_then(|(a, b)| {
+            let mut out = [0i128; PARTS + 1];
+            for k in 0..=PARTS {
+                out[k] = a[k].checked_add(b[k])?;
+            }
+            Some(out)
+        });
+        Self { transfer: add(self.transfer, o.transfer), external: add(self.external, o.external), predicted: add(self.predicted, o.predicted), parts }
+    }
+}
+
+/// `g · (−s)` added to a price's sum, `None` once the product or the sum passes its carrier.
+fn price_term(sum: &mut Option<i128>, g: i128, s: i128) {
+    *sum = sum.and_then(|a| g.checked_mul(-s).and_then(|p| a.checked_add(p)));
+}
+
+/// [realization; the lead, November 20, the engineering report's host deposit (A4 and the phases read)] **A section's deposit in one pass
+/// a family**: for each entry, its external step from the moments before (`deposit_step` at its rate), its covector on the step's grain
+/// ([`on_step_grain`]), its moments moved ([`toward`], or opened at its first nonzero covector), its step from the moments after (with its
+/// carried remainder where the learner carries one), and its terms of the four prices: [`predicted_change`]'s sum for the transfer of the
+/// step before (`last`, at its halvings), the external price and the step's own, and [`predicted_parts`]'s by founded part (`parts`).
+/// Every entry reads only its own moments, rate, remainder and covector, so the entries are split across the host's cores in chunks; each
+/// price's terms meet on their family's grain and are released once a family (`≫ shift`), as [`predicted_change`] releases them, so the
+/// chunks' sums give the same bits in any bracketing (integer sums, the guide's precision law). A product or a sum past its 128-bit carrier
+/// reads `None` for that price as it did; the only reading that can differ from the serial order's is a `None` at partial sums past
+/// `2^127` in one bracketing and not another, where the line's largest price stands near `2^40` (`agent-inferred`). A covector's square
+/// past its carrier refuses the section, as it did. Entries no family holds keep the serial law's treatment: moments moved by the raw
+/// covector, no step and no price. Why: on the store line at 1,859,961 entries the section's deposit took about 58 ms on the host, eight
+/// whole-layout passes four of them serial, while the card stood idle (`STORE_DEPOSIT_PARTS`, the phases read of November 20); every bit
+/// of the step, the moments, the remainders and the prices stands as the serial passes formed them (the test
+/// `the_deposit_in_one_pass_is_the_serial_passes_bit_for_bit`).
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: &mut [i128], second: &mut [i128], rates: &[u32], mut remainder: Option<&mut [i64]>, last: Option<&HeldStep>, parts: &[u8]) -> Result<DepositPass> {
+    // A chunk of entries a core takes at once; seven under test, so the tiny fields' families are cut in many places.
+    #[cfg(not(test))]
+    const CHUNK: usize = 1 << 13;
+    #[cfg(test)]
+    const CHUNK: usize = 7;
+    let n = first.len().min(second.len()).min(g.len());
+    let last = last.filter(|l| l.step.len() >= n);
+    let mut step = vec![0i128; n];
+    // The families as a partition: sorted by start, disjoint (the serial passes would have grained an entry once a family it lies in).
+    let mut sorted: Vec<(usize, usize, u32)> = families.iter().copied().filter(|&(start, len, _)| len > 0 && start < n).collect();
+    sorted.sort_unstable_by_key(|f| f.0);
+    if sorted.windows(2).any(|w| w[0].0 + w[0].1 > w[1].0) || sorted.iter().any(|&(start, len, _)| start + len > n) {
+        return refuse("a deposit over families that overlap or pass the material");
+    }
+    let refused = || TowerError::Refused("a covector's square outgrew its 128-bit carrier");
+    let (mut transfer, mut external, mut predicted) = (last.map(|_| 0i128), Some(0i128), Some(0i128));
+    let mut by = Some([0i128; PARTS + 1]);
+    let mut at = 0usize;
+    for &(start, len, grain) in &sorted {
+        // Entries before this family that no family holds: moments moved by the raw covector, no step.
+        for k in at..start {
+            let square = g[k].checked_mul(g[k]).ok_or_else(refused)?;
+            if first[k] == 0 && second[k] == 0 {
+                (first[k], second[k]) = (g[k], square);
+            } else {
+                first[k] = toward(first[k], g[k], FIRST_RATE);
+                second[k] = toward(second[k], square, SECOND_RATE);
+            }
+        }
+        at = start + len;
+        let shift = if grain == MATERIAL_BITS { 40 + grain - 20 } else { 24 + grain - 20 };
+        let chunks = len.div_ceil(CHUNK);
+        let rems: Vec<Option<&mut [i64]>> = match remainder.as_deref_mut() {
+            Some(r) => r[start..start + len].chunks_mut(CHUNK).map(Some).collect(),
+            None => (0..chunks).map(|_| None).collect(),
+        };
+        let chunk = |c: usize, m: &mut [i128], v: &mut [i128], s: &mut [i128], mut r: Option<&mut [i64]>| -> Result<PriceSums> {
+            let mut sums = PriceSums::zero(last.is_some());
+            let mut parts_ok = true;
+            for j in 0..m.len() {
+                let k = start + c * CHUNK + j;
+                let raw = g[k];
+                if let Some(l) = last {
+                    price_term(&mut sums.transfer, raw, release(l.step[k], l.halvings));
+                }
+                price_term(&mut sums.external, raw, deposit_step(m[j], v[j], grain, rates[k]));
+                let gk = on_step_grain(grain, raw);
+                let square = gk.checked_mul(gk).ok_or_else(refused)?;
+                if m[j] == 0 && v[j] == 0 {
+                    (m[j], v[j]) = (gk, square);
+                } else {
+                    m[j] = toward(m[j], gk, FIRST_RATE);
+                    v[j] = toward(v[j], square, SECOND_RATE);
+                }
+                s[j] = match r.as_deref_mut() {
+                    None => deposit_step(m[j], v[j], grain, rates[k]),
+                    Some(carried) => {
+                        let fine = deposit_step(m[j], v[j], grain + REMAINDER_BITS, rates[k]);
+                        let sum = i128::from(carried[j]) + fine;
+                        let whole = sum >> REMAINDER_BITS;
+                        carried[j] = (sum - (whole << REMAINDER_BITS)) as i64;
+                        whole
+                    }
+                };
+                price_term(&mut sums.predicted, raw, s[j]);
+                if parts_ok && let Some(p) = sums.parts.as_mut() {
+                    let at = parts.get(k).map_or(PARTS, |&p| if p == OLD_PART { PARTS } else { usize::from(p) });
+                    match raw.checked_mul(-s[j]).and_then(|x| p[at].checked_add(x)) {
+                        Some(x) => p[at] = x,
+                        None => parts_ok = false,
+                    }
+                }
+            }
+            if !parts_ok {
+                sums.parts = None;
+            }
+            Ok(sums)
+        };
+        let fam = first[start..start + len]
+            .par_chunks_mut(CHUNK)
+            .zip(second[start..start + len].par_chunks_mut(CHUNK))
+            .zip(step[start..start + len].par_chunks_mut(CHUNK))
+            .zip(rems.into_par_iter())
+            .enumerate()
+            .map(|(c, (((m, v), s), r))| chunk(c, m, v, s, r))
+            .try_reduce(|| PriceSums::zero(last.is_some()), |a, b| Ok(a.join(b)))?;
+        let close = |total: Option<i128>, family: Option<i128>| total.zip(family).and_then(|(t, f)| t.checked_add(f >> shift));
+        transfer = close(transfer, fam.transfer);
+        external = close(external, fam.external);
+        predicted = close(predicted, fam.predicted);
+        by = by.zip(fam.parts).and_then(|(mut b, f)| {
+            for k in 0..=PARTS {
+                b[k] = b[k].checked_add(f[k] >> shift)?;
+            }
+            Some(b)
+        });
+    }
+    for k in at..n {
+        let square = g[k].checked_mul(g[k]).ok_or_else(refused)?;
+        if first[k] == 0 && second[k] == 0 {
+            (first[k], second[k]) = (g[k], square);
+        } else {
+            first[k] = toward(first[k], g[k], FIRST_RATE);
+            second[k] = toward(second[k], square, SECOND_RATE);
+        }
+    }
+    let narrow = |v: Option<i128>| v.and_then(|v| i64::try_from(v).ok());
+    let parts = by.and_then(|b| {
+        let mut out = [0i64; PARTS + 1];
+        for (o, v) in out.iter_mut().zip(b) {
+            *o = i64::try_from(v).ok()?;
+        }
+        Some(out)
+    });
+    Ok(DepositPass { step, transfer: narrow(transfer), external: narrow(external), predicted: narrow(predicted), parts })
 }
 
 /// [definition; agent-inferred, November 1] **The field's learner**: the field, the covector's two
@@ -522,7 +701,7 @@ impl Learner {
             (compared(&faces, regions)?, g, next, codes)
         };
         let opening: Vec<(i64, usize)> = codes.iter().map(|c| (c.iter().flatten().sum(), c.iter().flatten().count())).collect();
-        let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
+        let g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
         if faces_old.pairs.is_empty() && !faces_old.ported {
@@ -532,74 +711,20 @@ impl Learner {
         let sites = spans.iter().filter(|s| s.0 > 0).map(|s| s.1 as usize).sum::<usize>()
             + regions.iter().filter_map(|r| r.port.map(|p| (p.start..p.stop.unwrap_or(r.classes.len()).min(r.classes.len())).filter(|&t| r.unresolved[t] && p.heard.is_none_or(|h| h[t])).count())).sum::<usize>();
         mark(1);
-        let raw = g.clone();
-        mark(2);
-        let transfer = self.last.take().and_then(|s| predicted_change(&self.field, &raw, &s.step, s.halvings));
-        mark(3);
-        // [the unified-theory reading of November 6, 08:54] The step the moments would deposit before this section moves them,
-        // priced on this section: the external price, a step this section never shaped.
+        // [the unified-theory reading of November 6, 08:54] The external price is the step the moments would deposit before this section
+        // moves them, priced on this section: a step this section never shaped. [realization; the lead, November 20] The transfer, the
+        // external step and its price, the covector's grains, the moments, the step and its prices are one pass a family ([`deposit_pass`]),
+        // every bit as the serial passes formed them; the parts `2`, `3`, `5`, `6`, `7`, `9`, `10` and `12` of [`SECTION_PART_NAMES`] read zero.
         let rates = self.entry_rates();
         mark(4);
-        // [realization; November 14, the engine audit's finding 1] Each entry's step reads only its own moments and rate, so the families' entries
-        // are split across the host's cores, every bit kept.
         let families = self.field.families_all();
-        let (first, second) = (&self.first, &self.second);
-        let step_into = |out: &mut [i128]| {
-            for &(start, len, grain) in &families {
-                out[start..start + len].par_iter_mut().enumerate().for_each(|(k, slot)| *slot = deposit_step(first[start + k], second[start + k], grain, rates[start + k]));
-            }
-        };
-        let mut external_step = vec![0i128; g.len()];
-        step_into(&mut external_step);
-        mark(5);
-        let external = predicted_change(&self.field, &raw, &external_step, 0);
-        mark(6);
-        for &(start, len, grain) in &families {
-            g[start..start + len].par_iter_mut().for_each(|v| *v = on_step_grain(grain, *v));
-        }
-        mark(7);
-        // Each entry's moments read only its own covector; a square past its carrier refuses the section wherever it stands.
-        self.first.par_iter_mut().zip(self.second.par_iter_mut()).zip(g.par_iter()).try_for_each(|((m, v), gv)| -> Result<()> {
-            let square = gv.checked_mul(*gv).ok_or(TowerError::Refused("a covector's square outgrew its 128-bit carrier"))?;
-            if *m == 0 && *v == 0 {
-                // A coordinate opens at its own first nonzero covector.
-                (*m, *v) = (*gv, square);
-            } else {
-                *m = toward(*m, *gv, FIRST_RATE);
-                *v = toward(*v, square, SECOND_RATE);
-            }
-            Ok(())
-        })?;
-        mark(8);
-        let (first, second) = (&self.first, &self.second);
-        let mut step = vec![0i128; g.len()];
-        match self.remainder.as_mut() {
-            None => {
-                for &(start, len, grain) in &families {
-                    step[start..start + len].par_iter_mut().enumerate().for_each(|(k, slot)| *slot = deposit_step(first[start + k], second[start + k], grain, rates[start + k]));
-                }
-            }
-            // The step formed under the entry's grain, its whole part released and the rest carried ([`Learner::remainder`]). Each entry
-            // reads only its own moments, rate and remainder, so the order is free.
-            Some(remainder) => {
-                for &(start, len, grain) in &families {
-                    step[start..start + len].par_iter_mut().zip(remainder[start..start + len].par_iter_mut()).enumerate().for_each(|(k, (slot, carried))| {
-                        let fine = deposit_step(first[start + k], second[start + k], grain + REMAINDER_BITS, rates[start + k]);
-                        let sum = i128::from(*carried) + fine;
-                        let whole = sum >> REMAINDER_BITS;
-                        *carried = (sum - (whole << REMAINDER_BITS)) as i64;
-                        *slot = whole;
-                    });
-                }
-            }
-        }
-        mark(9);
-        let predicted = predicted_change(&self.field, &raw, &step, 0);
-        mark(10);
         let parts = self.reading_parts();
         mark(11);
-        let predicted_parts = predicted_parts(&self.field, &raw, &step, 0, &parts);
-        mark(12);
+        let last = self.last.take();
+        let pass = deposit_pass(&families, &g, &mut self.first, &mut self.second, &rates, self.remainder.as_deref_mut(), last.as_ref(), &parts)?;
+        drop(g);
+        let DepositPass { step, transfer, external, predicted, parts: predicted_parts } = pass;
+        mark(8);
         // [definition; Brandon, November 5 17:29 and 17:32] **The step fluxes**: it deposits at its size, and no reread of the
         // section certifies it. The reread kept a step only where the regions reread under it coded strictly fewer bits, a
         // selection on the code (a maximum in effect) that discarded what an expansion measures ("you can't discard failure

@@ -1,0 +1,12 @@
+DEP2 head c83598c92 4 changed files 20:18:34
+DEP2 build athena=0 card_tests=0 20:19:18 warnings=0 
+# hold2: lock taken 20:40:09 other runs: 0
+DEP2 suite 20:46:17 test result: ok. 27 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 367.72s 
+DEP2 repro_L71 20:46:33 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+DEP2 hold 1 old 20:46:58 last30 ms_mean=580.7 FIELD_PHASE name=outside_the_card marks=80 ms=2140 us_a_mark=26756 card_ms=0 host_ms=2140 FIELD_PHASE name=stage_lists marks=240 ms=956 us_a_mark=3986 card_ms=0 host_ms=956 
+DEP2 hold 2 new 20:47:23 last30 ms_mean=582.5 FIELD_PHASE name=outside_the_card marks=80 ms=2137 us_a_mark=26718 card_ms=0 host_ms=2137 FIELD_PHASE name=stage_lists marks=240 ms=959 us_a_mark=3998 card_ms=0 host_ms=959 
+DEP2 hold 3 new 20:47:47 last30 ms_mean=577.6 FIELD_PHASE name=outside_the_card marks=80 ms=2117 us_a_mark=26465 card_ms=0 host_ms=2117 FIELD_PHASE name=stage_lists marks=240 ms=958 us_a_mark=3991 card_ms=0 host_ms=958 
+DEP2 hold 4 old 20:48:12 last30 ms_mean=578.8 FIELD_PHASE name=outside_the_card marks=80 ms=2112 us_a_mark=26411 card_ms=0 host_ms=2112 FIELD_PHASE name=stage_lists marks=240 ms=967 us_a_mark=4030 card_ms=0 host_ms=967 
+# hold2: released 20:48:12
+DEP2_ALL_DONE 20:48:12
+RUN_EXIT 0 2026-11-20T20:48:12Z
