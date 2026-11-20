@@ -18,7 +18,7 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 19, 15:15 UTC): the line holds 512 carry circles on its second pass, and her words stand at 69%
+## Where the work stands (November 20, 00:45 UTC): the line's 512 carry circles are pumped, on its third pass, and her words stand at 70%
 
 [The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
 §9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
@@ -69,7 +69,19 @@ no farther place in.
   host and on the card, bit for bit (30 cases). By §13 it is the carrier a level's own receipt needs and is not expected to move
   the frontier without one; its arm beside the line is G-1118-16.
 
-**What is owed, in order.** A part judged by the sure share at the settled places (§21), which is what her words follow, as an
+**The pumped carry** (§29; G-1119-7, G-1119-8; atlas `contact.pumped-carry`; merged as #1047). Each circle's move turns, leaks and
+reflects, `Q = κb + γQm + η conj(Qm)`, the three sharing one leak (`pumpedCharge_le` in Lean), founded at zero with every face kept.
+On the dihedral separator the pumped carry held the running product at 0.996 at three times its trained length where the commuting
+carry read 0.357 on 16 circles. On text its first lap (P48, on a Colab A100 beside the line's L48 from the same state) lowered every
+frontier read, rows S by 0.0017 (±0.0004) nats a place and one place open by 0.0040, most where four to sixty places are known, with
+the writes' lexicon where it stood (70%); the pump's rows stood at a tenth of the turn rows. The line takes it from P49 and continues
+on the PC from lap L50.
+
+**Devices** (§27, §28). A float is a word with its locale in its exponent, and a lap's regions commute and join exactly, so a second
+device is a member of the flock: an A100 runs this realization 1.54 times slower than the PC's card on one section, gives the same
+bits (24 sections of L48 equal), and runs the arms beside the line. It costs about eight compute units an hour.
+
+**What is owed, in order.** The pump read over laps (its rows still growing at P49, 0.134 of the turn rows). A part judged by the sure share at the settled places (§21), which is what her words follow, as an
 arm beside the line. Rows at the residue the circles compose failed their premise read (§25), and rows at her own read's direction
 add nothing to her face (§26): where a count is sure on many counts she already is, and her shortfall stands at the rare five-place
 contexts, which more passes over the passage reach (§24: one pass took her surety there from 0.579 to 0.667). The circles' extent is
@@ -84,6 +96,8 @@ The layers this file held under the section above stand at
 November 18 (C9 of #603), because a position that keeps every position before it reads as five, and the oldest still had the line
 at lap 87 with ten laps queued. Each is a dated reading with its record:
 
+- **November 19, 15:15 UTC**: the line holds 512 carry circles on its second pass, and her words stand at 69%
+  ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §19 to §26).
 - **November 18, 15:58 UTC**: every place of a stretch is compared at its frontier, on the card
   ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)).
 - **November 18, 12:45 UTC**: the line is compared where it writes, one change at a time beside a control from lap 70
