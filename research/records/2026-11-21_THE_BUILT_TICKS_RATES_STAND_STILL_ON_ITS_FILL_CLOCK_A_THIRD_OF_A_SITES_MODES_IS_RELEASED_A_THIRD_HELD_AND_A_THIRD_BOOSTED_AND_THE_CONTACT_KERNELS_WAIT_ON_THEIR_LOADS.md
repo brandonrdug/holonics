@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 02:20 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 02:45 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -174,12 +174,44 @@ circles' terminal operand is a recency of one symbol at the depth of three pairs
 reading of crossed against nested binding is owed elsewhere than this operand: in prefix states, as the failure-group record's §8.4 says
 of one terminal product (`agent-inferred`).
 
-## 8. Atlas
+## 8. The leak's reads at set strengths
+
+The formal thread's founding law for the leak (merged as #1070, the record of the same night, atlas `store.leak-founded-by-own-news`): by face
+lane, `x ← γx + g` with `γ = 1/(1 + d)` and `d` a state founded at zero (the built tick bit for bit), `d` rising where the cosine `c` of
+successive chart moves is positive, falling where it is negative, resting at zero; forward only. It offered six reads with their guess
+fixed at 02:22:29 UTC before any was read (`receipts/2026-11-21_leak-balance/GUESS.txt` of that record). Read here at 02:33 UTC
+(`a_lane_leaks_reads_at_set_strengths`, `leak_reads.txt`): the ruler's lane leak `x ← (1 − δ)x + g` at a set `δ` (`Constitution::ruler_leak`, a
+reading, no state), L71's end state, the same 240 sites, its ticks raised to 17, `δ` at 1/4, 1/2, 3/4, 0.8506 and 1, and the line's own
+four ticks with no leak.
+
+- B1 (on the built tick the pooled cosine over ticks 5 to 16 above 0.9 at every lane): held, 0.964 to 0.986. Its second half (at the line's
+  own four ticks, positive at every lane between 0.2 and 0.8): missed, the cosine of the first moves standing at −0.42 to +0.20, negative at
+  six lanes of seven; the first ticks' moves alternate.
+- B2 (at `δ = 1/2` the ratio of successive moves level in 0.5 to 0.8 at ticks 10 to 16): held, 0.611 rising to 0.623; the built tick's 0.787
+  rising to 0.866.
+- B3 (the cosine over ticks 1 to 16 falls with `δ` and changes sign between 3/4 and 1): missed as stated. It falls with `δ` at every lane, but
+  it is negative at six lanes already at `δ = 0`, the first ticks' alternation weighing on it. Over ticks 5 to 16, where the law's rest is read
+  (the late `c` is the dominant multiplier's sign), it stands at 0.93 to 0.97 up to `δ = 1/2`, 0.11 to 0.69 at 3/4, −0.49 to +0.26 at 0.85 and
+  −0.83 to −0.43 at 1: it changes sign between 3/4 and 0.85 at the first four lanes and between 0.85 and 1 at the last three, about the
+  rest `δ* = 0.851` the law derives. The moves fall about 0.34 to 0.37 a tick at 0.85 (0.311 derived), 0.46 to 0.51 at 3/4.
+- B4 (no growth up to 0.85): held; at every lane the move at tick 16 is 0.000 to 0.096 of the move at tick 6.
+- B5 (the held code at 17 ticks and `δ = 1/2` 0.05 to 0.5 nats above the four-tick read): missed, 4.137 against 1.655 nats a place over the 109
+  open places, 2.48 above. With no leak the raised ticks alone read 3.422; every `δ` from 1/2 to 1 reads 4.137 to 4.141. The state was trained
+  on the four-tick pass's transient, and what a raised pass has to recover is that whole distance.
+- F3 (the circles' `|γ|` median under 0.6, under a tenth near a third of a turn at `|γ|³ > 1/2`): held, median 0.400 (0.247 to 0.567 between
+  the tenth and ninetieth), 0.0001 near a third of a turn.
+
+So the law's rest stands where it derived it on the late ticks, and the leak contracts every lane geometrically from `δ = 1/2`, while at the
+line's four ticks its comparison has the wrong sign at most lanes and would rest `d` at its founding: the leak's consumer is a pass past four
+ticks, and such a pass starts 1.8 to 2.5 nats a place behind on this state (`agent-inferred`). Its arm carries that cost: raised ticks with the
+law beside raised ticks without it, from one saved state, read over laps long enough for both to recover.
+
+## 9. Atlas
 
 `tower.field-tick-rates-on-the-fill-clock` (new, measured), using `tower.field-tick-running-mean`, `motion.unit-power-push-log-clock`,
 `motion.relaxed-step-three-kinds` and `hodge.newton-above-hodge-is-a-mixing`.
 
-## 9. Sources
+## 10. Sources
 
 `crates/engine/src/contact.rs` (`Constitution::pass_probed`, `TickProbe`), `crates/engine/src/field/tests.rs`
 (`the_ticks_gains_by_finite_differences`, `the_trained_ticks_residual_by_tick`), `tools/tick_gains.py`, `crates/engine-cuda/kernels/field.cu`

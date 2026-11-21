@@ -6097,3 +6097,105 @@ fn the_forks_closing_orders_on_the_carry_circles() {
         eprintln!("FORK {name} samples={n} fillers={} circles={}", fillers.len(), field.declaration.carry);
     }
 }
+
+/// [measurement; the lead, November 21, the reads B1 to B5 and F3 the leak's founding record offers] **A lane leak's reads at set strengths**:
+/// the learner at `DEPOSIT_STATE` reads one region of `CARRIER_SITES` sites cut from `CARRIER_TEXT` (as the census of a pass's carriers cuts
+/// it) with its ticks raised to `LEAK_TICKS` and the ruler's lane leak `x ← (1 − δ)x + g` at each `δ = n 2^(−b)` of `LEAK_DELTAS` (`n/b` pairs),
+/// and once at the line's own declared ticks with no leak. For each read and each face lane: the moves `m_k = r^(k+1) − r^k` of every site's chart
+/// (`tick.read`), their pooled cosine `Σ⟨m_k, m_(k−1)⟩ / Σ‖m_k‖‖m_(k−1)‖` over the ticks of a span, and each tick's pooled move `(Σ‖m_k‖²)^½`; the
+/// held code over the open sites (nats a place, from the faces); and, at the line's own read, each circle's gate `γ` at every site (`tick.gam`,
+/// `2^(−30)`). Written as lines to stderr. A ruler on the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+#[allow(clippy::disallowed_types, reason = "a ruler's cosines and codes are reported on the host as floats")]
+fn a_lane_leaks_reads_at_set_strengths() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let units = crate::units::Units::from_text(&std::fs::read_to_string(var("CARRIER_UNITS")).unwrap()).unwrap();
+    let codec = crate::codec::Codec::from_text(&std::fs::read_to_string(var("CARRIER_CODEC")).unwrap(), units).unwrap();
+    let sites: usize = var("CARRIER_SITES").parse().unwrap();
+    let ticks: usize = var("LEAK_TICKS").parse().unwrap();
+    let deltas: Vec<(i64, u32)> = var("LEAK_DELTAS").split(',').map(|p| { let (n, b) = p.split_once('/').unwrap(); (n.parse().unwrap(), b.parse().unwrap()) }).collect();
+    let text = std::fs::read(var("CARRIER_TEXT")).unwrap();
+    let mut classes = Vec::new();
+    for line in text.split(|&b| b == b'\n') {
+        let mut l = line.to_vec();
+        l.push(b'\n');
+        if let Ok(c) = codec.encode(&l) {
+            classes.extend(c);
+        }
+        if classes.len() >= sites {
+            break;
+        }
+    }
+    classes.truncate(sites);
+    let unresolved: Vec<bool> = (0..classes.len()).map(|t| (t * 7) % 11 < 5).collect();
+    let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+    let (dw, lanes) = (learner.field.declaration.width, learner.field.declaration.lanes);
+    let lw = dw / lanes;
+    let read = |tag: &str, field: &Constitution| {
+        let pass = field.pass(&region, true).unwrap();
+        let n = pass.ticks.len();
+        // moves m_k for k in 0..n-1, per site and lane
+        let mv = |k: usize, t: usize, l: usize| -> Vec<f64> {
+            let (a, b) = (&pass.ticks[k].read, &pass.ticks[k + 1].read);
+            (0..lw).map(|i| f64::from(b[t * dw + l * lw + i]) - f64::from(a[t * dw + l * lw + i])).collect()
+        };
+        let span_cos = |from: usize, to: usize, l: usize| -> f64 {
+            let (mut num, mut den) = (0.0, 0.0);
+            for k in from.max(1)..to.min(n - 1) {
+                for t in 0..classes.len() {
+                    let (p, q) = (mv(k - 1, t, l), mv(k, t, l));
+                    num += p.iter().zip(&q).map(|(x, y)| x * y).sum::<f64>();
+                    den += p.iter().map(|x| x * x).sum::<f64>().sqrt() * q.iter().map(|x| x * x).sum::<f64>().sqrt();
+                }
+            }
+            if den > 0.0 { num / den } else { f64::NAN }
+        };
+        let norm = |k: usize, l: usize| -> f64 { (0..classes.len()).map(|t| mv(k, t, l).iter().map(|x| x * x).sum::<f64>()).sum::<f64>().sqrt() };
+        let lanes_cos = |from: usize, to: usize| (0..lanes).map(|l| format!("{:.3}", span_cos(from, to, l))).collect::<Vec<_>>().join(" ");
+        let norms: Vec<String> = (0..n - 1).map(|k| format!("{:.0}", (0..lanes).map(|l| norm(k, l).powi(2)).sum::<f64>().sqrt())).collect();
+        let lane_growth: Vec<String> = (0..lanes).map(|l| if n > 16 { format!("{:.3}", norm(15, l) / norm(5, l)) } else { "-".into() }).collect();
+        let (mut code, mut open) = (0.0, 0usize);
+        for t in 0..classes.len() {
+            if let (true, Some(face)) = (unresolved[t], pass.faces[t].as_ref()) {
+                code += face.code(classes[t]) as f64 / f64::from(1u32 << 20) * std::f64::consts::LN_2;
+                open += 1;
+            }
+        }
+        eprintln!("LEAK_READ {tag} ticks={n} cos_ticks_1_to_16_by_lane=[{}] cos_ticks_5_to_16_by_lane=[{}] cos_all_by_lane=[{}] move_by_tick=[{}] move_16_over_move_6_by_lane=[{}] held_code_nats={:.4} open={open}",
+            lanes_cos(1, 17), lanes_cos(5, 17), lanes_cos(1, n), norms.join(" "), lane_growth.join(" "), code / open.max(1) as f64);
+        pass
+    };
+    let own = read("own_ticks_no_leak", &learner.field);
+    // F3: the circles' gates at the line's own read, every site and circle, the last tick.
+    let c2 = 2 * learner.field.declaration.carry;
+    if c2 > 0 {
+        let gam = &own.ticks.last().unwrap().gam;
+        let c = c2 / 2;
+        let (mut mags, mut near_third) = (Vec::new(), 0usize);
+        for t in 0..classes.len() {
+            for k in 0..c {
+                let (re, im) = (gam[t * c2 + k] as f64 / f64::from(1u32 << 30), gam[t * c2 + c + k] as f64 / f64::from(1u32 << 30));
+                let m = re.hypot(im);
+                mags.push(m);
+                let arg = im.atan2(re).abs();
+                if (arg - 2.0 * std::f64::consts::PI / 3.0).abs() < 0.3 && m.powi(3) > 0.5 {
+                    near_third += 1;
+                }
+            }
+        }
+        mags.sort_by(f64::total_cmp);
+        let q = |p: f64| mags[((mags.len() - 1) as f64 * p) as usize];
+        eprintln!("LEAK_F3 circles={c} gates={} median_abs_gamma={:.3} p10={:.3} p90={:.3} share_near_a_third_turn_with_abs3_over_half={:.4}", mags.len(), q(0.5), q(0.1), q(0.9), near_third as f64 / mags.len() as f64);
+    }
+    let mut raised = learner.field.clone();
+    raised.declaration.ticks = ticks;
+    read("raised_no_leak", &raised);
+    for &(n, b) in &deltas {
+        let mut f = raised.clone();
+        f.ruler_leak = Some((n, b));
+        read(&format!("raised_delta_{n}/2^{b}"), &f);
+    }
+}

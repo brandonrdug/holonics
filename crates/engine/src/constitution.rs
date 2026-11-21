@@ -53,6 +53,11 @@ pub struct Constitution {
     /// `z = T S − falloff`. A reading at a set `γ` of what a row that keeps its evidence does, before the stage is a law: not part of the
     /// state, and no reverse reads it.
     pub lock_carry: Option<i64>,
+    /// [measurement; the lead, November 21, the leak's founding record's reads B1 to B5] Where set, **a lane leak at a set strength** `δ = n 2^(−b)`
+    /// (`(n, b)`): after each tick, `x ← x − release(n x_began, b)` over every entry, `x_began` the state the tick began from, so the tick is
+    /// `x ← (1 − δ) x + g` (the law founded at `δ = 0` is the built tick). A ruler's read of the leak before its stage is built: not part of the
+    /// state, and no reverse reads it.
+    pub ruler_leak: Option<(i64, u32)>,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
     /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the
