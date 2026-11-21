@@ -1,0 +1,51 @@
+Guesses fixed 2026-11-21T19:23:15Z (date -u), before any of these reads exists. Formal thread; the reads are the lead's to run.
+Every one is a host read of saved states of the store line (no lap, no card time but the held read's own).
+Sources read first: crates/engine/src/deposit.rs (deposit_over, deposit_root, toward), ratio.rs (release), adjoint.rs
+(affine), THE_ENGINE section 11 (rate 2^-12, mean |m|/sqrt(v) 0.19 against 0.21 for noise alone, the material moves 2% of
+its rms a lap, the end state 0.017 nats a place above its lap's mean, thousand-section moves at cosines -0.195 and -0.171).
+
+G-W0 (the top end; weak basis: the 2% a lap against a walk of at most 2^-12 * sqrt(3000) = 0.0134 puts the material's rms
+  under 0.67). By block, the 99.9th percentile of |theta| is under 4, and the largest |theta| anywhere is under 32. So of
+  the 7 places theta's 32-bit word holds above the point, at least 2 stand empty everywhere and 5 are empty for all but a
+  thousandth of the entries.
+
+G-W1 (the bottom end of the constitution's read part). Every material entry of the latest lap mean rounded to the nearest
+  2^-g, all blocks at once, then the standing held read. The rise of the held code over the unrounded mean, nats a place:
+    g = 12: under 0.0002      g = 10: under 0.002      g = 8: between 0.0003 and 0.03      g = 6: over 0.01
+  Scored statement: the coarsest whole g whose rise is under 0.001 is 8, 9 or 10. So 14 to 16 of the 24 places below the
+  point carry nothing the held code reads.
+
+G-W2 (the standing spread). By block, the rms over entries of (lap end less MEAN of the lap's last 1,000 sections) stands
+  between 2 and 18.3 times the block's rate: at 2^-12, between 2^-11 and 2^-7.8, places 13 to 16.2 above the grain 2^-24.
+  (18.3 = sqrt(1000/3), the walk with nothing restoring it; the cosines above say something restores it.)
+
+G-W2b (places under the spread are heat, as a price). The rise of G-W1 at a place g, over the end state's rise above its
+  mean, against the ratio of the two variances (4^-g / 12 over the mean square of G-W2): the quotient stands between 0.01
+  and 1. Under 1 because the walk moves along the covector's own noise, which is where the code curves, and a rounding
+  spreads evenly over the entries (agent-inferred).
+
+G-W3 (states; weak basis: a second-order estimate through one map, with the ticks' gain unread). Every state rounded to
+  2^-g after each tick, by a host ruler, on the held passage: rise under 0.0005 nats a place at g = 12 and at g = 10; the
+  first g at which the rise passes 0.001 is 8, 7, 6 or 5.
+
+G-W4 (silence at the deposit's step, read from saved moments with no run). The step ((m << 24) >> rate) / root is zero
+  where |m/root| < 2^(rate - 24). Share of entries with a nonzero first
+  moment whose step is zero in a section: at rate 12 under 0.5% (computed 0.1% from the 0.19); at rate 16 between 0.5% and
+  3% (computed 1.3%); at rate 20 between 12% and 30% (computed 21%). So the material grain is far from binding at the
+  line's rate and binds a cooled rate from about 2^-18, which is where the remainder line already carries it.
+
+G-W5 (how long a covector's news stays coherent, which is the law of the two moment rates). Cosine of a block's covector
+  between successive sections, averaged over a lap's last 1,000 sections: between -0.1 and +0.1 over the whole
+  constitution, and under 0.2 in absolute value for blocks holding nine tenths of the entries. If so the first moment's
+  8 sections average 8 nearly independent draws, which adds 1.5 places to a covector's grain and not the 8 its word holds.
+
+Scoring: each line is met or not met as written; a miss is recorded with the read beside it.
+
+Amended 2026-11-21T19:26:36Z (date -u), before any read exists: G-W2b's direction is reversed, and its first form above is kept as written.
+  The first form forgot that the deposit divides each entry's step by the root of its own second moment, so every entry
+  steps by the same size whatever the code's curvature there. With the code's rise taken to second order about the mean
+  (half of delta' H delta), the quotient is  mean(H_ii) * mean(S_ii) / mean((H S)_ii)  for the walk's covariance S: 1 where
+  the walk is even over the entries (a walk not yet restored), and over 1 where stiff entries are restored sooner
+  (S_ii falling as H_ii^(-1/2) under this step).
+G-W2b (amended, the one scored): the quotient stands between 1 and 30.
+G-W1 stands as written; its centre under the amended quotient is g = 10.

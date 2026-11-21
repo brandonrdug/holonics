@@ -52,6 +52,12 @@ run atlas-owners python3 tools/link_check.py atlas
 # checked by nothing. November 18: twelve modules stood outside the foundation's closure with six atlas rows on them.
 run lean-census-controls python3 tools/test_lean_census.py
 run lean-census python3 tools/lean_census.py
+# The declared widths against their table (crates/engine/WIDTHS.tsv): every constant that sets a width, a grain, a rate, a guard
+# or a carrier's bound has a row with its class and its need, a kernel's twin equals its host's, and the counts of picked,
+# carrier, literal and dead widths and of literal shifts only fall. November 21: five records from October 2 had found the
+# engine's grains picked by hand, and nothing that runs read them.
+run width-census-controls python3 tools/test_width_census.py
+run width-census python3 tools/width_census.py
 # The records' index is what the file names give today; where it is behind: python3 tools/records_index.py write
 run records-index-controls python3 tools/test_records_index.py
 exit $status
