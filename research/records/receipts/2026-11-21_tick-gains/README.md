@@ -39,3 +39,22 @@ So the forward contact gains from its warps more than it loses to its spills (si
 rows lose more to spills than they gain from warps: a register freed buys time only where it adds resident warps without a spill, which
 at the forward contact means its state under 64 registers for eight blocks (spilled heavily on November 14, G191), and its loads' latency
 stands either way (`agent-inferred`).
+
+## The carry circles' operand and drive on 32 bits (`nq.sh`, `nq.txt`)
+
+The premise read first: Nsight Compute on the pair and scan kernels (one launch each after 40, `ncu_src.sh` with their names) reads them
+bound by the card's memory, at 49% (`field_pair_scan`), 64% (`field_pair_gamma`), 68% (`field_pair_scan_back`), 70% (`field_pair_gate_back`),
+86% (`field_pair_scan_pre`) and 88% (`field_pair_scan_face`) of its DRAM peak, their compute at 6 to 83%. The circles' scan operand `Q`
+(`pqm`) and coupled drive `κ b` (`pkb`) stand within 21 bits on the trained state (`pass_carriers_L71.txt` of November 20) and were kept on
+64: `field.cu` now keeps both on 32, written through `fit32` (a word past 32 bits refuses the batch, `REFUSED_WORD32`), as the gate `γ` has been
+since November 19, and `read_octets` counts the circles' tick carriers at what they take (16 + 8 + 8 + 8 octets a circle, where it had counted
+48 with the drive left out). The same words while they fit: a realization.
+
+In one hold (OBS the one other process): the card crate's suite 28 passed; 24 sections of L71 from Y70's end reproduced `EQUAL`. A launch
+(three each after 40): the scan 673 to 703 µs against 735 to 743 (6.5% shorter, its DRAM 30% against 50%), its face 435 to 445 against 544
+to 551 (20%), the reverse's pre-scan 1.02 to 1.03 ms against 1.12 to 1.16 (9%), the gate and the gate's return unchanged (1.26 and 2.12 to
+2.14 ms both). The section in a warmed balanced hold of 40 sections: the control 510.7, 511.4, 511.8, 512.5 (511.6, spread 1.8), the build
+505.8, 504.4, 506.6, 506.2 (505.8, spread 2.2): 5.8 ms (1.1%) shorter; three batches a section in both (the tape 8 KB a site and tick
+lighter, not yet under a batch's cut). Guess (fixed 02:15 UTC): the scan, its face and the gate's return each 5 to 20% shorter (held for the
+scan and the face, missed for the gate's return, whose circle words are a small share of what it reads), the gate within 5% (held), the
+section 3 to 8 ms (held), three batches (held). Projection about 15 minutes, measured 12 min 40 s.
