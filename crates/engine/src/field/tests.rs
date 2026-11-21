@@ -6478,3 +6478,90 @@ fn the_circles_scan_with_its_residue_carried() {
     };
     eprintln!("SCAN_CARRY held_code_nats built={:.5} carried={:.5} change={:+.5}", code(&pb), code(&pc), code(&pc) - code(&pb));
 }
+
+/// [measurement; the lead, November 21, the formal thread's gate law G (04:15Z), reads G1 and G2] **The circles' news at lighter gates**: the
+/// learner at `DEPOSIT_STATE` with every circle's friction `d` multiplied by `2^(−k)` (its leak chart's bias lowered by `k` on the log chart, the
+/// coupling `κ` following `d` as built), for each `k` of `NEWS_SHIFTS`, reads one region of `CARRIER_SITES` sites cut from `CARRIER_TEXT` at its own
+/// ticks: by circle the pooled cosine of successive news along its scan (as `the_circles_successive_news` reads it, over the pass's ticks), the
+/// gates' median strength `δ = 1 − |γ|`, and the held code over the open places. Lines to stderr. A ruler on the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files")]
+#[allow(clippy::disallowed_types, reason = "a ruler's cosines and codes are reported on the host as floats")]
+fn the_circles_news_at_lighter_gates() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let units = crate::units::Units::from_text(&std::fs::read_to_string(var("CARRIER_UNITS")).unwrap()).unwrap();
+    let codec = crate::codec::Codec::from_text(&std::fs::read_to_string(var("CARRIER_CODEC")).unwrap(), units).unwrap();
+    let sites: usize = var("CARRIER_SITES").parse().unwrap();
+    let shifts: Vec<i32> = var("NEWS_SHIFTS").split(',').map(|v| v.parse().unwrap()).collect();
+    let text = std::fs::read(var("CARRIER_TEXT")).unwrap();
+    let mut classes = Vec::new();
+    for line in text.split(|&b| b == b'\n') {
+        let mut l = line.to_vec();
+        l.push(b'\n');
+        if let Ok(c) = codec.encode(&l) {
+            classes.extend(c);
+        }
+        if classes.len() >= sites {
+            break;
+        }
+    }
+    classes.truncate(sites);
+    let unresolved: Vec<bool> = (0..classes.len()).map(|t| (t * 7) % 11 < 5).collect();
+    let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+    let d = learner.field.declaration;
+    let (c, f) = (d.carry, d.contacts);
+    let (c2, plain) = (2 * c, f / 2 - c);
+    let n = classes.len();
+    for &k in &shifts {
+        let mut field = learner.field.clone();
+        let at = field.layout.carry_bias + c;
+        for v in &mut field.theta[at..at + c] {
+            *v -= k << FACE_BITS;
+        }
+        let pass = field.pass(&region, true).unwrap();
+        let mut cos: Vec<f64> = (0..c).map(|j| {
+            let left = (plain + j) % 2 == 0;
+            let order: Vec<usize> = if left { (0..n).collect() } else { (0..n).rev().collect() };
+            let (mut num, mut den) = (0.0f64, 0.0f64);
+            for cell in &pass.ticks {
+                let q = |t: usize| (cell.qm[t * c2 + j] as f64, cell.qm[t * c2 + c + j] as f64);
+                let g = |t: usize| {
+                    let (gr, gi) = (cell.gam[t * c2 + j] as f64, cell.gam[t * c2 + c + j] as f64);
+                    let m = gr.hypot(gi).max(1.0);
+                    (gr / m, gi / m)
+                };
+                let u = |i: usize| -> Option<(f64, f64)> {
+                    if i + 1 >= order.len() {
+                        return None;
+                    }
+                    let (t, next) = (order[i], order[i + 1]);
+                    let ((qr, qi), (ar, ai), (gr, gi)) = (q(t), q(next), g(t));
+                    Some((ar - (gr * qr - gi * qi), ai - (gr * qi + gi * qr)))
+                };
+                for i in 1..order.len() {
+                    let (Some(now), Some(before)) = (u(i), u(i - 1)) else { continue };
+                    let (gr, gi) = g(order[i]);
+                    let turned = (gr * before.0 - gi * before.1, gr * before.1 + gi * before.0);
+                    num += now.0 * turned.0 + now.1 * turned.1;
+                    den += now.0.hypot(now.1) * before.0.hypot(before.1);
+                }
+            }
+            if den > 0.0 { num / den } else { f64::NAN }
+        }).filter(|x| x.is_finite()).collect();
+        cos.sort_by(f64::total_cmp);
+        let last = pass.ticks.last().unwrap();
+        let mut deltas: Vec<f64> = (0..n).flat_map(|t| (0..c).map(move |j| (t, j))).map(|(t, j)| 1.0 - (last.gam[t * c2 + j] as f64).hypot(last.gam[t * c2 + c + j] as f64) / f64::from(1u32 << 30)).collect();
+        deltas.sort_by(f64::total_cmp);
+        let (mut code, mut open) = (0.0, 0usize);
+        for t in 0..n {
+            if let (true, Some(face)) = (unresolved[t], pass.faces[t].as_ref()) {
+                code += face.code(classes[t]) as f64 / f64::from(1u32 << 20) * std::f64::consts::LN_2;
+                open += 1;
+            }
+        }
+        let q = |p: f64| cos[((cos.len() - 1) as f64 * p) as usize];
+        eprintln!("GATE_LIGHTER k={k} cos_median={:.3} q25={:.3} q75={:.3} share_above_0={:.3} delta_median={:.3} held_code_nats={:.4}", q(0.5), q(0.25), q(0.75), cos.iter().filter(|&&x| x > 0.0).count() as f64 / cos.len() as f64, deltas[deltas.len() / 2], code / open as f64);
+    }
+}

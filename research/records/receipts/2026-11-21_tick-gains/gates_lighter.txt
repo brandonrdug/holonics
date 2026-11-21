@@ -1,0 +1,9 @@
+LIGHTER start 04:16:00 host_threads=24 (beside the line's lap on the card)
+GATE_LIGHTER k=0 cos_median=-0.275 q25=-0.349 q75=-0.205 share_above_0=0.016 delta_median=0.600 held_code_nats=1.6550
+GATE_LIGHTER k=1 cos_median=-0.190 q25=-0.278 q75=-0.107 share_above_0=0.076 delta_median=0.506 held_code_nats=1.8573
+GATE_LIGHTER k=2 cos_median=-0.125 q25=-0.224 q75=-0.024 share_above_0=0.201 delta_median=0.435 held_code_nats=2.2913
+GATE_LIGHTER k=3 cos_median=-0.089 q25=-0.187 q75=0.028 share_above_0=0.305 delta_median=0.392 held_code_nats=2.5983
+GATE_LIGHTER k=4 cos_median=-0.064 q25=-0.172 q75=0.056 share_above_0=0.355 delta_median=0.368 held_code_nats=2.7663
+GATE_LIGHTER k=5 cos_median=-0.060 q25=-0.165 q75=0.066 share_above_0=0.381 delta_median=0.356 held_code_nats=2.8567
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 167 filtered out; finished in 11.75s
+LIGHTER elapsed 40 s

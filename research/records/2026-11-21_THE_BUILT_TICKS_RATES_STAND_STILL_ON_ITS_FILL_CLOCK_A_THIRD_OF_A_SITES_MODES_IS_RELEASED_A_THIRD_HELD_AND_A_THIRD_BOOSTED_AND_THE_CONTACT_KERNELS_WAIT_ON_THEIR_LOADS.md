@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 04:15 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 04:20 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -281,6 +281,21 @@ reads 1.65500 built and 1.65501 carried, a change of +0.00001 nats a place. S1 m
 the circles whose gate stands near one widen the band past the median gate's 1.8 grains, `agent-inferred`); S2 held. So carrying the residue
 changes the operands at the grain and leaves the code where it was: the scan's order costs nothing the face reads, and its arm would be bought
 for speed alone, which the scans' memory bound does not promise (S3, not read on the host).
+
+### 8.5 The gates made lighter: the cosine climbs and stops short of zero, and the code rises
+
+The formal thread's gate law G (04:15 UTC, relayed; `agent-inferred` there): by circle `ℓ_b ← ℓ_b + η c` with `c` the circle's pooled cosine
+of successive news over a section, `κ` following `d` as built, resting at `c = 0`; a tracker on a drive correlated `φ` a site rests at
+`δ* = 2φ/(1 + φ)`, 0.068 on L71's median. Its guesses for the read with every circle's `d` multiplied by `2^(−k)`, `k` = 0 to 5: G1, the median
+cosine −0.275, −0.19, −0.11, −0.05, −0.01, +0.01, each within 0.03, crossing zero between 4 and 5; G2, no `k` reads the held code more than 0.003
+under 1.655 and `k = 4` reads at least 0.05 above. Read at 04:16 UTC (`the_circles_news_at_lighter_gates`, `gates_lighter.txt`; the leak chart's
+bias lowered by `k` on its log chart): the median cosine −0.275, −0.190, −0.125, −0.089, −0.064, −0.060 (the share above zero 0.016 to 0.381), the
+gates' median strength `δ` 0.600, 0.506, 0.435, 0.392, 0.368, 0.356, and the held code 1.655, 1.857, 2.291, 2.598, 2.766, 2.857 nats a place. G1
+held at `k` = 0 to 2 and missed from 3 on, never crossing zero; G2 held. The gates' strength stops near 0.36 however far `d` falls: the pumped
+gate's denominator carries the pump's own magnitude, `1 + d + n`, so a circle's turn cannot be lighter than its reflection allows
+(`carry_gate_pumped`; `agent-inferred`), and the rest the law derives is out of its reach while the pump stands. The code rises at every lighter
+gate, which the formal thread's caution reads as the scope of a level's law ending at a store that writes a word; G3 (the tension read at each
+`k`) is not read.
 
 ## 9. Atlas
 
