@@ -7,7 +7,7 @@ of the machine was read here and nothing in the engine was built. Refs #404, #41
 left the leak's strength to be founded as a store's balance, stated at its consumer. This record states that law (§3), reads the two
 receipts of the built tick against each other first (§2), and folds in that record's §6 and §7, the polygons and the fork (§6).
 
-Amended 02:35 to 03:06 UTC the same night (§10 to §14), after the engineering thread read the six guesses of §8 and then the scan
+Amended 02:35 to 03:08 UTC the same night (§10 to §14), after the engineering thread read the six guesses of §8 and then the scan
 with the opening held: the reads are scored, the law of §3 is amended twice (a pass's opening is held, §12; the deposit reads the pass's
 last pair of moves in place of the pooled cosine, §14), and what the pooled deposit founds on a pass of 8 ticks is stated as a number.
 
@@ -412,6 +412,14 @@ What it founds at 8 ticks is already in the engineering thread's table, at the p
 0.89 at lanes 1 to 7. Guesses fixed 03:04:05 UTC before any of it is run (`GUESS.txt`): H5, the last pair's deposit at 8 ticks from
 zero rests `d` at `δ` between 0.78 and 0.95 at every lane, and the held code read at 8 ticks at that rest stands between 3.7 and 4.0
 nats a place; H6, a pass of 8 ticks with no leak reads 2.6 to 3.2.
+
+The engineering thread read both at 03:05 to 03:06 UTC and relayed the result; its receipts (`leak_reads_8_ticks.txt`,
+`leak_law_8_ticks_at_rest.txt`, for its record's §8.2) were not on `main` or on its branch as this was written, so the figures here
+are as relayed and were not read at their source. On L71's end state, the 240 sites, 8 ticks, the opening held, `δ` scanned from ½ to 1:
+the last pair's cosine crosses zero inside 0.78 to 0.95 at every lane (0.876 at lane 7); the host law with each lane's store at its
+rest reads a held code of 3.912 nats a place, the last pair's cosine there standing at −0.16 to +0.29; with no leak 8 ticks read
+2.622, at the lower edge of H6's span, and the line's four ticks 1.655. H5 and H6 held. At its rest the friction costs the 8-tick
+pass 1.29 nats a place on this state, which is the caution's number.
 
 The caution sent with it: this friction settles a pass fastest and says nothing of what the settled lane holds. On L71 the settled
 lane holds little of its source (3.9 nats), because the modes read are fast and a held opening rests at `δ s/(1 − ν + δ a)`, 4% to

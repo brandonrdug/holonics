@@ -29,4 +29,10 @@ H3 pair (1,2) under +0.25 at every lane                              -0.708 to -
 H4 opening held, 17 ticks: the code falls as delta rises 1/2 to 1    3.991, 3.932, 3.911, 3.877                           held
    0.1 to 1.0 under the plain leak's 4.141 at delta = 1              3.877, 0.264 under                                   held
    above 3.0 at every delta                                          4.004 (1/4) to 3.877 (1)                             held
-# H5 and H6 (fixed 2026-11-21T03:04:05Z, the last pair's deposit at 8 ticks and the 8-tick pass with no leak) are unread.
+
+# H5 and H6 (fixed 2026-11-21T03:04:05Z) against the engineering thread's read of 03:05 to 03:06 UTC, AS RELAYED: its receipts
+# (leak_reads_8_ticks.txt, leak_law_8_ticks_at_rest.txt) were not on main or on its branch when this was written, so these lines
+# were not read at their source. L71's end state, 240 sites, 8 ticks, the opening held, delta scanned 0.5 to 1.
+H5 the last pair's rest in delta 0.78 to 0.95 at every lane          relayed: every lane's rest inside the span (lane 7 0.876)  held
+   the 8-tick held code at that rest 3.7 to 4.0 nats                 relayed: 3.912 (the last pair's cosine there -0.16 to +0.29) held
+H6 8 ticks with no leak reads 2.6 to 3.2 nats                        relayed: 2.622                                         held
