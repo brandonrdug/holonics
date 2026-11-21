@@ -319,11 +319,18 @@ impl Constitution {
             }
         }
         let (mut x, moment) = self.cavity_forward_sided(&region, &paces, false, false)?;
+        let opening = d.lane_leak.then(|| x.clone());
         // Every site is a source to the sites after it (definite, keyed); the lists make every site a listener.
         let (definite, keyed) = (vec![true; sites], vec![true; sites]);
+        // [the formal thread, November 21] The lane leak reads here as in the pass ([`Declaration::lane_leak`]).
+        let deltas: Option<Vec<i64>> = d.lane_leak.then(|| self.theta[self.layout.lane_leak..self.layout.lane_leak + d.lanes].iter().map(|&v| crate::contact::lane_leak_delta(v)).collect());
         for _ in 0..d.ticks {
             let mut cell = TickCell::default();
+            let from = deltas.as_ref().map(|_| x.clone());
             self.tick(&mut x, &definite, &keyed, &paces, &moment, &reaches, None, &mut cell, crate::contact::Sided::Chart(&receiving))?;
+            if let (Some(dl), Some(from)) = (deltas.as_deref(), from.as_deref()) {
+                crate::contact::lane_leak_tick(&mut x, from, opening.as_deref(), dl, dw)?;
+            }
         }
         x.chunks_exact(dw).map(|xt| self.readout_face(xt, &reaches)).collect()
     }

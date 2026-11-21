@@ -1034,6 +1034,7 @@ impl Constitution {
                 g[l.lane_leak + lane] -= release(v, FACE_BITS);
             }
         }
+        let mut opening_owed = vec![0i128; if leak_deltas.is_some() { dx.len() } else { 0 }];
         // [theory, November 13, the junction record §7] What a tick's return owes the state the tick before began from, `−Γ^(k+1) λ^(k+2)`.
         let mut owed: Option<Vec<i64>> = None;
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
@@ -1066,13 +1067,16 @@ impl Constitution {
                 }
             }
             owed = next_owed;
-            // [definition; the formal thread, November 21] The lane leak's return into the state this tick began from, `−δ_ℓ λ^(k+1)`.
+            // [definition; the formal thread, November 21] The lane leak's return into the state this tick began from, `−δ_ℓ λ^(k+1)`, and, the
+            // opening held, `+δ_ℓ λ^(k+1)` into the opening (owed there once the ticks have returned; at the first tick the two cancel).
             if let (Some(deltas), Some(lam)) = (leak_deltas.as_deref(), leak_lambda.take()) {
                 let lw = dw / deltas.len();
                 for (i, (slot, &v)) in dx.iter_mut().zip(&lam).enumerate() {
                     let dl = deltas[(i % dw) / lw];
                     if dl != 0 {
-                        *slot = fit64(i128::from(*slot) - release(i128::from(dl) * i128::from(v), 30))?;
+                        let term = release(i128::from(dl) * i128::from(v), 30);
+                        *slot = fit64(i128::from(*slot) - term)?;
+                        opening_owed[i] += term;
                     }
                 }
             }
@@ -1091,6 +1095,12 @@ impl Constitution {
                 if let Some(mut r) = returns[at].take() {
                     self.clock_return(region, &c.paces, &c.blank, Some((&c.reads, &mut dx)), &mut r, g)?;
                 }
+            }
+        }
+        // [the formal thread, November 21] What the lane leak owes the opening it holds.
+        if leak_deltas.is_some() {
+            for (slot, &v) in dx.iter_mut().zip(&opening_owed) {
+                *slot = fit64(i128::from(*slot) + v)?;
             }
         }
         // [measurement; November 13, the ring record's §4 first reading] The covector the opening receives, `λ⁰`, where read.

@@ -1,0 +1,60 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index 40e4b4ebb..cb4cbb8a4 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -8121,3 +8121,55 @@ extern "C" __global__ void field_yard_rows_max(const void *a, uint32_t kind, uin
+         out[r] = m;
+     }
+ }
++
++// [definition; the formal thread, November 21 (the record of the store's leak, §3; the host's `lane_leak_tick`)] **The lane leak's tick**: every
++// entry `x ← x − release(δ_ℓ from, 30)`, `δ` one a face lane on `2^(−30)` (`deltas`, `δ = d/(1 + d)` from the lane's store). In the forward `from` is
++// the state the tick began from, so the tick is `x ← γ x + g`; in the return `x` is the covector the tick's return made of the state it began from
++// and `from` the covector the tick received, so the term is `−δ λ^(k+1)`. Cells: `T D`.
++extern "C" __global__ void field_lane_leak(FieldWords w, int64_t *x, const int64_t *from, const int64_t *deltas) {
++    const uint64_t cells = (uint64_t)w.T * w.D;
++    const uint32_t lw = w.D / w.lanes;
++    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
++        const int64_t dl = deltas[(c % w.D) / lw];
++        if (dl != 0) {
++            x[c] = fit64((wide)x[c] - rel((wide)dl * (wide)from[c], 30), w.status);
++        }
++    }
++}
++
++// [definition; the formal thread, November 21] **The lane leak's stores' news** (the host's `returned_with`): at each site and face lane, the
++// pairing of two successive chart moves `Σ_i (b − a)(c − b)` over the lane (`a`, `b`, `c` three successive charts `[t][D]`), summed whole into its
++// region's and lane's sum `acc[r][ℓ]` (an integer sum at one grain: any order gives the same bits). Cells: `T lanes`.
++extern "C" __global__ void field_lane_leak_news(FieldWords w, const int32_t *a, const int32_t *b, const int32_t *c, wide *acc) {
++    const uint64_t cells = (uint64_t)w.T * w.lanes;
++    const uint32_t lw = w.D / w.lanes;
++    for (uint64_t cell = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; cell < cells; cell += (uint64_t)gridDim.x * blockDim.x) {
++        const uint64_t t = cell / w.lanes;
++        const uint32_t l = (uint32_t)(cell % w.lanes);
++        wide s = 0;
++        for (uint32_t i = 0; i < lw; i++) {
++            const uint64_t at = t * w.D + (uint64_t)l * lw + i;
++            s += (wide)((int64_t)b[at] - a[at]) * (wide)((int64_t)c[at] - b[at]);
++        }
++        if (s != 0) {
++            add_wide(acc + (uint64_t)w.site_region[t] * w.lanes + l, s);
++        }
++    }
++}
++
++// [definition; the formal thread, November 21] **The stores' covector** (the host's `returned_with`, one region a return): each region's pairing
++// released once by the face's grain, `−release(acc[r][ℓ], 16)`, summed over the batch's regions into the store's entry `at + ℓ` of `gcov`. One
++// block of at least `lanes` threads.
++extern "C" __global__ void field_lane_leak_news_end(FieldWords w, const wide *acc, uint64_t at) {
++    const uint32_t l = threadIdx.x;
++    if (l >= w.lanes) {
++        return;
++    }
++    wide total = 0;
++    for (uint32_t r = 0; r < w.R; r++) {
++        total -= rel(acc[(uint64_t)r * w.lanes + l], FACE_BITS);
++    }
++    if (total != 0) {
++        add_wide(w.gcov + at + l, total);
++    }
++}
