@@ -1,0 +1,2 @@
+dwellk.log:TRIAL_DONE sections=9600 ms=782586
+dwellt.log:TRIAL_DONE sections=4000 ms=291474

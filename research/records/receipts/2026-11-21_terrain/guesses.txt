@@ -1,0 +1,40 @@
+Fixed 2026-11-21T05:12:05Z (date -u), before W77 or L77 trains. The arm: W77, L76's end with the terrain line (4 records a region); its control L77, L76's end as it stands.
+
+G-T1 (the terrain founds what the line never took). On the terrain's held panel (96 held expressions in the world's own form, 16 a kind, 32 places
+written after each, read at each lap's MEAN.3000 on the host), W77's writes begin with the whole reference answer in at least 24 of 96, and
+L77's in at most 6. By kind, W77 at least 8 of 16 on sums and on copies.
+G-T2 (the tension is absorbed). The terrain's share of a section's sites (STORE_TERRAIN next_share over 41,490) stands above 0.5 over W77's first
+100 sections and under 0.3 over its last 100.
+G-T3 (the text's price). The frontier's one-place-open code at W77's mean stands within 0.03 nats a place of L77's on every region.
+G-T4 (another form is no finding). On the 21-prompt logic panel (other forms than the world's), W77's openings are at most twice L77's
+(Brandon, November 17 20:27Z: a form she was never shown is expected to fail and is no finding).
+
+Fixed 2026-11-21T06:06:18Z (date -u), before W77s trains (W77 at section 2,500; its section-2000 state wrote 0 of 96 held answers whole, first symbol 8 of 96).
+G-S1. W77s (the writer's state, two records a region) writes at least 24 of the 96 held answers whole at its MEAN.3000, and at least 8 of 16
+on sums and on copies.
+G-S2. W77s's whole count is at least three times W77's at the same read.
+
+Fixed 2026-11-21T06:45:50Z (date -u), before the dwell control trains. G-D1: try-passes from L76's end on 3,923 one- and two-digit sums (100 a section,
+100 passes) takes the held units digit read alone under 0.5 nats by pass 100, and writes at least 48 of 96 further held sums whole.
+
+Scored (07:40Z): G-D1 split: the held units digit read alone fell from 3.40 to 0.0005 nats by pass 100 (held), and the free writes in place
+order came out 0 of 95 whole (missed): the dwell founds sums in the two-sided state it is compared in, and the writer's one-sided state never
+meets that law. Fixed 2026-11-21T07:40:35Z, before the writer-state dwell trains. G-D2: try-passes from L76's end with every fit row opened by
+`suffix` (the writer's state) writes at least 48 of 96 held sums whole at pass 100.
+
+Scored (07:58Z): G-D2 missed: the suffix dwell's held last digit with the run open read 0.007 nats at pass 50, and its free writes came out 0
+of 96 (the first place written as `g`, `ge`, `get`): a region that runs past the compared place is not the writer's state. Fixed
+2026-11-21T07:58:08Z, before the frontier dwell trains. G-D3: try-passes from L76's end on rows that are each one answer place with its region ending
+there (the writer's state) writes at least 48 of 96 held sums whole after 40 passes.
+
+Scored (08:10Z): G-D3 missed: the frontier dwell (each row one answer place, its region ending there, plain) wrote 0 of 96 at pass 40 and 1
+at pass 25. Read in the writer's source, the reason: L76's pass reads its frontier by two streams (`strand past`), the writer writes in that
+regime, and every dwell and terrain region of the day was plain. Fixed 2026-11-21T08:11:46Z, before the two-stream dwell trains. G-D4: try-passes from
+L76's end on the 3,923 sums read by two streams (every place compared at its own frontier) writes at least 48 of 96 held sums whole at pass 100.
+
+Scored (08:32Z): G-D4 held: read by two streams, the dwell on sums wrote 67 of 96 held sums whole at pass 100 (59 at pass 50), first digit 91.
+Fixed 2026-11-21T08:35:07Z, before the six-kind dwell trains. G-D5: try-passes from L76's end on 4,000 unheld records of each of the world's six kinds,
+read by two streams, 40 passes: the held terrain panel at least 24 of 96 whole, and at least 8 of 16 on sums and on copies.
+
+Fixed 2026-11-21T08:36:44Z (date -u), before W77t trains. G-W1: W77t (the terrain read by two streams inside the line, two records a region) writes at
+least 24 of 96 held records whole at its MEAN.3000 and at least 8 of 16 on sums; its frontier within 0.03 nats a place of L77's on every region.

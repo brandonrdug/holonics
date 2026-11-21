@@ -1,0 +1,12 @@
+TRIAL_READ pass=0 group=strict rows=400 last_alone=3402994 last_run_open=3680457 first_alone=2244106 first_rows=398 density_at_last_milli=44
+TRIAL_READ pass=10 group=strict rows=400 last_alone=2477267 last_run_open=2279580 first_alone=1235074 first_rows=398 density_at_last_milli=105
+TRIAL_READ pass=20 group=strict rows=400 last_alone=1910392 last_run_open=1585989 first_alone=1023846 first_rows=398 density_at_last_milli=241
+TRIAL_READ pass=30 group=strict rows=400 last_alone=797249 last_run_open=102566 first_alone=654398 first_rows=398 density_at_last_milli=666
+TRIAL_READ pass=40 group=strict rows=400 last_alone=688287 last_run_open=15393 first_alone=557006 first_rows=398 density_at_last_milli=758
+TRIAL_READ pass=50 group=strict rows=400 last_alone=363655 last_run_open=6682 first_alone=430778 first_rows=398 density_at_last_milli=849
+TRIAL_READ pass=60 group=strict rows=400 last_alone=343739 last_run_open=3303 first_alone=430582 first_rows=398 density_at_last_milli=874
+TRIAL_READ pass=70 group=strict rows=400 last_alone=557083 last_run_open=114472 first_alone=387881 first_rows=398 density_at_last_milli=808
+TRIAL_READ pass=80 group=strict rows=400 last_alone=500999 last_run_open=1351 first_alone=305578 first_rows=398 density_at_last_milli=878
+TRIAL_READ pass=90 group=strict rows=400 last_alone=536984 last_run_open=511 first_alone=304046 first_rows=398 density_at_last_milli=879
+TRIAL_READ pass=100 group=strict rows=400 last_alone=907810 last_run_open=41673 first_alone=666579 first_rows=398 density_at_last_milli=768
+TRIAL_DONE sections=4000 ms=344665
