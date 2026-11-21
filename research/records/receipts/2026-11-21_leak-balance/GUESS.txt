@@ -13,3 +13,25 @@ B5 (what the comparison has to recover; the least certain): the held code read a
     is trained, stands above the line's own four-tick read by 0.05 to 0.5 nats a place.
 F3 (the circles' multipliers, read from the state's words; low confidence): the median of the 512 circles' |gamma| is under 0.6,
     and under a tenth of them turn within 0.3 radians of a third of a turn at |gamma|^3 > 1/2.
+
+# Fixed 2026-11-21T02:52:10Z, after the engineering thread's reads of B1 to B5 and F3 (receipts/2026-11-21_tick-gains/leak_reads.txt,
+# scored in LEAK_SCORES.txt beside this file) and before any of the reads below is run. Same state, sites and ruler. "Opening
+# held" is the ruler's leak applied to the currents alone, x <- x0 + (1 - delta)(x - x0) + g, x0 the pass's opening.
+H1 (the arm's number, arithmetic on the read's own moves): on a pass of 8 ticks with no leak the pooled cosine by face lane
+    stands within 0.005 of the 17-tick figure, [-0.003 +0.232 -0.002 -0.011 -0.393 -0.324 -0.178].
+H2 (how d moves at 8 ticks under the deposit as merged, chart l = log2(1 + d), over the first lap): lanes 5 to 7 stay under 0.05;
+    lanes 1, 3 and 4 stay under 0.2; lane 2 alone rises, to between 0.4 and 1.0 (delta between 1/4 and 1/2). The two arms'
+    held codes at their lap means agree within the scatter between laps.
+H3 (by pair of ticks, no leak): the pairs (1,2) and (2,3) read under +0.25 at every lane; the pair (3,4) reads between +0.4 and
+    +0.85 at lanes 1, 3 and 4; every pair from (4,5) reads above +0.9.
+H4 (the opening held, 17 ticks; the least certain): the held code falls as delta rises from 1/2 to 1 (the plain leak's rose,
+    4.137 to 4.141), at delta = 1 it reads 0.1 to 1.0 nats under the plain leak's 4.141, and at every delta of the scan it
+    stays above 3.0 nats (the line's four-tick read is 1.655): holding the opening does not recover the raised read on this state.
+
+# Fixed 2026-11-21T03:04:05Z, after the engineering thread's read with the opening held (receipts/2026-11-21_tick-gains/
+# leak_reads_opening_held.txt, started 02:54:41Z; it scores H3 and H4 above, in LEAK_SCORES.txt) and before any read below is run.
+# The deposit here reads the cosine of a pass's last pair of moves in place of the pooled cosine; the opening is held.
+H5 (the last pair's deposit at 8 ticks, from zero, on L71's end state and those 240 sites): d rests by face lane at delta between
+    0.78 and 0.95 (lanes 1 and 2 between 0.78 and 0.86, lanes 3 to 7 between 0.84 and 0.95), and the held code read at 8 ticks at
+    that rest stands between 3.7 and 4.0 nats a place.
+H6 (the control's start): a pass of 8 ticks with no leak reads a held code between 2.6 and 3.2 nats a place.
