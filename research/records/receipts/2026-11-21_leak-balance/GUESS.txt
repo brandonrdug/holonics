@@ -35,3 +35,22 @@ H5 (the last pair's deposit at 8 ticks, from zero, on L71's end state and those 
     0.78 and 0.95 (lanes 1 and 2 between 0.78 and 0.86, lanes 3 to 7 between 0.84 and 0.95), and the held code read at 8 ticks at
     that rest stands between 3.7 and 4.0 nats a place.
 H6 (the control's start): a pass of 8 ticks with no leak reads a held code between 2.6 and 3.2 nats a place.
+
+# S1 to S4 were fixed in a message to the engineering thread sent 2026-11-21T04:04:40Z, before its reads of 04:06 and 04:07 UTC,
+# and are copied here after those reads (the engineering record's §8.3 and §8.4 carry them as relayed). No file held them before.
+# The carry circles on L71's end state, the 240 sites, the line's own four ticks.
+S1 (the built chain against its unreleased orbit, released once): 97% of Q's components stand within one grain of the orbit, and
+    the largest gap is at most 6 grains.
+S2: the held code moves under 0.0005 nats a place with the residue carried.
+S3: an arm that carries the residue would shorten a section by under 6 ms.
+S4 (the circle read as a tracker, Q(t) = ghat Q(t-+1) + delta n(t), delta = d/(1 + d)): by circle, the cosine of successive news
+    along the strand has its median over circles between -0.20 and +0.05, with under a fifth of circles above +0.10. Under -0.20
+    says the gates over-track, and the own-news law applies to them.
+
+# G1 to G3 were fixed in a message to the engineering thread sent 2026-11-21T04:15:09Z, before its read of 04:16 UTC, and are
+# copied here after it (the engineering record's §8.5 carries G1 and G2 as relayed). Every circle's friction d times 2^(-k),
+# k = 0 to 5, the coupling following as built.
+G1: the median cosine reads -0.275, -0.19, -0.11, -0.05, -0.01, +0.01, each within 0.03, crossing zero between k = 4 and 5.
+G2: no k reads the held code more than 0.003 under 1.655, and k = 4 reads at least 0.05 above.
+G3 (the tension read, the charges recomputed at each k as a part's operands, the share of the face's covector removed on a held
+    half): no k removes more than the built charges' share plus 0.01.

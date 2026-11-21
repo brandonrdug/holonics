@@ -15,3 +15,10 @@ no state of the machine.
 - `fork_model.py`, `fork_model.txt`: the six closing orders of three arrivals on a leaking store and at a multiplier that turns by a third.
 - `opening.py`, `opening.txt`: a planted lane whose write is computed from its ray, run as the built pass, a leak of the whole lane and
   a leak of the currents with the opening held; the place a mode keeps of the opening at 8, 17 and 400 ticks against the record's §12.
+- `GUESS.txt` and `LEAK_SCORES.txt` also hold the carry circles' guesses S1 to S4 and G1 to G3 (fixed in messages of 04:04:40 and
+  04:15:09 UTC, copied in after the reads) and their scores from `../2026-11-21_tick-gains/circle_news.txt`, `scan_carry.txt` and
+  `gates_lighter.txt`; H5 and H6 are scored there from `leak_reads_8_ticks.txt` and `leak_law_8_ticks_at_rest.txt`.
+- `tracker.py`, `tracker.txt`: a store that follows a level on a planted drive of correlation `φ` (the correlation of its successive news
+  and its zero at `δ = 2φ/(1 + φ)`), the read's six medians of `1 − |γ|` against the pumped gate's form, a pumped circle on a white complex
+  Gaussian drive with its news pooled as the engineering thread's test pools it, and the charge's scale by axis as the friction falls
+  (6 seconds, one thread).
