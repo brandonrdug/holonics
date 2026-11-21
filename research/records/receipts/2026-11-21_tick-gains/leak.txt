@@ -1,0 +1,9 @@
+LEAK_M region top_singular_share=0.673 top5=1.000 0.406 0.280 0.189 0.145
+LEAK t=120 open=1 k=3 fill=0.73 M=region boosted:n=77,lowered=0.48,median_abs=0.187 held:n=59,lowered=0.58,median_abs=0.261 released:n=88,lowered=0.39,median_abs=0.160
+LEAK t=120 open=1 k=3 fill=0.73 M=site boosted:n=77,lowered=0.57,median_abs=0.150 held:n=59,lowered=0.46,median_abs=0.284 released:n=88,lowered=0.59,median_abs=0.232
+LEAK t=122 open=0 k=3 fill=0.43 M=region boosted:n=82,lowered=0.55,median_abs=0.108 held:n=56,lowered=0.45,median_abs=0.182 released:n=86,lowered=0.51,median_abs=0.243
+LEAK t=122 open=0 k=3 fill=0.43 M=site boosted:n=82,lowered=0.43,median_abs=0.071 held:n=56,lowered=0.34,median_abs=0.116 released:n=86,lowered=0.55,median_abs=0.136
+LEAK t=200 open=1 k=3 fill=0.75 M=region boosted:n=74,lowered=0.53,median_abs=0.127 held:n=66,lowered=0.62,median_abs=0.123 released:n=84,lowered=0.49,median_abs=0.187
+LEAK t=200 open=1 k=3 fill=0.75 M=site boosted:n=74,lowered=0.50,median_abs=0.096 held:n=66,lowered=0.53,median_abs=0.132 released:n=84,lowered=0.52,median_abs=0.106
+LEAK t=201 open=0 k=3 fill=0.82 M=region boosted:n=84,lowered=0.55,median_abs=0.111 held:n=46,lowered=0.52,median_abs=0.133 released:n=94,lowered=0.54,median_abs=0.179
+LEAK t=201 open=0 k=3 fill=0.82 M=site boosted:n=84,lowered=0.46,median_abs=0.056 held:n=46,lowered=0.46,median_abs=0.117 released:n=94,lowered=0.48,median_abs=0.120

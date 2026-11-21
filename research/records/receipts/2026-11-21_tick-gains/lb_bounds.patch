@@ -1,0 +1,26 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index ab0bfd002..6146f94b3 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -2915,7 +2915,7 @@ __device__ bool rowdiv_nearest(Big<L> x, const RowDiv<L> &d, uint64_t *quotient)
+ // Blocks a multiprocessor keeps resident (the register file shared among them): 6 blocks of 4 warps, for the forward contact and the
+ // exposure. [realization; G191, November 14] At 8 both spilled under a 64-register bound (778 and 220 spill stores, the engine audit's
+ // finding 4); timed with the outer sums' walk of 64 (above), the pair reads about 3 ms a section under 8 and 512 with the card warmed.
+-#define CONTACT_MIN_BLOCKS 6
++#define CONTACT_MIN_BLOCKS 5
+ // The block of `field_spread` (a region a block). [realization; November 16, the profile of lap 56's sections] 672, where 256 gave a
+ // region's span of 32 entries 8 chunks of about 26 sites each walked twice in order, 96 to 129 blocks a launch at 10% issue: 21 chunks. At
+ // the kernel's 48 registers it stands one block a multiprocessor (the register file's four quarters hold 10 warps of 1,536 each), and 640
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index ab0bfd002..2be80f549 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -5381,7 +5381,7 @@ __device__ __forceinline__ wide gained(wide v, int32_t beta, uint32_t *st) {
+ // (`REV_ROWS · 16 · S` words of 32 bits, `rows_words` below) by asynchronous copies, each lane the entries it then reads, and waited for once:
+ // the sixteen staged pairs' words, which the inner loop read one by one behind each load, now stand in flight together with no register held
+ // for them. The word is read on 32 bits as `mul32` reads it, so the products are the same.
+-extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
++extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 5) field_contact_rows(FieldWords w, uint32_t h, const int64_t *dyh, int64_t *ds, int64_t *dq) {
+     extern __shared__ __align__(16) int32_t rows_words[];
+     __shared__ uint32_t stj[REV_ROWS][32], stk[REV_ROWS][32];
+     __shared__ int64_t dss[REV_ROWS][32];

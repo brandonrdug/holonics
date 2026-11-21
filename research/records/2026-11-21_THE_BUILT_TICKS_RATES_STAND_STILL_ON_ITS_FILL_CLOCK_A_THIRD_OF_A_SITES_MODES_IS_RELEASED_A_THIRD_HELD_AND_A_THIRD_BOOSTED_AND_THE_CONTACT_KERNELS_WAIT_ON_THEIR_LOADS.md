@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 01:40 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 02:00 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -76,6 +76,22 @@ reading of these four sites tells apart from held), and a third grows as a power
   read before it is built (the method's "a premise is a presence at the consumer"), is whether the boosted third lies in what `P` sees:
   the projection of the boosted eigenvectors on `P`'s range at the same sites and ticks. Its guess is fixed when `P` is named at its
   consumer.
+
+### 3.1 The news write's premise: the comparison's descent does not prefer the boosted third
+
+Read at 01:54 to 01:56 UTC, its guess fixed first (`LEAK_GUESS.txt`): a leak `x ← x + g(x) − Λ x` founded at `Λ = 0` reads every bit of
+the built tick, and its first descent is along `M = Σ_(t,k) λ_t^(k+1) (x_t^k)ᵀ`, the covector each tick's return receives against the
+state the tick began from (`a_leaks_first_deposit_against_the_ticks_gains`, `tools/tick_gains.py --leak`). On L71's end state at its own
+four ticks, the same 240 sites, against the tick's block at its last tick (`k = 3`, where the lanes' fill is 0.43 to 0.82: the line's
+pass ends before the running mean settles): the first-order change of each eigenvalue under `J − ηM` lowers the gain of 43 to 57% of the
+boosted modes, 34 to 62% of the held and 39 to 59% of the released, for the region's `M` and each site's own alike (`leak.txt`), and the
+region's `M` stands near rank one (its largest singular value 67% of its square norm). Guess: L1, no preference within 0.4 to 0.6 in each
+kind (held for the boosted at every site, missed at its edges for the held at two sites and the released at one); L2, near rank one
+(held). So a leak whose map the comparison deposits from zero is pushed along the region's one mean covector against its mean state, and
+nothing in that push contracts what grows rather than what holds: the comparison's descent does not supply the contraction
+(`agent-inferred`). The rate at which a store contracts is the store's own (the stores-and-caches law: a store holds by upkeep at a finite
+quality; the method's rule that a temperature is a store's state), so the leak's strength is founded as a store's balance, and the
+comparison moves only what it reaches. The arm waits on that founding law, which is the formal thread's to state at its consumer.
 
 ## 4. The contact kernels wait on their loads
 
