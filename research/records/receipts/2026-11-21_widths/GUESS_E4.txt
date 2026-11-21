@@ -1,0 +1,9 @@
+Fixed 2026-11-21T20:40:18Z (date -u), the lead, before W81e trains (widths/w81.sh). E4 of #1088 as an arm.
+G-E4: W81e (W80g's end with the step's and the moments' remainders carried) beside W81t (W80g's end, no change), 3,000 sections each,
+read at MEAN.3000. (a) The held text at one place open stands within 0.005 nats a place of W81t's, paired, on every region, and the
+frontier read within 0.005. (b) The held terrain records written whole within 3 of W81t's, of 96. (c) At W81e's STATE.3000 the face-grain
+families' remainders are nonzero in at least 90% of their moving entries (the steps that released to zero are carried, not lost).
+(d) The lap's end over its mean (the heat on the 800 frontier rows) is within a tenth of W81t's.
+Why: a release that keeps its remainder changes only where a step was lost, which G-W4 placed in the face-grain families (half of
+their steps a section at rate 2^-12); their entries move by fluxes under one grain a section, a delay of a few sections, so the
+code moves little in a lap. A gain larger than 0.005 would say those silenced fluxes held something the line lacked.

@@ -1,6 +1,7 @@
 //! The receiver's coupling at temperature one (`receiver/coupling.rs` until C3): moved whole into the engine (C3 of the consolidation, #603), each item's
 //! text as it stood but for its visibility; C5 cuts them by object (THE_CONSOLIDATION §5).
 
+use crate::width::{COVECTOR_BITS, READ_BITS};
 use thiserror::Error;
 
 /// Which of the two participating strands supplied a refused face.
@@ -246,10 +247,10 @@ pub enum TemperatureRefusal {
 }
 
 /// The grain of a placed share and a lag (the learner's covector grain, `hnn::tower::COVECTOR_BITS`).
-pub const SHARE_BITS_T: u32 = 24;
+pub const SHARE_BITS_T: u32 = COVECTOR_BITS;
 
 /// The grain of a code (`hnn::tower::READ_BITS`).
-pub const CODE_BITS: u32 = 20;
+pub const CODE_BITS: u32 = READ_BITS;
 
 /// A mass's mantissa lies in `[2^62, 2^63)`.
 pub const MANTISSA_BITS: u32 = 62;

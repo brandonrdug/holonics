@@ -1,0 +1,5 @@
+read-reach on the 800 held frontier rows by two streams, W80t's STATE.3000 (the lap's end), host, 12 threads:
+REACH setting=law places=139998 nats_millionths=1350068
+REACH setting=state:3 places=139998 nats_millionths=1350105
+REACH setting=state:1 places=139998 nats_millionths=1351257
+(the lap's mean, MEAN.3000, reads 1309612 at the law: grains_W80t.txt)

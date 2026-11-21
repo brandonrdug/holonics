@@ -49,3 +49,21 @@ Amended 2026-11-21T19:26:36Z (date -u), before any read exists: G-W2b's directio
   (S_ii falling as H_ii^(-1/2) under this step).
 G-W2b (amended, the one scored): the quotient stands between 1 and 30.
 G-W1 stands as written; its centre under the amended quotient is g = 10.
+
+Scored 2026-11-21T20:34:02Z (date -u), the lead, on the store line's W80t (W79t's end + 3,000 sections, no change): its STATE.3000 and MEAN.3000.
+The held read is the 800 frontier rows of held text by two streams (read-reach, host), 139,998 places. Receipts beside this file.
+G-W0 missed in its first clause, held in its second: the 99.9th hundredth of |theta| is 4 or more in five blocks (read_bias 18.85,
+  pace 19.65, before 5.10, after 4.63, v 4.20), under 4 in the other 60; the largest anywhere 19.83 (under 32).
+G-W1 held: rises 0.000187, 0.000367, 0.000687, 0.002464, 0.030447 nats a place at g = 12, 10, 9, 8, 6; the coarsest g under 0.001 is 9.
+G-W2 missed at its top: the rms of the end less the mean stands between 2^-10.23 and 2^-6.67; nine blocks above 2^-7.8 (enc, before,
+  after, moment_before, moment_after, pace -6.67, carry, pump, one glue block), none under 2^-11.
+G-W2b held from g = 9 to 12, at its edge at 8, and missed at 6: with the end 0.0405 nats a place over the mean and the entries' mean
+  square spread 2.07e-5 (rms 2^-7.78), the quotient is 19.2, 2.36, 1.10, 0.99 and 0.76 at g = 12, 10, 9, 8, 6.
+G-W3 missed: every state rounded to 2^-g after each tick moves the code by under 0.0001 for g down to 5 (+0.000063 at 6, -0.000037 at 5),
+  and at the lap's end by +0.000037 at g = 3 and +0.0012 at g = 1. The state's bottom is set by its scale: each lane is read through
+  its own power.
+G-W4 missed at rates 12 and 16, held at 20, and the miss is the face-grain families: of 1,829,090 moving entries 4.89%, 10.63% and 27.15%
+  release to zero at rates 12, 16 and 20; on the material grain (1,654,225) 0.08%, 1.22% and 19.45%, as computed; on the face grain
+  (174,865: the encodings E, E-, E+, the moments' encodings, every bias) 50.36%, 99.61% and 100%.
+G-W5 missed: at W80t's end the covector's cosine between successive sections (six pairs of the sections the trainer cuts next, one
+  state) is 0.65 to 0.83 over the whole material, and by family from 0.30 (q_bias) to 0.90 (enc).

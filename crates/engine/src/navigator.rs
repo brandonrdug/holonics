@@ -78,7 +78,7 @@ pub(crate) fn skin_of(s: i128, n: usize, pi: i128, exponential: &Exponential) ->
 }
 
 /// The grain of `ln 2`'s face ([`ln2_face`]), `2^(−30)`.
-pub(crate) const LN2_FACE_BITS: u32 = 30;
+pub const LN2_FACE_BITS: u32 = LN2_BITS;
 
 /// [§16.44] The bits a blank's return through its face is held finer than the readout's, from its lift's covector to
 /// the state's (`2^16`, the face's own grain), so a small covector reaches the state rather than rounding away.
@@ -86,7 +86,7 @@ pub(crate) const BLANK_HELD: u32 = STATE_BITS;
 
 /// The temperature's carrier in its chart: `⌈log₂ T⌉ ≤ 7`, the reach its additive chart held on 32 bits, and
 /// `T ≥ 2^(−23)`, above the material's grain.
-pub(crate) const TEMPER_TOP: i128 = 7;
+pub const TEMPER_TOP: i128 = 7;
 
 /// [definition; agent-inferred, November 2] **A temperature is a scale, carried in the ratio law's logarithmic
 /// chart** (§16.12, §15.10): the material holds `ℓ = log₂ T` on `2^(−24)`, so a step multiplies the temperature

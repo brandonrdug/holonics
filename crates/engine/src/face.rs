@@ -346,7 +346,7 @@ pub fn fewer_bits_weighed(old: &[(u128, u128)], new: &[(u128, u128)], spans: &[(
 
 /// The weighed certificate's finer readings: the readings' own floor (a mantissa released at `2^(−62)` holds a
 /// reading within one grain and `2^(−60)` of `log₂ v`, so three grains at `2^(−60)`).
-pub const WEIGHED_DIGITS: u32 = 60;
+pub const WEIGHED_DIGITS: u32 = UNIT_BITS - 2;
 
 /// [definition; agent-inferred, November 2, the field's §16.23] **A weighed code** on `2^(−20)` bits: each region's
 /// code `Σ_(i∈r) −log₂ p_i` read at `m_r/K_r`, released once a region to the nearest (half away from zero), summed.

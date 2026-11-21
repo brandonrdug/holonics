@@ -22,6 +22,7 @@ pub mod learner;
 pub mod level;
 pub mod moment;
 pub mod navigator;
+pub mod number;
 pub mod passage;
 pub mod ratio;
 pub mod realization;

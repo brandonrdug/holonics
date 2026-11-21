@@ -384,7 +384,7 @@ impl Constitution {
             let ph = &cell.pq[h * sites * span..(h + 1) * sites * span];
             // A receiver's probe word (§16.19).
             let probe_of = |i: usize, r: usize| -> i64 { ph[i * span + r] };
-            let back = CONTACT_BITS + FACE_BITS + self.decay(h, 0, 0).1 - crate::field::COVECTOR_BITS;
+            let back = CONTACT_BACK + self.decay(h, 0, 0).1;
             // [measurement; G157] A turned head's reach on its own clock: its founding covector by receiver row, where read.
             let mut reach_rows = [ReachSums::default(); 2];
             let reach_clock = reach.as_ref().and(paces.row[h]).filter(|_| d.carries_moment(h) && !d.is_depth(h)).map(|p| &paces.sigma[p]);

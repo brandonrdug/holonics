@@ -10,11 +10,11 @@
 # law it could not derive. The campaign (#1088; the record of November 21) ends when picked, carrier, literal
 # and dead read zero.
 #
-# ceiling picked 15
+# ceiling picked 13
 # ceiling carrier 13
-# ceiling literal 8
-# ceiling dead 2
-# ceiling shifts engine 128
+# ceiling literal 0
+# ceiling dead 0
+# ceiling shifts engine 127
 # ceiling shifts engine-cuda 249
 # ceiling shifts athena 42
 name	owner	value	class	need
@@ -24,14 +24,14 @@ MATERIAL_BITS	crates/engine/src/width.rs	24	picked	the constitution's grain. Its
 COVECTOR_BITS	crates/engine/src/width.rs	24	picked	a covector's grain. Its law: the places below a section's own spread of the covector are heat (the record of November 7, section 5); read: the covector's spread across sections against its mean, by block
 STEP_BITS	crates/engine/src/width.rs	32	picked	the first moment's grain and its epsilon. Its law (agent-inferred): COVECTOR_BITS plus the places a mean over the moment's memory adds (half a place a doubling of the sections it averages); unread
 READ_BITS	crates/engine/src/width.rs	20	picked	a code reading's grain in bits. Its law: a read of N places confirms about half of log2 N places (receiver.grain-lemma: 7 at the held passage's 43,470); 20 is finer than any read on record
-CONTACT_BITS	crates/engine/src/width.rs	40	picked	the contact covector's grain. By its consumers (deposit.rs on_step_grain) it is a covector times a face, COVECTOR_BITS + FACE_BITS (agent-inferred); written so it becomes derived
+CONTACT_BITS	crates/engine/src/width.rs	40	derived	COVECTOR_BITS + FACE_BITS: a covector times a face, by its consumers (deposit.rs on_step_grain; E2 of #1088)
+CONTACT_BACK	crates/engine/src/width.rs	32	derived	CONTACT_BITS + FACE_BITS - COVECTOR_BITS: the probe and key return summed on the contact grain times a face, released to the covector grain; the kernel reads it from the generated widths.cuh (E3 of #1088)
 MOVE_BITS	crates/engine/src/width.rs	30	carrier	frames, skins and phasors: chosen so a face fits 32 bits and three faces times an encoding (106) fit 128. Its law: the reader's grain plus the state's top place plus the places its sum's terms add plus one (atlas radix.width-need; radix.face-width-from-readers); about 24 by that count at the line's width, unread
 SHARE_BITS	crates/engine/src/width.rs	63	carrier	a term's share of its row's mass: one place under a 64-bit word. Its law: the receiver's grain plus the places the row's count of terms adds; unread
 UNIT_BITS	crates/engine/src/width.rs	62	carrier	the exponential's faces: the widest whose square fits 128 bits. Its law: the grain of the share it forms plus the places its squarings lose (one a squaring); unread
-UNIT_BITS	crates/engine/src/units.rs	62	literal	repeats width.rs UNIT_BITS as a private number
 CODE_BITS	crates/engine/src/units.rs	32	picked	the code's grain in bits; one name with a second value in coupling.rs (20). Same law as READ_BITS
-SHARE_BITS_T	crates/engine/src/coupling.rs	24	literal	its text names it the covector grain (COVECTOR_BITS)
-CODE_BITS	crates/engine/src/coupling.rs	20	literal	its text names it READ_BITS
+SHARE_BITS_T	crates/engine/src/coupling.rs	24	identity	COVECTOR_BITS, the covector grain its text names (E2 of #1088)
+CODE_BITS	crates/engine/src/coupling.rs	20	identity	READ_BITS, the code reading grain its text names (E2 of #1088)
 MANTISSA_BITS	crates/engine/src/coupling.rs	62	carrier	a mass's mantissa in one 64-bit word; a mass is a count with its scale (the record of November 10, a count keeps its scale and half its digits)
 CLOSED_BITS	crates/engine/src/closed.rs	30	picked	the closed face's weights, densities and masses; the moves' grain under a second number, with no reader's cut on record
 WEIGHT_BITS	crates/engine/src/contact.rs	62	carrier	a source's value multiplier, 1 on 2^-62; the card weighs by one and gives the same rational (field.cu, November 15), so the multiplier is a carrier's habit the card has already dropped
@@ -45,38 +45,25 @@ JUNCTION_WHOLE_TOP	crates/engine/src/carry.rs	30	carrier	to 30: the same reach
 FIRST_RATE	crates/engine/src/deposit.rs	3	picked	the first moment's rate: the classical 0.9 read as 2^-3. Its law: a rate is a store's state (the method rule of November 13); a moment's memory is the count of sections over which its covector's news stays coherent, read from the cosine of successive covectors by block
 SECOND_RATE	crates/engine/src/deposit.rs	8	picked	the second moment's rate: the classical 0.999 read as 2^-8. Same law as FIRST_RATE
 HELD_RATE	crates/engine/src/deposit.rs	64	carrier	a sentinel past every shift; a step releases to zero from MATERIAL_BITS + 3 up (its text: m/root under 4.2), which is its need
-REMAINDER_BITS	crates/engine/src/deposit.rs	16	literal	its text derives it: the first moment's grain under a face-grain entry, STEP_BITS - FACE_BITS
-WEIGHED_DIGITS	crates/engine/src/face.rs	60	literal	its text derives it from the exponential's grain: UNIT_BITS - 2
+REMAINDER_BITS	crates/engine/src/deposit.rs	16	derived	STEP_BITS - FACE_BITS: the first moment's grain under a face-grain entry (E2 of #1088)
+WEIGHED_DIGITS	crates/engine/src/face.rs	60	derived	UNIT_BITS - 2, from the exponential's grain (E2 of #1088)
 CERTIFICATE_DIGITS	crates/engine/src/face.rs	32	picked	the certificate's logarithmic readings; no reader's cut on record
 CERTIFICATE_SLACK	crates/engine/src/face.rs	3	picked	its text proves a reading within one grain and 2^-60 of its value, a need of 2; the third grain is room
 COEFFICIENT_BITS	crates/engine/src/field/moment.rs	90	derived	three faces on the moves grain: a product adds its grains (radix.width-need)
 MOMENT_BITS	crates/engine/src/field/moment.rs	106	derived	a coefficient times an encoding
 RETURN_BITS	crates/engine/src/field/moment.rs	84	derived	two faces times a covector
 RETURN_RELEASE_BITS	crates/engine/src/field/moment.rs	60	derived	the return released to the covector's grain
-PACED_L1	crates/engine/src/field/moment.rs	2147483648	literal	its text bounds it: a unit turn's face has l1 at most sqrt 2 (2^30 + 1), under 2^(MOVE_BITS + 1)
-LN2_FACE_BITS	crates/engine/src/navigator.rs	30	literal	ln 2's face on the moves' grain; ratio.rs LN2_BITS repeats it
+PACED_L1	crates/engine/src/field/moment.rs	2147483648	derived	2^(MOVE_BITS + 1): a unit turn's face has l1 at most sqrt 2 (2^30 + 1) on the moves' grain (E2 of #1088)
+LN2_FACE_BITS	crates/engine/src/navigator.rs	30	identity	ratio.rs LN2_BITS, the same face (E2 of #1088)
 BLANK_HELD	crates/engine/src/navigator.rs	16	identity	STATE_BITS
 TEMPER_TOP	crates/engine/src/navigator.rs	7	carrier	the temperature's top place, from an additive chart held on 32 bits; a temperature is a store's state and its top grows by its carry
 LOCK_BACK_BITS	crates/engine/src/navigator.rs	33	derived	the lock's covector through its base: two faces and one place (its text)
 PACE_BITS	crates/engine/src/navigator.rs	24	identity	MATERIAL_BITS
 GUARD	crates/engine/src/ratio.rs	16	picked	Machin's guard for the half turn. Its law: a constant is read at the width its readers' cuts decide (radix.face-width-from-readers: 12 places past the faces on the field of November 11). The turn's series beside it (exp_series) carries no guard and stands up to 2.89 grains from its value over the rings' 15,368 angles (receipts/2026-11-21_widths/series_guard.txt)
-LN2_BITS	crates/engine/src/ratio.rs	30	literal	the moves' grain; navigator.rs LN2_FACE_BITS is the same face
+LN2_BITS	crates/engine/src/ratio.rs	30	identity	MOVE_BITS: ln 2's face on the moves' grain (E2 of #1088)
 OPEN_GRAIN_LEAST	crates/engine/src/ruler.rs	10	ruler	a ruler's coarsest grain, six places above the face's
 MIN_LIMBS	crates/engine-cuda/src/hnn/contact.rs	3	realization	the series row's carrier in limbs of 64 bits, read a row before its launch (field_exposure): the one width the engine reads from its value today
 MAX_LIMBS	crates/engine-cuda/src/hnn/contact.rs	20	realization	the widest contact kernel compiled (field_contact_l20); a wider row is refused, where number law N2 asks that the top grow
-FACE_BITS	crates/engine-cuda/kernels/field.cu	16	twin	= FACE_BITS @ crates/engine/src/width.rs
-MATERIAL_BITS	crates/engine-cuda/kernels/field.cu	24	twin	= MATERIAL_BITS @ crates/engine/src/width.rs
-MOVE_BITS	crates/engine-cuda/kernels/field.cu	30	twin	= MOVE_BITS @ crates/engine/src/width.rs
-COVECTOR_BITS	crates/engine-cuda/kernels/field.cu	24	twin	= COVECTOR_BITS @ crates/engine/src/width.rs
-UNIT_BITS	crates/engine-cuda/kernels/field.cu	62	twin	= UNIT_BITS @ crates/engine/src/width.rs
-CONTACT_BITS	crates/engine-cuda/kernels/field.cu	40	twin	= CONTACT_BITS @ crates/engine/src/width.rs
-SHARE_BITS	crates/engine-cuda/kernels/field.cu	63	twin	= SHARE_BITS @ crates/engine/src/width.rs
-TEMPER_TOP	crates/engine-cuda/kernels/field.cu	7	twin	= TEMPER_TOP @ crates/engine/src/navigator.rs
-LN2_FACE_BITS	crates/engine-cuda/kernels/field.cu	30	twin	= LN2_FACE_BITS @ crates/engine/src/navigator.rs
-PACE_BITS	crates/engine-cuda/kernels/field.cu	24	twin	= PACE_BITS @ crates/engine/src/navigator.rs
-CARRIED_BITS	crates/engine-cuda/kernels/field.cu	70	dead	no kernel reads it (found unused on November 8)
-HOLD_BITS	crates/engine-cuda/kernels/field.cu	40	dead	no kernel reads it and the host declares no HOLD_BITS (found unused on November 8)
-CONTACT_BACK	crates/engine-cuda/kernels/field.cu	32	picked	the contact return's release in three kernels, a number with no host name
 SERIES_STEPS	crates/engine-cuda/kernels/field.cu	64	realization	the reciprocals' resident face holds 64 steps; the terms release to zero by the 25th and past it the division gives the same integer
 WINDOW_LIMBS	crates/engine-cuda/kernels/field.cu	8	realization	the contact carriers that add a term where it stands; wider ones shift it whole, the same bits
 MOMENT_COEFFICIENT_BITS	crates/engine-cuda/kernels/field_moment.cuh	90	twin	= COEFFICIENT_BITS @ crates/engine/src/field/moment.rs

@@ -35,22 +35,12 @@
 typedef __int128 wide;
 typedef unsigned __int128 uwide;
 
-#define FACE_BITS 16
-#define MATERIAL_BITS 24
+// [the lead, November 21, E3 of #1088] The host's widths, written by the build script from `holonics_engine::width::kernel_widths`
+// (FACE_BITS, MATERIAL_BITS, MOVE_BITS, COVECTOR_BITS, UNIT_BITS, CONTACT_BITS, CONTACT_BACK, SHARE_BITS, TEMPER_TOP, LN2_FACE_BITS, PACE_BITS).
+#include "widths.cuh"
 // [theory, November 11 00:22] The bias offset of an affine map with no bias: no bias is added. Since the carry circles' charts took their biases
 // (November 11 17:25) no driver passes it; the affine kernels keep the branch, which every plain map shares.
 #define NO_BIAS 0xFFFFFFFFFFFFFFFFull
-#define MOVE_BITS 30
-#define COVECTOR_BITS 24
-#define UNIT_BITS 62
-#define CARRIED_BITS 70
-#define CONTACT_BACK 32
-// The contact's covector grain, `δz` on `2^(−40)` (the host's `CONTACT_BITS`).
-#define CONTACT_BITS 40
-// A hold's face on `2^(−40)` (the host's `HOLD_BITS`, §14.2) and a term's share of its row's mass on
-// `2^(−63)` (the host's `SHARE_BITS`, §14.11).
-#define HOLD_BITS 40
-#define SHARE_BITS 63
 // The most crowds a receiver hears (two an octave, `2 (⌈log₂ reach⌉ − 1)` at most), kept in one warp.
 #define MAX_CROWD_SLOTS 32
 
@@ -76,9 +66,6 @@ typedef unsigned __int128 uwide;
 // [theory, November 12, P50 step 1] A pair's or a crowd edge's skin read from the clock's store where its fill formed none
 // (`SKIN_UNFILLED`, `field_skin_fill`).
 #define REFUSED_UNFILLED 128u
-// The temperature's carrier and `ln 2`'s grain (`TEMPER_TOP`, `LN2_FACE_BITS` in `field.rs`).
-#define TEMPER_TOP 7
-#define LN2_FACE_BITS 30
 
 // -------------------------------------------------------------------------------------------
 // the host's integer law
@@ -703,8 +690,6 @@ __device__ __forceinline__ wide carried_wide(const FieldWords &w, uint32_t h, ui
     return skinless(w, h) ? v : rel(decay_of(w, h, l, d) * v, MOVE_BITS);
 }
 
-// The pace's grain (`PACE_BITS`): a rate, a clock and a variation on `2^(−24)`.
-#define PACE_BITS 24
 
 // `e^(a + i b)` on `2^(−30)`, `a`, `b` on `2^(−30)` (the host's `exp_series`): the series summed until its term
 // releases to zero at the grain.
