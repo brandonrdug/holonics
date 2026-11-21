@@ -1069,7 +1069,7 @@ impl Learner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Constitution::laned`]), the lane's
@@ -1112,7 +1112,7 @@ impl Learner {
         // [agent-inferred, November 14] The founded parts' rates are kept (the lane's entries join the lane parts, [`Constitution::founded_parts`]), and
         // where the learner carries each entry's own rate every standing entry keeps it and a lane entry takes `rate_bits`.
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Constitution::with_carry`]), the circles' draws read from
@@ -1142,7 +1142,7 @@ impl Learner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 18, the record of the two streams §19] **The learner with `circles` more carry circles**
@@ -1175,7 +1175,7 @@ impl Learner {
         }
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Constitution::with_triads`]), the triads' draws read
@@ -1232,7 +1232,7 @@ impl Learner {
         // before later ones, so the rates are mapped, not appended).
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect::<Vec<_>>());
         let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 16 21:40Z; atlas `contact.pool-founding`, `contact.tension-founds-face`] **The learner with its triads' legs
@@ -1314,7 +1314,7 @@ impl Learner {
             rates.resize(field.material_len(), self.rate_bits);
             rates
         });
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 17, the founding record] **The learner with closed characters** ([`Constitution::with_closed`]): every
@@ -1330,7 +1330,7 @@ impl Learner {
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 13, the junction record §7] **The learner with the junction's return** ([`Constitution::with_junction`]), founded at
@@ -1367,7 +1367,7 @@ impl Learner {
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 19 (G-1119-7)] **The learner whose carry circles are pumped** ([`Constitution::with_pump`]), the pump's chart
@@ -1397,7 +1397,7 @@ impl Learner {
         second[new.pump..new.pump + c2 * dw].fill(mean(old.carry, c2 * dw));
         second[new.pump_bias..new.pump_bias + c2].fill(mean(old.carry_bias, c2));
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **The learner whose tick leaks by lane**
@@ -1414,7 +1414,7 @@ impl Learner {
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 21 (the record of the reach)] **The learner whose heads carry a friction of distance**
@@ -1435,7 +1435,7 @@ impl Learner {
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
-        Ok(Self { remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The learner whose friction is read from its receivers' state**
@@ -1450,7 +1450,7 @@ impl Learner {
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
-        Ok(Self { remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Constitution::with_mark`]), its strengths
@@ -1473,7 +1473,7 @@ impl Learner {
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; Brandon, November 15 02:06Z] **The learner whose face reads its sites' loudness** ([`Constitution::with_loud`]): the new block's
@@ -1491,7 +1491,7 @@ impl Learner {
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
@@ -1522,7 +1522,7 @@ impl Learner {
             }
         }
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Constitution::contacted`]), the
@@ -1553,7 +1553,7 @@ impl Learner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -1573,7 +1573,7 @@ impl Learner {
             out.resize(len, self.rate_bits);
             out
         });
-        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 18, the record of the two streams §11] **The learner whose level is opened to one-sided streams**
@@ -1596,6 +1596,6 @@ impl Learner {
             out.resize(len, 0);
             out
         });
-        Ok(Self { remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 }

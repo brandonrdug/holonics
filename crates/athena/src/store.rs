@@ -1814,8 +1814,11 @@ pub fn set_leak(args: &[String]) -> Result<()> {
 /// rate's step truncates to nothing on the face-grain entries. The rate and the remainder are law and are carried in the learner's state.
 /// It writes a new state.
 pub fn set_rate(args: &[String]) -> Result<()> {
-    if args.len() != 5 && !(args.len() == 6 && args[5] == "remainder") {
-        return Err("set-rate STATE STATE_SHA BITS OUT [remainder]".into());
+    // [the lead, November 21, E4 of #1088] With the word `moments` the moments' remainders are carried too ([`Learner::carried`], at zero).
+    let words: Vec<&str> = args.iter().skip(5).map(String::as_str).collect();
+    let (with_remainder, with_moments) = (words.contains(&"remainder"), words.contains(&"moments"));
+    if args.len() < 5 || words.len() != usize::from(with_remainder) + usize::from(with_moments) {
+        return Err("set-rate STATE STATE_SHA BITS OUT [remainder] [moments]".into());
     }
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let bits: u32 = args[3].parse()?;
@@ -1829,15 +1832,19 @@ pub fn set_rate(args: &[String]) -> Result<()> {
     }
     let before = learner.rate_bits;
     learner.rate_bits = bits;
-    if args.len() == 6 && learner.remainder.is_none() {
+    if with_remainder && learner.remainder.is_none() {
         learner.remainder = Some(vec![0; learner.field.material_len()]);
+    }
+    if with_moments && learner.carried.is_none() {
+        let n = learner.field.material_len();
+        learner.carried = Some((vec![0; n], vec![0; n]));
     }
     let written = learner.to_text();
     if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
         return Err("a learner that does not read back as itself".into());
     }
     std::fs::write(out, &written)?;
-    println!("SET_RATE rate_bits={bits} before={before} remainder={} entries={}", learner.remainder.is_some(), learner.field.material_len());
+    println!("SET_RATE rate_bits={bits} before={before} remainder={} moments_carried={} entries={}", learner.remainder.is_some(), learner.carried.is_some(), learner.field.material_len());
     Ok(())
 }
 

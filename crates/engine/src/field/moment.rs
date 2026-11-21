@@ -139,7 +139,7 @@ pub const RETURN_RELEASE_BITS: u32 = RETURN_BITS - COVECTOR_BITS;
 const CARRIER: &str = "a moment's term outgrew its 128-bit carrier";
 
 /// The l1 bound of a paced strand's faces (§16): a unit turn's face on `2^(−30)` has l1 at most `√2 (2^30 + 1)`.
-pub const PACED_L1: u128 = 1 << 31;
+pub const PACED_L1: u128 = 1 << (MOVE_BITS + 1);
 
 fn carried(x: Option<i128>) -> Result<i128> {
     match x {

@@ -21,7 +21,31 @@ pub const SHARE_BITS: u32 = 63;
 pub(crate) const KEY_RETURN: &str = "a contact's key return past its 128-bit carrier";
 
 /// The contact covector's grain, `2^(−40)` (`δz` and `δs`).
-pub(crate) const CONTACT_BITS: u32 = 40;
+pub const CONTACT_BITS: u32 = COVECTOR_BITS + FACE_BITS;
+
+/// [definition; the lead, November 21, E3 of #1088] **The contact return's release**: the probe's and the key's return `δs D ŵ` summed on
+/// `2^(−(CONTACT_BITS + FACE_BITS))` and released to the covector's grain, `CONTACT_BITS + FACE_BITS − COVECTOR_BITS` places (the skins' own
+/// places added at a turned head). The kernel's `CONTACT_BACK`, which stood as a number with no host name.
+pub const CONTACT_BACK: u32 = CONTACT_BITS + FACE_BITS - COVECTOR_BITS;
+
+/// [definition; the lead, November 21, E3 of #1088] **The kernel's twins of the host's widths**, by their kernel names: the card crate's build
+/// script writes each as a `#define` of the kernels' generated `widths.cuh` from this list, so a width is declared once, here, and the
+/// kernel cannot drift from it (the twins of November 8's build order, step 2).
+pub fn kernel_widths() -> Vec<(&'static str, i128)> {
+    vec![
+        ("FACE_BITS", i128::from(FACE_BITS)),
+        ("MATERIAL_BITS", i128::from(MATERIAL_BITS)),
+        ("MOVE_BITS", i128::from(MOVE_BITS)),
+        ("COVECTOR_BITS", i128::from(COVECTOR_BITS)),
+        ("UNIT_BITS", i128::from(UNIT_BITS)),
+        ("CONTACT_BITS", i128::from(CONTACT_BITS)),
+        ("CONTACT_BACK", i128::from(CONTACT_BACK)),
+        ("SHARE_BITS", i128::from(SHARE_BITS)),
+        ("TEMPER_TOP", crate::navigator::TEMPER_TOP),
+        ("LN2_FACE_BITS", i128::from(crate::navigator::LN2_FACE_BITS)),
+        ("PACE_BITS", i128::from(crate::navigator::PACE_BITS)),
+    ]
+}
 
 /// A face carried as a site's state, each class's share on `2^(−16)` ([`shares`]); its opening
 /// `Σ_a w_a E(a)` releases the shares' grain to the encoding's own.

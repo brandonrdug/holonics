@@ -1,0 +1,12 @@
+REACH setting=law group=all places=139998 nats_millionths=1309612
+REACH setting=round:12 group=all places=139998 nats_millionths=1309799
+REACH setting=round:10 group=all places=139998 nats_millionths=1309979
+REACH setting=round:9 group=all places=139998 nats_millionths=1310299
+REACH setting=round:8 group=all places=139998 nats_millionths=1312076
+REACH setting=round:6 group=all places=139998 nats_millionths=1340059
+REACH setting=state:12 group=all places=139998 nats_millionths=1309611
+REACH setting=state:10 group=all places=139998 nats_millionths=1309609
+REACH setting=state:8 group=all places=139998 nats_millionths=1309607
+REACH setting=state:7 group=all places=139998 nats_millionths=1309612
+REACH setting=state:6 group=all places=139998 nats_millionths=1309675
+REACH setting=state:5 group=all places=139998 nats_millionths=1309575

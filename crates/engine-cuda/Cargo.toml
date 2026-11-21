@@ -20,6 +20,10 @@ rayon = "1.12"
 # [measurement; theory, November 12, P53 item 1 (G120)] the contact's rows with their memory and without their arithmetic
 # (`field_yard_rows`), immediately before the entry, its stores into scratch; [P54 item 1] the words' occupied bits by array and
 # clock (`field_yard_bits_*`). No learner's build enables them.
+# [the lead, November 21, E3 of #1088] The build script writes the kernel's widths from the host's declarations.
+[build-dependencies]
+holonics-engine = { path = "../engine" }
+
 [features]
 ruler-rows-reads = []
 ruler-bits = []

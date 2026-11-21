@@ -31,7 +31,7 @@ use crate::field::log2_face;
 /// The code's grain, `2^(−32)` bits.
 pub const CODE_BITS: u32 = 32;
 const NONE: u32 = u32::MAX;
-const UNIT_BITS: u32 = 62;
+use crate::width::UNIT_BITS;
 
 /// Refusals of the founding.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]

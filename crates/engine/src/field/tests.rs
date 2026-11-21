@@ -5645,7 +5645,7 @@ fn the_deposit_in_one_pass_is_the_serial_passes_bit_for_bit() {
         let mut remainder: Vec<i64> = (0..n).map(|_| (draw(15) as i64).rem_euclid(1 << REMAINDER_BITS)).collect();
         let (mut f1, mut s1, mut r1) = (first.clone(), second.clone(), remainder.clone());
         let serial = deposit_serial(field, &g, &mut f1, &mut s1, &rates, with_remainder.then_some(&mut r1[..]), last.as_ref(), &parts);
-        let pass = deposit_pass(&field.families_all(), &g, &mut first, &mut second, &rates, with_remainder.then_some(&mut remainder[..]), last.as_ref(), &parts).unwrap();
+        let pass = deposit_pass(&field.families_all(), &g, &mut first, &mut second, &rates, with_remainder.then_some(&mut remainder[..]), None, last.as_ref(), &parts).unwrap();
         assert_eq!(pass, serial, "last {with_last}, remainder {with_remainder}: the step and the prices");
         assert_eq!((first, second), (f1, s1), "last {with_last}, remainder {with_remainder}: the moments");
         assert_eq!(remainder, r1, "last {with_last}, remainder {with_remainder}: the remainders");
@@ -5690,7 +5690,7 @@ fn the_deposit_pass_on_a_lines_state() {
         serial_us.push(t.elapsed().as_micros());
         let (mut f2, mut s2, mut r2) = (learner.first.clone(), learner.second.clone(), learner.remainder.clone());
         let t = std::time::Instant::now();
-        let pass = deposit_pass(&families, &g, &mut f2, &mut s2, &rates, r2.as_deref_mut(), Some(&last), &parts).unwrap();
+        let pass = deposit_pass(&families, &g, &mut f2, &mut s2, &rates, r2.as_deref_mut(), None, Some(&last), &parts).unwrap();
         pass_us.push(t.elapsed().as_micros());
         assert_eq!(pass, serial);
         assert_eq!((f1, s1, r1), (f2, s2, r2));
@@ -6780,4 +6780,40 @@ fn the_friction_read_from_the_receivers_state_keeps_every_face_at_zero_and_retur
     }
     eprintln!("FRICTION_GATE_COVECTOR_PROBES read={read} on_a_seam={seams} at_the_gate={gated}");
     assert!(read >= 30 && 8 * seams <= read && gated >= 18, "read {read} probes, {seams} on a seam, {gated} at the gate");
+}
+
+/// [definition; the lead, November 21, E4 of #1088] **A moment with its remainder carried tracks its true mean within a grain and reaches its
+/// input**: driven by a constant input, the carried moment ends at the input where the forced grain ends there too; driven by an input
+/// a quarter grain a section away, the carried moment's `m + r 2^(−rate)` stays within a grain of the exact mean `M ← M + (g − M) 2^(−rate)`
+/// at every section, and a learner's text with the carried lines reads back as itself.
+#[test]
+fn a_moment_with_its_remainder_carried_tracks_its_mean() {
+    use crate::deposit::{toward, toward_carried};
+    for rate in [FIRST_RATE, SECOND_RATE] {
+        let (mut m, mut r, mut f) = (0i128, 0i32, 0i128);
+        for _ in 0..4000 {
+            m = toward_carried(m, &mut r, 1000, rate).unwrap();
+            f = toward(f, 1000, rate);
+        }
+        assert_eq!((m, f), (1000, 1000), "rate {rate}: both reach a constant input");
+        assert!(r.unsigned_abs() <= 1 << (rate - 1), "rate {rate}: the remainder inside half a grain");
+        // A slowly moving input: the exact mean on a fine grain, against the carried moment read with its remainder.
+        let fine = 20u32;
+        let (mut m, mut r, mut exact) = (0i128, 0i32, 0i128);
+        let mut worst = 0i128;
+        for k in 0..20_000i128 {
+            let g = k / 4;
+            m = toward_carried(m, &mut r, g, rate).unwrap();
+            exact += ((g << fine) - exact) >> rate;
+            let tracked = (m << fine) + (i128::from(r) << (fine - rate));
+            worst = worst.max((tracked - exact).abs());
+        }
+        assert!(worst <= 2 << fine, "rate {rate}: the carried moment stands {worst} fine grains (2^-{fine} of a grain) from its mean");
+    }
+    let mut learner = Learner::new(shaped(1), 12);
+    let n = learner.field.material_len();
+    learner.carried = Some(((0..n).map(|k| (k % 7) as i32 - 3).collect(), (0..n).map(|k| (k % 255) as i32 - 127).collect()));
+    let text = learner.to_text();
+    assert!(text.contains("\ncarried_first ") && text.contains("\ncarried_second "));
+    assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the carried lines read back");
 }

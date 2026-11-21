@@ -526,7 +526,7 @@ pub const SECOND_RATE: u32 = 8;
 /// [definition; the lead, November 18] **The bits a step's carried remainder holds under its entry's grain** ([`crate::learner::Learner::remainder`]):
 /// sixteen, so a face-grain entry's step is resolved to `2^(−32)`, the grain its first moment is carried on, and a rate of up to 28 bits
 /// still moves it.
-pub const REMAINDER_BITS: u32 = 16;
+pub const REMAINDER_BITS: u32 = STEP_BITS - FACE_BITS;
 
 /// A covector entry on the deposit's grain `2^(−32)` from its family's natural grain: a material
 /// family's `Σ δz x` on `2^(−40)` is released, a face family's `Σ δz` on `2^(−24)` raised. The moves
@@ -566,6 +566,17 @@ pub fn deposit_over(m: i128, root: i128, grain: u32, rate: u32) -> i128 {
 /// pass 4, the most of two contacts that had stopped conducting, each moving `2^(−9)` every section,
 /// one from 0.64 at pass 2 to 15.9 at pass 5). A silent contact's drifted weights meet the residual
 /// stream at full scale when it conducts again. Moved by a grain, the moment reaches its input.
+/// [definition; the lead, November 21, E4 of #1088 (Lean `HNN/LatticeDeposit`, `release_tracks`)] **A moment moved toward its input with
+/// its remainder carried**: `t = (g − m) + r`, `m + release(t, rate)`, and `r` keeps `t − release(t, rate) 2^rate`, inside half of
+/// `2^rate`. The forced grain of [`toward`] is a carried remainder here: a move under the moment's grain waits and moves it when it
+/// carries, so `m + r 2^(−rate)` tracks the moment's true mean within a grain and a moment always reaches its input.
+pub fn toward_carried(m: i128, r: &mut i32, g: i128, rate: u32) -> Result<i128> {
+    let t = (g - m) + i128::from(*r);
+    let step = release(t, rate);
+    *r = i32::try_from(t - (step << rate)).map_err(|_| TowerError::Refused("a moment's carried remainder past its word"))?;
+    Ok(m + step)
+}
+
 pub fn toward(m: i128, g: i128, rate: u32) -> i128 {
     let step = release(g - m, rate);
     m + if step == 0 { (g - m).signum() } else { step }

@@ -220,7 +220,8 @@ fn price_term(sum: &mut Option<i128>, g: i128, s: i128) {
 /// of the step, the moments, the remainders and the prices stands as the serial passes formed them (the test
 /// `the_deposit_in_one_pass_is_the_serial_passes_bit_for_bit`).
 #[allow(clippy::too_many_arguments)]
-pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: &mut [i128], second: &mut [i128], rates: &[u32], mut remainder: Option<&mut [i64]>, last: Option<&HeldStep>, parts: &[u8]) -> Result<DepositPass> {
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: &mut [i128], second: &mut [i128], rates: &[u32], mut remainder: Option<&mut [i64]>, mut carried: Option<(&mut [i32], &mut [i32])>, last: Option<&HeldStep>, parts: &[u8]) -> Result<DepositPass> {
     // A chunk of entries a core takes at once; seven under test, so the tiny fields' families are cut in many places.
     #[cfg(not(test))]
     const CHUNK: usize = 1 << 13;
@@ -245,6 +246,9 @@ pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: 
             let square = g[k].checked_mul(g[k]).ok_or_else(refused)?;
             if first[k] == 0 && second[k] == 0 {
                 (first[k], second[k]) = (g[k], square);
+            } else if let Some((cf, cs)) = carried.as_mut() {
+                first[k] = toward_carried(first[k], &mut cf[k], g[k], FIRST_RATE)?;
+                second[k] = toward_carried(second[k], &mut cs[k], square, SECOND_RATE)?;
             } else {
                 first[k] = toward(first[k], g[k], FIRST_RATE);
                 second[k] = toward(second[k], square, SECOND_RATE);
@@ -257,7 +261,12 @@ pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: 
             Some(r) => r[start..start + len].chunks_mut(CHUNK).map(Some).collect(),
             None => (0..chunks).map(|_| None).collect(),
         };
-        let chunk = |c: usize, m: &mut [i128], v: &mut [i128], s: &mut [i128], mut r: Option<&mut [i64]>| -> Result<PriceSums> {
+        // [the lead, November 21, E4 of #1088] The moments' carried remainders, chunked as the moments are.
+        let cars: Vec<Option<(&mut [i32], &mut [i32])>> = match carried.as_mut() {
+            Some((cf, cs)) => cf[start..start + len].chunks_mut(CHUNK).zip(cs[start..start + len].chunks_mut(CHUNK)).map(Some).collect(),
+            None => (0..chunks).map(|_| None).collect(),
+        };
+        let chunk = |c: usize, m: &mut [i128], v: &mut [i128], s: &mut [i128], mut r: Option<&mut [i64]>, mut car: Option<(&mut [i32], &mut [i32])>| -> Result<PriceSums> {
             let mut sums = PriceSums::zero(last.is_some());
             let mut parts_ok = true;
             for j in 0..m.len() {
@@ -271,6 +280,9 @@ pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: 
                 let square = gk.checked_mul(gk).ok_or_else(refused)?;
                 if m[j] == 0 && v[j] == 0 {
                     (m[j], v[j]) = (gk, square);
+                } else if let Some((cf, cs)) = car.as_mut() {
+                    m[j] = toward_carried(m[j], &mut cf[j], gk, FIRST_RATE)?;
+                    v[j] = toward_carried(v[j], &mut cs[j], square, SECOND_RATE)?;
                 } else {
                     m[j] = toward(m[j], gk, FIRST_RATE);
                     v[j] = toward(v[j], square, SECOND_RATE);
@@ -304,8 +316,9 @@ pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: 
             .zip(second[start..start + len].par_chunks_mut(CHUNK))
             .zip(step[start..start + len].par_chunks_mut(CHUNK))
             .zip(rems.into_par_iter())
+            .zip(cars.into_par_iter())
             .enumerate()
-            .map(|(c, (((m, v), s), r))| chunk(c, m, v, s, r))
+            .map(|(c, ((((m, v), s), r), car))| chunk(c, m, v, s, r, car))
             .try_reduce(|| PriceSums::zero(last.is_some()), |a, b| Ok(a.join(b)))?;
         let close = |total: Option<i128>, family: Option<i128>| total.zip(family).and_then(|(t, f)| t.checked_add(f >> shift));
         transfer = close(transfer, fam.transfer);
@@ -322,6 +335,9 @@ pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: 
         let square = g[k].checked_mul(g[k]).ok_or_else(refused)?;
         if first[k] == 0 && second[k] == 0 {
             (first[k], second[k]) = (g[k], square);
+        } else if let Some((cf, cs)) = carried.as_mut() {
+            first[k] = toward_carried(first[k], &mut cf[k], g[k], FIRST_RATE)?;
+            second[k] = toward_carried(second[k], &mut cs[k], square, SECOND_RATE)?;
         } else {
             first[k] = toward(first[k], g[k], FIRST_RATE);
             second[k] = toward(second[k], square, SECOND_RATE);
@@ -419,6 +435,14 @@ pub struct Learner {
     /// rate of 16, which is what bars a cooler deposit from being read. Carried in the learner's text as a trailing `remainder` line after
     /// the leak's and only where present; a state without the line has the truncating step.
     pub remainder: Option<Vec<i64>>,
+    /// [definition; the lead, November 21, E4 of #1088 (the precision record §4.4; Lean `HNN/LatticeDeposit`, `release_tracks`)] **The moments'
+    /// carried remainders**, one a moment an entry, each on the grain `2^(−rate)` of its moment's own grain. Where carried, a moment moves
+    /// toward its input as `t = (g − m) + r`, `m ← m + release(t, rate)`, `r ← t − release(t, rate) 2^rate`: what a section's move drops under
+    /// the moment's grain waits in `r` and moves the moment when it carries, so the moment stays within a grain of its true mean at any size.
+    /// Without them a move that releases to zero is forced to one grain toward its input ([`toward`]), a step that stands where a carried
+    /// remainder belongs. Carried in the learner's text as two trailing lines (`carried_first`, `carried_second`) after the remainder's,
+    /// and only where present; a state without them has the forced grain.
+    pub carried: Option<(Vec<i32>, Vec<i32>)>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`Receipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -678,7 +702,7 @@ impl Learner {
     pub fn new(field: Constitution, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None, remainder: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None, remainder: None, carried: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -790,7 +814,8 @@ impl Learner {
         let parts = self.reading_parts();
         mark(11);
         let last = self.last.take();
-        let pass = deposit_pass(&families, &g, &mut self.first, &mut self.second, &rates, self.remainder.as_deref_mut(), last.as_ref(), &parts)?;
+        let carried = self.carried.as_mut().map(|(cf, cs)| (&mut cf[..], &mut cs[..]));
+        let pass = deposit_pass(&families, &g, &mut self.first, &mut self.second, &rates, self.remainder.as_deref_mut(), carried, last.as_ref(), &parts)?;
         drop(g);
         let DepositPass { step, transfer, external, predicted, parts: predicted_parts } = pass;
         mark(8);
@@ -852,7 +877,9 @@ impl Learner {
             let leak = self.leak.map_or(String::new(), |k| format!("leak {k}\n"));
             // [definition; the lead, November 18] The step's carried remainders, a trailing line after the leak's and only where carried.
             let remainder = self.remainder.as_ref().map_or(String::new(), |r| format!("remainder {}\n", r.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")));
-            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{remainder}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+            // [the lead, November 21, E4 of #1088] The moments' carried remainders, two trailing lines after the remainder's, only where carried.
+            let carried = self.carried.as_ref().map_or(String::new(), |(cf, cs)| format!("carried_first {}\ncarried_second {}\n", cf.iter().map(i32::to_string).collect::<Vec<_>>().join(" "), cs.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{remainder}{carried}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
 
@@ -980,6 +1007,23 @@ impl Learner {
             }
             _ => None,
         };
+        // [definition; the lead, November 21, E4 of #1088] The moments' carried remainders, two trailing lines after the remainder's: one a
+        // moment an entry, each inside half of its rate's grain.
+        let carried = match lines.peek() {
+            Some(l) if l.starts_with("carried_first ") => {
+                let cf = read_numbers::<i32>(lines.next().and_then(|l| l.strip_prefix("carried_first ")))?;
+                let cs = read_numbers::<i32>(lines.next().and_then(|l| l.strip_prefix("carried_second ")))?;
+                if cf.len() != field.material_len() || cs.len() != field.material_len() {
+                    return refuse("a learner's carried moments that are not one a moment an entry");
+                }
+                let inside = |v: &[i32], rate: u32| v.iter().all(|&r| (-(1i32 << (rate - 1))..=(1i32 << (rate - 1))).contains(&r));
+                if !inside(&cf, FIRST_RATE) || !inside(&cs, SECOND_RATE) {
+                    return refuse("a moment's carried remainder outside half its rate's grain");
+                }
+                Some((cf, cs))
+            }
+            _ => None,
+        };
         // [definition; theory, November 12] The pass's place over a store, the text's last line where present ([`StorePass`]).
         let pass = match lines.peek() {
             Some(l) if l.starts_with("pass ") => Some(StorePass::from_line(lines.next().unwrap_or(""))?),
@@ -990,6 +1034,6 @@ impl Learner {
             (Some(p), Some(l)) if l.starts_with("terrain ") => Some(StorePass { terrain: Some(PassTerrain::from_line(lines.next().unwrap_or(""))?), ..p }),
             (p, _) => p,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, last: None, pass })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, carried, last: None, pass })
     }
 }

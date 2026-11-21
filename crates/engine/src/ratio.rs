@@ -231,7 +231,7 @@ pub struct Exponential {
 }
 
 /// The grain of `ln 2`'s face, `2^(−30)`.
-pub const LN2_BITS: u32 = 30;
+pub const LN2_BITS: u32 = MOVE_BITS;
 
 /// [definition; agent-inferred] **`ln 2` as its navigator's face** on `2^(−30)`: the series
 /// `Σ_(k≥1) 1/(k 2^k)`, its terms to `k = 60` read at `2^(−60)` and the sum released to `2^(−30)`
