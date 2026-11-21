@@ -61,6 +61,10 @@ pub struct Constitution {
     /// [measurement; the lead, November 21, the formal thread's check of 02:52Z] Where set with [`Constitution::ruler_leak`], the ruler's leak holds
     /// the pass's opening, `x ← x − release(n (x_began − x⁰), b)`, as the lane leak's law does.
     pub ruler_leak_hold: bool,
+    /// [measurement; the lead, November 21, the formal thread's reads S1 and S2] Where set, **the circles' scan carries its residue**: the chain's
+    /// state is kept 48 bits finer than the operand (`Q*`, the orbit released once at each read, `release.transported-residue`), and each site's
+    /// operand is that orbit released to `2^(−16)`. A ruler's read of the scan's per-step section: not part of the state, and no reverse reads it.
+    pub ruler_scan_carry: bool,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
     /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the

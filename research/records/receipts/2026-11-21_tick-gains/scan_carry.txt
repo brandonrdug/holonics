@@ -1,0 +1,8 @@
+CARRY start 04:07:43 host_threads=24 (beside the line's lap on the card)
+SCAN_CARRY tick=0 components=245760 within_one_grain=0.7285 equal=0.3269 largest_gap=15
+SCAN_CARRY tick=1 components=245760 within_one_grain=0.5193 equal=0.1992 largest_gap=24
+SCAN_CARRY tick=2 components=245760 within_one_grain=0.3896 equal=0.1425 largest_gap=40
+SCAN_CARRY tick=3 components=245760 within_one_grain=0.3282 equal=0.1187 largest_gap=44
+SCAN_CARRY held_code_nats built=1.65500 carried=1.65501 change=+0.00001
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 166 filtered out; finished in 4.24s
+CARRY elapsed 33 s

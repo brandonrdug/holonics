@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 04:00 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 04:15 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -254,6 +254,33 @@ zero, interpolated between the scan's strengths, at 0.821, 0.835, 0.862, 0.857, 
 3.7 to 4.0) and H6 (2.622 in 2.6 to 3.2, at its lower edge). With every lane at its own rest the last pair's cosine reads −0.16 to +0.29, the
 lanes moving one another. On this state the leak at its rest costs the eight-tick pass 1.29 nats a place, and what a comparison would have to
 train is a slow mode that carries the opening, from about 2.3 nats behind the line's own read: the arm's question, still without its card.
+
+### 8.3 The circles' successive news: their gates track a drive that is nearly white
+
+The formal thread's read S4 (its guess fixed 04:04 UTC, relayed): a circle is a tracker, `Q(t) = γ̂ Q(t∓1) + δ n(t)` with its news
+`n(t) = N₀ b(t) − γ̂ Q(t∓1)`, and the cosine of successive news along its scan reads `−δ/2` under a white drive and zero under a drive
+correlated 0.4 a site; S4, the median over circles between −0.20 and +0.05 with under a fifth above +0.10, would say the gates stand at their
+drives' own balance. Read at 04:06 UTC (`the_circles_successive_news`, `circle_news.txt`; L71 at its own four ticks, the same 240 sites; the
+news read as `Q(t) − γ̂(t) Q(t∓1)` with `γ̂ = γ/|γ|`, so the pump's reflection stands beside it): the circles' median −0.275 over the pass's
+ticks (quartiles −0.349 and −0.205) and −0.311 at the last tick, 76% and 82% of the circles under −0.20, 0.8% and 0.2% above +0.10; the gates'
+strength `δ = 1 − |γ|` at a median of 0.600 (0.433 to 0.753 between the tenth and the ninetieth), whose white drive gives −0.300. S4 missed: the
+cosine stands at the white drive's own, so the gates over-track a drive with little correlation from site to site, and the store's law of §8
+(its strength moved by the sign of its successive news) applies to the circles' gates, where its sign would make them heavier
+(`agent-inferred`, the formal thread's reading of the alternative).
+
+### 8.4 The circles' scan with its residue carried
+
+The formal thread's reads S1 and S2 of the same note (guesses fixed 04:04 UTC): the circles' store at its consumer is its unreleased orbit
+`Q*(t) = γ Q*(t∓1) + κ b`, released once at each read (the record of November 15 §6, atlas `contact.carry-scan-section-band`, and
+`release.transported-residue`); the built chain, which releases its store at each step, stands within `½/(1 − |γ|) + 1` grains of it. S1, 97% of
+`Q`'s components within one grain of the orbit and the largest gap at most 6; S2, the held code moves under 0.0005 nats a place. Read at 04:07 UTC
+(`the_circles_scan_with_its_residue_carried`, `Constitution::ruler_scan_carry`: the orbit kept 48 bits finer, `scan_carry.txt`; L71 at its own
+four ticks, the same sites): at the first tick, where both passes' operands are the same, 72.9% of the 245,760 components stand within one grain
+(32.7% equal) and the largest gap is 15 grains; at later ticks the passes' own states part (52%, 39% and 33% within one grain). The held code
+reads 1.65500 built and 1.65501 carried, a change of +0.00001 nats a place. S1 missed (72.9% against 97%, 15 against 6: the pump's reflection and
+the circles whose gate stands near one widen the band past the median gate's 1.8 grains, `agent-inferred`); S2 held. So carrying the residue
+changes the operands at the grain and leaves the code where it was: the scan's order costs nothing the face reads, and its arm would be bought
+for speed alone, which the scans' memory bound does not promise (S3, not read on the host).
 
 ## 9. Atlas
 
