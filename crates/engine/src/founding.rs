@@ -808,6 +808,33 @@ impl Constitution {
         Ok((out, from))
     }
 
+    /// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **The field whose tick leaks by lane**
+    /// ([`Declaration::lane_leak`]): the stores `d`, one a face lane, appended at the end of the fine field's material, founded at zero, every
+    /// standing entry kept; no key is read and the draws do not move. At `d = 0` the strength is zero ([`crate::contact::lane_leak_delta`]) and
+    /// every tick is the built one bit for bit. A tower keeps its level as it stands. Also the map over the whole material from each new entry
+    /// to the old one it copies (`None` for the stores). Refused on a field whose tick already leaks.
+    pub fn with_lane_leak(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.lane_leak {
+            return refuse("a field whose tick already leaks by lane");
+        }
+        let d = Declaration { lane_leak: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.lane_leak {
+            return refuse("a field whose material does not end where the lane leak's stores begin");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4; corrected 18:44Z: the founding reads no key)]
     /// **The field with `fresh` more letters**, founded at a passage's crossing: the fresh classes follow the standing ones, so every
     /// standing class keeps its index (the void's included, wherever the codec holds it), and the open row (the unresolved operand,
@@ -1316,6 +1343,23 @@ impl Learner {
         };
         second[new.pump..new.pump + c2 * dw].fill(mean(old.carry, c2 * dw));
         second[new.pump_bias..new.pump_bias + c2].fill(mean(old.carry_bias, c2));
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **The learner whose tick leaks by lane**
+    /// ([`Constitution::with_lane_leak`]), its stores founded at zero. Every standing entry keeps its moments, its remainder and its rate; the
+    /// stores' moments open at zero, so each opens at its own first covector (the deposit's law for a coordinate with no history), and their
+    /// covector is the store's own news ([`Declaration::lane_leak`]). Its rate: the founded parts' rates are kept and the leak's part takes octave
+    /// 0, what a newly grown block takes in this line; where the learner carries each entry's own rate, the stores take `rate_bits`. The draws,
+    /// the laps and the pass are kept; the held step and the last section's step are dropped. Refused while a step is held.
+    pub fn with_lane_leak(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its lane leak after its held step is read");
+        }
+        let (field, from) = self.field.with_lane_leak()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }

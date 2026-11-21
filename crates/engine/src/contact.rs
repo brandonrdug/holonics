@@ -59,6 +59,26 @@ pub(crate) struct TickProbe<'a> {
     pub(crate) outputs: Vec<Vec<i64>>,
 }
 
+/// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **A lane leak's strength** ([`Declaration::lane_leak`]):
+/// `δ = d/(1 + d)` on `2^(−30)` from a lane's store `d` on the face's grain, to the nearest, `d` read at zero where a deposit left it under.
+pub(crate) fn lane_leak_delta(d: i32) -> i64 {
+    let d = i128::from(d.max(0));
+    div_nearest(d << 30, (1i128 << FACE_BITS) + d) as i64
+}
+
+/// [definition; the formal thread, November 21] **The lane leak's tick** (the record's law, `x^(k+1) = γ x^k + g^k` as
+/// `x^(k+1) = x_built^(k+1) − release(δ_ℓ x^k, 30)`): `x` the state the built tick left, `from` the state it began from, `deltas` one a lane.
+pub(crate) fn lane_leak_tick(x: &mut [i64], from: &[i64], deltas: &[i64], dw: usize) -> Result<()> {
+    let lw = dw / deltas.len();
+    for (i, (xv, &f)) in x.iter_mut().zip(from).enumerate() {
+        let dl = deltas[(i % dw) / lw];
+        if dl != 0 {
+            *xv = fit64(i128::from(*xv) - release(i128::from(dl) * i128::from(f), 30))?;
+        }
+    }
+    Ok(())
+}
+
 /// One tick's forward temporaries over a region.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct TickCell {
@@ -1087,7 +1107,7 @@ impl Constitution {
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
             let began = d.junction.then(|| x.clone());
-            let leak_from = self.ruler_leak.map(|_| x.clone());
+            let leak_from = (self.ruler_leak.is_some() || d.lane_leak).then(|| x.clone());
             if keep {
                 cell.before = x.clone();
             }
@@ -1125,6 +1145,10 @@ impl Constitution {
             }
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
+            }
+            if let (true, Some(from)) = (d.lane_leak, leak_from.as_deref()) {
+                let deltas: Vec<i64> = self.theta[self.layout.lane_leak..self.layout.lane_leak + d.lanes].iter().map(|&v| lane_leak_delta(v)).collect();
+                lane_leak_tick(&mut x, from, &deltas, dw)?;
             }
             if let (Some((n, b)), Some(from)) = (self.ruler_leak, leak_from.as_deref()) {
                 for (xv, &f) in x.iter_mut().zip(from) {
