@@ -1,0 +1,21 @@
+samples=6020 instructions=20423991 local_sectors=490289
+ 7321   6.5% ins=  2.8% loc=      0 long_sb:259 long_sb (Not Issued):160 wait:42 | const wide vr = svp[(uint64_t)(hi_ + 1) * S + l] - svp[(uint64_t)lo * 
+  102   6.1% ins=  7.9% loc=      0 wait:100 not_selected:77 math:77 | return (x + half - (wide)(x < 0)) >> bits;
+ 6194   5.6% ins=  7.6% loc=      0 wait:108 selected:73 math:72 | return rel(rel(rel(e * decay, MOVE_BITS) * b, MOVE_BITS), 16);
+ 3376   4.6% ins=  9.9% loc=      0 selected:97 wait:91 wait (Not Issued):36 | return ((uwide)__umul64hi(a, b) << 64) | (uwide)(a * b);
+ 7328   3.8% ins=  1.2% loc=      0 long_sb:151 long_sb (Not Issued):90 wait:28 | const wide mr = swp[(uint64_t)(hi_ + 1) * S + l] - swp[(uint64_t)lo * 
+ 7283   3.6% ins=  4.5% loc=      0 long_sb:86 long_sb (Not Issued):59 math:37 | const wide inner = mul64_128(dyi[l], values[(uint64_t)j * S + l]) + mu
+ 3389   3.2% ins=  5.3% loc=      0 selected:49 not_selected:39 math:39 | if ((uint64_t)(p1 >> 64) != 0 || lo < p0 || lo > limit) {
+ 7323   3.1% ins=  2.8% loc=      0 wait:77 wait (Not Issued):52 selected:31 | if (!mul_fits_w64(mag64(dyi[l]), dyi[l] < 0, vr, &x) || !mul_fits_w64(
+ 3371   2.8% ins=  3.1% loc=      0 long_sb:72 long_sb (Not Issued):51 wait:35 | const uint64_t hi = (uint64_t)__mul64hi((long long)a, (long long)b);
+  935   2.5% ins=  0.1% loc=      0 long_sb:144 long_sb (Not Issued):90 not_selected:5 | if (v > ((uint32_t)1 << MOVE_BITS)) {
+  408   2.4% ins=  0.6% loc=  24766 branch_resolving:83 branch_resolving (Not Issued):40 no_inst:20 | ret = __nvvm_shfl_bfly_sync(mask, var, laneMask, c);
+ 3386   2.3% ins=  2.9% loc=      0 wait:53 selected:40 long_sb:31 | const uwide p0 = mulu64(ua, (uint64_t)ub), p1 = mulu64(ua, (uint64_t)(
+ 3392   2.1% ins=  4.0% loc=      0 selected:36 not_selected:32 wait:30 | *r = neg ? (wide)(0 - lo) : (wide)lo;
+  155   2.0% ins=  2.5% loc=      0 wait:46 selected:31 wait (Not Issued):29 | const uwide p = (uwide)q.v * (uwide)u1 + (((uwide)u1 << 64) | (uwide)u
+  957   1.9% ins=  0.4% loc=      0 long_sb:84 long_sb (Not Issued):59 math:10 | return skin_word(w, w.skin[((uint64_t)p * w.E2 + entry) * w.n + l]);
+ 7232   1.8% ins=  0.0% loc=  13440 barrier:110 barrier (Not Issued):86 wait (Not Issued):0 | __syncthreads();
+  201   1.8% ins=  0.2% loc=      0 long_sb:87 long_sb (Not Issued):63 wait:9 | atomicAdd(word + 1, hi + (old + lo < old ? 1ull : 0ull));
+ 7291   1.7% ins=  1.1% loc=      0 long_sb:73 long_sb (Not Issued):43 not_selected:13 | const wide pairing = (wide)mul32(wi[l], kr) + (wide)mul32(wi[n + l], k
+  159   1.7% ins=  1.8% loc=      0 wait:32 wait (Not Issued):26 not_selected:24 | if (r > q0) {
+ 3418   1.5% ins=  1.6% loc=      0 wait:25 not_selected:23 math:19 | return (uwide)(v + ((((wide)1) << 31) - 1)) < ((((uwide)1) << 32) - 1)

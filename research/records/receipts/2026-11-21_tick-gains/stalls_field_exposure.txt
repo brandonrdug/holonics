@@ -1,0 +1,21 @@
+samples=70909 instructions=316753224 local_sectors=25056525
+ 3448   7.3% ins= 17.4% loc=1217088 wait:1693 selected:1168 math:864 | return ((pairing * (wide)(2 * decay)) << grain) - power * (wide)(decay
+ 3318   4.9% ins=  4.8% loc=      0 wait:1333 not_selected:468 wait (Not Issued):433 | return hi != 0 ? 128 - __clzll((long long)hi) : (m == 0 ? 0 : 64 - __c
+ 3446   3.8% ins=  3.7% loc=1217088 long_sb:1113 long_sb (Not Issued):407 wait:402 | const wide pairing = (wide)(a0 * b0) + (wide)(a1 * b1);
+ 3695   3.0% ins=  0.7% loc=2218762 long_sb:1501 long_sb (Not Issued):559 wait:272 | for (uint32_t k = lane; k < K; k += 32) {
+ 1031   2.9% ins=  0.2% loc=      0 long_sb:1875 long_sb (Not Issued):685 math:57 | return umax(a, b);
+  990   2.9% ins=  0.2% loc=      0 long_sb:1875 long_sb (Not Issued):685 math:57 | top = max(top, dec[l]);
+ 3715   2.6% ins=  1.0% loc=      0 long_sb:1132 long_sb (Not Issued):388 wait:226 | if (members[mid] < ip) {
+ 3494   2.5% ins=  2.1% loc=4345248 long_sb:952 long_sb (Not Issued):336 wait:288 | return fit64(rel(temper * (wide)base, MATERIAL_BITS) - ((wide)octave_o
+ 3561   2.5% ins=  2.9% loc=      0 long_sb:830 long_sb (Not Issued):302 selected:226 | const wide lk = lock_of(wi[l], wi[w.n + l], swhi[l] - swlo[l], swhi[w.
+  669   2.4% ins=  2.3% loc=      0 wait:665 not_selected:273 math:261 | return h % w.frames < w.still;
+ 3323   2.4% ins=  2.3% loc=      0 wait:686 branch_resolving:277 wait (Not Issued):212 | if (wide_bits(a) + wide_bits(b) <= 126) {
+ 3344   2.3% ins=  4.4% loc=      0 wait:370 not_selected:365 math:316 | if ((a >= 0) == (b >= 0) && (s >= 0) != (a >= 0)) {
+ 3447   2.3% ins=  3.5% loc=      0 wait:386 not_selected:361 math:338 | const wide power = (wide)(b0 * b0) + (wide)(b1 * b1);
+ 3725   2.1% ins=  1.5% loc=4259808 long_sb:843 long_sb (Not Issued):295 wait:222 | const int64_t z = scored(w, temper, base, falloff);
+  408   2.0% ins=  1.0% loc=      0 branch_resolving:525 long_sb:318 no_inst:226 | ret = __nvvm_shfl_bfly_sync(mask, var, laneMask, c);
+ 3324   1.7% ins=  2.9% loc=      0 wait:387 no_inst:236 selected:176 | *r = a * b;
+ 3166   1.6% ins=  0.3% loc= 204736 long_sb:873 long_sb (Not Issued):318 not_selected:83 | return NEAR_SLOTS + (rc.open ? rc.ndef : rc.cum[rc.nc]);
+  970   1.6% ins=  0.7% loc= 341760 long_sb:879 long_sb (Not Issued):311 wait:113 | return skin_word(w, w.cskin[(((uint64_t)p * w.T + g) * w.slots + crowd
+ 3547   1.5% ins=  0.4% loc=1217088 long_sb:762 long_sb (Not Issued):287 wait:83 | const wide lk = lock_pair(a[l], a[8 + l], b[l], b[8 + l], (uint64_t)de
+ 3183   1.5% ins=  0.3% loc=      0 long_sb:802 long_sb (Not Issued):323 wait:109 | if (rc.before && j > i) {

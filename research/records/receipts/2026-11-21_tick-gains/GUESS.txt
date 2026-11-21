@@ -1,0 +1,7 @@
+# Fixed 2026-11-21T01:11:56Z, before the full read (the dev read at k=4, site 120 was written and not analysed).
+# Taken whole from the lattice record §6.1 (the formal thread, November 20), on L71's end state, 240 sites of docs/THE_ENGINE.md,
+# sites 120 and 200 (open) and 122 and 201 (known), ticks 4, 8 and 16; the site's own 224 x 224 block of the tick's map.
+G1: at every site, one eigenvalue a filled lane stands at one: 7 eigenvalues within 0.01 of 1 (the rays).
+G2: the others' distances from one fall as 1/(k + a): their median |lambda - 1| halves (ratio 0.4 to 0.6) from k=8 to k=16.
+G3: nu_j = (lambda_j - 1) * fill agree across k = 4, 8, 16 within a quarter of their size (median over sorted ranks).
+G4: the nu_j are spread over more than a factor of four (the 10th to the 90th percentile of |nu|).

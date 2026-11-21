@@ -1,0 +1,21 @@
+samples=25062 instructions=77871830 local_sectors=643858
+ 5442   9.5% ins=  5.0% loc=      0 long_sb:1704 long_sb (Not Issued):1158 wait:242 | dp += mul64_128(dyi[2 * q], still_h ? t.x : carry_d(dec[(2 * q) & 7], 
+ 5554   6.3% ins= 11.3% loc=      0 wait:572 wait (Not Issued):313 selected:313 | sum += mul64_128(dss[warp][jj], mul32((int64_t)skin_raw_hs(w, hs, m, g
+ 3371   3.8% ins=  3.0% loc=      0 long_sb:562 long_sb (Not Issued):396 wait:159 | const uint64_t hi = (uint64_t)__mul64hi((long long)a, (long long)b);
+ 5443   3.3% ins=  5.2% loc=      0 wait:226 long_sb:198 selected:136 | dp += mul64_128(dyi[2 * q + 1], still_h ? t.y : carry_d(dec[(2 * q + 1
+ 5552   3.1% ins=  0.8% loc=      0 short_sb:284 branch_resolving:284 branch_resolving (Not Issued):201 | if (jx != UINT32_MAX) {
+  214   3.0% ins=  1.0% loc=      0 long_sb:659 long_sb (Not Issued):452 selected:49 | atomicAdd((unsigned long long *)at + 1, hi + (old + lo < old ? 1ull : 
+ 5550   2.8% ins=  1.4% loc=      0 wait:289 long_sb:205 wait (Not Issued):179 | for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+ 5506   2.6% ins=  1.5% loc=  21954 long_sb:475 long_sb (Not Issued):304 wait:89 | const auto compare = [&](wide p, wide dpk) -> wide { return rel(ln2 * 
+ 5520   2.2% ins=  0.7% loc=      0 long_sb:474 long_sb (Not Issued):304 wait:52 | const wide dzj = compare((wide)e[j], dpr[j]);
+ 3578   2.1% ins=  1.2% loc=      0 long_sb:352 long_sb (Not Issued):234 wait:44 | const wide b0 = swhi[l] - swlo[l], b1 = swhi[w.n + l] - swlo[w.n + l];
+ 5490   2.0% ins=  1.3% loc=      0 long_sb:334 long_sb (Not Issued):217 wait:65 | term = (wide)dye * crowd_carried_wide_hs(w, hs, m, g, lv, lo > ip, svp
+ 5542   2.0% ins=  1.3% loc=      0 wait:291 wait (Not Issued):172 branch_resolving:107 | for (uint32_t jj = half + part; jj < half + 16; jj += parts) {
+ 5628   1.9% ins=  0.0% loc=      0 long_sb:464 long_sb (Not Issued):308 math:6 | add_wide_high(w0, pw, ow0);
+ 5544   1.8% ins=  1.2% loc=      0 short_sb:263 short_sb (Not Issued):171 wait:156 | if (jx != UINT32_MAX) {
+ 5601   1.6% ins=  0.5% loc=      0 long_sb:324 long_sb (Not Issued):221 no_inst:25 | const wide wsum = swp[(uint64_t)(hi_ + 1) * S + entry] - swp[(uint64_t
+  408   1.5% ins=  1.7% loc=      0 branch_resolving:112 wait:101 branch_resolving (Not Issued):68 | ret = __nvvm_shfl_bfly_sync(mask, var, laneMask, c);
+ 3584   1.4% ins=  0.4% loc=      0 long_sb:310 long_sb (Not Issued):203 wait:26 | const int64_t pairing = mul32(wi[l], n0) + mul32(wi[w.n + l], n1);
+  102   1.3% ins=  2.3% loc=      0 wait:84 long_sb:77 wait (Not Issued):62 | return (x + half - (wide)(x < 0)) >> bits;
+ 5551   1.3% ins=  0.8% loc=      0 branch_resolving:153 branch_resolving (Not Issued):82 no_inst:61 | const uint32_t jx = stj[warp][jj];
+ 3318   1.3% ins=  1.2% loc=      0 wait:149 wait (Not Issued):98 short_sb:43 | return hi != 0 ? 128 - __clzll((long long)hi) : (m == 0 ? 0 : 64 - __c

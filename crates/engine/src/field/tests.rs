@@ -5835,3 +5835,82 @@ fn the_trained_ticks_residual_by_tick() {
     }
     eprintln!("TICK_RESIDUALS sites={} open={} ticks={ticks}", classes.len(), unresolved.iter().filter(|&&u| u).count());
 }
+
+/// [measurement; the lead, November 21, the lattice record §6.1's read before any leak is built] **The tick's gains by finite differences**:
+/// the learner at `DEPOSIT_STATE`, its ticks raised past the largest of `PROBE_TICKS`, reads one region of `CARRIER_SITES` sites cut from
+/// `CARRIER_TEXT` (as the census of a pass's carriers cuts it). At each tick `k` of `PROBE_TICKS` and each site `t` of `PROBE_SITES`, every
+/// entry `d` of the site's state is moved by `±ε` (`ε` a lane's root mean square released by ten bits, at least `2^6`) and the perturbed
+/// state run through that one tick with the tick's own operands; the site's own block of the state after the tick, `x⁺ − x⁻`, is written
+/// to `PROBE_OUT/probe_k{k}_t{t}.txt` with the opening and settled blocks and each entry's `ε`, for the host's eigenvalues (`tools/tick_gains.py`).
+/// A ruler on the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files and a write of the ruler's tables")]
+fn the_ticks_gains_by_finite_differences() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let mut learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let units = crate::units::Units::from_text(&std::fs::read_to_string(var("CARRIER_UNITS")).unwrap()).unwrap();
+    let codec = crate::codec::Codec::from_text(&std::fs::read_to_string(var("CARRIER_CODEC")).unwrap(), units).unwrap();
+    let sites: usize = var("CARRIER_SITES").parse().unwrap();
+    let at: Vec<usize> = var("PROBE_TICKS").split(',').map(|v| v.parse().unwrap()).collect();
+    let probed: Vec<usize> = var("PROBE_SITES").split(',').map(|v| v.parse().unwrap()).collect();
+    let out = std::path::PathBuf::from(var("PROBE_OUT"));
+    let text = std::fs::read(var("CARRIER_TEXT")).unwrap();
+    let mut classes = Vec::new();
+    for line in text.split(|&b| b == b'\n') {
+        let mut l = line.to_vec();
+        l.push(b'\n');
+        if let Ok(c) = codec.encode(&l) {
+            classes.extend(c);
+        }
+        if classes.len() >= sites {
+            break;
+        }
+    }
+    classes.truncate(sites);
+    let unresolved: Vec<bool> = (0..classes.len()).map(|t| (t * 7) % 11 < 5).collect();
+    let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+    learner.field.declaration.ticks = at.iter().max().unwrap() + 1;
+    let dw = learner.field.declaration.width;
+    let lanes = learner.field.declaration.lanes;
+    let lw = dw / lanes;
+    let eps_of = |x: &[i64], t: usize| -> Vec<i64> {
+        (0..dw).map(|d| {
+            let l = d / lw;
+            let ss: i128 = x[t * dw + l * lw..t * dw + (l + 1) * lw].iter().map(|&v| i128::from(v) * i128::from(v)).sum();
+            let rms = ((ss / lw as i128) as u128).isqrt() as i64;
+            (rms >> 10).max(64)
+        }).collect()
+    };
+    for &k in &at {
+        let t0 = std::time::Instant::now();
+        let perturb = |x: &[i64]| -> Vec<Vec<(usize, i64)>> {
+            let mut all = Vec::new();
+            for &t in &probed {
+                let eps = eps_of(x, t);
+                for d in 0..dw {
+                    all.push(vec![(t * dw + d, eps[d])]);
+                    all.push(vec![(t * dw + d, -eps[d])]);
+                }
+            }
+            all
+        };
+        let mut probe = crate::contact::TickProbe { at: k, perturb: &perturb, before: Vec::new(), after: Vec::new(), outputs: Vec::new() };
+        learner.field.pass_probed(&region, &mut probe).unwrap();
+        assert_eq!(probe.outputs.len(), probed.len() * 2 * dw, "the probe ran at tick {k}");
+        for (n, &t) in probed.iter().enumerate() {
+            let eps = eps_of(&probe.before, t);
+            let block = |v: &[i64]| v[t * dw..(t + 1) * dw].iter().map(i64::to_string).collect::<Vec<_>>().join(" ");
+            let mut s = format!("k {k} t {t} dw {dw} lanes {lanes} open {}\n", u8::from(unresolved[t]));
+            s += &format!("before {}\nafter {}\neps {}\n", block(&probe.before), block(&probe.after), eps.iter().map(i64::to_string).collect::<Vec<_>>().join(" "));
+            for d in 0..dw {
+                let (p, m) = (&probe.outputs[(n * dw + d) * 2], &probe.outputs[(n * dw + d) * 2 + 1]);
+                let col: Vec<String> = (0..dw).map(|e| (p[t * dw + e] - m[t * dw + e]).to_string()).collect();
+                s += &format!("col {d} {}\n", col.join(" "));
+            }
+            std::fs::write(out.join(format!("probe_k{k}_t{t}.txt")), s).unwrap();
+        }
+        eprintln!("TICK_PROBE k={k} sites={} probes={} ms={}", probed.len(), probe.outputs.len(), t0.elapsed().as_millis());
+    }
+    eprintln!("TICK_PROBES region_sites={} open={} ticks={:?} sites={probed:?}", classes.len(), unresolved.iter().filter(|&&u| u).count(), at);
+}
