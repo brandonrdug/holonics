@@ -199,8 +199,9 @@ pub struct Declaration {
     /// with the closed characters' count written even at zero, then `1`. Needs carry circles.
     pub pump: bool,
     /// [definition; the formal thread, November 21 (the record of the store's leak, §3; atlas `store.leak-founded-by-own-news`, Lean
-    /// `HNN/LeakingStore`)] **The tick's lane leak**: at a site, on face lane `ℓ`, over the ticks of a pass, `x^(k+1) = γ_ℓ x^k + g^k` with
-    /// `γ_ℓ = 1/(1 + d_ℓ)`, written in integers as `x^(k+1) = x_built^(k+1) − release(δ_ℓ x^k, 30)`, `δ_ℓ = d_ℓ/(1 + d_ℓ)` on `2^(−30)` from
+    /// `HNN/LeakingStore`; the opening held, its correction of 02:52Z)] **The tick's lane leak**: at a site, on face lane `ℓ`, over the ticks of
+    /// a pass, `x^(k+1) = x⁰ + γ_ℓ (x^k − x⁰) + g^k` with `γ_ℓ = 1/(1 + d_ℓ)` and `x⁰` the pass's opening, written in integers as
+    /// `x^(k+1) = x_built^(k+1) − release(δ_ℓ (x^k − x⁰), 30)`, `δ_ℓ = d_ℓ/(1 + d_ℓ)` on `2^(−30)` from
     /// `d_ℓ` on the face's grain ([`Loci::lane_leak`], one a lane, founded at zero, so `δ = 0` is the built tick bit for bit). `d` is a store whose
     /// own news deposits it: its covector is `−Σ_(t, k≥1) ⟨Δr̂_t^k, Δr̂_t^(k−1)⟩`, successive chart moves of the lane, the forward's alone (it rises
     /// where they agree, falls where they oppose), and it is never under zero. Why (the record §3 to §5): a store's release is its prediction of

@@ -58,6 +58,9 @@ pub struct Constitution {
     /// `x ← (1 − δ) x + g` (the law founded at `δ = 0` is the built tick). A ruler's read of the leak before its stage is built: not part of the
     /// state, and no reverse reads it.
     pub ruler_leak: Option<(i64, u32)>,
+    /// [measurement; the lead, November 21, the formal thread's check of 02:52Z] Where set with [`Constitution::ruler_leak`], the ruler's leak holds
+    /// the pass's opening, `x ← x − release(n (x_began − x⁰), b)`, as the lane leak's law does.
+    pub ruler_leak_hold: bool,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
     /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the

@@ -6167,6 +6167,8 @@ fn a_lane_leaks_reads_at_set_strengths() {
         }
         eprintln!("LEAK_READ {tag} ticks={n} cos_ticks_1_to_16_by_lane=[{}] cos_ticks_5_to_16_by_lane=[{}] cos_all_by_lane=[{}] move_by_tick=[{}] move_16_over_move_6_by_lane=[{}] held_code_nats={:.4} open={open}",
             lanes_cos(1, 17), lanes_cos(5, 17), lanes_cos(1, n), norms.join(" "), lane_growth.join(" "), code / open.max(1) as f64);
+        let by_pair: Vec<String> = (1..n - 1).map(|k| format!("{k}:{}", (0..lanes).map(|l| format!("{:.3}", span_cos(k, k + 1, l))).collect::<Vec<_>>().join(","))).collect();
+        eprintln!("LEAK_PAIRS {tag} cos_by_pair_of_moves(k-1,k)_by_lane=[{}]", by_pair.join(" "));
         pass
     };
     let own = read("own_ticks_no_leak", &learner.field);
@@ -6194,10 +6196,12 @@ fn a_lane_leaks_reads_at_set_strengths() {
     let mut raised = learner.field.clone();
     raised.declaration.ticks = ticks;
     read("raised_no_leak", &raised);
+    let hold = std::env::var("LEAK_HOLD").is_ok_and(|v| v == "1");
     for &(n, b) in &deltas {
         let mut f = raised.clone();
         f.ruler_leak = Some((n, b));
-        read(&format!("raised_delta_{n}/2^{b}"), &f);
+        f.ruler_leak_hold = hold;
+        read(&format!("raised_delta_{n}/2^{b}{}", if hold { "_opening_held" } else { "" }), &f);
     }
 }
 

@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 02:45 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 03:00 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -205,6 +205,26 @@ So the law's rest stands where it derived it on the late ticks, and the leak con
 line's four ticks its comparison has the wrong sign at most lanes and would rest `d` at its founding: the leak's consumer is a pass past four
 ticks, and such a pass starts 1.8 to 2.5 nats a place behind on this state (`agent-inferred`). Its arm carries that cost: raised ticks with the
 law beside raised ticks without it, from one saved state, read over laps long enough for both to recover.
+
+### 8.1 The opening held, and why the arm waits
+
+The formal thread read §8 at its source (02:52 UTC, relayed): the pooled cosine is ruled by the first pairs of moves, whose weights are
+288.7, 209.9, 67.2, 8.6, 1.4 and 0.4 (`10^12`) from the first pair, so pairs from the fifth on hold under 2% and the deposit as built would move
+`d` at one lane only (lane 2, to about `δ = 0.38` at eight ticks); the rest near `δ = 0.85` belongs to ticks five on, 0.4% of the weight.
+And the law as built leaks the opening with the currents, where the built tick keeps the opening as a term of its sum; corrected, the tick is
+`x ← x⁰ + γ(x − x⁰) + g`, the same bits at `d = 0`. The host law now holds the opening (`lane_leak_tick`, its return `+δ λ^(k+1)` into the
+opening once the ticks have returned), and its tests pass as before. Read with the opening held (02:54 UTC, `leak_reads_opening_held.txt`;
+the ruler's leak with `Constitution::ruler_leak_hold`): the held code at 17 ticks reads 4.004, 3.991, 3.932, 3.911 and 3.877 nats a place at
+`δ` = 1/4, 1/2, 3/4, 0.85 and 1, against 4.137 to 4.141 with the opening leaked, 3.422 with no leak and 1.655 at the line's four ticks: holding the
+opening recovers 0.13 to 0.26 nats and the raised read stays above 3.0 at every `δ` (the formal thread's H4, fixed 02:52:10 UTC, held). The
+cosine by pair of moves on the built tick: −0.71 to −0.04 at the first pair, −0.22 to +0.49 at the second, 0.70 to 0.87 at the fourth, 0.95 to
+0.99 from the fifth; under the leak the late pairs' cosine crosses zero between 3/4 and 0.85 at the first four lanes, as before.
+
+So the arm as designed would be nearly its own control (the formal thread's guess: the two arms' held codes agree within the scatter between
+laps), and it is not given its day of card. The card realization written for it is set aside with this reading
+(`lane_leak_card_kernels_set_aside.patch`: the leak's tick, the stores' news by region and lane, and their release into the covector); the
+host law stands, founded at zero bit for bit, with the opening held, `d` on the chart `ℓ = log₂(1 + d)` with `γ = 2^(−ℓ)` the formal thread's
+choice for when it is next taken up.
 
 ## 9. Atlas
 
