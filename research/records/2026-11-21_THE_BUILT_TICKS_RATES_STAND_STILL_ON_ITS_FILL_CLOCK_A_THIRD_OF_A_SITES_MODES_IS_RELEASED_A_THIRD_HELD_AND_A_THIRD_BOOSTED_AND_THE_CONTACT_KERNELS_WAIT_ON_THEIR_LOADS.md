@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 03:35 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 04:00 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -126,6 +126,14 @@ bits (taken, #1071: the section 5.8 ms shorter); the pair's face on 32 bits so t
 (set aside: every bit kept, the section 7.3 ms longer, the `W` map bound by neither its products nor its operand's width); and the circles'
 reverse pair part on 64 bits where it stood on 128 (taken: the pre-scan 21% and the section 5.9 ms shorter). With the staged skins the night's
 realizations shorten a section by about 14 ms, every bit kept.
+
+The small kernels' lane use, read from the same trace's launch shapes (`launch_shapes.txt`): the kernels that leave the card's threads idle are
+the circles' scans, `field_pair_scan` and `field_pair_scan_back` (88 blocks of 256, 22,630 threads a launch against the 122,880 the card holds
+resident, 8.9 and 12.6 ms a section), a job a region and circle walking its sites in order; then the cavity's paced return (44 blocks, 5.9 ms) and
+the classes (177 blocks of 32, 1.9 ms). The scans are ordered by the law, not by their realization: each step releases its store at the face's
+grain, a section inside an ordered chain, so the chain's declared order is the law's (the precision law; `radix.release-quotient-or-section`).
+Their lane use rises only where the chain carries its remainder and releases once, which changes its bits and is an arm, not a realization
+(`agent-inferred`). The rest of the night's lane use is the contact family's, read above.
 
 ## 5. What the pass's ticks change
 
