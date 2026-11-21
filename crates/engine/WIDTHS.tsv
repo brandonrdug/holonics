@@ -10,6 +10,12 @@
 # law it could not derive. The campaign (#1088; the record of November 21) ends when picked, carrier, literal
 # and dead read zero.
 #
+# A grain is a relation between grains (the second record of November 21). A width's places are counted from a unit a state
+# holds (a store's own spread at its reader's clock, a lane's power, a rate), never from a fixed point for a tolerance handed
+# in by number: the point is a gauge. A `receiver` or `counted` row names that state as `unit:NAME`. The `tolerances` ceilings
+# count the code lines of each crate that hand a tolerance in by number (E5's `eps_bits` and `tolerance_bits`), and they
+# only fall.
+#
 # ceiling picked 13
 # ceiling carrier 13
 # ceiling literal 0
@@ -17,16 +23,19 @@
 # ceiling shifts engine 127
 # ceiling shifts engine-cuda 249
 # ceiling shifts athena 42
+# ceiling tolerances engine 7
+# ceiling tolerances engine-cuda 0
+# ceiling tolerances athena 1
 name	owner	value	class	need
-FACE_BITS	crates/engine/src/width.rs	16	picked	the root grain of states, faces, charts and currents. Its law: a reader's grain L holds 2L^2 >= N ln 2 at the reading count N of its admitted future (atlas receiver.grain-lemma), and a state place below what its readers' codes can tell apart is heat. First read: the mask sweep on states (the record of November 21, section 7)
+FACE_BITS	crates/engine/src/width.rs	16	picked	the root grain of states, faces, charts and currents. Its law: a state is a count in its lane's own power, the unit a lane's rms and never a place under the point (every read of a face is a ratio to the lane's power; Lean HNN/GrainRelation, lane_ratio_scale). Read (G-W3, the lead, November 21): rounding every state to 2^-5 moves the held code by under 0.0001 nats a place and to 2^-1 by 0.0012, so fifteen of its sixteen places under the point are read by nothing. Next read: each lane's rms beside the sweep written in places under it (G-R4, the second record of November 21, section 8)
 STATE_BITS	crates/engine/src/width.rs	16	picked	a class's share at a site; the face's grain under a second literal. Same law and read as FACE_BITS
-MATERIAL_BITS	crates/engine/src/width.rs	24	picked	the constitution's grain. Its law is the lattice rule the October machine built and the engine did not take (atlas hnn.receiving-precision-at-grain, hnn.lattice-deposit, hnn.word-sensitivity; hnn/field.rs at d5ed4adc1): a locus's lattice is ceil(log2(2 L_R X)) from its finest receiver's grain and its fan-in, and the deposit's remainder is carried under it at the locus's own clock precision. Reads: the mask sweep on the constitution by block and the spread of a lap's end about its mean (the record of November 21, sections 5 and 7)
+MATERIAL_BITS	crates/engine/src/width.rs	24	picked	the constitution's grain. Its law (atlas radix.grain-is-a-relation): an entry is a read part, a count on a lattice one place under its store's own standing spread (the rms of a lap's end less its mean), over a rest its deposit carries; a place is priced by its ratio to that spread, rent(u) = R (u/sigma)^2 / 12, and by no fixed point. Read (the lead's table of W80t, November 21): the spread stands at 2^-10.2 to 2^-6.7 by family, 2^-7.8 at the entry mean, so sixteen of these twenty-four places stand under it, and the ratio law gives 0.00067 and 0.0027 nats a place at 2^-9 and 2^-8 where the masks read 0.00069 and 0.0025. The October lattice rule (ceil(log2(2 L_R X)) for a tolerance handed in by number) certifies a worst case and sizes nothing. Next: G-R1 and the arm G-R5 (the second record of November 21, section 8)
 COVECTOR_BITS	crates/engine/src/width.rs	24	picked	a covector's grain. Its law: the places below a section's own spread of the covector are heat (the record of November 7, section 5); read: the covector's spread across sections against its mean, by block
 STEP_BITS	crates/engine/src/width.rs	32	picked	the first moment's grain and its epsilon. Its law (agent-inferred): COVECTOR_BITS plus the places a mean over the moment's memory adds (half a place a doubling of the sections it averages); unread
 READ_BITS	crates/engine/src/width.rs	20	picked	a code reading's grain in bits. Its law: a read of N places confirms about half of log2 N places (receiver.grain-lemma: 7 at the held passage's 43,470); 20 is finer than any read on record
 CONTACT_BITS	crates/engine/src/width.rs	40	derived	COVECTOR_BITS + FACE_BITS: a covector times a face, by its consumers (deposit.rs on_step_grain; E2 of #1088)
 CONTACT_BACK	crates/engine/src/width.rs	32	derived	CONTACT_BITS + FACE_BITS - COVECTOR_BITS: the probe and key return summed on the contact grain times a face, released to the covector grain; the kernel reads it from the generated widths.cuh (E3 of #1088)
-MOVE_BITS	crates/engine/src/width.rs	30	carrier	frames, skins and phasors: chosen so a face fits 32 bits and three faces times an encoding (106) fit 128. Its law: the reader's grain plus the state's top place plus the places its sum's terms add plus one (atlas radix.width-need; radix.face-width-from-readers); about 24 by that count at the line's width, unread
+MOVE_BITS	crates/engine/src/width.rs	30	carrier	frames, skins and phasors: chosen so a face fits 32 bits and three faces times an encoding (106) fit 128. Its law: a turn's count is its reader's count plus the places its sum's terms add plus one, and its reader is a state, a count in its lane's power; the exponential's series halts where a term releases to zero at this grain (ratio.rs, exp_series), a halt counted from the point. Unread until the states' count is (G-R4, the second record of November 21, section 7)
 SHARE_BITS	crates/engine/src/width.rs	63	carrier	a term's share of its row's mass: one place under a 64-bit word. Its law: the receiver's grain plus the places the row's count of terms adds; unread
 UNIT_BITS	crates/engine/src/width.rs	62	carrier	the exponential's faces: the widest whose square fits 128 bits. Its law: the grain of the share it forms plus the places its squarings lose (one a squaring); unread
 CODE_BITS	crates/engine/src/units.rs	32	picked	the code's grain in bits; one name with a second value in coupling.rs (20). Same law as READ_BITS
