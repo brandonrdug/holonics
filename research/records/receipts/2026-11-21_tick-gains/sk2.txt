@@ -1,0 +1,17 @@
+# sk2: lock taken 01:25:43 other runs: 1361623, obs 
+SK2 suite 01:31:51 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 367.42s 
+SK2 repro_L71 01:32:05 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+SK2 ncu old 01:32:25  Duration ms 1.53; Achieved Occupancy % 45.38; Duration ms 1.54; Achieved Occupancy % 46.81; Duration ms 1.50; Achieved Occupancy % 45.09;
+SK2 ncu new 01:32:44  Duration ms 1.43; Achieved Occupancy % 46.81; Duration ms 1.40; Achieved Occupancy % 46.09; Duration ms 1.39; Achieved Occupancy % 46.06;
+SK2 warm-up 01:33:07 53.32, 2805 MHz
+SK2 hold 1 old 01:33:29 last30 ms_mean=519.0 54.12, 2805 MHz
+SK2 hold 2 new 01:33:51 last30 ms_mean=518.1 54.86, 2805 MHz
+SK2 hold 3 new 01:34:13 last30 ms_mean=518.7 54.89, 2805 MHz
+SK2 hold 4 old 01:34:36 last30 ms_mean=520.5 55.14, 2805 MHz
+SK2 hold 5 old 01:34:58 last30 ms_mean=520.7 55.33, 2805 MHz
+SK2 hold 6 new 01:35:21 last30 ms_mean=517.8 55.52, 2805 MHz
+SK2 hold 7 new 01:35:43 last30 ms_mean=516.7 56.13, 2805 MHz
+SK2 hold 8 old 01:36:05 last30 ms_mean=521.4 55.55, 2805 MHz
+# sk2: released 01:36:05
+SK2_ALL_DONE 01:36:05
+RUN_EXIT 0 2026-11-21T01:36:05Z
