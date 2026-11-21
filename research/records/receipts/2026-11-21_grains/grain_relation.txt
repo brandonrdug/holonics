@@ -1,0 +1,24 @@
+A  families with a spread: 54 of 65, entries 1850865
+A  lg sigma: least -10.23 greatest -6.67 entry mean -7.80
+A  top over sigma, places: least 6.59 greatest 12.75 entry mean 8.67
+A  median over sigma, places: least 2.81 greatest 11.50 entry mean 3.93
+A  places of the declared word under sigma: entry mean 15.38 (grain 24: 16.18, grain 16: 8.34)
+B  the spread's rent R = end - mean = 0.040456 nats a place
+B  g   read rise   equal rent an entry   one stiffness
+B  12  0.000187   0.000010              0.000010
+B  10  0.000367   0.000167              0.000155
+B   9  0.000687   0.000670              0.000622
+B   8  0.002464   0.002679              0.002488
+B   6  0.030447   0.042861              0.039805
+C  lattice 0 under the spread's place: rent 0.002350 nats a place; read part bits (with sign): greatest 15, entry mean 10.53, entries over 16 bits 0
+C  lattice 1 under the spread's place: rent 0.000587 nats a place; read part bits (with sign): greatest 16, entry mean 11.53, entries over 16 bits 0
+C  lattice 2 under the spread's place: rent 0.000147 nats a place; read part bits (with sign): greatest 17, entry mean 12.53, entries over 16 bits 512
+C  the spread's place by family, places under the point: 7:1 8:19 9:18 10:14 11:2
+D  sigma/u   greatest frozen error over the cell (closed form)   drawn at m = 0.25 (200,000 reads)   closed form at 0.25
+D  0.000     5.000e-01                                          -0.25000                            -0.25000
+D  0.125     2.457e-01                                          -0.22714                            -0.22725
+D  0.250     9.272e-02                                          -0.09407                            -0.09269
+D  0.500     2.289e-03                                          -0.00425                            -0.00229
+D  0.750     4.795e-06                                          -0.00037                            -0.00000
+D  1.000     8.516e-10                                          +0.00068                            -0.00000
+E  true crossings 10; plain release 0; rest carried 10 (rest 0 of a grain of 1000)

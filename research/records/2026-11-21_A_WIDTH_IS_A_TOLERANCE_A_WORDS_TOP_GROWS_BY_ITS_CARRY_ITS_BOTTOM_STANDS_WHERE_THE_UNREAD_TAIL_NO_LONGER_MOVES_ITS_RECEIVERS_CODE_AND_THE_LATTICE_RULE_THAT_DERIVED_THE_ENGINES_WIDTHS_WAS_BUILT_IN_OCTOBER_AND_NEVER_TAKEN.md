@@ -1,5 +1,10 @@
 # A width is a tolerance: a word's top grows by its carry and its bottom stands where the unread tail no longer moves its receiver's code, and the lattice rule that derived the engine's widths was built in October and never taken
 
+**Amended the same day** by [the second pass](2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md):
+a bottom stated as a count of places under a point for a tolerance given by number (§4.2's `L = 18` at `ε = 2^(−10)`, §5's bottoms, E5 of
+§9) is counted from a gauge and set by a dial. A bottom is located from its store's own standing spread at its reader's clock, and the
+lattice rule stands as a certificate of a worst case. The census, the Lean and the reads G-W0 to G-W5 stand as written.
+
 November 21, 2026, 18:49 to 19:55 UTC, in a cloud container: the tree's own source, host arithmetic, a census tool and Lean. No state
 of the machine was read here and no compiled token of a crate was changed. Refs #404, #410, #1088.
 

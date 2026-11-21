@@ -20,6 +20,12 @@ that will). It refuses:
   4. a count of `picked`, `carrier`, `literal` or `dead` rows that is not the table's ceiling for that class, or a count of literal
      shifts in a crate above its ceiling. The ceilings only fall: a change that lowers a count lowers the ceiling in
      the same commit, and a change that raises one says in its record which law it could not derive.
+  5. a `receiver` or `counted` row whose need does not name, as `unit:NAME`, the state that holds the unit its places are
+     counted from, and a count of code lines in a crate that hand a tolerance in by number (an identifier `eps_bits`,
+     `epsilon_bits` or `tolerance_bits`) above its ceiling. Reason (the record of November 21, "a grain is a relation between
+     grains"): a place counted under a fixed point for a tolerance set by hand is a dial, and E5 of #1088 was built on one
+     the same day this check first ran, with nothing here to see it. A grain is located from its store's own spread at its
+     reader's clock and carried in the state.
 
 Scope: a name is read when it ends in _BITS (or _BITS_X), _DIGITS, _LIMBS, _RATE, _ROOT, _SLACK or _L1, is GUARD or
 TEMPER_TOP, or is named by a row of the table (so any other constant can be put under the check by giving it a row).
@@ -32,8 +38,10 @@ import sys
 
 CLASSES = {
     'exterior': 'a width the boundary gives (a byte enters at 8)',
-    'receiver': "a grain read from a receiver's kernel: its admitted future's reading count, or a mask read beside a control",
-    'counted': 'a width read from the count of states its part distinguishes above its spread',
+    'receiver': "a grain located from its store's own spread at its reader's clock, or a mask read beside a control; its need names "
+                'the state that holds it (unit:NAME)',
+    'counted': 'a width read from the count of states its part distinguishes above its spread; its need names the state that '
+               'holds its unit (unit:NAME)',
     'derived': 'computed from other widths by the need of its operation (a sum, a count of terms, a product, a bound proved)',
     'identity': 'another width under a second name, written as that name',
     'twin': "a kernel's copy of a host width, checked equal",
@@ -53,6 +61,9 @@ RUST_SCOPE = re.compile(r'(_BITS(_[A-Z])?|_DIGITS|_LIMBS|_RATE|_ROOT|_SLACK|_L1)
 KERNEL_SCOPE = re.compile(r'(_BITS|_DIGITS|_LIMBS|_RATE|_ROOT|_STEPS|_BACK)$|^TEMPER_TOP$')
 SHIFT = re.compile(r'(?:<<|>>)=?\s*([0-9]+)\b')
 SHIFT_LEAST = 8
+TOLERANCE = re.compile(r'\b(?:eps|epsilon|tolerance)_bits\b')
+LOCATED = ('receiver', 'counted')
+UNIT = re.compile(r'\bunit:[A-Za-z_][A-Za-z0-9_.:]*')
 TABLE = 'crates/engine/WIDTHS.tsv'
 
 
@@ -135,6 +146,15 @@ def shifts(files):
     return out
 
 
+def tolerances(files):
+    """Code lines that hand a tolerance in by number, by crate, outside comments."""
+    out = dict.fromkeys(CRATES, 0)
+    for path, lines in files:
+        crate = path.split('/')[1]
+        out[crate] += sum(1 for line in lines if TOLERANCE.search(line.split('//')[0]))
+    return out
+
+
 def read_table(root):
     rows, ceilings, problems = [], {}, []
     path = os.path.join(root, TABLE)
@@ -204,6 +224,10 @@ def census(root):
                             'changed in both, with the need that moved it written in the row')
         if not r['need'].strip():
             problems.append(f'{where}: the need is empty; state the law that gives the width, or the read that will')
+        if r['class'] in LOCATED and not UNIT.search(r['need']):
+            problems.append(f"{where}: class `{r['class']}` and its need names no unit. Write `unit:NAME`, the state that holds "
+                            'the unit its places are counted from (a store\'s spread, a lane\'s power, a rate): a place under a '
+                            'fixed point is a gauge')
         if r['class'] in ('derived', 'identity') and literal(d['expr']):
             problems.append(f"{where}: class `{r['class']}` but {r['owner']}:{d['line']} writes the bare literal `{d['expr']}`. "
                             'Write the derivation as the expression, or class the row `literal` or `picked`')
@@ -238,7 +262,16 @@ def census(root):
             problems.append(f"crates/{crate}: {found[crate]} literal shifts of {SHIFT_LEAST} places or more against a ceiling of "
                             f"{ceilings[key]}. A shift's count is a width: name it from the widths it follows from "
                             '(`<< (A_BITS - B_BITS)`), which the count does not read')
-    return scope, problems, counts, found
+    handed = tolerances(files)
+    for crate in CRATES:
+        key = f'tolerances {crate}'
+        if key not in ceilings:
+            problems.append(f'{TABLE}: no line `# ceiling {key} COUNT` (the crate holds {handed[crate]})')
+        elif handed[crate] > ceilings[key]:
+            problems.append(f"crates/{crate}: {handed[crate]} code lines hand a tolerance in by number against a ceiling of "
+                            f"{ceilings[key]}. A grain is a relation between grains: locate it from its store's own spread at "
+                            "its reader's clock and carry it in the state")
+    return scope, problems, counts, found, handed
 
 
 def main(argv):
@@ -247,7 +280,7 @@ def main(argv):
         i = argv.index('--root')
         root = argv[i + 1]
         argv = argv[:i] + argv[i + 2:]
-    scope, problems, counts, found = census(root)
+    scope, problems, counts, found, handed = census(root)
     if argv[1:2] == ['table']:
         print('name\towner\tvalue\tclass\tneed')
         for d in sorted(scope, key=lambda d: (d['owner'], d['line'])):
@@ -257,7 +290,8 @@ def main(argv):
         print(f'width-census: {p}')
     held = ', '.join(f'{counts[c]} {c}' for c in CLASSES if counts[c])
     print(f"width-census: {len(scope)} declared widths ({held}); literal shifts "
-          + ', '.join(f'{found[c]} {c}' for c in CRATES) + (f'; {len(problems)} violations' if problems else '; the table holds'))
+          + ', '.join(f'{found[c]} {c}' for c in CRATES) + '; tolerances handed in by number '
+          + ', '.join(f'{handed[c]} {c}' for c in CRATES) + (f'; {len(problems)} violations' if problems else '; the table holds'))
     return 1 if problems else 0
 
 

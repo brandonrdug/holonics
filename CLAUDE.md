@@ -228,6 +228,27 @@ reading "exact" in this sense, in code, guides or records.
   tolerance, with its remainder accounted. A width picked by hand, a doubled width, a max, or a
   fixed float width standing in for the series is arbitrary precision (October 14: "Floats and maxes
   have the same problem").
+- **A grain is a relation between grains, never a place under a point** (Brandon, November 21). A
+  word's places are counted from a unit that a state of the machine holds: a store's own standing
+  spread at its reader's clock, a lane's power, a rate. A reader takes the count that ends at that
+  unit, the integrator keeps the turn below it and pays it out in carries, and resolution finer than
+  a count's grain is bought by agreement, over time or among parts whose units are coprime, never by
+  a deeper word. A magnitude many orders under a word's unit is a distinct partition with its own
+  unit, translated at a contact; it is not carried as leading zeros. No tolerance, epsilon or grain
+  is handed to a founding or a reading by number: that is a temperature set by hand. An integer
+  register and a float are one rational cut at two places, each dropping what is small at its own
+  place, and neither is exact or precise by its kind (atlas `prime.register-two-places`). The test:
+  scale a part's unit and its reader's reading inversely, and a statement of width that changes was
+  counted from a gauge. Reason: on November 21 the first precision pass took the October lattice
+  rule, a count of places under the point for a tolerance of `2^(−10)` given by number, and E5 built
+  it; the lead's reads of that day showed fifteen of a state's sixteen places under the point read by
+  nothing, sixteen of the material's twenty-four standing under its store's own spread, and the rule
+  moving the held code by three millionths while narrowing no operand, and the atlas had held the
+  relation in a dozen rows since November 10
+  ([the record](research/records/2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md) §2, §3, §5).
+  Scope: every width, grain, tolerance and rate in code, guides, records and briefs. A certificate
+  of a worst case stays lawful as a ruler. Gate 1 counts the code lines that hand a tolerance in by
+  number, and the count only falls.
 - A sum is schedule-free where its terms meet at one declared grain and nothing is released between
   them: co-present terms summed in any order, on any partition of the card, then give the same bits.
   The register's kind is not the reason (Brandon, November 15 16:22: "there is no abstract difference
@@ -583,6 +604,8 @@ to the waiting standard, and the closing paragraph of the lap's list.
   which no store is. A reading of the field's own face is its face at the temperature the field holds, and a limit read beside it is
   named a ruler. A deposit's rate is such a store: a law that lowers it from the store's own travel or price is its dynamics and is
   owed. This rule bars a temperature passed by hand to a release or a reading, and it never bars a cooling law or a read of one.
+  A grain or a tolerance is such a state: it is located from its store's own spread and never passed by number (the precision
+  law's clause on grains, November 21).
   Reasons (the wording `agent-inferred`): a heat set from outside answers the runaway for the field instead of letting its own
   surprise answer it (G169 drew the release "at temperature one and zero";
   [the record](research/records/2026-11-13_THE_FIELD_RINGS_UNDER_ITS_OWN_RELEASE_A_PLACE_HEARING_ITSELF_FLIPS_EACH_PASS_THE_RUNAWAY_LEAVES_EVIDENCE_AT_THE_KNOWN_PLACES_AND_RECURSION_HELPS_ONLY_WHERE_THE_DEPOSIT_RUNS_THROUGH_IT.md) §5);
@@ -1105,8 +1128,8 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
    the declared widths against their table (`tools/width_census.py`: every constant that sets a
    width, a grain, a rate, a guard or a carrier's bound has a row in `crates/engine/WIDTHS.tsv` with
    its class and its need, a kernel's twin equals its host's, and the counts of picked, carrier,
-   literal and dead widths and of literal shifts only fall; a new width enters with its row in the
-   change that adds it, #1088).
+   literal and dead widths, of literal shifts and of code lines that hand a tolerance in by number
+   only fall; a new width enters with its row in the change that adds it, #1088).
    A change that adds or renames a record runs `python3 tools/records_index.py write` and commits
    `research/records/INDEX.md` with it, or gate 1 says the index is behind. On a machine with no card,
    `bash tools/gate_nocard.sh` runs it against a stand-in for the driver library. It reads no kernel

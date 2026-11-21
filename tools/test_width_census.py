@@ -24,6 +24,9 @@ TABLE = """# ceiling picked 1
 # ceiling shifts engine 1
 # ceiling shifts engine-cuda 0
 # ceiling shifts athena 0
+# ceiling tolerances engine 0
+# ceiling tolerances engine-cuda 0
+# ceiling tolerances athena 0
 name\towner\tvalue\tclass\tneed
 FACE_BITS\tcrates/engine/src/width.rs\t16\tpicked\tthe root
 MOVE_BITS\tcrates/engine/src/width.rs\t30\tcarrier\tfits 32 bits
@@ -79,9 +82,17 @@ def main():
     expect('a row with no declaration', code, out, 1, 'no such declaration')
     code, out = run(table=TABLE.replace('the root', ''))
     expect('an empty need', code, out, 1, 'the need is empty')
+    code, out = run(host=HOST + 'pub fn lattice(eps_bits: u32) -> u32 { eps_bits + 1 }\n')
+    expect('a tolerance handed in by number', code, out, 1, 'hand a tolerance in by number')
+    code, out = run(host=HOST + '/// a place counted for `2^(-eps_bits)` is a gauge\n')
+    expect('a tolerance named in a comment alone', code, out, 0, 'the table holds')
+    code, out = run(table=TABLE.replace('16\tpicked\tthe root', '16\treceiver\tthe store\'s spread').replace('ceiling picked 1', 'ceiling picked 0'))
+    expect('a located width with no unit named', code, out, 1, 'names no unit')
+    code, out = run(table=TABLE.replace('16\tpicked\tthe root', '16\treceiver\tunit:Lattice.places, the store\'s spread').replace('ceiling picked 1', 'ceiling picked 0'))
+    expect('a located width with its unit named', code, out, 0, 'the table holds')
     for f in failures:
         print(f'width-census controls: {f}')
-    print(f'width-census controls: {11 - len(failures)} of 11 hold')
+    print(f'width-census controls: {15 - len(failures)} of 15 hold')
     return 1 if failures else 0
 
 

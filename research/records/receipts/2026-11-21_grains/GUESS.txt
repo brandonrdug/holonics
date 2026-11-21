@@ -1,0 +1,43 @@
+Fixed 2026-11-21T23:38:58Z (date -u), the formal thread, before any of these reads. Refs #1088. The second precision pass: a grain is a
+relation between grains. The reads are the lead's (host, no card, W80t's STATE.3000 and MEAN.3000 unless said); the arm is the lead's.
+
+Not a guess (computed after the lead's reads, from his published table; grain_relation.txt): the price of a place as a ratio,
+rent(u) = R * mean_i (u/sigma_i)^2 / 12 with R = 0.040456 (the lap's end over its mean) and no fitted number, gives 0.000670 and
+0.002679 nats a place at 2^-9 and 2^-8 where G-W1 read 0.000687 and 0.002464; at 2^-10 and 2^-12 the reads stand on a floor near
+0.0002; at 2^-6 the second-order law gives 0.043 where the read is 0.030.
+
+G-R1  The read part at the store's own spread. MEAN.3000 with each family's entries rounded to the power of two at or under its own
+      rms(END - MEAN) (families_W80t.tsv: 7 to 11 places under the point), the 11 families with no spread left as they are, read on
+      the 800 held frontier rows (139,998 places). The rise over the law's read (1.309612):
+        at that lattice              0.0015 to 0.0035 nats a place   (the ratio law: 0.00235)
+        one place under it           0.0004 to 0.0009                (0.00059)
+        two places over it           0.020  to 0.045                 (0.0376; the law read 0.71 of itself at 2^-6)
+      Why: a place is priced by its ratio to the store's spread and by nothing else.
+
+G-R2  The unit is in the state. By family, (rms(END - MEAN))^2 times the mean root of the second moment, both in the entry's own
+      units: one number for every entry at one rate (atlas deposition.rate-temperature-standing-spread: Sigma = P/2, P = 2^-k/s).
+      Among the families at the base rate, at least 40 of the 54 with a spread stand within a factor 4 of their median; the rank
+      correlation of lg sigma against -1/2 lg s over those families is at least 0.6.
+      Why: if it holds, a lattice is founded from the learner's own lines at any tick, entry by entry, and needs no second state.
+
+G-R3  A bottom's unit is a family's. In the six largest maps (a, b, w, carry, pump and the largest glue map) the rms(END - MEAN) by
+      row: the 95th hundredth of rows over the 5th is under 1.5 places (a factor 2.8) in at least 4 of the 6.
+      Why: a step is a moment over the root of its second moment, even over entries; every large map's spread in the published
+      table stands within half a place of 2^-7.8.
+
+G-R4  A state's unit is its lane's. No number is fixed: the lanes' own rms are not on record. The read: each lane's rms beside the
+      state mask sweep of G-W3 written in places under that lane's rms. The structural guess: written so, the sweep's cost is one
+      curve for every lane, within a factor 2 at each place; written under the point it differs by the square of the lanes' ratio.
+
+G-R5  The arm: E5's split with a located lattice. From the line's state after E4's arm is read, each family's lattice one place
+      under its spread's place (8 to 12 places under the point, a read part of at most 16 bits with its sign), the rest carried,
+      beside a control from the same state, 3,000 sections each, read at MEAN.3000 over as many laps as the scatter between laps asks.
+        (a) the held text within 0.003 nats a place of the control on every region, paired;
+        (b) the held terrain records written whole within 3 of the control's, of 96;
+        (c) the whole word's spread (read part plus rest, END less MEAN) within 15% of the control's in at least 45 of the 54 families;
+        (d) the arm's MEAN.3000, a mean of read parts, within 0.001 nats a place of the same lap's mean of whole words where both are kept.
+      Why: the static rent is 0.0006; the walk's spread is at least the lattice's unit, so the frozen error of a mean of read parts
+      is under a 400th of a grain (grain_relation.txt, D); the forward's noise rises by a 48th of the walk's variance.
+
+Computed, to be verified on the state (no guess): at one place under each family's spread's place every entry's read part with its
+sign fits 16 bits (the greatest 16, the entry mean 11.5), from each family's largest entry and its spread.

@@ -26,7 +26,12 @@ the contact's on `2^(−40)` and the deposit's on `2^(−32)`, and a code's read
 ([`width.rs`](../crates/engine/src/width.rs)). These grains are declared numbers: each has a row in
 [`WIDTHS.tsv`](../crates/engine/WIDTHS.tsv) with its class and its need, read by gate 1 (`tools/width_census.py`), and on
 November 21 fifteen of the 64 declared widths are picked and none is derived from a receiver's tolerance (#1088;
-[the record](../research/records/2026-11-21_A_WIDTH_IS_A_TOLERANCE_A_WORDS_TOP_GROWS_BY_ITS_CARRY_ITS_BOTTOM_STANDS_WHERE_THE_UNREAD_TAIL_NO_LONGER_MOVES_ITS_RECEIVERS_CODE_AND_THE_LATTICE_RULE_THAT_DERIVED_THE_ENGINES_WIDTHS_WAS_BUILT_IN_OCTOBER_AND_NEVER_TAKEN.md)). A series releases each product's remainder below its grain to the nearest numerator
+[the record](../research/records/2026-11-21_A_WIDTH_IS_A_TOLERANCE_A_WORDS_TOP_GROWS_BY_ITS_CARRY_ITS_BOTTOM_STANDS_WHERE_THE_UNREAD_TAIL_NO_LONGER_MOVES_ITS_RECEIVERS_CODE_AND_THE_LATTICE_RULE_THAT_DERIVED_THE_ENGINES_WIDTHS_WAS_BUILT_IN_OCTOBER_AND_NEVER_TAKEN.md)). Each
+of these grains is a count of places under one point, and the point is a gauge: on the line's state W80t the material's own standing
+spread stands at `2^(−7.8)`, so sixteen of its twenty-four places lie under it, and fifteen of a state's sixteen are read by nothing
+(the lead's reads of November 21). A grain is located from its store's spread at its reader's clock and carried in the state
+([the record](../research/records/2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md) §3, §4;
+atlas `radix.grain-is-a-relation`). A series releases each product's remainder below its grain to the nearest numerator
 before the product enters its sum; a map's row forms its whole sum of products and releases it once (`affine`,
 [`adjoint.rs`](../crates/engine/src/adjoint.rs); read November 21). Every sum keeps its terms, so the host
 and any partition of the card give the same bits (CLAUDE.md, the precision law). The chains (the carry circles' scan,
