@@ -1,0 +1,18 @@
+LOUDNESS region=code places=20124 nats_a_place=0.4017 loudness_octaves=21.561 spearman_loud_code=-0.016
+  temperature (energy over the region's mean, a nat): -0.0072   rank-1 share: loudest fifth 0.899, quietest fifth 0.867
+  by lane (octaves): lane0=22.203  lane1=21.210  lane2=21.520  lane3=21.566  lane4=21.575  lane5=21.503  lane6=21.351
+LOUDNESS region=web places=20043 nats_a_place=0.7447 loudness_octaves=21.734 spearman_loud_code=-0.074
+  temperature (energy over the region's mean, a nat): -0.0230   rank-1 share: loudest fifth 0.844, quietest fifth 0.776
+  by lane (octaves): lane0=22.362  lane1=21.354  lane2=21.665  lane3=21.808  lane4=21.747  lane5=21.679  lane6=21.526
+LOUDNESS region=science places=20088 nats_a_place=0.5648 loudness_octaves=21.893 spearman_loud_code=-0.081
+  temperature (energy over the region's mean, a nat): -0.0239   rank-1 share: loudest fifth 0.893, quietest fifth 0.830
+  by lane (octaves): lane0=22.488  lane1=21.492  lane2=21.747  lane3=22.018  lane4=21.934  lane5=21.867  lane6=21.704
+LOUDNESS region=books places=20028 nats_a_place=0.6873 loudness_octaves=22.109 spearman_loud_code=+0.003
+  temperature (energy over the region's mean, a nat): -0.0083   rank-1 share: loudest fifth 0.796, quietest fifth 0.801
+  by lane (octaves): lane0=22.678  lane1=21.645  lane2=21.972  lane3=22.261  lane4=22.194  lane5=22.085  lane6=21.925
+LOUDNESS region=wikidata places=20225 nats_a_place=0.8986 loudness_octaves=21.721 spearman_loud_code=+0.326
+  temperature (energy over the region's mean, a nat): +0.0640   rank-1 share: loudest fifth 0.618, quietest fifth 0.880
+  by lane (octaves): lane0=22.378  lane1=21.438  lane2=21.630  lane3=21.858  lane4=21.615  lane5=21.656  lane6=21.470
+LOUDNESS region=all places=100508 nats_a_place=0.6596 loudness_octaves=21.803 spearman_loud_code=+0.108
+  temperature (energy over the region's mean, a nat): +0.0065   rank-1 share: loudest fifth 0.805, quietest fifth 0.850
+  by lane (octaves): lane0=22.422  lane1=21.428  lane2=21.707  lane3=21.902  lane4=21.812  lane5=21.758  lane6=21.595

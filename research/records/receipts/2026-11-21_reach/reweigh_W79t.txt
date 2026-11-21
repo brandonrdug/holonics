@@ -1,0 +1,12 @@
+REWEIGH head=0 copy tick=0 | phi=0.0: needed 0.032 counterparts 0.064 | phi=0.5: needed 0.044 counterparts 0.051 | phi=1.0: needed 0.053 counterparts 0.035 | phi=2.0: needed 0.048 counterparts 0.010
+REWEIGH head=0 copy tick=1 | phi=0.0: needed 0.501 counterparts 0.231 | phi=0.5: needed 0.580 counterparts 0.170 | phi=1.0: needed 0.635 counterparts 0.120 | phi=2.0: needed 0.677 counterparts 0.058
+REWEIGH head=0 copy tick=2 | phi=0.0: needed 0.653 counterparts 0.279 | phi=0.5: needed 0.738 counterparts 0.198 | phi=1.0: needed 0.804 counterparts 0.135 | phi=2.0: needed 0.873 counterparts 0.061
+REWEIGH head=0 copy tick=3 | phi=0.0: needed 0.587 counterparts 0.237 | phi=0.5: needed 0.643 counterparts 0.185 | phi=1.0: needed 0.690 counterparts 0.142 | phi=2.0: needed 0.747 counterparts 0.081
+REWEIGH head=0 reverse tick=0 | phi=0.0: needed 0.018 counterparts 0.035 | phi=0.5: needed 0.032 counterparts 0.029 | phi=1.0: needed 0.049 counterparts 0.021 | phi=2.0: needed 0.066 counterparts 0.007
+REWEIGH head=0 reverse tick=1 | phi=0.0: needed 0.025 counterparts 0.046 | phi=0.5: needed 0.035 counterparts 0.041 | phi=1.0: needed 0.044 counterparts 0.034 | phi=2.0: needed 0.053 counterparts 0.021
+REWEIGH head=0 reverse tick=2 | phi=0.0: needed 0.317 counterparts 0.126 | phi=0.5: needed 0.382 counterparts 0.096 | phi=1.0: needed 0.435 counterparts 0.070 | phi=2.0: needed 0.496 counterparts 0.033
+REWEIGH head=0 reverse tick=3 | phi=0.0: needed 0.759 counterparts 0.056 | phi=0.5: needed 0.826 counterparts 0.039 | phi=1.0: needed 0.877 counterparts 0.026 | phi=2.0: needed 0.938 counterparts 0.011
+REWEIGH head=0 sum tick=0 | phi=0.0: needed 0.263 counterparts 0.140 | phi=0.5: needed 0.287 counterparts 0.121 | phi=1.0: needed 0.306 counterparts 0.103 | phi=2.0: needed 0.329 counterparts 0.068
+REWEIGH head=0 sum tick=1 | phi=0.0: needed 0.351 counterparts 0.062 | phi=0.5: needed 0.376 counterparts 0.051 | phi=1.0: needed 0.396 counterparts 0.042 | phi=2.0: needed 0.423 counterparts 0.028
+REWEIGH head=0 sum tick=2 | phi=0.0: needed 0.326 counterparts 0.091 | phi=0.5: needed 0.358 counterparts 0.073 | phi=1.0: needed 0.384 counterparts 0.058 | phi=2.0: needed 0.423 counterparts 0.035
+REWEIGH head=0 sum tick=3 | phi=0.0: needed 0.352 counterparts 0.159 | phi=0.5: needed 0.401 counterparts 0.134 | phi=1.0: needed 0.446 counterparts 0.109 | phi=2.0: needed 0.521 counterparts 0.066

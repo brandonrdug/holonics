@@ -1,0 +1,21 @@
+TERRAIN_SCORE W80t whole 37/96 opening 38/96 first 63/96 | sum 7/7/10 of 16 difference 7/7/8 of 16 product 4/4/9 of 16 close 11/12/16 of 16 copy 3/3/7 of 16 reverse 5/5/13 of 16
+  W80t sum: 7 + 5 = '12\\n56' (want 12) | 57 + 9 = '86\\n26' (want 66) | 730 + 929 = '1359\\n10' (want 1659)
+  W80t difference: 82 - 49 = '22\\n21' (want 33) | 32 - 28 = '4\\n45' (want 4) | 97 - 34 = '63\\n47' (want 63)
+  W80t product: 7 * 3 = '28\\n25' (want 21) | 93 * 7 = '291\\n3 ' (want 651) | 67 * 0 = '0\\n1 ' (want 0)
+  W80t close: ( ( { { = '} } ) )\\n( ' (want } } ) )) | { [ [ [ [ = '] ] ] ] }\\n( ' (want ] ] ] ] }) | ( ( ( [ { [ = '] } ] ) ) )\\n( ' (want ] } ] ) ) ))
+  W80t copy: copy 1 5 2 0 4 7 7 = '1 5 2 0 3 7 7\\nco' (want 1 5 2 0 4 7 7) | copy 2 7 2 7 4 0 = '2 9 1 1 3 6\\nco' (want 2 7 2 7 4 0) | copy 0 6 9 = '6 0 8\\nco' (want 0 6 9)
+  W80t reverse: reverse 0 7 5 4 4 = '4 4 6 7 3\\nre' (want 4 4 5 7 0) | reverse 7 4 4 = '8 4 2\\nre' (want 4 4 7) | reverse 0 1 9 4 = '4 9 7 5\\nre' (want 4 9 1 0)
+TERRAIN_SCORE W80r whole 30/96 opening 32/96 first 63/96 | sum 4/4/10 of 16 difference 7/7/10 of 16 product 5/5/7 of 16 close 8/10/16 of 16 copy 3/3/7 of 16 reverse 3/3/13 of 16
+  W80r sum: 7 + 5 = '13\\n59' (want 12) | 57 + 9 = '86\\n78' (want 66) | 730 + 929 = '1469\\n29' (want 1659)
+  W80r difference: 82 - 49 = '23\\n13' (want 33) | 32 - 28 = '14\\n1' (want 4) | 97 - 34 = '63\\n85' (want 63)
+  W80r product: 7 * 3 = '21\\n47' (want 21) | 93 * 7 = '271\\n2 ' (want 651) | 67 * 0 = '0\\n6 ' (want 0)
+  W80r close: ( ( { { = '} } ) )\\n( ' (want } } ) )) | { [ [ [ [ = '] ] ] ] }\\n[ ' (want ] ] ] ] }) | ( ( ( [ { [ = '] } ] ) ) )\\n[ ' (want ] } ] ) ) ))
+  W80r copy: copy 1 5 2 0 4 7 7 = '1 9 4 0 3 7 7\\nco' (want 1 5 2 0 4 7 7) | copy 2 7 2 7 4 0 = '2 7 2 7 4 6\\nco' (want 2 7 2 7 4 0) | copy 0 6 9 = '6 0 8\\nco' (want 0 6 9)
+  W80r reverse: reverse 0 7 5 4 4 = '4 4 5 7 3\\nre' (want 4 4 5 7 0) | reverse 7 4 4 = '0 8 7\\nre' (want 4 4 7) | reverse 0 1 9 4 = '4 9 1 5\\nre' (want 4 9 1 0)
+TERRAIN_SCORE W80g whole 41/96 opening 42/96 first 70/96 | sum 6/6/11 of 16 difference 9/9/11 of 16 product 3/3/7 of 16 close 11/12/16 of 16 copy 7/7/10 of 16 reverse 5/5/15 of 16
+  W80g sum: 7 + 5 = '13\\n95' (want 12) | 57 + 9 = '76\\n33' (want 66) | 730 + 929 = '1579\\n31' (want 1659)
+  W80g difference: 82 - 49 = '23\\n69' (want 33) | 32 - 28 = '4\\n68' (want 4) | 97 - 34 = '63\\n0 ' (want 63)
+  W80g product: 7 * 3 = '28\\n6 ' (want 21) | 93 * 7 = '909\\n12' (want 651) | 67 * 0 = '0\\n50' (want 0)
+  W80g close: ( ( { { = '} } ) )\\n( ' (want } } ) )) | { [ [ [ [ = '] ] ] ] }\\n( ' (want ] ] ] ] }) | ( ( ( [ { [ = '] } ] ) ) )\\n( ' (want ] } ] ) ) ))
+  W80g copy: copy 1 5 2 0 4 7 7 = '1 5 2 0 3 7 7\\nco' (want 1 5 2 0 4 7 7) | copy 2 7 2 7 4 0 = '2 8 2 7 4 2\\nco' (want 2 7 2 7 4 0) | copy 0 6 9 = '0 6 9\\nco' (want 0 6 9)
+  W80g reverse: reverse 0 7 5 4 4 = '4 4 5 7 3\\nre' (want 4 4 5 7 0) | reverse 7 4 4 = '4 4 7\\nre' (want 4 4 7) | reverse 0 1 9 4 = '4 9 7 5\\nre' (want 4 9 1 0)

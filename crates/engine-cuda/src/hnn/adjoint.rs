@@ -58,6 +58,8 @@ pub(crate) struct Back<'c> {
     /// Read through `words.cds`; held here for its memory.
     pub(crate) _cds: Pooled<'c, i64>,
     pub(crate) pr_back: Pooled<'c, i64>,
+    /// [the lead, November 21] The friction's gate's row covectors `[t][H]` (`words.dfgate`), none where the field has no gate.
+    pub(crate) dfgate: Option<Pooled<'c, i64>>,
 }
 
 impl<'c> Resident<'c> {
@@ -79,7 +81,12 @@ impl<'c> Resident<'c> {
         let regions = words.r as usize;
         let rows = sites + regions;
         let paced = d.paced_heads();
-        let Back { dx, dr, dc, da, db, dg, dpump, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, .. } = b;
+        let Back { dx, dr, dc, da, db, dg, dpump, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, cv, cw, pr_back, dfgate, .. } = b;
+        // [the lead, November 21] The gate's row covectors start at zero a tick: a row the rows' kernel skips returns none.
+        if let Some(df) = dfgate.as_ref() {
+            words.dfgate = df.device_ptr();
+            card.zero_octets(df, 0, 8 * sites * heads).map_err(device)?;
+        }
         words.qf = tick.qf.device_ptr();
         words.qf32 = tick.qf32.device_ptr();
         words.pq = tick.pq.device_ptr();
@@ -270,6 +277,12 @@ impl<'c> Resident<'c> {
             self.outer_biased(words, g, weight, bias, m2, dw, chart.device_ptr(), m2, tick.read.device_ptr(), dw, false, false)?;
             self.transposed(words, weight, m2, dw, chart.device_ptr(), m2, dr.device_ptr(), true, false)?;
         }
+        // [the lead, November 21] The friction's gate, a chart of the read with one output a head: `Σ_t δψ(t) r̂(t)ᵀ` into `a`, and `aᵀ δψ(t)` into
+        // the read's covector ([`holonics_engine::field::Declaration::friction_gate`]).
+        if let Some(df) = dfgate.as_ref() {
+            self.outer_biased(words, g, words.gate_at, u64::MAX, heads, dw, df.device_ptr(), heads, tick.read.device_ptr(), dw, false, false)?;
+            self.transposed(words, words.gate_at, heads, dw, df.device_ptr(), heads, dr.device_ptr(), true, false)?;
+        }
         self.ratio_adjoint(words, tick.read.device_ptr(), tick.scale.device_ptr(), dr.device_ptr(), dmid.device_ptr(), dx.device_ptr(), false)?;
         Ok(())
     }
@@ -328,10 +341,13 @@ impl<'c> Resident<'c> {
         };
         let cds = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((heads * sites * words.slots as usize).max(1))).map_err(device)?;
         let pr_back = alloc64(sites * m2)?;
+        // [the lead, November 21] The friction's gate's row covectors `[t][H]`, none where the field has no gate.
+        let dfgate = if d.friction_gate { Some(alloc64(sites * heads)?) } else { None };
+        words.dfgate = dfgate.as_ref().map_or(0, |b| b.device_ptr());
         words.gtau = gtau.device_ptr();
         words.gsig = gsig.device_ptr();
         words.cds = cds.device_ptr();
-        Ok(Back { dx, dr, dc, da, db, dg, dpump, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, _dpb: dpb, cv, cw, dm, gtau, gsig, _cds: cds, pr_back })
+        Ok(Back { dx, dr, dc, da, db, dg, dpump, dh, dct, dabg, ra, rb, dmid, dy, dyh, dq, dv, dp, ds, _dpb: dpb, cv, cw, dm, gtau, gsig, _cds: cds, pr_back, dfgate })
     }
 
     #[allow(clippy::too_many_arguments)]

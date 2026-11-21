@@ -1,0 +1,34 @@
+Fixed 2026-11-21T16:25:13Z (date -u), before read-reach's codes are read (the read launched a minute before; nothing of it read). G-R1: at W79t's
+MEAN.3000, read by two streams, a ruler's friction of one bit an octave of distance on head 0's listeners (0:1:1000) lowers the code of a
+copy's answer digits by at least 0.15 nats a digit and a reversal's by at least 0.10, a sum's by at least 0.03, against the law; and costs
+the 800 held frontier rows of text under 0.03 nats a place (all places). Why: head 0's rows at fixed keys, reweighed by that friction, move
+a copy's needed share at tick 2 from 0.65 to 0.80 and its counterparts in the earlier records from 0.28 to 0.14 (reweigh.py).
+
+Scored (2026-11-21T16:40:08Z, date -u): G-R1 held on every clause. At 0:1:1000 the answer digits code, against the law: copies 0.541 -> 0.059
+nats a digit, reversals 0.445 -> 0.048, sums 1.024 -> 0.648 (the hundreds 2.465 -> 1.409); the 800 frontier rows +0.0148 nats a place
+(1.3087 -> 1.3235; code +0.013, wikidata +0.023, books +0.003). At 0:1:500: 0.160, 0.145, 0.783, text +0.0029. At 0:1:2000: 0.025, 0.049,
+0.525, text +0.075. Both still heads (0 and 1 at 1000): 0.056, 0.052, 0.643, text +0.019. The turned heads (2 and 3 at 1000): 1.044,
+0.778, 1.000, text +0.027, both worse.
+
+Fixed 2026-11-21T16:57:07Z (date -u), before W80r trains (reach/w80.sh). G-F1: W80r (W79t's end with each head's friction of distance
+founded at zero) beside W80t (W79t's end, no change), 3,000 sections each, read at their MEAN.3000: W80r writes at least 40 of 96 held
+terrain records whole and at least 8 of 16 copies, where W80t writes at most 33 and 5; W80r's answer digits by two streams (reach rows, the
+law) code at most 0.30 nats a copy digit and 0.85 a sum digit, W80t's at least 0.45 and 0.95; W80r's text at one place open within 0.02 nats
+a place of W80t's on every region; and head 0's listeners' friction at W80r's STATE.3000 stands at a quarter of a bit an octave or more.
+Why: the ruler's friction at half a bit took copy digits 0.54 -> 0.16 and text +0.003 (G-R1), and the deposit moves a face-grain entry at
+most 2^(-12) bits an octave a section, 0.73 over a lap where its covector holds its sign.
+
+Fixed 2026-11-21T18:44:10Z (date -u), before W80g trains (reach/w80g.sh). G-G1: W80g (W79t's end with each head's friction and its gate on the
+receiver's own state founded at zero) beside W80t (W79t's end, no change), 3,000 sections, read at MEAN.3000: the reach rows' answer digits
+by two streams code at most 0.35 nats a copy digit and 1.00 a sum digit (W80t: 0.549 and 1.139); W80g writes at least 34 of 96 held
+terrain records whole and at least 6 of 16 copies; its text at one place open within 0.02 nats a place of W80t's on every region.
+Why: the gate's ruler (site_friction.py) kept the whole terrain gain at a third of the text's price where a fixed friction of one bit
+stood; trained from zero, a third of that gain is guessed within a lap. W80r's G-F1 is scored when its reads land.
+
+Scored (2026-11-21T20:00:46Z, date -u): G-F1 missed on its writes, codes and friction, held on text. W80r 30 of 96 whole (40 asked), copies 3 of 16
+(8 asked); copy digits 0.537 (0.30 asked), sum digits 1.051 (0.85 asked); W80t wrote 37 and 3, its digits 0.549 and 1.139 (the control's
+clauses: at most 33 and 5 held on copies, missed on whole records); text +0.0001 (held); head 0's listeners' friction at STATE.3000 -2748
+on 2^(-16), -0.042 bits an octave (0.25 asked). The friction without its gate leaves the line.
+Scored (2026-11-21T20:00:46Z, date -u): G-G1 held on every clause. W80g's copy digits 0.269 (0.35 asked), sum digits 0.983 (1.00 asked); 41 of 96
+whole (34 asked), 7 of 16 copies (6 asked); text at one place open -0.0001 (+-0.0002) against W80t, every region within 0.002 (0.02 asked).
+The line takes the gate: W80g's end is its state.

@@ -64,3 +64,11 @@ wrote, in all 100. G-W2 so far: W78t's MEAN.3000 wrote 29 of 96 whole (missed 30
 
 Scored (2026-11-21T11:33:56Z, date -u): G-W2 split: W78t 29 of 96 whole (missed 30), sums 4 of 16 (missed 6); L78 0 of 96 (held);
 W78t's text at one place open +0.0129 (±0.0009) against L78's, at most +0.0195 in wikidata (held); the frontier read +0.0201, wikidata +0.0431.
+
+Fixed 2026-11-21T11:40:55Z (date -u), before W79t trains. G-W3: W79t (W78t's end, a third lap) writes at least 35 of 96 held records whole and at least
+6 of 16 on sums at its MEAN.3000; L79 (L78's end) at most 2; W79t's text at one place open within 0.03 nats a place of L79's on every region.
+
+Scored (2026-11-21T12:21:02Z, date -u): G-W3 missed: W79t's MEAN.3000 wrote 27 of 96 whole (35 asked; W78t 29), sums 4 of 16
+(6 asked); the 21-prompt panel 31 of 168 as at W78t. The terrain's gain stands still in its third lap. L79 and the text pending.
+Scored (2026-11-21T13:17:27Z, date -u), G-W3's rest: L79 1 of 96 (held); W79t's text at one place open +0.0122 (±0.0010), at most
++0.0155 in code (held); the frontier read +0.0136.
