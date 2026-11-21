@@ -1,0 +1,73 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index 36209e419..ab0bfd002 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -957,6 +957,31 @@ __device__ __forceinline__ wide pair_skin_word(const FieldWords &w, int32_t p, u
+     return skin_word(w, w.skin[((uint64_t)p * w.E2 + entry) * w.n + l]);
+ }
+ 
++// [realization; the lead, November 21, the contact kernels' source counters] **A staged term's skins**: the `n ≤ 8` modes' words of paced head
++// `p` at support entry `entry` read once, as `pair_skin_word` reads each (a word above `2^30` was never formed: it is refused and enters as zero),
++// into the warp's staged row, so that the lane holding a chunk's term issues its loads beside every other term's.
++__device__ __forceinline__ void stage_skin_words(const FieldWords &w, int32_t p, uint64_t entry, uint32_t n, uint32_t *out) {
++    const uint32_t *src = w.skin + ((uint64_t)p * w.E2 + entry) * n;
++    uint32_t v[8];
++    if (n == 8) {
++        const uint4 *s4 = reinterpret_cast<const uint4 *>(src);
++        const uint4 a = s4[0], b = s4[1];
++        v[0] = a.x; v[1] = a.y; v[2] = a.z; v[3] = a.w;
++        v[4] = b.x; v[5] = b.y; v[6] = b.z; v[7] = b.w;
++    } else {
++#pragma unroll
++        for (uint32_t l = 0; l < 8; l++) {
++            v[l] = l < n ? src[l] : 0;
++        }
++    }
++#pragma unroll
++    for (uint32_t l = 0; l < 8; l++) {
++        if (l < n) {
++            out[l] = (uint32_t)skin_word(w, v[l]);
++        }
++    }
++}
++
+ // A crowd's slot from its octave and side (`crowd_at`: `level = 2 + slot/2`, the even slots on the left).
+ __device__ __forceinline__ uint32_t crowd_slot_of(uint32_t level, bool right) {
+     return 2 * (level - 2) + (right ? 1u : 0u);
+@@ -3878,6 +3903,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
+     __shared__ uint64_t st0[CONTACT_ROWS][32], st1[CONTACT_ROWS][32], st2[CONTACT_ROWS][32];
+     __shared__ uint32_t crlo[CONTACT_ROWS][32], crhi[CONTACT_ROWS][32], crlv[CONTACT_ROWS][32];
+     __shared__ RowCls rcs[CONTACT_ROWS];
++    // A chunk's staged terms' paced skins, `[rank][mode]` (`stage_skin_words`).
++    __shared__ uint32_t skn[CONTACT_ROWS][32][8];
+     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
+     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
+     const uint32_t parts = span_parts(S);
+@@ -3925,6 +3952,8 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
+         const bool still_h = skinless(w, h), paced_h = paced_at(w, h, g);
+         // [realization; theory, November 16 00:55Z] The row's head is fixed, so its pace index is read once a row, not a term.
+         const int32_t ph = paced_index(w, h);
++        // [realization; the lead, November 21] A paced head's skins are staged with the chunk's terms where its modes fit the staged row.
++        const bool stage_skins = paced_h && !still_h && n <= 8 && w.skin != nullptr;
+         const auto numerators = [&](bool crowd, uint32_t nvalid) {
+             if (!active) {
+                 return;
+@@ -3965,7 +3994,7 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
+                         const uint32_t gap = j > ip ? j - ip : ip - j;
+                         const int64_t raw = values[(uint64_t)j * S + entry];
+                         // (a head of eight modes reads its skin from the vector table: the eight modes of a gap stand together)
+-                        const int64_t v = still_h ? raw : paced_h ? carry_d((uint64_t)pair_skin_word(w, ph, srow + stk[warp][pos], m), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
++                        const int64_t v = still_h ? raw : paced_h ? carry_d(stage_skins ? (uint64_t)skn[warp][pos][m] : (uint64_t)pair_skin_word(w, ph, srow + stk[warp][pos], m), raw) : w.n == 8 ? carry_d((uint64_t)w.decay_t[((uint64_t)h * w.dreach + gap) * 8 + m], raw) : carried_s(w, h, m, gap, raw);
+                         const bool neg = v < 0;
+                         const uint64_t mag = neg ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
+                         const uwide lo = (uwide)st0[warp][pos] * (uwide)mag;
+@@ -4086,6 +4115,9 @@ __device__ void contact_body(const FieldWords &w, uint32_t store) {
+                     sts[warp][rank] = key;
+                     stj[warp][rank] = j;
+                     stk[warp][rank] = k;
++                    if (stage_skins) {
++                        stage_skin_words(w, ph, srow + k, n, skn[warp][rank]);
++                    }
+                 }
+             } else {
+                 st0[warp][lane] = cf.c0;

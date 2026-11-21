@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 01:30 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 01:40 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -98,6 +98,11 @@ the one the rows' words already took on November 16: a chunk's skins, values and
 loads stand in flight at once. It keeps every bit (the same terms in the same order). The contact family holds about 95 ms of a
 section's 512 (rows 27, columns 22, the forward contact 16, the paced skins' return 14, the skins' fill 8 and the exposure 8, from the
 merged build's trace of 40 sections), 31.5 times its floor; it is the realization's next item, beside the arm of §3.
+
+The first such change (01:25 to 01:36 UTC, [its receipt](receipts/2026-11-21_tick-gains/README.md)): the forward contact's paced skins
+staged with the chunk's terms, every bit kept (the card's suite, 24 sections of L71 reproduced). The kernel reads 7.5% shorter a launch
+and the section 2.6 ms shorter in a warmed hold (520.4 against 517.8, spreads 2.4 and 2.0); the guess of 10 to 18% on the kernel missed,
+because the skin lines' samples were waits that the values' loads beside them still stand behind (`agent-inferred`).
 
 ## 5. What the pass's ticks change
 
