@@ -383,6 +383,7 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
     // A row's fourth field, where it stands, names its opening: `suffix` opens the run from a keyed place to its end (the state a write
     // in place order meets: every earlier place known, every later one open); absent, a keyed half of the run's places.
     // `first` opens the row's prompt and holds its run known: a place compared on what stands to its right (the backward reader's state).
+    // `strand` reads the row by two streams, every place compared at its own frontier.
     let mut rows: Vec<(String, Vec<usize>, Vec<usize>, u8)> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
@@ -397,7 +398,12 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
             None | Some("") => 0u8,
             Some("suffix") => 1,
             Some("first") => 2,
-            Some(_) => return Err("a forms row whose opening is not `suffix` or `first`".into()),
+            // [the lead, November 21] `strand`: the row read by two streams as the pass reads its frontier ([`OwnedRegion::strand`], with
+            // the pass's `past` and `second`), every place compared at its own frontier: the regime the writer (`write-next`) reads a state
+            // in whose pass reads so. Why: the dwell on plain rows founded the held sums' digit (0.0005 nats) and its free writes came out
+            // 0 of 95, because L76's pass reads by two streams and the writer reads there.
+            Some("strand") => 3,
+            Some(_) => return Err("a forms row whose opening is not `suffix`, `first` or `strand`".into()),
         };
         rows.push((w[0].to_string(), p, r, opening));
     }
@@ -520,6 +526,11 @@ pub fn try_passes(args: &[String], realization: &mut dyn holonics_engine::realiz
                     let mut classes = p.clone();
                     classes.extend_from_slice(r);
                     let mut open = vec![false; classes.len()];
+                    if *opening == 3 {
+                        let (past, second) = learner.pass.as_ref().map_or((false, false), |q| (q.past, q.second));
+                        let n = classes.len();
+                        return OwnedRegion { strand: true, past, second, ..OwnedRegion::plain(classes, vec![false; n]) };
+                    }
                     if *opening == 2 {
                         open[..p.len()].fill(true);
                     } else if *opening == 1 {

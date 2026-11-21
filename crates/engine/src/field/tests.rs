@@ -4431,7 +4431,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     let text = learner.to_text();
     assert_eq!(text, format!("{plain}{}\n", pass.to_line()), "the pass line follows every other line");
     // [the lead, November 21] A terrain's line follows the pass line only where set, reads back as itself, and its share is its tension's.
-    let held = StorePass { terrain: Some(PassTerrain { records: 4, met: 99, tension_world: 3_000_000, tension_passage: 1_000_000 }), ..pass.clone() };
+    let held = StorePass { terrain: Some(PassTerrain { records: 4, met: 99, tension_world: 3_000_000, tension_passage: 1_000_000, suffix: false, strand: false }), ..pass.clone() };
     learner.pass = Some(held.clone());
     let with_terrain = learner.to_text();
     assert_eq!(with_terrain, format!("{plain}{}\nterrain 4 99 3000000 1000000\n", pass.to_line()));
@@ -4439,6 +4439,13 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
     let t = held.terrain.clone().unwrap();
     assert_eq!((t.share(41_490), PassTerrain { tension_world: 0, tension_passage: 0, ..t.clone() }.share(41_490)), (31_117, 20_745));
     assert!(PassTerrain::from_line("terrain 0 1 2 3").is_err() && PassTerrain::from_line("terrain 4 1 2").is_err());
+    let suffix = PassTerrain { suffix: true, ..t.clone() };
+    assert_eq!(suffix.to_line(), "terrain 4 99 3000000 1000000 suffix");
+    assert_eq!(PassTerrain::from_line(&suffix.to_line()).unwrap(), suffix);
+    assert!(PassTerrain::from_line("terrain 4 99 1 2 prefix").is_err());
+    let strand = PassTerrain { strand: true, ..t.clone() };
+    assert_eq!(strand.to_line(), "terrain 4 99 3000000 1000000 strand");
+    assert_eq!(PassTerrain::from_line(&strand.to_line()).unwrap(), strand);
     learner.pass = Some(pass.clone());
     let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.pass.as_ref(), back.to_text()), (Some(&pass), text.clone()));
