@@ -1,0 +1,4 @@
+STORE_TERRAIN n=0 regions=369 records=738 budget=13198 met=2244084 world_code=1527874 passage_code=3640436 next_share=12265
+STORE_TERRAIN n=1000 regions=369 records=738 budget=12964 met=2950298 world_code=1501007 passage_code=3466803 next_share=12536
+STORE_TERRAIN n=2000 regions=315 records=630 budget=11496 met=3656980 world_code=1497851 passage_code=3618832 next_share=12145
+STORE_TERRAIN n=2999 regions=377 records=754 budget=13518 met=4356794 world_code=1480472 passage_code=3335104 next_share=12755

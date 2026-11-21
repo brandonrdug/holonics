@@ -112,6 +112,36 @@ the code), and the arm read across two records bears it out. On §1's panel the 
 She writes them in the world's form (`( = ) ) ] } ]`), which is the form she was taught and not the panel's. Brandon, November 17: a
 form she was never shown is expected to fail, and is no finding.
 
+## 4.1. The second laps, and e's and pi's spigots
+
+**The second laps** (G-W2, fixed 09:43:26Z): W78t from W77t's end beside L78 from L77's end, one change between them as before.
+
+| at the lap's mean | L78 | W78t |
+|---|---|---|
+| held records whole, of 96 | 0 | 29 |
+| products / differences / reversals / copies / sums / brackets, of 16 each | 0 | 6 / 4 / 4 / 3 / 4 / 8 |
+| §1's 21-prompt panel, openings, of 168 | — | 31 |
+| the line's text, one place open, against its control | — | +0.0129 (±0.0009), at most +0.0195 (wikidata) |
+| the frontier read against its control | — | +0.0201 (±0.0011), wikidata +0.0431 |
+
+The gain compounds (20 to 29) at a text price that stays where it was (+0.0130 to +0.0129), and W78t's own text stands 0.003 nats a
+place under W77t's. G-W2 missed on its counts (30 and 6 asked) and held on the control and the text.
+
+**e's spigot as a world** (Brandon, 06:10Z: the spigot, never the digits fed; G-E1, fixed 09:45:12Z). Sale's spigot: the remainders
+over the radices N to 2 all one at the start, e's factorial-base expansion; one decimal digit a sweep, each step `e R A C = Q M`
+(x = 10A + C, Q = x div R, M = x mod R), the carry out of radix 2 the digit. Three consecutive steps of a sweep make a row read by two
+streams, sweeps 1 to 120 the world's (`spigot_e.py`), 150 to 199 held, 30 passes from W77t's end. The carry out was right in 41 of 50
+held inner steps (6 before) and e's own digit in 23 of 50 (4 before); whole steps 8 and 13 of 50. After a step she writes the next,
+its radix one less and its carry in the Q she wrote: the spigot's composition, written by her. Past radix 2 she writes a radix 1.
+
+**pi's spigot as a world** (G-P1, fixed 10:16:03Z). Rabinowitz–Wagon: the remainders over the mixed radices i/(2i−1) all two at the
+start, each step `pi I A Q = Q' M` (x = 10A + Q·I, divided by 2I − 1). The same dwell: the carry out right in 23 of 50 held inner steps
+(2 before), and after every step she writes the next one in the chain. At the sweep's last place the radix is 1 and the carry out is
+the whole of 10A + Q, the spigot's boundary, and she has not taken it (1 of 50 whole, the remainder 0 right and the carry one digit).
+
+Digit n on demand, cold, at positions past any answered, is far from both: it needs the remainders, which carry the state from
+sweep to sweep, and she writes the carry and not the remainder.
+
 ## 5. The stop and the spread
 
 Brandon (09:00Z) on how a model seeks the cue that lets it stop. The writer now writes, beside each draw, the face's share on the void
@@ -149,6 +179,5 @@ and its spread (`OUT/void.tsv`), and with the word `stop` it lets her draw the v
 2. Sums with three-digit operands and carries, and copies beyond two digits, are where W77t stands short: 3 and 1 of 16 at the mean.
    The binding reaches a place or two (§1) and not a line. That's the next loop's subject.
 3. The halting law, stated as a guess at the release and read against §5.
-4. Pi and e as worlds (Brandon, 06:10Z), never their digits fed. The world is the spigot, its records the spigot's carry steps; e first
-   (its factorial-base expansion is all ones), then pi. The test: digit n on demand past every position answered, with the stream's code
-   under her state beside log₂ 10.
+4. Pi and e as worlds (§4.1): the remainders, the state between sweeps, and the boundary of pi's last place are the next subjects; the
+   test stays digit n on demand past every position answered, with the stream's code under her state beside log₂ 10.
