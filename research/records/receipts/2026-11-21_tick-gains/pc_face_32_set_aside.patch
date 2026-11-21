@@ -1,0 +1,142 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index 40e4b4ebb..7fdd2f66d 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -395,7 +395,10 @@ struct FieldWords {
+     uint64_t *e;
+     const uint64_t *e_prev;
+     int64_t *y;
+-    int64_t *pa, *pb, *pc;
++    // [realization; the lead, November 21] The pair's face `c` stands within 23 bits on the trained state (the carriers' census of November 20):
++    // kept on 32 bits, written through `fit32`, so the pair's return `W` and its outer sum read it on the 32-bit (tensor-unit) maps.
++    int64_t *pa, *pb;
++    int32_t *pc;
+     // The tick's magnitude (the binary length of the largest unit word, `bits[0]`) and the
+     // exponential's resident face.
+     uint32_t *bits;
+@@ -2335,11 +2338,12 @@ extern "C" __global__ void __launch_bounds__(256, 2) field_outer_x64(FieldWords
+ // `wmax · xmax · (cols + 1) + wmax₂ · x₂max · (cols₂ + 1)` (each at most `2^126`, so their sum never wraps 128 bits), refused at `2^126`; the sum in 64
+ // bits below `2^62` and in 128 otherwise (the same integer either way). With `add`, the result is added to `add[t][o]` (the residual). One thread a
+ // `(site, output)` cell.
+-__device__ void affine_two(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
++__device__ void affine_two(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+     const uint64_t cells = (uint64_t)w.T * rows;
+     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+         const uint64_t t = c / rows, o = c % rows;
+-        const int64_t *xt = x + t * x_stride, *x2t = x2 + t * x2_stride;
++        const int32_t *xt = x + t * x_stride;
++        const int64_t *x2t = x2 + t * x2_stride;
+         uint64_t xmax = 0, x2max = 0;
+         for (uint32_t i = 0; i < cols; i++) {
+             const uint64_t m = mag64(xt[i]);
+@@ -2392,7 +2396,7 @@ __device__ void affine_two(const FieldWords &w, uint64_t weight, uint64_t bias,
+ // memory, then each pass's joint carrier bound a site (`per` of them, 128 bits each) and the pass's site rows of both blocks, and each thread forms one
+ // `(site, output)` cell. The same integers as `affine_two`: the joint bound, the sum in 64 bits below `2^62` and in 128 otherwise, the bias at the
+ // material's grain, the one release and the residual.
+-__device__ void affine_two_tiled(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
++__device__ void affine_two_tiled(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+     extern __shared__ __align__(16) unsigned char affine_two_shared[];
+     const uint32_t stride = cols + 1, stride2 = cols2 + 1;
+     int32_t *ws = (int32_t *)affine_two_shared;
+@@ -2478,11 +2482,11 @@ __device__ void affine_two_tiled(const FieldWords &w, uint64_t weight, uint64_t
+     }
+ }
+ 
+-extern "C" __global__ void field_affine_two_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
++extern "C" __global__ void field_affine_two_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+     affine_two(w, weight, bias, wmax, rows, cols, x, x_stride, weight2, wmax2, cols2, x2, x2_stride, out, out_stride, add);
+ }
+ 
+-extern "C" __global__ void field_affine_two_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int64_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
++extern "C" __global__ void field_affine_two_tiled_x64(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, uint64_t weight2, uint64_t wmax2, uint32_t cols2, const int64_t *x2, uint64_t x2_stride, int64_t *out, uint64_t out_stride, int64_t *add) {
+     affine_two_tiled(w, weight, bias, wmax, rows, cols, x, x_stride, weight2, wmax2, cols2, x2, x2_stride, out, out_stride, add);
+ }
+ 
+@@ -4522,8 +4526,8 @@ extern "C" __global__ void field_pair(FieldWords w) {
+         const uint64_t s = w.before && e % 2 == 1 ? (before_past(w) ? strand_mate_back2(w, t) : UINT64_MAX) : strand_mate(w, t, e);
+         const wide ar = w.pa[re], ai = w.pa[im];
+         const wide br = s == UINT64_MAX ? 0 : w.pb[s * w.f + e], bi = s == UINT64_MAX ? 0 : w.pb[s * w.f + half + e];
+-        w.pc[re] = fit64(rel(ar * br - ai * bi, FACE_BITS), w.status);
+-        w.pc[im] = fit64(rel(ar * bi + ai * br, FACE_BITS), w.status);
++        w.pc[re] = fit32(rel(ar * br - ai * bi, FACE_BITS), w.status);
++        w.pc[im] = fit32(rel(ar * bi + ai * br, FACE_BITS), w.status);
+     }
+ }
+ 
+@@ -4624,8 +4628,8 @@ extern "C" __global__ void field_pair_scan_face(FieldWords w) {
+         const uint64_t re = t * w.f + plain + k, im = re + half, gr = t * c2 + k, gi = gr + C;
+         const wide qr = w.pqm[gr], qi = w.pqm[gi];
+         const wide ar = w.pa[re], ai = w.pa[im];
+-        w.pc[re] = fit64(rel(ar * qr - ai * qi, FACE_BITS), w.status);
+-        w.pc[im] = fit64(rel(ar * qi + ai * qr, FACE_BITS), w.status);
++        w.pc[re] = fit32(rel(ar * qr - ai * qi, FACE_BITS), w.status);
++        w.pc[im] = fit32(rel(ar * qi + ai * qr, FACE_BITS), w.status);
+     }
+ }
+ 
+diff --git a/crates/engine-cuda/src/hnn/adjoint.rs b/crates/engine-cuda/src/hnn/adjoint.rs
+index 416aca8a5..294c07eed 100644
+--- a/crates/engine-cuda/src/hnn/adjoint.rs
++++ b/crates/engine-cuda/src/hnn/adjoint.rs
+@@ -110,7 +110,7 @@ impl<'c> Resident<'c> {
+         words.pc = tick.pc.device_ptr();
+         set_triads(words, tick);
+         // The pair contact: x_out = x_mid + W_c c + b_c.
+-        self.outer_biased(words, g, words.w, words.w_bias, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, true, false)?;
++        self.outer_biased(words, g, words.w, words.w_bias, dw, f, dx.device_ptr(), dw, tick.pc.device_ptr(), f, false, false)?;
+         self.transposed(words, words.w, dw, f, dx.device_ptr(), dw, dc.device_ptr(), false, false)?;
+         // [definition; theory, November 12; the triad record §4] The triads' reverse, by the product rule through the producing operands: `W_T`'s
+         // covector `Σ_t δx_t c^T_tᵀ`, the products' covector `δc^T = W_Tᵀ δx` a site, then the legs' covectors `δα`, `δβ`, `δγ` (`field_triad_back`), each
+diff --git a/crates/engine-cuda/src/hnn/contact.rs b/crates/engine-cuda/src/hnn/contact.rs
+index e6b7196f9..022db0198 100644
+--- a/crates/engine-cuda/src/hnn/contact.rs
++++ b/crates/engine-cuda/src/hnn/contact.rs
+@@ -151,7 +151,7 @@ pub(crate) struct Tick<'c> {
+     pub(crate) pp: Option<Pooled<'c, i64>>,
+     pub(crate) peta: Option<Pooled<'c, i32>>,
+     pub(crate) pb: Pooled<'c, i64>,
+-    pub(crate) pc: Pooled<'c, i64>,
++    pub(crate) pc: Pooled<'c, i32>,
+     /// [theory, November 12; the triad record §3 and §4] The triads' chart read `abg` `[t][6J]`, their products `p` `[t][2J]` and `c^T` `[t][2J]`, kept
+     /// for the reverse; none where the field has no triads, so a field without them takes nothing more.
+     pub(crate) pabg: Option<Pooled<'c, i64>>,
+@@ -220,7 +220,7 @@ impl<'c> Resident<'c> {
+             pp: if field.declaration.pump { Some(alloc64(sites * 2 * field.declaration.carry)?) } else { None },
+             peta: if field.declaration.pump { Some(self.timed(Kind::Alloc, || self.take::<i32>(sites * 2 * field.declaration.carry)).map_err(device)?) } else { None },
+             pb: alloc64(sites * f)?,
+-            pc: alloc64(sites * f)?,
++            pc: self.timed(Kind::Alloc, || self.take::<i32>((sites * f).max(1))).map_err(device)?,
+             pabg: triad(6)?,
+             ptp: triad(2)?,
+             pct: triad(2)?,
+@@ -354,7 +354,7 @@ impl<'c> Resident<'c> {
+             self.launch("field_triad", Self::cells((sites * triads) as u64), THREADS, &mut [arg(words)])?;
+             self.affine_two(words, (words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f), (words.wtr, words.rwt, 2 * triads, words.pct, 2 * triads), words.x)?;
+         } else {
+-            self.affine("field_affine_x64", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
++            self.affine("field_affine_x32", words, words.w, words.w_bias, words.rw, dw, f, tick.pc.device_ptr(), f, 0, dw, words.x, false)?;
+         }
+         self.mark("tick_launch_post");
+         Ok(())
+@@ -406,7 +406,7 @@ impl<'c> Resident<'c> {
+     /// way): `add[t][o] += release(Σ_i W[o][i] x_t[i] + Σ_j W₂[o][j] x₂_t[j] + bias[o] 2^24, 24)`, both blocks summed whole in one wide sum with the bias
+     /// before the one release, the carrier bound read over both blocks together (the sum of each block's bound as [`Self::affine`] reads it) and refused
+     /// at `2^126`. The first block is `(weight, bias, wmax, rows, cols, x, x_stride)` (the pair's return `W` over `c`), the second `(weight₂, wmax₂,
+-    /// cols₂, x₂, x₂_stride)` (the triads' `W_T` over `c^T`, no bias of its own), both on 64-bit faces.
++    /// cols₂, x₂, x₂_stride)` (the triads' `W_T` over `c^T`, no bias of its own), `c` on 32 bits (since November 21) and `c^T` on 64.
+     #[allow(clippy::type_complexity)]
+     pub(crate) fn affine_two(&self, words: &mut Words, (weight, bias, wmax, rows, cols, x, x_stride): (u64, u64, u64, usize, usize, u64, usize), (weight2, wmax2, cols2, x2, x2_stride): (u64, u64, usize, u64, usize), add: u64) -> Result<()> {
+         let (mut weight, mut bias, mut wmax, mut rows32, mut cols32, mut x, mut xs) = (weight, bias, wmax, rows as u32, cols as u32, x, x_stride as u64);
+diff --git a/crates/engine-cuda/src/hnn/resident.rs b/crates/engine-cuda/src/hnn/resident.rs
+index a039cec1f..fe94b4181 100644
+--- a/crates/engine-cuda/src/hnn/resident.rs
++++ b/crates/engine-cuda/src/hnn/resident.rs
+@@ -2290,7 +2290,7 @@ pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -
+     let carry_site = carry_site + pump_site;
+     // [theory, November 12; the triad record §4] The triads' chart read `[t][6J]` and their products `p` and `c^T` `[t][2J]` each, kept a tick.
+     let triad_site = 8 * 10 * d.triads as u64;
+-    let tick_site = triad_site + carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
++    let tick_site = triad_site + carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + (8 + 8 + 4) * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
+     let tick_fixed = tick_fixed_octets(d);
+     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
+     let face_site = 8 * dw + 4 * dw + 16 * lanes + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;

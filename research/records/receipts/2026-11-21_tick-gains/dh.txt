@@ -1,0 +1,19 @@
+# dh: lock taken 03:18:55 other runs: 1361623, obs 
+DH suite 03:25:01 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 366.12s 
+DH repro_L71 03:25:15 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+DH ncu field_pair_scan_pre old 03:25:34  DRAM Throughput % 84.59; Duration ms 1.03; DRAM Throughput % 85.11; Duration ms 1.02; DRAM Throughput % 84.92; Duration ms 1.05;
+DH ncu field_pair_scan_pre new 03:25:53  DRAM Throughput % 87.77; Duration us 808.93; DRAM Throughput % 86.89; Duration us 828.48; DRAM Throughput % 87.74; Duration us 810.53;
+DH ncu field_pair_scan_back old 03:26:12  DRAM Throughput % 67.37; Duration us 871.17; DRAM Throughput % 67.26; Duration us 870.18; DRAM Throughput % 67.45; Duration us 863.62;
+DH ncu field_pair_scan_back new 03:26:30  DRAM Throughput % 51.79; Duration us 799.39; DRAM Throughput % 52.37; Duration us 803.78; DRAM Throughput % 52.30; Duration us 798.34;
+DH warm-up 03:26:52 49.62, 2820 MHz
+DH hold 1 old 03:27:14 batches=120 last30 ms_mean=505.8 51.66, 2805 MHz
+DH hold 2 new 03:27:36 batches=120 last30 ms_mean=500.8 53.18, 2805 MHz
+DH hold 3 new 03:27:58 batches=120 last30 ms_mean=500.9 54.39, 2805 MHz
+DH hold 4 old 03:28:19 batches=120 last30 ms_mean=507.1 54.12, 2805 MHz
+DH hold 5 old 03:28:41 batches=120 last30 ms_mean=505.7 54.56, 2805 MHz
+DH hold 6 new 03:29:03 batches=120 last30 ms_mean=500.9 54.75, 2805 MHz
+DH hold 7 new 03:29:25 batches=120 last30 ms_mean=501.4 55.30, 2805 MHz
+DH hold 8 old 03:29:47 batches=120 last30 ms_mean=508.8 55.20, 2805 MHz
+# dh: released 03:29:47
+DH_ALL_DONE 03:29:47
+RUN_EXIT 0 2026-11-21T03:29:47Z

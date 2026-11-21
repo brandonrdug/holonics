@@ -1,0 +1,2 @@
+# The formal thread's guesses for this read, fixed 03:04:05Z (relayed): H5, the rests (the last pair's cosine crossing zero, opening held) fall
+# in 0.78 to 0.95 at every lane and the 8-tick held code there reads 3.7 to 4.0 nats; H6, 8 ticks with no leak reads 2.6 to 3.2.

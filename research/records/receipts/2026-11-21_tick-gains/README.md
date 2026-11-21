@@ -58,3 +58,25 @@ to 551 (20%), the reverse's pre-scan 1.02 to 1.03 ms against 1.12 to 1.16 (9%), 
 lighter, not yet under a batch's cut). Guess (fixed 02:15 UTC): the scan, its face and the gate's return each 5 to 20% shorter (held for the
 scan and the face, missed for the gate's return, whose circle words are a small share of what it reads), the gate within 5% (held), the
 section 3 to 8 ms (held), three batches (held). Projection about 15 minutes, measured 12 min 40 s.
+
+## The pair's face on 32 bits, set aside (`pc.sh`, `pc.txt`, `pc_trace.sh`, `pc_face_32_set_aside.patch`)
+
+`field.cu` kept the pair's face `c` (`pc`) on 32 bits through `fit32` (it stands within 23 bits), so the pair's return `W` (224 × 1088) ran on
+the 32-bit tensor-unit map and its outer sum on the 32-bit outer, where both had read 64-bit faces on the CUDA cores. Every bit kept: the
+card crate's suite 28 passed and 24 sections of L71 reproduced `EQUAL`. The section in a warmed balanced hold read 512.9 against 505.6 ms
+(the build 512.9, 512.7, 514.5, 511.6; the control 504.5, 505.2, 506.0, 506.5): 7.3 ms (1.4%) longer. Guess (fixed 03:03 UTC): 8 to 20 ms
+shorter (missed, the other way). Nsight Systems over 20 sections each (`pc_trace.sh`) put the kernels at 408.7 against 410.3 ms a section: the
+64-bit map and outer fell 10.5 and 11.4 ms, the tensor-unit map, the 32-bit outer and the digit planes rose 8.3, 10.6 and 1.7, so the `W` map is
+bound by neither its products nor its operand's width, and the section's 7 ms more stand outside the kernels, in the host's steps around the
+32-bit maps (`agent-inferred`). Not taken; the tape it saves (4.3 KB a site and tick) moves no batch yet.
+
+## The circles' reverse pair part on 64 bits (`dh.sh`, `dh.txt`)
+
+`field_pair_scan_pre` forms the circles' pair part `h = conj(a) δp` off the chain and `field_pair_scan_back` reads it where it meets the chain's
+sum; it stood on 128 bits (16 octets a circle and site, uncounted in the batch's budget), and now stands on 64, written through `fit64` (a part
+past 64 bits is refused, where it had been carried to the sum and refused there), and `read_octets` counts it. The same words while they fit:
+a realization. In one hold: the card crate's suite 28 passed; 24 sections of L71 reproduced `EQUAL`; the pre-scan 0.81 to 0.83 ms a launch
+against 1.02 to 1.05 (21% shorter), the scan's reverse 0.798 to 0.804 against 0.864 to 0.871 (8%); the section in a warmed balanced hold 500.8,
+500.9, 500.9, 501.4 against 505.8, 507.1, 505.7, 508.8 (501.0 and 506.9, spreads 0.6 and 3.1), 5.9 ms (1.2%) shorter; three batches a section.
+Guess (fixed 03:18 UTC): the pre-scan 12 to 25% (held), the scan's reverse 15 to 30% (missed, 8%), the section 2 to 6 ms (held), three batches
+(held). Projection about 13 minutes, measured 10 min 52 s.

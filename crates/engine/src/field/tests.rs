@@ -6196,6 +6196,17 @@ fn a_lane_leaks_reads_at_set_strengths() {
     let mut raised = learner.field.clone();
     raised.declaration.ticks = ticks;
     read("raised_no_leak", &raised);
+    // [the formal thread, 03:04Z] The law itself at stores given by lane (`LEAK_LAW_DELTAS`, each `δ` in millionths), the opening held.
+    if let Ok(list) = std::env::var("LEAK_LAW_DELTAS") {
+        let (mut f, _) = raised.with_lane_leak().unwrap();
+        let at = f.layout.lane_leak;
+        let ds: Vec<i64> = list.split(',').map(|v| v.parse().unwrap()).collect();
+        for (l, &dm) in ds.iter().enumerate() {
+            // d = δ/(1 − δ) on the face's grain
+            f.theta[at + l] = ((dm << FACE_BITS) / (1_000_000 - dm)) as i32;
+        }
+        read(&format!("law_at_deltas_millionths_{list}"), &f);
+    }
     let hold = std::env::var("LEAK_HOLD").is_ok_and(|v| v == "1");
     for &(n, b) in &deltas {
         let mut f = raised.clone();

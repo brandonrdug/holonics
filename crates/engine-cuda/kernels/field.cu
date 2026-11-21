@@ -4705,9 +4705,10 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
 // `[t][2C]` (real parts then imaginary), `X(t) = conj(a(t)) δp(t) + conj(γ(t)) u` (the next `u`). The gate's and the coupling's covectors are formed off the
 // chain (`field_pair_gate_back`).
 // [realization; theory, November 16 05:40Z] **The reverse's terms off the chain** (T C cells): the pair's part `h(t) = conj(a(t)) δp(t)` released at the
-// face's grain, kept on 128 bits until it meets the chain's sum (`fit64` stands on the sum, never on a part), and `δa(t) = conj(Qm(t)) δp(t)`, which
+// face's grain, kept on 64 bits through `fit64` (since November 21: a part past 64 bits is refused, where it had been carried on 128 to the chain's
+// sum and refused there; every part read on the trained state stands far under it), and `δa(t) = conj(Qm(t)) δp(t)`, which
 // reads no `u`. The chain then carries `u` alone, and `δγ` is formed after it by the gate's reverse. The same terms on the same operands.
-extern "C" __global__ void field_pair_scan_pre(FieldWords w, const int64_t *dc, int64_t *da, wide *dh) {
+extern "C" __global__ void field_pair_scan_pre(FieldWords w, const int64_t *dc, int64_t *da, int64_t *dh) {
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t cells = (uint64_t)w.T * C;
@@ -4719,8 +4720,8 @@ extern "C" __global__ void field_pair_scan_pre(FieldWords w, const int64_t *dc, 
         const wide qr = w.pqm[gr], qi = w.pqm[gi];
         da[re] = fit64(rel(qr * pr + qi * pi, FACE_BITS), w.status);
         da[im] = fit64(rel(qr * pi - qi * pr, FACE_BITS), w.status);
-        dh[gr] = rel(ar * pr + ai * pi, FACE_BITS);
-        dh[gi] = rel(ar * pi - ai * pr, FACE_BITS);
+        dh[gr] = fit64(rel(ar * pr + ai * pi, FACE_BITS), w.status);
+        dh[gi] = fit64(rel(ar * pi - ai * pr, FACE_BITS), w.status);
     }
 }
 
@@ -4728,7 +4729,7 @@ extern "C" __global__ void field_pair_scan_pre(FieldWords w, const int64_t *dc, 
 // next site of the reverse), `u` is written to `db` (the coupled drive's covector, which `field_pair_gate_back` carries through the coupling and from which
 // it forms `δγ(t) = conj(Qm(t)) u`), and `X(t) = h(t) + conj(γ(t)) u` (the next `u`), `h` the pair's part `field_pair_scan_pre` formed. The step's `h` and
 // gate are read a step ahead.
-extern "C" __global__ void field_pair_scan_back(FieldWords w, const wide *dh, int64_t *db) {
+extern "C" __global__ void field_pair_scan_back(FieldWords w, const int64_t *dh, int64_t *db) {
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t jobs = (uint64_t)w.R * C;
