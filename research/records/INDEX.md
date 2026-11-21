@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,737 records from July 2026 to November 2026. 388 receipts directories: 225 beside the records and 163 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,738 records from July 2026 to November 2026. 389 receipts directories: 225 beside the records and 164 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 136 | 104 |
+| [November 2026](#november-2026) | 137 | 105 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-21 [A stores leak is founded by its own news every mode of the built tick contracts under a leak and a leaking circle holds an order as its words polynomial at its multiplier](2026-11-21_A_STORES_LEAK_IS_FOUNDED_BY_ITS_OWN_NEWS_EVERY_MODE_OF_THE_BUILT_TICK_CONTRACTS_UNDER_A_LEAK_AND_A_LEAKING_CIRCLE_HOLDS_AN_ORDER_AS_ITS_WORDS_POLYNOMIAL_AT_ITS_MULTIPLIER.md)
 - 2026-11-21 [The built ticks rates stand still on its fill clock a third of a sites modes is released a third held and a third boosted and the contact kernels wait on their loads](2026-11-21_THE_BUILT_TICKS_RATES_STAND_STILL_ON_ITS_FILL_CLOCK_A_THIRD_OF_A_SITES_MODES_IS_RELEASED_A_THIRD_HELD_AND_A_THIRD_BOOSTED_AND_THE_CONTACT_KERNELS_WAIT_ON_THEIR_LOADS.md)
 - 2026-11-20 [A lane is a register of the face and never a thread the cards register file is the precision law as capacity heat follows every merge and order only a section and a series releases only where its tick contracts](2026-11-20_A_LANE_IS_A_REGISTER_OF_THE_FACE_AND_NEVER_A_THREAD_THE_CARDS_REGISTER_FILE_IS_THE_PRECISION_LAW_AS_CAPACITY_HEAT_FOLLOWS_EVERY_MERGE_AND_ORDER_ONLY_A_SECTION_AND_A_SERIES_RELEASES_ONLY_WHERE_ITS_TICK_CONTRACTS.md)
 - 2026-11-20 [A lattice an aperture and a dilation are one lens the hexagon is three classes without their common mode and the characteristic polygon lies on or above the grains in Lean](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)

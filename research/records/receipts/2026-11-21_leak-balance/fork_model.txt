@@ -1,0 +1,10 @@
+FORK gamma=0.10 gaps between orders sharing their last closer [9.4, 9.4, 9.4], between the others [110.6, 110.6, 110.6], radius 0.948
+FORK gamma=0.30 gaps between orders sharing their last closer [25.5, 25.5, 25.5], between the others [94.5, 94.5, 94.5], radius 0.825
+FORK gamma=0.50 gaps between orders sharing their last closer [38.2, 38.2, 38.2], between the others [81.8, 81.8, 81.8], radius 0.661
+FORK gamma=0.80 gaps between orders sharing their last closer [52.7, 52.7, 52.7], between the others [67.3, 67.3, 67.3], radius 0.312
+FORK gamma=0.95 gaps between orders sharing their last closer [58.3, 58.3, 58.3], between the others [61.7, 61.7, 61.7], radius 0.084
+FORK a short side of 10 degrees is gamma=0.11 at classes a third of a turn apart
+FORK a short side of 40 degrees is gamma=0.53 at classes a third of a turn apart
+FORK a short side of 58 degrees is gamma=0.94 at classes a third of a turn apart
+FORK turn by a third, classes at thirds: (0, 1, 2):p0:|Z|=3.000 (0, 2, 1):p1:|Z|=0.000 (1, 0, 2):p1:|Z|=0.000 (1, 2, 0):p0:|Z|=3.000 (2, 0, 1):p0:|Z|=3.000 (2, 1, 0):p1:|Z|=0.000
+FORK turn by a third, classes in general position: holding against the order (0,1,2): (0, 1, 2):p0:1.000@0 (0, 2, 1):p1:0.240@111 (1, 0, 2):p1:0.240@351 (1, 2, 0):p0:1.000@120 (2, 0, 1):p0:1.000@240 (2, 1, 0):p1:0.240@231

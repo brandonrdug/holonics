@@ -1,0 +1,39 @@
+PLANT n=97 nu in [-0.54, +0.19] top_singular=6.00 max_abs_eig=0.54
+BUILT k=50 fill=58.0 move_ratio=0.9836 law (F+nu_max)/(F+2)=0.9692 cos_successive=+1.000
+BUILT k=100 fill=113.0 move_ratio=0.9940 law (F+nu_max)/(F+2)=0.9841 cos_successive=+1.000
+BUILT k=200 fill=208.3 move_ratio=0.9973 law (F+nu_max)/(F+2)=0.9914 cos_successive=+1.000
+BUILT k=399 fill=361.4 move_ratio=0.9979 law (F+nu_max)/(F+2)=0.9950 cos_successive=+1.000
+BUILT 17 ticks: cos of successive moves pooled from tick 1: +0.813; ray's distance from the fixed ray at ticks 4, 17, 400: 61.61 58.13 37.87 degrees
+SCAN delta fill_at_rest late_rate(law) late_rate(read) cos_late cos_pooled_17 cos_pooled_4 worst_transient
+SCAN 0.125 8.220 0.899 1.000 +0.997 +0.750 +0.699 1.00
+SCAN 0.250 4.110 0.797 0.971 +0.993 +0.710 +0.623 1.00
+SCAN 0.500 2.000 0.595 0.866 +0.994 +0.573 +0.396 1.00
+SCAN 0.750 1.333 0.392 0.599 +0.991 +0.247 +0.006 1.00
+SCAN 0.800 1.250 0.352 0.625 +0.997 +0.135 -0.100 1.00
+SCAN 0.850 1.176 0.311 0.513 +0.994 -0.012 -0.213 1.00
+SCAN 0.900 1.111 0.386 0.435 +0.943 -0.225 -0.325 1.00
+SCAN 1.000 1.000 0.540 0.490 -0.902 -0.727 -0.522 1.00
+SCAN law: the late cosine changes sign at delta*=2/(eps_min+eps_max)=0.851, rate there 0.311
+DEPOSIT planted ticks=17 jitter=0.0: first cosine at zero +0.784; rests at delta=0.832 (spread 0.004), Q=1.20, cosine there +0.000
+DEPOSIT planted ticks=4 jitter=0.0: first cosine at zero +0.756; rests at delta=0.745 (spread 0.004), Q=1.34, cosine there -0.000
+FLIP planted nu_min=-1.50: a replacement (delta=1) multiplies it by -1.50 a tick; law delta*=0.604
+DEPOSIT flip ticks=17 jitter=0.0: first cosine at zero +0.773; rests at delta=0.852 (spread 0.005), Q=1.17, cosine there +0.002
+DEPOSIT flip ticks=4 jitter=0.0: first cosine at zero +0.743; rests at delta=0.748 (spread 0.004), Q=1.34, cosine there +0.001
+DEPOSIT jittered ticks=17 jitter=0.05: first cosine at zero +0.783; rests at delta=0.814 (spread 0.003), Q=1.23, cosine there +0.000
+DEPOSIT jittered ticks=17 jitter=0.2: first cosine at zero +0.767; rests at delta=0.768 (spread 0.002), Q=1.30, cosine there -0.000
+DEPOSIT jittered ticks=17 jitter=0.5: first cosine at zero +0.690; rests at delta=0.695 (spread 0.002), Q=1.44, cosine there -0.000
+SPARSE planted: six entries above the diagonal, top_singular=6.00
+SPARSE BUILT k=8 fill=9.7 move_ratio=0.8249 law=0.8309 cos=+0.999
+SPARSE BUILT k=16 fill=17.4 move_ratio=0.8985 law=0.9019 cos=+1.000
+SPARSE BUILT k=50 fill=51.2 move_ratio=0.9649 law=0.9653 cos=+1.000
+SPARSE BUILT k=200 fill=201.1 move_ratio=0.9911 law=0.9910 cos=+1.000
+SPARSE SCAN delta=0.25 law=0.797 read=0.787 cos_pooled_17=+0.937 first_tick_2^-12_below_tick_4=40
+SPARSE SCAN delta=0.50 law=0.595 read=0.589 cos_pooled_17=+0.858 first_tick_2^-12_below_tick_4=20
+SPARSE SCAN delta=0.75 law=0.392 read=0.388 cos_pooled_17=+0.646 first_tick_2^-12_below_tick_4=13
+SPARSE SCAN delta=0.85 law=0.311 read=0.307 cos_pooled_17=+0.383 first_tick_2^-12_below_tick_4=11
+SPARSE SCAN delta=1.00 law=0.540 read=0.540 cos_pooled_17=-0.442 first_tick_2^-12_below_tick_4=17
+DEPOSIT sparse ticks=17 jitter=0.0: first cosine at zero +0.967; rests at delta=0.927 (spread 0.004), Q=1.08, cosine there -0.001
+DEPOSIT sparse ticks=4 jitter=0.0: first cosine at zero +0.963; rests at delta=0.927 (spread 0.004), Q=1.08, cosine there -0.001
+FULL SCAN delta=0.50 first_tick_2^-12_below_tick_4=76
+FULL SCAN delta=0.75 first_tick_2^-12_below_tick_4=46
+FULL SCAN delta=0.85 first_tick_2^-12_below_tick_4=38
