@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 04:20 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 04:25 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -268,6 +268,13 @@ cosine stands at the white drive's own, so the gates over-track a drive with lit
 (its strength moved by the sign of its successive news) applies to the circles' gates, where its sign would make them heavier
 (`agent-inferred`, the formal thread's reading of the alternative).
 
+**Corrected at 04:23 UTC** (the formal thread, relayed). Once the circles are pumped, `1 − |γ|` is not a circle's gain: the move is
+`Q = T(Qm) + g (N₀ b − T(Qm))` with `T = (γ̂ + p conj)/(1 + n)` the hold at no friction and `g = κ/N₀ = d/(1 + d + n)` (0.38 at the built
+median), so the store's own news is `N₀ b − T(Qm)`, and `Q − γ̂ Qm`, read above, carries the pump's reflection, which is the store's hold. The
+−0.300 baseline is the unpumped form's. And `−δ/2` is a correlation: pooled by `|u| |u|` a white drive reads up to `4/π` of it (simulated there:
+−0.31 unpumped at gain 0.49, −0.37 to −0.40 pumped at the medians). So "nearly white" and "the gates over-track" are withdrawn: −0.275 stands above
+the white value by an amount that the turns and the drives' moduli would state, and they are not read.
+
 ### 8.4 The circles' scan with its residue carried
 
 The formal thread's reads S1 and S2 of the same note (guesses fixed 04:04 UTC): the circles' store at its consumer is its unreleased orbit
@@ -296,6 +303,13 @@ gate's denominator carries the pump's own magnitude, `1 + d + n`, so a circle's 
 (`carry_gate_pumped`; `agent-inferred`), and the rest the law derives is out of its reach while the pump stands. The code rises at every lighter
 gate, which the formal thread's caution reads as the scope of a level's law ending at a store that writes a word; G3 (the tension read at each
 `k`) is not read.
+
+**Corrected at 04:23 UTC** (the formal thread, relayed). The six medians of `1 − |γ|` fit `d = 0.96 · 2^(−k)` and `n = 0.54` within 0.008, so the
+stop near 0.36 is the pump's share, as read. But lowering `ℓ_b` lowers `κ` too, and with `n > 0` the charge's scale `κ/(1 − hold)` falls 13 to 19
+fold on at least one axis by `k = 5`, where the unpumped gate keeps it at `N₀`: part of the code's rise is the charge emptying, so G2 is no
+reading against reach, and the G1 series was matched at `k ≤ 2` partly by chance (its baseline being the unpumped form's). Form G is set aside on
+G1 and G2: its rest is out of reach while the pump stands, and the first halving alone starts 0.20 nats behind. G3 stands unread, to be read
+beside a reach part where one is built.
 
 ## 9. Atlas
 
