@@ -278,7 +278,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -348,6 +348,43 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let (mut in_pairs, mut in_sites) = (0u64, 0u64);
         // The section's stretches read at the frontier (the pass's share, [`holonics_engine::field::StorePass::frontier`]).
         let mut at_frontier = 0u64;
+        // [definition; the lead, November 21] The terrain's own records, first in the section, as many regions of `records` records of one
+        // kind as its share of the section's sites holds ([`holonics_engine::field::PassTerrain`]): every expression known, every answer and
+        // its line feed open. A region's kind turns with the terrain's count of records, so every kind is met alike.
+        let (mut terrain_regions, mut terrain_records, mut terrain_budget) = (0usize, 0u64, 0u64);
+        if let Some(t) = cut.pass.terrain.clone() {
+            terrain_budget = t.share(cut.pass.sites);
+            let mut met = t.met;
+            loop {
+                let kind = usize::try_from((met / t.records) % crate::world::KINDS.len() as u64).unwrap_or(0);
+                let (mut classes, mut open, mut counted) = (Vec::new(), Vec::new(), 0usize);
+                for r in 0..t.records {
+                    let (expression, answered) = crate::world::record(kind, seed ^ (met + r));
+                    let mut known = expression;
+                    known.extend_from_slice(b" = ");
+                    let mut answered = answered;
+                    answered.push(b'\n');
+                    let (k, a) = (codec.encode(&known)?, codec.encode(&answered)?);
+                    open.extend(std::iter::repeat_n(false, k.len()));
+                    open.extend(std::iter::repeat_n(true, a.len()));
+                    counted += a.len();
+                    classes.extend(k);
+                    classes.extend(a);
+                }
+                let n = classes.len() as u64;
+                if in_sites + n > terrain_budget || in_pairs + n * n > cut.pass.pairs {
+                    break;
+                }
+                let region = OwnedRegion::plain(classes, open);
+                tally.take(&region, counted);
+                (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
+                regions.push(region);
+                (met, terrain_regions, terrain_records) = (met + t.records, terrain_regions + 1, terrain_records + t.records);
+            }
+            if let Some(t) = cut.pass.terrain.as_mut() {
+                t.met = met;
+            }
+        }
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
         let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
         while let Some(drawn) = cut.next() {
@@ -467,6 +504,30 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let first: usize = world_line.rsplit("first=").next().and_then(|v| v.parse().ok()).unwrap_or(regions.len());
             let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
+        }
+        if let Some(t) = cut.pass.terrain.as_mut() {
+            // [definition; the lead, November 21] The terrain's tension and the passage's, read from the section's opening code at their open
+            // places (millionths of a bit a place), carried into the next section's share. A side with no places keeps its reading.
+            let micro_of = |part: &[(i64, usize)]| {
+                let (code, places) = part.iter().fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + i128::from(rc), n + rn));
+                (places > 0).then(|| u64::try_from((code.max(0) * 1_000_000) / ((places as i128) << 20)).unwrap_or(u64::MAX))
+            };
+            if receipt.opening.len() >= terrain_regions {
+                let (world, passage) = receipt.opening.split_at(terrain_regions);
+                if let Some(w) = micro_of(world) {
+                    t.tension_world = w;
+                }
+                if let Some(p) = micro_of(passage) {
+                    t.tension_passage = p;
+                }
+            }
+            println!(
+                "STORE_TERRAIN n={done} regions={terrain_regions} records={terrain_records} budget={terrain_budget} met={} world_code={} passage_code={} next_share={}",
+                t.met,
+                t.tension_world,
+                t.tension_passage,
+                t.share(cut.pass.sites)
+            );
         }
         if let (Some(t), Some(e)) = (receipt.transfer, prior) {
             (transfers, externals, curvatures, priced) = (transfers + t as i128, externals + e, curvatures + (t as i128 - e), priced + 1);
@@ -1321,6 +1382,44 @@ pub fn set_world(args: &[String]) -> Result<()> {
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
     println!("SET_WORLD stretches={} lines={lines} differing_line={differing} pass_tail={}", before.stretches, line.rsplit(" world ").next().map_or(String::new(), |w| format!("world {w}")));
+    Ok(())
+}
+
+/// [definition; the lead, November 21] `set-terrain STATE STATE_SHA RECORDS OUT`: **a terrain joined to a state's pass**
+/// ([`holonics_engine::field::PassTerrain`]): the state with a terrain line after its pass line, `RECORDS` records of one kind a region, no
+/// record met and no reading yet, every other line byte for byte (read back and checked). Refused on a state with no pass or one with a
+/// terrain.
+pub fn set_terrain(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("set-terrain STATE STATE_SHA RECORDS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.terrain.is_some() {
+        return Err("a state whose pass has a terrain".into());
+    }
+    let terrain = holonics_engine::field::PassTerrain { records: positive(&args[3])? as u64, met: 0, tension_world: 0, tension_passage: 0 };
+    let line = terrain.to_line();
+    let mut next = learner.clone();
+    next.pass = Some(StorePass { terrain: Some(terrain), ..before });
+    let written = next.to_text();
+    let pass_line = written.lines().position(|l| l.starts_with("pass ")).ok_or("a written state with no pass line")?;
+    let mut expected: Vec<&str> = text.lines().collect();
+    expected.insert(pass_line + 1, &line);
+    if written.lines().collect::<Vec<_>>() != expected {
+        return Err("a written terrain that changes a line other than its own".into());
+    }
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.field != learner.field || back.pass != next.pass {
+        return Err("a written terrain whose state does not read back as the source's field and pass".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_TERRAIN lines={} {line}", expected.len());
     Ok(())
 }
 

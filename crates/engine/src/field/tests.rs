@@ -4369,7 +4369,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4425,10 +4425,21 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         strand: false,
         past: false,
         second: false,
+        terrain: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
     assert_eq!(text, format!("{plain}{}\n", pass.to_line()), "the pass line follows every other line");
+    // [the lead, November 21] A terrain's line follows the pass line only where set, reads back as itself, and its share is its tension's.
+    let held = StorePass { terrain: Some(PassTerrain { records: 4, met: 99, tension_world: 3_000_000, tension_passage: 1_000_000 }), ..pass.clone() };
+    learner.pass = Some(held.clone());
+    let with_terrain = learner.to_text();
+    assert_eq!(with_terrain, format!("{plain}{}\nterrain 4 99 3000000 1000000\n", pass.to_line()));
+    assert_eq!(Learner::from_text(&with_terrain).unwrap().pass, Some(held.clone()));
+    let t = held.terrain.clone().unwrap();
+    assert_eq!((t.share(41_490), PassTerrain { tension_world: 0, tension_passage: 0, ..t.clone() }.share(41_490)), (31_117, 20_745));
+    assert!(PassTerrain::from_line("terrain 0 1 2 3").is_err() && PassTerrain::from_line("terrain 4 1 2").is_err());
+    learner.pass = Some(pass.clone());
     let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.pass.as_ref(), back.to_text()), (Some(&pass), text.clone()));
     assert_eq!(StorePass::from_line(&pass.to_line()).unwrap(), pass);

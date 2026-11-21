@@ -484,6 +484,54 @@ pub struct StorePass {
     /// ([`crate::field::Region::second`]): the word `second` last, after `before` or `strand` and after `past` where that stands
     /// (`frontier E strand past second`), only where set.
     pub second: bool,
+    /// [definition; the lead, November 21, Brandon's 04:54Z] The terrain whose own records the pass meets beside its slices, held by its
+    /// tension ([`PassTerrain`]); written as its own line after the pass line, only where set.
+    pub terrain: Option<PassTerrain>,
+}
+
+/// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
+/// expect arithmetic or code success without tension reinforcement"; the deterministic panel's openings stood at 4 to 5 of 168 at L17,
+/// L71 and L75] **A terrain held by its tension.** A world writes its own records, each `EXPRESSION = ANSWER` on one line
+/// (`athena::world::record`), `records` of one kind a region, every answer and its line feed open and every expression known: the condition
+/// under which the plain engine founded sums on November 17 (about 160 to 200 thousand records of the law, in any arrangement tried). The
+/// share of a section's sites the terrain takes is its tension against the passage's, `T_w / (T_w + T_p)`, where `T_w` is the field's code
+/// at the terrain's open places in the last section and `T_p` its code at the passage's open places there (millionths of a bit a place,
+/// the opening's code the section's receipt reads): the pass stays on the world while the field's misses on its answers stand above its
+/// misses on the passage, and leaves as they are absorbed, never to nothing. Why the share and not a count by hand: on the old line the
+/// sums were about a hundredth of a section's places and stood at 2.33 nats over 1.6 million records; met alone or a quarter of a section
+/// they were founded inside 200 thousand. `met` counts the records written, the key of the next draw. Written `terrain RECORDS MET T_W
+/// T_P` after the pass line, only where set; a terrain with no reading yet (`T_w + T_p = 0`) takes half.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PassTerrain {
+    pub records: u64,
+    pub met: u64,
+    pub tension_world: u64,
+    pub tension_passage: u64,
+}
+
+impl PassTerrain {
+    pub fn to_line(&self) -> String {
+        format!("terrain {} {} {} {}", self.records, self.met, self.tension_world, self.tension_passage)
+    }
+
+    pub fn from_line(line: &str) -> Result<Self> {
+        let w: Vec<&str> = line.split(' ').collect();
+        let n = |w: &str| w.parse::<u64>().map_err(|_| TowerError::Refused("a terrain's count that is not a count"));
+        if w.len() != 5 || w[0] != "terrain" {
+            return refuse("a terrain line that is not `terrain RECORDS MET T_W T_P`");
+        }
+        let t = Self { records: n(w[1])?, met: n(w[2])?, tension_world: n(w[3])?, tension_passage: n(w[4])? };
+        if t.records == 0 {
+            return refuse("a terrain of no records a region");
+        }
+        Ok(t)
+    }
+
+    /// The sites of a section of `sites` the terrain takes: `sites · T_w / (T_w + T_p)`, floored, or half where it has no reading.
+    pub fn share(&self, sites: u64) -> u64 {
+        let (w, p) = (u128::from(self.tension_world), u128::from(self.tension_passage));
+        if w + p == 0 { sites / 2 } else { u64::try_from(u128::from(sites) * w / (w + p)).unwrap_or(sites) }
+    }
 }
 
 /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC, the friction record §3 and §5] **A world joined at the
@@ -595,7 +643,7 @@ impl StorePass {
                 return refuse("a world whose share, records or run is zero, or whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -778,7 +826,7 @@ impl Learner {
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
-            let pass = self.pass.as_ref().map_or(String::new(), |p| format!("{}\n", p.to_line()));
+            let pass = self.pass.as_ref().map_or(String::new(), |p| format!("{}\n{}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line()))));
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
             let leak = self.leak.map_or(String::new(), |k| format!("leak {k}\n"));
             // [definition; the lead, November 18] The step's carried remainders, a trailing line after the leak's and only where carried.
@@ -909,6 +957,11 @@ impl Learner {
         let pass = match lines.peek() {
             Some(l) if l.starts_with("pass ") => Some(StorePass::from_line(lines.next().unwrap_or(""))?),
             _ => None,
+        };
+        // [definition; the lead, November 21] The pass's terrain, a line after the pass line and only where set ([`PassTerrain`]).
+        let pass = match (pass, lines.peek()) {
+            (Some(p), Some(l)) if l.starts_with("terrain ") => Some(StorePass { terrain: Some(PassTerrain::from_line(lines.next().unwrap_or(""))?), ..p }),
+            (p, _) => p,
         };
         Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, last: None, pass })
     }
