@@ -1,0 +1,12 @@
+field_pace_skin_back       regs=  96 stack=  40 spill_st=   56 spill_ld=  124
+field_spread               regs=  48 stack=   0 spill_st=    0 spill_ld=    0
+field_contact_columns      regs=  72 stack=   0 spill_st=    0 spill_ld=    0
+field_contact_rows         regs= 128 stack=  64 spill_st=   60 spill_ld=   92
+field_pair_gate_back       regs=  90 stack=   0 spill_st=    0 spill_ld=    0
+field_pair_scan_back       regs=  80 stack=   0 spill_st=    0 spill_ld=    0
+field_pair_scan_pre        regs=  40 stack=   0 spill_st=    0 spill_ld=    0
+field_pair_gamma           regs=  64 stack=   0 spill_st=    0 spill_ld=    0
+field_pair_scan            regs=  70 stack=   0 spill_st=    0 spill_ld=    0
+field_contact_l4           regs=  96 stack= 112 spill_st=  176 spill_ld=  316
+field_skin_fill            regs=  64 stack=   0 spill_st=    0 spill_ld=    0
+field_exposure             regs=  96 stack=   8 spill_st=   16 spill_ld=   56

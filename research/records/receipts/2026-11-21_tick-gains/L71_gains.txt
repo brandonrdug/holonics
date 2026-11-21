@@ -1,0 +1,64 @@
+GAINS t=120 open=1 k=4 fill_ticks=5 fill_lanes_median=1.59 fill_lanes=[1.3 1.6 1.4 1.4 2.1 2.0 2.1] rays_within_0.01=27 lane_block_rays=[2 1 2 1 13 19 32] complex=204 max_abs=1.1537 min_abs=0.7003 dist_rest_p10=0.0153 p50=0.0573 p90=0.1387 off_lane_share=0.875
+GAINS_NEAREST_ONE t=120 k=4 1.0015+0.0000i 0.9992+0.0018i 0.9992-0.0018i 1.0018+0.0032i 1.0018-0.0032i 1.0038-0.0003i 1.0038+0.0003i 0.9973+0.0028i 0.9973-0.0028i 0.9959-0.0019i
+GAINS_LARGEST t=120 k=4 1.1537+0.0000i 1.1219+0.0263i 1.1219-0.0263i 1.1174-0.0556i 1.1174+0.0556i 1.1026-0.0078i
+GAINS t=122 open=0 k=4 fill_ticks=5 fill_lanes_median=1.49 fill_lanes=[1.5 1.5 1.5 1.5 1.5 1.8 1.2] rays_within_0.01=21 lane_block_rays=[0 1 1 1 9 17 32] complex=206 max_abs=1.1485 min_abs=0.7090 dist_rest_p10=0.0190 p50=0.0567 p90=0.1315 off_lane_share=0.886
+GAINS_NEAREST_ONE t=122 k=4 0.9998+0.0000i 0.9986+0.0013i 0.9986-0.0013i 1.0031+0.0000i 1.0038+0.0000i 0.9951+0.0026i 0.9951-0.0026i 0.9941+0.0000i 1.0047-0.0043i 1.0047+0.0043i
+GAINS_LARGEST t=122 k=4 1.1482-0.0256i 1.1482+0.0256i 1.1245+0.0000i 1.1144+0.1091i 1.1144-0.1091i 1.1187+0.0184i
+GAINS t=200 open=1 k=4 fill_ticks=5 fill_lanes_median=1.48 fill_lanes=[1.4 1.5 1.5 1.4 2.0 1.9 2.0] rays_within_0.01=24 lane_block_rays=[2 0 0 2 9 15 32] complex=206 max_abs=1.1396 min_abs=0.6211 dist_rest_p10=0.0178 p50=0.0634 p90=0.1542 off_lane_share=0.873
+GAINS_NEAREST_ONE t=200 k=4 0.9998+0.0000i 0.9981+0.0000i 0.9980+0.0007i 0.9980-0.0007i 1.0022+0.0000i 1.0038+0.0031i 1.0038-0.0031i 1.0050+0.0016i 1.0050-0.0016i 1.0000-0.0053i
+GAINS_LARGEST t=200 k=4 1.1364+0.0854i 1.1364-0.0854i 1.1303+0.0000i 1.1252+0.0398i 1.1252-0.0398i 1.1011+0.0684i
+GAINS t=201 open=0 k=4 fill_ticks=5 fill_lanes_median=1.41 fill_lanes=[1.5 1.4 1.5 1.2 1.3 1.4 1.6] rays_within_0.01=15 lane_block_rays=[1 0 0 0 5 11 32] complex=206 max_abs=1.2185 min_abs=0.7026 dist_rest_p10=0.0191 p50=0.0755 p90=0.1695 off_lane_share=0.883
+GAINS_NEAREST_ONE t=201 k=4 1.0015+0.0000i 0.9983+0.0000i 0.9998+0.0041i 0.9998-0.0041i 1.0028-0.0033i 1.0028+0.0033i 0.9993-0.0050i 0.9993+0.0050i 1.0053+0.0000i 0.9928+0.0023i
+GAINS_LARGEST t=201 k=4 1.2185+0.0000i 1.1694+0.0000i 1.1384+0.0380i 1.1384-0.0380i 1.1328+0.0000i 1.1283+0.0848i
+GAINS t=120 open=1 k=8 fill_ticks=9 fill_lanes_median=5.61 fill_lanes=[5.5 5.6 5.5 5.5 6.2 6.2 6.4] rays_within_0.01=94 lane_block_rays=[16 8 10 8 32 32 32] complex=204 max_abs=1.0327 min_abs=0.9118 dist_rest_p10=0.0123 p50=0.0236 p90=0.0388 off_lane_share=0.882
+GAINS_NEAREST_ONE t=120 k=8 0.9999+0.0000i 1.0005+0.0002i 1.0005-0.0002i 0.9992+0.0003i 0.9992-0.0003i 1.0001+0.0011i 1.0001-0.0011i 0.9996+0.0011i 0.9996-0.0011i 1.0013+0.0000i
+GAINS_LARGEST t=120 k=8 1.0326+0.0101i 1.0326-0.0101i 1.0300-0.0067i 1.0300+0.0067i 1.0298+0.0000i 1.0269+0.0000i
+GAINS t=122 open=0 k=8 fill_ticks=9 fill_lanes_median=5.59 fill_lanes=[5.8 5.5 5.6 5.6 5.7 6.1 5.5] rays_within_0.01=93 lane_block_rays=[18 7 8 13 32 32 32] complex=210 max_abs=1.0346 min_abs=0.9161 dist_rest_p10=0.0118 p50=0.0221 p90=0.0372 off_lane_share=0.886
+GAINS_NEAREST_ONE t=122 k=8 1.0000-0.0002i 1.0000+0.0002i 1.0003+0.0000i 0.9994+0.0000i 1.0004-0.0008i 1.0004+0.0008i 0.9990+0.0000i 1.0000+0.0014i 1.0000-0.0014i 0.9996+0.0017i
+GAINS_LARGEST t=122 k=8 1.0346+0.0118i 1.0346-0.0118i 1.0299+0.0000i 1.0289+0.0029i 1.0289-0.0029i 1.0288+0.0126i
+GAINS t=200 open=1 k=8 fill_ticks=9 fill_lanes_median=5.30 fill_lanes=[5.2 5.2 5.3 5.1 5.4 5.4 5.7] rays_within_0.01=86 lane_block_rays=[13 6 9 11 32 32 32] complex=210 max_abs=1.0335 min_abs=0.9022 dist_rest_p10=0.0120 p50=0.0238 p90=0.0422 off_lane_share=0.880
+GAINS_NEAREST_ONE t=200 k=8 1.0000-0.0004i 1.0000+0.0004i 1.0001+0.0007i 1.0001-0.0007i 1.0007+0.0003i 1.0007-0.0003i 0.9991+0.0000i 0.9986+0.0000i 0.9997-0.0015i 0.9997+0.0015i
+GAINS_LARGEST t=200 k=8 1.0334+0.0129i 1.0334-0.0129i 1.0330+0.0000i 1.0293+0.0092i 1.0293-0.0092i 1.0283+0.0032i
+GAINS t=201 open=0 k=8 fill_ticks=9 fill_lanes_median=5.07 fill_lanes=[5.1 5.0 5.0 4.7 5.1 5.2 5.7] rays_within_0.01=76 lane_block_rays=[12 6 5 7 32 32 32] complex=214 max_abs=1.0368 min_abs=0.8969 dist_rest_p10=0.0120 p50=0.0226 p90=0.0438 off_lane_share=0.882
+GAINS_NEAREST_ONE t=201 k=8 0.9998+0.0005i 0.9998-0.0005i 1.0003+0.0006i 1.0003-0.0006i 0.9991+0.0005i 0.9991-0.0005i 1.0012+0.0000i 1.0000+0.0013i 1.0000-0.0013i 1.0014+0.0000i
+GAINS_LARGEST t=201 k=8 1.0368+0.0061i 1.0368-0.0061i 1.0349-0.0148i 1.0349+0.0148i 1.0325+0.0000i 1.0321+0.0089i
+GAINS t=120 open=1 k=16 fill_ticks=17 fill_lanes_median=13.64 fill_lanes=[13.6 13.6 13.5 13.6 14.3 14.3 14.7] rays_within_0.01=163 lane_block_rays=[26 29 28 30 32 32 32] complex=208 max_abs=1.0138 min_abs=0.9630 dist_rest_p10=0.0107 p50=0.0129 p90=0.0225 off_lane_share=0.882
+GAINS_NEAREST_ONE t=120 k=16 1.0001+0.0001i 1.0001-0.0001i 0.9998+0.0000i 1.0001+0.0003i 1.0001-0.0003i 0.9995+0.0000i 0.9999-0.0005i 0.9999+0.0005i 1.0001-0.0005i 1.0001+0.0005i
+GAINS_LARGEST t=120 k=16 1.0138-0.0055i 1.0138+0.0055i 1.0121+0.0005i 1.0121-0.0005i 1.0119+0.0025i 1.0119-0.0025i
+GAINS t=122 open=0 k=16 fill_ticks=17 fill_lanes_median=13.84 fill_lanes=[14.0 13.7 13.7 13.7 13.9 14.3 13.8] rays_within_0.01=162 lane_block_rays=[26 29 28 30 32 32 32] complex=204 max_abs=1.0140 min_abs=0.9639 dist_rest_p10=0.0109 p50=0.0129 p90=0.0227 off_lane_share=0.885
+GAINS_NEAREST_ONE t=122 k=16 1.0000+0.0000i 1.0001+0.0001i 1.0001-0.0001i 0.9998+0.0001i 0.9998-0.0001i 0.9995+0.0001i 0.9995-0.0001i 1.0002+0.0005i 1.0002-0.0005i 0.9994+0.0000i
+GAINS_LARGEST t=122 k=16 1.0140+0.0053i 1.0140-0.0053i 1.0134+0.0000i 1.0120+0.0046i 1.0120-0.0046i 1.0112-0.0017i
+GAINS t=200 open=1 k=16 fill_ticks=17 fill_lanes_median=13.05 fill_lanes=[13.0 13.0 13.1 13.0 13.1 13.2 13.5] rays_within_0.01=157 lane_block_rays=[26 27 26 30 32 32 32] complex=204 max_abs=1.0141 min_abs=0.9599 dist_rest_p10=0.0108 p50=0.0131 p90=0.0234 off_lane_share=0.882
+GAINS_NEAREST_ONE t=200 k=16 1.0000+0.0000i 1.0002+0.0001i 1.0002-0.0001i 1.0000+0.0004i 1.0000-0.0004i 0.9996+0.0000i 0.9996-0.0001i 0.9996+0.0001i 1.0005+0.0000i 1.0003+0.0005i
+GAINS_LARGEST t=200 k=16 1.0141+0.0056i 1.0141-0.0056i 1.0131+0.0000i 1.0125+0.0026i 1.0125-0.0026i 1.0114-0.0027i
+GAINS t=201 open=0 k=16 fill_ticks=17 fill_lanes_median=12.79 fill_lanes=[12.8 12.8 12.7 12.4 12.8 13.0 13.5] rays_within_0.01=148 lane_block_rays=[26 26 28 30 32 32 32] complex=206 max_abs=1.0146 min_abs=0.9581 dist_rest_p10=0.0107 p50=0.0136 p90=0.0243 off_lane_share=0.882
+GAINS_NEAREST_ONE t=201 k=16 0.9998+0.0001i 0.9998-0.0001i 0.9999-0.0006i 0.9999+0.0006i 1.0006+0.0000i 1.0005+0.0005i 1.0005-0.0005i 1.0006+0.0003i 1.0006-0.0003i 0.9993-0.0000i
+GAINS_LARGEST t=201 k=16 1.0146+0.0000i 1.0141+0.0052i 1.0141-0.0052i 1.0132+0.0072i 1.0132-0.0072i 1.0125+0.0055i
+NU t=120 fill=k 4->8:median_rel_diff=0.524,within_quarter=0.058 8->16:median_rel_diff=0.195,within_quarter=0.817 spread_p90_over_p10=30.08 4:p10=-0.471,p50=-0.009,p90=0.343 8:p10=-0.217,p50=-0.004,p90=0.148 16:p10=-0.181,p50=-0.003,p90=0.115
+NU t=120 fill=f 4->8:median_rel_diff=0.101,within_quarter=0.862 8->16:median_rel_diff=0.071,within_quarter=0.871 spread_p90_over_p10=30.08 4:p10=-0.149,p50=-0.003,p90=0.109 8:p10=-0.136,p50=-0.003,p90=0.092 16:p10=-0.145,p50=-0.002,p90=0.092
+SPLIT t=120 k=4 |nu|<0.005:29 |nu|<0.01:45 |nu|<0.02:69 |nu|<0.05:130 released_nu<-0.02:84 amplified_nu>0.02:71 of 224 min_nu=-0.476 max_nu=0.244
+SPLIT t=120 k=8 |nu|<0.005:25 |nu|<0.01:50 |nu|<0.02:72 |nu|<0.05:134 released_nu<-0.02:83 amplified_nu>0.02:69 of 224 min_nu=-0.495 max_nu=0.183
+SPLIT t=120 k=16 |nu|<0.005:21 |nu|<0.01:41 |nu|<0.02:68 |nu|<0.05:129 released_nu<-0.02:82 amplified_nu>0.02:74 of 224 min_nu=-0.505 max_nu=0.189
+HALVING t=120 4->8 median_dist 0.0573 -> 0.0236 ratio=0.413
+HALVING t=120 8->16 median_dist 0.0236 -> 0.0129 ratio=0.544
+NU t=122 fill=k 4->8:median_rel_diff=0.562,within_quarter=0.000 8->16:median_rel_diff=0.210,within_quarter=0.696 spread_p90_over_p10=27.47 4:p10=-0.439,p50=-0.011,p90=0.310 8:p10=-0.200,p50=-0.003,p90=0.154 16:p10=-0.184,p50=-0.004,p90=0.119
+NU t=122 fill=f 4->8:median_rel_diff=0.090,within_quarter=0.839 8->16:median_rel_diff=0.079,within_quarter=0.893 spread_p90_over_p10=27.47 4:p10=-0.130,p50=-0.003,p90=0.092 8:p10=-0.124,p50=-0.002,p90=0.095 16:p10=-0.150,p50=-0.003,p90=0.097
+SPLIT t=122 k=4 |nu|<0.005:16 |nu|<0.01:38 |nu|<0.02:62 |nu|<0.05:122 released_nu<-0.02:86 amplified_nu>0.02:76 of 224 min_nu=-0.433 max_nu=0.220
+SPLIT t=122 k=8 |nu|<0.005:24 |nu|<0.01:43 |nu|<0.02:72 |nu|<0.05:129 released_nu<-0.02:82 amplified_nu>0.02:70 of 224 min_nu=-0.469 max_nu=0.193
+SPLIT t=122 k=16 |nu|<0.005:19 |nu|<0.01:42 |nu|<0.02:72 |nu|<0.05:125 released_nu<-0.02:84 amplified_nu>0.02:68 of 224 min_nu=-0.500 max_nu=0.193
+HALVING t=122 4->8 median_dist 0.0567 -> 0.0221 ratio=0.390
+HALVING t=122 8->16 median_dist 0.0221 -> 0.0129 ratio=0.583
+NU t=200 fill=k 4->8:median_rel_diff=0.534,within_quarter=0.027 8->16:median_rel_diff=0.209,within_quarter=0.679 spread_p90_over_p10=27.91 4:p10=-0.520,p50=-0.010,p90=0.297 8:p10=-0.242,p50=-0.005,p90=0.172 16:p10=-0.192,p50=-0.003,p90=0.126
+NU t=200 fill=f 4->8:median_rel_diff=0.095,within_quarter=0.862 8->16:median_rel_diff=0.074,within_quarter=0.848 spread_p90_over_p10=27.91 4:p10=-0.154,p50=-0.003,p90=0.088 8:p10=-0.143,p50=-0.003,p90=0.101 16:p10=-0.147,p50=-0.002,p90=0.097
+SPLIT t=200 k=4 |nu|<0.005:25 |nu|<0.01:44 |nu|<0.02:70 |nu|<0.05:124 released_nu<-0.02:82 amplified_nu>0.02:72 of 224 min_nu=-0.562 max_nu=0.202
+SPLIT t=200 k=8 |nu|<0.005:23 |nu|<0.01:41 |nu|<0.02:77 |nu|<0.05:132 released_nu<-0.02:77 amplified_nu>0.02:70 of 224 min_nu=-0.518 max_nu=0.177
+SPLIT t=200 k=16 |nu|<0.005:19 |nu|<0.01:40 |nu|<0.02:70 |nu|<0.05:127 released_nu<-0.02:82 amplified_nu>0.02:72 of 224 min_nu=-0.523 max_nu=0.184
+HALVING t=200 4->8 median_dist 0.0634 -> 0.0238 ratio=0.375
+HALVING t=200 8->16 median_dist 0.0238 -> 0.0131 ratio=0.552
+NU t=201 fill=k 4->8:median_rel_diff=0.574,within_quarter=0.009 8->16:median_rel_diff=0.259,within_quarter=0.420 spread_p90_over_p10=38.54 4:p10=-0.552,p50=-0.010,p90=0.401 8:p10=-0.264,p50=-0.005,p90=0.174 16:p10=-0.196,p50=-0.002,p90=0.133
+NU t=201 fill=f 4->8:median_rel_diff=0.162,within_quarter=0.781 8->16:median_rel_diff=0.045,within_quarter=0.897 spread_p90_over_p10=38.54 4:p10=-0.156,p50=-0.003,p90=0.113 8:p10=-0.149,p50=-0.003,p90=0.098 16:p10=-0.148,p50=-0.002,p90=0.100
+SPLIT t=201 k=4 |nu|<0.005:18 |nu|<0.01:31 |nu|<0.02:60 |nu|<0.05:116 released_nu<-0.02:89 amplified_nu>0.02:75 of 224 min_nu=-0.431 max_nu=0.309
+SPLIT t=201 k=8 |nu|<0.005:26 |nu|<0.01:46 |nu|<0.02:67 |nu|<0.05:118 released_nu<-0.02:85 amplified_nu>0.02:72 of 224 min_nu=-0.523 max_nu=0.187
+SPLIT t=201 k=16 |nu|<0.005:24 |nu|<0.01:43 |nu|<0.02:68 |nu|<0.05:129 released_nu<-0.02:85 amplified_nu>0.02:71 of 224 min_nu=-0.536 max_nu=0.187
+HALVING t=201 4->8 median_dist 0.0755 -> 0.0226 ratio=0.300
+HALVING t=201 8->16 median_dist 0.0226 -> 0.0136 ratio=0.603

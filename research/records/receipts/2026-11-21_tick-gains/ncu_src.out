@@ -1,0 +1,8 @@
+# ncu: lock taken 01:05:56 other runs: 1
+NCU field_contact_l4 01:06:21 exit=0
+NCU field_contact_rows 01:06:27 exit=0
+NCU field_contact_columns 01:06:34 exit=0
+NCU field_exposure 01:06:45 exit=0
+NCU field_pace_skin_back 01:06:57 exit=0
+# ncu: released 01:06:57
+NCU_ALL_DONE 01:06:57

@@ -1,0 +1,21 @@
+samples=13310 instructions=56040230 local_sectors=0
+ 5725  16.0% ins=  1.3% loc=      0 long_sb:1929 long_sb (Not Issued):1118 not_selected:71 | const uint32_t gap = j > ipl ? j - ipl : ipl - j;
+ 3371  12.5% ins= 14.7% loc=      0 wait:496 not_selected:353 math:336 | const uint64_t hi = (uint64_t)__mul64hi((long long)a, (long long)b);
+ 5714   6.8% ins=  1.7% loc=      0 branch_resolving:364 short_sb:210 branch_resolving (Not Issued):198 | const uint32_t i = cgi[warp][kk];
+ 5736   5.7% ins=  9.7% loc=      0 selected:190 wait:182 not_selected:127 | const wide bracket = rel(((wide)mul32((int64_t)dec, probe_i) << g0) - 
+  102   5.0% ins=  7.1% loc=      0 wait:178 selected:155 not_selected:152 | return (x + half - (wide)(x < 0)) >> bits;
+ 5738   3.7% ins=  4.7% loc=      0 wait:158 selected:107 wait (Not Issued):86 | sv += mulu64_128(cge[warp][kk], (int64_t)carried_hs(w, hs, m, first + 
+ 3376   3.5% ins=  5.5% loc=      0 wait:227 selected:103 wait (Not Issued):75 | return ((uwide)__umul64hi(a, b) << 64) | (uwide)(a * b);
+ 3398   3.4% ins=  4.2% loc=      0 not_selected:122 wait:93 math:92 | return b < 0 ? -p : p;
+ 5708   3.4% ins=  0.0% loc=      0 long_sb:439 long_sb (Not Issued):226 selected:3 | cgd[warp][lane] = dsv;
+ 5721   2.7% ins=  5.9% loc=      0 wait:121 selected:119 wait (Not Issued):60 | const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + ent
+ 5713   2.4% ins=  1.8% loc=      0 wait:172 wait (Not Issued):90 selected:43 | for (uint32_t kk = part; part < parts && kk < kn; kk += parts) {
+  957   2.3% ins=  6.3% loc=      0 selected:133 wait:51 not_selected:29 | return skin_word(w, w.skin[((uint64_t)p * w.E2 + entry) * w.n + l]);
+  572   2.3% ins=  3.4% loc=      0 wait:82 not_selected:79 selected:63 | return w.site_place ? w.site_place[g] : w.site_pos[g];
+ 5712   2.0% ins=  0.9% loc=      0 branch_resolving:72 wait:62 math:49 | const uint32_t kn = K - k0 < 32 ? K - k0 : 32;
+ 3397   1.8% ins=  2.9% loc=      0 selected:55 wait:47 no_inst:37 | const wide p = (wide)mulu64(a, mag64(b));
+  234   1.4% ins=  2.5% loc=      0 selected:50 no_inst:37 branch_resolving:29 | return v < 0 ? (uint64_t)0 - (uint64_t)v : (uint64_t)v;
+ 3259   1.4% ins=  0.5% loc=      0 long_sb:121 long_sb (Not Issued):75 wait:25 | const uint32_t i = e < probed ? pmem[poff[c] + e] : olist[e - probed];
+ 5747   1.4% ins=  0.2% loc=      0 long_sb:147 long_sb (Not Issued):83 not_selected:12 | dq[slot] = fit64((wide)dq[slot] + rel(sk, CONTACT_BACK + g0), w.status
+ 5737   1.4% ins=  2.9% loc=      0 wait:68 selected:55 wait (Not Issued):41 | sk += mul64_128(cgd[warp][kk], (int64_t)bracket);
+ 5728   1.2% ins=  0.8% loc=      0 long_sb:75 long_sb (Not Issued):43 wait:39 | const uint64_t sentry = paced_c && paced_hs(w, hs, first + i) ? suppor

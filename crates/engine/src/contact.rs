@@ -48,6 +48,17 @@ pub fn shares(face: &TowerFace) -> Shares {
         .collect()
 }
 
+/// [measurement; the lead, November 21] **A probe of one tick** ([`Constitution::pass_probed`]): at tick `at`, `perturb` reads the tick's opening
+/// state and returns the perturbations to run through that tick (each a list of `(entry, change)`); the pass fills the opening state, the
+/// state the tick left, and each perturbed state's state after the tick.
+pub(crate) struct TickProbe<'a> {
+    pub(crate) at: usize,
+    pub(crate) perturb: &'a (dyn Fn(&[i64]) -> Vec<Vec<(usize, i64)>> + Sync),
+    pub(crate) before: Vec<i64>,
+    pub(crate) after: Vec<i64>,
+    pub(crate) outputs: Vec<Vec<i64>>,
+}
+
 /// One tick's forward temporaries over a region.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct TickCell {
@@ -1014,7 +1025,31 @@ impl Constitution {
 
 
     /// [`Constitution::pass_with`], with the site-ticks of `hold` held where given (a reading: [`Constitution::pass_held`]).
+    /// [measurement; the lead, November 21, the lattice record §6.1's read] **The region's forward with one tick probed**: the pass runs as
+    /// [`Constitution::pass`] reads it (both reads where the field reads twice, the probe on the second) up to tick `probe.at`, where each state
+    /// `probe.perturb` gives from the tick's opening state is run through that one tick with the tick's own operands (its clocks, moments,
+    /// carried locks and junction), and its state after the tick is kept; the pass stops there. A ruler for the gains of the tick's
+    /// reading-then-writing map by finite differences; the constitution is only read.
+    #[cfg_attr(not(test), expect(dead_code, reason = "a ruler that the host tests read (`the_ticks_gains_by_finite_differences`)"))]
+    pub(crate) fn pass_probed(&self, region: &Region, probe: &mut TickProbe<'_>) -> Result<()> {
+        if region.strand {
+            return refuse("a probed pass of a passage read by two streams");
+        }
+        if !self.declaration.mark || matches!(self.ruler_far, 3..=5 | 7..=9) || region.before {
+            self.pass_with_held_probed(region, false, None, None, Some(probe))?;
+            return Ok(());
+        }
+        let first = self.pass_with(region, false, None)?;
+        let marks: Vec<Option<Shares>> = (0..region.classes.len()).map(|t| if Self::silent(region, t) { first.faces[t].as_ref().map(shares) } else { None }).collect();
+        self.pass_with_held_probed(region, false, Some(&marks), None, Some(probe))?;
+        Ok(())
+    }
+
     fn pass_with_held(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>, hold: Option<(&[Vec<bool>], bool)>) -> Result<Forward> {
+        self.pass_with_held_probed(region, keep, marks, hold, None)
+    }
+
+    fn pass_with_held_probed(&self, region: &Region, keep: bool, marks: Option<&[Option<Shares>]>, hold: Option<(&[Vec<bool>], bool)>, mut probe: Option<&mut TickProbe<'_>>) -> Result<Forward> {
         self.admit_region(region)?;
         let d = &self.declaration;
         let dw = d.width;
@@ -1062,12 +1097,37 @@ impl Constitution {
             if self.lock_carry.is_some() {
                 cell.lock_prev = std::mem::take(&mut locks);
             }
-            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, if self.sided(region) { Sided::Before { past: self.past(region) } } else { Sided::Both })?;
+            let sided = if self.sided(region) { Sided::Before { past: self.past(region) } } else { Sided::Both };
+            if let Some(p) = probe.as_deref_mut().filter(|p| p.at == k) {
+                let states: Vec<Vec<i64>> = (p.perturb)(&x).into_iter().map(|delta| {
+                    let mut xp = x.clone();
+                    for (i, dv) in delta {
+                        xp[i] += dv;
+                    }
+                    xp
+                }).collect();
+                let lock_prev = cell.lock_prev.clone();
+                let outs: Vec<Vec<i64>> = states.into_par_iter().map(|mut xp| -> Result<Vec<i64>> {
+                    let mut c = TickCell { lock_prev: lock_prev.clone(), ..TickCell::default() };
+                    self.tick(&mut xp, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut c, sided)?;
+                    if let Some(prev) = prior.as_deref() {
+                        self.junction_forward(&mut xp, prev, &reaches, &mut c)?;
+                    }
+                    Ok(xp)
+                }).collect::<Result<Vec<_>>>()?;
+                p.before = x.clone();
+                p.outputs = outs;
+            }
+            self.tick(&mut x, &definite, &keyed, tick_paces, tick_moment, &reaches, window.as_deref(), &mut cell, sided)?;
             if self.lock_carry.is_some() {
                 locks = cell.rows.iter().map(|row| row.iter().map(|src| (src.j, src.s)).collect()).collect();
             }
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
+            }
+            if let Some(p) = probe.as_deref_mut().filter(|p| p.at == k) {
+                p.after = x.clone();
+                return Ok(out);
             }
             if let (Some((h, carry)), Some(from)) = (hold, held_from.as_ref()) {
                 let mut next = vec![0i64; if carry { x.len() } else { 0 }];

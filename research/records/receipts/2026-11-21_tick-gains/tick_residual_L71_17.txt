@@ -1,0 +1,20 @@
+TICK_RESIDUAL k=0 state_step_over_state_micro=5887288 state_step_ratio_milli=- chart_step_over_chart_micro=1411995 chart_step_ratio_milli=-
+TICK_RESIDUAL k=1 state_step_over_state_micro=533416 state_step_ratio_milli=708 chart_step_over_chart_micro=1107177 chart_step_ratio_milli=784
+TICK_RESIDUAL k=2 state_step_over_state_micro=1493927 state_step_ratio_milli=4348 chart_step_over_chart_micro=746087 chart_step_ratio_milli=673
+TICK_RESIDUAL k=3 state_step_over_state_micro=2441177 state_step_ratio_milli=5684 chart_step_over_chart_micro=113591 chart_step_ratio_milli=152
+TICK_RESIDUAL k=4 state_step_over_state_micro=442753 state_step_ratio_milli=1072 chart_step_over_chart_micro=12351 chart_step_ratio_milli=108
+TICK_RESIDUAL k=5 state_step_over_state_micro=157137 state_step_ratio_milli=958 chart_step_over_chart_micro=2885 chart_step_ratio_milli=233
+TICK_RESIDUAL k=6 state_step_over_state_micro=79647 state_step_ratio_milli=977 chart_step_over_chart_micro=1037 chart_step_ratio_milli=359
+TICK_RESIDUAL k=7 state_step_over_state_micro=48049 state_step_ratio_milli=986 chart_step_over_chart_micro=469 chart_step_ratio_milli=451
+TICK_RESIDUAL k=8 state_step_over_state_micro=32120 state_step_ratio_milli=990 chart_step_over_chart_micro=244 chart_step_ratio_milli=520
+TICK_RESIDUAL k=9 state_step_over_state_micro=23005 state_step_ratio_milli=993 chart_step_over_chart_micro=140 chart_step_ratio_milli=576
+TICK_RESIDUAL k=10 state_step_over_state_micro=17279 state_step_ratio_milli=994 chart_step_over_chart_micro=87 chart_step_ratio_milli=619
+TICK_RESIDUAL k=11 state_step_over_state_micro=13467 state_step_ratio_milli=996 chart_step_over_chart_micro=57 chart_step_ratio_milli=656
+TICK_RESIDUAL k=12 state_step_over_state_micro=10790 state_step_ratio_milli=997 chart_step_over_chart_micro=39 chart_step_ratio_milli=685
+TICK_RESIDUAL k=13 state_step_over_state_micro=8836 state_step_ratio_milli=997 chart_step_over_chart_micro=27 chart_step_ratio_milli=710
+TICK_RESIDUAL k=14 state_step_over_state_micro=7372 state_step_ratio_milli=997 chart_step_over_chart_micro=20 chart_step_ratio_milli=731
+TICK_RESIDUAL k=15 state_step_over_state_micro=6243 state_step_ratio_milli=998 chart_step_over_chart_micro=15 chart_step_ratio_milli=750
+TICK_RESIDUAL k=16 state_step_over_state_micro=5356 state_step_ratio_milli=998 chart_step_over_chart_micro=0 chart_step_ratio_milli=0
+TICK_RESIDUALS sites=240 open=109 ticks=17
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 157 filtered out; finished in 8.23s
+RES17 elapsed 8 s
