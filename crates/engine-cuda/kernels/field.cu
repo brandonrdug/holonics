@@ -5694,6 +5694,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
     __shared__ uint32_t cgi[CONTACT_ROWS][32];
     __shared__ int64_t cgd[CONTACT_ROWS][32];
     __shared__ uint64_t cge[CONTACT_ROWS][32];
+    // [realization; the lead, November 21, the columns' source counters] The receiver's distance and its skins' support entry, formed once by the
+    // lane that gathers the receiver: every lane of the part had formed them again behind the receiver's place, and the distance's line held 0.160
+    // of the kernel's stall samples. The same integers in the same order.
+    __shared__ uint32_t cgg[CONTACT_ROWS][32];
+    __shared__ uint64_t cgs[CONTACT_ROWS][32];
     const uint32_t warp = threadIdx.x >> 5;
     const uint32_t lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
@@ -5726,9 +5731,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
             {
                 const uint32_t k = k0 + lane;
-                uint32_t iv = UINT32_MAX;
+                uint32_t iv = UINT32_MAX, gv = 0;
                 int64_t dsv = 0;
-                uint64_t ev = 0;
+                uint64_t ev = 0, sv_entry = 0;
                 if (k < K) {
                     const uint32_t i = receiver_at(members, off, pmem, poff, olist, c, j, heard_of(w, r, sites), k, w.site_place ? w.site_place + first : nullptr);
                     // [the known stream] A receiver before the source does not hear it (`support_at`): its row holds no entry for it.
@@ -5737,11 +5742,19 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                         iv = i;
                         dsv = dsc[at];
                         ev = e[at];
+                        // (the pair's distance by the receiver's place: an open place of a strand's second stream stands at its place)
+                        const uint32_t ipl = place_of(w, first + i);
+                        gv = j > ipl ? j - ipl : ipl - j;
+                        // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
+                        // whose pace is not plain there, the one row that reads the store.
+                        sv_entry = paced_c && paced_hs(w, hs, first + i) ? support_row(w, r, i) + support_entry(w, h, r, first, members, off, i, j) : 0;
                     }
                 }
                 cgi[warp][lane] = iv;
                 cgd[warp][lane] = dsv;
                 cge[warp][lane] = ev;
+                cgg[warp][lane] = gv;
+                cgs[warp][lane] = sv_entry;
             }
             __syncwarp();
             const uint32_t kn = K - k0 < 32 ? K - k0 : 32;
@@ -5755,12 +5768,8 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32) field_contact_co
                 // which waited on the probe, held 0.255 of the kernel's stall samples. The same integers in the same order.
                 const int64_t probe_i = w.pq[((uint64_t)h * w.T + first + i) * S + entry];
                 const int64_t dy_i = dyr[(uint64_t)i * S + entry];
-                // (the pair's distance by the receiver's place: an open place of a strand's second stream stands at its place)
-                const uint32_t ipl = place_of(w, first + i);
-                const uint32_t gap = j > ipl ? j - ipl : ipl - j;
-                // The pair's support entry in receiver `i`'s row (`support_entry`), where the clock's skins stand: read only on a paced head
-                // whose pace is not plain there, the one row that reads the store.
-                const uint64_t sentry = paced_c && paced_hs(w, hs, first + i) ? support_row(w, r, i) + support_entry(w, h, r, first, members, off, i, j) : 0;
+                const uint32_t gap = cgg[warp][kk];
+                const uint64_t sentry = cgs[warp][kk];
                 const wide dec = skin_raw_hs(w, hs, m, first + i, sentry, gap);
                 // The key's bracket released by the skin's bits once (the probe's grain), then by the covector,
                 // against the receiver's probe (§16.19).
