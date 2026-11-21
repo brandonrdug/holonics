@@ -1006,6 +1006,34 @@ impl Constitution {
             }
             outer_sum(&mut g[l.read..l.read + dw * dw], dw, &ys, &xs)?;
         }
+        // [definition; the formal thread, November 21] The lane leak's strengths, and its stores' covector from the forward alone: each lane's
+        // successive chart moves over the region's sites and the pass's ticks, `−Σ_(t, k≥1) ⟨Δr̂_t^k, Δr̂_t^(k−1)⟩` released by the face's grain
+        // (the last move read from the state the last tick left).
+        let leak_deltas: Option<Vec<i64>> = d.lane_leak.then(|| self.theta[l.lane_leak..l.lane_leak + d.lanes].iter().map(|&v| crate::contact::lane_leak_delta(v)).collect());
+        if d.lane_leak {
+            let lw = dw / d.lanes;
+            let mut charts: Vec<&[i32]> = pass.ticks.iter().map(|c| c.read.as_slice()).collect();
+            let last = pass.ticks.last().ok_or(TowerError::Refused("a lane leak's return reads a pass with no tick"))?;
+            let mut end = vec![0i32; sites * dw];
+            let (mut r, mut sc) = (Vec::with_capacity(dw), Vec::with_capacity(d.lanes));
+            for t in 0..sites {
+                r.clear();
+                sc.clear();
+                lane_chart(&last.after[t * dw..(t + 1) * dw], d.lanes, &mut r, &mut sc)?;
+                end[t * dw..(t + 1) * dw].copy_from_slice(&r);
+            }
+            charts.push(&end);
+            let mut ip = vec![0i128; d.lanes];
+            for k in 1..charts.len() - 1 {
+                let (a, b, c) = (charts[k - 1], charts[k], charts[k + 1]);
+                for (i, slot) in (0..sites * dw).map(|i| (i, (i % dw) / lw)) {
+                    ip[slot] += (i128::from(b[i]) - i128::from(a[i])) * (i128::from(c[i]) - i128::from(b[i]));
+                }
+            }
+            for (lane, &v) in ip.iter().enumerate() {
+                g[l.lane_leak + lane] -= release(v, FACE_BITS);
+            }
+        }
         // [theory, November 13, the junction record §7] What a tick's return owes the state the tick before began from, `−Γ^(k+1) λ^(k+2)`.
         let mut owed: Option<Vec<i64>> = None;
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
@@ -1015,6 +1043,8 @@ impl Constitution {
             if let Some(out) = lambdas.as_deref_mut() {
                 out.push(dx.clone());
             }
+            let leak_lambda: Option<Vec<i64>> = leak_deltas.as_ref().map(|_| dx.clone());
+            let mut leak_lambda = leak_lambda;
             // The return after this tick: `dx` holds `λ^(k+1)` and becomes the output's `(1 + Γ) λ^(k+1)` ([`Constitution::junction_back`]).
             let joined = if cell.jg.is_empty() { None } else { Some(self.junction_back(cell, &mut dx)?) };
             self.tick_return(cell, &mut dx, g, pass.paces_at(cell), &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, shares.as_deref_mut(), currents.as_deref_mut(), reach.as_deref_mut(), Some(closed_rows.as_slice()).filter(|c| !c.is_empty() && k + 1 == pass.ticks.len()))?;
@@ -1036,6 +1066,16 @@ impl Constitution {
                 }
             }
             owed = next_owed;
+            // [definition; the formal thread, November 21] The lane leak's return into the state this tick began from, `−δ_ℓ λ^(k+1)`.
+            if let (Some(deltas), Some(lam)) = (leak_deltas.as_deref(), leak_lambda.take()) {
+                let lw = dw / deltas.len();
+                for (i, (slot, &v)) in dx.iter_mut().zip(&lam).enumerate() {
+                    let dl = deltas[(i % dw) / lw];
+                    if dl != 0 {
+                        *slot = fit64(i128::from(*slot) - release(i128::from(dl) * i128::from(v), 30))?;
+                    }
+                }
+            }
             // [measurement] A forward that did not hear the level (a ruler's at `3` or `4`, a known stream's) returns nothing to it.
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && self.levelled(region)) {
                 let sp = pass.tower.as_ref().ok_or(TowerError::Refused("a tower's reverse reads a forward that held its scale"))?;

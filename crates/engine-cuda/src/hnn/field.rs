@@ -58,7 +58,7 @@ mod tests {
     use holonics_engine::contact::WEIGHT_BITS;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> Declaration {
-        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }
+        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -72,7 +72,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
+        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
         let describe = |name: &str, d: Declaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics_engine::field::Constitution::found(d, &vec![7u8; draws]).expect("founded");
