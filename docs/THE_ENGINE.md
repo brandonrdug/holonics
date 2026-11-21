@@ -23,8 +23,12 @@ over its store ([§5](#5-the-learners-state)).
 Every value is a word at a declared grain. Faces, charts and currents stand on `2^(−16)`, material on `2^(−24)`, frames and skins on
 `2^(−30)`, a series row's exponential faces on `2^(−62)` with its shares on `2^(−63)`, covectors on `2^(−24)`,
 the contact's on `2^(−40)` and the deposit's on `2^(−32)`, and a code's reading on `2^(−20)` bits
-([`width.rs`](../crates/engine/src/width.rs)). Every product's remainder below its grain
-is released to the nearest numerator before the product enters a sum, and every sum keeps its terms, so the host
+([`width.rs`](../crates/engine/src/width.rs)). These grains are declared numbers: each has a row in
+[`WIDTHS.tsv`](../crates/engine/WIDTHS.tsv) with its class and its need, read by gate 1 (`tools/width_census.py`), and on
+November 21 fifteen of the 64 declared widths are picked and none is derived from a receiver's tolerance (#1088;
+[the record](../research/records/2026-11-21_A_WIDTH_IS_A_TOLERANCE_A_WORDS_TOP_GROWS_BY_ITS_CARRY_ITS_BOTTOM_STANDS_WHERE_THE_UNREAD_TAIL_NO_LONGER_MOVES_ITS_RECEIVERS_CODE_AND_THE_LATTICE_RULE_THAT_DERIVED_THE_ENGINES_WIDTHS_WAS_BUILT_IN_OCTOBER_AND_NEVER_TAKEN.md)). A series releases each product's remainder below its grain to the nearest numerator
+before the product enters its sum; a map's row forms its whole sum of products and releases it once (`affine`,
+[`adjoint.rs`](../crates/engine/src/adjoint.rs); read November 21). Every sum keeps its terms, so the host
 and any partition of the card give the same bits (CLAUDE.md, the precision law). The chains (the carry circles' scan,
 the ticks) release at every step and run in their declared order, which is the law's
 ([the record of November 15](../research/records/2026-11-15_A_VALUE_IS_READ_AT_A_PLACE_A_SUM_IS_ORDERED_ONLY_WHERE_A_RELEASE_IS_A_SECTION_A_CENSUS_CONFIRMS_TO_ITS_OWN_SPREAD_AND_THREADS_RECONCILE_AT_THEIR_CONDITIONAL_INFORMATION.md) §6). The host realization (`Host`) is the reference the card's
