@@ -118,7 +118,7 @@ each head word's line is the line before it with one word more:
 | `hnn-field-v14c` | 19 | closed `E`, more than zero; the crossing's word is `0` or `1` |
 | `hnn-field-v14p` | 20 | the pump's word, `1`; closed `E` is written even at zero |
 | `hnn-field-v14q` | 21 | the lane leak's word, `1`; the pump's is `0` or `1` |
-| `hnn-field-v14r` | 22 | the friction's word, `1`: each head's friction of distance (`ψ`, two a head, `Loci::friction`); the leak's is `0` or `1` |
+| `hnn-field-v14r` | 22 | the friction's word: `1`, each head's friction of distance (`ψ`, two a head, `Loci::friction`); `2`, with it read from the receiver's own state (`a_h`, a row of `D` a head, `Loci::friction_gate`); the leak's is `0` or `1` |
 
 A field writes the first of these lines that holds everything it declares. `hnn-field-v13` (ten words, no depth) is
 read as a field with no depth ring. `hnn-field-v14k` and `hnn-field-v14t` are refused: their states are receipts.

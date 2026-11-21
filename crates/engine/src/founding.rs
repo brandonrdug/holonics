@@ -817,7 +817,7 @@ impl Constitution {
         if self.declaration.lane_leak {
             return refuse("a field whose tick already leaks by lane");
         }
-        let d = Declaration { lane_leak: true, friction: false, ..self.declaration };
+        let d = Declaration { lane_leak: true, friction: false, friction_gate: false, ..self.declaration };
         d.admit()?;
         let layout = Loci::new(&d);
         if self.theta.len() != layout.lane_leak {
@@ -844,11 +844,37 @@ impl Constitution {
         if self.declaration.friction {
             return refuse("a field whose heads already carry a friction of distance");
         }
-        let d = Declaration { friction: true, ..self.declaration };
+        let d = Declaration { friction: true, friction_gate: false, ..self.declaration };
         d.admit()?;
         let layout = Loci::new(&d);
         if self.theta.len() != layout.friction {
             return refuse("a field whose material does not end where the frictions of distance begin");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; the lead, November 21 (the record of the reach, §6)] **The field whose friction is read from its receivers' state**
+    /// ([`Declaration::friction_gate`]): `a_h`, a row of `D` a head, appended at the end of the fine field's material, founded at zero, every
+    /// standing entry kept, so every friction is its head's and kind's and every face the source's bit for bit. Also the map over the whole
+    /// material from each new entry to the old one it copies (`None` for the gate). Refused on a field without the friction or with its gate.
+    pub fn with_friction_gate(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if !self.declaration.friction || self.declaration.friction_gate {
+            return refuse("a field whose friction's gate is founded has the friction and no gate");
+        }
+        let d = Declaration { friction_gate: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.friction_gate {
+            return refuse("a field whose material does not end where the friction's gate begins");
         }
         let (fine, total) = (self.theta.len(), self.material_len());
         let mut theta = self.theta.clone();
@@ -1405,6 +1431,21 @@ impl Learner {
             return refuse("a learner founds its friction after its held step is read");
         }
         let (field, from) = self.field.with_friction()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        Ok(Self { remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 21 (the record of the reach, §6)] **The learner whose friction is read from its receivers' state**
+    /// ([`Constitution::with_friction_gate`]), founded at zero, as [`Learner::with_friction`] founds the friction: every standing entry keeps
+    /// its moments, its remainder and its rate; the gate's moments open at zero; the gate is the friction's part. Refused while a step is held.
+    pub fn with_friction_gate(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its friction's gate after its held step is read");
+        }
+        let (field, from) = self.field.with_friction_gate()?;
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());

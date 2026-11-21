@@ -157,6 +157,8 @@ pub(crate) struct Tick<'c> {
     pub(crate) pabg: Option<Pooled<'c, i64>>,
     pub(crate) ptp: Option<Pooled<'c, i64>>,
     pub(crate) pct: Option<Pooled<'c, i64>>,
+    /// [the lead, November 21] The friction's gate at each receiver `[t][H]` on `2^(−16)` bits an octave, none where the field has no gate.
+    pub(crate) fgate: Option<Pooled<'c, i64>>,
     /// The tick's carrier width: the binary length of its largest unit word.
     pub(crate) bits: Pooled<'c, u32>,
 }
@@ -224,6 +226,7 @@ impl<'c> Resident<'c> {
             pabg: triad(6)?,
             ptp: triad(2)?,
             pct: triad(2)?,
+            fgate: if d.friction_gate { Some(alloc64(sites * heads)?) } else { None },
             bits: self.timed(Kind::Alloc, || self.take_zeroed::<u32>(4)).map_err(device)?,
         })
     }
@@ -248,6 +251,10 @@ impl<'c> Resident<'c> {
         card.zero_octets(&tick.bits, 0, 16).map_err(device)?;
         // Every receiver's probe (§16.19), before the classes: a receiver's probed classes are its probe's.
         self.affine("field_affine_x32", words, words.probe, words.probe_bias, words.rprobe, m2, dw, tick.read.device_ptr(), dw, pr, m2, 0, false)?;
+        // [the lead, November 21] The friction's gate at each receiver, read from the tick's chart: `release(⟨a_h, r̂_t⟩, 24)` `[t][H]`.
+        if let Some(fg) = tick.fgate.as_ref() {
+            self.affine("field_affine_x32", words, words.gate_at, u64::MAX, words.rgate, heads, dw, tick.read.device_ptr(), dw, fg.device_ptr(), heads, 0, false)?;
+        }
         // Its probe reads its moment, as its value does (§16.20).
         let mut prp = pr;
         self.launch("field_moment_add_probe", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut prp)])?;

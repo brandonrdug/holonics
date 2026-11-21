@@ -317,6 +317,10 @@ impl Constitution {
         if d.friction {
             parts[l.friction..l.friction + 2 * d.heads].fill(FRICTION_PART as u8);
         }
+        // The friction's gate is the friction's part too ([`Declaration::friction_gate`]).
+        if d.friction_gate {
+            parts[l.friction_gate..l.friction_gate + d.heads * d.width].fill(FRICTION_PART as u8);
+        }
         parts
     }
 }

@@ -438,6 +438,12 @@ struct FieldWords {
     // [the lead, November 21] Each head's friction of distance (`theta[friction_at + 2 h + kind]` on `2^(−16)` bits an octave, the host's
     // `Declaration::friction`); `UINT64_MAX` where the field has none.
     uint64_t friction_at;
+    // [the lead, November 21] The friction's gate (`theta[gate_at + h D + i]`, `a_h` on `2^(−24)`, the host's `Declaration::friction_gate`;
+    // `UINT64_MAX` where none), its largest word, the tick's gate `[t][H]` on `2^(−16)` bits an octave and its covector `[t][H]`.
+    uint64_t gate_at;
+    uint64_t rgate;
+    int64_t *fgate;
+    int64_t *dfgate;
     // The temperatures' fine roots (§16.12): the exponential's roots 17 to 24 on `2^(−62)` (`Constitution::fine_exponential`).
     const uint64_t *fine_roots;
     wide *gcov;
@@ -3531,6 +3537,13 @@ __device__ __forceinline__ wide friction_of(const FieldWords &w, uint32_t h, boo
     return w.friction_at == UINT64_MAX ? (wide)0 : (wide)w.theta[w.friction_at + 2 * h + (listens ? 1 : 0)];
 }
 
+// [definition; the lead, November 21] **A receiver's friction of distance read from its own state**: the head's and kind's friction and, where
+// the field has the gate, `release(⟨a_h, r̂_g⟩, 24)` of the receiver `g` at this tick (the host's `Declaration::friction_gate`), formed once a
+// tick by the forward map into `fgate` `[t][H]`.
+__device__ __forceinline__ wide friction_at_site(const FieldWords &w, uint32_t h, bool listens, uint64_t g) {
+    return friction_of(w, h, listens) + (w.gate_at == UINT64_MAX ? (wide)0 : (wide)w.fgate[g * w.H + h]);
+}
+
 // The head's lock at unit gain `S` of the word `wi` (at unit power, its `span` reals) against site `j`'s across
 // `gap` sites: the sum over its `n` modes of each mode's lock carried by the skin (checked, exact), released
 // `16 + 2g + 1` bits (§2.5, §12, §15.2, §15.10); its score is `scored`.
@@ -3640,7 +3653,7 @@ __device__ __forceinline__ int64_t crowd_base_narrow(const FieldWords &w, uint32
 // A crowd's score: `z = release(T S, 24) − level 2^16`.
 __device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level, wide temper, uint64_t gi, bool right) {
     // A crowd is heard by a class receiver alone (an open receiver hears every definite site sharply), so its friction is kind 0's.
-    return scored(w, temper, crowd_base(w, h, wi, swlo, swhi, count, level, gi, right), level, friction_of(w, h, false) * (wide)level);
+    return scored(w, temper, crowd_base(w, h, wi, swlo, swhi, count, level, gi, right), level, friction_at_site(w, h, false, gi) * (wide)level);
 }
 
 // The lanes that carry one entry of the span, and the parts of a chunk each lane takes: a lane an
@@ -3710,7 +3723,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
-        const wide fric = friction_of(w, h, rcs[warp].open != 0);
+        const wide fric = friction_at_site(w, h, rcs[warp].open != 0, g);
         // The pairs' scores are kept at the region block's dense address `[i][j]` for the contact, which reads
         // them there (a score is computed once; the entries outside the support are never read). On a return
         // the locks at unit gain are kept beside them, for the temperatures' covector.
@@ -5643,6 +5656,10 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             facc = warp_sum(facc);
             if (lane == 0 && facc != 0) {
                 add_wide(w.gcov + w.friction_at + 2 * h + (rcs[warp].open ? 1 : 0), rel(facc, FACE_BITS));
+            }
+            // The gate's row covector at its receiver, `release(δψ_g, 16)` (`[t][H]`), which the gate's maps return after the heads.
+            if (lane == 0 && w.gate_at != UINT64_MAX) {
+                w.dfgate[g * w.H + h] = fit64(rel(facc, FACE_BITS), w.status);
             }
         }
         __syncwarp();

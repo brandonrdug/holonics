@@ -345,6 +345,9 @@ impl Constitution {
         if let Some(c) = currents.as_deref_mut() {
             c.push(vec![0i64; heads * sites * span]);
         }
+        // [the lead, November 21] Each row's friction covector at its receiver, `release(δψ_i, 16)` on the face family's `2^(−24)` (`[t][h]`), for
+        // the friction's gate ([`Declaration::friction_gate`]).
+        let mut dgate = vec![0i64; if d.friction_gate { sites * heads } else { 0 }];
         for h in 0..heads {
             // A paced head's current returns to the receiver's frame `y = conj(U) ỹ`, turned by `τ_i`:
             // `δτ_i −= b Re(conj(δy_i) i y_i)` (§16).
@@ -499,6 +502,9 @@ impl Constitution {
                 g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
                 if d.friction {
                     g[l.friction + 2 * h + kind] += release(dpsi, FACE_BITS);
+                }
+                if d.friction_gate {
+                    dgate[i * heads + h] = fit64(release(dpsi, FACE_BITS))?;
                 }
                 if let Some(sh) = shares.as_deref_mut() {
                     for (src, &v) in row.iter().zip(&out) {
@@ -683,6 +689,22 @@ impl Constitution {
                     g[bias + e] += v as i128;
                 }
                 transposed(&self.theta[w..w + m2 * dw], reach_w, dw, rows[t], MATERIAL_BITS, &mut back)?;
+                for i in 0..dw {
+                    dr_all[t * dw + i] = fit64(dr_all[t * dw + i] as i128 + back[i] as i128)?;
+                }
+            }
+        }
+        // [the lead, November 21] The friction's gate, a chart of the read with one output a head: `δa_h = Σ_t δψ_(t,h) r̂_t` on `2^(−40)`, and the
+        // read takes `a_h δψ_(t,h)` back ([`Declaration::friction_gate`]).
+        if d.friction_gate {
+            let (at, len) = (l.friction_gate, heads * dw);
+            let rows: Vec<&[i64]> = dgate.chunks_exact(heads).collect();
+            outer_sum(&mut g[at..at + len], dw, &rows, &reads)?;
+            let a = &self.theta[at..at + len];
+            let amax = a.iter().map(|v| u64::from(v.unsigned_abs())).max().unwrap_or(0);
+            let mut back = vec![0i64; dw];
+            for t in 0..sites {
+                transposed(a, amax, dw, rows[t], MATERIAL_BITS, &mut back)?;
                 for i in 0..dw {
                     dr_all[t * dw + i] = fit64(dr_all[t * dw + i] as i128 + back[i] as i128)?;
                 }

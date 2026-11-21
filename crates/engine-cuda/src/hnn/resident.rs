@@ -170,6 +170,13 @@ pub(crate) struct Words {
     /// [the lead, November 21] Each head's friction of distance (`theta[friction_at + 2 h + kind]` on `2^(−16)` bits an octave,
     /// [`holonics_engine::field::Declaration::friction`]); `u64::MAX` where the field has none.
     pub(crate) friction_at: u64,
+    /// [the lead, November 21] The friction's gate (`theta[gate_at + h D + i]`, `a_h` on `2^(−24)`,
+    /// [`holonics_engine::field::Declaration::friction_gate`]; `u64::MAX` where none), its largest word, and the tick's gate `[t][H]` on
+    /// `2^(−16)` bits an octave and its covector `[t][H]` on `2^(−24)` (zero pointers where none).
+    pub(crate) gate_at: u64,
+    pub(crate) rgate: u64,
+    pub(crate) fgate: u64,
+    pub(crate) dfgate: u64,
     pub(crate) fine_roots: u64,
     pub(crate) gcov: u64,
     pub(crate) sb: u64,
@@ -974,6 +981,10 @@ impl<'c> Resident<'c> {
             met: met.device_ptr(),
             temper_at: l.temper as u64,
             friction_at: if d.friction { l.friction as u64 } else { u64::MAX },
+            gate_at: if d.friction_gate { l.friction_gate as u64 } else { u64::MAX },
+            rgate: if d.friction_gate { reach(l.friction_gate, d.heads * dw) } else { 0 },
+            fgate: 0,
+            dfgate: 0,
             fine_roots: run_base + fine_at,
             probe: l.probe as u64,
             probe_bias: l.probe_bias as u64,

@@ -82,6 +82,7 @@ pub(crate) fn set_clock(w: &mut Words, clock: Option<&CardClock>, base: [u64; 7]
 }
 
 pub(crate) fn set_tick(w: &mut Words, tick: &Tick, returning: bool) {
+    w.fgate = tick.fgate.as_ref().map_or(0, |b| b.device_ptr());
     w.qkv = tick.qkv.device_ptr();
     w.qf = tick.qf.device_ptr();
     w.qf32 = tick.qf32.device_ptr();

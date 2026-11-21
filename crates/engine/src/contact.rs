@@ -735,6 +735,14 @@ impl Constitution {
         cell.sums = Vec::with_capacity(heads);
         for h in 0..heads {
             let lists = &cell.classes[h];
+            // [the lead, November 21] The friction read from each receiver's state at this tick, `release(⟨a_h, r̂_i⟩, 24)` on `2^(−16)` bits an
+            // octave ([`Declaration::friction_gate`]); zero where the field has no gate.
+            let gates: Vec<i128> = if d.friction_gate {
+                let a = &self.theta[self.layout.friction_gate + h * dw..self.layout.friction_gate + (h + 1) * dw];
+                cell.read.chunks_exact(dw).map(|r| release(a.iter().zip(r).map(|(&w, &x)| i128::from(w) * i128::from(x)).sum::<i128>(), MATERIAL_BITS)).collect()
+            } else {
+                vec![0; sites]
+            };
             let sums = Sums::of(&cell.q[h * sites * span..(h + 1) * sites * span], &cell.v[h * sites * span..(h + 1) * sites * span], definite, span);
             // [definition; agent-inferred, November 3, §16.38] **Conservation of faces**: a still head reads content
             // alone, so the definite sources of one resonance class are one face to it, and that face's mass is shared
@@ -769,7 +777,7 @@ impl Constitution {
                 // The lock's temperature for this receiver's kind (§15.10).
                 let temper = self.temper(h, lists.listens(i))?;
                 // The head's friction of distance for this receiver's kind ([`Declaration::friction`]), a ruler's beside it where set.
-                let friction = self.friction(h, lists.listens(i));
+                let friction = self.friction(h, lists.listens(i)) + gates[i];
                 let mut series = SeriesRow::new(span);
                 let mut row: Vec<Source> = Vec::new();
                 for j in lists.support(i) {
@@ -1503,6 +1511,9 @@ impl Constitution {
     /// clocks, `rx` the open places', `moment` their retarded moments.
     fn twin_tick(&self, y: &mut [i64], known: &TickCell, paces: &Paces, rx: &Paces, moment: &[i64], reaches: &Reaches) -> Result<()> {
         let d = &self.declaration;
+        if d.friction_gate {
+            return refuse("the second tick's oracle on a field whose friction is read from its receivers' state (the joined tick reads it)");
+        }
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
         let (m2, span) = (2 * m, 2 * n);
         let sites = y.len() / dw;

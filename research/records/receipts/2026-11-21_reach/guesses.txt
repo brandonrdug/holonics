@@ -17,3 +17,10 @@ law) code at most 0.30 nats a copy digit and 0.85 a sum digit, W80t's at least 0
 a place of W80t's on every region; and head 0's listeners' friction at W80r's STATE.3000 stands at a quarter of a bit an octave or more.
 Why: the ruler's friction at half a bit took copy digits 0.54 -> 0.16 and text +0.003 (G-R1), and the deposit moves a face-grain entry at
 most 2^(-12) bits an octave a section, 0.73 over a lap where its covector holds its sign.
+
+Fixed 2026-11-21T18:44:10Z (date -u), before W80g trains (reach/w80g.sh). G-G1: W80g (W79t's end with each head's friction and its gate on the
+receiver's own state founded at zero) beside W80t (W79t's end, no change), 3,000 sections, read at MEAN.3000: the reach rows' answer digits
+by two streams code at most 0.35 nats a copy digit and 1.00 a sum digit (W80t: 0.549 and 1.139); W80g writes at least 34 of 96 held
+terrain records whole and at least 6 of 16 copies; its text at one place open within 0.02 nats a place of W80t's on every region.
+Why: the gate's ruler (site_friction.py) kept the whole terrain gain at a third of the text's price where a fixed friction of one bit
+stood; trained from zero, a third of that gain is guessed within a lap. W80r's G-F1 is scored when its reads land.

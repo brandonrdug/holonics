@@ -1229,8 +1229,11 @@ pub fn found_pump(args: &[String]) -> Result<()> {
 /// one, the source's with the friction's octave, zero, appended; every other line equal. Anything else is refused and nothing is written.
 /// Reads no realization: that every face is kept is read on the card by the line's own read of the founded state.
 pub fn found_friction(args: &[String]) -> Result<()> {
-    if args.len() != 4 {
-        return Err("found-friction STATE STATE_SHA OUT".into());
+    // [the lead, November 21, the reach §6] With the word `gate`, the friction read from the receivers' state is founded too
+    // ([`Learner::with_friction_gate`]), on a learner with the friction or without it.
+    let gate = args.len() == 5 && args[4] == "gate";
+    if args.len() != 4 && !gate {
+        return Err("found-friction STATE STATE_SHA OUT [gate]".into());
     }
     let started = std::time::Instant::now();
     let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
@@ -1242,8 +1245,21 @@ pub fn found_friction(args: &[String]) -> Result<()> {
     if out.exists() {
         return Err("a founded state's path that exists".into());
     }
-    let founded = learner.with_friction().map_err(|e| e.to_string())?;
-    let (field, from) = learner.field.with_friction().map_err(|e| e.to_string())?;
+    let had = learner.field.declaration.friction;
+    let base = if had { learner.clone() } else { learner.with_friction().map_err(|e| e.to_string())? };
+    let founded = if gate { base.with_friction_gate().map_err(|e| e.to_string())? } else { base.clone() };
+    if !gate && had {
+        return Err("a learner that has the friction founds only its gate (the word `gate`)".into());
+    }
+    let (field, from) = {
+        let (f1, from1): (holonics_engine::field::Constitution, Vec<Option<usize>>) = if had { (learner.field.clone(), (0..learner.field.material_len()).map(Some).collect()) } else { learner.field.with_friction().map_err(|e| e.to_string())? };
+        if gate {
+            let (f2, from2) = f1.with_friction_gate().map_err(|e| e.to_string())?;
+            (f2, from2.iter().map(|o| o.and_then(|i| from1[i])).collect::<Vec<_>>())
+        } else {
+            (f1, from1)
+        }
+    };
     if field != founded.field {
         return Err("the learner's founding and the field's differ".into());
     }
@@ -1262,7 +1278,7 @@ pub fn found_friction(args: &[String]) -> Result<()> {
         let verdict = if x == y {
             judged[0] += 1;
             "equal".to_string()
-        } else if k == 1 && wy[0] == "hnn-field-v14r" && wx.len() >= 12 && wy.len() == 23 && wx[1..12] == wy[1..12] && wy[22] == "1" && founded.field.declaration == (holonics_engine::field::Declaration { friction: true, ..old_d }) {
+        } else if k == 1 && wy[0] == "hnn-field-v14r" && wx.len() >= 12 && wy.len() == 23 && wx[1..12] == wy[1..12] && wy[22] == if gate { "2" } else { "1" } && founded.field.declaration == (holonics_engine::field::Declaration { friction: true, friction_gate: gate, ..old_d }) {
             judged[1] += 1;
             format!("declaration {} to {}", wx[0], wy[0])
         } else if wx.len() == old_fine && wy.len() == new_fine && mapped(&wx, &wy, 0) {
@@ -1283,11 +1299,11 @@ pub fn found_friction(args: &[String]) -> Result<()> {
         println!("FOUND_FRICTION_LINE k={k} {verdict}");
     }
     let moments = 2 + usize::from(learner.remainder.is_some());
-    if judged[1] != 1 || judged[2] != 1 || judged[3] != moments || (learner.rate_parts.is_some() && judged[4] != 1) {
+    if judged[1] != 1 || judged[2] != 1 || judged[3] != moments || (learner.rate_parts.is_some() && !had && judged[4] != 1) || (had && judged[4] != 0) {
         return Err(format!("a founding whose lines were judged {judged:?}").into());
     }
     std::fs::write(out, b.as_bytes())?;
-    println!("FOUND_FRICTION lines={} equal={} material={old_m} founded_material={new_m} friction_entries={} ms={}", la.len(), judged[0], from.iter().filter(|o| o.is_none()).count(), started.elapsed().as_millis());
+    println!("FOUND_FRICTION gate={gate} lines={} equal={} material={old_m} founded_material={new_m} friction_entries={} ms={}", la.len(), judged[0], from.iter().filter(|o| o.is_none()).count(), started.elapsed().as_millis());
     Ok(())
 }
 

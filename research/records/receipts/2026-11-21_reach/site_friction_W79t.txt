@@ -1,0 +1,6 @@
+SITE_FRICTION places=257997 held=158446 gain_mean=-0.0011 r2_held=0.026
+SITE_FRICTION_CODES text     n= 99198 law=1.2797 friction_everywhere=1.2957 friction_where_read=1.2846 share_gated=0.352
+SITE_FRICTION_CODES copy     n=  1361 law=0.5319 friction_everywhere=0.0695 friction_where_read=0.0695 share_gated=1.000
+SITE_FRICTION_CODES reverse  n=  1333 law=0.4453 friction_everywhere=0.0610 friction_where_read=0.0610 share_gated=0.998
+SITE_FRICTION_CODES sum      n=   788 law=0.9492 friction_everywhere=0.6024 friction_where_read=0.6066 share_gated=0.695
+SITE_FRICTION_CODES other    n= 55766 law=0.5757 friction_everywhere=0.5757 friction_where_read=0.5755 share_gated=0.533
