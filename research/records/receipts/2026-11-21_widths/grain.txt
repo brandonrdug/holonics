@@ -1,0 +1,15 @@
+1. the grain a reading count confirms
+   N =        6148: L =     47, 5.55 places
+   N =       43470: L =    123, 6.94 places
+   N =    10000000: L =   1862, 10.86 places
+   N =  1000000000: L =  18617, 14.18 places
+   N = 10000000000: L =  58871, 15.85 places
+2. a grain of 2^-16 is the coarsest its readings confirm at N = 1.239e+10 readings
+3. the walk of an entry at rate 2^-12, in places above the grain 2^-24
+   after    1 sections: 2^-12.00, place 12.0
+   after    8 sections: 2^-10.50, place 13.5
+   after  100 sections: 2^-8.68, place 15.3
+   after 1000 sections: 2^-7.02, place 17.0
+   after 3000 sections: 2^-6.22, place 17.8
+4. the skin is zero past 3.420 periods at a grain of 2^-30; under one face grain (2^-16) past 1.765 periods
+5. resident threads a multiprocessor: 32 registers 1536, 42 registers 1536, 64 registers 1024, 96 registers 672, 128 registers 512

@@ -531,7 +531,10 @@ to the waiting standard, and the closing paragraph of the lap's list.
   a reading improves. Reason: the precision law above, and a width tuned to a reading is fitted to that reading. The reason does not
   reach a part's width read from its capacity price beside a control (atlas `code.capacity-price`; the face lanes of November 14,
   [THE_CONSOLIDATION §10](docs/plans/THE_CONSOLIDATION.md#10-declared-extents-that-stand-in-for-laws)): that read is the partition's
-  instrument (`agent-inferred`).
+  instrument (`agent-inferred`). A rule that nothing runs does not hold: from October 2 to November 21 nine findings said that the engine's grains
+  were picked by hand, each ended as a record or a clause, and the lattice rule that derived them retired unconsumed; gate 1 now
+  counts the declared widths with no law or read behind them, and the count only falls
+  ([the record](research/records/2026-11-21_A_WIDTH_IS_A_TOLERANCE_A_WORDS_TOP_GROWS_BY_ITS_CARRY_ITS_BOTTOM_STANDS_WHERE_THE_UNREAD_TAIL_NO_LONGER_MOVES_ITS_RECEIVERS_CODE_AND_THE_LATTICE_RULE_THAT_DERIVED_THE_ENGINES_WIDTHS_WAS_BUILT_IN_OCTOBER_AND_NEVER_TAKEN.md) §2, §10).
 - **A size belongs to its part, and the store is not "the field"** (Brandon, November 12). No extent of a realization (a width, a
   reach, a count of contacts, heads or ticks) is reported or reasoned from as a property of the machine: it is stated with the part
   it sizes and the reading that sized it, and a constitution's entries are given by block. An extent is a composition sized from its
@@ -911,6 +914,14 @@ file in the tree, committed or not, is ours to account for.
 - Old names, compatibility aliases and legacy save-format decoders go: an old save is a superseded
   prototype.
 - "Keep all mathematics" means keeping each law once, in its owner, with its consumer.
+- An owner that a plan's build order or an open issue still names is retired with those remaining
+  steps moved to an issue with a done condition, in the same change. Reason: on November 15 the host
+  number owner retired as unconsumed while the width census's build order of November 8 still named
+  it as its first step, and the October machine's lattice rule (a locus's lattice derived from its
+  receivers' declared tolerances) retired with it; nothing showed that the order had lost its base,
+  and its later steps (the kernel's twins generated, the remainders returned, the lint) never began
+  ([the record](research/records/2026-11-21_A_WIDTH_IS_A_TOLERANCE_A_WORDS_TOP_GROWS_BY_ITS_CARRY_ITS_BOTTOM_STANDS_WHERE_THE_UNREAD_TAIL_NO_LONGER_MOVES_ITS_RECEIVERS_CODE_AND_THE_LATTICE_RULE_THAT_DERIVED_THE_ENGINES_WIDTHS_WAS_BUILT_IN_OCTOBER_AND_NEVER_TAKEN.md) §2). Scope: every retirement of code or Lean that a plan, a
+  build order or an issue names (`agent-inferred`).
 
 [project-postulate] **Documentation is the fix.** When an agent misunderstands, repair the
 documentation, not the rules. Create or reorganize documentation whenever that makes the
@@ -983,7 +994,8 @@ An issue is one piece of work with a done condition.
 The open issues (November 18):
 - step 8, Athena alpha #404, with its sub-issues #405 (learning per contact), #406 (text release),
   #407 (the card route), #601 (a release compared to its target through their coupling, on the card),
-  #602 (what the question tells the answer, read with a joint code) and #603 (the consolidation);
+  #602 (what the question tells the answer, read with a joint code), #603 (the consolidation) and
+  #1088 (every width derived or read, opened November 21);
 - steps 4–5, the HNN learning law #73, the helical code #386 (critical) and the contact and chain
   laws #408 (which merged #27, #28 and #48);
 - step 7, Lean curation #147;
@@ -1089,7 +1101,12 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
    does not hold). Its last lines read the text against the tree: the guides' relative links
    (`tools/link_check.py links`), the atlas's owners (`link_check.py atlas`), the records' index and
    the Lean package's files against the targets that build them (`tools/lean_census.py`: a module is
-   imported by its library's root, or by an owner the root reaches, in the change that adds it).
+   imported by its library's root, or by an owner the root reaches, in the change that adds it) and
+   the declared widths against their table (`tools/width_census.py`: every constant that sets a
+   width, a grain, a rate, a guard or a carrier's bound has a row in `crates/engine/WIDTHS.tsv` with
+   its class and its need, a kernel's twin equals its host's, and the counts of picked, carrier,
+   literal and dead widths and of literal shifts only fall; a new width enters with its row in the
+   change that adds it, #1088).
    A change that adds or renames a record runs `python3 tools/records_index.py write` and commits
    `research/records/INDEX.md` with it, or gate 1 says the index is behind. On a machine with no card,
    `bash tools/gate_nocard.sh` runs it against a stand-in for the driver library. It reads no kernel
