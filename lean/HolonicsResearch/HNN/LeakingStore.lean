@@ -44,6 +44,14 @@ holds the algebra the record's law rests on, one coordinate at a time.
    where successive moves are aligned, and a step back lowers it where `μ < 0`, where they are opposed. So the sign
    of a pass's last pair of moves is the descent of the move its reader meets.
 
+9. **A store that follows a level, and a pumped circle** (`tracker_white_news`, `tracker_rest_correlated`,
+   `pumped_move_is_tracker`, `pumped_strength_floor`, `pumped_band_step`; the record's §15): on a white drive a store of
+   gain `δ` reads the product of successive news at `−(δ/2)` of the news's power, and on a drive of correlation `φ` a
+   step that product is zero at the gain `2φ/(1 + φ)`; a pumped carry circle's move is such a store at the gain
+   `d/(1 + d + n)` about the hold `X/(1 + n)`, its strength read as `1 − |γ|` stops at `n/(1 + n)`, and a chain that
+   releases at each step stays within `r/(1 − |γ| − |η|)` of its unreleased orbit. The second moments of part 9 are
+   given numbers that obey the move's balances; no process is constructed.
+
 Limits. Vectors are read one coordinate at a time except in part 5; in part 7 the writes are a given sequence (in the
 machine they are computed from the state, and `held_step_at_one` is the statement that needs no such reading), and
 the two rest statements are one mode's balance, with the split of a lane into its fixed ray and a mode the record's; the fixed ray, the linearization about it and
@@ -341,5 +349,64 @@ theorem last_move_falls_opposed (μ ε h : ℝ) (n : ℕ) (hn : n ≠ 0) (hε : 
   have h0 : 0 ≤ -(μ + h * ε) := by linarith
   have h1 : -(μ + h * ε) < -μ := by nlinarith [mul_pos hh hε]
   exact pow_lt_pow_left₀ h1 h0 (by omega)
+
+/-! ### 9. A store that follows a level: its news on a white and on a correlated drive, and a pumped circle's move -/
+
+/-- [proved-standard; formal-checked] **On a white drive a level's store reads successive news opposed, at half its gain.**
+The store holds `a = 1 − δ` of itself a step, so its news obeys `n(t) = a n(t−1) + b(t) − b(t−1)`; on a drive of unit power
+with no correlation the news's power `v` and the product `c` of successive news obey `v = a c + 2 − a` and `c = a v − 1`
+(pair the move with `n(t)` and with `n(t−1)`). Then `c = −(δ/2) v`. -/
+theorem tracker_white_news (a v c : ℝ) (ha : a ≠ 1) (hv : v = a * c + 2 - a) (hc : c = a * v - 1) :
+    c = -((1 - a) / 2) * v := by
+  have h1 : (1 - a) * (v * (1 + a) - 2) = 0 := by linear_combination hv + a * hc
+  have h2 : v * (1 + a) - 2 = 0 := by
+    rcases mul_eq_zero.mp h1 with h | h
+    · exact absurd (by linarith) ha
+    · exact h
+  linear_combination hc + (1 / 2) * h2
+
+/-- [proved-standard; formal-checked] **On a drive of correlation `φ` a step the news is unopposed and unaligned at the
+gain `2φ/(1 + φ)`.** With `a = (1 − φ)/(1 + φ)`, the news's pairings with the drive at the same step and one step back,
+`x₀ = a φ x₀ + 1 − φ` and `x₁ = a x₀ + φ − 1`, and the two balances `v = a c + x₀ − x₁`, `c = a v + φ x₀ − x₀`, give
+`c = 0`. At `φ = 0` the gain is zero (the store is its drive's mean) and at `φ = 1` it is one. -/
+theorem tracker_rest_correlated (φ a v c x₀ x₁ : ℝ) (hφ : 1 + φ ≠ 0) (ha : a = (1 - φ) / (1 + φ)) (ha2 : a ^ 2 ≠ 1)
+    (hx₀ : x₀ = a * φ * x₀ + 1 - φ) (hx₁ : x₁ = a * x₀ + φ - 1) (hv : v = a * c + x₀ - x₁)
+    (hc : c = a * v + φ * x₀ - x₀) : c = 0 := by
+  have h1 : a * (1 + φ) = 1 - φ := by rw [ha]; field_simp
+  have h2 : x₁ = -φ * x₀ := by linear_combination hx₁ + hx₀ + x₀ * h1
+  have h3 : c * (1 - a ^ 2) = 0 := by linear_combination hc + a * hv + x₀ * h1 - a * h2
+  rcases mul_eq_zero.mp h3 with h | h
+  · exact h
+  · exact absurd (by linarith) ha2
+
+/-- [proved-standard; formal-checked] **A pumped circle's move is a level's store at the gain `d/(1 + d + n)`.** With
+`X = γ̂ Q + p Q̄` the turned and reflected charge, friction `d` and the pump's budget `n`, the move
+`X/(1 + d + n) + (N₀ d/(1 + d + n)) b` is `T + g (N₀ b − T)` with the hold at no friction `T = X/(1 + n)` and
+`g = d/(1 + d + n)`. So the gain is the coupling's `κ/N₀`, and `1 − |γ| = (d + n)/(1 + d + n)` exceeds it by the pump's
+share wherever `n > 0`. -/
+theorem pumped_move_is_tracker {K : Type*} [Field K] (X d n N b : K) (h1 : 1 + n ≠ 0) (h2 : 1 + d + n ≠ 0) :
+    X / (1 + d + n) + N * d / (1 + d + n) * b = X / (1 + n) + d / (1 + d + n) * (N * b - X / (1 + n)) := by
+  field_simp
+  ring
+
+/-- [proved-standard; formal-checked] **The pumped gate's turn is no lighter than its pump allows.** For `d ≥ 0` and
+`n ≥ 0`, `1 − 1/(1 + d + n) ≥ n/(1 + n)`: the strength read as `1 − |γ|` stops at the pump's share however far the
+friction falls. -/
+theorem pumped_strength_floor (d n : ℝ) (hd : 0 ≤ d) (hn : 0 ≤ n) : n / (1 + n) ≤ 1 - 1 / (1 + d + n) := by
+  have h1 : (0 : ℝ) < 1 + n := by linarith
+  have h2 : (0 : ℝ) < 1 + d + n := by linarith
+  rw [div_le_iff₀ h1, show 1 - 1 / (1 + d + n) = (d + n) / (1 + d + n) by field_simp; ring, div_mul_eq_mul_div,
+    le_div_iff₀ h2]
+  nlinarith [mul_nonneg hd hn]
+
+/-- [proved-standard; formal-checked] **A chain that releases at each step stays within `r/(1 − a − h)` of its unreleased
+orbit, the pump's reflection counted.** The gap obeys `e′ ≤ a e + h e + r` with `a = |γ|`, `h = |η|` and `r` one
+release; the band `r/(1 − a − h)` is kept by the step. At `h = 0` it is the unpumped chain's `r/(1 − |γ|)`. -/
+theorem pumped_band_step (a h r e : ℝ) (ha : 0 ≤ a) (hh : 0 ≤ h) (hah : a + h < 1) (he : e ≤ r / (1 - a - h)) :
+    a * e + h * e + r ≤ r / (1 - a - h) := by
+  have hpos : (0 : ℝ) < 1 - a - h := by linarith
+  have hB : (a + h) * (r / (1 - a - h)) + r = r / (1 - a - h) := by field_simp; ring
+  have hstep : (a + h) * e ≤ (a + h) * (r / (1 - a - h)) := mul_le_mul_of_nonneg_left he (by linarith)
+  linarith
 
 end Holonics.HNN.LeakingStore

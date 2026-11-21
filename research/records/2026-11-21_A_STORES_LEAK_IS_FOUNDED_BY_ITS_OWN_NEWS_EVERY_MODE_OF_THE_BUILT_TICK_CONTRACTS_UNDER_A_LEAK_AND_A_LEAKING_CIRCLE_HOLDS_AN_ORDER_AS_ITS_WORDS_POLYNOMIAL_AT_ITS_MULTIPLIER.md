@@ -11,6 +11,10 @@ Amended 02:35 to 03:08 UTC the same night (§10 to §14), after the engineering 
 with the opening held: the reads are scored, the law of §3 is amended twice (a pass's opening is held, §12; the deposit reads the pass's
 last pair of moves in place of the pooled cosine, §14), and what the pooled deposit founds on a pass of 8 ticks is stated as a number.
 
+Amended again 04:04 to 04:37 UTC (§15): the engineering thread's reads on the carry circles are scored (two of seven guesses
+held, three missed in whole or in part, two unread), the scan's per-step release is read to cost the face nothing, the own-news law's rest is stated on a
+correlated drive, and that law is set aside on the circles, which are pumped and were read here by an unpumped form.
+
 On the objects: the navigator is a site's tick, a clock inside a pass; the terrain is what a tick adds to a face lane; the kernel is the
 lane's scale, which no reader distinguishes, since every reader takes the lane at unit power; the cokernel is the news, the arrival less what
 the lane already releases; the landmark is the fixed ray a pass runs to.
@@ -426,22 +430,156 @@ lane holds little of its source (3.9 nats), because the modes read are fast and 
 13% of its own place (§12). Whether the face's comparison trains a slow mode that carries the opening is that arm's question, from
 about 2.2 nats behind the line's four-tick read, and it was advised not to take a day of card on what is read so far.
 
+## 15. The carry circles: the scan's order costs the face nothing, and the own-news law finds no rest on a pumped circle
+
+After §14 the engineering thread asked which law to take next, the scan's carried remainder or the last pair's deposit. The answer
+sent at 04:04:40 UTC: the scan's, as a host read first, and it is already in the tree (the record of November 15 §6, atlas
+`contact.carry-scan-section-band`: the circle's store is its unreleased orbit and the one release is the face's); not the leak; and
+a third read, the circles' own successive news. Seven guesses were fixed in two messages (S1 to S4 at 04:04:40, G1 to G3 at 04:15:09)
+and copied into `GUESS.txt` after the reads; no file held them before. The engineering thread read S1, S2 and S4 at 04:06 and 04:07 UTC
+and G1 and G2 at 04:16 ([its record](2026-11-21_THE_BUILT_TICKS_RATES_STAND_STILL_ON_ITS_FILL_CLOCK_A_THIRD_OF_A_SITES_MODES_IS_RELEASED_A_THIRD_HELD_AND_A_THIRD_BOOSTED_AND_THE_CONTACT_KERNELS_WAIT_ON_THEIR_LOADS.md) §8.3 to §8.5; `receipts/2026-11-21_tick-gains/circle_news.txt`, `scan_carry.txt`,
+`gates_lighter.txt`): L71's end state, the same 240 sites, the line's own four ticks, 512 circles, on the host beside a lap. They are
+scored here from its receipts.
+
+### 15.1 The scores
+
+| guess | read | score |
+|---|---|---|
+| S1: 97% of `Q`'s components within one grain of the orbit released once; largest gap at most 6 | 72.85% at the first tick (32.69% equal); largest gap 15 grains | missed, both parts |
+| S2: the held code moves under 0.0005 nats a place | 1.65500 built, 1.65501 carried | held |
+| S3: an arm would shorten a section by under 6 ms | not read | |
+| S4: the median over circles of the cosine of successive news between −0.20 and +0.05; under a fifth of circles above +0.10 | median −0.275 over the pass's ticks (−0.311 at the last); 0.8% above +0.10 | missed; the second part held |
+| G1: with every circle's `d` times `2^(−k)`, the median cosine −0.275, −0.19, −0.11, −0.05, −0.01, +0.01 within 0.03, crossing zero between `k` = 4 and 5 | −0.275, −0.190, −0.125, −0.089, −0.064, −0.060; no crossing | held at `k` = 0 to 2, missed from 3 |
+| G2: no `k` reads the held code more than 0.003 under 1.655; `k = 4` at least 0.05 above | 1.655, 1.857, 2.291, 2.598, 2.766, 2.857 | held |
+| G3: with the charges recomputed at each `k` as a part's operands, no `k` removes more of the face's covector than the built charges' share plus 0.01 | not read: declined by this thread (§15.5) | |
+
+H5 and H6 of §14 are now read at their source (`leak_reads_8_ticks.txt`, `leak_law_8_ticks_at_rest.txt`): the last pair's rests by
+lane are 0.821, 0.835, 0.862, 0.857, 0.891, 0.889 and 0.876, the law at those rests reads 3.9120 nats a place at 8 ticks and no leak
+reads 2.6224. Both held as §14 relayed them.
+
+### 15.2 The scan's per-step release costs the face nothing
+
+With the orbit kept 48 bits finer and released at each read, the held code moves by 0.00001 nats a place. So the order the built
+chain's release fixes is no part of what the face reads on this state, any bracketing with a guard and a check at the read serves it,
+and an arm that carries the residue would be bought for speed alone.
+
+S1's guess was tighter than the row it came from, and the row lacks the pump. The band of November 15 is
+`½/(1 − |γ|) + 1` grains, 1.83 at the median gate, so "97% within one grain" asked more than the law gives. And these circles are
+pumped: the gap between the built chain and its orbit obeys `e′ = γ e + η ē + r`, one release `r` a step, so the band is
+
+```text
+|e| ≤ r/(1 − |γ| − |η|)        (Lean pumped_band_step),        |γ| + |η| ≤ (1 + n)/(1 + d + n) = 1 − κ/N₀,
+```
+
+at most `r N₀/κ`. At the medians §15.4 fits (`d` 0.99, `n` 0.52, `κ/N₀` 0.394) that is 2.3 grains with the read's own release added;
+a gap of 15 needs a run of sites whose coupling stands near `κ/N₀ = 0.036` (`d` near 0.06 beside that pump). Whether the largest gap
+sits on such a run was not read by circle, so the pumped band is derived here and not confirmed on the state. The gaps of 24, 40 and
+44 grains at the later ticks are the two passes' own states parting, as the engineering record says.
+
+### 15.3 A store that follows a level, and where its own news rests
+
+The algebra S4 and G1 stood on is true of the store it describes. A store that takes its drive at a gain `δ`,
+`Q(t) = Q(t−1) + δ n(t)` with news `n(t) = b(t) − Q(t−1)`, has `n(t) = a n(t−1) + b(t) − b(t−1)`, `a = 1 − δ`. Pairing that move
+with `n(t)` and with `n(t−1)` gives the news's power `v` and the product `c` of successive news:
+
+```text
+white drive, unit power:        v = a c + 2 − a,   c = a v − 1          ⇒   c = −(δ/2) v
+drive of correlation φ a step:  x₀ = a φ x₀ + 1 − φ,  x₁ = a x₀ + φ − 1,
+                                v = a c + x₀ − x₁,    c = a v + φ x₀ − x₀   ⇒   c = 0  at  a = (1 − φ)/(1 + φ),  δ* = 2φ/(1 + φ)
+```
+
+(Lean `tracker_white_news`, `tracker_rest_correlated`; `x₀`, `x₁` the news's pairings with the drive at its step and one back;
+`tracker.txt` checks the zero at five `φ` from the news's weights.) So the law of §3 and §14 has a rest stated on a drive as well as
+on a pass: a store that follows a level through a drive correlated `φ` a step rests at the gain `2φ/(1 + φ)`, no gain on a white
+drive, where the store is its drive's mean, and the whole drive at `φ = 1`.
+
+### 15.4 What was wrong in reading the circles by it
+
+Two errors of form, both this record's, found after G1 missed and the engineering thread read that the gates' strength stops near
+0.36 because the pumped gate's denominator carries the pump.
+
+**The circles are pumped, and `1 − |γ|` is not their gain.** The gate is `γ = γ̂/(1 + d + n)`, `η = p/(1 + d + n)`,
+`κ = N₀ d/(1 + d + n)`, `n = |p_re| + |p_im|` (`crates/engine/src/carry.rs`, `carry_gate_pumped`, of November 19). The six medians
+of `1 − |γ|` the read printed, 0.600, 0.506, 0.435, 0.392, 0.368, 0.356, fit `1 − 1/(1 + d 2^(−k) + n)` at `d = 0.99`, `n = 0.52`
+within 0.002; with no pump they would read 0.600, 0.429, 0.273, 0.158, 0.086, 0.045 (`tracker.txt`; the pump's own magnitudes were
+not read, so `n` is this fit's). The engineering thread's reading stands against the form: the strength read as `1 − |γ|` has the
+floor `n/(1 + n)` (Lean `pumped_strength_floor`). The move, written as a level's store, is
+
+```text
+Q = T + g (N₀ b − T),      T = (γ̂ Qm + p Q̄m)/(1 + n)  the hold at no friction,      g = κ/N₀ = d/(1 + d + n)
+```
+
+(Lean `pumped_move_is_tracker`), with the gain 0.394 at the built medians and 0.020 at `k = 5`. The test's news, `Q − γ̂ Qm`, is
+`g (N₀ b − T)` and beside it `T − γ̂ Qm`, the reflection and the pump's share of the leak: the store's own hold, not what arrived.
+G1's series was the unpumped form at `δ = d/(1 + d)` and matched the read at `k` = 0 to 2 with a form the line does not have.
+The same form corrects the reading of F3 sent at 04:04, that a gate at `|γ|` 0.400 is an e-fold a site. With `|p|` between `n/√2`
+and `n`: where the pump beats the turn the circle holds 0.55 to 0.61 a site along the pump's axis and 0.19 to 0.25 across it, and
+where the turn beats the pump, 0.34 to 0.37 on both.
+
+**`−δ/2` is a correlation, and the test pools a cosine.** The read divides by `Σ |u(t)| |u(t∓1)|`. On a white complex Gaussian
+drive that figure is 1.25 times the correlation (`4/π` as the correlation goes to zero): an unpumped store of gain 0.497 reads
+−0.313 against −0.249, and a pumped circle at the fitted medians reads −0.37 to −0.39 at the built gates and −0.08 to −0.29 at
+`k = 5`, by its turn and the pump's axis (`tracker.txt`, part 3).
+
+So the reading sent at 04:15, that the circles' drives are nearly white along the strand, is withdrawn. Against a pumped circle on a
+white Gaussian drive the read −0.275 stands about 0.10 higher, which says the drives are positively correlated from site to site or
+steadier in modulus than a Gaussian's, by an amount that needs each circle's turn, pump and drive and is not stated here.
+
+### 15.5 What the lighter gates read, and where the law stands on the circles
+
+The held code rises by 0.20, 0.64, 0.94, 1.11 and 1.20 nats a place at one to five halvings of the friction. By the gate's form that
+rise is not a reading of reach: lowering the leak chart's bias lowers `κ` with `d`, and with the pump standing the charge's scale
+`κ/(N₀ (1 − hold))` falls 13 to 17 fold on at least one axis by `k = 5`, where an unpumped gate keeps it at one (`tracker.txt`,
+part 4; the message to the engineering thread said 13 to 19, from a fit by hand). The faces were trained on charges the read empties.
+
+The own-news law on a circle's friction (form G: by circle `ℓ_b ← ℓ_b + η c`, `c` the pooled cosine of its successive news) is set
+aside, `agent-inferred`, with these readings and no bar on taking it up again:
+- its quantity as read was not the pumped store's news (§15.4);
+- no `k` reached its rest: the share of circles above zero is 0.381 at five halvings, and by the form a pumped circle's axis across
+  the pump keeps leaking at the pump's share at any friction, so its successive news as the test reads them stay opposed;
+- the first halving starts 0.20 nats behind on the trained state;
+- the comparison has moved these frictions the other way, from the founding's ¼ to about one by the fit (the founding state was not
+  read).
+
+Its scope (`agent-inferred`, unread). The law's reason is a store running to a level: opposed news is overshoot, and the friction
+that removes it settles the store. A carry circle writes its strand as a word at its multiplier
+(`contact.leaking-circle-word-polynomial`), each site's drive a new digit set above the ones before it, and there opposed news is
+the earlier digit leaving the top place. The reason does not reach that store. The read that would say whether a longer hold
+presents something the face lacks is G3, and this thread declined it at 04:23:38 UTC: the tension read is a founding's instrument,
+offered beside a part and never in front of one (the method rule of November 16, its gate retired November 18), and between 02:22 and
+04:16 this record's 19 guesses, 15 of them read, set two candidate laws aside and built nothing. G3's guess stands in `GUESS.txt`,
+to be read beside a part that lengthens a circle's hold if one is built.
+
+### 15.6 Errors of this record's, kept
+
+H3, S1, S4 and G1 from `k = 3` were each inferred from a model before the built part's form was read at its owner. The pump has
+stood in `carry_gate_pumped` since November 19, and the message that fixed S4 named it ("a pumped step is real-linear") four
+sentences before writing the circle as an unpumped store. A guess on a built part is fixed after its owner's form is read, which
+here was a minute's read of one function.
+
 ## 9. Lean, atlas, receipts, sources
 
-- Lean: `lean/HolonicsResearch/HNN/LeakingStore.lean`, 29 statements and three definitions (seven statements and two definitions
+- Lean: `lean/HolonicsResearch/HNN/LeakingStore.lean`, 34 statements and three definitions (seven statements and two definitions
   added with §12: `leaked`, `held`, `leaked_eq`, `held_eq`, `held_sub_leaked`, `held_step_at_one`, `growth_is_leak`,
-  `leak_rest_imprint`, `held_rest_imprint`; two with §14: `last_move_falls_aligned`, `last_move_falls_opposed`), on `propext`, `Classical.choice` and
+  `leak_rest_imprint`, `held_rest_imprint`; two with §14: `last_move_falls_aligned`, `last_move_falls_opposed`; five with §15:
+  `tracker_white_news`, `tracker_rest_correlated`, `pumped_move_is_tracker`, `pumped_strength_floor`, `pumped_band_step`, whose second
+  moments are given numbers that obey the move's balances, no process constructed), on `propext`, `Classical.choice` and
   `Quot.sound`; built alone (`lake build HolonicsResearch.HNN.LeakingStore`). The whole research library was not rebuilt here: the
   module adds names under its own namespace and imports Mathlib alone, so the root's closure is inferred, stated apart.
 - Atlas: `store.leak-founded-by-own-news` and `contact.leaking-circle-word-polynomial` (new), `store.leak-holds-its-opening` (new with
-  §12 and §14, which also amend the first); notes on
+  §12 and §14, which also amend the first), `store.level-news-rest-on-a-correlated-drive` (new with §15, which also amends the first
+  and `contact.carry-scan-section-band`); notes on
   `tower.field-tick-rates-on-the-fill-clock`, `tower.field-tick-contraction` and `store.finite-quality`.
 - Receipts: `receipts/2026-11-21_leak-balance/` (`GUESS.txt`, `LEAK_SCORES.txt`, `crosscheck.py` and `.txt`, `planted.py` and `.txt`,
-  `fork_model.py` and `.txt`, `opening.py` and `.txt`). Each script ran in under a minute on one host thread; no card.
+  `fork_model.py` and `.txt`, `opening.py` and `.txt`, `tracker.py` and `.txt` with §15). Each script ran in under a minute on one host
+  thread; no card.
 - Read at source: the engineering record of November 21 and its receipts (`leak.txt`, `polygons.txt`, `fork.txt`),
   `receipts/2026-11-20_engineering/tick_residual_L71.txt`, `docs/THE_ENGINE.md` §2, `crates/engine/src/field.rs` (the forward's
   equations) and `crates/engine/src/contact.rs` (`pass_with_held_probed`: a tick's operands take no tick index; the index enters where
-  a level splits and through what the tick before left).
+  a level splits and through what the tick before left); with §15, the engineering record's §8.2 to §8.5 and its receipts
+  (`leak_reads_8_ticks.txt`, `leak_law_8_ticks_at_rest.txt`, `circle_news.txt`, `scan_carry.txt`, `gates_lighter.txt`),
+  `crates/engine/src/carry.rs` (`carry_gate_pumped`) and `crates/engine/src/field/tests.rs` (`the_circles_successive_news`: how the
+  cosine is pooled).
 - From training, not stated in Lean: Kalman 1960 and Muth 1960 (a level that drifts, read in scatter, is tracked at a constant gain);
   Mehra 1970 (a filter's news is white exactly at its balanced gain); Richardson 1910 and Krasnosel'skii 1955 (the relaxed step and its
   best strength); Katz 1979 (a map splits where its two polygons touch).

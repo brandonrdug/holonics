@@ -1,0 +1,30 @@
+PART 1  the tracker's successive news, correlation by gain delta = 0.2 0.4 0.6 0.8, and its zero
+TRACKER phi=0.000 corr=[-0.100 -0.200 -0.300 -0.400] white=-delta/2=[-0.100 -0.200 -0.300 -0.400] rest=2phi/(1+phi)=0.000 corr_at_rest=-0.00000
+TRACKER phi=0.035 corr=[-0.068 -0.172 -0.275 -0.379] white=-delta/2=[-0.100 -0.200 -0.300 -0.400] rest=2phi/(1+phi)=0.068 corr_at_rest=+0.00000
+TRACKER phi=0.200 corr=[+0.080 -0.040 -0.160 -0.280] white=-delta/2=[-0.100 -0.200 -0.300 -0.400] rest=2phi/(1+phi)=0.333 corr_at_rest=+0.00000
+TRACKER phi=0.400 corr=[+0.260 +0.120 -0.020 -0.160] white=-delta/2=[-0.100 -0.200 -0.300 -0.400] rest=2phi/(1+phi)=0.571 corr_at_rest=-0.00000
+TRACKER phi=0.600 corr=[+0.440 +0.280 +0.120 -0.040] white=-delta/2=[-0.100 -0.200 -0.300 -0.400] rest=2phi/(1+phi)=0.750 corr_at_rest=+0.00000
+TRACKER phi=0.800 corr=[+0.620 +0.440 +0.260 +0.080] white=-delta/2=[-0.100 -0.200 -0.300 -0.400] rest=2phi/(1+phi)=0.889 corr_at_rest=-0.00000
+TRACKER guess_G1 (unpumped, delta=d/(1+d), d=1.5*2^-k, phi=0.035) = [-0.275 -0.187 -0.106 -0.047 -0.009 +0.012]
+PART 2  the medians of 1 - |gamma| against the pumped form
+PUMPED_FORM read=[0.600 0.506 0.435 0.392 0.368 0.356]
+PUMPED_FORM fit d0=0.99 n=0.52 model=[0.602 0.504 0.434 0.392 0.368 0.355] largest_miss=0.002
+PUMPED_FORM unpumped (n=0, d0=1.5) model=[0.600 0.429 0.273 0.158 0.086 0.045]
+PUMPED_FORM gain on the drive kappa/N0 = d/(1+d+n) by k=[0.394 0.246 0.140 0.075 0.039 0.020]
+PART 3  a pumped circle on a white complex Gaussian drive, the cosine as the test pools it
+COSINE read (gates_lighter.txt) k=0..5 = [-0.275 -0.190 -0.125 -0.089 -0.064 -0.060]
+COSINE unpumped d=0.99 (gain 0.497): pooled=-0.313 correlation=-0.249 -delta/2=-0.249 ratio=1.254 (4/pi=1.273)
+COSINE pumped n=0.52 |p|=0.37 turn=0.0 k=0..5 = [-0.383 -0.328 -0.289 -0.265 -0.252 -0.245]
+COSINE pumped n=0.52 |p|=0.37 turn=0.3 k=0..5 = [-0.380 -0.318 -0.266 -0.228 -0.203 -0.188]
+COSINE pumped n=0.52 |p|=0.37 turn=0.8 k=0..5 = [-0.374 -0.309 -0.260 -0.228 -0.210 -0.200]
+COSINE pumped n=0.52 |p|=0.37 turn=1.5 k=0..5 = [-0.377 -0.325 -0.293 -0.276 -0.268 -0.264]
+COSINE pumped n=0.52 |p|=0.52 turn=0.0 k=0..5 = [-0.392 -0.341 -0.306 -0.284 -0.272 -0.265]
+COSINE pumped n=0.52 |p|=0.52 turn=0.3 k=0..5 = [-0.384 -0.317 -0.248 -0.181 -0.124 -0.083]
+COSINE pumped n=0.52 |p|=0.52 turn=0.8 k=0..5 = [-0.369 -0.297 -0.239 -0.199 -0.176 -0.164]
+COSINE pumped n=0.52 |p|=0.52 turn=1.5 k=0..5 = [-0.376 -0.329 -0.303 -0.292 -0.287 -0.285]
+PART 4  the charge's scale kappa/(N0 (1 - hold)) by axis, n standing (the pump along and across, where the pump beats the turn)
+SCALE |p|=0.37 along=[0.867 0.765 0.619 0.448 0.289 0.169] across=[0.527 0.358 0.218 0.122 0.065 0.034] across_k0_over_k5=15.7
+SCALE |p|=0.52 along=[1.000 1.000 1.000 1.000 1.000 1.000] across=[0.488 0.322 0.192 0.106 0.056 0.029] across_k0_over_k5=16.9
+SCALE |p|=0.37 where the turn beats the pump (both multipliers of modulus sqrt(|gamma|^2 - |eta|^2)) both=[0.627 0.456 0.296 0.173 0.095 0.050] k0_over_k5=12.6
+SCALE |p|=0.52 where the turn beats the pump (both multipliers of modulus sqrt(|gamma|^2 - |eta|^2)) both=[0.598 0.426 0.271 0.157 0.085 0.044] k0_over_k5=13.5
+SCALE unpumped (n = 0): kappa/(N0 (1 - |gamma|)) = 1 at every d
