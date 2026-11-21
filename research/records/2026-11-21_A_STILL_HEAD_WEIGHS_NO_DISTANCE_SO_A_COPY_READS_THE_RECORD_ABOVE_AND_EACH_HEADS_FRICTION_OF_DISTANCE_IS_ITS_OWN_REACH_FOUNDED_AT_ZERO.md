@@ -177,7 +177,7 @@ copy 4 7 1 8 4 7 9 =          0 8 0 7 5 3 9          0 8 0 7 5 3 9
 - **What it does not yet carry.** `copy 4 7 1 8 4 7 9` still writes the record above it whole, and the sums gained a little in code and
   nothing in whole writes (7 of 16 at the control, 6 at the gate). A sum's answer digit needs two operands and their carry, and the
   friction brings the near one of the two (§3: head 0's pair took 0.35 of its row before and 0.45 under the ruler's friction).
-- The loudness of every region at W80g's mean is in `loudness_W80g.txt` (its regions' lines; the pieces stay under `.local/`) (all regions 21.80 octaves, temperature −0.023 a nat).
+- The loudness of every region at W80g's mean is in `loudness_W80g.txt` (all regions 21.80 octaves, temperature −0.023 a nat).
 
 **The guesses.** G-F1 (16:57:07Z) missed on its writes, its codes and its friction (30 of 96, 3 copies; copy digits 0.537; head 0's
 listeners at −0.042), and held its text clause. G-G1 (18:44:13Z) held on every clause: 0.269 against 0.35 a copy digit, 0.983 against
