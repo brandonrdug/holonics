@@ -104,7 +104,7 @@ def main():
             print(f"HALVING t={t} {a}->{b} median_dist {da:.4f} -> {db:.4f} ratio={db / da:.3f}")
 
 
-if __name__ == '__main__' and '--leak' not in sys.argv and '--polygons' not in sys.argv:
+if __name__ == '__main__' and not {'--leak', '--polygons', '--fork'} & set(sys.argv):
     main()
 
 
@@ -178,4 +178,67 @@ def polygons(root):
 
 if __name__ == '__main__' and '--polygons' in sys.argv:
     polygons(sys.argv[1])
+    sys.exit(0)
+
+
+def fork(root):
+    """`--fork`: the circles' operand at the line's end over the six closing orders (`fork_{pumped,unpumped}.txt`), each filler's mean over its
+    orders taken out (the common mode). The plane is the orders' own: the two largest principal directions of the six orders' centroids on
+    one half of the fillers, read on the other half (and the halves swapped): there each order's centroid, its angle, and the held half's
+    nearest-centroid reading of the order (chance 1/6) and of the crossings' parity (chance 1/2). A planted hexagon at half the read's own
+    residual spread, added to the read's residuals on the same shapes, is read first."""
+    rng = np.random.default_rng(1121)
+
+    def common_out(X, fillers):
+        Y = X.copy()
+        for f in np.unique(fillers):
+            Y[fillers == f] -= Y[fillers == f].mean(axis=0)
+        return Y
+
+    def read(Y, orders, fillers, parity):
+        fs = np.unique(fillers)
+        halves = (fs[::2], fs[1::2])
+        acc_o, acc_p, angs, shares = [], [], [], []
+        for fit, held in (halves, halves[::-1]):
+            mf, mh = np.isin(fillers, fit), np.isin(fillers, held)
+            cents = np.array([Y[mf & (orders == o)].mean(axis=0) for o in range(6)])
+            _, _, Vt = np.linalg.svd(cents - cents.mean(axis=0), full_matrices=False)
+            B = Vt[:2].T
+            Ph = Y[mh] @ B
+            ch = cents @ B
+            d2 = ((Ph[:, None, :] - ch[None, :, :]) ** 2).sum(axis=2)
+            pick = d2.argmin(axis=1)
+            acc_o.append(np.mean(pick == orders[mh]))
+            acc_p.append(np.mean(np.array(parity)[pick] == np.array(parity)[orders[mh]]))
+            hc = np.array([Ph[orders[mh] == o].mean(axis=0) for o in range(6)])
+            angs.append(np.degrees(np.arctan2(hc[:, 1] - hc[:, 1].mean(), hc[:, 0] - hc[:, 0].mean())))
+            between = sum(np.sum(orders[mh] == o) * np.sum((hc[o] - Ph.mean(axis=0)) ** 2) for o in range(6))
+            shares.append(between / np.sum((Ph - Ph.mean(axis=0)) ** 2))
+        ang = angs[0]
+        by_angle = np.argsort(ang)
+        alternating = all(parity[by_angle[i]] != parity[by_angle[(i + 1) % 6]] for i in range(6))
+        gaps = np.diff(np.sort(np.append(ang, ang.min() + 360)))
+        return np.mean(acc_o), np.mean(acc_p), np.mean(shares), alternating, gaps, ang
+
+    for name in ('unpumped', 'pumped'):
+        rows = [l.split() for l in open(os.path.join(root, f'fork_{name}.txt'))]
+        fillers = np.array([int(r[1]) for r in rows]); orders = np.array([int(r[3]) for r in rows]); cross = np.array([int(r[5]) for r in rows])
+        X = np.array([[float(v) for v in r[9:]] for r in rows])
+        X = X[:, X.std(axis=0) > 0]
+        parity = [int(cross[orders == o][0]) % 2 for o in range(6)]
+        Y = common_out(X, fillers)
+        resid = Y - np.array([Y[(orders == o)].mean(axis=0) for o in orders])
+        sigma = np.sqrt(np.mean(np.sum(resid ** 2, axis=1)))
+        basis, _ = np.linalg.qr(rng.standard_normal((Y.shape[1], 2)))
+        corners = np.array([[np.cos(np.pi / 3 * k), np.sin(np.pi / 3 * k)] for k in range(6)]) * 0.5 * sigma
+        Yp = common_out(resid + corners[orders] @ basis.T, fillers)
+        for tag, Z, par in ((f"{name} planted_hexagon", Yp, [o % 2 for o in range(6)]), (name, Y, parity)):
+            ao, ap, sh, alt, gaps, ang = read(Z, orders, fillers, par)
+            print(f"FORK {tag} held_order_reading={ao:.3f} (chance 0.167) held_parity_reading={ap:.3f} (chance 0.5) held_between_share={sh:.3f}"
+                  f" alternating_parity={alt} angle_gaps={' '.join(f'{g:.0f}' for g in gaps)} angles_by_order={' '.join(f'{a:.0f}' for a in ang)}")
+        print(f"FORK {name} crossings_by_order={' '.join(str(int(cross[orders == o][0])) for o in range(6))} samples={len(rows)} dims={X.shape[1]} residual_rms={sigma:.0f}")
+
+
+if __name__ == '__main__' and '--fork' in sys.argv:
+    fork(sys.argv[1])
     sys.exit(0)

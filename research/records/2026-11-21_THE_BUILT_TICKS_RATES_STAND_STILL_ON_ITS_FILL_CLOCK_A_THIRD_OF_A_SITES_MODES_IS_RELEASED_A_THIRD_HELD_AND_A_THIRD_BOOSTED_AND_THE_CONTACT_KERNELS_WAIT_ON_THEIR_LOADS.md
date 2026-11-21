@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 02:10 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 02:20 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -148,12 +148,38 @@ face's reading, with a tail of 28 places a register narrower than the rest needs
 part a width belongs to is the partition's to found at the part's need (`radix.register-composition`, the precision law); this read gives
 the counts it would found on, and changes nothing in the line.
 
-## 7. Atlas
+## 7. The fork's closing orders on the carry circles
+
+The lattice record's §6.3 read, its guess taken whole and fixed at 02:05 UTC (`FORK_GUESS.txt`): three pairs opened `([{` and closed in each
+of the six orders of `)]}` inside 30 fillers authored for the read (`fork_fillers.txt`: 20 code-like lines, 10 prose-like), each line a region
+of its own through the line's codec on L71's end state; at the line's end the last tick's circle operand `Q(t − 1)` of the 512 circles
+(the 256 scanned from the left carry it; those from the right stand at rest there), each filler's mean over its six orders taken out (the
+common mode), the state as it stands (pumped) and with the pump's chart and bias at zero (`p = 0`, so `η = 0`, the unpumped circles)
+(`the_forks_closing_orders_on_the_carry_circles`, `tools/tick_gains.py --fork`, `fork.txt`). The plane is the orders' own: the two
+largest principal directions of the six orders' centroids on half the fillers, read on the other half and the halves swapped. A planted
+hexagon at half the residual's own spread, added to the read's residuals on the same shapes, is recovered whole first (the held half
+reads its order and parity at 1.000, its corners 59 to 61 degrees apart).
+
+| circles | the held half reads the order (chance 0.167) | the parity (chance 0.5) | between-order share of the plane | the centroids' gaps around the plane (degrees) |
+|---|---|---|---|---|
+| unpumped | 0.478 | 0.650 | 0.464 | 40, 90, 10, 71, 58, 90 |
+| pumped | 0.444 | 0.622 | 0.445 | 58, 106, 1, 31, 88, 76 |
+
+Score: F1 (two clusters by parity, unpumped) missed; F2 (six on a hexagon, alternating in parity, pumped) missed. What the centroids show
+instead: the orders that close on the same last bracket stand together (`]`, `)`, `}` and `)`, `]`, `}`, both ending on `}`, one degree apart
+pumped and ten unpumped; the pairs ending on `]` and on `)` 40 to 58 degrees apart), so the circles at the line's end hold the last closer
+and little of the two before it. Three clusters by the last closer with the order within each at chance would read the order at 0.5 and
+the parity near 0.5; the reads stand at 0.44 to 0.48 and 0.62 to 0.65. The pump changes neither reading by more than 0.04. So on this state the
+circles' terminal operand is a recency of one symbol at the depth of three pairs, the crossings' order is not where it is held, and a
+reading of crossed against nested binding is owed elsewhere than this operand: in prefix states, as the failure-group record's §8.4 says
+of one terminal product (`agent-inferred`).
+
+## 8. Atlas
 
 `tower.field-tick-rates-on-the-fill-clock` (new, measured), using `tower.field-tick-running-mean`, `motion.unit-power-push-log-clock`,
 `motion.relaxed-step-three-kinds` and `hodge.newton-above-hodge-is-a-mixing`.
 
-## 8. Sources
+## 9. Sources
 
 `crates/engine/src/contact.rs` (`Constitution::pass_probed`, `TickProbe`), `crates/engine/src/field/tests.rs`
 (`the_ticks_gains_by_finite_differences`, `the_trained_ticks_residual_by_tick`), `tools/tick_gains.py`, `crates/engine-cuda/kernels/field.cu`

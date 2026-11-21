@@ -6042,3 +6042,58 @@ fn a_parts_transport_for_its_polygons() {
     }
     eprintln!("PART_MAPS width={dw} contacts={f} m2={m2} lanes={}", field.declaration.lanes);
 }
+
+/// [measurement; the lead, November 21, the lattice record §6.3's read] **The fork's closing orders on the carry circles**: three pairs opened
+/// in one order, `([{`, closed in each of the six orders of `)]}`, inside one filler of `FORK_FILLERS` (`{f}` in each line of fillers is
+/// replaced by the brackets), each a region of its own through the codec; at the region's last site (the line's end) the last tick's scan
+/// operand `Q(t − 1)` of every circle is written, with the order and its crossings (inversions against the nested order), for the pumped
+/// state as it stands and with the pump's chart and bias at zero (`p = 0`, so `η = 0`: the unpumped circles), to `PROBE_OUT/fork_{pumped,
+/// unpumped}.txt` (`tools/tick_gains.py --fork`). A ruler on the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of saved state files and a write of the ruler's tables")]
+fn the_forks_closing_orders_on_the_carry_circles() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let units = crate::units::Units::from_text(&std::fs::read_to_string(var("CARRIER_UNITS")).unwrap()).unwrap();
+    let codec = crate::codec::Codec::from_text(&std::fs::read_to_string(var("CARRIER_CODEC")).unwrap(), units).unwrap();
+    let fillers: Vec<String> = std::fs::read_to_string(var("FORK_FILLERS")).unwrap().lines().filter(|l| l.contains("{f}")).map(str::to_string).collect();
+    let out = std::path::PathBuf::from(var("PROBE_OUT"));
+    let closers = [b')', b']', b'}'];
+    let orders: [[usize; 3]; 6] = [[2, 1, 0], [1, 2, 0], [2, 0, 1], [0, 2, 1], [1, 0, 2], [0, 1, 2]];
+    let mut unpumped = learner.field.clone();
+    {
+        let (l, c2, dw) = (unpumped.layout().clone(), 2 * unpumped.declaration.carry, unpumped.declaration.width);
+        assert!(unpumped.declaration.pump, "the state's circles are pumped");
+        for v in &mut unpumped.theta[l.pump..l.pump + c2 * dw] {
+            *v = 0;
+        }
+        for v in &mut unpumped.theta[l.pump_bias..l.pump_bias + c2] {
+            *v = 0;
+        }
+    }
+    for (name, field) in [("pumped", &learner.field), ("unpumped", &unpumped)] {
+        let mut s = String::new();
+        let mut n = 0usize;
+        for (fi, filler) in fillers.iter().enumerate() {
+            for (oi, order) in orders.iter().enumerate() {
+                // The nested order closes `}` `]` `)`: its closers' ranks 2, 1, 0; crossings are the inversions against it.
+                let crossings = (0..3).flat_map(|a| ((a + 1)..3).map(move |b| (a, b))).filter(|&(a, b)| order[a] < order[b]).count();
+                let brackets: Vec<u8> = b"([{".iter().copied().chain(order.iter().map(|&c| closers[c])).collect();
+                let line = filler.replace("{f}", std::str::from_utf8(&brackets).unwrap()) + "\n";
+                let Ok(classes) = codec.encode(line.as_bytes()) else { continue };
+                let unresolved = vec![false; classes.len()];
+                let region = Region { classes: &classes, unresolved: &unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+                let pass = field.pass(&region, true).unwrap();
+                let last = pass.ticks.last().unwrap();
+                let c2 = 2 * field.declaration.carry;
+                let t = classes.len() - 1;
+                let q = &last.qm[t * c2..(t + 1) * c2];
+                s += &format!("filler {fi} order {oi} crossings {crossings} sites {} q {}\n", classes.len(), q.iter().map(i64::to_string).collect::<Vec<_>>().join(" "));
+                n += 1;
+            }
+        }
+        std::fs::write(out.join(format!("fork_{name}.txt")), s).unwrap();
+        eprintln!("FORK {name} samples={n} fillers={} circles={}", fillers.len(), field.declaration.carry);
+    }
+}
