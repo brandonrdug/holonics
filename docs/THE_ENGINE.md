@@ -221,7 +221,7 @@ its words and one line a unit of work, and a run that opens the card prints `FIE
 `FIELD_SKIN`. The variables `FIELD_PROFILE`, `FIELD_PHASES`, `FIELD_TRACE` and `FIELD_BLANK_LIVE` are readings (their lines
 begin with those names); the trainer, the writers and the readings refuse every other variable named `FIELD_…`. The
 pass's tools and the foundings that judge their lines (`next-pass`, `join-store`, `move-store`, `own-states`,
-`set-world`, `set-frontier`, `found-lane`, `found-loud`, `found-pump`, `open-level`) read the written state back and refuse a line
+`set-world`, `set-terrain`, `set-frontier`, `found-lane`, `found-loud`, `found-pump`, `open-level`) read the written state back and refuse a line
 they did not mean to change.
 
 **The line's commands.**
@@ -247,6 +247,7 @@ reproduced, and the lap's read byte for byte (CLAUDE.md, the gates).
 | `move-store` | `train` | the pass moved to a store whose slice was redrawn: the slice set to the first piece at or past the places the pass has taken of it, its cursor zero | `MOVE_STORE` |
 | `own-states` | `train` | the pass's word `own` set: each stretch's training state is the release's own | `OWN_STATES` |
 | `set-world` | `train` | the pass's world clause set: one stretch in so many of a slice is an act the world answers | `SET_WORLD` |
+| `set-terrain` | `train` | the pass's terrain line set: the world's own records, `RECORDS` of one kind a region, their share of a section's sites held by the terrain's tension against the passage's (`PassTerrain`) | `SET_TERRAIN`; the trainer prints `STORE_TERRAIN` a section |
 | `set-frontier` | `host` | the pass reads a share of its stretches at the frontier, in eighths, with its reading's words | `SET_FRONTIER` |
 | `set-rate` | `host` | the deposit's rate set and, on request, its steps' remainders carried | `SET_RATE` |
 | `set-leak` | `host` | the store's leak set ([`Learner::leak`](../crates/engine/src/learner.rs)) | `SET_LEAK` |
