@@ -2277,8 +2277,9 @@ pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -
     let probe_site = 4 * h * (1 + 2 * (1u64 << d.class_trits()));
     // The chart's and the pair contact's scales are one a lane (§16.40).
     let lanes = d.lanes as u64;
-    // [theory, November 11 17:25] The carry circles' charts' reads, gate and scan operand, `[t][2C]` each.
-    let carry_site = 48 * d.carry as u64;
+    // [theory, November 11 17:25] The carry circles' charts' reads `[t][2C]` (64 bits), and their gate, scan operand and coupled drive `[t][2C]` each
+    // (32 bits: the gate since November 19, the operand and the drive since November 21).
+    let carry_site = (16 + 8 + 8 + 8) * d.carry as u64;
     // [the lead, November 19] The pump's chart read `[t][2C]` (64 bits) and its `η` `[t][2C]` (32 bits) a tick, and its covector `[t][2C]` on the return.
     let pump_site = if d.pump { 24 * d.carry as u64 } else { 0 };
     let carry_site = carry_site + pump_site;

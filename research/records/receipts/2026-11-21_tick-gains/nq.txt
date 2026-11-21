@@ -1,0 +1,25 @@
+# nq: lock taken 02:16:02 other runs: 1361623, obs 
+NQ suite 02:22:04 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 362.47s 
+NQ repro_L71 02:22:18 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+NQ ncu field_pair_scan old 02:22:37  DRAM Throughput % 49.20; Duration us 734.46; DRAM Throughput % 50.74; Duration us 743.36; DRAM Throughput % 50.45; Duration us 736.93;
+NQ ncu field_pair_scan new 02:22:56  DRAM Throughput % 30.39; Duration us 680.70; DRAM Throughput % 29.05; Duration us 702.56; DRAM Throughput % 30.14; Duration us 672.74;
+NQ ncu field_pair_scan_face old 02:23:15  DRAM Throughput % 88.08; Duration us 543.55; DRAM Throughput % 87.72; Duration us 551.17; DRAM Throughput % 86.72; Duration us 550.02;
+NQ ncu field_pair_scan_face new 02:23:33  DRAM Throughput % 87.35; Duration us 444.93; DRAM Throughput % 87.73; Duration us 434.56; DRAM Throughput % 88.19; Duration us 436.19;
+NQ ncu field_pair_gamma old 02:23:51  DRAM Throughput % 64.24; Duration ms 1.26; DRAM Throughput % 63.69; Duration ms 1.26; DRAM Throughput % 65.84; Duration ms 1.26;
+NQ ncu field_pair_gamma new 02:24:10  DRAM Throughput % 57.78; Duration ms 1.26; DRAM Throughput % 57.53; Duration ms 1.27; DRAM Throughput % 57.61; Duration ms 1.26;
+NQ ncu field_pair_scan_pre old 02:24:28  DRAM Throughput % 84.67; Duration ms 1.13; DRAM Throughput % 85.50; Duration ms 1.12; DRAM Throughput % 84.93; Duration ms 1.16;
+NQ ncu field_pair_scan_pre new 02:24:47  DRAM Throughput % 84.93; Duration ms 1.03; DRAM Throughput % 85.23; Duration ms 1.02; DRAM Throughput % 84.76; Duration ms 1.03;
+NQ ncu field_pair_gate_back old 02:25:06  DRAM Throughput % 67.98; Duration ms 2.14; DRAM Throughput % 68.37; Duration ms 2.13; DRAM Throughput % 68.34; Duration ms 2.13;
+NQ ncu field_pair_gate_back new 02:25:24  DRAM Throughput % 65.44; Duration ms 2.12; DRAM Throughput % 66.71; Duration ms 2.12; DRAM Throughput % 64.00; Duration ms 2.14;
+NQ warm-up 02:25:46 47.72, 2820 MHz
+NQ hold 1 old 02:26:08 batches=120 last30 ms_mean=510.7 50.61, 2805 MHz
+NQ hold 2 new 02:26:30 batches=120 last30 ms_mean=505.8 52.11, 2820 MHz
+NQ hold 3 new 02:26:52 batches=120 last30 ms_mean=504.4 53.34, 2805 MHz
+NQ hold 4 old 02:27:14 batches=120 last30 ms_mean=511.4 54.04, 2805 MHz
+NQ hold 5 old 02:27:36 batches=120 last30 ms_mean=511.8 54.75, 2805 MHz
+NQ hold 6 new 02:27:58 batches=120 last30 ms_mean=506.6 54.81, 2805 MHz
+NQ hold 7 new 02:28:20 batches=120 last30 ms_mean=506.2 54.78, 2805 MHz
+NQ hold 8 old 02:28:42 batches=120 last30 ms_mean=512.5 54.92, 2805 MHz
+# nq: released 02:28:42
+NQ_ALL_DONE 02:28:42
+RUN_EXIT 0 2026-11-21T02:28:42Z

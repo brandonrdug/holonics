@@ -145,8 +145,8 @@ pub(crate) struct Tick<'c> {
     /// `[t][2C]` and the coupled drive `κ b` `[t][2C]` (one slot each without them).
     pub(crate) pg: Pooled<'c, i64>,
     pub(crate) pgam: Pooled<'c, i32>,
-    pub(crate) pqm: Pooled<'c, i64>,
-    pub(crate) pkb: Pooled<'c, i64>,
+    pub(crate) pqm: Pooled<'c, i32>,
+    pub(crate) pkb: Pooled<'c, i32>,
     /// [the lead, November 19] The pump chart's read `p` `[t][2C]` and the pump `η` `[t][2C]`, none where the circles are not pumped.
     pub(crate) pp: Option<Pooled<'c, i64>>,
     pub(crate) peta: Option<Pooled<'c, i32>>,
@@ -215,8 +215,8 @@ impl<'c> Resident<'c> {
             pa: alloc64(sites * f)?,
             pg: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
             pgam: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
-            pqm: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
-            pkb: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+            pqm: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
+            pkb: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
             pp: if field.declaration.pump { Some(alloc64(sites * 2 * field.declaration.carry)?) } else { None },
             peta: if field.declaration.pump { Some(self.timed(Kind::Alloc, || self.take::<i32>(sites * 2 * field.declaration.carry)).map_err(device)?) } else { None },
             pb: alloc64(sites * f)?,

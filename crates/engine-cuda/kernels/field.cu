@@ -492,8 +492,10 @@ struct FieldWords {
     uint64_t rg;
     int64_t *pg;
     int32_t *pgam;  // [realization; November 19, Neon's note §1b] |γ| < 1 on 2^(−30): every word fits 32 bits, half the store and its traffic
-    int64_t *pqm;
-    int64_t *pkb;
+    // [realization; the lead, November 21] `Q` and `κ b` stand within 21 bits on the trained state (the carriers' census of November 20):
+    // each word is kept on 32 bits, written through `fit32` (a word past them is refused), half the tape's words and their traffic.
+    int32_t *pqm;
+    int32_t *pkb;
     // [definition; theory, November 11 04:14, step S] **The skin's exponent from site addresses**: `2π σ_x = q_x k + r_x`, `0 ≤ r_x < k`, `k = (n ln 2) << 24` of the
     // slot, written once a (site, paced head, mode) in `field_paces` beside `σ`: `[p][l][t]` three words each, `q`, then `r`'s low and high 64 bits (`r < k` is held 128 bits wide
     // from the start: `k` passes `INT64_MAX` at `n ≥ 739` and 64 unsigned bits at `n ≥ 1478`, and the pair's compare is made on 128 bits from `k` itself).
@@ -4588,8 +4590,8 @@ extern "C" __global__ void field_pair_scan(FieldWords w) {
                     ei = w.peta[nr + C];
                 }
             }
-            w.pqm[gr] = fit64(qr, w.status);
-            w.pqm[gi] = fit64(qi, w.status);
+            w.pqm[gr] = fit32(qr, w.status);
+            w.pqm[gi] = fit32(qi, w.status);
             wide nr, ni;
             if (pumped) {
                 nr = ckr + rel(cyr * qr - cyi * qi + cer * qr + cei * qi, MOVE_BITS);
@@ -4692,8 +4694,8 @@ extern "C" __global__ void field_pair_gamma(FieldWords w) {
         }
         const wide kappa = div_nearest((CARRY_GROUP_FOUNDING * d) << MOVE_BITS, one);
         const uint64_t re = t * w.f + plain + k, im = re + half;
-        w.pkb[gr] = fit64(rel(kappa * (wide)w.pb[re], MOVE_BITS), w.status);
-        w.pkb[gi] = fit64(rel(kappa * (wide)w.pb[im], MOVE_BITS), w.status);
+        w.pkb[gr] = fit32(rel(kappa * (wide)w.pb[re], MOVE_BITS), w.status);
+        w.pkb[gi] = fit32(rel(kappa * (wide)w.pb[im], MOVE_BITS), w.status);
     }
 }
 
