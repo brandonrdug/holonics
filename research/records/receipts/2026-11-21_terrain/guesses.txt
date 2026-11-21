@@ -38,3 +38,29 @@ read by two streams, 40 passes: the held terrain panel at least 24 of 96 whole, 
 
 Fixed 2026-11-21T08:36:44Z (date -u), before W77t trains. G-W1: W77t (the terrain read by two streams inside the line, two records a region) writes at
 least 24 of 96 held records whole at its MEAN.3000 and at least 8 of 16 on sums; its frontier within 0.03 nats a place of L77's on every region.
+
+Scored (2026-11-21T09:43:26Z, date -u): G-W1 missed: W77t's MEAN.3000 wrote 20 of 96 whole (sums 3 of 16); its text at one place open +0.0130 (at most +0.0169,
+within 0.03), its frontier read +0.0153 with wikidata +0.0370 (over). L77 wrote 0 of 96. On the 21-prompt panel W77t 29 of 168, L77 2.
+Fixed 2026-11-21T09:43:26Z, before W78t trains. G-W2: W78t (W77t's end, a second lap) writes at least 30 of 96 held records whole and at least 6 of 16
+on sums at its MEAN.3000; L78 (L77's end) at most 2; W78t's text at one place open within 0.03 nats a place of L78's on every region.
+
+Fixed 2026-11-21T09:45:12Z (date -u), before e's spigot world trains (spigot/dwell_e.sh). G-E1: from W77t's end, 30 passes of e's chained carry steps
+(digits 1 to 120) read by two streams: held last steps of a sweep (digits 150 to 199, radices 4, 3, 2) at least 30 of 50 whole; held
+inner steps at least 5 of 50.
+
+Scored (2026-11-21T09:55:36Z, date -u): G-E1 split: held last steps whole 13 of 50 (missed 30); held inner steps whole 8 of 50
+(held 5). The carry out Q right in 41 of 50 inner steps and e's digit (Q at radix 2) in 23 of 50; at W77t's end 6 and 4. After a step she
+writes the next one, its radix one less and its carry in the Q she wrote; past radix 2 she writes a radix 1.
+
+Fixed 2026-11-21T10:16:03Z (date -u), before pi's spigot world trains (spigot/dwell_pi.sh). G-P1: from W77t's end, 30 passes of pi's chained
+Rabinowitz-Wagon carry steps (sweeps 1 to 120) read by two streams: the held inner steps' carry out right in at least 20 of 50, the held
+last steps whole in at least 10 of 50.
+(Note: dwell_pi.sh's header carries e's stamp, 09:45:12Z, by a substitution's order; G-P1 was fixed at the stamp above, before the run.)
+
+Scored (2026-11-21T10:40:14Z, date -u): G-P1 split: the held inner steps' carry out right in 23 of 50 (held 20; W77t's end 2); the
+held last steps whole 1 of 50 (missed 10). At the place I = 1 the radix is 1 and the carry out is the whole of 10A + Q, the spigot's
+boundary; she writes the remainder 0 and a one-digit carry. After each step she writes the next, its place one less, its carry in the Q she
+wrote, in all 100. G-W2 so far: W78t's MEAN.3000 wrote 29 of 96 whole (missed 30 by one), sums 4 of 16 (missed 6); L78 and the text pending.
+
+Scored (2026-11-21T11:33:56Z, date -u): G-W2 split: W78t 29 of 96 whole (missed 30), sums 4 of 16 (missed 6); L78 0 of 96 (held);
+W78t's text at one place open +0.0129 (±0.0009) against L78's, at most +0.0195 in wikidata (held); the frontier read +0.0201, wikidata +0.0431.
