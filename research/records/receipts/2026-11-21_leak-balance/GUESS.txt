@@ -1,0 +1,15 @@
+# Fixed 2026-11-21T02:22:29Z, before any of these is read. Host reads offered to the engineering thread on L71's end state, the residual
+# probe's region (240 sites of docs/THE_ENGINE.md), its declared ticks raised to 17 as in tick_residual_L71_17.txt. A "move" is a
+# face lane's chart step r(x^(k+1)) - r(x^k); its cosine is of successive moves, pooled as sum of inner products over sum of
+# products of norms. "delta" is a lane leak x <- (1 - delta) x + g on the host forward, a ruler's read and no state of the line.
+B1 (the leak's first deposit has a sign): on the built tick the pooled cosine over ticks 5 to 16 is above 0.9 at every face lane.
+    At the line's own four ticks (three pairs of moves) it is positive at every lane, between 0.2 and 0.8 (the less certain half).
+B2 (every mode contracts): at delta = 1/2 the ratio of successive moves' norms at ticks 10 to 16 stands between 0.5 and 0.8 and
+    is level (it changes by under 0.05 from tick 10 to tick 16), where the built tick's rises from 0.79 to 0.88.
+B3 (the rest): over delta in {1/4, 1/2, 3/4, 0.85, 1} the pooled cosine over ticks 1 to 16 falls with delta and changes sign
+    between 3/4 and 1; it is negative at delta = 1.
+B4 (no growth): at every delta of the scan up to 0.85 no lane's pooled move at tick 16 is larger than its move at tick 6.
+B5 (what the comparison has to recover; the least certain): the held code read at tick 17 with delta = 1/2, on the state as it
+    is trained, stands above the line's own four-tick read by 0.05 to 0.5 nats a place.
+F3 (the circles' multipliers, read from the state's words; low confidence): the median of the 512 circles' |gamma| is under 0.6,
+    and under a tenth of them turn within 0.3 radians of a third of a turn at |gamma|^3 > 1/2.
