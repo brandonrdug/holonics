@@ -1,0 +1,7 @@
+E5's premise read (the lead, November 21): W80g's STATE.3000 and the same state with every family's read part at the lattice rule's places for
+eps = 2^-10 nats at every symbol (set-lattice ... 10; 1,844,993 of 1,860,865 entries read 1 to 12 places coarser than their grain), read by
+two streams on the 800 held frontier rows (read-reach, host, 8 threads), nats a place in millionths:
+end    all 1350077 | books 1633943 code 1080288 science 1452819 web 1406494 wikidata 1176831
+lattice all 1350080 | books 1633915 code 1080374 science 1452808 web 1406450 wikidata 1176843
+The rule's places, by family: a map read through D = 224 inputs keeps 20 places (drops 4 of 24), through 2M = 64 keeps 18 (drops 6), the
+pair's return through f = 1,088 keeps 23 (drops 1), the encodings keep 14 of 16, a bias 12 of 16, a temperature or a rate 12 of 24.

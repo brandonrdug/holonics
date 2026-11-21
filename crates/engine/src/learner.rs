@@ -443,6 +443,14 @@ pub struct Learner {
     /// remainder belongs. Carried in the learner's text as two trailing lines (`carried_first`, `carried_second`) after the remainder's,
     /// and only where present; a state without them has the forced grain.
     pub carried: Option<(Vec<i32>, Vec<i32>)>,
+    /// [definition; the lead, November 21, E5 of #1088 (the October lattice deposit; Lean `HNN/LatticeDeposit`, `lattice_deposit_accounting`;
+    /// atlas `hnn.lattice-deposit`)] **The forward reads each family's read part, and the deposit integrates under it**: each entry is its
+    /// read part on its family's lattice of `L` places below the point plus a carried rest under half of that lattice's unit, and the
+    /// material every forward and every reader reads is the read part. A section's step adds to the read part and its rest, and the read
+    /// part moves only where their sum crosses a lattice point, so `read + rest + Σ released = start + Σ steps`. The places are the lattice
+    /// rule's ([`Constitution::lattice_by_rule`]) for a receiver's tolerance `2^(−tolerance_bits)` nats at every symbol. Carried in the
+    /// learner's text as two trailing lines (`lattice`, `lattice_rest`) after the moments' carried lines, and only where present.
+    pub lattice: Option<Lattice>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`Receipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
     /// kept under the held read (whose next section moves the step before pricing it).
@@ -691,7 +699,60 @@ impl StorePass {
     }
 }
 
+/// [definition; the lead, November 21, E5 of #1088] A learner's lattice ([`Learner::lattice`]): the receiver's tolerance in bits, each
+/// family's places below the point (one a family of [`Constitution::families_all`]), and each entry's rest under its read part, on its
+/// family's grain.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Lattice {
+    pub tolerance_bits: u32,
+    pub places: Vec<u32>,
+    pub rest: Vec<i32>,
+}
+
+impl Lattice {
+    /// Each entry's places dropped below its family's grain: `grain − L` where the lattice is coarser than the grain, else zero.
+    pub(crate) fn drops(&self, families: &[(usize, usize, u32)], len: usize) -> Vec<u32> {
+        let mut drop = vec![0u32; len];
+        for (&(start, n, grain), &places) in families.iter().zip(&self.places) {
+            drop[start..start + n].fill(grain.saturating_sub(places));
+        }
+        drop
+    }
+
+    /// The deposit under the lattice: every entry's read part and rest summed, the read part set to the nearest lattice point, the rest kept.
+    fn settle(&mut self, families: &[(usize, usize, u32)], material: &mut dyn Iterator<Item = &mut i32>, len: usize) -> Result<()> {
+        let drops = self.drops(families, len);
+        for ((v, r), &q) in material.zip(self.rest.iter_mut()).zip(&drops) {
+            if q == 0 {
+                continue;
+            }
+            let full = i128::from(*v) + i128::from(*r);
+            let read = release(full, q) << q;
+            *v = i32::try_from(read).map_err(|_| TowerError::Refused("a read part past its 32-bit word"))?;
+            *r = i32::try_from(full - read).map_err(|_| TowerError::Refused("a lattice's rest past its word"))?;
+        }
+        Ok(())
+    }
+}
+
 impl Learner {
+    /// [definition; the lead, November 21, E5 of #1088] **The learner whose forward reads the lattice rule's read parts** ([`Learner::lattice`])
+    /// for a receiver's tolerance `2^(−tolerance_bits)` nats: every entry split into its read part and its rest, so the whole word is the
+    /// source's and every face reads the read part. Every other line is kept. Refused where a lattice is set.
+    pub fn with_lattice(&self, tolerance_bits: u32) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a learner whose forward already reads a lattice");
+        }
+        let mut out = self.clone();
+        let families = out.field.families_all();
+        let len = out.field.material_len();
+        let mut lattice = Lattice { tolerance_bits, places: out.field.lattice_by_rule(tolerance_bits), rest: vec![0; len] };
+        lattice.settle(&families, &mut out.field.material_mut(), len)?;
+        out.lattice = Some(lattice);
+        out.last = None;
+        Ok(out)
+    }
+
     /// [measurement; the lead, November 21, the precision pass's G-W4] The deposit's two moments, one entry each for the material: a reading.
     pub fn moments(&self) -> (&[i128], &[i128]) {
         (&self.first, &self.second)
@@ -702,7 +763,7 @@ impl Learner {
     pub fn new(field: Constitution, rate_bits: u32) -> Self {
         let len = field.material_len();
         let drawn = 4 * field.declaration.founding_draws();
-        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None, remainder: None, carried: None }
+        Self { field, first: vec![0; len], second: vec![0; len], rate_bits, drawn, laps: 0, held: None, read_held: false, rate_parts: None, own_rates: None, leak: None, last: None, pass: None, remainder: None, carried: None, lattice: None }
     }
 
     /// Whether a deposited step is held for the next regions' read.
@@ -826,7 +887,13 @@ impl Learner {
         // of the section (27% of path75's second segment). What the step does is read by the passes the field makes anyway:
         // the next section's own covector prices it at first order ([`Receipt::transfer`]), contraction and expansion
         // alike, and the moments carry every covector.
-        let (candidate, moved) = stepped(&self.field, &step, 0)?;
+        let (mut candidate, moved) = stepped(&self.field, &step, 0)?;
+        // [definition; the lead, November 21, E5 of #1088] Under a lattice the step lands on the read part and its rest, and the read part moves
+        // only where their sum crosses a lattice point ([`Learner::lattice`]).
+        if moved && let Some(lattice) = self.lattice.as_mut() {
+            let (families, len) = (candidate.families_all(), candidate.material_len());
+            lattice.settle(&families, &mut candidate.material_mut(), len)?;
+        }
         mark(13);
         if !moved {
             self.relax(&rates);
@@ -879,7 +946,9 @@ impl Learner {
             let remainder = self.remainder.as_ref().map_or(String::new(), |r| format!("remainder {}\n", r.iter().map(i64::to_string).collect::<Vec<_>>().join(" ")));
             // [the lead, November 21, E4 of #1088] The moments' carried remainders, two trailing lines after the remainder's, only where carried.
             let carried = self.carried.as_ref().map_or(String::new(), |(cf, cs)| format!("carried_first {}\ncarried_second {}\n", cf.iter().map(i32::to_string).collect::<Vec<_>>().join(" "), cs.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")));
-            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{remainder}{carried}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
+            // [the lead, November 21, E5 of #1088] The lattice, two trailing lines after the moments' carried lines, only where set.
+            let lattice = self.lattice.as_ref().map_or(String::new(), |l| format!("lattice {} {}\nlattice_rest {}\n", l.tolerance_bits, l.places.iter().map(u32::to_string).collect::<Vec<_>>().join(" "), l.rest.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")));
+            format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{remainder}{carried}{lattice}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
 
@@ -1024,6 +1093,25 @@ impl Learner {
             }
             _ => None,
         };
+        // [definition; the lead, November 21, E5 of #1088] The lattice, two trailing lines after the moments' carried lines: the tolerance's bits
+        // and one place count a family, then one rest an entry, each under half its lattice's unit.
+        let lattice = match lines.peek() {
+            Some(l) if l.starts_with("lattice ") => {
+                let w = read_numbers::<u32>(lines.next().and_then(|l| l.strip_prefix("lattice ")))?;
+                let rest = read_numbers::<i32>(lines.next().and_then(|l| l.strip_prefix("lattice_rest ")))?;
+                let families = field.families_all();
+                if w.len() != families.len() + 1 || rest.len() != field.material_len() {
+                    return refuse("a learner's lattice that is not one place count a family and one rest an entry");
+                }
+                let lattice = Lattice { tolerance_bits: w[0], places: w[1..].to_vec(), rest };
+                let drops = lattice.drops(&families, field.material_len());
+                if lattice.rest.iter().zip(&drops).any(|(&r, &q)| if q == 0 { r != 0 } else { i128::from(r).abs() > 1i128 << (q - 1) }) {
+                    return refuse("a lattice's rest outside half its lattice's unit");
+                }
+                Some(lattice)
+            }
+            _ => None,
+        };
         // [definition; theory, November 12] The pass's place over a store, the text's last line where present ([`StorePass`]).
         let pass = match lines.peek() {
             Some(l) if l.starts_with("pass ") => Some(StorePass::from_line(lines.next().unwrap_or(""))?),
@@ -1034,6 +1122,6 @@ impl Learner {
             (Some(p), Some(l)) if l.starts_with("terrain ") => Some(StorePass { terrain: Some(PassTerrain::from_line(lines.next().unwrap_or(""))?), ..p }),
             (p, _) => p,
         };
-        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, carried, last: None, pass })
+        Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, carried, lattice, last: None, pass })
     }
 }

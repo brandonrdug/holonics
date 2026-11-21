@@ -6817,3 +6817,46 @@ fn a_moment_with_its_remainder_carried_tracks_its_mean() {
     assert!(text.contains("\ncarried_first ") && text.contains("\ncarried_second "));
     assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the carried lines read back");
 }
+
+/// [definition; the lead, November 21, E5 of #1088] **The lattice deposit keeps the whole word and reads the read part**: founded on a learner
+/// with drawn material, every entry's read part plus its rest is the source's entry and every read part stands on its family's lattice; the
+/// text reads back; over three sections the whole word moves by exactly the sum of the steps the learner without the lattice would take
+/// from the same faces (the read part and rest are the deposit's, every step lands); and at a lattice no coarser than every grain the
+/// learner is the plain one bit for bit.
+#[test]
+fn the_lattice_deposit_keeps_the_whole_word_and_reads_the_read_part() {
+    let learner = Learner::new(drawn(shaped(1)), 12);
+    for tolerance_bits in [2u32, 6] {
+        let latticed = learner.with_lattice(tolerance_bits).unwrap();
+        let l = latticed.lattice.as_ref().unwrap();
+        let families = latticed.field.families_all();
+        assert_eq!(l.places.len(), families.len());
+        let whole: Vec<i64> = latticed.field.material().zip(&l.rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect();
+        let source: Vec<i64> = learner.field.material().map(|&v| i64::from(v)).collect();
+        assert_eq!(whole, source, "eps 2^-{tolerance_bits}: the whole word is the source's");
+        let drops = l.drops(&families, latticed.field.material_len());
+        assert!(latticed.field.material().zip(&drops).all(|(&v, &q)| q == 0 || v % (1 << q) == 0), "eps 2^-{tolerance_bits}: every read part on its lattice");
+        assert!(drops.iter().any(|&q| q > 0), "eps 2^-{tolerance_bits}: some family is read coarser than its grain");
+        let text = latticed.to_text();
+        assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the lattice's lines read back");
+        let mut run = latticed.clone();
+        for _ in 0..3 {
+            let before: Vec<i64> = run.field.material().zip(&run.lattice.as_ref().unwrap().rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect();
+            run.section(&[region()]).unwrap();
+            let step = run.last.as_ref().map(|s| s.step.clone()).unwrap_or_default();
+            let after: Vec<i64> = run.field.material().zip(&run.lattice.as_ref().unwrap().rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect();
+            for (k, ((a, b), s)) in after.iter().zip(&before).zip(&step).enumerate() {
+                assert_eq!(*a - *b, -(*s as i64), "eps 2^-{tolerance_bits}: entry {k} moves by its step (the descent, θ − s), read part and rest together");
+            }
+        }
+    }
+    // A lattice no coarser than any grain: the plain learner, bit for bit.
+    let fine = learner.with_lattice(40).unwrap();
+    assert!(fine.lattice.as_ref().unwrap().rest.iter().all(|&r| r == 0));
+    let (mut a, mut b) = (learner.clone(), fine.clone());
+    for _ in 0..2 {
+        a.section(&[region()]).unwrap();
+        b.section(&[region()]).unwrap();
+    }
+    assert_eq!(a.field, b.field, "a lattice finer than every grain changes nothing");
+}

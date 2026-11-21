@@ -417,6 +417,26 @@ impl Constitution {
         out
     }
 
+    /// [definition; the lead, November 21, E5 of #1088] **Each family's read part by the lattice rule**: for a receiver whose code tolerance is
+    /// `ε = 2^(−eps_bits)` nats at every symbol, the grain `L_R = 2/ε` (a face whose exponents are within `B` codes every symbol within `2B`,
+    /// Lean `face_tail_moves_code`) and each family's places `L = ⌈log₂(2 L_R X)⌉` ([`lattice_exponent`]) by its fan-in `X`
+    /// ([`Loci::fan_in`]; the level's families by the level's layout; the glue's maps by their input widths, their biases by one), one a family
+    /// of [`Constitution::families_all`].
+    pub fn lattice_by_rule(&self, eps_bits: u32) -> Vec<u32> {
+        let grain = 1u128 << (eps_bits + 1);
+        let mut out: Vec<u32> = self.layout.families.iter().map(|&(start, _, _)| lattice_exponent(grain, u128::from(self.layout.fan_in(&self.declaration, start)))).collect();
+        if let Some(s) = &self.scale {
+            out.extend(s.coarse.layout.families.iter().map(|&(start, _, _)| lattice_exponent(grain, u128::from(s.coarse.layout.fan_in(&s.coarse.declaration, start)))));
+            let (d0, d1) = (self.declaration.width as u128, s.coarse.declaration.width as u128);
+            let h = s.harmonics as u128;
+            out.extend([lattice_exponent(grain, h * d0), lattice_exponent(grain, 1), lattice_exponent(grain, d1), lattice_exponent(grain, 1)]);
+            if s.before_offsets(self.declaration.width).is_some() {
+                out.extend([lattice_exponent(grain, d1), lattice_exponent(grain, 1)]);
+            }
+        }
+        out
+    }
+
     /// [definition; the lead, November 18, the record of the two streams §11] **The level opened to one-sided streams**: this tower with
     /// the block `B⁻`, `b_B⁻` after its glue, at zero, so every face reads as before (a passage read by two streams then takes the epoch
     /// before each place through it, [`Constitution::scale_forward_before`]). Refused without a level or where the level carries it.
