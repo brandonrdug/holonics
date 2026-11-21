@@ -104,7 +104,7 @@ def main():
             print(f"HALVING t={t} {a}->{b} median_dist {da:.4f} -> {db:.4f} ratio={db / da:.3f}")
 
 
-if __name__ == '__main__' and '--leak' not in sys.argv:
+if __name__ == '__main__' and '--leak' not in sys.argv and '--polygons' not in sys.argv:
     main()
 
 
@@ -141,4 +141,41 @@ def leak(root):
 
 if __name__ == '__main__' and '--leak' in sys.argv:
     leak(sys.argv[1])
+    sys.exit(0)
+
+
+def polygons(root):
+    """`--polygons`: each site map's grains (its singular values on the material's grain `2^(-24)`), counted by octave, the polygon's breaks
+    (the sorted ranks where the octave changes) and, for the square `read`, the rates (its eigenvalues' moduli) against the grains: the
+    cumulative sums of `log2` of each, where they touch (the part splits there, `hodge.newton-above-hodge-is-a-mixing`)."""
+    for path in sorted(glob.glob(os.path.join(root, 'map_*.txt'))):
+        name = os.path.basename(path)[4:-4]
+        lines = open(path).read().split('\n')
+        rows, cols = map(int, lines[0].split())
+        A = np.array([[float(v) for v in l.split()] for l in lines[1:1 + rows]]) / 2.0 ** 24
+        sv = np.linalg.svd(A, compute_uv=False)
+        sv = sv[sv > 0]
+        o = np.floor(np.log2(sv)).astype(int)
+        counts = {k: int(np.sum(o == k)) for k in range(o.max(), o.min() - 1, -1)}
+        occupied = [c for c in counts.values() if c > 0]
+        breaks = [int(np.sum(o > k)) for k in range(o.max(), o.min() - 1, -1)]
+        breaks = [b for b in breaks if 0 < b < len(sv)]
+        on32 = [b for b in breaks if b % 32 == 0]
+        print(f"POLY {name} {rows}x{cols} rank={len(sv)} top={sv[0]:.3f} octaves(high..low)={' '.join(f'{k}:{c}' for k, c in counts.items())}"
+              f" fullest_over_emptiest={max(occupied) / min(occupied):.1f} breaks={breaks} on_multiple_of_32={on32}")
+        if rows == cols:
+            lam = np.sort(np.abs(np.linalg.eigvals(A)))[::-1]
+            lam = lam[lam > 0]
+            n = min(len(lam), len(sv))
+            newton, hodge = np.cumsum(np.log2(lam[:n])), np.cumsum(np.log2(sv[:n]))
+            gap = hodge - newton
+            touches = [i + 1 for i in range(n - 1) if gap[i] < 0.05]
+            lo = np.floor(np.log2(lam)).astype(int)
+            lcounts = {k: int(np.sum(lo == k)) for k in range(lo.max(), lo.min() - 1, -1)}
+            print(f"POLY {name} rates(high..low)={' '.join(f'{k}:{c}' for k, c in lcounts.items())} hodge_minus_newton_at(32,64,96,128,160,192)="
+                  f"{' '.join(f'{gap[i - 1]:.2f}' for i in (32, 64, 96, 128, 160, 192) if i <= n)} ends={hodge[-1]:.2f},{newton[-1]:.2f} touches_within_0.05={touches[:20]}")
+
+
+if __name__ == '__main__' and '--polygons' in sys.argv:
+    polygons(sys.argv[1])
     sys.exit(0)

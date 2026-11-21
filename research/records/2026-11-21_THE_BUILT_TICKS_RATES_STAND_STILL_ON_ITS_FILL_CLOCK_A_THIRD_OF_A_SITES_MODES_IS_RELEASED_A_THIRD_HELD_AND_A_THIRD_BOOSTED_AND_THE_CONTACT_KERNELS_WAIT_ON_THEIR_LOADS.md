@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 02:00 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 02:10 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -127,12 +127,33 @@ at tick 4 12,351 against 12,656): the declared count reaches the pass before its
 line's four-tick pass at its own ticks. The line trains at four, where the fill is under two and the rates of §2 have not settled; the
 read is of the tick's form, which the raised count leaves as it is (`agent-inferred`).
 
-## 6. Atlas
+## 6. The site maps' polygons
+
+The lattice record's §6.2 read, its guess taken whole and fixed at 02:00 UTC (`POLY_GUESS.txt`): on L71's end state each site map that reads
+or writes the face (`read` `224 × 224`, `out` `224 × 64`, `w` `224 × 1088`, and `q`, `v`, `a`, `b` reading the face's chart), its grains
+(singular values on the material's grain `2^(−24)`) counted by octave, the polygon's breaks (the sorted ranks where the octave changes), and
+for the square `read` its rates (eigenvalues' moduli) against its grains (`a_parts_transport_for_its_polygons`, `tools/tick_gains.py
+--polygons`, `polygons.txt`).
+
+- The counts by octave are unequal by 11 to 43 times between the fullest occupied octave and the emptiest (P1 held at every map).
+- No break falls on a multiple of 32 (P2 held at every map). The face's own reading, `read`, spreads its 224 grains over 17 octaves
+  (2^2 down to 2^(−14)): 10, 32, 37, 35, 34, 28, 20, 12, 7, 4, 3 and 1 from the top, breaks at 10, 42, 79, 114, 148, 176 and 196, so its middle
+  five octaves are segments of 28 to 37 places, and its last 28 places hold gains under 1/64 of the largest.
+- Its rates' polygon meets its grains' only at the ends (both −281.60 bits, the determinant, as Weyl's inequality asks), and stands 26 to 45
+  bits from it at ranks 32 to 192: the reading mixes all its places and splits nowhere, so the face's reading is one carrier, and the seven
+  lanes of 32 are not segments of its own transport (`agent-inferred`).
+
+So a width read from a part's own polygon is a segment of about one octave of its grains, five such segments of 28 to 37 places in the
+face's reading, with a tail of 28 places a register narrower than the rest needs; the lanes' 32 is not a break of any map read here. Which
+part a width belongs to is the partition's to found at the part's need (`radix.register-composition`, the precision law); this read gives
+the counts it would found on, and changes nothing in the line.
+
+## 7. Atlas
 
 `tower.field-tick-rates-on-the-fill-clock` (new, measured), using `tower.field-tick-running-mean`, `motion.unit-power-push-log-clock`,
 `motion.relaxed-step-three-kinds` and `hodge.newton-above-hodge-is-a-mixing`.
 
-## 7. Sources
+## 8. Sources
 
 `crates/engine/src/contact.rs` (`Constitution::pass_probed`, `TickProbe`), `crates/engine/src/field/tests.rs`
 (`the_ticks_gains_by_finite_differences`, `the_trained_ticks_residual_by_tick`), `tools/tick_gains.py`, `crates/engine-cuda/kernels/field.cu`

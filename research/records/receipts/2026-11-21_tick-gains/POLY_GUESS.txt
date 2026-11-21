@@ -1,0 +1,5 @@
+# Fixed 2026-11-21T02:00:30Z, before the read: the lattice record §6.2's guess, taken whole, on L71's end state, for each site map
+# whose output or input is the face (read D x D, out D x 2M, w D x f, and q, v, a, b reading the face's chart): the grains are the singular
+# values, sorted, at the grain of one octave (log2), and the rates the eigenvalues' moduli where the map is square (read).
+P1: the counts by octave are unequal by more than a factor of two between the fullest occupied octave and the emptiest.
+P2: no break of the grains' polygon (a change of octave in the sorted grains) falls on a multiple of 32.
