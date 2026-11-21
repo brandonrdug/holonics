@@ -1848,6 +1848,39 @@ pub fn set_rate(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 21, E5 of #1088] `set-lattice STATE STATE_SHA EPS_BITS OUT`: **a learner whose forward reads the lattice
+/// rule's read parts** ([`Learner::with_lattice`]) for a receiver's tolerance `2^(−EPS_BITS)` nats at every symbol. Every entry is split into
+/// its read part and its rest, so the whole word is the source's; every other line is kept. One `SET_LATTICE_FAMILY` line a family (its
+/// index, fan-in, grain, places and the places dropped from the forward) and a `SET_LATTICE` line; the written state reads back as itself.
+pub fn set_lattice(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("set-lattice STATE STATE_SHA EPS_BITS OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let eps: u32 = args[3].parse()?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let latticed = learner.with_lattice(eps).map_err(|e| e.to_string())?;
+    let lattice = latticed.lattice.as_ref().ok_or("a lattice founded with none")?;
+    let families = latticed.field.families_all();
+    let mut dropped = 0usize;
+    for (k, (&(start, len, grain), &places)) in families.iter().zip(&lattice.places).enumerate() {
+        let drop = grain.saturating_sub(places);
+        dropped += if drop > 0 { len } else { 0 };
+        println!("SET_LATTICE_FAMILY family={k} start={start} entries={len} grain={grain} places={places} dropped={drop}");
+    }
+    let written = latticed.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_LATTICE eps_bits={eps} families={} entries_read_coarser={dropped} of {}", families.len(), latticed.field.material_len());
+    Ok(())
+}
+
 /// [definition; the lead, November 18, the audit of that day §1.4] `set-frontier STATE STATE_SHA EIGHTHS OUT`: **a learner whose pass reads
 /// a share of its stretches at the frontier** ([`holonics_engine::field::StorePass::frontier`]): `EIGHTHS` of every eight stretches, keyed by
 /// the stretch's count, are the context known and the next place alone open ([`holonics_engine::passage::frontier_state_of`]), the state

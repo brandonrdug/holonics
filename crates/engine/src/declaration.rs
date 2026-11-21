@@ -818,10 +818,51 @@ pub struct Loci {
     pub families: Vec<(usize, usize, u32)>,
 }
 
+/// [definition; the lead, November 21, E5 of #1088 (the October lattice rule, `hnn/field.rs` at `d5ed4adc1`; atlas `hnn.lattice-deposit`)]
+/// **The lattice rule's exponent**: `L = ⌈log₂(2 L_R X)⌉` places below the point for a receiver grain `L_R = ⌈1/ε⌉` and a locus's fan-in
+/// `X` (at least one). A face whose every exponent is within `B` has every symbol's code within `2B` (Lean `HNN/WidthTolerance`,
+/// `face_tail_moves_code`), and an entry read through `X` terms moves its sum by at most `X` times its own tail, so a read part at `L`
+/// places keeps every symbol's code within the receiver's tolerance.
+pub fn lattice_exponent(grain: u128, fan_in: u128) -> u32 {
+    let reach = 2u128.saturating_mul(grain).saturating_mul(fan_in.max(1));
+    if reach <= 1 {
+        0
+    } else {
+        128 - (reach - 1).leading_zeros()
+    }
+}
+
 /// The encodings a mark's strengths are read in, in [`Loci::mark`]'s order.
 pub const MARK_BASES: usize = 3;
 
 impl Loci {
+    /// [definition; the lead, November 21, E5 of #1088] **A family's fan-in**: the count of terms an entry's product is summed among into one
+    /// output, the `X` of the lattice rule ([`lattice_exponent`]): a map's input width (`D` for a chart of the read, `2M` for a map of the
+    /// current, `f` for the pair's return), the encodings' four (a symbol's three rows and the moment's chart into one coordinate), a
+    /// moment encoding's reach (a moment sums a strand's sites), and one for a bias, a temperature, a rate or a strength read alone.
+    pub fn fan_in(&self, d: &Declaration, start: usize) -> u64 {
+        let (dw, m2, f) = (d.width as u64, 2 * d.complex() as u64, d.contacts as u64);
+        if [self.enc, self.before, self.after].contains(&start) {
+            4
+        } else if [self.q, self.v, self.probe, self.a, self.b, self.read, self.carry, self.triad, self.opening, self.junction, self.closed_odds, self.pump, self.friction_gate].contains(&start) {
+            dw
+        } else if [self.out, self.moment_face].contains(&start) {
+            m2
+        } else if start == self.w {
+            f
+        } else if start == self.w_triad {
+            2 * d.triads as u64
+        } else if [self.moment_before, self.moment_after].contains(&start) {
+            d.reach as u64
+        } else if start == self.loud {
+            d.lanes as u64 + 1
+        } else if start == self.mark {
+            MARK_BASES as u64
+        } else {
+            1
+        }
+    }
+
     pub(crate) fn new(d: &Declaration) -> Self {
         let (dw, m2, f, a) = (d.width, 2 * d.complex(), d.contacts, d.alphabet);
         let mut families = Vec::new();

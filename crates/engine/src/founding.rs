@@ -1059,6 +1059,9 @@ impl Learner {
     /// sum move together, so the rate falls by `⌈log₂ f⌉` bits: the field's step stays the old one.
     /// A learner holding a step is refused: the step is read first ([`Learner::read_step_on`]).
     pub fn widened(&self, factor: usize, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner widens after its held step is read");
         }
@@ -1069,7 +1072,7 @@ impl Learner {
         let second = from.iter().map(|&(i, divided)| if divided { div_nearest(self.second[i], f2) } else { self.second[i] }).collect();
         let drawn = self.drawn + 4 * self.field.growth_draws(factor);
         let rate_bits = self.rate_bits + (usize::BITS - (factor - 1).leading_zeros());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 4, §16.40] **The learner with one more lane** ([`Constitution::laned`]), the lane's
@@ -1089,6 +1092,9 @@ impl Learner {
     /// 211 deposited, the withheld code 0.268 to 0.286. Smaller, not gone: the lane's covectors stay coherent, so its steps
     /// grow toward the full normalized size as its first moments fill.
     pub fn laned(&self, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner grows a lane after its held step is read");
         }
@@ -1112,7 +1118,7 @@ impl Learner {
         // [agent-inferred, November 14] The founded parts' rates are kept (the lane's entries join the lane parts, [`Constitution::founded_parts`]), and
         // where the learner carries each entry's own rate every standing entry keeps it and a lane entry takes `rate_bits`.
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Constitution::with_carry`]), the circles' draws read from
@@ -1122,6 +1128,9 @@ impl Learner {
     /// the turn rows'. The founded parts' rates are kept, the circles' parts at the old rate (octaves 0), so the parts line goes on telling the
     /// contacts before the last plain growth; the held step and the last section's step, of the old layout, are dropped.
     pub fn with_carry(&self, circles: usize, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner takes carry circles after its held step is read");
         }
@@ -1142,7 +1151,7 @@ impl Learner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 18, the record of the two streams §19] **The learner with `circles` more carry circles**
@@ -1154,6 +1163,9 @@ impl Learner {
     /// and the step's remainder, where the state carries one, opens at zero over the new length (as every founding here opens it:
     /// no standing entry's remainder is carried).
     pub fn more_carry(&self, circles: usize, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner grows its carry circles after its held step is read");
         }
@@ -1175,7 +1187,7 @@ impl Learner {
         }
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let drawn = self.drawn + 4 * self.field.declaration.carry_draws(circles);
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 12, the triad record §4] **The learner with `triads` triads** ([`Constitution::with_triads`]), the triads' draws read
@@ -1191,12 +1203,18 @@ impl Learner {
     /// old entry's rate too, since a state tool that left the part rates behind once made every part train at the base rate with nothing refused.
     /// The held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
     pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         self.with_triads_at(triads, keys, false)
     }
 
     /// [definition; theory, November 16 19:10Z] **The learner with crossing triads** ([`Constitution::with_crossings`]), opened as
     /// [`Learner::with_triads`] opens the strand's: every standing entry keeps its moments, its remainder and its rate at its new index.
     pub fn with_crossings(&self, triads: usize, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         self.with_triads_at(triads, keys, true)
     }
 
@@ -1232,7 +1250,7 @@ impl Learner {
         // before later ones, so the rates are mapped, not appended).
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect::<Vec<_>>());
         let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 16 21:40Z; atlas `contact.pool-founding`, `contact.tension-founds-face`] **The learner with its triads' legs
@@ -1247,6 +1265,9 @@ impl Learner {
     /// its unicity distance by a walk; legs located from the tension give the return its covector at the first section. Refused on a learner
     /// without triads, while a step is held, or where the lengths are not the declaration's.
     pub fn with_located_legs(&self, legs: &[i32], ret: Option<&[i32]>) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner's legs are founded after its held step is read");
         }
@@ -1287,6 +1308,9 @@ impl Learner {
     /// entry's own rate, every standing entry keeps it and the block's entries take `rate_bits`. The draws, the laps and the pass are kept; the
     /// held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
     pub fn with_opening(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner takes the opening's lift after its held step is read");
         }
@@ -1314,7 +1338,7 @@ impl Learner {
             rates.resize(field.material_len(), self.rate_bits);
             rates
         });
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 17, the founding record] **The learner with closed characters** ([`Constitution::with_closed`]): every
@@ -1323,6 +1347,9 @@ impl Learner {
     /// covector. The
     /// draws, the laps and the pass are kept; the held step and the last section's step are dropped. Refused while a step is held.
     pub fn with_closed(&self, closed: usize, keys: &[i32], odds: &[i32]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner takes closed characters after its held step is read");
         }
@@ -1330,7 +1357,7 @@ impl Learner {
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 13, the junction record §7] **The learner with the junction's return** ([`Constitution::with_junction`]), founded at
@@ -1342,6 +1369,9 @@ impl Learner {
     /// standing entry keeps it and the chart's entries take `rate_bits`. The draws, the laps and the pass are kept; the held step and the last
     /// section's step are dropped. Refused while a step is held.
     pub fn with_junction(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner takes the junction's return after its held step is read");
         }
@@ -1367,7 +1397,7 @@ impl Learner {
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 19 (G-1119-7)] **The learner whose carry circles are pumped** ([`Constitution::with_pump`]), the pump's chart
@@ -1378,6 +1408,9 @@ impl Learner {
     /// (agent-inferred: one gate, one family); where the learner carries each entry's own rate, the chart's entries take `rate_bits`. The draws,
     /// the laps and the pass are kept; the held step and the last section's step are dropped. Refused while a step is held.
     pub fn with_pump(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner pumps its carry circles after its held step is read");
         }
@@ -1397,7 +1430,7 @@ impl Learner {
         second[new.pump..new.pump + c2 * dw].fill(mean(old.carry, c2 * dw));
         second[new.pump_bias..new.pump_bias + c2].fill(mean(old.carry_bias, c2));
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **The learner whose tick leaks by lane**
@@ -1407,6 +1440,9 @@ impl Learner {
     /// 0, what a newly grown block takes in this line; where the learner carries each entry's own rate, the stores take `rate_bits`. The draws,
     /// the laps and the pass are kept; the held step and the last section's step are dropped. Refused while a step is held.
     pub fn with_lane_leak(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner founds its lane leak after its held step is read");
         }
@@ -1414,7 +1450,7 @@ impl Learner {
         let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 21 (the record of the reach)] **The learner whose heads carry a friction of distance**
@@ -1427,6 +1463,9 @@ impl Learner {
     /// founded as an arm beside a control from the same state, and an arm differs from its control by one change (CLAUDE.md, a line's lap,
     /// rule 1), so its first section deposits every standing entry as the control's does.
     pub fn with_friction(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner founds its friction after its held step is read");
         }
@@ -1435,13 +1474,16 @@ impl Learner {
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The learner whose friction is read from its receivers' state**
     /// ([`Constitution::with_friction_gate`]), founded at zero, as [`Learner::with_friction`] founds the friction: every standing entry keeps
     /// its moments, its remainder and its rate; the gate's moments open at zero; the gate is the friction's part. Refused while a step is held.
     pub fn with_friction_gate(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner founds its friction's gate after its held step is read");
         }
@@ -1450,7 +1492,7 @@ impl Learner {
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Constitution::with_mark`]), its strengths
@@ -1461,6 +1503,9 @@ impl Learner {
     /// every standing entry keeps it and the strengths take `rate_bits`. The draws, the laps and the pass are kept; the held step and the last
     /// section's step are dropped. Refused while a step is held.
     pub fn with_mark(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner reads twice after its held step is read");
         }
@@ -1473,12 +1518,15 @@ impl Learner {
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; Brandon, November 15 02:06Z] **The learner whose face reads its sites' loudness** ([`Constitution::with_loud`]): the new block's
     /// moments open at zero, so its first step is its own covector's, and its part's rate at the old entries'. Refused while a step is held.
     pub fn with_loud(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner reads its sites' loudness after its held step is read");
         }
@@ -1491,7 +1539,7 @@ impl Learner {
             RateParts { octaves, ..rp }
         });
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 12 (the record of the opening's room, §4 item 4)] **The learner with `fresh` more letters**
@@ -1503,6 +1551,9 @@ impl Learner {
     /// fresh one takes `rate_bits`. The held step and the last section's step, of the old layout, are dropped; the pass is kept. Refused while
     /// a step is held.
     pub fn lettered(&self, fresh: usize) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner takes letters after its held step is read");
         }
@@ -1522,7 +1573,7 @@ impl Learner {
             }
         }
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Constitution::contacted`]), the
@@ -1533,6 +1584,9 @@ impl Learner {
     /// take, and not the largest normalized step of a fresh entry. The rate is kept: no coordinate is shared among copies. The step
     /// the last section stood at is of the old layout and is dropped, as every growth drops it.
     pub fn contacted(&self, added: usize, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         if self.held.is_some() {
             return refuse("a learner grows its contacts after its held step is read");
         }
@@ -1553,7 +1607,7 @@ impl Learner {
             }
         }
         let drawn = self.drawn + 4 * self.field.declaration.contact_draws(added);
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: None, own_rates: None, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 3, the tower record] **The learner grown in scale**: its field grown in scale
@@ -1561,6 +1615,9 @@ impl Learner {
     /// material and opened at zero on the packets' field's and the glue's, which every coordinate opens at its own first
     /// nonzero covector.
     pub fn scaled_up(&self, harmonics: usize, split: usize, declaration: Declaration, keys: &[u8]) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         let (field, drawn) = self.field.scaled_up(harmonics, split, declaration, keys, self.drawn)?;
         let len = field.material_len();
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
@@ -1573,7 +1630,7 @@ impl Learner {
             out.resize(len, self.rate_bits);
             out
         });
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 18, the record of the two streams §11] **The learner whose level is opened to one-sided streams**
@@ -1581,6 +1638,9 @@ impl Learner {
     /// zero there and every other entry, moment, rate and line is kept (an entry's own rate, where the state carries them, opens at
     /// the base rate; the step's remainder, where carried, keeps its entries and opens at zero).
     pub fn level_before(&self) -> Result<Self> {
+        if self.lattice.is_some() {
+            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
+        }
         let field = self.field.level_before()?;
         let len = field.material_len();
         let (mut first, mut second) = (self.first.clone(), self.second.clone());
@@ -1596,6 +1656,6 @@ impl Learner {
             out.resize(len, 0);
             out
         });
-        Ok(Self { carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 }

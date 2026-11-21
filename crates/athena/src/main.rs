@@ -94,6 +94,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-rate") {
         return athena::store::set_rate(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("set-lattice") {
+        return athena::store::set_lattice(&rest[1..]);
+    }
     // [the lead, November 18] A ruler's forward on the host's threads: what a place at the frontier hears far.
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-strand-states") {
         return athena::ruler::tension::read_strand_states(&rest[1..]);

@@ -64,3 +64,19 @@ without the lines reads, writes and trains as before, and the build reproduced W
 
 The arm W81e (W80g's end with both carried) runs beside W81t (W80g's end, no change), its guess G-E4 fixed first
 ([`GUESS_E4.txt`](receipts/2026-11-21_widths/GUESS_E4.txt)). Its premise is §2's first point. Its reading is added here when it lands.
+
+## 5. E5, built: the lattice rule and the lattice deposit
+
+The October rule stands in the engine: `lattice_exponent` gives `L = ⌈log₂(2 L_R X)⌉`, `Loci::fan_in` gives each family's `X`, and
+`Constitution::lattice_by_rule` gives every family its places for a receiver's tolerance `ε = 2^(−eps)` nats at every symbol, with
+`L_R = 2/ε` (Lean `face_tail_moves_code`). `Learner::lattice` splits each entry into its read part on its family's lattice and a carried
+rest under half the lattice's unit. Every forward and every reader reads the read part. A section's step lands on the read part and
+its rest, and the read part moves only where their sum crosses a lattice point. A test shows the founding keeps the whole word, every
+read part stands on its lattice, every step lands whole over three sections, and a lattice finer than every grain changes nothing.
+`set-lattice STATE SHA EPS OUT` founds it.
+
+**Its premise read** ([`lattice_premise_W80g.txt`](receipts/2026-11-21_widths/lattice_premise_W80g.txt)). At `ε = 2^(−10)` nats the rule
+reads 1,844,993 of the line's 1,860,865 entries coarser than their grain. A map through `D = 224` inputs keeps 20 of its 24 places, a map
+of the current 18, the pair's return 23, the encodings 14 of 16, a bias 12 of 16, a temperature or a rate 12 of 24. On W80g's end the
+held text read through those read parts moves by +0.000003 nats a place, every region within 0.0001. The rule certifies `2^(−10)` at
+every symbol and the mean moves by three millionths. The arm that takes it runs from the line's state after E4's.
