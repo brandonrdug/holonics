@@ -507,20 +507,36 @@ pub struct PassTerrain {
     pub met: u64,
     pub tension_world: u64,
     pub tension_passage: u64,
+    /// [definition; the lead, November 21, W77's read at section 2000; `agent-inferred`] **The writer's state**: each region's records but its
+    /// last stand known whole, and the last record's answer is open from a keyed place to its line feed, where the region ends: the state a
+    /// write in place order meets at that place (every earlier place known, nothing to its right). Where unset, every record's answer is
+    /// open at once with the next record known to its right. Why: at W77's section 2000 (1.36 million records met, every answer open at
+    /// once) the held panel's writes took the arithmetic answers' form and no value, and wrote no bracket, copy or reversal in the world's
+    /// form, while the November 17 dwell that founded sums compared a keyed part of a record's answer with the region ending there. Written
+    /// as the word `suffix` after the four counts, only where set.
+    pub suffix: bool,
+    /// [definition; the lead, November 21, the dwells of that morning] **Read by two streams**: each region is read as the pass reads its
+    /// frontier where the pass's word is `strand` ([`crate::region::OwnedRegion::strand`], with the pass's `past` and `second`), every place
+    /// compared at its own frontier, the expressions' places with the answers'. Why: a dwell on sums from L76's end founded the held digit
+    /// in two-sided regions (0.0005 nats) and wrote 0 of 95 held sums free, and the same dwell read by two streams wrote 67 of 96: the
+    /// writer writes in the pass's regime, and a law founded in another regime does not reach it. The terrain's tension is then read over
+    /// every place of its regions, the expressions' irreducible news included (`agent-inferred`: its share falls only as far as the
+    /// answers' news does). Written as the word `strand` after the four counts, only where set, never beside `suffix`.
+    pub strand: bool,
 }
 
 impl PassTerrain {
     pub fn to_line(&self) -> String {
-        format!("terrain {} {} {} {}", self.records, self.met, self.tension_world, self.tension_passage)
+        format!("terrain {} {} {} {}{}", self.records, self.met, self.tension_world, self.tension_passage, if self.suffix { " suffix" } else if self.strand { " strand" } else { "" })
     }
 
     pub fn from_line(line: &str) -> Result<Self> {
         let w: Vec<&str> = line.split(' ').collect();
         let n = |w: &str| w.parse::<u64>().map_err(|_| TowerError::Refused("a terrain's count that is not a count"));
-        if w.len() != 5 || w[0] != "terrain" {
-            return refuse("a terrain line that is not `terrain RECORDS MET T_W T_P`");
+        if !(w.len() == 5 || (w.len() == 6 && (w[5] == "suffix" || w[5] == "strand"))) || w[0] != "terrain" {
+            return refuse("a terrain line that is not `terrain RECORDS MET T_W T_P [suffix|strand]`");
         }
-        let t = Self { records: n(w[1])?, met: n(w[2])?, tension_world: n(w[3])?, tension_passage: n(w[4])? };
+        let t = Self { records: n(w[1])?, met: n(w[2])?, tension_world: n(w[3])?, tension_passage: n(w[4])?, suffix: w.get(5) == Some(&"suffix"), strand: w.get(5) == Some(&"strand") };
         if t.records == 0 {
             return refuse("a terrain of no records a region");
         }

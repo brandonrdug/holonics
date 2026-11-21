@@ -365,9 +365,16 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                     let mut answered = answered;
                     answered.push(b'\n');
                     let (k, a) = (codec.encode(&known)?, codec.encode(&answered)?);
-                    open.extend(std::iter::repeat_n(false, k.len()));
-                    open.extend(std::iter::repeat_n(true, a.len()));
-                    counted += a.len();
+                    // [definition; the lead, November 21] In the writer's state every record but the last is known whole, and the last one's
+                    // answer is open from a keyed place to its line feed (`PassTerrain::suffix`).
+                    let from = match (t.suffix, r + 1 == t.records) {
+                        (false, _) => 0,
+                        (true, false) => a.len(),
+                        (true, true) => usize::try_from(crate::world::mix(seed ^ (met + r) ^ 0x7375_6666_6978) % a.len() as u64).unwrap_or(0),
+                    };
+                    open.extend(std::iter::repeat_n(false, k.len() + from));
+                    open.extend(std::iter::repeat_n(true, a.len() - from));
+                    counted += a.len() - from;
                     classes.extend(k);
                     classes.extend(a);
                 }
@@ -375,7 +382,14 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 if in_sites + n > terrain_budget || in_pairs + n * n > cut.pass.pairs {
                     break;
                 }
-                let region = OwnedRegion::plain(classes, open);
+                // [definition; the lead, November 21] Read by two streams (`PassTerrain::strand`): every site known, every place past the
+                // first compared at its own frontier, as the pass reads its frontier.
+                let region = if t.strand {
+                    counted = classes.len() - 1;
+                    OwnedRegion { strand: true, past: cut.pass.past, second: cut.pass.second, ..OwnedRegion::plain(classes, vec![false; open.len()]) }
+                } else {
+                    OwnedRegion::plain(classes, open)
+                };
                 tally.take(&region, counted);
                 (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
                 regions.push(region);
@@ -1385,13 +1399,13 @@ pub fn set_world(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [definition; the lead, November 21] `set-terrain STATE STATE_SHA RECORDS OUT`: **a terrain joined to a state's pass**
+/// [definition; the lead, November 21] `set-terrain STATE STATE_SHA RECORDS OUT [suffix|strand]`: **a terrain joined to a state's pass**
 /// ([`holonics_engine::field::PassTerrain`]): the state with a terrain line after its pass line, `RECORDS` records of one kind a region, no
 /// record met and no reading yet, every other line byte for byte (read back and checked). Refused on a state with no pass or one with a
 /// terrain.
 pub fn set_terrain(args: &[String]) -> Result<()> {
-    if args.len() != 5 {
-        return Err("set-terrain STATE STATE_SHA RECORDS OUT".into());
+    if args.len() != 5 && args.len() != 6 {
+        return Err("set-terrain STATE STATE_SHA RECORDS OUT [suffix|strand]".into());
     }
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let out = Path::new(&args[4]);
@@ -1403,7 +1417,13 @@ pub fn set_terrain(args: &[String]) -> Result<()> {
     if before.terrain.is_some() {
         return Err("a state whose pass has a terrain".into());
     }
-    let terrain = holonics_engine::field::PassTerrain { records: positive(&args[3])? as u64, met: 0, tension_world: 0, tension_passage: 0 };
+    let (suffix, strand) = match args.get(5).map(String::as_str) {
+        None => (false, false),
+        Some("suffix") => (true, false),
+        Some("strand") if before.strand => (false, true),
+        Some(_) => return Err("the opening word is `suffix`, `strand` (on a pass read by two streams) or nothing".into()),
+    };
+    let terrain = holonics_engine::field::PassTerrain { records: positive(&args[3])? as u64, met: 0, tension_world: 0, tension_passage: 0, suffix, strand };
     let line = terrain.to_line();
     let mut next = learner.clone();
     next.pass = Some(StorePass { terrain: Some(terrain), ..before });
