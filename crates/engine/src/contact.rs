@@ -935,9 +935,14 @@ impl Constitution {
             for k in (0..circles).filter(|&k| (!one_sided || past || (plain + k) % 2 == 0) && self.ruler_far != 7) {
                 let e = plain + k;
                 let (mut qr, mut qi) = (0i128, 0i128);
+                // [measurement] The orbit with its residue carried, 48 bits finer, where a ruler reads it ([`Constitution::ruler_scan_carry`]).
+                let (mut xr, mut xi) = (0i128, 0i128);
                 for step in 0..heard {
                     // [the strand's odd contacts face the past] Every circle of a one-sided stream that is scanned is scanned from the left.
                     let t = if e % 2 == 0 || one_sided { step } else { heard - 1 - step };
+                    if self.ruler_scan_carry {
+                        (qr, qi) = (release(xr, 48), release(xi, 48));
+                    }
                     cell.qm[t * c2 + k] = fit64(qr)?;
                     cell.qm[t * c2 + circles + k] = fit64(qi)?;
                     let (ar, ai) = (cell.a[t * f + e] as i128, cell.a[t * f + half + e] as i128);
@@ -947,6 +952,12 @@ impl Constitution {
                     // [the lead, November 19] The pump's reflection `η conj(Qm)` joins the turn's term in its one release ([`Declaration::pump`]); zero
                     // where the circles are not pumped, so the sum is the unpumped one's.
                     let (er, ei) = if pumped { (i128::from(cell.eta[t * c2 + k]), i128::from(cell.eta[t * c2 + circles + k])) } else { (0, 0) };
+                    if self.ruler_scan_carry {
+                        let nr = (cell.kb[t * c2 + k] as i128) * (1i128 << 48) + release(yr * xr - yi * xi + er * xr + ei * xi, GAMMA_BITS);
+                        let ni = (cell.kb[t * c2 + circles + k] as i128) * (1i128 << 48) + release(yr * xi + yi * xr + ei * xr - er * xi, GAMMA_BITS);
+                        (xr, xi) = (nr, ni);
+                        continue;
+                    }
                     let next_r = cell.kb[t * c2 + k] as i128 + release(yr * qr - yi * qi + er * qr + ei * qi, GAMMA_BITS);
                     let next_i = cell.kb[t * c2 + circles + k] as i128 + release(yr * qi + yi * qr + ei * qr - er * qi, GAMMA_BITS);
                     (qr, qi) = (i128::from(fit64(next_r)?), i128::from(fit64(next_i)?));

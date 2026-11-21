@@ -1,0 +1,6 @@
+NEWS start 04:06:30 host_threads=24 (beside the line's lap L75 on the card)
+CIRCLE_NEWS all_ticks circles=512 median=-0.275 q25=-0.349 q75=-0.205 p10=-0.397 p90=-0.145 share_above_+0.10=0.008 share_under_-0.20=0.764
+CIRCLE_NEWS last_tick circles=512 median=-0.311 q25=-0.387 q75=-0.228 p10=-0.446 p90=-0.151 share_above_+0.10=0.002 share_under_-0.20=0.820
+CIRCLE_NEWS gates delta=1-|gamma| median=0.600 p10=0.433 p90=0.753 white_drive_cosine=-delta/2=-0.300
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 165 filtered out; finished in 2.14s
+NEWS elapsed 3 s
