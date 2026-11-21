@@ -1,0 +1,141 @@
+diff --git a/crates/engine-cuda/kernels/field.cu b/crates/engine-cuda/kernels/field.cu
+index ab39c0417..8b3199a6c 100644
+--- a/crates/engine-cuda/kernels/field.cu
++++ b/crates/engine-cuda/kernels/field.cu
+@@ -395,7 +395,10 @@ struct FieldWords {
+     uint64_t *e;
+     const uint64_t *e_prev;
+     int64_t *y;
+-    int64_t *pa, *pb, *pc;
++    // [realization; the lead, November 21] The contacts' operands `a` and `b` stand within 20 bits on the trained state (the carriers' census of
++    // November 20): kept on 32 bits, written through `fit32` by their maps (`field_affine_tiled_tc_x32_o32`).
++    int32_t *pa, *pb;
++    int64_t *pc;
+     // The tick's magnitude (the binary length of the largest unit word, `bits[0]`) and the
+     // exponential's resident face.
+     uint32_t *bits;
+@@ -1821,8 +1824,8 @@ extern "C" __global__ void field_tc_planes(FieldWords w, uint32_t kind, uint64_t
+     }
+ }
+ 
+-template <typename X, bool TRANSPOSED, bool B_PLANES>
+-__device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
++template <typename X, bool TRANSPOSED, bool B_PLANES, typename O = int64_t>
++__device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, O *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+     // The sites' digit planes of a chunk where they are staged, `bp[d][site][word]` (a row of 32 octets padded to 48, so a fragment's eight rows
+     // fall on distinct banks), cut from the operand as it is staged. (Staging the tile's released words to write them along the outputs read
+     // 497 µs against 391 written in place, in one hold of November 20: the second barrier and pass cost more than the scattered stores.)
+@@ -1840,13 +1843,18 @@ __device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias,
+     // A released word written where its map writes it: the transposed map's `out[t][o]` (added with `accumulate`), the forward map's
+     // `add[t][o]` added or `out[t][o]` set.
+     const auto put = [&](uint32_t o, uint64_t t, int64_t v) {
+-        if (TRANSPOSED) {
++        if constexpr (TRANSPOSED) {
+             const uint64_t c = t * cols + o;
+             out[c] = accumulate ? fit64((wide)out[c] + (wide)v, w.status) : v;
+-        } else if (add) {
+-            add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
+         } else {
+-            out[t * out_stride + o] = v;
++            if (add) {
++                add[t * out_stride + o] = fit64((wide)add[t * out_stride + o] + (wide)v, w.status);
++            } else if constexpr (sizeof(O) == 4) {
++                // [realization; the lead, November 21] A 32-bit carrier's word through `fit32` (a word past 32 bits is refused).
++                out[t * out_stride + o] = fit32((wide)v, w.status);
++            } else {
++                out[t * out_stride + o] = v;
++            }
+         }
+     };
+     const auto released = [&](uint32_t o, wide sum) -> int64_t {
+@@ -2018,6 +2026,12 @@ extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tc_x32(F
+     map_tile_tc<int32_t, false, true>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw);
+ }
+ 
++// [realization; the lead, November 21] The same map writing a 32-bit carrier (the contacts' operands `a` and `b`, which stand within 20 bits on
++// the trained state): each released word through `fit32`, never added into a 64-bit `add`.
++extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tc_x32_o32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int32_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
++    map_tile_tc<int32_t, false, true, int32_t>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, nullptr, 0, only_unresolved, pa, fa, pb, fb, kw);
++}
++
+ // The same map with the sites' digits cut as each chunk is staged (no planes of the sites; `pb` and `fb` unread).
+ extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tcs_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+     map_tile_tc<int32_t, false, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw);
+diff --git a/crates/engine-cuda/src/hnn/contact.rs b/crates/engine-cuda/src/hnn/contact.rs
+index e6b7196f9..273e1ab43 100644
+--- a/crates/engine-cuda/src/hnn/contact.rs
++++ b/crates/engine-cuda/src/hnn/contact.rs
+@@ -140,7 +140,7 @@ pub(crate) struct Tick<'c> {
+     pub(crate) y: Pooled<'c, i64>,
+     pub(crate) read2: Pooled<'c, i32>,
+     pub(crate) scale2: Pooled<'c, i128>,
+-    pub(crate) pa: Pooled<'c, i64>,
++    pub(crate) pa: Pooled<'c, i32>,
+     /// [theory, November 11 17:25 and November 12 (G98)] The carry circles' charts' reads `q`, `ℓ` `[t][2C]`, their gate `γ` `[t][2C]`, the scan's operand
+     /// `[t][2C]` and the coupled drive `κ b` `[t][2C]` (one slot each without them).
+     pub(crate) pg: Pooled<'c, i64>,
+@@ -150,7 +150,7 @@ pub(crate) struct Tick<'c> {
+     /// [the lead, November 19] The pump chart's read `p` `[t][2C]` and the pump `η` `[t][2C]`, none where the circles are not pumped.
+     pub(crate) pp: Option<Pooled<'c, i64>>,
+     pub(crate) peta: Option<Pooled<'c, i32>>,
+-    pub(crate) pb: Pooled<'c, i64>,
++    pub(crate) pb: Pooled<'c, i32>,
+     pub(crate) pc: Pooled<'c, i64>,
+     /// [theory, November 12; the triad record §3 and §4] The triads' chart read `abg` `[t][6J]`, their products `p` `[t][2J]` and `c^T` `[t][2J]`, kept
+     /// for the reverse; none where the field has no triads, so a field without them takes nothing more.
+@@ -212,14 +212,14 @@ impl<'c> Resident<'c> {
+             y: alloc64(sites * m2)?,
+             read2: self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?,
+             scale2: self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?,
+-            pa: alloc64(sites * f)?,
++            pa: self.timed(Kind::Alloc, || self.take::<i32>((sites * f).max(1))).map_err(device)?,
+             pg: alloc64(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })?,
+             pgam: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
+             pqm: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
+             pkb: self.timed(Kind::Alloc, || self.take::<i32>(if field.declaration.carry > 0 { sites * 2 * field.declaration.carry } else { 1 })).map_err(device)?,
+             pp: if field.declaration.pump { Some(alloc64(sites * 2 * field.declaration.carry)?) } else { None },
+             peta: if field.declaration.pump { Some(self.timed(Kind::Alloc, || self.take::<i32>(sites * 2 * field.declaration.carry)).map_err(device)?) } else { None },
+-            pb: alloc64(sites * f)?,
++            pb: self.timed(Kind::Alloc, || self.take::<i32>((sites * f).max(1))).map_err(device)?,
+             pc: alloc64(sites * f)?,
+             pabg: triad(6)?,
+             ptp: triad(2)?,
+@@ -323,8 +323,8 @@ impl<'c> Resident<'c> {
+         }
+         self.affine("field_affine_x64", words, words.out, words.out_bias, words.rout, dw, m2, tick.y.device_ptr(), m2, 0, dw, words.x, false)?;
+         self.chart(words, words.x, &tick.read2, &tick.scale2, false)?;
+-        self.affine("field_affine_x32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
+-        self.affine("field_affine_x32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
++        self.affine("field_affine_x32_o32", words, words.wa, words.a_bias, words.ra, f, dw, tick.read2.device_ptr(), dw, tick.pa.device_ptr(), f, 0, false)?;
++        self.affine("field_affine_x32_o32", words, words.wb, words.b_bias, words.rb, f, dw, tick.read2.device_ptr(), dw, tick.pb.device_ptr(), f, 0, false)?;
+         // The plain contacts, the first `f/2 − C`: one thread a site and contact.
+         let (plain, circles) = (d.carry_first(), d.carry);
+         if plain > 0 {
+@@ -385,11 +385,13 @@ impl<'c> Resident<'c> {
+         // [realization; P61 item 4] Every forward map in the tile form (`map_tile` in `kernels/field.cu`): a block a tile of 64 outputs by 64
+         // sites, whatever the map's shape; the cell map and its tiling are retired with it.
+         let x64 = entry.ends_with("x64");
++        // [realization; the lead, November 21] `field_affine_x32_o32`: the 32-bit map writing a 32-bit carrier, never added into `add`.
++        let out32 = entry.ends_with("o32");
+         let grid = (rows as u64).div_ceil(64).saturating_mul((words.t as u64).div_ceil(64)).clamp(1, 65_535) as u32;
+         // [realization; the lead, November 20, the engineering report's site maps] A map on 32-bit inputs on the card's integer tensor units
+         // (`map_tile_tc`: each operand's words as four digit planes of eight bits, a tile of 64 outputs by 64 sites), the same integers as the
+         // tile form.
+-        let launched = if x64 { "field_affine_tiled_x64" } else { "field_affine_tiled_tc_x32" };
++        let launched = if x64 { "field_affine_tiled_x64" } else if out32 { "field_affine_tiled_tc_x32_o32" } else { "field_affine_tiled_tc_x32" };
+         if x64 {
+             self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])?;
+         } else {
+diff --git a/crates/engine-cuda/src/hnn/resident.rs b/crates/engine-cuda/src/hnn/resident.rs
+index 884f16037..deff190e8 100644
+--- a/crates/engine-cuda/src/hnn/resident.rs
++++ b/crates/engine-cuda/src/hnn/resident.rs
+@@ -2290,7 +2290,7 @@ pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -
+     let carry_site = carry_site + pump_site;
+     // [theory, November 12; the triad record §4] The triads' chart read `[t][6J]` and their products `p` and `c^T` `[t][2J]` each, kept a tick.
+     let triad_site = 8 * 10 * d.triads as u64;
+-    let tick_site = triad_site + carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + 3 * 8 * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
++    let tick_site = triad_site + carry_site + 4 * dw + 16 * lanes + 8 * 2 * m2 + 2 * 8 * h * span + 16 * h + 8 * h + 4 * h + 4 * h + 8 * m2 + 4 * dw + 16 * lanes + (4 + 4 + 8) * f + (2 * 16 * span + 8) * h + 8 * h * slots + probe_site + 4 * h * span + 8 * h * span + 4 * h * span + 16 * h;
+     let tick_fixed = tick_fixed_octets(d);
+     // The face: its read, scale, logits, masses and total, and (§16.26) the lift and its covector.
+     let face_site = 8 * dw + 4 * dw + 16 * lanes + 8 * a + 8 * a + 16 + 16 + 2 * 8 * dw;

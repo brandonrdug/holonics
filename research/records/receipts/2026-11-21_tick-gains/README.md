@@ -80,3 +80,15 @@ against 1.02 to 1.05 (21% shorter), the scan's reverse 0.798 to 0.804 against 0.
 500.9, 500.9, 501.4 against 505.8, 507.1, 505.7, 508.8 (501.0 and 506.9, spreads 0.6 and 3.1), 5.9 ms (1.2%) shorter; three batches a section.
 Guess (fixed 03:18 UTC): the pre-scan 12 to 25% (held), the scan's reverse 15 to 30% (missed, 8%), the section 2 to 6 ms (held), three batches
 (held). Projection about 13 minutes, measured 10 min 52 s.
+
+## The contacts' operands on 32 bits, set aside (`ab.sh`, `ab.txt`, `ab_operands_32_set_aside.patch`)
+
+`field.cu` kept the contacts' operands `a` and `b` (`pa`, `pb`, within 20 bits) on 32 bits, written by a 32-bit-output tensor-unit map
+(`field_affine_tiled_tc_x32_o32`, each word through `fit32`). Every bit kept: the card crate's suite 28 passed; 24 sections of L71 reproduced
+`EQUAL`. A launch: the circles' face 373 to 380 µs against 439 to 452 (15% shorter), the pre-scan 792 to 808 against 822 to 853 (4%), the pair's
+return 19 to 38 against 26 to 44, but the gate 1.38 to 1.40 ms against 1.27 (9% longer) and the gate's return 2.31 to 2.32 against 2.11 to 2.13
+(9% longer). The section in a warmed balanced hold: the build 496.9, 500.2, 498.6, 501.6 (499.3, spread 4.7), the control 500.5, 503.6, 500.7,
+503.5 (502.1, spread 3.1): 2.8 ms, inside the controls' spread, so no difference at the section. Guess (fixed 03:36 UTC): the face and the
+pre-scan 5 to 20% (held for the face, missed for the pre-scan), the two returns 3 to 15% shorter (missed: the gate's return longer), the section
+2 to 6 ms (not resolved). Not taken: the two gate kernels, bound by their arithmetic (83% of the multiprocessors' peak for the gate on November
+20), read their 32-bit operand slower than their 64-bit one (`agent-inferred`), and the section moves inside its own spread.
