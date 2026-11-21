@@ -1087,6 +1087,7 @@ impl Constitution {
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
             let began = d.junction.then(|| x.clone());
+            let leak_from = self.ruler_leak.map(|_| x.clone());
             if keep {
                 cell.before = x.clone();
             }
@@ -1124,6 +1125,11 @@ impl Constitution {
             }
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
+            }
+            if let (Some((n, b)), Some(from)) = (self.ruler_leak, leak_from.as_deref()) {
+                for (xv, &f) in x.iter_mut().zip(from) {
+                    *xv = fit64(i128::from(*xv) - release(i128::from(n) * i128::from(f), b))?;
+                }
             }
             if let Some(p) = probe.as_deref_mut().filter(|p| p.at == k) {
                 p.after = x.clone();
