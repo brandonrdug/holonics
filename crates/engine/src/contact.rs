@@ -59,6 +59,30 @@ pub(crate) struct TickProbe<'a> {
     pub(crate) outputs: Vec<Vec<i64>>,
 }
 
+/// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **A lane leak's strength** ([`Declaration::lane_leak`]):
+/// `δ = d/(1 + d)` on `2^(−30)` from a lane's store `d` on the face's grain, to the nearest, `d` read at zero where a deposit left it under.
+pub(crate) fn lane_leak_delta(d: i32) -> i64 {
+    let d = i128::from(d.max(0));
+    div_nearest(d << 30, (1i128 << FACE_BITS) + d) as i64
+}
+
+/// [definition; the formal thread, November 21 (corrected 02:52Z: the opening is held)] **The lane leak's tick** (the record's law with the
+/// opening held, `x^(k+1) = x⁰ + γ (x^k − x⁰) + g^k`, as `x^(k+1) = x_built^(k+1) − release(δ_ℓ (x^k − x⁰), 30)`): `x` the state the built tick
+/// left, `from` the state it began from, `opening` the pass's opening `x⁰` where it is held (a ruler's leak may leak it too), `deltas` one a lane.
+/// Why the opening is held (the formal thread's correction): the built tick keeps the opening as a term of its sum, and a leak of the whole
+/// state forgets it as `γ^k`, so only the moment's per-tick part would stand.
+pub(crate) fn lane_leak_tick(x: &mut [i64], from: &[i64], opening: Option<&[i64]>, deltas: &[i64], dw: usize) -> Result<()> {
+    let lw = dw / deltas.len();
+    for (i, (xv, &f)) in x.iter_mut().zip(from).enumerate() {
+        let dl = deltas[(i % dw) / lw];
+        if dl != 0 {
+            let moved = i128::from(f) - opening.map_or(0, |o| i128::from(o[i]));
+            *xv = fit64(i128::from(*xv) - release(i128::from(dl) * moved, 30))?;
+        }
+    }
+    Ok(())
+}
+
 /// One tick's forward temporaries over a region.
 #[derive(Clone, Debug, Default)]
 pub(crate) struct TickCell {
@@ -1060,6 +1084,8 @@ impl Constitution {
         let (after, levelled) = (!self.sided(region), self.levelled(region));
         let moment = self.moments_sided(region, &paces, after)?;
         let mut x = self.open_sided(region, &moment, marks, after, self.second(region))?;
+        // [the formal thread, November 21 02:52Z] The opening a lane leak holds ([`lane_leak_tick`]).
+        let opening_state = (d.lane_leak || (self.ruler_leak.is_some() && self.ruler_leak_hold)).then(|| x.clone());
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
@@ -1087,7 +1113,7 @@ impl Constitution {
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
             let mut cell = TickCell::default();
             let began = d.junction.then(|| x.clone());
-            let leak_from = self.ruler_leak.map(|_| x.clone());
+            let leak_from = (self.ruler_leak.is_some() || d.lane_leak).then(|| x.clone());
             if keep {
                 cell.before = x.clone();
             }
@@ -1126,9 +1152,15 @@ impl Constitution {
             if let Some(prev) = prior.as_deref() {
                 self.junction_forward(&mut x, prev, &reaches, &mut cell)?;
             }
+            if let (true, Some(from)) = (d.lane_leak, leak_from.as_deref()) {
+                let deltas: Vec<i64> = self.theta[self.layout.lane_leak..self.layout.lane_leak + d.lanes].iter().map(|&v| lane_leak_delta(v)).collect();
+                lane_leak_tick(&mut x, from, opening_state.as_deref(), &deltas, dw)?;
+            }
             if let (Some((n, b)), Some(from)) = (self.ruler_leak, leak_from.as_deref()) {
-                for (xv, &f) in x.iter_mut().zip(from) {
-                    *xv = fit64(i128::from(*xv) - release(i128::from(n) * i128::from(f), b))?;
+                let held = opening_state.as_deref().filter(|_| self.ruler_leak_hold);
+                for (i, (xv, &f)) in x.iter_mut().zip(from).enumerate() {
+                    let moved = i128::from(f) - held.map_or(0, |o| i128::from(o[i]));
+                    *xv = fit64(i128::from(*xv) - release(i128::from(n) * moved, b))?;
                 }
             }
             if let Some(p) = probe.as_deref_mut().filter(|p| p.at == k) {
@@ -1360,8 +1392,8 @@ impl Constitution {
     /// ([`Region::second`]).
     pub(crate) fn strand_pass_with(&self, classes: &[usize], keep: bool, past: bool, second: bool) -> Result<StrandForward> {
         let d = &self.declaration;
-        if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 {
-            return refuse("a passage read at its boundary on a field with triads, a junction, depth rings or a closed face");
+        if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 || d.lane_leak {
+            return refuse("a passage read by two streams on a field with triads, a junction, depth rings, a closed face or a lane leak");
         }
         let n = classes.len();
         let known = vec![false; n];

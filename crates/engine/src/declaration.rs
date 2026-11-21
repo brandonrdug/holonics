@@ -198,6 +198,17 @@ pub struct Declaration {
     /// more than one on an axis. `false` writes every head line exactly as before; `true` writes `hnn-field-v14p`, the twenty words of `v14c`
     /// with the closed characters' count written even at zero, then `1`. Needs carry circles.
     pub pump: bool,
+    /// [definition; the formal thread, November 21 (the record of the store's leak, §3; atlas `store.leak-founded-by-own-news`, Lean
+    /// `HNN/LeakingStore`; the opening held, its correction of 02:52Z)] **The tick's lane leak**: at a site, on face lane `ℓ`, over the ticks of
+    /// a pass, `x^(k+1) = x⁰ + γ_ℓ (x^k − x⁰) + g^k` with `γ_ℓ = 1/(1 + d_ℓ)` and `x⁰` the pass's opening, written in integers as
+    /// `x^(k+1) = x_built^(k+1) − release(δ_ℓ (x^k − x⁰), 30)`, `δ_ℓ = d_ℓ/(1 + d_ℓ)` on `2^(−30)` from
+    /// `d_ℓ` on the face's grain ([`Loci::lane_leak`], one a lane, founded at zero, so `δ = 0` is the built tick bit for bit). `d` is a store whose
+    /// own news deposits it: its covector is `−Σ_(t, k≥1) ⟨Δr̂_t^k, Δr̂_t^(k−1)⟩`, successive chart moves of the lane, the forward's alone (it rises
+    /// where they agree, falls where they oppose), and it is never under zero. Why (the record §3 to §5): a store's release is its prediction of
+    /// its next arrival, the inner product of successive news is the descent covector of its gain, and the face's comparison does not found a
+    /// tick's clock (its descent on a leak is near rank one and prefers no kind of mode, the record of November 21 §3.1). `false` writes every
+    /// head line exactly as before; `true` writes `hnn-field-v14q`, the twenty words of `v14p` with the pump's word written as `0` or `1`, then `1`.
+    pub lane_leak: bool,
 }
 
 impl Declaration {
@@ -526,7 +537,9 @@ impl Declaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.pump {
+        let head = if self.lane_leak {
+            "hnn-field-v14q"
+        } else if self.pump {
             "hnn-field-v14p"
         } else if self.closed > 0 {
             "hnn-field-v14c"
@@ -547,7 +560,9 @@ impl Declaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.pump {
+        let tail = if self.lane_leak {
+            format!(" {} {} {} {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump))
+        } else if self.pump {
             format!(" {} {} {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed)
         } else if self.closed > 0 {
             format!(" {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed)
@@ -580,24 +595,30 @@ impl Declaration {
         // [the lead, November 17] The closed characters' count is read from `v14c` alone, whose crossing word is zero or one.
         // [the lead, November 19] The pump's word is read from `v14p` alone: the twenty words of `v14c`, the closed characters' count zero or more,
         // then one.
-        let pump = words.first().copied() == Some("hnn-field-v14p") && words.len() == 21;
-        if pump && words[20] != "1" {
+        // [the formal thread, November 21] The lane leak's word is read from `v14q` alone: the twenty words of `v14p`, the pump's word zero or one,
+        // then one.
+        let lane_leak = words.first().copied() == Some("hnn-field-v14q") && words.len() == 22;
+        if lane_leak && (words[21] != "1" || !matches!(words[20], "0" | "1")) {
+            return refuse("an hnn-field-v14q head line whose pump word is not zero or one or whose leak word is not one");
+        }
+        let pump = (words.first().copied() == Some("hnn-field-v14p") && words.len() == 21) || (lane_leak && words[20] == "1");
+        if !lane_leak && pump && words[20] != "1" {
             return refuse("an hnn-field-v14p head line whose pump word is not one (a field without the pump writes the line before it)");
         }
         let closed_line = words.first().copied() == Some("hnn-field-v14c") && words.len() == 20;
-        let crossing = words.first().copied() == Some("hnn-field-v14x") || ((closed_line || pump) && words[18] == "1");
+        let crossing = words.first().copied() == Some("hnn-field-v14x") || ((closed_line || pump || lane_leak) && words[18] == "1");
         let closed = if closed_line {
             match n(words[19])? {
                 0 => return refuse("an hnn-field-v14c head line with no closed characters (a field without them writes the line before it)"),
                 e => e,
             }
-        } else if pump {
+        } else if pump || lane_leak {
             n(words[19])?
         } else {
             0
         };
         let (depth_word, carry, triads, opening, junction, mark, loud) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14p"), 21) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
+            (Some("hnn-field-v14p"), 21) | (Some("hnn-field-v14q"), 22) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
                 (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 0 | 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
                 _ => return refuse("an hnn-field-v14p head line whose opening, junction, mark, loudness or crossing word is not zero or one"),
             },
@@ -648,7 +669,7 @@ impl Declaration {
             (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump, lane_leak };
         d.admit()?;
         Ok(d)
     }
@@ -745,6 +766,9 @@ pub struct Loci {
     /// at. The last families, zero long where the circles are not pumped.
     pub pump: usize,
     pub pump_bias: usize,
+    /// [definition; the formal thread, November 21] **The lane leak's stores** ([`Declaration::lane_leak`]): `d`, one a face lane on the face's
+    /// grain, never under zero; the last family, zero long where the tick does not leak.
+    pub lane_leak: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -811,6 +835,7 @@ impl Loci {
         let (closed_odds, closed_odds_bias) = (tail(has * d.heads * dw, MATERIAL_BITS), tail(has * d.heads, FACE_BITS));
         let pumped = 2 * d.carry * usize::from(d.pump);
         let (pump, pump_bias) = (tail(pumped * dw, MATERIAL_BITS), tail(pumped, FACE_BITS));
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, len: at, families }
+        let lane_leak = tail(usize::from(d.lane_leak) * d.lanes, FACE_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, lane_leak, len: at, families }
     }
 }

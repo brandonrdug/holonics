@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -2035,7 +2035,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3072,12 +3072,12 @@ fn a_growth_by_carry_circles_keeps_every_face_and_returns_through_its_circles() 
     assert_eq!(grown.rate_parts, Some(RateParts { contacts_before: 8, octaves: [0; PARTS] }));
     let text = grown.to_text();
     // The parts a field with circles and no triads writes: every part before the triad's (twenty-two), the line as before the triads.
-    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(2, 0, false, false, false, false).len(), "a field with carry circles writes all twenty-two parts before the triad's");
-    assert_eq!(written_parts(2, 0, false, false, false, false).len(), TRIAD_PART);
+    assert_eq!(text.lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(2, 0, false, false, false, false, false).len(), "a field with carry circles writes all twenty-two parts before the triad's");
+    assert_eq!(written_parts(2, 0, false, false, false, false, false).len(), TRIAD_PART);
     let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.field.theta.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (grown.field.theta.clone(), grown.first.clone(), grown.second.clone(), grown.rate_parts, grown.drawn));
     assert_eq!(back.field.declaration, grown.field.declaration);
-    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0, 0, false, false, false, false).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
+    assert_eq!(learner.to_text().lines().find(|l| l.starts_with("parts ")).unwrap().split(' ').count(), 2 + written_parts(0, 0, false, false, false, false, false).len(), "a field without carry circles writes nineteen: the plain sixteen and the first lane's letter rows");
 }
 
 /// [definition; theory, November 11 17:25 and November 12 (G98)] **The carry circles' scan is the law, site by site in strand order**: on a drawn
@@ -3711,8 +3711,8 @@ fn the_parts_line_reads_its_own_order_and_every_older_one() {
     let older: String = text.lines().map(|l| if l.starts_with("parts ") { format!("{}\n", l.split(' ').take(2 + PLAIN_PARTS).collect::<Vec<_>>().join(" ")) } else { format!("{l}\n") }).collect();
     let read = Learner::from_text(&older).unwrap().rate_parts.unwrap();
     assert_eq!((read.octaves[3], read.octaves[19], read.octaves[20], read.octaves[21]), (1, 0, 0, 0), "a sixteen-part line reads the letter rows at octave 0");
-    assert_eq!(written_parts(0, 0, false, false, false, false), (0..16).chain(19..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(2, 0, false, false, false, false), (0..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(0, 0, false, false, false, false, false), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, 0, false, false, false, false, false), (0..22).collect::<Vec<_>>());
 }
 
 /// The triads the drawn fixtures carry: four (the founding counts its triads in fours, the triad record §4).
@@ -3875,7 +3875,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
@@ -3959,7 +3959,7 @@ fn a_growth_by_triads_keeps_every_face_and_its_return_has_a_covector() {
     fast.rate_parts.as_mut().unwrap().octaves[TRIAD_PART] = 3;
     let text = fast.to_text();
     let line = text.lines().find(|l| l.starts_with("parts ")).unwrap().to_string();
-    assert_eq!(line.split(' ').count(), 2 + written_parts(0, j, false, false, false, false).len());
+    assert_eq!(line.split(' ').count(), 2 + written_parts(0, j, false, false, false, false, false).len());
     assert_eq!(line.rsplit_once(' ').unwrap().1, "3", "the triad's octave written last");
     let back = Learner::from_text(&text).unwrap();
     assert_eq!((back.field.clone(), back.first.clone(), back.second.clone(), back.rate_parts, back.drawn), (fast.field.clone(), fast.first.clone(), fast.second.clone(), fast.rate_parts, fast.drawn));
@@ -4251,17 +4251,18 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
 /// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
 #[test]
 fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
-    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 27));
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 28));
     assert_eq!((PART_NAMES[LOUD_PART], LOUD_PART), ("loud", 26));
+    assert_eq!((PART_NAMES[LEAK_PART], LEAK_PART), ("lane_leak", 27));
     assert_eq!((PART_NAMES[OPENING_PART], OPENING_PART), ("opening", 23));
     assert_eq!((PART_NAMES[JUNCTION_PART], JUNCTION_PART), ("junction", 24));
     assert_eq!((PART_NAMES[MARK_PART], MARK_PART), ("mark", 25));
-    assert_eq!(written_parts(2, TRIADS, true, true, true, false), (0..26).collect::<Vec<_>>(), "the mark's part last, only where the field reads twice");
-    assert_eq!(written_parts(2, TRIADS, true, true, false, false), (0..25).collect::<Vec<_>>(), "the junction's part last, only where the tick has the return");
-    assert_eq!(written_parts(0, 0, false, false, false, false), (0..16).chain(19..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(2, 0, false, false, false, false), (0..22).collect::<Vec<_>>());
-    assert_eq!(written_parts(0, TRIADS, false, false, false, false), (0..16).chain(19..23).collect::<Vec<_>>());
-    assert_eq!(written_parts(2, TRIADS, false, false, false, false), (0..23).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, TRIADS, true, true, true, false, false), (0..26).collect::<Vec<_>>(), "the mark's part last, only where the field reads twice");
+    assert_eq!(written_parts(2, TRIADS, true, true, false, false, false), (0..25).collect::<Vec<_>>(), "the junction's part last, only where the tick has the return");
+    assert_eq!(written_parts(0, 0, false, false, false, false, false), (0..16).chain(19..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, 0, false, false, false, false, false), (0..22).collect::<Vec<_>>());
+    assert_eq!(written_parts(0, TRIADS, false, false, false, false, false), (0..16).chain(19..23).collect::<Vec<_>>());
+    assert_eq!(written_parts(2, TRIADS, false, false, false, false, false), (0..23).collect::<Vec<_>>());
     for circled in [false, true] {
         let field = if circled { circled_triad_shaped(1, TRIADS) } else { triad_shaped(1, TRIADS) };
         let (l, dw, j) = (field.layout.clone(), field.declaration.width, field.declaration.triads);
@@ -6166,6 +6167,8 @@ fn a_lane_leaks_reads_at_set_strengths() {
         }
         eprintln!("LEAK_READ {tag} ticks={n} cos_ticks_1_to_16_by_lane=[{}] cos_ticks_5_to_16_by_lane=[{}] cos_all_by_lane=[{}] move_by_tick=[{}] move_16_over_move_6_by_lane=[{}] held_code_nats={:.4} open={open}",
             lanes_cos(1, 17), lanes_cos(5, 17), lanes_cos(1, n), norms.join(" "), lane_growth.join(" "), code / open.max(1) as f64);
+        let by_pair: Vec<String> = (1..n - 1).map(|k| format!("{k}:{}", (0..lanes).map(|l| format!("{:.3}", span_cos(k, k + 1, l))).collect::<Vec<_>>().join(","))).collect();
+        eprintln!("LEAK_PAIRS {tag} cos_by_pair_of_moves(k-1,k)_by_lane=[{}]", by_pair.join(" "));
         pass
     };
     let own = read("own_ticks_no_leak", &learner.field);
@@ -6193,9 +6196,132 @@ fn a_lane_leaks_reads_at_set_strengths() {
     let mut raised = learner.field.clone();
     raised.declaration.ticks = ticks;
     read("raised_no_leak", &raised);
+    let hold = std::env::var("LEAK_HOLD").is_ok_and(|v| v == "1");
     for &(n, b) in &deltas {
         let mut f = raised.clone();
         f.ruler_leak = Some((n, b));
-        read(&format!("raised_delta_{n}/2^{b}"), &f);
+        f.ruler_leak_hold = hold;
+        read(&format!("raised_delta_{n}/2^{b}{}", if hold { "_opening_held" } else { "" }), &f);
     }
+}
+
+/// [definition; the formal thread, November 21 (the record of the store's leak, §3)] **The lane leak founded at zero keeps every face and the
+/// built reverse**: grown onto a field (plain, with carry circles, with the opening's lift, and a tower), the stores are zero, every face is the
+/// source's, the code's covector is the source's on every standing entry, and the stores' covector, the store's own news, is
+/// `−Σ ⟨Δr̂^k, Δr̂^(k−1)⟩` released by the face's grain, read here from the pass's charts directly; the head line is `hnn-field-v14q` and
+/// round-trips (with and without the pump); a second growth is refused.
+#[test]
+fn the_lane_leak_founded_at_zero_keeps_every_face_and_the_built_reverse() {
+    let mut fields: Vec<(&str, Constitution)> = Vec::new();
+    for still in [0usize, 1, 2] {
+        fields.push(("four ticks", four_ticks(still)));
+        fields.push(("carry", circled_shaped(still)));
+        fields.push(("opened", opened(still)));
+        fields.push(("tower", towered_live(still)));
+    }
+    for (name, plain) in &fields {
+        let (grown, from) = plain.with_lane_leak().unwrap();
+        let (d, l) = (grown.declaration, grown.layout.clone());
+        assert!(d.lane_leak && !plain.declaration.lane_leak);
+        assert_eq!(l.lane_leak, plain.theta.len(), "{name}: the stores at the fine field's end");
+        assert!(grown.theta[l.lane_leak..l.lane_leak + d.lanes].iter().all(|&v| v == 0), "{name}: founded at zero");
+        assert_eq!(from.iter().flatten().count(), plain.material_len(), "{name}: every standing entry kept");
+        let r = region();
+        assert_eq!(grown.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: every face kept");
+        let (g, h) = (tower_covector(&grown, &r), tower_covector(plain, &r));
+        for (n, o) in from.iter().enumerate() {
+            if let Some(o) = o {
+                assert_eq!(g[n], h[*o], "{name}: the covector of standing entry {o}");
+            }
+        }
+        // The stores' covector from the charts: one read's (the field's single read; a marked field's both reads are meaned).
+        if !grown.declaration.mark {
+            let pass = grown.pass(&r, true).unwrap();
+            let (dw, lanes) = (d.width, d.lanes);
+            let lw = dw / lanes;
+            let sites = r.classes.len();
+            let mut charts: Vec<Vec<i32>> = pass.ticks.iter().map(|c| c.read.clone()).collect();
+            let mut end = Vec::new();
+            for t in 0..sites {
+                let (mut rr, mut sc) = (Vec::new(), Vec::new());
+                crate::contact::lane_chart(&pass.ticks.last().unwrap().after[t * dw..(t + 1) * dw], lanes, &mut rr, &mut sc).unwrap();
+                end.extend(rr);
+            }
+            charts.push(end);
+            for lane in 0..lanes {
+                let mut ip = 0i128;
+                for k in 1..charts.len() - 1 {
+                    for t in 0..sites {
+                        for i in t * dw + lane * lw..t * dw + (lane + 1) * lw {
+                            ip += (i128::from(charts[k][i]) - i128::from(charts[k - 1][i])) * (i128::from(charts[k + 1][i]) - i128::from(charts[k][i]));
+                        }
+                    }
+                }
+                let mut gg = vec![0i128; grown.material_len()];
+                grown.returned(&r, &pass, &mut gg).unwrap();
+                assert_eq!(gg[l.lane_leak + lane], -release(ip, FACE_BITS), "{name}: lane {lane}'s store covector is its successive moves' pairing");
+            }
+        }
+        let text = d.to_text();
+        assert!(text.starts_with("hnn-field-v14q "), "{name}: {text}");
+        assert_eq!(Declaration::from_text(&text).unwrap(), d);
+        assert!(grown.with_lane_leak().is_err(), "{name}: a second growth");
+    }
+    // With the pump: the v14q line carries the pump's word as one.
+    let pumped = Declaration { pump: true, lane_leak: true, ..circled_shaped(1).declaration };
+    assert_eq!(Declaration::from_text(&pumped.to_text()).unwrap(), pumped);
+    let line = pumped.to_text();
+    assert!(Declaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a leak word of zero");
+}
+
+/// [definition; the formal thread, November 21] **The lane leak's return matches its code's difference**: on fields of four ticks with the
+/// stores drawn off zero (so every lane leaks, `δ` from about a tenth to a half), the code's covector predicts the code's central difference at
+/// the entries with the largest covector of each family but the stores' (whose covector is their own news, not the code's), as the carry's and
+/// the junction's covector tests read it: so the leak's `−δ λ^(k+1)` into the state each tick began from is the reverse of its forward.
+#[test]
+fn the_lane_leaks_return_matches_its_codes_difference() {
+    let (mut read, mut seams) = (0usize, 0usize);
+    for still in [0usize, 1, 2] {
+        let (mut field, _) = four_ticks(still).with_lane_leak().unwrap();
+        let l = field.layout.clone();
+        let lanes = field.declaration.lanes;
+        for (n, v) in field.theta[l.lane_leak..l.lane_leak + lanes].iter_mut().enumerate() {
+            *v = (1 << 13) + (n as i32) * (1 << 14);
+        }
+        let r = region();
+        let g = covector_of(&field, &r);
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let p = f.pass(&r, true).unwrap();
+            p.ticks.iter().flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+        };
+        assert_ne!(field.faces(&r).unwrap(), four_ticks(still).faces(&r).unwrap(), "still {still}: the leak moves the faces");
+        for &(start, len, grain) in field.families() {
+            if start == l.temper || start == l.lane_leak {
+                continue;
+            }
+            let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+            let mut entries: Vec<usize> = (start..start + len).collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                let shift = natural + grain - 20;
+                let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let measured = moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0;
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still} family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("LANE_LEAK_COVECTOR_PROBES read={read} on_a_seam={seams}");
+    assert!(read > 0 && 16 * seams <= read, "read {read} probes, {seams} on a seam");
 }
