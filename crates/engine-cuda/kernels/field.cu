@@ -435,6 +435,9 @@ struct FieldWords {
     // class receiver, 1 a listener, on `2^(−24)`), the covector buffer the reverse adds their covectors to, and,
     // on a return, the pairs' locks at unit gain `S` (`sb`, at the dense address, a tick's).
     uint64_t temper_at;
+    // [the lead, November 21] Each head's friction of distance (`theta[friction_at + 2 h + kind]` on `2^(−16)` bits an octave, the host's
+    // `Declaration::friction`); `UINT64_MAX` where the field has none.
+    uint64_t friction_at;
     // The temperatures' fine roots (§16.12): the exponential's roots 17 to 24 on `2^(−62)` (`Constitution::fine_exponential`).
     const uint64_t *fine_roots;
     wide *gcov;
@@ -3517,8 +3520,15 @@ __device__ __forceinline__ wide temper_chain(const FieldWords &w, wide temper, w
     return rel(carried, MATERIAL_BITS);
 }
 
-__device__ __forceinline__ int64_t scored(const FieldWords &w, wide temper, int64_t base, uint32_t octave_of) {
-    return fit64(rel(temper * (wide)base, MATERIAL_BITS) - ((wide)octave_of << FACE_BITS), w.status);
+__device__ __forceinline__ int64_t scored(const FieldWords &w, wide temper, int64_t base, uint32_t octave_of, wide fric) {
+    return fit64(rel(temper * (wide)base, MATERIAL_BITS) - ((wide)octave_of << FACE_BITS) - fric, w.status);
+}
+
+// [definition; the lead, November 21] **A head's friction of distance** for a receiver of `kind` (one a listener) on `2^(−16)` bits an
+// octave (the host's `Constitution::friction`): a source `d` places away scores `ψ ⌊log₂ d⌋` lower, an octave's crowd `ψ` times its level;
+// zero where the field has none.
+__device__ __forceinline__ wide friction_of(const FieldWords &w, uint32_t h, bool listens) {
+    return w.friction_at == UINT64_MAX ? (wide)0 : (wide)w.theta[w.friction_at + 2 * h + (listens ? 1 : 0)];
 }
 
 // The head's lock at unit gain `S` of the word `wi` (at unit power, its `span` reals) against site `j`'s across
@@ -3629,7 +3639,8 @@ __device__ __forceinline__ int64_t crowd_base_narrow(const FieldWords &w, uint32
 
 // A crowd's score: `z = release(T S, 24) − level 2^16`.
 __device__ __forceinline__ int64_t crowd_score(const FieldWords &w, uint32_t h, const int64_t *wi, const wide *swlo, const wide *swhi, uint64_t count, uint32_t level, wide temper, uint64_t gi, bool right) {
-    return scored(w, temper, crowd_base(w, h, wi, swlo, swhi, count, level, gi, right), level);
+    // A crowd is heard by a class receiver alone (an open receiver hears every definite site sharply), so its friction is kind 0's.
+    return scored(w, temper, crowd_base(w, h, wi, swlo, swhi, count, level, gi, right), level, friction_of(w, h, false) * (wide)level);
 }
 
 // The lanes that carry one entry of the span, and the parts of a chunk each lane takes: a lane an
@@ -3699,6 +3710,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
         const uint64_t *scp = w.sc + prow0;
         const uint32_t nslots = rcs[warp].open ? 0 : crowd_slots(heard);
         const wide temper = temper_of(w, h, rcs[warp].open != 0);
+        const wide fric = friction_of(w, h, rcs[warp].open != 0);
         // The pairs' scores are kept at the region block's dense address `[i][j]` for the contact, which reads
         // them there (a score is computed once; the entries outside the support are never read). On a return
         // the locks at unit gain are kept beside them, for the temperatures' covector.
@@ -3749,7 +3761,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, CONTACT_MIN_BLOC
                     }
                     falloff = (uint32_t)octave(count > 1 ? count : 1);
                 }
-                const int64_t z = scored(w, temper, base, falloff);
+                const int64_t z = scored(w, temper, base, falloff, fric * (wide)octave(gap));
                 erow[j] = (uint64_t)z;
                 if (sbrow) {
                     sbrow[j] = base;
@@ -5545,6 +5557,8 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         // The temperature's covector (§15.10): `δT[h][kind] += release(δz S, 16)` over the row's sources and crowds,
         // each released alone and summed (an exact integer sum, the lanes' partials added over the warp).
         wide tacc = 0;
+        // [the lead, November 21] The friction's covector, `−Σ δz ⌊log₂ d⌋` (a crowd's `δz` times its level), released once a row as the host's.
+        wide facc = 0;
         // The covector's magnitude near and far (§16.20), where read.
         wide near_ds = 0, far_ds = 0;
         for (uint32_t k0 = 0; k0 < K; k0 += 32) {
@@ -5554,6 +5568,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             if (j != UINT32_MAX) {
                 const wide dzj = compare((wide)e[j], dpr[j]);
                 tacc += rel(dzj * (wide)sbr[j], FACE_BITS);
+                facc -= dzj * (wide)octave(j > ip ? j - ip : ip - j);
                 const wide dz = rel(temper * dzj, MATERIAL_BITS);
                 if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                     atomicOr(w.status, REFUSED_CARRIER);
@@ -5600,6 +5615,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
             const uint32_t clo = crlo[warp][lane], chi = crhi[warp][lane], clv = crlv[warp][lane];
             const int64_t cs = crowd_base_narrow(w, h, w.pq + ((uint64_t)h * w.T + g) * S, swp + (uint64_t)clo * S, swp + (uint64_t)(chi + 1) * S, cnts[warp][lane], clv, g, clo > ip);
             tacc += rel(dzc * (wide)cs, FACE_BITS);
+            facc -= dzc * (wide)clv;
             const wide dz = rel(temper * dzc, MATERIAL_BITS);
             if ((dz < 0 ? -dz : dz) >> min(w.dsbits, 63u) != 0) {
                 atomicOr(w.status, REFUSED_CARRIER);
@@ -5622,6 +5638,12 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
         if (lane == 0 && tacc != 0) {
             // Into the temperature's own chart (§16.12): `δℓ = release(δT · release(T ln 2, 30), 24)`, the row's.
             add_wide(w.gcov + w.temper_at + 2 * h + (rcs[warp].open ? 1 : 0), temper_chain(w, temper, tacc));
+        }
+        if (w.friction_at != UINT64_MAX) {
+            facc = warp_sum(facc);
+            if (lane == 0 && facc != 0) {
+                add_wide(w.gcov + w.friction_at + 2 * h + (rcs[warp].open ? 1 : 0), rel(facc, FACE_BITS));
+            }
         }
         __syncwarp();
         if (active) {

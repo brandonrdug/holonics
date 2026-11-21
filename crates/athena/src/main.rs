@@ -98,6 +98,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-strand-states") {
         return athena::ruler::tension::read_strand_states(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-reach") {
+        return athena::ruler::tension::read_reach(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-far") {
         return athena::ruler::tension::read_far(&rest[1..]);
     }
@@ -334,7 +337,7 @@ fn reserve(args: &[String]) -> Result<()> {
     use holonics_engine_cuda::hnn::field::{read_octets, skin_octets};
     let kv: std::collections::HashMap<&str, usize> = args.iter().filter_map(|a| a.split_once('=')).filter_map(|(k, v)| v.parse().ok().map(|v| (k, v))).collect();
     let get = |k: &str| kv.get(k).copied().ok_or_else(|| format!("reserve: {k}= is owed"));
-    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
+    let d = Declaration { alphabet: get("alphabet")?, width: get("lanes")? * get("lane_width")?, heads: get("heads")?, modes: get("modes")?, still: get("still")?, contacts: get("contacts")?, ticks: get("ticks")?, frames: get("frames")?, reach: get("reach")?, lanes: get("lanes")?, depth: kv.get("depth").copied().unwrap_or(0), carry: get("carry")?, triads: get("triads")?, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false };
     let f = |s: usize| read_octets(&d, true, false, s);
     let (f1, f2, f3) = (f(1), f(2), f(3));
     let pair = (f3 + f1 - 2 * f2) / 2;
@@ -355,6 +358,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-lane") => athena::store::found_lane(args),
         Some("found-loud") => athena::store::found_loud(args),
         Some("found-pump") => athena::store::found_pump(args),
+        Some("found-friction") => athena::store::found_friction(args),
         Some("next-pass") => athena::store::next_pass(args),
         Some("join-store") => athena::store::join_store(args),
         Some("move-store") => athena::store::move_store(args),
@@ -378,7 +382,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("write-forms") => athena::store::write_forms(args, realization),
         Some("write-acts") => athena::store::write_acts(args, realization),
         Some("read-writes") => athena::store::read_writes(args, realization),
-        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, read-prompt, read-writes, read-forms, write-forms, found-lane, found-loud, found-pump, next-pass, join-store or own-states".into()),
+        _ => Err("a store command is train-store, read-cavity, read-loudness, write-store, read-prompt, read-writes, read-forms, write-forms, found-lane, found-loud, found-pump, found-friction, next-pass, join-store or own-states".into()),
     }
 }
 

@@ -733,12 +733,20 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
 /// reads (at 512 circles they are 4 KB a place a tick), `OUT/carries.i32`: each known site's carried product before it at the last tick
 /// on every sixteenth circle (`k = 0, 16, 32, …`), real parts then imaginary, on `2^(−16)`
 /// ([`holonics_engine::field::Constitution::strand_carries`]), `OUT/open_last.i32` each open place's read after the last tick (`D` words
-/// a place, the operand its face is linear in), and `dims.tsv` names the circles written and `D`.
+/// a place, the operand its face is linear in), and `dims.tsv` names the circles written and `D`. [the lead, November 21, the reach] With the
+/// word `rows` (after `past` where both are given) it writes, in place of the known reads and the gates, `OUT/shares.tsv`: each open
+/// place's row at every tick and head (`row`, `tick`, `head`, `place`, the source's place, its share in millionths, the sources under a
+/// thousandth left out; [`holonics_engine::field::Constitution::strand_open_rows`]), beside `OUT/open_K.i32`.
 pub fn read_strand_states(args: &[String]) -> Result<()> {
     let words: Vec<&str> = args.iter().skip(12).map(String::as_str).collect();
-    let (past, carries) = (words.contains(&"past"), words.contains(&"carries"));
-    if args.len() < 12 || words.len() != usize::from(past) + usize::from(carries) || (past && carries && words != ["past", "carries"]) {
-        return Err("read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past] [carries]".into());
+    let (past, carries, open_rows) = (words.contains(&"past"), words.contains(&"carries"), words.contains(&"rows"));
+    if args.len() < 12
+        || words.len() != usize::from(past) + usize::from(carries) + usize::from(open_rows)
+        || (past && carries && words != ["past", "carries"])
+        || (open_rows && carries)
+        || (past && open_rows && words != ["past", "rows"])
+    {
+        return Err("read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past] [carries | rows]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-strand-states")?;
@@ -794,6 +802,44 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
         println!("STRAND_CARRIES rows={} places={} circles_written={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), every.len(), started.elapsed().as_millis());
         return Ok(());
     }
+    if open_rows {
+        // [the lead, November 21] Each open place's row at every tick and head, each source's place and its share in millionths, the
+        // sources under a thousandth of the row left out, beside each open place's read after every tick.
+        let reads: Vec<(Vec<i32>, Vec<Vec<i32>>)> = rows.par_iter().map(|(_, classes)| field.strand_reads(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let opened: Vec<Vec<Vec<Vec<Vec<(u32, u64)>>>>> = rows.par_iter().map(|(_, classes)| field.strand_open_rows(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        std::fs::create_dir_all(out)?;
+        let ticks = field.declaration.ticks;
+        let (mut lines, mut shares) = (String::new(), String::new());
+        let mut open: Vec<Vec<u8>> = vec![Vec::new(); ticks];
+        for (r, (((group, classes), (_, o)), by_tick)) in rows.iter().zip(&reads).zip(&opened).enumerate() {
+            for (t, class) in classes.iter().enumerate() {
+                lines.push_str(&format!("{r}\t{group}\t{t}\t{class}\n"));
+            }
+            for (tick, slot) in open.iter_mut().enumerate() {
+                slot.extend(o[tick].iter().flat_map(|v| v.to_le_bytes()));
+            }
+            for (tick, by_head) in by_tick.iter().enumerate() {
+                for (h, by_place) in by_head.iter().enumerate() {
+                    for (p, row) in by_place.iter().enumerate() {
+                        for &(j, share) in row {
+                            let milli = (u128::from(share) * 1_000_000) >> holonics_engine::field::SHARE_BITS;
+                            if milli >= 1_000 {
+                                shares.push_str(&format!("{r}\t{tick}\t{h}\t{p}\t{j}\t{milli}\n"));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        write_new(&out.join("rows.tsv"), lines.as_bytes())?;
+        write_new(&out.join("shares.tsv"), shares.as_bytes())?;
+        for (tick, bytes) in open.iter().enumerate() {
+            write_new(&out.join(format!("open_{tick}.i32")), bytes)?;
+        }
+        write_new(&out.join("dims.tsv"), format!("read\t{}\nticks\t{ticks}\nheads\t{}\nstill\t{}\nframes\t{}\n", field.declaration.width, field.declaration.heads, field.declaration.still, field.declaration.frames).as_bytes())?;
+        println!("STRAND_ROWS rows={} places={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), started.elapsed().as_millis());
+        return Ok(());
+    }
     let reads: Vec<(Vec<i32>, Vec<Vec<i32>>)> = rows.par_iter().map(|(_, classes)| field.strand_reads(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
     let gates: Vec<Vec<Vec<i64>>> = rows.par_iter().map(|(_, classes)| field.strand_gates(classes, past).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
     std::fs::create_dir_all(out)?;
@@ -821,6 +867,98 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
     }
     write_new(&out.join("dims.tsv"), format!("read\t{}\nticks\t{ticks}\ncircles\t{}\n", field.declaration.width, field.declaration.carry).as_bytes())?;
     println!("STRAND_STATES rows={} places={} past={past} ms={}", rows.len(), rows.iter().map(|(_, c)| c.len()).sum::<usize>(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; the lead, November 21, the reach] `read-reach UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT
+/// SETTINGS…`: **the code of every place by two streams under a ruler's friction of distance**. Each row of `ROWS` (`read-far`'s table) is
+/// read whole as a passage by two streams with its odd contacts facing the past, every place at its own frontier
+/// ([`holonics_engine::field::Constitution::strand_codes`]), once a setting. A setting is `law` (none) or a list `h:kind:milli,…`, head `h`'s
+/// receivers of kind `kind` (one a listener) scoring a source `milli` thousandths of a bit lower an octave of its distance
+/// ([`holonics_engine::field::Constitution::ruler_friction`]). `OUT/codes.tsv` takes a line a place (`row`, `group`, `place`, then each
+/// setting's code on `2^(−20)` bits); one `REACH` line a setting and group gives the code in millionths of a nat a place. A ruler's forward:
+/// the state is read, never written.
+pub fn read_reach(args: &[String]) -> Result<()> {
+    if args.len() < 13 {
+        return Err("read-reach UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT SETTINGS…".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-reach")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[11]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let heads = learner.field.declaration.heads;
+    let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
+    for word in &args[12..] {
+        if word == "law" {
+            settings.push((word.clone(), None));
+            continue;
+        }
+        let mut f = vec![0i64; 2 * heads];
+        for part in word.split(',') {
+            let w: Vec<&str> = part.split(':').collect();
+            let [h, kind, milli] = w[..] else { return Err("a setting that is not h:kind:milli,…".into()) };
+            let (h, kind, milli): (usize, usize, i64) = (h.parse()?, kind.parse()?, milli.parse()?);
+            if h >= heads || kind > 1 {
+                return Err("a setting past the field's heads or kinds".into());
+            }
+            f[2 * h + kind] = holonics_engine::field::div_nearest(i128::from(milli) << holonics_engine::field::FACE_BITS, 1000) as i64;
+        }
+        settings.push((word.clone(), Some(f)));
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<(String, Vec<usize>)> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [label, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(unescape(known).as_bytes())?;
+        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        if classes.len() < 2 {
+            return Err("a row of fewer than two places".into());
+        }
+        rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
+    }
+    let mut codes: Vec<Vec<Vec<i64>>> = Vec::new();
+    for (name, friction) in &settings {
+        let mut field = learner.field.clone();
+        field.ruler_friction = friction.clone();
+        let c: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| field.strand_codes(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let mut by: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
+        for ((group, _), cs) in rows.iter().zip(&c) {
+            for g in [group.split(':').next().unwrap_or("").to_string(), "all".to_string()] {
+                let e = by.entry(g).or_insert((0, 0));
+                e.0 += cs.iter().skip(1).map(|&v| i128::from(v)).sum::<i128>();
+                e.1 += cs.len() - 1;
+            }
+        }
+        for (g, (sum, n)) in &by {
+            println!("REACH setting={name} group={g} places={n} nats_millionths={} ms={}", ((*sum * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / (*n).max(1) as i128, started.elapsed().as_millis());
+        }
+        codes.push(c);
+    }
+    std::fs::create_dir_all(out)?;
+    let mut lines = String::new();
+    for (r, (group, classes)) in rows.iter().enumerate() {
+        for t in 0..classes.len() {
+            lines.push_str(&format!("{r}\t{group}\t{t}"));
+            for c in &codes {
+                lines.push_str(&format!("\t{}", c[r][t]));
+            }
+            lines.push('\n');
+        }
+    }
+    write_new(&out.join("codes.tsv"), lines.as_bytes())?;
+    write_new(&out.join("settings.tsv"), settings.iter().map(|(n, _)| format!("{n}\n")).collect::<String>().as_bytes())?;
+    println!("REACH_DONE rows={} settings={} ms={}", rows.len(), settings.len(), started.elapsed().as_millis());
     Ok(())
 }
 

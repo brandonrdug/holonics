@@ -1221,6 +1221,76 @@ pub fn found_pump(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 21, the reach] **`found-friction STATE STATE_SHA OUT`**: the learner `STATE` whose heads carry a friction of
+/// distance ([`Learner::with_friction`]: `ψ`, two a head, appended at zero, so every face and every standing covector is the source's),
+/// written to `OUT`. Before it writes, every line is judged (`FOUND_FRICTION_LINE`): the fine field's declaration only its head line's friction
+/// (read back as the source's with the friction on, the eleven counts kept); the fine field's material, the moments and the carried
+/// remainders keep every standing word at the place the founding's map gives it, the new words zero; the parts line, where the learner has
+/// one, the source's with the friction's octave, zero, appended; every other line equal. Anything else is refused and nothing is written.
+/// Reads no realization: that every face is kept is read on the card by the line's own read of the founded state.
+pub fn found_friction(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-friction STATE STATE_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = learner.with_friction().map_err(|e| e.to_string())?;
+    let (field, from) = learner.field.with_friction().map_err(|e| e.to_string())?;
+    if field != founded.field {
+        return Err("the learner's founding and the field's differ".into());
+    }
+    let old_d = learner.field.declaration;
+    let (old_m, new_m) = (learner.field.material_len(), founded.field.material_len());
+    let (old_fine, new_fine) = (learner.field.theta.len(), founded.field.theta.len());
+    let (a, b) = (learner.to_text(), founded.to_text());
+    let (la, lb): (Vec<&str>, Vec<&str>) = (a.lines().collect(), b.lines().collect());
+    if la.len() != lb.len() {
+        return Err(format!("a founding that wrote {} lines for {}", lb.len(), la.len()).into());
+    }
+    let mapped = |wx: &[&str], wy: &[&str], skip: usize| -> bool { wy.iter().enumerate().all(|(n, w)| if n < skip { wx.get(n) == Some(w) } else { match from[n - skip] { Some(o) => o + skip < wx.len() && *w == wx[o + skip], None => *w == "0" } }) };
+    let mut judged = [0usize; 5];
+    for (k, (x, y)) in la.iter().zip(&lb).enumerate() {
+        let (wx, wy): (Vec<&str>, Vec<&str>) = (x.split(' ').collect(), y.split(' ').collect());
+        let verdict = if x == y {
+            judged[0] += 1;
+            "equal".to_string()
+        } else if k == 1 && wy[0] == "hnn-field-v14r" && wx.len() >= 12 && wy.len() == 23 && wx[1..12] == wy[1..12] && wy[22] == "1" && founded.field.declaration == (holonics_engine::field::Declaration { friction: true, ..old_d }) {
+            judged[1] += 1;
+            format!("declaration {} to {}", wx[0], wy[0])
+        } else if wx.len() == old_fine && wy.len() == new_fine && mapped(&wx, &wy, 0) {
+            judged[2] += 1;
+            format!("fine material {old_fine} words to {new_fine}")
+        } else if wx.len() == old_m && wy.len() == new_m && mapped(&wx, &wy, 0) {
+            judged[3] += 1;
+            format!("moments {old_m} words to {new_m}")
+        } else if wx[0] == "remainder" && wx.len() == old_m + 1 && wy.len() == new_m + 1 && mapped(&wx, &wy, 1) {
+            judged[3] += 1;
+            "remainders".to_string()
+        } else if wx[0] == "parts" && wy[0] == "parts" && wy.len() == wx.len() + 1 && wy[..wx.len()] == wx[..] && wy[wx.len()] == "0" {
+            judged[4] += 1;
+            "parts, the friction's octave appended at zero".to_string()
+        } else {
+            return Err(format!("line {k}: a change the friction's founding does not make").into());
+        };
+        println!("FOUND_FRICTION_LINE k={k} {verdict}");
+    }
+    let moments = 2 + usize::from(learner.remainder.is_some());
+    if judged[1] != 1 || judged[2] != 1 || judged[3] != moments || (learner.rate_parts.is_some() && judged[4] != 1) {
+        return Err(format!("a founding whose lines were judged {judged:?}").into());
+    }
+    std::fs::write(out, b.as_bytes())?;
+    println!("FOUND_FRICTION lines={} equal={} material={old_m} founded_material={new_m} friction_entries={} ms={}", la.len(), judged[0], from.iter().filter(|o| o.is_none()).count(), started.elapsed().as_millis());
+    Ok(())
+}
+
 /// A state's text with its pass line replaced by `pass`'s, every other line byte for byte: the written text, its count of lines and the one
 /// line that differs (counted from 1), read back and checked (its field the source's, its count of stretches kept). Refused where any other
 /// line would differ. The one tool under [`next_pass`] and [`own_states`].

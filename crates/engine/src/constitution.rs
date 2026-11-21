@@ -65,6 +65,12 @@ pub struct Constitution {
     /// state is kept 48 bits finer than the operand (`Q*`, the orbit released once at each read, `release.transported-residue`), and each site's
     /// operand is that orbit released to `2^(−16)`. A ruler's read of the scan's per-step section: not part of the state, and no reverse reads it.
     pub ruler_scan_carry: bool,
+    /// [measurement; the lead, November 21, the reach] Where set, **a head's friction of distance as a ruler sets it**: entry `2 h + kind` (kind
+    /// one a listener) on `2^(−16)` bits an octave, so a source `d` places from its receiver scores `ψ ⌊log₂ d⌋` lower on top of the falloff
+    /// that stands (a turned head's octave of distance, a still head's octave of its class's count), and an octave's crowd `ψ` times its
+    /// level lower. The finite difference of a code under it is the slope a friction founded at zero would have (atlas
+    /// `wave.matched-friction-reach`), read before the stage is a law: not part of the state, and no reverse reads it.
+    pub ruler_friction: Option<Vec<i64>>,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
     /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the
@@ -185,6 +191,15 @@ impl Constitution {
     /// its logarithm ([`temperature_of`]).
     pub fn temper(&self, h: usize, listens: bool) -> Result<i128> {
         temperature_of(self.theta[self.layout.temper + 2 * h + usize::from(listens)], &self.fine)
+    }
+
+    /// [definition; the lead, November 21] **A head's friction of distance** for a receiver of `kind` (one a listener) on `2^(−16)` bits an
+    /// octave ([`Declaration::friction`]; zero where the field has none), with a ruler's beside it where one is set
+    /// ([`Constitution::ruler_friction`]).
+    pub fn friction(&self, h: usize, listens: bool) -> i128 {
+        let k = 2 * h + usize::from(listens);
+        let law = if self.declaration.friction { i128::from(self.theta[self.layout.friction + k]) } else { 0 };
+        law + self.ruler_friction.as_ref().map_or(0, |f| i128::from(f[k]))
     }
 
     /// Each turned slot's skin decay on `2^(−30)` at every distance within the reach (a

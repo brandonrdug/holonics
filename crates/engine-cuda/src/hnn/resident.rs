@@ -167,6 +167,9 @@ pub(crate) struct Words {
     pub(crate) olist: u64,
     pub(crate) ostart: u64,
     pub(crate) temper_at: u64,
+    /// [the lead, November 21] Each head's friction of distance (`theta[friction_at + 2 h + kind]` on `2^(−16)` bits an octave,
+    /// [`holonics_engine::field::Declaration::friction`]); `u64::MAX` where the field has none.
+    pub(crate) friction_at: u64,
     pub(crate) fine_roots: u64,
     pub(crate) gcov: u64,
     pub(crate) sb: u64,
@@ -970,6 +973,7 @@ impl<'c> Resident<'c> {
             roots: run_base + roots_at,
             met: met.device_ptr(),
             temper_at: l.temper as u64,
+            friction_at: if d.friction { l.friction as u64 } else { u64::MAX },
             fine_roots: run_base + fine_at,
             probe: l.probe as u64,
             probe_bias: l.probe_bias as u64,

@@ -24,7 +24,7 @@ impl Constitution {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_far: 0, ruler_level: 0, mark: None }
+        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_far: 0, ruler_level: 0, mark: None }
     }
 
     /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
@@ -817,11 +817,38 @@ impl Constitution {
         if self.declaration.lane_leak {
             return refuse("a field whose tick already leaks by lane");
         }
-        let d = Declaration { lane_leak: true, ..self.declaration };
+        let d = Declaration { lane_leak: true, friction: false, ..self.declaration };
         d.admit()?;
         let layout = Loci::new(&d);
         if self.theta.len() != layout.lane_leak {
             return refuse("a field whose material does not end where the lane leak's stores begin");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from.resize(layout.len, None);
+        from.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from))
+    }
+
+    /// [definition; the lead, November 21 (the record of the reach)] **The field with each head's friction of distance**
+    /// ([`Declaration::friction`]): `ψ`, two a head (its receivers' two kinds), appended at the end of the fine field's material, founded at
+    /// zero, every standing entry kept; no key is read and the draws do not move. At `ψ = 0` every score is the built one bit for bit. A tower
+    /// keeps its level as it stands, and the level's own field has none. Also the map over the whole material from each new entry to the old
+    /// one it copies (`None` for the frictions). Refused on a field that has them.
+    pub fn with_friction(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.friction {
+            return refuse("a field whose heads already carry a friction of distance");
+        }
+        let d = Declaration { friction: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.friction {
+            return refuse("a field whose material does not end where the frictions of distance begin");
         }
         let (fine, total) = (self.theta.len(), self.material_len());
         let mut theta = self.theta.clone();
@@ -1362,6 +1389,27 @@ impl Learner {
         let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         Ok(Self { remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 21 (the record of the reach)] **The learner whose heads carry a friction of distance**
+    /// ([`Constitution::with_friction`]), founded at zero. Every standing entry keeps its moments, its remainder and its rate, so a section at
+    /// the founding deposits every standing entry as the source would; the frictions' moments open at zero, so each opens at its own first
+    /// covector (the deposit's law for a coordinate with no history). Its rate: the founded parts' rates are kept and the friction's part takes
+    /// octave 0, what a newly grown block takes in this line; where the learner carries each entry's own rate, the frictions take `rate_bits`.
+    /// The draws, the laps and the pass are kept; the held step and the last section's step (a reading's, absent from a state read back) are
+    /// dropped. Refused while a step is held. Why the remainder is kept where the other foundings set it back (`agent-inferred`): the friction is
+    /// founded as an arm beside a control from the same state, and an arm differs from its control by one change (CLAUDE.md, a line's lap,
+    /// rule 1), so its first section deposits every standing entry as the control's does.
+    pub fn with_friction(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its friction after its held step is read");
+        }
+        let (field, from) = self.field.with_friction()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        Ok(Self { remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; agent-inferred, November 14, the ring record §4] **The learner that reads twice** ([`Constitution::with_mark`]), its strengths

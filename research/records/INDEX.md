@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,739 records from July 2026 to November 2026. 390 receipts directories: 225 beside the records and 165 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,740 records from July 2026 to November 2026. 391 receipts directories: 225 beside the records and 166 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 138 | 106 |
+| [November 2026](#november-2026) | 139 | 107 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,7 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-21 [A law founded in a regime the writer never reads never reaches her writes read by two streams the terrain takes brackets and sums inside the line and a release halts where its gain dies](2026-11-21_A_LAW_FOUNDED_IN_A_REGIME_THE_WRITER_NEVER_READS_NEVER_REACHES_HER_WRITES_READ_BY_TWO_STREAMS_THE_TERRAIN_TAKES_BRACKETS_AND_SUMS_INSIDE_THE_LINE_AND_A_RELEASE_HALTS_WHERE_ITS_GAIN_DIES.md)
+- 2026-11-21 [A still head weighs no distance so a copy reads the record above and each heads friction of distance is its own reach founded at zero](2026-11-21_A_STILL_HEAD_WEIGHS_NO_DISTANCE_SO_A_COPY_READS_THE_RECORD_ABOVE_AND_EACH_HEADS_FRICTION_OF_DISTANCE_IS_ITS_OWN_REACH_FOUNDED_AT_ZERO.md)
 - 2026-11-21 [A stores leak is founded by its own news every mode of the built tick contracts under a leak and a leaking circle holds an order as its words polynomial at its multiplier](2026-11-21_A_STORES_LEAK_IS_FOUNDED_BY_ITS_OWN_NEWS_EVERY_MODE_OF_THE_BUILT_TICK_CONTRACTS_UNDER_A_LEAK_AND_A_LEAKING_CIRCLE_HOLDS_AN_ORDER_AS_ITS_WORDS_POLYNOMIAL_AT_ITS_MULTIPLIER.md)
 - 2026-11-21 [The built ticks rates stand still on its fill clock a third of a sites modes is released a third held and a third boosted and the contact kernels wait on their loads](2026-11-21_THE_BUILT_TICKS_RATES_STAND_STILL_ON_ITS_FILL_CLOCK_A_THIRD_OF_A_SITES_MODES_IS_RELEASED_A_THIRD_HELD_AND_A_THIRD_BOOSTED_AND_THE_CONTACT_KERNELS_WAIT_ON_THEIR_LOADS.md)
 - 2026-11-20 [A lane is a register of the face and never a thread the cards register file is the precision law as capacity heat follows every merge and order only a section and a series releases only where its tick contracts](2026-11-20_A_LANE_IS_A_REGISTER_OF_THE_FACE_AND_NEVER_A_THREAD_THE_CARDS_REGISTER_FILE_IS_THE_PRECISION_LAW_AS_CAPACITY_HEAT_FOLLOWS_EVERY_MERGE_AND_ORDER_ONLY_A_SECTION_AND_A_SERIES_RELEASES_ONLY_WHERE_ITS_TICK_CONTRACTS.md)

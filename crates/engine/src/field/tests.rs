@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -2035,7 +2035,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3875,7 +3875,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, friction: old.friction, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
@@ -4251,7 +4251,8 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
 /// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
 #[test]
 fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
-    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 28));
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 29));
+    assert_eq!((PART_NAMES[FRICTION_PART], FRICTION_PART), ("friction", 28));
     assert_eq!((PART_NAMES[LOUD_PART], LOUD_PART), ("loud", 26));
     assert_eq!((PART_NAMES[LEAK_PART], LEAK_PART), ("lane_leak", 27));
     assert_eq!((PART_NAMES[OPENING_PART], OPENING_PART), ("opening", 23));
@@ -6297,7 +6298,7 @@ fn the_lane_leak_founded_at_zero_keeps_every_face_and_the_built_reverse() {
         assert!(grown.with_lane_leak().is_err(), "{name}: a second growth");
     }
     // With the pump: the v14q line carries the pump's word as one.
-    let pumped = Declaration { pump: true, lane_leak: true, ..circled_shaped(1).declaration };
+    let pumped = Declaration { pump: true, lane_leak: true, friction: false, ..circled_shaped(1).declaration };
     assert_eq!(Declaration::from_text(&pumped.to_text()).unwrap(), pumped);
     let line = pumped.to_text();
     assert!(Declaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a leak word of zero");
@@ -6582,4 +6583,113 @@ fn the_circles_news_at_lighter_gates() {
         let q = |p: f64| cos[((cos.len() - 1) as f64 * p) as usize];
         eprintln!("GATE_LIGHTER k={k} cos_median={:.3} q25={:.3} q75={:.3} share_above_0={:.3} delta_median={:.3} held_code_nats={:.4}", q(0.5), q(0.25), q(0.75), cos.iter().filter(|&&x| x > 0.0).count() as f64 / cos.len() as f64, deltas[deltas.len() / 2], code / open as f64);
     }
+}
+
+/// [definition; the lead, November 21, the reach] **Each head's friction of distance, founded at zero, keeps every face and every standing
+/// covector** ([`Constitution::with_friction`]): on fields with still and turned heads, circles, four ticks and the opening, the founded field
+/// reads the same faces and returns the same covector at every standing entry, in a region and in a passage read by two streams; its line is
+/// `hnn-field-v14r` and reads back as written, with the pump's and the leak's words carried; a second founding is refused.
+#[test]
+fn the_friction_founded_at_zero_keeps_every_face_and_every_standing_covector() {
+    let fields: Vec<(&str, Constitution)> = vec![("plain, one still", shaped(1)), ("four ticks, two still", four_ticks(2)), ("circles, one still", circled_shaped(1)), ("opened, turned", opened(0))];
+    for (name, plain) in &fields {
+        let (grown, from) = plain.with_friction().unwrap();
+        let (d, l) = (grown.declaration, grown.layout.clone());
+        assert!(d.friction && !plain.declaration.friction);
+        assert_eq!(l.friction, plain.theta.len(), "{name}: the frictions at the fine field's end");
+        assert!(grown.theta[l.friction..l.friction + 2 * d.heads].iter().all(|&v| v == 0), "{name}: founded at zero");
+        assert_eq!(from.iter().flatten().count(), plain.material_len(), "{name}: every standing entry kept");
+        let r = region();
+        assert_eq!(grown.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: every face kept");
+        let (g, h) = (covector_of(&grown, &r), covector_of(plain, &r));
+        for (n, o) in from.iter().enumerate() {
+            if let Some(o) = o {
+                assert_eq!(g[n], h[*o], "{name}: the covector of standing entry {o}");
+            }
+        }
+        let classes = drawn_classes(0xF1, 9, d.alphabet);
+        for past in [false, true] {
+            let (pg, pp) = (grown.strand_pass(&classes, true, past).unwrap(), plain.strand_pass(&classes, true, past).unwrap());
+            assert_eq!(pg.faces, pp.faces, "{name}: a strand's faces kept");
+            let (mut sg, mut sp) = (vec![0i128; grown.theta.len()], vec![0i128; plain.theta.len()]);
+            grown.strand_returned(&classes, &pg, &mut sg).unwrap();
+            plain.strand_returned(&classes, &pp, &mut sp).unwrap();
+            assert_eq!(&sg[..plain.theta.len()], &sp[..], "{name}: a strand's standing covector kept");
+        }
+        let text = d.to_text();
+        assert!(text.starts_with("hnn-field-v14r "), "{name}: {text}");
+        assert_eq!(Declaration::from_text(&text).unwrap(), d);
+        assert!(grown.with_friction().is_err(), "{name}: a second founding");
+    }
+    for (pump, lane_leak) in [(true, false), (false, true), (true, true)] {
+        let both = Declaration { pump, lane_leak, friction: true, ..circled_shaped(1).declaration };
+        assert_eq!(Declaration::from_text(&both.to_text()).unwrap(), both);
+    }
+    let line = Declaration { friction: true, ..shaped(1).declaration }.to_text();
+    assert!(Declaration::from_text(&format!("{} 0", &line[..line.len() - 2])).is_err(), "a friction word of zero");
+}
+
+/// [definition; the lead, November 21, the reach] **The friction's return matches its code's difference**: with every head's frictions
+/// drawn off zero (a quarter of a bit to one bit an octave, of either sign), the code's covector predicts the code's central difference at
+/// each friction entry and at the entries of every family with the largest covector, in a region whose open sites listen and in a passage
+/// read by two streams with its odd contacts facing the past: so `δψ = −Σ δz ⌊log₂ d⌋` is the reverse of the friction's forward.
+#[test]
+fn the_frictions_return_matches_its_codes_difference() {
+    let (mut read, mut seams, mut frictions) = (0usize, 0usize, 0usize);
+    for (name, plain) in [("plain, one still", shaped(1)), ("circles, one still", circled_shaped(1)), ("four ticks, two still", four_ticks(2))] {
+        let (mut field, _) = plain.with_friction().unwrap();
+        let l = field.layout.clone();
+        let heads = field.declaration.heads;
+        for (n, v) in field.theta[l.friction..l.friction + 2 * heads].iter_mut().enumerate() {
+            *v = [1 << 14, -(1 << 15), 3 << 14, 1 << 16][n % 4];
+        }
+        let r = region();
+        assert_ne!(field.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: the friction moves the faces");
+        let classes = drawn_classes(0xF2, 11, field.declaration.alphabet);
+        let strand_code = |f: &Constitution| -> i64 { f.strand_pass(&classes, false, true).unwrap().faces.iter().zip(&classes).skip(1).map(|(fc, &c)| crate::field::ratio_code(fc.masses[c], fc.total)).sum() };
+        let strand_g = {
+            let pass = field.strand_pass(&classes, true, true).unwrap();
+            let mut g = vec![0i128; field.theta.len()];
+            field.strand_returned(&classes, &pass, &mut g).unwrap();
+            g
+        };
+        let region_g = covector_of(&field, &r);
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let p = f.pass(&r, true).unwrap();
+            let s = f.strand_pass(&classes, true, true).unwrap();
+            p.ticks.iter().chain(&s.ticks).flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+        };
+        for (which, g) in [("region", &region_g), ("strand", &strand_g)] {
+            for &(start, len, grain) in field.families() {
+                if start == l.temper {
+                    continue;
+                }
+                let natural: u32 = if grain == MATERIAL_BITS { 40 } else { 24 };
+                let mut entries: Vec<usize> = (start..start + len).collect();
+                entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+                let take = if start == l.friction { len } else { 2 };
+                for i in entries.into_iter().take(take).filter(|&i| g[i] != 0) {
+                    let moved = |delta: i32| {
+                        let mut f = field.clone();
+                        f.theta[i] += delta;
+                        f
+                    };
+                    let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                    let shift = natural + grain - 20;
+                    let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                        seams += 1;
+                        continue;
+                    };
+                    read += 1;
+                    frictions += usize::from(start == l.friction);
+                    let measured = if which == "region" { moved(delta).code(&r).unwrap().0 - moved(-delta).code(&r).unwrap().0 } else { strand_code(&moved(delta)) - strand_code(&moved(-delta)) };
+                    let predicted = (g[i] * 2 * delta as i128) >> shift;
+                    let tolerance = predicted.abs() / 8 + (64 * 10 << h);
+                    assert!((measured as i128 - predicted).abs() <= tolerance, "{name}, {which}: family at {start} (grain {grain}) entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+                }
+            }
+        }
+    }
+    eprintln!("FRICTION_COVECTOR_PROBES read={read} on_a_seam={seams} at_the_frictions={frictions}");
+    assert!(read >= 30 && 8 * seams <= read && frictions >= 12, "read {read} probes, {seams} on a seam, {frictions} at the frictions");
 }

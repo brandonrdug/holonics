@@ -461,9 +461,13 @@ impl Constitution {
                 let compare = |p: i128, dpk: i128| -> i128 { release(ln2 * release(p * (dpk - mean), SHARE_BITS), MOVE_BITS) };
                 let mut out = Vec::with_capacity(row.len());
                 let mut dt = 0i128;
+                // [the lead, November 21] The friction's covector, `−Σ δz ⌊log₂ d⌋` (a crowd's `δz` times its level), on the face family's
+                // `2^(−24)` from `δz` on `2^(−40)` ([`Declaration::friction`]).
+                let mut dpsi = 0i128;
                 let (mut row_w, mut row_u) = (0i128, 0i128);
                 for (src, &dpj) in row.iter().zip(&dp) {
                     let dz = compare(src.p as i128, dpj);
+                    dpsi -= dz * i128::from(octave(place(i).abs_diff(src.j as usize)));
                     if let Some(sigma) = reach_clock {
                         let (lw, lu) = reach_logs(sigma, i, src.j as usize);
                         (row_w, row_u) = (row_w - dz * i128::from(lw), row_u - dz * i128::from(lu));
@@ -478,6 +482,7 @@ impl Constitution {
                 let mut outc = Vec::with_capacity(crowd.len());
                 for (c, &dpj) in crowd.iter().zip(&dpc) {
                     let dz = compare(c.e as i128, dpj);
+                    dpsi -= dz * i128::from(c.level);
                     if let Some(sigma) = reach_clock {
                         // A crowd takes the clock's term at the place its skin reads, `2^level` away, and no remainder.
                         let e = if c.lo > i { i + (1 << c.level) } else { i - (1 << c.level) };
@@ -492,6 +497,9 @@ impl Constitution {
                 }
                 // Into the temperature's own chart (§16.12), the row's.
                 g[l.temper + 2 * h + kind] += temperature_chain(temper, dt)?;
+                if d.friction {
+                    g[l.friction + 2 * h + kind] += release(dpsi, FACE_BITS);
+                }
                 if let Some(sh) = shares.as_deref_mut() {
                     for (src, &v) in row.iter().zip(&out) {
                         sh[2 * h + usize::from(place(i).abs_diff(src.j as usize) >= NEAR)] += v.unsigned_abs();

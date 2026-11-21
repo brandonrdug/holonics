@@ -768,6 +768,8 @@ impl Constitution {
                 let wi = &cell.pq[(h * sites + i) * span..(h * sites + i + 1) * span];
                 // The lock's temperature for this receiver's kind (§15.10).
                 let temper = self.temper(h, lists.listens(i))?;
+                // The head's friction of distance for this receiver's kind ([`Declaration::friction`]), a ruler's beside it where set.
+                let friction = self.friction(h, lists.listens(i));
                 let mut series = SeriesRow::new(span);
                 let mut row: Vec<Source> = Vec::new();
                 for j in lists.support(i) {
@@ -795,7 +797,7 @@ impl Constitution {
                         }
                         _ => base,
                     };
-                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (falloff(d, j, i) << FACE_BITS))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (falloff(d, j, i) << FACE_BITS) - friction * octave(d) as i128)?;
                     series.push(self.face(z), one, one, &value);
                     row.push(Source { j: j as u32, p: 0, s: base });
                 }
@@ -818,7 +820,7 @@ impl Constitution {
                         (value[li], value[n + li]) = (decayed_wide(decay, sums.value(lo, hi_, li)), decayed_wide(decay, sums.value(lo, hi_, n + li)));
                     }
                     let base = fit64(div_nearest(score, ((count * count) as i128) << (FACE_BITS + 2 * self.decay(h, 0, 1 << level).1 + 1)))?;
-                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((level as i128) << FACE_BITS))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((level as i128) << FACE_BITS) - friction * level as i128)?;
                     series.push(self.face(z), (count as u128) << WEIGHT_BITS, one, &value);
                     crowds.push(Crowd { lo, hi: hi_, level, count, z, e: 0, s: base });
                 }
@@ -1377,6 +1379,29 @@ impl Constitution {
         Ok(pass.ticks.iter().map(|cell| cell.gam[..n * c2].to_vec()).collect())
     }
 
+    /// [measurement; the lead, November 21, the reach] **A strand's codes, for a ruler on the host**: each open place's code of the symbol
+    /// standing there, `−log₂ p̂(u_p)` on `2^(−20)` bits ([`face_code`]), the place every place before it known, read by two streams as
+    /// [`Constitution::strand_pass`] reads it. A reading: the state is the same with it.
+    pub fn strand_codes(&self, classes: &[usize], past: bool) -> Result<Vec<i64>> {
+        let pass = self.strand_pass(classes, false, past)?;
+        Ok(pass.faces.iter().zip(classes).map(|(f, &u)| face_code(f.masses[u], f.total)).collect())
+    }
+
+    /// [measurement; the lead, November 21] **A strand's open rows, for a ruler on the host**: at every tick and head, each open place's
+    /// row as [`Constitution::strand_pass`] formed it, each source's place and its share of the row on `2^(−63)` (`[ticks][heads][n]`,
+    /// the open place at place `p` in slot `p`). Where a far operand's weight goes at the place that needs it (the record of November 21
+    /// on the reach) is read from these outside the machine. A reading: the state is the same with it.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_open_rows(&self, classes: &[usize], past: bool) -> Result<Vec<Vec<Vec<Vec<(u32, u64)>>>>> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let (heads, n) = (self.declaration.heads, classes.len());
+        Ok(pass
+            .ticks
+            .iter()
+            .map(|cell| (0..heads).map(|h| (0..n).map(|p| cell.rows.get(h * 2 * n + n + p).map_or_else(Vec::new, |row| row.iter().map(|s| (s.j, s.p)).collect())).collect()).collect())
+            .collect())
+    }
+
     /// [measurement; the lead, November 19, the frontier record §23] **A strand's carried products, for a ruler on the host**: each known
     /// site's scan value before it on every carry circle at the last tick, `Q(t − 1)` (`[n][2C]`, real parts then imaginary, on
     /// `2^(−16)`), as [`Constitution::strand_pass`] formed it: the unit's move the places before the site compose on each circle
@@ -1509,6 +1534,7 @@ impl Constitution {
                 let lists = &known.classes[h];
                 let shared = !d.carries_moment(h);
                 let temper = self.temper(h, true)?;
+                let friction = self.friction(h, true);
                 let mut series = SeriesRow::new(span);
                 // Its near field before it, nearest first, then every known site past it (an open receiver's row, one side of it).
                 let near = (1..NEAR).filter_map(|gap| t.checked_sub(gap));
@@ -1525,7 +1551,7 @@ impl Constitution {
                     }
                     let base = fit64(release(s, FACE_BITS + 2 * self.decay(h, 0, gap).1 + 1))?;
                     let fall = if shared { octave(lists.class_count(j, t).max(1)) as i128 } else { octave(gap) as i128 };
-                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (fall << FACE_BITS))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS) - (fall << FACE_BITS) - friction * octave(gap) as i128)?;
                     series.push(self.face(z), one, one, &value);
                 }
                 let (framed, _) = series.release();
