@@ -1,0 +1,6 @@
+# Fixed 2026-11-21T01:54:33Z, before the read. L71's end state at its own 4 declared ticks, 240 sites of docs/THE_ENGINE.md,
+# sites 120, 122, 200, 201; the tick's block at its last tick (k=3) and the first descent of a leak founded at zero, M = sum lambda^(k+1) x^kT.
+# The first-order change of eigenvalue j under J - eta M: d lambda_j = -eta (w_j* M v_j)/(w_j* v_j), w and v its left and right vectors.
+L1 (the null): at each site the share of the boosted modes (nu > 0.02) whose gain the deposit lowers (Re d lambda < 0) stands between 0.4
+    and 0.6, and so do the held and the released: the descent has no preference for contracting what grows.
+L2: the region's M is near rank one against a site's own (its largest singular value over 40% of its Frobenius norm).

@@ -104,5 +104,41 @@ def main():
             print(f"HALVING t={t} {a}->{b} median_dist {da:.4f} -> {db:.4f} ratio={db / da:.3f}")
 
 
-if __name__ == '__main__':
+if __name__ == '__main__' and '--leak' not in sys.argv:
     main()
+
+
+def leak(root):
+    """`--leak`: the first descent of a leak founded at zero, `M = Σ λ^(k+1) x^kᵀ` (`grad_all.txt`, `grad_t{t}.txt`), against the tick's own
+    block at its last tick (`probe_k{k}_t{t}.txt`): each eigenvalue's first-order change under `J − ηM`, `−(W M V)_jj` with `W = V⁻¹`, by the
+    mode's kind on the lanes' fill (boosted `ν > 0.02`, held `|ν| ≤ 0.02`, released `ν < −0.02`)."""
+    def mat(path):
+        return np.array([[float(v) for v in line.split()] for line in open(path)])
+    m_all = mat(os.path.join(root, 'grad_all.txt'))
+    sv = np.linalg.svd(m_all, compute_uv=False)
+    print(f"LEAK_M region top_singular_share={sv[0] ** 2 / np.sum(sv ** 2):.3f} top5={' '.join(f'{v / sv[0]:.3f}' for v in sv[:5])}")
+    for path in sorted(glob.glob(os.path.join(root, 'probe_k*_t*.txt'))):
+        head, J = read(path)
+        k, t, dw, lanes = head['k'], head['t'], head['dw'], head['lanes']
+        lw = dw // lanes
+        x0, x1 = head['before'], head['after']
+        fill = float(np.median([np.linalg.norm(x0[l * lw:(l + 1) * lw]) / max(np.linalg.norm(x1[l * lw:(l + 1) * lw] - x0[l * lw:(l + 1) * lw]), 1e-30) for l in range(lanes)]))
+        lam, V = np.linalg.eig(J)
+        W = np.linalg.inv(V)
+        nu = (lam.real - 1.0) * fill
+        kinds = {'boosted': nu > 0.02, 'held': np.abs(nu) <= 0.02, 'released': nu < -0.02}
+        for name, M in (('region', m_all), ('site', mat(os.path.join(root, f'grad_t{t}.txt')))):
+            d = -np.einsum('ij,jk,ki->i', W, M, V)
+            d = d / max(np.max(np.abs(d)), 1e-300)
+            parts = []
+            for kind, mask in kinds.items():
+                if mask.sum() == 0:
+                    parts.append(f"{kind}:0")
+                    continue
+                parts.append(f"{kind}:n={int(mask.sum())},lowered={np.mean(d[mask].real < 0):.2f},median_abs={np.median(np.abs(d[mask])):.3f}")
+            print(f"LEAK t={t} open={head['open']} k={k} fill={fill:.2f} M={name} {' '.join(parts)}")
+
+
+if __name__ == '__main__' and '--leak' in sys.argv:
+    leak(sys.argv[1])
+    sys.exit(0)
