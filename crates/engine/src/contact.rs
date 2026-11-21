@@ -1488,6 +1488,13 @@ impl Constitution {
                 cell.before = x.clone();
             }
             self.tick(&mut x, &definite, &definite, &tick_paces, &moment, &reaches, None, &mut cell, Sided::Strand { known: n, past })?;
+            // [measurement] A ruler's rounding of every state after the tick, where set ([`Constitution::ruler_state_grain`]).
+            if let Some(g) = self.ruler_state_grain.filter(|&g| g < STATE_BITS) {
+                let k = STATE_BITS - g;
+                for v in x.iter_mut() {
+                    *v = fit64(release(i128::from(*v), k) << k)?;
+                }
+            }
             if keep {
                 cell.after = x.clone();
                 out.paces.push(tick_paces.clone());

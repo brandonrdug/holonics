@@ -71,6 +71,10 @@ pub struct Constitution {
     /// level lower. The finite difference of a code under it is the slope a friction founded at zero would have (atlas
     /// `wave.matched-friction-reach`), read before the stage is a law: not part of the state, and no reverse reads it.
     pub ruler_friction: Option<Vec<i64>>,
+    /// [measurement; the lead, November 21, the precision pass's G-W3] Where set, **every state rounded to `2^(−g)` after each tick** of a
+    /// passage read by two streams: `x ← release(x, 16 − g) ≪ (16 − g)` over every site, `x` on the state's `2^(−16)`. A ruler's read of how
+    /// many of the state's places the code reads: not part of the state, and no reverse reads it.
+    pub ruler_state_grain: Option<u32>,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
     /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the

@@ -1,6 +1,6 @@
 # A still head weighs no distance, so a copy reads the record above; each head's friction of distance is its own reach, founded at zero
 
-November 21, the lead, 16:10 to 17:xx UTC. Refs #404, #405. It follows
+November 21, the lead, 16:10 to 20:10 UTC. Refs #404, #405. It follows
 [the day's record of the terrain read by two streams](2026-11-21_A_LAW_FOUNDED_IN_A_REGIME_THE_WRITER_NEVER_READS_NEVER_REACHES_HER_WRITES_READ_BY_TWO_STREAMS_THE_TERRAIN_TAKES_BRACKETS_AND_SUMS_INSIDE_THE_LINE_AND_A_RELEASE_HALTS_WHERE_ITS_GAIN_DIES.md),
 whose §7 item 2 named this loop's subject: sums with three-digit operands and carries, and copies beyond two digits, where the
 terrain's third lap stood still (W79t: 27 of 96 held records whole, sums 4 and copies 3 of 16), because the binding reached a place or
@@ -80,7 +80,7 @@ fixed at 16:25:13Z before the read was looked at, and held on every clause:
 | heads 0 and 1, one bit each | 0.056 | 0.052 | 0.643 | +0.0190 |
 | the turned heads one bit more | 1.044 | 0.778 | 1.000 | +0.0272 |
 
-In nats a digit, by two streams. The terrain's other places code 0.578 nats a place at the law and 0.553 at one bit.
+In nats a digit, by two streams. Over every place of the terrain's passages the code is 0.578 nats a place at the law and 0.553 at one bit.
 
 ## 4. On the objects
 
@@ -120,16 +120,75 @@ Receipts of the build:
 - `found-friction` on W79t's end: 12 lines judged, the declaration's head word, the fine material and both moments with eight new
   words at zero, the parts line with the friction's octave appended at zero, seven lines equal.
 
-The friction's Lean statement (the score linear in `ψ`, its covector `−Σ δz ⌊log₂ d⌋`) is owed in #410.
+**The gate** (`Declaration::friction_gate`, the `v14r` line's friction word `2`; written after W80r's first lap showed one number a head
+and kind standing still, §6). Head `h`'s friction at receiver `i` is `ψ_(h,k) + release(⟨a_h, r̂_i⟩, 24)`, with `r̂_i` the receiver's chart at
+the tick (the read its key, probe and value are charted from) and `a_h` a row of `D` a head on `2^(−24)` (`Loci::friction_gate`, the friction's
+part), founded at zero. Its covector is the row's `δψ_i` against the read, `δa_h = Σ_i δψ_i r̂_i`, and the read takes `a_h δψ_i` back, so the
+friction is a gate of the site's state as the carry circle's leak is. Its premise read: a linear read of the receiver's last-tick state,
+fitted on half the passages, told where a friction of one bit pays, and a friction set only there kept every copy and reversal digit's gain
+(0.53 to 0.07 nats a copy digit) at +0.005 nats a text place where the friction everywhere cost +0.016 (`site_friction.py`). Receipts:
+founded at zero every face and standing covector kept; off zero its return matches the code's difference on 325 probes, 36 at the gate;
+the card the host's bits on the first run (`the_friction_read_from_the_receivers_state_on_the_card_reads_the_hosts_bits`); gate 3 equal
+on its build; `found-friction … gate` founds both on a state (904 entries, every other line judged).
 
-## 6. The arm
+The friction's Lean statement (the score linear in `ψ` and in `a_h`, its covector `−Σ δz ⌊log₂ d⌋` and the gate's `Σ δψ r̂`) is owed in #410.
 
-The arm W80r (W79t's end with the friction founded at zero) and its control W80t (W79t's end, no change), 3,000 sections each on this build from 17:05 UTC, then their reads; G-F1 fixed at 16:57:07Z. Its reading is added here when the laps and reads land.
+## 6. The arms
+
+Three laps of 3,000 sections from W79t's end on the card, each read at its MEAN.3000 (the mean of its last 1,000 sections). W80t is the
+control (no change). W80r carries the friction founded at zero, W80g the friction and its gate. Each arm differs from W80t by one change.
+Each build reproduced W79t's lap with its new law off before it trained (gate 3: parity 3 of 3, 24 of 24 sections, the lap's read byte for
+byte), and each founded state's first sections read the control's bits.
+
+**What they wrote.** The terrain's held panel, the copies (the panel's last prompt, then the write):
+
+```
+                              W80t (control)         W80g (the gate)
+copy 0 6 9 =                  6 0 8                  0 6 9
+copy 4 8 5 =                  4 7 3                  4 8 5
+copy 0 1 7 6 =                8 8 8 4                0 1 7 6
+copy 1 3 4 0 0 =              9 3 4 0 0              1 3 4 0 0
+copy 2 7 2 7 4 0 =            2 9 1 1 3 6            2 8 2 7 4 2
+copy 4 7 1 8 4 7 9 =          0 8 0 7 5 3 9          0 8 0 7 5 3 9
+730 + 929 =                   1359                   1579
+```
+
+| at the lap's mean | W80t | W80r | W80g |
+|---|---|---|---|
+| held records whole, of 96 | 37 | 30 | **41** |
+| copies / reversals / sums / differences / products / brackets, of 16 | 3 / 5 / 7 / 7 / 4 / 11 | 3 / 3 / 4 / 7 / 5 / 8 | **7** / 5 / 6 / 9 / 3 / 11 |
+| first symbol, of 96 | 63 | 63 | 70 |
+| answer digits by two streams, nats a digit: copy / reversal / sum | 0.549 / 0.442 / 1.139 | 0.537 / 0.496 / 1.051 | **0.269 / 0.138 / 0.983** |
+| held text, one place open, against W80t (nats a place) | | +0.0001 (±0.0002) | −0.0001 (±0.0002) |
+| the frontier read against W80t | | +0.0001 (±0.0002) | +0.0000 (±0.0003) |
+| wide panel, words in the lexicon | | 71% | 73% |
+
+- **W80r: one friction a head and kind does not move.** Over the lap head 0's class receivers took 0.077 bits an octave and its listeners,
+  the open places the writer reads, went to −0.042: less friction, where the copies needed more. The heads' frictions stood within a
+  tenth of a bit. The passage's mix decides one number for every place, and text outweighs the terrain's answer digits, as one
+  temperature for the whole passage did on November 16 (§4.3 of that record). The copies stay at 3 of 16, and the whole records fall
+  from 37 to 30.
+- **W80g: the friction read from the receiver's own state carries the operand.** The gate's rows moved fast (head 0's row reached a
+  norm of 0.15 on `2^(−24)` by section 1,000) while the head's own friction stayed near zero, so each place takes the friction its own
+  state asks for. Copy digits fell from 0.549 to 0.269 nats and reversals from 0.442 to 0.138. Copies written whole went from 3 to 7 of
+  16, whole records from 37 to 41 of 96, and first symbols from 63 to 70. The held text did not move (−0.0001 ± 0.0002 nats a place at
+  one place open, every region within 0.002). The ruler's static gate had kept the terrain's gain at a third of the text's price.
+  Trained from zero, the gate takes half of that gain and pays none of the price.
+- **What it does not yet carry.** `copy 4 7 1 8 4 7 9` still writes the record above it whole, and the sums gained a little in code and
+  nothing in whole writes (7 of 16 at the control, 6 at the gate). A sum's answer digit needs two operands and their carry, and the
+  friction brings the near one of the two (§3: head 0's pair took 0.35 of its row before and 0.45 under the ruler's friction).
+- The loudness of every region at W80g's mean is in `loudness_W80g.txt` (its regions' lines; the pieces stay under `.local/`) (all regions 21.80 octaves, temperature −0.023 a nat).
+
+**The guesses.** G-F1 (16:57:07Z) missed on its writes, its codes and its friction (30 of 96, 3 copies; copy digits 0.537; head 0's
+listeners at −0.042), and held its text clause. G-G1 (18:44:13Z) held on every clause: 0.269 against 0.35 a copy digit, 0.983 against
+1.00 a sum digit, 41 of 96 whole against 34, 7 copies against 6, and text −0.0001 against 0.02. By each guess's own rule the line takes
+the gate (W80g's end is the line's state from here), and the friction without its gate leaves it.
 
 ## 7. Recorded failures this could repeat
 
 - A part founded at zero and waited for (November 13 to 16). What differs: its slope at the founding was read first, as a finite
-  difference of the code (§3), and is large on the terrain and small on text.
+  difference of the code (§3), and is large on the terrain and small on text. The first form still waited (W80r), because one number
+  for every place is pulled by the whole passage; the gate gives each place its own.
 - A width or a reach set by hand. The ruler's settings were readings; the law's `ψ` is located by its covector, and the arm reads where it
   goes.
 - A routine standing in for learning. No copy, no counter of records: a contact's prior over distance, the same for every stream.
@@ -138,5 +197,7 @@ The arm W80r (W79t's end with the friction founded at zero) and its control W80t
 ## 8. Receipts
 
 `receipts/2026-11-21_reach/`: `guesses.txt`; `make_rows.py` (the rows, seed 1121, 600 a kind); `reach_ruler.py`, `rows_W79t.txt`;
-`reweigh.py`, `reweigh_W79t.txt`; `reach_read.sh`, `answer_codes.py`, `answer_codes_W79t.txt`, `text_codes_W79t.txt`. The passages' text
+`reweigh.py`, `reweigh_W79t.txt`; `reach_read.sh`, `answer_codes.py`, `answer_codes_W79t.txt`, `text_codes_W79t.txt`; `site_friction.py`,
+`site_friction_W79t.txt`; the arms' scripts `w80.sh`, `w80g.sh`; `terrain_scores_W80.txt`, `reach_W80.txt` (the answer digits' codes and
+the frictions at each save), `text_W80.txt`, `panels_W80.txt`, `loudness_W80g.txt` (its regions' lines; the pieces stay under `.local/`). The passages' text
 and the states stay under `.local/`.

@@ -330,7 +330,7 @@ mod tests {
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_friction_of_distance_on_the_card_reads_the_hosts_bits() {
         use holonics_engine::field::{Host, Learner, Realization};
-        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(5).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 11)).to_be_bytes()).collect();
+        let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(5).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
         let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
         let pumped = Learner::new(founded, 12).with_carry(4, &keys).unwrap().with_pump().unwrap();
         let frictioned = pumped.with_friction().unwrap();
@@ -355,7 +355,7 @@ mod tests {
         let tail = keys.len() - 4 * moved.len() - 8;
         for (k, &i) in moved.iter().enumerate() {
             let word = &keys[tail + 4 * k..tail + 4 * k + 4];
-            let v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+            let v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> (MATERIAL_BITS - 10);
             field.theta[i] = v;
             plain.theta[i] = v;
         }
@@ -367,7 +367,8 @@ mod tests {
             assert_eq!(zero_g[..plain.theta.len()], plain_g[..plain.theta.len()], "and every standing entry's covector");
         }
         for (n, v) in field.theta[l.friction..l.friction + 2 * d.heads].iter_mut().enumerate() {
-            *v = [1 << 14, -(1 << 15), 3 << 14, 1 << 16, -(1 << 14), 1 << 15, -(3 << 14), 1 << 13][n % 8];
+            let bit = 1i32 << holonics_engine::field::FACE_BITS;
+            *v = [bit / 4, -bit / 2, 3 * bit / 4, bit, -bit / 4, bit / 2, -3 * bit / 4, bit / 8][n % 8];
         }
         for (section, regions) in [("law", &law), ("strands", &strands), ("mixed", &mixed)] {
             let (host_faces, host_g) = field.read_and_return(regions).unwrap();
@@ -394,7 +395,7 @@ mod tests {
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn the_friction_read_from_the_receivers_state_on_the_card_reads_the_hosts_bits() {
         use holonics_engine::field::{Host, Learner, Realization};
-        let keys: Vec<u8> = (0..1u64 << 18).flat_map(|i| (i.wrapping_add(5).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (i << 11)).to_be_bytes()).collect();
+        let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(5).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
         let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
         let pumped = Learner::new(founded, 12).with_carry(4, &keys).unwrap().with_pump().unwrap();
         let frictioned = pumped.with_friction().unwrap().with_friction_gate().unwrap();
@@ -419,7 +420,7 @@ mod tests {
         let tail = keys.len() - 4 * moved.len() - 8;
         for (k, &i) in moved.iter().enumerate() {
             let word = &keys[tail + 4 * k..tail + 4 * k + 4];
-            let v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 14;
+            let v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> (MATERIAL_BITS - 10);
             field.theta[i] = v;
             plain.theta[i] = v;
         }
@@ -431,11 +432,12 @@ mod tests {
             assert_eq!(zero_g[..plain.theta.len()], plain_g[..plain.theta.len()], "and every standing entry's covector");
         }
         for (n, v) in field.theta[l.friction..l.friction + 2 * d.heads].iter_mut().enumerate() {
-            *v = [1 << 14, -(1 << 15), 3 << 14, 1 << 16, -(1 << 14), 1 << 15, -(3 << 14), 1 << 13][n % 8];
+            let bit = 1i32 << holonics_engine::field::FACE_BITS;
+            *v = [bit / 4, -bit / 2, 3 * bit / 4, bit, -bit / 4, bit / 2, -3 * bit / 4, bit / 8][n % 8];
         }
         for (n, v) in field.theta[l.friction_gate..l.friction_gate + d.heads * dw].iter_mut().enumerate() {
             let word = &keys[16 * n..16 * n + 4];
-            *v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> 12;
+            *v = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> (MATERIAL_BITS - 12);
         }
         for (section, regions) in [("law", &law), ("strands", &strands), ("mixed", &mixed)] {
             let (host_faces, host_g) = field.read_and_return(regions).unwrap();

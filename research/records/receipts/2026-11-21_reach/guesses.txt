@@ -24,3 +24,11 @@ by two streams code at most 0.35 nats a copy digit and 1.00 a sum digit (W80t: 0
 terrain records whole and at least 6 of 16 copies; its text at one place open within 0.02 nats a place of W80t's on every region.
 Why: the gate's ruler (site_friction.py) kept the whole terrain gain at a third of the text's price where a fixed friction of one bit
 stood; trained from zero, a third of that gain is guessed within a lap. W80r's G-F1 is scored when its reads land.
+
+Scored (2026-11-21T20:00:46Z, date -u): G-F1 missed on its writes, codes and friction, held on text. W80r 30 of 96 whole (40 asked), copies 3 of 16
+(8 asked); copy digits 0.537 (0.30 asked), sum digits 1.051 (0.85 asked); W80t wrote 37 and 3, its digits 0.549 and 1.139 (the control's
+clauses: at most 33 and 5 held on copies, missed on whole records); text +0.0001 (held); head 0's listeners' friction at STATE.3000 -2748
+on 2^(-16), -0.042 bits an octave (0.25 asked). The friction without its gate leaves the line.
+Scored (2026-11-21T20:00:46Z, date -u): G-G1 held on every clause. W80g's copy digits 0.269 (0.35 asked), sum digits 0.983 (1.00 asked); 41 of 96
+whole (34 asked), 7 of 16 copies (6 asked); text at one place open -0.0001 (+-0.0002) against W80t, every region within 0.002 (0.02 asked).
+The line takes the gate: W80g's end is its state.

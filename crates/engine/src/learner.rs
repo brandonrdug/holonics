@@ -668,6 +668,11 @@ impl StorePass {
 }
 
 impl Learner {
+    /// [measurement; the lead, November 21, the precision pass's G-W4] The deposit's two moments, one entry each for the material: a reading.
+    pub fn moments(&self) -> (&[i128], &[i128]) {
+        (&self.first, &self.second)
+    }
+
     /// The learner of a field founded on its declared key stream (the founding read
     /// [`Declaration::founding_draws`] draws).
     pub fn new(field: Constitution, rate_bits: u32) -> Self {

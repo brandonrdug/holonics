@@ -98,6 +98,12 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-strand-states") {
         return athena::ruler::tension::read_strand_states(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-section-covectors") {
+        return athena::ruler::tension::read_section_covectors(&rest[1..]);
+    }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-widths") {
+        return athena::ruler::tension::read_widths(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-reach") {
         return athena::ruler::tension::read_reach(&rest[1..]);
     }

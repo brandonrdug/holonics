@@ -870,6 +870,146 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 21, the precision pass (G-W5)] `read-section-covectors UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA
+/// CODEC CODEC_SHA SECTIONS STATE STATE_SHA`: **how long a block's covector stays coherent**. The store's `ROLE` is cut from the state's own pass
+/// as [`read_tension_store`] cuts it (no world's acts, no terrain's records), `SECTIONS` sections, and each section's material covector is read
+/// on the host at the state (`Constitution::read_and_return`, the deposit's operand, every section at the same state). One `SECTION_COSINE` line a
+/// pair of successive sections: the cosine of the whole covector, and by family the cosine and its entries. A ruler: nothing is deposited.
+pub fn read_section_covectors(args: &[String]) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-section-covectors UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-section-covectors")?;
+    let units = units_of(&args[1], &args[2])?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let role = args[5].as_str();
+    let keys = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?, units)?;
+    let sections = positive(&args[10])?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let pass = learner.pass.clone().ok_or("a state with no pass line")?;
+    let names = role_names(&counts, role);
+    let mut slices = Vec::with_capacity(names.len());
+    for &name in &names {
+        slices.push(open_slice(store, role, name, &counts)?);
+    }
+    let families = learner.field.families_all();
+    let mut cut = Cut { seed, slices, pass };
+    let mut last: Option<Vec<i128>> = None;
+    for done in 0..sections {
+        let mut regions: Vec<OwnedRegion> = Vec::new();
+        let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        while let Some(drawn) = cut.next() {
+            let n = drawn.sites();
+            if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
+                break;
+            }
+            let Stretch { region, .. } = cut.take(drawn, &codec)?;
+            (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
+            regions.push(region);
+        }
+        if regions.is_empty() {
+            break;
+        }
+        let views: Vec<holonics_engine::field::Region> = regions.iter().map(view_of).collect();
+        let (_, g) = learner.field.read_and_return(&views).map_err(|e| e.to_string())?;
+        if let Some(prev) = &last {
+            // A cosine read at the host's exterior: floats are a ruler's here.
+            #[allow(clippy::float_arithmetic, clippy::cast_precision_loss)]
+            let cos = |a: &[i128], b: &[i128]| -> String {
+                let (mut ab, mut aa, mut bb) = (0f64, 0f64, 0f64);
+                for (&x, &y) in a.iter().zip(b) {
+                    let (x, y) = (x as f64, y as f64);
+                    ab += x * y;
+                    aa += x * x;
+                    bb += y * y;
+                }
+                if aa == 0.0 || bb == 0.0 { "-".to_string() } else { format!("{:.4}", ab / (aa * bb).sqrt()) }
+            };
+            let by: Vec<String> = families.iter().enumerate().filter(|(_, f)| f.1 > 0).map(|(k, &(start, len, _))| format!("{k}:{len}:{}", cos(&prev[start..start + len], &g[start..start + len]))).collect();
+            println!("SECTION_COSINE section={done} regions={} sites={in_sites} all={} families={} ms={}", regions.len(), cos(prev, &g), by.join(","), started.elapsed().as_millis());
+        }
+        last = Some(g);
+    }
+    Ok(())
+}
+
+/// [measurement; the lead, November 21, the precision pass (G-W0, G-W2, G-W4)] `read-widths END END_SHA MEAN MEAN_SHA OUT`: **each family's
+/// words, their spread and their silent steps**. `OUT/families.tsv` takes a line a family of the whole material (fine, level and glue): its
+/// name, entries, grain, the 50th, 99th and 99.9th hundredths and the largest of `|θ|` at the end (on `2^(−24)` whatever the grain), the root
+/// mean square of the end less the mean (on `2^(−24)`), and of the entries with a nonzero first moment the count whose deposit step
+/// releases to zero at rates 12, 16 and 20 (`deposit_over` on the end's moments). A ruler's read of saved states; nothing is written back.
+pub fn read_widths(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("read-widths END END_SHA MEAN MEAN_SHA OUT".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-widths")?;
+    let end = Learner::from_text(std::str::from_utf8(&pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mean = Learner::from_text(std::str::from_utf8(&pinned_read(&args[3], &args[4], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    if end.field.material_len() != mean.field.material_len() {
+        return Err("an end and a mean of different material".into());
+    }
+    let named = |l: &holonics_engine::field::Loci| -> Vec<(usize, &'static str)> {
+        vec![(l.enc, "enc"), (l.before, "before"), (l.after, "after"), (l.q, "q"), (l.q_bias, "q_bias"), (l.v, "v"), (l.v_bias, "v_bias"), (l.out, "out"), (l.out_bias, "out_bias"), (l.a, "a"), (l.a_bias, "a_bias"), (l.b, "b"), (l.b_bias, "b_bias"), (l.w, "w"), (l.w_bias, "w_bias"), (l.read, "read"), (l.read_bias, "read_bias"), (l.moment_before, "moment_before"), (l.moment_after, "moment_after"), (l.temper, "temper"), (l.probe, "probe"), (l.probe_bias, "probe_bias"), (l.pace, "pace"), (l.moment_face, "moment_face"), (l.moment_face_bias, "moment_face_bias"), (l.lift_bias, "lift_bias"), (l.carry, "carry"), (l.carry_bias, "carry_bias"), (l.triad, "triad"), (l.triad_bias, "triad_bias"), (l.w_triad, "w_triad"), (l.opening, "opening"), (l.opening_bias, "opening_bias"), (l.junction, "junction"), (l.junction_bias, "junction_bias"), (l.mark, "mark"), (l.loud, "loud"), (l.closed_key, "closed_key"), (l.closed_odds, "closed_odds"), (l.closed_odds_bias, "closed_odds_bias"), (l.pump, "pump"), (l.pump_bias, "pump_bias"), (l.lane_leak, "lane_leak"), (l.friction, "friction"), (l.friction_gate, "friction_gate")]
+    };
+    let field = &end.field;
+    let fine = field.theta.len();
+    let level_at = fine;
+    let glue_at = fine + field.scale.as_ref().map_or(0, |s| s.coarse.theta.len());
+    let name_of = |start: usize, len: usize| -> String {
+        let pick = |l: &holonics_engine::field::Loci, at: usize| named(l).into_iter().filter(|&(o, _)| o == at).map(|(_, n)| n).last().unwrap_or("?").to_string();
+        if start < fine {
+            pick(field.layout(), start)
+        } else if start < glue_at {
+            format!("level:{}", field.scale.as_ref().map_or("?".to_string(), |s| pick(s.coarse.layout(), start - level_at)))
+        } else {
+            format!("glue:{}:{len}", start - glue_at)
+        }
+    };
+    let ve: Vec<i32> = end.field.material().copied().collect();
+    let vm: Vec<i32> = mean.field.material().copied().collect();
+    let (first, second) = end.moments();
+    let mut lines = String::from("family\tname\tentries\tgrain\tp50\tp99\tp999\tmax\trms_end_less_mean\tmoving\tsilent12\tsilent16\tsilent20\n");
+    for (k, &(start, len, grain)) in field.families_all().iter().enumerate() {
+        if len == 0 {
+            continue;
+        }
+        let up = |v: i64| -> i64 { if grain < MATERIAL_BITS_ { v << (MATERIAL_BITS_ - grain) } else { v } };
+        let mut mags: Vec<i64> = ve[start..start + len].iter().map(|&v| up(i64::from(v).abs())).collect();
+        mags.sort_unstable();
+        let q = |f: usize| mags[((len - 1) * f) / 1000];
+        let sq: i128 = (start..start + len).map(|i| { let d = i128::from(up(i64::from(ve[i]) - i64::from(vm[i]))); d * d }).sum();
+        let rms = (sq / len as i128).max(0) as u128;
+        let rms = rms.isqrt();
+        let (mut moving, mut silent) = (0usize, [0usize; 3]);
+        for i in start..start + len {
+            if first[i] == 0 {
+                continue;
+            }
+            moving += 1;
+            let root = holonics_engine::field::deposit_root(second[i]);
+            for (s, rate) in silent.iter_mut().zip([12u32, 16, 20]) {
+                *s += usize::from(holonics_engine::field::deposit_over(first[i], root, grain, rate) == 0);
+            }
+        }
+        lines.push_str(&format!("{k}\t{}\t{len}\t{grain}\t{}\t{}\t{}\t{}\t{rms}\t{moving}\t{}\t{}\t{}\n", name_of(start, len), q(500), q(990), q(999), mags[len - 1], silent[0], silent[1], silent[2]));
+    }
+    std::fs::create_dir_all(out)?;
+    write_new(&out.join("families.tsv"), lines.as_bytes())?;
+    println!("WIDTHS families={} material={} rate={} ms={}", field.families_all().len(), field.material_len(), end.rate_bits, started.elapsed().as_millis());
+    Ok(())
+}
+
+const MATERIAL_BITS_: u32 = holonics_engine::field::MATERIAL_BITS;
+
 /// [measurement; the lead, November 21, the reach] `read-reach UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT
 /// SETTINGS…`: **the code of every place by two streams under a ruler's friction of distance**. Each row of `ROWS` (`read-far`'s table) is
 /// read whole as a passage by two streams with its odd contacts facing the past, every place at its own frontier
@@ -899,7 +1039,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" {
+        if word == "law" || word.starts_with("round:") || word.starts_with("state:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -931,6 +1071,25 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     for (name, friction) in &settings {
         let mut field = learner.field.clone();
         field.ruler_friction = friction.clone();
+        // [the lead, November 21, the precision pass] `round:g`: every material entry on its family's grain `b` rounded to `2^(−g)` where `b > g`
+        // (G-W1); `state:g`: every state rounded to `2^(−g)` after each tick (G-W3, [`holonics_engine::field::Constitution::ruler_state_grain`]).
+        if let Some(g) = name.strip_prefix("round:") {
+            let g: u32 = g.parse()?;
+            let families = field.families_all();
+            let mut grain = vec![0u32; field.material_len()];
+            for &(start, len, b) in &families {
+                grain[start..start + len].fill(b);
+            }
+            for (v, &b) in field.material_mut().zip(&grain) {
+                if b > g {
+                    let k = b - g;
+                    *v = i32::try_from(holonics_engine::field::release(i128::from(*v), k) << k).map_err(|_| "a rounded entry past 32 bits")?;
+                }
+            }
+        }
+        if let Some(g) = name.strip_prefix("state:") {
+            field.ruler_state_grain = Some(g.parse()?);
+        }
         let c: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| field.strand_codes(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
         let mut by: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         for ((group, _), cs) in rows.iter().zip(&c) {
@@ -941,7 +1100,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
             }
         }
         for (g, (sum, n)) in &by {
-            println!("REACH setting={name} group={g} places={n} nats_millionths={} ms={}", ((*sum * holonics_engine::field::ln2_face() * 1_000_000) >> 50) / (*n).max(1) as i128, started.elapsed().as_millis());
+            println!("REACH setting={name} group={g} places={n} nats_millionths={} ms={}", ((*sum * holonics_engine::field::ln2_face() * 1_000_000) >> (holonics_engine::field::READ_BITS + holonics_engine::field::LN2_BITS)) / (*n).max(1) as i128, started.elapsed().as_millis());
         }
         codes.push(c);
     }
