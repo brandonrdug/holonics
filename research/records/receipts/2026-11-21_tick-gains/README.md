@@ -92,3 +92,14 @@ return 19 to 38 against 26 to 44, but the gate 1.38 to 1.40 ms against 1.27 (9% 
 pre-scan 5 to 20% (held for the face, missed for the pre-scan), the two returns 3 to 15% shorter (missed: the gate's return longer), the section
 2 to 6 ms (not resolved). Not taken: the two gate kernels, bound by their arithmetic (83% of the multiprocessors' peak for the gate on November
 20), read their 32-bit operand slower than their 64-bit one (`agent-inferred`), and the section moves inside its own spread.
+
+## The columns' receiver distance and skin entry formed once a receiver (`col.sh`, `col.txt`)
+
+`field_contact_columns` gathers a chunk of 32 receivers a lane each; the lanes of a part then formed each receiver's distance from its place and,
+on a paced head, its skins' support entry (a search of the receiver's row), sixteen times a receiver, behind the receiver's place, whose line
+held 16% of the kernel's stall samples (`stalls_field_contact_columns.txt`). The gathering lane now forms both once and stages them beside the
+receiver. The same integers in the same order: a realization. In one hold (taken between the line's L75 cavity read and its panels; OBS
+closed, so the levels stand lower than the night's earlier holds): the card crate's suite 28 passed; 24 sections of L71 reproduced `EQUAL`;
+the columns 130 to 132 µs a launch against 164 to 175 (and 293 against 397 on the third), about 22% shorter; the section in a warmed balanced
+hold 473.5, 473.8, 473.1, 473.2 against 480.7, 478.6, 478.2, 478.6 (473.4 and 479.0, spreads 0.7 and 2.5), 5.6 ms (1.2%) shorter; three batches a
+section. Guess (fixed 04:26 UTC): the columns 10 to 25% (held), the section 2 to 5 ms (missed above, 5.6).

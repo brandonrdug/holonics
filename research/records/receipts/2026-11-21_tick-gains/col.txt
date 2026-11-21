@@ -1,0 +1,17 @@
+# col: lock taken 04:31:00 other runs: 
+COL suite 04:37:20 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 380.81s 
+COL repro_L71 04:37:34 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+COL ncu field_contact_columns old 04:37:40  DRAM Throughput % 14.15; Duration us 175.14; DRAM Throughput % 14.18; Duration us 163.65; DRAM Throughput % 11.63; Duration us 397.41;
+COL ncu field_contact_columns new 04:37:46  DRAM Throughput % 17.90; Duration us 130.21; DRAM Throughput % 17.30; Duration us 131.52; DRAM Throughput % 14.73; Duration us 292.64;
+COL warm-up 04:38:07 51.08, 2805 MHz
+COL hold 1 old 04:38:28 batches=120 last30 ms_mean=480.7 52.99, 2805 MHz
+COL hold 2 new 04:38:48 batches=120 last30 ms_mean=473.5 53.79, 2805 MHz
+COL hold 3 new 04:39:09 batches=120 last30 ms_mean=473.8 54.09, 2805 MHz
+COL hold 4 old 04:39:30 batches=120 last30 ms_mean=478.6 54.39, 2805 MHz
+COL hold 5 old 04:39:51 batches=120 last30 ms_mean=478.2 54.67, 2805 MHz
+COL hold 6 new 04:40:11 batches=120 last30 ms_mean=473.1 54.67, 2805 MHz
+COL hold 7 new 04:40:32 batches=120 last30 ms_mean=473.2 54.73, 2805 MHz
+COL hold 8 old 04:40:53 batches=120 last30 ms_mean=478.6 54.86, 2805 MHz
+# col: released 04:40:53
+COL_ALL_DONE 04:40:53
+RUN_EXIT 0 2026-11-21T04:40:53Z
