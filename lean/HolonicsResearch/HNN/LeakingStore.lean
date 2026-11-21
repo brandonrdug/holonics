@@ -32,7 +32,21 @@ holds the algebra the record's law rests on, one coordinate at a time.
    that share their first by `(1 − γ)` times it, so the six orders stand on a hexagon whose sides alternate in the
    ratio `γ`; at a multiplier that is a turn by a third a cyclic change of the order turns the holding by a third.
 
-Limits. Vectors are read one coordinate at a time except in part 5; the fixed ray, the linearization about it and
+7. **The opening under a leak** (`leaked`, `held`, `leaked_eq`, `held_eq`, `held_sub_leaked`, `held_step_at_one`,
+   `growth_is_leak`, `leak_rest_imprint`, `held_rest_imprint`; the record's §11 to §13): a pass that leaks its whole
+   lane keeps its opening at `γ ^ n`, and one that leaks its currents alone keeps it whole, the two differing by
+   `(1 − γ ^ n) x₀` and agreeing in every bit at `γ = 1`; writes that grow by `F` a tick are, at the lane's scale, a
+   leak of multiplier `1/F`; at rest a leaking lane holds nothing of its opening on a mode with `ν ≠ 1`, and a lane
+   that holds its opening keeps the opening's part `s` on that mode at `δ s/(1 − ν + δ a)`.
+
+8. **The move a reader meets** (`last_move_falls_aligned`, `last_move_falls_opposed`; the record's §14): on a
+   settling lane a mode's last move carries `μ ^ (2n)`, `μ = 1 − δ ε`; a step of the leak lowers it where `μ > 0`,
+   where successive moves are aligned, and a step back lowers it where `μ < 0`, where they are opposed. So the sign
+   of a pass's last pair of moves is the descent of the move its reader meets.
+
+Limits. Vectors are read one coordinate at a time except in part 5; in part 7 the writes are a given sequence (in the
+machine they are computed from the state, and `held_step_at_one` is the statement that needs no such reading), and
+the two rest statements are one mode's balance, with the split of a lane into its fixed ray and a mode the record's; the fixed ray, the linearization about it and
 the non-normal transient are the record's and are not stated; `lag_one_zero_iff` is the algebra of the lag-one
 covariance of a level's news under a fixed gain, `P − K S` with `S = P + r` (Mehra 1970, from training), and the
 covariance itself is not stated.
@@ -237,6 +251,95 @@ theorem third_turn_cycle (ω a b c : R) (h : ω ^ 3 = 1) :
     b + ω * c + ω ^ 2 * a = ω ^ 2 * (a + ω * b + ω ^ 2 * c) := by
   linear_combination (-(b + ω * c)) * h
 
+/-! ### 7. The opening under a leak -/
+
+/-- [definition] A pass that leaks its whole lane from its opening `x₀`: `x ← γ x + g`. -/
+def leaked (γ x₀ : R) (g : ℕ → R) : ℕ → R
+  | 0 => x₀
+  | n + 1 => γ * leaked γ x₀ g n + g n
+
+/-- [definition] A pass that leaks its currents and holds its opening: `x ← x₀ + γ (x − x₀) + g`. -/
+def held (γ x₀ : R) (g : ℕ → R) : ℕ → R
+  | 0 => x₀
+  | n + 1 => x₀ + γ * (held γ x₀ g n - x₀) + g n
+
+/-- [proved-standard; formal-checked] **A leak of the whole lane keeps the opening at `γ ^ n`.** -/
+theorem leaked_eq (γ x₀ : R) (g : ℕ → R) (n : ℕ) :
+    leaked γ x₀ g n = γ ^ n * x₀ + store γ g n := by
+  induction n with
+  | zero => simp [leaked, store]
+  | succ n ih =>
+    rw [leaked, ih, store]
+    ring
+
+/-- [proved-standard; formal-checked] **A leak of the currents alone keeps the opening whole.** -/
+theorem held_eq (γ x₀ : R) (g : ℕ → R) (n : ℕ) :
+    held γ x₀ g n = x₀ + store γ g n := by
+  induction n with
+  | zero => simp [held, store]
+  | succ n ih =>
+    rw [held, ih, store]
+    ring
+
+/-- [proved-standard; formal-checked] Along one sequence of writes the two passes differ by what the leak took of
+the opening. -/
+theorem held_sub_leaked (γ x₀ : R) (g : ℕ → R) (n : ℕ) :
+    held γ x₀ g n - leaked γ x₀ g n = (1 - γ ^ n) * x₀ := by
+  rw [held_eq, leaked_eq]
+  ring
+
+/-- [proved-standard; formal-checked] **With no leak the held opening's step is the built step**, whatever the write
+was computed from: a friction founded at zero keeps every bit. -/
+theorem held_step_at_one (x₀ x g : R) : x₀ + 1 * (x - x₀) + g = x + g := by
+  ring
+
 end Word
+
+/-- [proved-standard; formal-checked] **At a lane's scale a growth of the writes is a leak.** A lane that takes
+writes growing by `F` a tick, read at the scale `F ^ n`, is a store of multiplier `1/F`. -/
+theorem growth_is_leak (F : ℝ) (hF : F ≠ 0) (x h : ℕ → ℝ) (hx : ∀ n, x (n + 1) = x n + F ^ n * h n) (n : ℕ) :
+    x (n + 1) / F ^ (n + 1) = F⁻¹ * (x n / F ^ n) + F⁻¹ * h n := by
+  rw [hx n, pow_succ]
+  field_simp
+
+/-- [proved-standard; formal-checked] **At rest a leaking lane holds nothing of its opening on a mode with `ν ≠ 1`.**
+At the rest fill `M = 1/δ` a mode's place `u` obeys `M u = ((1 − δ) M + ν) u`. -/
+theorem leak_rest_imprint (δ ν u M : ℝ) (hδ : δ ≠ 0) (hM : M = 1 / δ) (hν : ν ≠ 1)
+    (hu : M * u = ((1 - δ) * M + ν) * u) : u = 0 := by
+  have h1 : δ * M = 1 := by rw [hM]; exact mul_one_div_cancel hδ
+  have h2 : (1 - ν) * u = 0 := by linear_combination hu - u * h1
+  rcases mul_eq_zero.mp h2 with h | h
+  · exact absurd (by linarith) hν
+  · exact h
+
+/-- [proved-standard; formal-checked] **A lane that holds its opening keeps it at rest, at `δ s/(1 − ν + δ a)`.**
+The opening has the part `a` along the fixed ray and `s` on the mode; the rest fill is `M = a + 1/δ`, and the mode's
+place obeys `M u = δ s + ((1 − δ) M + ν) u`. -/
+theorem held_rest_imprint (δ ν a s u M : ℝ) (hδ : δ ≠ 0) (hM : M = a + 1 / δ) (hden : 1 - ν + δ * a ≠ 0)
+    (hu : M * u = δ * s + ((1 - δ) * M + ν) * u) : u = δ * s / (1 - ν + δ * a) := by
+  have h1 : δ * M = δ * a + 1 := by rw [hM, mul_add, mul_one_div_cancel hδ]
+  rw [eq_div_iff hden]
+  linear_combination hu - u * h1
+
+/-! ### 8. The move a reader meets, and the pair that founds the friction -/
+
+/-- [proved-standard; formal-checked] **Where a settling lane's moves are aligned, more leak lowers the move its reader
+meets.** A mode's multiplier is `μ = 1 − δ ε` with `ε = 1 − ν > 0`; a step `h` of the leak that keeps it from crossing
+zero lowers the `2n`-th power the last move carries. -/
+theorem last_move_falls_aligned (μ ε h : ℝ) (n : ℕ) (hn : n ≠ 0) (hε : 0 < ε) (hh : 0 < h) (hμ : h * ε ≤ μ) :
+    (μ - h * ε) ^ (2 * n) < μ ^ (2 * n) := by
+  have h0 : 0 ≤ μ - h * ε := by linarith
+  have h1 : μ - h * ε < μ := by nlinarith [mul_pos hh hε]
+  exact pow_lt_pow_left₀ h1 h0 (by omega)
+
+/-- [proved-standard; formal-checked] **Where they are opposed, less leak lowers it.** -/
+theorem last_move_falls_opposed (μ ε h : ℝ) (n : ℕ) (hn : n ≠ 0) (hε : 0 < ε) (hh : 0 < h) (hμ : μ + h * ε ≤ 0) :
+    (μ + h * ε) ^ (2 * n) < μ ^ (2 * n) := by
+  have e1 : (μ + h * ε) ^ (2 * n) = (-(μ + h * ε)) ^ (2 * n) := ((even_two_mul n).neg_pow _).symm
+  have e2 : μ ^ (2 * n) = (-μ) ^ (2 * n) := ((even_two_mul n).neg_pow _).symm
+  rw [e1, e2]
+  have h0 : 0 ≤ -(μ + h * ε) := by linarith
+  have h1 : -(μ + h * ε) < -μ := by nlinarith [mul_pos hh hε]
+  exact pow_lt_pow_left₀ h1 h0 (by omega)
 
 end Holonics.HNN.LeakingStore

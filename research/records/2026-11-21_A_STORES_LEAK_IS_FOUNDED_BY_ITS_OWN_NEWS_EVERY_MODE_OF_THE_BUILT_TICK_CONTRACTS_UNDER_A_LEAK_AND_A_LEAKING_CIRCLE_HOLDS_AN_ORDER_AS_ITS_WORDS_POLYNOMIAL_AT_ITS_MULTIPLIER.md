@@ -7,6 +7,10 @@ of the machine was read here and nothing in the engine was built. Refs #404, #41
 left the leak's strength to be founded as a store's balance, stated at its consumer. This record states that law (§3), reads the two
 receipts of the built tick against each other first (§2), and folds in that record's §6 and §7, the polygons and the fork (§6).
 
+Amended 02:35 to 03:06 UTC the same night (§10 to §14), after the engineering thread read the six guesses of §8 and then the scan
+with the opening held: the reads are scored, the law of §3 is amended twice (a pass's opening is held, §12; the deposit reads the pass's
+last pair of moves in place of the pooled cosine, §14), and what the pooled deposit founds on a pass of 8 ticks is stated as a number.
+
 On the objects: the navigator is a site's tick, a clock inside a pass; the terrain is what a tick adds to a face lane; the kernel is the
 lane's scale, which no reader distinguishes, since every reader takes the lane at unit power; the cokernel is the news, the arrival less what
 the lane already releases; the landmark is the fixed ray a pass runs to.
@@ -209,15 +213,223 @@ recover and is the least certain.
 The arm the law asks, as one change beside its control from one saved state: the lane's friction with its deposit, founded at zero,
 at a count of ticks past four. Its acceptance is the engineering thread's to fix, with the writes first.
 
+## 10. The reads, scored
+
+Read by the engineering thread at 02:33 UTC ([its record](2026-11-21_THE_BUILT_TICKS_RATES_STAND_STILL_ON_ITS_FILL_CLOCK_A_THIRD_OF_A_SITES_MODES_IS_RELEASED_A_THIRD_HELD_AND_A_THIRD_BOOSTED_AND_THE_CONTACT_KERNELS_WAIT_ON_THEIR_LOADS.md) §8, `receipts/2026-11-21_tick-gains/leak_reads.txt`), and read here at
+that source: L71's end state, the residual probe's 240 sites (109 open places for the held code), the ticks raised to 17, the ruler's lane
+leak `x ← (1 − δ)x + g` at `δ` of ¼, ½, ¾, 871/1024 and 1, and the line's own four ticks with no leak; 46 seconds on 24 host threads,
+no card. `receipts/2026-11-21_leak-balance/LEAK_SCORES.txt` keeps the lines.
+
+| guess | read | |
+|---|---|---|
+| B1, built tick, ticks 5 to 16: the cosine above 0.9 at every lane | 0.964 to 0.986 | held |
+| B1, the line's four ticks: positive at every lane, 0.2 to 0.8 | −0.421 to +0.197, negative at six lanes of seven | missed |
+| B2, `δ = ½`: the ratio of successive moves level in 0.5 to 0.8 at ticks 10 to 16 | 0.611 to 0.623; the built tick 0.787 to 0.866 | held |
+| B3, ticks 1 to 16: the cosine falls with `δ` and changes sign between ¾ and 1 | it falls at every lane, and is negative at six lanes at `δ = 0` | missed as stated |
+| the rest `δ* = 0.851` of §5.2, read over ticks 5 to 16 | the sign changes between ¾ and 0.85 at lanes 1 to 4 and between 0.85 and 1 at lanes 5 to 7; the moves fall 0.34 to 0.37 a tick at 0.85 (0.311 derived) | held where derived |
+| B4, up to 0.85 no move at tick 16 larger than at tick 6 | 0.000 to 0.096 of it | held |
+| B5, the held code at 17 ticks and `δ = ½`: 0.05 to 0.5 nats above the four-tick read | 4.137 against 1.655 nats a place, 2.48 above; no leak 3.422; `δ` of ½, ¾, 0.85, 1 read 4.137, 4.139, 4.140, 4.141 | missed |
+| F3, the circles' `\|γ\|`: median under 0.6, under a tenth near a third of a turn | median 0.400, share 0.0001 | held |
+
+The three misses are one error. §2's fit and §5's rates were read on ticks 5 to 10, and B1's second half, B3 and B5 carried them to
+the ticks before, against §5.3 and §5.5 of this record, which had said that the trained ticks stand near their balance by a growth of
+their writes and that a cosine weighed by power answers what is loud in a pass.
+
+## 11. A pass has two stages, and the pooled deposit reads the first
+
+By the read's own moves (`move_by_tick` of the 17-tick pass with no leak, a root of summed squares over the 240 sites and the seven
+face lanes together), the products of successive moves stand at 288.7, 209.9, 67.2, 8.6, 1.4 and 0.4 for the pairs (1,2) to (6,7), in
+units of 10¹², and 0.35 for the nine pairs after. For the seven lanes together the first two pairs hold 86.5% of that weight, the
+first three 98.1%, and the pairs from (5,6) on, where the law's rest was read, 0.37%. By lane the weights differ: the by-pair read of
+§14 shows lanes 1, 3 and 4 carrying about a tenth of their pooled weight from the pair (4,5) on (`agent-inferred` from their pooled
+−0.003 against pairs of −0.09, −0.22 and +0.03), and lanes 5 to 7 less than the seven together. Three things follow.
+
+1. **The pooled cosine at 8 ticks is near the 17-tick figure**, within about 0.005 by lane (`agent-inferred`; no pass of 8 ticks was
+   read): −0.003, +0.232, −0.002, −0.011, −0.393, −0.324, −0.178 (face lanes 1 to 7). The line's four ticks read −0.112, +0.197,
+   −0.073, −0.071, −0.421, −0.344, −0.241. The first sending to the engineering thread said "within 0.001", from the seven lanes'
+   moves together, and inferred the pair (3,4) at about +0.65 at lanes 1, 3 and 4 (guess H3); it reads +0.01 to +0.03 there (§14),
+   and both were corrected in the second sending.
+2. **Under the deposit as §3 wrote it, `d` moves at one lane.** At lanes 5 to 7 the cosine is negative at founding and `d` stays at
+   zero. At lanes 1, 3 and 4 it stands within 0.011 of zero on its negative side, and `d` hovers at its founding. At lane 2 it reads
+   +0.232, then +0.074 at `δ = ¼` and −0.069 at `δ = ½` (a scan that leaked every lane together), so `d` rises there to `δ` near 0.38
+   (`d` 0.6, `ℓ = log₂(1 + d)` 0.7). The rest near `d = 5.7` is the second stage's, which holds under 2% of the weight. An arm of 8
+   ticks with this law beside 8 ticks without it differs by one lane's light leak and is nearly its own control. That is the number sent
+   to the engineering thread (guess H2), with the advice not to give that arm its day of card.
+3. **On a lane's ray a growth of the writes is a leak** (Lean `growth_is_leak`): a lane that takes writes growing by `F` a tick is, at
+   the scale `F^n`, a store of multiplier `1/F`, and every reader takes the lane at unit power. The trained writes grow 2.1 and 2.4
+   times at ticks 2 and 3 (§5.3), multipliers of 0.48 and 0.42. On the line's four ticks the two pairs of moves read −0.09 to −0.05
+   and −0.15 to −0.12 at lanes 1, 3 and 4, −0.08 and +0.48 at lane 2, and −0.71 to −0.56 then +0.15 to +0.17 at lanes 5 to 7 (§14's
+   by-pair lines), where the ticks past the trained ones read +0.95 to +1.00 from the pair (5,6). So the trained ticks do not lag,
+   and the pooled deposit calls for no friction on them at six lanes: the face's comparison gave them a growth of currents where the
+   store had no friction (`agent-inferred`; one state, 240 sites). The first sending said those ticks stand at the law's rest at
+   lanes 1, 3 and 4, "within 0.011 of zero"; that figure pooled two stages, and by pair those lanes are mildly opposed. The fill
+   clock of the engineering record stands on the ticks past the trained ones, where the writes stop growing and nothing is read.
+
+The two stages, then. On the first ticks the chart moves 73, 64 and 51 degrees, the moves are loud and mostly opposed, and the code
+is made. From the fifth the lane runs to the tick's fixed ray, the moves are aligned at 0.96 to 0.99, and there the law's numbers held.
+One friction a lane, the same at every tick, cannot stand at zero on the first stage and near 0.85 on the second; in the scan a set
+leak makes the first moves oppose more at every lane (lane 1 from −0.003 at `δ = 0` to −0.448 at ½).
+
+At lanes 5 to 7 the deposit's sign at founding points below zero, where §3 holds `d`. On the ray a multiplier above one is a write
+taken at less than its strength, so the sign reads that those lanes' first steps overshoot. It is recorded as a reading of the sign,
+and nothing is built on it.
+
+## 12. A leak keeps the opening only where the opening is held
+
+§3 wrote `x ← γx + g` on the whole lane. Along a pass's writes that is `x^n = γ^n x⁰ + Σ_j γ^(n−1−j) g^j` (Lean `leaked_eq`): the
+opening is released with everything else, at `γ^n`, where the built tick keeps it as a term of its sum. What re-enters at every tick is
+the moment, at the turned modes, through the values and the probes (`crates/engine/src/field.rs`: `v_t += s_t`, `p_t += s_t`); the
+site's own row and its two neighbours' (`E(u_t)`, `E₋`, `E₊`) and the opening's bias enter once, in `x⁰`. The engineering read shows
+the release: the held code at 17 ticks is one figure within 0.004 nats a place at four strengths from `δ = ½` to 1 (4.137 to 4.141),
+where the built tick reads 3.422 at 17 ticks and 1.655 at four (`agent-inferred`: it is the code of the rest a leaking lane runs to,
+which the moment and the neighbours' rests feed and the opening does not).
+
+So the law of §3 is amended: **the friction acts on the lane's currents, and the opening is held.**
+
+```text
+x^(k+1) = x⁰ + γ (x^k − x⁰) + g^k            that is   x = x⁰ + J,   J ← γ J + g,   J⁰ = 0
+```
+
+Along a pass's writes it is `x^n = x⁰ + Σ_j γ^(n−1−j) g^j` (Lean `held_eq`; the two forms differ by `(1 − γ^n) x⁰`,
+`held_sub_leaked`). At `d = 0` it is the built step in every bit, whatever the write was computed from (`held_step_at_one`), so a
+founding at zero still reproduces the line. Its reasons were in the tree: `tower.field-tick-contraction` states its contraction for
+a tick with a held source, `F(x; s)`, and the carry circle charges its drive through its friction
+(`contact.carry-coupling-through-the-leak`). A leak with no held source is the decay of an initial charge, and a store is charged by
+a flux through a port.
+
+What each pass keeps of its opening at rest, on one mode of exponent `ν` across the fixed ray, the opening holding the part `a` along
+the ray and `s` on the mode, in units of one write:
+
+| pass | the mode's place at rest | on the way |
+|---|---|---|
+| built, `x ← x + g` | 0 | as the fill to the power `−(1 − ν)` (§2) |
+| leaked, `x ← γx + g` | 0 where `ν ≠ 1` (Lean `leak_rest_imprint`) | as `(1 − δ(1 − ν))^k` |
+| held, `x ← x⁰ + γ(x − x⁰) + g` | `δ s/(1 − ν + δ a)` (Lean `held_rest_imprint`) | to that place, at the same rate |
+
+A planted lane on the host (`opening.py`: the write computed from the ray, an opening of `a = 0.12`, `s = 0.10`, about a sixth of a
+late write, an estimate from the residual probe's pooled ratios; the opening's own place is `s/a = 0.833`) reads the held pass at 400
+ticks at 0.0313, 0.0576 and 0.322 for `ν` of −0.54, +0.19 and +0.9 at `δ = ½` (the law 0.0313, 0.0575, 0.3125) and at 0.0603, 0.108
+and 0.475 at `δ = 1` (0.0602, 0.1075, 0.4545; the law is the first order in `s`); the leaked pass reads 0 in every row; the built pass
+at 17 ticks still holds −0.001, +0.025 and +0.596.
+
+Two things follow (`agent-inferred`, a planted lane and one state's ends):
+- **What a settled pass holds of its opening lives on the tick's slow modes.** At the ends read on L71 (`ν` from −0.54 to +0.19) and
+  `δ` from ½ to 1, a held opening stands at rest at 4% to 13% of its own place; at a mode of `ν = 0.9` at 38% to 57% (the planted
+  read), and as `ν` nears one it nears the opening's own place. A tick whose every mode is fast settles to a ray that says little of its source however the source is held.
+  L71's four ticks never asked the tick for a slow mode that carries the opening.
+- **Holding the opening does not bring back the raised read on this state** (guess H4): the opening's place at rest grows with `δ`,
+  the reverse of the plain leak's order, and stays a small part of a state the line was not trained to read.
+
+## 13. What was sent, and the read offered
+
+Sent to the engineering thread between 02:52 and 02:55 UTC through the coordinator, in answer to its two questions (how `d` moves over the first
+laps at 8 ticks; which chart `d` stands in):
+
+- the number of §11.2 and its consequence for the arm;
+- the amendment of §12, before its build goes further;
+- the chart: `ℓ = log₂(1 + d)`, `γ = 2^(−ℓ)`, so a deposit's step is a ratio of the multiplier, the carry circle's own chart
+  (`agent-inferred`); the block's rate is its own part's, declared at founding, and a founding at zero keeps the line's bits. A
+  founding at a rest read on the late cosine was advised against: it gives up reproducing the line, and that rest is the second
+  stage's.
+
+The read offered before any card time is the engineering thread's 46-second scan with the opening held and the cosine printed by
+pair of ticks. Its guesses were fixed at 02:52:10 UTC (`GUESS.txt`), before the answer was sent:
+
+- H1: on a pass of 8 ticks with no leak the pooled cosine by lane stands within 0.005 of the 17-tick figure.
+- H2: over the first lap at 8 ticks under the deposit as merged, `ℓ` stays under 0.05 at lanes 5 to 7 and under 0.2 at lanes 1, 3 and
+  4, and rises at lane 2 alone, to between 0.4 and 1.0; the two arms' held codes at their lap means agree within the scatter between
+  laps.
+- H3: with no leak the pairs (1,2) and (2,3) read under +0.25 at every lane, the pair (3,4) between +0.4 and +0.85 at lanes 1, 3 and
+  4, and every pair from (4,5) above +0.9.
+- H4, the least certain: with the opening held the 17-tick held code falls as `δ` rises from ½ to 1, reads 0.1 to 1.0 nats under the
+  plain leak's 4.141 at `δ = 1`, and stays above 3.0 nats at every `δ` of the scan.
+
+What the reads leave to construct, said by its cause: a pass that settles and still answers needs a tick with a slow mode that
+carries its source, and a friction that follows a pass's own stage. The law here supplies the lane's friction and its rest on a
+settling stage; the trained ticks make their route by the growth of their currents. The join of the two is a pass whose reading
+tick stands in its settled stage, and it is read first on the host by the scan above (run at 02:54 UTC: §14).
+
+## 14. The read with the opening held, and the pair the deposit reads
+
+The engineering thread ran the offered scan at 02:54 UTC ([its record](2026-11-21_THE_BUILT_TICKS_RATES_STAND_STILL_ON_ITS_FILL_CLOCK_A_THIRD_OF_A_SITES_MODES_IS_RELEASED_A_THIRD_HELD_AND_A_THIRD_BOOSTED_AND_THE_CONTACT_KERNELS_WAIT_ON_THEIR_LOADS.md) §8.1,
+`receipts/2026-11-21_tick-gains/leak_reads_opening_held.txt`, 74 seconds on 24 host threads, no card): the same state, sites and ticks,
+the ruler's leak on the currents with the opening held, and the cosine printed by pair of moves. Its host law now holds the opening and
+is the built tick in every bit at `d = 0`. H1 to H4 had been fixed at 02:52:10 UTC in a file on this thread's working branch, which was
+not on `main` when the read ran; H4's bound was in the message sent before the read, and H1 to H3 were not. The engineering thread
+sent its numbers unscored, and they are scored here from its receipt.
+
+| `δ` | held code at 17 ticks, opening held | opening leaked (§10) |
+|---|---|---|
+| ¼ | 4.004 | 4.088 |
+| ½ | 3.991 | 4.137 |
+| ¾ | 3.932 | 4.139 |
+| 871/1024 | 3.911 | 4.140 |
+| 1 | 3.877 | 4.141 |
+
+Nats a place over the 109 open places; no leak reads 3.422 at 17 ticks and 1.655 at the line's four.
+
+- **H4 held** in its three parts: the code falls as `δ` rises from ½ to 1 (the plain leak's rose), it reads 0.264 nats under the
+  plain leak's at `δ = 1`, and it stays above 3.0 at every `δ`. The order is §12's: the opening's place at rest grows with `δ`.
+- **H3 held at the first pair and from the fifth, and missed between.** By pair of moves on the built tick, lanes 1 to 7:
+
+  | pair | lane 1 | 2 | 3 | 4 | 5 | 6 | 7 | guess |
+  |---|---|---|---|---|---|---|---|---|
+  | (1,2) | −0.086 | −0.076 | −0.040 | −0.045 | −0.708 | −0.634 | −0.555 | under +0.25: held |
+  | (2,3) | −0.223 | +0.493 | −0.174 | −0.161 | +0.166 | +0.142 | +0.141 | under +0.25: missed at lane 2 |
+  | (3,4) | +0.029 | +0.156 | +0.011 | +0.027 | +0.509 | +0.568 | +0.268 | +0.4 to +0.85 at lanes 1, 3, 4: missed |
+  | (4,5) | +0.866 | +0.818 | +0.782 | +0.806 | +0.712 | +0.681 | +0.774 | above +0.9: missed |
+  | (5,6) | +0.981 | +0.967 | +0.963 | +0.967 | +0.946 | +0.949 | +0.954 | above +0.9: held, and every pair after |
+
+  The miss is §11's error by lane: the guess took each lane's weights from the seven lanes' moves together.
+- H1 was not read (no pass of 8 ticks), and H2 was not run: the engineering thread gave the arm no card time, on §11.2.
+- **The rest stands where §5.2 derived it with the opening held.** Over the pairs from (5,6) the cosine at `δ = 871/1024` reads −0.449,
+  −0.303, +0.001, −0.012, +0.320, +0.294, +0.202 by lane: it crosses zero between ¾ and 0.85 at lanes 1 and 2, at 0.85 at lanes 3
+  and 4, and between 0.85 and 1 at lanes 5 to 7. Holding the opening moves the place a lane settles to and leaves its multipliers.
+
+**The deposit reads the pass's last pair of moves.** The engineering thread asked whether a deposit weighed to the late pairs is what
+the law wants. It is, and §3's pooled form was this record's mis-statement of §5.2. The rest §5.2 derives is the sign change of a
+settling lane's news, the statement of a store near its steady state; the first ticks are a route far from rest, their pairs are the
+face's comparison's to train, and a sum weighed by power is ruled by them. Stated at its consumer, the friction descends the move the
+reader meets: on a settling lane a mode's last move carries `μ^(2n)`, `μ = 1 − δ(1 − ν)`, so a step of the leak lowers it where `μ > 0`,
+where the last two moves are aligned, and a step back lowers it where `μ < 0`, where they are opposed (Lean
+`last_move_falls_aligned`, `last_move_falls_opposed`). So
+
+```text
+deposit    c = Σ_t ⟨Δr̂^(K−1), Δr̂^(K−2)⟩ / Σ_t ‖Δr̂^(K−1)‖ ‖Δr̂^(K−2)‖     the pass's last pair of moves, over a section's sites;
+           d rises where c > 0, falls where c < 0, rests at c = 0           K the tick the face reads
+```
+
+with no weight set by hand: the pair is the reader's. Two bounds on it (`agent-inferred`):
+- **Its scope is a pass that has contracted by its reading tick.** At the line's four ticks the last pair is the pair (2,3), a route
+  pair (+0.48 at lane 2, −0.15 at lane 1), and the law's reason does not reach it; the block stays at its founding there. A test of
+  "contracted" that needs no declared count is the pass's own move against its tolerance, the count of `tower.field-tick-contraction`,
+  and it is not built.
+- **The pair is read above the grain.** At `δ = 871/1024` and 17 ticks the last moves are 79 to 169 units over the region and the
+  pairs (14,15) and (15,16) read −0.31 to +0.14, the release's rounding.
+
+What it founds at 8 ticks is already in the engineering thread's table, at the pair (6,7) with the opening held: +0.68 to +0.85 at
+`δ = ¾`, −0.37 to +0.40 at 871/1024, −0.91 to −0.68 at 1, so by a line `d` rests near `δ` of 0.82, 0.83, 0.87, 0.86, 0.90, 0.90 and
+0.89 at lanes 1 to 7. Guesses fixed 03:04:05 UTC before any of it is run (`GUESS.txt`): H5, the last pair's deposit at 8 ticks from
+zero rests `d` at `δ` between 0.78 and 0.95 at every lane, and the held code read at 8 ticks at that rest stands between 3.7 and 4.0
+nats a place; H6, a pass of 8 ticks with no leak reads 2.6 to 3.2.
+
+The caution sent with it: this friction settles a pass fastest and says nothing of what the settled lane holds. On L71 the settled
+lane holds little of its source (3.9 nats), because the modes read are fast and a held opening rests at `δ s/(1 − ν + δ a)`, 4% to
+13% of its own place (§12). Whether the face's comparison trains a slow mode that carries the opening is that arm's question, from
+about 2.2 nats behind the line's four-tick read, and it was advised not to take a day of card on what is read so far.
+
 ## 9. Lean, atlas, receipts, sources
 
-- Lean: `lean/HolonicsResearch/HNN/LeakingStore.lean`, 20 statements and one definition, on `propext`, `Classical.choice` and
+- Lean: `lean/HolonicsResearch/HNN/LeakingStore.lean`, 29 statements and three definitions (seven statements and two definitions
+  added with §12: `leaked`, `held`, `leaked_eq`, `held_eq`, `held_sub_leaked`, `held_step_at_one`, `growth_is_leak`,
+  `leak_rest_imprint`, `held_rest_imprint`; two with §14: `last_move_falls_aligned`, `last_move_falls_opposed`), on `propext`, `Classical.choice` and
   `Quot.sound`; built alone (`lake build HolonicsResearch.HNN.LeakingStore`). The whole research library was not rebuilt here: the
   module adds names under its own namespace and imports Mathlib alone, so the root's closure is inferred, stated apart.
-- Atlas: `store.leak-founded-by-own-news` and `contact.leaking-circle-word-polynomial` (new); notes on
+- Atlas: `store.leak-founded-by-own-news` and `contact.leaking-circle-word-polynomial` (new), `store.leak-holds-its-opening` (new with
+  §12 and §14, which also amend the first); notes on
   `tower.field-tick-rates-on-the-fill-clock`, `tower.field-tick-contraction` and `store.finite-quality`.
-- Receipts: `receipts/2026-11-21_leak-balance/` (`GUESS.txt`, `crosscheck.py` and `.txt`, `planted.py` and `.txt`, `fork_model.py` and
-  `.txt`). Each script ran in under a minute on one host thread; no card.
+- Receipts: `receipts/2026-11-21_leak-balance/` (`GUESS.txt`, `LEAK_SCORES.txt`, `crosscheck.py` and `.txt`, `planted.py` and `.txt`,
+  `fork_model.py` and `.txt`, `opening.py` and `.txt`). Each script ran in under a minute on one host thread; no card.
 - Read at source: the engineering record of November 21 and its receipts (`leak.txt`, `polygons.txt`, `fork.txt`),
   `receipts/2026-11-20_engineering/tick_residual_L71.txt`, `docs/THE_ENGINE.md` §2, `crates/engine/src/field.rs` (the forward's
   equations) and `crates/engine/src/contact.rs` (`pass_with_held_probed`: a tick's operands take no tick index; the index enters where

@@ -4,9 +4,14 @@ For [the record](../../2026-11-21_A_STORES_LEAK_IS_FOUNDED_BY_ITS_OWN_NEWS_EVERY
 no state of the machine.
 
 - `GUESS.txt`: the guesses for the reads the record offers, fixed 02:22 UTC before any is read.
+- `LEAK_SCORES.txt`: those guesses against the engineering thread's reads of 02:33 UTC (`../2026-11-21_tick-gains/leak_reads.txt`), with
+  the weights of the pooled cosine by pair of ticks. `GUESS.txt` then holds H1 to H4, fixed 02:52 UTC, for the scan with the opening held (scored in the same file from
+  `../2026-11-21_tick-gains/leak_reads_opening_held.txt`), and H5 and H6, fixed 03:04 UTC, for the deposit read on a pass's last pair of moves.
 - `crosscheck.py`, `crosscheck.txt`: the residual of November 20 read against the finite differences of November 21 (the slowest mode's
   exponent and the fill's offset), the three kinds against the fill, and a lane leak's multipliers and counts of ticks.
 - `planted.py`, `planted.txt`: a planted tick of one lane (97 places, exponents from -0.54 to +0.19, largest singular value 6, as a full
   triangle and as six entries): the built tick, a scan of the leak, the friction deposited from zero by the cosine of successive moves,
   a planted flip, and jittered arrivals.
 - `fork_model.py`, `fork_model.txt`: the six closing orders of three arrivals on a leaking store and at a multiplier that turns by a third.
+- `opening.py`, `opening.txt`: a planted lane whose write is computed from its ray, run as the built pass, a leak of the whole lane and
+  a leak of the currents with the opening held; the place a mode keeps of the opening at 8, 17 and 400 ticks against the record's §12.
