@@ -1,0 +1,168 @@
+pattern:count:d0	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d1	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d2	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d3	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d4	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d5	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d6	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:count:d7	1, 2, 3, 4, 5, 6, 	7, 8, 9
+pattern:tens:d0	10, 20, 30, 40, 	50, 60
+pattern:tens:d1	10, 20, 30, 40, 	50, 60
+pattern:tens:d2	10, 20, 30, 40, 	50, 60
+pattern:tens:d3	10, 20, 30, 40, 	50, 60
+pattern:tens:d4	10, 20, 30, 40, 	50, 60
+pattern:tens:d5	10, 20, 30, 40, 	50, 60
+pattern:tens:d6	10, 20, 30, 40, 	50, 60
+pattern:tens:d7	10, 20, 30, 40, 	50, 60
+pattern:letters:d0	a b c d e f g 	h i j
+pattern:letters:d1	a b c d e f g 	h i j
+pattern:letters:d2	a b c d e f g 	h i j
+pattern:letters:d3	a b c d e f g 	h i j
+pattern:letters:d4	a b c d e f g 	h i j
+pattern:letters:d5	a b c d e f g 	h i j
+pattern:letters:d6	a b c d e f g 	h i j
+pattern:letters:d7	a b c d e f g 	h i j
+pattern:brackets:d0	((()))\n(())\n((((	))))
+pattern:brackets:d1	((()))\n(())\n((((	))))
+pattern:brackets:d2	((()))\n(())\n((((	))))
+pattern:brackets:d3	((()))\n(())\n((((	))))
+pattern:brackets:d4	((()))\n(())\n((((	))))
+pattern:brackets:d5	((()))\n(())\n((((	))))
+pattern:brackets:d6	((()))\n(())\n((((	))))
+pattern:brackets:d7	((()))\n(())\n((((	))))
+pattern:lists:d0	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d1	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d2	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d3	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d4	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d5	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d6	[[1, 2], [3, 4], [5, 	6]]
+pattern:lists:d7	[[1, 2], [3, 4], [5, 	6]]
+pattern:code:d0	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d1	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d2	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d3	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d4	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d5	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d6	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:code:d7	def f(x):\n    return (x + (2 * (x - 1	)))
+pattern:alternate:d0	ab ab ab ab ab 	ab ab
+pattern:alternate:d1	ab ab ab ab ab 	ab ab
+pattern:alternate:d2	ab ab ab ab ab 	ab ab
+pattern:alternate:d3	ab ab ab ab ab 	ab ab
+pattern:alternate:d4	ab ab ab ab ab 	ab ab
+pattern:alternate:d5	ab ab ab ab ab 	ab ab
+pattern:alternate:d6	ab ab ab ab ab 	ab ab
+pattern:alternate:d7	ab ab ab ab ab 	ab ab
+pattern:colours:d0	red blue red blue red blue 	red blue
+pattern:colours:d1	red blue red blue red blue 	red blue
+pattern:colours:d2	red blue red blue red blue 	red blue
+pattern:colours:d3	red blue red blue red blue 	red blue
+pattern:colours:d4	red blue red blue red blue 	red blue
+pattern:colours:d5	red blue red blue red blue 	red blue
+pattern:colours:d6	red blue red blue red blue 	red blue
+pattern:colours:d7	red blue red blue red blue 	red blue
+pattern:doubles:d0	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d1	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d2	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d3	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d4	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d5	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d6	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:doubles:d7	1 + 1 = 2\n2 + 2 = 4\n3 + 3 = 	6
+pattern:sums:d0	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d1	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d2	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d3	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d4	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d5	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d6	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:sums:d7	2 + 3 = 5\n4 + 1 = 5\n6 + 2 = 	8
+pattern:days:d0	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d1	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d2	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d3	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d4	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d5	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d6	Monday, Tuesday, Wednesday, 	Thursday
+pattern:days:d7	Monday, Tuesday, Wednesday, 	Thursday
+pattern:repeat:d0	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d1	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d2	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d3	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d4	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d5	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d6	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:repeat:d7	the cat sat.\nthe cat sat.\nthe cat 	sat.
+pattern:copy:d0	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d1	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d2	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d3	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d4	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d5	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d6	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:copy:d7	copy: 7 3 9 1\ncopy: 7 3 9 1\ncopy: 4 8 2 6\ncopy: 	4 8 2 6
+pattern:reverse:d0	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d1	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d2	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d3	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d4	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d5	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d6	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:reverse:d7	reverse: 1 2 3 -> 3 2 1\nreverse: 4 5 6 -> 6 5 4\nreverse: 7 8 9 -> 	9 8 7
+pattern:close:d0	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d1	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d2	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d3	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d4	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d5	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d6	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:close:d7	( [ { } ] )\n[ ( ) ]\n{ [ ( 	) ] }
+pattern:call:d0	for i in range(10):\n    print(i	))
+pattern:call:d1	for i in range(10):\n    print(i	))
+pattern:call:d2	for i in range(10):\n    print(i	))
+pattern:call:d3	for i in range(10):\n    print(i	))
+pattern:call:d4	for i in range(10):\n    print(i	))
+pattern:call:d5	for i in range(10):\n    print(i	))
+pattern:call:d6	for i in range(10):\n    print(i	))
+pattern:call:d7	for i in range(10):\n    print(i	))
+pattern:else:d0	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d1	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d2	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d3	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d4	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d5	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d6	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:else:d7	if x == 1:\n    return True\nelse:\n    return 	False
+pattern:add:d0	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d1	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d2	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d3	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d4	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d5	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d6	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:add:d7	1 + 2 = 3\n2 + 3 = 5\n3 + 4 = 	7
+pattern:sub:d0	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d1	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d2	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d3	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d4	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d5	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d6	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:sub:d7	10 - 3 = 7\n9 - 4 = 5\n8 - 2 = 	6
+pattern:times:d0	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d1	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d2	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d3	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d4	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d5	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d6	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:times:d7	2 * 3 = 6\n3 * 3 = 9\n4 * 3 = 	12
+pattern:evens:d0	2, 4, 6, 8, 	10, 12
+pattern:evens:d1	2, 4, 6, 8, 	10, 12
+pattern:evens:d2	2, 4, 6, 8, 	10, 12
+pattern:evens:d3	2, 4, 6, 8, 	10, 12
+pattern:evens:d4	2, 4, 6, 8, 	10, 12
+pattern:evens:d5	2, 4, 6, 8, 	10, 12
+pattern:evens:d6	2, 4, 6, 8, 	10, 12
+pattern:evens:d7	2, 4, 6, 8, 	10, 12

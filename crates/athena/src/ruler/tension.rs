@@ -591,8 +591,12 @@ fn keyed_bit(key: &str) -> u64 {
 /// the release's law is unchanged. [the lead, November 18] A state whose pass reads its frontier as known streams
 /// ([`holonics_engine::field::StorePass::before`]) is written so: each region's known places hear only what stands before them.
 pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realization::Realization) -> Result<()> {
+    // [measurement; the lead, November 21, Brandon's 09:00Z] With the last word `stop`, the writer draws the void like any symbol and a
+    // row's write ends where the void is drawn: where she would stop if she were let.
+    let stop = args.last().map(String::as_str) == Some("stop");
+    let args = if stop { &args[..args.len() - 1] } else { args };
     if args.len() != 13 && args.len() != 14 {
-        return Err("write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [WINDOW]".into());
+        return Err("write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN OUT STATE STATE_SHA [WINDOW] [stop]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("write-next")?;
@@ -640,6 +644,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     let past = learner.pass.as_ref().is_some_and(|p| p.past);
     let second = learner.pass.as_ref().is_some_and(|p| p.second);
     let mut written: Vec<Vec<usize>> = vec![Vec::new(); rows.len()];
+    let mut voids: Vec<Vec<u64>> = vec![Vec::new(); rows.len()];
+    let mut stopped: Vec<Option<usize>> = vec![None; rows.len()];
+    let mut spreads: Vec<Vec<i128>> = vec![Vec::new(); rows.len()];
     for step in 0..run {
         let regions: Vec<OwnedRegion> = rows
             .iter()
@@ -663,19 +670,34 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
         let views: Vec<_> = regions.iter().map(view_of).collect();
         let faces = realization.read_faces(&learner.field, &views).map_err(|e| e.to_string())?;
         for (k, (face, w)) in faces.iter().zip(written.iter_mut()).enumerate() {
+            if stopped[k].is_some() {
+                continue;
+            }
             let f = face.last().and_then(|f| f.as_ref()).ok_or("a written place that carries no face")?;
-            let letters = f.total - f.masses[void];
+            let letters = if stop { f.total } else { f.total - f.masses[void] };
             if letters == 0 {
                 return Err("a face with no mass on a letter".into());
             }
+            // [measurement; the lead, November 21, Brandon's 09:00Z (whether she seeks the stop the writer withholds)] The face's share on
+            // the void at each written place, in millionths, beside the draw (`OUT/void.tsv`); the draw itself is unchanged.
+            voids[k].push(u64::try_from(f.masses[void].saturating_mul(1_000_000) / f.total.max(1)).unwrap_or(u64::MAX));
+            // [measurement; the lead, November 21, Brandon's 09:15Z (halting by least action)] The face's spread at the place, its entropy
+            // `Σ p·code(p)` on `2^(−20)` bits (each class's code by the face's own law, its mass on `2^(−40)` of the total), beside the draw.
+            let spread: i128 = (0..f.masses.len()).filter(|&c| f.masses[c] > 0).map(|c| (i128::try_from((f.masses[c] << 20) / f.total.max(1)).unwrap_or(0) * i128::from(f.code(c))) >> 20).sum();
+            spreads[k].push(spread);
             // A keyed uniform under the letters' mass: two draws make its 128 bits.
             let u = ((u128::from(mix(((k as u64) << 24) ^ step as u64)) << 64) | u128::from(mix(((k as u64) << 24) ^ step as u64 ^ (1 << 60)))) % letters;
             let mut acc = 0u128;
-            let class = (0..f.masses.len()).filter(|&c| c != void).find(|&c| {
+            let class = (0..f.masses.len()).filter(|&c| stop || c != void).find(|&c| {
                 acc += f.masses[c];
                 acc > u
             });
-            w.push(class.ok_or("a draw past the letters' mass")?);
+            let class = class.ok_or("a draw past the letters' mass")?;
+            if class == void {
+                stopped[k] = Some(step);
+                continue;
+            }
+            w.push(class);
         }
     }
     let mut text = String::new();
@@ -683,6 +705,17 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
         text.push_str(&format!("{label}\t{}\t{}\t{}\n", escape(prompt), escape(&codec.decode(w)), escape(reference)));
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
+    let mut void_text = String::from("label\tplace\twritten\tvoid_ppm\tspread_millibits\n");
+    for (((label, ..), (w, v)), e) in rows.iter().zip(written.iter().zip(&voids)).zip(&spreads) {
+        for (t, ((&c, &share), &h)) in w.iter().zip(v).zip(e).enumerate() {
+            void_text.push_str(&format!("{label}\t{t}\t{}\t{share}\t{}\n", escape(&codec.decode(&[c])), (h * 1000) >> 20));
+        }
+    }
+    write_new(&out.join("void.tsv"), void_text.as_bytes())?;
+    if stop {
+        let stops: String = rows.iter().zip(&stopped).map(|((label, ..), s)| format!("{label}\t{}\n", s.map_or("-".to_string(), |t| t.to_string()))).collect();
+        write_new(&out.join("stops.tsv"), stops.as_bytes())?;
+    }
     println!("NEXT_WRITE_DONE rows={} run={run} window={} ms={}", rows.len(), window.map_or("-".to_string(), |n| n.to_string()), started.elapsed().as_millis());
     Ok(())
 }

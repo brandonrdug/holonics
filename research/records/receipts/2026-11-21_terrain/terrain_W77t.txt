@@ -1,0 +1,9 @@
+STORE_TERRAIN n=0 regions=586 records=1172 budget=20745 met=1172 world_code=4883643 passage_code=2991235 next_share=25730
+STORE_TERRAIN n=10 regions=507 records=1014 budget=18185 met=12928 world_code=2730661 passage_code=3618879 next_share=17843
+STORE_TERRAIN n=100 regions=424 records=848 budget=15032 met=92920 world_code=2048614 passage_code=3760553 next_share=14631
+STORE_TERRAIN n=500 regions=407 records=814 budget=14686 met=411608 world_code=1746295 passage_code=3746230 next_share=13191
+STORE_TERRAIN n=1000 regions=366 records=732 budget=13093 met=790304 world_code=1659725 passage_code=3662511 next_share=12938
+STORE_TERRAIN n=1500 regions=378 records=756 budget=13514 met=1161692 world_code=1588266 passage_code=3145024 next_share=13922
+STORE_TERRAIN n=2000 regions=381 records=762 budget=13621 met=1528670 world_code=1566008 passage_code=3174934 next_share=13704
+STORE_TERRAIN n=2500 regions=317 records=634 budget=11609 met=1886360 world_code=1542063 passage_code=3641437 next_share=12343
+STORE_TERRAIN n=2999 regions=353 records=706 budget=12453 met=2243346 world_code=1531815 passage_code=3283335 next_share=13198

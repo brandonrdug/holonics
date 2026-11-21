@@ -1,0 +1,96 @@
+terrain:sum:h0	1 + 3 = 4\n541 + 3 = 544\n9 + 2 = 11\n7 + 5 = 	12
+terrain:sum:h1	2 + 344 = 346\n75 + 94 = 169\n741 + 59 = 800\n57 + 9 = 	66
+terrain:sum:h2	28 + 7 = 35\n40 + 617 = 657\n23 + 24 = 47\n730 + 929 = 	1659
+terrain:sum:h3	53 + 300 = 353\n91 + 394 = 485\n18 + 36 = 54\n1 + 8 = 	9
+terrain:sum:h4	6 + 210 = 216\n719 + 1 = 720\n97 + 573 = 670\n42 + 5 = 	47
+terrain:sum:h5	5 + 71 = 76\n7 + 28 = 35\n91 + 563 = 654\n2 + 8 = 	10
+terrain:sum:h6	89 + 9 = 98\n18 + 2 = 20\n73 + 618 = 691\n8 + 9 = 	17
+terrain:sum:h7	0 + 3 = 3\n38 + 516 = 554\n3 + 900 = 903\n52 + 214 = 	266
+terrain:sum:h8	197 + 77 = 274\n159 + 374 = 533\n87 + 91 = 178\n630 + 3 = 	633
+terrain:sum:h9	901 + 5 = 906\n724 + 1 = 725\n2 + 987 = 989\n8 + 49 = 	57
+terrain:sum:h10	6 + 1 = 7\n87 + 6 = 93\n62 + 86 = 148\n44 + 42 = 	86
+terrain:sum:h11	9 + 701 = 710\n40 + 91 = 131\n972 + 66 = 1038\n28 + 434 = 	462
+terrain:sum:h12	23 + 77 = 100\n97 + 77 = 174\n959 + 4 = 963\n9 + 71 = 	80
+terrain:sum:h13	99 + 257 = 356\n1 + 78 = 79\n333 + 678 = 1011\n209 + 9 = 	218
+terrain:sum:h14	87 + 541 = 628\n34 + 6 = 40\n4 + 4 = 8\n57 + 3 = 	60
+terrain:sum:h15	1 + 852 = 853\n40 + 953 = 993\n100 + 5 = 105\n534 + 372 = 	906
+terrain:difference:h0	887 - 88 = 799\n825 - 33 = 792\n40 - 2 = 38\n82 - 49 = 	33
+terrain:difference:h1	963 - 783 = 180\n669 - 1 = 668\n783 - 95 = 688\n32 - 28 = 	4
+terrain:difference:h2	89 - 2 = 87\n186 - 174 = 12\n73 - 70 = 3\n97 - 34 = 	63
+terrain:difference:h3	6 - 0 = 6\n412 - 71 = 341\n552 - 8 = 544\n718 - 60 = 	658
+terrain:difference:h4	86 - 2 = 84\n373 - 1 = 372\n40 - 16 = 24\n171 - 76 = 	95
+terrain:difference:h5	38 - 6 = 32\n640 - 42 = 598\n381 - 5 = 376\n792 - 7 = 	785
+terrain:difference:h6	132 - 31 = 101\n563 - 450 = 113\n489 - 7 = 482\n47 - 22 = 	25
+terrain:difference:h7	6 - 1 = 5\n968 - 944 = 24\n872 - 86 = 786\n315 - 5 = 	310
+terrain:difference:h8	961 - 53 = 908\n226 - 43 = 183\n6 - 0 = 6\n961 - 6 = 	955
+terrain:difference:h9	459 - 295 = 164\n537 - 37 = 500\n604 - 95 = 509\n990 - 5 = 	985
+terrain:difference:h10	115 - 9 = 106\n85 - 7 = 78\n22 - 4 = 18\n99 - 2 = 	97
+terrain:difference:h11	85 - 24 = 61\n248 - 4 = 244\n537 - 1 = 536\n24 - 2 = 	22
+terrain:difference:h12	933 - 7 = 926\n626 - 0 = 626\n7 - 6 = 1\n617 - 0 = 	617
+terrain:difference:h13	79 - 7 = 72\n891 - 9 = 882\n364 - 1 = 363\n724 - 9 = 	715
+terrain:difference:h14	31 - 4 = 27\n53 - 6 = 47\n969 - 559 = 410\n850 - 6 = 	844
+terrain:difference:h15	492 - 64 = 428\n8 - 4 = 4\n417 - 2 = 415\n227 - 133 = 	94
+terrain:product:h0	7 * 4 = 28\n27 * 1 = 27\n8 * 9 = 72\n7 * 3 = 	21
+terrain:product:h1	2 * 3 = 6\n39 * 5 = 195\n2 * 8 = 16\n93 * 7 = 	651
+terrain:product:h2	1 * 3 = 3\n9 * 4 = 36\n1 * 9 = 9\n67 * 0 = 	0
+terrain:product:h3	5 * 0 = 0\n3 * 4 = 12\n18 * 4 = 72\n99 * 4 = 	396
+terrain:product:h4	24 * 6 = 144\n77 * 0 = 0\n26 * 5 = 130\n7 * 3 = 	21
+terrain:product:h5	5 * 4 = 20\n22 * 3 = 66\n88 * 5 = 440\n22 * 7 = 	154
+terrain:product:h6	1 * 8 = 8\n3 * 2 = 6\n8 * 9 = 72\n43 * 2 = 	86
+terrain:product:h7	6 * 8 = 48\n88 * 8 = 704\n75 * 4 = 300\n84 * 3 = 	252
+terrain:product:h8	71 * 4 = 284\n35 * 0 = 0\n41 * 6 = 246\n23 * 4 = 	92
+terrain:product:h9	1 * 1 = 1\n1 * 8 = 8\n0 * 4 = 0\n13 * 2 = 	26
+terrain:product:h10	2 * 8 = 16\n16 * 1 = 16\n5 * 1 = 5\n23 * 4 = 	92
+terrain:product:h11	4 * 4 = 16\n77 * 6 = 462\n71 * 5 = 355\n13 * 2 = 	26
+terrain:product:h12	2 * 1 = 2\n3 * 0 = 0\n5 * 7 = 35\n93 * 7 = 	651
+terrain:product:h13	6 * 9 = 54\n66 * 7 = 462\n1 * 7 = 7\n39 * 0 = 	0
+terrain:product:h14	13 * 8 = 104\n51 * 3 = 153\n50 * 2 = 100\n8 * 7 = 	56
+terrain:product:h15	4 * 9 = 36\n54 * 8 = 432\n1 * 9 = 9\n23 * 4 = 	92
+terrain:close:h0	[ ( [ { = } ] ) ]\n( = )\n{ [ ( ( [ { = } ] ) ) ] }\n( ( { { = 	} } ) )
+terrain:close:h1	[ { { { ( [ = ] ) } } } ]\n[ { = } ]\n{ = }\n{ [ [ [ [ = 	] ] ] ] }
+terrain:close:h2	[ { = } ]\n[ = ]\n[ ( = ) ]\n( ( ( [ { [ = 	] } ] ) ) )
+terrain:close:h3	{ = }\n( [ = ] )\n[ [ = ] ]\n( ( ( ( ( { = 	} ) ) ) ) )
+terrain:close:h4	( { = } )\n( { { [ { = } ] } } )\n( { ( = ) } )\n{ { [ [ = 	] ] } }
+terrain:close:h5	( ( [ = ] ) )\n{ ( [ [ = ] ] ) }\n( ( ( [ = ] ) ) )\n[ ( ( [ ( ( = 	) ) ] ) ) ]
+terrain:close:h6	{ [ ( ( { = } ) ) ] }\n{ [ = ] }\n{ { { = } } }\n{ { [ [ = 	] ] } }
+terrain:close:h7	{ ( { ( [ = ] ) } ) }\n[ ( ( { ( = ) } ) ) ]\n{ ( ( [ ( [ = ] ) ] ) ) }\n( [ ( [ ( { = 	} ) ] ) ] )
+terrain:close:h8	{ = }\n( ( = ) )\n[ { [ = ] } ]\n{ ( ( { { [ = 	] } } ) ) }
+terrain:close:h9	{ [ [ ( [ = ] ) ] ] }\n( ( = ) )\n[ { ( { { { = } } } ) } ]\n( ( { { = 	} } ) )
+terrain:close:h10	[ [ { ( [ = ] ) } ] ]\n( { [ { [ = ] } ] } )\n( { = } )\n[ ( ( [ ( ( = 	) ) ] ) ) ]
+terrain:close:h11	{ ( { { [ [ = ] ] } } ) }\n{ [ ( ( [ { = } ] ) ) ] }\n( ( ( { [ [ = ] ] } ) ) )\n{ { { [ ( ( = 	) ) ] } } }
+terrain:close:h12	{ { [ ( { = } ) ] } }\n( [ = ] )\n[ [ [ = ] ] ]\n{ [ ( [ = 	] ) ] }
+terrain:close:h13	{ ( ( ( ( = ) ) ) ) }\n( { ( [ = ] ) } )\n[ = ]\n{ { [ ( { [ = 	] } ) ] } }
+terrain:close:h14	[ = ]\n{ ( [ ( ( = ) ) ] ) }\n( = )\n[ ( { [ { = 	} ] } ) ]
+terrain:close:h15	[ = ]\n{ [ { [ = ] } ] }\n{ = }\n[ ( { [ { = 	} ] } ) ]
+terrain:copy:h0	copy 2 1 9 7 9 = 2 1 9 7 9\ncopy 1 9 4 0 3 = 1 9 4 0 3\ncopy 7 0 7 6 6 = 7 0 7 6 6\ncopy 1 5 2 0 4 7 7 = 	1 5 2 0 4 7 7
+terrain:copy:h1	copy 6 3 7 0 7 = 6 3 7 0 7\ncopy 0 8 8 3 7 6 2 = 0 8 8 3 7 6 2\ncopy 8 9 1 1 3 6 8 = 8 9 1 1 3 6 8\ncopy 2 7 2 7 4 0 = 	2 7 2 7 4 0
+terrain:copy:h2	copy 2 9 4 0 1 4 = 2 9 4 0 1 4\ncopy 3 7 = 3 7\ncopy 6 0 8 5 1 5 4 = 6 0 8 5 1 5 4\ncopy 0 6 9 = 	0 6 9
+terrain:copy:h3	copy 4 6 8 = 4 6 8\ncopy 8 4 7 9 2 = 8 4 7 9 2\ncopy 8 3 0 1 5 = 8 3 0 1 5\ncopy 4 7 8 = 	4 7 8
+terrain:copy:h4	copy 1 7 9 = 1 7 9\ncopy 1 2 8 8 = 1 2 8 8\ncopy 0 8 0 7 5 3 = 0 8 0 7 5 3\ncopy 4 7 1 8 4 7 9 = 	4 7 1 8 4 7 9
+terrain:copy:h5	copy 2 9 4 0 4 0 2 = 2 9 4 0 4 0 2\ncopy 6 7 0 8 0 7 = 6 7 0 8 0 7\ncopy 4 9 2 9 1 5 = 4 9 2 9 1 5\ncopy 7 5 = 	7 5
+terrain:copy:h6	copy 1 0 0 4 1 = 1 0 0 4 1\ncopy 1 1 4 9 6 2 = 1 1 4 9 6 2\ncopy 3 4 2 5 = 3 4 2 5\ncopy 5 7 9 1 = 	5 7 9 1
+terrain:copy:h7	copy 0 4 9 3 4 = 0 4 9 3 4\ncopy 6 7 2 = 6 7 2\ncopy 4 2 1 = 4 2 1\ncopy 3 9 7 9 0 3 = 	3 9 7 9 0 3
+terrain:copy:h8	copy 1 1 5 5 = 1 1 5 5\ncopy 4 3 3 = 4 3 3\ncopy 1 7 3 3 8 8 = 1 7 3 3 8 8\ncopy 4 8 5 = 	4 8 5
+terrain:copy:h9	copy 1 0 7 4 3 5 = 1 0 7 4 3 5\ncopy 8 8 8 = 8 8 8\ncopy 3 0 8 4 5 7 5 = 3 0 8 4 5 7 5\ncopy 0 1 7 6 = 	0 1 7 6
+terrain:copy:h10	copy 9 2 0 2 6 1 = 9 2 0 2 6 1\ncopy 4 6 2 = 4 6 2\ncopy 9 0 2 5 0 7 1 = 9 0 2 5 0 7 1\ncopy 1 3 4 0 0 = 	1 3 4 0 0
+terrain:copy:h11	copy 3 4 0 4 2 9 = 3 4 0 4 2 9\ncopy 4 4 = 4 4\ncopy 6 2 2 = 6 2 2\ncopy 5 0 = 	5 0
+terrain:copy:h12	copy 1 3 4 = 1 3 4\ncopy 4 5 1 2 9 8 3 = 4 5 1 2 9 8 3\ncopy 2 6 2 9 6 2 = 2 6 2 9 6 2\ncopy 0 3 9 9 5 0 4 = 	0 3 9 9 5 0 4
+terrain:copy:h13	copy 2 9 4 9 = 2 9 4 9\ncopy 4 4 0 0 0 = 4 4 0 0 0\ncopy 7 4 5 7 3 4 = 7 4 5 7 3 4\ncopy 0 5 4 = 	0 5 4
+terrain:copy:h14	copy 3 6 9 9 6 5 9 = 3 6 9 9 6 5 9\ncopy 2 3 8 8 = 2 3 8 8\ncopy 6 9 3 2 2 = 6 9 3 2 2\ncopy 5 0 = 	5 0
+terrain:copy:h15	copy 0 3 5 1 3 6 2 = 0 3 5 1 3 6 2\ncopy 1 6 1 0 = 1 6 1 0\ncopy 6 3 6 4 0 = 6 3 6 4 0\ncopy 8 7 9 1 9 5 7 = 	8 7 9 1 9 5 7
+terrain:reverse:h0	reverse 3 6 8 4 4 = 4 4 8 6 3\nreverse 3 0 9 0 8 = 8 0 9 0 3\nreverse 3 7 6 = 6 7 3\nreverse 0 7 5 4 4 = 	4 4 5 7 0
+terrain:reverse:h1	reverse 7 4 7 = 7 4 7\nreverse 4 3 2 2 3 0 = 0 3 2 2 3 4\nreverse 2 8 0 = 0 8 2\nreverse 7 4 4 = 	4 4 7
+terrain:reverse:h2	reverse 3 8 = 8 3\nreverse 6 0 7 = 7 0 6\nreverse 5 7 = 7 5\nreverse 0 1 9 4 = 	4 9 1 0
+terrain:reverse:h3	reverse 1 6 1 8 1 0 = 0 1 8 1 6 1\nreverse 3 3 3 8 = 8 3 3 3\nreverse 1 3 0 9 = 9 0 3 1\nreverse 5 1 2 7 1 9 = 	9 1 7 2 1 5
+terrain:reverse:h4	reverse 8 1 0 1 7 = 7 1 0 1 8\nreverse 8 0 1 6 4 2 = 2 4 6 1 0 8\nreverse 3 8 7 3 0 1 4 = 4 1 0 3 7 8 3\nreverse 5 3 4 8 6 = 	6 8 4 3 5
+terrain:reverse:h5	reverse 4 4 9 4 = 4 9 4 4\nreverse 1 0 = 0 1\nreverse 4 7 0 1 = 1 0 7 4\nreverse 8 6 8 = 	8 6 8
+terrain:reverse:h6	reverse 8 8 3 7 8 = 8 7 3 8 8\nreverse 9 7 0 0 6 0 = 0 6 0 0 7 9\nreverse 7 8 7 1 3 = 3 1 7 8 7\nreverse 2 5 8 6 7 3 7 = 	7 3 7 6 8 5 2
+terrain:reverse:h7	reverse 5 2 5 = 5 2 5\nreverse 1 8 1 6 = 6 1 8 1\nreverse 6 6 = 6 6\nreverse 6 3 5 5 5 0 8 = 	8 0 5 5 5 3 6
+terrain:reverse:h8	reverse 8 8 0 3 8 2 7 = 7 2 8 3 0 8 8\nreverse 8 9 9 4 = 4 9 9 8\nreverse 6 4 9 = 9 4 6\nreverse 1 7 2 9 5 = 	5 9 2 7 1
+terrain:reverse:h9	reverse 5 7 8 4 4 7 1 = 1 7 4 4 8 7 5\nreverse 1 4 = 4 1\nreverse 1 2 = 2 1\nreverse 1 3 1 1 7 9 4 = 	4 9 7 1 1 3 1
+terrain:reverse:h10	reverse 6 1 0 = 0 1 6\nreverse 4 7 9 8 8 2 = 2 8 8 9 7 4\nreverse 0 7 3 3 8 = 8 3 3 7 0\nreverse 0 4 6 1 9 6 4 = 	4 6 9 1 6 4 0
+terrain:reverse:h11	reverse 7 0 5 9 5 2 = 2 5 9 5 0 7\nreverse 1 2 8 6 6 8 0 = 0 8 6 6 8 2 1\nreverse 5 0 1 7 0 9 2 = 2 9 0 7 1 0 5\nreverse 9 6 9 7 = 	7 9 6 9
+terrain:reverse:h12	reverse 7 4 0 4 4 8 = 8 4 4 0 4 7\nreverse 2 5 2 9 8 6 3 = 3 6 8 9 2 5 2\nreverse 1 0 9 3 2 5 1 = 1 5 2 3 9 0 1\nreverse 7 2 3 7 1 0 = 	0 1 7 3 2 7
+terrain:reverse:h13	reverse 6 4 6 4 2 1 9 = 9 1 2 4 6 4 6\nreverse 9 0 5 1 4 5 = 5 4 1 5 0 9\nreverse 6 2 8 3 5 4 1 = 1 4 5 3 8 2 6\nreverse 5 4 5 3 5 8 9 = 	9 8 5 3 5 4 5
+terrain:reverse:h14	reverse 9 1 8 1 6 5 = 5 6 1 8 1 9\nreverse 9 4 0 = 0 4 9\nreverse 3 8 2 = 2 8 3\nreverse 5 5 4 2 = 	2 4 5 5
+terrain:reverse:h15	reverse 1 0 4 4 1 = 1 4 4 0 1\nreverse 9 4 = 4 9\nreverse 4 1 2 7 4 = 4 7 2 1 4\nreverse 6 3 0 5 = 	5 0 3 6
