@@ -6016,3 +6016,29 @@ fn a_leaks_first_deposit_against_the_ticks_gains() {
     }
     eprintln!("LEAK_PREMISE sites={} open={} ticks={ticks} probed={probed:?}", classes.len(), unresolved.iter().filter(|&&u| u).count());
 }
+
+/// [measurement; the lead, November 21, the lattice record §6.2's read] **A part's transport for its polygons**: the learner at `DEPOSIT_STATE`
+/// writes its site maps, each a block of the material read as rows by columns (`affine`'s layout: `read` `D × D`, `out` `D × 2M`, `q` and `v`
+/// `2M × D`, `a` and `b` `f × D`, `w` `D × f`), to `PROBE_OUT/map_{name}.txt` (a line `rows cols`, then the entries), for the polygons of their
+/// one-step gains (`tools/tick_gains.py --polygons`). A ruler on the host; no state changes.
+#[test]
+#[ignore]
+#[allow(clippy::disallowed_methods, reason = "an exterior reading of a saved state file and a write of the ruler's tables")]
+fn a_parts_transport_for_its_polygons() {
+    let var = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("{k} is not set"));
+    let learner = Learner::from_text(&std::fs::read_to_string(var("DEPOSIT_STATE")).unwrap()).unwrap();
+    let out = std::path::PathBuf::from(var("PROBE_OUT"));
+    let field = &learner.field;
+    let (dw, f, m2) = (field.declaration.width, field.declaration.contacts, 2 * field.declaration.complex());
+    let l = field.layout();
+    for (name, at, rows, cols) in [("read", l.read, dw, dw), ("out", l.out, dw, m2), ("q", l.q, m2, dw), ("v", l.v, m2, dw), ("a", l.a, f, dw), ("b", l.b, f, dw), ("w", l.w, dw, f)] {
+        let block = &field.theta[at..at + rows * cols];
+        let mut s = format!("{rows} {cols}\n");
+        for r in 0..rows {
+            s += &block[r * cols..(r + 1) * cols].iter().map(i32::to_string).collect::<Vec<_>>().join(" ");
+            s.push('\n');
+        }
+        std::fs::write(out.join(format!("map_{name}.txt")), s).unwrap();
+    }
+    eprintln!("PART_MAPS width={dw} contacts={f} m2={m2} lanes={}", field.declaration.lanes);
+}
