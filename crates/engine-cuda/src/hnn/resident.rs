@@ -2305,7 +2305,8 @@ pub fn read_octets(d: &Declaration, returning: bool, echo: bool, sites: usize) -
     let moment_site = moment_site + address_site;
     // The reverse adds its covectors (the triads' `δc^T` `[t][2J]` and `δabg` `[t][6J]` among them), the values' sum over the ticks and the
     // moments' return, and the crowds' two difference arrays.
-    let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + if d.pump { 16 * d.carry as u64 } else { 0 } + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
+    // [the lead, November 21] The circles' pair part `h` `[t][2C]` on 64 bits beside their covector (it had stood on 128 bits, uncounted).
+    let reverse_site = if returning { 8 * 8 * d.triads as u64 + 16 * d.carry as u64 + 16 * d.carry as u64 + if d.pump { 16 * d.carry as u64 } else { 0 } + 8 * m2 + 8 * a + 5 * 8 * dw + 3 * 8 * f + 8 * m2 + 8 * h * span + 2 * 8 * m2 + 16 * m2 + 2 * 16 * span + 112 * tm } else { 0 };
     // [the ring record §4] A field that reads twice holds its first read's shares `[t][A]` through the second read, and its return the marked
     // sites' list and `release(α_b dx, 24)` in each of the three encodings (`[3][t][D]` at most). [G180] Where both reads return, the first
     // leaves the base clock's two covectors from the opening's comparison (`[p][t]` on 128 bits each) for the second; the reads' own carriers

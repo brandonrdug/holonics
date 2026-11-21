@@ -1,6 +1,6 @@
 # The built tick's rates stand still on its fill clock: a third of a site's modes is released, a third held and a third boosted, and the contact kernels wait on their loads
 
-November 21, 2026, 00:59 to 03:00 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
+November 21, 2026, 00:59 to 03:35 UTC, on the PC (RTX 4080 SUPER, the host's 24 threads). Refs #404, #407, #410. The engineering report of
 November 20 (its §11 list, [the receipts](receipts/2026-11-20_engineering/README.md)) read beside the lattice record's §6.1
 ([the record](2026-11-20_A_LATTICE_AN_APERTURE_AND_A_DILATION_ARE_ONE_LENS_THE_HEXAGON_IS_THREE_CLASSES_WITHOUT_THEIR_COMMON_MODE_AND_THE_CHARACTERISTIC_POLYGON_LIES_ON_OR_ABOVE_THE_GRAINS_IN_LEAN.md)),
 as one design: whether the tick contracts decides both what a pass retains and how long the return's tape must be. Two readings, both
@@ -120,6 +120,13 @@ staged with the chunk's terms, every bit kept (the card's suite, 24 sections of 
 and the section 2.6 ms shorter in a warmed hold (520.4 against 517.8, spreads 2.4 and 2.0); the guess of 10 to 18% on the kernel missed,
 because the skin lines' samples were waits that the values' loads beside them still stand behind (`agent-inferred`).
 
+The pair and scan kernels read bound by the card's memory (49 to 88% of its DRAM peak), so their carriers' width is their lever, and three
+changes were read the same night ([the receipts](receipts/2026-11-21_tick-gains/README.md)): the circles' scan operand and coupled drive on 32
+bits (taken, #1071: the section 5.8 ms shorter); the pair's face on 32 bits so that the pair's return `W` and its outer sum ran on the 32-bit maps
+(set aside: every bit kept, the section 7.3 ms longer, the `W` map bound by neither its products nor its operand's width); and the circles'
+reverse pair part on 64 bits where it stood on 128 (taken: the pre-scan 21% and the section 5.9 ms shorter). With the staged skins the night's
+realizations shorten a section by about 14 ms, every bit kept.
+
 ## 5. What the pass's ticks change
 
 The 17-tick read prints a first step 0.6% under the 12-tick read's (5,887,288 against 5,923,141 millionths at tick 0, the chart's step
@@ -225,6 +232,20 @@ laps), and it is not given its day of card. The card realization written for it 
 (`lane_leak_card_kernels_set_aside.patch`: the leak's tick, the stores' news by region and lane, and their release into the covector); the
 host law stands, founded at zero bit for bit, with the opening held, `d` on the chart `ℓ = log₂(1 + d)` with `γ = 2^(−ℓ)` the formal thread's
 choice for when it is next taken up.
+
+### 8.2 The rest read at its consumer, eight ticks
+
+The formal thread's sharpening (03:04 UTC, relayed): the rest it derived is a steady-state statement, so the deposit reads the cosine of the
+pass's last pair of moves, the news at the tick the face reads, and only on a pass that has contracted by its reading tick (at the line's four
+ticks the last pair is still the route, so the block stays off there). Its guesses, fixed at 03:04:05 UTC: H5, the rests fall in 0.78 to 0.95 at
+every lane and the eight-tick held code there reads 3.7 to 4.0 nats; H6, eight ticks with no leak read 2.6 to 3.2. Read at 03:05 and 03:06 UTC
+(`leak_reads_8_ticks.txt`, `leak_law_8_ticks_at_rest.txt`), L71, the same sites, eight ticks, the opening held: the last pair's cosine crosses
+zero, interpolated between the scan's strengths, at 0.821, 0.835, 0.862, 0.857, 0.891, 0.889 and 0.876 by lane (the formal thread's 0.82,
+0.83, 0.87, 0.86, 0.90, 0.90, 0.89), and the law itself with its stores at those rests (`Learner::with_lane_leak`, `d = δ/(1 − δ)`) reads
+3.912 nats a place; with no leak eight ticks read 2.622, the line's four 1.655. Both held: H5 (every rest in 0.78 to 0.95, the code 3.912 in
+3.7 to 4.0) and H6 (2.622 in 2.6 to 3.2, at its lower edge). With every lane at its own rest the last pair's cosine reads −0.16 to +0.29, the
+lanes moving one another. On this state the leak at its rest costs the eight-tick pass 1.29 nats a place, and what a comparison would have to
+train is a slow mode that carries the opening, from about 2.3 nats behind the line's own read: the arm's question, still without its card.
 
 ## 9. Atlas
 

@@ -1,0 +1,27 @@
+# pc: lock taken 03:03:08 other runs: 1361623, obs 
+PC suite 03:09:15 test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 367.20s 
+PC repro_L71 03:09:29 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+PC ncu field_affine_tiled_x64 old 03:09:43  DRAM Throughput % 70.29; Duration us 114.66; DRAM Throughput % 24.50; Duration ms 1.16; DRAM Throughput % 69.58; Duration us 113.82;
+PC ncu field_affine_tiled_x64 new 03:10:01  DRAM Throughput % 15.68; Duration us 15.42; DRAM Throughput % 14.40; Duration us 16.10; DRAM Throughput % 47.80; Duration us 49.70;
+PC ncu field_affine_tiled_tc_x32 old 03:10:07  DRAM Throughput % 24.69; Duration us 369.28; DRAM Throughput % 23.38; Duration us 352.93; DRAM Throughput % 23.39; Duration us 356.10;
+PC ncu field_affine_tiled_tc_x32 new 03:10:13  DRAM Throughput % 11.00; Duration us 89.28; DRAM Throughput % 26.13; Duration us 46.59; DRAM Throughput % 23.27; Duration us 44.35;
+PC ncu field_outer_x64 old 03:10:29  DRAM Throughput % 68.26; Duration us 94.62; DRAM Throughput % 22.46; Duration ms 1.24; DRAM Throughput % 61.32; Duration us 94.46;
+PC ncu field_outer_x64 new 03:10:46  DRAM Throughput % 39.48; Duration us 58.50; DRAM Throughput % 34.40; Duration us 55.30; DRAM Throughput % 36.07; Duration us 54.18;
+PC ncu field_outer_x32 old 03:10:52  DRAM Throughput % 23.43; Duration us 59.14; DRAM Throughput % 22.88; Duration us 60.74; DRAM Throughput % 27.77; Duration us 50.40;
+PC ncu field_outer_x32 new 03:10:58  DRAM Throughput % 27.05; Duration us 50.11; DRAM Throughput % 16.22; Duration us 559.10; DRAM Throughput % 24.02; Duration us 556.96;
+PC ncu field_pair old 03:11:17  DRAM Throughput % 80.23; Duration us 28; DRAM Throughput % 77.49; Duration us 25.89; DRAM Throughput % 65.58; Duration us 15.78;
+PC ncu field_pair new 03:11:35  DRAM Throughput % 72.60; Duration us 25.25; DRAM Throughput % 70.30; Duration us 26.85; DRAM Throughput % 59.15; Duration us 14.30;
+PC ncu field_pair_scan_face old 03:11:53  DRAM Throughput % 87.87; Duration us 442.08; DRAM Throughput % 89.01; Duration us 430.62; DRAM Throughput % 88.42; Duration us 431.10;
+PC ncu field_pair_scan_face new 03:12:12  DRAM Throughput % 88.32; Duration us 406.27; DRAM Throughput % 89.13; Duration us 394.59; DRAM Throughput % 91.38; Duration us 380.32;
+PC warm-up 03:12:33 48.63, 2820 MHz
+PC hold 1 old 03:12:55 batches=120 last30 ms_mean=504.5 51.28, 2820 MHz
+PC hold 2 new 03:13:17 batches=120 last30 ms_mean=512.9 52.79, 2805 MHz
+PC hold 3 new 03:13:39 batches=120 last30 ms_mean=512.7 53.98, 2805 MHz
+PC hold 4 old 03:14:01 batches=120 last30 ms_mean=505.2 54.23, 2805 MHz
+PC hold 5 old 03:14:23 batches=120 last30 ms_mean=506.0 54.42, 2805 MHz
+PC hold 6 new 03:14:45 batches=120 last30 ms_mean=514.5 54.59, 2805 MHz
+PC hold 7 new 03:15:07 batches=120 last30 ms_mean=511.6 54.84, 2805 MHz
+PC hold 8 old 03:15:29 batches=120 last30 ms_mean=506.5 54.84, 2805 MHz
+# pc: released 03:15:29
+PC_ALL_DONE 03:15:29
+RUN_EXIT 0 2026-11-21T03:15:29Z

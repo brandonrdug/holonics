@@ -32,9 +32,9 @@ pub(crate) struct Back<'c> {
     pub(crate) dg: Pooled<'c, i64>,
     /// [the lead, November 19] The pump chart's covector `δp` `[t][2C]`, none where the circles are not pumped (`Declaration::pump`).
     pub(crate) dpump: Option<Pooled<'c, i64>>,
-    /// [realization; theory, November 16 05:40Z] The circles' pair part `h = conj(a) δp` `[t][2C]` (one slot without them), formed off the chain on
-    /// 128 bits by `field_pair_scan_pre` and read by the scan's reverse, where it meets the chain's sum before that sum's one fit.
-    pub(crate) dh: Pooled<'c, i128>,
+    /// [realization; theory, November 16 05:40Z; the lead, November 21] The circles' pair part `h = conj(a) δp` `[t][2C]` (one slot without them),
+    /// formed off the chain by `field_pair_scan_pre` on 64 bits through `fit64` and read by the scan's reverse, where it meets the chain's sum.
+    pub(crate) dh: Pooled<'c, i64>,
     /// [theory, November 12; the triad record §4] The triads' covectors (none without them): the products' `δc^T = W_Tᵀ δx` `[t][2J]`, and the legs'
     /// `δα`, `δβ`, `δγ` `[t][6J]` in the chart's row order.
     pub(crate) dct: Option<Pooled<'c, i64>>,
@@ -286,7 +286,7 @@ impl<'c> Resident<'c> {
         let da = alloc64(sites * f)?;
         let db = alloc64(sites * f)?;
         let dg = alloc64(if d.carry > 0 { sites * 2 * d.carry } else { 1 })?;
-        let dh = self.timed(Kind::Alloc, || self.take::<i128>(if d.carry > 0 { sites * 2 * d.carry } else { 1 })).map_err(device)?;
+        let dh = self.timed(Kind::Alloc, || self.take::<i64>(if d.carry > 0 { sites * 2 * d.carry } else { 1 })).map_err(device)?;
         // [the lead, November 19] The pump chart's covector `δp` `[t][2C]`, none where the circles are not pumped.
         let dpump = if d.pump { Some(alloc64(sites * 2 * d.carry)?) } else { None };
         // [theory, November 12; the triad record §4] The triads' covectors, `δc^T` `[t][2J]` and `δabg` `[t][6J]`, none without triads.
