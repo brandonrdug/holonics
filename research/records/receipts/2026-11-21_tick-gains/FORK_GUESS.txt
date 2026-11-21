@@ -1,0 +1,6 @@
+# Fixed 2026-11-21T02:05:54Z, before the read: the lattice record §6.3's guess, taken whole, on L71's end state: three pairs opened
+# ([{ and closed in the six orders of )]}, inside 30 fillers (fillers.txt, authored for the read: 20 code-like, 10 prose-like), each its own
+# region; the last tick's circle operand Q(t-1) at the line's end; each filler's mean over its six orders taken out (the common mode), then
+# the plane of the two largest principal directions. A planted hexagon at the read's own spread is recovered on the same shapes first.
+F1: with the pump's chart at zero (unpumped circles) the six orders fall into two clusters, by the parity of their crossings.
+F2: pumped (the state as it stands) they fall into six, at the corners of a hexagon in that plane, alternating in parity around it.

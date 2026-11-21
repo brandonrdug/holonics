@@ -1,0 +1,30 @@
+x = f{f}
+result = compute{f} + 1
+if items{f}:
+print{f}
+value = data{f} * 2
+return g{f}
+total += weights{f}
+assert check{f}
+y = transform{f} - offset
+for k in range{f}:
+name = lookup{f}
+out.append{f}
+while ready{f}:
+z = a{f} / b
+call{f}
+self.state = step{f}
+s = sum{f}
+m = max{f} + min(n)
+q = parse{f}
+w = model{f}
+The count is {f} here.
+She wrote {f} on the board.
+We read {f} twice.
+It came to {f} in the end.
+Add {f} to the list.
+The answer was {f}.
+They kept {f} for later.
+Then {f} closed the line.
+A word like {f} has no sound.
+Look at {f} again.

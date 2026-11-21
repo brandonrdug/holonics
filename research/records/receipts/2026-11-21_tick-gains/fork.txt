@@ -1,0 +1,6 @@
+FORK unpumped planted_hexagon held_order_reading=1.000 (chance 0.167) held_parity_reading=1.000 (chance 0.5) held_between_share=0.975 alternating_parity=True angle_gaps=59 60 59 61 60 61 angles_by_order=127 -172 -112 -52 7 68
+FORK unpumped held_order_reading=0.478 (chance 0.167) held_parity_reading=0.650 (chance 0.5) held_between_share=0.464 alternating_parity=True angle_gaps=40 90 10 71 58 90 angles_by_order=146 88 -124 -84 16 6
+FORK unpumped crossings_by_order=0 1 1 2 2 3 samples=180 dims=512 residual_rms=1290312
+FORK pumped planted_hexagon held_order_reading=1.000 (chance 0.167) held_parity_reading=1.000 (chance 0.5) held_between_share=0.981 alternating_parity=True angle_gaps=60 60 61 59 61 60 angles_by_order=114 174 -126 -66 -6 54
+FORK pumped held_order_reading=0.444 (chance 0.167) held_parity_reading=0.622 (chance 0.5) held_between_share=0.445 alternating_parity=False angle_gaps=58 106 1 31 88 76 angles_by_order=123 35 -160 -103 3 4
+FORK pumped crossings_by_order=0 1 1 2 2 3 samples=180 dims=512 residual_rms=602183
