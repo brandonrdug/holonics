@@ -1,6 +1,6 @@
 # A family's lattice is read from its own spread at every save, the spread is no function of the second moment, a lane's power sets its scale but not its price, and a pass ends with its text
 
-November 21, 2026, 23:58 UTC, to November 22, 04:40 UTC, the lead, on the PC: the card for the laps, gate 3 and the card reads, the host for
+November 21, 2026, 23:58 UTC, to November 22, 07:40 UTC, the lead, on the PC: the card for the laps, gate 3 and the card reads, the host for
 the rulers. Refs #404, #1088. This is the build order of [the second precision record](2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md)
 §7, run in its order: E4's arm read, the host reads G-R1 to G-R3, E5 re-founded with no tolerance, the arm G-R5, and G-R4. Its guesses
 were fixed by the formal thread at 23:38:58Z ([`GUESS.txt`](receipts/2026-11-21_grains/GUESS.txt)) and E4's by the lead at 20:40:18Z
@@ -212,17 +212,25 @@ line at W83t stands −0.0023 (±0.0009) nats a place under W81e's mean one plac
 The line does not take the lattice on this lap: by the guess's own rule a clause that misses keeps the change out. Clause (b) missed by
 one record where the last three pairs of arms moved by three to four between them (W80g 41 and W80t 37, W81e 47 and W81t 44, the first
 G-R5 run 54 and 54), so the guide's lap rule 1 asks the arm read over the laps that scatter needs: the second lap pair, W84t and W84l
-from W83t's and W83l's ends, is on the card, and its four reads decide.
+from W83t's and W83l's ends, read them again ([`gr5_laps_W83_W84.txt`](receipts/2026-11-22_grains/gr5_laps_W83_W84.txt)):
+
+| G-R5, second lap (W84l beside W84t) | read | guess |
+|---|---|---|
+| (a) held text, one place open | +0.0004 (±0.0002); books +0.0006, code −0.0004, science −0.0004, web +0.0002, wikidata +0.0023; the frontier +0.0012 | held |
+| (b) terrain records whole | 47 against 43 | missed by one, the other way |
+| (c) the whole word's spread | within 15% in 55 of 56 (median 0.997; `mark` 1.21) | held |
+| (d) mean of read parts against mean of whole words | 1.300878 against 1.300904 | held |
+
+Over the two laps the arm wrote 90 records whole and the control 90. Clause (b) missed its bound by one on each lap, in opposite
+directions: the bound of three was tighter than the scatter between two arms of one state, and the clause's claim (the lattice costs no
+writes) holds over the laps that scatter asks for. **The line takes the lattice**: W84l's end is the line's state, and W85 (no change)
+is its next lap.
 
 ## 8. What follows
 
-- **The line** stands at W83t's STATE.3000 (E4's remainders carried, no lattice, the second pass), and the trainer it runs on ends a
-  pass with its text.
-- **The lattice** is built and lawful, and it waits on G-R5's second lap. Its read parts fit 16 bits with their sign wherever a family
-  moves; the families that stand still hold 17 to 24 bits and are read whole, so the card's 16-bit operand (the second record's step 5)
-  carries those families in their own words. The maps already read their weights as four signed digits of eight bits on the tensor units
-  (the engineering receipt of November 20), so a 16-bit read part halves the weight's digit planes; whether that buys a rate is read
-  from the kernels' counters once the line takes the lattice.
+- **The line** stands at W84l's STATE.3000 (E4's remainders carried, each family on its own lattice, the second pass), and the trainer
+  it runs on ends a pass with its text.
+- **The card reads the material as its family's count** (§9).
 - **The states** (G-R4): a lane's count ends at its own power less the places its own price asks, and the prices stand in three tiers.
   E9 (the face in its code chart, lanes of unequal width) and E6 (the series halting at its reader's count plus its guard) are derived
   from that table: the exponential's terms are read by the lanes, so its halt is counted from the loudest lane's price and never from
@@ -232,7 +240,57 @@ from W83t's and W83l's ends, is on the card, and its four reads decide.
 - **The pass's end** was a defect of the trainer, and the line's laps from November 21 on read text only while the text lasted; any lap
   read across a pass's end before this repair (W82t, W82l) reads the terrain alone past it.
 
-## 9. The failures this could repeat
+## 9. The card reads a weight as its family's count
+
+The maps read their weights on the tensor units as four signed digits of eight bits (the engineering receipt of November 20). On the
+lattice a material map's entries are `read · 2^drop` with `drop` = 13 to 15 and `|read|` under `2^15`, so their low places are zero and
+their counts take two digits. Built (`e5u`; `kernels/field.cu` `field_tc_planes`, `map_tile_tc`; `resident.rs` `Resident::units`;
+`contact.rs` `tc_planes`): as each upload writes the material, the card reads each family's unit from it, the places every entry holds
+under its read part (the common trailing zeros of its words) and whether its counts fit two digits (`TC_TWO`, `|d₀ + 2⁸ d₁|` at most
+32,639). The planes are cut from `θ ≫ wshift`, the tile multiplies only the planes a family holds, and the tile's sum is multiplied back
+by `2^wshift` once before its bias and its one release. A family off the lattice (a glue map, a bench's buffer, any state with no lattice)
+reads `wshift = 0` and four planes, as before. The same integers ([`GUESS_units.txt`](receipts/2026-11-22_grains/GUESS_units.txt),
+[`units_gate3_and_hold.txt`](receipts/2026-11-22_grains/units_gate3_and_hold.txt)):
+
+- **G-U1 held.** Gate 3 against the latticed line's lap W84l (from W83l's state): parity 3 of 3 sections equal, 24 sections reproduced,
+  the lap's read byte for byte.
+- **G-U2 missed on its control.** One hold of 40-section runs from W84l's end after a warm-up, control and build in the balanced order:
+  the controls 737.5, 730.6, 752.8, 717.3 ms a section (spread 35.5, where the guess asked under 10), the build 733.3, 726.2, 698.5,
+  689.0. The build reads 22.8 ms shorter, inside the controls' own spread, so the hold resolves nothing: W85's host panels (two of six
+  threads) ran beside it, which the timing rule bars. It is read again alone.
+
+## 10. Where a sum is lost: the digit she writes first
+
+The trace behind §1's sums, on the line's states ([`sum_ruler.py`](receipts/2026-11-22_grains/sum_ruler.py),
+[`sum_trace_W83t.txt`](receipts/2026-11-22_grains/sum_trace_W83t.txt),
+[`sum_friction_W84l.txt`](receipts/2026-11-22_grains/sum_friction_W84l.txt); the reach's 1,800 terrain passages, 1,579 sum digits):
+
+- **Rows** (W83t, last tick). Head 0 puts 0.19 of its row on the first operand's digit `a_k`, 0.15 on the second's `b_k`, 0.16 on the
+  same digit of the records above, 0.38 elsewhere. Head 1 puts 0.20 on the lower digits (the carry's sources) where a carry is due and
+  0.03 where none is.
+- **Presence** (a ridge read of the open place's state, fitted on the even passages and read on the odd; a planted law reads 0.35 on
+  it and noise 0): the carry 0.52 at the last tick, `(a_k + b_k) mod 10` 0.42, the answer digit 0.42, each operand digit 0.21 and 0.22.
+- **The code by digit** (W84l's mean): the units digit 0.087 nats, the tens 0.557, the hundreds 2.992 and the thousands 2.305. She
+  writes a sum from its top, so the digit she writes first is the one that holds the whole carry chain, and there she stands above a
+  uniform guess (`ln 10` = 2.303): she is sure and wrong. A ruler's friction on head 1 (one or two bits an octave, toward the nearer
+  operand) moves no digit; on head 0 toward the farther one it costs every digit.
+
+So the sum is not short of its near operand at the units digit, and the second operand's own address (the plan of §8 as first written)
+is not the first link that slips: the link is the top digit, which needs the sum of both operands' lower places before any of them is
+written. That is the next law's subject, read on these states before it is built.
+
+## 11. A correction of this day's reading
+
+Brandon, November 22, 04:40Z, on the lead's proposal to stop the precision work after G-R5 and to skip the card's operand: the precision
+work is no campaign with an end and no attempt at the writes' quality; it is the theory's way of holding a number (a count in its own
+unit, units translated at contacts, nothing held past what its reader reads), the flaw it removes is a flaw of how computational models
+hold numbers, and the models do not scale without it. Its reason, in the lead's words: a machine whose words are counted from a fixed
+point carries places no reader reads at every operation, on every device, and the cost of those places grows with the machine; a change
+that removes them is judged by the bits it keeps and the places it frees, never by a write it was not meant to move. So it runs beside
+the learning work, both every day, and this record's §8 and §9 are its continuation. The word "pass" for it is retired in the lead's
+messages.
+
+## 12. The failures this could repeat
 
 - **A width tuned to a reading** (October 31). Each lattice follows its family's spread at every save and is never set by a reading's
   improvement; G-R5 is one arm beside its control.

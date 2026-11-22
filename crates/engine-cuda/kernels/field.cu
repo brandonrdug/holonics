@@ -1775,7 +1775,10 @@ __device__ __forceinline__ uint32_t tc_digits(int64_t v, uint32_t *d1, uint32_t 
 // row's flag (`flags[r] = 1` where a word of the row is at or past `TC_WORD`; the flags are zeroed by the caller). `kind`: 0 the weight's rows
 // (`θ[base + r · stride + k]`), 1 its columns (`θ[base + k · stride + r]`, lanes along the rows), 2 a 32-bit operand's rows, 3 a 64-bit one's
 // (`src[r · stride + k]`).
-extern "C" __global__ void field_tc_planes(FieldWords w, uint32_t kind, uint64_t src, uint64_t base, uint64_t stride, uint32_t R, uint32_t K, uint32_t kw, uint32_t *planes, uint32_t *flags) {
+// [realization; the lead, November 22] A weight's words are read in their family's unit, `θ ≫ wshift` (`wshift` the places every entry of
+// the family holds under its read part, zero where none), so a family on its lattice cuts to two planes of eight bits where four stood; the
+// tile shifts its sum back once (`map_tile_tc`). The host reads `wshift` from the material as it uploads it, so the integers are the same.
+extern "C" __global__ void field_tc_planes(FieldWords w, uint32_t kind, uint64_t src, uint64_t base, uint64_t stride, uint32_t R, uint32_t K, uint32_t kw, uint32_t *planes, uint32_t *flags, uint32_t wshift) {
     const uint64_t cells = (uint64_t)R * kw;
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint32_t r = kind == 1 ? (uint32_t)(c % R) : (uint32_t)(c / kw), g = kind == 1 ? (uint32_t)(c / R) : (uint32_t)(c % kw);
@@ -1787,9 +1790,9 @@ extern "C" __global__ void field_tc_planes(FieldWords w, uint32_t kind, uint64_t
             int64_t v = 0;
             if (k < K) {
                 if (kind == 0) {
-                    v = w.theta[base + (uint64_t)r * stride + k];
+                    v = (int64_t)w.theta[base + (uint64_t)r * stride + k] >> wshift;
                 } else if (kind == 1) {
-                    v = w.theta[base + (uint64_t)k * stride + r];
+                    v = (int64_t)w.theta[base + (uint64_t)k * stride + r] >> wshift;
                 } else if (kind == 2) {
                     v = reinterpret_cast<const int32_t *>(src)[(uint64_t)r * stride + k];
                 } else {
@@ -1816,7 +1819,7 @@ extern "C" __global__ void field_tc_planes(FieldWords w, uint32_t kind, uint64_t
 }
 
 template <typename X, bool TRANSPOSED, bool B_PLANES>
-__device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
+__device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const X *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw, uint32_t wshift, uint32_t wplanes) {
     // The sites' digit planes of a chunk where they are staged, `bp[d][site][word]` (a row of 32 octets padded to 48, so a fragment's eight rows
     // fall on distinct banks), cut from the operand as it is staged. (Staging the tile's released words to write them along the outputs read
     // 497 µs against 391 written in place, in one hold of November 20: the second barrier and pass cost more than the scattered stores.)
@@ -1942,6 +1945,10 @@ __device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias,
                 }
 #pragma unroll
                 for (int a = 0; a < 4; a++) {
+                    // A weight read in its family's unit holds `wplanes` digit planes; the planes above are zero and take no product.
+                    if (a >= (int)wplanes) {
+                        break;
+                    }
                     const uint32_t *ra = pa + a * aplane + (uint64_t)oa * kw + c0, *rb = pa + a * aplane + (uint64_t)ob * kw + c0;
                     const uint32_t a0 = oa < outs ? __ldg(ra + tg) : 0u, a1 = ob < outs ? __ldg(rb + tg) : 0u;
                     const uint32_t a2 = oa < outs ? __ldg(ra + 4 + tg) : 0u, a3 = ob < outs ? __ldg(rb + 4 + tg) : 0u;
@@ -1973,7 +1980,7 @@ __device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias,
                             for (int s = 0; s < 7; s++) {
                                 sum += (wide)acc[s][j][c] << (8 * s);
                             }
-                            put(o, ts, released(o, sum));
+                            put(o, ts, released(o, sum * ((wide)1 << wshift)));
                         }
                     }
                 }
@@ -2008,21 +2015,21 @@ __device__ void map_tile_tc(const FieldWords &w, uint64_t weight, uint64_t bias,
     }
 }
 
-extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tc_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
-    map_tile_tc<int32_t, false, true>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw);
+extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tc_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw, uint32_t wshift, uint32_t wplanes) {
+    map_tile_tc<int32_t, false, true>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw, wshift, wplanes);
 }
 
 // The same map with the sites' digits cut as each chunk is staged (no planes of the sites; `pb` and `fb` unread).
-extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tcs_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
-    map_tile_tc<int32_t, false, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw);
+extern "C" __global__ void __launch_bounds__(256, 1) field_affine_tiled_tcs_x32(FieldWords w, uint64_t weight, uint64_t bias, uint64_t wmax, uint32_t rows, uint32_t cols, const int32_t *x, uint64_t x_stride, int64_t *out, uint64_t out_stride, int64_t *add, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw, uint32_t wshift, uint32_t wplanes) {
+    map_tile_tc<int32_t, false, false>(w, weight, bias, wmax, rows, cols, x, x_stride, out, out_stride, add, 0, only_unresolved, pa, fa, pb, fb, kw, wshift, wplanes);
 }
 
-extern "C" __global__ void __launch_bounds__(256, 1) field_transposed_tc(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
-    map_tile_tc<int64_t, true, true>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved, pa, fa, pb, fb, kw);
+extern "C" __global__ void __launch_bounds__(256, 1) field_transposed_tc(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw, uint32_t wshift, uint32_t wplanes) {
+    map_tile_tc<int64_t, true, true>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved, pa, fa, pb, fb, kw, wshift, wplanes);
 }
 
-extern "C" __global__ void __launch_bounds__(256, 1) field_transposed_tcs(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw) {
-    map_tile_tc<int64_t, true, false>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved, pa, fa, pb, fb, kw);
+extern "C" __global__ void __launch_bounds__(256, 1) field_transposed_tcs(FieldWords w, uint64_t weight, uint32_t rows, uint32_t cols, const int64_t *y, uint64_t y_stride, int64_t *out, uint32_t accumulate, uint32_t only_unresolved, const uint32_t *pa, const uint32_t *fa, const uint32_t *pb, const uint32_t *fb, uint32_t kw, uint32_t wshift, uint32_t wplanes) {
+    map_tile_tc<int64_t, true, false>(w, weight, NO_BIAS, 0, rows, cols, y, y_stride, out, cols, nullptr, accumulate, only_unresolved, pa, fa, pb, fb, kw, wshift, wplanes);
 }
 
 // `out[t][i] = release(Σ_o W[o][i] y[t][o], 24)` (`transposed`), the weight `rows × cols`; with `accumulate` it is added to `out[t][i]` (each

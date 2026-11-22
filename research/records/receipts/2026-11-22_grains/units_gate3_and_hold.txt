@@ -1,0 +1,20 @@
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+# units1: lock taken 07:03:22 other runs: 0
+UNITS_GATE3 07:17:53 STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL GATE_READ cavity.tsv EQUAL GATE_ENGINE EQUAL 
+UNITS_HOLD warm-up 07:18:27 54.56, 2805 MHz
+UNITS_HOLD 1 old 07:19:00 last30 ms_mean=737.5 54.17, 2805 MHz
+UNITS_HOLD 2 new 07:19:32 last30 ms_mean=733.3 54.12, 2805 MHz
+UNITS_HOLD 3 new 07:20:05 last30 ms_mean=726.2 54.53, 2805 MHz
+UNITS_HOLD 4 old 07:20:37 last30 ms_mean=730.6 54.56, 2805 MHz
+UNITS_HOLD 5 old 07:21:10 last30 ms_mean=752.8 54.67, 2805 MHz
+UNITS_HOLD 6 new 07:21:41 last30 ms_mean=698.5 54.56, 2805 MHz
+UNITS_HOLD 7 new 07:22:12 last30 ms_mean=689.0 54.89, 2805 MHz
+UNITS_HOLD 8 old 07:22:44 last30 ms_mean=717.3 54.92, 2805 MHz
+# units1: released 07:22:44
+UNITS_SAME_LINES runs 1 and 2
+UNITS_SAME_LINES runs 4 and 5
+UNITS_ALL_DONE 07:22:44
