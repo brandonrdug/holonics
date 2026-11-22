@@ -1,0 +1,22 @@
+X88D_START 10:17:19
+X88_PARITY 10:51:50 STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+# arm W88x: lock taken 11:02:14
+# arm W88x: exit 0 released 11:51:37
+TERRAIN_TRAINED W88x 11:51:37 sections=3000 ended=false
+TERRAIN_REACH W88x 11:53:08 ANSWER copy n= 2655 0.209|ANSWER reverse n= 2667 0.116|ANSWER sum n= 1579 1.029|
+TERRAIN_HOSTPANEL W88x panel_logic.tsv 11:54:19 NEXT_WRITE_DONE rows=168 run=32 window=- ms=161872 
+TERRAIN_HOSTPANEL W88x panel_terrain.tsv 11:55:11 NEXT_WRITE_DONE rows=96 run=32 window=- ms=213718 
+TERRAIN_READ_DONE mean_W88x 12:12:23 CAVITY_DONE ms=1236266  rows_S=99844
+TERRAIN_PANEL W88x_mean 12:18:05 seen: words 44 in_lexicon 34 (77%) longest_copy 15 held: words 64 in_lexicon 46 (71%) longest_copy 15 unread: words 66 in_lexicon 52 (78%) longest_copy 14  || LONG W88x_mean: all words 262 in lexicon 199 (75%) writes that loop 2 of 20 longest run shared with its prompt 75 | code 33/43 (76%) web 45/51 (88%) science 36/55 (65%) books 52/63 (82%) wikidata 33/50 (66%)
+TERRAIN_LOUD W88x 12:30:42  lines=71
+TERRAIN_WIDE W88x 12:32:46 LONG W88x: all words 2169 in lexicon 1599 (73%) writes that loop 26 of 160 longest run shared with its prompt 76 | code 344/401 (85%) web 379/453 (83%) science 266/425 (62%) books 391/498 (78%) wikidata 219/392 (55%)
+TERRAIN_W88_FRONTIER FRONTIER W88x; one place open: all 0.6494 (100508 places) | books 0.6704 code 0.3924 science 0.5544 web 0.7440 wikidata 0.8849 || less the control's, paired: +0.0004 (±0.0002) | books +0.0003 code +0.0001 science +0.0007 web +0.0006 wikidata +0.0005|FRONTIER W88x; the frontier: all 1.8290 (99844 places) | books 1.8075 code 1.5312 science 1.7496 web 2.0195 wikidata 2.0368 || less the control's, paired: +0.0007 (±0.0003) | books +0.0003 code -0.0007 science +0.0027 web +0.0017 wikidata -0.0006|
+TERRAIN_SCORE W88 whole 51/96 opening 54/96 first 73/96 | sum 7/7/10 of 16 difference 9/9/10 of 16 product 5/5/8 of 16 close 9/12/16 of 16 copy 10/10/13 of 16 reverse 11/11/16 of 16
+TERRAIN_SCORE W88x whole 57/96 opening 58/96 first 77/96 | sum 7/7/11 of 16 difference 8/8/10 of 16 product 6/6/9 of 16 close 11/12/16 of 16 copy 13/13/15 of 16 reverse 12/12/16 of 16
+X88_ALL_DONE 12:32:51
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+REACH setting=law group=all places=139998 nats_millionths=1300649 ms=242396
+REACH setting=law group=all places=139998 nats_millionths=1332909 ms=241479
+REACH setting=law group=all places=139998 nats_millionths=1300659 ms=240468
+TERRAIN_SCORE W87 whole 53/96 opening 55/96 first 74/96 | sum 8/8/12 of 16 difference 5/5/8 of 16 product 5/5/8 of 16 close 11/13/16 of 16 copy 13/13/14 of 16 reverse 11/11/16 of 16
+TERRAIN_SCORE W88 whole 51/96 opening 54/96 first 73/96 | sum 7/7/10 of 16 difference 9/9/10 of 16 product 5/5/8 of 16 close 9/12/16 of 16 copy 10/10/13 of 16 reverse 11/11/16 of 16

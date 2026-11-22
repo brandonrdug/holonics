@@ -1,0 +1,38 @@
+# W88
+ANSWER_CODES nats a digit, settings: law
+ANSWER copy         n= 2655 0.185
+ANSWER copy:k0      n=  600 0.536
+ANSWER copy:k1      n=  600 0.134
+ANSWER copy:k2      n=  477 0.050
+ANSWER copy:k3      n=  394 0.021
+ANSWER copy:k4      n=  584 0.099
+ANSWER reverse      n= 2667 0.144
+ANSWER reverse:k0   n=  600 0.048
+ANSWER reverse:k1   n=  600 0.085
+ANSWER reverse:k2   n=  498 0.030
+ANSWER reverse:k3   n=  387 0.311
+ANSWER reverse:k4   n=  582 0.290
+ANSWER sum          n= 1579 0.905
+ANSWER sum:k0       n=  600 0.043
+ANSWER sum:k1       n=  553 0.515
+ANSWER sum:k2       n=  377 2.756
+ANSWER sum:k3       n=   49 1.627
+# W88x
+ANSWER_CODES nats a digit, settings: law
+ANSWER copy         n= 2655 0.209
+ANSWER copy:k0      n=  600 0.667
+ANSWER copy:k1      n=  600 0.177
+ANSWER copy:k2      n=  477 0.030
+ANSWER copy:k3      n=  394 0.005
+ANSWER copy:k4      n=  584 0.055
+ANSWER reverse      n= 2667 0.116
+ANSWER reverse:k0   n=  600 0.026
+ANSWER reverse:k1   n=  600 0.038
+ANSWER reverse:k2   n=  498 0.001
+ANSWER reverse:k3   n=  387 0.084
+ANSWER reverse:k4   n=  582 0.409
+ANSWER sum          n= 1579 1.029
+ANSWER sum:k0       n=  600 0.045
+ANSWER sum:k1       n=  553 0.618
+ANSWER sum:k2       n=  377 3.099
+ANSWER sum:k3       n=   49 1.786
