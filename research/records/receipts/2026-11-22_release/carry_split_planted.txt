@@ -1,0 +1,5 @@
+CARRY sum:k0 due n=   0 none n= 600
+CARRY sum:k1 due n= 281 none n= 272 | due 1.513 | none 0.461 | due less none +1.052
+CARRY sum:k2 due n= 149 none n= 228 | due 1.511 | none 0.451 | due less none +1.060
+CARRY sum:k3 due n=  49 none n=   0
+CARRY planted: one nat more where a carry is due reads as one nat at every index with 20 places a side

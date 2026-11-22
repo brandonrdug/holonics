@@ -423,8 +423,13 @@ pub struct Learner {
     /// over what one section left behind. With the leak an entry's steady state is `2^(leak − rate)` times the mean of its own step's
     /// ratio `m / (⌊√v⌋ + 1)`: what its flux keeps up. Carried in the learner's text as a trailing `leak K` line after the rates' and only
     /// where set, so every state without one reads and writes byte for byte as before; none on a state without the line. Kept by every
-    /// growth. Its value is a trial's bracket until a law gives it (`agent-inferred`: the deposit's own rate is the candidate, the
-    /// balance of a store's noise against its dissipation).
+    /// growth. Its value is a trial's bracket until a law gives it (`agent-inferred`, November 17: the deposit's own rate was the first
+    /// candidate, the balance of a store's noise against its dissipation). Read on November 22 (`agent-inferred`; that day's record on a
+    /// release, §3.3 and §5.4): a part the code reads as a ratio to its own power rests under the leak at a root mean square of
+    /// `2^(−rate) √(c 2^(leak − 1))`, `c` its growth of power an entry a section over `2^(−2 rate)`, and turns there by the leak alone.
+    /// So at the rate itself such a part shrinks to a sixteenth of the store line's sizes and turns fifteen times as far a section;
+    /// the leak that keeps a part where it stands is `1 + 2 log₂(rms · 2^rate) − log₂ c` bits, 16 to 23 by block on the floor line of
+    /// November 11, and one value rests no two parts alike.
     pub leak: Option<u32>,
     /// [definition; the lead, November 18, the audit of that day §1.8; the precision law (a term is released only by partition, its
     /// remainder accounted)] **The step's carried remainder**, one an entry, on [`REMAINDER_BITS`] bits under the entry's own grain. Where

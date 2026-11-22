@@ -1,0 +1,4 @@
+SLIPS planted: a dropped carry, an added carry and an other found among 3 sums; 3 in-operand and 1 foreign among 2 copies
+SLIPS sum: 9 writes, 24 reference digits, 10 missed | carry added 3, other, a carry due 3, other, none due 4
+SLIPS copy: 9 writes, 48 reference digits, 19 missed | foreign 13, in its operand 6
+SLIPS reverse: 9 writes, 36 reference digits, 13 missed | foreign 13

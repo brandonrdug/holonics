@@ -1,0 +1,18 @@
+PART 1, planted covectors (rate 6; 300 entries)
+  no leak, zero mean, 4,096 sections: rms 0.9907; the walk 2^-6 sqrt(4096) = 1.0000
+  leak 6, zero mean: rms 0.0805; the form 0.0839; its limit 2^-6 sqrt(2^6/2) = 0.0884
+  leak 8, zero mean: rms 0.1562; the form 0.1744; its limit 2^-6 sqrt(2^8/2) = 0.1768
+  leak 8, covector mean 0.1 of its spread: entry mean 0.3993; 2^(8-6) c / sqrt(1 + c^2) = 0.3980
+  leak 8, covector mean 0.5 of its spread: entry mean 1.7806; 2^(8-6) c / sqrt(1 + c^2) = 1.7889
+PART 2, the line (the audit of November 18, section 1.6): rate 12, 3,000 sections a lap
+  a free walk stands at 0.0423 at lap 10 and 0.1296 at lap 94; its power grows 0.01502
+  w        rms 0.129 -> 0.169: power grows 0.01192, 0.79 of the walk's; the growth is 0.42 of the power at lap 94
+  read     rms 0.128 -> 0.171: power grows 0.01286, 0.86 of the walk's; the growth is 0.44 of the power at lap 94
+  a        rms 0.120 -> 0.153: power grows 0.00901, 0.60 of the walk's; the growth is 0.38 of the power at lap 94
+  opening  rms 0.084 -> 0.165: power grows 0.02017, 1.34 of the walk's; the growth is 0.74 of the power at lap 94
+PART 3, a leak of K bits on the line (rate 12)
+  K=12: an unrestrained entry rests at 0.0110 (the walk at lap 94: 0.1296); a ratio of mean c holds 1 c; e-fold 1.4 laps; settled after 1, 2, 3 laps: 0.52, 0.77, 0.89
+  K=13: an unrestrained entry rests at 0.0156 (the walk at lap 94: 0.1296); a ratio of mean c holds 2 c; e-fold 2.7 laps; settled after 1, 2, 3 laps: 0.31, 0.52, 0.67
+  K=14: an unrestrained entry rests at 0.0221 (the walk at lap 94: 0.1296); a ratio of mean c holds 4 c; e-fold 5.5 laps; settled after 1, 2, 3 laps: 0.17, 0.31, 0.42
+  K=15: an unrestrained entry rests at 0.0312 (the walk at lap 94: 0.1296); a ratio of mean c holds 8 c; e-fold 10.9 laps; settled after 1, 2, 3 laps: 0.09, 0.17, 0.24
+  K=16: an unrestrained entry rests at 0.0442 (the walk at lap 94: 0.1296); a ratio of mean c holds 16 c; e-fold 21.8 laps; settled after 1, 2, 3 laps: 0.04, 0.09, 0.13
