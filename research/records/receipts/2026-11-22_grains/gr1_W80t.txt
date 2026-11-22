@@ -1,0 +1,23 @@
+# G-R1: W80t MEAN.3000, each family rounded at (1) the power of two at or under its spread, (2) one place under, (3) two places over; settings in gr1_settings.txt order
+REACH setting=places group=all places=139998 nats_millionths=1312227 ms=233834
+REACH setting=places group=books places=28000 nats_millionths=1610372 ms=233834
+REACH setting=places group=code places=28000 nats_millionths=1037380 ms=233834
+REACH setting=places group=science places=28000 nats_millionths=1414965 ms=233834
+REACH setting=places group=web places=28000 nats_millionths=1375253 ms=233834
+REACH setting=places group=wikidata places=27998 nats_millionths=1123151 ms=233834
+REACH setting=places group=all places=139998 nats_millionths=1310295 ms=413953
+REACH setting=places group=books places=28000 nats_millionths=1607634 ms=413953
+REACH setting=places group=code places=28000 nats_millionths=1035839 ms=413953
+REACH setting=places group=science places=28000 nats_millionths=1411942 ms=413953
+REACH setting=places group=web places=28000 nats_millionths=1373468 ms=413953
+REACH setting=places group=wikidata places=27998 nats_millionths=1122576 ms=413953
+REACH setting=places group=all places=139998 nats_millionths=1337055 ms=537303
+REACH setting=places group=books places=28000 nats_millionths=1629138 ms=537303
+REACH setting=places group=code places=28000 nats_millionths=1061781 ms=537303
+REACH setting=places group=science places=28000 nats_millionths=1446055 ms=537303
+REACH setting=places group=web places=28000 nats_millionths=1401186 ms=537303
+REACH setting=places group=wikidata places=27998 nats_millionths=1147102 ms=537303
+# the settings
+places:8,8,8,9,10,9,11,9,10,8,10,8,10,8,10,8,8,8,8,8,8,10,7,9,10,11,8,9,9,10,10,8,9,-,-,-,8,9,9,10,9,10,9,10,9,9,9,10,-,-,-,-,9,8,9,-,-,-,-,8,10,8,9,8,9
+places:9,9,9,10,11,10,12,10,11,9,11,9,11,9,11,9,9,9,9,9,9,11,8,10,11,12,9,10,10,11,11,9,10,-,-,-,9,10,10,11,10,11,10,11,10,10,10,11,-,-,-,-,10,9,10,-,-,-,-,9,11,9,10,9,10
+places:6,6,6,7,8,7,9,7,8,6,8,6,8,6,8,6,6,6,6,6,6,8,5,7,8,9,6,7,7,8,8,6,7,-,-,-,6,7,7,8,7,8,7,8,7,7,7,8,-,-,-,-,7,6,7,-,-,-,-,6,8,6,7,6,7

@@ -1376,6 +1376,30 @@ impl Constitution {
         Ok((known, open))
     }
 
+    /// [measurement; the lead, November 22, the second precision pass's G-R4] **Each lane's power in a strand's states, for a ruler on the
+    /// host**: after every tick, for each of the `Declaration::lanes` blocks of a site's `D` coordinates, the sum over every site (known and
+    /// open) of its coordinates' squares on the state's `2^(−16)`, and the count of coordinates (`[ticks][lanes]`), as
+    /// [`Constitution::strand_pass`] formed them. A reading: the state is the same with it.
+    pub fn strand_lane_squares(&self, classes: &[usize], past: bool) -> Result<Vec<Vec<(u128, u64)>>> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let (dw, lanes) = (self.declaration.width, self.declaration.lanes);
+        let lw = dw / lanes;
+        Ok(pass
+            .ticks
+            .iter()
+            .map(|cell| {
+                let mut out = vec![(0u128, 0u64); lanes];
+                for site in cell.after.chunks_exact(dw) {
+                    for (j, lane) in site.chunks_exact(lw).enumerate() {
+                        out[j].0 += lane.iter().map(|&v| (i128::from(v) * i128::from(v)) as u128).sum::<u128>();
+                        out[j].1 += lw as u64;
+                    }
+                }
+                out
+            })
+            .collect())
+    }
+
     /// [measurement; the lead, November 18, the record of the two streams §17] **A strand's carry gates, for a ruler on the host**: each
     /// known site's gate `γ` on every carry circle at every tick (`[ticks][n][2C]`, real parts then imaginary, on `2^(−30)`), as
     /// [`Constitution::strand_pass`] formed them. Whether a circle's turn follows the site's symbol (a stride of its own a symbol,
@@ -1493,6 +1517,24 @@ impl Constitution {
                 let k = STATE_BITS - g;
                 for v in x.iter_mut() {
                     *v = fit64(release(i128::from(*v), k) << k)?;
+                }
+            }
+            // [measurement] A ruler's rounding of one lane of every state after the tick, where set ([`Constitution::ruler_lane_grain`]).
+            if let Some((j, h, relative)) = self.ruler_lane_grain.filter(|&(j, _, _)| j < d.lanes) {
+                let lw = dw / d.lanes;
+                for site in x.chunks_exact_mut(dw) {
+                    let lane = &mut site[j * lw..(j + 1) * lw];
+                    let k = if relative {
+                        let rms = (lane.iter().map(|&v| (i128::from(v) * i128::from(v)) as u128).sum::<u128>() / lw as u128).isqrt();
+                        if rms == 0 { 0 } else { rms.ilog2().saturating_sub(h) }
+                    } else {
+                        h
+                    };
+                    if k > 0 {
+                        for v in lane.iter_mut() {
+                            *v = fit64(release(i128::from(*v), k) << k)?;
+                        }
+                    }
                 }
             }
             if keep {

@@ -1,0 +1,9 @@
+HEAT_READ W81e_mean exit=0 00:02:42 REACH setting=law group=all places=139998 nats_millionths=1307939 ms=210944
+HEAT_READ W81e_end exit=0 00:02:43 REACH setting=law group=all places=139998 nats_millionths=1367351 ms=212525
+HEAT_READ W81t_mean exit=0 00:07:12 REACH setting=law group=all places=139998 nats_millionths=1307643 ms=268263
+HEAT_READ W81t_end exit=0 00:07:18 REACH setting=law group=all places=139998 nats_millionths=1366509 ms=274773
+W82L_LAW W82l_mean exit=0 01:52:53 REACH setting=law group=all places=139998 nats_millionths=1428179 ms=214984
+W82L_LAW W82l_whole exit=0 01:52:54 REACH setting=law group=all places=139998 nats_millionths=1428176 ms=215646
+W82L_LAW W82l_end exit=0 01:57:10 REACH setting=law group=all places=139998 nats_millionths=1482972 ms=255943
+W82L_LAW W82t_end exit=0 01:57:10 REACH setting=law group=all places=139998 nats_millionths=1473470 ms=256417
+W82L_LAW W82t_mean exit=0 01:57:11 REACH setting=law group=all places=139998 nats_millionths=1417972 ms=257193
