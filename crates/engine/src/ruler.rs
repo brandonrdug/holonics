@@ -1302,6 +1302,36 @@ impl Constitution {
     }
 }
 
+impl Constitution {
+    /// [measurement; the lead, November 22] **The tension on the writer's own regime**: [`Constitution::crossing_tension`] for a passage read
+    /// by two streams ([`Constitution::strand_pass`], `past` its odd contacts facing the past), its rows the open places, where the writer
+    /// compares each place at its own frontier: for place `t` (one a class of `classes`), the covector each tick's reverse receives at its
+    /// open place, that place's pair chart `r̂′`, opening chart, current and triads' products, and its face's code of `classes[t]` (none at
+    /// the first place, which no open place compares). The temperatures, sources, values, charges and gates are left empty. A reading: no
+    /// state changes.
+    pub fn strand_tension(&self, classes: &[usize], past: bool) -> Result<CrossingTension> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambda: Vec<Vec<i64>> = Vec::new();
+        self.strand_returned_with(classes, &pass, &mut g, Some(&mut lambda))?;
+        lambda.reverse();
+        let d = &self.declaration;
+        let (n, dw, m2, j2) = (classes.len(), d.width, 2 * d.complex(), 2 * d.triads);
+        let open = |v: &[i64], w: usize| v[n * w..2 * n * w].to_vec();
+        let open32 = |v: &[i32], w: usize| v[n * w..2 * n * w].to_vec();
+        let codes = (0..n).map(|t| if t == 0 { None } else { pass.faces.get(t).map(|f| f.code(classes[t])) }).collect();
+        Ok(CrossingTension {
+            lambda: lambda.iter().map(|l| open(l, dw)).collect(),
+            read: pass.ticks.iter().map(|c| open32(&c.read2, dw)).collect(),
+            chart: pass.ticks.iter().map(|c| open32(&c.read, dw)).collect(),
+            current: pass.ticks.iter().map(|c| open(&c.y, m2)).collect(),
+            products: pass.ticks.iter().map(|c| if j2 == 0 { Vec::new() } else { open(&c.ct, j2) }).collect(),
+            codes,
+            ..Default::default()
+        })
+    }
+}
+
 /// [measurement; the lead, November 16 21:40Z] **A region's tension at the strand's return** ([`Constitution::crossing_tension`]), each list one
 /// entry a tick in tick order: `lambda` the covector the tick's reverse receives (`[t][D]`, on the covector's grain `2^(−24)`), `read` the
 /// pair chart `r̂′` (`[t][D]` on `2^(−16)`), `current` the gathered current `y` (`[t][2M]` on `2^(−16)`, each site's own frame), `products`
