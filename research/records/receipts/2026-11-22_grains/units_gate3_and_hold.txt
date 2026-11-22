@@ -18,3 +18,17 @@ UNITS_HOLD 8 old 07:22:44 last30 ms_mean=717.3 54.92, 2805 MHz
 UNITS_SAME_LINES runs 1 and 2
 UNITS_SAME_LINES runs 4 and 5
 UNITS_ALL_DONE 07:22:44
+# units1: lock taken 07:45:08 other runs: 1
+UNITS2_HOLD warm-up 07:45:10 48.49, 2580 MHz
+UNITS2_HOLD 1 old 07:45:43 last30 ms_mean=740.5 52.79, 2820 MHz
+UNITS2_HOLD 2 new 07:46:15 last30 ms_mean=730.0 53.15, 2805 MHz
+UNITS2_HOLD 3 new 07:46:47 last30 ms_mean=733.2 53.90, 2805 MHz
+UNITS2_HOLD 4 old 07:47:21 last30 ms_mean=752.8 54.29, 2805 MHz
+UNITS2_HOLD 5 old 07:47:54 last30 ms_mean=752.6 54.61, 2805 MHz
+UNITS2_HOLD 6 new 07:48:26 last30 ms_mean=730.2 54.48, 2805 MHz
+UNITS2_HOLD 7 new 07:48:59 last30 ms_mean=731.9 54.39, 2805 MHz
+UNITS2_HOLD 8 old 07:49:32 last30 ms_mean=751.0 54.50, 2805 MHz
+# units1: released 07:49:32
+UNITS2_SAME_LINES runs 1 and 2
+UNITS2_SAME_LINES runs 4 and 5
+UNITS2_ALL_DONE 07:49:32
