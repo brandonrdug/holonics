@@ -1203,18 +1203,12 @@ impl Learner {
     /// old entry's rate too, since a state tool that left the part rates behind once made every part train at the base rate with nothing refused.
     /// The held step and the last section's step, of the old layout, are dropped. Refused while a step is held.
     pub fn with_triads(&self, triads: usize, keys: &[u8]) -> Result<Self> {
-        if self.lattice.is_some() {
-            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
-        }
         self.with_triads_at(triads, keys, false)
     }
 
     /// [definition; theory, November 16 19:10Z] **The learner with crossing triads** ([`Constitution::with_crossings`]), opened as
     /// [`Learner::with_triads`] opens the strand's: every standing entry keeps its moments, its remainder and its rate at its new index.
     pub fn with_crossings(&self, triads: usize, keys: &[u8]) -> Result<Self> {
-        if self.lattice.is_some() {
-            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
-        }
         self.with_triads_at(triads, keys, true)
     }
 
@@ -1250,7 +1244,20 @@ impl Learner {
         // before later ones, so the rates are mapped, not appended).
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect::<Vec<_>>());
         let drawn = self.drawn + 4 * self.field.declaration.triad_draws(triads);
-        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        // [definition; the lead, November 22] Every standing entry keeps its carried remainders (the step's and the moments', E4 of #1088) and its
+        // lattice's rest at its new index, and every family its spread; a family the growth adds opens with no spread, read whole until the next
+        // save reads its spread (`Learner::refound_lattice`). Until this day the growth refused a learner on a lattice and opened every
+        // remainder at zero, which dropped what each entry had carried.
+        let mapped = |old: &[i32]| -> Vec<i32> { from.iter().map(|o| o.map_or(0, |i| old[i])).collect() };
+        let carried = self.carried.as_ref().map(|(f1, f2)| (mapped(f1), mapped(f2)));
+        let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect::<Vec<i64>>());
+        let lattice = self.lattice.as_ref().map(|l| {
+            let old_families = self.field.families_all();
+            let family_of = |i: usize| old_families.iter().position(|&(start, len, _)| i >= start && i < start + len);
+            let spread = field.families_all().iter().map(|&(start, len, _)| if len == 0 { 0 } else { from[start].and_then(family_of).map_or(0, |k| l.spread[k]) }).collect();
+            Lattice { spread, rest: mapped(&l.rest) }
+        });
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 16 21:40Z; atlas `contact.pool-founding`, `contact.tension-founds-face`] **The learner with its triads' legs
@@ -1265,9 +1272,6 @@ impl Learner {
     /// its unicity distance by a walk; legs located from the tension give the return its covector at the first section. Refused on a learner
     /// without triads, while a step is held, or where the lengths are not the declaration's.
     pub fn with_located_legs(&self, legs: &[i32], ret: Option<&[i32]>) -> Result<Self> {
-        if self.lattice.is_some() {
-            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
-        }
         if self.held.is_some() {
             return refuse("a learner's legs are founded after its held step is read");
         }
@@ -1283,6 +1287,18 @@ impl Learner {
         match ret {
             Some(r) => out.field.theta[l.w_triad..l.w_triad + dw * j2].copy_from_slice(r),
             None => out.field.theta[l.w_triad..l.w_triad + dw * j2].fill(0),
+        }
+        // [definition; the lead, November 22] Under a lattice the founded families are read whole, their rests at zero, until the next save
+        // reads their spread (`Learner::refound_lattice`); every other family keeps its lattice and every other entry its rest.
+        let founded = [(l.triad, j6 * dw), (l.triad_bias, j6), (l.w_triad, dw * j2)];
+        let families = out.field.families_all();
+        if let Some(lattice) = out.lattice.as_mut() {
+            for &(start, len) in &founded {
+                if let Some(k) = families.iter().position(|&(s0, n0, _)| s0 == start && n0 == len) {
+                    lattice.spread[k] = 0;
+                }
+                lattice.rest[start..start + len].fill(0);
+            }
         }
         let mean = |ranges: &[(usize, usize)]| -> i128 {
             let values: Vec<i128> = ranges.iter().flat_map(|&(start, len)| self.second[start..start + len].iter().copied()).collect();

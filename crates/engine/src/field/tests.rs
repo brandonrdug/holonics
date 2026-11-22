@@ -6890,3 +6890,51 @@ fn the_lattice_deposit_keeps_the_whole_word_and_reads_the_read_part() {
     }
     assert_eq!(a.field, b.field, "a lattice with no spread changes nothing");
 }
+
+/// [definition; the lead, November 22] **A growth carries the lattice and the remainders**: a learner on a lattice with carried remainders,
+/// grown by crossing triads, keeps every standing entry's whole word, read part, lattice rest and remainders at its new index and every
+/// family's spread; the families it adds open read whole with no rest; the grown learner reads back; and its legs founded at zero keep the
+/// lattice, the founded families read whole.
+#[test]
+fn a_growth_carries_the_lattice_and_the_remainders() {
+    let mut learner = Learner::new(drawn(shaped(1)), 12);
+    let n = learner.field.material_len();
+    learner.remainder = Some((0..n).map(|k| (k % 5) as i64).collect());
+    learner.carried = Some(((0..n).map(|k| (k % 7) as i32 - 3).collect(), (0..n).map(|k| (k % 3) as i32 - 1).collect()));
+    let mut mean = learner.clone();
+    for (k, v) in mean.field.material_mut().enumerate() {
+        *v -= ((k % 3) as i32 - 1) << 6;
+    }
+    let latticed = learner.with_lattice_from(&mean).unwrap();
+    let triads = 2;
+    let d = latticed.field.declaration;
+    let grown = latticed.with_crossings(triads, &keys(latticed.drawn + 4 * d.triad_draws(triads))).unwrap();
+    let (_, from) = latticed.field.with_crossings(triads, &keys(latticed.drawn + 4 * d.triad_draws(triads))[latticed.drawn..]).unwrap();
+    let (old_whole, new_whole) = (latticed.whole_material(), grown.whole_material());
+    let (ol, nl) = (latticed.lattice.as_ref().unwrap(), grown.lattice.as_ref().unwrap());
+    let (or, nr) = (latticed.remainder.as_ref().unwrap(), grown.remainder.as_ref().unwrap());
+    for (i, o) in from.iter().enumerate() {
+        match o {
+            Some(j) => {
+                assert_eq!(new_whole[i], old_whole[*j], "entry {i}: the whole word at its new index");
+                assert_eq!(nl.rest[i], ol.rest[*j], "entry {i}: the lattice's rest at its new index");
+                assert_eq!(nr[i], or[*j], "entry {i}: the step's remainder at its new index");
+            }
+            None => assert_eq!(nl.rest[i], 0, "entry {i}: a new entry opens with no rest"),
+        }
+    }
+    let places = nl.places();
+    for (k, &(start, len, _)) in grown.field.families_all().iter().enumerate() {
+        if len > 0 && from[start].is_none() {
+            assert!(places[k].is_none(), "family {k}: a family the growth adds is read whole");
+        }
+    }
+    let text = grown.to_text();
+    assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the grown learner reads back");
+    let g = grown.field.declaration;
+    let legs: Vec<i32> = (0..6 * g.triads * g.width + 6 * g.triads).map(|k| ((k % 9) as i32 - 4) << 10).collect();
+    let founded = grown.with_located_legs(&legs, None).unwrap();
+    assert!(founded.lattice.is_some(), "the legs' founding keeps the lattice");
+    let text = founded.to_text();
+    assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the founded learner reads back");
+}
