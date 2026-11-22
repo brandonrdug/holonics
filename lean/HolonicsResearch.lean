@@ -1223,6 +1223,7 @@ import HolonicsResearch.Mathematics.ColourScope
 import HolonicsResearch.Mathematics.RotorStep
 import HolonicsResearch.HNN.PassiveMode
 import HolonicsResearch.HNN.RingHand
+import HolonicsResearch.HNN.PumpedMoveKinds
 import HolonicsResearch.Geometry.ShiftClock
 import HolonicsResearch.Geometry.Crystallographic
 import HolonicsResearch.Geometry.TorusBraid
