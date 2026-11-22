@@ -1076,7 +1076,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word == "lanes" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") {
+        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1103,6 +1103,56 @@ pub fn read_reach(args: &[String]) -> Result<()> {
             return Err("a row of fewer than two places".into());
         }
         rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
+    }
+    // [the lead, November 22, the chirality pass's second read] The word `hands` among the settings: the circles' hands along their scans
+    // summed over every row ([`holonics_engine::field::Constitution::strand_chirality`]), printed as `REACH_HANDS` lines and each circle's
+    // line in `OUT/hands.tsv` (`circle`, `scan`, `turns`, `s_positive`, `bias` and `spread` of the turn chart on its `2^(−16)`), no code read.
+    if let Some(at) = settings.iter().position(|(n, _)| n == "hands") {
+        settings.remove(at);
+        let parts: Vec<holonics_engine::field::Chirality> = rows.par_iter().map(|(_, classes)| learner.field.strand_chirality(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let c = learner.field.declaration.carry;
+        let mut all = holonics_engine::field::Chirality { circle_turns: vec![0; c], circle_right: vec![0; c], circle_square: vec![0; c], circle_count: vec![0; c], ..Default::default() };
+        for p in &parts {
+            (all.pairs, all.s_agree, all.os_agree) = (all.pairs + p.pairs, all.s_agree + p.s_agree, all.os_agree + p.os_agree);
+            (all.left_turns, all.left_right, all.right_turns, all.right_right) = (all.left_turns + p.left_turns, all.left_right + p.left_right, all.right_turns + p.right_turns, all.right_right + p.right_right);
+            for k in 0..c {
+                all.circle_turns[k] += p.circle_turns[k];
+                all.circle_right[k] += p.circle_right[k];
+                all.circle_square[k] += p.circle_square[k];
+                all.circle_count[k] += p.circle_count[k];
+            }
+        }
+        let thousandths = |a: u64, b: u64| if b == 0 { 0 } else { a * 1000 / b };
+        println!("REACH_HANDS pairs={} s_agree_milli={} os_agree_milli={} left_turns={} left_right_milli={} right_turns={} right_right_milli={}", all.pairs, thousandths(all.s_agree, all.pairs), thousandths(all.os_agree, all.pairs), all.left_turns, thousandths(all.left_right, all.left_turns), all.right_turns, thousandths(all.right_right, all.right_turns));
+        std::fs::create_dir_all(out)?;
+        let (l, first) = (learner.field.layout(), learner.field.declaration.carry_first());
+        let mut text = String::from("circle\tscan\tturns\ts_positive\tbias\tspread\n");
+        for k in 0..c {
+            let spread = if all.circle_count[k] == 0 { 0 } else { (all.circle_square[k] / u128::from(all.circle_count[k])).isqrt() };
+            text.push_str(&format!("{k}\t{}\t{}\t{}\t{}\t{spread}\n", if (first + k) % 2 == 0 { "left" } else { "right" }, all.circle_turns[k], all.circle_right[k], learner.field.theta[l.carry_bias + k]));
+        }
+        write_new(&out.join("hands.tsv"), text.as_bytes())?;
+        // [the lead, November 22, the chirality pass's third read] Each circle's row of the turn chart `Q` (`D` words on the material's grain,
+        // little-endian), so a ruler reads which circles' rows stand near which.
+        let dw = learner.field.declaration.width;
+        let rows_q: Vec<u8> = learner.field.theta[l.carry..l.carry + c * dw].iter().flat_map(|v| v.to_le_bytes()).collect();
+        write_new(&out.join("carry_rows.i32"), &rows_q)?;
+    }
+    // [the lead, November 22, the chirality pass] The word `moves` among the settings: each known site's pumped-circle moves by kind and hand
+    // ([`holonics_engine::field::Constitution::strand_moves`]), written to `OUT/moves.tsv` (`row`, `group`, `place`, `class`, then turn+,
+    // turn−, shear+, shear−, lock+, lock−, flip+, flip− over every tick and circle), no code read.
+    if let Some(at) = settings.iter().position(|(n, _)| n == "moves") {
+        settings.remove(at);
+        let moves: Vec<Vec<[u32; 8]>> = rows.par_iter().map(|(_, classes)| learner.field.strand_moves(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        std::fs::create_dir_all(out)?;
+        let mut text = String::new();
+        for (r, ((group, classes), m)) in rows.iter().zip(&moves).enumerate() {
+            for (t, counts) in m.iter().enumerate() {
+                text.push_str(&format!("{r}\t{group}\t{t}\t{}\t{}\n", classes[t], counts.iter().map(u32::to_string).collect::<Vec<_>>().join("\t")));
+            }
+        }
+        write_new(&out.join("moves.tsv"), text.as_bytes())?;
+        println!("REACH_MOVES rows={} ms={}", rows.len(), started.elapsed().as_millis());
     }
     // [the lead, November 22, G-R4] The word `lanes` among the settings: each lane's root mean square in the states after every tick, over
     // every site of every row, one `REACH_LANE` line a tick and lane (on the state's `2^(−16)`, and its power of two's place), no code read.

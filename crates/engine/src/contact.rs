@@ -1405,6 +1405,102 @@ impl Constitution {
     /// [`Constitution::strand_pass`] formed them. Whether a circle's turn follows the site's symbol (a stride of its own a symbol,
     /// `navigator.content-stride-moment`) or stands the same at every site (a fixed advance) is read from these outside the machine.
     /// A reading: the state is the same with it.
+    /// [measurement; the lead, November 22, the chirality pass's read] **Each site's circle moves by kind, for a ruler on the host**: for a
+    /// passage read by two streams, at every tick and on every pumped circle, a site's move `Q ↦ γ Q + η conj(Q) + κ b` is a turn where
+    /// `|p| < 4|q|/(4 + q²)` (`p`, `q` the pump's and the turn's charts in units of `2^16`), a shear at equality, a lock between that and
+    /// `|p| = 1`, and a hand flip past it (`det = |γ|² − |η|² < 0`); its hand is the circle's scan direction (left where `(first + k)` is
+    /// even) times the sign of `q`. Returns for each of the passage's `n` known sites the counts `[turn+, turn−, shear+, shear−, lock+,
+    /// lock−, flip+, flip−]` over every tick and circle. Refused on a field whose circles are not pumped. A reading: the state is the same.
+    pub fn strand_moves(&self, classes: &[usize], past: bool) -> Result<Vec<[u32; 8]>> {
+        let d = &self.declaration;
+        if !d.pump || d.carry == 0 {
+            return refuse("a circle's moves read on a field whose circles are not pumped");
+        }
+        let pass = self.strand_pass(classes, true, past)?;
+        let (c, n, first) = (d.carry, classes.len(), d.carry_first());
+        let c2 = 2 * c;
+        let one = 1i128 << FACE_BITS;
+        let mut out = vec![[0u32; 8]; n];
+        for cell in &pass.ticks {
+            for t in 0..n {
+                for k in 0..c {
+                    let q = i128::from(cell.qh[t * c2 + k]);
+                    let (pr, pi) = (i128::from(cell.ph[t * c2 + k]), i128::from(cell.ph[t * c2 + c + k]));
+                    // |p| against 4|q| one² / (4 one² + q²), all on the charts' 2^-16 grain, as ⌊√|p|²⌋ (4 one² + q²) against 4 |q| one²
+                    // (each under 2^120: |p| under 2^40 and q² under 2^80 by the charts' bounds).
+                    let p2 = pr * pr + pi * pi;
+                    let lhs = (p2.unsigned_abs()).isqrt() * (4 * one * one + q * q).unsigned_abs();
+                    let rhs = 4 * q.unsigned_abs() * (one * one).unsigned_abs();
+                    let kind = if lhs < rhs { 0 } else if lhs == rhs { 1 } else if p2 <= one * one { 2 } else { 3 };
+                    let left = (first + k) % 2 == 0;
+                    let hand = usize::from(!((q >= 0) == left));
+                    out[t][2 * kind + hand] += 1;
+                }
+            }
+        }
+        Ok(out)
+    }
+
+    /// [measurement; the lead, November 22, the chirality pass's second read] **The circles' hands along their scans**, for a passage read by
+    /// two streams, summed over its ticks: on each circle, walking its sites in its own scan's order (left to right where `(first + k)` is even,
+    /// right to left otherwise) and taking each move's kind as [`Constitution::strand_moves`] does, `s = dir · sign q` on a turn (`dir = −1`
+    /// for a circle scanned from the right) and `o` the parity of the flips before the move along the scan: `[pairs, s_agree, os_agree]` over
+    /// consecutive turns of a circle (a flip between them counted in `o`); each circle's turns and those with `s > 0`; and at each site the
+    /// left-scanned and the right-scanned circles' turns with `s > 0` and in all; with each circle's sum of `(q − q_b)²` over its sites and
+    /// ticks and its count (the linear part's spread beside the bias). A reading: the state is the same.
+    pub fn strand_chirality(&self, classes: &[usize], past: bool) -> Result<Chirality> {
+        let d = &self.declaration;
+        if !d.pump || d.carry == 0 {
+            return refuse("a circle's hands read on a field whose circles are not pumped");
+        }
+        let pass = self.strand_pass(classes, true, past)?;
+        let (c, n, first) = (d.carry, classes.len(), d.carry_first());
+        let c2 = 2 * c;
+        let one = 1i128 << FACE_BITS;
+        let l = &self.layout;
+        let mut out = Chirality { circle_turns: vec![0; c], circle_right: vec![0; c], circle_square: vec![0; c], circle_count: vec![0; c], ..Default::default() };
+        for cell in &pass.ticks {
+            let kind = |t: usize, k: usize| -> (usize, i128) {
+                let q = i128::from(cell.qh[t * c2 + k]);
+                let (pr, pi) = (i128::from(cell.ph[t * c2 + k]), i128::from(cell.ph[t * c2 + c + k]));
+                let p2 = pr * pr + pi * pi;
+                let lhs = p2.unsigned_abs().isqrt() * (4 * one * one + q * q).unsigned_abs();
+                let rhs = 4 * q.unsigned_abs() * (one * one).unsigned_abs();
+                (if lhs < rhs { 0 } else if lhs == rhs { 1 } else if p2 <= one * one { 2 } else { 3 }, q)
+            };
+            for k in 0..c {
+                let left = (first + k) % 2 == 0;
+                let dir: i64 = if left { 1 } else { -1 };
+                let qb = i128::from(self.theta[l.carry_bias + k]);
+                let (mut prev, mut flips): (Option<(i64, i64)>, i64) = (None, 0);
+                for step in 0..n {
+                    let t = if left { step } else { n - 1 - step };
+                    let (kd, q) = kind(t, k);
+                    out.circle_square[k] += ((q - qb) * (q - qb)).unsigned_abs();
+                    out.circle_count[k] += 1;
+                    match kd {
+                        0 => {
+                            let s = dir * if q >= 0 { 1 } else { -1 };
+                            let o = if flips % 2 == 0 { 1 } else { -1 };
+                            if let Some((ps, po)) = prev {
+                                out.pairs += 1;
+                                out.s_agree += u64::from(ps == s);
+                                out.os_agree += u64::from(po * ps == o * s);
+                            }
+                            prev = Some((s, o));
+                            out.circle_turns[k] += 1;
+                            out.circle_right[k] += u64::from(s > 0);
+                            if left { out.left_turns += 1; out.left_right += u64::from(s > 0) } else { out.right_turns += 1; out.right_right += u64::from(s > 0) }
+                        }
+                        3 => flips += 1,
+                        _ => {}
+                    }
+                }
+            }
+        }
+        Ok(out)
+    }
+
     pub fn strand_gates(&self, classes: &[usize], past: bool) -> Result<Vec<Vec<i64>>> {
         let pass = self.strand_pass(classes, true, past)?;
         let (c2, n) = (2 * self.declaration.carry, classes.len());
@@ -1685,4 +1781,21 @@ pub(crate) fn lane_chart(xt: &[i64], lanes: usize, read: &mut Vec<i32>, scale: &
 /// roots on `2^(−16)`.
 pub(crate) fn chart_scale(width: usize) -> (u128, u128) {
     ((3u128 << 32).isqrt(), ((width as u128) << 32).isqrt())
+}
+
+
+/// [measurement; the lead, November 22] The circles' hands along their scans ([`Constitution::strand_chirality`]), summed over a passage's ticks.
+#[derive(Clone, Debug, Default)]
+pub struct Chirality {
+    pub pairs: u64,
+    pub s_agree: u64,
+    pub os_agree: u64,
+    pub circle_turns: Vec<u64>,
+    pub circle_right: Vec<u64>,
+    pub circle_square: Vec<u128>,
+    pub circle_count: Vec<u64>,
+    pub left_turns: u64,
+    pub left_right: u64,
+    pub right_turns: u64,
+    pub right_right: u64,
 }
