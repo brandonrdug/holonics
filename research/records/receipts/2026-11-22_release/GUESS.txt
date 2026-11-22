@@ -1,0 +1,99 @@
+Fixed 2026-11-22T06:19:38Z (date -u), in a cloud thread, before any of these reads is made. No state of the line was read to fix them: the
+figures behind them are the audit's of November 18 (its section 1.6), the reach receipts of November 21 and walk.txt, slips_W80.txt
+and carry_split_planted.txt beside this file. Each guess carries its own rule.
+
+G-C1 (a host read of codes the engineering thread already holds: read-reach's codes at W79t's mean, the law's column, split by
+carry_split.py). Where no carry is due, a sum's tens digit codes at 0.60 nats or more and its hundreds at 1.85 or more (three quarters
+of each digit's whole code, 0.832 and 2.465), and at the tens the code where a carry is due stands under 0.40 nats above the code
+where none is. Why: in the nine sums of the W80 panels, 10 digits differ from the reference's; none is the reference less one at a
+place a carry is due, and 7 stand where none is due (slips_W80.txt). Rule: held, the sums stand on their operands' arrival and the
+carry is not their subject; if the tens where no carry is due codes under 0.30, the carry is the tens' subject and the reading of
+October 24 (the lap kept beside the phase) comes before a second address.
+
+G-K1 (a host read of three saved means of the line, successive laps; no card). By family, d1 the displacement from the first
+mean to the second and d2 from the second to the third: the cosine of d1 and d2 is under 0.10 in w, read, a, b, q, v, out, probe,
+carry and pump, and over 0.20 in pace; and the root mean square of d2 in w, read and a stands between 0.3 and 1.5 times
+2^(-rate) sqrt(sections between the means). Why: the audit read the paces as the one family whose successive displacements agree
+(0.31, 0.51), and from lap 10 to lap 94 the power of w, read and a grew by 0.79, 0.86 and 0.60 of a free walk's at 2^(-12)
+(walk.txt, part 2; it assumes the audit's figures stand in the step's own unit, which this read replaces). Rule: held, what those
+families gain in a lap is of a walk's size and nothing upholds it, the premise of the arm below; missed (a cosine over 0.30 outside
+pace), the material is driven and a leak would take what a comparison is still depositing: the arm waits and this guess's miss is
+the reading.
+
+G-K2 (the arm, if G-K1 holds: the line's end state with `set-leak 14`, beside its control, one change; read at each lap's mean).
+(a) At lap 3 the root mean square of w, of read and of a stands at 0.94 of the control's or under.
+(b) The held text at one place open stands within 0.01 nats a place of the control's on every region at laps 2 and 3.
+(c) The terrain's held records written whole stand within 4 of the control's at lap 3, and the brackets closed within 3.
+(d) The median modulus of the carry circles' turn chart stands within 5% of the control's at lap 3, and the paces' rates at a
+    newline and at a closing bracket stand under the control's.
+Why: at 14 bits a store settles 0.42 of the way in three laps and an unrestrained entry rests at 0.022 where the walk stood at
+0.130 (walk.txt, part 3); the growth since lap 10 was 0.38 to 0.44 of those families' power; a comparison holds what it reads, so
+the text and the turns stand; and three laps are short of the 5.5 a store takes to settle, so the writes are not guessed to move yet.
+Rule: the leak stays in the line where (b) holds, as the stores law's own term; it leaves where the text reads more than 0.02 above
+the control at lap 3. Where (d) misses on the turns, the next arm spares the families whose rows chart a turn or a clock.
+Its worth to the writes is read at laps 6 and 10: guessed, under even odds, at 5 or more of 96 held records over the control by
+lap 10.
+
+Amended 2026-11-22T06:35:30Z (date -u), before any of these reads is made and before anything was sent to the engineering thread.
+
+G-K1 is superseded: its premise was on record and had not been read when it was fixed. The audit's section 1.1 reads the lap-to-lap
+displacements of the mean at cosines 0.11, 0.04 and -0.11 over laps 92 to 94 and four laps' displacement at 2.0 to 2.5 of one lap's;
+its companion reads -0.07 to -0.22 lap to lap from lap 40; THE_ENGINE's section 11 gives the material's travel as 2% of its root
+mean square a lap, where a free walk's lap is 7.9% (length.txt, part 2). So the entries are held and do not walk, and "of a walk's
+size and nothing upholds it" does not stand. The figures 0.79, 0.86 and 0.60 stand as arithmetic and are read by another law (the
+record's section 3: every step lengthens a part read as a ratio by 2^(-2 rate) of power an entry a section whatever holds its
+direction; length.txt, part 1, plants it at 0.97 to 0.99).
+
+G-K2 is withdrawn before it ran. Under that law a leak of 14 bits rests a part read as a ratio at a root mean square of 0.022, an
+eighth of where w and read stand, turning 7.6 times as far a section (length.txt, part 3), and 12 bits, the candidate on record, at
+0.011 and 15 times: heat on a line the audit reads at the floor of its own step. Clause (b) would have missed by this arithmetic.
+The leak under which w, read, a and the opening rest where they stand is 19.6 to 19.9 bits, and at 20 bits nothing readable moves in
+an arm of three laps (such a part settles by e in 175 laps), so no arm is ordered.
+
+G-L1 (a host read of three successive means of the line: tools/state_travel.py scale, or the audit's travel.py with each travel's
+component along its family; no card). With eps a family's relative lengthening over a lap, <d, x>/|x|^2, rms its root mean square
+at the lap's start in its own unit, r the state's rate and n the sections between the means, c = 2 eps rms^2 2^(2r) / n.
+(a) c stands between 0.5 and 1.1 for w, for read and for a (at rate 12, 3,000 sections and the audit's sizes: 1.6 to 3.4 parts a
+    thousand a lap for w and read, 1.9 to 4.2 for a).
+(b) The cosine of a lap's travel with the family it left stands between 0.08 and 0.25 for each of the three.
+(c) c for the paces stands over 100 (530 by the audit's two figures).
+Why: length.txt, parts 1, 2 and 5; the scale read of November 11 gave 0.10 to 0.20 for the letter rows' cosine with their block.
+Rule: held, the lengthening is the step's own and the leak's value is read from a part's size over its step (the record's section
+3); (a) under 0.2, the growth since lap 10 was early or a comparison's, those families are not read as ratios where the line stands,
+and the law names no leak for them; (c) is the paces' push, which a balance of their own answers.
+
+G-L0, fixed 2026-11-22T06:36:38Z (date -u): a read of receipts already committed, the scale read of November 11 on the floor line's lap means
+(g73_scale_floor_means.txt under that day's record on a deposit's rate; rate 12, 1,535 sections a lap; c as in G-L1). Seen before
+this was fixed: the lap=0 lines of the first lane's blocks and of six of the second's, where c reads 0.71 for w's old columns,
+0.96 for the lift's rows and 0.80 for moment_face, and under 0.2 for the old rows of a and b. Unseen: every lap=1 line, the rest of
+the second lane, and the other three files.
+(a) At lap=1, c of the first lane's w (old), read_rows and moment_face each stands between 0.4 and 1.3.
+(b) At lap=1, c of the first lane's a (old) and b (old) each stands under 0.4.
+(c) The second lane's q, v and probe read c over 3 on both laps: a push, and no lengthening of the step's own.
+Rule: (a) and (b) held, the law is the lane's writers' and their lift's and is not the contacts' rows'; (c) held, part 5 of length.py,
+which took those charts' 18 parts in a thousand as the law's own figure, is withdrawn.
+
+G-L0 scored 2026-11-22T06:39:34Z (scale_c_floor_means.txt; c with one standard deviation of a drawn cosine).
+(a) MISSED. At lap=1: w (old) 1.38 (0.54), read_rows 1.69 (0.40), moment_face 2.17 (0.59), where 0.4 to 1.3 was guessed. The figures
+    called seen were computed at 3,000 sections a lap where that line's lap is 1,535: the seen lap reads 1.39, 1.88 and 1.55, and the
+    guess stood on that slip.
+(b) HELD. a (old) +0.01 (0.57), b (old) +0.21 (0.84).
+(c) HELD. q 4.35 and 4.23, v 8.31 and 8.38, probe 7.67 and 8.41. Part 5 of length.py is withdrawn: those charts were charging, and
+    their 18 parts in a thousand is no figure of the step's own lengthening.
+Beside the guess: each block's c repeats from one lap to the next (the second lane: w old 0.28 and 0.29, the lift's rows 1.04 and
+1.14, a old 0.49 and 0.39, b old 0.64 and 0.60, moment_face -0.61 and -0.54, out 3.10 and 2.67), so a block's size has a steady rate
+of its own, of the order of the step's lengthening and of either sign about it; and a family's travel a lap in its own unit is the
+same in both lanes (0.73 to 1.05 of the first lane's over the nine families whose sizes stand 4.5 to 8.9 times apart).
+
+G-L1 as fixed at 06:35:30 is replaced, 2026-11-22T06:39:34Z, before any read of the store line: the floor line's read above bears on it.
+G-L1 (a host read of three successive means of the store line: tools/state_travel.py scale, or the audit's travel.py with each
+travel's component along its family; no card; c as above with the state's own rate and the sections between the means).
+(a) Where one family's blocks in two lanes stand 2 times apart in size or more, their travels a lap in their own unit stand within
+    a factor of 1.5 of each other, in at least four families of five.
+(b) c of the lift's rows (read) stands between 0.6 and 2.2 in every lane, and each block's c at the second travel stands within 0.5
+    or a third of its c at the first.
+(c) c of the paces stands over 100 (530 by the audit's two figures).
+Why: scale_c_floor_means.txt; length.txt, parts 1 and 2. Rule: (a) held, a part's turn on the store line is its rate over its size
+and the deposit's rate is counted from a gauge there as on the floor line; (b) held, the lift's rows lengthen by the step alone and
+each block's size has its own steady rate, so one leak for every entry rests no two blocks alike; (c) is the paces' push, which a
+balance of their own answers.

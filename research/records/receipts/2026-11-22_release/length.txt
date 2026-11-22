@@ -1,0 +1,31 @@
+PART 1, a planted part read as a ratio (rate 8; 1,024 entries; laps of 3,000 sections)
+LENGTH hold=0.0  c=0.989 (1 on a white covector)  net travel a lap over a free walk's=0.991  cosine of successive laps=-0.004  of a lap with the part=+0.001
+LENGTH hold=0.5  c=0.988 (1 on a white covector)  net travel a lap over a free walk's=0.394  cosine of successive laps=-0.313  of a lap with the part=+0.303
+LENGTH hold=2.0  c=0.986 (1 on a white covector)  net travel a lap over a free walk's=0.231  cosine of successive laps=+0.014  of a lap with the part=+0.562
+LENGTH hold=8.0  c=0.973 (1 on a white covector)  net travel a lap over a free walk's=0.164  cosine of successive laps=+0.471  of a lap with the part=+0.795
+REST   leak= 8  rms=0.0417  2^(-rate) sqrt(2^(K-1))=0.0442  ratio=0.944 (sqrt c)  turn a section=0.02319  2^(-(K-1)/2)/sqrt(15)=0.02282
+REST   leak=10  rms=0.0863  2^(-rate) sqrt(2^(K-1))=0.0884  ratio=0.976 (sqrt c)  turn a section=0.01145  2^(-(K-1)/2)/sqrt(15)=0.01141
+REST   leak=12  rms=0.1747  2^(-rate) sqrt(2^(K-1))=0.1768  ratio=0.988 (sqrt c)  turn a section=0.00571  2^(-(K-1)/2)/sqrt(15)=0.00571
+PART 2, the line (the audit of November 18, section 1.6): rate 12, 3,000 sections a lap, lap 10 to lap 94
+LINE w        rms 0.129 -> 0.169  c=0.79  lengthening a lap at lap 94, parts a thousand: 2.48 at this c, 3.13 at c=1, 0.21 at c=1/15  turn a section=0.000373  rests at its present size under K=19.87
+LINE read     rms 0.128 -> 0.171  c=0.86  lengthening a lap at lap 94, parts a thousand: 2.62 at this c, 3.06 at c=1, 0.20 at c=1/15  turn a section=0.000369  rests at its present size under K=19.90
+LINE a        rms 0.120 -> 0.153  c=0.60  lengthening a lap at lap 94, parts a thousand: 2.29 at this c, 3.82 at c=1, 0.25 at c=1/15  turn a section=0.000412  rests at its present size under K=19.58
+LINE opening  rms 0.084 -> 0.165  c=1.34  lengthening a lap at lap 94, parts a thousand: 4.41 at this c, 3.28 at c=1, 0.22 at c=1/15  turn a section=0.000382  rests at its present size under K=19.80
+LINE a free walk's lap: 0.01337, 7.9% of 0.169 and 10.4% of 0.129; a walk of unlike sections at the ratio's own rms: 0.00345, 2.0% of 0.169
+PART 3, a part read as a ratio under a leak of K bits (rate 12, c = 1; present turn of a part of rms 0.169 beside)
+LEAK K=12  rest rms=0.0110  turn at rest=0.005705  over the present turn= 15.30  settles by e in     0.7 laps (its power)  an entry under 0.00012 stands (grain 2^-24), under 0.0312 (grain 2^-16)
+LEAK K=14  rest rms=0.0221  turn at rest=0.002853  over the present turn=  7.65  settles by e in     2.7 laps (its power)  an entry under 0.00049 stands (grain 2^-24), under 0.1250 (grain 2^-16)
+LEAK K=16  rest rms=0.0442  turn at rest=0.001426  over the present turn=  3.82  settles by e in    10.9 laps (its power)  an entry under 0.00195 stands (grain 2^-24), under 0.5000 (grain 2^-16)
+LEAK K=18  rest rms=0.0884  turn at rest=0.000713  over the present turn=  1.91  settles by e in    43.7 laps (its power)  an entry under 0.00781 stands (grain 2^-24), under 2.0000 (grain 2^-16)
+LEAK K=20  rest rms=0.1768  turn at rest=0.000357  over the present turn=  0.96  settles by e in   174.8 laps (its power)  an entry under 0.03125 stands (grain 2^-24), under 8.0000 (grain 2^-16)
+LEAK K=22  rest rms=0.3536  turn at rest=0.000178  over the present turn=  0.48  settles by e in   699.1 laps (its power)  an entry under 0.12500 stands (grain 2^-24), under 32.0000 (grain 2^-16)
+LEAK K=24  rest rms=0.7071  turn at rest=0.000089  over the present turn=  0.24  settles by e in  2796.2 laps (its power)  an entry under 0.50000 stands (grain 2^-24), under 128.0000 (grain 2^-16)
+PART 4, the paces (the audit: maximum 12.9 -> 19.9, rms 2.50 -> 3.77, lap 10 to lap 94)
+PACE maximum  mean ratio a section=0.1138  its rest 2^(K - rate) ratio at K=18, 19, 20:   7.3  14.6  29.1
+PACE rms      mean ratio a section=0.0206  its rest 2^(K - rate) ratio at K=18, 19, 20:   1.3   2.6   5.3
+PART 5, WITHDRAWN (G-L0 (c), GUESS.txt): the second lane's charts were charging, c 4 to 8 (scale_c_floor_means.txt), so the figures below take a push for the step's own lengthening
+RATIO forms at 0.23 and 0.14 of the first lane's lengthen 19 to 51 times as fast (read: 18 to 24 parts a thousand a lap against under 1)
+RAISED rate x 4: lengthening by lap, parts a thousand, from the floor's 18 alone:   257   169   126   101    84    72
+RAISED rate x 8: lengthening by lap, parts a thousand, from the floor's 18 alone:   823   304   188   136   107    88
+RAISED rate x16: lengthening by lap, parts a thousand, from the floor's 18 alone:  2209   379   214   150   115    94
+RAISED read on November 11: 71 at four times the rate and 110 at eight; 184 then 107 on a raised chart (the laps of those reads not recorded)
