@@ -355,7 +355,9 @@ impl Constitution {
             return refuse("a region needs one class and one resolution a site, and two sites to meet");
         }
         // A triad's third leg is read at the site after (`triad_products`), which a known stream's site has not met; no one-sided triad is built.
-        if self.sided(region) && self.declaration.triads > 0 {
+        // [definition; the lead, November 22] A crossing triad's three legs stand at the site itself (`Declaration::crossing`), so the reason
+        // does not reach it: a known stream reads a crossing triad as every other place does.
+        if self.sided(region) && self.declaration.triads > 0 && !self.declaration.crossing {
             return refuse("a known stream on a field with triads, whose third leg is the site after");
         }
         if region.classes.len() > self.declaration.reach {
