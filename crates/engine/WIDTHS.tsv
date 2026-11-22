@@ -23,9 +23,9 @@
 # ceiling shifts engine 127
 # ceiling shifts engine-cuda 249
 # ceiling shifts athena 42
-# ceiling tolerances engine 7
+# ceiling tolerances engine 2
 # ceiling tolerances engine-cuda 0
-# ceiling tolerances athena 1
+# ceiling tolerances athena 0
 name	owner	value	class	need
 FACE_BITS	crates/engine/src/width.rs	16	picked	the root grain of states, faces, charts and currents. Its law: a state is a count in its lane's own power, the unit a lane's rms and never a place under the point (every read of a face is a ratio to the lane's power; Lean HNN/GrainRelation, lane_ratio_scale). Read (G-W3, the lead, November 21): rounding every state to 2^-5 moves the held code by under 0.0001 nats a place and to 2^-1 by 0.0012, so fifteen of its sixteen places under the point are read by nothing. Next read: each lane's rms beside the sweep written in places under it (G-R4, the second record of November 21, section 8)
 STATE_BITS	crates/engine/src/width.rs	16	picked	a class's share at a site; the face's grain under a second literal. Same law and read as FACE_BITS

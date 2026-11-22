@@ -444,14 +444,32 @@ impl MaterialMean {
 
     /// The field's material joins the sum; refused on a material of another length and past `2^31` states.
     pub fn take(&mut self, field: &Constitution) -> Result<()> {
-        if field.material_len() != self.sum.len() || self.states >= 1 << 31 {
+        self.join(field.material_len(), field.material().map(|&v| i64::from(v)))
+    }
+
+    /// [definition; the lead, November 22, the second precision pass] The learner's whole words ([`Learner::whole_material`]: each read part
+    /// plus its rest under a lattice) join the sum; refused on a material of another length and past `2^31` states.
+    pub fn take_whole(&mut self, learner: &Learner) -> Result<()> {
+        self.join(learner.field.material_len(), learner.whole_material().into_iter())
+    }
+
+    fn join(&mut self, len: usize, values: impl Iterator<Item = i64>) -> Result<()> {
+        if len != self.sum.len() || self.states >= 1 << 31 {
             return refuse("a material joined to a mean of another length, or past the states its sums hold");
         }
-        for (sum, &v) in self.sum.iter_mut().zip(field.material()) {
-            *sum += i64::from(v);
+        for (sum, v) in self.sum.iter_mut().zip(values) {
+            *sum += v;
         }
         self.states += 1;
         Ok(())
+    }
+
+    /// [definition; the lead, November 22] The mean of each entry, to its nearest grain; refused before a state joined.
+    pub fn values(&self) -> Result<Vec<i64>> {
+        if self.states == 0 {
+            return refuse("a mean read before a state joined");
+        }
+        Ok(self.sum.iter().map(|&sum| div_nearest(i128::from(sum), i128::from(self.states)) as i64).collect())
     }
 
     /// The states joined.

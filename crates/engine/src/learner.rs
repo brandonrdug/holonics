@@ -445,11 +445,14 @@ pub struct Learner {
     pub carried: Option<(Vec<i32>, Vec<i32>)>,
     /// [definition; the lead, November 21, E5 of #1088 (the October lattice deposit; Lean `HNN/LatticeDeposit`, `lattice_deposit_accounting`;
     /// atlas `hnn.lattice-deposit`)] **The forward reads each family's read part, and the deposit integrates under it**: each entry is its
-    /// read part on its family's lattice of `L` places below the point plus a carried rest under half of that lattice's unit, and the
-    /// material every forward and every reader reads is the read part. A section's step adds to the read part and its rest, and the read
-    /// part moves only where their sum crosses a lattice point, so `read + rest + Σ released = start + Σ steps`. The places are the lattice
-    /// rule's ([`Constitution::lattice_by_rule`]) for a receiver's tolerance `2^(−tolerance_bits)` nats at every symbol. Carried in the
-    /// learner's text as two trailing lines (`lattice`, `lattice_rest`) after the moments' carried lines, and only where present.
+    /// read part on its family's lattice plus a carried rest under half of that lattice's unit, and the material every forward and every
+    /// reader reads is the read part. A section's step adds to the read part and its rest, and the read part moves only where their sum
+    /// crosses a lattice point, so `read + rest + Σ released = start + Σ steps`.
+    /// [definition; the lead, November 22, the second precision pass (the record of November 21, "a grain is a relation between grains",
+    /// §4 and §7; atlas `radix.grain-is-a-relation`)] **A family's lattice is a relation to its own spread**: its unit is the power of two one
+    /// place under its whole words' standing spread (the rms of a save's end less the mean of the states since the save before), read from
+    /// the machine at a save and carried in this line, never a tolerance handed in by number ([`Lattice`]). Carried in the learner's text as
+    /// two trailing lines (`lattice`, `lattice_rest`) after the moments' carried lines, and only where present.
     pub lattice: Option<Lattice>,
     /// [measurement; §16.41] The step the last section stood at, the operand of the next section's
     /// [`Receipt::transfer`]; a reading's operand, not carried in the learner's text, cleared by every growth, and not
@@ -699,22 +702,47 @@ impl StorePass {
     }
 }
 
-/// [definition; the lead, November 21, E5 of #1088] A learner's lattice ([`Learner::lattice`]): the receiver's tolerance in bits, each
-/// family's places below the point (one a family of [`Constitution::families_all`]), and each entry's rest under its read part, on its
-/// family's grain.
+/// [definition; the lead, November 21, E5 of #1088; re-founded November 22] A learner's lattice ([`Learner::lattice`]): each family's unit,
+/// the standing spread of its whole words (read part plus rest), the root mean square of a save's end less the mean of the states since the
+/// save before, on `2^(−MATERIAL_BITS)` whatever the family's grain (zero for a family that did not move), one a family of
+/// [`Constitution::families_all`]; and each entry's rest under its read part, on its family's grain.
+/// A family of spread `σ` reads its entries on the power of two one place under `σ`'s own ([`Lattice::places`]): the static rent of a place
+/// is `R (u/σ)² / 12` (the record's §3) and a store that jitters by `σ ≥ u` is read without bias (its frozen error, §6, under `10^(−9)` of a
+/// grain), so one place under is under a 48th of the store's own heat; a family that did not move is read whole.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Lattice {
-    pub tolerance_bits: u32,
-    pub places: Vec<u32>,
+    pub spread: Vec<u64>,
     pub rest: Vec<i32>,
 }
 
+/// [definition; the lead, November 22] **Each family's standing spread**: the root mean square of `end − mean` over its entries, each
+/// difference on `2^(−MATERIAL_BITS)` (a family on a coarser grain shifted up), rounded down; one a family of `families`.
+pub fn family_spreads(families: &[(usize, usize, u32)], end: &[i64], mean: &[i64]) -> Vec<u64> {
+    families
+        .iter()
+        .map(|&(start, n, grain)| {
+            if n == 0 {
+                return 0;
+            }
+            let up = MATERIAL_BITS.saturating_sub(grain);
+            let sq: u128 = (start..start + n).map(|i| { let d = (i128::from(end[i]) - i128::from(mean[i])).unsigned_abs() << up; d * d }).sum();
+            u64::try_from((sq / n as u128).isqrt()).unwrap_or(u64::MAX)
+        })
+        .collect()
+}
+
 impl Lattice {
+    /// Each family's places below the point, one place under its spread's own power of two (`MATERIAL_BITS − ⌊log₂ σ⌋ + 1`, `σ` on
+    /// `2^(−MATERIAL_BITS)`), and `None` for a family with no spread, read whole.
+    pub fn places(&self) -> Vec<Option<u32>> {
+        self.spread.iter().map(|&s| (s > 0).then(|| (MATERIAL_BITS + 1).saturating_sub(s.ilog2()))).collect()
+    }
+
     /// Each entry's places dropped below its family's grain: `grain − L` where the lattice is coarser than the grain, else zero.
     pub(crate) fn drops(&self, families: &[(usize, usize, u32)], len: usize) -> Vec<u32> {
         let mut drop = vec![0u32; len];
-        for (&(start, n, grain), &places) in families.iter().zip(&self.places) {
-            drop[start..start + n].fill(grain.saturating_sub(places));
+        for (&(start, n, grain), places) in families.iter().zip(self.places()) {
+            drop[start..start + n].fill(places.map_or(0, |p| grain.saturating_sub(p)));
         }
         drop
     }
@@ -724,6 +752,9 @@ impl Lattice {
         let drops = self.drops(families, len);
         for ((v, r), &q) in material.zip(self.rest.iter_mut()).zip(&drops) {
             if q == 0 {
+                // A family read whole holds no rest: what it held joins the read part.
+                *v = i32::try_from(i128::from(*v) + i128::from(*r)).map_err(|_| TowerError::Refused("a read part past its 32-bit word"))?;
+                *r = 0;
                 continue;
             }
             let full = i128::from(*v) + i128::from(*r);
@@ -736,21 +767,72 @@ impl Lattice {
 }
 
 impl Learner {
-    /// [definition; the lead, November 21, E5 of #1088] **The learner whose forward reads the lattice rule's read parts** ([`Learner::lattice`])
-    /// for a receiver's tolerance `2^(−tolerance_bits)` nats: every entry split into its read part and its rest, so the whole word is the
-    /// source's and every face reads the read part. Every other line is kept. Refused where a lattice is set.
-    pub fn with_lattice(&self, tolerance_bits: u32) -> Result<Self> {
+    /// [definition; the lead, November 22, the second precision pass] **The learner's whole words**: each entry's read part plus its rest
+    /// ([`Learner::lattice`]), or its material where no lattice is set.
+    pub fn whole_material(&self) -> Vec<i64> {
+        match &self.lattice {
+            Some(l) => self.field.material().zip(&l.rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect(),
+            None => self.field.material().map(|&v| i64::from(v)).collect(),
+        }
+    }
+
+    /// [definition; the lead, November 22, the second precision pass (G-R5)] **The learner whose forward reads each family's read part on a
+    /// lattice one place under its own spread** ([`Lattice`]), the spread read from this state as a save's end and `mean`'s whole words as the
+    /// mean of the states before it: every entry split into its read part and its rest, so the whole word is this state's and every face
+    /// reads the read part. Every other line is kept. Refused where a lattice is set or on a mean of another material.
+    pub fn with_lattice_from(&self, mean: &Learner) -> Result<Self> {
         if self.lattice.is_some() {
             return refuse("a learner whose forward already reads a lattice");
         }
+        let len = self.field.material_len();
+        if mean.field.material_len() != len {
+            return refuse("a lattice founded from a mean of another material");
+        }
         let mut out = self.clone();
         let families = out.field.families_all();
-        let len = out.field.material_len();
-        let mut lattice = Lattice { tolerance_bits, places: out.field.lattice_by_rule(tolerance_bits), rest: vec![0; len] };
+        let mut lattice = Lattice { spread: family_spreads(&families, &self.whole_material(), &mean.whole_material()), rest: vec![0; len] };
         lattice.settle(&families, &mut out.field.material_mut(), len)?;
         out.lattice = Some(lattice);
         out.last = None;
         Ok(out)
+    }
+
+    /// [definition; the lead, November 22, the second precision pass (the record's §7: "the lattice is re-founded at a save where the spread
+    /// has moved a place, and `settle` conserves across it")] **The lattice re-founded at a save**: each family's spread read from this
+    /// state's whole words against `mean_whole` (the whole words' mean of the states since the save before); a family whose spread's power
+    /// of two moved (or which began or ceased to move) takes the new spread, and its entries are settled on the new lattice, each read part
+    /// and rest summed and split again, so every whole word is kept. Returns the families re-founded; none where no lattice is set.
+    pub fn refound_lattice(&mut self, mean_whole: &[i64]) -> Result<usize> {
+        let whole = self.whole_material();
+        let families = self.field.families_all();
+        let len = self.field.material_len();
+        let Some(lattice) = self.lattice.as_mut() else { return Ok(0) };
+        if mean_whole.len() != len {
+            return refuse("a lattice re-founded from a mean of another material");
+        }
+        let fresh = family_spreads(&families, &whole, mean_whole);
+        let place = |s: u64| (s > 0).then(|| s.ilog2());
+        let moved: Vec<usize> = (0..families.len()).filter(|&k| place(fresh[k]) != place(lattice.spread[k])).collect();
+        if moved.is_empty() {
+            return Ok(0);
+        }
+        for &k in &moved {
+            lattice.spread[k] = fresh[k];
+        }
+        let drops = lattice.drops(&families, len);
+        let mut chosen = vec![false; len];
+        for &k in &moved {
+            let (start, n, _) = families[k];
+            chosen[start..start + n].fill(true);
+        }
+        for (((v, r), &q), _) in self.field.material_mut().zip(lattice.rest.iter_mut()).zip(&drops).zip(&chosen).filter(|(_, c)| **c) {
+            let full = i128::from(*v) + i128::from(*r);
+            let read = if q == 0 { full } else { release(full, q) << q };
+            *v = i32::try_from(read).map_err(|_| TowerError::Refused("a read part past its 32-bit word"))?;
+            *r = i32::try_from(full - read).map_err(|_| TowerError::Refused("a lattice's rest past its word"))?;
+        }
+        self.last = None;
+        Ok(moved.len())
     }
 
     /// [measurement; the lead, November 21, the precision pass's G-W4] The deposit's two moments, one entry each for the material: a reading.
@@ -947,7 +1029,7 @@ impl Learner {
             // [the lead, November 21, E4 of #1088] The moments' carried remainders, two trailing lines after the remainder's, only where carried.
             let carried = self.carried.as_ref().map_or(String::new(), |(cf, cs)| format!("carried_first {}\ncarried_second {}\n", cf.iter().map(i32::to_string).collect::<Vec<_>>().join(" "), cs.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")));
             // [the lead, November 21, E5 of #1088] The lattice, two trailing lines after the moments' carried lines, only where set.
-            let lattice = self.lattice.as_ref().map_or(String::new(), |l| format!("lattice {} {}\nlattice_rest {}\n", l.tolerance_bits, l.places.iter().map(u32::to_string).collect::<Vec<_>>().join(" "), l.rest.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")));
+            let lattice = self.lattice.as_ref().map_or(String::new(), |l| format!("lattice {}\nlattice_rest {}\n", l.spread.iter().map(u64::to_string).collect::<Vec<_>>().join(" "), l.rest.iter().map(i32::to_string).collect::<Vec<_>>().join(" ")));
             format!("hnn-field-learner-v3 {} {} {} {held}\n{}{}\n{}\n{step}{parts}{own}{leak}{remainder}{carried}{lattice}{pass}", self.rate_bits, self.drawn, self.laps, self.field.to_text(), join(&self.first), join(&self.second))
         }
     }
@@ -1093,17 +1175,17 @@ impl Learner {
             }
             _ => None,
         };
-        // [definition; the lead, November 21, E5 of #1088] The lattice, two trailing lines after the moments' carried lines: the tolerance's bits
-        // and one place count a family, then one rest an entry, each under half its lattice's unit.
+        // [definition; the lead, November 21, E5 of #1088; re-founded November 22] The lattice, two trailing lines after the moments' carried
+        // lines: one spread a family, then one rest an entry, each under half its lattice's unit.
         let lattice = match lines.peek() {
             Some(l) if l.starts_with("lattice ") => {
-                let w = read_numbers::<u32>(lines.next().and_then(|l| l.strip_prefix("lattice ")))?;
+                let spread = read_numbers::<u64>(lines.next().and_then(|l| l.strip_prefix("lattice ")))?;
                 let rest = read_numbers::<i32>(lines.next().and_then(|l| l.strip_prefix("lattice_rest ")))?;
                 let families = field.families_all();
-                if w.len() != families.len() + 1 || rest.len() != field.material_len() {
-                    return refuse("a learner's lattice that is not one place count a family and one rest an entry");
+                if spread.len() != families.len() || rest.len() != field.material_len() {
+                    return refuse("a learner's lattice that is not one spread a family and one rest an entry");
                 }
-                let lattice = Lattice { tolerance_bits: w[0], places: w[1..].to_vec(), rest };
+                let lattice = Lattice { spread, rest };
                 let drops = lattice.drops(&families, field.material_len());
                 if lattice.rest.iter().zip(&drops).any(|(&r, &q)| if q == 0 { r != 0 } else { i128::from(r).abs() > 1i128 << (q - 1) }) {
                     return refuse("a lattice's rest outside half its lattice's unit");

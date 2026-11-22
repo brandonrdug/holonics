@@ -331,6 +331,10 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     println!("STORE_PASS_AT stretches={} {} {} ms={}", pass.stretches, pass.slices.iter().map(|s| format!("{}_piece={} {}_cursor={} {}_taken={}", s.name, s.piece, s.name, s.cursor, s.name, s.taken)).collect::<Vec<_>>().join(" "), counters_text(realization), started.elapsed().as_millis());
     let mut cut = Cut { seed, slices, pass };
     let mut mean = MaterialMean::new(learner.field.material_len());
+    // [definition; the lead, November 22, the second precision pass] Under a lattice the trainer also sums the whole words (each read part
+    // plus its rest): at a save their mean is written as `WHOLE.k` beside `MEAN.k` (the mean of read parts), and each family's spread, the
+    // end's whole words less that mean, re-founds the families whose spread moved a place ([`Learner::refound_lattice`]).
+    let mut whole = learner.lattice.as_ref().map(|_| MaterialMean::new(learner.field.material_len()));
     // The step's price since the last save ([`Receipt::transfer`] and [`Receipt::external`]), printed and never acted on.
     let (mut transfers, mut externals, mut curvatures, mut priced, mut since) = (0i128, 0i128, 0i128, 0usize, 0usize);
     let mut prior: Option<i128> = None;
@@ -352,6 +356,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // kind as its share of the section's sites holds ([`holonics_engine::field::PassTerrain`]): every expression known, every answer and
         // its line feed open. A region's kind turns with the terrain's count of records, so every kind is met alike.
         let (mut terrain_regions, mut terrain_records, mut terrain_budget) = (0usize, 0u64, 0u64);
+        // [definition; the lead, November 22] The terrain's count of records met when the section opens, kept so that a section the pass ends
+        // in returns the records it drew ([`PassTerrain::met`]).
+        let met_at_open = cut.pass.terrain.as_ref().map(|t| t.met);
         if let Some(t) = cut.pass.terrain.clone() {
             terrain_budget = t.share(cut.pass.sites);
             let mut met = t.met;
@@ -401,7 +408,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         }
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
         let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
+        let mut stretches_drawn = 0usize;
         while let Some(drawn) = cut.next() {
+            stretches_drawn += 1;
             let act = cut.pass.world.as_ref().filter(|w| !drawn.frontier && cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
             let n = drawn.sites() + act.map_or(0, |run| run + REACTION_BOUND);
             // A stretch read by two streams is staged as its known stream's sites and as many open places: the section's bounds are the card's.
@@ -430,7 +439,15 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 }
             }
         }
-        if regions.is_empty() && acts.is_empty() {
+        // [definition; the lead, November 22] **A pass ends with its passage**: a section that draws no stretch of the role's documents ends
+        // the pass, whatever the terrain's share would add (the terrain is a share of a section beside the passage, never a passage of its
+        // own), and the records it drew are returned to the terrain's count. Reason: from November 21 the terrain filled every section, so the
+        // pass's end, read as a section with no region, never came; on W82's lap the store's text ended at section 1,592 and the line trained
+        // 1,408 sections on the terrain alone, its held text 0.11 nats a place over W81e's mean on the 800 held frontier rows.
+        if stretches_drawn == 0 && acts.is_empty() {
+            if let (Some(t), Some(m)) = (cut.pass.terrain.as_mut(), met_at_open) {
+                t.met = m;
+            }
             ended = true;
             break;
         }
@@ -482,6 +499,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         host[2] += deposit_start.elapsed().as_nanos();
         let mean_start = std::time::Instant::now();
         mean.take(&learner.field).map_err(|e| e.to_string())?;
+        if let Some(w) = whole.as_mut() {
+            w.take_whole(&learner).map_err(|e| e.to_string())?;
+        }
         host[3] += mean_start.elapsed().as_nanos();
         let lines_start = std::time::Instant::now();
         if receipt.sites as u64 != tally.domain {
@@ -555,11 +575,15 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         since += 1;
         let saves_start = std::time::Instant::now();
         if done % save == 0 || done == sections {
+            let refounded = save_whole(&mut learner, whole.as_ref(), out, done)?;
             write_new(&out.join(format!("STATE.{done}")), learner.to_text().as_bytes())?;
             let (rest, moved, square) = mean.released(&learner.field).map_err(|e| e.to_string())?;
             let mut resting = learner.clone();
             resting.field = rest;
             write_new(&out.join(format!("MEAN.{done}")), resting.to_text().as_bytes())?;
+            if let Some(n) = refounded {
+                println!("STORE_LATTICE k={done} refounded={n} {}", lattice_line(&learner));
+            }
             println!(
                 "STORE_SAVE k={done} sections={since} states={} moved={moved} square={square} priced={priced} transfer={transfers} external={externals} curvature={curvatures} octave={} rate={} {} ms={}",
                 mean.states(),
@@ -569,6 +593,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 started.elapsed().as_millis()
             );
             mean = MaterialMean::new(learner.field.material_len());
+            whole = learner.lattice.as_ref().map(|_| MaterialMean::new(learner.field.material_len()));
             (transfers, externals, curvatures, priced, since) = (0, 0, 0, 0, 0);
         }
         host[6] += saves_start.elapsed().as_nanos();
@@ -579,6 +604,10 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         }
     }
     if ended && since > 0 {
+        let refounded = save_whole(&mut learner, whole.as_ref(), out, done)?;
+        if let Some(n) = refounded {
+            println!("STORE_LATTICE k={done} refounded={n} {}", lattice_line(&learner));
+        }
         write_new(&out.join(format!("STATE.{done}")), learner.to_text().as_bytes())?;
         let (rest, moved, square) = mean.released(&learner.field).map_err(|e| e.to_string())?;
         let mut resting = learner.clone();
@@ -1848,36 +1877,69 @@ pub fn set_rate(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [definition; the lead, November 21, E5 of #1088] `set-lattice STATE STATE_SHA EPS_BITS OUT`: **a learner whose forward reads the lattice
-/// rule's read parts** ([`Learner::with_lattice`]) for a receiver's tolerance `2^(−EPS_BITS)` nats at every symbol. Every entry is split into
-/// its read part and its rest, so the whole word is the source's; every other line is kept. One `SET_LATTICE_FAMILY` line a family (its
-/// index, fan-in, grain, places and the places dropped from the forward) and a `SET_LATTICE` line; the written state reads back as itself.
-pub fn set_lattice(args: &[String]) -> Result<()> {
-    if args.len() != 5 {
-        return Err("set-lattice STATE STATE_SHA EPS_BITS OUT".into());
+/// [definition; the lead, November 22, the second precision pass] At a save under a lattice: the whole words' mean since the save before
+/// written as `OUT/WHOLE.k` (a learner whose material is that mean, with no lattice), and the lattice re-founded from the end's whole words
+/// against it ([`Learner::refound_lattice`]); `None` where no lattice is set.
+fn save_whole(learner: &mut Learner, whole: Option<&MaterialMean>, out: &Path, done: usize) -> Result<Option<usize>> {
+    let Some(w) = whole else { return Ok(None) };
+    if w.states() == 0 {
+        return Ok(None);
     }
-    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
-    let eps: u32 = args[3].parse()?;
-    let out = Path::new(&args[4]);
+    let values = w.values().map_err(|e| e.to_string())?;
+    let mut at_mean = learner.clone();
+    at_mean.lattice = None;
+    for (slot, &v) in at_mean.field.material_mut().zip(&values) {
+        *slot = i32::try_from(v).map_err(|_| "a whole word's mean past its 32-bit word")?;
+    }
+    write_new(&out.join(format!("WHOLE.{done}")), at_mean.to_text().as_bytes())?;
+    Ok(Some(learner.refound_lattice(&values).map_err(|e| e.to_string())?))
+}
+
+/// The lattice's places by family, for a save's line (`-` a family read whole).
+fn lattice_line(learner: &Learner) -> String {
+    learner.lattice.as_ref().map_or(String::new(), |l| format!("places={}", l.places().iter().map(|p| p.map_or("-".to_string(), |p| p.to_string())).collect::<Vec<_>>().join(",")))
+}
+
+/// [definition; the lead, November 21, E5 of #1088; re-founded November 22, the second precision pass (G-R5)] `set-lattice END END_SHA MEAN
+/// MEAN_SHA OUT`: **a learner whose forward reads each family's read part on a lattice one place under its own spread**
+/// ([`Learner::with_lattice_from`]): the spread is the root mean square of `END`'s whole words less `MEAN`'s (a save's end and the mean of
+/// the states since the save before), read by family. Every entry of `END` is split into its read part and its rest, so the whole word is
+/// `END`'s; every other line is kept. One `SET_LATTICE_FAMILY` line a family (its index, entries, grain, spread on `2^(−24)`, places below
+/// the point, the places dropped from the forward, and the largest read part in bits with its sign) and a `SET_LATTICE` line; the written
+/// state reads back as itself. No tolerance enters: the unit is the store's own.
+pub fn set_lattice(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("set-lattice END END_SHA MEAN MEAN_SHA OUT".into());
+    }
+    let end = Learner::from_text(&String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let mean = Learner::from_text(&String::from_utf8(pinned_read(&args[3], &args[4], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[5]);
     if out.exists() {
         return Err(format!("{} exists", out.display()).into());
     }
-    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
-    let latticed = learner.with_lattice(eps).map_err(|e| e.to_string())?;
+    let latticed = end.with_lattice_from(&mean).map_err(|e| e.to_string())?;
     let lattice = latticed.lattice.as_ref().ok_or("a lattice founded with none")?;
     let families = latticed.field.families_all();
-    let mut dropped = 0usize;
-    for (k, (&(start, len, grain), &places)) in families.iter().zip(&lattice.places).enumerate() {
-        let drop = grain.saturating_sub(places);
+    let material: Vec<i32> = latticed.field.material().copied().collect();
+    let (mut dropped, mut widest) = (0usize, 0u32);
+    for (k, (&(start, len, grain), places)) in families.iter().zip(lattice.places()).enumerate() {
+        let drop = places.map_or(0, |p| grain.saturating_sub(p));
         dropped += if drop > 0 { len } else { 0 };
-        println!("SET_LATTICE_FAMILY family={k} start={start} entries={len} grain={grain} places={places} dropped={drop}");
+        // The read part's count: the largest entry over its lattice's unit, in bits with its sign.
+        let most = material[start..start + len].iter().map(|&v| (i64::from(v) >> drop).unsigned_abs()).max().unwrap_or(0);
+        let bits = 65 - most.leading_zeros();
+        widest = widest.max(bits);
+        println!("SET_LATTICE_FAMILY family={k} start={start} entries={len} grain={grain} spread={} places={} dropped={drop} read_bits={bits}", lattice.spread[k], places.map_or("whole".to_string(), |p| p.to_string()));
     }
     let written = latticed.to_text();
     if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
         return Err("a learner that does not read back as itself".into());
     }
+    if latticed.whole_material() != end.whole_material() {
+        return Err("a lattice that did not keep every whole word".into());
+    }
     std::fs::write(out, &written)?;
-    println!("SET_LATTICE eps_bits={eps} families={} entries_read_coarser={dropped} of {}", families.len(), latticed.field.material_len());
+    println!("SET_LATTICE families={} entries_read_coarser={dropped} of {} widest_read_bits={widest}", families.len(), latticed.field.material_len());
     Ok(())
 }
 

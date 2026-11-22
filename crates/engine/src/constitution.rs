@@ -75,6 +75,13 @@ pub struct Constitution {
     /// passage read by two streams: `x ← release(x, 16 − g) ≪ (16 − g)` over every site, `x` on the state's `2^(−16)`. A ruler's read of how
     /// many of the state's places the code reads: not part of the state, and no reverse reads it.
     pub ruler_state_grain: Option<u32>,
+    /// [measurement; the lead, November 22, the second precision pass's G-R4] Where set to `(j, k, relative)`, **lane `j` of every site's
+    /// state rounded after each tick** of a passage read by two streams, the other lanes kept: a lane is the `j`-th of the
+    /// `Declaration::lanes` equal blocks of a site's `D` coordinates, the block the readout reads as a ratio to its own power. With
+    /// `relative` the lane is rounded to the power of two `k` places under that site's own lane's root mean square at that tick; without
+    /// it, `k` places are dropped from the state's `2^(−16)` (a place under the point, or over it past 16). A ruler's read of how many of a
+    /// lane's places the code reads and from which unit they count: not part of the state, and no reverse reads it.
+    pub ruler_lane_grain: Option<(usize, u32, bool)>,
     /// [measurement; the lead, November 18, the frontier record §5] **What an open receiver hears far, as a ruler reads it**: `0`, the law
     /// (every definite site past its near field, each sharply, [`crate::contact::ClassLists::support`]); `1`, as a definite receiver hears
     /// (the definite members of its probe's classes sharply and each octave's crowd at its mean word); `2`, its near field alone; `4`, the

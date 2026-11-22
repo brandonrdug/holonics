@@ -424,14 +424,20 @@ impl Constitution {
     /// of [`Constitution::families_all`].
     pub fn lattice_by_rule(&self, eps_bits: u32) -> Vec<u32> {
         let grain = 1u128 << (eps_bits + 1);
-        let mut out: Vec<u32> = self.layout.families.iter().map(|&(start, _, _)| lattice_exponent(grain, u128::from(self.layout.fan_in(&self.declaration, start)))).collect();
+        self.fan_ins().into_iter().map(|x| lattice_exponent(grain, u128::from(x))).collect()
+    }
+
+    /// [definition; the lead, November 22, the second precision pass (G-R3)] **Each family's fan-in**, one a family of
+    /// [`Constitution::families_all`]: [`Loci::fan_in`] for the fine and the level's families, the glue's maps by their input widths and their
+    /// biases by one. A map's entries stand in rows of its fan-in, one row an output ([`crate::adjoint::affine`]'s `cols`).
+    pub fn fan_ins(&self) -> Vec<u64> {
+        let mut out: Vec<u64> = self.layout.families.iter().map(|&(start, _, _)| self.layout.fan_in(&self.declaration, start)).collect();
         if let Some(s) = &self.scale {
-            out.extend(s.coarse.layout.families.iter().map(|&(start, _, _)| lattice_exponent(grain, u128::from(s.coarse.layout.fan_in(&s.coarse.declaration, start)))));
-            let (d0, d1) = (self.declaration.width as u128, s.coarse.declaration.width as u128);
-            let h = s.harmonics as u128;
-            out.extend([lattice_exponent(grain, h * d0), lattice_exponent(grain, 1), lattice_exponent(grain, d1), lattice_exponent(grain, 1)]);
+            out.extend(s.coarse.layout.families.iter().map(|&(start, _, _)| s.coarse.layout.fan_in(&s.coarse.declaration, start)));
+            let (d0, d1) = (self.declaration.width as u64, s.coarse.declaration.width as u64);
+            out.extend([s.harmonics as u64 * d0, 1, d1, 1]);
             if s.before_offsets(self.declaration.width).is_some() {
-                out.extend([lattice_exponent(grain, d1), lattice_exponent(grain, 1)]);
+                out.extend([d1, 1]);
             }
         }
         out

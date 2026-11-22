@@ -6818,45 +6818,75 @@ fn a_moment_with_its_remainder_carried_tracks_its_mean() {
     assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the carried lines read back");
 }
 
-/// [definition; the lead, November 21, E5 of #1088] **The lattice deposit keeps the whole word and reads the read part**: founded on a learner
-/// with drawn material, every entry's read part plus its rest is the source's entry and every read part stands on its family's lattice; the
-/// text reads back; over three sections the whole word moves by exactly the sum of the steps the learner without the lattice would take
-/// from the same faces (the read part and rest are the deposit's, every step lands); and at a lattice no coarser than every grain the
-/// learner is the plain one bit for bit.
+/// [definition; the lead, November 21, E5 of #1088; re-founded November 22, the second precision pass] **The lattice deposit keeps the whole
+/// word and reads the read part, on each family's own spread**: founded from an end and a mean whose difference stands at a known spread by
+/// family, every family's places stand one place under its spread's power of two, every entry's read part plus its rest is the end's entry,
+/// and every read part stands on its family's lattice; the text reads back; over three sections the whole word moves by exactly the sum of
+/// the steps (every step lands); re-founded from a mean whose spread moved a place, the moved families take it and every whole word is kept,
+/// and re-founded from the same spread nothing moves; and from a mean equal to the end (no spread) every family is read whole, the plain
+/// learner bit for bit.
 #[test]
 fn the_lattice_deposit_keeps_the_whole_word_and_reads_the_read_part() {
     let learner = Learner::new(drawn(shaped(1)), 12);
-    for tolerance_bits in [2u32, 6] {
-        let latticed = learner.with_lattice(tolerance_bits).unwrap();
+    let families = learner.field.families_all();
+    let len = learner.field.material_len();
+    // A mean standing `±2^(s−1)` to `±2^s` units of each entry's grain from the end, `s` by family.
+    let mean_at = |shift: u32| {
+        let mut m = learner.clone();
+        for (k, v) in m.field.material_mut().enumerate() {
+            *v -= ((k % 3) as i32 - 1) << shift;
+        }
+        m
+    };
+    for shift in [6u32, 9] {
+        let mean = mean_at(shift);
+        let latticed = learner.with_lattice_from(&mean).unwrap();
         let l = latticed.lattice.as_ref().unwrap();
-        let families = latticed.field.families_all();
-        assert_eq!(l.places.len(), families.len());
-        let whole: Vec<i64> = latticed.field.material().zip(&l.rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect();
-        let source: Vec<i64> = learner.field.material().map(|&v| i64::from(v)).collect();
-        assert_eq!(whole, source, "eps 2^-{tolerance_bits}: the whole word is the source's");
-        let drops = l.drops(&families, latticed.field.material_len());
-        assert!(latticed.field.material().zip(&drops).all(|(&v, &q)| q == 0 || v % (1 << q) == 0), "eps 2^-{tolerance_bits}: every read part on its lattice");
-        assert!(drops.iter().any(|&q| q > 0), "eps 2^-{tolerance_bits}: some family is read coarser than its grain");
+        assert_eq!(l.spread.len(), families.len());
+        for (k, (&(_, n, grain), p)) in families.iter().zip(l.places()).enumerate() {
+            if n == 0 {
+                continue;
+            }
+            // The spread is `2^shift · √(2/3)` grains of the family, so its power of two is `2^(shift − 1)` grains: one place under it is
+            // `grain − shift + 2` places below the point.
+            assert_eq!(p, Some(grain + 2 - shift.min(grain + 2)), "shift {shift}, family {k}: one place under its own spread");
+        }
+        assert_eq!(latticed.whole_material(), learner.whole_material(), "shift {shift}: the whole word is the end's");
+        let drops = l.drops(&families, len);
+        assert!(latticed.field.material().zip(&drops).all(|(&v, &q)| q == 0 || v % (1 << q) == 0), "shift {shift}: every read part on its lattice");
+        assert!(drops.iter().any(|&q| q > 0), "shift {shift}: some family is read coarser than its grain");
         let text = latticed.to_text();
         assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the lattice's lines read back");
         let mut run = latticed.clone();
         for _ in 0..3 {
-            let before: Vec<i64> = run.field.material().zip(&run.lattice.as_ref().unwrap().rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect();
+            let before = run.whole_material();
             run.section(&[region()]).unwrap();
             let step = run.last.as_ref().map(|s| s.step.clone()).unwrap_or_default();
-            let after: Vec<i64> = run.field.material().zip(&run.lattice.as_ref().unwrap().rest).map(|(&v, &r)| i64::from(v) + i64::from(r)).collect();
-            for (k, ((a, b), s)) in after.iter().zip(&before).zip(&step).enumerate() {
-                assert_eq!(*a - *b, -(*s as i64), "eps 2^-{tolerance_bits}: entry {k} moves by its step (the descent, θ − s), read part and rest together");
+            for (k, ((a, b), s)) in run.whole_material().iter().zip(&before).zip(&step).enumerate() {
+                assert_eq!(*a - *b, -(*s as i64), "shift {shift}: entry {k} moves by its step (the descent, θ − s), read part and rest together");
             }
         }
+        // Re-founded at a save: the same spread moves nothing; a spread two places finer moves every family that moved, and keeps the word.
+        let kept = run.whole_material();
+        let same: Vec<i64> = kept.iter().zip(mean.whole_material()).zip(learner.whole_material()).map(|((&w, m), e)| w - (e - m)).collect();
+        let mut again = run.clone();
+        assert_eq!(again.refound_lattice(&same).unwrap(), 0, "shift {shift}: the same spread re-founds nothing");
+        let finer: Vec<i64> = kept.iter().zip(mean_at(shift - 2).whole_material()).zip(learner.whole_material()).map(|((&w, m), e)| w - (e - m)).collect();
+        let moved = again.refound_lattice(&finer).unwrap();
+        assert_eq!(moved, families.iter().filter(|f| f.1 > 0).count(), "shift {shift}: every family's spread moved two places");
+        assert_eq!(again.whole_material(), kept, "shift {shift}: re-founding keeps every whole word");
+        let drops = again.lattice.as_ref().unwrap().drops(&families, len);
+        assert!(again.field.material().zip(&drops).all(|(&v, &q)| q == 0 || v % (1 << q) == 0), "shift {shift}: re-founded, every read part on its new lattice");
+        let text = again.to_text();
+        assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the re-founded lattice reads back");
     }
-    // A lattice no coarser than any grain: the plain learner, bit for bit.
-    let fine = learner.with_lattice(40).unwrap();
-    assert!(fine.lattice.as_ref().unwrap().rest.iter().all(|&r| r == 0));
-    let (mut a, mut b) = (learner.clone(), fine.clone());
+    // No spread: every family read whole, the plain learner bit for bit.
+    let whole = learner.with_lattice_from(&learner).unwrap();
+    assert!(whole.lattice.as_ref().unwrap().places().iter().all(Option::is_none));
+    let (mut a, mut b) = (learner.clone(), whole.clone());
     for _ in 0..2 {
         a.section(&[region()]).unwrap();
         b.section(&[region()]).unwrap();
     }
-    assert_eq!(a.field, b.field, "a lattice finer than every grain changes nothing");
+    assert_eq!(a.field, b.field, "a lattice with no spread changes nothing");
 }

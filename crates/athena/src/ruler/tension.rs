@@ -942,6 +942,12 @@ pub fn read_section_covectors(args: &[String]) -> Result<()> {
 /// name, entries, grain, the 50th, 99th and 99.9th hundredths and the largest of `|θ|` at the end (on `2^(−24)` whatever the grain), the root
 /// mean square of the end less the mean (on `2^(−24)`), and of the entries with a nonzero first moment the count whose deposit step
 /// releases to zero at rates 12, 16 and 20 (`deposit_over` on the end's moments). A ruler's read of saved states; nothing is written back.
+/// [measurement; the lead, November 22, the second precision pass (G-R2, G-R3, G-E4 (c))] Each family's line also takes the mean of
+/// `deposit_root` of the end's second moment over its moving entries (`root_mean`, in the second moment's own units, rounded down), and the
+/// moving entries whose step remainder is nonzero at the end (`rest_nonzero`, `-` where the end carries none); `OUT/rows.tsv` takes a line
+/// a row of every family whose fan-in is over one and divides its entries (`Constitution::fan_ins`; a map's row is one output): the
+/// family, its name, the row and the row's root mean square of the end less the mean (on `2^(−24)`). Every entry is read as its whole word
+/// (its read part plus its rest where a lattice is set), so a lattice's end is read against its whole words' mean (`WHOLE.k`).
 pub fn read_widths(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("read-widths END END_SHA MEAN MEAN_SHA OUT".into());
@@ -974,36 +980,51 @@ pub fn read_widths(args: &[String]) -> Result<()> {
             format!("glue:{}:{len}", start - glue_at)
         }
     };
-    let ve: Vec<i32> = end.field.material().copied().collect();
-    let vm: Vec<i32> = mean.field.material().copied().collect();
+    // [the lead, November 22] Each entry's whole word (its read part plus its rest under a lattice, `Learner::whole_material`).
+    let ve: Vec<i64> = end.whole_material();
+    let vm: Vec<i64> = mean.whole_material();
     let (first, second) = end.moments();
-    let mut lines = String::from("family\tname\tentries\tgrain\tp50\tp99\tp999\tmax\trms_end_less_mean\tmoving\tsilent12\tsilent16\tsilent20\n");
+    let fan_ins = field.fan_ins();
+    let mut rows = String::from("family\tname\trow\trms_end_less_mean\n");
+    let mut lines = String::from("family\tname\tentries\tgrain\tp50\tp99\tp999\tmax\trms_end_less_mean\tmoving\tsilent12\tsilent16\tsilent20\troot_mean\trest_nonzero\n");
     for (k, &(start, len, grain)) in field.families_all().iter().enumerate() {
         if len == 0 {
             continue;
         }
         let up = |v: i64| -> i64 { if grain < MATERIAL_BITS_ { v << (MATERIAL_BITS_ - grain) } else { v } };
-        let mut mags: Vec<i64> = ve[start..start + len].iter().map(|&v| up(i64::from(v).abs())).collect();
+        let mut mags: Vec<i64> = ve[start..start + len].iter().map(|&v| up(v.abs())).collect();
         mags.sort_unstable();
         let q = |f: usize| mags[((len - 1) * f) / 1000];
-        let sq: i128 = (start..start + len).map(|i| { let d = i128::from(up(i64::from(ve[i]) - i64::from(vm[i]))); d * d }).sum();
+        let sq: i128 = (start..start + len).map(|i| { let d = i128::from(up(ve[i] - vm[i])); d * d }).sum();
         let rms = (sq / len as i128).max(0) as u128;
         let rms = rms.isqrt();
-        let (mut moving, mut silent) = (0usize, [0usize; 3]);
+        let (mut moving, mut silent, mut roots, mut rested) = (0usize, [0usize; 3], 0i128, 0usize);
         for i in start..start + len {
             if first[i] == 0 {
                 continue;
             }
             moving += 1;
             let root = holonics_engine::field::deposit_root(second[i]);
+            roots += root;
+            rested += usize::from(end.remainder.as_ref().is_some_and(|r| r[i] != 0));
             for (s, rate) in silent.iter_mut().zip([12u32, 16, 20]) {
                 *s += usize::from(holonics_engine::field::deposit_over(first[i], root, grain, rate) == 0);
             }
         }
-        lines.push_str(&format!("{k}\t{}\t{len}\t{grain}\t{}\t{}\t{}\t{}\t{rms}\t{moving}\t{}\t{}\t{}\n", name_of(start, len), q(500), q(990), q(999), mags[len - 1], silent[0], silent[1], silent[2]));
+        let root_mean = if moving == 0 { 0 } else { roots / moving as i128 };
+        let rest_nonzero = if end.remainder.is_some() { rested.to_string() } else { "-".to_string() };
+        lines.push_str(&format!("{k}\t{}\t{len}\t{grain}\t{}\t{}\t{}\t{}\t{rms}\t{moving}\t{}\t{}\t{}\t{root_mean}\t{rest_nonzero}\n", name_of(start, len), q(500), q(990), q(999), mags[len - 1], silent[0], silent[1], silent[2]));
+        let x = usize::try_from(fan_ins.get(k).copied().unwrap_or(1)).unwrap_or(1);
+        if x > 1 && len % x == 0 {
+            for (row, at) in (start..start + len).step_by(x).enumerate() {
+                let sq: i128 = (at..at + x).map(|i| { let d = i128::from(up(ve[i] - vm[i])); d * d }).sum();
+                rows.push_str(&format!("{k}\t{}\t{row}\t{}\n", name_of(start, len), ((sq / x as i128).max(0) as u128).isqrt()));
+            }
+        }
     }
     std::fs::create_dir_all(out)?;
     write_new(&out.join("families.tsv"), lines.as_bytes())?;
+    write_new(&out.join("rows.tsv"), rows.as_bytes())?;
     println!("WIDTHS families={} material={} rate={} ms={}", field.families_all().len(), field.material_len(), end.rate_bits, started.elapsed().as_millis());
     Ok(())
 }
@@ -1039,7 +1060,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word.starts_with("round:") || word.starts_with("state:") {
+        if word == "law" || word == "lanes" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1067,6 +1088,20 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         }
         rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
     }
+    // [the lead, November 22, G-R4] The word `lanes` among the settings: each lane's root mean square in the states after every tick, over
+    // every site of every row, one `REACH_LANE` line a tick and lane (on the state's `2^(−16)`, and its power of two's place), no code read.
+    if let Some(at) = settings.iter().position(|(n, _)| n == "lanes") {
+        settings.remove(at);
+        let squares: Vec<Vec<Vec<(u128, u64)>>> = rows.par_iter().map(|(_, classes)| learner.field.strand_lane_squares(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let (ticks, lanes) = (squares.first().map_or(0, Vec::len), learner.field.declaration.lanes);
+        for t in 0..ticks {
+            for j in 0..lanes {
+                let (sq, n) = squares.iter().fold((0u128, 0u64), |(a, b), r| (a + r[t][j].0, b + r[t][j].1));
+                let rms = (sq / u128::from(n.max(1))).isqrt();
+                println!("REACH_LANE tick={t} lane={j} coordinates={n} rms={rms} rms_place={}", if rms == 0 { "-".to_string() } else { rms.ilog2().to_string() });
+            }
+        }
+    }
     let mut codes: Vec<Vec<Vec<i64>>> = Vec::new();
     for (name, friction) in &settings {
         let mut field = learner.field.clone();
@@ -1087,8 +1122,37 @@ pub fn read_reach(args: &[String]) -> Result<()> {
                 }
             }
         }
+        // [the lead, November 22, the second precision pass (G-R1)] `places:g₀,g₁,…`: one count a family of `families_all`, each entry on its
+        // family's grain `b` rounded to `2^(−g)` where `b > g`, and a family whose count is `-` kept as it is.
+        if let Some(list) = name.strip_prefix("places:") {
+            let families = field.families_all();
+            let counts: Vec<&str> = list.split(',').collect();
+            if counts.len() != families.len() {
+                return Err("a places setting that is not one count a family".into());
+            }
+            let mut drop = vec![0u32; field.material_len()];
+            for (&(start, len, b), c) in families.iter().zip(&counts) {
+                if *c != "-" {
+                    drop[start..start + len].fill(b.saturating_sub(c.parse::<u32>()?));
+                }
+            }
+            for (v, &k) in field.material_mut().zip(&drop) {
+                if k > 0 {
+                    *v = i32::try_from(holonics_engine::field::release(i128::from(*v), k) << k).map_err(|_| "a rounded entry past 32 bits")?;
+                }
+            }
+        }
         if let Some(g) = name.strip_prefix("state:") {
             field.ruler_state_grain = Some(g.parse()?);
+        }
+        // [the lead, November 22, G-R4] `lane:j:h`: lane `j` of every site's state rounded after each tick to the power of two `h` places under
+        // that site's own lane's root mean square; `lanept:j:k`: the same lane with `k` places dropped from the state's `2^(−16)`. The other
+        // lanes are kept.
+        for (prefix, relative) in [("lane:", true), ("lanept:", false)] {
+            if let Some(jh) = name.strip_prefix(prefix) {
+                let (j, h) = jh.split_once(':').ok_or("a lane setting that is not lane:j:h or lanept:j:k")?;
+                field.ruler_lane_grain = Some((j.parse()?, h.parse()?, relative));
+            }
         }
         let c: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| field.strand_codes(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
         let mut by: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
