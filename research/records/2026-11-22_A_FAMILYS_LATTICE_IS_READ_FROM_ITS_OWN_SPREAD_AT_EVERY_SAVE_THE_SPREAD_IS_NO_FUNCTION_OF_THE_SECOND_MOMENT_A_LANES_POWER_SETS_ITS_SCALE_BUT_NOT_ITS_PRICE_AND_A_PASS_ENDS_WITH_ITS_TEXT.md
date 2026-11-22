@@ -257,7 +257,10 @@ reads `wshift = 0` and four planes, as before. The same integers ([`GUESS_units.
 - **G-U2 missed on its control.** One hold of 40-section runs from W84l's end after a warm-up, control and build in the balanced order:
   the controls 737.5, 730.6, 752.8, 717.3 ms a section (spread 35.5, where the guess asked under 10), the build 733.3, 726.2, 698.5,
   689.0. The build reads 22.8 ms shorter, inside the controls' own spread, so the hold resolves nothing: W85's host panels (two of six
-  threads) ran beside it, which the timing rule bars. It is read again alone.
+  threads) ran beside it, which the timing rule bars. Read again alone (07:45 to 07:50 UTC, nothing else on the host or the card): the
+  controls 740.5, 752.8, 752.6, 751.0 (749.2, spread 12.3), the build 730.0, 733.2, 730.2, 731.9 (731.3, spread 3.2), so **17.9 ms a
+  section shorter (2.4%)**, outside the controls' spread, every section line the same. G-U2 held on its gain (15 to 40) and missed its
+  control's spread (under 10) by 2.3 ms.
 
 ## 10. Where a sum is lost: the digit she writes first
 
