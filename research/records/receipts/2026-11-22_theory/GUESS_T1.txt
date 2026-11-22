@@ -1,0 +1,14 @@
+Fixed 2026-11-22T17:17:39Z (date -u), the lead, before the arm trains or any of its reads. Refs #404.
+G-T1: W91j (W90's end joined to store-2026-11-22 at a new pass: the five slices of before and the repository's own theory, its guides and
+records, and its logic, its Lean; by quota the repository is 6% of the pass) beside W91 (W90's end, no change, the old store), 3,000
+sections each on e5t, read at MEAN.3000, both read on the new store's held set:
+(a) the held theory records (16, dated November 20 to 22, which no state has read) code at least 0.10 nats a place under the control's at
+    one place open, and the held Lean at least 0.10 under;
+(b) the five old regions' held text within 0.010 nats a place of the control's, paired, at one place open (the joined pass reads their
+    first pieces again);
+(c) on the theory panel (12 openings of held records, 8 of held Lean files, 96 places each, panel_theory.tsv), the share of the writes'
+    words in the theory lexicon at least 5 points over the control's, writes that loop no more than the control's and two, and the
+    longest run a write shares with its prompt under 48 bytes (no prompt recited).
+Why: the repository's text has a vocabulary and a form no slice of the line has met (the objects' names, the records' sentences, Lean's
+declarations), about 9 MB of it a lap at its quota (6% of some 150 MB a lap), and a lap's deposit takes a register it meets (the store line's laps of November 12 on
+code); 6% of a pass costs the old registers little.

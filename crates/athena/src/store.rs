@@ -27,7 +27,8 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 
 /// The store's slices in its own order: `tools/corpus_passage.py`'s `SLICES` (Common Corpus's five), then the arithmetic world
 /// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
-const SLICES: [&str; 7] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words"];
+// [the lead, November 22] `theory` and `logic`: the repository's own guides and records, and its Lean (`tools/holonics_passage.py`).
+const SLICES: [&str; 9] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic"];
 /// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
 /// `?` between two line feeds.
 const REACTION_BOUND: u64 = 41;
