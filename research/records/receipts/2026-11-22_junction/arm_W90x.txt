@@ -1,0 +1,5 @@
+TERRAIN_W90_FRONTIER FRONTIER W90x; one place open: all 0.6481 (100508 places) | books 0.6669 code 0.3902 science 0.5532 web 0.7378 wikidata 0.8913 || less the control's, paired: -0.0002 (±0.0002) | books -0.0001 code -0.0001 science -0.0002 web +0.0000 wikidata -0.0008|FRONTIER W90x; the frontier: all 1.8240 (99844 places) | books 1.7995 code 1.5381 science 1.7497 web 2.0091 wikidata 2.0233 || less the control's, paired: -0.0015 (±0.0003) | books -0.0009 code +0.0003 science -0.0016 web +0.0004 wikidata -0.0055|
+TERRAIN_SCORE W90 whole 46/96 opening 49/96 first 69/96 | sum 7/7/10 of 16 difference 6/6/7 of 16 product 4/4/7 of 16 close 9/12/16 of 16 copy 7/7/13 of 16 reverse 13/13/16 of 16
+TERRAIN_SCORE W90x whole 45/96 opening 48/96 first 71/96 | sum 7/7/11 of 16 difference 4/4/6 of 16 product 5/5/8 of 16 close 9/12/16 of 16 copy 8/8/14 of 16 reverse 12/12/16 of 16
+W90_SUMCODES W90 ANSWER sum n= 1579 1.014|ANSWER sum:k0 n= 600 0.058|ANSWER sum:k1 n= 553 0.555|ANSWER sum:k2 n= 377 3.190|ANSWER sum:k3 n= 49 1.160|
+W90_SUMCODES W90x ANSWER sum n= 1579 1.055|ANSWER sum:k0 n= 600 0.064|ANSWER sum:k1 n= 553 0.591|ANSWER sum:k2 n= 377 3.286|ANSWER sum:k3 n= 49 1.266|

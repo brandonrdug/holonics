@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,746 records from July 2026 to November 2026. 396 receipts directories: 225 beside the records and 171 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,747 records from July 2026 to November 2026. 397 receipts directories: 225 beside the records and 172 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 145 | 112 |
+| [November 2026](#november-2026) | 146 | 113 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -23,6 +23,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-22 [At the top digit both operands and the carry arrive and their sum is not formed a crossing triad reads on two streams and drawn legs do not take it in a lap](2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md)
 - 2026-11-22 [A familys lattice is read from its own spread at every save the spread is no function of the second moment a lanes power sets its scale but not its price and a pass ends with its text](2026-11-22_A_FAMILYS_LATTICE_IS_READ_FROM_ITS_OWN_SPREAD_AT_EVERY_SAVE_THE_SPREAD_IS_NO_FUNCTION_OF_THE_SECOND_MOMENT_A_LANES_POWER_SETS_ITS_SCALE_BUT_NOT_ITS_PRICE_AND_A_PASS_ENDS_WITH_ITS_TEXT.md)
 - 2026-11-22 [A release keeps a class where what it takes is a boundary the deposits step is a shear so a part turns by its rate over its size and lengthens at every step and the constitutions one release has never run on the line](2026-11-22_A_RELEASE_KEEPS_A_CLASS_WHERE_WHAT_IT_TAKES_IS_A_BOUNDARY_THE_DEPOSITS_STEP_IS_A_SHEAR_SO_A_PART_TURNS_BY_ITS_RATE_OVER_ITS_SIZE_AND_LENGTHENS_AT_EVERY_STEP_AND_THE_CONSTITUTIONS_ONE_RELEASE_HAS_NEVER_RUN_ON_THE_LINE.md)
+- 2026-11-22 [The repositorys own text enters her passage one lap takes its register and not yet its sentences and the triads sum gain was scatter](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md)
 - 2026-11-21 [A grain is a relation between grains a word is a count in its stores own unit above a turn its integrator keeps a place is priced by its ratio to the stores spread and resolution is bought by agreement never by depth](2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md)
 - 2026-11-21 [A law founded in a regime the writer never reads never reaches her writes read by two streams the terrain takes brackets and sums inside the line and a release halts where its gain dies](2026-11-21_A_LAW_FOUNDED_IN_A_REGIME_THE_WRITER_NEVER_READS_NEVER_REACHES_HER_WRITES_READ_BY_TWO_STREAMS_THE_TERRAIN_TAKES_BRACKETS_AND_SUMS_INSIDE_THE_LINE_AND_A_RELEASE_HALTS_WHERE_ITS_GAIN_DIES.md)
 - 2026-11-21 [A still head weighs no distance so a copy reads the record above and each heads friction of distance is its own reach founded at zero](2026-11-21_A_STILL_HEAD_WEIGHS_NO_DISTANCE_SO_A_COPY_READS_THE_RECORD_ABOVE_AND_EACH_HEADS_FRICTION_OF_DISTANCE_IS_ITS_OWN_REACH_FOUNDED_AT_ZERO.md)

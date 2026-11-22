@@ -1,0 +1,13 @@
+W91_START 18:04:00
+JOIN_STORE stretches=99450770 store_before=72e05a476c914c22b199885a5d1211ff844753973160f5a9b9f8236bfd80cbcb store_after=3ae8f46ed42994a4d99dbe106ad069c0fa69172783a871dac71d812a041be79f before=code:407
+TERRAIN_TRAINED W91 18:40:49 sections=3000 ended=false
+TERRAIN_TRAINED W91j 19:17:57 sections=3000 ended=false
+TERRAIN_PANEL W91_mean 19:29:16 seen: words 49 in_lexicon 35 (71%) longest_copy 15 held: words 64 in_lexicon 49 (76%) longest_copy 14 unread: words 62 in_lexicon 47 (75%) longest_copy 14  || LONG W91_mean: all words 249 in lexicon 179 (71%) writes that loop 3 of 20 longest run shared with its prompt 67 | code 40/43 (93%) web 38/53 (71%) science 34/51 (66%) books 44/54 (81%) wikidata 23/48 (47%)
+W91_CAVITY W91 20:09:19 CAVITY_DONE ms=894120
+W91_THEORY THEORY_PANEL W91 logic: words 95 in lexicon 73 (76%) loops 0 of 8 longest shared with prompt 17 | theory: words 169 in lexicon 141 (83%) loops 0 of 12 longest shared with prompt 13
+W91_CAVITY W91j 20:25:27 CAVITY_DONE ms=953252
+W91_THEORY THEORY_PANEL W91j logic: words 93 in lexicon 70 (75%) loops 0 of 8 longest shared with prompt 11 | theory: words 172 in lexicon 136 (79%) loops 0 of 12 longest shared with prompt 12
+W91_FRONTIER_NEW_STORE FRONTIER W91j; one place open: all 0.6580 (140564 places) | books 0.6644 code 0.3899 logic 0.6533 science 0.5499 theory 0.7158 web 0.7383 wikidata 0.8936 || less the control's, paired: -0.0223 (±0.0009) | books +0.0024 code +0.0040 logic -0.0982 science -0.0054 theory -0.0623 web +0.0005 wikidata +0.0025|FRONTIER W91j; the frontier: all 1.8677 (139706 places) | books 1.8022 code 1.5333 logic 1.9629 science 1.7446 theory 1.9653 web 2.0183 wikidata 2.0471 || less the control's, paired: -0.0158 (±0.0010) | books +0.0069 code +0.0074 logic -0.1226 science +0.0065 theory -0.0608 web +0.0146 wikidata +0.0370|
+TERRAIN_SCORE W91 whole 55/96 opening 56/96 first 73/96 | sum 9/9/12 of 16 difference 4/4/6 of 16 product 6/6/9 of 16 close 11/12/16 of 16 copy 13/13/14 of 16 reverse 12/12/16 of 16
+TERRAIN_SCORE W91j whole 54/96 opening 57/96 first 73/96 | sum 7/7/10 of 16 difference 8/8/9 of 16 product 5/5/7 of 16 close 9/12/16 of 16 copy 12/12/15 of 16 reverse 13/13/16 of 16
+W91_ALL_DONE 20:25:44
