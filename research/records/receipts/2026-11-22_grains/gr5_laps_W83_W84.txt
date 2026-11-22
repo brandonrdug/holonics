@@ -1,0 +1,16 @@
+W84_LAW W84l_whole exit=0 06:20:41 REACH setting=law group=all places=139998 nats_millionths=1300904 ms=206484
+W84_LAW W84l_mean exit=0 06:20:42 REACH setting=law group=all places=139998 nats_millionths=1300878 ms=207314
+W84_LAW W84t_end exit=0 06:24:46 REACH setting=law group=all places=139998 nats_millionths=1350962 ms=243956
+W84_LAW W84t_mean exit=0 06:24:46 REACH setting=law group=all places=139998 nats_millionths=1301252 ms=244066
+W84_LAW W84l_end exit=0 06:24:47 REACH setting=law group=all places=139998 nats_millionths=1351027 ms=245332
+W83_LAW W83l_mean exit=0 04:22:57 REACH setting=law group=all places=139998 nats_millionths=1302288 ms=209363
+W83_LAW W83l_whole exit=0 04:22:57 REACH setting=law group=all places=139998 nats_millionths=1302394 ms=209396
+W83_LAW W83t_mean exit=0 04:27:00 REACH setting=law group=all places=139998 nats_millionths=1302615 ms=243050
+W83_LAW W83l_end exit=0 04:27:01 REACH setting=law group=all places=139998 nats_millionths=1336380 ms=244215
+W83_LAW W83t_end exit=0 04:27:02 REACH setting=law group=all places=139998 nats_millionths=1337223 ms=244894
+TERRAIN_W84_FRONTIER FRONTIER W84l; one place open: all 0.6520 (100508 places) | books 0.6808 code 0.3913 science 0.5598 web 0.7390 wikidata 0.8880 || less the control's, paired: +0.0004 (±0.0002) | books +0.0006 code -0.0004 science -0.0004 web +0.0002 wikidata +0.0023|FRONTIER W84l; the frontier: all 1.8296 (99844 places) | books 1.8109 code 1.5354 science 1.7484 web 2.0148 wikidata 2.0382 || less the control's, paired: +0.0012 (±0.0003) | books +0.0003 code +0.0026 science +0.0008 web +0.0008 wikidata +0.0014|
+TERRAIN_SCORE W84t whole 43/96 opening 46/96 first 72/96 | sum 7/7/13 of 16 difference 5/5/6 of 16 product 5/5/10 of 16 close 11/14/16 of 16 copy 8/8/12 of 16 reverse 7/7/15 of 16
+TERRAIN_SCORE W84l whole 47/96 opening 50/96 first 71/96 | sum 6/6/11 of 16 difference 7/7/8 of 16 product 5/5/9 of 16 close 9/12/16 of 16 copy 10/10/12 of 16 reverse 10/10/15 of 16
+TERRAIN_W83_FRONTIER FRONTIER W83l; one place open: all 0.6548 (100508 places) | books 0.6812 code 0.3943 science 0.5610 web 0.7397 wikidata 0.8969 || less the control's, paired: +0.0001 (±0.0002) | books -0.0003 code +0.0002 science +0.0001 web +0.0005 wikidata +0.0001|FRONTIER W83l; the frontier: all 1.8328 (99844 places) | books 1.8101 code 1.5410 science 1.7611 web 2.0147 wikidata 2.0369 || less the control's, paired: -0.0006 (±0.0003) | books -0.0002 code -0.0019 science +0.0018 web +0.0010 wikidata -0.0035|
+TERRAIN_SCORE W83t whole 47/96 opening 48/96 first 69/96 | sum 4/4/8 of 16 difference 6/6/7 of 16 product 5/5/8 of 16 close 11/12/16 of 16 copy 11/11/15 of 16 reverse 10/10/15 of 16
+TERRAIN_SCORE W83l whole 43/96 opening 44/96 first 68/96 | sum 4/4/8 of 16 difference 6/6/6 of 16 product 6/6/10 of 16 close 10/11/16 of 16 copy 9/9/14 of 16 reverse 8/8/14 of 16

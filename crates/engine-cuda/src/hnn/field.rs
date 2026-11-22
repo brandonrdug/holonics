@@ -990,9 +990,9 @@ mod tests {
             // The staged variant: the sites' digits cut in the kernel.
             let mut w3 = base;
             let (st_least, _) = time(&mut || {
-                let (pl, fl, kw) = cf.tc_planes(&mut w3, (0, 0, 0, cols as u64, rows, cols)).unwrap();
+                let (pl, fl, kw, (mut wsh, mut wpl)) = cf.tc_planes(&mut w3, (0, 0, 0, cols as u64, rows, cols)).unwrap();
                 let (mut weight, mut bias, mut wm, mut r32, mut c32, mut xp, mut xs, mut op, mut os, mut ap, mut u, mut pa, mut fa, mut pb, mut fb, mut kw) = (0u64, (rows * cols) as u64, wmax, rows as u32, cols as u32, x32_buf.device_ptr(), cols as u64, out_b.device_ptr(), rows as u64, 0u64, 0u32, pl.device_ptr(), fl.device_ptr(), 0u64, 0u64, kw);
-                cf.launch("field_affine_tiled_tcs_x32", grid, THREADS, &mut [arg(&mut w3), arg(&mut weight), arg(&mut bias), arg(&mut wm), arg(&mut r32), arg(&mut c32), arg(&mut xp), arg(&mut xs), arg(&mut op), arg(&mut os), arg(&mut ap), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)]).unwrap();
+                cf.launch("field_affine_tiled_tcs_x32", grid, THREADS, &mut [arg(&mut w3), arg(&mut weight), arg(&mut bias), arg(&mut wm), arg(&mut r32), arg(&mut c32), arg(&mut xp), arg(&mut xs), arg(&mut op), arg(&mut os), arg(&mut ap), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw), arg(&mut wsh), arg(&mut wpl)]).unwrap();
             });
             let b = card.fetch(&out_b).unwrap();
             assert!(a[..sites * rows] == b[..sites * rows], "forward {rows}x{cols}: the staged route differs");
@@ -1010,10 +1010,10 @@ mod tests {
             // The planes variant: the covector's digits written as planes first.
             let mut w3 = base;
             let (pl_least, _) = time(&mut || {
-                let (pl, fl, kw) = cf.tc_planes(&mut w3, (1, 0, 0, cols as u64, cols, rows)).unwrap();
-                let (sp, sf, _) = cf.tc_planes(&mut w3, (3, y_buf.device_ptr(), 0, rows as u64, sites, rows)).unwrap();
+                let (pl, fl, kw, (mut wsh, mut wpl)) = cf.tc_planes(&mut w3, (1, 0, 0, cols as u64, cols, rows)).unwrap();
+                let (sp, sf, _, _) = cf.tc_planes(&mut w3, (3, y_buf.device_ptr(), 0, rows as u64, sites, rows)).unwrap();
                 let (mut weight, mut r32, mut c32, mut yp, mut ys, mut op, mut a0, mut u, mut pa, mut fa, mut pb, mut fb, mut kw) = (0u64, rows as u32, cols as u32, y_buf.device_ptr(), rows as u64, out_b.device_ptr(), 0u32, 0u32, pl.device_ptr(), fl.device_ptr(), sp.device_ptr(), sf.device_ptr(), kw);
-                cf.launch("field_transposed_tc", grid, THREADS, &mut [arg(&mut w3), arg(&mut weight), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ys), arg(&mut op), arg(&mut a0), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)]).unwrap();
+                cf.launch("field_transposed_tc", grid, THREADS, &mut [arg(&mut w3), arg(&mut weight), arg(&mut r32), arg(&mut c32), arg(&mut yp), arg(&mut ys), arg(&mut op), arg(&mut a0), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw), arg(&mut wsh), arg(&mut wpl)]).unwrap();
             });
             let b = card.fetch(&out_b).unwrap();
             assert!(a[..sites * cols] == b[..sites * cols], "transposed {rows}x{cols}: the planes route differs");

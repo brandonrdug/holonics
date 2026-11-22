@@ -1,0 +1,54 @@
+SUM rows: split tick head | places | a_k | b_k | lower | higher | written | near | counterparts | rest
+SUM_ROW all tick=0 head=0 places=1579 a_k=0.190 b_k=0.060 lower=0.155 higher=0.012 written=0.020 near=0.081 counterparts=0.126 rest=0.356
+SUM_ROW all tick=0 head=1 places=1579 a_k=0.004 b_k=0.003 lower=0.007 higher=0.001 written=0.001 near=0.292 counterparts=0.002 rest=0.690
+SUM_ROW all tick=0 head=2 places=1579 a_k=0.030 b_k=0.030 lower=0.064 higher=0.031 written=0.267 near=0.160 counterparts=0.046 rest=0.372
+SUM_ROW all tick=0 head=3 places=1579 a_k=0.006 b_k=0.008 lower=0.013 higher=0.007 written=0.024 near=0.639 counterparts=0.009 rest=0.293
+SUM_ROW all tick=1 head=0 places=1579 a_k=0.142 b_k=0.215 lower=0.049 higher=0.000 written=0.000 near=0.035 counterparts=0.056 rest=0.503
+SUM_ROW all tick=1 head=1 places=1579 a_k=0.008 b_k=0.006 lower=0.010 higher=0.000 written=0.000 near=0.085 counterparts=0.010 rest=0.882
+SUM_ROW all tick=1 head=2 places=1579 a_k=0.017 b_k=0.004 lower=0.018 higher=0.016 written=0.003 near=0.547 counterparts=0.011 rest=0.385
+SUM_ROW all tick=1 head=3 places=1579 a_k=0.008 b_k=0.005 lower=0.012 higher=0.010 written=0.036 near=0.511 counterparts=0.010 rest=0.409
+SUM_ROW all tick=2 head=0 places=1579 a_k=0.211 b_k=0.140 lower=0.034 higher=0.021 written=0.000 near=0.012 counterparts=0.066 rest=0.516
+SUM_ROW all tick=2 head=1 places=1579 a_k=0.058 b_k=0.083 lower=0.076 higher=0.011 written=0.001 near=0.092 counterparts=0.106 rest=0.574
+SUM_ROW all tick=2 head=2 places=1579 a_k=0.011 b_k=0.006 lower=0.035 higher=0.006 written=0.000 near=0.682 counterparts=0.015 rest=0.245
+SUM_ROW all tick=2 head=3 places=1579 a_k=0.005 b_k=0.003 lower=0.026 higher=0.002 written=0.001 near=0.568 counterparts=0.007 rest=0.389
+SUM_ROW all tick=3 head=0 places=1579 a_k=0.191 b_k=0.150 lower=0.038 higher=0.053 written=0.000 near=0.024 counterparts=0.163 rest=0.381
+SUM_ROW all tick=3 head=1 places=1579 a_k=0.016 b_k=0.094 lower=0.082 higher=0.075 written=0.007 near=0.137 counterparts=0.061 rest=0.528
+SUM_ROW all tick=3 head=2 places=1579 a_k=0.012 b_k=0.037 lower=0.055 higher=0.040 written=0.000 near=0.399 counterparts=0.033 rest=0.423
+SUM_ROW all tick=3 head=3 places=1579 a_k=0.017 b_k=0.036 lower=0.083 higher=0.031 written=0.003 near=0.530 counterparts=0.021 rest=0.278
+SUM_ROW carry tick=0 head=0 places=479 a_k=0.173 b_k=0.047 lower=0.303 higher=0.001 written=0.002 near=0.052 counterparts=0.097 rest=0.325
+SUM_ROW carry tick=0 head=1 places=479 a_k=0.003 b_k=0.003 lower=0.014 higher=0.001 written=0.001 near=0.307 counterparts=0.003 rest=0.669
+SUM_ROW carry tick=0 head=2 places=479 a_k=0.025 b_k=0.023 lower=0.120 higher=0.013 written=0.182 near=0.168 counterparts=0.042 rest=0.428
+SUM_ROW carry tick=0 head=3 places=479 a_k=0.004 b_k=0.006 lower=0.021 higher=0.003 written=0.014 near=0.633 counterparts=0.008 rest=0.311
+SUM_ROW carry tick=1 head=0 places=479 a_k=0.131 b_k=0.218 lower=0.152 higher=0.000 written=0.000 near=0.003 counterparts=0.062 rest=0.434
+SUM_ROW carry tick=1 head=1 places=479 a_k=0.007 b_k=0.005 lower=0.027 higher=0.000 written=0.000 near=0.099 counterparts=0.016 rest=0.846
+SUM_ROW carry tick=1 head=2 places=479 a_k=0.015 b_k=0.003 lower=0.034 higher=0.008 written=0.001 near=0.530 counterparts=0.012 rest=0.396
+SUM_ROW carry tick=1 head=3 places=479 a_k=0.006 b_k=0.003 lower=0.020 higher=0.004 written=0.018 near=0.552 counterparts=0.009 rest=0.388
+SUM_ROW carry tick=2 head=0 places=479 a_k=0.206 b_k=0.165 lower=0.092 higher=0.003 written=0.000 near=0.004 counterparts=0.069 rest=0.461
+SUM_ROW carry tick=2 head=1 places=479 a_k=0.076 b_k=0.097 lower=0.178 higher=0.005 written=0.001 near=0.090 counterparts=0.117 rest=0.436
+SUM_ROW carry tick=2 head=2 places=479 a_k=0.011 b_k=0.007 lower=0.067 higher=0.004 written=0.000 near=0.564 counterparts=0.023 rest=0.324
+SUM_ROW carry tick=2 head=3 places=479 a_k=0.005 b_k=0.002 lower=0.044 higher=0.001 written=0.000 near=0.425 counterparts=0.009 rest=0.514
+SUM_ROW carry tick=3 head=0 places=479 a_k=0.159 b_k=0.195 lower=0.089 higher=0.004 written=0.000 near=0.026 counterparts=0.140 rest=0.386
+SUM_ROW carry tick=3 head=1 places=479 a_k=0.027 b_k=0.123 lower=0.203 higher=0.112 written=0.012 near=0.087 counterparts=0.094 rest=0.342
+SUM_ROW carry tick=3 head=2 places=479 a_k=0.012 b_k=0.035 lower=0.097 higher=0.027 written=0.000 near=0.328 counterparts=0.048 rest=0.454
+SUM_ROW carry tick=3 head=3 places=479 a_k=0.024 b_k=0.041 lower=0.138 higher=0.022 written=0.005 near=0.399 counterparts=0.030 rest=0.341
+SUM_ROW no_carry tick=0 head=0 places=1100 a_k=0.197 b_k=0.066 lower=0.090 higher=0.018 written=0.028 near=0.094 counterparts=0.139 rest=0.369
+SUM_ROW no_carry tick=0 head=1 places=1100 a_k=0.004 b_k=0.003 lower=0.004 higher=0.001 written=0.001 near=0.286 counterparts=0.002 rest=0.699
+SUM_ROW no_carry tick=0 head=2 places=1100 a_k=0.033 b_k=0.032 lower=0.039 higher=0.039 written=0.304 near=0.157 counterparts=0.048 rest=0.347
+SUM_ROW no_carry tick=0 head=3 places=1100 a_k=0.006 b_k=0.009 lower=0.010 higher=0.009 written=0.029 near=0.642 counterparts=0.010 rest=0.285
+SUM_ROW no_carry tick=1 head=0 places=1100 a_k=0.147 b_k=0.214 lower=0.004 higher=0.000 written=0.000 near=0.049 counterparts=0.053 rest=0.533
+SUM_ROW no_carry tick=1 head=1 places=1100 a_k=0.008 b_k=0.006 lower=0.002 higher=0.000 written=0.000 near=0.078 counterparts=0.008 rest=0.898
+SUM_ROW no_carry tick=1 head=2 places=1100 a_k=0.018 b_k=0.004 lower=0.011 higher=0.019 written=0.003 near=0.554 counterparts=0.010 rest=0.380
+SUM_ROW no_carry tick=1 head=3 places=1100 a_k=0.010 b_k=0.005 lower=0.008 higher=0.012 written=0.044 near=0.493 counterparts=0.010 rest=0.418
+SUM_ROW no_carry tick=2 head=0 places=1100 a_k=0.214 b_k=0.129 lower=0.009 higher=0.029 written=0.000 near=0.015 counterparts=0.064 rest=0.540
+SUM_ROW no_carry tick=2 head=1 places=1100 a_k=0.050 b_k=0.077 lower=0.032 higher=0.013 written=0.001 near=0.093 counterparts=0.101 rest=0.634
+SUM_ROW no_carry tick=2 head=2 places=1100 a_k=0.011 b_k=0.006 lower=0.021 higher=0.007 written=0.000 near=0.733 counterparts=0.012 rest=0.211
+SUM_ROW no_carry tick=2 head=3 places=1100 a_k=0.005 b_k=0.003 lower=0.019 higher=0.002 written=0.001 near=0.630 counterparts=0.006 rest=0.335
+SUM_ROW no_carry tick=3 head=0 places=1100 a_k=0.205 b_k=0.131 lower=0.015 higher=0.074 written=0.000 near=0.024 counterparts=0.173 rest=0.379
+SUM_ROW no_carry tick=3 head=1 places=1100 a_k=0.011 b_k=0.081 lower=0.029 higher=0.059 written=0.005 near=0.159 counterparts=0.047 rest=0.609
+SUM_ROW no_carry tick=3 head=2 places=1100 a_k=0.012 b_k=0.038 lower=0.037 higher=0.046 written=0.000 near=0.430 counterparts=0.027 rest=0.410
+SUM_ROW no_carry tick=3 head=3 places=1100 a_k=0.015 b_k=0.033 lower=0.059 higher=0.035 written=0.002 near=0.587 counterparts=0.017 rest=0.251
+SUM presence: 1579 answer digits, 1454 under the top, 479 with a carry in
+SUM_PRESENCE tick=0 a_k=0.161 b_k=0.144 carry=0.257 pair_mod10=0.013 answer=0.015
+SUM_PRESENCE tick=1 a_k=0.188 b_k=0.279 carry=0.359 pair_mod10=0.115 answer=0.053
+SUM_PRESENCE tick=2 a_k=0.257 b_k=0.316 carry=0.507 pair_mod10=0.164 answer=0.112
+SUM_PRESENCE tick=3 a_k=0.210 b_k=0.219 carry=0.519 pair_mod10=0.420 answer=0.417

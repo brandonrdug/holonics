@@ -371,13 +371,18 @@ impl<'c> Resident<'c> {
     /// as the kernel reads them: 0 and 1 the weight's rows and columns at `base`, 2 and 3 a 32-bit and a 64-bit operand at `src`) written as four
     /// planes of eight-bit digits, `8 ⌈terms/32⌉` words a row, beside a flag a row.
     #[allow(clippy::type_complexity)]
-    pub(crate) fn tc_planes(&self, words: &mut Words, (kind, src, base, stride, rows, terms): (u32, u64, u64, u64, usize, usize)) -> Result<(Pooled<'c, u32>, Pooled<'c, u32>, u32)> {
+    /// [realization; the lead, November 22] A weight's planes are cut in its family's unit ([`Resident::units`]): its words shifted down by the
+    /// places every entry holds under its read part, so a family on its lattice takes two planes; the returned `(wshift, wplanes)` go to the
+    /// tile, which shifts its sum back once. A weight not in the table (a glue map, a bench's buffer) is read as it stands, four planes.
+    #[allow(clippy::type_complexity)]
+    pub(crate) fn tc_planes(&self, words: &mut Words, (kind, src, base, stride, rows, terms): (u32, u64, u64, u64, usize, usize)) -> Result<(Pooled<'c, u32>, Pooled<'c, u32>, u32, (u32, u32))> {
         let kw = terms.div_ceil(32) * 8;
         let planes = self.timed(Kind::Alloc, || self.take::<u32>((4 * rows * kw).max(1))).map_err(device)?;
         let flags = self.timed(Kind::Alloc, || self.take_zeroed::<u32>(rows.max(1))).map_err(device)?;
-        let (mut kind, mut src, mut base, mut stride, mut r32, mut k32, mut kw32, mut pp, mut fp) = (kind, src, base, stride, rows as u32, terms as u32, kw as u32, planes.device_ptr(), flags.device_ptr());
-        self.launch("field_tc_planes", Self::cells((rows * kw) as u64), THREADS, &mut [arg(words), arg(&mut kind), arg(&mut src), arg(&mut base), arg(&mut stride), arg(&mut r32), arg(&mut k32), arg(&mut kw32), arg(&mut pp), arg(&mut fp)])?;
-        Ok((planes, flags, kw as u32))
+        let unit = if kind <= 1 { self.units.borrow().iter().find(|(at, _)| *at == words.theta).and_then(|(_, t)| t.get(&base).copied()).unwrap_or((0, 4)) } else { (0, 4) };
+        let (mut kind, mut src, mut base, mut stride, mut r32, mut k32, mut kw32, mut pp, mut fp, mut ws) = (kind, src, base, stride, rows as u32, terms as u32, kw as u32, planes.device_ptr(), flags.device_ptr(), unit.0);
+        self.launch("field_tc_planes", Self::cells((rows * kw) as u64), THREADS, &mut [arg(words), arg(&mut kind), arg(&mut src), arg(&mut base), arg(&mut stride), arg(&mut r32), arg(&mut k32), arg(&mut kw32), arg(&mut pp), arg(&mut fp), arg(&mut ws)])?;
+        Ok((planes, flags, kw as u32, unit))
     }
 
     pub(crate) fn chart(&self, words: &mut Words, x: u64, read: &CardBuffer<'c, i32>, scale: &CardBuffer<'c, i128>, only_unresolved: bool) -> Result<()> {
@@ -400,10 +405,10 @@ impl<'c> Resident<'c> {
         if x64 {
             self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u)])?;
         } else {
-            let (planes, flags, kw) = self.tc_planes(words, (0, 0, weight, cols as u64, rows, cols))?;
-            let (site_planes, site_flags, _) = self.tc_planes(words, (2, x, 0, x_stride as u64, words.t as usize, cols))?;
-            let (mut pa, mut fa, mut pb, mut fb, mut kw) = (planes.device_ptr(), flags.device_ptr(), site_planes.device_ptr(), site_flags.device_ptr(), kw);
-            self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)])?;
+            let (planes, flags, kw, (wshift, wplanes)) = self.tc_planes(words, (0, 0, weight, cols as u64, rows, cols))?;
+            let (site_planes, site_flags, _, _) = self.tc_planes(words, (2, x, 0, x_stride as u64, words.t as usize, cols))?;
+            let (mut pa, mut fa, mut pb, mut fb, mut kw, mut wshift, mut wplanes) = (planes.device_ptr(), flags.device_ptr(), site_planes.device_ptr(), site_flags.device_ptr(), kw, wshift, wplanes);
+            self.launch(launched, grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut bias), arg(&mut wmax), arg(&mut rows32), arg(&mut cols32), arg(&mut x), arg(&mut xs), arg(&mut out), arg(&mut os), arg(&mut add), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw), arg(&mut wshift), arg(&mut wplanes)])?;
         }
         self.map_record((launched, rows32, cols32, u != 0, add != 0), words, Some(cols), Some(wmax), None, &[(x, x64, xs as usize, cols)])
     }
@@ -439,9 +444,9 @@ impl<'c> Resident<'c> {
         let grid = (cols as u64).div_ceil(64).saturating_mul((words.t as u64).div_ceil(64)).clamp(1, 65_535) as u32;
         // The covector's digits are cut as each chunk is staged (`field_transposed_tcs`): its 64-bit words, read whole to write their planes,
         // would cost the map's own time again.
-        let (planes, flags, kw) = self.tc_planes(words, (1, 0, weight, cols as u64, cols, rows))?;
-        let (mut pa, mut fa, mut pb, mut fb, mut kw) = (planes.device_ptr(), flags.device_ptr(), 0u64, 0u64, kw);
-        self.launch("field_transposed_tcs", grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut out), arg(&mut acc), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw)])?;
+        let (planes, flags, kw, (wshift, wplanes)) = self.tc_planes(words, (1, 0, weight, cols as u64, cols, rows))?;
+        let (mut pa, mut fa, mut pb, mut fb, mut kw, mut wshift, mut wplanes) = (planes.device_ptr(), flags.device_ptr(), 0u64, 0u64, kw, wshift, wplanes);
+        self.launch("field_transposed_tcs", grid, THREADS, &mut [arg(words), arg(&mut weight), arg(&mut rows32), arg(&mut cols32), arg(&mut y), arg(&mut ys), arg(&mut out), arg(&mut acc), arg(&mut u), arg(&mut pa), arg(&mut fa), arg(&mut pb), arg(&mut fb), arg(&mut kw), arg(&mut wshift), arg(&mut wplanes)])?;
         self.map_record(("field_transposed_tcs", rows32, cols32, u != 0, acc != 0), words, Some(rows), None, Some((weight, rows * cols)), &[(y, true, ys as usize, rows)])
     }
 

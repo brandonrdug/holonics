@@ -1,0 +1,7 @@
+Fixed 2026-11-22T06:31:16Z (date -u), the lead, before units1.sh runs. The card's material operand read as its family's count (e5u).
+G-U1 (bits): gate 3 against the latticed line's lap W84l (from W83l's STATE.3000): parity 3 of 3 sections equal, 24 sections reproduced,
+the lap's read byte for byte.
+G-U2 (time): in one balanced hold of 40-section runs from W84l's STATE.3000 (warm-up, then e5p, e5u, e5u, e5p, e5p, e5u, e5u, e5p), the
+section reads 15 to 40 ms shorter on e5u (of about 500), the controls' own spread under 10 ms. Why: on the lattice the material maps' weights
+are 15-bit counts, two digit planes where four stood, so the site maps' products halve; the maps took 156.7 ms a section on November 20 at
+1.7 times their octet floor, the forward map near its octets and the transposed map nearer its products.

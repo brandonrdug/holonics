@@ -497,6 +497,12 @@ impl<T: Poolable> Drop for Pooled<'_, T> {
 }
 
 /// **The field on the card**: its image, the card it runs on and the octets a batch may take.
+/// [realization; the lead, November 22] The largest magnitude two signed digits of eight bits hold as `tc_digits` cuts a word
+/// (`d₀ + 2⁸ d₁`, each `d ∈ [−128, 127]`): a weight within it takes two planes.
+const TC_TWO: u32 = 127 + 256 * 127;
+/// The uploads whose units are kept: a section's fine field and its level's, with room for a reading's own.
+const UNIT_TABLES: usize = 4;
+
 pub struct Resident<'c> {
     pub(crate) card: &'c Card,
     pub(crate) module: Module,
@@ -512,6 +518,12 @@ pub struct Resident<'c> {
     pub(crate) last_ns: std::cell::Cell<u128>,
     /// [realization; P61 item 4f] The outer passes' slots for their largest words and the next slot ([`Resident::outer_slot`]).
     pub(crate) outer_maxima: std::cell::RefCell<Option<(Pooled<'c, u64>, usize)>>,
+    /// [realization; the lead, November 22] **Each family's unit as the card reads it**, keyed by the material's address on the card and the
+    /// family's first entry: the places every entry of the family holds under its read part (the common trailing zeros of its words) and the
+    /// digit planes of eight bits its words take once read in that unit (two where every `|θ ≫ s|` stands within `TC_TWO`, else four). Read
+    /// from the material as each upload writes it ([`Resident::upload`]); a family on its lattice ([`holonics_engine::field::Lattice`]) is read
+    /// as its count, the same integers.
+    pub(crate) units: std::cell::RefCell<std::collections::VecDeque<(u64, std::collections::HashMap<u64, (u32, u32)>)>>,
     /// [theory, November 12, P50 step 1] The test build's negative control: the clock's fill withheld, its store left at `SKIN_UNFILLED`.
     #[cfg(test)]
     pub(crate) unfilled: std::cell::Cell<bool>,
@@ -588,7 +600,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1016,6 +1028,24 @@ impl<'c> Resident<'c> {
             }
             (None, Some(shared)) => words.face = shared,
             (None, None) => unreachable!("a face is made where none is shared"),
+        }
+        // [realization; the lead, November 22] Each family's unit read from the material as it is uploaded ([`Resident::units`]).
+        {
+            let mut table = std::collections::HashMap::new();
+            for &(start, len, _) in &l.families {
+                let block = &field.theta[start..start + len];
+                let held = block.iter().fold(0u32, |o, &v| o | v.unsigned_abs());
+                let shift = if held == 0 { 0 } else { held.trailing_zeros() };
+                let most = block.iter().map(|&v| (v >> shift).unsigned_abs()).max().unwrap_or(0);
+                table.insert(start as u64, (shift, if most <= TC_TWO { 2 } else { 4 }));
+            }
+            // The materials of the last few uploads (a section uploads the fine field and its level's), the oldest released.
+            let mut units = self.units.borrow_mut();
+            units.retain(|(at, _)| *at != words.theta);
+            units.push_back((words.theta, table));
+            while units.len() > UNIT_TABLES {
+                units.pop_front();
+            }
         }
         Ok((words, Upload { _pack: run_pack, _face: face, met }, face_octets))
     }
