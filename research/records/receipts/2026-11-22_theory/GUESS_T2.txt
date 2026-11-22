@@ -1,0 +1,10 @@
+Fixed 2026-11-22T22:46:55Z (date -u), the lead, before the third lap trains. Refs #404.
+G-T1 missed on its magnitudes over two laps (held theory −0.062 and −0.057 nats a place against 0.10; held Lean −0.098 and −0.120; the
+panel's lexicon share unmoved) and held on its cost (the five old registers within 0.005 on both laps). G-T2, the third lap, W93j from
+W92j's end beside W93 from W92's end, 3,000 sections each, both read on store-2026-11-22's held set and the theory panel:
+(a) held theory at least 0.04 and held Lean at least 0.08 nats a place under the control, one place open;
+(b) every old register within 0.010 of the control;
+(c) the theory panel's writes hold at least twice the control's distinct terms of the register's own (theory_score.py THEORY_TERMS:
+    over the two laps 7 and 5 against 1 and 2 on the theory prompts, 4 and 3 against 3 and 4 on the Lean).
+Rule: held, the line takes the join (W93j's end is the line's state); missed on (b), the join leaves; missed on (a) or (c) alone, the
+join stays an arm and the share is the next change.

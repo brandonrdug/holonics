@@ -1132,6 +1132,11 @@ pub fn read_reach(args: &[String]) -> Result<()> {
             text.push_str(&format!("{k}\t{}\t{}\t{}\t{}\t{spread}\n", if (first + k) % 2 == 0 { "left" } else { "right" }, all.circle_turns[k], all.circle_right[k], learner.field.theta[l.carry_bias + k]));
         }
         write_new(&out.join("hands.tsv"), text.as_bytes())?;
+        // [the lead, November 22, the chirality pass's third read] Each circle's row of the turn chart `Q` (`D` words on the material's grain,
+        // little-endian), so a ruler reads which circles' rows stand near which.
+        let dw = learner.field.declaration.width;
+        let rows_q: Vec<u8> = learner.field.theta[l.carry..l.carry + c * dw].iter().flat_map(|v| v.to_le_bytes()).collect();
+        write_new(&out.join("carry_rows.i32"), &rows_q)?;
     }
     // [the lead, November 22, the chirality pass] The word `moves` among the settings: each known site's pumped-circle moves by kind and hand
     // ([`holonics_engine::field::Constitution::strand_moves`]), written to `OUT/moves.tsv` (`row`, `group`, `place`, `class`, then turn+,

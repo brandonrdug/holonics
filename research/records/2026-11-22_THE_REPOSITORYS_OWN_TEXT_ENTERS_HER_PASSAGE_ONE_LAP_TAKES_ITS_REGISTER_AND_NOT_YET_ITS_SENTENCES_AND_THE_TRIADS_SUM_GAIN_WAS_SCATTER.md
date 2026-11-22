@@ -63,7 +63,26 @@ theory stay noise in both arms, and the panel's lexicon share does not tell them
 is a weak ruler here; a register's own terms, the objects' names and Lean's declarations, are the read to build). The line does not take the
 join on this lap by the guess's rule; the second lap of both arms is on the card (W92j, W92).
 
-## 5. What follows
+## 5. The second lap, and the chirality pass's reads
+
+**The second lap** (W92j from W91j's end beside W92 from W91's, [`arm_W92j.txt`](receipts/2026-11-22_theory/arm_W92j.txt)): held theory
+−0.0565 and held Lean −0.1201 nats a place, the five old registers −0.0048 to −0.0006, all paired at one place open. The register's own
+terms in her panel writes (`theory_score.py`'s `THEORY_TERMS`: words twenty times as frequent in the slice as in the reference registers)
+stand at 7 distinct on the theory prompts (chart, clock, finite, lattice, receiver, source, stokes) against the control's 1, and 4 against 3
+on the Lean ([`theory_panel_W92j.written`](receipts/2026-11-22_theory/theory_panel_W92j.written)); her sentences stay noise. G-T1's
+magnitudes missed on both laps and its cost held on both, so the join stays an arm; the third lap runs under G-T2
+([`GUESS_T2.txt`](receipts/2026-11-22_theory/GUESS_T2.txt)), whose rule says what the line does with each outcome.
+
+**The chirality pass's reads** (host, W91's mean, the 800 held rows by two streams; the coordinator's relays, the guesses its own):
+the pumped circles' site moves are 47.5% turns, 20.1% locks and 32.5% hand flips ([`moves_W91.txt`](receipts/2026-11-22_theory/moves_W91.txt):
+locks flat at 0.20 over every surprise fifth, flips 0.37 at spaces); each circle holds its hand along its scan (consecutive turns agree
+0.881, 0.713 in the circle's own frame; 486 of 512 circles outside 0.35 to 0.65 right-handed; left- and right-scanned 0.506 and 0.491;
+the turn chart's bias a twenty-fifth of its linear part, [`hands_W91.txt`](receipts/2026-11-22_theory/hands_W91.txt)); a mirror is a site
+event (a site's flips over its ticks and circles vary 40 times a binomial's at 0.325, 31 times at spaces); and nothing pairs the hands (a
+circle's nearest turn row by `|cos|`, median 0.27, has the opposite hand 0.496 of the time against 0.498 for random pairs). Rulers:
+`Constitution::strand_moves` and `strand_chirality`, read-reach's words `moves` and `hands`.
+
+## 6. What follows
 
 - **The share.** At its quota the repository's text is 9 MB of a lap: the line meets each held record's register a few times a pass.
   What share of a pass the theory takes is the next choice, read against the old registers' cost, which one lap puts at nothing.
@@ -72,7 +91,7 @@ join on this lap by the guess's rule; the second lap of both arms is on the card
 - **The tension read on two streams** (the record of the top digit, §5) still owes its planted law: its chart removes nothing of the open
   places' covector where the plain read's removed 0.35.
 
-## 6. The failures this could repeat
+## 7. The failures this could repeat
 
 - **Bits read as progress.** The held code fell a tenth of a nat a place; the writes did not move, and the record says so first.
 - **Seen material graded as unseen.** The held theory is the records of November 20 to 22, which no state of the line has read, and the

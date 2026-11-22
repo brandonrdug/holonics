@@ -1,0 +1,12 @@
+W92_START 20:26:25
+TERRAIN_TRAINED W92 21:01:45 sections=3000 ended=false
+TERRAIN_TRAINED W92j 21:37:25 sections=3000 ended=false
+TERRAIN_PANEL W92_mean 21:49:32 seen: words 35 in_lexicon 24 (68%) longest_copy 15 held: words 68 in_lexicon 50 (73%) longest_copy 14 unread: words 61 in_lexicon 40 (65%) longest_copy 16  || LONG W92_mean: all words 262 in lexicon 182 (69%) writes that loop 3 of 20 longest run shared with its prompt 76 | code 37/43 (86%) web 40/53 (75%) science 30/52 (57%) books 48/61 (78%) wikidata 27/53 (50%)
+W92_CAVITY W92 22:29:39 CAVITY_DONE ms=872474
+W92_THEORY THEORY_PANEL W92 logic: words 101 in lexicon 73 (72%) loops 0 of 8 longest shared with prompt 12 | theory: words 158 in lexicon 125 (79%) loops 1 of 12 longest shared with prompt 12
+W92_CAVITY W92j 22:45:13 CAVITY_DONE ms=919908
+W92_THEORY THEORY_PANEL W92j logic: words 96 in lexicon 60 (62%) loops 0 of 8 longest shared with prompt 19 | theory: words 169 in lexicon 134 (79%) loops 0 of 12 longest shared with prompt 17
+W92_FRONTIER_NEW_STORE FRONTIER W92j; one place open: all 0.6514 (140564 places) | books 0.6644 code 0.3866 logic 0.6260 science 0.5457 theory 0.7162 web 0.7366 wikidata 0.8839 || less the control's, paired: -0.0270 (±0.0010) | books -0.0048 code -0.0036 logic -0.1201 science -0.0030 theory -0.0565 web -0.0006 wikidata -0.0010|FRONTIER W92j; the frontier: all 1.8666 (139706 places) | books 1.8041 code 1.5352 logic 1.9432 science 1.7420 theory 1.9778 web 2.0252 wikidata 2.0386 || less the control's, paired: -0.0241 (±0.0011) | books -0.0007 code +0.0023 logic -0.1500 science +0.0030 theory -0.0502 web +0.0196 wikidata +0.0071|
+TERRAIN_SCORE W92 whole 47/96 opening 51/96 first 70/96 | sum 9/9/12 of 16 difference 7/7/7 of 16 product 3/3/7 of 16 close 9/13/16 of 16 copy 9/9/13 of 16 reverse 10/10/15 of 16
+TERRAIN_SCORE W92j whole 49/96 opening 52/96 first 71/96 | sum 7/7/9 of 16 difference 5/5/7 of 16 product 5/5/8 of 16 close 10/13/16 of 16 copy 9/9/15 of 16 reverse 13/13/16 of 16
+W92_ALL_DONE 22:45:33
