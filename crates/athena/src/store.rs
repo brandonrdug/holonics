@@ -359,52 +359,14 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // [definition; the lead, November 22] The terrain's count of records met when the section opens, kept so that a section the pass ends
         // in returns the records it drew ([`PassTerrain::met`]).
         let met_at_open = cut.pass.terrain.as_ref().map(|t| t.met);
-        if let Some(t) = cut.pass.terrain.clone() {
-            terrain_budget = t.share(cut.pass.sites);
-            let mut met = t.met;
-            loop {
-                let kind = usize::try_from((met / t.records) % crate::world::KINDS.len() as u64).unwrap_or(0);
-                let (mut classes, mut open, mut counted) = (Vec::new(), Vec::new(), 0usize);
-                for r in 0..t.records {
-                    let (expression, answered) = crate::world::record(kind, seed ^ (met + r));
-                    let mut known = expression;
-                    known.extend_from_slice(b" = ");
-                    let mut answered = answered;
-                    answered.push(b'\n');
-                    let (k, a) = (codec.encode(&known)?, codec.encode(&answered)?);
-                    // [definition; the lead, November 21] In the writer's state every record but the last is known whole, and the last one's
-                    // answer is open from a keyed place to its line feed (`PassTerrain::suffix`).
-                    let from = match (t.suffix, r + 1 == t.records) {
-                        (false, _) => 0,
-                        (true, false) => a.len(),
-                        (true, true) => usize::try_from(crate::world::mix(seed ^ (met + r) ^ 0x7375_6666_6978) % a.len() as u64).unwrap_or(0),
-                    };
-                    open.extend(std::iter::repeat_n(false, k.len() + from));
-                    open.extend(std::iter::repeat_n(true, a.len() - from));
-                    counted += a.len() - from;
-                    classes.extend(k);
-                    classes.extend(a);
-                }
-                let n = classes.len() as u64;
-                if in_sites + n > terrain_budget || in_pairs + n * n > cut.pass.pairs {
-                    break;
-                }
-                // [definition; the lead, November 21] Read by two streams (`PassTerrain::strand`): every site known, every place past the
-                // first compared at its own frontier, as the pass reads its frontier.
-                let region = if t.strand {
-                    counted = classes.len() - 1;
-                    OwnedRegion { strand: true, past: cut.pass.past, second: cut.pass.second, ..OwnedRegion::plain(classes, vec![false; open.len()]) }
-                } else {
-                    OwnedRegion::plain(classes, open)
-                };
+        if cut.pass.terrain.is_some() {
+            let drawn = terrain_section(&mut cut.pass, &codec, seed)?;
+            terrain_budget = drawn.budget;
+            for (region, counted) in drawn.regions {
                 tally.take(&region, counted);
-                (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
                 regions.push(region);
-                (met, terrain_regions, terrain_records) = (met + t.records, terrain_regions + 1, terrain_records + t.records);
             }
-            if let Some(t) = cut.pass.terrain.as_mut() {
-                t.met = met;
-            }
+            (in_pairs, in_sites, terrain_regions, terrain_records) = (drawn.pairs, drawn.sites, drawn.count, drawn.records);
         }
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
         let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
@@ -1360,6 +1322,71 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
 }
 
 /// A pass's slices as `NAME:PIECE:TAKEN`, joined by commas.
+/// [definition; the lead, November 21; drawn out of `train-store` on November 22 so the store's tension read meets the same terrain] **A
+/// section's terrain** ([`holonics_engine::field::PassTerrain`]): as many regions of `records` records of one kind as the terrain's share of
+/// the section's sites holds, every expression known and every answer and its line feed open (read by two streams where the terrain says
+/// so), a region's kind turning with the terrain's count of records; the count moves in `pass`.
+#[derive(Default)]
+pub(crate) struct TerrainSection {
+    pub(crate) regions: Vec<(OwnedRegion, usize)>,
+    pub(crate) budget: u64,
+    pub(crate) sites: u64,
+    pub(crate) pairs: u64,
+    pub(crate) count: usize,
+    pub(crate) records: u64,
+}
+
+pub(crate) fn terrain_section(pass: &mut StorePass, codec: &Codec, seed: u64) -> Result<TerrainSection> {
+    let mut out = TerrainSection::default();
+    if let Some(t) = pass.terrain.clone() {
+        out.budget = t.share(pass.sites);
+        let mut met = t.met;
+        loop {
+            let kind = usize::try_from((met / t.records) % crate::world::KINDS.len() as u64).unwrap_or(0);
+            let (mut classes, mut open, mut counted) = (Vec::new(), Vec::new(), 0usize);
+            for r in 0..t.records {
+                let (expression, answered) = crate::world::record(kind, seed ^ (met + r));
+                let mut known = expression;
+                known.extend_from_slice(b" = ");
+                let mut answered = answered;
+                answered.push(b'\n');
+                let (k, a) = (codec.encode(&known)?, codec.encode(&answered)?);
+                // [definition; the lead, November 21] In the writer's state every record but the last is known whole, and the last one's
+                // answer is open from a keyed place to its line feed (`PassTerrain::suffix`).
+                let from = match (t.suffix, r + 1 == t.records) {
+                    (false, _) => 0,
+                    (true, false) => a.len(),
+                    (true, true) => usize::try_from(crate::world::mix(seed ^ (met + r) ^ 0x7375_6666_6978) % a.len() as u64).unwrap_or(0),
+                };
+                open.extend(std::iter::repeat_n(false, k.len() + from));
+                open.extend(std::iter::repeat_n(true, a.len() - from));
+                counted += a.len() - from;
+                classes.extend(k);
+                classes.extend(a);
+            }
+            let n = classes.len() as u64;
+            if out.sites + n > out.budget || out.pairs + n * n > pass.pairs {
+                break;
+            }
+            // [definition; the lead, November 21] Read by two streams (`PassTerrain::strand`): every site known, every place past the
+            // first compared at its own frontier, as the pass reads its frontier.
+            let region = if t.strand {
+                counted = classes.len() - 1;
+                OwnedRegion { strand: true, past: pass.past, second: pass.second, ..OwnedRegion::plain(classes, vec![false; open.len()]) }
+            } else {
+                OwnedRegion::plain(classes, open)
+            };
+            (out.pairs, out.sites) = (out.pairs + n * n, out.sites + n);
+            out.regions.push((region, counted));
+            (met, out.count, out.records) = (met + t.records, out.count + 1, out.records + t.records);
+        }
+        if let Some(t) = pass.terrain.as_mut() {
+            t.met = met;
+        }
+    }
+    Ok(out)
+}
+
 fn slices_text(pass: &StorePass) -> String {
     pass.slices.iter().map(|s| format!("{}:{}:{}", s.name, s.piece, s.taken)).collect::<Vec<_>>().join(",")
 }

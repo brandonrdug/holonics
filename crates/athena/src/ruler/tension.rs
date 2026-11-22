@@ -263,8 +263,17 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
     while done < sections {
         let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
         let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        // [the lead, November 22] The section's terrain first, as `train-store` draws it ([`crate::store::terrain_section`]), its rows named
+        // `terrain`: the tension a lap would meet next includes the terrain's share.
+        let mut stretches = 0usize;
+        if cut.pass.terrain.is_some() {
+            let drawn = crate::store::terrain_section(&mut cut.pass, &codec, seed)?;
+            (in_pairs, in_sites) = (drawn.pairs, drawn.sites);
+            regions.extend(drawn.regions.into_iter().map(|(region, _)| (usize::MAX, region)));
+        }
         while let Some(drawn) = cut.next() {
             let n = drawn.sites();
+            stretches += 1;
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
             }
@@ -273,21 +282,28 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
             (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
             regions.push((slice, region));
         }
-        if regions.is_empty() {
+        if regions.is_empty() || stretches == 0 {
             break;
         }
-        let reads: Vec<std::result::Result<holonics_engine::field::CrossingTension, String>> =
-            regions.par_iter().map(|(_, region)| learner.field.crossing_tension(&view_of(region)).map_err(|e| e.to_string())).collect();
+        // [the lead, November 22] A stretch the pass reads by two streams is read on that regime ([`Constitution::strand_tension`]): its rows are
+        // its open places, every place past the first, each compared at its own frontier as the writer compares it.
+        let reads: Vec<std::result::Result<holonics_engine::field::CrossingTension, String>> = regions
+            .par_iter()
+            .map(|(_, region)| if region.strand { learner.field.strand_tension(&region.classes, region.past) } else { learner.field.crossing_tension(&view_of(region)) }.map_err(|e| e.to_string()))
+            .collect();
         for (r, ((slice, region), tension)) in regions.iter().zip(reads).enumerate() {
             let tension = tension?;
             for site in 0..region.classes.len() {
-                let open = region.unresolved[site];
+                let open = if region.strand { site > 0 } else { region.unresolved[site] };
+                if region.strand && !open {
+                    continue;
+                }
                 if !open && site % every != 0 {
                     continue;
                 }
                 let code = if open { tension.codes[site].ok_or("an open place without a face")? } else { -1 };
                 for k in 0..ticks {
-                    writeln!(rows, "{}\t{done}\t{r}\t{site}\t{k}\t{}\t{}\t{code}", names[*slice], u8::from(open), region.classes[site])?;
+                    writeln!(rows, "{}\t{done}\t{r}\t{site}\t{k}\t{}\t{}\t{code}", if *slice == usize::MAX { "terrain" } else { names[*slice] }, u8::from(open), region.classes[site])?;
                     for &v in &tension.lambda[k][site * dw..(site + 1) * dw] {
                         lambda.write_all(&v.to_le_bytes())?;
                     }
@@ -310,7 +326,7 @@ pub fn read_tension_store(args: &[String]) -> Result<()> {
             }
             for (k, rows_k) in tension.temper.iter().enumerate() {
                 for &(h, i, dl) in rows_k {
-                    writeln!(temper, "{}\t{done}\t{r}\t{i}\t{k}\t{h}\t{dl}", names[*slice])?;
+                    writeln!(temper, "{}\t{done}\t{r}\t{i}\t{k}\t{h}\t{dl}", if *slice == usize::MAX { "terrain" } else { names[*slice] })?;
                 }
             }
         }

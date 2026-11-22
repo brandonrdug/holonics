@@ -736,6 +736,13 @@ impl Constitution {
     ///
     /// Refused on a loud face and where the forward kept no ticks. A place is compared at weight one.
     pub(crate) fn strand_returned(&self, classes: &[usize], pass: &StrandForward, g: &mut [i128]) -> Result<()> {
+        self.strand_returned_with(classes, pass, g, None)
+    }
+
+    /// [measurement; the lead, November 22] [`Constitution::strand_returned`] with the covector each tick's reverse receives (`λ^(k+1)` over
+    /// the strand's `2n` sites, the known stream's then the open places', on the covector's grain), pushed in the reverse's order where
+    /// `lambdas` is given: what a founding reads on the writer's own regime ([`Constitution::strand_tension`]). The return is the same.
+    pub(crate) fn strand_returned_with(&self, classes: &[usize], pass: &StrandForward, g: &mut [i128], mut lambdas: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
         if d.loud {
             return refuse("a strand's return on a loud face");
@@ -797,6 +804,9 @@ impl Constitution {
         let mut ended: Option<ClockReturn> = None;
         for (k, cell) in pass.ticks.iter().enumerate().rev() {
             let mut r = ClockReturn::new(paced, sites, m2);
+            if let Some(out) = lambdas.as_deref_mut() {
+                out.push(dx.clone());
+            }
             self.tick_return(cell, &mut dx, g, &pass.paces[k], &definite, &mut r.dm, &mut r.gtau, &mut r.gsig, None, None, None, None)?;
             // The level, where the strand heard it before this tick ([`Constitution::scale_return_before`]).
             if let (Some(s), Some(sp)) = (self.scale.as_deref().filter(|s| s.split == k), pass.tower.as_ref()) {
