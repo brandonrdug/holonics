@@ -1460,7 +1460,9 @@ impl Constitution {
     /// ([`Region::second`]).
     pub(crate) fn strand_pass_with(&self, classes: &[usize], keep: bool, past: bool, second: bool) -> Result<StrandForward> {
         let d = &self.declaration;
-        if d.triads > 0 || d.junction || d.depth > 0 || d.closed > 0 || d.lane_leak {
+        // [definition; the lead, November 22] A crossing triad's three legs stand at the site (`Declaration::crossing`, [`triad_products`]):
+        // each product is one site's, of the known stream's sites and the open places alike, so the two streams read it as every tick does.
+        if (d.triads > 0 && !d.crossing) || d.junction || d.depth > 0 || d.closed > 0 || d.lane_leak {
             return refuse("a passage read by two streams on a field with triads, a junction, depth rings, a closed face or a lane leak");
         }
         let n = classes.len();
