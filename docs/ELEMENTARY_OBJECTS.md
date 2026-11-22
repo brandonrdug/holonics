@@ -1352,6 +1352,13 @@ Its five parts:
      helix, which inverts the screw, `USU = S⁻¹`. Positions, frames and the duplex's shape carry one
      dihedral group `⟨S, U | U² = 1, USU = S⁻¹⟩`: its half-turns are the `SʲU`, about dyads at
      every half step, and the pairing is its reflection lifted by `σ`.
+     The dyad reverses the turn and the carry together, so it keeps the helix's hand (the reduced
+     pitch's sign, [HELICAL_GEOMETRY](HELICAL_GEOMETRY.md#a-helix-and-its-independent-collapses)): the
+     duplex is antiparallel and of one hand. A mirror reverses the turn alone and pairs a strand with
+     the opposite hand, a heterochiral partner outside `⟨S, U⟩`. Read on the turn alone the two are one
+     map, which is why a rotation carrier without its carry cannot tell them apart and the hand is read
+     only against the carry into the next grain (`HNN/PumpedMoveKinds`, `turn_alone_cannot_tell`;
+     [record](../research/records/2026-11-22_A_HELIX_CARRIES_TWO_SIGNS_AND_ITS_HAND_IS_THEIR_PRODUCT_A_RING_ALONE_HAS_NONE_THE_MIRROR_CARRIES_ORDER_COMPARISON_AND_STORAGE_AND_A_CHAIN_COMPOSES_WHERE_ITS_CONTACTS_MEET_OPPOSITE_HANDS.md)).
    - **The Enigma's two properties.** Read through any frame `A` (a rotor's stepping, a phase of the
      helix), the pairing `A⁻¹σA` is again a fixed-point-free involution (`phaseTransport`;
      `reflectedReturn_involutive` at each fixed frame; `reflectedReturn_no_fixed_point`), and it is
