@@ -1,0 +1,11 @@
+MOVES all            sites  140798  turn 0.4745  shear 0.000000  lock 0.2008  flip 0.324726  right-handed 0.499
+MOVES letter         sites   82475  turn 0.4684  shear 0.000000  lock 0.2034  flip 0.328184  right-handed 0.498
+MOVES first          sites   21355  turn 0.5301  shear 0.000000  lock 0.1918  flip 0.278124  right-handed 0.504
+MOVES digit          sites    3957  turn 0.5238  shear 0.000000  lock 0.2271  flip 0.249025  right-handed 0.504
+MOVES space          sites   23680  turn 0.4371  shear 0.000000  lock 0.1954  flip 0.367444  right-handed 0.497
+MOVES other          sites    9331  turn 0.4748  shear 0.000000  lock 0.2007  flip 0.324518  right-handed 0.499
+MOVES surprise 1/5   sites   28159  turn 0.4539  shear 0.000000  lock 0.1991  flip 0.346997  right-handed 0.497
+MOVES surprise 2/5   sites   28160  turn 0.4560  shear 0.000000  lock 0.2002  flip 0.343850  right-handed 0.498
+MOVES surprise 3/5   sites   28159  turn 0.4667  shear 0.000000  lock 0.2024  flip 0.330912  right-handed 0.499
+MOVES surprise 4/5   sites   28160  turn 0.4904  shear 0.000000  lock 0.2036  flip 0.305965  right-handed 0.500
+MOVES surprise 5/5   sites   28160  turn 0.5055  shear 0.000000  lock 0.1986  flip 0.295910  right-handed 0.501

@@ -1405,6 +1405,42 @@ impl Constitution {
     /// [`Constitution::strand_pass`] formed them. Whether a circle's turn follows the site's symbol (a stride of its own a symbol,
     /// `navigator.content-stride-moment`) or stands the same at every site (a fixed advance) is read from these outside the machine.
     /// A reading: the state is the same with it.
+    /// [measurement; the lead, November 22, the chirality pass's read] **Each site's circle moves by kind, for a ruler on the host**: for a
+    /// passage read by two streams, at every tick and on every pumped circle, a site's move `Q ↦ γ Q + η conj(Q) + κ b` is a turn where
+    /// `|p| < 4|q|/(4 + q²)` (`p`, `q` the pump's and the turn's charts in units of `2^16`), a shear at equality, a lock between that and
+    /// `|p| = 1`, and a hand flip past it (`det = |γ|² − |η|² < 0`); its hand is the circle's scan direction (left where `(first + k)` is
+    /// even) times the sign of `q`. Returns for each of the passage's `n` known sites the counts `[turn+, turn−, shear+, shear−, lock+,
+    /// lock−, flip+, flip−]` over every tick and circle. Refused on a field whose circles are not pumped. A reading: the state is the same.
+    pub fn strand_moves(&self, classes: &[usize], past: bool) -> Result<Vec<[u32; 8]>> {
+        let d = &self.declaration;
+        if !d.pump || d.carry == 0 {
+            return refuse("a circle's moves read on a field whose circles are not pumped");
+        }
+        let pass = self.strand_pass(classes, true, past)?;
+        let (c, n, first) = (d.carry, classes.len(), d.carry_first());
+        let c2 = 2 * c;
+        let one = 1i128 << FACE_BITS;
+        let mut out = vec![[0u32; 8]; n];
+        for cell in &pass.ticks {
+            for t in 0..n {
+                for k in 0..c {
+                    let q = i128::from(cell.qh[t * c2 + k]);
+                    let (pr, pi) = (i128::from(cell.ph[t * c2 + k]), i128::from(cell.ph[t * c2 + c + k]));
+                    // |p| against 4|q| one² / (4 one² + q²), all on the charts' 2^-16 grain, as ⌊√|p|²⌋ (4 one² + q²) against 4 |q| one²
+                    // (each under 2^120: |p| under 2^40 and q² under 2^80 by the charts' bounds).
+                    let p2 = pr * pr + pi * pi;
+                    let lhs = (p2.unsigned_abs()).isqrt() * (4 * one * one + q * q).unsigned_abs();
+                    let rhs = 4 * q.unsigned_abs() * (one * one).unsigned_abs();
+                    let kind = if lhs < rhs { 0 } else if lhs == rhs { 1 } else if p2 <= one * one { 2 } else { 3 };
+                    let left = (first + k) % 2 == 0;
+                    let hand = usize::from(!((q >= 0) == left));
+                    out[t][2 * kind + hand] += 1;
+                }
+            }
+        }
+        Ok(out)
+    }
+
     pub fn strand_gates(&self, classes: &[usize], past: bool) -> Result<Vec<Vec<i64>>> {
         let pass = self.strand_pass(classes, true, past)?;
         let (c2, n) = (2 * self.declaration.carry, classes.len());

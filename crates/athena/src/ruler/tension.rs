@@ -1076,7 +1076,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word == "lanes" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") {
+        if word == "law" || word == "lanes" || word == "moves" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1103,6 +1103,22 @@ pub fn read_reach(args: &[String]) -> Result<()> {
             return Err("a row of fewer than two places".into());
         }
         rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
+    }
+    // [the lead, November 22, the chirality pass] The word `moves` among the settings: each known site's pumped-circle moves by kind and hand
+    // ([`holonics_engine::field::Constitution::strand_moves`]), written to `OUT/moves.tsv` (`row`, `group`, `place`, `class`, then turn+,
+    // turn−, shear+, shear−, lock+, lock−, flip+, flip− over every tick and circle), no code read.
+    if let Some(at) = settings.iter().position(|(n, _)| n == "moves") {
+        settings.remove(at);
+        let moves: Vec<Vec<[u32; 8]>> = rows.par_iter().map(|(_, classes)| learner.field.strand_moves(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        std::fs::create_dir_all(out)?;
+        let mut text = String::new();
+        for (r, ((group, classes), m)) in rows.iter().zip(&moves).enumerate() {
+            for (t, counts) in m.iter().enumerate() {
+                text.push_str(&format!("{r}\t{group}\t{t}\t{}\t{}\n", classes[t], counts.iter().map(u32::to_string).collect::<Vec<_>>().join("\t")));
+            }
+        }
+        write_new(&out.join("moves.tsv"), text.as_bytes())?;
+        println!("REACH_MOVES rows={} ms={}", rows.len(), started.elapsed().as_millis());
     }
     // [the lead, November 22, G-R4] The word `lanes` among the settings: each lane's root mean square in the states after every tick, over
     // every site of every row, one `REACH_LANE` line a tick and lane (on the state's `2^(−16)`, and its power of two's place), no code read.
