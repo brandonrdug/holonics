@@ -344,7 +344,8 @@ pub(crate) struct ScalePass {
 
 impl ScalePass {
     /// The level's receipt's code ([`Scale::receipt`]): the summed code of the written symbols at the prolonged rows' faces, on the
-    /// codes' grain, and the count of places it compared.
+    /// codes' grain, and the count of places it compared (a reading: the tests read it against the covector).
+    #[cfg(test)]
     pub(crate) fn receipt_code(&self) -> (i64, usize) {
         (self.receipt.iter().map(|(_, read, c)| read.face.code(*c)).sum(), self.receipt.len())
     }

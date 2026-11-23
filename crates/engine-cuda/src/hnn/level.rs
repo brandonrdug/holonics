@@ -82,6 +82,10 @@ pub(crate) struct TowerBatch<'c> {
     pub(crate) _stores: Vec<Pooled<'c, u32>>,
     /// A strand batch's tables ([`StrandTables`]).
     pub(crate) strand: Option<StrandTables<'c>>,
+    /// [the lead, November 23] The level's receipt (`Scale::receipt`, the host's `scale_forward_before`): the open places that read an
+    /// epoch (a mask over the fine sites) and each one's covector of its prolonged row through the opening's reader, written by the forward
+    /// and joined on the level's route alone in the reverse.
+    pub(crate) receipt: Option<(Pooled<'c, u8>, Pooled<'c, i64>)>,
 }
 
 impl<'c> Resident<'c> {
@@ -136,6 +140,7 @@ impl<'c> Resident<'c> {
             return Err(TowerError::Refused("a strand's level's batch without its regions' known places or their expected news"));
         }
         let (mut own, mut lo, mut hi, mut lo1, mut hi1, mut lo2, mut hi2): (Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>) = Default::default();
+        let mut receipt_sites: Vec<u8> = Vec::new();
         for r in 0..regions {
             let (first, end) = (fine.region_off[r] as usize, fine.region_off[r + 1] as usize);
             if strand {
@@ -166,6 +171,7 @@ impl<'c> Resident<'c> {
                     }
                 }
                 epoch_of.extend(sc.source.iter().map(|src| src.map_or(LEVEL_NONE, |j| base + j as u32)));
+                receipt_sites.extend(sc.source.iter().enumerate().map(|(k, src)| u8::from(k >= n && src.is_some())));
                 own.extend(sc.cut.epoch.iter().map(|&j| base + j as u32));
                 own.extend(std::iter::repeat_n(LEVEL_NONE, n));
                 harm.extend_from_slice(&sc.cut.harmonics);
@@ -270,7 +276,14 @@ impl<'c> Resident<'c> {
         } else {
             None
         };
-        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores, strand })
+        let receipt = if strand.is_some() && s.receipt {
+            let mask = self.timed(Kind::Copy, || self.take_up(if receipt_sites.is_empty() { &[0u8][..] } else { &receipt_sites[..] })).map_err(device)?;
+            let own_dx = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((fine.sites * d0).max(1))).map_err(device)?;
+            Some((mask, own_dx))
+        } else {
+            None
+        };
+        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores, strand, receipt })
     }
 
     /// A read's own ticks on a batch's level ([`Resident::tower_batch`]): every tick kept where the read keeps the fine field's, and the shares
@@ -316,8 +329,55 @@ impl<'c> Resident<'c> {
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.affine("field_affine_x32", &mut gwords, b as u64, bb as u64, reach_b, h * d0, d1, tb.read1.device_ptr(), d1, tb.pad.device_ptr(), h * d0, 0, false)?;
+        if let (Some((mask, own_dx)), true) = (tb.receipt.as_ref(), returning) {
+            self.level_receipt(field, words, tb, mask, own_dx, h)?;
+        }
         let (mut vp, mut hp, mut ep, mut h32, mut w32, mut dst, mut add) = (tb.pad.device_ptr(), tb.harmonics.device_ptr(), tb.epoch.device_ptr(), h as u32, d0 as u32, words.x, 1u32);
         self.launch("field_level_unchart", Self::cells((tb_fine_sites(words) * d0) as u64), THREADS, &mut [arg(words), arg(&mut vp), arg(&mut hp), arg(&mut ep), arg(&mut h32), arg(&mut w32), arg(&mut dst), arg(&mut add)])
+    }
+
+    /// [realization; the lead, November 23] **The level's receipt on the card** (the host's `scale_forward_before` and `scale_return_before`
+    /// under `Scale::receipt`): each prolonged row alone (`field_level_unchart` into its own buffer), read through the opening's reader at the
+    /// masked open places (the chart, the opening's lift, the tied face at temperature one), compared with the staged class there (an open
+    /// place's is its target) at unit gain, and carried back through the encoding, the opening's block and the chart's adjoint into `own_dx`,
+    /// the reader taking none; the reverse joins `own_dx` with the places' covectors on the level's route alone.
+    fn level_receipt(&self, field: &Constitution, words: &mut Words, tb: &TowerBatch<'c>, mask: &Pooled<'c, u8>, own_dx: &Pooled<'c, i64>, h: usize) -> Result<()> {
+        let d = field.declaration;
+        let (dw, a, lanes) = (d.width, d.alphabet, d.lanes);
+        let sites = tb_fine_sites(words);
+        let l = field.layout();
+        let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
+        let rows = alloc64(sites * dw)?;
+        let (mut vp, mut hp, mut ep, mut h32, mut w32, mut dst, mut add) = (tb.pad.device_ptr(), tb.harmonics.device_ptr(), tb.epoch.device_ptr(), h as u32, dw as u32, rows.device_ptr(), 0u32);
+        self.launch("field_level_unchart", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut vp), arg(&mut hp), arg(&mut ep), arg(&mut h32), arg(&mut w32), arg(&mut dst), arg(&mut add)])?;
+        let mut cw = *words;
+        cw.unresolved = mask.device_ptr();
+        let read = self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?;
+        let scale = self.timed(Kind::Alloc, || self.take::<i128>((sites * lanes).max(1))).map_err(device)?;
+        self.chart(&mut cw, rows.device_ptr(), &read, &scale, true)?;
+        let reach = field.theta[l.opening..l.opening + dw * dw].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
+        let lift = alloc64(sites * dw)?;
+        self.affine("field_affine_x32", &mut cw, l.opening as u64, l.opening_bias as u64, reach, dw, dw, read.device_ptr(), dw, lift.device_ptr(), dw, 0, true)?;
+        let z = alloc64(sites * a)?;
+        {
+            let (mut enc, mut cb, mut yp, mut zp) = (cw.enc, cw.read_bias, lift.device_ptr(), z.device_ptr());
+            self.launch("field_tied_face_tiled", Self::map_grid(a, sites), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut cb), arg(&mut yp), arg(&mut zp)])?;
+        }
+        let masses = self.timed(Kind::Alloc, || self.take::<u64>((sites * a).max(1))).map_err(device)?;
+        let totals = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+        let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
+        self.launch("field_face", Self::warps(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
+        let dz = alloc64(sites * a)?;
+        let (mut mp, mut tp, mut dzp) = (masses.device_ptr(), totals.device_ptr(), dz.device_ptr());
+        self.launch("field_face_covector", Self::cells((sites * a) as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut tp), arg(&mut dzp)])?;
+        let dy = alloc64(sites * dw)?;
+        {
+            let (mut enc, mut dzp, mut dyp) = (cw.enc, dz.device_ptr(), dy.device_ptr());
+            self.launch("field_tied_back_y_tiled", Self::map_grid(dw, sites), THREADS, &mut [arg(&mut cw), arg(&mut enc), arg(&mut dzp), arg(&mut dyp)])?;
+        }
+        let dr = alloc64(sites * dw)?;
+        self.transposed(&mut cw, l.opening as u64, dw, dw, dy.device_ptr(), dw, dr.device_ptr(), false, true)?;
+        self.ratio_adjoint(&mut cw, read.device_ptr(), scale.device_ptr(), dr.device_ptr(), 0, own_dx.device_ptr(), true)
     }
 
     /// The level's reverse at the split (the host's `scale_return`): `back.dx`, the covector of the fine faces after the prolongation,
@@ -333,7 +393,20 @@ impl<'c> Resident<'c> {
             _ => return Err(TowerError::Refused("a level's reverse without its levels' covectors")),
         };
         // The prolongation: `δv(j)` each epoch's harmonics of its places' covectors, then `δb_B`, `δB` and `δr̂¹ = Bᵀ δv`.
-        let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (back.dx.device_ptr(), tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.pad.device_ptr());
+        // [the level's receipt] The places' covectors with the receipt's joined on the level's route alone (the fine path keeps `back.dx`).
+        let joined = match tb.receipt.as_ref() {
+            Some((_, own_dx)) => {
+                let cells = (tb_fine_sites(words) * d0) as u64;
+                let sum = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((cells as usize).max(1))).map_err(device)?;
+                for from in [back.dx.device_ptr(), own_dx.device_ptr()] {
+                    let (mut p, mut q, mut c) = (from, sum.device_ptr(), cells);
+                    self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut p), arg(&mut q), arg(&mut c)])?;
+                }
+                Some(sum)
+            }
+            None => None,
+        };
+        let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (joined.as_ref().map_or(back.dx.device_ptr(), |s| s.device_ptr()), tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.pad.device_ptr());
         // [the record of the two streams §11] A strand's level: an epoch's `δv⁻` is the chart of the covectors of the sites that read it (the
         // known sites of the epoch after it and the open places that stand in that epoch), through `B⁻`; the restriction returns to each
         // epoch's known sites alone (the host's `scale_return_before`).
