@@ -1,0 +1,12 @@
+Fixed 2026-11-23T19:10:16Z (date -u), the lead, before the level's receipt trains. Refs #404.
+At a word's first letter her state carries the word before at 0.225 and the word two before at 0.024 (W99's mean; the play record §6).
+The level's design record of November 17 names the cause first among three: the level has no receipt at its own grain, so the one
+comparison gives it no slope. Built: Scale::receipt (host and card, parity EQUAL on six passages); set-receipt writes it.
+G-L1: W101r from W100's STATE.3000 with its level's receipt set beside W101 from the same state with no change, 3,000 sections each on
+e5r2 after its gate 3 against W100's lap and a development read of 30 sections; read at MEAN.3000:
+(a) at a word's first letter (tools/word_presence.py on read-strand-states of the mean, the 407 held passages of tools/word_rows.py),
+    the word two before present at least 0.05 in the arm, and the word before at least the control's;
+(b) held theory and every old register at most 0.01 nats a place above the control, one place open;
+(c) the theory panel's words in the register's lexicon at least the control's share, and its own terms at least the control's less two.
+Rule: (a), (b) and (c) held, the line takes the receipt; (a) missed with (b) held, a second lap runs as an arm (a level's slope may need
+laps); (b) missed, the receipt costs the fine comparison, and that is read before a second lap.

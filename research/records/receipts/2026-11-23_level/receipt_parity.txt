@@ -1,0 +1,7 @@
+test hnn::field::tests::the_levels_receipt_on_the_card_reads_the_hosts_bits ... LEVEL_RECEIPT_PARITY places=3 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY places=3 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY places=7 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY places=7 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY places=64 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY places=64 past=true faces_equal=true covector_apart=0 of 70812
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 1.09s
