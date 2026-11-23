@@ -1,0 +1,7 @@
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+E5W_GATE EQUAL 12:26:11
