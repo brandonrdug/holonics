@@ -794,6 +794,33 @@ nothing runs does not hold.
   finite word every reader runs (atlas `key.derivation-finite-word-every-reader`; wording `agent-inferred`). Scope: every message,
   record and brief on such a statement; the grade's name stays in the atlas, and a short list of statements for Lean (#410) stays a
   work list ([the record](research/records/2026-11-15_UNDER_A_CHANGE_OF_SCALE_A_MODE_IS_A_COUNT_OR_A_TURN_RH_IS_THE_STRETCHS_HALF_AND_HODGE_THE_QUOTIENTS_THE_PRIMES_ARE_AS_LOUD_IN_ONE_DECADE_AS_THE_NEXT_AND_A_PRIMES_FACTOR_IS_ONE_CELL_OF_A_JUNCTION_AND_A_DELAY.md) §9).
+- **A phenomenon is one propagation read at a ratio, and a lens given coarsely is answered at its generality** (Brandon,
+  November 23). No message, record, brief or design sets a phenomenon apart from propagation by its regime or its scale ("not a
+  wave", "only a static field", the fine grain's interactions against the coarse grain's law). A regime is named by its constitution
+  and by the ratio that places the reader in it: the reader's clock over the medium's relaxation, the reader's distance over the
+  wavelength (atlas `wave.one-propagation-two-ratios`). An answer to a lens given in a discipline's coarse words states the general
+  physics first, on the objects, and takes the words at the meaning the lens gives them; a difference of wording is raised only
+  where it changes a law. Reason: on November 23 a note on how an action spreads through media (sound in the sea, a shark's electric
+  sense) was answered with corrections of its wording and with the sentence that the electric sense is not a propagating wave, where
+  conduction is charge in motion that propagates from its source as every disturbance does (the sea carries one turn a second with a
+  wavelength of 1.6 km and a front at a ninth of light's speed); he named the split of physics by grain as recurring, the formal
+  thread's first draft of that day's record had drawn the same split, and a physics split by grain cannot state a theory whose
+  precision law is a relation between grains (wording `agent-inferred`). Scope: every message, record, brief and design that names
+  a physical regime
+  ([the record](research/records/2026-11-23_PLAY_IS_AN_ACT_ANSWERED_IN_KIND_AN_UNANSWERED_ACT_TEACHES_ITS_READER_TO_DISCOUNT_IT_A_RECEIVER_IS_BUDGETED_BY_ITS_PORTS_EVERY_MEDIUM_PROPAGATES_AND_FADES_BY_ITS_QUALITY_AND_A_RHYTHM_IS_A_PERIOD_CARRIED.md) §5).
+- **A synthesis is told at its weight, and waits on no check or name** (Brandon, November 23). An answer to what the theory says of
+  a subject states the one law the subjects share, then its charts, then a number on each of the tree's own statements with the read
+  that would move it. It is sent before its Lean and before any read, and neither waits on the other. No statement of the tree's is
+  held back, or left without a weight, because a kernel has not checked it or no outside name stands behind it, and an outside claim
+  is weighed by the reading the tree's own are. A weight is calibrated: a coin is called a coin, a miss is scored as a miss in one
+  line, and a guess on a built part is fixed after that part and its rows are read at their owner. A law that names a regime is held,
+  in the pass that states it, against each constant of the engine that sets that regime. Reason: on November 20 an outside archive
+  was given 0.8 on a reading of its text while the tree's own routes carried no number, and the replies of November 23 hedged where
+  the logic was composing; a weight is a direction of work and no verdict, and hesitance leaves the theory without one. On that day
+  five guesses on the line's level were fixed before its owner was read and four missed, and the morning's law of a medium's fade
+  was written without reading the engine's skin, which an outside letter then did (wording `agent-inferred`). Scope: every message,
+  record and brief that states what the theory holds; the gates and a line's lap keep their own rules
+  ([the record](research/records/2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_AND_KEEPS_WHAT_A_COMMON_TURN_LEAVES_A_COUNT_OR_A_PAIR_OF_OPPOSITE_HANDS_A_UNIT_IS_A_LOOP_THAT_NEARLY_CLOSES_ITS_COMMA_IS_ITS_REMAINDER_AND_NESTED_DEPTH_IS_AN_INDEX.md) §14, §18, §19).
 - **Speed is a steady background, never a pendulum** (Brandon, November 16). The main effort is the product (Athena's acceptance:
   online ingestion with retained deposition, a cold restart, answers from the retained state with their provenance, readable text,
   GSM8K the yardstick), and its decoded writes are read and shown beside the nats and the loudness. Where the counters a mission step

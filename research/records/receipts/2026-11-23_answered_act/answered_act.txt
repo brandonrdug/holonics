@@ -1,0 +1,87 @@
+A  an unanswered act (contexts 3, hidden continuations 5, targets 6, acts 5; laws drawn)
+   the target's law given the context and the act, against its law given the context alone: largest difference 1.1e-16
+   least code with the hidden continuation shown 1.1524 nats; with the act shown in its place 1.3999; the difference 0.2475 = I(target; continuation | context)
+   news of the act in the target: 0.0000 nats. An answer that is a one-to-one function of the act holds all of it: 1.1111 nats (the act's own entropy)
+
+B  one reader for the passage and for drafts it cannot tell from the passage: what a passage place pays, by the drafts' share
+   share     nats a passage place     over share      over share squared
+   0.0037        0.000235              0.0634          17.145
+   0.0142        0.001101              0.0776           5.462
+   0.0600        0.004015              0.0669           1.115
+   0.2360        0.013301              0.0564           0.239
+   0.5000        0.031625              0.0632           0.126
+   the cost is never negative and zero only at no drafts; across this range it stands near first order in the share, because a draft
+   stands where the passage seldom does and the drafts' comparison takes those states over (second order only under the share at which
+   a state's drafts outnumber its passages)
+   the lead's two reads on the theory's held code: +0.0112 and +0.0442 nats a place at 92 and 354 drafted places a section (ratio 3.95 at 3.85 times the dose)
+
+C  a probe reads its loop (a world of memory 0.97 and spread 4.1, a balanced probe of size 0.25, a loop of gain 0.37)
+       4096 ticks: the reading demodulated against the probe 0.2665; its whole error is the world's correlation with the probe, -0.1035 (spread 4.1/(0.25 sqrt n) = 0.2562)
+      65536 ticks: the reading demodulated against the probe 0.4566; its whole error is the world's correlation with the probe, +0.0866 (spread 4.1/(0.25 sqrt n) = 0.0641)
+    1048576 ticks: the reading demodulated against the probe 0.3590; its whole error is the world's correlation with the probe, -0.0110 (spread 4.1/(0.25 sqrt n) = 0.0160)
+   at the last dwell the reading's power 17488268.6 = the world's 17479830.1 + the loop's 8971.9 + the cross term -533.3
+   a response 3 - 0.8u + 0.5u^2 at u = 0.2 under a probe of +-0.05: the mean moves by +0.001250 (the curvature times the probe's power, 0.001250)
+   demodulated against the probe it returns -0.6000, the slope there (-0.6000)
+
+D  one propagation at every quality: k = a + ib turns at a and fades at b; t = b/a, t/(1 - t^2) = 1/(2Q)
+   Q is the reader's clock over the medium's relaxation (omega tau); the wavenumber's angle is half the loss angle,
+   and the medium at that clock is a diffusion whose diffusivity stands at the angle arctan Q
+   quality Q      t            kept over one wavelength     angle of k (degrees)     angle of the diffusivity (degrees)
+    1.0e-09     1.000000     0.001867                     45.0000                    0.000000
+    1.0e-01     0.904988     0.003392                     42.1447                    5.710593
+    1.0e+00     0.414214     0.074082                     22.5000                   45.000000
+    1.0e+01     0.049876     0.730974                      2.8553                   84.289407
+    1.0e+03     0.000500     0.996863                      0.0286                   89.942704
+    1.0e+07     0.000000     1.000000                      0.0000                   89.999994
+   the slow end: t = 1, e^(-2 pi) = 0.001867 of the amplitude a wavelength, 45 degrees; it still turns once in every wavelength
+
+   sound: air 343 m/s and 1.2 kg/m^3, sea 1,500 m/s and 1,025 kg/m^3
+   power handed across a flat face between them: 0.00107 (-29.7 dB); a tone keeps its frequency and its wavelength grows 4.37 times
+   a bubble's own tone (Minnaert 1933) at the surface: 3260 Hz at 1 mm radius, 652 Hz at 5 mm
+   frequency      wavelength     absorbed (dB a km)     km to lose 20 dB to absorption     Q            wavelengths to 1/e
+          20 Hz      75.000 m        0.0030                   6560.9                     1.19e+05      3.80e+04
+         100 Hz      15.000 m        0.0042                   4762.8                     4.33e+05      1.38e+05
+        1000 Hz       1.500 m        0.0690                    289.8                     2.64e+05      8.39e+04
+       10000 Hz       0.150 m        1.1870                     16.8                     1.53e+05      4.88e+04
+      100000 Hz       0.015 m       34.0687                      0.6                     5.34e+04      1.70e+04
+
+   the same fluid's shear (its vorticity) at the same clocks: k^2 = i omega/nu, 45 degrees, depth sqrt(2 nu/omega) (Stokes 1851)
+   frequency      depth in air (nu 1.5e-5 m^2/s)     depth in the sea (nu 1.0e-6)     sound's wavelength in air, in the sea
+           1 Hz      2.185 mm                           0.564 mm                        343.000 m,   1500.00 m
+          10 Hz      0.691 mm                           0.178 mm                         34.300 m,    150.00 m
+         100 Hz      0.219 mm                           0.056 mm                          3.430 m,     15.00 m
+        1000 Hz      0.069 mm                           0.018 mm                          0.343 m,      1.50 m
+
+   a slow electric field in the sea: conductivity 4 S/m, relative permittivity 80
+   the store's relaxation eps/sigma = 1.77e-10 s; the reader's clock passes it (Q = 1) at 0.90 GHz
+   the front's speed at every frequency, c/sqrt(80): 3.352e+07 m/s
+   frequency      depth delta     wavelength 2 pi delta     phase speed omega delta     Q = omega eps/sigma     kept over one wavelength
+           1 Hz     251.646 m        1581.14 m                    1581.1 m/s            1.11e-09               0.001867
+          10 Hz      79.577 m         500.00 m                    5000.0 m/s            1.11e-08               0.001867
+          76 Hz      28.866 m         181.37 m                   13784.0 m/s            8.46e-08               0.001867
+        1000 Hz       7.958 m          50.00 m                   50000.0 m/s            1.11e-06               0.001867
+     1000000 Hz       0.252 m           1.58 m                 1581138.8 m/s            1.11e-03               0.001881
+   a dipole of 8 microamperes over 5 cm against a threshold of 5 nV a cm (Kalmijn 1971, 1982): read on its axis to 0.32 m
+   over that distance the front passes in 9.5 ns and the current's pattern settles in about mu sigma r^2 = 0.50 microseconds
+   a plane disturbance of 1 Hz has then turned r/delta = 1.26 thousandths of a radian and faded by the same share: the reader stands inside its first turn,
+   0.200 thousandths of a wavelength from the source (a dipole's near terms cancel the first order and leave (r/delta)^2 = 1.6e-06 radians)
+   the carriers at the threshold field: a sodium ion (mobility 5.19e-8 m^2/(V s)) drifts at 2.6e-14 m/s, and the pattern of their motion crosses at the front's speed
+   a body moving at 1 m/s across a field of 50 microtesla meets v B = 500 nV a cm, 100 times that threshold
+
+E  a boundary's ports
+   a star of 5 spokes: its rows sum to 5.6e-17; spoke 0 is 2.074961 and three ports read 2.074961
+   two spokes in series read at two ports: (1, 1) gives 0.5000 and (3/4, 3/2) gives 0.5000
+   ports n and the numbers a reciprocal boundary of n ports carries, n(n-1)/2: 2: 1, 3: 3, 4: 6, 8: 28, 16: 120
+
+F  a beat of period 1 that takes period 0.9 at beat 20 (phase gain 0.5; the carried period moves by 0.2 of the error)
+   a follower, its own period 1: error at beats 19, 25, 40, 79: +0.0000, -0.1969, -0.2000, -0.2000; its period at the end 1.0000
+   a carried period: error at beats 19, 25, 40, 79: +0.0000, -0.0349, +0.0014, -0.0000; its period at the end 0.9000
+   the follower's standing error is the detuning over its gain, (0.9 - 1)/0.5 = -0.2000
+
+G  a turn handed along a line of members: chi phi'' + eta phi' = J (phi[i-1] - 2 phi[i] + phi[i+1]), chi = J = 1, member 0 held turned
+   the time at which member d has taken half the turn
+   each member keeps its turn for 50 hand-overs (eta 0.02): d = 2:      2.20, d = 4:      4.30, d = 8:      8.45, d = 16:     16.75; each doubling of the distance multiplies the time by 1.95, 1.97, 1.98
+   each member loses its turn inside a hand-over (eta 20): d = 2:     88.35, d = 4:    352.15, d = 8:   1407.20, d = 16:   5627.50; each doubling of the distance multiplies the time by 3.99, 4.00, 4.00
+   a mode of the contacts' eigenvalue lam travels where 4 chi J lam > eta^2 and settles without turning below it; a line of N members' coarsest
+   mode has lam = (pi/N)^2: at eta 0.02 every mode travels in a line of fewer than 314 members; at eta 20 the bound is lam > 100,
+   above the largest a line holds (4), and no mode travels: one law, read at two frictions

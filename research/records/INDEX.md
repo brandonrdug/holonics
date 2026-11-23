@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,751 records from July 2026 to November 2026. 400 receipts directories: 225 beside the records and 175 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,753 records from July 2026 to November 2026. 402 receipts directories: 225 beside the records and 177 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 150 | 116 |
+| [November 2026](#november-2026) | 152 | 118 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,8 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-23 [A dwell on the repositorys text takes its register and forgets the others the mixed passages pull is a walk and the dwells holds its direction](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md)
+- 2026-11-23 [A fading medium carries by a cycle with a hand and keeps what a common turn leaves a count or a pair of opposite hands a unit is a loop that nearly closes its comma is its remainder and nested depth is an index](2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_AND_KEEPS_WHAT_A_COMMON_TURN_LEAVES_A_COUNT_OR_A_PAIR_OF_OPPOSITE_HANDS_A_UNIT_IS_A_LOOP_THAT_NEARLY_CLOSES_ITS_COMMA_IS_ITS_REMAINDER_AND_NESTED_DEPTH_IS_AN_INDEX.md)
+- 2026-11-23 [Play is an act answered in kind an unanswered act teaches its reader to discount it a receiver is budgeted by its ports every medium propagates and fades by its quality and a rhythm is a period carried](2026-11-23_PLAY_IS_AN_ACT_ANSWERED_IN_KIND_AN_UNANSWERED_ACT_TEACHES_ITS_READER_TO_DISCOUNT_IT_A_RECEIVER_IS_BUDGETED_BY_ITS_PORTS_EVERY_MEDIUM_PROPAGATES_AND_FADES_BY_ITS_QUALITY_AND_A_RHYTHM_IS_A_PERIOD_CARRIED.md)
 - 2026-11-23 [Play is her own draft compared with the passage one lap at a three hundredth of the places moves neither her drafts nor her writes and a draft costs a read a place](2026-11-23_PLAY_IS_HER_OWN_DRAFT_COMPARED_WITH_THE_PASSAGE_ONE_LAP_AT_A_THREE_HUNDREDTH_OF_THE_PLACES_MOVES_NEITHER_HER_DRAFTS_NOR_HER_WRITES_AND_A_DRAFT_COSTS_A_READ_A_PLACE.md)
 - 2026-11-23 [The levels receipt at every place asks the word before for a law it does not hold and its pull runs through the shared fine field so it costs every register](2026-11-23_THE_LEVELS_RECEIPT_AT_EVERY_PLACE_ASKS_THE_WORD_BEFORE_FOR_A_LAW_IT_DOES_NOT_HOLD_AND_ITS_PULL_RUNS_THROUGH_THE_SHARED_FINE_FIELD_SO_IT_COSTS_EVERY_REGISTER.md)
 - 2026-11-22 [At the top digit both operands and the carry arrive and their sum is not formed a crossing triad reads on two streams and drawn legs do not take it in a lap](2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md)

@@ -72,7 +72,14 @@ def main():
         assert [r for r, _ in lap_check.notes(named, tmp)] == [7], "a companion that calls no read"
         open(os.path.join(tmp, "loud.sh"), "w").write("card timeout 1800 $BIN train complete-language read-loudness $U0 $S $K $C $M $D/loud\n")
         assert lap_check.notes(named, tmp) == []
-    print(f"lap check: the whole script prints nothing, {len(PLANTED)} planted omissions are each found alone, the decoys are not read, a companion's loudness is read where it stands")
+    # A world joined before the lap: an answered act (records of one or more) prints nothing, a draft world (no records) prints the
+    # note of rule 1 alone, and a count the text does not show (a variable) prints nothing.
+    join = "$BIN train complete-language set-world $src $(sha $src) theory 8 %s 32 $D/OPEN.L14 > $D/world.log 2>&1\ntrain L14"
+    for records, want in (("1", []), ("0", [1]), ("$RECORDS", [])):
+        got = [r for r, _ in lap_check.notes(WHOLE.replace("train L14", join % records, 1))]
+        assert got == want, (records, got)
+    assert lap_check.shell_words(" $s $(sha $s) theory 8 0 32 $o 1 > log") == ["$s", "$(sha $s)", "theory", "8", "0", "32", "$o", "1"]
+    print(f"lap check: the whole script prints nothing, {len(PLANTED)} planted omissions are each found alone, the decoys are not read, a companion's loudness is read where it stands, a draft world is named and an answered act is not")
 
 
 if __name__ == "__main__":

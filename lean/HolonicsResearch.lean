@@ -1487,3 +1487,5 @@ import HolonicsResearch.Landmarks.CharacteristicPolygon
 import HolonicsResearch.HNN.LeakingStore
 import HolonicsResearch.HNN.WidthTolerance
 import HolonicsResearch.HNN.GrainRelation
+import HolonicsResearch.HNN.AnsweredAct
+import HolonicsResearch.HNN.HandedCycle
