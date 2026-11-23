@@ -15,6 +15,11 @@ What it reads, each from the script's own text. A command inside a function coun
 does not, and nothing is executed; a word inside a quoted string reads as code, which a text ruler cannot tell apart:
 
   rule 1   a guess is named in the comments (G-1118-16, G169, G-V1)
+  rule 1   a world joined by `set-world` has records (its fifth word is not a plain `0`). A world of no records is a draft world:
+           the field's draft stands as known context and every place is compared with the passage's own symbol, which is no
+           function of the draft, so that comparison's least code ignores the draft and opposes the passage's own at the states
+           a reader cannot tell apart (atlas `receipt.unanswered-act-is-discounted`; November 23: two arms of it cost the held
+           theory +0.0112 and +0.0442 nats a place). The note says what the arm's comparison is; the configuration stays lawful.
   rule 4   the training command stands under an outer `timeout` and the card's lock (`flock` on `gpu.lock`)
   rule 5   `read-cavity` is called, and a saved mean (`MEAN.k`) is among the states read
   rule 6   a panel is written (`write-next` or `write-store`)
@@ -31,6 +36,7 @@ from pathlib import Path
 TRAIN = re.compile(r"\btrain-store\b")
 COMPANION = re.compile(r"\bloudness:\s*([\w./-]+\.sh)\b")
 GUESS = re.compile(r"\bG(?:\d{1,4}|-[0-9A-Z]{1,6}(?:-[0-9A-Z]{1,6})*)\b")
+WORLD = re.compile(r"\bset-world\b(.*)")
 
 
 def logical_lines(text):
@@ -61,6 +67,45 @@ def split_comment(line):
     return line, ""
 
 
+def shell_words(text):
+    """The words of a stretch of shell text, with a quoted string or a `$(...)` kept as one word."""
+    words, word, quote, depth = [], "", None, 0
+    for ch in text:
+        if quote:
+            word += ch
+            if ch == quote:
+                quote = None
+        elif ch in "'\"`":
+            quote = ch
+            word += ch
+        elif ch == "(":
+            depth += 1
+            word += ch
+        elif ch == ")" and depth:
+            depth -= 1
+            word += ch
+        elif ch.isspace() and not depth:
+            if word:
+                words.append(word)
+            word = ""
+        elif ch in ";|&><" and not depth:
+            break
+        else:
+            word += ch
+    if word:
+        words.append(word)
+    return words
+
+
+def world_records(code):
+    """The RECORDS word of a `set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT` call in one line of code, or None."""
+    found = WORLD.search(code)
+    if not found:
+        return None
+    words = shell_words(found.group(1))
+    return words[4] if len(words) > 4 else None
+
+
 def companion_reads(name, beside):
     """Whether the companion script `name`, a file under the directory `beside`, calls `read-loudness` in its code."""
     try:
@@ -85,6 +130,8 @@ def notes(text, beside=None):
     guess = [g for g in GUESS.findall(comments) if any(ch.isdigit() for ch in g)]
     if not guess:
         found.append((1, "no guess is named in the comments: the guess is fixed as a number before the lap"))
+    if any(world_records(c) == "0" for c in code):
+        found.append((1, "`set-world` joins a world of no records (a draft world): a draft compared with the passage's own symbols carries no news of them, so that comparison's least code ignores the draft and opposes the passage's (atlas `receipt.unanswered-act-is-discounted`); an act answered in kind has `RECORDS` of one or more"))
     if not all(re.search(r"\btimeout\b", c) for c in trains):
         found.append((4, "a training command stands under no outer `timeout`: the deadline is fixed once, from the projection"))
     if not (re.search(r"\bflock\b", body) and "gpu.lock" in body):

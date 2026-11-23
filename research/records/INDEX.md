@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,750 records from July 2026 to November 2026. 400 receipts directories: 225 beside the records and 175 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,751 records from July 2026 to November 2026. 401 receipts directories: 225 beside the records and 176 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 149 | 116 |
+| [November 2026](#november-2026) | 150 | 117 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,7 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-23 [A dwell on the repositorys text takes its register and forgets the others the mixed passages pull is a walk and the dwells holds its direction](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md)
+- 2026-11-23 [Play is an act answered in kind an unanswered act teaches its reader to discount it a receiver is budgeted by its ports every medium propagates and fades by its quality and a rhythm is a period carried](2026-11-23_PLAY_IS_AN_ACT_ANSWERED_IN_KIND_AN_UNANSWERED_ACT_TEACHES_ITS_READER_TO_DISCOUNT_IT_A_RECEIVER_IS_BUDGETED_BY_ITS_PORTS_EVERY_MEDIUM_PROPAGATES_AND_FADES_BY_ITS_QUALITY_AND_A_RHYTHM_IS_A_PERIOD_CARRIED.md)
 - 2026-11-23 [Play is her own draft compared with the passage one lap at a three hundredth of the places moves neither her drafts nor her writes and a draft costs a read a place](2026-11-23_PLAY_IS_HER_OWN_DRAFT_COMPARED_WITH_THE_PASSAGE_ONE_LAP_AT_A_THREE_HUNDREDTH_OF_THE_PLACES_MOVES_NEITHER_HER_DRAFTS_NOR_HER_WRITES_AND_A_DRAFT_COSTS_A_READ_A_PLACE.md)
 - 2026-11-22 [At the top digit both operands and the carry arrive and their sum is not formed a crossing triad reads on two streams and drawn legs do not take it in a lap](2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md)
 - 2026-11-22 [A familys lattice is read from its own spread at every save the spread is no function of the second moment a lanes power sets its scale but not its price and a pass ends with its text](2026-11-22_A_FAMILYS_LATTICE_IS_READ_FROM_ITS_OWN_SPREAD_AT_EVERY_SAVE_THE_SPREAD_IS_NO_FUNCTION_OF_THE_SECOND_MOMENT_A_LANES_POWER_SETS_ITS_SCALE_BUT_NOT_ITS_PRICE_AND_A_PASS_ENDS_WITH_ITS_TEXT.md)
