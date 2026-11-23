@@ -182,3 +182,53 @@ What the owner says of the 3.6 places (crates/engine/src/field/scale.rs: level_s
   of about half a byte. A unit counted from the level under it (the news over which the fine field's own holding falls to its
   floor) comes, for this codec and this line, to about the same number, so no change of the line follows today; it is a row
   owed under #1088.
+
+Scored 2026-11-23 on the lead's reads relayed at 22:48Z (W101r's and W101's means, the same 407 held passages):
+G-H10 (a): MISSED, and in the other direction. The handed row's power over the state's at open places is 0.0296 with the
+  receipt and 0.0797 without (0.041 and 0.123 at word starts): the row fell to about a third, where the guess had it at 1.5
+  times or more. The passage's comparison sized the row down. G-H10 (b), the splices, reads after W102's lap.
+Read beside it, the lead's (tools/level_link_presence.py, 19,040 word starts; the links are the restricted state, the level's
+  read after its ticks, the handed row, the joined state, the final read):
+    the last byte of the epoch before the handed one   W101  0.237 / 0.102 / 0.074 / 0.028 / 0.017   W101r 0.236 / 0.201 / 0.161 / 0.018 / 0.017
+    the handed epoch's last byte                       W101  0.190 / 0.089 / 0.072 / 0.137 / 0.107   W101r 0.211 / 0.182 / 0.168 / 0.138 / 0.111
+    the handed epoch's first byte                      W101  0.135 / 0.031 / 0.019 / 0.016 / 0.012   W101r 0.135 / 0.089 / 0.065 / 0.015 / 0.012
+    the handed epoch as one identity (64 cells), W101  0.009 / 0.001 / 0.000 / 0.001 / 0.001
+    the word before, W101                              0.002 / 0.002 / 0.005 / 0.233 / 0.229
+    the word two before, W101                          0.017 / 0.016 / 0.014 / 0.022 / 0.026
+  and (tools/ring_presence.py) the field's 32 complex moment modes together hold the word before at letters 1 to 6 at 0.089,
+  0.013, 0.011, 0.018, 0.017, 0.012; periods 128 and up hold under 0.006 at every letter.
+  The receipt did what it asked of the level (its ticks no longer halve what the restriction holds, and the row carries the
+  handed epoch's bytes about twice as well), and the join is the link that slips: 0.161 in the row is 0.018 in the joined state.
+Reweighed 2026-11-23T22:52:16Z (date -u), on an arm still unbuilt; the first weight stays on file above:
+  G-H9 (a) 0.55 -> 0.15. The moments are 32 complex numbers and the long rings hold a smear (under 0.006), so a fade held by
+  each ring moves a channel that carries a hundredth of the word before past its third letter. The skin's constant is still a
+  state with no balance (G-H9 (b) stays at 0.8); it is not what the third letter waits on. The guess was fixed on the skin's
+  code and Neon's letter without the moments' width being read: the same failure as G-H1 to G-H5.
+
+Fixed 2026-11-23T22:52:16Z (date -u), before any read, on the lead's question (the closure receipt of tower.level-receipt-codec-and-square,
+D E = rho through the law's B, its pull stopped at the moment) and on the link read above. Guesses; whether anything runs is
+the lead's.
+G-H12, a host read before any build: the tension read of November 18 (deposition.no-linear-tension-at-the-levels-locus) on
+  W101's mean, the held half, at the level's locus, with bound features in place of linear ones: each symbol of the handed
+  epoch on its news phase times the place's own last symbol (hashed to the width the read of November 18 gave its located
+  operands or wider), the plant recovered as before.
+  (0.55) the share of the covector's power removed at the open places is 0.02 or more, where the linear table removed 0.0006
+  to 0.005.
+  Held: the fine comparison has tension that a bound far unit relieves, a part that forms the product has something to found
+  on, and the level has a consumer. Missed (under 0.005): bound or not, nothing an epoch back relieves the fine comparison at
+  this locus, and the level is not what her writes wait on first.
+G-H13, on the closure receipt if it is ordered as relayed, beside a control, a lap, at means:
+  (a) (0.85) every held register within 0.003 nats a place of its control;
+  (b) (0.7) the handed epoch's first byte at the restricted state reads 0.30 or more (0.135 now): the closure moves A off its
+      draw;
+  (c) (0.85) the last byte of the epoch before the handed one in the joined state stays under 0.05 (0.028 now): the join still
+      drowns it;
+  (d) (0.85) the word two before at a word's start stays under 0.035.
+  Reason: at 3.6 places an epoch the level's 64 numbers hold the epoch whole, so D E has nothing to quotient and its least code
+  is a copy of the bytes the fine field already holds; and it repairs the first link while the join, which loses nine tenths,
+  stands as it was.
+G-H14, on an arm nobody has built (the handed row written to a face lane of its own in place of being added into the state's
+  lanes, the readers' entries of that lane founded so that every face is kept, beside a control, a lap, at means), fixed
+  only if G-H12 holds:
+  (a) (0.5) at least one held register 0.003 nats a place or more under its control;
+  (b) (0.7) the last byte of the epoch before the handed one reads 0.07 or more in the final read (0.017 now).
