@@ -1,0 +1,118 @@
+Fixed 2026-11-23T21:01:58Z (date -u), the formal thread, before any read. Refs #404.
+Each is a guess. Whether a read is taken is the lead's.
+
+Premise read from the records before fixing: W99's mean, at a word's first letter, tools/word_presence.py (a ridge read of the open
+read after the last tick, fitted on the even rows, read on the odd): the word before 0.225, the word two before 0.024; G-A2 as the
+lead read it on November 23: the count of words since the line's start 0.183 at 18,520 word starts, the previous word's length 0.367.
+The carry circles' moves at W91: turns 0.475, locks 0.201, flips 0.325.
+
+G-H1 (a coin, 0.5). tools/word_presence.py on W99's mean, the same 407 held passages and split, with product features in place of
+the read's coordinates: 2,048 pairs of read coordinates drawn by a fixed key, each pair's product, standardized; the planted cell
+read the same way as the floor. The share of prev2_word is at least 0.05 (its linear share is 0.024).
+  At or above: the word two before stands in the relative phases of the state and the level lacks a contact that pairs opposite
+  hands across circles and a slow store behind it.
+  Below, with the planted floor under 0.01: it is gone before the level, and the carry is first (the arm of November 22: the carry
+  re-based after each move of negative determinant, so the winding rolls through a mirror, beside its control).
+
+G-H2 (0.6). The count of words since the line's start, read as in G-A2 with the place's index in its line regressed out of the read
+and of the indicator alike: at most 0.09. A count of words tracks the place's index, and this read tells a count from a position.
+
+G-H3 (0.6). The share of prev2_word binned by the length of the word between (2 to 3 letters, 4 to 6, 7 or more), each bin of at
+least 2,000 word starts: the share falls from each bin to the next, and the first bin's share is at least three times the last's.
+
+Scored 2026-11-23, as the lead read them at 21:06Z on W99's mean, 407 passages, 19,351 word starts (the lead's receipt
+receipts/2026-11-23_level/word_presence_W99_GH.txt):
+G-H1 MISSED. Products of 2,048 keyed pairs: the word before 0.313 (0.225 linear), the word two before 0.026 (0.024 linear), the
+  planted cell 0.000. The word two before is not in the read's pairs either.
+G-H2 HELD. With the place's position in its line (buckets of eight) out of both sides, the count of words reads 0.002 over 18,520
+  starts. The 0.183 of G-A2's read was position; no count of words is carried.
+G-H3 MISSED, in direction. The word two before by the length of the word between: 0.012 at 2 to 3 letters (7,609 starts), 0.035 at
+  4 to 6 (6,879), 0.041 at 7 or more (3,545). It rises. A loss by the place (a flip or a turn at each place between) is not what
+  removes the word two before, and the fit of 0.675^5.7 to the ratio 0.107 was a coincidence.
+Withdrawn with G-H3: "below, the carry is first" as G-H1's rule read it. The rule stood on a loss by the place.
+
+Fixed 2026-11-23T21:08:31Z (date -u), before any read, on the three reads above. Each is a guess.
+G-H4 (0.7). The word two before with the word before's cell regressed out of the read and of the indicator alike (as position was in
+  G-H2), W99's mean, the same passages: at most 0.010. A long word between is most often followed back by a frequent short word,
+  which the word before foretells; this read tells a carried word from one inferred, and G-L1's clause (a) is read with it.
+G-H5 (0.6). The word before, read at the k-th letter of the present word for k = 1 to 6 (words of six letters or more, at least
+  2,000 of them): its share at the fifth letter is at least 0.6 of its share at the first. A step at the word's start and no slope
+  within the word: the level holds one word and replaces it at its own tick.
+  Held: the construction is a push at the level's clock (the held word moves to a second register when a word starts; a ring of
+  the level turning one fixed unit a word start, atlas hnn.tower-news-clock-carry), and the arm is that one change.
+  Missed, with a slope: the loss is by the place after all and the carry's re-basing of November 22 stands as the arm.
+
+Scored 2026-11-23, as the lead read them near 21:12Z on W99's mean, the same 407 passages (the lead's receipt
+receipts/2026-11-23_level/word_presence_W99_GH.txt):
+G-H4 MISSED. The word two before with the word before's cell out of both sides: 0.022 (guess: at most 0.010; 0.024 before the
+  control). What little of the word two before the read holds is its own and is not inferred from the word before.
+G-H5 MISSED. The word before at letters 1 to 6 of the present word, 5,355 words of six letters or more: 0.289, 0.128, 0.028, 0.005,
+  0.004, 0.004. The fifth letter's share is 0.014 of the first's (guess: at least 0.6). A slope and no step: the read holds the
+  last few bytes and lets a word go as the next is spelled, whatever the level hands over at an epoch's edge.
+  By G-H5's own rule the arm named is the carry re-based after each move of negative determinant (November 22), beside its control.
+  That naming carries little weight: the model of her state these five guesses were fixed from missed four of five, and none of
+  the four was fixed after reading the level's form at its owner (crates/engine/src/field/scale.rs).
+Withdrawn with G-H5: "a push at the level's clock" (the level has its own clock and hands an epoch to the place before, B-minus),
+  and the reading of G-H3's rise as an inference from the word before (G-H4 removed it).
+
+One reading the five leave standing (stated after the reads, so a fit and no test): the open read at a place is a short moving
+window of the last three or so bytes, the same at every place of a word; the word before stands at a word's first letter because
+its last bytes are in that window, and it is 0.028 by the third letter because they have left it. The word two before rises with
+the length of the word between (G-H3) only as far as a longer word between leaves more of itself, and so more of what it follows,
+in the window. Its forward test is G-L1 (the lead's arm W101r beside W101) and the read of the level's own state x1 in place of
+the open read, which no guess here has yet named a number for.
+
+Fixed 2026-11-23T21:27:17Z (date -u), before any read, after reading the level's form at its owner (crates/engine/src/field/scale.rs) and its
+rows (atlas tower.level-holds-no-unit, tower.level-restriction-is-its-draw, tower.level-before) and tools/word_presence.py. A guess.
+G-H6 (0.75). Nested-depth read directly, and the forward test of the reading the five reads left (a short moving window).
+  tools/word_presence.py's read (the open read after the last tick, ridge, fitted on the even rows and read on the odd) on W99's
+  mean and the same held passages, over every place of a line that holds an even count, two or more, of the plain double quotation
+  mark (one byte opens and closes, so only a parity tells inside from outside, and what stands inside is ordinary words). The
+  indicator: an odd count of marks stands before the place in its line. Read apart at places one, two, three and four or more
+  past the last mark, the place's position in its line (buckets of eight) regressed out of the read and of the indicator alike,
+  the planted cell read the same way as the floor.
+  At four or more places past the last mark the share is at most 0.03.
+  Clause beside it (0.6): at one place past the mark it is at least 0.10 (the mark is in the window, and its parity is not).
+  Rows: at least 1,000 places at four or more past a mark on each side of the parity, or the read is of parentheses in their
+  place (one byte opens and another closes, and what stands inside differs in kind, so a share there is an upper reading only).
+  Held: no parity crosses the window, nested-depth is not in the open read at depth one, and the count half of the law (a turn at
+  an opener undone by the opposite turn at its closer, on one circle) is what no part of her state does.
+  Missed (0.10 or more at four or more places): a latch of one bit crosses the window, and the reading of the five reads above
+  as a window of three bytes is wrong for a quantity that is a parity.
+Weights beside it, on arms no one has run (each a guess, no read asked): 0.35 that G-L1's clause (a) holds (the word two before at
+0.05 or more under G-H4's control); 0.3 that the carry re-based after each move of negative determinant lifts the word before at
+the present word's third letter from 0.028 to 0.10 or more beside its control; 0.7, unchanged, on G-A3.
+
+Scored 2026-11-23, without a read: the sentence "G-H5 says little", sent to the lead at 21:13Z. MISSED. Under a one-sided stream
+every place of epoch e takes the row of epoch e - 1 (strand_level_cut, crates/engine/src/field/scale.rs), so a word before that
+the level handed on would stand as a shelf across the next word's letters. It falls to 0.004. G-H5 says that what the open read
+holds of the word before is the fine field's tail, and that the level hands it nothing a linear read finds. The point is Neon's
+(its letter of 21:30Z, relayed by the coordinator), read here against the code it cites.
+
+Fixed 2026-11-23T21:37:18Z (date -u), before any read, on Neon's letter and the code it cites (scale.rs: level_declaration, level_section,
+level_anchors_before, strand_level_cut, the receipt's push; navigator.rs: skin_decay; contact.rs: the class count's octave). Guesses.
+G-H7. Neon's read: tools/word_presence.py on W99's mean with the block B-minus and its offset set to zero in the state read
+  (premise, the lead's to confirm: W99 carries the block and its rows are not zero; if they are zero the read is void and says so).
+  (a) (0.6) the word two before at a word's first letter falls under 0.010 in each of G-H3's three bins. Its 0.012, 0.035 and
+      0.041 are the level's handoff, an epoch late: the longer the word between, the likelier a site stands inside it, and the
+      epoch before the one in progress is then the word two before's.
+  (b) (0.8) the word before at the present word's letters 1 to 3 moves by less than 0.010 at each: it is the fine field's tail.
+G-H8, on the arm W101r at its MEAN.3000 beside W101 (the lead's G-L1; Neon's stamped guess of 21:29:10Z is that the block wakes and
+  clause (a) misses under G-H4's control):
+  (a) (0.55) the word before at letters 4 to 6 of the present word reads at least 0.020 at one of them (0.005, 0.004, 0.004 now);
+  (b) (0.35, as fixed at 21:27:17Z) G-L1's clause on the word two before holds under G-H4's control.
+A caution on the ruler, a guess (0.4 that it changes a reading by 0.02 or more): the handoff is the sum over harmonics of
+  h_k(phi_t) v_k, a product of the row with the place's phase. A read that is linear in the state finds its k = 0 term and whatever
+  the fine ticks made of the rest. A ruler given h_k(phi_t) times the read's coordinates as features reads the handoff whole.
+
+G-H7's premise, as the lead read it at 21:38Z on W99's STATE.3000: the block is not zero (B-minus 85,099 of 86,016 entries
+nonzero, rms about 0.14 on its grain; its offset 1,320 of 1,344), so the read is not void. After the receipt's lap the block stands
+at 85,529 nonzero in W101r and 85,068 in W101. No read runs ahead of G-L1, which scores near 22:30Z.
+
+Fixed 2026-11-23T21:42:26Z (date -u), on an arm nobody has built (a ring's fade held as a state of that ring, founded at the skin's present
+number so the build reproduces the line, moved by the covector that reaches it; one change beside its control, a lap). Guesses,
+and no read is asked:
+G-H9 (a) (0.55, as told at 21:40Z) the word before at the present word's third letter reads 0.10 or more in the arm (0.028 now);
+     (b) (0.8) the located fades leave their one value: over the rings of period 128 and more, the fade a radian at the lap's mean
+         stands under 0.5 of the founding's on at least half of them;
+     (c) (0.7) every held register within 0.003 nats a place of its control (the founding is the line's own law).

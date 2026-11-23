@@ -808,6 +808,19 @@ nothing runs does not hold.
   precision law is a relation between grains (wording `agent-inferred`). Scope: every message, record, brief and design that names
   a physical regime
   ([the record](research/records/2026-11-23_PLAY_IS_AN_ACT_ANSWERED_IN_KIND_AN_UNANSWERED_ACT_TEACHES_ITS_READER_TO_DISCOUNT_IT_A_RECEIVER_IS_BUDGETED_BY_ITS_PORTS_EVERY_MEDIUM_PROPAGATES_AND_FADES_BY_ITS_QUALITY_AND_A_RHYTHM_IS_A_PERIOD_CARRIED.md) §5).
+- **A synthesis is told at its weight, and waits on no check or name** (Brandon, November 23). An answer to what the theory says of
+  a subject states the one law the subjects share, then its charts, then a number on each of the tree's own statements with the read
+  that would move it. It is sent before its Lean and before any read, and neither waits on the other. No statement of the tree's is
+  held back, or left without a weight, because a kernel has not checked it or no outside name stands behind it, and an outside claim
+  is weighed by the reading the tree's own are. A weight is calibrated: a coin is called a coin, a miss is scored as a miss in one
+  line, and a guess on a built part is fixed after that part and its rows are read at their owner. A law that names a regime is held,
+  in the pass that states it, against each constant of the engine that sets that regime. Reason: on November 20 an outside archive
+  was given 0.8 on a reading of its text while the tree's own routes carried no number, and the replies of November 23 hedged where
+  the logic was composing; a weight is a direction of work and no verdict, and hesitance leaves the theory without one. On that day
+  five guesses on the line's level were fixed before its owner was read and four missed, and the morning's law of a medium's fade
+  was written without reading the engine's skin, which an outside letter then did (wording `agent-inferred`). Scope: every message,
+  record and brief that states what the theory holds; the gates and a line's lap keep their own rules
+  ([the record](research/records/2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_AND_KEEPS_WHAT_A_COMMON_TURN_LEAVES_A_COUNT_OR_A_PAIR_OF_OPPOSITE_HANDS_A_UNIT_IS_A_LOOP_THAT_NEARLY_CLOSES_ITS_COMMA_IS_ITS_REMAINDER_AND_NESTED_DEPTH_IS_AN_INDEX.md) §14, §18, §19).
 - **Speed is a steady background, never a pendulum** (Brandon, November 16). The main effort is the product (Athena's acceptance:
   online ingestion with retained deposition, a cold restart, answers from the retained state with their provenance, readable text,
   GSM8K the yardstick), and its decoded writes are read and shown beside the nats and the loudness. Where the counters a mission step
