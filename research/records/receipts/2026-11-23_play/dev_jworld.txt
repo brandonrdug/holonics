@@ -1,0 +1,2 @@
+PLAY_JDEV jworld sections=30 ms_mean=921
+PLAY_JDEV jplain sections=30 ms_mean=832
