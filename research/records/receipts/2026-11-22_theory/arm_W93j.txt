@@ -1,0 +1,25 @@
+W93_START 22:47:01
+TERRAIN_TRAINED W93 23:23:49 sections=3000 ended=false
+TERRAIN_REACH W93 23:25:38 ANSWER copy n= 2655 0.172|ANSWER reverse n= 2667 0.071|ANSWER sum n= 1579 1.022|
+TERRAIN_HOSTPANEL W93 panel_logic.tsv 23:26:48 NEXT_WRITE_DONE rows=168 run=32 window=- ms=179089 
+TERRAIN_HOSTPANEL W93 panel_terrain.tsv 23:27:44 NEXT_WRITE_DONE rows=96 run=32 window=- ms=235356 
+TERRAIN_TRAINED W93j 00:00:17 sections=3000 ended=false
+TERRAIN_READ_DONE mean_W93 00:11:14 CAVITY_DONE ms=656351  rows_S=99844
+TERRAIN_PANEL W93_mean 00:11:46 seen: words 39 in_lexicon 30 (76%) longest_copy 13 held: words 64 in_lexicon 46 (71%) longest_copy 16 unread: words 59 in_lexicon 45 (76%) longest_copy 14  || LONG W93_mean: all words 270 in lexicon 190 (70%) writes that loop 3 of 20 longest run shared with its prompt 48 | code 44/49 (89%) web 36/52 (69%) science 36/59 (61%) books 46/60 (76%) wikidata 28/50 (56%)
+TERRAIN_LOUD W93 00:17:34  lines=71
+TERRAIN_WIDE W93 00:18:36 LONG W93: all words 2137 in lexicon 1550 (72%) writes that loop 24 of 160 longest run shared with its prompt 78 | code 326/371 (87%) web 326/416 (78%) science 253/442 (57%) books 415/510 (81%) wikidata 230/398 (57%)
+TERRAIN_REACH W93j 00:20:23 ANSWER copy n= 2655 0.161|ANSWER reverse n= 2667 0.113|ANSWER sum n= 1579 1.212|
+TERRAIN_HOSTPANEL W93j panel_logic.tsv 00:22:03 NEXT_WRITE_DONE rows=168 run=32 window=- ms=206778 
+TERRAIN_HOSTPANEL W93j panel_terrain.tsv 00:22:59 NEXT_WRITE_DONE rows=96 run=32 window=- ms=262164 
+TERRAIN_READ_DONE mean_W93j 00:30:18 CAVITY_DONE ms=700568  rows_S=99844
+TERRAIN_PANEL W93j_mean 00:30:49 seen: words 40 in_lexicon 26 (65%) longest_copy 18 held: words 67 in_lexicon 50 (74%) longest_copy 15 unread: words 65 in_lexicon 57 (87%) longest_copy 17  || LONG W93j_mean: all words 282 in lexicon 213 (75%) writes that loop 2 of 20 longest run shared with its prompt 74 | code 39/45 (86%) web 44/57 (77%) science 50/63 (79%) books 56/67 (83%) wikidata 24/50 (48%)
+TERRAIN_LOUD W93j 00:36:38  lines=71
+TERRAIN_WIDE W93j 00:37:41 LONG W93j: all words 2134 in lexicon 1531 (71%) writes that loop 17 of 160 longest run shared with its prompt 74 | code 323/378 (85%) web 331/426 (77%) science 271/422 (64%) books 403/501 (80%) wikidata 203/407 (49%)
+W93_CAVITY W93 00:52:58 CAVITY_DONE ms=916807
+W93_THEORY THEORY_PANEL W93 logic: words 89 in lexicon 62 (69%) loops 0 of 8 longest shared with prompt 18 | theory: words 172 in lexicon 130 (75%) loops 0 of 12 longest shared with prompt 12
+W93_CAVITY W93j 01:08:28 CAVITY_DONE ms=914779
+W93_THEORY THEORY_PANEL W93j logic: words 103 in lexicon 73 (70%) loops 0 of 8 longest shared with prompt 15 | theory: words 176 in lexicon 140 (79%) loops 0 of 12 longest shared with prompt 14
+W93_FRONTIER_NEW_STORE FRONTIER W93j; one place open: all 0.6495 (140564 places) | books 0.6650 code 0.3837 logic 0.6165 science 0.5476 theory 0.7042 web 0.7404 wikidata 0.8883 || less the control's, paired: -0.0277 (±0.0010) | books +0.0001 code -0.0005 logic -0.1300 science +0.0039 theory -0.0769 web +0.0045 wikidata +0.0045|FRONTIER W93j; the frontier: all 1.8684 (139706 places) | books 1.8029 code 1.5357 logic 1.9543 science 1.7541 theory 1.9677 web 2.0196 wikidata 2.0442 || less the control's, paired: -0.0194 (±0.0012) | books +0.0064 code +0.0082 logic -0.1345 science +0.0123 theory -0.0613 web +0.0212 wikidata +0.0116|
+TERRAIN_SCORE W93 whole 55/96 opening 58/96 first 76/96 | sum 11/11/12 of 16 difference 7/7/9 of 16 product 4/4/8 of 16 close 9/12/16 of 16 copy 12/12/15 of 16 reverse 12/12/16 of 16
+TERRAIN_SCORE W93j whole 51/96 opening 53/96 first 67/96 | sum 8/8/9 of 16 difference 6/6/6 of 16 product 2/2/5 of 16 close 11/13/16 of 16 copy 12/12/15 of 16 reverse 12/12/16 of 16
+W93_ALL_DONE 01:08:44
