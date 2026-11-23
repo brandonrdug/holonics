@@ -1018,9 +1018,15 @@ impl Constitution {
     pub(crate) fn pass(&self, region: &Region, keep: bool) -> Result<Forward> {
         // [definition; the lead, November 18] A passage read by two streams ([`Region::strand`]): the forward is the strand's, its faces the
         // open places' (none at the first place, which has nothing before it).
+        if !region.strand && region.targets.is_some() {
+            return refuse("targets on a region not read by two streams");
+        }
         if region.strand {
             if region.unresolved.iter().any(|&u| u) || region.faces.iter().any(Option::is_some) || region.locked.iter().any(|&l| l) || region.echo.iter().any(Option::is_some) || region.port.is_some() {
                 return refuse("a passage read by two streams whose sites are not all known, or that has a port");
+            }
+            if region.targets.is_some_and(|t| t.len() != region.classes.len()) {
+                return refuse("a passage read by two streams whose targets are not one a site");
             }
             self.admit_region(region)?;
             let mut strand = self.strand_pass_with(region.classes, keep, self.past(region), self.second(region))?;
@@ -1326,7 +1332,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
         // The known stream, its ticks kept: the forward a ruler reads at `3`.
         let mut stream = self.clone();
         stream.ruler_far = 3;
@@ -1563,7 +1569,7 @@ impl Constitution {
         }
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
         self.admit_region(&region)?;
         let (dw, m2) = (d.width, 2 * d.complex());
         let reaches = self.reaches();

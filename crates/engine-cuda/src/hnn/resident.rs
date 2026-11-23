@@ -1101,7 +1101,7 @@ impl<'c> Resident<'c> {
                     if at.is_empty() {
                         continue;
                     }
-                    let staged = if strand { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].classes).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() } else { Vec::new() };
+                    let staged = if strand { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].targets.unwrap_or(regions[r].classes)).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() } else { Vec::new() };
                     groups.push(Group { at, strand, past, second, staged });
                 }
             }
@@ -1124,7 +1124,7 @@ impl<'c> Resident<'c> {
             order.extend_from_slice(at);
             let views: Vec<Region> = match group {
                 None => law_regions.clone(),
-                Some(gr) if gr.strand => gr.staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect(),
+                Some(gr) if gr.strand => gr.staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect(),
                 Some(gr) => gr.at.iter().map(|&r| Region { before: false, past: false, second: false, ..regions[r] }).collect(),
             };
             let heard: Vec<u32> = group.filter(|gr| gr.strand).map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].classes.len() as u32).collect());
