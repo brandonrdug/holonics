@@ -1,6 +1,6 @@
 # A dwell on the repository's text takes its register and forgets the others; the mixed passage's pull is a walk, and the dwell's holds its direction
 
-November 23, 2026, 01:10 to 03:50 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 22](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
+November 23, 2026, 01:10 to 06:40 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 22](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
 whose §6 reads Brandon's note of 01:13Z on reinforcement and play against the engine. Receipts: [`receipts/2026-11-23_dwell/`](receipts/2026-11-23_dwell/).
 
 On the objects: the navigator is her writer at the frontier; the terrain is the passage, here the repository's own guides, records and
@@ -87,15 +87,44 @@ result whose first 4 KB another call also returned; 12,851 calls (114 MB) fall i
 held out as the human messages' tool holds it out. It is three times a whole pass of the present store, so it enters by a share and a
 selection, never whole, and only after a read shows a pull holding under a mix.
 
-## 6. What follows
+## 6. The share, mixed
 
-- **The share, mixed** (G-T4, running): from W94j's end, the theory and the Lean at a third of every lap from the first section (the
-  dwell store joined at a new pass; `join-store` now takes a store with the state's slices and no more) beside the same reset at their
-  octets' share. Its rule names what the line takes, and the lap's travel under a mix is the read that brings the history set in.
-- **Play** stays the next change after the share: her drafts entering her passage with an answer, the curated tool calls being the
+From W94j's end, W95m joined at a new pass to the dwell store (the theory and the Lean at a third of every lap from its first section;
+`join-store` now takes a store with the state's slices and no more) beside W95c joined at a new pass to store-2026-11-22 (the same reset,
+the two slices at their octets' 6%), 3,000 sections each on `e5r`, whose entry reproduced W94j's lap (parity on 3 sections, 24 sections
+and the read, [`gate_e5r.txt`](receipts/2026-11-23_dwell/gate_e5r.txt)); guess [`GUESS_T4.txt`](receipts/2026-11-23_dwell/GUESS_T4.txt),
+reads [`arm_W95m.txt`](receipts/2026-11-23_dwell/arm_W95m.txt) and [`frontier_W95m.txt`](receipts/2026-11-23_dwell/frontier_W95m.txt):
+
+| G-T4 | read | guess |
+|---|---|---|
+| (a) held theory, held Lean, one place open | −0.065 and −0.112 nats a place | held (0.06 and 0.08) |
+| (b) the old registers | books +0.013, code +0.020, science +0.012, web +0.018, wikidata +0.011 | held (at most +0.03) |
+| (c) the theory panel's own terms | 8 distinct against 4 (theory prompts), 8 against 5 (Lean) | held |
+| (d) the material's persistence over the lap's thirds | 1.111 against 1.020 (the level 1.220, the third block 1.148) | held (1.10, at most 1.08) |
+
+At a third of a lap the register costs the old registers a fifteenth of what the dwell cost them, and the pull holds over the lap, at
+the margin of the guess and in a first lap of a new mix, where part of any persistence is the drift toward it. Her writes
+([`theory_panel_W95m.written`](receipts/2026-11-23_dwell/theory_panel_W95m.written)) carry the register's forms and do not compose. By
+the rule the line takes the mixed share, W95m's end its state, and the curated history comes in at its own share.
+
+## 7. The history's entry
+
+[`tools/history_passage.py`](../../tools/history_passage.py), a boundary codec of the private set (its output never committed), writes
+two slices in time order: `dialogue`, one conversation a document, each turn opened by its time and speaker (3,812 conversations, 82 MB),
+and `acts`, one model turn's tool calls a document, each call's command or arguments and its result whole, with its exit code where the
+log gives one (a keyed eighth of the turns, spread over every date: 18,799 turns and 310 MB; calls whose result passes 64 KB are left out
+whole, never cut). The September 3 to 7 window is left out of both, and the held cut is everything dated on or after November 20. In the
+store they are about 21% of a pass, the theory and the Lean 27%, the five registers 53%. The store's slice list names them; G-T5
+([`GUESS_T5.txt`](receipts/2026-11-23_dwell/GUESS_T5.txt)) runs the history beside a control from W95m's end, with two private panels
+on the held history (what she writes after a logged call's line, and after a model turn opens) shown raw to Brandon and scored by no
+clause.
+
+## 8. What follows
+
+- **Play** stays the next change after the history: her drafts entering her passage with an answer, the curated tool calls being the
   answers already logged.
 
-## 7. The failures this could repeat
+## 9. The failures this could repeat
 
 - **Bits read as progress.** The held theory fell 0.15 nats a place; the record opens with her writes and says first that no sentence
   composes.

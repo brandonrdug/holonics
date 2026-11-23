@@ -1,0 +1,33 @@
+W95_START 03:45:05
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+W95_GATE EQUAL 04:03:21
+TERRAIN_TRAINED W95c 04:40:12 sections=3000 ended=false
+TERRAIN_REACH W95c 04:41:51 ANSWER copy n= 2655 0.144|ANSWER reverse n= 2667 0.071|ANSWER sum n= 1579 1.027|
+TERRAIN_HOSTPANEL W95c panel_logic.tsv 04:43:04 NEXT_WRITE_DONE rows=168 run=32 window=- ms=171954 
+TERRAIN_HOSTPANEL W95c panel_terrain.tsv 04:43:59 NEXT_WRITE_DONE rows=96 run=32 window=- ms=226064 
+TERRAIN_TRAINED W95m 05:17:20 sections=3000 ended=false
+TERRAIN_READ_DONE mean_W95c 05:28:34 CAVITY_DONE ms=674074  rows_S=99844
+TERRAIN_PANEL W95c_mean 05:29:06 seen: words 34 in_lexicon 20 (58%) longest_copy 13 held: words 60 in_lexicon 45 (75%) longest_copy 14 unread: words 61 in_lexicon 50 (81%) longest_copy 18  || LONG W95c_mean: all words 275 in lexicon 197 (71%) writes that loop 2 of 20 longest run shared with its prompt 30 | code 41/49 (83%) web 43/54 (79%) science 31/55 (56%) books 57/67 (85%) wikidata 25/50 (50%)
+TERRAIN_LOUD W95c 05:34:58  lines=71
+TERRAIN_WIDE W95c 05:36:01 LONG W95c: all words 2197 in lexicon 1597 (72%) writes that loop 19 of 160 longest run shared with its prompt 76 | code 333/395 (84%) web 357/449 (79%) science 244/427 (57%) books 425/509 (83%) wikidata 238/417 (57%)
+TERRAIN_REACH W95m 05:37:38 ANSWER copy n= 2655 0.188|ANSWER reverse n= 2667 0.164|ANSWER sum n= 1579 1.059|
+TERRAIN_HOSTPANEL W95m panel_logic.tsv 05:39:21 NEXT_WRITE_DONE rows=168 run=32 window=- ms=200001 
+TERRAIN_HOSTPANEL W95m panel_terrain.tsv 05:40:12 NEXT_WRITE_DONE rows=96 run=32 window=- ms=250966 
+TERRAIN_READ_DONE mean_W95m 05:47:41 CAVITY_DONE ms=698738  rows_S=99844
+TERRAIN_PANEL W95m_mean 05:48:11 seen: words 44 in_lexicon 40 (90%) longest_copy 14 held: words 54 in_lexicon 36 (66%) longest_copy 16 unread: words 61 in_lexicon 40 (65%) longest_copy 17  || LONG W95m_mean: all words 263 in lexicon 188 (71%) writes that loop 3 of 20 longest run shared with its prompt 71 | code 39/45 (86%) web 40/52 (76%) science 31/52 (59%) books 51/63 (80%) wikidata 27/51 (52%)
+TERRAIN_LOUD W95m 05:53:56  lines=71
+TERRAIN_WIDE W95m 05:54:59 LONG W95m: all words 2128 in lexicon 1532 (71%) writes that loop 20 of 160 longest run shared with its prompt 71 | code 315/366 (86%) web 349/435 (80%) science 258/419 (61%) books 389/491 (79%) wikidata 221/417 (52%)
+W95_CAVITY W95c 06:09:50 CAVITY_DONE ms=890856
+W95_THEORY THEORY_PANEL W95c logic: words 107 in lexicon 82 (76%) loops 0 of 8 longest shared with prompt 20 | theory: words 160 in lexicon 128 (80%) loops 0 of 12 longest shared with prompt 15
+W95_CAVITY W95m 06:24:54 CAVITY_DONE ms=889828
+W95_THEORY THEORY_PANEL W95m logic: words 100 in lexicon 76 (76%) loops 0 of 8 longest shared with prompt 13 | theory: words 143 in lexicon 111 (77%) loops 1 of 12 longest shared with prompt 12
+W95_LAP_TRAVEL W95c material: |d|=1.101e+08,1.046e+08,1.045e+08 cos01=+0.063 cos12=+0.119 persistence=1.020 | level: |d|=1.603e+07,1.567e+07,1.544e+07 cos01=+0.089 cos12=+0.119 persistence=1.041 | third: |d|=5.307e+07,5.13e+07,5.138e+07 cos01=+0.144 cos12=+0.175 persistence=1.076
+W95_LAP_TRAVEL W95m material: |d|=1.19e+08,1.143e+08,1.112e+08 cos01=+0.185 cos12=+0.182 persistence=1.111 | level: |d|=1.853e+07,1.882e+07,1.829e+07 cos01=+0.304 cos12=+0.319 persistence=1.220 | third: |d|=5.564e+07,5.555e+07,5.464e+07 cos01=+0.231 cos12=+0.252 persistence=1.148
+W95_FRONTIER_NEW_STORE FRONTIER W95m; one place open: all 0.6313 (140564 places) | books 0.6767 code 0.4051 logic 0.4886 science 0.5625 theory 0.6232 web 0.7568 wikidata 0.9047 || less the control's, paired: -0.0146 (±0.0009) | books +0.0133 code +0.0198 logic -0.1124 science +0.0118 theory -0.0648 web +0.0183 wikidata +0.0112|FRONTIER W95m; the frontier: all 1.8468 (139706 places) | books 1.8191 code 1.5710 logic 1.7725 science 1.7683 theory 1.8863 web 2.0550 wikidata 2.0551 || less the control's, paired: -0.0123 (±0.0010) | books +0.0169 code +0.0348 logic -0.1609 science +0.0209 theory -0.0583 web +0.0360 wikidata +0.0242|
+TERRAIN_SCORE W95c whole 57/96 opening 60/96 first 73/96 | sum 9/9/11 of 16 difference 6/6/6 of 16 product 7/7/10 of 16 close 9/12/16 of 16 copy 13/13/14 of 16 reverse 13/13/16 of 16
+TERRAIN_SCORE W95m whole 56/96 opening 58/96 first 73/96 | sum 10/10/12 of 16 difference 9/9/10 of 16 product 3/3/6 of 16 close 11/13/16 of 16 copy 11/11/13 of 16 reverse 12/12/16 of 16
+W95_ALL_DONE 06:25:14

@@ -1,0 +1,18 @@
+Fixed 2026-11-23T03:44:12Z (date -u), the lead, before the mixed share's lap trains. Refs #404.
+G-T3 read (the dwell alone, W94d beside W94j): held theory -0.150 and held Lean -0.216 nats a place, the old registers +0.135 to
++0.289, the theory panel's own terms 12 against 4 and 11 against 8; the moments' snapshot scattered (0.189 to 0.254 on an unchanged
+passage); over the lap's thirds the mixed passage's material walked (persistence 1.02 to 1.08, tools/lap_travel.py) and the dwell's held
+its direction (1.27 to 1.37). By G-T3's rule ((b) missed) the share is read mixed.
+G-T4: from W94j's STATE.3000, W95m joined at a new pass to store-2026-11-23-dwell8 (the theory and the Lean drawn at eight times their
+quota from the first section, about a third of each lap's places) beside W95c joined at a new pass to store-2026-11-22 (the same reset,
+the theory and the Lean at their octets' quota, 6%); 3,000 sections each on the build whose join takes a redrawn store; read on
+store-2026-11-22's held set at MEAN.3000, the theory panel at MEAN.3000, the lap's travel from WHOLE.k:
+(a) held theory at least 0.06 and held Lean at least 0.08 nats a place under the control, one place open, paired;
+(b) every old register at most 0.03 above the control, one place open;
+(c) the theory panel's own terms (theory_score.py THEORY_TERMS) at least twice the control's on the theory prompts and at least the
+    control's on the Lean;
+(d) the material's persistence over the lap's thirds at least 1.10 for the arm and at most 1.08 for the control.
+Rule: (a), (b) and (c) held, the line takes the mixed share (W95m's end is the line's state); with (d) held beside them the pull holds
+under a mix, which is the read that brings the curated history in at its own share. (b) missed, the mix trades the registers for the
+theory: separating what a register's tension reaches is the next change, before more data. (a) or (c) missed with (b) held, the register
+needs a dwell's density and the share stays an arm.
