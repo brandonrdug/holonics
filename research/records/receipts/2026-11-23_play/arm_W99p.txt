@@ -1,0 +1,23 @@
+W99P_START 16:24:04
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+W99P_GATE EQUAL 16:47:51
+TERRAIN_TRAINED W99p 17:27:38 sections=3000 ended=false
+TERRAIN_REACH W99p 17:29:18 ANSWER copy n= 2655 0.175|ANSWER reverse n= 2667 0.133|ANSWER sum n= 1579 1.189|
+TERRAIN_HOSTPANEL W99p panel_logic.tsv 17:30:37 NEXT_WRITE_DONE rows=168 run=32 window=- ms=178141 
+TERRAIN_HOSTPANEL W99p panel_terrain.tsv 17:31:29 NEXT_WRITE_DONE rows=96 run=32 window=- ms=230195 
+TERRAIN_READ_DONE mean_W99p 17:44:54 CAVITY_DONE ms=669200  rows_S=99844
+TERRAIN_PANEL W99p_mean 17:46:08 seen: words 44 in_lexicon 35 (79%) longest_copy 14 held: words 58 in_lexicon 35 (60%) longest_copy 16 unread: words 61 in_lexicon 45 (73%) longest_copy 17  || LONG W99p_mean: all words 272 in lexicon 196 (72%) writes that loop 3 of 20 longest run shared with its prompt 76 | code 37/41 (90%) web 33/46 (71%) science 41/62 (66%) books 59/73 (80%) wikidata 26/50 (52%)
+TERRAIN_LOUD W99p 18:07:32  lines=71
+TERRAIN_WIDE W99p 18:08:48 LONG W99p: all words 2149 in lexicon 1524 (70%) writes that loop 24 of 160 longest run shared with its prompt 76 | code 304/364 (83%) web 305/416 (73%) science 261/433 (60%) books 413/518 (79%) wikidata 241/418 (57%)
+W99P_LAP_TRAVEL W99p material: |d|=1.169e+08,1.156e+08,1.108e+08 cos01=+0.142 cos12=+0.104 persistence=1.044 | level: |d|=2.669e+07,2.522e+07,2.045e+07 cos01=+0.492 cos12=+0.391 persistence=1.292 | third: |d|=5.916e+07,5.926e+07,5.482e+07 cos01=+0.300 cos12=+0.239 persistence=1.167
+W99P_FRONTIER_NEW_STORE FRONTIER W99p; one place open: all 0.6219 (140564 places) | books 0.6919 code 0.4017 logic 0.4306 science 0.5718 theory 0.5929 web 0.7583 wikidata 0.9045 || less the control's, paired: +0.0120 (±0.0004) | books +0.0078 code +0.0013 logic +0.0233 science +0.0046 theory +0.0442 web +0.0035 wikidata -0.0005|FRONTIER W99p; the frontier: all 1.8348 (139706 places) | books 1.8119 code 1.5721 logic 1.7271 science 1.7786 theory 1.8577 web 2.0443 wikidata 2.0512 || less the control's, paired: +0.0056 (±0.0005) | books +0.0079 code -0.0013 logic +0.0189 science +0.0007 theory +0.0297 web -0.0074 wikidata -0.0091|
+W99P_DRAFTS thousand=1 acts=11212 draft_places=358770 world_places=27483 agreement=0.0766
+W99P_DRAFTS thousand=2 acts=11348 draft_places=363111 world_places=26070 agreement=0.0718
+W99P_DRAFTS thousand=3 acts=11220 draft_places=359014 world_places=25888 agreement=0.0721
+TERRAIN_SCORE W99 whole 46/96 opening 50/96 first 68/96 | sum 7/7/10 of 16 difference 5/5/7 of 16 product 5/5/6 of 16 close 8/12/16 of 16 copy 10/10/13 of 16 reverse 11/11/16 of 16
+TERRAIN_SCORE W99p whole 49/96 opening 53/96 first 71/96 | sum 8/8/11 of 16 difference 5/5/7 of 16 product 5/5/7 of 16 close 9/13/16 of 16 copy 10/10/14 of 16 reverse 12/12/16 of 16
+W99P_ALL_DONE 18:24:40
