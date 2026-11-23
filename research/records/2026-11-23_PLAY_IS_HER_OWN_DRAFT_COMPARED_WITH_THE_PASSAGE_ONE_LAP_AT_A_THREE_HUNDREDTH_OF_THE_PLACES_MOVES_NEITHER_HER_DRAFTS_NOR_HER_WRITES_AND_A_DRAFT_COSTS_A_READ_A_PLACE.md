@@ -1,6 +1,6 @@
 # Play is her own draft compared with the passage: one lap at a three-hundredth of the places moves neither her drafts nor her writes, and a draft costs a read a place
 
-November 23, 2026, 10:30 to 18:40 UTC, the lead, on the PC. Refs #404. It follows [the dwell's record](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md),
+November 23, 2026, 10:30 to 18:35 UTC, the lead, on the PC. Refs #404. It follows [the dwell's record](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md),
 whose §10 named play as the one change the arms left untried on text. Receipts: [`receipts/2026-11-23_play/`](receipts/2026-11-23_play/).
 
 ## 1. The lens and the reading
@@ -95,8 +95,22 @@ rows; the count of the five bytes before split the same way by `tools/before_cou
 
 At a word's first letter she stands 0.24 to 0.28 nats over a count of the five bytes before, and the place costs about four bits;
 inside a word she pays a third of that. The choice of the next word, where a sentence is composed, is where she stands nearest a count:
-the next loop reads what her state holds at a word's start, whether the words before it are present or only the last bytes (the level
-that reads the units the level below committed, THE_ENGINE §11).
+what her state holds at a word's start was then read (`tools/word_presence.py` on `read-strand-states` of W99's mean over 407 held
+passages of the theory and the books, `tools/word_rows.py`; 19,351 word starts; [`word_presence_W99.txt`](receipts/2026-11-23_play/word_presence_W99.txt)):
+the share of each quantity the open read after the last tick removes, fitted on the even passages and read on the odd.
+
+| at a word's first letter | share present |
+|---|---|
+| the byte two places before (the last letter of the word before) | 0.604 |
+| the first letter of the word before | 0.272 |
+| the word before (64 cells) | 0.225 |
+| the word two before (64 cells) | 0.024 |
+| the letter the place holds | 0.038 |
+| a cell drawn by a key that nothing in the passage fixes (the floor) | 0.000 |
+
+Her state at a word's start carries the word before in part and the word two before not at all: the context she composes the next word
+from is one word deep. The level that reads the units the level below committed (THE_ENGINE §11, the level's row) does not deliver the
+words before the last; that is the next loop's subject, read against the records that own the level (November 13 and 17).
 
 ## 7. The failures this could repeat
 
