@@ -37,6 +37,15 @@ pub struct Scale {
     /// `A` (`D₁ × H D₀`, an epoch's harmonics of its places' reads) and `b_A` (`D₁`), then `B` (`H D₀ × D₁`) and `b_B` (`H D₀`, a bias
     /// a harmonic); matrices on `2^(−24)`, biases on the faces' `2^(−16)`.
     pub glue: Vec<i32>,
+    /// [definition; the lead, November 23, the level's design record of November 17 §3 and §4 item 2; `agent-inferred`] **The level's
+    /// receipt at its own grain**: where set, on a passage read by two streams each open place that reads an epoch has its prolonged row
+    /// alone (the level's state through `B⁻`, with no fine tick after it) read through the opening's reader and compared with the
+    /// written symbol there; its covector returns through `B⁻`, the level's ticks and the restriction only, the reader taking none (a part
+    /// trained by its own comparison, the objects' receipt law: every receiver has its own). Written as the word `receipt` after the
+    /// level's two counts, only where set. Why: one comparison at the fine face gives the level no slope (the design record §9: nothing
+    /// linear in the units relieves the fine comparison at the level's locus), and at a word's first letter her state holds the word two
+    /// before at 24 thousandths (the play record of November 23, §6).
+    pub receipt: bool,
 }
 
 impl Scale {
@@ -328,6 +337,18 @@ pub(crate) struct ScalePass {
     /// and each open place reads (`[2n]`, `None` where it reads none).
     open_harmonics: Vec<i64>,
     source: Vec<Option<usize>>,
+    /// The level's receipt ([`Scale::receipt`]): each open place that reads an epoch, its site, the opening's read of its prolonged row
+    /// alone and the written symbol it is compared with.
+    receipt: Vec<(usize, crate::navigator::BlankRead, usize)>,
+}
+
+impl ScalePass {
+    /// The level's receipt's code ([`Scale::receipt`]): the summed code of the written symbols at the prolonged rows' faces, on the
+    /// codes' grain, and the count of places it compared (a reading: the tests read it against the covector).
+    #[cfg(test)]
+    pub(crate) fn receipt_code(&self) -> (i64, usize) {
+        (self.receipt.iter().map(|(_, read, c)| read.face.code(*c)).sum(), self.receipt.len())
+    }
 }
 
 impl ScalePass {
@@ -519,7 +540,7 @@ impl Constitution {
             *v = fit32((k * ((three << MATERIAL_BITS) / pd) as i128) >> 31, "a founded value outgrew its 32-bit carrier")?;
         }
         let mut out = self.clone();
-        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue }));
+        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false }));
         Ok((out, at))
     }
 
@@ -647,7 +668,7 @@ impl Constitution {
     /// frontier arrives through the known places' states, and two thirds of the whole survives every place reading the epoch before
     /// its own, before any training in that relation (`read-far`'s `21` and `22` on the line's state of November 18).
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn scale_forward_before(&self, s: &Scale, x: &mut [i64], n: usize, known_news: &[i64], open_news: &[i64], past: bool, keep: bool) -> Result<ScalePass> {
+    pub(crate) fn scale_forward_before(&self, s: &Scale, x: &mut [i64], n: usize, known_news: &[i64], open_news: &[i64], past: bool, keep: bool, targets: &[usize]) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let Some((b2, bb2, _)) = s.before_offsets(d0) else {
             return refuse("a strand's level on a tower without its one-sided block");
@@ -697,6 +718,11 @@ impl Constitution {
             for t in (0..2 * n).filter(|&t| out.source[t] == Some(j)) {
                 let ht = if t < n { &cut.harmonics[t * h..(t + 1) * h] } else { &out.open_harmonics[(t - n) * h..(t - n + 1) * h] };
                 uncharted(ht, &v, d0, &mut row)?;
+                // [the level's receipt] The prolonged row alone, read through the opening's reader at an open place, against its symbol.
+                if s.receipt && t >= n {
+                    let reach_o = reach(&self.theta[self.layout.opening..self.layout.opening + d0 * d0]);
+                    out.receipt.push((t, self.opening_read(&row, reach_o)?, targets[t - n]));
+                }
                 for (xv, &r) in x[t * d0..(t + 1) * d0].iter_mut().zip(&row) {
                     *xv = fit64(*xv as i128 + r as i128)?;
                 }
@@ -744,14 +770,34 @@ impl Constitution {
         let gl = &s.glue;
         // The prolongation: `δv⁻_k(j) = release(Σ_(t reads j) h_k(φ_t) δx_t, 30)` over the known sites and the open places that read
         // epoch `j`, then `δb_B⁻ += Σ_j δv⁻(j)`, `δB⁻ += δv⁻(j) r̂¹_jᵀ` and `δr̂¹_j = B⁻ᵀ δv⁻(j)`.
+        // [the level's receipt] Each compared row's covector through the opening's reader, held (the reader takes none): `δy⁰ =
+        // release(Σ_c δz_c E(c), 16)`, `δr̂ = Rᵀ δy⁰`, `δrow` through the lane chart's adjoint. It joins the place's `δx_t` on the level's
+        // route alone: the fine state before the prolongation takes none of it.
+        let mut own = vec![0i64; 2 * n * d0];
+        if !pass.receipt.is_empty() {
+            let l = &self.layout;
+            let reach_o = reach(&self.theta[l.opening..l.opening + d0 * d0]);
+            for (t, read, c) in &pass.receipt {
+                let dz = covector(&read.face, *c);
+                let mut dy = vec![0i64; d0];
+                for (i, slot) in dy.iter_mut().enumerate() {
+                    let sum: i128 = dz.iter().enumerate().map(|(cc, &dzc)| dzc as i128 * self.theta[l.enc + cc * d0 + i] as i128).sum();
+                    *slot = fit64(release(sum, STATE_BITS))?;
+                }
+                let mut dr = vec![0i64; d0];
+                transposed(&self.theta[l.opening..l.opening + d0 * d0], reach_o, d0, &dy, MATERIAL_BITS, &mut dr)?;
+                let back = lane_adjoint(&read.read, &read.scale[..self.declaration.lanes], &dr)?;
+                own[t * d0..(t + 1) * d0].copy_from_slice(&back);
+            }
+        }
         let mut acc = vec![0i128; epochs * h * d0];
         for t in 0..2 * n {
             let Some(j) = pass.source[t] else { continue };
             let ht = if t < n { &cut.harmonics[t * h..(t + 1) * h] } else { &pass.open_harmonics[(t - n) * h..(t - n + 1) * h] };
             let slot = &mut acc[j * h * d0..(j + 1) * h * d0];
             for (k, &hk) in ht.iter().enumerate() {
-                for (c, &v) in dx[t * d0..(t + 1) * d0].iter().enumerate() {
-                    slot[k * d0 + c] += hk as i128 * v as i128;
+                for (c, (&v, &o)) in dx[t * d0..(t + 1) * d0].iter().zip(&own[t * d0..(t + 1) * d0]).enumerate() {
+                    slot[k * d0 + c] += hk as i128 * (v as i128 + o as i128);
                 }
             }
         }

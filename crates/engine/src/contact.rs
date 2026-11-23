@@ -1609,7 +1609,7 @@ impl Constitution {
         };
         for k in 0..d.ticks {
             if let (Some(s), Some((known_news, open_news))) = (level.filter(|s| s.split == k), news.as_ref()) {
-                out.tower = Some(self.scale_forward_before(s, &mut x, n, known_news, open_news, past, keep)?);
+                out.tower = Some(self.scale_forward_before(s, &mut x, n, known_news, open_news, past, keep, classes)?);
             }
             let mut cell = TickCell::default();
             if keep {

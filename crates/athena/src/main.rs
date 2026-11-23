@@ -94,6 +94,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-rate") {
         return athena::store::set_rate(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("set-receipt") {
+        return athena::store::set_receipt(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-lattice") {
         return athena::store::set_lattice(&rest[1..]);
     }

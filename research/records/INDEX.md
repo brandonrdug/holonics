@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,750 records from July 2026 to November 2026. 399 receipts directories: 225 beside the records and 174 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,750 records from July 2026 to November 2026. 400 receipts directories: 225 beside the records and 175 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 149 | 115 |
+| [November 2026](#november-2026) | 149 | 116 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |

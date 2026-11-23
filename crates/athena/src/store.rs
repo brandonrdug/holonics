@@ -1905,6 +1905,43 @@ pub fn set_leak(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 23] `set-receipt STATE STATE_SHA OUT`: **a learner whose level is compared at its own grain**
+/// ([`holonics_engine::field::Scale::receipt`]): the state with its level's line carrying the word `receipt`, every other line as it stands
+/// (read back and checked). Refused on a state with no level, with a level that has no one-sided block (the receipt is a strand's), or
+/// whose level already carries it. It writes a new state.
+pub fn set_receipt(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("set-receipt STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let width = learner.field.declaration.width;
+    let s = learner.field.scale.as_deref_mut().ok_or("a state with no level")?;
+    if s.before_offsets(width).is_none() {
+        return Err("a level with no one-sided block (the receipt is a passage read by two streams')".into());
+    }
+    if s.receipt {
+        return Err("a level already compared at its own grain".into());
+    }
+    s.receipt = true;
+    let written = learner.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    let (old, new): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
+    let differing: Vec<usize> = (0..old.len().max(new.len())).filter(|&i| old.get(i) != new.get(i)).collect();
+    if differing.len() != 1 || !new[differing[0]].starts_with("level ") {
+        return Err(format!("a receipt that changed lines {differing:?}, not the level's alone").into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_RECEIPT lines={} differing_line={} level_line={}", new.len(), differing[0], new[differing[0]]);
+    Ok(())
+}
+
 /// [definition; the lead, November 18, the audit of that day §1.1 and §1.8] `set-rate STATE STATE_SHA BITS OUT [remainder]`: **a learner
 /// with the deposit's rate set** to `2^(−BITS)` (every moment, entry and line as it stands; the moments are the covector's and do not
 /// read the rate), and with the word `remainder` its steps' remainders carried from zero ([`Learner::remainder`]), without which a cooler
