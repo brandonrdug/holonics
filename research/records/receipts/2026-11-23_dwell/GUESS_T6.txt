@@ -1,0 +1,11 @@
+Fixed 2026-11-23T09:47:23Z (date -u), the lead, before the history's second lap trains. Refs #404.
+G-T5 read (W96h beside W96c): held dialogue -0.052 and held acts -0.039 nats a place (missed 0.15), every other register within 0.012
+(held), the theory panel's own terms 7 against 10 (missed by one), the material's persistence 1.022 (missed 1.10); the control's second
+lap at the mixed share reads 0.981, so G-T4's 1.111 was a first lap's drift to a new mix. By G-T5's rule the history stays an arm for a
+second lap.
+G-T6: W97h from W96h's STATE.3000 (the history store, its pass going on) beside W97c from W96c's STATE.3000 (the dwell store), 3,000
+sections each on e5h, read as G-T5's:
+(a) held dialogue and held acts each at least 0.10 nats a place under the control, one place open, paired, at the second lap's means;
+(b) every other register at most 0.03 above the control.
+Rule: (a) and (b) held, the line takes the history (W97h's end); otherwise the history stays out of the line until play is read, and
+the line goes on from W97c's end.
