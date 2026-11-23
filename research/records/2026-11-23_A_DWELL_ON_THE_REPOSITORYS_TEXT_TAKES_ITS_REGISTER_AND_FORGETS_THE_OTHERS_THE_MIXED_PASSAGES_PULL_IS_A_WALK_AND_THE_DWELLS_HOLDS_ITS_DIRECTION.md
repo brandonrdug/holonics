@@ -1,6 +1,6 @@
 # A dwell on the repository's text takes its register and forgets the others; the mixed passage's pull is a walk, and the dwell's holds its direction
 
-November 23, 2026, 01:10 to 10:30 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 22](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
+November 23, 2026, 01:10 to 13:05 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 22](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
 whose §6 reads Brandon's note of 01:13Z on reinforcement and play against the engine. Receipts: [`receipts/2026-11-23_dwell/`](receipts/2026-11-23_dwell/).
 
 On the objects: the navigator is her writer at the frontier; the terrain is the passage, here the repository's own guides, records and
@@ -131,6 +131,12 @@ command's shape more often than the control's, and no result's. By G-T5's rule t
 The correction: W96c is the mixed share's second lap, and its material's persistence reads 0.981. G-T4's 1.111 was a first lap's
 drift toward a new mix, as §6 allowed, and no mix has yet held a pull past its first lap. G-T4's rule read that clause as the one that
 brings the history in; the history came in on a transient.
+
+**The history's second lap** (G-T6, W97h from W96h's end beside W97c from W96c's end, [`arm_W97h.txt`](receipts/2026-11-23_dwell/arm_W97h.txt)):
+held dialogue −0.070 and held acts −0.053 nats a place (missed 0.10), every other register within 0.006 (held). By its rule the history
+stays out of the line until play is read, and the line goes on from W97c's end. The correction above is itself corrected: W97c, the mix's
+third lap, reads persistence 1.101 where its second read 0.981 ([`lap_travel.txt`](receipts/2026-11-23_dwell/lap_travel.txt)), so the
+read scatters by about a tenth from lap to lap on one mix, and neither G-T4's 1.111 nor W96c's 0.981 decides whether a pull holds.
 
 ## 9. What the arms say together
 
