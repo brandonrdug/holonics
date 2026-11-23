@@ -1,0 +1,32 @@
+Guesses of the record of November 23 on an act answered in kind. Fixed 2026-11-23T20:08:39Z (date -u), before any read of the line for them.
+They are the formal thread's, marked as guesses; whether a read or an arm runs is the lead's. A miss is scored as a miss.
+Forms read at their owners before fixing: holonics_engine::learner::PassWorld (the act path, RECORDS >= 1, and the draft world,
+RECORDS = 0), athena::world::{react, answer, record}, tools/word_presence.py, and the lead's record of November 23 on her drafts
+(its G-P1 and G-P2 as scored there).
+
+G-A1  the draft world's cause, by place in a run (a host read of a saved state of W99p or of its rows, if they hold the run place).
+      The record's section 3: at the first drafted place the context is the passage's own and the comparison is the ordinary one; at
+      place j the target is the passage's symbol j places on with the j - 1 between them hidden and her draft shown in their place.
+      (a) her code at the passage's symbol at run place 1: within 10% of her code at open places outside a run in the same stretches;
+      (b) at run places 9 to 32, over the lap's first thousand sections: a mean between 2.8 and 4.5 nats a place;
+      (c) over its last thousand: under (b) by at least 0.1, and no lower than 2.3 (the blind floor: what the context alone says of a
+          symbol that many places on).
+
+G-A2  the meter (a host read with tools/word_presence.py on read-strand-states of W99's mean, the rows of the lead's section 6).
+      At word starts that stand at least three words into their line:
+      (a) the count of words since the line's start, cells 3 to 10 (10 and over as one): share present at most 0.10;
+      (b) that count's parity: at most 0.05;
+      (c) at every word start, the length of the word before, cells 1 to 12: at least 0.25.
+      Read: she keeps the beat inside a word and no count of words; (a) at 0.4 or more would say a meter stands and what is missing
+      is the binding of words to it.
+
+G-A3  the answered act as an arm (the lead's to choose; one change beside its control from one saved state, a lap).
+      The act path as built on November 16, world SLICE EVERY RECORDS RUN with RECORDS >= 1, on the terrain's kinds she partly
+      holds inside the line (brackets, copies, reversals: her drafted line answered by athena::world::react), at about the draft
+      arm's first dose (some 90 answered places a section):
+      (a) every held text register within 0.003 nats a place of its control (the draft arm at that dose: +0.0112 on the theory);
+      (b) the world's code at its answers (STORE_WORLD world_code): the last thousand sections at most 0.9 of the first thousand;
+      (c) no number on her drafts: nothing in the act path compares a draft.
+
+Not guesses (computed after the reads they concern, so fits): the draft arm's two costs on the theory's held code stand in ratio
+3.95 at doses in ratio 3.85, and the ruler's drawn world (part B) stands near first order in the share over the same range.

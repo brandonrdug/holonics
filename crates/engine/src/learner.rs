@@ -605,8 +605,10 @@ pub struct PassWorld {
     /// [definition; the lead, November 23; `agent-inferred`] Zero: **a draft world**. Its act is
     /// the stretch itself: the field drafts the stretch's last `run` places from the places before them, and the stretch is read by two
     /// streams with the draft in its known stream and the passage's own symbols what every place is compared with
-    /// ([`crate::field::Region::targets`]). The passage is the world: what it holds at each drafted place is its answer to the field's
-    /// own act there, and an error stays possible at every place (the release draws at the field's own temperature). With `refine` unset
+    /// ([`crate::field::Region::targets`]). The passage's symbol at a drafted place is no function of the draft, so the draft carries no
+    /// news of what it is compared with and that comparison's least code is reached by ignoring the draft (atlas
+    /// `receipt.unanswered-act-is-discounted`, Lean `HNN/AnsweredAct`; the formal thread, November 23): the draft world is no answered
+    /// act, which is the path of `records` of one or more above. The release draws at the field's own temperature. With `refine` unset
     /// the draft is the writer's, one place a read; set, it is drawn whole from one read of the field and reopened `refine` times, the
     /// release's runs ([`Constitution::sample_runs`]; the record of November 23 on her drafts, §4: a place a read priced a draft at `run` reads; Brandon, 19:49Z: grading her drafts
     /// against the passage is not play, which has no right answer and is answered in kind).
