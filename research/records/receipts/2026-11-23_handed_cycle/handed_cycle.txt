@@ -1,0 +1,68 @@
+A. A helix of fifths addressed by its own remainders
+   Euclid on the octave 2:1 and the fifth 3:2, multiplicatively: how many times the smaller fits the larger, and the
+   remainder becomes the next unit. Integers only.
+   step  fits  remainder (2^a 3^b)        nats      cents   unit (fifths)  laps to one own step
+      1     1  2^2     3^-1              0.287682   498.045        1             2.41
+      2     1  2^-3    3^2               0.117783   203.910        2             2.94
+      3     2  2^8     3^-5              0.052116    90.225        5             2.66
+      4     2  2^-19   3^12              0.013551    23.460       12             4.26
+      5     3  2^65    3^-41             0.011463    19.845       41             1.47
+      6     1  2^-84   3^53              0.002088     3.615       53             6.26
+      7     5  2^485   3^-306            0.001022     1.770      306             2.22
+      8     2  2^-1054 3^665             0.000044     0.076      665            23.88
+      9    23  2^24727 3^-15601          0.000018     0.031    15601             2.44
+   the address of the fifth in the octave: [1, 1, 2, 2, 3, 1, 5, 2, 23]
+   remainders: the fourth 4:3, the tone 9:8, the leimma 256:243, the comma 531441:524288, then finer commas;
+   each level's remainder is the next level's gap, and a unit's laps before its comma amounts to one of its own steps
+   is its quality, which lies between the next quotient and the next quotient and one: 4.26 for twelve, 6.26 for fifty-three, 23.88 for 665.
+
+B. What a quotient costs to write and what it fixes
+   entropy of a quotient (its law at large, Gauss and Kuzmin): 3.4325 bits = 2.3792 nats
+   written with its own length (Elias gamma, 2 floor(log2 k) + 1 bits): 3.5070 bits a quotient
+   fixed of the ratio by a quotient, pi^2 / (6 ln 2): 2.3731 nats = 3.4237 bits
+   measured on 200 drawn pairs of 4,096-bit integers, 478311 quotients:
+     nats of the ratio fixed a quotient 2.3740; the quotients' entropy 3.4269 bits; written with
+     their own length 3.5082 bits; share of quotients equal to 1, 2, 3: 0.414, 0.170, 0.093
+   a radix digit of base b costs log b and fixes log b, with the base, the width and the point's place held beside it.
+
+C. A layout against a count
+   cells at one least separation in one volume (the packing's share of space), and the mean squared rounding distance
+   at one cell volume (the normalized second moment G), each against the cubic lattice of scalar digits.
+   lattice            dim  share      against cube   bits/coordinate   G          bits/coordinate (rounding)
+   cube Z^n (n = 1)     1   1.000000         1.0000        0.0000      0.083333     0.0000
+   hexagonal A2         2   0.906900         1.1547        0.1038      0.080188     0.0278
+   face-centred D3      3   0.740480         1.4142        0.1667      0.078745     0.0409
+   E8                   8   0.253670        16.0000        0.5000      0.071682     0.1086
+   Leech               24   0.001930  16777216.0000        1.0000      0.065771     0.1707
+   the rounding cost's floor in any dimension, 1/(2 pi e) = 0.058550: 0.2546 bits a coordinate
+   (G of D3 and of the Leech lattice are Conway and Sloane's values, from training; the rest is computed here.)
+
+D. A common stretch, and a loop of stretches
+   speed 0.1: the stretch of every rate 1.10554, on the logarithmic axis 0.10034; two in a chain: speed 0.19802, log stretch 0.20067 = twice
+   speed 0.5: the stretch of every rate 1.73205, on the logarithmic axis 0.54931; two in a chain: speed 0.80000, log stretch 1.09861 = twice
+   a spectrum of partials 2:3:5 under the stretch 1.73205: 3.4641 : 5.1962 : 8.6603, ratios 2:3:5 as before
+   two equal stretches at a right angle (2 x 2 complex, a half-angle each), then the turn the product holds:
+     speed 0.1: turn   0.2879 degrees; 2 atan(tanh^2(eta/2)) =   0.2879
+     speed 0.5: turn   8.2132 degrees; 2 atan(tanh^2(eta/2)) =   8.2132
+     speed 0.9: turn  42.8962 degrees; 2 atan(tanh^2(eta/2)) =  42.8962
+
+E. Mutual loss on a drawn pair of shares over 16 symbols
+   p's reader paying to read with q's shares 0.015174 nats; q's with p's 0.015287; their sum 0.030461
+   the sum over symbols of (p - q)(log p - log q) = 0.030461; the least symbol's term 2.40e-05, none negative
+   its second order, the sum of (p - q)^2 / p: 0.031034
+
+F. A unit as the difference tone of its partials
+   partials 3, 4, 5 of a unit, each turned by 0.0: the unit in a linear read 0.000000; in the square 2.000000 at phase -0.0000; partial 3 at phase -0.0000
+   partials 3, 4, 5 of a unit, each turned by 0.7: the unit in a linear read 0.000000; in the square 2.000000 at phase -0.0000; partial 3 at phase +0.7000
+   the common turn moves every partial's phase and leaves the difference tone where it was.
+
+G. A chain of relative moves with one link unread
+   1,000 drawn chains trunk . a . x . b . c of planar moves (a turn and a shift each), x unread:
+   the far part read against the part before it returns c, worst difference 6.7e-16;
+   one touch of the far part's place returns the link, worst difference 7.8e-16.
+
+H. A triad under a second invariant
+   weights 1, 4, 9 (a squared rate at rates 1, 2, 3), the middle gives 1: the coarse end takes 5/8, the fine end 3/8;
+   of the weighted total the coarse end takes 5/8 and the fine end 27/8 of 4
+   weights 1, -1 (two hands): members 1 and 1 hold the weighted total 0 at any size, so it bounds neither.
+
