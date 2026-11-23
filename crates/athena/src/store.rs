@@ -372,22 +372,32 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             (in_pairs, in_sites, terrain_regions, terrain_records) = (drawn.pairs, drawn.sites, drawn.count, drawn.records);
         }
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
-        let mut acts: Vec<(Vec<usize>, usize)> = Vec::new();
+        // [definition; the lead, November 23, play] A draft world's act carries the passage's own symbols at the drafted places (its targets).
+        let mut acts: Vec<(Vec<usize>, usize, Option<Vec<usize>>)> = Vec::new();
         let mut stretches_drawn = 0usize;
         while let Some(drawn) = cut.next() {
             stretches_drawn += 1;
-            let act = cut.pass.world.as_ref().filter(|w| !drawn.frontier && cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every)).map(|w| w.run);
-            let n = drawn.sites() + act.map_or(0, |run| run + REACTION_BOUND);
+            let draft_world = cut.pass.world.as_ref().is_some_and(|w| w.records == 0);
+            let act = cut.pass.world.as_ref().filter(|w| (!drawn.frontier || draft_world) && cut.slices[drawn.slice].name == w.slice && acts_here(seed, drawn.d, w.every) && (!draft_world || drawn.sites() > w.run + 1)).map(|w| w.run);
+            // A draft world's act is the stretch itself, read by two streams: no reaction is appended.
+            let n = drawn.sites() + act.filter(|_| !draft_world).map_or(0, |run| run + REACTION_BOUND);
             // A stretch read by two streams is staged as its known stream's sites and as many open places: the section's bounds are the card's.
-            let n = if drawn.frontier && cut.pass.strand { 2 * n } else { n };
+            let n = if (drawn.frontier && cut.pass.strand) || (act.is_some() && draft_world) { 2 * n } else { n };
             if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
                 break;
             }
             let prompt = match act {
-                Some(_) => {
+                Some(run) => {
                     let at = cut.pass.slices[drawn.slice].clone();
                     let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
-                    cut.pass.world.as_ref().and_then(|w| world_prompt(&bytes, w.records as usize))
+                    if draft_world {
+                        // [definition; the lead, November 23, play] The stretch less its last `run` places is the prompt; those places are the
+                        // passage's answer to her draft.
+                        let cut_at = bytes.len() - run as usize;
+                        Some((bytes[..cut_at].to_vec(), Some(bytes[cut_at..].to_vec())))
+                    } else {
+                        cut.pass.world.as_ref().and_then(|w| world_prompt(&bytes, w.records as usize)).map(|p| (p, None))
+                    }
                 }
                 None => None,
             };
@@ -397,7 +407,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             by_slice[slice] += 1;
             (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
             match prompt {
-                Some(p) => acts.push((codec.encode(&p)?, slice)),
+                Some((p, truth)) => acts.push((codec.encode(&p)?, slice, truth.map(|t| codec.encode(&t)).transpose()?)),
                 None => {
                     tally.take(&region, counted);
                     regions.push(region);
@@ -422,19 +432,39 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let mut world_line = String::new();
         if let (Some(w), false) = (cut.pass.world.clone(), acts.is_empty()) {
             let run = w.run as usize;
-            let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _)| (p.as_slice(), run)).collect();
+            let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _, _)| (p.as_slice(), run)).collect();
             let act_seed = seed ^ cut.pass.stretches.wrapping_mul(0x9E37_79B9_7F4A_7C15);
             let mut drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
             if w.refine > 0 {
                 // [definition; theory, November 16 20:39Z] Each draft redrawn once, place by place in landmark order, its predicted reaction known.
                 let lens: Vec<usize> = drafts.iter().map(|d| draft_places(&codec.decode(&d[..d.iter().position(|&c| c == codec.void()).unwrap_or(d.len())]))).collect();
-                let prompts: Vec<&[usize]> = acts.iter().map(|(p, _)| p.as_slice()).collect();
+                let prompts: Vec<&[usize]> = acts.iter().map(|(p, _, _)| p.as_slice()).collect();
                 drafts = learner.field.refine_drafts(&prompts, &drafts, &lens, codec.void(), act_seed ^ 0x7265_6669_6E65, realization).map_err(|e| e.to_string())?;
             }
             let (mut read_ok, mut draft_places, mut world_places) = (0usize, 0usize, 0usize);
             let first = regions.len();
-            for ((prompt, _), draft) in acts.iter().zip(&drafts) {
+            for ((prompt, _, truth), draft) in acts.iter().zip(&drafts) {
                 let written = &draft[..draft.iter().position(|&c| c == codec.void()).unwrap_or(draft.len())];
+                if let Some(truth) = truth {
+                    // [definition; the lead, November 23, play] Her draft stands in the known stream after the prompt, and every place is
+                    // compared with the passage's own symbol there: the prompt's with themselves, the drafted places with what the passage holds.
+                    let k = written.len().min(truth.len());
+                    let mut classes = prompt.clone();
+                    classes.extend_from_slice(&written[..k]);
+                    let mut targets = prompt.clone();
+                    targets.extend_from_slice(&truth[..k]);
+                    let n = classes.len();
+                    if n < 2 {
+                        continue;
+                    }
+                    let agree = (0..k).filter(|&t| written[t] == truth[t]).count();
+                    read_ok += usize::from(agree == k);
+                    let region = OwnedRegion { strand: true, past: cut.pass.past, second: cut.pass.second, targets: Some(targets), ..OwnedRegion::plain(classes, vec![false; n]) };
+                    tally.take(&region, n - 1);
+                    (draft_places, world_places) = (draft_places + k, world_places + agree);
+                    regions.push(region);
+                    continue;
+                }
                 let reaction = crate::world::react(&codec.decode(written));
                 if reaction.appended != b"?\n" && reaction.appended != b"\n?\n" {
                     read_ok += 1;
@@ -1518,7 +1548,8 @@ pub fn move_store(args: &[String]) -> Result<()> {
 /// [definition; agent-inferred, November 16, the theory thread's Build B] `set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT`: **a world
 /// joined to a state's pass** ([`holonics_engine::field::PassWorld`]): the state with its pass line's world clause set (one stretch in
 /// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
-/// other line byte for byte (read back and checked, as [`next_pass`]). Refused where the pass holds no slice `SLICE`.
+/// other line byte for byte (read back and checked, as [`next_pass`]). Refused where the pass holds no slice `SLICE`. `RECORDS` zero is a draft
+/// world (the lead, November 23, play; [`holonics_engine::field::PassWorld::records`]): the act is the stretch, its last `RUN` places drafted.
 pub fn set_world(args: &[String]) -> Result<()> {
     if args.len() != 8 && args.len() != 9 {
         return Err("set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT [REFINE]".into());
@@ -1537,7 +1568,7 @@ pub fn set_world(args: &[String]) -> Result<()> {
     if refine > 1 {
         return Err("REFINE is zero or one".into());
     }
-    let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: positive(&args[5])? as u64, run: positive(&args[6])? as u64, refine };
+    let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: args[5].parse::<u64>().map_err(|_| "RECORDS is a count (zero: a draft world)")?, run: positive(&args[6])? as u64, refine };
     let pass = StorePass { world: Some(world), ..before.clone() };
     let line = pass.to_line();
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;

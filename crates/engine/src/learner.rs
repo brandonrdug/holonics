@@ -74,7 +74,7 @@ pub(crate) fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> 
     let mut out = Compared { pairs: Vec::new(), coupled: 0, ported: false };
     for (f, r) in faces.iter().zip(regions) {
         let end = r.port.map_or(r.classes.len(), |p| p.start);
-        out.pairs.extend(f.iter().zip(r.classes).take(end).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
+        out.pairs.extend(f.iter().zip(r.targets.unwrap_or(r.classes)).take(end).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
         if let Some(port) = r.port {
             out.coupled += port_code(f, &port)?;
             out.ported = true;
@@ -602,6 +602,11 @@ impl PassTerrain {
 pub struct PassWorld {
     pub slice: String,
     pub every: u64,
+    /// [definition; the lead, November 23, play (Brandon, November 23 01:13Z); `agent-inferred`] Zero: **a draft world**. Its act is
+    /// the stretch itself: the field drafts the stretch's last `run` places from the places before them, and the stretch is read by two
+    /// streams with the draft in its known stream and the passage's own symbols what every place is compared with
+    /// ([`crate::field::Region::targets`]). The passage is the world: what it holds at each drafted place is its answer to the field's
+    /// own act there, and an error stays possible at every place (the release draws at the field's own temperature). Never refined.
     pub records: u64,
     pub run: u64,
     /// [definition; theory, November 16 20:39Z] Whether each act's draft is redrawn once after its predicted reaction is drawn
@@ -695,8 +700,8 @@ impl StorePass {
             None => None,
         };
         if let Some(w) = &world {
-            if w.every == 0 || w.records == 0 || w.run == 0 || w.refine > 1 || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
-                return refuse("a world whose share, records or run is zero, or whose slice is not the pass's");
+            if w.every == 0 || w.run == 0 || w.refine > 1 || (w.records == 0 && w.refine > 0) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
+                return refuse("a world whose share or run is zero, a draft world that refines, or a world whose slice is not the pass's");
             }
         }
         let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None };

@@ -119,7 +119,7 @@ pub fn weighed_domain(m: usize, mask: &[bool]) -> usize {
 /// the codec's own byte kind was the numeral matcher's partition, read beside the field's own.
 pub fn held_out(field: &Constitution, codec: &Codec, problems: &Problems, realization: &mut dyn Realization) -> Result<[(i64, usize); 3]> {
     let regions = held_regions(codec, problems);
-    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+    let views: Vec<Region> = regions.iter().map(|(c, u, _)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
     let mut out = [(0i64, 0usize); 3];
     let mut opening = 0usize;
     for (chunk, parts) in views.chunks(64).zip(regions.chunks(64)) {

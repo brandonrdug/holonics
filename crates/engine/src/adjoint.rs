@@ -91,7 +91,7 @@ impl Constitution {
         // stands for both reads where the field reads twice (as a known stream's does, below).
         if let Some(strand) = pass.strand.as_deref() {
             for _ in 0..if self.declaration.mark { 2 } else { 1 } {
-                self.strand_returned(region.classes, strand, g)?;
+                self.strand_returned(region.classes, region.targets.unwrap_or(region.classes), strand, g)?;
             }
             return Ok(());
         }
@@ -735,14 +735,15 @@ impl Constitution {
     ///   and each open place's unresolved row and the row of the site before it.
     ///
     /// Refused on a loud face and where the forward kept no ticks. A place is compared at weight one.
-    pub(crate) fn strand_returned(&self, classes: &[usize], pass: &StrandForward, g: &mut [i128]) -> Result<()> {
-        self.strand_returned_with(classes, pass, g, None)
+    /// [the lead, November 23] Each open place is compared with `targets` there ([`Region::targets`]); the known stream is `classes`.
+    pub(crate) fn strand_returned(&self, classes: &[usize], targets: &[usize], pass: &StrandForward, g: &mut [i128]) -> Result<()> {
+        self.strand_returned_with(classes, targets, pass, g, None)
     }
 
     /// [measurement; the lead, November 22] [`Constitution::strand_returned`] with the covector each tick's reverse receives (`λ^(k+1)` over
     /// the strand's `2n` sites, the known stream's then the open places', on the covector's grain), pushed in the reverse's order where
     /// `lambdas` is given: what a founding reads on the writer's own regime ([`Constitution::strand_tension`]). The return is the same.
-    pub(crate) fn strand_returned_with(&self, classes: &[usize], pass: &StrandForward, g: &mut [i128], mut lambdas: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
+    pub(crate) fn strand_returned_with(&self, classes: &[usize], targets: &[usize], pass: &StrandForward, g: &mut [i128], mut lambdas: Option<&mut Vec<Vec<i64>>>) -> Result<()> {
         let d = &self.declaration;
         if d.loud {
             return refuse("a strand's return on a loud face");
@@ -751,14 +752,14 @@ impl Constitution {
         let m2 = 2 * m;
         let n = pass.known;
         let sites = 2 * n;
-        if pass.ticks.len() != d.ticks || pass.last.len() != sites * dw || classes.len() != n {
+        if pass.ticks.len() != d.ticks || pass.last.len() != sites * dw || classes.len() != n || targets.len() != n {
             return refuse("a strand's reverse reads a forward of the same passage that held every tick");
         }
         let l = &self.layout;
         let reaches = self.reaches();
         let known = vec![false; n];
         // (the known stream's region: sided, so the opening's comparison below is the retarded one)
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second, targets: None };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
@@ -770,7 +771,7 @@ impl Constitution {
             let reads: Vec<BlankRead> = (1..n).map(|t| self.face_of(&pass.last[(n + t) * dw..(n + t + 1) * dw], &reaches)).collect::<Result<_>>()?;
             let mut ys: Vec<Vec<i64>> = Vec::with_capacity(reads.len());
             for (t, read) in (1..n).zip(&reads) {
-                let dz = covector(&read.face, classes[t]);
+                let dz = covector(&read.face, targets[t]);
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }

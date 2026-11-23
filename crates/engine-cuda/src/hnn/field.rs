@@ -238,7 +238,7 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -276,11 +276,11 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let strand_lengths = [2usize, 3, 7, 64, 300];
         let passages: Vec<Vec<usize>> = strand_lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
         let known: Vec<Vec<bool>> = strand_lengths.iter().map(|&n| vec![false; n]).collect();
-        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false }).collect();
+        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: None }).collect();
         let mixed: Vec<Region> = law.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -318,6 +318,53 @@ mod tests {
         }
     }
 
+    /// [definition; the lead, November 23, play] **A passage read by two streams and compared with its own targets on the card reads the
+    /// host's bits** (needs the card; `Region::targets`): a pumped field with carry circles, its read, readout and pair returns moved off zero
+    /// from a keyed stream's tail, read and returned on passages of 2, 3, 7, 64 and 300 places whose open places are compared with a second
+    /// keyed sequence, through the host and through the card: every face and every covector entry equal. The faces are the passages' own
+    /// without targets (the known stream alone moves a face), and the covector is not (the targets move the comparison); targets equal to the
+    /// known stream give the covector of none.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn a_strand_compared_with_its_targets_on_the_card_reads_the_hosts_bits() {
+        use holonics_engine::field::{Learner, Realization};
+        let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(3).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
+        let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
+        let pumped = Learner::new(founded, 12).with_carry(4, &keys).unwrap().with_pump().unwrap();
+        let mut field = pumped.field.clone();
+        let (l, dw, m2) = (field.layout().clone(), field.declaration.width, 2 * field.declaration.complex());
+        let moved: Vec<usize> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).collect();
+        // (each moved entry on the material's families' `2^(−24)` less ten places, as the pump's test moves its material)
+        let (tail, shift) = (keys.len() - 4 * moved.len() - 8, 14u32);
+        for (k, &i) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        let lengths = [2usize, 3, 7, 64, 300];
+        let passages: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
+        let targets: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 29 + 7 + 13 * k) % 120).collect()).collect();
+        let known: Vec<Vec<bool>> = lengths.iter().map(|&n| vec![false; n]).collect();
+        fn strand<'a>(classes: &'a [usize], unresolved: &'a [bool], past: bool, with: Option<&'a [usize]>) -> Region<'a> {
+            Region { classes, unresolved, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: with }
+        }
+        let plain: Vec<Region> = (0..lengths.len()).map(|k| strand(&passages[k], &known[k], k % 2 == 1, None)).collect();
+        let aimed: Vec<Region> = (0..lengths.len()).map(|k| strand(&passages[k], &known[k], k % 2 == 1, Some(&targets[k]))).collect();
+        let itself: Vec<Region> = (0..lengths.len()).map(|k| strand(&passages[k], &known[k], k % 2 == 1, Some(&passages[k]))).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        let (host_faces, host_g) = field.read_and_return(&aimed).unwrap();
+        let (card_faces, card_g) = card_field.read_and_return(&field, &aimed).unwrap();
+        assert_eq!(host_faces, card_faces, "every face of a strand compared with its targets");
+        let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
+        assert_eq!(unequal, 0, "every covector entry of a strand compared with its targets");
+        let (plain_faces, plain_g) = card_field.read_and_return(&field, &plain).unwrap();
+        assert_eq!(plain_faces, card_faces, "the targets move no face");
+        assert_ne!(plain_g, card_g, "the targets move the comparison");
+        let (_, itself_g) = card_field.read_and_return(&field, &itself).unwrap();
+        assert_eq!(itself_g, plain_g, "targets equal to the known stream are none");
+        println!("STRAND_TARGETS_PARITY regions={} covector_entries={} faces_equal=1 covector_equal=1", aimed.len(), card_g.len());
+    }
+
     /// [definition; the lead, November 21, the reach] **Each head's friction of distance on the card reads the host's bits** (needs the card): a
     /// field of `declaration(32, 4, 32)` grown by four carry circles, pumped, and given its frictions ([`holonics_engine::field::Learner::with_friction`]),
     /// its readout, current and pair returns moved off zero from a keyed stream's tail and its frictions drawn at a quarter of a bit to one bit an
@@ -342,11 +389,11 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let strand_lengths = [2usize, 3, 7, 64, 300];
         let passages: Vec<Vec<usize>> = strand_lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
         let known: Vec<Vec<bool>> = strand_lengths.iter().map(|&n| vec![false; n]).collect();
-        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false }).collect();
+        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: None }).collect();
         let mixed: Vec<Region> = law.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -407,11 +454,11 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let law: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let strand_lengths = [2usize, 3, 7, 64, 300];
         let passages: Vec<Vec<usize>> = strand_lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
         let known: Vec<Vec<bool>> = strand_lengths.iter().map(|&n| vec![false; n]).collect();
-        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false }).collect();
+        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: None }).collect();
         let mixed: Vec<Region> = law.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -490,7 +537,7 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -557,7 +604,7 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -1054,7 +1101,7 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
@@ -1119,7 +1166,7 @@ mod tests {
         let lengths = [2usize, 3, 5, 64, 257];
         let classes: Vec<Vec<usize>> = lengths.iter().map(|&n| (0..n).map(|t| (t * 37 + 11) % 120).collect()).collect();
         let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1 || t + 1 == n).collect()).collect();
-        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let cuts: Vec<usize> = regions.iter().map(|r| holonics_engine::field::level_anchors(&field.level_news(r).unwrap(), holonics_engine::field::level_section(d.alphabet)).len()).collect();
         assert!(cuts.iter().zip(&lengths).any(|(&e, &n)| e > 1 && e < n), "the fixture's news cuts some region into epochs: {cuts:?} of {lengths:?}");
         let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
@@ -1197,7 +1244,7 @@ mod tests {
     fn a_lettered_learners_section_on_the_card_reads_the_hosts_bits() {
         use holonics_engine::field::Host;
         let (learner, l, dw, fresh, classes, open, domains) = lettered_case();
-        let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
         let (host_faces, host_g) = learner.field.read_and_return(&regions).unwrap();
@@ -1244,7 +1291,7 @@ mod tests {
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
     fn a_skin_no_fill_formed_is_refused() {
         let (learner, _, _, _, classes, open, domains) = lettered_case();
-        let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = classes.iter().zip(&open).zip(&domains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
         card_field.unfilled.set(true);
@@ -1325,7 +1372,7 @@ mod tests {
     fn the_field_that_reads_twice_on_the_card_reads_the_hosts_bits() {
         use holonics_engine::field::{Realization, Host, MARK_BASES};
         let (classes, open, carried, domains) = mark_regions();
-        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
         for (name, learner) in mark_cases() {
@@ -1386,7 +1433,7 @@ mod tests {
             carried.push(Vec::new());
             domains.push(Some(n));
         }
-        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
         for (name, learner) in mark_cases() {
@@ -1459,10 +1506,10 @@ mod tests {
         let passages: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
         let known: Vec<Vec<bool>> = lengths.iter().map(|&n| vec![false; n]).collect();
         // (the passages of 3 and 64 places with their odd strand contacts facing the past, `Region::past`; then every one of them)
-        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false }).collect();
+        let strands: Vec<Region> = passages.iter().zip(&known).enumerate().map(|(k, (c, u))| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: None }).collect();
         let faced: Vec<Region> = strands.iter().map(|r| Region { past: true, ..*r }).collect();
         let (classes, open, carried, domains) = mark_regions();
-        let others: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: r % 2 == 1, strand: false, past: false, second: false }).collect();
+        let others: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: r % 2 == 1, strand: false, past: false, second: false, targets: None }).collect();
         // A section of the law's regions, known streams and passages read by two streams, interleaved.
         let mixed: Vec<Region> = others.iter().zip(&strands).flat_map(|(a, b)| [*a, *b]).collect();
         // [the record of the two streams §15] The same section with the row of the site after reading the second site before
@@ -1554,7 +1601,7 @@ mod tests {
                 let classes: Vec<usize> = (0..n).map(|t| (t * 53 + 5) % 120).collect();
                 let known = vec![false; n];
                 for past in [false, true] {
-                    let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false }];
+                    let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None }];
                     let host_faces = Host.read_faces(field, &regions).unwrap();
                     let forward = card_field.read_faces(field, &regions);
                     let forward_line = match &forward {
@@ -1589,9 +1636,9 @@ mod tests {
     fn a_marked_learners_sections_on_the_card_read_the_hosts_bits() {
         use holonics_engine::field::{Host, MARK_BASES};
         let (classes, open, carried, domains) = mark_regions();
-        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = (0..classes.len()).map(|r| Region { classes: &classes[r], unresolved: &open[r], faces: &carried[r], locked: &[], echo: &[], domain: domains[r], port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let (lettered, _, _, _, lclasses, lopen, ldomains) = lettered_case();
-        let lregions: Vec<Region> = lclasses.iter().zip(&lopen).zip(&ldomains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let lregions: Vec<Region> = lclasses.iter().zip(&lopen).zip(&ldomains).map(|((c, u), &dom)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: dom, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
         let mut cases = mark_cases();
@@ -1622,7 +1669,7 @@ mod tests {
     fn the_field_that_reads_twice_times_its_two_reads_on_the_card() {
         use holonics_engine::field::MARK_BASES;
         let (classes, open, _, _) = mark_regions();
-        let regions: Vec<Region> = (0..32).map(|_| Region { classes: &classes[4], unresolved: &open[4], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let regions: Vec<Region> = (0..32).map(|_| Region { classes: &classes[4], unresolved: &open[4], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         let (_, learner) = mark_cases().into_iter().find(|(n, _)| *n == "opened").unwrap();
         let plain = learner.field.clone();
         let mut marked = learner.with_mark().unwrap().field;

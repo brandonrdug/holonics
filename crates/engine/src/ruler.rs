@@ -1313,7 +1313,7 @@ impl Constitution {
         let pass = self.strand_pass(classes, true, past)?;
         let mut g = vec![0i128; self.material_len()];
         let mut lambda: Vec<Vec<i64>> = Vec::new();
-        self.strand_returned_with(classes, &pass, &mut g, Some(&mut lambda))?;
+        self.strand_returned_with(classes, classes, &pass, &mut g, Some(&mut lambda))?;
         lambda.reverse();
         let d = &self.declaration;
         let (n, dw, m2, j2) = (classes.len(), d.width, 2 * d.complex(), 2 * d.triads);

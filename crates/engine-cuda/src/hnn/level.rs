@@ -192,7 +192,7 @@ impl<'c> Resident<'c> {
             owned.push((vec![0usize; epochs], unres, faces));
         }
         off.push(fine.sites as u32);
-        let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false }).collect();
+        let pregions: Vec<Region> = owned.iter().map(|(c, u, f)| Region { classes: c, unresolved: u, faces: if f.iter().any(Option::is_some) { f } else { &[] }, locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
         // (the level's regions are epochs, no passage read by two streams: the fine batch's known places stand aside while they are staged)
         let fine_heard = std::mem::take(&mut *self.strand_heard.borrow_mut());
         let staged = self.stage(&pregions, cd.alphabet, cd.width, &cd, &mut tr.cwords);
