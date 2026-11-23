@@ -1,12 +1,12 @@
 # A fading medium carries by a cycle with a hand and keeps what a common turn leaves, a count or a pair of opposite hands: a unit is a loop that nearly closes, its comma is its remainder, and nested-depth is an index
 
-November 23, 2026, 20:48 to 22:40 UTC, a cloud thread. Refs #404, #410. Four notes of Brandon's of that day (20:47, 21:07,
+November 23, 2026, 20:48 to 22:55 UTC, a cloud thread. Refs #404, #410. Four notes of Brandon's of that day (20:47, 21:07,
 21:12 and 21:39 UTC) and two guesses of the coordinator's, derived and joined to their owners. Nothing here ran on the card or opened a state
 of the line. The readings are of the tree's source and atlas, of a host ruler on drawn numbers and on constants of the literature
 ([`receipts/2026-11-23_handed_cycle/`](receipts/2026-11-23_handed_cycle/)), and of six reads the lead took on the line's saved
 mean W99 at this thread's asking, each scored against a guess fixed before it (§13), and of a letter from Neon weighed against the code it cites (§19). Lean: `HolonicsResearch/HNN/HandedCycle` (new,
 50 statements). The synthesis of §2 was told to Brandon at 21:01 UTC, before the Lean was checked and before any read, as he asked.
-§21 was added from 22:32 to 22:40 UTC, after the lead's reads of the level's own comparison.
+§21 and §22 were added from 22:32 to 22:55 UTC, after the lead's reads of the level's own comparison.
 
 ## 1. The lens
 
@@ -507,9 +507,9 @@ loop of two stretches leaves in closed form, and Fjørtoft's bound for a continu
 ## 17. What changed
 
 - `lean/HolonicsResearch/HNN/HandedCycle.lean` (new) and its import.
-- This record, the host ruler `receipts/2026-11-23_handed_cycle/handed_cycle.py` with its output, and `GUESS.txt` with eleven guesses
-  (G-H1 to G-H11): five scored on the lead's reads of W99, G-H8 scored on the level's own comparison (§21), and one sentence
-  scored without a read.
+- This record, the host ruler `receipts/2026-11-23_handed_cycle/handed_cycle.py` with its output, and `GUESS.txt` with fourteen guesses
+  (G-H1 to G-H14): five scored on the lead's reads of W99, G-H8 and one clause of G-H10 scored on the level's own comparison
+  (§21, §22), and one sentence scored without a read.
 - Atlas: sixteen rows (`receiver.size-is-one-readers-gauge-anothers-state`, added with §21; `swing.retraced-stroke-moves-nothing`, `swing.three-states-least-hand`,
   `pair.common-turn-leaves-opposite-hands`, `tower.level-is-difference-tone`, `radix.floored-shift-push-pop`,
   `code.nesting-depth-is-index`, `key.loop-closes-a-sleeping-link`, `receiver.order-in-the-skew-half`,
@@ -539,6 +539,9 @@ loop of two stretches leaves in closed form, and Fjørtoft's bound for a continu
   decision of November 3 that followed from it. G-H8 was fixed on the receipt's code and three rows of the level; these two rows
   were read after the result. The search before a guess names the operation (a level compared at its own grain) and not only
   the part.
+- **A route told with a direction, before the size was read.** §21's forward route said the receipt turned or grew the row,
+  and G-H10 (a) put 0.55 on growth. The row shrank to a third (§22). What the owner's code gave was that the receipt holds no
+  balance on the size; which way the other reader would move it was a guess told as part of the route.
 - **A fit told before its forward test.** The `0.675^5.7` fit was marked as a fit when it was told and was wrong within twenty
   minutes. A fit is now told with the read that would break it.
 - **A lens filed as changing nothing.** Four constructions are named (§15.1, §15.3, §15.4, §15.5) and three reads are fixed.
@@ -777,6 +780,80 @@ of the two lifts the word two before to 0.05 within a lap. §15's first item nam
 one arm if G-L1 missed. It has missed and the arm stands named; beside the lead's next change it is a second change and so a
 second arm. The 0.8 and 0.4 of §5's row are unchanged: a comparison of the row with the symbols did not make a linear level
 hold the word two before, which agrees with §5 and with the row of November 18 and is no test of the product.
+
+## 22. The join is the link that slips: a part far under a word's unit is a partition of its own
+
+**The lead's reads** (relayed at 22:48 UTC; W101r's and W101's means over the same 407 held passages; the receipts are the
+lead's).
+
+- *The row's size.* The handed row's power over the state's at open places is 0.0296 with the receipt and 0.0797 without
+  (0.041 and 0.123 at word starts). **G-H10 (a) missed, and in the other direction**: the row fell to about a third, where the
+  guess had it grown by half or more. The passage's comparison sized the row down.
+- *The level, link by link* (`tools/level_link_presence.py`, 19,040 word starts; the restricted state, the level's read after
+  its ticks, the handed row, the joined state, the final read).
+
+  | Read | W101 (control) | W101r (with the receipt) |
+  |---|---|---|
+  | The last byte of the epoch before the handed one | 0.237 / 0.102 / 0.074 / 0.028 / 0.017 | 0.236 / 0.201 / 0.161 / 0.018 / 0.017 |
+  | The handed epoch's last byte | 0.190 / 0.089 / 0.072 / 0.137 / 0.107 | 0.211 / 0.182 / 0.168 / 0.138 / 0.111 |
+  | The handed epoch's first byte | 0.135 / 0.031 / 0.019 / 0.016 / 0.012 | 0.135 / 0.089 / 0.065 / 0.015 / 0.012 |
+  | The handed epoch as one identity (64 cells) | 0.009 / 0.001 / 0.000 / 0.001 / 0.001 | |
+  | The word before | 0.002 / 0.002 / 0.005 / 0.233 / 0.229 | |
+  | The word two before | 0.017 / 0.016 / 0.014 / 0.022 / 0.026 | |
+
+- *Ring by ring* (`tools/ring_presence.py`). The field's 32 complex moment modes together hold the word before at letters 1 to
+  6 at 0.089, 0.013, 0.011, 0.018, 0.017 and 0.012, and the word two before at a word's start at 0.005. Periods 9 to 27 hold
+  the first letter at 0.019 to 0.037; periods of 128 and more hold under 0.006 at every letter.
+
+**What they say.** The receipt did what it asked of the level: the level's ticks no longer halve what the restriction holds,
+and the row carries the handed epoch's bytes about twice as well. The join then loses nine tenths of it (0.161 in the row,
+0.018 in the joined state), and under the receipt the row was sized down to a third. The restriction holds single bytes at
+about a fifth and no identity. The word before stands in the joined state at 0.233 and in the row at 0.005: the fine field holds
+it and the level does not.
+
+**Two of §21's statements, after these reads.** The row's size is the passage's to set, and the passage set it: down. §21's
+forward route had the size growing, and it shrank. What a smaller row can cost forward is bounded by what the control's row was
+worth, which G-H7's read (the block set to zero) gives and no read has yet given. The back route is untouched by the row's
+size: the covector that reaches the level's state is `B⁻ᵀ` of a covector as large as one over the row's size, and `B⁻` is as
+large as the size, so the pull through the level into the restriction does not fall as the row shrinks. The splices of G-H10
+(b) still decide between the routes.
+
+**G-H9, reweighed before any build.** The moments are 32 complex numbers whatever their fade, and the long rings hold a smear.
+A fade held by each ring would move a channel that carries about a hundredth of the word before past its third letter. G-H9
+(a) goes from 0.55 to 0.15, stamped at 22:52:16 UTC, with the first weight kept on file. The skin's constant is still a state
+with no balance (§20, and G-H9 (b) at 0.8); it is not what the third letter waits on. The guess was fixed on the skin's code and
+on a letter, and the moments' width was not read: §18's first failure again.
+
+**The join, on the objects.** The precision law's clause of November 21 says it: a magnitude many orders under a word's unit is
+a distinct partition with its own unit, translated at a contact, and is not carried as leading zeros. Each face lane is read as
+a ratio to its own power. The handed row, at 0.03 to 0.08 of the state's power and added into the state's own lanes, is the low
+places of those lanes: leading zeros. In a face lane of its own (`tower.face-lane-composition`, `tower.field-growth-by-lanes`;
+the engine grows one by `Field::laned`, the premise read G188 of November 14) the row is a count in its own unit, its size is a
+gauge to every reader, and the conflict of §21 between a reader that gauges the size and a reader that reads it has nothing left
+to act on: a reader that does not want the lane lowers its own entries for it, which is that reader's balance and no one
+else's.
+
+**The closure receipt, weighed at the lead's asking** (the design of November 17, `D E = ρ` through the law's `B`, its pull
+stopped at the moment). At 3.6 places an epoch the level's 64 numbers hold the epoch whole, so the closure has nothing to
+quotient, and its least code is a copy of bytes that the fine field holds already. It repairs the first link and leaves the
+join. It is safe with its pull stopped, it gives the level a face and so a news of its own (what a second level's cut needs),
+and it is not what the reads above ask for. G-H13, fixed at 22:52:16 UTC: every held register within 0.003 nats a place of its
+control (0.85); the handed epoch's first byte at the restricted state at 0.30 or more, from 0.135 (0.7); the far byte in the
+joined state still under 0.05 (0.85); the word two before at a word's start under 0.035 (0.85).
+
+**The premise, by a host read before any build.** The row of November 18 (`deposition.no-linear-tension-at-the-levels-locus`)
+found nothing linear in a unit's symbols that relieves the fine comparison at the level's locus, and says of itself that it
+never read a function of bound units. §5 says the level's term is a product. The read that joins them is that tension read
+with bound features: each symbol of the handed epoch on its news phase times the place's own last symbol. G-H12 (0.55): 0.02
+or more of the covector's power removed at the open places, where the linear table removed 0.0006 to 0.005. Held, a part that
+forms the product has a tension to found on and a lane of the row's own has a consumer (G-H14, fixed only then: a held register
+0.003 nats a place or more under its control, 0.5). Missed, nothing an epoch back relieves the fine comparison bound or
+unbound, and the level is not what her writes wait on first: §14's 0.4 on that row then falls to 0.15.
+
+**A figure to read against the records** (rule 11 of a line's lap). The row of November 18 read the built restriction holding
+the epoch as one identity at 0.265 on lap 94's mean, on the two-sided cut of 8.56 places. The link read above holds it at
+0.009, on the one-sided cut of 3.6 places and in 64 cells. The cut and the cells differ, and the two figures are not yet read
+against each other.
 
 ## Sources
 
