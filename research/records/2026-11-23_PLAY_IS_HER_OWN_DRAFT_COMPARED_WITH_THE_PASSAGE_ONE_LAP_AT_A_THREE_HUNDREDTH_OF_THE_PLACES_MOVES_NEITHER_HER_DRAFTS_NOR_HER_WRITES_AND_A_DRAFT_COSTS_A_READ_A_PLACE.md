@@ -1,6 +1,6 @@
 # Play is her own draft compared with the passage: one lap at a three-hundredth of the places moves neither her drafts nor her writes, and a draft costs a read a place
 
-November 23, 2026, 10:30 to 16:00 UTC, the lead, on the PC. Refs #404. It follows [the dwell's record](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md),
+November 23, 2026, 10:30 to 18:40 UTC, the lead, on the PC. Refs #404. It follows [the dwell's record](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md),
 whose §10 named play as the one change the arms left untried on text. Receipts: [`receipts/2026-11-23_play/`](receipts/2026-11-23_play/).
 
 ## 1. The lens and the reading
@@ -62,7 +62,43 @@ reopen and redraw ([`Constitution::sample_runs`](../../crates/engine/src/release
 (generation refines a joint field and releases its boundary). A draft opened whole and settled over a few passes costs a few reads
 in place of `RUN`, so the dose can rise tenfold at this lap's cost. That is the next loop, read beside a control.
 
-## 5. The failures this could repeat
+## 5. The draft drawn whole, at four times the dose
+
+A draft world that refines now draws each draft whole from one read of the field and reopens it `REFINE` times (the release's runs, no
+bound on a run). Gate 3 of that build against the line's lap W99 with no world: EQUAL ([`gate_e5j.txt`](receipts/2026-11-23_play/gate_e5j.txt)).
+W99p (W98's end with `world theory 1 0 32 2`: every theory stretch an act) beside W99 (W98's end, no change), 3,000 sections each
+([`arm_W99p.txt`](receipts/2026-11-23_play/arm_W99p.txt), [`frontier_W99p.txt`](receipts/2026-11-23_play/frontier_W99p.txt), guess
+[`GUESS_P2.txt`](receipts/2026-11-23_play/GUESS_P2.txt)): 354 drafted places a section at 0.79 s a section (the lap in 39.7 minutes).
+
+| G-P2 | read | guess |
+|---|---|---|
+| (a) her drafts' agreement, last thousand against first | 0.0721 against 0.0766 (0.94 times) | missed (1.3 times) |
+| (b) held registers, one place open, above the control | theory +0.0442, logic +0.0233, books +0.0078; the rest within 0.0046 | missed |
+| (c) the theory panel | own terms 7 against 12 (theory), 8 against 10 (Lean); words in the lexicon 76% against 85% | missed |
+
+Her writes ([`theory_panel_W99p.written`](receipts/2026-11-23_play/theory_panel_W99p.written)) hold the register's forms and no sentence,
+as the control's. About 93 of every 100 drafted places differ from the passage, and each is compared with the passage's symbol in the
+context of her own: the comparison teaches the places to discount what she wrote before them, and the theory's code, the drafted
+register's, pays for it. Play asks an act that lands near an answer it can reach (the wiggle of November 21: a small motion about a
+good one); at about two bits a byte her drafts are not near, and by G-P2's rule play waits on a reading of composition, and the line goes
+on from W99's end (`agent-inferred`).
+
+## 6. Where she pays
+
+The writer's code split by place ([`word_split.txt`](receipts/2026-11-23_play/word_split.txt), `tools/word_split.py` on W98's two-stream
+rows; the count of the five bytes before split the same way by `tools/before_count_ruler.py ... split`), nats a place:
+
+| held | a word's first letter: hers, the count's | inside a word: hers, the count's | elsewhere: hers, the count's |
+|---|---|---|---|
+| books | 2.824, 3.106 | 1.208, 1.406 | 0.827, 1.557 |
+| theory | 2.756, 2.999 | 0.971, 1.112 | 1.532, 2.100 |
+
+At a word's first letter she stands 0.24 to 0.28 nats over a count of the five bytes before, and the place costs about four bits;
+inside a word she pays a third of that. The choice of the next word, where a sentence is composed, is where she stands nearest a count:
+the next loop reads what her state holds at a word's start, whether the words before it are present or only the last bytes (the level
+that reads the units the level below committed, THE_ENGINE §11).
+
+## 7. The failures this could repeat
 
 - **A world founded outside the writer's regime** (November 21). The draft world's regions are read by two streams, the writer's own.
 - **The field deposits toward its own act** (G169's drift, read again on November 16). The drafted places are compared with the
