@@ -606,7 +606,9 @@ pub struct PassWorld {
     /// the stretch itself: the field drafts the stretch's last `run` places from the places before them, and the stretch is read by two
     /// streams with the draft in its known stream and the passage's own symbols what every place is compared with
     /// ([`crate::field::Region::targets`]). The passage is the world: what it holds at each drafted place is its answer to the field's
-    /// own act there, and an error stays possible at every place (the release draws at the field's own temperature). Never refined.
+    /// own act there, and an error stays possible at every place (the release draws at the field's own temperature). With `refine` unset
+    /// the draft is the writer's, one place a read; set, it is drawn whole from one read of the field and reopened `refine` times, the
+    /// release's runs ([`Constitution::sample_runs`]; the play record of November 23, §4: a place a read priced a draft at `run` reads).
     pub records: u64,
     pub run: u64,
     /// [definition; theory, November 16 20:39Z] Whether each act's draft is redrawn once after its predicted reaction is drawn
@@ -700,8 +702,8 @@ impl StorePass {
             None => None,
         };
         if let Some(w) = &world {
-            if w.every == 0 || w.run == 0 || w.refine > 1 || (w.records == 0 && w.refine > 0) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
-                return refuse("a world whose share or run is zero, a draft world that refines, or a world whose slice is not the pass's");
+            if w.every == 0 || w.run == 0 || (w.records > 0 && w.refine > 1) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
+                return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
         let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None };
