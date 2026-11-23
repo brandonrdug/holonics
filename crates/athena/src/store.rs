@@ -392,9 +392,10 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                     let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
                     if draft_world {
                         // [definition; the lead, November 23, play] The stretch less its last `run` places is the prompt; those places are the
-                        // passage's answer to her draft.
-                        let cut_at = bytes.len() - run as usize;
-                        Some((bytes[..cut_at].to_vec(), Some(bytes[cut_at..].to_vec())))
+                        // passage's answer to her draft. A stretch whose bytes hold no place before its last `run` is no act (its sites can stand
+                        // above its bytes where it ends its piece: on W98p's lap a stretch of 28 bytes drew an act of 32 places at section 2,278).
+                        let run = run as usize;
+                        (bytes.len() > run + 1).then(|| (bytes[..bytes.len() - run].to_vec(), Some(bytes[bytes.len() - run..].to_vec())))
                     } else {
                         cut.pass.world.as_ref().and_then(|w| world_prompt(&bytes, w.records as usize)).map(|p| (p, None))
                     }
