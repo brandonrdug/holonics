@@ -97,12 +97,18 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-receipt") {
         return athena::store::set_receipt(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("splice-level") {
+        return athena::store::splice_level(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-lattice") {
         return athena::store::set_lattice(&rest[1..]);
     }
     // [the lead, November 18] A ruler's forward on the host's threads: what a place at the frontier hears far.
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-strand-states") {
         return athena::ruler::tension::read_strand_states(&rest[1..]);
+    }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-strand-cut") {
+        return athena::ruler::tension::read_strand_cut(&rest[1..]);
     }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-section-covectors") {
         return athena::ruler::tension::read_section_covectors(&rest[1..]);

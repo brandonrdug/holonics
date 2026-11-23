@@ -37,6 +37,11 @@ const REACTION_BOUND: u64 = 41;
 
 /// [definition; Build B] Whether the stretch of count `d` is an act of the world joined to its slice: one in `every`, keyed by the key
 /// file's seed and the stretch's count (the mixer of [`holonics_engine::passage`]'s draws, SplitMix64).
+/// [definition; the lead, November 23, an act answered in kind] The world's slice name that sets it on the terrain's records
+/// (`set-world STATE SHA terrain EVERY RECORDS RUN OUT`), and the slice an act of the terrain is drawn from.
+pub(crate) const TERRAIN_WORLD: &str = "terrain";
+const TERRAIN_ACT: usize = usize::MAX;
+
 fn acts_here(seed: u64, d: u64, every: u64) -> bool {
     let mut z = seed.wrapping_add(d.wrapping_mul(0x9E37_79B9_7F4A_7C15)) ^ 0x776F_726C_6400_0000;
     z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -362,10 +367,19 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // [definition; the lead, November 22] The terrain's count of records met when the section opens, kept so that a section the pass ends
         // in returns the records it drew ([`PassTerrain::met`]).
         let met_at_open = cut.pass.terrain.as_ref().map(|t| t.met);
+        // [definition; the lead, November 23, an act answered in kind] Where the world is the terrain's (`world terrain EVERY RECORDS RUN`),
+        // one region in `EVERY` (keyed by its first record's count) is an act: its records but the last stand as the prompt, she drafts the
+        // last record from them, and the world answers what she wrote (`world::react`).
+        let mut acts: Vec<(Vec<usize>, usize, Option<Vec<usize>>)> = Vec::new();
+        let terrain_world = cut.pass.world.as_ref().filter(|w| w.slice == TERRAIN_WORLD).map(|w| w.every);
         if cut.pass.terrain.is_some() {
             let drawn = terrain_section(&mut cut.pass, &codec, seed)?;
             terrain_budget = drawn.budget;
-            for (region, counted) in drawn.regions {
+            for ((region, counted), &(last_start, key)) in drawn.regions.into_iter().zip(&drawn.last) {
+                if terrain_world.is_some_and(|e| last_start > 1 && acts_here(seed, key, e)) {
+                    acts.push((region.classes[..last_start].to_vec(), TERRAIN_ACT, None));
+                    continue;
+                }
                 tally.take(&region, counted);
                 regions.push(region);
             }
@@ -373,7 +387,6 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         }
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
         // [definition; the lead, November 23, a draft world] A draft world's act carries the passage's own symbols at the drafted places (its targets).
-        let mut acts: Vec<(Vec<usize>, usize, Option<Vec<usize>>)> = Vec::new();
         let mut stretches_drawn = 0usize;
         while let Some(drawn) = cut.next() {
             stretches_drawn += 1;
@@ -420,7 +433,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // own), and the records it drew are returned to the terrain's count. Reason: from November 21 the terrain filled every section, so the
         // pass's end, read as a section with no region, never came; on W82's lap the store's text ended at section 1,592 and the line trained
         // 1,408 sections on the terrain alone, its held text 0.11 nats a place over W81e's mean on the 800 held frontier rows.
-        if stretches_drawn == 0 && acts.is_empty() {
+        if stretches_drawn == 0 && acts.iter().all(|a| a.1 == TERRAIN_ACT) {
             if let (Some(t), Some(m)) = (cut.pass.terrain.as_mut(), met_at_open) {
                 t.met = m;
             }
@@ -448,8 +461,31 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             }
             let (mut read_ok, mut draft_places, mut world_places) = (0usize, 0usize, 0usize);
             let first = regions.len();
-            for ((prompt, _, truth), draft) in acts.iter().zip(&drafts) {
+            for ((prompt, slice, truth), draft) in acts.iter().zip(&drafts) {
                 let written = &draft[..draft.iter().position(|&c| c == codec.void()).unwrap_or(draft.len())];
+                if *slice == TERRAIN_ACT {
+                    // [definition; the lead, November 23, an act answered in kind] The terrain's act, read by two streams as the terrain is: the
+                    // prompt's records compared as the terrain compares them, her drafted expression known and not compared, and the world's
+                    // answer compared, so the comparison stands at what the world returned (the formal thread's record of November 23, §3.1).
+                    let reaction = crate::world::react(&codec.decode(written));
+                    if reaction.appended != b"?\n" && reaction.appended != b"\n?\n" {
+                        read_ok += 1;
+                    }
+                    let answered = codec.encode(&reaction.appended)?;
+                    let drafted = &written[..reaction.read.min(written.len())];
+                    let mut classes = prompt.clone();
+                    classes.extend_from_slice(drafted);
+                    classes.extend_from_slice(&answered);
+                    let mut targets = prompt.clone();
+                    targets.extend(std::iter::repeat_n(holonics_engine::field::UNCOMPARED, drafted.len()));
+                    targets.extend_from_slice(&answered);
+                    let n = classes.len();
+                    let region = OwnedRegion { strand: true, past: cut.pass.past, second: cut.pass.second, targets: Some(targets), ..OwnedRegion::plain(classes, vec![false; n]) };
+                    tally.take(&region, n - 1 - drafted.len());
+                    (draft_places, world_places) = (draft_places + drafted.len(), world_places + answered.len());
+                    regions.push(region);
+                    continue;
+                }
                 if let Some(truth) = truth {
                     // [definition; the lead, November 23, a draft world] Her draft stands in the known stream after the prompt, and every place is
                     // compared with the passage's own symbol there: the prompt's with themselves, the drafted places with what the passage holds.
@@ -1367,6 +1403,8 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
 #[derive(Default)]
 pub(crate) struct TerrainSection {
     pub(crate) regions: Vec<(OwnedRegion, usize)>,
+    /// Each region's last record's first place and the terrain's count of records met before its first (its key), beside `regions`.
+    pub(crate) last: Vec<(usize, u64)>,
     pub(crate) budget: u64,
     pub(crate) sites: u64,
     pub(crate) pairs: u64,
@@ -1381,8 +1419,9 @@ pub(crate) fn terrain_section(pass: &mut StorePass, codec: &Codec, seed: u64) ->
         let mut met = t.met;
         loop {
             let kind = usize::try_from((met / t.records) % crate::world::KINDS.len() as u64).unwrap_or(0);
-            let (mut classes, mut open, mut counted) = (Vec::new(), Vec::new(), 0usize);
+            let (mut classes, mut open, mut counted, mut last_start) = (Vec::new(), Vec::new(), 0usize, 0usize);
             for r in 0..t.records {
+                last_start = classes.len();
                 let (expression, answered) = crate::world::record(kind, seed ^ (met + r));
                 let mut known = expression;
                 known.extend_from_slice(b" = ");
@@ -1416,6 +1455,7 @@ pub(crate) fn terrain_section(pass: &mut StorePass, codec: &Codec, seed: u64) ->
             };
             (out.pairs, out.sites) = (out.pairs + n * n, out.sites + n);
             out.regions.push((region, counted));
+            out.last.push((last_start, met));
             (met, out.count, out.records) = (met + t.records, out.count + 1, out.records + t.records);
         }
         if let Some(t) = pass.terrain.as_mut() {
@@ -1566,8 +1606,11 @@ pub fn set_world(args: &[String]) -> Result<()> {
     }
     let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
     let before = learner.pass.clone().ok_or("a state with no pass line")?;
-    if !before.slices.iter().any(|s| s.name == args[3]) {
+    if !before.slices.iter().any(|s| s.name == args[3]) && !(args[3] == TERRAIN_WORLD && before.terrain.is_some()) {
         return Err(format!("a pass with no slice {}", args[3]).into());
+    }
+    if args[3] == TERRAIN_WORLD && args[5] == "0" {
+        return Err("the terrain's world answers her acts: RECORDS is one or more".into());
     }
     let refine = match args.get(8) { Some(r) => r.parse::<u64>().map_err(|_| "REFINE is a count")?, None => 0 };
     if refine > 1 && args[5] != "0" {
@@ -1939,6 +1982,40 @@ pub fn set_receipt(args: &[String]) -> Result<()> {
     }
     std::fs::write(out, &written)?;
     println!("SET_RECEIPT lines={} differing_line={} level_line={}", new.len(), differing[0], new[differing[0]]);
+    Ok(())
+}
+
+/// [measurement; the lead, November 23, the level's receipt record §5, the formal thread's G-H10 (b)] `splice-level FINE FINE_SHA LEVEL
+/// LEVEL_SHA OUT`: **a learner with one state's fine field and another's level**: `FINE`'s every line but the level's, which is
+/// `LEVEL`'s with its receipt off (its field and its glue). Both must hold a level of one declaration on fine fields of one declaration.
+/// It writes a state for a reading: which of two laps' parts carries a difference of their codes is read on the two splices; nothing
+/// trains from it.
+pub fn splice_level(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("splice-level FINE FINE_SHA LEVEL LEVEL_SHA OUT".into());
+    }
+    let mut fine = Learner::from_text(&String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let level = Learner::from_text(&String::from_utf8(pinned_read(&args[3], &args[4], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    if fine.field.declaration != level.field.declaration {
+        return Err("two fine fields of different declarations".into());
+    }
+    let (Some(a), Some(b)) = (fine.field.scale.as_deref(), level.field.scale.as_deref()) else { return Err("a state with no level".into()) };
+    if a.coarse.declaration != b.coarse.declaration || a.harmonics != b.harmonics || a.split != b.split || a.glue.len() != b.glue.len() {
+        return Err("two levels of different declarations".into());
+    }
+    let mut s = b.clone();
+    s.receipt = false;
+    fine.field.scale = Some(Box::new(s));
+    let written = fine.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SPLICE_LEVEL lines={}", written.lines().count());
     Ok(())
 }
 

@@ -352,6 +352,18 @@ impl ScalePass {
 }
 
 impl ScalePass {
+    /// The known stream's anchors and the epoch each of a strand's `2n` sites reads (the known sites, then the open places), as
+    /// [`strand_level_cut`] formed them (a reading for a ruler: [`Constitution::strand_cut_read`]).
+    pub(crate) fn strand_cut(&self) -> (&[usize], &[Option<usize>]) {
+        (&self.cut.anchors, &self.source)
+    }
+
+    /// Each epoch's restricted state before the level's ticks (`[j][D₁]`, kept where the forward keeps) and its read after the last
+    /// (`[j][D₁]`, the lane chart on `2^(−16)`): two links of the level's equation, for a ruler ([`Constitution::strand_level_links`]).
+    pub(crate) fn level_links(&self) -> (&[i64], &[i32]) {
+        (&self.before_ticks, &self.coarse_read)
+    }
+
     /// The level's ticks kept for the reverse.
     #[cfg(test)]
     pub(super) fn ticks(&self) -> &[TickCell] {

@@ -146,7 +146,8 @@ pub struct Region<'a> {
     /// while the passage's own symbols are what each place is compared with: each place is read from what she wrote before it and
     /// compared with what the passage holds (the draft world's arms, the record of November 23 on her drafts; Brandon's 19:49Z note says
     /// that grading her drafts against a passage is not play). None, the law as it stood: the open places are
-    /// compared with the known stream's own symbols. Refused on a region that is not read by two streams.
+    /// compared with the known stream's own symbols. Refused on a region that is not read by two streams. A target of [`UNCOMPARED`]
+    /// leaves its place uncompared: it is read and returns nothing (an act's own places, where the world answers the act).
     pub targets: Option<&'a [usize]>,
 }
 
@@ -322,6 +323,14 @@ impl Region<'_> {
         (self.domain.map_or(open, |m| m as u64), open)
     }
 }
+
+/// [definition; the lead, November 23, an act answered in kind; `agent-inferred`] **A place read and not compared**: a target of a
+/// passage read by two streams ([`Region::targets`]) that leaves its place out of the comparison. The place is read as every place is,
+/// in its known stream and as an open place, and its face takes no covector and counts in no code. Why: in an act answered in kind the
+/// act's own places are her draft, and a comparison there would deposit toward her own act (G169's drift) or against a passage that is
+/// no function of it (the draft world, `receipt.unanswered-act-is-discounted`); the comparison stands at the world's answer alone, with
+/// the act as known context (the formal thread's record of November 23, §3.1).
+pub const UNCOMPARED: usize = usize::MAX;
 
 /// [definition; agent-inferred, November 1] **A read leaves its own echo out** (the dispersing field's
 /// §15.3): a site carried as a face is read through contacts both ways, so its face returns to it a

@@ -96,11 +96,18 @@ impl<'c> Resident<'c> {
         let l = field.layout();
         // [the strand's two streams] In a passage read by two streams the compared places are the known stream's (`Resident::strand_heard`).
         let heard = self.strand_heard.borrow().clone();
+        // [the lead, November 23] A place read and not compared (`Resident::strand_skip`) is no compared place of the opening either.
+        let skip = self.strand_skip.borrow().clone();
         let mut mask = vec![0u8; sites.max(1)];
         for (r, region) in regions.iter().enumerate() {
             let first = st.region_off[r] as usize;
             let end = heard.get(r).map_or(region.port.map_or(region.classes.len(), |p| p.start), |&n| n as usize);
             mask[first..first + end].fill(1);
+            if let Some(k) = skip.get(r).filter(|_| heard.len() == regions.len()) {
+                for (t, _) in k.iter().enumerate().filter(|&(t, &s)| s && t < end) {
+                    mask[first + t] = 0;
+                }
+            }
         }
         let mask = self.timed(Kind::Copy, || self.take_up(&mask)).map_err(device)?;
         let (cmoment, sb, sa) = self.cavity_forward(field, words, regions.len(), sites, keep.as_ref())?;
