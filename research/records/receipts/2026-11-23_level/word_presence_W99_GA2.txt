@@ -1,0 +1,1 @@
+WORD_PRESENCE st_W99 word_starts=19351 read=224 tick=3 byte_2=0.604 prev_first=0.272 prev_word=0.225 prev2_word=0.024 target=0.038 planted=0.000 prev_len=0.367 | three or more words into a line (18520): line_words=0.183

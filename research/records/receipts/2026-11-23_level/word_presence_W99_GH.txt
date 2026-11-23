@@ -1,0 +1,6 @@
+WORD_PRESENCE st_W99 word_starts=19351 read=224 tick=3 byte_2=0.604 prev_first=0.272 prev_word=0.225 prev2_word=0.024 target=0.038 planted=0.000 prev_len=0.367 | three or more words into a line (18520): line_words=0.183
+WORD_PRESENCE_GH1 products=2048 prev_word=0.313 prev2_word=0.026 planted=0.000
+WORD_PRESENCE_GH2 line_words_less_index=0.002 (18520 word starts)
+WORD_PRESENCE_GH3 prev2_word between_2_3=0.012(7609) between_4_6=0.035(6879) between_7_more=0.041(3545)
+WORD_PRESENCE_GH4 prev2_word_less_prev_word=0.022
+WORD_PRESENCE_GH5 prev_word (5355 words of six letters or more) letter_1=0.289 letter_2=0.128 letter_3=0.028 letter_4=0.005 letter_5=0.004 letter_6=0.004
