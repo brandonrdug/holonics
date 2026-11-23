@@ -1,0 +1,33 @@
+W97_START 09:47:36
+TERRAIN_TRAINED W97c 10:23:22 sections=3000 ended=false
+TERRAIN_REACH W97c 10:25:01 ANSWER copy n= 2655 0.184|ANSWER reverse n= 2667 0.197|ANSWER sum n= 1579 1.048|
+TERRAIN_HOSTPANEL W97c panel_logic.tsv 10:26:12 NEXT_WRITE_DONE rows=168 run=32 window=- ms=169716 
+TERRAIN_HOSTPANEL W97c panel_terrain.tsv 10:27:04 NEXT_WRITE_DONE rows=96 run=32 window=- ms=221560 
+TERRAIN_TRAINED W97h 10:59:04 sections=3000 ended=false
+TERRAIN_READ_DONE mean_W97c 11:09:39 CAVITY_DONE ms=633478  rows_S=99844
+TERRAIN_PANEL W97c_mean 11:10:16 seen: words 43 in_lexicon 31 (72%) longest_copy 16 held: words 61 in_lexicon 46 (75%) longest_copy 17 unread: words 67 in_lexicon 54 (80%) longest_copy 17  || LONG W97c_mean: all words 273 in lexicon 207 (75%) writes that loop 2 of 20 longest run shared with its prompt 57 | code 35/42 (83%) web 53/61 (86%) science 37/54 (68%) books 48/63 (76%) wikidata 34/53 (64%)
+TERRAIN_LOUD W97c 11:15:58  lines=71
+TERRAIN_WIDE W97c 11:16:58 LONG W97c: all words 2146 in lexicon 1551 (72%) writes that loop 22 of 160 longest run shared with its prompt 66 | code 295/343 (86%) web 353/444 (79%) science 277/428 (64%) books 395/515 (76%) wikidata 231/416 (55%)
+TERRAIN_REACH W97h 11:18:35 ANSWER copy n= 2655 0.200|ANSWER reverse n= 2667 0.167|ANSWER sum n= 1579 1.170|
+TERRAIN_HOSTPANEL W97h panel_logic.tsv 11:20:13 NEXT_WRITE_DONE rows=168 run=32 window=- ms=194403 
+TERRAIN_HOSTPANEL W97h panel_terrain.tsv 11:21:07 NEXT_WRITE_DONE rows=96 run=32 window=- ms=248664 
+TERRAIN_READ_DONE mean_W97h 11:28:14 CAVITY_DONE ms=675089  rows_S=99844
+TERRAIN_PANEL W97h_mean 11:28:44 seen: words 41 in_lexicon 34 (82%) longest_copy 15 held: words 61 in_lexicon 43 (70%) longest_copy 15 unread: words 61 in_lexicon 46 (75%) longest_copy 16  || LONG W97h_mean: all words 273 in lexicon 198 (72%) writes that loop 3 of 20 longest run shared with its prompt 37 | code 43/54 (79%) web 50/57 (87%) science 30/53 (56%) books 47/57 (82%) wikidata 28/52 (53%)
+TERRAIN_LOUD W97h 11:34:19  lines=71
+TERRAIN_WIDE W97h 11:35:19 LONG W97h: all words 2137 in lexicon 1558 (72%) writes that loop 22 of 160 longest run shared with its prompt 74 | code 285/351 (81%) web 345/429 (80%) science 274/433 (63%) books 411/505 (81%) wikidata 243/419 (57%)
+W97_CAVITY W97c 11:49:58 CAVITY_DONE ms=878256
+W97_CAVITY4 W97c 12:08:43 CAVITY_DONE ms=1124541
+W97_THEORY THEORY_PANEL W97c logic: words 94 in lexicon 80 (85%) loops 1 of 8 longest shared with prompt 16 | theory: words 155 in lexicon 132 (85%) loops 0 of 12 longest shared with prompt 12
+W97_HPANEL W97c panel_acts.tsv 12:26:28 NEXT_WRITE_DONE rows=16 run=96 window=- ms=3655
+W97_HPANEL W97c panel_dialogue.tsv 12:26:47 NEXT_WRITE_DONE rows=12 run=96 window=- ms=18783
+W97_CAVITY W97h 12:41:25 CAVITY_DONE ms=877420
+W97_CAVITY4 W97h 13:01:14 CAVITY_DONE ms=1125383
+W97_THEORY THEORY_PANEL W97h logic: words 106 in lexicon 89 (83%) loops 0 of 8 longest shared with prompt 14 | theory: words 161 in lexicon 130 (80%) loops 0 of 12 longest shared with prompt 15
+W97_HPANEL W97h panel_acts.tsv 13:01:31 NEXT_WRITE_DONE rows=16 run=96 window=- ms=3561
+W97_HPANEL W97h panel_dialogue.tsv 13:01:50 NEXT_WRITE_DONE rows=12 run=96 window=- ms=18339
+W97_LAP_TRAVEL W97c material: |d|=1.14e+08,1.191e+08,1.249e+08 cos01=+0.181 cos12=+0.231 persistence=1.101 | level: |d|=1.763e+07,1.847e+07,1.953e+07 cos01=+0.261 cos12=+0.340 persistence=1.200 | third: |d|=5.367e+07,5.541e+07,5.749e+07 cos01=+0.214 cos12=+0.257 persistence=1.134
+W97_LAP_TRAVEL W97h material: |d|=1.105e+08,1.205e+08,1.237e+08 cos01=+0.144 cos12=+0.169 persistence=1.081 | level: |d|=1.823e+07,1.874e+07,1.984e+07 cos01=+0.192 cos12=+0.216 persistence=1.133 | third: |d|=5.415e+07,5.635e+07,5.732e+07 cos01=+0.192 cos12=+0.206 persistence=1.117
+W97_FRONTIER_HIST_STORE FRONTIER W97h; one place open: all 0.7053 (180879 places) | acts 0.9638 books 0.6937 code 0.4116 dialogue 0.9765 logic 0.4465 science 0.5761 theory 0.5950 web 0.7574 wikidata 0.9236 || less the control's, paired: -0.0176 (±0.0009) | acts -0.0529 books +0.0008 code +0.0059 dialogue -0.0698 logic -0.0148 science +0.0032 theory -0.0303 web -0.0018 wikidata +0.0013|FRONTIER W97h; the frontier: all 1.9425 (179795 places) | acts 2.2894 books 1.8242 code 1.5876 dialogue 2.2405 logic 1.7579 science 1.7849 theory 1.8798 web 2.0473 wikidata 2.0671 || less the control's, paired: -0.0152 (±0.0010) | acts -0.0489 books -0.0043 code +0.0074 dialogue -0.0536 logic -0.0129 science +0.0038 theory -0.0275 web -0.0080 wikidata +0.0069|
+TERRAIN_SCORE W97c whole 52/96 opening 55/96 first 71/96 | sum 9/9/10 of 16 difference 7/7/7 of 16 product 5/5/9 of 16 close 10/13/16 of 16 copy 10/10/13 of 16 reverse 11/11/16 of 16
+TERRAIN_SCORE W97h whole 50/96 opening 54/96 first 71/96 | sum 10/10/12 of 16 difference 6/6/6 of 16 product 5/5/7 of 16 close 9/13/16 of 16 copy 10/10/14 of 16 reverse 10/10/16 of 16
+W97_ALL_DONE 13:02:00
