@@ -435,8 +435,12 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let run = w.run as usize;
             let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _, _)| (p.as_slice(), run)).collect();
             let act_seed = seed ^ cut.pass.stretches.wrapping_mul(0x9E37_79B9_7F4A_7C15);
-            let mut drafts = learner.field.sample_runs(&release, run, 0, codec.void(), act_seed, 0, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
-            if w.refine > 0 {
+            // [definition; the lead, November 23, play] A draft world that refines draws each draft whole from one read and reopens it
+            // `refine` times (the release's runs, no bound on a run); otherwise the writer's sweeps draw one place a read.
+            let joint = w.records == 0 && w.refine > 0;
+            let (sweeps, passes, bound) = if joint { (1, w.refine as usize, i128::MAX) } else { (run, 0, 0) };
+            let mut drafts = learner.field.sample_runs(&release, sweeps, passes, codec.void(), act_seed, bound, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+            if w.refine > 0 && !joint {
                 // [definition; theory, November 16 20:39Z] Each draft redrawn once, place by place in landmark order, its predicted reaction known.
                 let lens: Vec<usize> = drafts.iter().map(|d| draft_places(&codec.decode(&d[..d.iter().position(|&c| c == codec.void()).unwrap_or(d.len())]))).collect();
                 let prompts: Vec<&[usize]> = acts.iter().map(|(p, _, _)| p.as_slice()).collect();
@@ -1565,9 +1569,9 @@ pub fn set_world(args: &[String]) -> Result<()> {
     if !before.slices.iter().any(|s| s.name == args[3]) {
         return Err(format!("a pass with no slice {}", args[3]).into());
     }
-    let refine = match args.get(8) { Some(r) => r.parse::<u64>().map_err(|_| "REFINE is zero or one")?, None => 0 };
-    if refine > 1 {
-        return Err("REFINE is zero or one".into());
+    let refine = match args.get(8) { Some(r) => r.parse::<u64>().map_err(|_| "REFINE is a count")?, None => 0 };
+    if refine > 1 && args[5] != "0" {
+        return Err("REFINE is zero or one for a world of records (a draft world's is its count of passes)".into());
     }
     let world = holonics_engine::field::PassWorld { slice: args[3].clone(), every: positive(&args[4])? as u64, records: args[5].parse::<u64>().map_err(|_| "RECORDS is a count (zero: a draft world)")?, run: positive(&args[6])? as u64, refine };
     let pass = StorePass { world: Some(world), ..before.clone() };
