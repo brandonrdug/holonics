@@ -140,11 +140,12 @@ pub struct Region<'a> {
     /// half and the third at a fifth, and no tick carries a farther place in; the frontier binds about three places, and `E₊`'s
     /// entries, as many as `E₋`'s, stood idle in a one-sided stream. No meaning on a region of the law.
     pub second: bool,
-    /// [definition; the lead, November 23, play (Brandon, November 23 01:13Z: reinforcement and play); `agent-inferred`] **What a
+    /// [definition; the lead, November 23; `agent-inferred`] **What a
     /// strand's open places are compared with**: in a passage read by two streams ([`Region::strand`]) the known stream is `classes`
     /// and the open place at each place is compared with `targets` there, one a site. Her own draft can then stand in the known stream
     /// while the passage's own symbols are what each place is compared with: each place is read from what she wrote before it and
-    /// compared with what the passage holds (the arm of play, the Nov 23 record §10). None, the law as it stood: the open places are
+    /// compared with what the passage holds (the draft world's arms, the record of November 23 on her drafts; Brandon's 19:49Z note says
+    /// that grading her drafts against a passage is not play). None, the law as it stood: the open places are
     /// compared with the known stream's own symbols. Refused on a region that is not read by two streams.
     pub targets: Option<&'a [usize]>,
 }

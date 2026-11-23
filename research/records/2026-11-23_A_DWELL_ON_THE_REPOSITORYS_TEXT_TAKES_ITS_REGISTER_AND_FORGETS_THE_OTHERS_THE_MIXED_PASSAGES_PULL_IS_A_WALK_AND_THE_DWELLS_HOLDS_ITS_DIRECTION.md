@@ -159,7 +159,8 @@ is the subject the review of November 17 named (§4.2 and §4.3 of [the phase's 
 
 ## 10. What follows
 
-- **Play**, her own drafts in her passage with the passage's continuation as the answer, is the one change the arms leave untried on
+- (Corrected by Brandon, November 23 19:49Z, in [the record of her drafts](2026-11-23_PLAY_IS_HER_OWN_DRAFT_COMPARED_WITH_THE_PASSAGE_ONE_LAP_AT_A_THREE_HUNDREDTH_OF_THE_PLACES_MOVES_NEITHER_HER_DRAFTS_NOR_HER_WRITES_AND_A_DRAFT_COSTS_A_READ_A_PLACE.md) §0: what follows was graded drafting,
+  not play, which has no right answer and is answered in kind.) **Play**, her own drafts in her passage with the passage's continuation as the answer, is the one change the arms leave untried on
   text; the arithmetic world of November 16 trained no behaviour because the prediction it asked needed a product no descent reaches (the
   review, §4.1), and a text world asks the same engine for a continuation, so it is read beside the composition it needs.
 
