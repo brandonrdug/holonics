@@ -1,0 +1,2 @@
+arm_W93 all n=1842378 mean=0.2253 material: n=1540034 mean=0.2270 rms=0.2939 share_over_0.5=0.0901 | level: n=41544 mean=0.2207 rms=0.2790 share_over_0.5=0.0732 | third: n=260800 mean=0.2163 rms=0.2720 share_over_0.5=0.0660 (floor 0.2060)
+arm_W93j all n=1842295 mean=0.1887 material: n=1539951 mean=0.1889 rms=0.2447 share_over_0.5=0.0437 | level: n=41544 mean=0.1877 rms=0.2372 share_over_0.5=0.0380 | third: n=260800 mean=0.1876 rms=0.2359 share_over_0.5=0.0348 (floor 0.2060)

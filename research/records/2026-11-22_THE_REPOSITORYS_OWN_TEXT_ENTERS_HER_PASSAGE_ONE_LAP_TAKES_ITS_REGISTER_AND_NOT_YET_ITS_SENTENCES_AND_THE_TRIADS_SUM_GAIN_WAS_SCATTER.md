@@ -1,6 +1,6 @@
 # The repository's own text enters her passage: one lap takes its register and not yet its sentences, and the triads' sum gain was scatter
 
-November 22, 2026, 15:40 to 20:40 UTC, the lead, on the PC. Refs #404. It follows [the record of the top digit](2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md).
+November 22, 2026, 15:40 UTC, to November 23, 01:40 UTC, the lead, on the PC. Refs #404. It follows [the record of the top digit](2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md).
 Receipts: [`receipts/2026-11-22_theory/`](receipts/2026-11-22_theory/) and, for the triads' second lap,
 [`receipts/2026-11-22_junction/arm_W90x.txt`](receipts/2026-11-22_junction/arm_W90x.txt).
 
@@ -28,7 +28,7 @@ stay out of the line.
 for the theory (the records dated November 20 to 22, which no state has read) and a keyed 3% of the Lean files. Built at `df684d1` into
 `store-2026-11-22` beside the five slices of before ([`STORE_2026-11-22.tsv`](receipts/2026-11-22_theory/STORE_2026-11-22.tsv)): theory
 1,799 documents and 26.3 MB, 16 held; logic 1,902 files and 36.8 MB, 45 held. The store's slice list names them (`store.rs` `SLICES`).
-By quota (each slice's octets) the repository's text is 6% of a pass, about 9 MB of a lap's 150.
+By quota (each slice's octets) the repository's text is 6% of a pass, about 3 MB of a lap's 54 (corrected November 23: the join's three laps took 162 MB of places, which W93j's pass line counts).
 
 `join-store` puts a state's pass on the grown store at a new pass, every slice at its first piece. The line stood 38% into its second pass,
 so the five old slices begin again from their first pieces.
@@ -73,6 +73,20 @@ on the Lean ([`theory_panel_W92j.written`](receipts/2026-11-22_theory/theory_pan
 magnitudes missed on both laps and its cost held on both, so the join stays an arm; the third lap runs under G-T2
 ([`GUESS_T2.txt`](receipts/2026-11-22_theory/GUESS_T2.txt)), whose rule says what the line does with each outcome.
 
+**The third lap** (W93j from W92j's end beside W93 from W92's, 22:47 to 01:08 UTC, [`arm_W93j.txt`](receipts/2026-11-22_theory/arm_W93j.txt)):
+held theory −0.0769 and held Lean −0.1300 nats a place, one place open and paired; the five old registers −0.0005 to +0.0045; at the
+frontier theory −0.0613, Lean −0.1345, the old registers +0.0064 to +0.0212. The register's own terms in her panel writes stand at 5
+distinct on the theory prompts against the control's 3, and 5 against 6 on the Lean
+([`theory_panel_W93j.written`](receipts/2026-11-22_theory/theory_panel_W93j.written),
+[`theory_panel_W93.written`](receipts/2026-11-22_theory/theory_panel_W93.written)); her sentences stay noise in both arms. G-T2: (a)
+and (b) held, (c) missed, so by its rule the join stays an arm and the theory's share of a pass is the next change.
+
+**The deposit's moments on the two end states** ([`moments_W93.txt`](receipts/2026-11-22_theory/moments_W93.txt),
+`tools/moment_coherence.py`, the audit of November 18's read): the mean of `|m| / (⌊√v⌋ + 1)` over the entries with a second moment is
+0.225 on W93's end and 0.189 on W93j's, against 0.206 for pulls with no consistent sign (the material, the level and the third block
+alike in each). No entry of either state receives a pull that keeps its sign, and the joined passage's pulls cancel more than the
+line's: a mix of seven registers pulls each entry several ways at once.
+
 **The chirality pass's reads** (host, W91's mean, the 800 held rows by two streams; the coordinator's relays, the guesses its own):
 the pumped circles' site moves are 47.5% turns, 20.1% locks and 32.5% hand flips ([`moves_W91.txt`](receipts/2026-11-22_theory/moves_W91.txt):
 locks flat at 0.20 over every surprise fifth, flips 0.37 at spaces); each circle holds its hand along its scan (consecutive turns agree
@@ -84,8 +98,19 @@ circle's nearest turn row by `|cos|`, median 0.27, has the opposite hand 0.496 o
 
 ## 6. What follows
 
-- **The share.** At its quota the repository's text is 9 MB of a lap: the line meets each held record's register a few times a pass.
-  What share of a pass the theory takes is the next choice, read against the old registers' cost, which one lap puts at nothing.
+- **Reinforcement and play** (Brandon, November 23 01:13Z: "reinforcement and play are likely the solutions still", with a request to be
+  careful and reflective about what he means). The lead's reading, from his words of November 16 and 21 (feedback as friction and as
+  agreement that induces resonance, the network's tug-of-war that never pulls one string forever, no arithmetic or code without tension
+  reinforcement, the wiggle that tests where one can move): reinforcement is tension that holds, a knot that tightens where the pulls
+  reaching it keep agreeing and loosens where they cancel, never a reward; play is her own act meeting an answer, with room to err, so
+  she finds the generator rather than reciting the specimen. Against the engine: every lap reads the passage by two streams and her
+  writes meet no answer (the world of November 16 was the one exception); the moments above say nothing is reinforced; cooling the whole
+  rate on November 18 stopped the walk and moved no write, so what is missing is per knot; and nothing pairs the circles' opposite
+  hands (§5), so no knot forms (`agent-inferred`).
+- **The share, as a dwell.** At its quota the repository's text is 6% of a pass, about 3 MB of a lap's 54. The dwell's lap holds the
+  theory and the Lean eight times in the store (`tools/store_dwell.py`, store `store-2026-11-23-dwell8`), so W93j's pass, moved there,
+  reads about 67 MB of them alone before the mix resumes: the simplest test of "the same pull comes back", with the moments read again
+  (G-T3, [`GUESS_T3.txt`](receipts/2026-11-22_theory/GUESS_T3.txt)).
 - **The ruler of a write on the theory.** The lexicon share does not separate the arms; the theory's own terms (the objects' names, the
   records' and Lean's recurring forms) counted in her writes, and the code of a held record's continuation, are the reads.
 - **The tension read on two streams** (the record of the top digit, §5) still owes its planted law: its chart removes nothing of the open
