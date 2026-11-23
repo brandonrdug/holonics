@@ -1,6 +1,6 @@
 # A dwell on the repository's text takes its register and forgets the others; the mixed passage's pull is a walk, and the dwell's holds its direction
 
-November 23, 2026, 01:10 to 06:40 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 22](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
+November 23, 2026, 01:10 to 10:30 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 22](2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
 whose §6 reads Brandon's note of 01:13Z on reinforcement and play against the engine. Receipts: [`receipts/2026-11-23_dwell/`](receipts/2026-11-23_dwell/).
 
 On the objects: the navigator is her writer at the frontier; the terrain is the passage, here the repository's own guides, records and
@@ -119,12 +119,45 @@ store they are about 21% of a pass, the theory and the Lean 27%, the five regist
 on the held history (what she writes after a logged call's line, and after a model turn opens) shown raw to Brandon and scored by no
 clause.
 
-## 8. What follows
+## 8. The history's first lap, and a correction
 
-- **Play** stays the next change after the history: her drafts entering her passage with an answer, the curated tool calls being the
-  answers already logged.
+W96h (W95m's end joined at a new pass to the history store) beside W96c (the same reset on the dwell store), 3,000 sections each on
+`e5h`, whose entry reproduced W95m's lap ([`gate_e5h.txt`](receipts/2026-11-23_dwell/gate_e5h.txt)): held dialogue −0.052 and held
+acts −0.039 nats a place, one place open (G-T5 asked 0.15: missed); every other register within 0.012 (held); the theory panel's own
+terms 7 against 10 (missed by one); the material's persistence 1.022 (missed). Her writes after a held call's line carry a `$` and a
+command's shape more often than the control's, and no result's. By G-T5's rule the history stays an arm for a second lap (G-T6,
+[`GUESS_T6.txt`](receipts/2026-11-23_dwell/GUESS_T6.txt)).
 
-## 9. The failures this could repeat
+The correction: W96c is the mixed share's second lap, and its material's persistence reads 0.981. G-T4's 1.111 was a first lap's
+drift toward a new mix, as §6 allowed, and no mix has yet held a pull past its first lap. G-T4's rule read that clause as the one that
+brings the history in; the history came in on a transient.
+
+## 9. What the arms say together
+
+Within about a lap she takes a register's surface (its words, its forms, a `$` before a command) and then her state walks. An entry's
+first moment keeps its sign over a thousand sections half the time in every arm, the dwell's included
+([`moment_sign.txt`](receipts/2026-11-23_dwell/moment_sign.txt), `tools/moment_sign.py`), so the pull that persists over a lap is a
+small collective drift and no entry's own. Against plain counts ([`before_count.txt`](receipts/2026-11-23_dwell/before_count.txt),
+`tools/before_count_ruler.py`, the cloze ruler of November 17 read one-sided; [`frontier_two_streams_W96c.txt`](receipts/2026-11-23_dwell/frontier_two_streams_W96c.txt)):
+
+| held, nats a place | a count of the bytes before (16 MB): 3, 4, 5 before | W96c, the writer's regime by two streams | W96c with 512 to 1,023 places known |
+|---|---|---|---|
+| books | 1.906, 1.760, 1.732 | 1.405 | 1.261 (all slices) |
+| theory | 1.862, 1.715, 1.707 | 1.463 | |
+| web | 1.977, 1.798, 1.771 | 1.583 | |
+
+She writes 0.25 to 0.33 nats a place under a count of the five bytes before and uses a long context (3.20 nats a place with one place
+known, 1.26 with 512 or more), and she stands at about two bits a byte where a sentence needs well under one. The registers, the mix
+and the history move what she copies; none moves that level. What limits her writes is what the engine composes from its context, which
+is the subject the review of November 17 named (§4.2 and §4.3 of [the phase's review](2026-11-17_THE_PHASE_REVIEWED_THE_ENGINE_RIDES_AND_NEVER_FOUNDS_ON_PROSE_IT_CODES_NO_BETTER_THAN_A_COUNT_OF_THREE_NEIGHBOURS_A_SIDE_THE_ARITHMETIC_WORLD_TRAINED_NO_BEHAVIOUR_AND_A_PLATEAU_WAS_REPORTED_AS_A_LEVEL.md)).
+
+## 10. What follows
+
+- **Play**, her own drafts in her passage with the passage's continuation as the answer, is the one change the arms leave untried on
+  text; the arithmetic world of November 16 trained no behaviour because the prediction it asked needed a product no descent reaches (the
+  review, §4.1), and a text world asks the same engine for a continuation, so it is read beside the composition it needs.
+
+## 11. The failures this could repeat
 
 - **Bits read as progress.** The held theory fell 0.15 nats a place; the record opens with her writes and says first that no sentence
   composes.

@@ -1,0 +1,2 @@
+FRONTIER W96c; the frontier, each stretch read by two streams: all 1.4553 (179795 places) | acts 1.8959 books 1.4047 code 1.0201 dialogue 1.8897 logic 1.1690 science 1.2513 theory 1.4627 web 1.5831 wikidata 1.4184
+FRONTIER W96c; each stretch read by two streams, by places known: 1: 3.198 | 2 to 3: 2.558 | 4 to 7: 2.005 | 8 to 15: 1.836 | 16 to 31: 1.684 | 32 to 63: 1.545 | 64 to 127: 1.412 | 128 to 255: 1.371 | 256 to 511: 1.302 | 512 to 1023: 1.261
