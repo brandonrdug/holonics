@@ -1,11 +1,12 @@
 # A fading medium carries by a cycle with a hand and keeps what a common turn leaves, a count or a pair of opposite hands: a unit is a loop that nearly closes, its comma is its remainder, and nested-depth is an index
 
-November 23, 2026, 20:48 to 21:55 UTC, a cloud thread. Refs #404, #410. Four notes of Brandon's of that day (20:47, 21:07,
+November 23, 2026, 20:48 to 22:40 UTC, a cloud thread. Refs #404, #410. Four notes of Brandon's of that day (20:47, 21:07,
 21:12 and 21:39 UTC) and two guesses of the coordinator's, derived and joined to their owners. Nothing here ran on the card or opened a state
 of the line. The readings are of the tree's source and atlas, of a host ruler on drawn numbers and on constants of the literature
 ([`receipts/2026-11-23_handed_cycle/`](receipts/2026-11-23_handed_cycle/)), and of six reads the lead took on the line's saved
 mean W99 at this thread's asking, each scored against a guess fixed before it (§13), and of a letter from Neon weighed against the code it cites (§19). Lean: `HolonicsResearch/HNN/HandedCycle` (new,
-48 statements). The synthesis of §2 was told to Brandon at 21:01 UTC, before the Lean was checked and before any read, as he asked.
+50 statements). The synthesis of §2 was told to Brandon at 21:01 UTC, before the Lean was checked and before any read, as he asked.
+§21 was added from 22:32 to 22:40 UTC, after the lead's reads of the level's own comparison.
 
 ## 1. The lens
 
@@ -495,20 +496,21 @@ the weights on her state below are set with that in view.
 
 ## 16. Lean
 
-`lean/HolonicsResearch/HNN/HandedCycle.lean`, 48 statements, imported from `lean/HolonicsResearch.lean`:
-`bash tools/lean_check.sh HolonicsResearch.HNN.HandedCycle`, 3006 jobs, no warning. Twelve sections: a retraced stroke and a loop;
+`lean/HolonicsResearch/HNN/HandedCycle.lean`, 50 statements, imported from `lean/HolonicsResearch.lean`:
+`bash tools/lean_check.sh HolonicsResearch.HNN.HandedCycle`, 3006 jobs, no warning. Thirteen sections: a retraced stroke and a loop;
 the least cycle with a hand; what a common turn leaves; a shift with a floor; nested-depth as an index; order in the skew half; a
 second invariant of one sign; a chosen query; a chain of relative moves; a unit, its comma and its parts; a common stretch and
-mutual loss; a face and its underside. Each statement is finite and elementary. None is a step toward a target's proof, and #410 gains no box: the three
+mutual loss; a face and its underside; a size as one reader's gauge and another's state (§21). Each statement is finite and elementary. None is a step toward a target's proof, and #410 gains no box: the three
 statements a later pass could take there are the index of the shift as a winding (Mathlib holds no Toeplitz index), the turn a
 loop of two stretches leaves in closed form, and Fjørtoft's bound for a continuum of members.
 
 ## 17. What changed
 
 - `lean/HolonicsResearch/HNN/HandedCycle.lean` (new) and its import.
-- This record, the host ruler `receipts/2026-11-23_handed_cycle/handed_cycle.py` with its output, and `GUESS.txt` with nine guesses,
-  five of them scored, and one sentence scored without a read.
-- Atlas: fifteen rows (`swing.retraced-stroke-moves-nothing`, `swing.three-states-least-hand`,
+- This record, the host ruler `receipts/2026-11-23_handed_cycle/handed_cycle.py` with its output, and `GUESS.txt` with eleven guesses
+  (G-H1 to G-H11): five scored on the lead's reads of W99, G-H8 scored on the level's own comparison (§21), and one sentence
+  scored without a read.
+- Atlas: sixteen rows (`receiver.size-is-one-readers-gauge-anothers-state`, added with §21; `swing.retraced-stroke-moves-nothing`, `swing.three-states-least-hand`,
   `pair.common-turn-leaves-opposite-hands`, `tower.level-is-difference-tone`, `radix.floored-shift-push-pop`,
   `code.nesting-depth-is-index`, `key.loop-closes-a-sleeping-link`, `receiver.order-in-the-skew-half`,
   `fluid.one-signed-invariant-bounds-fine-grain`, `key.chosen-query-halves`, `hodge.class-singlet-of-its-circle`,
@@ -531,6 +533,12 @@ loop of two stretches leaves in closed form, and Fjørtoft's bound for a continu
 - **A read dismissed before its owner was read.** "G-H5 says little" was sent to the lead eight minutes after the guess. The
   one-sided cut hands every place of an epoch the row of the epoch before, so the read is the cleanest there is of what the level
   hands on. Scored as a miss in the guess file.
+- **A cost on record under another name.** No guess here named a number for what the level's own comparison would cost the
+  registers, and it cost 0.025 to 0.060 nats a place (§21). The row `tower.heading-closure` had recorded on October 30 that a
+  level's comparison cost the arrivals where its covector reached their terrain, and the design row of November 17 cites the
+  decision of November 3 that followed from it. G-H8 was fixed on the receipt's code and three rows of the level; these two rows
+  were read after the result. The search before a guess names the operation (a level compared at its own grain) and not only
+  the part.
 - **A fit told before its forward test.** The `0.675^5.7` fit was marked as a fit when it was told and was wrong within twenty
   minutes. A fit is now told with the read that would break it.
 - **A lens filed as changing nothing.** Four constructions are named (§15.1, §15.3, §15.4, §15.5) and three reads are fixed.
@@ -664,6 +672,111 @@ of the rings of period 128 and more (0.8); every held register within 0.003 nats
 term can enter as a constant of integration (Einstein 1919) are the literature's, named as the charts the note points at; the
 tree's own reading of the last is the record of August 25. What transfers is the test of the first paragraph and the split of the
 third.
+
+## 21. The level's own comparison, read: a size is a gauge to one reader and a state to another
+
+**The lead's read** (relayed at 22:23 UTC; the lap's receipts are the lead's). The line with the level's receipt (`Scale::receipt`,
+the lap W101r) beside its control (W101), both from one saved state and read at their means. At a word's start the word two
+before reads 0.025 with the receipt and 0.024 without, where the lead's guess G-L1 asked 0.05. Every held register stands 0.025 to
+0.060 nats a place worse with the receipt, and the writes did not improve. The level travelled 2.7 times as far as the control's
+over the lap, in a steady direction. The lead reads the cost as the receipt's comparison opposing the passage's through the
+restriction's covector into the fine field the two share, and names the next change: one comparison a word, at its first place,
+with the pull kept inside the level, beside a control.
+
+**Scores.**
+
+| Guess | Read | Score |
+|---|---|---|
+| G-L1, the lead's: the word two before at 0.05 or more | 0.025 beside 0.024 | Missed |
+| G-H8 (b): 0.35 that G-L1's clause holds | the clause did not hold | The weight leaned to a miss and the miss came |
+| Neon's stamped guess of 21:29:10 UTC: the clause misses | as above | Held on the clause; "the block wakes" has no read |
+| G-H8 (a): the word before at 0.020 or more at one of letters 4 to 6 | 0.005, 0.004, 0.005 (W99: 0.005, 0.004, 0.004) | Missed |
+
+No guess of this record named a number for the registers under the receipt, so the cost was foreseen by none of them (§18).
+G-H6, G-H9, G-A1 and G-A3 are untouched by this read.
+
+**What the tree held.** The operation is a level compared at its own grain, and two rows hold it. `tower.heading-closure`
+(October 30): a clocked level's closure against the section's spans located its trace and cost the arrivals where its covector
+reached the arrivals' terrain, and stayed at flat, with the arrivals reading as without it, where it was kept on the level's own
+material. `tower.level-receipt-codec-and-square` (November 17) cites the decision of November 3 against a receipt at the level's
+grain, taken for that cost. A past configuration is an instruction and no verdict: what resembles is a comparison of the level's
+own whose covector reaches the fine terrain, and what differs is the comparison (at the fine face through the level's own route,
+where October's was a contrast among spans), the level (the engine's, with `A`, its own field and `B⁻`, where October's kept only
+the heading's read) and the length (one lap of 3,000 sections). The lead's next change is October's second arm on today's level.
+
+**What the owner says.** The receipt reads the prolonged row alone through `opening_read`, which charts each face lane as a ratio
+to its own power (`lane_chart`, `ratio_to_power`). Scale the row and the receipt's code stands, so the row's size is the
+receipt's gauge. Its covector on the row has no component along the row and is as large as one over the row's size
+(`ratio_adjoint`; Lean `ratio_reader_takes_no_step_along_size`, `ratio_reader_step_is_one_over_size`): the receipt holds no
+balance on the size, and pulls hardest on a row that is small. The passage's own pass adds the same row to each place's state
+before the later fine ticks, unscaled (`scale.rs`, the prolongation), so there the row's size against the state's is read. By
+§20's test that ratio of two powers is a state: it stands under every change of units, and the second reader's face moves with
+it. One part has two readers, its size is a gauge to one and a state to the other, and only the second sizes it
+(atlas `receiver.size-is-one-readers-gauge-anothers-state`). This is also where §19's second difference lands: a deposit's step
+is lawfully a turn exactly where a block is read as a ratio to its own power, and the receipt's read of the row is such a read.
+
+**Two routes, which one lap does not tell apart.**
+
+- *Back.* The receipt's covector passes through `B⁻`, the level's ticks and the restriction into the known sites' states and the
+  fine material. This is the lead's reading, and the receipt's own test names the route (the encoding takes the covector through
+  the restriction).
+- *Forward.* The receipt turns or grows the row, and the passage's own pass then adds that row at every place. No covector need
+  reach the fine field for the registers to pay.
+
+Keeping the pull inside the level closes the first route and leaves the second, at the new dose (one comparison a word in place
+of one a place). Guesses fixed at 22:28:55 UTC, before any further read (`GUESS.txt`), on two host reads of the two saved means:
+
+- G-H10 (a), 0.55: the power of the prolonged row over the power of the state it joins, a mean over the open places, is at least
+  1.5 times as large with the receipt as without.
+- G-H10 (b), 0.5, a coin and named one: the control's fine field spliced with the receipt's level and glue carries at least
+  half of the loss on the register that lost most, and the other splice carries less than half. Held, the cost went forward.
+  With the splices reversed, it went back.
+
+The fine field's travel with the receipt over the control's tells the same thing from the lap's own counters: near one, the
+fine material did not move further and the cost is forward.
+
+**The next change, guessed** (G-H11, the same stamp; the change as relayed, read at lap means beside its control). (a) 0.6:
+every held register within 0.003 nats a place of its control. (b) 0.3: the word two before at a word's start reads 0.05 or more.
+The tree's rows lean against (b): on lap 94's mean nothing linear in a unit's moments relieved the fine comparison at the level's
+locus (`deposition.no-linear-tension-at-the-levels-locus`), and October's closure kept on the level's own material stayed at
+flat. What gives it room: a restriction located from the keys held an epoch's leading symbol at 0.420 where the built one holds
+0.152 (`tower.level-restriction-is-its-draw`), so a comparison confined to the level can move `A` off its draw. If (a) misses
+with the pull inside the level, the row's size is the lever, and the statement above says whose it is.
+
+**The lead's further reads** (relayed at 22:36 UTC), with what they do to this record's statements.
+
+- *Travel, with the receipt over the control's, in the lap's three windows:* the fine field 1.30, 1.22 and 1.08; the level 2.64,
+  2.15 and 1.98. Some of the pull went back into the fine material early, and by the last window the fine field moves nearly as
+  the control's does. The registers are read at that window's mean and still stand 0.025 to 0.060 worse, so the travel alone
+  does not choose between the routes; the splices of G-H10 do, and they wait for the card's lock.
+- *The level's units under a one-sided stream* (`tools/strand_cut_ruler.py` on W101's mean, the same 19,351 word starts): 35,007
+  anchors over 125,404 places, 3.6 places an epoch, 36% of anchors at a word's first letter, 45% inside a word and 19% at a space
+  or a mark. At a word's first letter the epoch handed ends 2 to 5 places earlier (median about 3) and is the word before's 30%
+  of the time, the inside of the word before 25% and the word two before's 18%. The row stands at 0.08 of the state's power at
+  open places and 0.12 at word starts.
+- *A reason withdrawn before its read.* §19 gave G-H7 (a) the reason that G-H3's rise is the handoff an epoch late. The epoch
+  handed at a word's start is seldom the word two before's, and less often under a longer word between, where G-H3's share
+  rises with that length. The reason is withdrawn. G-H7 (a) is reweighed from 0.6 to 0.3 and G-H11 (b) from 0.3 to 0.15, stamped
+  before their reads; the first weights stay on file and both are scored.
+- *Where the 3.6 places come from.* The level's section is the flat face's code over the alphabet (`level_section`, 5.50 nats at
+  244 classes), and the one-sided anchor (`level_anchors_before`) leaves about one section an epoch; the two-sided cut read 8.56
+  places and 9.48 nats on November 17 (`tower.level-holds-no-unit`). The level's unit is counted from the codec's alphabet. By
+  the test of November 21 that is a gauge: the same passage coded in bits would cut epochs of about half a byte, with nothing
+  of the passage or of the fine field changed. A unit counted from the level under it, the news over which the fine field's own
+  holding falls to its floor, comes for this codec and this line to about the same number, so nothing of the line changes on
+  this today. It is a row owed under #1088, and it is the law of §8 at the level: a unit closes where the parts' own loop
+  nearly closes, and the codec's symbol is none of the level's parts.
+- *The ruler's grain.* Every read of §13 and of this section is cut by words and letters, which is the ruler's grain. The
+  level's founded grain is its epoch. What the level hands on is read at that grain by the rows of November 17 and 18 (the epoch
+  before as a bag at 0.163 in the level's read beside 0.168 in the fine read), and a read of the epoch two and three before is
+  the level's own question.
+
+**§14 and §15 after the read.** The 0.35 on G-L1's clause is scored. The 0.6 against 0.2 on the form of the level's own
+comparison is now under test by the lead's next change, and the 0.3 of G-H11 (b) is a different statement: that the better form
+of the two lifts the word two before to 0.05 within a lap. §15's first item named the restriction's products of opposite hands as
+one arm if G-L1 missed. It has missed and the arm stands named; beside the lead's next change it is a second change and so a
+second arm. The 0.8 and 0.4 of §5's row are unchanged: a comparison of the row with the symbols did not make a linear level
+hold the word two before, which agrees with §5 and with the row of November 18 and is no test of the product.
 
 ## Sources
 
