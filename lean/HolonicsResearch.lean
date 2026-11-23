@@ -1489,3 +1489,4 @@ import HolonicsResearch.HNN.WidthTolerance
 import HolonicsResearch.HNN.GrainRelation
 import HolonicsResearch.HNN.AnsweredAct
 import HolonicsResearch.HNN.HandedCycle
+import HolonicsResearch.HNN.ReachAndCapacity

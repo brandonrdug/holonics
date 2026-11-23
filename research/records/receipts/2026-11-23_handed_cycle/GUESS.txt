@@ -232,3 +232,18 @@ G-H14, on an arm nobody has built (the handed row written to a face lane of its 
   only if G-H12 holds:
   (a) (0.5) at least one held register 0.003 nats a place or more under its control;
   (b) (0.7) the last byte of the epoch before the handed one reads 0.07 or more in the final read (0.017 now).
+
+Scored 2026-11-23T23:47:50Z, from the lead's read of the splices (one place open on the held set of store-2026-11-22, 140,564 places, each
+less W101, paired):
+    SPa (W101's fine field, W101r's level and glue)   +0.0792 (0.0012); books +0.0839, code +0.0430, logic +0.0551,
+        science +0.0617, theory +0.0350, web +0.0800, wikidata +0.1947
+    SPb (W101r's fine field, W101's level and glue)   +0.0378 (0.0009); books +0.0342, code +0.0328, logic +0.0275,
+        science +0.0380, theory +0.0429, web +0.0378, wikidata +0.0513
+    W101r itself                                       +0.0355 (0.0009); wikidata +0.0602
+G-H10 (b): MISSED on its second clause. On the register that lost most (wikidata) SPa carries 3.2 times the arm's loss and SPb
+  0.85 of it, where the guess had the second splice under half. Neither route alone: both splices carry at least half.
+  What the read says, as the lead reads it: W101r's fine field costs about the arm's whole cost whichever level it is read with
+  (+0.0378 beside +0.0355), so the lap's cost stands in the fine material, by the return through the restriction (R1) or by the
+  fine field answering a level that pulls another way; and the receipt's level beside a fine field that never met it costs
+  twice the arm, so the forward route (R2) runs too and W101r's fine field had made room for it, which fits its row at a third.
+  Both splices are unmatched pairs, so a term of mismatch rides in each, and the two routes are not yet apart.
