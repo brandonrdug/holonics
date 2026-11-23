@@ -116,3 +116,69 @@ G-H9 (a) (0.55, as told at 21:40Z) the word before at the present word's third l
      (b) (0.8) the located fades leave their one value: over the rings of period 128 and more, the fade a radian at the lap's mean
          stands under 0.5 of the founding's on at least half of them;
      (c) (0.7) every held register within 0.003 nats a place of its control (the founding is the line's own law).
+
+Scored 2026-11-23 on the lead's read of the receipt's arm (W101r beside W101, relayed at 22:23Z): at a word's start the word two
+before reads 0.025 in the arm and 0.024 in its control, where G-L1 asked 0.05; every held register stands 0.025 to 0.060 nats a
+place worse; the writes did not improve; the level travelled 2.7 times as far as the control's, in a steady direction.
+G-L1 (the lead's): MISSED.
+G-H8 (b), the 0.35 that G-L1's clause holds: the clause did not hold. The weight leaned to a miss and the miss came.
+Neon's stamped guess of 21:29:10Z (the clause misses): HELD on the clause; "the block wakes" has no read (W99's block stood
+  nonzero before the arm).
+G-H8 (a), the word before at letters 4 to 6: no number relayed; unscored until the line by letter on W101r's mean is read.
+Not named by any guess here: the arm's cost. No number was fixed for the registers, and none of this file's guesses foresaw a
+  loss of 0.025 to 0.060.
+Untouched by this read: G-H6, G-H7, G-H9, G-A1, G-A3.
+
+Fixed 2026-11-23T22:28:55Z (date -u), after the receipt's form was read at its owner (crates/engine/src/field/scale.rs lines 709 to 733 and
+757 to 812; moment.rs opening_read; contact.rs lane_chart; ratio.rs ratio_to_power and ratio_adjoint; the test
+the_levels_receipt_reads_its_prolonged_rows_and_returns_through_the_level_alone) and its rows (atlas
+tower.level-receipt-codec-and-square, tower.level-restriction-is-its-draw, deposition.no-linear-tension-at-the-levels-locus,
+tower.heading-closure). Guesses; whether a read runs is the lead's.
+What the owner says. The receipt reads the prolonged row alone through opening_read, which charts each face lane as a ratio to
+  its own power. The row's power is therefore the receipt's gauge: scale the row and the receipt's code stands. Its covector on
+  the row is at right angles to the row lane by lane and is as large as one over the row's power (ratio_adjoint). The passage's
+  pass adds the same row to each place's state before the later fine ticks, unscaled, so there the row's power against the
+  state's is a state. One row has two readers; it is a gauge to one and a state to the other, and only the second holds a
+  balance on it. The cost has two routes that the arm does not tell apart: (R1) back, the receipt's covector through the
+  restriction into the known sites' states and the fine material (the lead's reading); (R2) forward, a row the receipt turned or
+  grew, added to every place's state in the passage's own pass, with no covector reaching the fine field at all.
+G-H10, two host reads on the two saved means (W101r's and W101's MEAN.3000, held passages, no card):
+  (a) (0.55) the power of the prolonged row over the power of the state it is added to, a mean over the open places, is at least
+      1.5 times as large in W101r as in W101;
+  (b) (0.5, a coin, named as one) a state spliced from W101's fine field and W101r's level with its glue (A, b_A, B-minus, its
+      offset, the level's field) loses, on the held register that lost most in the arm, at least half of what the arm lost
+      there; the other splice (W101r's fine field, W101's level and glue) loses less than half. Held: the cost went forward
+      through the handoff (R2). Missed with the splices reversed: it went back through the restriction (R1).
+G-H11, on the lead's next change as relayed (one comparison a word at its first place, the pull kept inside the level, beside
+  a control, read at lap means):
+  (a) (0.6) every held register within 0.003 nats a place of its control;
+  (b) (0.3) the word two before at a word's start reads 0.05 or more.
+  The tree's own rows lean against (b): on lap 94's mean nothing linear in a unit's moments relieved the fine comparison at the
+  level's locus (deposition.no-linear-tension-at-the-levels-locus), and the closure of October 30 kept on the level's own
+  material stayed at flat while the arrivals read as without it, where on the arrivals' terrain it located its trace and cost
+  the arrivals (tower.heading-closure). What differs now: the level's own material is larger (A, the level's field, B-minus),
+  and a restriction located from the keys held the leading symbol at 0.420 where the built one holds 0.152
+  (tower.level-restriction-is-its-draw), so a comparison confined to the level has room to move A off its draw.
+
+Scored 2026-11-23 on the lead's further reads (relayed at 22:36Z):
+G-H8 (a): MISSED. On W101r's mean the word before at letters 4 to 6 reads 0.005, 0.004, 0.005 (W99: 0.005, 0.004, 0.004); 0.020
+  was asked at one of them.
+Read beside it, the lead's (tools/strand_cut_ruler.py on W101's mean, the same 19,351 word starts): 35,007 anchors over 125,404
+  places, 3.6 places an epoch; 36% of anchors at a word's first letter, 45% inside a word, 19% at a space or mark. At a word's
+  first letter the epoch handed ends 2 to 5 places earlier (median about 3) and holds the word before 30% of the time, the inside
+  of the word before 25%, the word two before 18%. The row stands at 0.08 of the state's power at open places, 0.12 at word
+  starts. Travel with the receipt over the control's, in the lap's three windows: the fine field 1.30, 1.22, 1.08; the level
+  2.64, 2.15, 1.98. G-H10's two reads are written and wait for the card's lock (near 23:10Z).
+Withdrawn on that read, before G-H7 is read: the reason given for G-H7 (a), that G-H3's rise is the handoff an epoch late. The
+  epoch handed at a word's start is the word two before's 18% of the time, and less under a longer word between, where G-H3's
+  share rises with that length.
+Reweighed 2026-11-23T22:39:23Z (date -u), before their reads; the first weights stay on file above and both are scored:
+  G-H7 (a) 0.6 -> 0.3 (its reason is withdrawn; what is left is that the handoff is the only route past the fine tail);
+  G-H11 (b) 0.3 -> 0.15 (the row is 0.08 of the state's power and the handed epoch is seldom the word two before's).
+What the owner says of the 3.6 places (crates/engine/src/field/scale.rs: level_section, level_anchors_before): the level's
+  section is the flat face's code over the alphabet (5.50 nats at 244 classes), and the one-sided anchor leaves about one section
+  an epoch; the two-sided cut of November 17 read 8.56 places and 9.48 nats (atlas tower.level-holds-no-unit). The section is
+  counted from the codec's alphabet. By the test of November 21 that is a gauge: the same passage coded in bits would cut epochs
+  of about half a byte. A unit counted from the level under it (the news over which the fine field's own holding falls to its
+  floor) comes, for this codec and this line, to about the same number, so no change of the line follows today; it is a row
+  owed under #1088.

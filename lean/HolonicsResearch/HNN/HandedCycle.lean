@@ -11,7 +11,7 @@ Atlas: `swing.retraced-stroke-moves-nothing`, `swing.three-states-least-hand`, `
 `fluid.one-signed-invariant-bounds-fine-grain`, `key.chosen-query-halves`, `hodge.class-singlet-of-its-circle`,
 `tower.level-is-difference-tone`, `key.loop-closes-a-sleeping-link`, `ratio.unit-is-a-loop-that-nearly-closes`,
 `ratio.common-stretch-is-a-shift-of-the-log-axis`, `ratio.mutual-loss-is-a-two-reader-comma`,
-`constitution.one-sided-response-is-fixed-by-its-face`. Record:
+`constitution.one-sided-response-is-fixed-by-its-face`, `receiver.size-is-one-readers-gauge-anothers-state`. Record:
 `research/records/2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_…`.
 
 The law's owners stand in the tree, named where each is used: the helix as a circle and its carry (`winding.mixed-radix-odometer`),
@@ -62,6 +62,10 @@ a reciprocal boundary that cannot orient a passage (`junction.reciprocal-unorien
    and its part odd in time, the underside. Where nothing answers before the act, the underside is the face after the act and
    the face's negative before it, so the face alone gives the response: twice the face after the act. The ratio of a medium's fade
    to its turn is the same in every unit, so it is no gauge.
+13. **A size is a gauge to one reader and a state to another** (`ratio_reader_takes_no_step_along_size`,
+   `ratio_reader_step_is_one_over_size`). A reader of a part as a ratio to its own power returns a covector with no component
+   along the part, as large as one over the part's size: it holds no balance on the size. A second reader of the same part
+   added to a state reads the size, and is the only one that sizes it (`receiver.size-is-one-readers-gauge-anothers-state`).
 -/
 
 namespace Holonics
@@ -377,6 +381,21 @@ theorem one_sided_from_face (f : ℝ → ℝ) (h : ∀ t, t < 0 → f t = 0) (t 
 /-- The ratio of a medium's fade to its turn is the same in every unit of length or of time: a number of this kind is no gauge. -/
 theorem fade_over_turn_is_unit_free (c fade turn : ℝ) (hc : c ≠ 0) : (c * fade) / (c * turn) = fade / turn :=
   mul_div_mul_left fade turn hc
+
+/-! ### 13. A size is a gauge to one reader and a state to another -/
+
+/-- A reader that reads a part as a ratio to its own power returns a covector with no component along the part: with `r` the
+ratio (of unit power) and `g` the covector on it, the covector on the part is `g − r ⟨r, g⟩` over the part's size, and its pairing
+with `r` is zero. Such a reader takes no step along the part's size and holds no balance on it. -/
+theorem ratio_reader_takes_no_step_along_size {n : ℕ} (r g : Fin n → ℝ) (h : ∑ i, r i * r i = 1) :
+    ∑ i, r i * (g i - r i * ∑ j, r j * g j) = 0 := by
+  have step : ∀ i, r i * (g i - r i * ∑ j, r j * g j) = r i * g i - (r i * r i) * ∑ j, r j * g j := by
+    intro i; ring
+  simp only [step, Finset.sum_sub_distrib, ← Finset.sum_mul, h, one_mul, sub_self]
+
+/-- And the step it does take is as large as one over the size: at `c` times the size the covector is `1/c` of itself. -/
+theorem ratio_reader_step_is_one_over_size (g s c : ℝ) (hs : s ≠ 0) (hc : c ≠ 0) : g / (c * s) = (g / s) / c := by
+  field_simp
 
 end HandedCycle
 
