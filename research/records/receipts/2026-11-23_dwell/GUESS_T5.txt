@@ -1,0 +1,17 @@
+Fixed 2026-11-23T06:29:06Z (date -u), the lead, before the history's lap trains. Refs #404.
+G-T4 held on every clause (W95m beside W95c: held theory -0.065 and held Lean -0.112 nats a place, the old registers +0.011 to +0.020,
+the theory panel's own terms 8 against 4 and 8 against 5, the material's persistence 1.111 against 1.020); by its rule the line takes the
+mixed share (W95m's end) and the curated history comes in at its own share.
+G-T5: from W95m's STATE.3000, W96h joined at a new pass to store-2026-11-23-hist (the dwell store and two private slices written by
+tools/history_passage.py: dialogue, 3,812 conversations and 82 MB, and acts, a keyed eighth of the model turns' tool calls with their
+results, 18,799 turns and 310 MB; the history about 21% of a pass, the theory and the Lean 27%, the five registers 53%), beside W96c
+joined at a new pass to store-2026-11-23-dwell8 (the same reset, no history); 3,000 sections each on the build that names the two slices;
+read at MEAN.3000 on store-2026-11-22's held set and on the history store's held set (held from November 20, with September 3 to 7 left
+out), the theory panel, and two private panels on the held history (acts: 16 held calls' lines; dialogue: 12 held model turns' openings):
+(a) held dialogue and held acts each at least 0.15 nats a place under the control, one place open, paired;
+(b) every old register, the held theory and the held Lean at most 0.03 above the control, one place open;
+(c) the theory panel's own terms at least the control's less two, on the theory and on the Lean prompts;
+(d) the material's persistence over the lap's thirds at least 1.10 for the arm.
+Rule: (a), (b) and (c) held, the line takes the history (W96h's end is the line's state); (b) missed, the history's share is halved
+before the line takes it; (a) missed with (b) held, the history stays an arm for a second lap. The panels on the held history are
+shown raw and scored by no clause (a first look at what she writes after a logged call).
