@@ -3,6 +3,24 @@
 November 23, 2026, 10:30 to 18:35 UTC, the lead, on the PC. Refs #404. It follows [the dwell's record](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md),
 whose §10 named play as the one change the arms left untried on text. Receipts: [`receipts/2026-11-23_play/`](receipts/2026-11-23_play/).
 
+## 0. A correction: what this record calls play is not play
+
+Brandon, November 23 19:49Z, read in his own message: what this record calls play is likely not play, because play does not teach a
+learner things opposed to the rest of its equilibrium behaviour. Play is supplementary: the wiggle room in which a learner rapidly tries
+behaviours it would not try in other contexts, with little weight or pressure, babbling for language, and among animals a game with each
+other that teaches boundaries and cues. His example: when his cat meows he answers each time in a similar tone, and the cat now walks up
+and meows back when he starts it. It exchanges no language and has no right answer; it is feedback in kind about the behaviour, and it
+is what later makes the cat comfortable to ask. He adds that receivers are budgeted: what an organism can play with is bounded by the
+limbs and organs it has, and translation between languages (a grid of tiles before the symbols of multiplication) is how a game's
+geometry couples to symbols later.
+
+What the arms below ran is therefore named for what it was: her drafts graded against the passage's own symbols in the context of what
+she wrote, a fixed target at every place (scheduled sampling, in the literature's name). The finding stands as a finding about that:
+with 93 of every 100 drafted places away from the passage, grading the passage in the context of her drafts teaches the places to
+discount what she wrote. It says nothing against play, which this record does not test. The record's file name keeps its first title,
+which other records link; the reading is the paragraph above (`agent-inferred` where it puts his words on the engine: play has no right
+answer and is answered in kind, and it adds to the equilibrium the passage trains rather than replacing it).
+
 ## 1. The lens and the reading
 
 Brandon, 01:13Z: reinforcement and play are likely still the solutions, read carefully. The lead's reading (the evening record of

@@ -602,13 +602,14 @@ impl PassTerrain {
 pub struct PassWorld {
     pub slice: String,
     pub every: u64,
-    /// [definition; the lead, November 23, play (Brandon, November 23 01:13Z); `agent-inferred`] Zero: **a draft world**. Its act is
+    /// [definition; the lead, November 23; `agent-inferred`] Zero: **a draft world**. Its act is
     /// the stretch itself: the field drafts the stretch's last `run` places from the places before them, and the stretch is read by two
     /// streams with the draft in its known stream and the passage's own symbols what every place is compared with
     /// ([`crate::field::Region::targets`]). The passage is the world: what it holds at each drafted place is its answer to the field's
     /// own act there, and an error stays possible at every place (the release draws at the field's own temperature). With `refine` unset
     /// the draft is the writer's, one place a read; set, it is drawn whole from one read of the field and reopened `refine` times, the
-    /// release's runs ([`Constitution::sample_runs`]; the play record of November 23, §4: a place a read priced a draft at `run` reads).
+    /// release's runs ([`Constitution::sample_runs`]; the record of November 23 on her drafts, §4: a place a read priced a draft at `run` reads; Brandon, 19:49Z: grading her drafts
+    /// against the passage is not play, which has no right answer and is answered in kind).
     pub records: u64,
     pub run: u64,
     /// [definition; theory, November 16 20:39Z] Whether each act's draft is redrawn once after its predicted reaction is drawn

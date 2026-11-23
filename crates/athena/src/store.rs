@@ -372,7 +372,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             (in_pairs, in_sites, terrain_regions, terrain_records) = (drawn.pairs, drawn.sites, drawn.count, drawn.records);
         }
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
-        // [definition; the lead, November 23, play] A draft world's act carries the passage's own symbols at the drafted places (its targets).
+        // [definition; the lead, November 23, a draft world] A draft world's act carries the passage's own symbols at the drafted places (its targets).
         let mut acts: Vec<(Vec<usize>, usize, Option<Vec<usize>>)> = Vec::new();
         let mut stretches_drawn = 0usize;
         while let Some(drawn) = cut.next() {
@@ -391,7 +391,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                     let at = cut.pass.slices[drawn.slice].clone();
                     let bytes = cut.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
                     if draft_world {
-                        // [definition; the lead, November 23, play] The stretch less its last `run` places is the prompt; those places are the
+                        // [definition; the lead, November 23, a draft world] The stretch less its last `run` places is the prompt; those places are the
                         // passage's answer to her draft. A stretch whose bytes hold no place before its last `run` is no act (its sites can stand
                         // above its bytes where it ends its piece: on W98p's lap a stretch of 28 bytes drew an act of 32 places at section 2,278).
                         let run = run as usize;
@@ -435,7 +435,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let run = w.run as usize;
             let release: Vec<(&[usize], usize)> = acts.iter().map(|(p, _, _)| (p.as_slice(), run)).collect();
             let act_seed = seed ^ cut.pass.stretches.wrapping_mul(0x9E37_79B9_7F4A_7C15);
-            // [definition; the lead, November 23, play] A draft world that refines draws each draft whole from one read and reopens it
+            // [definition; the lead, November 23, a draft world] A draft world that refines draws each draft whole from one read and reopens it
             // `refine` times (the release's runs, no bound on a run); otherwise the writer's sweeps draw one place a read.
             let joint = w.records == 0 && w.refine > 0;
             let (sweeps, passes, bound) = if joint { (1, w.refine as usize, i128::MAX) } else { (run, 0, 0) };
@@ -451,7 +451,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             for ((prompt, _, truth), draft) in acts.iter().zip(&drafts) {
                 let written = &draft[..draft.iter().position(|&c| c == codec.void()).unwrap_or(draft.len())];
                 if let Some(truth) = truth {
-                    // [definition; the lead, November 23, play] Her draft stands in the known stream after the prompt, and every place is
+                    // [definition; the lead, November 23, a draft world] Her draft stands in the known stream after the prompt, and every place is
                     // compared with the passage's own symbol there: the prompt's with themselves, the drafted places with what the passage holds.
                     let k = written.len().min(truth.len());
                     let mut classes = prompt.clone();
@@ -1554,7 +1554,7 @@ pub fn move_store(args: &[String]) -> Result<()> {
 /// joined to a state's pass** ([`holonics_engine::field::PassWorld`]): the state with its pass line's world clause set (one stretch in
 /// `EVERY` of `SLICE` an act, its last `RECORDS` whole lines the prompt, `RUN` places released), its place in the pass kept, and every
 /// other line byte for byte (read back and checked, as [`next_pass`]). Refused where the pass holds no slice `SLICE`. `RECORDS` zero is a draft
-/// world (the lead, November 23, play; [`holonics_engine::field::PassWorld::records`]): the act is the stretch, its last `RUN` places drafted.
+/// world (the lead, November 23; [`holonics_engine::field::PassWorld::records`]): the act is the stretch, its last `RUN` places drafted.
 pub fn set_world(args: &[String]) -> Result<()> {
     if args.len() != 8 && args.len() != 9 {
         return Err("set-world STATE STATE_SHA SLICE EVERY RECORDS RUN OUT [REFINE]".into());
