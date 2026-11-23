@@ -1246,6 +1246,10 @@ impl<'c> Resident<'c> {
         // [the record of the two streams §11] A run of passages read by two streams on a tower that carries its one-sided block hears the
         // level (the host's `Constitution::scale_forward_before`): the level stays, its words under the known stream's.
         let strand_level = !self.strand_run.borrow().is_empty() && field.scale.as_deref().is_some_and(|s| s.before_offsets(d.width).is_some());
+        // [the lead, November 23] The level's receipt at its own grain (`Scale::receipt`) has its host realization alone so far.
+        if field.scale.as_deref().is_some_and(|s| s.receipt) {
+            return Err(TowerError::Refused("a level compared at its own grain (its receipt), which the card does not realize yet"));
+        }
         if field.ruler_far >= 3 && field.scale.is_some() && !strand_level {
             let mut unlevelled = field.clone();
             unlevelled.scale = None;

@@ -4840,6 +4840,77 @@ fn the_level_a_strand_hears_is_the_epoch_before_and_its_covector_matches_the_cod
     assert!(read >= 60 && fine_read >= 12 && 4 * seams <= read, "read {read} probes ({fine_read} of the fine field), {seams} on a seam");
 }
 
+/// [definition; the lead, November 23] **The level's receipt at its own grain** ([`Scale::receipt`]): with the word, a strand's faces are
+/// the same bits (the receipt reads the prolonged rows alone and changes no state), the text keeps the word, the opening's reader takes no
+/// covector from it (the opening block and its bias move as without the word), the block `B⁻` takes one that differs from
+/// the one without it, and the covector of the block's largest entries matches the central difference of the code with the receipt's
+/// own code added.
+#[test]
+fn the_levels_receipt_reads_its_prolonged_rows_and_returns_through_the_level_alone() {
+    let (mut read, mut seams) = (0usize, 0usize);
+    for (still, past) in [(1usize, false), (2, true)] {
+        let plain = towered_before_live(still);
+        let mut field = plain.clone();
+        field.scale.as_mut().unwrap().receipt = true;
+        assert_eq!(Constitution::from_text(&field.to_text()).unwrap(), field, "still {still}: the text keeps the receipt");
+        let a = field.declaration.alphabet;
+        let sites = 13;
+        let classes = drawn_classes(0xD5, sites, a);
+        let (with, without) = (field.strand_pass(&classes, true, past).unwrap(), plain.strand_pass(&classes, true, past).unwrap());
+        assert_eq!(with.faces, without.faces, "still {still}: the receipt moves no face");
+        let (rc, rn) = with.tower.as_ref().unwrap().receipt_code();
+        assert!(rn > 0 && rc > 0, "still {still}: the receipt compares {rn} places");
+        let (mut g, mut g0) = (vec![0i128; field.material_len()], vec![0i128; plain.material_len()]);
+        field.strand_returned(&classes, &classes, &with, &mut g).unwrap();
+        plain.strand_returned(&classes, &classes, &without, &mut g0).unwrap();
+        let l = &field.layout;
+        let dw = field.declaration.width;
+        // (the encoding is the input's as well as the reader's, and the receipt's covector reaches the input through the restriction)
+        for (name, range) in [("opening", l.opening..l.opening + dw * dw), ("opening bias", l.opening_bias..l.opening_bias + dw)] {
+            assert_eq!(g[range.clone()], g0[range], "still {still}: the {name} takes nothing from the receipt");
+        }
+        let base = field.theta.len();
+        let sc = field.scale.as_deref().unwrap();
+        let glue_at = base + sc.coarse.theta.len();
+        let (b2, bb2, _) = sc.before_offsets(dw).unwrap();
+        assert_ne!(g[glue_at + b2..glue_at + bb2], g0[glue_at + b2..glue_at + bb2], "still {still}: the block takes the receipt's covector");
+        let code = |f: &Constitution| -> i64 {
+            let pass = f.strand_pass(&classes, false, past).unwrap();
+            let places: i64 = pass.faces.iter().zip(&classes).skip(1).map(|(face, &c)| crate::field::ratio_code(face.masses[c], face.total)).sum();
+            let known = vec![false; sites];
+            places + opening_code(f, &Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past, second: false, targets: None }) + pass.tower.as_ref().map_or(0, |t| t.receipt_code().0)
+        };
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let pass = f.strand_pass(&classes, true, past).unwrap();
+            let coarse = pass.tower.iter().flat_map(|t| t.ticks().iter());
+            pass.ticks.iter().chain(coarse).flat_map(|c| c.classes.iter().map(|lst| lst.off.iter().chain(&lst.members).copied().collect())).collect()
+        };
+        let grain = MATERIAL_BITS;
+        let mut entries: Vec<usize> = (glue_at + b2..glue_at + bb2).collect();
+        entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+        for i in entries.into_iter().take(4).filter(|&i| g[i] != 0) {
+            let moved = |delta: i32| {
+                let mut f = field.clone();
+                *f.material_mut().nth(i).unwrap() += delta;
+                f
+            };
+            let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+            let shift = 40 + grain - 20;
+            let Some((delta, h)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                seams += 1;
+                continue;
+            };
+            read += 1;
+            let measured = code(&moved(delta)) - code(&moved(-delta));
+            let predicted = (g[i] * 2 * delta as i128) >> shift;
+            let tolerance = predicted.abs() / 8 + ((64 * (sites as i128 - 1)) << h);
+            assert!((measured as i128 - predicted).abs() <= tolerance, "still {still}, past {past}: the block's entry {i} at {h} halvings: measured {measured}, predicted {predicted}");
+        }
+    }
+    eprintln!("LEVEL_RECEIPT_PROBES read={read} on_a_seam={seams}");
+    assert!(read >= 4, "read {read} probes, {seams} on a seam");
+}
+
 /// [definition; the lead, November 18, the record of the two streams §15] **The row of the site after reads the second site before**
 /// ([`Region::second`]) in a passage read by two streams: with the word some face moves; a place's face is the same bits in the
 /// passage cut after it; the region's own word reads the same forward and returns the same covector; the rows `E₊` take a covector
