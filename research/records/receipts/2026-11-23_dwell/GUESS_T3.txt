@@ -1,0 +1,17 @@
+Fixed 2026-11-23T01:19:33Z (date -u), the lead, before the dwell's lap trains. Refs #404.
+Brandon, 01:13Z: reinforcement and play are likely still the solutions, read carefully. The lead's reading: tension that holds (a knot
+tightens where the pulls reaching it keep agreeing), and her own act meeting an answer. Read that night: the deposit's moments
+|m|/(isqrt(v)+1) at the no-direction floor (0.206): W93's end 0.225, W93j's 0.189 (the joined passage's pulls cancel more).
+G-T3, the dwell: W94d from W93j's end with its pass moved to store-2026-11-23-dwell8 (tools/store_dwell.py: the theory and the Lean held
+eight times, so they are drawn at eight times their quota; the pass at 0.152, the two slices at 0.019, so about the first 67 MB, some
+1.2 laps, are theirs alone), beside W94j from W93j's end on store-2026-11-22 with no change; 3,000 sections each on e5t; read on
+store-2026-11-22's held set at MEAN.3000, the theory panel at MEAN.3000, the moments on STATE.3000.
+(a) held theory and held Lean each at least 0.05 nats a place under the control, one place open, paired;
+(b) every old register (books, code, science, web, wikidata) at most 0.025 above the control, one place open;
+(c) the theory panel's distinct terms of the register's own (theory_score.py THEORY_TERMS) at least twice the control's on the theory
+    prompts and at least the control's on the Lean prompts;
+(d) the moments over the material at the arm's end at least 0.215, the control's at most 0.200.
+Rule: (a), (c) and (d) held, the dwell goes on as the theory's arm (its next lap at the store's quota) and play is the next change (her
+drafts in her passage, a world answering); (a) held and (c) missed, the dwell takes the code and not the writes, and play is the next
+change, not a larger share; (d) missed with (a) held, the entries' coherence is not what a dwell raises, and the knot is read per
+contact (the hands) before any grip law; (b) missed, the dwell forgets the registers and its share is read mixed, not alone.

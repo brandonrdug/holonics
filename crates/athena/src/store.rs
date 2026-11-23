@@ -1424,7 +1424,9 @@ pub fn next_pass(args: &[String]) -> Result<()> {
 /// joined to a grown store**: the state with its pass line set to the store `STORE` (`STORE_SHA` its `STORE.tsv`'s), its slices those of the
 /// store's role in the store's order, every slice at its first piece (piece, cursor and places taken zero), its count of stretches kept, and every
 /// other line of the state byte for byte (read back and checked, as [`next_pass`]). Refused where the state's slices are not the first of the
-/// grown store's, in order, or where the store adds no slice. Why at a new pass: the cut draws the slice whose places taken stand least against its
+/// grown store's, in order. A store with the state's slices and no more is a redrawn store (`tools/store_dwell.py`: named slices held K
+/// times, so their quotas grow and nothing else changes) and joins at a new pass for the same reason (the lead, November 23: the dwell read
+/// alone forgot the old registers by 0.13 to 0.29 nats a place in one lap, and its share is read mixed from the first section). Why at a new pass: the cut draws the slice whose places taken stand least against its
 /// quota ([`holonics_engine::passage::Cut::next`]), so a slice joined in the middle of a pass is drawn alone until it reaches the others' share,
 /// or, set to their share, is drawn alone once theirs end: on November 16 the line stood at 0.609 of its pass, and either join would have run
 /// some five laps on the joined slices alone. Joined at a new pass, every slice is drawn at its quota from the first section, and the pass ends
@@ -1444,7 +1446,7 @@ pub fn join_store(args: &[String]) -> Result<()> {
     let before = learner.pass.clone().ok_or("a state with no pass line")?;
     let names = role_names(&counts, &before.role);
     let held: Vec<&str> = before.slices.iter().map(|s| s.name.as_str()).collect();
-    if names.len() <= held.len() || names[..held.len()] != held[..] {
+    if names.len() < held.len() || names[..held.len()] != held[..] {
         return Err(format!("a store whose {} slices ({}) do not extend the state's ({})", before.role, names.join(","), held.join(",")).into());
     }
     let mut pass = before.clone();

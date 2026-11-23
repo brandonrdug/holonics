@@ -1,0 +1,26 @@
+W94D_START 01:19:55
+TERRAIN_TRAINED W94j 01:56:40 sections=3000 ended=false
+TERRAIN_REACH W94j 01:58:27 ANSWER copy n= 2655 0.215|ANSWER reverse n= 2667 0.104|ANSWER sum n= 1579 1.037|
+TERRAIN_HOSTPANEL W94j panel_logic.tsv 01:59:42 NEXT_WRITE_DONE rows=168 run=32 window=- ms=182331 
+TERRAIN_HOSTPANEL W94j panel_terrain.tsv 02:00:41 NEXT_WRITE_DONE rows=96 run=32 window=- ms=241577 
+TERRAIN_TRAINED W94d 02:33:19 sections=3000 ended=false
+TERRAIN_READ_DONE mean_W94j 02:44:18 CAVITY_DONE ms=657801  rows_S=99844
+TERRAIN_PANEL W94j_mean 02:44:49 seen: words 43 in_lexicon 29 (67%) longest_copy 13 held: words 57 in_lexicon 39 (68%) longest_copy 16 unread: words 57 in_lexicon 42 (73%) longest_copy 15  || LONG W94j_mean: all words 262 in lexicon 192 (73%) writes that loop 3 of 20 longest run shared with its prompt 96 | code 33/39 (84%) web 46/56 (82%) science 27/47 (57%) books 58/69 (84%) wikidata 28/51 (54%)
+TERRAIN_LOUD W94j 02:50:36  lines=71
+TERRAIN_WIDE W94j 02:51:39 LONG W94j: all words 2164 in lexicon 1621 (74%) writes that loop 19 of 160 longest run shared with its prompt 96 | code 330/385 (85%) web 357/441 (80%) science 270/419 (64%) books 418/506 (82%) wikidata 246/413 (59%)
+TERRAIN_REACH W94d 02:53:24 ANSWER copy n= 2655 0.280|ANSWER reverse n= 2667 0.329|ANSWER sum n= 1579 1.175|
+TERRAIN_HOSTPANEL W94d panel_logic.tsv 02:55:04 NEXT_WRITE_DONE rows=168 run=32 window=- ms=205207 
+TERRAIN_HOSTPANEL W94d panel_terrain.tsv 02:55:54 NEXT_WRITE_DONE rows=96 run=32 window=- ms=255566 
+TERRAIN_READ_DONE mean_W94d 03:03:18 CAVITY_DONE ms=698547  rows_S=99844
+TERRAIN_PANEL W94d_mean 03:03:49 seen: words 43 in_lexicon 38 (88%) longest_copy 15 held: words 53 in_lexicon 38 (71%) longest_copy 13 unread: words 59 in_lexicon 44 (74%) longest_copy 15  || LONG W94d_mean: all words 264 in lexicon 196 (74%) writes that loop 1 of 20 longest run shared with its prompt 72 | code 33/41 (80%) web 38/51 (74%) science 46/56 (82%) books 50/59 (84%) wikidata 29/57 (50%)
+TERRAIN_LOUD W94d 03:09:38  lines=71
+TERRAIN_WIDE W94d 03:10:41 LONG W94d: all words 2106 in lexicon 1555 (73%) writes that loop 18 of 160 longest run shared with its prompt 72 | code 277/361 (76%) web 354/432 (81%) science 356/444 (80%) books 381/453 (84%) wikidata 187/416 (44%)
+W94D_CAVITY W94j 03:25:55 CAVITY_DONE ms=912986
+W94D_THEORY THEORY_PANEL W94j logic: words 108 in lexicon 80 (74%) loops 0 of 8 longest shared with prompt 15 | theory: words 175 in lexicon 147 (84%) loops 0 of 12 longest shared with prompt 10
+W94D_CAVITY W94d 03:41:23 CAVITY_DONE ms=914037
+W94D_THEORY THEORY_PANEL W94d logic: words 101 in lexicon 84 (83%) loops 0 of 8 longest shared with prompt 18 | theory: words 171 in lexicon 152 (88%) loops 0 of 12 longest shared with prompt 13
+W94D_MOMENTS arm_W94j all n=1842617 mean=0.2544 material: n=1540273 mean=0.2529 rms=0.3279 share_over_0.5=0.1223 | level: n=41544 mean=0.2639 rms=0.3323 share_over_0.5=0.1322 | third: n=260800 mean=0.2617 rms=0.3291 share_over_0.5=0.1275 (floor 0.2060)|arm_W94d all n=1841809 mean=0.2206 material: n=1539465 mean=0.2207 rms=0.2834 share_over_0.5=0.0792 | level: n=41544 mean=0.2095 rms=0.2628 share_over_0.5=0.0562 | third: n=260800 mean=0.2221 rms=0.2789 share_over_0.5=0.0737 (floor 0.2060)|
+W94D_FRONTIER_NEW_STORE FRONTIER W94d; one place open: all 0.7449 (140564 places) | books 0.8361 code 0.6765 logic 0.4013 science 0.6846 theory 0.5510 web 0.9405 wikidata 1.1211 || less the control's, paired: +0.0949 (±0.0021) | books +0.1683 code +0.2889 logic -0.2157 science +0.1347 theory -0.1499 web +0.2044 wikidata +0.2308|FRONTIER W94d; the frontier: all 2.0095 (139706 places) | books 1.9823 code 1.9441 logic 1.6479 science 1.9440 theory 1.7870 web 2.3030 wikidata 2.4563 || less the control's, paired: +0.1450 (±0.0026) | books +0.1767 code +0.4117 logic -0.3003 science +0.1971 theory -0.1766 web +0.2885 wikidata +0.4160|
+TERRAIN_SCORE W94j whole 53/96 opening 57/96 first 71/96 | sum 8/8/10 of 16 difference 5/5/7 of 16 product 5/5/8 of 16 close 10/14/16 of 16 copy 12/12/14 of 16 reverse 13/13/16 of 16
+TERRAIN_SCORE W94d whole 42/96 opening 45/96 first 66/96 | sum 7/7/8 of 16 difference 6/6/7 of 16 product 4/4/6 of 16 close 9/12/16 of 16 copy 8/8/13 of 16 reverse 8/8/16 of 16
+W94D_ALL_DONE 03:41:44
