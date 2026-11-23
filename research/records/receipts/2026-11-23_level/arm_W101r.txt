@@ -1,0 +1,32 @@
+W101_START 19:10:40
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+W101_GATE EQUAL 19:30:12
+W101_DEV receipt_ms=702 plain_ms=691 sections=30 
+TERRAIN_TRAINED W101 20:12:10 sections=3000 ended=false
+TERRAIN_REACH W101 20:13:52 ANSWER copy n= 2655 0.233|ANSWER reverse n= 2667 0.127|ANSWER sum n= 1579 1.093|
+TERRAIN_HOSTPANEL W101 panel_logic.tsv 20:15:12 NEXT_WRITE_DONE rows=168 run=32 window=- ms=181907 
+TERRAIN_HOSTPANEL W101 panel_terrain.tsv 20:16:01 NEXT_WRITE_DONE rows=96 run=32 window=- ms=231451 
+TERRAIN_TRAINED W101r 20:49:45 sections=3000 ended=false
+TERRAIN_READ_DONE mean_W101 21:00:31 CAVITY_DONE ms=645618  rows_S=99844
+TERRAIN_PANEL W101_mean 21:15:36 seen: words 44 in_lexicon 35 (79%) longest_copy 16 held: words 68 in_lexicon 53 (77%) longest_copy 18 unread: words 56 in_lexicon 38 (67%) longest_copy 16  || LONG W101_mean: all words 277 in lexicon 192 (69%) writes that loop 1 of 20 longest run shared with its prompt 40 | code 36/47 (76%) web 50/61 (81%) science 31/52 (59%) books 44/61 (72%) wikidata 31/56 (55%)
+TERRAIN_LOUD W101 21:21:35  lines=71
+TERRAIN_WIDE W101 21:22:40 LONG W101: all words 2160 in lexicon 1552 (71%) writes that loop 24 of 160 longest run shared with its prompt 76 | code 289/342 (84%) web 364/443 (82%) science 268/455 (58%) books 397/494 (80%) wikidata 234/426 (54%)
+TERRAIN_REACH W101r 21:24:26 ANSWER copy n= 2655 0.906|ANSWER reverse n= 2667 0.488|ANSWER sum n= 1579 1.184|
+TERRAIN_HOSTPANEL W101r panel_logic.tsv 21:26:12 NEXT_WRITE_DONE rows=168 run=32 window=- ms=212014 
+TERRAIN_HOSTPANEL W101r panel_terrain.tsv 21:27:02 NEXT_WRITE_DONE rows=96 run=32 window=- ms=261516 
+TERRAIN_READ_DONE mean_W101r 21:34:26 CAVITY_DONE ms=705154  rows_S=99844
+TERRAIN_PANEL W101r_mean 21:34:57 seen: words 35 in_lexicon 24 (68%) longest_copy 13 held: words 60 in_lexicon 46 (76%) longest_copy 18 unread: words 61 in_lexicon 40 (65%) longest_copy 16  || LONG W101r_mean: all words 288 in lexicon 209 (72%) writes that loop 0 of 20 longest run shared with its prompt 19 | code 51/59 (86%) web 51/62 (82%) science 32/50 (64%) books 43/62 (69%) wikidata 32/55 (58%)
+TERRAIN_LOUD W101r 21:40:37  lines=71
+TERRAIN_WIDE W101r 21:41:39 LONG W101r: all words 2163 in lexicon 1556 (71%) writes that loop 20 of 160 longest run shared with its prompt 71 | code 319/381 (83%) web 367/451 (81%) science 249/415 (60%) books 400/491 (81%) wikidata 221/425 (52%)
+W101_LAP_TRAVEL W101 material: |d|=1.249e+08,1.14e+08,1.137e+08 cos01=+0.172 cos12=+0.125 persistence=1.067 | level: |d|=1.814e+07,1.716e+07,1.731e+07 cos01=+0.227 cos12=+0.131 persistence=1.100 | third: |d|=5.606e+07,5.311e+07,5.36e+07 cos01=+0.202 cos12=+0.170 persistence=1.100
+W101_LAP_TRAVEL W101r material: |d|=1.619e+08,1.392e+08,1.229e+08 cos01=+0.256 cos12=+0.392 persistence=1.184 | level: |d|=4.786e+07,3.683e+07,3.419e+07 cos01=+0.506 cos12=+0.720 persistence=1.372 | third: |d|=1.031e+08,8.029e+07,6.578e+07 cos01=+0.462 cos12=+0.626 persistence=1.331
+W101_FRONTIER_NEW_STORE FRONTIER W101r; one place open: all 0.6474 (140564 places) | books 0.7188 code 0.4296 logic 0.4285 science 0.6037 theory 0.5869 web 0.7910 wikidata 0.9707 || less the control's, paired: +0.0355 (±0.0009) | books +0.0314 code +0.0269 logic +0.0255 science +0.0350 theory +0.0334 web +0.0362 wikidata +0.0602|FRONTIER W101r; the frontier: all 1.8880 (139706 places) | books 1.8550 code 1.6315 logic 1.7598 science 1.8377 theory 1.8720 web 2.1117 wikidata 2.1477 || less the control's, paired: +0.0569 (±0.0012) | books +0.0348 code +0.0537 logic +0.0424 science +0.0636 theory +0.0471 web +0.0556 wikidata +0.1010|
+W101_WORD_PRESENCE st_W101 word_starts=19351 read=224 tick=3 byte_2=0.600 prev_first=0.275 prev_word=0.228 prev2_word=0.024 target=0.038 planted=0.000 prev_len=0.367 | three or more words into a line (18520): line_words=0.181
+W101_WORD_PRESENCE st_W101r word_starts=19351 read=224 tick=3 byte_2=0.626 prev_first=0.273 prev_word=0.231 prev2_word=0.025 target=0.035 planted=0.000 prev_len=0.377 | three or more words into a line (18520): line_words=0.144
+TERRAIN_SCORE W101 whole 53/96 opening 57/96 first 74/96 | sum 10/10/11 of 16 difference 7/7/8 of 16 product 6/6/9 of 16 close 10/14/16 of 16 copy 11/11/14 of 16 reverse 9/9/16 of 16
+TERRAIN_SCORE W101r whole 39/96 opening 43/96 first 65/96 | sum 8/8/9 of 16 difference 6/6/7 of 16 product 5/5/8 of 16 close 7/11/16 of 16 copy 7/7/9 of 16 reverse 6/6/16 of 16
+W101_ALL_DONE 22:22:29
