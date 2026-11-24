@@ -110,8 +110,8 @@ sites, so each place written costs about `(2n)²` pairs: the wide panel's 160 ro
 **The law.** In a region read one-sided a site hears only what stands before it (atlas `tower.region-known-stream`,
 `tower.region-strand`), and the level's hand-on keeps that: a place takes the epoch that ended before its own began
 (`tower.level-before`). A site's state is then a function of the symbols up to its own place. Ticks of that kind compose, so after
-any count of ticks the states of the sites that stand are the same whatever is appended: they are a retention sufficient for every
-continuation, the retention law read along a passage's own order. A place written is one known site and one open place joining the
+any count of ticks the states of the sites that stand are the same whatever is appended: they are sufficient for every
+continuation of that region. A place written is one known site and one open place joining the
 sites that stand: about `2n` pairs a tick with each tick's states kept, where the replay pays `(2n)²`.
 [`HNN/ContinuedRegion`](../../lean/HolonicsResearch/HNN/ContinuedRegion.lean) proves it for any tick of that kind
 (`OneSided.iterate`, `kept_states_stand`, `face_stands`) with the count: a site joining `m` adds `2m + 1` pairs, and
@@ -120,11 +120,43 @@ the replay costs at least `R` forwards of the prompt (`replayed_pairs_ge`). A 40
 2.3·10⁹ pairs replayed and 4·10⁶ continued. The same bits follow where every part of the built tick is one-sided in the theorem's
 sense, which its atlas rows state and a run reads (G-C1).
 
-**What it is for.** A lap's panels are 1.7 minutes of its card, so this is no lap's saving. It is the cost of what the line is
-asked for next: an exchange with her, whose reply follows a context that grows, and panels of many draws a prompt (the probe
-panel's 200 rows of 64 places take 368 s on ten host threads). Under replay a context of a few thousand places makes each place
-written a whole section's forward. The engine holds no command that continues a region: the row in
-[THE_ENGINE §11](../../docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine) says so.
+**What it is for.** A lap's panels are 1.7 minutes of its card, so this is no lap's saving. It is the cost of a ruler's writer on
+long rows: panels of many draws a prompt (the probe panel's 200 rows of 64 places take 368 s on ten host threads) and any prompt
+of a few thousand places, where under replay each place written is a whole section's forward. The engine holds no command that
+continues a region: the row in [THE_ENGINE §11](../../docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine) says so.
+
+**What it is not: how she holds an exchange** (18:33 UTC the same day; this section's first wording corrected, on a question of
+Brandon's whether "a context that grows" meant a language model's window of seen text). It did, in form. The first wording called
+the kept states a retention, the retention law read along a passage's own order, and gave the law as what an exchange with her
+needs, a reply following a context that grows. Both took the writer's laid-out text for what she holds, which is a model that
+reads its transcript again. A state kept a place is a list that grows with what was said: sufficient and no quotient, the cell
+list that atlas `hnn.leaky-count` names as what a sufficient quotient is not. §9 had met the resemblance (a cache of activations)
+and answered it with the word retention, where the retention law's own test answers the other way. The kept states are lawful
+as a realization's partials inside one region's forward, every bit kept, and they are no retention.
+
+What the tree holds for a passage's entry is older than the engine. The source moment is appended a symbol at a time,
+`z ← U z + J e(u)`, and never expands the interior (`Transport/SourceMoment`'s `moment_append_one`, atlas
+`encoding.reduced-recurrence`); it is aged by its own transport's decay over a passage of any length (`hnn.leaky-count`), in a
+store whose reach is its quality, `(1 + d)/d` (`store.finite-quality`); and the deposit is the slow store (the retention
+contract). A place then costs the same however long the passage has run, and what was heard stands after the text is gone. Reach
+is a store's quality and never a count of places.
+
+Against that, the engine of this date, read at its owners. A region's currents (its moments, its circles' running values, the
+level's epochs) open with the region and end with it: site 0 meets no source (`tower.region-known-stream`), and the learner's
+state carries its constitution, the deposit's two moments, its rates and the pass's place, and no current
+([THE_ENGINE §1](../../docs/THE_ENGINE.md#1-what-it-is)). `write-next` reads a saved state and deposits nothing, and its optional
+last argument keeps the last `WINDOW` known places. So the one thing that spans a turn today is text laid out again and read
+through the contact's sources. The parts that are carried states by their form reach a few places: her open read holds the last
+few bytes and the level hands on the epoch before ([the record of the handed cycle](2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_AND_KEEPS_WHAT_A_COMMON_TURN_LEAVES_A_COUNT_OR_A_PAIR_OF_OPPOSITE_HANDS_A_UNIT_IS_A_LOOP_THAT_NEARLY_CLOSES_ITS_COMMA_IS_ITS_REMAINDER_AND_NESTED_DEPTH_IS_AN_INDEX.md)
+§13, §19). Between a few places and a lap's deposit no store holds the span of an exchange, and laid-out text stands in for that
+span.
+
+The construction this names is the lead's to build, and its reading as the theory's is `agent-inferred` at weight 0.8: a region
+that opens on the currents the last one ended with, a hearing that deposits, and stores whose qualities cover the spans between a
+few places and a lap. The tower's levels are the tree's form of the last: at the line's 3.6 places an epoch a thousand places is
+five or six levels' epochs, where the line hands on one level's (arithmetic on today's epoch, and no reading). Carrying today's
+currents across a turn would carry the last few bytes and nothing of what was said, so the stores' reach is read first, before
+any command that carries them. The continued forward stays what it is proved as: a saving inside one region.
 
 **A guide's sentence this corrects.** `Region::strand`'s note said that the level is not heard in a passage read by two streams and
 that its faces are a known stream's open last place bit for bit. Both held until the level's block of the epoch before was built,
@@ -173,8 +205,10 @@ Whether a build or a read runs is the lead's. A miss is scored as a miss in one 
   rows P and W by the same forward. G-C2's form would change the read, so it is asked for as both forms on one state first.
 - **A workload cut to fit a clock** (GPU first). No lap, pass or held place is cut. §5 reads the count of places against its own
   law and finds it stands.
-- **A design thought in the programming language** (the lessons' list). §6 could be told as a cache of activations. It is stated
-  as the retention law: the states kept are sufficient for every continuation, they are what the forward itself computed, and
-  reading them costs the pairs a site adds. A table of faces indexed by a context met before would be the cache the guide refuses.
+- **A design thought in the programming language** (the lessons' list). §6 is in form a cache of activations: a state kept a
+  place. It is lawful as a realization's partials of one region's forward (the states kept are what the forward itself computed,
+  and reading them costs the pairs a site adds), and this record first wrote it as the retention law, which it is not (§6, what
+  it is not): the failure repeated was this one, a region's laid-out text taken for what she holds. A table of faces indexed by
+  a context met before would be the cache the guide refuses.
 - **A null from an unproved instrument** (rule 11). The ruler's controls plant a training log, a held read with its rows, a host
   log and an open log, and each is read as planted.

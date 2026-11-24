@@ -22,8 +22,8 @@ the states of the sites up to `t`.
    one-sided, so a forward of any count of ticks is.
 2. **The kept states stand** (`kept_states_stand`): two passages that agree up to place `n` hold the
    same state at every site up to `n` after every count of ticks. A passage continued past `n` moves no
-   state kept at its first `n` sites, at any tick: the states of the sites that stand are a retention
-   sufficient for every continuation, which is the retention law read on a passage's own order.
+   state kept at its first `n` sites, at any tick: the states of the sites that stand are sufficient
+   for every continuation of that region.
 3. **A face read one-sided stands** (`face_stands`): a one-sided reading of the forward at a place up
    to `n` is the same on both passages, so a face read once is never read again.
 4. **A continued reply costs one forward of the finished region** (`continued_pairs`): with a forward of
@@ -33,6 +33,12 @@ the states of the sites up to `t`.
 5. **A replayed reply costs at least `R` forwards of the prompt** (`replayed_pairs_ge`,
    `continued_le_replayed`): reading the forward anew at each of `R` places costs
    `Σ_(k<R) (m + k + 1)² ≥ R (m + 1)²`, and the continued count never exceeds it.
+
+Scope. The kept states are one a place: a realization's partials for one region's forward. They are
+sufficient and no quotient, so this file states no retention and nothing of what a receiver holds of
+a passage or of an exchange. That is the source moment appended a symbol at a time
+(`Holonics.Transport.SourceMoment`, `moment_append_one`; atlas `encoding.reduced-recurrence`), in a
+store whose reach is its quality (atlas `store.finite-quality`), with the deposit.
 
 Not proved here: that the engine's built tick is one-sided in this sense in every part (its still
 heads, crowds, circles and the level's hand-on are stated so in their atlas rows and are read on the
