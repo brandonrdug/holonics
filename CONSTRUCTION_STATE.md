@@ -118,9 +118,11 @@ rings under a thirtieth of themselves ([the record of the calendar](research/rec
 separator comes and no place in the period: she takes a stream's rate within about fifty places, and at no period from 3 to 16
 does a kept separator cost her less than a quarter of a nat under what the rate alone gives (§13; the panel that read her
 writes stood at its floor). Read under a ruler's slower and faster fades of her rings, a slower fade moves her rate at long words and
-blurs the count she holds at words of two letters, and a count of the letters since a break opens at the one length whose word
-spans a ring's turn on her clock when that ring is slowed; a fade founded at the skin's value hears its own return at a
-thirty-first of the most, so the form that reaches a count is a second store a ring founded where it rings (§14). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+blurs the count she holds at words of two letters, and her code of a break follows the letters since the last one at one
+length, words of six letters, on two seeds, where the last break stands half a turn back on the ring of 16 and a quarter on
+the ring of 32; a word placed on a ring's whole turn opened nothing. A fade founded at the skin's value hears its own return
+at a thirty-first of the most, so the form that reaches a count is a second store a ring founded where it rings, its second
+axis read by a weight founded at zero (§14). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
 the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions

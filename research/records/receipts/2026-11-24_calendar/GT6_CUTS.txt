@@ -1,0 +1,36 @@
+Cuts of the lead's read for G-T6 (GUESS.txt beside this file), made by fade_cuts.py (beside this file, sha256
+8980e6ff7e5420bd909155fcf1559f02b656df01ced0ba3dcfc19b487b3b6ce0) at 2026-11-24T23:22Z on the PC's host, one thread, under a
+second, from the tables the lead's read left: the rows (768: the lead's period_known.py at seed 27, 64 rows a length and kind,
+P1 = 5, 7, 9, 15, 21 and 27, 300 places a row; sha256 5cd185f09d677d2d258271d6c5c48f3e8de22e8549fb9b5ffb8fef1a067000c1) and
+read-reach's codes for them on W110's MEAN.3000 under law, fade:16:-2000 and fade:128:-2000 (codes.tsv sha256
+7c6e341c432d61c2fc0b7fef68b67cec1f11ba75bf73128e8829e548bbf1fdc5). The read's own lines, in millionths of a nat a place over
+229,632 places: law 3863758, fade:16:-2000 4076290, fade:128:-2000 3875758; about 272 s a setting on the host at eight threads
+by the lead's script, ended 23:16:46 UTC. No state was read by this cut and nothing ran on the card. The rows hold no held
+text, so the FADE_HELD lines are empty. The lines below are the cut's whole output (sha256
+6f1eacef27bd1da91d10612be29b1898beaaf067923dd24f622d31b243d55556).
+
+FADE run=gt6_W110 settings=law,fade:16:-2000,fade:128:-2000 codes=230400 held_places=0
+FADE_LAW run=gt6_W110 P1=5 kept=1.783 twin=2.031 1.935 1.909 letters=3.931 3.964 ln_P1=1.609
+FADE_LAW run=gt6_W110 P1=7 kept=2.192 twin=2.448 2.292 2.341 letters=3.953 3.943 ln_P1=1.946
+FADE_LAW run=gt6_W110 P1=9 kept=2.657 twin=2.715 2.630 2.651 letters=3.915 3.918 ln_P1=2.197
+FADE_LAW run=gt6_W110 P1=15 kept=3.526 twin=3.410 3.447 3.581 letters=3.894 3.890 ln_P1=2.708
+FADE_LAW run=gt6_W110 P1=21 kept=4.171 twin=4.126 4.279 4.037 letters=3.879 3.893 ln_P1=3.045
+FADE_LAW run=gt6_W110 P1=27 kept=4.322 twin=4.311 4.280 4.470 letters=3.896 3.900 ln_P1=3.296
+FADE_HELD run=gt6_W110 setting=fade:16:-2000 
+FADE_HELD_RUN run=gt6_W110 setting=fade:16:-2000 
+FADE_PAIRED run=gt6_W110 setting=fade:16:-2000 P1=5 kept=+0.300 twin=+0.321 change=+0.022 se=0.046 twin_around=+0.298 +0.275 letters=+0.182 +0.155 opens=+0.023(0.054)
+FADE_PAIRED run=gt6_W110 setting=fade:16:-2000 P1=7 kept=-0.011 twin=+0.041 change=+0.051 se=0.061 twin_around=+0.156 -0.155 letters=+0.354 +0.303 opens=+0.311(0.071)
+FADE_PAIRED run=gt6_W110 setting=fade:16:-2000 P1=9 kept=-0.461 twin=-0.434 change=+0.027 se=0.072 twin_around=-0.359 -0.375 letters=+0.291 +0.269 opens=+0.001(0.082)
+FADE_PAIRED run=gt6_W110 setting=fade:16:-2000 P1=15 kept=-0.529 twin=-0.445 change=+0.084 se=0.081 twin_around=-0.426 -0.594 letters=+0.173 +0.175 opens=+0.127(0.103)
+FADE_PAIRED run=gt6_W110 setting=fade:16:-2000 P1=21 kept=-0.791 twin=-0.775 change=+0.016 se=0.120 twin_around=-0.874 -0.660 letters=+0.245 +0.252 opens=-0.232(0.130)
+FADE_PAIRED run=gt6_W110 setting=fade:16:-2000 P1=27 kept=-0.577 twin=-0.737 change=-0.160 se=0.120 twin_around=-0.657 -0.625 letters=+0.167 +0.181 opens=-0.162(0.169)
+FADE_POOLED run=gt6_W110 setting=fade:16:-2000 P1<=5 change=+0.022 se=0.046 P1>=7 change=+0.003 se=0.042
+FADE_HELD run=gt6_W110 setting=fade:128:-2000 
+FADE_HELD_RUN run=gt6_W110 setting=fade:128:-2000 
+FADE_PAIRED run=gt6_W110 setting=fade:128:-2000 P1=5 kept=-0.015 twin=-0.017 change=-0.003 se=0.012 twin_around=-0.065 -0.014 letters=+0.030 +0.028 opens=-0.051(0.014)
+FADE_PAIRED run=gt6_W110 setting=fade:128:-2000 P1=7 kept=-0.045 twin=-0.076 change=-0.031 se=0.019 twin_around=-0.073 -0.047 letters=+0.022 +0.027 opens=-0.029(0.016)
+FADE_PAIRED run=gt6_W110 setting=fade:128:-2000 P1=9 kept=-0.055 twin=-0.034 change=+0.021 se=0.021 twin_around=-0.033 -0.020 letters=+0.018 +0.017 opens=-0.013(0.028)
+FADE_PAIRED run=gt6_W110 setting=fade:128:-2000 P1=15 kept=+0.010 twin=+0.023 change=+0.012 se=0.039 twin_around=-0.007 -0.008 letters=+0.002 +0.010 opens=+0.003(0.039)
+FADE_PAIRED run=gt6_W110 setting=fade:128:-2000 P1=21 kept=+0.137 twin=+0.179 change=+0.041 se=0.040 twin_around=+0.143 +0.215 letters=+0.001 -0.002 opens=-0.053(0.044)
+FADE_PAIRED run=gt6_W110 setting=fade:128:-2000 P1=27 kept=+0.209 twin=+0.191 change=-0.018 se=0.048 twin_around=+0.155 +0.244 letters=-0.002 +0.001 opens=-0.101(0.040)
+FADE_POOLED run=gt6_W110 setting=fade:128:-2000 P1<=5 change=-0.003 se=0.012 P1>=7 change=+0.005 se=0.016
