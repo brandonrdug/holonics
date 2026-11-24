@@ -37,10 +37,10 @@ const REACTION_BOUND: u64 = 41;
 
 /// [definition; Build B] Whether the stretch of count `d` is an act of the world joined to its slice: one in `every`, keyed by the key
 /// file's seed and the stretch's count (the mixer of [`holonics_engine::passage`]'s draws, SplitMix64).
-/// [definition; the lead, November 23, an act answered in kind] The world's slice name that sets it on the terrain's records
-/// (`set-world STATE SHA terrain EVERY RECORDS RUN OUT`), and the slice an act of the terrain is drawn from.
-pub(crate) const TERRAIN_WORLD: &str = "terrain";
+/// [definition; the lead, November 23, an act answered in kind] The slice an act of the terrain is drawn from (the world's slice name is
+/// [`holonics_engine::field::TERRAIN_WORLD`]).
 const TERRAIN_ACT: usize = usize::MAX;
+use holonics_engine::field::TERRAIN_WORLD;
 
 fn acts_here(seed: u64, d: u64, every: u64) -> bool {
     let mut z = seed.wrapping_add(d.wrapping_mul(0x9E37_79B9_7F4A_7C15)) ^ 0x776F_726C_6400_0000;

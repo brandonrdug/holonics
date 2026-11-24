@@ -594,6 +594,11 @@ impl PassTerrain {
     }
 }
 
+/// [definition; the lead, November 23, an act answered in kind] **The terrain's world**: a world whose slice is this name answers her acts
+/// on the terrain's records ([`PassTerrain`]) in place of a slice's stretches (`athena`'s `set-world ... terrain EVERY RECORDS RUN`); no
+/// slice of a store bears it. Its records count is one or more: it is a world of records, never a draft world.
+pub const TERRAIN_WORLD: &str = "terrain";
+
 /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC, the friction record §3 and §5] **A world joined at the
 /// pass's boundary**: a receiver outside the machine that answers the field's own act. One stretch in `every` of the slice `slice` (keyed by
 /// the stretch's count) becomes an act: its last `records` whole lines are the prompt, the field releases `run` places after them (its
@@ -709,7 +714,7 @@ impl StorePass {
             None => None,
         };
         if let Some(w) = &world {
-            if w.every == 0 || w.run == 0 || (w.records > 0 && w.refine > 1) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
+            if w.every == 0 || w.run == 0 || (w.records > 0 && w.refine > 1) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !(slices.iter().any(|s| s.name == w.slice) || (w.slice == TERRAIN_WORLD && w.records > 0)) {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
