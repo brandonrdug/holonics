@@ -19,9 +19,9 @@ Three slices, each a document a piece, every piece in time order (`corpus_passag
 
 - `harness`: one conversation's system-side text a document, its events in time order (the full collection, Brandon November 24).
 
-Held: everything dated on or after HELD_FROM (a `YYYY-MM-DD` UTC date), the time cut no earlier state has read. Left out of both roles:
-the GSM8K evaluation window (September 3 12:00 to September 7 12:00 UTC), whose messages contain the evaluation families
-(`tools/human_messages.py` withholds it the same way).
+Held: everything dated on or after HELD_FROM (a `YYYY-MM-DD` UTC date), the time cut no earlier state has read. Until November 24 the
+GSM8K evaluation window (September 3 12:00 to September 7 12:00 UTC) was left out of both roles; Brandon lifted it that day (05:53Z:
+"there are other yardsticks"), and nothing is left out by date now.
 
 Usage: history_passage.py SET OUT HELD_FROM [RESULT_LIMIT [ACTS_SHARE]]
 
@@ -34,7 +34,9 @@ import os
 import sys
 
 INDEX_HEAD = "document\ttitle_octets\ttext_octets\topens\tcloses\n"
-WINDOW = ("2026-09-03T12", "2026-09-07T12")
+# [the lead, November 24] Brandon, 05:53Z: the September 3 to 7 window is no longer left out ("there are other yardsticks"); WINDOW is
+# empty, so nothing is left out by date but the held cut.
+WINDOW = ("", "")
 
 
 class Role:

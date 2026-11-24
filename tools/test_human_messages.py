@@ -140,7 +140,7 @@ class ProvenanceFixtures(unittest.TestCase):
                 out, err = self.run_main([(time, origin, "fixture", text)
                                           for time, origin, text in entries])
                 self.assertEqual(out, "")
-                self.assertIn("withheld in the evaluation window (of the files read): 1", err)
+                self.assertIn("withheld with no readable time (of the files read): 1", err)
 
     def test_unrecognized_relay_author_is_ambiguous(self):
         entries, diagnostics = self.extract(relay(citation(author="unknown")))
@@ -169,22 +169,24 @@ class ProvenanceFixtures(unittest.TestCase):
                                (SENT, "claude-ambiguous", "fixture", "Uncertain.")], "--count")
         self.assertEqual(out, "claude 1\ncodex 0\nclaude-relayed 1\nclaude-ambiguous 1\n")
 
-    def test_evaluation_window_uses_inner_message_time(self):
+    def test_the_september_window_is_read(self):
+        # Lifted on November 24 (Brandon, 05:53Z): a message of September 4 is printed and nothing is withheld.
         for content in (wake(principal(**{"sent-at": "2026-09-04T15:00:00Z"})),
                         relay(citation(at="2026-09-04T15:00:00Z"))):
             entries, _ = self.extract(content)
             out, err = self.run_main([(time, origin, "fixture", text)
                                       for time, origin, text in entries])
-            self.assertEqual(out, "")
-            self.assertIn("withheld in the evaluation window (of the files read): 1", err)
+            self.assertIn("2026-09-04T15:00:00Z", out)
+            self.assertIn("withheld with no readable time (of the files read): 0", err)
 
-    def test_ambiguous_envelope_cannot_expose_evaluation_citation(self):
+    def test_ambiguous_envelope_keeps_its_time_now_that_no_window_is_withheld(self):
         contents = ['<wake><note>' + principal(**{"sent-at": "2026-09-04T15:00:00Z"})
                     + '</note></wake>', wake(principal(citation(at="2026-09-04T15:00:00Z")))]
         for text in contents:
             with self.subTest(text=text[:20]):
                 entries, diagnostics = self.extract(text)
-                self.assertEqual(entries[0][:2], ("", "claude-ambiguous"))
+                self.assertNotEqual(entries[0][0], "")
+                self.assertEqual(entries[0][1], "claude-ambiguous")
                 self.assertIn("2026-09-04T15:00:00Z", entries[0][2])
                 self.assertTrue(diagnostics)
 
