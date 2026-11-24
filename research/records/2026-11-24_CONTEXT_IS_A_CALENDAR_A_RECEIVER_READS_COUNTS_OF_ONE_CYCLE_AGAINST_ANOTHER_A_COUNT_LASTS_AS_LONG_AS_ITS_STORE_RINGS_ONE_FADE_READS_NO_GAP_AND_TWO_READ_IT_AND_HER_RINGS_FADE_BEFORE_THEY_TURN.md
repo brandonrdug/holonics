@@ -293,13 +293,16 @@ period is heard through the skin and the constant is not where the first build s
 | Currents passing a region's end, with the gap acting on them, are what a direct exchange needs (§6.3) | 0.8 | the probe panel's frame counts on a build that holds them |
 | The first build is §6.1 | 0.5 | G-T3 (d) at the constant, then on the arm |
 
+These are the weights as first written; §12 and §13 state what the reads moved.
+
 ## 9. Lean
 
 `lean/HolonicsResearch/HNN/ComparedClock.lean`, rooted in `HolonicsResearch`, built with the library (10,676 jobs), no `sorry`,
 no `axiom`: `countBefore_retimed`, `ratio_within`, `one_fade_reads_no_gap`, `two_fades_ratio`, `two_fades_read_gap`,
 `turns_under_grain`, `skin_turn` (a ring of period `n` fading `e^(−2π/n)` a step keeps `e^(−2π)` over its turn, whatever `n`),
 `skin_turn_lt` (under `1/400`), `dead_reckoning`, `dead_reckoning_attained`, `Local.comp`, `Local.iterate`,
-`outside_cone_moves_nothing`. The constructions these leave for #410, each a statement to write: a resonance's line width as
+`outside_cone_moves_nothing`, and with §13 `rateCode`, `log_lt_rateCode` and `rateCode_lt_one_add_log` (a reader that holds a
+tick's rate `1/P` and no place in its period pays between `log P` and `1 + log P` a period). The constructions these leave for #410, each a statement to write: a resonance's line width as
 the fineness of the comparison it holds; the bound of a ring's turns by its clock's error as a theorem on a phase; and the
 linking number as the whole part of a mutual induction on the complex.
 
@@ -313,6 +316,8 @@ linking number as the whole part of a mutual induction on the complex.
 - [THE_ENGINE §11](../../docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine): the law's row against the engine.
 - `CONSTRUCTION_STATE.md`: what binds an exchange, named by store.
 - The records' route and index.
+- With §13: `receipts/2026-11-24_calendar/known_cuts.py` and `KNOWN_CUTS.txt`, the atlas row
+  `aeon.rate-without-count-costs-its-entropy`, the three Lean statements of §9, and G-T5 in the guess file.
 
 ## 11. The failures this could repeat
 
@@ -394,6 +399,99 @@ the dyadic ring of period 16 or the triadic ring of period 9 takes a fade under 
 no period by timing alone" stays at 0.7 with no evidence added. "She keeps a period inside the near field by timing alone" was a
 coin and missed. G-T2 and G-T4 wait on an arm, and G-H9 with them.
 
+## 13. Her face on a shown period: she holds its rate and no count
+
+The lead ran the read §12 named inside the quarter hour (relayed at 20:59 UTC; `tools/period_known.py` in the lead's line,
+`read-reach` under the setting `law` on W110's `MEAN.3000`, seed 25, 64 rows a length). A kept row is drawn letters in words of
+`L = P1 − 1` letters, each followed by a space, 300 places; its loose twin cuts the same letters into words of `L − 1`, `L` or
+`L + 1`. Every place is coded at its own frontier, and the separators of each row's last third are read. The lead's cut, kept
+less loose, is −0.366, −0.228, −0.146, −0.141, −0.048, −0.008, −0.013 and +0.110 nats at `P1` = 3, 4, 5, 7, 9, 10, 15 and 16,
+read by the lead as a period kept to about seven places and gone by ten, with her rings' own periods not favoured.
+
+**The cut mixes two things.** The twin's separators follow `L − 1`, `L` and `L + 1` letters, so kept less loose also carries the
+curve of her code of a separator against the letters since the last one, whatever a row has shown: at `P1` = 3 the twin codes a
+separator after one letter at 1.44 nats and after two or three at 1.02. Four cuts of the codes the read saved part them
+([`known_cuts.py`](receipts/2026-11-24_calendar/known_cuts.py), its lines in
+[`KNOWN_CUTS.txt`](receipts/2026-11-24_calendar/KNOWN_CUTS.txt); no state was read and nothing ran on the card). Separators of the
+last third, nats:
+
+| `P1` | kept | the twin's after `L` letters | what the shown period gives (its standard error over rows) | a reader of the rate alone, `ln P1` |
+|---|---|---|---|---|
+| 3 | 0.781 | 1.017 | 0.236 (0.027) | 1.099 |
+| 4 | 1.340 | 1.580 | 0.240 (0.031) | 1.386 |
+| 5 | 1.792 | 1.891 | 0.099 (0.040) | 1.609 |
+| 7 | 2.196 | 2.342 | 0.146 (0.047) | 1.946 |
+| 9 | 2.630 | 2.689 | 0.060 (0.070) | 2.197 |
+| 10 | 2.763 | 2.750 | −0.013 (0.082) | 2.303 |
+| 15 | 3.515 | 3.582 | 0.066 (0.103) | 2.708 |
+| 16 | 3.729 | 3.653 | −0.076 (0.114) | 2.773 |
+
+1. **With the length matched the lead's shape stands and its size at three falls by a third.** A shown period gives her a
+   quarter of a nat at three and four, a tenth to a seventh at five and seven, and nothing told from zero from nine. A gain of
+   the size at three would stand at two to three standard errors at the long periods; a gain of a tenth would not be seen
+   there. The +0.110 at sixteen was the twin's curve.
+2. **The larger figure is the kept column.** After seventy repeats of a period of three a kept separator still costs 0.78 nats,
+   and after fifty of a period of four 1.34. A reader that held the count would pay next to nothing. A reader that holds how
+   often a separator comes and no place in the period pays `ln P1` at each. Her kept code stands 0.32 under that reader's at
+   three, at it at four, and 0.18 to 0.96 over it from five up. At no period from 3 to 16 does she hold a shown period as a
+   count.
+3. **She takes the rate within about fifty places.** By fifty places of the row, a separator at `P1` = 3 costs 1.66, 1.06,
+   0.97, 0.86, 0.81, 0.76 in the kept rows and 1.78, 1.32, 1.22, 1.19, 1.16, 1.13 in the twins, where a row's first separator
+   costs 2.7. The twins level at the rate reader's code where the ticks are many (1.13 against 1.10 at three) and stand 0.2 to
+   0.8 over it at the longer periods, where a row shows few (nineteen at sixteen). What the period adds comes slowly after
+   that: with the length matched, 0.05 and 0.00 at three and four over a row's first hundred places, 0.15 and 0.13 over its
+   second and 0.22 and 0.24 over its third, and the kept rows' code is still falling 0.05 a fifty places at a row's end.
+4. **What the period adds is not read off the last separators.** A twin's separator after `L` letters costs the same
+   whether one, two, or three and more of the words before it also had `L` letters: 1.02, 1.05, 1.02 at three against
+   the kept rows' 0.85, and 1.59, 1.59, 1.64 at four against 1.41 (places 100 to 299). So the last word's length does not reach the
+   next separator: nothing hands her a return one period on. What the kept rows add is a slow store's, charged over hundreds
+   of places.
+
+**On the law.** She holds how often, and no when. That is clause 5's first half measured at her face and its second half
+absent: each store of hers gives a fading share, which over a stream is a rate, and none stands through a count. The engine
+today is a context of fades by the octave with no count, clause 5 without its second half, and the read gives what the count
+is worth: a reader of the rate alone pays
+`ln P + (P − 1) ln(P/(P − 1))` a period, between `ln P` and `1 + ln P` (Lean, `rateCode`), where a reader of the count pays
+nothing once the period stands. On this specimen, which is nothing but its period, that is 0.64 nats a place at three and 0.23
+at sixteen. On her passages it is whatever share of a line's length, a table's columns, a meter or a nesting is its count, and
+this read does not size it.
+
+**Which store holds the rate** the read does not say. `read-reach` takes other settings, a ruler's friction on a head's sources
+by the octave of their distance, and the same rows under them would name the head. It is named here once and ordered by no one.
+
+**The split of the lengths by her rings bound no ring** (a miss of frame, mine). §7 set the lengths on and off her rings'
+periods counted in places, and her rings turn on her clock, where a space counts 9.6 letters on the dyadic head and 5.0 on the
+triadic (G-T1, read after the panel was fixed and before I scored (d)). A period of `P1` places is `(P1 − 1) κ_letter + κ_space`
+of her clock: 11.8, 12.9, 14.1, 16.3, 18.6, 19.7, 25.3, 26.4 on the dyadic head and 7.9, 9.3, 10.7, 13.6, 16.4, 17.8, 24.9, 26.4
+on the triadic, with a letter at the mean of a, e and t (the pace read prints no other letter). In her clock's units the lengths
+within a tenth of a turn of a ring are `P1` = 7 (the dyadic 16), 4 (the triadic 9) and 16 (the triadic 27), and they stand no
+higher than their neighbours (0.146 and 0.240 against 0.099 and 0.236; −0.076 against 0.066). With every ring keeping 0.0019 of
+itself over its turn none was expected to. So neither G-T3 (d)'s score nor the lead's "not favoured" binds a ring.
+
+**What a return asks of a ring, and what a carried count asks instead.** A ring keeps half of itself over one turn when its fade
+a radian stands at `ln 2 / 2π = 0.110` of the skin's one e-fold; at half the skin's fade, the mark G-T4 (b) was fixed on, it
+keeps 0.043. A kept stream is told one period on: the last word's length and the count since the last separator give the next
+separator. So §6.1 can deliver a count at her face only where a ring that spans a word or two takes a fade a ninth of the founding's
+or less. §6.2 asks for no ring to ring: the fine clock read at the level's tick and handed up is a count, and a count at one level
+is a rate at the level above, which her stores do hold (clause 2's carry up, meeting clause 5; 0.55 that this is the cheaper
+route to a count). Whether a level's site reads its epoch's length today is the first thing to read at its owner before
+either is built; I have not read it this hour.
+
+**G-T5**, fixed at 21:16:00 UTC before any read for it, on G-H9's arm beside its control at their lap means, the same rows and
+the cuts above: (a) (0.2) the arm's kept separators at `P1` = 3 over a row's last fifty places stand 0.15 nats or more under
+the control's (0.755 on W110's mean); (b) (0.7) the twins' separators over the last third stand within 0.08 nats of the
+control's at every period. I expect (a) to miss: a fade founded at the skin's value and moved by laps of her passages has
+little that pulls a short ring's quality up ninefold. Held, a located fade carries a count her face uses. Missed with the
+fades moved (G-H9 (b), G-T4 (b)), the count is §6.2's to carry.
+
+**What stands and what moved.** Clauses 1 to 5 stand at their weights, and clause 5's two halves are now read apart at the
+engine: the fading share she has, the count she has not. "Past the near field she keeps no period by timing alone" was at 0.7
+with nothing read; at her face on drawn letters it holds at every period read, the near field included, and the wider
+statement, that in a read her stores' currents hold rates and no count of places past a few, whatever the form, is at 0.75 (a
+form her laps asked for could show one: a learner's null is held to a length, and this is a ruler's read of one state on a
+form no lap asked of her). The order of §6.1
+and §6.2 keeps its weights; what the read adds is the ruler both are read by. Waiting on an arm: G-T2, G-T4, G-T5 and G-H9.
+
 ## Sources
 
 Read this hour: `crates/engine/src/navigator.rs` (`ring_periods`, `skin_decay`, `skin_of`), `crates/engine/src/declaration.rs`
@@ -403,6 +501,8 @@ Read this hour: `crates/engine/src/navigator.rs` (`ring_periods`, `skin_decay`, 
 (§13, §19, §20, §22);
 [the record of November 21 on a grain](2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md);
 [the record of October 27 on the levels' news](2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS.md);
-W109's training log on the PC (its declaration line); the lead's reads of §12, relayed by the coordinator. From the literature, from training and not restated: Kelvin's and
+W109's training log on the PC (its declaration line); the lead's reads of §12 and §13, relayed by the coordinator; for §13,
+`crates/athena/src/ruler/tension.rs` (`read_reach`: each row read whole, every place at its own frontier) and the rows and codes
+the lead's read left on the PC. From the literature, from training and not restated: Kelvin's and
 Helmholtz's theorems and the conservation of helicity; the fade `ν k²` of a viscous mode; the swimmer's theorem at small
 Reynolds number (Purcell 1977); the calendar's and the second's figures; free-running rhythms in isolation.
