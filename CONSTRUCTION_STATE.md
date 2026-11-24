@@ -97,7 +97,9 @@ the rows no guess is scored on, about 26 minutes. What stands after it: rows P (
 by the forward of rows P), and a section 3.1 times over the count of its arithmetic (684 ms against 223; 3.0 on November 21, the
 growth since being the declaration's). The writer replays its whole region at every place it writes; a one-sided region continues
 by a site, so a reply costs one forward of the finished region
-([`HNN/ContinuedRegion`](lean/HolonicsResearch/HNN/ContinuedRegion.lean)), and no command does that yet.
+([`HNN/ContinuedRegion`](lean/HolonicsResearch/HNN/ContinuedRegion.lean)), and no command does that yet. That is a saving inside
+one region and no account of how she holds an exchange: a region's currents end with the region and her writer deposits nothing,
+so only laid-out text spans a turn today, where the theory's hold is her stores' carried currents and her deposit (that record §6).
 
 **Guesses fixed and not yet read**, each in the receipts directory of its record (a guess's name is unique only with its directory):
 - the formal thread's: G-C1 to G-C3 (`receipts/2026-11-24_lap_cycle/GUESS.txt`); G-Q1, G-Q2, G-Q4, G-Q5
@@ -107,7 +109,8 @@ by a site, so a reply costs one forward of the finished region
   and no kin of the handed cycle's G-H); the laps after it (W108 and its arm, W109) carry their own in the lead's next receipts.
 
 **What binds, each by its measurement.** No write keeps a dialogue's frame (the probe panel's counts above), which is what a direct
-exchange with her needs first. The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+exchange with her needs first. No store's reach stands between a few places and a lap's deposit, so the span of an exchange is
+held by laid-out text alone (the record of the cycle §6). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
 the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions
