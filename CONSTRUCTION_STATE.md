@@ -112,8 +112,10 @@ so only laid-out text spans a turn today, where the theory's hold is her stores'
 exchange with her needs first. No store's reach stands between a few places and a lap's deposit, so the span of an exchange is
 held by laid-out text alone (the record of the cycle §6). By store: every turned ring keeps 0.0019 of itself over its own turn, the fine
 clock is a count compared with nothing, the carry circles alone hold their quality as a state, and no store fades through a gap
-between regions, so she attains no unit past the near field by timing and reads no silence
-([the record of the calendar](research/records/2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md) §5; its panel and guesses unread). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+between regions, so a silence is read by nothing. Her separators hold the long durations of a clock in her own units (a space
+8.5 letters on one turned head, a line feed 18 on the other), and under the skin's tie of fade to turn each leaves the short
+rings under a thirtieth of themselves ([the record of the calendar](research/records/2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md) §5, §12; that she keeps no
+period past the near field by timing is the law's reading at 0.7, and the panel that read her writes stood at its floor). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
 the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions

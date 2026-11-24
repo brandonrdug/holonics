@@ -336,6 +336,64 @@ linking number as the whole part of a mutual induction on the complex.
 - **Physics split by grain.** The fluid's two regimes are one medium read at a ratio, its fade time over its turnover time.
 - **A learner's null from a short or unasked trial** (rule 10). §7 states what the panel's null does not say.
 
+## 12. The reads, scored
+
+The lead read both cheap reads on W109's `MEAN.3000` within the hour (relayed at 20:43 UTC; the receipts stand under the lead's
+record of the day). Scored at 20:46:22 UTC, in the words the guesses were fixed in.
+
+| Guess | Read | Score |
+|---|---|---|
+| G-T1 (a) | the line feed's rate is 12.985 against a letter's 1.125 on the dyadic head, 25.457 against 1.420 on the triadic: 11.5 and 17.9 times | held |
+| G-T1 (b) | the space's is 9.553 and 5.046: 8.5 and 3.6 times | held |
+| G-T3 (a) | no drawn `meter1` at `P1` = 10, 15 or 16 reaches 0.3 | held |
+| G-T3 (b) | the largest drawn `meter2` at `P2` of 16 or more is 0.145 | held |
+| G-T3 (c) | the drawn `meter1` at `P1` = 3, 4 and 5 is 0.07 or less | missed |
+| G-T3 (d) | on her rings 0.034, off them 0.028 | held |
+| G-T3 (e) | bare 0.016 against drawn 0.025 | missed |
+
+**The panel stood at its floor.** No cell is kept: every `meter1` lies between −0.09 and 0.15, bare and drawn alike, in 256 rows
+written on the card in 66 s. So (a), (b) and (d) held where nothing could have missed them, and they carry little for the law.
+What the read says is the writer's: at the field's own temperature a write of 96 drawn places does not continue a form that no
+passage of hers holds, a bare line of one two-letter word repeated twenty times included, while her face codes a copy at 0.095
+nats a place on the terrain's own form. Once a drawn place leaves the pattern the text before it is no longer the pattern, and it
+does not come back (the lead's reading). The panel read a release where the law's claim is about a store. §7 cautioned that a
+null on a form no lap asked of her says little, and it did not ask for the read that tells the two apart: the face on the
+panel's reference laid out as known text, the code of the stretch with its period kept against the code of the same stretch
+with its separators one place late. That is the ruler's repair, a
+difference of two held codes, and it is named here once and ordered by no one.
+
+**The pace table says more than it was asked.** Her located clock ticks by her own units: a space is 8.5 letters of duration on
+the dyadic head and a line feed 18 on the triadic. Because the skin follows the turn's variation (`tower.field-pace`: the fade
+between two sites is `e^(−2π|σ_i − σ_j|/n)`, `σ` the running sum of `|κ|`), a long duration is also a deep fade. Across one space,
+from the read rates:
+
+| Ring's period (dyadic head) | 2 | 4 | 16 | 32 | 128 | 256 | 1,024 | 4,096 |
+|---|---|---|---|---|---|---|---|---|
+| kept across a space | 0.000 | 0.000 | 0.023 | 0.153 | 0.626 | 0.791 | 0.943 | 0.985 |
+| kept across a line feed | 0.000 | 0.000 | 0.006 | 0.078 | 0.529 | 0.727 | 0.923 | 0.980 |
+
+| Ring's period (triadic head) | 3 | 9 | 27 | 81 | 243 | 729 | 2,187 | 6,561 |
+|---|---|---|---|---|---|---|---|---|
+| kept across a space | 0.000 | 0.030 | 0.309 | 0.676 | 0.878 | 0.957 | 0.986 | 0.995 |
+| kept across a line feed | 0.000 | 0.000 | 0.003 | 0.139 | 0.518 | 0.803 | 0.929 | 0.976 |
+
+So under one constant a unit's tick is a wall. She has given her separators the long durations a clock in her own units needs,
+and at the skin's tie of fade to turn each of them leaves the rings of period 16 and less (9 and less on the triadic head) under
+a thirtieth of what they held. The atlas row had the reading from the rates of November 2 (each clock's rates are a friction its
+navigator located, and their carries screen what came before); the read gives it per ring at today's rates. With a word of 4.7
+letters and its space the dyadic clock advances about 14.8, which is 0.93 of a turn of the ring of period 16: a fit after the
+read at an assumed word length, no test (0.4 that her words' advances on that head have their median within 2 of 16).
+
+This is the first construction's reason stated at the engine: a turn that counts her units and a fade that forgets across them
+are one number today, and §6.1 is what lets them part. The weight that §6.1 is the first build goes from 0.5 to 0.6 on this
+read. Whether the long durations were wanted as ticks or as walls is what its arm reads, and G-T4 is fixed on it at
+20:46:22 UTC, before any read: on G-H9's arm the separators' rates still stand at 3 or more times a letter's (0.65), and
+the dyadic ring of period 16 or the triadic ring of period 9 takes a fade under half the founding's (0.5, a coin).
+
+**What stands and what moved.** Clauses 1 to 5 stand at their weights: no read here touched them. "Past the near field she keeps
+no period by timing alone" stays at 0.7 with no evidence added. "She keeps a period inside the near field by timing alone" was a
+coin and missed. G-T2 and G-T4 wait on an arm, and G-H9 with them.
+
 ## Sources
 
 Read this hour: `crates/engine/src/navigator.rs` (`ring_periods`, `skin_decay`, `skin_of`), `crates/engine/src/declaration.rs`
@@ -345,6 +403,6 @@ Read this hour: `crates/engine/src/navigator.rs` (`ring_periods`, `skin_decay`, 
 (§13, §19, §20, §22);
 [the record of November 21 on a grain](2026-11-21_A_GRAIN_IS_A_RELATION_BETWEEN_GRAINS_A_WORD_IS_A_COUNT_IN_ITS_STORES_OWN_UNIT_ABOVE_A_TURN_ITS_INTEGRATOR_KEEPS_A_PLACE_IS_PRICED_BY_ITS_RATIO_TO_THE_STORES_SPREAD_AND_RESOLUTION_IS_BOUGHT_BY_AGREEMENT_NEVER_BY_DEPTH.md);
 [the record of October 27 on the levels' news](2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS.md);
-W109's training log on the PC (its declaration line). From the literature, from training and not restated: Kelvin's and
+W109's training log on the PC (its declaration line); the lead's reads of §12, relayed by the coordinator. From the literature, from training and not restated: Kelvin's and
 Helmholtz's theorems and the conservation of helicity; the fade `ν k²` of a viscous mode; the swimmer's theorem at small
 Reynolds number (Purcell 1977); the calendar's and the second's figures; free-running rhythms in isolation.
