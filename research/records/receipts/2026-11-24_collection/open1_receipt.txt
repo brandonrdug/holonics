@@ -1,0 +1,20 @@
+# open1: e5o, the word open, W108's mean, the collection's held set, against out4_W108 (e5h2, the word known)
+OPEN1 lock taken 17:57:31
+OPEN1 exit 0 released 18:12:21 CAVITY_DONE ms=889573
+OPEN1_ROWS P n=200933 known=6c0b74f8ceea6746 open=6c0b74f8ceea6746 EQUAL
+OPEN1_ROWS W n=7568 known=ba484bc022ec94e7 open=ba484bc022ec94e7 EQUAL
+OPEN1_WORDS EQUAL
+OPEN1_FRONTIER FRONTIER W103; one place open: all 0.7311 (200933 places) | acts 1.2009 books 0.6802 code 0.4035 dialogue 1.0230 harness 0.8467 logic 0.3883 science 0.5741 theory 0.5341 web 0.7493 wikidata 0.9089
+OPEN1_FRONTIER FRONTIER W108o; one place open: all 0.7128 (200933 places) | acts 1.1537 books 0.6761 code 0.4038 dialogue 0.9541 harness 0.7862 logic 0.4021 science 0.5683 theory 0.5322 web 0.7408 wikidata 0.9093 || less the control's, paired: -0.0183 (±0.0009) | acts -0.0472 books -0.0041 code +0.0003 dialogue -0
+OPEN1_DONE 18:12:24
+CAVITY_SLICE slice=code stretches=107 places=20124 host_c0_ms=0 card_cK_ms=74423 card_batches=193 host_opening_ms=264 whole_masks=19 whole_places=730 whole_ms=785 copy_places=0 later_places=19375 host_copy_ms=261 elapsed_ms=80758
+CAVITY_SLICE slice=web stretches=104 places=20043 host_c0_ms=0 card_cK_ms=80085 card_batches=215 host_opening_ms=244 whole_masks=19 whole_places=758 whole_ms=788 copy_places=0 later_places=19315 host_copy_ms=237 elapsed_ms=166861
+CAVITY_SLICE slice=science stretches=98 places=20088 host_c0_ms=0 card_cK_ms=83573 card_batches=220 host_opening_ms=267 whole_masks=19 whole_places=776 whole_ms=822 copy_places=0 later_places=19402 host_copy_ms=262 elapsed_ms=256545
+CAVITY_SLICE slice=books stretches=97 places=20028 host_c0_ms=0 card_cK_ms=84599 card_batches=224 host_opening_ms=254 whole_masks=19 whole_places=776 whole_ms=829 copy_places=0 later_places=19349 host_copy_ms=258 elapsed_ms=347238
+CAVITY_SLICE slice=wikidata stretches=108 places=20225 host_c0_ms=0 card_cK_ms=82353 card_batches=206 host_opening_ms=265 whole_masks=19 whole_places=677 whole_ms=743 copy_places=0 later_places=19463 host_copy_ms=240 elapsed_ms=435644
+CAVITY_SLICE slice=theory stretches=97 places=20028 host_c0_ms=0 card_cK_ms=88228 card_batches=224 host_opening_ms=294 whole_masks=19 whole_places=776 whole_ms=863 copy_places=0 later_places=19349 host_copy_ms=262 elapsed_ms=530245
+CAVITY_SLICE slice=logic stretches=97 places=20028 host_c0_ms=0 card_cK_ms=85190 card_batches=224 host_opening_ms=258 whole_masks=19 whole_places=776 whole_ms=839 copy_places=0 later_places=19349 host_copy_ms=265 elapsed_ms=621595
+CAVITY_SLICE slice=dialogue stretches=97 places=20028 host_c0_ms=0 card_cK_ms=84776 card_batches=224 host_opening_ms=247 whole_masks=19 whole_places=776 whole_ms=840 copy_places=0 later_places=19349 host_copy_ms=254 elapsed_ms=712463
+CAVITY_SLICE slice=acts stretches=105 places=20050 host_c0_ms=0 card_cK_ms=80578 card_batches=213 host_opening_ms=253 whole_masks=19 whole_places=747 whole_ms=786 copy_places=0 later_places=19315 host_copy_ms=233 elapsed_ms=799059
+CAVITY_SLICE slice=harness stretches=99 places=20291 host_c0_ms=0 card_cK_ms=84409 card_batches=222 host_opening_ms=231 whole_masks=19 whole_places=776 whole_ms=822 copy_places=0 later_places=19598 host_copy_ms=236 elapsed_ms=889564
+CAVITY_DONE ms=889573

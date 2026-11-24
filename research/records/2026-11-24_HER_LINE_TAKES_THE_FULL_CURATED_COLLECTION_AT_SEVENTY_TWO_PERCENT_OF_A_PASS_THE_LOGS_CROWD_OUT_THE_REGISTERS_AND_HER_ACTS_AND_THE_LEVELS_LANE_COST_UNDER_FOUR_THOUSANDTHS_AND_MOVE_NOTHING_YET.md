@@ -85,6 +85,23 @@ pass W103 trained on, and it fell 0.027 in the lap where the theory, at 8.4% aga
 no change (W107, G-H5, [`GUESS_H5.txt`](receipts/2026-11-24_collection/GUESS_H5.txt)); if the Lean misses again, its share is raised to
 W103's as an arm beside that continuation.
 
+**W107**: W106t's end continued on the same store, no change ([`arm_W107.txt`](receipts/2026-11-24_collection/arm_W107.txt)). Less W103,
+one place open: the Lean +0.0117, the theory −0.0048, the five registers −0.0059 to +0.0060 (all +0.0008, ±0.0010); on the collection's
+held set, acts −0.054 and harness −0.061 (both under W106t's), and dialogue −0.039, 0.041 above W106t's. The terrain's codes rose
+(copy 0.117, reverse 0.111, sum 1.018), and the theory and logic panels read 84% and 81%. (a) and (b) held and (c) missed on the
+conversations: the line stays on this store. The held conversations are four documents (192 KB) read at 0.6% of a pass, and one lap
+moved their code by 0.04 in place where the tool turns' moved by 0.01: a slice that thin is not kept from lap to lap, which is G-D1's
+premise (§3a).
+
+**§3a. The conversations held eight times over** (G-D1, [`GUESS_D1.txt`](receipts/2026-11-24_collection/GUESS_D1.txt)): W107's end
+joined at a new pass to store-2026-11-24-wide-t6 (control W108) and to the same store with the conversations held eight times over
+(W108d, `store-2026-11-24-wide-t6-d8`: 0.6% of a pass to 4.3%), 3,000 sections each. W108d less W108, one place open on the
+collection's held set: the conversations −0.0157 (±0.0005 over all), the tool turns +0.0055, the harness −0.0031, every register within
+0.0044, the theory +0.0034, the Lean +0.0043. (a) missed (0.03 asked), (b) held: the line does not take the dwell, and goes on from W108.
+The control W108, less W103: the conversations −0.069, the tool turns −0.047, the harness −0.061, the Lean +0.014, the theory −0.002,
+the registers −0.009 to +0.001; the held conversations moved by 0.04 from lap to lap across W106t, W107 and W108 on one store, so a
+single lap's reading of them is resolved to about that.
+
 ## 4. The probe panels
 
 Forty prompts addressing Athena, Claude, B and Brandon (dialogue turns, questions, first person, notes, keywords), each drawn five
@@ -103,9 +120,61 @@ counts first person within a write's first 40 characters), of 200 writes each:
 | W104f (the whole collection, 72%) | 13 | 3 | 8 | 1 |
 | W105w (the wide store) | 17 | 8 | 7 | 0 |
 | W106t (the theory and the Lean six times over) | 16 | 9 | 3 | 1 |
+| W107 (the same store, a second lap) | 20 | 7 | 6 | 0 |
 
-Two laps of the collection moved none of these past the scatter between W102b and W103. Her writes on the panel are shown to Brandon
+Three laps of the collection moved none of these past the scatter between W102b and W103. Her writes on the panel are shown to Brandon
 and not kept here, because the states that wrote them read the private collection.
+
+**Does a name pull her to where it lives?** (Brandon, 16:18 UTC, reading W106t's writes after "Claude is" and "How are you feeling
+today?" as association with the theory.) A name is a place in her passage if a prompt naming it draws her toward the text it lives
+in. Eight names in six frames ("X is", "X said", "A note for X:", "X: what are you working on?" with her turn opened, "Who is X?",
+"# X"), each drawn eight times, 64 places, on W103 (before the collection) and W107
+([`panel_names.tsv`](receipts/2026-11-24_collection/panel_names.tsv)). A ruler on the host
+([`tools/register_ruler.py`](../../tools/register_ruler.py)) reads each write as the slice whose byte-trigram counts code it in the
+fewest bits; held to 400 held windows of 64 octets a slice, it places 65% to 95% of our slices' windows (the theory, the Lean, the
+conversations, the tool turns, the harness) in ours and 0% to 10% of the open registers' there
+([`names_register.txt`](receipts/2026-11-24_collection/names_register.txt)). The share of writes it places in ours, of 48 a name:
+
+| name | W103 | W107 | in our slices, a MB | in the open registers, a MB |
+|---|---|---|---|---|
+| Holonics | 0.44 | 0.73 | 16 to 1,796 | under 0.2 |
+| Brandon | 0.27 | 0.38 | 14 to 94 | under 0.5 |
+| Athena | 0.27 | 0.31 | 3 to 47 | under 0.8 |
+| Claude | 0.31 | 0.27 | 7 to 72 | under 0.8 |
+| Alice | 0.33 | 0.38 | under 0.3 | about 2 |
+| Marcus | 0.21 | 0.27 | 0 | about 1 |
+| The teacher | 0.35 | 0.42 | | |
+| The river | 0.58 | 0.62 | | |
+
+A share of 48 draws scatters by about 0.07. Claude, Brandon and Athena stand 50 to 100 times denser in our text than in the open
+registers, and Alice and Marcus the reverse, yet the five pull her toward us alike: a name met tens of times a MB is not yet a place to
+her. "Holonics", met in nearly every tool turn (most of it in paths), is: it rose from 0.44 to 0.73 with the collection, a third of its
+writes placed in the tool turns. (The two frames with nouns, "The teacher" and "The river", draw toward the theory's prose in both
+states; `river` also counts every `driver`, so its densities are not given.) The reading for the product: a name becomes a referent by
+being met as often as a path is, or by being addressed and answered, which is what a conversation does and a log does not.
+
+## 4a. A lap's card time (Brandon, 17:36 UTC: "we still don't want to waste time if we don't have to")
+
+The measurement and its reading stand in [the record of the lap's cycle](2026-11-24_A_LAPS_CARD_TIME_WAS_ITS_READS_THE_HELD_READ_RAN_ONE_FORWARD_FOUR_TIMES_A_ONE_SIDED_REGION_CONTINUES_BY_A_SITE_AND_A_READ_IS_SIZED_BY_THE_SCATTER_BETWEEN_LAPS.md)
+(§2, §3): W106t trained 34 minutes and its reads held the card 53. What the lead built and read that day:
+
+- **Two reads dropped.** The registers' read on store-2026-11-22's held set is the collection's read restricted (rows P of its seven
+  slices hash equal in `out2_W106t` and `out4_W106t`), and the older held set's read was scored by no guess.
+- **A last word `open`** (`crates/athena/src/ruler/cavity.rs`) reads rows P, W and S and leaves rows F, K and the code slice's copies
+  unread. On W108's mean: 890 s against 1,294 s, rows P and W and the charts byte for byte the full read's
+  ([`open1_receipt.txt`](receipts/2026-11-24_collection/open1_receipt.txt)).
+- **A last word `loud`** writes the loudness rows from the forward that reads the charts
+  (`Realization::read_tick_charts_scales`: by default the two reads in turn, on the card one run with both cells set). On W108's
+  mean the read with `open loud` took 926 s, its rows P, W and S and its charts equal to the full read's, and its `loudness.tsv`
+  (208,502 rows) byte for byte what `read-loudness` writes on the same store and places in 733 s
+  ([`open3_receipt.txt`](receipts/2026-11-24_collection/open3_receipt.txt)). The loudness now covers the ten regions of the
+  collection's held set, where it read the older held set's five.
+
+A lap's reads are then that one read (15.4 minutes) and the panels (about 2): a cycle near 52 minutes against 88. Training, profiled
+over 40 sections from W108's end ([`profile_W108_40_sections.txt`](receipts/2026-11-24_collection/profile_W108_40_sections.txt)):
+593 of a section's 684 ms are kernels in 4,400 launches; the dense products 246 ms (1.85 times their count's 133), the pair family
+107 and the contacts 75; 33 allocations and frees a section cost 35 ms beside the pool. No one kernel binds; the products and the
+allocations are the next places to look, and neither is taken as a campaign of its own.
 
 ## 5. The failures this could repeat
 

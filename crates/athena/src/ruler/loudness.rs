@@ -14,7 +14,7 @@ use holonics_engine::region::{views_of, OwnedRegion};
 use std::path::Path;
 
 /// The rank of `class` in `face`: one more than the classes whose mass stands above its own (1 is the face's loudest class).
-fn rank_of(face: &TowerFace, class: usize) -> usize {
+pub(crate) fn rank_of(face: &TowerFace, class: usize) -> usize {
     let m = face.masses[class];
     1 + face.masses.iter().filter(|&&v| v > m).count()
 }

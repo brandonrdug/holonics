@@ -1,0 +1,384 @@
+names:Claude:0:r0	Claude is	x
+names:Claude:0:r1	Claude is	x
+names:Claude:0:r2	Claude is	x
+names:Claude:0:r3	Claude is	x
+names:Claude:0:r4	Claude is	x
+names:Claude:0:r5	Claude is	x
+names:Claude:0:r6	Claude is	x
+names:Claude:0:r7	Claude is	x
+names:Claude:1:r0	Claude said	x
+names:Claude:1:r1	Claude said	x
+names:Claude:1:r2	Claude said	x
+names:Claude:1:r3	Claude said	x
+names:Claude:1:r4	Claude said	x
+names:Claude:1:r5	Claude said	x
+names:Claude:1:r6	Claude said	x
+names:Claude:1:r7	Claude said	x
+names:Claude:2:r0	A note for Claude:	x
+names:Claude:2:r1	A note for Claude:	x
+names:Claude:2:r2	A note for Claude:	x
+names:Claude:2:r3	A note for Claude:	x
+names:Claude:2:r4	A note for Claude:	x
+names:Claude:2:r5	A note for Claude:	x
+names:Claude:2:r6	A note for Claude:	x
+names:Claude:2:r7	A note for Claude:	x
+names:Claude:3:r0	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r1	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r2	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r3	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r4	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r5	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r6	Claude: what are you working on?\nAthena:	x
+names:Claude:3:r7	Claude: what are you working on?\nAthena:	x
+names:Claude:4:r0	Who is Claude?	x
+names:Claude:4:r1	Who is Claude?	x
+names:Claude:4:r2	Who is Claude?	x
+names:Claude:4:r3	Who is Claude?	x
+names:Claude:4:r4	Who is Claude?	x
+names:Claude:4:r5	Who is Claude?	x
+names:Claude:4:r6	Who is Claude?	x
+names:Claude:4:r7	Who is Claude?	x
+names:Claude:5:r0	# Claude\n\n	x
+names:Claude:5:r1	# Claude\n\n	x
+names:Claude:5:r2	# Claude\n\n	x
+names:Claude:5:r3	# Claude\n\n	x
+names:Claude:5:r4	# Claude\n\n	x
+names:Claude:5:r5	# Claude\n\n	x
+names:Claude:5:r6	# Claude\n\n	x
+names:Claude:5:r7	# Claude\n\n	x
+names:Brandon:0:r0	Brandon is	x
+names:Brandon:0:r1	Brandon is	x
+names:Brandon:0:r2	Brandon is	x
+names:Brandon:0:r3	Brandon is	x
+names:Brandon:0:r4	Brandon is	x
+names:Brandon:0:r5	Brandon is	x
+names:Brandon:0:r6	Brandon is	x
+names:Brandon:0:r7	Brandon is	x
+names:Brandon:1:r0	Brandon said	x
+names:Brandon:1:r1	Brandon said	x
+names:Brandon:1:r2	Brandon said	x
+names:Brandon:1:r3	Brandon said	x
+names:Brandon:1:r4	Brandon said	x
+names:Brandon:1:r5	Brandon said	x
+names:Brandon:1:r6	Brandon said	x
+names:Brandon:1:r7	Brandon said	x
+names:Brandon:2:r0	A note for Brandon:	x
+names:Brandon:2:r1	A note for Brandon:	x
+names:Brandon:2:r2	A note for Brandon:	x
+names:Brandon:2:r3	A note for Brandon:	x
+names:Brandon:2:r4	A note for Brandon:	x
+names:Brandon:2:r5	A note for Brandon:	x
+names:Brandon:2:r6	A note for Brandon:	x
+names:Brandon:2:r7	A note for Brandon:	x
+names:Brandon:3:r0	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r1	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r2	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r3	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r4	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r5	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r6	Brandon: what are you working on?\nAthena:	x
+names:Brandon:3:r7	Brandon: what are you working on?\nAthena:	x
+names:Brandon:4:r0	Who is Brandon?	x
+names:Brandon:4:r1	Who is Brandon?	x
+names:Brandon:4:r2	Who is Brandon?	x
+names:Brandon:4:r3	Who is Brandon?	x
+names:Brandon:4:r4	Who is Brandon?	x
+names:Brandon:4:r5	Who is Brandon?	x
+names:Brandon:4:r6	Who is Brandon?	x
+names:Brandon:4:r7	Who is Brandon?	x
+names:Brandon:5:r0	# Brandon\n\n	x
+names:Brandon:5:r1	# Brandon\n\n	x
+names:Brandon:5:r2	# Brandon\n\n	x
+names:Brandon:5:r3	# Brandon\n\n	x
+names:Brandon:5:r4	# Brandon\n\n	x
+names:Brandon:5:r5	# Brandon\n\n	x
+names:Brandon:5:r6	# Brandon\n\n	x
+names:Brandon:5:r7	# Brandon\n\n	x
+names:Athena:0:r0	Athena is	x
+names:Athena:0:r1	Athena is	x
+names:Athena:0:r2	Athena is	x
+names:Athena:0:r3	Athena is	x
+names:Athena:0:r4	Athena is	x
+names:Athena:0:r5	Athena is	x
+names:Athena:0:r6	Athena is	x
+names:Athena:0:r7	Athena is	x
+names:Athena:1:r0	Athena said	x
+names:Athena:1:r1	Athena said	x
+names:Athena:1:r2	Athena said	x
+names:Athena:1:r3	Athena said	x
+names:Athena:1:r4	Athena said	x
+names:Athena:1:r5	Athena said	x
+names:Athena:1:r6	Athena said	x
+names:Athena:1:r7	Athena said	x
+names:Athena:2:r0	A note for Athena:	x
+names:Athena:2:r1	A note for Athena:	x
+names:Athena:2:r2	A note for Athena:	x
+names:Athena:2:r3	A note for Athena:	x
+names:Athena:2:r4	A note for Athena:	x
+names:Athena:2:r5	A note for Athena:	x
+names:Athena:2:r6	A note for Athena:	x
+names:Athena:2:r7	A note for Athena:	x
+names:Athena:3:r0	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r1	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r2	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r3	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r4	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r5	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r6	Athena: what are you working on?\nAthena:	x
+names:Athena:3:r7	Athena: what are you working on?\nAthena:	x
+names:Athena:4:r0	Who is Athena?	x
+names:Athena:4:r1	Who is Athena?	x
+names:Athena:4:r2	Who is Athena?	x
+names:Athena:4:r3	Who is Athena?	x
+names:Athena:4:r4	Who is Athena?	x
+names:Athena:4:r5	Who is Athena?	x
+names:Athena:4:r6	Who is Athena?	x
+names:Athena:4:r7	Who is Athena?	x
+names:Athena:5:r0	# Athena\n\n	x
+names:Athena:5:r1	# Athena\n\n	x
+names:Athena:5:r2	# Athena\n\n	x
+names:Athena:5:r3	# Athena\n\n	x
+names:Athena:5:r4	# Athena\n\n	x
+names:Athena:5:r5	# Athena\n\n	x
+names:Athena:5:r6	# Athena\n\n	x
+names:Athena:5:r7	# Athena\n\n	x
+names:Holonics:0:r0	Holonics is	x
+names:Holonics:0:r1	Holonics is	x
+names:Holonics:0:r2	Holonics is	x
+names:Holonics:0:r3	Holonics is	x
+names:Holonics:0:r4	Holonics is	x
+names:Holonics:0:r5	Holonics is	x
+names:Holonics:0:r6	Holonics is	x
+names:Holonics:0:r7	Holonics is	x
+names:Holonics:1:r0	Holonics said	x
+names:Holonics:1:r1	Holonics said	x
+names:Holonics:1:r2	Holonics said	x
+names:Holonics:1:r3	Holonics said	x
+names:Holonics:1:r4	Holonics said	x
+names:Holonics:1:r5	Holonics said	x
+names:Holonics:1:r6	Holonics said	x
+names:Holonics:1:r7	Holonics said	x
+names:Holonics:2:r0	A note for Holonics:	x
+names:Holonics:2:r1	A note for Holonics:	x
+names:Holonics:2:r2	A note for Holonics:	x
+names:Holonics:2:r3	A note for Holonics:	x
+names:Holonics:2:r4	A note for Holonics:	x
+names:Holonics:2:r5	A note for Holonics:	x
+names:Holonics:2:r6	A note for Holonics:	x
+names:Holonics:2:r7	A note for Holonics:	x
+names:Holonics:3:r0	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r1	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r2	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r3	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r4	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r5	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r6	Holonics: what are you working on?\nAthena:	x
+names:Holonics:3:r7	Holonics: what are you working on?\nAthena:	x
+names:Holonics:4:r0	Who is Holonics?	x
+names:Holonics:4:r1	Who is Holonics?	x
+names:Holonics:4:r2	Who is Holonics?	x
+names:Holonics:4:r3	Who is Holonics?	x
+names:Holonics:4:r4	Who is Holonics?	x
+names:Holonics:4:r5	Who is Holonics?	x
+names:Holonics:4:r6	Who is Holonics?	x
+names:Holonics:4:r7	Who is Holonics?	x
+names:Holonics:5:r0	# Holonics\n\n	x
+names:Holonics:5:r1	# Holonics\n\n	x
+names:Holonics:5:r2	# Holonics\n\n	x
+names:Holonics:5:r3	# Holonics\n\n	x
+names:Holonics:5:r4	# Holonics\n\n	x
+names:Holonics:5:r5	# Holonics\n\n	x
+names:Holonics:5:r6	# Holonics\n\n	x
+names:Holonics:5:r7	# Holonics\n\n	x
+names:Alice:0:r0	Alice is	x
+names:Alice:0:r1	Alice is	x
+names:Alice:0:r2	Alice is	x
+names:Alice:0:r3	Alice is	x
+names:Alice:0:r4	Alice is	x
+names:Alice:0:r5	Alice is	x
+names:Alice:0:r6	Alice is	x
+names:Alice:0:r7	Alice is	x
+names:Alice:1:r0	Alice said	x
+names:Alice:1:r1	Alice said	x
+names:Alice:1:r2	Alice said	x
+names:Alice:1:r3	Alice said	x
+names:Alice:1:r4	Alice said	x
+names:Alice:1:r5	Alice said	x
+names:Alice:1:r6	Alice said	x
+names:Alice:1:r7	Alice said	x
+names:Alice:2:r0	A note for Alice:	x
+names:Alice:2:r1	A note for Alice:	x
+names:Alice:2:r2	A note for Alice:	x
+names:Alice:2:r3	A note for Alice:	x
+names:Alice:2:r4	A note for Alice:	x
+names:Alice:2:r5	A note for Alice:	x
+names:Alice:2:r6	A note for Alice:	x
+names:Alice:2:r7	A note for Alice:	x
+names:Alice:3:r0	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r1	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r2	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r3	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r4	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r5	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r6	Alice: what are you working on?\nAthena:	x
+names:Alice:3:r7	Alice: what are you working on?\nAthena:	x
+names:Alice:4:r0	Who is Alice?	x
+names:Alice:4:r1	Who is Alice?	x
+names:Alice:4:r2	Who is Alice?	x
+names:Alice:4:r3	Who is Alice?	x
+names:Alice:4:r4	Who is Alice?	x
+names:Alice:4:r5	Who is Alice?	x
+names:Alice:4:r6	Who is Alice?	x
+names:Alice:4:r7	Who is Alice?	x
+names:Alice:5:r0	# Alice\n\n	x
+names:Alice:5:r1	# Alice\n\n	x
+names:Alice:5:r2	# Alice\n\n	x
+names:Alice:5:r3	# Alice\n\n	x
+names:Alice:5:r4	# Alice\n\n	x
+names:Alice:5:r5	# Alice\n\n	x
+names:Alice:5:r6	# Alice\n\n	x
+names:Alice:5:r7	# Alice\n\n	x
+names:Marcus:0:r0	Marcus is	x
+names:Marcus:0:r1	Marcus is	x
+names:Marcus:0:r2	Marcus is	x
+names:Marcus:0:r3	Marcus is	x
+names:Marcus:0:r4	Marcus is	x
+names:Marcus:0:r5	Marcus is	x
+names:Marcus:0:r6	Marcus is	x
+names:Marcus:0:r7	Marcus is	x
+names:Marcus:1:r0	Marcus said	x
+names:Marcus:1:r1	Marcus said	x
+names:Marcus:1:r2	Marcus said	x
+names:Marcus:1:r3	Marcus said	x
+names:Marcus:1:r4	Marcus said	x
+names:Marcus:1:r5	Marcus said	x
+names:Marcus:1:r6	Marcus said	x
+names:Marcus:1:r7	Marcus said	x
+names:Marcus:2:r0	A note for Marcus:	x
+names:Marcus:2:r1	A note for Marcus:	x
+names:Marcus:2:r2	A note for Marcus:	x
+names:Marcus:2:r3	A note for Marcus:	x
+names:Marcus:2:r4	A note for Marcus:	x
+names:Marcus:2:r5	A note for Marcus:	x
+names:Marcus:2:r6	A note for Marcus:	x
+names:Marcus:2:r7	A note for Marcus:	x
+names:Marcus:3:r0	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r1	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r2	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r3	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r4	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r5	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r6	Marcus: what are you working on?\nAthena:	x
+names:Marcus:3:r7	Marcus: what are you working on?\nAthena:	x
+names:Marcus:4:r0	Who is Marcus?	x
+names:Marcus:4:r1	Who is Marcus?	x
+names:Marcus:4:r2	Who is Marcus?	x
+names:Marcus:4:r3	Who is Marcus?	x
+names:Marcus:4:r4	Who is Marcus?	x
+names:Marcus:4:r5	Who is Marcus?	x
+names:Marcus:4:r6	Who is Marcus?	x
+names:Marcus:4:r7	Who is Marcus?	x
+names:Marcus:5:r0	# Marcus\n\n	x
+names:Marcus:5:r1	# Marcus\n\n	x
+names:Marcus:5:r2	# Marcus\n\n	x
+names:Marcus:5:r3	# Marcus\n\n	x
+names:Marcus:5:r4	# Marcus\n\n	x
+names:Marcus:5:r5	# Marcus\n\n	x
+names:Marcus:5:r6	# Marcus\n\n	x
+names:Marcus:5:r7	# Marcus\n\n	x
+names:The_river:0:r0	The river is	x
+names:The_river:0:r1	The river is	x
+names:The_river:0:r2	The river is	x
+names:The_river:0:r3	The river is	x
+names:The_river:0:r4	The river is	x
+names:The_river:0:r5	The river is	x
+names:The_river:0:r6	The river is	x
+names:The_river:0:r7	The river is	x
+names:The_river:1:r0	The river said	x
+names:The_river:1:r1	The river said	x
+names:The_river:1:r2	The river said	x
+names:The_river:1:r3	The river said	x
+names:The_river:1:r4	The river said	x
+names:The_river:1:r5	The river said	x
+names:The_river:1:r6	The river said	x
+names:The_river:1:r7	The river said	x
+names:The_river:2:r0	A note for The river:	x
+names:The_river:2:r1	A note for The river:	x
+names:The_river:2:r2	A note for The river:	x
+names:The_river:2:r3	A note for The river:	x
+names:The_river:2:r4	A note for The river:	x
+names:The_river:2:r5	A note for The river:	x
+names:The_river:2:r6	A note for The river:	x
+names:The_river:2:r7	A note for The river:	x
+names:The_river:3:r0	The river: what are you working on?\nAthena:	x
+names:The_river:3:r1	The river: what are you working on?\nAthena:	x
+names:The_river:3:r2	The river: what are you working on?\nAthena:	x
+names:The_river:3:r3	The river: what are you working on?\nAthena:	x
+names:The_river:3:r4	The river: what are you working on?\nAthena:	x
+names:The_river:3:r5	The river: what are you working on?\nAthena:	x
+names:The_river:3:r6	The river: what are you working on?\nAthena:	x
+names:The_river:3:r7	The river: what are you working on?\nAthena:	x
+names:The_river:4:r0	Who is The river?	x
+names:The_river:4:r1	Who is The river?	x
+names:The_river:4:r2	Who is The river?	x
+names:The_river:4:r3	Who is The river?	x
+names:The_river:4:r4	Who is The river?	x
+names:The_river:4:r5	Who is The river?	x
+names:The_river:4:r6	Who is The river?	x
+names:The_river:4:r7	Who is The river?	x
+names:The_river:5:r0	# The river\n\n	x
+names:The_river:5:r1	# The river\n\n	x
+names:The_river:5:r2	# The river\n\n	x
+names:The_river:5:r3	# The river\n\n	x
+names:The_river:5:r4	# The river\n\n	x
+names:The_river:5:r5	# The river\n\n	x
+names:The_river:5:r6	# The river\n\n	x
+names:The_river:5:r7	# The river\n\n	x
+names:The_teacher:0:r0	The teacher is	x
+names:The_teacher:0:r1	The teacher is	x
+names:The_teacher:0:r2	The teacher is	x
+names:The_teacher:0:r3	The teacher is	x
+names:The_teacher:0:r4	The teacher is	x
+names:The_teacher:0:r5	The teacher is	x
+names:The_teacher:0:r6	The teacher is	x
+names:The_teacher:0:r7	The teacher is	x
+names:The_teacher:1:r0	The teacher said	x
+names:The_teacher:1:r1	The teacher said	x
+names:The_teacher:1:r2	The teacher said	x
+names:The_teacher:1:r3	The teacher said	x
+names:The_teacher:1:r4	The teacher said	x
+names:The_teacher:1:r5	The teacher said	x
+names:The_teacher:1:r6	The teacher said	x
+names:The_teacher:1:r7	The teacher said	x
+names:The_teacher:2:r0	A note for The teacher:	x
+names:The_teacher:2:r1	A note for The teacher:	x
+names:The_teacher:2:r2	A note for The teacher:	x
+names:The_teacher:2:r3	A note for The teacher:	x
+names:The_teacher:2:r4	A note for The teacher:	x
+names:The_teacher:2:r5	A note for The teacher:	x
+names:The_teacher:2:r6	A note for The teacher:	x
+names:The_teacher:2:r7	A note for The teacher:	x
+names:The_teacher:3:r0	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r1	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r2	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r3	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r4	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r5	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r6	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:3:r7	The teacher: what are you working on?\nAthena:	x
+names:The_teacher:4:r0	Who is The teacher?	x
+names:The_teacher:4:r1	Who is The teacher?	x
+names:The_teacher:4:r2	Who is The teacher?	x
+names:The_teacher:4:r3	Who is The teacher?	x
+names:The_teacher:4:r4	Who is The teacher?	x
+names:The_teacher:4:r5	Who is The teacher?	x
+names:The_teacher:4:r6	Who is The teacher?	x
+names:The_teacher:4:r7	Who is The teacher?	x
+names:The_teacher:5:r0	# The teacher\n\n	x
+names:The_teacher:5:r1	# The teacher\n\n	x
+names:The_teacher:5:r2	# The teacher\n\n	x
+names:The_teacher:5:r3	# The teacher\n\n	x
+names:The_teacher:5:r4	# The teacher\n\n	x
+names:The_teacher:5:r5	# The teacher\n\n	x
+names:The_teacher:5:r6	# The teacher\n\n	x
+names:The_teacher:5:r7	# The teacher\n\n	x
