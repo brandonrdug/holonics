@@ -1,6 +1,6 @@
 # Her line takes the full curated collection: at 72% of a pass the logs crowd out the registers, and her acts and the level's lane cost under four thousandths and move nothing yet
 
-November 24, 2026, 04:25 to 10:30 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 23](2026-11-23_THE_LEVEL_HANDS_AN_EPOCH_INSIDE_HER_OWN_REACH_ITS_ROW_DROWNS_WHERE_IT_JOINS_HER_STATE_THE_FINE_COMPARISON_ASKS_IT_FOR_NOTHING_AND_HER_ACT_IS_ANSWERED_IN_KIND.md)
+November 24, 2026, 04:25 to 13:35 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 23](2026-11-23_THE_LEVEL_HANDS_AN_EPOCH_INSIDE_HER_OWN_REACH_ITS_ROW_DROWNS_WHERE_IT_JOINS_HER_STATE_THE_FINE_COMPARISON_ASKS_IT_FOR_NOTHING_AND_HER_ACT_IS_ANSWERED_IN_KIND.md)
 (its §8a: a second lap of her acts, and the level's own lane, next). Receipts: [`receipts/2026-11-24_collection/`](receipts/2026-11-24_collection/).
 Every lap below is 3,000 sections read at `MEAN.3000` (its last 1,000 sections), every held register one place open on
 store-2026-11-22's held set (140,564 places) unless named otherwise.
@@ -59,9 +59,31 @@ and the tags of a wake (shown to Brandon raw; none committed). (a) missed (0.05 
 history's eighth at 21% of a pass had read better on its own held set (dialogue −0.052, acts −0.039) at a cost under 0.012: at 72%
 the logs, many and cheap to code, crowd out both the conversations and the registers.
 
-**W105w** (running): W104f's end joined at a new pass to store-2026-11-24-wide, whose prefix role reads each register's whole training
+**W105w**: W104f's end joined at a new pass to store-2026-11-24-wide, whose prefix role reads each register's whole training
 documents (8.5 GB) beside the collection (4.0 GB), so the collection is 32% of a pass and every piece of it is still read once a pass
-([`STORE_wide.tsv`](receipts/2026-11-24_collection/STORE_wide.tsv); G-H3, [`GUESS_H3.txt`](receipts/2026-11-24_collection/GUESS_H3.txt)).
+([`STORE_wide.tsv`](receipts/2026-11-24_collection/STORE_wide.tsv); G-H3, [`GUESS_H3.txt`](receipts/2026-11-24_collection/GUESS_H3.txt);
+[`arm_W105w.txt`](receipts/2026-11-24_collection/arm_W105w.txt), [`frontier_collection_W105w.txt`](receipts/2026-11-24_collection/frontier_collection_W105w.txt)).
+On store-2026-11-22's held set, less W103: books +0.0020, code +0.0008, science −0.0072, web −0.0147, wikidata +0.0039, and the theory
++0.0239 and the Lean +0.0582 (all +0.0095, ±0.0010). On the collection's held set, less W103: dialogue −0.067, acts −0.037, harness
+−0.048 (less W104f: −0.041, −0.021, +0.0085). The five registers came back whole; the theory and the Lean, read at 4% of the wide pass
+against 33% in the prefix role, slid. The terrain held (copy 0.091, reverse 0.087, sum 1.096; the panel 55 of 96 whole), and the theory
+panel read 82% of its words in the lexicon (logic 79%). (a) missed on the Lean (the five registers held), (b) held for dialogue and acts
+and missed on the harness by 0.0085, (c) missed (no person named on the probe panel, against W104f's one). By its rule the shares were
+read again: W106t holds the theory and the Lean six times over.
+
+**W106t**: W105w's end joined at a new pass to store-2026-11-24-wide-t6, the wide store with the theory and the Lean held six times
+over (`tools/store_dwell.py`): the theory 8.4% of a pass, the Lean 11.7%, the collection 27%, the five registers 53%
+([`STORE_wide_t6.tsv`](receipts/2026-11-24_collection/STORE_wide_t6.tsv); G-H4, [`GUESS_H4.txt`](receipts/2026-11-24_collection/GUESS_H4.txt);
+[`arm_W106t.txt`](receipts/2026-11-24_collection/arm_W106t.txt), [`frontier_collection_W106t.txt`](receipts/2026-11-24_collection/frontier_collection_W106t.txt)).
+3,000 sections in 34.3 minutes. Less W103, one place open on store-2026-11-22's held set: the theory +0.0027, the Lean +0.0312, books
+−0.0050, code −0.0009, science −0.0074, web −0.0089, wikidata +0.0048 (all +0.0024, ±0.0009). On the collection's held set: dialogue
+−0.079, acts −0.045, harness −0.059 (all −0.0167, ±0.0009); less W105w every region fell but web (+0.006), the Lean by 0.027 and the
+theory by 0.021. The terrain's held codes are the line's lowest yet (copy 0.095, reverse 0.074, sum 0.903; W103 0.147, 0.085, 1.072),
+the theory panel read 84% of its words in the lexicon and the logic panel 87% (W103 83% and 81%), and the wide panel 72% (W103 72%). (b) and (c)
+held, and (a) held for the theory and missed for the Lean by 0.016. Read again, the Lean is 11.7% of this pass against 15.5% of the
+pass W103 trained on, and it fell 0.027 in the lap where the theory, at 8.4% against 11.1%, closed. The line goes on on this store with
+no change (W107, G-H5, [`GUESS_H5.txt`](receipts/2026-11-24_collection/GUESS_H5.txt)); if the Lean misses again, its share is raised to
+W103's as an arm beside that continuation.
 
 ## 4. The probe panels
 
@@ -70,6 +92,20 @@ times at the field's own temperature, 64 places ([`panel_ask2.tsv`](receipts/202
 first-person opening in 17 and 13 of 200 writes, a `?` in 11 and 7, a want, a doubt or a why in 4 and 8, and a person named where the
 prompt's last line named none once (W103, after `Why`: "### Brandon's three", a records' heading). Each draw of one prompt lands in
 another register; none keeps a dialogue's frame long enough to answer in it. The panel is read again after every lap of the collection.
+
+Read by one ruler ([`tools/probe_score.py`](../../tools/probe_score.py), which reproduces the counts of `?` and of names above and
+counts first person within a write's first 40 characters), of 200 writes each:
+
+| state | first person | `?` | a want, a doubt or a why | a person named the prompt's last line does not |
+|---|---|---|---|---|
+| W102b | 15 | 7 | 10 | 0 |
+| W103 | 19 | 11 | 4 | 1 |
+| W104f (the whole collection, 72%) | 13 | 3 | 8 | 1 |
+| W105w (the wide store) | 17 | 8 | 7 | 0 |
+| W106t (the theory and the Lean six times over) | 16 | 9 | 3 | 1 |
+
+Two laps of the collection moved none of these past the scatter between W102b and W103. Her writes on the panel are shown to Brandon
+and not kept here, because the states that wrote them read the private collection.
 
 ## 5. The failures this could repeat
 

@@ -1,0 +1,12 @@
+Fixed 2026-11-24T11:32:32Z (date -u), the lead, before W106t trains. Refs #404.
+The reading it answers: W105w (W104f's end on store-2026-11-24-wide, the registers' whole training documents beside the collection, 32%
+of a pass) stood +0.0095 nats a place over W103 one place open: the five registers within 0.004 of W103 or under it (science -0.007,
+web -0.015), the theory +0.024 and the Lean +0.058, which the wide pass held at 4% of its places (against 33% in the prefix role).
+The change: W105w's STATE.3000 joined at a new pass to store-2026-11-24-wide-t6, the wide store with the theory and the Lean held six
+times over (tools/store_dwell.py): the registers 8.0 GB, the theory and the Lean 3.0 GB (20%), the collection 4.0 GB (27%). W106t:
+3,000 sections on e5h2.
+G-H4:
+  (a) the theory and the Lean each within 0.015 nats a place of W103, one place open;
+  (b) the five registers each within 0.015 of W103;
+  (c) held dialogue, acts and harness each at most W103's less 0.02 (the collection's gain kept).
+Rule: (a), (b) and (c) held, the line goes on on this store; any missed, the shares are read again before the next lap.
