@@ -1,0 +1,125 @@
+# the loudness table of W110's mean on the collection's held set (tools/loudness_table.py); the commonest pieces of the private
+# regions (dialogue, acts, harness) and of all regions together are left out here.
+LOUDNESS region=code places=20124 nats_a_place=0.4066 loudness_octaves=22.146 spearman_loud_code=-0.046
+  by surprise fifth (q1 least surprised): q1 nats=0.000 loud=22.168  q2 nats=0.001 loud=22.138  q3 nats=0.010 loud=22.155  q4 nats=0.109 loud=22.146  q5 nats=1.914 loud=22.125
+  by the written symbol's rank: rank 1: share=0.888 loud=22.150 nats=0.095  rank 2-3: share=0.067 loud=22.123 nats=1.989  rank 4-10: share=0.030 loud=22.102 nats=3.574  rank 11+: share=0.014 loud=22.095 nats=5.792
+  temperature (energy over the region's mean, a nat): -0.0200   rank-1 share: loudest fifth 0.911, quietest fifth 0.874
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8607  spearman loud~color=+0.041  color~code=+0.085  by surprise fifth: q1=1.8570 q2=1.8601 q3=1.8627 q4=1.8638 q5=1.8599
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): '  ': 2154 0.033 21.97 1.846 0.99  0a20: 288 0.043 21.99 1.883 0.99  0909: 210 0.086 22.15 1.855 0.99  'er': 197 0.216 22.14 1.865 0.96  'on': 180 0.081 22.27 1.868 0.97  're': 164 0.030 22.40 1.867 1.00  'te': 161 0.149 22.34 1.858 0.97  'or': 156 0.200 22.21 1.866 0.95
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): '   ': 1860 0.025 21.95 1.844 0.99  0a2020: 267 0.002 22.07 1.857 1.00  '###': 148 0.023 22.51 1.806 0.99  0a0909: 107 0.051 22.11 1.855 1.00  090909: 99 0.116 22.20 1.854 0.97  'ion': 91 0.003 22.15 1.864 1.00
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 10378 loud=22.234 nats=0.379 color=1.8622  2nd: 1543 loud=22.258 nats=0.283 color=1.8597  3rd+: 234 loud=22.214 nats=0.201 color=1.8691
+  places by their word's length: len 1-3: places=1497 loud=22.222 nats=0.706  len 4-6: places=3715 loud=22.255 nats=0.358  len 7-9: places=3944 loud=22.260 nats=0.275  len 10+: places=2999 loud=22.192 nats=0.316
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 343 against 464.6 for an order that carries nothing (ratio 0.738); at them nats=4.238 loud=22.157 color=1.8653 rank-1 share=0.15
+  by lane (octaves): lane0=22.515  lane1=21.655  lane2=22.021  lane3=22.023  lane4=22.329  lane5=22.252  lane6=22.229
+LOUDNESS region=web places=20043 nats_a_place=0.7473 loudness_octaves=22.317 spearman_loud_code=-0.116
+  by surprise fifth (q1 least surprised): q1 nats=0.001 loud=22.363  q2 nats=0.010 loud=22.332  q3 nats=0.065 loud=22.326  q4 nats=0.491 loud=22.318  q5 nats=3.169 loud=22.245
+  by the written symbol's rank: rank 1: share=0.806 loud=22.331 nats=0.159  rank 2-3: share=0.097 loud=22.295 nats=1.964  rank 4-10: share=0.061 loud=22.223 nats=3.473  rank 11+: share=0.036 loud=22.226 nats=5.989
+  temperature (energy over the region's mean, a nat): -0.0340   rank-1 share: loudest fifth 0.850, quietest fifth 0.756
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8637  spearman loud~color=-0.054  color~code=+0.070  by surprise fifth: q1=1.8587 q2=1.8649 q3=1.8651 q4=1.8657 q5=1.8643
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): '  ': 791 0.109 21.88 1.856 0.97  'e ': 350 0.105 22.29 1.869 0.98  ', ': 308 0.092 21.99 1.853 0.99  ' t': 260 0.249 22.59 1.869 0.92  'th': 230 0.128 22.77 1.851 0.96  ' a': 229 0.546 22.45 1.861 0.85  'in': 219 0.376 22.50 1.849 0.86  't ': 207 0.100 22.42 1.869 0.98
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): '   ': 628 0.061 21.85 1.856 0.99  ' th': 154 0.009 22.90 1.858 1.00  'the': 122 0.078 22.92 1.850 0.98  ' $t': 114 0.279 22.11 1.847 0.96  'he ': 92 0.033 22.29 1.855 1.00  ' in': 87 0.510 22.49 1.843 0.79
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 11420 loud=22.442 nats=0.703 color=1.8628  2nd: 1157 loud=22.406 nats=0.609 color=1.8581  3rd+: 97 loud=22.410 nats=0.525 color=1.8621
+  places by their word's length: len 1-3: places=3118 loud=22.463 nats=1.055  len 4-6: places=5207 loud=22.421 nats=0.584  len 7-9: places=2951 loud=22.457 nats=0.531  len 10+: places=1398 loud=22.411 nats=0.635
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 360 against 450.8 for an order that carries nothing (ratio 0.799); at them nats=5.284 loud=22.315 color=1.8664 rank-1 share=0.11
+  by lane (octaves): lane0=22.676  lane1=21.803  lane2=22.177  lane3=22.267  lane4=22.486  lane5=22.420  lane6=22.389
+LOUDNESS region=science places=20088 nats_a_place=0.5696 loudness_octaves=22.480 spearman_loud_code=-0.146
+  by surprise fifth (q1 least surprised): q1 nats=0.001 loud=22.529  q2 nats=0.008 loud=22.530  q3 nats=0.044 loud=22.459  q4 nats=0.268 loud=22.454  q5 nats=2.527 loud=22.430
+  by the written symbol's rank: rank 1: share=0.845 loud=22.491 nats=0.130  rank 2-3: share=0.084 loud=22.461 nats=1.992  rank 4-10: share=0.048 loud=22.402 nats=3.471  rank 11+: share=0.023 loud=22.347 nats=5.453
+  temperature (energy over the region's mean, a nat): -0.0405   rank-1 share: loudest fifth 0.896, quietest fifth 0.805
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8608  spearman loud~color=-0.140  color~code=+0.147  by surprise fifth: q1=1.8530 q2=1.8571 q3=1.8646 q4=1.8646 q5=1.8645
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 'e ': 437 0.151 22.37 1.871 0.99  ' a': 343 0.215 22.61 1.860 0.93  'an': 330 0.328 22.61 1.847 0.88  'er': 313 0.304 22.50 1.874 0.91  'at': 280 0.194 22.51 1.862 0.97  'd ': 278 0.064 22.41 1.880 1.00  'in': 278 0.265 22.59 1.843 0.94  'te': 273 0.188 22.71 1.834 0.96
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): ' an': 196 0.058 22.64 1.845 0.98  ' th': 175 0.002 23.00 1.850 1.00  'he ': 169 0.104 22.37 1.855 0.99  'the': 167 0.018 22.96 1.851 0.99  'and': 148 0.107 22.70 1.838 0.97  'ter': 146 0.104 22.41 1.876 0.96
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 13419 loud=22.543 nats=0.561 color=1.8604  2nd: 1714 loud=22.495 nats=0.373 color=1.8585  3rd+: 227 loud=22.484 nats=0.204 color=1.8519
+  places by their word's length: len 1-3: places=2760 loud=22.643 nats=0.714  len 4-6: places=4425 loud=22.550 nats=0.577  len 7-9: places=5025 loud=22.503 nats=0.478  len 10+: places=3150 loud=22.477 nats=0.406
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 322 against 432.5 for an order that carries nothing (ratio 0.744); at them nats=4.550 loud=22.480 color=1.8626 rank-1 share=0.08
+  by lane (octaves): lane0=22.791  lane1=21.940  lane2=22.254  lane3=22.457  lane4=22.694  lane5=22.639  lane6=22.588
+LOUDNESS region=books places=20028 nats_a_place=0.6890 loudness_octaves=22.707 spearman_loud_code=+0.014
+  by surprise fifth (q1 least surprised): q1 nats=0.002 loud=22.728  q2 nats=0.015 loud=22.673  q3 nats=0.096 loud=22.701  q4 nats=0.542 loud=22.727  q5 nats=2.789 loud=22.705
+  by the written symbol's rank: rank 1: share=0.800 loud=22.707 nats=0.172  rank 2-3: share=0.120 loud=22.718 nats=1.850  rank 4-10: share=0.062 loud=22.694 nats=3.596  rank 11+: share=0.018 loud=22.672 nats=5.808
+  temperature (energy over the region's mean, a nat): -0.0099   rank-1 share: loudest fifth 0.817, quietest fifth 0.829
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8577  spearman loud~color=-0.140  color~code=+0.117  by surprise fifth: q1=1.8519 q2=1.8568 q3=1.8588 q4=1.8594 q5=1.8614
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 'e ': 630 0.109 22.54 1.864 0.97  ' t': 518 0.313 22.76 1.858 0.91  'th': 486 0.181 23.01 1.836 0.95  's ': 476 0.046 22.56 1.872 0.99  'he': 445 0.099 23.03 1.847 0.97  ' a': 369 0.362 22.78 1.852 0.90  'd ': 308 0.039 22.55 1.879 0.99  'n ': 306 0.149 22.55 1.867 0.96
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): ' th': 388 0.016 23.07 1.843 0.99  'the': 325 0.072 23.10 1.842 0.98  'he ': 279 0.073 22.51 1.855 0.99  ' an': 152 0.191 22.86 1.839 0.95  'nd ': 146 0.014 22.53 1.876 1.00  ' of': 145 0.229 23.00 1.870 0.99
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 14329 loud=22.761 nats=0.803 color=1.8558  2nd: 1437 loud=22.690 nats=0.655 color=1.8520  3rd+: 151 loud=22.611 nats=0.802 color=1.8557
+  places by their word's length: len 1-3: places=3755 loud=22.852 nats=0.447  len 4-6: places=5919 loud=22.780 nats=0.876  len 7-9: places=4728 loud=22.675 nats=0.965  len 10+: places=1515 loud=22.643 nats=0.754
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 350 against 428.0 for an order that carries nothing (ratio 0.818); at them nats=4.682 loud=22.716 color=1.8611 rank-1 share=0.08
+  by lane (octaves): lane0=22.988  lane1=22.083  lane2=22.465  lane3=22.692  lane4=22.977  lane5=22.889  lane6=22.855
+LOUDNESS region=wikidata places=20225 nats_a_place=0.9222 loudness_octaves=22.277 spearman_loud_code=+0.277
+  by surprise fifth (q1 least surprised): q1 nats=0.003 loud=22.196  q2 nats=0.024 loud=22.197  q3 nats=0.137 loud=22.263  q4 nats=0.896 loud=22.333  q5 nats=3.551 loud=22.393
+  by the written symbol's rank: rank 1: share=0.759 loud=22.242 nats=0.205  rank 2-3: share=0.103 loud=22.360 nats=1.970  rank 4-10: share=0.087 loud=22.396 nats=3.320  rank 11+: share=0.052 loud=22.413 nats=5.332
+  temperature (energy over the region's mean, a nat): +0.0780   rank-1 share: loudest fifth 0.603, quietest fifth 0.876
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8786  spearman loud~color=-0.153  color~code=-0.126  by surprise fifth: q1=1.8836 q2=1.8802 q3=1.8800 q4=1.8766 q5=1.8724
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 'e ': 795 0.391 22.15 1.878 0.93  'an': 472 0.355 22.26 1.836 0.90  'or': 458 0.060 22.27 1.900 0.99  'n ': 432 0.217 22.21 1.898 0.96  'ee': 397 0.488 22.20 1.881 0.87  'ne': 366 0.171 22.21 1.875 0.96  'oo': 362 0.189 22.24 1.859 0.96  'rn': 345 0.184 22.18 1.890 0.95
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 'oor': 340 0.017 22.26 1.907 1.00  'rne': 335 0.099 22.20 1.875 0.98  'orn': 326 0.154 22.18 1.890 0.96  'an ': 318 0.113 22.23 1.905 0.99  'aan': 311 0.306 22.24 1.820 0.92  'e a': 299 0.697 22.19 1.903 0.90
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 12029 loud=22.319 nats=0.961 color=1.8811  2nd: 2305 loud=22.308 nats=0.757 color=1.8776  3rd+: 335 loud=22.286 nats=0.964 color=1.8784
+  places by their word's length: len 1-3: places=3020 loud=22.256 nats=0.912  len 4-6: places=4431 loud=22.329 nats=0.797  len 7-9: places=3857 loud=22.322 nats=0.884  len 10+: places=3361 loud=22.348 nats=1.170
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 386 against 464.6 for an order that carries nothing (ratio 0.831); at them nats=5.225 loud=22.392 color=1.8763 rank-1 share=0.06
+  by lane (octaves): lane0=22.602  lane1=21.832  lane2=22.087  lane3=22.262  lane4=22.391  lane5=22.391  lane6=22.372
+LOUDNESS region=theory places=20028 nats_a_place=0.5233 loudness_octaves=22.468 spearman_loud_code=-0.185
+  by surprise fifth (q1 least surprised): q1 nats=0.001 loud=22.572  q2 nats=0.010 loud=22.485  q3 nats=0.050 loud=22.432  q4 nats=0.296 loud=22.453  q5 nats=2.259 loud=22.399
+  by the written symbol's rank: rank 1: share=0.850 loud=22.481 nats=0.141  rank 2-3: share=0.096 loud=22.433 nats=1.937  rank 4-10: share=0.041 loud=22.355 nats=3.535  rank 11+: share=0.013 loud=22.274 nats=5.610
+  temperature (energy over the region's mean, a nat): -0.0464   rank-1 share: loudest fifth 0.895, quietest fifth 0.795
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8616  spearman loud~color=+0.018  color~code=+0.046  by surprise fifth: q1=1.8581 q2=1.8627 q3=1.8635 q4=1.8649 q5=1.8586
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 's ': 473 0.046 22.37 1.883 1.00  'e ': 468 0.075 22.33 1.868 0.99  ' t': 425 0.350 22.59 1.870 0.91  ' a': 394 0.276 22.55 1.867 0.91  'th': 376 0.038 22.83 1.852 0.99  'he': 342 0.042 22.90 1.854 0.99  're': 271 0.146 22.66 1.881 0.95  'd ': 251 0.074 22.40 1.883 0.99
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): ' th': 296 0.004 22.90 1.856 1.00  'he ': 250 0.045 22.30 1.855 1.00  'the': 237 0.009 22.93 1.852 1.00  ' a ': 138 0.318 22.50 1.874 0.93  'and': 125 0.177 22.74 1.847 0.95  'nd ': 121 0.059 22.38 1.881 0.99
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 13132 loud=22.552 nats=0.460 color=1.8629  2nd: 1105 loud=22.501 nats=0.331 color=1.8539  3rd+: 73 loud=22.501 nats=0.247 color=1.8459
+  places by their word's length: len 1-3: places=3365 loud=22.634 nats=0.561  len 4-6: places=6268 loud=22.539 nats=0.466  len 7-9: places=3728 loud=22.499 nats=0.376  len 10+: places=949 loud=22.493 nats=0.230
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 323 against 428.0 for an order that carries nothing (ratio 0.755); at them nats=4.337 loud=22.454 color=1.8561 rank-1 share=0.11
+  by lane (octaves): lane0=22.810  lane1=21.956  lane2=22.324  lane3=22.475  lane4=22.634  lane5=22.561  lane6=22.516
+LOUDNESS region=logic places=20028 nats_a_place=0.3926 loudness_octaves=22.299 spearman_loud_code=-0.115
+  by surprise fifth (q1 least surprised): q1 nats=0.000 loud=22.320  q2 nats=0.003 loud=22.352  q3 nats=0.017 loud=22.320  q4 nats=0.126 loud=22.288  q5 nats=1.817 loud=22.216
+  by the written symbol's rank: rank 1: share=0.890 loud=22.311 nats=0.101  rank 2-3: share=0.073 loud=22.232 nats=1.983  rank 4-10: share=0.025 loud=22.159 nats=3.494  rank 11+: share=0.013 loud=22.110 nats=5.573
+  temperature (energy over the region's mean, a nat): -0.0537   rank-1 share: loudest fifth 0.937, quietest fifth 0.844
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8526  spearman loud~color=+0.218  color~code=-0.048  by surprise fifth: q1=1.8571 q2=1.8565 q3=1.8568 q4=1.8538 q5=1.8386
+  commonest 2-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 'on': 367 0.106 22.31 1.864 0.97  'e ': 345 0.175 22.17 1.858 0.97  'ti': 308 0.076 22.64 1.864 0.98  'er': 303 0.186 22.29 1.856 0.96  's ': 280 0.086 22.31 1.877 0.99  'at': 269 0.155 22.48 1.870 0.94  're': 269 0.179 22.50 1.877 0.94  ' t': 223 0.381 22.62 1.874 0.84
+  commonest 3-byte pieces ending at the place (piece: count, nats, loud, color, rank-1 share): 'ion': 220 0.016 22.26 1.863 1.00  'tio': 213 0.005 22.58 1.838 1.00  ' th': 154 0.005 22.92 1.868 1.00  'ati': 142 0.025 22.61 1.862 0.99  'the': 140 0.009 22.83 1.860 1.00  'he ': 121 0.075 22.23 1.852 0.98
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 12601 loud=22.384 nats=0.361 color=1.8591  2nd: 1943 loud=22.390 nats=0.183 color=1.8637  3rd+: 335 loud=22.349 nats=0.129 color=1.8615
+  places by their word's length: len 1-3: places=2224 loud=22.431 nats=0.740  len 4-6: places=3825 loud=22.437 nats=0.315  len 7-9: places=3719 loud=22.374 nats=0.251  len 10+: places=5111 loud=22.332 nats=0.227
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 304 against 428.0 for an order that carries nothing (ratio 0.710); at them nats=4.227 loud=22.291 color=1.8395 rank-1 share=0.11
+  by lane (octaves): lane0=22.699  lane1=21.895  lane2=22.217  lane3=22.318  lane4=22.379  lane5=22.332  lane6=22.255
+LOUDNESS region=dialogue places=20028 nats_a_place=0.9740 loudness_octaves=22.322 spearman_loud_code=-0.035
+  by surprise fifth (q1 least surprised): q1 nats=0.001 loud=22.321  q2 nats=0.014 loud=22.317  q3 nats=0.125 loud=22.282  q4 nats=0.903 loud=22.256  q5 nats=3.826 loud=22.434
+  by the written symbol's rank: rank 1: share=0.748 loud=22.299 nats=0.188  rank 2-3: share=0.108 loud=22.277 nats=2.000  rank 4-10: share=0.074 loud=22.281 nats=3.411  rank 11+: share=0.070 loud=22.683 nats=5.228
+  temperature (energy over the region's mean, a nat): +0.2035   rank-1 share: loudest fifth 0.697, quietest fifth 0.717
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8645  spearman loud~color=-0.146  color~code=-0.015  by surprise fifth: q1=1.8612 q2=1.8678 q3=1.8688 q4=1.8666 q5=1.8581
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 11836 loud=22.413 nats=0.846 color=1.8660  2nd: 1237 loud=22.371 nats=0.390 color=1.8609  3rd+: 147 loud=22.730 nats=0.334 color=1.8432
+  places by their word's length: len 1-3: places=2666 loud=22.455 nats=1.269  len 4-6: places=5699 loud=22.405 nats=0.729  len 7-9: places=2967 loud=22.388 nats=0.671  len 10+: places=1888 loud=22.412 nats=0.540
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 380 against 428.0 for an order that carries nothing (ratio 0.888); at them nats=5.538 loud=22.398 color=1.8573 rank-1 share=0.08
+  by lane (octaves): lane0=22.685  lane1=21.807  lane2=22.172  lane3=22.263  lane4=22.501  lane5=22.429  lane6=22.397
+LOUDNESS region=acts places=20050 nats_a_place=1.1382 loudness_octaves=22.152 spearman_loud_code=-0.113
+  by surprise fifth (q1 least surprised): q1 nats=0.003 loud=22.207  q2 nats=0.032 loud=22.167  q3 nats=0.250 loud=22.156  q4 nats=1.308 loud=22.138  q5 nats=4.098 loud=22.094
+  by the written symbol's rank: rank 1: share=0.705 loud=22.171 nats=0.226  rank 2-3: share=0.126 loud=22.126 nats=2.015  rank 4-10: share=0.105 loud=22.088 nats=3.381  rank 11+: share=0.064 loud=22.104 nats=5.749
+  temperature (energy over the region's mean, a nat): -0.0304   rank-1 share: loudest fifth 0.806, quietest fifth 0.693
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8688  spearman loud~color=-0.093  color~code=+0.058  by surprise fifth: q1=1.8649 q2=1.8703 q3=1.8718 q4=1.8707 q5=1.8665
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 10080 loud=22.275 nats=0.944 color=1.8680  2nd: 789 loud=22.233 nats=0.703 color=1.8607  3rd+: 54 loud=22.103 nats=0.721 color=1.8670
+  places by their word's length: len 1-3: places=2837 loud=22.255 nats=1.541  len 4-6: places=5173 loud=22.285 nats=0.751  len 7-9: places=2338 loud=22.283 nats=0.672  len 10+: places=575 loud=22.176 nats=0.497
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 397 against 454.0 for an order that carries nothing (ratio 0.874); at them nats=5.802 loud=22.182 color=1.8652 rank-1 share=0.03
+  by lane (octaves): lane0=22.544  lane1=21.679  lane2=22.042  lane3=22.088  lane4=22.283  lane5=22.228  lane6=22.200
+LOUDNESS region=harness places=20291 nats_a_place=0.7729 loudness_octaves=22.379 spearman_loud_code=-0.191
+  by surprise fifth (q1 least surprised): q1 nats=0.002 loud=22.470  q2 nats=0.017 loud=22.402  q3 nats=0.101 loud=22.366  q4 nats=0.597 loud=22.353  q5 nats=3.147 loud=22.304
+  by the written symbol's rank: rank 1: share=0.789 loud=22.395 nats=0.176  rank 2-3: share=0.114 loud=22.339 nats=1.963  rank 4-10: share=0.062 loud=22.265 nats=3.485  rank 11+: share=0.034 loud=22.357 nats=5.593
+  temperature (energy over the region's mean, a nat): -0.0158   rank-1 share: loudest fifth 0.847, quietest fifth 0.723
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8639  spearman loud~color=-0.057  color~code=+0.026  by surprise fifth: q1=1.8616 q2=1.8641 q3=1.8666 q4=1.8658 q5=1.8614
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 12828 loud=22.469 nats=0.683 color=1.8630  2nd: 1245 loud=22.442 nats=0.370 color=1.8593  3rd+: 149 loud=22.491 nats=0.220 color=1.8699
+  places by their word's length: len 1-3: places=2491 loud=22.493 nats=1.130  len 4-6: places=6339 loud=22.459 nats=0.695  len 7-9: places=3932 loud=22.466 nats=0.417  len 10+: places=1460 loud=22.458 nats=0.272
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 341 against 436.8 for an order that carries nothing (ratio 0.781); at them nats=5.363 loud=22.399 color=1.8634 rank-1 share=0.05
+  by lane (octaves): lane0=22.726  lane1=21.870  lane2=22.228  lane3=22.354  lane4=22.550  lane5=22.485  lane6=22.441
+LOUDNESS region=all places=200933 nats_a_place=0.7137 loudness_octaves=22.355 spearman_loud_code=-0.051
+  by surprise fifth (q1 least surprised): q1 nats=0.001 loud=22.366  q2 nats=0.010 loud=22.372  q3 nats=0.064 loud=22.353  q4 nats=0.474 loud=22.356  q5 nats=3.020 loud=22.327
+  by the written symbol's rank: rank 1: share=0.808 loud=22.359 nats=0.157  rank 2-3: share=0.099 loud=22.346 nats=1.964  rank 4-10: share=0.060 loud=22.300 nats=3.451  rank 11+: share=0.034 loud=22.364 nats=5.560
+  temperature (energy over the region's mean, a nat): +0.0144   rank-1 share: loudest fifth 0.824, quietest fifth 0.777
+  color (the lanes' spectrum, its entropy in nats, ln L the whitest): mean=1.8633  spearman loud~color=-0.079  color~code=+0.060  by surprise fifth: q1=1.8589 q2=1.8640 q3=1.8660 q4=1.8653 q5=1.8623
+  a letter's occurrence within its word (Brandon 01:17Z: a count felt as magnitude): 1st: 122052 loud=22.453 nats=0.667 color=1.8639  2nd: 14475 loud=22.409 nats=0.462 color=1.8617  3rd+: 1802 loud=22.403 nats=0.427 color=1.8627
+  places by their word's length: len 1-3: places=27733 loud=22.497 nats=0.896  len 4-6: places=51001 loud=22.459 nats=0.632  len 7-9: places=37189 loud=22.436 nats=0.553  len 10+: places=22406 loud=22.380 nats=0.503
+  ceilings broken (a place's code above every earlier place's in its stretch, past the first): 3506 against 4415.3 for an order that carries nothing (ratio 0.794); at them nats=4.962 loud=22.376 color=1.8618 rank-1 share=0.08
+  by lane (octaves): lane0=22.703  lane1=21.852  lane2=22.199  lane3=22.320  lane4=22.522  lane5=22.462  lane6=22.424
+LOUDNESS_WHOLE region=code places=730 nats_a_place=2.0787 loudness_octaves=22.547
+LOUDNESS_WHOLE region=web places=758 nats_a_place=2.3545 loudness_octaves=22.828
+LOUDNESS_WHOLE region=science places=776 nats_a_place=1.9817 loudness_octaves=22.969
+LOUDNESS_WHOLE region=books places=776 nats_a_place=2.0108 loudness_octaves=23.091
+LOUDNESS_WHOLE region=wikidata places=677 nats_a_place=2.4709 loudness_octaves=22.693
+LOUDNESS_WHOLE region=theory places=776 nats_a_place=2.1759 loudness_octaves=22.860
+LOUDNESS_WHOLE region=logic places=776 nats_a_place=2.1751 loudness_octaves=22.776
+LOUDNESS_WHOLE region=dialogue places=776 nats_a_place=2.6922 loudness_octaves=22.714
+LOUDNESS_WHOLE region=acts places=747 nats_a_place=2.5637 loudness_octaves=22.599
+LOUDNESS_WHOLE region=harness places=776 nats_a_place=2.3265 loudness_octaves=22.814

@@ -1,0 +1,20 @@
+W109_START 17:58:59
+# arm W109: lock taken 18:13:17
+# arm W109: exit 0 released 18:51:10
+TERRAIN_TRAINED W109 18:51:10 sections=3000 ended=false
+W109_READS_START 18:51:10
+TERRAIN_REACH W109 18:53:11 ANSWER copy n= 2655 0.095|ANSWER reverse n= 2667 0.088|ANSWER sum n= 1579 1.025|
+TERRAIN_PANEL W109_mean 19:19:29 seen: words 44 in_lexicon 31 (70%) longest_copy 19 held: words 64 in_lexicon 50 (78%) longest_copy 16 unread: words 59 in_lexicon 42 (71%) longest_copy 18  || LONG W109_mean: all words 256 in lexicon 193 (75%) writes that loop 3 of 20 longest run shared with its prompt 34 | code 40/43 (93%) web 41/53 (77%) science 29/46 (63%) books 49/59 (83%) wikidata 34/55 (61%)
+TERRAIN_WIDE W109 19:27:11 LONG W109: all words 2127 in lexicon 1534 (72%) writes that loop 20 of 160 longest run shared with its prompt 86 | code 304/369 (82%) web 340/432 (78%) science 252/408 (61%) books 417/504 (82%) wikidata 221/414 (53%)
+W97_CAVITY4 W109 19:41:55 CAVITY_DONE ms=883212
+W97_THEORY THEORY_PANEL W109 logic: words 101 in lexicon 82 (81%) loops 0 of 8 longest shared with prompt 13 | theory: words 163 in lexicon 131 (80%) loops 0 of 12 longest shared with prompt 14
+W109_CARD_READS_DONE 19:42:34
+W109_FRONTIER FRONTIER W109; one place open: all 0.7131 (200933 places) | acts 1.1398 books 0.6827 code 0.4060 dialogue 0.9795 harness 0.7781 logic 0.3950 science 0.5656 theory 0.5232 web 0.7427 wikidata 0.9173 || less the control's, paired: +0.0003 (±0.0007) | acts -0.0138 books +0.0066 code +0.0022 dialogue +0.0254 harness -0.0081 logic -0.0071 science -0.0026 theory -0.0089 web +0.0019 wikidata +0.0080
+W109_FRONTIER_W103 FRONTIER W109; one place open: all 0.7131 (200933 places) | acts 1.1398 books 0.6827 code 0.4060 dialogue 0.9795 harness 0.7781 logic 0.3950 science 0.5656 theory 0.5232 web 0.7427 wikidata 0.9173 || less the control's, paired: -0.0179 (±0.0010) | acts -0.0610 books +0.0025 code +0.0026 dialogue -0.0435 harness -0.0686 logic +0.0067 science -0.0085 theory -0.0108 web -0.0067 wikidata +0.0084
+W109_LAP_TRAVEL W109 material: |d|=1.057e+08,1.065e+08,1.166e+08 cos01=+0.024 cos12=+0.104 persistence=0.974 | level: |d|=1.656e+07,1.741e+07,1.991e+07 cos01=+0.033 cos12=+0.187 persistence=1.018 | third: |d|=5.154e+07,5.222e+07,5.527e+07 cos01=+0.121 cos12=+0.148 persistence=1.041
+W109_PROBE NEXT_WRITE_DONE rows=200 run=64 window=- ms=296936
+W109_PROBE_SCORE PROBE ask2_W109 writes 200 first 14 q 9 want 6 named 0 
+TERRAIN_SCORE W103 whole 57/96 opening 59/96 first 72/96 | sum 8/8/10 of 16 difference 8/8/9 of 16 product 5/5/7 of 16 close 10/12/16 of 16 copy 12/12/14 of 16 reverse 14/14/16 of 16
+TERRAIN_SCORE W108 whole 56/96 opening 60/96 first 73/96 | sum 8/8/8 of 16 difference 8/8/8 of 16 product 5/5/9 of 16 close 8/12/16 of 16 copy 14/14/16 of 16 reverse 13/13/16 of 16
+TERRAIN_SCORE W109 whole 54/96 opening 57/96 first 72/96 | sum 8/8/11 of 16 difference 7/7/8 of 16 product 4/4/6 of 16 close 10/13/16 of 16 copy 14/14/15 of 16 reverse 11/11/16 of 16
+W109_ALL_DONE 19:47:41

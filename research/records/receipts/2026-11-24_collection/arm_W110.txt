@@ -1,0 +1,14 @@
+W110_START 19:42:39
+# arm W110: lock taken 19:42:39
+# arm W110: exit 0 released 20:20:12
+TERRAIN_TRAINED W110 20:20:12 sections=3000 ended=false
+W110_READS_START 20:20:12
+TERRAIN_PANEL W110_mean 20:21:12 seen: words 37 in_lexicon 22 (59%) longest_copy 14 held: words 60 in_lexicon 50 (83%) longest_copy 16 unread: words 61 in_lexicon 49 (80%) longest_copy 15  || LONG W110_mean: all words 274 in lexicon 200 (72%) writes that loop 2 of 20 longest run shared with its prompt 40 | code 42/47 (89%) web 47/56 (83%) science 35/58 (60%) books 51/61 (83%) wikidata 25/52 (48%)
+TERRAIN_REACH W110 20:22:41 ANSWER copy n= 2655 0.063|ANSWER reverse n= 2667 0.214|ANSWER sum n= 1579 0.991|
+TERRAIN_WIDE W110 20:22:44 LONG W110: all words 2085 in lexicon 1451 (69%) writes that loop 26 of 160 longest run shared with its prompt 76 | code 286/331 (86%) web 339/425 (79%) science 237/424 (55%) books 380/488 (77%) wikidata 209/417 (50%)
+W97_CAVITY4 W110 20:40:45 CAVITY_DONE ms=910467 loud_lines=131
+W97_THEORY THEORY_PANEL W110 logic: words 109 in lexicon 99 (90%) loops 0 of 8 longest shared with prompt 34 | theory: words 159 in lexicon 141 (88%) loops 0 of 12 longest shared with prompt 10
+W110_CARD_READS_DONE 20:41:25
+W110_FRONTIER FRONTIER W110; one place open: all 0.7137 (200933 places) | acts 1.1382 books 0.6890 code 0.4066 dialogue 0.9740 harness 0.7729 logic 0.3926 science 0.5696 theory 0.5233 web 0.7473 wikidata 0.9222 || less the control's, paired: +0.0006 (±0.0007) | acts -0.0016 books +0.0063 code +0.0006 dialogue -0.0055 harness -0.0052 logic -0.0024 science +0.0040 theory +0.0001 web +0.0046 wikidata +0.0049
+W110_FRONTIER_W103 FRONTIER W110; one place open: all 0.7137 (200933 places) | acts 1.1382 books 0.6890 code 0.4066 dialogue 0.9740 harness 0.7729 logic 0.3926 science 0.5696 theory 0.5233 web 0.7473 wikidata 0.9222 || less the control's, paired: -0.0174 (±0.0010) | acts -0.0627 books +0.0088 code +0.0031 dialogue -0.0491 harness -0.0739 logic +0.0043 science -0.0045 theory -0.0107 web -0.0020 wikidata +0.0133
+W110_LAP_TRAVEL W110 material: |d|=1.218e+08,1.254e+08,1.168e+08 cos01=+0.172 cos12=+0.204 persistence=1.095 | level: |d|=1.935e+07,1.86e+07,1.734e+07 cos01=+0.249 cos12=+0.228 persistence=1.143 | third: |d|=5.655e+07,5.778e+07,5.452e+07 cos01=+0.213 cos12=+0.223 persistence=1.124
