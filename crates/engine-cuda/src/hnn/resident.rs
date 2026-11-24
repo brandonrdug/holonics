@@ -1164,9 +1164,12 @@ impl<'c> Resident<'c> {
                 }
                 let mut narrow = self.narrow_out.borrow_mut();
                 if narrow.len() == narrow_group + views.len() {
+                    // [the lead, November 23] None at a place read and not compared, as the host's `faces_at_class` reads it.
+                    let targets: Vec<Option<&[usize]>> = group.map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].targets).collect());
                     for (k, row) in narrow[narrow_group..].iter_mut().enumerate() {
                         let h = heard[k] as usize;
-                        *row = (0..h).map(|t| if t == 0 { None } else { row[h + t] }).collect();
+                        let compared = |t: usize| targets.get(k).copied().flatten().is_none_or(|tg| tg[t] != UNCOMPARED);
+                        *row = (0..h).map(|t| if t == 0 || !compared(t) { None } else { row[h + t] }).collect();
                     }
                 }
                 let mut opening = self.opening_out.borrow_mut();
