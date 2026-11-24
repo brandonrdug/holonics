@@ -1,0 +1,17 @@
+W107_START 13:21:28
+TERRAIN_TRAINED W107 13:56:10 sections=3000 ended=false
+TERRAIN_REACH W107 13:57:50 ANSWER copy n= 2655 0.117|ANSWER reverse n= 2667 0.111|ANSWER sum n= 1579 1.018|
+TERRAIN_PANEL W107_mean 14:41:49 seen: words 38 in_lexicon 28 (73%) longest_copy 13 held: words 63 in_lexicon 51 (80%) longest_copy 15 unread: words 63 in_lexicon 54 (85%) longest_copy 16  || LONG W107_mean: all words 246 in lexicon 187 (76%) writes that loop 3 of 20 longest run shared with its prompt 46 | code 31/34 (91%) web 40/49 (81%) science 34/53 (64%) books 57/62 (91%) wikidata 25/48 (52%)
+TERRAIN_LOUD W107 15:33:19  lines=71
+TERRAIN_WIDE W107 15:44:55 LONG W107: all words 2074 in lexicon 1485 (71%) writes that loop 18 of 160 longest run shared with its prompt 52 | code 278/343 (81%) web 351/431 (81%) science 219/402 (54%) books 405/494 (81%) wikidata 232/404 (57%)
+W97_CAVITY W107 16:05:11 CAVITY_DONE ms=875637
+W97_CAVITY4 W107 16:33:28 CAVITY_DONE ms=1304491
+W97_THEORY THEORY_PANEL W107 logic: words 111 in lexicon 91 (81%) loops 0 of 8 longest shared with prompt 14 | theory: words 176 in lexicon 149 (84%) loops 0 of 12 longest shared with prompt 12
+W107_LAP_TRAVEL W107 material: |d|=1.066e+08,1.121e+08,1.281e+08 cos01=+0.071 cos12=+0.156 persistence=1.034 | level: |d|=1.661e+07,1.811e+07,2.083e+07 cos01=+0.072 cos12=+0.212 persistence=1.063 | third: |d|=5.205e+07,5.368e+07,5.837e+07 cos01=+0.150 cos12=+0.188 persistence=1.079
+W107_FRONTIER_HIST FRONTIER W107; one place open: all 0.7162 (200933 places) | acts 1.1465 books 0.6799 code 0.4075 dialogue 0.9844 harness 0.7853 logic 0.4000 science 0.5682 theory 0.5293 web 0.7441 wikidata 0.9149 || less the control's, paired: -0.0149 (±0.0009) | acts -0.0544 books -0.0003 code +0.0040 dialogue -0.0387 harness -0.0614 logic +0.0117 science -0.0059 theory -0.0048 web -0.0052 wikidata +0.0060
+W107_FRONTIER FRONTIER W107; one place open: all 0.6066 (140564 places) | books 0.6799 code 0.4075 logic 0.4000 science 0.5682 theory 0.5293 web 0.7441 wikidata 0.9149 || less the control's, paired: +0.0008 (±0.0010) | books -0.0003 code +0.0040 logic +0.0117 science -0.0059 theory -0.0048 web -0.0052 wikidata +0.0060
+W107_PROBE NEXT_WRITE_DONE rows=200 run=64 window=- ms=369450
+TERRAIN_SCORE W103 whole 57/96 opening 59/96 first 72/96 | sum 8/8/10 of 16 difference 8/8/9 of 16 product 5/5/7 of 16 close 10/12/16 of 16 copy 12/12/14 of 16 reverse 14/14/16 of 16
+TERRAIN_SCORE W106t whole 59/96 opening 63/96 first 69/96 | sum 8/8/8 of 16 difference 8/8/8 of 16 product 6/6/6 of 16 close 9/13/16 of 16 copy 14/14/15 of 16 reverse 14/14/16 of 16
+TERRAIN_SCORE W107 whole 55/96 opening 57/96 first 76/96 | sum 9/9/10 of 16 difference 9/9/9 of 16 product 5/5/10 of 16 close 8/10/16 of 16 copy 13/13/15 of 16 reverse 11/11/16 of 16
+W107_ALL_DONE 17:19:06

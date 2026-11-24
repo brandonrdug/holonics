@@ -176,6 +176,9 @@ impl Realization for Paired<'_> {
     fn read_tick_scales(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i128>>>)> {
         self.both("read_tick_scales", |c| c.read_tick_scales(field, regions), |h| h.read_tick_scales(field, regions))
     }
+    fn read_tick_charts_scales(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, Vec<Vec<Vec<i32>>>, Vec<Vec<Vec<i128>>>)> {
+        self.both("read_tick_charts_scales", |c| c.read_tick_charts_scales(field, regions), |h| h.read_tick_charts_scales(field, regions))
+    }
     fn read_faces_gated(&mut self, field: &Constitution, regions: &[Region]) -> Reads<(Faces, CarryGates)> {
         self.both("read_faces_gated", |c| c.read_faces_gated(field, regions), |h| h.read_faces_gated(field, regions))
     }

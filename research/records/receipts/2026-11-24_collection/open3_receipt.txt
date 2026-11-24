@@ -1,0 +1,33 @@
+# open3: e5o3, the words open and loud, W108's mean, against out4_W108 (e5h2, known) and read-loudness (e5h2) on the same store and places
+OPEN3 lock taken 18:51:17
+OPEN3 read exit 0 19:06:44 CAVITY_DONE ms=926344
+OPEN3 loudness exit 0 released 19:18:58 LOUDNESS_DONE ms=733177
+OPEN3_ROWS P known=6c0b74f8ceea6746 open=6c0b74f8ceea6746 EQUAL
+OPEN3_ROWS W known=ba484bc022ec94e7 open=ba484bc022ec94e7 EQUAL
+OPEN3_ROWS S known=9975664999acd2e2 open=9975664999acd2e2 EQUAL
+OPEN3_WORDS EQUAL
+OPEN3_LOUDNESS EQUAL 208502 rows
+OPEN3_TABLE lines=131
+OPEN3_DONE 19:19:05
+CAVITY_SLICE slice=code stretches=107 places=20124 host_c0_ms=0 card_cK_ms=98742 card_batches=193 host_opening_ms=605 whole_masks=19 whole_places=730 whole_ms=1489 copy_places=0 later_places=19375 host_copy_ms=597 elapsed_ms=109972
+CAVITY_SLICE slice=web stretches=104 places=20043 host_c0_ms=0 card_cK_ms=90665 card_batches=215 host_opening_ms=351 whole_masks=19 whole_places=758 whole_ms=934 copy_places=0 later_places=19315 host_copy_ms=342 elapsed_ms=208072
+CAVITY_SLICE slice=science stretches=98 places=20088 host_c0_ms=0 card_cK_ms=84765 card_batches=220 host_opening_ms=263 whole_masks=19 whole_places=776 whole_ms=845 copy_places=0 later_places=19402 host_copy_ms=245 elapsed_ms=299261
+CAVITY_SLICE slice=books stretches=97 places=20028 host_c0_ms=0 card_cK_ms=84269 card_batches=224 host_opening_ms=249 whole_masks=19 whole_places=776 whole_ms=857 copy_places=0 later_places=19349 host_copy_ms=259 elapsed_ms=389941
+CAVITY_SLICE slice=wikidata stretches=108 places=20225 host_c0_ms=0 card_cK_ms=81703 card_batches=206 host_opening_ms=235 whole_masks=19 whole_places=677 whole_ms=760 copy_places=0 later_places=19463 host_copy_ms=228 elapsed_ms=477941
+CAVITY_SLICE slice=theory stretches=97 places=20028 host_c0_ms=0 card_cK_ms=83930 card_batches=224 host_opening_ms=236 whole_masks=19 whole_places=776 whole_ms=836 copy_places=0 later_places=19349 host_copy_ms=237 elapsed_ms=568196
+CAVITY_SLICE slice=logic stretches=97 places=20028 host_c0_ms=0 card_cK_ms=83856 card_batches=224 host_opening_ms=270 whole_masks=19 whole_places=776 whole_ms=835 copy_places=0 later_places=19349 host_copy_ms=236 elapsed_ms=658386
+CAVITY_SLICE slice=dialogue stretches=97 places=20028 host_c0_ms=0 card_cK_ms=84190 card_batches=224 host_opening_ms=264 whole_masks=19 whole_places=776 whole_ms=833 copy_places=0 later_places=19349 host_copy_ms=247 elapsed_ms=748921
+CAVITY_SLICE slice=acts stretches=105 places=20050 host_c0_ms=0 card_cK_ms=80542 card_batches=213 host_opening_ms=233 whole_masks=19 whole_places=747 whole_ms=804 copy_places=0 later_places=19315 host_copy_ms=253 elapsed_ms=835735
+CAVITY_SLICE slice=harness stretches=99 places=20291 host_c0_ms=0 card_cK_ms=84210 card_batches=222 host_opening_ms=266 whole_masks=19 whole_places=776 whole_ms=828 copy_places=0 later_places=19598 host_copy_ms=257 elapsed_ms=926335
+CAVITY_DONE ms=926344
+LOUDNESS_SLICE slice=code stretches=107 places=20124 batches=193 whole_masks=19 whole_places=730 whole_batches=1 card_ms=65263
+LOUDNESS_SLICE slice=web stretches=104 places=20043 batches=215 whole_masks=19 whole_places=758 whole_batches=1 card_ms=70442
+LOUDNESS_SLICE slice=science stretches=98 places=20088 batches=220 whole_masks=19 whole_places=776 whole_batches=1 card_ms=73420
+LOUDNESS_SLICE slice=books stretches=97 places=20028 batches=224 whole_masks=19 whole_places=776 whole_batches=1 card_ms=74262
+LOUDNESS_SLICE slice=wikidata stretches=108 places=20225 batches=206 whole_masks=19 whole_places=677 whole_batches=1 card_ms=71695
+LOUDNESS_SLICE slice=theory stretches=97 places=20028 batches=224 whole_masks=19 whole_places=776 whole_batches=1 card_ms=74751
+LOUDNESS_SLICE slice=logic stretches=97 places=20028 batches=224 whole_masks=19 whole_places=776 whole_batches=1 card_ms=75481
+LOUDNESS_SLICE slice=dialogue stretches=97 places=20028 batches=224 whole_masks=19 whole_places=776 whole_batches=1 card_ms=77589
+LOUDNESS_SLICE slice=acts stretches=105 places=20050 batches=213 whole_masks=19 whole_places=747 whole_batches=1 card_ms=72961
+LOUDNESS_SLICE slice=harness stretches=99 places=20291 batches=222 whole_masks=19 whole_places=776 whole_batches=1 card_ms=76960
+LOUDNESS_DONE ms=733177

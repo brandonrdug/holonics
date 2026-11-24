@@ -1,0 +1,12 @@
+Fixed 2026-11-24T19:20:56Z (date -u), the lead, before W110 trains. Refs #404.
+The reading it answers: on W108's mean the held read with the words open and loud (e5o3) took 926 s, its rows P, W and S, its charts
+and its loudness rows byte for byte what the full read (1,294 s) and read-loudness (733 s on the same store) write
+(receipts/2026-11-24_collection/open3_receipt.txt). W109 is the first lap read without the two redundant reads.
+The change: none to the line. W110 is W109's STATE.3000 continued on store-2026-11-24-wide-t6 for 3,000 sections on e5h2; its reads are
+the held read with open and loud (e5o3) on the collection's held set, the loudness table from it, the panels, the theory panel, the
+held-conversation panels and the probe panel.
+G-P2:
+  (a) the reads after the lap hold the card at most 20 minutes, counted from their logs;
+  (b) every region of the collection's held set within 0.010 nats a place of W109, one place open, the conversations within 0.04;
+  (c) the loudness table reads all ten regions.
+Rule: (a) held, these are every lap's reads.

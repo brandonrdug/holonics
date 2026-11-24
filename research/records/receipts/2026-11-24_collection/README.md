@@ -9,5 +9,11 @@
 - `STORE_all.tsv`, `STORE_wide.tsv`, `STORE_wide_t6.tsv`: the three stores' tables (role, slice, share, floor, documents, pieces, octets), without hashes;
   `collection_left_out.txt`: what the collection's writer left out and why.
 - `GUESS_A6.txt`, `GUESS_L2.txt`, `GUESS_H2.txt` to `GUESS_H5.txt`: the guesses, each fixed before its lap.
+- `arm_W107.txt`, `frontier_collection_W107.txt`: the second lap on the six-times store; `GUESS_D1.txt`, `GUESS_P1.txt`, `GUESS_P2.txt`:
+  the conversations' dwell and the trimmed reads' guesses.
+- `panel_names.tsv`, `names_register.txt`: the name-swap panel's prompts and the register ruler's reading of her writes on it (counts
+  only).
+- `open1_receipt.txt`, `open3_receipt.txt`: the held read with the words `open` and `open loud` against the full read and
+  `read-loudness`, row hashes and times; `profile_W108_40_sections.txt`: 40 training sections by kernel family.
 Nothing derived from the private collection's text is here.
 - `panel_ask2.tsv`: the probe panel's 40 prompts, each five times (her writes on it are not here).

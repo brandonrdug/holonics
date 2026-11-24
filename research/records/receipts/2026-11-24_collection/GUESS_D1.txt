@@ -1,0 +1,15 @@
+Fixed 2026-11-24T13:53:45Z (date -u), the lead, before W108 and W108d train. Refs #404.
+The reading it answers: on store-2026-11-24-wide-t6 the held conversations are 0.6% of a pass (84 MB) beside the tool turns' 23.9%
+(3.6 GB). W106t coded them 0.079 nats a place under W103 and its writes after a held model turn's header are markup and tags, never a
+turn's text; the probe panel's counts (first person 16, `?` 9 of 200) stand inside the scatter of the states before the collection.
+Brandon's direction (05:25Z, 05:40Z): direct communication first, ping-pong over arithmetic. The store W103 trained on held the
+conversations at 4.3% of its prefix role.
+The change: the conversations held eight times over (tools/store_dwell.py, store-2026-11-24-wide-t6-d8): 4.3% of a pass, every other
+slice as it was. Control W108: W107's STATE.3000 joined at a new pass to store-2026-11-24-wide-t6; arm W108d: the same state joined at a
+new pass to store-2026-11-24-wide-t6-d8. 3,000 sections each on e5h2; the two differ by the conversations' dwell alone.
+G-D1:
+  (a) the held conversations (the collection's held set, one place open) at least 0.03 nats a place under W108;
+  (b) every other region of both held sets within 0.010 of W108 (tool turns, harness, the five registers, the theory, the Lean);
+  (c) the probe panel: first person and `?` together at least W108's plus 10 of 200 writes.
+Rule: (a) and (b) held, the line takes the dwell; (a) missed, it does not; (c) is read beside, and the held-conversation panel's writes
+are read whole for a turn's text after a model's header.

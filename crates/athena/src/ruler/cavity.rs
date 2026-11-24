@@ -60,6 +60,23 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
     // [measurement; the lead, November 18, the frontier record §6] A last word `known` reads the frontier's rows a second time with each region
     // a known stream ([`holonics_engine::field::Region::before`]: every known place hears only what stands before it), rows `K` of
     // `OUT/frontier.tsv` and a line of their own; a state whose pass reads its frontier so is read so without the word.
+    // [measurement; the lead, November 24, Brandon's 17:36Z on iteration pace] A last word `open` reads the rows the line's guesses are
+    // scored on: rows `P` (each place alone open) and `W` (the whole masks), their charts and the opening's codes, and the rows `S` (each
+    // stretch one region by two streams, the comparison she writes by, 0.2 s a slice). The frontier's rows `F` and `K` and the code slice's
+    // copies `C` are left unread, about a third of the read's time on the collection's held set; rows `P` and `W` are the same bits with
+    // the word and without it (the receipt of that day).
+    // [measurement; the lead, November 24, Brandon's 17:36Z on iteration pace] A last word `loud` writes `OUT/loudness.tsv`, the rows
+    // `read-loudness` writes on the same store and places (rows `P` and `W`, each open place's code, rank, units and its lanes' powers by
+    // stage), from the forward that reads the charts ([`Realization::read_tick_charts_scales`]), so the loudness costs no forward of its
+    // own; the cavity's own rows are the same bits with the word and without it.
+    let (args, loud_word) = match args.last().map(String::as_str) {
+        Some("loud") => (&args[..args.len() - 1], true),
+        _ => (args, false),
+    };
+    let (args, open_only) = match args.last().map(String::as_str) {
+        Some("open") => (&args[..args.len() - 1], true),
+        _ => (args, false),
+    };
     let (args, known_word) = match args.last().map(String::as_str) {
         Some("known") => (&args[..args.len() - 1], true),
         _ => (args, false),
@@ -69,7 +86,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
         None => (args, None),
     };
     if args.len() != 13 && args.len() != 14 {
-        return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE]".into());
+        return Err("read-cavity UNITS UNITS_SHA STORE STORE_SHA KEYS KEYS_SHA CODEC CODEC_SHA PLACES STATE STATE_SHA OUT [ROLE] [carry=MILLI] [known] [open] [loud]".into());
     }
     let started = std::time::Instant::now();
     refuse_variables("read-cavity")?;
@@ -101,6 +118,19 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
     let mut words_whole = std::io::BufWriter::new(std::fs::File::create(out.join("words_whole.bin"))?);
     let mut frontier_tsv = std::io::BufWriter::new(std::fs::File::create(out.join("frontier.tsv"))?);
     writeln!(frontier_tsv, "row\tslice\tstretch\tt\tclass\tcK")?;
+    let mut loud_tsv = if loud_word { Some(std::io::BufWriter::new(std::fs::File::create(out.join("loudness.tsv"))?)) } else { None };
+    if let Some(w) = loud_tsv.as_mut() {
+        let cols: Vec<String> = (0..learner.field.declaration.ticks + 1).flat_map(|s| (0..learner.field.declaration.lanes).map(move |l| format!("s{s}_l{l}"))).collect();
+        writeln!(w, "row\tslice\tstretch\tt\tclass\tcode\trank\tprev2\tprev\tunit\tnext\t{}", cols.join("\t"))?;
+    }
+    // (a loudness row as `read-loudness` writes it: the open place's code, rank and units, and its lanes' powers at every stage)
+    let loud_row = |w: &mut std::io::BufWriter<std::fs::File>, row: &str, name: &str, k: usize, t: usize, classes: &[usize], face: &holonics_engine::face::TowerFace, sc: &[Vec<i128>], open: usize, lanes: usize| -> std::result::Result<(), String> {
+        let class = classes[t];
+        let powers: Vec<String> = sc.iter().flat_map(|s| s[open * lanes..(open + 1) * lanes].iter().map(i128::to_string)).collect();
+        let unit = |at: Option<usize>| at.and_then(|i| classes.get(i)).map_or("-".to_string(), |&c| codec.decode(&[c]).iter().map(|b| format!("{b:02x}")).collect());
+        let (p2, p1, nx) = (unit(t.checked_sub(2)), unit(t.checked_sub(1)), unit(Some(t + 1)));
+        writeln!(w, "{row}\t{name}\t{k}\t{t}\t{class}\t{}\t{}\t{p2}\t{p1}\t{}\t{nx}\t{}", face.code(class), crate::ruler::loudness::rank_of(face, class), unit(Some(t)), powers.join("\t")).map_err(|e| e.to_string())
+    };
     let dw = learner.field.declaration.width;
     let stages_expected = learner.field.declaration.ticks + 1;
     // [P60 item 7] The opening's code through its lift at every place of a region (cavity openings only, no tick), where the field has the lift;
@@ -121,8 +151,16 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
     let loud = learner.field.declaration.loud;
     let lanes = learner.field.declaration.lanes;
     let code_of_read = |r: &[i32], s: &[i128], class: usize| -> std::result::Result<i64, String> { Ok(learner.field.face_of_chart(r, s).map_err(|e| e.to_string())?.code(class)) };
-    let powers = |realization: &mut dyn Realization, regions: &[OwnedRegion]| -> std::result::Result<Vec<Vec<Vec<i128>>>, String> {
-        if loud { Ok(realization.read_tick_scales(&learner.field, &views_of(regions)).map_err(|e| e.to_string())?.1) } else { Ok(vec![Vec::new(); regions.len()]) }
+    // [measurement; the lead, November 24, Brandon's 17:36Z on iteration pace] On a loud field the charts and the lanes' powers are read from
+    // one forward ([`Realization::read_tick_charts_scales`]), where until that day they were read by two, the same bits.
+    #[allow(clippy::type_complexity)]
+    let charts_powers = |realization: &mut dyn Realization, regions: &[OwnedRegion]| -> std::result::Result<(Vec<Vec<Option<holonics_engine::face::TowerFace>>>, Vec<Vec<Vec<i32>>>, Vec<Vec<Vec<i128>>>), String> {
+        if loud || loud_word {
+            realization.read_tick_charts_scales(&learner.field, &views_of(regions)).map_err(|e| e.to_string())
+        } else {
+            let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(regions)).map_err(|e| e.to_string())?;
+            Ok((faces, stages, vec![Vec::new(); regions.len()]))
+        }
     };
     let put_words = |w: &mut std::io::BufWriter<std::fs::File>, rows: &[Vec<i32>], at: usize| -> std::io::Result<()> {
         for stage in rows {
@@ -211,10 +249,12 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
                     OwnedRegion::plain(classes.clone(), mask)
                 })
                 .collect();
-            let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
-            let scales = powers(&mut *realization, &regions)?;
+            let (faces, stages, scales) = charts_powers(&mut *realization, &regions)?;
             for (((&(k, t), f), st), sc) in jobs[at..end].iter().zip(&faces).zip(stages).zip(scales) {
-                let sc_at = |s: usize| -> &[i128] { sc.get(s).map_or(&[][..], |v| &v[..lanes.min(v.len())]) };
+                let sc_at = |s: usize| -> &[i128] { sc.get(s).filter(|_| loud).map_or(&[][..], |v| &v[..lanes.min(v.len())]) };
+                if let Some(w) = loud_tsv.as_mut() {
+                    loud_row(w, "P", name, k, t, &stretches[k].0, f[t].as_ref().ok_or("an open place without a face")?, &sc, 0, lanes)?;
+                }
                 let class = stretches[k].0[t];
                 ck[k][t] = f[t].as_ref().ok_or("an open place without a face")?.code(class);
                 if st.len() != stages_expected || st.iter().any(|s| s.len() != dw) {
@@ -263,8 +303,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
                 (in_pairs, in_sites, end) = (in_pairs + s * s, in_sites + s, end + 1);
             }
             let regions: Vec<OwnedRegion> = wholes[w_at..end].iter().map(|(_, r)| r.clone()).collect();
-            let (faces, stages) = realization.read_tick_charts(&learner.field, &views_of(&regions)).map_err(|e| e.to_string())?;
-            let scales = powers(&mut *realization, &regions)?;
+            let (faces, stages, scales) = charts_powers(&mut *realization, &regions)?;
             for (((k, region), (f, st)), sc) in wholes[w_at..end].iter().zip(faces.iter().zip(&stages)).zip(&scales) {
                 let wo = opening_of(&region.classes, &region.unresolved)?;
                 if st.len() != stages_expected {
@@ -274,7 +313,10 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
                     let class = region.classes[t];
                     let cw = f[t].as_ref().ok_or("an open place without a face")?.code(class);
                     let at_row = |s: usize| &st[s][row * dw..(row + 1) * dw];
-                    let sc_row = |s: usize| -> &[i128] { sc.get(s).map_or(&[][..], |v| &v[row * lanes..(row + 1) * lanes]) };
+                    let sc_row = |s: usize| -> &[i128] { sc.get(s).filter(|_| loud).map_or(&[][..], |v| &v[row * lanes..(row + 1) * lanes]) };
+                    if let Some(w) = loud_tsv.as_mut() {
+                        loud_row(w, "W", name, *k, t, &region.classes, f[t].as_ref().ok_or("an open place without a face")?, sc, row, lanes)?;
+                    }
                     if code_of_read(at_row(stages_expected - 1), sc_row(stages_expected - 1), class)? != cw {
                         return Err(format!("a whole mask's last chart's face differs from the realization's face (stretch {k}, place {t})").into());
                     }
@@ -299,7 +341,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
         // The rows `F` as the law reads any region; then, where asked or where the state's pass reads its frontier so, the rows `K` with each
         // region a known stream.
         for (row, before) in [("F", false), ("K", true)] {
-            if before && !(known_word || law.before) {
+            if open_only || (before && !(known_word || law.before)) {
                 continue;
             }
             let kind_start = std::time::Instant::now();
@@ -340,7 +382,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
         // or where the state's pass reads its frontier so: each stretch one region carrying the word
         // ([`holonics_engine::field::Region::strand`]), whose face at a place is the open place's there. Rows `S` of `OUT/frontier.tsv`
         // (the columns of `F`) and a line of their own.
-        if known_word || law.strand {
+        if open_only || known_word || law.strand {
             let strand_start = std::time::Instant::now();
             let (mut s_at, mut s_batches, mut s_places) = (0usize, 0usize, 0usize);
             while s_at < stretches.len() {
@@ -376,7 +418,7 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
         // The code slice's copies: each line's leading spaces doubled, c0 on the host at every place of the copy.
         let mut copy_places = 0usize;
         let copy_start = std::time::Instant::now();
-        if name == "code" {
+        if name == "code" && !open_only {
             for (k, (_, bytes, ends)) in stretches.iter().enumerate() {
                 let (mut copy, mut source) = (Vec::with_capacity(2 * bytes.len()), Vec::with_capacity(2 * bytes.len()));
                 let mut leading = false;
@@ -456,6 +498,9 @@ pub fn read_cavity(args: &[String], realization: &mut dyn Realization) -> Result
     words.flush()?;
     words_whole.flush()?;
     frontier_tsv.flush()?;
+    if let Some(w) = loud_tsv.as_mut() {
+        w.flush()?;
+    }
     println!("CAVITY_DONE ms={}", started.elapsed().as_millis());
     Ok(())
 }

@@ -1,0 +1,18 @@
+REGISTER_PLANTED acts 0.26 books 0.94 code 0.93 dialogue 0.43 harness 0.02 logic 0.77 science 0.82 theory 0.78 web 0.26 wikidata 0.95 | mean 0.62 of 64-octet held windows placed in their own slice
+REGISTER_PLANTED_OURS acts 0.65 books 0.03 code 0.02 dialogue 0.68 harness 0.77 logic 0.95 science 0.07 theory 0.85 web 0.10 wikidata 0.00 | the share of each slice's held windows placed in ours (theory, logic, dialogue, acts, harness)
+REGISTER names_W103 Claude n=48 ours=0.31 | acts 0.02 books 0.15 code 0.15 dialogue 0.21 logic 0.02 science 0.06 theory 0.06 web 0.27 wikidata 0.06
+REGISTER names_W103 Brandon n=48 ours=0.27 | acts 0.08 books 0.08 code 0.08 dialogue 0.12 logic 0.02 science 0.08 theory 0.04 web 0.40 wikidata 0.08
+REGISTER names_W103 Athena n=48 ours=0.27 | books 0.25 code 0.08 dialogue 0.15 logic 0.02 science 0.15 theory 0.10 web 0.23 wikidata 0.02
+REGISTER names_W103 Holonics n=48 ours=0.44 | acts 0.02 books 0.12 code 0.06 dialogue 0.12 logic 0.12 science 0.19 theory 0.17 web 0.17 wikidata 0.02
+REGISTER names_W103 Alice n=48 ours=0.33 | acts 0.08 books 0.19 code 0.06 dialogue 0.15 logic 0.02 science 0.15 theory 0.08 web 0.23 wikidata 0.04
+REGISTER names_W103 Marcus n=48 ours=0.21 | acts 0.04 books 0.38 code 0.04 dialogue 0.12 logic 0.02 science 0.12 theory 0.02 web 0.17 wikidata 0.08
+REGISTER names_W103 The_river n=48 ours=0.58 | acts 0.06 books 0.21 code 0.06 dialogue 0.25 logic 0.02 science 0.06 theory 0.25 web 0.08
+REGISTER names_W103 The_teacher n=48 ours=0.35 | books 0.27 code 0.06 dialogue 0.21 science 0.08 theory 0.15 web 0.23
+REGISTER names_W107 Claude n=48 ours=0.27 | acts 0.10 books 0.15 code 0.25 dialogue 0.10 science 0.08 theory 0.06 web 0.21 wikidata 0.04
+REGISTER names_W107 Brandon n=48 ours=0.38 | acts 0.06 books 0.29 code 0.02 dialogue 0.10 science 0.06 theory 0.21 web 0.25
+REGISTER names_W107 Athena n=48 ours=0.31 | acts 0.08 books 0.31 code 0.02 dialogue 0.12 science 0.08 theory 0.10 web 0.25 wikidata 0.02
+REGISTER names_W107 Holonics n=48 ours=0.73 | acts 0.33 books 0.10 code 0.04 dialogue 0.15 logic 0.06 science 0.12 theory 0.19
+REGISTER names_W107 Alice n=48 ours=0.38 | acts 0.12 books 0.12 code 0.08 dialogue 0.17 science 0.15 theory 0.08 web 0.27
+REGISTER names_W107 Marcus n=48 ours=0.27 | acts 0.10 books 0.38 code 0.04 dialogue 0.10 logic 0.02 science 0.12 theory 0.04 web 0.17 wikidata 0.02
+REGISTER names_W107 The_river n=48 ours=0.62 | acts 0.12 books 0.19 code 0.06 dialogue 0.19 logic 0.02 science 0.02 theory 0.29 web 0.10
+REGISTER names_W107 The_teacher n=48 ours=0.42 | acts 0.04 books 0.31 code 0.04 dialogue 0.21 science 0.06 theory 0.17 web 0.17
