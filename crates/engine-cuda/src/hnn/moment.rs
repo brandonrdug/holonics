@@ -49,7 +49,11 @@ pub(crate) struct MomentKeep<'c> {
 /// `Constitution::opening_read` at every compared place), kept for its return and its codes: the compared places (`mask`, the words' open-site mask while
 /// the opening is read), the cavity moments `[t][2M]` and their two sides `[u][t]`, the cavity openings, their charts, lifts and faces.
 pub(crate) struct Opening<'c> {
-    pub(crate) mask: Pooled<'c, u8>,
+    /// The places the forward reads (held for its memory: the forward's kernels read it).
+    pub(crate) _mask: Pooled<'c, u8>,
+    /// [the lead, November 23] The places compared: the mask less the places read and not compared (`Resident::strand_skip`), whose
+    /// faces the forward still reads (the level's news reads them) and whose covector and codes are none.
+    pub(crate) compare: Pooled<'c, u8>,
     pub(crate) keep: Option<MomentKeep<'c>>,
     pub(crate) cmoment: Pooled<'c, i64>,
     pub(crate) sb: Pooled<'c, i64>,
@@ -96,20 +100,24 @@ impl<'c> Resident<'c> {
         let l = field.layout();
         // [the strand's two streams] In a passage read by two streams the compared places are the known stream's (`Resident::strand_heard`).
         let heard = self.strand_heard.borrow().clone();
-        // [the lead, November 23] A place read and not compared (`Resident::strand_skip`) is no compared place of the opening either.
+        // [the lead, November 23] A place read and not compared (`Resident::strand_skip`) is read (its face is the level's news there) and is no
+        // compared place of the opening: it leaves `compare`, which the covector and the codes read.
         let skip = self.strand_skip.borrow().clone();
         let mut mask = vec![0u8; sites.max(1)];
+        let mut compare_mask = vec![0u8; sites.max(1)];
         for (r, region) in regions.iter().enumerate() {
             let first = st.region_off[r] as usize;
             let end = heard.get(r).map_or(region.port.map_or(region.classes.len(), |p| p.start), |&n| n as usize);
             mask[first..first + end].fill(1);
+            compare_mask[first..first + end].fill(1);
             if let Some(k) = skip.get(r).filter(|_| heard.len() == regions.len()) {
                 for (t, _) in k.iter().enumerate().filter(|&(t, &s)| s && t < end) {
-                    mask[first + t] = 0;
+                    compare_mask[first + t] = 0;
                 }
             }
         }
         let mask = self.timed(Kind::Copy, || self.take_up(&mask)).map_err(device)?;
+        let compare = self.timed(Kind::Copy, || self.take_up(&compare_mask)).map_err(device)?;
         let (cmoment, sb, sa) = self.cavity_forward(field, words, regions.len(), sites, keep.as_ref())?;
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let cx = alloc64(sites * dw)?;
@@ -135,7 +143,7 @@ impl<'c> Resident<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         self.mark("opening_forward");
-        Ok(Opening { mask, keep, cmoment, sb, sa, read, scale, lift, masses, totals })
+        Ok(Opening { _mask: mask, compare, keep, cmoment, sb, sa, read, scale, lift, masses, totals })
     }
 
     /// [realization; theory, November 13, P60 item 2] **The opening's comparison's return** (the host's `Constitution::opening_compare_return`): at every
@@ -150,7 +158,7 @@ impl<'c> Resident<'c> {
         let (dw, m2, a, tm) = (d.width, 2 * d.complex(), d.alphabet, d.moment_modes());
         let l = field.layout();
         let mut cw = *words;
-        cw.unresolved = op.mask.device_ptr();
+        cw.unresolved = op.compare.device_ptr();
         let alloc64 = |len: usize| self.timed(Kind::Alloc, || self.take::<i64>(len.max(1))).map_err(device);
         let zeroed64 = |len: usize| self.timed(Kind::Alloc, || self.take_zeroed::<i64>(len.max(1))).map_err(device);
         // The face's covector at unit gain (no domain weighs it), written at every cell (zero past the compared places).
@@ -173,7 +181,7 @@ impl<'c> Resident<'c> {
         self.ratio_adjoint(&mut cw, op.read.device_ptr(), op.scale.device_ptr(), dr.device_ptr(), 0, dx.device_ptr(), true)?;
         // The cavity opening's rows: the unresolved row for every compared place, its neighbours' rows of theirs (a carried neighbour's mixture by
         // its shares), the entries partitioned by row once for each encoding, as the reverse's opening.
-        let mask = self.timed(Kind::Copy, || self.card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
+        let mask = self.timed(Kind::Copy, || self.card.fetch_range(&op.compare, 0, sites)).map_err(device)?;
         let terms = |s: usize, t: u32| -> Vec<(usize, u32, u32)> {
             let (from, to) = (mix_off[s] as usize, mix_off[s + 1] as usize);
             if from == to {

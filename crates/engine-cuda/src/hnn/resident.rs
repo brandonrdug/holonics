@@ -1861,12 +1861,12 @@ impl<'c> Resident<'c> {
                 if self.opening_wanted.get() {
                     let picked = self.timed(Kind::Alloc, || self.take::<u64>(sites.max(1))).map_err(device)?;
                     let mut cw = *words;
-                    cw.unresolved = op.mask.device_ptr();
+                    cw.unresolved = op.compare.device_ptr();
                     let (mut mp, mut pp) = (op.masses.device_ptr(), picked.device_ptr());
                     self.launch("field_face_at_class", Self::cells(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut pp)])?;
                     let picked = self.timed(Kind::Copy, || card.fetch_range(&picked, 0, sites)).map_err(device)?;
                     let totals = self.timed(Kind::Copy, || card.fetch_range(&op.totals, 0, sites)).map_err(device)?;
-                    let mask = self.timed(Kind::Copy, || card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
+                    let mask = self.timed(Kind::Copy, || card.fetch_range(&op.compare, 0, sites)).map_err(device)?;
                     let mut out = self.opening_out.borrow_mut();
                     for r in 0..regions.len() {
                         let span = region_off[r] as usize..region_off[r + 1] as usize;
