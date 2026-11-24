@@ -14,8 +14,9 @@ of each quantity present at each link:
   5. the open place's read after the last tick (`D₀`, what the face reads).
 The quantities: the word before and the word two before (64 cells each, hashed), the first letter of the word two before, the handed
 epoch's own text and the epochs one and two before it (the level's own grain, 64 cells each; the formal thread's offer of November 23),
-the handed epoch's first and last bytes and the last byte of the epoch before it (a byte the restriction sums, the ruler's positive control),
-and a cell drawn by a key from the place's row and position (the floor). Word starts whose handed epoch has two epochs before it. Outside the machine; shares only, floats at the exterior.
+the handed epoch's first and last bytes and the last bytes of the three epochs before it (a byte the restriction sums, the ruler's
+positive control; the two farther ones the formal thread's G-Q3),
+and a cell drawn by a key from the place's row and position (the floor). Word starts whose handed epoch has three epochs before it. Outside the machine; shares only, floats at the exterior.
 """
 import hashlib
 import sys
@@ -58,13 +59,13 @@ def main():
             return text[t:e]
         for i, t in enumerate(firsts):
             j = source[t]
-            if i < 2 or text[t - 1] not in (32, 10) or j is None or j < 2:
+            if i < 2 or text[t - 1] not in (32, 10) or j is None or j < 3:
                 continue
             key = int(hashlib.sha256(f'{r}:{t}'.encode()).hexdigest()[:8], 16) % 64
             w1, w2 = word_at(firsts[i - 1]), word_at(firsts[i - 2])
-            spans = [text[anchors[k]:(anchors[k + 1] if k + 1 < len(anchors) else n)] for k in (j, j - 1, j - 2)]
+            spans = [text[anchors[k]:(anchors[k + 1] if k + 1 < len(anchors) else n)] for k in (j, j - 1, j - 2, j - 3)]
             ep = [cell(x) for x in spans]
-            samples.append((r, epoch_at + j, place_at + t, cell(w1), cell(w2), w2[0], key, ep[0], ep[1], ep[2], spans[0][0], spans[0][-1], spans[1][-1]))
+            samples.append((r, epoch_at + j, place_at + t, cell(w1), cell(w2), w2[0], key, ep[0], ep[1], ep[2], spans[0][0], spans[0][-1], spans[1][-1], spans[2][-1], spans[3][-1]))
         epoch_at += len(anchors)
         place_at += n
     assert epoch_at == len(restricted) == len(coarse), (epoch_at, len(restricted), len(coarse))
@@ -98,7 +99,7 @@ def main():
 
     links = [('restricted', restricted[[s[1] for s in samples]]), ('coarse', coarse[[s[1] for s in samples]]),
              ('row', row[[s[2] for s in samples]]), ('joined', joined[[s[2] for s in samples]]), ('final', final[[s[2] for s in samples]])]
-    qs = [('prev_word', 3), ('prev2_word', 4), ('prev2_first', 5), ('handed_epoch', 7), ('epoch_before_it', 8), ('epoch_two_before_it', 9), ('handed_first_byte', 10), ('handed_last_byte', 11), ('last_byte_before_it', 12), ('planted', 6)]
+    qs = [('prev_word', 3), ('prev2_word', 4), ('prev2_first', 5), ('handed_epoch', 7), ('epoch_before_it', 8), ('epoch_two_before_it', 9), ('handed_first_byte', 10), ('handed_last_byte', 11), ('last_byte_before_it', 12), ('last_byte_two_before_it', 13), ('last_byte_three_before_it', 14), ('planted', 6)]
     print(f"LEVEL_LINKS {cut_d.rstrip('/').split('/')[-1]} word_starts={len(samples)} D0={d0} D1={d1}")
     for name, X in links:
         print(f"LEVEL_LINK {name} " + ' '.join(f"{q}={share(X, onehot([s[k] for s in samples])):.3f}" for q, k in qs))
