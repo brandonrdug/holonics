@@ -1,0 +1,7 @@
+REACH setting=law group=all places=221024 nats_millionths=2979427 ms=257660
+REACH setting=law group=held places=67936 nats_millionths=1336984 ms=257660
+REACH setting=law group=period places=153088 nats_millionths=3708295 ms=257660
+REACH setting=skin:places group=all places=221024 nats_millionths=3023369 ms=498406
+REACH setting=skin:places group=held places=67936 nats_millionths=1388251 ms=498406
+REACH setting=skin:places group=period places=153088 nats_millionths=3748987 ms=498406
+REACH_DONE rows=736 settings=2 ms=498463

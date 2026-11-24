@@ -1085,7 +1085,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") {
+        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1219,6 +1219,17 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         }
         if let Some(g) = name.strip_prefix("state:") {
             field.ruler_state_grain = Some(g.parse()?);
+        }
+        // [the lead, November 24, the calendar record §6 item 1, a read before the fade is a law] `fade:FROM:MILLI`: every turned ring of
+        // period `FROM` or more faded at `γ = 2^(MILLI/1000)` e-folds a radian of its own turn ([`holonics_engine::field::Constitution::set_ruler_fade`]),
+        // the others at one; on the host, where this read runs.
+        if name == "skin:places" {
+            field.ruler_skin_places = true;
+        }
+        if let Some(fm) = name.strip_prefix("fade:") {
+            let (from, milli) = fm.split_once(':').ok_or("a fade setting that is not fade:FROM:MILLI")?;
+            let ell = holonics_engine::field::div_nearest(i128::from(milli.parse::<i64>()?) << holonics_engine::field::MATERIAL_BITS, 1000);
+            field.set_ruler_fade(from.parse()?, i32::try_from(ell).map_err(|_| "a fade past its chart")?).map_err(|e| e.to_string())?;
         }
         // [the lead, November 22, G-R4] `lane:j:h`: lane `j` of every site's state rounded after each tick to the power of two `h` places under
         // that site's own lane's root mean square; `lanept:j:k`: the same lane with `k` places dropped from the state's `2^(−16)`. The other

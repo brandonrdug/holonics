@@ -4370,7 +4370,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4427,6 +4427,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         past: false,
         second: false,
         terrain: None,
+        slice_tension: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -7148,4 +7149,55 @@ fn a_growth_carries_the_lattice_and_the_remainders() {
     assert!(founded.lattice.is_some(), "the legs' founding keeps the lattice");
     let text = founded.to_text();
     assert_eq!(Learner::from_text(&text).unwrap().to_text(), text, "the founded learner reads back");
+}
+
+/// A slice's bytes that are never read (the cut's choice reads only the pass's counts).
+struct UnreadBytes;
+impl crate::passage::PieceBytes for UnreadBytes {
+    fn read_at(&mut self, _at: u64, out: &mut [u8]) -> std::result::Result<(), Box<dyn std::error::Error>> {
+        out.fill(b'a');
+        Ok(())
+    }
+}
+
+#[test]
+fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its_news_and_reads_the_quotas_alone_without_it() {
+    let piece = crate::passage::Piece { document: 0, offset: 0, title: 0, text: 1 << 20, opens: false, closes: true };
+    let slice = |name: &str| crate::passage::Slice { name: name.into(), quota: 1000, pieces: vec![piece], source: Box::new(UnreadBytes) };
+    let pass = |taken: [u64; 2], tension: Option<Vec<u64>>| StorePass {
+        role: "prefix".into(),
+        store: "ab".repeat(32),
+        stretches: 7,
+        least: 4,
+        octaves: 7,
+        pairs: 15_606_223,
+        sites: 41_490,
+        own: false,
+        slices: vec![PassSlice { name: "a".into(), piece: 0, cursor: taken[0], taken: taken[0] }, PassSlice { name: "b".into(), piece: 0, cursor: taken[1], taken: taken[1] }],
+        world: None,
+        frontier: 0,
+        before: false,
+        strand: false,
+        past: false,
+        second: false,
+        terrain: None,
+        slice_tension: tension,
+    };
+    let choose = |taken: [u64; 2], tension: Option<Vec<u64>>| crate::passage::Cut { seed: 3, slices: vec![slice("a"), slice("b")], pass: pass(taken, tension) }.next().unwrap().slice;
+    // Without tensions the quotas alone: the slice behind takes the next stretch.
+    assert_eq!(choose([100, 101], None), 0);
+    assert_eq!(choose([101, 100], None), 1);
+    // Held by tensions, slice b at three times a's news is read until it has taken three times a's places.
+    assert_eq!(choose([100, 250], Some(vec![1_000, 3_000])), 1);
+    assert_eq!(choose([100, 299], Some(vec![1_000, 3_000])), 1);
+    assert_eq!(choose([100, 301], Some(vec![1_000, 3_000])), 0);
+    // A slice with no reading weighs as the mean of those with one; with no reading at all, the quotas alone.
+    assert_eq!(choose([100, 101], Some(vec![0, 3_000])), 0);
+    assert_eq!(choose([101, 100], Some(vec![0, 0])), 1);
+    // The tension line reads back as written, after the pass's line.
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
+    learner.pass = Some(pass([100, 250], Some(vec![1_000, 3_000])));
+    let text = learner.to_text();
+    assert!(text.lines().any(|l| l == "tension 1000 3000"), "the tension line is written");
+    assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
 }
