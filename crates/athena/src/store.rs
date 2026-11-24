@@ -321,7 +321,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -423,6 +423,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // [definition; Build B] The section's acts: the prompt's classes and the slice of each stretch the world answers.
         // [definition; the lead, November 23, a draft world] A draft world's act carries the passage's own symbols at the drafted places (its targets).
         let mut stretches_drawn = 0usize;
+        // [definition; the lead, November 24] Each passage region's slice, in the order the regions stand from `passage_start`, so the
+        // section's receipt carries each slice's tension into the next section's cut ([`StorePass::slice_tension`]).
+        let (passage_start, mut region_slice) = (regions.len(), Vec::<usize>::new());
         while let Some(drawn) = cut.next() {
             stretches_drawn += 1;
             let draft_world = cut.pass.world.as_ref().is_some_and(|w| w.records == 0);
@@ -460,6 +463,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 None => {
                     tally.take(&region, counted);
                     regions.push(region);
+                    region_slice.push(slice);
                 }
             }
         }
@@ -622,12 +626,29 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
         }
+        if let Some(ts) = cut.pass.slice_tension.as_mut() {
+            // [definition; the lead, November 24] Each slice's tension, read from the section's opening code at its regions' open places
+            // (millionths of a bit a place), carried into the next section's cut; a slice the section did not read keeps its reading.
+            let mut sums = vec![(0i128, 0usize); ts.len()];
+            for (r, &sl) in region_slice.iter().enumerate() {
+                if let Some(&(c, n)) = receipt.opening.get(passage_start + r) {
+                    sums[sl].0 += i128::from(c);
+                    sums[sl].1 += n;
+                }
+            }
+            for (t, &(c, n)) in ts.iter_mut().zip(&sums) {
+                if n > 0 {
+                    *t = micro_a_place(c, n);
+                }
+            }
+            println!("STORE_TENSION n={done} {}", cut.slices.iter().zip(ts.iter()).map(|(s, t)| format!("{}={t}", s.name)).collect::<Vec<_>>().join(" "));
+        }
         if let Some(t) = cut.pass.terrain.as_mut() {
             // [definition; the lead, November 21] The terrain's tension and the passage's, read from the section's opening code at their open
             // places (millionths of a bit a place), carried into the next section's share. A side with no places keeps its reading.
             let micro_of = |part: &[(i64, usize)]| {
                 let (code, places) = part.iter().fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + i128::from(rc), n + rn));
-                (places > 0).then(|| u64::try_from((code.max(0) * 1_000_000) / ((places as i128) << 20)).unwrap_or(u64::MAX))
+                (places > 0).then(|| micro_a_place(code, places))
             };
             if receipt.opening.len() >= terrain_regions {
                 let (world, passage) = receipt.opening.split_at(terrain_regions);
@@ -1620,6 +1641,8 @@ pub fn join_store(args: &[String]) -> Result<()> {
     let mut pass = before.clone();
     pass.store = args[4].clone();
     pass.slices = names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect();
+    // A pass held by its slices' tensions reads its new slices afresh: one reading a slice, none yet.
+    pass.slice_tension = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
     let after = slices_text(&pass);
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
@@ -1757,6 +1780,51 @@ pub fn set_terrain(args: &[String]) -> Result<()> {
     }
     std::fs::write(out, &written)?;
     println!("SET_TERRAIN lines={} {line}", expected.len());
+    Ok(())
+}
+
+/// A code on `2^(−20)` bits over `places` places, in millionths of a bit a place (a tension's reading: the terrain's and the slices'),
+/// a negative sum read as zero.
+fn micro_a_place(code: i128, places: usize) -> u64 {
+    u64::try_from((code.max(0) * 1_000_000) / ((places as i128) << 20)).unwrap_or(u64::MAX)
+}
+
+/// [definition; the lead, November 24, Brandon's 21:57Z] `set-tension STATE STATE_SHA OUT`: **a state's pass held by its slices' tensions**
+/// ([`holonics_engine::field::StorePass::slice_tension`]): the state with a `tension` line after its pass line (and its terrain line), no
+/// reading yet (the cut then reads the quotas as before until a section reads a slice), every other line byte for byte (read back and
+/// checked). Refused on a state with no pass or one whose pass already holds its tensions.
+pub fn set_tension(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("set-tension STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.slice_tension.is_some() {
+        return Err("a state whose pass already holds its slices' tensions".into());
+    }
+    let tension = vec![0u64; before.slices.len()];
+    let line = format!("tension {}", tension.iter().map(u64::to_string).collect::<Vec<_>>().join(" "));
+    let mut next = learner.clone();
+    let terrain = usize::from(before.terrain.is_some());
+    next.pass = Some(StorePass { slice_tension: Some(tension), ..before });
+    let written = next.to_text();
+    let pass_line = written.lines().position(|l| l.starts_with("pass ")).ok_or("a written state with no pass line")?;
+    let mut expected: Vec<&str> = text.lines().collect();
+    expected.insert(pass_line + 1 + terrain, &line);
+    if written.lines().collect::<Vec<_>>() != expected {
+        return Err("a written tension that changes a line other than its own".into());
+    }
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.field != learner.field || back.pass != next.pass {
+        return Err("a written tension whose state does not read back as the source's field and pass".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_TENSION lines={} {line}", expected.len());
     Ok(())
 }
 

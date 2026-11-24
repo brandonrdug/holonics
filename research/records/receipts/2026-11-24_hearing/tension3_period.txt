@@ -1,0 +1,16 @@
+PERIOD_KNOWN law P1= 3 sep kept 0.801 loose 1.158 kept-loose -0.357 (n 1088, 1061) | letter kept 3.946 loose 4.181
+PERIOD_KNOWN law P1= 4 sep kept 1.319 loose 1.551 kept-loose -0.233 (n 800, 801) | letter kept 3.952 loose 4.021
+PERIOD_KNOWN law P1= 5 sep kept 1.806 loose 1.986 kept-loose -0.180 (n 640, 636) | letter kept 4.006 loose 3.992
+PERIOD_KNOWN law P1= 7 sep kept 2.217 loose 2.367 kept-loose -0.150 (n 448, 456) | letter kept 3.936 loose 3.931
+PERIOD_KNOWN law P1= 9 sep kept 2.567 loose 2.538 kept-loose +0.028 (n 352, 357) | letter kept 3.924 loose 3.924
+PERIOD_KNOWN law P1=10 sep kept 2.797 loose 2.781 kept-loose +0.016 (n 320, 324) | letter kept 3.914 loose 3.897
+PERIOD_KNOWN law P1=15 sep kept 3.588 loose 3.622 kept-loose -0.035 (n 224, 214) | letter kept 3.896 loose 3.885
+PERIOD_KNOWN law P1=16 sep kept 3.690 loose 3.707 kept-loose -0.017 (n 192, 196) | letter kept 3.871 loose 3.872
+PERIOD_KNOWN skin:places P1= 3 sep kept 0.824 loose 1.114 kept-loose -0.291 (n 1088, 1061) | letter kept 4.010 loose 4.245
+PERIOD_KNOWN skin:places P1= 4 sep kept 1.300 loose 1.498 kept-loose -0.197 (n 800, 801) | letter kept 4.007 loose 4.097
+PERIOD_KNOWN skin:places P1= 5 sep kept 1.756 loose 1.925 kept-loose -0.170 (n 640, 636) | letter kept 4.055 loose 4.051
+PERIOD_KNOWN skin:places P1= 7 sep kept 2.087 loose 2.257 kept-loose -0.169 (n 448, 456) | letter kept 4.014 loose 3.998
+PERIOD_KNOWN skin:places P1= 9 sep kept 2.405 loose 2.415 kept-loose -0.010 (n 352, 357) | letter kept 3.974 loose 3.976
+PERIOD_KNOWN skin:places P1=10 sep kept 2.636 loose 2.639 kept-loose -0.003 (n 320, 324) | letter kept 3.951 loose 3.938
+PERIOD_KNOWN skin:places P1=15 sep kept 3.378 loose 3.447 kept-loose -0.070 (n 224, 214) | letter kept 3.932 loose 3.926
+PERIOD_KNOWN skin:places P1=16 sep kept 3.537 loose 3.533 kept-loose +0.004 (n 192, 196) | letter kept 3.908 loose 3.915

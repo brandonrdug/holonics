@@ -71,6 +71,14 @@ pub struct Constitution {
     /// level lower. The finite difference of a code under it is the slope a friction founded at zero would have (atlas
     /// `wave.matched-friction-reach`), read before the stage is a law: not part of the state, and no reverse reads it.
     pub ruler_friction: Option<Vec<i64>>,
+    /// [measurement; the lead, November 24] Each turned slot's skin denominator where a ruler fades its rings
+    /// ([`Constitution::set_ruler_fade`]); `None` at one e-fold a radian. Not part of the state.
+    pub ruler_skin_k: Option<Vec<i128>>,
+    /// [measurement; the lead, November 24, the calendar record §5 ("a turn that counts her units and a fade that forgets across them are
+    /// one number today")] Where set, a paced head's pairs and crowds fade by their places' distance while their frames turn on her clock:
+    /// the skin's argument parted from the turn's. A ruler's setting on a clone of the field (`read-reach`'s `skin:places`); the moments keep
+    /// their paced skin. Not part of the state.
+    pub ruler_skin_places: bool,
     /// [measurement; the lead, November 21, the precision pass's G-W3] Where set, **every state rounded to `2^(−g)` after each tick** of a
     /// passage read by two streams: `x ← release(x, 16 − g) ≪ (16 − g)` over every site, `x` on the state's `2^(−16)`. A ruler's read of how
     /// many of the state's places the code reads: not part of the state, and no reverse reads it.
@@ -244,7 +252,7 @@ impl Constitution {
     /// indices' distance, but for an open place of a strand's second stream).
     pub(crate) fn pair_decay_placed(&self, paces: &Paces, h: usize, l: usize, i: usize, j: usize, gap: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) && !self.ruler_skin_places => (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
             _ => self.decay(h, l, gap),
         }
     }
@@ -253,7 +261,7 @@ impl Constitution {
     /// whose source `j` stands on its own (`paces`): [`Constitution::pair_decay`] between the two clocks.
     pub(crate) fn pair_decay_between(&self, rx: &Paces, i: usize, paces: &Paces, j: usize, h: usize, l: usize) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => (self.skin(self.slot(h, l), rx.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) && !self.ruler_skin_places => (self.skin(self.slot(h, l), rx.sigma[p][i] as i128 - paces.sigma[p][j] as i128) as i128, MOVE_BITS),
             _ => self.decay(h, l, i.abs_diff(j)),
         }
     }
@@ -262,7 +270,7 @@ impl Constitution {
     /// the skin to the place `2^ℓ` away on the crowd's side (inside the region wherever the octave is).
     pub(crate) fn octave_decay(&self, paces: &Paces, h: usize, l: usize, i: usize, level: u32, right: bool) -> (i128, u32) {
         match paces.row.get(h).copied().flatten() {
-            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) => {
+            Some(p) if !paces.plain[p] && !self.declaration.is_depth(h) && !self.ruler_skin_places => {
                 let k = if right { i + (1 << level) } else { i - (1 << level) };
                 (self.skin(self.slot(h, l), paces.sigma[p][i] as i128 - paces.sigma[p][k] as i128) as i128, MOVE_BITS)
             }

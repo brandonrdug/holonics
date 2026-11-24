@@ -531,6 +531,15 @@ pub struct StorePass {
     /// [definition; the lead, November 21, Brandon's 04:54Z] The terrain whose own records the pass meets beside its slices, held by its
     /// tension ([`PassTerrain`]); written as its own line after the pass line, only where set.
     pub terrain: Option<PassTerrain>,
+    /// [definition; the lead, November 24, Brandon's 21:57Z ("ultimately I'd prefer simultaneous"); `agent-inferred`, a guess at the law
+    /// fixed before its arm] **The slices held by their tension**: each slice's field code at its open places in the last section that read
+    /// it (millionths of a bit a place, the opening's code the section's receipt reads), in the store's order. Where set, the cut takes the
+    /// slice with least `taken_s / (quota_s · T_s)` ([`crate::passage::Cut::next`]), so a slice is read at its octets' share weighed by how
+    /// much news it still holds for the field: the terrain's law of November 21 ([`PassTerrain`]), read between the passage's slices. Every
+    /// piece is still read once a pass and in order; only the interleave moves. A slice with no reading yet weighs as the mean of those
+    /// with one (as its quota alone where none has). Written as its own line `tension T₀ … T_(k−1)` after the pass's (and its terrain's),
+    /// only where set.
+    pub slice_tension: Option<Vec<u64>>,
 }
 
 /// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
@@ -718,7 +727,7 @@ impl StorePass {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -1069,7 +1078,10 @@ impl Learner {
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
-            let pass = self.pass.as_ref().map_or(String::new(), |p| format!("{}\n{}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line()))));
+            let pass = self.pass.as_ref().map_or(String::new(), |p| {
+                let tension = p.slice_tension.as_ref().map_or(String::new(), |t| format!("tension {}\n", t.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
+                format!("{}\n{}{tension}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line())))
+            });
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
             let leak = self.leak.map_or(String::new(), |k| format!("leak {k}\n"));
             // [definition; the lead, November 18] The step's carried remainders, a trailing line after the leak's and only where carried.
@@ -1250,6 +1262,17 @@ impl Learner {
         // [definition; the lead, November 21] The pass's terrain, a line after the pass line and only where set ([`PassTerrain`]).
         let pass = match (pass, lines.peek()) {
             (Some(p), Some(l)) if l.starts_with("terrain ") => Some(StorePass { terrain: Some(PassTerrain::from_line(lines.next().unwrap_or(""))?), ..p }),
+            (p, _) => p,
+        };
+        // [definition; the lead, November 24] The slices' tensions, a line after the pass's (and its terrain's), only where set.
+        let pass = match (pass, lines.peek()) {
+            (Some(p), Some(l)) if l.starts_with("tension ") => {
+                let t: Vec<u64> = lines.next().unwrap_or("").split_whitespace().skip(1).map(str::parse).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a tension line that is not `tension T₀ … T_(k−1)`"))?;
+                if t.len() != p.slices.len() {
+                    return refuse("a tension line that is not one reading a slice of the pass");
+                }
+                Some(StorePass { slice_tension: Some(t), ..p })
+            }
             (p, _) => p,
         };
         Ok(Self { field, first, second, rate_bits, read_held: held.is_some(), drawn, laps, held, rate_parts, own_rates, leak, remainder, carried, lattice, last: None, pass })

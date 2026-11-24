@@ -1,0 +1,19 @@
+REACH setting=law group=all places=221024 nats_millionths=2979427 ms=258290
+REACH setting=law group=held places=67936 nats_millionths=1336984 ms=258290
+REACH setting=law group=period places=153088 nats_millionths=3708295 ms=258290
+REACH setting=fade:2:-100 group=all places=221024 nats_millionths=2983629 ms=572546
+REACH setting=fade:2:-100 group=held places=67936 nats_millionths=1339523 ms=572546
+REACH setting=fade:2:-100 group=period places=153088 nats_millionths=3713235 ms=572546
+REACH setting=fade:2:100 group=all places=221024 nats_millionths=2975876 ms=871805
+REACH setting=fade:2:100 group=held places=67936 nats_millionths=1337191 ms=871805
+REACH setting=fade:2:100 group=period places=153088 nats_millionths=3703077 ms=871805
+REACH setting=fade:16:-100 group=all places=221024 nats_millionths=2983354 ms=1136338
+REACH setting=fade:16:-100 group=held places=67936 nats_millionths=1339034 ms=1136338
+REACH setting=fade:16:-100 group=period places=153088 nats_millionths=3713056 ms=1136338
+REACH setting=fade:16:100 group=all places=221024 nats_millionths=2976184 ms=1401082
+REACH setting=fade:16:100 group=held places=67936 nats_millionths=1335998 ms=1401082
+REACH setting=fade:16:100 group=period places=153088 nats_millionths=3704052 ms=1401082
+REACH setting=fade:128:-100 group=all places=221024 nats_millionths=2979889 ms=1667037
+REACH setting=fade:128:-100 group=held places=67936 nats_millionths=1337372 ms=1667037
+REACH setting=fade:128:-100 group=period places=153088 nats_millionths=3708791 ms=1667037
+REACH_DONE rows=736 settings=6 ms=1667140

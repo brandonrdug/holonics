@@ -1,0 +1,8 @@
+PERIOD_KNOWN law P1= 3 sep kept 0.781 loose 1.147 kept-loose -0.366 (n 2176, 2134) | letter kept 3.879 loose 4.133
+PERIOD_KNOWN law P1= 4 sep kept 1.340 loose 1.569 kept-loose -0.228 (n 1600, 1620) | letter kept 3.931 loose 3.982
+PERIOD_KNOWN law P1= 5 sep kept 1.792 loose 1.937 kept-loose -0.146 (n 1280, 1276) | letter kept 3.936 loose 3.956
+PERIOD_KNOWN law P1= 7 sep kept 2.196 loose 2.336 kept-loose -0.141 (n 896, 911) | letter kept 3.949 loose 3.948
+PERIOD_KNOWN law P1= 9 sep kept 2.630 loose 2.678 kept-loose -0.048 (n 704, 714) | letter kept 3.909 loose 3.916
+PERIOD_KNOWN law P1=10 sep kept 2.763 loose 2.771 kept-loose -0.008 (n 640, 640) | letter kept 3.900 loose 3.899
+PERIOD_KNOWN law P1=15 sep kept 3.515 loose 3.528 kept-loose -0.013 (n 448, 423) | letter kept 3.903 loose 3.902
+PERIOD_KNOWN law P1=16 sep kept 3.729 loose 3.619 kept-loose +0.110 (n 384, 396) | letter kept 3.870 loose 3.874

@@ -1,0 +1,10 @@
+Fixed 2026-11-24T21:42:31Z (date -u), the lead, before W112 trains. Refs #404.
+The reading it answers: G-P3 missed (a): W111 less W110, books -0.0041 and wikidata -0.0003, so the open registers' drift of W109 and
+W110 was the scatter between laps; (b) held (every other region within 0.0086). Against W103 the line stands at -0.0166 over the
+collection's held set, and from W109 to W111 every region moved by under 0.01 a lap. A lap reads about 160 MB of a 15.7 GB pass, so a lap
+on this store still reads text the line has not met.
+The change: none. W112 is W111's STATE.3000 continued on store-2026-11-24-wide-t6, read as W111 was.
+G-P4:
+  (a) (0.55) the collection's three regions each below W111's by 0.005 or more (each lap meets new conversations, tool turns and harness);
+  (b) the seven registers each within 0.010 of W111's.
+Rule: (a) missed with (b) held, the line stands at its level on this store, and its next change is a law (the fade's arm) or the store.
