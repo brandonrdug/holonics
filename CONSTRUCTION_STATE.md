@@ -117,7 +117,10 @@ between regions, so a silence is read by nothing. Her separators hold the long d
 rings under a thirtieth of themselves ([the record of the calendar](research/records/2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md) §5, §12). Read at her face on a period laid out as known text, she holds how often a
 separator comes and no place in the period: she takes a stream's rate within about fifty places, and at no period from 3 to 16
 does a kept separator cost her less than a quarter of a nat under what the rate alone gives (§13; the panel that read her
-writes stood at its floor). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+writes stood at its floor). Read under a ruler's slower and faster fades of her rings, a slower fade moves her rate at long words and
+blurs the count she holds at words of two letters, and a count of the letters since a break opens at the one length whose word
+spans a ring's turn on her clock when that ring is slowed; a fade founded at the skin's value hears its own return at a
+thirty-first of the most, so the form that reaches a count is a second store a ring founded where it rings (§14). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
 the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions

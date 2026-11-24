@@ -49,6 +49,15 @@ section; no statement here reads those values.
    not where in its period it stands, pays `log P` at each tick and `log (P/(P − 1))` at each other
    place, between `log P` and `1 + log P` a period. A reader that holds the count pays nothing once
    the period stands, so this is what a count is worth on a kept period.
+9. **A fade hears a pair at its own length** (`fade_hearing_le`, `fade_hearing_turn_lt`,
+   `fade_hearing_half`, `fade_hearing_half_gt`): a store weighs a source at turn `s` by
+   `e^(−γ s)`, so a move of its fade `γ` by a part of itself is weighed at that source by
+   `x e^(−x)`, `x = γ s` the source's distance in fade lengths. That is at most `e^(−1)`, its value
+   at one fade length. A ring fading one e-fold a radian weighs its own return, a whole turn away,
+   by `2π e^(−2π)`, under a twentieth of that. A ring that keeps half of itself over its turn
+   weighs its return by `(log 2)/2`, over nine tenths of it. So a comparison moves a store's fade
+   by what stands within that fade, and a return's tension reaches a ring's fade only once the
+   ring rings through its turn.
 
 Not proved here: the general relation between a resonance's quality and the fineness of a
 comparison it can hold (the line width; from the literature), and Kelvin's and Helmholtz's theorems
@@ -61,7 +70,8 @@ a level); faces and placement, the cell holonomy and the tube stay attached.
 
 Consumers: the atlas rows `aeon.count-survives-every-retiming`, `aeon.one-fade-reads-no-gap`,
 `aeon.count-asks-for-quality`, `aeon.uncompared-clock-errs-by-the-count`,
-`aeon.rate-without-count-costs-its-entropy`, `tower.local-ticks-draw-a-cone` and #410.
+`aeon.rate-without-count-costs-its-entropy`, `aeon.fade-hears-a-pair-at-its-own-length`,
+`tower.local-ticks-draw-a-cone` and #410.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -206,6 +216,49 @@ theorem rateCode_lt_one_add_log {P : ℝ} (hP : 1 < P) : rateCode P < 1 + Real.l
   have h7 : (P - 1) * Real.log (P / (P - 1)) < (P - 1) * (P / (P - 1) - 1) :=
     mul_lt_mul_of_pos_left h5 h2
   unfold rateCode
+  linarith
+
+/-- **A fade hears a pair at its own length.** With `x` a source's distance in a store's fade
+lengths, a move of the fade by a part of itself is weighed at that source by `x e^(−x)`, at most
+`e^(−1)`. -/
+theorem fade_hearing_le (x : ℝ) : x * Real.exp (-x) ≤ Real.exp (-1) := by
+  have h1 : x ≤ Real.exp (x - 1) := by linarith [Real.add_one_le_exp (x - 1)]
+  have h2 : x * Real.exp (-x) ≤ Real.exp (x - 1) * Real.exp (-x) :=
+    mul_le_mul_of_nonneg_right h1 (Real.exp_pos _).le
+  have h3 : Real.exp (x - 1) * Real.exp (-x) = Real.exp (-1) := by
+    rw [← Real.exp_add]
+    congr 1
+    ring
+  linarith
+
+/-- **A ring fading one e-fold a radian hears its own return at under a twentieth of the most.** At a
+whole turn `x = 2π`, and `2π e^(−2π) < e^(−1)/20`. -/
+theorem fade_hearing_turn_lt :
+    2 * Real.pi * Real.exp (-(2 * Real.pi)) < Real.exp (-1) / 20 := by
+  have hpi : 2 * Real.pi < 6.3 := by linarith [Real.pi_lt_d2]
+  have hpos : 0 < 2 * Real.pi := by linarith [Real.pi_pos]
+  have h1 : 2 * Real.pi * Real.exp (-(2 * Real.pi)) < 2 * Real.pi * (1 / 400) :=
+    mul_lt_mul_of_pos_left skin_turn_lt hpos
+  have he : Real.exp 1 < 2.72 := by linarith [Real.exp_one_lt_d9]
+  have h2 : (1 / 2.72 : ℝ) < Real.exp (-1) := by
+    rw [Real.exp_neg, one_div]
+    exact (inv_lt_inv₀ (by norm_num) (Real.exp_pos 1)).mpr he
+  linarith
+
+/-- A ring that keeps half of itself over its turn stands `log 2` fade lengths from its return, and
+weighs it by `(log 2)/2`. -/
+theorem fade_hearing_half : Real.log 2 * Real.exp (-Real.log 2) = Real.log 2 / 2 := by
+  rw [Real.exp_neg, Real.exp_log (by norm_num : (0 : ℝ) < 2)]
+  ring
+
+/-- **A ring that keeps half of itself over its turn hears its return at over nine tenths of the
+most.** `(9/10) e^(−1) < (log 2)/2`. -/
+theorem fade_hearing_half_gt : 9 / 10 * Real.exp (-1) < Real.log 2 / 2 := by
+  have he : (2.718 : ℝ) < Real.exp 1 := by linarith [Real.exp_one_gt_d9]
+  have h2 : Real.exp (-1) < 1 / 2.718 := by
+    rw [Real.exp_neg, one_div]
+    exact (inv_lt_inv₀ (Real.exp_pos 1) (by norm_num)).mpr he
+  have h3 : (0.693 : ℝ) < Real.log 2 := by linarith [Real.log_two_gt_d9]
   linarith
 
 /-- A tick is local with reach `r`: the state it gives site `t` is fixed by the states of the sites
