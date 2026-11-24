@@ -1,0 +1,20 @@
+Fixed 2026-11-23T23:21:04Z (date -u), the lead, before the answered act trains. Refs #404.
+The change: a world on the terrain (set-world STATE SHA terrain 16 1 24): one terrain region in 16, keyed by its first record's count, is an
+act. Its records but the last stand as the prompt; she drafts 24 places from them at the field's own temperature (the writer, one place a
+read); the world reads her draft up to its first "= " and appends its answer (athena::world::react: a sum's value, the closers of what stands
+open, the digits copied or reversed, or "?"). The region is read by two streams as the terrain is: the prompt compared as the terrain
+compares it, her drafted expression known and not compared (holonics_engine::field::UNCOMPARED, on the host and the card, the opening's
+comparison too), and the world's answer compared. No number stands on her drafts.
+W102a: W101's STATE.3000 with the world, beside W102 (W101's STATE.3000, no change), 3,000 sections each on e5a after its gate 3 against
+W102's lap and the card's parity of the uncompared place; read at MEAN.3000.
+G-A3 (the formal thread's, fixed 2026-11-23T20:08:39Z, adopted here as fixed):
+  (a) every held text register within 0.003 nats a place of the control, one place open (tools/frontier_ruler.py on store-2026-11-22's held set);
+  (b) the world's code at its answers (STORE_WORLD world_code), the last thousand sections at most 0.9 of the first thousand.
+G-A4 (the lead's):
+  (a) the terrain panel's whole answers on brackets ("close", TERRAIN_SCORE whole) at least the control's plus 2 of 16: nested depth answered
+      in kind is the one kind whose answer is a function of what stands open, the push and its pop;
+  (b) the theory panel: words in the register's lexicon at least the control's less 3 points, its own distinct terms at least the control's
+      less two;
+  (c) the reach's held code on copy and on reverse (TERRAIN_REACH ANSWER copy, reverse) at most the control's.
+Rule: G-A3 (a) and (b) held, the line takes the world; G-A3 (a) missed, the act's cost to the text is read before a second lap; (a) held
+and (b) missed, a second lap runs as an arm (a world's code may need laps).

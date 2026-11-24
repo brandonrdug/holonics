@@ -1,0 +1,5 @@
+HR3_START 22:54:53
+HR3_W101 STRAND_CUT rows=407 places=125404 past=true ms=466060
+HR3_W101 LEVEL_TENSION cutT_W101 open_places=123720 D0=224 linear=0.0000 bound=-0.0030 bound_above_linear=-0.0031
+HR3_W101 LEVEL_TENSION_PLANTED a tenth of the power in the products' span: linear=0.0102 bound=0.0808 bound_above_linear=0.0706 (the plant alone is 0.0909 of the planted covector's power)
+HR3_ALL_DONE 23:08:21

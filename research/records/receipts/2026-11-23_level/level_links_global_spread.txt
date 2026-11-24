@@ -1,0 +1,16 @@
+HR2_START 22:35:52
+HR2_W101 STRAND_CUT rows=407 places=125404 past=true ms=334209
+HR2_W101 LEVEL_LINKS cutL_W101 word_starts=19040 D0=224 D1=64
+HR2_W101 LEVEL_LINK restricted prev_word=0.001 prev2_word=0.016 prev2_first=0.040 handed_epoch=0.008 epoch_before_it=0.004 epoch_two_before_it=0.000 planted=-0.000
+HR2_W101 LEVEL_LINK coarse prev_word=0.003 prev2_word=0.015 prev2_first=0.033 handed_epoch=0.001 epoch_before_it=0.001 epoch_two_before_it=0.000 planted=-0.000
+HR2_W101 LEVEL_LINK row prev_word=0.004 prev2_word=0.014 prev2_first=0.028 handed_epoch=0.000 epoch_before_it=0.000 epoch_two_before_it=0.000 planted=-0.000
+HR2_W101 LEVEL_LINK joined prev_word=0.232 prev2_word=0.022 prev2_first=0.033 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 planted=-0.000
+HR2_W101 LEVEL_LINK final prev_word=0.224 prev2_word=0.024 prev2_first=0.030 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 planted=0.000
+HR2_W101r STRAND_CUT rows=407 places=125404 past=true ms=301116
+HR2_W101r LEVEL_LINKS cutL_W101r word_starts=19040 D0=224 D1=64
+HR2_W101r LEVEL_LINK restricted prev_word=0.003 prev2_word=0.011 prev2_first=0.035 handed_epoch=0.007 epoch_before_it=0.003 epoch_two_before_it=0.000 handed_first_byte=0.135 handed_last_byte=0.211 last_byte_before_it=0.236 planted=0.000
+HR2_W101r LEVEL_LINK coarse prev_word=0.003 prev2_word=0.012 prev2_first=0.038 handed_epoch=0.006 epoch_before_it=0.003 epoch_two_before_it=0.000 handed_first_byte=0.089 handed_last_byte=0.182 last_byte_before_it=0.201 planted=-0.000
+HR2_W101r LEVEL_LINK row prev_word=0.004 prev2_word=0.011 prev2_first=0.027 handed_epoch=0.003 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.065 handed_last_byte=0.168 last_byte_before_it=0.161 planted=-0.000
+HR2_W101r LEVEL_LINK joined prev_word=0.240 prev2_word=0.017 prev2_first=0.027 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.015 handed_last_byte=0.138 last_byte_before_it=0.018 planted=-0.000
+HR2_W101r LEVEL_LINK final prev_word=0.231 prev2_word=0.027 prev2_first=0.033 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.012 handed_last_byte=0.111 last_byte_before_it=0.017 planted=0.000
+HR2_ALL_DONE 22:47:21
