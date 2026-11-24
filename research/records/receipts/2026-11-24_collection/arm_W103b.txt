@@ -1,0 +1,24 @@
+W103_START 04:25:41
+TERRAIN_TRAINED W103 05:00:53 sections=3000 ended=false
+TERRAIN_REACH W103 05:02:42 ANSWER copy n= 2655 0.147|ANSWER reverse n= 2667 0.085|ANSWER sum n= 1579 1.072|
+TERRAIN_TRAINED W103b 05:50:20 sections=3000 ended=false
+TERRAIN_PANEL W103_mean 06:51:20 seen: words 34 in_lexicon 18 (52%) longest_copy 12 held: words 69 in_lexicon 58 (84%) longest_copy 16 unread: words 66 in_lexicon 53 (80%) longest_copy 16  || LONG W103_mean: all words 250 in lexicon 179 (71%) writes that loop 6 of 20 longest run shared with its prompt 36 | code 27/37 (72%) web 39/51 (76%) science 41/53 (77%) books 47/54 (87%) wikidata 25/55 (45%)
+TERRAIN_LOUD W103 07:12:29  lines=71
+TERRAIN_WIDE W103 07:52:58 LONG W103: all words 2095 in lexicon 1519 (72%) writes that loop 28 of 160 longest run shared with its prompt 59 | code 304/352 (86%) web 304/392 (77%) science 269/427 (62%) books 424/506 (83%) wikidata 218/418 (52%)
+TERRAIN_REACH W103b 07:55:37 ANSWER copy n= 2655 0.175|ANSWER reverse n= 2667 0.092|ANSWER sum n= 1579 0.985|
+TERRAIN_PANEL W103b_mean 08:30:03 seen: words 39 in_lexicon 24 (61%) longest_copy 14 held: words 58 in_lexicon 37 (63%) longest_copy 15 unread: words 65 in_lexicon 44 (67%) longest_copy 13  || LONG W103b_mean: all words 274 in lexicon 189 (68%) writes that loop 2 of 20 longest run shared with its prompt 51 | code 30/38 (78%) web 46/57 (80%) science 21/52 (40%) books 59/67 (88%) wikidata 33/60 (55%)
+TERRAIN_LOUD W103b 08:52:04  lines=71
+TERRAIN_WIDE W103b 09:30:14 LONG W103b: all words 2107 in lexicon 1507 (71%) writes that loop 20 of 160 longest run shared with its prompt 76 | code 288/344 (83%) web 344/424 (81%) science 252/424 (59%) books 395/496 (79%) wikidata 228/419 (54%)
+W98_CAVITY W103 09:46:06 CAVITY_DONE ms=922916
+W98_THEORY THEORY_PANEL W103 logic: words 95 in lexicon 77 (81%) loops 0 of 8 longest shared with prompt 13 | theory: words 175 in lexicon 146 (83%) loops 0 of 12 longest shared with prompt 11
+W98_CAVITY W103b 10:01:52 CAVITY_DONE ms=908080
+W98_THEORY THEORY_PANEL W103b logic: words 98 in lexicon 74 (75%) loops 0 of 8 longest shared with prompt 12 | theory: words 156 in lexicon 124 (79%) loops 0 of 12 longest shared with prompt 13
+W103_LAP_TRAVEL W103 material: |d|=1.128e+08,1.133e+08,1.1e+08 cos01=+0.098 cos12=+0.128 persistence=1.046 | level: |d|=1.694e+07,1.741e+07,1.666e+07 cos01=+0.127 cos12=+0.154 persistence=1.077 | third: |d|=5.256e+07,5.362e+07,5.258e+07 cos01=+0.157 cos12=+0.180 persistence=1.088
+W103_LAP_TRAVEL W103b material: |d|=1.111e+08,1.099e+08,1.115e+08 cos01=+0.100 cos12=+0.121 persistence=1.041 | level: |d|=1.686e+07,1.714e+07,1.696e+07 cos01=+0.122 cos12=+0.167 persistence=1.081 | third: |d|=5.19e+07,5.309e+07,5.326e+07 cos01=+0.164 cos12=+0.164 persistence=1.083
+W103_FRONTIER FRONTIER W103b; one place open: all 0.6065 (140564 places) | books 0.6812 code 0.4020 logic 0.3923 science 0.5751 theory 0.5338 web 0.7492 wikidata 0.9101 || less the control's, paired: +0.0007 (±0.0004) | books +0.0010 code -0.0015 logic +0.0039 science +0.0009 theory -0.0003 web -0.0002 wikidata +0.0012|FRONTIER W103b; the frontier: all 1.8324 (139706 places) | books 1.8149 code 1.5815 logic 1.6913 science 1.7740 theory 1.8270 web 2.0659 wikidata 2.0712 || less the control's, paired: +0.0036 (±0.0005) | books +0.0016 code +0.0026 logic +0.0090 science +0.0047 theory +0.0043 web +0.0017 wikidata +0.0013|
+W103_WORLD thousand 1 acts 24.9 read 0.9978 world_code 1437055
+W103_WORLD thousand 2 acts 25.2 read 0.9981 world_code 1436941
+W103_WORLD thousand 3 acts 25.2 read 0.9982 world_code 1438076
+TERRAIN_SCORE W103 whole 57/96 opening 59/96 first 72/96 | sum 8/8/10 of 16 difference 8/8/9 of 16 product 5/5/7 of 16 close 10/12/16 of 16 copy 12/12/14 of 16 reverse 14/14/16 of 16
+TERRAIN_SCORE W103b whole 55/96 opening 58/96 first 73/96 | sum 10/10/11 of 16 difference 7/7/7 of 16 product 7/7/8 of 16 close 10/13/16 of 16 copy 11/11/15 of 16 reverse 10/10/16 of 16
+W103_ALL_DONE 10:22:50

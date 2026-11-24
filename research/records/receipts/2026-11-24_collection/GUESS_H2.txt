@@ -1,0 +1,12 @@
+Fixed 2026-11-24T05:49:18Z (date -u), its store rebuilt at 05:54:17Z with the September window in, the lead, as the line takes the full curated collection (Brandon 05:43Z and 05:44Z: "we prefer the full collection"). Refs #404.
+The change: W103's STATE.3000 joined at a new pass to store-2026-11-24-all (the dwell store's seven slices with the curated collection's dialogue, every tool call with its result whole, and
+the harness events: 84 MB, 3.60 GB and 322 MB beside the prefix role's 1.5 GB, so about 72% of a pass is the collection; nothing left out by
+date (Brandon 05:53Z lifted the September 3 to 7 window), the held cut every turn dated November 20 or later). W104f: 3,000 sections on e5h2 (e5b with the harness slice named). Its control is the history's two arm laps of November 23 (W96h, W97h beside W96c, W97c: every other register within 0.006 nats a
+place, held dialogue -0.070 and held acts -0.053), so the line takes it now, and W104f is read against W103, the line's lap before it.
+G-H2:
+  (a) held dialogue and held acts (the cavity on the history store's held set, one place open) at least 0.05 nats a place under W103;
+  (b) every other held register within 0.01 nats a place of W103 (two laps of one mix scatter by about that; at 72% of a pass the
+      registers may forget, which this clause reads);
+  (c) the probe panel (probe/panel_ask2.tsv, 40 prompts drawn five times): writes naming Brandon, Claude or Athena where the prompt's
+      last line does not, or holding a first-person clause after a turn addressed to her, in more of the 200 writes than on W103.
+The writes are shown raw to Brandon; none derived from the history is committed.

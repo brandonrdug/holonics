@@ -1,0 +1,1 @@
+HISTORY_PASSAGE left_out dialogue_window=0 dialogue_prompt_covered=575 dialogue_empty=5018 acts_window=0 acts_result_over_limit=0 acts_no_result=29507 acts_turns_outside_share=0 harness_window=0 harness_empty=8238

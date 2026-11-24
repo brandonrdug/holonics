@@ -1,0 +1,14 @@
+W104F_START 05:54:09
+JOIN_STORE stretches=104735816 store_before=6f5125d19986c7459431b7a018531af00c26cae899bf7c1502b44c67ad56acd7 store_after=b7e54eb7be15128d218301261d7868d8431bf471f20b806c3a9b081429390a8e before=code:27088:115066189,web:14907:57554574,science
+TERRAIN_TRAINED W104f 06:51:10 sections=3000 ended=false
+TERRAIN_REACH W104f 06:54:41 ANSWER copy n= 2655 0.131|ANSWER reverse n= 2667 0.091|ANSWER sum n= 1579 1.047|
+TERRAIN_PANEL W104f_mean 07:51:38 seen: words 39 in_lexicon 25 (64%) longest_copy 14 held: words 55 in_lexicon 36 (65%) longest_copy 14 unread: words 67 in_lexicon 51 (76%) longest_copy 14  || LONG W104f_mean: all words 274 in lexicon 190 (69%) writes that loop 2 of 20 longest run shared with its prompt 27 | code 44/52 (84%) web 34/44 (77%) science 33/57 (57%) books 57/69 (82%) wikidata 22/52 (42%)
+TERRAIN_LOUD W104f 08:11:51  lines=71
+TERRAIN_WIDE W104f 08:23:51 LONG W104f: all words 2106 in lexicon 1444 (68%) writes that loop 25 of 160 longest run shared with its prompt 70 | code 306/378 (80%) web 314/401 (78%) science 245/422 (58%) books 389/492 (79%) wikidata 190/413 (46%)
+W97_CAVITY W104f 08:45:09 CAVITY_DONE ms=905574
+W97_CAVITY4 W104f 09:13:14 CAVITY_DONE ms=1272147
+W97_THEORY THEORY_PANEL W104f logic: words 98 in lexicon 79 (80%) loops 0 of 8 longest shared with prompt 11 | theory: words 165 in lexicon 154 (93%) loops 0 of 12 longest shared with prompt 10
+W97_CAVITY4 W103 10:22:29 CAVITY_DONE ms=1236413
+W104F_LAP_TRAVEL W104f material: |d|=1.286e+08,1.344e+08,1.693e+08 cos01=+0.256 cos12=+0.180 persistence=1.112 | level: |d|=2.076e+07,2.238e+07,2.98e+07 cos01=+0.325 cos12=+0.136 persistence=1.092 | third: |d|=5.568e+07,6.1e+07,7.178e+07 cos01=+0.256 cos12=+0.192 persistence=1.123
+W104F_FRONTIER_HIST FRONTIER W104f; one place open: all 0.7460 (200933 places) | acts 1.1857 books 0.7223 code 0.4503 dialogue 0.9967 harness 0.7906 logic 0.4256 science 0.6118 theory 0.5422 web 0.7926 wikidata 0.9414 || less the control's, paired: +0.0150 (±0.0011) | acts -0.0152 books +0.0422 code +0.0468 dialogue -0.0264 harness -0.0561 logic +0.0373 science +0.0377 theory +0.0082 web +0.0432 wikidata +0.0325
+W104F_FRONTIER FRONTIER W104f; one place open: all 0.6412 (140564 places) | books 0.7223 code 0.4503 logic 0.4256 science 0.6118 theory 0.5422 web 0.7926 wikidata 0.9414 || less the control's, paired: +0.0354 (±0.0011) | books +0.0422 code +0.0468 logic +0.0373 science +0.0377 theory +0.0082 web +0.0432 wikidata +0.0325

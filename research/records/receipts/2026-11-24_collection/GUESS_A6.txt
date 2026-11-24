@@ -1,0 +1,8 @@
+Fixed 2026-11-24T04:25:41Z (date -u), the lead, before the second lap of her acts answered in kind. Refs #404.
+W103b: W102b's STATE.3000 (the world terrain 16 1 24 in its state, her writer's drafts) beside W103: W102's STATE.3000 (no world), 3,000
+sections each on e5b; read at MEAN.3000. G-A6, scored on W103b against W103:
+  (a) every held text register within 0.003 nats a place of the control, one place open (two laps of the world against two of none);
+  (b) the terrain's held codes on the world's own rows (TERRAIN_REACH copy, reverse, sum), each at most the control's;
+  (c) the terrain panel's whole answers at least the control's, and brackets at least the control's plus 2 of 16.
+Rule: (a), (b) and (c) held, the line takes the world; (a) held and (b) or (c) missed, the world leaves the line and the next change is the
+level's row in a face lane of its own; (a) missed, the act's cost to the text is read first.
