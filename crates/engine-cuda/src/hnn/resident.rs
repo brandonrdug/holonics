@@ -2523,6 +2523,22 @@ impl Realization for Resident<'_> {
         Ok((faces, scales))
     }
 
+    /// [measurement; the lead, November 24, Brandon's 17:36Z on iteration pace] The faces, the open sites' charts and their lane scales by
+    /// stage from one forward that keeps every tick: `run` gathers the charts and fetches the scales under their own cells, so one pass with
+    /// both cells set returns what the two reads return one after the other.
+    fn read_tick_charts_scales(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>, Vec<Vec<Vec<i128>>>)> {
+        *self.tick_charts.borrow_mut() = Some(Vec::new());
+        *self.tick_scales.borrow_mut() = Some(Vec::new());
+        let read = self.run(field, regions, false, true, None);
+        let charts = self.tick_charts.borrow_mut().take().unwrap_or_default();
+        let scales = self.tick_scales.borrow_mut().take().unwrap_or_default();
+        let faces = read?.0;
+        if charts.len() != regions.len() || scales.len() != regions.len() {
+            return Err(TowerError::Refused("a read of the charts and the lane powers by stage that did not return one of each a region"));
+        }
+        Ok((faces, charts, scales))
+    }
+
     /// [measurement; part P2] The faces and the carry circles' gates from the same pass: every tick's gate and leak reads are summed on the card
     /// over the open sites (`field_carry_gates_read`), so no face and no other read changes.
     fn read_faces_gated(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, CarryGates)> {

@@ -1,0 +1,15 @@
+Fixed 2026-11-24T17:58:33Z (date -u), the lead, before W109 trains. Refs #404.
+The reading it answers: G-D1 missed (a): the conversations held eight times over (W108d) read 0.016 nats a place under its control W108
+on the held conversations, against 0.03 asked, with every other region within 0.006 of it, so the line does not take the dwell. And
+Brandon's 17:36Z on iteration pace: a lap held the card 35 minutes training and 53 reading, two of the reads redundant (the older held
+set's, unscored, 11 minutes; the registers', byte for byte inside the collection's read, 14.6 minutes), and the collection's read spent a
+third of its time on rows no guess is scored on (F, K, S and C), which the word `open` leaves unread (e5o; rows P and W the same bits,
+the receipt of open1).
+The change: none to the line. W109 is W108's STATE.3000 continued on store-2026-11-24-wide-t6 for 3,000 sections on e5h2, read with the
+trimmed reads: the collection's held set alone (rows P and W, e5o), the loudness, the panels, the theory panel, the held-conversation
+panels and the probe panel.
+G-P1:
+  (a) the reads after the lap hold the card at most 30 minutes (W106t 53);
+  (b) every region of the collection's held set within 0.010 nats a place of W108, one place open, the conversations within 0.04;
+  (c) the probe panel's first person and `?` within the scatter of W103 to W108 (first person 13 to 26, `?` 3 to 11).
+Rule: (a) held, the trimmed reads stand for every lap; (b) is the line's own lap, read beside.

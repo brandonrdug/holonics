@@ -92,6 +92,18 @@ pub trait Realization {
     fn read_tick_scales(&mut self, _field: &Constitution, _regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i128>>>)> {
         refuse("a realization that cannot read its lane powers by stage")
     }
+    /// [measurement; the lead, November 24, Brandon's 17:36Z on iteration pace] Each region's faces, the open sites' charts by stage and their
+    /// lane scales by stage ([`Realization::read_tick_charts`], [`Realization::read_tick_scales`]), a reading. By default the two reads run
+    /// one after the other and their faces are checked equal; a realization whose forward keeps both returns them from one pass, the same bits.
+    #[allow(clippy::type_complexity)]
+    fn read_tick_charts_scales(&mut self, field: &Constitution, regions: &[Region]) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Vec<i32>>>, Vec<Vec<Vec<i128>>>)> {
+        let (faces, charts) = self.read_tick_charts(field, regions)?;
+        let (again, scales) = self.read_tick_scales(field, regions)?;
+        if again != faces {
+            return refuse("the charts' read and the lane powers' read gave two faces");
+        }
+        Ok((faces, charts, scales))
+    }
     /// [measurement; theory, November 11 18:33, part P2] The faces of `regions` ([`Realization::read_faces`]) and the carry circles' gates
     /// over their open sites ([`CarryGates`]), a reading. By default the faces are the realization's own read and the gates the host's
     /// ([`Constitution::carry_gates_of`]); a realization that holds the gates in its forward reads them from the same pass.
