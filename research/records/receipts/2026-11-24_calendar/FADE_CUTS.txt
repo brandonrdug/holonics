@@ -6,7 +6,7 @@ b1a072b4f770d4d2fcf9398c468b2fcad0857dc8483a9e6cf511889c1477dd11) and read-reach
 lists of settings (codes.tsv sha256 7004270a55d09e6de5e2969d54274ea64e6164154f117d8cd48906fe9ebfc733,
 b93ceb5f0b0f3966f0204014ecfa279f5f9d746c285b5417b3901400a7cc1d5d and
 50abccb604189167eb3c8e445a3adc1c2b284ccca10db37c2d874808d1591bf4). The settings fade:FROM:MILLI and skin:places are the lead's
-line's and are not on main at this hour. The reads' own lines for the held rows, in millionths of a nat a place over 67,936
+(Constitution::set_ruler_fade); they joined main at 22:52 UTC with #1133, after this cut ran. The reads' own lines for the held rows, in millionths of a nat a place over 67,936
 places: law 1336984, fade:2:0 1336984, fade:16:-1000 1401318, fade:16:-2000 1646023, fade:4:-1000 1475191, fade:2:-1000 1566309,
 fade:128:-2000 1363068, fade:2:-100 1339523, fade:2:100 1337191, fade:16:-100 1339034, fade:16:100 1335998, fade:128:-100 1337372,
 skin:places 1388251; each took about 260 s on the host. This cut counts a held row's first place too, which no setting moves, so

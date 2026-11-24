@@ -507,6 +507,8 @@ held text from seven public registers. Each setting took about 260 s on the host
 slower fade the separators after long words get cheaper and the letters dearer, so the fade should be read from her state, slow
 across a unit's break and fast inside a word. I cut the saved codes three ways (`fade_cuts.py`, `FADE_CUTS.txt`; the cut returns
 the reads' own totals, and the skin's own fade passed as a setting returns the law at every place).
+The lead's account of the reads, with the first cut I sent at 22:24 UTC taken in, is
+[the record of her hearing](2026-11-24_HER_NAVIGATION_AND_HER_HEARING_ARE_ONE_LAW_EACH_SLICES_SHARE_IS_HELD_BY_HER_TENSION_AT_IT_AND_HER_RINGS_FADE_STANDS_NEAR_ITS_BEST_AND_CANNOT_HEAR_A_COUNT_FROM_WHERE_IT_IS_FOUNDED.md) §3; the settings joined main with it at 22:52 UTC (#1133), after this cut ran.
 
 **The cut.** Changes from the law, in nats. Held: every place of the held rows. Kept and twin: the separators after `L` letters
 over a row's last third, averaged over `P1` = 7, 9, 10, 15 and 16. Gain: the twin's change less the kept's, the change in what a
@@ -617,6 +619,11 @@ arm: a kept period at `P1` = 3 cheaper by 0.15 nats at her face.
 The per-ring fade founded at the skin's value (G-H9's arm, §6.1 as first written) is expected to rest where it is: 0.05 on
 G-T5 (a).
 
+The lead's record chose form 2 for its fade arm at 22:30 UTC, near `γ = 0.11` on part of a tower, with a guess on the laps
+that win back the founding's cost. The readings above say two things to that choice, and it stays the lead's. Which part:
+the opening of reading 3 stands on the ring of 16, and the rings of 128 and longer, the cheap ones to move, did not open it.
+What it gives up: the near count of reading 2, which the rings of 16 and longer hold at the skin's fade and form 1 keeps.
+
 **Guesses.** Those fixed on G-H9's arm stand in their words and are scored as fixed if it runs. What I expect of them now, each
 with its reason, is in `GUESS.txt`: G-H9 (b), the long rings' fades leave their one value, was fixed at 0.8 beside the slope
 that says otherwise, a miss of reading, mine, and I hold it at 0.2; G-T2 at 0.15; G-T4 (b) at 0.05; G-T5 (a) at 0.05. A new
@@ -637,7 +644,9 @@ are drawn letters, a specimen that holds nothing but its period.
 with nothing read at her face; reading 3 is its first read there (0.6 that it is a ring's return), and the weight waits on
 G-T6. §13's reading stands at a second seed and under eleven settings: at the skin's fade she holds how often and not when. The
 reading relayed at 22:15 UTC, that she times a word better under a slower fade, holds at one length of eight and is the rate's
-at the others. What moved is §6.1: a ring's fade as its own state is still what the law asks, since the skin's number is a
+at the others. My first cut's line of 22:24 UTC, that the cheaper breaks are not timing, is in the lead's record as
+sent; it holds at seven lengths of eight and missed the one opening, a miss of mine: I had matched the twin's length and had not
+read across its count of letters. What moved is §6.1: a ring's fade as its own state is still what the law asks, since the skin's number is a
 state read as a number; founded at that number it is expected to rest there; and the form that reaches a count is a store
 founded where it rings, beside the one that stands. Waiting on an arm: G-T2, G-T4, G-T5 and G-H9; on a read: G-T6.
 
