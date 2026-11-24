@@ -367,8 +367,8 @@ mod tests {
 
     /// [definition; the lead, November 23, an act answered in kind] **A strand with places read and not compared on the card reads the
     /// host's bits** (needs the card; `holonics_engine::field::UNCOMPARED`): the field and passages of the targets' parity, every third
-    /// open place's target left out, on a field that compares its opening (so the opening's comparison leaves them out too), read and
-    /// returned through the host and through the card: every face and every covector entry equal, the faces those of the passages without
+    /// open place's target left out, on the field and on it with the opening compared (so the opening's comparison leaves them out too),
+    /// read and returned through the host and through the card: every face and every covector entry equal, the faces those of the passages without
     /// targets, and a strand whose every place is left out returning nothing on the card.
     #[test]
     #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
@@ -376,7 +376,9 @@ mod tests {
         use holonics_engine::field::{Learner, Realization, UNCOMPARED};
         let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(3).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
         let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
-        let pumped = Learner::new(founded, 12).with_carry(4, &keys).unwrap().with_pump().unwrap().with_opening().unwrap();
+        for opened in [false, true] {
+        let carried = Learner::new(founded.clone(), 12).with_carry(4, &keys).unwrap();
+        let pumped = if opened { carried.with_opening().unwrap().with_pump().unwrap() } else { carried.with_pump().unwrap() };
         let mut field = pumped.field.clone();
         let (l, dw, m2) = (field.layout().clone(), field.declaration.width, 2 * field.declaration.complex());
         let moved: Vec<usize> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).collect();
@@ -402,13 +404,14 @@ mod tests {
         let (card_faces, card_g) = card_field.read_and_return(&field, &skipped).unwrap();
         assert_eq!(host_faces, card_faces, "every face of a strand with places left out");
         let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
-        assert_eq!(unequal, 0, "every covector entry of a strand with places left out");
+        assert_eq!(unequal, 0, "every covector entry of a strand with places left out (the opening compared: {opened})");
         let (plain_faces, plain_g) = card_field.read_and_return(&field, &plain).unwrap();
         assert_eq!(plain_faces, card_faces, "leaving places out moves no face");
         assert_ne!(plain_g, card_g, "leaving places out moves the comparison");
         let (_, silent_g) = card_field.read_and_return(&field, &silent).unwrap();
         assert!(silent_g.iter().all(|&v| v == 0), "a strand with every place left out returns nothing on the card");
-        println!("STRAND_UNCOMPARED_PARITY regions={} covector_entries={} faces_equal=1 covector_equal=1", skipped.len(), card_g.len());
+        println!("STRAND_UNCOMPARED_PARITY opening={opened} regions={} covector_entries={} faces_equal=1 covector_equal=1", skipped.len(), card_g.len());
+        }
     }
 
     /// [definition; the lead, November 21, the reach] **Each head's friction of distance on the card reads the host's bits** (needs the card): a

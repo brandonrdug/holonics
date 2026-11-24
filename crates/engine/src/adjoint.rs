@@ -773,11 +773,9 @@ impl Constitution {
             let reads: Vec<BlankRead> = (1..n).map(|t| self.face_of(&pass.last[(n + t) * dw..(n + t + 1) * dw], &reaches)).collect::<Result<_>>()?;
             let mut ys: Vec<Vec<i64>> = Vec::with_capacity(reads.len());
             for (t, read) in (1..n).zip(&reads) {
-                // A place read and not compared ([`UNCOMPARED`]) takes no covector.
-                if targets[t] == UNCOMPARED {
-                    continue;
-                }
-                let dz = covector(&read.face, targets[t]);
+                // A place read and not compared ([`UNCOMPARED`]) takes no covector: its face's covector is zero, so every term it adds is
+                // (its row of the readout's outer sum stands beside the others', as the card's weight zero leaves it).
+                let dz = if targets[t] == UNCOMPARED { vec![0i64; read.face.masses.len()] } else { covector(&read.face, targets[t]) };
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }

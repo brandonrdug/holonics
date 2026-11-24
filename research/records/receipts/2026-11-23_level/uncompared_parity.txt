@@ -1,0 +1,2 @@
+STRAND_UNCOMPARED_PARITY regions=5 covector_entries=36088 faces_equal=1 covector_equal=1
+STRAND_UNCOMPARED_PARITY regions=5 covector_entries=37144 faces_equal=1 covector_equal=1
