@@ -1,6 +1,6 @@
 # Context is a calendar: a receiver reads counts of one cycle against another, a count lasts as long as its store rings, one fade reads no gap and two read it, and her rings fade before they turn
 
-November 24, 2026, 19:12 to 20:00 UTC, the formal thread, in a cloud container with the PC's run logs read through a link (reads
+November 24, 2026, 19:12 to 20:10 UTC, the formal thread, in a cloud container with the PC's run logs read through a link (reads
 only). Refs #404, #405, #410. Receipts: [`receipts/2026-11-24_calendar/`](receipts/2026-11-24_calendar/) (`GUESS.txt`). It follows
 [the day's record of a lap's cycle](2026-11-24_A_LAPS_CARD_TIME_WAS_ITS_READS_THE_HELD_READ_RAN_ONE_FORWARD_FOUR_TIMES_A_ONE_SIDED_REGION_CONTINUES_BY_A_SITE_AND_A_READ_IS_SIZED_BY_THE_SCATTER_BETWEEN_LAPS.md),
 whose §6 was corrected at 18:33 UTC: what she holds of an exchange is the state of her stores, never laid-out text. This record
@@ -295,7 +295,7 @@ period is heard through the skin and the constant is not where the first build s
 
 ## 9. Lean
 
-`lean/HolonicsResearch/HNN/ComparedClock.lean`, rooted in `HolonicsResearch`, built with the library (3,124 jobs), no `sorry`,
+`lean/HolonicsResearch/HNN/ComparedClock.lean`, rooted in `HolonicsResearch`, built with the library (10,676 jobs), no `sorry`,
 no `axiom`: `countBefore_retimed`, `ratio_within`, `one_fade_reads_no_gap`, `two_fades_ratio`, `two_fades_read_gap`,
 `turns_under_grain`, `skin_turn` (a ring of period `n` fading `e^(−2π/n)` a step keeps `e^(−2π)` over its turn, whatever `n`),
 `skin_turn_lt` (under `1/400`), `dead_reckoning`, `dead_reckoning_attained`, `Local.comp`, `Local.iterate`,
