@@ -1,0 +1,57 @@
+Cuts of the lead's face read on a shown period, made by known_cuts.py (beside this file, sha256
+530ccd7ba59d52328e400e2e7b68cb60ce7692d118eb9f0acad910fb8b65309b) at 2026-11-24T21:17Z on the PC's host, one thread, under a
+second, from two tables the lead's read left: the rows (the lead's period_known.py, seed 25, 64 rows a length and kind, 300
+places a row; sha256 88b99f5b4b1b91440d09c9b6fd44d7968a7e03986cfdc9e4ff0e08c6e16b91ff) and read-reach's codes for them under
+the setting `law` on W110's MEAN.3000 (sha256 1a8c0b4c9da2809d17f4b5d2cae12b426f116c2e9e07429835692fa2f387b5d7; the read's
+own line: REACH setting=law group=all places=306176 nats_millionths=3708227 ms=363948). No state was read and nothing ran on the
+card. Codes in nats at a separator; a row's letters are drawn, so nothing here is a passage of hers.
+
+KNOWN rows=1024 codes=307200 periods=3,4,5,7,9,10,15,16
+KNOWN_MATCHED P1=3 kept=0.781 loose_matched=1.017 gain=+0.236 se=0.027 loose_by_letters=1.438 1.017 1.027 loose_all=1.146 kept_less_loose_all=-0.365 ln_P1=1.099
+KNOWN_MATCHED P1=4 kept=1.340 loose_matched=1.580 gain=+0.240 se=0.031 loose_by_letters=1.579 1.580 1.538 loose_all=1.569 kept_less_loose_all=-0.229 ln_P1=1.386
+KNOWN_MATCHED P1=5 kept=1.792 loose_matched=1.891 gain=+0.099 se=0.040 loose_by_letters=2.029 1.891 1.894 loose_all=1.939 kept_less_loose_all=-0.147 ln_P1=1.609
+KNOWN_MATCHED P1=7 kept=2.196 loose_matched=2.342 gain=+0.146 se=0.047 loose_by_letters=2.355 2.342 2.315 loose_all=2.335 kept_less_loose_all=-0.139 ln_P1=1.946
+KNOWN_MATCHED P1=9 kept=2.630 loose_matched=2.689 gain=+0.060 se=0.070 loose_by_letters=2.628 2.689 2.720 loose_all=2.677 kept_less_loose_all=-0.047 ln_P1=2.197
+KNOWN_MATCHED P1=10 kept=2.763 loose_matched=2.750 gain=-0.013 se=0.082 loose_by_letters=2.713 2.750 2.831 loose_all=2.774 kept_less_loose_all=-0.010 ln_P1=2.303
+KNOWN_MATCHED P1=15 kept=3.515 loose_matched=3.582 gain=+0.066 se=0.103 loose_by_letters=3.453 3.582 3.540 loose_all=3.523 kept_less_loose_all=-0.007 ln_P1=2.708
+KNOWN_MATCHED P1=16 kept=3.729 loose_matched=3.653 gain=-0.076 se=0.114 loose_by_letters=3.580 3.653 3.647 loose_all=3.624 kept_less_loose_all=+0.105 ln_P1=2.773
+KNOWN_STRETCH P1=3 kind=kept 1.664 1.062 0.965 0.855 0.806 0.755
+KNOWN_STRETCH P1=3 kind=loose 1.779 1.320 1.224 1.193 1.164 1.130
+KNOWN_STRETCH P1=4 kind=kept 2.253 1.676 1.541 1.439 1.360 1.322
+KNOWN_STRETCH P1=4 kind=loose 2.156 1.809 1.699 1.640 1.556 1.581
+KNOWN_STRETCH P1=5 kind=kept 2.399 2.155 1.994 1.978 1.859 1.725
+KNOWN_STRETCH P1=5 kind=loose 2.398 2.169 2.059 2.022 1.974 1.900
+KNOWN_STRETCH P1=7 kind=kept 2.752 2.530 2.356 2.255 2.178 2.214
+KNOWN_STRETCH P1=7 kind=loose 2.746 2.617 2.447 2.368 2.314 2.358
+KNOWN_STRETCH P1=9 kind=kept 3.115 2.871 2.950 2.889 2.648 2.614
+KNOWN_STRETCH P1=9 kind=loose 3.069 2.910 2.929 2.823 2.738 2.616
+KNOWN_STRETCH P1=10 kind=kept 3.176 3.047 2.826 2.832 2.809 2.717
+KNOWN_STRETCH P1=10 kind=loose 3.190 3.050 2.902 2.875 2.800 2.743
+KNOWN_STRETCH P1=15 kind=kept 4.014 3.646 3.585 3.526 3.468 3.551
+KNOWN_STRETCH P1=15 kind=loose 3.955 3.500 3.584 3.534 3.547 3.511
+KNOWN_STRETCH P1=16 kind=kept 4.033 3.817 3.809 3.737 3.757 3.700
+KNOWN_STRETCH P1=16 kind=loose 3.973 3.832 3.731 3.680 3.712 3.529
+KNOWN_THIRDS P1=3 gain=+0.054(0.040) +0.145(0.023) +0.218(0.023)
+KNOWN_THIRDS P1=4 gain=+0.004(0.044) +0.132(0.027) +0.237(0.028)
+KNOWN_THIRDS P1=5 gain=-0.012(0.043) +0.046(0.035) +0.081(0.034)
+KNOWN_THIRDS P1=7 gain=-0.017(0.055) +0.052(0.045) +0.142(0.046)
+KNOWN_THIRDS P1=9 gain=+0.043(0.064) -0.086(0.065) +0.087(0.059)
+KNOWN_THIRDS P1=10 gain=-0.005(0.078) +0.025(0.064) -0.042(0.065)
+KNOWN_THIRDS P1=15 gain=-0.086(0.105) -0.024(0.086) +0.090(0.096)
+KNOWN_THIRDS P1=16 gain=-0.043(0.103) +0.009(0.100) -0.063(0.101)
+KNOWN_RUN P1=3 kept=0.845(4288) run1=1.022(930) run2=1.045(335) run3=1.024(196)
+KNOWN_RUN P1=4 kept=1.414(3200) run1=1.592(718) run2=1.594(237) run3=1.638(134)
+KNOWN_RUN P1=5 kept=1.889(2560) run1=1.976(583) run2=1.866(184) run3=1.952(114)
+KNOWN_RUN P1=7 kept=2.251(1792) run1=2.353(403) run2=2.371(132) run3=2.271(67)
+KNOWN_RUN P1=9 kept=2.773(1408) run1=2.786(307) run2=2.721(106) run3=2.798(66)
+KNOWN_RUN P1=10 kept=2.796(1280) run1=2.787(298) run2=2.877(104) run3=2.632(59)
+KNOWN_RUN P1=15 kept=3.537(896) run1=3.514(192) run2=3.688(62) run3=3.688(27)
+KNOWN_RUN P1=16 kept=3.751(768) run1=3.756(168) run2=3.549(56) run3=3.852(30)
+KNOWN_FIRST P1=3 2.694 2.419 2.646
+KNOWN_FIRST P1=4 3.198 2.784 2.464
+KNOWN_FIRST P1=5 2.968 2.378 2.468
+KNOWN_FIRST P1=7 3.255 2.770 2.608
+KNOWN_FIRST P1=9 3.472 3.047 2.982
+KNOWN_FIRST P1=10 3.568 2.896 3.246
+KNOWN_FIRST P1=15 4.275 3.882 3.886
+KNOWN_FIRST P1=16 4.171 3.962 3.966

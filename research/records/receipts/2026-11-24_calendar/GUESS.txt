@@ -50,3 +50,63 @@ G-T3  the period panel: tools/period_panel.py make with its default seed (256 ro
       circles' leaks by site name which. (d) missed, a ring's own period is heard through the skin, and the skin's constant is not
       where the first build stands. The panel reads a carry inside one region on a form no lap asked of her: a null here is no
       statement that she does not take a period under a lap that asks for one (a learner's null is held to a length).
+
+Scored at 2026-11-24T20:46:22Z on the lead's reads of W109's MEAN.3000, relayed at 20:43:51Z (their receipts are under the lead's record of
+the day). The guesses above stand in the words they were fixed in.
+
+G-T1  read-pace, rates in units of a place. Paced head 0 (the dyadic tower): line feed 12.985, space 9.553, mean of a, e, t 1.125,
+      so 11.5 and 8.5 times. Paced head 1 (the triadic tower): line feed 25.457, space 5.046, mean 1.420, so 17.9 and 3.6 times.
+      (a) held. (b) held.
+G-T3  the default seed's 256 rows written at RUN 96 on the card in 66 s. No cell kept: every meter1 between -0.09 and 0.15, bare and
+      drawn alike.
+      (a) held: no drawn meter1 at P1 = 10, 15 or 16 reaches 0.3.
+      (b) held: the largest drawn meter2 at P2 of 16 or more is 0.145.
+      (c) missed: the drawn meter1 at P1 = 3, 4 and 5 is 0.07 or less.
+      (d) held: on her rings 0.034, off them 0.028.
+      (e) missed: bare 0.016 against drawn 0.025.
+      Read: the panel stood at its floor in every cell, so (a), (b) and (d) held where nothing could have missed them and carry
+      little for the law. What the read does say is the writer's: at the field's own temperature a write of 96 drawn places does
+      not continue a form no passage of hers holds, a bare line of one word repeated included, while her face codes a copy at
+      0.095 nats on the terrain's own form. The read that tells a store from a release was not asked for: the face on the panel's
+      reference laid out as known text.
+G-T2  unread (an arm nobody has built).
+
+Fixed 2026-11-24T20:46:22Z (date -u), after G-T1's read and before any read for it, on G-H9's arm (unbuilt). Forms read before fixing: the atlas
+row tower.field-pace (the skin follows the turn's variation, sigma the running sum of |kappa|, so a class's long duration is a deep
+fade on every ring it turns far), the record of November 23 section 20 (the fade founded at the present number, its covector), and
+G-T1's rates above, at which one space leaves the dyadic head's rings of period 16 and less 0.023 or less of themselves and the
+triadic head's rings of period 9 and less 0.030 or less.
+
+G-T4  on G-H9's arm, after its laps:
+      (a) (0.65) on each paced head the line feed's and the space's rates still stand at 3 or more times the mean of a, e and t;
+      (b) (0.5, a coin) the dyadic head's ring of period 16 or the triadic head's ring of period 9 takes a fade a radian under half
+          the founding's.
+      Read: both held, she keeps the unit's tick and lets go of the wall it had to be under one constant; (a) missed, the long
+      durations were the wall she wanted, located through the fade and never through the turn; (b) missed with (a) held, the
+      short rings stay walls and a word's count is carried elsewhere (the carry circles, the level).
+
+The lead's face read on a shown period (relayed 2026-11-24T20:59:42Z; tools/period_known.py in the lead's line, read-reach under
+`law` on W110's MEAN.3000, seed 25, 64 rows a length), cut by known_cuts.py beside this file (KNOWN_CUTS.txt). It scores no guess
+above: G-T3's were fixed on the panel's writes and keep their scores. What it reads of their claims at her face: with a word's
+length matched, a shown period gives her 0.236, 0.240, 0.099, 0.146, 0.060, -0.013, 0.066 and -0.076 nats a separator at P1 = 3, 4,
+5, 7, 9, 10, 15 and 16 (standard errors 0.027 to 0.114), so of (c)'s claim, a period inside the near field kept by timing alone,
+her face holds a quarter of a nat where a count is worth a nat or more, and (a)'s claim holds at her face. A miss of frame in (d), mine, in one line:
+its lengths were set on her rings' periods counted in places, and her rings turn on her clock, where G-T1 read a space at 9.6
+and 5.0 letters, so (d) bound no ring.
+
+Fixed 2026-11-24T21:16:00Z (date -u), after the cuts above and before any read for it, on G-H9's arm (unbuilt). Forms read before
+fixing: athena::ruler::tension::read_reach (each row read whole, every place at its own frontier), the cuts' lines in
+KNOWN_CUTS.txt, and the skin's turn (a ring keeps half of itself over one turn at a fade a radian of ln 2 / 2 pi = 0.110 of the
+skin's, and 0.043 at half the skin's).
+
+G-T5  on G-H9's arm beside its control, both at their lap means, the lead's rows of seed 25 (sha256
+      88b99f5b4b1b91440d09c9b6fd44d7968a7e03986cfdc9e4ff0e08c6e16b91ff) read by
+      read-reach under `law` and cut by known_cuts.py:
+      (a) (0.2) the arm's kept separators at P1 = 3 over a row's last fifty places (KNOWN_STRETCH's sixth figure) stand 0.15 nats
+          or more under the control's (0.755 on W110's mean);
+      (b) (0.7) the twins' separators over the last third (KNOWN_MATCHED's loose_all) stand within 0.08 nats of the control's at
+          every period.
+      Read: (a) held, a fade located by her passages lets a ring that spans a word hear its return, and her face uses it as a
+      count; (a) missed with the fades moved (G-H9 (b), G-T4 (b)), a located fade does not reach the ninth a return asks, and
+      the count is the carried one's (the fine clock read at the level's tick and handed up: a count at one level is a rate at
+      the level above); (b) missed, the arm moved how she holds a rate.
