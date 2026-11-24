@@ -1,0 +1,14 @@
+Fixed 2026-11-24T02:50:37Z (date -u), the lead, before the answered act trains with her own writer's drafts. Refs #404.
+The change from W102a: the terrain's acts are drafted by her own writer (store::write_strand: read by two streams place after place, as
+write-next writes), in place of the release, which reads its open places from both sides; on W102a's lap the world read 0.7% of the
+release's drafts, and her writer on W102a's mean wrote 18 readable records of 18 after one record (play/act_W102a). Everything else as
+W102a: world terrain 16 1 24, her drafted expression uncompared, the answer compared.
+W102b: W101's STATE.3000 with the world, beside W102 (W101's STATE.3000, no change), 3,000 sections on e5b after the act path's parity of
+three sections; read at MEAN.3000.
+G-A5:
+  (a) the world reads her draft (STORE_WORLD read over acts) in at least half the acts over the lap;
+  (b) every held text register within 0.003 nats a place of the control, one place open (G-A3 (a) again);
+  (c) the world's code at its answers, the last thousand sections at most 0.9 of the first thousand (G-A3 (b) again);
+  (d) the terrain panel's whole answers at least the control's (54 of 96), and on brackets at least the control's plus 2 (8 of 16).
+Rule: (a), (b) and (c) held, the line takes the world; (b) missed, the act's cost to the text is read before a second lap; (a) missed,
+her writer's drafts are read in the trainer before anything else.

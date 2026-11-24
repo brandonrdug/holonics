@@ -1,0 +1,19 @@
+W102B_START 02:50:37
+W102B_ACT_PARITY STORE_PARITY_DONE calls=75 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL STORE_WORLD n=2 acts=34 read=34 draft_places=388 world_places=177 first=509 world_code=1526003 
+W102B_DEV act_ms=1009 plain_ms=749 sections=30 STORE_WORLD n=29 acts=25 read=25 draft_places=307 world_places=154 first=503 world_code=1380328 
+W102B_PROJECTION 50 minutes, deadline 4535 s
+TERRAIN_TRAINED W102b 03:44:12 sections=3000 ended=false
+W102B_WORLD_CODE first_thousand=1432659 last_thousand=1440335 ratio=1.005 (millionths of a bit a place)
+TERRAIN_REACH W102b 03:45:57 ANSWER copy n= 2655 0.246|ANSWER reverse n= 2667 0.101|ANSWER sum n= 1579 0.935|
+TERRAIN_HOSTPANEL W102b panel_logic.tsv 03:47:38 NEXT_WRITE_DONE rows=168 run=32 window=- ms=205851 
+TERRAIN_HOSTPANEL W102b panel_terrain.tsv 03:48:30 NEXT_WRITE_DONE rows=96 run=32 window=- ms=257588 
+TERRAIN_READ_DONE mean_W102b 03:55:52 CAVITY_DONE ms=699052  rows_S=99844
+TERRAIN_PANEL W102b_mean 03:56:23 seen: words 38 in_lexicon 27 (71%) longest_copy 16 held: words 60 in_lexicon 45 (75%) longest_copy 14 unread: words 60 in_lexicon 42 (70%) longest_copy 17  || LONG W102b_mean: all words 276 in lexicon 202 (73%) writes that loop 4 of 20 longest run shared with its prompt 30 | code 38/42 (90%) web 50/62 (80%) science 37/54 (68%) books 49/63 (77%) wikidata 28/55 (50%)
+TERRAIN_LOUD W102b 04:02:09  lines=71
+TERRAIN_WIDE W102b 04:03:11 LONG W102b: all words 2141 in lexicon 1564 (73%) writes that loop 24 of 160 longest run shared with its prompt 75 | code 301/360 (83%) web 363/454 (79%) science 254/423 (60%) books 412/493 (83%) wikidata 234/411 (56%)
+W102B_LAP_TRAVEL W102b material: |d|=1.146e+08,1.164e+08,1.106e+08 cos01=+0.127 cos12=+0.095 persistence=1.055 | level: |d|=1.722e+07,1.734e+07,1.703e+07 cos01=+0.118 cos12=+0.180 persistence=1.103 | third: |d|=5.412e+07,5.377e+07,5.233e+07 cos01=+0.160 cos12=+0.161 persistence=1.090
+W102B_FRONTIER FRONTIER W102b; one place open: all 0.6056 (140564 places) | books 0.6846 code 0.4029 logic 0.4057 science 0.5697 theory 0.5159 web 0.7500 wikidata 0.9087 || less the control's, paired: +0.0013 (±0.0002) | books +0.0006 code +0.0005 logic +0.0012 science +0.0013 theory +0.0030 web +0.0007 wikidata +0.0019|FRONTIER W102b; the frontier: all 1.8234 (139706 places) | books 1.8165 code 1.5725 logic 1.7185 science 1.7716 theory 1.7823 web 2.0593 wikidata 2.0426 || less the control's, paired: +0.0007 (±0.0003) | books +0.0019 code +0.0004 logic +0.0001 science +0.0016 theory +0.0008 web +0.0060 wikidata -0.0058|
+W102B_WORD_PRESENCE st_W102b word_starts=19351 read=224 tick=3 byte_2=0.601 prev_first=0.273 prev_word=0.224 prev2_word=0.023 target=0.038 planted=0.000 prev_len=0.366 | three or more words into a line (18520): line_words=0.181
+TERRAIN_SCORE W102 whole 54/96 opening 58/96 first 72/96 | sum 8/8/9 of 16 difference 7/7/7 of 16 product 5/5/8 of 16 close 8/12/16 of 16 copy 14/14/16 of 16 reverse 12/12/16 of 16
+TERRAIN_SCORE W102b whole 53/96 opening 57/96 first 71/96 | sum 9/9/11 of 16 difference 6/6/6 of 16 product 5/5/7 of 16 close 9/13/16 of 16 copy 12/12/15 of 16 reverse 12/12/16 of 16
+W102B_ALL_DONE 04:23:42

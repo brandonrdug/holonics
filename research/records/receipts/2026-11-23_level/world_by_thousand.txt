@@ -1,0 +1,8 @@
+== W102a
+thousand 1: sections 1000, acts 25.1 a section, read 0.0061 of acts, drafted places 398.8, world places 61.1, world_code 1551881
+thousand 2: sections 1000, acts 24.9 a section, read 0.0067 of acts, drafted places 384.3, world places 59.6, world_code 1500480
+thousand 3: sections 1000, acts 24.6 a section, read 0.0069 of acts, drafted places 387.8, world places 59.2, world_code 1493344
+== W102b
+thousand 1: sections 1000, acts 25.3 a section, read 0.9979 of acts, drafted places 306.0, world places 148.4, world_code 1432659
+thousand 2: sections 1000, acts 24.9 a section, read 0.9983 of acts, drafted places 301.9, world places 145.9, world_code 1438732
+thousand 3: sections 1000, acts 24.7 a section, read 0.9983 of acts, drafted places 298.1, world places 143.8, world_code 1440335

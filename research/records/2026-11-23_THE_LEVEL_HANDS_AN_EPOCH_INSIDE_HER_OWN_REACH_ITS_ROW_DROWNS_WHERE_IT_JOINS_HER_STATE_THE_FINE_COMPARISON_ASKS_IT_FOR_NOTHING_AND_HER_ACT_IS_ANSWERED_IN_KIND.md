@@ -123,6 +123,55 @@ The arm and its guess: W102a (W101's end with `world terrain 16 1 24`) beside W1
 23:21:04 UTC ([`GUESS_A3.txt`](receipts/2026-11-23_level/GUESS_A3.txt)). The guess names the build `e5a`; the arm runs
 on `e5a2`, the same law with the host's outer sum repaired, after its gate 3 against W102's lap.
 
+## 8a. The two arms
+
+Both beside W102 (W101's end, no change), 3,000 sections each, read at `MEAN.3000` (the last 1,000 sections); receipts
+[`arm_W102a.txt`](receipts/2026-11-23_level/arm_W102a.txt), [`arm_W102b.txt`](receipts/2026-11-23_level/arm_W102b.txt),
+[`world_by_thousand.txt`](receipts/2026-11-23_level/world_by_thousand.txt), [`frontier_W102a.txt`](receipts/2026-11-23_level/frontier_W102a.txt),
+[`frontier_W102b.txt`](receipts/2026-11-23_level/frontier_W102b.txt).
+
+**W102a, her acts drafted by the release** (`e5a5`, after three more faults found on the way: the pass line refused the terrain's world;
+the card's opening left an uncompared place's face out of its forward, where the level's news reads it, and the first development read
+was refused, "a level's news below zero"; and the card's faces at their classes read a mass there, which the act path's parity on the
+line's own declaration caught, 1,458 sites apart and every covector entry equal; each repaired, and that parity EQUAL on 75 calls). The
+world read 0.6% to 0.7% of her drafts and answered `?` to the rest. Her own writer, given one record of each kind on the same mean, wrote
+18 readable records of 18 ([`act_writer_W102a.written`](receipts/2026-11-23_level/act_writer_W102a.written)): the release that drafted
+the acts reads its open places from both sides, a regime she neither trains in nor writes with (the failure of November 21, a world
+outside the writer's regime, met again on the draft's side).
+
+**W102b, her acts drafted by her own writer** (`store::write_strand`, as `write-next` writes, `e5b`; the act path's parity EQUAL with
+the world reading 34 drafts of 34). The world read 99.8% of her drafts in every thousand sections.
+
+Her writes first ([`theory_panel_W102.written`](receipts/2026-11-23_level/theory_panel_W102.written),
+[`theory_panel_W102b.written`](receipts/2026-11-23_level/theory_panel_W102b.written)), raw, `⏎` her line feeds:
+
+| prompt | W102 (control) | W102b (her acts answered) |
+|---|---|---|
+| theory: `…the build order of [the second precision` | ` equal]⏎- both growths is gain of turn of the locks was globally under. No host's⏎passage is f` | `, system, (B03) 0010 order.⏎⏎The price up on the +s, height is a lap for the rate precision or` |
+| logic: `…\| c :: p => c + x * evalAt x p⏎⏎` | `theorem evalAt_eye {a : Born s Born) : ℚ⏎  \| (x : ℚ → ℝ) ≤ Ratio n := by⏎  have hstar ` | `/-- The same data is a pyptage from a second path is a pyptage under the cycle between a block o` |
+| brackets: `( ( ( ( ( { = ` | `} ) ) ) ) ]⏎( [ ( = ) ] )⏎` | `} ) ) ) ] )⏎[ { = } ]⏎[ ( ` |
+| reverse: `reverse 0 7 5 4 4 = ` | `4 4 5 7 0⏎reverse 1 3 0 8 =` | `4 4 5 7 0⏎reverse 2 0 1 = 1` |
+
+| read | W102 | W102a | W102b |
+|---|---|---|---|
+| one place open, less the control, paired | | +0.0015 (±0.0003); theory +0.0035, wikidata +0.0033, the rest within 0.0014 | +0.0013 (±0.0002); theory +0.0030, wikidata +0.0019, the rest within 0.0013 |
+| the world's code at its acts, last thousand over first | | 0.962 | 1.005 |
+| her drafts the world read | | 0.6% to 0.7% | 99.8% |
+| terrain panel, whole answers of 96 (brackets of 16) | 54 (8) | 49 (10) | 53 (9) |
+| held codes on the terrain's rows: copy, reverse, sum | 0.220, 0.160, 0.940 | 0.187, 0.192, 0.997 | 0.246, 0.101, 0.935 |
+| theory panel: words in the lexicon, own distinct terms | 80%, 7 | 86%, 11 | 88%, 4 |
+
+G-A3 on W102a: (a) missed by 0.0005 on theory and 0.0003 on wikidata; (b) missed (0.962 against 0.9). G-A4 on W102a: (a) held (10 of
+16 on brackets against 8), (b) held, (c) held on copy and missed on reverse. G-A5 on W102b: (a) held (99.8%), (b) held at its edge
+(theory +0.0030), (c) missed (1.005), (d) missed (53 whole against 54, 9 on brackets against the 10 asked).
+
+What it says: an act answered in kind costs the text about a thousandth of a nat a place at this dose, where grading her drafts against
+the passage cost ten to forty times that (the play record, §3 and §5); the comparison at what the world returned supplements the
+passage's, as the formal thread's equilibrium check said it would. One lap of it moves no terrain kind past the scatter of a panel of 16,
+and the world's code, which counts the prompt's places beside the answer's, does not fall. By G-A5's rule a second lap runs as an arm
+from W102b's end beside W103 from W102's end: a world's code may need laps, and (b) held. The world's code is a weak instrument here (the
+answer's places are a sixth of those it counts), so the second lap reads her code at the answers alone beside it.
+
 ## 9. What Brandon asked of her, read from her writes
 
 Brandon, 23:09 UTC: whether she poses questions of her own or refers to herself, as the parrot Alex coupled "What color?" to the answer
