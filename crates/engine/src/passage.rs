@@ -4,7 +4,7 @@
 //! octaves and each `u` within its octave (`mix(seed, d | …)`), and takes the rest of its piece where `rest < q + a + least`; its one
 //! keyed state is a mask (density `τ = u²`, `u` on `2^(−16)`, weighed back by its domain `⌊2√(mK)⌋`), the writer's (the run's first `k`
 //! places resolved, by octaves of their distance from the context) or, at the frontier, every place known but the last (weight `m` over
-//! one); its own state resolves `k = 2^o − 1`, `o = d mod (⌊log₂ a⌋ + 1)`; the cut takes the slice with least `taken_s/quota_s` (the
+//! one); its own state resolves `k = 2^o − 1`, `o = d mod (⌊log₂ a⌋ + 1)`; the cut takes the slice with least `taken_s/quota_s` (weighed by each slice's tension where the pass holds it; the
 //! earlier at a tie), its pieces in order from a cursor
 //!
 //! Kind: chain over a pass's stretches, its place carried in the learner's state (`StorePass`); gate, a site, inside a stretch. Kernels:
@@ -445,9 +445,19 @@ impl Cut {
     pub fn next(&self) -> Option<Drawn> {
         let live: Vec<usize> = (0..self.slices.len()).filter(|&s| (self.pass.slices[s].piece as usize) < self.slices[s].pieces.len()).collect();
         let mut slice = *live.first()?;
+        // [definition; the lead, November 24] Each slice's weight: its tension where the pass holds the slices by it ([`StorePass::slice_tension`],
+        // a slice with no reading at the mean of those with one), one where it does not, so the interleave is the quotas' as before.
+        let weight: Vec<u128> = match &self.pass.slice_tension {
+            Some(t) => {
+                let read: Vec<u128> = t.iter().filter(|&&v| v > 0).map(|&v| u128::from(v)).collect();
+                let mean = if read.is_empty() { 1 } else { (read.iter().sum::<u128>() / read.len() as u128).max(1) };
+                t.iter().map(|&v| if v > 0 { u128::from(v) } else { mean }).collect()
+            }
+            None => vec![1; self.slices.len()],
+        };
         for &other in &live[1..] {
             let (t_o, t_n) = (self.pass.slices[other].taken as u128, self.pass.slices[slice].taken as u128);
-            if t_o * self.slices[slice].quota < t_n * self.slices[other].quota {
+            if t_o * self.slices[slice].quota * weight[slice] < t_n * self.slices[other].quota * weight[other] {
                 slice = other;
             }
         }

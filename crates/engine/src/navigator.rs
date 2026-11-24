@@ -73,7 +73,19 @@ pub(crate) fn skin_decay(d: usize, n: usize, pi: i128, exponential: &Exponential
 /// `e^(−2π |s|/n)`, one e-fold a radian of turn, read as [`skin_decay`] reads a whole distance (the same bits at a
 /// whole `s`), so a head whose clock is its own decays by the turn it makes between two sites, not by their bytes.
 pub(crate) fn skin_of(s: i128, n: usize, pi: i128, exponential: &Exponential) -> i64 {
-    let bits = div_nearest(2 * pi * s.abs(), (n as i128 * ln2_face()) << PACE_BITS);
+    skin_of_k(s, skin_denominator(n), pi, exponential)
+}
+
+/// The skin's denominator of a ring of period `n` at one e-fold a radian, `n ln 2 2^24` (the `k` of [`skin_of`]).
+pub(crate) fn skin_denominator(n: usize) -> i128 {
+    (n as i128 * ln2_face()) << PACE_BITS
+}
+
+/// [measurement; the lead, November 24, the calendar record §6 item 1] **The skin across a variation `s` with its denominator `k`**:
+/// `e^(−2π |s|/k)` read as [`skin_of`] reads it; a ring whose fade is `γ` e-folds a radian of its own turn has `k = n ln 2 2^24 / γ`
+/// ([`Constitution::set_ruler_fade`]), and at `γ = 1` the same bits as [`skin_of`].
+pub(crate) fn skin_of_k(s: i128, k: i128, pi: i128, exponential: &Exponential) -> i64 {
+    let bits = div_nearest(2 * pi * s.abs(), k);
     release(exponential.below_one(-bits) as i128, 62 - MOVE_BITS) as i64
 }
 
@@ -230,7 +242,23 @@ impl Constitution {
                 return dv;
             }
         }
-        skin_of(s, self.rings[slot].0, self.pi, &self.exponential)
+        match &self.ruler_skin_k {
+            Some(k) => skin_of_k(s, k[slot], self.pi, &self.exponential),
+            None => skin_of(s, self.rings[slot].0, self.pi, &self.exponential),
+        }
+    }
+
+    /// [measurement; the lead, November 24, the calendar record §6 item 1, a read before the fade is a law] **The rings of period `from` and
+    /// more faded at `γ = 2^ℓ` e-folds a radian of their own turn** (`ℓ` on `2^(−24)`, read through the temperatures' chart), every other
+    /// ring at one: each such ring's skin denominator `k = n ln 2 2^24 / γ` and its decays at a whole distance formed again. A ruler's
+    /// setting on a clone of the field (`read-reach`'s `fade:FROM:MILLI`): not part of the state, and no reverse reads it.
+    pub fn set_ruler_fade(&mut self, from: usize, ell: i32) -> Result<()> {
+        let gamma = temperature_of(ell, &self.fine)?;
+        let ks: Vec<i128> = self.rings.iter().map(|&(n, _)| if n >= from { div_nearest(skin_denominator(n) << MATERIAL_BITS, gamma) } else { skin_denominator(n) }).collect();
+        let reach = self.declaration.reach;
+        self.decays = ks.iter().map(|&k| (0..reach).map(|d| skin_of_k((d as i128) << PACE_BITS, k, self.pi, &self.exponential)).collect()).collect();
+        self.ruler_skin_k = Some(ks);
+        Ok(())
     }
 
     /// The face of turned slot `slot` at a clock `ρ` on `2^(−24)`: the resident ring at a whole place it holds,

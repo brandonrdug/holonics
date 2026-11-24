@@ -386,6 +386,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("read-triads") => athena::store::read_triads(args),
         Some("set-world") => athena::store::set_world(args),
         Some("set-terrain") => athena::store::set_terrain(args),
+        Some("set-tension") => athena::store::set_tension(args),
         Some("grow-crossings") => athena::store::grow_crossings(args),
         Some("zero-triad-return") => athena::store::zero_triad_return(args),
         Some("found-crossing") => athena::store::found_crossing(args),

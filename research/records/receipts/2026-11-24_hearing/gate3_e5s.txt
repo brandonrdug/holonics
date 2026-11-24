@@ -1,0 +1,15 @@
+# gate begun 22:21:18
+# parity: exit 0 22:25:19
+# repro: exit 0 22:25:45
+# read: exit 0 22:45:20
+STORE_PARITY method=read_and_return_opening calls=3 unequal=0 card_ms=2491 host_ms=229011
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+MEASURE lap=parity rc=0 wall_s=240.4 peak_rss_kib=13928160
+MEASURE lap=read rc=0 wall_s=1175.8 peak_rss_kib=684468
+MEASURE lap=repro rc=0 wall_s=25.8 peak_rss_kib=1017020
+GATE_ENGINE EQUAL
