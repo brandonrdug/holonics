@@ -1,0 +1,14 @@
+LAP_CYCLE log=arm_W108.log word=train-store surface=card ms=2060745
+LAP_CYCLE log=cav_mean_W108.log word=read-cavity surface=card ms=665077 rows: P=389472 W=4164 F=135165 K=56846 S=962 copies=51947 opening=1396
+LAP_CYCLE log=w_W108_mean.log word=write-next surface=card ms=8068
+LAP_CYCLE log=loud_W108.log word=read-loudness surface=card ms=331210
+LAP_CYCLE log=w_W108.log word=write-next surface=card ms=59633
+LAP_CYCLE log=cav2_W108.log word=read-cavity surface=card ms=947710 rows: P=561918 W=5673 F=202037 K=86429 S=1290 copies=54842 opening=1780
+LAP_CYCLE log=cav4_W108.log word=read-cavity surface=card ms=1293504 rows: P=791298 W=7810 F=283147 K=121219 S=1803 copies=39454 opening=2369
+LAP_CYCLE log=w_W108.log word=write-next surface=card ms=13491
+LAP_CYCLE log=w_panel_acts_W108.log word=write-next surface=card ms=3830
+LAP_CYCLE log=w_panel_dialogue_W108.log word=write-next surface=card ms=19954
+LAP_CYCLE log=panel_terrain_W108.log word=write-next surface=host ms=222657
+LAP_CYCLE log=panel_logic_W108.log word=write-next surface=host ms=168116
+LAP_CYCLE log=code_terrain_W108.log word=read-reach surface=host ms=102417
+LAP_CYCLE_TOTAL card_ms=5403222 train_ms=2060745 reads_ms=3342477 train_share=0.381 reads_over_train=1.62 host_ms=493190 card_minutes=90.1

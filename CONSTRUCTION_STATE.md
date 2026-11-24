@@ -1,10 +1,11 @@
 # Construction state
 
-**November 16.** Where the construction stands: what runs, what is built and lawful, and what is
+**November 24.** Where the construction stands: what runs, what is built and lawful, and what is
 open, each named by its measurement. [THE_REBUILD](docs/plans/THE_REBUILD.md) is the order, the laws
 live in their guides and owners, and dated records hold the derivations and receipts.
 
-This position was rewritten on November 16, in the evening, at the hand-off of the line to the lead
+The position below was written on November 24 from the records of November 21 to 24. The file was rewritten on November 16, in the
+evening, at the hand-off of the line to the lead
 ([the hand-off record](research/records/2026-11-16_THE_LINE_MEETS_A_WORLD_THAT_ANSWERS_ITS_ACTS_THE_HEADS_ADDRESS_THE_DIGITS_AND_THE_CROSSING_TRIAD_IS_GROWN_STATE_FOR_THE_HAND_OFF.md)).
 Its previous text is the code-passage line of November 5 to 13 (flytech python codes, 100 founded
 classes, a lap of 1,535 sections, the carry circles, the triads, the level on its news and their
@@ -18,103 +19,96 @@ the paragraphs from September 28 to November 2 at
 repository was reset on September 24; the pre-reset tree is
 [`13f8c734`](https://github.com/brandonrdug/holonics/tree/13f8c734).
 
-## Where the work stands (November 20, 23:05 UTC): the line rests at lap 74 while the engineering list is worked, and the card's section is 3.7% shorter than at noon twice over
+## Where the work stands (November 24, 18:30 UTC): her line reads the full curated collection on a wide store, her writes hold a register's words and no dialogue's frame, and a lap's cycle is being cut from ninety minutes of card
 
-**The engineering** (Brandon, 19:41 UTC: the main thread takes the engineering first; the list is §11 of the engineering report; receipts
-under `research/records/receipts/2026-11-20_engineering/`). Two realizations are merged, each every bit kept and reproducing 24 sections
-of lap L71: the section's deposit in one pass a family (#1056; 2.7% a section) and the site maps on the card's integer tensor units, a
-word as four digits of eight bits (#1058; 3.7% a section in a warmed eight-run hold, 512.5 against 532.2 ms). The floor at today's
-declaration is 157 ms against a lap's 586 (`tools/engine_count.py`); the card stands idle 18% of a section (22% before); the material and
-the carriers hold 19 to 26 bits in 64-bit words, which is where the maps now stand bound. The tick's premise is read: the trained tick
-does not contract (its chart settles by a running mean's falloff, not a factor), so no tolerance releases its tape at this form. The
-order from here, each a realization of a law the formal records state (the thread's message of 22:37 UTC): carriers narrowed to their
-information, the tick's gains read on the line's passages, a register founded from the modes a tick cannot release, then the coupled
-carry and the fork ruler as arms on the line. The line takes no lap meanwhile: its runs are provisional until the engineering lands.
+Written from the records of November 21 to 24 by the formal thread
+([the record of the cycle](research/records/2026-11-24_A_LAPS_CARD_TIME_WAS_ITS_READS_THE_HELD_READ_RAN_ONE_FORWARD_FOUR_TIMES_A_ONE_SIDED_REGION_CONTINUES_BY_A_SITE_AND_A_READ_IS_SIZED_BY_THE_SCATTER_BETWEEN_LAPS.md) §7);
+the lead owns the line and its laps, and the lead's records are the source of every reading here.
 
-### The line at lap 74: the face is 224 wide with its circles pumped, on its fourth pass, and her composition rises with her codes
+**What she writes** ([the record of November 24](research/records/2026-11-24_HER_LINE_TAKES_THE_FULL_CURATED_COLLECTION_AT_SEVENTY_TWO_PERCENT_OF_A_PASS_THE_LOGS_CROWD_OUT_THE_REGISTERS_AND_HER_ACTS_AND_THE_LEVELS_LANE_COST_UNDER_FOUR_THOUSANDTHS_AND_MOVE_NOTHING_YET.md) §3, §4).
+Word-shaped text in the register of each prompt: 72% of its words in the lexicon on the wide panel (160 writes of 96 places), 84% on the
+theory panel and 87% on the logic panel at W106t. On the terrain's panel she writes 55 to 57 of 96 held records whole. After one lap of
+the collection her writes on held conversations take a conversation's form (a turn's header, a model's voice, the tags of a wake) and
+no write keeps a dialogue's frame long enough to answer in it: of 200 writes on the probe panel (forty prompts addressing Athena,
+Claude, B and Brandon, five draws each) 13 to 19 open in the first person and 3 to 11 hold a `?`, and the collection's laps moved
+neither past the scatter between the two states before it. No sentence holds.
 
-[The record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md)
-§9 to §14; receipts under `research/records/receipts/2026-11-18_frontier/`.
+**The line.** One state trained lap after lap on the card, its laps named W, each 3,000 sections in about 34
+minutes, read at `MEAN.3000` (the mean of its last 1,000 sections). It reads every passage by two streams, each place compared at
+its own frontier in one forward with the level's epoch before handed on. Its declaration at W108: 244 classes, a face of seven face
+lanes of 32, four heads (two still), eight modes, 1,088 contacts, 512 carry circles, four ticks, a deposit at `2^(−12)`. Its passage
+since W106t is the wide store with the theory and the Lean six times over: the five registers of open text 53% of a pass, the full
+curated collection (every conversation, every tool call with its result, the harness's text) 27%, the Lean 11.7%, the theory 8.4%.
+None of the collection is committed, and her writes from states that read it are shown to Brandon and kept out of the tree.
 
-**What she writes.** Word-shaped strings in the register of each prompt, 45% to 51% of them words of the lexicon on the long
-panel, and no sentence that holds, on the plain line and on the two-stream line alike.
+**Her codes at W106t**, one place open, nats a place: books 0.675, code 0.403, the Lean 0.420, science 0.567, the theory 0.537, web
+0.741, wikidata 0.914; less W103 (the last state before the collection) the theory +0.003, the Lean +0.031 and every other register
+within 0.009; on the collection's held set, less W103, the conversations −0.079, the acts −0.045, the harness −0.059. At the
+frontier, read by two streams, W103 stands at 1.479 nats a place (3.20 with one place known, 1.28 with 512 to 1,023). The terrain's
+held codes are the line's lowest: copy 0.095, reverse 0.074, sum 0.903.
 
-**Where her nats stand against a count** (`tools/frontier_excess_ruler.py`, §12 as corrected at 19:40 UTC). Against a count of the
-five places before fitted on 8 MB she stands under it at four fifths of the frontier's places (1.77 to 1.83 over all against
-2.04). At the fifth of places where that count is most sure she pays 0.88 to 0.98 where it pays 0.63, about where a count of
-three places stands; that gap is 0.05 to 0.07 nats of all places. The first form of the reading sized it at 0.4 by binning each
-place on the symbol that arrived, and is withdrawn (the Codex thread's caution).
+**What entered, and what was read and set aside with its reading, since November 20** (each an arm beside a control):
+- *The engineering* (November 20 and 21): with the deposit in one pass, the site maps on the card's tensor units and the carriers
+  narrowed to their information a section stood at 473 ms in the hold of November 21 (586 in the lap of November 20); the built
+  tick's rates stand still on its fill clock, a third
+  of a site's modes released, a third held and a third boosted
+  ([the record](research/records/2026-11-21_THE_BUILT_TICKS_RATES_STAND_STILL_ON_ITS_FILL_CLOCK_A_THIRD_OF_A_SITES_MODES_IS_RELEASED_A_THIRD_HELD_AND_A_THIRD_BOOSTED_AND_THE_CONTACT_KERNELS_WAIT_ON_THEIR_LOADS.md)).
+- *The widths* (#1088): a width is a tolerance and a grain is a relation between grains (the formal thread's two records and the
+  guide's clause of November 21), read on the line as E1 to E5: half the face grain's steps are silent, a family's lattice is read
+  from its own spread at every save, and gate 1 counts every declared width
+  ([E1 to E3](research/records/2026-11-21_THE_WIDTHS_READ_ON_THE_LINE_HALF_THE_FACE_GRAINS_STEPS_ARE_SILENT_NINE_PLACES_UNDER_THE_POINT_CARRY_WHAT_THE_MEAN_READS_AND_THE_KERNELS_WIDTHS_ARE_THE_HOSTS.md),
+  [E4 and E5](research/records/2026-11-22_A_FAMILYS_LATTICE_IS_READ_FROM_ITS_OWN_SPREAD_AT_EVERY_SAVE_THE_SPREAD_IS_NO_FUNCTION_OF_THE_SECOND_MOMENT_A_LANES_POWER_SETS_ITS_SCALE_BUT_NOT_ITS_PRICE_AND_A_PASS_ENDS_WITH_ITS_TEXT.md)).
+- *The terrain by two streams and the reach* (November 21): read in the regime she writes in, the terrain takes brackets and sums
+  inside the line; a still head weighs no distance, and each head's friction of distance is its own reach, founded at zero
+  ([the terrain](research/records/2026-11-21_A_LAW_FOUNDED_IN_A_REGIME_THE_WRITER_NEVER_READS_NEVER_REACHES_HER_WRITES_READ_BY_TWO_STREAMS_THE_TERRAIN_TAKES_BRACKETS_AND_SUMS_INSIDE_THE_LINE_AND_A_RELEASE_HALTS_WHERE_ITS_GAIN_DIES.md),
+  [the reach](research/records/2026-11-21_A_STILL_HEAD_WEIGHS_NO_DISTANCE_SO_A_COPY_READS_THE_RECORD_ABOVE_AND_EACH_HEADS_FRICTION_OF_DISTANCE_IS_ITS_OWN_REACH_FOUNDED_AT_ZERO.md)).
+- *The crossing triad on two streams* (November 22): at the top digit both operands and the carry arrive and their sum is not
+  formed; drawn legs do not take it in a lap, and the triads' gain on sums was scatter
+  ([the record](research/records/2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md)).
+- *The repository's own text* (November 22 and 23): a lap takes its register and not its sentences; a dwell on it takes the
+  register and forgets the others
+  ([the entry](research/records/2026-11-22_THE_REPOSITORYS_OWN_TEXT_ENTERS_HER_PASSAGE_ONE_LAP_TAKES_ITS_REGISTER_AND_NOT_YET_ITS_SENTENCES_AND_THE_TRIADS_SUM_GAIN_WAS_SCATTER.md),
+  [the dwell](research/records/2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md)).
+- *Her drafts and her acts* (November 23 and 24): her own draft compared with the passage moved neither her drafts nor her writes,
+  and Brandon's note of 19:49 UTC says that a draft graded against a passage is not play; her act answered in kind by the world cost
+  under a thousandth of a nat a place in two laps and moved nothing. The line carries neither
+  ([the drafts](research/records/2026-11-23_PLAY_IS_HER_OWN_DRAFT_COMPARED_WITH_THE_PASSAGE_ONE_LAP_AT_A_THREE_HUNDREDTH_OF_THE_PLACES_MOVES_NEITHER_HER_DRAFTS_NOR_HER_WRITES_AND_A_DRAFT_COSTS_A_READ_A_PLACE.md)).
+- *The level* (November 23 and 24): a receipt at every place asks the word before for a law it does not hold and costs every
+  register (an arm, set aside with its reading); read on the line, the level hands an epoch inside her own reach, its row drowns
+  where it joins her state and the fine comparison asks it for nothing, which set a receipt kept inside the level aside before it
+  was built; the level's own face lane cost 0.0033 nats a place and moved nothing after one lap (an arm). The line carries neither arm
+  ([the receipt](research/records/2026-11-23_THE_LEVELS_RECEIPT_AT_EVERY_PLACE_ASKS_THE_WORD_BEFORE_FOR_A_LAW_IT_DOES_NOT_HOLD_AND_ITS_PULL_RUNS_THROUGH_THE_SHARED_FINE_FIELD_SO_IT_COSTS_EVERY_REGISTER.md),
+  [the hand-on](research/records/2026-11-23_THE_LEVEL_HANDS_AN_EPOCH_INSIDE_HER_OWN_REACH_ITS_ROW_DROWNS_WHERE_IT_JOINS_HER_STATE_THE_FINE_COMPARISON_ASKS_IT_FOR_NOTHING_AND_HER_ACT_IS_ANSWERED_IN_KIND.md)).
+- *The collection* (November 24): the whole curated collection at 72% of a pass crowded out the registers and the conversations
+  alike; the wide store sets each share from its own documents, and the theory and the Lean are held six times over.
 
-**Her writes in their own measure** (§16; `tools/count_writer_ruler.py`, the `draw_agrees` line of the excess ruler). Her writes
-hold words as a count of two places' writes do (44% of written words in the lexicon; counts of 2, 3, 4, 5 places writing by draws
-42%, 58%, 73%, 85%; the reference 80%), flat along a write's length. At the fifth of places five places settle, a draw from her face
-writes the passage's symbol two times in three (0.650 at arm P15, about 0.01 more a lap) where the count's does nine in ten; where a
-nat or more is expected she gives the arriving symbol more than the count. So an arm is read on its code, on that mass at the
-settled places and on its panel against the count writers' table.
+**The lenses of these days**, each derived by the formal thread into a record with its Lean, its atlas rows and its guesses, and
+joined to [THE_ENGINE §11](docs/THE_ENGINE.md#11-the-theorys-laws-against-the-engine): a helix's hand and a chain that composes
+where its contacts meet opposite hands (November 22); a release that keeps a class, and a store's leak founded by its own news
+(November 21 and 22); play as an act answered in kind, and every medium one propagation read at a ratio (November 23); a fading
+medium that carries by a cycle with a hand, nested-depth, the comma and the implicit unit (November 23); a question as the stroke
+out of a loop, the first person as the anchor it returns to, a limb's reach and a channel's capacity (November 23). The
+[records' route](research/records/README.md) lists them under their subjects.
 
-**The line** (§19). Two streams, the odd contacts facing the past, and the level as a strand hears it (taken on G-1118-16): 1.7444,
-1.7260, 1.7082, 1.6992 nats a place at the frontier over laps L14 to L17, each the mean of a lap's last 1,000 sections, with the
-loudness reading beside each lap from L15. The row of the second place before left (G-1118-17).
+**A lap's cycle** ([the record of the cycle](research/records/2026-11-24_A_LAPS_CARD_TIME_WAS_ITS_READS_THE_HELD_READ_RAN_ONE_FORWARD_FOUR_TIMES_A_ONE_SIDED_REGION_CONTINUES_BY_A_SITE_AND_A_READ_IS_SIZED_BY_THE_SCATTER_BETWEEN_LAPS.md);
+`tools/lap_cycle.py`). At W108 a lap held the card 90 minutes: 34 training and 56 reading, 32 of the 56 on rows that one held read
+already computed; a control with its arm took 4 h 02. The lead's next lap (W109) reads the collection's held set alone and leaves
+the rows no guess is scored on, about 26 minutes. What stands after it: rows P (13 minutes), the loudness read (5.5 minutes, held
+by the forward of rows P), and a section 3.1 times over the count of its arithmetic (684 ms against 223; 3.0 on November 21, the
+growth since being the declaration's). The writer replays its whole region at every place it writes; a one-sided region continues
+by a site, so a reply costs one forward of the finished region
+([`HNN/ContinuedRegion`](lean/HolonicsResearch/HNN/ContinuedRegion.lean)), and no command does that yet.
 
-**The carry circles** (§17 to §24; G-1118-23, G-1119-1 to G-1119-3). Grown by their own founding law (`grow-carry`, every face
-kept), each doubling's second-lap gain was 0.040 (two doublings), 0.020, 0.015 and then 0.004 at 1024, which left: the line holds 512.
-It ended its first pass over the store at lap L30 and is on its second (laps from L31, opened by `next-pass`): 1.4198 nats a place at
-the frontier at L36, her words 68% to 69% on the wide panel, she is sure at 0.667 of the settled places (a count of five at 0.921).
+**Guesses fixed and not yet read**, each in the receipts directory of its record (a guess's name is unique only with its directory):
+- the formal thread's: G-C1 to G-C3 (`receipts/2026-11-24_lap_cycle/GUESS.txt`); G-Q1, G-Q2, G-Q4, G-Q5
+  (`receipts/2026-11-23_question_reach/GUESS.txt`); G-H6, G-H7, G-H9, G-H11 to G-H14
+  (`receipts/2026-11-23_handed_cycle/GUESS.txt`); G-A1, G-A3 (`receipts/2026-11-23_answered_act/GUESS.txt`);
+- the lead's: G-H5 on the line's continuation W107 (`receipts/2026-11-24_collection/GUESS_H5.txt`, where H is the history's laps
+  and no kin of the handed cycle's G-H); the laps after it (W108 and its arm, W109) carry their own in the lead's next receipts.
 
-**Where her words are decided** (§21; the excess ruler's spread column). At the places a count of five settles her code is level with
-the count's (0.644 against 0.627) while her draws agree 0.737 against 0.909: the count is sure at 92% of them, she at 52.5%, and she
-hedges at a third. Her words (the wide panel: 20 prompts drawn eight times) follow that sure share, rising about half a point a lap
-(55% at L17 to 59% at D20); the circles add about two points of surety a doubling.
-
-**What a strand's state carries** (§15; `tools/strand_presence_ruler.py`, halves split by source). An open place holds the place
-before it at nine tenths as it opens, the second before at a half, the third at a fifth, the fourth at a tenth, and the ticks carry
-no farther place in.
-
-**The lines.**
-- The two-stream line (every place of a frontier stretch compared in one forward, six stretches of eight; main since #986): three
-  laps of 13 minutes fell 0.103, 0.054 and 0.028 at the frontier and stand 0.038 above the plain line's seventh lap, without the
-  level. A fourth lap is training.
-- The strand's odd contacts facing the past (`Region::past`, main since #986): two laps beside the control from the same state
-  read 0.013 and then 0.031 lower at the frontier (1.796, under the plain line's 1.804), 0.055 lower at the places of least news,
-  and 0.070 higher on the one-place reading under the law. By G-1118-15's rule the line takes the word; its pass over the store's
-  prefix ended and its next pass is training.
-- The level as a strand hears it (`Constitution::scale_forward_before`; the epoch before, through a block founded at zero): on the
-  host and on the card, bit for bit (30 cases). By §13 it is the carrier a level's own receipt needs and is not expected to move
-  the frontier without one; its arm beside the line is G-1118-16.
-
-**The pumped carry** (§29; G-1119-7, G-1119-8; atlas `contact.pumped-carry`; merged as #1047). Each circle's move turns, leaks and
-reflects, `Q = κb + γQm + η conj(Qm)`, the three sharing one leak (`pumpedCharge_le` in Lean), founded at zero with every face kept.
-On the dihedral separator the pumped carry held the running product at 0.996 at three times its trained length where the commuting
-carry read 0.357 on 16 circles. On text its first lap (P48, on a Colab A100 beside the line's L48 from the same state) lowered every
-frontier read, rows S by 0.0017 (±0.0004) nats a place and one place open by 0.0040, most where four to sixty places are known, with
-the writes' lexicon where it stood (70%); the pump's rows stood at a tenth of the turn rows. The line takes it from P49 and continues
-on the PC from lap L50.
-
-**The face's width** (G-1120-1, G-1120-2; #1050). A lane grows beside the pump's chart and the tower's one-sided block with every face
-kept. Each lane was read as a capacity price beside the line from the same states: the first (width 128 to 160) lowered rows S by
-0.0013, 0.0022 and 0.0062 over its three laps and cost the card 1.11 times a section; the second (160 to 192) by 0.0003, 0.0017 and
-0.0029 at 1.03 to 1.04 times; the third (192 to 224) by -0.0002 and 0.0019 over two laps at 1.05 times. The line takes all three
-(rows S 1.3372 at Y69, one place open 0.6793). One lap beside its control never moved her writes past the panel's scatter, but over the
-laps her composition rises with her codes: word pairs attested in the training text 0.229 at L20 to 0.345 at L66, triples 0.023 to
-0.101 (the references 0.490 and 0.249), with no fall along a write (§30).
-
-**Devices** (§27, §28). A float is a word with its locale in its exponent, and a lap's regions commute and join exactly, so a second
-device is a member of the flock: an A100 runs this realization 1.54 times slower than the PC's card on one section, gives the same
-bits (24 sections of L48, L60, L63 and L68 equal), and runs the arms beside the line. It costs about seven to eight compute units an
-hour, and a standard session was reclaimed about two and a half hours into a run twice (09:50 and 16:20 UTC November 20), its files with it:
-an arm on Colab downloads each lap's states as it lands (24 units stood at 16:50 UTC). Brandon (19:08 UTC November 20): no more Colab
-(the units run out and the reclaimed sessions destroy work); every run stays on his PC, the Ryzen 9 7900X and its RAM among the surfaces to
-use. He also asked that "lanes" (blocks of 32 coordinates of the face's width, `Declaration::lanes`) not stand in for the radix and graph
-width a register should be located at: the three lanes taken are a hand-chosen uniform widening, read by price, and stand as a stopgap.
-
-**What is owed, in order.** The face's width read further by price (a fourth lane), and the pump and the lanes read over laps; the
-composition ruler read each few laps beside the codes. A part judged by the sure share at the settled places (§21), which is what her words follow, as an
-arm beside the line. Rows at the residue the circles compose failed their premise read (§25), and rows at her own read's direction
-add nothing to her face (§26): where a count is sure on many counts she already is, and her shortfall stands at the rare five-place
-contexts, which more passes over the passage reach (§24: one pass took her surety there from 0.579 to 0.667). The circles' extent is
-spent (§24). The Codex
-thread's section-choice test on the host (G-1118-18). The composite's rows
-at located addresses (§13) as an arm. A writer that keeps the known stream's states.
+**What binds, each by its measurement.** No write keeps a dialogue's frame (the probe panel's counts above), which is what a direct
+exchange with her needs first. The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions
 
@@ -123,8 +117,13 @@ The layers this file held under the section above stand at
 November 18 (C9 of #603), because a position that keeps every position before it reads as five, and the oldest still had the line
 at lap 87 with ten laps queued. Each is a dated reading with its record:
 
+- **November 20, 23:05 UTC**: the line rests at lap 74 while the engineering list is worked, the card's section 3.7% shorter than at
+  noon twice over, with the line's own section (her writes against a count's, the carry circles' doublings, the pump, the face's
+  three added face lanes, the devices and the order of that day) held whole at
+  [`bd624935`](https://github.com/brandonrdug/holonics/blob/bd624935/CONSTRUCTION_STATE.md)
+  ([the receipts](research/records/receipts/2026-11-20_engineering/README.md)).
 - **November 20, 18:30 UTC**: the line's face is 224 wide with its circles pumped, on its fourth pass, and her composition rises with
-  her codes ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §30; held below as the line's own section).
+  her codes ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §30; its section stands in the text at `bd624935`).
 - **November 20, 14:15 UTC**: the line's face is 192 wide with its circles pumped, on its fourth pass, and her words stand at 70%
   ([the record](research/records/2026-11-18_EVERY_PLACE_OF_A_PASSAGE_IS_COMPARED_AT_ITS_FRONTIER_IN_ONE_FORWARD_ON_THE_CARD_A_ONE_SIDED_CONTEXT_RECOVERS_IN_A_LAP_AND_WHAT_IT_LACKS_IS_THE_LEVEL.md) §30).
 - **November 20, 00:45 UTC**: the line's 512 carry circles are pumped, on its third pass, and her words stand at 70%

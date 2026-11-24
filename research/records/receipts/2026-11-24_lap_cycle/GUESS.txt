@@ -1,0 +1,26 @@
+Guesses of the record of November 24 on a lap's cycle. Fixed 2026-11-24T18:08:02Z (date -u), before any read for them. They are the formal
+thread's, marked as guesses; whether a build or a read runs is the lead's. A miss is scored as a miss in one line.
+Forms read at their owners before fixing: athena::ruler::tension::write_next (each step rebuilds every row's region and runs read_faces
+on the whole of it), athena::ruler::cavity::read_cavity (rows P, W, F, K, S and C, each slice cut afresh by held_stretches),
+athena::ruler::loudness::read_loudness (rows P and W through read_tick_scales), holonics_engine_cuda::hnn::resident::Resident::run (a
+tick's charts gathered at the open sites and its face lanes' scales fetched, under separate cells), holonics_engine::region::Region (before,
+strand, past, second), the atlas rows tower.region-known-stream, tower.region-strand, tower.region-past, tower.region-second and
+tower.level-before, and the logs of the lap W108 (lap_cycle_W108.txt here).
+
+G-C1  (0.85) a forward that continues a region read by two streams by one site, keeping each tick's states of the sites that stand
+      (with the circles' scans and the moments' running rows), gives the open place's face the same bits as write-next's replay of the
+      whole region, at every place of the long panel (20 rows of 96 places) on the line's state.
+      Read: a place whose bits differ names a part of the built tick that is not one-sided in the theorem's sense (a count over the
+      region's whole extent, a batch's own cut, a normalization over later sites), and that part's atlas row is then wrong.
+
+G-C2  rows P with 32 regions a stretch (region r holds open the places t = r mod 32) against rows P as built (a region a place), on one
+      slice of 20,000 places, the saved means of W108 and W108d:
+      (a) (0.7) the difference W108d less W108, paired by place, agrees between the two forms within 0.003 nats a place (a slice's own
+          paired error);
+      (b) (0.6) one state's level differs between the two forms by under 0.01 nats a place.
+      Read: (a) held, rows P cost about a sixth of their sites and a line's series is bridged by both forms on one state; (a) missed,
+      an open place 32 away moves a place's reading by more than two states differ, and her reach on a two-sided read is longer than
+      the frontier's three places.
+
+G-C3  (0.9) one run of the forward with the charts' and the scales' cells both set returns, for rows P and W of the same slices,
+      loudness tables equal byte for byte to read-loudness's and faces equal to read-cavity's.

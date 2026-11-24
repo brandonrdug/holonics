@@ -120,10 +120,14 @@ pub struct Region<'a> {
     /// ([`Constitution::strand_pass`]): the region's sites, every one known, are the known stream (each hearing only what stands before
     /// it, as under [`Region::before`]), and at every place past the first an open place of a second stream reads what stands before it
     /// and is compared with the symbol there at weight one. Its faces are the open places', one a place (none at the first), so one
-    /// forward compares every place of the passage at its own frontier: the same bits, place for place, as the open last place of the
-    /// region that ends there read as a known stream. The level is not heard and the field reads it once, its return standing for both
-    /// reads where the field reads twice; the opening is compared as the retarded one. Refused where a site is open or carried, or the
-    /// region has a port.
+    /// forward compares every place of the passage at its own frontier: on a tower without the level's block of the epoch before, the
+    /// same bits, place for place, as the open last place of the region that ends there read as a known stream with its open place on
+    /// the bare clock. The law's own level is not heard; where the tower carries the block of the epoch before
+    /// (`Constitution::level_before`, atlas `tower.level-before`, built later on November 18) each place hears the epoch that ended
+    /// before its own began, which a known stream's region does not, so the two readings part there (0.13 nats a place on the line's
+    /// state W103, November 24; this note said "the level is not heard" until that day). The field reads it once, its return standing
+    /// for both reads where the field reads twice; the opening is compared as the retarded one. Refused where a site is open or
+    /// carried, or the region has a port.
     pub strand: bool,
     /// [definition; the lead, November 18, the record of the two streams §9; `agent-inferred`] **The strand's odd contacts face the past**:
     /// in a region read one-sided ([`Region::before`], [`Region::strand`]) an odd plain contact's mate is the second site before (the two

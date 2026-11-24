@@ -939,12 +939,15 @@ raises, 20 tool-timeout raises).
   and reads the card's process list (`nvidia-smi --query-compute-apps=pid --format=csv`) empty of other runs before it times
   anything. A line's laps take the lock too, so a timing hold waits for a lap's end instead of splitting it. Gates, parity,
   reproductions and readings take no lock and run beside whatever the card runs, a line's laps included; a run that shares the card
-  states it in its projection. A run beside a lap still needs the exponential's resident face (`8 · 2^digits` octets, 4 GiB on the
-  store line) under its own batch budget, so while a lap's budget leaves less than that, gates and readings run in the gap between
-  laps, under the lock. Reason: on November 15 every profile, gate and timing run queued behind the line's 35-minute laps and each
-  lap's reads stood between laps, about 8 minutes in every 43, while every sum of the engine gives the same bits on any schedule; on
-  November 16 a lap's pool held 10.7 GB of the 16 and the 4.6 GB left refused all three of gate 3's runs
-  (`research/records/receipts/2026-11-16_rel/README.md`). Scope: every script that launches on the card.
+  states it in its projection. A run beside a lap takes its batch budget at its open from what the lap's pool leaves under the
+  board's ceiling, less a margin (`Resident::open`), and a budget that leaves nothing refuses even the exponential's resident face
+  (`8 · 2^digits` octets, 512 KiB at the face's 16 digits), so while a lap's pool leaves less than a run's batches need, gates and
+  readings run in the gap between laps, under the lock. Reason: on November 15 every profile, gate and timing run queued behind
+  the line's 35-minute laps and each lap's reads stood between laps, about 8 minutes in every 43, while every sum of the engine
+  gives the same bits on any schedule; on November 16 a lap's pool held 10.7 GB of the 16 and the 4.6 GB left refused all three of
+  gate 3's runs
+  (`research/records/receipts/2026-11-16_rel/README.md`; until November 24 this clause read that refusal as a face of 4 GiB, where
+  the face is 512 KiB and the refusal was the budget's). Scope: every script that launches on the card.
 - **The orchestrator waits on notifications** (task notifications, a Monitor on the mailbox), never by sleeping.
 
 [project-postulate] **Lenses join the work without resetting it.** A lens from Brandon is derived,
