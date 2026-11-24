@@ -1164,9 +1164,12 @@ impl<'c> Resident<'c> {
                 }
                 let mut narrow = self.narrow_out.borrow_mut();
                 if narrow.len() == narrow_group + views.len() {
+                    // [the lead, November 23] None at a place read and not compared, as the host's `faces_at_class` reads it.
+                    let targets: Vec<Option<&[usize]>> = group.map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].targets).collect());
                     for (k, row) in narrow[narrow_group..].iter_mut().enumerate() {
                         let h = heard[k] as usize;
-                        *row = (0..h).map(|t| if t == 0 { None } else { row[h + t] }).collect();
+                        let compared = |t: usize| targets.get(k).copied().flatten().is_none_or(|tg| tg[t] != UNCOMPARED);
+                        *row = (0..h).map(|t| if t == 0 || !compared(t) { None } else { row[h + t] }).collect();
                     }
                 }
                 let mut opening = self.opening_out.borrow_mut();
@@ -1861,12 +1864,12 @@ impl<'c> Resident<'c> {
                 if self.opening_wanted.get() {
                     let picked = self.timed(Kind::Alloc, || self.take::<u64>(sites.max(1))).map_err(device)?;
                     let mut cw = *words;
-                    cw.unresolved = op.mask.device_ptr();
+                    cw.unresolved = op.compare.device_ptr();
                     let (mut mp, mut pp) = (op.masses.device_ptr(), picked.device_ptr());
                     self.launch("field_face_at_class", Self::cells(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut mp), arg(&mut pp)])?;
                     let picked = self.timed(Kind::Copy, || card.fetch_range(&picked, 0, sites)).map_err(device)?;
                     let totals = self.timed(Kind::Copy, || card.fetch_range(&op.totals, 0, sites)).map_err(device)?;
-                    let mask = self.timed(Kind::Copy, || card.fetch_range(&op.mask, 0, sites)).map_err(device)?;
+                    let mask = self.timed(Kind::Copy, || card.fetch_range(&op.compare, 0, sites)).map_err(device)?;
                     let mut out = self.opening_out.borrow_mut();
                     for r in 0..regions.len() {
                         let span = region_off[r] as usize..region_off[r + 1] as usize;
