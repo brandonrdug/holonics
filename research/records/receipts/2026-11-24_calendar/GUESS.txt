@@ -1,0 +1,52 @@
+Guesses of the record of November 24 on context as a calendar. Fixed 2026-11-24T19:37:11Z (date -u), before any read for them. (A first
+fixing at 19:35:35Z put G-T3 (d) on P1 = 8 and 16; the line's declaration, read from W109's training log a minute later, has a reach of
+3,771, so its turned heads stand on 2, 4, 16, 32, 128, 256, 1,024, 4,096 and on 3, 9, 27, 81, 243, 729, 2,187, 6,561, and no ring on
+8. The panel's lengths and (d) were set again on that form; no state had been read.) They are the formal thread's, marked as guesses; whether a read or a build runs is the lead's. A miss is scored as a miss in one line. A guess name is
+unique only with this directory.
+Forms read at their owners before fixing: holonics_engine::navigator (ring_periods: the dyadic and the triadic tower to the reach;
+skin_decay and skin_of: e^(-2 pi |s|/n), one e-fold a radian of turn, for every ring), holonics_engine::contact::NEAR (the near field,
+under six sites), holonics_engine::declaration::Declaration (the
+depth rings, the carry circles: |gamma| = 1/(1 + d), founded at d = 1/4, a group of five places, the friction on the leak's log chart
+located by deposition), athena::store::read_pace (the rates of the digits, the space, four signs, the line feed and a, e, t, a paced
+head a line, with PACE_RINGS and PACE_HEAD), athena::ruler::tension::write_next (the forms table, RUN, forms.written), the atlas rows
+tower.field-pace, contact.carried-product-group-size, parametron.carry-bank-group-ceiling, wave.fade-per-turn-is-the-quality,
+store.finite-quality and tower.level-before, the record of November 23 on the handed cycle (sections 13, 19, 20 and 22: the word before
+by letter, the moments ring by ring, the fade as a state and G-H9) and the record of November 21 on a still head (a copy reads the
+record above; the line's held copy code 0.095 nats).
+
+Already fixed and unread, and not fixed again here: G-H9 of receipts/2026-11-23_handed_cycle (a ring's fade held as a state of that ring,
+founded at the skin's present value; its (a), the word before at a word's third letter at 0.10 or more, reweighed there from 0.55 to
+0.15; its (b), the long rings' fades leave the one value, at 0.8; its (c), every held register within 0.003 nats a place, at 0.7).
+
+G-T1  read-pace on the line's newest saved mean.
+      (a) (0.65) on at least one paced head the line feed's rate stands at 3 or more times the mean of the rates of a, e and t;
+      (b) (0.5, a coin) on at least one paced head the space's rate stands at 1.5 or more times that mean.
+      Read: held, her located clock ticks by her own units, a separator a longer duration than a letter, so a word is nearer a turn
+      than its bytes are; missed, her towers' phases count bytes with frictions on them, and a unit of hers is cut by the level's
+      news alone.
+
+G-T2  on G-H9's arm, after its laps (an arm nobody has built):
+      (0.55) on each paced head the located e-fold of its longest ring, in radians of that ring's own turn, stands at twice or more
+      that of its shortest ring: the quality a ring takes grows with its period.
+      Read: held, the towers' long hands ring through more of their own turn than the short ones, the order a calendar has (a year is
+      kept through more of its turn than a second is); missed, the fades move together or the short rings ring longest, and the
+      quality a ring takes is set by something other than its period (its clock's scatter a step is the first suspect).
+
+G-T3  the period panel: tools/period_panel.py make with its default seed (256 rows, sha256 5927eeee4cf125455309199558a15661c5a9a3cf8de63271a512986537528db3), written by write-next at RUN 96
+      on the line's newest saved mean, read by tools/period_panel.py read. Drawn rows show the timing alone; bare rows repeat a line,
+      so their letters carry the period too.
+      (a) (0.7) no period past the near field is kept by timing alone: at each of P1 = 10, 15 and 16 the drawn rows' meter1 is under
+          0.3 in at least three of the four cells;
+      (b) (0.7) no period of periods is kept by timing alone: the drawn rows' meter2 is under 0.3 in every cell of P2 of 16 or more
+          where a break is called;
+      (c) (0.5, a coin) a period inside the near field is kept by timing alone: at each of P1 = 3, 4 and 5 the drawn rows' meter1 is
+          0.5 or more in at least three of the four cells;
+      (d) (0.6) at the skin's constant a period one of her rings stands on is kept no better than its neighbours off them: the drawn
+          rows' mean meter1 over the cells of P1 = 9 and 16 stands within 0.15 of their mean over P1 = 10 and 15;
+      (e) (0.6) what she keeps of a period past the near field she keeps by its letters: over the cells of P1 of 7 or more the bare
+          rows' mean meter1 stands 0.2 or more over the drawn rows'.
+      Read: (a) and (b) held with (e), her stores hold what was said, and where to its octave, and no count of it, and a period
+      stands only where its letters carry it (a still head's copy). (a) missed, a store of hers counts past the near field; the carry
+      circles' leaks by site name which. (d) missed, a ring's own period is heard through the skin, and the skin's constant is not
+      where the first build stands. The panel reads a carry inside one region on a form no lap asked of her: a null here is no
+      statement that she does not take a period under a lap that asks for one (a learner's null is held to a length).

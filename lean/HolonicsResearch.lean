@@ -1491,3 +1491,4 @@ import HolonicsResearch.HNN.AnsweredAct
 import HolonicsResearch.HNN.HandedCycle
 import HolonicsResearch.HNN.ReachAndCapacity
 import HolonicsResearch.HNN.ContinuedRegion
+import HolonicsResearch.HNN.ComparedClock
