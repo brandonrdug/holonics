@@ -4594,6 +4594,69 @@ fn a_strand_compared_with_its_targets_reads_its_known_stream_and_returns_against
     assert!(field.read_and_return(&[r]).is_err(), "targets on a region not read by two streams are refused");
 }
 
+/// [definition; the lead, November 24] **The level's own lane** ([`Scale::lane`], [`Learner::level_laned`]): the founded learner's text
+/// keeps the word; every entry the lane holds is zero and the lane's rows of the prolongation are drawn; in a passage read by two streams
+/// the prolongation writes the lane alone (the state before the split and after it differ only in the lane's coordinates); and sections
+/// leave every held entry at zero while the lane's readers open and then the lane's rows of the prolongation move.
+#[test]
+fn the_levels_own_lane_is_written_by_the_prolongation_alone_and_a_section_keeps_it_so() {
+    for (still, past) in [(1usize, false), (2, true)] {
+        let field = towered_before_live(still);
+        let stream = keys(1 << 18);
+        let learner = Learner::new(field, 12);
+        let laned = learner.level_laned(&stream).unwrap();
+        let f = &laned.field;
+        assert!(f.scale.as_deref().unwrap().lane, "still {still}: the level owns its lane");
+        assert_eq!(Constitution::from_text(&f.to_text()).unwrap(), *f, "still {still}: the text keeps the lane");
+        let held = f.level_lane_held().unwrap().unwrap();
+        let material: Vec<i32> = f.material().copied().collect();
+        assert!(held.iter().all(|&i| material[i] == 0), "still {still}: every held entry founded at zero");
+        let (dw, w) = (f.declaration.width, f.declaration.lane_width());
+        let sc = f.scale.as_deref().unwrap();
+        let (b2, _, _) = sc.before_offsets(dw).unwrap();
+        let glue = f.theta.len() + sc.coarse.theta.len();
+        let d1 = sc.coarse.declaration.width;
+        let lane_rows: Vec<i32> = (dw - w..dw).flat_map(|c| (0..d1).map(move |j| (c, j))).map(|(c, j)| material[glue + b2 + c * d1 + j]).collect();
+        assert!(lane_rows.iter().any(|&v| v != 0), "still {still}: the lane's rows of the prolongation are drawn");
+        // The prolongation writes the lane alone: the state the split's tick reads differs from the tick before's only in the lane.
+        let a = f.declaration.alphabet;
+        let classes = drawn_classes(0xC7, 13, a);
+        let pass = f.strand_pass(&classes, true, past).unwrap();
+        let split = sc.split;
+        let (before, at) = (&pass.ticks[split - 1].after, &pass.ticks[split].before);
+        let mut moved_in_lane = false;
+        for (t, (xb, xa)) in before.chunks_exact(dw).zip(at.chunks_exact(dw)).enumerate() {
+            for c in 0..dw {
+                if c < dw - w {
+                    assert_eq!(xb[c], xa[c], "still {still}: site {t} coordinate {c} outside the lane is written by the level");
+                } else {
+                    moved_in_lane |= xb[c] != xa[c];
+                }
+            }
+        }
+        assert!(moved_in_lane, "still {still}: the level writes its lane");
+        // A section keeps the held entries at zero and moves the lane's rows.
+        let mut trained = laned.clone();
+        let known = vec![false; classes.len()];
+        let region = Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None };
+        trained.section(&[region]).unwrap();
+        let after: Vec<i32> = trained.field.material().copied().collect();
+        assert!(held.iter().all(|&i| after[i] == 0), "still {still}: a section keeps every held entry at zero");
+        // The lane's readers open first (their columns at zero read a drawn lane), and the prolongation's rows once they read it.
+        let read = f.layout.read;
+        let opened = (0..dw).flat_map(|o| (dw - w..dw).map(move |i| read + o * dw + i)).filter(|&i| after[i] != material[i]).count();
+        assert!(opened > 0, "still {still}: the readout's columns of the lane open in a section");
+        let lane_block = |m: &[i32]| -> Vec<i32> { (dw - w..dw).flat_map(|c| (0..d1).map(move |j| glue + b2 + c * d1 + j)).map(|i| m[i]).collect() };
+        let mut again = trained.clone();
+        for _ in 0..3 {
+            again.section(&[region]).unwrap();
+        }
+        let later: Vec<i32> = again.field.material().copied().collect();
+        assert!(held.iter().all(|&i| later[i] == 0), "still {still}: sections keep every held entry at zero");
+        assert_ne!(lane_block(&later), lane_block(&material), "still {still}: the lane's rows of the prolongation move once the lane is read");
+    }
+}
+
 /// [definition; the lead, November 23, an act answered in kind] **A place read and not compared** ([`UNCOMPARED`]): its faces are
 /// the strand's own, a strand whose every target is uncompared returns nothing and counts in no code, the section's scored pairs and
 /// spans leave the uncompared places out, and a place's being left out moves the covector where a comparison at it would; a target

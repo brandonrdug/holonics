@@ -800,6 +800,23 @@ impl Learner {
         }
     }
 
+    /// [definition; the lead, November 24] **The learner with its lattice folded back into its material**: every entry its whole word (read
+    /// part and rest summed), no lattice set, every other line kept, so a growth that refuses a lattice can found its parts and the lattice
+    /// be founded again after it ([`Learner::with_lattice_from`]). Refused where a whole word passes the material's 32-bit carrier.
+    pub fn unlatticed(&self) -> Result<Self> {
+        let mut out = self.clone();
+        if self.lattice.is_none() {
+            return Ok(out);
+        }
+        let whole = self.whole_material();
+        for (slot, &v) in out.field.material_mut().zip(&whole) {
+            *slot = i32::try_from(v).map_err(|_| TowerError::Refused("a whole word past the material's 32-bit carrier"))?;
+        }
+        out.lattice = None;
+        out.last = None;
+        Ok(out)
+    }
+
     /// [definition; the lead, November 22, the second precision pass (G-R5)] **The learner whose forward reads each family's read part on a
     /// lattice one place under its own spread** ([`Lattice`]), the spread read from this state as a save's end and `mean`'s whole words as the
     /// mean of the states before it: every entry split into its read part and its rest, so the whole word is this state's and every face
@@ -961,7 +978,14 @@ impl Learner {
             (compared(&faces, regions)?, g, next, codes)
         };
         let opening: Vec<(i64, usize)> = codes.iter().map(|c| (c.iter().flatten().sum(), c.iter().flatten().count())).collect();
-        let g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
+        let mut g = g.ok_or(TowerError::Refused("a section's opening read returned no covector"))?;
+        // [definition; the lead, November 24] The level's own lane holds its other writers and the prolongation's other rows at zero: their
+        // covector is none ([`Constitution::level_lane_held`]).
+        if let Some(held) = self.field.level_lane_held()? {
+            for i in held {
+                g[i] = 0;
+            }
+        }
         let spans = spans_of(regions);
         let code_before = code_of(&faces_old, &spans);
         if faces_old.pairs.is_empty() && !faces_old.ported {

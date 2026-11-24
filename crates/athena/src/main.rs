@@ -374,6 +374,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("read-cavity") => athena::ruler::cavity::read_cavity(args, realization),
         Some("read-loudness") => athena::ruler::loudness::read_loudness(args, realization),
         Some("found-lane") => athena::store::found_lane(args),
+        Some("found-level-lane") => athena::store::found_level_lane(args),
         Some("found-loud") => athena::store::found_loud(args),
         Some("found-pump") => athena::store::found_pump(args),
         Some("found-friction") => athena::store::found_friction(args),
