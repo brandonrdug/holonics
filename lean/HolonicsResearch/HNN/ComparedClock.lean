@@ -2,6 +2,7 @@ import Mathlib.Algebra.BigOperators.Group.Finset.Basic
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Algebra.Order.Floor.Semiring
 import Mathlib.Analysis.SpecialFunctions.Exp
+import Mathlib.Analysis.SpecialFunctions.Log.Basic
 import Mathlib.Analysis.Real.Pi.Bounds
 import Mathlib.Analysis.Complex.ExponentialBounds
 import Mathlib.Logic.Function.Iterate
@@ -43,6 +44,11 @@ section; no statement here reads those values.
 7. **Local ticks draw a cone** (`Local.comp`, `Local.iterate`, `outside_cone_moves_nothing`): a tick
    that reads a site's neighbours within `r` gives, after `k` ticks, a state fixed by the sites
    within `k r`; nothing outside that cone moves it.
+8. **A rate held with no count costs its binary entropy** (`rateCode`, `log_lt_rateCode`,
+   `rateCode_lt_one_add_log`): a reader that holds how often a cycle ticks, once in `P` places, and
+   not where in its period it stands, pays `log P` at each tick and `log (P/(P − 1))` at each other
+   place, between `log P` and `1 + log P` a period. A reader that holds the count pays nothing once
+   the period stands, so this is what a count is worth on a kept period.
 
 Not proved here: the general relation between a resonance's quality and the fineness of a
 comparison it can hold (the line width; from the literature), and Kelvin's and Helmholtz's theorems
@@ -55,7 +61,7 @@ a level); faces and placement, the cell holonomy and the tube stay attached.
 
 Consumers: the atlas rows `aeon.count-survives-every-retiming`, `aeon.one-fade-reads-no-gap`,
 `aeon.count-asks-for-quality`, `aeon.uncompared-clock-errs-by-the-count`,
-`tower.local-ticks-draw-a-cone` and #410.
+`aeon.rate-without-count-costs-its-entropy`, `tower.local-ticks-draw-a-cone` and #410.
 
 No `sorry`, no `axiom`, no `native_decide`.
 -/
@@ -165,6 +171,42 @@ theorem dead_reckoning_attained (κ : ℕ → ℝ) (ε : ℝ) (n : ℕ) :
     ∑ k ∈ range n, (κ k + ε) - ∑ k ∈ range n, κ k = n * ε := by
   rw [Finset.sum_add_distrib]
   simp
+
+/-- The code, in nats, that one period of `P` places with one tick costs a reader that holds the
+tick's rate `1/P` and no place in the period: `log P` at the tick and `log (P/(P − 1))` at each of
+the other `P − 1` places, `P` times the binary entropy of `1/P`. -/
+noncomputable def rateCode (P : ℝ) : ℝ :=
+  Real.log P + (P - 1) * Real.log (P / (P - 1))
+
+/-- **A rate held with no count costs more than `log P` a period**: the tick's own code, and
+something at every other place. A reader that holds the count pays nothing. -/
+theorem log_lt_rateCode {P : ℝ} (hP : 1 < P) : Real.log P < rateCode P := by
+  have h2 : 0 < P - 1 := by linarith
+  have h3 : 1 < P / (P - 1) := by
+    rw [lt_div_iff₀ h2]
+    linarith
+  have h4 : 0 < Real.log (P / (P - 1)) := Real.log_pos h3
+  have h5 : 0 < (P - 1) * Real.log (P / (P - 1)) := mul_pos h2 h4
+  unfold rateCode
+  linarith
+
+/-- **And less than `1 + log P`**: the places between two ticks cost under one nat together,
+whatever the period. -/
+theorem rateCode_lt_one_add_log {P : ℝ} (hP : 1 < P) : rateCode P < 1 + Real.log P := by
+  have h2 : 0 < P - 1 := by linarith
+  have h3 : 0 < P / (P - 1) := div_pos (by linarith) h2
+  have hne : P / (P - 1) ≠ 1 := by
+    intro h
+    rw [div_eq_one_iff_eq h2.ne'] at h
+    linarith
+  have h5 : Real.log (P / (P - 1)) < P / (P - 1) - 1 := Real.log_lt_sub_one_of_pos h3 hne
+  have h6 : (P - 1) * (P / (P - 1) - 1) = 1 := by
+    field_simp
+    ring
+  have h7 : (P - 1) * Real.log (P / (P - 1)) < (P - 1) * (P / (P - 1) - 1) :=
+    mul_lt_mul_of_pos_left h5 h2
+  unfold rateCode
+  linarith
 
 /-- A tick is local with reach `r`: the state it gives site `t` is fixed by the states of the sites
 within `r` of `t`. -/
