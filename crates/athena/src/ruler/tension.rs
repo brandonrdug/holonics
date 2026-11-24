@@ -596,6 +596,27 @@ fn keyed_bit(key: &str) -> u64 {
     x ^ (x >> 31)
 }
 
+/// The key stream's word at `counter` from `seed` (the splitmix finalizer), the writer's and her acts' draws.
+pub(crate) fn key_mix(seed: u64, counter: u64) -> u64 {
+    let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
+    z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
+    z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
+    z ^ (z >> 31)
+}
+
+/// [definition; the lead, November 21, drawn out on November 24 for her acts' drafts] **A keyed draw from a face at its own temperature**:
+/// a uniform under the letters' mass (`letters`, the void left out unless `stop`) from two draws of the key stream `mix` at the row `k` and
+/// the step, and the class whose cumulative mass passes it. The writer's draw (`write_next`) and her acts' (`store::write_strand`).
+pub(crate) fn keyed_draw(f: &holonics_engine::field::TowerFace, void: usize, stop: bool, letters: u128, mix: &dyn Fn(u64) -> u64, k: usize, step: usize) -> Option<usize> {
+    // A keyed uniform under the letters' mass: two draws make its 128 bits.
+    let u = ((u128::from(mix(((k as u64) << 24) ^ step as u64)) << 64) | u128::from(mix(((k as u64) << 24) ^ step as u64 ^ (1 << 60)))) % letters;
+    let mut acc = 0u128;
+    (0..f.masses.len()).filter(|&c| stop || c != void).find(|&c| {
+        acc += f.masses[c];
+        acc > u
+    })
+}
+
 /// [measurement; the lead, November 17, the night's text run] `write-next UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA FORMS FORMS_SHA RUN
 /// OUT STATE STATE_SHA [WINDOW]`: **a write of one place a read, each place the last of its region**: after each prompt `RUN` places are
 /// written one at a time, the place written being the single open site of a region that ends there (the prompt and what was written
@@ -646,12 +667,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     }
     std::fs::create_dir(out)?;
     let void = codec.void();
-    let mix = |counter: u64| -> u64 {
-        let mut z = seed.wrapping_add(counter.wrapping_mul(0x9E37_79B9_7F4A_7C15));
-        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-        z ^ (z >> 31)
-    };
+    let mix = |counter: u64| -> u64 { key_mix(seed, counter) };
     let known = learner.pass.as_ref().is_some_and(|p| p.before);
     // [the lead, November 18] A state whose pass reads its frontier by two streams ([`holonics_engine::field::StorePass::strand`]) is
     // written by them: the region is the known places and one more site holding the void (heard by no one: a known site hears only what
@@ -701,14 +717,7 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
             // `Σ p·code(p)` on `2^(−20)` bits (each class's code by the face's own law, its mass on `2^(−40)` of the total), beside the draw.
             let spread: i128 = (0..f.masses.len()).filter(|&c| f.masses[c] > 0).map(|c| (i128::try_from((f.masses[c] << 20) / f.total.max(1)).unwrap_or(0) * i128::from(f.code(c))) >> 20).sum();
             spreads[k].push(spread);
-            // A keyed uniform under the letters' mass: two draws make its 128 bits.
-            let u = ((u128::from(mix(((k as u64) << 24) ^ step as u64)) << 64) | u128::from(mix(((k as u64) << 24) ^ step as u64 ^ (1 << 60)))) % letters;
-            let mut acc = 0u128;
-            let class = (0..f.masses.len()).filter(|&c| stop || c != void).find(|&c| {
-                acc += f.masses[c];
-                acc > u
-            });
-            let class = class.ok_or("a draw past the letters' mass")?;
+            let class = keyed_draw(f, void, stop, letters, &mix, k, step).ok_or("a draw past the letters' mass")?;
             if class == void {
                 stopped[k] = Some(step);
                 continue;

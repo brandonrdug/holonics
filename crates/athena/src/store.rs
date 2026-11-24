@@ -49,6 +49,40 @@ fn acts_here(seed: u64, d: u64, every: u64) -> bool {
     (z ^ (z >> 31)) % every == 0
 }
 
+/// [definition; the lead, November 24, an act answered in kind] **Her writer's draft of each prompt's next `run` places**, as `write-next`
+/// writes on a line read by two streams: at each step every prompt with what it has written and one more site holding the void is read as a
+/// passage by two streams, the open place at that last site is read (it hears every known place), and a letter is drawn from its face at the
+/// field's own temperature by a keyed uniform under the letters' mass (the void is not drawn). One read of the field a place, all prompts
+/// together. Returns each prompt's written places.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn write_strand(field: &holonics_engine::field::Constitution, prompts: &[&[usize]], run: usize, void: usize, seed: u64, past: bool, second: bool, realization: &mut dyn Realization) -> Result<Vec<Vec<usize>>> {
+    let mix = |counter: u64| -> u64 { crate::ruler::tension::key_mix(seed, counter) };
+    let mut written: Vec<Vec<usize>> = vec![Vec::new(); prompts.len()];
+    for step in 0..run {
+        let regions: Vec<OwnedRegion> = prompts
+            .iter()
+            .zip(&written)
+            .map(|(p, w)| {
+                let mut classes: Vec<usize> = p.iter().chain(w.iter()).copied().collect();
+                classes.push(void);
+                let n = classes.len();
+                OwnedRegion { strand: true, past, second, ..OwnedRegion::plain(classes, vec![false; n]) }
+            })
+            .collect();
+        let views = views_of(&regions);
+        let faces = realization.read_faces(field, &views).map_err(|e| e.to_string())?;
+        for (k, (face, w)) in faces.iter().zip(written.iter_mut()).enumerate() {
+            let f = face.last().and_then(|f| f.as_ref()).ok_or("a written place that carries no face")?;
+            let letters = f.total - f.masses[void];
+            if letters == 0 {
+                return Err("a face with no mass on a letter".into());
+            }
+            w.push(crate::ruler::tension::keyed_draw(f, void, false, letters, &mix, k, step).ok_or("a draw past the letters' mass")?);
+        }
+    }
+    Ok(written)
+}
+
 /// [definition; theory, November 16 20:39Z] A draft's own places, the ones its refine redraws: its expression before its first `= `, or the
 /// places before its first line feed, or every place it wrote. The `= `, the predicted value and what follows stay written.
 fn draft_places(draft: &[u8]) -> usize {
@@ -452,7 +486,19 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             // `refine` times (the release's runs, no bound on a run); otherwise the writer's sweeps draw one place a read.
             let joint = w.records == 0 && w.refine > 0;
             let (sweeps, passes, bound) = if joint { (1, w.refine as usize, i128::MAX) } else { (run, 0, 0) };
-            let mut drafts = learner.field.sample_runs(&release, sweeps, passes, codec.void(), act_seed, bound, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?;
+            // [definition; the lead, November 24, an act answered in kind] The terrain's acts are drafted by her own writer, read by two streams
+            // place after place as `write-next` writes (`write_strand`): the release below reads its open places from both sides, a regime she
+            // neither trains in nor writes with, and on W102a's lap the world could read 0.7% of the drafts it drew.
+            let mut drafts = if w.slice == TERRAIN_WORLD {
+                let prompts: Vec<&[usize]> = acts.iter().map(|(p, _, _)| p.as_slice()).collect();
+                let mut written = write_strand(&learner.field, &prompts, run, codec.void(), act_seed, cut.pass.past, cut.pass.second, realization)?;
+                for d in &mut written {
+                    d.push(codec.void());
+                }
+                written
+            } else {
+                learner.field.sample_runs(&release, sweeps, passes, codec.void(), act_seed, bound, true, false, None, false, realization, &mut |_, _| true, &mut |_| {}).map_err(|e| e.to_string())?
+            };
             if w.refine > 0 && !joint {
                 // [definition; theory, November 16 20:39Z] Each draft redrawn once, place by place in landmark order, its predicted reaction known.
                 let lens: Vec<usize> = drafts.iter().map(|d| draft_places(&codec.decode(&d[..d.iter().position(|&c| c == codec.void()).unwrap_or(d.len())]))).collect();

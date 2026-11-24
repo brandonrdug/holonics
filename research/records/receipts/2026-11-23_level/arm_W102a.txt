@@ -1,0 +1,28 @@
+W102A_PARITY test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 31 filtered out; finished in 4.01s
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+W102A_GATE EQUAL 01:00:41
+W102A_ACT_PARITY STORE_PARITY_DONE calls=75 unequal=3 unequal_sites=1458 unequal_entries=0 first=read_and_return_opening_call_1:_region_429_site_13_card_Some((205028268082493,_40060220911818233895))_host_None DIFFERS STORE_WORLD n=2 acts=35 read=3 draft_places=636 world_places=95 first=504 world_code=2409841 
+W102A_START 01:05:24
+W102A_ACT_PARITY STORE_PARITY_DONE calls=75 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL STORE_WORLD n=2 acts=35 read=3 draft_places=636 world_places=95 first=504 world_code=2409841 
+W102A_DEV act_ms=1158 plain_ms=749 sections=30 STORE_WORLD n=29 acts=31 read=0 draft_places=496 world_places=75 first=516 world_code=1504854 
+W102A_PROJECTION 57 minutes, deadline 5116 s
+TERRAIN_TRAINED W102a 02:07:15 sections=3000 ended=false
+W102A_WORLD_CODE first_thousand=1551881 last_thousand=1493344 ratio=0.962 (millionths of a bit a place)
+TERRAIN_REACH W102a 02:09:03 ANSWER copy n= 2655 0.187|ANSWER reverse n= 2667 0.192|ANSWER sum n= 1579 0.997|
+TERRAIN_HOSTPANEL W102a panel_logic.tsv 02:10:43 NEXT_WRITE_DONE rows=168 run=32 window=- ms=208267 
+TERRAIN_HOSTPANEL W102a panel_terrain.tsv 02:11:38 NEXT_WRITE_DONE rows=96 run=32 window=- ms=262528 
+TERRAIN_READ_DONE mean_W102a 02:19:03 CAVITY_DONE ms=707884  rows_S=99844
+TERRAIN_PANEL W102a_mean 02:19:34 seen: words 44 in_lexicon 33 (75%) longest_copy 15 held: words 62 in_lexicon 47 (75%) longest_copy 14 unread: words 61 in_lexicon 45 (73%) longest_copy 17  || LONG W102a_mean: all words 261 in lexicon 177 (67%) writes that loop 4 of 20 longest run shared with its prompt 56 | code 46/50 (92%) web 25/41 (60%) science 28/47 (59%) books 49/67 (73%) wikidata 29/56 (51%)
+TERRAIN_LOUD W102a 02:25:25  lines=71
+TERRAIN_WIDE W102a 02:26:29 LONG W102a: all words 2143 in lexicon 1530 (71%) writes that loop 23 of 160 longest run shared with its prompt 63 | code 360/410 (87%) web 330/435 (75%) science 253/412 (61%) books 375/482 (77%) wikidata 212/404 (52%)
+W102A_LAP_TRAVEL W102a material: |d|=1.171e+08,1.171e+08,1.117e+08 cos01=+0.142 cos12=+0.105 persistence=1.063 | level: |d|=1.874e+07,2.122e+07,1.914e+07 cos01=+0.255 cos12=+0.346 persistence=1.210 | third: |d|=5.53e+07,5.576e+07,5.346e+07 cos01=+0.187 cos12=+0.198 persistence=1.114
+W102A_FRONTIER FRONTIER W102a; one place open: all 0.6058 (140564 places) | books 0.6834 code 0.4033 logic 0.4059 science 0.5694 theory 0.5164 web 0.7500 wikidata 0.9100 || less the control's, paired: +0.0015 (±0.0003) | books -0.0006 code +0.0009 logic +0.0014 science +0.0010 theory +0.0035 web +0.0007 wikidata +0.0033|FRONTIER W102a; the frontier: all 1.8236 (139706 places) | books 1.8170 code 1.5733 logic 1.7194 science 1.7733 theory 1.7842 web 2.0591 wikidata 2.0385 || less the control's, paired: +0.0009 (±0.0004) | books +0.0024 code +0.0012 logic +0.0010 science +0.0033 theory +0.0028 web +0.0057 wikidata -0.0099|
+W102A_WORD_PRESENCE st_W102a word_starts=19351 read=224 tick=3 byte_2=0.601 prev_first=0.272 prev_word=0.224 prev2_word=0.023 target=0.038 planted=0.000 prev_len=0.366 | three or more words into a line (18520): line_words=0.180
+TERRAIN_SCORE W102 whole 54/96 opening 58/96 first 72/96 | sum 8/8/9 of 16 difference 7/7/7 of 16 product 5/5/8 of 16 close 8/12/16 of 16 copy 14/14/16 of 16 reverse 12/12/16 of 16
+TERRAIN_SCORE W102a whole 49/96 opening 52/96 first 70/96 | sum 8/8/10 of 16 difference 6/6/8 of 16 product 3/3/5 of 16 close 10/13/16 of 16 copy 11/11/15 of 16 reverse 11/11/16 of 16
+W102A_ALL_DONE 02:47:41

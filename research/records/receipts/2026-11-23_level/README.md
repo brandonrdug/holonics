@@ -22,3 +22,9 @@
 - `word_presence_W101r_GH5.txt`: the word before at the current word's letters 1 to 6 on W101r's mean (the formal thread's G-H8).
 - `uncompared_parity.txt`: the card's parity of the place read and not compared, on the field and with the opening compared.
 - `GUESS_A3.txt`: the guess of the answered act's arm (G-A3 adopted from the formal thread, G-A4 the lead's).
+- `arm_W102a.txt`, `arm_W102b.txt`: the two arms' run lines (the card's tests, gate 3 on `e5a4`, the act path's parity, the development
+  read, the lap and its reads); `world_by_thousand.txt` the world's lines of both laps by thousand sections.
+- `frontier_W102a.txt`, `frontier_W102b.txt`: the held registers of each arm against W102, one place open and at the frontier.
+- `theory_panel_W102.written`, `theory_panel_W102a.written`, `theory_panel_W102b.written`: the theory and logic panels at each mean.
+- `act_writer_W102.written`, `act_writer_W102a.written`: her writer's 24 places after one record of each kind (`write-next` on the host).
+- `GUESS_A5.txt`: the guess of the second arm, her acts drafted by her own writer.
