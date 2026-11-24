@@ -4594,6 +4594,50 @@ fn a_strand_compared_with_its_targets_reads_its_known_stream_and_returns_against
     assert!(field.read_and_return(&[r]).is_err(), "targets on a region not read by two streams are refused");
 }
 
+/// [definition; the lead, November 23, an act answered in kind] **A place read and not compared** ([`UNCOMPARED`]): its faces are
+/// the strand's own, a strand whose every target is uncompared returns nothing and counts in no code, the section's scored pairs and
+/// spans leave the uncompared places out, and a place's being left out moves the covector where a comparison at it would; a target
+/// outside the alphabet is refused.
+#[test]
+fn a_strand_place_read_and_not_compared_takes_no_covector_and_counts_in_no_code() {
+    // (a field that compares its opening, so the opening's comparison leaves the places out too)
+    let plain = Constitution::found(four_contacts(1), &keys(1 << 14)).unwrap();
+    let (grown, _) = plain.with_carry(2, &keys(plain.declaration.carry_draws(2))).unwrap();
+    let field = drawn(grown.with_opening().unwrap().0);
+    assert!(field.declaration.opening);
+    let a = field.declaration.alphabet;
+    let sites = 9;
+    let classes = drawn_classes(0xB4, sites, a);
+    let known = vec![false; sites];
+    let none = vec![UNCOMPARED; sites];
+    let some: Vec<usize> = classes.iter().enumerate().map(|(t, &c)| if t % 3 == 1 { UNCOMPARED } else { c }).collect();
+    fn strand<'a>(classes: &'a [usize], known: &'a [bool], with: Option<&'a [usize]>) -> Region<'a> {
+        Region { classes, unresolved: known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: false, second: false, targets: with }
+    }
+    let (plain_faces, plain_g) = field.read_and_return(&[strand(&classes, &known, None)]).unwrap();
+    let (none_faces, none_g) = field.read_and_return(&[strand(&classes, &known, Some(&none))]).unwrap();
+    let (some_faces, some_g) = field.read_and_return(&[strand(&classes, &known, Some(&some))]).unwrap();
+    assert_eq!(plain_faces, none_faces, "an uncompared place moves no face");
+    assert_eq!(plain_faces, some_faces, "uncompared places move no face");
+    assert!(none_g.iter().all(|&v| v == 0), "a strand with every place uncompared returns nothing");
+    assert_ne!(some_g, plain_g, "leaving places out moves the comparison");
+    assert!(some_g.iter().any(|&v| v != 0), "the compared places still return");
+    let regions = [strand(&classes, &known, Some(&some))];
+    let compared_some = crate::learner::compared(&plain_faces, &regions).unwrap();
+    let compared_plain = crate::learner::compared(&plain_faces, &[strand(&classes, &known, None)]).unwrap();
+    let left_out = (1..sites).filter(|t| t % 3 == 1).count();
+    assert_eq!(compared_plain.pairs.len() - compared_some.pairs.len(), left_out, "the uncompared places count in no code");
+    assert_eq!(crate::learner::spans_of(&regions)[0].0, sites - 1 - left_out, "a strand's span is its compared places");
+    let at_class = faces_at_class(&plain_faces, &regions);
+    assert_eq!(crate::learner::compared_at_class(&at_class, &regions).unwrap().pairs, compared_some.pairs, "the faces read at their targets give the same pairs");
+    let none_codes = field.opening_codes(&strand(&classes, &known, Some(&none))).unwrap();
+    assert!(none_codes.iter().all(Option::is_none), "an uncompared place has no opening code");
+    let some_codes = field.opening_codes(&strand(&classes, &known, Some(&some))).unwrap();
+    assert_eq!(some_codes.iter().flatten().count(), (0..sites).filter(|t| t % 3 != 1).count(), "the opening is coded at the compared places alone");
+    let wide = vec![a; sites];
+    assert!(field.read_and_return(&[strand(&classes, &known, Some(&wide))]).is_err(), "a target outside the alphabet is refused");
+}
+
 /// [definition; the lead, November 18, the frontier record §6] **The strand's covector matches its code's difference, and the sum of its
 /// frontier regions' covectors.** The code is the passage's in place order, `Σ_(t≥1) −log₂ p̂_t(u_t)` over the open places of
 /// [`Constitution::strand_pass`]; [`Constitution::strand_returned`] is its reverse. Family by family at its largest entries the covector

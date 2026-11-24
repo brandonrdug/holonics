@@ -137,3 +137,6 @@ words before the last; that is the next loop's subject, read against the records
   passage's symbols, never with her draft.
 - **A run past its projection.** The arm ran 1.31 times the projection's section; the development read's 30 sections did not hold its
   mix of acts. The lap ended in its deadline once repaired.
+- **A defect found after the arms** (the record of the evening, §8). In a passage read by two streams the retarded opening is compared
+  with the known stream at every place, so on W98p and W99p her drafted places' openings were compared with her own draft as well as
+  their faces with the passage. Part of those arms' cost may be that second comparison; it is not read apart here.

@@ -59,7 +59,8 @@ pub(crate) struct Compared {
 
 /// [realization; theory, November 13, P58 item 3] Each region's faces read at their classes, `(m_c, T)` where a site carries a face.
 pub fn faces_at_class(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Vec<Vec<Option<(u128, u128)>>> {
-    faces.iter().zip(regions).map(|(f, r)| f.iter().zip(r.classes).map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))).collect()).collect()
+    // [the lead, November 23] A passage read by two streams is read at its targets ([`Region::targets`]), none at a place not compared.
+    faces.iter().zip(regions).map(|(f, r)| f.iter().zip(r.targets.unwrap_or(r.classes)).map(|(face, &c)| face.as_ref().filter(|_| c != UNCOMPARED).map(|face| (face.masses[c], face.total))).collect()).collect()
 }
 
 /// [`compared`] from the faces read at their classes ([`faces_at_class`]), where no region has a port: the same pairs.
@@ -67,14 +68,16 @@ pub(crate) fn compared_at_class(at_class: &[Vec<Option<(u128, u128)>>], regions:
     if at_class.len() != regions.len() || regions.iter().any(|r| r.port.is_some()) {
         return refuse("faces at their classes are compared one row a region, with no port");
     }
-    Ok(Compared { pairs: at_class.iter().zip(regions).flat_map(|(f, r)| f.iter().take(r.classes.len()).filter_map(|p| *p)).collect(), coupled: 0, ported: false })
+    // A place read and not compared ([`UNCOMPARED`]) counts in no code.
+    let compared_at = |r: &Region, t: usize| r.targets.is_none_or(|tg| tg[t] != UNCOMPARED);
+    Ok(Compared { pairs: at_class.iter().zip(regions).flat_map(|(f, r)| f.iter().take(r.classes.len()).enumerate().filter(move |&(t, _)| compared_at(r, t)).filter_map(|(_, p)| *p)).collect(), coupled: 0, ported: false })
 }
 
 pub(crate) fn compared(faces: &[Vec<Option<TowerFace>>], regions: &[Region]) -> Result<Compared> {
     let mut out = Compared { pairs: Vec::new(), coupled: 0, ported: false };
     for (f, r) in faces.iter().zip(regions) {
         let end = r.port.map_or(r.classes.len(), |p| p.start);
-        out.pairs.extend(f.iter().zip(r.targets.unwrap_or(r.classes)).take(end).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
+        out.pairs.extend(f.iter().zip(r.targets.unwrap_or(r.classes)).take(end).filter(|(_, c)| **c != UNCOMPARED).filter_map(|(face, &c)| face.as_ref().map(|face| (face.masses[c], face.total))));
         if let Some(port) = r.port {
             out.coupled += port_code(f, &port)?;
             out.ported = true;
@@ -92,7 +95,8 @@ pub(crate) fn spans_of(regions: &[Region]) -> Vec<(usize, u64, u64)> {
         .iter()
         .map(|r| {
             if r.strand {
-                let places = r.classes.len().saturating_sub(1);
+                // [the lead, November 23] Its places past the first that are compared ([`UNCOMPARED`]).
+                let places = (1..r.classes.len()).filter(|&t| r.targets.is_none_or(|tg| tg[t] != UNCOMPARED)).count();
                 return (places, places as u64, places as u64);
             }
             let (m, k) = r.weight();
@@ -590,6 +594,11 @@ impl PassTerrain {
     }
 }
 
+/// [definition; the lead, November 23, an act answered in kind] **The terrain's world**: a world whose slice is this name answers her acts
+/// on the terrain's records ([`PassTerrain`]) in place of a slice's stretches (`athena`'s `set-world ... terrain EVERY RECORDS RUN`); no
+/// slice of a store bears it. Its records count is one or more: it is a world of records, never a draft world.
+pub const TERRAIN_WORLD: &str = "terrain";
+
 /// [definition; agent-inferred, November 16, the theory thread's Build B of 18:58 UTC, the friction record §3 and §5] **A world joined at the
 /// pass's boundary**: a receiver outside the machine that answers the field's own act. One stretch in `every` of the slice `slice` (keyed by
 /// the stretch's count) becomes an act: its last `records` whole lines are the prompt, the field releases `run` places after them (its
@@ -705,7 +714,7 @@ impl StorePass {
             None => None,
         };
         if let Some(w) = &world {
-            if w.every == 0 || w.run == 0 || (w.records > 0 && w.refine > 1) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !slices.iter().any(|s| s.name == w.slice) {
+            if w.every == 0 || w.run == 0 || (w.records > 0 && w.refine > 1) || world_words.is_some_and(|ww| ww.len() == 5 && w.refine == 0) || !(slices.iter().any(|s| s.name == w.slice) || (w.slice == TERRAIN_WORLD && w.records > 0)) {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }

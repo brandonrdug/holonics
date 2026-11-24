@@ -16,7 +16,7 @@ use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, C
 #[allow(unused_imports)]
 use holonics_engine::field::{level_cut, level_section, PACE_BITS};
 #[allow(unused_imports)]
-use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS};
+use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS, UNCOMPARED};
 #[allow(unused_imports)]
 use crate::cuda::{Dim3, Module};
 #[allow(unused_imports)]
@@ -582,6 +582,11 @@ pub struct Resident<'c> {
     pub(crate) strand_heard: std::cell::RefCell<Vec<u32>>,
     /// The same counts over every region of the run being made (`Resident::run`'s group of strands), from which each batch takes its own.
     pub(crate) strand_run: std::cell::RefCell<Vec<u32>>,
+    /// [the lead, November 23, an act answered in kind] The batch being staged: each strand's open places read and not compared
+    /// (`holonics_engine::field::UNCOMPARED`), weight zero in the reverse; empty where none is. Set by the run for the batch it stages.
+    pub(crate) strand_skip: std::cell::RefCell<Vec<Vec<bool>>>,
+    /// The same over every region of the run being made, from which each batch takes its own.
+    pub(crate) strand_skip_run: std::cell::RefCell<Vec<Vec<bool>>>,
     /// [the record of the two streams §15] Whether the group a run reads takes the row of the second site before (`Region::second`): the
     /// second bit of the known stream's word (`FieldWords::before`), set by [`Resident::run`] for the run of that group.
     pub(crate) second_run: std::cell::Cell<bool>,
@@ -600,7 +605,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_skip: Default::default(), strand_skip_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1101,7 +1106,8 @@ impl<'c> Resident<'c> {
                     if at.is_empty() {
                         continue;
                     }
-                    let staged = if strand { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].targets.unwrap_or(regions[r].classes)).copied().collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() } else { Vec::new() };
+                    // [the lead, November 23] A place read and not compared stages a class of the alphabet and takes weight zero (`strand_skip`).
+                    let staged = if strand { at.iter().map(|&r| (regions[r].classes.iter().chain(regions[r].targets.unwrap_or(regions[r].classes)).map(|&c| if c == UNCOMPARED { 0 } else { c }).collect(), (0..2 * regions[r].classes.len()).map(|t| t >= regions[r].classes.len()).collect())).collect() } else { Vec::new() };
                     groups.push(Group { at, strand, past, second, staged });
                 }
             }
@@ -1138,10 +1144,15 @@ impl<'c> Resident<'c> {
             let (narrow_group, opening_group) = (self.narrow_out.borrow().len(), self.opening_out.borrow().len());
             if two {
                 *self.strand_run.borrow_mut() = heard.clone();
+                let skips: Vec<Vec<bool>> = group.map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].targets.map_or(Vec::new(), |t| t.iter().map(|&c| c == UNCOMPARED).collect())).collect());
+                if skips.iter().any(|s| s.iter().any(|&b| b)) {
+                    *self.strand_skip_run.borrow_mut() = skips;
+                }
             }
             self.second_run.set(group.is_some_and(|gr| gr.second));
             let ran = self.run_one(f, &views, returning, false, None);
             self.strand_run.borrow_mut().clear();
+            self.strand_skip_run.borrow_mut().clear();
             self.second_run.set(false);
             let (mut gf, _, gg, gr, ge) = ran?;
             if two {
@@ -1324,6 +1335,10 @@ impl<'c> Resident<'c> {
             }
             self.times.batches += 1;
             *self.strand_heard.borrow_mut() = if strands.is_empty() { Vec::new() } else { strands[batch.clone()].to_vec() };
+            *self.strand_skip.borrow_mut() = {
+                let all = self.strand_skip_run.borrow();
+                if all.len() == regions.len() { all[batch.clone()].to_vec() } else { Vec::new() }
+            };
             self.mark("run_setup");
             // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Constitution::pass`): the batch's
             // first read is the built read with no readings, and leaves each silent site's shares of its face on the card (`field_mark_shares`);
@@ -1348,6 +1363,7 @@ impl<'c> Resident<'c> {
             };
             drop(base);
             self.strand_heard.borrow_mut().clear();
+            self.strand_skip.borrow_mut().clear();
             self.strand_cavity.borrow_mut().take();
             self.mark("batch_drop_and_collect");
             faces.extend(f);
@@ -1517,10 +1533,16 @@ impl<'c> Resident<'c> {
         let (mut dlist, mut dstart, mut olist, mut ostart) = (Vec::<u32>::new(), Vec::<u32>::with_capacity(regions.len() + 1), Vec::<u32>::new(), Vec::<u32>::with_capacity(regions.len() + 1));
         // Each site's region's weight in the joint code (§16.23, `Region::weight`), for the reverse.
         let mut site_weight: Vec<(u64, u64)> = Vec::with_capacity(sites);
+        // [the lead, November 23] An open place read and not compared (`Resident::strand_skip`) takes weight zero, as the first place does.
+        let skip: Vec<Vec<bool>> = {
+            let k = self.strand_skip.borrow();
+            if k.len() == regions.len() { k.clone() } else { Vec::new() }
+        };
         for (r, (region, l)) in regions.iter().zip(parts).enumerate() {
             let s = region.classes.len();
             let weight = region.weight();
-            site_weight.extend((0..s).map(|t| if heard.get(r).is_some_and(|&n| t == n as usize) { (0, 1) } else { weight }));
+            let skipped = |t: usize| heard.get(r).is_some_and(|&n| t >= n as usize && skip.get(r).and_then(|k| k.get(t - n as usize)).copied().unwrap_or(false));
+            site_weight.extend((0..s).map(|t| if heard.get(r).is_some_and(|&n| t == n as usize) || skipped(t) { (0, 1) } else { weight }));
             region_eoff.push(pairs as u64);
             pairs += s * s;
             region_soff.push(skin_entries as u64);

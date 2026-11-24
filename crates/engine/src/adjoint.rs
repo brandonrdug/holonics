@@ -758,8 +758,10 @@ impl Constitution {
         let l = &self.layout;
         let reaches = self.reaches();
         let known = vec![false; n];
-        // (the known stream's region: sided, so the opening's comparison below is the retarded one)
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second, targets: None };
+        // (the known stream's region: sided, so the opening's comparison below is the retarded one; it leaves out the places read and not
+        // compared, [`UNCOMPARED`])
+        let skipped = targets.contains(&UNCOMPARED).then_some(targets);
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second, targets: skipped };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();
@@ -771,7 +773,9 @@ impl Constitution {
             let reads: Vec<BlankRead> = (1..n).map(|t| self.face_of(&pass.last[(n + t) * dw..(n + t + 1) * dw], &reaches)).collect::<Result<_>>()?;
             let mut ys: Vec<Vec<i64>> = Vec::with_capacity(reads.len());
             for (t, read) in (1..n).zip(&reads) {
-                let dz = covector(&read.face, targets[t]);
+                // A place read and not compared ([`UNCOMPARED`]) takes no covector: its face's covector is zero, so every term it adds is
+                // (its row of the readout's outer sum stands beside the others', as the card's weight zero leaves it).
+                let dz = if targets[t] == UNCOMPARED { vec![0i64; read.face.masses.len()] } else { covector(&read.face, targets[t]) };
                 for (o, &dzo) in dz.iter().enumerate() {
                     g[l.read_bias + o] += dzo as i128;
                 }

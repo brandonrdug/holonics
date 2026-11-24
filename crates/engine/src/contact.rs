@@ -1028,6 +1028,9 @@ impl Constitution {
             if region.targets.is_some_and(|t| t.len() != region.classes.len()) {
                 return refuse("a passage read by two streams whose targets are not one a site");
             }
+            if region.targets.is_some_and(|t| t.iter().any(|&c| c != UNCOMPARED && c >= self.declaration.alphabet)) {
+                return refuse("a target outside the alphabet");
+            }
             self.admit_region(region)?;
             let mut strand = self.strand_pass_with(region.classes, keep, self.past(region), self.second(region))?;
             let faces: Vec<Option<TowerFace>> = std::mem::take(&mut strand.faces).into_iter().enumerate().map(|(t, f)| (t > 0).then_some(f)).collect();
@@ -1380,6 +1383,91 @@ impl Constitution {
         let known = chart(&pass.last[..n * dw])?;
         let open = pass.ticks.iter().map(|cell| chart(&cell.after[n * dw..])).collect::<Result<_>>()?;
         Ok((known, open))
+    }
+
+    /// [measurement; the lead, November 23, the level's receipt record §5] **A strand's level cut, for a ruler on the host**: the known
+    /// stream's anchors, the epoch each of the `2n` sites reads (the known sites, then the open places; `None` where a site reads none),
+    /// and at each site the squared length of the row the prolongation added and of the state it was added to (on the state's grain,
+    /// summed over the site's `D` coordinates: the state after tick `split − 1` and the difference of the state before tick `split`
+    /// from it), as [`Constitution::strand_pass`] formed them ([`crate::field::scale::strand_level_cut`]). `None` on a field whose level
+    /// does not hear a strand. Which epoch an open place at a word's first letter is handed, and how large the handed row stands beside
+    /// the state it joins, are read from these outside the machine. A reading: the state is the same with it.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_cut_read(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(u128, u128)>)>> {
+        let Some(split) = self.scale.as_deref().map(|s| s.split) else { return Ok(None) };
+        let pass = self.strand_pass(classes, true, past)?;
+        let Some(t) = pass.tower.as_ref() else { return Ok(None) };
+        let (anchors, source) = t.strand_cut();
+        let dw = self.declaration.width;
+        let (Some(at), Some(before)) = (pass.ticks.get(split), split.checked_sub(1).and_then(|k| pass.ticks.get(k))) else {
+            return refuse("a level whose split stands outside the ticks");
+        };
+        let square = |v: &mut dyn Iterator<Item = i128>| v.map(|x| (x * x) as u128).sum::<u128>();
+        let powers = at
+            .before
+            .chunks_exact(dw)
+            .zip(before.after.chunks_exact(dw))
+            .map(|(a, b)| (square(&mut a.iter().zip(b).map(|(&a, &b)| i128::from(a) - i128::from(b))), square(&mut b.iter().map(|&b| i128::from(b)))))
+            .collect();
+        Ok(Some((anchors.to_vec(), source.to_vec(), powers)))
+    }
+
+    /// [measurement; the lead, November 23, the level's receipt record §5; the formal thread's §19 item 4] **A strand's open places'
+    /// moments, ring by ring, for a ruler on the host**: each open place's retarded cavity moment `[n][2M]` on `2^(−16)` (real parts then
+    /// imaginary, as [`Constitution::strand_pass`] hands them to every tick), and each of the `M` modes' ring period (zero on a head that
+    /// carries no moment). What each ring holds of the places before an open place, by the ring's period, is read from these outside the
+    /// machine: the read that tells whether the skin's one fade a radian is where the word before is let go. A reading: the state is the
+    /// same with it.
+    pub fn strand_open_moments(&self, classes: &[usize]) -> Result<(Vec<i64>, Vec<usize>)> {
+        let d = &self.declaration;
+        let n = classes.len();
+        let known = vec![false; n];
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
+        self.admit_region(&region)?;
+        let paces = self.paces(&region)?;
+        let (_, open_moment) = self.cavity_forward_sided(&region, &paces, false, false)?;
+        let mut periods = vec![0usize; d.complex()];
+        for h in (0..d.heads).filter(|&h| d.carries_moment(h) && !d.is_depth(h)) {
+            for li in 0..d.modes {
+                periods[h * d.modes + li] = self.rings[self.slot(h, li)].0;
+            }
+        }
+        Ok((open_moment, periods))
+    }
+
+    /// [measurement; the lead, November 23, the level's receipt record §5] **A strand's level link by link, for a ruler on the host**:
+    /// each epoch's restricted state before the level's ticks (`[j][D₁]` on the state's grain), its read after the last tick (`[j][D₁]`
+    /// on `2^(−16)`), at each open place the row the prolongation added and the state it made (`[n][D₀]` each, lane charts on
+    /// `2^(−16)`), as [`Constitution::strand_pass`] formed them, and the covector the reverse holds at that state (`[n][D₀]` on the
+    /// covector's grain `2^(−24)`, the passage compared with itself), the level's locus. With [`Constitution::strand_reads`]'s reads after every tick, the share
+    /// of a quantity present at each link is read outside the machine, and the first link where it slips is where a law enters. `None`
+    /// on a field whose level does not hear a strand. A reading: the state is the same with it.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_level_links(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<i64>, Vec<i32>, Vec<i32>, Vec<i32>, Vec<i64>)>> {
+        let Some(split) = self.scale.as_deref().map(|s| s.split) else { return Ok(None) };
+        let pass = self.strand_pass(classes, true, past)?;
+        // The covector each tick's reverse receives, in tick order: at tick `split − 1` it is the covector of the state the prolongation
+        // made (the open places take no restriction's term), the level's locus.
+        let mut g = vec![0i128; self.material_len()];
+        let mut lambda: Vec<Vec<i64>> = Vec::new();
+        self.strand_returned_with(classes, classes, &pass, &mut g, Some(&mut lambda))?;
+        lambda.reverse();
+        let Some(t) = pass.tower.as_ref() else { return Ok(None) };
+        let (restricted, coarse) = t.level_links();
+        let (dw, n) = (self.declaration.width, classes.len());
+        let (Some(at), Some(before)) = (pass.ticks.get(split), split.checked_sub(1).and_then(|k| pass.ticks.get(k))) else {
+            return refuse("a level whose split stands outside the ticks");
+        };
+        let (mut row_read, mut joined_read, mut scale) = (Vec::with_capacity(n * dw), Vec::with_capacity(n * dw), Vec::new());
+        for t in n..2 * n {
+            let (a, b) = (&at.before[t * dw..(t + 1) * dw], &before.after[t * dw..(t + 1) * dw]);
+            let row: Vec<i64> = a.iter().zip(b).map(|(&a, &b)| fit64(i128::from(a) - i128::from(b))).collect::<Result<_>>()?;
+            lane_chart(&row, self.declaration.lanes, &mut row_read, &mut scale)?;
+            lane_chart(a, self.declaration.lanes, &mut joined_read, &mut scale)?;
+        }
+        let dwn = self.declaration.width;
+        let at_locus = lambda.get(split - 1).ok_or(TowerError::Refused("a level whose split stands outside the ticks"))?[n * dwn..2 * n * dwn].to_vec();
+        Ok(Some((restricted.to_vec(), coarse.to_vec(), row_read, joined_read, at_locus)))
     }
 
     /// [measurement; the lead, November 22, the second precision pass's G-R4] **Each lane's power in a strand's states, for a ruler on the

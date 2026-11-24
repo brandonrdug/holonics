@@ -1519,3 +1519,136 @@ pub fn read_level(args: &[String]) -> Result<()> {
     println!("LEVEL_DONE regions={} links={links} threads={} ms={}", work.len(), rayon::current_num_threads(), started.elapsed().as_millis());
     Ok(())
 }
+
+/// [measurement; the lead, November 23, the level's receipt record §5] `read-strand-cut ... OUT moments`: each open place's retarded
+/// cavity moment `[n][2M]` (`OUT/moments.i64`, rows in the table's order) and each mode's ring period (`OUT/periods.tsv`), with `OUT/dims.tsv`
+/// naming `M` ([`holonics_engine::field::Constitution::strand_open_moments`]). The moments are the known stream's alone, so `past` does not
+/// enter. On the host's threads; the state is read, never written. The directory is private.
+fn read_strand_moments(args: &[String]) -> Result<()> {
+    let started = std::time::Instant::now();
+    refuse_variables("read-strand-cut")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[11]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<Vec<usize>> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [_, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(unescape(known).as_bytes())?;
+        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        rows.push(classes);
+    }
+    let field = &learner.field;
+    let read: Vec<(Vec<i64>, Vec<usize>)> = rows.par_iter().map(|classes| field.strand_open_moments(classes).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+    std::fs::create_dir_all(out)?;
+    let bytes: Vec<u8> = read.iter().flat_map(|(m, _)| m.iter().flat_map(|v| v.to_le_bytes())).collect();
+    write_new(&out.join("moments.i64"), &bytes)?;
+    let periods = read.first().map(|(_, p)| p.clone()).unwrap_or_default();
+    write_new(&out.join("periods.tsv"), periods.iter().map(|p| format!("{p}\n")).collect::<String>().as_bytes())?;
+    write_new(&out.join("dims.tsv"), format!("modes\t{}\n", periods.len()).as_bytes())?;
+    println!("STRAND_MOMENTS rows={} places={} modes={} ms={}", rows.len(), rows.iter().map(Vec::len).sum::<usize>(), periods.len(), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [measurement; the lead, November 23, the level's receipt record §5] `read-strand-cut UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS
+/// ROWS_SHA STATE STATE_SHA OUT [past] [links]`: **which epoch each place of a strand reads, written out for a ruler**. Each row of `ROWS`
+/// (`read-far`'s table, as [`read_strand_states`] reads it) is read whole as a passage by two streams; `OUT/cut.tsv` takes a line a row:
+/// its index, its places, the known stream's anchors, and the epoch each open place reads (`-` where it reads none), comma-separated;
+/// `OUT/powers.tsv` a line a site (`row`, `site` of the `2n`, the squared length of the row the level added there, of the state it was
+/// added to; [`holonics_engine::field::Constitution::strand_cut_read`]). With `links`, the level link by link
+/// ([`holonics_engine::field::Constitution::strand_level_links`]): `OUT/restricted.i64` and `OUT/coarse.i32` each epoch's restricted state
+/// before the level's ticks and its read after them (`D₁` an epoch, epochs in the cut's order), `OUT/row.i32` and `OUT/joined.i32` each
+/// open place's added row and the state it made (`D₀` a place, lane charts on `2^(−16)`), `OUT/lambda.i64` the covector the reverse
+/// holds at that state (`D₀` a place on `2^(−24)`), and `OUT/dims.tsv` names `D₀` and `D₁`. On the host's threads; the state is read, never written. The directory
+/// is private: its rows are the passage's places.
+pub fn read_strand_cut(args: &[String]) -> Result<()> {
+    let words: Vec<&str> = args.iter().skip(12).map(String::as_str).collect();
+    let (past, links) = match words[..] {
+        [] => (false, false),
+        ["past"] => (true, false),
+        ["links"] => (false, true),
+        ["past", "links"] => (true, true),
+        ["moments"] => {
+            return read_strand_moments(args);
+        }
+        _ => return Err("read-strand-cut UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past] [links]".into()),
+    };
+    if args.len() < 12 {
+        return Err("read-strand-cut UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT [past] [links]".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-strand-cut")?;
+    let units = units_of(&args[1], &args[2])?;
+    let _keys = pinned_read(&args[3], &args[4], READ_BUDGET as usize)?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[7], &args[8], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[9], &args[10], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let out = Path::new(&args[11]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let unescape = |t: &str| t.replace("\\n", "\n");
+    let mut rows: Vec<Vec<usize>> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [_, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(unescape(known).as_bytes())?;
+        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        if classes.len() < 2 {
+            return Err("a row of fewer than two places".into());
+        }
+        rows.push(classes);
+    }
+    let field = &learner.field;
+    #[allow(clippy::type_complexity)]
+    let cuts: Vec<(Vec<usize>, Vec<Option<usize>>, Vec<(u128, u128)>)> = rows
+        .par_iter()
+        .map(|classes| field.strand_cut_read(classes, past).map_err(|e| e.to_string()).and_then(|c| c.ok_or_else(|| "a field whose level does not hear a strand".to_string())))
+        .collect::<std::result::Result<_, _>>()?;
+    std::fs::create_dir_all(out)?;
+    let list = |v: &mut dyn Iterator<Item = String>| v.collect::<Vec<_>>().join(",");
+    let (mut lines, mut powers) = (String::new(), String::new());
+    for (r, (classes, (anchors, source, p))) in rows.iter().zip(&cuts).enumerate() {
+        let n = classes.len();
+        lines.push_str(&format!("{r}\t{n}\t{}\t{}\n", list(&mut anchors.iter().map(usize::to_string)), list(&mut source[n..].iter().map(|s| s.map_or("-".to_string(), |j| j.to_string())))));
+        for (site, (row, state)) in p.iter().enumerate() {
+            powers.push_str(&format!("{r}\t{site}\t{row}\t{state}\n"));
+        }
+    }
+    write_new(&out.join("cut.tsv"), lines.as_bytes())?;
+    write_new(&out.join("powers.tsv"), powers.as_bytes())?;
+    if links {
+        // [the lead, November 23] Each epoch's restricted state and its read after the level's ticks, and each open place's row and the
+        // state it made, row after row in the table's order.
+        #[allow(clippy::type_complexity)]
+        let traced: Vec<(Vec<i64>, Vec<i32>, Vec<i32>, Vec<i32>, Vec<i64>)> = rows
+            .par_iter()
+            .map(|classes| field.strand_level_links(classes, past).map_err(|e| e.to_string()).and_then(|c| c.ok_or_else(|| "a field whose level does not hear a strand".to_string())))
+            .collect::<std::result::Result<_, _>>()?;
+        let mut files: Vec<Vec<u8>> = vec![Vec::new(); 5];
+        for (restricted, coarse, row, joined, locus) in &traced {
+            files[4].extend(locus.iter().flat_map(|v| v.to_le_bytes()));
+            files[0].extend(restricted.iter().flat_map(|v| v.to_le_bytes()));
+            files[1].extend(coarse.iter().flat_map(|v| v.to_le_bytes()));
+            files[2].extend(row.iter().flat_map(|v| v.to_le_bytes()));
+            files[3].extend(joined.iter().flat_map(|v| v.to_le_bytes()));
+        }
+        for (name, bytes) in ["restricted.i64", "coarse.i32", "row.i32", "joined.i32", "lambda.i64"].iter().zip(&files) {
+            write_new(&out.join(name), bytes)?;
+        }
+        let coarse_width = field.scale.as_deref().map_or(0, |s| s.coarse.declaration.width);
+        write_new(&out.join("dims.tsv"), format!("read\t{}\ncoarse\t{coarse_width}\n", field.declaration.width).as_bytes())?;
+    }
+    println!("STRAND_CUT rows={} places={} past={past} ms={}", rows.len(), rows.iter().map(Vec::len).sum::<usize>(), started.elapsed().as_millis());
+    Ok(())
+}

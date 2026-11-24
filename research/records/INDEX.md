@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,754 records from July 2026 to November 2026. 403 receipts directories: 225 beside the records and 178 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,755 records from July 2026 to November 2026. 403 receipts directories: 225 beside the records and 178 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 153 | 119 |
+| [November 2026](#november-2026) | 154 | 119 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -26,6 +26,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-23 [Play is an act answered in kind an unanswered act teaches its reader to discount it a receiver is budgeted by its ports every medium propagates and fades by its quality and a rhythm is a period carried](2026-11-23_PLAY_IS_AN_ACT_ANSWERED_IN_KIND_AN_UNANSWERED_ACT_TEACHES_ITS_READER_TO_DISCOUNT_IT_A_RECEIVER_IS_BUDGETED_BY_ITS_PORTS_EVERY_MEDIUM_PROPAGATES_AND_FADES_BY_ITS_QUALITY_AND_A_RHYTHM_IS_A_PERIOD_CARRIED.md)
 - 2026-11-23 [Play is her own draft compared with the passage one lap at a three hundredth of the places moves neither her drafts nor her writes and a draft costs a read a place](2026-11-23_PLAY_IS_HER_OWN_DRAFT_COMPARED_WITH_THE_PASSAGE_ONE_LAP_AT_A_THREE_HUNDREDTH_OF_THE_PLACES_MOVES_NEITHER_HER_DRAFTS_NOR_HER_WRITES_AND_A_DRAFT_COSTS_A_READ_A_PLACE.md)
 - 2026-11-23 [The levels receipt at every place asks the word before for a law it does not hold and its pull runs through the shared fine field so it costs every register](2026-11-23_THE_LEVELS_RECEIPT_AT_EVERY_PLACE_ASKS_THE_WORD_BEFORE_FOR_A_LAW_IT_DOES_NOT_HOLD_AND_ITS_PULL_RUNS_THROUGH_THE_SHARED_FINE_FIELD_SO_IT_COSTS_EVERY_REGISTER.md)
+- 2026-11-23 [The level hands an epoch inside her own reach its row drowns where it joins her state the fine comparison asks it for nothing and her act is answered in kind](2026-11-23_THE_LEVEL_HANDS_AN_EPOCH_INSIDE_HER_OWN_REACH_ITS_ROW_DROWNS_WHERE_IT_JOINS_HER_STATE_THE_FINE_COMPARISON_ASKS_IT_FOR_NOTHING_AND_HER_ACT_IS_ANSWERED_IN_KIND.md)
 - 2026-11-22 [At the top digit both operands and the carry arrive and their sum is not formed a crossing triad reads on two streams and drawn legs do not take it in a lap](2026-11-22_AT_THE_TOP_DIGIT_BOTH_OPERANDS_AND_THE_CARRY_ARRIVE_AND_THEIR_SUM_IS_NOT_FORMED_A_CROSSING_TRIAD_READS_ON_TWO_STREAMS_AND_DRAWN_LEGS_DO_NOT_TAKE_IT_IN_A_LAP.md)
 - 2026-11-22 [A familys lattice is read from its own spread at every save the spread is no function of the second moment a lanes power sets its scale but not its price and a pass ends with its text](2026-11-22_A_FAMILYS_LATTICE_IS_READ_FROM_ITS_OWN_SPREAD_AT_EVERY_SAVE_THE_SPREAD_IS_NO_FUNCTION_OF_THE_SECOND_MOMENT_A_LANES_POWER_SETS_ITS_SCALE_BUT_NOT_ITS_PRICE_AND_A_PASS_ENDS_WITH_ITS_TEXT.md)
 - 2026-11-22 [A helix carries two signs and its hand is their product a ring alone has none the mirror carries order comparison and storage and a chain composes where its contacts meet opposite hands](2026-11-22_A_HELIX_CARRIES_TWO_SIGNS_AND_ITS_HAND_IS_THEIR_PRODUCT_A_RING_ALONE_HAS_NONE_THE_MIRROR_CARRIES_ORDER_COMPARISON_AND_STORAGE_AND_A_CHAIN_COMPOSES_WHERE_ITS_CONTACTS_MEET_OPPOSITE_HANDS.md)

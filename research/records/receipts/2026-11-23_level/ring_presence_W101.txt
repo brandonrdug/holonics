@@ -1,0 +1,15 @@
+STRAND_MOMENTS rows=407 places=125404 modes=32 ms=1823
+RING_PRESENCE period=9 reach=1.4 letter_1=0.019 letter_2=0.000 letter_3=0.000 letter_4=-0.000 letter_5=-0.000 letter_6=0.000 prev2_at_start=0.000 planted=-0.000
+RING_PRESENCE period=16 reach=2.5 letter_1=0.018 letter_2=0.000 letter_3=0.000 letter_4=0.002 letter_5=0.001 letter_6=0.000 prev2_at_start=0.001 planted=0.000
+RING_PRESENCE period=27 reach=4.3 letter_1=0.037 letter_2=0.001 letter_3=0.001 letter_4=0.002 letter_5=0.004 letter_6=0.001 prev2_at_start=0.002 planted=0.000
+RING_PRESENCE period=32 reach=5.1 letter_1=0.007 letter_2=0.000 letter_3=0.000 letter_4=0.003 letter_5=0.002 letter_6=0.001 prev2_at_start=0.001 planted=-0.000
+RING_PRESENCE period=81 reach=12.9 letter_1=0.012 letter_2=0.003 letter_3=0.002 letter_4=0.002 letter_5=0.003 letter_6=0.002 prev2_at_start=0.001 planted=0.000
+RING_PRESENCE period=128 reach=20.4 letter_1=0.006 letter_2=0.005 letter_3=0.006 letter_4=0.005 letter_5=0.004 letter_6=0.003 prev2_at_start=0.001 planted=-0.000
+RING_PRESENCE period=243 reach=38.7 letter_1=0.002 letter_2=0.001 letter_3=0.001 letter_4=0.002 letter_5=0.001 letter_6=0.001 prev2_at_start=0.000 planted=-0.000
+RING_PRESENCE period=256 reach=40.7 letter_1=0.001 letter_2=0.001 letter_3=0.001 letter_4=0.001 letter_5=0.001 letter_6=0.001 prev2_at_start=0.000 planted=-0.000
+RING_PRESENCE period=729 reach=116.0 letter_1=0.001 letter_2=0.001 letter_3=0.001 letter_4=0.001 letter_5=0.001 letter_6=0.001 prev2_at_start=0.000 planted=-0.000
+RING_PRESENCE period=1024 reach=163.0 letter_1=0.002 letter_2=0.002 letter_3=0.002 letter_4=0.002 letter_5=0.002 letter_6=0.001 prev2_at_start=0.000 planted=0.000
+RING_PRESENCE period=2187 reach=348.1 letter_1=0.000 letter_2=0.000 letter_3=0.000 letter_4=0.000 letter_5=0.000 letter_6=0.000 prev2_at_start=0.000 planted=-0.000
+RING_PRESENCE period=4096 reach=651.9 letter_1=0.000 letter_2=0.000 letter_3=0.000 letter_4=0.000 letter_5=0.000 letter_6=0.000 prev2_at_start=0.000 planted=0.000
+RING_PRESENCE period=6561 reach=1044.2 letter_1=0.000 letter_2=0.000 letter_3=0.000 letter_4=0.000 letter_5=0.000 letter_6=0.000 prev2_at_start=0.000 planted=-0.000
+RING_PRESENCE all letter_1=0.089 letter_2=0.013 letter_3=0.011 letter_4=0.018 letter_5=0.017 letter_6=0.012 prev2_at_start=0.005 planted=-0.000

@@ -1,0 +1,12 @@
+HR1_W101 STRAND_CUT rows=407 places=125404 past=true ms=145498
+HR1_W101 STRAND_CUT cut_W101 anchors=35007 first_letter=0.363 inside_a_word=0.446 space_or_mark=0.191
+HR1_W101 STRAND_CUT_LENGTHS 1=0.157 2=0.202 3=0.217 4=0.155 5=0.105 6=0.069 7=0.044 8=0.023 9=0.014 10=0.007 11=0.003 12=0.001 13=0.001 14=0.000 15=0.000 16+=0.000
+HR1_W101 STRAND_CUT_HANDED word_starts=19351 before_the_word_two_before=0.059 inside_the_word_before=0.250 no_epoch=0.001 other=0.210 the_word_before=0.296 the_word_two_before=0.184
+HR1_W101 STRAND_CUT_ENDS 1=0.026 2=0.249 3=0.222 4=0.151 5=0.125 6=0.095 7=0.058 8=0.032 9=0.020 10=0.010 11=0.005 12=0.005
+HR1_W101 STRAND_CUT_POWER row_over_state open_places=0.0797 at_word_starts=0.1231
+HR1_W101r STRAND_CUT rows=407 places=125404 past=true ms=170481
+HR1_W101r STRAND_CUT cut_W101r anchors=35011 first_letter=0.363 inside_a_word=0.446 space_or_mark=0.191
+HR1_W101r STRAND_CUT_LENGTHS 1=0.157 2=0.202 3=0.218 4=0.155 5=0.104 6=0.068 7=0.044 8=0.023 9=0.015 10=0.007 11=0.003 12=0.001 13=0.001 14=0.000 15=0.000 16+=0.000
+HR1_W101r STRAND_CUT_HANDED word_starts=19351 before_the_word_two_before=0.059 inside_the_word_before=0.250 no_epoch=0.001 other=0.210 the_word_before=0.295 the_word_two_before=0.183
+HR1_W101r STRAND_CUT_ENDS 1=0.026 2=0.249 3=0.222 4=0.151 5=0.125 6=0.094 7=0.058 8=0.032 9=0.021 10=0.010 11=0.005 12=0.005
+HR1_W101r STRAND_CUT_POWER row_over_state open_places=0.0296 at_word_starts=0.0406

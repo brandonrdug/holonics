@@ -383,7 +383,9 @@ impl Constitution {
             return Ok(Vec::new());
         }
         let end = Self::opening_end(region);
-        Ok(self.opening_faces(region)?.iter().enumerate().map(|(t, f)| (t < end).then(|| f.code(region.classes[t]))).collect())
+        // [the lead, November 23] None at a place read and not compared ([`UNCOMPARED`]).
+        let compared = |t: usize| t < end && region.targets.is_none_or(|tg| tg[t] != UNCOMPARED);
+        Ok(self.opening_faces(region)?.iter().enumerate().map(|(t, f)| compared(t).then(|| f.code(region.classes[t]))).collect())
     }
 
     /// [definition; theory, November 13, P60 item 1e] **The opening's comparison returned through the operands that produced it**: at every compared
@@ -415,6 +417,10 @@ impl Constitution {
         let mut dx = vec![0i64; sites * dw];
         let (mut ys, mut rs): (Vec<Vec<i64>>, Vec<Vec<i32>>) = (Vec::new(), Vec::new());
         for t in places.clone() {
+            // [the lead, November 23] A place read and not compared ([`UNCOMPARED`]) takes no covector: its row stays zero.
+            if region.targets.is_some_and(|tg| tg[t] == UNCOMPARED) {
+                continue;
+            }
             let read = self.opening_read(&x[t * dw..(t + 1) * dw], reach_o)?;
             let dz = covector(&read.face, region.classes[t]);
             for (o, &dzo) in dz.iter().enumerate() {
