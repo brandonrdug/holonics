@@ -29,8 +29,9 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 /// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
 // [the lead, November 22] `theory` and `logic`: the repository's own guides and records, and its Lean (`tools/holonics_passage.py`).
 // [the lead, November 23] `dialogue` and `acts`: the private conversation history, its turns and its tool calls with their results
-// (`tools/history_passage.py`; Brandon, November 23 01:37Z), joined once a mix held its pull (G-T4).
-const SLICES: [&str; 11] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts"];
+// (`tools/history_passage.py`; Brandon, November 23 01:37Z), joined once a mix held its pull (G-T4); [November 24] `harness`, its
+// system-side text, the curated collection in full (Brandon, 05:44Z).
+const SLICES: [&str; 12] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts", "harness"];
 /// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
 /// `?` between two line feeds.
 const REACTION_BOUND: u64 = 41;
