@@ -1,6 +1,6 @@
 # Her line takes the full curated collection: at 72% of a pass the logs crowd out the registers, and her acts and the level's lane cost under four thousandths and move nothing yet
 
-November 24, 2026, 04:25 to 13:35 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 23](2026-11-23_THE_LEVEL_HANDS_AN_EPOCH_INSIDE_HER_OWN_REACH_ITS_ROW_DROWNS_WHERE_IT_JOINS_HER_STATE_THE_FINE_COMPARISON_ASKS_IT_FOR_NOTHING_AND_HER_ACT_IS_ANSWERED_IN_KIND.md)
+November 24, 2026, 04:25 to 20:50 UTC, the lead, on the PC. Refs #404. It follows [the evening record of November 23](2026-11-23_THE_LEVEL_HANDS_AN_EPOCH_INSIDE_HER_OWN_REACH_ITS_ROW_DROWNS_WHERE_IT_JOINS_HER_STATE_THE_FINE_COMPARISON_ASKS_IT_FOR_NOTHING_AND_HER_ACT_IS_ANSWERED_IN_KIND.md)
 (its §8a: a second lap of her acts, and the level's own lane, next). Receipts: [`receipts/2026-11-24_collection/`](receipts/2026-11-24_collection/).
 Every lap below is 3,000 sections read at `MEAN.3000` (its last 1,000 sections), every held register one place open on
 store-2026-11-22's held set (140,564 places) unless named otherwise.
@@ -102,6 +102,19 @@ The control W108, less W103: the conversations −0.069, the tool turns −0.047
 the registers −0.009 to +0.001; the held conversations moved by 0.04 from lap to lap across W106t, W107 and W108 on one store, so a
 single lap's reading of them is resolved to about that.
 
+**W109 and W110**: the line from W108 on the same store, no change (G-P1 and G-P2, [`GUESS_P1.txt`](receipts/2026-11-24_collection/GUESS_P1.txt),
+[`GUESS_P2.txt`](receipts/2026-11-24_collection/GUESS_P2.txt); [`arm_W109.txt`](receipts/2026-11-24_collection/arm_W109.txt),
+[`arm_W110.txt`](receipts/2026-11-24_collection/arm_W110.txt)). W110 less W103, one place open on the collection's held set: the
+conversations −0.049, the tool turns −0.063, the harness −0.074, the theory −0.011, the Lean +0.004, code +0.003, science −0.005,
+web −0.002, books +0.009 and wikidata +0.013 (all −0.0174, ±0.0010); less W109 every region within 0.0063. Books and wikidata stand
+higher each lap since the collection entered (+0.0025 and +0.0084 at W109), which G-P3 reads on W111. The theory panel read 88% of its
+words in the lexicon and the logic panel 90%, the panels' highest; the probe panel's counts stayed in their scatter (W109: first person
+14, `?` 9). G-P1 (a) held (W109's reads held the card 22.7 minutes: the older held set's loudness, 6.5, and the read with `open`, 14.7),
+(c) held, and (b) held but for the tool turns, which fell 0.014 past the 0.010 asked. G-P2 (a) held (W110's one held read with `open
+loud`, 15.2 minutes, the panels about 2), (b) held, (c) held: the loudness reads all ten regions
+([`loudness_W110.table`](receipts/2026-11-24_collection/loudness_W110.table), the private regions' byte pieces left out). A lap's cycle
+on W110 was 58 minutes: the lap 37.5, its card reads 21 on the wall and about 17 held.
+
 ## 4. The probe panels
 
 Forty prompts addressing Athena, Claude, B and Brandon (dialogue turns, questions, first person, notes, keywords), each drawn five
@@ -175,6 +188,24 @@ over 40 sections from W108's end ([`profile_W108_40_sections.txt`](receipts/2026
 593 of a section's 684 ms are kernels in 4,400 launches; the dense products 246 ms (1.85 times their count's 133), the pair family
 107 and the contacts 75; 33 allocations and frees a section cost 35 ms beside the pool. No one kernel binds; the products and the
 allocations are the next places to look, and neither is taken as a campaign of its own.
+
+## 4b. Her clock and a period she is shown (the calendar record's cheap reads)
+
+[The record of November 24 on context as a calendar](2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md)
+(Brandon's 19:12 UTC lens: context is timings, read by comparison) fixed G-T1 and G-T3 before any read
+([its guesses](receipts/2026-11-24_calendar/GUESS.txt)). Both were read on W109's mean.
+
+- **G-T1, her located rates** ([`pace_W109.txt`](receipts/2026-11-24_collection/pace_W109.txt)): on the dyadic head the line feed's
+  rate is 11.5 times the mean of a, e and t and the space's 8.5 times; on the triadic head 17.9 and 3.6 times. (a) held, (b) held: her
+  clock ticks longer at a separator than at a letter, so a word stands nearer one turn than its bytes do.
+- **G-T3, the period panel** ([`period_panel_W109.txt`](receipts/2026-11-24_collection/period_panel_W109.txt)): the default seed's 256
+  rows written at RUN 96 on the card (66 s; on the host the writer replays each row's region at every place, and a first run projected
+  at 7 minutes was stopped at 29 with a tenth of its rows written). No cell keeps a period: every meter1 stands between −0.09 and 0.15,
+  bare rows and drawn alike, and the largest drawn meter2 past 16 places is 0.145. (a), (b) and (d) held; (c) missed (a period inside
+  the near field is not kept either: 0.07 at most at P1 of 3 to 5); (e) missed (bare 0.016 against drawn 0.025). Written freely at her
+  own temperature for 96 places, she continues neither a line's breaks nor a bare row of one two-letter word shown twenty times: her
+  held copy code (0.095 nats) is the face's, and drawn at her temperature a pattern once broken does not return. No ring of hers counts
+  a beat across her own writing yet, which is the calendar record's first construction (a ring's fade held as that ring's state).
 
 ## 5. The failures this could repeat
 

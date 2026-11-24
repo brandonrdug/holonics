@@ -1,0 +1,9 @@
+Fixed 2026-11-24T20:44:01Z (date -u), the lead, before W111 trains. Refs #404.
+The reading it answers: since the collection entered, the open registers have stood near W103 and two of them drift up a lap at a time:
+less W103, books +0.0025 (W109) and +0.0088 (W110), wikidata +0.0084 and +0.0133, while the collection's three regions stand -0.049 to
+-0.074 and the theory -0.011. W110's reads held the card about 17 minutes (G-P2 (a) held) and its loudness read all ten regions.
+The change: none. W111 is W110's STATE.3000 continued on store-2026-11-24-wide-t6 for 3,000 sections on e5h2, read as W110 was.
+G-P3:
+  (a) (0.6) the drift goes on: books and wikidata each read above W110's, one place open on the collection's held set;
+  (b) every other region within 0.010 of W110's.
+Rule: (a) held, the open registers' share is read again before the next lap; (a) missed, the drift was the scatter between laps.

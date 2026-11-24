@@ -15,5 +15,9 @@
   only).
 - `open1_receipt.txt`, `open3_receipt.txt`: the held read with the words `open` and `open loud` against the full read and
   `read-loudness`, row hashes and times; `profile_W108_40_sections.txt`: 40 training sections by kernel family.
+- `arm_W109.txt`, `arm_W110.txt`, `frontier_collection_W109.txt`, `frontier_collection_W110.txt`, `GUESS_P3.txt`: the line's laps on the
+  trimmed reads; `loudness_W110.table`: rule 7's table on the collection's held set, the private regions' byte pieces left out.
+- `pace_W109.txt`, `period_panel_W109.txt`: the calendar record's G-T1 and G-T3 on W109's mean (counts only; the panel's rows are drawn
+  letters, and her writes on them are not here).
 Nothing derived from the private collection's text is here.
 - `panel_ask2.tsv`: the probe panel's 40 prompts, each five times (her writes on it are not here).
