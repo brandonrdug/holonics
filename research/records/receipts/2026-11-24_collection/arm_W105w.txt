@@ -1,0 +1,18 @@
+W105W_START 10:24:00
+JOIN_STORE stretches=105133951 store_before=b7e54eb7be15128d218301261d7868d8431bf471f20b806c3a9b081429390a8e store_after=b5ecb12c9b17f94e379baeeecda2b11f072497b1f81490eb03a4dd1020a1bdfb before=code:727:3923045,web:605:1962276,science:345:19
+TERRAIN_TRAINED W105w 10:58:43 sections=3000 ended=false
+TERRAIN_REACH W105w 11:00:17 ANSWER copy n= 2655 0.091|ANSWER reverse n= 2667 0.087|ANSWER sum n= 1579 1.096|
+TERRAIN_PANEL W105w_mean 11:10:16 seen: words 43 in_lexicon 33 (76%) longest_copy 19 held: words 61 in_lexicon 44 (72%) longest_copy 15 unread: words 64 in_lexicon 54 (84%) longest_copy 16  || LONG W105w_mean: all words 264 in lexicon 191 (72%) writes that loop 2 of 20 longest run shared with its prompt 54 | code 30/34 (88%) web 44/57 (77%) science 34/53 (64%) books 54/68 (79%) wikidata 29/52 (55%)
+TERRAIN_LOUD W105w 11:15:51  lines=71
+TERRAIN_WIDE W105w 11:16:51 LONG W105w: all words 2158 in lexicon 1570 (72%) writes that loop 22 of 160 longest run shared with its prompt 54 | code 314/374 (83%) web 355/439 (80%) science 264/428 (61%) books 418/508 (82%) wikidata 219/409 (53%)
+W97_CAVITY W105w 11:31:26 CAVITY_DONE ms=874861
+W97_CAVITY4 W105w 11:52:05 CAVITY_DONE ms=1237608
+W97_THEORY THEORY_PANEL W105w logic: words 109 in lexicon 87 (79%) loops 0 of 8 longest shared with prompt 27 | theory: words 156 in lexicon 129 (82%) loops 0 of 12 longest shared with prompt 25
+W105W_LAP_TRAVEL W105w material: |d|=1.239e+08,1.152e+08,1.18e+08 cos01=+0.150 cos12=+0.190 persistence=1.068 | level: |d|=2.11e+07,1.938e+07,1.836e+07 cos01=+0.240 cos12=+0.267 persistence=1.135 | third: |d|=5.917e+07,5.427e+07,5.58e+07 cos01=+0.193 cos12=+0.212 persistence=1.099
+W105W_FRONTIER_HIST FRONTIER W105w; one place open: all 0.7226 (200933 places) | acts 1.1643 books 0.6822 code 0.4043 dialogue 0.9560 harness 0.7991 logic 0.4465 science 0.5669 theory 0.5580 web 0.7346 wikidata 0.9128 || less the control's, paired: -0.0234 (±0.0010) | acts -0.0214 books -0.0402 code -0.0460 dialogue -0.0407 harness +0.0085 logic +0.0209 science -0.0450 theory +0.0157 web -0.0580 wikidata -0.0286
+W105W_FRONTIER FRONTIER W105w; one place open: all 0.6153 (140564 places) | books 0.6822 code 0.4043 logic 0.4465 science 0.5669 theory 0.5580 web 0.7346 wikidata 0.9128 || less the control's, paired: +0.0095 (±0.0010) | books +0.0020 code +0.0008 logic +0.0582 science -0.0072 theory +0.0239 web -0.0147 wikidata +0.0039
+W105W_PROBE NEXT_WRITE_DONE rows=200 run=64 window=- ms=277245
+TERRAIN_SCORE W103 whole 57/96 opening 59/96 first 72/96 | sum 8/8/10 of 16 difference 8/8/9 of 16 product 5/5/7 of 16 close 10/12/16 of 16 copy 12/12/14 of 16 reverse 14/14/16 of 16
+TERRAIN_SCORE W104f whole 54/96 opening 57/96 first 75/96 | sum 9/9/12 of 16 difference 8/8/8 of 16 product 6/6/10 of 16 close 8/11/16 of 16 copy 12/12/13 of 16 reverse 11/11/16 of 16
+TERRAIN_SCORE W105w whole 55/96 opening 58/96 first 70/96 | sum 5/5/5 of 16 difference 7/7/8 of 16 product 7/7/10 of 16 close 9/12/16 of 16 copy 13/13/15 of 16 reverse 14/14/16 of 16
+W105W_ALL_DONE 12:42:56

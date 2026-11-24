@@ -1,0 +1,14 @@
+Fixed 2026-11-24T13:21:00Z (date -u), the lead, before W107 trains. Refs #404.
+The reading it answers: W106t (W105w's end on store-2026-11-24-wide-t6, the theory and the Lean held six times over: 20% of a pass,
+the collection 27%) stood, one place open less W103 on store-2026-11-22's held set: the theory +0.0027, the Lean +0.0312, the five
+registers -0.0089 to +0.0048; on the collection's held set dialogue -0.079, acts -0.045, harness -0.059. G-H4 held (b) and (c) and the
+theory's half of (a), and missed the Lean's by 0.016. The shares read again: the Lean is 11.7% of the pass on this store against 15.5%
+on the store W103 trained on, and its code fell 0.027 in this lap (W105w +0.058) while the theory, at 8.4% against 11.1%, closed.
+The change: none. W107 is W106t's STATE.3000 continued on the same store for 3,000 sections on e5h2 (the pass goes on), so it is the
+line's next lap and the control the Lean's raised share (store-2026-11-24-wide-t8) would be read against.
+G-H5:
+  (a) the Lean within 0.015 nats a place of W103, one place open (W106t +0.031); the theory stays within 0.015;
+  (b) the five registers each within 0.015 of W103;
+  (c) held dialogue, acts and harness each at most W106t's (the collection's gain kept or extended).
+Rule: (a) held, the line stays on this store; (a) missed, the Lean's share is raised to W103's (eight times over) as an arm beside
+this lap's continuation as its control.
