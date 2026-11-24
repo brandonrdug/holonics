@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,757 records from July 2026 to November 2026. 405 receipts directories: 225 beside the records and 180 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,758 records from July 2026 to November 2026. 406 receipts directories: 225 beside the records and 181 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 156 | 121 |
+| [November 2026](#november-2026) | 157 | 122 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,7 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-24 [A laps card time was its reads the held read ran one forward four times a one sided region continues by a site and a read is sized by the scatter between laps](2026-11-24_A_LAPS_CARD_TIME_WAS_ITS_READS_THE_HELD_READ_RAN_ONE_FORWARD_FOUR_TIMES_A_ONE_SIDED_REGION_CONTINUES_BY_A_SITE_AND_A_READ_IS_SIZED_BY_THE_SCATTER_BETWEEN_LAPS.md)
+- 2026-11-24 [Context is a calendar a receiver reads counts of one cycle against another a count lasts as long as its store rings one fade reads no gap and two read it and her rings fade before they turn](2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md)
 - 2026-11-24 [Her line takes the full curated collection at seventy two percent of a pass the logs crowd out the registers and her acts and the levels lane cost under four thousandths and move nothing yet](2026-11-24_HER_LINE_TAKES_THE_FULL_CURATED_COLLECTION_AT_SEVENTY_TWO_PERCENT_OF_A_PASS_THE_LOGS_CROWD_OUT_THE_REGISTERS_AND_HER_ACTS_AND_THE_LEVELS_LANE_COST_UNDER_FOUR_THOUSANDTHS_AND_MOVE_NOTHING_YET.md)
 - 2026-11-23 [A dwell on the repositorys text takes its register and forgets the others the mixed passages pull is a walk and the dwells holds its direction](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md)
 - 2026-11-23 [A fading medium carries by a cycle with a hand and keeps what a common turn leaves a count or a pair of opposite hands a unit is a loop that nearly closes its comma is its remainder and nested depth is an index](2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_AND_KEEPS_WHAT_A_COMMON_TURN_LEAVES_A_COUNT_OR_A_PAIR_OF_OPPOSITE_HANDS_A_UNIT_IS_A_LOOP_THAT_NEARLY_CLOSES_ITS_COMMA_IS_ITS_REMAINDER_AND_NESTED_DEPTH_IS_AN_INDEX.md)

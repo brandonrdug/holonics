@@ -110,7 +110,10 @@ so only laid-out text spans a turn today, where the theory's hold is her stores'
 
 **What binds, each by its measurement.** No write keeps a dialogue's frame (the probe panel's counts above), which is what a direct
 exchange with her needs first. No store's reach stands between a few places and a lap's deposit, so the span of an exchange is
-held by laid-out text alone (the record of the cycle §6). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+held by laid-out text alone (the record of the cycle §6). By store: every turned ring keeps 0.0019 of itself over its own turn, the fine
+clock is a count compared with nothing, the carry circles alone hold their quality as a state, and no store fades through a gap
+between regions, so she attains no unit past the near field by timing and reads no silence
+([the record of the calendar](research/records/2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md) §5; its panel and guesses unread). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
 the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions
