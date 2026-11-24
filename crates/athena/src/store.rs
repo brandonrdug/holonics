@@ -29,8 +29,9 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 /// (`tools/arithmetic_world.py`) and the word problems (`tools/words_passage.py`), joined on November 16 ([`join_store`]).
 // [the lead, November 22] `theory` and `logic`: the repository's own guides and records, and its Lean (`tools/holonics_passage.py`).
 // [the lead, November 23] `dialogue` and `acts`: the private conversation history, its turns and its tool calls with their results
-// (`tools/history_passage.py`; Brandon, November 23 01:37Z), joined once a mix held its pull (G-T4).
-const SLICES: [&str; 11] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts"];
+// (`tools/history_passage.py`; Brandon, November 23 01:37Z), joined once a mix held its pull (G-T4); [November 24] `harness`, its
+// system-side text, the curated collection in full (Brandon, 05:44Z).
+const SLICES: [&str; 12] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts", "harness"];
 /// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
 /// `?` between two line feeds.
 const REACTION_BOUND: u64 = 41;
@@ -1109,6 +1110,50 @@ pub fn read_open_rows(args: &[String]) -> Result<()> {
         }
     }
     println!("OPEN_ROWS_DONE sections={done} regions={regions_read} ms={}", started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; the lead, November 24] `found-level-lane STATE STATE_SHA MEAN MEAN_SHA KEYS KEYS_SHA OUT`: **the learner `STATE` with the level's own lane**
+/// ([`Learner::level_laned`]: one more face lane on the fine field, written by the level's prolongation alone, its other writers and the
+/// prolongation's rows of the old lanes at zero, the lane's rows drawn from `KEYS` at the old block's spread), written to `OUT`. Where the
+/// state reads a lattice, it is folded back ([`Learner::unlatticed`]), the lane founded, and the lattice founded again from `MEAN` laned
+/// alike (the save's mean the lattice's spreads are read from). The written state is read back and checked byte for byte; its level line
+/// carries the word `lane`. Reads no realization.
+pub fn found_level_lane(args: &[String]) -> Result<()> {
+    if args.len() != 8 {
+        return Err("found-level-lane STATE STATE_SHA MEAN MEAN_SHA KEYS KEYS_SHA OUT".into());
+    }
+    let read = |path: &str, sha: &str| -> Result<Learner> {
+        let text = pinned_read(path, sha, STATE_BUDGET)?;
+        let learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+        if learner.to_text().as_bytes() != text.as_slice() {
+            return Err("a state that does not read and write back byte for byte".into());
+        }
+        Ok(learner)
+    };
+    let (end, mean) = (read(&args[1], &args[2])?, read(&args[3], &args[4])?);
+    let keys = pinned_read(&args[5], &args[6], STATE_BUDGET)?;
+    let out = Path::new(&args[7]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    // A lattice is folded back, the lane founded on the end and on the mean alike, and the lattice founded again from the laned mean.
+    let latticed = end.lattice.is_some();
+    let founded = end.unlatticed().map_err(|e| e.to_string())?.level_laned(&keys).map_err(|e| e.to_string())?;
+    let founded = if latticed {
+        let laned_mean = mean.unlatticed().map_err(|e| e.to_string())?.level_laned(&keys).map_err(|e| e.to_string())?;
+        founded.with_lattice_from(&laned_mean).map_err(|e| e.to_string())?
+    } else {
+        founded
+    };
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    let held = founded.field.level_lane_held().map_err(|e| e.to_string())?.map_or(0, |h| h.len());
+    std::fs::write(out, &written)?;
+    let d = founded.field.declaration;
+    println!("FOUND_LEVEL_LANE width={} lanes={} held={held} drawn={} entries={} lattice={latticed}", d.width, d.lanes, founded.drawn, founded.field.material_len());
     Ok(())
 }
 

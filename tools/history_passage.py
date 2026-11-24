@@ -4,7 +4,7 @@ pairwise chain in time, likely the best data there is; their parts are told apar
 from the logged tool calls and their results, never from a compiler loop inside a lap). A boundary codec of a private curated set (its
 `strands/dialogue_turns.jsonl` and `strands/tool_events.jsonl`, the schema its `SCHEMA.md` states); nothing it writes is ever committed.
 
-Two slices, each a document a piece, every piece in time order (`corpus_passage.py`'s files: `DOCS_*`, `IDS_*`, `HELD_*`, `HELD_IDS_*`):
+Three slices, each a document a piece, every piece in time order (`corpus_passage.py`'s files: `DOCS_*`, `IDS_*`, `HELD_*`, `HELD_IDS_*`):
 - `dialogue`: one conversation a document, its turns in the chain's order. The document's title line names the platform, the machine
   and the date it opens; each turn opens with a line `[YYYY-MM-DD HH:MM UTC] SPEAKER:` (the speaker as the set names it: human, model,
   agent_prompt), then the turn's text whole. Documents are ordered by their first turn's time. Prompt-history rows that a transcript
@@ -17,9 +17,11 @@ Two slices, each a document a piece, every piece in time order (`corpus_passage.
   id's SHA-256 falls in the lowest ACTS_SHARE thousandths are kept, a keyed draw spread over every date (the strand is three times a
   whole pass of the store of November 23, so it enters by a share; a prefix of a time-ordered slice would be its oldest months alone).
 
-Held: everything dated on or after HELD_FROM (a `YYYY-MM-DD` UTC date), the time cut no earlier state has read. Left out of both roles:
-the GSM8K evaluation window (September 3 12:00 to September 7 12:00 UTC), whose messages contain the evaluation families
-(`tools/human_messages.py` withholds it the same way).
+- `harness`: one conversation's system-side text a document, its events in time order (the full collection, Brandon November 24).
+
+Held: everything dated on or after HELD_FROM (a `YYYY-MM-DD` UTC date), the time cut no earlier state has read. Until November 24 the
+GSM8K evaluation window (September 3 12:00 to September 7 12:00 UTC) was left out of both roles; Brandon lifted it that day (05:53Z:
+"there are other yardsticks"), and nothing is left out by date now.
 
 Usage: history_passage.py SET OUT HELD_FROM [RESULT_LIMIT [ACTS_SHARE]]
 
@@ -32,7 +34,9 @@ import os
 import sys
 
 INDEX_HEAD = "document\ttitle_octets\ttext_octets\topens\tcloses\n"
-WINDOW = ("2026-09-03T12", "2026-09-07T12")
+# [the lead, November 24] Brandon, 05:53Z: the September 3 to 7 window is no longer left out ("there are other yardsticks"); WINDOW is
+# empty, so nothing is left out by date but the held cut.
+WINDOW = ("", "")
 
 
 class Role:
@@ -142,6 +146,32 @@ def acts(set_dir, roles, held_from, limit, share, skipped):
     flush(turn, calls)
 
 
+def harness(set_dir, roles, held_from, skipped):
+    """[the lead, November 24, Brandon's 05:44Z: the full collection] `harness`: one conversation's system-side text a document (the set's
+    harness strand: slash-command wrappers, injected reminders, compaction summaries, checkpoints, errors, environment instructions), each
+    event opening with a line `[YYYY-MM-DD HH:MM UTC] KIND:` and its text whole, documents ordered by their first event's time."""
+    convs = {}
+    with open(os.path.join(set_dir, "strands", "harness_events.jsonl"), encoding="utf-8") as f:
+        for line in f:
+            r = json.loads(line)
+            w = r.get("when")
+            ts = (w.get("ts") if isinstance(w, dict) else w) or ""
+            if in_window(ts):
+                skipped["harness_window"] += 1
+                continue
+            if not (r.get("text") or "").strip():
+                skipped["harness_empty"] += 1
+                continue
+            convs.setdefault((r.get("platform"), r.get("conversation_id")), []).append((ts, r))
+    for key, events in sorted(convs.items(), key=lambda kv: min(e[0] for e in kv[1])):
+        events.sort(key=lambda e: e[0])
+        first = events[0][1]
+        title = f"{first.get('platform')} {first.get('machine')} {events[0][0][:10]}\n".encode()
+        body = "".join(f"[{e[0][:10]} {e[0][11:16]} UTC] {e[1].get('kind')}:\n{e[1]['text']}\n\n" for e in events).encode()
+        role = roles["HELD"] if events[0][0][:10] >= held_from else roles["DOCS"]
+        role.write(f"{key[0]}:{key[1]}", title, body)
+
+
 def main():
     if len(sys.argv) not in (4, 5, 6):
         sys.exit(__doc__)
@@ -149,8 +179,8 @@ def main():
     limit = int(sys.argv[4]) if len(sys.argv) >= 5 else 65536
     share = int(sys.argv[5]) if len(sys.argv) == 6 else 1000
     os.makedirs(out, exist_ok=True)
-    skipped = {k: 0 for k in ("dialogue_window", "dialogue_prompt_covered", "dialogue_empty", "acts_window", "acts_result_over_limit", "acts_no_result", "acts_turns_outside_share")}
-    for slice_, build in (("dialogue", lambda r: dialogue(set_dir, r, held_from, skipped)), ("acts", lambda r: acts(set_dir, r, held_from, limit, share, skipped))):
+    skipped = {k: 0 for k in ("dialogue_window", "dialogue_prompt_covered", "dialogue_empty", "acts_window", "acts_result_over_limit", "acts_no_result", "acts_turns_outside_share", "harness_window", "harness_empty")}
+    for slice_, build in (("dialogue", lambda r: dialogue(set_dir, r, held_from, skipped)), ("acts", lambda r: acts(set_dir, r, held_from, limit, share, skipped)), ("harness", lambda r: harness(set_dir, r, held_from, skipped))):
         roles = {stem: Role(out, stem, slice_) for stem in ("DOCS", "HELD")}
         build(roles)
         for role in roles.values():

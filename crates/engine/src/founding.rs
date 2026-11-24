@@ -393,7 +393,7 @@ impl Constitution {
             debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, total1));
             debug_assert_eq!(ng, from.len());
             from.extend(gfrom);
-            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue, receipt: sc.receipt }));
+            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue, receipt: sc.receipt, lane: sc.lane }));
         }
         Ok((out, from))
     }
@@ -1119,6 +1119,73 @@ impl Learner {
         // where the learner carries each entry's own rate every standing entry keeps it and a lane entry takes `rate_bits`.
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 24] **The learner with the level's own lane** ([`Scale::lane`]): one more face lane on the fine field
+    /// ([`Learner::laned`]), made the level's: every entry [`Constitution::level_lane_held`] names set to zero with its moments (the lane's
+    /// other writers, which the lane's founding drew, and the prolongation's rows of the old lanes, so the level hands the old lanes
+    /// nothing), and the prolongation's rows of the lane drawn from `keys` past the lane's draws, four bytes a draw, uniform at the spread
+    /// the old rows held (`√3` times their root mean square, read from the block itself), their moments at zero. The lane is then read by
+    /// nothing (its readers' columns at zero, as the lane's founding leaves them) and written by the level alone, so every reader's
+    /// covector on it opens from the first section. Refused where the level has no one-sided block or the field reads a junction.
+    pub fn level_laned(&self, keys: &[u8]) -> Result<Self> {
+        let Some(old) = self.field.scale.as_deref() else { return refuse("the level's own lane on a field without a level") };
+        let dw0 = self.field.declaration.width;
+        let Some((b2, bb2, _)) = old.before_offsets(dw0) else { return refuse("the level's own lane on a level without its one-sided block") };
+        // The old block's spread, from its own entries.
+        let block = &old.glue[b2..bb2];
+        let n = block.len() as i128;
+        let sq: i128 = block.iter().map(|&v| i128::from(v) * i128::from(v)).sum();
+        let rms = ((sq / n.max(1)) as u128).isqrt() as i128;
+        let reach = ((3 * rms * rms) as u128).isqrt() as i128;
+        let mut out = self.laned(keys)?;
+        if let Some(s) = out.field.scale.as_deref_mut() {
+            s.lane = true;
+        }
+        let held = out.field.level_lane_held()?.ok_or(TowerError::Refused("a level that took no lane of its own"))?;
+        let (len0, len1) = (out.field.theta.len(), out.field.scale.as_deref().map_or(0, |s| s.coarse.theta.len()));
+        for &i in &held {
+            out.set_entry(i, 0, len0, len1);
+            out.first[i] = 0;
+            out.second[i] = 0;
+        }
+        // The lane's rows of `B⁻` and `b_B⁻` drawn at the old block's spread.
+        let d = out.field.declaration;
+        let (dw, w) = (d.width, d.lane_width());
+        let s = out.field.scale.as_deref().ok_or(TowerError::Refused("a level lost in its lane's founding"))?;
+        let (b2, bb2, _) = s.before_offsets(dw).ok_or(TowerError::Refused("a block lost in its lane's founding"))?;
+        let (h, d1) = (s.harmonics, s.coarse.declaration.width);
+        let mut drawn = Vec::new();
+        for k in 0..h {
+            for c in dw - w..dw {
+                let row = k * dw + c;
+                drawn.extend((0..d1).map(|j| len0 + len1 + b2 + row * d1 + j));
+                drawn.push(len0 + len1 + bb2 + row);
+            }
+        }
+        let bytes = keys.get(out.drawn..out.drawn + 4 * drawn.len()).ok_or(TowerError::Refused("fewer key bytes than the lane's rows of the level"))?;
+        let span = 2 * reach + 1;
+        for (&i, word) in drawn.iter().zip(bytes.chunks_exact(4)) {
+            let u = i128::from(u32::from_be_bytes([word[0], word[1], word[2], word[3]]));
+            out.set_entry(i, i32::try_from(u % span - reach).map_err(|_| TowerError::Refused("a drawn row past its 32-bit carrier"))?, len0, len1);
+            out.first[i] = 0;
+            out.second[i] = 0;
+        }
+        out.drawn += 4 * drawn.len();
+        Ok(out)
+    }
+
+    /// One entry of the whole material set (the fine field's, the level's field's, then the glue), as a section's covector lays them.
+    fn set_entry(&mut self, i: usize, v: i32, len0: usize, len1: usize) {
+        if i < len0 {
+            self.field.theta[i] = v;
+        } else if let Some(s) = self.field.scale.as_deref_mut() {
+            if i < len0 + len1 {
+                s.coarse.theta[i - len0] = v;
+            } else {
+                s.glue[i - len0 - len1] = v;
+            }
+        }
     }
 
     /// [definition; theory, November 11 17:25] **The learner with `circles` carry circles** ([`Constitution::with_carry`]), the circles' draws read from

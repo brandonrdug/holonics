@@ -30,11 +30,11 @@ What is a human message:
   `user` message's text, less the injected AGENTS.md, environment, plugin, image and `/goal`
   continuation wrappers. A message with attached files keeps only its "My request" part.
 
-**The evaluation window is never read.** The private conversation dataset's evaluation partition
-(families at or after its 2026-09-04 temporal cut, captured 2026-09-06) was drawn from these
-conversations. THE_REBUILD's forward plan spends it once, in F5, so agents do not read it before
-then: every message timestamped in `EVALUATION_WINDOW` (a half day of margin on each side, UTC) is
-skipped and only counted.
+**No window is withheld** (Brandon, November 24 05:53Z: "there are other yardsticks"). Until that day
+every message timestamped from 2026-09-03 12:00 to 2026-09-07 12:00 UTC was skipped and only counted,
+because the private dataset's evaluation partition was drawn from those days and THE_REBUILD spent it
+once, in F5; `EVALUATION_WINDOW` is now empty. A message whose time cannot be read is still skipped
+and counted (fail closed), since its place in the time order is unknown.
 """
 
 import argparse
@@ -61,7 +61,7 @@ def main_checkout():
 
 
 ROOT = main_checkout()
-EVALUATION_WINDOW = ("2026-09-03T12:00:00", "2026-09-07T12:00:00")
+EVALUATION_WINDOW = ("", "")  # lifted November 24 (the module's docstring)
 
 CLAUDE_HARNESS = ("<local-command", "<command-name>", "<command-message>", "<command-args>",
                   "<task-notification>", "<bash-input>", "<bash-stdout>", "<bash-stderr>",
@@ -290,7 +290,7 @@ def main():
     else:
         for stamp, harness, session, text in messages:
             print(f"== {stamp[:19]}Z {harness} {session}\n{text}\n")
-    print(f"withheld in the evaluation window (of the files read): {withheld}", file=sys.stderr)
+    print(f"withheld with no readable time (of the files read): {withheld}", file=sys.stderr)
 
 
 if __name__ == "__main__":

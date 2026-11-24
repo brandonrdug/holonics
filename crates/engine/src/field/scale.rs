@@ -46,6 +46,16 @@ pub struct Scale {
     /// linear in the units relieves the fine comparison at the level's locus), and at a word's first letter her state holds the word two
     /// before at 24 thousandths (the play record of November 23, §6).
     pub receipt: bool,
+    /// [definition; the lead, November 24, the record of the evening of November 23 §7; the formal thread's reading of the join,
+    /// `agent-inferred`] **The level's own lane**: where set, the fine field's last face lane is the level's. The prolongation writes it
+    /// alone (`B⁻`'s and `b_B⁻`'s rows of every other coordinate are held at zero) and nothing else writes it (the encodings' and the strand
+    /// rows' columns into it, the current's, the pair contact's and the triads' returns into it, the moment's chart into it and their
+    /// biases, all held at zero: [`Constitution::level_lane_held`]), so every reader reads the handed row as a ratio to its own power,
+    /// a partition with its own unit translated at the readers' charts, never leading zeros under the state it would join. Why: on W101's
+    /// and W101r's means the row stood at 0.08 and 0.03 of the state's power at the open places, and what it held of the epochs before
+    /// (0.07 and 0.16) stood at 0.03 and 0.02 once joined (the precision law's clause of November 21). Written as the word `lane` after
+    /// the level's counts (and `receipt`), only where set.
+    pub lane: bool,
 }
 
 impl Scale {
@@ -552,7 +562,7 @@ impl Constitution {
             *v = fit32((k * ((three << MATERIAL_BITS) / pd) as i128) >> 31, "a founded value outgrew its 32-bit carrier")?;
         }
         let mut out = self.clone();
-        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false }));
+        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, lane: false }));
         Ok((out, at))
     }
 
@@ -656,6 +666,51 @@ impl Constitution {
         }
         out.cut = cut;
         Ok(out)
+    }
+
+    /// [definition; the lead, November 24] **The entries the level's own lane holds at zero** ([`Scale::lane`]), as indices of the whole
+    /// material (the fine field's, then the level's field's, then the glue, as a section's covector lays them): every writer into the fine
+    /// field's last lane but the prolongation (the encodings' `E`, `E₋`, `E₊` columns of the lane, the current's return `out`, the pair
+    /// contact's `W`, the triads' `W_T` and the moment's chart `C`, their rows of the lane, and their biases there), and the prolongation's
+    /// `B⁻` and `b_B⁻` rows of every coordinate outside the lane. `None` where the level has no lane of its own. Refused where the tick has
+    /// a junction's return (a writer this list does not name) or the level no one-sided block.
+    pub fn level_lane_held(&self) -> Result<Option<Vec<usize>>> {
+        let Some(s) = self.scale.as_deref().filter(|s| s.lane) else { return Ok(None) };
+        let d = &self.declaration;
+        if d.junction {
+            return refuse("the level's own lane on a field whose tick has a junction's return");
+        }
+        let Some((b2, bb2, _)) = s.before_offsets(d.width) else {
+            return refuse("the level's own lane on a level without its one-sided block");
+        };
+        let (dw, a, m2, f, j2, w) = (d.width, d.alphabet, 2 * d.complex(), d.contacts, 2 * d.triads, d.lane_width());
+        let lane = dw - w..dw;
+        let l = &self.layout;
+        let mut out = Vec::new();
+        for base in [l.enc, l.before, l.after] {
+            for c in 0..=a {
+                out.extend(lane.clone().map(|i| base + c * dw + i));
+            }
+        }
+        for (base, cols) in [(l.out, m2), (l.w, f), (l.w_triad, j2), (l.moment_face, m2)] {
+            for o in lane.clone() {
+                out.extend((0..cols).map(|j| base + o * cols + j));
+            }
+        }
+        for base in [l.out_bias, l.w_bias, l.moment_face_bias] {
+            out.extend(lane.clone().map(|o| base + o));
+        }
+        let glue = self.theta.len() + s.coarse.theta.len();
+        let d1 = s.coarse.declaration.width;
+        for k in 0..s.harmonics {
+            for c in (0..dw).filter(|c| !lane.contains(c)) {
+                let row = k * dw + c;
+                out.extend((0..d1).map(|j| glue + b2 + row * d1 + j));
+                out.push(glue + bb2 + row);
+            }
+        }
+        debug_assert!(out.iter().all(|&i| i < self.material_len()));
+        Ok(Some(out))
     }
 
     /// [definition; the lead, November 18, the record of the two streams §11; `agent-inferred`] **The level as a passage read by two

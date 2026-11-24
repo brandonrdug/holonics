@@ -288,7 +288,7 @@ impl Constitution {
         let mut out = format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "));
         if let Some(s) = &self.scale {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
-            out.push_str(&format!("level {} {}{}\n{}{}\n", s.harmonics, s.split, if s.receipt { " receipt" } else { "" }, s.coarse.to_text(), glue.join(" ")));
+            out.push_str(&format!("level {} {}{}{}\n{}{}\n", s.harmonics, s.split, if s.receipt { " receipt" } else { "" }, if s.lane { " lane" } else { "" }, s.coarse.to_text(), glue.join(" ")));
         }
         out
     }
@@ -312,6 +312,9 @@ impl Constitution {
         if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("level ")) {
             lines.next();
             // [the lead, November 23] The word `receipt` after the two counts, where the level is compared at its own grain ([`Scale::receipt`]).
+            // [the lead, November 24] The word `lane` last, where the fine field's last lane is the level's own ([`Scale::lane`]).
+            let lane = head.ends_with(" lane");
+            let head = head.strip_suffix(" lane").unwrap_or(head);
             let receipt = head.ends_with(" receipt");
             let counts = head.strip_suffix(" receipt").unwrap_or(head);
             let words: Vec<usize> = counts.split(' ').skip(1).map(|w| w.parse::<usize>().map_err(|_| TowerError::Refused("a level's line that is not two counts"))).collect::<Result<_>>()?;
@@ -323,7 +326,7 @@ impl Constitution {
             if (glue.len() != len && glue.len() != len + before) || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
                 return refuse("a level's glue that is not its declaration's length, a split outside the ticks, or a field without the opening's block");
             }
-            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt }));
+            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, lane }));
         }
         Ok(field)
     }

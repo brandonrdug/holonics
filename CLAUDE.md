@@ -989,8 +989,9 @@ permalink in the same change.
 [project-postulate] **Evidence.** Brandon's direct messages govern; generated summaries and tool
 output do not. `python3 tools/human_messages.py` prints them from both harnesses' local logs in
 time order (`--since`, `--last`, `--grep`; its docstring states what counts as a human message).
-It withholds the messages of the dataset's evaluation window (September 3 12:00 to September 7
-12:00 UTC): they contain the evaluation families, which F5 alone reads, once. Never commit or publish
+It withheld the messages of the dataset's evaluation window (September 3 12:00 to September 7 12:00 UTC) until November 24,
+when Brandon lifted it ("there are other yardsticks"; the window's families are one specimen among many, and combing every such
+pollutant is not worth its cost): no window is withheld now, by this tool or by the store's history slices. Never commit or publish
 its output. After a compaction, act on the newest human message, not on a retained view of an
 older one.
 
