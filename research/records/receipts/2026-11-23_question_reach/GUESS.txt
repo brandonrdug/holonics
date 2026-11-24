@@ -1,0 +1,70 @@
+Guesses of the record of November 23 on a question, a first person, a limb's reach and a channel's capacity. Fixed 2026-11-23T23:34:41Z (date -u),
+before any read of the line for them. They are the formal thread's, marked as guesses; whether a read or an arm runs is the lead's. A miss
+is scored as a miss in one line.
+Forms read at their owners before fixing: athena::store::train (the act path: each act's prompt released RUN places, the world's reaction
+appended and alone open, the prompt and the draft known and never a target; the lines STORE_WORLD and STORE_TERRAIN),
+holonics_engine::learner::PassWorld, athena::world::{react, answer, record}, athena::store::terrain_section (every expression known, every
+answer and its line feed open, or every place where the terrain is read by two streams), athena::store::write (a write ends at the codec's
+void or at RUN places), the atlas rows receipt.world-answers-own-act, receipt.unanswered-act-is-discounted, receipt.probe-reads-its-loop,
+receipt.reafference-lag, ratio.first-person-ratio, heat.leader-breakdown, holarchy.pocket-min-cut, frame.gyroparallelogram,
+swing.pantograph, and the lead's link read of 22:48Z on W101 and W101r (the handed-cycle record, section 22).
+
+G-Q1  what her drafts ask (a lap with a world clause of RECORDS >= 1; W102a if it is that arm). Nothing in the act path reaches the
+      draft's own face: the draft is known context and never compared, so a draft is a draw from the face she already holds.
+      (a) 0.75: over the lap, her code at the answers to her own drafts (STORE_WORLD world_code) stands below her code at the answers of
+          the terrain's own drawn records in the same sections (STORE_TERRAIN world_code where the terrain's open places are answers
+          alone; where the terrain is read by two streams, a held read at the answers' places): she asks what she already holds, or
+          what the world does not read, and both are cheap.
+      (b) 0.7: the share of drafts the world reads (STORE_WORLD read over acts) does not rise by more than a tenth of itself from the
+          lap's first thousand sections to its last, on a terrain whose expressions are known places (nothing compares an expression).
+      Read: (a) failing, her code at her own drafts' answers at or above the terrain's, would say her draws already seek where an
+      answer is news, and the 0.85 below falls.
+
+G-Q2  a mark of her own release (if the lead adds one to the act path as it stands, the draft's places marked in a face lane or at the
+      chart). The world's reaction is a function of the draft's text alone (athena::world::react), so who released a line carries no
+      news of what follows it: I(answer; releaser | text) = 0 by the world's law.
+      0.8: a tension read with the mark as the part's operand removes under 0.01 of the covector's power at the answers' places, and
+           the rate of first-person forms in her writes moves by under a tenth of itself against the control.
+      Read: the mark is a referent only on a terrain where a line's continuation differs by who released it.
+
+G-Q3  the level's hold along its own clock (a host read with the lead's link ruler on W101r's and W101's saved states: two more rows).
+      The lead read the last byte of the epoch before the handed one and the handed epoch's own bytes. New rows: the last byte of the
+      epochs three and four before a place's own, at the level's read (after the level's ticks, before the prolonged row).
+      0.7: both at most 0.05 on W101r and on W101.
+      Read: at 0.10 or more the level holds along its own clock and its reach waits on the join alone (the handed-cycle record's
+      section 22); at most 0.05, a level reaches one unit and distance is bought by depth or by the level's own quality.
+
+G-Q4  the pair across a pivot (no new read is asked; the standing read is the lead's word presence at word starts: the word before at
+      letters 3 to 6 stands at 0.028, 0.005, 0.004, 0.004 on W99).
+      0.8: keyed at the places after a pivot of held text (" : ", "? ", " = "), the word before the pivot is present at letters 3 to 6
+           after it at under 0.01 at each letter from the fourth on.
+
+G-Q5  a second joint (an arm the lead may never build; a coin, and said as one).
+      0.5: a level founded by the same rule on the first level's news holds an epoch of 10 to 17 places of the passage (3.6 squared
+           is 13).
+
+The statements the synthesis weighed (sent to Brandon at 23:30:27Z, before these and before any Lean):
+      0.85  she asks nothing as an act until an act of hers selects what she reads next;
+      0.8   the second half of a " : " pair carries nothing of the first beyond the last few bytes (G-Q4);
+      0.75  a mark of her own release gives the first person no referent alone (G-Q2);
+      0.7   the short unit is not the fault, and the missing part is a second joint;
+      0.5   a second joint founded by the same rule holds about 13 places (G-Q5);
+      0.6   on P against NP the cause is a frontier with no field to step along.
+
+Refined 2026-11-23T23:34:41Z, after the act path was read at its owner and before any read; the first wording and weights stay on file.
+      The 0.85: on the act path an act of hers already selects what she reads next (the world answers the expression she drafted), and
+      that path is built. Selection is necessary and is not the missing part. The statement now: she asks nothing as an act until
+      what an answer did reaches the face that drew the draft. 0.85 stays on that wording, and G-Q1 is its read.
+      The 0.7: "the short unit is not the fault" keeps 0.7. "The missing part is a second joint" is 0.5 against the level's own hold
+      along its clock (a joint with quality is a longer link); G-Q3 separates them.
+
+Scored 2026-11-23T23:38:35Z, from the lead's read on the dumps of the link read (18,852 word starts whose handed epoch has three epochs before it;
+the ruler's floor 0.000 at every link). The last byte of the epochs two and three before the handed one (three and four before a
+place's own), restricted / level's read / row / joined / final:
+      W101    0.014, 0.001 / 0.039, 0.010 / 0.027, 0.006 / 0.012, 0.003 / 0.002, 0.001
+      W101r   0.019, 0.001 / 0.092, 0.047 / 0.058, 0.031 / 0.003, 0.001 / 0.002, 0.001
+G-Q3  held on W101 (0.039, 0.010). MISSED on W101r (0.092 against at most 0.05; 0.047 held).
+      What the read says: the level's own comparison taught its ticks to carry earlier epochs (0.019 at the restriction, 0.092 at the
+      level's read), so a level trained at its own grain holds along its own clock, and the join takes all of it (0.058 and 0.031 in
+      the row, 0.003 and 0.001 joined). "The missing part is a second joint" falls from 0.5 to 0.25: the join comes first, as the
+      handed-cycle record's section 22 has it, and the lead takes the row's own face lane as the next part after the answered act.
