@@ -6,7 +6,7 @@ of the line. The readings are of the tree's source and atlas, of a host ruler on
 ([`receipts/2026-11-23_handed_cycle/`](receipts/2026-11-23_handed_cycle/)), and of six reads the lead took on the line's saved
 mean W99 at this thread's asking, each scored against a guess fixed before it (§13), and of a letter from Neon weighed against the code it cites (§19). Lean: `HolonicsResearch/HNN/HandedCycle` (new,
 50 statements). The synthesis of §2 was told to Brandon at 21:01 UTC, before the Lean was checked and before any read, as he asked.
-§21 and §22 were added from 22:32 to 22:55 UTC, after the lead's reads of the level's own comparison.
+§21 and §22 were added from 22:32 to 22:55 UTC, after the lead's reads of the level's own comparison. §23 was added at 23:50 UTC, after the lead's read of the splices.
 
 ## 1. The lens
 
@@ -854,6 +854,33 @@ unbound, and the level is not what her writes wait on first: §14's 0.4 on that 
 the epoch as one identity at 0.265 on lap 94's mean, on the two-sided cut of 8.56 places. The link read above holds it at
 0.009, on the one-sided cut of 3.6 places and in 64 cells. The cut and the cells differ, and the two figures are not yet read
 against each other.
+
+## 23. The splices, read: the lap's cost stands in the fine material, and both routes run
+
+The lead read G-H10 (b) at 23:47 UTC: two states spliced from the two laps, each read at one place open on the held set of
+`store-2026-11-22` (140,564 places), each less W101, paired, in nats a place.
+
+| state | all | books | code | logic | science | theory | web | wikidata |
+|---|---|---|---|---|---|---|---|---|
+| SPa: W101's fine field, W101r's level and glue | +0.0792 (0.0012) | +0.0839 | +0.0430 | +0.0551 | +0.0617 | +0.0350 | +0.0800 | +0.1947 |
+| SPb: W101r's fine field, W101's level and glue | +0.0378 (0.0009) | +0.0342 | +0.0328 | +0.0275 | +0.0380 | +0.0429 | +0.0378 | +0.0513 |
+| W101r itself | +0.0355 (0.0009) | | | | | | | +0.0602 |
+
+**G-H10 (b)** (0.5, a coin: the first splice loses at least half of the arm's loss on the register that lost most, and the second
+less than half): **missed** on its second clause. On wikidata the first splice carries 3.2 times the arm's loss and the second 0.85
+of it. Neither of §21's routes stands alone.
+
+What the read says, as the lead reads it. W101r's fine field costs about the arm's whole cost whichever level it is read with
+(+0.0378 beside +0.0355), so the lap's cost stands in the fine material: by the return through the restriction (§21's first
+route), or by the fine field answering a level that pulls another way. The level trained with its own comparison, beside a fine
+field that never met it, costs twice the arm, so the forward route runs too, and W101r's fine field had made room for that level,
+which fits its row at a third of the control's (§22). Both splices are unmatched pairs, so a term of mismatch rides in each, and
+the two routes are not yet apart.
+
+What follows. When the level's own comparison is read again with the row in a face lane of its own (§22;
+[the record of this evening](2026-11-23_A_QUESTION_IS_THE_STROKE_OUT_OF_A_LOOP_ITS_ANSWER_CLOSES_THE_LOOP_CARRIES_ITS_AREA_UP_TO_THE_LEAST_CUT_IT_THREADS_THE_FIRST_PERSON_IS_THE_ANCHOR_IT_RETURNS_TO_AND_A_LIMBS_REACH_IS_BOUGHT_BY_NESTED_DEPTH.md) §7 and §8, where the level's hold along its own clock is read), the form
+that separates the routes is G-H13's: the pull stopped at the level's own material. If the registers then hold within 0.003 nats a
+place of their control, the cost was the return's.
 
 ## Sources
 
