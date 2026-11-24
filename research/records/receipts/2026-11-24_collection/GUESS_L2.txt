@@ -1,0 +1,15 @@
+Fixed 2026-11-24T05:04:59Z (date -u), the lead, before the level's own lane trains. Refs #404.
+The change: found-level-lane on W102's STATE.3000 (and its MEAN.3000 for the lattice): one more face lane on the fine field (width 224 to
+256, lanes 7 to 8), written by the level's prolongation alone (its other writers and the prolongation's rows of the old lanes held at zero,
+149,888 entries; the lane's rows drawn at the old block's spread); every reader's columns of the lane founded at zero, so they open from
+the first section. The level hands the old lanes nothing from the founding on.
+W103l: that state, 3,000 sections on e5l after its gate 3 against W103's lap and the parity of three sections on the laned state, beside
+W103 (W102's STATE.3000, no change); read at MEAN.3000.
+G-L2:
+  (a) at a word's first letter, the last byte of the epoch before the handed one, read at the final read (tools/level_link_presence.py on
+      read-strand-cut ... past links), at least 0.05 (W101: 0.017; the row held it at 0.07 and the join passed a quarter of it);
+  (b) the word two before at a word's first letter (tools/word_presence.py), at least 0.035 (W102: 0.023);
+  (c) every held text register within 0.01 nats a place of the control, one place open (the level's old hand is withdrawn at founding);
+  (d) the theory panel's words in the register's lexicon at least the control's less 3 points.
+Rule: (a), (b) and (c) held, the line takes the lane; (a) held and (c) missed, a second lap runs as an arm; (a) missed, the lane's readers
+are read before a second lap.

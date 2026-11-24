@@ -1,0 +1,2 @@
+WORD_PRESENCE st_W103 word_starts=19351 read=224 tick=3 byte_2=0.603 prev_first=0.273 prev_word=0.226 prev2_word=0.024 target=0.038 planted=0.000 prev_len=0.363 | three or more words into a line (18520): line_words=0.184
+WORD_PRESENCE st_W103l word_starts=19351 read=256 tick=3 byte_2=0.595 prev_first=0.274 prev_word=0.233 prev2_word=0.026 target=0.036 planted=-0.000 prev_len=0.367 | three or more words into a line (18520): line_words=0.175

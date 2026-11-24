@@ -1,0 +1,36 @@
+W103L_START 05:05:09
+STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+W103L_GATE EQUAL 06:15:13
+W103L_LANE_PARITY STORE_PARITY_DONE calls=3 unequal=0 unequal_sites=0 unequal_entries=0 first=- EQUAL 
+W103L_DEV lane_ms=852 plain_ms=707 sections=30 
+W103L_PROJECTION 42 minutes, deadline 3922 s
+TERRAIN_TRAINED W103l 07:51:28 sections=3000 ended=false
+TERRAIN_REACH W103l 07:53:25 ANSWER copy n= 2655 0.512|ANSWER reverse n= 2667 0.302|ANSWER sum n= 1579 1.183|
+TERRAIN_PANEL W103l_mean 08:22:49 seen: words 38 in_lexicon 29 (76%) longest_copy 17 held: words 54 in_lexicon 37 (68%) longest_copy 14 unread: words 60 in_lexicon 43 (71%) longest_copy 15  || LONG W103l_mean: all words 268 in lexicon 189 (70%) writes that loop 1 of 20 longest run shared with its prompt 19 | code 30/44 (68%) web 45/60 (75%) science 37/53 (69%) books 52/62 (83%) wikidata 25/49 (51%)
+TERRAIN_LOUD W103l 08:29:57  lines=71
+TERRAIN_WIDE W103l 08:46:19 LONG W103l: all words 2108 in lexicon 1535 (72%) writes that loop 18 of 160 longest run shared with its prompt 76 | code 268/339 (79%) web 380/461 (82%) science 296/434 (68%) books 392/469 (83%) wikidata 199/405 (49%)
+W98_CAVITY W103l 09:29:14 CAVITY_DONE ms=959194
+W98_THEORY THEORY_PANEL W103l logic: words 104 in lexicon 85 (81%) loops 0 of 8 longest shared with prompt 17 | theory: words 172 in lexicon 141 (81%) loops 0 of 12 longest shared with prompt 10
+W103L_FRONTIER FRONTIER W103l; one place open: all 0.6090 (140564 places) | books 0.6832 code 0.4064 logic 0.3899 science 0.5783 theory 0.5381 web 0.7533 wikidata 0.9119|FRONTIER W103l; the frontier: all 1.8258 (139706 places) | books 1.8093 code 1.5756 logic 1.6796 science 1.7746 theory 1.8247 web 2.0636 wikidata 2.0525|
+W103L_WORD_PRESENCE st_W103 word_starts=19351 read=224 tick=3 byte_2=0.603 prev_first=0.273 prev_word=0.226 prev2_word=0.024 target=0.038 planted=0.000 prev_len=0.363 | three or more words into a line (18520): line_words=0.184
+W103L_W103 LEVEL_LINKS cutL_W103 word_starts=18848 D0=224 D1=64
+W103L_W103 LEVEL_LINK restricted prev_word=0.002 prev2_word=0.017 prev2_first=0.040 handed_epoch=0.009 epoch_before_it=0.004 epoch_two_before_it=0.000 handed_first_byte=0.130 handed_last_byte=0.188 last_byte_before_it=0.241 last_byte_two_before_it=0.020 last_byte_three_before_it=0.001 planted=0.000
+W103L_W103 LEVEL_LINK coarse prev_word=0.003 prev2_word=0.016 prev2_first=0.033 handed_epoch=0.001 epoch_before_it=0.001 epoch_two_before_it=0.000 handed_first_byte=0.031 handed_last_byte=0.087 last_byte_before_it=0.102 last_byte_two_before_it=0.036 last_byte_three_before_it=0.014 planted=-0.000
+W103L_W103 LEVEL_LINK row prev_word=0.004 prev2_word=0.014 prev2_first=0.027 handed_epoch=0.000 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.019 handed_last_byte=0.067 last_byte_before_it=0.071 last_byte_two_before_it=0.025 last_byte_three_before_it=0.007 planted=-0.000
+W103L_W103 LEVEL_LINK joined prev_word=0.234 prev2_word=0.022 prev2_first=0.034 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.017 handed_last_byte=0.132 last_byte_before_it=0.034 last_byte_two_before_it=0.011 last_byte_three_before_it=0.003 planted=-0.000
+W103L_W103 LEVEL_LINK final prev_word=0.226 prev2_word=0.026 prev2_first=0.033 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.012 handed_last_byte=0.102 last_byte_before_it=0.017 last_byte_two_before_it=0.002 last_byte_three_before_it=0.001 planted=0.000
+W103L_WORD_PRESENCE st_W103l word_starts=19351 read=256 tick=3 byte_2=0.595 prev_first=0.274 prev_word=0.233 prev2_word=0.026 target=0.036 planted=-0.000 prev_len=0.367 | three or more words into a line (18520): line_words=0.175
+W103L_W103l LEVEL_LINKS cutL_W103l word_starts=18848 D0=256 D1=64
+W103L_W103l LEVEL_LINK restricted prev_word=0.002 prev2_word=0.016 prev2_first=0.040 handed_epoch=0.009 epoch_before_it=0.004 epoch_two_before_it=0.000 handed_first_byte=0.138 handed_last_byte=0.193 last_byte_before_it=0.253 last_byte_two_before_it=0.023 last_byte_three_before_it=0.001 planted=0.000
+W103L_W103l LEVEL_LINK coarse prev_word=0.003 prev2_word=0.013 prev2_first=0.030 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.027 handed_last_byte=0.079 last_byte_before_it=0.091 last_byte_two_before_it=0.041 last_byte_three_before_it=0.014 planted=-0.000
+W103L_W103l LEVEL_LINK row prev_word=0.002 prev2_word=0.003 prev2_first=0.006 handed_epoch=0.000 epoch_before_it=0.000 epoch_two_before_it=-0.000 handed_first_byte=0.002 handed_last_byte=0.014 last_byte_before_it=0.004 last_byte_two_before_it=0.001 last_byte_three_before_it=0.000 planted=-0.000
+W103L_W103l LEVEL_LINK joined prev_word=0.243 prev2_word=0.019 prev2_first=0.029 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.015 handed_last_byte=0.131 last_byte_before_it=0.017 last_byte_two_before_it=0.003 last_byte_three_before_it=0.001 planted=-0.000
+W103L_W103l LEVEL_LINK final prev_word=0.230 prev2_word=0.026 prev2_first=0.033 handed_epoch=0.001 epoch_before_it=0.000 epoch_two_before_it=0.000 handed_first_byte=0.011 handed_last_byte=0.105 last_byte_before_it=0.017 last_byte_two_before_it=0.002 last_byte_three_before_it=0.001 planted=0.000
+TERRAIN_SCORE W103 whole 57/96 opening 59/96 first 72/96 | sum 8/8/10 of 16 difference 8/8/9 of 16 product 5/5/7 of 16 close 10/12/16 of 16 copy 12/12/14 of 16 reverse 14/14/16 of 16
+TERRAIN_SCORE W103l whole 45/96 opening 48/96 first 67/96 | sum 9/9/9 of 16 difference 7/7/7 of 16 product 4/4/6 of 16 close 8/11/16 of 16 copy 8/8/15 of 16 reverse 9/9/14 of 16
+W103L_ALL_DONE 09:59:05

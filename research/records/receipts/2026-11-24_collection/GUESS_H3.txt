@@ -1,0 +1,12 @@
+Fixed 2026-11-24T10:24:00Z (date -u), the lead, before W105w trains. Refs #404.
+The reading it answers: W104f (W103's end on store-2026-11-24-all, the full collection at 72% of a pass beside the prefix role's 1.5 GB
+of registers) held dialogue -0.026, acts -0.015 and harness -0.056 nats a place under W103, and cost every other register +0.03 to +0.05
+(theory +0.008); the history's eighth at 21% of a pass had held dialogue -0.052 and acts -0.039 at a cost under 0.012.
+The change: W104f's STATE.3000 joined at a new pass to store-2026-11-24-wide, whose prefix role reads each register's whole training
+documents (8.5 GB in place of 1.5 GB) beside the full collection (4.0 GB), so the collection is 32% of a pass and every piece of it is
+still read once a pass. W105w: 3,000 sections on e5h2.
+G-H3:
+  (a) every register but the theory within 0.015 nats a place of W103 (W104f: +0.03 to +0.05), one place open;
+  (b) held dialogue, acts and harness each at most W104f's (the collection's gain kept);
+  (c) the probe panel: writes naming Brandon, Claude or Athena where the prompt's last line does not, at least W104f's count.
+Rule: (a) and (b) held, the line goes on on the wide store; (a) missed, the share is read again before the next lap.
