@@ -1,0 +1,16 @@
+Fixed 2026-11-25T18:32:44Z (date -u), the lead, from Fable's G-M1 as restated in receipts/2026-11-25_second_stream/GUESS.txt (relayed 18:15Z), before W118m
+trains. Refs #404.
+The design: the line's end (widths/w123.line, named once G-T8 is scored) joined at a new pass onto its own store (W118, the control) and onto
+that store with the wave slice beside it (store-2026-11-25-wide-wave), the state grown by the store's thirteen fresh letters, C0, C1 and F5
+to FF (join-store's growth: each fresh class's rows and rates at zero, its bias at the least standing one; the lattice, grains and
+remainders kept; W118m), 3,000 sections each on e5fi. Both arms read their text from every slice's first piece, so they differ by the wave
+and its letters alone.
+G-M1, Fable's clauses in their words:
+  (a) (0.6) the fade's covector summed over the wave's regions at the arm's last saved state asks the rings of period 81, 128, 243 and 256
+      to fade slower on at least three of the four, where the same sum over the text slices' regions asks each of them to fade faster or
+      nothing;
+  (b) (0.5, a coin) the wave's held samples at the arm's lap mean, one place open, code at 1.13 nats a sample or less at thirteen levels
+      (the held count tables: 2.566 with nothing known, 1.435 one mate back, 1.266 two back, 0.980 both neighbours, 0.816 two each side);
+  (c) (0.6) the collection's held text over all its places at the arm's mean stands at most 0.004 nats a place over the control's.
+Rule (the lead's, naming the slice's purpose beside its ceiling of harm): the line takes the wave where (c) held and the wave's held code
+stands under the one-mate-back table (1.435), so that she holds more of the wave than a count of one sample back tells.
