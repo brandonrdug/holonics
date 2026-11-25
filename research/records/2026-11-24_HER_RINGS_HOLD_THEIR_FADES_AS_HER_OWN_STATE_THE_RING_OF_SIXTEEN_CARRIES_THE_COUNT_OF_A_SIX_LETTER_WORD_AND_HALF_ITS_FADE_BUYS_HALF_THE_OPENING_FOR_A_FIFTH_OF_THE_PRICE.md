@@ -269,3 +269,16 @@ the moments' encodings and chart at zero, so its moments, and the second fades' 
 parity draws them, and its first reading (with them at zero) read zero covectors at the second fades on host and card alike. Gate 3 of the build
 (e5fh) against the line, its second fade off: parity on 3 sections unequal = 0, the reproduction of 3 and of 24 sections equal, the lap's
 read equal (`receipts/2026-11-24_fade/gate3_e5fh.txt`).
+
+## 13. The trail as a rate of looks starves the slices it does not favour; the second fade's arm
+
+G-T2 missed on all three counts (`receipts/2026-11-24_fade/GUESS_T2.txt`). W116t less W116 at the lap means, one place open over the
+collection's held 200,933 places: +0.0132 (±0.0007), books +0.046 and science +0.040, code −0.0008 and the tool turns −0.0065. The trail,
+charged by each slice's out-of-sample work, rose fastest on the slices that already gain, and at the quota's rate times the trail it handed
+the tool turns and code about twice the control's places and web, science, books and theory about a seventh. What a slice gains under a
+look is no measure of what it lacks, so a trail of gains is a fovea that never moves. The line keeps W116's end (0.7045 at its lap mean, 0.0053
+under W115w's), and the walk at the quota's rate stands. The trail stays a state the cut reads (`set-trail`), held to this reading.
+
+The second fade's arm runs from W116's end: W117q founded by `found-twin −3180` (16 turned slots, a chart of 14,336 entries at zero),
+3,000 sections on e5fh beside W117, the same state continued on e5fh, which reproduces the line. Its guess G-T8 was fixed at 16:34:18Z
+before W117q trains (`receipts/2026-11-24_fade/GUESS_T8.txt`).

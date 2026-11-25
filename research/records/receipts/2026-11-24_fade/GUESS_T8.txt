@@ -1,0 +1,14 @@
+Fixed 2026-11-25T16:34:18Z (date -u, the file's write), the lead, before W117q trains. Refs #404, #405.
+The line: G-T2 missed on all three counts (W116t less W116 at the lap means, one place open: all +0.0133, books +0.046, science +0.040,
+code -0.0008, wikidata +0.005), so the line does not take the trails and W116's STATE.3000 is its end.
+The premise read first (the fade record §11, §14): a ring's one fade is drawn back toward the skin's and every boundary asks to erase more,
+so a count that lasts across a boundary needs a store a boundary does not erase; a ring founded at the skin's fade hears its return at a
+thirty-first of the most; the parts founded on this line at their first lap cost a little (W113f +0.0023, W114r +0.0007 at the lap means).
+The change: every turned ring's second fade founded where a ring keeps half of itself over its turn (found-twin -3180) and its chart at
+zero (e5fh; W117q), 3,000 sections beside W117 (W116's end continued on e5fh, which reproduces the line).
+G-T8 (at the lap means, one place open on the collection's held set; opens on gt7_rows at the lap means):
+  (a) (0.4) all places at most W117's;
+  (b) (0.3) code and logic each at least 0.003 under W117 (where a count across a boundary is read: indents, brackets, numbered steps);
+  (c) (0.6) no region more than 0.010 over W117;
+  (d) (0.35) the opening at P1 = 7 (a six-letter word's count) at least 0.05 over W117's.
+Rule: (a) and (c) held, the line takes the second fade; otherwise it does not.

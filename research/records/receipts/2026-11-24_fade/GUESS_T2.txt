@@ -12,3 +12,16 @@ G-T2 (at the lap means, one place open on the collection's held set):
   (b) (0.55) wikidata and code each at least 0.008 under W116;
   (c) (0.4) no region more than 0.015 over W116.
 Rule: (a) and (c) held, the line takes the trails; otherwise it does not.
+
+Scored 2026-11-25T16:40:03Z (date -u), the lead, from frontier_ruler.py on out4_W116 and out4_W116t (the collection's held set, one place open, lap
+means, 200,933 places). W116t less W116, paired: all +0.0132 (0.0007); acts -0.0065, books +0.0461, code -0.0008, dialogue +0.0071,
+harness +0.0087, logic +0.0093, science +0.0398, theory +0.0111, web +0.0129, wikidata +0.0047. Its trails at section 2,992: acts 8,668,
+wikidata 8,477, code 7,747, logic 926, books 882, harness 701, theory 482, web 480, science 453, the conversations -484; over the lap the
+tool turns took 190,145 places and code 148,665 against the control's 96,065 and 87,312, while web, science, books and theory took 3,804
+to 5,328 against 25,758 to 43,802.
+  (a) missed: +0.0132.
+  (b) missed: wikidata +0.0047, code -0.0008.
+  (c) missed: books +0.0461, science +0.0398.
+By the rule the line does not take the trails: W116's STATE.3000 is its end (0.7045 at its lap mean, 0.0053 under W115w's). A trail charged
+by out-of-sample work concentrates the looks on the slices that already gain (the tool turns, code, wikidata), and the slices it starves
+lose four to five times what the favoured ones gain; the work of a slice is not its need. The walk at the quota's rate stands.
