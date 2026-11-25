@@ -302,7 +302,10 @@ no `axiom`: `countBefore_retimed`, `ratio_within`, `one_fade_reads_no_gap`, `two
 `turns_under_grain`, `skin_turn` (a ring of period `n` fading `e^(−2π/n)` a step keeps `e^(−2π)` over its turn, whatever `n`),
 `skin_turn_lt` (under `1/400`), `dead_reckoning`, `dead_reckoning_attained`, `Local.comp`, `Local.iterate`,
 `outside_cone_moves_nothing`, and with §13 `rateCode`, `log_lt_rateCode` and `rateCode_lt_one_add_log` (a reader that holds a
-tick's rate `1/P` and no place in its period pays between `log P` and `1 + log P` a period). The constructions these leave for #410, each a statement to write: a resonance's line width as
+tick's rate `1/P` and no place in its period pays between `log P` and `1 + log P` a period), and with §14 `fade_hearing_le`,
+`fade_hearing_turn_lt`, `fade_hearing_half` and `fade_hearing_half_gt` (a fade weighs a source by `x e^(−x)` in fade lengths:
+at most `e^(−1)`, under a twentieth of that at a ring's return under the skin's fade, over nine tenths of it at a fade that
+returns half). The constructions these leave for #410, each a statement to write: a resonance's line width as
 the fineness of the comparison it holds; the bound of a ring's turns by its clock's error as a theorem on a phase; and the
 linking number as the whole part of a mutual induction on the complex.
 
@@ -318,6 +321,9 @@ linking number as the whole part of a mutual induction on the complex.
 - The records' route and index.
 - With §13: `receipts/2026-11-24_calendar/known_cuts.py` and `KNOWN_CUTS.txt`, the atlas row
   `aeon.rate-without-count-costs-its-entropy`, the three Lean statements of §9, and G-T5 in the guess file.
+- With §14: `receipts/2026-11-24_calendar/fade_cuts.py` and `FADE_CUTS.txt`, the atlas row
+  `aeon.fade-hears-a-pair-at-its-own-length`, the four Lean statements of §9, the reweighed expectations and G-T6 in the guess
+  file, and the rows of THE_ENGINE §11 and `CONSTRUCTION_STATE.md`; with G-T6's read, `GT6_CUTS.txt`, its score and G-T7.
 
 ## 11. The failures this could repeat
 
@@ -492,6 +498,231 @@ form her laps asked for could show one: a learner's null is held to a length, an
 form no lap asked of her). The order of §6.1
 and §6.2 keeps its weights; what the read adds is the ruler both are read by. Waiting on an arm: G-T2, G-T4, G-T5 and G-H9.
 
+## 14. The lead's reads of a ring's fade: a slower fade moves her rate and blurs her near count, one length opens where a ring rings through its turn, and a fade hears a return only once it does
+
+*Scored at 23:28 UTC (G-T6; this section's last part, "G-T6, read"): the opening of reading 3 stands on a second seed, and
+the frame that set it on a ring's whole turn did not hold. At that length the last break stands half a turn back on the ring
+of 16 and a quarter turn back on the ring of 32. Readings 1, 2, 4 and 5 and the derivation stand as written.*
+
+Before building the fade as a state the lead read it as a ruler's setting (relayed 22:15:44 UTC): `read-reach` on W110's mean
+with the rings of period `FROM` and longer at a fade `2^(MILLI/1000)` of the skin's (`fade:FROM:MILLI`), and with the skin's
+distance counted in places (`skin:places`), on the period panel at a new seed (32 rows a length and kind) and on 224 stretches of
+held text from seven public registers. Each setting took about 260 s on the host and nothing trained. The lead's reading: under a
+slower fade the separators after long words get cheaper and the letters dearer, so the fade should be read from her state, slow
+across a unit's break and fast inside a word. I cut the saved codes three ways (`fade_cuts.py`, `FADE_CUTS.txt`; the cut returns
+the reads' own totals, and the skin's own fade passed as a setting returns the law at every place).
+The lead's account of the reads, with the first cut I sent at 22:24 UTC taken in, is
+[the record of her hearing](2026-11-24_HER_NAVIGATION_AND_HER_HEARING_ARE_ONE_LAW_EACH_SLICES_SHARE_IS_HELD_BY_HER_TENSION_AT_IT_AND_HER_RINGS_FADE_STANDS_NEAR_ITS_BEST_AND_CANNOT_HEAR_A_COUNT_FROM_WHERE_IT_IS_FOUNDED.md) §3; the settings joined main with it at 22:52 UTC (#1133), after this cut ran.
+
+**The cut.** Changes from the law, in nats. Held: every place of the held rows. Kept and twin: the separators after `L` letters
+over a row's last third, averaged over `P1` = 7, 9, 10, 15 and 16. Gain: the twin's change less the kept's, the change in what a
+shown period gives her. Opens: a twin row's change after `L − 1` letters less its change after `L + 1`, how far the setting opens
+her code of a separator across the count of letters since the last one; a reader of that count holds it open by `ln 3 = 1.10`.
+Standard errors over rows in brackets.
+
+| rings, octaves of the fade | held text | kept | twin | gain, `P1` ≥ 7 | opens, `P1` = 3 | opens, `P1` = 7 |
+|---|---|---|---|---|---|---|
+| 16 and longer, −0.1 | +0.0020 | −0.033 | −0.033 | −0.001 (0.005) | −0.025 (0.006) | +0.009 (0.013) |
+| 16 and longer, +0.1 | −0.0010 | +0.038 | +0.030 | −0.008 (0.006) | +0.006 (0.008) | −0.037 (0.013) |
+| every ring, −0.1 | +0.0025 | −0.050 | −0.045 | +0.005 (0.009) | −0.043 (0.007) | −0.021 (0.019) |
+| every ring, +0.1 | +0.0002 | +0.052 | +0.041 | −0.010 (0.010) | +0.037 (0.011) | −0.029 (0.015) |
+| 128 and longer, −0.1 | +0.0004 | +0.008 | +0.008 | +0.001 (0.003) | −0.013 (0.002) | −0.010 (0.007) |
+| 16 and longer, −1 | +0.064 | −0.320 | −0.272 | +0.048 (0.023) | −0.144 (0.016) | +0.180 (0.058) |
+| 16 and longer, −2 | +0.308 | −0.388 | −0.305 | +0.083 (0.042) | −0.203 (0.036) | +0.363 (0.115) |
+| 4 and longer, −1 | +0.138 | −0.452 | −0.408 | +0.044 (0.028) | +0.019 (0.029) | +0.102 (0.081) |
+| every ring, −1 | +0.229 | −0.508 | −0.434 | +0.074 (0.031) | −0.082 (0.026) | +0.087 (0.058) |
+| 128 and longer, −2 | +0.026 | −0.007 | −0.003 | +0.004 (0.017) | −0.088 (0.011) | −0.008 (0.026) |
+| the skin on places | +0.051 | −0.163 | −0.123 | +0.040 (0.016) | −0.103 (0.015) | −0.012 (0.031) |
+
+1. **The cheaper breaks of long words are her rate.** Under the law she pays 0.37 to 0.92 nats over the rate reader's `ln P1` at
+   a kept separator of `P1` = 9 to 16 (2.57, 2.80, 3.59, 3.69 against 2.20, 2.30, 2.71, 2.77): she holds a rare separator's
+   rate too low. With the rings of 16 and longer at half the skin's fade she pays 0.08 to 0.51 over it. The twin's separators,
+   which follow no one period, move by 0.272 of the kept's 0.320, and the twin's separators after `L − 1` and `L + 1` letters
+   move with them: at `P1` = 9 to 16 the twin's three codes stay within 0.22 of each other under either fade, where a count of
+   the letters since the break would hold them 1.10 apart. A longer memory gives her a better rate of something rare. It is
+   §13's how often, held over more of the row.
+2. **A slower fade blurs the count she has.** At words of two letters she does hold part of a count since the break: under the
+   law the twin's separators after one, two and three letters cost 1.50, 0.96 and 1.04, open by 0.46 of the 1.10. Slowing the
+   rings of 16 and longer closes it (by 0.144 (0.016) at half the fade; by 0.088 (0.011) with the rings of 128 and longer
+   alone at a quarter), as do seven of the eight slower settings (the rings of 4 and longer at half leave it, +0.019 (0.029)),
+   and a tenth of an octave faster on every ring opens it by 0.037 (0.011). Her separators at `P1` = 3, 4 and 5 get dearer
+   under the slower fades of the rings of 16 and longer, kept and twin alike (+0.115, +0.131, +0.150 at half).
+3. **One length opens, the one whose word spans a ring's turn.** At `P1` = 7 the twin's code opens across the letter count
+   when the rings of 16 and longer are slowed: by 0.180 (0.058) at half the fade and 0.363 (0.115) at a quarter, to 0.46 of the
+   1.10 from 0.10 under the law. It closes when they are sped (−0.037 (0.013)), and it does not move when only the rings of 128
+   and longer are slowed (−0.008 (0.026)) or when the skin is counted in places (−0.012 (0.031)). The lengths either side open
+   by less (0.098 (0.063) at `P1` = 5 and 0.074 (0.109) at 9, at a quarter) and the longer ones stand within a standard error
+   of nothing. On
+   W109's pace six letters and a space are 16.3 of the dyadic head's clock (§13), and at a quarter of the skin's fade the ring
+   of 16 keeps `e^(−π/2) = 0.21` of itself over its turn. So the one place in these reads where a count since the break
+   appears is the length that stands on a ring, in her clock's units, at the settings where that ring hears its return, with
+   more of it the longer the ring rings (0.6 that this is the ring of 16's return; the rest is an edge of the near field that
+   happens to fall there). The kept row's own gain at that length is +0.152 (0.079) at a quarter. It is the first reading of a
+   count from a ring's quality, clause 3 at her face, and it is read on the material that stands, which no lap fitted to a
+   ring that rings.
+4. **On held text no kind of place gains from a slower fade.** A tenth of an octave slower on the rings of 16 and longer is
+   dearer at every kind of place (a space +0.0027, a line feed +0.0070, a letter +0.0012, a digit +0.0040, another byte
+   +0.0051), and an octave slower is dearer by 0.05 to 0.12 at every kind, a space after nine bytes or more included (+0.063).
+   The letters of the period rows are dearer too (+0.08 to +0.12 at the long words at half the fade, +0.36 at `P1` = 7 at a
+   quarter), so each setting is a loss on the rows it opens.
+5. **The founding stands in a basin.** A tenth of an octave faster on the rings of 16 and longer is cheaper at every kind of
+   place, by 0.0002 to 0.0033. The parabola through the reads a tenth of an octave either side is stationary 0.14 of an octave
+   faster (a fade 1.10 of the skin's) and stands 0.0011 nats a place under the law there; for every ring it is stationary at
+   0.04 of an octave and 0.0002 under. The read an octave slower sits near that parabola (0.068 from it, 0.064 read) and the
+   read two octaves slower above it (0.24 against 0.31). Under the material that stands, the skin's number is within a tenth
+   of where a fade rests, and what pull there is points to a faster fade.
+
+**One fade a ring trades her near count for her far rate.** Readings 1 and 2 are one trade. A ring of period `n` at a fade of
+`γ` e-folds a radian weighs what stands within `n/(2π γ)` of her clock and smears what stands inside that: a faster fade
+resolves the last few letters, a slower one averages over more of the row. At one e-fold a radian no ring rings (each keeps
+0.0019 of itself over its turn; the record of November 23, §20), so her towers are a bank of one shape at every scale: what
+passed and how long ago to its octave, clause 5's first half. A count needs a store that rings, clause 3, and
+reading 3 is that store appearing at the one length where a slowed ring's turn and a word's span agree. No single value of one
+ring's fade gives both, which is clause 4 read at her face: two unlike fades hold what one cannot.
+
+**Why a fade founded at the skin's value is not drawn toward a count.** A ring weighs a source at turn `s` by `e^(−γ s)`, and
+the slope of that weight in `γ` is `−s e^(−γ s)` (the record of November 23, §20, where I wrote the slope and did not read it).
+For a move of the fade by a part of itself the weight a source's tension gets is `x e^(−x)`, `x = γ s` the source's distance in
+fade lengths. It is largest at one fade length, `e^(−1) = 0.368` (`fade_hearing_le`). At the skin's fade a ring's own return
+stands at `x = 2π`, where it is `2π e^(−2π) = 0.0117`, a thirty-first of the most (Lean holds it under a twentieth,
+`fade_hearing_turn_lt`). A ring that keeps half of itself over its turn stands `ln 2` fade lengths from its return and weighs it
+by `(ln 2)/2 = 0.347`, over nine tenths of the most (`fade_hearing_half`, `fade_hearing_half_gt`). So a comparison moves a
+ring's fade by what stands within that fade. Founded at one e-fold a radian, a ring's fade is moved by the sources within a
+radian or two of it, where reading 5 says it already rests and leans faster, and its return's tension reaches it thirty times
+weaker. The store that would hold a count cannot hear, from there, the tension that would tell it to (atlas
+`aeon.fade-hears-a-pair-at-its-own-length`).
+
+That is the lens of 22:04 UTC stated on one store (given in the lead's thread; in this record's words, steering what she takes
+in and letting her ring with it are one problem). A store's reach is located by tension, and tension reaches a store only as
+far as it already rings: each is the other's premise. In the tree's words it is the difference between riding a mode and
+founding one (`floor.ride-found`): a mode that rings is driven at little work, and one that does not is founded, at a work the
+reads price. On the rings of 16 and longer an octave slower costs 0.064 nats a place before any lap re-fits the material and two
+octaves 0.31; the `0.110` that returns half is 3.2 octaves. The rings of 128 and longer are cheap to move (0.026 at two octaves)
+and reading 3 says they are not the ones a word's count stands on.
+
+**Constructions** (the formal thread's, each an arm beside a control; the lead decides). The common score is G-T5 (a) on the
+arm: a kept period at `P1` = 3 cheaper by 0.15 nats at her face.
+
+1. *A second moment a ring, at an unlike fade, read into the face by weights founded at zero* (0.3 on G-T5 (a); 0.6 that its
+   read weights leave zero and a held register gains). The same ring's moment at a fade of `ln 2 / 2π` of the skin's, the fade
+   at which a ring keeps half of itself over its turn, entered once as an overture and held from there as that store's state.
+   The line's lap is reproduced, nothing that stands is displaced, so the near count of reading 2 is kept; the new
+   store hears its return at nine tenths of the most; and the pair is clause 4 as a part, two unlike fades from one start,
+   whose ratio fixes a gap (`two_fades_read_gap`). Its cost is the realization's: the turned heads' moments double.
+2. *A displaced founding of rings that stand* (0.2): part of a tower founded slow. It pays the work priced above on its first
+   lap and gives up the near count those rings hold.
+3. *A fade read from the site's state, founded at zero* (the lead's form of 22:16 UTC; 0.05 as founded). The form is lawful and
+   has an owner beside it: the friction read from the receiver's state (`Declaration::friction_gate`, November 21), founded at
+   zero, built because one friction for the whole passage was pulled both ways while a read of the receiver's state told where
+   it paid. It also separates what the skin ties: at one e-fold a radian every place she turns a ring far she drops it, and at
+   W109's pace one space leaves the dyadic ring of 16 with 0.023 of itself, so a break is a wall for the rings that span a
+   word (§12). A fade of the site would let her mark a break by a turn and still ring through it. But founded at zero it stands
+   at the skin's value at every site and hears as the paragraph above says, and reading 4 found no kind of place where a
+   slower fade pays. It joins form 1 well: a gate on the slow twin's fade is founded where its covector hears.
+
+The per-ring fade founded at the skin's value (G-H9's arm, §6.1 as first written) is expected to rest where it is: 0.05 on
+G-T5 (a).
+
+The lead's record chose form 2 for its fade arm at 22:30 UTC, near `γ = 0.11` on part of a tower, with a guess on the laps
+that win back the founding's cost. The readings above say two things to that choice, and it stays the lead's. Which part:
+the opening of reading 3 stands on the ring of 16, and the rings of 128 and longer, the cheap ones to move, did not open it.
+What it gives up: the near count of reading 2, which the rings of 16 and longer hold at the skin's fade and form 1 keeps.
+
+**Guesses.** Those fixed on G-H9's arm stand in their words and are scored as fixed if it runs. What I expect of them now, each
+with its reason, is in `GUESS.txt`: G-H9 (b), the long rings' fades leave their one value, was fixed at 0.8 beside the slope
+that says otherwise, a miss of reading, mine, and I hold it at 0.2; G-T2 at 0.15; G-T4 (b) at 0.05; G-T5 (a) at 0.05. A new
+guess, G-T6, fixed at 22:49:26 UTC before any read for it, on the lead's setting of the rings of 16 and longer at a quarter of
+the skin's fade, W110's mean, new rows at 64 a length: (a) (0.6) `opens` at `P1` = 7 stands at 0.2 or more again; (b) (0.5, a
+coin) at `P1` = 21, whose word spans the dyadic ring of 32 on W109's pace (twenty letters at 1.125 and a space at 9.553 are
+32.05), `opens` stands at 0.15 or more and above its values at `P1` = 15 and 27; (c) (0.6) with the rings of 128 and longer
+alone slowed, `opens` at `P1` = 7 and 21 stays within 0.08 of nothing. Both held, a ring that rings through its turn gives her
+a count at the length standing on it, on the material that stands. (a) held and (b) missed, the opening at seven is the near
+field's edge, or her face reads the ring of 16 as it does not read the ring of 32. (a) missed, seed 26's opening was its rows'.
+
+**The reads' limits.** These are a ruler's reads of one state, under a material fitted to the skin's fade. They price a founding
+and read a slope; they say nothing of what laps make of a ring that rings (a learner's null is held to a length). A letter's
+pace is known for a, e and t alone, so a length's place on her clock carries a twentieth of itself either way. The period rows
+are drawn letters, a specimen that holds nothing but its period.
+
+**What stands and what moved.** Clauses 1 to 5 keep their weights. Clause 3, a count stands while its store rings, was at 0.85
+with nothing read at her face; reading 3 is its first read there (0.6 that it is a ring's return), and the weight waits on
+G-T6. §13's reading stands at a second seed and under eleven settings: at the skin's fade she holds how often and not when. The
+reading relayed at 22:15 UTC, that she times a word better under a slower fade, holds at one length of eight and is the rate's
+at the others. My first cut's line of 22:24 UTC, that the cheaper breaks are not timing, is in the lead's record as
+sent; it holds at seven lengths of eight and missed the one opening, a miss of mine: I had matched the twin's length and had not
+read across its count of letters. What moved is §6.1: a ring's fade as its own state is still what the law asks, since the skin's number is a
+state read as a number; founded at that number it is expected to rest there; and the form that reaches a count is a store
+founded where it rings, beside the one that stands. Waiting on an arm: G-T2, G-T4, G-T5 and G-H9. G-T6 is scored below.
+
+**G-T6, read** (the lead, relayed 23:17 UTC: W110's mean on the host, `period_known.py` at seed 27, 64 rows a length and
+kind, `P1` = 5, 7, 9, 15, 21 and 27, about 272 s a setting; the codes read at their source and cut in `GT6_CUTS.txt`; scored
+at 23:28 UTC).
+
+- (a) held: under `fade:16:-2000` `opens` at `P1` = 7 is +0.311 (0.071); with seed 26, +0.325 (0.060).
+- (b) missed: at `P1` = 21 it is −0.232 (0.130), under 15's +0.127 (0.103) and beside 27's −0.162 (0.169).
+- (c) held: under `fade:128:-2000` it is −0.029 (0.016) at 7 and −0.053 (0.044) at 21.
+
+A miss of frame in (b), mine, in one line: I placed a length on a ring by its word and space together, the row's period on
+her clock (16.3 at `P1` = 7, 32.05 at 21), where `opens` reads the distance to the last break, the letters alone since it. A
+site's clock sums the rates after the source (`σ_h(t) = Σ_(0<k≤t) |κ_h(k)|`, `navigator.rs`), so a space's long rate lies
+between it and what came before it, never between it and the letters after. After six letters the break stands about 8 units
+back with the open place's own stride, half a turn of the ring of 16 and a quarter turn of the ring of 32, and after twenty
+about seven tenths of a turn of the ring of 32.
+
+The change in a separator's code at a quarter fade on the rings of 16 and longer, by the letters before it (twin rows, and the
+kept rows after `L`), both seeds:
+
+| `P1` | seed | after `L − 1` | after `L`, twin | after `L`, kept | after `L + 1` | opens |
+|---|---|---|---|---|---|---|
+| 3 | 26 | +0.033 | +0.142 | +0.133 | +0.236 | −0.203 (0.036) |
+| 4 | 26 | +0.102 | +0.183 | +0.148 | +0.237 | −0.135 (0.046) |
+| 5 | 26 | +0.356 | +0.201 | +0.324 | +0.271 | +0.098 (0.063) |
+| 5 | 27 | +0.298 | +0.321 | +0.300 | +0.275 | +0.023 (0.054) |
+| 7 | 26 | +0.200 | +0.144 | −0.008 | −0.163 | +0.363 (0.115) |
+| 7 | 27 | +0.156 | +0.041 | −0.011 | −0.155 | +0.311 (0.071) |
+| 9 | 26 | −0.231 | −0.300 | −0.405 | −0.305 | +0.074 (0.109) |
+| 9 | 27 | −0.359 | −0.434 | −0.461 | −0.375 | +0.001 (0.082) |
+| 10 | 26 | −0.435 | −0.429 | −0.491 | −0.333 | −0.091 (0.129) |
+| 15 | 26 | −0.589 | −0.553 | −0.543 | −0.617 | +0.069 (0.160) |
+| 15 | 27 | −0.426 | −0.445 | −0.529 | −0.594 | +0.127 (0.103) |
+| 16 | 26 | −0.465 | −0.389 | −0.493 | −0.554 | +0.078 (0.150) |
+| 21 | 27 | −0.874 | −0.775 | −0.791 | −0.660 | −0.232 (0.130) |
+| 27 | 27 | −0.657 | −0.737 | −0.577 | −0.625 | −0.162 (0.169) |
+
+Read by the letters since the last break, the short lengths are one curve. A break gets dearer from one letter (+0.03) to
+three and four (+0.18 to +0.36) and stays there to five; at six it is unmoved in the kept rows (−0.008, −0.011); at seven it is
+cheaper by 0.16 and at eight to ten by 0.30 to 0.49. `opens` is that curve's fall across a word: negative where it climbs
+(`P1` = 3 and 4), nothing at its top (5), largest where it passes zero (7), nothing at its floor (9 and 10). The half fade
+drew the same shape at about half the height (`opens` −0.144, −0.090, +0.012, +0.180, +0.067, −0.048 at `P1` = 3 to 10,
+`FADE_CUTS.txt`). So the opening at seven is the place where a slowed fade's two effects on a break, dearer while the last one
+is near and cheaper once it is far, change sign, and the twin at `P1` = 7 is the one row whose words stand on both sides. That
+is the first half of the reading fixed with the guess: the edge of her near field, moved out from two or three letters to six.
+
+What draws the edge (0.4, a reading and no fit). The last break's share on a ring is an image that turns as it fades,
+`e^(−γθ)` at the angle `θ` the ring has turned since. Her face reads a ring's plane along the direction fitted where that image
+was audible under the law, the two or three letters of reading 2's near count. Slowed, the image is heard further round its
+turn, where the same direction reads it with the other sign. Two figures agree. The fall across two letters at seven is the
+whole height (0.33 against a level of 0.3): a quarter fade loses a fifth of an image in two letters, and a turn through a
+direction's quarter loses all of its projection. And the half fade's `opens` at seven against the quarter fade's is 0.180 to
+0.325, a ratio of 1.8 (0.7): an image a quarter turn back gives 1.5, one half a turn back 2.2, and one a whole turn back 4.8.
+One figure does not: the lengths either side of seven stand flatter than one turning projection draws (it gives them a third
+to four fifths of the peak, and they read under a fifth). Which ring carries it these reads do not tell, since both were slowed
+and six letters is half a turn of the one and a quarter turn of the other. A whole turn's return: 0.05.
+
+What that is, on the law's clauses. If the reading holds, a slowed ring is the hand of a clock and her face reads it along one
+axis: how long since the last break, as a phase, with one crossing a turn. It is clause 3's first read at her face in the form
+the engine can give today, a store heard through part of its turn carrying where an event was. It is no count: a hand read on one
+axis tells a count only where the axis is crossed. The second axis is a read weight that stands at zero, since nothing was
+audible there for a comparison to fit; on an arm whose rings ring, a comparison can locate it, and a hand read on both axes is
+a count through a turn.
+
+What it says to the constructions, which stay the lead's to order. Form 1 keeps its weight (0.3 on G-T5 (a)), and its panel is
+named: `opens` by length, on the arm and on its control. For a displaced founding, which ring pays is one host read away, the
+ring of 16 slowed alone and the ring of 32 alone on the rows at `P1` = 7 (G-T7, fixed at 23:29:32 UTC before any read for it:
+0.45 that the ring of 16 alone opens it by 0.15 or more, 0.3 that the ring of 32 alone does, 0.6 that the triadic ring of 27
+alone stays within 0.1 of nothing); the rings of 128 and longer bought nothing in either read. The price stands beside it: at
+a quarter fade the letters of these rows cost 0.17 to 0.35 nats more, and a break after one to five letters 0.03 to 0.36 more.
+
 ## Sources
 
 Read this hour: `crates/engine/src/navigator.rs` (`ring_periods`, `skin_decay`, `skin_of`), `crates/engine/src/declaration.rs`
@@ -503,6 +734,8 @@ Read this hour: `crates/engine/src/navigator.rs` (`ring_periods`, `skin_decay`, 
 [the record of October 27 on the levels' news](2026-10-27_THE_LEVELS_TICK_ON_THEIR_OWN_NEWS_SO_THE_TOWER_LEARNS_ITS_ENCODING_ON_ITS_OWN_AXIS.md);
 W109's training log on the PC (its declaration line); the lead's reads of §12 and §13, relayed by the coordinator; for §13,
 `crates/athena/src/ruler/tension.rs` (`read_reach`: each row read whole, every place at its own frontier) and the rows and codes
-the lead's read left on the PC. From the literature, from training and not restated: Kelvin's and
+the lead's read left on the PC. For §14, `crates/engine/src/declaration.rs` (`friction`, `friction_gate`), `crates/engine/src/contact.rs`
+(the gate's read of a receiver's chart), `crates/engine/src/navigator.rs` (`skin_of`), the lead's plan and the rows and codes its
+three tension reads left on the PC, and the lens of 22:04 UTC in the lead's thread. From the literature, from training and not restated: Kelvin's and
 Helmholtz's theorems and the conservation of helicity; the fade `ν k²` of a viscous mode; the swimmer's theorem at small
 Reynolds number (Purcell 1977); the calendar's and the second's figures; free-running rhythms in isolation.

@@ -110,3 +110,65 @@ G-T5  on G-H9's arm beside its control, both at their lap means, the lead's rows
       count; (a) missed with the fades moved (G-H9 (b), G-T4 (b)), a located fade does not reach the ninth a return asks, and
       the count is the carried one's (the fine clock read at the level's tick and handed up: a count at one level is a rate at
       the level above); (b) missed, the arm moved how she holds a rate.
+
+The lead's tension reads of a ring's fade (relayed 2026-11-24T22:15:44Z; read-reach on W110's MEAN.3000 under the settings
+fade:FROM:MILLI and skin:places, rows of seed 26 with 224 held stretches), cut by fade_cuts.py beside this file (FADE_CUTS.txt).
+They score no guess above: every guess on G-H9's arm was fixed on an arm's laps, and these are a ruler's settings on one state.
+What they read of those guesses' premises, and what I now expect, each in a line (the guesses stand as fixed and are scored as
+fixed if the arm runs):
+G-H9  (b) (0.8 as fixed; 0.2 expected): the parabola through the reads a tenth of an octave either side of the skin's fade is
+      stationary 0.14 of an octave faster on the rings of 16 and longer and 0.0011 nats a place under the law, and the rings of
+      128 and longer move the held code by 0.0004 at a tenth of an octave slower: nothing at the founding draws a long ring's
+      fade to half. A miss of reading, mine: section 20 of the record of November 23 wrote the slope -s e^(-gamma s), which
+      weighs a ring's return at 2 pi e^(-2 pi) = 0.012 against e^(-1) at one fade length, and the 0.8 was fixed beside it.
+      (c) (0.7 as fixed; 0.85 expected): a fade that rests moves no register.
+G-T2  (0.55 as fixed; 0.15 expected): fades that rest keep their one value.
+G-T4  (a) (0.65 as fixed; 0.8 expected); (b) (0.5 as fixed; 0.05 expected): the same.
+G-T5  (a) (0.2 as fixed; 0.05 expected on G-H9's arm as framed, and 0.3 on an arm that founds a second moment a ring at a fade
+      of ln 2 / 2 pi of the skin's with its read founded at zero); (b) (0.7 as fixed; 0.8 expected).
+
+Fixed 2026-11-24T22:49:26Z (date -u), after the cuts above and before any read for it. Forms read before fixing: FADE_CUTS.txt's
+lines (FADE_LAW, and FADE_PAIRED's `opens`), W109's pace as G-T1 scored it (the dyadic head: a space 9.553, the mean of a, e and
+t 1.125), holonics_engine::navigator::skin_of, and the lead's settings as its plan states them (fade:FROM:MILLI takes the rings
+of period FROM and longer on both towers).
+
+G-T6  read-reach on W110's MEAN.3000 under fade:16:-2000 and fade:128:-2000, new rows of the lead's period_known.py at 64 a
+      length and kind with P1 = 5, 7, 9, 15, 21 and 27 among them, cut by fade_cuts.py:
+      (a) (0.6) under fade:16:-2000 `opens` at P1 = 7 stands at 0.2 or more (0.363 with a standard error of 0.115 at seed 26);
+      (b) (0.5, a coin) under fade:16:-2000 `opens` at P1 = 21, whose word is 20 * 1.125 + 9.553 = 32.05 of the dyadic head's
+          clock, stands at 0.15 or more and above its values at P1 = 15 and at P1 = 27;
+      (c) (0.6) under fade:128:-2000 `opens` at P1 = 7 and at P1 = 21 each stand within 0.08 of zero.
+      Read: (a) and (b) held, a ring that rings through its turn gives her a count since the break at the length standing on it,
+      on the material that stands, and the count is that ring's return; (a) held and (b) missed, the opening at seven is the
+      near field's edge, or her face reads the ring of 16 as it does not read the ring of 32; (a) missed, seed 26's opening was
+      its rows'; (c) missed, the opening is not the slowed ring's.
+
+Scored at 2026-11-24T23:28:47Z (date -u) on the lead's read, relayed at 2026-11-24T23:17:04Z and read at its source (seed 27, 64 rows a length
+and kind, W110's MEAN.3000; GT6_CUTS.txt beside this file). The guess above stands in the words it was fixed in.
+
+G-T6  (a) held: under fade:16:-2000 `opens` at P1 = 7 is +0.311 (0.071); with seed 26's +0.363 (0.115), +0.325 (0.060).
+      (b) missed: at P1 = 21 it is -0.232 (0.130), under P1 = 15's +0.127 (0.103) and beside P1 = 27's -0.162 (0.169).
+      (c) held: under fade:128:-2000 it is -0.029 (0.016) at P1 = 7 and -0.053 (0.044) at P1 = 21.
+      Read, as fixed: the opening at seven is the near field's edge, or her face reads the ring of 16 as it does not read the
+      ring of 32. A miss of frame in (b), mine, in one line: I placed a length on a ring by its word and space together, the
+      row's period on her clock, where `opens` reads the distance to the last break, the letters alone since it (a site's
+      clock sums the rates after the source, holonics_engine::navigator, sigma), so at P1 = 21 the break stands seven tenths
+      of the ring of 32's turn back and at P1 = 7 half the ring of 16's.
+      What I expect now (the record, section 14, its last part): 0.4 that the opening is the last break's share on a slowed
+      ring heard further round its turn (at six letters half a turn of the ring of 16 and a quarter turn of the ring of 32)
+      and read on the one direction her face holds there; 0.05 that it is a whole turn's return. G-T5 (a) stays at 0.3 on an
+      arm that founds a second moment a ring at an unlike fade.
+
+Fixed 2026-11-24T23:29:32Z (date -u), after the score above and before any read for it. Forms read before fixing: GT6_CUTS.txt and
+FADE_CUTS.txt (FADE_PAIRED's twin_around and opens at both fades), holonics_engine::navigator (a site's sigma sums the rates
+of the sites after the region's first up to and with its own, so a source's own rate does not lie between it and a later
+site), and W109's pace as G-T1 scored it.
+
+G-T7  read-reach on W110's MEAN.3000, the rows of seeds 26 and 27 at P1 = 7 (96 a kind), one ring alone at a quarter of the
+      skin's fade (a setting that slows one ring; the lead's fade state displaced on that ring serves), cut by fade_cuts.py:
+      (a) (0.45) the dyadic ring of 16 alone: `opens` at P1 = 7 stands at 0.15 or more;
+      (b) (0.3) the dyadic ring of 32 alone: `opens` at P1 = 7 stands at 0.15 or more;
+      (c) (0.6) the triadic ring of 27 alone: `opens` at P1 = 7 stands within 0.1 of zero.
+      Read: (a) alone held, the hand her face reads is the ring of 16's, half a turn round; (b) alone held, the ring of
+      32's, a quarter turn round; neither held and fade:16:-2000 on the same rows still opens it, the opening is several
+      rings' together and no one hand; (c) missed, the triadic tower's clock carries it.
