@@ -962,6 +962,87 @@ pub fn read_section_covectors(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 25, G-M1 (a)] `read-slice-fades UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA
+/// SECTIONS STATE STATE_SHA`: **each ring's fade covector summed slice by slice**. The pass's own cut draws `SECTIONS` sections from the state's
+/// place as training draws them; each section's regions are read and returned on the host a slice at a time (`read_and_return` on that slice's
+/// regions alone, nothing deposited), and each turned ring's fade covector (`2^40 ∂L/∂ℓ_s`, the skin's homogeneity) and second fade's, where the
+/// rings hold them, are summed by slice with the slice's sites. A negative sum asks the ring to fade more slowly there, a positive one faster.
+/// One `SLICE_FADES` line a slice and kind (`fade`, `twin`): its sites and `period:sum` for every turned ring; one `RINGS` line first with the
+/// rings' periods by slot. A ruler's read of a saved state; nothing is written back.
+pub fn read_slice_fades(args: &[String]) -> Result<()> {
+    if args.len() != 13 {
+        return Err("read-slice-fades UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA".into());
+    }
+    let started = std::time::Instant::now();
+    refuse_variables("read-slice-fades")?;
+    let units = units_of(&args[1], &args[2])?;
+    let store = Path::new(&args[3]);
+    let counts = store_counts(std::str::from_utf8(&pinned_read(&store.join("STORE.tsv").to_string_lossy(), &args[4], READ_BUDGET as usize)?)?)?;
+    let role = args[5].as_str();
+    let keys = pinned_read(&args[6], &args[7], READ_BUDGET as usize)?;
+    let seed = u64::from_be_bytes(keys.get(keys.len().saturating_sub(8)..).filter(|w| w.len() == 8).ok_or("a key file of fewer than eight bytes")?.try_into()?);
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?, units)?;
+    let sections = positive(&args[10])?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[11], &args[12], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let pass = learner.pass.clone().ok_or("a state with no pass line")?;
+    let names = role_names(&counts, role);
+    let mut slices = Vec::with_capacity(names.len());
+    for &name in &names {
+        slices.push(open_slice(store, role, name, &counts)?);
+    }
+    let (d, l) = (learner.field.declaration, learner.field.layout().clone());
+    if !d.fade && !d.twin {
+        return Err("a state whose rings hold no fade".into());
+    }
+    let slots = d.turned_slots();
+    let periods: Vec<usize> = learner.field.rings().iter().map(|(n, _)| *n).collect();
+    println!("RINGS slots={slots} periods={}", periods.iter().map(|p| p.to_string()).collect::<Vec<_>>().join(","));
+    let mut cut = Cut { seed, slices, pass };
+    let (mut fade, mut twin, mut sites) = (vec![vec![0i128; slots]; names.len()], vec![vec![0i128; slots]; names.len()], vec![0u64; names.len()]);
+    for done in 0..sections {
+        let mut regions: Vec<(usize, OwnedRegion)> = Vec::new();
+        let (mut in_pairs, mut in_sites) = (0u64, 0u64);
+        while let Some(drawn) = cut.next() {
+            let n = drawn.sites();
+            if in_sites > 0 && (in_pairs + n * n > cut.pass.pairs || in_sites + n > cut.pass.sites) {
+                break;
+            }
+            let slice = drawn.slice;
+            let Stretch { region, .. } = cut.take(drawn, &codec)?;
+            (in_pairs, in_sites) = (in_pairs + n * n, in_sites + n);
+            regions.push((slice, region));
+        }
+        if regions.is_empty() {
+            break;
+        }
+        for s in 0..names.len() {
+            let views: Vec<holonics_engine::field::Region> = regions.iter().filter(|(k, _)| *k == s).map(|(_, r)| view_of(r)).collect();
+            if views.is_empty() {
+                continue;
+            }
+            sites[s] += views.iter().map(|v| v.classes.len() as u64).sum::<u64>();
+            let (_, g) = learner.field.read_and_return(&views).map_err(|e| e.to_string())?;
+            for slot in 0..slots {
+                if d.fade {
+                    fade[s][slot] += g[l.fade + slot];
+                }
+                if d.twin {
+                    twin[s][slot] += g[l.twin_fade + slot];
+                }
+            }
+        }
+        println!("SLICE_FADES_SECTION section={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+    }
+    for (s, name) in names.iter().enumerate() {
+        for (kind, sums, on) in [("fade", &fade, d.fade), ("twin", &twin, d.twin)] {
+            if on {
+                println!("SLICE_FADES slice={name} kind={kind} sites={} {}", sites[s], (0..slots).map(|slot| format!("{}:{}", periods[slot], sums[s][slot])).collect::<Vec<_>>().join(" "));
+            }
+        }
+    }
+    Ok(())
+}
+
 /// [measurement; the lead, November 21, the precision pass (G-W0, G-W2, G-W4)] `read-widths END END_SHA MEAN MEAN_SHA OUT`: **each family's
 /// words, their spread and their silent steps**. `OUT/families.tsv` takes a line a family of the whole material (fine, level and glue): its
 /// name, entries, grain, the 50th, 99th and 99.9th hundredths and the largest of `|θ|` at the end (on `2^(−24)` whatever the grain), the root

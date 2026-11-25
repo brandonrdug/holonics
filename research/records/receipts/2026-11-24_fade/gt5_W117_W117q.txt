@@ -1,0 +1,52 @@
+GT5_READ W117 17:46:11 
+GT5 W117 KNOWN_MATCHED P1=3 kept=0.711 loose_matched=0.950 gain=+0.239 se=0.026 loose_by_letters=1.263 0.950 0.922 loose_all=1.030 kept_less_loose_all=-0.319 ln_P1=1.099
+GT5 W117 KNOWN_MATCHED P1=4 kept=1.301 loose_matched=1.558 gain=+0.257 se=0.034 loose_by_letters=1.623 1.558 1.538 loose_all=1.577 kept_less_loose_all=-0.276 ln_P1=1.386
+GT5 W117 KNOWN_MATCHED P1=5 kept=1.747 loose_matched=1.902 gain=+0.156 se=0.047 loose_by_letters=2.064 1.902 1.880 loose_all=1.951 kept_less_loose_all=-0.204 ln_P1=1.609
+GT5 W117 KNOWN_MATCHED P1=7 kept=2.238 loose_matched=2.390 gain=+0.151 se=0.054 loose_by_letters=2.475 2.390 2.442 loose_all=2.432 kept_less_loose_all=-0.194 ln_P1=1.946
+GT5 W117 KNOWN_MATCHED P1=9 kept=2.657 loose_matched=2.755 gain=+0.098 se=0.078 loose_by_letters=2.742 2.755 2.866 loose_all=2.766 kept_less_loose_all=-0.109 ln_P1=2.197
+GT5 W117 KNOWN_MATCHED P1=10 kept=2.843 loose_matched=2.825 gain=-0.018 se=0.092 loose_by_letters=2.816 2.825 2.831 loose_all=2.845 kept_less_loose_all=-0.002 ln_P1=2.303
+GT5 W117 KNOWN_MATCHED P1=15 kept=3.680 loose_matched=3.669 gain=-0.011 se=0.103 loose_by_letters=3.579 3.669 3.715 loose_all=3.666 kept_less_loose_all=+0.014 ln_P1=2.708
+GT5 W117 KNOWN_MATCHED P1=16 kept=3.864 loose_matched=3.724 gain=-0.140 se=0.111 loose_by_letters=3.833 3.724 3.822 loose_all=3.774 kept_less_loose_all=+0.090 ln_P1=2.773
+GT5 W117 KNOWN_STRETCH P1=3 kind=kept 1.563 0.981 0.880 0.775 0.739 0.683
+GT5 W117 KNOWN_STRETCH P1=3 kind=loose 1.631 1.175 1.097 1.088 1.039 1.022
+GT5 W117 KNOWN_STRETCH P1=4 kind=kept 2.126 1.578 1.501 1.426 1.315 1.289
+GT5 W117 KNOWN_STRETCH P1=4 kind=loose 2.069 1.754 1.681 1.645 1.567 1.587
+GT5 W117 KNOWN_STRETCH P1=5 kind=kept 2.364 2.099 2.006 1.926 1.806 1.687
+GT5 W117 KNOWN_STRETCH P1=5 kind=loose 2.343 2.173 2.083 2.053 1.986 1.911
+GT5 W117 KNOWN_STRETCH P1=7 kind=kept 2.751 2.529 2.393 2.254 2.198 2.278
+GT5 W117 KNOWN_STRETCH P1=7 kind=loose 2.792 2.638 2.491 2.455 2.402 2.465
+GT5 W117 KNOWN_STRETCH P1=9 kind=kept 3.182 2.843 2.919 2.905 2.686 2.632
+GT5 W117 KNOWN_STRETCH P1=9 kind=loose 3.131 2.874 2.921 2.876 2.804 2.728
+GT5 W117 KNOWN_STRETCH P1=10 kind=kept 3.227 3.028 2.848 2.807 2.892 2.794
+GT5 W117 KNOWN_STRETCH P1=10 kind=loose 3.249 3.059 2.963 2.868 2.914 2.773
+GT5 W117 KNOWN_STRETCH P1=15 kind=kept 4.038 3.609 3.572 3.567 3.583 3.753
+GT5 W117 KNOWN_STRETCH P1=15 kind=loose 3.976 3.474 3.599 3.585 3.623 3.717
+GT5 W117 KNOWN_STRETCH P1=16 kind=kept 4.072 3.862 3.873 3.833 3.854 3.874
+GT5 W117 KNOWN_STRETCH P1=16 kind=loose 3.992 3.800 3.798 3.745 3.824 3.723
+GT5_READ W117q 18:04:38 
+GT5 W117q KNOWN_MATCHED P1=3 kept=0.705 loose_matched=0.942 gain=+0.236 se=0.025 loose_by_letters=1.269 0.942 0.915 loose_all=1.027 kept_less_loose_all=-0.322 ln_P1=1.099
+GT5 W117q KNOWN_MATCHED P1=4 kept=1.262 loose_matched=1.540 gain=+0.278 se=0.035 loose_by_letters=1.619 1.540 1.518 loose_all=1.564 kept_less_loose_all=-0.301 ln_P1=1.386
+GT5 W117q KNOWN_MATCHED P1=5 kept=1.724 loose_matched=1.868 gain=+0.144 se=0.046 loose_by_letters=2.022 1.868 1.845 loose_all=1.917 kept_less_loose_all=-0.193 ln_P1=1.609
+GT5 W117q KNOWN_MATCHED P1=7 kept=2.219 loose_matched=2.373 gain=+0.154 se=0.053 loose_by_letters=2.467 2.373 2.409 loose_all=2.413 kept_less_loose_all=-0.194 ln_P1=1.946
+GT5 W117q KNOWN_MATCHED P1=9 kept=2.648 loose_matched=2.737 gain=+0.089 se=0.079 loose_by_letters=2.725 2.737 2.818 loose_all=2.743 kept_less_loose_all=-0.096 ln_P1=2.197
+GT5 W117q KNOWN_MATCHED P1=10 kept=2.854 loose_matched=2.823 gain=-0.031 se=0.093 loose_by_letters=2.809 2.823 2.829 loose_all=2.844 kept_less_loose_all=+0.010 ln_P1=2.303
+GT5 W117q KNOWN_MATCHED P1=15 kept=3.688 loose_matched=3.701 gain=+0.013 se=0.105 loose_by_letters=3.562 3.701 3.719 loose_all=3.672 kept_less_loose_all=+0.016 ln_P1=2.708
+GT5 W117q KNOWN_MATCHED P1=16 kept=3.888 loose_matched=3.759 gain=-0.129 se=0.110 loose_by_letters=3.816 3.759 3.803 loose_all=3.774 kept_less_loose_all=+0.114 ln_P1=2.773
+GT5 W117q KNOWN_STRETCH P1=3 kind=kept 1.563 0.985 0.885 0.774 0.735 0.676
+GT5 W117q KNOWN_STRETCH P1=3 kind=loose 1.637 1.187 1.105 1.084 1.040 1.014
+GT5 W117q KNOWN_STRETCH P1=4 kind=kept 2.124 1.568 1.482 1.397 1.277 1.249
+GT5 W117q KNOWN_STRETCH P1=4 kind=loose 2.062 1.758 1.675 1.632 1.558 1.568
+GT5 W117q KNOWN_STRETCH P1=5 kind=kept 2.357 2.089 1.986 1.894 1.784 1.663
+GT5 W117q KNOWN_STRETCH P1=5 kind=loose 2.327 2.162 2.069 2.029 1.954 1.876
+GT5 W117q KNOWN_STRETCH P1=7 kind=kept 2.736 2.546 2.383 2.246 2.178 2.259
+GT5 W117q KNOWN_STRETCH P1=7 kind=loose 2.789 2.660 2.499 2.449 2.383 2.444
+GT5 W117q KNOWN_STRETCH P1=9 kind=kept 3.138 2.838 2.903 2.865 2.675 2.625
+GT5 W117q KNOWN_STRETCH P1=9 kind=loose 3.083 2.860 2.911 2.856 2.791 2.695
+GT5 W117q KNOWN_STRETCH P1=10 kind=kept 3.195 3.017 2.854 2.802 2.904 2.804
+GT5 W117q KNOWN_STRETCH P1=10 kind=loose 3.227 3.042 2.936 2.839 2.903 2.782
+GT5 W117q KNOWN_STRETCH P1=15 kind=kept 4.014 3.574 3.573 3.570 3.566 3.779
+GT5 W117q KNOWN_STRETCH P1=15 kind=loose 3.921 3.444 3.604 3.565 3.606 3.744
+GT5 W117q KNOWN_STRETCH P1=16 kind=kept 4.014 3.815 3.885 3.803 3.846 3.931
+GT5 W117q KNOWN_STRETCH P1=16 kind=loose 3.943 3.768 3.786 3.730 3.797 3.751
+GT5_DONE 18:04:39
+RUN_EXIT 0 2026-11-25T18:04:39Z

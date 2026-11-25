@@ -4363,8 +4363,14 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
         }
     }
     assert!(forward_kept > 0, "a field with no paced head read the whole forward");
+    // A tower's fine field takes letters and its level stands as it was, the level's and the glue's entries after the fine field's.
     let tower = towered(1);
-    assert!(tower.lettered(1).is_err(), "a tower's levels take letters level by level");
+    let (grown, from) = tower.lettered(1).unwrap();
+    let s = tower.scale.as_ref().unwrap();
+    assert_eq!(grown.scale.as_ref(), Some(s), "the level keeps its field and glue");
+    assert_eq!(from.len(), grown.material_len(), "the map runs over the whole material");
+    let (of, nf) = (tower.theta.len(), grown.theta.len());
+    assert!((0..s.coarse.theta.len() + s.glue.len()).all(|k| from[nf + k] == Some(of + k)), "the level's entries after the fine field's");
     // The learner.
     let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.section(&[region()]).unwrap();
@@ -4400,6 +4406,70 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     let mut holding = learner.clone();
     holding.held = Some(HeldStep { step: vec![0; learner.field.material_len()], halvings: 0 });
     assert!(holding.lettered(1).is_err(), "refused while a step is held");
+}
+
+/// [definition; the lead, November 25, the wave slice's growth] **A growth by letters carries the classes' fade rates, the rings' fades and
+/// second fades, and a learner's lattice, grains and remainders**: on a field holding the rings' fades, the classes' fade rates (drawn off zero)
+/// and the second fades, every standing entry is carried once at its value, each paced head's fade-rate rows keep the standing classes at their
+/// indices with a fresh class's at zero and the open row at the end, and the text round-trips; the learner on a lattice keeps every family's
+/// spread and each standing entry's rest, carried grains and remainder, a fresh entry's at zero.
+#[test]
+fn a_growth_by_letters_carries_the_fade_rates_the_second_fades_and_the_lattice() {
+    let one = 1i32 << MATERIAL_BITS;
+    let (faded, _) = shaped(1).with_fade(2, -one / 2).unwrap();
+    let (rated, _) = faded.with_fade_rate().unwrap();
+    let (mut plain, _) = rated.with_twin(-(51 * one) / 16).unwrap();
+    let ol = plain.layout.clone();
+    let (a, paced) = (plain.declaration.alphabet, plain.declaration.paced_heads());
+    for (k, v) in plain.theta[ol.fade_rate..ol.fade_rate + paced * (a + 1)].iter_mut().enumerate() {
+        *v = [-one / 4, one / 8, -3 * one / 8, one / 4, -one / 2][k % 5];
+    }
+    plain.refresh_fade().unwrap();
+    let fresh = 3usize;
+    let (grown, from) = plain.lettered(fresh).unwrap();
+    let (l, a2) = (grown.layout.clone(), a + fresh);
+    assert_eq!(grown.declaration, Declaration { alphabet: a2, ..plain.declaration }, "the alphabet grows and nothing else");
+    assert_eq!(from.iter().filter(|o| o.is_some()).count(), plain.theta.len(), "every standing entry is carried once");
+    for (k, &o) in from.iter().enumerate() {
+        if let Some(i) = o {
+            assert_eq!(grown.theta[k], plain.theta[i], "entry {k} keeps its value");
+        }
+    }
+    for p in 0..paced {
+        let (o, n) = (ol.fade_rate + p * (a + 1), l.fade_rate + p * (a2 + 1));
+        assert_eq!(grown.theta[n..n + a], plain.theta[o..o + a], "head {p}'s standing classes' fade rates at their indices");
+        assert!(grown.theta[n + a..n + a2].iter().all(|&v| v == 0), "a fresh class's fade rate at zero");
+        assert_eq!(grown.theta[n + a2], plain.theta[o + a], "the open row's fade rate at the end");
+    }
+    let (m2, slots) = (2 * plain.declaration.complex(), plain.declaration.turned_slots());
+    assert_eq!(grown.theta[l.twin_face..l.twin_face + plain.declaration.width * m2], plain.theta[ol.twin_face..ol.twin_face + plain.declaration.width * m2]);
+    assert_eq!(grown.theta[l.twin_fade..l.twin_fade + slots], plain.theta[ol.twin_fade..ol.twin_fade + slots], "the second fades kept");
+    assert_eq!(grown.theta[l.fade..l.fade + slots], plain.theta[ol.fade..ol.fade + slots], "the fades kept");
+    assert_eq!(Constitution::from_text(&grown.to_text()).unwrap(), grown, "the text round-trips");
+    // The learner on a lattice, with carried grains and remainders.
+    let mut learner = Learner::new(plain.clone(), 6);
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    let mean = learner.clone();
+    learner.section(&[region()]).unwrap();
+    learner.held = None;
+    let len = learner.field.material_len();
+    let mut learner = learner.with_lattice_from(&mean).unwrap();
+    learner.carried = Some(((0..len).map(|i| (i % 3) as i32 - 1).collect(), (0..len).map(|i| ((i + 1) % 3) as i32 - 1).collect()));
+    learner.remainder = Some((0..len).map(|i| (i % 3) as i64).collect());
+    let grown = learner.lettered(fresh).unwrap();
+    let (_, from) = learner.field.lettered(fresh).unwrap();
+    let (gl, ll) = (grown.lattice.as_ref().unwrap(), learner.lattice.as_ref().unwrap());
+    assert_eq!(gl.spread, ll.spread, "every family keeps its spread");
+    let (gc, lc) = (grown.carried.as_ref().unwrap(), learner.carried.as_ref().unwrap());
+    let (gr, lr) = (grown.remainder.as_ref().unwrap(), learner.remainder.as_ref().unwrap());
+    for (k, &o) in from.iter().enumerate() {
+        match o {
+            Some(i) => assert_eq!((gl.rest[k], gc.0[k], gc.1[k], gr[k]), (ll.rest[i], lc.0[i], lc.1[i], lr[i]), "entry {k} keeps its rest, grains and remainder"),
+            None => assert_eq!((gl.rest[k], gc.0[k], gc.1[k], gr[k]), (0, 0, 0, 0), "a fresh entry's at zero"),
+        }
+    }
+    assert_eq!(Learner::from_text(&grown.to_text()).unwrap().to_text(), grown.to_text(), "the learner's text round-trips");
 }
 
 /// [definition; theory, November 12 (the record of the opening's room, §4 item 5)] **The pass's place is the learner's last line, written only

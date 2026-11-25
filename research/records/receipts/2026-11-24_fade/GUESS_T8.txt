@@ -1,0 +1,29 @@
+Fixed 2026-11-25T16:34:18Z (date -u, the file's write), the lead, before W117q trains. Refs #404, #405.
+The line: G-T2 missed on all three counts (W116t less W116 at the lap means, one place open: all +0.0133, books +0.046, science +0.040,
+code -0.0008, wikidata +0.005), so the line does not take the trails and W116's STATE.3000 is its end.
+The premise read first (the fade record §11, §14): a ring's one fade is drawn back toward the skin's and every boundary asks to erase more,
+so a count that lasts across a boundary needs a store a boundary does not erase; a ring founded at the skin's fade hears its return at a
+thirty-first of the most; the parts founded on this line at their first lap cost a little (W113f +0.0023, W114r +0.0007 at the lap means).
+The change: every turned ring's second fade founded where a ring keeps half of itself over its turn (found-twin -3180) and its chart at
+zero (e5fh; W117q), 3,000 sections beside W117 (W116's end continued on e5fh, which reproduces the line).
+G-T8 (at the lap means, one place open on the collection's held set; opens on gt7_rows at the lap means):
+  (a) (0.4) all places at most W117's;
+  (b) (0.3) code and logic each at least 0.003 under W117 (where a count across a boundary is read: indents, brackets, numbered steps);
+  (c) (0.6) no region more than 0.010 over W117;
+  (d) (0.35) the opening at P1 = 7 (a six-letter word's count) at least 0.05 over W117's.
+Rule: (a) and (c) held, the line takes the second fade; otherwise it does not.
+
+Scored 2026-11-25T19:07:13Z (date -u), the lead, from frontier_ruler.py on out4_W117 and out4_W117q (the collection's held set, one place open, lap
+means, 200,933 places) and fade_cuts.py on gt7_rows at the lap means. W117q less W117, paired: all +0.0004 (0.0002); acts +0.0010,
+books -0.0003, code +0.0011, dialogue -0.0002, harness +0.0005, logic +0.0009, science +0.0014, theory -0.0004, web -0.0005, wikidata
++0.0004. At P1 = 7 the kept separators 2.268 against 2.284 and the twins' matched 2.325 against 2.350: the opening (matched less kept)
+0.057 against 0.066. Seed 25's cuts (G-T5): the kept separators at P1 = 3 over a row's last fifty places 0.676 against 0.683. At the
+arm's mean the second chart stood at a root mean square of 0.0059 (its largest 0.050) on the turned heads' half of its 14,336 entries, and
+the second fades had moved from -3.18 to between -3.26 and -2.73 octaves, each toward a faster fade.
+  (a) missed: +0.0004.
+  (b) missed: code +0.0011, logic +0.0009.
+  (c) held: no region over +0.0014.
+  (d) missed: the opening -0.009.
+By the rule the line does not take the second fade: W117's STATE.3000 is its end (0.6973 at its lap mean). Her deposit took the second
+chart up and drew every second fade toward the skin's, as it drew the first fades (the fade record §11): on this terrain at one lap a
+store that a boundary does not erase is not what her covector asks for.
