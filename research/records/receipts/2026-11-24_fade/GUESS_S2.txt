@@ -28,3 +28,14 @@ gaps, unit gaps, trees/branches of graphs, holonic): the clock's reference was a
 unit. A slice's share is now a partition, p_s = quota_s T_s / sum_r quota_r T_r, its share of her news (the aperture's normalization
 and the terrain's two-branch share one level up), and its clock counts the passage's own places, a gap of 1/p_s between reads (e5f8).
 W113u was stopped at 1,029 sections, unread. G-S2 is scored, unchanged, on W113v; W113vf is the both cell.
+
+Scored 2026-11-25T05:24:34Z (date -u), the lead, from frontier_ruler.py on out4_W113 and out4_W113v (the collection's held set, one place open, lap
+means, 200,933 places). W113v less W113, paired: all +0.0004 (0.0005); acts +0.0003, books -0.0001, code +0.0006, dialogue +0.0066,
+harness -0.0002, logic +0.0005, science -0.0004, theory -0.0016, web -0.0020, wikidata +0.0005. Its mix over the lap against W113's:
+wikidata 20,137 regions against 17,354, dialogue 2,430 against 2,253, harness 8,955 against 8,605, books 24,183 against 25,489,
+theory 31,967 against 33,359.
+  (a) missed: wikidata +0.0005, science -0.0004, harness -0.0002, where 0.005 under each was guessed.
+  (b) held: the tool turns +0.0003, the conversations +0.0066.
+  (c) held: +0.0004.
+By the rule the line does not take the tensions. A slice read 16% more (wikidata) codes its held stretches as before: her raw code at a
+slice's open places is no measure of what reading it buys, which is the news's reducible part (Neon's audit, Brandon 05:03Z).

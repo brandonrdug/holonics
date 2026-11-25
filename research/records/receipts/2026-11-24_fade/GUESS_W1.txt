@@ -1,0 +1,14 @@
+Fixed 2026-11-25T05:24:34Z (date -u), the lead, before W114w trains. Refs #404.
+The reading it answers: W113s read wikidata at nearly three times its control's regions and coded its held stretches 0.048 nats a
+place dearer, and W113v read it 16% more for +0.0005: reading a slice faster in its stored order moves her toward the stretch she is
+in. Neon's audit (relayed by Brandon 05:03Z): a coprime-stride walk visits every piece once with no table and maximal mixing.
+The line: by G-F1's rule (b held, +0.0023) it takes the fades as her state, so W113f's STATE.3000 is its end; by G-S2's (a missed) it
+does not take the tensions.
+The change: each slice's remaining pieces walked on their golden stride (e5f9, set-walk; StorePass::slice_walk), every piece still
+read once a pass. Control W114: W113f's STATE.3000 continued on store-2026-11-24-wide-t6; arm W114w: the same state with its walk set.
+3,000 sections each on e5f9 (gate 3 of e5f9 first), every read of a lap.
+G-W1 (at the lap means, one place open on the collection's held set):
+  (a) (0.5) all places at least 0.003 nats a place under W114;
+  (b) (0.45) wikidata and books each at least 0.008 under W114;
+  (c) (0.65) no region more than 0.005 over W114.
+Rule: (a) and (c) held, the line takes the walk; otherwise it does not.

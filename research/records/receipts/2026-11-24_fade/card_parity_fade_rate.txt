@@ -1,0 +1,5 @@
+# parity: lock taken 05:40:49
+FADE_RATE_PARITY strands unequal=0 first=None rates=[(910557184, 910557184), (490602496, 490602496), (628948992, 628948992), (1354432512, 1354432512)]
+FADE_RATE_PARITY regions unequal=0 first=None rates=[(829227008, 829227008), (233439232, 233439232), (-310706176, -310706176), (0, 0)]
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 34 filtered out; finished in 3.99s
+# parity: released 05:41:18

@@ -157,3 +157,42 @@ three times its control's regions, coded its held stretches 0.048 nats a place d
 lap, moved by −0.0007. Reading a slice faster in its own order moves her toward the stretch she is in, not toward the slice's law (the
 audit of November 18 found the same of a fixed-rate deposit on an unshuffled terrain), so a share that rises for a slice is read
 against what its order does to a held read of it, and a slice's held code is not a property of how often it was read.
+
+## 8. What steers is power at her ports, read out of sample, foveated and as a flock
+
+G-S2 scored on W113v (the partition clock), W113v less W113 at the lap means over the collection's held places: all +0.0004 (0.0005);
+(a) missed (wikidata +0.0005, science −0.0004, harness −0.0002, where 0.005 under each was guessed), (b) and (c) held; the line does not
+take the tensions. Wikidata was read 16% more and its held code did not move. At 03:03 and 05:32 UTC Brandon named what the steering
+lacked: a share is a partition (§7), and the theory never steered by surprise alone ("loudness, helicity in chirality and pairing,
+handedness, loudness/power/volume (geometry, Galois, spectral gaps)"). On the objects: surprise is the comparison's effort; what a port
+takes is power, effort paired with flow (atlas `physics.port-hamiltonian`), and a port's power is what falls in less what emanates back
+(`wave.emanation-infall-split`, `e·f = Y(a² − b²)/4`), so its sign is the hand. News that no mode of hers carries is effort with no
+flow: no power, whatever its surprise. At 06:14 he added foveation and a flock's integration: a section is about 470 regions read at
+once, and only the choice rule was serial.
+
+The reading built first (`train-store … work`, a reading that leaves the state's bytes as they are): at the last of every sixteen
+sections the passage's regions are read after their own deposit, and at the next the same regions are read again after that section's
+deposit (`STORE_TRANSFER`, the deposit priced on stretches it was not fit on), beside the section's own before and after
+(`STORE_WORK`). A first read of `STORE_WORK` alone (every eighth section of 400 from W113f's STATE.3000) gave, in millionths of a bit a
+place a deposit: all 7,954 (2,636 across sections); wikidata 25,208, code 14,240, logic 8,405, the tool turns 6,384, science 4,147, web
+3,567, theory 3,037, the harness 2,488, books 2,178, the conversations 1,682. That is the deposit's fit to the stretches it was fit on:
+the slices whose stretches repeat inside a document (identifiers, code, logs) take two to ten times the rest, so a steering law on it
+would read memorisation as news, the lessons' "seen material graded as unseen". The steering quantity is the out-of-sample transfer,
+whose read is running.
+
+The law the readings lead to (Brandon's 06:14Z): each slice, and below it each document's neighbourhood, holds a trail, a store charged
+by the out-of-sample work found there and fading at its own quality; the trail's strength sets a read's extent (the fovea's long
+stretches at the cut's high octaves, the periphery's short glimpses that keep every slice in view, which is the floor no number sets);
+the cut forms the section's mix at once as a partition over the trail field, and the golden walk spreads the foragers through a slice.
+
+## 9. The complex pace's lap, read before its held read
+
+W114r (the classes' fade rates founded at zero on W113f's STATE.3000, e5fa): its first section's code equals W114's (1,724,636 both,
+`W118_FIRST`), so the founding is the source's bit for bit on the line's own declaration. Over its lap the rows moved toward faster
+fade at the boundaries, in thousandths of a stride at STATE.3000: on the dyadic head the line feed +483, `(` +351, `,` +289, `.` +272,
+`[` +263, the space +9; on the triadic head the backtick +425, `p` +390, `)` +339, `.` +321, the backslash +279, the space −25. Her
+deposit asks a break to erase more of what came before it, not less, and leaves the space where the turn put it. G-R1 (a) missed (the
+space and the line feed below −100 on both heads was guessed): at her state and objective the skin's covector does not ask a separator
+to keep more, and the count across a word is not held back by the tie of fade to turn. With W113f's long rings moving toward faster fade
+on their own (§6 of G-F1's reading), her text asks for locality at its boundaries; a count across them needs a store that a boundary
+does not erase, which is the second fade of a ring (Form 1), read by a conjugate product.

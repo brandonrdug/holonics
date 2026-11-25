@@ -255,6 +255,10 @@ fn counters_text(realization: &dyn Realization) -> String {
     }
 }
 
+/// [measurement; the lead, November 25] The sections a `work` reading reads its slices' work at: the last of every sixteen holds its
+/// regions, the next reads its own and them again, three extra comparison reads in sixteen sections (a reading's schedule, no law's).
+const WORK_EVERY: usize = 16;
+
 /// `train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA`:
 /// the learner `FROM` continued over the store `STORE` (`STORE_SHA` its `STORE.tsv`'s) in the role `ROLE` (`prefix`, `train` or `held`), for
 /// `SECTIONS` sections, saving `OUT/STATE.k` and `OUT/MEAN.k` every `SAVE` sections and at the last (`k` the sections done in this run, and
@@ -267,8 +271,13 @@ fn counters_text(realization: &dyn Realization) -> String {
 /// ([`Learner::lettered`]), the yardstick read again (`at=after`), the pass set at the store's start with its law (the octaves of a
 /// stretch's draws, the section's bounds) and `OUT/STATE.0` saved. A continued learner (with its pass) reads on from its place.
 pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
-    if args.len() != 18 {
-        return Err("train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA".into());
+    // [measurement; the lead, November 25, Brandon's 05:32Z: what steers is power at her ports, effort paired with flow] A trailing `work`
+    // reads, at every `WORK_EVERY`-th section, the work each slice's news did on her through the section's deposit (`STORE_WORK`): the
+    // opening's code at its regions' compared places before the deposit less after it, on the same stretches. A reading: the state's bytes
+    // are the same with it and without it.
+    let work_read = args.len() == 19 && args[18] == "work";
+    if args.len() != 18 && !work_read {
+        return Err("train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA [work]".into());
     }
     let started = std::time::Instant::now();
     // [definition; the record §5, R5] The store's law reads no variable: every one named `FIELD_…` is refused, but for the card driver's two
@@ -388,6 +397,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     // line and the saves (ns).
     let host_phases = std::env::var_os("FIELD_PROFILE").is_some() || std::env::var_os("FIELD_PHASES").is_some();
     let mut host = [0u128; 7];
+    // [measurement; the lead, November 25] The work reading's probe: a section's passage regions, their slices and their opening codes read
+    // after its own deposit, held to be read again after the next section's (`STORE_TRANSFER`).
+    let mut probe: Option<(Vec<OwnedRegion>, Vec<usize>, Vec<i128>, Vec<usize>)> = None;
     while done < sections {
         let section_start = std::time::Instant::now();
         let mut regions: Vec<OwnedRegion> = Vec::new();
@@ -625,6 +637,44 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let first: usize = world_line.rsplit("first=").next().and_then(|v| v.parse().ok()).unwrap_or(regions.len());
             let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
+        }
+        if work_read && !receipt.opening.is_empty() && (done % WORK_EVERY == WORK_EVERY - 1 || (done % WORK_EVERY == 0 && probe.is_some())) {
+            // [measurement; the lead, November 25] Each slice's work through a deposit, in millionths of a bit a compared place. `STORE_WORK`:
+            // the opening's code before the deposit less after it on the section's own regions, the stretches the deposit was fit on (in
+            // sample). `STORE_TRANSFER`: the section before's regions read after its own deposit and again after this one, so this deposit
+            // priced on stretches it was not fit on (out of sample), the slice's reducible news; positive where the deposit took up what
+            // the slice teaches, negative where what the other slices moved costs it.
+            let n = cut.slices.len();
+            let per = |b: i128, a: i128, places: usize| micro_signed(b - a, places);
+            let line = |tag: &str, sums: &[(i128, i128, usize)]| {
+                let (tb, ta, tp) = sums.iter().fold((0i128, 0i128, 0usize), |(x, y, z), s| (x + s.0, y + s.1, z + s.2));
+                println!("{tag} n={done} all={} places={tp} {}", per(tb, ta, tp), cut.slices.iter().zip(sums).map(|(s, &(b, a, p))| format!("{}={}/{}", s.name, per(b, a, p), p)).collect::<Vec<_>>().join(" "));
+            };
+            let passage: Vec<OwnedRegion> = regions[passage_start..passage_start + region_slice.len()].to_vec();
+            let passage_views = views_of(&passage);
+            let (_, _, after) = realization.read_and_return_opening(&learner.field, &passage_views).map_err(|e| e.to_string())?;
+            let codes: Vec<i128> = after.iter().map(|c| c.iter().flatten().map(|&v| i128::from(v)).sum()).collect();
+            let places: Vec<usize> = after.iter().map(|c| c.iter().flatten().count()).collect();
+            if done % WORK_EVERY == 0 {
+                let mut sums = vec![(0i128, 0i128, 0usize); n];
+                for (r, &sl) in region_slice.iter().enumerate() {
+                    if let Some(&(b, p)) = receipt.opening.get(passage_start + r) {
+                        (sums[sl].0, sums[sl].1, sums[sl].2) = (sums[sl].0 + i128::from(b), sums[sl].1 + codes[r], sums[sl].2 + p);
+                    }
+                }
+                line("STORE_WORK", &sums);
+                if let Some((held, held_slice, before, held_places)) = probe.take() {
+                    let (_, _, again) = realization.read_and_return_opening(&learner.field, &views_of(&held)).map_err(|e| e.to_string())?;
+                    let mut sums = vec![(0i128, 0i128, 0usize); n];
+                    for (r, &sl) in held_slice.iter().enumerate() {
+                        let a: i128 = again[r].iter().flatten().map(|&v| i128::from(v)).sum();
+                        (sums[sl].0, sums[sl].1, sums[sl].2) = (sums[sl].0 + before[r], sums[sl].1 + a, sums[sl].2 + held_places[r]);
+                    }
+                    line("STORE_TRANSFER", &sums);
+                }
+            } else {
+                probe = Some((passage, region_slice.clone(), codes, places));
+            }
         }
         if let Some(ts) = cut.pass.slice_tension.as_mut() {
             // [definition; the lead, November 24] Each slice's tension, read from the section's opening code at its regions' open places
@@ -1849,7 +1899,12 @@ pub fn set_terrain(args: &[String]) -> Result<()> {
 /// A code on `2^(−20)` bits over `places` places, in millionths of a bit a place (a tension's reading: the terrain's and the slices'),
 /// a negative sum read as zero.
 fn micro_a_place(code: i128, places: usize) -> u64 {
-    u64::try_from((code.max(0) * 1_000_000) / ((places as i128) << 20)).unwrap_or(u64::MAX)
+    u64::try_from(micro_signed(code.max(0), places)).unwrap_or(u64::MAX)
+}
+
+/// A code on `2^(−20)` bits over `places`, in millionths of a bit a place, its sign kept (zero over no place).
+fn micro_signed(code: i128, places: usize) -> i128 {
+    if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) }
 }
 
 /// [definition; the lead, November 25, Gemini Neon's audit relayed by Brandon] `set-walk STATE STATE_SHA OUT`: **a state's slices walked on
