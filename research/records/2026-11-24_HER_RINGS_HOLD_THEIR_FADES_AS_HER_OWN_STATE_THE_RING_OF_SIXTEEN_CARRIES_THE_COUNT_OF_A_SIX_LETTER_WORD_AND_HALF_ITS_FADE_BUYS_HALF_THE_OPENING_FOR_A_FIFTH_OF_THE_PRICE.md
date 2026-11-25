@@ -266,4 +266,6 @@ take the known stream's second cavity moments as they take the first's. The card
 on it with the opening, and on that with the mark and the first fades (the line's parts), strands and regions alike: unequal = 0 in all six,
 the chart's 1,024 entries and every second fade taking a covector (`receipts/2026-11-24_fade/card_parity_twin.txt`). A founded field holds
 the moments' encodings and chart at zero, so its moments, and the second fades' with them, read nothing until a deposit moves them; the
-parity draws them, and its first reading (with them at zero) read zero covectors at the second fades on host and card alike.
+parity draws them, and its first reading (with them at zero) read zero covectors at the second fades on host and card alike. Gate 3 of the build
+(e5fh) against the line, its second fade off: parity on 3 sections unequal = 0, the reproduction of 3 and of 24 sections equal, the lap's
+read equal (`receipts/2026-11-24_fade/gate3_e5fh.txt`).
