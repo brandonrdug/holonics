@@ -196,3 +196,27 @@ space and the line feed below −100 on both heads was guessed): at her state an
 to keep more, and the count across a word is not held back by the tie of fade to turn. With W113f's long rings moving toward faster fade
 on their own (§6 of G-F1's reading), her text asks for locality at its boundaries; a count across them needs a store that a boundary
 does not erase, which is the second fade of a ring (Form 1), read by a conjugate product.
+
+## 10. The scores, and what each change did to her held code
+
+Each arm less its control at the lap means, one place open over the collection's 200,933 held places (receipts `GUESS_*.txt`):
+
+| arm | change | all | largest regions | guess |
+|---|---|---|---|---|
+| W113f | the ring of 16's fade founded at −1, every fade her state | +0.0023 (0.0003) | acts +0.0058 | G-F1: (a) missed, (b) held, (c) missed, (d) held; taken |
+| W113v | slices on the partition clock | +0.0004 (0.0005) | dialogue +0.0066 | G-S2: (a) missed; not taken |
+| W114r | each class's fade rate | +0.0007 (0.0002) | dialogue +0.0021 | G-R1: (a) missed, (b) held, (c) missed; taken |
+| W114w | each slice walked on its golden stride | −0.0038 (0.0008) | acts −0.0239, wikidata +0.0103 | G-W1: (a) held, (b) and (c) missed; not taken |
+
+The walk is the one change of the night that moved her held code down over all its places, and it is kept out by its own rule's guard
+on regions: the slices whose documents are long (wikidata's entities, books) code their held stretches dearer when she leaves a
+document for another instead of reading its next stretch. Its theory panel's words stood in the register's lexicon at 93% against the
+control's 78%. Its second arm runs on the line's own end (W115w beside W115, G-W2).
+
+The out-of-sample transfer (`STORE_TRANSFER`, the field held from before the last of every sixteen sections' deposit reading the next
+section's stretches; 49 readings over 800 sections from W113f's STATE.3000; receipt `work_transfer_W113f.txt`), in millionths of a bit a
+place a deposit: all 4,432 (in sample 7,889); wikidata 15,042, code 8,755, logic 3,690, web 3,031, the tool turns 2,954, science
+2,108, theory 1,485, books 862, the harness 700, the conversations 319. Out of sample keeps 0.45 to 0.66 of the in-sample work on most
+slices and 0.18 to 0.24 on the conversations and the harness, whose in-sample work is mostly the deposit's fit to the stretch. With a
+symmetric step, a slice's transfer `⟨g_s, P g⟩` is also the first-order value of reading it for every slice, `⟨g, P g_s⟩`, which is
+why it is the trail's charge.

@@ -24,3 +24,15 @@ G-F1 (scored at the lap means, one place open on the collection's held set; the 
 Rule: (b) held, the line takes the fades as her state (W113f's end, or W113sf's where G-S1 also held); (b) missed, it does not.
 (c) missed with (a) held: a fade the deposit draws back toward the skin's does not keep a count for her text at this founding,
 and the count is owed to the read weight at zero the formal thread named (the second axis).
+
+Scored 2026-11-25T09:32:25Z (date -u), the lead, from fades.py on W113f's states, frontier_ruler.py on out4_W113, out4_W113f, out4_W113v and
+out4_W113vf (the collection's held set, one place open, lap means, 200,933 places), and read-reach at the lap means on gt7_rows.tsv.
+  (a) missed: the ring of 16's fade at STATE.3000 -636 (held, -750 to -150 was guessed), but every ring of 32 and up moved toward faster
+      fade and three passed +300 (2187 +311, 4096 +388, 6561 +397); the other rings at 2 to 27 within -30.
+  (b) held: W113f less W113 +0.0023 (0.0003) over all places, every region +0.0005 to +0.0058.
+  (c) missed: P1 = 7's opening (FADE_LAW twin after L - 1 less after L + 1) 0.137 at W113f's mean against 0.121 at W113's, +0.016
+      where 0.08 was guessed; the founding read had given +0.188 at the same displacement on W110's mean, with nothing else moved.
+  (d) held: W113vf less W113 +0.0012 (0.0005), against the two cells' sum +0.0027.
+By the rule ((b) held) the line takes the fades as her state: W113f's STATE.3000 is its end. By (c) missed with the ring of 16 drawn
+back: a fade the deposit draws back toward the skin's does not keep a count for her text at this founding, and the count is owed to a
+second store a boundary does not erase.

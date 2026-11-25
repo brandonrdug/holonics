@@ -4372,7 +4372,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4432,6 +4432,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         slice_tension: None,
         slice_clock: None,
         slice_walk: None,
+        slice_trail: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -7193,6 +7194,7 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
         slice_tension: tension,
         slice_clock: clock,
         slice_walk: None,
+        slice_trail: None,
     };
     let cut = |taken: [u64; 2], tension: Option<Vec<u64>>, clock: Option<Vec<u128>>| crate::passage::Cut { seed: 3, slices: vec![slice("a"), slice("b")], pass: pass(taken, tension, clock) };
     // Without tensions the quotas alone: the slice behind takes the next stretch.
@@ -7246,6 +7248,57 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
     assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
 }
 
+/// [definition; the lead, November 25] **The trail sets a look's octaves and the flock looks at every slice at its quota's rate**: with no
+/// trail every slice draws over the pass's octaves; with trails the strongest draws over all of them and a slice with none over the least
+/// octave alone; the next look goes to the slice with fewest looks for its quota; the trail line reads back as written.
+#[test]
+fn the_trail_sets_a_looks_octaves_and_the_flock_looks_at_every_slice_at_its_quotas_rate() {
+    let piece = crate::passage::Piece { document: 0, offset: 0, title: 0, text: 1 << 20, opens: false, closes: true };
+    let slice = |name: &str, quota: u128| crate::passage::Slice { name: name.into(), quota, pieces: vec![piece], source: Box::new(UnreadBytes) };
+    let pass = |trail: Option<(Vec<i64>, Vec<u64>)>| StorePass {
+        role: "prefix".into(),
+        store: "ab".repeat(32),
+        stretches: 7,
+        least: 4,
+        octaves: 7,
+        pairs: 15_606_223,
+        sites: 41_490,
+        own: false,
+        slices: vec![PassSlice { name: "a".into(), piece: 0, cursor: 0, taken: 0 }, PassSlice { name: "b".into(), piece: 0, cursor: 0, taken: 0 }, PassSlice { name: "c".into(), piece: 0, cursor: 0, taken: 0 }],
+        world: None,
+        frontier: 0,
+        before: false,
+        strand: false,
+        past: false,
+        second: false,
+        terrain: None,
+        slice_tension: None,
+        slice_clock: None,
+        slice_walk: None,
+        slice_trail: trail,
+    };
+    let cut = |trail: Option<(Vec<i64>, Vec<u64>)>| crate::passage::Cut { seed: 3, slices: vec![slice("a", 1000), slice("b", 2000), slice("c", 1000)], pass: pass(trail) };
+    assert_eq!((0..3).map(|s| cut(None).octaves_of(s)).collect::<Vec<_>>(), vec![7, 7, 7], "no trail: the pass's octaves");
+    assert_eq!((0..3).map(|s| cut(Some((vec![0, 0, 0], vec![0, 0, 0]))).octaves_of(s)).collect::<Vec<_>>(), vec![7, 7, 7], "no reading: the pass's octaves");
+    assert_eq!((0..3).map(|s| cut(Some((vec![3000, 1500, -200], vec![0, 0, 0]))).octaves_of(s)).collect::<Vec<_>>(), vec![7, 4, 1], "the fovea, between, a glimpse");
+    // The flock: b at twice a's quota takes two looks to a's one.
+    assert_eq!(cut(Some((vec![0; 3], vec![4, 7, 4]))).next().unwrap().slice, 1);
+    assert_eq!(cut(Some((vec![0; 3], vec![4, 8, 4]))).next().unwrap().slice, 0);
+    let mut c = cut(Some((vec![0; 3], vec![0; 3])));
+    let mut looked = [0u64; 3];
+    for _ in 0..400 {
+        let s = c.next().unwrap().slice;
+        c.pass.slice_trail.as_mut().unwrap().1[s] += 1;
+        looked[s] += 1;
+    }
+    assert_eq!(looked, [100, 200, 100], "every slice at its quota's rate of looks");
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
+    learner.pass = Some(pass(Some((vec![3000, 1500, -200], vec![1, 2, 3]))));
+    let text = learner.to_text();
+    assert!(text.lines().any(|l| l == "trail 3000 1500 -200 looks 1 2 3"), "the trail line is written");
+    assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
+}
+
 /// [definition; the lead, November 25] **A slice walked on its golden stride reads every piece once and spreads its reads over the
 /// slice**: the stride is coprime to the pieces left; the pieces before the walk's place keep their order; every piece from it is read once;
 /// consecutive pieces stand about 0.618 of the slice apart; the walk line reads back as written.
@@ -7286,6 +7339,7 @@ fn a_slice_walked_on_its_golden_stride_reads_every_piece_once_and_spreads_its_re
         slice_tension: None,
         slice_clock: None,
         slice_walk: Some(vec![6]),
+        slice_trail: None,
     };
     let cut = crate::passage::Cut { seed: 3, slices: vec![slice], pass };
     let order: Vec<usize> = (0..n as u64).map(|k| cut.piece_of(0, k)).collect();

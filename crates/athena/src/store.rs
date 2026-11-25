@@ -331,7 +331,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -593,7 +593,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let views_start = std::time::Instant::now();
         let views = views_of(&regions);
         host[1] += views_start.elapsed().as_nanos();
-        if work_read && done % WORK_EVERY == WORK_EVERY - 1 {
+        // [the lead, November 25] A pass that holds its slices' trails reads their work at every such section: the trail's charge.
+        let reading = work_read || cut.pass.slice_trail.is_some();
+        if reading && done % WORK_EVERY == WORK_EVERY - 1 {
             before_deposit = Some(learner.field.clone());
         }
         let deposit_start = std::time::Instant::now();
@@ -642,7 +644,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
         }
-        if work_read && done % WORK_EVERY == 0 && !receipt.opening.is_empty() {
+        if reading && done % WORK_EVERY == 0 && !receipt.opening.is_empty() {
             // [measurement; the lead, November 25] Each slice's work through a deposit, in millionths of a bit a compared place. `STORE_WORK`:
             // the opening's code on the section's own regions before its deposit less after it, the stretches the deposit was fit on (in
             // sample). `STORE_TRANSFER`, where the section before held its field: these regions read with the field before that section's
@@ -673,6 +675,18 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 // `sum_of` pairs the comparison's codes (after the deposit before) with these (before it): the deposit's work is earlier less now.
                 let sums: Vec<(i128, i128, usize)> = sum_of(&earlier).into_iter().map(|(now, then, p)| (then, now, p)).collect();
                 line("STORE_TRANSFER", &sums);
+                // [definition; the lead, November 25] Each slice's trail charged by its out-of-sample work, `(x − trail)/R`, `R` the readings
+                // in a mean's window ([`holonics_engine::field::StorePass::slice_trail`]); a slice the section did not read keeps its trail.
+                let window = (save / WORK_EVERY).max(1) as i128;
+                if let Some((trail, _)) = cut.pass.slice_trail.as_mut() {
+                    for (t, &(b, a, p)) in trail.iter_mut().zip(&sums) {
+                        if p > 0 {
+                            let x = per(b, a, p);
+                            *t = i64::try_from(i128::from(*t) + (x - i128::from(*t)) / window).unwrap_or(*t);
+                        }
+                    }
+                    println!("STORE_TRAIL n={done} {}", cut.slices.iter().zip(trail.iter()).map(|(s, t)| format!("{}={t}", s.name)).collect::<Vec<_>>().join(" "));
+                }
             }
         }
         if let Some(ts) = cut.pass.slice_tension.as_mut() {
@@ -1755,6 +1769,7 @@ pub fn join_store(args: &[String]) -> Result<()> {
     pass.slice_tension = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
     pass.slice_clock = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
     pass.slice_walk = pass.slice_walk.as_ref().map(|_| vec![0; names.len()]);
+    pass.slice_trail = pass.slice_trail.as_ref().map(|_| (vec![0; names.len()], vec![0; names.len()]));
     let after = slices_text(&pass);
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
@@ -1904,6 +1919,45 @@ fn micro_a_place(code: i128, places: usize) -> u64 {
 /// A code on `2^(−20)` bits over `places`, in millionths of a bit a place, its sign kept (zero over no place).
 fn micro_signed(code: i128, places: usize) -> i128 {
     if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) }
+}
+
+/// [definition; the lead, November 25, Brandon's 05:32Z and 06:14Z] `set-trail STATE STATE_SHA OUT`: **a state's slices read by their
+/// trails** ([`holonics_engine::field::StorePass::slice_trail`]): the state with a `trail` line after its pass's lines, every trail and
+/// look at zero (the pass's octaves for every slice until a reading charges one), every other line byte for byte (read back and checked).
+/// Refused on a state with no pass or one whose pass already holds its trails.
+pub fn set_trail(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("set-trail STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.slice_trail.is_some() {
+        return Err("a state whose pass already holds its trails".into());
+    }
+    let k = before.slices.len();
+    let line = format!("trail {} looks {}", vec!["0"; k].join(" "), vec!["0"; k].join(" "));
+    let mut next = learner.clone();
+    let after = usize::from(before.terrain.is_some()) + usize::from(before.slice_tension.is_some()) + usize::from(before.slice_clock.is_some()) + usize::from(before.slice_walk.is_some());
+    next.pass = Some(StorePass { slice_trail: Some((vec![0; k], vec![0; k])), ..before });
+    let written = next.to_text();
+    let pass_line = written.lines().position(|l| l.starts_with("pass ")).ok_or("a written state with no pass line")?;
+    let mut expected: Vec<&str> = text.lines().collect();
+    expected.insert(pass_line + 1 + after, &line);
+    if written.lines().collect::<Vec<_>>() != expected {
+        return Err("a written trail that changes a line other than its own".into());
+    }
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.field != learner.field || back.pass != next.pass {
+        return Err("a written trail whose state does not read back as the source's field and pass".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_TRAIL lines={} slices={k}", expected.len());
+    Ok(())
 }
 
 /// [definition; the lead, November 25, Gemini Neon's audit relayed by Brandon] `set-walk STATE STATE_SHA OUT`: **a state's slices walked on

@@ -559,6 +559,15 @@ pub struct StorePass {
     /// toward the stretch she is in: on W113s wikidata, read at nearly three times its control's regions, coded its held stretches 0.048
     /// nats a place dearer. Written as a line `walk W₀ … W_(k−1)` after the clock line (or the tension line, or the pass's), only where set.
     pub slice_walk: Option<Vec<u64>>,
+    /// [definition; the lead, November 25, Brandon's 05:32Z and 06:14Z: power at her ports, foveated, read by a flock] **Each slice's trail
+    /// and its looks**: `(trail, looks)` a slice, the trail a store of the out-of-sample work a deposit did on the slice's stretches (millionths
+    /// of a bit a place, `STORE_TRANSFER`), charged at each reading by `(x − trail)/R` with `R` the readings in a mean's window (its fade,
+    /// the line's own clock), and the looks the stretches the slice has given since the trail was set. Where set, the cut takes the slice
+    /// with fewest looks for its quota (every slice is looked at at its quota's rate, the flock and the periphery) and draws each look's
+    /// lengths over the first `o_s` octaves of the pass's `octaves`, `o_s = 1 + ⌊(octaves − 1) trail_s⁺ / max_r trail_r⁺⌋` (the fovea's long
+    /// reads where the trail is strongest, a glimpse of the least octave where it is none; every octave where no slice has a trail).
+    /// Written as a line `trail T₀ … T_(k−1) looks L₀ … L_(k−1)` after the walk line, only where set.
+    pub slice_trail: Option<(Vec<i64>, Vec<u64>)>,
 }
 
 /// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
@@ -746,7 +755,7 @@ impl StorePass {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -1103,7 +1112,8 @@ impl Learner {
                 let tension = p.slice_tension.as_ref().map_or(String::new(), |t| format!("tension {}\n", t.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
                 let clock = p.slice_clock.as_ref().map_or(String::new(), |c| format!("clock {}\n", c.iter().map(u128::to_string).collect::<Vec<_>>().join(" ")));
                 let walk = p.slice_walk.as_ref().map_or(String::new(), |w| format!("walk {}\n", w.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
-                let tension = format!("{tension}{clock}{walk}");
+                let trail = p.slice_trail.as_ref().map_or(String::new(), |(t, l)| format!("trail {} looks {}\n", t.iter().map(i64::to_string).collect::<Vec<_>>().join(" "), l.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
+                let tension = format!("{tension}{clock}{walk}{trail}");
                 format!("{}\n{}{tension}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line())))
             });
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
@@ -1330,6 +1340,20 @@ impl Learner {
                     return refuse("a walk line that is not one place a slice of the pass");
                 }
                 Some(StorePass { slice_walk: Some(w), ..p })
+            }
+            (p, _) => p,
+        };
+        // [definition; the lead, November 25] The slices' trails and looks, a line after the walk's, only where set.
+        let pass = match (pass, lines.peek()) {
+            (Some(p), Some(l)) if l.starts_with("trail ") => {
+                let words: Vec<&str> = lines.next().unwrap_or("").split_whitespace().collect();
+                let k = p.slices.len();
+                if words.len() != 2 * k + 2 || words[k + 1] != "looks" {
+                    return refuse("a trail line that is not `trail T₀ … T_(k−1) looks L₀ … L_(k−1)`");
+                }
+                let t: Vec<i64> = words[1..=k].iter().map(|w| w.parse()).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a trail that is not a count"))?;
+                let l: Vec<u64> = words[k + 2..].iter().map(|w| w.parse()).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a look that is not a count"))?;
+                Some(StorePass { slice_trail: Some((t, l)), ..p })
             }
             (p, _) => p,
         };

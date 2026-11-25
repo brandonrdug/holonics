@@ -470,12 +470,37 @@ impl Cut {
         }
     }
 
+    /// [definition; the lead, November 25] The octaves slice `s`'s looks are drawn over: the pass's own where no trail is set or no slice
+    /// has a trail, else `1 + ⌊(octaves − 1) trail_s⁺ / max_r trail_r⁺⌋` ([`StorePass::slice_trail`]): the fovea where the trail is strongest,
+    /// a glimpse of the least octave where it is none.
+    pub fn octaves_of(&self, s: usize) -> u64 {
+        let octaves = self.pass.octaves;
+        match &self.pass.slice_trail {
+            Some((trail, _)) => {
+                let top = trail.iter().copied().max().unwrap_or(0);
+                if top <= 0 {
+                    octaves
+                } else {
+                    1 + ((octaves - 1) as i128 * i128::from(trail[s].max(0)) / i128::from(top)) as u64
+                }
+            }
+            None => octaves,
+        }
+    }
+
     pub fn next(&self) -> Option<Drawn> {
         let live: Vec<usize> = (0..self.slices.len()).filter(|&s| (self.pass.slices[s].piece as usize) < self.slices[s].pieces.len()).collect();
         let mut slice = *live.first()?;
         // [definition; the lead, November 25] Where the pass holds its slices by their tensions, the slice whose own clock stands furthest
         // behind ([`StorePass::slice_clock`], every clock at zero where none is written); otherwise the quotas' interleave as before.
-        if self.pass.slice_tension.is_some() {
+        if let Some((_, looks)) = &self.pass.slice_trail {
+            // [definition; the lead, November 25] The flock: the slice with fewest looks for its quota ([`StorePass::slice_trail`]).
+            for &other in &live[1..] {
+                if u128::from(looks[other]) * self.slices[slice].quota < u128::from(looks[slice]) * self.slices[other].quota {
+                    slice = other;
+                }
+            }
+        } else if self.pass.slice_tension.is_some() {
             let clock = |s: usize| self.pass.slice_clock.as_ref().map_or(0, |c| c[s]);
             for &other in &live[1..] {
                 if clock(other) < clock(slice) {
@@ -495,10 +520,11 @@ impl Cut {
         let d = self.pass.stretches + 1;
         let rest = piece.places() - at.cursor;
         let frontier = frontier_here(self.seed, d, self.pass.frontier);
+        let octaves = self.octaves_of(slice);
         let (q, a, ends, done) = if frontier {
-            frontier_cut_of(self.seed, d, rest, piece.closes, self.pass.least, self.pass.octaves)
+            frontier_cut_of(self.seed, d, rest, piece.closes, self.pass.least, octaves)
         } else {
-            cut_of(self.seed, d, rest, piece.closes, self.pass.least, self.pass.octaves)
+            cut_of(self.seed, d, rest, piece.closes, self.pass.least, octaves)
         };
         Some(Drawn { slice, d, q, a, ends, done, frontier })
     }
@@ -539,6 +565,9 @@ impl Cut {
             let n = self.slices.len();
             let step = clock_step(drawn.q + drawn.a, self.slices[drawn.slice].quota, weight[drawn.slice], z);
             self.pass.slice_clock.get_or_insert_with(|| vec![0; n])[drawn.slice] += step;
+        }
+        if let Some((_, looks)) = self.pass.slice_trail.as_mut() {
+            looks[drawn.slice] += 1;
         }
         let place = &mut self.pass.slices[drawn.slice];
         place.taken += drawn.q + drawn.a;

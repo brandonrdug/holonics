@@ -16,3 +16,13 @@ held set):
       W114's.
 Rule: (b) held, the line takes the fade rates as her state; (a) missed, the skin's covector does not ask a separator to keep more,
 and the count's wall is not the tie of fade to turn.
+
+Scored 2026-11-25T10:14:38Z (date -u), the lead: rates.py on W114r's states; frontier_ruler.py on out4_W114 and out4_W114r (the collection's held set, one
+place open, lap means, 200,933 places); read-reach at the lap means on gt7_rows.tsv.
+  (a) missed: at STATE.3000 the line feed +483 and +129, the space +9 and -25 (dyadic and triadic heads); the rates moved toward faster
+      fade at the boundaries ('(' +351, ',' +289, '.' +272, '[' +263 on the dyadic; the backtick +425, 'p' +390, ')' +339, '.' +321 on
+      the triadic), and no row fell below -100.
+  (b) held: W114r less W114 +0.0007 (0.0002), every region within +0.0021.
+  (c) missed: the opening 0.145 at W114r's mean against 0.154 at W114's, -0.009.
+By the rule ((b) held) the line takes the fade rates as her state. By (a) missed: at her state the skin's covector does not ask a
+separator to keep more; her text asks its boundaries to erase more, and the count's wall is not the tie of fade to turn.

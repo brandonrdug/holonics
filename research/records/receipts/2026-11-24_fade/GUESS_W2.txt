@@ -1,0 +1,12 @@
+Fixed 2026-11-25T10:26:40Z (date -u), the lead, before W115w trains. Refs #404.
+The line: G-F1's rule took the fades (W113f's end), G-R1's took the fade rates (W114r's end); G-W1's (c) kept the walk out.
+The reading it answers: the walk's first lap (W114w beside W114) moved the held set by -0.0038 over all places with the tool turns
+-0.024 and wikidata +0.010, books +0.006, inside one lap's scatter between laps of the line (W113f to W114 +0.0023; W112 to W113
+-0.0014; W111 to W112 -0.0092).
+The change: the line's end, W114r's STATE.3000, with each slice's remaining pieces walked on their golden stride (set-walk, e5fe),
+beside W115 (the same state continued), 3,000 sections each on e5fe.
+G-W2 (at the lap means, one place open on the collection's held set):
+  (a) (0.55) all places at least 0.002 under W115;
+  (b) (0.5) no region more than 0.008 over W115 (wikidata and books, whose documents are long, are where it could);
+  (c) (0.5) the tool turns at least 0.010 under W115.
+Rule: (a) and (b) held, the line takes the walk; otherwise it does not.
