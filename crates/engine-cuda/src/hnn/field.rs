@@ -544,6 +544,47 @@ mod tests {
         }
     }
 
+    /// [definition; the lead, November 25, Fable's construction] **A passage read as its consecutive stretches on the card reads the host's
+    /// bits** (needs the card; `Region::stretches`): on the targets' parity field with its moments drawn, and on it with the opening and the
+    /// mark, strands compared with targets and read as two to four stretches give the host's faces and every covector entry, and differ
+    /// from the same strands read as one stretch.
+    #[test]
+    #[ignore]
+    fn a_passage_read_as_its_stretches_on_the_card_reads_the_hosts_bits() {
+        use holonics_engine::field::Learner;
+        let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(3).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
+        let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
+        let carried = Learner::new(founded, 12).with_carry(4, &keys).unwrap();
+        let opened = carried.clone().with_opening().unwrap().with_mark().unwrap();
+        let lengths = [7usize, 64, 300, 41];
+        let starts: [&[usize]; 4] = [&[3], &[20, 41], &[100, 180, 250], &[6, 30]];
+        let passages: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
+        let targets: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 29 + 7 + 13 * k) % 120).collect()).collect();
+        let known: Vec<Vec<bool>> = lengths.iter().map(|&n| vec![false; n]).collect();
+        let strands = |joined: bool| -> Vec<Region> { (0..lengths.len()).map(|k| Region { classes: &passages[k], unresolved: &known[k], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: Some(&targets[k]), stretches: joined.then_some(starts[k]) }).collect() };
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        for (case, learner) in [("carried", &carried), ("opened and marked", &opened)] {
+            let mut field = learner.field.clone();
+            let (l, dw, m2) = (field.layout().clone(), field.declaration.width, 2 * field.declaration.complex());
+            let rows = 2 * (field.declaration.alphabet + 1) * field.declaration.moment_modes();
+            let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.moment_face..l.moment_face + dw * m2).map(|i| (i, 14u32)).chain((l.moment_before..l.moment_before + 2 * rows).map(|i| (i, 18u32))).collect();
+            let tail = keys.len() - 4 * moved.len() - 8;
+            for (k, &(i, shift)) in moved.iter().enumerate() {
+                let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+                field.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+            }
+            let (host_one, _) = field.read_and_return(&strands(false)).unwrap();
+            let (host_faces, host_g) = field.read_and_return(&strands(true)).unwrap();
+            let (card_faces, card_g) = card_field.read_and_return(&field, &strands(true)).unwrap();
+            assert_ne!(host_faces, host_one, "{case}: the stretches move a face");
+            assert_eq!(host_faces, card_faces, "{case}: every face read as stretches");
+            let unequal: Vec<usize> = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).collect();
+            println!("JOINED_PARITY {case} unequal={} first={:?}", unequal.len(), unequal.first().map(|&i| (i, host_g[i], card_g[i])));
+            assert_eq!(unequal.len(), 0, "{case}: every covector entry read as stretches");
+        }
+    }
+
     /// [definition; the lead, November 23, an act answered in kind] **A strand with places read and not compared on the card reads the
     /// host's bits** (needs the card; `holonics_engine::field::UNCOMPARED`): the field and passages of the targets' parity, every third
     /// open place's target left out, on the field and on it with the opening compared (so the opening's comparison leaves them out too),

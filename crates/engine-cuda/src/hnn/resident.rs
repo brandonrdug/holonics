@@ -284,6 +284,9 @@ pub(crate) struct Words {
     // [the lead, November 25] Where the classes fade at their own rates, the material's offset of the paced heads' fade rows
     // (`FieldWords::fade_rate_at`, the host's `Loci::fade_rate`); `u64::MAX` where they do not.
     pub(crate) fade_rate_at: u64,
+    // [the lead, November 25] Each site's stretch start in a passage read as its stretches (`FieldWords::site_stretch`); zero (null) where the
+    // batch holds none.
+    pub(crate) site_stretch: u64,
 }
 
 pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
@@ -616,6 +619,10 @@ pub struct Resident<'c> {
     pub(crate) strand_skip: std::cell::RefCell<Vec<Vec<bool>>>,
     /// The same over every region of the run being made, from which each batch takes its own.
     pub(crate) strand_skip_run: std::cell::RefCell<Vec<Vec<bool>>>,
+    /// [the lead, November 25] The batch being staged: each strand's stretch starts (`Region::stretches`), empty where none is joined; and the
+    /// same over every region of the run being made.
+    pub(crate) strand_stretch: std::cell::RefCell<Vec<Vec<u32>>>,
+    pub(crate) strand_stretch_run: std::cell::RefCell<Vec<Vec<u32>>>,
     /// [the record of the two streams §15] Whether the group a run reads takes the row of the second site before (`Region::second`): the
     /// second bit of the known stream's word (`FieldWords::before`), set by [`Resident::run`] for the run of that group.
     pub(crate) second_run: std::cell::Cell<bool>,
@@ -636,7 +643,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_skip: Default::default(), strand_skip_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), second_fade: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_skip: Default::default(), strand_skip_run: Default::default(), strand_stretch: Default::default(), strand_stretch_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), second_fade: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -1118,10 +1125,9 @@ impl<'c> Resident<'c> {
     /// regions of one kind.
     #[allow(clippy::type_complexity)]
     pub(crate) fn run(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
-        // [the lead, November 25] A passage read as its consecutive stretches (`Region::stretches`) has no card realization yet: its open
-        // places' hearing across each stretch's first place is the host's alone, so the card refuses it rather than read it as one stretch.
-        if regions.iter().any(|r| r.stretches.is_some()) {
-            return Err(TowerError::Refused("a passage read as its stretches (the card realizes one stretch a region)"));
+        // [the lead, November 25] A passage read as its consecutive stretches is a strand's alone (the host refuses it elsewhere).
+        if regions.iter().any(|r| r.stretches.is_some() && !r.strand) {
+            return Err(TowerError::Refused("stretches on a region not read by two streams"));
         }
         if !regions.iter().any(|r| r.before || r.strand) {
             let (faces, read_logits, g, rows, echoes) = self.run_one(field, regions, returning, logits, keep)?;
@@ -1201,11 +1207,16 @@ impl<'c> Resident<'c> {
                 if skips.iter().any(|s| s.iter().any(|&b| b)) {
                     *self.strand_skip_run.borrow_mut() = skips;
                 }
+                let stretches: Vec<Vec<u32>> = group.map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].stretches.map_or(Vec::new(), |s| s.iter().map(|&p| p as u32).collect())).collect());
+                if stretches.iter().any(|s| !s.is_empty()) {
+                    *self.strand_stretch_run.borrow_mut() = stretches;
+                }
             }
             self.second_run.set(group.is_some_and(|gr| gr.second));
             let ran = self.run_one(f, &views, returning, false, None);
             self.strand_run.borrow_mut().clear();
             self.strand_skip_run.borrow_mut().clear();
+            self.strand_stretch_run.borrow_mut().clear();
             self.second_run.set(false);
             let (mut gf, _, gg, gr, ge) = ran?;
             if two {
@@ -1402,6 +1413,10 @@ impl<'c> Resident<'c> {
                 let all = self.strand_skip_run.borrow();
                 if all.len() == regions.len() { all[batch.clone()].to_vec() } else { Vec::new() }
             };
+            *self.strand_stretch.borrow_mut() = {
+                let all = self.strand_stretch_run.borrow();
+                if all.len() == regions.len() { all[batch.clone()].to_vec() } else { Vec::new() }
+            };
             self.mark("run_setup");
             // [definition; agent-inferred, November 14, the ring record §4] **The field that reads twice** (the host's `Constitution::pass`): the batch's
             // first read is the built read with no readings, and leaves each silent site's shares of its face on the card (`field_mark_shares`);
@@ -1427,6 +1442,7 @@ impl<'c> Resident<'c> {
             drop(base);
             self.strand_heard.borrow_mut().clear();
             self.strand_skip.borrow_mut().clear();
+            self.strand_stretch.borrow_mut().clear();
             self.strand_cavity.borrow_mut().take();
             self.mark("batch_drop_and_collect");
             faces.extend(f);
@@ -1671,6 +1687,19 @@ impl<'c> Resident<'c> {
             let place: Vec<u32> = regions.iter().zip(&heard).flat_map(|(r, &n)| (0..r.classes.len() as u32).map(move |t| if t >= n { t - n } else { t })).collect();
             (pack.put(&place), pack.put(&heard))
         });
+        // [the lead, November 25] Each open place's stretch start in a joined passage (`FieldWords::site_stretch`): the last start at or before its place.
+        let stretch_at = {
+            let starts = self.strand_stretch.borrow();
+            (!heard.is_empty() && starts.len() == regions.len() && starts.iter().any(|s| !s.is_empty())).then(|| {
+                let at: Vec<u32> = regions
+                    .iter()
+                    .zip(&heard)
+                    .zip(starts.iter())
+                    .flat_map(|((r, &n), s)| (0..r.classes.len() as u32).map(move |t| if t >= n { let p = t - n; s.iter().copied().take_while(|&b| b <= p).last().unwrap_or(0) } else { 0 }))
+                    .collect();
+                pack.put(&at)
+            })
+        };
         // [theory, November 12, P50 step 2] The moment modes' map (the moment kernels' `cmap`, `moment_modes`), for the clock's fill.
         let d = declaration;
         let mcmap: Vec<u32> = (0..d.heads).filter(|&h| d.carries_moment(h)).flat_map(|h| (0..d.modes).map(move |li| (h * d.modes + li) as u32 | if d.is_depth(h) { 1 << 31 } else { 0 })).collect();
@@ -1700,6 +1729,7 @@ impl<'c> Resident<'c> {
         words.mix_share = base + mix_share_at;
         words.region_soff = base + region_soff_at;
         (words.site_place, words.region_heard) = strand_at.map_or((0, 0), |(p, h)| (base + p, base + h));
+        words.site_stretch = stretch_at.map_or(0, |at| base + at);
         (words.mcmap, words.tm) = (base + mcmap_at, mcmap.len() as u64);
         words.skin_entries = skin_entries as u64;
         words.dlist = base + dlist_at;
