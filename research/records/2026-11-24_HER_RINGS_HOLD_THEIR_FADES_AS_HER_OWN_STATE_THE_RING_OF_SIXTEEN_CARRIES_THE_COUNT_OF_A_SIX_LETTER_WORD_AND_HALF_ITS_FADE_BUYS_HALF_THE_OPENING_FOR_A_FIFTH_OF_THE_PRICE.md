@@ -298,3 +298,24 @@ The arm ran 2,589 s against its control's 2,226 s (1.16 times; its first forty s
 Three of the fade family's clauses of purpose have now missed (G-F1's opening, G-R1's (a), G-T8's (d)) while each part stood under its
 ceiling of harm. The next arm on this family founds the line's fades and fade rates back at the skin's value (ℓ = 0, every rate row at
 zero) beside a control, as one change, after the wave slice's arm (G-M1, W118m beside W118, running from W117's end).
+
+## 15. A passage read as its consecutive stretches: the host side
+
+Fable's cut ruler (`Constitution::ruler_cut`, PR #1145) read on W117's mean that no compared place of a pass asks a store for a far
+source. Inside a region every source is heard one by one, and at its first place every store stands emptied, so no covector reaches a
+store's far content on any fade, which is why the fade family's three purpose clauses missed (§14). Its construction is built on the host:
+
+- `Region::stretches`, in a passage read by two streams, lists the known stream's places where a stretch after the first begins. Each
+  is a cut at `JOINED_MASK` (the ruler's 191) for the open places of its stretch. An open place hears its own stretch's definite sites
+  one by one, as the law's open row does, and the stretches before only by its probe's classes and each octave's crowd before its
+  stretch. The moments, circles, near field, level and return run whole (`ClassLists::cut_for`).
+- Two stretches read bit for bit as the ruler's cut at the second's first place; a third leaves every place before it as the passage of
+  two. The joined return agrees with its code's central difference on 56 probes across three fields, none on a seam.
+- `StorePass::joined` (the line `joined`, `set-joined`): the trainer joins a section's stretches of one slice in the order drawn while
+  none ends its piece and the passage stays within the field's reach (`join_stretches`).
+
+The card refuses a joined passage until it is realized there. Its realization is source-centric: a definite source's support lists its
+near field, the receivers probing its class and every open site of the region (`receiver_at`). Joined, an open site receives a source
+sharply only from its own stretch on, and by its probe's classes before it; an open receiver gains the octave crowds before its stretch;
+and the return kernels mirror each. Fable's G-R1 to G-R5 (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`) score its arm. The fade
+family's arm waits for it: its purpose can only be read once a covector reaches a store's far content.
