@@ -1,0 +1,6 @@
+COUNT_TABLES levels=13 training_places=79481280
+HELD_CODE known='none'             nats_a_place=2.5659 places=26211998
+HELD_CODE known='one back'         nats_a_place=1.4351 places=26211870
+HELD_CODE known='two back'         nats_a_place=1.2660 places=26211742
+HELD_CODE known='both sides'       nats_a_place=0.9803 places=26211742
+HELD_CODE known='two each side'    nats_a_place=0.8162 places=26211486
