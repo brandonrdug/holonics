@@ -344,6 +344,8 @@ pub(crate) struct BatchBase<'c> {
     /// The clock's skins and its near phases and skins, one store each for the batch, formed again at each clock.
     pub(crate) _skins: Option<(Pooled<'c, u32>, Pooled<'c, u32>)>,
     pub(crate) _clock_store: Option<(Pooled<'c, u32>, Pooled<'c, u32>)>,
+    /// [the lead, November 25] The base clock's second skin addresses, near skins, crowd skins and moments ([`SecondFade`]).
+    pub(crate) _second: Option<(Pooled<'c, i64>, Pooled<'c, u32>, Pooled<'c, u32>, Pooled<'c, i64>)>,
     pub(crate) opening: Option<Opening<'c>>,
     /// [G180] The base clock's covectors the opening's comparison gave (`τ`, `σ`), left by the first read for the second's reverse.
     pub(crate) early: Option<(Pooled<'c, i128>, Pooled<'c, i128>)>,
@@ -359,6 +361,24 @@ pub(crate) struct StrandBase<'c> {
     pub(crate) cmoment: Pooled<'c, i64>,
     pub(crate) sb: Pooled<'c, i64>,
     pub(crate) sa: Pooled<'c, i64>,
+    /// [the lead, November 25] The same at the rings' second fades ([`SecondFade`]), where they hold them.
+    pub(crate) second: Option<Box<StrandBase<'c>>>,
+}
+
+/// [the lead, November 25] **The rings' second fades on the card** (the host's `Declaration::twin`): the run's second decays, skin
+/// denominators and rates of fade (uploaded with the material), the covector's second fades (set where the run returns), and the base clock's
+/// second skin addresses, near skins, crowd skins and moments (taken by the batch's base). The second fades' moments are the first's kernels
+/// on words whose skins are these ([`Resident::second_words`]): the same clock, phases, strands and encodings, at the second skins.
+#[derive(Clone, Copy, Default)]
+pub(crate) struct SecondFade {
+    pub(crate) decay: u64,
+    pub(crate) skin_k: u64,
+    pub(crate) skin_b: u64,
+    pub(crate) gfade: u64,
+    pub(crate) saddr: u64,
+    pub(crate) mskin: u64,
+    pub(crate) cskin: u64,
+    pub(crate) moment: u64,
 }
 
 impl BatchBase<'_> {
@@ -602,6 +622,8 @@ pub struct Resident<'c> {
     /// The cavity's kept forward of the strand batch being read (the standing moments' operands, the cavity moments and their two sides),
     /// which the batch's reverse returns the open places' moments through; taken when the batch ends.
     pub(crate) strand_cavity: std::cell::RefCell<Option<StrandBase<'c>>>,
+    /// [the lead, November 25] The rings' second fades of the run being made ([`SecondFade`]); none where the field holds none.
+    pub(crate) second_fade: std::cell::Cell<Option<SecondFade>>,
 }
 
 impl<'c> Resident<'c> {
@@ -614,7 +636,7 @@ impl<'c> Resident<'c> {
         let (free, total) = (memory.free_bytes as u64, memory.total_bytes as u64);
         let used = total.saturating_sub(free);
         let budget = free.min(BOARD_CEILING.saturating_sub(used)).saturating_sub(MARGIN);
-        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_skip: Default::default(), strand_skip_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
+        Ok(Self { card, module, budget, strand_heard: Default::default(), strand_run: Default::default(), strand_skip: Default::default(), strand_skip_run: Default::default(), second_run: Default::default(), strand_cavity: Default::default(), second_fade: Default::default(), times: FieldTimes::default(), profile: None, head: Default::default(), tick: Default::default(), last_ns: Default::default(), outer_maxima: Default::default(), units: Default::default(), #[cfg(test)] unfilled: Default::default(), #[cfg(feature = "ruler-bits")] bits: Default::default(), pools: Default::default(), held_questions: Default::default(), covector_shares: Default::default(), row_questions: Default::default(), row_out: Default::default(), row_cov: Default::default(), held_cells: Default::default(), tick_reads: Default::default(), carry_gates: Default::default(), near_sites: Default::default(), near_out: Default::default(), clock_sites: Default::default(), clock_out: Default::default(), phases: None, phase_card: Default::default(), narrow: Default::default(), narrow_out: Default::default(), last_mark: std::cell::Cell::new("open"), tick_charts: Default::default(), tick_scales: Default::default(), opening_wanted: Default::default(), opening_out: Default::default() })
     }
 
     /// The octets a batch's weight and contact stores may take.
@@ -886,12 +908,21 @@ impl<'c> Resident<'c> {
         let skin_k: Vec<i128> = if slots == 0 { vec![1] } else { field.skin_denominators() };
         let skin_b: Vec<i128> = if slots == 0 { vec![0] } else { (0..slots).map(|slot| field.skin_rate(slot)).collect() };
         let (skin_k_at, skin_b_at) = (pack.put(&skin_k), pack.put(&skin_b));
+        // [the lead, November 25] The rings' second decays, skin denominators and rates of fade, where they hold them.
+        let second_at = if d.twin {
+            let decay2: Vec<i64> = field.twin_decays().iter().flatten().copied().collect();
+            let skin_b2: Vec<i128> = (0..slots).map(|slot| field.skin_rate_with(true, slot)).collect();
+            Some((pack.put(&decay2), pack.put(field.twin_skin_denominators()), pack.put(&skin_b2)))
+        } else {
+            None
+        };
         let decay_t_at = pack.put(&decay_t);
         // The temperatures' fine roots, past the resident face's sixteen (§16.12).
         let fine: Vec<u64> = field.fine_exponential().roots()[roots.len()..].iter().map(|&r| u64::try_from(r).map_err(|_| TowerError::Refused("the exponential's roots lie below 2^63"))).collect::<Result<_>>()?;
         let fine_at = pack.put(&fine);
         let run_pack = self.timed(Kind::Copy, || self.take_up(&pack.bytes)).map_err(device)?;
         let run_base = run_pack.device_ptr();
+        self.second_fade.set(second_at.map(|(decay, skin_k, skin_b)| SecondFade { decay: run_base + decay, skin_k: run_base + skin_k, skin_b: run_base + skin_b, ..SecondFade::default() }));
         if d.contacts % 2 != 0 {
             return Err(TowerError::Refused("a field's contacts are complex pairs (an even count)"));
         }
@@ -1304,6 +1335,11 @@ impl<'c> Resident<'c> {
         words.gcov = g.as_ref().map_or(0, |g| g.device_ptr());
         // [the lead, November 24] Where the rings hold their fades, the kernels add each ring's fade covector into the covector's own entries.
         words.gfade = if d.fade { g.as_ref().map_or(0, |g| g.device_ptr() + 16 * l.fade as u64) } else { 0 };
+        // [the lead, November 25] And each ring's second fade's, where they hold them.
+        if let Some(mut s) = self.second_fade.get() {
+            s.gfade = g.as_ref().map_or(0, |g| g.device_ptr() + 16 * l.twin_fade as u64);
+            self.second_fade.set(Some(s));
+        }
         // The batches: whole regions in order, each batch's every allocation within the budget.
         // A landmark read stores one tick's weights beside a read's carriers; a logits read keeps every tick
         // and its shares (the echo's round trips, §15.3).
@@ -1721,6 +1757,22 @@ impl<'c> Resident<'c> {
         words.saddr = saddr.device_ptr();
         words.plain = plain.device_ptr();
         words.pframe = pframe.device_ptr();
+        // [the lead, November 25] The base clock's second skin addresses, near and crowd skins and moments, where the rings hold second fades.
+        let second_stores = match self.second_fade.get() {
+            Some(mut s) => {
+                let saddr2 = self.timed(Kind::Alloc, || self.take::<i64>((3 * paced * n * sites).max(1))).map_err(device)?;
+                let mskin2 = self.timed(Kind::Alloc, || self.take::<u32>((tm * sites * CLOCK_NEAR).max(1))).map_err(device)?;
+                let cskin2 = self.timed(Kind::Alloc, || self.take::<u32>((paced * sites * words.slots as usize * n).max(1))).map_err(device)?;
+                let moment2 = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((sites * m2).max(1))).map_err(device)?;
+                s.saddr = saddr2.device_ptr();
+                s.mskin = if words.mskin != 0 { mskin2.device_ptr() } else { 0 };
+                s.cskin = if words.cskin != 0 { cskin2.device_ptr() } else { 0 };
+                s.moment = moment2.device_ptr();
+                self.second_fade.set(Some(s));
+                Some((saddr2, mskin2, cskin2, moment2))
+            }
+            None => None,
+        };
         // [measurement; theory, November 13, P56 item 4] The batch's clocks' takes.
         self.mark("batch_takes");
         // [the strand's two streams] A batch of passages read by two streams (the stage's `region_heard`).
@@ -1740,24 +1792,46 @@ impl<'c> Resident<'c> {
         // wherever a level stands; its comparison and return only where the pass returns.
         let opened = d.opening && (returning || field.scale.is_some());
         let kept_moments = self.moments(field, words, regions.len(), sites, opened || strand)?;
+        // [the lead, November 25] The second fades' moments on the same clock at the second skins ([`SecondFade`]): their skin addresses, then
+        // the moments' own kernels on the second words, kept where the opening or a strand reads their cavity.
+        let kept_second = match self.second_words(words) {
+            Some(mut w2) => {
+                if paced > 0 {
+                    self.launch("field_skin_addresses", Self::cells((paced * n * sites) as u64), THREADS, &mut [arg(&mut w2)])?;
+                }
+                Some(self.moments(field, &w2, regions.len(), sites, opened || strand)?)
+            }
+            None => None,
+        };
         // [the strand's two streams] The open places read the known stream's retarded cavity moments (`field_twin_moment`): the opening's
         // forward formed them where the opening is compared; where it is not, the cavity's forward alone forms them, kept for the reverse.
         let opening = if opened {
-            Some(self.opening_forward(field, words, regions, &st, kept_moments)?)
+            Some(self.opening_forward(field, words, regions, &st, kept_moments, kept_second)?)
         } else {
             if strand {
                 let (cmoment, sb, sa) = self.cavity_forward(field, words, regions.len(), sites, kept_moments.as_ref())?;
-                *self.strand_cavity.borrow_mut() = Some(StrandBase { keep: kept_moments, cmoment, sb, sa });
+                let second = match (self.second_words(words), kept_second) {
+                    (Some(w2), Some(keep2)) => {
+                        let (cmoment, sb, sa) = self.cavity_forward(field, &w2, regions.len(), sites, keep2.as_ref())?;
+                        Some(Box::new(StrandBase { keep: keep2, cmoment, sb, sa, second: None }))
+                    }
+                    _ => None,
+                };
+                *self.strand_cavity.borrow_mut() = Some(StrandBase { keep: kept_moments, cmoment, sb, sa, second });
             }
             None
         };
         if strand {
-            let mut cp = match (opening.as_ref(), self.strand_cavity.borrow().as_ref()) {
-                (Some(op), _) => op.cmoment.device_ptr(),
-                (None, Some(c)) => c.cmoment.device_ptr(),
+            let (mut cp, mut cp2) = match (opening.as_ref(), self.strand_cavity.borrow().as_ref()) {
+                (Some(op), _) => (op.cmoment.device_ptr(), op.second.as_ref().map(|s| s.cmoment.device_ptr())),
+                (None, Some(c)) => (c.cmoment.device_ptr(), c.second.as_ref().map(|s| s.cmoment.device_ptr())),
                 (None, None) => return Err(TowerError::Refused("a strand batch with no cavity moments")),
             };
             self.launch("field_twin_moment", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp)])?;
+            // The open places' second moments, the known stream's second cavity moments.
+            if let (Some(mut w2), Some(cp2)) = (self.second_words(words), cp2.as_mut()) {
+                self.launch("field_twin_moment", Self::cells((sites * m2) as u64), THREADS, &mut [arg(&mut w2), arg(cp2)])?;
+            }
         }
         // [G145] The level's news at every place, from the opening's face (`field_level_news`, the host's `Constitution::level_news`), read to the
         // host, which cuts each region's epochs (`level_cut`, a kind of work placed on the host; its bits are the host's own function's).
@@ -1784,8 +1858,8 @@ impl<'c> Resident<'c> {
         // The opening's forward ends here where no read compares it (a strand batch keeps the cavity's part of it for its reverse or its ticks).
         let opening = match opening {
             Some(op) if !compared && strand => {
-                let Opening { keep, cmoment, sb, sa, .. } = op;
-                *self.strand_cavity.borrow_mut() = Some(StrandBase { keep, cmoment, sb, sa });
+                let Opening { keep, cmoment, sb, sa, second, .. } = op;
+                *self.strand_cavity.borrow_mut() = Some(StrandBase { keep, cmoment, sb, sa, second });
                 None
             }
             other => other.filter(|_| compared),
@@ -1795,7 +1869,7 @@ impl<'c> Resident<'c> {
             None => None,
         };
         self.mark("batch_base");
-        Ok(BatchBase { st, kappa, tau, sigma, saddr, plain, pframe, moment, _skins: skins, _clock_store: clock_store, opening, early: None, tb, reads: 0 })
+        Ok(BatchBase { st, kappa, tau, sigma, saddr, plain, pframe, moment, _skins: skins, _clock_store: clock_store, _second: second_stores, opening, early: None, tb, reads: 0 })
     }
 
     /// One read of a batch of regions on its base ([`Resident::batch_base`]): the opening and the forward, each unresolved site's face (and its
@@ -1861,6 +1935,11 @@ impl<'c> Resident<'c> {
         // The moment's chart into the face (§16.22, the host's `Constitution::open`): `x⁰ += release(C s + b, 24)`.
         let (mface, mface_bias, rmface) = moment_face(field);
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, words.moment, m2, 0, dw, words.x, false)?;
+        // [the lead, November 25] The second fades' chart into the face (the host's `Constitution::twin_term`): `x⁰ += release(C′ s′, 24)`, no bias.
+        if let Some(s2) = self.second_fade.get() {
+            let (tface, rtface) = twin_face(field);
+            self.affine("field_affine_x64", words, tface, u64::MAX, rtface, dw, m2, s2.moment, m2, 0, dw, words.x, false)?;
+        }
         // [realization; theory, November 13, G144] **The opening's return runs at the end of its own forward, before the ticks.** It reads only its
         // forward's buffers, the constitution, the base clock's frames and clocks (the words hold the base clock here and again at the reverse's start,
         // and its kernels read no filled clock store) and the stage's host arrays; it adds into `g` and into the base clock's two covectors, taken here
@@ -1917,8 +1996,8 @@ impl<'c> Resident<'c> {
                 }
                 // [the strand's two streams] The cavity's part of the opening's forward stays for the open places' return.
                 if words.region_heard != 0 {
-                    let Opening { keep, cmoment, sb, sa, .. } = op;
-                    *self.strand_cavity.borrow_mut() = Some(StrandBase { keep, cmoment, sb, sa });
+                    let Opening { keep, cmoment, sb, sa, second, .. } = op;
+                    *self.strand_cavity.borrow_mut() = Some(StrandBase { keep, cmoment, sb, sa, second });
                 } else {
                     drop(op);
                 }

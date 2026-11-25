@@ -241,3 +241,29 @@ through the skin's homogeneity (`HNN/FadeHomogeneity`). Its cost is the moments'
 twice. The conjugate
 product of a ring's two moments (`c c̄′`, the gap read by ratio, the determinant's signed cancellation) is the form's second step, read
 once the linear one has its lap.
+
+## 12. The second fade, built
+
+Built as §11 states it (`Declaration::twin`, the fade word's bit four, `hnn-field-v14s`): the chart `C′` and each turned slot's second fade
+`ℓ′_s` stand at the end of the fine material (`Loci::twin_face`, `Loci::twin_fade`), founded by `found-twin STATE SHA MILLI OUT` with the chart
+at zero and every second fade at `MILLI` thousandths of an octave (−3180 is the half-a-turn founding), every other line of the state kept
+(`Learner::with_twin`). The second skins are formed from the second fades as the first's are (`refresh_fade`), and every reader of the moment's
+chart reads `C′` on the second moments beside it: the region's opening and the strand's (`open_sided`), the cavity openings
+(`cavity_forward_sided`) and the opening's comparison. Every return runs the second moments back through the same strands' encodings and the same
+clocks at the second skins (`moments_return_with`, `cavity_moments_return_with`), with the second fade's covector from the skin's homogeneity at
+its own skin, and the chart's covector `Σ_t δx⁰_t s′_tᵀ` (`twin_chart_return`).
+
+On the host: founded with its chart at zero on four fields (plain, circles, four ticks, the opening), every face and every standing entry's
+covector is the source's and the chart's covector is not zero; with the chart drawn at half the moment's own and the second fades spread about
+their founding, 80 central differences of the code (region and strand; 24 of them on second fades) agree with the covector within an eighth,
+none on a seam.
+
+On the card the second moments are the first's kernels on words whose skins are the second's (`Resident::second_words`): the second decays,
+skin denominators and rates of fade go up with the material, and the batch's base forms the base clock's second skin addresses, near and crowd
+skins and moments in stores of their own, since the first's near and crowd skins are the ticks' too. The clock, its phases, the strands and
+the encodings are the first's. The second cavity rides beside the first wherever the opening or a strand reads it, and a strand's open places
+take the known stream's second cavity moments as they take the first's. The card's parity against the host, read on the targets' parity field,
+on it with the opening, and on that with the mark and the first fades (the line's parts), strands and regions alike: unequal = 0 in all six,
+the chart's 1,024 entries and every second fade taking a covector (`receipts/2026-11-24_fade/card_parity_twin.txt`). A founded field holds
+the moments' encodings and chart at zero, so its moments, and the second fades' with them, read nothing until a deposit moves them; the
+parity draws them, and its first reading (with them at zero) read zero covectors at the second fades on host and card alike.

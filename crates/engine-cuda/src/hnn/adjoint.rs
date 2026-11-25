@@ -469,6 +469,21 @@ impl<'c> Resident<'c> {
         self.transposed(words, mface, dw, m2, dx.device_ptr(), dw, dq.device_ptr(), false, false)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+        // [the lead, November 25] The second fades' chart into the face (the host's `returned_with`): `δC′ += Σ_t δx⁰_t s′_tᵀ`, and the second
+        // moments' covector `δs′_t = C′ᵀ δx⁰_t` in a buffer of its own, returned below at the second skins.
+        let second_dm = match self.second_fade.get() {
+            Some(s2) => {
+                let (tface, _) = twin_face(field);
+                self.outer_biased(words, g, tface, u64::MAX, dw, m2, dx.device_ptr(), dw, s2.moment, m2, true, false)?;
+                let dq2 = self.timed(Kind::Alloc, || self.take::<i64>((sites * m2).max(1))).map_err(device)?;
+                self.transposed(words, tface, dw, m2, dx.device_ptr(), dw, dq2.device_ptr(), false, false)?;
+                let dm2 = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+                let (mut cp, mut dmp) = (dq2.device_ptr(), dm2.device_ptr());
+                self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+                Some(dm2)
+            }
+            None => None,
+        };
         // [definition; the lead, November 18, the frontier record §6] **The open places' moments return** (the host's `strand_returned`): an
         // open place read the known stream's retarded cavity moment of its place at every tick and in its opening, so its moments' covector,
         // summed over them, is that cavity moment's: taken to the place's known site in a buffer of its own (`field_twin_take_wide`, which
@@ -483,6 +498,16 @@ impl<'c> Resident<'c> {
         } else {
             None
         };
+        // The open places' second moments' covector, taken to their known sites as the first's.
+        let second_taken = match (second_dm.as_ref(), words.region_heard != 0) {
+            (Some(dm2), true) => {
+                let taken = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+                let (mut sp, mut tp, mut stride) = (dm2.device_ptr(), taken.device_ptr(), m2 as u32);
+                self.launch("field_twin_take_wide", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut sp), arg(&mut tp), arg(&mut stride)])?;
+                Some(taken)
+            }
+            _ => None,
+        };
         // The moments' return (§15.1): each moment mode's value covector, summed over the ticks that read one clock,
         // through the strands to the families on that clock (the host's `moments_return`); then the clocks return to
         // their paces (§16, §16.16): `δκ` by suffix sums, then `δc[u] += Σ_(u_t = u) δκ_t` on the class sheet, a blank's by
@@ -492,6 +517,17 @@ impl<'c> Resident<'c> {
             set_clock(words, None, base_clock);
             (words.gtau, words.gsig) = (gtp, gsp);
             self.moments_return_at(field, words, g, dmp, regions, sites)?;
+            // [the lead, November 25] The second fades' moments return on the base clock at the second skins (its skins formed again for
+            // them), into `g`, the base clock's covectors and the second fades; a strand's open places' through the second cavity.
+            if let (Some(w2), Some(dm2)) = (self.second_words(words), second_dm.as_ref()) {
+                self.clock_fill(field, &w2, sites)?;
+                self.moments_return_at(field, &w2, g, dm2.device_ptr(), regions, sites)?;
+                if let (Some(taken2), Some(sc)) = (second_taken.as_ref(), strand_cavity.as_ref().and_then(|c| c.second.as_deref())) {
+                    if let Some(k2) = sc.keep.as_ref() {
+                        self.cavity_back(field, &w2, k2, &sc.sb, &sc.sa, taken2, g, sites)?;
+                    }
+                }
+            }
             if let Some(taken) = twin_dm.as_ref() {
                 let cavity = strand_cavity.as_ref().ok_or(TowerError::Refused("a strand batch's reverse without its cavity's forward"))?;
                 if let Some(k) = cavity.keep.as_ref() {

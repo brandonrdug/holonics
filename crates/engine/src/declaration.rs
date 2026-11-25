@@ -254,6 +254,16 @@ pub struct Declaration {
     /// and a count across a word cannot be heard (the calendar record §12). `false` writes every head line as before; `true` writes the
     /// `hnn-field-v14s` line with its fade word `2` (or `3` with the rings' fades).
     pub fade_rate: bool,
+    /// [definition; the lead, November 25, the formal thread's form 1 and `two_fades_read_gap`; the record of the fades §11] **Each turned
+    /// ring's second fade**: with `true`, every turned slot's moment is formed again at its twin fade `γ′_s = 2^(ℓ′_s)` ([`Loci::twin_fade`],
+    /// the rings' fades' chart), from the same encodings and on the same clock, `s′_t` (`[t][2M]`, the still heads' entries zero as the
+    /// moment's are), and read into the opening by its own chart `C′` ([`Loci::twin_face`], `D × 2M`) beside the moment's wherever that chart
+    /// is read; the tick's values and probes do not read it. Founded with the chart at zero the field reads every face of its source bit for
+    /// bit. Why: on W113f and W114r a ring's one fade was drawn back toward the skin's, the long rings faded faster of their own accord and
+    /// every boundary asked to erase more, so a count that lasts across a boundary needs a store a boundary does not erase beside the one
+    /// that does; two unlike fades from one start read a gap by their ratio (`HNN/ComparedClock.two_fades_read_gap`). `false` writes every
+    /// head line as before; `true` adds four to the `hnn-field-v14s` fade word.
+    pub twin: bool,
 }
 
 impl Declaration {
@@ -569,6 +579,9 @@ impl Declaration {
         if self.fade_rate && self.paced_heads() == 0 {
             return refuse("a field whose classes fade at their own rates needs paced heads");
         }
+        if self.twin && self.turned_slots() == 0 {
+            return refuse("a field whose rings hold a second fade needs turned rings");
+        }
         if self.pump && self.carry == 0 {
             return refuse("a field whose carry circles are pumped needs carry circles");
         }
@@ -591,7 +604,7 @@ impl Declaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.fade || self.fade_rate {
+        let head = if self.fade || self.fade_rate || self.twin {
             "hnn-field-v14s"
         } else if self.friction {
             "hnn-field-v14r"
@@ -618,8 +631,8 @@ impl Declaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.fade || self.fade_rate {
-            format!(" {} {} {} {} {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump), u8::from(self.lane_leak), u8::from(self.friction) + u8::from(self.friction_gate), u8::from(self.fade) + 2 * u8::from(self.fade_rate))
+        let tail = if self.fade || self.fade_rate || self.twin {
+            format!(" {} {} {} {} {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump), u8::from(self.lane_leak), u8::from(self.friction) + u8::from(self.friction_gate), u8::from(self.fade) + 2 * u8::from(self.fade_rate) + 4 * u8::from(self.twin))
         } else if self.friction {
             format!(" {} {} {} {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump), u8::from(self.lane_leak), 1 + u8::from(self.friction_gate))
         } else if self.lane_leak {
@@ -663,13 +676,16 @@ impl Declaration {
         // one.
         // [the lead, November 24] The fade's word is read from `v14s` alone: the twenty-two words of `v14r`, its friction word zero, one or
         // two, then one ([`Declaration::fade`]).
-        // [the lead, November 25] Its fade word is one (the rings' fades), two (the classes' fade rates, [`Declaration::fade_rate`]) or three.
+        // [the lead, November 25] Its fade word is a sum: one (the rings' fades), two (the classes' fade rates, [`Declaration::fade_rate`]) and
+        // four (the rings' second fades, [`Declaration::twin`]), from one to seven.
         let fade_line = words.first().copied() == Some("hnn-field-v14s") && words.len() == 24;
-        if fade_line && (!matches!(words[23], "1" | "2" | "3") || !matches!(words[22], "0" | "1" | "2") || !matches!(words[21], "0" | "1") || !matches!(words[20], "0" | "1")) {
-            return refuse("an hnn-field-v14s head line whose pump or leak word is not zero or one, whose friction word is not zero, one or two, or whose fade word is not one, two or three");
+        let fade_word: u8 = if fade_line { words[23].parse().unwrap_or(0) } else { 0 };
+        if fade_line && (!(1..=7).contains(&fade_word) || !matches!(words[22], "0" | "1" | "2") || !matches!(words[21], "0" | "1") || !matches!(words[20], "0" | "1")) {
+            return refuse("an hnn-field-v14s head line whose pump or leak word is not zero or one, whose friction word is not zero, one or two, or whose fade word is not one to seven");
         }
-        let fade = fade_line && matches!(words[23], "1" | "3");
-        let fade_rate = fade_line && matches!(words[23], "2" | "3");
+        let fade = fade_word & 1 != 0;
+        let fade_rate = fade_word & 2 != 0;
+        let twin = fade_word & 4 != 0;
         let friction_line = (words.first().copied() == Some("hnn-field-v14r") && words.len() == 23) || fade_line;
         if friction_line && !fade_line && (!matches!(words[22], "1" | "2") || !matches!(words[21], "0" | "1") || !matches!(words[20], "0" | "1")) {
             return refuse("an hnn-field-v14r head line whose pump or leak word is not zero or one or whose friction word is not one or two");
@@ -751,7 +767,7 @@ impl Declaration {
             (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump, lane_leak, friction, friction_gate, fade, fade_rate };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump, lane_leak, friction, friction_gate, fade, fade_rate, twin };
         d.admit()?;
         Ok(d)
     }
@@ -863,6 +879,12 @@ pub struct Loci {
     /// [definition; the lead, November 25] **Each paced head's fade rate a class** ([`Declaration::fade_rate`]): `ρ_h`, one row of `A + 1` a
     /// paced head on the material's grain, as the paces' rows; the last family, zero long where the classes do not fade at their own rates.
     pub fade_rate: usize,
+    /// [definition; the lead, November 25] **The second fades' chart** ([`Declaration::twin`]): `C′`, `D × 2M` on the material's grain, read
+    /// as the moment's chart is; zero long where the rings hold no second fade.
+    pub twin_face: usize,
+    /// [definition; the lead, November 25] **Each turned ring's second fade** ([`Declaration::twin`]): `ℓ′_s`, one a turned slot on the
+    /// material's grain (the rings' fades' chart); the last family, zero long where the rings hold no second fade.
+    pub twin_fade: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -975,6 +997,8 @@ impl Loci {
         let friction_gate = tail(usize::from(d.friction_gate) * d.heads * d.width, MATERIAL_BITS);
         let fade = tail(usize::from(d.fade) * d.turned_slots(), MATERIAL_BITS);
         let fade_rate = tail(usize::from(d.fade_rate) * d.paced_heads() * (a + 1), MATERIAL_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, lane_leak, friction, friction_gate, fade, fade_rate, len: at, families }
+        let twin_face = tail(usize::from(d.twin) * dw * m2, MATERIAL_BITS);
+        let twin_fade = tail(usize::from(d.twin) * d.turned_slots(), MATERIAL_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, lane_leak, friction, friction_gate, fade, fade_rate, twin_face, twin_fade, len: at, families }
     }
 }

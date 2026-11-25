@@ -24,7 +24,7 @@ impl Constitution {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        let mut out = Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_skin_k: None, ruler_skin_places: false, fade_skin_k: None, ruler_state_grain: None, ruler_lane_grain: None, ruler_far: 0, ruler_level: 0, mark: None };
+        let mut out = Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_skin_k: None, ruler_skin_places: false, fade_skin_k: None, twin_skin_k: Vec::new(), twin_decays: Vec::new(), ruler_state_grain: None, ruler_lane_grain: None, ruler_far: 0, ruler_level: 0, mark: None };
         // [the lead, November 24] A field whose rings hold their fades forms their skins from its material ([`Declaration::fade`]).
         out.refresh_fade().expect("a fade past its chart");
         out
@@ -932,6 +932,38 @@ impl Constitution {
         Ok((out, from_map))
     }
 
+    /// [definition; the lead, November 25 (the fade record §11)] **The field whose turned rings hold a second fade** ([`Declaration::twin`]):
+    /// the second fades' chart `C′` (`D × 2M`) founded at zero and each turned slot's second fade `ℓ′_s` founded at `ell` (on `2^(−24)`
+    /// octaves of its skin, read through the temperatures' chart; the record founds it where a ring keeps half of itself over its turn,
+    /// `γ′ = ln 2 / 2π`), appended at the end of the fine field's material, every standing entry kept, so every face is the source's bit for
+    /// bit and the chart's covector `Σ_t δx⁰_t s′_tᵀ` is the deposit's to take. Also the map over the whole material from each new entry to
+    /// the old one it copies (`None` for the chart and the fades). Refused on a field that holds them.
+    pub fn with_twin(&self, ell: i32) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.twin {
+            return refuse("a field whose rings already hold their second fades");
+        }
+        let d = Declaration { twin: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.twin_face {
+            return refuse("a field whose material does not end where the second fades' chart begins");
+        }
+        temperature_of(ell, &self.fine)?;
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        for slot in 0..d.turned_slots() {
+            theta[layout.twin_fade + slot] = ell;
+        }
+        let mut from_map: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from_map.resize(layout.len, None);
+        from_map.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from_map))
+    }
+
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The field whose friction is read from its receivers' state**
     /// ([`Declaration::friction_gate`]): `a_h`, a row of `D` a head, appended at the end of the fine field's material, founded at zero, every
     /// standing entry kept, so every friction is its head's and kind's and every face the source's bit for bit. Also the map over the whole
@@ -1686,6 +1718,37 @@ impl Learner {
                 spread.insert(self.field.families().len(), 0);
                 if spread.len() != field.families_all().len() {
                     return refuse("a lattice whose families do not meet the field's with its fade rates");
+                }
+                Some(Lattice { spread, rest: mapped(&l.rest) })
+            }
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 25] **The learner whose turned rings hold a second fade** ([`Constitution::with_twin`]), founded as
+    /// [`Learner::with_fade_rate`] founds the rows: every other line of the state kept (the lattice's spreads and rests, the carried grains,
+    /// the rates), the chart's and the second fades' families read whole until a save reads their spreads. Refused while a step is held.
+    pub fn with_twin(&self, ell: i32) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its rings' second fades after its held step is read");
+        }
+        let (field, from_map) = self.field.with_twin(ell)?;
+        let mapped = |v: &[i32]| -> Vec<i32> { from_map.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let first = from_map.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from_map.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from_map.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from_map.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let lattice = match &self.lattice {
+            Some(l) => {
+                let mut spread = l.spread.clone();
+                let at = self.field.families().len();
+                for _ in at..field.families().len() {
+                    spread.insert(at, 0);
+                }
+                if spread.len() != field.families_all().len() {
+                    return refuse("a lattice whose families do not meet the field's with its second fades");
                 }
                 Some(Lattice { spread, rest: mapped(&l.rest) })
             }

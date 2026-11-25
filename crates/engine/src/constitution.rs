@@ -83,6 +83,11 @@ pub struct Constitution {
     /// ([`Declaration::fade`], [`Constitution::refresh_fade`]); `None` on a field whose rings do not hold their fades. Derived from the
     /// material, so no part of the state's text.
     pub fade_skin_k: Option<Vec<i128>>,
+    /// [definition; the lead, November 25] Each turned slot's second skin denominator and its decays at a whole distance, formed from the
+    /// second fade the material holds ([`Declaration::twin`], [`Constitution::refresh_fade`]); empty on a field whose rings hold no second
+    /// fade. Derived from the material, so no part of the state's text.
+    pub twin_skin_k: Vec<i128>,
+    pub(crate) twin_decays: Vec<Vec<i64>>,
     /// [measurement; the lead, November 21, the precision pass's G-W3] Where set, **every state rounded to `2^(−g)` after each tick** of a
     /// passage read by two streams: `x ← release(x, 16 − g) ≪ (16 − g)` over every site, `x` on the state's `2^(−16)`. A ruler's read of how
     /// many of the state's places the code reads: not part of the state, and no reverse reads it.

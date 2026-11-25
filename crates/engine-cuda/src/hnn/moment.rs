@@ -32,6 +32,15 @@ pub(crate) fn moment_face(field: &Constitution) -> (u64, u64, u64) {
     (l.moment_face as u64, l.moment_face_bias as u64, reach)
 }
 
+/// [the lead, November 25] The second fades' chart into the face (the host's `Loci::twin_face`): its offset in the material and its reach
+/// `max |C′|`. No bias.
+pub(crate) fn twin_face(field: &Constitution) -> (u64, u64) {
+    let (l, d) = (field.layout(), field.declaration);
+    let len = d.width * 2 * d.complex();
+    let reach = field.theta[l.twin_face..l.twin_face + len].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
+    (l.twin_face as u64, reach)
+}
+
 /// [realization; theory, November 13, P60 item 2] **The standing moments' operands, kept for the cavity's**: every moment mode's strands and their
 /// exact prefixes, the forward's admission flags and the modes' words (`moments` with `keep`), which the cavity moments read at their standing
 /// phases and the cavity's clock covector reads again.
@@ -63,9 +72,18 @@ pub(crate) struct Opening<'c> {
     pub(crate) lift: Pooled<'c, i64>,
     pub(crate) masses: Pooled<'c, u64>,
     pub(crate) totals: Pooled<'c, i128>,
+    /// [the lead, November 25] The cavity at the rings' second fades ([`SecondFade`]): their kept operands, cavity moments and two sides.
+    pub(crate) second: Option<Box<StrandBase<'c>>>,
 }
 
 impl<'c> Resident<'c> {
+
+    /// [the lead, November 25] **The second fades' words** ([`SecondFade`]): the words with the second decays, skin denominators and rates of
+    /// fade, the covector's second fades and the base clock's second skin addresses, skins and moments in place of the first's; none where the
+    /// field holds no second fade. Every other word (the clock, the phases, the strands' encodings, the covectors of the clock) is the words'.
+    pub(crate) fn second_words(&self, words: &Words) -> Option<Words> {
+        self.second_fade.get().map(|s| Words { decay: s.decay, skin_k: s.skin_k, skin_b: s.skin_b, gfade: s.gfade, saddr: s.saddr, mskin: s.mskin, cskin: s.cskin, moment: s.moment, ..*words })
+    }
 
     /// [realization; theory, November 13, P60 item 2] **The opening's comparison's forward** (the host's `Constitution::cavity_forward` and
     /// `Constitution::opening_read`): the cavity moments from the standing moments' kept operands (`field_cavity_moment_all`), the cavity openings
@@ -93,7 +111,7 @@ impl<'c> Resident<'c> {
         Ok((cmoment, sb, sa))
     }
 
-    pub(crate) fn opening_forward(&self, field: &Constitution, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>) -> Result<Opening<'c>> {
+    pub(crate) fn opening_forward(&self, field: &Constitution, words: &mut Words, regions: &[Region], st: &Staged<'c>, keep: Option<MomentKeep<'c>>, keep_second: Option<Option<MomentKeep<'c>>>) -> Result<Opening<'c>> {
         let d = field.declaration;
         let (dw, m2, a, sites, tm, lanes) = (d.width, 2 * d.complex(), d.alphabet, st.sites, d.moment_modes(), d.lanes);
         let _ = tm;
@@ -125,6 +143,16 @@ impl<'c> Resident<'c> {
         self.launch("field_cavity_open", Self::cells((sites * dw) as u64), THREADS, &mut [arg(words), arg(&mut cxp)])?;
         let (mface, mface_bias, rmface) = moment_face(field);
         self.affine("field_affine_x64", words, mface, mface_bias, rmface, dw, m2, cmoment.device_ptr(), m2, 0, dw, cx.device_ptr(), false)?;
+        // [the lead, November 25] The second fades' cavity moments and their chart on the cavity openings (the host's `cavity_forward_sided`).
+        let second = match (self.second_words(words), keep_second) {
+            (Some(w2), Some(keep2)) => {
+                let (cm2, sb2, sa2) = self.cavity_forward(field, &w2, regions.len(), sites, keep2.as_ref())?;
+                let (tface, rtface) = twin_face(field);
+                self.affine("field_affine_x64", words, tface, u64::MAX, rtface, dw, m2, cm2.device_ptr(), m2, 0, dw, cx.device_ptr(), false)?;
+                Some(Box::new(StrandBase { keep: keep2, cmoment: cm2, sb: sb2, sa: sa2, second: None }))
+            }
+            _ => None,
+        };
         let mut cw = *words;
         cw.unresolved = mask.device_ptr();
         let read = self.timed(Kind::Alloc, || self.take::<i32>((sites * dw).max(1))).map_err(device)?;
@@ -143,7 +171,7 @@ impl<'c> Resident<'c> {
         let (mut zp, mut mp, mut tp) = (z.device_ptr(), masses.device_ptr(), totals.device_ptr());
         self.launch("field_face", Self::warps(sites as u64), THREADS, &mut [arg(&mut cw), arg(&mut zp), arg(&mut mp), arg(&mut tp)])?;
         self.mark("opening_forward");
-        Ok(Opening { _mask: mask, compare, keep, cmoment, sb, sa, read, scale, lift, masses, totals })
+        Ok(Opening { _mask: mask, compare, keep, cmoment, sb, sa, read, scale, lift, masses, totals, second })
     }
 
     /// [realization; theory, November 13, P60 item 2] **The opening's comparison's return** (the host's `Constitution::opening_compare_return`): at every
@@ -223,6 +251,20 @@ impl<'c> Resident<'c> {
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
         self.cavity_back(field, words, k, &op.sb, &op.sa, &dm, g, sites)?;
+        // [the lead, November 25] The second fades' chart on their cavity moments (the host's `opening_compare_return`): `δC′ += Σ_t δx_t s′_tᵀ`,
+        // `δs′_t = C′ᵀ δx_t`, returned through the second cavity at the second skins into `g`, the clocks' covectors and the second fades.
+        if let (Some(sc), Some(w2)) = (op.second.as_deref(), self.second_words(words)) {
+            let (tface, _) = twin_face(field);
+            self.outer_biased(&mut cw, g, tface, u64::MAX, dw, m2, dx.device_ptr(), dw, sc.cmoment.device_ptr(), m2, true, true)?;
+            let dq2 = zeroed64(sites * m2)?;
+            self.transposed(&mut cw, tface, dw, m2, dx.device_ptr(), dw, dq2.device_ptr(), false, true)?;
+            let dm2 = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
+            let (mut cp, mut dmp) = (dq2.device_ptr(), dm2.device_ptr());
+            self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
+            if let Some(k2) = sc.keep.as_ref() {
+                self.cavity_back(field, &w2, k2, &sc.sb, &sc.sa, &dm2, g, sites)?;
+            }
+        }
         self.mark("opening_back");
         Ok(())
     }

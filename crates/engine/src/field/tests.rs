@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -2035,7 +2035,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3875,7 +3875,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, friction: old.friction, friction_gate: old.friction_gate, fade: old.fade, fade_rate: old.fade_rate, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, friction: old.friction, friction_gate: old.friction_gate, fade: old.fade, fade_rate: old.fade_rate, twin_face: old.twin_face, twin_fade: old.twin_fade, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
@@ -4251,10 +4251,11 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
 /// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
 #[test]
 fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
-    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 31));
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 32));
     assert_eq!((PART_NAMES[FRICTION_PART], FRICTION_PART), ("friction", 28));
     assert_eq!((PART_NAMES[FADE_PART], FADE_PART), ("fade", 29));
     assert_eq!((PART_NAMES[FADE_RATE_PART], FADE_RATE_PART), ("fade_rate", 30));
+    assert_eq!((PART_NAMES[TWIN_PART], TWIN_PART), ("twin", 31));
     assert_eq!((PART_NAMES[LOUD_PART], LOUD_PART), ("loud", 26));
     assert_eq!((PART_NAMES[LEAK_PART], LEAK_PART), ("lane_leak", 27));
     assert_eq!((PART_NAMES[OPENING_PART], OPENING_PART), ("opening", 23));
@@ -7436,6 +7437,95 @@ fn the_classes_fade_rates_founded_at_zero_keep_every_face_and_their_return_match
     assert!(read >= 12 && 8 * seams <= read.max(1), "read {read} probes, {seams} on a seam");
 }
 
+/// [definition; the lead, November 25] **The rings' second fades founded with their chart at zero keep every face, and their return
+/// matches their code's difference** ([`Constitution::with_twin`]): a field whose turned rings hold a second fade, its chart `C′` founded at
+/// zero, reads every face of its source and returns the same covector at every standing entry, its chart's covector is not zero, and its
+/// line writes `hnn-field-v14s` and reads back; with the chart drawn off zero and the second fades off their founding, the code's covector
+/// at each chart entry and each second fade predicts the code's central difference, in a region and in a passage read by two streams.
+#[test]
+fn the_rings_second_fades_founded_with_their_chart_at_zero_keep_every_face_and_their_return_matches_their_codes_difference() {
+    let (mut read, mut seams, mut fades_read) = (0usize, 0usize, 0usize);
+    let one = 1i32 << MATERIAL_BITS;
+    // Where a ring keeps half of itself over its turn, `γ′ = ln 2 / 2π` of the skin's: `log₂ 0.1103 ≈ −3.18` octaves.
+    let half_a_turn = -(51 * one) / 16;
+    for (name, plain) in [("plain, one still", shaped(1)), ("circles, one still", circled_shaped(1)), ("four ticks, one still", four_ticks(1)), ("the opening, one still", opened(1))] {
+        let (zero, _) = plain.with_twin(half_a_turn).unwrap();
+        let r = region();
+        assert_eq!(zero.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: the second fades founded with their chart at zero keep every face");
+        let base_g = covector_of(&plain, &r);
+        let zero_g = covector_of(&zero, &r);
+        assert_eq!(&zero_g[..plain.theta.len()], &base_g[..], "{name}: and every standing entry's covector");
+        let l = zero.layout.clone();
+        let (dw, m2) = (zero.declaration.width, 2 * zero.declaration.complex());
+        assert!(zero_g[l.twin_face..l.twin_face + dw * m2].iter().any(|&v| v != 0), "{name}: the chart's covector is the deposit's to take");
+        let text = zero.to_text();
+        assert!(text.starts_with("hnn-field-v14s "), "{name}: the line is v14s");
+        assert_eq!(Constitution::from_text(&text).unwrap().theta, zero.theta, "{name}: and reads back");
+        assert!(Constitution::from_text(&text).unwrap().declaration.twin, "{name}: with its second fades");
+        let mut field = zero.clone();
+        // The chart drawn at half the moment's own, the second fades spread about their founding.
+        for k in 0..dw * m2 {
+            field.theta[l.twin_face + k] = field.theta[l.moment_face + k] / 2;
+        }
+        let slots = field.declaration.turned_slots();
+        for (k, v) in field.theta[l.twin_fade..l.twin_fade + slots].iter_mut().enumerate() {
+            *v += [-one / 4, one / 8, -3 * one / 8, one / 4, -one / 2][k % 5];
+        }
+        field.refresh_fade().unwrap();
+        assert_ne!(field.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: the second fades move the faces");
+        let classes = drawn_classes(0xFC, 11, field.declaration.alphabet);
+        let strand_code = |f: &Constitution| -> i64 {
+            let places: i64 = f.strand_pass(&classes, false, true).unwrap().faces.iter().zip(&classes).skip(1).map(|(fc, &c)| crate::field::ratio_code(fc.masses[c], fc.total)).sum();
+            let known = vec![false; classes.len()];
+            let opening = if f.declaration.opening { opening_code(f, &Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: true, second: false, targets: None }) } else { 0 };
+            places + opening
+        };
+        let strand_g = {
+            let pass = field.strand_pass(&classes, true, true).unwrap();
+            let mut g = vec![0i128; field.theta.len()];
+            field.strand_returned(&classes, &classes, &pass, &mut g).unwrap();
+            g
+        };
+        let region_g = covector_of(&field, &r);
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let p = f.pass(&r, true).unwrap();
+            let s = f.strand_pass(&classes, true, true).unwrap();
+            p.ticks.iter().chain(&s.ticks).flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+        };
+        for (which, g) in [("region", &region_g), ("strand", &strand_g)] {
+            // Every second fade, and every seventh chart entry with a covector.
+            let chart: Vec<usize> = (l.twin_face..l.twin_face + dw * m2).filter(|&i| g[i] != 0).step_by(7).collect();
+            let fades: Vec<usize> = (l.twin_fade..l.twin_fade + slots).filter(|&i| g[i] != 0).collect();
+            for i in chart.into_iter().chain(fades) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f.refresh_fade().unwrap();
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                let shift = 40 + MATERIAL_BITS - 20;
+                let Some((delta, h)) = probe_step(MATERIAL_BITS, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                if i >= l.twin_fade {
+                    fades_read += 1;
+                }
+                let region_code = |f: &Constitution| -> i64 { f.code(&r).unwrap().0 + if f.declaration.opening { opening_code(f, &r) } else { 0 } };
+                let measured = if which == "region" { region_code(&moved(delta)) - region_code(&moved(-delta)) } else { strand_code(&moved(delta)) - strand_code(&moved(-delta)) };
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 * 10 << h);
+                let what = if i >= l.twin_fade { format!("second fade {}", i - l.twin_fade) } else { format!("chart entry {}", i - l.twin_face) };
+                assert!((measured as i128 - predicted).abs() <= tolerance, "{name}, {which}: {what} at {h} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("TWIN_COVECTOR_PROBES read={read} fades={fades_read} on_a_seam={seams}");
+    assert!(read >= 16 && fades_read >= 4 && 8 * seams <= read.max(1), "read {read} probes ({fades_read} second fades), {seams} on a seam");
+}
+
 /// [definition; the lead, November 24] **The rings' fades founded at zero keep every face, and their return matches their code's
 /// difference**: a field whose rings hold their fades founded at zero reads every face of its source and returns the same covector at
 /// every standing entry, its line writes `hnn-field-v14s` and reads back; with the fades drawn off zero, the code's covector at each fade
@@ -7508,3 +7598,4 @@ fn the_rings_fades_founded_at_zero_keep_every_face_and_their_return_matches_thei
     eprintln!("FADE_COVECTOR_PROBES read={read} on_a_seam={seams}");
     assert!(read >= 12 && 8 * seams <= read.max(1), "read {read} probes, {seams} on a seam");
 }
+

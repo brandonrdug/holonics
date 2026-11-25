@@ -95,7 +95,10 @@ impl<'c> Resident<'c> {
     /// covector where the run returns one.
     /// `one_sided`: the known stream's word of a run of passages read by two streams (`FieldWords::before`, one or two), zero otherwise.
     pub(crate) fn tower_run(&self, field: &Constitution, s: &Scale, face: u64, returning: bool, one_sided: u64) -> Result<TowerRun<'c>> {
+        // The coarse field's upload leaves the fine field's second fades as they stand ([`SecondFade`]).
+        let fine_second = self.second_fade.get();
         let (mut cwords, cup, _) = self.upload(&s.coarse, Some(face))?;
+        self.second_fade.set(fine_second);
         let glue = self.timed(Kind::Copy, || self.take_up(&s.glue)).map_err(device)?;
         let offsets = s.glue_offsets(field.declaration.width);
         let (a, ab, b, bb, _) = offsets;
