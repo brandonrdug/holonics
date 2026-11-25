@@ -1,0 +1,5 @@
+test hnn::field::tests::the_rings_fades_on_the_card_read_the_hosts_bits ... FADE_PARITY strands unequal=0 first=None fades=[(-3966288509, -3966288509), (-3529334906, -3529334906), (6467858009, 6467858009), (1559068936, 1559068936)]
+FADE_PARITY regions unequal=0 first=None fades=[(-1014773513, -1014773513), (1429195734, 1429195734), (1829626772, 1829626772), (-6544219322, -6544219322)]
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 33 filtered out; finished in 25.24s
+
+[exited with code 0]

@@ -346,7 +346,7 @@ extern "C" __global__ void field_cavity_return_paced_all(const MomentWords *ws, 
 
 // One skin term of the cavity's clock covector whose receiver end is the cavity clock (`σ_c = sr`, the clock of site `rt = g − 1`), the other end
 // site `gk` (the host's `cavity_pace_return`'s `skin` with `rt = t − 1`): as `moment_skin_back`, `sgn = sgn(σ_c − σ_k)`.
-__device__ __forceinline__ void cavity_skin_back(const FieldWords &w, int32_t p, uint64_t rt, wide sr, uint64_t gk, wide decay, wide inner, wide b) {
+__device__ __forceinline__ void cavity_skin_back(const FieldWords &w, int32_t p, uint64_t rt, wide sr, uint64_t gk, wide decay, wide inner, wide b, wide *fade = nullptr) {
     const wide sk = (wide)w.sigma[(uint64_t)p * w.T + gk];
     if (sr == sk) {
         return;
@@ -356,6 +356,10 @@ __device__ __forceinline__ void cavity_skin_back(const FieldWords &w, int32_t p,
         atomicOr(w.status, REFUSED_CARRIER);
     }
     const wide at = rel(rel(y, MOVE_BITS), MOVE_BITS + FACE_BITS);
+    // [the lead, November 24] The pair's share of the ring's fade, summed on the thread ([`fade_term_dev`]).
+    if (fade != nullptr) {
+        *fade += fade_term_dev(w, sr - sk, at);
+    }
     const wide signed_at = sr > sk ? at : -at;
     add_wide(w.gsig + (uint64_t)p * w.T + rt, -signed_at);
     add_wide(w.gsig + (uint64_t)p * w.T + gk, signed_at);
@@ -405,22 +409,26 @@ extern "C" __global__ void field_cavity_pace_back_all(const MomentWords *ws, con
         }
         dtau += rel(both, MOVE_BITS + FACE_BITS);
         add_wide(fw.gtau + (uint64_t)p * fw.T + g, dtau);
-        // The skins, at the paced law on every region (the plain region's are the same law at whole variations).
+        // The skins, at the paced law on every region (the plain region's are the same law at whole variations), their slope the ring's rate
+        // of fade, and their shares of its fade summed on the thread and added once a site ([the lead, November 24]).
         PacedMode pm = own;
         pm.plain = false;
+        const wide bs = fw.skin_b[slot];
+        wide own_fade = 0;
+        wide *fade = fw.gfade != nullptr ? &own_fade : nullptr;
         const wide tc = cavity_tau(fw, p, g, t), sc = cavity_sigma(fw, p, g, t);
         const wide tt = paced_tau(fw, p, g), st = paced_sigma(fw, p, g);
         const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
         for (uint32_t d = 1; d < forward; ++d) {
             const uint64_t gk = g - d;
             const MomentGauss face = cavity_turn(fw, slot, paced_tau(fw, p, gk) - tc);
-            cavity_skin_back(fw, p, g - 1, sc, gk, skin_dev(fw, slot, sc - paced_sigma(fw, p, gk)), re_pair(fw, dr, di, mg_mul(face, mg_load(before, gk))), b);
+            cavity_skin_back(fw, p, g - 1, sc, gk, skin_dev(fw, slot, sc - paced_sigma(fw, p, gk)), re_pair(fw, dr, di, mg_mul(face, mg_load(before, gk))), bs, fade);
         }
         const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
         for (uint32_t d = 1; d < backward; ++d) {
             const uint64_t gk = g + d;
             const MomentGauss face = cavity_turn(fw, slot, paced_tau(fw, p, gk) - tt);
-            moment_skin_back(fw, pm, g, gk, skin_dev(fw, slot, st - paced_sigma(fw, p, gk)), re_pair(fw, dr, di, mg_mul(face, mg_load(after, gk))), b);
+            moment_skin_back(fw, pm, g, gk, skin_dev(fw, slot, st - paced_sigma(fw, p, gk)), re_pair(fw, dr, di, mg_mul(face, mg_load(after, gk))), bs, nullptr, fade);
         }
         const MomentGauss home = mg_conj(paced_absolute(fw, w, own, g));
         const MomentGauss home_c = mg_conj(cavity_turn(fw, slot, tc));
@@ -430,13 +438,16 @@ extern "C" __global__ void field_cavity_pace_back_all(const MomentWords *ws, con
             if (moment_octave(t, sites, level, true, &lo, &hi)) {
                 const MomentGauss f = mg_mul(home, mg_sub(mg_load_wide(down, hi + 1), mg_load_wide(down, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
-                moment_skin_back(fw, pm, g, g + pow, skin_dev(fw, slot, st - paced_sigma(fw, p, g + pow)), re_pair(fw, dr, di, face), b);
+                moment_skin_back(fw, pm, g, g + pow, skin_dev(fw, slot, st - paced_sigma(fw, p, g + pow)), re_pair(fw, dr, di, face), bs, nullptr, fade);
             }
             if (moment_octave(t, sites, level, false, &lo, &hi)) {
                 const MomentGauss f = mg_mul(home_c, mg_sub(mg_load_wide(up, hi + 1), mg_load_wide(up, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
-                cavity_skin_back(fw, p, g - 1, sc, g - pow, skin_dev(fw, slot, sc - paced_sigma(fw, p, g - pow)), re_pair(fw, dr, di, face), b);
+                cavity_skin_back(fw, p, g - 1, sc, g - pow, skin_dev(fw, slot, sc - paced_sigma(fw, p, g - pow)), re_pair(fw, dr, di, face), bs, fade);
             }
+        }
+        if (own_fade != 0) {
+            add_wide(fw.gfade + slot, own_fade);
         }
     }
 }

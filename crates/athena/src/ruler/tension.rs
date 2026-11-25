@@ -1227,9 +1227,15 @@ pub fn read_reach(args: &[String]) -> Result<()> {
             field.ruler_skin_places = true;
         }
         if let Some(fm) = name.strip_prefix("fade:") {
-            let (from, milli) = fm.split_once(':').ok_or("a fade setting that is not fade:FROM:MILLI")?;
+            let words: Vec<&str> = fm.split(':').collect();
+            let (from, milli, to) = match words[..] {
+                [f, m] => (f, m, None),
+                [f, m, t] => (f, m, Some(t)),
+                _ => return Err("a fade setting that is not fade:FROM:MILLI or fade:FROM:MILLI:TO".into()),
+            };
             let ell = holonics_engine::field::div_nearest(i128::from(milli.parse::<i64>()?) << holonics_engine::field::MATERIAL_BITS, 1000);
-            field.set_ruler_fade(from.parse()?, i32::try_from(ell).map_err(|_| "a fade past its chart")?).map_err(|e| e.to_string())?;
+            let to = to.map_or(Ok(usize::MAX), str::parse)?;
+            field.set_ruler_fade_between(from.parse()?, to, i32::try_from(ell).map_err(|_| "a fade past its chart")?).map_err(|e| e.to_string())?;
         }
         // [the lead, November 22, G-R4] `lane:j:h`: lane `j` of every site's state rounded after each tick to the power of two `h` places under
         // that site's own lane's root mean square; `lanept:j:k`: the same lane with `k` places dropped from the state's `2^(−16)`. The other

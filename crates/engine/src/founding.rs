@@ -24,7 +24,10 @@ impl Constitution {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_skin_k: None, ruler_skin_places: false, ruler_state_grain: None, ruler_lane_grain: None, ruler_far: 0, ruler_level: 0, mark: None }
+        let mut out = Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_skin_k: None, ruler_skin_places: false, fade_skin_k: None, ruler_state_grain: None, ruler_lane_grain: None, ruler_far: 0, ruler_level: 0, mark: None };
+        // [the lead, November 24] A field whose rings hold their fades forms their skins from its material ([`Declaration::fade`]).
+        out.refresh_fade().expect("a fade past its chart");
+        out
     }
 
     /// [definition; agent-inferred, November 6] **A field's last `depth` turned ring sets become depth rings**
@@ -862,6 +865,47 @@ impl Constitution {
         Ok((out, from))
     }
 
+    /// [definition; the lead, November 24, the record of the evening §3] **The field whose turned rings hold their fades**
+    /// ([`Declaration::fade`]): `ℓ_s`, one a turned slot, appended at the end of the fine field's material, at `ell` (on `2^(−24)`, the
+    /// temperatures' chart) on every ring of period `from` or more and at zero on the others, every standing entry kept; no key is read and the
+    /// draws do not move. At `ell = 0` (or a `from` past every period) every score is the built one bit for bit. Founded displaced on part of
+    /// a tower it is the 2×2's fade cell: at the constant skin a ring keeps `e^(−2π)` of itself over a turn and the fade's own covector at a
+    /// pair a turn apart is a thirtieth of a pair a radian apart, so a fade that can hear a count starts where a ring keeps part of itself.
+    /// A tower keeps its level as it stands. Also the map over the whole material from each new entry to the old one it copies (`None` for
+    /// the fades). Refused on a field that holds them.
+    pub fn with_fade(&self, from: usize, ell: i32) -> Result<(Self, Vec<Option<usize>>)> {
+        self.with_fade_between(from, usize::MAX, ell)
+    }
+
+    /// [`Constitution::with_fade`] founded at `ell` on the rings of period `from` to `to` alone (part of a tower), zero on the others.
+    pub fn with_fade_between(&self, from: usize, to: usize, ell: i32) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.fade {
+            return refuse("a field whose rings already hold their fades");
+        }
+        let d = Declaration { fade: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.fade {
+            return refuse("a field whose material does not end where the rings' fades begin");
+        }
+        temperature_of(ell, &self.fine)?;
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        for (slot, &(n, _)) in self.rings.iter().enumerate() {
+            if n >= from && n <= to {
+                theta[layout.fade + slot] = ell;
+            }
+        }
+        let mut from_map: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from_map.resize(layout.len, None);
+        from_map.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from_map))
+    }
+
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The field whose friction is read from its receivers' state**
     /// ([`Declaration::friction_gate`]): `a_h`, a row of `D` a head, appended at the end of the fine field's material, founded at zero, every
     /// standing entry kept, so every friction is its head's and kind's and every face the source's bit for bit. Also the map over the whole
@@ -1558,6 +1602,42 @@ impl Learner {
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
         let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
         Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 24] **The learner whose turned rings hold their fades** ([`Constitution::with_fade`]), founded at `ell`
+    /// on the rings of period `from` or more, as [`Learner::with_friction`] founds the friction: every standing entry keeps its moments, its
+    /// remainder, its carried grains, its rate and its lattice's rest; the fades' moments open at zero; their part takes octave 0, and where
+    /// the learner carries each entry's own rate the fades take `rate_bits`. On a lattice every family keeps its spread and the fades' family
+    /// (the last of the fine level) is read whole until a save reads its spread, so the founded learner differs from its source by the fades
+    /// alone, which is what lets it run as an arm beside the source's own control. Refused while a step is held.
+    pub fn with_fade(&self, from: usize, ell: i32) -> Result<Self> {
+        self.with_fade_between(from, usize::MAX, ell)
+    }
+
+    /// [`Learner::with_fade`] on the rings of period `from` to `to` alone ([`Constitution::with_fade_between`]).
+    pub fn with_fade_between(&self, from: usize, to: usize, ell: i32) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its fades after its held step is read");
+        }
+        let (field, from_map) = self.field.with_fade_between(from, to, ell)?;
+        let mapped = |v: &[i32]| -> Vec<i32> { from_map.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let first = from_map.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from_map.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from_map.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from_map.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let lattice = match &self.lattice {
+            Some(l) => {
+                let mut spread = l.spread.clone();
+                spread.insert(self.field.families().len(), 0);
+                if spread.len() != field.families_all().len() {
+                    return refuse("a lattice whose families do not meet the faded field's");
+                }
+                Some(Lattice { spread, rest: mapped(&l.rest) })
+            }
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The learner whose friction is read from its receivers' state**

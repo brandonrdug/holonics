@@ -1,0 +1,3 @@
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 33 filtered out; finished in 0.35s
+FADE_COVECTOR_PROBES read=24 on_a_seam=0
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 195 filtered out; finished in 0.28s

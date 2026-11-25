@@ -1,0 +1,39 @@
+REACH setting=law group=all places=297568 nats_millionths=3286885 ms=350065
+REACH setting=law group=held places=67936 nats_millionths=1336984 ms=350067
+REACH setting=law group=period places=229632 nats_millionths=3863758 ms=350067
+REACH setting=fade:16:-1000:32 group=all places=297568 nats_millionths=3371019 ms=738809
+REACH setting=fade:16:-1000:32 group=held places=67936 nats_millionths=1388484 ms=738812
+REACH setting=fade:16:-1000:32 group=period places=229632 nats_millionths=3957547 ms=738812
+REACH setting=fade:16:-2000:32 group=all places=297568 nats_millionths=3553542 ms=1152318
+REACH setting=fade:16:-2000:32 group=held places=67936 nats_millionths=1599030 ms=1152320
+REACH setting=fade:16:-2000:32 group=period places=229632 nats_millionths=4131779 ms=1152320
+REACH setting=fade:16:-3170:32 group=all places=297568 nats_millionths=4075137 ms=1569702
+REACH setting=fade:16:-3170:32 group=held places=67936 nats_millionths=2318949 ms=1569704
+REACH setting=fade:16:-3170:32 group=period places=229632 nats_millionths=4594700 ms=1569704
+REACH_DONE rows=992 settings=4 ms=1569829
+FADE_LAW run=found_W110 P1=5 kept=1.783 twin=2.031 1.935 1.909 letters=3.931 3.964 ln_P1=1.609
+FADE_LAW run=found_W110 P1=7 kept=2.192 twin=2.448 2.292 2.341 letters=3.953 3.943 ln_P1=1.946
+FADE_LAW run=found_W110 P1=9 kept=2.657 twin=2.715 2.630 2.651 letters=3.915 3.918 ln_P1=2.197
+FADE_LAW run=found_W110 P1=15 kept=3.526 twin=3.410 3.447 3.581 letters=3.894 3.890 ln_P1=2.708
+FADE_LAW run=found_W110 P1=21 kept=4.171 twin=4.126 4.279 4.037 letters=3.879 3.893 ln_P1=3.045
+FADE_LAW run=found_W110 P1=27 kept=4.322 twin=4.311 4.280 4.470 letters=3.896 3.900 ln_P1=3.296
+FADE_PAIRED run=found_W110 setting=fade:16:-1000:32 P1=5 kept=+0.093 twin=+0.102 change=+0.009 se=0.021 twin_around=+0.127 +0.057 letters=+0.057 +0.053 opens=+0.069(0.027)
+FADE_PAIRED run=found_W110 setting=fade:16:-1000:32 P1=7 kept=-0.139 twin=-0.100 change=+0.039 se=0.029 twin_around=+0.009 -0.184 letters=+0.132 +0.132 opens=+0.193(0.032)
+FADE_PAIRED run=found_W110 setting=fade:16:-1000:32 P1=9 kept=-0.379 twin=-0.365 change=+0.014 se=0.041 twin_around=-0.313 -0.325 letters=+0.166 +0.158 opens=+0.002(0.046)
+FADE_PAIRED run=found_W110 setting=fade:16:-1000:32 P1=15 kept=-0.473 twin=-0.464 change=+0.009 se=0.063 twin_around=-0.373 -0.518 letters=+0.138 +0.130 opens=+0.137(0.057)
+FADE_PAIRED run=found_W110 setting=fade:16:-1000:32 P1=21 kept=-0.776 twin=-0.731 change=+0.045 se=0.082 twin_around=-0.795 -0.768 letters=+0.139 +0.151 opens=+0.038(0.103)
+FADE_PAIRED run=found_W110 setting=fade:16:-1000:32 P1=27 kept=-0.822 twin=-0.900 change=-0.079 se=0.084 twin_around=-0.761 -0.887 letters=+0.131 +0.138 opens=+0.072(0.117)
+FADE_PAIRED run=found_W110 setting=fade:16:-2000:32 P1=5 kept=+0.248 twin=+0.281 change=+0.032 se=0.047 twin_around=+0.295 +0.221 letters=+0.244 +0.221 opens=+0.074(0.058)
+FADE_PAIRED run=found_W110 setting=fade:16:-2000:32 P1=7 kept=+0.028 twin=+0.079 change=+0.051 se=0.062 twin_around=+0.247 -0.115 letters=+0.468 +0.410 opens=+0.356(0.066)
+FADE_PAIRED run=found_W110 setting=fade:16:-2000:32 P1=9 kept=-0.468 twin=-0.459 change=+0.008 se=0.074 twin_around=-0.360 -0.329 letters=+0.380 +0.352 opens=-0.049(0.084)
+FADE_PAIRED run=found_W110 setting=fade:16:-2000:32 P1=15 kept=-0.551 twin=-0.453 change=+0.097 se=0.094 twin_around=-0.378 -0.632 letters=+0.240 +0.228 opens=+0.231(0.106)
+FADE_PAIRED run=found_W110 setting=fade:16:-2000:32 P1=21 kept=-0.922 twin=-0.963 change=-0.042 se=0.136 twin_around=-0.955 -0.835 letters=+0.353 +0.376 opens=-0.062(0.161)
+FADE_PAIRED run=found_W110 setting=fade:16:-2000:32 P1=27 kept=-0.874 twin=-1.003 change=-0.129 se=0.156 twin_around=-0.948 -0.968 letters=+0.280 +0.298 opens=-0.030(0.208)
+FADE_PAIRED run=found_W110 setting=fade:16:-3170:32 P1=5 kept=+0.919 twin=+0.825 change=-0.094 se=0.105 twin_around=+0.933 +0.733 letters=+1.085 +1.002 opens=+0.199(0.124)
+FADE_PAIRED run=found_W110 setting=fade:16:-3170:32 P1=7 kept=+0.978 twin=+1.121 change=+0.143 se=0.159 twin_around=+1.143 +0.750 letters=+1.556 +1.449 opens=+0.395(0.158)
+FADE_PAIRED run=found_W110 setting=fade:16:-3170:32 P1=9 kept=-0.056 twin=+0.026 change=+0.083 se=0.143 twin_around=-0.202 -0.026 letters=+0.675 +0.634 opens=-0.197(0.104)
+FADE_PAIRED run=found_W110 setting=fade:16:-3170:32 P1=15 kept=-0.314 twin=-0.192 change=+0.122 se=0.144 twin_around=-0.141 -0.320 letters=+0.380 +0.382 opens=+0.187(0.188)
+FADE_PAIRED run=found_W110 setting=fade:16:-3170:32 P1=21 kept=-0.529 twin=-0.596 change=-0.066 se=0.162 twin_around=-0.510 -0.511 letters=+0.758 +0.769 opens=+0.156(0.265)
+FADE_PAIRED run=found_W110 setting=fade:16:-3170:32 P1=27 kept=-0.372 twin=-0.456 change=-0.084 se=0.307 twin_around=-0.462 -0.469 letters=+0.416 +0.434 opens=-0.072(0.230)
+FOUND_DONE 23:50:51
+RUN_EXIT 0 2026-11-24T23:50:51Z

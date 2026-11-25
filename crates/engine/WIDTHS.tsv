@@ -21,7 +21,7 @@
 # ceiling literal 0
 # ceiling dead 0
 # ceiling shifts engine 127
-# ceiling shifts engine-cuda 249
+# ceiling shifts engine-cuda 243
 # ceiling shifts athena 42
 # ceiling tolerances engine 2
 # ceiling tolerances engine-cuda 0

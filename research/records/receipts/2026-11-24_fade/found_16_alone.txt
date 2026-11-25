@@ -1,0 +1,15 @@
+REACH setting=law group=all places=125344 nats_millionths=2461723 ms=231058
+REACH setting=law group=held places=67936 nats_millionths=1336984 ms=231058
+REACH setting=fade:16:-1000:16 group=all places=125344 nats_millionths=2515890 ms=459341
+REACH setting=fade:16:-1000:16 group=held places=67936 nats_millionths=1363989 ms=459351
+REACH setting=fade:16:-2000:16 group=all places=125344 nats_millionths=2698021 ms=669913
+REACH setting=fade:16:-2000:16 group=held places=67936 nats_millionths=1485796 ms=669913
+REACH_DONE rows=416 settings=3 ms=669970
+FADE_HELD run=found16_W110 setting=fade:16:-1000:16 all=+0.0269(68160) space=+0.0328(10427) feed=+0.0313(1043) letter=+0.0231(46625) digit=+0.0361(2271) other=+0.0388(7794)
+FADE_HELD_RUN run=found16_W110 setting=fade:16:-1000:16 space:0-2=+0.0179(3874) space:3-5=+0.0352(3352) space:6-8=+0.0539(1836) space:9+=+0.0409(1365) letter:0-2=+0.0091(21638) letter:3-5=+0.0249(12276) letter:6-8=+0.0603(5604) letter:9+=+0.0331(7107)
+FADE_PAIRED run=found16_W110 setting=fade:16:-1000:16 P1=7 kept=-0.152 twin=-0.098 change=+0.053 se=0.023 twin_around=+0.010 -0.180 letters=+0.133 +0.124 opens=+0.188(0.028)
+FADE_HELD run=found16_W110 setting=fade:16:-2000:16 all=+0.1483(68160) space=+0.1334(10427) feed=+0.1640(1043) letter=+0.1512(46625) digit=+0.1296(2271) other=+0.1544(7794)
+FADE_HELD_RUN run=found16_W110 setting=fade:16:-2000:16 space:0-2=+0.0707(3874) space:3-5=+0.1404(3352) space:6-8=+0.2337(1836) space:9+=+0.1595(1365) letter:0-2=+0.0720(21638) letter:3-5=+0.1709(12276) letter:6-8=+0.3087(5604) letter:9+=+0.2341(7107)
+FADE_PAIRED run=found16_W110 setting=fade:16:-2000:16 P1=7 kept=-0.102 twin=+0.036 change=+0.138 se=0.045 twin_around=+0.217 -0.165 letters=+0.459 +0.412 opens=+0.378(0.063)
+FOUND16_DONE 23:52:28
+RUN_EXIT 0 2026-11-24T23:52:28Z

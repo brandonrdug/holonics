@@ -1,0 +1,26 @@
+Fixed 2026-11-24T23:52:47Z (date -u), the lead, before W113f and W113sf train and after the founding reads. Refs #404.
+The reading it answers: Brandon, 22:04Z: her navigation and her hearing are one problem and are built together; the 2x2 from W112's
+STATE.3000 (control W113, tension W113s, fade W113f, both W113sf) reads what each does. Her rings' fades as her own state (e5f5:
+hnn-field-v14s, a fade entry a turned ring on the material's grain, FADE_PART; its covector the skin's homogeneity,
+dL/dl = ln2 sum s dL/ds; card parity unequal=0; 24 covector probes on four fields). At one e-fold a radian a pair a turn apart
+weighs e^(-2 pi) of a pair a radian apart and the fade's covector cannot hear a count (the formal thread, the evening record §3), so
+the cell is founded displaced. Founding reads on W110's mean (fade/found.out, fade/gt7.out, fade/found16.out), seeds 26 and 27:
+  the ring of 16 alone at 2^-1 of its skin's fade opens P1 = 7 by +0.188 (0.028) at +0.027 nats a place on the 224 held stretches;
+  at 2^-2 by +0.378 (0.063) at +0.148; the rings of 16 to 32 at 2^-1 by +0.193 (0.032) at +0.051; the 32 alone and the 27 alone at
+  2^-2 open +0.011 (0.019) and +0.026 (0.027).
+The change: the ring of 16's fade founded at -1 octave (it keeps 4% of itself over a turn, against 0.2% at the skin's), every other
+ring at the skin's, every ring's fade then moved by the deposit. W113f from W112's STATE.3000, W113sf from J113s (W112's state with
+its tensions), 3,000 sections each on store-2026-11-24-wide-t6, beside W113 and W113s. Every other line of the state is kept
+(the lattice's spreads and rests, the carried grains, the rates).
+G-F1 (scored at the lap means, one place open on the collection's held set; the fades read at each saved state by fades.py):
+  (a) (0.5) at W113f's STATE.3000 the ring of 16's fade stands between -0.75 and -0.15 octave: the deposit draws it back toward the
+      skin's and keeps part of the displacement; every other ring's within 0.3 octave of zero.
+  (b) (0.4) the collection's held set over all its places at W113f's mean at most W113's plus 0.008 nats a place (the founding
+      cost of about 0.027 mostly repaid in one lap).
+  (c) (0.35) P1 = 7's opening on the rows of seeds 26 and 27 at W113f's mean (FADE_LAW: the twin's separator after L - 1 letters
+      less after L + 1) at least 0.08 nats over W113's.
+  (d) (0.5) the both cell W113sf beside W113s: within 0.005 nats a place of W113s plus (W113f - W113) on the held set (the two
+      changes add).
+Rule: (b) held, the line takes the fades as her state (W113f's end, or W113sf's where G-S1 also held); (b) missed, it does not.
+(c) missed with (a) held: a fade the deposit draws back toward the skin's does not keep a count for her text at this founding,
+and the count is owed to the read weight at zero the formal thread named (the second axis).

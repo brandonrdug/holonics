@@ -52,7 +52,7 @@ use rayon::prelude::*;
 /// [definition; Brandon, November 15 02:06Z] The face's loudness is one part, `loud` (index 26, [`LOUD_PART`]): `κ_ℓ` and `b`. Why a part of its
 /// own: a new block whose covector reaches it only through the readout's sharpness, founded at zero, and the part rates' law sets each block's
 /// rate from its own travel. A parts line carries it only where the face reads its sites' loudness.
-pub const PART_NAMES: [&str; 29] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction", "mark", "loud", "lane_leak", "friction"];
+pub const PART_NAMES: [&str; 30] = ["w_new", "a_new", "b_new", "enc_lane", "before_lane", "after_lane", "q_lane", "v_lane", "probe_lane", "out_lane", "moment_face_lane", "read_lane", "face_biases_lane", "a_lane", "b_lane", "carry", "w_carry", "a_carry", "b_carry", "enc_first", "before_first", "after_first", "triad", "opening", "junction", "mark", "loud", "lane_leak", "friction", "fade"];
 
 /// The triads' one part ([`PART_NAMES`] index 22), written after the first lane's letter rows only where the field has triads.
 pub const TRIAD_PART: usize = 22;
@@ -76,6 +76,10 @@ pub const LEAK_PART: usize = 27;
 /// [the lead, November 21] Each head's friction of distance, one part ([`PART_NAMES`] index 28), written after every other only where the field
 /// has it ([`Declaration::friction`]; the learner's parts line appends it to [`written_parts`]'s).
 pub const FRICTION_PART: usize = 28;
+
+/// [the lead, November 24] Each turned ring's fade, one part ([`PART_NAMES`] index 29), written last only where the rings hold their fades
+/// ([`Declaration::fade`]).
+pub const FADE_PART: usize = 29;
 
 /// The plain founded parts (the first sixteen of [`PART_NAMES`]): every field writes them.
 pub const PLAIN_PARTS: usize = 16;
@@ -320,6 +324,10 @@ impl Constitution {
         // The friction's gate is the friction's part too ([`Declaration::friction_gate`]).
         if d.friction_gate {
             parts[l.friction_gate..l.friction_gate + d.heads * d.width].fill(FRICTION_PART as u8);
+        }
+        // [the lead, November 24] Each turned ring's fade, one part ([`FADE_PART`]).
+        if d.fade {
+            parts[l.fade..l.fade + d.turned_slots()].fill(FADE_PART as u8);
         }
         parts
     }

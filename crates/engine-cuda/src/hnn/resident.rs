@@ -275,6 +275,12 @@ pub(crate) struct Words {
     pub(crate) rp: u64,
     pub(crate) pp: u64,
     pub(crate) peta: u64,
+    // [the lead, November 24] Each turned ring's skin denominator and rate of fade (`FieldWords::skin_k`, `skin_b`: the host's
+    // `Constitution::skin_denominator_of` and `skin_rate`), and the covector's fades where the rings hold them (`FieldWords::gfade`, zero
+    // where they do not).
+    pub(crate) skin_k: u64,
+    pub(crate) skin_b: u64,
+    pub(crate) gfade: u64,
 }
 
 pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
@@ -872,6 +878,11 @@ impl<'c> Resident<'c> {
         // The material, the skin, the rings and the exponential's roots go up in one transfer.
         let mut pack = Packed::default();
         let (theta_at, decay_at, phasor_at, ring_off_at, ring_n_at, roots_at) = (pack.put(&field.theta), pack.put(&decay), pack.put(&phasor), pack.put(&ring_off), pack.put(&ring_n), pack.put(&roots));
+        // [the lead, November 24] Each turned ring's skin denominator and rate of fade, one word where no slot is turned.
+        let slots = field.rings().len();
+        let skin_k: Vec<i128> = if slots == 0 { vec![1] } else { field.skin_denominators() };
+        let skin_b: Vec<i128> = if slots == 0 { vec![0] } else { (0..slots).map(|slot| field.skin_rate(slot)).collect() };
+        let (skin_k_at, skin_b_at) = (pack.put(&skin_k), pack.put(&skin_b));
         let decay_t_at = pack.put(&decay_t);
         // The temperatures' fine roots, past the resident face's sixteen (§16.12).
         let fine: Vec<u64> = field.fine_exponential().roots()[roots.len()..].iter().map(|&r| u64::try_from(r).map_err(|_| TowerError::Refused("the exponential's roots lie below 2^63"))).collect::<Result<_>>()?;
@@ -991,6 +1002,8 @@ impl<'c> Resident<'c> {
             phasor: run_base + phasor_at,
             ring_off: run_base + ring_off_at,
             ring_n: run_base + ring_n_at,
+            skin_k: run_base + skin_k_at,
+            skin_b: run_base + skin_b_at,
             decay: run_base + decay_at,
             decay_t: run_base + decay_t_at,
             dreach: d.reach as u64,
@@ -1285,6 +1298,8 @@ impl<'c> Resident<'c> {
         let heads = d.heads;
         let g = if returning { Some(self.timed(Kind::Alloc, || self.take_zeroed::<i128>(l.len)).map_err(device)?) } else { None };
         words.gcov = g.as_ref().map_or(0, |g| g.device_ptr());
+        // [the lead, November 24] Where the rings hold their fades, the kernels add each ring's fade covector into the covector's own entries.
+        words.gfade = if d.fade { g.as_ref().map_or(0, |g| g.device_ptr() + 16 * l.fade as u64) } else { 0 };
         // The batches: whole regions in order, each batch's every allocation within the budget.
         // A landmark read stores one tick's weights beside a read's carriers; a logits read keeps every tick
         // and its shares (the echo's round trips, §15.3).

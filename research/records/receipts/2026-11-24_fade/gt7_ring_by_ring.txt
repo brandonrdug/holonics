@@ -1,0 +1,11 @@
+REACH setting=law group=all places=57408 nats_millionths=3792727 ms=119694
+REACH setting=fade:16:-2000:16 group=all places=57408 nats_millionths=4132553 ms=231137
+REACH setting=fade:32:-2000:32 group=all places=57408 nats_millionths=3798535 ms=339647
+REACH setting=fade:27:-2000:27 group=all places=57408 nats_millionths=3823249 ms=445475
+REACH_DONE rows=192 settings=4 ms=445518
+FADE_LAW run=gt7_W110 P1=7 kept=2.200 twin=2.450 2.289 2.346 letters=3.947 3.939 ln_P1=1.946
+FADE_PAIRED run=gt7_W110 setting=fade:16:-2000:16 P1=7 kept=-0.102 twin=+0.036 change=+0.138 se=0.045 twin_around=+0.217 -0.165 letters=+0.459 +0.412 opens=+0.378(0.063)
+FADE_PAIRED run=gt7_W110 setting=fade:32:-2000:32 P1=7 kept=+0.052 twin=+0.030 change=-0.022 se=0.015 twin_around=+0.045 +0.033 letters=+0.000 +0.000 opens=+0.011(0.019)
+FADE_PAIRED run=gt7_W110 setting=fade:27:-2000:27 P1=7 kept=-0.106 twin=-0.098 change=+0.008 se=0.024 twin_around=-0.130 -0.157 letters=+0.059 +0.052 opens=+0.026(0.027)
+GT7_DONE 23:40:58
+RUN_EXIT 0 2026-11-24T23:40:58Z
