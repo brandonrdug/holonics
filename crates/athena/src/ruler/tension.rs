@@ -966,7 +966,7 @@ pub fn read_section_covectors(args: &[String]) -> Result<()> {
 /// SECTIONS STATE STATE_SHA`: **each ring's fade covector summed slice by slice**. The pass's own cut draws `SECTIONS` sections from the state's
 /// place as training draws them; each section's regions are read and returned on the host a slice at a time (`read_and_return` on that slice's
 /// regions alone, nothing deposited), and each turned ring's fade covector (`2^40 ∂L/∂ℓ_s`, the skin's homogeneity) and second fade's, where the
-/// rings hold them, are summed by slice with the slice's sites. A negative sum asks the ring to fade more slowly there, a positive one faster.
+/// rings hold them, are summed by slice with the slice's sites. A positive sum asks the ring to fade more slowly there (the deposit descends it, `γ = 2^ℓ`), a negative one faster.
 /// One `SLICE_FADES` line a slice and kind (`fade`, `twin`): its sites and `period:sum` for every turned ring; one `RINGS` line first with the
 /// rings' periods by slot. A ruler's read of a saved state; nothing is written back.
 pub fn read_slice_fades(args: &[String]) -> Result<()> {

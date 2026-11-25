@@ -1,0 +1,11 @@
+Fixed 2026-11-25T20:43:12Z (date -u), the lead, before W119j trains. Refs #404.
+The guesses are Fable's, in their words: G-R1 to G-R5 (receipts/2026-11-25_what_crosses_a_cut/GUESS.txt, fixed 19:33:51Z before any such
+arm was built) and G-W2 (receipts/2026-11-25_hairs_cones_flock/GUESS.txt): the arm reads a slice's consecutive stretches as one region, the
+stores and the return whole and an open place hearing across its stretch's first place as a definite receiver hears far (the ruler's mask
+191 at every stretch's first place), from the line's end beside a control from the same state, 3,000 sections each, read at the lap means
+with the cut ruler on the same hundred far rows.
+The build, as it stands: Region::stretches on host and card (card parity unequal = 0), StorePass::joined (set-joined), the trainer joining
+a section's stretches of one slice in the order drawn while none ends its piece, within the field's reach (3,771 places).
+Rule (the lead's, naming the construction's purpose beside its ceiling of harm): the line takes the joined stretches where G-R4 held
+(the held code with one place open within 0.003 of the control) and G-R2 or G-R3 held (the cut's cost falls on the arm's mean, or the
+stores' horizon grows).

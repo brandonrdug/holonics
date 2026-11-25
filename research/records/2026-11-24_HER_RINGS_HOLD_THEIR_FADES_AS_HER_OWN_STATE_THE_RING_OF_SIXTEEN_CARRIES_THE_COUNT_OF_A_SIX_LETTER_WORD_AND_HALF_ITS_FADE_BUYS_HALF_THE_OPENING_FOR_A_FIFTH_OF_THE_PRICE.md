@@ -319,3 +319,19 @@ near field, the receivers probing its class and every open site of the region (`
 sharply only from its own stretch on, and by its probe's classes before it; an open receiver gains the octave crowds before its stretch;
 and the return kernels mirror each. Fable's G-R1 to G-R5 (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`) score its arm. The fade
 family's arm waits for it: its purpose can only be read once a covector reaches a store's far content.
+
+## 16. She takes the wave: the line holds a sampled voice beside its text
+
+G-M1 (Fable's guesses; the lead's rule; `receipts/2026-11-24_fade/GUESS_M1.txt`). The arm W118m joined the wave slice (recorded speech
+from 237 voices, at its boundary chart's thirteen levels on the octets no UTF-8 text holds) to the line's store, and its state grew by
+the thirteen fresh letters (alphabet 257). It ran beside W118, W117's end continued at a new pass, for 3,000 sections: about six minutes
+of wave in the lap.
+- (c) held: the held text stood +0.0021 (±0.0005) over the control's.
+- (b) missed: the wave's held cut from 14 unseen voices codes at 1.278 nats a sample against the guessed 1.13. The count tables give
+  1.435 for one sample back and 1.266 for two.
+- (a) held: at the arm's last state, the fade covector over the wave's regions asks the rings of 128, 243 and 256 to fade more slowly,
+  where the text asks all four to fade faster. At the recorder's 16 kHz those rings turn at 125, 66 and 62.5 Hz, a speaking voice's
+  pitch, so the trimming of the long rings was the text's doing and no property of the fade's law.
+- By the rule, (c) held and the wave stands under the one-back table, so the line takes the wave. W118m's end is the line's, on the wave
+  store and its codec. The read by slice ran 223 s a section on the host against a projected 25. It was stopped at its first section
+  and read over 8, which hold about 80 of the wave's regions.
