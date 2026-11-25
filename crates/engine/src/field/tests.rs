@@ -4363,8 +4363,14 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
         }
     }
     assert!(forward_kept > 0, "a field with no paced head read the whole forward");
+    // A tower's fine field takes letters and its level stands as it was, the level's and the glue's entries after the fine field's.
     let tower = towered(1);
-    assert!(tower.lettered(1).is_err(), "a tower's levels take letters level by level");
+    let (grown, from) = tower.lettered(1).unwrap();
+    let s = tower.scale.as_ref().unwrap();
+    assert_eq!(grown.scale.as_ref(), Some(s), "the level keeps its field and glue");
+    assert_eq!(from.len(), grown.material_len(), "the map runs over the whole material");
+    let (of, nf) = (tower.theta.len(), grown.theta.len());
+    assert!((0..s.coarse.theta.len() + s.glue.len()).all(|k| from[nf + k] == Some(of + k)), "the level's entries after the fine field's");
     // The learner.
     let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.section(&[region()]).unwrap();

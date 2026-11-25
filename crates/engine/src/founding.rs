@@ -1011,10 +1011,13 @@ impl Constitution {
     ///
     /// No key is read. Refused for a tower's levels. `fresh = 0` returns the field as it stands. Returns the grown field and, for each
     /// entry, the old entry it carries (`None` for a fresh class's own).
+    /// [the lead, November 25, the wave slice's growth] On a tower the level keeps its field and glue: the level's field has an alphabet of
+    /// its own (its epochs' classes), and the glue's blocks are sized by the two fields' widths and the harmonics, so no family of the level
+    /// indexes a fine class; the map then runs over the whole material, the level's and the glue's entries after the fine field's. Until
+    /// that day a tower was refused ("a tower's levels take letters level by level"), which read the level's alphabet as the fine field's.
+    /// What the level reads of the fine alphabet is the flat face's code `σ`, the news of one place nothing predicts, which grows with it
+    /// (`ln A`): the level's cut and clock read the grown alphabet's news from the first section, the growth's price on a tower.
     pub fn lettered(&self, fresh: usize) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.scale.is_some() {
-            return refuse("a tower's levels take letters level by level, not through the fine field alone");
-        }
         let old = self.declaration;
         let d = old.lettered(fresh)?;
         let layout = Loci::new(&d);
@@ -1083,6 +1086,13 @@ impl Constitution {
         }
         let mut out = Self::with_theta(d, new);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        // The level's field and glue, each entry after the fine field's as it stood.
+        if let Some(s) = self.scale.as_ref() {
+            let (old_fine, new_fine) = (self.theta.len(), out.theta.len());
+            from.extend((0..s.coarse.theta.len() + s.glue.len()).map(|k| Some(old_fine + k)));
+            debug_assert_eq!(new_fine + s.coarse.theta.len() + s.glue.len(), from.len());
+            out.scale = Some(s.clone());
+        }
         Ok((out, from))
     }
 

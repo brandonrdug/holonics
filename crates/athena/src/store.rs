@@ -1651,8 +1651,11 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
         return Err("a written pass whose state has a different count of lines".into());
     }
     let differing: Vec<usize> = (0..old_lines.len()).filter(|&i| old_lines[i] != new_lines[i]).collect();
-    if differing.len() != 1 || !old_lines[differing[0]].starts_with("pass ") {
-        return Err(format!("a written pass that changes lines other than the pass line ({:?})", differing).into());
+    // [the lead, November 25] The pass's own lines after it (its slices' tensions, clocks, walk and trail, one a slice) move with it: a pass
+    // set afresh sets each slice's afresh. Until that day only the pass line could differ, which refused a join of any state with a walk.
+    let own = |l: &str| ["pass ", "tension ", "clock ", "walk ", "trail "].iter().any(|p| l.starts_with(p));
+    if differing.is_empty() || !old_lines[differing[0]].starts_with("pass ") || differing.iter().any(|&i| !own(old_lines[i]) || !own(new_lines[i])) {
+        return Err(format!("a written pass that changes lines other than the pass's own ({:?})", differing).into());
     }
     let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
     if back.pass.as_ref().map(|p| p.stretches) != Some(stretches) || back.field != learner.field || back.pass != next.pass {
