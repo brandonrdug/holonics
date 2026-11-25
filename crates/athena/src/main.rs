@@ -110,6 +110,9 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-strand-cut") {
         return athena::ruler::tension::read_strand_cut(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-slice-fades") {
+        return athena::ruler::tension::read_slice_fades(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("read-section-covectors") {
         return athena::ruler::tension::read_section_covectors(&rest[1..]);
     }

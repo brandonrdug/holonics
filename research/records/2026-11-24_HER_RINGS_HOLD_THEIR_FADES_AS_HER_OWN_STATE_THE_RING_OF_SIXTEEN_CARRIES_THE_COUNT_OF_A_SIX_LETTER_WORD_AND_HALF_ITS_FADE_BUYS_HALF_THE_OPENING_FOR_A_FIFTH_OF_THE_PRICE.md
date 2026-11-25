@@ -269,3 +269,32 @@ the moments' encodings and chart at zero, so its moments, and the second fades' 
 parity draws them, and its first reading (with them at zero) read zero covectors at the second fades on host and card alike. Gate 3 of the build
 (e5fh) against the line, its second fade off: parity on 3 sections unequal = 0, the reproduction of 3 and of 24 sections equal, the lap's
 read equal (`receipts/2026-11-24_fade/gate3_e5fh.txt`).
+
+## 13. The trail as a rate of looks starves the slices it does not favour; the second fade's arm
+
+G-T2 missed on all three counts (`receipts/2026-11-24_fade/GUESS_T2.txt`). W116t less W116 at the lap means, one place open over the
+collection's held 200,933 places: +0.0132 (±0.0007), books +0.046 and science +0.040, code −0.0008 and the tool turns −0.0065. The trail,
+charged by each slice's out-of-sample work, rose fastest on the slices that already gain, and at the quota's rate times the trail it handed
+the tool turns and code about twice the control's places and web, science, books and theory about a seventh. What a slice gains under a
+look is no measure of what it lacks, so a trail of gains is a fovea that never moves. The line keeps W116's end (0.7045 at its lap mean, 0.0053
+under W115w's), and the walk at the quota's rate stands. The trail stays a state the cut reads (`set-trail`), held to this reading.
+
+The second fade's arm runs from W116's end: W117q founded by `found-twin −3180` (16 turned slots, a chart of 14,336 entries at zero),
+3,000 sections on e5fh beside W117, the same state continued on e5fh, which reproduces the line. Its guess G-T8 was fixed at 16:34:18Z
+before W117q trains (`receipts/2026-11-24_fade/GUESS_T8.txt`).
+
+## 14. The second fade at its first lap: her deposit draws it toward the skin's, and the line does not take it
+
+G-T8 missed (a), (b) and (d) and held (c) (`receipts/2026-11-24_fade/GUESS_T8.txt`). W117q less W117 at the lap means, one place open:
++0.0004 (±0.0002), no region over +0.0014; the opening at P1 = 7 0.057 against 0.066, and seed 25's kept separators at P1 = 3 over a row's
+last fifty places 0.676 against 0.683 (G-T5 (a), which asked 0.15, missed; (b) held, every period's twins within 0.035,
+`gt5_W117_W117q.txt`). Her writes moved as little (the theory panel's lexicon share 85% against 91%, a single draw; the wide panel 71% and
+71%, loops 23 and 31 of 160). The deposit took the chart up (its root mean square 0.0059 on the turned heads' half of its entries) and drew
+every second fade from −3.18 octaves toward the skin's, to −3.26 to −2.73, as it drew the first fades toward it (§11): at one lap on this
+terrain no covector asks for a store a boundary does not erase. The line keeps W117's end (0.6973 at its lap mean).
+
+The arm ran 2,589 s against its control's 2,226 s (1.16 times; its first forty sections at 1.6 times), against the tenth projected.
+
+Three of the fade family's clauses of purpose have now missed (G-F1's opening, G-R1's (a), G-T8's (d)) while each part stood under its
+ceiling of harm. The next arm on this family founds the line's fades and fade rates back at the skin's value (ℓ = 0, every rate row at
+zero) beside a control, as one change, after the wave slice's arm (G-M1, W118m beside W118, running from W117's end).

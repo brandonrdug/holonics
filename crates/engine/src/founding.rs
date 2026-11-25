@@ -1011,10 +1011,13 @@ impl Constitution {
     ///
     /// No key is read. Refused for a tower's levels. `fresh = 0` returns the field as it stands. Returns the grown field and, for each
     /// entry, the old entry it carries (`None` for a fresh class's own).
+    /// [the lead, November 25, the wave slice's growth] On a tower the level keeps its field and glue: the level's field has an alphabet of
+    /// its own (its epochs' classes), and the glue's blocks are sized by the two fields' widths and the harmonics, so no family of the level
+    /// indexes a fine class; the map then runs over the whole material, the level's and the glue's entries after the fine field's. Until
+    /// that day a tower was refused ("a tower's levels take letters level by level"), which read the level's alphabet as the fine field's.
+    /// What the level reads of the fine alphabet is the flat face's code `σ`, the news of one place nothing predicts, which grows with it
+    /// (`ln A`): the level's cut and clock read the grown alphabet's news from the first section, the growth's price on a tower.
     pub fn lettered(&self, fresh: usize) -> Result<(Self, Vec<Option<usize>>)> {
-        if self.scale.is_some() {
-            return refuse("a tower's levels take letters level by level, not through the fine field alone");
-        }
         let old = self.declaration;
         let d = old.lettered(fresh)?;
         let layout = Loci::new(&d);
@@ -1042,13 +1045,31 @@ impl Constitution {
                 place(ol.pace + p * (a + 1) + r, layout.pace + p * (a2 + 1) + row(r));
             }
         }
+        // [the lead, November 25, the wave slice's growth] The classes' fade rates (`Declaration::fade_rate`), a row a class and the open row a
+        // paced head as the paces are: a fresh class's at zero, its skin clock the turn's variation, as the rows were founded.
+        if old.fade_rate {
+            for p in 0..paced {
+                for r in 0..=a {
+                    place(ol.fade_rate + p * (a + 1) + r, layout.fade_rate + p * (a2 + 1) + row(r));
+                }
+            }
+        }
+        // A closed face's keys (`Declaration::closed`), `2C` a class with no open row: a fresh class's at zero.
+        let ck = 2 * old.closed;
+        for c in 0..a {
+            for j in 0..ck {
+                place(ol.closed_key + c * ck + j, layout.closed_key + c * ck + j);
+            }
+        }
         // The class biases: each standing class at its index; the fresh at the least the standing hold.
         for c in 0..a {
             place(ol.read_bias + c, layout.read_bias + c);
         }
-        // The families no class indexes, in their three stretches of the layout: the charts from `q` to the lift, the temperatures and the
-        // probe chart, and the moment's chart into the face with every family after it.
-        for (o_from, o_to, n_from) in [(ol.q, ol.read_bias, layout.q), (ol.temper, ol.pace, layout.temper), (ol.moment_face, ol.len, layout.moment_face)] {
+        // The families no class indexes, in their five stretches of the layout: the charts from `q` to the lift, the temperatures and the
+        // probe chart, the moment's chart into the face with every family after it up to a closed face's keys, the closed face's odds up to
+        // the classes' fade rates, and the second fades' chart and fades.
+        let stretches = [(ol.q, ol.read_bias, layout.q, layout.read_bias), (ol.temper, ol.pace, layout.temper, layout.pace), (ol.moment_face, ol.closed_key, layout.moment_face, layout.closed_key), (ol.closed_odds, ol.fade_rate, layout.closed_odds, layout.fade_rate), (ol.twin_face, ol.len, layout.twin_face, layout.len)];
+        for &(o_from, o_to, n_from, _) in &stretches {
             for k in 0..o_to - o_from {
                 place(o_from + k, n_from + k);
             }
@@ -1057,7 +1078,7 @@ impl Constitution {
         new[layout.read_bias + a..layout.read_bias + a2].fill(least);
         // [theory, November 12, P49] The two coverage checks are refusals: a growth is rare, and a release build must not pass a family it
         // missed (the stretches no class indexes keep their lengths, and every standing entry is carried once).
-        if (layout.read_bias - layout.q, layout.pace - layout.temper, layout.len - layout.moment_face) != (ol.read_bias - ol.q, ol.pace - ol.temper, ol.len - ol.moment_face) {
+        if stretches.iter().any(|&(o_from, o_to, n_from, n_to)| n_to - n_from != o_to - o_from) {
             return refuse("a growth by letters whose families no class indexes changed their lengths");
         }
         if from.iter().filter(|o| o.is_some()).count() != self.theta.len() {
@@ -1065,6 +1086,13 @@ impl Constitution {
         }
         let mut out = Self::with_theta(d, new);
         (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        // The level's field and glue, each entry after the fine field's as it stood.
+        if let Some(s) = self.scale.as_ref() {
+            let (old_fine, new_fine) = (self.theta.len(), out.theta.len());
+            from.extend((0..s.coarse.theta.len() + s.glue.len()).map(|k| Some(old_fine + k)));
+            debug_assert_eq!(new_fine + s.coarse.theta.len() + s.glue.len(), from.len());
+            out.scale = Some(s.clone());
+        }
         Ok((out, from))
     }
 
@@ -1830,10 +1858,11 @@ impl Learner {
     /// rates are kept, and where the learner carries each entry's own rate ([`Learner::own_rates`]) every standing entry keeps it and a
     /// fresh one takes `rate_bits`. The held step and the last section's step, of the old layout, are dropped; the pass is kept. Refused while
     /// a step is held.
+    /// [the lead, November 25, the wave slice's growth] On a lattice every family keeps its spread and each standing entry its rest, and the
+    /// carried grains and the remainders are each standing entry's (a fresh entry's at zero, on every lattice), so the grown learner differs
+    /// from its source by the letters alone, which is what lets it run as an arm beside the source's own control. Until that day the lattice
+    /// was refused and the grains and remainders were set to zero, which a crossing (where none is held yet) did not see.
     pub fn lettered(&self, fresh: usize) -> Result<Self> {
-        if self.lattice.is_some() {
-            return refuse("a growth of a learner whose forward reads a lattice (the lattice is founded again after it)");
-        }
         if self.held.is_some() {
             return refuse("a learner takes letters after its held step is read");
         }
@@ -1853,7 +1882,15 @@ impl Learner {
             }
         }
         let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
-        Ok(Self { lattice: None, carried: self.carried.as_ref().map(|_| (vec![0; field.material_len()], vec![0; field.material_len()])), remainder: self.remainder.as_ref().map(|_| vec![0; field.material_len()]), field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+        let mapped = |v: &[i32]| -> Vec<i32> { from.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let lattice = match &self.lattice {
+            Some(l) if l.spread.len() == field.families_all().len() => Some(Lattice { spread: l.spread.clone(), rest: mapped(&l.rest) }),
+            Some(_) => return refuse("a lattice whose families do not meet the field's with its letters"),
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
     }
 
     /// [definition; theory, November 10 09:55] **The learner with `added` more pair contacts** ([`Constitution::contacted`]), the
