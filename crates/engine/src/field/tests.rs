@@ -7248,11 +7248,11 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
     assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
 }
 
-/// [definition; the lead, November 25] **The trail sets a look's octaves and the flock looks at every slice at its quota's rate**: with no
-/// trail every slice draws over the pass's octaves; with trails the strongest draws over all of them and a slice with none over the least
-/// octave alone; the next look goes to the slice with fewest looks for its quota; the trail line reads back as written.
+/// [definition; the lead, November 25] **The trail sets how often the flock looks at a slice**: with no trail every slice is looked at at
+/// its quota's rate; with trails each at its quota times its trail held between the strongest and that over twice the count of slices; the
+/// trail line reads back as written.
 #[test]
-fn the_trail_sets_a_looks_octaves_and_the_flock_looks_at_every_slice_at_its_quotas_rate() {
+fn the_trail_sets_how_often_the_flock_looks_at_a_slice() {
     let piece = crate::passage::Piece { document: 0, offset: 0, title: 0, text: 1 << 20, opens: false, closes: true };
     let slice = |name: &str, quota: u128| crate::passage::Slice { name: name.into(), quota, pieces: vec![piece], source: Box::new(UnreadBytes) };
     let pass = |trail: Option<(Vec<i64>, Vec<u64>)>| StorePass {
@@ -7278,9 +7278,9 @@ fn the_trail_sets_a_looks_octaves_and_the_flock_looks_at_every_slice_at_its_quot
         slice_trail: trail,
     };
     let cut = |trail: Option<(Vec<i64>, Vec<u64>)>| crate::passage::Cut { seed: 3, slices: vec![slice("a", 1000), slice("b", 2000), slice("c", 1000)], pass: pass(trail) };
-    assert_eq!((0..3).map(|s| cut(None).octaves_of(s)).collect::<Vec<_>>(), vec![7, 7, 7], "no trail: the pass's octaves");
-    assert_eq!((0..3).map(|s| cut(Some((vec![0, 0, 0], vec![0, 0, 0]))).octaves_of(s)).collect::<Vec<_>>(), vec![7, 7, 7], "no reading: the pass's octaves");
-    assert_eq!((0..3).map(|s| cut(Some((vec![3000, 1500, -200], vec![0, 0, 0]))).octaves_of(s)).collect::<Vec<_>>(), vec![7, 4, 1], "the fovea, between, a glimpse");
+    assert_eq!(cut(None).trail_weights(), vec![1, 1, 1], "no trail: one each");
+    assert_eq!(cut(Some((vec![0, 0, 0], vec![0, 0, 0]))).trail_weights(), vec![1, 1, 1], "no reading: one each");
+    assert_eq!(cut(Some((vec![3000, 1500, -200], vec![0, 0, 0]))).trail_weights(), vec![3000, 1500, 500], "the strongest, between, the floor of 3000/6");
     // The flock: b at twice a's quota takes two looks to a's one.
     assert_eq!(cut(Some((vec![0; 3], vec![4, 7, 4]))).next().unwrap().slice, 1);
     assert_eq!(cut(Some((vec![0; 3], vec![4, 8, 4]))).next().unwrap().slice, 0);
@@ -7292,6 +7292,15 @@ fn the_trail_sets_a_looks_octaves_and_the_flock_looks_at_every_slice_at_its_quot
         looked[s] += 1;
     }
     assert_eq!(looked, [100, 200, 100], "every slice at its quota's rate of looks");
+    // With trails, a at three times c's trail and b at the floor: looks in proportion to quota times weight (1000·3000 : 2000·500 : 1000·1000).
+    let mut c = cut(Some((vec![3000, -40, 1000], vec![0; 3])));
+    let mut looked = [0u64; 3];
+    for _ in 0..500 {
+        let s = c.next().unwrap().slice;
+        c.pass.slice_trail.as_mut().unwrap().1[s] += 1;
+        looked[s] += 1;
+    }
+    assert_eq!(looked, [300, 100, 100], "looks by quota times trail weight");
     let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.pass = Some(pass(Some((vec![3000, 1500, -200], vec![1, 2, 3]))));
     let text = learner.to_text();

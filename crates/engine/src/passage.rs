@@ -470,22 +470,21 @@ impl Cut {
         }
     }
 
-    /// [definition; the lead, November 25] The octaves slice `s`'s looks are drawn over: the pass's own where no trail is set or no slice
-    /// has a trail, else `1 + ⌊(octaves − 1) trail_s⁺ / max_r trail_r⁺⌋` ([`StorePass::slice_trail`]): the fovea where the trail is strongest,
-    /// a glimpse of the least octave where it is none.
-    pub fn octaves_of(&self, s: usize) -> u64 {
-        let octaves = self.pass.octaves;
-        match &self.pass.slice_trail {
-            Some((trail, _)) => {
-                let top = trail.iter().copied().max().unwrap_or(0);
-                if top <= 0 {
-                    octaves
-                } else {
-                    1 + ((octaves - 1) as i128 * i128::from(trail[s].max(0)) / i128::from(top)) as u64
-                }
-            }
-            None => octaves,
+    /// [definition; the lead, November 25] Each slice's trail weight ([`StorePass::slice_trail`]): its trail, held between the strongest
+    /// trail and that trail over twice the count of slices (the bounds of a max-min ant system, Stützle and Hoos: every trail stays in
+    /// reach of the flock, the periphery a slice of the strongest look); one each where no slice has a trail. Why bounds and not a glimpse:
+    /// on W115t a look shortened to the least octave where its slice's trail was weak cost each such slice 0.03 to 0.05 nats a place, so the
+    /// trail sets how often a slice is looked at, and every look keeps the pass's octaves.
+    pub fn trail_weights(&self) -> Vec<u128> {
+        let Some((trail, _)) = &self.pass.slice_trail else {
+            return vec![1; self.slices.len()];
+        };
+        let top = trail.iter().copied().max().unwrap_or(0);
+        if top <= 0 {
+            return vec![1; self.slices.len()];
         }
+        let floor = (top / (2 * self.slices.len() as i64)).max(1);
+        trail.iter().map(|&t| t.clamp(floor, top) as u128).collect()
     }
 
     pub fn next(&self) -> Option<Drawn> {
@@ -494,9 +493,11 @@ impl Cut {
         // [definition; the lead, November 25] Where the pass holds its slices by their tensions, the slice whose own clock stands furthest
         // behind ([`StorePass::slice_clock`], every clock at zero where none is written); otherwise the quotas' interleave as before.
         if let Some((_, looks)) = &self.pass.slice_trail {
-            // [definition; the lead, November 25] The flock: the slice with fewest looks for its quota ([`StorePass::slice_trail`]).
+            // [definition; the lead, November 25] The flock: the slice with fewest looks for its quota times its trail's weight
+            // ([`StorePass::slice_trail`], [`Cut::trail_weights`]).
+            let w = self.trail_weights();
             for &other in &live[1..] {
-                if u128::from(looks[other]) * self.slices[slice].quota < u128::from(looks[slice]) * self.slices[other].quota {
+                if u128::from(looks[other]) * self.slices[slice].quota * w[slice] < u128::from(looks[slice]) * self.slices[other].quota * w[other] {
                     slice = other;
                 }
             }
@@ -520,11 +521,10 @@ impl Cut {
         let d = self.pass.stretches + 1;
         let rest = piece.places() - at.cursor;
         let frontier = frontier_here(self.seed, d, self.pass.frontier);
-        let octaves = self.octaves_of(slice);
         let (q, a, ends, done) = if frontier {
-            frontier_cut_of(self.seed, d, rest, piece.closes, self.pass.least, octaves)
+            frontier_cut_of(self.seed, d, rest, piece.closes, self.pass.least, self.pass.octaves)
         } else {
-            cut_of(self.seed, d, rest, piece.closes, self.pass.least, octaves)
+            cut_of(self.seed, d, rest, piece.closes, self.pass.least, self.pass.octaves)
         };
         Some(Drawn { slice, d, q, a, ends, done, frontier })
     }

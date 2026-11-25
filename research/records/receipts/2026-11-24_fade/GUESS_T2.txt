@@ -1,0 +1,14 @@
+Fixed 2026-11-25T13:54:10Z (date -u), the lead, before W116t trains. Refs #404.
+The reading it answers: W115t (G-T1): the slices the trail favoured gained (wikidata -0.029, code -0.010) and every slice read in glimpses
+of 4 to 7 places lost 0.03 to 0.05 nats a place; a look shorter than the context she reads with teaches less than it costs.
+The line: G-W2's rule took the walk, so W115w's STATE.3000 is its end.
+The change: the trail sets how often the flock looks at a slice, every look at the pass's octaves (e5fg; Cut::trail_weights): the slice
+with fewest looks for its quota times its trail, the trail held between the strongest and that over twice the count of slices (the
+max-min ant system's bounds). W116t: the line's end so set (set-trail), 3,000 sections beside W116 (the same state continued), e5fg.
+At W115t's trails the weights would stand at code 14,018, wikidata 12,753, the tool turns 2,974, the harness 1,121, logic 985 and the
+floor 700 for the rest: code and wikidata looked at about four to twenty times as often for their quotas as the others.
+G-T2 (at the lap means, one place open on the collection's held set):
+  (a) (0.35) all places at most W116's (no worse over the whole);
+  (b) (0.55) wikidata and code each at least 0.008 under W116;
+  (c) (0.4) no region more than 0.015 over W116.
+Rule: (a) and (c) held, the line takes the trails; otherwise it does not.

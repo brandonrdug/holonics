@@ -563,9 +563,9 @@ pub struct StorePass {
     /// and its looks**: `(trail, looks)` a slice, the trail a store of the out-of-sample work a deposit did on the slice's stretches (millionths
     /// of a bit a place, `STORE_TRANSFER`), charged at each reading by `(x − trail)/R` with `R` the readings in a mean's window (its fade,
     /// the line's own clock), and the looks the stretches the slice has given since the trail was set. Where set, the cut takes the slice
-    /// with fewest looks for its quota (every slice is looked at at its quota's rate, the flock and the periphery) and draws each look's
-    /// lengths over the first `o_s` octaves of the pass's `octaves`, `o_s = 1 + ⌊(octaves − 1) trail_s⁺ / max_r trail_r⁺⌋` (the fovea's long
-    /// reads where the trail is strongest, a glimpse of the least octave where it is none; every octave where no slice has a trail).
+    /// with fewest looks for its quota times its trail's weight ([`crate::passage::Cut::trail_weights`]: the trail held between the strongest
+    /// and that over twice the count of slices), every look at the pass's octaves: the fovea looked at often, the periphery rarely and never
+    /// in a shorter look (W115t: looks shortened to the least octave cost their slices 0.03 to 0.05 nats a place).
     /// Written as a line `trail T₀ … T_(k−1) looks L₀ … L_(k−1)` after the walk line, only where set.
     pub slice_trail: Option<(Vec<i64>, Vec<u64>)>,
 }
