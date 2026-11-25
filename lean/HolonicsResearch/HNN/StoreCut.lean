@@ -4,7 +4,7 @@ import Mathlib.Tactic
 /-!
 # What a region is handed: a store's state at a cut is sufficient for what stands before it
 
-The record `research/records/2026-11-25_A_REGIONS_CUT_IS_A_CUT_OF_EVERY_STORE_TODAY_A_RULER_PARTS_FIVE_STORES_AT_A_CUT_ON_HER_OWN_STATE_AND_A_STRAND_CUT_ONLY_IN_ITS_SHARP_HEARING_KEEPS_WHAT_HER_STORES_CARRY.md`
+The record `research/records/2026-11-25_A_REGIONS_FIRST_PLACE_EMPTIES_EVERY_STORE_SO_NO_COMPARED_PLACE_ASKS_A_STORE_FOR_WHAT_STANDS_FAR_BEFORE_IT_A_CUT_COSTS_HER_FORTY_NATS_AND_CONSECUTIVE_STRETCHES_CUT_ONLY_IN_THEIR_SHARP_HEARING_ARE_WHERE_A_STORE_IS_ASKED.md`
 (atlas `store.state-at-cut-sufficient`) reads the engine's regions: a region begins with every store
 at rest, so a place just past a region's first reads as if nothing stood before it. This file states
 what a store run along a strand hands across a cut, on any store of that kind.
@@ -25,7 +25,11 @@ read through the store's state and a band of the `w` places before it, heard one
 3. **A face a band past the cut reads nothing before the cut but the state** (`face_past_band`): where a
    face reads the store's state and the `w` places before it, at a place `w` or more past the cut it is
    the same on both strands.
-4. **A banded strand costs its band a place** (`banded_pairs_le`, `whole_pairs`): a place that hears
+4. **A store emptied at a cut hands nothing on** (`emptied_at_cut`): where the run begins anew at the cut from a state that does not
+   depend on what stood before, two strands that agree from the cut on hold one state at every later place. What stands before the
+   cut is then in the kernel of every later face, so a quotient sufficient for those faces keeps none of it: the engine's regions
+   today, each beginning with every store at rest.
+5. **A banded strand costs its band a place** (`banded_pairs_le`, `whole_pairs`): a place that hears
    the `min t w` places before it one by one costs at most `N w` pairs over `N` places, where every
    place heard by every later one costs `N (N − 1) / 2`.
 
@@ -80,6 +84,15 @@ theorem state_at_cut_sufficient (step : σ → α → σ) (s s' : σ) (x y : ℕ
   | zero => exact hstate
   | succ k ih =>
     rw [← Nat.add_assoc, run_succ, run_succ, ih, hafter (c + k) (Nat.le_add_right c k)]
+
+/-- **A store emptied at a cut hands nothing on.** Where the run begins anew at the cut from a state `s₀` that does not depend on what
+stood before, two strands that agree from the cut on hold one state at every later place: what stands before the cut is in the
+kernel of every later face, and a quotient sufficient for those faces keeps none of it. -/
+theorem emptied_at_cut (step : σ → α → σ) (s₀ : σ) (x y : ℕ → α) (c : ℕ)
+    (hafter : ∀ i, c ≤ i → x i = y i) (k : ℕ) :
+    run step s₀ (fun i => x (c + i)) k = run step s₀ (fun i => y (c + i)) k := by
+  have h : (fun i => x (c + i)) = fun i => y (c + i) := funext fun i => hafter _ (Nat.le_add_right c i)
+  rw [h]
 
 /-- **A face a band past the cut reads nothing before the cut but the state.** `R` reads the store's
 state and the `w` places before the place (`hR`: nothing past the band). -/

@@ -37,3 +37,31 @@ place at the cut in it). No cut setting had been read. G-X0 to G-X5 stand as fix
 
 G-X7  the level's epochs before the cut alone (mask 16) close between 0.010 and 0.040 (point 0.020). Weight 0.5.
 G-X6  restated on the five stores (mask 31): together they close between 0.45 and 0.75 of G (point 0.6). Weight 0.5.
+
+Scored 2026-11-25T19:33:51Z (date -u), from table.txt (the hundred rows, the 192 places past the cut of each, nats a place over the law).
+G-X0  missed by its letter: 49 of 19,300 places differ by more than 0.001, the largest 0.023; the mean difference is 0.00004.
+      A paced frame turns on the passage's own clock, which a cut does not reset; no defect was found.
+G-X1  held: G = 0.211 (se 0.018).
+G-X2  missed: the moments alone cost 0.001.
+G-X3  missed: the circles' charge alone costs 0.044 (guessed to close under 0.010, point 0.005).
+G-X4  missed: the near field and mates alone cost 0.025.
+G-X5  missed: the crowds alone cost 0.005 as first built (given to both kinds of receiver) and 0.021 as a definite receiver's.
+G-X6  missed: the five stores close 0.03 of G (0.17 with each octave's crowd given to an open place as well).
+G-X7  missed low: the level alone closes 0.007.
+One of eight held. The clause fixed with G-X6 for this outcome stands: what a place takes from before a cut is sharp.
+
+Guesses on an arm, fixed 2026-11-25T19:33:51Z (date -u), before any such arm is built. The arm: from the line's end, 3,000 sections
+beside a control from the same saved state, one change: a slice's consecutive stretches are read as one region, in which the
+stores and the return run whole and an open place hears across its stretch's first place as a definite receiver hears far
+(its probe's classes one by one, each octave's crowd), the ruler's mask 191 at every stretch's first place. Read at the lap
+means with this ruler on the same hundred rows.
+G-R1  over its first 200 sections the arm's own frontier comparison reads 0.04 nats a place or more under the control's.
+      Weight 0.75. (Untrained, mask 191 brings back 0.53 of a cut's cost, and a pass's regions' first places cost 0.149.)
+G-R2  cut:256:191 over the law past the cut reads under 0.07 on the arm's mean (0.100 on W117) and within 0.015 of 0.100 on
+      the control's. Weight 0.6.
+G-R3  the stores' horizon grows: cut:256:64 over the law at 32 to 127 places past the cut reads 0.05 or more on the arm's mean
+      (0.026 on W117) and under 0.035 on the control's. Weight 0.45.
+G-R4  the held code with one place open moves by less than 0.003 against the control, and the law's frontier code at 256 to
+      511 places known by less than 0.01. Weight 0.6.
+G-R5  the wide panel's share of words in the lexicon or its count of loops leaves the spread of the last ten laps (69.6 to
+      73.8; 18 to 26). Weight 0.3.
