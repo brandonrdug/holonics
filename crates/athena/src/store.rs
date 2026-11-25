@@ -1302,6 +1302,35 @@ pub fn found_fade_rate(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [the lead, November 25 (the fade record §11)] `found-twin STATE STATE_SHA MILLI OUT`: the line's state with every turned ring's second fade
+/// founded at `MILLI` thousandths of an octave of its skin and their chart at zero (`Learner::with_twin`), every other line kept, so the founded
+/// state reads every face of its source bit for bit; the record founds it where a ring keeps half of itself over its turn (`log₂(ln 2 / 2π)`,
+/// −3180).
+pub fn found_twin(args: &[String]) -> Result<()> {
+    if args.len() != 5 {
+        return Err("found-twin STATE STATE_SHA MILLI OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let ell = i32::try_from(holonics_engine::field::div_nearest(i128::from(args[3].parse::<i64>()?) << holonics_engine::field::MATERIAL_BITS, 1000)).map_err(|_| "a second fade past its chart")?;
+    let out = Path::new(&args[4]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = end.with_twin(ell).map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    let d = &founded.field.declaration;
+    println!("FOUND_TWIN slots={} chart={} ell={ell} entries={} lattice={}", d.turned_slots(), d.width * 2 * d.complex(), founded.field.material_len(), founded.lattice.is_some());
+    Ok(())
+}
+
 pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());

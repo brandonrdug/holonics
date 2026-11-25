@@ -12,3 +12,16 @@ G-T1 (at the lap means, one place open on the collection's held set):
   (b) (0.5) wikidata and code each at least 0.005 under W115;
   (c) (0.5) the conversations and the harness each at most 0.010 over W115.
 Rule: (a) and (c) held, the line takes the trails; otherwise it does not.
+
+Scored 2026-11-25T13:32:00Z (date -u), the lead, from frontier_ruler.py on out4_W115 and out4_W115t (the collection's held set, one place open, lap
+means, 200,933 places). W115t less W115, paired: all +0.0184 (0.0009); acts +0.0066, books +0.0470, code -0.0103, dialogue +0.0053,
+harness +0.0299, logic +0.0444, science +0.0422, theory +0.0372, web +0.0111, wikidata -0.0292. Its trails at section 2,992: code 14,018,
+wikidata 12,753, the tool turns 2,974, the harness 1,121, logic 985, science 538, web 470, the conversations 264, theory -77, books
+-178; so code and wikidata read over all seven octaves, the tool turns over two, every other slice over one (looks of 4 to 7 places),
+and the lap's regions were six times the control's (2,477,684 against 405,146).
+  (a) missed: +0.0184.
+  (b) held: wikidata -0.0292, code -0.0103.
+  (c) missed: the harness +0.0299 (the conversations +0.0053 held).
+By the rule the line does not take the trails. The fovea's slices gained what the guess said and more; the periphery's glimpses of 4 to 7
+places cost each of them 0.03 to 0.05 nats a place: a look shorter than the context a slice is read with teaches her less than it costs,
+so the periphery is to be a rarer look at the slice's own extent, not a shorter one.

@@ -1,0 +1,7 @@
+TWIN_PARITY carried strands unequal=0 first=None chart_nonzero=1024 fades=[(897029080, 897029080), (-534438000, -534438000), (521900381, 521900381), (459757493, 459757493)]
+TWIN_PARITY carried regions unequal=0 first=None chart_nonzero=1024 fades=[(145181789, 145181789), (301674685, 301674685), (-77224385, -77224385), (956582653, 956582653)]
+TWIN_PARITY opened strands unequal=0 first=None chart_nonzero=1024 fades=[(897029080, 897029080), (-534438000, -534438000), (521900381, 521900381), (459757493, 459757493)]
+TWIN_PARITY opened regions unequal=0 first=None chart_nonzero=1024 fades=[(145181789, 145181789), (301674685, 301674685), (-77224385, -77224385), (956582653, 956582653)]
+TWIN_PARITY opened, marked, faded strands unequal=0 first=None chart_nonzero=1024 fades=[(898210145, 898210145), (-524489673, -524489673), (530031676, 530031676), (447129053, 447129053)]
+TWIN_PARITY opened, marked, faded regions unequal=0 first=None chart_nonzero=1024 fades=[(155130120, 155130120), (307670944, 307670944), (-72409208, -72409208), (956673502, 956673502)]
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 35 filtered out; finished in 11.53s

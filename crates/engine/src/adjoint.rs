@@ -19,11 +19,14 @@ pub(crate) struct ClockReturn {
     pub(crate) gtau: Vec<Vec<i128>>,
     pub(crate) gsig: Vec<Vec<i128>>,
     pub(crate) dm: Vec<i128>,
+    /// [the lead, November 25] The second fades' moments' covector, where the pass's opening read them ([`Declaration::twin`]); empty
+    /// elsewhere.
+    pub(crate) dm_twin: Vec<i128>,
 }
 
 impl ClockReturn {
     pub(crate) fn new(paced: usize, sites: usize, m2: usize) -> Self {
-        Self { gtau: vec![vec![0i128; sites]; paced], gsig: vec![vec![0i128; sites]; paced], dm: vec![0i128; sites * m2] }
+        Self { gtau: vec![vec![0i128; sites]; paced], gsig: vec![vec![0i128; sites]; paced], dm: vec![0i128; sites * m2], dm_twin: Vec::new() }
     }
 }
 
@@ -871,6 +874,22 @@ impl Constitution {
             }
         }
         self.moments_return_sided(&region, &paces, &whole.dm, g, &mut whole.gtau, &mut whole.gsig, false)?;
+        // [the lead, November 25] The second fades' chart over the known sites and the open places alike ([`Declaration::twin`]): the known
+        // stream's second moments and the open places' second cavity moments, each returned at the second fades.
+        if d.twin {
+            let known_twin = self.moments_with(&region, &paces, false, true)?;
+            let open_twin = self.cavity_moments_with(&region, &paces, false, true)?;
+            let twin: Vec<i64> = known_twin.iter().chain(&open_twin).copied().collect();
+            let mut dmt = self.twin_chart_return(&twin, &dx, 0..2 * n, g)?;
+            for (k, slot) in dmt.iter_mut().enumerate() {
+                if !moment_modes[(k % m2) % m] {
+                    *slot = 0;
+                }
+            }
+            let (known_dm, open_dm) = dmt.split_at(n * m2);
+            self.moments_return_with(&region, &paces, known_dm, g, &mut whole.gtau, &mut whole.gsig, false, true)?;
+            self.cavity_moments_return_with(&region, &paces, open_dm, g, &mut whole.gtau, &mut whole.gsig, false, true)?;
+        }
         for p in 0..paced {
             let base = l.pace + p * width;
             let fade_base = d.fade_rate.then(|| l.fade_rate + p * width);
@@ -1193,6 +1212,11 @@ impl Constitution {
                 }
             }
         }
+        // [the lead, November 25] The second fades' chart into the face, and the second moments' covector for the pass's clock ([`Declaration::twin`]).
+        if d.twin {
+            let dmt = self.twin_chart_return(&pass.twin_moment, &dx, 0..sites, g)?;
+            returns[0].as_mut().ok_or(TowerError::Refused("a reverse without the pass's clock"))?.dm_twin = dmt;
+        }
         // [theory, November 13, P60 item 1e] The opening's comparison at every place, where the field has the opening's lift: its covector joins the
         // last tick's in this one return, and its clocks' covectors join the pass's own before they fold into the strides.
         if d.opening {
@@ -1244,6 +1268,14 @@ impl Constitution {
             }
         }
         self.moments_return(region, paces, &r.dm, g, &mut r.gtau, &mut r.gsig)?;
+        if !r.dm_twin.is_empty() {
+            for (k, slot) in r.dm_twin.iter_mut().enumerate() {
+                if !moment_modes[(k % m2) % m] {
+                    *slot = 0;
+                }
+            }
+            self.moments_return_with(region, paces, &r.dm_twin, g, &mut r.gtau, &mut r.gsig, !self.sided(region), true)?;
+        }
         if paced == 0 {
             return Ok(());
         }

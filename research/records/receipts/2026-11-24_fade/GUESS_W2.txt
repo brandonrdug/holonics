@@ -10,3 +10,13 @@ G-W2 (at the lap means, one place open on the collection's held set):
   (b) (0.5) no region more than 0.008 over W115 (wikidata and books, whose documents are long, are where it could);
   (c) (0.5) the tool turns at least 0.010 under W115.
 Rule: (a) and (b) held, the line takes the walk; otherwise it does not.
+
+Scored 2026-11-25T13:52:04Z (date -u), the lead, from frontier_ruler.py on out4_W115 and out4_W115w (the collection's held set, one place open, lap
+means, 200,933 places). W115w less W115, paired: all -0.0041 (0.0008); acts -0.0181, books +0.0031, code +0.0010, dialogue -0.0109,
+harness -0.0112, logic -0.0040, science +0.0005, theory -0.0069, web +0.0023, wikidata +0.0029.
+  (a) held: -0.0041.
+  (b) held: no region over +0.0031.
+  (c) held: the tool turns -0.0181.
+By the rule the line takes the walk: W115w's STATE.3000 is its end. Two laps on two states moved her held code by -0.0038 and -0.0041.
+The line's level at its lap means: W112 0.7053, W113 0.7039, W113f 0.7062, W114 0.7085, W114r 0.7092, W115 0.7139 nats a place, a rise
+of 0.010 over three laps read in the pass's stored order; W114w 0.7047 and W115w 0.7098 beside them.

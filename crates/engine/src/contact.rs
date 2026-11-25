@@ -515,6 +515,9 @@ pub(crate) struct Forward {
     pub(crate) paces: Paces,
     /// The region's moments `[t][2M]` (§15.1), which the opening reads (§16.22).
     pub(crate) moment: Vec<i64>,
+    /// [the lead, November 25] The region's moments at the rings' second fades `[t][2M]` ([`Declaration::twin`]), which the opening reads
+    /// by its own chart; empty where the rings hold no second fade.
+    pub(crate) twin_moment: Vec<i64>,
     /// A tower's forward at its split, for the reverse.
     pub(crate) tower: Option<crate::field::scale::ScalePass>,
     /// [the lead, November 18] The two streams' forward, where the region is a passage read by two streams ([`Region::strand`]): its
@@ -1113,7 +1116,8 @@ impl Constitution {
         // site; at `3` and `4` the level is not heard.
         let (after, levelled) = (!self.sided(region), self.levelled(region));
         let moment = self.moments_sided(region, &paces, after)?;
-        let mut x = self.open_sided(region, &moment, marks, after, self.second(region))?;
+        let twin_moment = if d.twin { self.moments_with(region, &paces, after, true)? } else { Vec::new() };
+        let mut x = self.open_sided(region, &moment, Some(twin_moment.as_slice()).filter(|t| !t.is_empty()), marks, after, self.second(region))?;
         // [the formal thread, November 21 02:52Z] The opening a lane leak holds ([`lane_leak_tick`]).
         let opening_state = (d.lane_leak || (self.ruler_leak.is_some() && self.ruler_leak_hold)).then(|| x.clone());
         let definite: Vec<bool> = (0..region.classes.len()).map(|t| Self::definite(region, t)).collect();
@@ -1259,6 +1263,7 @@ impl Constitution {
         out.echo = trips.iter().map(|&t| ((t + read / 2) / read) as u64).collect();
         out.paces = paces;
         out.moment = moment;
+        out.twin_moment = twin_moment;
         out.read = vec![0i32; sites * dw];
         out.lift = vec![0i64; sites * dw];
         out.scale = vec![0i128; sites * d.lanes];
@@ -1664,7 +1669,8 @@ impl Constitution {
         // The known stream's clocks, moments and opening: what stands before each site, its own row in its opening.
         let paces = self.paces(&region)?;
         let known_moment = self.moments_sided(&region, &paces, false)?;
-        let mut x = self.open_sided(&region, &known_moment, None, false, second)?;
+        let known_twin = if d.twin { self.moments_with(&region, &paces, false, true)? } else { Vec::new() };
+        let mut x = self.open_sided(&region, &known_moment, Some(known_twin.as_slice()).filter(|t| !t.is_empty()), None, false, second)?;
         // The open places: the retarded opening on the clock each holds before its symbol arrives (its stride bare).
         let bare: Vec<(Vec<i64>, Vec<i64>)> = (0..d.heads).map(|h| Self::cavity_clocks(&paces, h, n)).collect();
         let (open_x, open_moment) = self.cavity_forward_sided(&region, &paces, false, second)?;

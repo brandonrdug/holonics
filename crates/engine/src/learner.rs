@@ -224,7 +224,6 @@ fn price_term(sum: &mut Option<i128>, g: i128, s: i128) {
 /// of the step, the moments, the remainders and the prices stands as the serial passes formed them (the test
 /// `the_deposit_in_one_pass_is_the_serial_passes_bit_for_bit`).
 #[allow(clippy::too_many_arguments)]
-#[allow(clippy::too_many_arguments)]
 pub(crate) fn deposit_pass(families: &[(usize, usize, u32)], g: &[i128], first: &mut [i128], second: &mut [i128], rates: &[u32], mut remainder: Option<&mut [i64]>, mut carried: Option<(&mut [i32], &mut [i32])>, last: Option<&HeldStep>, parts: &[u8]) -> Result<DepositPass> {
     // A chunk of entries a core takes at once; seven under test, so the tiny fields' families are cut in many places.
     #[cfg(not(test))]
@@ -563,9 +562,9 @@ pub struct StorePass {
     /// and its looks**: `(trail, looks)` a slice, the trail a store of the out-of-sample work a deposit did on the slice's stretches (millionths
     /// of a bit a place, `STORE_TRANSFER`), charged at each reading by `(x − trail)/R` with `R` the readings in a mean's window (its fade,
     /// the line's own clock), and the looks the stretches the slice has given since the trail was set. Where set, the cut takes the slice
-    /// with fewest looks for its quota (every slice is looked at at its quota's rate, the flock and the periphery) and draws each look's
-    /// lengths over the first `o_s` octaves of the pass's `octaves`, `o_s = 1 + ⌊(octaves − 1) trail_s⁺ / max_r trail_r⁺⌋` (the fovea's long
-    /// reads where the trail is strongest, a glimpse of the least octave where it is none; every octave where no slice has a trail).
+    /// with fewest looks for its quota times its trail's weight ([`crate::passage::Cut::trail_weights`]: the trail held between the strongest
+    /// and that over twice the count of slices), every look at the pass's octaves: the fovea looked at often, the periphery rarely and never
+    /// in a shorter look (W115t: looks shortened to the least octave cost their slices 0.03 to 0.05 nats a place).
     /// Written as a line `trail T₀ … T_(k−1) looks L₀ … L_(k−1)` after the walk line, only where set.
     pub slice_trail: Option<(Vec<i64>, Vec<u64>)>,
 }
@@ -1104,7 +1103,7 @@ impl Learner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud, d.lane_leak).iter().chain(d.friction.then_some(&FRICTION_PART)).chain(d.fade.then_some(&FADE_PART)).chain(d.fade_rate.then_some(&FADE_RATE_PART)).map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud, d.lane_leak).iter().chain(d.friction.then_some(&FRICTION_PART)).chain(d.fade.then_some(&FADE_PART)).chain(d.fade_rate.then_some(&FADE_RATE_PART)).chain(d.twin.then_some(&TWIN_PART)).map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
@@ -1180,7 +1179,10 @@ impl Learner {
                 // at the old rate.
                 let fade_rate = field.declaration.fade_rate;
                 let unrated: Vec<usize> = unfaded.iter().copied().chain(fade.then_some(FADE_PART)).collect();
-                let order: Vec<usize> = unrated.iter().copied().chain(fade_rate.then_some(FADE_RATE_PART)).collect();
+                let untwinned: Vec<usize> = unrated.iter().copied().chain(fade_rate.then_some(FADE_RATE_PART)).collect();
+                // [the lead, November 25] A field whose rings hold a second fade appends its part; its line without it reads with it at the old rate.
+                let twin = field.declaration.twin;
+                let order: Vec<usize> = untwinned.iter().copied().chain(twin.then_some(TWIN_PART)).collect();
                 let unleaked = written_parts(carry, triads, opening, junction, mark, loud, false);
                 let unloud = written_parts(carry, triads, opening, junction, mark, false, false);
                 let unmarked = written_parts(carry, triads, opening, junction, false, false, false);
@@ -1191,6 +1193,8 @@ impl Learner {
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if twin && n == untwinned.len() {
+                    untwinned
                 } else if fade_rate && n == unrated.len() {
                     unrated
                 } else if fade && n == unfaded.len() {

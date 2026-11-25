@@ -270,11 +270,80 @@ impl Constitution {
         (0..self.rings.len()).map(|slot| self.skin_denominator_of(slot)).collect()
     }
 
+    /// [definition; the lead, November 25] **The rings' second skins formed from their second fades** ([`Declaration::twin`]): each turned
+    /// slot's `γ′ = 2^(ℓ′)` read from the material through the temperatures' chart, its denominator `n ln 2 2^24 / γ′` and its decays at a
+    /// whole distance formed again where it moved. A field whose rings hold no second fade is untouched.
+    fn refresh_twin(&mut self) -> Result<()> {
+        if !self.declaration.twin {
+            return Ok(());
+        }
+        let at = self.layout.twin_fade;
+        let ks: Vec<i128> = (0..self.rings.len())
+            .map(|slot| -> Result<i128> {
+                let base = skin_denominator(self.rings[slot].0);
+                let ell = self.theta[at + slot];
+                Ok(if ell == 0 { base } else { div_nearest(base << MATERIAL_BITS, temperature_of(ell, &self.fine)?) })
+            })
+            .collect::<Result<_>>()?;
+        let reach = self.declaration.reach;
+        let (pi, exponential) = (self.pi, &self.exponential);
+        let stale: Vec<usize> = (0..ks.len()).filter(|&slot| self.twin_skin_k.get(slot) != Some(&ks[slot])).collect();
+        let fresh: Vec<(usize, Vec<i64>)> = stale.par_iter().map(|&slot| (slot, (0..reach).map(|d| skin_of_k((d as i128) << PACE_BITS, ks[slot], pi, exponential)).collect())).collect();
+        if self.twin_decays.len() != ks.len() {
+            self.twin_decays = vec![Vec::new(); ks.len()];
+        }
+        for (slot, row) in fresh {
+            self.twin_decays[slot] = row;
+        }
+        self.twin_skin_k = ks;
+        Ok(())
+    }
+
+    /// [the lead, November 25] The rings' second skin denominators ([`Declaration::twin`]; empty where they hold none), for the card's upload.
+    pub fn twin_skin_denominators(&self) -> &[i128] {
+        &self.twin_skin_k
+    }
+
+    /// [the lead, November 25] The rings' second decays at a whole distance (`[slot][d]`, [`Declaration::twin`]; empty where they hold none).
+    pub fn twin_decays(&self) -> &[Vec<i64>] {
+        &self.twin_decays
+    }
+
+    /// The skin of turned slot `slot`, or of its second fade where `twin` ([`Declaration::twin`]), across a variation `s` on `2^(−24)`.
+    pub(crate) fn skin_with(&self, twin: bool, slot: usize, s: i128) -> i64 {
+        if !twin {
+            return self.skin(slot, s);
+        }
+        let s = s.abs();
+        if s & ((1i128 << PACE_BITS) - 1) == 0 {
+            if let Some(&dv) = self.twin_decays[slot].get((s >> PACE_BITS) as usize) {
+                return dv;
+            }
+        }
+        skin_of_k(s, self.twin_skin_k[slot], self.pi, &self.exponential)
+    }
+
+    /// Turned slot `slot`'s decays at a whole distance, or its second fade's where `twin`.
+    pub(crate) fn decays_with(&self, twin: bool, slot: usize) -> &[i64] {
+        if twin { &self.twin_decays[slot] } else { &self.decays[slot] }
+    }
+
+    /// Turned slot `slot`'s rate of fade ([`Constitution::skin_rate`]), or its second fade's where `twin`: `div_nearest(b n ln 2 2^24, k′)`.
+    pub fn skin_rate_with(&self, twin: bool, slot: usize) -> i128 {
+        if !twin {
+            return self.skin_rate(slot);
+        }
+        let b = self.turn_rate(slot);
+        let (base, k) = (skin_denominator(self.rings[slot].0), self.twin_skin_k[slot]);
+        if k == base { b } else { div_nearest(b * base, k) }
+    }
+
     /// [definition; the lead, November 24] **The rings' skins formed from their fades** ([`Declaration::fade`]): each turned slot's fade
     /// `γ_s = 2^(ℓ_s)` read from the material through the temperatures' chart, its skin denominator `k = n ln 2 2^24 / γ` and its decays at a
     /// whole distance formed again where `k` moved. A field whose rings do not hold their fades is untouched. At `ℓ = 0` every word is the
     /// constant skin's, bit for bit.
     pub fn refresh_fade(&mut self) -> Result<()> {
+        self.refresh_twin()?;
         if !self.declaration.fade {
             return Ok(());
         }

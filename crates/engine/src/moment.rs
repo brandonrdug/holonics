@@ -22,7 +22,8 @@ impl Constitution {
         self.admit_region(region)?;
         let paces = self.paces(region)?;
         let moment = self.moments_of(region, &paces)?;
-        self.open(region, &moment, None)
+        let twin = if self.declaration.twin { Some(self.moments_with(region, &paces, true, true)?) } else { None };
+        self.open(region, &moment, twin.as_deref(), None)
     }
 
     /// [measurement; theory, November 13, P55 part B; the design record of November 13, §4.4] **A place's face at the region's opening**, before
@@ -53,6 +54,9 @@ impl Constitution {
         affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
         for (slot, &v) in xt.iter_mut().zip(&term) {
             *slot = fit64(*slot as i128 + v as i128)?;
+        }
+        if d.twin {
+            self.twin_term(&self.moments_with(region, &paces, true, true)?, t, &mut xt)?;
         }
         self.readout_face(&xt, &self.reaches())
     }
@@ -143,6 +147,12 @@ impl Constitution {
     /// [`Constitution::moments_of`], or with `after` unset the moments of what stands before each site alone (the after rows read as
     /// zero), a ruler's forward ([`Constitution::ruler_far`] at `3`).
     pub(crate) fn moments_sided(&self, region: &Region, paces: &Paces, after: bool) -> Result<Vec<i64>> {
+        self.moments_with(region, paces, after, false)
+    }
+
+    /// [`Constitution::moments_sided`] at the rings' fades, or at their second fades where `twin` ([`Declaration::twin`]): the same
+    /// encodings and clocks, each turned slot's decays and skin its second's.
+    pub(crate) fn moments_with(&self, region: &Region, paces: &Paces, after: bool, twin: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         let mut out = vec![0i64; sites * 2 * m];
@@ -158,9 +168,9 @@ impl Constitution {
                 let slot = self.slot(h, li);
                 let (period, ring) = &self.rings[slot];
                 let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
-                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin_with(twin, slot, s));
                 let pace = self.pace_of(paces, h, &turn, &skin);
-                let s = moment::moments(&pick(&eb), &pick(&ea), ring, *period, &self.decays[slot], pace.as_ref())?;
+                let s = moment::moments(&pick(&eb), &pick(&ea), ring, *period, self.decays_with(twin, slot), pace.as_ref())?;
                 for (t, &(re, im)) in s.iter().enumerate() {
                     out[t * 2 * m + h * n + li] = re;
                     out[t * 2 * m + m + h * n + li] = im;
@@ -184,6 +194,11 @@ impl Constitution {
     /// §13]: `s_t = Σ_(k<t) ζ^(k−t) D(t−k) E₋(u_k)` on the place's cavity clock, the strand's past at the place and nothing of what
     /// stands at it or after it (the after rows read as zero, so every term they carry is absent).
     pub(crate) fn cavity_moments_sided(&self, region: &Region, paces: &Paces, after: bool) -> Result<Vec<i64>> {
+        self.cavity_moments_with(region, paces, after, false)
+    }
+
+    /// [`Constitution::cavity_moments_sided`] at the rings' fades, or at their second fades where `twin` ([`Declaration::twin`]).
+    pub(crate) fn cavity_moments_with(&self, region: &Region, paces: &Paces, after: bool, twin: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         let mut out = vec![0i64; sites * 2 * m];
@@ -200,9 +215,9 @@ impl Constitution {
                 let slot = self.slot(h, li);
                 let (period, ring) = &self.rings[slot];
                 let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
-                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin_with(twin, slot, s));
                 let pace = self.pace_of(paces, h, &turn, &skin);
-                let s = moment::cavity_moments(&pick(&eb), &pick(&ea), ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
+                let s = moment::cavity_moments(&pick(&eb), &pick(&ea), ring, *period, self.decays_with(twin, slot), pace.as_ref(), &tau_c, &sigma_c)?;
                 for (t, &(re, im)) in s.iter().enumerate() {
                     out[t * 2 * m + h * n + li] = re;
                     out[t * 2 * m + m + h * n + li] = im;
@@ -250,6 +265,8 @@ impl Constitution {
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
         let moment = self.cavity_moments_sided(region, paces, after)?;
+        // [the lead, November 25] The second fades' cavity moments, read into the opening by their own chart ([`Declaration::twin`]).
+        let twin = if d.twin { Some(self.cavity_moments_with(region, paces, after, true)?) } else { None };
         let l = &self.layout;
         let reach_c = reach(&self.theta[l.moment_face..l.moment_face + dw * m2]);
         let unresolved = l.enc + d.alphabet * dw;
@@ -271,6 +288,9 @@ impl Constitution {
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
                 *slot = fit64(*slot as i128 + v as i128)?;
+            }
+            if let Some(tw) = twin.as_deref() {
+                self.twin_term(tw, t, xt)?;
             }
         }
         Ok((x, moment))
@@ -455,6 +475,12 @@ impl Constitution {
         let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
         let ss: Vec<&[i64]> = moment.chunks_exact(m2).collect();
         outer_sum(&mut g[mf..mf + dw * m2], m2, &dxs[places.clone()], &ss[places.clone()])?;
+        // [the lead, November 25] The second fades' chart on their cavity moments ([`Declaration::twin`]).
+        if d.twin {
+            let twin = self.cavity_moments_with(region, paces, after, true)?;
+            let dmt = self.twin_chart_return(&twin, &dx, places.clone(), g)?;
+            self.cavity_moments_return_with(region, paces, &dmt, g, gtau, gsig, after, true)?;
+        }
         let mut dm = vec![0i128; sites * m2];
         let mut back = vec![0i64; m2];
         for t in places {
@@ -488,6 +514,12 @@ impl Constitution {
     /// zero and take no covector.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn cavity_moments_return(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], after: bool) -> Result<()> {
+        self.cavity_moments_return_with(region, paces, dm, g, gtau, gsig, after, false)
+    }
+
+    /// [`Constitution::cavity_moments_return`] at the rings' fades, or at their second fades where `twin` ([`Declaration::twin`]).
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn cavity_moments_return_with(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], after: bool, twin: bool) -> Result<()> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         if tm == 0 {
@@ -505,22 +537,25 @@ impl Constitution {
                 let slot = self.slot(h, li);
                 let (period, ring) = &self.rings[slot];
                 let ds: Vec<(i64, i64)> = (0..sites).map(|t| Ok((fit64(dm[t * 2 * m + h * n + li])?, fit64(dm[t * 2 * m + m + h * n + li])?))).collect::<Result<_>>()?;
-                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin_with(twin, slot, s));
                 let pace = self.pace_of(paces, h, &turn, &skin);
-                let (back_b, back_a) = moment::cavity_moments_return(&ds, ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
+                let decays = self.decays_with(twin, slot);
+                let (back_b, back_a) = moment::cavity_moments_return(&ds, ring, *period, decays, pace.as_ref(), &tau_c, &sigma_c)?;
                 if let Some(p) = paces.row[h] {
                     let full = moment::Pace { tau: &paces.tau[p], sigma: &paces.sigma[p], turn: &turn, skin: &skin };
                     let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
                     let (before, after) = (pick(&eb), pick(&ea));
-                    let parts = moment::cavity_moment_parts_exact(&before, &after, ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
+                    let parts = moment::cavity_moment_parts_exact(&before, &after, ring, *period, decays, pace.as_ref(), &tau_c, &sigma_c)?;
                     let (sb, sa): (Vec<_>, Vec<_>) = parts.into_iter().unzip();
                     let (sb, sa) = (side(sb)?, side(sa)?);
-                    let (dt, dsg, _, _, fade) = moment::cavity_pace_return_faded(&before, &after, &sb, &sa, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, &tau_c, &sigma_c, self.turn_rate(slot), self.skin_rate(slot))?;
+                    let (dt, dsg, _, _, fade) = moment::cavity_pace_return_faded(&before, &after, &sb, &sa, &ds, &back_b, &back_a, ring, *period, decays, &full, &tau_c, &sigma_c, self.turn_rate(slot), self.skin_rate_with(twin, slot))?;
                     for t in 0..sites {
                         gtau[p][t] += dt[t];
                         gsig[p][t] += dsg[t];
                     }
-                    if d.fade {
+                    if twin {
+                        g[l.twin_fade + slot] += fade;
+                    } else if d.fade {
                         g[l.fade + slot] += fade;
                     }
                 }
@@ -574,6 +609,13 @@ impl Constitution {
     /// none takes a covector.
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn moments_return_sided(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], after: bool) -> Result<()> {
+        self.moments_return_with(region, paces, dm, g, gtau, gsig, after, false)
+    }
+
+    /// [`Constitution::moments_return_sided`] at the rings' fades, or at their second fades where `twin` ([`Declaration::twin`]): the
+    /// covector of the second fades' moments to the same encodings and clocks, and to the second fades.
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn moments_return_with(&self, region: &Region, paces: &Paces, dm: &[i128], g: &mut [i128], gtau: &mut [Vec<i128>], gsig: &mut [Vec<i128>], after: bool, twin: bool) -> Result<()> {
         let d = &self.declaration;
         let (m, n, sites, tm) = (d.complex(), d.modes, region.classes.len(), d.moment_modes());
         if tm == 0 {
@@ -589,21 +631,24 @@ impl Constitution {
                 let slot = self.slot(h, li);
                 let (period, ring) = &self.rings[slot];
                 let ds: Vec<(i64, i64)> = (0..sites).map(|t| Ok((fit64(dm[t * 2 * m + h * n + li])?, fit64(dm[t * 2 * m + m + h * n + li])?))).collect::<Result<_>>()?;
-                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin(slot, s));
+                let (turn, skin) = (|r: i128| self.turn(slot, r), |s: i128| self.skin_with(twin, slot, s));
                 let pace = self.pace_of(paces, h, &turn, &skin);
-                let (back_b, back_a) = moment::moments_return(&ds, ring, *period, &self.decays[slot], pace.as_ref())?;
+                let decays = self.decays_with(twin, slot);
+                let (back_b, back_a) = moment::moments_return(&ds, ring, *period, decays, pace.as_ref())?;
                 // A paced head's moments turn and decay by its clock (§16): their covector returns to it.
                 if let Some(p) = paces.row[h] {
                     let full = moment::Pace { tau: &paces.tau[p], sigma: &paces.sigma[p], turn: &turn, skin: &skin };
                     let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
                     let (before, after) = (pick(&eb), pick(&ea));
-                    let s = moment::moments(&before, &after, ring, *period, &self.decays[slot], pace.as_ref())?;
-                    let (dt, dsg, fade) = moment::pace_return_faded(&before, &after, &s, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, self.turn_rate(slot), self.skin_rate(slot))?;
+                    let s = moment::moments(&before, &after, ring, *period, decays, pace.as_ref())?;
+                    let (dt, dsg, fade) = moment::pace_return_faded(&before, &after, &s, &ds, &back_b, &back_a, ring, *period, decays, &full, self.turn_rate(slot), self.skin_rate_with(twin, slot))?;
                     for t in 0..sites {
                         gtau[p][t] += dt[t];
                         gsig[p][t] += dsg[t];
                     }
-                    if d.fade {
+                    if twin {
+                        g[l.twin_fade + slot] += fade;
+                    } else if d.fade {
                         g[l.fade + slot] += fade;
                     }
                 }
@@ -626,14 +671,52 @@ impl Constitution {
     /// neighbours' rows of their own encodings and its moment read through its chart,
     /// `x⁰_t = E(u_t) + E₋(u_(t−1)) + E₊(u_(t+1)) + release(C s_t + b, 24)` (§16.22; a region's first site has no
     /// site before it, its last none after), `moment` the region's moments `[t][2M]` ([`Constitution::moments_of`]).
-    pub(crate) fn open(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>) -> Result<Vec<i64>> {
-        self.open_sided(region, moment, marks, true, false)
+    pub(crate) fn open(&self, region: &Region, moment: &[i64], twin: Option<&[i64]>, marks: Option<&[Option<Shares>]>) -> Result<Vec<i64>> {
+        self.open_sided(region, moment, twin, marks, true, false)
+    }
+
+    /// [definition; the lead, November 25] **The second fades' chart into the opening** ([`Declaration::twin`]): `x⁰_t += release(C′ s′_t, 24)`,
+    /// `s′` the moments at the rings' second fades, no bias.
+    pub(crate) fn twin_term(&self, twin: &[i64], t: usize, xt: &mut [i64]) -> Result<()> {
+        let d = &self.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let l = &self.layout;
+        let chart = &self.theta[l.twin_face..l.twin_face + dw * m2];
+        let mut term = vec![0i64; dw];
+        affine(chart, reach(chart), m2, &twin[t * m2..(t + 1) * m2], None, MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
+        for (slot, &v) in xt.iter_mut().zip(&term) {
+            *slot = fit64(*slot as i128 + v as i128)?;
+        }
+        Ok(())
+    }
+
+    /// [the lead, November 25] **The second fades' chart's return** ([`Constitution::twin_term`]): `δC′ += Σ_t δx⁰_t s′_tᵀ` over `places`,
+    /// and the second moments' covector `δs′_t = C′ᵀ δx⁰_t` (`[t][2M]` on `2^(−24)`), for [`Constitution::moments_return_with`] or
+    /// [`Constitution::cavity_moments_return_with`] at the second fades.
+    pub(crate) fn twin_chart_return(&self, twin: &[i64], dx: &[i64], places: std::ops::Range<usize>, g: &mut [i128]) -> Result<Vec<i128>> {
+        let d = &self.declaration;
+        let (dw, m2) = (d.width, 2 * d.complex());
+        let l = &self.layout;
+        let dxs: Vec<&[i64]> = dx.chunks_exact(dw).collect();
+        let ss: Vec<&[i64]> = twin.chunks_exact(m2).collect();
+        outer_sum(&mut g[l.twin_face..l.twin_face + dw * m2], m2, &dxs[places.clone()], &ss[places.clone()])?;
+        let chart = &self.theta[l.twin_face..l.twin_face + dw * m2];
+        let reach_t = reach(chart);
+        let mut dm = vec![0i128; dxs.len() * m2];
+        let mut back = vec![0i64; m2];
+        for t in places {
+            transposed(chart, reach_t, m2, dxs[t], MATERIAL_BITS, &mut back)?;
+            for (slot, &b) in dm[t * m2..(t + 1) * m2].iter_mut().zip(&back) {
+                *slot += b as i128;
+            }
+        }
+        Ok(dm)
     }
 
     /// [`Constitution::open`], or with `after` unset without the row of the site after (a ruler's forward,
     /// [`Constitution::ruler_far`] at `3`).
     /// [the record of the two streams §15] With `second` ([`Region::second`]) each site takes the row `E₊` of the second site before it.
-    pub(crate) fn open_sided(&self, region: &Region, moment: &[i64], marks: Option<&[Option<Shares>]>, after: bool, second: bool) -> Result<Vec<i64>> {
+    pub(crate) fn open_sided(&self, region: &Region, moment: &[i64], twin: Option<&[i64]>, marks: Option<&[Option<Shares>]>, after: bool, second: bool) -> Result<Vec<i64>> {
         let d = &self.declaration;
         let (dw, m2) = (d.width, 2 * d.complex());
         let sites = region.classes.len();
@@ -655,6 +738,9 @@ impl Constitution {
             affine(&self.theta[l.moment_face..l.moment_face + dw * m2], reach_c, m2, &moment[t * m2..(t + 1) * m2], Some(&self.theta[l.moment_face_bias..l.moment_face_bias + dw]), MATERIAL_BITS, MATERIAL_BITS, &mut term)?;
             for (slot, &v) in xt.iter_mut().zip(&term) {
                 *slot = fit64(*slot as i128 + v as i128)?;
+            }
+            if let Some(tw) = twin {
+                self.twin_term(tw, t, xt)?;
             }
         }
         Ok(x)

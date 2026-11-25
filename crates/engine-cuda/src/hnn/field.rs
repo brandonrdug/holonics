@@ -58,7 +58,7 @@ mod tests {
     use holonics_engine::contact::WEIGHT_BITS;
 
     fn declaration(width: usize, heads: usize, contacts: usize) -> Declaration {
-        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }
+        Declaration { alphabet: 122, width, heads, modes: 8, still: 2, contacts, ticks: 2, frames: 4, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false }
     }
 
     /// [measurement; theory, November 10 20:34] **The card's footprint by growth route** (host arithmetic, no card read): from the
@@ -72,7 +72,7 @@ mod tests {
     #[test]
     #[ignore]
     fn the_card_footprint_by_growth_route() {
-        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
+        let base = Declaration { alphabet: 100, width: 64, heads: 4, modes: 8, still: 2, contacts: 64, ticks: 4, frames: 4, reach: 3771, lanes: 2, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false, twin: false };
         let describe = |name: &str, d: Declaration| {
             let draws = 4 * d.founding_draws();
             let field = holonics_engine::field::Constitution::found(d, &vec![7u8; draws]).expect("founded");
@@ -470,6 +470,77 @@ mod tests {
             println!("FADE_PARITY {which} unequal={} first={:?} fades={:?}", unequal.len(), unequal.first(), &fades[..fades.len().min(4)]);
             assert!(fades.iter().any(|&(h, _)| h != 0), "{which}: the fades take a covector");
             assert_eq!(unequal.len(), 0, "{which}: every covector entry with the fades drawn");
+        }
+    }
+
+    /// [definition; the lead, November 25] **The rings' second fades on the card read the host's bits** (needs the card; `Declaration::twin`):
+    /// on the targets' parity field, on it with the opening compared, and on that with the mark and the rings' first fades (the line's parts),
+    /// the second fades founded with their chart at zero read every face and covector entry of the field without them, and with the chart drawn
+    /// off zero and the second fades spread about their founding the card's faces and every covector entry, the chart's and the second fades'
+    /// among them, are the host's, on strands compared with targets and on regions with open places.
+    #[test]
+    #[ignore]
+    fn the_rings_second_fades_on_the_card_read_the_hosts_bits() {
+        use holonics_engine::field::Learner;
+        let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(3).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
+        let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
+        let carried = Learner::new(founded, 12).with_carry(4, &keys).unwrap();
+        let one = 1i32 << MATERIAL_BITS;
+        let half_a_turn = -(51 * one) / 16;
+        let opened = carried.clone().with_opening().unwrap();
+        let marked = opened.clone().with_mark().unwrap().with_fade(2, -one / 2).unwrap();
+        let lengths = [2usize, 3, 7, 64, 300];
+        let passages: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
+        let targets: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 29 + 7 + 13 * k) % 120).collect()).collect();
+        let known: Vec<Vec<bool>> = lengths.iter().map(|&n| vec![false; n]).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1).collect()).collect();
+        let strands: Vec<Region> = (0..lengths.len()).map(|k| Region { classes: &passages[k], unresolved: &known[k], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: Some(&targets[k]) }).collect();
+        let regions: Vec<Region> = (0..lengths.len()).map(|k| Region { classes: &passages[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        for (case, learner) in [("carried", &carried), ("opened", &opened), ("opened, marked, faded", &marked)] {
+            let mut plain = learner.field.clone();
+            let (l, dw, m2) = (plain.layout().clone(), plain.declaration.width, 2 * plain.declaration.complex());
+            // The readout drawn as the fades' parity draws it, and the moments' encodings and chart drawn too (a founded field holds them at
+            // zero, so its moments, and the second fades' with them, read nothing until a deposit moves them).
+            let rows = 2 * (plain.declaration.alphabet + 1) * plain.declaration.moment_modes();
+            let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.moment_face..l.moment_face + dw * m2).map(|i| (i, 14u32)).chain((l.moment_before..l.moment_before + 2 * rows).map(|i| (i, 18u32))).collect();
+            let tail = keys.len() - 4 * moved.len() - 8;
+            for (k, &(i, shift)) in moved.iter().enumerate() {
+                let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+                plain.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+            }
+            let (zero, _) = plain.with_twin(half_a_turn).unwrap();
+            for (which, batch) in [("strands", &strands), ("regions", &regions)] {
+                let (plain_faces, plain_g) = card_field.read_and_return(&plain, batch).unwrap();
+                let (zero_faces, zero_g) = card_field.read_and_return(&zero, batch).unwrap();
+                assert_eq!(plain_faces, zero_faces, "{case}, {which}: the second fades founded with their chart at zero keep every face on the card");
+                assert_eq!(&zero_g[..plain_g.len()], &plain_g[..], "{case}, {which}: and every standing covector entry");
+            }
+            let mut field = zero.clone();
+            let l = field.layout().clone();
+            for k in 0..dw * m2 {
+                field.theta[l.twin_face + k] = field.theta[l.moment_face + k] / 2;
+            }
+            let slots = field.declaration.turned_slots();
+            for (k, v) in field.theta[l.twin_fade..l.twin_fade + slots].iter_mut().enumerate() {
+                *v += [-one / 4, one / 8, -3 * one / 8, one / 4, -one / 2][k % 5];
+            }
+            field.refresh_fade().unwrap();
+            for (which, batch) in [("strands", &strands), ("regions", &regions)] {
+                let (host_faces, host_g) = field.read_and_return(batch).unwrap();
+                let (card_faces, card_g) = card_field.read_and_return(&field, batch).unwrap();
+                assert_eq!(host_faces, card_faces, "{case}, {which}: every face with the second fades drawn");
+                let unequal: Vec<usize> = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).collect();
+                let fades: Vec<(i128, i128)> = (l.twin_fade..l.twin_fade + slots).map(|i| (host_g[i], card_g[i])).collect();
+                let chart = (l.twin_face..l.twin_face + dw * m2).filter(|&i| host_g[i] != 0).count();
+                let named = |i: usize| -> String {
+                    if i >= l.twin_fade { format!("second fade {}", i - l.twin_fade) } else if i >= l.twin_face { format!("second chart {}", i - l.twin_face) } else if field.declaration.fade && i >= l.fade && i < l.fade + slots { format!("fade {}", i - l.fade) } else { format!("entry {i}") }
+                };
+                println!("TWIN_PARITY {case} {which} unequal={} first={:?} chart_nonzero={chart} fades={:?}", unequal.len(), unequal.first().map(|&i| (named(i), host_g[i], card_g[i])), &fades[..fades.len().min(4)]);
+                assert!(fades.iter().any(|&(h, _)| h != 0) && chart > 0, "{case}, {which}: the second fades and their chart take a covector");
+                assert_eq!(unequal.len(), 0, "{case}, {which}: every covector entry with the second fades drawn");
+            }
         }
     }
 
