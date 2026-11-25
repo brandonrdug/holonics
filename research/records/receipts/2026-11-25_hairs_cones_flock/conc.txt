@@ -1,0 +1,64 @@
+CONC_HEAD cut=256 places_past=19200 law_mean=1.1097
+CONC setting=cut:256:0 places=19200 net=4044.2 positive=5596.4 top1%=0.180 top2%=0.297 top5%=0.535 top10%=0.746 top20%=0.912 top50%=0.999 under_zero=0.380 giving_back=-1552.2 participation=0.124
+CONC_FIFTH setting=cut:256:0 1:law=0.004,price=+0.1154,share=+0.110 2:law=0.049,price=+0.3005,share=+0.285 3:law=0.325,price=+0.4242,share=+0.403 4:law=1.382,price=+0.2545,share=+0.242 5:law=3.788,price=-0.0414,share=-0.039
+CONC setting=cut:256:1 places=19200 net=4060.0 positive=5600.2 top1%=0.184 top2%=0.302 top5%=0.540 top10%=0.751 top20%=0.916 top50%=0.999 under_zero=0.393 giving_back=-1540.2 participation=0.121
+CONC_FIFTH setting=cut:256:1 1:law=0.004,price=+0.1147,share=+0.109 2:law=0.049,price=+0.2989,share=+0.283 3:law=0.325,price=+0.4181,share=+0.395 4:law=1.382,price=+0.2510,share=+0.237 5:law=3.788,price=-0.0254,share=-0.024
+CONC setting=cut:256:16 places=19200 net=3910.2 positive=5395.1 top1%=0.192 top2%=0.314 top5%=0.557 top10%=0.763 top20%=0.918 top50%=0.999 under_zero=0.379 giving_back=-1484.9 participation=0.115
+CONC_FIFTH setting=cut:256:16 1:law=0.004,price=+0.1178,share=+0.116 2:law=0.049,price=+0.2941,share=+0.289 3:law=0.325,price=+0.3938,share=+0.387 4:law=1.382,price=+0.2400,share=+0.236 5:law=3.788,price=-0.0275,share=-0.027
+CONC setting=cut:256:4 places=19200 net=4515.8 positive=6140.0 top1%=0.187 top2%=0.303 top5%=0.537 top10%=0.746 top20%=0.912 top50%=1.000 under_zero=0.396 giving_back=-1624.3 participation=0.121
+CONC_FIFTH setting=cut:256:4 1:law=0.004,price=+0.1223,share=+0.104 2:law=0.049,price=+0.3228,share=+0.275 3:law=0.325,price=+0.4299,share=+0.366 4:law=1.382,price=+0.2771,share=+0.236 5:law=3.788,price=+0.0239,share=+0.020
+CONC setting=cut:256:2 places=19200 net=4884.7 positive=6502.6 top1%=0.207 top2%=0.325 top5%=0.555 top10%=0.757 top20%=0.915 top50%=0.999 under_zero=0.393 giving_back=-1617.9 participation=0.108
+CONC_FIFTH setting=cut:256:2 1:law=0.004,price=+0.1504,share=+0.118 2:law=0.049,price=+0.3327,share=+0.262 3:law=0.325,price=+0.4521,share=+0.355 4:law=1.382,price=+0.2914,share=+0.229 5:law=3.788,price=+0.0455,share=+0.036
+CONC setting=cut:256:23 places=19200 net=3802.6 positive=5299.8 top1%=0.203 top2%=0.330 top5%=0.575 top10%=0.779 top20%=0.930 top50%=1.000 under_zero=0.417 giving_back=-1497.3 participation=0.107
+CONC_FIFTH setting=cut:256:23 1:law=0.004,price=+0.0977,share=+0.099 2:law=0.049,price=+0.2876,share=+0.290 3:law=0.325,price=+0.3613,share=+0.365 4:law=1.382,price=+0.2292,share=+0.231 5:law=3.788,price=+0.0144,share=+0.015
+CONC setting=cut:256:7 places=19200 net=4040.6 positive=5636.9 top1%=0.196 top2%=0.317 top5%=0.554 top10%=0.757 top20%=0.918 top50%=1.000 under_zero=0.411 giving_back=-1596.2 participation=0.115
+CONC_FIFTH setting=cut:256:7 1:law=0.004,price=+0.1018,share=+0.097 2:law=0.049,price=+0.2928,share=+0.278 3:law=0.325,price=+0.3924,share=+0.373 4:law=1.382,price=+0.2492,share=+0.237 5:law=3.788,price=+0.0161,share=+0.015
+CONC setting=cut:256:63 places=19200 net=2251.1 positive=3415.7 top1%=0.228 top2%=0.367 top5%=0.618 top10%=0.808 top20%=0.944 top50%=1.000 under_zero=0.447 giving_back=-1164.7 participation=0.090
+CONC_FIFTH setting=cut:256:63 1:law=0.004,price=+0.0544,share=+0.093 2:law=0.049,price=+0.1720,share=+0.293 3:law=0.325,price=+0.2382,share=+0.406 4:law=1.382,price=+0.1395,share=+0.238 5:law=3.788,price=-0.0179,share=-0.031
+CONC setting=cut:256:351 places=19200 net=6056.8 positive=7815.3 top1%=0.173 top2%=0.272 top5%=0.472 top10%=0.668 top20%=0.857 top50%=0.996 under_zero=0.324 giving_back=-1758.5 participation=0.141
+CONC_FIFTH setting=cut:256:351 1:law=0.004,price=+0.1509,share=+0.096 2:law=0.049,price=+0.3863,share=+0.245 3:law=0.325,price=+0.5853,share=+0.371 4:law=1.382,price=+0.3701,share=+0.235 5:law=3.788,price=+0.0847,share=+0.054
+CONC setting=cut:256:319 places=19200 net=5707.7 positive=7436.0 top1%=0.179 top2%=0.280 top5%=0.487 top10%=0.686 top20%=0.869 top50%=0.997 under_zero=0.333 giving_back=-1728.4 participation=0.134
+CONC_FIFTH setting=cut:256:319 1:law=0.004,price=+0.1427,share=+0.096 2:law=0.049,price=+0.3657,share=+0.246 3:law=0.325,price=+0.5519,share=+0.371 4:law=1.382,price=+0.3565,share=+0.240 5:law=3.788,price=+0.0696,share=+0.047
+CONC setting=cut:256:31 places=19200 net=3906.1 positive=5389.0 top1%=0.205 top2%=0.332 top5%=0.580 top10%=0.783 top20%=0.934 top50%=1.000 under_zero=0.445 giving_back=-1482.9 participation=0.106
+CONC_FIFTH setting=cut:256:31 1:law=0.004,price=+0.0988,share=+0.097 2:law=0.049,price=+0.2896,share=+0.285 3:law=0.325,price=+0.3588,share=+0.353 4:law=1.382,price=+0.2327,share=+0.229 5:law=3.788,price=+0.0372,share=+0.037
+CONC setting=cut:256:64 places=19200 net=1064.7 positive=1989.0 top1%=0.264 top2%=0.391 top5%=0.589 top10%=0.755 top20%=0.907 top50%=0.999 under_zero=0.388 giving_back=-924.4 participation=0.083
+CONC_FIFTH setting=cut:256:64 1:law=0.004,price=+0.0274,share=+0.099 2:law=0.049,price=+0.0537,share=+0.194 3:law=0.325,price=+0.1177,share=+0.425 4:law=1.382,price=+0.0952,share=+0.343 5:law=3.788,price=-0.0168,share=-0.061
+CONC setting=cut:256:159 places=19200 net=3343.1 positive=4725.9 top1%=0.205 top2%=0.336 top5%=0.590 top10%=0.792 top20%=0.935 top50%=1.000 under_zero=0.412 giving_back=-1382.8 participation=0.104
+CONC_FIFTH setting=cut:256:159 1:law=0.004,price=+0.0835,share=+0.096 2:law=0.049,price=+0.2525,share=+0.290 3:law=0.325,price=+0.3371,share=+0.387 4:law=1.382,price=+0.2018,share=+0.232 5:law=3.788,price=-0.0043,share=-0.005
+CONC setting=cut:256:191 places=19200 net=1916.3 positive=3013.0 top1%=0.235 top2%=0.375 top5%=0.622 top10%=0.802 top20%=0.936 top50%=1.000 under_zero=0.400 giving_back=-1096.7 participation=0.088
+CONC_FIFTH setting=cut:256:191 1:law=0.004,price=+0.0432,share=+0.086 2:law=0.049,price=+0.1490,share=+0.298 3:law=0.325,price=+0.2262,share=+0.453 4:law=1.382,price=+0.1283,share=+0.257 5:law=3.788,price=-0.0476,share=-0.095
+CONC setting=cut:256:287 places=19200 net=5465.8 positive=7157.1 top1%=0.184 top2%=0.292 top5%=0.507 top10%=0.708 top20%=0.883 top50%=0.998 under_zero=0.343 giving_back=-1691.3 participation=0.127
+CONC_FIFTH setting=cut:256:287 1:law=0.004,price=+0.1454,share=+0.102 2:law=0.049,price=+0.3493,share=+0.245 3:law=0.325,price=+0.5133,share=+0.361 4:law=1.382,price=+0.3481,share=+0.245 5:law=3.788,price=+0.0674,share=+0.047
+CONC setting=cut:256:8 places=19200 net=4455.0 positive=6075.2 top1%=0.182 top2%=0.299 top5%=0.536 top10%=0.747 top20%=0.915 top50%=1.000 under_zero=0.413 giving_back=-1620.1 participation=0.123
+CONC_FIFTH setting=cut:256:8 1:law=0.004,price=+0.1218,share=+0.105 2:law=0.049,price=+0.3115,share=+0.269 3:law=0.325,price=+0.4205,share=+0.362 4:law=1.382,price=+0.2721,share=+0.235 5:law=3.788,price=+0.0343,share=+0.030
+CONC setting=cut:256:128 places=19200 net=3999.8 positive=5532.1 top1%=0.178 top2%=0.294 top5%=0.531 top10%=0.742 top20%=0.908 top50%=0.999 under_zero=0.363 giving_back=-1532.3 participation=0.127
+CONC_FIFTH setting=cut:256:128 1:law=0.004,price=+0.1156,share=+0.111 2:law=0.049,price=+0.3003,share=+0.288 3:law=0.325,price=+0.4225,share=+0.406 4:law=1.382,price=+0.2481,share=+0.238 5:law=3.788,price=-0.0448,share=-0.043
+CONC setting=cut:256:19 places=19200 net=4376.3 positive=5881.3 top1%=0.210 top2%=0.334 top5%=0.575 top10%=0.779 top20%=0.930 top50%=1.000 under_zero=0.410 giving_back=-1505.0 participation=0.105
+CONC_FIFTH setting=cut:256:19 1:law=0.004,price=+0.1311,share=+0.115 2:law=0.049,price=+0.3118,share=+0.274 3:law=0.325,price=+0.4047,share=+0.355 4:law=1.382,price=+0.2581,share=+0.226 5:law=3.788,price=+0.0340,share=+0.030
+CONC setting=cut:256:27 places=19200 net=4116.2 positive=5613.5 top1%=0.202 top2%=0.329 top5%=0.575 top10%=0.779 top20%=0.932 top50%=1.000 under_zero=0.436 giving_back=-1497.2 participation=0.108
+CONC_FIFTH setting=cut:256:27 1:law=0.004,price=+0.1146,share=+0.107 2:law=0.049,price=+0.2974,share=+0.277 3:law=0.325,price=+0.3759,share=+0.351 4:law=1.382,price=+0.2455,share=+0.229 5:law=3.788,price=+0.0386,share=+0.036
+CONC setting=cut:256:59 places=19200 net=2381.9 positive=3575.0 top1%=0.226 top2%=0.364 top5%=0.612 top10%=0.804 top20%=0.942 top50%=1.000 under_zero=0.442 giving_back=-1193.1 participation=0.092
+CONC_FIFTH setting=cut:256:59 1:law=0.004,price=+0.0619,share=+0.100 2:law=0.049,price=+0.1767,share=+0.285 3:law=0.325,price=+0.2513,share=+0.405 4:law=1.382,price=+0.1478,share=+0.238 5:law=3.788,price=-0.0174,share=-0.028
+CONC_DEAR setting=cut:256:0 dear:places=1920,alone=4175.9,price=4175.9,back=+0.000 rest:places=17280,alone=-131.7,price=-131.7,back=+0.000 law_at_dear=1.009
+CONC_DEAR setting=cut:256:1 dear:places=1920,alone=4175.9,price=4123.1,back=+0.013 rest:places=17280,alone=-131.7,price=-63.1,back=+0.521 law_at_dear=1.009
+CONC_DEAR setting=cut:256:16 dear:places=1920,alone=4175.9,price=3932.7,back=+0.058 rest:places=17280,alone=-131.7,price=-22.5,back=+0.829 law_at_dear=1.009
+CONC_DEAR setting=cut:256:4 dear:places=1920,alone=4175.9,price=4365.3,back=-0.045 rest:places=17280,alone=-131.7,price=150.4,back=+2.142 law_at_dear=1.009
+CONC_DEAR setting=cut:256:2 dear:places=1920,alone=4175.9,price=4632.6,back=-0.109 rest:places=17280,alone=-131.7,price=252.1,back=+2.914 law_at_dear=1.009
+CONC_DEAR setting=cut:256:23 dear:places=1920,alone=4175.9,price=3681.2,back=+0.118 rest:places=17280,alone=-131.7,price=121.4,back=+1.921 law_at_dear=1.009
+CONC_DEAR setting=cut:256:7 dear:places=1920,alone=4175.9,price=3935.3,back=+0.058 rest:places=17280,alone=-131.7,price=105.4,back=+1.800 law_at_dear=1.009
+CONC_DEAR setting=cut:256:63 dear:places=1920,alone=4175.9,price=2323.5,back=+0.444 rest:places=17280,alone=-131.7,price=-72.5,back=+0.450 law_at_dear=1.009
+CONC_DEAR setting=cut:256:351 dear:places=1920,alone=4175.9,price=4398.9,back=-0.053 rest:places=17280,alone=-131.7,price=1657.9,back=+13.586 law_at_dear=1.009
+CONC_DEAR setting=cut:256:319 dear:places=1920,alone=4175.9,price=4391.6,back=-0.052 rest:places=17280,alone=-131.7,price=1316.1,back=+10.991 law_at_dear=1.009
+CONC_DEAR setting=cut:256:31 dear:places=1920,alone=4175.9,price=3718.2,back=+0.110 rest:places=17280,alone=-131.7,price=187.9,back=+2.427 law_at_dear=1.009
+CONC_DEAR setting=cut:256:64 dear:places=1920,alone=4175.9,price=1018.7,back=+0.756 rest:places=17280,alone=-131.7,price=45.9,back=+1.349 law_at_dear=1.009
+CONC_DEAR setting=cut:256:159 dear:places=1920,alone=4175.9,price=3359.9,back=+0.195 rest:places=17280,alone=-131.7,price=-16.8,back=+0.873 law_at_dear=1.009
+CONC_DEAR setting=cut:256:191 dear:places=1920,alone=4175.9,price=2046.5,back=+0.510 rest:places=17280,alone=-131.7,price=-130.2,back=+0.012 law_at_dear=1.009
+CONC_DEAR setting=cut:256:287 dear:places=1920,alone=4175.9,price=4435.0,back=-0.062 rest:places=17280,alone=-131.7,price=1030.8,back=+8.825 law_at_dear=1.009
+CONC_DEAR setting=cut:256:8 dear:places=1920,alone=4175.9,price=4354.6,back=-0.043 rest:places=17280,alone=-131.7,price=100.5,back=+1.763 law_at_dear=1.009
+CONC_DEAR setting=cut:256:128 dear:places=1920,alone=4175.9,price=4076.6,back=+0.024 rest:places=17280,alone=-131.7,price=-76.8,back=+0.417 law_at_dear=1.009
+CONC_DEAR setting=cut:256:19 dear:places=1920,alone=4175.9,price=4126.8,back=+0.012 rest:places=17280,alone=-131.7,price=249.5,back=+2.894 law_at_dear=1.009
+CONC_DEAR setting=cut:256:27 dear:places=1920,alone=4175.9,price=3933.7,back=+0.058 rest:places=17280,alone=-131.7,price=182.5,back=+2.385 law_at_dear=1.009
+CONC_DEAR setting=cut:256:59 dear:places=1920,alone=4175.9,price=2466.5,back=+0.409 rest:places=17280,alone=-131.7,price=-84.6,back=+0.358 law_at_dear=1.009
+CONC_PLANT setting=even places=19200 net=19200.0 positive=19200.0 top1%=0.010 top2%=0.020 top5%=0.050 top10%=0.100 top20%=0.200 top50%=0.500 under_zero=0.000 giving_back=0.0 participation=1.000
+CONC_PLANT setting=exponential places=19200 net=19533.1 positive=19533.1 top1%=0.055 top2%=0.098 top5%=0.199 top10%=0.330 top20%=0.521 top50%=0.847 under_zero=0.000 giving_back=0.0 participation=0.502
+CONC_PLANT setting=one-in-fifty places=19200 net=19050.0 positive=19050.0 top1%=0.504 top2%=1.000 top5%=1.000 top10%=1.000 top20%=1.000 top50%=1.000 under_zero=0.000 giving_back=0.0 participation=0.020

@@ -1493,4 +1493,5 @@ import HolonicsResearch.HNN.HandedCycle
 import HolonicsResearch.HNN.ReachAndCapacity
 import HolonicsResearch.HNN.ContinuedRegion
 import HolonicsResearch.HNN.StoreCut
+import HolonicsResearch.Mathematics.ResidueStacks
 import HolonicsResearch.HNN.ComparedClock

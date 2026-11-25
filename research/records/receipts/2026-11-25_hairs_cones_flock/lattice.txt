@@ -1,0 +1,37 @@
+LATTICE w=3 h=5 slice=15 live=8 of 15 live_stacks=[1, 2, 4, 7, 8, 11, 13, 14] square_stacks=[1, 4]
+STACKS depth<10 below=150 0:0 1:2 2:5 3:1 4:4 5:1 6:0 7:5 8:4 9:0 10:0 11:5 12:0 13:4 14:4
+STACKS depth<10 live_mean=4.1 least=2 most=5 spread_share=0.7273 square_mean=3.0 plain_mean=4.5 lag=1.5 primes_below_root=5
+STACKS depth<100 below=1500 0:0 1:27 2:31 3:1 4:28 5:1 6:0 7:30 8:30 9:0 10:0 11:31 12:0 13:30 14:30
+STACKS depth<100 live_mean=29.6 least=27 most=31 spread_share=0.1350 square_mean=27.5 plain_mean=30.3 lag=2.8 primes_below_root=12
+STACKS depth<1000 below=15000 0:0 1:210 2:223 3:1 4:212 5:1 6:0 7:222 8:221 9:0 10:0 11:220 12:0 13:221 14:223
+STACKS depth<1000 live_mean=219.0 least=210 most=223 spread_share=0.0594 square_mean=211.0 plain_mean=221.7 lag=10.7 primes_below_root=30
+STACKS depth<10000 below=150000 0:0 1:1717 2:1725 3:1 4:1717 5:1 6:0 7:1741 8:1736 9:0 10:0 11:1745 12:0 13:1731 14:1734
+STACKS depth<10000 live_mean=1730.8 least=1717 most=1745 spread_share=0.0162 square_mean=1717.0 plain_mean=1735.3 lag=18.3 primes_below_root=76
+STACKS depth<100000 below=1500000 0:0 1:14219 2:14291 3:1 4:14228 5:1 6:0 7:14308 8:14291 9:0 10:0 11:14279 12:0 13:14256 14:14281
+STACKS depth<100000 live_mean=14269.1 least=14219 most=14308 spread_share=0.0062 square_mean=14223.5 plain_mean=14284.3 lag=60.8 primes_below_root=200
+STACKS depth<1000000 below=15000000 0:0 1:121170 2:121340 3:1 4:121204 5:1 6:0 7:121414 8:121389 9:0 10:0 11:121404 12:0 13:121411 14:121370
+STACKS depth<1000000 live_mean=121337.8 least=121170 most=121414 spread_share=0.0020 square_mean=121187.0 plain_mean=121388.0 lag=201.0 primes_below_root=536
+READING rings (3,5): stack 11 gcd_with_slice=1 primes=121404 first=[11, 41, 71, 101, 131]
+READING rings (5,3): stack 7 gcd_with_slice=1 primes=121414 first=[7, 37, 67, 97, 127, 157]
+READING raster 3 wide: stack 5 gcd_with_slice=5 primes=1 first=[5]
+READING raster 5 wide: stack 7 gcd_with_slice=1 primes=121414 first=[7, 37, 67, 97, 127, 157]
+WHEEL through=2 slice=2 live_share=0.5000 mertens=0.8100
+WHEEL through=3 slice=6 live_share=0.3333 mertens=0.5111
+WHEEL through=5 slice=30 live_share=0.2667 mertens=0.3489
+WHEEL through=7 slice=210 live_share=0.2286 mertens=0.2885
+WHEEL through=11 slice=2310 live_share=0.2078 mertens=0.2341
+WHEEL through=13 slice=30030 live_share=0.1918 mertens=0.2189
+WHEEL through=17 slice=510510 live_share=0.1805 mertens=0.1982
+WHEEL through=19 slice=9699690 live_share=0.1710 mertens=0.1907
+WHEEL through=23 slice=223092870 live_share=0.1636 mertens=0.1791
+CONE c=41 k<20000 primes=7620 at_random=1143 ratio=6.67
+CONE c=17 k<20000 primes=4774 at_random=1144 ratio=4.17
+CONE c=11 k<20000 primes=3773 at_random=1144 ratio=3.30
+CONE c=5 k<20000 primes=2177 at_random=1144 ratio=1.90
+CONE c=3 k<20000 primes=1148 at_random=1144 ratio=1.00
+CONE c=2 k<20000 primes=1 at_random=1144 ratio=0.00
+CONE c=1 k<20000 primes=2580 at_random=1145 ratio=2.25
+CONE c=7 k<20000 primes=2603 at_random=1144 ratio=2.28
+CONE c=13 k<20000 primes=1624 at_random=1144 ratio=1.42
+CONE c=19 k<20000 primes=2076 at_random=1144 ratio=1.82
+CONE c=23 k<20000 primes=2451 at_random=1143 ratio=2.14

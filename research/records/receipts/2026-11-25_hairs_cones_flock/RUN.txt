@@ -1,0 +1,23 @@
+The lens of hairs, cones and the flock: what was run (November 25, 2026, 19:55 to 20:15 UTC, a cloud container, no card).
+
+No forward was run for this record. The first two rulers read the codes that the cut's ruler printed that evening
+(../2026-11-25_what_crosses_a_cut/RUN.txt: W117's lap mean, 100 held rows of 449 places, cut at 256, three reads OUT_X, OUT_Y,
+OUT_Z of the same rows) and, for the second, the rows file those reads read. The codes a place and the rows stay in the thread's
+scratch and are not committed; what is committed prints sums over places and no row's text.
+
+    python3 -I far_gain_concentration.py 256 OUT_X OUT_Y OUT_Z > conc.txt          (under 10 s)
+    python3 -I repeat_at_dear.py 256 ROWS OUT_X OUT_Y OUT_Z > repeat.txt           (under 10 s)
+    python3 stack_lattice.py 3 5 1000000 > lattice.txt                             (about 25 s; a sieve to 15,000,000 and to 400,020,200)
+    python3 eight_pi.py > eight_pi.txt                                             (under 2 s)
+
+Order. conc.txt was read first; G-W1 was then fixed (GUESS.txt, its stamp from `date -u`); repeat_at_dear.py was written and its
+first run refused the rows before any count (it counted characters where a place is an octet); the second run is the read. The
+REPEAT_FOUR, REPEAT_GROUP and REPEAT_SET lines were added after G-W1 was scored and are unguessed.
+
+Controls. far_gain_concentration.py: three planted prices (even, exponential, one place in fifty) return their own shares
+(CONC_PLANT). repeat_at_dear.py: a planted price that is one at the far-only repeats of a run of four reads every dear place as
+one (REPEAT_PLANT); a row whose count of places differs from its count of octets is refused. The reads are forwards of one saved
+state and repeat to the bit, so no spread over draws is given; the spread is over places and over the five groups.
+
+Lean. bash tools/lean_check.sh HolonicsResearch.Mathematics.ResidueStacks HolonicsResearch: 10,679 jobs, exit 0 (about 2 minutes
+with the library's cache).

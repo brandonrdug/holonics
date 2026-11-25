@@ -1,0 +1,12 @@
+EIGHT_PI 25.132741229
+SPHERE two_pi_chi=12.566370614 share_of_eight_pi=1/2 twelve_corners_of_pi_over_3=12.566370614
+POINT d=3 lap_r_times_r=2 flux_of_grad_lap_r=-25.132741229 ratio_to_eight_pi=-1.000000
+POINT lap_r_at_1.7=1.176471 two_over_r=1.176471
+PLANE d=2 mass_where_spreading_stops=25.132741229 ratio_to_eight_pi=1.000000
+PLANE bubble_area=25.132741 ratio_to_eight_pi=1.000000 its_curvature=1/2 curvature_times_area=12.566371 (4 pi = 12.566371)
+PLANE minus_lap_u_at_0.9=2.441928 exp_u=2.441928
+HORIZON kappa_times_M=1/4 period_over_M=2 pi / kappa=25.132741229 ratio_to_eight_pi=1.000000
+EINSTEIN D=4 coupling_over_4_pi=2 directions_across_a_ray=2 states_of_light=2 states_of_gravity=2
+EINSTEIN D=5 coupling_over_4_pi=3/2 directions_across_a_ray=3 states_of_light=3 states_of_gravity=5
+EINSTEIN D=6 coupling_over_4_pi=4/3 directions_across_a_ray=4 states_of_light=4 states_of_gravity=9
+EINSTEIN D=11 coupling_over_4_pi=9/8 directions_across_a_ray=9 states_of_light=9 states_of_gravity=44
