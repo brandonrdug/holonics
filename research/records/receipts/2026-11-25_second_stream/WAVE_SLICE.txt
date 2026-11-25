@@ -1,0 +1,57 @@
+The wave slice as written on the PC, 2026-11-25T17:59:58Z: .local/corpus/wave-2026-11-25 (untracked).
+Command: python3 -I tools/wave_passage.py write OUT LISTING wave 36000 128 16
+
+WAVE_CHART clock_hz=16000 levels=13 cuts=-2337 -1107 -524 -214 -68 -11 10 63 207 508 1067 2242
+WAVE_MASS least=43916297 most=44636335 of=576099441
+role	slice	share	line_floor	documents	pieces	text_octets	store_octets	sha256
+train	wave	0	0	2860	2860	576099441	576099441	6ddb89e89a3d13e2ef87e117b931d90d39f1cb8c98aec45d61f1ff5b561ded96
+prefix	wave	0	0	2860	2860	576099441	576099441	6ddb89e89a3d13e2ef87e117b931d90d39f1cb8c98aec45d61f1ff5b561ded96
+held	wave	0	0	128	128	26211998	26211998	ac312e4ebca8808e99d5f6618660a8a592eeb6b125281df8a75514a3bfd240be
+
+BOUNDARY_wave.tsv
+clock_hz	16000
+sample_bits	16
+levels	13
+octets	C0,C1,F5,F6,F7,F8,F9,FA,FB,FC,FD,FE,FF
+held_one_group_in	16
+level_entropy_micronats	2564941
+train_documents	2860
+train_samples	576099441
+train_samples_sha256	7f5367822e5c5ba2109f7e19da1a518ef649c7dbd7025d721d2a5726ce75e3da
+held_documents	128
+held_samples	26211998
+held_samples_sha256	cc0da8b501961251040410debfef8cdb0fea2fbf58ce09cb16a3878b686897ea
+remainder	0
+
+CHART_wave.tsv
+level	octet	low	high	count
+0	192	-32768	-2337	44334014
+1	193	-2337	-1107	44309161
+2	245	-1107	-524	44306246
+3	246	-524	-214	44495932
+4	247	-214	-68	44292293
+5	248	-68	-11	44636335
+6	249	-11	10	44542755
+7	250	10	63	43916297
+8	251	63	207	44077770
+9	252	207	508	44243439
+10	253	508	1067	44340550
+11	254	1067	2242	44296429
+12	255	2242	32768	44308220
+
+Files (sha256):
+b723513d4c0550943a837d51d1184add9f0208851fc73375e4ae7153cdc0827f  BOUNDARY_wave.tsv
+c3bb7f4f14e0365c09047639df6dd99a86b5fade44144813c52b0e28501ac208  CHART_wave.tsv
+6ddb89e89a3d13e2ef87e117b931d90d39f1cb8c98aec45d61f1ff5b561ded96  DOCS_wave.bin      576,099,441 octets, one a sample
+c3cd5ecc4e3f7766f0f7fe0f0dc5c48d309f9a011c24e0dabc8a6aa0a104f93d  DOCS_wave.tsv
+c38e6fa9abad6e4cb24d8eaffb9190d94f0c6cb0fef645b00e6adf7f4c3034e2  HELD_IDS_wave.txt
+ac312e4ebca8808e99d5f6618660a8a592eeb6b125281df8a75514a3bfd240be  HELD_wave.bin       26,211,998 octets
+a234e52d6fc2727a7b2d807e96112eaa255e09ba08720da5d1b311c4eb46b6e3  HELD_wave.tsv
+3e7e06a29e4752c237ff4bb02649679d322c2a7e8464157ebad1c38cf032921e  IDS_wave.txt
+
+What it holds: 36,006 s of one specimen of a sampled propagation (recorded speech, LibriSpeech train-clean-100, public, CC BY 4.0),
+2,860 utterances of 237 voices read in the order of their id's SHA-256; held, 128 utterances (1,638 s) of the 14 voices the keyed
+draw holds (1246, 26, 3664, 4018, 4051, 4160, 6000, 7367, 7635, 78, 7800, 8098, 8838, 89), none of which trains. Each level holds
+0.0762 to 0.0775 of the samples (a thirteenth is 0.0769); the levels' entropy is 2.564941 nats of ln 13 = 2.564949.
+Against the line's store of that day (15,053 MB over ten slices) the slice's 576 MB is 0.0369 of a pass: about 5.8 million samples,
+six minutes of the wave, in a lap of 3,000 sections.

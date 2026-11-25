@@ -184,6 +184,8 @@ is a clock of about twelve letters a second: the lens's example is in the specim
 - **Reach is.** A region reaches 3,771 places: 0.236 s of the wave, the sound of under three letters. An utterance lasts 12.7 s in
   the mean and stands 54 regions from its transcript's 151 letters, and no current passes a region's end (atlas
   `aeon.context-is-a-calendar`, its conditions). A passage that pairs them hands her two streams that never meet in one region.
+  *Corrected the same day (§10):* 3,771 is the most a region may span. The pass draws regions of 8 to 1,022 places, so a
+  wave's region is 64 ms at the longest and an utterance is over a thousand regions. The reading stands, more strongly.
 - **This shape has been read once.** On October 25 one listener heard word problems, pen strokes of digits and half-cycles of
   speech as sections of one passage
   ([the record](2026-10-25_ONE_LISTENER_HEARS_GSM8K_MNIST_AND_SPEECH_AS_SECTIONS_OF_ONE_PASSAGE.md)): after four passes each
@@ -236,4 +238,72 @@ hold its two cycles together. Nothing here waits on a check; the guesses are fix
 [`receipts/2026-11-25_second_stream/`](receipts/2026-11-25_second_stream/): `ring_lag_ruler.py`, `RING_LAG.out` and `RUN.txt` (the
 ruler, its output and its run, with the hashes that equal the PC's), `GUESS.txt` (G-M1, G-M2). The review's figures are read from
 the lead's logs on the PC (`widths/w1NN.out`: the `TERRAIN_WIDE`, `W97_THEORY` and `FRONTIER` lines of each lap) and from
-[`receipts/2026-11-24_fade/`](receipts/2026-11-24_fade/). The ruler took five seconds of the PC's host and no card.
+[`receipts/2026-11-24_fade/`](receipts/2026-11-24_fade/). The ruler took five seconds of the PC's host and no card. Section 10's are
+beside them: `levels_ruler.py` and `LEVELS.out`, `held_count_ruler.py` and `HELD_COUNT.out`, and `WAVE_SLICE.txt` (the slice's own
+lines, chart, boundary statement and hashes).
+
+## 10. The boundary as built, the same day
+
+The lead took the arm of weight 3 for the lap after the second fade's, once a boundary and a slice stood. Both stand:
+[`tools/wave_passage.py`](../../tools/wave_passage.py) with its controls (`tools/test_wave_passage.py`, in gate 1), and a slice on
+the PC cut by it. Nothing of the engine changed.
+
+**What the pass draws, read before the chart.** The store's cut (atlas `tower.store-stretch-cut`) draws a stretch's context and its
+run each from seven octaves above four places, so a region is 8 to 1,022 places, 217 in the mean of a full stretch and 109 at the
+writer's frontier, and the mean site stands in a region of 288. At the recorder's clock that is 64 ms of a wave at the longest and
+18 ms at the mean site: one to four turns of a voice's pitch. A site hears the place 81 back inside its own region at 0.57 to 0.68
+of sites (frontier and full stretches), 128 back at 0.42 to 0.55, 243 at 0.19 to 0.31, 256 at 0.17 to 0.28, 729 at under 0.01. §7
+counted a region at the reach's bound, which no stretch draws; its reading holds more strongly, and G-M1 (a) keeps its four rings.
+
+**The chart.** One symbol a sample at the source's own clock: the sample's rank among levels of equal mass, the cuts located on the
+training samples by whole counts (`c_j` the least value with `K·#{x < v} ≥ j·N`). What the chart holds back is `x − low_r`, and
+chart and remainder return the sample. Three choices, each with its reason:
+
+- **Thirteen levels, on the thirteen octets no UTF-8 text holds** (C0, C1, F5 to FF). The line's codec holds every other octet
+  and the void (243 + 1 = 244, read from its file on the PC), so these are the octets a store's bytes can carry without one level
+  sharing a class with a letter. A learner then grows by them as it did at the store's crossing (`Codec::extended`,
+  `Constitution::lettered`: a fresh class's rows open at zero, its pace at the founding's), and the engine takes no chart of its
+  own for one slice. The width is a partition's count, read beside others by a ruler (`LEVELS.out`, the 48 utterances of §5):
+
+  | levels | entropy | 1 back | 16 | 128 | 256 | 1,024 | both neighbours known |
+  |---:|---:|---:|---:|---:|---:|---:|---:|
+  | 3 | 1.099 | 0.590 | 0.203 | 0.161 | 0.151 | 0.068 | 0.341 |
+  | 9 | 2.197 | 1.142 | 0.398 | 0.341 | 0.298 | 0.147 | 0.692 |
+  | 13 | 2.565 | 1.277 | 0.437 | 0.374 | 0.328 | 0.166 | 0.851 |
+  | 16 | 2.773 | 1.347 | 0.457 | 0.389 | 0.342 | 0.175 | 0.942 |
+
+  (nats a place: what a level tells of the level n back, and in the last column a place's code under a count table of its two
+  neighbours.) Thirteen levels tell 0.95 to 0.96 of what sixteen tell, nine 0.85 to 0.88, three 0.41 to 0.44.
+- **One register a sample.** The value-word design of November 12 (atlas `compression.value-word-rank-registers`) sends a value as
+  several rank digits whose radix a ruler on a paired port fixes. This chart sends the first register alone and keeps the rest as
+  the remainder: a second digit a sample would halve what a region spans, and the arm is unpaired, so no port stands to fix a
+  radix by. A level's atom wider than a level (a raster's empty ground) is refused by the tool and named; that case is the
+  value-word's and is not built.
+- **The recorder's clock.** At 8 and 4 kHz the same ruler reads less a place back and no more a ring back (at thirteen levels 1.064
+  and 0.903 one back against 1.277; 0.346 and 0.285 at 128 against 0.374), and a resampler is an authored ear in front of hers.
+  The clock is the boundary's statement (`clock_hz`), and nothing in the tool reads it but to refuse a source drawn at another.
+
+**The held cut is by whose hand.** A group (a voice) is held where a keyed draw on its name falls, one in sixteen; its documents
+never train and the chart is located without them. Reason: a held utterance of a voice that trains would be seen material graded
+as unseen.
+
+**The slice** (`WAVE_SLICE.txt`): 36,006 s, 2,860 utterances of 237 voices, 576,099,441 samples; held, 128 utterances of 14 other
+voices, 26,211,998 samples. Each level holds 0.0762 to 0.0775 of the samples. Written with its remainder, both roles came back
+sample for sample. Against the line's store of that day it is 0.037 of a pass: about 5.8 million samples, six minutes of the wave,
+in a lap of 3,000 sections.
+
+**A yardstick for the held read** (`HELD_COUNT.out`; count tables on 79 million training places, read on the held cut, nats a
+sample): nothing known 2.566, one back 1.435, two back 1.266, both neighbours 0.980, two each side 0.816. A voice that never trained
+costs 0.13 to 0.15 more than the same tables read where they were counted. G-M1 (b) is restated against these before any arm
+(`GUESS.txt`): 1.13 nats or less at thirteen levels, the margin it was fixed at under one mate back.
+
+**What the arm asks of the engine** (the lead's to build): the store's list of slices gains the name; a state joined to the grown
+store takes the crossing's growth for the fresh octets (its codec extended, its field lettered by thirteen, with whatever the
+parts added since the crossing hold a class at: the fade rates of November 25 among them); the held read lists the slice; and one
+reading is new, the fade's covector summed slice by slice at a saved state, which is G-M1 (a)'s read.
+
+**Failures this could repeat.** A table of merges at the input (the symbol rule): none is made, a level is one octet and a class.
+Free rows a class: the fresh classes take them as every letter does today, and the levels are an ordered residue the symbol's
+word can read when it is built (their octets ascend with the level). A width tuned to a reading: thirteen is the count of free
+octets, and the ruler was read after it. A seen voice graded as unseen: the keyed draw. A stream as the exception: the tool reads
+a listing of sources and a clock and names no kind of source.
