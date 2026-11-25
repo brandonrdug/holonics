@@ -395,6 +395,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("found-fade") => athena::store::found_fade(args),
         Some("found-fade-rate") => athena::store::found_fade_rate(args),
         Some("found-twin") => athena::store::found_twin(args),
+        Some("drop-fades") => athena::store::drop_fades(args),
         Some("grow-crossings") => athena::store::grow_crossings(args),
         Some("zero-triad-return") => athena::store::zero_triad_return(args),
         Some("found-crossing") => athena::store::found_crossing(args),

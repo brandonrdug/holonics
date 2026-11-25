@@ -1332,6 +1332,31 @@ pub fn found_twin(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [the lead, November 25 (the fade record §14)] `drop-fades STATE STATE_SHA OUT`: the line's state without its rings' fades, fade rates
+/// and second fades (`Learner::without_fades`), every other line kept, so every ring's skin stands at the skin's constant.
+pub fn drop_fades(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("drop-fades STATE STATE_SHA OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a state's path that exists".into());
+    }
+    let bare = end.without_fades().map_err(|e| e.to_string())?;
+    let written = bare.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("DROP_FADES entries={} from={} lattice={}", bare.field.material_len(), end.field.material_len(), bare.lattice.is_some());
+    Ok(())
+}
+
 pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());

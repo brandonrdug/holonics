@@ -4472,6 +4472,46 @@ fn a_growth_by_letters_carries_the_fade_rates_the_second_fades_and_the_lattice()
     assert_eq!(Learner::from_text(&grown.to_text()).unwrap().to_text(), grown.to_text(), "the learner's text round-trips");
 }
 
+/// [definition; the lead, November 25 (the fade record §14)] **A field without its fades is its source before they were founded**: the
+/// fades, fade rates and second fades founded and then drawn off zero, taken out, leave the field they were founded on entry for entry
+/// with its faces, and a learner on a lattice keeps every kept entry's moments, rest and spread.
+#[test]
+fn a_field_without_its_fades_is_its_source_before_they_were_founded() {
+    let one = 1i32 << MATERIAL_BITS;
+    let plain = shaped(1);
+    let (faded, _) = plain.with_fade(2, -one / 2).unwrap();
+    let (rated, _) = faded.with_fade_rate().unwrap();
+    let (mut twinned, _) = rated.with_twin(-(51 * one) / 16).unwrap();
+    let l = twinned.layout.clone();
+    let paced = twinned.declaration.paced_heads() * (twinned.declaration.alphabet + 1);
+    for (k, v) in twinned.theta[l.fade_rate..l.fade_rate + paced].iter_mut().enumerate() {
+        *v = [-one / 4, one / 8, -3 * one / 8][k % 3];
+    }
+    twinned.refresh_fade().unwrap();
+    let (bare, from) = twinned.without_fades().unwrap();
+    assert_eq!(bare.theta, plain.theta, "every kept entry its source's");
+    assert_eq!(bare.declaration, plain.declaration, "the declaration without the fades");
+    assert!(from.iter().enumerate().all(|(i, &o)| o == Some(i)), "each kept entry at its place");
+    let r = region();
+    assert_eq!(bare.faces(&r).unwrap(), plain.faces(&r).unwrap(), "the faces of the field before the fades");
+    assert!(plain.without_fades().is_err(), "refused where the rings hold no fade");
+    let mut learner = Learner::new(twinned.clone(), 6);
+    learner.section(&[r.clone()]).unwrap();
+    learner.held = None;
+    let mean = learner.clone();
+    learner.section(&[r]).unwrap();
+    learner.held = None;
+    let learner = learner.with_lattice_from(&mean).unwrap();
+    let out = learner.without_fades().unwrap();
+    let n = out.field.material_len();
+    assert_eq!((&out.first[..], &out.second[..]), (&learner.first[..n], &learner.second[..n]), "every kept entry's moments");
+    let (ol, ll) = (out.lattice.as_ref().unwrap(), learner.lattice.as_ref().unwrap());
+    assert_eq!(&ol.rest[..], &ll.rest[..n], "every kept entry's rest");
+    assert_eq!(ol.spread.len(), out.field.families_all().len());
+    assert_eq!(&ol.spread[..], &ll.spread[..ol.spread.len()], "every kept family's spread");
+    assert_eq!(Learner::from_text(&out.to_text()).unwrap().to_text(), out.to_text(), "the learner's text round-trips");
+}
+
 /// [definition; theory, November 12 (the record of the opening's room, §4 item 5)] **The pass's place is the learner's last line, written only
 /// where present**: a learner with no pass writes no pass line and reads back as it was; with one, its text is the text without it and the pass
 /// line after, and it reads back with it; a malformed pass line is refused.
