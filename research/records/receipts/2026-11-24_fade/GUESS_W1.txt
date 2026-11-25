@@ -12,3 +12,13 @@ G-W1 (at the lap means, one place open on the collection's held set):
   (b) (0.45) wikidata and books each at least 0.008 under W114;
   (c) (0.65) no region more than 0.005 over W114.
 Rule: (a) and (c) held, the line takes the walk; otherwise it does not.
+
+Scored 2026-11-25T10:26:40Z (date -u), the lead, from frontier_ruler.py on out4_W114 and out4_W114w (the collection's held set, one place open, lap
+means, 200,933 places). W114w less W114, paired: all -0.0038 (0.0008); acts -0.0239, books +0.0057, code -0.0003, dialogue -0.0109,
+harness -0.0073, logic -0.0109, science +0.0045, theory -0.0067, web +0.0015, wikidata +0.0103. Theory panel words in the register's
+lexicon 93% against 78%.
+  (a) held: -0.0038 over all places.
+  (b) missed: wikidata +0.0103 and books +0.0057, where 0.008 under each was guessed.
+  (c) missed: wikidata and books over +0.005.
+By the rule the line does not take the walk. The slices whose documents are long (books, wikidata's entities) code their held
+stretches dearer when the walk leaves a document for another rather than reading its next stretch.
