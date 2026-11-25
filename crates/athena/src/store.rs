@@ -30,8 +30,9 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 // [the lead, November 22] `theory` and `logic`: the repository's own guides and records, and its Lean (`tools/holonics_passage.py`).
 // [the lead, November 23] `dialogue` and `acts`: the private conversation history, its turns and its tool calls with their results
 // (`tools/history_passage.py`; Brandon, November 23 01:37Z), joined once a mix held its pull (G-T4); [November 24] `harness`, its
-// system-side text, the curated collection in full (Brandon, 05:44Z).
-const SLICES: [&str; 12] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts", "harness"];
+// system-side text, the curated collection in full (Brandon, 05:44Z). [November 25] `wave`, a sampled propagation at its boundary chart's
+// thirteen levels on the octets no UTF-8 text holds (`tools/wave_passage.py`; G-M1), joined with its letters ([`join_store`]).
+const SLICES: [&str; 13] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts", "harness", "wave"];
 /// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
 /// `?` between two line feeds.
 const REACTION_BOUND: u64 = 41;
@@ -1773,9 +1774,15 @@ pub fn next_pass(args: &[String]) -> Result<()> {
 /// or, set to their share, is drawn alone once theirs end: on November 16 the line stood at 0.609 of its pass, and either join would have run
 /// some five laps on the joined slices alone. Joined at a new pass, every slice is drawn at its quota from the first section, and the pass ends
 /// for all of them together. What the old slices had left of their pass is read on the next one, the same law over the same passage.
+/// [the lead, November 25, the wave slice] `join-store STATE STATE_SHA STORE STORE_SHA OUT UNITS UNITS_SHA CODEC CODEC_SHA CODEC_OUT`: the
+/// same join, with the letters the grown store holds and the codec lacks grown as the crossing grows them: every octet some slice of the
+/// store holds and the codec does not takes a class after the last (`Codec::extended`, written to `CODEC_OUT`), and the state takes as many
+/// letters (`Learner::lettered`: each fresh class's rows and rates at zero, its bias at the least standing one, every standing entry and the
+/// lattice, grains and remainders kept), so the joined state reads every standing class as it stood and differs from its source by the
+/// letters and the pass alone.
 pub fn join_store(args: &[String]) -> Result<()> {
-    if args.len() != 6 {
-        return Err("join-store STATE STATE_SHA STORE STORE_SHA OUT".into());
+    if args.len() != 6 && args.len() != 11 {
+        return Err("join-store STATE STATE_SHA STORE STORE_SHA OUT [UNITS UNITS_SHA CODEC CODEC_SHA CODEC_OUT]".into());
     }
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let store = Path::new(&args[3]);
@@ -1784,7 +1791,29 @@ pub fn join_store(args: &[String]) -> Result<()> {
     if out.exists() {
         return Err(format!("{} exists", out.display()).into());
     }
-    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let mut learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    // The letters the grown store holds and the codec lacks, grown as the crossing grows them.
+    let mut grown_text: Option<String> = None;
+    if args.len() == 11 {
+        let units = units_of(&args[6], &args[7])?;
+        let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[8], &args[9], READ_BUDGET as usize)?)?, units)?;
+        let codec_out = Path::new(&args[10]);
+        if codec_out.exists() {
+            return Err(format!("{} exists", codec_out.display()).into());
+        }
+        if learner.field.declaration.alphabet != codec.alphabet() {
+            return Err("a state whose alphabet is not its codec's".into());
+        }
+        let bytes = bytes_held(store)?;
+        let standing: Vec<bool> = (0..256usize).map(|b| codec.encode(&[b as u8]).is_ok()).collect();
+        let fresh: Vec<u32> = (0..256u32).filter(|&b| bytes[b as usize] && !standing[b as usize]).collect();
+        let grown = codec.extended(&fresh)?;
+        learner = learner.lettered(fresh.len()).map_err(|e| e.to_string())?;
+        println!("JOIN_LETTERS fresh={} octets={} alphabet={} void={} material={}", fresh.len(), fresh.iter().map(|b| format!("{b:02X}")).collect::<Vec<_>>().join(","), grown.alphabet(), grown.void(), learner.field.material_len());
+        std::fs::write(codec_out, grown.to_text())?;
+        grown_text = Some(learner.to_text());
+    }
+    let text = grown_text.unwrap_or(text);
     let before = learner.pass.clone().ok_or("a state with no pass line")?;
     let names = role_names(&counts, &before.role);
     let held: Vec<&str> = before.slices.iter().map(|s| s.name.as_str()).collect();
