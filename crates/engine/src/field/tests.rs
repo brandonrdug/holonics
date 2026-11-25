@@ -7599,3 +7599,54 @@ fn the_rings_fades_founded_at_zero_keep_every_face_and_their_return_matches_thei
     assert!(read >= 12 && 8 * seams <= read.max(1), "read {read} probes, {seams} on a seam");
 }
 
+
+/// [measurement; theory, November 25, what a region hands the next] **A ruler's cut of a passage read by two streams**
+/// ([`Constitution::ruler_cut`]). Whatever the mask lets across, every place before the cut reads as under the law, bit for bit (a
+/// place of a one-sided stream reads nothing at or past it), unless the mask leaves those places untended. With nothing let across, the
+/// place at the cut reads the first face of the region that begins there, bit for bit, and every place past it reads that region's face
+/// up to the rounding of its frame (the passage's frames turn on the passage's clock, the region's on its own, and a face reads their
+/// differences alone); and it reads the same bits whether the places before the cut are tended or not. With the five stores and the
+/// law's open row let across, every place reads as under the law, bit for bit. And each thing the mask names moves some face past the
+/// cut where the field holds it.
+#[test]
+fn a_rulers_cut_reads_the_region_from_the_cut_alone_and_leaves_the_places_before_it() {
+    let codes = |field: &Constitution, classes: &[usize]| -> Vec<i64> { field.strand_codes(classes, true).unwrap() };
+    let stores = CUT_MOMENTS | CUT_CIRCLES | CUT_NEAR | CUT_CROWDS | CUT_LEVEL;
+    let mut farthest = 0i64;
+    for (name, field, sites, c) in [("circles, one still head", circled_shaped(1), 14usize, 6usize), ("circles, turned heads", circled_shaped(0), 14, 5), ("plain contacts", shaped(1), 12, 4), ("a strand's level", towered_before_live(1), 13, 5)] {
+        let classes = drawn_classes(0xC7, sites, field.declaration.alphabet);
+        let law = field.strand_pass(&classes, false, true).unwrap().faces;
+        let rest = field.strand_pass(&classes[c..], false, true).unwrap().faces;
+        let rest_codes = codes(&field, &classes[c..]);
+        let cut = |mask: u16| -> Constitution {
+            let mut f = field.clone();
+            f.ruler_cut = Some((c, mask));
+            f
+        };
+        for mask in 0..CUT_UNTENDED {
+            let faces = cut(mask).strand_pass(&classes, false, true).unwrap().faces;
+            assert_eq!(faces[..c], law[..c], "{name}: mask {mask}, the places before the cut");
+        }
+        assert_eq!(cut(stores | CUT_SHARP).strand_pass(&classes, false, true).unwrap().faces, law, "{name}: the five stores and the open row let across are the law");
+        let alone = cut(0);
+        let faces = alone.strand_pass(&classes, false, true).unwrap().faces;
+        assert_eq!(faces[c], rest[0], "{name}: the place at the cut is the region's first");
+        let alone_codes = codes(&alone, &classes);
+        for (t, (&a, &b)) in alone_codes[c..].iter().zip(&rest_codes).enumerate() {
+            farthest = farthest.max((a - b).abs());
+            assert!((a - b).abs() <= 1 << 10, "{name}: place {t} past the cut codes {a} against the region's {b} (on 2^-20 bits)");
+        }
+        let law_codes = codes(&field, &classes);
+        assert_ne!(alone_codes[c..], law_codes[c..], "{name}: the cut moves the places past it");
+        assert_eq!(codes(&cut(CUT_UNTENDED), &classes)[c..], alone_codes[c..], "{name}: with nothing let across, what stands before the cut is not read");
+        assert_ne!(codes(&cut(stores | CUT_SHARP | CUT_UNTENDED), &classes)[c..], law_codes[c..], "{name}: sites left at their opening are heard as such");
+        let named = [(CUT_MOMENTS, true), (CUT_CIRCLES, field.declaration.carry > 0), (CUT_NEAR, true), (CUT_CROWDS, true), (CUT_LEVEL, field.scale.is_some()), (CUT_SHARP, true), (CUT_OPEN_CROWDS, true)];
+        for (mask, held) in named {
+            let moved = codes(&cut(mask), &classes)[c..] != alone_codes[c..];
+            assert_eq!(moved, held, "{name}: mask {mask} let across");
+        }
+        assert!(cut(0).strand_pass(&classes, true, true).is_err(), "{name}: a cut read for a return is refused");
+        assert!(Constitution { ruler_cut: Some((sites - 1, 0)), ..field.clone() }.strand_codes(&classes, true).is_err(), "{name}: a cut that leaves one place is refused");
+    }
+    eprintln!("RULER_CUT farthest_code_from_the_regions_on_2^-20_bits={farthest}");
+}

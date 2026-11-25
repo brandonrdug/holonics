@@ -1,0 +1,39 @@
+Guesses on the cut ruler's read, fixed at 2026-11-25T18:40:47Z (date -u), before the ruler's first run.
+
+The read: athena host complete-language read-reach on W117's lap mean (MEAN.3000), the lead's far rows of 448 known
+places (code, web, science, books, wikidata), each row read by two streams with its odd contacts facing the past,
+cut at place 256. Every figure is a mean over the places past the cut (257 to 448 of each row), in nats a place.
+G is the gap: the code under cut:256:0 (the region from the cut read alone) less the code under the law (the whole
+passage). What was read before fixing: her own frontier rows of the lap (front/out4_W117/frontier.tsv), whose
+codes by places known put a stretch's cost over its level at 256 to 511 known at 0.149 nats a place over all ten
+slices, and the code read in contact.rs and moment.rs.
+
+G-X0  the control: cut:256:0 equals from:256 (the row's places from 256 read as their own passage) within
+      0.001 nats a place at every place. Weight 0.85. (A larger difference is a defect of the ruler, repaired
+      before any other line is read.)
+G-X1  G stands between 0.12 and 0.22 (point 0.17). Weight 0.7.
+G-X2  the rings' moments and the opening's rows alone (mask 1) close between 0.008 and 0.035 of it (point 0.020,
+      an eighth of G). Weight 0.6.
+G-X3  the carry circles' charge alone (mask 2) closes under 0.010 (point 0.005). Weight 0.6.
+G-X4  the near field and the strand mates alone (mask 4) close between 0.010 and 0.030 (point 0.018), nearly all
+      of it in the first five places past the cut. Weight 0.6.
+G-X5  the far field before the cut as octave crowds alone (mask 8) closes between 0.03 and 0.09 (point 0.06, a
+      third of G). Weight 0.5.
+G-X6  all four together (mask 15) close between 0.4 and 0.7 of G (point 0.55): the rest is what only a source
+      heard sharply gives. Weight 0.5.
+
+What each outcome moves. G-X2 high (over 0.035): the first-order hand-off (ring moments carried across a cut by
+the October machine's leaky recurrence) is the build, and it keeps regions commuting. G-X5 high with G-X6 over
+0.7: an octave pyramid of block sums crosses a cut and no region needs to be longer. G-X6 under 0.4: what a place
+takes from before a cut is sharp, and the cheaper routes are longer regions or consecutive stretches of one
+stream, not a carried store.
+
+Amended 2026-11-25T18:43:11Z (date -u). The ruler's first run (eight rows of books) refused at its first cut setting: W117's strand
+hears a level (the tower carries its block of the epoch before), a fifth store that crosses a cut, which the ruler did not
+part. It now does (mask 16: the level's epochs before the cut; without it the places past the cut hear the level of the
+region that begins there). Seen before this amendment: that run's two REACH lines, law 1.577 nats over the eight rows'
+448 places and from:256 0.716 over the same count with 256 places coded zero (about 1.66 a place past the cut with the
+place at the cut in it). No cut setting had been read. G-X0 to G-X5 stand as fixed, each mask alone as before.
+
+G-X7  the level's epochs before the cut alone (mask 16) close between 0.010 and 0.040 (point 0.020). Weight 0.5.
+G-X6  restated on the five stores (mask 31): together they close between 0.45 and 0.75 of G (point 0.6). Weight 0.5.
