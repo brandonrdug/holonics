@@ -1144,7 +1144,8 @@ const MATERIAL_BITS_: u32 = holonics_engine::field::MATERIAL_BITS;
 /// receivers of kind `kind` (one a listener) scoring a source `milli` thousandths of a bit lower an octave of its distance
 /// ([`holonics_engine::field::Constitution::ruler_friction`]). `OUT/codes.tsv` takes a line a place (`row`, `group`, `place`, then each
 /// setting's code on `2^(−20)` bits); one `REACH` line a setting and group gives the code in millionths of a nat a place. A ruler's forward:
-/// the state is read, never written.
+/// the state is read, never written. `cut:C:MASK` reads every place from `C` on as the region that begins there, but for the stores `MASK`
+/// lets across the cut, and `from:C` the places from `C` on as a passage of their own (what a region hands the next, November 25).
 pub fn read_reach(args: &[String]) -> Result<()> {
     if args.len() < 13 {
         return Err("read-reach UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT SETTINGS…".into());
@@ -1166,7 +1167,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" {
+        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" || word.starts_with("cut:") || word.starts_with("from:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1307,6 +1308,21 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         if name == "skin:places" {
             field.ruler_skin_places = true;
         }
+        // [theory, November 25, what a region hands the next] `cut:C:MASK`: every place from `C` on read as the region that begins at `C`
+        // would read it, but for what `MASK` lets across the cut ([`holonics_engine::field::Constitution::ruler_cut`]: 1 the rings' moments
+        // and the opening's rows, 2 the carry circles' charges, 4 the near field and the strand mates, 8 a definite receiver's octave
+        // crowds, 16 the level's epochs, 32 the sites in a receiver's probed classes, 64 every site to an open place, 128 the octave crowds
+        // to an open place, 256 the sites before the cut held at their opening); a row of fewer than `C + 2` places is read by the law.
+        // `from:C`: the row's places from `C` on read as a passage of their own, the places before it coded zero: the control `cut:C:0`
+        // is held to (`cut:C:95` is the law's bits).
+        let mut from = 0usize;
+        if let Some(cm) = name.strip_prefix("cut:") {
+            let (c, mask) = cm.split_once(':').ok_or("a cut setting that is not cut:C:MASK")?;
+            field.ruler_cut = Some((c.parse()?, mask.parse()?));
+        }
+        if let Some(c) = name.strip_prefix("from:") {
+            from = c.parse()?;
+        }
         if let Some(fm) = name.strip_prefix("fade:") {
             let words: Vec<&str> = fm.split(':').collect();
             let (from, milli, to) = match words[..] {
@@ -1327,7 +1343,17 @@ pub fn read_reach(args: &[String]) -> Result<()> {
                 field.ruler_lane_grain = Some((j.parse()?, h.parse()?, relative));
             }
         }
-        let c: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| field.strand_codes(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        let c: Vec<Vec<i64>> = rows
+            .par_iter()
+            .map(|(_, classes)| {
+                // A row too short for the cut, or for a passage of its own past `from`, is read by the law.
+                let mut field = field.clone();
+                field.ruler_cut = field.ruler_cut.filter(|&(c, _)| c >= 1 && c + 2 <= classes.len());
+                let from = if from + 2 <= classes.len() { from } else { 0 };
+                let codes = field.strand_codes(&classes[from..], true).map_err(|e| e.to_string())?;
+                Ok::<_, String>(std::iter::repeat_n(0, from).chain(codes).collect())
+            })
+            .collect::<std::result::Result<_, _>>()?;
         let mut by: std::collections::BTreeMap<String, (i128, usize)> = std::collections::BTreeMap::new();
         for ((group, _), cs) in rows.iter().zip(&c) {
             for g in [group.split(':').next().unwrap_or("").to_string(), "all".to_string()] {

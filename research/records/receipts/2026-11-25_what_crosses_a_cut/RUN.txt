@@ -1,0 +1,30 @@
+What crosses a cut: the runs, November 25, 2026, 18:48 to 19:36 UTC (date -u), a cloud container, four host threads, no card.
+
+Build: the workspace's `athena` (release) linked against a stand-in for the driver library, as tools/gate_nocard.sh does; the
+reads are `host` reads and launch nothing on a card. Runs 2 and 3 are the tree's ruler as committed; run 1 is the build before
+bit 8 was parted in two (its settings 31 and 8 are labelled `old` in table.txt, and its other settings are the same law).
+
+Inputs, staged from the PC and kept off the tree (the state has read the private collection): the line's units, keys and codec,
+W117's lap mean (MEAN.3000, 107,862,164 octets), and a hundred of the lead's held far rows of 448 known places (twenty each of
+code, web, science, books, wikidata, the first twenty of each group in the file's order).
+
+    athena host complete-language read-reach UNITS sha KEYS sha CODEC sha ROWS sha STATE sha OUT SETTING...
+
+    run 1  law cut:256:0 cut:256:31 cut:256:1 cut:256:8 cut:256:16 cut:256:4 cut:256:2 cut:256:23 cut:256:7 from:256
+           projected 33 min (3 min a setting, from an eight-row read), measured 1,489 s, ratio 0.75
+    run 2  cut:256:63 cut:256:351 cut:256:319 cut:256:31 cut:256:64 cut:256:159 cut:256:191 cut:256:287 cut:256:8 cut:256:128
+           projected 30 min, measured 1,145 s, ratio 0.64
+    run 3  cut:256:19 cut:256:27 cut:256:59
+           projected 9 min, measured 348 s, ratio 0.64
+
+The harness's background limit stood as each run's deadline; no limit was raised. Peak resident set: not read.
+
+    python3 -I cut_table.py OUT1 256 OUT2 OUT3 > table.txt
+
+Controls before the reads (eight rows of books): cut:256:0 against from:256, a mean difference of 0.000038 nats a place and a
+largest of 0.001172; cut:256:95 against the law, 0 of 3,592 places differ; cut:256:256 against cut:256:0, 0 places differ past the
+cut. On the hundred rows: CUT_CONTROL in table.txt (mean 0.000043, largest 0.022964; 49 of 19,300 places over 0.001).
+
+The host test: cargo test -p holonics-engine a_rulers_cut_reads_the_region_from_the_cut_alone (passes;
+RULER_CUT farthest_code_from_the_regions_on_2^-20_bits=30). The gate: tools/gate_nocard.sh, every crate step and tool control
+passing in this container; the PC's gate 1 is the lead's at the next build.
