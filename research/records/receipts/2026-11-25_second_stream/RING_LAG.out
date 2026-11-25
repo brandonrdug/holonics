@@ -1,0 +1,41 @@
+PAIR utterances=28539 seconds=362127 letters=4298426 r=0.8832 gaussian_nats_an_utterance=0.757 letters_a_second=11.865 residual_sd=22.40 mean_letters=150.6 sd_letters=47.8
+PAIR utterances=28539 seconds=362127 words=990101 r=0.8583 gaussian_nats_an_utterance=0.667 words_a_second=2.732 residual_sd=5.79 mean_words=34.7 sd_words=11.3
+PAIR_RATE letters_a_second all mean=11.87 sd=1.79 | speakers=251 between_sd=1.20 within_sd_mean=1.29 | seconds_a_letter=0.0842 an_eleven_letter_word_seconds=0.927
+WAVE utterances=48 speakers=16 samples=9890880 seconds=618.2 cuts=-3620 -1950 -1096 -603 -302 -138 -48 -9 7 45 135 298 620 1223 2483
+STREAM wave_rank16 runs=48 places=9890880 alphabet=16 entropy_nats=2.7725
+STREAM wave_sign runs=48 places=9890880 alphabet=2 entropy_nats=0.6915
+STREAM transcripts runs=585 places=5298357 alphabet=256 entropy_nats=2.8632
+STREAM guides.txt runs=1 places=335662 alphabet=256 entropy_nats=3.4876
+LAG lag ring wave_rank16 wave_sign transcripts guides.txt
+LAG 1 - 1.3468 0.3089 0.5355 0.7935
+LAG 2 ring 1.0452 0.2183 0.1995 0.3915
+LAG 3 ring 0.9132 0.1902 0.0736 0.2580
+LAG 4 ring 0.8089 0.1547 0.0323 0.1873
+LAG 5 - 0.7345 0.1272 0.0128 0.1439
+LAG 6 - 0.6803 0.1086 0.0087 0.1265
+LAG 7 - 0.6370 0.0926 0.0035 0.1129
+LAG 8 - 0.6019 0.0790 0.0022 0.1034
+LAG 9 ring 0.5694 0.0657 0.0011 0.0980
+LAG 12 - 0.4956 0.0321 0.0003 0.0763
+LAG 16 ring 0.4569 0.0147 0.0001 0.0611
+LAG 24 - 0.4152 0.0103 0.0001 0.0443
+LAG 27 ring 0.4088 0.0097 0.0001 0.0388
+LAG 32 ring 0.3985 0.0066 0.0000 0.0322
+LAG 48 - 0.3813 0.0000 0.0000 0.0134
+LAG 64 - 0.3787 0.0001 0.0000 0.0033
+LAG 81 ring 0.3769 0.0007 0.0000 -0.0043
+LAG 96 - 0.3779 0.0010 0.0000 -0.0064
+LAG 128 ring 0.3887 0.0027 0.0000 -0.0123
+LAG 160 - 0.3716 0.0026 0.0000 -0.0147
+LAG 192 - 0.3542 0.0006 0.0000 -0.0163
+LAG 243 ring 0.3387 0.0037 0.0000 -0.0171
+LAG 256 ring 0.3422 0.0049 0.0000 -0.0172
+LAG 384 - 0.3028 0.0003 0.0000 -0.0186
+LAG 512 - 0.2681 0.0025 0.0000 -0.0186
+LAG 729 ring 0.2176 0.0002 0.0000 -0.0174
+LAG 1024 ring 0.1749 0.0008 0.0000 -0.0180
+LAG 1536 - 0.1357 0.0005 0.0000 -0.0186
+LAG 2187 ring 0.1113 0.0004 0.0000 -0.0192
+LAG 3072 - 0.0946 0.0005 0.0000 -0.0191
+LAG 4096 ring 0.0770 0.0005 0.0000 -0.0190
+LAG 6561 ring 0.0565 0.0004 0.0000 -0.0199

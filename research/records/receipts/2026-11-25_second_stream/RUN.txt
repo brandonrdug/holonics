@@ -1,0 +1,16 @@
+The ruler's run (the formal thread, read 2026-11-25T17:26:13Z from the PC's own output; the output's and the program's hashes equal the PC's).
+Where: the PC, in the desktop's Linux VM over the checkout's folder, reads only, no card; python3 -I with numpy 2.2.6, ffmpeg decoding each
+FLAC to its own 16-bit samples at its own 16 kHz. 2026-11-25, 17:20:32 to 17:20:37 UTC by its files' stamps, under a 170 s outer timeout (exit 0).
+Command: python3 -I ring_lag_ruler.py LIBRISPEECH GUIDES > RING_LAG.out
+  LIBRISPEECH: the PC's admitted copy of LibriSpeech train-clean-100 (public, CC BY 4.0; 28,539 utterances, 251 speakers, 585 chapters;
+    archive sha256 d4ddd1d5a6ab303066f14971d768ee43278a5f2a0aa43dc716b0e64ecbbbf6e2), its manifest and its transcripts.
+  GUIDES: docs/THE_MACHINE.md, docs/ELEMENTARY_OBJECTS.md and docs/THE_ENGINE.md of the PC's main checkout, joined in that order
+    (335,662 octets, sha256 0be4944c20b7fbc2f84abdfe5f731a6893cddfae38c4a14af078558cc5acbdf4).
+ring_lag_ruler.py sha256 11b53945d2b6463bc583f25e7ee882612d18b35ae2cc36fed3afcb620f4f16f3
+RING_LAG.out      sha256 796179b812844f59e36df48753f652d22e160709bb2a6dd80922f8bf0cc3cb79
+The wave's runs: the first three utterances of every sixteenth speaker in the manifest's sorted order (48 utterances, 16 speakers,
+9,890,880 samples, 618.2 s). The transcripts' runs: each of the 585 chapters' utterances joined in order, one a line.
+What the ruler is not: it enters no law and is no code of hers. Its lags count places; her rings turn on her own clock (a space
+9.6 and 5.0 letters on W109's mean), so it reads what a terrain holds a ring's period back on the count of places and nothing of what
+she takes. The guides' column is one file of 336 KB at an alphabet of 256: its bias correction over-corrects by about 0.02 nats, so its
+entries past 64 places are zero within that.

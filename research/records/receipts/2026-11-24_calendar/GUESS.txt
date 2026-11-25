@@ -172,3 +172,27 @@ G-T7  read-reach on W110's MEAN.3000, the rows of seeds 26 and 27 at P1 = 7 (96 
       Read: (a) alone held, the hand her face reads is the ring of 16's, half a turn round; (b) alone held, the ring of
       32's, a quarter turn round; neither held and fade:16:-2000 on the same rows still opens it, the opening is several
       rings' together and no one hand; (c) missed, the triadic tower's clock carries it.
+
+Scored at 2026-11-25T17:26:13Z (date -u) on the lead's reads, read at their source (the record of November 24 and 25, her rings' fades as her own
+state, sections 2, 3 and 9; receipts/2026-11-24_fade/gt7_ring_by_ring.txt, found_16_alone.txt, GUESS_F1.txt, GUESS_R1.txt).
+G-T7  (a) held: the dyadic ring of 16 alone at a quarter of the skin's fade opens P1 = 7 by +0.378 (0.063) on seeds 26 and 27.
+      (b) missed: the ring of 32 alone, +0.011 (0.019).
+      (c) held: the triadic ring of 27 alone, +0.026 (0.027).
+      By its read: the hand her face reads is the ring of 16's, half a turn round.
+The arm the lead built in G-H9's place is W113f beside W113 (every turned ring's fade her own state; the ring of 16 founded an
+octave slow by a read, the others at the skin's; G-H9's arm as framed founded none displaced). Scored on it where its founding
+does not stand between the guess and the read:
+G-H9  (b) missed, and the other way: at W113f's STATE.3000 every ring of 32 and longer stands at a faster fade than its founding
+      (2187 +0.311, 4096 +0.388, 6561 +0.397 octave) and none of the rings of 128 and more stands under half of it.
+      (c) not scored: the founding moved one ring off the line's law; W113f less W113 is +0.0023 (0.0003) nats a place over the
+      collection's 200,933 held places, every region +0.0005 to +0.0058.
+      (a) unread: the lead read the opening at P1 = 7, not the word before at a word's third letter.
+G-T2  missed, and the other way: the longest ring of each tower stands 0.39 and 0.40 octave faster than its founding and the
+      shortest within 0.03 of it. Her long hands ring through less of their own turn than her short ones.
+G-T4  (b) missed: the ring of 16, founded an octave slow, was drawn back to -0.64, and the triadic ring of 9 stayed within 0.03 of
+      the skin's. (a) unread on this arm (no read-pace on W113f); the fade rates of W114r left the space where its turn put it
+      (+9 and -25 thousandths of a stride) and moved the line feed +483 and +129.
+G-T5  unread: seed 25's rows were not read on W113f. Its (a) at 0.3 is on the arm that founds a second moment a ring at an unlike
+      fade read by a chart founded at zero, which is the lead's W117q (training from 16:34 UTC on November 25).
+What the misses say together, in a line: on her text the deposit orders her rings the reverse of a calendar, and a count of one
+cycle against another needs a terrain that holds the cycles (the record of November 25, a second stream, sections 4 and 5).
