@@ -906,6 +906,32 @@ impl Constitution {
         Ok((out, from_map))
     }
 
+    /// [definition; the lead, November 25] **The field whose classes fade at their own rates** ([`Declaration::fade_rate`]): `ρ_h`, one row of
+    /// `A + 1` a paced head, appended at the end of the fine field's material, founded at zero, every standing entry kept, so every skin
+    /// clock is the turn's variation and every face the source's bit for bit. Also the map over the whole material from each new entry to the
+    /// old one it copies (`None` for the rows). Refused on a field that holds them.
+    pub fn with_fade_rate(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        if self.declaration.fade_rate {
+            return refuse("a field whose classes already fade at their own rates");
+        }
+        let d = Declaration { fade_rate: true, ..self.declaration };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if self.theta.len() != layout.fade_rate {
+            return refuse("a field whose material does not end where the classes' fade rates begin");
+        }
+        let (fine, total) = (self.theta.len(), self.material_len());
+        let mut theta = self.theta.clone();
+        theta.resize(layout.len, 0);
+        let mut from_map: Vec<Option<usize>> = (0..fine).map(Some).collect();
+        from_map.resize(layout.len, None);
+        from_map.extend((fine..total).map(Some));
+        let mut out = Self::with_theta(d, theta);
+        out.scale = self.scale.clone();
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        Ok((out, from_map))
+    }
+
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The field whose friction is read from its receivers' state**
     /// ([`Declaration::friction_gate`]): `a_h`, a row of `D` a head, appended at the end of the fine field's material, founded at zero, every
     /// standing entry kept, so every friction is its head's and kind's and every face the source's bit for bit. Also the map over the whole
@@ -1632,6 +1658,34 @@ impl Learner {
                 spread.insert(self.field.families().len(), 0);
                 if spread.len() != field.families_all().len() {
                     return refuse("a lattice whose families do not meet the faded field's");
+                }
+                Some(Lattice { spread, rest: mapped(&l.rest) })
+            }
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 25] **The learner whose classes fade at their own rates** ([`Constitution::with_fade_rate`]), founded at
+    /// zero as [`Learner::with_fade_between`] founds the rings' fades: every other line of the state kept (the lattice's spreads and rests,
+    /// the carried grains, the rates), the rows' family read whole until a save reads its spread. Refused while a step is held.
+    pub fn with_fade_rate(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its classes' fade rates after its held step is read");
+        }
+        let (field, from_map) = self.field.with_fade_rate()?;
+        let mapped = |v: &[i32]| -> Vec<i32> { from_map.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let first = from_map.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from_map.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from_map.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from_map.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let lattice = match &self.lattice {
+            Some(l) => {
+                let mut spread = l.spread.clone();
+                spread.insert(self.field.families().len(), 0);
+                if spread.len() != field.families_all().len() {
+                    return refuse("a lattice whose families do not meet the field's with its fade rates");
                 }
                 Some(Lattice { spread, rest: mapped(&l.rest) })
             }

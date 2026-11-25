@@ -551,6 +551,14 @@ pub struct StorePass {
     /// against 2,253 and 94,646 regions on its control. Written as a line `clock C₀ … C_(k−1)` after the tension line, only where the
     /// tensions are set; a tension line with no clock line reads every clock at zero.
     pub slice_clock: Option<Vec<u128>>,
+    /// [definition; the lead, November 25, Gemini Neon's audit relayed by Brandon (a coprime-stride walk); W113s's reading] **Each slice's
+    /// pieces walked on a golden stride**: where set, slice `s`'s pieces from `W_s` on (the count it had finished when the walk was set) are
+    /// read in the order `W_s + (k g) mod M`, `M` the pieces left and `g` the stride nearest `M (√5 − 1)/2` coprime to `M`
+    /// ([`crate::passage::golden_stride`]), so every piece is still read once a pass and the slice's stretches are spread over the whole
+    /// slice instead of walked down its order. Why: a slice is stored in its documents' order, and a slice read faster in order moves her
+    /// toward the stretch she is in: on W113s wikidata, read at nearly three times its control's regions, coded its held stretches 0.048
+    /// nats a place dearer. Written as a line `walk W₀ … W_(k−1)` after the clock line (or the tension line, or the pass's), only where set.
+    pub slice_walk: Option<Vec<u64>>,
 }
 
 /// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
@@ -738,7 +746,7 @@ impl StorePass {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -1087,14 +1095,15 @@ impl Learner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud, d.lane_leak).iter().chain(d.friction.then_some(&FRICTION_PART)).chain(d.fade.then_some(&FADE_PART)).map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud, d.lane_leak).iter().chain(d.friction.then_some(&FRICTION_PART)).chain(d.fade.then_some(&FADE_PART)).chain(d.fade_rate.then_some(&FADE_RATE_PART)).map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
             let pass = self.pass.as_ref().map_or(String::new(), |p| {
                 let tension = p.slice_tension.as_ref().map_or(String::new(), |t| format!("tension {}\n", t.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
                 let clock = p.slice_clock.as_ref().map_or(String::new(), |c| format!("clock {}\n", c.iter().map(u128::to_string).collect::<Vec<_>>().join(" ")));
-                let tension = format!("{tension}{clock}");
+                let walk = p.slice_walk.as_ref().map_or(String::new(), |w| format!("walk {}\n", w.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
+                let tension = format!("{tension}{clock}{walk}");
                 format!("{}\n{}{tension}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line())))
             });
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
@@ -1157,7 +1166,11 @@ impl Learner {
                 // old rate.
                 let fade = field.declaration.fade;
                 let unfaded: Vec<usize> = unfrictioned.iter().copied().chain(friction.then_some(FRICTION_PART)).collect();
-                let order: Vec<usize> = unfaded.iter().copied().chain(fade.then_some(FADE_PART)).collect();
+                // [the lead, November 25] A field whose classes fade at their own rates appends their part; its line without it reads with it
+                // at the old rate.
+                let fade_rate = field.declaration.fade_rate;
+                let unrated: Vec<usize> = unfaded.iter().copied().chain(fade.then_some(FADE_PART)).collect();
+                let order: Vec<usize> = unrated.iter().copied().chain(fade_rate.then_some(FADE_RATE_PART)).collect();
                 let unleaked = written_parts(carry, triads, opening, junction, mark, loud, false);
                 let unloud = written_parts(carry, triads, opening, junction, mark, false, false);
                 let unmarked = written_parts(carry, triads, opening, junction, false, false, false);
@@ -1168,6 +1181,8 @@ impl Learner {
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if fade_rate && n == unrated.len() {
+                    unrated
                 } else if fade && n == unfaded.len() {
                     unfaded
                 } else if friction && n == unfrictioned.len() {
@@ -1304,6 +1319,17 @@ impl Learner {
                     return refuse("a clock line that is not one clock a slice of the pass");
                 }
                 Some(StorePass { slice_clock: Some(c), ..p })
+            }
+            (p, _) => p,
+        };
+        // [definition; the lead, November 25] The slices' walks, a line after the pass's (and its terrain, tension and clock lines), only where set.
+        let pass = match (pass, lines.peek()) {
+            (Some(p), Some(l)) if l.starts_with("walk ") => {
+                let w: Vec<u64> = lines.next().unwrap_or("").split_whitespace().skip(1).map(str::parse).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a walk line that is not `walk W₀ … W_(k−1)`"))?;
+                if w.len() != p.slices.len() {
+                    return refuse("a walk line that is not one place a slice of the pass");
+                }
+                Some(StorePass { slice_walk: Some(w), ..p })
             }
             (p, _) => p,
         };

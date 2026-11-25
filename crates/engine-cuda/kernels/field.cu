@@ -570,6 +570,9 @@ struct FieldWords {
     const wide *skin_k;
     const wide *skin_b;
     wide *gfade;
+    // [the lead, November 25] Where the classes fade at their own rates, the material's offset of the paced heads' fade rows (the host's
+    // `Loci::fade_rate`, one row of `A + 1` a paced head); `UINT64_MAX` where they do not.
+    uint64_t fade_rate_at;
 };
 
 // [the strand's two streams] Site `g`'s place on its passage (`FieldWords::site_place`), its position where the batch holds no strand.
@@ -6311,6 +6314,25 @@ __device__ __forceinline__ wide pace_rate(const FieldWords &w, uint32_t p, uint6
     return rel(sum, FACE_BITS);
 }
 
+// [the lead, November 25] A site's fade rate on paced head `p` (the host's `Constitution::paces_with` where the classes fade at their own
+// rates): its class's entry of the fade row, a carried face's mixture `release(Σ_a w_a ρ_p[a], 16)`, zero at a silent site (whose fade is
+// the turn's) and where the classes do not fade at their own rates.
+__device__ __forceinline__ wide fade_rate_dev(const FieldWords &w, uint32_t p, uint64_t s) {
+    if (w.fade_rate_at == UINT64_MAX) {
+        return 0;
+    }
+    const uint64_t base = w.fade_rate_at + (uint64_t)p * (w.A + 1);
+    const uint32_t from = w.mix_off[s], to = w.mix_off[s + 1];
+    if (from == to) {
+        return w.unresolved[s] ? (wide)0 : (wide)w.theta[base + row_of(w, s)];
+    }
+    wide sum = 0;
+    for (uint32_t k = from; k < to; k++) {
+        sum += (wide)w.mix_share[k] * (wide)w.theta[base + w.mix_class[k]];
+    }
+    return rel(sum, FACE_BITS);
+}
+
 // A blank's share of class `a` in the face it was read from (the host's `shares`): `⌊(m_a 2^16 + T/2) / T⌋`, zero where
 // the face has no mass.
 __device__ __forceinline__ uwide blank_share(const FieldWords &w, uint64_t s, uint32_t a) {
@@ -6642,11 +6664,14 @@ extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_paces(Fiel
             wide k = 0, kc = 0, kv = 0;
             if (t < sites) {
                 k = one + pace_rate(w, p, first + (t > stretch && !w.bare_stretch ? stretch : t));
+                // [the lead, November 25] The skin clock's step `κ + ρ` where the classes fade at their own rates (zero at a silent site, and
+                // every site past the stretch is silent).
+                const wide ks = k + fade_rate_dev(w, p, first + t);
                 if (t > 0) {
                     kc = k;
-                    kv = k < 0 ? -k : k;
+                    kv = ks < 0 ? -ks : ks;
                 }
-                if (k != one) {
+                if (k != one || ks != k) {
                     plain_s = 0;
                 }
             }
@@ -7488,7 +7513,7 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
 // (§16.47). [realization; November 15] One block a paced head and region: the suffix sums are the block's scans in tiles taken from the
 // region's end, each carried to the next, and the folded covectors past the stretch the block's sum; integer sums, so the bits are the
 // one-thread walk's. Launched with `PACE_SCAN_THREADS` threads a block.
-extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_pace_kappa_back(FieldWords w, wide *dkappa) {
+extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_pace_kappa_back(FieldWords w, wide *dkappa, wide *dfade) {
     __shared__ wide st[PACE_SCAN_THREADS], ss[PACE_SCAN_THREADS];
     __shared__ wide folded_s;
     __shared__ uint32_t stretch_s;
@@ -7520,11 +7545,18 @@ extern "C" __global__ void __launch_bounds__(PACE_SCAN_THREADS) field_pace_kappa
                 ss[tid] += as_;
                 __syncthreads();
             }
-            wide own = 0;
+            wide own = 0, own_f = 0;
             if (t > 0) {
                 const wide tau = carry_t + st[tid], sig = carry_s + ss[tid];
-                const int64_t k = w.kappa[at];
-                own = tau + (k > 0 ? sig : k < 0 ? -sig : 0);
+                // [the lead, November 25] The skin clock's step is `κ + ρ` where the classes fade at their own rates: its sign takes `σ`'s
+                // covector to the turn's row and alone to the fade's (`dfade`, the host's `dfs`).
+                const wide ks = (wide)w.kappa[at] + fade_rate_dev(w, p, first + (uint64_t)t);
+                const wide signed_sig = ks > 0 ? sig : ks < 0 ? -sig : (wide)0;
+                own = tau + signed_sig;
+                own_f = signed_sig;
+            }
+            if (dfade != nullptr && t >= 0) {
+                dfade[at] = own_f;
             }
             const wide tile_t = st[nt - 1], tile_s = ss[nt - 1];
             __syncthreads();
@@ -7583,6 +7615,32 @@ extern "C" __global__ void field_pace_c_back(FieldWords w, const wide *dkappa, w
         } else {
             for (uint32_t k = from; k < to; k++) {
                 add_wide(g + base + w.mix_class[k], dk * (wide)w.mix_share[k]);
+            }
+        }
+    }
+}
+
+// [the lead, November 25] `δρ_p[u] += Σ_(t: u_t = u) δρ_p(t)` on the fade rows where the classes fade at their own rates (the host's region and
+// strand folds of `dfs`): a written site's class, a carried face's classes by their shares; a silent site's fade is the turn's and takes
+// nothing. One thread a paced head and a site, the sums exact in any order.
+extern "C" __global__ void field_pace_fade_back(FieldWords w, const wide *dfade, wide *g) {
+    const uint64_t cells = (uint64_t)w.paced * w.T;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t p = c / w.T;
+        const uint64_t t = c % w.T;
+        const wide df = dfade[(uint64_t)p * w.T + t];
+        if (df == 0) {
+            continue;
+        }
+        const uint64_t base = w.fade_rate_at + (uint64_t)p * (w.A + 1);
+        const uint32_t from = w.mix_off[t], to = w.mix_off[t + 1];
+        if (from == to) {
+            if (!w.unresolved[t]) {
+                add_wide(g + base + row_of(w, t), df << FACE_BITS);
+            }
+        } else {
+            for (uint32_t k = from; k < to; k++) {
+                add_wide(g + base + w.mix_class[k], df * (wide)w.mix_share[k]);
             }
         }
     }

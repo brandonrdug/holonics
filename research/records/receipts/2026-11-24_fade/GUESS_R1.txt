@@ -1,0 +1,18 @@
+Fixed 2026-11-25T05:30:48Z (date -u), the lead, before W114r trains. Refs #404.
+The reading it answers: Neon's audit (relayed by Brandon 05:03Z): one rate drives a ring's turn and its fade, so a space, which her
+paces learned at 9.55 letters' duration on the dyadic head (25.5 for a line feed on the triadic), leaves the ring of 16 at about two
+hundredths of itself and the ring of 9 at three; a phase advance is reversible and a fade dissipates, and they are two rates.
+The change: each paced head's fade rate a class (e5fa, Declaration::fade_rate, hnn-field-v14s fade word 3): the skin clock steps by
+|kappa + rho[u]| at a written site and by the turn's at a silent one, the rows founded at zero, their covector the skin clock's alone.
+W114r: W113f's STATE.3000 so founded, 3,000 sections on store-2026-11-24-wide-t6 beside W114 (w117.sh's control from the same state).
+Founded at zero its first section's code equals W114's (read as W118_FIRST). Deposit: the rows take FADE_RATE_PART at octave 0, a
+section's step about 2^-12 of a stride, so a lap moves a row by at most about 0.7 stride.
+G-R1 (rates read by fade/rates.py at STATE.3000, in thousandths of a stride; codes at the lap means, one place open on the collection's
+held set):
+  (a) (0.55) the space's and the line feed's fade rates both below -100 on both heads (a space and a line break fade less than they
+      turn), and no letter's rate below -100;
+  (b) (0.45) the held set over all its places at most W114's plus 0.001;
+  (c) (0.3) P1 = 7's opening at W114r's mean (FADE_LAW, the twin's separator after L - 1 letters less after L + 1) at least 0.03 over
+      W114's.
+Rule: (b) held, the line takes the fade rates as her state; (a) missed, the skin's covector does not ask a separator to keep more,
+and the count's wall is not the tie of fade to turn.

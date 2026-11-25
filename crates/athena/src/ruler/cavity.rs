@@ -22,7 +22,7 @@ pub(crate) struct HeldStretch {
 #[allow(clippy::too_many_arguments, reason = "the cut's declared inputs, each a pinned file's reading or the pass's law")]
 pub(crate) fn held_stretches(store: &Path, role: &str, name: &str, counts: &std::collections::HashMap<(String, String), (u64, u128)>, store_sha: &str, seed: u64, law: &StorePass, codec: &Codec, places: usize) -> Result<Vec<HeldStretch>> {
     let slice = open_slice(store, role, name, counts)?;
-    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None };
+    let pass = StorePass { role: role.to_string(), store: store_sha.to_string(), stretches: 0, least: law.least, octaves: law.octaves, pairs: law.pairs, sites: law.sites, own: false, slices: vec![PassSlice { name: name.to_string(), piece: 0, cursor: 0, taken: 0 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None };
     let mut cut = Cut { seed, slices: vec![slice], pass };
     let mut out = Vec::new();
     let mut taken = 0usize;

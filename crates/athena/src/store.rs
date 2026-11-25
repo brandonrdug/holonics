@@ -255,6 +255,11 @@ fn counters_text(realization: &dyn Realization) -> String {
     }
 }
 
+/// [measurement; the lead, November 25] The sections a `work` reading reads its slices' work at: the last of every sixteen holds its field
+/// before its deposit, the next reads its own regions after its deposit and with that field, two extra comparison reads in sixteen
+/// sections (a reading's schedule, no law's).
+const WORK_EVERY: usize = 16;
+
 /// `train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA`:
 /// the learner `FROM` continued over the store `STORE` (`STORE_SHA` its `STORE.tsv`'s) in the role `ROLE` (`prefix`, `train` or `held`), for
 /// `SECTIONS` sections, saving `OUT/STATE.k` and `OUT/MEAN.k` every `SAVE` sections and at the last (`k` the sections done in this run, and
@@ -267,8 +272,13 @@ fn counters_text(realization: &dyn Realization) -> String {
 /// ([`Learner::lettered`]), the yardstick read again (`at=after`), the pass set at the store's start with its law (the octaves of a
 /// stretch's draws, the section's bounds) and `OUT/STATE.0` saved. A continued learner (with its pass) reads on from its place.
 pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
-    if args.len() != 18 {
-        return Err("train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA".into());
+    // [measurement; the lead, November 25, Brandon's 05:32Z: what steers is power at her ports, effort paired with flow] A trailing `work`
+    // reads, at every `WORK_EVERY`-th section, the work each slice's news did on her through the section's deposit (`STORE_WORK`): the
+    // opening's code at its regions' compared places before the deposit less after it, on the same stretches. A reading: the state's bytes
+    // are the same with it and without it.
+    let work_read = args.len() == 19 && args[18] == "work";
+    if args.len() != 18 && !work_read {
+        return Err("train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA [work]".into());
     }
     let started = std::time::Instant::now();
     // [definition; the record §5, R5] The store's law reads no variable: every one named `FIELD_…` is refused, but for the card driver's two
@@ -321,7 +331,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -388,6 +398,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     // line and the saves (ns).
     let host_phases = std::env::var_os("FIELD_PROFILE").is_some() || std::env::var_os("FIELD_PHASES").is_some();
     let mut host = [0u128; 7];
+    // [measurement; the lead, November 25] The work reading's field before a deposit: the constitution the last of every sixteen sections
+    // read, held to price that section's deposit on the next section's stretches, which no deposit has been fit on (`STORE_TRANSFER`).
+    let mut before_deposit: Option<holonics_engine::field::Constitution> = None;
     while done < sections {
         let section_start = std::time::Instant::now();
         let mut regions: Vec<OwnedRegion> = Vec::new();
@@ -580,6 +593,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let views_start = std::time::Instant::now();
         let views = views_of(&regions);
         host[1] += views_start.elapsed().as_nanos();
+        if work_read && done % WORK_EVERY == WORK_EVERY - 1 {
+            before_deposit = Some(learner.field.clone());
+        }
         let deposit_start = std::time::Instant::now();
         let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
         let deposit_ms = deposit_start.elapsed().as_millis();
@@ -625,6 +641,39 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let first: usize = world_line.rsplit("first=").next().and_then(|v| v.parse().ok()).unwrap_or(regions.len());
             let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
+        }
+        if work_read && done % WORK_EVERY == 0 && !receipt.opening.is_empty() {
+            // [measurement; the lead, November 25] Each slice's work through a deposit, in millionths of a bit a compared place. `STORE_WORK`:
+            // the opening's code on the section's own regions before its deposit less after it, the stretches the deposit was fit on (in
+            // sample). `STORE_TRANSFER`, where the section before held its field: these regions read with the field before that section's
+            // deposit less as this section's comparison read them (after it), so that deposit priced on stretches no deposit has been fit on
+            // (out of sample), the slice's reducible news; positive where the deposit took up what the slice teaches, negative where what
+            // the other slices moved costs it. Why both: in sample the slices that repeat inside a document take two to ten times the rest,
+            // and the section before's own stretches, read again after the next deposit, carry that deposit's momentum of their own fit.
+            let n = cut.slices.len();
+            let per = |b: i128, a: i128, places: usize| micro_signed(b - a, places);
+            let line = |tag: &str, sums: &[(i128, i128, usize)]| {
+                let (tb, ta, tp) = sums.iter().fold((0i128, 0i128, 0usize), |(x, y, z), s| (x + s.0, y + s.1, z + s.2));
+                println!("{tag} n={done} all={} places={tp} {}", per(tb, ta, tp), cut.slices.iter().zip(sums).map(|(s, &(b, a, p))| format!("{}={}/{}", s.name, per(b, a, p), p)).collect::<Vec<_>>().join(" "));
+            };
+            let sum_of = |codes: &[Vec<Option<i64>>]| -> Vec<(i128, i128, usize)> {
+                let mut sums = vec![(0i128, 0i128, 0usize); n];
+                for (r, &sl) in region_slice.iter().enumerate() {
+                    if let (Some(&(b, p)), Some(c)) = (receipt.opening.get(passage_start + r), codes.get(passage_start + r)) {
+                        let a: i128 = c.iter().flatten().map(|&v| i128::from(v)).sum();
+                        (sums[sl].0, sums[sl].1, sums[sl].2) = (sums[sl].0 + i128::from(b), sums[sl].1 + a, sums[sl].2 + p);
+                    }
+                }
+                sums
+            };
+            let (_, _, after) = realization.read_and_return_opening(&learner.field, &views).map_err(|e| e.to_string())?;
+            line("STORE_WORK", &sum_of(&after));
+            if let Some(field) = before_deposit.take() {
+                let (_, _, earlier) = realization.read_and_return_opening(&field, &views).map_err(|e| e.to_string())?;
+                // `sum_of` pairs the comparison's codes (after the deposit before) with these (before it): the deposit's work is earlier less now.
+                let sums: Vec<(i128, i128, usize)> = sum_of(&earlier).into_iter().map(|(now, then, p)| (then, now, p)).collect();
+                line("STORE_TRANSFER", &sums);
+            }
         }
         if let Some(ts) = cut.pass.slice_tension.as_mut() {
             // [definition; the lead, November 24] Each slice's tension, read from the section's opening code at its regions' open places
@@ -1211,6 +1260,34 @@ pub fn found_fade(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 25, Neon's audit relayed by Brandon] `found-fade-rate STATE STATE_SHA OUT`: **the state whose classes fade
+/// at their own rates** ([`holonics_engine::field::Declaration::fade_rate`], [`holonics_engine::field::Learner::with_fade_rate`]), founded at
+/// zero: every face is the source's bit for bit and every other line of the state is kept, so it differs from its source by the rows alone
+/// and runs as an arm beside the source's control. Written and read back.
+pub fn found_fade_rate(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-fade-rate STATE STATE_SHA OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = end.with_fade_rate().map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    let d = &founded.field.declaration;
+    println!("FOUND_FADE_RATE paced={} rows={} entries={} lattice={}", d.paced_heads(), d.paced_heads() * (d.alphabet + 1), founded.field.material_len(), founded.lattice.is_some());
+    Ok(())
+}
+
 pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());
@@ -1677,6 +1754,7 @@ pub fn join_store(args: &[String]) -> Result<()> {
     // A pass held by its slices' tensions reads its new slices afresh: one reading a slice, none yet.
     pass.slice_tension = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
     pass.slice_clock = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
+    pass.slice_walk = pass.slice_walk.as_ref().map(|_| vec![0; names.len()]);
     let after = slices_text(&pass);
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
@@ -1820,7 +1898,51 @@ pub fn set_terrain(args: &[String]) -> Result<()> {
 /// A code on `2^(−20)` bits over `places` places, in millionths of a bit a place (a tension's reading: the terrain's and the slices'),
 /// a negative sum read as zero.
 fn micro_a_place(code: i128, places: usize) -> u64 {
-    u64::try_from((code.max(0) * 1_000_000) / ((places as i128) << 20)).unwrap_or(u64::MAX)
+    u64::try_from(micro_signed(code.max(0), places)).unwrap_or(u64::MAX)
+}
+
+/// A code on `2^(−20)` bits over `places`, in millionths of a bit a place, its sign kept (zero over no place).
+fn micro_signed(code: i128, places: usize) -> i128 {
+    if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) }
+}
+
+/// [definition; the lead, November 25, Gemini Neon's audit relayed by Brandon] `set-walk STATE STATE_SHA OUT`: **a state's slices walked on
+/// their golden strides from where each stands** ([`holonics_engine::field::StorePass::slice_walk`]): the state with a `walk` line after its
+/// pass's lines, each slice's place the count of pieces it has finished (and the piece it is inside, which it finishes first), every other
+/// line byte for byte (read back and checked). Refused on a state with no pass or one whose pass already walks.
+pub fn set_walk(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("set-walk STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.slice_walk.is_some() {
+        return Err("a state whose pass already walks its slices".into());
+    }
+    let walk: Vec<u64> = before.slices.iter().map(|s| s.piece + u64::from(s.cursor > 0)).collect();
+    let line = format!("walk {}", walk.iter().map(u64::to_string).collect::<Vec<_>>().join(" "));
+    let mut next = learner.clone();
+    let after = usize::from(before.terrain.is_some()) + usize::from(before.slice_tension.is_some()) + usize::from(before.slice_clock.is_some());
+    next.pass = Some(StorePass { slice_walk: Some(walk), ..before });
+    let written = next.to_text();
+    let pass_line = written.lines().position(|l| l.starts_with("pass ")).ok_or("a written state with no pass line")?;
+    let mut expected: Vec<&str> = text.lines().collect();
+    expected.insert(pass_line + 1 + after, &line);
+    if written.lines().collect::<Vec<_>>() != expected {
+        return Err("a written walk that changes a line other than its own".into());
+    }
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.field != learner.field || back.pass != next.pass {
+        return Err("a written walk whose state does not read back as the source's field and pass".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_WALK lines={} {line}", expected.len());
+    Ok(())
 }
 
 /// [definition; the lead, November 24, Brandon's 21:57Z] `set-tension STATE STATE_SHA OUT`: **a state's pass held by its slices' tensions**
