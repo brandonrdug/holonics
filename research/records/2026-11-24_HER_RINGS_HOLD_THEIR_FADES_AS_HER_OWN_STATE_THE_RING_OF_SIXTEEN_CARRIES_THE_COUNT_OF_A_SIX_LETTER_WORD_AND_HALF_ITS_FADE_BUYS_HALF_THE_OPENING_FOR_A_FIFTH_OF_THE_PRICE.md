@@ -220,3 +220,22 @@ place a deposit: all 4,432 (in sample 7,889); wikidata 15,042, code 8,755, logic
 slices and 0.18 to 0.24 on the conversations and the harness, whose in-sample work is mostly the deposit's fit to the stretch. With a
 symmetric step, a slice's transfer `⟨g_s, P g⟩` is also the first-order value of reading it for every slice, `⟨g, P g_s⟩`, which is
 why it is the trail's charge.
+
+## 11. The second fade of a ring, where it can stand
+
+The walk held on its second lap (G-W2: −0.0041, no region over +0.0031) and the line took it; the trail read as glimpses failed (G-T1:
++0.0184, the favoured slices −0.010 and −0.029, the glimpsed ones +0.03 to +0.05) and is rerun as a rate of looks at full extent (G-T2,
+W116t). What W113f and W114r read together for the hearing: a ring's one fade is drawn back toward the skin's, the long rings fade faster
+of their own accord, and every boundary asks to erase more. A count that lasts across a boundary therefore needs a store a boundary does
+not erase, beside the one that does: the formal thread's form 1, a second moment a ring at an unlike fade (`two_fades_read_gap`).
+
+Where it can stand without a new layout: the moment vector `[t][2M]` carries a slot for every head's every mode, and the still heads'
+slots are written zero at every site (`moments_sided` fills the turned heads alone), so their columns of the moment's chart are read
+against zero and their covector is zero; on the line two still heads stand beside two turned ones, mode for mode. The twin law writes each
+turned slot's moment again at its twin fade into the still head's slot of the same mode, from the same encodings and on the same clock,
+its fade its own state (`ℓ'_s`, founded where a ring keeps half of itself over its turn, `γ' = ln 2 / 2π` of the skin's, about −3.2
+octaves), the still slots' chart columns founded at zero, which keeps every face of the source bit for bit since they read zeros today.
+Its covector returns through the shared encodings and the turned head's clocks, and the twin fades' through the skin's homogeneity
+(`HNN/FadeHomogeneity`). Its cost is the moments' alone: the turned heads' moments and their returns are computed twice. The conjugate
+product of a ring's two moments (`c c̄′`, the gap read by ratio, the determinant's signed cancellation) is the form's second step, read
+once the linear one has its lap.
