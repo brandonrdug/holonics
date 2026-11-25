@@ -529,6 +529,10 @@ impl Constitution {
             // lock (`δs (2 P 2^30 − 2 D Q)` over the lock's grains), then `δσ_i −= sgn b D E`, `δσ_j += sgn b D E`.
             if let Some(p) = paces.row[h].filter(|_| !d.is_depth(h)) {
                 let sigma = &paces.sigma[p];
+                // [the lead, November 24] Each turned slot's fade covector from its pairs and crowds ([`Declaration::fade`],
+                // [`Constitution::fade_covector`]): the skin's slope in the variation is the slot's rate of fade, and its homogeneity gives
+                // `∂L/∂ℓ = ln 2 Σ s ∂L/∂s`.
+                let mut fade_sums = vec![0i128; if d.fade { n } else { 0 }];
                 for i in 0..sites {
                     for (k, src) in rows[i].iter().enumerate() {
                         let j = src.j as usize;
@@ -543,9 +547,12 @@ impl Constitution {
                             let (wr, wi, kr, ki) = (probe_of(i, l) as i128, probe_of(i, n + l) as i128, qh[j * span + l] as i128, qh[j * span + n + l] as i128);
                             let bracket = (2 * (wr * kr + wi * ki) << g_) - 2 * dec * (kr * kr + ki * ki);
                             let lock = release(ds[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
-                            let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
+                            let at = skin_back(self.skin_rate(self.slot(h, l)), dec, value + lock)?;
                             gsig[p][i] -= sgn * at;
                             gsig[p][j] += sgn * at;
+                            if d.fade {
+                                fade_sums[l] += Self::fade_term(sigma[i] as i128 - sigma[j] as i128, at)?;
+                            }
                         }
                     }
                     for (k, c) in crowds[i].iter().enumerate() {
@@ -565,11 +572,17 @@ impl Constitution {
                             let (mr, mi) = (sums.words[(c.hi + 1) * span + l] - sums.words[c.lo * span + l], sums.words[(c.hi + 1) * span + n + l] - sums.words[c.lo * span + n + l]);
                             let bracket = div_nearest((2 * count * (wr * mr + wi * mi) << g_) - 2 * dec * (mr * mr + mi * mi), count * count);
                             let lock = release(dsc[i][k].checked_mul(bracket).ok_or(TowerError::Refused(PACE_RETURN))?, LOCK_BACK_BITS + 2 * g_ - MOVE_BITS);
-                            let at = skin_back(self.turn_rate(self.slot(h, l)), dec, value + lock)?;
+                            let at = skin_back(self.skin_rate(self.slot(h, l)), dec, value + lock)?;
                             gsig[p][i] -= sgn * at;
                             gsig[p][e] += sgn * at;
+                            if d.fade {
+                                fade_sums[l] += Self::fade_term(sigma[i] as i128 - sigma[e] as i128, at)?;
+                            }
                         }
                     }
+                }
+                for (li, &sum) in fade_sums.iter().enumerate() {
+                    g[self.layout.fade + self.slot(h, li)] += sum;
                 }
             }
             // Each mode's lock ([`lock`]) returns to its two words: to the receiver's probe

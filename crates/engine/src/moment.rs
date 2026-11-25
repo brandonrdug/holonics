@@ -515,10 +515,13 @@ impl Constitution {
                     let parts = moment::cavity_moment_parts_exact(&before, &after, ring, *period, &self.decays[slot], pace.as_ref(), &tau_c, &sigma_c)?;
                     let (sb, sa): (Vec<_>, Vec<_>) = parts.into_iter().unzip();
                     let (sb, sa) = (side(sb)?, side(sa)?);
-                    let (dt, dsg) = moment::cavity_pace_return(&before, &after, &sb, &sa, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, &tau_c, &sigma_c, self.turn_rate(slot))?;
+                    let (dt, dsg, _, _, fade) = moment::cavity_pace_return_faded(&before, &after, &sb, &sa, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, &tau_c, &sigma_c, self.turn_rate(slot), self.skin_rate(slot))?;
                     for t in 0..sites {
                         gtau[p][t] += dt[t];
                         gsig[p][t] += dsg[t];
+                    }
+                    if d.fade {
+                        g[l.fade + slot] += fade;
                     }
                 }
                 for t in 0..sites {
@@ -595,10 +598,13 @@ impl Constitution {
                     let pick = |e: &[Vec<i64>]| -> Vec<(i64, i64)> { e.iter().map(|r| (r[idx], r[tm + idx])).collect() };
                     let (before, after) = (pick(&eb), pick(&ea));
                     let s = moment::moments(&before, &after, ring, *period, &self.decays[slot], pace.as_ref())?;
-                    let (dt, dsg) = moment::pace_return(&before, &after, &s, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, self.turn_rate(slot))?;
+                    let (dt, dsg, fade) = moment::pace_return_faded(&before, &after, &s, &ds, &back_b, &back_a, ring, *period, &self.decays[slot], &full, self.turn_rate(slot), self.skin_rate(slot))?;
                     for t in 0..sites {
                         gtau[p][t] += dt[t];
                         gsig[p][t] += dsg[t];
+                    }
+                    if d.fade {
+                        g[l.fade + slot] += fade;
                     }
                 }
                 for t in 0..sites {

@@ -563,6 +563,13 @@ struct FieldWords {
     uint64_t rp;
     int64_t *pp;
     int32_t *peta;
+    // [definition; the lead, November 24] **Each turned ring's skin denominator and rate of fade** (the host's
+    // `Constitution::skin_denominator_of` and `skin_rate`): `k = n ln 2 2^24 / γ` and `b γ` on `2^(−30)`, a turned slot each, the constant skin's
+    // words where the rings do not hold their fades; and, where they do (`Declaration::fade`), the material's covector at the fades `[slot]`, its
+    // terms summed in any order (null where they do not).
+    const wide *skin_k;
+    const wide *skin_b;
+    wide *gfade;
 };
 
 // [the strand's two streams] Site `g`'s place on its passage (`FieldWords::site_place`), its position where the batch holds no strand.
@@ -845,8 +852,7 @@ __device__ void turn_dev(const FieldWords &w, uint32_t slot, wide rho, wide *re,
 // `e^(−2π|s|/n)` read through the exponential's face, `release(below_one(−bits), 32)` with `bits = div_nearest(2π |s|,
 // (n ln 2) 2^24)` on `2^(−16)`.
 __device__ __forceinline__ wide skin_k(const FieldWords &w, uint32_t slot) {
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
-    return ((wide)w.ring_n[slot] * ln2) << PACE_BITS;
+    return w.skin_k[slot];
 }
 
 // [definition; theory, November 11 04:14, step S] **The skin across a variation from the two sites' addresses.** `div_nearest(2π |σ_i − σ_j|, k)` for the later site `a`
@@ -880,10 +886,10 @@ __device__ wide skin_dev(const FieldWords &w, uint32_t slot, wide s) {
         return (wide)w.decay[(uint64_t)slot * w.dreach + (uint64_t)(s >> PACE_BITS)];
     }
     const wide pi = (wide)(((uwide)w.pi_hi << 64) | (uwide)w.pi_lo);
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
-    const wide bits = div_nearest(2 * pi * s, ((wide)w.ring_n[slot] * ln2) << PACE_BITS);
+    const wide bits = div_nearest(2 * pi * s, skin_k(w, slot));
     return rel((wide)below_one_face(-bits, w.face, w.digits), UNIT_BITS - MOVE_BITS);
 }
+
 
 // Whether head `h`'s skins and frames read its own clock over the region of batch site `g` (a paced head whose
 // pace is not plain there).
@@ -3367,6 +3373,23 @@ __device__ __forceinline__ bool mul_fits(wide a, wide b, wide *r) {
     return true;
 }
 
+// [definition; the lead, November 24] **One pair's share of a ring's fade covector** (the host's `Constitution::fade_term`): the skin reads the
+// clock only through `γ |s|`, so the pair's `−sgn at` on the variation `s` gives `−release(ln 2 release(|s| at, MATERIAL_BITS − FACE_BITS), LN2_FACE_BITS)` at the ring's fade,
+// each term released alone so the terms sum in any order.
+// ln 2 on `2^(−LN2_FACE_BITS)`, its two words joined (the face the host reads as `ln2_face`).
+__device__ __forceinline__ wide ln2_of(const FieldWords &w) {
+    return (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+}
+
+__device__ __forceinline__ wide fade_term_dev(const FieldWords &w, wide s, wide at) {
+    const wide ln2 = ln2_of(w);
+    wide x = 0, y = 0;
+    if (!mul_fits(s < 0 ? -s : s, at, &x) || !mul_fits(ln2, rel(x, MATERIAL_BITS - FACE_BITS), &y)) {
+        atomicOr(w.status, REFUSED_CARRIER);
+    }
+    return -rel(y, LN2_FACE_BITS);
+}
+
 __device__ __forceinline__ bool add_fits(wide a, wide b, wide *r) {
     const wide s = (wide)((uwide)a + (uwide)b);
     if ((a >= 0) == (b >= 0) && (s >= 0) != (a >= 0)) {
@@ -3509,7 +3532,7 @@ __device__ __forceinline__ wide temper_of(const FieldWords &w, uint32_t h, bool 
 // `temperature_chain`): the row's `δT = Σ release(δz S, 16)`, carried into `ℓ = log₂ T` as `δℓ = release(δT ·
 // release(T ln 2, 30), 24)`, so the rows' covectors sum in any order to the same bits.
 __device__ __forceinline__ wide temper_chain(const FieldWords &w, wide temper, wide dt) {
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const wide ln2 = ln2_of(w);
     wide carried;
     if (!mul_fits(dt, rel(temper * ln2, LN2_FACE_BITS), &carried)) {
         atomicOr(w.status, REFUSED_CARRIER);
@@ -4847,7 +4870,7 @@ extern "C" __global__ void field_pair_gate_back(FieldWords w, int64_t *dg, int64
     const uint32_t half = w.f / 2;
     const uint64_t C = w.carry, c2 = 2 * C, plain = half - C;
     const uint64_t cells = (uint64_t)w.T * C;
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const wide ln2 = ln2_of(w);
     for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
         const uint64_t t = c / C, k = c % C;
         const uint64_t gr = t * c2 + k, gi = gr + C;
@@ -5142,7 +5165,7 @@ extern "C" __global__ void field_tied_face_sharp(FieldWords w, uint64_t enc, uin
 // radially into the state, `radial_i = (δλ_ℓ r̂_i 2^30) / (W s_ℓ ln 2)`, the base the chart's adjoint adds to. One thread a site; every site's
 // radial row written (zero where closed or where the lane has no power).
 extern "C" __global__ void field_loud_back(FieldWords w, uint64_t loud, const int64_t *dz, const int64_t *v, const wide *beta, const int64_t *lambda, const wide *scale, const int32_t *read, wide *g, int64_t *dzv, int64_t *radial) {
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const wide ln2 = ln2_of(w);
     const uint32_t lw = w.D / w.lanes;
     for (uint64_t t = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; t < w.T; t += (uint64_t)gridDim.x * blockDim.x) {
         for (uint32_t i = 0; i < w.D; i++) {
@@ -5416,7 +5439,7 @@ extern "C" __global__ void __launch_bounds__(REV_ROWS * 32, 4) field_contact_row
     const uint32_t parts = span_parts(S);
     const bool active = lane < S * parts;
     const uint32_t entry = lane % S, part = lane / S, m = entry % n;
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const wide ln2 = ln2_of(w);
     const bool still = skinless(w, h);
     const HeadSkin hs = head_skin(w, h);
     const uint32_t g0 = still ? 0 : MOVE_BITS;
@@ -6310,7 +6333,7 @@ extern "C" __global__ void __launch_bounds__(BLANK_DZ_THREADS) field_blank_dz(Fi
     __shared__ wide red[BLANK_DZ_THREADS];
     __shared__ wide mean_s[BLANK_DZ_PACED];
     const uint32_t tid = threadIdx.x, nt = blockDim.x;
-    const wide ln2 = (wide)(((uwide)w.ln2_hi << 64) | (uwide)w.ln2_lo);
+    const wide ln2 = ln2_of(w);
     if (w.paced > BLANK_DZ_PACED) {
         if (blockIdx.x == 0 && tid == 0) {
             atomicOr(w.status, REFUSED_CARRIER);
@@ -7151,7 +7174,7 @@ __device__ __forceinline__ wide re_pair(const FieldWords &w, wide ar, wide ai, M
 
 // One skin term of the moments' clock covector (the host's `pace_return`'s `skin`): `at = release(release(release(inner
 // D, 30) b, 30), 46)`, `δσ_t −= sgn at`, `δσ_k += sgn at`, `sgn = sgn(σ_t − σ_k)`.
-__device__ __forceinline__ void moment_skin_back(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk, wide decay, wide inner, wide b, wide *own = nullptr) {
+__device__ __forceinline__ void moment_skin_back(const FieldWords &w, const PacedMode &pm, uint64_t gt, uint64_t gk, wide decay, wide inner, wide b, wide *own = nullptr, wide *fade = nullptr) {
     const wide st = (wide)w.sigma[(uint64_t)pm.p * w.T + gt], sk = (wide)w.sigma[(uint64_t)pm.p * w.T + gk];
     if (st == sk) {
         return;
@@ -7161,6 +7184,10 @@ __device__ __forceinline__ void moment_skin_back(const FieldWords &w, const Pace
         atomicOr(w.status, REFUSED_CARRIER);
     }
     const wide at = rel(rel(y, MOVE_BITS), MOVE_BITS + FACE_BITS);
+    // [the lead, November 24] The pair's share of the ring's fade, summed on the thread ([`fade_term_dev`]).
+    if (fade != nullptr) {
+        *fade += fade_term_dev(w, st - sk, at);
+    }
     const wide signed_at = st > sk ? at : -at;
     // [realization; November 15] With `own`, the receiver's own end is summed on the thread and added once a site (a ring sum on
     // `Z/2^128`: the same bits), so each term costs one atomic step where it cost two.
@@ -7191,7 +7218,7 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
         }
         const uint64_t first = w.region_off[r];
         const uint32_t sites = w.region_off[r + 1] - (uint32_t)first;
-        const wide b = turn_rate_dev(fw, pm.slot);
+        const wide b = turn_rate_dev(fw, pm.slot), bs = fw.skin_b[pm.slot];
         const wide sr = (wide)fw.moment[g * fw.M2 + cm], si = (wide)fw.moment[g * fw.M2 + fw.M + cm];
         const wide dr = (wide)ds[2 * g], di = (wide)ds[2 * g + 1];
         wide dtau = -turned_back_dev(fw, b, dr, di, sr, si);
@@ -7212,16 +7239,17 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
         add_wide(fw.gtau + (uint64_t)pm.p * fw.T + g, dtau);
         // The skins: the plain region's are the same law at whole variations.
         pm.plain = false;
-        wide own_sig = 0;
+        wide own_sig = 0, own_fade = 0;
+        wide *fade = fw.gfade != nullptr ? &own_fade : nullptr;
         const uint32_t forward = t + 1 < (uint32_t)NEAR ? t + 1 : (uint32_t)NEAR;
         for (uint32_t d = 0; d < forward; ++d) {
             const uint64_t gk = g - d;
-            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), b, &own_sig);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, -(int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, -(int32_t)d), mg_load(before, gk))), bs, &own_sig, fade);
         }
         const uint32_t backward = sites - t < (uint32_t)NEAR ? sites - t : (uint32_t)NEAR;
         for (uint32_t d = 0; d < backward; ++d) {
             const uint64_t gk = g + d;
-            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), b, &own_sig);
+            moment_skin_back(fw, pm, g, gk, clock_skin(fw, pm, u, g, (int32_t)d), re_pair(fw, dr, di, mg_mul(clock_phase(fw, pm, u, g, (int32_t)d), mg_load(after, gk))), bs, &own_sig, fade);
         }
         PacedMode own = paced_mode(fw, cm, r);
         const MomentGauss home = mg_conj(paced_absolute(fw, w, own, g));
@@ -7236,11 +7264,14 @@ extern "C" __global__ void field_moment_pace_back_all(const MomentWords *ws, con
                 const MomentGauss f = mg_mul(home, mg_sub(mg_load_wide(pre, hi + 1), mg_load_wide(pre, lo)));
                 const MomentGauss face = mg_make(rel(f.re, MOVE_BITS), rel(f.im, MOVE_BITS));
                 const uint64_t edge = right ? g + ((uint64_t)1 << level) : g - ((uint64_t)1 << level);
-                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), b, &own_sig);
+                moment_skin_back(fw, pm, g, edge, clock_far(fw, pm, g, level, right), re_pair(fw, dr, di, face), bs, &own_sig, fade);
             }
         }
         if (own_sig != 0) {
             add_wide(fw.gsig + (uint64_t)pm.p * fw.T + g, own_sig);
+        }
+        if (own_fade != 0) {
+            add_wide(fw.gfade + pm.slot, own_fade);
         }
     }
 }
@@ -7294,6 +7325,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
     // [theory, November 13, P55 step 5] Each mode's turn rate `b_l = release(2π/n_l, 16)` read once a block (`turn_rate_dev`): the quotient is the
     // head's and the mode's, the same at every pair and crowd of every row (at most 16 modes: the card's span is at most 32 entries).
     __shared__ wide turn_b[16];
+    // [the lead, November 24] Each mode's share of its ring's fade over the block's rows ([`fade_term_dev`]), summed in shared words and added
+    // once a block where the rings hold their fades.
+    __shared__ wide fade_b[16];
     const uint32_t warp = threadIdx.x >> 5, lane = threadIdx.x & 31;
     const uint32_t S = w.span, n = w.n, classes = w.nclasses;
     const int32_t p = paced_index(w, h);
@@ -7302,9 +7336,11 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
     }
     const HeadSkin hs = head_skin(w, h);
     for (uint32_t l = threadIdx.x; l < n; l += blockDim.x) {
-        turn_b[l] = turn_rate_dev(w, l * (w.frames - w.still) + h % w.frames - w.still);
+        turn_b[l] = w.skin_b[l * (w.frames - w.still) + h % w.frames - w.still];
+        fade_b[l] = 0;
     }
     __syncthreads();
+    const bool fading = w.gfade != nullptr;
     const uint64_t rows1 = (uint64_t)w.T + w.R;
     for (uint64_t g = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; g < w.T; g += (uint64_t)gridDim.x * (blockDim.x >> 5)) {
         const uint64_t hg = (uint64_t)h * w.T + g;
@@ -7374,6 +7410,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
                 at = skin_back_proved(turn_b[l], dec, value + lock);
                 own -= sgn * at;
                 to_source += (uwide)(sgn * at);
+                if (fading) {
+                    add_wide(&fade_b[l], fade_term_dev(w, (wide)sigma[g] - (wide)sigma[gj], at));
+                }
             }
             add_wide(w.gsig + (uint64_t)p * w.T + gj, (wide)to_source);
         }
@@ -7420,6 +7459,9 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
                         const wide at = skin_back_proved(turn_b[l], dec, value + lock);
                         own -= sgn * at;
                         to_edge += (uwide)(sgn * at);
+                        if (fading) {
+                            add_wide(&fade_b[l], fade_term_dev(w, (wide)sigma[g] - (wide)sigma[ge], at));
+                        }
                     }
                     add_wide(w.gsig + (uint64_t)p * w.T + ge, (wide)to_edge);
                 }
@@ -7428,6 +7470,14 @@ extern "C" __global__ void __launch_bounds__(CONTACT_ROWS * 32, 5) field_pace_sk
         own = warp_sum(own);
         if (lane == 0 && own != 0) {
             add_wide(w.gsig + (uint64_t)p * w.T + g, own);
+        }
+    }
+    if (fading) {
+        __syncthreads();
+        for (uint32_t l = threadIdx.x; l < n; l += blockDim.x) {
+            if (fade_b[l] != 0) {
+                add_wide(w.gfade + l * (w.frames - w.still) + h % w.frames - w.still, fade_b[l]);
+            }
         }
     }
 }

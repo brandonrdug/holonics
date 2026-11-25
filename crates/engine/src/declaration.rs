@@ -232,6 +232,17 @@ pub struct Declaration {
     /// the terrain's whole gain at a third of the text's price. Needs the friction; `false` writes every head line exactly as before; `true`
     /// writes the `hnn-field-v14r` line with its friction word `2`.
     pub friction_gate: bool,
+    /// [definition; the lead, November 24, the calendar record §6 item 1 and the record of the evening §3; `agent-inferred`] **Each turned
+    /// ring's fade as its own state**: with `true`, turned slot `s`'s skin is `e^(−2π γ_s |σ_i − σ_j|/n_s)` with `γ_s = 2^(ℓ_s)` e-folds a
+    /// radian of its own turn, `ℓ_s` on `2^(−24)` read through the temperatures' chart ([`Loci::fade`], one a turned slot), so its skin
+    /// denominator is `n ln 2 2^24 / γ` ([`crate::field::Constitution::set_ruler_fade`]'s form). Its covector is the skin's homogeneity: the
+    /// skin reads her clock only through `γ |σ_i − σ_j|`, so `δℓ_s = ln 2 Σ_pairs s ∂L/∂s` over the slot's pairs and crowds. Founded at zero the
+    /// field reads every face of its source bit for bit; founded displaced on part of a tower (`with_fade`) it is the 2×2's fade cell. Why:
+    /// the skin's constant holds every ring at `e^(−2π)` of itself over its own turn, so no ring hears its return (the calendar record §5),
+    /// and at that constant the fade's own covector at a pair a turn apart is a thirtieth of a pair a radian apart (the record of the
+    /// evening §3): a fade that can hear a count is founded where a ring keeps part of itself over a turn. `false` writes every head line as
+    /// before; `true` writes `hnn-field-v14s`, the twenty-two words of `v14r` (its friction word zero, one or two), then `1`.
+    pub fade: bool,
 }
 
 impl Declaration {
@@ -541,6 +552,9 @@ impl Declaration {
         if self.friction_gate && !self.friction {
             return refuse("a field whose friction is read from its receivers' state needs the friction");
         }
+        if self.fade && self.turned_slots() == 0 {
+            return refuse("a field whose rings hold their fades needs turned rings");
+        }
         if self.pump && self.carry == 0 {
             return refuse("a field whose carry circles are pumped needs carry circles");
         }
@@ -563,7 +577,9 @@ impl Declaration {
     pub(crate) fn to_text(self) -> String {
         // [theory, November 12, the triad record §4] With triads the head is `v14f`: `v14e`'s words with `C` written even at zero, then `J`; without
         // them the line before, exactly.
-        let head = if self.friction {
+        let head = if self.fade {
+            "hnn-field-v14s"
+        } else if self.friction {
             "hnn-field-v14r"
         } else if self.lane_leak {
             "hnn-field-v14q"
@@ -588,7 +604,9 @@ impl Declaration {
         } else {
             "hnn-field-v14"
         };
-        let tail = if self.friction {
+        let tail = if self.fade {
+            format!(" {} {} {} {} {} {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump), u8::from(self.lane_leak), u8::from(self.friction) + u8::from(self.friction_gate))
+        } else if self.friction {
             format!(" {} {} {} {} {} {} {} {} {} {} {}", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump), u8::from(self.lane_leak), 1 + u8::from(self.friction_gate))
         } else if self.lane_leak {
             format!(" {} {} {} {} {} {} {} {} {} 1", self.carry, self.triads, u8::from(self.opening), u8::from(self.junction), u8::from(self.mark), u8::from(self.loud), u8::from(self.crossing), self.closed, u8::from(self.pump))
@@ -629,35 +647,43 @@ impl Declaration {
         // then one.
         // [the lead, November 21] The friction's word is read from `v14r` alone: the twenty-one words of `v14q`, the leak's word zero or one, then
         // one.
-        let friction = words.first().copied() == Some("hnn-field-v14r") && words.len() == 23;
-        if friction && (!matches!(words[22], "1" | "2") || !matches!(words[21], "0" | "1") || !matches!(words[20], "0" | "1")) {
+        // [the lead, November 24] The fade's word is read from `v14s` alone: the twenty-two words of `v14r`, its friction word zero, one or
+        // two, then one ([`Declaration::fade`]).
+        let fade = words.first().copied() == Some("hnn-field-v14s") && words.len() == 24;
+        if fade && (words[23] != "1" || !matches!(words[22], "0" | "1" | "2") || !matches!(words[21], "0" | "1") || !matches!(words[20], "0" | "1")) {
+            return refuse("an hnn-field-v14s head line whose pump or leak word is not zero or one, whose friction word is not zero, one or two, or whose fade word is not one");
+        }
+        let friction_line = (words.first().copied() == Some("hnn-field-v14r") && words.len() == 23) || fade;
+        if friction_line && !fade && (!matches!(words[22], "1" | "2") || !matches!(words[21], "0" | "1") || !matches!(words[20], "0" | "1")) {
             return refuse("an hnn-field-v14r head line whose pump or leak word is not zero or one or whose friction word is not one or two");
         }
+        let friction = friction_line && words[22] != "0";
         // [the lead, November 21] The friction word two: the friction read from the receiver's own state ([`Declaration::friction_gate`]).
-        let friction_gate = friction && words[22] == "2";
+        let friction_gate = friction_line && words[22] == "2";
+        let friction_words = friction_line;
         let leak_line = words.first().copied() == Some("hnn-field-v14q") && words.len() == 22;
         if leak_line && (words[21] != "1" || !matches!(words[20], "0" | "1")) {
             return refuse("an hnn-field-v14q head line whose pump word is not zero or one or whose leak word is not one");
         }
-        let lane_leak = leak_line || (friction && words[21] == "1");
-        let pump = (words.first().copied() == Some("hnn-field-v14p") && words.len() == 21) || ((leak_line || friction) && words[20] == "1");
-        if !leak_line && !friction && pump && words[20] != "1" {
+        let lane_leak = leak_line || (friction_words && words[21] == "1");
+        let pump = (words.first().copied() == Some("hnn-field-v14p") && words.len() == 21) || ((leak_line || friction_words) && words[20] == "1");
+        if !leak_line && !friction_words && pump && words[20] != "1" {
             return refuse("an hnn-field-v14p head line whose pump word is not one (a field without the pump writes the line before it)");
         }
         let closed_line = words.first().copied() == Some("hnn-field-v14c") && words.len() == 20;
-        let crossing = words.first().copied() == Some("hnn-field-v14x") || ((closed_line || pump || leak_line || friction) && words[18] == "1");
+        let crossing = words.first().copied() == Some("hnn-field-v14x") || ((closed_line || pump || leak_line || friction_words) && words[18] == "1");
         let closed = if closed_line {
             match n(words[19])? {
                 0 => return refuse("an hnn-field-v14c head line with no closed characters (a field without them writes the line before it)"),
                 e => e,
             }
-        } else if pump || leak_line || friction {
+        } else if pump || leak_line || friction_words {
             n(words[19])?
         } else {
             0
         };
         let (depth_word, carry, triads, opening, junction, mark, loud) = match (words.first().copied(), words.len()) {
-            (Some("hnn-field-v14p"), 21) | (Some("hnn-field-v14q"), 22) | (Some("hnn-field-v14r"), 23) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
+            (Some("hnn-field-v14p"), 21) | (Some("hnn-field-v14q"), 22) | (Some("hnn-field-v14r"), 23) | (Some("hnn-field-v14s"), 24) => match (n(words[14])?, n(words[15])?, n(words[16])?, n(words[17])?, n(words[18])?) {
                 (o @ (0 | 1), j @ (0 | 1), m @ (0 | 1), l @ (0 | 1), 0 | 1) => (Some(words[11]), n(words[12])?, n(words[13])?, o == 1, j == 1, m == 1, l == 1),
                 _ => return refuse("an hnn-field-v14p head line whose opening, junction, mark, loudness or crossing word is not zero or one"),
             },
@@ -708,7 +734,7 @@ impl Declaration {
             (Some("hnn-field-v13"), 11) => (None, 0, 0, false, false, false, false),
             _ => return refuse("a field's head line that is not hnn-field-v14"),
         };
-        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump, lane_leak, friction, friction_gate };
+        let d = Self { alphabet: n(words[1])?, width: n(words[2])?, heads: n(words[3])?, modes: n(words[4])?, still: n(words[5])?, contacts: n(words[6])?, ticks: n(words[7])?, frames: n(words[8])?, reach: n(words[9])?, lanes: n(words[10])?, depth: depth_word.map(n).transpose()?.unwrap_or(0), carry, triads, opening, junction, mark, loud, crossing, closed, pump, lane_leak, friction, friction_gate, fade };
         d.admit()?;
         Ok(d)
     }
@@ -814,6 +840,9 @@ pub struct Loci {
     /// [definition; the lead, November 21] **The friction's gate** ([`Declaration::friction_gate`]): `a_h`, a row of `D` a head on the
     /// material's grain; the last family, zero long where the friction is not read from the receiver's state.
     pub friction_gate: usize,
+    /// [definition; the lead, November 24] **Each turned ring's fade** ([`Declaration::fade`]): `ℓ_s`, one a turned slot on the material's
+    /// grain (the temperatures' chart, `γ = 2^ℓ`); the last family, zero long where the rings do not hold their fades.
+    pub fade: usize,
     pub len: usize,
     pub families: Vec<(usize, usize, u32)>,
 }
@@ -924,6 +953,7 @@ impl Loci {
         let lane_leak = tail(usize::from(d.lane_leak) * d.lanes, FACE_BITS);
         let friction = tail(usize::from(d.friction) * 2 * d.heads, FACE_BITS);
         let friction_gate = tail(usize::from(d.friction_gate) * d.heads * d.width, MATERIAL_BITS);
-        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, lane_leak, friction, friction_gate, len: at, families }
+        let fade = tail(usize::from(d.fade) * d.turned_slots(), MATERIAL_BITS);
+        Self { enc, before, after, q, q_bias, v, v_bias, out, out_bias, a: a_, a_bias, b, b_bias, w, w_bias, read, read_bias, moment_before, moment_after, temper, probe, probe_bias, pace, moment_face, moment_face_bias, lift_bias, carry, carry_bias, triad, triad_bias, w_triad, opening, opening_bias, junction, junction_bias, mark, loud, closed_key, closed_odds, closed_odds_bias, pump, pump_bias, lane_leak, friction, friction_gate, fade, len: at, families }
     }
 }

@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,759 records from July 2026 to November 2026. 407 receipts directories: 225 beside the records and 182 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,760 records from July 2026 to November 2026. 408 receipts directories: 225 beside the records and 183 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 158 | 123 |
+| [November 2026](#november-2026) | 159 | 124 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -24,6 +24,7 @@ directory leaves out (the listing stops at 1,000).
 - 2026-11-24 [Context is a calendar a receiver reads counts of one cycle against another a count lasts as long as its store rings one fade reads no gap and two read it and her rings fade before they turn](2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md)
 - 2026-11-24 [Her line takes the full curated collection at seventy two percent of a pass the logs crowd out the registers and her acts and the levels lane cost under four thousandths and move nothing yet](2026-11-24_HER_LINE_TAKES_THE_FULL_CURATED_COLLECTION_AT_SEVENTY_TWO_PERCENT_OF_A_PASS_THE_LOGS_CROWD_OUT_THE_REGISTERS_AND_HER_ACTS_AND_THE_LEVELS_LANE_COST_UNDER_FOUR_THOUSANDTHS_AND_MOVE_NOTHING_YET.md)
 - 2026-11-24 [Her navigation and her hearing are one law each slices share is held by her tension at it and her rings fade stands near its best and cannot hear a count from where it is founded](2026-11-24_HER_NAVIGATION_AND_HER_HEARING_ARE_ONE_LAW_EACH_SLICES_SHARE_IS_HELD_BY_HER_TENSION_AT_IT_AND_HER_RINGS_FADE_STANDS_NEAR_ITS_BEST_AND_CANNOT_HEAR_A_COUNT_FROM_WHERE_IT_IS_FOUNDED.md)
+- 2026-11-24 [Her rings hold their fades as her own state the ring of sixteen carries the count of a six letter word and half its fade buys half the opening for a fifth of the price](2026-11-24_HER_RINGS_HOLD_THEIR_FADES_AS_HER_OWN_STATE_THE_RING_OF_SIXTEEN_CARRIES_THE_COUNT_OF_A_SIX_LETTER_WORD_AND_HALF_ITS_FADE_BUYS_HALF_THE_OPENING_FOR_A_FIFTH_OF_THE_PRICE.md)
 - 2026-11-23 [A dwell on the repositorys text takes its register and forgets the others the mixed passages pull is a walk and the dwells holds its direction](2026-11-23_A_DWELL_ON_THE_REPOSITORYS_TEXT_TAKES_ITS_REGISTER_AND_FORGETS_THE_OTHERS_THE_MIXED_PASSAGES_PULL_IS_A_WALK_AND_THE_DWELLS_HOLDS_ITS_DIRECTION.md)
 - 2026-11-23 [A fading medium carries by a cycle with a hand and keeps what a common turn leaves a count or a pair of opposite hands a unit is a loop that nearly closes its comma is its remainder and nested depth is an index](2026-11-23_A_FADING_MEDIUM_CARRIES_BY_A_CYCLE_WITH_A_HAND_AND_KEEPS_WHAT_A_COMMON_TURN_LEAVES_A_COUNT_OR_A_PAIR_OF_OPPOSITE_HANDS_A_UNIT_IS_A_LOOP_THAT_NEARLY_CLOSES_ITS_COMMA_IS_ITS_REMAINDER_AND_NESTED_DEPTH_IS_AN_INDEX.md)
 - 2026-11-23 [A question is the stroke out of a loop its answer closes the loop carries its area up to the least cut it threads the first person is the anchor it returns to and a limbs reach is bought by nested depth](2026-11-23_A_QUESTION_IS_THE_STROKE_OUT_OF_A_LOOP_ITS_ANSWER_CLOSES_THE_LOOP_CARRIES_ITS_AREA_UP_TO_THE_LEAST_CUT_IT_THREADS_THE_FIRST_PERSON_IS_THE_ANCHOR_IT_RETURNS_TO_AND_A_LIMBS_REACH_IS_BOUGHT_BY_NESTED_DEPTH.md)

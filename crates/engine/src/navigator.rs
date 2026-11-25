@@ -242,10 +242,48 @@ impl Constitution {
                 return dv;
             }
         }
-        match &self.ruler_skin_k {
+        match self.ruler_skin_k.as_ref().or(self.fade_skin_k.as_ref()) {
             Some(k) => skin_of_k(s, k[slot], self.pi, &self.exponential),
             None => skin_of(s, self.rings[slot].0, self.pi, &self.exponential),
         }
+    }
+
+    /// The skin denominator of turned slot `slot` as the field reads it: a ruler's, else its fade's ([`Declaration::fade`]), else one
+    /// e-fold a radian ([`skin_denominator`]). The card reads the same words ([`Constitution::skin_denominators`]).
+    pub fn skin_denominator_of(&self, slot: usize) -> i128 {
+        self.ruler_skin_k.as_ref().or(self.fade_skin_k.as_ref()).map_or_else(|| skin_denominator(self.rings[slot].0), |k| k[slot])
+    }
+
+    /// Every turned slot's skin denominator ([`Constitution::skin_denominator_of`]), in slot order.
+    pub fn skin_denominators(&self) -> Vec<i128> {
+        (0..self.rings.len()).map(|slot| self.skin_denominator_of(slot)).collect()
+    }
+
+    /// [definition; the lead, November 24] **The rings' skins formed from their fades** ([`Declaration::fade`]): each turned slot's fade
+    /// `γ_s = 2^(ℓ_s)` read from the material through the temperatures' chart, its skin denominator `k = n ln 2 2^24 / γ` and its decays at a
+    /// whole distance formed again where `k` moved. A field whose rings do not hold their fades is untouched. At `ℓ = 0` every word is the
+    /// constant skin's, bit for bit.
+    pub fn refresh_fade(&mut self) -> Result<()> {
+        if !self.declaration.fade {
+            return Ok(());
+        }
+        let at = self.layout.fade;
+        let ks: Vec<i128> = (0..self.rings.len())
+            .map(|slot| -> Result<i128> {
+                let base = skin_denominator(self.rings[slot].0);
+                let ell = self.theta[at + slot];
+                Ok(if ell == 0 { base } else { div_nearest(base << MATERIAL_BITS, temperature_of(ell, &self.fine)?) })
+            })
+            .collect::<Result<_>>()?;
+        let reach = self.declaration.reach;
+        let (pi, exponential) = (self.pi, &self.exponential);
+        let stale: Vec<usize> = (0..ks.len()).filter(|&slot| self.fade_skin_k.as_ref().is_none_or(|old| old[slot] != ks[slot])).collect();
+        let fresh: Vec<(usize, Vec<i64>)> = stale.par_iter().map(|&slot| (slot, (0..reach).map(|d| skin_of_k((d as i128) << PACE_BITS, ks[slot], pi, exponential)).collect())).collect();
+        for (slot, row) in fresh {
+            self.decays[slot] = row;
+        }
+        self.fade_skin_k = Some(ks);
+        Ok(())
     }
 
     /// [measurement; the lead, November 24, the calendar record §6 item 1, a read before the fade is a law] **The rings of period `from` and
@@ -253,8 +291,13 @@ impl Constitution {
     /// ring at one: each such ring's skin denominator `k = n ln 2 2^24 / γ` and its decays at a whole distance formed again. A ruler's
     /// setting on a clone of the field (`read-reach`'s `fade:FROM:MILLI`): not part of the state, and no reverse reads it.
     pub fn set_ruler_fade(&mut self, from: usize, ell: i32) -> Result<()> {
+        self.set_ruler_fade_between(from, usize::MAX, ell)
+    }
+
+    /// [`Constitution::set_ruler_fade`] on the rings of period `from` to `to` alone.
+    pub fn set_ruler_fade_between(&mut self, from: usize, to: usize, ell: i32) -> Result<()> {
         let gamma = temperature_of(ell, &self.fine)?;
-        let ks: Vec<i128> = self.rings.iter().map(|&(n, _)| if n >= from { div_nearest(skin_denominator(n) << MATERIAL_BITS, gamma) } else { skin_denominator(n) }).collect();
+        let ks: Vec<i128> = self.rings.iter().map(|&(n, _)| if n >= from && n <= to { div_nearest(skin_denominator(n) << MATERIAL_BITS, gamma) } else { skin_denominator(n) }).collect();
         let reach = self.declaration.reach;
         self.decays = ks.iter().map(|&k| (0..reach).map(|d| skin_of_k((d as i128) << PACE_BITS, k, self.pi, &self.exponential)).collect()).collect();
         self.ruler_skin_k = Some(ks);
@@ -388,6 +431,25 @@ impl Constitution {
     /// A turned slot's rate of turn `b = 2π/n` per unit of its clock, on `2^(−30)`.
     pub(crate) fn turn_rate(&self, slot: usize) -> i128 {
         release(div_nearest(2 * self.pi, self.rings[slot].0 as i128), FACE_BITS)
+    }
+
+    /// [definition; the lead, November 24] **A turned slot's rate of fade** on `2^(−30)`: its turn rate `2π/n` times its fade `γ`
+    /// ([`Declaration::fade`]), read as `div_nearest(b n ln 2 2^24, k)` from its skin denominator `k = n ln 2 2^24/γ`, so at one e-fold a
+    /// radian it is the turn rate bit for bit. The skin's slope in the clock's variation is this rate, where the frame's is the turn rate.
+    pub fn skin_rate(&self, slot: usize) -> i128 {
+        let b = self.turn_rate(slot);
+        let (base, k) = (skin_denominator(self.rings[slot].0), self.skin_denominator_of(slot));
+        if k == base { b } else { div_nearest(b * base, k) }
+    }
+
+    /// [definition; the lead, November 24] **A ring's fade covector from its skin's homogeneity** ([`Declaration::fade`]): the skin reads
+    /// her clock only through `γ |s|`, so `∂L/∂ℓ = ln 2 Σ_pairs s ∂L/∂s`. One pair's term, with `s` on `2^(−24)` and `term` its share of the
+    /// clock covector (`2^24 ∂/∂σ`, so that `−sgn term` is the pair's `∂/∂s`), is `−release(ln 2 · release(|s| term, MATERIAL_BITS − FACE_BITS), LN2_FACE_BITS)` on the
+    /// material's covector at the slot's fade (`2^40 ∂/∂ℓ`). Each term is released alone and the terms meet at that one grain, so their sum
+    /// is the same bits on any partition of the pairs (the card's, the host's cells).
+    pub(crate) fn fade_term(s: i128, term: i128) -> Result<i128> {
+        let at = release(s.abs().checked_mul(term).ok_or(TowerError::Refused(PACE_RETURN))?, MATERIAL_BITS - FACE_BITS);
+        Ok(-release(ln2_face().checked_mul(at).ok_or(TowerError::Refused(PACE_RETURN))?, LN2_FACE_BITS))
     }
 
     /// Head `h`'s clock as the moment reads it ([`moment::Pace`]): none where its pace is plain (the byte place).

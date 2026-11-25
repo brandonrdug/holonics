@@ -1178,6 +1178,39 @@ pub fn found_level_lane(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 24, the record of the evening §3] `found-fade STATE STATE_SHA FROM TO MILLI OUT`: **the state whose
+/// turned rings hold their fades** ([`holonics_engine::field::Declaration::fade`], [`holonics_engine::field::Learner::with_fade_between`]),
+/// founded at `2^(MILLI/1000)` of the skin's fade on the rings of period `FROM` to `TO` and at the skin's on the others. Every other line of
+/// the state is kept, its lattice's spreads and rests among them, so it differs from its source by the fades alone and runs as an arm beside
+/// the source's control. At `MILLI = 0` every face is the source's bit for bit. Written and read back.
+pub fn found_fade(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("found-fade STATE STATE_SHA FROM TO MILLI OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let (from, to): (usize, usize) = (args[3].parse()?, args[4].parse()?);
+    let ell = i32::try_from(holonics_engine::field::div_nearest(i128::from(args[5].parse::<i64>()?) << holonics_engine::field::MATERIAL_BITS, 1000)).map_err(|_| "a fade past its chart")?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = end.with_fade_between(from, to, ell).map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    let f = &founded.field;
+    let at = f.layout().fade;
+    let fades: Vec<String> = f.rings().iter().enumerate().filter(|(s, _)| f.theta[at + s] != 0).map(|(s, (n, _))| format!("{n}:{}", f.theta[at + s])).collect();
+    println!("FOUND_FADE rings={} faded={} [{}] entries={} lattice={}", f.rings().len(), fades.len(), fades.join(" "), f.material_len(), founded.lattice.is_some());
+    Ok(())
+}
+
 pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());

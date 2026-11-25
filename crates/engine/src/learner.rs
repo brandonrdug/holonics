@@ -968,6 +968,8 @@ impl Learner {
     /// [`Learner::section`] on a declared realization of the field's read and return; the step
     /// is deposited at its size, and the moments and the step stay on the host.
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn Realization) -> Result<Receipt> {
+        // [the lead, November 24] The rings' skins formed from the fades the material holds now ([`Declaration::fade`]).
+        self.field.refresh_fade()?;
         let mut part = std::time::Instant::now();
         let mut mark = |k: usize| {
             SECTION_PARTS[k].fetch_add(part.elapsed().as_nanos() as u64, std::sync::atomic::Ordering::Relaxed);
@@ -1074,7 +1076,7 @@ impl Learner {
             // The parts the field has, in the line's order ([`written_parts`]): nineteen without carry circles, twenty-two with them, and the
             // triad's one more where the field has triads.
             let d = &self.field.declaration;
-            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud, d.lane_leak).iter().chain(d.friction.then_some(&FRICTION_PART)).map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
+            let parts = self.rate_parts.map_or(String::new(), |rp| format!("parts {} {}\n", rp.contacts_before, written_parts(d.carry, d.triads, d.opening, d.junction, d.mark, d.loud, d.lane_leak).iter().chain(d.friction.then_some(&FRICTION_PART)).chain(d.fade.then_some(&FADE_PART)).map(|&p| rp.octaves[p].to_string()).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12 00:20] Each entry's own rate, a trailing line after the parts' (`rates r₀ … r_(n−1)`).
             let own = self.own_rates.as_ref().map_or(String::new(), |r| format!("rates {}\n", r.iter().map(u32::to_string).collect::<Vec<_>>().join(" ")));
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
@@ -1138,7 +1140,11 @@ impl Learner {
                 // founding) reads with it at the old rate.
                 let friction = field.declaration.friction;
                 let unfrictioned = written_parts(carry, triads, opening, junction, mark, loud, lane_leak);
-                let order: Vec<usize> = unfrictioned.iter().copied().chain(friction.then_some(FRICTION_PART)).collect();
+                // [the lead, November 24] A field whose rings hold their fades appends their part; its line without it reads with it at the
+                // old rate.
+                let fade = field.declaration.fade;
+                let unfaded: Vec<usize> = unfrictioned.iter().copied().chain(friction.then_some(FRICTION_PART)).collect();
+                let order: Vec<usize> = unfaded.iter().copied().chain(fade.then_some(FADE_PART)).collect();
                 let unleaked = written_parts(carry, triads, opening, junction, mark, loud, false);
                 let unloud = written_parts(carry, triads, opening, junction, mark, false, false);
                 let unmarked = written_parts(carry, triads, opening, junction, false, false, false);
@@ -1149,6 +1155,8 @@ impl Learner {
                 let n = v.len().saturating_sub(1);
                 let slots: Vec<usize> = if n == order.len() {
                     order
+                } else if fade && n == unfaded.len() {
+                    unfaded
                 } else if friction && n == unfrictioned.len() {
                     unfrictioned
                 } else if lane_leak && n == unleaked.len() {

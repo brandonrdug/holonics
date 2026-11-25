@@ -2,7 +2,7 @@
 """Does her store keep a period it is shown? A ruler on the host, read on known text (the lead, November 24; the formal thread's
 20:49Z note on the period panel: "the read that would tell is her face on the reference laid out as known text").
 
-Usage: python3 tools/period_known.py make ROWS.tsv PLACES.tsv [SEED [ROWS_EACH]]
+Usage: python3 tools/period_known.py make ROWS.tsv PLACES.tsv [SEED [ROWS_EACH [L,L,...]]]
        python3 tools/period_known.py read CODES_DIR PLACES.tsv
 
 `make` writes rows for `athena ... read-reach` (`label<TAB>text<TAB>`) and the places to read. Each row is a stretch of drawn lowercase
@@ -27,10 +27,10 @@ SPAN = 300
 LETTERS = "abcdefghijklmnopqrstuvwxyz"
 
 
-def make(rows_path, places_path, seed, rows_each=ROWS_EACH):
+def make(rows_path, places_path, seed, rows_each=ROWS_EACH, lengths=LENGTHS):
     rng = random.Random(seed)
     rows, places = [], []
-    for L in LENGTHS:
+    for L in lengths:
         for i in range(rows_each):
             letters = [rng.choice(LETTERS) for _ in range(SPAN)]
             for kind in ("kept", "loose"):
@@ -82,7 +82,7 @@ def read(codes_dir, places_path):
 
 if __name__ == "__main__":
     if len(sys.argv) >= 4 and sys.argv[1] == "make":
-        make(sys.argv[2], sys.argv[3], int(sys.argv[4]) if len(sys.argv) > 4 else 24, int(sys.argv[5]) if len(sys.argv) > 5 else ROWS_EACH)
+        make(sys.argv[2], sys.argv[3], int(sys.argv[4]) if len(sys.argv) > 4 else 24, int(sys.argv[5]) if len(sys.argv) > 5 else ROWS_EACH, tuple(int(v) for v in sys.argv[6].split(",")) if len(sys.argv) > 6 else LENGTHS)
     elif len(sys.argv) == 4 and sys.argv[1] == "read":
         read(sys.argv[2], sys.argv[3])
     else:

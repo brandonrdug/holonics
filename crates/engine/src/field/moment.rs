@@ -628,14 +628,23 @@ pub fn cavity_pace_return(before: &[(i64, i64)], after: &[(i64, i64)], s_before:
 /// from its face) owes that stride the same covector.
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]
 pub fn cavity_pace_return_split(before: &[(i64, i64)], after: &[(i64, i64)], s_before: &[(i64, i64)], s_after: &[(i64, i64)], ds: &[(i64, i64)], back_before: &[(i128, i128)], back_after: &[(i128, i128)], ring: &[(i64, i64)], n: usize, decay: &[i64], pace: &Pace, tau_c: &[i64], sigma_c: &[i64], b: i128) -> Result<(Vec<i128>, Vec<i128>, Vec<i128>, Vec<i128>)> {
+    let (dtau, dsig, rx_tau, rx_sig, _) = cavity_pace_return_faded(before, after, s_before, s_after, ds, back_before, back_after, ring, n, decay, pace, tau_c, sigma_c, b, b)?;
+    Ok((dtau, dsig, rx_tau, rx_sig))
+}
+
+/// [definition; the lead, November 24] [`cavity_pace_return_split`] on a ring whose skin fades at its own rate `b_skin`, with the ring's fade
+/// sum beside ([`pace_return_faded`]). At `b_skin = b` the clocks' covectors are the split's bit for bit.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+pub fn cavity_pace_return_faded(before: &[(i64, i64)], after: &[(i64, i64)], s_before: &[(i64, i64)], s_after: &[(i64, i64)], ds: &[(i64, i64)], back_before: &[(i128, i128)], back_after: &[(i128, i128)], ring: &[(i64, i64)], n: usize, decay: &[i64], pace: &Pace, tau_c: &[i64], sigma_c: &[i64], b: i128, b_skin: i128) -> Result<(Vec<i128>, Vec<i128>, Vec<i128>, Vec<i128>, i128)> {
     let sites = before.len();
     if [after.len(), s_before.len(), s_after.len(), ds.len(), back_before.len(), back_after.len(), tau_c.len(), sigma_c.len()].iter().any(|&l| l != sites) {
         return refuse("a strand's cavity clock covector over parts of different lengths");
     }
     let (mut dtau, mut dsig) = (vec![0i128; sites], vec![0i128; sites]);
     let (mut rx_tau, mut rx_sig) = (vec![0i128; sites], vec![0i128; sites]);
+    let mut fade = 0i128;
     if sites == 0 {
-        return Ok((dtau, dsig, rx_tau, rx_sig));
+        return Ok((dtau, dsig, rx_tau, rx_sig, fade));
     }
     let law = Law::new(sites, ring, n, decay, Some(pace))?;
     let sign = |x: i64| -> i128 { x.signum() as i128 };
@@ -650,11 +659,12 @@ pub fn cavity_pace_return_split(before: &[(i64, i64)], after: &[(i64, i64)], s_b
     }
     // The skins: one term a pair or an octave, its share of `σ` at its two ends; a receiver's end on its before side is `t − 1`'s clock.
     let mut skin = |rt: usize, sr: i64, k: usize, d: i128, inner: i128, receiver: Option<usize>| -> Result<()> {
-        let at = scaled(scaled(inner, d, MOVE_BITS)?, b, MOVE_BITS)?;
+        let at = scaled(scaled(inner, d, MOVE_BITS)?, b_skin, MOVE_BITS)?;
         let term = release(at, MOVE_BITS + FACE_BITS);
         let sgn = sign(sr - pace.sigma[k]);
         dsig[rt] = sub(dsig[rt], mul(sgn, term)?)?;
         dsig[k] = add(dsig[k], mul(sgn, term)?)?;
+        fade = add(fade, crate::field::Constitution::fade_term(sr as i128 - pace.sigma[k] as i128, term)?)?;
         if let Some(t) = receiver {
             rx_sig[t] = sub(rx_sig[t], mul(sgn, term)?)?;
         }
@@ -687,7 +697,7 @@ pub fn cavity_pace_return_split(before: &[(i64, i64)], after: &[(i64, i64)], s_b
             }
         }
     }
-    Ok((dtau, dsig, rx_tau, rx_sig))
+    Ok((dtau, dsig, rx_tau, rx_sig, fade))
 }
 
 /// **The cavity moments** on `2^(−16)`: [`cavity_moment_exact`] released once, to the nearest numerator, as [`moments`] releases.
@@ -814,13 +824,24 @@ fn scaled(x: i128, y: i128, bits: u32) -> Result<i128> {
 /// `D` released 30, times `b` released 30, released 46; the far octave's face `conj(ζ^τ) P` released 30 first).
 #[allow(clippy::too_many_arguments)]
 pub fn pace_return(before: &[(i64, i64)], after: &[(i64, i64)], s: &[(i64, i64)], ds: &[(i64, i64)], back_before: &[(i128, i128)], back_after: &[(i128, i128)], ring: &[(i64, i64)], n: usize, decay: &[i64], pace: &Pace, b: i128) -> Result<(Vec<i128>, Vec<i128>)> {
+    let (dtau, dsig, _) = pace_return_faded(before, after, s, ds, back_before, back_after, ring, n, decay, pace, b, b)?;
+    Ok((dtau, dsig))
+}
+
+/// [definition; the lead, November 24] [`pace_return`] on a ring whose skin fades at its own rate `b_skin` (the turn's `b` times its fade
+/// `γ`, [`crate::field::Declaration::fade`]), with the ring's fade sum beside the clocks' covectors: `Σ release(|s| term, 8)` over its pairs
+/// and octaves, which [`crate::field::Constitution::fade_covector`] carries into the fade's covector. At `b_skin = b` the clocks' covectors
+/// are [`pace_return`]'s bit for bit.
+#[allow(clippy::too_many_arguments, clippy::type_complexity)]
+pub fn pace_return_faded(before: &[(i64, i64)], after: &[(i64, i64)], s: &[(i64, i64)], ds: &[(i64, i64)], back_before: &[(i128, i128)], back_after: &[(i128, i128)], ring: &[(i64, i64)], n: usize, decay: &[i64], pace: &Pace, b: i128, b_skin: i128) -> Result<(Vec<i128>, Vec<i128>, i128)> {
     let sites = before.len();
     if [after.len(), s.len(), ds.len(), back_before.len(), back_after.len()].iter().any(|&l| l != sites) {
         return refuse("a strand's clock covector over parts of different lengths");
     }
     let (mut dtau, mut dsig) = (vec![0i128; sites], vec![0i128; sites]);
+    let mut fade = 0i128;
     if sites == 0 {
-        return Ok((dtau, dsig));
+        return Ok((dtau, dsig, fade));
     }
     let law = Law::new(sites, ring, n, decay, Some(pace))?;
     let sign = |x: i64| -> i128 { x.signum() as i128 };
@@ -828,13 +849,14 @@ pub fn pace_return(before: &[(i64, i64)], after: &[(i64, i64)], s: &[(i64, i64)]
         dtau[t] = sub(dtau[t], scaled(cross(wide(ds[t]), wide(s[t]))?, b, MOVE_BITS + FACE_BITS)?)?;
         dtau[t] = add(dtau[t], scaled(add(cross(back_before[t], wide(before[t]))?, cross(back_after[t], wide(after[t]))?)?, b, MOVE_BITS + FACE_BITS)?)?;
     }
-    // The skins: one term a pair or an octave, its share of `σ` at its two ends.
+    // The skins: one term a pair or an octave, its share of `σ` at its two ends, and its share of the ring's fade.
     let mut skin = |t: usize, k: usize, d: i128, inner: i128| -> Result<()> {
-        let at = scaled(scaled(inner, d, MOVE_BITS)?, b, MOVE_BITS)?;
+        let at = scaled(scaled(inner, d, MOVE_BITS)?, b_skin, MOVE_BITS)?;
         let term = release(at, MOVE_BITS + FACE_BITS);
         let sgn = sign(pace.sigma[t] - pace.sigma[k]);
         dsig[t] = sub(dsig[t], mul(sgn, term)?)?;
         dsig[k] = add(dsig[k], mul(sgn, term)?)?;
+        fade = add(fade, crate::field::Constitution::fade_term(pace.sigma[t] as i128 - pace.sigma[k] as i128, term)?)?;
         Ok(())
     };
     let re = |a: Gauss, z: Gauss| -> Result<i128> { add(mul(a.0, z.0)?, mul(a.1, z.1)?) };
@@ -858,7 +880,7 @@ pub fn pace_return(before: &[(i64, i64)], after: &[(i64, i64)], s: &[(i64, i64)]
             skin(t, k, law.octave(t, level, right), re(wide(ds[t]), face)?)?;
         }
     }
-    Ok((dtau, dsig))
+    Ok((dtau, dsig, fade))
 }
 
 #[cfg(test)]

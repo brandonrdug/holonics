@@ -79,6 +79,10 @@ pub struct Constitution {
     /// the skin's argument parted from the turn's. A ruler's setting on a clone of the field (`read-reach`'s `skin:places`); the moments keep
     /// their paced skin. Not part of the state.
     pub ruler_skin_places: bool,
+    /// [definition; the lead, November 24] Each turned slot's skin denominator formed from the fade its material holds
+    /// ([`Declaration::fade`], [`Constitution::refresh_fade`]); `None` on a field whose rings do not hold their fades. Derived from the
+    /// material, so no part of the state's text.
+    pub fade_skin_k: Option<Vec<i128>>,
     /// [measurement; the lead, November 21, the precision pass's G-W3] Where set, **every state rounded to `2^(−g)` after each tick** of a
     /// passage read by two streams: `x ← release(x, 16 − g) ≪ (16 − g)` over every site, `x` on the state's `2^(−16)`. A ruler's read of how
     /// many of the state's places the code reads: not part of the state, and no reverse reads it.
