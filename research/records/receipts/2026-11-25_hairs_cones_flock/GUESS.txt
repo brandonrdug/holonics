@@ -1,0 +1,27 @@
+Guesses of the lens of hairs, cones and the flock (the formal thread, November 25). Fixed before the read each names.
+
+G-W1  fixed 2026-11-25T20:09:21Z, before `repeat_at_dear.py` was run on any row.
+      Premise read first: the price of a cut (a place's code with nothing crossing less its code under the law, W117 MEAN.3000,
+      100 held rows, cut at 256) stands on few places: the dearest tenth hold 4,176 nats where the net over all 19,200 places is
+      4,044 (`conc.txt`, read before this guess).
+      Guess (0.65): the dear places are where the far past holds the continuation and the near past does not. Counting a place as
+      a far-only repeat when the run of four characters that ends at it stands whole before the cut and nowhere between the cut and
+      the place, the share of far-only repeats among the dearest tenth is at least twice their share among the other nine tenths.
+      A miss: under twice. Beside it, unguessed: the same at runs of 2, 3 and 6, and the repeats that also stand after the cut.
+      What it bears on: a hair aimed where the far past repeats (hearing by address) is then the rod that takes most of a cut's price,
+      and a founding law has a place to strike.
+      Note, written before any count: the ruler's first run refused the rows (it counted characters; a place is an octet of the
+      row as the codec reads it, a line break written as backslash n in the rows file). The guess stands as fixed, a run of four
+      being four places.
+      SCORED 2026-11-25T20:13:01Z: held. At a run of four the far-only repeats are 0.629 of the dearest tenth and 0.138 of the other nine tenths,
+      4.55 times (2.80, 3.84 and 5.16 times at runs of 2, 3 and 6). Beside it, unguessed and larger than the guess: from place 32
+      past the cut on, the far-only repeats at a run of three (3,387 of 16,100 places) hold 1.004 of the net price of the cut, and
+      the places whose run stands nowhere before (7,947) read 0.016 nats a place better with nothing crossing (`repeat.txt`).
+
+G-W2  fixed 2026-11-25T20:13:01Z, before the joined stretches are built (the lead's next arm; no state of it stands).
+      Premise read first: on W117 the far past is worth nothing to her at a place whose run of three is new (REPEAT_FOUR and
+      REPEAT_SET of `repeat.txt`: -0.016 nats a place under cut:256:0, between -0.013 and +0.040 under every other setting).
+      Guess (0.3): on the arm's first read at a lap's mean, the price under cut:256:0 at the places whose run of three stands
+      nowhere before, from place 32 past the cut on (the same 100 rows), is +0.010 nats a place or more. A miss: under +0.010.
+      What it reads: whether anything other than recurrence has begun to cross a region's first place, which is what a store
+      asked for far content would carry. It is beside G-R3 (the stores' horizon), and it can hold while G-R3 misses.
