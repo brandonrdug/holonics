@@ -22,3 +22,9 @@ first section's steps (read before any slice had a reading, every weight one) st
 in 2,620 sections code and science (the two largest quotas) took 267,833 and 89,060 regions and the other eight slices 62 among them
 (its log; no held read of it was made). The clock now reads each tension's ratio to the slices' mean (e5f7, clock_step). G-S2 is
 scored, unchanged, on W113u: W112's STATE.3000 with its tensions set by e5f7, 3,000 sections beside W113; W113uf is the both cell.
+
+Moved again 2026-11-25T03:06:54Z (date -u), before W113v trains, by the lead on Brandon's 03:03Z ("average"? normality, sigmoid (softmax), prime
+gaps, unit gaps, trees/branches of graphs, holonic): the clock's reference was a plain mean of the tensions, a statistic in no reader's
+unit. A slice's share is now a partition, p_s = quota_s T_s / sum_r quota_r T_r, its share of her news (the aperture's normalization
+and the terrain's two-branch share one level up), and its clock counts the passage's own places, a gap of 1/p_s between reads (e5f8).
+W113u was stopped at 1,029 sections, unread. G-S2 is scored, unchanged, on W113v; W113vf is the both cell.

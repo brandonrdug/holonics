@@ -7202,10 +7202,10 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
     // The first stretches are read before any slice has a reading (one each), as a pass held by its tensions opens (W113t's first section).
     let mut c = cut([400, 100], Some(vec![0, 0]), Some(vec![0, 0]));
     let mut gave = [0u64; 2];
-    let mut step = |c: &mut crate::passage::Cut, gave: &mut [u64; 2]| {
+    let step = |c: &mut crate::passage::Cut, gave: &mut [u64; 2]| {
         let s = c.next().unwrap().slice;
-        let (w, mean) = c.slice_weights().unwrap();
-        c.pass.slice_clock.as_mut().unwrap()[s] += crate::passage::clock_step(10, c.slices[s].quota, w[s], mean);
+        let (w, z) = c.slice_weights().unwrap();
+        c.pass.slice_clock.as_mut().unwrap()[s] += crate::passage::clock_step(10, c.slices[s].quota, w[s], z);
         gave[s] += 10;
     };
     for _ in 0..2 {
@@ -7228,9 +7228,12 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
         step(&mut c, &mut gave);
     }
     assert!((3 * gave[1] as i64 - 4 * gave[0] as i64).abs() <= 120, "b gives four thirds of a's places: {gave:?}");
-    // A slice with no reading weighs as the mean of those with one; with no reading at all, one each.
-    assert_eq!(cut([0, 0], Some(vec![0, 3_000]), None).slice_weights().unwrap(), (vec![3_000, 3_000], 3_000));
-    assert_eq!(cut([0, 0], Some(vec![0, 0]), None).slice_weights().unwrap(), (vec![1, 1], 1));
+    // A slice with no reading is read at the partition's own tension a quota octet; with no reading at all, one each, the quotas' shares;
+    // the partition is the flux of news, quota times tension, summed over the slices.
+    assert_eq!(cut([0, 0], Some(vec![0, 3_000]), None).slice_weights().unwrap(), (vec![3_000, 3_000], 6_000_000));
+    assert_eq!(cut([0, 0], Some(vec![0, 0]), None).slice_weights().unwrap(), (vec![1, 1], 2_000));
+    // A slice's clock counts the passage's places: at a share of one quarter, ten places are forty of the passage's.
+    assert_eq!(crate::passage::clock_step(10, 1_000, 1_000, 4_000_000), 40 << SHARE_BITS);
     // The tension and clock lines read back as written, after the pass's line.
     let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.pass = Some(pass([100, 250], Some(vec![1_000, 3_000]), Some(vec![17, 4])));
