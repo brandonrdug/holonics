@@ -1485,6 +1485,7 @@ import HolonicsResearch.Zeta.PeriodicChartLimit
 import HolonicsResearch.Compression.JoinReadsSupport
 import HolonicsResearch.Landmarks.CharacteristicPolygon
 import HolonicsResearch.HNN.LeakingStore
+import HolonicsResearch.HNN.FadeHomogeneity
 import HolonicsResearch.HNN.WidthTolerance
 import HolonicsResearch.HNN.GrainRelation
 import HolonicsResearch.HNN.AnsweredAct
