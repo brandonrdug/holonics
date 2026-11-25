@@ -173,6 +173,17 @@ pub(crate) struct Paces {
     pub(crate) tau: Vec<Vec<i64>>,
     pub(crate) sigma: Vec<Vec<i64>>,
     pub(crate) plain: Vec<bool>,
+    /// [definition; the lead, November 25] Each paced head's skin-clock step `κ_h(t) + ρ_h[u_t]` where the classes fade at their own rates
+    /// ([`Declaration::fade_rate`]); empty where they do not, and the skin clock steps by the turn's `|κ_h(t)|`.
+    pub(crate) kappa_sigma: Vec<Vec<i64>>,
+}
+
+impl Paces {
+    /// The sign of the skin clock's step at site `k` of paced head `p`: its own where the classes fade at their own rates, the turn's
+    /// otherwise (the clock is the sum of the steps' magnitudes, so its covector reaches a step through this sign).
+    pub(crate) fn skin_sign(&self, p: usize, k: usize) -> i128 {
+        self.kappa_sigma.get(p).map_or(self.kappa[p][k], |ks| ks[k]).signum() as i128
+    }
 }
 
 /// `e^(2πi r/n)` on `2^(−30)`, `r` taken in `(−n/2, n/2]`, from the half turn on `2^(−46)` by the
@@ -346,7 +357,9 @@ impl Constitution {
             let p = out.kappa.len();
             out.row[h] = Some(p);
             let base = self.layout.pace + p * width;
+            let fade_base = d.fade_rate.then(|| self.layout.fade_rate + p * width);
             let (mut kappa, mut tau, mut sigma) = (Vec::with_capacity(sites), Vec::with_capacity(sites), Vec::with_capacity(sites));
+            let mut kappa_sigma = Vec::with_capacity(if fade_base.is_some() { sites } else { 0 });
             let (mut clock, mut variation) = (0i128, 0i128);
             for t in 0..sites {
                 // [§16.47] Past the last arrival every silent place runs at the first one's rate (one passage); under
@@ -361,19 +374,33 @@ impl Constitution {
                 };
                 // A depth ring's rate is its located increment alone (base zero, [`Declaration::depth`]).
                 let k = if d.is_depth(h) { rate } else { one + rate };
+                // [the lead, November 25] Where the classes fade at their own rates the skin clock steps by `κ + ρ[u]`, the fade's row read at a
+                // written site as the turn's is (a carried face by its shares) and zero at a silent one, whose fade is the turn's
+                // ([`Declaration::fade_rate`]).
+                let ks = match fade_base {
+                    Some(fb) => {
+                        let rho = self.strand_row(region, fb, 1, at)[0] as i128;
+                        kappa_sigma.push(fit64(k + rho)?);
+                        k + rho
+                    }
+                    None => k,
+                };
                 if t > 0 {
                     clock += k;
-                    variation += k.abs();
+                    variation += ks.abs();
                 }
                 kappa.push(fit64(k)?);
                 tau.push(fit64(clock)?);
                 sigma.push(fit64(variation)?);
             }
             let rest = if d.is_depth(h) { 0 } else { one };
-            out.plain.push(kappa.iter().all(|&k| k as i128 == rest));
+            out.plain.push(kappa.iter().all(|&k| k as i128 == rest) && kappa_sigma.iter().zip(&kappa).all(|(s, k)| s == k));
             out.kappa.push(kappa);
             out.tau.push(tau);
             out.sigma.push(sigma);
+            if fade_base.is_some() {
+                out.kappa_sigma.push(kappa_sigma);
+            }
         }
         Ok(out)
     }

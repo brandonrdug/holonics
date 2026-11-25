@@ -281,6 +281,9 @@ pub(crate) struct Words {
     pub(crate) skin_k: u64,
     pub(crate) skin_b: u64,
     pub(crate) gfade: u64,
+    // [the lead, November 25] Where the classes fade at their own rates, the material's offset of the paced heads' fade rows
+    // (`FieldWords::fade_rate_at`, the host's `Loci::fade_rate`); `u64::MAX` where they do not.
+    pub(crate) fade_rate_at: u64,
 }
 
 pub(crate) fn arg<T>(v: &mut T) -> *mut c_void {
@@ -1012,6 +1015,7 @@ impl<'c> Resident<'c> {
             temper_at: l.temper as u64,
             friction_at: if d.friction { l.friction as u64 } else { u64::MAX },
             gate_at: if d.friction_gate { l.friction_gate as u64 } else { u64::MAX },
+            fade_rate_at: if d.fade_rate { l.fade_rate as u64 } else { u64::MAX },
             rgate: if d.friction_gate { reach(l.friction_gate, d.heads * dw) } else { 0 },
             fgate: 0,
             dfgate: 0,

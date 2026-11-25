@@ -873,13 +873,22 @@ impl Constitution {
         self.moments_return_sided(&region, &paces, &whole.dm, g, &mut whole.gtau, &mut whole.gsig, false)?;
         for p in 0..paced {
             let base = l.pace + p * width;
+            let fade_base = d.fade_rate.then(|| l.fade_rate + p * width);
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
             for k in (1..n).rev() {
                 tail_tau += whole.gtau[p][k];
                 tail_sig += whole.gsig[p][k];
-                let dk = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+                let sgn = paces.skin_sign(p, k);
+                let dk = tail_tau + sgn * tail_sig;
                 if dk != 0 {
                     g[base + self.row(&region, k)] += dk << STATE_BITS;
+                }
+                // [the lead, November 25] The fade's row takes the skin clock's covector alone ([`Declaration::fade_rate`]).
+                if let Some(fb) = fade_base {
+                    let df = sgn * tail_sig;
+                    if df != 0 {
+                        g[fb + self.row(&region, k)] += df << STATE_BITS;
+                    }
                 }
             }
         }
@@ -1248,34 +1257,49 @@ impl Constitution {
             let head = (0..d.heads).find(|&h| paces.row[h] == Some(p)).ok_or(TowerError::Refused("a paced head with no row"))?;
             let (mut tail_tau, mut tail_sig) = (0i128, 0i128);
             let mut dks = vec![0i128; sites];
+            // [the lead, November 25] The fade's row takes the skin clock's covector alone ([`Declaration::fade_rate`]).
+            let mut dfs = vec![0i128; if d.fade_rate { sites } else { 0 }];
             for k in (1..sites).rev() {
                 tail_tau += r.gtau[p][k];
                 tail_sig += r.gsig[p][k];
-                dks[k] = tail_tau + paces.kappa[p][k].signum() as i128 * tail_sig;
+                let sgn = paces.skin_sign(p, k);
+                dks[k] = tail_tau + sgn * tail_sig;
+                if let Some(slot) = dfs.get_mut(k) {
+                    *slot = sgn * tail_sig;
+                }
             }
             // [§16.47] The silent stretch past the last arrival runs at its first place's rate, so their covectors return there.
             if stretch < sites && !self.bare_stretch {
-                let folded: i128 = dks[stretch + 1..].iter().sum();
-                dks[stretch] += folded;
-                for slot in &mut dks[stretch + 1..] {
-                    *slot = 0;
+                for ds in [&mut dks, &mut dfs] {
+                    if ds.is_empty() {
+                        continue;
+                    }
+                    let folded: i128 = ds[stretch + 1..].iter().sum();
+                    ds[stretch] += folded;
+                    for slot in &mut ds[stretch + 1..] {
+                        *slot = 0;
+                    }
                 }
             }
-            for k in (0..sites).rev() {
-                let dk = dks[k];
-                if dk == 0 {
-                    continue;
-                }
-                let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref).filter(|_| !self.declaration.is_depth(head)) } else { Self::carried(region, k) };
-                match face {
-                    None if Self::silent(region, k) => {}
-                    None => g[base + self.row(region, k)] += dk << STATE_BITS,
-                    Some(face) => {
-                        for &(c, w) in face {
-                            g[base + c as usize] += dk * w as i128;
-                        }
-                        if Self::silent(region, k) && !rates.is_empty() {
-                            rates[k].push((base, dk));
+            let rows: Vec<(usize, &[i128], bool)> = std::iter::once((base, dks.as_slice(), false)).chain(d.fade_rate.then(|| (l.fade_rate + p * width, dfs.as_slice(), true))).collect();
+            for (base, ds, fade) in rows {
+                for k in (0..sites).rev() {
+                    let dk = ds[k];
+                    // A silent site's fade is the turn's: its fade row reads nothing there and takes nothing.
+                    if dk == 0 || (fade && Self::silent(region, k)) {
+                        continue;
+                    }
+                    let face = if Self::silent(region, k) { blank.get(k).and_then(Option::as_ref).filter(|_| !self.declaration.is_depth(head)) } else { Self::carried(region, k) };
+                    match face {
+                        None if Self::silent(region, k) => {}
+                        None => g[base + self.row(region, k)] += dk << STATE_BITS,
+                        Some(face) => {
+                            for &(c, w) in face {
+                                g[base + c as usize] += dk * w as i128;
+                            }
+                            if Self::silent(region, k) && !rates.is_empty() {
+                                rates[k].push((base, dk));
+                            }
                         }
                     }
                 }

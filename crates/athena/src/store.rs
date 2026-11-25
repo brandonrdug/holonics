@@ -321,7 +321,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -1211,6 +1211,34 @@ pub fn found_fade(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 25, Neon's audit relayed by Brandon] `found-fade-rate STATE STATE_SHA OUT`: **the state whose classes fade
+/// at their own rates** ([`holonics_engine::field::Declaration::fade_rate`], [`holonics_engine::field::Learner::with_fade_rate`]), founded at
+/// zero: every face is the source's bit for bit and every other line of the state is kept, so it differs from its source by the rows alone
+/// and runs as an arm beside the source's control. Written and read back.
+pub fn found_fade_rate(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("found-fade-rate STATE STATE_SHA OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = end.with_fade_rate().map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    let d = &founded.field.declaration;
+    println!("FOUND_FADE_RATE paced={} rows={} entries={} lattice={}", d.paced_heads(), d.paced_heads() * (d.alphabet + 1), founded.field.material_len(), founded.lattice.is_some());
+    Ok(())
+}
+
 pub fn found_lane(args: &[String]) -> Result<()> {
     if args.len() != 6 {
         return Err("found-lane STATE STATE_SHA KEYS KEYS_SHA OUT".into());
@@ -1677,6 +1705,7 @@ pub fn join_store(args: &[String]) -> Result<()> {
     // A pass held by its slices' tensions reads its new slices afresh: one reading a slice, none yet.
     pass.slice_tension = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
     pass.slice_clock = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
+    pass.slice_walk = pass.slice_walk.as_ref().map(|_| vec![0; names.len()]);
     let after = slices_text(&pass);
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
@@ -1821,6 +1850,45 @@ pub fn set_terrain(args: &[String]) -> Result<()> {
 /// a negative sum read as zero.
 fn micro_a_place(code: i128, places: usize) -> u64 {
     u64::try_from((code.max(0) * 1_000_000) / ((places as i128) << 20)).unwrap_or(u64::MAX)
+}
+
+/// [definition; the lead, November 25, Gemini Neon's audit relayed by Brandon] `set-walk STATE STATE_SHA OUT`: **a state's slices walked on
+/// their golden strides from where each stands** ([`holonics_engine::field::StorePass::slice_walk`]): the state with a `walk` line after its
+/// pass's lines, each slice's place the count of pieces it has finished (and the piece it is inside, which it finishes first), every other
+/// line byte for byte (read back and checked). Refused on a state with no pass or one whose pass already walks.
+pub fn set_walk(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("set-walk STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.slice_walk.is_some() {
+        return Err("a state whose pass already walks its slices".into());
+    }
+    let walk: Vec<u64> = before.slices.iter().map(|s| s.piece + u64::from(s.cursor > 0)).collect();
+    let line = format!("walk {}", walk.iter().map(u64::to_string).collect::<Vec<_>>().join(" "));
+    let mut next = learner.clone();
+    let after = usize::from(before.terrain.is_some()) + usize::from(before.slice_tension.is_some()) + usize::from(before.slice_clock.is_some());
+    next.pass = Some(StorePass { slice_walk: Some(walk), ..before });
+    let written = next.to_text();
+    let pass_line = written.lines().position(|l| l.starts_with("pass ")).ok_or("a written state with no pass line")?;
+    let mut expected: Vec<&str> = text.lines().collect();
+    expected.insert(pass_line + 1 + after, &line);
+    if written.lines().collect::<Vec<_>>() != expected {
+        return Err("a written walk that changes a line other than its own".into());
+    }
+    let back = Learner::from_text(&written).map_err(|e| e.to_string())?;
+    if back.field != learner.field || back.pass != next.pass {
+        return Err("a written walk whose state does not read back as the source's field and pass".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_WALK lines={} {line}", expected.len());
+    Ok(())
 }
 
 /// [definition; the lead, November 24, Brandon's 21:57Z] `set-tension STATE STATE_SHA OUT`: **a state's pass held by its slices' tensions**

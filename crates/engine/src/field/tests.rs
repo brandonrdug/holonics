@@ -23,7 +23,7 @@ fn keys(n: usize) -> Vec<u8> {
 }
 
 fn tiny_declaration(still: usize) -> Declaration {
-    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false }
+    Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still, contacts: 4, ticks: 2, frames: 2, reach: 16, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }
 }
 
 /// A tiny field with every family drawn from the keys (the founding holds the returns and the
@@ -813,7 +813,7 @@ fn no_site_meets_itself() {
 /// head's lock of an equal word (`n` at unit power, half its `2n` reals) reads `2⌈log₂ reach⌉` bits.
 #[test]
 fn the_contact_s_gain_covers_the_falloff() {
-    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false }.score_shift();
+    let at = |modes: usize, reach: usize| Declaration { alphabet: 5, width: 8, heads: 2, modes, still: 1, contacts: 4, ticks: 2, frames: 2, reach, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }.score_shift();
     assert_eq!(at(8, 2221), -2, "reading 8's declaration locks an equal word at 32 bits");
     assert_eq!(at(16, 16), 1);
     assert_eq!(at(3, 16), -2);
@@ -822,7 +822,7 @@ fn the_contact_s_gain_covers_the_falloff() {
         let gained = |b: i32| if b >= 0 { (modes as u128) >> b } else { (modes as u128) << -b };
         assert!(gained(beta) >= need && gained(beta + 1) < need, "the largest such shift: modes {modes} reach {reach}");
     }
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 8, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 2221, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
     assert_eq!((d.class_trits(), d.classes()), (4, 81), "81 classes at reading 8's reach");
     assert_eq!(Declaration { modes: 3, ..d }.class_trits(), 3);
     assert_eq!((Declaration { reach: 81, ..d }.class_trits(), Declaration { reach: 82, ..d }.class_trits()), (2, 3));
@@ -877,7 +877,7 @@ fn the_skin_decay_is_an_e_fold_a_radian_and_vanishes_below_the_grain() {
 /// and a turned field. Probes across a sheet are left out and counted.
 #[test]
 fn the_covector_matches_the_code_across_the_far_support() {
-    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false };
+    let d = Declaration { alphabet: 5, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 32, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
     let classes: Vec<usize> = (0..26).map(|t| [1usize, 3, 2, 4, 0, 2, 1][t % 7]).collect();
     let open: Vec<bool> = (0..26).map(|t| t % 9 == 4 || t == 25).collect();
     let r = Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
@@ -965,7 +965,7 @@ fn the_covector_matches_the_code_across_the_far_support() {
 /// of a row, the loudest far source 0.005.)
 #[test]
 fn a_listener_s_founding_row_keeps_its_near_field() {
-    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false };
+    let d = Declaration { alphabet: 44, width: 32, heads: 5, modes: 8, still: 2, contacts: 32, ticks: 2, frames: 5, reach: 484, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false };
     assert_eq!((d.score_shift(), d.listen_shift()), (-2, 2));
     let sites = 420;
     let classes = drawn_classes(7, sites, d.alphabet);
@@ -2035,7 +2035,7 @@ fn refinement_moves_the_end_one_place_a_read() {
 
 /// The level's field of the tower fixtures.
 fn coarse_declaration() -> Declaration {
-    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false }
+    Declaration { alphabet: 2, width: 8, heads: 2, modes: 3, still: 1, contacts: 4, ticks: 2, frames: 2, reach: 6, lanes: 1, depth: 0, carry: 0, triads: 0, opening: false, junction: false, mark: false, loud: false, crossing: false, closed: 0, pump: false, lane_leak: false, friction: false, friction_gate: false, fade: false, fade_rate: false }
 }
 
 /// A level on [`opened`]`(still)` (the level reads the opening's news): six harmonics after the first of its two ticks, founded
@@ -3875,7 +3875,7 @@ fn the_triads_head_line_is_v14f_and_at_no_triads_every_line_is_as_before() {
         assert_eq!(new.families[..old.families.len()], old.families[..], "C {c}: every old family as before");
         assert_eq!(new.families[old.families.len()..], [(old.len, 6 * j * dw, MATERIAL_BITS), (old.len + 6 * j * dw, 6 * j, FACE_BITS), (old.len + 6 * j * dw + 6 * j, dw * 2 * j, MATERIAL_BITS)]);
         assert_eq!((new.triad, new.triad_bias, new.w_triad, new.len), (old.len, old.len + 6 * j * dw, old.len + 6 * j * dw + 6 * j, old.len + 6 * j * dw + 6 * j + dw * 2 * j));
-        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, friction: old.friction, friction_gate: old.friction_gate, fade: old.fade, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
+        assert_eq!(Loci { triad: old.triad, triad_bias: old.triad_bias, w_triad: old.w_triad, opening: old.opening, opening_bias: old.opening_bias, junction: old.junction, junction_bias: old.junction_bias, mark: old.mark, loud: old.loud, closed_key: old.closed_key, closed_odds: old.closed_odds, closed_odds_bias: old.closed_odds_bias, pump: old.pump, pump_bias: old.pump_bias, lane_leak: old.lane_leak, friction: old.friction, friction_gate: old.friction_gate, fade: old.fade, fade_rate: old.fade_rate, len: old.len, families: old.families.clone(), ..new.clone() }, old, "C {c}: every old offset unchanged");
     }
 }
 
@@ -4251,9 +4251,10 @@ fn the_triads_are_the_law_site_by_site_with_none_at_a_regions_two_ends() {
 /// letter rows only where the field has triads, so at `J = 0` the written parts are the lines before.
 #[test]
 fn the_triad_is_one_founded_part_written_only_where_the_field_has_triads() {
-    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 30));
+    assert_eq!((PART_NAMES[TRIAD_PART], TRIAD_PART, PARTS), ("triad", 22, 31));
     assert_eq!((PART_NAMES[FRICTION_PART], FRICTION_PART), ("friction", 28));
     assert_eq!((PART_NAMES[FADE_PART], FADE_PART), ("fade", 29));
+    assert_eq!((PART_NAMES[FADE_RATE_PART], FADE_RATE_PART), ("fade_rate", 30));
     assert_eq!((PART_NAMES[LOUD_PART], LOUD_PART), ("loud", 26));
     assert_eq!((PART_NAMES[LEAK_PART], LEAK_PART), ("lane_leak", 27));
     assert_eq!((PART_NAMES[OPENING_PART], OPENING_PART), ("opening", 23));
@@ -4371,7 +4372,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4430,6 +4431,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         terrain: None,
         slice_tension: None,
         slice_clock: None,
+        slice_walk: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -7190,6 +7192,7 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
         terrain: None,
         slice_tension: tension,
         slice_clock: clock,
+        slice_walk: None,
     };
     let cut = |taken: [u64; 2], tension: Option<Vec<u64>>, clock: Option<Vec<u128>>| crate::passage::Cut { seed: 3, slices: vec![slice("a"), slice("b")], pass: pass(taken, tension, clock) };
     // Without tensions the quotas alone: the slice behind takes the next stretch.
@@ -7241,6 +7244,133 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
     assert!(text.lines().any(|l| l == "tension 1000 3000"), "the tension line is written");
     assert!(text.lines().any(|l| l == "clock 17 4"), "the clock line is written");
     assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
+}
+
+/// [definition; the lead, November 25] **A slice walked on its golden stride reads every piece once and spreads its reads over the
+/// slice**: the stride is coprime to the pieces left; the pieces before the walk's place keep their order; every piece from it is read once;
+/// consecutive pieces stand about 0.618 of the slice apart; the walk line reads back as written.
+#[test]
+fn a_slice_walked_on_its_golden_stride_reads_every_piece_once_and_spreads_its_reads_over_the_slice() {
+    for m in [2u64, 3, 10, 97, 1_000, 65_536, 1_000_003] {
+        let g = crate::passage::golden_stride(m);
+        assert!(g > 0 && g < m, "a stride inside the slice: {m} {g}");
+        let (mut a, mut b) = (g, m);
+        while b != 0 {
+            (a, b) = (b, a % b);
+        }
+        assert_eq!(a, 1, "coprime to the pieces left: {m} {g}");
+        if m >= 97 {
+            assert!((g as i128 - (m as i128 * 618 / 1000)).abs() <= (m as i128) / 100 + 2, "near the golden section: {m} {g}");
+        }
+    }
+    let piece = crate::passage::Piece { document: 0, offset: 0, title: 0, text: 64, opens: false, closes: true };
+    let n = 23usize;
+    let slice = crate::passage::Slice { name: "a".into(), quota: 1000, pieces: vec![piece; n], source: Box::new(UnreadBytes) };
+    let pass = StorePass {
+        role: "prefix".into(),
+        store: "ab".repeat(32),
+        stretches: 7,
+        least: 4,
+        octaves: 7,
+        pairs: 15_606_223,
+        sites: 41_490,
+        own: false,
+        slices: vec![PassSlice { name: "a".into(), piece: 5, cursor: 3, taken: 300 }],
+        world: None,
+        frontier: 0,
+        before: false,
+        strand: false,
+        past: false,
+        second: false,
+        terrain: None,
+        slice_tension: None,
+        slice_clock: None,
+        slice_walk: Some(vec![6]),
+    };
+    let cut = crate::passage::Cut { seed: 3, slices: vec![slice], pass };
+    let order: Vec<usize> = (0..n as u64).map(|k| cut.piece_of(0, k)).collect();
+    assert_eq!(&order[..6], &[0, 1, 2, 3, 4, 5], "the pieces before the walk keep their order, the one it is inside first");
+    let mut seen = order[6..].to_vec();
+    seen.sort_unstable();
+    assert_eq!(seen, (6..n).collect::<Vec<_>>(), "every piece from the walk's place read once");
+    let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
+    learner.pass = Some(cut.pass.clone());
+    let text = learner.to_text();
+    assert!(text.lines().any(|l| l == "walk 6"), "the walk line is written");
+    assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
+}
+
+/// [definition; the lead, November 25] **The classes' fade rates founded at zero keep every face, and their return matches their code's
+/// difference**: a field whose classes fade at their own rates founded at zero reads every face of its source and returns the same covector
+/// at every standing entry, its line writes `hnn-field-v14s` and reads back; with the rates drawn off zero, the code's covector at each
+/// rate (the skin clock's covector alone, [`Declaration::fade_rate`]) predicts the code's central difference, in a region and in a passage
+/// read by two streams.
+#[test]
+fn the_classes_fade_rates_founded_at_zero_keep_every_face_and_their_return_matches_their_codes_difference() {
+    let (mut read, mut seams) = (0usize, 0usize);
+    for (name, plain) in [("plain, one still", shaped(1)), ("circles, one still", circled_shaped(1)), ("four ticks, one still", four_ticks(1)), ("the opening, one still", opened(1))] {
+        let (zero, _) = plain.with_fade_rate().unwrap();
+        let r = region();
+        assert_eq!(zero.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: the rates founded at zero keep every face");
+        let base_g = covector_of(&plain, &r);
+        let zero_g = covector_of(&zero, &r);
+        assert_eq!(&zero_g[..plain.theta.len()], &base_g[..], "{name}: and every standing entry's covector");
+        let text = zero.to_text();
+        assert!(text.starts_with("hnn-field-v14s "), "{name}: the line is v14s");
+        assert_eq!(Constitution::from_text(&text).unwrap().theta, zero.theta, "{name}: and reads back");
+        assert!(Constitution::from_text(&text).unwrap().declaration.fade_rate, "{name}: with its fade rates");
+        let mut field = zero.clone();
+        let l = field.layout.clone();
+        let rows = field.declaration.paced_heads() * (field.declaration.alphabet + 1);
+        let one = 1i32 << MATERIAL_BITS;
+        for (k, v) in field.theta[l.fade_rate..l.fade_rate + rows].iter_mut().enumerate() {
+            *v = [-one / 4, one / 8, -3 * one / 8, one / 4, -one / 2][k % 5];
+        }
+        assert_ne!(field.faces(&r).unwrap(), plain.faces(&r).unwrap(), "{name}: the rates move the faces");
+        let classes = drawn_classes(0xFB, 11, field.declaration.alphabet);
+        let strand_code = |f: &Constitution| -> i64 {
+            let places: i64 = f.strand_pass(&classes, false, true).unwrap().faces.iter().zip(&classes).skip(1).map(|(fc, &c)| crate::field::ratio_code(fc.masses[c], fc.total)).sum();
+            let known = vec![false; classes.len()];
+            let opening = if f.declaration.opening { opening_code(f, &Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: true, second: false, targets: None }) } else { 0 };
+            places + opening
+        };
+        let strand_g = {
+            let pass = field.strand_pass(&classes, true, true).unwrap();
+            let mut g = vec![0i128; field.theta.len()];
+            field.strand_returned(&classes, &classes, &pass, &mut g).unwrap();
+            g
+        };
+        let region_g = covector_of(&field, &r);
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let p = f.pass(&r, true).unwrap();
+            let s = f.strand_pass(&classes, true, true).unwrap();
+            p.ticks.iter().chain(&s.ticks).flat_map(|c| c.classes.iter().map(|cl| cl.off.iter().chain(&cl.members).copied().chain(cl.probes.iter().flat_map(|p| std::iter::once(u32::MAX).chain(p.iter().copied()))).collect())).collect()
+        };
+        for (which, g) in [("region", &region_g), ("strand", &strand_g)] {
+            for i in (l.fade_rate..l.fade_rate + rows).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    f.theta[i] += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                let shift = 40 + MATERIAL_BITS - 20;
+                let Some((delta, h)) = probe_step(MATERIAL_BITS, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                // A region on a field that compares its opening owes the opening's code beside the readout's ([`opening_code`]).
+                let region_code = |f: &Constitution| -> i64 { f.code(&r).unwrap().0 + if f.declaration.opening { opening_code(f, &r) } else { 0 } };
+                let measured = if which == "region" { region_code(&moved(delta)) - region_code(&moved(-delta)) } else { strand_code(&moved(delta)) - strand_code(&moved(-delta)) };
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + (64 * 10 << h);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "{name}, {which}: fade rate entry {} at {h} halvings: measured {measured}, predicted {predicted}", i - l.fade_rate);
+            }
+        }
+    }
+    eprintln!("FADE_RATE_COVECTOR_PROBES read={read} on_a_seam={seams}");
+    assert!(read >= 12 && 8 * seams <= read.max(1), "read {read} probes, {seams} on a seam");
 }
 
 /// [definition; the lead, November 24] **The rings' fades founded at zero keep every face, and their return matches their code's
@@ -7315,4 +7445,3 @@ fn the_rings_fades_founded_at_zero_keep_every_face_and_their_return_matches_thei
     eprintln!("FADE_COVECTOR_PROBES read={read} on_a_seam={seams}");
     assert!(read >= 12 && 8 * seams <= read.max(1), "read {read} probes, {seams} on a seam");
 }
-

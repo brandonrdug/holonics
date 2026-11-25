@@ -18,7 +18,7 @@
 //! history is in the records; the items below keep their reasons.
 
 use crate::codec::{question_text, Codec, RECORD, UNIT};
-use crate::field::{octave_of, Constitution, Realization, Region, StorePass, NEAR, SHARE_BITS};
+use crate::field::{octave_of, Constitution, Realization, Region, StorePass, NEAR, SHARE_BITS, UNIT_BITS};
 use crate::region::{region_classes, OwnedRegion};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -457,6 +457,19 @@ impl Cut {
         Some((w, z))
     }
 
+    /// [definition; the lead, November 25] The piece slice `s` reads as its `k`-th of the pass: `k` itself before its walk's place `W` (and where
+    /// no walk is set), and `W + ((k − W) g) mod M` after it, `M` the pieces from `W` on and `g` their golden stride ([`StorePass::slice_walk`]).
+    pub fn piece_of(&self, s: usize, k: u64) -> usize {
+        let n = self.slices[s].pieces.len() as u64;
+        match self.pass.slice_walk.as_ref().map(|w| w[s]) {
+            Some(w) if k >= w && n > w => {
+                let m = n - w;
+                (w + ((u128::from(k - w) * u128::from(golden_stride(m))) % u128::from(m)) as u64) as usize
+            }
+            _ => k as usize,
+        }
+    }
+
     pub fn next(&self) -> Option<Drawn> {
         let live: Vec<usize> = (0..self.slices.len()).filter(|&s| (self.pass.slices[s].piece as usize) < self.slices[s].pieces.len()).collect();
         let mut slice = *live.first()?;
@@ -478,7 +491,7 @@ impl Cut {
             }
         }
         let at = &self.pass.slices[slice];
-        let piece = self.slices[slice].pieces[at.piece as usize];
+        let piece = self.slices[slice].pieces[self.piece_of(slice, at.piece)];
         let d = self.pass.stretches + 1;
         let rest = piece.places() - at.cursor;
         let frontier = frontier_here(self.seed, d, self.pass.frontier);
@@ -493,7 +506,8 @@ impl Cut {
     /// The drawn stretch taken: its region read from its slice's file, and the pass moved past it.
     pub fn take(&mut self, drawn: Drawn, codec: &Codec) -> Result<Stretch> {
         let at = self.pass.slices[drawn.slice].clone();
-        let bytes = self.slices[drawn.slice].bytes(at.piece as usize, at.cursor, drawn.q + drawn.a)?;
+        let k = self.piece_of(drawn.slice, at.piece);
+        let bytes = self.slices[drawn.slice].bytes(k, at.cursor, drawn.q + drawn.a)?;
         let mut classes = codec.encode(&bytes)?;
         if classes.len() != bytes.len() {
             return Err("a stretch whose bytes are not one class each".into());
@@ -536,6 +550,26 @@ impl Cut {
         self.pass.stretches = drawn.d;
         Ok(region)
     }
+}
+
+/// [definition; the lead, November 25] **The golden stride of `m` pieces**: the stride nearest `m (√5 − 1)/2` (the golden section's face on
+/// `2^(−UNIT_BITS)`) that is coprime to `m`, so `k ↦ k g mod m` visits every piece once and consecutive reads stand about 0.618 of the slice
+/// apart (the three-gap theorem's most even spread). One where `m` is at most one.
+pub fn golden_stride(m: u64) -> u64 {
+    if m <= 1 {
+        return 1;
+    }
+    let one = 1u128 << UNIT_BITS;
+    let root5 = (5u128 << (2 * UNIT_BITS)).isqrt();
+    let mut g = ((u128::from(m) * (root5 - one)) >> (UNIT_BITS + 1)).max(1) as u64;
+    while gcd_u64(g, m) != 1 {
+        g += 1;
+    }
+    g % m
+}
+
+fn gcd_u64(a: u64, b: u64) -> u64 {
+    if b == 0 { a } else { gcd_u64(b, a % b) }
 }
 
 /// [definition; the lead, November 25, Brandon's 03:03Z] **A slice's clock step** ([`StorePass::slice_clock`]): `places` over the slice's

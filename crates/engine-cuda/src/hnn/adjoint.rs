@@ -446,9 +446,15 @@ impl<'c> Resident<'c> {
                     // [realization; theory, November 13, P58 item 2] Unzeroed: `field_pace_kappa_back` writes every `(paced head, site)` word, each
                     // region's sites from its last to its first, before `field_pace_c_back` and `field_blank_dz` read them.
                     let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
+                    // [the lead, November 25] The fade rows' share of the skin clock's covector, where the classes fade at their own rates.
+                    let dfade = if field.declaration.fade_rate { Some(self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?) } else { None };
                     let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
-                    self.launch("field_pace_kappa_back", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words), arg(&mut dkp)])?;
+                    let mut dfp = dfade.as_ref().map_or(0u64, |b| b.device_ptr());
+                    self.launch("field_pace_kappa_back", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dfp)])?;
                     self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
+                    if dfade.is_some() {
+                        self.launch("field_pace_fade_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dfp), arg(&mut gp)])?;
+                    }
                     self.blank_back(field, words, clock, &dkappa, g, dx, sites)?;
                 }
             }
@@ -500,9 +506,14 @@ impl<'c> Resident<'c> {
             if paced > 0 {
                 // [P58 item 2] Unzeroed, as each tick's: `field_pace_kappa_back` writes every word before `field_pace_c_back` reads it.
                 let dkappa = self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?;
+                let dfade = if field.declaration.fade_rate { Some(self.timed(Kind::Alloc, || self.take::<i128>((paced * sites).max(1))).map_err(device)?) } else { None };
                 let (mut dkp, mut gp) = (dkappa.device_ptr(), g.device_ptr());
-                self.launch("field_pace_kappa_back", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words), arg(&mut dkp)])?;
+                let mut dfp = dfade.as_ref().map_or(0u64, |b| b.device_ptr());
+                self.launch("field_pace_kappa_back", ((paced * regions) as u64).clamp(1, 65_535) as u32, PACE_SCAN_THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut dfp)])?;
                 self.launch("field_pace_c_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dkp), arg(&mut gp)])?;
+                if dfade.is_some() {
+                    self.launch("field_pace_fade_back", Self::cells((paced * sites) as u64), THREADS, &mut [arg(words), arg(&mut dfp), arg(&mut gp)])?;
+                }
             }
         }
         set_clock(words, None, base_clock);
