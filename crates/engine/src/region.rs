@@ -49,18 +49,20 @@ pub struct OwnedRegion {
     pub second: bool,
     /// What its strand's open places are compared with ([`Region::targets`]); none where they are compared with the known stream.
     pub targets: Option<Vec<usize>>,
+    /// Where its stretches after the first begin ([`Region::stretches`]); empty where it is one stretch.
+    pub stretches: Vec<usize>,
 }
 
 impl OwnedRegion {
     /// A region carrying no face and no lock.
     pub fn plain(classes: Vec<usize>, unresolved: Vec<bool>) -> Self {
-        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, before: false, strand: false, past: false, second: false, targets: None }
+        Self { classes, unresolved, faces: Vec::new(), locked: Vec::new(), echo: Vec::new(), domain: None, port: None, window: false, letters: false, before: false, strand: false, past: false, second: false, targets: None, stretches: Vec::new() }
     }
 }
 
 /// A region as the field reads it.
 pub fn view_of(region: &OwnedRegion) -> Region<'_> {
-    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }), before: region.before, strand: region.strand, past: region.past, second: region.second, targets: region.targets.as_deref() }
+    Region { classes: &region.classes, unresolved: &region.unresolved, faces: &region.faces, locked: &region.locked, echo: &region.echo, domain: region.domain, port: region.port.as_ref().map(|(start, void, target, boundary, stop, heard)| Port { start: *start, void: *void, target, boundary: *boundary, stop: *stop, heard: heard.as_deref(), window: region.window, letters: region.letters }), before: region.before, strand: region.strand, past: region.past, second: region.second, targets: region.targets.as_deref(), stretches: (!region.stretches.is_empty()).then_some(region.stretches.as_slice()) }
 }
 
 /// The regions as the field reads them.
@@ -153,6 +155,16 @@ pub struct Region<'a> {
     /// compared with the known stream's own symbols. Refused on a region that is not read by two streams. A target of [`UNCOMPARED`]
     /// leaves its place uncompared: it is read and returns nothing (an act's own places, where the world answers the act).
     pub targets: Option<&'a [usize]>,
+    /// [definition; the lead, November 25, Fable's construction (the cut ruler's record of that day)] **A passage read as its
+    /// consecutive stretches**: in a passage read by two streams ([`Region::strand`]), the known stream's places where a stretch after the
+    /// first begins, ascending. Each is a cut at [`JOINED_MASK`]: an open place hears the definite sites of its own stretch one by one as
+    /// the law's open row does, and those of the stretches before it only as a definite receiver hears far (its probe's classes one by
+    /// one, each octave's crowd before its stretch); the stores, the near field, the level and the return run whole. Why: on W117's mean
+    /// no compared place of a pass asked a store for a far source, since inside a region every source is heard one by one and before it
+    /// every store stood emptied at the first place, so no covector reached a store's far content on any fade; read with the ruler, the
+    /// stores and the address at a cut bring back half of what a cut costs (0.211 to 0.100 nats a place over the law, untrained). None
+    /// where the passage is one stretch.
+    pub stretches: Option<&'a [usize]>,
 }
 
 /// [definition; agent-inferred, November 3, §16.24] **An answer port** ([`Region::port`]): the place its open strand

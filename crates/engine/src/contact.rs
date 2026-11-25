@@ -42,6 +42,10 @@ pub const CUT_CLASSES: u16 = 32;
 pub const CUT_SHARP: u16 = 64;
 pub const CUT_OPEN_CROWDS: u16 = 128;
 pub const CUT_UNTENDED: u16 = 256;
+/// [definition; the lead, November 25, Fable's construction] **What a stretch's first place lets across** in a passage read as its
+/// consecutive stretches ([`Region::stretches`]): the five stores whole, an open place's hearing of the stretches before its own by its
+/// probe's classes and each octave's crowd, and no sharp hearing across (the ruler's mask 191).
+pub const JOINED_MASK: u16 = CUT_MOMENTS | CUT_CIRCLES | CUT_NEAR | CUT_CROWDS | CUT_LEVEL | CUT_CLASSES | CUT_OPEN_CROWDS;
 
 /// The most shells a head's classes may carry (`3^7 = 2,187` classes, within the card's `2^12`
 /// buckets a head and region).
@@ -197,7 +201,8 @@ pub(crate) enum Sided<'a> {
     Chart(&'a Paces),
     /// The strand's two streams in one tick ([`Constitution::strand_pass`]): the first `known` sites are the known stream, each hearing
     /// only what stands before it; the sites after them are its open places, site `known + t` at place `t`. `past` as under `Before`.
-    Strand { known: usize, past: bool },
+    /// `stretches`: where a stretch after the first begins ([`crate::field::Region::stretches`]), empty for one stretch.
+    Strand { known: usize, past: bool, stretches: &'a [usize] },
 }
 
 /// [`Constitution::strand_pass`]'s forward: the open places' faces (one a place), and where kept for the return each tick's cell over
@@ -282,6 +287,9 @@ pub struct ClassLists {
     /// [measurement] A ruler's cut of a strand's two streams ([`Constitution::ruler_cut`]): a receiver whose place is at or past the cut
     /// meets no site before it, but for what the mask lets across. `None` is the law.
     pub cut: Option<(usize, u16)>,
+    /// [definition; the lead, November 25] The places where a stretch after the first begins ([`Region::stretches`]), each a cut at
+    /// [`JOINED_MASK`] for the receivers of its stretch; empty where the passage is one stretch.
+    pub stretches: Vec<usize>,
 }
 
 impl ClassLists {
@@ -305,7 +313,7 @@ impl ClassLists {
         let probe_class = class.clone();
         let keyed = vec![true; class.len()];
         let twins_from = class.len();
-        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, past: false, all_listen: false, twins_from, cut: None }
+        Self { class, probe_class, definite, keyed, off, members, probes, far: 0, one_sided: false, past: false, all_listen: false, twins_from, cut: None, stretches: Vec::new() }
     }
 
     /// The lists with each site's key (§16.20): the sources a near field holds.
@@ -336,10 +344,12 @@ impl ClassLists {
         let before = move |j: usize| !self.one_sided || j < i;
         // [measurement] A ruler's cut ([`Constitution::ruler_cut`]): a receiver at or past it meets a site before it only by what the mask
         // lets across (`lets`), and under `CUT_UNTENDED` a receiver before it meets no site at all.
-        let (c, mask) = self.cut.unwrap_or((0, 0));
-        let cuts = self.cut.is_some() && i >= c;
+        // [definition; the lead, November 25] In a passage read as its stretches the receiver's cut is its own stretch's first place.
+        let ruled = self.cut_for(i);
+        let (c, mask) = ruled.unwrap_or((0, 0));
+        let cuts = ruled.is_some() && i >= c;
         let lets = move |j: usize, bits: u16| !cuts || j >= c || mask & bits != 0;
-        let tended = self.cut.is_none() || i >= c || mask & CUT_UNTENDED == 0;
+        let tended = ruled.is_none() || i >= c || mask & CUT_UNTENDED == 0;
         let near = (1..NEAR).flat_map(move |d| [i.checked_sub(d), Some(i + d).filter(|&j| j < sites)]).flatten().filter(move |&j| self.keyed[j] && before(j) && lets(j, CUT_NEAR) && tended);
         // The law: an open receiver hears every definite site, a definite one its classes. A ruler's `far` gives an open receiver a
         // definite one's far field (`1`) or none (`2`).
@@ -355,6 +365,15 @@ impl ClassLists {
         let addressed = cuts && sharp && mask & CUT_CLASSES != 0 && mask & CUT_SHARP == 0;
         let across = probed().filter(move |_| addressed).flat_map(move |k| members(k).filter(move |&j| j < c && j.abs_diff(i) >= NEAR));
         near.chain(far).chain(listened).chain(across)
+    }
+
+    /// The cut a receiver at place `at` meets: a ruler's ([`ClassLists::cut`]), or in a passage read as its stretches the first place of
+    /// the receiver's own stretch at [`JOINED_MASK`] (none in the first stretch).
+    pub fn cut_for(&self, at: usize) -> Option<(usize, u16)> {
+        self.cut.or_else(|| {
+            let k = self.stretches.partition_point(|&s| s <= at);
+            (k > 0).then(|| (self.stretches[k - 1], JOINED_MASK))
+        })
     }
 
     /// Whether receiver `i` listens to every definite site (it is open, §15.9; every site of a passage read at its boundary).
@@ -377,7 +396,7 @@ impl ClassLists {
             let at = self.place(i);
             // [measurement] Past a ruler's cut the face is shared among the class's sites from the cut on, where no site before it is
             // heard one by one past the near field.
-            let from = self.cut.filter(|&(c, mask)| at >= c && mask & (CUT_CLASSES | CUT_SHARP) == 0).map_or(0, |(c, _)| all.partition_point(|&m| (m as usize) < c));
+            let from = self.cut_for(at).filter(|&(c, mask)| at >= c && mask & (CUT_CLASSES | CUT_SHARP) == 0).map_or(0, |(c, _)| all.partition_point(|&m| (m as usize) < c));
             all.partition_point(|&m| (m as usize) < at) - from
         } else {
             all.len()
@@ -648,6 +667,11 @@ impl Constitution {
             Sided::Strand { known, .. } => (true, None, Some(known)),
         };
         let past = matches!(sided, Sided::Before { past: true } | Sided::Strand { past: true, .. });
+        // [definition; the lead, November 25] A passage read as its stretches: each stretch's first place a cut for its open places.
+        let stretches: Vec<usize> = match sided {
+            Sided::Strand { stretches, .. } => stretches.to_vec(),
+            _ => Vec::new(),
+        };
         let receiving = boundary.unwrap_or(paces);
         let d = &self.declaration;
         let (dw, m, n, f, heads) = (d.width, d.complex(), d.modes, d.contacts, d.heads);
@@ -699,7 +723,7 @@ impl Constitution {
                 let class = (0..sites).map(|t| class_of(&q, t, h)).collect();
                 let probe_class = (0..sites).map(|t| class_of(&pr, t, h)).collect();
                 let probed = (0..sites).map(|t| probes((0..trits).map(|li| (pr[t * m2 + h * n + li], pr[t * m2 + m + h * n + li])), band_bits(trits))).collect();
-                ClassLists { far: self.ruler_far, one_sided, past, all_listen: boundary.is_some(), twins_from: heard, cut, ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
+                ClassLists { far: self.ruler_far, one_sided, past, all_listen: boundary.is_some(), twins_from: heard, cut, stretches: stretches.clone(), ..ClassLists::of(class, definite.to_vec(), buckets).probing(probe_class, probed).keyed(keyed.to_vec()) }
             })
             .collect();
         cell.word = q.clone();
@@ -857,7 +881,7 @@ impl Constitution {
                 // An open receiver hears every definite source sharply (§15.9), so no crowd of them.
                 // [measurement] Past a ruler's cut a crowd holds the sites from the cut on, and what stands before the cut is heard as its
                 // octave's crowd only where the mask lets it across, by every receiver there (an open place among them).
-                let ranges: Vec<(usize, usize, u32)> = match cut {
+                let ranges: Vec<(usize, usize, u32)> = match lists.cut_for(place(i)) {
                     None => crowd_ranges(place(i), heard).into_iter().filter(|&(lo, _, _)| lists.crowded(i) && (!one_sided || lo < i)).collect(),
                     // Under `CUT_UNTENDED` a receiver before the cut hears no crowd; the others before it hear the law's.
                     Some((c, mask)) if place(i) < c => crowd_ranges(place(i), heard).into_iter().filter(|&(lo, _, _)| lists.crowded(i) && lo < place(i) && mask & CUT_UNTENDED == 0).collect(),
@@ -1083,6 +1107,9 @@ impl Constitution {
         if !region.strand && region.targets.is_some() {
             return refuse("targets on a region not read by two streams");
         }
+        if !region.strand && region.stretches.is_some() {
+            return refuse("stretches on a region not read by two streams");
+        }
         if region.strand {
             if region.unresolved.iter().any(|&u| u) || region.faces.iter().any(Option::is_some) || region.locked.iter().any(|&l| l) || region.echo.iter().any(Option::is_some) || region.port.is_some() {
                 return refuse("a passage read by two streams whose sites are not all known, or that has a port");
@@ -1094,7 +1121,7 @@ impl Constitution {
                 return refuse("a target outside the alphabet");
             }
             self.admit_region(region)?;
-            let mut strand = self.strand_pass_with(region.classes, keep, self.past(region), self.second(region))?;
+            let mut strand = self.strand_pass_joined(region.classes, keep, self.past(region), self.second(region), region.stretches.unwrap_or(&[]))?;
             let faces: Vec<Option<TowerFace>> = std::mem::take(&mut strand.faces).into_iter().enumerate().map(|(t, f)| (t > 0).then_some(f)).collect();
             return Ok(Forward { faces, strand: Some(Box::new(strand)), ..Forward::default() });
         }
@@ -1399,7 +1426,7 @@ impl Constitution {
         }
         let sites = classes.len();
         let known = vec![false; sites];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None };
         // The known stream, its ticks kept: the forward a ruler reads at `3`.
         let mut stream = self.clone();
         stream.ruler_far = 3;
@@ -1486,7 +1513,7 @@ impl Constitution {
         let d = &self.declaration;
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None };
         self.admit_region(&region)?;
         let paces = self.paces(&region)?;
         let (_, open_moment) = self.cavity_forward_sided(&region, &paces, false, false)?;
@@ -1713,6 +1740,16 @@ impl Constitution {
     /// [`Constitution::strand_pass`], with `second` each site's and each open place's row of the second place before
     /// ([`Region::second`]).
     pub(crate) fn strand_pass_with(&self, classes: &[usize], keep: bool, past: bool, second: bool) -> Result<StrandForward> {
+        self.strand_pass_joined(classes, keep, past, second, &[])
+    }
+
+    /// [`Constitution::strand_pass_with`] on a passage read as its consecutive stretches ([`crate::field::Region::stretches`]): each
+    /// stretch's first place a cut at [`JOINED_MASK`] for the open places of its stretch. Refused where the starts are not ascending
+    /// places after the first, or where a ruler's cut is set beside them.
+    pub(crate) fn strand_pass_joined(&self, classes: &[usize], keep: bool, past: bool, second: bool, stretches: &[usize]) -> Result<StrandForward> {
+        if !stretches.is_empty() && (self.ruler_cut.is_some() || stretches[0] == 0 || stretches.windows(2).any(|w| w[0] >= w[1]) || stretches.last().is_some_and(|&s| s >= classes.len())) {
+            return refuse("a passage's stretches that are not ascending places after its first, or beside a ruler's cut");
+        }
         let d = &self.declaration;
         // [definition; the lead, November 22] A crossing triad's three legs stand at the site (`Declaration::crossing`, [`triad_products`]):
         // each product is one site's, of the known stream's sites and the open places alike, so the two streams read it as every tick does.
@@ -1721,7 +1758,7 @@ impl Constitution {
         }
         let n = classes.len();
         let known = vec![false; n];
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None };
         self.admit_region(&region)?;
         let (dw, m2) = (d.width, 2 * d.complex());
         let reaches = self.reaches();
@@ -1744,7 +1781,7 @@ impl Constitution {
                 return refuse("a ruler's cut read for a return (it is a forward's reading alone)");
             }
             if mask & CUT_MOMENTS == 0 {
-                let rest = Region { classes: &classes[c..], unresolved: &known[c..], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None };
+                let rest = Region { classes: &classes[c..], unresolved: &known[c..], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None };
                 let rest_paces = self.paces(&rest)?;
                 let rest_moment = self.moments_sided(&rest, &rest_paces, false)?;
                 let rest_twin = if d.twin { self.moments_with(&rest, &rest_paces, false, true)? } else { Vec::new() };
@@ -1816,7 +1853,7 @@ impl Constitution {
             if keep {
                 cell.before = x.clone();
             }
-            self.tick(&mut x, &definite, &definite, &tick_paces, &moment, &reaches, None, &mut cell, Sided::Strand { known: n, past })?;
+            self.tick(&mut x, &definite, &definite, &tick_paces, &moment, &reaches, None, &mut cell, Sided::Strand { known: n, past, stretches })?;
             // [measurement] A ruler's rounding of every state after the tick, where set ([`Constitution::ruler_state_grain`]).
             if let Some(g) = self.ruler_state_grain.filter(|&g| g < STATE_BITS) {
                 let k = STATE_BITS - g;

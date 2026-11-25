@@ -964,6 +964,32 @@ impl Constitution {
         Ok((out, from_map))
     }
 
+    /// [definition; the lead, November 25 (the fade record §14)] **The field without its rings' fades**: the rings' fades, the classes' fade
+    /// rates and the second fades (`Declaration::fade`, `fade_rate`, `twin`), the last families of the fine material, taken out, so every
+    /// ring's skin stands at the skin's constant (`γ = 1`) as it did before they were founded, and every other entry kept, the level's and the
+    /// glue's after the fine field's. Also the map over the whole material from each kept entry to the old one it copies. Refused on a field
+    /// that holds none of them.
+    pub fn without_fades(&self) -> Result<(Self, Vec<Option<usize>>)> {
+        let old = self.declaration;
+        if !old.fade && !old.fade_rate && !old.twin {
+            return refuse("a field whose rings hold no fade");
+        }
+        let d = Declaration { fade: false, fade_rate: false, twin: false, ..old };
+        d.admit()?;
+        let layout = Loci::new(&d);
+        if layout.len != self.layout.fade {
+            return refuse("a field whose fades are not the last families of its fine material");
+        }
+        let mut from: Vec<Option<usize>> = (0..layout.len).map(Some).collect();
+        let mut out = Self::with_theta(d, self.theta[..layout.len].to_vec());
+        (out.per_blank_clock, out.bare_stretch) = (self.per_blank_clock, self.bare_stretch);
+        if let Some(s) = self.scale.as_ref() {
+            from.extend((0..s.coarse.theta.len() + s.glue.len()).map(|k| Some(self.theta.len() + k)));
+            out.scale = Some(s.clone());
+        }
+        Ok((out, from))
+    }
+
     /// [definition; the lead, November 21 (the record of the reach, §6)] **The field whose friction is read from its receivers' state**
     /// ([`Declaration::friction_gate`]): `a_h`, a row of `D` a head, appended at the end of the fine field's material, founded at zero, every
     /// standing entry kept, so every friction is its head's and kind's and every face the source's bit for bit. Also the map over the whole
@@ -1747,6 +1773,33 @@ impl Learner {
                 if spread.len() != field.families_all().len() {
                     return refuse("a lattice whose families do not meet the field's with its fade rates");
                 }
+                Some(Lattice { spread, rest: mapped(&l.rest) })
+            }
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 25 (the fade record §14)] **The learner without its rings' fades** ([`Constitution::without_fades`]):
+    /// every kept entry keeps its moments, rest, grains, remainder and rate, and on a lattice every kept family its spread, so the state
+    /// differs from its source by the fades alone, which is what lets it run as an arm beside the source's own control. Refused while a step
+    /// is held.
+    pub fn without_fades(&self) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner takes out its fades after its held step is read");
+        }
+        let (field, from) = self.field.without_fades()?;
+        let first = from.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let mapped = |v: &[i32]| -> Vec<i32> { from.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let lattice = match &self.lattice {
+            Some(l) => {
+                // Each kept family's spread, found by where its first entry stood.
+                let old: std::collections::HashMap<usize, usize> = self.field.families_all().iter().enumerate().map(|(k, &(start, _, _))| (start, k)).collect();
+                let spread = field.families_all().iter().map(|&(start, _, _)| from[start].and_then(|o| old.get(&o)).map(|&k| l.spread[k]).ok_or(TowerError::Refused("a kept family the lattice does not hold"))).collect::<Result<Vec<_>>>()?;
                 Some(Lattice { spread, rest: mapped(&l.rest) })
             }
             None => None,

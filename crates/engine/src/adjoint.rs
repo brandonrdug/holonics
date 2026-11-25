@@ -777,7 +777,7 @@ impl Constitution {
         // (the known stream's region: sided, so the opening's comparison below is the retarded one; it leaves out the places read and not
         // compared, [`UNCOMPARED`])
         let skipped = targets.contains(&UNCOMPARED).then_some(targets);
-        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second, targets: skipped };
+        let region = Region { classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past: false, second: pass.second, targets: skipped, stretches: None };
         let paces = self.paces(&region)?;
         let paced = paces.kappa.len();
         let definite: Vec<bool> = (0..sites).map(|t| t < n).collect();

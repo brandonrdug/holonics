@@ -567,6 +567,11 @@ pub struct StorePass {
     /// in a shorter look (W115t: looks shortened to the least octave cost their slices 0.03 to 0.05 nats a place).
     /// Written as a line `trail T₀ … T_(k−1) looks L₀ … L_(k−1)` after the walk line, only where set.
     pub slice_trail: Option<(Vec<i64>, Vec<u64>)>,
+    /// [definition; the lead, November 25, Fable's construction (the cut ruler's record of that day)] **The pass reads a slice's
+    /// consecutive stretches as one passage**: a section's stretches of one slice that follow each other in its text (none ending its
+    /// piece before the next begins) are read as one region up to the field's reach, each stretch's first place a cut at the joined
+    /// mask (`Region::stretches`). Written as a line `joined` after the trail's, only where set.
+    pub joined: bool,
 }
 
 /// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
@@ -754,7 +759,7 @@ impl StorePass {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -1112,7 +1117,8 @@ impl Learner {
                 let clock = p.slice_clock.as_ref().map_or(String::new(), |c| format!("clock {}\n", c.iter().map(u128::to_string).collect::<Vec<_>>().join(" ")));
                 let walk = p.slice_walk.as_ref().map_or(String::new(), |w| format!("walk {}\n", w.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
                 let trail = p.slice_trail.as_ref().map_or(String::new(), |(t, l)| format!("trail {} looks {}\n", t.iter().map(i64::to_string).collect::<Vec<_>>().join(" "), l.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
-                let tension = format!("{tension}{clock}{walk}{trail}");
+                let joined = if p.joined { "joined\n" } else { "" };
+                let tension = format!("{tension}{clock}{walk}{trail}{joined}");
                 format!("{}\n{}{tension}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line())))
             });
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
@@ -1358,6 +1364,14 @@ impl Learner {
                 let t: Vec<i64> = words[1..=k].iter().map(|w| w.parse()).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a trail that is not a count"))?;
                 let l: Vec<u64> = words[k + 2..].iter().map(|w| w.parse()).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a look that is not a count"))?;
                 Some(StorePass { slice_trail: Some((t, l)), ..p })
+            }
+            (p, _) => p,
+        };
+        // [definition; the lead, November 25] The pass reads a slice's consecutive stretches as one passage, a line after the trail's.
+        let pass = match (pass, lines.peek()) {
+            (Some(p), Some(&"joined")) => {
+                lines.next();
+                Some(StorePass { joined: true, ..p })
             }
             (p, _) => p,
         };
