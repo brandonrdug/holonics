@@ -335,3 +335,22 @@ of wave in the lap.
 - By the rule, (c) held and the wave stands under the one-back table, so the line takes the wave. W118m's end is the line's, on the wave
   store and its codec. The read by slice ran 223 s a section on the host against a projected 25. It was stopped at its first section
   and read over 8, which hold about 80 of the wave's regions.
+
+## 17. The joined arm's first starts, and what bounds a joined passage on the card
+
+W119j was refused three times at its first or second section, and each refusal named a bound the card's realization holds:
+- A passage joined to the reach (2,590 places, staged as its two streams in 5,180 sites) asked 14.7 GB of the card's 10.9 GB, because
+  the card holds a region's rows whole, a receiver's row being its region's sites long, one a head.
+- Joined within the section's bound of pairs, the section's receipt counted 96 more compared places than the cut's domain: a later
+  stretch's first place is compared once it has a place before it, which the per-stretch tally did not count.
+- A passage of 1,975 places, staged in 3,950 sites, outran the card's resident skins, which hold a distance up to the reach (3,771)
+  between any two of a region's sites.
+
+So `join_stretches` joins while the passage, staged as its two streams, stays within the reach and the section's bound of pairs, and
+counts the passage as the one region it is read as. Each later stretch's first place adds one compared place. On the fourth start the
+arm trains at about 1.1 s a section against its control's 0.75, with three times the control's pairs (50.2 million against 16.0 at
+section 34): a joined passage's open places still hold rows its whole length, though they hear only their own stretch one by one. A row
+of a stretch plus its address, Fable's sizing, is the realization's next step.
+
+The control's mean read with the cut ruler on the hundred far rows gives a cut's cost of +0.210 nats a place over the law (Fable read
+0.211 on W117) and mask 191 at +0.102, closing 0.51 of it.
