@@ -255,8 +255,9 @@ fn counters_text(realization: &dyn Realization) -> String {
     }
 }
 
-/// [measurement; the lead, November 25] The sections a `work` reading reads its slices' work at: the last of every sixteen holds its
-/// regions, the next reads its own and them again, three extra comparison reads in sixteen sections (a reading's schedule, no law's).
+/// [measurement; the lead, November 25] The sections a `work` reading reads its slices' work at: the last of every sixteen holds its field
+/// before its deposit, the next reads its own regions after its deposit and with that field, two extra comparison reads in sixteen
+/// sections (a reading's schedule, no law's).
 const WORK_EVERY: usize = 16;
 
 /// `train-store UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA HELD HELD_SHA SECTIONS SAVE STOP_MS OUT FROM FROM_SHA`:
@@ -397,9 +398,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
     // line and the saves (ns).
     let host_phases = std::env::var_os("FIELD_PROFILE").is_some() || std::env::var_os("FIELD_PHASES").is_some();
     let mut host = [0u128; 7];
-    // [measurement; the lead, November 25] The work reading's probe: a section's passage regions, their slices and their opening codes read
-    // after its own deposit, held to be read again after the next section's (`STORE_TRANSFER`).
-    let mut probe: Option<(Vec<OwnedRegion>, Vec<usize>, Vec<i128>, Vec<usize>)> = None;
+    // [measurement; the lead, November 25] The work reading's field before a deposit: the constitution the last of every sixteen sections
+    // read, held to price that section's deposit on the next section's stretches, which no deposit has been fit on (`STORE_TRANSFER`).
+    let mut before_deposit: Option<holonics_engine::field::Constitution> = None;
     while done < sections {
         let section_start = std::time::Instant::now();
         let mut regions: Vec<OwnedRegion> = Vec::new();
@@ -592,6 +593,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         let views_start = std::time::Instant::now();
         let views = views_of(&regions);
         host[1] += views_start.elapsed().as_nanos();
+        if work_read && done % WORK_EVERY == WORK_EVERY - 1 {
+            before_deposit = Some(learner.field.clone());
+        }
         let deposit_start = std::time::Instant::now();
         let receipt = learner.section_realized(&views, realization).map_err(|e| e.to_string())?;
         let deposit_ms = deposit_start.elapsed().as_millis();
@@ -638,42 +642,37 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
             let (code, places) = receipt.opening.iter().skip(first).fold((0i128, 0usize), |(c, n), &(rc, rn)| (c + rc as i128, n + rn));
             println!("STORE_WORLD n={done} {world_line} world_code={}", if places == 0 { 0 } else { (code * 1_000_000) / ((places as i128) << 20) });
         }
-        if work_read && !receipt.opening.is_empty() && (done % WORK_EVERY == WORK_EVERY - 1 || (done % WORK_EVERY == 0 && probe.is_some())) {
+        if work_read && done % WORK_EVERY == 0 && !receipt.opening.is_empty() {
             // [measurement; the lead, November 25] Each slice's work through a deposit, in millionths of a bit a compared place. `STORE_WORK`:
-            // the opening's code before the deposit less after it on the section's own regions, the stretches the deposit was fit on (in
-            // sample). `STORE_TRANSFER`: the section before's regions read after its own deposit and again after this one, so this deposit
-            // priced on stretches it was not fit on (out of sample), the slice's reducible news; positive where the deposit took up what
-            // the slice teaches, negative where what the other slices moved costs it.
+            // the opening's code on the section's own regions before its deposit less after it, the stretches the deposit was fit on (in
+            // sample). `STORE_TRANSFER`, where the section before held its field: these regions read with the field before that section's
+            // deposit less as this section's comparison read them (after it), so that deposit priced on stretches no deposit has been fit on
+            // (out of sample), the slice's reducible news; positive where the deposit took up what the slice teaches, negative where what
+            // the other slices moved costs it. Why both: in sample the slices that repeat inside a document take two to ten times the rest,
+            // and the section before's own stretches, read again after the next deposit, carry that deposit's momentum of their own fit.
             let n = cut.slices.len();
             let per = |b: i128, a: i128, places: usize| micro_signed(b - a, places);
             let line = |tag: &str, sums: &[(i128, i128, usize)]| {
                 let (tb, ta, tp) = sums.iter().fold((0i128, 0i128, 0usize), |(x, y, z), s| (x + s.0, y + s.1, z + s.2));
                 println!("{tag} n={done} all={} places={tp} {}", per(tb, ta, tp), cut.slices.iter().zip(sums).map(|(s, &(b, a, p))| format!("{}={}/{}", s.name, per(b, a, p), p)).collect::<Vec<_>>().join(" "));
             };
-            let passage: Vec<OwnedRegion> = regions[passage_start..passage_start + region_slice.len()].to_vec();
-            let passage_views = views_of(&passage);
-            let (_, _, after) = realization.read_and_return_opening(&learner.field, &passage_views).map_err(|e| e.to_string())?;
-            let codes: Vec<i128> = after.iter().map(|c| c.iter().flatten().map(|&v| i128::from(v)).sum()).collect();
-            let places: Vec<usize> = after.iter().map(|c| c.iter().flatten().count()).collect();
-            if done % WORK_EVERY == 0 {
+            let sum_of = |codes: &[Vec<Option<i64>>]| -> Vec<(i128, i128, usize)> {
                 let mut sums = vec![(0i128, 0i128, 0usize); n];
                 for (r, &sl) in region_slice.iter().enumerate() {
-                    if let Some(&(b, p)) = receipt.opening.get(passage_start + r) {
-                        (sums[sl].0, sums[sl].1, sums[sl].2) = (sums[sl].0 + i128::from(b), sums[sl].1 + codes[r], sums[sl].2 + p);
+                    if let (Some(&(b, p)), Some(c)) = (receipt.opening.get(passage_start + r), codes.get(passage_start + r)) {
+                        let a: i128 = c.iter().flatten().map(|&v| i128::from(v)).sum();
+                        (sums[sl].0, sums[sl].1, sums[sl].2) = (sums[sl].0 + i128::from(b), sums[sl].1 + a, sums[sl].2 + p);
                     }
                 }
-                line("STORE_WORK", &sums);
-                if let Some((held, held_slice, before, held_places)) = probe.take() {
-                    let (_, _, again) = realization.read_and_return_opening(&learner.field, &views_of(&held)).map_err(|e| e.to_string())?;
-                    let mut sums = vec![(0i128, 0i128, 0usize); n];
-                    for (r, &sl) in held_slice.iter().enumerate() {
-                        let a: i128 = again[r].iter().flatten().map(|&v| i128::from(v)).sum();
-                        (sums[sl].0, sums[sl].1, sums[sl].2) = (sums[sl].0 + before[r], sums[sl].1 + a, sums[sl].2 + held_places[r]);
-                    }
-                    line("STORE_TRANSFER", &sums);
-                }
-            } else {
-                probe = Some((passage, region_slice.clone(), codes, places));
+                sums
+            };
+            let (_, _, after) = realization.read_and_return_opening(&learner.field, &views).map_err(|e| e.to_string())?;
+            line("STORE_WORK", &sum_of(&after));
+            if let Some(field) = before_deposit.take() {
+                let (_, _, earlier) = realization.read_and_return_opening(&field, &views).map_err(|e| e.to_string())?;
+                // `sum_of` pairs the comparison's codes (after the deposit before) with these (before it): the deposit's work is earlier less now.
+                let sums: Vec<(i128, i128, usize)> = sum_of(&earlier).into_iter().map(|(now, then, p)| (then, now, p)).collect();
+                line("STORE_TRANSFER", &sums);
             }
         }
         if let Some(ts) = cut.pass.slice_tension.as_mut() {
