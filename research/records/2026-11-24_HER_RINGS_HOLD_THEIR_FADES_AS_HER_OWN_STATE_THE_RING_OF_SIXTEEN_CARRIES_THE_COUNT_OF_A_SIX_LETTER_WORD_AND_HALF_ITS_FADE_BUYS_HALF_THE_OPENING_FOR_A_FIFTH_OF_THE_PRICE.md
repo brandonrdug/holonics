@@ -116,3 +116,21 @@ place) and the conversations (0.97) are the highest, while the cut reads the sec
 lowest. Its score waits on W113s's reads, and stands as the reading of the first form. The 2×2 is now W113 (control), W113f (the
 fades), W113t (the tensions on their clocks, G-S2 fixed 00:08:43 UTC before it trains, `receipts/2026-11-24_fade/GUESS_S2.txt`) and
 W113tf (both), all from W112's STATE.3000, on e5f6 (gate 3 against LINE_W109 first).
+
+## 6. The clock read the tension's own scale, and W113t read two slices
+
+W113t's log at 2,620 sections (02:10 UTC, before any held read of it): code took 267,833 regions and science 89,060, and the other
+eight slices 62 among them (W113 at the same count: code 76,174, acts 82,728, logic 41,463, web 38,514, science 37,963). The clock
+step divided the places by `quota_s · T_s` with `T_s` itself, in millionths of a bit (about three million); the pass's first section
+is read before any slice has a reading, when every weight is one, so its steps stood about three million times every step after it,
+and the slices with the largest quotas, whose first steps were the smallest, were read alone until the others' first steps would be
+repaid. The repair reads the ratio `T_s / mean` (`clock_step(places, quota, weight, mean)`), so a clock counts quota-places scaled by a
+dimensionless tension and the opening section's steps stand with the rest. The test now opens a pass with no readings and then sets
+tensions, with equal and with unlike quotas (a slice at quota 4,000 and a third of the other's tension gives four thirds of its places
+over 7,000 stretches; the first clock gives the larger quota every stretch). W113t and its both cell were stopped; G-S2 is scored,
+unchanged, on W113u, W112's state with its tensions set by e5f7 (the move stamped in the guess file before W113u trains).
+
+Two realizations of one law failed in one evening, each read off the lap's own log before any held read: the first carried a debt
+from before the law was set, the second a scale from before any reading. Both are the same mistake, a law's quantity compared across a
+change of its own units or regime without the ratio that makes the comparison lawful (the guide's "a grain is a relation between
+grains"); the test that catches both is to open the law mid-pass from a state with no readings, which the first test did not do.

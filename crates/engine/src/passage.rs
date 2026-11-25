@@ -442,13 +442,14 @@ pub struct Cut {
 
 impl Cut {
     /// The next stretch at the pass's place, drawn and not taken (none where every slice's pieces are read).
-    /// [definition; the lead, November 24] Each slice's weight where the pass holds the slices by their tensions
-    /// ([`StorePass::slice_tension`]): its tension, a slice with no reading at the mean of those with one, one each where none has.
-    pub fn slice_weights(&self) -> Option<Vec<u128>> {
+    /// [definition; the lead, November 24 and 25] Each slice's weight where the pass holds the slices by their tensions
+    /// ([`StorePass::slice_tension`]), with the mean it is read against: its tension, a slice with no reading at the mean of those with one,
+    /// one each where none has. A clock reads the ratio `T_s / mean` ([`clock_step`]), never the tension's own scale.
+    pub fn slice_weights(&self) -> Option<(Vec<u128>, u128)> {
         let t = self.pass.slice_tension.as_ref()?;
         let read: Vec<u128> = t.iter().filter(|&&v| v > 0).map(|&v| u128::from(v)).collect();
         let mean = if read.is_empty() { 1 } else { (read.iter().sum::<u128>() / read.len() as u128).max(1) };
-        Some(t.iter().map(|&v| if v > 0 { u128::from(v) } else { mean }).collect())
+        Some((t.iter().map(|&v| if v > 0 { u128::from(v) } else { mean }).collect(), mean))
     }
 
     pub fn next(&self) -> Option<Drawn> {
@@ -513,11 +514,11 @@ impl Cut {
         } else {
             state_of(self.seed, drawn.d, classes, q, a)
         };
-        if let Some(weight) = self.slice_weights() {
+        if let Some((weight, mean)) = self.slice_weights() {
             // [definition; the lead, November 25] The slice's own clock moves by the places it gave over its quota times its tension now
             // ([`StorePass::slice_clock`]).
             let n = self.slices.len();
-            let step = clock_step(drawn.q + drawn.a, self.slices[drawn.slice].quota, weight[drawn.slice]);
+            let step = clock_step(drawn.q + drawn.a, self.slices[drawn.slice].quota, weight[drawn.slice], mean);
             self.pass.slice_clock.get_or_insert_with(|| vec![0; n])[drawn.slice] += step;
         }
         let place = &mut self.pass.slices[drawn.slice];
@@ -533,9 +534,12 @@ impl Cut {
 }
 
 /// [definition; the lead, November 25] **A slice's clock step** ([`StorePass::slice_clock`]): `places` over the slice's quota times its
-/// tension, on `2^(−SHARE_BITS)` of a place, released once a step.
-pub fn clock_step(places: u64, quota: u128, weight: u128) -> u128 {
-    (u128::from(places) << SHARE_BITS) / (quota * weight).max(1)
+/// tension's ratio to the mean of the slices' tensions (`weight / mean`), on `2^(−SHARE_BITS)` of a place, released once a step. Why the
+/// ratio: the first clock divided by the tension itself, so the steps of the first section, read before any slice had a reading (every
+/// weight one), stood three million times the steps after it (tensions in millionths of a bit, about three million), and on W113t code and
+/// science, the two largest quotas, took 267,833 and 89,060 regions in 2,620 sections and the other eight slices 62 among them.
+pub fn clock_step(places: u64, quota: u128, weight: u128, mean: u128) -> u128 {
+    ((u128::from(places) << SHARE_BITS) * mean) / (quota * weight).max(1)
 }
 
 /// The code line's held passage (te7's lap script's `DEV`) as `train-field` reads it: its problems at the codec, those whose answer stands

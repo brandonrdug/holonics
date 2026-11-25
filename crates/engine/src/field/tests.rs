@@ -7199,18 +7199,38 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
     assert_eq!(cut([400, 100], Some(vec![1_000, 3_000]), Some(vec![5, 6])).next().unwrap().slice, 0);
     assert_eq!(cut([100, 400], Some(vec![1_000, 3_000]), None).next().unwrap().slice, 0);
     // Over many stretches, b at three times a's tension gives three times a's places (each stretch's places advance its slice's clock).
-    let mut c = cut([400, 100], Some(vec![1_000, 3_000]), Some(vec![0, 0]));
+    // The first stretches are read before any slice has a reading (one each), as a pass held by its tensions opens (W113t's first section).
+    let mut c = cut([400, 100], Some(vec![0, 0]), Some(vec![0, 0]));
     let mut gave = [0u64; 2];
-    for _ in 0..4_000 {
+    let mut step = |c: &mut crate::passage::Cut, gave: &mut [u64; 2]| {
         let s = c.next().unwrap().slice;
-        let w = c.slice_weights().unwrap();
-        c.pass.slice_clock.as_mut().unwrap()[s] += crate::passage::clock_step(10, c.slices[s].quota, w[s]);
+        let (w, mean) = c.slice_weights().unwrap();
+        c.pass.slice_clock.as_mut().unwrap()[s] += crate::passage::clock_step(10, c.slices[s].quota, w[s], mean);
         gave[s] += 10;
+    };
+    for _ in 0..2 {
+        step(&mut c, &mut gave);
     }
-    assert!((gave[1] as i64 - 3 * gave[0] as i64).abs() <= 30, "b gives three times a's places: {gave:?}");
+    assert_eq!(gave, [10, 10], "one stretch each before any reading");
+    c.pass.slice_tension = Some(vec![1_000_000, 3_000_000]);
+    for _ in 0..4_000 {
+        step(&mut c, &mut gave);
+    }
+    assert!((gave[1] as i64 - 3 * gave[0] as i64).abs() <= 60, "b gives three times a's places, the first stretches no debt: {gave:?}");
+    // Unlike quotas: a at quota 1,000 and three times b's tension, b at quota 4,000; b gives four thirds of a's places.
+    let mut c = crate::passage::Cut { seed: 3, slices: vec![slice("a"), crate::passage::Slice { quota: 4000, ..slice("b") }], pass: pass([0, 0], Some(vec![0, 0]), Some(vec![0, 0])) };
+    let mut gave = [0u64; 2];
+    for _ in 0..2 {
+        step(&mut c, &mut gave);
+    }
+    c.pass.slice_tension = Some(vec![3_000_000, 1_000_000]);
+    for _ in 0..7_000 {
+        step(&mut c, &mut gave);
+    }
+    assert!((3 * gave[1] as i64 - 4 * gave[0] as i64).abs() <= 120, "b gives four thirds of a's places: {gave:?}");
     // A slice with no reading weighs as the mean of those with one; with no reading at all, one each.
-    assert_eq!(cut([0, 0], Some(vec![0, 3_000]), None).slice_weights().unwrap(), vec![3_000, 3_000]);
-    assert_eq!(cut([0, 0], Some(vec![0, 0]), None).slice_weights().unwrap(), vec![1, 1]);
+    assert_eq!(cut([0, 0], Some(vec![0, 3_000]), None).slice_weights().unwrap(), (vec![3_000, 3_000], 3_000));
+    assert_eq!(cut([0, 0], Some(vec![0, 0]), None).slice_weights().unwrap(), (vec![1, 1], 1));
     // The tension and clock lines read back as written, after the pass's line.
     let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
     learner.pass = Some(pass([100, 250], Some(vec![1_000, 3_000]), Some(vec![17, 4])));
