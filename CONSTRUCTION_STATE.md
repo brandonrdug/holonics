@@ -122,7 +122,12 @@ blurs the count she holds at words of two letters, and her code of a break follo
 length, words of six letters, on two seeds, where the last break stands half a turn back on the ring of 16 and a quarter on
 the ring of 32; a word placed on a ring's whole turn opened nothing. A fade founded at the skin's value hears its own return
 at a thirty-first of the most, so the form that reaches a count is a second store a ring founded where it rings, its second
-axis read by a weight founded at zero (§14). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
+axis read by a weight founded at zero (§14). On November 25 the ring of 16 alone was read to carry that opening, her rings' fades
+became her own state, and her deposit on her text moved every ring of 32 and longer to a faster fade; over that night's arms her
+writes and her held code stood where they were (0.7045 nats a place at W116's mean), and a count ruler read a text as holding
+nothing a ring's turn back past sixteen places, where a sampled wave holds something at every ring. A second stream is a second
+strand with its own clock; it is unbuilt, and its pairing waits on what a region hands the next
+([the record of November 25](research/records/2026-11-25_A_NIGHT_OF_ARMS_LEFT_HER_WRITES_WHERE_THEY_WERE_HER_DEPOSIT_ON_TEXT_TRIMS_LONG_RINGS_A_TEXT_ONE_TURN_BACK_TELLS_NOTHING_PAST_SIXTEEN_PLACES_A_SAMPLED_WAVE_TELLS_AT_EVERY_RING_A_SECOND_STREAMS_PAIRING_WAITS_ON_REACH.md)). The Lean stands 0.031 nats a place over W103 at 11.7% of a pass. The loudness reading does not reach
 the collection's registers. A section stands 3.1 times over its count, and the site maps are three quarters of that count.
 
 ## Earlier positions

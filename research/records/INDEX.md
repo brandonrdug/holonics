@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,760 records from July 2026 to November 2026. 408 receipts directories: 225 beside the records and 183 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,761 records from July 2026 to November 2026. 409 receipts directories: 225 beside the records and 184 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 159 | 124 |
+| [November 2026](#november-2026) | 160 | 125 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-25 [A night of arms left her writes where they were her deposit on text trims long rings a text one turn back tells nothing past sixteen places a sampled wave tells at every ring a second streams pairing waits on reach](2026-11-25_A_NIGHT_OF_ARMS_LEFT_HER_WRITES_WHERE_THEY_WERE_HER_DEPOSIT_ON_TEXT_TRIMS_LONG_RINGS_A_TEXT_ONE_TURN_BACK_TELLS_NOTHING_PAST_SIXTEEN_PLACES_A_SAMPLED_WAVE_TELLS_AT_EVERY_RING_A_SECOND_STREAMS_PAIRING_WAITS_ON_REACH.md)
 - 2026-11-24 [A laps card time was its reads the held read ran one forward four times a one sided region continues by a site and a read is sized by the scatter between laps](2026-11-24_A_LAPS_CARD_TIME_WAS_ITS_READS_THE_HELD_READ_RAN_ONE_FORWARD_FOUR_TIMES_A_ONE_SIDED_REGION_CONTINUES_BY_A_SITE_AND_A_READ_IS_SIZED_BY_THE_SCATTER_BETWEEN_LAPS.md)
 - 2026-11-24 [Context is a calendar a receiver reads counts of one cycle against another a count lasts as long as its store rings one fade reads no gap and two read it and her rings fade before they turn](2026-11-24_CONTEXT_IS_A_CALENDAR_A_RECEIVER_READS_COUNTS_OF_ONE_CYCLE_AGAINST_ANOTHER_A_COUNT_LASTS_AS_LONG_AS_ITS_STORE_RINGS_ONE_FADE_READS_NO_GAP_AND_TWO_READ_IT_AND_HER_RINGS_FADE_BEFORE_THEY_TURN.md)
 - 2026-11-24 [Her line takes the full curated collection at seventy two percent of a pass the logs crowd out the registers and her acts and the levels lane cost under four thousandths and move nothing yet](2026-11-24_HER_LINE_TAKES_THE_FULL_CURATED_COLLECTION_AT_SEVENTY_TWO_PERCENT_OF_A_PASS_THE_LOGS_CROWD_OUT_THE_REGISTERS_AND_HER_ACTS_AND_THE_LEVELS_LANE_COST_UNDER_FOUR_THOUSANDTHS_AND_MOVE_NOTHING_YET.md)
