@@ -105,7 +105,8 @@ so only laid-out text spans a turn today, where the theory's hold is her stores'
 - the formal thread's: G-C1 to G-C3 (`receipts/2026-11-24_lap_cycle/GUESS.txt`); G-Q1, G-Q2, G-Q4, G-Q5
   (`receipts/2026-11-23_question_reach/GUESS.txt`); G-H6, G-H7, G-H9, G-H11 to G-H14
   (`receipts/2026-11-23_handed_cycle/GUESS.txt`); G-A1, G-A3 (`receipts/2026-11-23_answered_act/GUESS.txt`); G-R1 to G-R5, on an
-  arm that reads a slice's consecutive stretches as one region (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`);
+  arm that reads a slice's consecutive stretches as one region (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`), and G-W2 on
+  the same arm (`receipts/2026-11-25_hairs_cones_flock/GUESS.txt`);
 - the lead's: G-H5 on the line's continuation W107 (`receipts/2026-11-24_collection/GUESS_H5.txt`, where H is the history's laps
   and no kin of the handed cycle's G-H); the laps after it (W108 and its arm, W109) carry their own in the lead's next receipts.
 
@@ -116,7 +117,11 @@ ruler; [the record of the cut](research/records/2026-11-25_A_REGIONS_FIRST_PLACE
 site still heard one by one and every store emptied she loses thirty places and nothing after, and with the stores kept and the
 hearing cut she gets back 3%. Her stores hold about thirty places and everything farther she holds by hearing its sites one by
 one, because no compared place of a pass asks a store for more: a far source is heard one by one inside its region, and every
-store is emptied at a region's first place. By store: every turned ring keeps 0.0019 of itself over its own turn, the fine
+store is emptied at a region's first place. Counted over the same codes ([the record of the taper](research/records/2026-11-25_A_RECEIVER_MEETS_A_MEDIUM_THROUGH_A_TAPER_A_ROD_READS_AN_EFFORT_ALONG_IT_A_CONE_A_FLOW_THROUGH_ITS_MOUTH_IT_CARRIES_BY_A_STROKE_THAT_DOES_NOT_RETRACE_AND_SHE_GAINS_FROM_THE_FAR_PAST_ONLY_WHERE_IT_REPEATS_ITSELF.md),
+atlas `store.far-price-stands-at-recurrence`): the price of a cut stands on a tenth of the places, and from place 32 past the cut
+on all of it stands at the fifth of the places whose run of three octets stood before the cut and not since; where the run is new
+the far past is worth nothing to her. Her far hearing is a wager on recurrence carried by hearing sites one by one, and no other
+far content has begun to cross. By store: every turned ring keeps 0.0019 of itself over its own turn, the fine
 clock is a count compared with nothing, the carry circles alone hold their quality as a state, and no store fades through a gap
 between regions, so a silence is read by nothing. Her separators hold the long durations of a clock in her own units (a space
 8.5 letters on one turned head, a line feed 18 on the other), and under the skin's tie of fade to turn each leaves the short
