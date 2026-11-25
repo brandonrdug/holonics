@@ -16,3 +16,9 @@ G-S2 (at the lap means, one place open on the collection's held set, by region):
   (b) (0.6) the tool turns and the conversations each at most 0.020 over W113;
   (c) (0.45) the held set over all its places at most W113's plus 0.001.
 Rule: (a) and (c) held, the line takes the tensions; otherwise it does not.
+
+Moved 2026-11-25T02:14:28Z (date -u), before W113u trains, by the lead: W113t's lap was not this law. Its clock divided by the tension itself, so the
+first section's steps (read before any slice had a reading, every weight one) stood about three million times the steps after it, and
+in 2,620 sections code and science (the two largest quotas) took 267,833 and 89,060 regions and the other eight slices 62 among them
+(its log; no held read of it was made). The clock now reads each tension's ratio to the slices' mean (e5f7, clock_step). G-S2 is
+scored, unchanged, on W113u: W112's STATE.3000 with its tensions set by e5f7, 3,000 sections beside W113; W113uf is the both cell.
