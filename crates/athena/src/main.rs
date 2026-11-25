@@ -392,6 +392,7 @@ fn train_command(args: &[String], realization: &mut dyn Realization) -> Result<(
         Some("set-tension") => athena::store::set_tension(args),
         Some("set-walk") => athena::store::set_walk(args),
         Some("set-trail") => athena::store::set_trail(args),
+        Some("set-joined") => athena::store::set_joined(args),
         Some("found-fade") => athena::store::found_fade(args),
         Some("found-fade-rate") => athena::store::found_fade_rate(args),
         Some("found-twin") => athena::store::found_twin(args),

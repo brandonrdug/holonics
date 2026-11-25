@@ -332,7 +332,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -440,6 +440,8 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // [definition; the lead, November 24] Each passage region's slice, in the order the regions stand from `passage_start`, so the
         // section's receipt carries each slice's tension into the next section's cut ([`StorePass::slice_tension`]).
         let (passage_start, mut region_slice) = (regions.len(), Vec::<usize>::new());
+        // [definition; the lead, November 25] Whether each passage region's stretch ended its piece ([`StorePass::joined`]).
+        let mut region_done = Vec::<bool>::new();
         while let Some(drawn) = cut.next() {
             stretches_drawn += 1;
             let draft_world = cut.pass.world.as_ref().is_some_and(|w| w.records == 0);
@@ -468,6 +470,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                 None => None,
             };
             let slice = drawn.slice;
+            let piece_ends = drawn.done;
             at_frontier += u64::from(drawn.frontier);
             let Stretch { region, counted, .. } = cut.take(drawn, &codec)?;
             by_slice[slice] += 1;
@@ -478,8 +481,16 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                     tally.take(&region, counted);
                     regions.push(region);
                     region_slice.push(slice);
+                    region_done.push(piece_ends);
                 }
             }
+        }
+        // [definition; the lead, November 25, Fable's construction] A slice's consecutive stretches read as one passage ([`StorePass::joined`]).
+        if cut.pass.joined {
+            let passage: Vec<OwnedRegion> = regions.drain(passage_start..).collect();
+            let (joined, slices) = join_stretches(passage, &region_slice, &region_done, learner.field.declaration.reach);
+            regions.extend(joined);
+            region_slice = slices;
         }
         // [definition; the lead, November 22] **A pass ends with its passage**: a section that draws no stretch of the role's documents ends
         // the pass, whatever the terrain's share would add (the terrain is a share of a section beside the passage, never a passage of its
@@ -1678,7 +1689,7 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
     let differing: Vec<usize> = (0..old_lines.len()).filter(|&i| old_lines[i] != new_lines[i]).collect();
     // [the lead, November 25] The pass's own lines after it (its slices' tensions, clocks, walk and trail, one a slice) move with it: a pass
     // set afresh sets each slice's afresh. Until that day only the pass line could differ, which refused a join of any state with a walk.
-    let own = |l: &str| ["pass ", "tension ", "clock ", "walk ", "trail "].iter().any(|p| l.starts_with(p));
+    let own = |l: &str| ["pass ", "tension ", "clock ", "walk ", "trail "].iter().any(|p| l.starts_with(p)) || l == "joined";
     if differing.is_empty() || !old_lines[differing[0]].starts_with("pass ") || differing.iter().any(|&i| !own(old_lines[i]) || !own(new_lines[i])) {
         return Err(format!("a written pass that changes lines other than the pass's own ({:?})", differing).into());
     }
@@ -1687,6 +1698,45 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
         return Err("a written pass whose state does not read back as the source's field, count and pass".into());
     }
     Ok((written, old_lines.len(), differing[0] + 1))
+}
+
+/// [definition; the lead, November 25, Fable's construction] **A section's consecutive stretches of a slice joined into one passage**: in
+/// the order drawn, each stretch read by two streams joins the open passage of its slice where the last stretch joined did not end its
+/// piece (so the two follow each other in the slice's text), both are read alike (the same words and both compared with targets or
+/// neither), and the passage stays within `reach` places; its first place is then a stretch start ([`holonics_engine::field::Region::stretches`]).
+/// Every other region stands as drawn. Returns the regions and each one's slice.
+fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], reach: usize) -> (Vec<OwnedRegion>, Vec<usize>) {
+    let mut out: Vec<OwnedRegion> = Vec::with_capacity(regions.len());
+    let mut out_slices: Vec<usize> = Vec::with_capacity(regions.len());
+    let mut open: std::collections::HashMap<usize, usize> = std::collections::HashMap::new();
+    for ((region, &slice), &ends) in regions.into_iter().zip(slices).zip(done) {
+        let joins = open.get(&slice).copied().filter(|&k| {
+            let j = &out[k];
+            region.strand && j.strand && (j.past, j.second, j.targets.is_some()) == (region.past, region.second, region.targets.is_some()) && j.classes.len() + region.classes.len() <= reach
+        });
+        match joins {
+            Some(k) => {
+                let j = &mut out[k];
+                j.stretches.push(j.classes.len());
+                j.classes.extend_from_slice(&region.classes);
+                j.unresolved.extend_from_slice(&region.unresolved);
+                if let (Some(t), Some(rt)) = (j.targets.as_mut(), region.targets.as_ref()) {
+                    t.extend_from_slice(rt);
+                }
+            }
+            None => {
+                if region.strand {
+                    open.insert(slice, out.len());
+                }
+                out.push(region);
+                out_slices.push(slice);
+            }
+        }
+        if ends {
+            open.remove(&slice);
+        }
+    }
+    (out, out_slices)
 }
 
 /// A pass's slices as `NAME:PIECE:TAKEN`, joined by commas.
@@ -2050,6 +2100,37 @@ pub fn set_trail(args: &[String]) -> Result<()> {
 /// their golden strides from where each stands** ([`holonics_engine::field::StorePass::slice_walk`]): the state with a `walk` line after its
 /// pass's lines, each slice's place the count of pieces it has finished (and the piece it is inside, which it finishes first), every other
 /// line byte for byte (read back and checked). Refused on a state with no pass or one whose pass already walks.
+/// [the lead, November 25, Fable's construction] `set-joined STATE STATE_SHA OUT`: the line's state with its pass reading a slice's
+/// consecutive stretches as one passage ([`StorePass::joined`]), every other line kept.
+pub fn set_joined(args: &[String]) -> Result<()> {
+    if args.len() != 4 {
+        return Err("set-joined STATE STATE_SHA OUT".into());
+    }
+    let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
+    let out = Path::new(&args[3]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let learner = Learner::from_text(&text).map_err(|e| e.to_string())?;
+    let before = learner.pass.clone().ok_or("a state with no pass line")?;
+    if before.joined {
+        return Err("a state whose pass already reads its stretches joined".into());
+    }
+    let mut next = learner.clone();
+    next.pass = Some(StorePass { joined: true, ..before });
+    let written = next.to_text();
+    let (old, new): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
+    if new.len() != old.len() + 1 || new.iter().filter(|&&l| l == "joined").count() != 1 || new.iter().filter(|&&l| l != "joined").ne(old.iter()) {
+        return Err("a written joined pass that changes a line other than its own".into());
+    }
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("SET_JOINED lines={}", new.len());
+    Ok(())
+}
+
 pub fn set_walk(args: &[String]) -> Result<()> {
     if args.len() != 4 {
         return Err("set-walk STATE STATE_SHA OUT".into());
@@ -3631,5 +3712,23 @@ mod tests {
             seen += 1;
         }
         assert!(seen > 20, "{seen}");
+    }
+
+    /// [the lead, November 25] **A section's consecutive stretches of a slice are joined into one passage** (`join_stretches`): a slice's
+    /// stretches join while none ends its piece and the passage stays within the reach, each joined one's first place a stretch start;
+    /// another slice's between them stands apart, and a stretch ending its piece closes its slice's passage.
+    #[test]
+    fn a_slices_consecutive_stretches_join_into_one_passage_within_the_reach() {
+        let strand = |n: usize, c: usize| OwnedRegion { strand: true, past: true, ..OwnedRegion::plain(vec![c; n], vec![false; n]) };
+        let regions = vec![strand(4, 1), strand(3, 2), strand(5, 1), strand(2, 1), strand(6, 1), strand(3, 2)];
+        let slices = [0usize, 1, 0, 0, 0, 1];
+        let done = [false, false, false, true, false, false];
+        let (out, out_slices) = join_stretches(regions, &slices, &done, 20);
+        assert_eq!(out_slices, vec![0, 1, 0], "slice 0's first three joined, slice 1's two joined, slice 0's fourth after its piece ended");
+        assert_eq!((out[0].classes.len(), out[0].stretches.clone()), (11, vec![4, 9]));
+        assert_eq!((out[1].classes.len(), out[1].stretches.clone()), (6, vec![3]));
+        assert_eq!((out[2].classes.len(), out[2].stretches.clone()), (6, vec![]));
+        let (short, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], 9);
+        assert_eq!(short.iter().map(|r| (r.classes.len(), r.stretches.clone())).collect::<Vec<_>>(), vec![(9, vec![4]), (3, vec![])], "a passage stays within the reach");
     }
 }

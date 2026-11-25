@@ -1118,6 +1118,11 @@ impl<'c> Resident<'c> {
     /// regions of one kind.
     #[allow(clippy::type_complexity)]
     pub(crate) fn run(&mut self, field: &Constitution, regions: &[Region], returning: bool, logits: bool, keep: Option<&[usize]>) -> Result<(Vec<Vec<Option<TowerFace>>>, Vec<Vec<Option<Vec<i64>>>>, Vec<i128>, Rows, Vec<Vec<u64>>)> {
+        // [the lead, November 25] A passage read as its consecutive stretches (`Region::stretches`) has no card realization yet: its open
+        // places' hearing across each stretch's first place is the host's alone, so the card refuses it rather than read it as one stretch.
+        if regions.iter().any(|r| r.stretches.is_some()) {
+            return Err(TowerError::Refused("a passage read as its stretches (the card realizes one stretch a region)"));
+        }
         if !regions.iter().any(|r| r.before || r.strand) {
             let (faces, read_logits, g, rows, echoes) = self.run_one(field, regions, returning, logits, keep)?;
             return Ok((faces, read_logits, field.both_reads_mean(g), rows, echoes));
@@ -1178,7 +1183,7 @@ impl<'c> Resident<'c> {
             order.extend_from_slice(at);
             let views: Vec<Region> = match group {
                 None => law_regions.clone(),
-                Some(gr) if gr.strand => gr.staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None }).collect(),
+                Some(gr) if gr.strand => gr.staged.iter().map(|(c, u)| Region { classes: c, unresolved: u, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None }).collect(),
                 Some(gr) => gr.at.iter().map(|&r| Region { before: false, past: false, second: false, ..regions[r] }).collect(),
             };
             let heard: Vec<u32> = group.filter(|gr| gr.strand).map_or(Vec::new(), |gr| gr.at.iter().map(|&r| regions[r].classes.len() as u32).collect());
