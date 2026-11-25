@@ -442,14 +442,19 @@ pub struct Cut {
 
 impl Cut {
     /// The next stretch at the pass's place, drawn and not taken (none where every slice's pieces are read).
-    /// [definition; the lead, November 24 and 25] Each slice's weight where the pass holds the slices by their tensions
-    /// ([`StorePass::slice_tension`]), with the mean it is read against: its tension, a slice with no reading at the mean of those with one,
-    /// one each where none has. A clock reads the ratio `T_s / mean` ([`clock_step`]), never the tension's own scale.
+    /// [definition; the lead, November 25, Brandon's 03:03Z] Each slice's tension where the pass holds the slices by them
+    /// ([`StorePass::slice_tension`]), with the partition they are shared by: `Z = Σ_r quota_r T_r`, the passage's flux of news, so a
+    /// slice's share is `p_s = quota_s T_s / Z` and the shares sum to one (the aperture's normalization, atlas
+    /// `receipt.aperture-normalization`; the terrain's two-branch share one level up, `receipt.terrain-held-by-its-tension`). A slice with no
+    /// reading is read at the partition's own tension a quota octet, `Σ_read quota T / Σ_read quota`; where none has a reading, every
+    /// tension is one and the shares are the quotas'.
     pub fn slice_weights(&self) -> Option<(Vec<u128>, u128)> {
         let t = self.pass.slice_tension.as_ref()?;
-        let read: Vec<u128> = t.iter().filter(|&&v| v > 0).map(|&v| u128::from(v)).collect();
-        let mean = if read.is_empty() { 1 } else { (read.iter().sum::<u128>() / read.len() as u128).max(1) };
-        Some((t.iter().map(|&v| if v > 0 { u128::from(v) } else { mean }).collect(), mean))
+        let (flux, quota) = t.iter().zip(&self.slices).filter(|(v, _)| **v > 0).fold((0u128, 0u128), |(f, q), (v, s)| (f + s.quota * u128::from(*v), q + s.quota));
+        let unread = if quota == 0 { 1 } else { (flux / quota).max(1) };
+        let w: Vec<u128> = t.iter().map(|&v| if v > 0 { u128::from(v) } else { unread }).collect();
+        let z = w.iter().zip(&self.slices).map(|(&w, s)| s.quota * w).sum::<u128>().max(1);
+        Some((w, z))
     }
 
     pub fn next(&self) -> Option<Drawn> {
@@ -514,11 +519,11 @@ impl Cut {
         } else {
             state_of(self.seed, drawn.d, classes, q, a)
         };
-        if let Some((weight, mean)) = self.slice_weights() {
+        if let Some((weight, z)) = self.slice_weights() {
             // [definition; the lead, November 25] The slice's own clock moves by the places it gave over its quota times its tension now
             // ([`StorePass::slice_clock`]).
             let n = self.slices.len();
-            let step = clock_step(drawn.q + drawn.a, self.slices[drawn.slice].quota, weight[drawn.slice], mean);
+            let step = clock_step(drawn.q + drawn.a, self.slices[drawn.slice].quota, weight[drawn.slice], z);
             self.pass.slice_clock.get_or_insert_with(|| vec![0; n])[drawn.slice] += step;
         }
         let place = &mut self.pass.slices[drawn.slice];
@@ -533,13 +538,15 @@ impl Cut {
     }
 }
 
-/// [definition; the lead, November 25] **A slice's clock step** ([`StorePass::slice_clock`]): `places` over the slice's quota times its
-/// tension's ratio to the mean of the slices' tensions (`weight / mean`), on `2^(−SHARE_BITS)` of a place, released once a step. Why the
-/// ratio: the first clock divided by the tension itself, so the steps of the first section, read before any slice had a reading (every
-/// weight one), stood three million times the steps after it (tensions in millionths of a bit, about three million), and on W113t code and
-/// science, the two largest quotas, took 267,833 and 89,060 regions in 2,620 sections and the other eight slices 62 among them.
-pub fn clock_step(places: u64, quota: u128, weight: u128, mean: u128) -> u128 {
-    ((u128::from(places) << SHARE_BITS) * mean) / (quota * weight).max(1)
+/// [definition; the lead, November 25, Brandon's 03:03Z] **A slice's clock step** ([`StorePass::slice_clock`]): `places` over the slice's
+/// share of her news, `p_s = quota_s T_s / Z` ([`Cut::slice_weights`]), so a slice's clock counts the passage's own places and its next
+/// read falls due `1/p_s` of them after its last: its gap, a stride the cut merges with the others'. `1/p_s` is held on `2^(−SHARE_BITS)`,
+/// released once a step. Why a partition: the first clock divided by the tension itself, so the steps of the first section, read before
+/// any slice had a reading (every weight one), stood three million times the steps after it, and on W113t code and science, the two largest
+/// quotas, took 267,833 and 89,060 regions in 2,620 sections and the other eight slices 62 among them; the second divided by the plain mean
+/// of the tensions, a statistic in no reader's unit, which moves with every slice's reading alike whatever its size.
+pub fn clock_step(places: u64, quota: u128, weight: u128, z: u128) -> u128 {
+    u128::from(places) * ((z << SHARE_BITS) / (quota * weight).max(1))
 }
 
 /// The code line's held passage (te7's lap script's `DEV`) as `train-field` reads it: its problems at the codec, those whose answer stands

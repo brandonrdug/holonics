@@ -1,0 +1,27 @@
+Fixed 2026-11-24T22:03:18Z (date -u), the lead, before W113 and W113s train. Refs #404.
+The reading it answers: Brandon, 21:54Z and 21:57Z: her navigation should meet the pipeline that exposes her to the material, and it was
+built: the terrain's share of a section follows her tension at it against the passage's (atlas receipt.terrain-held-by-its-tension,
+November 21). Inside the passage the slices are drawn by their octets' quotas alone. On W111's mean her one-place-open code by region
+stands 1.15 (tool turns), 0.97 (conversations), 0.92 (wikidata), 0.77 (harness), 0.75 (web), 0.68 (books), 0.57 (science),
+0.52 (theory), 0.40 (code), 0.40 (Lean) nats a place.
+The change: the pass held by its slices' tensions (set-tension, e5s): the cut takes the slice with least taken/(quota x T), T her code at
+the slice's open places in the last section that read it, so the interleave follows her news and every piece is still read once a pass.
+Control W113: W112's STATE.3000 continued on store-2026-11-24-wide-t6; arm W113s: the same state with its pass held by its tensions.
+3,000 sections each on e5s (gate 3 of e5s against the line first).
+G-S1:
+  (a) (0.6) the conversations and the tool turns each at least 0.010 nats a place under the control, one place open on the collection's
+      held set;
+  (b) (0.6) code and the Lean, read less, each within 0.015 over the control;
+  (c) (0.5, a coin) the collection's held set over all its places at most the control's plus 0.002.
+Rule: (a) and (c) held, the line takes the tensions; (a) missed, it does not.
+
+Scored 2026-11-25T03:07:14Z (date -u), the lead, from frontier_ruler.py on out4_W113 and out4_W113s (the collection's held set, one place open, lap
+means over sections 2,001 to 3,000, 200,933 places). W113s less W113, paired: all +0.0125 (0.0008); acts +0.0194, books +0.0291,
+code +0.0250, dialogue -0.0007, harness +0.0030, logic -0.0155, science +0.0047, theory -0.0063, web +0.0179, wikidata +0.0482.
+  (a) missed: the conversations -0.0007 and the tool turns +0.0194, where 0.010 under was guessed; neither was read after the lap's
+      first section (W113s's log: 1 and 19 regions over the lap).
+  (b) missed: code +0.0250, read at about half its control's regions (46,332 against 87,473); logic, read at 1.9 times, -0.0155.
+  (c) missed: +0.0125 over all places.
+By the rule the line does not take this form. It is the reading of the first realization, whose clock owed the pass's history (the
+fade record §5): a slice read at three times its control's regions (wikidata, 48,727 against 17,354) coded its held stretches 0.048
+dearer, and the two slices not read at all moved by -0.0007 and +0.019.

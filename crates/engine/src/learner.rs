@@ -540,10 +540,11 @@ pub struct StorePass {
     /// with one (as its quota alone where none has). Written as its own line `tension T₀ … T_(k−1)` after the pass's (and its terrain's),
     /// only where set.
     pub slice_tension: Option<Vec<u64>>,
-    /// [definition; the lead, November 25, W113s's reading] **Each slice's own clock under its tension**: `c_s = Σ places / (quota_s · T_s)`
-    /// over the stretches it gave since its tension was set, each place on `2^(−SHARE_BITS)` and each term released alone in the pass's
-    /// order, with the tension it held when it was read. Where the tensions are set the cut takes the slice whose clock stands furthest
-    /// behind ([`crate::passage::Cut::next`]), so a change of tension moves the rate a slice is read at from then on and carries no debt from
+    /// [definition; the lead, November 25, W113s's reading and Brandon's 03:03Z] **Each slice's own clock under its tension**:
+    /// `c_s = Σ places / p_s` over the stretches it gave since its tension was set, `p_s = quota_s T_s / Σ_r quota_r T_r` its share of her
+    /// news when it was read ([`crate::passage::clock_step`]), so the clock counts the passage's own places and a slice is due again a gap of
+    /// `1/p_s` of them after its last read. Where the tensions are set the cut takes the slice whose clock stands furthest behind
+    /// ([`crate::passage::Cut::next`]), so a change of tension moves the rate a slice is read at from then on and carries no debt from
     /// before it. Why: the first form compared `taken_s / (quota_s · T_s)` over the whole pass, so a slice read at its quota for most of a
     /// pass and then given a low tension owed every place read before it: on W113s (from W112's state, 108 million places into its pass) her
     /// conversations and her tool turns, at the two lowest tensions, were read in its first section and in none of the 2,999 after it,

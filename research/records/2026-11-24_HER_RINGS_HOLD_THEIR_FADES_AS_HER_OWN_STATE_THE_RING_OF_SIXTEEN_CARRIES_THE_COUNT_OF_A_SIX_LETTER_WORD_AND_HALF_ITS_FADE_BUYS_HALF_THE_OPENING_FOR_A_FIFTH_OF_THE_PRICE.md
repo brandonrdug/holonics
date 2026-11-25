@@ -134,3 +134,26 @@ Two realizations of one law failed in one evening, each read off the lap's own l
 from before the law was set, the second a scale from before any reading. Both are the same mistake, a law's quantity compared across a
 change of its own units or regime without the ratio that makes the comparison lawful (the guide's "a grain is a relation between
 grains"); the test that catches both is to open the law mid-pass from a state with no readings, which the first test did not do.
+
+## 7. A share is a partition, and the first form's held read
+
+At 03:03 UTC Brandon read the ratio clock's reference: '"average"? normality, sigmoid (softmax), prime gaps, unit gaps,
+trees/branches of graphs, holonic'. The plain mean of the slices' tensions was a statistic standing where a partition belongs. On the
+objects: what a slice delivers to her is a flux of news, its quota's places times her surprise there, and its share is that flux over
+the passage's total, `p_s = quota_s T_s / Σ_r quota_r T_r`, which sums to one (the aperture's normalization, atlas
+`receipt.aperture-normalization`; a softmax is the same partition over exponentiated scores, and here the scores are already bits). The
+terrain's share between world and passage (`receipt.terrain-held-by-its-tension`) is the same law at the node above, so the passage's
+slices and the terrain are one tree of partitions, branch within branch. With the share a partition, a slice's clock counts the
+passage's own places: its next read falls due a gap of `1/p_s` places after its last, a stride, and the cut merges the slices' strides
+as the progressions of the primes interleave, each slice a ring whose period is its gap. `clock_step(places, quota, weight, z)` now holds
+`1/p_s` on `2^(−SHARE_BITS)`; a slice with no reading is read at the partition's own tension a quota octet. W113u (the mean's clock)
+was stopped at 1,029 sections, unread; G-S2 moves unchanged to W113v (e5f8), stamped before it trains.
+
+G-S1, on W113s's held read (the first form, which left her conversations and tool turns unread after the first section), scored by
+`frontier_ruler.py` at the lap means over the collection's 200,933 held places, W113s less W113: all +0.0125 (0.0008); acts +0.0194,
+books +0.0291, code +0.0250, dialogue −0.0007, harness +0.0030, logic −0.0155, science +0.0047, theory −0.0063, web +0.0179, wikidata
++0.0482. (a), (b) and (c) missed, and the line does not take that form. Two readings stand beside the defect: wikidata, read at nearly
+three times its control's regions, coded its held stretches 0.048 nats a place dearer, and the conversations, not read at all for the
+lap, moved by −0.0007. Reading a slice faster in its own order moves her toward the stretch she is in, not toward the slice's law (the
+audit of November 18 found the same of a fixed-rate deposit on an unshuffled terrain), so a share that rises for a slice is read
+against what its order does to a held read of it, and a slice's held code is not a property of how often it was read.
