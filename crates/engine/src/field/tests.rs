@@ -4371,7 +4371,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4429,6 +4429,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         second: false,
         terrain: None,
         slice_tension: None,
+        slice_clock: None,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -7161,11 +7162,16 @@ impl crate::passage::PieceBytes for UnreadBytes {
     }
 }
 
+/// [definition; the lead, November 24 and 25] **The cut held by its slices' tensions reads each slice at its quota weighed by its news, by
+/// each slice's own clock, and the quotas alone without them**: without tensions the slice behind its quota takes the next stretch; with
+/// them the slice whose clock stands furthest behind does, so over many stretches a slice at three times another's tension gives three
+/// times its places, whatever each had taken before the tensions were set (W113s: a slice that owed its history was never read); the
+/// tension and clock lines read back as written.
 #[test]
 fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its_news_and_reads_the_quotas_alone_without_it() {
     let piece = crate::passage::Piece { document: 0, offset: 0, title: 0, text: 1 << 20, opens: false, closes: true };
     let slice = |name: &str| crate::passage::Slice { name: name.into(), quota: 1000, pieces: vec![piece], source: Box::new(UnreadBytes) };
-    let pass = |taken: [u64; 2], tension: Option<Vec<u64>>| StorePass {
+    let pass = |taken: [u64; 2], tension: Option<Vec<u64>>, clock: Option<Vec<u128>>| StorePass {
         role: "prefix".into(),
         store: "ab".repeat(32),
         stretches: 7,
@@ -7183,23 +7189,34 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
         second: false,
         terrain: None,
         slice_tension: tension,
+        slice_clock: clock,
     };
-    let choose = |taken: [u64; 2], tension: Option<Vec<u64>>| crate::passage::Cut { seed: 3, slices: vec![slice("a"), slice("b")], pass: pass(taken, tension) }.next().unwrap().slice;
+    let cut = |taken: [u64; 2], tension: Option<Vec<u64>>, clock: Option<Vec<u128>>| crate::passage::Cut { seed: 3, slices: vec![slice("a"), slice("b")], pass: pass(taken, tension, clock) };
     // Without tensions the quotas alone: the slice behind takes the next stretch.
-    assert_eq!(choose([100, 101], None), 0);
-    assert_eq!(choose([101, 100], None), 1);
-    // Held by tensions, slice b at three times a's news is read until it has taken three times a's places.
-    assert_eq!(choose([100, 250], Some(vec![1_000, 3_000])), 1);
-    assert_eq!(choose([100, 299], Some(vec![1_000, 3_000])), 1);
-    assert_eq!(choose([100, 301], Some(vec![1_000, 3_000])), 0);
-    // A slice with no reading weighs as the mean of those with one; with no reading at all, the quotas alone.
-    assert_eq!(choose([100, 101], Some(vec![0, 3_000])), 0);
-    assert_eq!(choose([101, 100], Some(vec![0, 0])), 1);
-    // The tension line reads back as written, after the pass's line.
+    assert_eq!(cut([100, 101], None, None).next().unwrap().slice, 0);
+    assert_eq!(cut([101, 100], None, None).next().unwrap().slice, 1);
+    // With them, the clock furthest behind, whatever was taken before: a's history of four times b's places is no debt.
+    assert_eq!(cut([400, 100], Some(vec![1_000, 3_000]), Some(vec![5, 6])).next().unwrap().slice, 0);
+    assert_eq!(cut([100, 400], Some(vec![1_000, 3_000]), None).next().unwrap().slice, 0);
+    // Over many stretches, b at three times a's tension gives three times a's places (each stretch's places advance its slice's clock).
+    let mut c = cut([400, 100], Some(vec![1_000, 3_000]), Some(vec![0, 0]));
+    let mut gave = [0u64; 2];
+    for _ in 0..4_000 {
+        let s = c.next().unwrap().slice;
+        let w = c.slice_weights().unwrap();
+        c.pass.slice_clock.as_mut().unwrap()[s] += crate::passage::clock_step(10, c.slices[s].quota, w[s]);
+        gave[s] += 10;
+    }
+    assert!((gave[1] as i64 - 3 * gave[0] as i64).abs() <= 30, "b gives three times a's places: {gave:?}");
+    // A slice with no reading weighs as the mean of those with one; with no reading at all, one each.
+    assert_eq!(cut([0, 0], Some(vec![0, 3_000]), None).slice_weights().unwrap(), vec![3_000, 3_000]);
+    assert_eq!(cut([0, 0], Some(vec![0, 0]), None).slice_weights().unwrap(), vec![1, 1]);
+    // The tension and clock lines read back as written, after the pass's line.
     let mut learner = Learner::new(shaped_with(four_contacts(1)), 6);
-    learner.pass = Some(pass([100, 250], Some(vec![1_000, 3_000])));
+    learner.pass = Some(pass([100, 250], Some(vec![1_000, 3_000]), Some(vec![17, 4])));
     let text = learner.to_text();
     assert!(text.lines().any(|l| l == "tension 1000 3000"), "the tension line is written");
+    assert!(text.lines().any(|l| l == "clock 17 4"), "the clock line is written");
     assert_eq!(Learner::from_text(&text).unwrap().pass, learner.pass, "and read back");
 }
 

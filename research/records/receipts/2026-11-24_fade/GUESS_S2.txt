@@ -1,0 +1,18 @@
+Fixed 2026-11-25T00:08:43Z (date -u), the lead, before W113t trains and before W113s's reads are scored. Refs #404.
+What W113s's own log printed (its STORE_SECTION and STORE_TENSION lines; W113 beside it): the first form of the slices' tensions,
+the cut taking the slice with least taken_s / (quota_s x T_s) over the whole pass, read W112's state 108 million places into its
+pass, where every slice's taken stood at its quota's share; the slices given the lowest tensions then owed every place read before.
+Her conversations (dialogue, T = 2.07 bits a place at the section's open places) and her tool turns (acts, 1.73) were read in its
+first section and in none of the 2,999 after it: 1 and 19 regions over the lap against 2,253 and 94,646 on W113. G-S1's premise
+was read from the held read's one-place-open codes (tool turns 1.15 and conversations 0.97 nats a place, the highest), and the cut
+reads the section's code at its open places, where the same two are the lowest: the premise was not read at the law's own quantity.
+The change for G-S2: each slice's own clock, c_s = sum of places / (quota_s x T_s) since its tension was set, each term at the
+tension it held; the cut takes the clock furthest behind (e5f6; StorePass::slice_clock). A slice is then read at quota x T from the
+set on, with no debt. W113t: W112's STATE.3000 with its tensions set by e5f6, 3,000 sections on store-2026-11-24-wide-t6, beside W113.
+At W113s's tensions, the share a slice is read at against its quota stands near T_s over their quota-weighted mean: the harness,
+wikidata, code, logic and science above one, books, theory, the conversations and the tool turns under it (about 0.6 for the last two).
+G-S2 (at the lap means, one place open on the collection's held set, by region):
+  (a) (0.5) wikidata, science and the harness each at least 0.005 nats a place under W113;
+  (b) (0.6) the tool turns and the conversations each at most 0.020 over W113;
+  (c) (0.45) the held set over all its places at most W113's plus 0.001.
+Rule: (a) and (c) held, the line takes the tensions; otherwise it does not.

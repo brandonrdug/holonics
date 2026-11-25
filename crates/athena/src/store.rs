@@ -321,7 +321,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -1676,6 +1676,7 @@ pub fn join_store(args: &[String]) -> Result<()> {
     pass.slices = names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect();
     // A pass held by its slices' tensions reads its new slices afresh: one reading a slice, none yet.
     pass.slice_tension = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
+    pass.slice_clock = pass.slice_tension.as_ref().map(|_| vec![0; names.len()]);
     let after = slices_text(&pass);
     let (written, lines, differing) = with_pass(&text, &learner, pass)?;
     std::fs::write(out, &written)?;
@@ -1844,11 +1845,14 @@ pub fn set_tension(args: &[String]) -> Result<()> {
     let line = format!("tension {}", tension.iter().map(u64::to_string).collect::<Vec<_>>().join(" "));
     let mut next = learner.clone();
     let terrain = usize::from(before.terrain.is_some());
-    next.pass = Some(StorePass { slice_tension: Some(tension), ..before });
+    let clock_line = format!("clock {}", vec!["0"; before.slices.len()].join(" "));
+    let clocks = vec![0u128; before.slices.len()];
+    next.pass = Some(StorePass { slice_tension: Some(tension), slice_clock: Some(clocks), ..before });
     let written = next.to_text();
     let pass_line = written.lines().position(|l| l.starts_with("pass ")).ok_or("a written state with no pass line")?;
     let mut expected: Vec<&str> = text.lines().collect();
     expected.insert(pass_line + 1 + terrain, &line);
+    expected.insert(pass_line + 2 + terrain, &clock_line);
     if written.lines().collect::<Vec<_>>() != expected {
         return Err("a written tension that changes a line other than its own".into());
     }

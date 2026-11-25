@@ -92,3 +92,27 @@ W113f's mean at most W113's plus 0.008 nats a place; (c) 0.35, P1 = 7's opening 
 - A part with no card realization (GPU first): the card's pace backs, crowds and pairs carry the fade's sum, with their parity.
 - A null from an unproved ruler (rule 11): `opens` was read on the half fade of all three rings beside each ring alone, and the
   ring that opens it opens it at the size the three together did.
+
+## 5. The slices' first form left two of them unread, and a slice's own clock replaces it
+
+W113s's lap ended at 00:02 UTC on November 25. Its log, before any read of its means: the first form of the slices' tensions
+(the cut taking the slice with least `taken_s / (quota_s · T_s)` over the whole pass) read W112's state 108 million places into
+its pass, where every slice's `taken` stood at its quota's share, so a slice given a low tension owed every place read before the
+tensions were set. Her conversations (`T` = 2.07 bits a place at the section's open places) and her tool turns (1.73), the two
+lowest, were read in the lap's first section and in none of the 2,999 after it: 1 and 19 regions against 2,253 and 94,646 on
+W113. The other slices took their places (code 46,332 regions against 87,473, logic 90,644 against 47,435, wikidata 48,727
+against 17,354).
+
+The law it was to realize is the terrain's: a share read from the tension now. An integral of the whole pass multiplied by today's
+tension is a store with no leak that remembers a schedule it never held, which is a defect of the realization, not a reading of the
+law. The repair is each slice's own clock, `c_s = Σ places / (quota_s · T_s)` since its tension was set, each term at the tension it
+held when it was read (`StorePass::slice_clock`, a `clock` line after the tension line; `clock_step` on `2^(−SHARE_BITS)` of a place),
+the cut taking the clock furthest behind: a change of tension moves the rate a slice is read at from then on and carries no debt. Its
+test reads a slice with four times the other's history read first at equal clocks, and over 4,000 stretches a slice at three times the
+other's tension giving three times its places.
+
+G-S1's premise was read at the wrong quantity, mine: it took the held read's one-place-open codes, where the tool turns (1.15 nats a
+place) and the conversations (0.97) are the highest, while the cut reads the section's code at its open places, where they are the
+lowest. Its score waits on W113s's reads, and stands as the reading of the first form. The 2×2 is now W113 (control), W113f (the
+fades), W113t (the tensions on their clocks, G-S2 fixed 00:08:43 UTC before it trains, `receipts/2026-11-24_fade/GUESS_S2.txt`) and
+W113tf (both), all from W112's STATE.3000, on e5f6 (gate 3 against LINE_W109 first).

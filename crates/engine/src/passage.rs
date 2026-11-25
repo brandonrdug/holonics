@@ -18,7 +18,7 @@
 //! history is in the records; the items below keep their reasons.
 
 use crate::codec::{question_text, Codec, RECORD, UNIT};
-use crate::field::{octave_of, Constitution, Realization, Region, StorePass, NEAR};
+use crate::field::{octave_of, Constitution, Realization, Region, StorePass, NEAR, SHARE_BITS};
 use crate::region::{region_classes, OwnedRegion};
 
 type Result<T> = std::result::Result<T, Box<dyn std::error::Error>>;
@@ -442,23 +442,33 @@ pub struct Cut {
 
 impl Cut {
     /// The next stretch at the pass's place, drawn and not taken (none where every slice's pieces are read).
+    /// [definition; the lead, November 24] Each slice's weight where the pass holds the slices by their tensions
+    /// ([`StorePass::slice_tension`]): its tension, a slice with no reading at the mean of those with one, one each where none has.
+    pub fn slice_weights(&self) -> Option<Vec<u128>> {
+        let t = self.pass.slice_tension.as_ref()?;
+        let read: Vec<u128> = t.iter().filter(|&&v| v > 0).map(|&v| u128::from(v)).collect();
+        let mean = if read.is_empty() { 1 } else { (read.iter().sum::<u128>() / read.len() as u128).max(1) };
+        Some(t.iter().map(|&v| if v > 0 { u128::from(v) } else { mean }).collect())
+    }
+
     pub fn next(&self) -> Option<Drawn> {
         let live: Vec<usize> = (0..self.slices.len()).filter(|&s| (self.pass.slices[s].piece as usize) < self.slices[s].pieces.len()).collect();
         let mut slice = *live.first()?;
-        // [definition; the lead, November 24] Each slice's weight: its tension where the pass holds the slices by it ([`StorePass::slice_tension`],
-        // a slice with no reading at the mean of those with one), one where it does not, so the interleave is the quotas' as before.
-        let weight: Vec<u128> = match &self.pass.slice_tension {
-            Some(t) => {
-                let read: Vec<u128> = t.iter().filter(|&&v| v > 0).map(|&v| u128::from(v)).collect();
-                let mean = if read.is_empty() { 1 } else { (read.iter().sum::<u128>() / read.len() as u128).max(1) };
-                t.iter().map(|&v| if v > 0 { u128::from(v) } else { mean }).collect()
+        // [definition; the lead, November 25] Where the pass holds its slices by their tensions, the slice whose own clock stands furthest
+        // behind ([`StorePass::slice_clock`], every clock at zero where none is written); otherwise the quotas' interleave as before.
+        if self.pass.slice_tension.is_some() {
+            let clock = |s: usize| self.pass.slice_clock.as_ref().map_or(0, |c| c[s]);
+            for &other in &live[1..] {
+                if clock(other) < clock(slice) {
+                    slice = other;
+                }
             }
-            None => vec![1; self.slices.len()],
-        };
-        for &other in &live[1..] {
-            let (t_o, t_n) = (self.pass.slices[other].taken as u128, self.pass.slices[slice].taken as u128);
-            if t_o * self.slices[slice].quota * weight[slice] < t_n * self.slices[other].quota * weight[other] {
-                slice = other;
+        } else {
+            for &other in &live[1..] {
+                let (t_o, t_n) = (self.pass.slices[other].taken as u128, self.pass.slices[slice].taken as u128);
+                if t_o * self.slices[slice].quota < t_n * self.slices[other].quota {
+                    slice = other;
+                }
             }
         }
         let at = &self.pass.slices[slice];
@@ -503,6 +513,13 @@ impl Cut {
         } else {
             state_of(self.seed, drawn.d, classes, q, a)
         };
+        if let Some(weight) = self.slice_weights() {
+            // [definition; the lead, November 25] The slice's own clock moves by the places it gave over its quota times its tension now
+            // ([`StorePass::slice_clock`]).
+            let n = self.slices.len();
+            let step = clock_step(drawn.q + drawn.a, self.slices[drawn.slice].quota, weight[drawn.slice]);
+            self.pass.slice_clock.get_or_insert_with(|| vec![0; n])[drawn.slice] += step;
+        }
         let place = &mut self.pass.slices[drawn.slice];
         place.taken += drawn.q + drawn.a;
         if drawn.done {
@@ -513,6 +530,12 @@ impl Cut {
         self.pass.stretches = drawn.d;
         Ok(region)
     }
+}
+
+/// [definition; the lead, November 25] **A slice's clock step** ([`StorePass::slice_clock`]): `places` over the slice's quota times its
+/// tension, on `2^(−SHARE_BITS)` of a place, released once a step.
+pub fn clock_step(places: u64, quota: u128, weight: u128) -> u128 {
+    (u128::from(places) << SHARE_BITS) / (quota * weight).max(1)
 }
 
 /// The code line's held passage (te7's lap script's `DEV`) as `train-field` reads it: its problems at the codec, those whose answer stands

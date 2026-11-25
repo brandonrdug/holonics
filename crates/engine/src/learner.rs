@@ -534,12 +534,22 @@ pub struct StorePass {
     /// [definition; the lead, November 24, Brandon's 21:57Z ("ultimately I'd prefer simultaneous"); `agent-inferred`, a guess at the law
     /// fixed before its arm] **The slices held by their tension**: each slice's field code at its open places in the last section that read
     /// it (millionths of a bit a place, the opening's code the section's receipt reads), in the store's order. Where set, the cut takes the
-    /// slice with least `taken_s / (quota_s · T_s)` ([`crate::passage::Cut::next`]), so a slice is read at its octets' share weighed by how
+    /// slice whose own clock stands furthest behind ([`StorePass::slice_clock`], [`crate::passage::Cut::next`]), so a slice is read at its octets' share weighed by how
     /// much news it still holds for the field: the terrain's law of November 21 ([`PassTerrain`]), read between the passage's slices. Every
     /// piece is still read once a pass and in order; only the interleave moves. A slice with no reading yet weighs as the mean of those
     /// with one (as its quota alone where none has). Written as its own line `tension T₀ … T_(k−1)` after the pass's (and its terrain's),
     /// only where set.
     pub slice_tension: Option<Vec<u64>>,
+    /// [definition; the lead, November 25, W113s's reading] **Each slice's own clock under its tension**: `c_s = Σ places / (quota_s · T_s)`
+    /// over the stretches it gave since its tension was set, each place on `2^(−SHARE_BITS)` and each term released alone in the pass's
+    /// order, with the tension it held when it was read. Where the tensions are set the cut takes the slice whose clock stands furthest
+    /// behind ([`crate::passage::Cut::next`]), so a change of tension moves the rate a slice is read at from then on and carries no debt from
+    /// before it. Why: the first form compared `taken_s / (quota_s · T_s)` over the whole pass, so a slice read at its quota for most of a
+    /// pass and then given a low tension owed every place read before it: on W113s (from W112's state, 108 million places into its pass) her
+    /// conversations and her tool turns, at the two lowest tensions, were read in its first section and in none of the 2,999 after it,
+    /// against 2,253 and 94,646 regions on its control. Written as a line `clock C₀ … C_(k−1)` after the tension line, only where the
+    /// tensions are set; a tension line with no clock line reads every clock at zero.
+    pub slice_clock: Option<Vec<u128>>,
 }
 
 /// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
@@ -727,7 +737,7 @@ impl StorePass {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -1082,6 +1092,8 @@ impl Learner {
             // [definition; theory, November 12] The pass's place over a store, the text's last line and only where present ([`StorePass`]).
             let pass = self.pass.as_ref().map_or(String::new(), |p| {
                 let tension = p.slice_tension.as_ref().map_or(String::new(), |t| format!("tension {}\n", t.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
+                let clock = p.slice_clock.as_ref().map_or(String::new(), |c| format!("clock {}\n", c.iter().map(u128::to_string).collect::<Vec<_>>().join(" ")));
+                let tension = format!("{tension}{clock}");
                 format!("{}\n{}{tension}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line())))
             });
             // [definition; the lead, November 17] The store's leak, a trailing line after the rates' and only where set (`leak K`).
@@ -1280,6 +1292,17 @@ impl Learner {
                     return refuse("a tension line that is not one reading a slice of the pass");
                 }
                 Some(StorePass { slice_tension: Some(t), ..p })
+            }
+            (p, _) => p,
+        };
+        // [definition; the lead, November 25] The slices' clocks under their tensions, a line after the tension line, only where set.
+        let pass = match (pass, lines.peek()) {
+            (Some(p), Some(l)) if l.starts_with("clock ") && p.slice_tension.is_some() => {
+                let c: Vec<u128> = lines.next().unwrap_or("").split_whitespace().skip(1).map(str::parse).collect::<std::result::Result<_, _>>().map_err(|_| TowerError::Refused("a clock line that is not `clock C₀ … C_(k−1)`"))?;
+                if c.len() != p.slices.len() {
+                    return refuse("a clock line that is not one clock a slice of the pass");
+                }
+                Some(StorePass { slice_clock: Some(c), ..p })
             }
             (p, _) => p,
         };
