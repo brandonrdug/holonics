@@ -29,3 +29,19 @@ G-M2  an arm that pairs them as today's engine reads a passage (an utterance's s
       speaker, its loudness, its close) reaches the first letters, and that reach is measured before a build.
 Standing beside them and not new: G-T5 (a) of receipts/2026-11-24_calendar (0.3 on an arm that founds a second moment a ring at an
 unlike fade read by a chart founded at zero) is the lead's W117q, training from 16:34 UTC on November 25.
+
+Restated 2026-11-25T18:06:12Z (date -u), before any arm is built or read, after the boundary was built (tools/wave_passage.py, the record's
+section 10) and two more count rulers were read (LEVELS.out, HELD_COUNT.out):
+G-M1  the slice as built is thirteen levels (the octets no UTF-8 text holds), ten hours from 237 voices, a held cut of 128 utterances
+      from 14 voices that never train. Clauses (a) and (c) stand in their words. Clause (b) named sixteen levels and a count read on
+      the samples it was counted on (one mate back 1.43); on the held cut at thirteen levels the count tables hold 2.566 with nothing
+      known, 1.435 with one mate back, 1.266 with two back, 0.980 with both neighbours and 0.816 with two each side. Restated at the
+      margin it was fixed at, 0.30 under one mate back:
+      (b) (0.5, a coin) the wave's held samples at the arm's lap mean, one place open, code at 1.13 nats a sample or less at thirteen
+          levels (under the table of two mates back, 0.15 over the table of both neighbours).
+      One premise is corrected beside it: the pass draws regions of 8 to 1,022 places (least 4, seven octaves; a size-weighted mean of
+      288), so a wave's region is 64 ms at the longest and 18 ms where the mean site stands, never the 0.236 s of the reach's bound;
+      a site hears a place 81, 128, 243, 256 back inside its own region at 0.57 to 0.68, 0.42 to 0.55, 0.19 to 0.31 and 0.17 to 0.28
+      of sites (the frontier's stretches and the full ones), and 729 back at under 0.01. Clause (a) keeps its four rings and its 0.6.
+G-M2  stands in its words; its "54 regions" was counted at the reach's bound, and at the pass's cut an utterance of 203,000
+      samples is over a thousand regions, which moves nothing in the guess.

@@ -46,6 +46,9 @@ run mailbox-controls python3 tools/test_agent_mailbox.py
 run copy-length-controls python3 tools/test_copy_length.py
 run human-messages-controls python3 tools/test_human_messages.py
 run link-check-controls python3 tools/test_link_check.py
+# The boundary chart of a sampled wave (tools/wave_passage.py): levels of equal mass, the store's form, chart and remainder returning
+# every sample, no held group training, on synthetic raw sources (no decoder runs). November 25.
+run wave-passage-controls python3 tools/test_wave_passage.py
 # The text against the tree (C9 of #603): every relative link of the root guides, docs/ and the records' README resolves, and
 # every atlas owner that names the tree stands in it. A link test that nothing runs does not hold.
 run guide-links python3 tools/link_check.py links

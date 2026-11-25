@@ -14,3 +14,31 @@ What the ruler is not: it enters no law and is no code of hers. Its lags count p
 9.6 and 5.0 letters on W109's mean), so it reads what a terrain holds a ring's period back on the count of places and nothing of what
 she takes. The guides' column is one file of 336 KB at an alphabet of 256: its bias correction over-corrects by about 0.02 nats, so its
 entries past 64 places are zero within that.
+
+The boundary's runs (the formal thread, 2026-11-25, the same VM, reads of the public copy only, no card; stamps from date -u there).
+levels_ruler.py LIBRISPEECH > LEVELS.out            17:42:58 to 17:43:08 UTC (11 s), the 48 utterances above at 16, 8 and 4 kHz
+                                                    (ffmpeg's resampler), ranks among 3, 9, 13 and 16 levels of equal mass.
+  levels_ruler.py sha256 502df1457ea8dbac64d4023e273e744302751c1ddc885305f532c3eeedfdc546
+  LEVELS.out      sha256 c4d0fbd5b4c9fddbfe0a04c72df2f2803a14815e8944eeef2fd8d3e35fa00a71   (both equal the PC's)
+tools/wave_passage.py write OUT LISTING wave 36000 128 16    17:59:38 to 17:59:58 UTC (21 s); its lines, the chart, the boundary's
+                                                    statement and every file's hash are in WAVE_SLICE.txt.
+  wave_passage.py sha256 5190ae26c3e1c2b52d5d92a286cb608dfd1fd5a4a73c70bbf24cb3976b431313 (the tree's file at this commit)
+  LISTING: one row an utterance of the manifest, `id TAB speaker TAB path`. The run read each needed source as raw samples that
+    ffmpeg had decoded to the VM's scratch at 17:56:59 to 17:59:04 (2,988 files, `ffmpeg -i SRC -f s16le DST`), listed with a rate
+    of 16000, because a shell call there ends at three minutes; the tool's own decode gives the same samples (a one-hour slice
+    written both ways came out byte for byte the same in its first 48 documents, and the ten-minute trial through the decoder
+    returned every sample).
+  OUT: the PC's .local/corpus/wave-2026-11-25 (untracked; the slice itself is not in the repository).
+  The same write with --remainder into the VM's scratch, then `check`: both roles returned=equal (576,099,441 and 26,211,998
+    samples), and its DOCS and HELD files equal OUT's byte for byte (18:00:07 to 18:00:33 UTC).
+held_count_ruler.py SLICE wave 400 > HELD_COUNT.out  18:05:29 to 18:05:32 UTC (3 s): count tables on the slice's first 400 training
+                                                    documents (79,481,280 places), read on its 128 held documents.
+  held_count_ruler.py sha256 b76da07af9228ead75884409d95c1ee61968b72dc8ba3277d5f4abbafe7d0eb0 (equals the PC's)
+  HELD_COUNT.out      sha256 694d672939a056faed597ec28d86039e95dc842d84146d563aa96124a3a117c6
+  A first run over all 2,860 documents with a table of three neighbours a side passed its 178 s call and was stopped by it; nothing
+  is read from it.
+Left on the PC by these runs: the slice directory above (602 MB), and one empty file .local/formal/formal_probe_5 from a write test.
+
+Gate 1 of this change (cloud container, no card, no kernel read; the change leaves every crate's compiled tokens as they were):
+`bash tools/gate_nocard.sh`, 2026-11-25 18:09Z to 18:14:40Z, every line ok, `gate wave-passage-controls: ok (1243 ms)` among them,
+`gate_nocard: gate 1 passed with no card and no kernel read`.
