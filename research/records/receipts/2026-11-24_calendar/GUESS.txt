@@ -196,3 +196,15 @@ G-T5  unread: seed 25's rows were not read on W113f. Its (a) at 0.3 is on the ar
       fade read by a chart founded at zero, which is the lead's W117q (training from 16:34 UTC on November 25).
 What the misses say together, in a line: on her text the deposit orders her rings the reverse of a calendar, and a count of one
 cycle against another needs a terrain that holds the cycles (the record of November 25, a second stream, sections 4 and 5).
+
+Scored 2026-11-25T18:41:08Z (date -u), from the lead's read of 2026-11-25T18:04:39Z: seed 25's rows (pk64_rows.tsv, the sha256 above) read
+by read-reach under `law` at W117's lap mean (the control, the same build with no second fade) and at W117q's (the second
+fade's arm: sixteen turned slots twinned, the chart read by fourteen thousand entries founded at zero), cut by known_cuts.py.
+G-T5  (a) missed. KNOWN_STRETCH at P1 = 3, kind kept, the sixth figure: W117q 0.676 against W117 0.683, 0.007 under where the
+          guess asked 0.15 or more.
+      (b) held. KNOWN_MATCHED's loose_all, W117 then W117q: P1 = 3 1.030, 1.027; 4 1.577, 1.564; 5 1.951, 1.917; 7 2.432, 2.413;
+          9 2.766, 2.743; 10 2.845, 2.844; 15 3.666, 3.672; 16 3.774, 3.774. Every period within 0.08.
+      Held to its length (a line's lap, rule 10): one lap of 3,000 sections from a chart founded at zero. The arm's writes and its
+      frontier stand beside the control's (words in the lexicon 71% both; one place open 0.697 on the control). The read says a
+      second fade a ring, located by one lap of her text, does not make her face hold a count; it does not say what a longer
+      dwell or a terrain that holds the cycles gives (the second stream's G-M1).

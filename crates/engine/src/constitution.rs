@@ -79,6 +79,20 @@ pub struct Constitution {
     /// the skin's argument parted from the turn's. A ruler's setting on a clone of the field (`read-reach`'s `skin:places`); the moments keep
     /// their paced skin. Not part of the state.
     pub ruler_skin_places: bool,
+    /// [measurement; theory, November 25, what a region hands the next] **A ruler's cut of a passage read by two streams**: `(c, crosses)`.
+    /// Every place from `c` on is read as a region that begins at `c` would read it (its heads meet no site before `c`, its strand
+    /// contacts no mate before `c`, its circles start at rest at `c`, its moments, its opening and its level hold nothing before `c`),
+    /// except for what `crosses` names, each kept as the whole passage's forward has it. Five stores: [`CUT_MOMENTS`], the rings'
+    /// moments and the opening's rows of the places before; [`CUT_CIRCLES`], the carry circles' charges at the cut; [`CUT_NEAR`], the
+    /// near field's sites and the strand mates across the cut; [`CUT_CROWDS`], the octave crowds before the cut that the law gives a
+    /// definite receiver; [`CUT_LEVEL`], the level's epochs before the cut. Two ways of hearing a site before the cut one by one:
+    /// [`CUT_CLASSES`], by address (the sites in the receiver's probed classes), and [`CUT_SHARP`], an open place hearing every site
+    /// (the law's). [`CUT_OPEN_CROWDS`] gives an open place the octave crowds before the cut, which the law does not; and
+    /// [`CUT_UNTENDED`] holds every site before the cut at its opening through the ticks, meeting no source: the passage before the cut
+    /// as terrain. With none it is the region from `c` read alone, up to the rounding of a place's frame; with the five stores and
+    /// [`CUT_SHARP`] it is the law, bit for bit (the two controls the read is held to). A reading of what carries what a place takes
+    /// from before a cut, before anything is carried across one: not part of the state, forwards only, and no reverse reads it.
+    pub ruler_cut: Option<(usize, u16)>,
     /// [definition; the lead, November 24] Each turned slot's skin denominator formed from the fade its material holds
     /// ([`Declaration::fade`], [`Constitution::refresh_fade`]); `None` on a field whose rings do not hold their fades. Derived from the
     /// material, so no part of the state's text.

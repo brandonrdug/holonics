@@ -104,13 +104,19 @@ so only laid-out text spans a turn today, where the theory's hold is her stores'
 **Guesses fixed and not yet read**, each in the receipts directory of its record (a guess's name is unique only with its directory):
 - the formal thread's: G-C1 to G-C3 (`receipts/2026-11-24_lap_cycle/GUESS.txt`); G-Q1, G-Q2, G-Q4, G-Q5
   (`receipts/2026-11-23_question_reach/GUESS.txt`); G-H6, G-H7, G-H9, G-H11 to G-H14
-  (`receipts/2026-11-23_handed_cycle/GUESS.txt`); G-A1, G-A3 (`receipts/2026-11-23_answered_act/GUESS.txt`);
+  (`receipts/2026-11-23_handed_cycle/GUESS.txt`); G-A1, G-A3 (`receipts/2026-11-23_answered_act/GUESS.txt`); G-R1 to G-R5, on an
+  arm that reads a slice's consecutive stretches as one region (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`);
 - the lead's: G-H5 on the line's continuation W107 (`receipts/2026-11-24_collection/GUESS_H5.txt`, where H is the history's laps
   and no kin of the handed cycle's G-H); the laps after it (W108 and its arm, W109) carry their own in the lead's next receipts.
 
 **What binds, each by its measurement.** No write keeps a dialogue's frame (the probe panel's counts above), which is what a direct
 exchange with her needs first. No store's reach stands between a few places and a lap's deposit, so the span of an exchange is
-held by laid-out text alone (the record of the cycle §6). By store: every turned ring keeps 0.0019 of itself over its own turn, the fine
+held by laid-out text alone (the record of the cycle §6). Read at a cut inside a held passage on W117's mean (November 25, a host
+ruler; [the record of the cut](research/records/2026-11-25_A_REGIONS_FIRST_PLACE_EMPTIES_EVERY_STORE_SO_NO_COMPARED_PLACE_ASKS_A_STORE_FOR_WHAT_STANDS_FAR_BEFORE_IT_A_CUT_COSTS_HER_FORTY_NATS_AND_CONSECUTIVE_STRETCHES_CUT_ONLY_IN_THEIR_SHARP_HEARING_ARE_WHERE_A_STORE_IS_ASKED.md)): a cut costs the 192 places past it 40 nats; with every
+site still heard one by one and every store emptied she loses thirty places and nothing after, and with the stores kept and the
+hearing cut she gets back 3%. Her stores hold about thirty places and everything farther she holds by hearing its sites one by
+one, because no compared place of a pass asks a store for more: a far source is heard one by one inside its region, and every
+store is emptied at a region's first place. By store: every turned ring keeps 0.0019 of itself over its own turn, the fine
 clock is a count compared with nothing, the carry circles alone hold their quality as a state, and no store fades through a gap
 between regions, so a silence is read by nothing. Her separators hold the long durations of a clock in her own units (a space
 8.5 letters on one turned head, a line feed 18 on the other), and under the skin's tie of fade to turn each leaves the short

@@ -24,7 +24,7 @@ impl Constitution {
         let rings: Vec<(usize, Vec<(i64, i64)>)> = ring_periods(declaration.turned_slots(), declaration.reach).into_iter().map(|n| (n, (0..n.min(declaration.reach)).map(|r| ring_phasor(r, n, pi)).collect())).collect();
         let exponential = Exponential::new(FACE_BITS);
         let decays = rings.iter().map(|&(n, _)| (0..declaration.reach).map(|d| skin_decay(d, n, pi, &exponential)).collect()).collect();
-        let mut out = Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_skin_k: None, ruler_skin_places: false, fade_skin_k: None, twin_skin_k: Vec::new(), twin_decays: Vec::new(), ruler_state_grain: None, ruler_lane_grain: None, ruler_far: 0, ruler_level: 0, mark: None };
+        let mut out = Self { declaration, theta, layout, rings, decays, exponential, fine: Exponential::new(MATERIAL_BITS), pi, scale: None, per_blank_clock: false, bare_stretch: false, mirror_strength: None, lock_carry: None, ruler_leak: None, ruler_leak_hold: false, ruler_scan_carry: false, ruler_friction: None, ruler_skin_k: None, ruler_skin_places: false, ruler_cut: None, fade_skin_k: None, twin_skin_k: Vec::new(), twin_decays: Vec::new(), ruler_state_grain: None, ruler_lane_grain: None, ruler_far: 0, ruler_level: 0, mark: None };
         // [the lead, November 24] A field whose rings hold their fades forms their skins from its material ([`Declaration::fade`]).
         out.refresh_fade().expect("a fade past its chart");
         out
