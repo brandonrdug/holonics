@@ -229,13 +229,15 @@ W116t). What W113f and W114r read together for the hearing: a ring's one fade is
 of their own accord, and every boundary asks to erase more. A count that lasts across a boundary therefore needs a store a boundary does
 not erase, beside the one that does: the formal thread's form 1, a second moment a ring at an unlike fade (`two_fades_read_gap`).
 
-Where it can stand without a new layout: the moment vector `[t][2M]` carries a slot for every head's every mode, and the still heads'
-slots are written zero at every site (`moments_sided` fills the turned heads alone), so their columns of the moment's chart are read
-against zero and their covector is zero; on the line two still heads stand beside two turned ones, mode for mode. The twin law writes each
-turned slot's moment again at its twin fade into the still head's slot of the same mode, from the same encodings and on the same clock,
-its fade its own state (`ℓ'_s`, founded where a ring keeps half of itself over its turn, `γ' = ln 2 / 2π` of the skin's, about −3.2
-octaves), the still slots' chart columns founded at zero, which keeps every face of the source bit for bit since they read zeros today.
-Its covector returns through the shared encodings and the turned head's clocks, and the twin fades' through the skin's homogeneity
-(`HNN/FadeHomogeneity`). Its cost is the moments' alone: the turned heads' moments and their returns are computed twice. The conjugate
+Where it stands: not in the still heads' slots of the moment vector. Those are written zero by `moments_sided`, but the tick adds the
+moment vector into every head's value and probe (`contact.rs`, §15.1 and §16.20), so a twin written there would move the still heads'
+values and their resonance classes at once and no founding would keep the source's faces. The twin law is its own vector and its own
+chart: each turned slot's moment again at its twin fade, from the same encodings and on the same clock, `s′_t` (`2T` a site), read into
+the opening by a chart `C′` (`D × 2T`, founded at zero) beside the moment's chart wherever that chart is read (the opening, the cavity
+openings), its fade its own state (`ℓ′_s`, founded where a ring keeps half of itself over its turn, `γ′ = ln 2 / 2π` of the skin's, about
+−3.2 octaves). Founded at zero the chart keeps every face of the source bit for bit, and its covector `Σ_t δx⁰_t s′_tᵀ` is not zero, since
+`s′` is not, so the deposit can take it up. Its return runs through the shared encodings and the turned head's clocks, and the twin fades'
+through the skin's homogeneity (`HNN/FadeHomogeneity`). Its cost is the moments': the turned heads' moments and their returns are computed
+twice. The conjugate
 product of a ring's two moments (`c c̄′`, the gap read by ratio, the determinant's signed cancellation) is the form's second step, read
 once the linear one has its lap.
