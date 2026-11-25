@@ -45,3 +45,46 @@ G-M1  the slice as built is thirteen levels (the octets no UTF-8 text holds), te
       of sites (the frontier's stretches and the full ones), and 729 back at under 0.01. Clause (a) keeps its four rings and its 0.6.
 G-M2  stands in its words; its "54 regions" was counted at the reach's bound, and at the pass's cut an utterance of 203,000
       samples is over a thousand regions, which moves nothing in the guess.
+
+Scored 2026-11-25T22:22:00Z (date -u), G-M1, from the lead's arm W118m beside W118 (3,000 sections each from W117's end, the wave slice
+joined at 0.0372 of a pass's sites, about six minutes of the wave in the lap by the lead's count), each figure read at its source: the lead's
+receipts/2026-11-24_fade/GUESS_M1.txt and slice_fades8_W118m.txt (the record of November 24, section 16).
+  (a) held at 0.6. The fade's covector a site at W118m's last state over 8 sections (2^40 dL/dl over 10^9; the wave's 12,291 sites, the ten
+      text slices' 318,412): the wave 81 -16.77, 128 +5.30, 243 +4.21, 256 +4.02; the text slices' sum -6.47, -11.39, -7.80, -0.46. A
+      positive sum asks a slower fade: the fade is 2^l, the skin e^(-2 pi |s| 2^l / (n ln 2 2^24)), and the deposit takes its step away
+      (holonics_engine::navigator::skin_of_k, fade_term; deposit::stepped), read in the source beside the lead's corrected line. Three of
+      the four slower on the wave, each faster or nothing on the text's sum.
+  (b) missed at 0.5: the held wave at W118m's lap mean, one place open, 1.2781 nats a sample over 20,028 places against 1.13. She stands
+      at the count table of two samples back (1.266) with both sides known to her (0.980), 0.157 under one back where I asked 0.30.
+  (c) held at 0.6: the held text +0.0021 (0.0005) over the control's 0.6946 against a ceiling of 0.004; web +0.0055 and wikidata +0.0072
+      are over it, dialogue -0.0018 and logic -0.0010 under zero.
+  Read beside the score, from the same receipt and RING_LAG.out here (weights mine):
+  - The count ruler read the same order on the terrain before any arm: by rank, a sample 128 back tells more (0.3887) than any from 48
+    to 96 back (0.3813 to 0.3769), and by sign 0.0007 at 81 against 0.0027, 0.0037 and 0.0049 at 128, 243 and 256. Her covector changes
+    sign between the rings of 81 and 128 where the terrain's pure period begins. (0.7 that the two are one fact.)
+  - The read is 0.77 s of the wave (about 80 regions) and the tool prints totals alone, so the three signs carry no spread of their
+    own. (0.6 that each stands on a read with a section's sums printed.)
+  - One text slice asks as the wave does and louder: the harness slice (6,903 sites) +10.16, +42.72, +5.94, +24.32 on the four. Slice
+    by slice the text is of one mind only at 128 (eight of ten faster); at 243 five of ten ask slower and at 256 three.
+  - Over all eleven slices a ring's sum against the sum of its slices' magnitudes: 0.996 at 27, 0.82 to 0.81 at 81, 128 and 243, and
+    0.07 to 0.11 at 3, 4, 16, 256 and 2187, where the slices' asks cancel. Whether that is opposed pulls or a read's scatter the totals
+    cannot say.
+  - The wave's ask at 128 stands under the text's by 56 to 1 in the one fade a ring holds (12,291 x 5.30 against 318,412 x 11.39), so a
+    line that takes the wave keeps trimming the rings the wave asks to keep. On W117q's terrain no covector asked for a second fade
+    (the record's section 14); on this store two terrains ask one ring's fade opposite ways, which is the premise that arm lacked.
+
+Fixed 2026-11-25T22:22:00Z (date -u), before W119's reads and before any read of a section's sums; forms read first: the lead's
+read-slice-fades (crates/athena/src/ruler/tension.rs), the record of November 24 sections 11 to 16, deposit::deposit_step (a step is a
+first moment over the root of a second, so its direction is the summed covector's sign).
+G-M3  on the wave store, the line continued (W119, 3,000 sections from W118m's end):
+      (a) (0.75) at W119's end the fades of the rings of 128 and 243 stand at or faster than at W118m's end (l not lower on either): the
+          text's sum carries the one fade a ring holds.
+      (b) (0.5, a coin) the held wave at W119's lap mean, one place open, codes at 1.20 nats a sample or less (1.278 after the first
+          lap; the count tables 1.266 two back, 0.980 both sides).
+      (c) (0.6) on a read of the fade's covector by slice that prints each section's sums, 8 sections at any state of the line on the
+          wave store: the wave's sum is positive in at least five of eight sections on at least two of the rings 128, 243, 256, and
+          negative in at least five of eight at 81.
+      (d) (0.55) on that read the harness slice's sum is positive in at least five of eight sections at 128 and at 256.
+      Read: (a) and (c) held, one fade a ring is where the two terrains meet and the wave's cycles are heard only by a member with a
+      fade of its own (the second fade of section 12, founded where two slices' asks oppose); (c) missed, the three signs of (a) of
+      G-M1 were a draw of 0.77 s and the trimming's cause stays unread.
