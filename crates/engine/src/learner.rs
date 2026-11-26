@@ -572,6 +572,11 @@ pub struct StorePass {
     /// piece before the next begins) are read as one region up to the field's reach, each stretch's first place a cut at the joined
     /// mask (`Region::stretches`). Written as a line `joined` after the trail's, only where set.
     pub joined: bool,
+    /// [definition; the lead, November 26, the formal thread's lever after the class hairs (the cut record's §8.3 and §11)] **A joined
+    /// passage heard whole**: with [`StorePass::joined`], its stretches are one region with no cut between them, so every open place hears
+    /// every definite site of the stretches before its own, sharply, by the law; the same bound on its length and its pairs. Written as
+    /// the line `joined whole` in place of `joined`, only where set.
+    pub joined_whole: bool,
 }
 
 /// [definition; the lead, November 21; `agent-inferred` (a guess at the law, fixed before its arm): Brandon, 04:52Z and 04:54Z, "do not
@@ -759,7 +764,7 @@ impl StorePass {
                 return refuse("a world whose share or run is zero, a world of records that refines past once, or a world whose slice is not the pass's");
             }
         }
-        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false };
+        let pass = Self { role: word(words[1])?, store: words[2].to_string(), stretches: n(words[3])?, least: n(words[4])?, octaves: n(words[5])?, pairs: n(words[6])?, sites: n(words[7])?, own, slices, world, frontier, before, strand, past, second, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false, joined_whole: false };
         if pass.least == 0 || pass.octaves == 0 || pass.pairs == 0 || pass.sites == 0 {
             return refuse("a pass whose least context, octaves or bounds are zero");
         }
@@ -1117,7 +1122,11 @@ impl Learner {
                 let clock = p.slice_clock.as_ref().map_or(String::new(), |c| format!("clock {}\n", c.iter().map(u128::to_string).collect::<Vec<_>>().join(" ")));
                 let walk = p.slice_walk.as_ref().map_or(String::new(), |w| format!("walk {}\n", w.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
                 let trail = p.slice_trail.as_ref().map_or(String::new(), |(t, l)| format!("trail {} looks {}\n", t.iter().map(i64::to_string).collect::<Vec<_>>().join(" "), l.iter().map(u64::to_string).collect::<Vec<_>>().join(" ")));
-                let joined = if p.joined { "joined\n" } else { "" };
+                let joined = match (p.joined, p.joined_whole) {
+                    (true, true) => "joined whole\n",
+                    (true, false) => "joined\n",
+                    _ => "",
+                };
                 let tension = format!("{tension}{clock}{walk}{trail}{joined}");
                 format!("{}\n{}{tension}", p.to_line(), p.terrain.as_ref().map_or(String::new(), |t| format!("{}\n", t.to_line())))
             });
@@ -1372,6 +1381,10 @@ impl Learner {
             (Some(p), Some(&"joined")) => {
                 lines.next();
                 Some(StorePass { joined: true, ..p })
+            }
+            (Some(p), Some(&"joined whole")) => {
+                lines.next();
+                Some(StorePass { joined: true, joined_whole: true, ..p })
             }
             (p, _) => p,
         };

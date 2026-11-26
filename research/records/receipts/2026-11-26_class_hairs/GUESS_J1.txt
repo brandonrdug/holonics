@@ -1,0 +1,15 @@
+Fixed 2026-11-26T11:40:25Z (date -u), the lead, before W126 trains. Refs #404.
+The joined passage heard whole (StorePass::joined_whole, set-joined ... whole): a section's consecutive stretches of one slice read as
+one region with no cut between them, so every open place hears every definite site of the stretches before its own sharply, by the law,
+under the joined arm's bound (2n <= reach, (2n)^2 <= the section's pairs). The formal thread's lever after the class hairs (the cut
+record's §8.3, §11): sharp rays across a stretch's first place, priced in pairs. The arm: W126w from W125's end with the pass heard
+whole, then W127w from W126w; the control W126 from W125's end, then W127 from W126; 3,000 sections each on e5fr, one change.
+The premise read first: the joined arm at mask 191 (W119j, W120j) held a one-time step in the cut ruler's closing (0.600 against 0.508)
+and moved the held text by -0.0001; the cut ruler on W121's mean reads the law past the cut at 1.1094 against 1.2262 by address and
+1.3201 with nothing across.
+G-J1, read at the second laps' means (W127w against W127), one place open and the cut ruler on the hundred far rows:
+  (a) (0.4) the law's code past the cut on the hundred far rows stands at least 0.010 under the control's;
+  (b) (0.3) the held text, paired over its places, stands at least 0.002 under the control's;
+  (c) (0.6) each arm lap takes at most 1.3 times its control lap's card time;
+  (d) (0.7) the wide panel's lexicon share stands within 3 points of the control's.
+The line takes the construction if (a) and (b) hold and (d) holds.

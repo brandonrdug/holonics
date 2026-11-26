@@ -164,3 +164,14 @@ panel 73% and 77%, loops 4 and 3 of 20; the theory panel's theory rows 89% and 8
 panel wrote its first answers in 17 and 9 of 200. Every region read 0.02 to 0.05 octaves louder at W125, and loudness against code stood
 near zero (Spearman −0.041 and −0.036). The line's end is W125's STATE.3000: the wave still falls a lap and the text holds, so the plain
 line is a slow wave and a standing text, and a change that moves the text is the next arm's subject.
+
+## 6. The joined passage heard whole, the arm that follows
+
+The formal thread's lever after the hairs (the cut record's §8.3 and §11): sharp rays across a stretch's first place, priced in pairs.
+`StorePass::joined_whole` (the pass line `joined whole`, written by `set-joined STATE STATE_SHA OUT whole`) reads a section's
+consecutive stretches of one slice as one region with no cut between them, under the joined arm's bound (twice its places within the
+reach, their square within the section's pairs): every open place hears every definite site of the stretches before its own, sharply,
+by the law, which the cut ruler reads at 1.1094 past the cut against 1.2262 by address on W121's mean. The host test
+`a_slices_consecutive_stretches_join_into_one_passage_within_the_reach` holds the same passages and counts heard whole, with no cut
+between their stretches. The build e5fr reproduces the line (gate 3, `gate3_e5fr.txt`: parity on 3 sections, 24 sections reproduced,
+the lap's read equal). G-J1 (`GUESS_J1.txt`, fixed before W126 trained) is read at the arm's second lap and scored where it lands.
