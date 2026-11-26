@@ -207,3 +207,63 @@ region's held text, which no read of a shorter region had shown the field could 
 1.57 times its card time. Sizing that price (a section's pairs bounded after its stretches join, or the dense rows the card holds a
 region long made sparse past the near field) is the realization's next loop, and the lap's rate is judged against its count of pairs
 before a long run is ordered (the method's rule 3).
+
+## 7. Two more laps heard whole: the text keeps falling
+
+G-L3 (`receipts/2026-11-26_class_hairs/GUESS_L3.txt`, fixed 16:41:45 UTC before W128w trained) asked whether hearing whole compounds
+or was a step taken once, as the joined arm at mask 191 was (§19 of November 24). W128w from W127w's end, W129w from W128w's, no
+change, read at each lap's mean (sections 2,001 to 3,000). Brandon asked on November 26 at 18:27 UTC for readings by part, never a
+mean headline, so the table gives the regions.
+
+| region (held, one place open) | W127w | W129w | W129w less W127w, paired |
+|---|---|---|---|
+| acts | 1.0820 | 1.0738 | −0.0082 |
+| harness | 0.7425 | 0.7321 | −0.0103 |
+| wikidata | 0.9170 | 0.9097 | −0.0073 |
+| books | 0.6771 | 0.6712 | −0.0059 |
+| theory | 0.4682 | 0.4624 | −0.0058 |
+| science | 0.5756 | 0.5708 | −0.0048 |
+| logic | 0.3329 | 0.3303 | −0.0026 |
+| code | 0.4016 | 0.4002 | −0.0014 |
+| dialogue | 0.9301 | 0.9298 | −0.0003 |
+| web | 0.7425 | 0.7425 | −0.0000 |
+| the wave (joined store) | 0.8903 | 0.8846 | −0.0057 |
+| all held text, 200,933 places | 0.6871 | 0.6824 | −0.0047 (±0.0006) |
+
+(a) (0.45, the held text at least 0.002 under W127w's) held; (b) (0.55, the wave at 0.885 or under) held at 0.8846; (c) (0.6, the wide
+panel's lexicon share within 3 points) held, 72% against 71%, loops 15 against 20 of 160. W128w's mean read the text at 0.6782 between
+them, so a lap mean scatters by about 0.004 on a fall of 0.0047 over two laps: the fall is read over the two laps, not a lap. By age past
+a cut on the far rows the law fell at every age but four to fifteen places (one place 1.362 against 1.386, two and three 1.059 against
+1.085, 64 to 255 1.066 against 1.072). The laps took 3,414 and 3,568 s.
+
+Heard whole, the line compounds where the joined arm at mask 191 held a step: four laps from W125 took the held text from 0.6916 to
+0.6824, and the plain line had stood at 0.6912 to 0.6916 for the four laps before. Her theory panel's theory rows read 87% and 84% in the
+lexicon at W128w and W129w against 93% at W127w, one panel of twelve rows; the wide panel's 160 writes held. The line's end is W129w.
+
+## 8. Her wave writes, heard
+
+Brandon asked at 18:27 UTC whether the acoustics did well and whether she can transcribe. She cannot: the wave slice is speech with no
+text beside it, so no comparison has ever paired a sound with its words. What she writes of sound was rendered for him to hear.
+
+**The write.** `write-next` takes a row's prompt and reference as `hex:` and its octets and writes them back the same way
+(`athena::ruler::tension::write_next`). On W127w's lap mean, four held wave documents, a prompt of 1,000 samples (62.5 ms at 16 kHz)
+and 16,000 written samples, one place at a time, the region keeping its last 1,800 known places (two streams within the reach); on the
+card, 1,635 s against 2,190 projected from a 200-sample development write (ratio 0.75). The rendering
+(`receipts/2026-11-26_class_hairs/wave_audio/render.py`) hears each of the chart's 13 levels at the middle of its range, a written
+octet off the chart as silence, and puts the held reference beside each write. The audio and the writes stay out of the tree.
+
+**What she writes**, by voice:
+
+| voice | samples written as sound before her first other octet | her mean level against the held speech's (of 0 to 12) | periodicity at 50 to 400 Hz, per tenth of a second (hers; held) |
+|---|---|---|---|
+| 1 | 8,258 | 4.01 against 6.03 | 0.34, 0.19, 0.71, 0.15; 0.56, 0.16, 0.13, 0.12 |
+| 2 | 9,511 | 4.43 against 6.30 | 0.14, 0.31, 0.26, 0.19; 0.78, 0.61, 0.17, 0.82 |
+| 3 | 102 | (684 samples of sound) against 6.07 | |
+| 4 | 11,624 | 4.90 against 5.56 | 0.27, 0.10, 0.16, 0.39; 0.64, 0.80, 0.65, 0.92 |
+
+She holds the grain of speech (her level counts spread over all thirteen) and drifts below its middle, she voices rarely (one tenth of
+a second locks at 125 Hz, 0.71), and after half a second to three quarters of one she leaves the wave for text; in the third voice she
+leaves it after 102 samples and writes 15,316 octets of text in her corpus's register. The field holds both kinds of passage as one
+stream, as the stream law asks, and moves between them by its own face. Transcription asks for a passage that holds both kinds of
+passage: an utterance and then its words. Within her reach (1,885 places) a word's sound at 16 kHz spans 0.12 s, so a paired slice has
+to bring a word's sound and its text within one region (a chart at a coarser clock, or a level's epochs), which is that slice's design.
