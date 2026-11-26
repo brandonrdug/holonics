@@ -1,7 +1,7 @@
 #!/usr/bin/env -S python3 -I
 """A count ruler on a wave slice's held cut: what a sample n places back tells of a sample once its near past is known, in nats a place.
 
-    far_given_near_ruler.py SLICE_DIR NAME [plant:N:P | shuffle | terrain | envelope | envelope2] [near=NAME] [lags=N,N,...]
+    far_given_near_ruler.py SLICE_DIR NAME [plant:N:P | shuffle | terrain | envelope | envelope2 | split] [near=NAME] [lags=N,N,...]
 
 The held documents are read on their own (no context crosses a document's end) and cross-fitted: count tables (add-1/2 within a
 context) are taken on the documents of one parity and code the documents of the other, then the halves exchange. For each lag n and
@@ -15,6 +15,8 @@ its gain over the near context and ENVELOPE_SHUFFLED the same with the classes d
 form a store's state takes (charged by what arrives, leaking at its own rate), read by a ruler and held by no law. `envelope2` asks
 whether that sum is far or near: the near context also holds the same sum read one place back (fade 4 or 16, the loudness of the
 last few samples), and FAR_ENVELOPE is what the sum read seventeen places back adds to it (FAR_ENVELOPE_SHUFFLED its control).
+`split` parts that gain over the held places (by the near loudness, by the fifth of a place's own code, and by whether the far
+loudness stands above or under the near), so a reading says where it stands and not only its mean.
 
 Controls: `plant:N:P` replaces each sample, with probability P, by the sample N back (in order, so a planted run carries), and the
 ruler should read a gain at N over its neighbours; `shuffle` replaces the far sample by one drawn at random from the same document,
@@ -115,6 +117,56 @@ def code(docs, k, backs, far, rng, shuffle, lo_cut, extras=()):
     return total / places, places
 
 
+def code_by(docs, k, backs, extras, lo_cut):
+    """Each held place's cross-fitted code in nats (as `code`, with no shuffle), with the place's document and place, in one order."""
+    cells = k ** (len(backs) + len(extras) + 1)
+    lo = max(list(backs) + [0])
+    keys = []
+    for d, s in enumerate(docs):
+        kk = keyed(s, k, backs, 0, None, False)
+        key = kk // k
+        for extra in extras:
+            key = key * k + extra[d][lo:]
+        keys.append((key * k + kk % k)[max(0, lo_cut - lo):])
+    codes, where = [], []
+    for parity in (0, 1):
+        train = [kk for i, kk in enumerate(keys) if i % 2 == parity]
+        c = np.bincount(np.concatenate(train), minlength=cells).reshape(-1, k).astype(np.float64)
+        logp = np.log((c + 0.5) / (c.sum(1, keepdims=True) + k / 2)).reshape(-1)
+        for i, kk in enumerate(keys):
+            if i % 2 != parity:
+                codes.append(-logp[kk])
+                where.append((i, max(lo, lo_cut)))
+    return codes, where
+
+
+def split(docs, k, lo_cut, rng=None):
+    """Where the far loudness's gain over the last two samples and their loudness stands: the held places parted by the near loudness
+    (its 13 classes, quiet to loud), by the fifth of the place's own code under the near context (cheap to dear), and by whether the
+    far loudness stands above or under the near one. Each part prints its share of places, its mean code, its mean gain and its share
+    of the whole gain. With `rng`, the far loudness is shuffled within its document: the control for a part chosen by a place's own
+    code, where a held code's scatter alone gives the dear places a gain and the cheap ones a loss."""
+    here, far = envelopes(docs, k, 16, 1), envelopes(docs, k, 64, 17)
+    if rng is not None:
+        far = [f[rng.permutation(len(f))] for f in far]
+    base, where = code_by(docs, k, (1, 2), (here,), lo_cut)
+    with_far, _ = code_by(docs, k, (1, 2), (here, far), lo_cut)
+    gain = np.concatenate(base) - np.concatenate(with_far)
+    b = np.concatenate(base)
+    near_c = np.concatenate([here[d][lo:] for d, lo in where]).astype(np.int64)
+    far_c = np.concatenate([far[d][lo:] for d, lo in where]).astype(np.int64)
+    fifth = np.searchsorted(np.quantile(b, [0.2, 0.4, 0.6, 0.8]), b, side="right")
+    total, n = gain.sum(), len(gain)
+    print(f"SPLIT_HEAD places={n} base={b.mean():.4f} gain={gain.mean():+.4f} near=1,2+env16@1 far=env64@17{' shuffled' if rng is not None else ''}")
+    for label, part, size in (("near_loudness", near_c, k), ("code_fifth", fifth, 5), ("far_minus_near", np.sign(far_c - near_c) + 1, 3)):
+        rows = []
+        for g in range(size):
+            m = part == g
+            if m.any():
+                rows.append(f"{g}:places={m.mean():.3f},code={b[m].mean():.3f},gain={gain[m].mean():+.4f},share={gain[m].sum() / total:+.3f}")
+        print(f"SPLIT by={label} " + " ".join(rows))
+
+
 def main():
     out, name = sys.argv[1], sys.argv[2]
     opts = sys.argv[3:]
@@ -136,6 +188,10 @@ def main():
         docs = planted
     shuffle = mode == "shuffle"
     lo_cut = max(LAGS) + 16
+    if "split" in opts:
+        print(f"FAR_HEAD levels={k} documents={len(docs)} places={sum(len(s) for s in docs)} mode=split from_place={lo_cut}")
+        split(docs, k, lo_cut, rng if shuffle else None)
+        return
     if "envelope2" in opts:
         print(f"FAR_HEAD levels={k} documents={len(docs)} places={sum(len(s) for s in docs)} mode=envelope2 from_place={lo_cut}")
         far = {n: envelopes(docs, k, n, 17) for n in (4, 16, 64, 256, 1024)}
