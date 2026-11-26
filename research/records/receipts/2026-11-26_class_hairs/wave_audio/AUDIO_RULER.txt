@@ -1,0 +1,13 @@
+AUDIO file=control_tone_150hz.wav flatness_median=0.000 static_share=0.00 voiced_share=1.00 hnr_db_median=23.9 pitch_hz_median=150 pitch_held=1.00 f1_median=nan f2_median=nan
+AUDIO file=control_noise.wav flatness_median=0.559 static_share=1.00 voiced_share=0.00 hnr_db_median=-5.4 pitch_hz_median=nan pitch_held=0.00 f1_median=nan f2_median=nan
+AUDIO file=control_vowel.wav flatness_median=0.000 static_share=0.00 voiced_share=1.00 hnr_db_median=30.0 pitch_hz_median=150 pitch_held=1.00 f1_median=717 f2_median=1201
+AUDIO file=voice1_original_only.wav flatness_median=0.036 static_share=0.00 voiced_share=0.85 hnr_db_median=7.3 pitch_hz_median=283 pitch_held=0.87 f1_median=498 f2_median=1633
+AUDIO file=voice2_original_only.wav flatness_median=0.014 static_share=0.00 voiced_share=0.96 hnr_db_median=10.4 pitch_hz_median=126 pitch_held=0.94 f1_median=nan f2_median=nan
+AUDIO file=voice4_original_only.wav flatness_median=0.039 static_share=0.00 voiced_share=0.82 hnr_db_median=10.2 pitch_hz_median=211 pitch_held=0.91 f1_median=379 f2_median=2967
+AUDIO file=voice1_hers_only.wav flatness_median=0.089 static_share=0.11 voiced_share=0.33 hnr_db_median=-2.0 pitch_hz_median=58 pitch_held=0.29 f1_median=nan f2_median=nan
+AUDIO file=voice2_hers_only.wav flatness_median=0.084 static_share=0.01 voiced_share=0.45 hnr_db_median=-0.7 pitch_hz_median=62 pitch_held=0.28 f1_median=nan f2_median=nan
+AUDIO file=voice4_hers_only.wav flatness_median=0.061 static_share=0.01 voiced_share=0.53 hnr_db_median=0.3 pitch_hz_median=57 pitch_held=0.36 f1_median=280 f2_median=4334
+AUDIO file=wave_0_her_write.wav flatness_median=0.369 static_share=0.64 voiced_share=0.02 hnr_db_median=-4.2 pitch_hz_median=163 pitch_held=0.00 f1_median=463 f2_median=2207
+AUDIO file=wave_32_her_write.wav flatness_median=0.331 static_share=0.63 voiced_share=0.13 hnr_db_median=-3.3 pitch_hz_median=96 pitch_held=0.83 f1_median=nan f2_median=nan
+AUDIO file=wave_96_her_write.wav flatness_median=0.379 static_share=0.84 voiced_share=0.00 hnr_db_median=-4.6 pitch_hz_median=nan pitch_held=0.00 f1_median=nan f2_median=nan
+AUDIO file=tube_babble_folds.wav flatness_median=0.006 static_share=0.00 voiced_share=1.00 hnr_db_median=13.0 pitch_hz_median=182 pitch_held=0.94 f1_median=644 f2_median=2561
