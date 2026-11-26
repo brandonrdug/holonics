@@ -4379,7 +4379,7 @@ fn a_growth_by_letters_keeps_every_standing_entry_and_reads_fresh_letters_at_the
     (octaves[3], octaves[19]) = (2, 1);
     learner.rate_parts = Some(RateParts { contacts_before: 8, octaves });
     learner.own_rates = Some((0..learner.field.material_len()).map(|i| 3 + (i % 5) as u32).collect());
-    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false });
+    learner.pass = Some(StorePass { role: "prefix".into(), store: "ab".repeat(32), stretches: 7, least: 4, octaves: 7, pairs: 15_606_223, sites: 41_490, own: false, slices: vec![PassSlice { name: "code".into(), piece: 2, cursor: 17, taken: 900 }], world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false, joined_whole: false });
     let same = learner.lettered(0).unwrap();
     assert_eq!(same.to_text(), learner.to_text(), "no fresh class leaves the learner's text byte for byte");
     let fresh = 2usize;
@@ -4545,6 +4545,7 @@ fn the_pass_line_is_the_learners_last_line_and_only_where_present() {
         slice_walk: None,
         slice_trail: None,
         joined: false,
+        joined_whole: false,
     };
     learner.pass = Some(pass.clone());
     let text = learner.to_text();
@@ -7308,6 +7309,7 @@ fn the_cut_held_by_its_slices_tensions_reads_a_slice_by_its_quota_weighed_by_its
         slice_walk: None,
         slice_trail: None,
         joined: false,
+        joined_whole: false,
     };
     let cut = |taken: [u64; 2], tension: Option<Vec<u64>>, clock: Option<Vec<u128>>| crate::passage::Cut { seed: 3, slices: vec![slice("a"), slice("b")], pass: pass(taken, tension, clock) };
     // Without tensions the quotas alone: the slice behind takes the next stretch.
@@ -7390,6 +7392,7 @@ fn the_trail_sets_how_often_the_flock_looks_at_a_slice() {
         slice_walk: None,
         slice_trail: trail,
         joined: false,
+        joined_whole: false,
     };
     let cut = |trail: Option<(Vec<i64>, Vec<u64>)>| crate::passage::Cut { seed: 3, slices: vec![slice("a", 1000), slice("b", 2000), slice("c", 1000)], pass: pass(trail) };
     assert_eq!(cut(None).trail_weights(), vec![1, 1, 1], "no trail: one each");
@@ -7464,6 +7467,7 @@ fn a_slice_walked_on_its_golden_stride_reads_every_piece_once_and_spreads_its_re
         slice_walk: Some(vec![6]),
         slice_trail: None,
         joined: false,
+        joined_whole: false,
     };
     let cut = crate::passage::Cut { seed: 3, slices: vec![slice], pass };
     let order: Vec<usize> = (0..n as u64).map(|k| cut.piece_of(0, k)).collect();

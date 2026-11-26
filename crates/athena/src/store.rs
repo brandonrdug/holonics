@@ -332,7 +332,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         println!("STORE_LETTERS fresh={} alphabet={} void={} material={} ms={}", fresh.len(), codec.alphabet(), codec.void(), learner.field.material_len(), started.elapsed().as_millis());
         let after = held_out(&learner.field, &codec, &held_set(&codec, &held_text_bytes)?, realization)?;
         println!("STORE_YARDSTICK at=after {} ms={}", held_text(&after), started.elapsed().as_millis());
-        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false });
+        learner.pass = Some(StorePass { role: role.to_string(), store: args[4].clone(), stretches: 0, least: LEAST, octaves: OCTAVES, pairs: PAIRS_BOUND, sites: SITES_BOUND, own: false, slices: names.iter().map(|n| PassSlice { name: n.to_string(), piece: 0, cursor: 0, taken: 0 }).collect(), world: None, frontier: 0, before: false, strand: false, past: false, second: false, terrain: None, slice_tension: None, slice_clock: None, slice_walk: None, slice_trail: None, joined: false, joined_whole: false });
         write_new(&out.join("STATE.0"), learner.to_text().as_bytes())?;
         println!("STORE_CROSSING role={role} saved=STATE.0 ms={}", started.elapsed().as_millis());
     }
@@ -490,7 +490,7 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // [definition; the lead, November 25, Fable's construction] A slice's consecutive stretches read as one passage ([`StorePass::joined`]).
         if cut.pass.joined {
             let passage: Vec<OwnedRegion> = regions.drain(passage_start..).collect();
-            let (joined, slices, counted) = join_stretches(passage, &region_slice, &region_done, &region_counted, learner.field.declaration.reach, cut.pass.pairs);
+            let (joined, slices, counted) = join_stretches(passage, &region_slice, &region_done, &region_counted, learner.field.declaration.reach, cut.pass.pairs, cut.pass.joined_whole);
             // The passage's counts again, a joined passage one region whose later stretches' first places are compared.
             tally = tally_before;
             for (region, &c) in joined.iter().zip(&counted) {
@@ -1717,7 +1717,7 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
 /// passage joined to 2,590 places, staged as 5,180 sites, asked 14.7 GB of the card's 10.9 (W119j's first section); within the bound each
 /// region is one the card already holds; and the card's resident skins hold a distance up to the reach between any two of a region's sites,
 /// so a strand staged past the reach outruns them (W119j's second section, a passage of 1,975 places staged as 3,950 sites).
-fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], counted: &[usize], reach: usize, pairs: u64) -> (Vec<OwnedRegion>, Vec<usize>, Vec<usize>) {
+fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], counted: &[usize], reach: usize, pairs: u64, whole: bool) -> (Vec<OwnedRegion>, Vec<usize>, Vec<usize>) {
     let mut out: Vec<OwnedRegion> = Vec::with_capacity(regions.len());
     let mut out_slices: Vec<usize> = Vec::with_capacity(regions.len());
     let mut out_counted: Vec<usize> = Vec::with_capacity(regions.len());
@@ -1733,7 +1733,10 @@ fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], co
                 // A joined stretch's places are compared as before, and its first place too: it now has a place before it.
                 out_counted[k] += places + 1;
                 let j = &mut out[k];
-                j.stretches.push(j.classes.len());
+                // Heard whole ([`StorePass::joined_whole`]), the passage keeps no cut between its stretches.
+                if !whole {
+                    j.stretches.push(j.classes.len());
+                }
                 j.classes.extend_from_slice(&region.classes);
                 j.unresolved.extend_from_slice(&region.unresolved);
                 if let (Some(t), Some(rt)) = (j.targets.as_mut(), region.targets.as_ref()) {
@@ -2120,9 +2123,11 @@ pub fn set_trail(args: &[String]) -> Result<()> {
 /// [the lead, November 25, Fable's construction] `set-joined STATE STATE_SHA OUT`: the line's state with its pass reading a slice's
 /// consecutive stretches as one passage ([`StorePass::joined`]), every other line kept.
 pub fn set_joined(args: &[String]) -> Result<()> {
-    if args.len() != 4 {
-        return Err("set-joined STATE STATE_SHA OUT".into());
+    // [the lead, November 26] `set-joined STATE STATE_SHA OUT whole`: the joined passage heard whole ([`StorePass::joined_whole`]).
+    if args.len() != 4 && !(args.len() == 5 && args[4] == "whole") {
+        return Err("set-joined STATE STATE_SHA OUT [whole]".into());
     }
+    let whole = args.len() == 5;
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let out = Path::new(&args[3]);
     if out.exists() {
@@ -2134,10 +2139,11 @@ pub fn set_joined(args: &[String]) -> Result<()> {
         return Err("a state whose pass already reads its stretches joined".into());
     }
     let mut next = learner.clone();
-    next.pass = Some(StorePass { joined: true, ..before });
+    next.pass = Some(StorePass { joined: true, joined_whole: whole, ..before });
     let written = next.to_text();
+    let line = if whole { "joined whole" } else { "joined" };
     let (old, new): (Vec<&str>, Vec<&str>) = (text.lines().collect(), written.lines().collect());
-    if new.len() != old.len() + 1 || new.iter().filter(|&&l| l == "joined").count() != 1 || new.iter().filter(|&&l| l != "joined").ne(old.iter()) {
+    if new.len() != old.len() + 1 || new.iter().filter(|&&l| l == line).count() != 1 || new.iter().filter(|&&l| l != line).ne(old.iter()) {
         return Err("a written joined pass that changes a line other than its own".into());
     }
     if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
@@ -3740,15 +3746,20 @@ mod tests {
         let regions = vec![strand(4, 1), strand(3, 2), strand(5, 1), strand(2, 1), strand(6, 1), strand(3, 2)];
         let slices = [0usize, 1, 0, 0, 0, 1];
         let done = [false, false, false, true, false, false];
-        let (out, out_slices, counted) = join_stretches(regions, &slices, &done, &[3, 2, 4, 1, 5, 2], 40, u64::MAX);
+        let (out, out_slices, counted) = join_stretches(regions, &slices, &done, &[3, 2, 4, 1, 5, 2], 40, u64::MAX, false);
         assert_eq!(counted, vec![3 + 4 + 1 + 1 + 1, 2 + 2 + 1, 5], "each later stretch's first place is compared");
         assert_eq!(out_slices, vec![0, 1, 0], "slice 0's first three joined, slice 1's two joined, slice 0's fourth after its piece ended");
         assert_eq!((out[0].classes.len(), out[0].stretches.clone()), (11, vec![4, 9]));
         assert_eq!((out[1].classes.len(), out[1].stretches.clone()), (6, vec![3]));
         assert_eq!((out[2].classes.len(), out[2].stretches.clone()), (6, vec![]));
-        let (short, _, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], &[3, 4, 2], 18, u64::MAX);
+        let (short, _, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], &[3, 4, 2], 18, u64::MAX, false);
         assert_eq!(short.iter().map(|r| (r.classes.len(), r.stretches.clone())).collect::<Vec<_>>(), vec![(9, vec![4]), (3, vec![])], "a passage staged as its two streams stays within the reach");
-        let (bound, _, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], &[3, 4, 2], 40, 18 * 18);
+        let (bound, _, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], &[3, 4, 2], 40, 18 * 18, false);
         assert_eq!(bound.iter().map(|r| r.classes.len()).collect::<Vec<_>>(), vec![9, 3], "and its two streams within the section's bound of pairs");
+        // Heard whole, the same passages keep no cut between their stretches, and the same places are compared.
+        let regions = vec![strand(4, 1), strand(3, 2), strand(5, 1), strand(2, 1), strand(6, 1), strand(3, 2)];
+        let (whole, whole_slices, whole_counted) = join_stretches(regions, &slices, &done, &[3, 2, 4, 1, 5, 2], 40, u64::MAX, true);
+        assert_eq!((whole_slices, whole_counted), (out_slices, counted), "heard whole, the same passages and counts");
+        assert_eq!(whole.iter().map(|r| (r.classes.len(), r.stretches.is_empty())).collect::<Vec<_>>(), vec![(11, true), (6, true), (6, true)], "and no cut between their stretches");
     }
 }
