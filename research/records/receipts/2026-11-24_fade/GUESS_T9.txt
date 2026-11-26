@@ -12,3 +12,13 @@ G-T9 (at the lap means; the wave's held cut and the text's, one place open; read
   (c) (0.5) at W121q's last state the second-fade covector over the wave asks the rings of 128, 243 and 256 to fade more slowly on at
       least two of them, where over the text it does not on any two.
 Rule (naming the purpose beside the ceiling of harm): the line takes the second fade where (a) and (b) held.
+
+Scored 2026-11-26T06:20:04Z (date -u), the lead. W121q less W121 at the lap means, one place open: the held text +0.0001 (0.0002), no region over
++0.0017; the wave's held cut 1.0182 against 1.0172 (+0.0010). At W121q's last state over 8 sections, a site's covector over 10^9 in
+2^40 dL/dl (positive asks a slower fade): the second fade over the wave 128 -0.116, 243 +0.150, 256 +0.032, over the text -0.632, -0.324,
+-0.334; the first fade over the wave 128 +6.78, 243 -6.83, 256 -7.29, over the text -3.52, -5.22, -1.60.
+  (a) missed: +0.0010.
+  (b) held.
+  (c) held: the second fade over the wave asks 243 and 256 to fade more slowly, over the text none.
+By the rule ((a) and (b)) the line does not take the second fade: at one lap its chart's covector is about a fiftieth of the first fade's,
+and the wave's held cut does not move. The line's end is W121's STATE.3000.
