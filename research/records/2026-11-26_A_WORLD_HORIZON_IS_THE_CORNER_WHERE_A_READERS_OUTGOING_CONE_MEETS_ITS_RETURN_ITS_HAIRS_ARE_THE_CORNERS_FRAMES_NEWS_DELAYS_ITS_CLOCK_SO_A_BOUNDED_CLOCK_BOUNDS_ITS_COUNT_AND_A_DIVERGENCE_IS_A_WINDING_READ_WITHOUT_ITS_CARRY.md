@@ -370,6 +370,24 @@ brings back at least 0.8 of address's 0.088 on fewer than half its pairs. §5.1'
 lever left after joining is sharp rays across a stretch's first place (the ruler's bit 64), paid in pairs. The weight that the
 joined arm stalled for the paper's reason stays at 0.65.
 
+### 8.4 The coherent hairs scored (09:51 UTC)
+
+The lead's read of §8.3's guess (its G-H5) missed its main clause and held its clause on pairs. Merging a class into its mean only
+where its value word stands over chance brings back 0.0046 of address's 0.090 nats a place, 5%, on 23% of address's pairs. The
+test admitted 73% of the hairs, and those classes held 83% of address's pairs.
+
+What it says. Being over chance is far too weak a bar: a class's mean keeps only its coherent share `e^(−Ξ)` of the class's power,
+and a share well over `1/M` can still be a small one. What hearing by address carries is not a class's power. It is the selection:
+the receiver's lock picks, among a class's sites, the one whose key fits its probe. A mean has no selection in it. So the corner's
+capacity on the engine is a capacity to select. A reader that can choose among `R` rays a crossing carries up to `ln R` nats a
+read, and the paper's `A/4` is that same count of distinguishable states. Weight 0.8.
+
+So rays may merge only where no receiver's lock can tell them apart: framed key words that agree within the lock's own resolution.
+That is the kernel's law, differences no admitted receiver distinguishes, and not a test of the values' coherence. A merge of that
+kind can cost nothing at most and gains only pairs, and pairs were not what this cut lacked. The merge direction falls to 0.15 and
+asks no more card time. The lever stays where §8.3 put it: sharp rays across a stretch's first place (the ruler's bit 64), whose
+price in pairs is the realization's to size.
+
 ## 9. Atlas, receipts and sources
 
 Atlas rows added: `gr.null-clock-shear-delay`, `gr.corner-hairs-relative-boost`, `gr.bounded-clock-finite-diamond`,
