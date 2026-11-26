@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,766 records from July 2026 to November 2026. 414 receipts directories: 225 beside the records and 189 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,767 records from July 2026 to November 2026. 415 receipts directories: 225 beside the records and 190 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 165 | 130 |
+| [November 2026](#november-2026) | 166 | 131 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,7 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-26 [A classs mean word carries a twentieth of what its sites heard one by one carry across a cut and her face already reads each ring on two axes](2026-11-26_A_CLASSS_MEAN_WORD_CARRIES_A_TWENTIETH_OF_WHAT_ITS_SITES_HEARD_ONE_BY_ONE_CARRY_ACROSS_A_CUT_AND_HER_FACE_ALREADY_READS_EACH_RING_ON_TWO_AXES.md)
+- 2026-11-26 [A composition stands in a locale only after its causes its cost is its build from the parts the locale holds a Holarchy over an aeon is that build kept and generalization is a short build from ones own parts](2026-11-26_A_COMPOSITION_STANDS_IN_A_LOCALE_ONLY_AFTER_ITS_CAUSES_ITS_COST_IS_ITS_BUILD_FROM_THE_PARTS_THE_LOCALE_HOLDS_A_HOLARCHY_OVER_AN_AEON_IS_THAT_BUILD_KEPT_AND_GENERALIZATION_IS_A_SHORT_BUILD_FROM_ONES_OWN_PARTS.md)
 - 2026-11-26 [A world horizon is the corner where a readers outgoing cone meets its return its hairs are the corners frames news delays its clock so a bounded clock bounds its count and a divergence is a winding read without its carry](2026-11-26_A_WORLD_HORIZON_IS_THE_CORNER_WHERE_A_READERS_OUTGOING_CONE_MEETS_ITS_RETURN_ITS_HAIRS_ARE_THE_CORNERS_FRAMES_NEWS_DELAYS_ITS_CLOCK_SO_A_BOUNDED_CLOCK_BOUNDS_ITS_COUNT_AND_A_DIVERGENCE_IS_A_WINDING_READ_WITHOUT_ITS_CARRY.md)
 - 2026-11-26 [Mass is where rays circulate and it is an index to the rays that cross it a classs mean heard as a ray read an index as a source and the waves slow level stands where its loudness moves](2026-11-26_MASS_IS_WHERE_RAYS_CIRCULATE_AND_IT_IS_AN_INDEX_TO_THE_RAYS_THAT_CROSS_IT_A_CLASSS_MEAN_HEARD_AS_A_RAY_READ_AN_INDEX_AS_A_SOURCE_AND_THE_WAVES_SLOW_LEVEL_STANDS_WHERE_ITS_LOUDNESS_MOVES.md)
 - 2026-11-25 [A night of arms left her writes where they were her deposit on text trims long rings a text one turn back tells nothing past sixteen places a sampled wave tells at every ring a second streams pairing waits on reach](2026-11-25_A_NIGHT_OF_ARMS_LEFT_HER_WRITES_WHERE_THEY_WERE_HER_DEPOSIT_ON_TEXT_TRIMS_LONG_RINGS_A_TEXT_ONE_TURN_BACK_TELLS_NOTHING_PAST_SIXTEEN_PLACES_A_SAMPLED_WAVE_TELLS_AT_EVERY_RING_A_SECOND_STREAMS_PAIRING_WAITS_ON_REACH.md)
