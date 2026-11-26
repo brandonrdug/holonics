@@ -1,0 +1,20 @@
+Fixed 2026-11-26T08:55:48Z (date -u), the lead, before W124 trains. Refs #404.
+The line's laps, no change: W124 from W123's end and W125 from W124's, 3,000 sections each on e5fk, on the wave's store.
+The premise read first: the wave's held cut at the line's means 1.278, 1.131, 1.029, 1.017, 0.964, 0.931 (W118m to W123); the held text
+0.6936 to 0.6986 over those laps.
+G-L2 (at the lap means, one place open):
+  (a) (0.5) the wave's held cut at W125's mean stands at 0.900 or under;
+  (b) (0.7) the held text at W125's mean stands within 0.004 of W123's 0.6948;
+  (c) (0.55) the wave's held cut falls at both laps.
+
+Scored at 2026-11-26T11:32:47Z, at the lap means (sections 2,001 to 3,000 of each lap), one place open:
+  (a) missed: the wave's held cut at W125's mean is 0.9179 (W124 0.9245, W123 0.9311).
+  (b) held: the held text at W125's mean is 0.6916 (W124 0.6912), 0.0032 under W123's 0.6948.
+  (c) held: the wave falls at both laps, by 0.0066 and 0.0066.
+Paired against W123 over the 220,961 held places, W125 less W123 is -0.0041 (+-0.0006); against W124, -0.0003 (+-0.0006): acts -0.0032,
+books +0.0037, code +0.0002, dialogue +0.0107, harness +0.0025, logic -0.0019, science +0.0013, theory -0.0019, wave -0.0066, web -0.0025,
+wikidata -0.0052. Laps: W124 2,323 s (08:55:48 to 09:34:31) and W125 2,477 s (09:34:31 to 10:15:48) on the card under the lock, e5fk.
+Writes (counts off the text; the text is shown in conversation and never committed): the long panel at W124's and W125's means, lexicon
+73% and 77%, loops 4 and 3 of 20; the wide panel 72% and 72%, loops 21 and 23 of 160; the theory panel's theory rows 89% and 86%, its logic
+rows 91% and 88%, no loops; the probe's ask2 panel first 17 and 9 of 200. Loudness (read-loudness at the means, every region): all regions
+22.563 and 22.591 octaves, each region 0.02 to 0.05 louder at W125; spearman of loudness against code -0.041 and -0.036.
