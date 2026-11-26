@@ -1222,13 +1222,21 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         }
         settings.push((word.clone(), Some(f)));
     }
-    let unescape = |t: &str| t.replace("\\n", "\n");
+    // A row's text is escaped (`\\n` a line's end), or `hex:` and its octets two hex digits each, for a passage of any octets (the
+    // lead, November 26: the wave's held rows).
+    let unescape = |t: &str| -> std::result::Result<Vec<u8>, String> {
+        match t.strip_prefix("hex:") {
+            Some(h) if h.len() % 2 == 0 => (0..h.len()).step_by(2).map(|k| u8::from_str_radix(&h[k..k + 2], 16).map_err(|e| e.to_string())).collect(),
+            Some(_) => Err("a hex row of an odd count of digits".into()),
+            None => Ok(t.replace("\\n", "\n").into_bytes()),
+        }
+    };
     let mut rows: Vec<(String, Vec<usize>)> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         let [label, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
-        let mut classes = codec.encode(unescape(known).as_bytes())?;
-        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        let mut classes = codec.encode(&unescape(known)?)?;
+        classes.extend(codec.encode(&unescape(next)?)?.into_iter().take(1));
         if classes.len() < 2 {
             return Err("a row of fewer than two places".into());
         }
