@@ -40,6 +40,11 @@ Against these, the day's boundary codecs cut by a frame: the paired slice reads 
 The guide's rule of November 13 (no clock or frame length is privileged) reaches a boundary codec's cut: the frame is a clock
 of the recorder, handed to her as if it were the stream's.
 
+The lead stopped both before they trained and named the level's sites at the landmarks of its news as the lawful coarse chart
+(that record's §8, the same hour). This record adds what a frame does to a steady act, by measurement (§5), and what that chart
+asks of her depth: a level's clock is a syllable's only at the third level above a sample (§6), and a body hands the limb its two
+lowest levels.
+
 ## 3. The physics, one propagation
 
 - **A grid and a parcel.** A flow is written on a grid fixed in the recorder's frame, or on the parcels that move with it. On
