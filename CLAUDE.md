@@ -739,6 +739,14 @@ reading, and rule 6's second requirement every design on how the machine learns.
    November 11 "raised rates buy no level" was read from whole-field means while a quarter of the field's lasting fall stood on 2% of
    its heat, all in the letter rows (atlas `deposition.block-polarization`). Scope: every reading in a message, a record or a guess;
    a guess on a total keeps the partition beside it ([the record](research/records/2026-11-11_A_READING_NAMES_ITS_REGION_THE_LETTER_ROWS_LEARN_WHERE_THE_CONTACTS_REST_E_IS_A_CHART_NEVER_A_DIGIT_AND_EVERY_GLOBAL_SUM_IS_A_JOIN_THE_CARD_PAYS.md)).
+   A line's level is told by depth beside its partition (Brandon, November 26): what the past is worth by the octave of its age,
+   her code and her writes parted by the span of the parts they are built from, the links held from one cycle to the next, and
+   each level's news in that level's own unit, with the mean in nats a place beside them. Reason: a place's nats weigh a level
+   whose unit spans `κ` places by `1/κ` a level (0.116, 0.0135 and 0.0016 through three levels of 8.6 places), so a lap that
+   deepens the machine and a lap that sharpens its last places read alike in the mean; on November 26 the correction came twice
+   in a day, and through four laps whose mean fell the worth of the past older than 64 places had not moved (atlas
+   `receipt.level-read-in-its-own-unit`, `store.reach-by-age-stood-through-four-laps`; wording `agent-inferred`;
+   [the record](research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_A_FRAMES_CLOCK_BEATS_AGAINST_ITS_SOURCES_A_LEVEL_IS_READ_BY_ITS_COUNT_IN_ITS_OWN_UNIT_AND_A_DEPOSIT_COMPOUNDS_ONLY_WHERE_A_CLOSED_UNIT_IS_KEPT_AS_A_PART.md)).
 9. **Judge by structure, with the held code as one reading** (November 7). Before ruling on a law, read its structural measures
    (coherence per family, the letters' balance, the lock of writes against references, counts of counts of surprise) and name which
    one decides. Reason: one scalar over a short read cannot see a weak consistent direction and says nothing of structure.
