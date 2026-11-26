@@ -21,6 +21,8 @@ holds 1,885, so no region holds an utterance beside its words; at a frame of 10 
 words some 200 more. The loudness carries an utterance's timing (its syllables' beat and its pauses), the part the formal thread read
 standing in the wave past sixteen samples (the cut record's §12). It carries no spectrum, so the slice tests whether timing alone tells
 her the words' count and rhythm; a spectrum would take more octets a frame than the field's free octets give.
+[A dated reading, Brandon, November 26 22:39 UTC: a frame of 10 ms is a privileged clock, which the stream law bars; the lawful coarse
+chart is the level's sites at the landmarks of its news (the limb record's §8). The tool stands as that configuration.]
 The octets are by default the thirteen no UTF-8 text holds (C0, C1, F5 to FF), the wave slice's: a frame's level and a sample's level
 share a class, told apart by the passage around them (`agent-inferred`: the free octets are thirteen, and a second chart's own
 octets would cost two places a frame).
