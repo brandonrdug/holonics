@@ -1,0 +1,3 @@
+VOICED_EPOCHS W129w's lap mean, read-strand-cut past on 64 held voiced stretches of the wave slice (1,200 samples each, a
+stretch kept where an autocorrelation peak over 0.5 stood in four of five frames of 400 samples at lags of 40 to 320), the known stream's anchors
+epochs=11392 median=5 mean=6.7 p10=1 p90=15 share_under_55=0.999 longest=120

@@ -273,3 +273,29 @@ the words were the held originals, which each file played first (the 13 levels' 
 her writes are "pure static". That agrees with the table: at 0.88 nats a sample she is unsure of every sample, and sixteen thousand
 draws one at a time keep the level mix of speech and lose its shape, which a voice holds over hundreds of samples, a pitch period after
 another, past her reach of 0.12 s.
+
+## 9. Her depth is one: the formal pass's depth reads
+
+The formal pass on Brandon's note of 22:39 UTC (its record of a reader's nested cycles, PR #1168) fixed four guesses at 22:55 UTC on
+her depth and asked the lead for three reads (`receipts/2026-11-26_nested_cycles/GUESS.txt`). Read by part, never by the mean:
+
+- **G-Z1 (0.6), held.** What the past older than a cut is worth to her, by the octave of a place's age past it (her code with nothing
+  crossing less the law's, `reach_by_age.py` over the hundred far rows; `receipts/2026-11-26_class_hairs/joined_whole/REACH_BY_AGE.txt`):
+  at ages 64 to 127, 0.128 to 0.135 nats a place from W127w to W131w, and at 128 to 255, 0.078 to 0.082, inside the guess's bands, while
+  the law's mean past the cut fell from 1.0983 to 1.0896. Her reach does not move outward; the laps heard whole improved what she hears,
+  not how far.
+- **G-Z3 (0.65), held.** The word two before, read by ridge from her open reads at the current word's letters 1 to 4 (10,651 words of
+  four letters or more on the 407 word rows, `tools/word_presence.py ... more`, its G-Z3 read added today), on W129w's mean: 0.025,
+  0.003, 0.001, 0.000. The word before stands at 0.281, 0.119, 0.026, 0.006 at letters 1 to 4 of words of six letters or more, and at a
+  word's first letter the word two before at 0.023, as on W99's mean (0.024) thirty laps before
+  (`receipts/2026-11-26_class_hairs/depth/word_presence_W129w.txt`). Her chain is one word long and fades inside the next word.
+- **G-Z2 (0.65), missed on its median, held on its point.** On 64 voiced stretches of the held wave slice (1,200 samples each, read by
+  `read-strand-cut ... past`, which now takes `hex:` rows), her one level cuts 11,392 epochs of median 5 samples (6 to 20 asked), the
+  tenth and ninetieth hundredths 1 and 15, and 99.9% shorter than the folds' shortest period of 55 samples
+  (`receipts/2026-11-26_class_hairs/depth/voiced_epochs_W129w.txt`). Her one level cuts inside a pulse and counts none.
+
+What follows, with the formal pass's reading (0.75): a syllable is the third level above a sample and a word the fourth, a digit's
+place the third above a character and a phrase the second or third above a letter, and the engine holds one level, whose own face (its
+unit counted in its own unit, its join a product of two parts; the level's design record of November 17, the record of November 23
+§21 and §22) is not built. Until it is, every arm's guess stands at depth one, which is why the laps heard whole compound nothing past
+it. That face is the next build, before any other arm.
