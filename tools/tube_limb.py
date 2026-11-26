@@ -19,6 +19,9 @@ power of three bands of the frame's spectrum (under 500 Hz, 500 to 2,000 Hz, ove
 on speakers' frames (`bands-chart`), so what she hears of her own act is read on the levels a speaker's sound is read on, and a formant
 moving through a band is a ridge across frames. Every place is one of the thirteen free octets (C0, C1, F5 to FF).
 
+[A dated reading, Brandon, November 26 22:39 UTC: a control frame of 10 ms is a privileged clock; the limb's rate belongs to the
+level's clock of news (the limb record's §8). The tool stands as that configuration.]
+
 `babble` writes a slice of babbled acts: each document a run of frames whose controls walk by keyed steps of at most one level a frame
 and are held for a keyed count of frames, rendered and charted back; the acts are the body's, drawn, never hers, so the slice holds the
 map from an act to its sound (a forward model's terrain, as an infant's babbling is), and a held part of the same law.
