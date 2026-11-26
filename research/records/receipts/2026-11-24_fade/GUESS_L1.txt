@@ -6,3 +6,11 @@ G-L1 (at the lap means, one place open):
   (a) (0.5) the wave's held cut at W123's mean stands at 1.005 or under;
   (b) (0.7) the held text at W123's mean stands within 0.004 of W121's 0.6963;
   (c) (0.6) the wave's held cut at W122's mean stands under W121's 1.0172.
+
+Scored 2026-11-26T08:55:04Z (date -u), the lead, at the lap means, one place open. The wave's held cut 0.9639 at W122's, 0.9311 at W123's; the held text
+0.6936 and 0.6948 (W121's 0.6963).
+  (a) held: 0.931 under 1.005.
+  (b) held: the text within 0.0027 of W121's.
+  (c) held: 0.964 under 1.017.
+The wave's fall, which had slowed from 0.147 to 0.012 a lap, quickened to 0.053 and 0.033: over six laps of about six minutes of speech
+each her held cut from 14 unseen voices passed the count table of both neighbours (0.980). The line's end is W123's STATE.3000.

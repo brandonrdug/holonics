@@ -396,3 +396,11 @@ ran beside W121, W120's end continued, for 3,000 sections on the wave's store.
 
 By the rule the line does not take it; its end is W121's. The wave's held cut on the line was 1.278, 1.131, 1.029 and 1.017 at W118m,
 W119, W120 and W121: its fall slows as it nears the table of both neighbours (0.980).
+
+## 21. Two laps of the line: the wave passes the table of both neighbours
+
+G-L1 held on all three clauses (`receipts/2026-11-24_fade/GUESS_L1.txt`). The wave's held cut stood at 0.964 at W122's mean and 0.931 at
+W123's, under the count table that knows both of a sample's neighbours (0.980). Her code of held speech from 14 voices she never heard
+fell, lap by lap, through 1.278, 1.131, 1.029, 1.017, 0.964 and 0.931 nats a sample, about six minutes of speech a lap. The held text
+stood at 0.6936 and 0.6948 beside it, within the walk of the laps before. Her writes moved as little as the text: the theory panel's
+lexicon share was 88% and 87%, the wide panel's 72% and 71%. The line's end is W123's.
