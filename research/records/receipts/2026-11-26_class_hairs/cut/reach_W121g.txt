@@ -1,0 +1,15 @@
+REACH setting=cut:256:1567 group=all places=44800 nats_millionths=1316078 ms=68160
+REACH setting=cut:256:1567 group=books places=8960 nats_millionths=1576251 ms=68163
+REACH setting=cut:256:1567 group=code places=8960 nats_millionths=1107790 ms=68163
+REACH setting=cut:256:1567 group=science places=8960 nats_millionths=1383847 ms=68163
+REACH setting=cut:256:1567 group=web places=8960 nats_millionths=1414513 ms=68163
+REACH setting=cut:256:1567 group=wikidata places=8960 nats_millionths=1097991 ms=68163
+REACH_PAIRS setting=cut:256:1567 far=0 hairs=958948
+REACH setting=cut:256:3647 group=all places=44800 nats_millionths=1312077 ms=138770
+REACH setting=cut:256:3647 group=books places=8960 nats_millionths=1574771 ms=138773
+REACH setting=cut:256:3647 group=code places=8960 nats_millionths=1103924 ms=138773
+REACH setting=cut:256:3647 group=science places=8960 nats_millionths=1378939 ms=138773
+REACH setting=cut:256:3647 group=web places=8960 nats_millionths=1408307 ms=138773
+REACH setting=cut:256:3647 group=wikidata places=8960 nats_millionths=1094444 ms=138773
+REACH_PAIRS setting=cut:256:3647 far=1955818 hairs=696196
+REACH_DONE rows=100 settings=2 ms=138786

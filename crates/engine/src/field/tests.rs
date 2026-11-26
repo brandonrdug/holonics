@@ -7814,6 +7814,13 @@ fn a_rulers_cut_reads_the_region_from_the_cut_alone_and_leaves_the_places_before
             let moved = codes(&cut(mask), &classes)[c..] != alone_codes[c..];
             assert_eq!(moved, held, "{name}: mask {mask} let across");
         }
+        // The class hairs (§8.1 of the formal record of November 26): the places before the cut stand as the law's, and past it the
+        // hairs move a face, beside nothing let across and beside the five stores.
+        for mask in [CUT_HAIRS, stores | CUT_HAIRS, stores | CUT_CLASSES | CUT_HAIRS, stores | CUT_HAIRS | CUT_HAIRS_WEIGHED, stores | CUT_CLASSES | CUT_HAIRS | CUT_HAIRS_WEIGHED | CUT_HAIRS_COHERENT] {
+            let faces = cut(mask).strand_pass(&classes, false, true).unwrap().faces;
+            assert_eq!(faces[..c], law[..c], "{name}: mask {mask}, the places before the cut");
+            assert_ne!(codes(&cut(mask), &classes)[c..], codes(&cut(mask & !(CUT_HAIRS | CUT_HAIRS_WEIGHED | CUT_HAIRS_COHERENT)), &classes)[c..], "{name}: mask {mask}, the hairs let across");
+        }
         assert!(cut(0).strand_pass(&classes, true, true).is_err(), "{name}: a cut read for a return is refused");
         assert!(Constitution { ruler_cut: Some((sites - 1, 0)), ..field.clone() }.strand_codes(&classes, true).is_err(), "{name}: a cut that leaves one place is refused");
     }
