@@ -81,4 +81,9 @@ theorem slow_share {ω₂ ω₃ n : ℝ} (hn : n ≠ 0) : (ω₂ * n) / (ω₃ *
 theorem depth_share (κ : ℝ) (L : ℕ) : (1 / κ) ^ L = 1 / κ ^ L :=
   one_div_pow κ L
 
+/-- A unit's unsaid share is read in its own unit: its places coded at a common scale `c` (twice over, or at another grain of
+nats) leave the share of the unit the join left unsaid where it was. -/
+theorem unsaid_share_scale_free {R Z c : ℝ} (hc : c ≠ 0) : (c * R) / (c * Z) = R / Z :=
+  mul_div_mul_left R Z hc
+
 end Holonics.HNN.OwnCycleCells

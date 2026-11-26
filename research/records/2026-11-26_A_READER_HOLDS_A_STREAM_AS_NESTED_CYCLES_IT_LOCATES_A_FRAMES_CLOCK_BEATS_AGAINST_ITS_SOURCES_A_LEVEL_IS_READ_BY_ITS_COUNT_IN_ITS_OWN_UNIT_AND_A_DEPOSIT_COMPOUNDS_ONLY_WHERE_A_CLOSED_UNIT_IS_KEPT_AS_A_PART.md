@@ -241,3 +241,46 @@ dissipates keeps the count only up to what it loses. Nothing is built, and no ca
 - The engine guide's §11 (a row) and the method's rule 8 (a clause on depth).
 - Receipts: `receipts/2026-11-26_nested_cycles/` (`frame_beat.py`, `FRAME_BEAT.out`, `reach_by_age.py`, `REACH_BY_AGE.out`,
   `GUESS.txt`).
+
+## 12. A second level's cut, asked by the lead the same evening
+
+**The scores.** G-Z1 held: at W130w and W131w the past older than 64 places is worth 0.128 to 0.135 nats a place and older than
+128 0.078 to 0.082. G-Z3 held: on W129w's mean the word two before stands at 0.025, 0.003, 0.001 and 0.000 at the next word's first
+four letters. G-Z2 missed on its median (5 samples where 6 to 20 were asked) and held on its point: 99.9% of her epochs on voiced
+speech are shorter than the folds' shortest period. (The lead's record of a class's mean word, §9, with its receipts.)
+
+**The premise the lead read** (`tools/level_face_ruler.py` on the 407 word rows; `receipts/2026-11-26_class_hairs/depth/level_face.txt`). The level's own face, its prolonged row alone read
+through the opening's reader, codes W101r at a median of 2.96 nats a place against the flat face's 5.50, after one lap of the
+level's own receipt; on W129w and W101 it codes 22.99 and 21.68, above flat. A second level cut from `C¹_j` (the summed codes of
+the places reading unit `j`, the design of the atlas row `tower.level-receipt-codec-and-square`) by the first level's law puts its
+sites at word starts at 0.336 on W129w and 0.324 on W101r, against 0.352 and 0.358 for a shuffle among the same first-level sites;
+cut from the same codes a place, 0.359 and 0.387. The ruler recovers planted words at 0.91. That design is a miss.
+
+**The law** (0.7, `agent-inferred`). The second level is cut by the first level's own law one level up, with every quantity in
+the level's own unit. Its places are the first level's units, and its clock counts them. A unit's news is the share of it the
+join left unsaid,
+
+    n_j = R_j / Z_j,
+
+with `R_j` the level's face's code of unit `j`'s places read from unit `j−1`'s row carried across the join (the square's read leg)
+and `Z_j` the same places through the same reader from the opening's row at rest: what the level says of the unit from nothing.
+The clock is `S²_j = Σ_(i≤j) n_i`, and the section is one unit: a unit the join told nothing reads `n = 1`, as a flat symbol
+carries `ln A` one level down, so the section is the unit itself and no number is handed in. A site is a unit whose `n` stands
+above every unit within one unit of `S²` (`code.site-isolation-landmark` on these three); a unit the past misleads, `n > 1`, is
+always one. Read through a common scale (the same places coded twice over, or at another grain of nats) `n` stays where it was
+(`unsaid_share_scale_free`).
+
+**Why the sum missed.** A unit's summed place codes carry its length and its letters' rarity, both quantities of the first level,
+and their mean a place is the news of the level under that. Neither says whether the unit follows from the one before, which is the
+only news a second level has: what the join carried cancels, as what the receiver predicts cancels at every section. The charts
+are the dip of the transitional binding by which an infant cuts words from a stream of syllables (Saffran, Aslin and Newport 1996)
+and the successor peaks of Harris (1955), and in this record's law the binding `1 − n` is the share a count carries across the
+join: a unit compounds where it is high.
+
+**What the read asks.** Only W101r has a level with a face, so only it has anything above its level to cut. With the first level
+near a word and a half, word starts are a ruler scored against the shuffle among the same first-level sites, with the starts of
+phrases (after punctuation or a line feed) beside, and the second level's units are told by depth, their count in first-level
+units. G-Z5 to G-Z7 are in `GUESS.txt`, fixed before any read.
+
+Owners: atlas `tower.second-level-cut-by-unbound-share` (interpretation) and the reading of `C¹` in
+`tower.level-receipt-codec-and-square`; Lean `HNN/OwnCycleCells`, `unsaid_share_scale_free`.
