@@ -1,0 +1,18 @@
+SPLIT_HEAD cut=256 rows=100 places_past=19200 settings=law,cut:256:0,cut:256:31,cut:256:63,cut:256:159,cut:256:191,cut:256:32
+SPLIT setting=cut:256:0 control=+0.2102 arm=+0.2171 closes_control=0.000 closes_arm=0.000 arm_less_control=+0.0069 se=0.0021
+SPLIT setting=cut:256:31 control=+0.2036 arm=+0.2117 closes_control=0.031 closes_arm=0.025 arm_less_control=+0.0081 se=0.0021
+SPLIT setting=cut:256:63 control=+0.1168 arm=+0.1067 closes_control=0.444 closes_arm=0.508 arm_less_control=-0.0100 se=0.0024
+SPLIT setting=cut:256:159 control=+0.1739 arm=+0.1718 closes_control=0.173 closes_arm=0.208 arm_less_control=-0.0020 se=0.0018
+SPLIT setting=cut:256:191 control=+0.1023 arm=+0.0859 closes_control=0.513 closes_arm=0.604 arm_less_control=-0.0164 se=0.0021
+SPLIT setting=cut:256:32 control=+0.1706 arm=+0.1639 closes_control=0.189 closes_arm=0.245 arm_less_control=-0.0067 se=0.0027
+SPLIT_BAND setting=cut:256:0 arm_less_control 1-31:+0.0246(0.0066) 32-on:+0.0035(0.0021)
+SPLIT_BAND setting=cut:256:31 arm_less_control 1-31:+0.0285(0.0065) 32-on:+0.0042(0.0022)
+SPLIT_BAND setting=cut:256:63 arm_less_control 1-31:-0.0064(0.0075) 32-on:-0.0108(0.0023)
+SPLIT_BAND setting=cut:256:159 arm_less_control 1-31:-0.0044(0.0044) 32-on:-0.0016(0.0020)
+SPLIT_BAND setting=cut:256:191 arm_less_control 1-31:-0.0194(0.0049) 32-on:-0.0158(0.0022)
+SPLIT_BAND setting=cut:256:32 arm_less_control 1-31:-0.0132(0.0084) 32-on:-0.0054(0.0027)
+SPLIT_STEP from=cut:256:0 to=cut:256:31 back_control=+0.0066 back_arm=+0.0054 gain=-0.0013 se=0.0021
+SPLIT_STEP from=cut:256:0 to=cut:256:32 back_control=+0.0396 back_arm=+0.0532 gain=+0.0136 se=0.0024
+SPLIT_STEP from=cut:256:31 to=cut:256:63 back_control=+0.0868 back_arm=+0.1050 gain=+0.0182 se=0.0026
+SPLIT_STEP from=cut:256:63 to=cut:256:191 back_control=+0.0145 back_arm=+0.0209 gain=+0.0064 se=0.0018
+SPLIT_STEP from=cut:256:31 to=cut:256:159 back_control=+0.0297 back_arm=+0.0399 gain=+0.0102 se=0.0015

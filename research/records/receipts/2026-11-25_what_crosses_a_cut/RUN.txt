@@ -28,3 +28,21 @@ cut. On the hundred rows: CUT_CONTROL in table.txt (mean 0.000043, largest 0.022
 The host test: cargo test -p holonics-engine a_rulers_cut_reads_the_region_from_the_cut_alone (passes;
 RULER_CUT farthest_code_from_the_regions_on_2^-20_bits=30). The gate: tools/gate_nocard.sh, every crate step and tool control
 passing in this container; the PC's gate 1 is the lead's at the next build.
+
+The joined arm's first lap, read by part (2026-11-26). Inputs staged from the PC and kept off the tree: the lap means of the lead's
+arm and its control (front/arm_W119j/MEAN.3000, sha256 f2eafffa...7ea3b2, 108,019,039 octets; front/arm_W119/MEAN.3000, sha256
+51cf8673...b34520, 108,399,197 octets), the wave store's codec (alphabet 257, sha256 d13e4960...4807a0) and the lead's hundred far
+rows as its cut ruler reads them (cut/cut_rows.tsv, sha256 1c51651e...f7bdb3). The binary: athena built in the cloud container from
+main at 0f2206c3 against the stand-in driver, host only.
+
+    athena host complete-language read-reach UNITS sha KEYS sha CODEC sha ROWS sha STATE sha OUT \
+        law cut:256:0 cut:256:31 cut:256:63 cut:256:159 cut:256:191 cut:256:32        (once a state, two host threads each, side by side)
+    python3 -I joined_split.py 256 OUT_W119 OUT_W119j > joined_split_W119.txt
+    python3 -I ../2026-11-25_hairs_cones_flock/repeat_at_dear.py 256 ROWS OUT          (its run-of-three lines: joined_split_repeat_W119.txt)
+
+Projected 28 minutes for the two (2 minutes a setting at four threads on W117); measured 1,643 s each (00:23:34Z to 00:50:57Z),
+ratio 0.98; the harness's background limit stood as the deadline. Peak resident set: not read.
+Reproduction: law, cut:256:0 and cut:256:191 on both states equal the lead's cut/table_W119.txt and table_W119j.txt at every printed
+place (1.1102 and 1.1066; +0.2102 and +0.2171; +0.1023 and +0.0859). Controls of joined_split.py: a read against itself gives zero
+at every setting, and a fall of 0.0100 nats a place planted in one setting past the cut is recovered there (-0.0100, both bands) and
+at no other setting.
