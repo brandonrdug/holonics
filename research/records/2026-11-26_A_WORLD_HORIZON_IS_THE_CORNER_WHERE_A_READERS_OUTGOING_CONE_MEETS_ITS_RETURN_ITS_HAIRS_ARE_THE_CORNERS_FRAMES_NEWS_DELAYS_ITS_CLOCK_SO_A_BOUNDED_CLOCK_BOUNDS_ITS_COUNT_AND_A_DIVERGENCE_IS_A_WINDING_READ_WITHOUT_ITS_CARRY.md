@@ -327,6 +327,67 @@ Weights. 0.5 and 0.35 on the two guesses of 8.1. 0.4, as in §5.1, that a built 
 that founding at focusing founds children on her line within a lap of the hairs' arm, at the trits where recurrence stands
 (`store.far-price-stands-at-recurrence`).
 
+### 8.3 Scored on the lead's reads (09:42 UTC)
+
+The lead read W121's mean on the 100 held rows, cut at 256 (its numbers, nats a place past the cut against the law):
+
+- Hearing by address brings back 0.088 nats a place.
+- Hairs at `φ = 0`, unweighed, cost +0.586.
+- Hairs weighed at the law's own falloff bring back nothing (+0.005).
+- Hairs beside address cost +0.054.
+
+The scores:
+
+- §8.1's first guess (0.5): missed.
+- §8.1's second guess (0.35): missed. The hairs cost 0.054 beside address.
+- §5.2 (0.45): missed on its premise. The face already reads the ring of 16 on two axes, the second at two thirds of the first's weight.
+  The premise was taken from a sentence of November 24's §14 and never read at the face's owner, which the synthesis rule bars for a
+  guess on a built part.
+
+What it says of the law. §4.3 holds, and the read sharpens how it is charted on the engine. A corner's capacity counts its
+distinguishable rays, one hair a ray, each carrying its own shape `q̄(y)`. My hair took a class's count as its area share and gave it
+one mean word. That makes a corner with the area of many rays and the content of one, and when unweighed it took the row's share
+from the sites that carry. Three reads of one cut now agree:
+
+| What crosses | Share of the cut's cost it carries |
+|---|---|
+| Stores | 3% |
+| Octave crowds | 8% |
+| Class means | 0% or less |
+| Rays heard one by one | the rest |
+
+On the gravity, `§4.3` stays at 0.75. On her, the reading that what carries a cut is distinguishable rays goes to 0.8.
+
+What it says of §8. §8.1 as specified is retired as a part. A class mean pays at the cut with weight 0.1. §8.2 turns over. A class
+of unrelated sources is focused from its founding (`θ ≈ 1`), so the split law would cut every class down to its sites, which is
+hearing by address. The corner is compressed the other way: it starts from its rays and merges where they agree, which is where
+navigator paths converge. Agreeing rays are where the far price stands, at the runs that recur (`store.far-price-stands-at-recurrence`):
+the sites of a recurring run carry one word.
+
+The read that would move this: hearing by address, with a class's sites replaced by their mean only where the class's coherent
+share stands above what unrelated sources give (`|V|² > P`, so `e^(−Ξ) > 1/M`), and heard one by one elsewhere. 0.35 that it
+brings back at least 0.8 of address's 0.088 on fewer than half its pairs. §5.1's "more charged hairs" falls from 0.4 to 0.2. The
+lever left after joining is sharp rays across a stretch's first place (the ruler's bit 64), paid in pairs. The weight that the
+joined arm stalled for the paper's reason stays at 0.65.
+
+### 8.4 The coherent hairs scored (09:51 UTC)
+
+The lead's read of §8.3's guess (its G-H5) missed its main clause and held its clause on pairs. Merging a class into its mean only
+where its value word stands over chance brings back 0.0046 of address's 0.090 nats a place, 5%, on 23% of address's pairs. The
+test admitted 73% of the hairs, and those classes held 83% of address's pairs.
+
+What it says. Being over chance is far too weak a bar: a class's mean keeps only its coherent share `e^(−Ξ)` of the class's power,
+and a share well over `1/M` can still be a small one. What hearing by address carries is not a class's power. It is the selection:
+the receiver's lock picks, among a class's sites, the one whose key fits its probe. A mean has no selection in it. So the corner's
+capacity on the engine is a capacity to select. A reader that can choose among `R` rays a crossing carries up to `ln R` nats a
+read, and the paper's `A/4` is that same count of distinguishable states. Weight 0.8.
+
+So rays may merge only where no receiver's lock can tell them apart: framed key words that agree within the lock's own resolution.
+That is the kernel's law, differences no admitted receiver distinguishes, and not a test of the values' coherence. A merge of that
+kind can cost nothing at most and gains only pairs, and pairs were not what this cut lacked. The merge direction falls to 0.15 and
+asks no more card time. The lever stays where §8.3 put it: sharp rays across a stretch's first place (the ruler's bit 64), whose
+price in pairs is the realization's to size.
+
 ## 9. Atlas, receipts and sources
 
 Atlas rows added: `gr.null-clock-shear-delay`, `gr.corner-hairs-relative-boost`, `gr.bounded-clock-finite-diamond`,
