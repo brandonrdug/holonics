@@ -106,7 +106,9 @@ so only laid-out text spans a turn today, where the theory's hold is her stores'
   (`receipts/2026-11-23_question_reach/GUESS.txt`); G-H6, G-H7, G-H9, G-H11 to G-H14
   (`receipts/2026-11-23_handed_cycle/GUESS.txt`); G-A1, G-A3 (`receipts/2026-11-23_answered_act/GUESS.txt`); G-R1 to G-R5, on an
   arm that reads a slice's consecutive stretches as one region (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`), and G-W2 on
-  the same arm (`receipts/2026-11-25_hairs_cones_flock/GUESS.txt`);
+  the same arm (`receipts/2026-11-25_hairs_cones_flock/GUESS.txt`); G-M2 (a paired second stream, built by nobody) and G-M3 (the
+  line continued on the wave store, and the fade's covector by slice read a section at a time), beside G-M1 scored on November 25
+  with (a) and (c) held and (b) missed (`receipts/2026-11-25_second_stream/GUESS.txt`);
 - the lead's: G-H5 on the line's continuation W107 (`receipts/2026-11-24_collection/GUESS_H5.txt`, where H is the history's laps
   and no kin of the handed cycle's G-H); the laps after it (W108 and its arm, W109) carry their own in the lead's next receipts.
 
