@@ -249,7 +249,7 @@ dissipates keeps the count only up to what it loses. Nothing is built, and no ca
 four letters. G-Z2 missed on its median (5 samples where 6 to 20 were asked) and held on its point: 99.9% of her epochs on voiced
 speech are shorter than the folds' shortest period. (The lead's record of a class's mean word, §9, with its receipts.)
 
-**The premise the lead read** (its level-face ruler, on the 407 word rows). The level's own face, its prolonged row alone read
+**The premise the lead read** (`tools/level_face_ruler.py` on the 407 word rows; `receipts/2026-11-26_class_hairs/depth/level_face.txt`). The level's own face, its prolonged row alone read
 through the opening's reader, codes W101r at a median of 2.96 nats a place against the flat face's 5.50, after one lap of the
 level's own receipt; on W129w and W101 it codes 22.99 and 21.68, above flat. A second level cut from `C¹_j` (the summed codes of
 the places reading unit `j`, the design of the atlas row `tower.level-receipt-codec-and-square`) by the first level's law puts its
