@@ -22,7 +22,7 @@ ENVELOPE_SHUFFLED near=1,2,16 base=1.2227 places=26078878 fade4:-0.0080 fade16:-
 FAR_HEAD levels=13 documents=128 places=26211998 mode=plant:128:0.1 from_place=1040
 GAIN near=1,2,16 base=1.4816 places=26078878 96:+0.0058 127:+0.0312 128:+0.0827 129:+0.0475 160:+0.0053
 
-## envelope2 near=1,2 (this version, sha256 2ccf82d3b0a2fb98...)
+## envelope2 near=1,2 (the second version, sha256 2ccf82d3b0a2fb98...)
 11:36:36
 FAR_HEAD levels=13 documents=128 places=26211998 mode=envelope2 from_place=1040
 FAR_ENVELOPE near=1,2+env4@1 base=1.2104 places=26078878 fade4:+0.0205 fade16:+0.0260 fade64:+0.0288 fade256:+0.0213 fade1024:+0.0082
@@ -31,7 +31,7 @@ FAR_ENVELOPE near=1,2+env16@1 base=1.1979 places=26078878 fade4:+0.0062 fade16:+
 FAR_ENVELOPE_SHUFFLED near=1,2+env16@1 base=1.1979 places=26078878 fade4:-0.0059 fade16:-0.0058 fade64:-0.0058 fade256:-0.0057 fade1024:-0.0057
 11:36:51
 
-## envelope2 near=1,2,16 (this version)
+## envelope2 near=1,2,16 (the second version)
 11:37:15
 FAR_HEAD levels=13 documents=128 places=26211998 mode=envelope2 from_place=1040
 FAR_ENVELOPE near=1,2,16+env4@1 base=1.1909 places=26078878 fade4:+0.0013 fade16:+0.0029 fade64:+0.0045 fade256:-0.0026 fade1024:-0.0150
@@ -57,3 +57,20 @@ FAR_ENVELOPE_SHUFFLED near=1,2+env4@1 base=1.2743 places=1179200 fade4:-0.0588 f
 FAR_ENVELOPE near=1,2+env16@1 base=1.2829 places=1179200 fade4:-0.0770 fade16:-0.0745 fade64:-0.0787 fade256:-0.0823 fade1024:-0.0834
 FAR_ENVELOPE_SHUFFLED near=1,2+env16@1 base=1.2829 places=1179200 fade4:-0.0827 fade16:-0.0831 fade64:-0.0826 fade256:-0.0828 fade1024:-0.0834
 11:36:08
+
+## split, then split shuffle (this version, sha256 6c6a995c78dbea0a...): where the far loudness's gain over two samples and their loudness stands
+18:33:12
+FAR_HEAD levels=13 documents=128 places=26211998 mode=split from_place=1040
+SPLIT_HEAD places=26078878 base=1.1979 gain=+0.0103 near=1,2+env16@1 far=env64@17
+SPLIT by=near_loudness 0:places=0.075,code=0.598,gain=+0.0133,share=+0.097 1:places=0.076,code=0.928,gain=+0.0154,share=+0.114 2:places=0.076,code=1.300,gain=+0.0091,share=+0.067 3:places=0.077,code=1.409,gain=+0.0126,share=+0.094 4:places=0.077,code=1.533,gain=+0.0141,share=+0.106 5:places=0.077,code=1.538,gain=+0.0153,share=+0.115 6:places=0.077,code=1.454,gain=+0.0142,share=+0.106 7:places=0.077,code=1.380,gain=+0.0107,share=+0.081 8:places=0.077,code=1.305,gain=+0.0079,share=+0.059 9:places=0.077,code=1.229,gain=+0.0055,share=+0.041 10:places=0.077,code=1.160,gain=+0.0057,share=+0.043 11:places=0.077,code=0.982,gain=+0.0078,share=+0.059 12:places=0.077,code=0.741,gain=+0.0023,share=+0.018
+SPLIT by=code_fifth 0:places=0.197,code=0.169,gain=+0.0006,share=+0.011 1:places=0.203,code=0.342,gain=+0.0006,share=+0.013 2:places=0.200,code=0.749,gain=-0.0015,share=-0.028 3:places=0.200,code=1.687,gain=+0.0077,share=+0.150 4:places=0.200,code=3.038,gain=+0.0439,share=+0.854
+SPLIT by=far_minus_near 0:places=0.285,code=1.171,gain=+0.0116,share=+0.320 1:places=0.427,code=1.166,gain=+0.0026,share=+0.108 2:places=0.288,code=1.272,gain=+0.0204,share=+0.571
+18:33:24
+
+18:34:03
+FAR_HEAD levels=13 documents=128 places=26211998 mode=split from_place=1040
+SPLIT_HEAD places=26078878 base=1.1979 gain=-0.0058 near=1,2+env16@1 far=env64@17 shuffled
+SPLIT by=near_loudness 0:places=0.075,code=0.598,gain=-0.0004,share=+0.005 1:places=0.076,code=0.928,gain=-0.0010,share=+0.013 2:places=0.076,code=1.300,gain=-0.0029,share=+0.039 3:places=0.077,code=1.409,gain=-0.0046,share=+0.061 4:places=0.077,code=1.533,gain=-0.0062,share=+0.083 5:places=0.077,code=1.538,gain=-0.0078,share=+0.104 6:places=0.077,code=1.454,gain=-0.0084,share=+0.112 7:places=0.077,code=1.380,gain=-0.0088,share=+0.117 8:places=0.077,code=1.305,gain=-0.0087,share=+0.116 9:places=0.077,code=1.229,gain=-0.0083,share=+0.112 10:places=0.077,code=1.160,gain=-0.0072,share=+0.096 11:places=0.077,code=0.982,gain=-0.0062,share=+0.083 12:places=0.077,code=0.741,gain=-0.0043,share=+0.058
+SPLIT by=code_fifth 0:places=0.197,code=0.169,gain=-0.0018,share=+0.061 1:places=0.203,code=0.342,gain=-0.0018,share=+0.063 2:places=0.200,code=0.749,gain=-0.0114,share=+0.395 3:places=0.200,code=1.687,gain=-0.0124,share=+0.429 4:places=0.200,code=3.038,gain=-0.0015,share=+0.053
+SPLIT by=far_minus_near 0:places=0.455,code=1.203,gain=-0.0072,share=+0.570 1:places=0.094,code=1.131,gain=-0.0043,share=+0.070 2:places=0.450,code=1.207,gain=-0.0046,share=+0.360
+18:34:09

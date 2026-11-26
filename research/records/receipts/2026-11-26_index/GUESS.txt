@@ -1,0 +1,12 @@
+The formal thread's guesses on mass as an index to the rays that cross it, fixed at 2026-11-26T18:37:08Z (date -u) before any read
+of them. The record: research/records/2026-11-26_MASS_IS_WHERE_RAYS_CIRCULATE_AND_IT_IS_AN_INDEX_TO_THE_RAYS_THAT_CROSS_IT_...md §6.
+
+G-I1 (0.45, the premise). On the line's mean (W127w), across a cut at 256 on the lead's hundred far rows, the lock's weight on its
+  selected far sources falls more cleanly with the news between source and receiver (the summed code of the places between, in
+  the news clock's octaves) than with their distance in places: a higher rank correlation, by row, over the selected pairs.
+G-I2 (0.4). If G-I1 holds, a falloff counted in octaves of news crossed instead of places brings back at least 0.1 of a cut's cost
+  past place 32 more than the address does today (an arm beside its control, built only after G-I1 is read).
+G-I3 (0.6). Of what address brings back past a cut on text (cut:256:32 against cut:256:0), more than half stands on the dearest
+  fifth of the places past the cut by their code under the law.
+G-I4 (0.6). Read per epoch of 512 samples (32 ms), the loudness of the epochs four to eight back adds at least 0.02 nats an epoch to
+  the next epoch's loudness over the epoch just before it (a count ruler on the wave slice's held cut).

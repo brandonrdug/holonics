@@ -61,3 +61,9 @@ nothing; nothing is read from it). The ruler was carried to the VM as a compress
     out_envelope2_1216.txt a4561e1b...) were carried to the container and checked by hash before FAR_GIVEN_NEAR.out was written.
 Left on the VM (outside the repository and the PC's folders): $HOME/fgn with the ruler's copies and these outputs. Nothing was
 written on the PC's folders.
+
+November 26, 18:33 to 18:34 UTC: `split`, then `split shuffle`, on the same slice on the PC's VM, each in the foreground (12 s and
+6 s). The ruler's third version (sha256 6c6a995c78dbea0a...) adds the mode; its split totals equal envelope2's line for the same
+tables (base 1.1979, gain +0.0103, and -0.0058 shuffled). The shuffle mode was carried to the VM as the same four edits, and the
+copy's hash was checked there before the run. Outputs out_split.txt (95b83dbe...) and out_split_shuffle.txt (041bbd44...) were
+checked by hash in the container and appended to FAR_GIVEN_NEAR.out.
