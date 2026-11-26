@@ -1,0 +1,5 @@
+The pairing read's premise on W129w's lap mean (2026-11-26, the lead): read-reach at the law on 64 held documents of the paired
+slice (tools/speech_pairs.py: an utterance's loudness at 100 frames a second, a line's end, its transcript), each read with its own frames
+and with the next document's, by two streams on the host (734 s at 10 threads, projected 940 s). pair_codes.py, codes of the transcript's places:
+PAIRS_TEXT pairs=64 letters=12169 own=1.7841 swap=1.7783 own_less_swap=+0.0069 se=0.0075 first20_own_less_swap=-0.0126 frames_own=1.5039
+Own less swap is +0.0069 (+-0.0075) nats a letter: before any pairing trains, her own sound tells her nothing of its words, as a field that never met them should.
