@@ -1,0 +1,20 @@
+REPEAT_HEAD cut=256 rows=100 places_past=19200 net=4168.1
+REPEAT run=2 places=19200 far_at_dear=0.867 far_at_rest=0.632 far_only_at_dear=0.738 far_only_at_rest=0.263 ratio_far_only=2.81 price_at_far_only=+0.6201 (places 5957) price_elsewhere=+0.0358 share_of_net_at_far_only=0.886
+REPEAT_FOUR run=2 band=1-31 places=3100 net=1769.8 far_only:places=1791,price=+0.8516,share=+0.862 far_and_since:places=286,price=+0.2499,share=+0.040 since_only:places=37,price=-0.0020,share=-0.000 neither:places=986,price=+0.1757,share=+0.098
+REPEAT_FOUR run=2 band=32-on places=16100 net=2398.2 far_only:places=4166,price=+0.5206,share=+0.904 far_and_since:places=6342,price=+0.0844,share=+0.223 since_only:places=1619,price=-0.0697,share=-0.047 neither:places=3973,price=-0.0486,share=-0.080
+REPEAT run=3 places=19200 far_at_dear=0.754 far_at_rest=0.372 far_only_at_dear=0.723 far_only_at_rest=0.185 ratio_far_only=3.90 price_at_far_only=+0.8187 (places 4591) price_elsewhere=+0.0280 share_of_net_at_far_only=0.902
+REPEAT_FOUR run=3 band=1-31 places=3100 net=1769.8 far_only:places=1204,price=+1.1047,share=+0.751 far_and_since:places=126,price=+0.2621,share=+0.019 since_only:places=18,price=+0.0785,share=+0.001 neither:places=1752,price=+0.2314,share=+0.229
+REPEAT_FOUR run=3 band=32-on places=16100 net=2398.2 far_only:places=3387,price=+0.7171,share=+1.013 far_and_since:places=3161,price=+0.0575,share=+0.076 since_only:places=1605,price=-0.0387,share=-0.026 neither:places=7947,price=-0.0189,share=-0.063
+REPEAT_SET run=3 band=32-on setting=cut:256:0 far_only_places=3387 far_only_price=+0.7171 back_at_far_only=+0.000 neither_places=7947 neither_price=-0.0189
+REPEAT_SET run=3 band=32-on setting=cut:256:191 far_only_places=3387 far_only_price=+0.4039 back_at_far_only=+0.437 neither_places=7947 neither_price=-0.0206
+REPEAT_SET run=3 band=32-on setting=cut:256:64 far_only_places=3387 far_only_price=+0.0610 back_at_far_only=+0.915 neither_places=7947 neither_price=-0.0099
+REPEAT_GROUP run=3 band=32-on group=books places=3220 net=144.8 a_place=+0.0450 far_only_places=0.198 far_only_price=+0.2535 far_only_share_of_net=+1.115 neither_places=0.629 neither_price=-0.0048
+REPEAT_GROUP run=3 band=32-on group=code places=3220 net=469.5 a_place=+0.1458 far_only_places=0.175 far_only_price=+0.8462 far_only_share_of_net=+1.016 neither_places=0.421 neither_price=-0.0057
+REPEAT_GROUP run=3 band=32-on group=science places=3220 net=655.0 a_place=+0.2034 far_only_places=0.305 far_only_price=+0.6777 far_only_share_of_net=+1.016 neither_places=0.481 neither_price=-0.0205
+REPEAT_GROUP run=3 band=32-on group=web places=3220 net=319.0 a_place=+0.0991 far_only_places=0.206 far_only_price=+0.5548 far_only_share_of_net=+1.153 neither_places=0.584 neither_price=-0.0279
+REPEAT_GROUP run=3 band=32-on group=wikidata places=3220 net=809.9 a_place=+0.2515 far_only_places=0.168 far_only_price=+1.3986 far_only_share_of_net=+0.934 neither_places=0.352 neither_price=-0.0424
+REPEAT run=4 places=19200 far_at_dear=0.656 far_at_rest=0.277 far_only_at_dear=0.635 far_only_at_rest=0.138 ratio_far_only=4.61 price_at_far_only=+0.9248 (places 3600) price_elsewhere=+0.0538 share_of_net_at_far_only=0.799
+REPEAT_FOUR run=4 band=1-31 places=3100 net=1769.8 far_only:places=917,price=+1.2635,share=+0.655 far_and_since:places=95,price=+0.2825,share=+0.015 since_only:places=10,price=+0.0736,share=+0.000 neither:places=2078,price=+0.2809,share=+0.330
+REPEAT_FOUR run=4 band=32-on places=16100 net=2398.2 far_only:places=2683,price=+0.8090,share=+0.905 far_and_since:places=2351,price=+0.0593,share=+0.058 since_only:places=1348,price=-0.0266,share=-0.015 neither:places=9718,price=+0.0128,share=+0.052
+REPEAT_PLANT run=4 places=19200 far_at_dear=1.000 far_at_rest=0.239 far_only_at_dear=1.000 far_only_at_rest=0.097 ratio_far_only=10.29 price_at_far_only=+1.0000 (places 3600) price_elsewhere=+0.0000 share_of_net_at_far_only=1.000
+REPEAT run=6 places=19200 far_at_dear=0.526 far_at_rest=0.190 far_only_at_dear=0.512 far_only_at_rest=0.095 ratio_far_only=5.40 price_at_far_only=+1.0210 (places 2625) price_elsewhere=+0.0898 share_of_net_at_far_only=0.643

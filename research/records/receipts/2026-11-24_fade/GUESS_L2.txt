@@ -1,0 +1,8 @@
+Fixed 2026-11-26T08:55:48Z (date -u), the lead, before W124 trains. Refs #404.
+The line's laps, no change: W124 from W123's end and W125 from W124's, 3,000 sections each on e5fk, on the wave's store.
+The premise read first: the wave's held cut at the line's means 1.278, 1.131, 1.029, 1.017, 0.964, 0.931 (W118m to W123); the held text
+0.6936 to 0.6986 over those laps.
+G-L2 (at the lap means, one place open):
+  (a) (0.5) the wave's held cut at W125's mean stands at 0.900 or under;
+  (b) (0.7) the held text at W125's mean stands within 0.004 of W123's 0.6948;
+  (c) (0.55) the wave's held cut falls at both laps.

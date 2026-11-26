@@ -440,8 +440,9 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
         // [definition; the lead, November 24] Each passage region's slice, in the order the regions stand from `passage_start`, so the
         // section's receipt carries each slice's tension into the next section's cut ([`StorePass::slice_tension`]).
         let (passage_start, mut region_slice) = (regions.len(), Vec::<usize>::new());
-        // [definition; the lead, November 25] Whether each passage region's stretch ended its piece ([`StorePass::joined`]).
-        let mut region_done = Vec::<bool>::new();
+        // [definition; the lead, November 25] Whether each passage region's stretch ended its piece, the places it compares, and the section's
+        // counts before its passage ([`StorePass::joined`]), so a joined passage is counted as the one region it is read as.
+        let (mut region_done, mut region_counted, tally_before) = (Vec::<bool>::new(), Vec::<usize>::new(), tally);
         while let Some(drawn) = cut.next() {
             stretches_drawn += 1;
             let draft_world = cut.pass.world.as_ref().is_some_and(|w| w.records == 0);
@@ -482,13 +483,19 @@ pub fn train(args: &[String], realization: &mut dyn Realization) -> Result<()> {
                     regions.push(region);
                     region_slice.push(slice);
                     region_done.push(piece_ends);
+                    region_counted.push(counted);
                 }
             }
         }
         // [definition; the lead, November 25, Fable's construction] A slice's consecutive stretches read as one passage ([`StorePass::joined`]).
         if cut.pass.joined {
             let passage: Vec<OwnedRegion> = regions.drain(passage_start..).collect();
-            let (joined, slices) = join_stretches(passage, &region_slice, &region_done, learner.field.declaration.reach);
+            let (joined, slices, counted) = join_stretches(passage, &region_slice, &region_done, &region_counted, learner.field.declaration.reach, cut.pass.pairs);
+            // The passage's counts again, a joined passage one region whose later stretches' first places are compared.
+            tally = tally_before;
+            for (region, &c) in joined.iter().zip(&counted) {
+                tally.take(region, c);
+            }
             regions.extend(joined);
             region_slice = slices;
         }
@@ -1703,19 +1710,28 @@ fn with_pass(text: &str, learner: &Learner, pass: StorePass) -> Result<(String, 
 /// [definition; the lead, November 25, Fable's construction] **A section's consecutive stretches of a slice joined into one passage**: in
 /// the order drawn, each stretch read by two streams joins the open passage of its slice where the last stretch joined did not end its
 /// piece (so the two follow each other in the slice's text), both are read alike (the same words and both compared with targets or
-/// neither), and the passage stays within `reach` places; its first place is then a stretch start ([`holonics_engine::field::Region::stretches`]).
-/// Every other region stands as drawn. Returns the regions and each one's slice.
-fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], reach: usize) -> (Vec<OwnedRegion>, Vec<usize>) {
+/// neither), and the passage, staged as its two streams, stays within `reach` sites and the section's bound of pairs (`pairs`, the bound a
+/// stretch is drawn under); its first place is then a stretch start ([`holonics_engine::field::Region::stretches`]). Every other region
+/// stands as drawn. Returns the regions, each one's slice and the places each compares.
+/// [the lead, November 25] Why the pairs: the card holds a region's rows whole (a receiver's row is its region's sites long, a head each), so a
+/// passage joined to 2,590 places, staged as 5,180 sites, asked 14.7 GB of the card's 10.9 (W119j's first section); within the bound each
+/// region is one the card already holds; and the card's resident skins hold a distance up to the reach between any two of a region's sites,
+/// so a strand staged past the reach outruns them (W119j's second section, a passage of 1,975 places staged as 3,950 sites).
+fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], counted: &[usize], reach: usize, pairs: u64) -> (Vec<OwnedRegion>, Vec<usize>, Vec<usize>) {
     let mut out: Vec<OwnedRegion> = Vec::with_capacity(regions.len());
     let mut out_slices: Vec<usize> = Vec::with_capacity(regions.len());
+    let mut out_counted: Vec<usize> = Vec::with_capacity(regions.len());
     let mut open: std::collections::HashMap<usize, usize> = std::collections::HashMap::new();
-    for ((region, &slice), &ends) in regions.into_iter().zip(slices).zip(done) {
+    for (((region, &slice), &ends), &places) in regions.into_iter().zip(slices).zip(done).zip(counted) {
         let joins = open.get(&slice).copied().filter(|&k| {
             let j = &out[k];
-            region.strand && j.strand && (j.past, j.second, j.targets.is_some()) == (region.past, region.second, region.targets.is_some()) && j.classes.len() + region.classes.len() <= reach
+            let n = j.classes.len() + region.classes.len();
+            region.strand && j.strand && (j.past, j.second, j.targets.is_some()) == (region.past, region.second, region.targets.is_some()) && 2 * n <= reach && ((2 * n) as u64).pow(2) <= pairs
         });
         match joins {
             Some(k) => {
+                // A joined stretch's places are compared as before, and its first place too: it now has a place before it.
+                out_counted[k] += places + 1;
                 let j = &mut out[k];
                 j.stretches.push(j.classes.len());
                 j.classes.extend_from_slice(&region.classes);
@@ -1730,13 +1746,14 @@ fn join_stretches(regions: Vec<OwnedRegion>, slices: &[usize], done: &[bool], re
                 }
                 out.push(region);
                 out_slices.push(slice);
+                out_counted.push(places);
             }
         }
         if ends {
             open.remove(&slice);
         }
     }
-    (out, out_slices)
+    (out, out_slices, out_counted)
 }
 
 /// A pass's slices as `NAME:PIECE:TAKEN`, joined by commas.
@@ -3723,12 +3740,15 @@ mod tests {
         let regions = vec![strand(4, 1), strand(3, 2), strand(5, 1), strand(2, 1), strand(6, 1), strand(3, 2)];
         let slices = [0usize, 1, 0, 0, 0, 1];
         let done = [false, false, false, true, false, false];
-        let (out, out_slices) = join_stretches(regions, &slices, &done, 20);
+        let (out, out_slices, counted) = join_stretches(regions, &slices, &done, &[3, 2, 4, 1, 5, 2], 40, u64::MAX);
+        assert_eq!(counted, vec![3 + 4 + 1 + 1 + 1, 2 + 2 + 1, 5], "each later stretch's first place is compared");
         assert_eq!(out_slices, vec![0, 1, 0], "slice 0's first three joined, slice 1's two joined, slice 0's fourth after its piece ended");
         assert_eq!((out[0].classes.len(), out[0].stretches.clone()), (11, vec![4, 9]));
         assert_eq!((out[1].classes.len(), out[1].stretches.clone()), (6, vec![3]));
         assert_eq!((out[2].classes.len(), out[2].stretches.clone()), (6, vec![]));
-        let (short, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], 9);
-        assert_eq!(short.iter().map(|r| (r.classes.len(), r.stretches.clone())).collect::<Vec<_>>(), vec![(9, vec![4]), (3, vec![])], "a passage stays within the reach");
+        let (short, _, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], &[3, 4, 2], 18, u64::MAX);
+        assert_eq!(short.iter().map(|r| (r.classes.len(), r.stretches.clone())).collect::<Vec<_>>(), vec![(9, vec![4]), (3, vec![])], "a passage staged as its two streams stays within the reach");
+        let (bound, _, _) = join_stretches(vec![strand(4, 1), strand(5, 1), strand(3, 1)], &[0, 0, 0], &[false; 3], &[3, 4, 2], 40, 18 * 18);
+        assert_eq!(bound.iter().map(|r| r.classes.len()).collect::<Vec<_>>(), vec![9, 3], "and its two streams within the section's bound of pairs");
     }
 }

@@ -42,6 +42,26 @@ pub const CUT_CLASSES: u16 = 32;
 pub const CUT_SHARP: u16 = 64;
 pub const CUT_OPEN_CROWDS: u16 = 128;
 pub const CUT_UNTENDED: u16 = 256;
+/// [measurement; the formal pass, November 26, §8.1 of its record] **The class hairs across a ruler's cut**: every receiver past the cut
+/// hears, for each class it probes, the definite sites of that class before the cut as one term, their count `M`, their summed framed
+/// key word `K` and value word `V`: a hair at `φ = 0`, which no news has faded. It is scored by the lock against `K/M` with `M` as its
+/// multiplier, as an octave's crowd is, at no octave of distance (`agent-inferred`: the hair's fade by news stands where the octave of
+/// distance stands, and at `φ = 0` it is one), and its value is `V`. A read of what a hair would carry, before a hair is built.
+pub const CUT_HAIRS: u16 = 512;
+/// [measurement; the lead, November 26, after the hairs' read at `φ = 0`] **The class hairs at the law's own weights**, with
+/// [`CUT_HAIRS`]: each source enters its hair weighted as the law weighs it at that receiver, `w_j = 2^(−f_ij)` with `f_ij` the row's
+/// falloff (a turned head's octave of distance, a still head's octave of its class's count), so `M = Σ w_j`, `K = Σ w_j k̃_j`,
+/// `V = Σ w_j ṽ_j`. The hair is then its members heard as one mean word at their own weights, and the read parts what the mean word
+/// blurs from what the weight drowns (`agent-inferred`: the place clock's falloff stands where the news clock's fade stands).
+pub const CUT_HAIRS_WEIGHED: u16 = 1024;
+/// [measurement; the formal pass, November 26, §8.3 of its record] **The coherent hairs**, with [`CUT_HAIRS`] and [`CUT_CLASSES`]: a
+/// receiver past the cut hears a probed class's sites before it by their hair where the hair's value word stands over chance
+/// (`|V|² > Σ w_j² |ṽ_j|²`), and one by one, by address, where it does not.
+pub const CUT_HAIRS_COHERENT: u16 = 2048;
+/// [measurement] The pairs a ruler's cut lets across, counted as they are read: the sites before the cut, past the near field, a
+/// receiver past it hears one by one, and the hairs it hears. A ruler's counters, read and reset by `read-reach` between its settings.
+pub static CUT_PAIRS_FAR: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+pub static CUT_PAIRS_HAIR: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 /// [definition; the lead, November 25, Fable's construction] **What a stretch's first place lets across** in a passage read as its
 /// consecutive stretches ([`Region::stretches`]): the five stores whole, an open place's hearing of the stretches before its own by its
 /// probe's classes and each octave's crowd, and no sharp hearing across (the ruler's mask 191).
@@ -365,6 +385,13 @@ impl ClassLists {
         let addressed = cuts && sharp && mask & CUT_CLASSES != 0 && mask & CUT_SHARP == 0;
         let across = probed().filter(move |_| addressed).flat_map(move |k| members(k).filter(move |&j| j < c && j.abs_diff(i) >= NEAR));
         near.chain(far).chain(listened).chain(across)
+    }
+
+    /// The definite sites of class `class` that stand before place `c`, in their order (a class's definite members are listed first,
+    /// ascending).
+    pub fn definite_before(&self, class: u32, c: usize) -> &[u32] {
+        let all = &self.members[self.off[2 * class as usize] as usize..self.off[2 * class as usize + 1] as usize];
+        &all[..all.partition_point(|&m| (m as usize) < c)]
     }
 
     /// The cut a receiver at place `at` meets: a ruler's ([`ClassLists::cut`]), or in a passage read as its stretches the first place of
@@ -845,7 +872,64 @@ impl Constitution {
                 let friction = self.friction(h, lists.listens(i)) + gates[i];
                 let mut series = SeriesRow::new(span);
                 let mut row: Vec<Source> = Vec::new();
+                // [measurement] The class hairs across a ruler's cut ([`CUT_HAIRS`]): past the cut, for each class the receiver probes, its
+                // definite sites before the cut summed whole at no fade (or at the law's weights, [`CUT_HAIRS_WEIGHED`]): each hair's mass on
+                // the weights' grain, its key and value words at that grain, and whether it is heard ([`CUT_HAIRS_COHERENT`]: where its value word's power
+                // stands over chance, its sites are not heard one by one).
+                let mut hairs: Vec<(i128, Vec<i128>, Vec<i128>, bool, u32)> = Vec::new();
+                // The weights' grain: one place past the farthest octave a falloff reaches in the region (an octave of distance or of a
+                // class's count, each under the region's sites), so every weight `2^(−f)` stands on it whole.
+                let grain = usize::BITS - sites.max(1).leading_zeros();
+                let hair_cut = lists.cut.filter(|&(c, mask)| mask & CUT_HAIRS != 0 && place(i) >= c);
+                if let Some((c, mask)) = hair_cut {
+                    let weighed = mask & CUT_HAIRS_WEIGHED != 0;
+                    let coherent = mask & CUT_HAIRS_COHERENT != 0;
+                    // The law's falloff here: a turned head's octave of distance, a still head's octave of the class's definite count before the
+                    // receiver (the law's shared face, its members past the cut and before it together).
+                    let weight = |j: usize, k: u32| -> i128 {
+                        let f = if !weighed { 0 } else if shared { octave(lists.definite_before(k, place(i)).len().max(1)) } else { octave(place(i).abs_diff(j)) };
+                        (1i128 << grain) >> f
+                    };
+                    let mut probed: Vec<u32> = std::iter::once(lists.probe_class[i]).chain(lists.probes.get(i).into_iter().flatten().copied()).collect();
+                    probed.sort_unstable();
+                    probed.dedup();
+                    for k in probed {
+                        let js = lists.definite_before(k, c);
+                        let mut count = 0i128;
+                        let mut chance = 0i128;
+                        let (mut word, mut value) = (vec![0i128; span], vec![0i128; span]);
+                        for &j in js {
+                            let w = weight(j as usize, k);
+                            count += w;
+                            let at = (h * sites + j as usize) * span;
+                            let mut power = 0i128;
+                            for r in 0..span {
+                                word[r] += w * cell.q[at + r] as i128;
+                                value[r] += w * cell.v[at + r] as i128;
+                                power += (cell.v[at + r] as i128).pow(2);
+                            }
+                            chance += w * w * power;
+                        }
+                        if count == 0 {
+                            continue;
+                        }
+                        // A hair is heard where its value word's power stands over chance, `|V|² > Σ w_j² |ṽ_j|²` (unrelated sources give their
+                        // sum; at unit weights it is `|V|² > P`, the formal pass's `e^(−Ξ) > 1/M`), or always under the plain hairs.
+                        let heard = !coherent || value.iter().map(|&v| v * v).sum::<i128>() > chance;
+                        hairs.push((count, word, value, heard, k));
+                    }
+                    CUT_PAIRS_HAIR.fetch_add(hairs.iter().filter(|h| h.3).count() as u64, std::sync::atomic::Ordering::Relaxed);
+                }
+                let merged: Vec<u32> = hairs.iter().filter(|h| h.3 && hair_cut.is_some_and(|(_, mask)| mask & CUT_HAIRS_COHERENT != 0)).map(|h| h.4).collect();
                 for j in lists.support(i) {
+                    // A ruler's cut: a site before it, past the near field, heard one by one is counted; under the coherent hairs a site whose
+                    // class's hair is heard is heard in it alone.
+                    if lists.cut.is_some_and(|(c, _)| place(i) >= c && j < c && place(i).abs_diff(j) >= NEAR) {
+                        if merged.contains(&lists.class[j]) {
+                            continue;
+                        }
+                        CUT_PAIRS_FAR.fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+                    }
                     let wj = &cell.q[(h * sites + j) * span..(h * sites + j + 1) * span];
                     let vj = &cell.v[(h * sites + j) * span..(h * sites + j + 1) * span];
                     // Each mode's lock carried by its skin decay across the pair's distance, summed
@@ -911,6 +995,17 @@ impl Constitution {
                     let z = fit64(release(temper * base as i128, MATERIAL_BITS) - ((level as i128) << FACE_BITS) - friction * level as i128)?;
                     series.push(self.face(z), (count as u128) << WEIGHT_BITS, one, &value);
                     crowds.push(Crowd { lo, hi: hi_, level, count, z, e: 0, s: base });
+                }
+                // [measurement] The class hairs across a ruler's cut ([`CUT_HAIRS`]), after the row's crowds; no share is kept for them (a cut
+                // is read forwards only).
+                for (count, word, value) in hairs.iter().filter(|h| h.3).map(|h| (h.0, &h.1, &h.2)) {
+                    let mut score = 0i128;
+                    for li in 0..n {
+                        score = carried(score.checked_add(lock((wi[li] as i128, wi[n + li] as i128), (word[li], word[n + li]), count, (1, 0))?))?;
+                    }
+                    let base = fit64(div_nearest(score, (count * count) << (FACE_BITS + 1)))?;
+                    let z = fit64(release(temper * base as i128, MATERIAL_BITS))?;
+                    series.push(self.face(z), (count as u128) << (WEIGHT_BITS - grain), one >> grain, value);
                 }
                 let (framed, shares) = series.release();
                 for (src, &share) in row.iter_mut().zip(&shares) {

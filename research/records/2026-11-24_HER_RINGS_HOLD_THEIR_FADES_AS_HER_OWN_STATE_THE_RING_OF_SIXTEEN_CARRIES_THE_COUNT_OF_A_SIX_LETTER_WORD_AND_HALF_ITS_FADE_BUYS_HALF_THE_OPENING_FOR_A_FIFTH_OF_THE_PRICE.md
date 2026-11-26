@@ -319,3 +319,88 @@ near field, the receivers probing its class and every open site of the region (`
 sharply only from its own stretch on, and by its probe's classes before it; an open receiver gains the octave crowds before its stretch;
 and the return kernels mirror each. Fable's G-R1 to G-R5 (`receipts/2026-11-25_what_crosses_a_cut/GUESS.txt`) score its arm. The fade
 family's arm waits for it: its purpose can only be read once a covector reaches a store's far content.
+
+## 16. She takes the wave: the line holds a sampled voice beside its text
+
+G-M1 (Fable's guesses; the lead's rule; `receipts/2026-11-24_fade/GUESS_M1.txt`). The arm W118m joined the wave slice (recorded speech
+from 237 voices, at its boundary chart's thirteen levels on the octets no UTF-8 text holds) to the line's store, and its state grew by
+the thirteen fresh letters (alphabet 257). It ran beside W118, W117's end continued at a new pass, for 3,000 sections: about six minutes
+of wave in the lap.
+- (c) held: the held text stood +0.0021 (±0.0005) over the control's.
+- (b) missed: the wave's held cut from 14 unseen voices codes at 1.278 nats a sample against the guessed 1.13. The count tables give
+  1.435 for one sample back and 1.266 for two.
+- (a) held: at the arm's last state, the fade covector over the wave's regions asks the rings of 128, 243 and 256 to fade more slowly,
+  where the text asks all four to fade faster. At the recorder's 16 kHz those rings turn at 125, 66 and 62.5 Hz, a speaking voice's
+  pitch, so the trimming of the long rings was the text's doing and no property of the fade's law.
+- By the rule, (c) held and the wave stands under the one-back table, so the line takes the wave. W118m's end is the line's, on the wave
+  store and its codec. The read by slice ran 223 s a section on the host against a projected 25. It was stopped at its first section
+  and read over 8, which hold about 80 of the wave's regions.
+
+## 17. The joined arm's first starts, and what bounds a joined passage on the card
+
+W119j was refused three times at its first or second section, and each refusal named a bound the card's realization holds:
+- A passage joined to the reach (2,590 places, staged as its two streams in 5,180 sites) asked 14.7 GB of the card's 10.9 GB, because
+  the card holds a region's rows whole, a receiver's row being its region's sites long, one a head.
+- Joined within the section's bound of pairs, the section's receipt counted 96 more compared places than the cut's domain: a later
+  stretch's first place is compared once it has a place before it, which the per-stretch tally did not count.
+- A passage of 1,975 places, staged in 3,950 sites, outran the card's resident skins, which hold a distance up to the reach (3,771)
+  between any two of a region's sites.
+
+So `join_stretches` joins while the passage, staged as its two streams, stays within the reach and the section's bound of pairs, and
+counts the passage as the one region it is read as. Each later stretch's first place adds one compared place. On the fourth start the
+arm trains at about 1.1 s a section against its control's 0.75, with three times the control's pairs (50.2 million against 16.0 at
+section 34): a joined passage's open places still hold rows its whole length, though they hear only their own stretch one by one. A row
+of a stretch plus its address, Fable's sizing, is the realization's next step.
+
+The control's mean read with the cut ruler on the hundred far rows gives a cut's cost of +0.210 nats a place over the law (Fable read
+0.211 on W117) and mask 191 at +0.102, closing 0.51 of it.
+
+## 18. The joined stretches at one lap: the address across a cut closes more, short of its guess
+
+The guesses were Fable's G-R1 to G-R5, under the lead's rule (`receipts/2026-11-24_fade/GUESS_R.txt`, the cut tables in `cut/`).
+W119j (W118m's end, set-joined) ran beside W119 (W118m's end continued), 3,000 sections each. G-R4 held: the held text, paired, was
+−0.0007 (±0.0003). G-R1, G-R2, G-R3 and G-R5 missed, so by the rule the line keeps W119.
+
+What moved is the purpose's own quantity, in its direction. On the hundred far rows cut at 256, the stores with the address across the
+cut (mask 191) cost +0.0859 nats a place over the law on the arm's mean against +0.1023 on the control's, closing 0.604 of a cut's cost
+against 0.513, about a third of what G-R2 asked in one lap. With every site heard one by one and the stores emptied (mask 64), the cost at
+32 to 127 places past the cut moved by 0.004, and the stores' horizon has not yet grown. The arm's training code at its compared places
+over the first 200 sections fell 0.035 nats a place, against the 0.04 asked.
+
+A learner's null is held to a length (rule 10), so the arm runs a second lap: W120j from W119j's end beside W120 from W119's end, both
+read again by the same rule. The joined arm costs 1.4 times its control's time a section, because a joined passage's open places hold rows
+of its whole length.
+
+## 19. The joined stretches at two laps, and the wave learned fast
+
+At its second lap the joined arm held its step and did not grow it. With mask 191 the cut's cost closed 0.600 against the control's 0.508,
+as at the first lap (0.604 against 0.513). The stores' horizon at 32 to 127 places past the cut stood at 0.028 against 0.024, and the held
+text moved −0.0001. By G-R's rule the line does not take the construction: its gain is a step in how a place hears across a stretch's
+first place, taken in one lap and not compounding. The line's end is W120's.
+
+The wave's held cut fell from 1.278 nats a sample at W118m's mean to 1.131 at W119's and 1.029 at W120's. Two laps of about six minutes
+of speech each brought it under the count tables of two samples back (1.266) and to the edge of both neighbours' (0.980). The text held at
+0.6958 and 0.6986 beside it. At W119's end the rings of 128 and 243 faded faster than at W118m's (+0.516 and +0.520 octaves against
++0.486 and +0.484; Fable's G-M3 (a) held), while the wave asks them to fade more slowly. In the one fade a ring holds, the text's share
+outvotes the wave's ask, which is the premise for a second fade that the text alone never gave (§14).
+
+## 20. The second fade on the wave's store: the covector splits as the premise said, and the wave does not move in a lap
+
+G-T9 (`receipts/2026-11-24_fade/GUESS_T9.txt`). W121q, W120's end with its rings' second fades founded at −3180 and their chart at zero,
+ran beside W121, W120's end continued, for 3,000 sections on the wave's store.
+- (b) held: the held text moved +0.0001.
+- (c) held: the second fade's covector splits as the premise of §19 said. Over the wave it asks the rings of 243 and 256 to fade more
+  slowly; over the text it asks all four faster.
+- (a) missed: the wave's held cut stood at 1.0182 against 1.0172. At one lap the second chart's covector is about a fiftieth of the first
+  fade's, so the store the wave asks for is founded but not yet charged.
+
+By the rule the line does not take it; its end is W121's. The wave's held cut on the line was 1.278, 1.131, 1.029 and 1.017 at W118m,
+W119, W120 and W121: its fall slows as it nears the table of both neighbours (0.980).
+
+## 21. Two laps of the line: the wave passes the table of both neighbours
+
+G-L1 held on all three clauses (`receipts/2026-11-24_fade/GUESS_L1.txt`). The wave's held cut stood at 0.964 at W122's mean and 0.931 at
+W123's, under the count table that knows both of a sample's neighbours (0.980). Her code of held speech from 14 voices she never heard
+fell, lap by lap, through 1.278, 1.131, 1.029, 1.017, 0.964 and 0.931 nats a sample, about six minutes of speech a lap. The held text
+stood at 0.6936 and 0.6948 beside it, within the walk of the laps before. Her writes moved as little as the text: the theory panel's
+lexicon share was 88% and 87%, the wide panel's 72% and 71%. The line's end is W123's.
