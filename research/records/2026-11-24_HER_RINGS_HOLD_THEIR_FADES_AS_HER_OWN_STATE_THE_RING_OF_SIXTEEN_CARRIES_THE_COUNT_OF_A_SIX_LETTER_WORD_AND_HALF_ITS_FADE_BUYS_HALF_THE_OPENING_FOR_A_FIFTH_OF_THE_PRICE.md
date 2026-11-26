@@ -383,3 +383,16 @@ of speech each brought it under the count tables of two samples back (1.266) and
 0.6958 and 0.6986 beside it. At W119's end the rings of 128 and 243 faded faster than at W118m's (+0.516 and +0.520 octaves against
 +0.486 and +0.484; Fable's G-M3 (a) held), while the wave asks them to fade more slowly. In the one fade a ring holds, the text's share
 outvotes the wave's ask, which is the premise for a second fade that the text alone never gave (§14).
+
+## 20. The second fade on the wave's store: the covector splits as the premise said, and the wave does not move in a lap
+
+G-T9 (`receipts/2026-11-24_fade/GUESS_T9.txt`). W121q, W120's end with its rings' second fades founded at −3180 and their chart at zero,
+ran beside W121, W120's end continued, for 3,000 sections on the wave's store.
+- (b) held: the held text moved +0.0001.
+- (c) held: the second fade's covector splits as the premise of §19 said. Over the wave it asks the rings of 243 and 256 to fade more
+  slowly; over the text it asks all four faster.
+- (a) missed: the wave's held cut stood at 1.0182 against 1.0172. At one lap the second chart's covector is about a fiftieth of the first
+  fade's, so the store the wave asks for is founded but not yet charged.
+
+By the rule the line does not take it; its end is W121's. The wave's held cut on the line was 1.278, 1.131, 1.029 and 1.017 at W118m,
+W119, W120 and W121: its fall slows as it nears the table of both neighbours (0.980).
