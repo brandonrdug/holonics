@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,763 records from July 2026 to November 2026. 411 receipts directories: 225 beside the records and 186 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,764 records from July 2026 to November 2026. 412 receipts directories: 225 beside the records and 187 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 162 | 127 |
+| [November 2026](#november-2026) | 163 | 128 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-26 [A world horizon is the corner where a readers outgoing cone meets its return its hairs are the corners frames news delays its clock so a bounded clock bounds its count and a divergence is a winding read without its carry](2026-11-26_A_WORLD_HORIZON_IS_THE_CORNER_WHERE_A_READERS_OUTGOING_CONE_MEETS_ITS_RETURN_ITS_HAIRS_ARE_THE_CORNERS_FRAMES_NEWS_DELAYS_ITS_CLOCK_SO_A_BOUNDED_CLOCK_BOUNDS_ITS_COUNT_AND_A_DIVERGENCE_IS_A_WINDING_READ_WITHOUT_ITS_CARRY.md)
 - 2026-11-25 [A night of arms left her writes where they were her deposit on text trims long rings a text one turn back tells nothing past sixteen places a sampled wave tells at every ring a second streams pairing waits on reach](2026-11-25_A_NIGHT_OF_ARMS_LEFT_HER_WRITES_WHERE_THEY_WERE_HER_DEPOSIT_ON_TEXT_TRIMS_LONG_RINGS_A_TEXT_ONE_TURN_BACK_TELLS_NOTHING_PAST_SIXTEEN_PLACES_A_SAMPLED_WAVE_TELLS_AT_EVERY_RING_A_SECOND_STREAMS_PAIRING_WAITS_ON_REACH.md)
 - 2026-11-25 [A receiver meets a medium through a taper a rod reads an effort along it a cone a flow through its mouth it carries by a stroke that does not retrace and she gains from the far past only where it repeats itself](2026-11-25_A_RECEIVER_MEETS_A_MEDIUM_THROUGH_A_TAPER_A_ROD_READS_AN_EFFORT_ALONG_IT_A_CONE_A_FLOW_THROUGH_ITS_MOUTH_IT_CARRIES_BY_A_STROKE_THAT_DOES_NOT_RETRACE_AND_SHE_GAINS_FROM_THE_FAR_PAST_ONLY_WHERE_IT_REPEATS_ITSELF.md)
 - 2026-11-25 [A regions first place empties every store so no compared place asks a store for what stands far before it a cut costs her forty nats and consecutive stretches cut only in their sharp hearing are where a store is asked](2026-11-25_A_REGIONS_FIRST_PLACE_EMPTIES_EVERY_STORE_SO_NO_COMPARED_PLACE_ASKS_A_STORE_FOR_WHAT_STANDS_FAR_BEFORE_IT_A_CUT_COSTS_HER_FORTY_NATS_AND_CONSECUTIVE_STRETCHES_CUT_ONLY_IN_THEIR_SHARP_HEARING_ARE_WHERE_A_STORE_IS_ASKED.md)
