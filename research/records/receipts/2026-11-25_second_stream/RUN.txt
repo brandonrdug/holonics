@@ -42,3 +42,22 @@ Left on the PC by these runs: the slice directory above (602 MB), and one empty 
 Gate 1 of this change (cloud container, no card, no kernel read; the change leaves every crate's compiled tokens as they were):
 `bash tools/gate_nocard.sh`, 2026-11-25 18:09Z to 18:14:40Z, every line ok, `gate wave-passage-controls: ok (1243 ms)` among them,
 `gate_nocard: gate 1 passed with no card and no kernel read`.
+
+November 26, the formal thread: what the held speech holds past its last samples (far_given_near_ruler.py, FAR_GIVEN_NEAR.out).
+Run on the PC's VM (2 cores, 3.9 GB), on the slice's held cut at .local/corpus/wave-2026-11-25 (128 documents, 26,211,998 samples),
+each call in the foreground under its 180 s limit (a first `envelope2` dispatched with nohup died with its call at 11:36 and wrote
+nothing; nothing is read from it). The ruler was carried to the VM as a compressed copy and its hash checked there.
+  far_given_near_ruler.py SLICE wave terrain; ... shuffle         first version (sha256 195d95a7c73838e2...), ended 11:22 UTC
+  far_given_near_ruler.py SLICE wave envelope; ... plant:128:0.1 near=1,2,16 lags=96,127,128,129,160   first version, ended 11:25 UTC
+  far_given_near_ruler.py SLICE wave envelope2 near=1,2           11:36:36 to 11:36:51 UTC (15 s)
+  far_given_near_ruler.py SLICE wave envelope2 near=1,2,16        11:37:15 to 11:37:31 UTC (16 s)
+  Parity of the two versions: `envelope near=1,2` on this version, 11:38:34 to 11:38:49, prints the first version's ENVELOPE line
+    byte for byte; its ENVELOPE_SHUFFLED line differs at fade 4096 (-0.0005 against -0.0004), the shuffle's draws standing later in
+    the generator's order when `near=none` is not read first.
+  far_given_near_ruler.py  sha256 2ccf82d3b0a2fb989047e7f2032f48a97505732071857efbf1a21ff8be0c93d3 (equals the VM's copy)
+  far_given_near_synth.py  sha256 37adf15a34387d200fa5df918ebc0aa8cc9cf8e0c2c11ab075d222cd5e17edf8; its two slices were read in the
+    cloud container (11:36:06 to 11:36:08 UTC).
+  The VM's outputs (out_terrain_shuffle.txt 7c6435a7..., out_envelope_plant.txt b01ea2cb..., out_envelope2_12.txt 36eb27eb...,
+    out_envelope2_1216.txt a4561e1b...) were carried to the container and checked by hash before FAR_GIVEN_NEAR.out was written.
+Left on the VM (outside the repository and the PC's folders): $HOME/fgn with the ruler's copies and these outputs. Nothing was
+written on the PC's folders.
