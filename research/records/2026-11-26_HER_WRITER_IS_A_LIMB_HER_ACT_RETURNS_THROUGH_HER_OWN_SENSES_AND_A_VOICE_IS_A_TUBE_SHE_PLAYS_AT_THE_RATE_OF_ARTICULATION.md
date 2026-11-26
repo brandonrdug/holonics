@@ -132,3 +132,16 @@ through resonators at 700 and 1,200 Hz reads 150 Hz and formants of 717 and 1,20
 Her one-at-a-time write is a low rumble whose period sits at the floor of the pitch range, the release's is flat static, and the tube
 holds a voice whatever its controls. The ruler scores each arm on her sound from here on; an intelligibility read by a speech recognizer
 waits on Brandon's word about its model's download.
+
+## 8. A frame of 10 ms is a privileged clock
+
+Brandon read the account at 22:39 UTC and named the fixed frame among the marks of naivety. The guide's own law reads every stream with
+no clock or frame length privileged, and both the paired slice (`tools/speech_pairs.py`) and the tube's controls and returns
+(`tools/tube_limb.py`) were cut on a frame of 160 samples chosen by hand. The paired arm (w134) was stopped before it trained, and so
+were the tube's babble shards. The lawful coarse chart is already the engine's object: a level whose sites are the landmarks of its news
+(the record of November 13 on a level's sites), so an epoch ends where the news a place carries stands above every place within a
+section of it, on onsets and syllables rather than on a ruler's tick, and the limb's control rate is the level's clock. Both tools stand
+as dated configurations with their readings (the pairing premise read flat; the tube's body heard and measured), to be re-cut on that
+chart. His other notes of that message are the subject of the next pass: chaining depth in place of averages (a reading is given by
+part and depth), why nothing she gains compounds (the engine holds no founding law, so a lap adds where a staircase would found),
+and vision read by the same law, a raster's order located by her navigator rather than scanned.
