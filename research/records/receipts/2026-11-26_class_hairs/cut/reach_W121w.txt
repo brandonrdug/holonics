@@ -1,0 +1,25 @@
+REACH setting=cut:256:31 group=all places=44800 nats_millionths=1314033 ms=53649
+REACH setting=cut:256:31 group=books places=8960 nats_millionths=1570270 ms=53653
+REACH setting=cut:256:31 group=code places=8960 nats_millionths=1104516 ms=53653
+REACH setting=cut:256:31 group=science places=8960 nats_millionths=1379519 ms=53653
+REACH setting=cut:256:31 group=web places=8960 nats_millionths=1405812 ms=53653
+REACH setting=cut:256:31 group=wikidata places=8960 nats_millionths=1110050 ms=53653
+REACH setting=cut:256:543 group=all places=44800 nats_millionths=1564872 ms=103276
+REACH setting=cut:256:543 group=books places=8960 nats_millionths=1766155 ms=103278
+REACH setting=cut:256:543 group=code places=8960 nats_millionths=1420406 ms=103278
+REACH setting=cut:256:543 group=science places=8960 nats_millionths=1621623 ms=103278
+REACH setting=cut:256:543 group=web places=8960 nats_millionths=1637107 ms=103278
+REACH setting=cut:256:543 group=wikidata places=8960 nats_millionths=1379068 ms=103278
+REACH setting=cut:256:1567 group=all places=44800 nats_millionths=1316078 ms=144230
+REACH setting=cut:256:1567 group=books places=8960 nats_millionths=1576251 ms=144232
+REACH setting=cut:256:1567 group=code places=8960 nats_millionths=1107790 ms=144232
+REACH setting=cut:256:1567 group=science places=8960 nats_millionths=1383847 ms=144232
+REACH setting=cut:256:1567 group=web places=8960 nats_millionths=1414513 ms=144232
+REACH setting=cut:256:1567 group=wikidata places=8960 nats_millionths=1097991 ms=144232
+REACH setting=cut:256:1599 group=all places=44800 nats_millionths=1298507 ms=191079
+REACH setting=cut:256:1599 group=books places=8960 nats_millionths=1573575 ms=191081
+REACH setting=cut:256:1599 group=code places=8960 nats_millionths=1091270 ms=191081
+REACH setting=cut:256:1599 group=science places=8960 nats_millionths=1364474 ms=191081
+REACH setting=cut:256:1599 group=web places=8960 nats_millionths=1398923 ms=191081
+REACH setting=cut:256:1599 group=wikidata places=8960 nats_millionths=1064291 ms=191081
+REACH_DONE rows=100 settings=4 ms=191096

@@ -1,0 +1,71 @@
+G-H1 and G-H2, the class hairs' premise read (the formal pass's record of November 26, §8.1), fixed before the read at 2026-11-26T09:28:36Z (date -u).
+
+The read: the cut ruler (Constitution::ruler_cut) on W121's lap mean (MEAN.3000, the sections 2,001 to 3,000 of its lap), the hundred
+held far rows of 448 known places (twenty each of books, code, science, web, wikidata), cut at place 256, by two streams, on the host.
+Ruler bit 512 (CUT_HAIRS): every receiver past the cut hears, for each class it probes, the definite sites of that class before the cut
+as one term at phi = 0 (count M, summed framed key and value words), scored by the lock against K/M with M its multiplier.
+
+G-H1 (0.5): beside the five stores, the hairs bring back at least half of what hearing by address brings beside them:
+  nats(cut:256:31) - nats(cut:256:543) >= 0.5 * (nats(cut:256:31) - nats(cut:256:63)), on the hundred rows' places past the cut.
+G-H2 (0.35): hairs and address together bring back at least 0.005 nats a place more than address alone:
+  nats(cut:256:63) - nats(cut:256:575) >= 0.005.
+Either fails if the class's mean word blurs what one-by-one hearing finds.
+
+Settings read: law, cut:256:0, cut:256:31, cut:256:63, cut:256:543, cut:256:575 (the law and cut:256:0 for the table's closes).
+
+G-C1 (0.35, the formal record's §5.3: her rate is her count's logarithm), fixed at 2026-11-26T09:34:28Z (date -u). The read: the
+fade covector (2^40 dL/dl, read-slice-fades with `breaks`) on W121's lap mean over eight sections drawn as training draws them, each text
+slice's regions of a section parted at the slice's median count of breaks a place (a space or a line's end) into a sparser and a denser
+half, each half read and returned alone. If a ring's rate holds the count of breaks, the covector a place differs between the halves.
+Guess: on at least three of the rings of 9, 16, 27, 32, 81 and 128, in at least four of the five text slices (books, code, science, web,
+wikidata), dense less sparse (a place) has one sign across those slices, and its mean over the eight sections stands over twice its
+standard error across them. A miss is scored in one line.
+
+Scored at 2026-11-26T09:37:06Z: G-H1 missed, G-H2 missed. At phi = 0 the hairs cost what they were to bring back: past the cut
+cut:256:543 reads 1.9003 nats a place against cut:256:31's 1.3144 (+0.586; address brought 0.0882 back, to 1.2262), and cut:256:575
+1.8885 against cut:256:63's 1.2262. At the cut's own place they help (1.711 against 1.828).
+
+G-H3 and G-H4, fixed at 2026-11-26T09:37:06Z, on the same read with bit 1024 (CUT_HAIRS_WEIGHED: each source enters its hair at
+the law's own weight from the receiver, 2^-f with f the row's falloff), which parts what the mean word blurs from what an unweighed
+hair drowns:
+G-H3 (0.45): nats(cut:256:31) - nats(cut:256:1567) >= 0.25 * (nats(cut:256:31) - nats(cut:256:63)), that is >= 0.022.
+G-H4 (0.3): nats(cut:256:1599) - nats(cut:256:63) <= 0.003 (the weighed hairs beside address cost nothing that counts).
+Controls in the same read: cut:256:31 and cut:256:543 read their earlier bits (1,314,033 and 1,564,872 millionths over the 44,800 places).
+
+Scored at 2026-11-26T09:41:32Z: G-H3 missed, G-H4 missed. Both controls read their earlier bits (cut:256:31 1,314,033 and
+cut:256:543 1,564,872 millionths over the 44,800 places). Past the cut (192 places a row, 19,200 in all; a difference over the 44,800
+places times 7/3): weighed hairs beside the five stores, cut:256:1567, cost 0.0048 nats a place over cut:256:31 (address brings 0.0882
+back), and beside address, cut:256:1599, they cost 0.0538 over cut:256:63. By slice, 1567 against 31 past the cut: books +0.014,
+code +0.008, science +0.010, web +0.020, wikidata -0.028. The class's mean word, at its members' own weights, brings back nothing that
+the five stores do not carry, where its members heard one by one bring back 0.088: the guesses' own failure clause, the mean word
+blurs what one-by-one hearing finds.
+
+2026-11-26T09:42:37Z: the first breaks read stopped on evidence after its first section (457 s against the projection's 312 s a
+section; two ten-thread cut reads ran beside it for most of that section), incomplete, nothing scored from it. Relaunched as six sections
+under the same deadline of 3,600 s (projection 6 x 457 s = 2,742 s, the largest measured value), and G-C1 is read over those six sections
+in place of eight; nothing else in it changes.
+
+G-H5 (0.35, the formal pass's, relayed 09:44:44Z; record §8.3), fixed at 2026-11-26T09:47:05Z: hear by address, but replace a
+probed class's sites before the cut by their hair (at the law's weights) only where the hair's value word stands over chance
+(|V|^2 > sum w_j^2 |v_j|^2; at unit weights |V|^2 > P, e^-Xi > 1/M), the rest one by one: cut:256:3647 (bits 31, 32, 512, 1024, 2048).
+It brings back at least 0.8 of address's 0.088 (over the 44,800 places, 1,314,033 - nats_millionths(3647) >= 0.8 x 38,583 = 30,866) on
+fewer than half its pairs (far + hairs at 3647 under half of far at cut:256:63, the REACH_PAIRS counts over every tick's rows).
+Control: cut:256:1567 reads its earlier 1,316,078.
+
+Scored at 2026-11-26T09:51:27Z: G-H5 missed on its first clause and held its second. cut:256:3647 reads 1,312,077 against
+cut:256:31's 1,314,033 and cut:256:63's 1,275,450: it brings back 1,956 of address's 38,583 millionths (0.05 of it; past the cut,
+0.0046 of 0.0900 nats a place), on 2,652,014 pairs (1,955,818 sites one by one and 696,196 hairs) against address's 11,727,308 (0.23).
+The test passed 696,196 of the 958,948 hairs cut:256:1567 hears (0.73), and those classes held 0.83 of address's pairs: over chance
+by |V|^2 > sum w^2 |v|^2, most classes stand coherent, and their mean word still carries what their sites one by one carry at a
+twentieth. The control cut:256:1567 read its earlier 1,316,078.
+
+2026-11-26T09:58:30Z: the hairs' weights moved from a grain of 2^-16 to one named from the region (one place past the farthest
+octave a falloff reaches, gate 1's count of literal shifts); cut:256:1567 and cut:256:3647 read the same bits on it (1,316,078 and
+1,312,077, the same pair counts; reach_W121g.txt).
+
+Scored at 2026-11-26T10:17:06Z: G-C1 missed. Over six sections (1,838 s at 8 threads, projected 2,742 s, ratio 0.67), no ring
+of the six holds both clauses: on the five text slices, dense less sparse a place has one sign on the rings of 9 (+, all five), 32
+(+, all five) and 128 (-, all five), and stands over twice its error in one slice of the fifteen (32 on science); the rings of 16 and 27
+change sign, and 81 is negative in four. Read beside it: the ring of 128's sign holds where a slice's dense half has the longer regions
+(code, 173 against 107 places) and where it has the shorter (science 126 against 143, web 112 against 133), so it is not the halves'
+lengths; in the two slices with no breaks, parted by length alone, it is negative too (harness, over twice its error; wave). HALVES.txt.

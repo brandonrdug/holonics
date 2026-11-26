@@ -970,9 +970,10 @@ pub fn read_section_covectors(args: &[String]) -> Result<()> {
 /// One `SLICE_FADES` line a slice and kind (`fade`, `twin`): its sites and `period:sum` for every turned ring; one `RINGS` line first with the
 /// rings' periods by slot. A ruler's read of a saved state; nothing is written back.
 pub fn read_slice_fades(args: &[String]) -> Result<()> {
-    if args.len() != 13 {
-        return Err("read-slice-fades UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA".into());
+    if args.len() != 13 && !(args.len() == 14 && args[13] == "breaks") {
+        return Err("read-slice-fades UNITS UNITS_SHA STORE STORE_SHA ROLE KEYS KEYS_SHA CODEC CODEC_SHA SECTIONS STATE STATE_SHA [breaks]".into());
     }
+    let halves = args.len() == 14;
     let started = std::time::Instant::now();
     refuse_variables("read-slice-fades")?;
     let units = units_of(&args[1], &args[2])?;
@@ -997,6 +998,10 @@ pub fn read_slice_fades(args: &[String]) -> Result<()> {
     let slots = d.turned_slots();
     let periods: Vec<usize> = learner.field.rings().iter().map(|(n, _)| *n).collect();
     println!("RINGS slots={slots} periods={}", periods.iter().map(|p| p.to_string()).collect::<Vec<_>>().join(","));
+    let breaks: Vec<usize> = [&b" "[..], &b"\n"[..]].iter().filter_map(|t| codec.encode(t).ok().filter(|c| c.len() == 1).map(|c| c[0])).collect();
+    if halves {
+        println!("BREAKS classes={breaks:?}");
+    }
     let mut cut = Cut { seed, slices, pass };
     let (mut fade, mut twin, mut sites) = (vec![vec![0i128; slots]; names.len()], vec![vec![0i128; slots]; names.len()], vec![0u64; names.len()]);
     for done in 0..sections {
@@ -1014,6 +1019,40 @@ pub fn read_slice_fades(args: &[String]) -> Result<()> {
         }
         if regions.is_empty() {
             break;
+        }
+        // [measurement; the lead, November 26, the formal record's §5.3] With `breaks`, each slice's regions of the section are parted at
+        // the slice's median count of breaks a place (a space or a line's end, as the codec writes them) into its sparser and denser
+        // half, each half read and returned alone: a ring's fade covector against the count of breaks a passage holds.
+        if halves {
+            for s in 0..names.len() {
+                let mut views: Vec<(u64, u64, holonics_engine::field::Region)> = regions
+                    .iter()
+                    .filter(|(k, _)| *k == s)
+                    .map(|(_, r)| {
+                        let v = view_of(r);
+                        let b = v.classes.iter().filter(|c| breaks.contains(c)).count() as u64;
+                        (b, v.classes.len() as u64, v)
+                    })
+                    .collect();
+                if views.len() < 2 {
+                    continue;
+                }
+                // The order is by breaks a place, `b_1 n_2 < b_2 n_1`, ties by place count: a partition of the section's regions.
+                views.sort_by(|a, b| (a.0 * b.1).cmp(&(b.0 * a.1)).then(a.1.cmp(&b.1)));
+                let half = views.len() / 2;
+                for (name_h, part) in [("sparse", &views[..half]), ("dense", &views[half..])] {
+                    let (b, n) = (part.iter().map(|v| v.0).sum::<u64>(), part.iter().map(|v| v.1).sum::<u64>());
+                    let rs: Vec<holonics_engine::field::Region> = part.iter().map(|v| v.2.clone()).collect();
+                    let (_, g) = learner.field.read_and_return(&rs).map_err(|e| e.to_string())?;
+                    for (kind, base, on) in [("fade", l.fade, d.fade), ("twin", l.twin_fade, d.twin)] {
+                        if on {
+                            println!("SLICE_FADES_HALF section={done} slice={} half={name_h} regions={} sites={n} breaks={b} kind={kind} {}", names[s], part.len(), (0..slots).map(|slot| format!("{}:{}", periods[slot], g[base + slot])).collect::<Vec<_>>().join(" "));
+                        }
+                    }
+                }
+            }
+            println!("SLICE_FADES_SECTION section={done} regions={} sites={in_sites} ms={}", regions.len(), started.elapsed().as_millis());
+            continue;
         }
         for s in 0..names.len() {
             let views: Vec<holonics_engine::field::Region> = regions.iter().filter(|(k, _)| *k == s).map(|(_, r)| view_of(r)).collect();
@@ -1312,7 +1351,8 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         // would read it, but for what `MASK` lets across the cut ([`holonics_engine::field::Constitution::ruler_cut`]: 1 the rings' moments
         // and the opening's rows, 2 the carry circles' charges, 4 the near field and the strand mates, 8 a definite receiver's octave
         // crowds, 16 the level's epochs, 32 the sites in a receiver's probed classes, 64 every site to an open place, 128 the octave crowds
-        // to an open place, 256 the sites before the cut held at their opening); a row of fewer than `C + 2` places is read by the law.
+        // to an open place, 256 the sites before the cut held at their opening, 512 the class hairs: each probed class's definite sites before the cut heard as
+        // one term at no fade, 1024 at the law's weights, 2048 only where coherent, the rest by address); a row of fewer than `C + 2` places is read by the law.
         // `from:C`: the row's places from `C` on read as a passage of their own, the places before it coded zero: the control `cut:C:0`
         // is held to (`cut:C:95` is the law's bits).
         let mut from = 0usize;
@@ -1343,6 +1383,10 @@ pub fn read_reach(args: &[String]) -> Result<()> {
                 field.ruler_lane_grain = Some((j.parse()?, h.parse()?, relative));
             }
         }
+        // [measurement] The pairs a cut lets across, counted over the setting's forwards (every tick's row): its sites heard one by one
+        // past the near field, and its hairs.
+        holonics_engine::field::CUT_PAIRS_FAR.store(0, std::sync::atomic::Ordering::Relaxed);
+        holonics_engine::field::CUT_PAIRS_HAIR.store(0, std::sync::atomic::Ordering::Relaxed);
         let c: Vec<Vec<i64>> = rows
             .par_iter()
             .map(|(_, classes)| {
@@ -1364,6 +1408,9 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         }
         for (g, (sum, n)) in &by {
             println!("REACH setting={name} group={g} places={n} nats_millionths={} ms={}", ((*sum * holonics_engine::field::ln2_face() * 1_000_000) >> (holonics_engine::field::READ_BITS + holonics_engine::field::LN2_BITS)) / (*n).max(1) as i128, started.elapsed().as_millis());
+        }
+        if field.ruler_cut.is_some() {
+            println!("REACH_PAIRS setting={name} far={} hairs={}", holonics_engine::field::CUT_PAIRS_FAR.load(std::sync::atomic::Ordering::Relaxed), holonics_engine::field::CUT_PAIRS_HAIR.load(std::sync::atomic::Ordering::Relaxed));
         }
         codes.push(c);
     }
