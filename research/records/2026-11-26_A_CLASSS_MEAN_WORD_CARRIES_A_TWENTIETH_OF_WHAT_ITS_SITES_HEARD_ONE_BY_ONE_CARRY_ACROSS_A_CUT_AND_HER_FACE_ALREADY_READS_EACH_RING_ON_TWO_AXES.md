@@ -267,3 +267,9 @@ leaves it after 102 samples and writes 15,316 octets of text in her corpus's reg
 stream, as the stream law asks, and moves between them by its own face. Transcription asks for a passage that holds both kinds of
 passage: an utterance and then its words. Within her reach (1,885 places) a word's sound at 16 kHz spans 0.12 s, so a paired slice has
 to bring a word's sound and its text within one region (a chart at a coarser clock, or a level's epochs), which is that slice's design.
+
+Brandon listened at 20:32 UTC and heard words, a woman's and three men's voices with natural intonation, and static between the words;
+the words were the held originals, which each file played first (the 13 levels' quantization is that static). Heard alone (20:35 UTC),
+her writes are "pure static". That agrees with the table: at 0.88 nats a sample she is unsure of every sample, and sixteen thousand
+draws one at a time keep the level mix of speech and lose its shape, which a voice holds over hundreds of samples, a pitch period after
+another, past her reach of 0.12 s.

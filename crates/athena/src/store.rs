@@ -32,7 +32,9 @@ use holonics_engine::passage::{Cut, Piece, PieceBytes, Slice, Stretch, held_set}
 // (`tools/history_passage.py`; Brandon, November 23 01:37Z), joined once a mix held its pull (G-T4); [November 24] `harness`, its
 // system-side text, the curated collection in full (Brandon, 05:44Z). [November 25] `wave`, a sampled propagation at its boundary chart's
 // thirteen levels on the octets no UTF-8 text holds (`tools/wave_passage.py`; G-M1), joined with its letters ([`join_store`]).
-const SLICES: [&str; 13] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts", "harness", "wave"];
+// [November 26] `pairs`, speech beside its words: each utterance's loudness at a frame of 10 ms on the wave's thirteen octets, then its
+// transcript (`tools/speech_pairs.py`; Brandon, November 25 17:10Z and November 26 18:27Z).
+const SLICES: [&str; 14] = ["code", "web", "science", "books", "wikidata", "arithmetic", "words", "theory", "logic", "dialogue", "acts", "harness", "wave", "pairs"];
 /// [definition; Build B] The most places the world's reaction takes: a signed value of 128 bits (39 digits and its sign) and a line feed, or
 /// `?` between two line feeds.
 const REACTION_BOUND: u64 = 41;
@@ -3380,16 +3382,29 @@ pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result
     }
     let unescape = |t: &str| t.replace("\\n", "\n");
     let escape = |b: &[u8]| String::from_utf8_lossy(b).replace('\n', "\\n").replace('\t', "\\t");
+    // [the lead, November 26] A row's prompt and reference may be `hex:` and their octets, two hex digits each, for a passage of any
+    // octets (the wave's held documents); such a row's prompt, write and reference are written back as `hex:` too.
+    let unhex = |h: &str| -> std::result::Result<Vec<u8>, String> {
+        if h.len() % 2 != 0 {
+            return Err("a hex row of an odd count of digits".into());
+        }
+        (0..h.len()).step_by(2).map(|k| u8::from_str_radix(&h[k..k + 2], 16).map_err(|e| e.to_string())).collect()
+    };
+    let hexed = |b: &[u8]| format!("hex:{}", b.iter().map(|o| format!("{o:02x}")).collect::<String>());
     let mut rows: Vec<(String, Vec<u8>, Vec<usize>, Vec<u8>)> = Vec::new();
+    let mut hex_rows: Vec<bool> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         let [label, prompt, reference] = w[..] else { return Err("a forms row that is not three fields".into()) };
-        let bytes = unescape(prompt).into_bytes();
+        let hex = prompt.starts_with("hex:");
+        hex_rows.push(hex);
+        let field = |t: &str| -> std::result::Result<Vec<u8>, String> { if hex { unhex(t.strip_prefix("hex:").unwrap_or(t)) } else { Ok(unescape(t).into_bytes()) } };
+        let bytes = field(prompt)?;
         let classes = codec.encode(&bytes)?;
         if classes.is_empty() {
             return Err("a forms row with an empty prompt".into());
         }
-        rows.push((label.to_string(), bytes, classes, unescape(reference).into_bytes()));
+        rows.push((label.to_string(), bytes, classes, field(reference)?));
     }
     std::fs::create_dir(out)?;
     println!("FORMS_WRITE_LAW rows={} run={run} sweeps={run} refine={refine} alphabet={} void={} ms={}", rows.len(), codec.alphabet(), codec.void(), started.elapsed().as_millis());
@@ -3399,10 +3414,11 @@ pub fn write_forms(args: &[String], realization: &mut dyn Realization) -> Result
         .sample_runs(&release, run, refine, codec.void(), seed, 0, true, place_order, None, false, realization, &mut |_, _| true, &mut |_| {})
         .map_err(|e| e.to_string())?;
     let mut text = String::new();
-    for ((label, prompt, _, reference), w) in rows.iter().zip(&written) {
+    for (((label, prompt, _, reference), w), &hex) in rows.iter().zip(&written).zip(&hex_rows) {
         let before_void = w.iter().position(|&c| c == codec.void()).unwrap_or(w.len());
         let decoded = codec.decode(&w[..before_void]);
-        text.push_str(&format!("{label}\t{}\t{}\t{}\n", escape(prompt), escape(&decoded), escape(reference)));
+        let out_of = |b: &[u8]| if hex { hexed(b) } else { escape(b) };
+        text.push_str(&format!("{label}\t{}\t{}\t{}\n", out_of(prompt), out_of(&decoded), out_of(reference)));
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
     println!("FORMS_WRITE_DONE rows={} {} ms={}", rows.len(), counters_text(realization), started.elapsed().as_millis());
