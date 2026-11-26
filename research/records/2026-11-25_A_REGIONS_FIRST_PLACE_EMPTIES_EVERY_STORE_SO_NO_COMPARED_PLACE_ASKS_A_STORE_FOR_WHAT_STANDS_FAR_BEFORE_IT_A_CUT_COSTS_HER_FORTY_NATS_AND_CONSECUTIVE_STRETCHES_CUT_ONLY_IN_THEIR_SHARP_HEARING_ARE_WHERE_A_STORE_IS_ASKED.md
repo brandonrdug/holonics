@@ -387,6 +387,10 @@ weighs a second fade before it is built is therefore this ruler on the wave's ow
 there, beside the address's. The ruler reads a row as text today and a wave's octets are no text; it is given rows of any octets
 next.
 
-**Not claimed.** One lap, one cut's place, a hundred rows. A learner's null is held to a length: the stores' share is read again at
-the second lap's means (W120j beside W120). Receipts: `joined_split.py`, `joined_split_W119.txt`, `joined_split_repeat_W119.txt`,
+**The second lap** (G-R7, scored in `GUESS.txt`). W120j beside W120 held the step and did not grow it: mask 191 closes 0.600 of a
+cut's cost against 0.508, the far-only recurrences bring back 0.434 against 0.351, and where the run is new the price is −0.0185 against
+−0.0143. The lead's rule read the same and the line does not take the construction (the lead's record §19).
+
+**Not claimed.** Two laps, one cut's place, a hundred rows. The stores' share was parted at the first lap's means; at the second
+the lead's settings (0, 191, 64) hold the sum, which stood. Receipts: `joined_split.py`, `joined_split_W119.txt`, `joined_split_repeat_W119.txt`,
 `RUN.txt`, `GUESS.txt` (G-R6 scored, G-R7 fixed). Atlas: `store.joined-lap-trains-address-not-store` (measured).
