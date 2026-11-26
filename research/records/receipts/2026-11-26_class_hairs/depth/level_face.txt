@@ -1,0 +1,21 @@
+== W101
+LEVEL_FACE rows=407 first_epochs=35414 first_word_start_share=0.350 c1_nats_median=65.25 c1_nats_mean=74.86 section_nats=5.497
+LEVEL_FACE_SECOND law units=11577 word_start_share=0.341 places_median=10 places_mean=10.8 first_epochs_median=3
+LEVEL_FACE_SECOND shuffled units=11573 word_start_share=0.352 places_median=10 places_mean=10.7 first_epochs_median=3
+LEVEL_FACE_SECOND planted units=13670 word_start_share=0.907 places_median=8 places_mean=9.1 first_epochs_median=2
+LEVEL_FACE_SECOND per_place units=11586 word_start_share=0.362 places_median=10 places_mean=10.8 first_epochs_median=3
+FACE_PLACES open_places=123720 median_nats=21.68 p10=9.29 p90=32.89
+== W101r
+LEVEL_FACE rows=407 first_epochs=35418 first_word_start_share=0.350 c1_nats_median=10.09 c1_nats_mean=11.28 section_nats=5.497
+LEVEL_FACE_SECOND law units=10065 word_start_share=0.324 places_median=12 places_mean=12.4 first_epochs_median=3
+LEVEL_FACE_SECOND shuffled units=9942 word_start_share=0.358 places_median=11 places_mean=12.4 first_epochs_median=3
+LEVEL_FACE_SECOND planted units=13666 word_start_share=0.907 places_median=8 places_mean=9.1 first_epochs_median=2
+LEVEL_FACE_SECOND per_place units=6458 word_start_share=0.387 places_median=17 places_mean=19.1 first_epochs_median=5
+FACE_PLACES open_places=123720 median_nats=2.96 p10=1.77 p90=4.91
+== W129w
+LEVEL_FACE rows=407 first_epochs=34987 first_word_start_share=0.350 c1_nats_median=71.50 c1_nats_mean=82.50 section_nats=5.549
+LEVEL_FACE_SECOND law units=11488 word_start_share=0.336 places_median=10 places_mean=10.8 first_epochs_median=3
+LEVEL_FACE_SECOND shuffled units=11453 word_start_share=0.352 places_median=10 places_mean=10.9 first_epochs_median=3
+LEVEL_FACE_SECOND planted units=13440 word_start_share=0.910 places_median=8 places_mean=9.3 first_epochs_median=2
+LEVEL_FACE_SECOND per_place units=11415 word_start_share=0.359 places_median=10 places_mean=10.9 first_epochs_median=3
+FACE_PLACES open_places=123575 median_nats=22.99 p10=10.02 p90=37.27

@@ -1769,7 +1769,7 @@ fn read_strand_moments(args: &[String]) -> Result<()> {
 }
 
 /// [measurement; the lead, November 23, the level's receipt record §5] `read-strand-cut UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA ROWS
-/// ROWS_SHA STATE STATE_SHA OUT [past] [links]`: **which epoch each place of a strand reads, written out for a ruler**. Each row of `ROWS`
+/// ROWS_SHA STATE STATE_SHA OUT [past] [links] [face]`: **which epoch each place of a strand reads, written out for a ruler**. Each row of `ROWS`
 /// (`read-far`'s table, as [`read_strand_states`] reads it) is read whole as a passage by two streams; `OUT/cut.tsv` takes a line a row:
 /// its index, its places, the known stream's anchors, and the epoch each open place reads (`-` where it reads none), comma-separated;
 /// `OUT/powers.tsv` a line a site (`row`, `site` of the `2n`, the squared length of the row the level added there, of the state it was
@@ -1781,6 +1781,9 @@ fn read_strand_moments(args: &[String]) -> Result<()> {
 /// is private: its rows are the passage's places.
 pub fn read_strand_cut(args: &[String]) -> Result<()> {
     let words: Vec<&str> = args.iter().skip(12).map(String::as_str).collect();
+    // [the lead, November 26] `past face`: each open place's code at the level's own face beside the cut (`OUT/face.tsv`).
+    let face = words.last() == Some(&"face");
+    let words: Vec<&str> = if face { words[..words.len() - 1].to_vec() } else { words };
     let (past, links) = match words[..] {
         [] => (false, false),
         ["past"] => (true, false),
@@ -1837,6 +1840,27 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
     }
     write_new(&out.join("cut.tsv"), lines.as_bytes())?;
     write_new(&out.join("powers.tsv"), powers.as_bytes())?;
+    if face {
+        // [the lead, November 26, the formal thread's record of nested cycles §9 item 3] The level read at its own face: each open place
+        // that reads an epoch, its site of the `2n` and its symbol's code at the prolonged row alone (on `2^(−20)` bits), on a copy of the
+        // field with the receipt's read set; the state is the same.
+        let mut faced = learner.field.clone();
+        if let Some(sc) = faced.scale.as_deref_mut() {
+            sc.receipt = true;
+        }
+        #[allow(clippy::type_complexity)]
+        let read: Vec<Vec<(usize, i64)>> = rows
+            .par_iter()
+            .map(|classes| faced.strand_level_face(classes, past).map_err(|e| e.to_string()).and_then(|c| c.map(|(_, _, f)| f).ok_or_else(|| "a field whose level does not hear a strand".to_string())))
+            .collect::<std::result::Result<_, _>>()?;
+        let mut text = String::new();
+        for (r, f) in read.iter().enumerate() {
+            for (site, code) in f {
+                text.push_str(&format!("{r}\t{site}\t{code}\n"));
+            }
+        }
+        write_new(&out.join("face.tsv"), text.as_bytes())?;
+    }
     if links {
         // [the lead, November 23] Each epoch's restricted state and its read after the level's ticks, and each open place's row and the
         // state it made, row after row in the table's order.

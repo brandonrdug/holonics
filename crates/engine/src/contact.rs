@@ -1598,6 +1598,22 @@ impl Constitution {
         Ok(Some((anchors.to_vec(), source.to_vec(), powers)))
     }
 
+    /// [measurement; the lead, November 26, the formal thread's record of nested cycles §9 item 3] **A strand's level read at its own
+    /// face, for a ruler on the host**: the known stream's anchors, the epoch each of the `2n` sites reads, and at each open place that
+    /// reads an epoch its symbol's code at the prolonged row alone, read through the opening's reader (the level's own face, `D` then `F`
+    /// with no fine tick; the receipt's read, [`Scale::receipt`], which the caller sets on its copy of the field). The unit's news under
+    /// the level, `C¹_j = Σ ĉ_t`, and the landmarks a second level would cut from it, are read from these outside the machine. A reading:
+    /// no state changes. `None` where the field has no level.
+    pub fn strand_level_face(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(usize, i64)>)>> {
+        if !self.scale.as_deref().is_some_and(|s| s.receipt) {
+            return refuse("a level's face is read with its receipt set on the reading's copy");
+        }
+        let pass = self.strand_pass(classes, true, past)?;
+        let Some(t) = pass.tower.as_ref() else { return Ok(None) };
+        let (anchors, source) = t.strand_cut();
+        Ok(Some((anchors.to_vec(), source.to_vec(), t.receipt_codes())))
+    }
+
     /// [measurement; the lead, November 23, the level's receipt record §5; the formal thread's §19 item 4] **A strand's open places'
     /// moments, ring by ring, for a ruler on the host**: each open place's retarded cavity moment `[n][2M]` on `2^(−16)` (real parts then
     /// imaginary, as [`Constitution::strand_pass`] hands them to every tick), and each of the `M` modes' ring period (zero on a head that
