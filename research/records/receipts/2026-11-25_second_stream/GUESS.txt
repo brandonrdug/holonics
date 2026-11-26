@@ -88,3 +88,21 @@ G-M3  on the wave store, the line continued (W119, 3,000 sections from W118m's e
       Read: (a) and (c) held, one fade a ring is where the two terrains meet and the wave's cycles are heard only by a member with a
       fade of its own (the second fade of section 12, founded where two slices' asks oppose); (c) missed, the three signs of (a) of
       G-M1 were a draw of 0.77 s and the trimming's cause stays unread.
+
+Scored 2026-11-26T00:34:49Z (date -u), G-M3 (a) and (b), from the line's lap W119 (W118m's end continued on the wave store, 3,000
+sections), each figure read at its source on the PC: the lead's frontier_ruler.py on out5_W119, and the fades read from the states'
+material at their own place (the sixteen entries before the two paced heads' fade rates, with the lattice's rest).
+  (a) held at 0.75. A ring's fade in octaves of the skin's (l), W118m's end to W119's end: 128 +0.487 to +0.516, 243 +0.485 to +0.519
+      (256 +0.192 to +0.203, 81 +0.276 to +0.295). Both fade faster: the text's sum carried the one fade a ring holds. On W119j's end
+      128 +0.530 and 243 +0.518.
+  (b) held at 0.5: the held wave at W119's lap mean, one place open, 1.1307 nats a sample (1.2781 a lap before; the count tables 1.266
+      two back, 0.980 both sides). She reached G-M1 (b)'s 1.13 one lap late.
+  (c) and (d) wait on a read that prints each section's sums.
+  Read beside the score:
+  - The read of the fade's covector by slice at W118m's end named the next lap's direction on thirteen of the sixteen rings (a
+    positive sum, the fade slower): 2, 3, 4, 9 slower by 0.008 to 0.015 octave; 16, 27, 81, 128, 243, 256, 729, 2187, 4096 faster by
+    0.011 to 0.103; it missed at 32, 1024 and 6561, the first two where the slices' asks cancel (0.18, 0.23 of their magnitudes). A
+    ruler's sign held to the deposit's own move. (The receipts' fades.py of November 24 reads the material's last sixteen entries,
+    which on a state that holds fade rates are the rates' tail; the figures here are read at the fades' place.)
+  - Every ring from 27 on fades faster than the skin and faster with its period (+0.15 octave at 27, +0.52 at 128 and 243, +1.5 at
+    4096 and 6561), and each moved faster again in this lap, by more the longer the ring.
