@@ -24,7 +24,8 @@ With `more` (the formal thread's guesses of November 23, receipts/2026-11-23_han
   - G-H2: the count of words since the line's start with the place's index in its line (in buckets of eight) taken out of both sides;
   - G-H3: the word two before, split by the length of the word between (2 to 3, 4 to 6, 7 or more letters);
   - G-H4: the word two before with the word before's cell taken out of both sides (its one-hot regressed out);
-  - G-H5: the word before, read at the current word's letters 1 to 6, in words of six letters or more.
+  - G-H5: the word before, read at the current word's letters 1 to 6, in words of six letters or more;
+  - G-Z3 (November 26): the word two before, read at the current word's letters 1 to 4, in words of four letters or more.
 """
 import hashlib
 import sys
@@ -171,6 +172,39 @@ def main():
             out.append(f"letter_{k}={share(onehot([q[2] for q in rows_k])):.3f}")
         X, side = X_all, side_all
         print(f"WORD_PRESENCE_GH5 prev_word ({len(at_letter[1])} words of six letters or more) " + ' '.join(out))
+        # G-Z3 (the formal thread, November 26): the word two before at the current word's letters 1 to 4, words of four letters or more.
+        at_two = {k: [] for k in range(1, 5)}
+        for r in sorted(count):
+            text = texts[r][:count[r]]
+            for t in range(1, len(text)):
+                if letter(text[t]) and text[t - 1] in (32, 10):
+                    e = t
+                    while e < len(text) and letter(text[e]):
+                        e += 1
+                    if e - t < 4:
+                        continue
+                    words, j = [], t - 1
+                    while len(words) < 2 and j >= 0:
+                        while j >= 0 and not letter(text[j]):
+                            j -= 1
+                        end = j + 1
+                        while j >= 0 and letter(text[j]):
+                            j -= 1
+                        if end > j + 1:
+                            words.append(text[j + 1:end])
+                    if len(words) < 2:
+                        continue
+                    two = cell(words[1])
+                    for k in range(1, 5):
+                        at_two[k].append((r, t + k - 1, two))
+        out = []
+        for k in range(1, 5):
+            rows_k = at_two[k]
+            X = opens[[offset[q[0]] + q[1] for q in rows_k]]
+            side = np.array([q[0] % 2 == 0 for q in rows_k])
+            out.append(f"letter_{k}={share(onehot([q[2] for q in rows_k])):.3f}")
+        X, side = X_all, side_all
+        print(f"WORD_PRESENCE_GZ3 prev2_word ({len(at_two[1])} words of four letters or more) " + ' '.join(out))
 
 
 if __name__ == '__main__':

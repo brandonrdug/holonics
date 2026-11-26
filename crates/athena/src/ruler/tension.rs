@@ -759,6 +759,16 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     Ok(())
 }
 
+/// [the lead, November 26] A row's text as its octets: escaped (`\\n` a line's end), or `hex:` and its octets two hex digits each, for a
+/// passage of any octets (the wave's held documents), as `read-reach` reads its rows.
+fn row_octets(t: &str) -> std::result::Result<Vec<u8>, String> {
+    match t.strip_prefix("hex:") {
+        Some(h) if h.len() % 2 == 0 => (0..h.len()).step_by(2).map(|k| u8::from_str_radix(&h[k..k + 2], 16).map_err(|e| e.to_string())).collect(),
+        Some(_) => Err("a hex row of an odd count of digits".into()),
+        None => Ok(t.replace("\\n", "\n").into_bytes()),
+    }
+}
+
 /// [measurement; the lead, November 18, the record of the two streams §14] `read-strand-states UNITS UNITS_SHA KEYS KEYS_SHA CODEC CODEC_SHA
 /// ROWS ROWS_SHA STATE STATE_SHA OUT [past]`: **what a strand's sites hold, written out for a ruler**. Each row of `ROWS` (`read-far`'s
 /// table: `label<TAB>known text<TAB>next symbol`) is read whole as a passage by two streams, every place known
@@ -801,13 +811,12 @@ pub fn read_strand_states(args: &[String]) -> Result<()> {
     if out.exists() {
         return Err(format!("{} exists", out.display()).into());
     }
-    let unescape = |t: &str| t.replace("\\n", "\n");
     let mut rows: Vec<(String, Vec<usize>)> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         let [label, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
-        let mut classes = codec.encode(unescape(known).as_bytes())?;
-        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        let mut classes = codec.encode(&row_octets(known)?)?;
+        classes.extend(codec.encode(&row_octets(next)?)?.into_iter().take(1));
         if classes.len() < 2 {
             return Err("a row of fewer than two places".into());
         }
@@ -1799,13 +1808,12 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
     if out.exists() {
         return Err(format!("{} exists", out.display()).into());
     }
-    let unescape = |t: &str| t.replace("\\n", "\n");
     let mut rows: Vec<Vec<usize>> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         let [_, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
-        let mut classes = codec.encode(unescape(known).as_bytes())?;
-        classes.extend(codec.encode(unescape(next).as_bytes())?.into_iter().take(1));
+        let mut classes = codec.encode(&row_octets(known)?)?;
+        classes.extend(codec.encode(&row_octets(next)?)?.into_iter().take(1));
         if classes.len() < 2 {
             return Err("a row of fewer than two places".into());
         }
