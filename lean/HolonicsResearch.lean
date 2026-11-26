@@ -1495,3 +1495,4 @@ import HolonicsResearch.HNN.ContinuedRegion
 import HolonicsResearch.HNN.StoreCut
 import HolonicsResearch.Mathematics.ResidueStacks
 import HolonicsResearch.HNN.ComparedClock
+import HolonicsResearch.Compression.AssemblyDepth
