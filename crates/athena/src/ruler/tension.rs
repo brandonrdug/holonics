@@ -652,18 +652,31 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
-    let unescape = |t: &str| t.replace("\\n", "\n");
+    // [the lead, November 26] A row's prompt and reference may be `hex:` and their octets, two hex digits each, for a passage of any
+    // octets (the wave's held documents); such a row's prompt, write and reference are written back as `hex:` too.
+    let unhex = |h: &str| -> std::result::Result<Vec<u8>, String> {
+        if h.len() % 2 != 0 {
+            return Err("a hex row of an odd count of digits".into());
+        }
+        (0..h.len()).step_by(2).map(|k| u8::from_str_radix(&h[k..k + 2], 16).map_err(|e| e.to_string())).collect()
+    };
+    let unescape = |t: &str| -> std::result::Result<String, String> { Ok(t.replace("\\n", "\n")) };
     let escape = |b: &[u8]| String::from_utf8_lossy(b).replace('\n', "\\n").replace('\t', "\\t");
+    let hexed = |b: &[u8]| format!("hex:{}", b.iter().map(|o| format!("{o:02x}")).collect::<String>());
     let mut rows: Vec<(String, Vec<u8>, Vec<usize>, Vec<u8>)> = Vec::new();
+    let mut hex_rows: Vec<bool> = Vec::new();
     for line in table.lines() {
         let w: Vec<&str> = line.split('\t').collect();
         let [label, prompt, reference] = w[..] else { return Err("a forms row that is not three fields".into()) };
-        let bytes = unescape(prompt).into_bytes();
+        let hex = prompt.starts_with("hex:");
+        hex_rows.push(hex);
+        let field = |t: &str| -> std::result::Result<Vec<u8>, String> { if hex { unhex(t.strip_prefix("hex:").unwrap_or(t)) } else { unescape(t).map(String::into_bytes) } };
+        let bytes = field(prompt)?;
         let classes = codec.encode(&bytes)?;
         if classes.is_empty() {
             return Err("a forms row with an empty prompt".into());
         }
-        rows.push((label.to_string(), bytes, classes, unescape(reference).into_bytes()));
+        rows.push((label.to_string(), bytes, classes, field(reference)?));
     }
     std::fs::create_dir(out)?;
     let void = codec.void();
@@ -726,8 +739,9 @@ pub fn write_next(args: &[String], realization: &mut dyn holonics_engine::realiz
         }
     }
     let mut text = String::new();
-    for ((label, prompt, _, reference), w) in rows.iter().zip(&written) {
-        text.push_str(&format!("{label}\t{}\t{}\t{}\n", escape(prompt), escape(&codec.decode(w)), escape(reference)));
+    for (((label, prompt, _, reference), w), &hex) in rows.iter().zip(&written).zip(&hex_rows) {
+        let out_of = |b: &[u8]| if hex { hexed(b) } else { escape(b) };
+        text.push_str(&format!("{label}\t{}\t{}\t{}\n", out_of(prompt), out_of(&codec.decode(w)), out_of(reference)));
     }
     write_new(&out.join("forms.written"), text.as_bytes())?;
     let mut void_text = String::from("label\tplace\twritten\tvoid_ppm\tspread_millibits\n");

@@ -1,0 +1,21 @@
+Fixed 2026-11-26T16:41:45Z (date -u), the lead, before W128w trains. Refs #404.
+The line's laps heard whole, no change: W128w from W127w's end and W129w from W128w's, 3,000 sections each on e5fr on the wave's store,
+every read at each lap's mean. The premise read first: the plain line's held text stood at 0.6912 to 0.6916 from W124 to W127 while
+the wave fell 0.0066 a lap; two laps heard whole took the held text to 0.6871 (-0.0042 against the plain W127) and the wave to 0.8903.
+Whether hearing whole compounds or was a step taken once is what the two laps read (the joined arm at mask 191 held a step, §19 of
+November 24).
+G-L3 (at the lap means, one place open):
+  (a) (0.45) the held text at W129w's mean stands at least 0.002 under W127w's 0.6871;
+  (b) (0.55) the wave on the joined store at W129w's mean stands at 0.885 or under (W127w 0.8903);
+  (c) (0.6) the wide panel's lexicon share at W129w's mean stands within 3 points of W127w's 71%.
+
+Scored at 2026-11-26T19:57:18Z, at the lap means (sections 2,001 to 3,000), one place open:
+  (a) held: the held text at W129w's mean is 0.6824, paired against W127w's -0.0047 (+-0.0006); by region acts -0.0082, books -0.0059,
+      code -0.0014, dialogue -0.0003, harness -0.0103, logic -0.0026, science -0.0048, theory -0.0058, web -0.0000, wikidata -0.0073.
+      W128w's mean read 0.6782 between them, so the two lap means scatter by 0.0042 on a fall of 0.0047 over two laps.
+  (b) held: the wave on the joined store 0.8903, 0.8896, 0.8846 at W127w, W128w and W129w (0.885 asked).
+  (c) held: the wide panel's lexicon share 71% (W127w), 72% (W129w, 1,580 of 2,168 words), loops 20 and 15 of 160.
+Beside the guess: the far rows' law past a cut at 256 1.0983, 1.0921, 1.0917 (by age past the cut at W129w against W127w: one place
+1.362 against 1.386, two and three 1.059 against 1.085, 64 to 255 1.066 to 1.068 against 1.072 to 1.073); the theory panel's theory rows
+87% and 84% at W128w and W129w (93% at W127w), its logic rows 91% and 90%; the probe's first answers 11 of 200 at W129w. Laps: W128w
+3,414 s (16:41:45 to 17:38:39), W129w 3,568 s (17:38:39 to 18:38:07).
