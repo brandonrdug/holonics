@@ -1,0 +1,59 @@
+# far_given_near_ruler.py on the wave slice's held cut (128 documents, 26,211,998 samples; every place from 1,040 into its document),
+# run on the PC's VM (2 cores) on November 26. Outputs verbatim; RUN.txt has the commands, times and hashes.
+
+## terrain, then shuffle (the first version of the ruler, sha256 195d95a7c73838e2...; ended 11:22 UTC)
+FAR_HEAD levels=13 documents=128 places=26211998 mode=terrain from_place=1040
+FREE near=none base=2.5661 places=26078878 3:+0.7310 4:+0.6350 8:+0.4453 9:+0.4194 16:+0.3650 24:+0.3532 27:+0.3509 32:+0.3483 48:+0.3260 64:+0.3231 81:+0.3326 96:+0.3290 128:+0.3205 160:+0.3160 192:+0.3023 243:+0.2830 256:+0.2784 384:+0.2457 512:+0.2136 729:+0.1680 1024:+0.1267
+GAIN near=1,2 base=1.2631 places=26078878 3:+0.0792 4:+0.0690 8:+0.0548 9:+0.0532 16:+0.0404 24:+0.0327 27:+0.0319 32:+0.0306 48:+0.0287 64:+0.0276 81:+0.0276 96:+0.0271 128:+0.0256 160:+0.0253 192:+0.0241 243:+0.0221 256:+0.0216 384:+0.0183 512:+0.0153 729:+0.0113 1024:+0.0082
+GAIN near=1,2,16 base=1.2227 places=26078878 3:+0.0651 4:+0.0504 8:+0.0308 9:+0.0282 24:+0.0141 27:+0.0115 32:+0.0089 48:+0.0068 64:+0.0054 81:+0.0051 96:+0.0043 128:+0.0038 160:+0.0036 192:+0.0028 243:+0.0017 256:+0.0015 384:-0.0000 512:-0.0011 729:-0.0027 1024:-0.0039
+FAR_HEAD levels=13 documents=128 places=26211998 mode=shuffle from_place=1040
+FREE near=none base=2.5661 places=26078878 3:+0.0015 4:+0.0015 8:+0.0015 9:+0.0016 16:+0.0015 24:+0.0015 27:+0.0015 32:+0.0015 48:+0.0015 64:+0.0015 81:+0.0015 96:+0.0015 128:+0.0016 160:+0.0015 192:+0.0015 243:+0.0016 256:+0.0015 384:+0.0016 512:+0.0015 729:+0.0015 1024:+0.0015
+GAIN near=1,2 base=1.2631 places=26078878 3:-0.0006 4:-0.0006 8:-0.0006 9:-0.0006 16:-0.0006 24:-0.0006 27:-0.0006 32:-0.0006 48:-0.0006 64:-0.0006 81:-0.0006 96:-0.0006 128:-0.0006 160:-0.0006 192:-0.0006 243:-0.0006 256:-0.0006 384:-0.0006 512:-0.0006 729:-0.0006 1024:-0.0006
+GAIN near=1,2,16 base=1.2227 places=26078878 3:-0.0082 4:-0.0083 8:-0.0083 9:-0.0083 24:-0.0083 27:-0.0082 32:-0.0083 48:-0.0083 64:-0.0082 81:-0.0083 96:-0.0082 128:-0.0083 160:-0.0083 192:-0.0082 243:-0.0082 256:-0.0083 384:-0.0082 512:-0.0083 729:-0.0082 1024:-0.0083
+
+## envelope, then plant:128:0.1 (the first version; ended 11:25 UTC)
+FAR_HEAD levels=13 documents=128 places=26211998 mode=envelope from_place=1040
+ENVELOPE near=none base=2.5661 places=26078878 fade4:+0.4718 fade16:+0.5352 fade64:+0.5621 fade256:+0.4991 fade1024:+0.3357 fade4096:+0.1668
+ENVELOPE_SHUFFLED near=none base=2.5661 places=26078878 fade4:+0.0021 fade16:+0.0025 fade64:+0.0027 fade256:+0.0028 fade1024:+0.0028 fade4096:+0.0035
+ENVELOPE near=1,2 base=1.2631 places=26078878 fade4:+0.0510 fade16:+0.0592 fade64:+0.0626 fade256:+0.0511 fade1024:+0.0269 fade4096:+0.0098
+ENVELOPE_SHUFFLED near=1,2 base=1.2631 places=26078878 fade4:-0.0004 fade16:-0.0003 fade64:-0.0002 fade256:-0.0002 fade1024:-0.0002 fade4096:-0.0004
+ENVELOPE near=1,2,16 base=1.2227 places=26078878 fade4:+0.0215 fade16:+0.0248 fade64:+0.0274 fade256:+0.0201 fade1024:+0.0056 fade4096:-0.0037
+ENVELOPE_SHUFFLED near=1,2,16 base=1.2227 places=26078878 fade4:-0.0080 fade16:-0.0079 fade64:-0.0078 fade256:-0.0078 fade1024:-0.0079 fade4096:-0.0081
+FAR_HEAD levels=13 documents=128 places=26211998 mode=plant:128:0.1 from_place=1040
+GAIN near=1,2,16 base=1.4816 places=26078878 96:+0.0058 127:+0.0312 128:+0.0827 129:+0.0475 160:+0.0053
+
+## envelope2 near=1,2 (this version, sha256 2ccf82d3b0a2fb98...)
+11:36:36
+FAR_HEAD levels=13 documents=128 places=26211998 mode=envelope2 from_place=1040
+FAR_ENVELOPE near=1,2+env4@1 base=1.2104 places=26078878 fade4:+0.0205 fade16:+0.0260 fade64:+0.0288 fade256:+0.0213 fade1024:+0.0082
+FAR_ENVELOPE_SHUFFLED near=1,2+env4@1 base=1.2104 places=26078878 fade4:-0.0041 fade16:-0.0040 fade64:-0.0039 fade256:-0.0039 fade1024:-0.0039
+FAR_ENVELOPE near=1,2+env16@1 base=1.1979 places=26078878 fade4:+0.0062 fade16:+0.0087 fade64:+0.0103 fade256:+0.0066 fade1024:+0.0005
+FAR_ENVELOPE_SHUFFLED near=1,2+env16@1 base=1.1979 places=26078878 fade4:-0.0059 fade16:-0.0058 fade64:-0.0058 fade256:-0.0057 fade1024:-0.0057
+11:36:51
+
+## envelope2 near=1,2,16 (this version)
+11:37:15
+FAR_HEAD levels=13 documents=128 places=26211998 mode=envelope2 from_place=1040
+FAR_ENVELOPE near=1,2,16+env4@1 base=1.1909 places=26078878 fade4:+0.0013 fade16:+0.0029 fade64:+0.0045 fade256:-0.0026 fade1024:-0.0150
+FAR_ENVELOPE_SHUFFLED near=1,2,16+env4@1 base=1.1909 places=26078878 fade4:-0.0271 fade16:-0.0270 fade64:-0.0271 fade256:-0.0272 fade1024:-0.0272
+FAR_ENVELOPE near=1,2,16+env16@1 base=1.1889 places=26078878 fade4:-0.0036 fade16:-0.0016 fade64:-0.0033 fade256:-0.0108 fade1024:-0.0218
+FAR_ENVELOPE_SHUFFLED near=1,2,16+env16@1 base=1.1889 places=26078878 fade4:-0.0327 fade16:-0.0327 fade64:-0.0327 fade256:-0.0328 fade1024:-0.0328
+11:37:31
+
+## the planted control of envelope2 (far_given_near_synth.py slow | steady, read in the cloud container)
+# synth_slow2
+11:36:06
+FAR_HEAD levels=13 documents=20 places=1200000 mode=envelope2 from_place=1040
+FAR_ENVELOPE near=1,2+env4@1 base=1.2377 places=1179200 fade4:-0.0331 fade16:-0.0185 fade64:-0.0217 fade256:-0.0429 fade1024:-0.0563
+FAR_ENVELOPE_SHUFFLED near=1,2+env4@1 base=1.2377 places=1179200 fade4:-0.0603 fade16:-0.0604 fade64:-0.0610 fade256:-0.0606 fade1024:-0.0613
+FAR_ENVELOPE near=1,2+env16@1 base=1.2251 places=1179200 fade4:-0.0509 fade16:-0.0368 fade64:-0.0440 fade256:-0.0661 fade1024:-0.0796
+FAR_ENVELOPE_SHUFFLED near=1,2+env16@1 base=1.2251 places=1179200 fade4:-0.0834 fade16:-0.0828 fade64:-0.0834 fade256:-0.0829 fade1024:-0.0843
+11:36:07
+# synth_steady2
+11:36:07
+FAR_HEAD levels=13 documents=20 places=1200000 mode=envelope2 from_place=1040
+FAR_ENVELOPE near=1,2+env4@1 base=1.2743 places=1179200 fade4:-0.0582 fade16:-0.0581 fade64:-0.0584 fade256:-0.0587 fade1024:-0.0588
+FAR_ENVELOPE_SHUFFLED near=1,2+env4@1 base=1.2743 places=1179200 fade4:-0.0588 fade16:-0.0585 fade64:-0.0578 fade256:-0.0586 fade1024:-0.0588
+FAR_ENVELOPE near=1,2+env16@1 base=1.2829 places=1179200 fade4:-0.0770 fade16:-0.0745 fade64:-0.0787 fade256:-0.0823 fade1024:-0.0834
+FAR_ENVELOPE_SHUFFLED near=1,2+env16@1 base=1.2829 places=1179200 fade4:-0.0827 fade16:-0.0831 fade64:-0.0826 fade256:-0.0828 fade1024:-0.0834
+11:36:08
