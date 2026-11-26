@@ -69,3 +69,20 @@ of the six holds both clauses: on the five text slices, dense less sparse a plac
 change sign, and 81 is negative in four. Read beside it: the ring of 128's sign holds where a slice's dense half has the longer regions
 (code, 173 against 107 places) and where it has the shorter (science 126 against 143, web 112 against 133), so it is not the halves'
 lengths; in the two slices with no breaks, parted by length alone, it is negative too (harness, over twice its error; wave). HALVES.txt.
+
+G-W3 and G-W4 (the formal thread's offer of 11:06Z: the cut ruler on the wave's own held rows, the stores' share of a cut's cost
+there), fixed at 2026-11-26T11:09:00Z. Rows: a hundred of the wave slice's held documents, 449 octets from each one's middle
+(448 known), read through `hex:` rows by two streams, on W121's mean, cut at 256. On text the five stores close 0.027 of the cut's
+gap on this state (cut:256:31's closes, table_W121h.txt).
+G-W3 (0.45): on the wave's rows the five stores close at least 0.2 of the gap (closes at cut:256:31 >= 0.2).
+G-W4 (0.4): of the five stores alone, the rings' moments (cut:256:1) close the most of the gap.
+
+Scored at 2026-11-26T11:18:16Z: G-W3 missed, G-W4 missed (cutwave/table_W121.txt; 497 s for ten settings at 8 threads,
+projected 9 minutes). On the wave's rows a cut costs its own place 20.53 nats with nothing let across (the law 0.96) and the 192 places
+past it 0.0129 a place, all of it within sixteen samples (by age past the cut, nothing against the law: 1.564 against 1.034 at one,
+1.461 against 1.166 at two and three, 1.202 against 1.099 at eight to fifteen, the same from sixteen on, and under the law from 64 on,
+1.119 against 1.124 and 1.142 against 1.154). The five stores bring the cut's own place back to 1.016 and the first place past it to
+1.213, and from sixteen samples on cost 0.008 to 0.030 a place over nothing, so over the 192 places they close -0.655 of the gap (G-W3
+asked 0.2). Each store alone costs the first places more than nothing does (the moments 4.09, the circles 12.71, the near field 2.58,
+the crowds 6.37, the level 3.29 at one sample past the cut), and of the five the near field closes the most over the 192 places (-0.287;
+the moments -4.597), so G-W4 missed.

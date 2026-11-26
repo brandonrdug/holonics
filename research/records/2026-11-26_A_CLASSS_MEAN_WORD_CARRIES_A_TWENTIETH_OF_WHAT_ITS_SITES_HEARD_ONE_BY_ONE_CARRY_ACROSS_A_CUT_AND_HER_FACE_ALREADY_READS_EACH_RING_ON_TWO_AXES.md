@@ -116,3 +116,51 @@ difference inside its scatter. What it shows is a sign: denser breaks ask the ri
 32 places) to keep longer, and the ring of 128 to keep shorter. That sign is the form §5.3's law would take if the count's store
 were the near rings, and the read that would move it is the same ruler over a length that holds the difference over its scatter
 (about four times the sections, on the rule that a null is held to a length). Weight on §5.3: 0.3.
+
+## 4. What crosses a cut on the wave
+
+The formal thread split the joined arm's gain by what crosses (the cut record's §11, 11:06 UTC): on text, a lap of joined stretches
+trained hearing by address and the open place's crowds and no store, and its reading (0.75) is that what the far past is worth on text
+is recurrence, a place, which an address carries and a store does not. It named the read that would weigh a second fade on the wave:
+the cut ruler on the wave's own held rows.
+
+**The ruler.** `read-reach` takes a row's text as `hex:` and its octets, for a passage of any octets (`athena::ruler::tension::read_reach`).
+The rows: a hundred of the wave slice's held documents, 449 octets from each one's middle (448 known), on W121's mean, cut at 256, by
+two streams (`receipts/2026-11-26_class_hairs/cutwave/`; the rows stay under `.local/`).
+
+**The read.** With nothing let across, a cut costs its own place 20.53 nats (the law 0.96), and the 192 places past it 0.0129 a place,
+all within sixteen samples: by age past the cut, 1.564 against the law's 1.034 at one, 1.461 against 1.166 at two and three, 1.202
+against 1.099 at eight to fifteen, the same from sixteen on. Beyond 64 samples the law's far past costs a little more than hearing
+nothing (1.124 against 1.119 at 64 to 127, 1.154 against 1.142 at 128 to 255).
+
+The five stores bring the cut's own place back to 1.016 and the first place past it to 1.213. From sixteen samples on they cost 0.008 to
+0.030 a place over nothing, so over the 192 places they close −0.655 of the gap. Each store alone costs the first places more than
+nothing does (at one sample past the cut: the moments 4.09, the circles 12.71, the near field 2.58, the crowds 6.37, the level 3.29), so
+the five carry the cut's first place together and none alone. G-W3 (0.45: the five stores close at least a fifth of the gap) and G-W4
+(0.4: the moments close the most of the five alone; the near field does, −0.287 against −4.597) missed.
+
+**What it says.** On the wave the far past is worth sixteen samples, and a cut's cost is its own first place; the stores carry that
+place and no span, as on text, where they also cost past about thirty places (the formal thread's 0.009 a place from place 32 on). A
+second fade would lengthen a store's hold where holding already costs, so the weight that a second-fade arm on the wave moves its held
+code: 0.2. What a store answers on both streams is a re-opening, and the lever both reads leave is the formal thread's: sharp rays
+across a stretch's first place, priced in pairs.
+
+## 5. The line's two plain laps
+
+G-L2 (`receipts/2026-11-26_class_hairs/GUESS_L2.txt`, fixed 08:55:48 UTC before W124 trained): W124 from W123's end and W125 from
+W124's, 3,000 sections each on e5fk on the wave's store, no change, every read at each lap's mean (sections 2,001 to 3,000).
+
+| lap | the wave's held cut | the held text | all held places | lap on the card |
+|---|---|---|---|---|
+| W123 | 0.9311 | 0.6948 | 0.7163 | |
+| W124 | 0.9245 | 0.6912 | 0.7124 | 2,323 s |
+| W125 | 0.9179 | 0.6916 | 0.7121 | 2,477 s |
+
+(a) (0.5, the wave at W125's mean at 0.900 or under) missed. (b) (0.7, the text within 0.004 of W123's) held, 0.0032 under it. (c)
+(0.55, the wave falls at both laps) held, by 0.0066 and 0.0066, where the five laps before fell by 0.147, 0.102, 0.012, 0.053 and 0.033.
+W125 less W124 paired over the 220,961 held places is −0.0003 (±0.0006): the wave −0.0066, wikidata −0.0052, acts −0.0032, dialogue
++0.0107, books +0.0037. Her writes held their counts (the wide panel's lexicon share 72% at both means, loops 21 and 23 of 160; the long
+panel 73% and 77%, loops 4 and 3 of 20; the theory panel's theory rows 89% and 86%, its logic rows 91% and 88%, no loops), and the probe
+panel wrote its first answers in 17 and 9 of 200. Every region read 0.02 to 0.05 octaves louder at W125, and loudness against code stood
+near zero (Spearman −0.041 and −0.036). The line's end is W125's STATE.3000: the wave still falls a lap and the text holds, so the plain
+line is a slow wave and a standing text, and a change that moves the text is the next arm's subject.

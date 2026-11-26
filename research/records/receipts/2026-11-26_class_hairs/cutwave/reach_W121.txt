@@ -1,0 +1,30 @@
+REACH setting=law group=all places=44800 nats_millionths=1118460 ms=69886
+REACH setting=law group=wave places=44800 nats_millionths=1118460 ms=69886
+REACH setting=cut:256:0 group=all places=44800 nats_millionths=1167661 ms=113499
+REACH setting=cut:256:0 group=wave places=44800 nats_millionths=1167661 ms=113499
+REACH_PAIRS setting=cut:256:0 far=0 hairs=0
+REACH setting=cut:256:31 group=all places=44800 nats_millionths=1127709 ms=157439
+REACH setting=cut:256:31 group=wave places=44800 nats_millionths=1127709 ms=157439
+REACH_PAIRS setting=cut:256:31 far=0 hairs=0
+REACH setting=cut:256:63 group=all places=44800 nats_millionths=1122073 ms=206316
+REACH setting=cut:256:63 group=wave places=44800 nats_millionths=1122073 ms=206316
+REACH_PAIRS setting=cut:256:63 far=17847828 hairs=0
+REACH setting=cut:256:95 group=all places=44800 nats_millionths=1118460 ms=276459
+REACH setting=cut:256:95 group=wave places=44800 nats_millionths=1118460 ms=276459
+REACH_PAIRS setting=cut:256:95 far=88113218 hairs=0
+REACH setting=cut:256:1 group=all places=44800 nats_millionths=1197152 ms=320505
+REACH setting=cut:256:1 group=wave places=44800 nats_millionths=1197152 ms=320505
+REACH_PAIRS setting=cut:256:1 far=0 hairs=0
+REACH setting=cut:256:2 group=all places=44800 nats_millionths=1206732 ms=364525
+REACH setting=cut:256:2 group=wave places=44800 nats_millionths=1206732 ms=364525
+REACH_PAIRS setting=cut:256:2 far=0 hairs=0
+REACH setting=cut:256:4 group=all places=44800 nats_millionths=1147134 ms=408476
+REACH setting=cut:256:4 group=wave places=44800 nats_millionths=1147134 ms=408476
+REACH_PAIRS setting=cut:256:4 far=0 hairs=0
+REACH setting=cut:256:8 group=all places=44800 nats_millionths=1179460 ms=452946
+REACH setting=cut:256:8 group=wave places=44800 nats_millionths=1179460 ms=452946
+REACH_PAIRS setting=cut:256:8 far=0 hairs=0
+REACH setting=cut:256:16 group=all places=44800 nats_millionths=1161208 ms=497354
+REACH setting=cut:256:16 group=wave places=44800 nats_millionths=1161208 ms=497354
+REACH_PAIRS setting=cut:256:16 far=0 hairs=0
+REACH_DONE rows=100 settings=10 ms=497377
