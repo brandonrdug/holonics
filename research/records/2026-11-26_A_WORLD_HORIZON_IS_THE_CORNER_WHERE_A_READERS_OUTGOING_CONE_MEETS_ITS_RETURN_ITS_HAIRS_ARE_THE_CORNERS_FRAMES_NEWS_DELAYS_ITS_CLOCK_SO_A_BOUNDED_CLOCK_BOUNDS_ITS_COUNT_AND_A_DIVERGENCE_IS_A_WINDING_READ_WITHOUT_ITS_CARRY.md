@@ -1,6 +1,6 @@
 # A world-horizon is the corner where a reader's outgoing cone meets its return: its hairs are the corner's frames, news delays its clock so a bounded clock bounds its count, and a divergence is a winding read without its carry
 
-November 26, 2026, 08:47 to 09:40 UTC, a thread of the project, in a cloud container (no card, no engine read). Refs #404, #410,
+November 26, 2026, 08:47 to 09:16 UTC, a thread of the project, in a cloud container (no card, no engine read). Refs #404, #410,
 #386. Occasion: Brandon sent, without comment, the paper V. Chandrasekaran, *An algebraic quantization of gravity from the null
 cone*, arXiv:2611.34924 (November 25, 2026). It was read whole (83 pages; appendices A to C for their results) and answered in the
 thread at its weight before this record was written. Receipts: [`receipts/2026-11-26_null_cone/`](receipts/2026-11-26_null_cone/).
@@ -203,7 +203,131 @@ transverse directions are her stores and rings, so which of her quantities is a 
 make before any build, and the prologue's result (a one-dimensional strand whose clock bound does not bound its content) may be the
 closer chart for a single ring.
 
-## 8. Atlas, receipts and sources
+## 8. Two parts specified for the lead (09:07 to 09:16 UTC)
+
+The lead took §5.2 and §5.3 as host reads on W121's mean, and asked for §5.1 and §5.4 as parts stated on the objects: state, law,
+covector, founding locus and card. No ruler for §5.2 was written here; the lead writes it from `read-reach`'s codes. Both parts below
+are `agent-inferred` from the paper and the engine's source as it stands at `721e2d0`, and each is read by a host ruler before it is
+built (CLAUDE.md, a premise is a presence at the consumer).
+
+### 8.1 The class hairs (§5.1)
+
+**Which store a hair is.** One hair stands for each head `h` and each of the head's classes `c`: the 81 classes the contact already
+reads (`Declaration::class_trits`, four trits at the reach of 3,771). A class is the cone sector of each of the head's first four
+modes, the sky plate, the ground plate or the bridge across the mode's light cone `|Re| = |Im|` (`shell`). That is the paper's
+corner in the engine's own geometry: a ray through the corner is labelled by where it crosses each mode's null cone. The hair holds
+the octave crowd's law (`Crowd`, `lock`), read over a class instead of an octave of distance. It has a mass `M`, the summed framed
+key word `K` and the summed framed value word `V`, each word `2n` reals. That makes 324 hairs of 33 words each, 10,692 words in all
+at the face's grain. The masses differ from hair to hair, as the paper's `K(y)` differs from ray to ray.
+
+**Its own frame.** Each source enters in its own place's frame (`k̃_j = U_j ⊙ k_j`, `ṽ_j = U_j ⊙ v_j`, `frame_placed`), and a receiver
+reads the hair through its own frame (`conj(U_i)`). Only the relative turn reaches the receiver, which is the paper's gluing law: a
+common boost carries no charge. On a turned head the hair's phase is the place of its class's sources on that head's rings, so the
+hair tells the receiver when its class last stood, as a residue on each period. On a still head the hair is blind to place.
+
+**Its law: the one move's step** (THE_ENGINE §2). At a definite site `j` of class `c` on head `h`, after each tick:
+
+```text
+(M, K, V)_hc ← (γ_j M + 1,  γ_j K + k̃_j,  γ_j V + ṽ_j)
+```
+
+At every other site the hair is carried by `γ_j` alone. The fade runs on the clock of news, `γ_j = 2^(−φ_h c_j)`. Here `c_j` is the
+site's news, the code of its class at its opening face (`level_news`), read as a gate, as the level reads it. `φ_h` is the head's
+fade a bit of news, a learner's state on the log chart, as her rings' fades are (November 24). The product is
+`2^(−φ_h (S_i − S_j))` over the news between source and receiver (`code.site-isolation-landmark`'s `S`). So a hair forgets by the
+news that has crossed since it was charged and never by the places, and through a run the field predicts it holds. This is §4.1's
+law for a store. Its quality is finite wherever `φ_h > 0` (`store.finite-quality`).
+
+**Its read.** Each receiver's row gains one entry for each class it probes: its own class's neighbours across its seams (`probes`),
+about two runs a receiver at `band_bits`. Each entry is scored by `lock(a, K/M, M, skin)` as a crowd is, with its mass as its
+multiplier, and its value is `V/M`. Its share of the row is decided by the lock against the receiver's own probe. No pointer to a
+symbol is returned.
+
+**What crosses.** Inside a region the hairs repeat what sharp hearing and the address already carry: a mode dependent at the receiver,
+which §6 of November 25 shows the deposit leaves alone. A hair earns at the cut. For each slice, the hairs at the end of its region
+in one section are the hairs at its region's first place in the next section, carried by `2^(−φ_h ΔS)` over the news between them.
+This is the paper's corner data, handed across. It is a slow variable carried on the host, read at the section's crossing and
+joined at the next (CLAUDE.md, the host as a second surface), so a section's regions still commute. Its covector stops at the
+carried state: the operands that charged it belong to the deposit before, and the retention law reads it through the present
+constitution and returns its residual. The slice's 10,692 words go in the pass line beside its cursor.
+
+**Its covector.** At the read, the row's return reaches the hair's `K/M` through the lock and its `V/M` through the value. A hair
+charged inside the region passes that return to every source that charged it, `∂(K, V)_hc/∂(k̃_j, ṽ_j) = 2^(−φ_h (S_i − S_j))`: a
+suffix sum over the class's list, reversed as the crowds' prefix sums are. The fade's covector is
+`δφ_h = −ln 2 · Σ_(i, j) (S_i − S_j) 2^(−φ_h (S_i − S_j)) ⟨δ(K, V), (k̃_j, ṽ_j)⟩`, deposited on the rings' log chart. The news is a
+gate, and no return reaches it.
+
+**Its founding.** All 81 classes of each head are founded at once: the paper's corner has a hair on every ray, and the masses make
+them unequal, so no threshold is set. `φ_h` is founded at the fade of the ring of 16 that she holds, divided by the mean news a
+place over the founding section. At its founding a hair then fades as her ring does on average, and the deposit moves it from
+there; the founding number is read and not picked. A region with no past, or a hair of zero mass, adds no entry. So with every hair
+empty the forward is today's bit for bit, and that is the twin test.
+
+**On the card.** The contact already sorts each head's definite sites into class lists by one stable counting sort (`ClassLists`).
+Inside a region a hair is that class list's prefix in the one move's compose, `(γ₂ γ₁, γ₂ m₁ + m₂, γ₂ j₁ + j₂)`. The compose is
+associative for every `γ`, so the scan is cut into blocks as the carry circles' is (`field_pair_scan`). Its terms meet at the face's
+grain and are released once at the read. The read is one more source in the contact's row, whose kernels already score a crowd's
+count in its own exponent (`field_contact_l*`). The return is the suffix scan and the contact's own row return. The carried hairs go
+up with the region at its upload: 324 × 33 words a slice.
+
+**Read before it is built (guess fixed, 0.5).** Add a ruler bit 512 to `ruler_cut`: every receiver past the cut hears the hairs of
+the sites before it, at `φ = 0`. The read is on W121's mean, the 100 held rows, cut at 256. Guess: beside the five stores
+(`cut:256:543` against `cut:256:31`), the hairs bring back at least half of what hearing by address brings beside them
+(`cut:256:63` against `cut:256:31`). Second guess (0.35): hairs and address together (`cut:256:575`) bring back at least 0.005
+nats a place more than address alone. Either guess fails if the class's mean word blurs what one-by-one hearing finds. Then a hair
+founded at 81 classes is too coarse, and 8.2 is how a hair grows finer.
+
+**The arm, once built.** The arm (W-h) runs beside the plain control from the same saved state, with one change: the hairs and
+their carried state. It is read at both means, with the cut ruler at the line's mask, the panel and the loudness (the lap
+procedure).
+
+### 8.2 Founding at focusing (§5.4)
+
+**Which store's action.** The hair's. It carries one moment more, its spread `P = Σ γ… |ṽ_j|²` (one real), so it holds a second
+moment of what crossed it beside the first, as the deposit does. Its action is
+
+```text
+Ξ_hc = ln(M P / |V|²) ≥ 0
+```
+
+`Ξ_hc ≥ 0` by Cauchy–Schwarz, and it is zero only where every source the hair holds carried one framed value word. `e^(−Ξ)` is the
+hair's coherent share, the area its charge still spans, and `Ξ` is the paper's shear action read on a store.
+
+**Measured how.** The read is the hair's expansion over a lap, `θ_hc = Δ ln |V|² / Δ ln M`, at the lap's crossing. `θ = 2` is an
+aligned congruence, whose coherent power grows as its mass squared. `θ = 1` is unrelated sources, whose power grows as their count.
+`θ < 1` means the sources cancel: the area's growth `p e^(−Ξ)` has fallen toward zero, and the congruence through that class has
+focused. The bound 1 is the law's: what unrelated sources give.
+
+**Founds which member.** A hair with `θ_hc ≤ 1` over a lap, and with the covector reaching it non-zero on the held half, is covered
+by its three children: the class refined by the next mode's shell (trit five of the source's key; the head has eight modes). This
+is the paper's new diamond whose cones are regular at the focal point. The founding is decided by code length
+(`contact.tension-founds-face`). The children's share of the hair's covector power, `Σ_k |δV_k|²/M_k − |δV|²/M` on the held half,
+must exceed the description of their founded words. That description is `½ log₂` of each child's count a word, the code length
+that refuses a chance correlation. The parent stays beside its children. A source charges the deepest founded hair whose trits its
+key word matches, and a receiver reads the deepest its probes reach. Each head's hairs are then a tree of trits: the class address
+refined where the tension asks, never where items were seen. It grows only by this law.
+
+**On the card.** The split is a host step at the lap's crossing, a founding, at the grain of the learner's clock. On the card each
+source's class word is read at the founded depth: the counting sort keys on the founded node's index in place of the class. The
+kernels are the same.
+
+**The failures these could repeat, and what differs.**
+- *The binding bank of October 26* was a key, query and value store: 64 slots written by the delta rule, opened as an induction
+  copier and accepted on a lookup benchmark. A hair brings no new key, query or value map. It holds the head's own framed words over
+  the contact's own class address, is charged additively by the one move and never overwritten, fades by news, and opens empty. Its
+  acceptance is the cut's cost and her writes. By the store test it obeys a balance (arrival, and a fade by news), it is read by the
+  contact's own flux, and its size is fixed by founding, never by the items seen.
+- *The passage tree* held decayed counts by exact byte context and returned the class that followed the deepest match. A hair is
+  addressed by the cone sectors of key modes that the deposit moves, and it enters a row by its lock against the receiver's own
+  probe. It holds a mean word, not a successor.
+- *A width as a dial.* The 81 classes are the contact's own, and the children are founded by 8.2's law.
+- *A switch outside the law.* The hairs are a declaration word with their state carried in the learner.
+
+Weights. 0.5 and 0.35 on the two guesses of 8.1. 0.4, as in §5.1, that a built arm moves the cut's cost where joining did not. 0.3
+that founding at focusing founds children on her line within a lap of the hairs' arm, at the trits where recurrence stands
+(`store.far-price-stands-at-recurrence`).
+
+## 9. Atlas, receipts and sources
 
 Atlas rows added: `gr.null-clock-shear-delay`, `gr.corner-hairs-relative-boost`, `gr.bounded-clock-finite-diamond`,
 `gr.pair-amplitude-winding-carry`, `gr.marginal-surface-entropy-half-turns`, `gr.handle-adds-no-state` (physics) and
