@@ -65,3 +65,49 @@ G-R4  the held code with one place open moves by less than 0.003 against the con
       511 places known by less than 0.01. Weight 0.6.
 G-R5  the wide panel's share of words in the lexicon or its count of loops leaves the spread of the last ten laps (69.6 to
       73.8; 18 to 26). Weight 0.3.
+
+Scored 2026-11-26T00:21:42Z (date -u), G-R1 to G-R5, from the lead's arm W119j (W118m's end with set-joined, the join bounded by the
+reach and the section's pairs as two streams) beside W119 (the same state continued), 3,000 sections each, read at the lap means; each
+figure read at its source, the lead's receipts/2026-11-24_fade/GUESS_R.txt and cut/table_W119.txt, table_W119j.txt, repeat_W119.txt,
+repeat_W119j.txt (the hundred far rows cut at 256, nats a place over the law on the 192 places past the cut).
+G-R1  missed at 0.75: the arm's code at its compared places over the first 200 sections stood 0.035 nats a place under the control's
+      (asked 0.04 or more).
+G-R2  missed at 0.6: cut:256:191 reads +0.0859 (se 0.0096) on the arm's mean, asked under 0.07; the control's +0.1023 held its half.
+G-R3  missed at 0.45: cut:256:64 over the law at 32 to 127 places past the cut reads 0.029 on the arm, asked 0.05 or more (0.025 on
+      the control).
+G-R4  held at 0.6: the held text, arm less control paired, -0.0007 (0.0003); the law's code on the far rows past the cut 1.1066
+      against 1.1102.
+G-R5  missed at 0.3: the wide panel stayed inside its spread (72% of words in the lexicon, 23 loops of 160).
+One of five held, and the two I weighed highest missed: I priced one lap as a taken law. The clause's own quantity moved its way, a
+third of what G-R2 asked: the stores and the address across a cut close 0.604 of its cost on the arm against 0.513.
+Read beside the score, from the same tables (weights mine):
+  - The gain stands at the recurrences. From place 32 past the cut, where a run of three octets stood before the cut and not since
+    (3,387 places): the price of the cut +0.717 on the arm against +0.692, and the stores with the address bring back 0.437 of it
+    against 0.358 (0.313 nats a place against 0.248). Where the run is new (7,947 places) the far past is worth -0.019 against
+    -0.016: G-W2 missed. What crosses a cut is still recurrence. (0.85)
+  - Read whole, the far rows code better past place 256 on the arm in all five groups (books -0.0018, code -0.0068, science -0.0068,
+    web -0.0002, wikidata -0.0023; -0.0036 over all against -0.0007 on the held text): the places with a long past gain most. (0.6
+    that this stands at the second lap.)
+  - The stores' own share is unread: the lead's settings hold 0 (nothing), 191 (the stores, the address and the crowds) and 64 (every
+    site one by one). The masks 31, 63 and 159 part them, read next on both means (G-R6).
+
+Fixed 2026-11-26T00:21:42Z (date -u), before the read of masks 31, 63 and 159 on W119's and W119j's means (the same hundred rows, the
+host ruler, the formal thread's build of main at 0f2206c3). Read first: holonics_engine::contact (CUT_MOMENTS 1, CUT_CIRCLES 2,
+CUT_NEAR 4, CUT_CROWDS 8, CUT_LEVEL 16, the five stores; CUT_CLASSES 32, the address: a site before the cut heard through the
+receiver's probe classes; CUT_OPEN_CROWDS 128; JOINED_MASK 191) and W117's read of the same masks (31 closes 0.04 of a cut's cost,
+63 closes 0.45, 191 closes 0.53).
+G-R6  (a) (0.7) the five stores alone (cut:256:31) close under 0.08 of a cut's cost on the arm's mean: a lap of joined stretches
+          has not made a store asked.
+      (b) (0.7) the address beside the stores carries the gain: cut:256:63 on the arm stands under the control's by 0.010 nats a
+          place or more (191 stands under by 0.0164).
+      (c) (0.55) the open crowds add on the arm what they add on the control: (cut:256:63 less cut:256:191) on the arm within 0.004
+          of the control's.
+      Read: (a) and (b) held, the construction trains the address, a place re-heard by its class where it recurs, and a store is
+      asked no more than before; its purpose (a store's far content reached by a covector) then needs a store that holds what the
+      address finds. (a) missed, the stores have begun to carry and G-R3's horizon is a matter of laps.
+
+Fixed 2026-11-26T00:21:42Z (date -u), before W120j's and W120's reads (the second lap of the same arm and control, running).
+G-R7  (a) (0.35) cut:256:191 over the law on W120j's mean reads under 0.07 (point 0.076).
+      (b) (0.6) it reads under W119j's 0.0859 by 0.005 or more: the gain continues.
+      (c) (0.55) the law's code on the far rows past the cut, W120j less W120, reads -0.004 or lower.
+      (d) (0.75) the price of the cut where the run of three is new, from place 32 on, stays under +0.010 on W120j.
