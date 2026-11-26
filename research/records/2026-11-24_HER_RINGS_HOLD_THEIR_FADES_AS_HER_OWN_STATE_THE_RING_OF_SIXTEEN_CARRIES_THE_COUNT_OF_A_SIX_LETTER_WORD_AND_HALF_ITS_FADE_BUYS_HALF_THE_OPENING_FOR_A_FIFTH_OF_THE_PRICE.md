@@ -370,3 +370,16 @@ over the first 200 sections fell 0.035 nats a place, against the 0.04 asked.
 A learner's null is held to a length (rule 10), so the arm runs a second lap: W120j from W119j's end beside W120 from W119's end, both
 read again by the same rule. The joined arm costs 1.4 times its control's time a section, because a joined passage's open places hold rows
 of its whole length.
+
+## 19. The joined stretches at two laps, and the wave learned fast
+
+At its second lap the joined arm held its step and did not grow it. With mask 191 the cut's cost closed 0.600 against the control's 0.508,
+as at the first lap (0.604 against 0.513). The stores' horizon at 32 to 127 places past the cut stood at 0.028 against 0.024, and the held
+text moved −0.0001. By G-R's rule the line does not take the construction: its gain is a step in how a place hears across a stretch's
+first place, taken in one lap and not compounding. The line's end is W120's.
+
+The wave's held cut fell from 1.278 nats a sample at W118m's mean to 1.131 at W119's and 1.029 at W120's. Two laps of about six minutes
+of speech each brought it under the count tables of two samples back (1.266) and to the edge of both neighbours' (0.980). The text held at
+0.6958 and 0.6986 beside it. At W119's end the rings of 128 and 243 faded faster than at W118m's (+0.516 and +0.520 octaves against
++0.486 and +0.484; Fable's G-M3 (a) held), while the wave asks them to fade more slowly. In the one fade a ring holds, the text's share
+outvotes the wave's ask, which is the premise for a second fade that the text alone never gave (§14).
