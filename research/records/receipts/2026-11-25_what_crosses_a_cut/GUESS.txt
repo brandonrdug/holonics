@@ -111,3 +111,14 @@ G-R7  (a) (0.35) cut:256:191 over the law on W120j's mean reads under 0.07 (poin
       (b) (0.6) it reads under W119j's 0.0859 by 0.005 or more: the gain continues.
       (c) (0.55) the law's code on the far rows past the cut, W120j less W120, reads -0.004 or lower.
       (d) (0.75) the price of the cut where the run of three is new, from place 32 on, stays under +0.010 on W120j.
+
+Scored 2026-11-26T00:53:24Z (date -u), G-R6, from joined_split_W119.txt and joined_split_repeat_W119.txt (the read of RUN.txt; nats a
+place over each state's own law on the 192 places past the cut; the arm less the control paired by row).
+  (a) held at 0.7: the five stores alone close 0.025 of a cut's cost on the arm (0.031 on the control). They bring back 0.0054 nats a
+      place against 0.0066, a gain of -0.0013 (se 0.0021).
+  (b) held at 0.7, at its edge: cut:256:63 on the arm stands 0.01005 under the control's (se 0.0024; asked 0.010). The address beside
+      the stores brings back 0.1050 against 0.0868, a gain of +0.0182 (0.0026); alone, 0.0532 against 0.0396.
+  (c) missed at 0.55: an open place's crowds beside both bring back 0.0209 on the arm against 0.0145, 0.0064 apart (asked within
+      0.004). The crowds took a quarter of the gain.
+  The read named with G-R6 stands: a lap of joined stretches trained the address and the crowds, and no store. Of the 0.0233 nats a
+  place more that crosses a cut on the arm, the address brings 0.0182, the crowds 0.0064 and the stores -0.0013.

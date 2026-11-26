@@ -332,3 +332,61 @@ nearly all of the structure a listener names lies past the cut.
 - The engine's change is the ruler alone (`contact.rs`, `constitution.rs`, `founding.rs`, `ruler/tension.rs`, one host test). Gate 1
   was read in the cloud container against the stand-in driver (`tools/gate_nocard.sh`); the PC's gate 1 is the lead's at the next
   build, and no kernel changed.
+
+## 11. The joined arm's first lap, read by part (November 26)
+
+The lead built §7's construction on the host and the card ([the lead's record](2026-11-24_HER_RINGS_HOLD_THEIR_FADES_AS_HER_OWN_STATE_THE_RING_OF_SIXTEEN_CARRIES_THE_COUNT_OF_A_SIX_LETTER_WORD_AND_HALF_ITS_FADE_BUYS_HALF_THE_OPENING_FOR_A_FIFTH_OF_THE_PRICE.md) §15 to §18; atlas
+`region.joined-stretches`) and ran it one lap from the line's end on the wave store: W119j beside W119, 3,000 sections each. The
+arm's guesses are scored in `GUESS.txt`. G-R4 held and G-R1, G-R2, G-R3 and G-R5 missed, the two weighed highest among them: one
+lap was priced as a taken law. The clause's own quantity moved a third of what G-R2 asked: the stores, the address and the crowds
+across a cut close 0.604 of its cost on the arm's mean against 0.513 on the control's. This section reads which of them carries that
+gain. Its guess, G-R6, was fixed before the read.
+
+**The read.** The ruler's masks 31 (the five stores), 32 (the address alone: a site before the cut heard through the receiver's
+probe classes), 63 (the stores and the address), 159 (the stores and an open place's crowds) and 191 (all of them, the joined
+stretches' own mask) beside `law` and `cut:256:0`, on both lap means and the lead's hundred far rows. `joined_split.py` prints each
+setting's price over its state's own law on the 192 places past the cut and the arm's price less the control's, paired by row. The
+build reproduces the lead's table at every printed place on both states. Nats a place:
+
+| what the cut lets across | the control brings back | the arm brings back | the arm's gain (se) |
+|---|---|---|---|
+| the five stores | 0.0066 | 0.0054 | −0.0013 (0.0021) |
+| the address alone | 0.0396 | 0.0532 | +0.0136 (0.0024) |
+| the address beside the stores | 0.0868 | 0.1050 | +0.0182 (0.0026) |
+| an open place's crowds beside both | 0.0145 | 0.0209 | +0.0064 (0.0018) |
+| all of it (mask 191) | 0.1079 | 0.1312 | +0.0233 |
+
+1. **A lap of joined stretches trained the address and the crowds, and no store.** Of the 0.0233 nats a place more that crosses a
+   cut on the arm, the address brings 0.0182, an open place's crowds 0.0064, and the five stores 0.0013 less than before.
+2. **The gain stands at the recurrences.** From place 32 past the cut, where a run of three octets stood before the cut and not
+   since (3,387 places), the address beside the stores brings back 0.364 of the cut's price on the arm against 0.296 (alone 0.301
+   against 0.250). Where the run is new (7,947 places) nothing gains under any setting: −0.019 with nothing crossing (−0.016 on the
+   control), −0.011 under mask 63, −0.021 under mask 191.
+3. **Alone across a cut the stores cost her past thirty places.** A store's state handed on with none of its sites heard raises the
+   price at the recurrences from +0.692 to +0.743 on the control (+0.717 to +0.768 on the arm), and where the run is new from −0.016
+   to +0.028, on both states. Over the first 31 places past the cut the stores bring back 0.090 nats a place (0.086 on the arm); over
+   the places from 32 on they cost 0.009 (0.010). Their 0.03 of a cut's cost is closed in the first thirty places alone.
+4. **Her fades did not hear the arm.** A ring's fade in octaves of the skin's at W119j's end against W119's: 128 +0.530 and +0.516,
+   243 +0.518 and +0.519, 1024 +0.896 and +0.879, 4096 +1.535 and +1.521, each faster than a lap before on both. A store asked for far
+   content would be a ring asked to keep more.
+5. Read whole, the far rows code 0.0036 nats a place (se 0.0016) better past place 256 on the arm, 61 of 100 rows.
+
+**Why (weight 0.75).** What the far past is worth to her on this text is recurrence
+([the taper record](2026-11-25_A_RECEIVER_MEETS_A_MEDIUM_THROUGH_A_TAPER_A_ROD_READS_AN_EFFORT_ALONG_IT_A_CONE_A_FLOW_THROUGH_ITS_MOUTH_IT_CARRIES_BY_A_STROKE_THAT_DOES_NOT_RETRACE_AND_SHE_GAINS_FROM_THE_FAR_PAST_ONLY_WHERE_IT_REPEATS_ITSELF.md) §5: past thirty places all of a cut's price stands where a run recurs). A recurrence is a place: a span
+found again by what it holds. An address carries a place. A store carries a sum over its sources under one fade, which is a count, a
+rate or a phase and never a span. So a covector that reaches across a cut on this terrain finds the address and moves it, and finds
+nothing in a store to move. §7's construction opened both paths and the terrain paid for one of them. §6's "nothing compared asks a
+store" was half of the cause; the other half is that this text, as she reads it today, holds nothing past thirty places that a
+store could answer.
+
+**What a store answers.** What stands across a cut where no span recurs: a cycle whose phase continues (a voice's pitch, a meter, a
+line's length) and a level that persists (a register, a subject). The second is the price where the run is new, which reads under
+zero on both states (G-R7 (d) holds it for the second lap). The first is the sampled wave's, where the fade's covector asks the rings
+of 128, 243 and 256 to keep more (the lead's record §16) and one fade a ring follows the text against it (G-M3 (a)). The read that
+weighs a second fade before it is built is therefore this ruler on the wave's own held rows: the stores' share of a cut's cost
+there, beside the address's. The ruler reads a row as text today and a wave's octets are no text; it is given rows of any octets
+next.
+
+**Not claimed.** One lap, one cut's place, a hundred rows. A learner's null is held to a length: the stores' share is read again at
+the second lap's means (W120j beside W120). Receipts: `joined_split.py`, `joined_split_W119.txt`, `joined_split_repeat_W119.txt`,
+`RUN.txt`, `GUESS.txt` (G-R6 scored, G-R7 fixed). Atlas: `store.joined-lap-trains-address-not-store` (measured).

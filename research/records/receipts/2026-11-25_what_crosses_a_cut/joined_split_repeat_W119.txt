@@ -1,0 +1,20 @@
+# W119 (repeat_at_dear.py 256 ROWS OUT, the lines of a run of three)
+REPEAT_HEAD cut=256 rows=100 places_past=19200 net=4036.1
+REPEAT_FOUR run=3 band=1-31 places=3100 net=1693.5 far_only:places=1204,price=+1.0613,share=+0.755 far_and_since:places=126,price=+0.2540,share=+0.019 since_only:places=18,price=+0.0649,share=+0.001 neither:places=1752,price=+0.2184,share=+0.226
+REPEAT_FOUR run=3 band=32-on places=16100 net=2342.6 far_only:places=3387,price=+0.6921,share=+1.001 far_and_since:places=3161,price=+0.0568,share=+0.077 since_only:places=1605,price=-0.0344,share=-0.024 neither:places=7947,price=-0.0159,share=-0.054
+REPEAT_SET run=3 band=32-on setting=cut:256:0 far_only_places=3387 far_only_price=+0.6921 back_at_far_only=+0.000 neither_places=7947 neither_price=-0.0159
+REPEAT_SET run=3 band=32-on setting=cut:256:31 far_only_places=3387 far_only_price=+0.7432 back_at_far_only=-0.074 neither_places=7947 neither_price=+0.0275
+REPEAT_SET run=3 band=32-on setting=cut:256:63 far_only_places=3387 far_only_price=+0.4874 back_at_far_only=+0.296 neither_places=7947 neither_price=-0.0056
+REPEAT_SET run=3 band=32-on setting=cut:256:159 far_only_places=3387 far_only_price=+0.7039 back_at_far_only=-0.017 neither_places=7947 neither_price=+0.0125
+REPEAT_SET run=3 band=32-on setting=cut:256:191 far_only_places=3387 far_only_price=+0.4443 back_at_far_only=+0.358 neither_places=7947 neither_price=-0.0128
+REPEAT_SET run=3 band=32-on setting=cut:256:32 far_only_places=3387 far_only_price=+0.5192 back_at_far_only=+0.250 neither_places=7947 neither_price=-0.0161
+# W119j (repeat_at_dear.py 256 ROWS OUT, the lines of a run of three)
+REPEAT_HEAD cut=256 rows=100 places_past=19200 net=4168.1
+REPEAT_FOUR run=3 band=1-31 places=3100 net=1769.8 far_only:places=1204,price=+1.1047,share=+0.751 far_and_since:places=126,price=+0.2621,share=+0.019 since_only:places=18,price=+0.0785,share=+0.001 neither:places=1752,price=+0.2314,share=+0.229
+REPEAT_FOUR run=3 band=32-on places=16100 net=2398.2 far_only:places=3387,price=+0.7171,share=+1.013 far_and_since:places=3161,price=+0.0575,share=+0.076 since_only:places=1605,price=-0.0387,share=-0.026 neither:places=7947,price=-0.0189,share=-0.063
+REPEAT_SET run=3 band=32-on setting=cut:256:0 far_only_places=3387 far_only_price=+0.7171 back_at_far_only=+0.000 neither_places=7947 neither_price=-0.0189
+REPEAT_SET run=3 band=32-on setting=cut:256:31 far_only_places=3387 far_only_price=+0.7679 back_at_far_only=-0.071 neither_places=7947 neither_price=+0.0276
+REPEAT_SET run=3 band=32-on setting=cut:256:63 far_only_places=3387 far_only_price=+0.4561 back_at_far_only=+0.364 neither_places=7947 neither_price=-0.0112
+REPEAT_SET run=3 band=32-on setting=cut:256:159 far_only_places=3387 far_only_price=+0.7218 back_at_far_only=-0.007 neither_places=7947 neither_price=+0.0062
+REPEAT_SET run=3 band=32-on setting=cut:256:191 far_only_places=3387 far_only_price=+0.4039 back_at_far_only=+0.437 neither_places=7947 neither_price=-0.0206
+REPEAT_SET run=3 band=32-on setting=cut:256:32 far_only_places=3387 far_only_price=+0.5014 back_at_far_only=+0.301 neither_places=7947 neither_price=-0.0207
