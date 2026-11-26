@@ -1,0 +1,20 @@
+MEDIUM gas='air' c=343.2 m/s tube_pitch_against_air=1.000 cents=+0
+MEDIUM gas='carbon dioxide' c=267.2 m/s tube_pitch_against_air=0.778 cents=-434
+MEDIUM gas='helium' c=1007.5 m/s tube_pitch_against_air=2.935 cents=+1864
+MEDIUM water c=1481 m/s index_against_air=0.232 impedance_ratio=3577 power_across_the_surface=0.00112 (-29.5 dB)
+REED brass thickness=0.20 mm length=15.00 mm note=493 Hz
+REED brass thickness=0.20 mm length=13.42 mm note=616 Hz
+REED brass thickness=0.20 mm length=12.25 mm note=739 Hz
+GAPS periods=3,5 count=4 formula=4 largest=7 formula=7 gaps=[1, 2, 4, 7]
+GAPS periods=4,5 count=6 formula=6 largest=11 formula=11 gaps=[1, 2, 3, 6, 7, 11]
+GAPS periods=5,6 count=10 formula=10 largest=19 formula=19 gaps=[1, 2, 3, 4, 7, 8, 9, 13, 14, 19]
+GAPS periods=2,3 count=1 formula=1 largest=1 formula=1 gaps=[1]
+JOINS count=7 least=4 floor=3 binary=4
+JOINS count=15 least=5 floor=4 binary=6
+JOINS count=16 least=4 floor=4 binary=4
+JOINS count=23 least=6 floor=5 binary=7
+JOINS count=31 least=7 floor=5 binary=8
+JOINS count=32 least=5 floor=5 binary=5
+JOINS count=60 least=7 floor=6 binary=8
+JOINS count=64 least=6 floor=6 binary=6
+JOINS count=127 least=10 floor=7 binary=12

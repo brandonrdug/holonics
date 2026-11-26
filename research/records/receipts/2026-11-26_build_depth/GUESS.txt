@@ -1,0 +1,12 @@
+The formal thread's guesses on a composition's build from the parts a locale holds, fixed at 2026-11-26T20:17:37Z (date -u) before any read of
+them. The record: research/records/2026-11-26_A_COMPOSITION_STANDS_IN_A_LOCALE_ONLY_AFTER_ITS_CAUSES_...md §8.
+
+G-B1 (0.55). Of her panel writes that loop (the write-form ruler's count, on the line's current mean), at least three quarters loop
+  on a period of sixteen octets or fewer: a word or a pair of words.
+G-B2 (0.55). Her held-text code a place, parted by the longest span ending at that place that already stands in her training
+  passage (under 4 octets, 4 to 7, 8 to 15, 16 to 31, 32 and over), falls through the part 8 to 15 and then falls by less than a
+  tenth more over the two longer parts, where a count ruler read over the same parts keeps falling by a third or more.
+G-B3 (0.6). Parse each panel write greedily into the longest spans that stand in her training passage. Outside their loops her
+  writes parse into spans under two thirds as long, in the mean and at the median, as held text of the same slices parses into.
+
+Each is a host read on codes and writes she already gives; none builds a part. A miss is scored in one line in the record.
