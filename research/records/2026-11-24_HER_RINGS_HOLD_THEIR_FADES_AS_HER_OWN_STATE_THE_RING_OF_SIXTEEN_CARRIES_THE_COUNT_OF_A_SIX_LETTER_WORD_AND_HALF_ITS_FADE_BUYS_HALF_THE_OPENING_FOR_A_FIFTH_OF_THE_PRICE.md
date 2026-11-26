@@ -354,3 +354,19 @@ of a stretch plus its address, Fable's sizing, is the realization's next step.
 
 The control's mean read with the cut ruler on the hundred far rows gives a cut's cost of +0.210 nats a place over the law (Fable read
 0.211 on W117) and mask 191 at +0.102, closing 0.51 of it.
+
+## 18. The joined stretches at one lap: the address across a cut closes more, short of its guess
+
+The guesses were Fable's G-R1 to G-R5, under the lead's rule (`receipts/2026-11-24_fade/GUESS_R.txt`, the cut tables in `cut/`).
+W119j (W118m's end, set-joined) ran beside W119 (W118m's end continued), 3,000 sections each. G-R4 held: the held text, paired, was
+−0.0007 (±0.0003). G-R1, G-R2, G-R3 and G-R5 missed, so by the rule the line keeps W119.
+
+What moved is the purpose's own quantity, in its direction. On the hundred far rows cut at 256, the stores with the address across the
+cut (mask 191) cost +0.0859 nats a place over the law on the arm's mean against +0.1023 on the control's, closing 0.604 of a cut's cost
+against 0.513, about a third of what G-R2 asked in one lap. With every site heard one by one and the stores emptied (mask 64), the cost at
+32 to 127 places past the cut moved by 0.004, and the stores' horizon has not yet grown. The arm's training code at its compared places
+over the first 200 sections fell 0.035 nats a place, against the 0.04 asked.
+
+A learner's null is held to a length (rule 10), so the arm runs a second lap: W120j from W119j's end beside W120 from W119's end, both
+read again by the same rule. The joined arm costs 1.4 times its control's time a section, because a joined passage's open places hold rows
+of its whole length.
