@@ -174,4 +174,36 @@ reach, their square within the section's pairs): every open place hears every de
 by the law, which the cut ruler reads at 1.1094 past the cut against 1.2262 by address on W121's mean. The host test
 `a_slices_consecutive_stretches_join_into_one_passage_within_the_reach` holds the same passages and counts heard whole, with no cut
 between their stretches. The build e5fr reproduces the line (gate 3, `gate3_e5fr.txt`: parity on 3 sections, 24 sections reproduced,
-the lap's read equal). G-J1 (`GUESS_J1.txt`, fixed before W126 trained) is read at the arm's second lap and scored where it lands.
+the lap's read equal). G-J1 (`GUESS_J1.txt`, fixed before W126 trained) was read at the arm's second lap.
+
+**The first launch.** The arm's first lap ran 1.228 seconds a section (the largest 1.399) against the control's 0.760, past the 40
+minutes a lap its script projected from the line's laps: heard whole, a section holds 3.4 times the pairs (55.3 million squared places
+against 16.1), because the section's bound on pairs is met by its stretches before they join. It was stopped on that evidence after
+197 sections and relaunched from W125 with its deadline set from the largest measured section (4,197 s, deadline 4,300 s), the control
+lap W126 kept.
+
+**The read**, at the second laps' means (sections 2,001 to 3,000), W127w (two laps heard whole from W125) against W127 (two plain laps):
+
+| reading | W127 | W127w | arm less control |
+|---|---|---|---|
+| the held text, one place open, 200,933 places | 0.6913 | 0.6871 | −0.0042 (±0.0004), every region under |
+| the wave on the joined store | 0.8957 | 0.8903 | −0.0054 |
+| the far rows' law past the cut | 1.1117 | 1.0983 | −0.0133 (±0.0021) by row |
+| what the law closes over nothing across the cut | 0.2111 | 0.2252 | +0.0141 |
+| the wide panel: lexicon share, loops of 160 | 71%, 17 | 71%, 20 | |
+| the lap on the card | 2,259 s | 3,549 s | 1.57 times |
+
+(a) (0.4, the law's code past the cut at least 0.010 under the control's) held; (b) (0.3, the held text at least 0.002 under) held, by
+twice the margin and in every region (acts −0.0084, science −0.0049, web −0.0046, books −0.0044, code −0.0023, dialogue −0.0018); (c)
+(0.6, each arm lap within 1.3 times its control's) missed, 1.55 and 1.57; (d) (0.7, the wide panel's lexicon share within 3 points)
+held. By its rule the line takes the construction, and the line's end is W127w's state. The first laps read the same direction (the
+far rows' law −0.0110). Beside the guess, the long panel's twenty writes read 68% in the lexicon against 78%, with 5 loops against 2,
+and the theory panel's theory rows 93% against 89%.
+
+**What it says.** Two laps of the joined arm at mask 191 moved the held text by −0.0001 (§19 of November 24); two heard whole moved it
+by −0.0042, the text's first movement since the wave entered. What the far past is worth on text is recurrence, which a place carries
+(the formal thread's §11), and a place is heard across a stretch's first place only sharply. Training that hears it there teaches every
+region's held text, which no read of a shorter region had shown the field could gain. The price is pairs: 3.4 times a section's, at
+1.57 times its card time. Sizing that price (a section's pairs bounded after its stretches join, or the dense rows the card holds a
+region long made sparse past the near field) is the realization's next loop, and the lap's rate is judged against its count of pairs
+before a long run is ordered (the method's rule 3).
