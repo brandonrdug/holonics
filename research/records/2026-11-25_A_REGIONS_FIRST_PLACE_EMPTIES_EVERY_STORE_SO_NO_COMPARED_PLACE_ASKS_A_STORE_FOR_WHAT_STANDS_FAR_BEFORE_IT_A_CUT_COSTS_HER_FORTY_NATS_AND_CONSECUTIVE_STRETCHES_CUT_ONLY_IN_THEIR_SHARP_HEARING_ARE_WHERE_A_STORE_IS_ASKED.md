@@ -385,7 +385,7 @@ zero on both states (G-R7 (d) holds it for the second lap). The first is the sam
 of 128, 243 and 256 to keep more (the lead's record §16) and one fade a ring follows the text against it (G-M3 (a)). The read that
 weighs a second fade before it is built is therefore this ruler on the wave's own held rows: the stores' share of a cut's cost
 there, beside the address's. The ruler reads a row as text today and a wave's octets are no text; it is given rows of any octets
-next.
+next. (Read on November 26, and the cycle's half missed: §12.)
 
 **The second lap** (G-R7, scored in `GUESS.txt`). W120j beside W120 held the step and did not grow it: mask 191 closes 0.600 of a
 cut's cost against 0.508, the far-only recurrences bring back 0.434 against 0.351, and where the run is new the price is −0.0185 against
@@ -394,3 +394,64 @@ cut's cost against 0.508, the far-only recurrences bring back 0.434 against 0.35
 **Not claimed.** Two laps, one cut's place, a hundred rows. The stores' share was parted at the first lap's means; at the second
 the lead's settings (0, 191, 64) hold the sum, which stood. Receipts: `joined_split.py`, `joined_split_W119.txt`, `joined_split_repeat_W119.txt`,
 `RUN.txt`, `GUESS.txt` (G-R6 scored, G-R7 fixed). Atlas: `store.joined-lap-trains-address-not-store` (measured).
+
+## 12. The wave's own rows, and what the speech holds past its last samples (November 26)
+
+§11 expected a store to earn its keep on the wave, where a voice's pitch continues across a cut. **That missed.** The lead read it
+(G-W3 0.45 and G-W4 0.4, both missed; the lead's `receipts/2026-11-26_class_hairs/GUESS.txt` with its table
+`cutwave/table_W121.txt`, which land with the lead's change): a hundred
+rows of 449 samples from the middles of the slice's held documents, cut at 256, on W121's mean. With nothing let across, a cut costs
+its own place 20.53 nats (the law 0.96) and the 192 places past it 0.0129 a place, all of it within sixteen samples; from 64 samples
+on, nothing let across codes under the law (1.119 against 1.124, 1.142 against 1.154). The five stores bring the cut's own place
+back to 1.016 and cost 0.008 to 0.030 a place from sixteen samples on, so over the 192 places they close −0.655 of the gap; each
+store alone costs the first places more than nothing does, and the rings' moments the most.
+
+Whether that is hers or the speech's is a read of the terrain: what a sample far back tells of a sample once its last samples are
+known. A count ruler on the slice's held cut (`far_given_near_ruler.py`, the 128 held documents, 26,078,878 places; tables of one
+parity of documents code the other and the halves exchange, so every gain stands net of its table's price), in nats a sample:
+
+| what the near past is given, and what is added | over nothing | over the last two samples | over the samples 1, 2 and 16 back |
+|---|---|---|---|
+| one sample 128 back | +0.3205 | +0.0256 | +0.0038 |
+| one sample 243 back | +0.2830 | +0.0221 | +0.0017 |
+| one sample 1,024 back | +0.1267 | +0.0082 | −0.0039 |
+| a loudness read 17 back: each sample's distance from the middle level, summed fading by 64 places, in 13 classes | +0.5621 | +0.0626 | +0.0274 |
+| the same far loudness, beside the loudness of the last samples (fading by 4, read one back) | | +0.0288 | +0.0045 |
+| the same, beside the loudness of the last samples (fading by 16, read one back) | | +0.0103 | −0.0033 |
+| a far loudness shuffled in its document, beside the last samples' (fading by 16): the table's price alone | | −0.0058 | −0.0327 |
+
+Controls (`FAR_GIVEN_NEAR.out`): a sample shuffled in its document reads its table's price at every lag (−0.0006 over two
+samples); a planted copy of the sample 128 back, one place in ten, reads +0.0827 at 128 against +0.0058 at 96 and +0.0053 at 160;
+on a synthetic resonance whose drive holds a gain for a few hundred samples, a far loudness beside the near one reads 0.040 above the
+same resonance at a steady gain (`far_given_near_synth.py`).
+
+1. Given its last samples, the speech tells little past sixteen of them at this grain. A sample at a pitch ring adds 0.004 over three
+   samples and decays smoothly with its lag, with no peak at a ring's period: the free information at every ring that the morning
+   read (atlas `code.turn-back-information-of-a-stream`) is what a lag tells alone, and almost all of it is what the last samples
+   already tell.
+2. What stands past them is a level. The far loudness's +0.063 over two samples is mostly the loudness of the last few samples seen
+   through a lag: beside a loudness fading by sixteen it keeps 0.010 to 0.016 (its held gain, and that gain with the table's price
+   added back). Beside three samples and a near loudness the table is 13^6 cells, more than these places resolve: its held gain is
+   +0.0045 or −0.0033 where a variable with nothing to tell costs 0.033. A fade slower than 64 places tells less: a loudness summed
+   over a syllable's span (fading by 4,096 places, a quarter of a second) adds 0.010 over two samples and nothing over three.
+3. So her cut read and the speech agree: nothing crosses past sixteen samples because little stands there to cross, sample by
+   sample. The miss is the premise's: a voice's pitch continues across a cut, and the next sample's code does not need it once
+   the last samples are heard.
+
+**Why her stores leave even that (weight 0.4).** The level that stands (about 0.01 nats a sample over two samples and a near
+loudness) is a sum under one fade that does not turn, the kind §11 says a store carries. Her rings' moments turn, and a turned
+ring's moment averages a persisting level over its turn; a still head carries no moment (`Declaration::carries_moment`: a still
+mode has no skin to bound its sum). The crowds and the level's epochs hold sites' words by octave and by epoch, which carry a level
+only as the lock reads it (`agent-inferred`). The second fade the lead weighs at 0.2 has little to take by this read: a ring kept
+longer at a pitch period carries a cycle whose single samples add 0.004 over three samples.
+
+**What the slow structure of speech asks instead.** A syllable's beat, a word's stress and a phrase's fall tell a sample almost
+nothing at thirteen levels; they are cycles of the level's epochs, read per epoch at the level that holds them (§8). A store asked
+for them is the level's, and a read of them is this ruler at that level's clock.
+
+**Not claimed.** The ruler's near context is coarse (three samples and a loudness, in thirteen classes each); she reads her near
+field at its own resolution and codes the held wave at 0.931 nats a sample at W123's mean, under every table here, so what a far
+variable adds over her own near reading is expected to be less than over the ruler's (`agent-inferred`). One slice, one grain
+(the slice's thirteen levels), one cut's place on the lead's rows. Receipts: `receipts/2026-11-25_second_stream/`
+`far_given_near_ruler.py`, `far_given_near_synth.py`, `FAR_GIVEN_NEAR.out`, `RUN.txt`. Atlas: `code.wave-holds-little-past-its-last-samples`
+(measured).
