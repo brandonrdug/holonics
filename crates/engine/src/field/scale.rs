@@ -368,6 +368,13 @@ impl ScalePass {
         (&self.cut.anchors, &self.source)
     }
 
+    /// [measurement; the lead, November 26, the level's face before a second level] Each compared open place of the receipt
+    /// ([`Scale::receipt`]) with its code at the prolonged row's face alone (the level through its own decoder and the receiver's face,
+    /// no fine tick after it), on the codes' grain: a reading for a ruler ([`Constitution::strand_level_face`]).
+    pub(crate) fn receipt_codes(&self) -> Vec<(usize, i64)> {
+        self.receipt.iter().map(|(t, read, c)| (*t, read.face.code(*c))).collect()
+    }
+
     /// Each epoch's restricted state before the level's ticks (`[j][D₁]`, kept where the forward keeps) and its read after the last
     /// (`[j][D₁]`, the lane chart on `2^(−16)`): two links of the level's equation, for a ruler ([`Constitution::strand_level_links`]).
     pub(crate) fn level_links(&self) -> (&[i64], &[i32]) {

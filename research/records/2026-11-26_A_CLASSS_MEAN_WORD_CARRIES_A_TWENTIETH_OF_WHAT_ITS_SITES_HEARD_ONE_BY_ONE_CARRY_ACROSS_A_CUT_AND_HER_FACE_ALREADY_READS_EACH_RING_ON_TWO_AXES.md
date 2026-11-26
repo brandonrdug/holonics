@@ -299,3 +299,42 @@ place the third above a character and a phrase the second or third above a lette
 unit counted in its own unit, its join a product of two parts; the level's design record of November 17, the record of November 23
 §21 and §22) is not built. Until it is, every arm's guess stands at depth one, which is why the laps heard whole compound nothing past
 it. That face is the next build, before any other arm.
+
+## 10. Her level has no face of its own: a second level cut from it finds no word
+
+The formal pass's next piece (its record of nested cycles §9 item 3) is the level's own face, from which a second level is cut. Its
+premise was read first, on W129w's mean and the 407 word rows: `read-strand-cut ... past face` writes, at each open place that reads an
+epoch, its symbol's code at the prolonged row alone, the level through its own decoder and the receiver's face with no fine tick after
+it (the receipt's read, `Constitution::strand_level_face`, on a copy of the field with the receipt set; the state is the same); and
+`tools/level_face_ruler.py` sums it by epoch into the unit's news under the level, `C¹`, and cuts a second level from `C¹` by the first
+level's own law (a site where no larger news stands within a section, the section the first level's: the flat face's 5.55 nats)
+(`receipts/2026-11-26_class_hairs/depth/level_face.txt`).
+
+- At her level's own face a place codes at a median of 22.99 nats (the tenth and ninetieth hundredths 10.0 and 37.3), four times the
+  flat face's 5.55: read alone, her level is confidently wrong about every symbol. It has no face of its own, which is the design
+  record's second finding of November 17 (no receipt at its own grain) read as a number.
+- So `C¹` is noise: an epoch's news under the level has a median of 71.5 nats, and the second level cut from it begins at a word's
+  first letter 0.336 of the time, where the same cut on `C¹` shuffled within each row gives 0.352 and the first level's anchors 0.350.
+  The ruler finds words where they are planted (news peaking at every epoch a word begins: 0.910).
+
+So a second level has nothing to stand on until the first level reads its own grain. The build that follows is the receipt at the
+level's own grain with its pull kept inside the level (the record of November 23, §21: the receipt of W101r cost every register because
+its covector went back through the restriction into the fine field the two share, and the change named then is the same comparison
+with no return into the fine field), read by this ruler before any arm: the level's own face under the flat face's code, and a second
+level that finds words.
+
+**The same read on the level's receipt lap of November 23** (W101r, one lap with the receipt at every open place, beside its control
+W101, both from W100's end; `receipts/2026-11-26_class_hairs/depth/level_face.txt`, where all three states stand):
+
+| state | the level's own face, a place (median; tenth and ninetieth hundredths) | a second level by the sum law: word starts, shuffled | by the unit's news a place: word starts, its units' median length |
+|---|---|---|---|
+| W101 (no receipt) | 21.68 (9.29, 32.89) | 0.341, 0.352 | |
+| W101r (the receipt, one lap) | 2.96 (1.77, 4.91), under the flat face's 5.50 | 0.324, 0.358 | 0.387, 17 places |
+| W129w (no receipt) | 22.99 (10.02, 37.27) | 0.336, 0.352 | 0.359, 10 places |
+
+One lap of the receipt gave her level a face of its own: it codes a place at 2.96 nats where the level without it codes at 21.7. A
+second level cut from that face's news by the sum law still finds no words (0.324 against 0.358 shuffled), and cut from the news a
+place that reads each unit finds a little (0.387 against 0.358) in units of about 17 places. So the comparison at the level's own grain
+is what gives a level a face, and the receipt with its pull kept inside the level is the way to have it without the cost W101r paid in
+every register; and how a second level is cut from a first level's face is not yet the sum of its news, which is the formal pass's to
+state before a second level is built.
