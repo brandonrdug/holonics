@@ -1,0 +1,62 @@
+FRAME_BEAT clock_hz=16000 frame_samples=160 run_frames=300 skipped=50 areas=(9, 4, 7, 10) loud=8
+PLANTED tone period=40 frame range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 1 period=200 hz=  80.0 radians_a_frame= 5.03 periods_a_cell=1
+  loudness  frame range= 27 tenth_to_ninetieth= 27 distinct=  4 entropy=1.332 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=194 tenth_to_ninetieth=194 distinct=  5 entropy=1.609 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 55 tenth_to_ninetieth= 55 distinct=  5 entropy=1.609 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 66 tenth_to_ninetieth= 66 distinct=  5 entropy=1.609 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 2 period=178 hz=  89.9 radians_a_frame= 5.65 periods_a_cell=1
+  loudness  frame range= 15 tenth_to_ninetieth=  9 distinct= 15 entropy=2.065 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=198 tenth_to_ninetieth=145 distinct= 65 entropy=4.045 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 54 tenth_to_ninetieth= 50 distinct= 49 entropy=3.738 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 67 tenth_to_ninetieth= 60 distinct= 54 entropy=3.854 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 3 period=158 hz= 101.3 radians_a_frame= 6.36 periods_a_cell=1
+  loudness  frame range=  1 tenth_to_ninetieth=  0 distinct=  2 entropy=0.193 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=135 tenth_to_ninetieth=107 distinct= 51 entropy=3.797 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 43 tenth_to_ninetieth= 39 distinct= 40 entropy=3.525 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 55 tenth_to_ninetieth= 51 distinct= 46 entropy=3.697 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 4 period=141 hz= 113.5 radians_a_frame= 7.13 periods_a_cell=1
+  loudness  frame range= 10 tenth_to_ninetieth=  8 distinct= 11 entropy=2.018 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range= 96 tenth_to_ninetieth= 80 distinct= 74 entropy=4.052 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 34 tenth_to_ninetieth= 32 distinct= 35 entropy=3.365 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 43 tenth_to_ninetieth= 40 distinct= 44 entropy=3.643 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 5 period=125 hz= 128.0 radians_a_frame= 8.04 periods_a_cell=1
+  loudness  frame range= 11 tenth_to_ninetieth=  9 distinct= 11 entropy=2.234 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range= 70 tenth_to_ninetieth= 62 distinct= 23 entropy=3.087 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 27 tenth_to_ninetieth= 27 distinct= 18 entropy=2.789 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 33 tenth_to_ninetieth= 31 distinct= 20 entropy=2.921 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 6 period=111 hz= 144.1 radians_a_frame= 9.06 periods_a_cell=1
+  loudness  frame range= 11 tenth_to_ninetieth= 10 distinct= 12 entropy=2.296 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range= 43 tenth_to_ninetieth= 40 distinct= 42 entropy=3.537 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 18 tenth_to_ninetieth= 17 distinct= 19 entropy=2.735 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 24 tenth_to_ninetieth= 23 distinct= 25 entropy=3.041 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 7 period= 99 hz= 161.6 radians_a_frame=10.15 periods_a_cell=2
+  loudness  frame range= 10 tenth_to_ninetieth=  8 distinct= 11 entropy=2.045 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range= 34 tenth_to_ninetieth= 31 distinct= 35 entropy=3.306 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range= 13 tenth_to_ninetieth= 12 distinct= 14 entropy=2.550 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 17 tenth_to_ninetieth= 15 distinct= 18 entropy=2.752 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 8 period= 88 hz= 181.8 radians_a_frame=11.42 periods_a_cell=2
+  loudness  frame range=  4 tenth_to_ninetieth=  3 distinct=  5 entropy=1.389 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range= 22 tenth_to_ninetieth= 20 distinct=  8 entropy=2.023 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range=  8 tenth_to_ninetieth=  7 distinct=  7 entropy=1.896 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range= 10 tenth_to_ninetieth= 10 distinct=  7 entropy=1.896 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level= 9 period= 78 hz= 205.1 radians_a_frame=12.89 periods_a_cell=2
+  loudness  frame range=  3 tenth_to_ninetieth=  1 distinct=  4 entropy=0.882 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=  7 tenth_to_ninetieth=  7 distinct=  8 entropy=1.933 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range=  6 tenth_to_ninetieth=  6 distinct=  7 entropy=1.918 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range=  6 tenth_to_ninetieth=  6 distinct=  7 entropy=1.926 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level=10 period= 70 hz= 228.6 radians_a_frame=14.36 periods_a_cell=2
+  loudness  frame range=  3 tenth_to_ninetieth=  3 distinct=  4 entropy=1.276 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=  5 tenth_to_ninetieth=  5 distinct=  5 entropy=1.549 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range=  3 tenth_to_ninetieth=  3 distinct=  4 entropy=1.279 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range=  3 tenth_to_ninetieth=  3 distinct=  4 entropy=1.350 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level=11 period= 62 hz= 258.1 radians_a_frame=16.21 periods_a_cell=3
+  loudness  frame range=  5 tenth_to_ninetieth=  4 distinct=  6 entropy=1.584 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=  7 tenth_to_ninetieth=  7 distinct=  8 entropy=2.047 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range=  1 tenth_to_ninetieth=  1 distinct=  2 entropy=0.668 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range=  1 tenth_to_ninetieth=  1 distinct=  2 entropy=0.693 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+PITCH level=12 period= 55 hz= 290.9 radians_a_frame=18.28 periods_a_cell=3
+  loudness  frame range=  2 tenth_to_ninetieth=  1 distinct=  3 entropy=0.917 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  under 500 frame range=  2 tenth_to_ninetieth=  0 distinct=  3 entropy=0.596 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  500-2000  frame range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
+  over 2000 frame range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000 | cycle range=  0 tenth_to_ninetieth=  0 distinct=  1 entropy=0.000
