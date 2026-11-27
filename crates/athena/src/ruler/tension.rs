@@ -1229,7 +1229,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word == "faces" || word == "faces:all" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" || word.starts_with("cut:") || word.starts_with("from:") {
+        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word == "faces" || word == "faces:all" || word == "gates" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" || word.starts_with("cut:") || word.starts_with("from:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1294,6 +1294,25 @@ pub fn read_reach(args: &[String]) -> Result<()> {
         let names: String = (0..alphabet).map(|k| format!("{k}\t{}\n", codec.decode(&[k]).iter().map(|b| format!("{b:02x}")).collect::<String>())).collect();
         write_new(&out.join("classes.tsv"), names.as_bytes())?;
         println!("REACH_FACES places={} classes={alphabet} ms={}", index.lines().count(), started.elapsed().as_millis());
+        return Ok(());
+    }
+    // [the lead, November 27, the formal thread's G-Z46] The word `gates` among the settings: every known site's gate on every carry circle at
+    // the last tick (`OUT/gates.i32`, `[place][2C]` row after row, real parts then imaginary on `2^(−30)`, little-endian; `OUT/gates.tsv` a
+    // line a row, its places), so a ruler outside the machine can compose a unit's turns on her own circles. No other setting is read with it.
+    if let Some(at) = settings.iter().position(|(n, _)| n == "gates") {
+        settings.remove(at);
+        let gates: Vec<Vec<i64>> = rows.par_iter().map(|(_, classes)| learner.field.strand_carry_gates(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        std::fs::create_dir_all(out)?;
+        let (mut index, mut octets) = (String::new(), Vec::new());
+        for (r, ((_, classes), g)) in rows.iter().zip(&gates).enumerate() {
+            index.push_str(&format!("{r}\t{}\n", classes.len()));
+            for &v in g {
+                octets.extend_from_slice(&i32::try_from(v).map_err(|_| "a gate past its chart")?.to_le_bytes());
+            }
+        }
+        write_new(&out.join("gates.tsv"), index.as_bytes())?;
+        write_new(&out.join("gates.i32"), &octets)?;
+        println!("REACH_GATES rows={} circles={} ms={}", rows.len(), learner.field.declaration.carry, started.elapsed().as_millis());
         return Ok(());
     }
     // [the lead, November 22, the chirality pass's second read] The word `hands` among the settings: the circles' hands along their scans

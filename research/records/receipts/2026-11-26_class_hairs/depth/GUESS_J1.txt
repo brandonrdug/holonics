@@ -1,0 +1,20 @@
+G-J1 (the lead, fixed 2026-11-27T16:26Z before the read, weight 0.5): the count of G-Z35 carried across four consecutive 3,700-octet stretches of the
+sixteen held passages of G-Z36 while her face is reset at each stretch (tools/word_cache_ruler.py joined), its coefficient set by the
+count's own state. Where a word was last met in an earlier stretch, the count gains at least 0.05 nats at the word's fourth letter on,
+and under 0.01 at its first letter. Reason: in the 3,700-place rows the upper ceiling past 30 places was +0.10 at the rest and +0.003 at a
+first letter, and the state-set read +0.027 where her own face held the word at 0.18 nats; past a reset she holds no address for it, so
+more of the ceiling is open to the count at the rest, and a first letter stays the word's identity, which no prefix gives.
+
+Read (word_cache_joined.txt; her faces on the four stretches, faces_long and faces_joined, 177,600 places of the second to fourth
+stretches read in 1,793 s at eight threads; 180,575 letter places, 90,694 even and 89,881 odd). One coefficient and one leak chosen on the
+fitting half: no leak, 0.2 one way and 0.15 the other; over every letter place +0.0126 and +0.0193. Where the word was last met in an
+earlier stretch (her face reset since), even to odd: her code and the gain of the one coefficient
+  first letter   2,817 places  hers 3.021  +0.0061 (±0.0041)
+  second letter  2,687 places  hers 1.545  +0.0617 (±0.0058)
+  third letter   2,262 places  hers 1.322  +0.2151 (±0.0107)
+  the rest       4,690 places  hers 0.555  +0.1742 (±0.0074)
+(a word met past 30 places inside her stretch: hers 2.373, 0.886, 0.562 and 0.191; a new word: 3.379, 1.956, 1.891 and 0.957). With the
+coefficient set by the count's own state, the mean of the halves (scatter): first letter +0.0083 (0.0041), second +0.0435 (0.0071),
+third +0.2291 (0.0046), the rest +0.2897 (0.0228). Knowing whether the word was met: +0.006 and +0.016, +0.08 and +0.12, +0.42 and +0.46,
++0.38 and +0.45.
+Score: held (+0.290 at the fourth letter on, at least 0.05 asked; +0.008 at a first letter, under 0.01 asked).
