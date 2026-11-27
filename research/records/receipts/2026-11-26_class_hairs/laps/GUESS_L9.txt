@@ -9,3 +9,16 @@ G-L9 (at the lap means, one place open, paired, by part):
   (b) (0.3) a word's first letter last met over 30 places back stands at least 0.005 under its control's (W136b less W136s);
   (c) (0.6) B_bank's root mean square at W136b's end at least 1.5 times W135b's;
   (d) (0.2) the word two before at a word's first letter at least 0.028 at W136b's mean.
+
+Read (W136b and W136s at their lap means, MEAN.3000, the last 1,000 of 3,000 sections; G-L9_reads.txt):
+  the training code: W136b's 1.0006 times W136s's over the lap, 0.9998 to 1.0012 in every 250 sections, with no trend;
+  (a) held text, one place open, paired: +0.0004 (±0.0003), every region within 0.0022 (dialogue −0.0022, theory +0.0018): held;
+  (b) a word's first letter last met over 30 places back: +0.0034 (±0.0017), within 30 +0.0049 (±0.0033), not before −0.0007: missed;
+  (c) B_bank's root mean square: 239,966 on 2^-24 at W136b's end against 183,259 at W135b's, 1.31 times (B⁻'s 3,055,733): missed;
+  (d) the word two before at a word's first letter: 0.025 (control 0.025): missed.
+  The fades stand at their founding (all six at −44,476,400). The wide panel: 72% of words in the lexicon on both, 18 of 160 writes loop
+  on both, the longest run shared with its prompt 49 against 74. Loudness: 22.789 octaves against 22.728 over every region, the
+  temperature −0.0245 against −0.0256.
+G-Z27 (the formal thread, 0.6), W136b's far first letters within 0.005 of W136s's: +0.0034, held.
+So the slow store on τ¹ does not enter the line: in two laps it carries no news a first letter reads, its block grows by a third in the
+second lap, and the line goes on from W134's end. The part store keyed by identity carries what this store cannot (record §21 to §23).

@@ -1,0 +1,35 @@
+TERRAIN_REACH W136b 15:59:03 ANSWER copy n= 2655 0.085|ANSWER reverse n= 2667 0.035|ANSWER sum n= 1579 0.794|
+W139_PRESENCE W136b 16:09:10 WORD_PRESENCE st_W136b word_starts=19351 read=224 tick=3 byte_2=0.590 prev_first=0.270 prev_word=0.224 prev2_word=0.025 target=0.038 planted=0.000 prev_len=0.359 | three or more words into a line (18520): line_words=0.180|WORD_PRESENCE_GH1 products=2048 prev_word=0.305 prev2_word=0.028 planted=0.000|WORD_PRESENCE_GH3 prev2_word between_2_3=0.014(7609) between_4_6=0.036(6879) between_7_more=0.042(3
+W139_UNIT W136b 16:45:57 cell=restricted pos1=0.430 pos2=0.541 pos3=0.528 pos4=0.525 pos5=0.545 pos6=0.473 pos7=0.433 pos8=0.305|cell=E_rings pos1=0.946 pos2=0.925 pos3=0.920 pos4=0.894 pos5=0.837 pos6=0.800 pos7=0.695 pos8=0.459|
+TERRAIN_REACH W136s 17:18:55 ANSWER copy n= 2655 0.080|ANSWER reverse n= 2667 0.015|ANSWER sum n= 1579 0.799|
+TERRAIN_WIDE W136b 17:18:55 LONG W136b: all words 2173 in lexicon 1571 (72%) writes that loop 18 of 160 longest run shared with its prompt 49 | code 346/408 (84%) web 383/458 (83%) science 241/420 (57%) books 423/508 (83%) wikidata 178/379 (46%)
+W139_PRESENCE W136s 17:31:31 WORD_PRESENCE st_W136s word_starts=19351 read=224 tick=3 byte_2=0.592 prev_first=0.271 prev_word=0.225 prev2_word=0.025 target=0.038 planted=0.000 prev_len=0.360 | three or more words into a line (18520): line_words=0.185|WORD_PRESENCE_GH1 products=2048 prev_word=0.307 prev2_word=0.028 planted=0.000|WORD_PRESENCE_GH3 prev2_word between_2_3=0.014(7609) between_4_6=0.036(6879) between_7_more=0.042(3
+TERRAIN_WIDE W136s 17:40:03 LONG W136s: all words 2223 in lexicon 1608 (72%) writes that loop 18 of 160 longest run shared with its prompt 74 | code 309/380 (81%) web 392/472 (83%) science 272/432 (62%) books 407/512 (79%) wikidata 228/427 (53%)
+W139_UNIT W136s 18:08:38 cell=restricted pos1=0.420 pos2=0.522 pos3=0.521 pos4=0.526 pos5=0.540 pos6=0.473 pos7=0.442 pos8=0.296|cell=E_rings pos1=0.947 pos2=0.926 pos3=0.922 pos4=0.895 pos5=0.839 pos6=0.802 pos7=0.696 pos8=0.456|
+W139_TEXT FRONTIER W136b; one place open: all 0.6843 (200933 places) | acts 1.0722 books 0.6807 code 0.4113 dialogue 0.8679 harness 0.7297 logic 0.3304 science 0.5799 theory 0.4662 web 0.7515 wikidata 0.9510 || less the control's, paired: +0.0004 (±0.0003) | acts -0.0003 books +0.0012 code +0.0013 dialogue -0.0022 harness -0.0007 logic +0.0016 science -0.0002 theory +0.0018 web +0.0012 wikidata +0.0002
+W139_WAVE FRONTIER W136b; one place open: all 0.6999 (220961 places) | acts 1.0722 books 0.6807 code 0.4113 dialogue 0.8679 harness 0.7297 logic 0.3304 science 0.5799 theory 0.4662 wave 0.8559 web 0.7515 wikidata 0.9510 || less the control's, paired: +0.0005 (±0.0003) | acts -0.0003 books +0.0012 code +0.0013 dialogue -0.0022 harness -0.0007 logic +0.0016 science -0.0002 theory +0.0018 wave +0.0015 web +0.0012 wikidata +0.0002
+W139_CLASS all=all nats_a_place=+0.0004 (±0.0003)|first_letter_last_met=not_before nats_a_place=-0.0007 (±0.0010)|first_letter_last_met=over_30 nats_a_place=+0.0034 (±0.0017)|first_letter_last_met=within_30 nats_a_place=+0.0049 (±0.0033)|kind=letter_inside nats_a_place=+0.0009 (±0.0003)|kind=other nats_a_place=-0.0013 (±0.0010)|kind=space nats_a_place=+0.0003 (±0.0005)|kind=word_first nats_a_place=+0.0004 (±0.0009)|
+W139_FADES -44476400 -44476400 -44476400 -44476400 -44476400 -44476400 
+PLACE_CLASS W136b_less_W136s all=all places=200933 nats_a_place=+0.0004 (±0.0003)
+PLACE_CLASS W136b_less_W136s first_letter_last_met=not_before places=22592 nats_a_place=-0.0007 (±0.0010)
+PLACE_CLASS W136b_less_W136s first_letter_last_met=over_30 places=5242 nats_a_place=+0.0034 (±0.0017)
+PLACE_CLASS W136b_less_W136s first_letter_last_met=within_30 places=2066 nats_a_place=+0.0049 (±0.0033)
+PLACE_CLASS W136b_less_W136s kind=letter_inside places=108429 nats_a_place=+0.0009 (±0.0003)
+PLACE_CLASS W136b_less_W136s kind=other places=29052 nats_a_place=-0.0013 (±0.0010)
+PLACE_CLASS W136b_less_W136s kind=space places=33552 nats_a_place=+0.0003 (±0.0005)
+PLACE_CLASS W136b_less_W136s kind=word_first places=29900 nats_a_place=+0.0004 (±0.0009)
+PLACE_CLASS W136b_less_W136s octave=0+ places=1009 nats_a_place=-0.0125 (±0.0062)
+PLACE_CLASS W136b_less_W136s octave=1+ places=1009 nats_a_place=-0.0080 (±0.0047)
+PLACE_CLASS W136b_less_W136s octave=2+ places=2018 nats_a_place=+0.0002 (±0.0027)
+PLACE_CLASS W136b_less_W136s octave=4+ places=4036 nats_a_place=-0.0018 (±0.0020)
+PLACE_CLASS W136b_less_W136s octave=8+ places=8008 nats_a_place=+0.0001 (±0.0014)
+PLACE_CLASS W136b_less_W136s octave=16+ places=14515 nats_a_place=+0.0002 (±0.0010)
+PLACE_CLASS W136b_less_W136s octave=32+ places=24354 nats_a_place=+0.0000 (±0.0008)
+PLACE_CLASS W136b_less_W136s octave=64+ places=38783 nats_a_place=+0.0017 (±0.0006)
+PLACE_CLASS W136b_less_W136s octave=128+ places=53237 nats_a_place=+0.0006 (±0.0005)
+PLACE_CLASS W136b_less_W136s octave=256+ places=49077 nats_a_place=-0.0002 (±0.0005)
+PLACE_CLASS W136b_less_W136s octave=512+ places=4887 nats_a_place=+0.0039 (±0.0017)
+PLACE_CLASS W136b_less_W136s recurrence=2_to_7 places=39877 nats_a_place=+0.0018 (±0.0004)
+PLACE_CLASS W136b_less_W136s recurrence=8_or_more places=3419 nats_a_place=+0.0043 (±0.0010)
+PLACE_CLASS W136b_less_W136s recurrence=once places=95033 nats_a_place=+0.0002 (±0.0004)
+PLACE_CLASS W136b_less_W136s recurrence=outside_a_word places=62604 nats_a_place=-0.0005 (±0.0006)
