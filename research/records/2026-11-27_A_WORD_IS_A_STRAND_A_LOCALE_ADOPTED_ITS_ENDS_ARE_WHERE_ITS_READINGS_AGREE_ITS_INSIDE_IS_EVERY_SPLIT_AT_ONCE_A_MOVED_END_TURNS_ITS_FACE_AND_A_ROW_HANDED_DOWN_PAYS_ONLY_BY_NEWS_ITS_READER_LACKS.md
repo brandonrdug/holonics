@@ -1,6 +1,6 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z52 fixed before their reads; the formal thread,
+[interpretation at weight 0.7, with twenty finite statements in Lean and the guesses G-Z13 to G-Z56 fixed before their reads; the formal thread,
 November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
@@ -534,14 +534,50 @@ The read locates the depth: an address never met again reads at the field's back
 by the addresses it holds and its leak, and its slope `g_k + a_k ρ_k` gives it nothing. The cap is located where the fitted `a_k`
 falls toward zero, the depth past which suffixes no longer recur within the leak's span. G-Z51 and G-Z52 are fixed.
 
-## 23. Owners
+## 23. A nested store is a flag, and a depth's worth is its slope on its graded piece (the lead's floor arm and slopes, 20:08 UTC)
+
+The floor arm takes the field's own background, `√(‖F‖²/(2J²A))`, a symbol's read at an uncharged carry, as the charge's floor. It
+charges 635,131 addresses against k = 1 to 8's 1,892,096 and keeps +0.020 (scatter 0.019) of the +0.072 at the third letter past
+a reset, 0.28 of it: G-Z51 held, and the store stands as k = 1 to 8 charged with its news at every depth.
+
+**The composition (0.65).** The address of length `k + 1` fixes the address of length `k`, so the depths' reads lie on a flag
+
+  `F_1 ⊂ F_2 ⊂ ⋯ ⊂ F_8`,   `x_k = ρ_k ℓ_k` read at `F_k`,
+
+and the read the slopes fit is `Σ_k a_k x_k`. Abel summation writes it on the flag's graded pieces `F_k / F_(k−1)`:
+
+  `Σ_k a_k x_k = Σ_k b_k (x_k − x_(k−1))`,   `b_k = Σ_(j ≥ k) a_j`,   `x_0 = 0`
+
+(Lean `flag_slopes_tail_sums`, with `flag_increments_telescope`: the pieces telescope back to the deepest read). The two are one
+read with one code and one gain, in two bases. In the basis of the reads, neighbouring depths share all but one place of their
+address and trade against each other, which is the alternation of the lead's slopes at `J = 512` (−0.33, −0.40, −0.28, 0.33, −0.51,
+0.90, 0.72, 0.28 on the even half). In the flag's own basis, `b_k` is the weight on the news depth `k` adds over depth `k − 1`, and
+it is the depth's own worth: 0.71, 1.04, 1.44, 1.72, 1.39, 1.90, 1.00, 0.28 on the even half and 1.63, 0.78, 1.76, 1.89, 0.17,
+1.25, −0.18, −0.32 on the odd, positive on both at every depth from 1 to 6 and split at 7 and 8. So `J = 512` locates depth six.
+A depth's slope fitted alone takes the shares of every shallower depth with it, and it is a ruler beside this one; `b_1 = Σ a_k`
+is the store's whole weight. G-Z53 and G-Z54 are fixed on the tail sums at `J = 4,096`.
+
+**The next composition (0.55).** One slope per depth locates one depth for every address. The context tree locates it at each
+address: its weight at a node is the mixture over the standings that stop there or go deeper (atlas
+`landmark.context-tree-mixture-over-standings`, Lean `Compression/Landmark/Context/Standing`), and its classical form carries at
+each node the ratio of the two codes. On the store that ratio is a store of its own, a stop weight `β` at each depth's carry,
+charged at each meeting by the code of stopping there less the code of the deeper read and leaking, read through the same pairing
+`⟨B, χ_k⟩` as `F`; the read mixes down the flag by `σ(β)`. It is a store and no cache: its rows are shared, its charge is its news
+and its read costs a pairing. G-Z55 is fixed on it. The lead's ruler (20:12 UTC) builds it as `β_k = Re⟨B, χ_k⟩/J`, mixes from
+the deepest read up, `M_k = σ(β_k) P_k + (1 − σ(β_k)) M_(k+1)`, and charges `B` by `η (c(M_(k+1)) − c(P_k))`, the tree's Bayes
+update in the log chart tempered by `η`, with no leak yet. Where the global form weighs a depth by its own read power, this form
+weighs it by its parent's stop weight alone, so at a word's first meetings half of each address's mass goes to a deeper read that
+may stand at the background. Depth located at the read repairs it without touching the charge: where depth `k + 1` reads at the
+field's background, `M_k = P_k`. G-Z56 is fixed on that one change.
+
+## 24. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
   `her_rings_alias`, `skin_heard_iff`, `skin_at_period`, `two_paths_code_le`, `adjoin_part_same_ring`,
-  `regarding_two_splits`, `regarding_splits_differ`, `carry_pairing_le`, `carry_pairing_full_iff`, `delta_charge_contracts` and
-  `delta_charge_zero_at_read` (checked).
+  `regarding_two_splits`, `regarding_splits_differ`, `carry_pairing_le`, `carry_pairing_full_iff`, `delta_charge_contracts`,
+  `delta_charge_zero_at_read`, `flag_increments_telescope` and `flag_slopes_tail_sums` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z52.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z56.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
