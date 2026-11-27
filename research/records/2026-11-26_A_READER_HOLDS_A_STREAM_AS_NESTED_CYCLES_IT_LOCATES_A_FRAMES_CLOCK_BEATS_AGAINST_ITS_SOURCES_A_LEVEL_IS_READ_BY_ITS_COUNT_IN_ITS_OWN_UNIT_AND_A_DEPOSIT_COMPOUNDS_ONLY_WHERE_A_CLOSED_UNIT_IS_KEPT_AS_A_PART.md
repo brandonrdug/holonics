@@ -300,3 +300,97 @@ letters' rarity would have them.
 
 Owners: atlas `tower.second-level-cut-by-unbound-share` (interpretation) and the reading of `C¹` in
 `tower.level-receipt-codec-and-square`; Lean `HNN/OwnCycleCells`, `unsaid_share_scale_free`.
+
+## 13. The level's unit is the epoch's strand face on the count of its parts (asked by the lead, November 27)
+
+**The lead's reading.** The receipt kept inside the level (W132i, from W131w's end beside its plain control) holds the level's face
+at 2.98 nats a place against 22.50 and costs the held text 0.0253 nats a place (every region 0.018 to 0.026), a third less than the
+joined receipt's cost on W101r and of the same shape. The share the join leaves unsaid at a word's first letter is 0.893, the second
+level cut by `n` lands on word starts at 0.334 against 0.338 shuffled, and her state's word presence did not move. The face holds the
+rhythm of breaks whatever its route.
+
+**The law** (0.75, `agent-inferred`). The level's unit is the epoch's strand face,
+
+    m_j = Σ_(t∈e_j) Ĝ(t − s_j)⁻¹ E(u_t),
+
+each symbol's own word turned back by the fine rings' phases counted from the epoch's site `s_j` and summed at the epoch's close.
+The news decides where a unit ends, and the count of its parts addresses what stands inside it. It is the source moment of the
+retention law (`navigator.source-moment`, `navigator.clocked-ring-moment`) read over one cycle, and §4's law one level down: a
+unit is a cycle of the level below, read by the count of its own parts. The rings' turn is used without their fade, since an epoch
+is read whole at its close and no place in it is far.
+
+**What the built restriction changed, and why it held the handed epoch at 0.009.** `code.epoch-news-phase-chart` restricts
+`Σ_(t∈e_j) e^(2πikφ_t) r̂(x_t)` over six harmonics of the news phase. Two things differ from the strand face, and each loses the
+unit's content. The chart: on the news phase a predicted place stands where the place before it stood (51.7% of an epoch's places
+share the sixth of the place before, 75.1% of those under 1 nat; `tower.news-phase-chart-blind-to-dark-order`), and one word read
+with two surprises takes two addresses, where on the count of places its positions are told apart up to the product of the rings'
+periods whatever the reader expected. The term: `r̂(x_t)` is her state at the place, mostly her guess of what comes next, where
+`E(u_t)` is the symbol, and a sum of guesses keeps the rhythm of the breaks and drops the letters, which is what G-L5 read. The news
+phase was chosen on November 13 so that predicted places added to an epoch move no other place's phase; that holds for where the
+epoch is cut, which the news still decides, and it is what leaves the inside of a unit without an address.
+
+**The premise read first, before any build.** Four cells on the same epochs, one change each (the term `r̂` or `E`, the chart of
+news harmonics or of ring phases from the site), with the built restriction as the control, read for the letters at positions 1 to
+8, the epoch as one identity, and the next epoch's first letter from `m_(j−1)`. G-Z8 to G-Z10 are in `GUESS.txt`.
+
+Owners: atlas `tower.level-unit-is-the-epochs-strand-face` (interpretation).
+
+## 14. The level's width is read as the face's capacity price, and the join is scored by codes (asked by the lead, November 27)
+
+**The premise read** (the lead, on W132i's end: 407 word rows, 34,530 epochs, least squares fitted on even rows and read on odd; the
+rings the fine field's own, periods 2, 3 and 4 giving six terms a place, and 2, 3, 4, 9 and 16 giving ten; the cell of her read on
+the news harmonics equals the built moment at a correlation of 1.0000). The bytes at the epoch's places 1 to 8 stand at 0.13 to 0.33
+in the built level's 64 coordinates; at 0.55, 0.53, 0.43 and then 0.39 down to 0.25 in the built moment itself; at 0.66 to 0.82 for
+places 1 to 7 with her read on the rings; at 0.84, 0.52 and then 0.30 to 0.41 with the symbol on the news harmonics; at 0.944, 0.923,
+0.920, 0.895, 0.835, 0.789, 0.687 and 0.445 on the strand face; and at 0.94 to 0.99 at every place on ten ring terms, against a
+ceiling of 0.993 to 0.998 with the first eight symbols side by side. The epoch as one identity (64 hashed cells) reads 0.013 in the
+built level, 0.063 on the strand face and 0.066 at the ceiling, and the next epoch's first byte 0.006 to 0.012 in every cell against
+a ceiling of 0.007.
+
+**The scores.** G-Z8 missed, its bar of 0.5 above the ruler's own ceiling of 0.066: the error of G-Z7, a guess fixed before its
+ruler's ceiling was read. G-Z9 missed on its first half (the symbol on the news chart holds places 3 to 6 at 0.36 to 0.41, not under
+0.3) and held on its second (the strand face holds places 1 to 6 at 0.79 or more). G-Z10 missed: no linear read reaches the next
+epoch's first byte, even at the ceiling.
+
+**What the read says.** The built level loses its epoch twice: on the news chart (past the first place the bytes fall to about 0.4,
+where on the rings they hold 0.8 to 0.94), and in its restriction to 64 coordinates (about half of its own moment's presence). The
+lead builds the restriction on the strand face with six terms and keeps the prolongation on the news harmonics, one change against
+its control; the prolongation on the count of places is the arm after it.
+
+**The width** (0.8). The level's width is read before the build as the face's capacity price (`code.capacity-price`): the strand
+face restricted to its leading directions on even rows at widths 16, 32, 64, 128 and its full width, each read on odd rows for the
+bytes at places 1 to 8, and the width is the least one whose read stands within the read's own spread (the halves swapped) of the
+unrestricted face's. That read is the width's receipt, and the width enters the line's declaration, and the widths' table of #1088
+where it is a constant, as read and never as picked. The built level kept half its own moment at 64, so 64 is no default.
+
+**The join** (0.75). A join is scored by codes and never by a linear presence: a next word's first byte is a function of the word
+before it that no linear read holds, and the level's face is no linear reader. The score is the unsaid share `n = R/Z` of §12 read
+by part (at a word's first letter 0.893 on W132i, inside a word 0.810, on spaces and marks 0.521), the arm against its control. Its
+ceiling is a count ruler read first: the code of the next epoch's first byte given the spelling of the epoch before, against its
+code alone, counted on even rows with backoff and read on odd, which is the most any reader across the join can tell. Her depth (the
+word two before, 0.025 on W129w) and her writes stand beside it. G-Z11 and G-Z12 are in `GUESS.txt`, each fixed against the ceiling
+it names, none of which was read.
+
+## 15. The join's anchor is the level's standing state, and the face's width has no cut under its whole (November 27)
+
+**The reads** (the lead, on W132i's end). The strand face on rings 2, 3 and 4, restricted to its leading directions on one half and
+read on the other both ways, holds the bytes at places 1 to 8 at 0.15 to 0.49 at width 16, 0.30 to 0.58 at 32, 0.62 down to 0.35 at
+64, 0.80 down to 0.41 at 128 and 0.94 down to 0.44 at its full width of 1,344, with spreads of 0.000 to 0.014. G-Z11 held: at 64 the
+restricted face keeps 0.655 to 0.779 of the full face's read at places 1 to 6. A count ruler of the join (the spelling of the epoch
+before and the place's distance) tells nothing past a unigram on the 407 word rows, a null that no planted join has yet proved. The
+join's own codes on W132i stand near the counted unigram: 3.86 nats at word starts against 3.81, 3.21 against 3.30 inside a word,
+3.11 against 3.04 at other bytes.
+
+**The correction** (0.8). `Z_j` of §12 is the unit read from the level's standing state, the mean of its rows, which is its own
+marginal over units, and never from a row at zero. No store is at rest, and a level with nothing crossing a join still holds its
+steady state; a zero row is the reader's bias alone (4.40 nats at word starts), so the 0.88 unsaid share read on W132i was mostly
+the distance from that bias to a unigram. With the anchor corrected, `1 − n` is what the join tells past the level's own prior, and
+on W132i it stands near zero at word starts, which is her depth of one read at the join.
+
+**The width.** By §14's criterion the least width is the full face: no direction of the strand face can be dropped at this read's
+resolution. A restriction is then a cost, priced per doubling (64 to 128 buys about 0.15 a doubling at places 1 to 6, 128 to the full
+face about 0.05), and the arm that reads the width tries the face unrestricted, the moment itself as the level's unit, unless its card
+cost, projected first, binds. The lead's first arm keeps 64 so that the trained level carries over, one change against its control.
+
+**The ruler's null** is proved by a planted join on the same shapes (method rule 11): the next epoch's first byte set by the last
+letter of the epoch before on a share of rows. A larger text raises its ceiling and proves nothing alone.

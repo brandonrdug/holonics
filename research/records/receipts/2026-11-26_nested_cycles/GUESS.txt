@@ -24,3 +24,22 @@ G-Z5 (0.55). On W101r's mean, on the 407 word rows, the second level cut by n pu
 G-Z6 (0.65). On W129w's and W101's means (their level faces code above the flat face) the same cut stands inside 0.02 of its
   shuffle.
 G-Z7 (0.5). On W101r's mean the median second-level unit holds 2 or 3 first-level units.
+
+Fixed 2026-11-27T03:30Z (date -u 03:27:48 at drafting), on the lead's question of the level's unit, before any read and sent to the
+lead at that time. Four cells on the same epochs and rows of W132i's end, one change each: the term r(x_t) (her read at t) or E(u_t)
+(the symbol's word), and the chart (six harmonics of the news phase, or the fine rings' phases counted from the epoch's site);
+least squares fitted on one half and read on the other. The built restriction (r, news harmonics) is the control.
+
+G-Z8 (0.7). The epoch as one identity: the control near 0.01; E on ring phases at 0.5 or more.
+G-Z9 (0.65). E on the news harmonics holds the epoch's first byte at 0.6 or more and its letters at positions 3 to 6 under 0.3;
+  E on ring phases holds the letters at positions 1 to 6 at 0.6 or more each.
+G-Z10 (0.5, a coin). The next epoch's first letter read from m_(j-1), E on ring phases, at twice the control cell's share or more
+  (the level of November 17 held 0.043).
+
+Fixed 2026-11-27T04:05Z (date -u 04:01:23 at drafting), on the lead's questions of the level's width and the join's score, before
+any read and with no ruler's ceiling read; each stands against the ceiling it names.
+
+G-Z11 (0.55). At width 64 the strand face restricted to its leading directions holds the bytes at places 1 to 6 under nine tenths
+  of the unrestricted face's presence.
+G-Z12 (0.45). Two laps of the arm with the restriction on the strand face close at least a fifth of the gap between the join's
+  unsaid share at a word's first letter (0.893 on W132i) and a count ruler's unsaid share there.
