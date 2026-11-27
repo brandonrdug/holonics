@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, and a charge is its news
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, and a nested store's depths are read on the graded pieces of its flag
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -56,6 +56,12 @@ finite statements those rows do not.
 10. **A charge is its news** (`delta_charge_contracts`, `delta_charge_zero_at_read`). The delta step `x + η (m − x)` moves an
     address's read toward its letter by `(1 − η)` of its distance, and an address that already reads its letter takes no charge,
     so a heavy address saturates where a summed charge grows with every word that shares it.
+11. **A nested store is a flag, and a depth's worth is its slope on its graded piece** (`flag_increments_telescope`,
+    `flag_slopes_tail_sums`). The address of length `k + 1` fixes the address of length `k`, so the reads `x_0, …, x_(n−1)` at the
+    depths sit on a flag. Their graded pieces `x_k − x_(k−1)` (with `x_(−1) = 0`) telescope back to the deepest read, and a read
+    `Σ_k a_k x_k` is the same read `Σ_k b_k (x_k − x_(k−1))` with `b_k = Σ_(j ≥ k) a_j`: the slope on the news depth `k` adds over
+    depth `k − 1` is the tail sum of the slopes from `k` down. A fit on the reads themselves trades neighbours; the tail sums are
+    the same fit read in the flag's own coordinates.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -215,5 +221,33 @@ theorem delta_charge_contracts (x m η : ℝ) : x + η * (m - x) - m = (1 - η) 
 /-- An address that already reads its letter takes no charge. -/
 theorem delta_charge_zero_at_read (x m η : ℝ) (h : x = m) : η * (m - x) = 0 := by
   simp [h]
+
+/-- The graded pieces of a flag of reads telescope back to the deepest read. -/
+theorem flag_increments_telescope (r : ℕ → ℝ) (n : ℕ) :
+    ∑ k ∈ Finset.range (n + 1), (r k - if k = 0 then 0 else r (k - 1)) = r n := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.sum_range_succ, ih]
+    simp
+
+/-- A read on the depths of a flag is the same read on its graded pieces, each piece weighed by the tail sum of the slopes from
+its depth down (Abel summation). -/
+theorem flag_slopes_tail_sums (a r : ℕ → ℝ) (n : ℕ) :
+    ∑ k ∈ Finset.range n, a k * r k =
+      ∑ k ∈ Finset.range n, (∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1)) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hsplit : ∑ k ∈ Finset.range (n + 1),
+        (∑ j ∈ Finset.Ico k (n + 1), a j) * (r k - if k = 0 then 0 else r (k - 1)) =
+        ∑ k ∈ Finset.range (n + 1),
+          ((∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1)) +
+            a n * (r k - if k = 0 then 0 else r (k - 1))) := by
+      refine Finset.sum_congr rfl fun k hk => ?_
+      rw [Finset.sum_Ico_succ_top (Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)), add_mul]
+    rw [hsplit, Finset.sum_add_distrib, ← Finset.mul_sum, flag_increments_telescope,
+      Finset.sum_range_succ (fun k => (∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1))),
+      Finset.Ico_self, Finset.sum_empty, zero_mul, add_zero, ← ih, Finset.sum_range_succ]
 
 end Holonics.HNN.OwnCycleCells

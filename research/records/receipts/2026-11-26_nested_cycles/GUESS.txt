@@ -325,3 +325,29 @@ G-Z51 (0.6). Any floor on the charge, the field's own background √(‖F‖²/J
   word's third letter past a reset under 0.5 of k = 1 to 8's at the same J.
 G-Z52 (0.55). With k = 1 to 8 at J = 4,096, the fitted read slopes a_k fall past a word's typical length: a_8 stands under a fifth of
   the largest a_k.
+
+Scored 2026-11-27T20:08Z on the lead's floor arm at J = 512 (the background √(‖F‖²/(2J²A)), a symbol's read at an uncharged
+carry, as the floor): G-Z51 held. The floored store charges 635,131 addresses on its own walk (489,184 and 404,438 on the joint
+walks) against 1,892,096 for k = 1 to 8, and past a reset gains +0.020 (scatter 0.019) at the third letter, 0.28 of k = 1 to 8's
++0.072, and +0.013 after it, 0.22 of k = 1 to 8's; over every byte place +0.0018 (scatter 0.0060, halves +0.0048 and −0.0012).
+
+Fixed 2026-11-27T20:10Z (date -u 20:10:57 at drafting), before the J = 4,096 read. Premise read first: the address of length k + 1
+determines the address of length k, so the reads at k = 1 to 8 are a flag, and a fit on the reads themselves trades neighbours;
+on its graded pieces (the read at k less the read at k − 1) the same fit's slopes are the tail sums b_k = Σ_(j ≥ k) a_j (Lean
+OwnCycleCells.flag_slopes_tail_sums). At J = 512 the tail sums of the lead's slopes are 0.71, 1.04, 1.44, 1.72, 1.39, 1.90, 1.00,
+0.28 on the even half and 1.63, 0.78, 1.76, 1.89, 0.17, 1.25, −0.18, −0.32 on the odd half: positive in both at k = 1 to 6.
+
+G-Z53 (0.65). At J = 4,096 the tail sums of the joint fit's a_k are positive on both halves at every k from 1 to 6.
+G-Z54 (0.5). At J = 4,096 the located depth, the deepest k at which that tail sum and every shallower one are positive on both
+  halves, is 7 or 8, deeper than the 6 that J = 512 locates.
+G-Z55 (0.45). A stop weight per address (at each depth's carry a ratio store charged at each meeting by the code of stopping there
+  less the code of the deeper read, leaking, the context tree's own weight), at J = 512, gains at a recurring word's third letter
+  past a reset at least 1.2 times the joint fit's +0.072.
+
+Noted 2026-11-27T20:14Z (date -u 20:14:58 at drafting), before G-Z55's read: the lead's ruler (tools/tree_store_ruler.py, J = 512)
+builds the stop weight as β_k = Re⟨B, χ_k⟩/J, mixes from the deepest read up, M_k = σ(β_k) P_k + (1 − σ(β_k)) M_(k+1), and charges
+B by η (c(M_(k+1)) − c(P_k)) with no leak; G-Z55 is scored on that form, its missing leak named beside the score.
+
+G-Z56 (0.5). In the same ruler, passing the deeper mixture through where the deeper address reads at the field's background
+  (M_k = P_k wherever depth k + 1 reads at √(‖F‖²/J) or under), with the charge unchanged at every depth, gains at least 0.01 nats
+  more at a recurring word's third letter past a reset than the form without it.
