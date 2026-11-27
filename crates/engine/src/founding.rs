@@ -347,6 +347,9 @@ impl Constitution {
         // the fine face (`A`'s columns of each harmonic, `B`'s rows and `b_B` of each harmonic) take the lane at zero, so the restriction reads no
         // lane coordinate and the prolongation writes none, and every face is kept. Each block is harmonic-major (`k D₀ + c`, [`charted`]).
         if let Some(sc) = &self.scale {
+            if !sc.bank.is_empty() {
+                return refuse("a field's lanes grown under a level that holds a slow store (its block is not laid again)");
+            }
             // [the lead, November 20] The one-sided block's rows of the fine face (`B⁻`, `b_B⁻`, [`Scale::before_offsets`]) take the lane at
             // zero as `B`'s do, laid after the law's glue as before.
             let before = sc.before_offsets(dw);
@@ -396,7 +399,7 @@ impl Constitution {
             debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, total1));
             debug_assert_eq!(ng, from.len());
             from.extend(gfrom);
-            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue, receipt: sc.receipt, inside: sc.inside, strand: sc.strand, lane: sc.lane }));
+            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue, receipt: sc.receipt, inside: sc.inside, strand: sc.strand, bank: sc.bank.clone(), lane: sc.lane }));
         }
         Ok((out, from))
     }
@@ -906,6 +909,49 @@ impl Constitution {
         Ok((out, from_map))
     }
 
+    /// [definition; the formal thread, November 27 08:22 UTC; the lead's build] **The field whose level's rings hold their fades**: the
+    /// level's own field founded as [`Constitution::with_fade_between`] founds the fine field's (its turned slots' `ℓ_s` appended at the end
+    /// of the level's material, at `ell` on the rings of period `from` to `to`, zero on the others), every other entry kept, the fine field
+    /// and the glue as they stand. The level's sites are epochs, so a ring of period `n` faded at one e-fold a turn hears about `n` epochs
+    /// back, where at the skin's constant it keeps `e^(−2π)` of itself over its own turn. Also the map over the whole material from each new
+    /// entry to the old one it copies (`None` for the level's fades). Refused on a field with no level, or whose level holds them.
+    pub fn with_level_fade(&self, from: usize, to: usize, ell: i32) -> Result<(Self, Vec<Option<usize>>)> {
+        let Some(s) = self.scale.as_deref() else { return refuse("a level's fades on a field with no level") };
+        let (coarse, cmap) = s.coarse.with_fade_between(from, to, ell)?;
+        let (len0, len1) = (self.theta.len(), s.coarse.theta.len());
+        let mut from_map: Vec<Option<usize>> = (0..len0).map(Some).collect();
+        from_map.extend(cmap.iter().map(|o| o.map(|i| len0 + i)));
+        from_map.extend((0..s.glue.len()).map(|g| Some(len0 + len1 + g)));
+        let mut out = self.clone();
+        out.scale = Some(Box::new(Scale { coarse, ..s.clone() }));
+        Ok((out, from_map))
+    }
+
+    /// [definition; the formal thread, November 27 08:51 UTC; the lead's build] **The field whose level holds a slow store** ([`Scale::bank`]):
+    /// the bank's block appended at the end of the glue, `B_bank` at zero and each ring's fade at `ell` (on `2^(−24)`), so every face is the
+    /// source's bit for bit until `B_bank` moves. Also the map over the whole material from each new entry to the old one it copies (`None`
+    /// for the block). Refused on a field with no level, on a level without its one-sided block, or one that holds a bank.
+    pub fn with_bank(&self, periods: &[u32], ell: i32) -> Result<(Self, Vec<Option<usize>>)> {
+        let Some(s) = self.scale.as_deref() else { return refuse("a slow store on a field with no level") };
+        if !s.bank.is_empty() || periods.is_empty() || s.before_offsets(self.declaration.width).is_none() {
+            return refuse("a slow store on a level that holds one, with no rings, or without its one-sided block");
+        }
+        temperature_of(ell, &self.fine)?;
+        let total = self.material_len();
+        let mut out = self.clone();
+        let mut sc = s.clone();
+        sc.bank = periods.to_vec();
+        let (_, bf, end) = sc.bank_offsets_unchecked(self.declaration.width);
+        sc.glue.resize(end, 0);
+        for v in &mut sc.glue[bf..end] {
+            *v = ell;
+        }
+        out.scale = Some(Box::new(sc));
+        let mut from: Vec<Option<usize>> = (0..total).map(Some).collect();
+        from.resize(out.material_len(), None);
+        Ok((out, from))
+    }
+
     /// [definition; the lead, November 25] **The field whose classes fade at their own rates** ([`Declaration::fade_rate`]): `ρ_h`, one row of
     /// `A + 1` a paced head, appended at the end of the fine field's material, founded at zero, every standing entry kept, so every skin
     /// clock is the turn's variation and every face the source's bit for bit. Also the map over the whole material from each new entry to the
@@ -1288,6 +1334,9 @@ impl Learner {
         let Some(old) = self.field.scale.as_deref() else { return refuse("the level's own lane on a field without a level") };
         let dw0 = self.field.declaration.width;
         let Some((b2, bb2, _)) = old.before_offsets(dw0) else { return refuse("the level's own lane on a level without its one-sided block") };
+        if !old.bank.is_empty() {
+            return refuse("the level's own lane on a level that holds a slow store (its block is not laid again)");
+        }
         // The old block's spread, from its own entries.
         let block = &old.glue[b2..bb2];
         let n = block.len() as i128;
@@ -1744,6 +1793,66 @@ impl Learner {
                 spread.insert(self.field.families().len(), 0);
                 if spread.len() != field.families_all().len() {
                     return refuse("a lattice whose families do not meet the faded field's");
+                }
+                Some(Lattice { spread, rest: mapped(&l.rest) })
+            }
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 27] **The learner whose level's rings hold their fades** ([`Constitution::with_level_fade`]), founded
+    /// as [`Learner::with_fade_between`] founds the fine field's: every standing entry keeps its moments, its remainder, its carried grains
+    /// and its rate; the fades' moments open at zero and where the learner carries each entry's own rate they take `rate_bits`; on a lattice
+    /// the level's fades take a family of their own after the level's others, read whole until a save reads its spread. Refused while a step
+    /// is held.
+    pub fn with_level_fade(&self, from: usize, to: usize, ell: i32) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its level's fades after its held step is read");
+        }
+        let (field, from_map) = self.field.with_level_fade(from, to, ell)?;
+        let mapped = |v: &[i32]| -> Vec<i32> { from_map.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let first = from_map.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from_map.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from_map.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from_map.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let lattice = match &self.lattice {
+            Some(l) => {
+                let mut spread = l.spread.clone();
+                let at = self.field.layout.families.len() + self.field.scale.as_deref().map_or(0, |s| s.coarse.layout.families.len());
+                spread.insert(at, 0);
+                if spread.len() != field.families_all().len() {
+                    return refuse("a lattice whose families do not meet the faded level's");
+                }
+                Some(Lattice { spread, rest: mapped(&l.rest) })
+            }
+            None => None,
+        };
+        Ok(Self { lattice, carried, remainder, field, first, second, rate_bits: self.rate_bits, drawn: self.drawn, laps: self.laps, held: None, read_held: self.read_held, rate_parts: self.rate_parts, own_rates, leak: self.leak, last: None, pass: self.pass.clone() })
+    }
+
+    /// [definition; the lead, November 27] **The learner whose level holds a slow store** ([`Constitution::with_bank`]): every standing entry
+    /// keeps its moments, its remainder, its carried grains and its rate; the block's moments open at zero and where the learner carries each
+    /// entry's own rate they take `rate_bits`; on a lattice the block's two families (`B_bank`, the fades) are appended, read whole until a
+    /// save reads their spreads. Refused while a step is held.
+    pub fn with_bank(&self, periods: &[u32], ell: i32) -> Result<Self> {
+        if self.held.is_some() {
+            return refuse("a learner founds its slow store after its held step is read");
+        }
+        let (field, from_map) = self.field.with_bank(periods, ell)?;
+        let mapped = |v: &[i32]| -> Vec<i32> { from_map.iter().map(|o| o.map_or(0, |i| v[i])).collect() };
+        let first = from_map.iter().map(|o| o.map_or(0, |i| self.first[i])).collect();
+        let second = from_map.iter().map(|o| o.map_or(0, |i| self.second[i])).collect();
+        let own_rates = self.own_rates.as_ref().map(|own| from_map.iter().map(|o| o.map_or(self.rate_bits, |i| own[i])).collect());
+        let remainder = self.remainder.as_ref().map(|r| from_map.iter().map(|o| o.map_or(0, |i| r[i])).collect());
+        let carried = self.carried.as_ref().map(|(a, b)| (mapped(a), mapped(b)));
+        let lattice = match &self.lattice {
+            Some(l) => {
+                let mut spread = l.spread.clone();
+                spread.extend([0, 0]);
+                if spread.len() != field.families_all().len() {
+                    return refuse("a lattice whose families do not meet the banked level's");
                 }
                 Some(Lattice { spread, rest: mapped(&l.rest) })
             }

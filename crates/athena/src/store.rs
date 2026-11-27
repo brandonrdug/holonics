@@ -1295,6 +1295,69 @@ pub fn found_fade(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [definition; the lead, November 27, the formal thread's slow store of 08:51 UTC] `found-bank STATE STATE_SHA PERIODS MILLI OUT`: **the state
+/// whose level holds a slow store** ([`holonics_engine::field::Learner::with_bank`]): the bank's rings on the periods `PERIODS` (comma-joined,
+/// in sections of news on the level's clock), each ring's fade at `2^(MILLI/1000)` e-folds a radian (one e-fold a turn is `MILLI = −2651`),
+/// its block `B_bank` at zero, so every face is the source's bit for bit and the state differs from its source by the bank alone. Written and
+/// read back.
+pub fn found_bank(args: &[String]) -> Result<()> {
+    if args.len() != 6 {
+        return Err("found-bank STATE STATE_SHA PERIODS MILLI OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let periods: Vec<u32> = args[3].split(',').map(str::parse).collect::<std::result::Result<_, _>>()?;
+    let ell = i32::try_from(holonics_engine::field::div_nearest(i128::from(args[4].parse::<i64>()?) << holonics_engine::field::MATERIAL_BITS, 1000)).map_err(|_| "a fade past its chart")?;
+    let out = Path::new(&args[5]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = end.with_bank(&periods, ell).map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("FOUND_BANK periods={} fade={ell} entries={} lattice={}", args[3], founded.field.material_len(), founded.lattice.is_some());
+    Ok(())
+}
+
+/// [definition; the lead, November 27, the formal thread's slow store] `found-level-fade STATE STATE_SHA FROM TO MILLI OUT`: **the state whose
+/// level's rings hold their fades** ([`holonics_engine::field::Learner::with_level_fade`]), founded at `2^(MILLI/1000)` of the skin's fade on
+/// the level's rings of period `FROM` to `TO` and at the skin's on the others (one e-fold a turn is `MILLI = −2651`, `log₂ 1/2π`). Every other
+/// line of the state is kept, so it differs from its source by the level's fades alone. At `MILLI = 0` every face is the source's bit for
+/// bit. Written and read back.
+pub fn found_level_fade(args: &[String]) -> Result<()> {
+    if args.len() != 7 {
+        return Err("found-level-fade STATE STATE_SHA FROM TO MILLI OUT".into());
+    }
+    let text = pinned_read(&args[1], &args[2], STATE_BUDGET)?;
+    let end = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if end.to_text().as_bytes() != text.as_slice() {
+        return Err("a state that does not read and write back byte for byte".into());
+    }
+    let (from, to): (usize, usize) = (args[3].parse()?, args[4].parse()?);
+    let ell = i32::try_from(holonics_engine::field::div_nearest(i128::from(args[5].parse::<i64>()?) << holonics_engine::field::MATERIAL_BITS, 1000)).map_err(|_| "a fade past its chart")?;
+    let out = Path::new(&args[6]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let founded = end.with_level_fade(from, to, ell).map_err(|e| e.to_string())?;
+    let written = founded.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    let c = &founded.field.scale.as_deref().ok_or("a state with no level")?.coarse;
+    let at = c.layout().fade;
+    let fades: Vec<String> = c.rings().iter().enumerate().filter(|(s, _)| c.theta[at + s] != 0).map(|(s, (n, _))| format!("{n}:{}", c.theta[at + s])).collect();
+    println!("FOUND_LEVEL_FADE rings={} faded={} [{}] entries={} lattice={}", c.rings().len(), fades.len(), fades.join(" "), founded.field.material_len(), founded.lattice.is_some());
+    Ok(())
+}
+
 /// [definition; the lead, November 25, Neon's audit relayed by Brandon] `found-fade-rate STATE STATE_SHA OUT`: **the state whose classes fade
 /// at their own rates** ([`holonics_engine::field::Declaration::fade_rate`], [`holonics_engine::field::Learner::with_fade_rate`]), founded at
 /// zero: every face is the source's bit for bit and every other line of the state is kept, so it differs from its source by the rows alone

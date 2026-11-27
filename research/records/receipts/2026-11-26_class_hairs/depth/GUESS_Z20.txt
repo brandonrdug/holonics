@@ -1,0 +1,11 @@
+G-Z15 to G-Z20, the formal thread's, relayed between 08:14 and 08:52 UTC on November 27 (G-Z20's relay at 08:51:55 UTC, before its read
+was dispatched at 08:53:24 UTC; the thread names it fixed at 08:55Z).
+G-Z15 (0.55): W134s's last 250 sections read 1.010 to 1.020 times W134's, so G-L7 (a) misses.
+G-Z16 (0.5): W134s's held gap at its mean is +0.012 to +0.025.
+G-Z17 (0.55): in the slow store's arm less its control, first letters of words last met over 30 places back stand at least 0.03 nats under
+those met within 30.
+G-Z18 (0.6): W133s less W133 by fifth of W133's own face entropy rises across fifths, top at least 3x bottom.
+G-Z19 (0.6): on W133s's mean x¹_j holds the epoch k back under 0.05 for k = 4, 8, 16.
+G-Z20 (0.55): founded on W133s's end and untrained, the bank (m²_j = Σ_(i≤j) Ĝ²(τ¹_j − τ¹_i)⁻¹ x¹_i, octave periods on τ¹ at one e-fold a
+turn, charged by x¹ before the level's ticks) holds the third place's byte of the epoch k back at least 3x the ticked level's at k = 4 and
+8 (0.060 and 0.030 or more).

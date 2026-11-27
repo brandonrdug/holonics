@@ -319,7 +319,8 @@ impl Constitution {
         let mut out = format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "));
         if let Some(s) = &self.scale {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
-            out.push_str(&format!("level {} {}{}{}{}\n{}{}\n", s.harmonics, s.split, if s.strand { " strand" } else { "" }, if s.receipt { if s.inside { " receipt inside" } else { " receipt" } } else { "" }, if s.lane { " lane" } else { "" }, s.coarse.to_text(), glue.join(" ")));
+            let bank = if s.bank.is_empty() { String::new() } else { format!(" bank {}", s.bank.iter().map(u32::to_string).collect::<Vec<_>>().join(",")) };
+            out.push_str(&format!("level {} {}{}{}{}{bank}\n{}{}\n", s.harmonics, s.split, if s.strand { " strand" } else { "" }, if s.receipt { if s.inside { " receipt inside" } else { " receipt" } } else { "" }, if s.lane { " lane" } else { "" }, s.coarse.to_text(), glue.join(" ")));
         }
         out
     }
@@ -343,6 +344,11 @@ impl Constitution {
         if let Some(head) = lines.peek().copied().filter(|l| l.starts_with("level ")) {
             lines.next();
             // [the lead, November 23] The word `receipt` after the two counts, where the level is compared at its own grain ([`Scale::receipt`]).
+            // [the lead, November 27] The word `bank` and its periods last, where the level holds a slow store ([`Scale::bank`]).
+            let (head, bank) = match head.rsplit_once(" bank ") {
+                Some((h, periods)) => (h, periods.split(',').map(|w| w.parse::<u32>().map_err(|_| TowerError::Refused("a level's bank that is not its periods"))).collect::<Result<Vec<u32>>>()?),
+                None => (head, Vec::new()),
+            };
             // [the lead, November 24] The word `lane` last, where the fine field's last lane is the level's own ([`Scale::lane`]).
             let lane = head.ends_with(" lane");
             let head = head.strip_suffix(" lane").unwrap_or(head);
@@ -360,10 +366,11 @@ impl Constitution {
             let glue = read_numbers::<i32>(lines.next())?;
             let (.., len) = crate::field::scale::glue_len(harmonics, field.declaration.width, coarse.declaration.width);
             let before = crate::field::scale::glue_before_len(harmonics, field.declaration.width, coarse.declaration.width);
-            if (glue.len() != len && glue.len() != len + before) || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
+            let banked = crate::field::scale::glue_bank_len(harmonics, field.declaration.width, coarse.declaration.width, bank.len());
+            if (glue.len() != len && glue.len() != len + before + banked) || (banked > 0 && glue.len() == len) || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
                 return refuse("a level's glue that is not its declaration's length, a split outside the ticks, or a field without the opening's block");
             }
-            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, inside, strand, lane }));
+            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, inside, strand, bank, lane }));
         }
         Ok(field)
     }

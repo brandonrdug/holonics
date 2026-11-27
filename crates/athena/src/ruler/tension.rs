@@ -1900,16 +1900,18 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
         // its places' reads and each known site's harmonics of its news phase, row after row in the table's order (`known.i32`,
         // `moment.i64`, `harmonics.i64`), and the encoding's rows (`enc.i32`).
         #[allow(clippy::type_complexity)]
-        let summed: Vec<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>)> = rows
+        let summed: Vec<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>, Vec<i64>)> = rows
             .par_iter()
             .map(|classes| field.strand_level_moment(classes, past).map_err(|e| e.to_string()).and_then(|c| c.ok_or_else(|| "a field whose level does not hear a strand".to_string())))
             .collect::<std::result::Result<_, _>>()?;
-        let (mut known, mut moment, mut phases) = (Vec::new(), Vec::new(), Vec::new());
-        for (_, read, m, hk) in &summed {
+        let (mut known, mut moment, mut phases, mut clock) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        for (_, read, m, hk, tau) in &summed {
             known.extend(read.iter().flat_map(|v| v.to_le_bytes()));
             moment.extend(m.iter().flat_map(|v| v.to_le_bytes()));
             phases.extend(hk.iter().flat_map(|v| v.to_le_bytes()));
+            clock.extend(tau.iter().flat_map(|v| v.to_le_bytes()));
         }
+        write_new(&out.join("tau.i64"), &clock)?;
         write_new(&out.join("known.i32"), &known)?;
         write_new(&out.join("moment.i64"), &moment)?;
         write_new(&out.join("harmonics.i64"), &phases)?;

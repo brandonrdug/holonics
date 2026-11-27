@@ -562,3 +562,40 @@ it lands on word starts 0.299 against 0.345 shuffled.
 third row each place's byte set to the last byte of the epoch it reads, the count finds the join (its held depth two orders; the planted
 rows' unsaid share 0.378 at a word's first letter, 0.392 inside a word, 0.376 elsewhere), so its 0.998 on the real rows is a ruler's
 null: on the word rows a count of the epoch before's spelling tells nothing past a unigram.
+
+## 17. Where the strand face's cost stands, how far the level reaches, and a slow store one level up
+
+**By place class** (`tools/place_class_ruler.py`, [`place_class.txt`](receipts/2026-11-26_class_hairs/laps/place_class.txt); the formal
+pass's decisive read). W133s less W133, paired place by place: a word's first letter +0.0546 (±0.0021), any other byte (the marks)
++0.0564, a space +0.0185, a letter inside a word +0.0180; no octave of a place's position in its stretch and no class of its word's
+recurrence codes under the control. W132i less W132 has the same shape. By fifth of the control's own code at the place
+([`price_by_surprise.txt`](receipts/2026-11-26_class_hairs/laps/price_by_surprise.txt), a stand-in for its face's entropy, which the held
+tables do not carry): +0.0007, +0.0047, +0.0197, +0.0673, +0.0530. A first letter of a word met within 30 places pays +0.0815, over 30
++0.0646, not before +0.0498. The price stands where her own face is open, as the formal pass's law says (a push `δ` on her logits costs
+`½ Var_p(δ)` under her face), and no class carries news.
+
+**How far back the level holds its epochs** (`tools/level_back_ruler.py`, [`level_back_W133s.txt`](receipts/2026-11-26_class_hairs/depth/level_back_W133s.txt);
+G-Z19 held). On W133s's end the level after its ticks holds the bytes at the first three places of the epoch `k` back at 0.16 to 0.32
+(`k = 0`), 0.04 to 0.11, 0.03 to 0.09, 0.006 to 0.020 (`k = 4`), 0.004 to 0.010 (`k = 8`) and 0.003 to 0.008 (`k = 16`): its ticks carry
+one or two epochs. Its rings faded at one e-fold a turn (`found-level-fade`, `Constitution::with_level_fade`) carry nothing farther before
+training ([`level_back_fade_W133s.txt`](receipts/2026-11-26_class_hairs/depth/level_back_fade_W133s.txt): 0.005 to 0.019 at `k = 4`), the
+contacts' loss standing in them.
+
+**The slow store** (the formal pass's law of 08:51 UTC, the strand face one level up: `m²_j = Σ_(i ≤ j) Ĝ²(τ¹_j − τ¹_i)⁻¹ x¹_i`, the
+closed epochs as the level's symbols, each ring's fade its quality). Built on the host from the dump with the level's clock and untrained,
+on octave periods of 2 to 64 sections at one e-fold a turn ([`level_back_bank_W133s.txt`](receipts/2026-11-26_class_hairs/depth/level_back_bank_W133s.txt);
+G-Z20 held): the third byte of the epoch 4 and 8 back at 0.147 and 0.082, 7.4 and 8.2 times the level's, and 0.032 at 16. The count of
+its rings read by dropping each in turn ([`bank_rings.txt`](receipts/2026-11-26_class_hairs/depth/bank_rings.txt)): every drop costs at
+least 0.01 at some age, most near its own reach (2 at one epoch back, 4 at one to two, 8 at two to four, 16 at eight, 64 at sixteen), so
+the bank is a calendar in octaves of age; adding periods 128 and 256 lifts the epoch 16 back to 0.043. G-Z21 and G-Z22 missed; six rings.
+
+Built as `Scale::bank` (the word `bank` and its periods last on the level's line; `found-bank STATE SHA PERIODS MILLI OUT`): its block
+after the one-sided block (`B_bank`, `H D₀ × 2 R D₁`, founded at zero, and one held fade a ring); the forward charges each region's bank
+with each epoch's restricted state before the level's ticks, through the turns of `bank_rotations` (the fine field's faded skin and a
+ring's phasor on the level's clock, each region's first epoch zero), reads it as a ratio to its own power one lane a ring's part, and adds
+`B_bank`'s read into each epoch's harmonic blocks beside `B⁻`'s; the reverse runs `B_bank`'s outer sum and transpose, the lanes'
+adjoint and the bank's reverse scan into the restricted states' covector, joined after the level's ticks' reverse and stopping at `A`.
+The host test `the_levels_slow_store_reads_its_epochs_back_and_its_covector_meets_the_code` (founded at zero, every face its source's;
+with the block drawn, the probes of `B_bank` and `A` meet the code's central difference); the card's scans `field_level_bank_scan`,
+`field_level_bank_back` and `field_level_bank_sum`, its parity in the strand-face test. The arm (G-L8,
+[`GUESS_L8.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L8.txt)) runs from W134s's end beside its control.

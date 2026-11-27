@@ -5293,6 +5293,112 @@ fn the_strand_face_restricts_the_symbols_words_on_the_rings_and_its_covector_sto
     assert!(read >= 6, "read {read} probes, {seams} on a seam");
 }
 
+/// [definition; the lead, November 27] **The level's rings hold their fades** ([`Constitution::with_level_fade`]): founded at zero every face
+/// of a strand is the source's bit for bit and the text keeps the level's fades; opened at one e-fold a turn on every ring the level hears its
+/// epochs farther and the faces move; the fine field and the glue keep every entry, and the level's own entries stand where they stood.
+#[test]
+fn the_levels_rings_hold_their_fades_founded_at_zero_bit_for_bit() {
+    for (still, past) in [(1usize, false), (2, true)] {
+        let plain = towered_before_live(still);
+        let classes = drawn_classes(0xD5, 13, plain.declaration.alphabet);
+        let (zero, map) = plain.with_level_fade(0, usize::MAX, 0).unwrap();
+        assert!(zero.scale.as_deref().unwrap().coarse.declaration.fade, "still {still}: the level holds its fades");
+        assert_eq!(Constitution::from_text(&zero.to_text()).unwrap(), zero, "still {still}: the text keeps the level's fades");
+        assert_eq!(zero.strand_pass(&classes, false, past).unwrap().faces, plain.strand_pass(&classes, false, past).unwrap().faces, "still {still}: founded at zero, every face is the source's");
+        let (old, new): (Vec<i32>, Vec<i32>) = (plain.material().copied().collect(), zero.material().copied().collect());
+        assert_eq!(map.len(), new.len(), "still {still}: the map covers the whole material");
+        for (k, o) in map.iter().enumerate() {
+            match o {
+                Some(i) => assert_eq!(new[k], old[*i], "still {still}: entry {k} copies entry {i}"),
+                None => assert_eq!(new[k], 0, "still {still}: a level's fade founded at zero"),
+            }
+        }
+        let ell = i32::try_from(div_nearest(-2651i128 << MATERIAL_BITS, 1000)).unwrap();
+        let (open, _) = plain.with_level_fade(0, usize::MAX, ell).unwrap();
+        let mut open = open;
+        open.scale.as_deref_mut().unwrap().coarse.refresh_fade().unwrap();
+        if open.scale.as_deref().unwrap().coarse.rings().iter().any(|&(n, _)| n > 1) {
+            assert_ne!(open.strand_pass(&classes, false, past).unwrap().faces, plain.strand_pass(&classes, false, past).unwrap().faces, "still {still}: opened, the level's fades move the faces");
+        }
+    }
+}
+
+/// [definition; the lead, November 27] **The level's slow store** ([`Scale::bank`]): founded with `B_bank` at zero every face of a strand is
+/// its source's bit for bit and the text keeps the bank; with `B_bank` drawn the faces move, and the covector of the largest entries of
+/// `B_bank` and of `A` matches the central difference of the code (the bank's reverse into the restricted states and the restriction).
+#[test]
+fn the_levels_slow_store_reads_its_epochs_back_and_its_covector_meets_the_code() {
+    let (mut read, mut seams) = (0usize, 0usize);
+    for (still, past) in [(1usize, false), (2, true)] {
+        let plain = towered_before_live(still);
+        let classes = drawn_classes(0xD5, 13, plain.declaration.alphabet);
+        let sites = classes.len();
+        let ell = i32::try_from(div_nearest(-2651i128 << MATERIAL_BITS, 1000)).unwrap();
+        let (zero, map) = plain.with_bank(&[2, 4, 8], ell).unwrap();
+        assert!(zero.to_text().contains(" bank 2,4,8"), "still {still}: the level's line carries the bank");
+        assert_eq!(Constitution::from_text(&zero.to_text()).unwrap(), zero, "still {still}: the text keeps the bank");
+        assert_eq!(map.len(), zero.material_len(), "still {still}: the map covers the whole material");
+        assert_eq!(zero.strand_pass(&classes, false, past).unwrap().faces, plain.strand_pass(&classes, false, past).unwrap().faces, "still {still}: founded at zero, every face is the source's");
+        let mut field = zero.clone();
+        let dw = field.declaration.width;
+        let (bk, bf, _) = field.scale.as_deref().unwrap().bank_offsets(dw).unwrap();
+        let base = field.theta.len() + field.scale.as_deref().unwrap().coarse.theta.len();
+        draw_from(&mut field, base + bk);
+        {
+            // the fades drawn over the whole block are put back at their founding
+            let sc = field.scale.as_deref_mut().unwrap();
+            let end = sc.glue.len();
+            for v in &mut sc.glue[bf..end] {
+                *v = ell;
+            }
+        }
+        let with = field.strand_pass(&classes, true, past).unwrap();
+        assert_ne!(with.faces, zero.strand_pass(&classes, true, past).unwrap().faces, "still {still}: the drawn block moves the faces");
+        let mut g = vec![0i128; field.material_len()];
+        field.strand_returned(&classes, &classes, &with, &mut g).unwrap();
+        let sc = field.scale.as_deref().unwrap();
+        let glue_at = field.theta.len() + sc.coarse.theta.len();
+        let (ga, gab, _, _, _) = sc.glue_offsets(dw);
+        assert!(g[glue_at + bf..].iter().all(|&v| v == 0), "still {still}: the fades take no covector (held)");
+        let code = |f: &Constitution| -> i64 {
+            let pass = f.strand_pass(&classes, false, past).unwrap();
+            let places: i64 = pass.faces.iter().zip(&classes).skip(1).map(|(face, &c)| crate::field::ratio_code(face.masses[c], face.total)).sum();
+            let known = vec![false; sites];
+            places + opening_code(f, &Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past, second: false, targets: None, stretches: None })
+        };
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let pass = f.strand_pass(&classes, true, past).unwrap();
+            let coarse = pass.tower.iter().flat_map(|t| t.ticks().iter());
+            pass.ticks.iter().chain(coarse).flat_map(|c| c.classes.iter().map(|lst| lst.off.iter().chain(&lst.members).copied().collect())).collect()
+        };
+        let grain = MATERIAL_BITS;
+        for block in [glue_at + bk..glue_at + bf, glue_at + ga..glue_at + gab] {
+            let mut entries: Vec<usize> = block.collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    *f.material_mut().nth(i).unwrap() += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                let shift = 40 + grain - 20;
+                let Some((delta, hv)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let measured = code(&moved(delta)) - code(&moved(-delta));
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + ((64 * (sites as i128 - 1)) << hv);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still}, past {past}: the level's entry {i} at {hv} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+    }
+    eprintln!("LEVEL_BANK_PROBES read={read} on_a_seam={seams}");
+    assert!(read >= 6, "read {read} probes, {seams} on a seam");
+}
+
 /// [definition; the lead, November 18, the record of the two streams §15] **The row of the site after reads the second site before**
 /// ([`Region::second`]) in a passage read by two streams: with the word some face moves; a place's face is the same bits in the
 /// passage cut after it; the region's own word reads the same forward and returns the same covector; the rows `E₊` take a covector

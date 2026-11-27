@@ -7873,6 +7873,62 @@ extern "C" __global__ void field_level_unchart(FieldWords w, const int64_t *v, c
     }
 }
 
+// [definition; the formal thread, November 27 08:51 UTC; the lead's build] **The level's slow store** (the host's `bank_scan`):
+// `m_q(j) = rel(rot_q(j) ⊗ m_q(j − 1), 30) + x¹_j` over the batch's epochs in order, each region's first epoch's turn zero, so each region
+// opens empty; `bank[j][q][re D₁, im D₁]`. One thread a ring and coordinate, the epochs in sequence.
+extern "C" __global__ void field_level_bank_scan(FieldWords w, const int64_t *rot, const int64_t *x1, uint32_t R, uint32_t D1, uint64_t epochs, int64_t *bank) {
+    const uint64_t cells = (uint64_t)R * D1;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t q = c / D1;
+        const uint32_t i = c % D1;
+        wide pre = 0, pim = 0;
+        for (uint64_t j = 0; j < epochs; j++) {
+            const wide rr = rot[(j * R + q) * 2];
+            const wide ri = rot[(j * R + q) * 2 + 1];
+            const int64_t re = fit64(rel(rr * pre - ri * pim, MOVE_BITS) + (wide)x1[j * D1 + i], w.status);
+            const int64_t im = fit64(rel(rr * pim + ri * pre, MOVE_BITS), w.status);
+            bank[(j * R + q) * 2 * D1 + i] = re;
+            bank[(j * R + q) * 2 * D1 + D1 + i] = im;
+            pre = re;
+            pim = im;
+        }
+    }
+}
+
+// The slow store's reverse (the host's `bank_return`): from each epoch's bank covector, `δm_q(j) = δbank_q(j) + rot_q(j + 1)ᵀ δm_q(j + 1)`
+// (the carry released at `2^(−30)`), each ring's part of the restricted states' covector `Re δm_q(j)` written whole into `dq[q][j][D₁]`.
+// One thread a ring and coordinate, the epochs in reverse.
+extern "C" __global__ void field_level_bank_back(FieldWords w, const int64_t *rot, const int64_t *dbank, uint32_t R, uint32_t D1, uint64_t epochs, wide *dq) {
+    const uint64_t cells = (uint64_t)R * D1;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        const uint32_t q = c / D1;
+        const uint32_t i = c % D1;
+        wide cre = 0, cim = 0;
+        for (uint64_t jj = epochs; jj > 0; jj--) {
+            const uint64_t j = jj - 1;
+            const wide re = cre + (wide)dbank[(j * R + q) * 2 * D1 + i];
+            const wide im = cim + (wide)dbank[(j * R + q) * 2 * D1 + D1 + i];
+            dq[((uint64_t)q * epochs + j) * D1 + i] = re;
+            const wide rr = rot[(j * R + q) * 2];
+            const wide ri = rot[(j * R + q) * 2 + 1];
+            cre = rel(rr * re + ri * im, MOVE_BITS);
+            cim = rel(rr * im - ri * re, MOVE_BITS);
+        }
+    }
+}
+
+// The restricted states' covector from the slow store, `δx¹_j = Σ_q dq[q][j]`, summed whole and added into `dx` (`[j][D₁]`).
+extern "C" __global__ void field_level_bank_sum(FieldWords w, const wide *dq, uint32_t R, uint32_t D1, uint64_t epochs, int64_t *dx) {
+    const uint64_t cells = epochs * D1;
+    for (uint64_t c = (uint64_t)blockIdx.x * blockDim.x + threadIdx.x; c < cells; c += (uint64_t)gridDim.x * blockDim.x) {
+        wide sum = 0;
+        for (uint32_t q = 0; q < R; q++) {
+            sum += dq[(uint64_t)q * cells + c];
+        }
+        dx[c] = fit64((wide)dx[c] + (wide)fit64(sum, w.status), w.status);
+    }
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 // [measurement; theory, November 12, P50 step 0b] **The card's yardsticks**: two readings of the card itself, no law and no
 // state (the engine's record, §2 and §6 step 0). They replace the published ceilings in the count of a site's arithmetic.

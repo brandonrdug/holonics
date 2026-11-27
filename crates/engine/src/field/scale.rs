@@ -67,6 +67,17 @@ pub struct Scale {
     /// places 1 to 6 at 0.79 to 0.94 (`tools/level_unit_ruler.py`); and on G-L5 a second comparison through the shared fine field cost
     /// every register.
     pub strand: bool,
+    /// [definition; the formal thread, November 27 08:51 UTC, its law of the slow store; the lead's build] **The level's slow store**: the
+    /// periods `P` (in sections of news on the level's clock `τ¹`) of a bank of rings beside the level's state, each charged once by every
+    /// closed epoch's restricted state before the level's ticks, `m_P(j) = Σ_(i ≤ j) e^(−2π γ_P (τ_j − τ_i)/P) e^(−2πi (τ_j − τ_i)/P) x¹_i`
+    /// (the strand face one level up: the epochs are the level's symbols), each ring's fade `γ_P = 2^(ℓ_P)` e-folds a radian held as state
+    /// beside it ([`Scale::bank_offsets`]; one e-fold a turn is `ℓ = log₂ 1/2π`), so its only loss is its own fade and its reach is built
+    /// in. The prolongation reads it through its own block `B_bank` (`H D₀ × 2 R D₁`, founded at zero) at each place's news phase, beside
+    /// `B⁻`'s read of the level's state; its covector returns through the bank's reverse into the restricted state's and the restriction's
+    /// material; the fades take none (held). Written as the word `bank` and the periods, comma-joined, last on the level's line, only where
+    /// set. Why: on W133s's end the level after its ticks held the third byte of the epoch 4 and 8 back at 0.020 and 0.010, and such a bank,
+    /// built on the host and untrained, at 0.147 and 0.082 (`tools/level_back_ruler.py`).
+    pub bank: Vec<u32>,
     /// [definition; the lead, November 24, the record of the evening of November 23 §7; the formal thread's reading of the join,
     /// `agent-inferred`] **The level's own lane**: where set, the fine field's last face lane is the level's. The prolongation writes it
     /// alone (`B⁻`'s and `b_B⁻`'s rows of every other coordinate are held at zero) and nothing else writes it (the encodings' and the strand
@@ -92,8 +103,110 @@ impl Scale {
     /// ([`Constitution::scale_forward_before`]). `None` where the glue is the law's alone.
     pub fn before_offsets(&self, fine_width: usize) -> Option<(usize, usize, usize)> {
         let (_, _, b, bb, len) = self.glue_offsets(fine_width);
-        (self.glue.len() == len + (len - b)).then_some((len, len + (bb - b), len + (len - b)))
+        (self.glue.len() == len + (len - b) + self.bank_len(fine_width)).then_some((len, len + (bb - b), len + (len - b)))
     }
+
+    /// The slow store's offsets laid after the one-sided block whatever the glue's length (for the founding that lays them).
+    pub(crate) fn bank_offsets_unchecked(&self, fine_width: usize) -> (usize, usize, usize) {
+        let (_, _, b, _, len) = self.glue_offsets(fine_width);
+        let end = len + (len - b);
+        let fades = end + self.harmonics * fine_width * 2 * self.bank.len() * self.coarse.declaration.width;
+        (end, fades, fades + self.bank.len())
+    }
+
+    /// The length of the slow store's block in the glue ([`Scale::bank`]): `B_bank` and the rings' fades, none where the level holds no bank.
+    pub fn bank_len(&self, fine_width: usize) -> usize {
+        glue_bank_len(self.harmonics, fine_width, self.coarse.declaration.width, self.bank.len())
+    }
+
+    /// [definition; the lead, November 27] **The slow store's block** ([`Scale::bank`]): `B_bank` (`H D₀ × 2 R D₁`) and the rings' fades
+    /// (`R`, on `2^(−24)`) after the one-sided block: the offsets of `B_bank`, of the fades, and the glue's whole length. `None` where the
+    /// level holds no bank (or no one-sided block, which the bank follows).
+    pub fn bank_offsets(&self, fine_width: usize) -> Option<(usize, usize, usize)> {
+        if self.bank.is_empty() {
+            return None;
+        }
+        let (_, _, end) = self.before_offsets(fine_width)?;
+        let fades = end + self.harmonics * fine_width * 2 * self.bank.len() * self.coarse.declaration.width;
+        Some((end, fades, fades + self.bank.len()))
+    }
+}
+
+/// The length of the slow store's block ([`Scale::bank_len`]): `B_bank` and one fade a ring.
+pub(crate) fn glue_bank_len(harmonics: usize, fine: usize, coarse: usize, rings: usize) -> usize {
+    if rings == 0 {
+        0
+    } else {
+        harmonics * fine * 2 * rings * coarse + rings
+    }
+}
+
+/// [definition; the formal thread, November 27 08:51 UTC; the lead's build] **The slow store's turn at each epoch** ([`Scale::bank`]): for
+/// epoch `j ≥ 1` of a region and each ring of period `P` and fade `ℓ`, `e^(−2π γ Δτ/P) e^(−2πi Δτ/P)` on `2^(−30)` (its real and imaginary
+/// parts, `[j][R][2]`), `Δτ = τ_j − τ_(j−1)` on the pace grain, the decay read as the fine field's faded skin reads it ([`skin_of_k`], its
+/// denominator `P ln 2 2^24/γ`) and the turn as a ring's phasor; the region's first epoch takes zero, so each region's bank opens empty.
+pub fn bank_rotations(field: &Constitution, periods: &[u32], fades: &[i32], tau: &[i64]) -> Result<Vec<i64>> {
+    let r = periods.len();
+    let ks: Vec<i128> = periods
+        .iter()
+        .zip(fades)
+        .map(|(&p, &ell)| -> Result<i128> {
+            let base = skin_denominator(p as usize);
+            Ok(if ell == 0 { base } else { div_nearest(base << MATERIAL_BITS, temperature_of(ell, &field.fine)?) })
+        })
+        .collect::<Result<_>>()?;
+    let mut out = vec![0i64; tau.len() * r * 2];
+    for j in 1..tau.len() {
+        let dt = i128::from(tau[j]) - i128::from(tau[j - 1]);
+        for (q, (&p, &k)) in periods.iter().zip(&ks).enumerate() {
+            let decay = i128::from(skin_of_k(dt, k, field.pi, &field.exponential));
+            let (re, im) = turn_phasor(dt, p as usize, field.pi);
+            out[(j * r + q) * 2] = fit64(release(decay * i128::from(re), MOVE_BITS))?;
+            out[(j * r + q) * 2 + 1] = fit64(release(-decay * i128::from(im), MOVE_BITS))?;
+        }
+    }
+    Ok(out)
+}
+
+/// The slow store's charge ([`Scale::bank`]): `m_q(j) = rot_q(j) ⊗ m_q(j − 1) + x¹_j` over a region's epochs (`x¹` on its grain, the turn
+/// released at `2^(−30)`), each epoch's bank `[j][R][re D₁, im D₁]`.
+pub(crate) fn bank_scan(rot: &[i64], x1: &[i64], r: usize, d1: usize) -> Result<Vec<i64>> {
+    let epochs = x1.len() / d1.max(1);
+    let mut out = vec![0i64; epochs * 2 * r * d1];
+    for j in 0..epochs {
+        for q in 0..r {
+            let (rr, ri) = (i128::from(rot[(j * r + q) * 2]), i128::from(rot[(j * r + q) * 2 + 1]));
+            for c in 0..d1 {
+                let (pre, pim) = if j == 0 { (0, 0) } else { let at = ((j - 1) * r + q) * 2 * d1; (i128::from(out[at + c]), i128::from(out[at + d1 + c])) };
+                let at = (j * r + q) * 2 * d1;
+                out[at + c] = fit64(release(rr * pre - ri * pim, MOVE_BITS) + i128::from(x1[j * d1 + c]))?;
+                out[at + d1 + c] = fit64(release(rr * pim + ri * pre, MOVE_BITS))?;
+            }
+        }
+    }
+    Ok(out)
+}
+
+/// The reverse of [`bank_scan`]: from each epoch's bank covector `[j][R][re D₁, im D₁]`, `δm_q(j) = δbank_q(j) + rot_q(j + 1)ᵀ δm_q(j + 1)`
+/// (released at `2^(−30)`), and the restricted states' covector `δx¹_j = Σ_q Re δm_q(j)`.
+pub(crate) fn bank_return(rot: &[i64], dbank: &[i64], r: usize, d1: usize) -> Result<Vec<i64>> {
+    let epochs = dbank.len() / (2 * r * d1).max(1);
+    let mut dx = vec![0i128; epochs * d1];
+    let mut carry = vec![0i128; r * 2 * d1];
+    for j in (0..epochs).rev() {
+        for q in 0..r {
+            let at = (j * r + q) * 2 * d1;
+            for c in 0..d1 {
+                let (re, im) = (carry[q * 2 * d1 + c] + i128::from(dbank[at + c]), carry[q * 2 * d1 + d1 + c] + i128::from(dbank[at + d1 + c]));
+                dx[j * d1 + c] += re;
+                // the carry into epoch j − 1 through epoch j's turn, its transpose
+                let (rr, ri) = (i128::from(rot[(j * r + q) * 2]), i128::from(rot[(j * r + q) * 2 + 1]));
+                carry[q * 2 * d1 + c] = release(rr * re + ri * im, MOVE_BITS);
+                carry[q * 2 * d1 + d1 + c] = release(rr * im - ri * re, MOVE_BITS);
+            }
+        }
+    }
+    dx.into_iter().map(fit64).collect()
 }
 
 /// The length of the block a one-sided stream reads the level through ([`Scale::before_offsets`]): `B`'s and `b_B`'s.
@@ -374,6 +487,10 @@ pub(crate) struct ScalePass {
     /// [measurement; the lead, November 27] Where the forward keeps for a reading under the receipt: each compared open place's
     /// prolonged row (`[r][D₀]`, in the receipt's order), for the level's standing state, the mean of its rows.
     receipt_rows: Vec<i64>,
+    /// The slow store ([`Scale::bank`]): each epoch's turn `[j][R][2]`, and its bank's read `[j][2 R D₁]` with each lane's scale `[j][2 R]`.
+    bank_rot: Vec<i64>,
+    bank_read: Vec<i32>,
+    bank_scale: Vec<i128>,
 }
 
 impl ScalePass {
@@ -412,10 +529,10 @@ impl ScalePass {
 
     /// [measurement; the lead, November 27, the record of the class hairs §13] What the restriction reads and what it sums: each known
     /// site's read at the split (`[n][D₀]` on `2^(−16)`, the lane chart's ratio), each epoch's harmonics of its places' reads
-    /// (`[j][H D₀]`, the chart's sums) and each known site's harmonics of its news phase (`[n][H]` on `2^(−30)`), for a ruler of what
-    /// the level's unit keeps of its epoch, link by link.
-    pub(crate) fn level_moment(&self) -> (&[i32], &[i64], &[i64]) {
-        (&self.read, &self.restricted, &self.cut.harmonics)
+    /// (`[j][H D₀]`, the chart's sums), each known site's harmonics of its news phase (`[n][H]` on `2^(−30)`) and the level's clock at
+    /// each epoch (`τ¹_j`, on the pace grain), for a ruler of what the level's unit keeps of its epoch, link by link.
+    pub(crate) fn level_moment(&self) -> (&[i32], &[i64], &[i64], &[i64]) {
+        (&self.read, &self.restricted, &self.cut.harmonics, &self.cut.tau)
     }
 
     /// The level's ticks kept for the reverse.
@@ -544,6 +661,9 @@ impl Constitution {
             if let Some((b2, bb2, end)) = s.before_offsets(d0) {
                 out.extend([(at + b2, bb2 - b2, MATERIAL_BITS), (at + bb2, end - bb2, FACE_BITS)]);
             }
+            if let Some((bk, bf, end)) = s.bank_offsets(d0) {
+                out.extend([(at + bk, bf - bk, MATERIAL_BITS), (at + bf, end - bf, MATERIAL_BITS)]);
+            }
         }
         out
     }
@@ -570,6 +690,9 @@ impl Constitution {
             if s.before_offsets(self.declaration.width).is_some() {
                 out.extend([d1, 1]);
             }
+            if s.bank_offsets(self.declaration.width).is_some() {
+                out.extend([2 * s.bank.len() as u64 * d1, 1]);
+            }
         }
         out
     }
@@ -581,8 +704,8 @@ impl Constitution {
         let Some(s) = self.scale.as_deref() else {
             return refuse("a level opened to one-sided streams on a field without a level");
         };
-        if s.before_offsets(self.declaration.width).is_some() {
-            return refuse("a level that already carries its one-sided block");
+        if s.before_offsets(self.declaration.width).is_some() || !s.bank.is_empty() {
+            return refuse("a level that already carries its one-sided block (or a slow store, which follows it)");
         }
         let mut out = self.clone();
         let extra = glue_before_len(s.harmonics, self.declaration.width, s.coarse.declaration.width);
@@ -650,7 +773,7 @@ impl Constitution {
             *v = fit32((k * ((three << MATERIAL_BITS) / pd) as i128) >> 31, "a founded value outgrew its 32-bit carrier")?;
         }
         let mut out = self.clone();
-        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, inside: false, strand: false, lane: false }));
+        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, inside: false, strand: false, bank: Vec::new(), lane: false }));
         Ok((out, at))
     }
 
@@ -685,6 +808,53 @@ impl Constitution {
 
     /// The level's forward at the split: the region's cut from its `news`, `x` restricted to the epochs by the news phase, the level's
     /// ticks on its own clock, and the prolongation added back into `x`.
+    /// The slow store's forward ([`Scale::bank`]): each epoch's turn from the level's clock, the bank charged by the restricted states `x¹`
+    /// (`[j][D₁]`, before the level's ticks), and each epoch's bank read as a ratio to its own power, one lane a ring's part.
+    fn bank_forward(&self, s: &Scale, tau: &[i64], x1: &[i64], out: &mut ScalePass) -> Result<()> {
+        let Some((_, bf, end)) = s.bank_offsets(self.declaration.width) else { return Ok(()) };
+        let (r, d1) = (s.bank.len(), s.coarse.declaration.width);
+        out.bank_rot = bank_rotations(self, &s.bank, &s.glue[bf..end], tau)?;
+        let bank = bank_scan(&out.bank_rot, x1, r, d1)?;
+        for bj in bank.chunks_exact(2 * r * d1) {
+            lane_chart(bj, 2 * r, &mut out.bank_read, &mut out.bank_scale)?;
+        }
+        Ok(())
+    }
+
+    /// Epoch `j`'s harmonic blocks from the slow store, `B_bank r̂(bank_j)`, added into `v` (`[H D₀]`); nothing where the level holds no bank.
+    fn bank_prolonged(&self, s: &Scale, pass: &ScalePass, reach_k: u64, j: usize, v: &mut [i64]) -> Result<()> {
+        let d0 = self.declaration.width;
+        let Some((bk, bf, _)) = s.bank_offsets(d0) else { return Ok(()) };
+        let w = 2 * s.bank.len() * s.coarse.declaration.width;
+        let mut vb = vec![0i64; v.len()];
+        affine(&s.glue[bk..bf], reach_k, w, &pass.bank_read[j * w..(j + 1) * w], None, MATERIAL_BITS, MATERIAL_BITS, &mut vb)?;
+        for (a, &b) in v.iter_mut().zip(&vb) {
+            *a = fit64(*a as i128 + b as i128)?;
+        }
+        Ok(())
+    }
+
+    /// The slow store's reverse ([`Scale::bank`]): from each epoch's covector of its harmonic blocks `δv(j)`, `δB_bank += δv(j) r̂(bank_j)ᵀ`
+    /// into the glue's covector `gg`, and the restricted states' covector through `B_bankᵀ`, the lanes' adjoint and the bank's reverse
+    /// (`[j][D₁]`, to join `δx¹` before the level's ticks); empty where the level holds no bank. The fades take none (held).
+    fn bank_returned(&self, s: &Scale, pass: &ScalePass, douts: &[&[i64]], gg: &mut [i128]) -> Result<Vec<i64>> {
+        let d0 = self.declaration.width;
+        let Some((bk, bf, _)) = s.bank_offsets(d0) else { return Ok(Vec::new()) };
+        let (r, d1) = (s.bank.len(), s.coarse.declaration.width);
+        let w = 2 * r * d1;
+        let reads: Vec<&[i32]> = pass.bank_read.chunks_exact(w).collect();
+        outer_sum(&mut gg[bk..bf], w, douts, &reads)?;
+        let reach_k = reach(&s.glue[bk..bf]);
+        let mut dbank = vec![0i64; douts.len() * w];
+        let mut drb = vec![0i64; w];
+        for (j, dout) in douts.iter().enumerate() {
+            transposed(&s.glue[bk..bf], reach_k, w, dout, MATERIAL_BITS, &mut drb)?;
+            let back = lane_adjoint(reads[j], &pass.bank_scale[j * 2 * r..(j + 1) * 2 * r], &drb)?;
+            dbank[j * w..(j + 1) * w].copy_from_slice(&back);
+        }
+        bank_return(&pass.bank_rot, &dbank, r, d1)
+    }
+
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool, classes: &[usize], unresolved: &[bool]) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
@@ -718,6 +888,8 @@ impl Constitution {
         for j in 0..epochs {
             affine(&g[a..ab], reach_a, h * d0, &out.restricted[j * h * d0..(j + 1) * h * d0], Some(&g[ab..ab + d1]), MATERIAL_BITS, MATERIAL_BITS, &mut x1[j * d1..(j + 1) * d1])?;
         }
+        // [`Scale::bank`] The slow store, charged by each epoch's restricted state before the level's ticks.
+        self.bank_forward(s, &cut.tau, &x1, &mut out)?;
         // The level's field, on its own clock.
         let span = |j: usize| cut.anchors[j]..cut.anchors.get(j + 1).copied().unwrap_or(sites);
         out.definite = (0..epochs).map(|j| span(j).all(|t| definite[t])).collect();
@@ -752,8 +924,10 @@ impl Constitution {
             2 | 4 => j.checked_sub(1),
             _ => Some(j),
         };
+        let reach_k = s.bank_offsets(d0).map_or(0, |(bk, bf, _)| reach(&g[bk..bf]));
         for j in 0..epochs {
             affine(&g[b..bb], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], Some(&g[bb..bb + h * d0]), MATERIAL_BITS, MATERIAL_BITS, &mut v)?;
+            self.bank_prolonged(s, &out, reach_k, j, &mut v)?;
             for t in (0..sites).filter(|&t| source(t, cut.epoch[t]) == Some(j)) {
                 uncharted(&cut.harmonics[t * h..(t + 1) * h], &v, d0, &mut row)?;
                 for (xv, &r) in x[t * d0..(t + 1) * d0].iter_mut().zip(&row) {
@@ -860,6 +1034,8 @@ impl Constitution {
         for j in 0..epochs {
             affine(&g[a..ab], reach_a, h * d0, &out.restricted[j * h * d0..(j + 1) * h * d0], Some(&g[ab..ab + d1]), MATERIAL_BITS, MATERIAL_BITS, &mut x1[j * d1..(j + 1) * d1])?;
         }
+        // [`Scale::bank`] The slow store, charged by each epoch's restricted state before the level's ticks.
+        self.bank_forward(s, &cut.tau, &x1, &mut out)?;
         // The level's field on its own clock, each epoch hearing only the epochs before it.
         out.definite = vec![true; epochs];
         out.paces = level_paces(&s.coarse.declaration, &cut)?;
@@ -878,8 +1054,9 @@ impl Constitution {
         for xj in x1.chunks_exact(d1) {
             lane_chart(xj, s.coarse.declaration.lanes, &mut out.coarse_read, &mut out.coarse_scale)?;
         }
-        // The prolongation of the epoch before, through `B⁻`.
+        // The prolongation of the epoch before, through `B⁻` (and the slow store's `B_bank`, [`Scale::bank`]).
         let reach_b = reach(&g[b2..bb2]);
+        let reach_k = s.bank_offsets(d0).map_or(0, |(bk, bf, _)| reach(&g[bk..bf]));
         let mut v = vec![0i64; h * d0];
         let mut row = vec![0i64; d0];
         for j in 0..epochs {
@@ -887,6 +1064,7 @@ impl Constitution {
                 continue;
             }
             affine(&g[b2..bb2], reach_b, d1, &out.coarse_read[j * d1..(j + 1) * d1], Some(&g[bb2..bb2 + h * d0]), MATERIAL_BITS, MATERIAL_BITS, &mut v)?;
+            self.bank_prolonged(s, &out, reach_k, j, &mut v)?;
             for t in (0..2 * n).filter(|&t| out.source[t] == Some(j)) {
                 let ht = if t < n { &cut.harmonics[t * h..(t + 1) * h] } else { &out.open_harmonics[(t - n) * h..(t - n + 1) * h] };
                 uncharted(ht, &v, d0, &mut row)?;
@@ -998,6 +1176,8 @@ impl Constitution {
         }
         let dv: Vec<i64> = acc.into_iter().map(|v| fit64(release(v, MOVE_BITS))).collect::<Result<_>>()?;
         let douts: Vec<&[i64]> = dv.chunks_exact(h * d0).collect();
+        // [`Scale::bank`] The slow store's block and the restricted states' covector through it, joined after the level's ticks' reverse.
+        let dxb = self.bank_returned(s, pass, &douts, gg)?;
         for dout in &douts {
             for (i, &v) in dout.iter().enumerate() {
                 gg[bb2 + i] += v as i128;
@@ -1020,6 +1200,9 @@ impl Constitution {
         let mut dm = vec![0i128; epochs * 2 * s.coarse.declaration.complex()];
         for cell in pass.ticks.iter().rev() {
             s.coarse.tick_return(cell, &mut dx1, gc, &pass.paces, &pass.definite, &mut dm, &mut gtau, &mut gsig, None, None, None, None)?;
+        }
+        for (a, &b) in dx1.iter_mut().zip(&dxb) {
+            *a = fit64(*a as i128 + b as i128)?;
         }
         // The restriction, over the known sites.
         for j in 0..epochs {
@@ -1067,6 +1250,8 @@ impl Constitution {
         // `δr̂¹_j = Bᵀ δv(j)`.
         let dv = charted(cut, h, dx, d0)?;
         let douts: Vec<&[i64]> = dv.chunks_exact(h * d0).collect();
+        // [`Scale::bank`] The slow store's block and the restricted states' covector through it, joined after the level's ticks' reverse.
+        let dxb = self.bank_returned(s, pass, &douts, gg)?;
         for dout in &douts {
             for (i, &v) in dout.iter().enumerate() {
                 gg[bb + i] += v as i128;
@@ -1089,6 +1274,9 @@ impl Constitution {
         let mut dm = vec![0i128; epochs * 2 * s.coarse.declaration.complex()];
         for cell in pass.ticks.iter().rev() {
             s.coarse.tick_return(cell, &mut dx1, gc, &pass.paces, &pass.definite, &mut dm, &mut gtau, &mut gsig, None, None, None, None)?;
+        }
+        for (a, &b) in dx1.iter_mut().zip(&dxb) {
+            *a = fit64(*a as i128 + b as i128)?;
         }
         // The restriction: `δb_A += Σ_j δx¹_j`, `δA += δx¹_j m(j)ᵀ` and `δm(j) = Aᵀ δx¹_j`, each place's part
         // `release(Σ_k h_k(φ_t) δm_k(j), 30)` through its read's adjoint into `δx_t`.

@@ -1,0 +1,42 @@
+LEVEL_UNIT_CHECK r_news_against_the_built_moment corr=0.0189 values=2688000
+LEVEL_UNIT unit_W133s cell=restricted width=64 epochs=34152 pos1=0.428 pos2=0.560 pos3=0.562 pos4=0.534 pos5=0.549 pos6=0.487 pos7=0.429 pos8=0.292 identity=0.029 next_first=0.006 planted=-0.000
+LEVEL_UNIT_KEYED unit_W133s cell=restricted site_inside epochs=7869 pos1=0.483 pos2=0.573 pos3=0.605 pos4=0.546 pos5=0.563 pos6=0.508 pos7=0.466 pos8=0.311
+LEVEL_UNIT_KEYED unit_W133s cell=restricted site_other epochs=3196 pos1=0.247 pos2=0.379 pos3=0.356 pos4=0.463 pos5=0.464 pos6=0.463 pos7=0.328 pos8=0.292
+LEVEL_UNIT_KEYED unit_W133s cell=restricted site_word_first epochs=6062 pos1=0.454 pos2=0.631 pos3=0.614 pos4=0.555 pos5=0.582 pos6=0.472 pos7=0.437 pos8=0.264
+LEVEL_UNIT_KEYED unit_W133s cell=restricted recur_2_7 epochs=5058 pos1=0.513 pos2=0.647 pos3=0.670 pos4=0.630 pos5=0.618 pos6=0.474 pos7=0.259 pos8=-0.188
+LEVEL_UNIT_KEYED unit_W133s cell=restricted recur_8_more epochs=1950 pos1=0.597 pos2=0.856 pos3=0.835 pos4=0.807 pos5=0.753 pos6=0.484 pos7=0.113 pos8=-2.580
+LEVEL_UNIT_KEYED unit_W133s cell=restricted recur_once epochs=10119 pos1=0.353 pos2=0.470 pos3=0.497 pos4=0.495 pos5=0.532 pos6=0.488 pos7=0.447 pos8=0.332
+LEVEL_UNIT unit_W133s cell=r_news width=1344 epochs=34152 pos1=0.554 pos2=0.550 pos3=0.450 pos4=0.393 pos5=0.399 pos6=0.381 pos7=0.331 pos8=0.253 identity=0.067 next_first=0.009 planted=-0.000
+LEVEL_UNIT unit_W133s cell=r_rings width=1344 epochs=34152 pos1=0.662 pos2=0.803 pos3=0.798 pos4=0.822 pos5=0.800 pos6=0.773 pos7=0.693 pos8=0.517 identity=0.091 next_first=0.009 planted=-0.000
+LEVEL_UNIT unit_W133s cell=r_rings10 width=2240 epochs=34152 pos1=0.686 pos2=0.840 pos3=0.851 pos4=0.900 pos5=0.919 pos6=0.926 pos7=0.922 pos8=0.894 identity=0.106 next_first=0.013 planted=-0.000
+LEVEL_UNIT unit_W133s cell=E_news width=1344 epochs=34152 pos1=0.842 pos2=0.534 pos3=0.420 pos4=0.367 pos5=0.370 pos6=0.357 pos7=0.306 pos8=0.226 identity=0.050 next_first=0.005 planted=-0.000
+LEVEL_UNIT unit_W133s cell=E_rings width=1344 epochs=34152 pos1=0.945 pos2=0.924 pos3=0.921 pos4=0.895 pos5=0.837 pos6=0.794 pos7=0.696 pos8=0.457 identity=0.063 next_first=0.006 planted=-0.000
+LEVEL_UNIT_KEYED unit_W133s cell=E_rings site_inside epochs=7869 pos1=0.954 pos2=0.928 pos3=0.925 pos4=0.897 pos5=0.840 pos6=0.804 pos7=0.712 pos8=0.481
+LEVEL_UNIT_KEYED unit_W133s cell=E_rings site_other epochs=3196 pos1=0.903 pos2=0.875 pos3=0.883 pos4=0.853 pos5=0.803 pos6=0.771 pos7=0.646 pos8=0.433
+LEVEL_UNIT_KEYED unit_W133s cell=E_rings site_word_first epochs=6062 pos1=0.957 pos2=0.943 pos3=0.936 pos4=0.914 pos5=0.854 pos6=0.796 pos7=0.704 pos8=0.438
+LEVEL_UNIT_KEYED unit_W133s cell=E_rings recur_2_7 epochs=5058 pos1=0.982 pos2=0.968 pos3=0.969 pos4=0.951 pos5=0.893 pos6=0.833 pos7=0.660 pos8=0.015
+LEVEL_UNIT_KEYED unit_W133s cell=E_rings recur_8_more epochs=1950 pos1=0.971 pos2=0.973 pos3=0.963 pos4=0.907 pos5=0.810 pos6=0.659 pos7=0.145 pos8=-3.386
+LEVEL_UNIT_KEYED unit_W133s cell=E_rings recur_once epochs=10119 pos1=0.922 pos2=0.895 pos3=0.900 pos4=0.880 pos5=0.828 pos6=0.791 pos7=0.704 pos8=0.499
+LEVEL_UNIT unit_W133s cell=E_rings10 width=2240 epochs=34152 pos1=0.990 pos2=0.978 pos3=0.986 pos4=0.985 pos5=0.986 pos6=0.978 pos7=0.959 pos8=0.939 identity=0.070 next_first=0.008 planted=-0.000
+LEVEL_UNIT unit_W133s cell=E_places width=1792 epochs=34152 pos1=0.995 pos2=0.993 pos3=0.996 pos4=0.993 pos5=0.994 pos6=0.996 pos7=0.996 pos8=0.996 identity=0.065 next_first=0.007 planted=-0.000
+LEVEL_UNIT_CHECK r_news_against_the_built_moment corr=1.0000 values=2688000
+LEVEL_UNIT unit_W133 cell=restricted width=64 epochs=34193 pos1=0.138 pos2=0.174 pos3=0.196 pos4=0.274 pos5=0.326 pos6=0.329 pos7=0.289 pos8=0.220 identity=0.014 next_first=0.008 planted=-0.000
+LEVEL_UNIT_KEYED unit_W133 cell=restricted site_inside epochs=7886 pos1=0.065 pos2=0.107 pos3=0.185 pos4=0.274 pos5=0.320 pos6=0.331 pos7=0.302 pos8=0.227
+LEVEL_UNIT_KEYED unit_W133 cell=restricted site_other epochs=3195 pos1=0.245 pos2=0.274 pos3=0.196 pos4=0.305 pos5=0.352 pos6=0.373 pos7=0.260 pos8=0.237
+LEVEL_UNIT_KEYED unit_W133 cell=restricted site_word_first epochs=6074 pos1=0.174 pos2=0.211 pos3=0.209 pos4=0.259 pos5=0.318 pos6=0.293 pos7=0.290 pos8=0.194
+LEVEL_UNIT_KEYED unit_W133 cell=restricted recur_2_7 epochs=5102 pos1=0.163 pos2=0.192 pos3=0.272 pos4=0.358 pos5=0.402 pos6=0.354 pos7=0.191 pos8=-0.048
+LEVEL_UNIT_KEYED unit_W133 cell=restricted recur_8_more epochs=1935 pos1=0.132 pos2=0.422 pos3=0.756 pos4=0.893 pos5=0.749 pos6=0.447 pos7=-0.205 pos8=-1.231
+LEVEL_UNIT_KEYED unit_W133 cell=restricted recur_once epochs=10118 pos1=0.126 pos2=0.125 pos3=0.116 pos4=0.223 pos5=0.302 pos6=0.324 pos7=0.303 pos8=0.242
+LEVEL_UNIT unit_W133 cell=r_news width=1344 epochs=34193 pos1=0.560 pos2=0.556 pos3=0.457 pos4=0.397 pos5=0.403 pos6=0.384 pos7=0.331 pos8=0.251 identity=0.068 next_first=0.009 planted=-0.000
+LEVEL_UNIT unit_W133 cell=r_rings width=1344 epochs=34193 pos1=0.667 pos2=0.806 pos3=0.802 pos4=0.827 pos5=0.806 pos6=0.777 pos7=0.699 pos8=0.522 identity=0.093 next_first=0.009 planted=-0.000
+LEVEL_UNIT unit_W133 cell=r_rings10 width=2240 epochs=34193 pos1=0.691 pos2=0.842 pos3=0.854 pos4=0.902 pos5=0.922 pos6=0.922 pos7=0.927 pos8=0.899 identity=0.108 next_first=0.013 planted=-0.000
+LEVEL_UNIT unit_W133 cell=E_news width=1344 epochs=34193 pos1=0.843 pos2=0.536 pos3=0.423 pos4=0.368 pos5=0.371 pos6=0.357 pos7=0.305 pos8=0.222 identity=0.050 next_first=0.005 planted=-0.000
+LEVEL_UNIT unit_W133 cell=E_rings width=1344 epochs=34193 pos1=0.947 pos2=0.925 pos3=0.923 pos4=0.899 pos5=0.842 pos6=0.798 pos7=0.698 pos8=0.455 identity=0.062 next_first=0.006 planted=-0.000
+LEVEL_UNIT_KEYED unit_W133 cell=E_rings site_inside epochs=7886 pos1=0.954 pos2=0.929 pos3=0.925 pos4=0.898 pos5=0.842 pos6=0.805 pos7=0.712 pos8=0.476
+LEVEL_UNIT_KEYED unit_W133 cell=E_rings site_other epochs=3195 pos1=0.905 pos2=0.874 pos3=0.884 pos4=0.856 pos5=0.806 pos6=0.774 pos7=0.648 pos8=0.436
+LEVEL_UNIT_KEYED unit_W133 cell=E_rings site_word_first epochs=6074 pos1=0.960 pos2=0.946 pos3=0.941 pos4=0.922 pos5=0.865 pos6=0.806 pos7=0.710 pos8=0.434
+LEVEL_UNIT_KEYED unit_W133 cell=E_rings recur_2_7 epochs=5102 pos1=0.982 pos2=0.967 pos3=0.968 pos4=0.952 pos5=0.892 pos6=0.834 pos7=0.670 pos8=0.038
+LEVEL_UNIT_KEYED unit_W133 cell=E_rings recur_8_more epochs=1935 pos1=0.971 pos2=0.974 pos3=0.964 pos4=0.907 pos5=0.811 pos6=0.670 pos7=0.164 pos8=-3.329
+LEVEL_UNIT_KEYED unit_W133 cell=E_rings recur_once epochs=10118 pos1=0.925 pos2=0.897 pos3=0.903 pos4=0.884 pos5=0.835 pos6=0.795 pos7=0.706 pos8=0.496
+LEVEL_UNIT unit_W133 cell=E_rings10 width=2240 epochs=34193 pos1=0.991 pos2=0.978 pos3=0.986 pos4=0.986 pos5=0.987 pos6=0.981 pos7=0.963 pos8=0.941 identity=0.069 next_first=0.008 planted=-0.000
+LEVEL_UNIT unit_W133 cell=E_places width=1792 epochs=34193 pos1=0.996 pos2=0.993 pos3=0.996 pos4=0.994 pos5=0.994 pos6=0.996 pos7=0.997 pos8=0.996 identity=0.065 next_first=0.007 planted=-0.000

@@ -12,7 +12,7 @@ use std::time::Instant;
 #[allow(unused_imports)]
 use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
-use holonics_engine::field::{level_cut, level_section, strand_face_reads, strand_face_terms, strand_level_cut, PACE_BITS};
+use holonics_engine::field::{bank_rotations, level_cut, level_section, strand_face_reads, strand_face_terms, strand_level_cut, PACE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS};
 #[allow(unused_imports)]
@@ -91,6 +91,17 @@ pub(crate) struct TowerBatch<'c> {
     /// own power (`[t][D₀]`), both from the engine's own `strand_face_terms` and `strand_face_reads`, which the restriction charts in
     /// place of the news harmonics and the reads at the split.
     pub(crate) face: Option<(Pooled<'c, i64>, Pooled<'c, i32>)>,
+    /// [the lead, November 27] The level's slow store (`Scale::bank`, the host's `bank_forward`): each epoch's turn on every ring
+    /// (`[j][R][2]` on `2^(−30)`, from the engine's own `bank_rotations`, each region's first epoch zero), and the bank's read with its
+    /// lanes' scales, written by the forward and read by the reverse.
+    pub(crate) bank: Option<BankBuffers<'c>>,
+}
+
+/// The level's slow store's buffers on the card ([`TowerBatch::bank`]).
+pub(crate) struct BankBuffers<'c> {
+    pub(crate) rot: Pooled<'c, i64>,
+    pub(crate) read: Pooled<'c, i32>,
+    pub(crate) scale: Pooled<'c, i128>,
 }
 
 impl<'c> Resident<'c> {
@@ -151,6 +162,9 @@ impl<'c> Resident<'c> {
         let mut receipt_sites: Vec<u8> = Vec::new();
         let d0 = field.declaration.width;
         let (mut face_terms, mut face_reads): (Vec<i64>, Vec<i32>) = (Vec::new(), Vec::new());
+        // [`Scale::bank`] Each region's epochs' turns on the slow store's rings, from the level's clock.
+        let fades: Vec<i32> = s.bank_offsets(d0).map_or(Vec::new(), |(_, bf, end)| s.glue[bf..end].to_vec());
+        let mut bank_rot: Vec<i64> = Vec::new();
         for r in 0..regions {
             let (first, end) = (fine.region_off[r] as usize, fine.region_off[r + 1] as usize);
             if strand {
@@ -193,6 +207,9 @@ impl<'c> Resident<'c> {
                     face_reads.extend(strand_face_reads(field, &classes)?);
                     face_reads.extend(std::iter::repeat_n(0i32, n * d0));
                 }
+                if !s.bank.is_empty() {
+                    bank_rot.extend(bank_rotations(field, &s.bank, &fades, &sc.cut.tau)?);
+                }
                 taus.push(sc.cut.tau);
                 owned.push((vec![0usize; epochs], vec![false; epochs], vec![None; epochs]));
                 continue;
@@ -211,6 +228,9 @@ impl<'c> Resident<'c> {
             }
             epoch_of.extend(cut.epoch.iter().map(|&j| base + j as u32));
             harm.extend_from_slice(&cut.harmonics);
+            if !s.bank.is_empty() {
+                bank_rot.extend(bank_rotations(field, &s.bank, &fades, &cut.tau)?);
+            }
             if s.strand {
                 // [`Scale::strand`] On a passage read by one stream an open place's symbol is unwritten and adds nothing.
                 let shown: Vec<usize> = (first..end).map(|t| if fine.unresolved[t] != 0 { 0 } else { fine.classes[t] as usize }).collect();
@@ -316,7 +336,16 @@ impl<'c> Resident<'c> {
         } else {
             None
         };
-        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores, strand, receipt, face })
+        let bank = if s.bank.is_empty() {
+            None
+        } else {
+            let r = s.bank.len();
+            let rot = up64(&bank_rot)?;
+            let read = self.timed(Kind::Alloc, || self.take::<i32>((sites * 2 * r * cd.width).max(1))).map_err(device)?;
+            let scale = self.timed(Kind::Alloc, || self.take::<i128>((sites * 2 * r).max(1))).map_err(device)?;
+            Some(BankBuffers { rot, read, scale })
+        };
+        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores, strand, receipt, face, bank })
     }
 
     /// A read's own ticks on a batch's level ([`Resident::tower_batch`]): every tick kept where the read keeps the fine field's, and the shares
@@ -362,6 +391,20 @@ impl<'c> Resident<'c> {
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.affine("field_affine_x64", &mut gwords, a as u64, ab as u64, tr.reach_a, d1, h * d0, tb.restricted.device_ptr(), h * d0, tr.cwords.x, d1, 0, false)?;
+        // [`Scale::bank`] The slow store, charged by each epoch's restricted state before the level's ticks, and its read.
+        if let Some(bk) = tb.bank.as_ref() {
+            let (r, w) = (s.bank.len(), 2 * s.bank.len() * d1);
+            let cells = (epochs * d1) as u64;
+            let x1c = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((cells as usize).max(1))).map_err(device)?;
+            let (mut p, mut q, mut c) = (tr.cwords.x, x1c.device_ptr(), cells);
+            self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut p), arg(&mut q), arg(&mut c)])?;
+            let mem = self.timed(Kind::Alloc, || self.take::<i64>((epochs * w).max(1))).map_err(device)?;
+            let (mut rp, mut xp, mut r32, mut d32, mut e64, mut mp) = (bk.rot.device_ptr(), x1c.device_ptr(), r as u32, d1 as u32, epochs as u64, mem.device_ptr());
+            self.launch("field_level_bank_scan", Self::cells((r * d1) as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut xp), arg(&mut r32), arg(&mut d32), arg(&mut e64), arg(&mut mp)])?;
+            let mut bw = tr.cwords;
+            (bw.d, bw.lanes) = (w as u32, (2 * r) as u32);
+            self.chart(&mut bw, mem.device_ptr(), &bk.read, &bk.scale, false)?;
+        }
         for k in 0..s.coarse.declaration.ticks {
             self.tick_forward(&s.coarse, &mut tr.cwords, &tb.ticks, k, kept, stored, false, false, returning, tb.pr.device_ptr(), epochs, tb.st.pairs, regions)?;
         }
@@ -370,6 +413,12 @@ impl<'c> Resident<'c> {
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.affine("field_affine_x32", &mut gwords, b as u64, bb as u64, reach_b, h * d0, d1, tb.read1.device_ptr(), d1, tb.pad.device_ptr(), h * d0, 0, false)?;
+        // [`Scale::bank`] The slow store's read through `B_bank`, added into each epoch's harmonic blocks.
+        if let (Some(bk), Some((bko, bf, _))) = (tb.bank.as_ref(), s.bank_offsets(d0)) {
+            let w = 2 * s.bank.len() * d1;
+            let reach_k = s.glue[bko..bf].iter().map(|v| v.unsigned_abs() as u64).max().unwrap_or(0);
+            self.affine("field_affine_x32", &mut gwords, bko as u64, u64::MAX, reach_k, h * d0, w, bk.read.device_ptr(), w, tb.pad.device_ptr(), h * d0, tb.pad.device_ptr(), false)?;
+        }
         if let (Some((mask, own_dx)), true) = (tb.receipt.as_ref(), returning) {
             self.level_receipt(field, words, tb, mask, own_dx, h)?;
         }
@@ -479,11 +528,33 @@ impl<'c> Resident<'c> {
         self.outer_biased(&mut tr.cwords, gg, b as u64, bb as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, tb.read1.device_ptr(), d1, false, false)?;
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
+        // [`Scale::bank`] The slow store's block and each ring's part of the restricted states' covector through it.
+        let banked = if let (Some(bk), Some((bko, _, _))) = (tb.bank.as_ref(), s.bank_offsets(d0)) {
+            let (r, w) = (s.bank.len(), 2 * s.bank.len() * d1);
+            self.outer_biased(&mut tr.cwords, gg, bko as u64, u64::MAX, h * d0, w, tb.pad.device_ptr(), h * d0, bk.read.device_ptr(), w, false, false)?;
+            let dr = self.timed(Kind::Alloc, || self.take::<i64>((epochs * w).max(1))).map_err(device)?;
+            self.transposed(&mut gwords, bko as u64, h * d0, w, tb.pad.device_ptr(), h * d0, dr.device_ptr(), false, false)?;
+            let dbank = self.timed(Kind::Alloc, || self.take::<i64>((epochs * w).max(1))).map_err(device)?;
+            let mut bw = tr.cwords;
+            (bw.d, bw.lanes) = (w as u32, (2 * r) as u32);
+            self.ratio_adjoint(&mut bw, bk.read.device_ptr(), bk.scale.device_ptr(), dr.device_ptr(), 0, dbank.device_ptr(), false)?;
+            let dq = self.timed(Kind::Alloc, || self.take::<i128>((r * epochs * d1).max(1))).map_err(device)?;
+            let (mut rp, mut dp, mut r32, mut d32, mut e64, mut qp) = (bk.rot.device_ptr(), dbank.device_ptr(), r as u32, d1 as u32, epochs as u64, dq.device_ptr());
+            self.launch("field_level_bank_back", Self::cells((r * d1) as u64), THREADS, &mut [arg(words), arg(&mut rp), arg(&mut dp), arg(&mut r32), arg(&mut d32), arg(&mut e64), arg(&mut qp)])?;
+            Some((dq, r))
+        } else {
+            None
+        };
         self.transposed(&mut gwords, b as u64, h * d0, d1, tb.pad.device_ptr(), h * d0, cb.dr.device_ptr(), false, false)?;
         self.ratio_adjoint(&mut tr.cwords, tb.read1.device_ptr(), tb.scale1.device_ptr(), cb.dr.device_ptr(), 0, cb.dx.device_ptr(), false)?;
         // The level's ticks, in reverse.
         for (at, tick) in tb.ticks.iter().enumerate().rev() {
             self.tick_back(&s.coarse, &mut tr.cwords, tick, at, cg, cb, cb.dm.device_ptr(), epochs, false)?;
+        }
+        // [`Scale::bank`] The slow store's part of the restricted states' covector, joined after the level's ticks' reverse.
+        if let Some((dq, r)) = banked {
+            let (mut qp, mut r32, mut d32, mut e64, mut xp) = (dq.device_ptr(), r as u32, d1 as u32, epochs as u64, cb.dx.device_ptr());
+            self.launch("field_level_bank_sum", Self::cells((epochs * d1) as u64), THREADS, &mut [arg(words), arg(&mut qp), arg(&mut r32), arg(&mut d32), arg(&mut e64), arg(&mut xp)])?;
         }
         // The restriction: `δb_A`, `δA` and `δm = Aᵀ δx¹`, each place's part at its own phase through its read's adjoint into `δx`.
         self.outer_biased(&mut tr.cwords, gg, a as u64, ab as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.restricted.device_ptr(), h * d0, true, false)?;

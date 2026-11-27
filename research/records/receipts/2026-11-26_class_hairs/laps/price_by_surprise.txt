@@ -1,0 +1,11 @@
+The arm's code less its control's, paired place by place over the held text, by fifth of the control's own code at the place (its surprise; a stand-in for its face's entropy, which the held tables do not carry). The lead, November 27; the formal thread's G-Z18.
+PRICE_BY_CONTROL_SURPRISE W133s_less_W133 fifth=1 control_nats=0.001 places=40186 nats_a_place=+0.0007 (±0.0000)
+PRICE_BY_CONTROL_SURPRISE W133s_less_W133 fifth=2 control_nats=0.008 places=40187 nats_a_place=+0.0047 (±0.0001)
+PRICE_BY_CONTROL_SURPRISE W133s_less_W133 fifth=3 control_nats=0.054 places=40186 nats_a_place=+0.0197 (±0.0004)
+PRICE_BY_CONTROL_SURPRISE W133s_less_W133 fifth=4 control_nats=0.412 places=40187 nats_a_place=+0.0673 (±0.0014)
+PRICE_BY_CONTROL_SURPRISE W133s_less_W133 fifth=5 control_nats=2.878 places=40187 nats_a_place=+0.0530 (±0.0030)
+PRICE_BY_CONTROL_SURPRISE W132i_less_W132 fifth=1 control_nats=0.001 places=40186 nats_a_place=+0.0007 (±0.0000)
+PRICE_BY_CONTROL_SURPRISE W132i_less_W132 fifth=2 control_nats=0.009 places=40187 nats_a_place=+0.0050 (±0.0001)
+PRICE_BY_CONTROL_SURPRISE W132i_less_W132 fifth=3 control_nats=0.056 places=40186 nats_a_place=+0.0212 (±0.0004)
+PRICE_BY_CONTROL_SURPRISE W132i_less_W132 fifth=4 control_nats=0.418 places=40187 nats_a_place=+0.0632 (±0.0013)
+PRICE_BY_CONTROL_SURPRISE W132i_less_W132 fifth=5 control_nats=2.889 places=40187 nats_a_place=+0.0367 (±0.0029)

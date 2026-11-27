@@ -1,0 +1,9 @@
+BANK_RINGS 2,4,16,32,64 back=1 pos3=0.443 back=2 pos3=0.227 back=4 pos3=0.115 back=8 pos3=0.075 back=16 pos3=0.032 
+BANK_RINGS 2,4,8,32,64 back=1 pos3=0.464 back=2 pos3=0.234 back=4 pos3=0.130 back=8 pos3=0.049 back=16 pos3=0.027 
+BANK_RINGS 2,8,16,32,64 back=1 pos3=0.429 back=2 pos3=0.227 back=4 pos3=0.142 back=8 pos3=0.084 back=16 pos3=0.032 
+BANK_RINGS 4,8,16,32,64 back=1 pos3=0.448 back=2 pos3=0.254 back=4 pos3=0.149 back=8 pos3=0.084 back=16 pos3=0.032 
+BANK_RINGS 2,4,8,16,32 back=1 pos3=0.483 back=2 pos3=0.255 back=4 pos3=0.139 back=8 pos3=0.065 back=16 pos3=0.013 
+BANK_RINGS 2,4,8,16,64 back=1 pos3=0.477 back=2 pos3=0.248 back=4 pos3=0.132 back=8 pos3=0.069 back=16 pos3=0.024 
+BANK_RINGS 4,8,16,32,64,128,256 back=1 pos3=0.435 back=2 pos3=0.257 back=4 pos3=0.154 back=8 pos3=0.091 back=16 pos3=0.043 
+BANK_RINGS 2,4,8,16,32,64,128,256 back=1 pos3=0.474 back=2 pos3=0.262 back=4 pos3=0.151 back=8 pos3=0.071 back=16 pos3=0.043 
+BANK_RINGS_DONE 09:13:06
