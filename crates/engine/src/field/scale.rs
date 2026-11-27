@@ -371,6 +371,9 @@ pub(crate) struct ScalePass {
     /// The level's receipt ([`Scale::receipt`]): each open place that reads an epoch, its site, the opening's read of its prolonged row
     /// alone and the written symbol it is compared with.
     receipt: Vec<(usize, crate::navigator::BlankRead, usize)>,
+    /// [measurement; the lead, November 27] Where the forward keeps for a reading under the receipt: each compared open place's
+    /// prolonged row (`[r][D₀]`, in the receipt's order), for the level's standing state, the mean of its rows.
+    receipt_rows: Vec<i64>,
 }
 
 impl ScalePass {
@@ -392,6 +395,11 @@ impl ScalePass {
     /// [measurement; the lead, November 26, the level's face before a second level] Each compared open place of the receipt
     /// ([`Scale::receipt`]) with its code at the prolonged row's face alone (the level through its own decoder and the receiver's face,
     /// no fine tick after it), on the codes' grain: a reading for a ruler ([`Constitution::strand_level_face`]).
+    /// The compared open places' prolonged rows (`[r][D₀]`, the receipt's order), kept where the forward kept.
+    pub(crate) fn receipt_rows(&self) -> &[i64] {
+        &self.receipt_rows
+    }
+
     pub(crate) fn receipt_codes(&self) -> Vec<(usize, i64)> {
         self.receipt.iter().map(|(t, read, c)| (*t, read.face.code(*c))).collect()
     }
@@ -886,6 +894,9 @@ impl Constitution {
                 if s.receipt && t >= n {
                     let reach_o = reach(&self.theta[self.layout.opening..self.layout.opening + d0 * d0]);
                     out.receipt.push((t, self.opening_read(&row, reach_o)?, targets[t - n]));
+                    if keep {
+                        out.receipt_rows.extend_from_slice(&row);
+                    }
                 }
                 for (xv, &r) in x[t * d0..(t + 1) * d0].iter_mut().zip(&row) {
                     *xv = fit64(*xv as i128 + r as i128)?;

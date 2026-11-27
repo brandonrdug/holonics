@@ -1,0 +1,4 @@
+JOIN_COUNT_DEPTH orders=2 held_codes_a_place=3.093 3.101 2.769 2.919 3.071 3.224
+JOIN_COUNT_PLANTED join_W132i part=word_first places=3271 code_given=1.069 code_alone=2.826 unsaid_share=0.378 join_codes=3.889/4.452 join_unsaid_share=0.873
+JOIN_COUNT_PLANTED join_W132i part=letter_inside places=12027 code_given=1.007 code_alone=2.573 unsaid_share=0.392 join_codes=3.219/4.196 join_unsaid_share=0.767
+JOIN_COUNT_PLANTED join_W132i part=other places=5328 code_given=1.133 code_alone=3.013 unsaid_share=0.376 join_codes=3.032/4.683 join_unsaid_share=0.647
