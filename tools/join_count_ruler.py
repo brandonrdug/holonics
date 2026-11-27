@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python3 -I
-"""join_count_ruler.py DUMP ROWS [planted]: a ruler (the lead, November 27; the formal thread's ceiling for the join, 04:01 UTC, G-Z12). How much
+"""join_count_ruler.py DUMP ROWS [planted|words]: a ruler (the lead, November 27; the formal thread's ceiling for the join, 04:01 UTC, G-Z12). How much
 of a place a count of the passage could tell from what the join carries.
 
 `read-strand-cut ... past face` (DUMP) writes the known stream's anchors and the epoch each open place reads (`cut.tsv`). The join tells
@@ -13,7 +13,9 @@ once and coded the places given the spelling above their codes alone.) On the od
 count leaves unsaid, `n_count = R/Z`, read by the place's part (a word's first letter, a letter inside a word, any other byte) beside the
 join's own share (`tools/level_face_ruler.py`'s `LEVEL_FACE_JOIN_PART`). With `planted` (rule 11, the formal thread's proof of the
 ruler's null, November 27): on every third row each place's byte is set to the last byte of the epoch it reads, a join a count must find,
-and the planted rows' parts are read apart (`JOIN_COUNT_PLANTED`). Outside the machine; counts and ratios, floats at the exterior.
+and the planted rows' parts are read apart (`JOIN_COUNT_PLANTED`). With `words` (the formal thread's G-Z29, November 27 14:59 UTC) the
+units are the writers' words in place of her epochs: a place's unit is the run of non-space bytes it stands in with the spaces after it,
+the join's condition the spelling of the unit before and the place's distance into its own (`JOIN_COUNT_WORDS`). Outside the machine; counts and ratios, floats at the exterior.
 """
 import math
 import sys
@@ -26,6 +28,7 @@ DISCOUNT = 0.75
 def main():
     d, rows_f = sys.argv[1], sys.argv[2]
     planted = len(sys.argv) > 3 and sys.argv[3] == 'planted'
+    words = len(sys.argv) > 3 and sys.argv[3] == 'words'
     texts = []
     for line in open(rows_f, encoding='utf-8'):
         f = line.rstrip('\n').split('\t')
@@ -39,6 +42,13 @@ def main():
         anchors = [int(a) for a in f[2].split(',') if a]
         source = [None if s == '-' else int(s) for s in f[3].split(',')] if len(f) > 3 and f[3] else []
         text = texts[r][:n]
+        if words:
+            # the writers' units: a run of non-space bytes with the spaces after it
+            anchors = [t for t in range(n) if t == 0 or (text[t] not in (32, 10) and text[t - 1] in (32, 10))]
+            source = [None] + [None] * (n - 1)
+            for p in range(1, n):
+                u = max(k for k, a in enumerate(anchors) if a <= p - 1)
+                source[p] = u - 1 if u >= 1 else None
         epoch_of = [0] * n
         for j, a in enumerate(anchors):
             for t in range(a, anchors[j + 1] if j + 1 < len(anchors) else n):
@@ -112,7 +122,7 @@ def main():
     for part in ("word_first", "letter_inside", "other"):
         R, Z, k, FR, FZ = by[part]
         join = f" join_codes={FR / max(k, 1):.3f}/{FZ / max(k, 1):.3f} join_unsaid_share={FR / FZ:.3f}" if FZ > 0 else ""
-        print(f"JOIN_COUNT{'_PLANTED' if planted else ''} {label} part={part} places={k} code_given={R / max(k, 1):.3f} code_alone={Z / max(k, 1):.3f} unsaid_share={R / max(Z, 1e-12):.3f}{join}")
+        print(f"JOIN_COUNT{'_PLANTED' if planted else ('_WORDS' if words else '')} {label} part={part} places={k} code_given={R / max(k, 1):.3f} code_alone={Z / max(k, 1):.3f} unsaid_share={R / max(Z, 1e-12):.3f}{join}")
 
 
 if __name__ == '__main__':

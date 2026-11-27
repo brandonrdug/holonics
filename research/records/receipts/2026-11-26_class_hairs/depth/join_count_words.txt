@@ -1,0 +1,4 @@
+JOIN_COUNT_DEPTH orders=1 held_codes_a_place=3.285 3.244 3.280 3.389 3.535 3.661
+JOIN_COUNT_WORDS join_W132i part=word_first places=9815 code_given=3.843 code_alone=3.817 unsaid_share=1.007 join_codes=3.841/4.383 join_unsaid_share=0.876
+JOIN_COUNT_WORDS join_W132i part=letter_inside places=35899 code_given=3.170 code_alone=3.286 unsaid_share=0.965 join_codes=3.197/4.179 join_unsaid_share=0.765
+JOIN_COUNT_WORDS join_W132i part=other places=15732 code_given=2.975 code_alone=3.028 unsaid_share=0.983 join_codes=3.083/4.727 join_unsaid_share=0.652

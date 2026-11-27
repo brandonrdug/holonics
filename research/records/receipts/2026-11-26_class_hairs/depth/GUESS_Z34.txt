@@ -1,0 +1,26 @@
+G-Z34 (the formal thread, fixed 2026-11-27 15:20 UTC, weight 0.6): the level's comparison face over a word's first letter, with the slow
+store as an operand, fitted on the even rows and read on the odd, codes those letters better than her own face by 0.05 nats or more in no
+part (the word last met within 30 places, over 30, not met before).
+
+Read (tools/level_face_fit_ruler.py on W135b's lap mean, her own code from read-reach law at W135s's lap mean; 896 features: the read
+epoch's restricted state, its read after the level's ticks, its slow-store read; 52 letters; shrinkage 0.1, the largest of its grid):
+  bias alone (the letters' frequencies at word starts)  3.262 nats a place
+  the fitted face                                       3.521
+  her own code                                          2.947   fitted less hers +0.575
+  within 30   415 places  fitted 2.633  hers 2.046  +0.587 (±0.062)
+  over 30    1577 places  fitted 2.897  hers 2.202  +0.695 (±0.032)
+  not before 7866 places  fitted 3.693  hers 3.144  +0.550 (±0.016)
+Score: held (the fitted face codes worse than hers in every part). The fit stands under its own bias by 0.26 nats, so its grid's shrinkage
+was too weak for 896 features over about 10,000 rows; the handing question is read by the offset fit beside it.
+
+The offset fit (the formal thread, 15:27 UTC; tools/level_face_fit_ruler.py with her face whole at each word's first place, read-reach
+faces at W135s's lap mean, 19,527 places): both faces over the 52 letters; her face renormalized over them codes 2.864 nats on the odd
+rows (2.947 before renormalizing). Her log face held at coefficient one beside the level's 896 features, the shrinkage chosen on a split
+of the fitting half (it took the grid's largest, 10, both ways: the features left nearly off):
+  part        fit even, read odd     fit odd, read even    mean     halves' scatter
+  within 30   +0.0104 (±0.0033)      −0.0027 (±0.0050)     +0.0039  0.0131
+  over 30     +0.0112 (±0.0021)      +0.0029 (±0.0018)     +0.0070  0.0083
+  not before  −0.0019 (±0.0014)      +0.0005 (±0.0014)     −0.0007  0.0023
+The letters' frequencies alone beside her face give the same gains (+0.0100, +0.0101, −0.0024 one way). The ruler's null held to a planted
+law: the written letter's own column at three places in ten among the features, recovered as +0.331 nats. No part gains beyond the
+halves' scatter, so no handed face is built: the level is scored by what it writes and by its own unit's news.

@@ -1,0 +1,21 @@
+G-Z35 (the formal thread, fixed 2026-11-27 15:55 UTC, weight 0.55): the ceiling of a level heard by address. A leaky count of the whole
+words met earlier in the row, charged at each word's close and read as a face over the next letter, joined to her letter-renormalized
+face by one coefficient fitted on the even rows and read on the odd, gains 0.05 nats or more at a word's first letter where the word was
+last met over 30 places back, and costs under 0.03 where the word was not met before. Read also by the place in the word (1, 2, 3, the
+rest): her address needs a run of three, so a recurring word's second and third letters are where a level heard by address pays most.
+If the ceiling is under 0.02 past 30, depth does not show at first letters and the level is read word by word, whole.
+
+Read (tools/word_cache_ruler.py, her face whole at every place at W135s's lap mean, read-reach faces:all; 92,716 letter places of the
+word rows, 46,314 even and 46,402 odd; word_cache_W135s.txt). One coefficient and one leak chosen on the fitting half: even to odd, a leak
+of 512 places and 0.02; odd to even, no leak and 0.02. Gain over her letter-renormalized face (mean of the two halves; halves' scatter):
+  first letter, over 30   +0.0093 (0.0015)    within 30 +0.0162 (0.0035)    not before +0.0003 (0.0002)
+  second letter, over 30  +0.0129 (0.0014)    within 30 +0.0129 (0.0012)    not before −0.0024 (0.0007)
+  third letter, over 30   +0.0092 (0.0000)    within 30 +0.0051 (0.0021)    not before −0.0011 (0.0001)
+  the rest, over 30       +0.0055 (0.0006)    within 30 +0.0051 (0.0018)    not before −0.0001 (0.0001)
+Score: missed (+0.009 past 30 at a first letter, under the 0.02 the guess names as the floor where depth shows at first letters); its
+cost where the word was not met before is +0.0003, under the 0.03 (that half held).
+Beside it, the coefficient set by the count's own state (a place in the word and how many earlier words share its prefix: one, two or
+three, four to fifteen, more): over 30, +0.016 at a first letter, +0.010 at the second, +0.013 at the third, +0.045 (scatter 0.010) at
+the rest; over every letter place +0.0011 and +0.0020. And an upper ceiling that knows whether the word was met before (which a count at
+a first letter cannot tell): over 30, +0.029 and +0.034 at a first letter, +0.126 and +0.158 at the second, +0.185 and +0.187 at the
+third, +0.113 and +0.114 at the rest.

@@ -1,0 +1,7 @@
+STORE_COUNT_TEXT octets=31457281 suffix_array=31457281
+STORE_COUNT units=words part=word_first places=9815 depth=2 code_given=3.791 code_alone=3.803 unsaid_share=0.997 by_depth_odd=1.000,1.008,0.997,1.011,1.038
+STORE_COUNT units=words part=letter_inside places=35899 depth=3 code_given=3.057 code_alone=3.284 unsaid_share=0.931 by_depth_odd=1.000,0.968,0.938,0.931,0.939
+STORE_COUNT units=words part=other places=15732 depth=0 code_given=3.120 code_alone=3.120 unsaid_share=1.000 by_depth_odd=1.000,1.018,1.068,1.097,1.129
+STORE_COUNT units=epochs part=word_first places=9853 depth=0 code_given=3.803 code_alone=3.803 unsaid_share=1.000 by_depth_odd=1.000,1.002,1.002,1.010,1.028
+STORE_COUNT units=epochs part=letter_inside places=36016 depth=3 code_given=3.029 code_alone=3.291 unsaid_share=0.920 by_depth_odd=1.000,0.971,0.949,0.920,0.924
+STORE_COUNT units=epochs part=other places=15851 depth=0 code_given=3.135 code_alone=3.135 unsaid_share=1.000 by_depth_odd=1.000,1.007,1.034,1.052,1.087

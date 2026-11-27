@@ -531,8 +531,8 @@ impl ScalePass {
     /// site's read at the split (`[n][D₀]` on `2^(−16)`, the lane chart's ratio), each epoch's harmonics of its places' reads
     /// (`[j][H D₀]`, the chart's sums), each known site's harmonics of its news phase (`[n][H]` on `2^(−30)`) and the level's clock at
     /// each epoch (`τ¹_j`, on the pace grain), for a ruler of what the level's unit keeps of its epoch, link by link.
-    pub(crate) fn level_moment(&self) -> (&[i32], &[i64], &[i64], &[i64]) {
-        (&self.read, &self.restricted, &self.cut.harmonics, &self.cut.tau)
+    pub(crate) fn level_moment(&self) -> (&[i32], &[i64], &[i64], &[i64], &[i64]) {
+        (&self.read, &self.restricted, &self.cut.harmonics, &self.cut.tau, &self.open_harmonics)
     }
 
     /// The level's ticks kept for the reverse.
