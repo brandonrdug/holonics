@@ -300,3 +300,37 @@ letters' rarity would have them.
 
 Owners: atlas `tower.second-level-cut-by-unbound-share` (interpretation) and the reading of `C¹` in
 `tower.level-receipt-codec-and-square`; Lean `HNN/OwnCycleCells`, `unsaid_share_scale_free`.
+
+## 13. The level's unit is the epoch's strand face on the count of its parts (asked by the lead, November 27)
+
+**The lead's reading.** The receipt kept inside the level (W132i, from W131w's end beside its plain control) holds the level's face
+at 2.98 nats a place against 22.50 and costs the held text 0.0253 nats a place (every region 0.018 to 0.026), a third less than the
+joined receipt's cost on W101r and of the same shape. The share the join leaves unsaid at a word's first letter is 0.893, the second
+level cut by `n` lands on word starts at 0.334 against 0.338 shuffled, and her state's word presence did not move. The face holds the
+rhythm of breaks whatever its route.
+
+**The law** (0.75, `agent-inferred`). The level's unit is the epoch's strand face,
+
+    m_j = Σ_(t∈e_j) Ĝ(t − s_j)⁻¹ E(u_t),
+
+each symbol's own word turned back by the fine rings' phases counted from the epoch's site `s_j` and summed at the epoch's close.
+The news decides where a unit ends, and the count of its parts addresses what stands inside it. It is the source moment of the
+retention law (`navigator.source-moment`, `navigator.clocked-ring-moment`) read over one cycle, and §4's law one level down: a
+unit is a cycle of the level below, read by the count of its own parts. The rings' turn is used without their fade, since an epoch
+is read whole at its close and no place in it is far.
+
+**What the built restriction changed, and why it held the handed epoch at 0.009.** `code.epoch-news-phase-chart` restricts
+`Σ_(t∈e_j) e^(2πikφ_t) r̂(x_t)` over six harmonics of the news phase. Two things differ from the strand face, and each loses the
+unit's content. The chart: on the news phase a predicted place stands where the place before it stood (51.7% of an epoch's places
+share the sixth of the place before, 75.1% of those under 1 nat; `tower.news-phase-chart-blind-to-dark-order`), and one word read
+with two surprises takes two addresses, where on the count of places its positions are told apart up to the product of the rings'
+periods whatever the reader expected. The term: `r̂(x_t)` is her state at the place, mostly her guess of what comes next, where
+`E(u_t)` is the symbol, and a sum of guesses keeps the rhythm of the breaks and drops the letters, which is what G-L5 read. The news
+phase was chosen on November 13 so that predicted places added to an epoch move no other place's phase; that holds for where the
+epoch is cut, which the news still decides, and it is what leaves the inside of a unit without an address.
+
+**The premise read first, before any build.** Four cells on the same epochs, one change each (the term `r̂` or `E`, the chart of
+news harmonics or of ring phases from the site), with the built restriction as the control, read for the letters at positions 1 to
+8, the epoch as one identity, and the next epoch's first letter from `m_(j−1)`. G-Z8 to G-Z10 are in `GUESS.txt`.
+
+Owners: atlas `tower.level-unit-is-the-epochs-strand-face` (interpretation).
