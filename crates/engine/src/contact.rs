@@ -1602,16 +1602,23 @@ impl Constitution {
     /// face, for a ruler on the host**: the known stream's anchors, the epoch each of the `2n` sites reads, and at each open place that
     /// reads an epoch its symbol's code at the prolonged row alone, read through the opening's reader (the level's own face, `D` then `F`
     /// with no fine tick; the receipt's read, [`Scale::receipt`], which the caller sets on its copy of the field). The unit's news under
-    /// the level, `C¹_j = Σ ĉ_t`, and the landmarks a second level would cut from it, are read from these outside the machine. A reading:
-    /// no state changes. `None` where the field has no level.
-    pub fn strand_level_face(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(usize, i64)>)>> {
+    /// the level, `C¹_j = Σ ĉ_t`, and the landmarks a second level would cut from it, are read from these outside the machine. Beside
+    /// each code, the same symbol's code through the same reader from the row at rest (a zero row, which charts to zero: the reader's
+    /// bias alone), so a ruler reads the share the join left unsaid, `R/Z` (the formal thread's law of the second level's cut, November
+    /// 26 23:50 UTC). A reading: no state changes. `None` where the field has no level.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_level_face(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(usize, i64, i64)>)>> {
         if !self.scale.as_deref().is_some_and(|s| s.receipt) {
             return refuse("a level's face is read with its receipt set on the reading's copy");
         }
         let pass = self.strand_pass(classes, true, past)?;
         let Some(t) = pass.tower.as_ref() else { return Ok(None) };
         let (anchors, source) = t.strand_cut();
-        Ok(Some((anchors.to_vec(), source.to_vec(), t.receipt_codes())))
+        let dw = self.declaration.width;
+        let reach_o = reach(&self.theta[self.layout.opening..self.layout.opening + dw * dw]);
+        let rest = self.opening_read(&vec![0i64; dw], reach_o)?.face;
+        let codes = t.receipt_codes().into_iter().map(|(site, code)| (site, code, rest.code(classes[site - classes.len()]))).collect();
+        Ok(Some((anchors.to_vec(), source.to_vec(), codes)))
     }
 
     /// [measurement; the lead, November 23, the level's receipt record §5; the formal thread's §19 item 4] **A strand's open places'

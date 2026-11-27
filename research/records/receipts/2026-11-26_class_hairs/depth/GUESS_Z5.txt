@@ -1,0 +1,10 @@
+G-Z5 to G-Z7, the formal thread's, fixed at 2026-11-26 23:50 UTC (relayed), before the join read was dispatched (23:53:36 UTC).
+
+Law: the second level cut by the first level's law one level up, in the level's own unit: a unit's news n_u = R_u / Z_u, R_u the level
+face's code of unit u's places read from unit u-1's row carried across the join, Z_u the same places through the same reader from the
+row at rest; clock S2 = sum of n; section one unit; a site is a unit whose n stands above every unit within one unit of S2, and a unit
+with n > 1 is always a site. The ruler: word starts against the same cut on n shuffled among the row's first-level units; phrase starts beside.
+
+G-Z5 (0.55): on W101r's 407 rows the second level's sites fall at word starts at least 0.05 above that shuffle.
+G-Z6 (0.65): on W129w and W101, within 0.02 of it.
+G-Z7 (0.5): on W101r the median second-level unit holds 2 or 3 first-level units.
