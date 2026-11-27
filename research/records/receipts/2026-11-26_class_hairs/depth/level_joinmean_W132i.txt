@@ -1,0 +1,19 @@
+LEVEL_FACE rows=407 first_epochs=34810 first_word_start_share=0.349 c1_nats_median=10.46 c1_nats_mean=11.78 section_nats=5.549
+LEVEL_FACE_JOIN units=34114 n_median=0.980 n_p10=0.856 n_p90=1.080 misled_share=0.381
+LEVEL_FACE_JOIN_PART letter_inside count=72109 share_median=0.966 share_mean=0.968 misled_share=0.372
+LEVEL_FACE_JOIN_PART other count=31917 share_median=1.030 share_mean=1.067 misled_share=0.557
+LEVEL_FACE_JOIN_PART word_first count=19517 share_median=0.994 share_mean=1.000 misled_share=0.476
+LEVEL_FACE_JOIN_PART unit_letter_inside count=15796 share_median=0.990 share_mean=0.982 misled_share=0.433
+LEVEL_FACE_JOIN_PART unit_other count=6465 share_median=0.969 share_mean=0.948 misled_share=0.343
+LEVEL_FACE_JOIN_PART unit_word_first count=11853 share_median=0.971 share_mean=0.978 misled_share=0.334
+LEVEL_FACE_SECOND law units=9887 word_start_share=0.296 phrase_start_share=0.032 places_median=12 places_mean=12.5 first_epochs_median=3
+LEVEL_FACE_SECOND shuffled units=9862 word_start_share=0.342 phrase_start_share=0.029 places_median=11 places_mean=12.4 first_epochs_median=3
+LEVEL_FACE_SECOND planted units=13144 word_start_share=0.902 phrase_start_share=0.080 places_median=8 places_mean=9.3 first_epochs_median=2
+LEVEL_FACE_SECOND per_place units=6305 word_start_share=0.293 phrase_start_share=0.021 places_median=18 places_mean=19.5 first_epochs_median=5
+LEVEL_FACE_SECOND join units=13825 word_start_share=0.299 phrase_start_share=0.036 places_median=7 places_mean=8.9 first_epochs_median=2
+LEVEL_FACE_SECOND join_shuffled units=13711 word_start_share=0.345 phrase_start_share=0.031 places_median=7 places_mean=8.9 first_epochs_median=2
+LEVEL_FACE_SECOND join_planted units=12356 word_start_share=0.959 phrase_start_share=0.085 places_median=8 places_mean=9.9 first_epochs_median=2
+JOIN_COUNT_DEPTH orders=1 held_codes_a_place=3.293 3.287 3.328 3.474 3.625 3.785
+JOIN_COUNT joinmean_W132i part=word_first places=9853 code_given=3.798 code_alone=3.807 unsaid_share=0.998 join_codes=3.862/3.924 join_unsaid_share=0.984
+JOIN_COUNT joinmean_W132i part=letter_inside places=36016 code_given=3.267 code_alone=3.297 unsaid_share=0.991 join_codes=3.211/3.343 join_unsaid_share=0.960
+JOIN_COUNT joinmean_W132i part=other places=15851 code_given=3.043 code_alone=3.038 unsaid_share=1.002 join_codes=3.107/3.163 join_unsaid_share=0.982

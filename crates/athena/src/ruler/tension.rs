@@ -1842,16 +1842,32 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
     write_new(&out.join("powers.tsv"), powers.as_bytes())?;
     if face {
         // [the lead, November 26, the formal thread's record of nested cycles §9 item 3] The level read at its own face: each open place
-        // that reads an epoch, its site of the `2n`, its symbol's code at the prolonged row alone and from the row at rest (on `2^(−20)`
-        // bits), on a copy of the field with the receipt's read set; the state is the same.
+        // that reads an epoch, its site of the `2n`, its symbol's code at the prolonged row alone and from the row at rest, the level's
+        // mean row (on `2^(−20)` bits), on a copy of the field with the receipt's read set; the state is the same.
         let mut faced = learner.field.clone();
         if let Some(sc) = faced.scale.as_deref_mut() {
             sc.receipt = true;
         }
+        // [the lead, November 27; the formal thread's correction of 04:23 UTC] The row at rest is the level's standing state: the mean of
+        // its compared rows over every passage of the table, summed whole and divided once.
+        #[allow(clippy::type_complexity)]
+        let sums: Vec<(Vec<i128>, usize)> = rows
+            .par_iter()
+            .map(|classes| faced.strand_level_rows(classes, past).map_err(|e| e.to_string()).and_then(|c| c.ok_or_else(|| "a field whose level does not hear a strand".to_string())))
+            .collect::<std::result::Result<_, _>>()?;
+        let dw = faced.declaration.width;
+        let count: usize = sums.iter().map(|(_, k)| k).sum();
+        let mut mean = vec![0i128; dw];
+        for (sum, _) in &sums {
+            for (m, &v) in mean.iter_mut().zip(sum) {
+                *m += v;
+            }
+        }
+        let mean: Vec<i64> = mean.iter().map(|&v| i64::try_from(holonics_engine::field::div_nearest(v, count.max(1) as i128)).map_err(|_| "a mean row outgrew its carrier".to_string())).collect::<std::result::Result<_, _>>()?;
         #[allow(clippy::type_complexity)]
         let read: Vec<Vec<(usize, i64, i64)>> = rows
             .par_iter()
-            .map(|classes| faced.strand_level_face(classes, past).map_err(|e| e.to_string()).and_then(|c| c.map(|(_, _, f)| f).ok_or_else(|| "a field whose level does not hear a strand".to_string())))
+            .map(|classes| faced.strand_level_face(classes, past, Some(&mean)).map_err(|e| e.to_string()).and_then(|c| c.map(|(_, _, f)| f).ok_or_else(|| "a field whose level does not hear a strand".to_string())))
             .collect::<std::result::Result<_, _>>()?;
         let mut text = String::new();
         for (r, f) in read.iter().enumerate() {

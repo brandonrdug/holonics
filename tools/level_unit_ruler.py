@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python3 -I
-"""level_unit_ruler.py CUT ROWS CODEC: a ruler (the lead, November 27; the formal thread's premise of 03:28 UTC, its G-Z8 to G-Z10). What a
+"""level_unit_ruler.py CUT ROWS CODEC [keyed]: a ruler (the lead, November 27; the formal thread's premise of 03:28 UTC, its G-Z8 to G-Z10). What a
 level's unit keeps of its epoch, by the term it sums and the chart it sums it on.
 
 `read-strand-cut ... past links` (CUT) writes, for passages read by two streams, the known stream's anchors (`cut.tsv`), each known
@@ -20,6 +20,9 @@ read on the odd, the shrinkage chosen on a split of the even) for the share of e
   quantities  the byte at each of the epoch's first eight places (`pos1` … `pos8`, a class of its own where the epoch is shorter),
             the epoch's text as one identity hashed into 64 cells (`identity`), the next epoch's first byte (`next_first`, what the
             join would carry), and a cell drawn by a key from the row and the epoch (`planted`, the floor).
+With `keyed` (the formal thread's keys of November 27 08:03 UTC), the control and the strand face are also read apart by where the
+epoch's site falls (a word's first letter, a letter inside a word, any other byte) and by how often the epoch's spelling recurs in its own
+passage (once, 2 to 7 times, 8 or more), each fitted on the even rows whole and read on the odd rows of the class (`LEVEL_UNIT_KEYED`).
 A line `LEVEL_UNIT_CHECK` gives the correlation of `r` on `news` with the dumped built moment, so the dump's layout is read before any
 share is. Outside the machine; shares only, floats at the exterior.
 """
@@ -40,6 +43,7 @@ def ring_terms(dt, periods):
 
 def main():
     d, rows_f, codec_f = sys.argv[1], sys.argv[2], sys.argv[3]
+    keyed = len(sys.argv) > 4 and sys.argv[4] == 'keyed'
     lines = open(codec_f).read().split('\n')
     head = lines[0].split(' ')
     void = int(head[2]) if head[0] == 'field-codec-v3' else None
@@ -66,7 +70,7 @@ def main():
     cell = lambda w: int(hashlib.sha256(w).hexdigest()[:8], 16) % 64
     names = ['pos1', 'pos2', 'pos3', 'pos4', 'pos5', 'pos6', 'pos7', 'pos8', 'identity', 'next_first', 'planted']
     reps = {k: [] for k in ('restricted', 'r_news', 'r_rings', 'r_rings10', 'E_news', 'E_rings', 'E_rings10', 'E_places')}
-    qs, side, check = [], [], []
+    qs, side, check, keys = [], [], [], []
     p0 = e0 = 0
     for r, n, anchors in cuts:
         text = texts[r][:n]
@@ -96,6 +100,10 @@ def main():
             key = int(hashlib.sha256(f'{r}:{j}'.encode()).hexdigest()[:8], 16) % 64
             qs.append([text[a + p] if a + p < end else -1 for p in range(8)] + [cell(text[a:end]), text[end], key])
             side.append(r % 2 == 0)
+            letter = lambda b: 65 <= b <= 90 or 97 <= b <= 122
+            site = "site_word_first" if letter(text[a]) and (a == 0 or text[a - 1] in (32, 10)) else ("site_inside" if letter(text[a]) else "site_other")
+            k = text.count(text[a:end])
+            keys.append((site, "recur_once" if k <= 1 else ("recur_2_7" if k < 8 else "recur_8_more")))
         p0 += n
         e0 += len(anchors)
     side = np.array(side)
@@ -142,6 +150,23 @@ def main():
             f = predict(ft, Y[tr], best_lam * len(tr) / len(a_idx), X[te])
             out.append(1.0 - ((Y[te] - f) ** 2).sum() / ((Y[te] - Y[tr].mean(0)) ** 2).sum())
         print(f"LEVEL_UNIT {label} cell={rep} width={X.shape[1]} epochs={X.shape[0]} " + ' '.join(f"{n}={s:.3f}" for n, s in zip(names, out)))
+        if keyed and rep in ('restricted', 'E_rings'):
+            preds = []
+            for Y in Ys[:8]:
+                best, best_lam = -1e9, scale
+                for lam in scale * np.array([0.001, 0.01, 0.1, 1, 10, 100]):
+                    f = predict(fa, Y[a_idx], lam, X[b_idx])
+                    v = 1.0 - ((Y[b_idx] - f) ** 2).sum() / ((Y[b_idx] - Y[a_idx].mean(0)) ** 2).sum()
+                    if v > best:
+                        best, best_lam = v, lam
+                preds.append(predict(ft, Y[tr], best_lam * len(tr) / len(a_idx), X[te]))
+            for axis in (0, 1):
+                for cls in sorted({k[axis] for k in keys}):
+                    m = np.array([keys[i][axis] == cls for i in te])
+                    if m.sum() < 50:
+                        continue
+                    sh = [1.0 - ((Y[te][m] - f[m]) ** 2).sum() / ((Y[te][m] - Y[tr].mean(0)) ** 2).sum() for Y, f in zip(Ys[:8], preds)]
+                    print(f"LEVEL_UNIT_KEYED {label} cell={rep} {cls} epochs={int(m.sum())} " + ' '.join(f"pos{p + 1}={v:.3f}" for p, v in enumerate(sh)))
 
 
 if __name__ == '__main__':

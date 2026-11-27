@@ -519,3 +519,46 @@ through the shared fine field costing every register. Host test `the_strand_face
 (the probes of `A` and `B⁻` against the code's central difference); the card's parity
 `the_levels_strand_face_on_the_card_reads_the_hosts_bits` on the line's own sixteen rings, both stream forms, 0 entries apart of 70,812
 at 3, 7 and 64 places.
+
+## 16. One lap of the strand face: the level holds its words and her depth does not move (G-L6)
+
+W133s (W132's end with `level 6 2 strand`) beside W133 (W132's end, no change, the line's next lap), 3,000 sections each heard whole on
+e5g1, read at their means; guess [`GUESS_L6.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L6.txt), fixed 04:22:32 UTC on November
+27; reads [`G-L6_reads.txt`](receipts/2026-11-26_class_hairs/laps/G-L6_reads.txt). The laps took 3,711 s and 3,796 s under the lock, one
+after the other.
+
+Her writes first (the theory panel, shown to Brandon raw): neither lap holds a sentence; the words in the register's lexicon are 81% and
+83% (logic, theory) on the arm. The probe panel wrote her name once on the arm.
+
+| G-L6 | read at the means, W133s against W133 | guess |
+|---|---|---|
+| (a) the word two before at a word's first letter | 0.025 against 0.024 | missed (0.035 asked) |
+| (b) the word before | 0.224 against 0.220 | missed (0.24 asked) |
+| (c) held text | +0.0291 (±0.0007) over 200,933 places | missed |
+| (d) text regions | none under: acts +0.0249, books +0.0195, code +0.0175, dialogue +0.0313, harness +0.0224, logic +0.0177, science +0.0252, theory +0.0191, web +0.0334, wikidata +0.0795 | missed |
+| (e) the level's restricted state, bytes at places 1 to 6 | 0.428, 0.560, 0.562, 0.534, 0.549, 0.487 (the control 0.138 to 0.329) | missed (0.5 each asked; four of six) |
+| (f) the wide panel's lexicon share | 72% against 71% | held |
+
+Beside them: the arm is louder (22.691 octaves against 22.655), and the terrain's held codes rose (copy 0.059 against 0.037, reverse
+0.073 against 0.041). The line goes on from W133's end (held text 0.6703, −0.0042 against W132).
+
+Inside the lap the cost closes. Each section's code before its deposit, the arm's over the control's on the same sections (the acts'
+drafts differ between the two, so the sections are nearly and not wholly the same): 1.046 over sections 0 to 249, 1.031, 1.026, 1.025,
+1.023, 1.023, 1.022, 1.021, 1.019, 1.020, 1.019 and 1.018 over 2,750 to 2,999. The arm's own code is still falling against its
+control's at the lap's end, so by rule 10 one lap is no null of the strand face, and a second lap runs beside the line's next
+([`GUESS_L7.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L7.txt)).
+
+The shape is G-L5's: a change to what the level hands into her state at the split costs every register by about the same amount and
+makes her louder, whatever the row holds (the receipt's prediction there, the epoch's words here). Her fine readers read the state
+whole and pay for a row they have not adapted to; what the row carries reaches them only as they adapt.
+
+**The join with its rest at the level's mean row** (the formal pass's correction; `strand_level_rows`, `strand_level_face`'s rest;
+[`level_joinmean_W132i.txt`](receipts/2026-11-26_class_hairs/depth/level_joinmean_W132i.txt)). On W132i's mean the join leaves unsaid
+0.984 of a word's first letter, 0.960 of a letter inside a word and 0.982 of any other byte (by its codes summed; the medians 0.994, 0.966
+and 1.030): past the level's own prior it tells a sixtieth of a word's first letter, as the formal pass expected. A second level cut on
+it lands on word starts 0.299 against 0.345 shuffled.
+
+**The count ruler proven** (rule 11; [`join_count_planted.txt`](receipts/2026-11-26_class_hairs/depth/join_count_planted.txt)). On every
+third row each place's byte set to the last byte of the epoch it reads, the count finds the join (its held depth two orders; the planted
+rows' unsaid share 0.378 at a word's first letter, 0.392 inside a word, 0.376 elsewhere), so its 0.998 on the real rows is a ruler's
+null: on the word rows a count of the epoch before's spelling tells nothing past a unigram.

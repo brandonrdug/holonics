@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python3 -I
-"""join_count_ruler.py DUMP ROWS: a ruler (the lead, November 27; the formal thread's ceiling for the join, 04:01 UTC, G-Z12). How much
+"""join_count_ruler.py DUMP ROWS [planted]: a ruler (the lead, November 27; the formal thread's ceiling for the join, 04:01 UTC, G-Z12). How much
 of a place a count of the passage could tell from what the join carries.
 
 `read-strand-cut ... past face` (DUMP) writes the known stream's anchors and the epoch each open place reads (`cut.tsv`). The join tells
@@ -11,7 +11,9 @@ alone over the alphabet seen, with one added to every count. How many of the ord
 (counted on their first half, coded on their second). (Witten–Bell's interpolation, its first form, trusted a spelling seen
 once and coded the places given the spelling above their codes alone.) On the odd rows each place's code given the join's condition over its code alone is the share a
 count leaves unsaid, `n_count = R/Z`, read by the place's part (a word's first letter, a letter inside a word, any other byte) beside the
-join's own share (`tools/level_face_ruler.py`'s `LEVEL_FACE_JOIN_PART`). Outside the machine; counts and ratios, floats at the exterior.
+join's own share (`tools/level_face_ruler.py`'s `LEVEL_FACE_JOIN_PART`). With `planted` (rule 11, the formal thread's proof of the
+ruler's null, November 27): on every third row each place's byte is set to the last byte of the epoch it reads, a join a count must find,
+and the planted rows' parts are read apart (`JOIN_COUNT_PLANTED`). Outside the machine; counts and ratios, floats at the exterior.
 """
 import math
 import sys
@@ -23,6 +25,7 @@ DISCOUNT = 0.75
 
 def main():
     d, rows_f = sys.argv[1], sys.argv[2]
+    planted = len(sys.argv) > 3 and sys.argv[3] == 'planted'
     texts = []
     for line in open(rows_f, encoding='utf-8'):
         f = line.rstrip('\n').split('\t')
@@ -46,7 +49,8 @@ def main():
             e = epoch_of[p - 1]
             read = text[anchors[j]:anchors[j + 1] if j + 1 < len(anchors) else n]
             dist = min(p - anchors[e], 15)
-            samples.append((r % 2 == 0, text[p], [(read, dist), (read[-4:], dist), (read[-2:], dist), (read[-1:], dist), ((), dist)], kind(text, p), (r, n + p)))
+            byte = (read[-1] if read else 32) if planted and r % 3 == 0 else text[p]
+            samples.append((r % 2 == 0, byte, [(read, dist), (read[-4:], dist), (read[-2:], dist), (read[-1:], dist), ((), dist)], kind(text, p), (r, n + p)))
     orders = 5
 
     def fit(rows):
@@ -95,7 +99,7 @@ def main():
         pass
     by = defaultdict(lambda: [0.0, 0.0, 0, 0.0, 0.0])
     for even, b, conds, part, site in samples:
-        if even:
+        if even or (planted and site[0] % 3 != 0):
             continue
         g = by[part]
         g[0] += -math.log(p_given(b, conds))
@@ -108,7 +112,7 @@ def main():
     for part in ("word_first", "letter_inside", "other"):
         R, Z, k, FR, FZ = by[part]
         join = f" join_codes={FR / max(k, 1):.3f}/{FZ / max(k, 1):.3f} join_unsaid_share={FR / FZ:.3f}" if FZ > 0 else ""
-        print(f"JOIN_COUNT {label} part={part} places={k} code_given={R / max(k, 1):.3f} code_alone={Z / max(k, 1):.3f} unsaid_share={R / max(Z, 1e-12):.3f}{join}")
+        print(f"JOIN_COUNT{'_PLANTED' if planted else ''} {label} part={part} places={k} code_given={R / max(k, 1):.3f} code_alone={Z / max(k, 1):.3f} unsaid_share={R / max(Z, 1e-12):.3f}{join}")
 
 
 if __name__ == '__main__':
