@@ -778,3 +778,64 @@ So the level's worth binds at her reach. Inside it a word-keyed count re-says wh
 in a stretch she has been reset across, it hands her two to three tenths of a nat at the word's third letter on, and under a fiftieth at
 its first, whose identity no prefix gives yet. The next test is the level's own state carried across her stretches at its own clock,
 read by the same parts.
+
+## 22. A part store keyed by a superposed face holds a bag of letters; keyed by a carry and charged with its news it holds two fifths to a half of the count past a reset (G-Z38 to G-Z45)
+
+The formal pass's part store (17:13 UTC, 0.65): a fast contact of the level, charged at each closed unit's close and leaking at its own
+rate, read at a place by the open prefix's face, beside her face as the second path. Before building it, its host form on the joined
+passages of §21, read by the same parts (`tools/part_store_ruler.py`, `tools/carry_store_ruler.py`). Each store joins her
+letter-renormalized face by one coefficient, and beside it by a coefficient set by the store's own state (the place in the word and the
+octave of its read), chosen on one half and read on the other; the gains below are past a reset, the mean of the halves with their
+scatter.
+
+**What October 26 measured, and what differs.** The binding bank of October 26 was a grid of 64 slots written by the delta rule, with
+learned key and query maps opened on one draw, so that before any learning a read returned what had followed the present face; it was
+accepted on a lookup benchmark and retired as a copier. The store read here is a field with its own charge and leak, read through a port,
+its rows shared; its key is the unit's own encoding or a carry of turns, never a learned map opened on a draw; and it is graded where a
+word recurs past a reset of her state, beside her writes' loop share, never on a lookup.
+
+**Keyed by the superposed strand face** (G-Z38, 0.55, missed; G-Z39, not read; G-Z42, 0.6, half held). A word's face
+`Σ_i ρ(i) ⊗ e(u_i)` with the level's six terms and her encoding's rows, charged as an outer product into a field of width 64 to 512 through
+a fixed random projection (the level's own restriction is no linear map of the dumped moments: its held `R²` is negative), read as the
+cosine of each letter's face at the place's terms with the completion: the coefficient fits to zero both ways at every width and leak, with
+her rows as they stand, centered (they share a part, a cosine of 0.40 between letters on the mean) or with all 32 of her rings' turns
+([`part_store_her_level.txt`](receipts/2026-11-26_class_hairs/depth/part_store_her_level.txt),
+[`part_store_her_rings.txt`](receipts/2026-11-26_class_hairs/depth/part_store_her_rings.txt),
+[`part_store_centered_rings.txt`](receipts/2026-11-26_class_hairs/depth/part_store_centered_rings.txt)). The planted limit, a letter's
+own column against a place's own column (832 terms), reads +0.0026 at the third letter
+([`part_store_onehot_onehot.txt`](receipts/2026-11-26_class_hairs/depth/part_store_onehot_onehot.txt)). Pairing two superposed faces is
+bilinear, `⟨Σa, Σb⟩ = Σ_ij ⟨a_i, b_j⟩`, so a prefix that shares any letter at any place pays partial credit: the store reads a bag.
+
+**Keyed by a carry** (G-Z43, 0.65, missed; the formal pass's law of 17:30 UTC, 0.7: a key binds by a product). A prefix carries one phase on
+each of `J` circles, `Φ_j(p) = Σ_i θ_j(u_i, i)`, each letter's turn at each place drawn once on the circle (a ruler's stand-in for her
+located turns); the field is `J` circles by the letters, charged at each word's close with `Σ_k χ(w_(<k)) ⊗ e(w_k)` and read as
+`softmax(β Re(χ(p)* F)/J)`. Summed, it gains +0.007 at the third letter at `J = 1,024` and +0.042 (scatter 0.027) at 4,096
+([`carry_store_sum.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_sum.txt)): the empty prefix's carry, one on every circle, is
+charged by every word, and an address charged `n` times leaks into every read as `n/√(2J)`, about 28 at 4,096 for the first letters' column
+against a signal of one. With the first two letters' addresses left uncharged, a grain set by hand, it reads +0.099 at the third letter and
++0.066 at the rest ([`carry_store_sum_from3.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_sum_from3.txt)).
+
+**Charged with its news** (G-Z44, 0.65, held at the rest and short by 0.006 at the third letter; G-Z45, 0.55, held; the pass's law of 17:53
+UTC, 0.7: a charge is the news and an address's read a ratio). The delta charge `F ← F + η (e − F χ) χ*` deposits at each address only the
+letter less what the store already reads there, the store's own covector at the locus it reaches; its fixed point is the least-squares map,
+each address divided by its own count, the count ruler's prefix ratio, and a saturated address stops charging, so its crosstalk falls away.
+At `J = 4,096` from the empty prefix, `η = 1/4`: the third letter +0.0935 (0.0039), the rest +0.162 (0.018); `η = 1`: +0.051 and +0.181; at
+`J = 1,024`, `η = 1/4`: +0.083 and +0.118 ([`carry_store_delta025.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_delta025.txt),
+[`carry_store_delta1.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_delta1.txt)). The cut at two letters adds nothing under the
+delta charge (`η = 1`, from the third address: +0.051 and +0.182,
+[`carry_store_delta1_from3.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_delta1_from3.txt)). Inside her reach, past 30 places, the
+same store gives +0.044 and +0.042. With one coefficient and no state gate it gives +0.028 and +0.031 past a reset.
+
+| guess | read | score |
+|---|---|---|
+| G-Z38 the strand-face store at the level's width: 0.1 to 0.5 of +0.229 at the third letter on | 0 | missed |
+| G-Z39 twice the width a quarter more | nothing to scale | not read |
+| G-Z42 the planted limit ≥ a third of +0.229; her rows ⊗ ring turns under a tenth | +0.0026; 0 | half held |
+| G-Z43 the carry store at `J ≥ 1,024` ≥ half the ceiling, rising as `√J` | +0.007 at 1,024; +0.042 at 4,096 | missed |
+| G-Z44 the delta charge, `η = 1/4`, `J = 4,096`: ≥ +0.10 at the third letter on | +0.094 at the third, +0.162 at the rest | held at the rest |
+| G-Z45 `η = 1/4` beats `η = 1` at the third letter by ≥ 0.02 | +0.043 | held |
+
+So the part store is a store of the theory's kind once its key is a product and its charge the news: a fixed field of `J` circles by the
+letters holds two fifths of the count's ceiling at a recurring word's third letter and over half at its later letters, past a reset, at
+`J = 4,096`. Her own field has 512 carry circles (the declaration's carry word), so a build on her circles' own composed moves stands at or
+under the read at 1,024 unless her located turns tell prefixes apart better than drawn ones.

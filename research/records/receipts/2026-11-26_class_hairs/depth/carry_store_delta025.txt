@@ -1,0 +1,101 @@
+CARRY_STORE from=1 charge=delta:0.25 letter_places=180575 even=90694 odd=89881 her_nats_odd=1.443
+CARRY_STORE circles=1024 fit=even_to_odd leak=None beta=32.0 coefficient=0.02 her_nats=1.443 joined_nats=1.442 gain=+0.0012
+CARRY_STORE circles=1024 fit=even_to_odd place=1 part=within_30 places=959 her_nats=1.967 gain=+0.0206 (±0.0036) state_gain=+0.0000
+CARRY_STORE circles=1024 fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.373 gain=-0.0067 (±0.0006) state_gain=+0.0000
+CARRY_STORE circles=1024 fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.379 gain=-0.0044 (±0.0009) state_gain=+0.0000
+CARRY_STORE circles=1024 fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.021 gain=-0.0026 (±0.0018) state_gain=+0.0000
+CARRY_STORE circles=1024 fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.592 gain=+0.0146 (±0.0018) state_gain=+0.0250
+CARRY_STORE circles=1024 fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.886 gain=+0.0062 (±0.0007) state_gain=+0.0087
+CARRY_STORE circles=1024 fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.956 gain=-0.0018 (±0.0008) state_gain=-0.0048
+CARRY_STORE circles=1024 fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.545 gain=+0.0001 (±0.0009) state_gain=-0.0019
+CARRY_STORE circles=1024 fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.274 gain=+0.0070 (±0.0012) state_gain=+0.0472
+CARRY_STORE circles=1024 fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.562 gain=+0.0089 (±0.0007) state_gain=+0.0441
+CARRY_STORE circles=1024 fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.891 gain=-0.0029 (±0.0009) state_gain=-0.0275
+CARRY_STORE circles=1024 fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.322 gain=+0.0321 (±0.0036) state_gain=+0.0840
+CARRY_STORE circles=1024 fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.178 gain=+0.0041 (±0.0011) state_gain=+0.0497
+CARRY_STORE circles=1024 fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.191 gain=+0.0053 (±0.0006) state_gain=+0.0394
+CARRY_STORE circles=1024 fit=even_to_odd place=rest part=not_before places=22928 her_nats=0.957 gain=-0.0064 (±0.0009) state_gain=-0.0155
+CARRY_STORE circles=1024 fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.555 gain=+0.0296 (±0.0028) state_gain=+0.1169
+CARRY_STORE circles=1024 fit=odd_to_even leak=None beta=32.0 coefficient=0.01 her_nats=1.397 joined_nats=1.394 gain=+0.0026
+CARRY_STORE circles=1024 fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.763 gain=+0.0124 (±0.0022) state_gain=+0.0016
+CARRY_STORE circles=1024 fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.315 gain=-0.0030 (±0.0003) state_gain=-0.0002
+CARRY_STORE circles=1024 fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.282 gain=-0.0004 (±0.0007) state_gain=-0.0003
+CARRY_STORE circles=1024 fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.051 gain=+0.0001 (±0.0009) state_gain=-0.0000
+CARRY_STORE circles=1024 fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.434 gain=+0.0049 (±0.0006) state_gain=+0.0218
+CARRY_STORE circles=1024 fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.888 gain=+0.0021 (±0.0003) state_gain=+0.0067
+CARRY_STORE circles=1024 fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.965 gain=-0.0012 (±0.0004) state_gain=-0.0099
+CARRY_STORE circles=1024 fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.614 gain=+0.0040 (±0.0012) state_gain=+0.0077
+CARRY_STORE circles=1024 fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.220 gain=+0.0027 (±0.0003) state_gain=+0.0411
+CARRY_STORE circles=1024 fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.535 gain=+0.0043 (±0.0003) state_gain=+0.0418
+CARRY_STORE circles=1024 fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.899 gain=-0.0002 (±0.0009) state_gain=-0.0284
+CARRY_STORE circles=1024 fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.406 gain=+0.0201 (±0.0024) state_gain=+0.0823
+CARRY_STORE circles=1024 fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.152 gain=+0.0022 (±0.0008) state_gain=+0.0344
+CARRY_STORE circles=1024 fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.170 gain=+0.0022 (±0.0002) state_gain=+0.0303
+CARRY_STORE circles=1024 fit=odd_to_even place=rest part=not_before places=22325 her_nats=0.920 gain=+0.0003 (±0.0010) state_gain=-0.0084
+CARRY_STORE circles=1024 fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.606 gain=+0.0238 (±0.0019) state_gain=+0.1193
+CARRY_STORE circles=1024 place=1 part=earlier_stretch gain_mean=-0.0012 halves_scatter=0.0027 state_gain_mean=-0.0000 state_scatter=0.0000
+CARRY_STORE circles=1024 place=1 part=not_before gain_mean=-0.0024 halves_scatter=0.0040 state_gain_mean=-0.0001 state_scatter=0.0003
+CARRY_STORE circles=1024 place=1 part=over_30 gain_mean=-0.0049 halves_scatter=0.0036 state_gain_mean=-0.0001 state_scatter=0.0002
+CARRY_STORE circles=1024 place=1 part=within_30 gain_mean=+0.0165 halves_scatter=0.0081 state_gain_mean=+0.0008 state_scatter=0.0016
+CARRY_STORE circles=1024 place=2 part=earlier_stretch gain_mean=+0.0021 halves_scatter=0.0039 state_gain_mean=+0.0029 state_scatter=0.0096
+CARRY_STORE circles=1024 place=2 part=not_before gain_mean=-0.0015 halves_scatter=0.0006 state_gain_mean=-0.0074 state_scatter=0.0051
+CARRY_STORE circles=1024 place=2 part=over_30 gain_mean=+0.0042 halves_scatter=0.0041 state_gain_mean=+0.0077 state_scatter=0.0020
+CARRY_STORE circles=1024 place=2 part=within_30 gain_mean=+0.0097 halves_scatter=0.0097 state_gain_mean=+0.0234 state_scatter=0.0032
+CARRY_STORE circles=1024 place=3 part=earlier_stretch gain_mean=+0.0261 halves_scatter=0.0120 state_gain_mean=+0.0831 state_scatter=0.0016
+CARRY_STORE circles=1024 place=3 part=not_before gain_mean=-0.0016 halves_scatter=0.0027 state_gain_mean=-0.0279 state_scatter=0.0009
+CARRY_STORE circles=1024 place=3 part=over_30 gain_mean=+0.0066 halves_scatter=0.0047 state_gain_mean=+0.0429 state_scatter=0.0023
+CARRY_STORE circles=1024 place=3 part=within_30 gain_mean=+0.0048 halves_scatter=0.0043 state_gain_mean=+0.0442 state_scatter=0.0061
+CARRY_STORE circles=1024 place=rest part=earlier_stretch gain_mean=+0.0267 halves_scatter=0.0058 state_gain_mean=+0.1181 state_scatter=0.0024
+CARRY_STORE circles=1024 place=rest part=not_before gain_mean=-0.0031 halves_scatter=0.0066 state_gain_mean=-0.0120 state_scatter=0.0071
+CARRY_STORE circles=1024 place=rest part=over_30 gain_mean=+0.0038 halves_scatter=0.0031 state_gain_mean=+0.0348 state_scatter=0.0091
+CARRY_STORE circles=1024 place=rest part=within_30 gain_mean=+0.0032 halves_scatter=0.0019 state_gain_mean=+0.0421 state_scatter=0.0152
+CARRY_STORE circles=4096 fit=even_to_odd leak=None beta=32.0 coefficient=0.02 her_nats=1.443 joined_nats=1.442 gain=+0.0016
+CARRY_STORE circles=4096 fit=even_to_odd place=1 part=within_30 places=959 her_nats=1.967 gain=+0.0206 (±0.0036) state_gain=+0.0000
+CARRY_STORE circles=4096 fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.373 gain=-0.0067 (±0.0006) state_gain=+0.0000
+CARRY_STORE circles=4096 fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.379 gain=-0.0044 (±0.0009) state_gain=+0.0000
+CARRY_STORE circles=4096 fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.021 gain=-0.0026 (±0.0018) state_gain=+0.0000
+CARRY_STORE circles=4096 fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.592 gain=+0.0145 (±0.0018) state_gain=+0.0252
+CARRY_STORE circles=4096 fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.886 gain=+0.0062 (±0.0007) state_gain=+0.0087
+CARRY_STORE circles=4096 fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.956 gain=-0.0020 (±0.0007) state_gain=-0.0053
+CARRY_STORE circles=4096 fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.545 gain=+0.0006 (±0.0010) state_gain=-0.0008
+CARRY_STORE circles=4096 fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.274 gain=+0.0070 (±0.0012) state_gain=+0.0478
+CARRY_STORE circles=4096 fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.562 gain=+0.0091 (±0.0007) state_gain=+0.0455
+CARRY_STORE circles=4096 fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.891 gain=-0.0030 (±0.0009) state_gain=-0.0289
+CARRY_STORE circles=4096 fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.322 gain=+0.0338 (±0.0037) state_gain=+0.0916
+CARRY_STORE circles=4096 fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.178 gain=+0.0044 (±0.0011) state_gain=+0.0503
+CARRY_STORE circles=4096 fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.191 gain=+0.0055 (±0.0005) state_gain=+0.0460
+CARRY_STORE circles=4096 fit=even_to_odd place=rest part=not_before places=22928 her_nats=0.957 gain=-0.0062 (±0.0009) state_gain=-0.0162
+CARRY_STORE circles=4096 fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.555 gain=+0.0353 (±0.0029) state_gain=+0.1529
+CARRY_STORE circles=4096 fit=odd_to_even leak=None beta=32.0 coefficient=0.01 her_nats=1.397 joined_nats=1.394 gain=+0.0030
+CARRY_STORE circles=4096 fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.763 gain=+0.0125 (±0.0022) state_gain=+0.0018
+CARRY_STORE circles=4096 fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.315 gain=-0.0030 (±0.0003) state_gain=-0.0002
+CARRY_STORE circles=4096 fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.282 gain=-0.0004 (±0.0007) state_gain=-0.0003
+CARRY_STORE circles=4096 fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.051 gain=+0.0002 (±0.0009) state_gain=-0.0000
+CARRY_STORE circles=4096 fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.434 gain=+0.0048 (±0.0006) state_gain=+0.0217
+CARRY_STORE circles=4096 fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.888 gain=+0.0023 (±0.0003) state_gain=+0.0072
+CARRY_STORE circles=4096 fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.965 gain=-0.0012 (±0.0004) state_gain=-0.0099
+CARRY_STORE circles=4096 fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.614 gain=+0.0041 (±0.0012) state_gain=+0.0082
+CARRY_STORE circles=4096 fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.220 gain=+0.0026 (±0.0003) state_gain=+0.0412
+CARRY_STORE circles=4096 fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.535 gain=+0.0043 (±0.0003) state_gain=+0.0423
+CARRY_STORE circles=4096 fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.899 gain=-0.0001 (±0.0009) state_gain=-0.0301
+CARRY_STORE circles=4096 fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.406 gain=+0.0221 (±0.0025) state_gain=+0.0955
+CARRY_STORE circles=4096 fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.152 gain=+0.0025 (±0.0009) state_gain=+0.0504
+CARRY_STORE circles=4096 fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.170 gain=+0.0025 (±0.0002) state_gain=+0.0370
+CARRY_STORE circles=4096 fit=odd_to_even place=rest part=not_before places=22325 her_nats=0.920 gain=+0.0009 (±0.0010) state_gain=-0.0106
+CARRY_STORE circles=4096 fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.606 gain=+0.0274 (±0.0021) state_gain=+0.1711
+CARRY_STORE circles=4096 place=1 part=earlier_stretch gain_mean=-0.0012 halves_scatter=0.0027 state_gain_mean=-0.0000 state_scatter=0.0000
+CARRY_STORE circles=4096 place=1 part=not_before gain_mean=-0.0024 halves_scatter=0.0040 state_gain_mean=-0.0001 state_scatter=0.0003
+CARRY_STORE circles=4096 place=1 part=over_30 gain_mean=-0.0049 halves_scatter=0.0036 state_gain_mean=-0.0001 state_scatter=0.0002
+CARRY_STORE circles=4096 place=1 part=within_30 gain_mean=+0.0166 halves_scatter=0.0081 state_gain_mean=+0.0009 state_scatter=0.0018
+CARRY_STORE circles=4096 place=2 part=earlier_stretch gain_mean=+0.0024 halves_scatter=0.0035 state_gain_mean=+0.0037 state_scatter=0.0090
+CARRY_STORE circles=4096 place=2 part=not_before gain_mean=-0.0016 halves_scatter=0.0008 state_gain_mean=-0.0076 state_scatter=0.0047
+CARRY_STORE circles=4096 place=2 part=over_30 gain_mean=+0.0042 halves_scatter=0.0039 state_gain_mean=+0.0079 state_scatter=0.0015
+CARRY_STORE circles=4096 place=2 part=within_30 gain_mean=+0.0097 halves_scatter=0.0097 state_gain_mean=+0.0234 state_scatter=0.0035
+CARRY_STORE circles=4096 place=3 part=earlier_stretch gain_mean=+0.0279 halves_scatter=0.0117 state_gain_mean=+0.0935 state_scatter=0.0039
+CARRY_STORE circles=4096 place=3 part=not_before gain_mean=-0.0016 halves_scatter=0.0029 state_gain_mean=-0.0295 state_scatter=0.0012
+CARRY_STORE circles=4096 place=3 part=over_30 gain_mean=+0.0067 halves_scatter=0.0048 state_gain_mean=+0.0439 state_scatter=0.0032
+CARRY_STORE circles=4096 place=3 part=within_30 gain_mean=+0.0048 halves_scatter=0.0044 state_gain_mean=+0.0445 state_scatter=0.0066
+CARRY_STORE circles=4096 place=rest part=earlier_stretch gain_mean=+0.0314 halves_scatter=0.0079 state_gain_mean=+0.1620 state_scatter=0.0182
+CARRY_STORE circles=4096 place=rest part=not_before gain_mean=-0.0026 halves_scatter=0.0071 state_gain_mean=-0.0134 state_scatter=0.0056
+CARRY_STORE circles=4096 place=rest part=over_30 gain_mean=+0.0040 halves_scatter=0.0031 state_gain_mean=+0.0415 state_scatter=0.0090
+CARRY_STORE circles=4096 place=rest part=within_30 gain_mean=+0.0035 halves_scatter=0.0019 state_gain_mean=+0.0504 state_scatter=0.0001
