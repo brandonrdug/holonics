@@ -589,8 +589,10 @@ mixture, `σ P_k + (1 − σ) M_(k+1)`, and a component at or under the face it 
 (Lean `mixture_with_flat_le`): a mixture pays its weight's share for every unmet depth. The context tree's mixture is the Bayes
 mixture over its standings and is lawful for counts that start at a prior; on a superposed store whose unmet addresses read noise
 it pays at every first meeting. So the location per address enters the product's exponent, `λ_k(s) = g_k + a_k ρ_k + β_k(s)`,
-`β_k(s) = Re⟨B, χ_k⟩/J`, with `B` charged by `η (E_p[ℓ_k] − ℓ_k(x))`, the exponent's own covector (§20): an address whose read pays
-learns a larger exponent, and an unmet one stays flat and costs nothing whatever its weight. G-Z57 is fixed on it.
+`β_k(s) = Re⟨B, χ_k⟩/J`, with `B` charged by `η (ℓ_k(x) − E_p[ℓ_k])`, the negative of the exponent's own covector (§20; first written here with the covector's sign, corrected the same evening): an address whose read pays
+learns a larger exponent, and an unmet one stays flat and costs nothing whatever its weight. G-Z57 is fixed on it. The plain mixture on a grid reaching below its edge
+(21:15 UTC) takes `τ = 1`, the new edge: its best is to flatten every face toward its components' background, which removes the
+first-letter cost (+0.0040) and keeps +0.020 at the third letter against the product's +0.072. A mixture asks for less of itself.
 
 ## 24. Owners
 
