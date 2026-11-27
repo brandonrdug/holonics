@@ -9,8 +9,9 @@ As read (the lead): eight held passages of the store's held slices (six books, t
 by read-reach faces:all at W135s's lap mean; beside them the same text cut into 300-octet rows (216 rows), each passage's pieces on one
 half, so the long read and the cut read stand on one text.
 
-The span the guess fixed cannot be read: her declaration's reach is 3,771 places (9·419), and a region past it is refused (a development
-read of 4,000 places: "a region past the field's reach, where its frames would repeat"). Scored as a variant at 3,700 places against the
+The span the guess fixed cannot be read: her declaration's reach is 3,771 places, a declared extent (each ring's phasor table holds
+min(P, reach) residues), and a region past it is refused (a development read of 4,000 places: "a region past the field's reach, where its
+frames would repeat"; her rings, 2^1 to 2^12 and 3^1 to 3^8 in sixteen slots, alias only past 2^12·3^8 = 26,873,856 places). Scored as a variant at 3,700 places against the
 300-octet cut of the same text (the formal thread, 16:12 UTC). Her two-stream read's time grows about as the square of a row's places (one
 thread: 1,000 places 22.6 s, 2,000 places 83.7 s; the sixteen rows of 3,700 took 710 s at eight threads).
 

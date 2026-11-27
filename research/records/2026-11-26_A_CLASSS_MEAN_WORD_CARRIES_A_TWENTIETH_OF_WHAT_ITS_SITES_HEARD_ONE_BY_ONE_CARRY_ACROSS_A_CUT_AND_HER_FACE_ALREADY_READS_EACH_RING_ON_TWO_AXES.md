@@ -738,11 +738,16 @@ every row, so a word met more than 30 places back had a row's few dozen words to
 carried whole over 8,000 places.
 
 **Her reach** ([`GUESS_Z36.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_Z36.txt)). No passage can be carried whole that far: her
-declaration's reach is 3,771 places (9·419), and a region past it is refused, its frames repeating (a development read of 4,000 places).
-The pass's law (0.75): coprime frames meet once per residue pair only modulo their product, so past 3,771 places every address her rings
-form recurs, and the refusal is that aliasing; a wider product moves the same edge outward at every ring's width. Past it only a level
-can address, whose clock counts closed units and whose frames repeat after the product of its own periods in units. Her two-stream read's
-time grows about as the square of a row's places (one thread: 1,000 places 22.6 s, 2,000 places 83.7 s).
+declaration's reach is 3,771 places, and a region past it is refused (a development read of 4,000 places). The reach is a declared
+extent, the terrain's extent read from the passages the field meets (`Declaration::reach`): each ring's phasor table holds
+`min(P, reach)` residues (`founding.rs`), so the rings of 4,096 and 6,561 hold 3,771 phasors each, and `admit_region` refuses a longer
+region. It is no aliasing of her rings: they are 2, 3, 4, 9, 16, 27, 32, 81, 128, 243, 256, 729, 1,024, 2,187, 4,096 and 6,561 (16 turned
+slots, `navigator::ring_periods`), whose joint period is `2^12 · 3^8` = 26,873,856 places, so a place and the place 3,771 later are
+distinct addresses to them. What bounds how far she hears a past place is each ring's skin, `e^(−2πd/P)`, one e-fold a radian of turn:
+the coarsest ring is heard over about `P/2π`, some 1,040 places (the formal pass's first reading, 16:12 UTC, took the cap for an
+aliasing of rings 9 and 419, from the lead's factoring of 3,771, and the lead corrected it at 17:14 UTC). Past a reset of her state, or
+past about a thousand places of skin, only a level carried across can address. Her two-stream read's time grows about as the square of a
+row's places (one thread: 1,000 places 22.6 s, 2,000 places 83.7 s).
 
 **At her reach** (G-Z36 read as a variant; sixteen held passages of the store's held slices, twelve of books and four of the theory, each
 its first 3,700 octets as one row, beside the same text cut into 300-octet rows with each passage's pieces on one half;
