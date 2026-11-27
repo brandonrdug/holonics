@@ -1229,7 +1229,7 @@ pub fn read_reach(args: &[String]) -> Result<()> {
     let heads = learner.field.declaration.heads;
     let mut settings: Vec<(String, Option<Vec<i64>>)> = Vec::new();
     for word in &args[12..] {
-        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" || word.starts_with("cut:") || word.starts_with("from:") {
+        if word == "law" || word == "lanes" || word == "moves" || word == "hands" || word == "faces" || word == "faces:all" || word.starts_with("round:") || word.starts_with("state:") || word.starts_with("places:") || word.starts_with("lane:") || word.starts_with("lanept:") || word.starts_with("fade:") || word == "skin:places" || word.starts_with("cut:") || word.starts_with("from:") {
             settings.push((word.clone(), None));
             continue;
         }
@@ -1264,6 +1264,37 @@ pub fn read_reach(args: &[String]) -> Result<()> {
             return Err("a row of fewer than two places".into());
         }
         rows.push((label.splitn(3, ':').take(2).collect::<Vec<_>>().join(":"), classes));
+    }
+    // [the lead, November 27, the formal thread's G-Z34] The word `faces` among the settings: the law's face whole at every place that
+    // follows a space or a line's end (a word's first place), every class's code on `2^(−20)` bits (`OUT/faces.i32`, `[place][class]`,
+    // little-endian), the places in `OUT/faces.tsv` (`row`, `place`, the written class) and each class's octets in `OUT/classes.tsv`
+    // (`class`, hex), so a ruler outside the machine can read her face over a part of the alphabet; `faces:all` every place from the
+    // second (the formal thread's G-Z35, 15:55 UTC: her face at each place of a word). No other setting is read with it.
+    if let Some(at) = settings.iter().position(|(n, _)| n == "faces" || n == "faces:all") {
+        let every = settings.remove(at).0 == "faces:all";
+        let starts: Vec<usize> = [b" ".as_slice(), b"\n".as_slice()].iter().map(|s| codec.encode(s)).collect::<std::result::Result<Vec<_>, _>>()?.into_iter().flatten().collect();
+        let faces: Vec<Vec<holonics_engine::face::TowerFace>> = rows.par_iter().map(|(_, classes)| learner.field.strand_faces_read(classes, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+        std::fs::create_dir_all(out)?;
+        let (mut index, mut octets) = (String::new(), Vec::new());
+        for (r, ((_, classes), fs)) in rows.iter().zip(&faces).enumerate() {
+            for t in 1..classes.len() {
+                if !every && !starts.contains(&classes[t - 1]) {
+                    continue;
+                }
+                index.push_str(&format!("{r}\t{t}\t{}\n", classes[t]));
+                for &m in &fs[t].masses {
+                    let c = i32::try_from(holonics_engine::face::face_code(m, fs[t].total)).map_err(|_| "a code past its chart")?;
+                    octets.extend_from_slice(&c.to_le_bytes());
+                }
+            }
+        }
+        write_new(&out.join("faces.tsv"), index.as_bytes())?;
+        write_new(&out.join("faces.i32"), &octets)?;
+        let alphabet = learner.field.declaration.alphabet;
+        let names: String = (0..alphabet).map(|k| format!("{k}\t{}\n", codec.decode(&[k]).iter().map(|b| format!("{b:02x}")).collect::<String>())).collect();
+        write_new(&out.join("classes.tsv"), names.as_bytes())?;
+        println!("REACH_FACES places={} classes={alphabet} ms={}", index.lines().count(), started.elapsed().as_millis());
+        return Ok(());
     }
     // [the lead, November 22, the chirality pass's second read] The word `hands` among the settings: the circles' hands along their scans
     // summed over every row ([`holonics_engine::field::Constitution::strand_chirality`]), printed as `REACH_HANDS` lines and each circle's
@@ -1900,18 +1931,21 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
         // its places' reads and each known site's harmonics of its news phase, row after row in the table's order (`known.i32`,
         // `moment.i64`, `harmonics.i64`), and the encoding's rows (`enc.i32`).
         #[allow(clippy::type_complexity)]
-        let summed: Vec<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>, Vec<i64>)> = rows
+        let summed: Vec<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>, Vec<i64>, Vec<i64>)> = rows
             .par_iter()
             .map(|classes| field.strand_level_moment(classes, past).map_err(|e| e.to_string()).and_then(|c| c.ok_or_else(|| "a field whose level does not hear a strand".to_string())))
             .collect::<std::result::Result<_, _>>()?;
-        let (mut known, mut moment, mut phases, mut clock) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
-        for (_, read, m, hk, tau) in &summed {
+        let (mut known, mut moment, mut phases, mut clock, mut open_phases) = (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
+        for (_, read, m, hk, tau, oh) in &summed {
+            open_phases.extend(oh.iter().flat_map(|v| v.to_le_bytes()));
             known.extend(read.iter().flat_map(|v| v.to_le_bytes()));
             moment.extend(m.iter().flat_map(|v| v.to_le_bytes()));
             phases.extend(hk.iter().flat_map(|v| v.to_le_bytes()));
             clock.extend(tau.iter().flat_map(|v| v.to_le_bytes()));
         }
         write_new(&out.join("tau.i64"), &clock)?;
+        // [the lead, November 27] Each open place's harmonics of its news phase (`[n][H]` on `2^(−30)`), the phase the prolongation reads it at.
+        write_new(&out.join("open_harmonics.i64"), &open_phases)?;
         write_new(&out.join("known.i32"), &known)?;
         write_new(&out.join("moment.i64"), &moment)?;
         write_new(&out.join("harmonics.i64"), &phases)?;

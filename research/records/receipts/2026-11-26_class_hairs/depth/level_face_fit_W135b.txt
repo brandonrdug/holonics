@@ -1,0 +1,6 @@
+LEVEL_FACE_FIT unit3_W135b_mean bias_alone_nats=3.262
+LEVEL_FACE_FIT unit3_W135b_mean first_letters_odd=9858 classes=52 shrinkage=0.1 face_nats=3.521 own_nats=2.947 face_less_own=+0.575
+LEVEL_FACE_FIT unit3_W135b_mean part=within_30 places=415 face_nats=2.633 own_nats=2.046 face_less_own=+0.587 (±0.062)
+LEVEL_FACE_FIT unit3_W135b_mean part=over_30 places=1577 face_nats=2.897 own_nats=2.202 face_less_own=+0.695 (±0.032)
+LEVEL_FACE_FIT unit3_W135b_mean part=not_before places=7866 face_nats=3.693 own_nats=3.144 face_less_own=+0.550 (±0.016)
+FIT_DONE

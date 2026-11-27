@@ -1,0 +1,101 @@
+WORD_CACHE letter_places=92716 even=46314 odd=46402 her_nats_odd=1.570 her_nats_even=1.559 count_has_charge=0.443
+WORD_CACHE fit=even_to_odd leak=512 coefficient=0.02 her_nats=1.570 joined_nats=1.569 gain=+0.0006
+WORD_CACHE fit=even_to_odd place=1 part=within_30 places=453 her_nats=1.951 joined_nats=1.937 gain=+0.0144 (±0.0038) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=1 part=over_30 places=1697 her_nats=2.095 joined_nats=2.086 gain=+0.0086 (±0.0015) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=1 part=not_before places=8614 her_nats=3.051 joined_nats=3.051 gain=+0.0001 (±0.0005) count_has_charge=0.994
+WORD_CACHE fit=even_to_odd place=2 part=within_30 places=371 her_nats=0.560 joined_nats=0.547 gain=+0.0135 (±0.0026) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=2 part=over_30 places=1481 her_nats=0.676 joined_nats=0.664 gain=+0.0122 (±0.0012) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=2 part=not_before places=8201 her_nats=1.716 joined_nats=1.719 gain=-0.0027 (±0.0003) count_has_charge=0.510
+WORD_CACHE fit=even_to_odd place=3 part=within_30 places=254 her_nats=0.258 joined_nats=0.252 gain=+0.0062 (±0.0014) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=3 part=over_30 places=960 her_nats=0.359 joined_nats=0.350 gain=+0.0091 (±0.0011) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=3 part=not_before places=6838 her_nats=1.585 joined_nats=1.586 gain=-0.0011 (±0.0002) count_has_charge=0.162
+WORD_CACHE fit=even_to_odd place=rest part=within_30 places=113 her_nats=0.180 joined_nats=0.174 gain=+0.0060 (±0.0017) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=rest part=over_30 places=927 her_nats=0.144 joined_nats=0.139 gain=+0.0052 (±0.0011) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=rest part=not_before places=16493 her_nats=0.936 joined_nats=0.936 gain=-0.0001 (±0.0000) count_has_charge=0.025
+WORD_CACHE fit=even_to_odd place=1 own_coefficient=0.05 gain=+0.0017
+WORD_CACHE fit=even_to_odd place=2 own_coefficient=0.02 gain=+0.0001
+WORD_CACHE fit=even_to_odd place=3 own_coefficient=0.05 gain=+0.0004
+WORD_CACHE fit=even_to_odd place=rest own_coefficient=0.3 gain=+0.0009
+WORD_CACHE fit=even_to_odd place=1 part=within_30 known_part_coefficient=0.4 gain=+0.0751
+WORD_CACHE fit=even_to_odd place=1 part=over_30 known_part_coefficient=0.2 gain=+0.0294
+WORD_CACHE fit=even_to_odd place=2 part=within_30 known_part_coefficient=0.8 gain=+0.1823
+WORD_CACHE fit=even_to_odd place=2 part=over_30 known_part_coefficient=0.8 gain=+0.1257
+WORD_CACHE fit=even_to_odd place=3 part=within_30 known_part_coefficient=0.9 gain=+0.1409
+WORD_CACHE fit=even_to_odd place=3 part=over_30 known_part_coefficient=0.9 gain=+0.1854
+WORD_CACHE fit=even_to_odd place=rest part=within_30 known_part_coefficient=0.9 gain=+0.1620
+WORD_CACHE fit=even_to_odd place=rest part=over_30 known_part_coefficient=0.9 gain=+0.1125
+WORD_CACHE fit=even_to_odd place=1 part=within_30 count_state_coefficient gain=+0.0157 (±0.0046)
+WORD_CACHE fit=even_to_odd place=1 part=over_30 count_state_coefficient gain=+0.0148 (±0.0026)
+WORD_CACHE fit=even_to_odd place=1 part=not_before count_state_coefficient gain=+0.0002 (±0.0008)
+WORD_CACHE fit=even_to_odd place=2 part=within_30 count_state_coefficient gain=+0.0158 (±0.0038)
+WORD_CACHE fit=even_to_odd place=2 part=over_30 count_state_coefficient gain=+0.0135 (±0.0016)
+WORD_CACHE fit=even_to_odd place=2 part=not_before count_state_coefficient gain=-0.0034 (±0.0005)
+WORD_CACHE fit=even_to_odd place=3 part=within_30 count_state_coefficient gain=+0.0042 (±0.0017)
+WORD_CACHE fit=even_to_odd place=3 part=over_30 count_state_coefficient gain=+0.0119 (±0.0028)
+WORD_CACHE fit=even_to_odd place=3 part=not_before count_state_coefficient gain=-0.0014 (±0.0003)
+WORD_CACHE fit=even_to_odd place=rest part=within_30 count_state_coefficient gain=+0.0699 (±0.0160)
+WORD_CACHE fit=even_to_odd place=rest part=over_30 count_state_coefficient gain=+0.0505 (±0.0060)
+WORD_CACHE fit=even_to_odd place=rest part=not_before count_state_coefficient gain=-0.0024 (±0.0003)
+WORD_CACHE fit=even_to_odd count_state_coefficient all_letters gain=+0.0011 coefficients=1:1:0.0,1:2:0.0,1:3:0.02,1:4:0.05,2:1:0.01,2:2:0.05,2:3:0.02,2:4:-,3:1:0.02,3:2:0.02,3:3:0.3,3:4:-,4:1:0.3,4:2:0.3,4:3:0.9,4:4:-
+WORD_CACHE fit=odd_to_even leak=None coefficient=0.02 her_nats=1.559 joined_nats=1.558 gain=+0.0010
+WORD_CACHE fit=odd_to_even place=1 part=within_30 places=468 her_nats=1.937 joined_nats=1.919 gain=+0.0179 (±0.0040) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=1 part=over_30 places=1695 her_nats=2.091 joined_nats=2.081 gain=+0.0101 (±0.0019) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=1 part=not_before places=8384 her_nats=3.038 joined_nats=3.037 gain=+0.0004 (±0.0006) count_has_charge=0.995
+WORD_CACHE fit=odd_to_even place=2 part=within_30 places=381 her_nats=0.540 joined_nats=0.527 gain=+0.0123 (±0.0027) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=2 part=over_30 places=1515 her_nats=0.671 joined_nats=0.658 gain=+0.0136 (±0.0013) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=2 part=not_before places=8035 her_nats=1.705 joined_nats=1.707 gain=-0.0020 (±0.0006) count_has_charge=0.512
+WORD_CACHE fit=odd_to_even place=3 part=within_30 places=272 her_nats=0.219 joined_nats=0.215 gain=+0.0041 (±0.0014) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=3 part=over_30 places=1013 her_nats=0.385 joined_nats=0.376 gain=+0.0092 (±0.0009) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=3 part=not_before places=6758 her_nats=1.650 joined_nats=1.651 gain=-0.0012 (±0.0002) count_has_charge=0.164
+WORD_CACHE fit=odd_to_even place=rest part=within_30 places=155 her_nats=0.126 joined_nats=0.122 gain=+0.0042 (±0.0015) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=rest part=over_30 places=1106 her_nats=0.134 joined_nats=0.128 gain=+0.0058 (±0.0012) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=rest part=not_before places=16532 her_nats=0.943 joined_nats=0.943 gain=-0.0001 (±0.0000) count_has_charge=0.025
+WORD_CACHE fit=odd_to_even place=1 own_coefficient=0.02 gain=+0.0027
+WORD_CACHE fit=odd_to_even place=2 own_coefficient=0.01 gain=+0.0008
+WORD_CACHE fit=odd_to_even place=3 own_coefficient=0.05 gain=+0.0004
+WORD_CACHE fit=odd_to_even place=rest own_coefficient=0.2 gain=+0.0017
+WORD_CACHE fit=odd_to_even place=1 part=within_30 known_part_coefficient=0.3 gain=+0.0863
+WORD_CACHE fit=odd_to_even place=1 part=over_30 known_part_coefficient=0.2 gain=+0.0341
+WORD_CACHE fit=odd_to_even place=2 part=within_30 known_part_coefficient=0.9 gain=+0.1329
+WORD_CACHE fit=odd_to_even place=2 part=over_30 known_part_coefficient=0.7 gain=+0.1583
+WORD_CACHE fit=odd_to_even place=3 part=within_30 known_part_coefficient=0.9 gain=+0.0716
+WORD_CACHE fit=odd_to_even place=3 part=over_30 known_part_coefficient=0.9 gain=+0.1872
+WORD_CACHE fit=odd_to_even place=rest part=within_30 known_part_coefficient=0.9 gain=+0.1076
+WORD_CACHE fit=odd_to_even place=rest part=over_30 known_part_coefficient=0.9 gain=+0.1143
+WORD_CACHE fit=odd_to_even place=1 part=within_30 count_state_coefficient gain=+0.0256 (±0.0062)
+WORD_CACHE fit=odd_to_even place=1 part=over_30 count_state_coefficient gain=+0.0174 (±0.0031)
+WORD_CACHE fit=odd_to_even place=1 part=not_before count_state_coefficient gain=+0.0006 (±0.0009)
+WORD_CACHE fit=odd_to_even place=2 part=within_30 count_state_coefficient gain=+0.0054 (±0.0020)
+WORD_CACHE fit=odd_to_even place=2 part=over_30 count_state_coefficient gain=+0.0058 (±0.0010)
+WORD_CACHE fit=odd_to_even place=2 part=not_before count_state_coefficient gain=-0.0001 (±0.0005)
+WORD_CACHE fit=odd_to_even place=3 part=within_30 count_state_coefficient gain=+0.0024 (±0.0017)
+WORD_CACHE fit=odd_to_even place=3 part=over_30 count_state_coefficient gain=+0.0132 (±0.0020)
+WORD_CACHE fit=odd_to_even place=3 part=not_before count_state_coefficient gain=-0.0013 (±0.0003)
+WORD_CACHE fit=odd_to_even place=rest part=within_30 count_state_coefficient gain=+0.0374 (±0.0122)
+WORD_CACHE fit=odd_to_even place=rest part=over_30 count_state_coefficient gain=+0.0402 (±0.0054)
+WORD_CACHE fit=odd_to_even place=rest part=not_before count_state_coefficient gain=-0.0012 (±0.0003)
+WORD_CACHE fit=odd_to_even count_state_coefficient all_letters gain=+0.0020 coefficients=1:1:0.0,1:2:0.01,1:3:0.02,1:4:0.05,2:1:0.0,2:2:0.02,2:3:0.02,2:4:-,3:1:0.02,3:2:0.05,3:3:0.15,3:4:-,4:1:0.2,4:2:0.4,4:3:0.9,4:4:-
+WORD_CACHE place=1 part=not_before gain_mean=+0.0003 halves_scatter=0.0002
+WORD_CACHE count_state place=1 part=not_before gain_mean=+0.0004 halves_scatter=0.0005
+WORD_CACHE place=1 part=over_30 gain_mean=+0.0093 halves_scatter=0.0015
+WORD_CACHE count_state place=1 part=over_30 gain_mean=+0.0161 halves_scatter=0.0025
+WORD_CACHE place=1 part=within_30 gain_mean=+0.0162 halves_scatter=0.0035
+WORD_CACHE count_state place=1 part=within_30 gain_mean=+0.0206 halves_scatter=0.0099
+WORD_CACHE place=2 part=not_before gain_mean=-0.0024 halves_scatter=0.0007
+WORD_CACHE count_state place=2 part=not_before gain_mean=-0.0018 halves_scatter=0.0032
+WORD_CACHE place=2 part=over_30 gain_mean=+0.0129 halves_scatter=0.0014
+WORD_CACHE count_state place=2 part=over_30 gain_mean=+0.0097 halves_scatter=0.0077
+WORD_CACHE place=2 part=within_30 gain_mean=+0.0129 halves_scatter=0.0012
+WORD_CACHE count_state place=2 part=within_30 gain_mean=+0.0106 halves_scatter=0.0105
+WORD_CACHE place=3 part=not_before gain_mean=-0.0011 halves_scatter=0.0001
+WORD_CACHE count_state place=3 part=not_before gain_mean=-0.0013 halves_scatter=0.0001
+WORD_CACHE place=3 part=over_30 gain_mean=+0.0092 halves_scatter=0.0000
+WORD_CACHE count_state place=3 part=over_30 gain_mean=+0.0125 halves_scatter=0.0012
+WORD_CACHE place=3 part=within_30 gain_mean=+0.0051 halves_scatter=0.0021
+WORD_CACHE count_state place=3 part=within_30 gain_mean=+0.0033 halves_scatter=0.0018
+WORD_CACHE place=rest part=not_before gain_mean=-0.0001 halves_scatter=0.0001
+WORD_CACHE count_state place=rest part=not_before gain_mean=-0.0018 halves_scatter=0.0012
+WORD_CACHE place=rest part=over_30 gain_mean=+0.0055 halves_scatter=0.0006
+WORD_CACHE count_state place=rest part=over_30 gain_mean=+0.0453 halves_scatter=0.0103
+WORD_CACHE place=rest part=within_30 gain_mean=+0.0051 halves_scatter=0.0018
+WORD_CACHE count_state place=rest part=within_30 gain_mean=+0.0537 halves_scatter=0.0325

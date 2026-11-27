@@ -1,0 +1,4 @@
+BANK_STANDING unit_W135b_mean share_of_power=0.847 by_ring P2=0.585 P4=0.546 P8=0.671 P16=0.756 P32=0.823 P64=0.882
+BANK_TENSION unit_W135b_mean charge=charged places=61744 share_all=0.0000 first_letters=9858 share_first=0.0000
+BANK_TENSION unit_W135b_mean charge=centered places=61744 share_all=0.0000 first_letters=9858 share_first=0.0000
+BANK_TENSION unit_W135b_mean charge=planted places=61744 share_all=0.0970 first_letters=9858 share_first=0.0923

@@ -640,3 +640,93 @@ too few to stand on.
 So the slow store enters as the formal pass said, at no price (founded at zero, its block deposits only where a covector reaches it), and
 in one lap it carries no news the fine comparison reads: what it holds of the epochs four to sixteen back reaches her faces through a
 block a seventeenth of `B⁻`'s scale. Its second lap runs beside its control ([`GUESS_L9.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L9.txt)).
+
+## 19. What the level could hand down at a word's first letter, read before any handed face is built (G-Z25 to G-Z34)
+
+The formal pass's order of the afternoon: read what the slow store holds and what a count of the store's own text could tell a word's
+first letter, then whether a face the level could form there beats hers, and build a handed face only in a part where it does.
+
+**The slow store is mostly its standing part** (G-Z25, 0.6, held). Each ring's read predicted from the mean restricted state through the
+ring's own gain, its rise included, holds 0.847 of the bank's read's power on W135b's lap mean and 0.855 on W133s's end, from 0.55 on the
+ring of period 2 to 0.88 on the ring of 64 ([`bank_tension_W135b.txt`](receipts/2026-11-26_class_hairs/depth/bank_tension_W135b.txt),
+[`bank_tension_W133s.txt`](receipts/2026-11-26_class_hairs/depth/bank_tension_W133s.txt)). What a ring reads is mostly what every epoch
+shares; what tells one epoch from another is the rest.
+
+**It carries no news the fine covector reads** (G-Z26, 0.5, missed; G-Z28, 0.65, half held). The tension at `B_bank`'s locus on a held half,
+the share of the fine covector's power the bank's read removes at first letters: as charged 0.0000, centered 0.0000, a planted law 0.0923
+(0.0970 over every place); in the full outer form of every ring's lanes with the level's harmonics (width 4,608, 19,527 first letters)
+−0.0001, 0.0004 and a planted 0.0346, and by sixths of the passage 0.0001, 0.0003 and 0.0333
+([`bank_tension_full_W135b.txt`](receipts/2026-11-26_class_hairs/depth/bank_tension_full_W135b.txt)). G-Z26 asked the centered read at
+twice the charged one and it is no larger; G-Z28's null half holds and its planted half reads 0.035 against the 0.05 asked. The ruler sees a
+planted law at a hundred times the read in every form.
+
+**What a count of the store's text tells a word's first letter** (G-Z29 to G-Z32; `tools/store_count_ruler.py`, 30 MB of the store's web
+documents and books, a suffix array, interpolated absolute discounting with its depth chosen on the even half;
+[`store_count.txt`](receipts/2026-11-26_class_hairs/depth/store_count.txt), [`store_count_depth.txt`](receipts/2026-11-26_class_hairs/depth/store_count_depth.txt),
+[`join_count_words.txt`](receipts/2026-11-26_class_hairs/depth/join_count_words.txt)). Under the join's convention (the unit before the
+one the place before stands in, and the distance into it) the writers' words leave 0.997 of a first letter's code unsaid and her epochs
+1.000 (G-Z29 missed at 1.007 on the rows' own counts, G-Z30 missed, G-Z31 held). The convention is the read's: at a word's first place the
+place before is a space that closes the word before, so the join hands the word two back. Conditioned on the word just before, the count
+codes a first letter at 3.109 nats against its unigram's 3.803, 0.818 of it, from its last byte (3.426) through its last two (3.213) and
+four (3.122) to the whole word (3.109). The word two back beside it reads 1.0000 of that (G-Z32 missed): 30 MB of text cannot price a
+second word of depth at a word's start.
+
+**Her own code there** (G-Z33, 0.7, held). At W135s's lap mean, read by two streams at every place, a word's first letter on the odd rows
+codes 2.953 nats (9,997 places; even rows 2.925), under the count's 3.109: she reads the place better than a count of thirty million
+octets of the store reads it from the word before. A letter inside a word codes 1.336 and any other byte 1.388.
+
+**The level's face over a word's first letter** (G-Z34, 0.6, held; `tools/level_face_fit_ruler.py`,
+[`level_face_fit_W135b.txt`](receipts/2026-11-26_class_hairs/depth/level_face_fit_W135b.txt),
+[`level_face_offset_W135b.txt`](receipts/2026-11-26_class_hairs/depth/level_face_offset_W135b.txt),
+[`GUESS_Z34.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_Z34.txt)). The features are what the level holds when the place opens: the
+read epoch's restricted state, its read after the level's ticks and its slow-store read (896, standardized). A face fitted on them over the
+52 letters, on the even rows and read on the odd, codes 3.521 nats against her 2.947 and against 3.262 for the letters' frequencies alone,
+worse than hers in every part (+0.587 within 30 places, +0.695 over 30, +0.550 not met before). Then the handing question itself: her face
+renormalized over the letters (2.864 on the odd rows) held at coefficient one, with the level's features beside it. Its shrinkage took the
+grid's largest both ways, leaving the features nearly off, and its gain over her face is +0.0039 within 30 (halves' scatter 0.0131), +0.0070
+over 30 (0.0083) and −0.0007 not before (0.0023), what the letters' frequencies alone give beside her. A planted column, the written
+letter's own at three places in ten, is recovered at +0.331. No part gains beyond the scatter between halves.
+
+| guess | read | score |
+|---|---|---|
+| G-Z25 the standing part ≥ 3/4 of the bank's power | 0.847 | held |
+| G-Z26 charged < 0.002 at first letters, centered twice that | 0.0000, 0.0000 | missed |
+| G-Z28 the full form < 0.002, planted ≥ 0.05 | 0.0004, planted 0.035 | half held |
+| G-Z29 words under the join < 0.9 at word starts | 1.007 | missed |
+| G-Z30 words counted on the store's text < 0.9 | 0.997 (the join's convention); 0.818 on the word before | missed as fixed |
+| G-Z31 epochs within 0.05 of words | 1.000 against 0.997 | held |
+| G-Z32 two words back ≤ 0.97 of the word before | 1.0000 | missed |
+| G-Z33 her code < 3.109 at first letters | 2.953 | held |
+| G-Z34 the level's face beats hers by 0.05 in no part | free +0.55 to +0.70 worse; offset within its scatter | held |
+
+So no handed face is built. What the level holds when a word opens is already in her face at the place: the letters it could tell her
+are the ones she has, and a count of the store's text, which knows the word before, reads the place less well than she does. The level is
+scored by what it writes and by its own unit's news in its own unit (a line's lap, rule 8), and the slow store by its second lap beside
+its control ([`GUESS_L9.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L9.txt)).
+
+The read path is a reading: `read-reach … faces` writes her face whole at every place that follows a space or a line's end, every class's
+code on `2^(−20)` bits, through `Constitution::strand_faces_read`; the state is the same with it.
+
+## 20. The ceiling of a level heard by its words: a leaky count of the words met earlier in the row (G-Z35)
+
+The formal pass's law of 15:55 UTC: a level carries far news only by hearing its units by address, so a closed unit kept as a part takes
+its own word as its key and a recurrence charges the rows its earlier meeting charged; the slow store on `τ¹` is addressed by time, and a
+word met again forty places on lands at another phase of every ring. Before any build, its ceiling, read by a ruler: a count of the whole
+words met earlier in the row (a word a run of letters), charged with one at each word's close and leaking by `e^(−d/L)` over the places
+since, read at a word's `k`-th letter as the charge of the earlier words that share its first `k − 1` letters, shared by their `k`-th, and
+joined to her letter-renormalized face by one coefficient (`tools/word_cache_ruler.py`, her face whole at every place by `read-reach …
+faces:all`; [`word_cache_W135s.txt`](receipts/2026-11-26_class_hairs/depth/word_cache_W135s.txt),
+[`GUESS_Z35.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_Z35.txt)).
+
+Chosen on each half and read on the other (92,716 letter places), the coefficient is 0.02 both ways, and the count adds +0.0093 at a
+word's first letter where the word was last met over 30 places back (scatter 0.0015), +0.013 at its second letter and +0.009 at its
+third, and costs nothing where the word is new (+0.0003 at a first letter, −0.0024 at a second). G-Z35 missed: past 30 the ceiling at a
+first letter stands under the 0.02 the pass named as the floor where depth shows there. With its coefficient set by the count's own state
+(the place in the word and how many earlier words share the prefix) it adds +0.016 at a first letter over 30 and +0.045 at a recurring
+word's fourth letter on, +0.0011 to +0.0020 over every letter. Knowing whether the word was met before, which a count at a word's start
+cannot, it would add +0.03 at a first letter and +0.13 to +0.19 at the second and third letters of a word met over 30 places back.
+
+So what a word-keyed store could hand her is gated by the word's identity, which the place's own prefix does not yet tell: she already
+codes a recurring word's second letter at 0.68 nats against 1.72 for a new one, and her own hearing by address carries most of what the
+count holds once three letters have passed. Depth does not show at a first letter; the level is read word by word, whole, and by what it
+writes.

@@ -1,0 +1,18 @@
+LEVEL_FACE_FIT unit3_W135b_mean bias_alone_nats=3.262
+LEVEL_FACE_FIT unit3_W135b_mean first_letters_odd=9858 classes=52 shrinkage=0.1 face_nats=3.521 own_nats=2.947 face_less_own=+0.575
+LEVEL_FACE_FIT unit3_W135b_mean part=within_30 places=415 face_nats=2.633 own_nats=2.046 face_less_own=+0.587 (±0.062)
+LEVEL_FACE_FIT unit3_W135b_mean part=over_30 places=1577 face_nats=2.897 own_nats=2.202 face_less_own=+0.695 (±0.032)
+LEVEL_FACE_FIT unit3_W135b_mean part=not_before places=7866 face_nats=3.693 own_nats=3.144 face_less_own=+0.550 (±0.016)
+LEVEL_FACE_OFFSET unit3_W135b_mean letters=52 places=19527 her_renormalized_nats_odd=2.864 her_renormalized_nats_even=2.844 own_nats_odd=2.947
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=even_to_odd shrinkage=10.0 offset_fit_nats=2.863 offset_bias_alone_nats=2.864 her_nats=2.864 gain=+0.0008
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=even_to_odd part=within_30 places=415 her_nats=1.960 offset_fit_nats=1.949 gain=+0.0104 (±0.0033) bias_alone_gain=+0.0100
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=even_to_odd part=over_30 places=1577 her_nats=2.125 offset_fit_nats=2.114 gain=+0.0112 (±0.0021) bias_alone_gain=+0.0101
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=even_to_odd part=not_before places=7866 her_nats=3.060 offset_fit_nats=3.062 gain=-0.0019 (±0.0014) bias_alone_gain=-0.0024
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=odd_to_even shrinkage=10.0 offset_fit_nats=2.844 offset_bias_alone_nats=2.844 her_nats=2.844 gain=+0.0007
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=odd_to_even part=within_30 places=427 her_nats=1.940 offset_fit_nats=1.943 gain=-0.0027 (±0.0050) bias_alone_gain=-0.0018
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=odd_to_even part=over_30 places=1598 her_nats=2.116 offset_fit_nats=2.113 gain=+0.0029 (±0.0018) bias_alone_gain=+0.0038
+LEVEL_FACE_OFFSET unit3_W135b_mean fit=odd_to_even part=not_before places=7644 her_nats=3.047 offset_fit_nats=3.047 gain=+0.0005 (±0.0014) bias_alone_gain=-0.0005
+LEVEL_FACE_OFFSET unit3_W135b_mean part=within_30 gain_mean=+0.0039 halves_scatter=0.0131
+LEVEL_FACE_OFFSET unit3_W135b_mean part=over_30 gain_mean=+0.0070 halves_scatter=0.0083
+LEVEL_FACE_OFFSET unit3_W135b_mean part=not_before gain_mean=-0.0007 halves_scatter=0.0023
+LEVEL_FACE_OFFSET unit3_W135b_mean planted=letter_three_in_ten shrinkage=0.1 offset_fit_nats=2.533 her_nats=2.864 gain=+0.3311

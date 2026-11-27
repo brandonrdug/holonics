@@ -1,0 +1,4 @@
+BANK_STANDING unit2_W133s share_of_power=0.855 by_ring P2=0.555 P4=0.527 P8=0.668 P16=0.768 P32=0.832 P64=0.891
+BANK_TENSION unit2_W133s charge=charged places=61738 share_all=0.0000 first_letters=9854 share_first=0.0000
+BANK_TENSION unit2_W133s charge=centered places=61738 share_all=0.0000 first_letters=9854 share_first=0.0000
+BANK_TENSION unit2_W133s charge=planted places=61738 share_all=0.1025 first_letters=9854 share_first=0.0936

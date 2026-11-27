@@ -1650,12 +1650,13 @@ impl Constitution {
     /// news phase, beside the known stream's anchors.
     /// A reading: no state changes. `None` where the field has no level.
     #[allow(clippy::type_complexity)]
-    pub fn strand_level_moment(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>, Vec<i64>)>> {
+    #[allow(clippy::type_complexity)]
+    pub fn strand_level_moment(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>, Vec<i64>, Vec<i64>)>> {
         let pass = self.strand_pass(classes, true, past)?;
         let Some(t) = pass.tower.as_ref() else { return Ok(None) };
         let (anchors, _) = t.strand_cut();
-        let (read, moment, harmonics, tau) = t.level_moment();
-        Ok(Some((anchors.to_vec(), read.to_vec(), moment.to_vec(), harmonics.to_vec(), tau.to_vec())))
+        let (read, moment, harmonics, tau, open) = t.level_moment();
+        Ok(Some((anchors.to_vec(), read.to_vec(), moment.to_vec(), harmonics.to_vec(), tau.to_vec(), open.to_vec())))
     }
 
     /// [measurement; the lead, November 23, the level's receipt record §5; the formal thread's §19 item 4] **A strand's open places'
@@ -1853,6 +1854,14 @@ impl Constitution {
     pub fn strand_codes(&self, classes: &[usize], past: bool) -> Result<Vec<i64>> {
         let pass = self.strand_pass(classes, false, past)?;
         Ok(pass.faces.iter().zip(classes).map(|(f, &u)| face_code(f.masses[u], f.total)).collect())
+    }
+
+    /// [measurement; the lead, November 27, the formal thread's G-Z34] **A strand's faces whole, for a ruler on the host**: every
+    /// place's face as [`Constitution::strand_codes`] reads it, every class's mass beside its total, so a ruler outside the machine can
+    /// renormalize a place's face over a part of the alphabet or set it as an offset beside another face. A reading: the state is the
+    /// same with it.
+    pub fn strand_faces_read(&self, classes: &[usize], past: bool) -> Result<Vec<TowerFace>> {
+        Ok(self.strand_pass(classes, false, past)?.faces)
     }
 
     /// [measurement; the lead, November 21] **A strand's open rows, for a ruler on the host**: at every tick and head, each open place's
