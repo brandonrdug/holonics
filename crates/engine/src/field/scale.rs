@@ -55,6 +55,18 @@ pub struct Scale {
     /// register's code rose by about the same amount (+0.0355 nats a place over 140,564 places) while the level's face fell from 21.7 to
     /// 2.96 nats a place.
     pub inside: bool,
+    /// [definition; the formal thread, November 27 03:28 UTC, the record of the class hairs §14; the build the lead's] **The level's
+    /// unit is its epoch's strand face**: where set, the restriction sums each known site's symbol word
+    /// `E(u_t)` (its encoding row read as a ratio to its own power, as a read is) on the fine field's rings' phases counted from the
+    /// epoch's site, `m_k(j) = Σ_(t ∈ e_j) ρ_k(t − s_j) r̂(E(u_t))` with `ρ = (1, the turn back on each ring of the fine field's periods,
+    /// cos and sin, the period 2 by its cosine)` to the level's `H` terms ([`strand_face_terms`]), in place of the six harmonics of the
+    /// news phase on her reads. The news still decides where a unit ends, and the prolongation still reads it at each place's news phase.
+    /// The restriction's covector stops at its own material (`A`, `b_A`): the encoding is the fine field's boundary chart, read as data
+    /// by the level. Written as the word `strand` after the level's counts, only where set. Why: on W132i's end the built restriction
+    /// held the bytes at an epoch's first eight places at 0.13 to 0.33 and its own moment at 0.25 to 0.55, where `E` on the rings held
+    /// places 1 to 6 at 0.79 to 0.94 (`tools/level_unit_ruler.py`); and on G-L5 a second comparison through the shared fine field cost
+    /// every register.
+    pub strand: bool,
     /// [definition; the lead, November 24, the record of the evening of November 23 §7; the formal thread's reading of the join,
     /// `agent-inferred`] **The level's own lane**: where set, the fine field's last face lane is the level's. The prolongation writes it
     /// alone (`B⁻`'s and `b_B⁻`'s rows of every other coordinate are held at zero) and nothing else writes it (the encodings' and the strand
@@ -390,6 +402,14 @@ impl ScalePass {
         (&self.before_ticks, &self.coarse_read)
     }
 
+    /// [measurement; the lead, November 27, the record of the class hairs §13] What the restriction reads and what it sums: each known
+    /// site's read at the split (`[n][D₀]` on `2^(−16)`, the lane chart's ratio), each epoch's harmonics of its places' reads
+    /// (`[j][H D₀]`, the chart's sums) and each known site's harmonics of its news phase (`[n][H]` on `2^(−30)`), for a ruler of what
+    /// the level's unit keeps of its epoch, link by link.
+    pub(crate) fn level_moment(&self) -> (&[i32], &[i64], &[i64]) {
+        (&self.read, &self.restricted, &self.cut.harmonics)
+    }
+
     /// The level's ticks kept for the reverse.
     #[cfg(test)]
     pub(super) fn ticks(&self) -> &[TickCell] {
@@ -442,6 +462,50 @@ fn charted<V: Copy + Into<i64>>(cut: &LevelCut, h: usize, rows: &[V], width: usi
         }
     }
     acc.into_iter().map(|v| fit64(release(v, MOVE_BITS))).collect()
+}
+
+/// [definition; the formal thread, November 27 03:28 UTC; the lead's build] **The strand face's terms** at each known site of a cut
+/// ([`Scale::strand`]): `ρ(t − s_j)` on the turn's grain (`2^(−30)`), the constant term first, then for each distinct ring period `P` of
+/// the fine field's turned slots ([`crate::navigator::ring_periods`], ascending) the turn back by `t − s_j` places, `cos 2π(t − s_j)/P`
+/// and `−sin 2π(t − s_j)/P` (the period 2 by its cosine alone, its sine being zero), until the level's `h` terms are filled. Positions
+/// inside an epoch are told apart up to the product of the periods the terms reach.
+pub fn strand_face_terms(field: &Constitution, cut: &LevelCut, h: usize) -> Vec<i64> {
+    let d = &field.declaration;
+    let mut periods = crate::navigator::ring_periods(d.turned_slots(), d.reach);
+    periods.dedup();
+    let n = cut.epoch.len();
+    let mut out = vec![0i64; n * h];
+    for t in 0..n {
+        let dist = t - cut.anchors[cut.epoch[t]];
+        let slot = &mut out[t * h..(t + 1) * h];
+        slot[0] = 1i64 << MOVE_BITS;
+        let mut k = 1;
+        for &p in &periods {
+            if k >= h {
+                break;
+            }
+            let (re, im) = crate::navigator::ring_phasor(dist % p, p, field.pi);
+            slot[k] = re;
+            k += 1;
+            if p > 2 && k < h {
+                slot[k] = -im;
+                k += 1;
+            }
+        }
+    }
+    out
+}
+
+/// The strand face's rows ([`Scale::strand`]): each symbol's encoding row `E(u)` read as a ratio to its own power through the lane chart
+/// (`[n][D₀]` on the read's grain, as a place's read is), for the classes of a strand's known sites.
+pub fn strand_face_reads(field: &Constitution, classes: &[usize]) -> Result<Vec<i32>> {
+    let (dw, enc) = (field.declaration.width, field.layout.enc);
+    let (mut read, mut scale) = (Vec::with_capacity(classes.len() * dw), Vec::new());
+    for &c in classes {
+        let row: Vec<i64> = field.theta[enc + c * dw..enc + (c + 1) * dw].iter().map(|&v| i64::from(v)).collect();
+        lane_chart(&row, field.declaration.lanes, &mut read, &mut scale)?;
+    }
+    Ok(read)
 }
 
 /// Place `t`'s row from its epoch's harmonic blocks `v` (`[H][width]`): `release(Σ_k h_k(φ_t) v_k, 30)`.
@@ -578,7 +642,7 @@ impl Constitution {
             *v = fit32((k * ((three << MATERIAL_BITS) / pd) as i128) >> 31, "a founded value outgrew its 32-bit carrier")?;
         }
         let mut out = self.clone();
-        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, inside: false, lane: false }));
+        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, inside: false, strand: false, lane: false }));
         Ok((out, at))
     }
 
@@ -613,7 +677,8 @@ impl Constitution {
 
     /// The level's forward at the split: the region's cut from its `news`, `x` restricted to the epochs by the news phase, the level's
     /// ticks on its own clock, and the prolongation added back into `x`.
-    pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool) -> Result<ScalePass> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool, classes: &[usize], unresolved: &[bool]) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let sites = definite.len();
         // [measurement] A ruler's forward ([`Constitution::ruler_level`]): at `4` the cut a one-sided stream can name, the level's ticks
@@ -627,8 +692,19 @@ impl Constitution {
         for xt in x.chunks_exact(d0) {
             lane_chart(xt, self.declaration.lanes, &mut out.read, &mut out.scale)?;
         }
-        // The restriction: each epoch's harmonics of its places' reads, through `A`.
-        out.restricted = charted(&cut, h, &out.read, d0)?;
+        // The restriction: each epoch's harmonics of its places' reads, through `A`; [`Scale::strand`] on the strand face, each known
+        // place's symbol word on the rings, an open place's symbol unwritten and adding nothing.
+        out.restricted = if s.strand {
+            let ring = LevelCut { harmonics: strand_face_terms(self, &cut, h), ..cut.clone() };
+            let shown: Vec<usize> = classes.iter().zip(unresolved).map(|(&c, &u)| if u { 0 } else { c }).collect();
+            let mut reads = strand_face_reads(self, &shown)?;
+            for t in (0..unresolved.len()).filter(|&t| unresolved[t]) {
+                reads[t * d0..(t + 1) * d0].fill(0);
+            }
+            charted(&ring, h, &reads, d0)?
+        } else {
+            charted(&cut, h, &out.read, d0)?
+        };
         let reach_a = reach(&g[a..ab]);
         let mut x1 = vec![0i64; epochs * d1];
         for j in 0..epochs {
@@ -764,8 +840,13 @@ impl Constitution {
         for xt in x[..n * d0].chunks_exact(d0) {
             lane_chart(xt, self.declaration.lanes, &mut out.read, &mut out.scale)?;
         }
-        // The restriction over the known sites, through `A`.
-        out.restricted = charted(&cut, h, &out.read, d0)?;
+        // The restriction over the known sites, through `A`; [`Scale::strand`] on the strand face, each site's symbol word on the rings.
+        out.restricted = if s.strand {
+            let ring = LevelCut { harmonics: strand_face_terms(self, &cut, h), ..cut.clone() };
+            charted(&ring, h, &strand_face_reads(self, &targets[..n])?, d0)?
+        } else {
+            charted(&cut, h, &out.read, d0)?
+        };
         let reach_a = reach(&g[a..ab]);
         let mut x1 = vec![0i64; epochs * d1];
         for j in 0..epochs {
@@ -938,7 +1019,8 @@ impl Constitution {
         let ds: Vec<&[i64]> = dx1.chunks_exact(d1).collect();
         let ms: Vec<&[i64]> = pass.restricted.chunks_exact(h * d0).collect();
         outer_sum(&mut gg[a..ab], h * d0, &ds, &ms)?;
-        let Some(dx) = push else { return Ok(()) };
+        // [`Scale::strand`] The strand face reads the encoding as data: the restriction's covector stops at its own material.
+        let Some(dx) = push.filter(|_| !s.strand) else { return Ok(()) };
         let reach_a = reach(&gl[a..ab]);
         let mut dm_k = vec![0i64; h * d0];
         let mut dr = vec![0i64; d0];
@@ -1007,6 +1089,10 @@ impl Constitution {
         let ds: Vec<&[i64]> = dx1.chunks_exact(d1).collect();
         let ms: Vec<&[i64]> = pass.restricted.chunks_exact(h * d0).collect();
         outer_sum(&mut gg[a..ab], h * d0, &ds, &ms)?;
+        // [`Scale::strand`] The strand face reads the encoding as data: the restriction's covector stops at its own material.
+        if s.strand {
+            return Ok(());
+        }
         let reach_a = reach(&gl[a..ab]);
         let mut dm_k = vec![0i64; h * d0];
         let mut dr = vec![0i64; d0];

@@ -12,7 +12,7 @@ use std::time::Instant;
 #[allow(unused_imports)]
 use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
-use holonics_engine::field::{level_cut, level_section, strand_level_cut, PACE_BITS};
+use holonics_engine::field::{level_cut, level_section, strand_face_reads, strand_face_terms, strand_level_cut, PACE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS};
 #[allow(unused_imports)]
@@ -86,6 +86,11 @@ pub(crate) struct TowerBatch<'c> {
     /// epoch (a mask over the fine sites) and each one's covector of its prolonged row through the opening's reader, written by the forward
     /// and joined on the level's route alone in the reverse.
     pub(crate) receipt: Option<(Pooled<'c, u8>, Pooled<'c, i64>)>,
+    /// [the lead, November 27] The level's strand face (`Scale::strand`, the host's `scale_forward_before`): each known site's terms on
+    /// the fine rings from its epoch's site (`[t][H]` on `2^(−30)`, zero at the open places) and its symbol's word read as a ratio to its
+    /// own power (`[t][D₀]`), both from the engine's own `strand_face_terms` and `strand_face_reads`, which the restriction charts in
+    /// place of the news harmonics and the reads at the split.
+    pub(crate) face: Option<(Pooled<'c, i64>, Pooled<'c, i32>)>,
 }
 
 impl<'c> Resident<'c> {
@@ -144,6 +149,8 @@ impl<'c> Resident<'c> {
         }
         let (mut own, mut lo, mut hi, mut lo1, mut hi1, mut lo2, mut hi2): (Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>, Vec<u32>) = Default::default();
         let mut receipt_sites: Vec<u8> = Vec::new();
+        let d0 = field.declaration.width;
+        let (mut face_terms, mut face_reads): (Vec<i64>, Vec<i32>) = (Vec::new(), Vec::new());
         for r in 0..regions {
             let (first, end) = (fine.region_off[r] as usize, fine.region_off[r + 1] as usize);
             if strand {
@@ -179,6 +186,13 @@ impl<'c> Resident<'c> {
                 own.extend(std::iter::repeat_n(LEVEL_NONE, n));
                 harm.extend_from_slice(&sc.cut.harmonics);
                 harm.extend_from_slice(&sc.open_harmonics);
+                if s.strand {
+                    let classes: Vec<usize> = fine.classes[first..first + n].iter().map(|&c| c as usize).collect();
+                    face_terms.extend(strand_face_terms(field, &sc.cut, h));
+                    face_terms.extend(std::iter::repeat_n(0i64, n * h));
+                    face_reads.extend(strand_face_reads(field, &classes)?);
+                    face_reads.extend(std::iter::repeat_n(0i32, n * d0));
+                }
                 taus.push(sc.cut.tau);
                 owned.push((vec![0usize; epochs], vec![false; epochs], vec![None; epochs]));
                 continue;
@@ -197,6 +211,16 @@ impl<'c> Resident<'c> {
             }
             epoch_of.extend(cut.epoch.iter().map(|&j| base + j as u32));
             harm.extend_from_slice(&cut.harmonics);
+            if s.strand {
+                // [`Scale::strand`] On a passage read by one stream an open place's symbol is unwritten and adds nothing.
+                let shown: Vec<usize> = (first..end).map(|t| if fine.unresolved[t] != 0 { 0 } else { fine.classes[t] as usize }).collect();
+                let mut reads = strand_face_reads(field, &shown)?;
+                for k in (0..end - first).filter(|&k| fine.unresolved[first + k] != 0) {
+                    reads[k * d0..(k + 1) * d0].fill(0);
+                }
+                face_terms.extend(strand_face_terms(field, &cut, h));
+                face_reads.extend(reads);
+            }
             taus.push(cut.tau);
             owned.push((vec![0usize; epochs], unres, faces));
         }
@@ -263,7 +287,6 @@ impl<'c> Resident<'c> {
             self.launch("field_pframes", Self::cells((paced * sites * n) as u64), THREADS, &mut [arg(&mut tr.cwords)])?;
             self.clock_fill(coarse, &tr.cwords, sites)?;
         }
-        let d0 = field.declaration.width;
         let split_read = self.timed(Kind::Alloc, || self.take::<i32>((fine.sites * d0).max(1))).map_err(device)?;
         let split_scale = self.timed(Kind::Alloc, || self.take::<i128>((fine.sites * field.declaration.lanes).max(1))).map_err(device)?;
         let restricted = alloc64(sites * h * d0)?;
@@ -286,7 +309,14 @@ impl<'c> Resident<'c> {
         } else {
             None
         };
-        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores, strand, receipt })
+        let face = if s.strand {
+            let terms = up64(&face_terms)?;
+            let reads = self.timed(Kind::Copy, || self.take_up(if face_reads.is_empty() { &[0i32][..] } else { &face_reads[..] })).map_err(device)?;
+            Some((terms, reads))
+        } else {
+            None
+        };
+        Ok(TowerBatch { st, ticks: Vec::new(), _trips: trips, _moment: moment, pr, _clocks: clocks, _plain: plain, split_read, split_scale, restricted, read1, scale1, pad, epoch, harmonics, off, _saddr: saddr, _stores: stores, strand, receipt, face })
     }
 
     /// A read's own ticks on a batch's level ([`Resident::tower_batch`]): every tick kept where the read keeps the fine field's, and the shares
@@ -312,10 +342,18 @@ impl<'c> Resident<'c> {
         let (b, bb, reach_b) = match (tr.before, tb.strand.as_ref()) {
             (Some((b2, bb2, reach2)), Some(tables)) => {
                 let (mut lo, mut hi, mut none2a, mut none2b) = (tables.lo.device_ptr(), tables.hi.device_ptr(), 0u64, 0u64);
+                // [`Scale::strand`] The strand face: each known site's symbol word on its terms from the epoch's site.
+                if let Some((terms, reads)) = tb.face.as_ref() {
+                    (src, hp) = (reads.device_ptr(), terms.device_ptr());
+                }
                 self.launch("field_level_chart32_spans", Self::cells((epochs * h * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut hp), arg(&mut lo), arg(&mut hi), arg(&mut none2a), arg(&mut none2b), arg(&mut e64), arg(&mut h32), arg(&mut w32), arg(&mut dst)])?;
                 (b2, bb2, reach2)
             }
             (None, None) => {
+                // [`Scale::strand`] The strand face: each known place's symbol word on its terms from the epoch's site.
+                if let Some((terms, reads)) = tb.face.as_ref() {
+                    (src, hp) = (reads.device_ptr(), terms.device_ptr());
+                }
                 self.launch("field_level_chart32", Self::cells((epochs * h * d0) as u64), THREADS, &mut [arg(words), arg(&mut src), arg(&mut hp), arg(&mut op), arg(&mut e64), arg(&mut h32), arg(&mut w32), arg(&mut dst)])?;
                 (b, bb, tr.reach_b)
             }
@@ -449,7 +487,8 @@ impl<'c> Resident<'c> {
         }
         // The restriction: `δb_A`, `δA` and `δm = Aᵀ δx¹`, each place's part at its own phase through its read's adjoint into `δx`.
         self.outer_biased(&mut tr.cwords, gg, a as u64, ab as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.restricted.device_ptr(), h * d0, true, false)?;
-        let Some(back) = push else { return Ok(()) };
+        // [`Scale::strand`] The strand face reads the encoding as data: the restriction's covector stops at its own material.
+        let Some(back) = push.filter(|_| !s.strand) else { return Ok(()) };
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.transposed(&mut gwords, a as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.pad.device_ptr(), false, false)?;

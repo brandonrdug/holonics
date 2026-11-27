@@ -1880,8 +1880,30 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
         for (name, bytes) in ["restricted.i64", "coarse.i32", "row.i32", "joined.i32", "lambda.i64"].iter().zip(&files) {
             write_new(&out.join(name), bytes)?;
         }
+        // [the lead, November 27] What the restriction reads and sums: each known site's read at the split, each epoch's harmonics of
+        // its places' reads and each known site's harmonics of its news phase, row after row in the table's order (`known.i32`,
+        // `moment.i64`, `harmonics.i64`), and the encoding's rows (`enc.i32`).
+        #[allow(clippy::type_complexity)]
+        let summed: Vec<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>)> = rows
+            .par_iter()
+            .map(|classes| field.strand_level_moment(classes, past).map_err(|e| e.to_string()).and_then(|c| c.ok_or_else(|| "a field whose level does not hear a strand".to_string())))
+            .collect::<std::result::Result<_, _>>()?;
+        let (mut known, mut moment, mut phases) = (Vec::new(), Vec::new(), Vec::new());
+        for (_, read, m, hk) in &summed {
+            known.extend(read.iter().flat_map(|v| v.to_le_bytes()));
+            moment.extend(m.iter().flat_map(|v| v.to_le_bytes()));
+            phases.extend(hk.iter().flat_map(|v| v.to_le_bytes()));
+        }
+        write_new(&out.join("known.i32"), &known)?;
+        write_new(&out.join("moment.i64"), &moment)?;
+        write_new(&out.join("harmonics.i64"), &phases)?;
+        // Each symbol's encoding row `E(u)` (`[A][D₀]` on the material's grain), the term the formal thread's strand face sums.
+        let (l, dw) = (field.layout(), field.declaration.width);
+        let enc: Vec<u8> = field.theta[l.enc..l.enc + field.declaration.alphabet * dw].iter().flat_map(|v| v.to_le_bytes()).collect();
+        write_new(&out.join("enc.i32"), &enc)?;
         let coarse_width = field.scale.as_deref().map_or(0, |s| s.coarse.declaration.width);
-        write_new(&out.join("dims.tsv"), format!("read\t{}\ncoarse\t{coarse_width}\n", field.declaration.width).as_bytes())?;
+        let harmonics = field.scale.as_deref().map_or(0, |s| s.harmonics);
+        write_new(&out.join("dims.tsv"), format!("read\t{}\ncoarse\t{coarse_width}\nharmonics\t{harmonics}\n", field.declaration.width).as_bytes())?;
     }
     println!("STRAND_CUT rows={} places={} past={past} ms={}", rows.len(), rows.iter().map(Vec::len).sum::<usize>(), started.elapsed().as_millis());
     Ok(())

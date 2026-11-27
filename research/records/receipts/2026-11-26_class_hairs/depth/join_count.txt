@@ -1,0 +1,8 @@
+JOIN_COUNT_DEPTH orders=1 held_codes_a_place=3.293 3.287 3.328 3.474 3.625 3.785
+JOIN_COUNT join_W132i part=word_first places=9853 code_given=3.798 code_alone=3.807 unsaid_share=0.998 join_codes=3.862/4.401 join_unsaid_share=0.878
+JOIN_COUNT join_W132i part=letter_inside places=36016 code_given=3.267 code_alone=3.297 unsaid_share=0.991 join_codes=3.211/4.193 join_unsaid_share=0.766
+JOIN_COUNT join_W132i part=other places=15851 code_given=3.043 code_alone=3.038 unsaid_share=1.002 join_codes=3.107/4.754 join_unsaid_share=0.654
+JOIN_COUNT_DEPTH orders=1 held_codes_a_place=3.293 3.287 3.327 3.473 3.624 3.784
+JOIN_COUNT join_W132 part=word_first places=9853 code_given=3.799 code_alone=3.807 unsaid_share=0.998 join_codes=20.257/4.402 join_unsaid_share=4.601
+JOIN_COUNT join_W132 part=letter_inside places=36014 code_given=3.267 code_alone=3.297 unsaid_share=0.991 join_codes=20.461/4.193 join_unsaid_share=4.879
+JOIN_COUNT join_W132 part=other places=15851 code_given=3.045 code_alone=3.038 unsaid_share=1.002 join_codes=30.464/4.758 join_unsaid_share=6.403

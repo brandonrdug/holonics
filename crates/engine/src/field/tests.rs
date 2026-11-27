@@ -5210,6 +5210,89 @@ fn the_receipt_kept_inside_the_level_moves_the_levels_material_and_never_the_fin
     assert!(read >= 6, "read {read} probes, {seams} on a seam");
 }
 
+/// [definition; the lead, November 27] **The level's unit on its epoch's strand face** ([`Scale::strand`]): with the word the text keeps
+/// it; the strand face's terms are the constant term then each ring's turn back from the epoch's site (one at every site, then the
+/// first ring's cosine: a period 2's flips each place, and a field with no turned ring has the constant term alone); the level's restriction reads the symbols' words, so the faces move from the plain level's; and the
+/// covector of the largest entries of `A` and of `B⁻` matches the central difference of the code (the encoding, which the level reads as
+/// data, is not probed).
+#[test]
+fn the_strand_face_restricts_the_symbols_words_on_the_rings_and_its_covector_stops_at_its_material() {
+    let (mut read, mut seams) = (0usize, 0usize);
+    for (still, past) in [(1usize, false), (2, true)] {
+        let plain = towered_before_live(still);
+        let mut field = plain.clone();
+        field.scale.as_mut().unwrap().strand = true;
+        assert!(field.to_text().contains(" strand"), "still {still}: the level's line carries the word");
+        assert_eq!(Constitution::from_text(&field.to_text()).unwrap(), field, "still {still}: the text keeps the strand face");
+        let a = field.declaration.alphabet;
+        let sites = 13;
+        let classes = drawn_classes(0xD5, sites, a);
+        let (with, without) = (field.strand_pass(&classes, true, past).unwrap(), plain.strand_pass(&classes, true, past).unwrap());
+        assert_ne!(with.faces, without.faces, "still {still}: the strand face moves the faces");
+        let h = field.scale.as_deref().unwrap().harmonics;
+        let cut = with.tower.as_ref().unwrap().cut().clone();
+        let terms = crate::field::scale::strand_face_terms(&field, &cut, h);
+        let d = &field.declaration;
+        let first = crate::navigator::ring_periods(d.turned_slots(), d.reach).first().copied();
+        for (t, &j) in cut.epoch.iter().enumerate() {
+            assert_eq!(terms[t * h], 1i64 << MOVE_BITS, "still {still}: the constant term at site {t}");
+            // (a field with no turned ring has the constant term alone; the period 2 is the line's first, its cosine flipping each place)
+            let want = match first {
+                None => 0,
+                Some(2) => if (t - cut.anchors[j]) % 2 == 0 { 1i64 << MOVE_BITS } else { -(1i64 << MOVE_BITS) },
+                Some(p) => crate::navigator::ring_phasor((t - cut.anchors[j]) % p, p, field.pi).0,
+            };
+            assert_eq!(terms[t * h + 1], want, "still {still}: the first ring's cosine at site {t}");
+        }
+        let (mut g, mut g0) = (vec![0i128; field.material_len()], vec![0i128; plain.material_len()]);
+        field.strand_returned(&classes, &classes, &with, &mut g).unwrap();
+        plain.strand_returned(&classes, &classes, &without, &mut g0).unwrap();
+        let dw = field.declaration.width;
+        let base = field.theta.len();
+        let sc = field.scale.as_deref().unwrap();
+        let glue_at = base + sc.coarse.theta.len();
+        let (b2, bb2, _) = sc.before_offsets(dw).unwrap();
+        let (ga, gab, _, _, _) = sc.glue_offsets(dw);
+        let code = |f: &Constitution| -> i64 {
+            let pass = f.strand_pass(&classes, false, past).unwrap();
+            let places: i64 = pass.faces.iter().zip(&classes).skip(1).map(|(face, &c)| crate::field::ratio_code(face.masses[c], face.total)).sum();
+            let known = vec![false; sites];
+            places + opening_code(f, &Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: true, strand: false, past, second: false, targets: None, stretches: None })
+        };
+        let sheets = |f: &Constitution| -> Vec<Vec<u32>> {
+            let pass = f.strand_pass(&classes, true, past).unwrap();
+            let coarse = pass.tower.iter().flat_map(|t| t.ticks().iter());
+            pass.ticks.iter().chain(coarse).flat_map(|c| c.classes.iter().map(|lst| lst.off.iter().chain(&lst.members).copied().collect())).collect()
+        };
+        let grain = MATERIAL_BITS;
+        for block in [glue_at + ga..glue_at + gab, glue_at + b2..glue_at + bb2] {
+            let mut entries: Vec<usize> = block.collect();
+            entries.sort_by_key(|&i| std::cmp::Reverse(g[i].unsigned_abs()));
+            for i in entries.into_iter().take(3).filter(|&i| g[i] != 0) {
+                let moved = |delta: i32| {
+                    let mut f = field.clone();
+                    *f.material_mut().nth(i).unwrap() += delta;
+                    f
+                };
+                let straddles = |delta: i32| sheets(&moved(delta)) != sheets(&field) || sheets(&moved(-delta)) != sheets(&field);
+                let shift = 40 + grain - 20;
+                let Some((delta, hv)) = probe_step(grain, &|delta: i32| (g[i] * 2 * delta as i128) >> shift, &straddles) else {
+                    seams += 1;
+                    continue;
+                };
+                read += 1;
+                let measured = code(&moved(delta)) - code(&moved(-delta));
+                let predicted = (g[i] * 2 * delta as i128) >> shift;
+                let tolerance = predicted.abs() / 8 + ((64 * (sites as i128 - 1)) << hv);
+                assert!((measured as i128 - predicted).abs() <= tolerance, "still {still}, past {past}: the level's entry {i} at {hv} halvings: measured {measured}, predicted {predicted}");
+            }
+        }
+        let _ = g0;
+    }
+    eprintln!("LEVEL_STRAND_FACE_PROBES read={read} on_a_seam={seams}");
+    assert!(read >= 6, "read {read} probes, {seams} on a seam");
+}
+
 /// [definition; the lead, November 18, the record of the two streams §15] **The row of the site after reads the second site before**
 /// ([`Region::second`]) in a passage read by two streams: with the word some face moves; a place's face is the same bits in the
 /// passage cut after it; the region's own word reads the same forward and returns the same covector; the rows `E₊` take a covector

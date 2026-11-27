@@ -435,3 +435,87 @@ six harmonics of the news phase, which held the handed epoch as one identity at 
 its first byte at 0.135. The next premise is the level's restriction itself, read against the form the theory gives a unit: a strand's
 face `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`, each place transported by the navigator's own phase, of which the level's harmonics of one news phase
 are the coarsest case.
+
+## 14. The level's unit on the theory's strand face holds every letter of its epoch by position; the built restriction holds a fifth
+
+The formal pass's law for the level's unit (03:28 UTC; [`GUESS_Z8.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_Z8.txt)): the
+epoch's strand face, `m_j = Σ_(t ∈ e_j) Ĝ(t − s_j)⁻¹ E(u_t)`, each symbol's own word turned back by the fine rings' phases counted from
+the epoch's site and summed at its close (the retention law's source moment over one cycle, `navigator.source-moment`), read with the
+rings' turn and without their fade. The news decides where a unit ends; the count of its parts addresses what is inside. Its two reasons
+for the 0.009 of November 23: the chart (on the news phase, predicted places pile into one sixth, and a word read with two surprises
+gets two addresses; on the place count, positions are told apart up to the product of the rings' periods) and the term (`r̂(x_t)` is her
+state, mostly her guess of what comes next, where `E(u_t)` is the symbol).
+
+`read-strand-cut ... links` now writes each known site's read at the split, its news harmonics, each epoch's built moment and the
+encoding's rows, and `tools/level_unit_ruler.py` builds the four cells, `{r̂, E} × {news, rings}`, and reads each for the bytes at an
+epoch's first eight places, the epoch as one identity (64 cells) and the next epoch's first byte, beside the built restriction (the
+control) and a ceiling (`E` at the first eight places side by side). The rings are the fine field's own (periods 2, 3, 4, 9, 16, 27, …,
+`ring_periods`): those of periods 2, 3 and 4 give six terms a place, the news chart's count, and with 9 and 16 ten. `r̂` on the news is
+the built moment to a correlation of 1.0000 over 2,688,000 values. W132i's end, the 407 word rows, 34,530 epochs; receipt
+[`level_unit_W132i.txt`](receipts/2026-11-26_class_hairs/depth/level_unit_W132i.txt).
+
+| cell | width | bytes at the epoch's places 1 to 8 | identity | next epoch's first byte |
+|---|---|---|---|---|
+| the built restriction (control) | 64 | 0.133, 0.174, 0.204, 0.276, 0.320, 0.326, 0.291, 0.223 | 0.013 | 0.008 |
+| `r̂` on the news (the built moment) | 1,344 | 0.546, 0.533, 0.434, 0.386, 0.391, 0.374, 0.324, 0.250 | 0.063 | 0.008 |
+| `r̂` on the rings | 1,344 | 0.660, 0.801, 0.798, 0.821, 0.798, 0.769, 0.678, 0.510 | 0.090 | 0.009 |
+| `E` on the news | 1,344 | 0.838, 0.517, 0.408, 0.364, 0.368, 0.355, 0.303, 0.224 | 0.050 | 0.006 |
+| `E` on the rings (the strand face) | 1,344 | 0.944, 0.923, 0.920, 0.895, 0.835, 0.789, 0.687, 0.445 | 0.063 | 0.006 |
+| `E` on ten ring terms | 2,240 | 0.990, 0.978, 0.986, 0.986, 0.986, 0.980, 0.961, 0.937 | 0.070 | 0.008 |
+| ceiling, `E` side by side | 1,792 | 0.993 to 0.998 | 0.066 | 0.007 |
+
+| G | read | guess |
+|---|---|---|
+| G-Z8 | identity: control 0.013, the strand face 0.063 | missed; the ceiling reads 0.066, so a hash of the epoch's text is out of a linear read's reach whatever holds it, and the letters by position are the measure |
+| G-Z9 | `E` on the news: the first byte 0.838, places 3 to 6 at 0.355 to 0.408; `E` on the rings: places 1 to 6 at 0.789 to 0.944 | missed on its first half (under 0.3 asked for places 3 to 6), held on its second |
+| G-Z10 | next epoch's first byte from the strand face 0.006, control 0.008, ceiling 0.007 | missed; no linear read of an epoch's letters tells the next epoch's first byte |
+
+What it says, link by link. The built level loses its epoch twice: its chart (on the news phase the bytes past the first fall to about
+0.4, where on the rings they stand at 0.8 to 0.94) and its width (the restriction to 64 coordinates keeps about half of what its own
+moment holds). On the rings the symbol's word holds the epoch more cleanly than her state does (0.79 to 0.94 against 0.66 to 0.82 for
+places 1 to 6), as the formal pass's second reason says; with ten ring terms every place of eight stands at 0.94 or more. And the 0.009
+of November 23 was the ruler's ceiling as much as the restriction's loss: a linear read of a hashed identity stops at 0.066 on the
+epoch's letters themselves. The strand face is the unit the theory gives, and it holds what a unit is made of; what it hands on, and
+whether the next epoch follows from it, is not a linear read of its letters, which is what the level's ticks and its join are for.
+
+## 15. The strand face built, its width read, and the join's count ceiling
+
+**The width** (`tools/level_width_ruler.py`, [`level_width_W132i.txt`](receipts/2026-11-26_class_hairs/depth/level_width_W132i.txt);
+the formal pass's capacity read of 04:01 UTC, `code.capacity-price`). The strand face on the rings of periods 2, 3 and 4, restricted to
+its leading directions on one half of the rows and read on the other, both ways:
+
+| width | bytes at places 1 to 8 (each ± the halves' difference, at most 0.014) |
+|---|---|
+| 16 | 0.148, 0.448, 0.421, 0.457, 0.487, 0.482, 0.373, 0.281 |
+| 32 | 0.350, 0.584, 0.522, 0.549, 0.553, 0.521, 0.418, 0.304 |
+| 64 | 0.618, 0.723, 0.664, 0.657, 0.640, 0.592, 0.493, 0.354 |
+| 128 | 0.797, 0.832, 0.809, 0.800, 0.726, 0.695, 0.587, 0.414 |
+| 1,344 (the face) | 0.944, 0.929, 0.918, 0.893, 0.831, 0.787, 0.685, 0.443 |
+
+No restriction stands within the read's spread of the face's, so the width the read gives is the face's own: a restriction is a price,
+about 0.15 a doubling from 64 to 128 at places 1 to 6 and about 0.05 from 128 to the face. G-Z11 held: at 64 the restricted face keeps
+0.655 to 0.779 of the face's read at places 1 to 6. The level's width stays 64 in the first arm, so its trained level carries over and
+the arm is one change; the face unrestricted is the width's own arm, its card time projected first.
+
+**The join's ceiling** (`tools/join_count_ruler.py`, [`join_count.txt`](receipts/2026-11-26_class_hairs/depth/join_count.txt)). A
+count of each place's byte given the spelling of the epoch it reads and its distance into its own epoch, backed off and its depth chosen
+on held even rows, tells nothing past a unigram on the 407 word rows (its held choice is the distance alone; the share it leaves unsaid
+0.998 at a word's first letter, 0.991 inside a word, 1.002 elsewhere). That null is not yet a ruler's: rule 11 asks it to recover a
+planted join on the same shapes, and the formal pass names one (the next epoch's first byte set by the last letter of the epoch before
+on a share of the rows). Beside it, W132i's join codes a word's first letter at 3.862 nats against the count's unigram at 3.807, a
+letter inside a word at 3.211 against 3.297 and any other byte at 3.107 against 3.038: the level's face codes about at a counted unigram,
+and its share of 0.878 measured mostly the distance from the reader's bias (4.401) to a unigram. The formal pass's correction of the
+join's law (04:23 UTC): `Z` is read from the level's mean row, its standing state, never a zero row, so `1 − n` is what the join tells
+past the level's own prior; the ruler takes it at the next read of the join.
+
+**The build** (`Scale::strand`, the word `strand` after the level's counts; `set-strand STATE SHA OUT`). On a passage read by two streams
+the restriction sums each known site's symbol word, its encoding row read as a ratio to its own power, on the terms of
+`strand_face_terms`: the constant term, then for each ring of the fine field's periods (2, 3, 4, 9, 16, …) the turn back from the epoch's
+site, its cosine and its sine, the period 2 by its cosine, to the level's six terms. On a passage read by one stream an open place's
+symbol is unwritten and adds nothing (the first gate run refused the lap's plain regions, the acts' answers and the terrain, before this
+form was given). The prolongation reads the epoch at each place's news phase as before. The restriction's covector stops at its own
+material (`A`, `b_A`): the encoding is the fine field's boundary chart, which the level reads as data, and G-L5 showed a second comparison
+through the shared fine field costing every register. Host test `the_strand_face_restricts_the_symbols_words_on_the_rings_and_its_covector_stops_at_its_material`
+(the probes of `A` and `B⁻` against the code's central difference); the card's parity
+`the_levels_strand_face_on_the_card_reads_the_hosts_bits` on the line's own sixteen rings, both stream forms, 0 entries apart of 70,812
+at 3, 7 and 64 places.

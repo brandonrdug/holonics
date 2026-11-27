@@ -1,0 +1,13 @@
+G-Z8 to G-Z10, the formal thread's, fixed at 2026-11-27 03:30 UTC (relayed), before the read was dispatched (03:31:50 UTC).
+Law (0.75): the level's unit is the epoch's strand face, m_j = sum over t in e_j of G(t - s_j)^-1 E(u_t): each symbol's own word turned
+back by the fine rings' phases counted from the epoch's site, summed at the epoch's close (the rings' turn without their fade). The news
+decides where a unit ends; the count of its parts addresses what is inside.
+Premise read, no build: the same epochs and rows on W132i's end, four cells, one change each: {r, E} x {six news harmonics, ring phases
+from the site}; least squares on half, read on half: letters at positions 1 to 8, the epoch as one identity, the next epoch's first
+letter from m_(j-1). The built restriction is the control.
+G-Z8 (0.7): identity, control near 0.01, E on ring phases 0.5 or more.
+G-Z9 (0.65): E on news harmonics holds the first byte at 0.6 or more and positions 3 to 6 under 0.3; E on ring phases holds positions 1
+to 6 at 0.6 or more each.
+G-Z10 (0.5, a coin): next epoch's first letter from m_(j-1), E on ring phases, at twice the control's or more (Nov 17: 0.043).
+The lead's ruler (tools/level_unit_ruler.py): ring phases on the fine rings of periods 2, 3 and 4 (six terms a place, the news chart's
+count) and, beside it, with 9 and 16 (ten terms); a ceiling of E side by side at the epoch's first eight places.
