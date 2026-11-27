@@ -334,3 +334,39 @@ news harmonics or of ring phases from the site), with the built restriction as t
 8, the epoch as one identity, and the next epoch's first letter from `m_(j−1)`. G-Z8 to G-Z10 are in `GUESS.txt`.
 
 Owners: atlas `tower.level-unit-is-the-epochs-strand-face` (interpretation).
+
+## 14. The level's width is read as the face's capacity price, and the join is scored by codes (asked by the lead, November 27)
+
+**The premise read** (the lead, on W132i's end: 407 word rows, 34,530 epochs, least squares fitted on even rows and read on odd; the
+rings the fine field's own, periods 2, 3 and 4 giving six terms a place, and 2, 3, 4, 9 and 16 giving ten; the cell of her read on
+the news harmonics equals the built moment at a correlation of 1.0000). The bytes at the epoch's places 1 to 8 stand at 0.13 to 0.33
+in the built level's 64 coordinates; at 0.55, 0.53, 0.43 and then 0.39 down to 0.25 in the built moment itself; at 0.66 to 0.82 for
+places 1 to 7 with her read on the rings; at 0.84, 0.52 and then 0.30 to 0.41 with the symbol on the news harmonics; at 0.944, 0.923,
+0.920, 0.895, 0.835, 0.789, 0.687 and 0.445 on the strand face; and at 0.94 to 0.99 at every place on ten ring terms, against a
+ceiling of 0.993 to 0.998 with the first eight symbols side by side. The epoch as one identity (64 hashed cells) reads 0.013 in the
+built level, 0.063 on the strand face and 0.066 at the ceiling, and the next epoch's first byte 0.006 to 0.012 in every cell against
+a ceiling of 0.007.
+
+**The scores.** G-Z8 missed, its bar of 0.5 above the ruler's own ceiling of 0.066: the error of G-Z7, a guess fixed before its
+ruler's ceiling was read. G-Z9 missed on its first half (the symbol on the news chart holds places 3 to 6 at 0.36 to 0.41, not under
+0.3) and held on its second (the strand face holds places 1 to 6 at 0.79 or more). G-Z10 missed: no linear read reaches the next
+epoch's first byte, even at the ceiling.
+
+**What the read says.** The built level loses its epoch twice: on the news chart (past the first place the bytes fall to about 0.4,
+where on the rings they hold 0.8 to 0.94), and in its restriction to 64 coordinates (about half of its own moment's presence). The
+lead builds the restriction on the strand face with six terms and keeps the prolongation on the news harmonics, one change against
+its control; the prolongation on the count of places is the arm after it.
+
+**The width** (0.8). The level's width is read before the build as the face's capacity price (`code.capacity-price`): the strand
+face restricted to its leading directions on even rows at widths 16, 32, 64, 128 and its full width, each read on odd rows for the
+bytes at places 1 to 8, and the width is the least one whose read stands within the read's own spread (the halves swapped) of the
+unrestricted face's. That read is the width's receipt, and the width enters the line's declaration, and the widths' table of #1088
+where it is a constant, as read and never as picked. The built level kept half its own moment at 64, so 64 is no default.
+
+**The join** (0.75). A join is scored by codes and never by a linear presence: a next word's first byte is a function of the word
+before it that no linear read holds, and the level's face is no linear reader. The score is the unsaid share `n = R/Z` of §12 read
+by part (at a word's first letter 0.893 on W132i, inside a word 0.810, on spaces and marks 0.521), the arm against its control. Its
+ceiling is a count ruler read first: the code of the next epoch's first byte given the spelling of the epoch before, against its
+code alone, counted on even rows with backoff and read on odd, which is the most any reader across the join can tell. Her depth (the
+word two before, 0.025 on W129w) and her writes stand beside it. G-Z11 and G-Z12 are in `GUESS.txt`, each fixed against the ceiling
+it names, none of which was read.
