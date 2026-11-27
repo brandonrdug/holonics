@@ -1582,6 +1582,21 @@ impl Constitution {
     /// does not hear a strand. Which epoch an open place at a word's first letter is handed, and how large the handed row stands beside
     /// the state it joins, are read from these outside the machine. A reading: the state is the same with it.
     #[allow(clippy::type_complexity)]
+    /// [measurement; the lead, November 27, the review's build step 1] **A strand's epochs and her code over them**, for a crossing's
+    /// founding ([`crate::field::units::Units::found`]): the known stream's anchors as the level cut them (its founded units held) and the
+    /// code of each place's written symbol at her face (on `2^(−20)` bits), from one pass. `None` on a field without a level. A reading:
+    /// the state is the same with it.
+    pub fn strand_epochs(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<i64>)>> {
+        if self.scale.is_none() {
+            return Ok(None);
+        }
+        let pass = self.strand_pass(classes, false, past)?;
+        let Some(t) = pass.tower.as_ref() else { return Ok(None) };
+        let anchors = t.strand_cut().0.to_vec();
+        let codes = pass.faces.iter().zip(classes).map(|(f, &u)| face_code(f.masses[u], f.total)).collect();
+        Ok(Some((anchors, codes)))
+    }
+
     pub fn strand_cut_read(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(u128, u128)>)>> {
         let Some(split) = self.scale.as_deref().map(|s| s.split) else { return Ok(None) };
         let pass = self.strand_pass(classes, true, past)?;

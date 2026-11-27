@@ -399,7 +399,7 @@ impl Constitution {
             debug_assert_eq!((len0, gfrom.len()), (bb0 + h * dw, total1));
             debug_assert_eq!(ng, from.len());
             from.extend(gfrom);
-            out.scale = Some(Box::new(Scale { harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue, receipt: sc.receipt, inside: sc.inside, strand: sc.strand, bank: sc.bank.clone(), lane: sc.lane }));
+            out.scale = Some(Box::new(Scale { units: sc.units.clone(), harmonics: h, split: sc.split, coarse: sc.coarse.clone(), glue, receipt: sc.receipt, inside: sc.inside, strand: sc.strand, bank: sc.bank.clone(), lane: sc.lane }));
         }
         Ok((out, from))
     }

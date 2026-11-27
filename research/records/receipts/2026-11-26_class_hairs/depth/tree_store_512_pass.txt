@@ -1,0 +1,57 @@
+/home/b/Workspaces/holonics/.local/wt/lead/.local/run/long/../../../tools/tree_store_ruler.py:34: RuntimeWarning: overflow encountered in exp
+  return 1.0 / (1.0 + np.exp(-x))
+TREE_STORE pass=True J=512 symbols=155 places=236800 her_nats_odd=1.4359
+TREE_STORE fit=even_to_odd tau=4.0 slope=0.5 her_nats=1.4359 joined_nats=1.4481 gain=-0.0121
+TREE_STORE fit=even_to_odd place=1 part=within_30 places=959 her_nats=2.095 gain=+0.0085 (±0.0123)
+TREE_STORE fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.457 gain=-0.0072 (±0.0049)
+TREE_STORE fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.477 gain=-0.0601 (±0.0046)
+TREE_STORE fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.116 gain=-0.0575 (±0.0106)
+TREE_STORE fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.611 gain=+0.0538 (±0.0074)
+TREE_STORE fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.913 gain=+0.0324 (±0.0030)
+TREE_STORE fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.999 gain=-0.0770 (±0.0040)
+TREE_STORE fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.586 gain=-0.0252 (±0.0077)
+TREE_STORE fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.291 gain=+0.0217 (±0.0052)
+TREE_STORE fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.600 gain=+0.0431 (±0.0033)
+TREE_STORE fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.976 gain=-0.0596 (±0.0038)
+TREE_STORE fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.403 gain=+0.0162 (±0.0080)
+TREE_STORE fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.279 gain=+0.0487 (±0.0109)
+TREE_STORE fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.259 gain=+0.0293 (±0.0018)
+TREE_STORE fit=even_to_odd place=rest part=not_before places=22928 her_nats=1.093 gain=-0.0298 (±0.0017)
+TREE_STORE fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.663 gain=+0.0310 (±0.0038)
+TREE_STORE fit=odd_to_even tau=4.0 slope=0.5 her_nats=1.3747 joined_nats=1.3810 gain=-0.0063
+TREE_STORE fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.876 gain=+0.0782 (±0.0132)
+TREE_STORE fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.391 gain=+0.0217 (±0.0049)
+TREE_STORE fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.366 gain=-0.0730 (±0.0045)
+TREE_STORE fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.136 gain=-0.0255 (±0.0086)
+TREE_STORE fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.445 gain=+0.0341 (±0.0072)
+TREE_STORE fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.910 gain=+0.0246 (±0.0031)
+TREE_STORE fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.999 gain=-0.0722 (±0.0041)
+TREE_STORE fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.649 gain=-0.0120 (±0.0073)
+TREE_STORE fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.245 gain=+0.0385 (±0.0066)
+TREE_STORE fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.573 gain=+0.0517 (±0.0034)
+TREE_STORE fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.979 gain=-0.0660 (±0.0041)
+TREE_STORE fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.473 gain=+0.0338 (±0.0078)
+TREE_STORE fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.194 gain=+0.0372 (±0.0116)
+TREE_STORE fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.232 gain=+0.0299 (±0.0019)
+TREE_STORE fit=odd_to_even place=rest part=not_before places=22325 her_nats=1.050 gain=-0.0256 (±0.0016)
+TREE_STORE fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.721 gain=+0.0377 (±0.0038)
+TREE_STORE all gain_mean=-0.0092 halves_scatter=0.0058
+TREE_STORE kind=letter gain_mean=-0.0129 halves_scatter=0.0074
+TREE_STORE kind=other gain_mean=-0.0018 halves_scatter=0.0026
+TREE_STORE kind=space gain_mean=+0.0038 halves_scatter=0.0023
+TREE_STORE place=1 part=earlier_stretch gain_mean=-0.0415 halves_scatter=0.0321
+TREE_STORE place=1 part=not_before gain_mean=-0.0666 halves_scatter=0.0129
+TREE_STORE place=1 part=over_30 gain_mean=+0.0073 halves_scatter=0.0290
+TREE_STORE place=1 part=within_30 gain_mean=+0.0433 halves_scatter=0.0697
+TREE_STORE place=2 part=earlier_stretch gain_mean=-0.0186 halves_scatter=0.0132
+TREE_STORE place=2 part=not_before gain_mean=-0.0746 halves_scatter=0.0048
+TREE_STORE place=2 part=over_30 gain_mean=+0.0285 halves_scatter=0.0078
+TREE_STORE place=2 part=within_30 gain_mean=+0.0439 halves_scatter=0.0196
+TREE_STORE place=3 part=earlier_stretch gain_mean=+0.0250 halves_scatter=0.0176
+TREE_STORE place=3 part=not_before gain_mean=-0.0628 halves_scatter=0.0064
+TREE_STORE place=3 part=over_30 gain_mean=+0.0474 halves_scatter=0.0086
+TREE_STORE place=3 part=within_30 gain_mean=+0.0301 halves_scatter=0.0167
+TREE_STORE place=rest part=earlier_stretch gain_mean=+0.0343 halves_scatter=0.0067
+TREE_STORE place=rest part=not_before gain_mean=-0.0277 halves_scatter=0.0041
+TREE_STORE place=rest part=over_30 gain_mean=+0.0296 halves_scatter=0.0006
+TREE_STORE place=rest part=within_30 gain_mean=+0.0430 halves_scatter=0.0115

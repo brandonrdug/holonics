@@ -12,7 +12,7 @@ use std::time::Instant;
 #[allow(unused_imports)]
 use holonics_engine::field::{band_bits, landmarks_of, BlankClocks, CarryGates, Constitution, Declaration, ReadLogits, Realization, HeldRows, NearOffsets, RealizationCounters, RowCurrent, Region, Scale, TickRead, NEAR, SHARE_BITS, STATE_BITS};
 #[allow(unused_imports)]
-use holonics_engine::field::{bank_rotations, level_cut, level_section, strand_face_reads, strand_face_terms, strand_level_cut, PACE_BITS};
+use holonics_engine::field::{bank_rotations, level_cut_units, level_section, strand_face_reads, strand_face_terms, strand_level_cut_units, PACE_BITS};
 #[allow(unused_imports)]
 use holonics_engine::field::{TowerError, TowerFace, MATERIAL_BITS};
 #[allow(unused_imports)]
@@ -165,15 +165,33 @@ impl<'c> Resident<'c> {
         // [`Scale::bank`] Each region's epochs' turns on the slow store's rings, from the level's clock.
         let fades: Vec<i32> = s.bank_offsets(d0).map_or(Vec::new(), |(_, bf, end)| s.glue[bf..end].to_vec());
         let mut bank_rot: Vec<i64> = Vec::new();
+        // [the lead, November 27] Every strand region's cut, on the host's threads (each region's own function of its news and classes, so
+        // the bits are the host's), the level's founded units over the known stream's classes as the host cuts them ([`Scale::units`]).
+        let mut strand_cuts: Vec<Option<holonics_engine::field::StrandCut>> = if strand {
+            use rayon::prelude::*;
+            let open_news = open_news.ok_or(TowerError::Refused("a strand's level without its expected news"))?;
+            let (section, pi, alphabet) = (tr.section, tr.pi, field.declaration.alphabet);
+            let (region_off, classes, heard_) = (&fine.region_off[..], &fine.classes[..], &heard[..]);
+            (0..regions)
+                .into_par_iter()
+                .map(|r| {
+                    let (first, end) = (region_off[r] as usize, region_off[r + 1] as usize);
+                    let n = heard_[r] as usize;
+                    if end - first != 2 * n {
+                        return Err(TowerError::Refused("a strand staged as other than its known sites and as many open places"));
+                    }
+                    let known_classes: Vec<usize> = classes[first..first + n].iter().map(|&c| c as usize).collect();
+                    strand_level_cut_units(&news[first..first + n], &open_news[first..first + n], s.units.as_ref().map(|u| (u, known_classes.as_slice(), alphabet)), section, h, pi).map(Some)
+                })
+                .collect::<Result<Vec<_>>>()?
+        } else {
+            Vec::new()
+        };
         for r in 0..regions {
             let (first, end) = (fine.region_off[r] as usize, fine.region_off[r + 1] as usize);
             if strand {
                 let n = heard[r] as usize;
-                if end - first != 2 * n {
-                    return Err(TowerError::Refused("a strand staged as other than its known sites and as many open places"));
-                }
-                let open_news = open_news.ok_or(TowerError::Refused("a strand's level without its expected news"))?;
-                let sc = strand_level_cut(&news[first..first + n], &open_news[first..first + n], tr.section, h, tr.pi)?;
+                let sc = strand_cuts[r].take().ok_or(TowerError::Refused("a strand region's cut taken twice"))?;
                 let base = off.len() as u32;
                 let epochs = sc.cut.anchors.len();
                 let ends = |j: usize| sc.cut.anchors.get(j + 1).copied().unwrap_or(n);
@@ -214,7 +232,8 @@ impl<'c> Resident<'c> {
                 owned.push((vec![0usize; epochs], vec![false; epochs], vec![None; epochs]));
                 continue;
             }
-            let cut = level_cut(&news[first..end], tr.section, h, tr.pi)?;
+            let region_classes: Vec<usize> = fine.classes[first..end].iter().map(|&c| c as usize).collect();
+            let cut = level_cut_units(&news[first..end], s.units.as_ref().map(|u| (u, region_classes.as_slice(), field.declaration.alphabet)), tr.section, h, tr.pi, false)?;
             let base = off.len() as u32;
             let epochs = cut.anchors.len();
             let (mut unres, mut faces) = (Vec::with_capacity(epochs), Vec::with_capacity(epochs));

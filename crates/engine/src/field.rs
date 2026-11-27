@@ -197,6 +197,7 @@ pub use crate::ruler::*;
 
 pub mod moment;
 pub(crate) mod scale;
-pub use scale::{bank_rotations, level_anchors, level_anchors_before, level_cut, level_cut_sided, strand_face_reads, strand_face_terms, strand_level_cut, StrandCut, level_declaration, level_isolation, level_section, level_split, LevelCut, Scale, LEVEL_HARMONICS};
+pub mod units;
+pub use scale::{bank_rotations, level_anchors, level_anchors_before, level_cut, level_cut_sided, level_cut_units, strand_level_cut_units, strand_face_reads, strand_face_terms, strand_level_cut, StrandCut, level_declaration, level_isolation, level_section, level_split, LevelCut, Scale, LEVEL_HARMONICS};
 #[cfg(test)]
 mod tests;
