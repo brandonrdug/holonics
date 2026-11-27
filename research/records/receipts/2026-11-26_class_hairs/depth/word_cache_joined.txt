@@ -1,0 +1,133 @@
+WORD_CACHE letter_places=180575 even=90694 odd=89881 her_nats_odd=1.443 her_nats_even=1.397 count_has_charge=0.773
+WORD_CACHE fit=even_to_odd leak=None coefficient=0.2 her_nats=1.443 joined_nats=1.431 gain=+0.0126
+WORD_CACHE fit=even_to_odd place=1 part=within_30 places=959 her_nats=1.967 joined_nats=2.010 gain=-0.0432 (±0.0063) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.373 joined_nats=2.400 gain=-0.0271 (±0.0022) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.379 joined_nats=3.375 gain=+0.0032 (±0.0025) count_has_charge=0.999
+WORD_CACHE fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.021 joined_nats=3.015 gain=+0.0061 (±0.0041) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.592 joined_nats=0.607 gain=-0.0153 (±0.0048) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.886 joined_nats=0.890 gain=-0.0043 (±0.0021) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.956 joined_nats=1.977 gain=-0.0210 (±0.0025) count_has_charge=0.951
+WORD_CACHE fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.545 joined_nats=1.483 gain=+0.0617 (±0.0058) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.274 joined_nats=0.270 gain=+0.0038 (±0.0053) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.562 joined_nats=0.526 gain=+0.0355 (±0.0026) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.891 joined_nats=1.927 gain=-0.0360 (±0.0028) count_has_charge=0.725
+WORD_CACHE fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.322 joined_nats=1.107 gain=+0.2151 (±0.0107) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.178 joined_nats=0.159 gain=+0.0194 (±0.0064) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.191 joined_nats=0.158 gain=+0.0332 (±0.0020) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=rest part=not_before places=22928 her_nats=0.957 joined_nats=0.960 gain=-0.0033 (±0.0009) count_has_charge=0.195
+WORD_CACHE fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.555 joined_nats=0.381 gain=+0.1742 (±0.0074) count_has_charge=1.000
+WORD_CACHE fit=even_to_odd place=1 own_coefficient=0.05 gain=+0.0017
+WORD_CACHE fit=even_to_odd place=2 own_coefficient=0.1 gain=+0.0045
+WORD_CACHE fit=even_to_odd place=3 own_coefficient=0.2 gain=+0.0277
+WORD_CACHE fit=even_to_odd place=rest own_coefficient=0.4 gain=+0.0341
+WORD_CACHE fit=even_to_odd place=1 part=within_30 known_part_coefficient=0.0 gain=+0.0000
+WORD_CACHE fit=even_to_odd place=1 part=over_30 known_part_coefficient=0.01 gain=+0.0001
+WORD_CACHE fit=even_to_odd place=1 part=earlier_stretch known_part_coefficient=0.2 gain=+0.0061
+WORD_CACHE fit=even_to_odd place=2 part=within_30 known_part_coefficient=0.0 gain=+0.0000
+WORD_CACHE fit=even_to_odd place=2 part=over_30 known_part_coefficient=0.05 gain=+0.0027
+WORD_CACHE fit=even_to_odd place=2 part=earlier_stretch known_part_coefficient=0.5 gain=+0.0789
+WORD_CACHE fit=even_to_odd place=3 part=within_30 known_part_coefficient=0.1 gain=+0.0038
+WORD_CACHE fit=even_to_odd place=3 part=over_30 known_part_coefficient=0.5 gain=+0.0534
+WORD_CACHE fit=even_to_odd place=3 part=earlier_stretch known_part_coefficient=0.9 gain=+0.4184
+WORD_CACHE fit=even_to_odd place=rest part=within_30 known_part_coefficient=0.9 gain=+0.0442
+WORD_CACHE fit=even_to_odd place=rest part=over_30 known_part_coefficient=0.9 gain=+0.0849
+WORD_CACHE fit=even_to_odd place=rest part=earlier_stretch known_part_coefficient=0.9 gain=+0.3781
+WORD_CACHE fit=even_to_odd place=1 part=within_30 count_state_coefficient gain=-0.0077 (±0.0022)
+WORD_CACHE fit=even_to_odd place=1 part=over_30 count_state_coefficient gain=-0.0024 (±0.0009)
+WORD_CACHE fit=even_to_odd place=1 part=not_before count_state_coefficient gain=+0.0058 (±0.0008)
+WORD_CACHE fit=even_to_odd place=1 part=earlier_stretch count_state_coefficient gain=+0.0063 (±0.0015)
+WORD_CACHE fit=even_to_odd place=2 part=within_30 count_state_coefficient gain=-0.0059 (±0.0027)
+WORD_CACHE fit=even_to_odd place=2 part=over_30 count_state_coefficient gain=+0.0015 (±0.0014)
+WORD_CACHE fit=even_to_odd place=2 part=not_before count_state_coefficient gain=-0.0036 (±0.0015)
+WORD_CACHE fit=even_to_odd place=2 part=earlier_stretch count_state_coefficient gain=+0.0399 (±0.0039)
+WORD_CACHE fit=even_to_odd place=3 part=within_30 count_state_coefficient gain=-0.0033 (±0.0056)
+WORD_CACHE fit=even_to_odd place=3 part=over_30 count_state_coefficient gain=+0.0340 (±0.0029)
+WORD_CACHE fit=even_to_odd place=3 part=not_before count_state_coefficient gain=-0.0412 (±0.0032)
+WORD_CACHE fit=even_to_odd place=3 part=earlier_stretch count_state_coefficient gain=+0.2314 (±0.0113)
+WORD_CACHE fit=even_to_odd place=rest part=within_30 count_state_coefficient gain=+0.0393 (±0.0119)
+WORD_CACHE fit=even_to_odd place=rest part=over_30 count_state_coefficient gain=+0.0609 (±0.0030)
+WORD_CACHE fit=even_to_odd place=rest part=not_before count_state_coefficient gain=-0.0244 (±0.0016)
+WORD_CACHE fit=even_to_odd place=rest part=earlier_stretch count_state_coefficient gain=+0.2783 (±0.0100)
+WORD_CACHE fit=even_to_odd count_state_coefficient all_letters gain=+0.0192 coefficients=1:1:0.0,1:2:0.0,1:3:0.0,1:4:0.05,2:1:0.05,2:2:0.1,2:3:0.1,2:4:0.1,3:1:0.15,3:2:0.2,3:3:0.3,3:4:0.3,4:1:0.5,4:2:0.4,4:3:0.4,4:4:0.0
+WORD_CACHE fit=odd_to_even leak=None coefficient=0.15 her_nats=1.397 joined_nats=1.377 gain=+0.0193
+WORD_CACHE fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.763 joined_nats=1.804 gain=-0.0410 (±0.0035) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.315 joined_nats=2.330 gain=-0.0145 (±0.0018) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.282 joined_nats=3.276 gain=+0.0057 (±0.0021) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.051 joined_nats=3.032 gain=+0.0193 (±0.0033) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.434 joined_nats=0.453 gain=-0.0192 (±0.0033) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.888 joined_nats=0.886 gain=+0.0011 (±0.0018) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.965 joined_nats=1.969 gain=-0.0039 (±0.0023) count_has_charge=0.948
+WORD_CACHE fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.614 joined_nats=1.540 gain=+0.0739 (±0.0058) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.220 joined_nats=0.219 gain=+0.0013 (±0.0031) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.535 joined_nats=0.509 gain=+0.0257 (±0.0023) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.899 joined_nats=1.915 gain=-0.0154 (±0.0027) count_has_charge=0.735
+WORD_CACHE fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.406 joined_nats=1.201 gain=+0.2049 (±0.0096) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.152 joined_nats=0.131 gain=+0.0215 (±0.0074) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.170 joined_nats=0.148 gain=+0.0221 (±0.0014) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=rest part=not_before places=22325 her_nats=0.920 joined_nats=0.921 gain=-0.0010 (±0.0009) count_has_charge=0.194
+WORD_CACHE fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.606 joined_nats=0.428 gain=+0.1778 (±0.0069) count_has_charge=1.000
+WORD_CACHE fit=odd_to_even place=1 own_coefficient=0.05 gain=+0.0024
+WORD_CACHE fit=odd_to_even place=2 own_coefficient=0.1 gain=+0.0099
+WORD_CACHE fit=odd_to_even place=3 own_coefficient=0.2 gain=+0.0371
+WORD_CACHE fit=odd_to_even place=rest own_coefficient=0.4 gain=+0.0437
+WORD_CACHE fit=odd_to_even place=1 part=within_30 known_part_coefficient=0.0 gain=+0.0000
+WORD_CACHE fit=odd_to_even place=1 part=over_30 known_part_coefficient=0.01 gain=+0.0003
+WORD_CACHE fit=odd_to_even place=1 part=earlier_stretch known_part_coefficient=0.1 gain=+0.0162
+WORD_CACHE fit=odd_to_even place=2 part=within_30 known_part_coefficient=0.0 gain=+0.0000
+WORD_CACHE fit=odd_to_even place=2 part=over_30 known_part_coefficient=0.05 gain=+0.0034
+WORD_CACHE fit=odd_to_even place=2 part=earlier_stretch known_part_coefficient=0.4 gain=+0.1169
+WORD_CACHE fit=odd_to_even place=3 part=within_30 known_part_coefficient=0.15 gain=+0.0013
+WORD_CACHE fit=odd_to_even place=3 part=over_30 known_part_coefficient=0.6 gain=+0.0422
+WORD_CACHE fit=odd_to_even place=3 part=earlier_stretch known_part_coefficient=0.9 gain=+0.4644
+WORD_CACHE fit=odd_to_even place=rest part=within_30 known_part_coefficient=0.9 gain=+0.0632
+WORD_CACHE fit=odd_to_even place=rest part=over_30 known_part_coefficient=0.9 gain=+0.0681
+WORD_CACHE fit=odd_to_even place=rest part=earlier_stretch known_part_coefficient=0.9 gain=+0.4468
+WORD_CACHE fit=odd_to_even place=1 part=within_30 count_state_coefficient gain=-0.0120 (±0.0013)
+WORD_CACHE fit=odd_to_even place=1 part=over_30 count_state_coefficient gain=-0.0013 (±0.0008)
+WORD_CACHE fit=odd_to_even place=1 part=not_before count_state_coefficient gain=+0.0059 (±0.0010)
+WORD_CACHE fit=odd_to_even place=1 part=earlier_stretch count_state_coefficient gain=+0.0104 (±0.0015)
+WORD_CACHE fit=odd_to_even place=2 part=within_30 count_state_coefficient gain=-0.0062 (±0.0015)
+WORD_CACHE fit=odd_to_even place=2 part=over_30 count_state_coefficient gain=+0.0046 (±0.0011)
+WORD_CACHE fit=odd_to_even place=2 part=not_before count_state_coefficient gain=+0.0001 (±0.0014)
+WORD_CACHE fit=odd_to_even place=2 part=earlier_stretch count_state_coefficient gain=+0.0471 (±0.0041)
+WORD_CACHE fit=odd_to_even place=3 part=within_30 count_state_coefficient gain=-0.0012 (±0.0037)
+WORD_CACHE fit=odd_to_even place=3 part=over_30 count_state_coefficient gain=+0.0266 (±0.0025)
+WORD_CACHE fit=odd_to_even place=3 part=not_before count_state_coefficient gain=-0.0190 (±0.0030)
+WORD_CACHE fit=odd_to_even place=3 part=earlier_stretch count_state_coefficient gain=+0.2268 (±0.0103)
+WORD_CACHE fit=odd_to_even place=rest part=within_30 count_state_coefficient gain=+0.0424 (±0.0132)
+WORD_CACHE fit=odd_to_even place=rest part=over_30 count_state_coefficient gain=+0.0440 (±0.0023)
+WORD_CACHE fit=odd_to_even place=rest part=not_before count_state_coefficient gain=-0.0177 (±0.0015)
+WORD_CACHE fit=odd_to_even place=rest part=earlier_stretch count_state_coefficient gain=+0.3011 (±0.0097)
+WORD_CACHE fit=odd_to_even count_state_coefficient all_letters gain=+0.0260 coefficients=1:1:0.0,1:2:0.0,1:3:0.05,1:4:0.05,2:1:0.05,2:2:0.1,2:3:0.1,2:4:0.05,3:1:0.15,3:2:0.15,3:3:0.2,3:4:0.3,4:1:0.4,4:2:0.4,4:3:0.3,4:4:0.02
+WORD_CACHE place=1 part=earlier_stretch gain_mean=+0.0127 halves_scatter=0.0132
+WORD_CACHE count_state place=1 part=earlier_stretch gain_mean=+0.0083 halves_scatter=0.0041
+WORD_CACHE place=1 part=not_before gain_mean=+0.0045 halves_scatter=0.0025
+WORD_CACHE count_state place=1 part=not_before gain_mean=+0.0058 halves_scatter=0.0001
+WORD_CACHE place=1 part=over_30 gain_mean=-0.0208 halves_scatter=0.0126
+WORD_CACHE count_state place=1 part=over_30 gain_mean=-0.0018 halves_scatter=0.0011
+WORD_CACHE place=1 part=within_30 gain_mean=-0.0421 halves_scatter=0.0022
+WORD_CACHE count_state place=1 part=within_30 gain_mean=-0.0098 halves_scatter=0.0043
+WORD_CACHE place=2 part=earlier_stretch gain_mean=+0.0678 halves_scatter=0.0122
+WORD_CACHE count_state place=2 part=earlier_stretch gain_mean=+0.0435 halves_scatter=0.0071
+WORD_CACHE place=2 part=not_before gain_mean=-0.0124 halves_scatter=0.0171
+WORD_CACHE count_state place=2 part=not_before gain_mean=-0.0018 halves_scatter=0.0037
+WORD_CACHE place=2 part=over_30 gain_mean=-0.0016 halves_scatter=0.0054
+WORD_CACHE count_state place=2 part=over_30 gain_mean=+0.0031 halves_scatter=0.0031
+WORD_CACHE place=2 part=within_30 gain_mean=-0.0173 halves_scatter=0.0039
+WORD_CACHE count_state place=2 part=within_30 gain_mean=-0.0061 halves_scatter=0.0004
+WORD_CACHE place=3 part=earlier_stretch gain_mean=+0.2100 halves_scatter=0.0102
+WORD_CACHE count_state place=3 part=earlier_stretch gain_mean=+0.2291 halves_scatter=0.0046
+WORD_CACHE place=3 part=not_before gain_mean=-0.0257 halves_scatter=0.0206
+WORD_CACHE count_state place=3 part=not_before gain_mean=-0.0301 halves_scatter=0.0222
+WORD_CACHE place=3 part=over_30 gain_mean=+0.0306 halves_scatter=0.0098
+WORD_CACHE count_state place=3 part=over_30 gain_mean=+0.0303 halves_scatter=0.0074
+WORD_CACHE place=3 part=within_30 gain_mean=+0.0026 halves_scatter=0.0026
+WORD_CACHE count_state place=3 part=within_30 gain_mean=-0.0023 halves_scatter=0.0020
+WORD_CACHE place=rest part=earlier_stretch gain_mean=+0.1760 halves_scatter=0.0036
+WORD_CACHE count_state place=rest part=earlier_stretch gain_mean=+0.2897 halves_scatter=0.0228
+WORD_CACHE place=rest part=not_before gain_mean=-0.0022 halves_scatter=0.0023
+WORD_CACHE count_state place=rest part=not_before gain_mean=-0.0211 halves_scatter=0.0067
+WORD_CACHE place=rest part=over_30 gain_mean=+0.0276 halves_scatter=0.0110
+WORD_CACHE count_state place=rest part=over_30 gain_mean=+0.0524 halves_scatter=0.0169
+WORD_CACHE place=rest part=within_30 gain_mean=+0.0204 halves_scatter=0.0021
+WORD_CACHE count_state place=rest part=within_30 gain_mean=+0.0409 halves_scatter=0.0030
