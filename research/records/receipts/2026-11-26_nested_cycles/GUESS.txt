@@ -144,3 +144,24 @@ same held rows, by place class.
 G-Z30 (0.7). Words as units, counted on about 50 MB of the store's web and books, read an unsaid share at word starts under 0.9.
 G-Z31 (0.5). Her epochs' strings counted in the same raw text (the unit before as a string, and the unit's places after it) read
   an unsaid share at word starts within 0.05 of the words' read.
+
+Scored 2026-11-27T15:16Z on the lead's store count ruler (tools/store_count_ruler.py, 30 MB of the store's web and books, read on the 407 held
+rows' odd half): G-Z30 missed (words at word first letters 0.997, inside 0.931); G-Z31 held (her epochs at word first letters 1.000,
+inside 0.920). The read, by the join's construction, conditions a word's first letter on the unit two back alone: the unit it
+stands in is the word before, still open.
+
+Fixed 2026-11-27T15:16Z (date -u 15:16:34 at drafting), before the read.
+
+G-Z32 (0.55). The same ruler, words as units, conditioned on the word before and the word two back together, reads at word first
+  letters at most 0.97 of its read conditioned on the word before alone.
+
+Scored 2026-11-27T15:20Z: G-Z32 missed. At word first letters (9,815 on the odd half, 30 MB of counts) the word before alone codes 3.109 nats
+against the unigram's 3.803 (0.818; by depth none, 1, 2, 4 bytes, whole word: 3.803, 3.426, 3.213, 3.122, 3.109), and two back
+with the word before reads 3.109 as well (joint over word-before alone 1.0000): at 30 MB a count cannot price depth.
+
+Fixed 2026-11-27T15:20Z (date -u 15:20:57 at drafting), before either read.
+
+G-Z33 (0.7). Her own code at the same 9,815 word first letters, at W135s's lap mean, stands under 3.109 nats (the count's word
+  before): the 30 MB count is a weaker reader than she is, and its nulls bound nothing of hers.
+G-Z34 (0.6). The level's comparison face with the bank as an operand, fitted on the even half and read on the odd, codes word first
+  letters better than her own face by 0.05 nats or more in no part (split by whether the word was last met past 30 places).

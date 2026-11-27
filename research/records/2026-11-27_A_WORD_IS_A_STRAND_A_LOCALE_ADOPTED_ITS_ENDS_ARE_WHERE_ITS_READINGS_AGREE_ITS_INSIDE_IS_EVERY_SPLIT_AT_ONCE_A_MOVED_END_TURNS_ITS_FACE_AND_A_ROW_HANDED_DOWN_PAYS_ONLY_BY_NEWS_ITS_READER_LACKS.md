@@ -272,11 +272,58 @@ spelling): words as units (G-Z30, 0.7: under 0.9 at word starts), and her held e
 unit before as a string and the unit's places after it (G-Z31, 0.5: within 0.05 of the words' read at word starts). Both fixed at
 15:04 UTC.
 
-## 12. Owners
+## 12. The level hands its prediction, on time, and is scored in its own unit (the lead's store count read, 15:15 UTC)
+
+**The reads** (`tools/store_count_ruler.py`, the lead's: 30 MB of the store's web and books in a suffix array, interpolated absolute
+discounting, the count depth chosen on the held rows' even half and read on the odd). Words as units: at word first letters 0.997
+(the depth the last two bytes; none 1.000, one byte 1.008, four 1.011, the whole unit 1.038), inside a word 0.931, other bytes
+1.000; G-Z30 missed. Her epochs (W132i's cut): at word first letters 1.000 (no depth chosen), inside 0.920, other bytes 1.000;
+G-Z31 held. By the join's construction a place stands in the unit of the place before it and reads the unit before that, so at a
+word's first letter the unit it stands in is the word before, still open, and the read conditions on the word two back alone. The
+word directly before tells a great deal by the same counts (after "of " the next byte is "t" in 36% against 6.6% unconditioned),
+and her own field holds it.
+
+**The law (0.65).** First, a level hands on one unit late wherever it closes a unit at the next unit's surprise; a word closes at
+its own end, where its readings agree (in text the space), and the word before is then handed before the next first letter is
+read, though on its own that buys little, since she holds the word before. Second, what a level adds at a first letter is an
+interaction, the unit two back read together with the word before; a read on two back alone measures a skip-gram, and the level's
+ceiling is the joint count against the count on the word before alone. G-Z32 (0.55), fixed at 15:16 UTC: words as units, the word
+before and two back together, at most 0.97 of the word before alone at first letters. Third, the level hands its prediction, not
+its state: a face over its next unit formed from the units it holds together, the level's own comparison trained on its own news,
+the bank its operand. Its row then carries a density over the next word's spelling, news exactly where her face is open and the
+price stands (§7); a state handed down leaves her readers to find the interaction, and the tension reads say first-order readers
+do not.
+
+**The measure.** A level's arm is scored in the level's own unit, the mean in nats a place beside it (CLAUDE.md rule 8): the code
+of a word (its places summed), split by whether its predictor stands past her reach of about 30 places; and the writes, shown
+whole, read for whether a word from the prompt or from 30 places or more back comes back and agrees in what she writes past it. A
+mean a place at first letters weighs a level by `1/κ` and hides it.
+
+## 13. A face is worth handing only where it codes her next unit better than her own face does (the lead's question, 15:19 UTC)
+
+G-Z32 missed: at 9,815 word first letters on the odd half, the word before alone codes 3.109 nats against the unigram's 3.803
+(0.818), and the word two back with the word before codes 3.109 as well (1.0000). Read by CLAUDE.md rule 11, that is a ruler's
+null on depth that has recovered no planted instance: 30 MB of counts are too thin under a pair of words to stand over the word
+before alone, so the read prices the instrument and no law of the passage.
+
+The lead asked what makes a level's prediction face worth handing when the face of W101r's receipt, at 2.96 nats a place, coded at
+a counted unigram. **The law (0.7):** a face handed down is news to her only where it codes her next unit better than her own face
+does at the same places, part by part (§6, §7: a row pays by what her stores lack). W101r's face coded far above her own held code
+(about 0.67 nats a place), so handing it could only cost. The same test reaches every count: a count is a reader, and a reader
+weaker than she is bounds nothing of hers. The bank as an operand and the density in place of the state are two changes, run as two
+arms beside a control (rule 1).
+
+The order the law gives: G-Z33 (0.7), her own code at the same 9,815 first letters at W135s's lap mean, under 3.109 nats; then
+G-Z34 (0.6), the level's comparison face with the bank as an operand, fitted on the even half and read on the odd, beating her own
+face by 0.05 nats or more in no part split by whether the word was last met past 30 places. A handed face is built only in a part
+where it beats hers by more than the scatter between halves; where it beats her nowhere, the level is scored by what it writes and
+by its own unit's news (§12), and nothing is handed down.
+
+## 14. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z31.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z34.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
