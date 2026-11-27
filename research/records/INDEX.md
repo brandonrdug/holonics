@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,771 records from July 2026 to November 2026. 417 receipts directories: 225 beside the records and 192 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,772 records from July 2026 to November 2026. 417 receipts directories: 225 beside the records and 192 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 170 | 133 |
+| [November 2026](#november-2026) | 171 | 133 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -21,6 +21,7 @@ directory leaves out (the listing stops at 1,000).
 ## November 2026
 
 - 2026-11-27 [A bit shared by many places costs the width of the region they span a copy inside it is free distance is the price of a shared bit and an address is the placement that makes a recurrence short](2026-11-27_A_BIT_SHARED_BY_MANY_PLACES_COSTS_THE_WIDTH_OF_THE_REGION_THEY_SPAN_A_COPY_INSIDE_IT_IS_FREE_DISTANCE_IS_THE_PRICE_OF_A_SHARED_BIT_AND_AN_ADDRESS_IS_THE_PLACEMENT_THAT_MAKES_A_RECURRENCE_SHORT.md)
+- 2026-11-27 [A unit is founded by its saving over its pools choice held by a leaky count and moved at its own means rate](2026-11-27_A_UNIT_IS_FOUNDED_BY_ITS_SAVING_OVER_ITS_POOLS_CHOICE_HELD_BY_A_LEAKY_COUNT_AND_MOVED_AT_ITS_OWN_MEANS_RATE.md)
 - 2026-11-27 [A word is a strand a locale adopted its ends are where its readings agree its inside is every split at once a moved end turns its face and a row handed down pays only by news its reader lacks](2026-11-27_A_WORD_IS_A_STRAND_A_LOCALE_ADOPTED_ITS_ENDS_ARE_WHERE_ITS_READINGS_AGREE_ITS_INSIDE_IS_EVERY_SPLIT_AT_ONCE_A_MOVED_END_TURNS_ITS_FACE_AND_A_ROW_HANDED_DOWN_PAYS_ONLY_BY_NEWS_ITS_READER_LACKS.md)
 - 2026-11-26 [A classs mean word carries a twentieth of what its sites heard one by one carry across a cut and her face already reads each ring on two axes](2026-11-26_A_CLASSS_MEAN_WORD_CARRIES_A_TWENTIETH_OF_WHAT_ITS_SITES_HEARD_ONE_BY_ONE_CARRY_ACROSS_A_CUT_AND_HER_FACE_ALREADY_READS_EACH_RING_ON_TWO_AXES.md)
 - 2026-11-26 [A composition stands in a locale only after its causes its cost is its build from the parts the locale holds a Holarchy over an aeon is that build kept and generalization is a short build from ones own parts](2026-11-26_A_COMPOSITION_STANDS_IN_A_LOCALE_ONLY_AFTER_ITS_CAUSES_ITS_COST_IS_ITS_BUILD_FROM_THE_PARTS_THE_LOCALE_HOLDS_A_HOLARCHY_OVER_AN_AEON_IS_THAT_BUILD_KEPT_AND_GENERALIZATION_IS_A_SHORT_BUILD_FROM_ONES_OWN_PARTS.md)

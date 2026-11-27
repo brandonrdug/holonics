@@ -596,7 +596,11 @@ first-letter cost (+0.0040) and keeps +0.020 at the third letter against the pro
 product form by `B` alone (21:20 UTC), gains +0.078 at the third letter past a reset against +0.072 and +0.0128 over every byte
 place against +0.0113, by halves +0.0017 and +0.0014: G-Z57 held, by a hair. Located per address in the product's exponent, depth
 adds about a tenth to one slope per depth, and it costs nothing at the first letters (+0.020 against +0.024, inside the scatter)
-because an unmet address stays flat whatever its weight.
+because an unmet address stays flat whatever its weight. At `J = 4,096` (22:51 UTC) the suffix key gains +0.1045 at the third letter
+past a reset against the word key's +0.0954 and +0.0185 over every byte place against +0.0097: G-Z49 held. The tail sums of its
+slopes are not positive on both halves at every depth from 1 to 6, so G-Z53 missed, and G-Z52 and G-Z54 are not called: the depth
+rides on the linear slopes `g_k`, about 0.5 to 1.1 through `k = 8`, so at that `J` the read still pays at the cap. How a unit is
+founded on the card from here is [its own record](2026-11-27_A_UNIT_IS_FOUNDED_BY_ITS_SAVING_OVER_ITS_POOLS_CHOICE_HELD_BY_A_LEAKY_COUNT_AND_MOVED_AT_ITS_OWN_MEANS_RATE.md).
 
 ## 24. Owners
 
