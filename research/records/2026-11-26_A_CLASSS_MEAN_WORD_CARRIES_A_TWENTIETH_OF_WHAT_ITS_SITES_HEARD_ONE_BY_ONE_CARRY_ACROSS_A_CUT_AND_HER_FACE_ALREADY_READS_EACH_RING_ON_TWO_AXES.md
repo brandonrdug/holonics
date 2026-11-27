@@ -599,3 +599,44 @@ The host test `the_levels_slow_store_reads_its_epochs_back_and_its_covector_meet
 with the block drawn, the probes of `B_bank` and `A` meet the code's central difference); the card's scans `field_level_bank_scan`,
 `field_level_bank_back` and `field_level_bank_sum`, its parity in the strand-face test. The arm (G-L8,
 [`GUESS_L8.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L8.txt)) runs from W134s's end beside its control.
+
+## 18. The strand face's second lap pays its price still, and the slow store's first lap enters free and carries no news yet (G-L7, G-L8)
+
+Reads: [`G-L7_L8_reads.txt`](receipts/2026-11-26_class_hairs/laps/G-L7_L8_reads.txt); guesses
+[`GUESS_L7.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L7.txt), [`GUESS_L8.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L8.txt).
+
+**G-L7** (W134s from W133s's end against W134 from W133's end, the line's lap). Each section's training code over the control's, by 250
+sections: 1.018, 1.019, 1.017, 1.020, 1.016, 1.017, 1.016, 1.013, 1.014, 1.015, 1.015 and 1.0145 over the last 250, so the price settles
+near 1.4% where the formal pass's fit put a floor near 1.2% (its G-Z15, 1.010 to 1.020, held).
+
+| G-L7 | read | guess |
+|---|---|---|
+| (a) the last 250 sections' training code | 1.0145 times the control's | missed (1.010 asked) |
+| (b) the held gap | +0.0221 (±0.0006), every region up (books +0.0105 to wikidata +0.0631) | missed (+0.015 asked); G-Z16 (+0.012 to +0.025) held |
+| (c) within 0.004 | +0.0221 | missed |
+| (d) the word two before at a word's first letter | 0.025 (control 0.024) | missed |
+| (e) the level's bytes at places 1 to 6 | 0.421 to 0.547, two of six under 0.5 | missed |
+
+By place class the second lap's cost keeps the first's shape at about two thirds of its size (a first letter +0.0369, a mark +0.0363, a
+space +0.0204, a letter inside a word +0.0147; a first letter met within 30 places +0.0581, over 30 +0.0403). The line goes on from W134's
+end (held text 0.6698).
+
+**G-L8** (W135b, W134s's end with the slow store, against W135s, W134s's end). The bank's training code runs 1.0002 to 1.0012 times the
+control's in every 250 sections, 1.0005 over the lap, with no trend; its six fades stand at their founding after the lap; `B_bank`'s root
+mean square reached 183,259 on `2^(−24)` against `B⁻`'s 3,059,687.
+
+| G-L8 | read | guess |
+|---|---|---|
+| (a) held text | +0.0005 (±0.0002), every region within 0.0012 | held (G-Z23 held) |
+| (b) a first letter met over 30 places back, against within 30 | +0.0063 (±0.0015) against −0.0017 (±0.0030) | missed (G-Z17 missed) |
+| (c) the word two before | 0.025 (control 0.025) | missed |
+| (d) the fades as founded | all six at −44,476,400 | held |
+| (e) the wide panel's lexicon share | 70% against 68% | held |
+
+G-Z24 half held: a letter inside a word moves +0.0011, within 0.005; a first letter moves −0.0003, the least of the kinds rather than the
+most. The places at the very head of a stretch read lower on the arm (place 0: −0.0206 ± 0.0051 over 1,009 places; place 1: −0.0058),
+too few to stand on.
+
+So the slow store enters as the formal pass said, at no price (founded at zero, its block deposits only where a covector reaches it), and
+in one lap it carries no news the fine comparison reads: what it holds of the epochs four to sixteen back reaches her faces through a
+block a seventeenth of `B⁻`'s scale. Its second lap runs beside its control ([`GUESS_L9.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L9.txt)).

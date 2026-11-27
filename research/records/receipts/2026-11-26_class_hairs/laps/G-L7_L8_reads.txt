@@ -1,0 +1,64 @@
+FRONTIER W134s; one place open: all 0.6919 (200933 places) | acts 1.0803 books 0.6830 code 0.4136 dialogue 0.8865 harness 0.7265 logic 0.3336 science 0.5922 theory 0.4631 web 0.7579 wikidata 0.9797 || less the control's, paired: +0.0221 (±0.0006) | acts +0.0214 books +0.0105 code +0.0169 dialogue +0.0209 harness +0.0145 logic +0.0111 science +0.0201 theory +0.0167 web +0.0254 wikidata +0.0631
+PLACE_CLASS W134s_less_W134 all=all places=200933 nats_a_place=+0.0221 (±0.0006)
+PLACE_CLASS W134s_less_W134 first_letter_last_met=not_before places=22592 nats_a_place=+0.0342 (±0.0024)
+PLACE_CLASS W134s_less_W134 first_letter_last_met=over_30 places=5242 nats_a_place=+0.0403 (±0.0035)
+PLACE_CLASS W134s_less_W134 first_letter_last_met=within_30 places=2066 nats_a_place=+0.0581 (±0.0070)
+PLACE_CLASS W134s_less_W134 kind=letter_inside places=108429 nats_a_place=+0.0147 (±0.0007)
+PLACE_CLASS W134s_less_W134 kind=other places=29052 nats_a_place=+0.0363 (±0.0024)
+PLACE_CLASS W134s_less_W134 kind=space places=33552 nats_a_place=+0.0204 (±0.0013)
+PLACE_CLASS W134s_less_W134 kind=word_first places=29900 nats_a_place=+0.0369 (±0.0020)
+PLACE_CLASS W134s_less_W134 octave=0+ places=1009 nats_a_place=+0.0182 (±0.0142)
+PLACE_CLASS W134s_less_W134 octave=1+ places=1009 nats_a_place=+0.0310 (±0.0119)
+PLACE_CLASS W134s_less_W134 octave=2+ places=2018 nats_a_place=+0.0359 (±0.0068)
+PLACE_CLASS W134s_less_W134 octave=4+ places=4036 nats_a_place=+0.0337 (±0.0052)
+PLACE_CLASS W134s_less_W134 octave=8+ places=8008 nats_a_place=+0.0269 (±0.0037)
+PLACE_CLASS W134s_less_W134 octave=16+ places=14515 nats_a_place=+0.0281 (±0.0026)
+PLACE_CLASS W134s_less_W134 octave=32+ places=24354 nats_a_place=+0.0264 (±0.0019)
+PLACE_CLASS W134s_less_W134 octave=64+ places=38783 nats_a_place=+0.0227 (±0.0014)
+PLACE_CLASS W134s_less_W134 octave=128+ places=53237 nats_a_place=+0.0186 (±0.0012)
+PLACE_CLASS W134s_less_W134 octave=256+ places=49077 nats_a_place=+0.0199 (±0.0012)
+PLACE_CLASS W134s_less_W134 octave=512+ places=4887 nats_a_place=+0.0130 (±0.0038)
+PLACE_CLASS W134s_less_W134 recurrence=2_to_7 places=39877 nats_a_place=+0.0148 (±0.0009)
+PLACE_CLASS W134s_less_W134 recurrence=8_or_more places=3419 nats_a_place=+0.0217 (±0.0021)
+PLACE_CLASS W134s_less_W134 recurrence=once places=95033 nats_a_place=+0.0214 (±0.0010)
+PLACE_CLASS W134s_less_W134 recurrence=outside_a_word places=62604 nats_a_place=+0.0278 (±0.0013)
+FRONTIER W135b; one place open: all 0.6912 (200933 places) | acts 1.0826 books 0.6769 code 0.4128 dialogue 0.8962 harness 0.7414 logic 0.3347 science 0.5859 theory 0.4699 web 0.7541 wikidata 0.9558 || less the control's, paired: +0.0005 (±0.0002) | acts -0.0000 books -0.0003 code +0.0009 dialogue +0.0010 harness +0.0011 logic +0.0012 science -0.0002 theory +0.0009 web +0.0000 wikidata +0.0005
+PLACE_CLASS W135b_less_W135s all=all places=200933 nats_a_place=+0.0005 (±0.0002)
+PLACE_CLASS W135b_less_W135s first_letter_last_met=not_before places=22592 nats_a_place=-0.0016 (±0.0009)
+PLACE_CLASS W135b_less_W135s first_letter_last_met=over_30 places=5242 nats_a_place=+0.0063 (±0.0015)
+PLACE_CLASS W135b_less_W135s first_letter_last_met=within_30 places=2066 nats_a_place=-0.0017 (±0.0030)
+PLACE_CLASS W135b_less_W135s kind=letter_inside places=108429 nats_a_place=+0.0011 (±0.0003)
+PLACE_CLASS W135b_less_W135s kind=other places=29052 nats_a_place=+0.0010 (±0.0009)
+PLACE_CLASS W135b_less_W135s kind=space places=33552 nats_a_place=-0.0011 (±0.0004)
+PLACE_CLASS W135b_less_W135s kind=word_first places=29900 nats_a_place=-0.0003 (±0.0008)
+PLACE_CLASS W135b_less_W135s octave=0+ places=1009 nats_a_place=-0.0206 (±0.0051)
+PLACE_CLASS W135b_less_W135s octave=1+ places=1009 nats_a_place=-0.0058 (±0.0041)
+PLACE_CLASS W135b_less_W135s octave=2+ places=2018 nats_a_place=+0.0046 (±0.0024)
+PLACE_CLASS W135b_less_W135s octave=4+ places=4036 nats_a_place=-0.0001 (±0.0017)
+PLACE_CLASS W135b_less_W135s octave=8+ places=8008 nats_a_place=+0.0002 (±0.0013)
+PLACE_CLASS W135b_less_W135s octave=16+ places=14515 nats_a_place=+0.0004 (±0.0009)
+PLACE_CLASS W135b_less_W135s octave=32+ places=24354 nats_a_place=+0.0001 (±0.0007)
+PLACE_CLASS W135b_less_W135s octave=64+ places=38783 nats_a_place=+0.0007 (±0.0005)
+PLACE_CLASS W135b_less_W135s octave=128+ places=53237 nats_a_place=+0.0010 (±0.0005)
+PLACE_CLASS W135b_less_W135s octave=256+ places=49077 nats_a_place=+0.0006 (±0.0005)
+PLACE_CLASS W135b_less_W135s octave=512+ places=4887 nats_a_place=+0.0004 (±0.0016)
+PLACE_CLASS W135b_less_W135s recurrence=2_to_7 places=39877 nats_a_place=+0.0011 (±0.0004)
+PLACE_CLASS W135b_less_W135s recurrence=8_or_more places=3419 nats_a_place=+0.0017 (±0.0010)
+PLACE_CLASS W135b_less_W135s recurrence=once places=95033 nats_a_place=+0.0006 (±0.0004)
+PLACE_CLASS W135b_less_W135s recurrence=outside_a_word places=62604 nats_a_place=-0.0001 (±0.0005)
+TERRAIN_REACH W135b 12:22:28 ANSWER copy n= 2655 0.053|ANSWER reverse n= 2667 0.077|ANSWER sum n= 1579 0.757|
+W138_PRESENCE W135b 12:31:42 WORD_PRESENCE st_W135b word_starts=19351 read=224 tick=3 byte_2=0.588 prev_first=0.263 prev_word=0.223 prev2_word=0.025 target=0.037 planted=0.000 prev_len=0.361 | three or more words into a line (18520): line_words=0.179|WORD_PRESENCE_GH1 products=2048 prev_word=0.306 prev2_word=0.028 planted=0.000|WORD_PRESENCE_GH3 prev2_word between_2_3=0.014(7609) between_4_6=0.036(6879) between_7_more=0.042(3
+W138_UNIT W135b 13:03:14 cell=restricted pos1=0.423 pos2=0.538 pos3=0.533 pos4=0.519 pos5=0.545 pos6=0.452 pos7=0.404 pos8=0.289|cell=E_rings pos1=0.942 pos2=0.923 pos3=0.915 pos4=0.892 pos5=0.830 pos6=0.787 pos7=0.678 pos8=0.415|
+TERRAIN_REACH W135s 13:38:39 ANSWER copy n= 2655 0.072|ANSWER reverse n= 2667 0.057|ANSWER sum n= 1579 0.752|
+TERRAIN_WIDE W135b 13:38:57 LONG W135b: all words 2154 in lexicon 1520 (70%) writes that loop 22 of 160 longest run shared with its prompt 50 | code 295/363 (81%) web 365/449 (81%) science 242/422 (57%) books 407/511 (79%) wikidata 211/409 (51%)
+W138_PRESENCE W135s 13:47:49 WORD_PRESENCE st_W135s word_starts=19351 read=224 tick=3 byte_2=0.589 prev_first=0.264 prev_word=0.224 prev2_word=0.025 target=0.038 planted=0.000 prev_len=0.362 | three or more words into a line (18520): line_words=0.178|WORD_PRESENCE_GH1 products=2048 prev_word=0.308 prev2_word=0.028 planted=0.000|WORD_PRESENCE_GH3 prev2_word between_2_3=0.015(7609) between_4_6=0.036(6879) between_7_more=0.042(3
+TERRAIN_WIDE W135s 13:57:36 LONG W135s: all words 2169 in lexicon 1476 (68%) writes that loop 22 of 160 longest run shared with its prompt 43 | code 282/369 (76%) web 357/467 (76%) science 242/428 (56%) books 404/495 (81%) wikidata 191/410 (46%)
+W138_UNIT W135s 14:21:48 cell=restricted pos1=0.416 pos2=0.528 pos3=0.526 pos4=0.518 pos5=0.538 pos6=0.457 pos7=0.409 pos8=0.290|cell=E_rings pos1=0.942 pos2=0.923 pos3=0.915 pos4=0.892 pos5=0.831 pos6=0.790 pos7=0.677 pos8=0.415|
+TERRAIN_REACH W134s 09:16:08 ANSWER copy n= 2655 0.061|ANSWER reverse n= 2667 0.045|ANSWER sum n= 1579 0.763|
+W137_PRESENCE W134s 09:26:42 WORD_PRESENCE st_W134s word_starts=19351 read=224 tick=3 byte_2=0.592 prev_first=0.264 prev_word=0.224 prev2_word=0.025 target=0.038 planted=0.000 prev_len=0.359 | three or more words into a line (18520): line_words=0.169|WORD_PRESENCE_GH1 products=2048 prev_word=0.307 prev2_word=0.028 planted=0.000|WORD_PRESENCE_GH3 prev2_word between_2_3=0.014(7609) between_4_6=0.037(6879) between_7_more=0.043(3
+W137_UNIT W134s 09:59:54 cell=restricted pos1=0.421 pos2=0.540 pos3=0.541 pos4=0.525 pos5=0.547 pos6=0.486 pos7=0.414 pos8=0.310|cell=E_rings pos1=0.946 pos2=0.923 pos3=0.920 pos4=0.894 pos5=0.834 pos6=0.792 pos7=0.690 pos8=0.462|
+TERRAIN_REACH W134 10:37:27 ANSWER copy n= 2655 0.039|ANSWER reverse n= 2667 0.011|ANSWER sum n= 1579 0.717|
+W137_PRESENCE W134 10:48:32 WORD_PRESENCE st_W134 word_starts=19351 read=224 tick=3 byte_2=0.591 prev_first=0.267 prev_word=0.220 prev2_word=0.024 target=0.039 planted=0.000 prev_len=0.362 | three or more words into a line (18520): line_words=0.171|WORD_PRESENCE_GH1 products=2048 prev_word=0.302 prev2_word=0.027 planted=0.000|WORD_PRESENCE_GH3 prev2_word between_2_3=0.007(7609) between_4_6=0.035(6879) between_7_more=0.042(35
+TERRAIN_WIDE W134s 11:19:28 LONG W134s: all words 2150 in lexicon 1555 (72%) writes that loop 19 of 160 longest run shared with its prompt 46 | code 333/397 (83%) web 342/420 (81%) science 264/418 (63%) books 397/506 (78%) wikidata 219/409 (53%)
+W137_UNIT W134 11:19:55 cell=restricted pos1=0.132 pos2=0.169 pos3=0.195 pos4=0.273 pos5=0.324 pos6=0.330 pos7=0.290 pos8=0.234|cell=E_rings pos1=0.946 pos2=0.923 pos3=0.919 pos4=0.895 pos5=0.834 pos6=0.792 pos7=0.691 pos8=0.467|
+TERRAIN_WIDE W134 12:38:00 LONG W134: all words 2183 in lexicon 1532 (70%) writes that loop 18 of 160 longest run shared with its prompt 79 | code 349/404 (86%) web 320/423 (75%) science 247/425 (58%) books 406/517 (78%) wikidata 210/414 (50%)
