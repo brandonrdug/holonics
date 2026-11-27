@@ -1,0 +1,19 @@
+G-Z23, G-Z24 and G-Z17, the formal thread's, relayed at 09:24 UTC on November 27 (fixed 09:28Z), before W135b runs.
+G-Z23 (0.55): W135b's held text within +0.008 of W135s's, or under it.
+G-Z24 (0.5): in W135b less W135s by place class, letters inside a word within 0.005 of zero, and first letters move the most of any class,
+either way.
+G-Z17 (0.55): first letters of words last met over 30 places back stand at least 0.03 nats under those met within 30 (W135b less W135s).
+
+Fixed 2026-11-27T09:24:36Z (date -u), the lead, before W135b trains. Refs #404.
+The arm W135b: W134s's end (the strand face in its state) with its level's slow store (found-bank, rings of 2, 4, 8, 16, 32 and 64
+sections on the level's clock at one e-fold a turn, B_bank at zero; Scale::bank), 3,000 sections heard whole on e5g5; its control W135s:
+W134s's end, no change. Both read at their lap means. The premise read first: on W133s's end the bank, built on the host and untrained,
+holds the third byte of the epoch 4 and 8 back at 0.147 and 0.082 where the level after its ticks holds 0.020 and 0.010; W133s against
+W133 cost most at a word's first letter met within 30 places (+0.0815) and over 30 (+0.0646).
+G-L8 (one place open where a code is read, paired, by part):
+  (a) (0.5) W135b's held text within +0.008 a place of W135s's, or under it (G-Z23);
+  (b) (0.4) at a word's first letter, W135b less W135s stands at least 0.01 lower where the word was last met over 30 places back than
+      where it was met within 30;
+  (c) (0.3) the word two before at a word's first letter at least 0.030 at W135b's mean;
+  (d) (0.9) the bank's six fades at W135b's end as founded (held: nothing moves them);
+  (e) (0.55) the wide panel's lexicon share within 3 points of W135s's.

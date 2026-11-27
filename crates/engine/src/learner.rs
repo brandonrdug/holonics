@@ -1007,6 +1007,10 @@ impl Learner {
     pub fn section_realized(&mut self, regions: &[Region], realization: &mut dyn Realization) -> Result<Receipt> {
         // [the lead, November 24] The rings' skins formed from the fades the material holds now ([`Declaration::fade`]).
         self.field.refresh_fade()?;
+        // [the lead, November 27] And the level's, where its rings hold their fades (`Constitution::with_level_fade`).
+        if let Some(s) = self.field.scale.as_deref_mut() {
+            s.coarse.refresh_fade()?;
+        }
         let mut part = std::time::Instant::now();
         let mut mark = |k: usize| {
             SECTION_PARTS[k].fetch_add(part.elapsed().as_nanos() as u64, std::sync::atomic::Ordering::Relaxed);

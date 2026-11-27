@@ -1993,6 +1993,39 @@ mod tests {
                     assert!(plain_faces != card_faces || plain_g != card_g, "{n} places, past {past}: the strand face moves the read");
                 }
             }
+            // [the lead, November 27] The level's rings holding their fades, opened at one e-fold a turn (`Constitution::with_level_fade`).
+            let ell = i32::try_from(holonics_engine::field::div_nearest(-2651i128 << holonics_engine::field::MATERIAL_BITS, 1000)).unwrap();
+            let mut faded = field.with_level_fade(0, usize::MAX, ell).unwrap().0;
+            faded.scale.as_deref_mut().unwrap().coarse.refresh_fade().unwrap();
+            for past in [false, true] {
+                let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None, stretches: None }];
+                let (host_faces, host_g) = faded.read_and_return(&regions).unwrap();
+                let (card_faces, card_g) = card_field.read_and_return(&faded, &regions).unwrap();
+                let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
+                println!("LEVEL_FADE_PARITY places={n} past={past} faces_equal={} covector_apart={unequal} of {}", host_faces == card_faces, card_g.len());
+                assert_eq!(host_faces, card_faces, "{n} places, past {past}, the level faded: the faces are the host's");
+                assert_eq!(unequal, 0, "{n} places, past {past}, the level faded: the covector is the host's");
+            }
+            // [the lead, November 27] The level's slow store (`Scale::bank`) on rings of 2, 4 and 8 sections at one e-fold a turn, its block
+            // drawn from a fixed stride so the bank moves the read.
+            let mut banked = field.with_bank(&[2, 4, 8], ell).unwrap().0;
+            {
+                let dw = banked.declaration.width;
+                let sc = banked.scale.as_deref_mut().unwrap();
+                let (bk, bf, _) = sc.bank_offsets(dw).unwrap();
+                for (k, v) in sc.glue[bk..bf].iter_mut().enumerate() {
+                    *v = ((k as i64 * 2_654_435_761 % 4001) - 2000) as i32 * 64;
+                }
+            }
+            for past in [false, true] {
+                let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None, stretches: None }];
+                let (host_faces, host_g) = banked.read_and_return(&regions).unwrap();
+                let (card_faces, card_g) = card_field.read_and_return(&banked, &regions).unwrap();
+                let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
+                println!("LEVEL_BANK_PARITY places={n} past={past} faces_equal={} covector_apart={unequal} of {}", host_faces == card_faces, card_g.len());
+                assert_eq!(host_faces, card_faces, "{n} places, past {past}, the level banked: the faces are the host's");
+                assert_eq!(unequal, 0, "{n} places, past {past}, the level banked: the covector is the host's");
+            }
             // A passage read by one stream, its last third open: an open place's symbol adds nothing to its epoch's face.
             let open: Vec<bool> = (0..n).map(|t| 3 * t >= 2 * n).collect();
             let regions = [Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None }];
