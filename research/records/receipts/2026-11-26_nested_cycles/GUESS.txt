@@ -103,3 +103,19 @@ fades held with no covector) and its control W135s, both from W134s's end, read 
 G-Z23 (0.55). W135b's held text stands within +0.008 nats a place of W135s's, or under it.
 G-Z24 (0.5). In W135b less W135s by place class (tools/place_class_ruler.py), letters inside a word stand within 0.005 of zero,
   and first letters move the most of any class, either way.
+
+Scored 2026-11-27T14:41Z on the lead's scores of G-L7 and G-L8 (record of the class hairs §18): G-Z15 held (W134s's last 250
+sections at 1.0145); G-Z16 held (W134s's held gap +0.0221); G-Z23 held (W135b +0.0005 over W135s, every region within 0.0012);
+G-Z17 missed (first letters of words last met more than 30 places back +0.0063, within 30 −0.0017); G-Z24 half (inside a word
++0.0011 held; first letters −0.0003 did not move the most).
+
+Fixed 2026-11-27T14:41Z (date -u 14:41:38 at drafting), on the lead's question whether the bank's drive is too weak, before any of
+these reads.
+
+G-Z25 (0.6). On W135b's mean, the bank's standing part (each ring's read predicted from the level's mean row through that ring's
+  own gain, with its rise from empty at a stretch's start) holds at least three quarters of the power of the bank's read over held
+  places.
+G-Z26 (0.5). At B_bank's locus on a held half (the tension read), the bank's lanes as charged remove under 0.002 of the fine
+  covector's power at first letters, and charged with the level's row against its standing state at least twice what they remove.
+G-Z27 (0.6). W136b less W136s at first letters of words last met more than 30 places back stands within 0.005 of zero (so G-L9's
+  far first letter at 0.005 or more under misses).
