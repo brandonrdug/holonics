@@ -189,3 +189,16 @@ G-Z35 (0.55). A host ruler's ceiling for a store of the row's words: a leaky cou
   charged at each word's close, read as a face over the next word's first letter by the first letters of the words it holds,
   joined to her letter-renormalized face by one coefficient fitted on the even rows and read on the odd. It gains 0.05 nats or
   more where the word was last met past 30 places, and costs under 0.03 where the word was not met before.
+
+Scored 2026-11-27T16:06Z on the lead's word-count ruler (tools/word_cache_ruler.py, W135s's mean, 92,716 letter places on the
+407 word rows; the lead's record of November 26, §20): G-Z35 missed on its gain and held on its cost. Past 30 places the count
+adds +0.0093 at a first letter (scatter 0.0015), +0.013 at a second, +0.009 at a third, +0.0055 after; where the word is new,
+−0.0024 to +0.0003. With its coefficient set by the count's own state, +0.016 at a first letter and +0.045 at the fourth on;
+knowing whether the word recurs, +0.03 at a first letter and +0.13 to +0.19 at the second and third.
+
+Fixed 2026-11-27T16:06Z (date -u 16:06:44 at drafting), before the read. Premise read first: the 407 rows average about 230 letter
+places each, so a word met past 30 places has at most a row's few dozen earlier words to recur from.
+
+G-Z36 (0.5). The same ruler with its coefficient set by the count's state, read on a held passage carried whole over 8,000 places
+  or more (her state run on through it, never reset at a row), adds past 30 places at least twice its row read at a word's fourth
+  letter on (0.09 or more) and at least 0.03 at a first letter.
