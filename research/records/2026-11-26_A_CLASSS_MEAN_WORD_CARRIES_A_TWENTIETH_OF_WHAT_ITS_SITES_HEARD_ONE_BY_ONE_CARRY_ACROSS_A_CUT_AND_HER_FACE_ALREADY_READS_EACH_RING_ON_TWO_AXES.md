@@ -839,3 +839,24 @@ So the part store is a store of the theory's kind once its key is a product and 
 letters holds two fifths of the count's ceiling at a recurring word's third letter and over half at its later letters, past a reset, at
 `J = 4,096`. Her own field has 512 carry circles (the declaration's carry word), so a build on her circles' own composed moves stands at or
 under the read at 1,024 unless her located turns tell prefixes apart better than drawn ones.
+
+## 23. Her own carry turns cannot key the part store: the letter tells a fifth of a turn, and the rest is context (G-Z46)
+
+The formal pass's guess of 18:00 UTC (0.6): a delta store keyed by her own located turns on her 512 carry circles gains past a reset at
+most 0.8 of what a store on drawn turns at 512 circles gains on the same rows. Her gates were read whole on the joined passages
+(`read-reach … gates`, through `Constitution::strand_carry_gates`, each known site's gate `γ` on every circle at the last tick; a reading,
+16 and 48 rows in 623 s and 2,026 s at eight threads after a first form that kept every tick's cell passed 14 GB and was stopped), and a
+place's turn on a circle taken as the argument of its gate there (`carry_store_ruler.py … her:`).
+
+Her gates read a modulus of 0.32 on the mean (a circle's group of a few places) and turns of about a radian, and the letter at a place
+tells 0.22 of a turn's variance on the mean circle (0.07 to 0.50 by circle): the rest is the site's context, through its pair chart. So a
+word met again in another context composes another carry. The store on her turns, `η = 1/4` from the empty prefix, gains past a reset
++0.0034 at the third letter and +0.0069 at the rest; on drawn turns at 512 circles beside it, +0.067 (scatter 0.001) and +0.074 (0.017)
+([`carry_store_her512.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_her512.txt),
+[`carry_store_random512.txt`](receipts/2026-11-26_class_hairs/depth/carry_store_random512.txt)). G-Z46 held, at a twentieth and a tenth of
+the control.
+
+So the part store's key is its own: circles of the level turned at founding by the unit's letters and places, the same at every meeting,
+never borrowed from her located turns, which place a prefix by what it predicts in its context, as her face already reads it. At 512 such
+circles the store holds 0.29 of the count's ceiling at a recurring word's third letter and 0.25 at its later letters, past a reset; at
+4,096, 0.41 and 0.56 (§22).

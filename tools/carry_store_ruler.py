@@ -42,6 +42,15 @@ def main():
     ETA = float(charge.split(':')[1]) if charge.startswith('delta:') else None
     if ETA is not None:
         CIRCLES, LEAKS = (1024, 4096), (2048, None)
+    # TURNS (a sixth argument, the formal thread's G-Z46, November 27 18:00 UTC): `random` the drawn turns; `her:DIR,…` her own gates on her
+    # carry circles (a `read-reach … gates` output a faces dir, in step), a place's turn on a circle the argument of its gate `γ` there, so a
+    # prefix's carry is the sum of her own turns at its places; `random:J` the drawn turns on `J` circles alone, the control beside her
+    turns_arg = sys.argv[6] if len(sys.argv) > 6 else 'random'
+    her_gates = None
+    if turns_arg.startswith('her:'):
+        her_gates = turns_arg[4:].split(',')
+    if turns_arg.startswith('random:'):
+        CIRCLES = (int(turns_arg.split(':')[1]),)
     texts, halves, keys, source = [], [], [], []
     for k_, rows_f in enumerate(rows_fs):
         for local, line in enumerate(open(rows_f, encoding='utf-8')):
@@ -69,6 +78,18 @@ def main():
     nl = len(letters)
     rng = np.random.default_rng(1130)
     turns = rng.uniform(0, 2 * np.pi, (MAXLEN, nl, max(CIRCLES)))  # θ_j(u, i), the first J columns for J circles
+    angle_at = None
+    if her_gates is not None:
+        # her turn at each place of each row: arg γ on each circle, from the gates read in step with the faces dirs
+        angle_at = []
+        for gd in her_gates:
+            counts = [int(line.split('\t')[1]) for line in open(f'{gd}/gates.tsv')]
+            raw_g = np.fromfile(f'{gd}/gates.i32', dtype='<i4')
+            c2 = len(raw_g) // sum(counts)
+            raw_g = raw_g.reshape(sum(counts), c2)
+            offs = np.concatenate([[0], np.cumsum(counts)])
+            angle_at.append([np.arctan2(raw_g[offs[i]:offs[i + 1], c2 // 2:], raw_g[offs[i]:offs[i + 1], :c2 // 2]).astype(np.float32) for i in range(len(counts))])
+        CIRCLES = (angle_at[0][0].shape[1],)
     passages = defaultdict(list)
     for r, (key, stretch) in enumerate(keys):
         passages[key].append((stretch, r))
@@ -103,7 +124,12 @@ def main():
             # the carries of the word's prefixes: Φ(w_<k) for k = 1..L (the empty prefix's carry is one on every circle)
             phase = np.zeros((L_, max(CIRCLES)))
             for k in range(1, L_):
-                phase[k] = phase[k - 1] + turns[k - 1, ids[k - 1]]
+                if angle_at is None:
+                    phase[k] = phase[k - 1] + turns[k - 1, ids[k - 1]]
+                else:
+                    r0, t0, _ = owner[s + k - 1]
+                    k0, local0 = source[r0]
+                    phase[k] = phase[k - 1] + angle_at[k0][local0][t0]
             carry = np.exp(1j * phase)
             places = []
             for k in range(1, L_ + 1):
@@ -147,7 +173,7 @@ def main():
     hers = np.array(hers)
     place_k, recur, even, written = np.array(place_k), np.array(recur), np.array(even), np.array(written)
     own = -np.log(hers)
-    print(f"CARRY_STORE from={FROM} charge={'sum' if ETA is None else f'delta:{ETA}'} letter_places={len(hers)} even={int(even.sum())} odd={int((~even).sum())} her_nats_odd={own[~even].mean():.3f}", flush=True)
+    print(f"CARRY_STORE turns={turns_arg.split(':')[0]} from={FROM} charge={'sum' if ETA is None else f'delta:{ETA}'} letter_places={len(hers)} even={int(even.sum())} odd={int((~even).sum())} her_nats_odd={own[~even].mean():.3f}", flush=True)
     for J in CIRCLES:
         # the store's face is `softmax(β r)` over the letters (the first form, its positive part's share, drowned the one matching item's
         # read under the scatter of the 51 others): the written letter's share under each leak and each β, and the octave of the read's

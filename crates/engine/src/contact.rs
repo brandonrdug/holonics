@@ -241,6 +241,9 @@ pub(crate) struct StrandForward {
     pub(crate) tower: Option<crate::field::scale::ScalePass>,
     /// Whether the openings took the row of the second place before ([`crate::field::Region::second`]).
     pub(crate) second: bool,
+    /// [measurement; the lead, November 27] The last tick's carry gates over the joined sites (`[sites][2C]`, the tick cell's `gam`),
+    /// kept where the ticks are not, for [`Constitution::strand_carry_gates`].
+    pub(crate) gates: Vec<i64>,
 }
 
 /// [definition; agent-inferred, November 1] **A head's resonance classes over a region** (the
@@ -1864,6 +1867,16 @@ impl Constitution {
         Ok(self.strand_pass(classes, false, past)?.faces)
     }
 
+    /// [measurement; the lead, November 27, the formal thread's G-Z46] **A strand's carry gates, for a ruler on the host**: each known
+    /// site's gate `γ` on every carry circle at the last tick (`[n][2C]`, real parts then imaginary, on `2^(−30)`), as
+    /// [`Constitution::strand_pass`] formed it from the site's own pair chart, so a ruler outside the machine can compose a unit's turns
+    /// on her own circles. A reading: the state is the same with it.
+    pub fn strand_carry_gates(&self, classes: &[usize], past: bool) -> Result<Vec<i64>> {
+        let pass = self.strand_pass(classes, false, past)?;
+        let (c2, n) = (2 * self.declaration.carry, classes.len());
+        Ok(pass.gates.get(..n * c2).map(<[i64]>::to_vec).unwrap_or_default())
+    }
+
     /// [measurement; the lead, November 21] **A strand's open rows, for a ruler on the host**: at every tick and head, each open place's
     /// row as [`Constitution::strand_pass`] formed it, each source's place and its share of the row on `2^(−63)` (`[ticks][heads][n]`,
     /// the open place at place `p` in slot `p`). Where a far operand's weight goes at the place that needs it (the record of November 21
@@ -2051,6 +2064,8 @@ impl Constitution {
             }
             if keep {
                 out.ticks.push(cell);
+            } else {
+                out.gates = std::mem::take(&mut cell.gam);
             }
         }
         out.faces = x[n * dw..].chunks_exact(dw).map(|yt| self.readout_face(yt, &reaches)).collect::<Result<_>>()?;
