@@ -380,3 +380,21 @@ This is the depth reads' finding (G-Z3: the word two before at 0.025) seen from 
 rhythm and not its word, so what the level hands on cannot tell which word comes. The receipt kept inside the level (`Scale::inside`,
 this day) is built and on the card (its parity reads the host's bits in both forms), and its arm from the line's end reads, beside the
 face, whether the share at a word's first letter falls.
+
+## 12. Two more laps heard whole (G-L4)
+
+W130w from W129w's end and W131w from W130w's, 3,000 sections each with no change, read at their means
+([`GUESS_L4.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L4.txt), fixed 20:26:57 UTC; reads
+[`G-L4_reads.txt`](receipts/2026-11-26_class_hairs/laps/G-L4_reads.txt)). Her writes on the theory panel hold no sentence at either
+lap (shown to Brandon raw; the panel's twelve theory and eight logic prompts); the words in the register's lexicon are 82% and 83% at
+W131w against 88% and 86% at W130w.
+
+| G-L4 | read at W131w's mean, against W129w's, paired | guess |
+|---|---|---|
+| (a) held text | 0.6781 a place over 200,933 places, −0.0043 (±0.0006) | held |
+| (b) text regions | 7 of 10 under: acts −0.0070, dialogue −0.0227, harness −0.0068, logic −0.0002, science −0.0071, theory −0.0043, web −0.0085; books +0.0067, code +0.0004, wikidata +0.0062 | missed (eight asked) |
+| (c) the wave | 0.8758 (W129w 0.8846), −0.0089 | held |
+| (d) the wide panel's lexicon share | 71% (W129w 72%) | held |
+
+The line goes on from W131w's end. The arm that keeps the level's receipt inside the level (G-L5,
+[`GUESS_L5.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L5.txt)) trains from it beside the line's next lap.
