@@ -860,3 +860,41 @@ So the part store's key is its own: circles of the level turned at founding by t
 never borrowed from her located turns, which place a prefix by what it predicts in its context, as her face already reads it. At 512 such
 circles the store holds 0.29 of the count's ceiling at a recurring word's third letter and 0.25 at its later letters, past a reset; at
 4,096, 0.41 and 0.56 (§22).
+
+## 24. The slow store's second lap carries no news and leaves the line; her epochs cut a recurring word alike in a little over half its meetings; a store charged by the joined face's covector spends itself on what her face misses (G-L9, G-Z27, G-Z47, G-Z48)
+
+**G-L9** (W136b, W135b's end with the slow store, against W136s, W135s's end; [`GUESS_L9.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L9.txt),
+[`G-L9_reads.txt`](receipts/2026-11-26_class_hairs/laps/G-L9_reads.txt)). The writes first: on the wide panel 72% of words in the lexicon
+on both arms, 18 of 160 writes loop on both, and the longest run shared with its prompt is 49 places against 74; the writes themselves
+went to Brandon whole, beside each other. The training code runs 1.0006 times the control's over the lap (0.9998 to 1.0012 in every 250
+sections, no trend). Loudness 22.789 octaves against 22.728 over every region, the temperature −0.0245 against −0.0256.
+
+| G-L9 | read | guess |
+|---|---|---|
+| (a) held text within +0.002 | +0.0004 (±0.0003), every region within 0.0022 | held |
+| (b) a first letter met over 30 places back ≥ 0.005 under the control | +0.0034 (±0.0017) | missed |
+| (c) `B_bank`'s root mean square ≥ 1.5 times W135b's | 239,966 against 183,259 on `2^(−24)`, 1.31 times | missed |
+| (d) the word two before ≥ 0.028 | 0.025 (control 0.025) | missed |
+
+G-Z27 held (+0.0034 within 0.005). The fades stand at their founding. So the store on `τ¹` leaves the line by its guess's rule: two laps
+and no news a first letter reads, while §21 to §23 locate what a store keyed by a unit's identity carries past a reset. The line goes on
+from W134's end (held text 0.6698).
+
+**Her epochs on a recurring word** (G-Z47, the formal pass, 0.5, missed; `tools/epoch_cut_ruler.py`,
+[`epoch_cut_long.txt`](receipts/2026-11-26_class_hairs/depth/epoch_cut_long.txt)). On the sixteen held passages at 3,700 places, read at
+W135s's lap mean (`read-strand-cut … past`, three threads: eight passed 12 GB in ninety seconds beside the lap's reads), her epochs span
+3.74 places on the mean. Of 4,743 words met again in their row, the later meeting's anchors stand at the same offsets as the earlier's in
+0.559 (0.566 of the 3,012 of three letters or more), against 0.7 asked; by length from 0.67 to 0.75 for two and three letters met within
+30 places down to 0.32 to 0.40 for six to eight letters met over 30 back, against chance of 0.36 for three letters, 0.15 for four and 0.07
+for six. Her cut follows the word well over chance and still moves in nearly half its meetings, as predicted input goes dark and its
+landmarks shift. By the pass's own branch, the store is keyed with no cut: by the carries of the last `k` places for `k = 1` to `K`, its
+delta charge saturating the short suffixes.
+
+**The joined face's covector at the store** (G-Z48, the formal pass, 0.55, half held; `tools/joint_store_ruler.py`,
+[`joint_store_joined.txt`](receipts/2026-11-26_class_hairs/depth/joint_store_joined.txt)). The store of §22 on drawn turns at 512 circles,
+`η = 1/4`, joined in the log chart, `p ∝ q · e^(g r)`, one slope chosen on the fitting half (0.5 for both charges, both ways). Charged by its
+own news, it gains past a reset −0.0042, −0.0126, +0.0171 and +0.0287 at the first, second, third and later letters; charged by the joined
+face's covector, `F ← F + η g (e − p_joined) χ`, +0.0043, +0.0148, +0.0344 and +0.0198; over every letter place +0.0036 against +0.0093 and
++0.0103, two and a half to nearly three times as much, with a word's first letter met within her reach gaining +0.047 where the own charge
+left +0.0006. The third letter gains 0.017 more and the later letters 0.009 less, where her face already reads a recurring word at 0.19
+nats. The joint charge spends the field on what her face misses, as the pass's law says.

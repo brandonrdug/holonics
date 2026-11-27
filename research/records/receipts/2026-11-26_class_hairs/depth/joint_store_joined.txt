@@ -1,0 +1,107 @@
+JOINT_STORE circles=512 eta=0.25 letter_places=180575 her_nats_odd=1.443
+JOINT_STORE walked joint slope=0.25
+JOINT_STORE walked joint slope=0.5
+JOINT_STORE walked joint slope=1.0
+JOINT_STORE walked joint slope=2.0
+JOINT_STORE walked joint slope=4.0
+JOINT_STORE walked joint slope=8.0
+JOINT_STORE charge=own fit=even_to_odd slope=0.5 her_nats=1.443 joined_nats=1.440 gain=+0.0036
+JOINT_STORE charge=own fit=even_to_odd place=1 part=within_30 places=959 her_nats=1.967 gain=+0.0523 (±0.0015)
+JOINT_STORE charge=own fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.373 gain=+0.0006 (±0.0005)
+JOINT_STORE charge=own fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.379 gain=-0.0075 (±0.0005)
+JOINT_STORE charge=own fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.021 gain=-0.0045 (±0.0008)
+JOINT_STORE charge=own fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.592 gain=+0.0566 (±0.0023)
+JOINT_STORE charge=own fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.886 gain=+0.0250 (±0.0010)
+JOINT_STORE charge=own fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.956 gain=-0.0216 (±0.0011)
+JOINT_STORE charge=own fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.545 gain=-0.0148 (±0.0021)
+JOINT_STORE charge=own fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.274 gain=+0.0459 (±0.0021)
+JOINT_STORE charge=own fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.562 gain=+0.0344 (±0.0011)
+JOINT_STORE charge=own fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.891 gain=-0.0183 (±0.0010)
+JOINT_STORE charge=own fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.322 gain=+0.0178 (±0.0024)
+JOINT_STORE charge=own fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.178 gain=+0.0206 (±0.0025)
+JOINT_STORE charge=own fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.191 gain=+0.0170 (±0.0004)
+JOINT_STORE charge=own fit=even_to_odd place=rest part=not_before places=22928 her_nats=0.957 gain=-0.0034 (±0.0003)
+JOINT_STORE charge=own fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.555 gain=+0.0269 (±0.0009)
+JOINT_STORE charge=own fit=odd_to_even slope=0.5 her_nats=1.397 joined_nats=1.393 gain=+0.0036
+JOINT_STORE charge=own fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.763 gain=+0.0540 (±0.0015)
+JOINT_STORE charge=own fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.315 gain=+0.0006 (±0.0005)
+JOINT_STORE charge=own fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.282 gain=-0.0066 (±0.0005)
+JOINT_STORE charge=own fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.051 gain=-0.0039 (±0.0008)
+JOINT_STORE charge=own fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.434 gain=+0.0472 (±0.0022)
+JOINT_STORE charge=own fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.888 gain=+0.0207 (±0.0010)
+JOINT_STORE charge=own fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.965 gain=-0.0255 (±0.0012)
+JOINT_STORE charge=own fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.614 gain=-0.0105 (±0.0021)
+JOINT_STORE charge=own fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.220 gain=+0.0444 (±0.0020)
+JOINT_STORE charge=own fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.535 gain=+0.0331 (±0.0011)
+JOINT_STORE charge=own fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.899 gain=-0.0226 (±0.0011)
+JOINT_STORE charge=own fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.406 gain=+0.0163 (±0.0023)
+JOINT_STORE charge=own fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.152 gain=+0.0192 (±0.0024)
+JOINT_STORE charge=own fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.170 gain=+0.0162 (±0.0004)
+JOINT_STORE charge=own fit=odd_to_even place=rest part=not_before places=22325 her_nats=0.920 gain=-0.0033 (±0.0003)
+JOINT_STORE charge=own fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.606 gain=+0.0306 (±0.0009)
+JOINT_STORE charge=own place=1 part=earlier_stretch gain_mean=-0.0042 halves_scatter=0.0005
+JOINT_STORE charge=own place=1 part=not_before gain_mean=-0.0070 halves_scatter=0.0009
+JOINT_STORE charge=own place=1 part=over_30 gain_mean=+0.0006 halves_scatter=0.0000
+JOINT_STORE charge=own place=1 part=within_30 gain_mean=+0.0531 halves_scatter=0.0016
+JOINT_STORE charge=own place=2 part=earlier_stretch gain_mean=-0.0126 halves_scatter=0.0043
+JOINT_STORE charge=own place=2 part=not_before gain_mean=-0.0235 halves_scatter=0.0039
+JOINT_STORE charge=own place=2 part=over_30 gain_mean=+0.0229 halves_scatter=0.0042
+JOINT_STORE charge=own place=2 part=within_30 gain_mean=+0.0519 halves_scatter=0.0094
+JOINT_STORE charge=own place=3 part=earlier_stretch gain_mean=+0.0171 halves_scatter=0.0015
+JOINT_STORE charge=own place=3 part=not_before gain_mean=-0.0205 halves_scatter=0.0043
+JOINT_STORE charge=own place=3 part=over_30 gain_mean=+0.0337 halves_scatter=0.0013
+JOINT_STORE charge=own place=3 part=within_30 gain_mean=+0.0451 halves_scatter=0.0015
+JOINT_STORE charge=own place=rest part=earlier_stretch gain_mean=+0.0287 halves_scatter=0.0037
+JOINT_STORE charge=own place=rest part=not_before gain_mean=-0.0034 halves_scatter=0.0001
+JOINT_STORE charge=own place=rest part=over_30 gain_mean=+0.0166 halves_scatter=0.0008
+JOINT_STORE charge=own place=rest part=within_30 gain_mean=+0.0199 halves_scatter=0.0014
+JOINT_STORE charge=joint fit=even_to_odd slope=0.5 her_nats=1.443 joined_nats=1.434 gain=+0.0093
+JOINT_STORE charge=joint fit=even_to_odd place=1 part=within_30 places=959 her_nats=1.967 gain=+0.0739 (±0.0078)
+JOINT_STORE charge=joint fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.373 gain=+0.0471 (±0.0028)
+JOINT_STORE charge=joint fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.379 gain=-0.0156 (±0.0028)
+JOINT_STORE charge=joint fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.021 gain=-0.0002 (±0.0053)
+JOINT_STORE charge=joint fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.592 gain=+0.0319 (±0.0035)
+JOINT_STORE charge=joint fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.886 gain=+0.0278 (±0.0014)
+JOINT_STORE charge=joint fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.956 gain=-0.0169 (±0.0013)
+JOINT_STORE charge=joint fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.545 gain=+0.0095 (±0.0030)
+JOINT_STORE charge=joint fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.274 gain=+0.0075 (±0.0024)
+JOINT_STORE charge=joint fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.562 gain=+0.0289 (±0.0014)
+JOINT_STORE charge=joint fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.891 gain=-0.0078 (±0.0008)
+JOINT_STORE charge=joint fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.322 gain=+0.0333 (±0.0026)
+JOINT_STORE charge=joint fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.178 gain=+0.0097 (±0.0027)
+JOINT_STORE charge=joint fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.191 gain=+0.0112 (±0.0005)
+JOINT_STORE charge=joint fit=even_to_odd place=rest part=not_before places=22928 her_nats=0.957 gain=-0.0010 (±0.0002)
+JOINT_STORE charge=joint fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.555 gain=+0.0179 (±0.0008)
+JOINT_STORE charge=joint fit=odd_to_even slope=0.5 her_nats=1.397 joined_nats=1.386 gain=+0.0103
+JOINT_STORE charge=joint fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.763 gain=+0.0702 (±0.0064)
+JOINT_STORE charge=joint fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.315 gain=+0.0478 (±0.0026)
+JOINT_STORE charge=joint fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.282 gain=-0.0269 (±0.0027)
+JOINT_STORE charge=joint fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.051 gain=+0.0089 (±0.0050)
+JOINT_STORE charge=joint fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.434 gain=+0.0174 (±0.0031)
+JOINT_STORE charge=joint fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.888 gain=+0.0272 (±0.0014)
+JOINT_STORE charge=joint fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.965 gain=-0.0139 (±0.0015)
+JOINT_STORE charge=joint fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.614 gain=+0.0202 (±0.0030)
+JOINT_STORE charge=joint fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.220 gain=+0.0153 (±0.0031)
+JOINT_STORE charge=joint fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.535 gain=+0.0308 (±0.0014)
+JOINT_STORE charge=joint fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.899 gain=-0.0082 (±0.0008)
+JOINT_STORE charge=joint fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.406 gain=+0.0355 (±0.0024)
+JOINT_STORE charge=joint fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.152 gain=+0.0144 (±0.0035)
+JOINT_STORE charge=joint fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.170 gain=+0.0117 (±0.0005)
+JOINT_STORE charge=joint fit=odd_to_even place=rest part=not_before places=22325 her_nats=0.920 gain=-0.0009 (±0.0002)
+JOINT_STORE charge=joint fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.606 gain=+0.0216 (±0.0009)
+JOINT_STORE charge=joint place=1 part=earlier_stretch gain_mean=+0.0043 halves_scatter=0.0091
+JOINT_STORE charge=joint place=1 part=not_before gain_mean=-0.0212 halves_scatter=0.0113
+JOINT_STORE charge=joint place=1 part=over_30 gain_mean=+0.0475 halves_scatter=0.0007
+JOINT_STORE charge=joint place=1 part=within_30 gain_mean=+0.0721 halves_scatter=0.0036
+JOINT_STORE charge=joint place=2 part=earlier_stretch gain_mean=+0.0148 halves_scatter=0.0107
+JOINT_STORE charge=joint place=2 part=not_before gain_mean=-0.0154 halves_scatter=0.0031
+JOINT_STORE charge=joint place=2 part=over_30 gain_mean=+0.0275 halves_scatter=0.0006
+JOINT_STORE charge=joint place=2 part=within_30 gain_mean=+0.0246 halves_scatter=0.0145
+JOINT_STORE charge=joint place=3 part=earlier_stretch gain_mean=+0.0344 halves_scatter=0.0022
+JOINT_STORE charge=joint place=3 part=not_before gain_mean=-0.0080 halves_scatter=0.0003
+JOINT_STORE charge=joint place=3 part=over_30 gain_mean=+0.0298 halves_scatter=0.0018
+JOINT_STORE charge=joint place=3 part=within_30 gain_mean=+0.0114 halves_scatter=0.0078
+JOINT_STORE charge=joint place=rest part=earlier_stretch gain_mean=+0.0198 halves_scatter=0.0037
+JOINT_STORE charge=joint place=rest part=not_before gain_mean=-0.0009 halves_scatter=0.0001
+JOINT_STORE charge=joint place=rest part=over_30 gain_mean=+0.0115 halves_scatter=0.0005
+JOINT_STORE charge=joint place=rest part=within_30 gain_mean=+0.0121 halves_scatter=0.0047
