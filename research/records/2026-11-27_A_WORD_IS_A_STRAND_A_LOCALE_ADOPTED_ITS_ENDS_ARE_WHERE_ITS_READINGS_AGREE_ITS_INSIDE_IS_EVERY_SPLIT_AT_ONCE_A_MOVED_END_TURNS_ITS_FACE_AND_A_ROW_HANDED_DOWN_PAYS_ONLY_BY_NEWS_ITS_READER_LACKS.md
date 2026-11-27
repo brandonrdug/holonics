@@ -1,6 +1,6 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z48 fixed before their reads; the formal thread,
+[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z50 fixed before their reads; the formal thread,
 November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
@@ -506,7 +506,19 @@ reads the symbol. Its confidence is `λ = a ρ(s)`, `ρ` the store's read power 
 with `∂L/∂a = ρ (E_p[ℓ_store] − ℓ_store(target))`: the slope rises where the store gives the target more than the joined face
 expects. G-Z48 reads the joined charge against the store's own delta.
 
-## 21. Owners
+## 21. Her epochs move between meetings, so the part is keyed with no cut and its depth is located (the lead's epoch read, 19:28 UTC)
+
+G-Z47 missed: her epochs, 3.74 places on the mean, cut a word met again at the same offsets in 0.559 of 4,743 meetings, from 0.67
+to 0.75 for short words met near to 0.32 to 0.40 for long words met far, where a predicted input goes dark and its landmarks move.
+By §20's branch the part is keyed with no cut: at each place, the carries of the last `k` places, over every byte class.
+
+**The law (0.6).** A suffix address charged once never pays, and its charge is noise of about `√(N/J)` in every other read, so
+its depth is located as a chain becomes a part (§16): the address of length `k + 1` is charged only where the address of length
+`k` already reads above the field's own noise, a grain taken from the store's own spread and never handed by number. Beside it,
+as a ruler, the cap is `k ≤ 8`, two of her epochs: the unit and the one before it, the interaction a level adds (§12). The widths
+`J = 4,096` and `J = 512` (her carry word) are read side by side as the part's capacity price. G-Z49 and G-Z50 are fixed.
+
+## 22. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
@@ -515,5 +527,5 @@ expects. G-Z48 reads the joined charge against the store's own delta.
   `delta_charge_zero_at_read` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z48.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z50.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
