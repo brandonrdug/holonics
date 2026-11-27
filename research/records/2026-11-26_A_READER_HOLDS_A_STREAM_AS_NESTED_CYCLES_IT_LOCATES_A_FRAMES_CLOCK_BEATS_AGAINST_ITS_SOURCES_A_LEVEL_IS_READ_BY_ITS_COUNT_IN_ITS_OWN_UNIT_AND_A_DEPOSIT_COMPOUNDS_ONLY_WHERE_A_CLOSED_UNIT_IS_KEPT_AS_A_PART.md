@@ -370,3 +370,27 @@ ceiling is a count ruler read first: the code of the next epoch's first byte giv
 code alone, counted on even rows with backoff and read on odd, which is the most any reader across the join can tell. Her depth (the
 word two before, 0.025 on W129w) and her writes stand beside it. G-Z11 and G-Z12 are in `GUESS.txt`, each fixed against the ceiling
 it names, none of which was read.
+
+## 15. The join's anchor is the level's standing state, and the face's width has no cut under its whole (November 27)
+
+**The reads** (the lead, on W132i's end). The strand face on rings 2, 3 and 4, restricted to its leading directions on one half and
+read on the other both ways, holds the bytes at places 1 to 8 at 0.15 to 0.49 at width 16, 0.30 to 0.58 at 32, 0.62 down to 0.35 at
+64, 0.80 down to 0.41 at 128 and 0.94 down to 0.44 at its full width of 1,344, with spreads of 0.000 to 0.014. G-Z11 held: at 64 the
+restricted face keeps 0.655 to 0.779 of the full face's read at places 1 to 6. A count ruler of the join (the spelling of the epoch
+before and the place's distance) tells nothing past a unigram on the 407 word rows, a null that no planted join has yet proved. The
+join's own codes on W132i stand near the counted unigram: 3.86 nats at word starts against 3.81, 3.21 against 3.30 inside a word,
+3.11 against 3.04 at other bytes.
+
+**The correction** (0.8). `Z_j` of §12 is the unit read from the level's standing state, the mean of its rows, which is its own
+marginal over units, and never from a row at zero. No store is at rest, and a level with nothing crossing a join still holds its
+steady state; a zero row is the reader's bias alone (4.40 nats at word starts), so the 0.88 unsaid share read on W132i was mostly
+the distance from that bias to a unigram. With the anchor corrected, `1 − n` is what the join tells past the level's own prior, and
+on W132i it stands near zero at word starts, which is her depth of one read at the join.
+
+**The width.** By §14's criterion the least width is the full face: no direction of the strand face can be dropped at this read's
+resolution. A restriction is then a cost, priced per doubling (64 to 128 buys about 0.15 a doubling at places 1 to 6, 128 to the full
+face about 0.05), and the arm that reads the width tries the face unrestricted, the moment itself as the level's unit, unless its card
+cost, projected first, binds. The lead's first arm keeps 64 so that the trained level carries over, one change against its control.
+
+**The ruler's null** is proved by a planted join on the same shapes (method rule 11): the next epoch's first byte set by the last
+letter of the epoch before on a share of rows. A larger text raises its ceiling and proves nothing alone.
