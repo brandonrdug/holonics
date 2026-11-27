@@ -351,3 +351,14 @@ B by η (c(M_(k+1)) − c(P_k)) with no leak; G-Z55 is scored on that form, its 
 G-Z56 (0.5). In the same ruler, passing the deeper mixture through where the deeper address reads at the field's background
   (M_k = P_k wherever depth k + 1 reads at √(‖F‖²/J) or under), with the charge unchanged at every depth, gains at least 0.01 nats
   more at a recurring word's third letter past a reset than the form without it.
+
+Scored 2026-11-27T20:37Z on the lead's stop-weight store at J = 512 (tools/tree_store_ruler.py, tree_store_512.txt; B with no
+leak; both halves chose τ = 4 and g = 0.5, the low edge of each grid, so the grid bounds the fit): G-Z55 missed. Past a reset it
+gains +0.032 (scatter 0.011) at the third letter, 0.44 of the global form's +0.072, +0.034 after it, and −0.029 and −0.017 at the
+first and second letters; over every byte place −0.0060 (0.0045), letters −0.0092, spaces +0.0070, other −0.0042. The cost falls
+on first letters and new words, where the stop weight stands at its prior and half of each address's mass goes to a deeper read
+at the background.
+Read beside it, the word-keyed store at J = 4,096 (the run since the last space, the joint charge, read-power slopes): past a reset
++0.095 (0.003) at the third letter and +0.088 (0.009) after it, 0.42 and 0.30 of the count ceiling's +0.229 and +0.290, with
++0.027 and +0.005 at the second and first; over every byte place +0.0097 (0.0047), letters +0.0103, spaces +0.0047, other +0.0165.
+G-Z49 is scored when the suffix key at 4,096 ends.

@@ -570,6 +570,15 @@ weighs it by its parent's stop weight alone, so at a word's first meetings half 
 may stand at the background. Depth located at the read repairs it without touching the charge: where depth `k + 1` reads at the
 field's background, `M_k = P_k`. G-Z56 is fixed on that one change.
 
+The lead's read (20:37 UTC) scores G-Z55 as missed. Past a reset the stop-weight store gains +0.032 at the third letter, 0.44 of
+the global form's +0.072, and it loses at the first and second letters (−0.029, −0.017) and over every byte place (−0.0060). Both
+halves took the low edge of each grid (`τ = 4`, `g = 0.5`), so the grid bounds the fit. The loss falls where the dilution reading
+put it: on first letters and new words, where every stop weight stands at its prior. A mixture that weighs a depth by a stop
+weight alone spends its first meetings learning what the depth's own read power already holds. The read power is the evidence
+the address carries, and the stop weight should carry only the news beyond it. Beside it, the word-keyed store at `J = 4,096`
+gains +0.095 at the third letter past a reset and +0.088 after it, 0.42 and 0.30 of the count ceiling, and +0.0097 over every
+byte place.
+
 ## 24. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
