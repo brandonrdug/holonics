@@ -119,3 +119,28 @@ G-Z26 (0.5). At B_bank's locus on a held half (the tension read), the bank's lan
   covector's power at first letters, and charged with the level's row against its standing state at least twice what they remove.
 G-Z27 (0.6). W136b less W136s at first letters of words last met more than 30 places back stands within 0.005 of zero (so G-L9's
   far first letter at 0.005 or more under misses).
+
+Scored 2026-11-27T14:59Z on the lead's bank tension read (W135b's mean, 407 word rows, tools/bank_tension_ruler.py):
+G-Z25 held (the standing part holds 0.847 of the charged bank's power; by ring 0.585 to 0.882, rising with the period); G-Z26
+missed (the bank, charged and centered, removes 0.0000 of the covector's power everywhere and at first letters; a planted tenth
+reads 0.097 and 0.092).
+
+Fixed 2026-11-27T14:59Z (date -u 14:59:41 at drafting), before either read.
+
+G-Z28 (0.65). Read at first letters with a map per sixth of the news phase (the full form up to its harmonic basis, each map fitted
+  on its own places, one half fitted and the other read), the bank removes under 0.002 of the covector's power, where a planted
+  tenth in that form reads 0.05 or more.
+G-Z29 (0.6). The count ruler's join on the same rows with words as units (cut at spaces) reads an unsaid share at word starts under
+  0.9, against 0.998 on her epochs.
+
+Scored 2026-11-27T15:04Z: G-Z29 missed. With words as units on the same 407 rows the count ruler reads 1.007 at word starts (3.843 nats against
+the unigram's 3.817), 0.965 inside a word and 0.983 elsewhere (the lead's join_count_words.txt): about 30,000 training words give a
+word bigram nothing to stand on, so the null was the ruler's counts and not her units. The guess was fixed against a ruler whose
+ceiling on real rows had not been read, the lesson of G-Z8 again.
+
+Fixed 2026-11-27T15:04Z (date -u 15:04:52 at drafting), before either read; the counts are taken from the store's own training text and read on the
+same held rows, by place class.
+
+G-Z30 (0.7). Words as units, counted on about 50 MB of the store's web and books, read an unsaid share at word starts under 0.9.
+G-Z31 (0.5). Her epochs' strings counted in the same raw text (the unit before as a string, and the unit's places after it) read
+  an unsaid share at word starts within 0.05 of the words' read.
