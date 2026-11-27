@@ -1,10 +1,11 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with four finite statements in Lean and seven guesses fixed before their reads; the formal thread,
-November 27, on Brandon's message of 07:57 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
+[interpretation at weight 0.7, with sixteen finite statements in Lean and the guesses G-Z13 to G-Z43 fixed before their reads; the formal thread,
+November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
-and the form of the level's slow store.
+the form of the level's slow store, and, where her hearing ends, a level that holds its units whole by their own shape, a chain
+becoming a part of its own once whole is cheaper than its pieces.
 
 ## 1. The lens
 
@@ -340,11 +341,134 @@ coefficient, gains 0.05 nats or more past 30 places and costs under 0.03 where t
 since her address needs a run of three and a recurring word's second and third letters are where a level heard by address pays
 most. Under 0.02 past 30, depth does not show at first letters and the level is read whole word by whole word.
 
-## 15. Owners
+## 15. Where her hearing ends, a word held whole pays from its third letter on, and agreement is priced by placement (the lead's joined read, 16:57 UTC)
+
+Her declaration's reach, 3,771 places, is a declared extent: the most sites a region may span, over which the founding builds
+each ring's phasor table (`min(period, reach)` residues), and a longer region is refused. It is no aliasing. Her sixteen rings are
+the powers of two to 4,096 and of three to 6,561 (`navigator::ring_periods(16, 3771)`), whose phases all return only after
+26,873,856 places (`her_rings_alias`). What bounds her hearing is each ring's skin, `e^(−2π d/P)`, one e-fold a radian of turn
+(`navigator::skin_of`): a ring keeps `e^(−1)` of a place within `P/(2π)` places (`skin_heard_iff`), about 650 for 4,096 and 1,040
+for 6,561, and at a whole period, where its phase first returns, it keeps `e^(−2π)`, about 0.0019 (`skin_at_period`). This section
+first read the reach as two coprime rings of 9 and 419 aliasing at their product, from how 3,771 factors and before the
+declaration's owner was read; that missed, and so did the same statement in a note to the lead at 16:13 UTC. At
+her reach, on sixteen held passages read as 3,700-octet rows against the same text cut into 300-octet rows, a leaky count of the
+words met earlier gains past 30 places +0.0028 at a first letter and +0.0271 at the fourth on (G-Z36 missed as a variant), since
+her face already holds a recurring word there (its fourth letter on at 0.182 nats). The lead then joined four stretches of each
+passage (14,800 places, 180,575 letter places), her face reset at each stretch and the count carried across. Where a word was
+last met in an earlier stretch, with no address left in her, her code is 3.02, 1.55, 1.32 and 0.56 nats at the first, second,
+third letter and the rest, and the count with its coefficient set by its own state gains +0.0083, +0.0435, +0.229 and +0.290
+(scatter 0.0041, 0.0071, 0.005, 0.023); inside her reach the same count gave +0.02 to +0.03 at those letters. The lead's G-J1
+held. The level's worth stands where the address law of §14 put it: where the level below no longer hears the word (past its
+skins, or across a reset), from the letter on which the prefix tells the word.
+
+The lens of the tensor-spectrum paper of November 24, which Brandon brought (another thread holds its record), composes with this. Agreement
+costs the span its holders cover, never how many agree: on a line, the distance between the outermost places, and a copy placed
+inside is free (`span_insert_inside`, `span_le_insert`). A word's ends pay and its inside is free (§3). An address is a placement:
+the price of a shared bit is the distance between where two places sit. On her rings a place is placed by its age: each heard ring
+turns about one radian across its skin, and its phase returns only where its skin has spent the place, so no recurrence of hers
+is met by a returning phase. Past the skins of her coarsest rings, or across a reset of her state as in the joined read, a word is
+placed only by what carries it farther: a level whose clock counts closed units, where a lag of thousands of places is a lag of
+hundreds of units.
+
+**The law (0.65).** The level's part store is a fast contact of the level, deposited by its own closed units: at each unit's
+close, the outer product of the unit's strand face with its own terms is charged into a fixed field of the level's width, and the
+field leaks at its own rate. At a place, the open prefix's strand face pairs with that field, and the continuation the paired
+faces carry is the level's face over the next letter, with her face as the second path (§16). It passes the test of [stores and
+caches](../../CLAUDE.md#stores-and-caches): a balance of charge and leak, a read that costs a flux through a port, and rows
+shared by every unit, whose number never grows with the units met. Its capacity is its width over its faces' overlap, and the
+ruler's ceiling (+0.23 to +0.29 a letter past a reset) is what it can buy at most. Its key, the strand face, pairs as a bag on
+the first read; §18 keys it by the carry, the product of the prefix's moves.
+
+The lead read the October 26 coupled bank beside it: a grid of 64 slots written by the delta rule through key and query maps opened
+on one draw, which before any learning returned what followed the present face the last time it arrived, and was retired as a
+copier, the eighth recurrence of recitation counted as generation. What differs, by the recitation reason: the key is the unit's
+own strand face, the machine's encoding, with no maps opened on a draw; the field is of fixed width with shared rows, its own
+charge and leak, and a read through a port; and the part is accepted on held text past a reset, beside her writes and their share
+of loops, never on a lookup benchmark or on seen material. The premise it must meet: the store line draws stretches of 8 to
+1,022 places from random places in documents, so no ring and no level has met a recurrence past about a thousand places in
+training, and a part charged inside a stretch could only re-say her address. The part earns its ceiling only where the trainer
+walks a document's stretches in order with the part carried across each crossing (a slow variable read at one crossing and joined
+at the next, in the learner's state) and the covector reaches it there, which changes the terrain's draw as much as it adds a
+part. The guesses G-Z37 to G-Z41 are fixed before either read.
+
+## 16. A chain becomes its own part once meeting it whole costs less than rebuilding it, and a reader keeps both paths (Brandon's lens, 17:07 UTC)
+
+**The lens.** An acronym is a chain compressed into its own unit. "lol" and "lmao" are read as the sounds they make, not unfolded
+into their phrases, and they are understood said aloud. A reader new to one takes the longer path, translating it through the full
+phrase, and guesses a colloquial one from its context; in science an acronym can mean anything outside its context. Words have
+shapes of their own, and a board, like Scrabble's, is a budget that constrains which words fit.
+
+**The law (0.7).** In physics this is a bound state. Atoms that keep meeting in one arrangement move as one molecule; the inside
+is still there and shows when the molecule is struck hard enough. A chain of parts becomes a part of its own once meeting it whole
+costs a reader less, over its meetings, than rebuilding it from its pieces: the founding price (`hnn.founded-units`, the order-one
+mass growing by more than `2A²`). The pieces then stop carrying its meaning: "lol" has a sound of its own, its articulation the
+shape it now carries (the onomatopoeia of §1). A reader keeps both paths at once, the part whole and its pieces, and holding both
+with equal weight costs at most either path's code and one bit (`two_paths_code_le`; the lattice codes a source at most as any one
+parse, `receiver.merge-segmentation-mass`). The fluent reader and the newcomer are one reader at two states of its stores. A short
+chain adopted by several locales keeps a plural preimage fibre, one expansion a locale, and the reader's context, its stores and
+timings, names the locale and collapses the fibre; in casual speech a locale is shared and the fibre is one. A board's budget is
+the receiver's capacity: of the parts a reader holds, only those that fit its ports are drawn.
+
+**For the level.** A closed unit is held as a part keyed by its own shape (§15), beside its pieces as the second path, and the level
+founds a chain of its units as a part of its own by the same price. The test on the theory passages: an acronym is written after
+its expansion and then alone, and where the level holds the expansion as a part, the acronym's later uses past a reset of her state are coded
+at the part's price, while the newcomer's path, her letters alone, codes them as a new word.
+
+## 17. Fitting a chain is a presentation and inverting it is a fibre (Brandon's message, 17:25 UTC)
+
+**The lens.** The bound-state law likely works the same for fitting algebraic cycles and inverting them in general. He asks for
+laws in algebraic geometry because he reads the composition of terms and factors, not output numbers: an attention and locale
+networking matter. From this section on, a law here is written as a composition of factors first, with its numbers after it as
+support.
+
+**The law (0.7).** The parts a locale holds generate a ring, and the locale's relations cut it: `R = k⟨P⟩/I`. A word is an
+element `w` of `R`, and its splits are the points of the fibre of the product map `μ : P × ⋯ × P → R` over `w`; `re·gard·ing` and
+`re·gar·ding` are two points over one `w` (`regarding_two_splits`, `regarding_splits_differ`), the co-present readings of §3.
+
+- *Fitting* composes: a chain held whole is a generator adjoined with its defining relation, `R[t]/(t − u₁u₂u₃) ≅ R`
+  (`adjoin_part_same_ring`). The element is unchanged and only its presentation moves; the fluent reader writes `t`, the newcomer
+  `u₁u₂u₃`, and the relation is the decoder they share. A locale adopts `t` where the presentation with it describes the passage
+  more briefly than without it by more than the relation costs, the founding price of §16.
+- *Inverting* reads the fibre: an acronym is the image of a phrase under the initials map, `π(laugh·out·loud) = l·o·l`. The
+  newcomer inverts `π`, whose fibre over `l·o·l` is every phrase of those initials, and the locale's relations cut it to a point;
+  each field of science cuts the fibre of its acronyms at its own point.
+- *Becoming a word of its own* drops the relation: `lol` keeps `t` and forgets `t = u₁u₂u₃`, a free generator whose meaning is the
+  relations it gathers in use (its sound, its company), a new cycle of the locale's ring.
+
+**Its chart in algebraic cycles (0.5).** Writing a cohomology class as a rational sum of cycle classes is the same move, a
+presentation of the class by parts, and inverting it, finding which cycles, is a fibre that is plural up to rational equivalence.
+For the machine the chart says what a level's part is: a generator adjoined with its relation to the units below, held beside
+them (§16), and released from that relation when its own company outweighs its expansion.
+
+## 18. A key binds by a product and a store superposes by a sum (the lead's first read of the part store, 17:28 UTC)
+
+**The read.** The part store of §15 as first written, a word's face `Σ_i ρ(i) ⊗ e(u_i)` charged at each close into a field of `W`
+through a fixed orthonormal projection and read by pairing the prefix's face with it, gains nothing in any part at `W` of 64, 128
+and 256 with any leak, her letter rows centered or not and one-hot letters too (`tools/part_store_ruler.py`). Her letter rows share
+a common part (mean cosine 0.40), the six terms barely separate places, and the pairing of two such faces is a bag of letters,
+whose read is a unigram she already beats. The count ruler selected by an exact prefix, a conjunction. G-Z38 misses as read so far.
+
+**The law (0.7), as a composition.** A word is a product in the parts' ring, `w = u₁u₂u₃` (§17), and the strand face is its log,
+the linear image of that product. The pairing of two logs is bilinear, `⟨Σ_i a_i, Σ_j b_j⟩ = Σ_ij ⟨a_i, b_j⟩`, so two prefixes
+that share any term share credit. The key is the product itself: the carry `χ(p) = Π_i χ_i(u_i)`, a phase on each of `J` circles,
+`Φ_j(p) = Σ_i θ_j(u_i, i)`. Two carries pair as `Σ_j cos(Φ_j(a) − Φ_j(b))`, at most `J` and equal to it exactly when they agree on
+every circle (`carry_pairing_le`, `carry_pairing_full_iff`), while for distinct prefixes the sum scatters about zero at `√J`.
+Exponentiation turns the bag into the conjunction the count ruler drew, and the machine holds it already as the composite move a
+prefix makes on her circles (`strand_carries`).
+
+The store: at a word's close, `Σ_k χ(w_<k) ⊗ e(w_k)` is charged into one field that leaks; at a place with prefix `p` the read is
+`F · χ(p)*`, the sum over the words held of their weight times `⟨χ(w_<k), χ(p)⟩ e(w_k)`, the ruler's prefix match carried by a
+field of fixed width. Its capacity is its count of circles: `N` items stand at a signal over their noise of about `√(J/N)`, and the
+leak sets `N`, as a parametron's capacity is its lock count. Guesses G-Z42 (the planted one-hot limit) and G-Z43 (the carried key
+at `J` of 1,024 or more) are fixed before the reads.
+
+## 19. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
-  `two_way_push_variance` and `two_way_push_variance_le` (checked).
+  `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
+  `her_rings_alias`, `skin_heard_iff`, `skin_at_period`, `two_paths_code_le`, `adjoin_part_same_ring`,
+  `regarding_two_splits`, `regarding_splits_differ`, `carry_pairing_le` and `carry_pairing_full_iff` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
-  `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z35.
+  `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z43.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
