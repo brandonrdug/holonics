@@ -292,3 +292,20 @@ charge against joint charge: the third letter +0.0171 against +0.0344 (0.017 mor
 +0.0198 (0.009 less). Over every letter place the joint charge gains +0.0093 and +0.0103 against the own charge's +0.0036, and
 inside her reach it moves gain to first letters past 30 places (+0.0475 against +0.0006). Read with one slope; the state-set
 slope under the joint charge is not read yet.
+
+Scored 2026-11-27T19:28Z on the lead's epoch-cut ruler (tools/epoch_cut_ruler.py, the 16 long rows, W135s's mean; the lead's
+record of November 26, §24): G-Z47 missed. Her epochs span 3.74 places; a word met again takes the same anchor offsets in 0.559 of
+4,743 meetings (0.566 for three letters or more) against the 0.7 asked, from 0.67 to 0.75 for words of two and three letters met
+within 30 places down to 0.32 to 0.40 for six to eight letters met past 30 (chance 0.36, 0.15, 0.07 by length).
+
+Fixed 2026-11-27T19:28Z (date -u 19:28:37 at drafting), before either read. Premises read first: her epochs span 3.74 places, so
+two epochs, a unit and the one before it, span about eight (the level adds only that interaction, §12); a suffix address charged
+once never pays, and its charge is noise of about √(N/J) in every other read.
+
+G-Z49 (0.55). On the joined held passages past a reset, over every byte class, the store keyed by the carries of the last k places
+  for k = 1 to 8, at J = 4,096 with the joint charge and the slope set by the store's read power, gains at a recurring word's third
+  letter on at least 0.7 of the word-keyed store's gain under the same charge, slope and J read beside it, and over every byte
+  place more than the word-keyed store.
+G-Z50 (0.5). Located depth, charging the address of length k + 1 only where the address of length k already reads above the
+  field's own noise, gains over every byte place at least as much as k = 1 to 8 within the halves' scatter, while charging under
+  half as many addresses.
