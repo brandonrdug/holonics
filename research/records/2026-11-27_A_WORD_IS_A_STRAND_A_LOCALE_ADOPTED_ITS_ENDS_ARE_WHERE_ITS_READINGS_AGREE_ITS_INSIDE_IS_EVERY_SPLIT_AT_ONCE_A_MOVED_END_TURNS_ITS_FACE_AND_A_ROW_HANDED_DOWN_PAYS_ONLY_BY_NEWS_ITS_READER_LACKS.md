@@ -1,6 +1,6 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with twenty finite statements in Lean and the guesses G-Z13 to G-Z56 fixed before their reads; the formal thread,
+[interpretation at weight 0.7, with twenty-two finite statements in Lean and the guesses G-Z13 to G-Z57 fixed before their reads; the formal thread,
 November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
@@ -570,14 +570,36 @@ weighs it by its parent's stop weight alone, so at a word's first meetings half 
 may stand at the background. Depth located at the read repairs it without touching the charge: where depth `k + 1` reads at the
 field's background, `M_k = P_k`. G-Z56 is fixed on that one change.
 
+The lead's read (20:37 UTC) scores G-Z55 as missed. Past a reset the stop-weight store gains +0.032 at the third letter, 0.44 of
+the global form's +0.072, and it loses at the first and second letters (−0.029, −0.017) and over every byte place (−0.0060). Both
+halves took the low edge of each grid (`τ = 4`, `g = 0.5`), so the grid bounds the fit. The loss falls where the dilution reading
+put it: on first letters and new words, where every stop weight stands at its prior. A mixture that weighs a depth by a stop
+weight alone spends its first meetings learning what the depth's own read power already holds. The read power is the evidence
+the address carries, and the stop weight should carry only the news beyond it. Beside it, the word-keyed store at `J = 4,096`
+gains +0.095 at the third letter past a reset and +0.088 after it, 0.42 and 0.30 of the count ceiling, and +0.0097 over every
+byte place.
+
+**The depths of a flag join by a product, never by a mixture (0.65; the lead's pass-through arm, 20:44 UTC).** Passing the deeper
+mixture through where the deeper address reads at its background (`σ√(2 ln A)`, the largest of `A` reads at an uncharged carry)
+gives back 0.007 at the third letter (+0.025 against +0.032) and loses more at the first: G-Z56 missed. The shallow face is often
+as flat as the deeper one it replaces, so a stop only moves the mass from one flat face to another. The cause is the form of the
+join. The global form is a product, `p ∝ q · Π_k P_k^(λ_k)`, and a factor at the background gives every symbol nearly the same
+weight, which renormalizes away (Lean `flat_factor_normalizes`): a product pays nothing for an unmet depth. The tree form is a
+mixture, `σ P_k + (1 − σ) M_(k+1)`, and a component at or under the face it mixes with gives the target no more than that face
+(Lean `mixture_with_flat_le`): a mixture pays its weight's share for every unmet depth. The context tree's mixture is the Bayes
+mixture over its standings and is lawful for counts that start at a prior; on a superposed store whose unmet addresses read noise
+it pays at every first meeting. So the location per address enters the product's exponent, `λ_k(s) = g_k + a_k ρ_k + β_k(s)`,
+`β_k(s) = Re⟨B, χ_k⟩/J`, with `B` charged by `η (E_p[ℓ_k] − ℓ_k(x))`, the exponent's own covector (§20): an address whose read pays
+learns a larger exponent, and an unmet one stays flat and costs nothing whatever its weight. G-Z57 is fixed on it.
+
 ## 24. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
   `her_rings_alias`, `skin_heard_iff`, `skin_at_period`, `two_paths_code_le`, `adjoin_part_same_ring`,
   `regarding_two_splits`, `regarding_splits_differ`, `carry_pairing_le`, `carry_pairing_full_iff`, `delta_charge_contracts`,
-  `delta_charge_zero_at_read`, `flag_increments_telescope` and `flag_slopes_tail_sums` (checked).
+  `delta_charge_zero_at_read`, `flag_increments_telescope`, `flag_slopes_tail_sums`, `flat_factor_normalizes` and `mixture_with_flat_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z56.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z57.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.

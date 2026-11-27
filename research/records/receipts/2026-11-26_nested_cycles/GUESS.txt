@@ -351,3 +351,29 @@ B by η (c(M_(k+1)) − c(P_k)) with no leak; G-Z55 is scored on that form, its 
 G-Z56 (0.5). In the same ruler, passing the deeper mixture through where the deeper address reads at the field's background
   (M_k = P_k wherever depth k + 1 reads at √(‖F‖²/J) or under), with the charge unchanged at every depth, gains at least 0.01 nats
   more at a recurring word's third letter past a reset than the form without it.
+
+Scored 2026-11-27T20:37Z on the lead's stop-weight store at J = 512 (tools/tree_store_ruler.py, tree_store_512.txt; B with no
+leak; both halves chose τ = 4 and g = 0.5, the low edge of each grid, so the grid bounds the fit): G-Z55 missed. Past a reset it
+gains +0.032 (scatter 0.011) at the third letter, 0.44 of the global form's +0.072, +0.034 after it, and −0.029 and −0.017 at the
+first and second letters; over every byte place −0.0060 (0.0045), letters −0.0092, spaces +0.0070, other −0.0042. The cost falls
+on first letters and new words, where the stop weight stands at its prior and half of each address's mass goes to a deeper read
+at the background.
+Read beside it, the word-keyed store at J = 4,096 (the run since the last space, the joint charge, read-power slopes): past a reset
++0.095 (0.003) at the third letter and +0.088 (0.009) after it, 0.42 and 0.30 of the count ceiling's +0.229 and +0.290, with
++0.027 and +0.005 at the second and first; over every byte place +0.0097 (0.0047), letters +0.0103, spaces +0.0047, other +0.0165.
+G-Z49 is scored when the suffix key at 4,096 ends.
+
+Scored 2026-11-27T20:44Z on the lead's pass-through arm at J = 512 (tree_store_512_pass.txt; the plain form's τ = 4, g = 0.5;
+M_k = P_k wherever depth k + 1's largest read stands at or under σ√(2 ln A), σ = √(‖F‖²/(2J²A))): G-Z56 missed. Past a reset it
+gains +0.025 (scatter 0.018) at the third letter against the plain form's +0.032, −0.042 against −0.029 at the first, the same
++0.034 after; over every byte place −0.0092 (0.0058) against −0.0060. Where the deeper address is unmet the shallow face is often
+as flat, so the stop saves nothing and loses what the deeper read held.
+
+Fixed 2026-11-27T20:45Z (date -u 20:45:00 at drafting), before its read. Premise read first: the global form joins the depths as a
+product, p ∝ q · Π_k P_k^(λ_k), where a factor at the background is flat and renormalizes away (Lean flat_factor_normalizes); the
+tree form joins them as a mixture, where a flat component takes its weight's share of the target's mass (Lean
+mixture_with_flat_le), so a mixture pays for every unmet depth and a product pays for none.
+
+G-Z57 (0.45). In the product form at J = 512, an exponent per address added to each depth's slope, λ_k(s) = g_k + a_k ρ_k + β_k(s)
+  with β_k(s) = Re⟨B, χ_k⟩/J and B charged at each place by η (E_p[ℓ_k] − ℓ_k(x)), the exponent's own covector, gains at a
+  recurring word's third letter past a reset at least +0.077, the global form's +0.072 and 0.005 more.

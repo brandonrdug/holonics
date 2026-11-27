@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, and a nested store's depths are read on the graded pieces of its flag
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, a nested store's depths are read on the graded pieces of its flag, and its depths join by a product, where a flat factor costs nothing
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -62,6 +62,10 @@ finite statements those rows do not.
     `Σ_k a_k x_k` is the same read `Σ_k b_k (x_k − x_(k−1))` with `b_k = Σ_(j ≥ k) a_j`: the slope on the news depth `k` adds over
     depth `k − 1` is the tail sum of the slopes from `k` down. A fit on the reads themselves trades neighbours; the tail sums are
     the same fit read in the flag's own coordinates.
+12. **Depths join by a product, where a flat factor costs nothing** (`flat_factor_normalizes`, `mixture_with_flat_le`). A
+    factor that gives every symbol the same weight `c` renormalizes away: `p_i c / Σ_j p_j c = p_i / Σ_j p_j`. A mixture that
+    gives weight `1 − σ` to a component `u` at or under the face `p` it mixes with gives the target no more than `p`: so an unmet
+    depth, read at its background, costs a mixture its weight's share of the mass and costs a product nothing.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -249,5 +253,15 @@ theorem flag_slopes_tail_sums (a r : ℕ → ℝ) (n : ℕ) :
     rw [hsplit, Finset.sum_add_distrib, ← Finset.mul_sum, flag_increments_telescope,
       Finset.sum_range_succ (fun k => (∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1))),
       Finset.Ico_self, Finset.sum_empty, zero_mul, add_zero, ← ih, Finset.sum_range_succ]
+
+/-- A flat factor renormalizes away: a product of faces pays nothing for a depth read at its background. -/
+theorem flat_factor_normalizes {ι : Type*} (s : Finset ι) (p : ι → ℝ) (c : ℝ) (hc : c ≠ 0) (i : ι) :
+    p i * c / ∑ j ∈ s, p j * c = p i / ∑ j ∈ s, p j := by
+  rw [← Finset.sum_mul, mul_div_mul_right _ _ hc]
+
+/-- A mixture with a component at or under the face it mixes with gives the target no more than that face. -/
+theorem mixture_with_flat_le (p u σ : ℝ) (h1 : σ ≤ 1) (hu : u ≤ p) :
+    σ * p + (1 - σ) * u ≤ p := by
+  nlinarith
 
 end Holonics.HNN.OwnCycleCells
