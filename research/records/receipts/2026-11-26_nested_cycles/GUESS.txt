@@ -14,3 +14,13 @@ G-Z4 (0.65). In the babble slice as written on frames of 160 samples, a count ru
   1 to 6 as where it is 9 to 12.
 
 Each is a host read; none builds a part. A miss is scored in one line in the record.
+
+Fixed 2026-11-26T23:50Z (date -u), on the lead's question of a second level's cut, before any read and sent to the lead at that
+time. n_j = R_j / Z_j: unit j's places read through the level's face from unit j-1's row carried across the join, over the same
+places read from the opening's row at rest; a site where n stands above every unit within one unit of S2 = sum of n.
+
+G-Z5 (0.55). On W101r's mean, on the 407 word rows, the second level cut by n puts its sites at word starts at a share at least
+  0.05 above a cut of the same count drawn among the same first-level sites (the lead's shuffle, 0.358).
+G-Z6 (0.65). On W129w's and W101's means (their level faces code above the flat face) the same cut stands inside 0.02 of its
+  shuffle.
+G-Z7 (0.5). On W101r's mean the median second-level unit holds 2 or 3 first-level units.
