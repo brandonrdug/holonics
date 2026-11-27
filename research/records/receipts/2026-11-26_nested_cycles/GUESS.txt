@@ -43,3 +43,33 @@ G-Z11 (0.55). At width 64 the strand face restricted to its leading directions h
   of the unrestricted face's presence.
 G-Z12 (0.45). Two laps of the arm with the restriction on the strand face close at least a fifth of the gap between the join's
   unsaid share at a word's first letter (0.893 on W132i) and a count ruler's unsaid share there.
+
+Fixed 2026-11-27T08:05Z (date -u 08:02:12 at drafting), on the lens of a word as an adopted strand with plural splits, before any
+read of W133s and with no ceiling read by these classes; each is scored after the count ruler's ceiling is read on the same classes,
+and a half whose ceiling stands under 0.02 (presence) or 0.05 nats (codes) is void, not held. Classes: an epoch's site is AT A START
+when it stands on a word's first letter or on the space before it, INSIDE when on any other letter of a word, OTHER elsewhere;
+an epoch's recurrence is the count of its byte string in the passage W133s trained on (once, 2 to 7, 8 or more).
+
+G-Z13 (0.5). W133s's gain over W133 (lap means) in the word before's presence at a word's first letter (tools/word_presence.py)
+  is at least twice as large where that word before began at a site AT A START as where it began INSIDE an epoch.
+G-Z14 (0.55). On W133s's mean, the second level's join (scored by codes against the passage's unigram, as on W132i) codes under
+  the unigram in epochs met 8 or more times and at or above it in epochs met once.
+
+Fixed 2026-11-27T08:15Z (date -u 08:14:07 at drafting), on the lead's score of G-L6 and its reading that a new row costs every register
+alike, before any read of W134s. The arm's training code ratio over its control read 1.046, 1.026 and 1.018 at about 125, 625 and
+2,875 sections of the arm's age; those three fit 1 + 0.012 + 0.034 (t/125)^(-0.55), a floor near 0.012 (three points, thin).
+
+G-Z15 (0.55). W134s's last 250 sections read a training code ratio over W134 between 1.010 and 1.020 (so G-L7 (a) misses).
+G-Z16 (0.5). W134s's held text at its lap mean stands +0.012 to +0.025 nats a place above W134's.
+
+Fixed 2026-11-27T08:30Z (date -u 08:21:45 at drafting), on the lead's place-class read of W133s less W133 (no class under its control;
+first letters +0.0546, marks +0.0564, spaces +0.0185, letters inside +0.0180) and its question of the level's slow store, before
+any of these reads.
+
+G-Z17 (0.55). In the arm that gives the level's turned slots their fades as state (opened at one e-fold a turn) less its control,
+  first letters of words last met more than 30 places back in their stretch stand at least 0.03 nats a place under first letters
+  of words last met within 30 places.
+G-Z18 (0.6). W133s less W133 by fifth of W133's own face entropy at the place rises across the fifths, the top fifth at least
+  three times the bottom.
+G-Z19 (0.6). The premise: on W133s's mean the level's state x¹_j holds the epoch k back (least squares, one half fitted, the other
+  read) under 0.05 for every k of 4, 8 and 16.
