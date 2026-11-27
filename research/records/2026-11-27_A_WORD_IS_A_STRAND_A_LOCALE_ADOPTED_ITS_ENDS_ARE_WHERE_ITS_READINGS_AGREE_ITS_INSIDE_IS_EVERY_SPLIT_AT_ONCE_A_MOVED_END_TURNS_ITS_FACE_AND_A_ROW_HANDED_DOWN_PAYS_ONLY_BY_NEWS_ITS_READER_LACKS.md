@@ -592,7 +592,11 @@ it pays at every first meeting. So the location per address enters the product's
 `β_k(s) = Re⟨B, χ_k⟩/J`, with `B` charged by `η (ℓ_k(x) − E_p[ℓ_k])`, the negative of the exponent's own covector (§20; first written here with the covector's sign, corrected the same evening): an address whose read pays
 learns a larger exponent, and an unmet one stays flat and costs nothing whatever its weight. G-Z57 is fixed on it. The plain mixture on a grid reaching below its edge
 (21:15 UTC) takes `τ = 1`, the new edge: its best is to flatten every face toward its components' background, which removes the
-first-letter cost (+0.0040) and keeps +0.020 at the third letter against the product's +0.072. A mixture asks for less of itself.
+first-letter cost (+0.0040) and keeps +0.020 at the third letter against the product's +0.072. A mixture asks for less of itself. The exponent arm, which differs from the
+product form by `B` alone (21:20 UTC), gains +0.078 at the third letter past a reset against +0.072 and +0.0128 over every byte
+place against +0.0113, by halves +0.0017 and +0.0014: G-Z57 held, by a hair. Located per address in the product's exponent, depth
+adds about a tenth to one slope per depth, and it costs nothing at the first letters (+0.020 against +0.024, inside the scatter)
+because an unmet address stays flat whatever its weight.
 
 ## 24. Owners
 
