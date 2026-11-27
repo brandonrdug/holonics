@@ -214,11 +214,39 @@ changed under it. Far repeats already reach her by address (`store.far-price-sta
 and the far epoch's identity. G-Z23 (0.55): W135b's held text within +0.008 nats a place of W135s's, or under it. G-Z24 (0.5): by
 place class, letters inside a word within 0.005 of zero and first letters moving the most. Both fixed at 09:28 UTC.
 
-## 10. Owners
+## 10. The bank's first lap carried no news: its read is mostly its own standing state (the lead's scores, 14:39 UTC)
+
+**The reads** (the lead's record of the class hairs, §18). The strand face's second lap, W134s against W134: the training code's
+ratio 1.018 to 1.0145 over the last 250 sections (G-Z15 held, G-L7 (a) missed), held text +0.0221 (±0.0006) with every region up
+(G-Z16 held), the word two before 0.025, and by place class the first lap's shape at about two thirds of its size: first letters
++0.0369, marks +0.0363, spaces +0.0204, letters inside +0.0147. The bank's first lap, W135b against W135s from W134s's end: the
+training code's ratio 1.0002 to 1.0012 in every block of 250 sections, held text +0.0005 (±0.0002) with every region within 0.0012
+(G-Z23 held), `B_bank`'s size a seventeenth of `B⁻`'s, first letters of words last met more than 30 places back +0.0063 (±0.0015)
+against −0.0017 (±0.0030) within 30 (G-Z17 missed), letters inside +0.0011 and first letters −0.0003 (G-Z24 half), the word two
+before 0.025, and a stretch's first places lower on the arm (−0.0206 at place 0, over 1,009 places).
+
+**The law (0.65).** A store's news is its deviation from its own standing state. The bank is charged with `x¹_j` whole, and `x¹`
+carries its mean row, so each ring holds `x̄¹` times its own gain `1/(1 − ρ e^(iω))`, rising from empty at a stretch's start to a
+constant. That standing part is most of the bank's read, `B_bank`'s covector is spent on it, and what it buys is a clock of
+position in the stretch, which the arm shows at a stretch's first places. The far epochs ride on the deviation, which drives the
+deposit weakly. A rate of `B_bank`'s own scales the direction and the walk alike; a lane reads a block against its own power, which
+fixes its scale and not its mean; and the face reads her state linearly, so `B_bank` already gives each candidate symbol its own
+read of the bank (`B_bankᵀ r_u`). The lever is the charge, the anchor law of §15 of the nested-cycles record: the bank charged with
+`x¹_j − x̄¹`, `x̄¹` the level's standing state held by a slow store on `τ¹` (a ring of no turn at the bank's longest fade), so the
+rise at a stretch's start goes with it.
+
+**Guesses** (fixed at 14:41 UTC). G-Z25 (0.6): on W135b's mean the bank's standing part holds at least three quarters of the power
+of its read over held places. G-Z26 (0.5): at `B_bank`'s locus on a held half (the tension read, `tools/tension_ruler.py`, as in
+`deposition.no-linear-tension-at-the-levels-locus`), the bank as charged removes under 0.002 of the fine covector's power at first
+letters, and charged against its standing state at least twice that. G-Z27 (0.6): on the second lap, W136b against W136s, first
+letters of words last met more than 30 places back stand within 0.005 of zero. If the centered share stays near zero, the null is
+the level's own (nothing linear at first order), and the next law is a product, not a charge.
+
+## 11. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z24.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z27.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
