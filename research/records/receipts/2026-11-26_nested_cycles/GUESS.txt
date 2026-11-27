@@ -73,3 +73,11 @@ G-Z18 (0.6). W133s less W133 by fifth of W133's own face entropy at the place ri
   three times the bottom.
 G-Z19 (0.6). The premise: on W133s's mean the level's state x¹_j holds the epoch k back (least squares, one half fitted, the other
   read) under 0.05 for every k of 4, 8 and 16.
+
+Fixed 2026-11-27T08:55Z (date -u 08:51:35 at drafting), on the lead's reads toward the slow store (G-Z19 held: the ticked level holds the
+third place's byte of the epoch 4, 8 and 16 back at 0.020, 0.010 and 0.008; the opened fade alone, untrained, carries nothing
+farther and drops the level's own epoch to 0.11 to 0.26), before the bank is built or read.
+
+G-Z20 (0.55). A ring bank on τ¹ (octave periods on the level's clock, each opened at one e-fold a turn), charged once per closed
+  epoch by x¹_j before the level's ticks, founded on W133s's end and untrained, holds the third place's byte of the epoch k back
+  (tools/level_back_ruler.py) at least three times the ticked level's at k = 4 and at k = 8 (0.060 and 0.030 or more).
