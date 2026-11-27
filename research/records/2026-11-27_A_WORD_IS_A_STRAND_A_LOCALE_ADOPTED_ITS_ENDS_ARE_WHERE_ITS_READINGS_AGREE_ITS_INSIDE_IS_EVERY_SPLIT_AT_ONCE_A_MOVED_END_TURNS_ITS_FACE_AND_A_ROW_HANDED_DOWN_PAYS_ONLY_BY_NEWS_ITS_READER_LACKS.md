@@ -1,6 +1,6 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with sixteen finite statements in Lean and the guesses G-Z13 to G-Z43 fixed before their reads; the formal thread,
+[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z46 fixed before their reads; the formal thread,
 November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
@@ -462,13 +462,37 @@ field of fixed width. Its capacity is its count of circles: `N` items stand at a
 leak sets `N`, as a parametron's capacity is its lock count. Guesses G-Z42 (the planted one-hot limit) and G-Z43 (the carried key
 at `J` of 1,024 or more) are fixed before the reads.
 
-## 19. Owners
+## 19. A charge is its news, so an address reads a ratio, and two paths join by the store's own confidence (the lead's reads, 17:53 and 18:00 UTC)
+
+**The law (0.75), as a composition.** A summed charge leaves `F χ_a ≈ n_a E[e | a]`, a count that grows with the words sharing the
+address, so the empty prefix and the short ones, charged by most words, leak into every read as `n/√(2J)`. The delta charge
+`F ← F + η (e − F χ) χ*`, the deposition law's covector `q − p` at the locus it reaches, has its fixed point at the least-squares
+map `F = E[e χ*] E[χ χ*]⁻¹`; with near-orthogonal carries `E[χ χ*]` is near the diagonal of the addresses' frequencies, so
+`F χ_a → E[e | a]`, each address divided by its own count: the count ruler's prefix ratio, a ratio keeping its denominator. An
+address that reads its letter takes no charge (`delta_charge_contracts`, `delta_charge_zero_at_read`), its crosstalk into other
+reads falls away, and what noise stands comes from the rare addresses, about `√(N_rare/J)`. A rate of one keeps the last word to
+charge an address; a rate under one keeps a ratio over its meetings.
+
+**The second law (0.7).** Two paths join by each one's own confidence: `p ∝ p_her · p_store^λ(s)`, with `λ` read from the store's
+state, its read's power at the address, how much it has met the prefix. That `λ` is the store's temperature, a state of the store
+and never a dial; a gate set by the place and the read's top octave is a ruler of it.
+
+**The reads, as support** (the joined held passages past a reset, J circles by the letters, mean of the halves). The delta charge
+at J = 4,096 from the empty prefix, η = 0.25: +0.0935 at the third letter (scatter 0.0039) and +0.162 after, 0.41 and 0.56 of the
+count ruler's ceiling; η = 1: +0.051 and +0.181; at J = 1,024, η = 0.25: +0.083 and +0.118. The two-letter cut that the summed
+charge needed adds nothing under the delta charge, which makes that hand-set grain unneeded. One coefficient in place of the
+state's gate gives +0.028 and +0.031, a third of it. G-Z44 half held and G-Z45 held. Her own field holds 512 carry circles; G-Z46
+reads whether her located turns key the store worse than random ones, which place a prefix by identity where hers place it by
+what it predicts. If it holds, the part's key is its own: circles of the level, turned at founding by the unit's identity.
+
+## 20. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
   `her_rings_alias`, `skin_heard_iff`, `skin_at_period`, `two_paths_code_le`, `adjoin_part_same_ring`,
-  `regarding_two_splits`, `regarding_splits_differ`, `carry_pairing_le` and `carry_pairing_full_iff` (checked).
+  `regarding_two_splits`, `regarding_splits_differ`, `carry_pairing_le`, `carry_pairing_full_iff`, `delta_charge_contracts` and
+  `delta_charge_zero_at_read` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z43.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z46.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
