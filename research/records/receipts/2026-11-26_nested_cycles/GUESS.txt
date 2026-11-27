@@ -43,3 +43,63 @@ G-Z11 (0.55). At width 64 the strand face restricted to its leading directions h
   of the unrestricted face's presence.
 G-Z12 (0.45). Two laps of the arm with the restriction on the strand face close at least a fifth of the gap between the join's
   unsaid share at a word's first letter (0.893 on W132i) and a count ruler's unsaid share there.
+
+Fixed 2026-11-27T08:05Z (date -u 08:02:12 at drafting), on the lens of a word as an adopted strand with plural splits, before any
+read of W133s and with no ceiling read by these classes; each is scored after the count ruler's ceiling is read on the same classes,
+and a half whose ceiling stands under 0.02 (presence) or 0.05 nats (codes) is void, not held. Classes: an epoch's site is AT A START
+when it stands on a word's first letter or on the space before it, INSIDE when on any other letter of a word, OTHER elsewhere;
+an epoch's recurrence is the count of its byte string in the passage W133s trained on (once, 2 to 7, 8 or more).
+
+G-Z13 (0.5). W133s's gain over W133 (lap means) in the word before's presence at a word's first letter (tools/word_presence.py)
+  is at least twice as large where that word before began at a site AT A START as where it began INSIDE an epoch.
+G-Z14 (0.55). On W133s's mean, the second level's join (scored by codes against the passage's unigram, as on W132i) codes under
+  the unigram in epochs met 8 or more times and at or above it in epochs met once.
+
+Fixed 2026-11-27T08:15Z (date -u 08:14:07 at drafting), on the lead's score of G-L6 and its reading that a new row costs every register
+alike, before any read of W134s. The arm's training code ratio over its control read 1.046, 1.026 and 1.018 at about 125, 625 and
+2,875 sections of the arm's age; those three fit 1 + 0.012 + 0.034 (t/125)^(-0.55), a floor near 0.012 (three points, thin).
+
+G-Z15 (0.55). W134s's last 250 sections read a training code ratio over W134 between 1.010 and 1.020 (so G-L7 (a) misses).
+G-Z16 (0.5). W134s's held text at its lap mean stands +0.012 to +0.025 nats a place above W134's.
+
+Fixed 2026-11-27T08:30Z (date -u 08:21:45 at drafting), on the lead's place-class read of W133s less W133 (no class under its control;
+first letters +0.0546, marks +0.0564, spaces +0.0185, letters inside +0.0180) and its question of the level's slow store, before
+any of these reads.
+
+G-Z17 (0.55). In the arm that gives the level's turned slots their fades as state (opened at one e-fold a turn) less its control,
+  first letters of words last met more than 30 places back in their stretch stand at least 0.03 nats a place under first letters
+  of words last met within 30 places.
+G-Z18 (0.6). W133s less W133 by fifth of W133's own face entropy at the place rises across the fifths, the top fifth at least
+  three times the bottom.
+G-Z19 (0.6). The premise: on W133s's mean the level's state x¹_j holds the epoch k back (least squares, one half fitted, the other
+  read) under 0.05 for every k of 4, 8 and 16.
+
+Fixed 2026-11-27T08:55Z (date -u 08:51:35 at drafting), on the lead's reads toward the slow store (G-Z19 held: the ticked level holds the
+third place's byte of the epoch 4, 8 and 16 back at 0.020, 0.010 and 0.008; the opened fade alone, untrained, carries nothing
+farther and drops the level's own epoch to 0.11 to 0.26), before the bank is built or read.
+
+G-Z20 (0.55). A ring bank on τ¹ (octave periods on the level's clock, each opened at one e-fold a turn), charged once per closed
+  epoch by x¹_j before the level's ticks, founded on W133s's end and untrained, holds the third place's byte of the epoch k back
+  (tools/level_back_ruler.py) at least three times the ticked level's at k = 4 and at k = 8 (0.060 and 0.030 or more).
+
+Scored 2026-11-27T09:10Z on the lead's ruler bank (W133s's end, octave periods 2 to 64 sections of news, 768 wide;
+level_back_bank_W133s.txt): G-Z20 held, the third place's byte of the epoch 4 and 8 back at 0.147 and 0.082, 7.4 and 8.2 times the
+ticked level's, against a bar of three.
+
+Fixed 2026-11-27T09:12Z (date -u 09:09:18 at drafting), on the lead's question of the bank's count of rings, before the read, on the
+same ruler bank with the ticked x¹ read beside it.
+
+G-Z21 (0.55). Dropping the period-2 ring lowers the third place's byte at no k of 1, 2, 4, 8, 16 by more than 0.01.
+G-Z22 (0.45). Adding periods 128 and 256 raises the third place's byte at k = 16 by at least half (0.032 to 0.048 or more).
+
+Scored 2026-11-27T09:26Z on the lead's ring-by-ring read (W133s's end, the third place's byte of the epoch k back, k = 1, 2, 4, 8,
+16; full bank 0.471, 0.259, 0.147, 0.082, 0.032): G-Z21 missed (dropping the period-2 ring lowers k = 1 by 0.023); G-Z22 missed
+(periods 2 to 256 raise k = 16 to 0.043, the bar 0.048). Each ring's drop costs most near the age of its own reach: the period 2
+at k = 1, 4 at k = 1 and 2, 8 at k = 2 and 4, 16 at k = 8, 32 at k = 4 and 8, 64 at k = 16.
+
+Fixed 2026-11-27T09:28Z (date -u 09:23:43 at drafting), before W135b (the bank, periods 2 to 64, 768 wide, B_bank founded at zero, its
+fades held with no covector) and its control W135s, both from W134s's end, read at lap means on held text.
+
+G-Z23 (0.55). W135b's held text stands within +0.008 nats a place of W135s's, or under it.
+G-Z24 (0.5). In W135b less W135s by place class (tools/place_class_ruler.py), letters inside a word stand within 0.005 of zero,
+  and first letters move the most of any class, either way.
