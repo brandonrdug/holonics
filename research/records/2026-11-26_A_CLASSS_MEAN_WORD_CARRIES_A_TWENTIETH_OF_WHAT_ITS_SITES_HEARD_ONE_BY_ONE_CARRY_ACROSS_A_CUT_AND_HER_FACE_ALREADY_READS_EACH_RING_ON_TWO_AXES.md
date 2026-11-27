@@ -730,3 +730,46 @@ So what a word-keyed store could hand her is gated by the word's identity, which
 codes a recurring word's second letter at 0.68 nats against 1.72 for a new one, and her own hearing by address carries most of what the
 count holds once three letters have passed. Depth does not show at a first letter; the level is read word by word, whole, and by what it
 writes.
+
+## 21. Her reach bounds what a level can add, and past it a word-keyed count pays at a recurring word's third letter on (G-Z36, G-J1)
+
+**The premise** (the formal pass, 16:06 UTC). Every read of the level stood on rows of about 230 letter places, her state started over at
+every row, so a word met more than 30 places back had a row's few dozen words to recur from. G-Z36 asked the same count read on a passage
+carried whole over 8,000 places.
+
+**Her reach** ([`GUESS_Z36.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_Z36.txt)). No passage can be carried whole that far: her
+declaration's reach is 3,771 places (9·419), and a region past it is refused, its frames repeating (a development read of 4,000 places).
+The pass's law (0.75): coprime frames meet once per residue pair only modulo their product, so past 3,771 places every address her rings
+form recurs, and the refusal is that aliasing; a wider product moves the same edge outward at every ring's width. Past it only a level
+can address, whose clock counts closed units and whose frames repeat after the product of its own periods in units. Her two-stream read's
+time grows about as the square of a row's places (one thread: 1,000 places 22.6 s, 2,000 places 83.7 s).
+
+**At her reach** (G-Z36 read as a variant; sixteen held passages of the store's held slices, twelve of books and four of the theory, each
+its first 3,700 octets as one row, beside the same text cut into 300-octet rows with each passage's pieces on one half;
+[`word_cache_long3700.txt`](receipts/2026-11-26_class_hairs/depth/word_cache_long3700.txt),
+[`word_cache_cut300.txt`](receipts/2026-11-26_class_hairs/depth/word_cache_cut300.txt)). Her letter code is 1.439 nats on the long rows
+against 1.504 cut. With the coefficient set by the count's state, past 30 places: a first letter +0.0028 against +0.0071 cut, the second
++0.0060 against +0.0005, the third +0.0196 against +0.0027, the rest +0.0271 against +0.0002. G-Z36 missed: the long read gains more
+than twice the cut's at a word's fourth letter on, but 0.027 where 0.09 was asked, and 0.003 at a first letter where 0.03 was. Her own
+face holds the word there: a recurring word's fourth letter on codes 0.182 nats past 30 places, its first letter 2.325 against 3.250 for
+a new one.
+
+**Past her reach** (G-J1, the lead's guess, 0.5; [`GUESS_J1.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_J1.txt),
+[`word_cache_joined.txt`](receipts/2026-11-26_class_hairs/depth/word_cache_joined.txt)). The same sixteen passages as four consecutive
+3,700-octet stretches each (14,800 places, 180,575 letter places), her face read stretch by stretch and reset at each, the count carried
+across the whole passage (`word_cache_ruler.py … joined`). Where the word was last met in an earlier stretch she holds no address for it:
+her code there is 3.02, 1.55, 1.32 and 0.56 nats at its first, second, third and later letters, against 2.37, 0.89, 0.56 and 0.19 for a
+word met past 30 places inside her stretch and 3.38, 1.96, 1.89 and 0.96 for a new one. The count's state-set coefficient gains there
++0.0083 (scatter 0.0041), +0.0435 (0.0071), +0.229 (0.005) and +0.290 (0.023); one coefficient (0.2 and 0.15, no leak) +0.006 and +0.019,
++0.062 and +0.074, +0.215 and +0.205, +0.174 and +0.178, and over every letter place of the four stretches +0.013 and +0.019. Knowing
+whether the word was met, +0.42 to +0.46 at the third letter. G-J1 held (+0.290 at the fourth letter on, +0.008 at a first letter).
+
+| guess | read | score |
+|---|---|---|
+| G-Z36 past 30, ≥ 0.09 at the fourth letter on and ≥ 0.03 at a first letter, at 8,000 places (read at 3,700) | +0.027 and +0.003 | missed |
+| G-J1 a word last met in an earlier stretch: ≥ 0.05 at the fourth letter on, < 0.01 at a first letter | +0.290 and +0.008 | held |
+
+So the level's worth binds at her reach. Inside it a word-keyed count re-says what her own address holds; past it, where a word recurs
+in a stretch she has been reset across, it hands her two to three tenths of a nat at the word's third letter on, and under a fiftieth at
+its first, whose identity no prefix gives yet. The next test is the level's own state carried across her stretches at its own clock,
+read by the same parts.

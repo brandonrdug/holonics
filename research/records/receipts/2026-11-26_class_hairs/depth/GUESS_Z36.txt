@@ -1,0 +1,27 @@
+G-Z36 (the formal thread, fixed 2026-11-27 16:06 UTC, weight 0.5): the premise that every read of the level stood on rows too short for a
+level of words (the 407 held rows, about 230 letter places each, her state started over at every row). The same ruler as G-Z35's, its
+coefficient set by the count's own state, read on held passages carried whole over 8,000 places or more (her state run on through each,
+never reset at a row): past 30 places it adds at least twice its row read at a word's fourth letter on (0.09 or more), and at least 0.03
+at a first letter. If it holds, the level's worth is bounded by the specimen and is read on long passages; if it misses, word recurrence
+is no route to depth at any span, and the level is judged by what it writes.
+
+As read (the lead): eight held passages of the store's held slices (six books, two theory), each its first 8,200 octets read as one row
+by read-reach faces:all at W135s's lap mean; beside them the same text cut into 300-octet rows (216 rows), each passage's pieces on one
+half, so the long read and the cut read stand on one text.
+
+The span the guess fixed cannot be read: her declaration's reach is 3,771 places (9·419), and a region past it is refused (a development
+read of 4,000 places: "a region past the field's reach, where its frames would repeat"). Scored as a variant at 3,700 places against the
+300-octet cut of the same text (the formal thread, 16:12 UTC). Her two-stream read's time grows about as the square of a row's places (one
+thread: 1,000 places 22.6 s, 2,000 places 83.7 s; the sixteen rows of 3,700 took 710 s at eight threads).
+
+Read (word_cache_long3700.txt, word_cache_cut300.txt): 45,551 and 44,339 letter places. Her code over the letters: long rows 1.439 (odd)
+and 1.372 (even), cut rows 1.504 and 1.448. The coefficient set by the count's own state, past 30 places (mean of the halves; scatter):
+                     3,700 places        300-octet cut
+  first letter       +0.0028 (0.0010)    +0.0071 (0.0025)
+  second letter      +0.0060 (0.0003)    +0.0005 (0.0010)
+  third letter       +0.0196 (0.0057)    +0.0027 (0.0013)
+  the rest           +0.0271 (0.0030)    +0.0002 (0.0004)
+Score: missed. At a word's fourth letter on, the long read gains more than twice the cut's but 0.027 against the 0.09 asked; at a first
+letter 0.003 against 0.03. Her own face there already holds the word: a recurring word's fourth letter on, past 30 places, codes 0.182
+nats in the long rows, and its first letter 2.325 against 3.250 for a new word. The upper ceiling that knows the word was met: past 30,
++0.002 and +0.003 at a first letter, +0.10 and +0.12 at the third, +0.10 at the rest.
