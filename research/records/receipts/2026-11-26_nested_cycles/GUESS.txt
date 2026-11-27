@@ -392,3 +392,22 @@ slopes, with β_k = Re⟨B, χ_k⟩/J added to each depth's exponent and B charg
 by B alone): G-Z57 held, by a hair. Past a reset +0.0780 (scatter 0.0017) at the third letter against +0.0720 (0.0027), 0.006 more
 against the 0.005 asked; +0.0636 against +0.0592 after it; +0.020 against +0.024 at the first and +0.029 against +0.030 at the
 second. Over every byte place +0.0128 (0.0043) against +0.0113 (0.0046), +0.0017 and +0.0014 on the two halves.
+
+Scored 2026-11-27T22:51Z on the lead's J = 4,096 reads (k = 1 to 8, the joint charge, read-power slopes): G-Z49 held. The suffix
+key gains +0.0185 over every byte place against the word key's +0.0097, and past a reset +0.1045 at the third letter against
++0.0954 (1.10 of it) and +0.1146 after it against +0.0875; the exponent arm reads +0.0199, +0.111 and +0.120 on the same three.
+G-Z53 missed: the tail sums of a_k are not positive on both halves at every k from 1 to 6. G-Z52 and G-Z54 are not called: the
+depth rides on the linear slopes g_k, about 0.5 to 1.1 through k = 8, so at J = 4,096 the read still pays at the cap of eight.
+
+Fixed 2026-11-27T22:54Z (date -u 22:54:44 at drafting), before the lead's founding build (Fable's review, step 1: units founded on
+the card by October's lap law; acceptance: a lap's foundings held after the next lap, a span cut alike at least 0.9 of the time
+against 0.56 today). Premises read first: the lap law's charge is the choice among the pool and the material's precision
+(contact.charge-falls-with-evidence, contact.lap-founds-reachable); the October merge law charges a pair's choice, 2 log₂ A + 1,
+and the alphabet's growth (hnn.founded-units); a stepped pass took 308 of 495 held units to 55 (review, October 24 to 26).
+
+G-Z58 (0.6). A founding read as Σ over meetings of (c_pieces − c_whole) > log₂|P| + 1, both codes read by the state before each
+  meeting, and a release only where the unit's leaky count times its mean saving falls under its row's share of the store's
+  background, holds at least 0.9 of a lap's foundings after the next lap; one threshold for founding and release, at a lap's
+  fade, holds under 0.8.
+G-Z59 (0.55). On the same lap, the charge log₂|P| + 1 with prequential codes founds at least twice as many units as
+  L·log₂A + log₂|P|, and the founded units' same-cut rate on recurrences stands within 2 points of the heavier charge's.

@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, a nested store's depths are read on the graded pieces of its flag, and its depths join by a product, where a flat factor costs nothing
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, a nested store's depths are read on the graded pieces of its flag, its depths join by a product, where a flat factor costs nothing, and a founded unit holds by a leaky count whose rate is its own mean
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -66,6 +66,11 @@ finite statements those rows do not.
     factor that gives every symbol the same weight `c` renormalizes away: `p_i c / Σ_j p_j c = p_i / Σ_j p_j`. A mixture that
     gives weight `1 − σ` to a component `u` at or under the face `p` it mixes with gives the target no more than `p`: so an unmet
     depth, read at its background, costs a mixture its weight's share of the mass and costs a product nothing.
+13. **A founded unit's evidence is a leaky count, and its material moves at its own mean's rate** (`leaky_count_fixed`,
+    `leaky_count_rises_below_fixed`, `cooled_rate_is_mean`). The count `n ← l n + m` of a unit met `m` times a lap, leaking by
+    `l < 1`, stands still at `m / (1 − l)` and rises toward it from below, so a unit that keeps recurring keeps its evidence and
+    one that stops leaves by the leak. The delta step at rate `1/(k + 1)` from the mean of `k` meetings is the mean of `k + 1`:
+    a unit's rate cools by its own count, and no fixed-rate step moves what it holds.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -263,5 +268,25 @@ theorem flat_factor_normalizes {ι : Type*} (s : Finset ι) (p : ι → ℝ) (c 
 theorem mixture_with_flat_le (p u σ : ℝ) (h1 : σ ≤ 1) (hu : u ≤ p) :
     σ * p + (1 - σ) * u ≤ p := by
   nlinarith
+
+/-- A unit met `m` times a lap, its count leaking by `l`, stands still at `m / (1 − l)`. -/
+theorem leaky_count_fixed (l m : ℝ) (hl : l ≠ 1) : l * (m / (1 - l)) + m = m / (1 - l) := by
+  have h : (1 - l) ≠ 0 := sub_ne_zero.mpr (Ne.symm hl)
+  field_simp
+  ring
+
+/-- Below its standing value the leaky count rises: a unit that keeps recurring keeps its evidence. -/
+theorem leaky_count_rises_below_fixed (l m n : ℝ) (hl : l < 1) (h : n ≤ m / (1 - l)) : n ≤ l * n + m := by
+  have hpos : 0 < 1 - l := by linarith
+  rw [le_div_iff₀ hpos] at h
+  linarith
+
+/-- The delta step at rate `1/(k + 1)` from the mean of `k` meetings gives the mean of `k + 1`. -/
+theorem cooled_rate_is_mean (S e k : ℝ) (hk : 0 < k) :
+    S / k + (e - S / k) / (k + 1) = (S + e) / (k + 1) := by
+  have h0 : k ≠ 0 := hk.ne'
+  have h1 : k + 1 ≠ 0 := by linarith
+  field_simp
+  ring
 
 end Holonics.HNN.OwnCycleCells
