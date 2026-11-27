@@ -1,6 +1,6 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z50 fixed before their reads; the formal thread,
+[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z52 fixed before their reads; the formal thread,
 November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
@@ -518,7 +518,23 @@ its depth is located as a chain becomes a part (§16): the address of length `k 
 as a ruler, the cap is `k ≤ 8`, two of her epochs: the unit and the one before it, the interaction a level adds (§12). The widths
 `J = 4,096` and `J = 512` (her carry word) are read side by side as the part's capacity price. G-Z49 and G-Z50 are fixed.
 
-## 22. Owners
+## 22. Depth is located at the read and never at the charge (the lead's cut-free store at J = 512, 19:50 UTC)
+
+At `J = 512` over every byte class, the store keyed by the last `k ≤ 8` places reaches 0.96 of the word-keyed store at a recurring
+word's third letter past a reset (+0.072 against +0.075) and gains more over every byte place (+0.0113 against +0.0078), so the
+cut-free key loses almost nothing of the cut one and serves the spaces and the other bytes besides. Depth located on the charge,
+deepening only where the parent address read its symbol above `√(n/2J)`, charges an eighth of the addresses and keeps +0.012 of
+the +0.072: G-Z50 missed.
+
+**The law (0.65).** A depth charged only where its parent already reads is first charged at a unit's second meeting and first read
+at its third, and past a reset most recurring words are met twice, so any gate on the charge puts depth one meeting late. The
+store's own balance is the law: every depth up to the cap is charged with its news at the first meeting, a trace never met again
+leaks away, and a part is founded by recurrence through the leak, never by a gate on its charge (dormancy is free, `code.rank-one-founding`).
+The read locates the depth: an address never met again reads at the field's background, `√(‖F‖²/J)`, a state of the store bounded
+by the addresses it holds and its leak, and its slope `g_k + a_k ρ_k` gives it nothing. The cap is located where the fitted `a_k`
+falls toward zero, the depth past which suffixes no longer recur within the leak's span. G-Z51 and G-Z52 are fixed.
+
+## 23. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
@@ -527,5 +543,5 @@ as a ruler, the cap is `k ≤ 8`, two of her epochs: the unit and the one before
   `delta_charge_zero_at_read` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z50.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z52.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.

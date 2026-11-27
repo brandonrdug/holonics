@@ -309,3 +309,19 @@ G-Z49 (0.55). On the joined held passages past a reset, over every byte class, t
 G-Z50 (0.5). Located depth, charging the address of length k + 1 only where the address of length k already reads above the
   field's own noise, gains over every byte place at least as much as k = 1 to 8 within the halves' scatter, while charging under
   half as many addresses.
+
+Scored 2026-11-27T19:50Z on the lead's cut-free store at J = 512 (tools/suffix_store_ruler.py, every byte class, 155 symbols over
+236,800 places of the joined passages, the joint charge at η = 1/4, slopes g_k + a_k ρ_k fitted on the fitting half), G-Z49's
+J of 4,096 still running: G-Z50 missed. Located depth charges 237,237 addresses against k = 1 to 8's 1,892,096 and gains +0.0049
+(scatter 0.0005) over every byte place against +0.0113 (0.0046), and past a reset +0.012 at the third letter against +0.072. At
+J = 512, G-Z49's conditions hold: k = 1 to 8 reaches 0.96 of the word-keyed store at the third letter past a reset (+0.072 against
++0.075) and 0.99 after it, and gains more over every byte place (+0.0113 against +0.0078); it is scored at 4,096 when that read ends.
+
+Fixed 2026-11-27T19:50Z (date -u 19:50:39 at drafting), before either read. Premise read first: a depth charged only where its
+parent already reads is first charged at a unit's second meeting and first read at its third, while past a reset most recurring
+words are met twice.
+
+G-Z51 (0.6). Any floor on the charge, the field's own background √(‖F‖²/J) included, keeps the located store's gain at a recurring
+  word's third letter past a reset under 0.5 of k = 1 to 8's at the same J.
+G-Z52 (0.55). With k = 1 to 8 at J = 4,096, the fitted read slopes a_k fall past a word's typical length: a_8 stands under a fifth of
+  the largest a_k.
