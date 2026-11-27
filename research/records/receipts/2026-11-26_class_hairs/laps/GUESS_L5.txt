@@ -1,0 +1,14 @@
+Fixed 2026-11-27T00:03:59Z (date -u), the lead, before W132i trains. Refs #404.
+The arm W132i: W131w's end with its level compared at its own grain and the receipt's pull kept inside the level (set-receipt ... inside,
+Scale::inside), 3,000 sections heard whole on e5fy on the wave's store; its control W132: W131w's end, no change (the line's next lap).
+Both read at their lap means. The premise read first: W101r's receipt (joined) took the level's face from 21.7 to 2.96 nats a place in
+one lap while every register's held code rose +0.0355 (paired, over 140,564 places); on W101r the join's share at a word's first letter
+is 0.915, at a space or mark 0.521; a second level cut by the join's law found 0.344 against 0.341 shuffled.
+G-L5 (one place open where a code is read, paired against the control, by part):
+  (a) (0.7) the level's own face at W132i's mean codes a place at a median under 5.5 nats (the flat face; the line's level 23);
+  (b) (0.5) the held text at W132i's mean within 0.004 nats a place of W132's;
+  (c) (0.4) at least eight of the ten text regions within 0.005 of W132's;
+  (d) (0.3) the join's share at a word's first letter under 0.88 at W132i's mean;
+  (e) (0.25) a second level by the join's law on W132i's mean at word starts at least 0.02 above its shuffle;
+  (f) (0.55) the wide panel's lexicon share within 3 points of W132's.
+The line takes the change by (b) and (c) holding together; otherwise it goes on from W132's end.

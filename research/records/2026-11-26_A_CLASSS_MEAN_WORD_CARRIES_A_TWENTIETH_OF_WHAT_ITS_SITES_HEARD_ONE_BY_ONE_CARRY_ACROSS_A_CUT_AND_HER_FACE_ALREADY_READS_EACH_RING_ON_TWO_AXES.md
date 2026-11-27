@@ -380,3 +380,58 @@ This is the depth reads' finding (G-Z3: the word two before at 0.025) seen from 
 rhythm and not its word, so what the level hands on cannot tell which word comes. The receipt kept inside the level (`Scale::inside`,
 this day) is built and on the card (its parity reads the host's bits in both forms), and its arm from the line's end reads, beside the
 face, whether the share at a word's first letter falls.
+
+## 12. Two more laps heard whole (G-L4)
+
+W130w from W129w's end and W131w from W130w's, 3,000 sections each with no change, read at their means
+([`GUESS_L4.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L4.txt), fixed 20:26:57 UTC; reads
+[`G-L4_reads.txt`](receipts/2026-11-26_class_hairs/laps/G-L4_reads.txt)). Her writes on the theory panel hold no sentence at either
+lap (shown to Brandon raw; the panel's twelve theory and eight logic prompts); the words in the register's lexicon are 82% and 83% at
+W131w against 88% and 86% at W130w.
+
+| G-L4 | read at W131w's mean, against W129w's, paired | guess |
+|---|---|---|
+| (a) held text | 0.6781 a place over 200,933 places, −0.0043 (±0.0006) | held |
+| (b) text regions | 7 of 10 under: acts −0.0070, dialogue −0.0227, harness −0.0068, logic −0.0002, science −0.0071, theory −0.0043, web −0.0085; books +0.0067, code +0.0004, wikidata +0.0062 | missed (eight asked) |
+| (c) the wave | 0.8758 (W129w 0.8846), −0.0089 | held |
+| (d) the wide panel's lexicon share | 71% (W129w 72%) | held |
+
+The line goes on from W131w's end. The arm that keeps the level's receipt inside the level (G-L5,
+[`GUESS_L5.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L5.txt)) trains from it beside the line's next lap.
+
+## 13. The receipt kept inside the level still costs every register: the cost runs through the row it hands on (G-L5)
+
+W132i (W131w's end with `level 6 2 receipt inside`) beside W132 (W131w's end, no change, the line's next lap), 3,000 sections each
+heard whole on e5fy, read at their means; guess [`GUESS_L5.txt`](receipts/2026-11-26_class_hairs/laps/GUESS_L5.txt), fixed 00:03:59
+UTC on November 27 before W132i trained; reads [`G-L5_reads.txt`](receipts/2026-11-26_class_hairs/laps/G-L5_reads.txt) and the two
+`level_join_*.txt`. The arm's sections ran 1,219 ms on its development read against 1,199 (the second stream and the receipt's read),
+and its lap 3,656 s against the control's 3,644 s, one after the other under the lock.
+
+Her writes first (the theory panel, shown to Brandon raw): neither lap holds a sentence; the arm keeps fewer of the register's words, 84%
+and 81% in the lexicon (logic, theory) against the control's 91% and 87%.
+
+| G-L5 | read at the means, W132i against W132, paired | guess |
+|---|---|---|
+| (a) the level's own face | 2.98 nats a place (tenth 1.76, ninetieth 5.02) against 22.50 | held |
+| (b) held text | +0.0253 (±0.0006) over 200,933 places | missed (within 0.004 asked) |
+| (c) text regions | every one up: acts +0.0217, books +0.0254, code +0.0178, dialogue +0.0259, harness +0.0204, logic +0.0187, science +0.0216, theory +0.0255, web +0.0212, wikidata +0.0550 | missed |
+| (d) the join's share at a word's first letter | 0.893 (W101r 0.915; at a space or mark 0.511, inside a word 0.804) | missed (under 0.88 asked) |
+| (e) a second level by the join's law | 0.334 against 0.338 shuffled (planted 0.959) | missed |
+| (f) the wide panel's lexicon share | 68% against 70% | held |
+
+Beside them: the terrain's held codes rose with the arm (copy 0.078 against 0.030, reverse 0.154 against 0.038, sum 0.765 against
+0.744); the arm is louder than its control in nine of ten regions (all 22.698 octaves against 22.652; lanes 0 to 4 by 0.02 to 0.04); her
+state at a word's first letter holds what it held (the word before 0.226 against 0.220, the word two before 0.025 against 0.024).
+
+What it says: keeping the receipt's covector out of the fine states removed about a third of W101r's cost (+0.0253 against +0.0355)
+and none of its shape (every register up by about the same amount). The rest runs forward: the receipt trains `B⁻` to make the row it
+hands on predict the next symbol through the opening's reader, the prolongation adds that row into her state at the split, and her
+readers, which read the state whole, pay for a row tuned to another reader; the arm is louder everywhere and codes worse everywhere. The
+face it buys is the same whatever the route (2.96 joined, 2.98 inside) and holds the rhythm of breaks (§11). The line goes on from
+W132's end (held text 0.6746, −0.0036 against W131w).
+
+So a comparison at the level's grain gives the level a face and no depth: what the level hands on is a sum over an epoch's places at
+six harmonics of the news phase, which held the handed epoch as one identity at 0.009 on November 23 (the level's receipt record) and
+its first byte at 0.135. The next premise is the level's restriction itself, read against the form the theory gives a unit: a strand's
+face `m = Σ_k Ĝ(τ(k))⁻¹ E(u_k)`, each place transported by the navigator's own phase, of which the level's harmonics of one news phase
+are the coarsest case.

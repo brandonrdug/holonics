@@ -1,0 +1,9 @@
+Fixed 2026-11-26T20:26:57Z (date -u), the lead, before W130w trains. Refs #404.
+The line's laps heard whole, no change: W130w from W129w's end and W131w from W130w's, 3,000 sections each on e5fr on the wave's store,
+every read at each lap's mean. The premise read first: four laps heard whole from W125 took the held text 0.6916, 0.6871 (W127w), 0.6782
+(W128w), 0.6824 (W129w), a lap mean scattering by about 0.004, and the wave 0.9179 to 0.8846.
+G-L4 (at the lap means, one place open, read by part):
+  (a) (0.5) the held text at W131w's mean stands at least 0.002 under W129w's 0.6824, paired;
+  (b) (0.45) at least eight of the ten text regions stand under W129w's at W131w's mean;
+  (c) (0.5) the wave at W131w's mean stands at 0.880 or under (W129w 0.8846);
+  (d) (0.6) the wide panel's lexicon share within 3 points of W129w's 72%.
