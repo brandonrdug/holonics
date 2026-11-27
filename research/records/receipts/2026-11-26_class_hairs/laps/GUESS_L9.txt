@@ -1,0 +1,11 @@
+Fixed 2026-11-27T14:38:04Z (date -u), the lead, before W136b trains. Refs #404.
+G-L8 read (W135b, the slow store, against W135s, one lap from W134s's end): held text +0.0005 (±0.0002), every region within 0.0012; a
+word's first letter last met over 30 places back +0.0063 (±0.0015), within 30 −0.0017 (±0.0030); the training code 1.0005 times the
+control's, flat across the lap; B_bank's root mean square 183,259 on 2^-24 against B⁻'s 3,059,687; the fades held. The bank enters at no
+price and carries no news in one lap while its block has opened to a seventeenth of B⁻'s scale, so a second lap: W136b from W135b's end
+beside W136s from W135s's end, 3,000 sections heard whole each on e5g5.
+G-L9 (at the lap means, one place open, paired, by part):
+  (a) (0.6) W136b's held text within +0.002 a place of W136s's, or under it;
+  (b) (0.3) a word's first letter last met over 30 places back stands at least 0.005 under its control's (W136b less W136s);
+  (c) (0.6) B_bank's root mean square at W136b's end at least 1.5 times W135b's;
+  (d) (0.2) the word two before at a word's first letter at least 0.028 at W136b's mean.
