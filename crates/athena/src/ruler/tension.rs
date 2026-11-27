@@ -1842,21 +1842,21 @@ pub fn read_strand_cut(args: &[String]) -> Result<()> {
     write_new(&out.join("powers.tsv"), powers.as_bytes())?;
     if face {
         // [the lead, November 26, the formal thread's record of nested cycles §9 item 3] The level read at its own face: each open place
-        // that reads an epoch, its site of the `2n` and its symbol's code at the prolonged row alone (on `2^(−20)` bits), on a copy of the
-        // field with the receipt's read set; the state is the same.
+        // that reads an epoch, its site of the `2n`, its symbol's code at the prolonged row alone and from the row at rest (on `2^(−20)`
+        // bits), on a copy of the field with the receipt's read set; the state is the same.
         let mut faced = learner.field.clone();
         if let Some(sc) = faced.scale.as_deref_mut() {
             sc.receipt = true;
         }
         #[allow(clippy::type_complexity)]
-        let read: Vec<Vec<(usize, i64)>> = rows
+        let read: Vec<Vec<(usize, i64, i64)>> = rows
             .par_iter()
             .map(|classes| faced.strand_level_face(classes, past).map_err(|e| e.to_string()).and_then(|c| c.map(|(_, _, f)| f).ok_or_else(|| "a field whose level does not hear a strand".to_string())))
             .collect::<std::result::Result<_, _>>()?;
         let mut text = String::new();
         for (r, f) in read.iter().enumerate() {
-            for (site, code) in f {
-                text.push_str(&format!("{r}\t{site}\t{code}\n"));
+            for (site, code, rest) in f {
+                text.push_str(&format!("{r}\t{site}\t{code}\t{rest}\n"));
             }
         }
         write_new(&out.join("face.tsv"), text.as_bytes())?;

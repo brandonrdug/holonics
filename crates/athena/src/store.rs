@@ -2512,13 +2512,19 @@ pub fn set_leak(args: &[String]) -> Result<()> {
     Ok(())
 }
 
-/// [definition; the lead, November 23] `set-receipt STATE STATE_SHA OUT`: **a learner whose level is compared at its own grain**
-/// ([`holonics_engine::field::Scale::receipt`]): the state with its level's line carrying the word `receipt`, every other line as it stands
-/// (read back and checked). Refused on a state with no level, with a level that has no one-sided block (the receipt is a strand's), or
-/// whose level already carries it. It writes a new state.
+/// [definition; the lead, November 23] `set-receipt STATE STATE_SHA OUT [inside]`: **a learner whose level is compared at its own grain**
+/// ([`holonics_engine::field::Scale::receipt`]): the state with its level's line carrying the word `receipt` (and `inside`, where given,
+/// so the receipt's pull stays in the level: [`holonics_engine::field::Scale::inside`]; the lead, November 26), every other line as it
+/// stands (read back and checked). Refused on a state with no level, with a level that has no one-sided block (the receipt is a
+/// strand's), or whose level already carries it. It writes a new state.
 pub fn set_receipt(args: &[String]) -> Result<()> {
-    if args.len() != 4 {
-        return Err("set-receipt STATE STATE_SHA OUT".into());
+    let inside = match args.get(4).map(String::as_str) {
+        None => false,
+        Some("inside") => true,
+        Some(_) => return Err("set-receipt STATE STATE_SHA OUT [inside]".into()),
+    };
+    if args.len() != 4 && args.len() != 5 {
+        return Err("set-receipt STATE STATE_SHA OUT [inside]".into());
     }
     let text = String::from_utf8(pinned_read(&args[1], &args[2], STATE_BUDGET)?)?;
     let out = Path::new(&args[3]);
@@ -2535,6 +2541,7 @@ pub fn set_receipt(args: &[String]) -> Result<()> {
         return Err("a level already compared at its own grain".into());
     }
     s.receipt = true;
+    s.inside = inside;
     let written = learner.to_text();
     if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
         return Err("a learner that does not read back as itself".into());
@@ -2573,6 +2580,7 @@ pub fn splice_level(args: &[String]) -> Result<()> {
     }
     let mut s = b.clone();
     s.receipt = false;
+    s.inside = false;
     fine.field.scale = Some(Box::new(s));
     let written = fine.to_text();
     if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {

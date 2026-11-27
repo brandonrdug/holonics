@@ -388,16 +388,14 @@ impl<'c> Resident<'c> {
     /// level's and the glue's covectors added into their own buffers. The cut is data and takes nothing.
     pub(crate) fn tower_back(&self, field: &Constitution, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, back: &Back<'c>, cb: &Back<'c>) -> Result<()> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's reverse of a field without a level"))?;
-        let (d0, d1, h) = (field.declaration.width, s.coarse.declaration.width, tr.harmonics);
-        let (a, ab, b, bb, _) = tr.offsets;
-        let epochs = tb.st.sites;
-        let (cg, gg) = match (tr.cg.as_deref(), tr.gg.as_deref()) {
-            (Some(cg), Some(gg)) => (cg, gg),
-            _ => return Err(TowerError::Refused("a level's reverse without its levels' covectors")),
-        };
-        // The prolongation: `δv(j)` each epoch's harmonics of its places' covectors, then `δb_B`, `δB` and `δr̂¹ = Bᵀ δv`.
-        // [the level's receipt] The places' covectors with the receipt's joined on the level's route alone (the fine path keeps `back.dx`).
-        let joined = match tb.receipt.as_ref() {
+        let d0 = field.declaration.width;
+        // [the level's receipt] The places' covectors with the receipt's joined on the level's route alone (the fine path keeps `back.dx`);
+        // [the lead, November 26] under `Scale::inside` the receipt's runs as a stream of its own that stops at the restriction's material.
+        match tb.receipt.as_ref() {
+            Some((_, own_dx)) if s.inside => {
+                self.level_stream_back(field, words, tr, tb, back.dx.device_ptr(), Some(back), cb)?;
+                self.level_stream_back(field, words, tr, tb, own_dx.device_ptr(), None, cb)
+            }
             Some((_, own_dx)) => {
                 let cells = (tb_fine_sites(words) * d0) as u64;
                 let sum = self.timed(Kind::Alloc, || self.take_zeroed::<i64>((cells as usize).max(1))).map_err(device)?;
@@ -405,11 +403,26 @@ impl<'c> Resident<'c> {
                     let (mut p, mut q, mut c) = (from, sum.device_ptr(), cells);
                     self.launch("field_add", Self::cells(cells), THREADS, &mut [arg(words), arg(&mut p), arg(&mut q), arg(&mut c)])?;
                 }
-                Some(sum)
+                self.level_stream_back(field, words, tr, tb, sum.device_ptr(), Some(back), cb)
             }
-            None => None,
+            None => self.level_stream_back(field, words, tr, tb, back.dx.device_ptr(), Some(back), cb),
+        }
+    }
+
+    /// One stream of the level's reverse ([`Resident::tower_back`]; the host's `level_stream_before`): the covector at `from` of the fine
+    /// sites' states after the prolongation, through the prolongation, the level's ticks and the restriction, the level's and the glue's
+    /// covectors added into their own buffers; where `push` is given, the restriction's adjoint returns it into `push.dx`.
+    #[allow(clippy::too_many_arguments)]
+    fn level_stream_back(&self, field: &Constitution, words: &mut Words, tr: &mut TowerRun<'c>, tb: &TowerBatch<'c>, from: u64, push: Option<&Back<'c>>, cb: &Back<'c>) -> Result<()> {
+        let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's reverse of a field without a level"))?;
+        let (d0, d1, h) = (field.declaration.width, s.coarse.declaration.width, tr.harmonics);
+        let (a, ab, b, bb, _) = tr.offsets;
+        let epochs = tb.st.sites;
+        let (cg, gg) = match (tr.cg.as_deref(), tr.gg.as_deref()) {
+            (Some(cg), Some(gg)) => (cg, gg),
+            _ => return Err(TowerError::Refused("a level's reverse without its levels' covectors")),
         };
-        let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (joined.as_ref().map_or(back.dx.device_ptr(), |s| s.device_ptr()), tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.pad.device_ptr());
+        let (mut src, mut hp, mut op, mut e64, mut h32, mut w32, mut dst) = (from, tb.harmonics.device_ptr(), tb.off.device_ptr(), epochs as u64, h as u32, d0 as u32, tb.pad.device_ptr());
         // [the record of the two streams §11] A strand's level: an epoch's `δv⁻` is the chart of the covectors of the sites that read it (the
         // known sites of the epoch after it and the open places that stand in that epoch), through `B⁻`; the restriction returns to each
         // epoch's known sites alone (the host's `scale_return_before`).
@@ -436,6 +449,7 @@ impl<'c> Resident<'c> {
         }
         // The restriction: `δb_A`, `δA` and `δm = Aᵀ δx¹`, each place's part at its own phase through its read's adjoint into `δx`.
         self.outer_biased(&mut tr.cwords, gg, a as u64, ab as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.restricted.device_ptr(), h * d0, true, false)?;
+        let Some(back) = push else { return Ok(()) };
         let mut gwords = tr.cwords;
         gwords.theta = tr.glue_at;
         self.transposed(&mut gwords, a as u64, d1, h * d0, cb.dx.device_ptr(), d1, tb.pad.device_ptr(), false, false)?;

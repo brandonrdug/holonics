@@ -338,3 +338,45 @@ place that reads each unit finds a little (0.387 against 0.358) in units of abou
 is what gives a level a face, and the receipt with its pull kept inside the level is the way to have it without the cost W101r paid in
 every register; and how a second level is cut from a first level's face is not yet the sum of its news, which is the formal pass's to
 state before a second level is built.
+
+## 11. The second level cut on what the join left unsaid: her level's face holds where a break falls and not the next word
+
+The formal pass answered §10 at 23:50 UTC with the cut's law, the first level's own law one level up in the level's own unit: a unit's
+news is the share the join left unsaid, `n_u = R_u / Z_u`, where `R_u` is the level face's code of unit `u`'s places (each read from unit
+`u − 1`'s row carried across the join) and `Z_u` the same places' codes through the same reader from the row at rest; its clock is
+`S2 = Σ n` and its section one unit (a unit the join told nothing has `n = 1`, so no number is handed in); a site is a unit whose `n`
+stands above every unit within one unit of `S2`, and a unit the past misleads (`n > 1`) is always one. Its reason: the sum of place
+codes of §10 carries a unit's length and its letters' rarity, which are the first level's quantities, while whether a unit follows
+from the one before is the only news a second level has (the chart: the dip in transitional probability infants cut words by, and
+Harris's successor counts). Its guesses were fixed before the read ([`GUESS_Z5.txt`](receipts/2026-11-26_class_hairs/depth/GUESS_Z5.txt)).
+
+`read-strand-cut ... face` now writes, beside each open place's code at the level's face, its code from the row at rest (a zero row,
+which charts to zero, so the reader's bias alone; `Field::strand_level_face`), and `tools/level_face_ruler.py` cuts by the law. The
+ruler also placed a unit's news one unit early until this read (the places that read epoch `j` are unit `j + 1`'s), which the §10
+figures carry; the sum law's word-start share falls to 0.300 on W101r (0.257 and 0.261 on W101 and W129w) once it stands at its own
+unit. The join's planted control finds the words (0.959). Receipt [`level_join.txt`](receipts/2026-11-26_class_hairs/depth/level_join.txt),
+the 407 word rows, 125,404 places, host reads of 449 to 453 s at eight threads each (three together).
+
+| state | `n`, median (tenth, ninetieth) | units misled | second level: word starts, against `n` shuffled | its units, in first-level units |
+|---|---|---|---|---|
+| W101r (the receipt, one lap) | 0.763 (0.541, 1.059) | 0.142 | 0.344 against 0.341 | 4 |
+| W101 (no receipt) | 5.03 (2.70, 7.18) | 0.988 | 0.350 against 0.346 | 1 |
+| W129w (no receipt) | 5.51 (2.94, 7.81) | 0.990 | 0.350 against 0.346 | 1 |
+
+| G | read | guess |
+|---|---|---|
+| G-Z5 | W101r 0.344 against 0.341 | missed (0.05 above asked) |
+| G-Z6 | W101 +0.004, W129w +0.004 | held (within 0.02) |
+| G-Z7 | W101r's median second-level unit holds 4 first-level units | missed (2 or 3 asked) |
+
+**By part** (the join's share a place, on W101r; `LEVEL_FACE_JOIN_PART`): at a space or a mark 0.521 (the join tells half of it), at a
+letter inside a word 0.810, and at a word's first letter 0.915. A unit's share is the same whatever stands at its anchor (0.751 at a
+word's start, 0.775 inside a word, 0.752 at another byte). Without the receipt the level misleads everywhere, a word's first letter
+least (4.5 and 5.0 on W101 and W129w).
+
+So the face the receipt gave her level holds where the next break falls, the rhythm of spaces and marks, and tells under a tenth of the
+next word's first letter. A unit then follows from the one before about as well wherever it starts, and no second level stands on it.
+This is the depth reads' finding (G-Z3: the word two before at 0.025) seen from the level's side: the epoch before carries the passage's
+rhythm and not its word, so what the level hands on cannot tell which word comes. The receipt kept inside the level (`Scale::inside`,
+this day) is built and on the card (its parity reads the host's bits in both forms), and its arm from the line's end reads, beside the
+face, whether the share at a word's first letter falls.

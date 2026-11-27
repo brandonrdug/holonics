@@ -1917,25 +1917,34 @@ mod tests {
             }
         }
         let plain = live.field.clone();
-        let mut field = plain.clone();
-        field.scale.as_deref_mut().unwrap().receipt = true;
         let card = Card::open(0).expect("a CUDA card with the field's kernels built");
         let mut card_field = Resident::open(&card).unwrap();
-        for n in [3usize, 7, 64] {
-            let classes: Vec<usize> = (0..n).map(|t| (t * 53 + 5) % 120).collect();
-            let known = vec![false; n];
-            for past in [false, true] {
-                let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None, stretches: None }];
-                let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
-                let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
-                let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
-                println!("LEVEL_RECEIPT_PARITY places={n} past={past} faces_equal={} covector_apart={unequal} of {}", host_faces == card_faces, card_g.len());
-                assert_eq!(host_faces, card_faces, "{n} places, past {past}: the faces are the host's");
-                assert_eq!(unequal, 0, "{n} places, past {past}: the covector is the host's");
-                let (plain_faces, plain_g) = card_field.read_and_return(&plain, &regions).unwrap();
-                assert_eq!(plain_faces, card_faces, "{n} places, past {past}: the receipt moves no face");
-                if n > 3 {
-                    assert_ne!(plain_g, card_g, "{n} places, past {past}: the receipt moves the covector");
+        // [the lead, November 26] Both forms of the receipt: joined to the places' covector, and kept inside the level (`Scale::inside`),
+        // whose fine field's covector is the plain field's.
+        for inside in [false, true] {
+            let mut field = plain.clone();
+            field.scale.as_deref_mut().unwrap().receipt = true;
+            field.scale.as_deref_mut().unwrap().inside = inside;
+            let base = field.theta.len();
+            for n in [3usize, 7, 64] {
+                let classes: Vec<usize> = (0..n).map(|t| (t * 53 + 5) % 120).collect();
+                let known = vec![false; n];
+                for past in [false, true] {
+                    let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None, stretches: None }];
+                    let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+                    let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+                    let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
+                    println!("LEVEL_RECEIPT_PARITY inside={inside} places={n} past={past} faces_equal={} covector_apart={unequal} of {}", host_faces == card_faces, card_g.len());
+                    assert_eq!(host_faces, card_faces, "inside {inside}, {n} places, past {past}: the faces are the host's");
+                    assert_eq!(unequal, 0, "inside {inside}, {n} places, past {past}: the covector is the host's");
+                    let (plain_faces, plain_g) = card_field.read_and_return(&plain, &regions).unwrap();
+                    assert_eq!(plain_faces, card_faces, "inside {inside}, {n} places, past {past}: the receipt moves no face");
+                    if n > 3 {
+                        assert_ne!(plain_g, card_g, "inside {inside}, {n} places, past {past}: the receipt moves the covector");
+                    }
+                    if inside {
+                        assert_eq!(plain_g[..base], card_g[..base], "{n} places, past {past}: the fine field takes nothing from the receipt kept inside");
+                    }
                 }
             }
         }

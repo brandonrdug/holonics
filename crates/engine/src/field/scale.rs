@@ -46,6 +46,15 @@ pub struct Scale {
     /// linear in the units relieves the fine comparison at the level's locus), and at a word's first letter her state holds the word two
     /// before at 24 thousandths (the play record of November 23, §6).
     pub receipt: bool,
+    /// [definition; the lead, November 26, the receipt record of November 23 §5 and the record of the class hairs §10] **The receipt's
+    /// pull kept inside the level**: where set beside [`Scale::receipt`], the reverse runs two streams through the level. The places'
+    /// covector alone runs the whole route and returns into the fine states before the prolongation, as it does with no receipt; the
+    /// receipt's covector alone runs `B⁻`, the level's ticks and the restriction's material (`A`, `b_A`) and stops there, so it changes the
+    /// level's own material and never the fine states it reads. Written as the word `inside` after `receipt`, only where set. Why: on
+    /// W101r the receipt joined to the places' covector ran back through the restriction's adjoint into the fine states, and every
+    /// register's code rose by about the same amount (+0.0355 nats a place over 140,564 places) while the level's face fell from 21.7 to
+    /// 2.96 nats a place.
+    pub inside: bool,
     /// [definition; the lead, November 24, the record of the evening of November 23 §7; the formal thread's reading of the join,
     /// `agent-inferred`] **The level's own lane**: where set, the fine field's last face lane is the level's. The prolongation writes it
     /// alone (`B⁻`'s and `b_B⁻`'s rows of every other coordinate are held at zero) and nothing else writes it (the encodings' and the strand
@@ -569,7 +578,7 @@ impl Constitution {
             *v = fit32((k * ((three << MATERIAL_BITS) / pd) as i128) >> 31, "a founded value outgrew its 32-bit carrier")?;
         }
         let mut out = self.clone();
-        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, lane: false }));
+        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, inside: false, lane: false }));
         Ok((out, at))
     }
 
@@ -828,20 +837,10 @@ impl Constitution {
     /// The reverse of [`Constitution::scale_forward_before`]: `dx`, the covector of the `2n` sites' states after the prolongation, is
     /// carried through `B⁻`, the level's ticks and the restriction into the covector of the known sites' states before it; the level's
     /// field's covector and the glue's (`A`, `b_A`, `B⁻`, `b_B⁻`) are added into `g`. The cut and the phases are data and take nothing.
+    /// Under [`Scale::inside`] the receipt's covector runs as a stream of its own that stops at the restriction's material.
     pub(crate) fn scale_return_before(&self, s: &Scale, pass: &ScalePass, dx: &mut [i64], g: &mut [i128]) -> Result<()> {
-        let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
-        let Some((b2, bb2, _)) = s.before_offsets(d0) else {
-            return refuse("a strand's level's reverse on a tower without its one-sided block");
-        };
-        let cut = &pass.cut;
-        let n = cut.epoch.len();
-        let epochs = pass.definite.len();
-        let (a, ab, _, _, _) = glue_layout(h, d0, d1);
-        let len0 = self.theta.len();
-        let len1 = s.coarse.theta.len();
-        let (_, rest) = g.split_at_mut(len0);
-        let (gc, gg) = rest.split_at_mut(len1);
-        let gl = &s.glue;
+        let d0 = self.declaration.width;
+        let n = pass.cut.epoch.len();
         // The prolongation: `δv⁻_k(j) = release(Σ_(t reads j) h_k(φ_t) δx_t, 30)` over the known sites and the open places that read
         // epoch `j`, then `δb_B⁻ += Σ_j δv⁻(j)`, `δB⁻ += δv⁻(j) r̂¹_jᵀ` and `δr̂¹_j = B⁻ᵀ δv⁻(j)`.
         // [the level's receipt] Each compared row's covector through the opening's reader, held (the reader takes none): `δy⁰ =
@@ -864,13 +863,43 @@ impl Constitution {
                 own[t * d0..(t + 1) * d0].copy_from_slice(&back);
             }
         }
+        if s.inside && !pass.receipt.is_empty() {
+            // [the receipt kept inside the level] Two streams: the places' covector runs the whole route into the fine states; the
+            // receipt's runs the level's own material and stops at the restriction's.
+            let places = dx.to_vec();
+            let none = vec![0i64; 2 * n * d0];
+            self.level_stream_before(s, pass, &places, &none, Some(dx), g)?;
+            self.level_stream_before(s, pass, &own, &none, None, g)
+        } else {
+            let places = dx.to_vec();
+            self.level_stream_before(s, pass, &places, &own, Some(dx), g)
+        }
+    }
+
+    /// One stream of [`Constitution::scale_return_before`]: the covector `src + extra` of the `2n` sites' states after the prolongation,
+    /// through `B⁻`, the level's ticks and the restriction, the level's field's and the glue's covectors added into `g`; where `push` is
+    /// given, the restriction's adjoint returns it into the known sites' states before the prolongation there.
+    fn level_stream_before(&self, s: &Scale, pass: &ScalePass, src: &[i64], extra: &[i64], push: Option<&mut [i64]>, g: &mut [i128]) -> Result<()> {
+        let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
+        let Some((b2, bb2, _)) = s.before_offsets(d0) else {
+            return refuse("a strand's level's reverse on a tower without its one-sided block");
+        };
+        let cut = &pass.cut;
+        let n = cut.epoch.len();
+        let epochs = pass.definite.len();
+        let (a, ab, _, _, _) = glue_layout(h, d0, d1);
+        let len0 = self.theta.len();
+        let len1 = s.coarse.theta.len();
+        let (_, rest) = g.split_at_mut(len0);
+        let (gc, gg) = rest.split_at_mut(len1);
+        let gl = &s.glue;
         let mut acc = vec![0i128; epochs * h * d0];
         for t in 0..2 * n {
             let Some(j) = pass.source[t] else { continue };
             let ht = if t < n { &cut.harmonics[t * h..(t + 1) * h] } else { &pass.open_harmonics[(t - n) * h..(t - n + 1) * h] };
             let slot = &mut acc[j * h * d0..(j + 1) * h * d0];
             for (k, &hk) in ht.iter().enumerate() {
-                for (c, (&v, &o)) in dx[t * d0..(t + 1) * d0].iter().zip(&own[t * d0..(t + 1) * d0]).enumerate() {
+                for (c, (&v, &o)) in src[t * d0..(t + 1) * d0].iter().zip(&extra[t * d0..(t + 1) * d0]).enumerate() {
                     slot[k * d0 + c] += hk as i128 * (v as i128 + o as i128);
                 }
             }
@@ -909,6 +938,7 @@ impl Constitution {
         let ds: Vec<&[i64]> = dx1.chunks_exact(d1).collect();
         let ms: Vec<&[i64]> = pass.restricted.chunks_exact(h * d0).collect();
         outer_sum(&mut gg[a..ab], h * d0, &ds, &ms)?;
+        let Some(dx) = push else { return Ok(()) };
         let reach_a = reach(&gl[a..ab]);
         let mut dm_k = vec![0i64; h * d0];
         let mut dr = vec![0i64; d0];
