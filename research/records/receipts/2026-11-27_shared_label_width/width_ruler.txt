@@ -1,0 +1,8 @@
+1. triangle 3-4-5: W = 6.007, half perimeter 6, three separate edge bits 12
+2. segment 0..8: W(ends) = 8.002, W(ends and 7 places inside) = 8.002
+3. square: geometric mean of cut ranks U 1.4142, V 1.4142, U+V 3.0000 against additive 2.8284
+4. rings 5, 7, 9: nearest lags 315 (0.000), 189 (0.540), 126 (0.540), 225 (0.558), 90 (0.558), 280 (0.566); lag 1 0.961, lag 2 1.705
+5. span 8, 2 splits held as one sum: at most the costliest split + 8.00 bits
+5. span 8, 3 splits held as one sum: at most the costliest split + 12.68 bits
+5. span 8, 4 splits held as one sum: at most the costliest split + 16.00 bits
+5. span 8, 8 splits held as one sum: at most the costliest split + 24.00 bits
