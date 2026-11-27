@@ -202,3 +202,39 @@ places each, so a word met past 30 places has at most a row's few dozen earlier 
 G-Z36 (0.5). The same ruler with its coefficient set by the count's state, read on a held passage carried whole over 8,000 places
   or more (her state run on through it, never reset at a row), adds past 30 places at least twice its row read at a word's fourth
   letter on (0.09 or more) and at least 0.03 at a first letter.
+
+Scored 2026-11-27T16:27Z as a variant, the 8,000 places fixed standing past her declaration's reach (3,771 places, 9·419): read
+at 3,700 places on sixteen held passages (12 books, 4 theory; 45,551 letter places) against the same text cut into 300-octet rows
+(44,339), W135s's mean, the count's coefficient set by its state. G-Z36 missed. Past 30 places, long against cut: a first letter
++0.0028 against +0.0071 (0.03 asked), a second +0.0060 against +0.0005, a third +0.0196 against +0.0027, the fourth on +0.0271
+against +0.0002 (more than twice the cut, under the 0.09 asked). Her face already holds a recurring word at that span: past 30, its
+fourth letter on codes 0.182 nats, its first letter 2.325 against 3.250 for a new word.
+
+Fixed 2026-11-27T17:17Z (date -u 17:17:34 at drafting), before any read. Premises read first: her sixteen rings are the powers of
+two to 4,096 and of three to 6,561, each with the skin e^(−2π d/P) (navigator::ring_periods, navigator::skin_of, the lead's read of
+17:14 UTC); the store line draws stretches of 8 to 1,022 places from random places in documents (store.rs, the lead's read).
+
+G-Z37 (0.75). The ring-placement ruler: her code at a recurring word's third letter on, its lag binned by sixteenths of an octave
+  from 32 to 3,700 places, shows no dip at lags within 1% of a multiple of 729, 1,024, 2,187 or 4,096: each such bin codes within
+  the scatter of its two neighbour bins, since a ring's phase returns only where its skin keeps e^(−2π) of the place.
+G-Z38 (0.55). The level's part store on the host at the level's own width, its read joined to her face by one coefficient fitted on
+  the even halves and read on the odd, on the joined held passages where the word was last met before a reset, gains at a word's
+  third letter on between 0.1 and 0.5 of the count ruler's +0.229 (+0.023 to +0.115): its width binds what it holds.
+G-Z39 (0.6). At twice that width, the only change, the same read gains at least a quarter more there.
+G-Z40 (0.55). The trainer's walk of consecutive stretches with the part carried across each crossing, as an arm beside the line's
+  random draw from the same saved state over the same sections: its held code inside her reach stands within 0.005 nats a place
+  of the control's, and on the joined held passages past a reset it codes a word's third letter on at least 0.05 nats under the
+  control.
+G-Z41 (0.65). On the fixed panel the walk arm's writes loop no more often than the control's: the copier's signature does not rise.
+
+Fixed 2026-11-27T17:30Z (date -u 17:30:07 at drafting; sent to the lead at once, written here at 17:32), before either read.
+Premise read first: the lead's first read of the host part store (tools/part_store_ruler.py) at W = 64, 128 and 256, with leaks of
+128, 512 and 2,048 places or none: the fitted coefficient 0 both ways and no gain in any part, her letter rows sharing a common
+part (mean cosine 0.40) and the six terms barely separating places, so the additive face pairs as a bag of letters.
+
+G-Z42 (0.6). The planted limit, one-hot letters ⊗ one-hot places (all 832 terms), reaches at least a third of the count ruler's
+  +0.229 at a word's third letter on past a reset; her rows ⊗ the constant and the sixteen rings' turns (32 terms) at W up to 512
+  stay under a tenth of it.
+G-Z43 (0.65). A store keyed by the carry, χ(p) = Π_i χ_i(u_i) on J circles, charged at each word's close with Σ_k χ(w_<k) ⊗ e(w_k)
+  and leaking, read by F · χ(p)*, at J of 1,024 or more reaches at least half the ruler's gain there, rising about as √J until it
+  meets the ceiling.
