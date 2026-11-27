@@ -1,6 +1,6 @@
 # A word is a strand a locale adopted: its ends are where its readings agree, its inside is every split at once, a moved end turns its face, and a row handed down pays only by news its reader lacks
 
-[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z46 fixed before their reads; the formal thread,
+[interpretation at weight 0.7, with eighteen finite statements in Lean and the guesses G-Z13 to G-Z48 fixed before their reads; the formal thread,
 November 27, on Brandon's messages of 07:57, 17:07 and 17:25 UTC and on the lead's score of G-L6 that morning] Status: one law on what a level's unit
 is past spelling, its charts (adoption, articulation, reading by prominence, a program's gaps), what it predicts for the strand-face
 arm W133s, a second law on why a row handed into her state costs every register and costs most where her face is open,
@@ -485,7 +485,28 @@ state's gate gives +0.028 and +0.031, a third of it. G-Z44 half held and G-Z45 h
 reads whether her located turns key the store worse than random ones, which place a prefix by identity where hers place it by
 what it predicts. If it holds, the part's key is its own: circles of the level, turned at founding by the unit's identity.
 
-## 20. Owners
+## 20. The part's key is its own, its ends are her epochs read for stability, and the joined covector charges it (the lead's read of her carry gates, 18:50 UTC)
+
+G-Z46 held. Her own carry circles key the delta store at a twentieth and a tenth of drawn circles (+0.0034 and +0.0069 against
++0.067 and +0.074 past a reset, at 512 circles): her turns place a prefix by what it predicts in its context, the letter at a place
+explaining 0.22 of a turn's variance on the mean circle, so a word met again in another context composes another carry. The part's
+key is its own: circles of the level turned at founding by a unit's symbols and their places, the same at every meeting, a part
+founded with drawn operands, its rows `F` located by deposition.
+
+**The ends (0.65).** One law reads every stream, so the unit is the machine's own cut, her epoch, and a letter run is a text
+codec's chart; `F`'s rows are her symbol rows `E(u)`. The key `θ_j(u, i)` takes each symbol's place in its unit, so a moved cut
+moves every key (§3), and a predicted input goes dark, so a recurring unit's landmark cuts can move. G-Z47 reads the stability
+first; where it misses, the store is keyed by the carries of the last `k` places for every `k` up to a unit's length, the same
+store with no cut, whose short suffixes the delta charge saturates.
+
+**The join (0.6).** The joined logits are `ℓ = ℓ_her + λ ℓ_store` with `ℓ_store = β F χ`. The field takes the joined face's
+covector at its locus, `F ← F + η λ β (q − p_joined) χ*`, whose fixed point is what her face misses, so the part spends its
+capacity only on her news, as a handed row pays only by news its reader lacks (§6), and it still saturates where the joined face
+reads the symbol. Its confidence is `λ = a ρ(s)`, `ρ` the store's read power at the address and `a` a slope of the constitution,
+with `∂L/∂a = ρ (E_p[ℓ_store] − ℓ_store(target))`: the slope rises where the store gives the target more than the joined face
+expects. G-Z48 reads the joined charge against the store's own delta.
+
+## 21. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance`, `two_way_push_variance_le`, `span_insert_inside`, `span_le_insert`, `coprime_rings_alias_iff`,
@@ -494,5 +515,5 @@ what it predicts. If it holds, the part's key is its own: circles of the level, 
   `delta_charge_zero_at_read` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store`, `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z46.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z48.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
