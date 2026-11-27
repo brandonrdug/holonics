@@ -377,3 +377,18 @@ mixture_with_flat_le), so a mixture pays for every unmet depth and a product pay
 G-Z57 (0.45). In the product form at J = 512, an exponent per address added to each depth's slope, λ_k(s) = g_k + a_k ρ_k + β_k(s)
   with β_k(s) = Re⟨B, χ_k⟩/J and B charged at each place by η (E_p[ℓ_k] − ℓ_k(x)), the exponent's own covector, gains at a
   recurring word's third letter past a reset at least +0.077, the global form's +0.072 and 0.005 more.
+
+Read 2026-11-27T21:15Z beside G-Z55, a ruler (tree_store_512_grid.txt, the plain stop-weight form on a grid reaching below its
+edge, τ over 1, 2, 4 and g over 0.25, 0.5): both halves took τ = 1, the new low edge, with g = 0.5. Past a reset +0.0040, +0.0074,
++0.020 (scatter 0.000) and +0.017 at the first, second and third letters and after; over every byte place +0.0074 (0.0001). The
+mixture's best is to flatten its faces toward its components' background, which removes the first-letter cost and keeps +0.020
+of the product's +0.072 at the third letter.
+Corrected 21:16Z: G-Z57's charge is written as the loss's derivative, E_p[ℓ_k] − ℓ_k(x); added to β it is its negative,
+η (ℓ_k(x) − E_p[ℓ_k]), the ascent of the joined log-likelihood, which is the lead's build (r_k(y) − E_p[r_k]). The guess is scored
+on that build.
+
+Scored 2026-11-27T21:20Z on the lead's exponent arm at J = 512 (suffix_store_suffix_512_exponent.txt; the global form's F and
+slopes, with β_k = Re⟨B, χ_k⟩/J added to each depth's exponent and B charged at η = 1/4 by r_k(y) − E_p[r_k], so the arm differs
+by B alone): G-Z57 held, by a hair. Past a reset +0.0780 (scatter 0.0017) at the third letter against +0.0720 (0.0027), 0.006 more
+against the 0.005 asked; +0.0636 against +0.0592 after it; +0.020 against +0.024 at the first and +0.029 against +0.030 at the
+second. Over every byte place +0.0128 (0.0043) against +0.0113 (0.0046), +0.0017 and +0.0014 on the two halves.
