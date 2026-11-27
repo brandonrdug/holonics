@@ -91,3 +91,15 @@ same ruler bank with the ticked x¹ read beside it.
 
 G-Z21 (0.55). Dropping the period-2 ring lowers the third place's byte at no k of 1, 2, 4, 8, 16 by more than 0.01.
 G-Z22 (0.45). Adding periods 128 and 256 raises the third place's byte at k = 16 by at least half (0.032 to 0.048 or more).
+
+Scored 2026-11-27T09:26Z on the lead's ring-by-ring read (W133s's end, the third place's byte of the epoch k back, k = 1, 2, 4, 8,
+16; full bank 0.471, 0.259, 0.147, 0.082, 0.032): G-Z21 missed (dropping the period-2 ring lowers k = 1 by 0.023); G-Z22 missed
+(periods 2 to 256 raise k = 16 to 0.043, the bar 0.048). Each ring's drop costs most near the age of its own reach: the period 2
+at k = 1, 4 at k = 1 and 2, 8 at k = 2 and 4, 16 at k = 8, 32 at k = 4 and 8, 64 at k = 16.
+
+Fixed 2026-11-27T09:28Z (date -u 09:23:43 at drafting), before W135b (the bank, periods 2 to 64, 768 wide, B_bank founded at zero, its
+fades held with no covector) and its control W135s, both from W134s's end, read at lap means on held text.
+
+G-Z23 (0.55). W135b's held text stands within +0.008 nats a place of W135s's, or under it.
+G-Z24 (0.5). In W135b less W135s by place class (tools/place_class_ruler.py), letters inside a word stand within 0.005 of zero,
+  and first letters move the most of any class, either way.

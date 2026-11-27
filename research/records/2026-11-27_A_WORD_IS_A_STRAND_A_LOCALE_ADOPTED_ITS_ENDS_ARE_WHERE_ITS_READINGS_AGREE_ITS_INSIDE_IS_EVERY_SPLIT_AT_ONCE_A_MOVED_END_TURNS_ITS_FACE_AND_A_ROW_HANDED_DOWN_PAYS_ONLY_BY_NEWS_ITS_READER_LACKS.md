@@ -197,11 +197,28 @@ G-Z21 (0.55): dropping the period-2 ring lowers the third place at no `k` of 1 t
 epoch standing inside the level's own ticks. G-Z22 (0.45): adding periods 128 and 256 raises the third place at `k` = 16 by at
 least half. Both fixed at 09:12 UTC.
 
+**The rings, one at a time** (the lead's read, 09:23 UTC; the third place's byte of the epoch `k` back at `k` = 1, 2, 4, 8, 16).
+Full bank 0.471, 0.259, 0.147, 0.082, 0.032. Dropping the period 2: 0.448, 0.254, 0.149, 0.084, 0.032; 4: 0.429, 0.227, 0.142,
+0.084, 0.032; 8: 0.443, 0.227, 0.115, 0.075, 0.032; 16: 0.464, 0.234, 0.130, 0.049, 0.027; 32: 0.477, 0.248, 0.132, 0.069, 0.024;
+64: 0.483, 0.255, 0.139, 0.065, 0.013. Periods 2 to 256: 0.474, 0.262, 0.151, 0.071, 0.043; 4 to 256: 0.435, 0.257, 0.154,
+0.091, 0.043. G-Z21 missed (the period 2 holds 0.023 at `k` = 1) and G-Z22 missed (0.043 at `k` = 16 against 0.048). Each ring's
+drop costs most near the age of its own reach, a ring of period `n` sections of news reaching about `n` of them, `n/1.7` epochs:
+the bank is a calendar by the octave of age (`aeon.context-is-a-calendar`), and the read keeps all six. That the bank of 4 to 256
+reads `k` = 8 above the full bank is the held read paying each ring's directions in its own variance: a ring pays a price even in
+a ruler.
+
+**Before the arm (0.65).** `B_bank` founded at zero enters with no price; it deposits only where a covector reaches it, and the
+covector holds a direction only where the bank tells her something, so its price grows at the rate's standing spread and stays drawn
+where her face is open (§7). The row of G-L6 cost at once because the level's `B` was already trained when the content of `x¹`
+changed under it. Far repeats already reach her by address (`store.far-price-stands-at-recurrence`), so the bank's news is the count
+and the far epoch's identity. G-Z23 (0.55): W135b's held text within +0.008 nats a place of W135s's, or under it. G-Z24 (0.5): by
+place class, letters inside a word within 0.005 of zero and first letters moving the most. Both fixed at 09:28 UTC.
+
 ## 10. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z22.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z24.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
