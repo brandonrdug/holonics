@@ -1,0 +1,9 @@
+LEVEL_UNIT_CHECK r_news_against_the_built_moment corr=1.0000 values=2688000
+LEVEL_UNIT unit_W132i cell=restricted width=64 epochs=34530 pos1=0.133 pos2=0.174 pos3=0.204 pos4=0.276 pos5=0.320 pos6=0.326 pos7=0.291 pos8=0.223 identity=0.013 next_first=0.008 planted=-0.000
+LEVEL_UNIT unit_W132i cell=r_news width=1344 epochs=34530 pos1=0.546 pos2=0.533 pos3=0.434 pos4=0.386 pos5=0.391 pos6=0.374 pos7=0.324 pos8=0.250 identity=0.063 next_first=0.008 planted=-0.000
+LEVEL_UNIT unit_W132i cell=r_rings width=1344 epochs=34530 pos1=0.660 pos2=0.801 pos3=0.798 pos4=0.821 pos5=0.798 pos6=0.769 pos7=0.678 pos8=0.510 identity=0.090 next_first=0.009 planted=-0.000
+LEVEL_UNIT unit_W132i cell=r_rings10 width=2240 epochs=34530 pos1=0.684 pos2=0.837 pos3=0.852 pos4=0.899 pos5=0.920 pos6=0.919 pos7=0.913 pos8=0.887 identity=0.104 next_first=0.012 planted=-0.000
+LEVEL_UNIT unit_W132i cell=E_news width=1344 epochs=34530 pos1=0.838 pos2=0.517 pos3=0.408 pos4=0.364 pos5=0.368 pos6=0.355 pos7=0.303 pos8=0.224 identity=0.050 next_first=0.006 planted=-0.000
+LEVEL_UNIT unit_W132i cell=E_rings width=1344 epochs=34530 pos1=0.944 pos2=0.923 pos3=0.920 pos4=0.895 pos5=0.835 pos6=0.789 pos7=0.687 pos8=0.445 identity=0.063 next_first=0.006 planted=-0.000
+LEVEL_UNIT unit_W132i cell=E_rings10 width=2240 epochs=34530 pos1=0.990 pos2=0.978 pos3=0.986 pos4=0.986 pos5=0.986 pos6=0.980 pos7=0.961 pos8=0.937 identity=0.070 next_first=0.008 planted=-0.000
+LEVEL_UNIT unit_W132i cell=E_places width=1792 epochs=34530 pos1=0.996 pos2=0.993 pos3=0.996 pos4=0.995 pos5=0.994 pos6=0.995 pos7=0.998 pos8=0.995 identity=0.066 next_first=0.007 planted=-0.000

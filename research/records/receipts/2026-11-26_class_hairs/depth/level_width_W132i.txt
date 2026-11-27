@@ -1,0 +1,6 @@
+LEVEL_WIDTH unit_W132i width=32 epochs=34530 pos1=0.350(±0.000) pos2=0.584(±0.009) pos3=0.522(±0.013) pos4=0.549(±0.014) pos5=0.553(±0.013) pos6=0.521(±0.001) pos7=0.418(±0.000) pos8=0.304(±0.003)
+LEVEL_WIDTH unit_W132i width=64 epochs=34530 pos1=0.618(±0.002) pos2=0.723(±0.009) pos3=0.664(±0.010) pos4=0.657(±0.008) pos5=0.640(±0.012) pos6=0.592(±0.001) pos7=0.493(±0.002) pos8=0.354(±0.010)
+LEVEL_WIDTH unit_W132i width=128 epochs=34530 pos1=0.797(±0.004) pos2=0.832(±0.005) pos3=0.809(±0.007) pos4=0.800(±0.006) pos5=0.726(±0.012) pos6=0.695(±0.005) pos7=0.587(±0.003) pos8=0.414(±0.013)
+LEVEL_WIDTH unit_W132i width=1344 epochs=34530 pos1=0.944(±0.006) pos2=0.929(±0.003) pos3=0.918(±0.007) pos4=0.893(±0.006) pos5=0.831(±0.011) pos6=0.787(±0.006) pos7=0.685(±0.004) pos8=0.443(±0.013)
+LEVEL_WIDTH_RECEIPT least_width=1344 of 1344; at 64 the share of the full face's read at places 1 to 6: 0.655 0.779 0.724 0.735 0.771 0.753
+

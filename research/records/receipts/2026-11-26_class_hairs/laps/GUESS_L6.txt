@@ -1,0 +1,17 @@
+Fixed 2026-11-27T04:22:32Z (date -u), the lead, before W133s trains. Refs #404.
+The arm W133s: W132's end (the line's) with its level's unit on its epoch's strand face (set-strand; Scale::strand: the restriction sums
+each known site's symbol word on the fine rings of periods 2, 3 and 4 from its epoch's site, six terms, at the level's width of 64, the
+restriction's covector stopping at its own material), 3,000 sections heard whole on e5g1; its control W133: W132's end, no change (the
+line's next lap). Both read at their lap means. The premise read first (record of the class hairs §14, W132i's end): the strand face
+holds an epoch's bytes at places 1 to 6 at 0.79 to 0.94 where the built restriction holds 0.13 to 0.33; restricted to its 64 leading
+directions it holds 0.66 to 0.78 of the full face's read; her state at a word's first letter holds the word before at 0.220 and the word
+two before at 0.024 (W132's mean).
+G-L6 (one place open where a code is read, paired against the control, by part):
+  (a) (0.45) the word two before at a word's first letter at least 0.035 at W133s's mean (tools/word_presence.py);
+  (b) (0.5) the word before at a word's first letter at least 0.24;
+  (c) (0.45) the held text within 0.004 nats a place of W133's, or under it;
+  (d) (0.35) at least seven of the ten text regions under W133's;
+  (e) (0.6) the level's restricted state at W133s's end holds the bytes at an epoch's places 1 to 6 at 0.5 or more each
+      (tools/level_unit_ruler.py, its control cell), against 0.13 to 0.33 on the plain level;
+  (f) (0.55) the wide panel's lexicon share within 3 points of W133's.
+The line takes the change by (c) and (d) holding together, or by (a) holding with (c).

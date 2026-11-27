@@ -1322,7 +1322,7 @@ impl Constitution {
         let mut locks: Vec<Vec<(u32, i64)>> = Vec::new();
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && levelled) {
-                out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep)?);
+                out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep, region.classes, region.unresolved)?);
             }
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
@@ -1619,6 +1619,19 @@ impl Constitution {
         let rest = self.opening_read(&vec![0i64; dw], reach_o)?.face;
         let codes = t.receipt_codes().into_iter().map(|(site, code)| (site, code, rest.code(classes[site - classes.len()]))).collect();
         Ok(Some((anchors.to_vec(), source.to_vec(), codes)))
+    }
+
+    /// [measurement; the lead, November 27, the record of the class hairs §13] **What a strand's level restricts, for a ruler on the
+    /// host**: each known site's read at the split, each epoch's harmonics of its places' reads and each known site's harmonics of its
+    /// news phase, beside the known stream's anchors.
+    /// A reading: no state changes. `None` where the field has no level.
+    #[allow(clippy::type_complexity)]
+    pub fn strand_level_moment(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<i32>, Vec<i64>, Vec<i64>)>> {
+        let pass = self.strand_pass(classes, true, past)?;
+        let Some(t) = pass.tower.as_ref() else { return Ok(None) };
+        let (anchors, _) = t.strand_cut();
+        let (read, moment, harmonics) = t.level_moment();
+        Ok(Some((anchors.to_vec(), read.to_vec(), moment.to_vec(), harmonics.to_vec())))
     }
 
     /// [measurement; the lead, November 23, the level's receipt record §5; the formal thread's §19 item 4] **A strand's open places'

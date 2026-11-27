@@ -1,0 +1,35 @@
+Gate 3 of e5g1 (Scale::strand, off on the line) against LINE_W109, the card parity of the strand face (both stream forms) and the receipt, and a development read of 30 sections heard whole from W132's end with and without the strand face, one hold of the card's lock from 04:36:24 UTC, November 27.
+
+test hnn::field::tests::the_levels_receipt_on_the_card_reads_the_hosts_bits ... LEVEL_RECEIPT_PARITY inside=false places=3 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=false places=3 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=false places=7 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=false places=7 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=false places=64 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=false places=64 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=true places=3 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=true places=3 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=true places=7 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=true places=7 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=true places=64 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_RECEIPT_PARITY inside=true places=64 past=true faces_equal=true covector_apart=0 of 70812
+test hnn::field::tests::the_levels_strand_face_on_the_card_reads_the_hosts_bits ... LEVEL_STRAND_FACE_RINGS [2, 3, 4, 9, 16, 27, 32, 81, 128, 243, 256, 729, 1024, 2187, 4096, 6561]
+LEVEL_STRAND_FACE_PARITY places=3 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=3 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=3 one_stream faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=7 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=7 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=7 one_stream faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=64 past=false faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=64 past=true faces_equal=true covector_apart=0 of 70812
+LEVEL_STRAND_FACE_PARITY places=64 one_stream faces_equal=true covector_apart=0 of 70812
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 36 filtered out; finished in 3.51s
+
+GATE_REPRO sections=3 line_lines=3 equal=3 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL
+GATE_SAVE aside (a run shorter than the line's first save)
+GATE_READ cavity.tsv EQUAL
+GATE_ENGINE EQUAL
+
+DEV plain sections=30 mean_ms=1148.5 max_ms=1334
+DEV strand sections=30 mean_ms=1197.9 max_ms=1397

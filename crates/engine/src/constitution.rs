@@ -319,7 +319,7 @@ impl Constitution {
         let mut out = format!("{}\n{}\n", self.declaration.to_text(), theta.join(" "));
         if let Some(s) = &self.scale {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
-            out.push_str(&format!("level {} {}{}{}\n{}{}\n", s.harmonics, s.split, if s.receipt { if s.inside { " receipt inside" } else { " receipt" } } else { "" }, if s.lane { " lane" } else { "" }, s.coarse.to_text(), glue.join(" ")));
+            out.push_str(&format!("level {} {}{}{}{}\n{}{}\n", s.harmonics, s.split, if s.strand { " strand" } else { "" }, if s.receipt { if s.inside { " receipt inside" } else { " receipt" } } else { "" }, if s.lane { " lane" } else { "" }, s.coarse.to_text(), glue.join(" ")));
         }
         out
     }
@@ -350,7 +350,10 @@ impl Constitution {
             let inside = head.ends_with(" receipt inside");
             let head = head.strip_suffix(" inside").filter(|_| inside).unwrap_or(head);
             let receipt = head.ends_with(" receipt");
-            let counts = head.strip_suffix(" receipt").unwrap_or(head);
+            let head = head.strip_suffix(" receipt").unwrap_or(head);
+            // [the lead, November 27] The word `strand` after the two counts, where the level's unit is its epoch's strand face ([`Scale::strand`]).
+            let strand = head.ends_with(" strand");
+            let counts = head.strip_suffix(" strand").unwrap_or(head);
             let words: Vec<usize> = counts.split(' ').skip(1).map(|w| w.parse::<usize>().map_err(|_| TowerError::Refused("a level's line that is not two counts"))).collect::<Result<_>>()?;
             let [harmonics, split] = words[..] else { return refuse("a level's line that is not two counts") };
             let coarse = Self::from_lines(lines)?;
@@ -360,7 +363,7 @@ impl Constitution {
             if (glue.len() != len && glue.len() != len + before) || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
                 return refuse("a level's glue that is not its declaration's length, a split outside the ticks, or a field without the opening's block");
             }
-            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, inside, lane }));
+            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, inside, strand, lane }));
         }
         Ok(field)
     }

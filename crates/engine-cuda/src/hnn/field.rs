@@ -1950,6 +1950,61 @@ mod tests {
         }
     }
 
+    /// [definition; the lead, November 27] **The level's strand face on the card reads the host's bits** (`Scale::strand`; needs the card):
+    /// on the tower among the mark cases with its one-sided block (the receipt parity's field), strands of 3, 7 and 64 places with and
+    /// without the past: the faces and the whole covector equal the host's, and the strand face moves both from the plain level's.
+    #[test]
+    #[ignore = "needs the CUDA card; run alone with --include-ignored --test-threads=1"]
+    fn the_levels_strand_face_on_the_card_reads_the_hosts_bits() {
+        let tower = mark_cases().into_iter().find(|(name, _)| *name == "tower").map(|(_, l)| l).expect("the tower among the cases");
+        let mut live = tower.level_before().unwrap();
+        {
+            let width = live.field.declaration.width;
+            let s = live.field.scale.as_deref_mut().unwrap();
+            let (_, _, b, bb, len) = s.glue_offsets(width);
+            let (b2, bb2, _) = s.before_offsets(width).unwrap();
+            for k in 0..bb - b {
+                s.glue[b2 + k] = s.glue[b + (bb - b - 1 - k)];
+            }
+            for k in 0..len - bb {
+                s.glue[bb2 + k] = s.glue[bb + (len - bb - 1 - k)];
+            }
+        }
+        let plain = live.field.clone();
+        let mut field = plain.clone();
+        field.scale.as_deref_mut().unwrap().strand = true;
+        let d = field.declaration;
+        println!("LEVEL_STRAND_FACE_RINGS {:?}", holonics_engine::field::ring_periods(d.turned_slots(), d.reach));
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        for n in [3usize, 7, 64] {
+            let classes: Vec<usize> = (0..n).map(|t| (t * 53 + 5) % 120).collect();
+            let known = vec![false; n];
+            for past in [false, true] {
+                let regions = [Region { classes: &classes, unresolved: &known, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past, second: false, targets: None, stretches: None }];
+                let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+                let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+                let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
+                println!("LEVEL_STRAND_FACE_PARITY places={n} past={past} faces_equal={} covector_apart={unequal} of {}", host_faces == card_faces, card_g.len());
+                assert_eq!(host_faces, card_faces, "{n} places, past {past}: the faces are the host's");
+                assert_eq!(unequal, 0, "{n} places, past {past}: the covector is the host's");
+                if n > 3 {
+                    let (plain_faces, plain_g) = card_field.read_and_return(&plain, &regions).unwrap();
+                    assert!(plain_faces != card_faces || plain_g != card_g, "{n} places, past {past}: the strand face moves the read");
+                }
+            }
+            // A passage read by one stream, its last third open: an open place's symbol adds nothing to its epoch's face.
+            let open: Vec<bool> = (0..n).map(|t| 3 * t >= 2 * n).collect();
+            let regions = [Region { classes: &classes, unresolved: &open, faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None }];
+            let (host_faces, host_g) = field.read_and_return(&regions).unwrap();
+            let (card_faces, card_g) = card_field.read_and_return(&field, &regions).unwrap();
+            let unequal = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).count();
+            println!("LEVEL_STRAND_FACE_PARITY places={n} one_stream faces_equal={} covector_apart={unequal} of {}", host_faces == card_faces, card_g.len());
+            assert_eq!(host_faces, card_faces, "{n} places, one stream: the faces are the host's");
+            assert_eq!(unequal, 0, "{n} places, one stream: the covector is the host's");
+        }
+    }
+
     /// [definition; agent-inferred, November 14, the ring record §4] **A marked learner's sections on the card read the host's bits** (needs the
     /// card): each of [`mark_cases`] and the lettered learner grown to read twice, its strengths at [`MARK_STRENGTHS`], takes two sections on
     /// [`mark_regions`] (the lettered one on its own stretches) through the host ([`holonics_engine::field::Host`]) and through the card:
