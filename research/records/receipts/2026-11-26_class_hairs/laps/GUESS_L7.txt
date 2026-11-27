@@ -1,0 +1,14 @@
+Fixed 2026-11-27T08:07:53Z (date -u), the lead, before W134s trains. Refs #404.
+G-L6 read (W133s, the strand face, against W133, one lap from W132's end): held text +0.0291 (±0.0007) over 200,933 places, every
+region up; the word before 0.224 against 0.220 and the word two before 0.025 against 0.024 at a word's first letter; the level's
+restricted state holds an epoch's bytes at places 1 to 6 at 0.43 to 0.56 against 0.14 to 0.33; the lap's training code (each section's
+before the deposit, the same sections) 1.046 times the control's over sections 0 to 249, 1.026 over 500 to 749, 1.019 over 2,000 to
+2,249 and 1.018 over 2,750 to 2,999, still closing at the lap's end. By rule 10 one lap is no null: a second lap, W134s from W133s's end
+(the strand face in its state), beside W134 from W133's end (the line's next lap, no change), 3,000 sections heard whole each on e5g1.
+G-L7 (at the lap means, one place open, paired, by part):
+  (a) (0.6) the training code over W134s's last 250 sections at most 1.010 times W134's;
+  (b) (0.4) the held text at W134s's mean at most +0.015 a place over W134's (W133s +0.0291);
+  (c) (0.15) the held text at W134s's mean within 0.004 of W134's, or under it;
+  (d) (0.3) the word two before at a word's first letter at least 0.030 at W134s's mean;
+  (e) (0.5) the level's restricted state at W134s's end holds an epoch's bytes at places 1 to 6 at 0.5 or more each.
+The line takes the change by (c) holding; otherwise it goes on from W134's end.

@@ -1603,11 +1603,14 @@ impl Constitution {
     /// reads an epoch its symbol's code at the prolonged row alone, read through the opening's reader (the level's own face, `D` then `F`
     /// with no fine tick; the receipt's read, [`Scale::receipt`], which the caller sets on its copy of the field). The unit's news under
     /// the level, `C¹_j = Σ ĉ_t`, and the landmarks a second level would cut from it, are read from these outside the machine. Beside
-    /// each code, the same symbol's code through the same reader from the row at rest (a zero row, which charts to zero: the reader's
-    /// bias alone), so a ruler reads the share the join left unsaid, `R/Z` (the formal thread's law of the second level's cut, November
-    /// 26 23:50 UTC). A reading: no state changes. `None` where the field has no level.
+    /// each code, the same symbol's code through the same reader from the row at rest, so a ruler reads the share the join left unsaid,
+    /// `R/Z` (the formal thread's law of the second level's cut, November 26 23:50 UTC). A reading: no state changes. `None` where the
+    /// field has no level.
+    /// `rest` is the row at rest the reader codes each symbol from beside its own row: the level's standing state, the mean of its rows
+    /// ([`Constitution::strand_level_rows`]; the formal thread's correction of November 27 04:23 UTC: no store is at rest, so a level with
+    /// nothing crossing the join holds the mean of its rows), or a zero row (the reader's bias alone) where none is given.
     #[allow(clippy::type_complexity)]
-    pub fn strand_level_face(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(usize, i64, i64)>)>> {
+    pub fn strand_level_face(&self, classes: &[usize], past: bool, rest: Option<&[i64]>) -> Result<Option<(Vec<usize>, Vec<Option<usize>>, Vec<(usize, i64, i64)>)>> {
         if !self.scale.as_deref().is_some_and(|s| s.receipt) {
             return refuse("a level's face is read with its receipt set on the reading's copy");
         }
@@ -1616,9 +1619,30 @@ impl Constitution {
         let (anchors, source) = t.strand_cut();
         let dw = self.declaration.width;
         let reach_o = reach(&self.theta[self.layout.opening..self.layout.opening + dw * dw]);
-        let rest = self.opening_read(&vec![0i64; dw], reach_o)?.face;
+        let zero = vec![0i64; dw];
+        let rest = self.opening_read(rest.unwrap_or(&zero), reach_o)?.face;
         let codes = t.receipt_codes().into_iter().map(|(site, code)| (site, code, rest.code(classes[site - classes.len()]))).collect();
         Ok(Some((anchors.to_vec(), source.to_vec(), codes)))
+    }
+
+    /// [measurement; the lead, November 27] **A strand's level rows, for its standing state**: the sum of the prolonged rows of the open
+    /// places its receipt compares (`[D₀]`, on the state's grain) and their count, read with the receipt set on the reading's copy. A
+    /// ruler sums them over its passages and divides once for the level's mean row. A reading: no state changes.
+    pub fn strand_level_rows(&self, classes: &[usize], past: bool) -> Result<Option<(Vec<i128>, usize)>> {
+        if !self.scale.as_deref().is_some_and(|s| s.receipt) {
+            return refuse("a level's rows are read with its receipt set on the reading's copy");
+        }
+        let pass = self.strand_pass(classes, true, past)?;
+        let Some(t) = pass.tower.as_ref() else { return Ok(None) };
+        let dw = self.declaration.width;
+        let rows = t.receipt_rows();
+        let mut sum = vec![0i128; dw];
+        for row in rows.chunks_exact(dw) {
+            for (s, &v) in sum.iter_mut().zip(row) {
+                *s += i128::from(v);
+            }
+        }
+        Ok(Some((sum, rows.len() / dw.max(1))))
     }
 
     /// [measurement; the lead, November 27, the record of the class hairs §13] **What a strand's level restricts, for a ruler on the
