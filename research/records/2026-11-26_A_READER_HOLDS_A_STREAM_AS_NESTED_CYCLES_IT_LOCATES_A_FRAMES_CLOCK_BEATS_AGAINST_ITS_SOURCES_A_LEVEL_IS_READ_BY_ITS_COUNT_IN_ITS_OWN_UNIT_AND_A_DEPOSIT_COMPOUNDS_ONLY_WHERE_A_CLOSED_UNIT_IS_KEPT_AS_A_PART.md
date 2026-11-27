@@ -282,5 +282,21 @@ near a word and a half, word starts are a ruler scored against the shuffle among
 phrases (after punctuation or a line feed) beside, and the second level's units are told by depth, their count in first-level
 units. G-Z5 to G-Z7 are in `GUESS.txt`, fixed before any read.
 
+**The scores, read by the lead before midnight** (its record of a class's mean word, §11; the row at rest read as a zero row,
+the opening reader's bias alone). G-Z5 missed: W101r's sites stand at word starts at 0.344 against 0.341 for `n` shuffled among
+the row's units, where a planted share (1.2 at each word start, 0.4 to 0.6 elsewhere) is recovered at 0.959. G-Z6 held: 0.350
+against 0.346 on W101 and on W129w, where `n` exceeds 1 at 99% of units (medians 5.0 and 5.5). G-Z7 missed: the median second-level
+unit holds 4 first-level units. That figure is what the landmark law gives when news is alike at every place: with `n`'s mean near
+its median of 0.763 and a section of one unit, a share `c̄/(2σ + c̄) = 0.276` of units are sites, one every 3.6 units
+(`code.site-isolation-landmark`), which G-Z7 should have been fixed against. So G-Z5 and G-Z7 read one thing: `n` carries no order
+the cut can use. The reason is by part. A place's unsaid share is 0.521 on spaces and marks, 0.810 on letters inside a word and
+0.915 on a word's first letter, and by the unit's anchor 0.751 at a word start, 0.775 inside a word and 0.752 at another byte. The
+receipt's face holds where the next break falls and tells under a tenth of the next word's first letter, so every unit's share is
+the same mixture of its places and none follows from the last by more than another. The law needs a first level whose face tells
+the next unit's content across the join, and the lead's arm with the receipt kept inside the level reads that first, as whether the
+share at a word's first letter falls under 0.9. On the lead's corrected read of `C¹` at its own unit, the landmarks of the sum
+stand at word starts at 0.300 on W101r (0.257 on W101, 0.261 on W129w): they avoid word starts, as a unit's length and its
+letters' rarity would have them.
+
 Owners: atlas `tower.second-level-cut-by-unbound-share` (interpretation) and the reading of `C¹` in
 `tower.level-receipt-codec-and-square`; Lean `HNN/OwnCycleCells`, `unsaid_share_scale_free`.
