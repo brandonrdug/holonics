@@ -154,11 +154,41 @@ where she is open. Far-only repeats already carry about 0.69 nats a place to her
 16. G-Z17 (0.55): in that arm less its control, first letters of words last met more than 30 places back stand at least 0.03 nats a
 place under first letters of words met within 30. Both fixed at 08:30 UTC.
 
-## 9. Owners
+## 9. The slow store is a bank on the level's clock, never the level's field trained to reach (the lead's reads, 08:50 UTC)
+
+**The reads.** G-Z19 held: after its ticks the level's state holds the bytes at the first three places of the epoch `k` back at
+0.16, 0.25, 0.32 (`k` = 0), 0.04, 0.09, 0.11 (1), 0.03, 0.06, 0.09 (2), 0.006, 0.012, 0.020 (4), 0.004, 0.006, 0.010 (8) and
+0.003, 0.005, 0.008 (16); before its ticks it holds only its own epoch, at 0.43 to 0.56 (`tools/level_back_ruler.py`). The lead
+built the level's fade opened alone (`Constitution::with_level_fade`, founded on W133s's end on all sixteen rings, the host test
+the same bits at the old fade) and read it untrained: the epoch 4 back at 0.005 to 0.019, 8 back at 0.003 to 0.006, 16 back at
+0.001 to 0.005, and its own epoch down to 0.11 to 0.26. Keyed by site class, the strand face's state holds an epoch's letters about
+alike at sites on a word's start (0.45 to 0.63) and inside a word (0.48 to 0.61), and 0.25 to 0.46 at marks and spaces.
+
+**The law (0.7).** A store's reach is its quality, and a field's quality is the least along the path a reading travels. The level's
+field moves its state through contacts that slip, mix and dissipate at every tick, so opening its skin left the loss in its
+contacts: the opened fade diluted the level's own epoch and carried nothing past four. Training those contacts toward reach would
+pay G-L5's and G-L6's price with no premise that they can hold it. The slow store is the strand face one level up, the same program
+at every level (`tower.reader-holds-nested-located-cycles`): a bank of rings on the level's clock `τ¹`,
+`m²_j = Σ_(i≤j) Ĝ²(τ¹_j − τ¹_i)⁻¹ x¹_i`, charged once per closed epoch by the level's state before its ticks, each ring's fade its
+quality. Its only loss is its own fade, so its reach is its construction's. It is a store by the guide's test: charged by the flux
+that reaches it, fading by its own law, read through a port (`B`), with no table keyed by content.
+
+**Its form.** Octave periods on `τ¹`, handed at founding and the same for every stream (a gene); each opened at one e-fold a turn,
+its fade held as state so deposition can move it; complex at the level's width; beside `x¹` and not in its place, so the current
+epoch stays apart; read by `B`, founded at zero.
+
+**What to expect (0.6).** One ring of period `n` holds a weighted bag of its last `n` or so epochs, not their order: read through
+its turn, every other epoch in its span stands as crosstalk whose power grows as `n`, so a far epoch reads weakly and the count of
+what came reads well. That count is what the first letter of a word last met far back needs (G-Z17). The price will again stand at
+first letters and marks (§7); G-Z17 scores whether the news there outruns it. G-Z20 (0.55), the premise, fixed at 08:55 UTC:
+founded on W133s's end and untrained, the bank holds the third place's byte of the epoch `k` back at least three times the ticked
+level's at `k` = 4 and 8 (0.060 and 0.030 or more).
+
+## 10. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z19.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z20.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
