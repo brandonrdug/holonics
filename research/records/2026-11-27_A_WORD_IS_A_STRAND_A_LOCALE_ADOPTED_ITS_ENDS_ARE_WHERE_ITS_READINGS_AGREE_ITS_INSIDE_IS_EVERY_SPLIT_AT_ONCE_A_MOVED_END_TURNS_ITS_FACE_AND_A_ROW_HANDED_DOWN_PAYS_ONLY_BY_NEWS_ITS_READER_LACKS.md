@@ -242,11 +242,41 @@ letters, and charged against its standing state at least twice that. G-Z27 (0.6)
 letters of words last met more than 30 places back stand within 0.005 of zero. If the centered share stays near zero, the null is
 the level's own (nothing linear at first order), and the next law is a product, not a charge.
 
-## 11. Owners
+## 11. Nothing linear in the bank is news yet, and the order among units waits on counts at scale (the lead's tension read, 14:58 UTC)
+
+**The reads** (W135b's mean, 407 word rows, the lead's `tools/bank_tension_ruler.py`). G-Z25 held: the standing part, each ring's
+response to `x̄¹` through the same turns, holds 0.847 of the charged bank's power (by ring 0.585, 0.546, 0.671, 0.756, 0.823 and
+0.882 from the period 2 to 64; 0.855 on W133s's end untrained). G-Z26 missed: read linearly against the covector at the level's
+locus, fitted on even rows and read on odd, the bank as charged removes 0.0000 of its power everywhere and at first letters (9,858
+places), and centered the same, where a planted tenth reads 0.097 and 0.092. The read takes each place's features through the
+constant harmonic alone, so the full form of `B_bank`'s read, the bank at each place's news phase, is not yet read: G-Z28 (0.65)
+reads it with one map for each sixth of the phase at first letters and expects under 0.002, a planted tenth at 0.05 or more.
+
+**The law (0.6).** If the full form is null, the bank holds no news at first order because its far content already reaches her by
+address: her field's participation carries far repeats (`store.far-price-stands-at-recurrence`, about 0.69 nats a far-only place)
+and sums over every match, which is a count, and a product of the bank with her present address would rebuild that participation.
+What she lacks is order among units: her join reads an unsaid share of 0.984 at word starts and the count ruler 0.998 on her
+epochs, while a planted join is found at 0.38, so on real rows her units hold no order a count can see. Her epochs, cut at her news
+landmarks, rarely recur as one string, and a unit becomes a part only when it recurs enough to pay for its description (§3). G-Z29
+(0.6): the count ruler's join on the same rows with words as units, cut at the spaces the writers agreed on, reads under 0.9 at word
+starts. If it holds, the next law is the level's sites: cut where her readings agree and keep the units that recur
+(`hnn.founded-units`), with the bank as that join's operand and its count the join's prior. Both fixed at 14:59 UTC.
+
+**G-Z29 missed, and the clause on units is withdrawn** (the lead's read, 15:01 UTC, `join_count_words.txt`). With words as units
+on the same 407 rows the count ruler reads 1.007 at word starts (3.843 nats against the unigram's 3.817), 0.965 inside a word and
+0.983 elsewhere: about 30,000 training words give a word bigram nothing to stand on. The null was the ruler's counts, not her units,
+and the guess was fixed against a ruler whose ceiling on real rows had not been read, the lesson of G-Z8 again. The first half of
+the law stands on G-Z28. The second waits on two reads with counts from the store's own training text read on the same held rows,
+by place class and with word first letters apart from inside letters (a unit cut inside a word carries the word's start in its
+spelling): words as units (G-Z30, 0.7: under 0.9 at word starts), and her held epochs' strings counted in the same raw text, the
+unit before as a string and the unit's places after it (G-Z31, 0.5: within 0.05 of the words' read at word starts). Both fixed at
+15:04 UTC.
+
+## 12. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z27.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z31.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
