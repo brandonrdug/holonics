@@ -1,0 +1,15 @@
+LEVEL_FACE rows=407 first_epochs=34810 first_word_start_share=0.349 c1_nats_median=10.46 c1_nats_mean=11.78 section_nats=5.549
+LEVEL_FACE_JOIN units=34114 n_median=0.778 n_p10=0.551 n_p90=1.087 misled_share=0.157
+LEVEL_FACE_JOIN_PART letter_inside count=72109 share_median=0.804 share_mean=0.862 misled_share=0.317
+LEVEL_FACE_JOIN_PART other count=31917 share_median=0.511 share_mean=0.622 misled_share=0.128
+LEVEL_FACE_JOIN_PART word_first count=19517 share_median=0.893 share_mean=0.954 misled_share=0.375
+LEVEL_FACE_JOIN_PART unit_letter_inside count=15796 share_median=0.789 share_mean=0.817 misled_share=0.171
+LEVEL_FACE_JOIN_PART unit_other count=6465 share_median=0.777 share_mean=0.804 misled_share=0.142
+LEVEL_FACE_JOIN_PART unit_word_first count=11853 share_median=0.762 share_mean=0.789 misled_share=0.147
+LEVEL_FACE_SECOND law units=9887 word_start_share=0.296 phrase_start_share=0.032 places_median=12 places_mean=12.5 first_epochs_median=3
+LEVEL_FACE_SECOND shuffled units=9862 word_start_share=0.342 phrase_start_share=0.029 places_median=11 places_mean=12.4 first_epochs_median=3
+LEVEL_FACE_SECOND planted units=13144 word_start_share=0.902 phrase_start_share=0.080 places_median=8 places_mean=9.3 first_epochs_median=2
+LEVEL_FACE_SECOND per_place units=6305 word_start_share=0.293 phrase_start_share=0.021 places_median=18 places_mean=19.5 first_epochs_median=5
+LEVEL_FACE_SECOND join units=8551 word_start_share=0.334 phrase_start_share=0.032 places_median=13 places_mean=14.4 first_epochs_median=4
+LEVEL_FACE_SECOND join_shuffled units=8450 word_start_share=0.338 phrase_start_share=0.031 places_median=13 places_mean=14.4 first_epochs_median=4
+LEVEL_FACE_SECOND join_planted units=12356 word_start_share=0.959 phrase_start_share=0.085 places_median=8 places_mean=9.9 first_epochs_median=2
