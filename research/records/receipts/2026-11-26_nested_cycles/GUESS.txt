@@ -238,3 +238,34 @@ G-Z42 (0.6). The planted limit, one-hot letters ⊗ one-hot places (all 832 term
 G-Z43 (0.65). A store keyed by the carry, χ(p) = Π_i χ_i(u_i) on J circles, charged at each word's close with Σ_k χ(w_<k) ⊗ e(w_k)
   and leaking, read by F · χ(p)*, at J of 1,024 or more reaches at least half the ruler's gain there, rising about as √J until it
   meets the ceiling.
+
+Scored 2026-11-27T17:53Z on the lead's part-store reads on the joined held passages past a reset (gains at a recurring word's
+letters, mean of the halves): G-Z38 missed (her rows with the level's six terms or all 32 ring turns, W 64 to 512: coefficient 0,
+gain 0). G-Z39 not read (nothing to scale). G-Z42 half held: the planted limit (832 one-hot terms, β up to 64) gains +0.0026 at the
+third letter (scatter 0.0043), under the +0.076 asked, while her rows ⊗ rings stay under a tenth. G-Z43 missed: the carry-keyed
+store with a summed charge gains +0.007 at the third letter at J = 1,024 and +0.042 at 4,096; charged only from prefixes of two
+letters or more, at J = 4,096, +0.099 (scatter 0.001) at the third letter and +0.066 after (0.43 and 0.23 of the ruler).
+
+Fixed 2026-11-27T17:53Z (date -u 17:53:43 at drafting), before the reads. Premise read first: the lead's cause, the empty prefix's
+carry charged by every word and short prefixes by most, an item charged n times leaking into every read as n/√(2J).
+
+G-Z44 (0.65). The delta charge (the letter less the store's own read at its carry), η = 0.25, from the empty prefix, at J = 4,096:
+  the third letter on past a reset gains at least +0.10, as much as the summed charge reached only with its first two letters cut,
+  so the cut is no longer needed.
+G-Z45 (0.55). At J = 4,096 from the empty prefix, η = 0.25 gains at least 0.02 more than η = 1 at the third letter: a rate of one
+  sets each address to the last word that charged it, and a recurring word past a reset is not always the last of its prefix.
+
+Scored 2026-11-27T18:00Z on the lead's delta-charge reads past a reset (J = 4,096 from the empty prefix, the coefficient set by the
+store's state): G-Z44 half held. At η = 0.25 the rest gains +0.162 (scatter 0.018), over the +0.10 asked; the third letter gains
++0.0935 (0.0039), 0.006 under it and level with the cut summed charge's +0.099, and the two-letter cut adds nothing under the delta
+charge (from the third letter, η = 1: +0.051 and +0.182). G-Z45 held at the third letter: η = 0.25 +0.0935 against η = 1 +0.051;
+after it η = 1 stands ahead (+0.181 against +0.162) inside its scatter of 0.06. At J = 1,024, η = 0.25: +0.083 at the third
+letter and +0.118 after. One coefficient in place of the state's: +0.028 and +0.031.
+
+Fixed 2026-11-27T18:00Z (date -u 18:00:36 at drafting), before the read. Premise read first: her field holds 512 carry circles
+(the declaration's carry word, the lead's read of 18:00 UTC), and the random-turn delta store gains +0.083 at J = 1,024 and +0.0935
+at 4,096 at the third letter on.
+
+G-Z46 (0.6). A delta store keyed by her own located turns on her 512 carry circles, η = 0.25 from the empty prefix, gains at a
+  recurring word's third letter on past a reset at most 0.8 of a random-turn delta store at J = 512 read beside it on the same
+  rows: her turns place a prefix by what it predicts, which her face already reads, where random turns place it by identity.

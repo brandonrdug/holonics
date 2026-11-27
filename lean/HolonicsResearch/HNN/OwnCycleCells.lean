@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, and a carried key pairs as a conjunction
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, and a charge is its news
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -53,6 +53,9 @@ finite statements those rows do not.
    with phase differences `θ j`, pair as `Σ_j cos θ_j`, at most the number of circles and equal to it exactly when they agree on
    every circle. A key that is the product of a prefix's moves is matched whole or not at all, where the sum of their logs, the
    additive face, pairs bilinearly and gives partial credit to every shared term: a bag.
+10. **A charge is its news** (`delta_charge_contracts`, `delta_charge_zero_at_read`). The delta step `x + η (m − x)` moves an
+    address's read toward its letter by `(1 − η)` of its distance, and an address that already reads its letter takes no charge,
+    so a heavy address saturates where a summed charge grows with every word that shares it.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -204,5 +207,13 @@ theorem carry_pairing_full_iff {ι : Type*} (s : Finset ι) (θ : ι → ℝ) :
   have hc : (s.card : ℝ) = ∑ j ∈ s, (1 : ℝ) := by simp
   rw [hc]
   exact Finset.sum_eq_sum_iff_of_le h
+
+/-- The delta step moves an address's read toward its letter by `(1 − η)` of its distance. -/
+theorem delta_charge_contracts (x m η : ℝ) : x + η * (m - x) - m = (1 - η) * (x - m) := by
+  ring
+
+/-- An address that already reads its letter takes no charge. -/
+theorem delta_charge_zero_at_read (x m η : ℝ) (h : x = m) : η * (m - x) = 0 := by
+  simp [h]
 
 end Holonics.HNN.OwnCycleCells
