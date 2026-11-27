@@ -8,11 +8,11 @@ keeps its capitals where the tool's table holds it. The [reading routes](README.
 for finding a record by its date or by a word of its title, and it reaches the entries that GitHub's listing of the
 directory leaves out (the listing stops at 1,000).
 
-1,769 records from July 2026 to November 2026. 416 receipts directories: 225 beside the records and 191 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
+1,770 records from July 2026 to November 2026. 416 receipts directories: 225 beside the records and 191 under [`receipts/`](receipts/). Receipt files that stand alone: 3.
 
 | Month | Records | Receipts directories |
 |---|---|---|
-| [November 2026](#november-2026) | 168 | 132 |
+| [November 2026](#november-2026) | 169 | 132 |
 | [October 2026](#october-2026) | 282 | 205 |
 | [September 2026](#september-2026) | 577 | 79 |
 | [August 2026](#august-2026) | 450 | 0 |
@@ -20,6 +20,7 @@ directory leaves out (the listing stops at 1,000).
 
 ## November 2026
 
+- 2026-11-27 [A word is a strand a locale adopted its ends are where its readings agree its inside is every split at once a moved end turns its face and a row handed down pays only by news its reader lacks](2026-11-27_A_WORD_IS_A_STRAND_A_LOCALE_ADOPTED_ITS_ENDS_ARE_WHERE_ITS_READINGS_AGREE_ITS_INSIDE_IS_EVERY_SPLIT_AT_ONCE_A_MOVED_END_TURNS_ITS_FACE_AND_A_ROW_HANDED_DOWN_PAYS_ONLY_BY_NEWS_ITS_READER_LACKS.md)
 - 2026-11-26 [A classs mean word carries a twentieth of what its sites heard one by one carry across a cut and her face already reads each ring on two axes](2026-11-26_A_CLASSS_MEAN_WORD_CARRIES_A_TWENTIETH_OF_WHAT_ITS_SITES_HEARD_ONE_BY_ONE_CARRY_ACROSS_A_CUT_AND_HER_FACE_ALREADY_READS_EACH_RING_ON_TWO_AXES.md)
 - 2026-11-26 [A composition stands in a locale only after its causes its cost is its build from the parts the locale holds a Holarchy over an aeon is that build kept and generalization is a short build from ones own parts](2026-11-26_A_COMPOSITION_STANDS_IN_A_LOCALE_ONLY_AFTER_ITS_CAUSES_ITS_COST_IS_ITS_BUILD_FROM_THE_PARTS_THE_LOCALE_HOLDS_A_HOLARCHY_OVER_AN_AEON_IS_THAT_BUILD_KEPT_AND_GENERALIZATION_IS_A_SHORT_BUILD_FROM_ONES_OWN_PARTS.md)
 - 2026-11-26 [A reader holds a stream as nested cycles it locates a frames clock beats against its sources a level is read by its count in its own unit and a deposit compounds only where a closed unit is kept as a part](2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_A_FRAMES_CLOCK_BEATS_AGAINST_ITS_SOURCES_A_LEVEL_IS_READ_BY_ITS_COUNT_IN_ITS_OWN_UNIT_AND_A_DEPOSIT_COMPOUNDS_ONLY_WHERE_A_CLOSED_UNIT_IS_KEPT_AS_A_PART.md)

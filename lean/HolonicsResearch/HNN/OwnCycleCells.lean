@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, and counts cross a join one for one
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, and a push costs where the face is open
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -22,6 +22,14 @@ finite statements those rows do not.
    a second kept quantity beside the power; the slow member's share of what the fast one hands down is its rate over the fast
    one's; and through `L` levels of one stride the share is the stride's inverse to the power `L`. A slow level is read by its
    count, in its own unit: as a share of the fast level's power it is small by construction.
+3. **A moved site turns the strand face** (`moved_site_turns_rings`, `moved_site_inside_epoch_turns`). The strand face counts each
+   place's ring phase from its epoch's site on the fine rings of periods 2, 3 and 4. A site moved by `δ` places leaves all three
+   rings unturned exactly when 12 divides `δ`, so inside an epoch shorter than twelve places every moved site turns some ring:
+   one word cut at two sites lands on two faces (atlas `tower.word-is-an-adopted-strand-cut-only-at-its-ends`).
+4. **A push costs where the face is open** (`two_way_push_variance`, `two_way_push_variance_le`). On a face that gives `p` and
+   `1 − p` to two symbols, a push of `a` and `b` on their logits has variance `p (1 − p) (a − b)²` under the face, the
+   second-order cost of a push that carries no news: nothing on a pinned face (`p` at 0 or 1), at most `(a − b)²/4`, reached at
+   an even face (atlas `code.handed-row-enters-at-its-capacity-price`).
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -85,5 +93,22 @@ theorem depth_share (κ : ℝ) (L : ℕ) : (1 / κ) ^ L = 1 / κ ^ L :=
 nats) leave the share of the unit the join left unsaid where it was. -/
 theorem unsaid_share_scale_free {R Z c : ℝ} (hc : c ≠ 0) : (c * R) / (c * Z) = R / Z :=
   mul_div_mul_left R Z hc
+
+/-- A site moved by `δ` places leaves the fine rings of periods 2, 3 and 4 unturned exactly when twelve divides `δ`. -/
+theorem moved_site_turns_rings (δ : ℤ) : (2 ∣ δ ∧ 3 ∣ δ ∧ 4 ∣ δ) ↔ 12 ∣ δ := by
+  omega
+
+/-- Inside an epoch shorter than twelve places, every moved site turns at least one of the three rings. -/
+theorem moved_site_inside_epoch_turns (δ : ℤ) (h0 : 0 < δ) (h12 : δ < 12) : ¬ (2 ∣ δ ∧ 3 ∣ δ ∧ 4 ∣ δ) := by
+  omega
+
+/-- On a two-way face `(p, 1 − p)`, a push `(a, b)` on the logits has variance `p (1 − p) (a − b)²` under the face. -/
+theorem two_way_push_variance (p a b : ℝ) :
+    p * a ^ 2 + (1 - p) * b ^ 2 - (p * a + (1 - p) * b) ^ 2 = p * (1 - p) * (a - b) ^ 2 := by
+  ring
+
+/-- That variance is at most a quarter of the push's spread, reached at an even face, and nothing on a pinned one. -/
+theorem two_way_push_variance_le (p a b : ℝ) : p * (1 - p) * (a - b) ^ 2 ≤ (a - b) ^ 2 / 4 := by
+  nlinarith [sq_nonneg (p - 1 / 2), sq_nonneg (a - b), mul_nonneg (sq_nonneg (p - 1 / 2)) (sq_nonneg (a - b))]
 
 end Holonics.HNN.OwnCycleCells
