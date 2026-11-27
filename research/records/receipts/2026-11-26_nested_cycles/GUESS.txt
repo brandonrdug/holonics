@@ -165,3 +165,27 @@ G-Z33 (0.7). Her own code at the same 9,815 word first letters, at W135s's lap m
   before): the 30 MB count is a weaker reader than she is, and its nulls bound nothing of hers.
 G-Z34 (0.6). The level's comparison face with the bank as an operand, fitted on the even half and read on the odd, codes word first
   letters better than her own face by 0.05 nats or more in no part (split by whether the word was last met past 30 places).
+
+Scored 2026-11-27T15:27Z on the lead's read at W135s's lap mean (read-reach law, each place read by two streams, its code at one
+place open): G-Z33 held. Her own code at word first letters, odd rows, 2.953 nats over 9,997 places (even 2.925), under the 30 MB
+count's word-before code of 3.109 by 0.156; inside a word 1.336, elsewhere 1.388.
+
+Scored 2026-11-27T15:55Z on the lead's reads at W135b's lap mean (held word first letters, tools/level_face_fit_ruler.py):
+G-Z34 held. The free face over a word's first letter (896 features of x¹, its ticked read and its bank read, 52 letters, even rows
+fitted, odd read) codes 3.521 nats against her 2.947, above its own bias alone (3.262); fit less her face +0.587 where the word was
+last met within 30 places, +0.695 past 30, +0.550 not before. Beside it, her face renormalized over letters (2.864 on odd rows) as a
+fixed offset with the same features: gain within 30 +0.0039 (halves +0.0104 and −0.0027), past 30 +0.0070 (+0.0112, +0.0029),
+not before −0.0007 (−0.0019, +0.0005), each inside its halves' scatter and the same as letter frequencies alone; a planted
+column (the written letter's own, at 3 places in 10) recovered at +0.331.
+G-Z28 half held. The full form (width 4,608, 19,527 first letters): charged −0.0001, centered 0.0004 (sixths form 0.0001,
+0.0003), where a planted tenth reads 0.0346 (sixths 0.0333), under the 0.05 fixed; the null stands a hundred times under the
+planted read.
+
+Fixed 2026-11-27T15:55Z (date -u 15:55:11 at drafting), before the read. Premise read first: atlas
+store.far-price-stands-at-recurrence (past her first thirty places the price of a cut stands at far-only repeats of runs of
+three, 1.004 of the net, and hearing by address brought back 0.310 of it).
+
+G-Z35 (0.55). A host ruler's ceiling for a store of the row's words: a leaky count of the whole words met earlier in the row,
+  charged at each word's close, read as a face over the next word's first letter by the first letters of the words it holds,
+  joined to her letter-renormalized face by one coefficient fitted on the even rows and read on the odd. It gains 0.05 nats or
+  more where the word was last met past 30 places, and costs under 0.03 where the word was not met before.

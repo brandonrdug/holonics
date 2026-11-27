@@ -319,11 +319,32 @@ face by 0.05 nats or more in no part split by whether the word was last met past
 where it beats hers by more than the scatter between halves; where it beats her nowhere, the level is scored by what it writes and
 by its own unit's news (§12), and nothing is handed down.
 
-## 14. Owners
+## 14. A level carries far news only by hearing its units by address (the lead's offset fit, 15:53 UTC)
+
+G-Z34 held and G-Z28 half held. Beside her face renormalized over letters as a fixed offset, the level's 896 features gain +0.0039
+where the word was last met within 30 places, +0.0070 past 30 and −0.0007 where it was not met before, each inside its halves'
+scatter (0.0131, 0.0083, 0.0023) and the same as letter frequencies alone, while a planted column comes back at +0.331. The full
+kron form reads 0.0004 against a planted 0.035. Nothing the level holds at a first letter is news to her.
+
+**The law (0.6).** A level carries far news only by hearing its units by address: a closed unit kept as a part, keyed by its own
+word on the level's rings, so that a recurrence charges the rows its earlier meeting charged. The bank on `τ¹` is addressed by
+time: a ring's phase moves with every epoch, a word met again forty places on lands at another phase, and the ring holds a bag of
+recent strand faces from which no linear or kron reader picks an identity. The premise stands in the atlas since W117
+(`store.far-price-stands-at-recurrence`): past her first thirty places a cut's price stands at far-only repeats of runs of three
+(1.004 of the net), and her hearing by address brought back 0.310 of it. The far news is in the passage and it is recurrence; the
+level needs an address, not a reach. A part keyed by its word is a store by the test of [stores and caches](../../CLAUDE.md#stores-and-caches):
+charged at its unit's close, leaking, read through a port, its rows shared at every residue and never a free row a word.
+
+The ceiling is read before a build: G-Z35 (0.55), a host ruler of a leaky count of the row's whole words joined to her face by one
+coefficient, gains 0.05 nats or more past 30 places and costs under 0.03 where the word is new, read also by place in the word,
+since her address needs a run of three and a recurring word's second and third letters are where a level heard by address pays
+most. Under 0.02 past 30, depth does not show at first letters and the level is read whole word by whole word.
+
+## 15. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z34.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z35.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.
