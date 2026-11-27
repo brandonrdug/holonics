@@ -184,11 +184,24 @@ first letters and marks (§7); G-Z17 scores whether the news there outruns it. G
 founded on W133s's end and untrained, the bank holds the third place's byte of the epoch `k` back at least three times the ticked
 level's at `k` = 4 and 8 (0.060 and 0.030 or more).
 
+**G-Z20 held** (the lead's ruler bank on W133s's end, 09:08 UTC; receipt `level_back_bank_W133s.txt`, the lead's). Octave periods
+2 to 64 sections of news on `τ¹`, each at one e-fold a turn, charged by `x¹` before its ticks, real and imaginary parts, 768 wide:
+the bytes at the first three places of the epoch `k` back read 0.385, 0.515, 0.517 (`k` = 0), 0.369, 0.480, 0.471 (1), 0.173,
+0.243, 0.259 (2), 0.103, 0.142, 0.147 (4), 0.054, 0.079, 0.082 (8) and 0.014, 0.026, 0.032 (16): at the third place 7.4 and 8.2
+times the ticked level's at `k` = 4 and 8. From `k` = 2 to 8 the third place halves about every doubling of age (0.56 a doubling),
+then falls to 0.39 from 8 to 16, the mark of a span ending near the longest ring's reach of about 37 epochs.
+
+**The bank's width.** A ring is as wide as its charge, the level's 64 before its ticks. The count of rings is a partition, read ring
+by ring on the ruler bank with the ticked `x¹` beside it: a ring whose drop moves no epoch's presence carries only its price (§7).
+G-Z21 (0.55): dropping the period-2 ring lowers the third place at no `k` of 1 to 16 by more than 0.01, its reach of about one
+epoch standing inside the level's own ticks. G-Z22 (0.45): adding periods 128 and 256 raises the third place at `k` = 16 by at
+least half. Both fixed at 09:12 UTC.
+
 ## 10. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `moved_site_turns_rings`, `moved_site_inside_epoch_turns`,
   `two_way_push_variance` and `two_way_push_variance_le` (checked).
 - Atlas: `tower.word-is-an-adopted-strand-cut-only-at-its-ends`, `code.handed-row-enters-at-its-capacity-price`,
   `tower.level-hands-down-its-slow-store` (objects).
-- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z20.
+- Guesses: `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`, G-Z13 to G-Z22.
 - The engine: the strand-face arm is the lead's (`Scale::strand`, `set-strand`); this record changes no code.

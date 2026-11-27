@@ -81,3 +81,13 @@ farther and drops the level's own epoch to 0.11 to 0.26), before the bank is bui
 G-Z20 (0.55). A ring bank on τ¹ (octave periods on the level's clock, each opened at one e-fold a turn), charged once per closed
   epoch by x¹_j before the level's ticks, founded on W133s's end and untrained, holds the third place's byte of the epoch k back
   (tools/level_back_ruler.py) at least three times the ticked level's at k = 4 and at k = 8 (0.060 and 0.030 or more).
+
+Scored 2026-11-27T09:10Z on the lead's ruler bank (W133s's end, octave periods 2 to 64 sections of news, 768 wide;
+level_back_bank_W133s.txt): G-Z20 held, the third place's byte of the epoch 4 and 8 back at 0.147 and 0.082, 7.4 and 8.2 times the
+ticked level's, against a bar of three.
+
+Fixed 2026-11-27T09:12Z (date -u 09:09:18 at drafting), on the lead's question of the bank's count of rings, before the read, on the
+same ruler bank with the ticked x¹ read beside it.
+
+G-Z21 (0.55). Dropping the period-2 ring lowers the third place's byte at no k of 1, 2, 4, 8, 16 by more than 0.01.
+G-Z22 (0.45). Adding periods 128 and 256 raises the third place's byte at k = 16 by at least half (0.032 to 0.048 or more).
