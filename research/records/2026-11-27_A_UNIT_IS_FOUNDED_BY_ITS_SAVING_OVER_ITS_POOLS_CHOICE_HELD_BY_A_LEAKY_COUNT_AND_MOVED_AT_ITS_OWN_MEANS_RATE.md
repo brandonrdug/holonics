@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z63 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z64 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -90,13 +90,19 @@ anchored or a unit ended there, the news-free prior elsewhere. Each key weighs b
 ```
 m_end(s)  = b + Σ n_u over units ending at s
 m_cont(s) = b + Σ n_u over units with s as a proper prefix
-end(t)    = Σ_d a(t − d) · m_end(s_d) + b · news(t)
-cont(t)   = Σ_d a(t − d) · m_cont(s_d)
+w(d)      = a(t − d) · Π_(j<d) (1 − a(t − j))          the chance that t − d is the last boundary
+end(t)    = Σ_d w(d) · m_end(s_d)/(m_end(s_d) + m_cont(s_d)) + Π_d (1 − a(t − d)) · news(t)
+cont(t)   = Σ_d w(d) · m_cont(s_d)/(m_end(s_d) + m_cont(s_d))
 cut at t ⇔ end(t) > cont(t)
 ```
 
 The starts are disjoint parses of one string, so their masses add: the fibre's sum over parses (§17 of the word record), read
-one-sided; the product of §23 there joins reads of one symbol and is a different composition. The weights come from her news and
+one-sided. A parse begun `d` places back is disjoint from the nearer ones only if no boundary stood between, so its weight is the
+chance that `t − d` is the last boundary, `w(d) = a(t − d) Π_(j<d) (1 − a(t − j))`, and each key is read as its ratio,
+`m_end/(m_end + m_cont)` against `m_cont/(m_end + m_cont)`. The first statement of this law (00:22 UTC) left the factor out, so
+each start counted as if it were the last and the continuing side gathered about a quarter from every depth where a suffix opens
+a unit (the lead's probe, 01:05 UTC: the units cut a unit's meetings whole 0.107 of the time against 0.093 without them, and less
+at lengths 6 to 8); that is the formal thread's miss, scored in the receipt, and G-Z64 reads the corrected weights; the product of §23 there joins reads of one symbol and is a different composition. The weights come from her news and
 the store's end marks and never from the cut's own past decisions, so nothing cascades and the cut stays a function of the last
 eight places. Where no unit speaks every mass is `b` and the cut is her news anchor (Lean `cut_at_background_is_news`). A depth-1
 prefix suppresses only right after a boundary, and there it competes on mass. The cap of eight is the store's own, since past the
@@ -139,5 +145,5 @@ stands on them; G-Z63 reads the units founded between them.
   `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
   and adds no statement.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z63.
+- Guesses: G-Z58 to G-Z64.
 - The engine: the founding build is the lead's; this record changes no code.

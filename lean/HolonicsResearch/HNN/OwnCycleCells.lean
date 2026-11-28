@@ -71,9 +71,10 @@ finite statements those rows do not.
     `l < 1`, stands still at `m / (1 − l)` and rises toward it from below, so a unit that keeps recurring keeps its evidence and
     one that stops leaves by the leak. The delta step at rate `1/(k + 1)` from the mean of `k` meetings is the mean of `k + 1`:
     a unit's rate cools by its own count, and no fixed-rate step moves what it holds.
-14. **Where no unit speaks, the cut is the news** (`cut_at_background_is_news`). The cut weighs every start `d` by the boundary
-    `a d` before it and its key's masses, ending against continuing, with the news's anchor `ν` weighed by the background `b`.
-    Where every key reads at the background, both sums are equal and the cut stands exactly where the news anchors.
+14. **Where no unit speaks, the cut is the news** (`cut_at_background_is_news`). The cut weighs every start `d` by the chance
+    that it is the last boundary and its key's ratio, ending against continuing, with the news's anchor `ν` at a positive
+    weight `c`. Where every key reads at the background, the two sides carry the same weight for each start and the cut stands
+    exactly where the news anchors.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -292,10 +293,11 @@ theorem cooled_rate_is_mean (S e k : ℝ) (hk : 0 < k) :
   field_simp
   ring
 
-/-- Where every key reads at the background `b`, the cut stands exactly where the news anchors. -/
-theorem cut_at_background_is_news {ι : Type*} (s : Finset ι) (a : ι → ℝ) (b ν : ℝ) (hb : 0 < b) :
-    (∑ d ∈ s, a d * b) < (∑ d ∈ s, a d * b) + b * ν ↔ 0 < ν := by
+/-- Where every key reads at the background, both sides of the cut carry the same weight `x d` for each start, and the cut
+stands exactly where the news anchors, whatever positive weight `c` the news carries. -/
+theorem cut_at_background_is_news {ι : Type*} (s : Finset ι) (x : ι → ℝ) (c ν : ℝ) (hc : 0 < c) :
+    (∑ d ∈ s, x d) < (∑ d ∈ s, x d) + c * ν ↔ 0 < ν := by
   rw [lt_add_iff_pos_right]
-  exact mul_pos_iff_of_pos_left hb
+  exact mul_pos_iff_of_pos_left hc
 
 end Holonics.HNN.OwnCycleCells

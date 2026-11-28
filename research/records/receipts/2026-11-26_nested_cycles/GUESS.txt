@@ -439,3 +439,15 @@ G-Z62 (0.5). With no units, a cut placed where her mean news after the suffix ri
   recurring words cut alike, with an epoch between 3.5 and 5 places.
 G-Z63 (0.5). Units founded by the charge of the founding record's §3 from the runs between those ends are cut whole at at least
   0.8 of their meetings on the lead's unit_cut_ruler.
+
+Read 2026-11-28T01:05Z beside G-Z61, a ruler (unit_cut_ruler on the weighted form's 2,074 units, the 16 held passages): a unit's
+meetings cut whole, with the units against without, 0.081 against 0.061 at length 2, 0.107 against 0.109 at 3, 0.201 against
+0.167 at 4, 0.194 against 0.181 at 5, 0.222 against 0.249 at 6, 0.381 against 0.413 at 7, 0.170 against 0.281 at 8, 0.107 against
+0.093 over 71,281 meetings. The lead's reading: nearly every suffix is some unit's prefix, so the continuing side gathers a(t − d)
+times its ratio from several depths at about 0.25 each, while a real close has one parse's ending ratio.
+Scored 2026-11-28T01:06Z, the formal thread's own law of §5 of the founding record: it summed the starts as disjoint parses without the
+factor that makes them disjoint, that no boundary stood between a start and t, so each start counted as if it were the last. The
+start's weight is the chance that it is the last boundary, w(d) = a(t − d) Π_(j<d) (1 − a(t − j)).
+
+G-Z64 (0.45, fixed 2026-11-28T01:06Z, date -u 01:06:11). With each start weighed by w(d) and each key read as its ending ratio, the
+  weighted form's units cut whole at no less than the no-unit rate at every length from 2 to 8 on unit_cut_ruler.
