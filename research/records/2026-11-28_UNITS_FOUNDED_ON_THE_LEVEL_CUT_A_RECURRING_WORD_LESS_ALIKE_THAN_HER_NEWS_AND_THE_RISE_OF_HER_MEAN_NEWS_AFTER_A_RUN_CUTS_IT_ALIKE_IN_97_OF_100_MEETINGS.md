@@ -326,4 +326,4 @@ thread of its own. The store builds are held to the line's own parity: every fac
 (the same with `Units::read_anchors` reading the expectation) its arm: W136s and W136e from W135c's end under G-Z78
 ([`GUESS_U5.txt`](receipts/2026-11-27_founded_units/GUESS_U5.txt)), beside the plain line's second lap W136p2. The kernel committed
 here reduces the warp's sums by the wide butterfly (`shfl_wide`) where the laps' binaries shuffled down; the sums are integer sums, so
-both give the same bits.
+both give the same bits. Gate 3 of `e5rf` against the line reproduces 24 of 24 sections and its lap's read ([`gate3_e5rf.txt`](receipts/2026-11-27_founded_units/gate3_e5rf.txt)); `e5rg`'s line runs the same bits.
