@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z71 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z72 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -199,7 +199,25 @@ shared only by the keys at that residue, its mean is the sum over the count with
 its own residues alone. The rings tell `p₁ p₂` pairs apart: resolution bought by agreement among coprime parts, the grain law of
 November 21, and the rows a symbol's word shares at a residue (November 12). A key is read at the ring whose count is least, an
 upper bound on its own count, so its weight needs no positive part. A leak on the sum and the count is the store's upkeep of §3 and
-enters as its own arm. G-Z71 reads the residue store at two sizes.
+enters as its own arm; a leak common to the sum and the count leaves their ratio the leaky mean, so at a fixed state it moves only
+the weights and the tracking. The lead's read of 03:35 UTC held it (G-Z71): on two primes near 4,096 the store keeps 0.996 of the
+type cut's peak ends, and its read of a run's mean errs 0.17 nats rms against the phasor store's 2.5.
+
+**A deeper run speaks by its increment over its parent (0.55).** The type cut's depths join by their counts,
+`ν̂ = Σ_k S_k / Σ_k N_k`, and every meeting of a run is a meeting of its last octet, so `N_1 ≥ N_2 ≥ … ≥ N_8`: the last octet
+weighs most at every place, and a deeper run moves the read by its share of the counts, most where it agrees with its parent. That
+depths 1 and 2 stand level with depth 8 is then the join's and not depth's: the last octet alone keeps 0.958 of the type cut's
+peak ends at depths 1 and 2 and 0.947 at depths 1 to 8, and cuts 0.951 alike at 3.06 places (G-Z72 held). The flag of the
+word record's §23 joins nested reads by their increments: a run reads as its parent's mean moved toward its own at its credibility,
+
+```
+m̂_k = m̂_(k−1) + Z_k (m_k − m̂_(k−1)),   Z_k = N_k / (N_k + c_k)
+```
+
+where the count join is `c_k = N_(k−1)`, the parent outvoting the child, and `c_k = 1` is the cooled step of §3 begun at the
+parent's read, a new run starting where its shorter suffix stands. The store's own spread sets `c_k` between them: the variance of
+her news within a run over the spread of the children's means, a third sum at each residue with the same leak (Bühlmann's
+credibility, 1967). It enters as its own arm after the residue store.
 
 ## 8. Owners
 
@@ -207,5 +225,5 @@ enters as its own arm. G-Z71 reads the residue store at two sizes.
   `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
   and adds no statement; §7 composes `cooled_rate_is_mean` and adds none.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z71.
+- Guesses: G-Z58 to G-Z72.
 - The engine: the founding build is the lead's; this record changes no code.
