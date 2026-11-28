@@ -484,3 +484,33 @@ rest inside words. G-Z67 missed: counting a meeting inside a longer founded unit
 0.751, 0.620, 0.759, 0.397 and 0.648 at lengths 2 to 6 (0.697 over all), the rise units 0.597, 0.555, 0.534 and 0.737 at 2 to 5
 (0.582). Nesting in a longer unit explains part of the uncut starts and not most of them: a start stays uncut where the word
 before reaches into the cut's keys.
+
+Scored 2026-11-28T03:24Z on the lead's read of 03:23 UTC: G-Z66 missed. Her face's entropy plus the store of what it lacks at k = 1
+and 2, cut at peaks, reads 0.764 alike at 3.21 places an epoch on the held rows (the rise form 0.637 at 2.23; 0.588 in sample against
+the plain rise cut's 0.883); the mean divergence is 0.0163 nats, so the meeting's own entropy drives the cut. The type form at k = 1
+and 2 alone reads 0.947 at 3.16 (rise 0.981 at 2.07; 0.884 in sample) on 8,825 runs (257 at k = 1, 8,568 at k = 2), level with depth
+8. G-Z65 read again at 0.978: peak ends fall 0.53 at a word's first letter, 0.38 inside a word, 0.05 after its last, 0.04 elsewhere.
+
+Fixed 2026-11-28T03:24Z (date -u 03:24:51), before the lead's read of the ring store (key χ_j(u) = Π_d ζ_j(d, u_(|u|−d)) on J circles,
+read r = Re⟨χ, F⟩/J, mean field M_k by the delta step at 1/(n̂ + 1), count field C_k ← C_k + χ, depths joined by their counts' reads).
+G-Z68 (0.5). At J = 4,096, depths 1 to 8 joined by their count reads over zero, the peak cut reads under 0.93 of recurring words cut
+  alike on the held rows.
+G-Z69 (0.5). At J = 4,096, depths 1 to 8, each depth weighed by its count read over its own field's background,
+  (Ĉ_k(s) − ‖C_k‖/(J√2))_+, the peak cut reads at least 0.93 alike at an epoch within 0.3 places of 3.14.
+G-Z70 (0.5). Depths 1 and 2 alone read at least 0.93 alike at each of J = 1,024, 4,096 and 8,192; what the field's size moves is where
+  the ends fall: the share of places after a space or a line's end that carry a peak end reads at least 0.05 lower at J = 1,024 than
+  at J = 8,192.
+
+Scored 2026-11-28T03:33Z on the lead's read, which ended at 03:24 UTC, the minute the guesses were fixed, so it scores them
+blind: G-Z68 held, depths 1 to 8 over zero at J = 4,096 read 0.874 alike at 3.08 places. G-Z69 missed, the weights over b_k read
+0.865 at 3.11: b_k is the commonest keys' crosstalk (b_2 = 424 at 4,096 against a depth-2 key's mean of 70 meetings), so it silences
+the rare keys and does not separate them. G-Z70 half held: depths 1 and 2 over b_k read 0.661, 0.907 and 0.917 at J = 1,024, 4,096 and
+8,192 (over zero 0.781, 0.932, 0.942), so the first clause missed; the share of places after a space carrying a peak end falls 0.216
+from 8,192 to 1,024 (0.969 to 0.753), so the second held. The store keeps 0.645, 0.774 and 0.815 of the type cut's ends at the three
+sizes (over zero), and 0.744 at depth 8 and J = 4,096. The count-cooled charge reads a run's mean with 2.5 nats rms a meeting at
+4,096 and 1.79 at 8,192: a key's first meetings charge at rate one into every other key's read and are never repaid.
+
+Fixed 2026-11-28T03:33Z (date -u 03:33:53), before the read.
+G-Z71 (0.5). Entries shared at a residue on two coprime rings, a sum and a count at each residue, read at the ring whose count is
+  least, at depths 1 and 2, keep at least 0.85 of the type cut's ends with both primes near 4,096 and at least 0.90 with both near
+  8,192.
