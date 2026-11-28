@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with three finite statements in Lean and the guesses G-Z58 and G-Z59 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z61 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -73,10 +73,41 @@ Both are fixed in `research/records/receipts/2026-11-26_nested_cycles/GUESS.txt`
 from October: the merge law's alphabet growth is a flat code's price; on the store a unit's naming cost is the level's face, and
 its growth is the background its row adds.
 
-## 5. Owners
+## 5. The cut weighs each start by the boundary before it (the lead's second cut form, November 28, 00:20 UTC)
 
-- Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed` and
-  `cooled_rate_is_mean` (checked).
+The lead's first founding on 2,000 rows made 1,111 units, lengths 2 to 5 at the cap of `J/18 = 227` each and 123, 54 and 26 of
+lengths 6, 7 and 8, under the charge `(n − 1)(c − log₂(U + 2)) > log₂ |P| + 1` with `n` a leaky count. Its first cut matched units
+from the last anchor with keys counted from the run's start; the anchor moved with her news, the misalignment cascaded, epochs
+went from 3.74 to 5.08 places and same-cut from 0.559 to 0.510. The second form counts keys back from a run's end and reads every
+suffix of length 1 to 8 at each place: an anchor where a unit ends and none may still run, none where a suffix is a unit's proper
+prefix (unless the epoch spans 8), and otherwise the news's anchor.
+
+No unit has length 1, so every symbol that opens a unit marks a prefix at depth 1, and a test of membership suppresses a news
+anchor at almost every place. **The composition (0.6): a prefix speaks only for a start that stands on a boundary.** Each suffix
+`s_d` is a parse, a unit begun `d` places back, and it is as strong as the boundary before it, `a(t − d)`: one where her news
+anchored or a unit ended there, the news-free prior elsewhere. Each key weighs by its leaky mass over the background `b`:
+
+```
+m_end(s)  = b + Σ n_u over units ending at s
+m_cont(s) = b + Σ n_u over units with s as a proper prefix
+end(t)    = Σ_d a(t − d) · m_end(s_d) + b · news(t)
+cont(t)   = Σ_d a(t − d) · m_cont(s_d)
+cut at t ⇔ end(t) > cont(t)
+```
+
+The starts are disjoint parses of one string, so their masses add: the fibre's sum over parses (§17 of the word record), read
+one-sided; the product of §23 there joins reads of one symbol and is a different composition. The weights come from her news and
+the store's end marks and never from the cut's own past decisions, so nothing cascades and the cut stays a function of the last
+eight places. Where no unit speaks every mass is `b` and the cut is her news anchor (Lean `cut_at_background_is_news`). A depth-1
+prefix suppresses only right after a boundary, and there it competes on mass. The cap of eight is the store's own, since past the
+longest unit no key has continuation mass. The cap of `J/18` a length binds at lengths 2 to 5 and is an extent set by hand; the
+upkeep band of §3 sets the count where a unit's saving falls under its row's share of the background. G-Z60 and G-Z61 are fixed on
+the stability read.
+
+## 6. Owners
+
+- Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed`,
+  `cooled_rate_is_mean` and `cut_at_background_is_news` (checked).
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 and G-Z59.
+- Guesses: G-Z58 to G-Z61.
 - The engine: the founding build is the lead's; this record changes no code.
