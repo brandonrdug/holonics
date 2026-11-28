@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z67 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z71 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -172,11 +172,40 @@ residue. It is held beside this form as the configuration to build if the meetin
 belongs to the meeting, so the cut is no longer a function of the type alone, and G-Z66 reads what that costs. Units of units are
 founded by the same charge from the runs of these units, the staircase of October 25, and no epoch is handed to the level above.
 
+The lead's read of 03:23 UTC took that cost: the meeting's entropy with the store of what it lacks cut alike 0.764 of the time at
+3.21 places, the divergence a mean 0.0163 nats, so her meeting drove the cut (G-Z66 missed), and the composition above is withdrawn
+for the cut. The type form stands, and its depth is short: the type mean at depths 1 and 2 alone cut alike 0.947 at 3.16 places, level
+with depth 8, on 8,825 keys.
+
+**A depth speaks over its field's own background (0.6).** On a store addressed on `J` circles, each depth a mean field `M_k` and a
+count field `C_k = Σ_v n_v χ_v`, a key's count reads its own `n_u` and a crosstalk of variance `Σ_v n_v²/(2J)`; since
+`‖C_k‖² ≈ J Σ_v n_v²`, the field's background is `b_k = ‖C_k‖/(J√2)`, read from the field itself. The depths join by
+`w_k(s) = (Ĉ_k(s) − b_k)_+`: a depth speaks for a suffix only where that suffix was met more than its field's noise, which is §3's
+upkeep band read at the cut and the floor of the suffix store's ruler. A weight taken over zero gives half the unmet deep keys a
+crosstalk weight near `b_k`, and that weight follows the word before.
+
+The lead's read of 03:31 UTC scored it: over zero, depths 1 to 8 at `J = 4,096` cut alike 0.874 (G-Z68 held), and over `b_k`
+0.865 (G-Z69 missed), since `b_k` is the commonest keys' crosstalk (`b_2 = 424` against a depth-2 key's mean of 70 meetings) and the
+weight over it silences the rare keys without separating them. Depths 1 and 2 kept 0.645, 0.774 and 0.815 of the type cut's ends at
+`J = 1,024`, 4,096 and 8,192, and the share of places after a space carrying a peak end fell from 0.969 to 0.753 (G-Z70 half held:
+the same-cut rate stood near 0.9 by construction, and the field's size showed in where the ends fall). The count-cooled step read
+a run's mean with 2.5 nats rms a meeting at 4,096.
+
+**A key's charge stands at its residues (0.65).** On `J` circles each key's charge is spread over every entry, so the crosstalk at
+every key is the sum over all keys' charges and the commonest set it; the step at `1/(n + 1)` is a mean only where a key's read is
+its own entry (Lean `cooled_rate_is_mean`), so a key's first meetings, charged at rate one, enter every other read and nothing
+repays them. On two coprime rings `p₁` and `p₂`, each key's charge stands at one residue a ring, an entry holds a sum and a count
+shared only by the keys at that residue, its mean is the sum over the count with nothing left elsewhere, and a heavy key pollutes
+its own residues alone. The rings tell `p₁ p₂` pairs apart: resolution bought by agreement among coprime parts, the grain law of
+November 21, and the rows a symbol's word shares at a residue (November 12). A key is read at the ring whose count is least, an
+upper bound on its own count, so its weight needs no positive part. A leak on the sum and the count is the store's upkeep of §3 and
+enters as its own arm. G-Z71 reads the residue store at two sizes.
+
 ## 8. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed`,
   `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
   and adds no statement; §7 composes `cooled_rate_is_mean` and adds none.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z67.
+- Guesses: G-Z58 to G-Z71.
 - The engine: the founding build is the lead's; this record changes no code.
