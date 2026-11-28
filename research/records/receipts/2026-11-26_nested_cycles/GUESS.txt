@@ -584,3 +584,12 @@ Fixed 2026-11-28T11:00Z (date -u 11:00:24), before the read.
 G-Z78 (0.5). An arm from W135c's end that reads the expected peak in place of the shifted peak, beside W136c (W135c's own second lap)
   as its control, with the added row as it stands, codes first letters dearer than its control on the same 100 held rows: the row
   then arrives at an epoch's first letter, where her face is most open, carrying a unit her state already holds.
+
+Read 12:05 UTC beside G-Z73 to G-Z78, on the lead's note of 12:05 UTC: e5re's parity differed on 48 covector entries because the
+host's scale_forward cut a region over its classes with each open place's comparison target in them, so the rise store read the
+target at open places on the host and a spurious class 0 on the card; e5rf reads only written classes on both. W135c and W136c were
+trained on e5rc with class 0 at open places and stand as what that build did. G-Z78's control is W135c's own second lap on e5rf with
+the shifted peak, so that the arm differs from it by the expected peak alone; W136c, on e5rc, is not. If a forward read of W135c ran
+through the host's scale_forward, the store read the target there and only in the store's arm, so its gap (+0.0070) and its
+first-letter excess (+0.0156) are lower bounds on that build's, and G-Z73 and G-Z74 stand as scored only once W135c's end is read
+again on e5rf.
