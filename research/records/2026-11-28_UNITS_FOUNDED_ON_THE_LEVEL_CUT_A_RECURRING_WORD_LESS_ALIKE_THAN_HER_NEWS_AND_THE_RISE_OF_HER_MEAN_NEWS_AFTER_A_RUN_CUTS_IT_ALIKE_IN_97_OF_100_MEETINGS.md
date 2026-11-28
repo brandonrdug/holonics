@@ -190,7 +190,7 @@ W135r (W134r: W134's end, its rise store charged at the first crossing and 2,278
 end), 3,000 sections each on `e5rs` after its gate 3, read at their lap means (the last 1,000 sections of each); then the second crossing
 on W135r's end from 2,000 rows of the same slices that the first never read (seed 28), the lap's fade of 368 thousandths
 ([`arm_W135r.txt`](receipts/2026-11-27_founded_units/arm_W135r.txt), [`found_x2.log`](receipts/2026-11-27_founded_units/found_x2.log)).
-W135r trained in 3,533 s and W135p in 3,546 s against W134's 3,662 s; the store's cut is a lookup a place on the host.
+W135r trained in 3,533 s and W135p in 3,545 s against W134's 3,662 s; the store's cut is a lookup a place on the host.
 
 Her writes first (the panels' counts; the writes themselves are shown in the conversation and stay out of the tree where their prompts
 are private): the long panel's 20 prompts wrote 275 words, 68% in the register's lexicon, 3 of 20 writes looping, on W135r, against 280,
