@@ -7790,6 +7790,46 @@ extern "C" __global__ void field_level_news_strand(FieldWords w, const uint64_t 
     }
 }
 
+// [definition; the formal thread, November 28 10:58 UTC] **Her face's expectation of the rise store's mean news** (the host's
+// `rise_expect`): at each place `t`, from the opening's face `masses[t][a]`, the pair `(Σ_x m_t(x) V[p][x], Σ_x m_t(x))` over the next
+// classes `x` the table has met (`V[p][x] ≥ 0`), `p` the class at `t − 1` in the place's own region (the table's last row at a region's
+// first place, at an open place, whose class is its comparison's target, or where it lies outside the alphabet); `table` is `[(A + 1) A]`. At a strand's open place both are zero. One warp a place;
+// the sums are integer sums, so any order gives the host's bits.
+extern "C" __global__ void field_level_rise_expect(FieldWords w, const uint64_t *masses, const int64_t *table, wide *num, wide *den) {
+    const uint32_t lane = threadIdx.x & 31;
+    const uint64_t warps = (uint64_t)gridDim.x * (blockDim.x >> 5);
+    for (uint64_t t = ((uint64_t)blockIdx.x * blockDim.x + threadIdx.x) >> 5; t < w.T; t += warps) {
+        if (twin_site(w, t)) {
+            if (lane == 0) {
+                num[t] = 0;
+                den[t] = 0;
+            }
+            continue;
+        }
+        const uint32_t prev = (w.site_pos[t] > 0 && w.definite[t - 1] && w.classes[t - 1] < w.A) ? w.classes[t - 1] : w.A;
+        const int64_t *row = table + (uint64_t)prev * w.A;
+        const uint64_t *m = masses + t * w.A;
+        wide sn = 0, sd = 0;
+        for (uint32_t a = lane; a < w.A; a += 32) {
+            if (row[a] >= 0) {
+                sn += (wide)m[a] * (wide)row[a];
+                sd += (wide)m[a];
+            }
+        }
+        for (int o = 16; o > 0; o >>= 1) {
+            const uwide un = (uwide)sn, ud = (uwide)sd;
+            const uint64_t nlo = __shfl_down_sync(0xffffffffu, (uint64_t)un, o), nhi = __shfl_down_sync(0xffffffffu, (uint64_t)(un >> 64), o);
+            const uint64_t dlo = __shfl_down_sync(0xffffffffu, (uint64_t)ud, o), dhi = __shfl_down_sync(0xffffffffu, (uint64_t)(ud >> 64), o);
+            sn += (wide)(((uwide)nhi << 64) | nlo);
+            sd += (wide)(((uwide)dhi << 64) | dlo);
+        }
+        if (lane == 0) {
+            num[t] = sn;
+            den[t] = sd;
+        }
+    }
+}
+
 // [definition; theory, November 13, the design record §4.9] **An epoch's harmonics of its places' rows** (the host's `charted`):
 // `out[e][k W + c] = release(Σ_(t∈e) h[t][k] rows[t][c], 30)`, epoch `e`'s places `off[e]..off[e + 1]` of the fine strand, `h` each
 // place's `H` harmonics on `2^(−30)`. One thread an entry.

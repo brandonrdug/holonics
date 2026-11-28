@@ -144,7 +144,8 @@ impl<'c> Resident<'c> {
     /// region's known stream is cut from its places' `news` where a one-sided stream can name a site, with `open_news` each place's
     /// expected news; an epoch's sites are its known sites; each site's epoch here is the one it reads (the epoch before its own, an
     /// open place's the one before the epoch of the place before it), and [`StrandTables`] hold the rest.
-    pub(crate) fn tower_batch(&self, field: &Constitution, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, news: &[i64], open_news: Option<&[i64]>) -> Result<TowerBatch<'c>> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn tower_batch(&self, field: &Constitution, tr: &mut TowerRun<'c>, fine: &Staged<'c>, regions: usize, news: &[i64], open_news: Option<&[i64]>, expect: Option<&[(i128, i128)]>) -> Result<TowerBatch<'c>> {
         let s = field.scale.as_deref().ok_or(TowerError::Refused("a level's batch of a field without a level"))?;
         let coarse = &s.coarse;
         let cd = coarse.declaration;
@@ -181,7 +182,7 @@ impl<'c> Resident<'c> {
                         return Err(TowerError::Refused("a strand staged as other than its known sites and as many open places"));
                     }
                     let known_classes: Vec<usize> = classes[first..first + n].iter().map(|&c| c as usize).collect();
-                    strand_level_cut_units(&news[first..first + n], &open_news[first..first + n], s.units.as_ref().map(|u| (u, known_classes.as_slice(), alphabet)), section, h, pi).map(Some)
+                    strand_level_cut_units(&news[first..first + n], &open_news[first..first + n], s.units.as_ref().map(|u| (u, known_classes.as_slice(), alphabet, expect.map(|e| &e[first..first + n]))), section, h, pi).map(Some)
                 })
                 .collect::<Result<Vec<_>>>()?
         } else {
@@ -232,8 +233,9 @@ impl<'c> Resident<'c> {
                 owned.push((vec![0usize; epochs], vec![false; epochs], vec![None; epochs]));
                 continue;
             }
-            let region_classes: Vec<usize> = fine.classes[first..end].iter().map(|&c| c as usize).collect();
-            let cut = level_cut_units(&news[first..end], s.units.as_ref().map(|u| (u, region_classes.as_slice(), field.declaration.alphabet)), tr.section, h, tr.pi, false)?;
+            // the store's cut reads the written classes alone (the host's `scale_forward`): an open place's class reads outside the alphabet
+            let region_classes: Vec<usize> = (first..end).map(|t| if fine.definite[t] != 0 { fine.classes[t] as usize } else { field.declaration.alphabet }).collect();
+            let cut = level_cut_units(&news[first..end], s.units.as_ref().map(|u| (u, region_classes.as_slice(), field.declaration.alphabet, expect.map(|e| &e[first..end]))), tr.section, h, tr.pi, false)?;
             let base = off.len() as u32;
             let epochs = cut.anchors.len();
             let (mut unres, mut faces) = (Vec::with_capacity(epochs), Vec::with_capacity(epochs));
