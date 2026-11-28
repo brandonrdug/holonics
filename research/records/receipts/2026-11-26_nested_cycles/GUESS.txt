@@ -593,3 +593,9 @@ the shifted peak, so that the arm differs from it by the expected peak alone; W1
 through the host's scale_forward, the store read the target there and only in the store's arm, so its gap (+0.0070) and its
 first-letter excess (+0.0156) are lower bounds on that build's, and G-Z73 and G-Z74 stand as scored only once W135c's end is read
 again on e5rf.
+
+Read 12:10 UTC, the lead's answer of 12:10 UTC, correcting the note above: the forward reads went through Constitution::strand_codes,
+whose known stream holds only written classes, so no target entered them, and G-Z73 and G-Z74 stand as scored. The leak stood in
+the region path alone: the card's training regions (class 0 at open places) and the host's region reads, the held cavity among them
+(the target at open places), so the cavity's credit to the store's arm carried its target. G-Z78's control is W136s, W135c's end on
+e5rg (the same repair, the peaks read a place late), beside W136e on e5rf (the peaks named in time by expectation).
