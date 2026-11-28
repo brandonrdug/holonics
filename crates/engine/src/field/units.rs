@@ -1,80 +1,51 @@
 //! [definition; the review of November 27 (the formal thread's F1 and the review's build step 1), October's lap law (the record of
-//! October 25 §1 and §2), the carry key of the lead's host reads of November 27 (the record of the class hairs §22 to §24);
-//! `agent-inferred`] **The level's founded units**: a unit is a closed run of the places' symbols, held whole as a part of the level, so
-//! that a recurring span is cut the same way at every meeting.
+//! October 25 §1 and §2), the formal thread's laws of November 28 (the rise cut of 00:58 UTC, its residues of 03:34 UTC); the review's
+//! check of step 1 (November 28 08:32 UTC); `agent-inferred` in the realization] **The level's founded units and the rise store that
+//! cuts them**: a unit is a closed run of the places' symbols, founded whole as a part of the level; the cut is the peaks of her mean news
+//! after the runs ending at each place, a property of the runs' types, so a recurring span is cut the same way at every meeting.
 //!
 //! ```text
-//! key      χ_j(u) = Π_(d=1..|u|) ζ_j(d, u_(|u|−d))   on J circles, ζ_j(d, a) a turn drawn once a circle, a distance back from the
-//!                                                   run's end and a symbol (the gene), so a run's key is read wherever it ends
-//! store    E_L, P_k : J circles each        the units' ends (a run of L symbols) and their proper prefixes (k symbols), the marks
-//! read     r(F, χ) = Re⟨χ, F⟩ / J           one at a charged key, scattered about zero at √(n / 2J) elsewhere (n the keys charged)
-//! charge   F ← F + (1 − r(F, χ)) χ           the delta charge: a key that reads its mark takes no more
-//! cut      at place t, over the runs ending there u_d = x_(t−d..t), d = 1..L:
-//!          some r(E_d, χ(u_d)) ≥ ½ and no r(P_d, χ(u_d)) ≥ ½ → an anchor at t (a unit closes)
-//!          some r(P_d, χ(u_d)) ≥ ½                          → no anchor at t (a founded unit may be running), unless the epoch
-//!                                                              already spans L places
-//!          otherwise                                         → the news's own anchor, as without units
-//!          so where units are founded the cut is the symbols' own, the same at every meeting of the same L places before it
-//! found    at a crossing, over a sample read through the state: each closed epoch u of 2 to L symbols, met n̂ times by a leaky count of
-//!          its key (a candidate field of its own), with her code c over its places at this meeting, is founded where
+//! word     w(u) = Σ_d u_(|u|−d) A^(d−1)              a run's word in the alphabet's base, oldest symbol first
+//! rings    two coprime periods p₀, p₁                the two largest primes under J; a run sits at w mod p on each
+//! rise     for the runs of k = 1, 2 symbols ending at a place, at each residue a sum S_k of her news at the place after the run (on
+//!          2^(−20) bits) and a count N_k, charged at a crossing from a sample's places and leaking by its fade; read at each depth at
+//!          the ring whose count is least (an entry shared by the fewest other runs), the depths joined by their counts,
+//!          ν̂(t) = Σ_k S_k / Σ_k N_k, a ratio held as its pair; an end stands at t + 1 where ν̂ rises at t and not at t + 1 (a peak),
+//!          and where the store holds meetings those ends are the level's cut; elsewhere the cut is her news's
+//! marks    for each length k = 2..L, at each residue of each ring: the count c of the units there, the sums of their words and of
+//!          their words' squares (wrapping, a quotient: a cell's sums are its units' in any order), and the sums of their evidence
+//!          (a leaky count of meetings on 2^(−20)) and of their saving (on 2^(−20) bits)
+//! held     u is held where its cell on a ring holds it alone (c = 1, the word sum w) or with one other unit v (c = 2,
+//!          v = Σw − w with v² + w² = Σw²), read at the ring whose count is least; a cell empty on either ring holds nothing
+//! found    at a crossing, over a sample read through the state: each closed epoch u of 2 to L symbols, met n̂ times on a crossing's
+//!          candidate rings (two primes under 65,536, a count at each residue, read at the least: an upper bound on its own count),
+//!          with her code c over its places at this meeting, is founded where
 //!          (n̂ − 1)(c − log₂(U + 2)) > log₂|P| + 1            (the saving of naming it whole at the meetings after the first, against
-//!          the choice among the pool's
-//!          |P| candidates and the bit of keeping two paths; the formal thread's charge of 22:55 UTC: the first meeting already spells the
-//!          unit by its pieces, so its letters are not charged again); `spelled` charges L log₂ A + log₂|P| beside it, October's form
-//! rise     the store of her mean news after a run: for the runs of k = 1, 2 symbols ending at a place, the run's word
-//!          w = Σ_d u_(|u|−d) A^(d−1) on two coprime rings (the two largest primes under J), a sum S_k of her news at the place after
-//!          the run (on 2^(−20) bits) and a count N_k at each residue, charged at a crossing from a sample's places and leaking by its
-//!          fade; read at each depth at the ring whose count is least (an entry shared by the fewest other runs), the depths joined by
-//!          their counts, ν̂(t) = Σ_k S_k / Σ_k N_k, a ratio held as its pair; an end stands at t + 1 where ν̂ rises at t and not at
-//!          t + 1 (a peak); where the store holds meetings those ends are the cut, and the units are founded between them
+//!          the choice among the pool's |P| candidates and the bit of keeping two paths; the formal thread's charge of 22:55 UTC: the
+//!          first meeting already spells the unit by its pieces); `spelled` charges L log₂ A + log₂|P| beside it, October's form; a
+//!          held unit met again charges one meeting and its saving at its cells
 //! ```
 //!
-//! The rise store is the formal thread's law of November 28 00:58 UTC (a span's ends are where its readings agree, a property of its
-//! type read as a mean over its meetings) in the form its fallback (a) of 01:29 UTC and its residues of 03:34 UTC give it. Why these
-//! depths and this addressing (the lead's host reads of November 28, the record of that day §5): her mean news after runs of one and
-//! two octets cuts a recurring word alike in 0.947 of 4,743 meetings at 3.16 places an epoch, against 0.940 at depths 1 to 8; her
-//! face's entropy at the meeting in its place reads 0.764; the same mean on J = 4,096 keyed circles keeps only 0.774 of the exact
-//! mean's ends (a key's charge spreads over every circle, so the commonest keys' charges set every read's crosstalk), and on the
-//! residues of two primes near 4,096 it keeps 0.996 (a key's charge sits at one entry a ring, shared only with the keys at that
-//! residue).
+//! Why residues for the marks too (the review's check of November 28, 08:32 UTC, read the same day): the marks on 4,096 keyed circles
+//! read 988 runs as held at the second crossing that neither crossing had founded and failed 30 that the first had (founded again), and
+//! a fade of 368 thousandths left a mark at 0.632 against a midpoint of 0.5; on residues a unit's charge sits at one cell a ring, shared
+//! only with the units at that residue, and its word's sums tell it apart from them. Why the rise store's depths and addressing (the
+//! record of November 28 §5 to §7): her mean news after runs of one and two octets cuts a recurring word alike in 0.947 of 4,743
+//! meetings at 3.16 places an epoch, against 0.940 at depths 1 to 8; on J = 4,096 keyed circles the same mean keeps 0.774 of the exact
+//! mean's ends and on the residues of two primes near 4,096 it keeps 0.996. The units' weighted parse of the formal thread's law of
+//! 00:22 UTC, which read the units' end and prefix marks into the cut, cut a recurring word alike in 0.872 of those meetings over the
+//! store's ends where the store's peaks alone read 0.948 (§8), and left the cut; its law stands in that record.
 //!
-//! The cut reads only the places before `t`, so a one-sided stream names its anchors from what has arrived. The marks are never
-//! stepped by a deposit: a founded unit stays while it is held and leaves by the store's leak at a crossing (`fade`). Why: on November 27
-//! her epochs cut a word met again at the same offsets in 0.559 of 4,743 meetings (the record §24, `epoch_cut_long.txt`), as her news
-//! moves the landmarks; the review of that day found that October's founding learner never ran where the line trains.
+//! The cut reads only the symbols up to `t + 1`, so a one-sided stream names an end one place after it. Nothing here is stepped by a
+//! deposit: the store and the marks change only at a crossing. No law yet releases a unit (the band is owed); a unit stays founded, and
+//! its evidence and saving leak by the crossing's fade.
 
 use super::*;
-use std::collections::HashMap;
-use std::sync::{Arc, Mutex, OnceLock};
 
-/// The store's grain: half the turn's (`2^(−15)`), far under a key's scatter `1/√(2J)` and narrow enough for a word's products.
-fn grain() -> u32 {
-    MOVE_BITS / 2
-}
-
-/// [definition] **The level's founded units** ([module](self)).
-#[derive(Clone, Debug, PartialEq, Eq)]
-pub struct Units {
-    /// `J`, the circles a key is held on.
-    pub circles: usize,
-    /// `L`, the longest unit in symbols (the shortest is two).
-    pub longest: usize,
-    /// The gene: the seed the turns `ζ_j(i, a)` are drawn from.
-    pub key: u64,
-    /// The units founded, by length (`founded[k]` for a run of `k` symbols, `k ≤ L`).
-    pub founded: Vec<u32>,
-    /// `E_k` for `k = 0..=L` (empty below two), each `2J` (real parts then imaginary, on the store's grain `2^(−15)`).
-    pub ends: Vec<Vec<i64>>,
-    /// `P_k` for `k = 0..=L − 1` (empty at zero), each `2J`.
-    pub prefixes: Vec<Vec<i64>>,
-    /// The rise store's two coprime periods, the two largest primes under `J`.
-    pub periods: [usize; 2],
-    /// `S_k` for `k = 1..=RISE_DEPTH` (index `k − 1`), a ring each: her news after a run of `k` symbols summed at its word's residue,
-    /// on `2^(−20)` bits.
-    pub news: Vec<[Vec<i64>; 2]>,
-    /// `N_k`, a ring each: the meetings charged at each residue.
-    pub meetings: Vec<[Vec<i64>; 2]>,
-}
+/// The candidate rings' extent: a crossing counts every closed epoch's word on the two largest primes under it (65,521 and 65,519).
+/// Why (`agent-inferred`): the first founding sample of November 27 met about 186,000 closed epochs a crossing, so a count at each of
+/// 65,521 residues holds about three meetings beside a run's own, the least of two rings fewer.
+pub const CANDIDATE_CIRCLES: usize = 65_536;
 
 /// The rise store's longest run: two symbols. Why: her mean news after runs of one and two octets cuts a recurring word as her mean
 /// news after runs of one to eight does (0.947 and 0.940 of 4,743 meetings, the lead's read of November 28; the formal thread's
@@ -82,59 +53,127 @@ pub struct Units {
 pub const RISE_DEPTH: usize = 2;
 
 /// The two largest primes under `j` (none where `j` is under four).
-fn rise_periods(j: usize) -> Option<[usize; 2]> {
+fn periods_under(j: usize) -> Option<[usize; 2]> {
     let prime = |q: usize| q >= 2 && (2..).take_while(|d| d * d <= q).all(|d| q % d != 0);
     let mut it = (2..j).rev().filter(|&q| prime(q));
     Some([it.next()?, it.next()?])
 }
 
-type Table = Arc<Vec<i64>>;
-
-fn tables() -> &'static Mutex<HashMap<(u64, usize, usize, usize), Table>> {
-    static T: OnceLock<Mutex<HashMap<(u64, usize, usize, usize), Table>>> = OnceLock::new();
-    T.get_or_init(|| Mutex::new(HashMap::new()))
+/// One ring's cells for the units of one length ([module](self)).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Cells {
+    /// The units at each residue.
+    pub count: Vec<u32>,
+    /// The sum of their words, wrapping.
+    pub words: Vec<u128>,
+    /// The sum of their words' squares, wrapping.
+    pub squares: Vec<u128>,
+    /// The sum of their evidence, a leaky count of meetings on `2^(−20)`.
+    pub evidence: Vec<i64>,
+    /// The sum of their saving, on `2^(−20)` bits.
+    pub saving: Vec<i64>,
 }
 
-/// The passage's own mixer ([`crate::passage::mix`], SplitMix64), counted from the gene.
-fn mix(z: u64) -> u64 {
-    crate::passage::mix(z, 0)
+impl Cells {
+    fn new(p: usize) -> Self {
+        Self { count: vec![0; p], words: vec![0; p], squares: vec![0; p], evidence: vec![0; p], saving: vec![0; p] }
+    }
 }
+
+/// [definition] **The level's founded units** ([module](self)).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Units {
+    /// `J`, the extent the rings' periods are read under.
+    pub circles: usize,
+    /// `L`, the longest unit in symbols (the shortest is two).
+    pub longest: usize,
+    /// The units founded, by length (`founded[k]` for a run of `k` symbols, `k ≤ L`).
+    pub founded: Vec<u32>,
+    /// The two coprime periods, the two largest primes under `J`.
+    pub periods: [usize; 2],
+    /// The marks for `k = 0..=L` (empty below two), a ring each.
+    pub cells: Vec<Vec<Cells>>,
+    /// The rise store's `S_k` for `k = 1..=RISE_DEPTH` (index `k − 1`), a ring each: her news after a run of `k` symbols summed at its
+    /// word's residue, on `2^(−20)` bits.
+    pub news: Vec<[Vec<i64>; 2]>,
+    /// `N_k`, a ring each: the meetings charged at each residue.
+    pub meetings: Vec<[Vec<i64>; 2]>,
+}
+
+/// A crossing's founding read ([`Units::found`]): the units founded, the epochs read as held and the founded runs, the distinct
+/// units met already held (a receipt, never read by the machine).
+pub type Founding = (usize, usize, Vec<Vec<usize>>, Vec<Vec<usize>>);
 
 impl Units {
-    /// A store of `circles` circles for units of 2 to `longest` symbols, its turns drawn from `key`, with nothing founded.
-    pub fn new(circles: usize, longest: usize, key: u64) -> Result<Self> {
-        if circles == 0 || longest < 2 {
-            return refuse("a unit store needs circles and a unit of two symbols or more");
+    /// A store whose periods are the two largest primes under `circles`, for units of 2 to `longest` symbols, with nothing founded.
+    pub fn new(circles: usize, longest: usize) -> Result<Self> {
+        if longest < 2 {
+            return refuse("a unit store needs a unit of two symbols or more");
         }
-        let Some(periods) = rise_periods(circles) else { return refuse("a unit store whose circles hold no two primes under them") };
+        let Some(periods) = periods_under(circles) else { return refuse("a unit store whose circles hold no two primes under them") };
         Ok(Self {
             circles,
             longest,
-            key,
             founded: vec![0; longest + 1],
-            ends: (0..=longest).map(|k| if k >= 2 { vec![0; 2 * circles] } else { Vec::new() }).collect(),
-            prefixes: (0..longest).map(|k| if k >= 1 { vec![0; 2 * circles] } else { Vec::new() }).collect(),
             periods,
+            cells: (0..=longest).map(|k| if k >= 2 { periods.iter().map(|&p| Cells::new(p)).collect() } else { Vec::new() }).collect(),
             news: (0..RISE_DEPTH).map(|_| periods.map(|p| vec![0; p])).collect(),
             meetings: (0..RISE_DEPTH).map(|_| periods.map(|p| vec![0; p])).collect(),
         })
     }
 
-    /// The word of the run of `k` symbols ending at `t`, `Σ_d u_(t−d+1) A^(d−1)`; `None` where the run starts before the row or holds a
-    /// class outside the alphabet.
-    fn rise_word(classes: &[usize], t: usize, k: usize, alphabet: usize) -> Option<u64> {
-        if t + 1 < k {
-            return None;
-        }
-        let mut w = 0u64;
-        for d in (1..=k).rev() {
-            let a = classes[t + 1 - d];
+    /// A run's word, oldest symbol first; `None` where a class lies outside the alphabet.
+    fn word(run: &[usize], alphabet: usize) -> Option<u128> {
+        let mut w = 0u128;
+        for &a in run {
             if a >= alphabet {
                 return None;
             }
-            w = w * alphabet as u64 + a as u64;
+            w = w.wrapping_mul(alphabet as u128).wrapping_add(a as u128);
         }
         Some(w)
+    }
+
+    /// The word of the run of `k` symbols ending at `t`; `None` where it starts before the row or holds a class outside the alphabet.
+    fn rise_word(classes: &[usize], t: usize, k: usize, alphabet: usize) -> Option<u128> {
+        if t + 1 < k {
+            return None;
+        }
+        Self::word(&classes[t + 1 - k..=t], alphabet)
+    }
+
+    /// Whether the unit store holds the word `w` among its units of length `k` ([module](self)).
+    fn holds(&self, k: usize, w: u128) -> bool {
+        let rings = &self.cells[k];
+        let at: Vec<usize> = self.periods.iter().map(|&p| (w % p as u128) as usize).collect();
+        if rings.iter().zip(&at).any(|(r, &a)| r.count[a] == 0) {
+            return false;
+        }
+        let i = if rings[1].count[at[1]] < rings[0].count[at[0]] { 1 } else { 0 };
+        let (c, s1, s2) = (rings[i].count[at[i]], rings[i].words[at[i]], rings[i].squares[at[i]]);
+        match c {
+            1 => s1 == w && s2 == w.wrapping_mul(w),
+            2 => {
+                let v = s1.wrapping_sub(w);
+                v.wrapping_mul(v).wrapping_add(w.wrapping_mul(w)) == s2
+            }
+            _ => false,
+        }
+    }
+
+    /// Charge a unit's cells on both rings: `units` more units there (one at a founding, none at a meeting), its evidence and saving.
+    fn charge_cells(&mut self, k: usize, w: u128, units: u32, evidence: i64, saving: i64) {
+        for (i, &p) in self.periods.iter().enumerate() {
+            let a = (w % p as u128) as usize;
+            let r = &mut self.cells[k][i];
+            if units > 0 {
+                r.count[a] += units;
+                r.words[a] = r.words[a].wrapping_add(w);
+                r.squares[a] = r.squares[a].wrapping_add(w.wrapping_mul(w));
+            }
+            r.evidence[a] += evidence;
+            r.saving[a] += saving;
+        }
     }
 
     /// [definition] **A crossing's charge of the rise store** ([module](self)): every entry leaks by `fade` thousandths, then each place
@@ -157,7 +196,7 @@ impl Units {
                 for k in 1..=RISE_DEPTH {
                     let Some(w) = Self::rise_word(classes, t, k, alphabet) else { continue };
                     for (i, &p) in self.periods.iter().enumerate() {
-                        let at = (w % p as u64) as usize;
+                        let at = (w % p as u128) as usize;
                         self.news[k - 1][i][at] += codes[t + 1];
                         self.meetings[k - 1][i][at] += 1;
                     }
@@ -172,7 +211,7 @@ impl Units {
         let (mut num, mut den) = (0i128, 0i128);
         for k in 1..=RISE_DEPTH {
             let Some(w) = Self::rise_word(classes, t, k, alphabet) else { continue };
-            let at = |i: usize| (w % self.periods[i] as u64) as usize;
+            let at = |i: usize| (w % self.periods[i] as u128) as usize;
             let i = if self.meetings[k - 1][1][at(1)] < self.meetings[k - 1][0][at(0)] { 1 } else { 0 };
             num += self.news[k - 1][i][at(i)] as i128;
             den += self.meetings[k - 1][i][at(i)] as i128;
@@ -200,235 +239,114 @@ impl Units {
         Some(out)
     }
 
-    /// The turns `ζ_j(d, a)` on the store's grain for a distance `d = 1..=L` back from a run's end (index `d − 1`), `a < alphabet`,
-    /// `j < J`, `[d − 1][a][j][re, im]`, drawn once a store's gene and held for the process (a navigator's resident face).
-    fn table(&self, alphabet: usize, pi: i128) -> Table {
-        let id = (self.key, self.circles, self.longest, alphabet);
-        if let Some(t) = tables().lock().map_err(|_| ()).ok().and_then(|m| m.get(&id).cloned()) {
-            return t;
-        }
-        let (j_, l_) = (self.circles, self.longest);
-        let mut v = vec![0i64; l_ * alphabet * j_ * 2];
-        for i in 0..l_ {
-            for a in 0..alphabet {
-                for j in 0..j_ {
-                    let phase = (mix(self.key ^ mix(i as u64 ^ mix(a as u64 ^ mix(j as u64)))) & ((1u64 << PACE_BITS) - 1)) as i128;
-                    let (re, im) = crate::navigator::turn_phasor(phase, 1, pi);
-                    let at = ((i * alphabet + a) * j_ + j) * 2;
-                    (v[at], v[at + 1]) = (release(re as i128, MOVE_BITS - grain()) as i64, release(im as i128, MOVE_BITS - grain()) as i64);
-                }
-            }
-        }
-        let t = Arc::new(v);
-        if let Ok(mut m) = tables().lock() {
-            m.insert(id, t.clone());
-        }
-        t
-    }
-
-    /// The carry of `run` (at most `L` symbols), `[re…, im…]` on the store's grain: the product of its symbols' turns at their distances
-    /// back from its end, the last symbol first.
-    fn carry_with(&self, table: &[i64], alphabet: usize, run: &[usize], out: &mut [i64]) {
-        let (j_, k, g) = (self.circles, run.len(), grain());
-        out[..j_].fill(1i64 << g);
-        out[j_..].fill(0);
-        for d in 1..=k {
-            self.turn(table, alphabet, d, run[k - d], out);
-        }
-        let _ = g;
-    }
-
-    /// One more symbol `a` at distance `d` back: `χ ← χ ζ(d, a)` on the store's grain.
-    fn turn(&self, table: &[i64], alphabet: usize, d: usize, a: usize, chi: &mut [i64]) {
-        let (j_, g) = (self.circles, grain());
-        let row = &table[((d - 1) * alphabet + a) * j_ * 2..((d - 1) * alphabet + a + 1) * j_ * 2];
-        for j in 0..j_ {
-            let (zr, zi) = (row[2 * j], row[2 * j + 1]);
-            let (re, im) = (chi[j], chi[j_ + j]);
-            (chi[j], chi[j_ + j]) = (release((re * zr - im * zi) as i128, g) as i64, release((re * zi + im * zr) as i128, g) as i64);
-        }
-    }
-
-    /// `r(F, χ) = Re⟨χ, F⟩ / J` on the store's grain.
-    fn read(&self, field: &[i64], chi: &[i64]) -> i64 {
-        let j_ = self.circles;
-        let s: i64 = (0..j_).map(|j| chi[j] * field[j] + chi[j_ + j] * field[j_ + j]).sum();
-        (release(s as i128, grain()) / j_ as i128) as i64
-    }
-
-    /// The delta charge `F ← F + (target − r(F, χ)) χ`.
-    fn charge(&self, field: &mut [i64], chi: &[i64], target: i64) {
-        let w = target - self.read(field, chi);
-        for (f, &c) in field.iter_mut().zip(chi) {
-            *f += release((w * c) as i128, grain()) as i64;
-        }
-    }
-
-    /// A mark read against its midpoint: one at a charged key, zero where none was charged.
-    fn marked(&self, field: &[i64], chi: &[i64]) -> bool {
-        self.read(field, chi) >= 1i64 << (grain() - 1)
-    }
-
-    /// [definition; the formal thread's law of November 28 00:22 UTC, `agent-inferred` in its constants] **The cut a founded unit holds**
-    /// ([module](self)): at each place `t` every run ending there, `s_d = x_(t−d..t)` for `d = 1..L`, is a parse in which a unit began `d`
-    /// places back, weighted by that start's own standing `a(t − d)`: one where the news anchored there or a founded unit ended there
-    /// (read from the symbols, never from this cut's own decisions), and the news's own rate of anchors elsewhere. Each parse speaks for an
-    /// end at `t` with its end mark and for a continuation with its prefix mark, each over the store's background `b` (the scatter a key no
-    /// charge met reads, `√(n/2J)` over the `n` keys charged): `end(t) = Σ_d a(t−d) (b + r(E_d, s_d)⁺) + b news(t)` and
-    /// `cont(t) = Σ_d a(t−d) (b + r(P_d, s_d)⁺)`, and the cut stands at `t` where `end > cont`. Where no unit speaks every parse reads `b`
-    /// both ways and the cut is the news's. Where the rise store holds meetings, the cut is its peaks alone. Increasing, the first `0`.
-    pub fn anchors(&self, anchors: &[usize], classes: &[usize], alphabet: usize, pi: i128) -> Vec<usize> {
-        let n = classes.len();
-        if n == 0 {
+    /// [definition] **The level's cut** ([module](self)): the rise store's peaks where it holds meetings, her news's `anchors` elsewhere.
+    /// Increasing, the first `0`. The cut a crossing founds units between.
+    pub fn anchors(&self, anchors: &[usize], classes: &[usize], alphabet: usize) -> Vec<usize> {
+        if classes.is_empty() {
             return Vec::new();
         }
-        // where the rise store holds meetings its peaks are the cut, and the founded units, founded between those ends, need no parse
-        // of their own ([`Units::rise_anchors`]; the formal thread, November 28 01:08 UTC: if the rise cut's ends agree, units founded
-        // between them need no prefix test; the lead's read of 04:02 UTC: the parse over the rise cut's ends cut a recurring word alike
-        // in 0.872 of 4,743 meetings, where the rise cut alone holds 0.948)
-        if let Some(rise) = self.rise_anchors(classes, alphabet) {
-            return rise;
-        }
-        if self.founded.iter().all(|&c| c == 0) {
-            return anchors.to_vec();
-        }
-        let table = self.table(alphabet, pi);
-        let mut news = vec![false; n + 1];
-        for &a in anchors {
-            news[a.min(n)] = true;
-        }
-        let (j_, g) = (self.circles, grain());
-        let one = 1i128 << g;
-        // the background: the scatter of a read at a key no charge met, over the keys the store holds (each unit's end and prefixes)
-        let keys: i128 = (2..=self.longest).map(|k| self.founded[k] as i128 * k as i128).sum();
-        let b = ((keys << (2 * g)) / (2 * j_ as i128)).max(0).isqrt();
-        // a start's standing away from the news and the units: the news's own rate of anchors over the region
-        let rate = (anchors.len() as i128 * one) / n as i128;
-        let mut ended = vec![false; n + 1];
-        let mut chi = vec![0i64; 2 * j_];
-        let mut out = vec![0usize];
-        for t in 1..n {
-            chi[..j_].fill(1i64 << g);
-            chi[j_..].fill(0);
-            let (mut end, mut cont) = (if news[t] { b } else { 0 }, 0i128);
-            for d in 1..=self.longest.min(t) {
-                let a = classes[t - d];
-                if a >= alphabet {
-                    break;
-                }
-                self.turn(&table, alphabet, d, a, &mut chi);
-                let start = t - d;
-                let w = if start == 0 || news[start] || ended[start] { one } else { rate };
-                let re = if d >= 2 && self.founded[d] > 0 { self.read(&self.ends[d], &chi).max(0) as i128 } else { 0 };
-                let rp = if d < self.longest && d >= 1 { self.read(&self.prefixes[d], &chi).max(0) as i128 } else { 0 };
-                if 2 * re >= one {
-                    ended[t] = true;
-                }
-                end += w * (b + re) >> g;
-                cont += w * (b + rp) >> g;
+        self.rise_anchors(classes, alphabet).unwrap_or_else(|| anchors.to_vec())
+    }
+
+    /// [definition; the formal thread, November 28 08:46 UTC; `agent-inferred` in its realization] **The cut as the level reads it**:
+    /// where the rise store holds meetings and the region is read with both sides of each place (`before` false: a region the trainer
+    /// owns, or a cavity), each peak's end `a` stands at `a + 1`, so a site at `t` reads only the ends that `x_(<t)` names and stands in
+    /// the epoch of the place before it; a one-sided stream (`before` true) already reads each open place in the epoch before its own
+    /// (the strand's law of November 18), so its known stream keeps the peaks as they are. Elsewhere [`Units::anchors`]. Why: the peak
+    /// at `a` reads the class at `a` (a rise at `a − 1` with none at `a`), so a site read at the peaks' own places reads a phase its own
+    /// symbol placed; the store's lap W135r coded the held cavity 0.0235 nats a place under its control and her forward code 0.0085 over
+    /// it, most at an epoch's first place (+0.048; the record of November 28 §10).
+    pub fn read_anchors(&self, anchors: &[usize], classes: &[usize], alphabet: usize, before: bool) -> Vec<usize> {
+        let n = classes.len();
+        match self.rise_anchors(classes, alphabet) {
+            Some(peaks) if !before => {
+                let mut out = vec![0usize];
+                out.extend(peaks.into_iter().skip(1).map(|a| a + 1).filter(|&a| a < n));
+                out
             }
-            if end > cont {
-                out.push(t);
-            }
+            _ => self.anchors(anchors, classes, alphabet),
         }
-        out
     }
 
     /// [definition] **A crossing's founding** ([module](self)) over the closed epochs of a sample read through the state, each `(its
-    /// symbols, her code over its places on 2^(−20) bits)` in the sample's order: the units founded and refreshed, and the share of the
-    /// epochs that were already held. Each epoch of 2 to `L` symbols is counted on a candidate field of `candidates` circles (a leaky
-    /// count of its key over the sample); one already held refreshes its mark; one not held is founded where the saving of naming it whole,
-    /// met `n̂` times, passes its description (the module's inequality); the store's crowding is read at the cut, as its background (the
-    /// cap by length the first form held is retired for the upkeep band, which is owed at the next crossing). Before the sample, every mark
-    /// leaks by `fade` thousandths.
-    #[allow(clippy::type_complexity)]
-    pub fn found(&mut self, epochs: &[(Vec<usize>, i64)], alphabet: usize, candidates: usize, fade: i64, spelled: bool, pi: i128) -> Result<(usize, usize, usize, Vec<Vec<usize>>, Vec<Vec<usize>>)> {
+    /// symbols, her code over its places on 2^(−20) bits)` in the sample's order. Before the sample every unit's evidence and saving leak
+    /// by `fade` thousandths. A held unit met charges one meeting and its saving (her code over it less its naming); a run not held is
+    /// counted on the crossing's candidate rings and founded where the saving of naming it whole, met `n̂` times, passes its
+    /// description (the module's inequality).
+    pub fn found(&mut self, epochs: &[(Vec<usize>, i64)], alphabet: usize, fade: i64, spelled: bool) -> Result<Founding> {
         if !(0..=1000).contains(&fade) {
             return refuse("a unit store's fade outside a thousandth's range");
         }
-        for f in self.ends.iter_mut().chain(self.prefixes.iter_mut()) {
-            for v in f.iter_mut() {
+        for r in self.cells.iter_mut().flat_map(|k| k.iter_mut()) {
+            for v in r.evidence.iter_mut().chain(r.saving.iter_mut()) {
                 *v = (*v as i128 * (1000 - fade) as i128 / 1000) as i64;
             }
         }
-        let table = self.table(alphabet, pi);
-        let cand = Units { circles: candidates, ..Units::new(candidates, self.longest, self.key ^ 0xC0FF_EE00_0000_0001)? };
-        let ctable = cand.table(alphabet, pi);
-        let mut counts: Vec<Vec<i64>> = (0..=self.longest).map(|_| vec![0i64; 2 * candidates]).collect();
-        let (mut chi, mut cchi) = (vec![0i64; 2 * self.circles], vec![0i64; 2 * candidates]);
-        let (mut founded, mut refreshed, mut held) = (0usize, 0usize, 0usize);
+        let cand_periods = periods_under(CANDIDATE_CIRCLES).ok_or(TowerError::Refused("candidate rings with no primes under them"))?;
+        let mut cand: Vec<Vec<u32>> = cand_periods.iter().map(|&p| vec![0u32; p]).collect();
+        let (mut founded, mut held) = (0usize, 0usize);
         let mut runs: Vec<Vec<usize>> = Vec::new();
-        let mut met: std::collections::HashSet<Vec<usize>> = std::collections::HashSet::new();
+        let mut met: std::collections::BTreeSet<Vec<usize>> = std::collections::BTreeSet::new();
+        let pool = face_code(1, epochs.len().max(1) as u128) as i128;
+        let meeting = 1i64 << READ_BITS;
         for (run, code) in epochs {
             let k = run.len();
-            if k < 2 || k > self.longest || run.iter().any(|&c| c >= alphabet) {
+            if k < 2 || k > self.longest {
                 continue;
             }
-            self.carry_with(&table, alphabet, run, &mut chi);
-            if self.founded[k] > 0 && self.marked(&self.ends[k], &chi) {
-                held += 1;
-                refreshed += 1;
-                met.insert(run.clone());
-                self.charge_unit(&table, alphabet, run, &mut chi);
-                continue;
-            }
-            cand.carry_with(&ctable, alphabet, run, &mut cchi);
-            let field = &mut counts[k];
-            // the meetings so far, this one included, on the store's grain
-            let seen = cand.read(field, &cchi) as i128 + (1i128 << grain());
-            for (f, &c) in field.iter_mut().zip(&cchi) {
-                *f += c;
-            }
-            // prequential: the first meeting spells the run by its pieces, so only the meetings after it save; naming it whole costs the
-            // choice among the units held and the path of no unit, `log₂(U + 2)`; all on 2^(−20) bits, the saving on 2^(−50)
+            let Some(w) = Self::word(run, alphabet) else { continue };
+            // naming it whole costs the choice among the units held and the path of no unit, `log₂(U + 2)`, on 2^(−20) bits
             let units: u128 = self.founded.iter().map(|&c| c as u128).sum::<u128>() + 2;
             let naming = face_code(1, units) as i128;
-            let saving = (seen - (1i128 << grain())).max(0) * (*code as i128 - naming);
-            let pool = face_code(1, epochs.len().max(1) as u128) as i128;
+            if self.founded[k] > 0 && self.holds(k, w) {
+                held += 1;
+                met.insert(run.clone());
+                self.charge_cells(k, w, 0, meeting, (*code as i128 - naming) as i64);
+                continue;
+            }
+            // the meetings so far, this one included: the least of the candidate rings' counts (an upper bound on its own)
+            let at: Vec<usize> = cand_periods.iter().map(|&p| (w % p as u128) as usize).collect();
+            for (c, &a) in cand.iter_mut().zip(&at) {
+                c[a] += 1;
+            }
+            let seen = cand.iter().zip(&at).map(|(c, &a)| c[a]).min().unwrap_or(1) as i128;
+            // prequential: the first meeting spells the run by its pieces, so only the meetings after it save
+            let saving = (seen - 1) * (*code as i128 - naming);
             let charge = if spelled { k as i128 * face_code(1, alphabet as u128) as i128 + pool } else { pool + (1i128 << READ_BITS) };
-            let charge = charge << grain();
             if saving > charge {
                 self.founded[k] += 1;
                 founded += 1;
                 runs.push(run.clone());
-                self.charge_unit(&table, alphabet, run, &mut chi);
+                self.charge_cells(k, w, 1, seen as i64 * meeting, saving.clamp(i64::MIN as i128, i64::MAX as i128) as i64);
             }
         }
-        let mut met: Vec<Vec<usize>> = met.into_iter().collect();
-        met.sort();
-        Ok((founded, refreshed, held, runs, met))
+        Ok((founded, held, runs, met.into_iter().collect()))
     }
 
-    /// The marks of a unit: its end at its length and each proper prefix.
-    fn charge_unit(&mut self, table: &[i64], alphabet: usize, run: &[usize], chi: &mut [i64]) {
-        let k = run.len();
-        self.carry_with(table, alphabet, run, chi);
-        let mut end = std::mem::take(&mut self.ends[k]);
-        self.charge(&mut end, chi, 1i64 << grain());
-        self.ends[k] = end;
-        for p in 1..k {
-            self.carry_with(table, alphabet, &run[..p], chi);
-            let mut pre = std::mem::take(&mut self.prefixes[p]);
-            self.charge(&mut pre, chi, 1i64 << grain());
-            self.prefixes[p] = pre;
-        }
-    }
-
-    /// The text form: `units J L KEY` then the counts by length, then each field's `2J` words, then `rise P₁ P₂` and, a depth at a
-    /// time, its sums on each ring and its meetings on each ring.
+    /// The text form: `units J L`, the counts by length, then for each length from two and each ring its counts, word sums, square
+    /// sums, evidence and saving a line each, then `rise P₁ P₂` and, a depth at a time, its sums on each ring and its meetings on each
+    /// ring.
     pub fn to_text(&self) -> String {
-        let mut s = format!("units {} {} {}\n", self.circles, self.longest, self.key);
-        s.push_str(&self.founded.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(" "));
-        s.push('\n');
-        for f in self.ends.iter().skip(2).chain(self.prefixes.iter().skip(1)) {
-            s.push_str(&f.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+        fn line<T: std::fmt::Display>(v: &[T]) -> String {
+            let mut s = v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(" ");
             s.push('\n');
+            s
+        }
+        let mut s = format!("units {} {}\n", self.circles, self.longest);
+        s.push_str(&line(&self.founded));
+        for k in 2..=self.longest {
+            for r in &self.cells[k] {
+                s.push_str(&line(&r.count));
+                s.push_str(&line(&r.words));
+                s.push_str(&line(&r.squares));
+                s.push_str(&line(&r.evidence));
+                s.push_str(&line(&r.saving));
+            }
         }
         s.push_str(&format!("rise {} {}\n", self.periods[0], self.periods[1]));
         for k in 0..RISE_DEPTH {
             for f in self.news[k].iter().chain(self.meetings[k].iter()) {
-                s.push_str(&f.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
-                s.push('\n');
+                s.push_str(&line(f));
             }
         }
         s
@@ -436,22 +354,22 @@ impl Units {
 
     /// The text form back ([`Units::to_text`]), from its lines.
     pub fn from_lines(lines: &mut dyn Iterator<Item = &str>) -> Result<Self> {
+        fn words<T: std::str::FromStr>(line: Option<&str>, len: usize) -> Result<Vec<T>> {
+            let v = line.ok_or(TowerError::Refused("a unit store missing a line"))?.split_whitespace().map(|w| w.parse::<T>().map_err(|_| TowerError::Refused("a unit store's word that is no integer"))).collect::<Result<Vec<T>>>()?;
+            if v.len() != len {
+                return refuse("a unit store's line that is not its period's words");
+            }
+            Ok(v)
+        }
         let head: Vec<&str> = lines.next().ok_or(TowerError::Refused("a unit store with no head"))?.split_whitespace().collect();
-        let ["units", j, l, key] = head[..] else { return refuse("a unit store's head that is not `units J L KEY`") };
-        let parse = |s: &str| s.parse::<i64>().map_err(|_| TowerError::Refused("a unit store's word that is no integer"));
-        let mut u = Units::new(j.parse().map_err(|_| TowerError::Refused("a unit store's circles"))?, l.parse().map_err(|_| TowerError::Refused("a unit store's length"))?, key.parse().map_err(|_| TowerError::Refused("a unit store's key"))?)?;
-        u.founded = lines.next().ok_or(TowerError::Refused("a unit store with no counts"))?.split_whitespace().map(|w| w.parse::<u32>().map_err(|_| TowerError::Refused("a unit store's count"))).collect::<Result<_>>()?;
-        if u.founded.len() != u.longest + 1 {
-            return refuse("a unit store's counts that are not one a length");
-        }
+        let ["units", j, l] = head[..] else { return refuse("a unit store's head that is not `units J L`") };
+        let mut u = Units::new(j.parse().map_err(|_| TowerError::Refused("a unit store's circles"))?, l.parse().map_err(|_| TowerError::Refused("a unit store's length"))?)?;
+        u.founded = words(lines.next(), u.longest + 1)?;
         for k in 2..=u.longest {
-            u.ends[k] = lines.next().ok_or(TowerError::Refused("a unit store missing a field"))?.split_whitespace().map(parse).collect::<Result<_>>()?;
-        }
-        for k in 1..u.longest {
-            u.prefixes[k] = lines.next().ok_or(TowerError::Refused("a unit store missing a field"))?.split_whitespace().map(parse).collect::<Result<_>>()?;
-        }
-        if u.ends.iter().skip(2).chain(u.prefixes.iter().skip(1)).any(|f| f.len() != 2 * u.circles) {
-            return refuse("a unit store's field that is not 2J words");
+            for i in 0..2 {
+                let p = u.periods[i];
+                u.cells[k][i] = Cells { count: words(lines.next(), p)?, words: words(lines.next(), p)?, squares: words(lines.next(), p)?, evidence: words(lines.next(), p)?, saving: words(lines.next(), p)? };
+            }
         }
         let head: Vec<&str> = lines.next().ok_or(TowerError::Refused("a unit store with no rise store"))?.split_whitespace().collect();
         let ["rise", p0, p1] = head[..] else { return refuse("a rise store's head that is not `rise P₁ P₂`") };
@@ -459,61 +377,48 @@ impl Units {
             return refuse("a rise store's periods that are not the two largest primes under its circles");
         }
         for k in 0..RISE_DEPTH {
-            for i in 0..4 {
-                let f: Vec<i64> = lines.next().ok_or(TowerError::Refused("a rise store missing a ring"))?.split_whitespace().map(parse).collect::<Result<_>>()?;
-                if f.len() != u.periods[i % 2] {
-                    return refuse("a rise store's ring that is not its period's words");
-                }
-                if i < 2 {
-                    u.news[k][i] = f;
-                } else {
-                    u.meetings[k][i - 2] = f;
-                }
+            for i in 0..2 {
+                u.news[k][i] = words(lines.next(), u.periods[i])?;
+            }
+            for i in 0..2 {
+                u.meetings[k][i] = words(lines.next(), u.periods[i])?;
             }
         }
         Ok(u)
     }
 }
 
-/// The candidate field's circles: a leaky count of every closed epoch's key over a crossing's sample, its scatter `√(n/2J)` near one at
-/// a sample's hundred thousand distinct epochs (`agent-inferred`: a count must stand over its own scatter before a saving is read from it).
-pub const CANDIDATE_CIRCLES: usize = 65_536;
-
 impl Constitution {
-    /// [definition; the lead, November 27, the review's build step 1; the rise store, November 28] **A crossing's founding on the level**
-    /// ([`Units::charge_rise`], [`Units::found`]): the level's unit store founded where it has none (`circles`, `longest`, `key`); its
-    /// rise store charged from every place of a sample read through the state (each row's classes, the anchors the level cut on it and
-    /// her code at each place); each row cut again by the charged store ([`Units::anchors`], on the host's threads); and its closed
-    /// epochs, each with her code over its places, founding units in the sample's order. Refused on a field without a level, or where a
-    /// store stands with another shape. Returns the units founded, refreshed and held, the founded runs, the units met already held and
-    /// the closed epochs read.
-    #[allow(clippy::type_complexity)]
-    pub fn found_units(&mut self, rows: &[(Vec<usize>, Vec<usize>, Vec<i64>)], circles: usize, longest: usize, key: u64, fade: i64, spelled: bool) -> Result<(usize, usize, usize, Vec<Vec<usize>>, Vec<Vec<usize>>, usize)> {
-        use rayon::prelude::*;
-        let (alphabet, pi) = (self.declaration.alphabet, self.pi);
+    /// [definition; the lead, November 27, the review's build step 1; the rise store and the marks on residues, November 28] **A
+    /// crossing's founding on the level** ([`Units::charge_rise`], [`Units::found`]): the level's unit store founded where it has none
+    /// (`circles`, `longest`); its rise store charged from every place of a sample read through the state (each row's classes, the
+    /// anchors the level cut on it and her code at each place); each row cut again by the charged store ([`Units::anchors`]); and its
+    /// closed epochs, each with her code over its places, founding units in the sample's order. Refused on a field without a level, or
+    /// where a store stands with another shape. Returns the founding's read and the closed epochs read.
+    pub fn found_units(&mut self, rows: &[(Vec<usize>, Vec<usize>, Vec<i64>)], circles: usize, longest: usize, fade: i64, spelled: bool) -> Result<(Founding, usize)> {
+        let alphabet = self.declaration.alphabet;
         let Some(s) = self.scale.as_deref_mut() else { return refuse("founded units on a field without a level") };
-        let units = match s.units.take() {
-            Some(u) if u.circles == circles && u.longest == longest && u.key == key => u,
-            Some(_) => return refuse("a unit store founded again with another shape or gene"),
-            None => Units::new(circles, longest, key)?,
+        let mut units = match s.units.take() {
+            Some(u) if u.circles == circles && u.longest == longest => u,
+            Some(_) => return refuse("a unit store founded again with another shape"),
+            None => Units::new(circles, longest)?,
         };
-        let mut units = units;
         let charged: Vec<(&[usize], &[i64])> = rows.iter().map(|(c, _, codes)| (c.as_slice(), codes.as_slice())).collect();
         if let Err(e) = units.charge_rise(&charged, alphabet, fade) {
             s.units = Some(units);
             return Err(e);
         }
-        let cuts: Vec<Vec<usize>> = rows.par_iter().map(|(classes, anchors, _)| units.anchors(anchors, classes, alphabet, pi)).collect();
         let mut epochs: Vec<(Vec<usize>, i64)> = Vec::new();
-        for ((classes, _, codes), cut) in rows.iter().zip(&cuts) {
+        for (classes, anchors, codes) in rows {
+            let cut = units.anchors(anchors, classes, alphabet);
             // the closed epochs: each run between two anchors (the last, open at the row's end, is not closed)
             for w in cut.windows(2) {
                 epochs.push((classes[w[0]..w[1]].to_vec(), codes[w[0]..w[1]].iter().sum()));
             }
         }
-        let out = units.found(&epochs, alphabet, CANDIDATE_CIRCLES, fade, spelled, pi);
+        let out = units.found(&epochs, alphabet, fade, spelled);
         s.units = Some(units);
-        out.map(|(f, r, h, runs, met)| (f, r, h, runs, met, epochs.len()))
+        out.map(|f| (f, epochs.len()))
     }
 
     /// The level's unit store, where it holds one.
@@ -526,62 +431,71 @@ impl Constitution {
 mod founded_unit_tests {
     use super::*;
 
-    fn pi() -> i128 {
-        crate::ratio::half_turn(MOVE_BITS + 16)
-    }
-
-    /// A run met often enough at a code it still pays is founded, then held whole by the cut against news anchors inside it, and the
-    /// store reads back from its text as itself.
+    /// A run met often enough at a code it still pays is founded and then held; a run met beside it at the same residue on both rings
+    /// is told apart by its word's sums; the store reads back from its text as itself.
     #[test]
-    fn a_recurring_run_is_founded_and_then_cut_whole() {
-        let (alphabet, pi) = (12usize, pi());
-        let mut u = Units::new(1024, 6, 27).unwrap();
-        // the run [1, 2, 3] met ten times at 30 bits, among runs met once
+    fn a_recurring_run_is_founded_and_held_on_its_residues() {
+        let alphabet = 12usize;
+        // periods 7 and 5: [1, 2, 3] has the word 1·144 + 2·12 + 3 = 171, at 3 mod 7 and 1 mod 5
+        let mut u = Units::new(8, 6).unwrap();
+        assert_eq!(u.periods, [7, 5]);
         let mut epochs: Vec<(Vec<usize>, i64)> = Vec::new();
         for k in 0..10usize {
             epochs.push((vec![1, 2, 3], 30i64 << READ_BITS));
             epochs.push((vec![4 + k % 7, 11, 4 + (k * 3) % 7], 30i64 << READ_BITS));
         }
-        let (founded, _, _, _, _) = u.found(&epochs, alphabet, 4096, 0, false, pi).unwrap();
-        assert!(founded >= 1 && u.founded[3] >= 1, "the recurring run is founded: {founded} {:?}", u.founded);
-        // news anchors at 1 (the unit's start), 2 (inside it) and 5; the unit [1, 2, 3] at places 1 to 3 closes at 4
-        let classes = [0usize, 1, 2, 3, 0, 8];
-        assert_eq!(u.anchors(&[0, 1, 2, 5], &classes, alphabet, pi), vec![0, 1, 4, 5]);
-        // a run that is no unit keeps the news's anchors
-        assert_eq!(u.anchors(&[0, 2, 4], &[0, 3, 2, 9, 9, 10], alphabet, pi), vec![0, 2, 4]);
+        let (founded, _, runs, _) = u.found(&epochs, alphabet, 0, false).unwrap();
+        assert!(founded >= 1 && runs.contains(&vec![1, 2, 3]), "the recurring run is founded: {runs:?}");
+        assert!(u.holds(3, Units::word(&[1, 2, 3], alphabet).unwrap()));
+        // a run at the same residues on both rings (171 + 35 = 206: 3 mod 7 and 1 mod 5) that was never founded is not held
+        assert!(!u.holds(3, 206));
+        let (_, held, _, met) = u.found(&[(vec![1, 2, 3], 30i64 << READ_BITS)], alphabet, 0, false).unwrap();
+        assert_eq!((held, met), (1, vec![vec![1, 2, 3]]), "a held unit met again is read held, not founded again");
         let text = u.to_text();
-        let back = Units::from_lines(&mut text.lines()).unwrap();
-        assert_eq!(back, u);
+        assert_eq!(Units::from_lines(&mut text.lines()).unwrap(), u);
+    }
+
+    /// Two units at one cell on both rings are each held, and a third word there is not.
+    #[test]
+    fn two_units_at_one_cell_are_told_apart_by_their_sums() {
+        let mut u = Units::new(8, 4).unwrap();
+        // 171 and 206 share 3 mod 7 and 1 mod 5; 241 shares them too
+        u.charge_cells(3, 171, 1, 0, 0);
+        u.charge_cells(3, 206, 1, 0, 0);
+        u.founded[3] = 2;
+        assert!(u.holds(3, 171) && u.holds(3, 206));
+        assert!(!u.holds(3, 241));
+    }
+
+    /// A run her code already holds cheaply is not founded: its saving does not pass its charge.
+    #[test]
+    fn a_run_her_code_holds_is_not_founded() {
+        let mut u = Units::new(1024, 6).unwrap();
+        let epochs: Vec<(Vec<usize>, i64)> = (0..10).map(|_| (vec![1, 2, 3], 1i64 << READ_BITS)).collect();
+        let (founded, _, _, _) = u.found(&epochs, 12, 0, false).unwrap();
+        assert_eq!(founded, 0);
     }
 
     /// The rise store cuts where her mean news after a run peaks: news high after a `2` and low elsewhere puts an end at every place
     /// after a `2`, the same in a row it was never charged from; an empty store leaves her news's anchors; the store reads back as itself.
     #[test]
     fn the_rise_store_cuts_at_the_peak_of_her_mean_news() {
-        let (alphabet, pi) = (6usize, pi());
-        let mut u = Units::new(64, 4, 27).unwrap();
+        let alphabet = 6usize;
+        let mut u = Units::new(64, 4).unwrap();
         assert_eq!(u.periods, [61, 59]);
         let row: Vec<usize> = (0..30).map(|t| t % 3).collect();
         // her code at each place: 10 bits at a place after a `2`, one bit elsewhere
         let codes: Vec<i64> = (0..30).map(|t| if t > 0 && row[t - 1] == 2 { 10i64 << READ_BITS } else { 1i64 << READ_BITS }).collect();
-        assert_eq!(u.anchors(&[0, 4], &[0, 1, 2, 0, 1, 2], alphabet, pi), vec![0, 4], "an empty store leaves the news's anchors");
+        assert_eq!(u.anchors(&[0, 4], &[0, 1, 2, 0, 1, 2], alphabet), vec![0, 4], "an empty store leaves the news's anchors");
         u.charge_rise(&[(&row, &codes)], alphabet, 0).unwrap();
         assert_eq!(u.rise_anchors(&[0, 1, 2, 0, 1, 2, 0, 1, 2], alphabet), Some(vec![0, 3, 6]));
-        assert_eq!(u.anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, pi), vec![0, 2, 5], "its peaks are the cut");
+        assert_eq!(u.anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet), vec![0, 2, 5], "its peaks are the cut");
+        assert_eq!(u.read_anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, false), vec![0, 3, 6], "read with both sides, a place late");
+        assert_eq!(u.read_anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, true), vec![0, 2, 5], "a one-sided stream keeps the peaks");
         let text = u.to_text();
         assert_eq!(Units::from_lines(&mut text.lines()).unwrap(), u);
         // a leak common to the sums and the counts keeps the mean, and so the cut
         u.charge_rise(&[], alphabet, 500).unwrap();
         assert_eq!(u.rise_anchors(&[0, 1, 2, 0, 1, 2, 0, 1, 2], alphabet), Some(vec![0, 3, 6]));
-    }
-
-    /// A run her code already holds cheaply is not founded: its saving does not pass its charge.
-    #[test]
-    fn a_run_her_code_holds_is_not_founded() {
-        let (alphabet, pi) = (12usize, pi());
-        let mut u = Units::new(1024, 6, 27).unwrap();
-        let epochs: Vec<(Vec<usize>, i64)> = (0..10).map(|_| (vec![1, 2, 3], 1i64 << READ_BITS)).collect();
-        let (founded, _, _, _, _) = u.found(&epochs, alphabet, 4096, 0, false, pi).unwrap();
-        assert_eq!(founded, 0);
     }
 }

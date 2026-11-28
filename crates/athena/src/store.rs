@@ -1342,16 +1342,16 @@ pub fn read_epochs(args: &[String]) -> Result<()> {
 }
 
 /// [definition; the lead, November 27, the review's build step 1] `found-units UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE
-/// STATE_SHA CIRCLES LONGEST KEY FADE CHARGE OUT`: **a crossing's founding of the level's units**
+/// STATE_SHA CIRCLES LONGEST FADE CHARGE OUT`: **a crossing's founding of the level's units**
 /// ([`holonics_engine::field::Constitution::found_units`]). Each row of `ROWS` (`read-far`'s table: a label, its text escaped or `hex:`, its
 /// next symbol) is read whole as a passage by two streams through the state (`Constitution::strand_epochs`, on the host's threads), and
 /// its places charge the level's rise store with her code at each (its peaks then cut each row again), and its closed epochs under that
-/// cut, each with her code over its places, found the level's units in the rows' order: the store founded where the level has none (`CIRCLES` circles, units of 2 to `LONGEST` symbols, its turns drawn from `KEY`), every mark leaking by `FADE` thousandths
+/// cut, each with her code over its places, found the level's units in the rows' order: the store founded where the level has none (its rings on the two largest primes under `CIRCLES`, units of 2 to `LONGEST` symbols), every store leaking by `FADE` thousandths
 /// first, and a unit founded where its saving passes `CHARGE` (`pool`: `log₂|P| + 1`; `spelled`: `L log₂ A + log₂|P|`, October's). Every
 /// other line of the state is kept. Written and read back.
 pub fn found_units(args: &[String]) -> Result<()> {
-    if args.len() != 15 {
-        return Err("found-units UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA CIRCLES LONGEST KEY FADE CHARGE OUT".into());
+    if args.len() != 14 {
+        return Err("found-units UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA CIRCLES LONGEST FADE CHARGE OUT".into());
     }
     use rayon::prelude::*;
     let started = std::time::Instant::now();
@@ -1363,13 +1363,13 @@ pub fn found_units(args: &[String]) -> Result<()> {
     if learner.field.declaration.alphabet != codec.alphabet() {
         return Err("a state whose alphabet is not its codec's".into());
     }
-    let (circles, longest, key, fade): (usize, usize, u64, i64) = (args[9].parse()?, args[10].parse()?, args[11].parse()?, args[12].parse()?);
-    let spelled = match args[13].as_str() {
+    let (circles, longest, fade): (usize, usize, i64) = (args[9].parse()?, args[10].parse()?, args[11].parse()?);
+    let spelled = match args[12].as_str() {
         "pool" => false,
         "spelled" => true,
         _ => return Err("a founding's charge that is not pool or spelled".into()),
     };
-    let out = Path::new(&args[14]);
+    let out = Path::new(&args[13]);
     if out.exists() {
         return Err("a founded state's path that exists".into());
     }
@@ -1397,7 +1397,7 @@ pub fn found_units(args: &[String]) -> Result<()> {
         let Some((anchors, codes)) = r else { return Err("founded units on a state without a level".into()) };
         sample.push((classes, anchors, codes));
     }
-    let (founded, refreshed, held, runs, met, epochs) = learner.field.found_units(&sample, circles, longest, key, fade, spelled).map_err(|e| e.to_string())?;
+    let ((founded, held, runs, met), epochs) = learner.field.found_units(&sample, circles, longest, fade, spelled).map_err(|e| e.to_string())?;
     // a receipt of the crossing, never read by the machine: the runs it founded, their octets in hex a line (private, beside the state)
     let receipt: String = runs.iter().map(|r| format!("{}\n", codec.decode(r).iter().map(|b| format!("{b:02x}")).collect::<String>())).collect();
     std::fs::write(format!("{}.founded.tsv", out.display()), receipt)?;
@@ -1410,7 +1410,7 @@ pub fn found_units(args: &[String]) -> Result<()> {
         return Err("a learner that does not read back as itself".into());
     }
     std::fs::write(out, &written)?;
-    println!("FOUND_UNITS rows={} epochs={epochs} founded={founded} refreshed={refreshed} held={held} units_met={} by_length={} rise_periods={},{} charge={} ms={}", sample.len(), met.len(), store.founded.iter().map(u32::to_string).collect::<Vec<_>>().join(","), store.periods[0], store.periods[1], args[13], started.elapsed().as_millis());
+    println!("FOUND_UNITS rows={} epochs={epochs} founded={founded} held={held} units_met={} by_length={} rise_periods={},{} charge={} ms={}", sample.len(), met.len(), store.founded.iter().map(u32::to_string).collect::<Vec<_>>().join(","), store.periods[0], store.periods[1], args[12], started.elapsed().as_millis());
     Ok(())
 }
 
