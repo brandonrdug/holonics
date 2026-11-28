@@ -1345,8 +1345,8 @@ pub fn read_epochs(args: &[String]) -> Result<()> {
 /// STATE_SHA CIRCLES LONGEST KEY FADE CHARGE OUT`: **a crossing's founding of the level's units**
 /// ([`holonics_engine::field::Constitution::found_units`]). Each row of `ROWS` (`read-far`'s table: a label, its text escaped or `hex:`, its
 /// next symbol) is read whole as a passage by two streams through the state (`Constitution::strand_epochs`, on the host's threads), and
-/// its closed epochs, each with her code over its places, found the level's units in the rows' order: the store founded where the level
-/// has none (`CIRCLES` circles, units of 2 to `LONGEST` symbols, its turns drawn from `KEY`), every mark leaking by `FADE` thousandths
+/// its places charge the level's rise store with her code at each (its peaks then cut each row again), and its closed epochs under that
+/// cut, each with her code over its places, found the level's units in the rows' order: the store founded where the level has none (`CIRCLES` circles, units of 2 to `LONGEST` symbols, its turns drawn from `KEY`), every mark leaking by `FADE` thousandths
 /// first, and a unit founded where its saving passes `CHARGE` (`pool`: `log₂|P| + 1`; `spelled`: `L log₂ A + log₂|P|`, October's). Every
 /// other line of the state is kept. Written and read back.
 pub fn found_units(args: &[String]) -> Result<()> {
@@ -1392,25 +1392,25 @@ pub fn found_units(args: &[String]) -> Result<()> {
     }
     let field = &learner.field;
     let read: Vec<Option<(Vec<usize>, Vec<i64>)>> = rows.par_iter().map(|c| field.strand_epochs(c, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
-    let mut epochs: Vec<(Vec<usize>, i64)> = Vec::new();
-    for (classes, r) in rows.iter().zip(&read) {
+    let mut sample: Vec<(Vec<usize>, Vec<usize>, Vec<i64>)> = Vec::new();
+    for (classes, r) in rows.into_iter().zip(read) {
         let Some((anchors, codes)) = r else { return Err("founded units on a state without a level".into()) };
-        // the closed epochs: each run between two anchors (the last, open at the row's end, is not closed)
-        for w in anchors.windows(2) {
-            epochs.push((classes[w[0]..w[1]].to_vec(), codes[w[0]..w[1]].iter().sum()));
-        }
+        sample.push((classes, anchors, codes));
     }
-    let (founded, refreshed, held, runs) = learner.field.found_units(&epochs, circles, longest, key, fade, spelled).map_err(|e| e.to_string())?;
+    let (founded, refreshed, held, runs, met, epochs) = learner.field.found_units(&sample, circles, longest, key, fade, spelled).map_err(|e| e.to_string())?;
     // a receipt of the crossing, never read by the machine: the runs it founded, their octets in hex a line (private, beside the state)
     let receipt: String = runs.iter().map(|r| format!("{}\n", codec.decode(r).iter().map(|b| format!("{b:02x}")).collect::<String>())).collect();
     std::fs::write(format!("{}.founded.tsv", out.display()), receipt)?;
     let store = learner.field.units().ok_or("a founding that left no store")?;
+    // beside it, the units the crossing met already held, a line each in the same form
+    let kept: String = met.iter().map(|r| format!("{}\n", codec.decode(r).iter().map(|b| format!("{b:02x}")).collect::<String>())).collect();
+    std::fs::write(format!("{}.held.tsv", out.display()), kept)?;
     let written = learner.to_text();
     if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
         return Err("a learner that does not read back as itself".into());
     }
     std::fs::write(out, &written)?;
-    println!("FOUND_UNITS rows={} epochs={} founded={founded} refreshed={refreshed} held={held} by_length={} charge={} ms={}", rows.len(), epochs.len(), store.founded.iter().map(u32::to_string).collect::<Vec<_>>().join(","), args[13], started.elapsed().as_millis());
+    println!("FOUND_UNITS rows={} epochs={epochs} founded={founded} refreshed={refreshed} held={held} units_met={} by_length={} rise_periods={},{} charge={} ms={}", sample.len(), met.len(), store.founded.iter().map(u32::to_string).collect::<Vec<_>>().join(","), store.periods[0], store.periods[1], args[13], started.elapsed().as_millis());
     Ok(())
 }
 

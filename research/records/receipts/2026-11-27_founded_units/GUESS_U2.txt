@@ -1,0 +1,17 @@
+Fixed 2026-11-28T04:12Z (date -u), the lead, before W135r trains. Refs #404. The review of November 27, its build step 1: units founded on the card.
+The level's rise store (crates/engine/src/field/units.rs, Units::charge_rise and Units::rise_anchors): her mean news after the runs of 1
+and 2 symbols ending at a place, held on two coprime rings (periods 4,093 and 4,091, the two largest primes under the unit store's 4,096
+circles) as a sum and a count at each residue, read at each depth at the ring whose count is least and joined by the counts; an end at
+each peak, and where the store holds meetings those ends are the level's cut (her news's anchors are not read). Charged at a crossing
+(found-units) from the 2,000 rows of 300 octets of the first founding sample through W134's end, which founded 2,278 units between its
+ends (W134r_STATE); never stepped by a lap. W135r: W134r_STATE; W135p: W134's end. 3,000 sections heard whole each on e5rs (gate 3 first).
+The second crossing: found-units on W135r's end (e5rt) from a second sample of 2,000 rows of the same slices (seed 28), the lap's fade
+of 368 thousandths.
+G-U2 (at the lap means unless named):
+  (a) (0.65) on the sixteen held passages at 3,700 places a word met again is cut at the same offsets as its earlier meeting in at
+      least 0.90 of its meetings at W135r's mean (read-epochs), against at most 0.60 at W135p's (her news; 0.576 on W134's end);
+  (b) (0.5) of the 2,278 units of the first crossing, at least 0.80 are met already held (read as held whole between the store's
+      ends) at the second crossing, from rows the first never read;
+  (c) (0.5) her held text (the joined store's held set, one place open, paired) on W135r within 0.003 nats a place of W135p's
+      either way: the arm changes only the level's epochs (her news's at 3.77 places an epoch, the store's at 3.15);
+  (d) (0.5) the wide panel's writes loop no more often on W135r than on W135p, and their lexicon share stands within 3 points.

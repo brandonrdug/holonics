@@ -1,0 +1,7 @@
+RISE_STORE sample_meetings=600000 runs=1448560 by_depth=208,8617,49882,127620,213474,290365,353819,404575
+RISE_STORE J=4096 depth=8 background=1512.5,423.5,215.3,150.0,111.5,86.2,69.7,57.3 rms_by_meeting=2.5051 within_tenth_by_meeting=0.230 runs_within_tenth=0.044
+RISE_STORE J=4096 depth=8 join=over form=peak places=59216 anchors=19025 places_an_epoch=3.11
+RISE_STORE J=4096 depth=8 join=over form=rise places=59216 anchors=28521 places_an_epoch=2.08
+RISE_STORE J=4096 depth=8 join=plain form=peak places=59216 anchors=19208 places_an_epoch=3.08
+RISE_STORE J=4096 depth=8 join=plain form=rise places=59216 anchors=29120 places_an_epoch=2.03
+nice -n 5 timeout 1200 python3 -I tools/rise_store_ruler.py $W/found_rows.tsv  123.08s user 0.33s system 99% cpu 2:04.44 total

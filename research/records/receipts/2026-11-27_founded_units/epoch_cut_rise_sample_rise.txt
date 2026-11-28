@@ -1,0 +1,32 @@
+EPOCH_CUT places=602000 anchors=290859 places_an_epoch=2.07
+EPOCH_CUT after_space places=92691 anchored=0.819
+EPOCH_CUT anchors_at first_letter count=76531 share=0.265
+EPOCH_CUT anchors_at inside_word count=118049 share=0.409
+EPOCH_CUT anchors_at after_word count=43776 share=0.152
+EPOCH_CUT anchors_at other count=50503 share=0.175
+EPOCH_CUT all pairs=20474 same=0.900
+EPOCH_CUT length 1 over_30 pairs=2235 same=0.877
+EPOCH_CUT length 1 within_30 pairs=1626 same=0.851
+EPOCH_CUT length 2 over_30 pairs=2645 same=0.940
+EPOCH_CUT length 2 within_30 pairs=702 same=0.915
+EPOCH_CUT length 3 over_30 pairs=3415 same=0.945
+EPOCH_CUT length 3 within_30 pairs=1084 same=0.935
+EPOCH_CUT length 4 over_30 pairs=1731 same=0.907
+EPOCH_CUT length 4 within_30 pairs=484 same=0.880
+EPOCH_CUT length 5 over_30 pairs=1231 same=0.902
+EPOCH_CUT length 5 within_30 pairs=324 same=0.796
+EPOCH_CUT length 6 over_30 pairs=1226 same=0.878
+EPOCH_CUT length 6 within_30 pairs=255 same=0.820
+EPOCH_CUT length 7 over_30 pairs=771 same=0.894
+EPOCH_CUT length 7 within_30 pairs=177 same=0.910
+EPOCH_CUT length 8 over_30 pairs=2209 same=0.876
+EPOCH_CUT length 8 within_30 pairs=359 same=0.772
+EPOCH_CUT three_or_more pairs=13266 same=0.901
+EPOCH_CUT_CHANCE length 1 same=0.835
+EPOCH_CUT_CHANCE length 2 same=0.562
+EPOCH_CUT_CHANCE length 3 same=0.444
+EPOCH_CUT_CHANCE length 4 same=0.358
+EPOCH_CUT_CHANCE length 5 same=0.362
+EPOCH_CUT_CHANCE length 6 same=0.373
+EPOCH_CUT_CHANCE length 7 same=0.363
+EPOCH_CUT_CHANCE length 8 same=0.175
