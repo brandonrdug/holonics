@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z64 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z67 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -139,11 +139,44 @@ places where her news anchors at nearly every meeting, is the same law with her 
 density and needs no fraction handed in. G-Z62 reads the rise cut alone, with no units, so the ends are read before any founding
 stands on them; G-Z63 reads the units founded between them.
 
-## 7. Owners
+## 7. The units are the cut's vocabulary, and the cut's store holds only what her face lacks (the lead's reads, 01:25 and 01:27 UTC)
+
+The rise cut with no units cut a recurring word alike 0.974 of the time at 2.07 places an epoch, and the peak cut, a rise with no
+rise after it, 0.940 at 3.14, against her news alone at 0.576 and 3.77 (G-Z62 half held: the rate far over, the epoch under the
+band; the band was the formal thread's own setting, and an epoch is set by no band). Units founded between the ends, 1,995 in the
+peak form and 1,866 in the rise form, cut whole 0.309 and 0.386 of their meetings against 0.082 and 0.071 with news alone (G-Z63
+missed), and 0.64 to 0.96 of the meetings whose first place the cut anchors, rising with length in the peak form. A unit is cut
+whole only where its start is an end, so its share over all meetings is the starts' cover times the started share; a short unit
+met inside a longer held unit is read inside it, which is the two paths of §2. Counting those meetings as whole lifts the peak
+units to 0.697 and the rise units to 0.582, not to the 0.8 that G-Z67 asked: nesting explains part of the uncut starts, and the
+rest stand where the word before reaches into the cut's keys. The stability is the type mean's, and the units are its vocabulary.
+
+A same-cut rate is read with the cut's density and where its ends fall: a cut that is a function of the last eight symbols cuts a
+recurring word alike wherever the word before does not reach its keys, and a cut at every place cuts every word alike. Read
+against the spaces, 0.972 of the places after a space carry a peak end (her news alone 0.600), and 0.519 of the peak ends fall
+there, the rest inside words (G-Z65 held): the peak cut keeps the word's ends and cuts about once more inside a word.
+
+**The composition (0.6).** The mean of her news after a suffix is the mean of her own face's entropy there plus the mean of what her
+face lacks: a cross-entropy is the entropy of her face and the divergence of the stream from it.
+
+```
+ν̂(s_t) = H(p_t) + δ̄(s_t)                                    her face's entropy for the next place, plus the store
+δ̄(s) ← δ̄(s) + ((ν_(t+1) − H(p_t)) − δ̄(s)) / (n_s + 1)     at k = 1, 2, n_s ← l n_s + 1 (Lean cooled_rate_is_mean)
+end after t ⇔ ν̂ peaks at t                                   as in §6
+```
+
+Her state already reaches past eight places, so the long depths are hers to read and need no keys. The store holds the residual,
+which is her miscalibration after a short suffix and no larger than the divergence, keyed at depths 1 and 2. The full field of §6,
+a mean per depth to eight, is the host ruler's own quantity and is lawful as a store on her rings with entries shared at a
+residue. It is held beside this form as the configuration to build if the meeting's own entropy loses the stability: `H(p_t)`
+belongs to the meeting, so the cut is no longer a function of the type alone, and G-Z66 reads what that costs. Units of units are
+founded by the same charge from the runs of these units, the staircase of October 25, and no epoch is handed to the level above.
+
+## 8. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed`,
   `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
-  and adds no statement.
+  and adds no statement; §7 composes `cooled_rate_is_mean` and adds none.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z64.
+- Guesses: G-Z58 to G-Z67.
 - The engine: the founding build is the lead's; this record changes no code.
