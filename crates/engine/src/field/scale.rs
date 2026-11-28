@@ -79,9 +79,11 @@ pub struct Scale {
     /// built on the host and untrained, at 0.147 and 0.082 (`tools/level_back_ruler.py`).
     pub bank: Vec<u32>,
     /// [definition; the review of November 27, its build step 1; the lead's build] **The level's founded units** ([`units::Units`]):
-    /// where set, the level's cut holds each founded unit whole, closed at its end, so a recurring span is cut alike at every meeting;
+    /// where set and charged, the level's cut is its rise store's peaks (her mean news after the runs ending at each place, a property
+    /// of the runs' types), so a recurring span is cut alike at every meeting, and its units are founded between those ends; charged and
     /// founded at a crossing (`found-units`), never stepped. Written as its own lines after the glue, only where set. Why: on November 27
-    /// her epochs cut a word met again alike in 0.559 of its meetings, as her news moves the landmarks (the record of the class hairs §24).
+    /// her epochs cut a word met again alike in 0.559 of its meetings, as her news moves the landmarks (the record of the class hairs §24);
+    /// the store's peaks cut it alike in 0.948 (the record of November 28 §8).
     pub units: Option<super::units::Units>,
     /// [definition; the lead, November 24, the record of the evening of November 23 §7; the formal thread's reading of the join,
     /// `agent-inferred`] **The level's own lane**: where set, the fine field's last face lane is the level's. The prolongation writes it
@@ -380,7 +382,7 @@ pub fn level_cut_units(news: &[i64], units: Option<(&super::units::Units, &[usiz
     }
     let anchors = if before { level_anchors_before(news, section) } else { level_anchors(news, section) };
     let anchors = match units {
-        Some((u, classes, alphabet)) if classes.len() == news.len() => u.anchors(&anchors, classes, alphabet, pi),
+        Some((u, classes, alphabet)) if classes.len() == news.len() => u.read_anchors(&anchors, classes, alphabet, before),
         Some(_) => return refuse("a level's founded units read over classes that are not the news's places"),
         None => anchors,
     };

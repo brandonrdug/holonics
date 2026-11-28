@@ -240,3 +240,41 @@ The step's acceptance stands at: the same span cut alike in 0.948 of its meeting
 what one crossing founds met held at the next (under 0.9). A unit founded once has no release yet: the formal thread's band (founded
 above `log₂|P| + 1`, held while `n_u s̄_u` stands over its row's share of the background) and a deeper run read as its increment over
 its parent at its credibility are each the next arm, one change apiece.
+
+## 11. The units' marks on residues
+
+The review's check of 08:32 UTC read G-U2 (b)'s 0.783 as three things: 285 of the first crossing's 2,277 runs occur nowhere in the
+second rows (a ceiling of 0.875, the tail a release is for); the marks on 4,096 keyed circles read 988 runs as held that neither
+crossing founded and failed 30 that the first had (founded again); and the fade left a mark at 0.632 against a midpoint of 0.5. The
+marks now stand on the rise store's rings (`Units`, `crates/engine/src/field/units.rs`): for each length, at each residue of the two
+primes under the store's circles, the count of the units there, the sums of their words and of their squares (wrapping) and the sums of
+their evidence and saving; a unit is held where a cell holds it alone (its word the sum) or beside one other (the second word the
+difference of the sums, checked against the squares), read at the ring whose count is least. The candidate counts of a crossing stand on
+two primes under 65,536, read at the least. The founding's cut and its charge are as before; the units' weighted parse and the keyed
+circles left the tree (the parse's law stands in §2 and §8). A state from before carries its store in the old form, and
+`tools/splice_units.py` moves a store founded in the new into a lap's end, every other line kept, the two rise stores checked equal.
+
+| crossing | founded | held epochs | first crossing's units met held | of those present in the rows | held, founded at neither | founded again |
+|---|---|---|---|---|---|---|
+| keyed circles: W134r, then W135r's end | 2,278, then 822 | 99,190, then 119,938 | 1,784 of 2,277 (0.783) | | 988 | 30 |
+| residues: W134q, then W135r's end with W134q's store | 2,156, then 823 | 98,076, then 118,104 | 1,876 of 2,156 (0.870) | 1,876 of 1,992 (0.942) | 0 | 0 |
+
+([`crossings_residue.txt`](receipts/2026-11-27_founded_units/crossings_residue.txt), [`found_q.log`](receipts/2026-11-27_founded_units/found_q.log),
+[`found_qx2.log`](receipts/2026-11-27_founded_units/found_qx2.log).) On residues no run is read held that was not founded and none is
+founded twice; 164 of the 2,156 occur nowhere in the second rows (a ceiling of 0.924), and of the 1,992 that do, 0.942 are met as a
+closed epoch of the store's cut.
+
+## 12. The peaks read as a writer reads them
+
+The formal thread's law of 08:46 UTC: the forward code governs a line's take (a section is crossed in the stream's order), and two arms
+compare on the cavity only where neither arm's input at a coded place is a function of that place; the store's peak at `a` reads the
+class at `a`, and training cuts a region over its own classes on both sides, so a site at `a` read a phase its own symbol placed.
+`Units::read_anchors` reads the peaks causally: in a region read with both sides (a region the trainer owns, a cavity) each end `a`
+stands at `a + 1`, so a site at `t` reads only the ends that `x_(<t)` names and stands in the epoch of the place before it; a one-sided
+stream keeps the peaks, since it already reads each open place in the epoch before its own (the strand's law of November 18). The cut
+a crossing founds units between, and the units, are unchanged. Gate 3 of the build against the line reproduces 24 of 24 sections and
+its lap's read ([`gate3_e5rc.txt`](receipts/2026-11-27_founded_units/gate3_e5rc.txt)); host tests and gate 1 pass. The arm W135c (W134q:
+W134's end with the store bit for bit W134r's and its units on residues, which train nothing) trains beside W135p under G-Z73
+([`GUESS_U3.txt`](receipts/2026-11-27_founded_units/GUESS_U3.txt)): W135c's forward code on the hundred held cut rows no more than 0.003
+nats a place above W135p's, and its excess at age 1 under 0.01. A phase `φ_t` sums her news through `t` in both arms, so every site's
+harmonics carry her own code at `t`; that stands under her news's anchors too and is read as its own question.

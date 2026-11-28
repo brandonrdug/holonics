@@ -1,0 +1,8 @@
+Fixed 2026-11-28T08:49Z (date -u), the lead, before W135c trains. Refs #404. The formal thread's G-Z73 (0.5, fixed 08:46Z), recorded here as this
+arm's guess: the level reads the rise store's peaks causally (Units::read_anchors: in a region read with both sides, each peak's end at
+a + 1, so a site at t reads only the ends x_(<t) names; a one-sided stream as before). W135c: W134q_STATE (W134's end, its rise store
+and its units on residues from the first crossing; the store bit for bit W134r's) on e5rc, 3,000 sections; its control W135p (W134's
+end, trained at 05:30 UTC); beside them W135r (the peaks read at their own places).
+G-Z73: with the peak read one-sided in training as in release and nothing else changed, W135c's forward code on the hundred held cut
+rows stands no more than 0.003 nats a place above W135p's (1.0846), and its excess at an epoch's first place past the cut (age 1, 1.343
+on W135p) falls under 0.01.

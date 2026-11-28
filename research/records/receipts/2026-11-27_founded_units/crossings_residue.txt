@@ -1,0 +1,5 @@
+CROSSQ_START 08:41:45
+CROSSQ_FIRST 08:53:22 FOUND_UNITS rows=2000 epochs=186757 founded=2156 held=98076 units_met=1724 by_length=0,0,427,810,540,244,100,27,8 rise_periods=4093,4091 charge=pool ms=696381
+CROSSQ_SECOND 09:04:32 FOUND_UNITS rows=2000 epochs=185463 founded=823 held=118104 units_met=2409 by_length=0,0,559,1050,779,381,151,49,10 rise_periods=4093,4091 charge=pool ms=669131
+CROSSQ_HELD first=2156 present_in_rows2=1992 ceiling=0.924 met_held=1876 share=0.870 of_present=0.942 held_in_neither=0 first_founded_again=0 second_founded=823
+CROSSQ_ALL_DONE 09:04:32
