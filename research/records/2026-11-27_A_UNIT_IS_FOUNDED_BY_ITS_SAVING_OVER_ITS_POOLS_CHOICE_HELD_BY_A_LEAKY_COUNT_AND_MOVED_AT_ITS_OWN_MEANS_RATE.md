@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z61 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z63 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -104,10 +104,40 @@ longest unit no key has continuation mass. The cap of `J/18` a length binds at l
 upkeep band of §3 sets the count where a unit's saving falls under its row's share of the background. G-Z60 and G-Z61 are fixed on
 the stability read.
 
-## 6. Owners
+## 6. A candidate's ends are where its readings agree, read as her mean news after each suffix (the lead's stability read, 00:56 UTC)
+
+On W134's end over the 16 held passages at 3,700 places, her news alone cuts a recurring word alike 0.576 of the time at 3.77
+places an epoch. Every unit form cuts less alike: from the last anchor 0.510 (5.08 places), by membership 0.346 (7.95), by the
+weighted parses of §5 0.450 (3.81, 2,074 units). G-Z60 and G-Z61 held, and the forms stand under the cut they were built on. The
+units were founded from her epochs, which are one meeting's anchors and cross word boundaries ("e th", " of", "ing "), so a
+candidate carries that meeting's noise and a suffix parse that ends inside a word carries the word before it.
+
+**The composition (0.65).** A word's ends are where its readings agree (the word record §3). Agreement over meetings is a property
+of the span's type, read as a mean over its meetings, never one meeting's anchor:
+
+```
+ν̄(s) ← ν̄(s) + (ν_(t+1) − ν̄(s)) / (n_s + 1),   n_s ← l n_s + 1      at each suffix key s_k, k = 1 to 8
+end after t ⇔ ν̄(s_t) > ν̄(s_(t−1))                                  the depths joined as the product of their reads
+inside ⇔ ν̄ falls                                                     the path does not branch, a split there is free
+candidate = a run between consecutive ends, founded by §3's charge
+```
+
+`ν̄(s)` is her news at the place after the suffix `s`, a leaky mean whose rate cools by its own count (Lean `cooled_rate_is_mean`):
+the stream's branching entropy after `s`, the same at every meeting of `s`. An end stands where it rises, where the paths that
+pass through `s` part. Inside a word it falls, the path does not branch, and every split there reads alike (the word record's
+"its inside is every split at once"). The depths join by the product of §23 there, so an unmet key is flat (Lean
+`flat_factor_normalizes`) and the shallow keys, which reach no word before, decide inside a word. The chart is Harris's successor
+peaks (1955), which the tree read at the second level on November 26 as the transitional dip (Saffran, Aslin and Newport 1996,
+the record of a class's mean word §11); here it is read at the first level from her own news. The lead's proposal, runs between
+places where her news anchors at nearly every meeting, is the same law with her anchor in place of her news; the mean keeps the
+density and needs no fraction handed in. G-Z62 reads the rise cut alone, with no units, so the ends are read before any founding
+stands on them; G-Z63 reads the units founded between them.
+
+## 7. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed`,
-  `cooled_rate_is_mean` and `cut_at_background_is_news` (checked).
+  `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
+  and adds no statement.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z61.
+- Guesses: G-Z58 to G-Z63.
 - The engine: the founding build is the lead's; this record changes no code.
