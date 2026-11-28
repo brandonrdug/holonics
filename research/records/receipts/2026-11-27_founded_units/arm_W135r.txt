@@ -1,0 +1,29 @@
+W141_START 04:13:23
+W141_GATE3 GATE_E5RS_ENGINE exit=0 GATE_REPRO sections=24 line_lines=24 equal=24 EQUAL GATE_READ cavity.tsv EQUAL GATE_ENGINE EQUAL 
+TERRAIN_TRAINED W135r 05:30:17 sections=3000 ended=false
+TERRAIN_REACH W135r 05:32:16 ANSWER copy n= 2655 0.032|ANSWER reverse n= 2667 0.029|ANSWER sum n= 1579 0.741|
+TERRAIN_TRAINED W135p 06:29:23 sections=3000 ended=false
+TERRAIN_PANEL W135r_mean 06:29:35 seen: words 38 in_lexicon 30 (78%) longest_copy 16 held: words 65 in_lexicon 45 (69%) longest_copy 16 unread: words 64 in_lexicon 48 (75%) longest_copy 15  || LONG W135r_mean: all words 275 in lexicon 187 (68%) writes that loop 3 of 20 longest run shared with its prompt 50 | code 38/52 (73%) web 43/54 (79%) science 32/57 (56%) books 50/60 (83%) wikidata 24/52 (46%)
+TERRAIN_WIDE W135r 06:30:49 LONG W135r: all words 2152 in lexicon 1516 (70%) writes that loop 19 of 160 longest run shared with its prompt 74 | code 338/408 (82%) web 337/425 (79%) science 228/409 (55%) books 405/495 (81%) wikidata 208/415 (50%)
+TERRAIN_PANEL W135p_mean 06:30:58 seen: words 36 in_lexicon 23 (63%) longest_copy 14 held: words 61 in_lexicon 42 (68%) longest_copy 15 unread: words 64 in_lexicon 46 (71%) longest_copy 16  || LONG W135p_mean: all words 280 in lexicon 203 (72%) writes that loop 3 of 20 longest run shared with its prompt 39 | code 41/49 (83%) web 49/57 (85%) science 33/57 (57%) books 52/66 (78%) wikidata 28/51 (54%)
+TERRAIN_REACH W135p 06:31:21 ANSWER copy n= 2655 0.048|ANSWER reverse n= 2667 0.021|ANSWER sum n= 1579 0.761|
+W97_CAVITY4 W135r 06:45:55 CAVITY_DONE ms=891154 loud_lines=131
+TERRAIN_WIDE W135p 06:46:47 LONG W135p: all words 2153 in lexicon 1487 (69%) writes that loop 17 of 160 longest run shared with its prompt 74 | code 344/405 (84%) web 334/442 (75%) science 224/407 (55%) books 379/482 (78%) wikidata 206/417 (49%)
+W97_THEORY THEORY_PANEL W135r logic: words 94 in lexicon 82 (87%) loops 0 of 8 longest shared with prompt 12 | theory: words 157 in lexicon 127 (80%) loops 0 of 12 longest shared with prompt 16
+W129_FRONTIER_W103 FRONTIER W135r; one place open: all 0.6504 (200933 places) | acts 1.0361 books 0.6345 code 0.3846 dialogue 0.8537 harness 0.6940 logic 0.3118 science 0.5439 theory 0.4468 web 0.7128 wikidata 0.8842 || less the control's, paired: -0.0807 (±0.0014) | acts -0.1648 books -0.0456 code -0.0188 dialogue -0.1693 harness -0.1528 logic -0.0766 science -0.0303 theory -0.0872 web -0.0365 wikidata -0.0247
+W129_PROBE_SCORE PROBE ask2_W135r writes 200 first 16 q 9 want 7 named 0 
+W97_CAVITY4 W135p 07:06:33 CAVITY_DONE ms=860551 loud_lines=131
+W97_THEORY THEORY_PANEL W135p logic: words 85 in lexicon 77 (90%) loops 0 of 8 longest shared with prompt 37 | theory: words 156 in lexicon 126 (80%) loops 0 of 12 longest shared with prompt 11
+W129_FRONTIER_W103 FRONTIER W135p; one place open: all 0.6739 (200933 places) | acts 1.0628 books 0.6674 code 0.3977 dialogue 0.8863 harness 0.7256 logic 0.3246 science 0.5699 theory 0.4579 web 0.7348 wikidata 0.9101 || less the control's, paired: -0.0572 (±0.0013) | acts -0.1381 books -0.0128 code -0.0057 dialogue -0.1367 harness -0.1211 logic -0.0637 science -0.0042 theory -0.0761 web -0.0145 wikidata +0.0012
+W129_PROBE_SCORE PROBE ask2_W135p writes 200 first 16 q 9 want 4 named 0 
+W141_CUT W135r 07:20:58  EPOCH_CUT places=59216 anchors=18751 places_an_epoch=3.16|EPOCH_CUT after_space places=9884 anchored=0.978|EPOCH_CUT all pairs=4743 same=0.948|EPOCH_CUT three_or_more pairs=3012 same=0.935|
+W141_CUT W135p 07:29:50  EPOCH_CUT places=59216 anchors=15812 places_an_epoch=3.75|EPOCH_CUT after_space places=9884 anchored=0.614|EPOCH_CUT all pairs=4743 same=0.559|EPOCH_CUT three_or_more pairs=3012 same=0.567|
+W129_CAVITY5 W135r 07:45:37 CAVITY_DONE ms=946548
+W129_CAVITY5 W135p 08:01:21 CAVITY_DONE ms=943578
+W141_TEXT FRONTIER W135r; one place open: all 0.6504 (200933 places) | acts 1.0361 books 0.6345 code 0.3846 dialogue 0.8537 harness 0.6940 logic 0.3118 science 0.5439 theory 0.4468 web 0.7128 wikidata 0.8842 || less the control's, paired: -0.0235 (±0.0008) | acts -0.0267 books -0.0329 code -0.0131 dialogue -0.0326 harness -0.0317 logic -0.0128 science -0.0260 theory -0.0111 web -0.0220 wikidata -0.0259
+W141_WAVE FRONTIER W135r; one place open: all 0.6694 (220961 places) | acts 1.0361 books 0.6345 code 0.3846 dialogue 0.8537 harness 0.6940 logic 0.3118 science 0.5439 theory 0.4468 wave 0.8595 web 0.7128 wikidata 0.8842 || less the control's, paired: -0.0213 (±0.0008) | acts -0.0267 books -0.0329 code -0.0131 dialogue -0.0326 harness -0.0317 logic -0.0128 science -0.0260 theory -0.0111 wave +0.0002 web -0.0220 wikidata -0.0259
+W141_CROSSING 08:12:38 FOUND_UNITS rows=2000 epochs=185463 founded=822 refreshed=119938 held=119938 units_met=3282 by_length=0,0,559,1087,855,447,115,29,8 rise_periods=4093,4091 charge=pool ms=673257
+W141_HELD first=2277 met_held=1784 share=0.783
+W141_ALL_DONE 08:12:38
+arm_W135p.log:STORE_PASS role=prefix sections=3000 stretches_read=117656583 ended=false code_pieces=47377 web_pieces=25744 science_pieces=16261 books_pieces=1477 wikidata_pieces=6482 theory_pieces=536
+arm_W135r.log:STORE_PASS role=prefix sections=3000 stretches_read=117656583 ended=false code_pieces=47377 web_pieces=25744 science_pieces=16261 books_pieces=1477 wikidata_pieces=6482 theory_pieces=536
