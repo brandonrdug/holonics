@@ -229,8 +229,8 @@ the line's take is the next loop's question.
 Her forward code (the review's check of 08:32 UTC, its item 5): on the hundred held cut rows (19,200 places, `read-reach … law
 cut:256:0 cut:256:191 cut:256:64 from:256`, `cut_table.py`, at the lap means) W135r codes 1.0931 nats a place against W135p's 1.0846,
 +0.0085; by the octave of a place's age past the cut (1, 2–3, 4–7, 8–15, 16–31, 32–63, 64–127, 128–255) 1.391, 1.096, 1.179, 1.229,
-1.143, 1.112, 1.067, 1.071 against 1.343, 1.088, 1.178, 1.224, 1.135, 1.102, 1.062, 1.059, higher at every octave and most at the
-first place (+0.048); the worth of the past (the code with nothing crossing the cut less the law's) stands alike on both, 2.089 against
+1.143, 1.112, 1.067, 1.071 against 1.343, 1.088, 1.178, 1.224, 1.135, 1.102, 1.062, 1.059, higher at every octave (the age is counted
+past the ruler's cut at place 256 of each row, the same places on both arms, so its first octave is place 257 of each row, 100 places); the worth of the past (the code with nothing crossing the cut less the law's) stands alike on both, 2.089 against
 2.123 at the first place and 0.133 against 0.136 at 64 to 127 ([`table_W135r.txt`](receipts/2026-11-27_founded_units/table_W135r.txt),
 [`table_W135p.txt`](receipts/2026-11-27_founded_units/table_W135p.txt)). A reading (`agent-inferred`): the peak names an end at
 `t + 1` from the class at `t + 1`, one place of look-ahead; the level trained on regions cut with every class known and is read forward
@@ -279,15 +279,20 @@ W134's end with the store bit for bit W134r's and its units on residues, which t
 nats a place above W135p's, and its excess at age 1 under 0.01. A phase `φ_t` sums her news through `t` in both arms, so every site's
 harmonics carry her own code at `t`; that stands under her news's anchors too and is read as its own question.
 
-W135c trained in 3,527 s ([`arm_W135c.txt`](receipts/2026-11-27_founded_units/arm_W135c.txt)). Her forward code on the hundred held cut
+W135c trained in 3,526 s ([`arm_W135c.txt`](receipts/2026-11-27_founded_units/arm_W135c.txt)). Her forward code on the hundred held cut
 rows: 1.0916 nats a place against W135p's 1.0846 (+0.0070; W135r +0.0085); by the octave of age past the cut 1.402, 1.097, 1.181, 1.228,
-1.140, 1.109, 1.066, 1.069 against 1.343, 1.088, 1.178, 1.224, 1.135, 1.102, 1.062, 1.059, the first place +0.059
-([`table_W135c.txt`](receipts/2026-11-27_founded_units/table_W135c.txt)). The held cavity, paired against W135p: −0.0138 (±0.0008), against
+1.140, 1.109, 1.066, 1.069 against 1.343, 1.088, 1.178, 1.224, 1.135, 1.102, 1.062, 1.059, its first octave (place 257 of each row,
+100 places) +0.059 ([`table_W135c.txt`](receipts/2026-11-27_founded_units/table_W135c.txt)). By the class of a place's octet on the same
+19,200 places (`tools/forward_class_ruler.py`, [`forward_class.txt`](receipts/2026-11-27_founded_units/forward_class.txt)), W135c less
+W135p: a word's first letter +0.0156 (±0.0046) over W135p's 2.498 nats, a letter inside a word +0.0060 (±0.0015), a space +0.0019
+(±0.0023), a mark +0.0004 (±0.0084), a digit +0.0227 (±0.0086): the excess stands where her own face is open, the price of the level's
+handed row (atlas `code.handed-row-enters-at-its-capacity-price`; the formal thread's reading of 10:51 UTC). G-Z74 half held (first
+letters over spaces and the inside of a word, marks not). The held cavity, paired against W135p: −0.0138 (±0.0008), against
 W135r's −0.0235, lower in every slice (logic −0.0025, theory −0.0015, books −0.0200). Her writes: the theory panel's theory prompts 86% in
 the lexicon against 80%, its logic prompts 85% against 90%, the wide panel 69% against 69% with 21 of 160 writes looping against 17
-([`loud_W135c.table`](receipts/2026-11-27_founded_units/loud_W135c.table)). G-Z73 missed on both clauses. The causal read took about
-two fifths of the cavity's credit and moved the forward code by 0.0015; the first place's excess, which it did not touch, stands where
-the level's handed row is newest.
+([`loud_W135c.table`](receipts/2026-11-27_founded_units/loud_W135c.table)). G-Z73 missed on both clauses (its second on a bin of 100 places; it was written, as
+this section first was, as an epoch's first place, which the ruler's age is not). The causal read took about two fifths of the cavity's
+credit and moved the forward code by 0.0015.
 
 A reading (`agent-inferred`): one lap moves a level whose glue and readers were trained on her news's epochs for every lap before W135,
 so it reads the switch's price and not the store's standing; a learner's null is held to a length (rule 10 of a line's lap). The second
