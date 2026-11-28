@@ -220,10 +220,23 @@ the crossing founded 822 more (by length 2 to 8: 559, 1,087, 855, 447, 115, 29, 
 | G-U2 (d) no more looping writes on W135r, the lexicon share within 3 points | 19 against 17 of 160; 70% against 69% | missed |
 
 (a) is the store's cut, which a lap cannot move; it says that the state carries the store. (c) missed on the arm's side by eight times
-its margin: the level read at the store's epochs, over a cut that is the same at every meeting of a run, codes her held text 0.0235
-nats a place cheaper in every slice, over twenty times the scatter of 0.001 to 0.0014 between laps that the line has read. The line
-takes the change (rule 1 of a line's lap: one change beside its control, its gain over the scatter), and W135r is the line's state;
-(b) and (d) are its open reads. The step's acceptance stands at: the same span cut alike in 0.948 of its meetings (held), and 0.783 of
+its margin in the held cavity: the level read at the store's epochs codes her held text 0.0235 nats a place cheaper in every slice,
+over twenty times the scatter of 0.001 to 0.0014 between laps that the line has read. That read is two-sided (one place open, every
+other place written), and her forward code reads the other way (below), so the take this section first stated (the line takes the
+change, W135r its state) is withdrawn: W135r stands as the base the level's next step needs, the store's cut, and which read governs
+the line's take is the next loop's question.
+
+Her forward code (the review's check of 08:32 UTC, its item 5): on the hundred held cut rows (19,200 places, `read-reach … law
+cut:256:0 cut:256:191 cut:256:64 from:256`, `cut_table.py`, at the lap means) W135r codes 1.0931 nats a place against W135p's 1.0846,
++0.0085; by the octave of a place's age past the cut (1, 2–3, 4–7, 8–15, 16–31, 32–63, 64–127, 128–255) 1.391, 1.096, 1.179, 1.229,
+1.143, 1.112, 1.067, 1.071 against 1.343, 1.088, 1.178, 1.224, 1.135, 1.102, 1.062, 1.059, higher at every octave and most at the
+first place (+0.048); the worth of the past (the code with nothing crossing the cut less the law's) stands alike on both, 2.089 against
+2.123 at the first place and 0.133 against 0.136 at 64 to 127 ([`table_W135r.txt`](receipts/2026-11-27_founded_units/table_W135r.txt),
+[`table_W135p.txt`](receipts/2026-11-27_founded_units/table_W135p.txt)). A reading (`agent-inferred`): the peak names an end at
+`t + 1` from the class at `t + 1`, one place of look-ahead; the level trained on regions cut with every class known and is read forward
+one place short of it, where the rise form (an end decided at `t` from the classes up to `t`) needs none.
+
+The step's acceptance stands at: the same span cut alike in 0.948 of its meetings (held), and 0.783 of
 what one crossing founds met held at the next (under 0.9). A unit founded once has no release yet: the formal thread's band (founded
 above `log₂|P| + 1`, held while `n_u s̄_u` stands over its row's share of the background) and a deeper run read as its increment over
 its parent at its credibility are each the next arm, one change apiece.
