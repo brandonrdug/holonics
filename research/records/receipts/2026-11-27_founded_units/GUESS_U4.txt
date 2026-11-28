@@ -1,0 +1,8 @@
+Fixed 2026-11-28T10:49Z (date -u), the lead, before W136c trains. Refs #404. A learner's null held to a length (rule 10 of a line's lap): after one lap
+the store's causal read W135c codes the hundred held cut rows forward at 1.0916 nats a place against its control W135p's 1.0846
+(+0.0070), most at an epoch's first place (1.402 against 1.343), on a constitution whose level was trained on her news's epochs for every
+lap before W135. W136c: W135c's end, 3,000 sections on e5rc; W136p: W135p's end, the same. G-U4 (at the lap means):
+  (a) (0.4) W136c's forward code on the hundred cut rows stands less than +0.0035 nats a place above W136p's: the gap falls to under
+      half its first lap's (+0.0070);
+  (b) (0.4) its excess at age 1 falls under +0.03 (from +0.059);
+  (c) (0.6) the held cavity's gap stays below zero (W136c under W136p, paired).
