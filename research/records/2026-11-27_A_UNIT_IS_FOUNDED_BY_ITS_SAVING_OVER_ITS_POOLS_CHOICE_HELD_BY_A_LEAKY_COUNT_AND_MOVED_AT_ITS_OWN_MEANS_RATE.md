@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z73 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z78 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -238,11 +238,79 @@ the place before it, as `level_anchors_before` gives her news. It enters as one 
 their reading made causal; the rise form, which decides an end from `x_≤t` alone, changes the cut, the epochs and the units, and is
 an arm of its own. G-Z73 reads the one-sided peak.
 
-## 9. Owners
+## 9. The store's excess stands where her face is open, as the added row's price, which the level's own face removes (the lead's reads, 10:50 and 11:00 UTC)
+
+With the peaks read one-sided (W135c, from the same store), her forward code on the 100 held rows read 1.0916 against the control's
+1.0846, the gap +0.0070 where W135r's was +0.0085, and in the 100 places just past the reach ruler's cut at place 256 1.402 against
+1.343; the cavity's credit fell from −0.0235 to −0.0138 (G-Z73 missed). The causal read removed the share of the cavity's credit that the coded symbol placed and left the
+forward excess, which is no leak.
+
+**The composition (0.7).** A row handed into her state pushes her logits by `δ_t`, and the code at `t` changes by
+
+```
+Δ(t) = log E_(p_t) e^(δ_t) − δ_t(x_t) ≈ ½ Var_(p_t)(δ_t) − (δ_t(x_t) − E_(p_t) δ_t)
+```
+
+the first term the row's price, largest where her face `p_t` is open, and the second its news, zero where her state already holds
+what the row carries (atlas `code.handed-row-enters-at-its-capacity-price`; W133s on November 27: first letters +0.0546, marks
++0.0564, spaces +0.0185, letters inside +0.0180). By place class on the same places, W135c less the control reads +0.0156 ±0.0046 at
+first letters (her code 2.498 nats), +0.0227 ±0.0086 at digits (2.032), +0.0060 ±0.0015 at letters inside a word (0.767), +0.0019
+±0.0023 at spaces (0.348) and +0.0004 ±0.0084 at marks (1.924), inside its noise (G-Z74 half held): the excess follows her open
+places. The peak cut opens most epochs at a word's first letter, where her face is most open, and the row handed there carries the
+unit just closed, which lies inside her hearing, so its news is near zero. A
+second lap sheds the price's transient, about 0.68 of it a doubling of sections on W133s's fit, over a floor that only the row's
+news lowers. The repair is the review's steps 2 and 3: the level reads by its own face, joined to hers as a factor,
+`p ∝ p_her · p_level^w`, so that where it knows nothing past her the factor is flat and costs nothing (Lean
+`flat_factor_normalizes`), with `w` its news over its price, and the added row removed. G-Z75 reads the second lap.
+
+## 10. The level's own face is a product of its rings over the units it holds, with an escape that her spelling codes (the lead's step 2, 11:20 UTC)
+
+The review's second step gives the level its own face: after epoch `j` the level's state reads a density over the next epoch's
+word, keyed as the word's residues on two coprime rings (4,093 and 4,091, the addressing of the marks and the rise store), compared
+with the word that comes, its covector deposited by the one law.
+
+**The composition (0.65 on the join of the rings, 0.6 on the normalization, 0.6 on the order).**
+
+```
+p(u)    = F₀(r₀(u)) F₁(r₁(u)) / Z        over the held units u, and p(esc) for an epoch no held unit matches
+Z       = p(esc) + Σ_(u held) F₀(r₀(u)) F₁(r₁(u))
+δ_i(r)  = q_i(r) − π_i(p)(r)             each ring's descent at residue r, π_i(p) the joint density's marginal on ring i
+C¹_j    = −log p(u_(j+1))                 a held word
+C¹_j    = −log p(esc) + Σ her code over the epoch's places      an unheld word, spelled by her face
+```
+
+Each ring trained on its own covector counts the word twice: where a held word is alone at its residues, `F₀(r₀) ≈ F₁(r₁) ≈ P(u)`,
+so their product stands near `P(u)²`; the joint covector, the joint charge of the suffix store's ruler, lets the two factors share
+what they both carry, as the depths of §23 of the word record join by a product. Normalized over the whole grid of residue pairs,
+the product spends its mass on pairs no word holds and codes a held word near twice its unigram code; normalized over the held units
+alone, it pays without bound at the first new word, which is the cache's failure. With an escape whose mass is the level's own leaky
+count of epochs no held unit matched, an unheld word is coded by her spelling, the two paths of §2 (Lean `two_paths_code_le`), and
+the unigram the face must beat takes the same escape.
+
+The product join to her face waits on this face's pass and enters as its own arm from its state, since a factor that carries no news
+past hers is flat (Lean `flat_factor_normalizes`) and reads nothing. The factor is worth most at an epoch's first letter, where her
+face is most open (§9), and the one-sided peak of §8 names an epoch's close only at the place after its opening, so the factor would
+reach from the second letter. The peak is named in time by expectation (0.55): an end after `t` where the rise at `t` is not
+expected to continue under her face, `E_(p_t) ν̄(s_t x) ≤ ν̄(s_t)`, the strand's law that an open place carries its expected news.
+G-Z76 reads the premise, the next word from the level's state. The lead's read of 11:30 UTC held the expected peak (G-Z77): it keeps
+0.909 of the peak cut's ends, cuts a recurring word alike 0.950 of the time at 3.29 places an epoch, and puts an end at 0.990 of the
+places after a space, each end named from `x_≤t` and her face.
+
+The expected peak enters as its own arm before the face (0.6), and the face trains from that arm's state: the cut moves what every
+part of the level reads (its epochs, its units' ends, the place its row arrives), and the face is trained over the epochs the join
+will read. With the added row as it stands, naming the close in time moves the newest row onto the first letter, where her face is
+most open, carrying a unit her state already holds, so by §9 the first letters grow dearer, and their gain comes with the factor
+join alone (G-Z78). The lead's parity of 12:05 UTC found the law of §8 broken inside the region path that the builds read: the
+host's regions were cut over classes holding each open place's target, and the card's training regions over a spurious class 0
+there. The forward reads went through the two streams, whose known stream holds only written classes, and stand; the held cavity
+is a host region read, so its credit to the store's arm carried the target as well. The repair reads only written classes on both
+realizations, and the arm and its control (the peaks read a place late) both run on it.
+
+## 11. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed`,
   `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
   and adds no statement; §7 composes `cooled_rate_is_mean` and adds none.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z73.
+- Guesses: G-Z58 to G-Z78.
 - The engine: the founding build is the lead's; this record changes no code.

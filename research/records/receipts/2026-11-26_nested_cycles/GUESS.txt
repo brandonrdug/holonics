@@ -544,3 +544,58 @@ Fixed 2026-11-28T08:46Z (date -u 08:46:18), before the read.
 G-Z73 (0.5). With the store's peak cut read one-sided in training as in release (a site at t reads only the anchors x_<t names, the
   strand's law of November 18), and nothing else changed, W135r's forward code on the same 100 held rows stands no more than 0.003
   nats a place above W135p's, and its excess at age 1 falls under 0.01.
+
+Scored 2026-11-28T10:51Z on the lead's read of 10:50 UTC: G-Z73 missed. With the peaks read one-sided (W135c), her forward code on the
+100 held rows reads 1.0916 against W135p's 1.0846 (+0.0070; W135r +0.0085), and its excess at age 1 is +0.059 (1.402 against
+1.343), over the 0.003 and 0.01 asked; the held cavity's credit fell from −0.0235 to −0.0138 (±0.0008). The causal read removed the
+part of the cavity's credit that the coded symbol placed and left the forward excess, which is the added row's price
+(code.handed-row-enters-at-its-capacity-price): a push δ with no news costs ½ Var_p(δ) under her face p, most where p is open, and the
+peak cut opens an epoch where her expected news peaks.
+Read beside the score: each arm's octaves of age are counted past its own cut, so W135c's age 1 and W135p's are different places.
+
+Fixed 2026-11-28T10:51Z (date -u 10:51:31), before the reads.
+G-Z74 (0.6). Read by place class on the same 100 held rows (one partition for both arms), W135c's excess over W135p is larger at first
+  letters and at marks than at spaces and at letters inside a word, as W133s's handed row read on November 27.
+G-Z75 (0.6). G-U4 (a) misses: at the second lap the forward gap of W136c over W136p stands above +0.0035 nats a place, since a handed
+  row's price sheds only its transient, about 0.68 of it a doubling of sections, over a floor that the row's news alone lowers.
+
+Scored 2026-11-28T10:54Z on the lead's read of 11:00 UTC: G-Z74 half held. By place class on the same 19,200 places, W135c less
+W135p (W135r less W135p): first letters (2,742 places, her code 2.498 nats) +0.0156 ±0.0046 (+0.0190), letters inside a word (11,138,
+0.767) +0.0060 ±0.0015 (+0.0066), spaces (3,036, 0.348) +0.0019 ±0.0023 (+0.0027), marks (1,319, 1.924) +0.0004 ±0.0084 (+0.0056),
+digits (684, 2.032) +0.0227 ±0.0086 (+0.0289). First letters stand over spaces and letters inside; marks stand inside their noise.
+The lead's correction of the same hour: the octaves of age in its table count past the reach ruler's cut at place 256 of each row, so
+both arms were read on the same places and age 1 is the 100 places at 257, not an epoch's first place; the note beside G-Z73 on
+partitions read the table's earlier description.
+
+Fixed 2026-11-28T10:57Z (date -u 10:57:50), before the reads, on the lead's step 2 (the level's own face over the next epoch's word on
+the rings 4,093 and 4,091, its premise read by least squares from x¹_j on W135c's end, fitted on half the rows).
+G-Z76 (0.45). The premise read, as the product over the two rings normalized over the held units with an escape for an epoch no held
+  unit matches, codes the next epoch's word at least 0.3 bits under the unigram with the same escape on the held half.
+G-Z77 (0.5). The expected peak, an end after t where the rise at t is not expected to continue under her face at t
+  (E_(p_t) ν̄(s_t x) ≤ ν̄(s_t)), keeps at least 0.9 of the peak cut's ends on the host ruler.
+
+Scored 2026-11-28T11:00Z on the lead's read of 11:30 UTC: G-Z77 held. The expected peak (an end after t where the rise at t holds
+and E_(p_(t+1)) ν̂(t + 1 | x) ≤ ν̂(t), her face read over its one-octet classes, ν̂ the type means at depths 1 and 2) keeps 0.909 of
+the peak cut's ends on the 16 held rows, and 0.946 of its own ends stand among the peak's; it cuts a recurring word alike 0.950 of
+the time (0.938 at three letters or more) at 3.29 places an epoch against the peak's 3.16, and 0.990 of the places after a space
+carry an end (0.978). Each end is named from x_≤t and her face.
+
+Fixed 2026-11-28T11:00Z (date -u 11:00:24), before the read.
+G-Z78 (0.5). An arm from W135c's end that reads the expected peak in place of the shifted peak, beside W136c (W135c's own second lap)
+  as its control, with the added row as it stands, codes first letters dearer than its control on the same 100 held rows: the row
+  then arrives at an epoch's first letter, where her face is most open, carrying a unit her state already holds.
+
+Read 12:05 UTC beside G-Z73 to G-Z78, on the lead's note of 12:05 UTC: e5re's parity differed on 48 covector entries because the
+host's scale_forward cut a region over its classes with each open place's comparison target in them, so the rise store read the
+target at open places on the host and a spurious class 0 on the card; e5rf reads only written classes on both. W135c and W136c were
+trained on e5rc with class 0 at open places and stand as what that build did. G-Z78's control is W135c's own second lap on e5rf with
+the shifted peak, so that the arm differs from it by the expected peak alone; W136c, on e5rc, is not. If a forward read of W135c ran
+through the host's scale_forward, the store read the target there and only in the store's arm, so its gap (+0.0070) and its
+first-letter excess (+0.0156) are lower bounds on that build's, and G-Z73 and G-Z74 stand as scored only once W135c's end is read
+again on e5rf.
+
+Read 12:10 UTC, the lead's answer of 12:10 UTC, correcting the note above: the forward reads went through Constitution::strand_codes,
+whose known stream holds only written classes, so no target entered them, and G-Z73 and G-Z74 stand as scored. The leak stood in
+the region path alone: the card's training regions (class 0 at open places) and the host's region reads, the held cavity among them
+(the target at open places), so the cavity's credit to the store's arm carried its target. G-Z78's control is W136s, W135c's end on
+e5rg (the same repair, the peaks read a place late), beside W136e on e5rf (the peaks named in time by expectation).
