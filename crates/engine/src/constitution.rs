@@ -321,6 +321,10 @@ impl Constitution {
             let glue: Vec<String> = s.glue.iter().map(i32::to_string).collect();
             let bank = if s.bank.is_empty() { String::new() } else { format!(" bank {}", s.bank.iter().map(u32::to_string).collect::<Vec<_>>().join(",")) };
             out.push_str(&format!("level {} {}{}{}{}{bank}\n{}{}\n", s.harmonics, s.split, if s.strand { " strand" } else { "" }, if s.receipt { if s.inside { " receipt inside" } else { " receipt" } } else { "" }, if s.lane { " lane" } else { "" }, s.coarse.to_text(), glue.join(" ")));
+            // [the lead, November 27] The level's founded units on their own lines after the glue, where it holds them ([`Scale::units`]).
+            if let Some(u) = &s.units {
+                out.push_str(&u.to_text());
+            }
         }
         out
     }
@@ -370,7 +374,8 @@ impl Constitution {
             if (glue.len() != len && glue.len() != len + before + banked) || (banked > 0 && glue.len() == len) || harmonics == 0 || split == 0 || split >= field.declaration.ticks || !field.declaration.opening {
                 return refuse("a level's glue that is not its declaration's length, a split outside the ticks, or a field without the opening's block");
             }
-            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, inside, strand, bank, lane }));
+            let units = if lines.peek().is_some_and(|l| l.starts_with("units ")) { Some(crate::field::units::Units::from_lines(lines)?) } else { None };
+            field.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt, inside, strand, bank, lane, units }));
         }
         Ok(field)
     }

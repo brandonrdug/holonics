@@ -1,0 +1,9 @@
+UNIT_CUT founded=2074 lengths=457,709,474,261,104,46,23
+UNIT_CUT length=2 meetings=41409 whole=0.081 whole_without_units=0.061
+UNIT_CUT length=3 meetings=19181 whole=0.107 whole_without_units=0.109
+UNIT_CUT length=4 meetings=6358 whole=0.201 whole_without_units=0.167
+UNIT_CUT length=5 meetings=2744 whole=0.194 whole_without_units=0.181
+UNIT_CUT length=6 meetings=1113 whole=0.222 whole_without_units=0.249
+UNIT_CUT length=7 meetings=341 whole=0.381 whole_without_units=0.413
+UNIT_CUT length=8 meetings=135 whole=0.170 whole_without_units=0.281
+UNIT_CUT all meetings=71281 whole=0.107 whole_without_units=0.093

@@ -1,0 +1,9 @@
+UNIT_CUT founded=1995 lengths=419,786,492,210,68,16,4
+UNIT_CUT length=2 meetings=24880 whole=0.239 whole_without_units=0.066 started=9274 whole_given_started=0.642
+UNIT_CUT length=3 meetings=15067 whole=0.324 whole_without_units=0.091 started=6740 whole_given_started=0.724
+UNIT_CUT length=4 meetings=4189 whole=0.628 whole_without_units=0.134 started=3018 whole_given_started=0.872
+UNIT_CUT length=5 meetings=1425 whole=0.373 whole_without_units=0.093 started=562 whole_given_started=0.945
+UNIT_CUT length=6 meetings=253 whole=0.644 whole_without_units=0.170 started=169 whole_given_started=0.964
+UNIT_CUT length=7 meetings=8 whole=1.000 whole_without_units=0.125 started=8 whole_given_started=1.000
+UNIT_CUT length=8 meetings=2 whole=1.000 whole_without_units=1.000 started=2 whole_given_started=1.000
+UNIT_CUT all meetings=45824 whole=0.309 whole_without_units=0.082

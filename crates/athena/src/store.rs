@@ -1295,6 +1295,125 @@ pub fn found_fade(args: &[String]) -> Result<()> {
     Ok(())
 }
 
+/// [measurement; the lead, November 27, the review's build step 1] `read-epochs UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA
+/// OUT`: **each row's epochs as the level cuts them** (its founded units held), from one pass that keeps no tick
+/// (`Constitution::strand_epochs`): `OUT/cut.tsv` a line a row, its index, its places and its known stream's anchors, comma-separated
+/// (the form `tools/epoch_cut_ruler.py` reads). On the host's threads; the state is read, never written. The directory is private.
+pub fn read_epochs(args: &[String]) -> Result<()> {
+    if args.len() != 10 {
+        return Err("read-epochs UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA OUT".into());
+    }
+    use rayon::prelude::*;
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[3], &args[4], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?;
+    let learner = Learner::from_text(std::str::from_utf8(&pinned_read(&args[7], &args[8], STATE_BUDGET)?)?).map_err(|e| e.to_string())?;
+    let out = Path::new(&args[9]);
+    if out.exists() {
+        return Err(format!("{} exists", out.display()).into());
+    }
+    let unescape = |t: &str| -> std::result::Result<Vec<u8>, String> {
+        match t.strip_prefix("hex:") {
+            Some(h) if h.len() % 2 == 0 => (0..h.len()).step_by(2).map(|k| u8::from_str_radix(&h[k..k + 2], 16).map_err(|e| e.to_string())).collect(),
+            Some(_) => Err("a hex row of an odd count of digits".into()),
+            None => Ok(t.replace("\\n", "\n").into_bytes()),
+        }
+    };
+    let mut rows: Vec<Vec<usize>> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [_, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(&unescape(known)?)?;
+        classes.extend(codec.encode(&unescape(next)?)?.into_iter().take(1));
+        rows.push(classes);
+    }
+    let field = &learner.field;
+    let read: Vec<Option<(Vec<usize>, Vec<i64>)>> = rows.par_iter().map(|c| field.strand_epochs(c, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+    std::fs::create_dir_all(out)?;
+    let mut text = String::new();
+    for (r, (classes, e)) in rows.iter().zip(&read).enumerate() {
+        let Some((anchors, _)) = e else { return Err("epochs read on a state without a level".into()) };
+        text.push_str(&format!("{r}\t{}\t{}\n", classes.len(), anchors.iter().map(usize::to_string).collect::<Vec<_>>().join(",")));
+    }
+    std::fs::write(out.join("cut.tsv"), text)?;
+    println!("READ_EPOCHS rows={} units={} ms={}", rows.len(), field.units().map_or(0, |u| u.founded.iter().map(|&c| c as usize).sum()), started.elapsed().as_millis());
+    Ok(())
+}
+
+/// [definition; the lead, November 27, the review's build step 1] `found-units UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE
+/// STATE_SHA CIRCLES LONGEST KEY FADE CHARGE OUT`: **a crossing's founding of the level's units**
+/// ([`holonics_engine::field::Constitution::found_units`]). Each row of `ROWS` (`read-far`'s table: a label, its text escaped or `hex:`, its
+/// next symbol) is read whole as a passage by two streams through the state (`Constitution::strand_epochs`, on the host's threads), and
+/// its closed epochs, each with her code over its places, found the level's units in the rows' order: the store founded where the level
+/// has none (`CIRCLES` circles, units of 2 to `LONGEST` symbols, its turns drawn from `KEY`), every mark leaking by `FADE` thousandths
+/// first, and a unit founded where its saving passes `CHARGE` (`pool`: `log₂|P| + 1`; `spelled`: `L log₂ A + log₂|P|`, October's). Every
+/// other line of the state is kept. Written and read back.
+pub fn found_units(args: &[String]) -> Result<()> {
+    if args.len() != 15 {
+        return Err("found-units UNITS UNITS_SHA CODEC CODEC_SHA ROWS ROWS_SHA STATE STATE_SHA CIRCLES LONGEST KEY FADE CHARGE OUT".into());
+    }
+    use rayon::prelude::*;
+    let started = std::time::Instant::now();
+    let units = units_of(&args[1], &args[2])?;
+    let codec = Codec::from_text(&String::from_utf8(pinned_read(&args[3], &args[4], READ_BUDGET as usize)?)?, units)?;
+    let table = String::from_utf8(pinned_read(&args[5], &args[6], READ_BUDGET as usize)?)?;
+    let text = pinned_read(&args[7], &args[8], STATE_BUDGET)?;
+    let mut learner = Learner::from_text(std::str::from_utf8(&text)?).map_err(|e| e.to_string())?;
+    if learner.field.declaration.alphabet != codec.alphabet() {
+        return Err("a state whose alphabet is not its codec's".into());
+    }
+    let (circles, longest, key, fade): (usize, usize, u64, i64) = (args[9].parse()?, args[10].parse()?, args[11].parse()?, args[12].parse()?);
+    let spelled = match args[13].as_str() {
+        "pool" => false,
+        "spelled" => true,
+        _ => return Err("a founding's charge that is not pool or spelled".into()),
+    };
+    let out = Path::new(&args[14]);
+    if out.exists() {
+        return Err("a founded state's path that exists".into());
+    }
+    let unescape = |t: &str| -> std::result::Result<Vec<u8>, String> {
+        match t.strip_prefix("hex:") {
+            Some(h) if h.len() % 2 == 0 => (0..h.len()).step_by(2).map(|k| u8::from_str_radix(&h[k..k + 2], 16).map_err(|e| e.to_string())).collect(),
+            Some(_) => Err("a hex row of an odd count of digits".into()),
+            None => Ok(t.replace("\\n", "\n").into_bytes()),
+        }
+    };
+    let mut rows: Vec<Vec<usize>> = Vec::new();
+    for line in table.lines() {
+        let w: Vec<&str> = line.split('\t').collect();
+        let [_, known, next] = w[..] else { return Err("a row that is not its label, its known text and its next symbol".into()) };
+        let mut classes = codec.encode(&unescape(known)?)?;
+        classes.extend(codec.encode(&unescape(next)?)?.into_iter().take(1));
+        if classes.len() >= 2 {
+            rows.push(classes);
+        }
+    }
+    let field = &learner.field;
+    let read: Vec<Option<(Vec<usize>, Vec<i64>)>> = rows.par_iter().map(|c| field.strand_epochs(c, true).map_err(|e| e.to_string())).collect::<std::result::Result<_, _>>()?;
+    let mut epochs: Vec<(Vec<usize>, i64)> = Vec::new();
+    for (classes, r) in rows.iter().zip(&read) {
+        let Some((anchors, codes)) = r else { return Err("founded units on a state without a level".into()) };
+        // the closed epochs: each run between two anchors (the last, open at the row's end, is not closed)
+        for w in anchors.windows(2) {
+            epochs.push((classes[w[0]..w[1]].to_vec(), codes[w[0]..w[1]].iter().sum()));
+        }
+    }
+    let (founded, refreshed, held, runs) = learner.field.found_units(&epochs, circles, longest, key, fade, spelled).map_err(|e| e.to_string())?;
+    // a receipt of the crossing, never read by the machine: the runs it founded, their octets in hex a line (private, beside the state)
+    let receipt: String = runs.iter().map(|r| format!("{}\n", codec.decode(r).iter().map(|b| format!("{b:02x}")).collect::<String>())).collect();
+    std::fs::write(format!("{}.founded.tsv", out.display()), receipt)?;
+    let store = learner.field.units().ok_or("a founding that left no store")?;
+    let written = learner.to_text();
+    if Learner::from_text(&written).map_err(|e| e.to_string())?.to_text() != written {
+        return Err("a learner that does not read back as itself".into());
+    }
+    std::fs::write(out, &written)?;
+    println!("FOUND_UNITS rows={} epochs={} founded={founded} refreshed={refreshed} held={held} by_length={} charge={} ms={}", rows.len(), epochs.len(), store.founded.iter().map(u32::to_string).collect::<Vec<_>>().join(","), args[13], started.elapsed().as_millis());
+    Ok(())
+}
+
 /// [definition; the lead, November 27, the formal thread's slow store of 08:51 UTC] `found-bank STATE STATE_SHA PERIODS MILLI OUT`: **the state
 /// whose level holds a slow store** ([`holonics_engine::field::Learner::with_bank`]): the bank's rings on the periods `PERIODS` (comma-joined,
 /// in sections of news on the level's clock), each ring's fade at `2^(MILLI/1000)` e-folds a radian (one e-fold a turn is `MILLI = −2651`),

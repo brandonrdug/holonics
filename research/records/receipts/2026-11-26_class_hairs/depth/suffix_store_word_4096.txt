@@ -1,0 +1,61 @@
+SUFFIX_STORE key=word J=4096 symbols=155 places=236800 her_nats_odd=1.4359 her_nats_even=1.3747 charged_own=195465
+SUFFIX_STORE fit=even_to_odd charged=195465 slopes=1.28,-0.58 her_nats=1.4359 joint_nats=1.4286 gain=+0.0074 own_charge_gain=+0.0049
+SUFFIX_STORE fit=even_to_odd kind=letter places=89881 her_nats=1.5293 gain=+0.0084
+SUFFIX_STORE fit=even_to_odd kind=space places=20645 her_nats=0.4383 gain=+0.0005
+SUFFIX_STORE fit=even_to_odd kind=other places=7874 her_nats=2.9863 gain=+0.0135
+SUFFIX_STORE fit=even_to_odd place=1 part=within_30 places=959 her_nats=2.095 gain=+0.0054 (±0.0019)
+SUFFIX_STORE fit=even_to_odd place=1 part=over_30 places=8823 her_nats=2.457 gain=+0.0033 (±0.0005)
+SUFFIX_STORE fit=even_to_odd place=1 part=not_before places=7740 her_nats=3.477 gain=-0.0008 (±0.0005)
+SUFFIX_STORE fit=even_to_odd place=1 part=earlier_stretch places=2817 her_nats=3.116 gain=+0.0033 (±0.0010)
+SUFFIX_STORE fit=even_to_odd place=2 part=within_30 places=794 her_nats=0.611 gain=+0.0501 (±0.0072)
+SUFFIX_STORE fit=even_to_odd place=2 part=over_30 places=8007 her_nats=0.913 gain=+0.0354 (±0.0028)
+SUFFIX_STORE fit=even_to_odd place=2 part=not_before places=7598 her_nats=1.999 gain=-0.0597 (±0.0031)
+SUFFIX_STORE fit=even_to_odd place=2 part=earlier_stretch places=2687 her_nats=1.586 gain=+0.0156 (±0.0063)
+SUFFIX_STORE fit=even_to_odd place=3 part=within_30 places=569 her_nats=0.291 gain=+0.0170 (±0.0062)
+SUFFIX_STORE fit=even_to_odd place=3 part=over_30 places=5552 her_nats=0.600 gain=+0.0636 (±0.0030)
+SUFFIX_STORE fit=even_to_odd place=3 part=not_before places=7126 her_nats=1.976 gain=-0.0464 (±0.0025)
+SUFFIX_STORE fit=even_to_odd place=3 part=earlier_stretch places=2262 her_nats=1.403 gain=+0.0970 (±0.0064)
+SUFFIX_STORE fit=even_to_odd place=rest part=within_30 places=232 her_nats=0.279 gain=+0.0506 (±0.0089)
+SUFFIX_STORE fit=even_to_odd place=rest part=over_30 places=7097 her_nats=0.259 gain=+0.0467 (±0.0017)
+SUFFIX_STORE fit=even_to_odd place=rest part=not_before places=22928 her_nats=1.093 gain=-0.0096 (±0.0007)
+SUFFIX_STORE fit=even_to_odd place=rest part=earlier_stretch places=4690 her_nats=0.663 gain=+0.0921 (±0.0033)
+SUFFIX_STORE fit=odd_to_even charged=195465 slopes=1.04,-0.46 her_nats=1.3747 joint_nats=1.3626 gain=+0.0121 own_charge_gain=+0.0067
+SUFFIX_STORE fit=odd_to_even kind=letter places=90694 her_nats=1.4756 gain=+0.0123
+SUFFIX_STORE fit=odd_to_even kind=space places=20637 her_nats=0.4113 gain=+0.0088
+SUFFIX_STORE fit=odd_to_even kind=other places=7069 her_nats=2.8924 gain=+0.0194
+SUFFIX_STORE fit=odd_to_even place=1 part=within_30 places=1026 her_nats=1.876 gain=+0.0052 (±0.0014)
+SUFFIX_STORE fit=odd_to_even place=1 part=over_30 places=8924 her_nats=2.391 gain=+0.0032 (±0.0004)
+SUFFIX_STORE fit=odd_to_even place=1 part=not_before places=7311 her_nats=3.366 gain=-0.0008 (±0.0003)
+SUFFIX_STORE fit=odd_to_even place=1 part=earlier_stretch places=3001 her_nats=3.136 gain=+0.0075 (±0.0011)
+SUFFIX_STORE fit=odd_to_even place=2 part=within_30 places=867 her_nats=0.445 gain=+0.0199 (±0.0047)
+SUFFIX_STORE fit=odd_to_even place=2 part=over_30 places=8175 her_nats=0.910 gain=+0.0332 (±0.0022)
+SUFFIX_STORE fit=odd_to_even place=2 part=not_before places=7164 her_nats=1.999 gain=-0.0416 (±0.0027)
+SUFFIX_STORE fit=odd_to_even place=2 part=earlier_stretch places=2876 her_nats=1.649 gain=+0.0374 (±0.0050)
+SUFFIX_STORE fit=odd_to_even place=3 part=within_30 places=649 her_nats=0.245 gain=+0.0235 (±0.0047)
+SUFFIX_STORE fit=odd_to_even place=3 part=over_30 places=5712 her_nats=0.573 gain=+0.0585 (±0.0022)
+SUFFIX_STORE fit=odd_to_even place=3 part=not_before places=6805 her_nats=1.979 gain=-0.0318 (±0.0021)
+SUFFIX_STORE fit=odd_to_even place=3 part=earlier_stretch places=2449 her_nats=1.473 gain=+0.0937 (±0.0050)
+SUFFIX_STORE fit=odd_to_even place=rest part=within_30 places=257 her_nats=0.194 gain=+0.0319 (±0.0072)
+SUFFIX_STORE fit=odd_to_even place=rest part=over_30 places=7841 her_nats=0.232 gain=+0.0350 (±0.0013)
+SUFFIX_STORE fit=odd_to_even place=rest part=not_before places=22325 her_nats=1.050 gain=-0.0054 (±0.0005)
+SUFFIX_STORE fit=odd_to_even place=rest part=earlier_stretch places=5312 her_nats=0.721 gain=+0.0828 (±0.0024)
+SUFFIX_STORE all gain_mean=+0.0097 halves_scatter=0.0047
+SUFFIX_STORE kind=letter gain_mean=+0.0103 halves_scatter=0.0039
+SUFFIX_STORE kind=other gain_mean=+0.0165 halves_scatter=0.0059
+SUFFIX_STORE kind=space gain_mean=+0.0047 halves_scatter=0.0083
+SUFFIX_STORE place=1 part=earlier_stretch gain_mean=+0.0054 halves_scatter=0.0042
+SUFFIX_STORE place=1 part=not_before gain_mean=-0.0008 halves_scatter=0.0000
+SUFFIX_STORE place=1 part=over_30 gain_mean=+0.0032 halves_scatter=0.0001
+SUFFIX_STORE place=1 part=within_30 gain_mean=+0.0053 halves_scatter=0.0002
+SUFFIX_STORE place=2 part=earlier_stretch gain_mean=+0.0265 halves_scatter=0.0218
+SUFFIX_STORE place=2 part=not_before gain_mean=-0.0506 halves_scatter=0.0181
+SUFFIX_STORE place=2 part=over_30 gain_mean=+0.0343 halves_scatter=0.0021
+SUFFIX_STORE place=2 part=within_30 gain_mean=+0.0350 halves_scatter=0.0302
+SUFFIX_STORE place=3 part=earlier_stretch gain_mean=+0.0954 halves_scatter=0.0033
+SUFFIX_STORE place=3 part=not_before gain_mean=-0.0391 halves_scatter=0.0146
+SUFFIX_STORE place=3 part=over_30 gain_mean=+0.0610 halves_scatter=0.0051
+SUFFIX_STORE place=3 part=within_30 gain_mean=+0.0202 halves_scatter=0.0065
+SUFFIX_STORE place=rest part=earlier_stretch gain_mean=+0.0875 halves_scatter=0.0094
+SUFFIX_STORE place=rest part=not_before gain_mean=-0.0075 halves_scatter=0.0042
+SUFFIX_STORE place=rest part=over_30 gain_mean=+0.0408 halves_scatter=0.0117
+SUFFIX_STORE place=rest part=within_30 gain_mean=+0.0413 halves_scatter=0.0188

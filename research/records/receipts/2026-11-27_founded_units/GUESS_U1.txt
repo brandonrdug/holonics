@@ -1,0 +1,13 @@
+Fixed 2026-11-27T23:09Z (date -u), the lead, before W135u trains. Refs #404. The review of November 27, its build step 1: units founded on the card.
+The level's founded units (Scale::units, crates/engine/src/field/units.rs): a store of J = 4,096 circles holding each founded unit's end and
+its proper prefixes at its key (the product of its symbols' drawn turns at their places); the level's cut, on the host for both
+realizations, holds a founded unit whole and closes it at its end, read from what has arrived; founded at a crossing (found-units) from a
+sample of 2,000 rows of 300 octets of the line's training slices, a closed epoch founded where (n - 1)(c - log2(U + 2)) > log2|P| + 1;
+never stepped. W135u: W134's end with the units of the first crossing; W135p: W134's end. 3,000 sections heard whole each on e5h1.
+G-U1 (at the lap means unless named):
+  (a) (0.6) on the sixteen held passages at 3,700 places, a word met again is cut at the same offsets as its earlier meeting in at least
+      0.90 of its meetings at W135u's mean, against about 0.56 at W135p's (the review's acceptance of step 1);
+  (b) (0.55) of the units the first crossing founded, at least 0.9 still read as held (the mark at or over half) at the second crossing
+      (found-units on W135u's end with the lap's fade of 0.368 per lap), the formal thread's G-Z58 read on this store;
+  (c) (0.5) held text within +0.002 nats a place of W135p's, one place open, paired;
+  (d) (0.5) the wide panel's writes loop no more often on W135u than on W135p, and their lexicon share stands within 3 points.

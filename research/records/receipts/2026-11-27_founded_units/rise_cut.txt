@@ -1,0 +1,3 @@
+RISE_CUT runs=1448560 meetings=4744000
+RISE_CUT form=rise places=59216 anchors=28571 places_an_epoch=2.07
+RISE_CUT form=peak places=59216 anchors=18829 places_an_epoch=3.14

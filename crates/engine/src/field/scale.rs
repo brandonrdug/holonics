@@ -78,6 +78,11 @@ pub struct Scale {
     /// set. Why: on W133s's end the level after its ticks held the third byte of the epoch 4 and 8 back at 0.020 and 0.010, and such a bank,
     /// built on the host and untrained, at 0.147 and 0.082 (`tools/level_back_ruler.py`).
     pub bank: Vec<u32>,
+    /// [definition; the review of November 27, its build step 1; the lead's build] **The level's founded units** ([`units::Units`]):
+    /// where set, the level's cut holds each founded unit whole, closed at its end, so a recurring span is cut alike at every meeting;
+    /// founded at a crossing (`found-units`), never stepped. Written as its own lines after the glue, only where set. Why: on November 27
+    /// her epochs cut a word met again alike in 0.559 of its meetings, as her news moves the landmarks (the record of the class hairs §24).
+    pub units: Option<super::units::Units>,
     /// [definition; the lead, November 24, the record of the evening of November 23 §7; the formal thread's reading of the join,
     /// `agent-inferred`] **The level's own lane**: where set, the fine field's last face lane is the level's. The prolongation writes it
     /// alone (`B⁻`'s and `b_B⁻`'s rows of every other coordinate are held at zero) and nothing else writes it (the encodings' and the strand
@@ -363,10 +368,22 @@ pub fn level_cut(news: &[i64], section: i64, harmonics: usize, pi: i128) -> Resu
 
 /// [`level_cut`], or with `before` the cut a one-sided stream can name ([`level_anchors_before`]).
 pub fn level_cut_sided(news: &[i64], section: i64, harmonics: usize, pi: i128, before: bool) -> Result<LevelCut> {
+    level_cut_units(news, None, section, harmonics, pi, before)
+}
+
+/// [definition; the lead, November 27, the review's build step 1] [`level_cut_sided`] with the level's founded units
+/// ([`super::units::Units::anchors`]): where a run of `classes` is a founded unit it is held whole, closed at its end, read from the places
+/// before each anchor. `units` names the store, the region's classes and the alphabet.
+pub fn level_cut_units(news: &[i64], units: Option<(&super::units::Units, &[usize], usize)>, section: i64, harmonics: usize, pi: i128, before: bool) -> Result<LevelCut> {
     if section <= 0 || harmonics == 0 {
         return refuse("a level's cut needs a positive section and a harmonic");
     }
     let anchors = if before { level_anchors_before(news, section) } else { level_anchors(news, section) };
+    let anchors = match units {
+        Some((u, classes, alphabet)) if classes.len() == news.len() => u.anchors(&anchors, classes, alphabet, pi),
+        Some(_) => return refuse("a level's founded units read over classes that are not the news's places"),
+        None => anchors,
+    };
     let n = news.len();
     let mut sum = vec![0i128; n + 1];
     for (t, &c) in news.iter().enumerate() {
@@ -406,11 +423,16 @@ pub struct StrandCut {
 /// phase `(S_(t−1) + ĉ_t − S_(a))/σ` its expected news `ĉ_t` (`open_news`) carries it to, and reads the same epoch before. Data: one
 /// function for the host's law and a card's batch.
 pub fn strand_level_cut(known_news: &[i64], open_news: &[i64], section: i64, harmonics: usize, pi: i128) -> Result<StrandCut> {
+    strand_level_cut_units(known_news, open_news, None, section, harmonics, pi)
+}
+
+/// [`strand_level_cut`] with the level's founded units ([`level_cut_units`]) over the known stream's classes.
+pub fn strand_level_cut_units(known_news: &[i64], open_news: &[i64], units: Option<(&super::units::Units, &[usize], usize)>, section: i64, harmonics: usize, pi: i128) -> Result<StrandCut> {
     let n = known_news.len();
     if open_news.len() != n {
         return refuse("a strand's cut needs each place's news and its expected news");
     }
-    let cut = level_cut_sided(known_news, section, harmonics, pi, true)?;
+    let cut = level_cut_units(known_news, units, section, harmonics, pi, true)?;
     let mut sum = vec![0i128; n + 1];
     for (t, &c) in known_news.iter().enumerate() {
         sum[t + 1] = sum[t] + c as i128;
@@ -773,7 +795,7 @@ impl Constitution {
             *v = fit32((k * ((three << MATERIAL_BITS) / pd) as i128) >> 31, "a founded value outgrew its 32-bit carrier")?;
         }
         let mut out = self.clone();
-        out.scale = Some(Box::new(Scale { harmonics, split, coarse, glue, receipt: false, inside: false, strand: false, bank: Vec::new(), lane: false }));
+        out.scale = Some(Box::new(Scale { units: None, harmonics, split, coarse, glue, receipt: false, inside: false, strand: false, bank: Vec::new(), lane: false }));
         Ok((out, at))
     }
 
@@ -862,7 +884,7 @@ impl Constitution {
         // [measurement] A ruler's forward ([`Constitution::ruler_level`]): at `4` the cut a one-sided stream can name, the level's ticks
         // one-sided and every place reading the epoch before its own; at `1` to `3` the prolongation's source alone changes.
         let rl = self.ruler_level;
-        let cut = level_cut_sided(news, level_section(self.declaration.alphabet), h, self.pi, rl == 4)?;
+        let cut = level_cut_units(news, s.units.as_ref().map(|u| (u, classes, self.declaration.alphabet)), level_section(self.declaration.alphabet), h, self.pi, rl == 4)?;
         let epochs = cut.anchors.len();
         let (a, ab, b, bb, _) = glue_layout(h, d0, d1);
         let g = &s.glue;
@@ -1014,7 +1036,7 @@ impl Constitution {
         let Some((b2, bb2, _)) = s.before_offsets(d0) else {
             return refuse("a strand's level on a tower without its one-sided block");
         };
-        let StrandCut { cut, open_harmonics, source } = strand_level_cut(known_news, open_news, level_section(self.declaration.alphabet), h, self.pi)?;
+        let StrandCut { cut, open_harmonics, source } = strand_level_cut_units(known_news, open_news, s.units.as_ref().map(|u| (u, &targets[..n.min(targets.len())], self.declaration.alphabet)), level_section(self.declaration.alphabet), h, self.pi)?;
         let epochs = cut.anchors.len();
         let (a, ab, _, _, _) = glue_layout(h, d0, d1);
         let g = &s.glue;

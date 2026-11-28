@@ -97,6 +97,12 @@ fn run(args: &[String]) -> Result<()> {
     if mode == "host" && rest.get(1).map(String::as_str) == Some("set-receipt") {
         return athena::store::set_receipt(&rest[1..]);
     }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("read-epochs") {
+        return athena::store::read_epochs(&rest[1..]);
+    }
+    if mode == "host" && rest.get(1).map(String::as_str) == Some("found-units") {
+        return athena::store::found_units(&rest[1..]);
+    }
     if mode == "host" && rest.get(1).map(String::as_str) == Some("found-bank") {
         return athena::store::found_bank(&rest[1..]);
     }
