@@ -532,3 +532,15 @@ Scored 2026-11-28T03:40Z on the lead's read of 03:41 UTC, read after the guess w
 octet alone keeps 0.958 of the type cut's peak ends at depths 1 and 2 and 0.947 of those at depths 1 to 8, and 0.928 and 0.921 of
 its own ends stand in theirs; it cuts 0.951 alike at 3.06 places an epoch (the rise form keeps 0.941 and 0.938). Under the count
 join the cut is nearly a function of the last octet and the next, and depths 1 and 2 stood level with depth 8 by the join.
+
+Read beside the lead's forward read of 08:50 UTC (W135r 1.0931 against W135p 1.0846 nats a place on 100 held cut rows, 19,200
+places; +0.048 at age 1; the held cavity's −0.0235 two-sided): the rise store's anchor at t stands where the rise at t − 1 is not
+followed by a rise at t (Units::rise_anchors), and the rise at t reads her mean news after the run ending at x_t, so the anchor at t
+is a function of x_t; a region's training cut is drawn over its own classes on both sides (engine-cuda hnn/level.rs, level_cut_units
+with before false), so a site at t reads a phase its own symbol placed. The atlas holds the regime law (release.writer-regime,
+November 21): what the field founds where its sites hear both sides is not what it writes where they hear only the past.
+
+Fixed 2026-11-28T08:46Z (date -u 08:46:18), before the read.
+G-Z73 (0.5). With the store's peak cut read one-sided in training as in release (a site at t reads only the anchors x_<t names, the
+  strand's law of November 18), and nothing else changed, W135r's forward code on the same 100 held rows stands no more than 0.003
+  nats a place above W135p's, and its excess at age 1 falls under 0.01.
