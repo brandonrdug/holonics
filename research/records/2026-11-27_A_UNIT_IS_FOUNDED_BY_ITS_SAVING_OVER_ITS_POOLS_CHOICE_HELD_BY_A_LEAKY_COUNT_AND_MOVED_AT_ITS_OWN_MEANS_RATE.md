@@ -300,7 +300,10 @@ The expected peak enters as its own arm before the face (0.6), and the face trai
 part of the level reads (its epochs, its units' ends, the place its row arrives), and the face is trained over the epochs the join
 will read. With the added row as it stands, naming the close in time moves the newest row onto the first letter, where her face is
 most open, carrying a unit her state already holds, so by §9 the first letters grow dearer, and their gain comes with the factor
-join alone (G-Z78).
+join alone (G-Z78). The lead's parity of 12:05 UTC found the law of §8 broken inside the builds that read it: the host's forward
+pass cut a region over classes holding each open place's target, and the card's over a spurious class 0 there; the repair reads
+only written classes on both, the arm and its control run on it, and a forward read of the earlier build through the host carried
+the target into the store's arm alone, so its excess stands as a lower bound until it is read again.
 
 ## 11. Owners
 
