@@ -451,3 +451,36 @@ start's weight is the chance that it is the last boundary, w(d) = a(t − d) Π_
 
 G-Z64 (0.45, fixed 2026-11-28T01:06Z, date -u 01:06:11). With each start weighed by w(d) and each key read as its ending ratio, the
   weighted form's units cut whole at no less than the no-unit rate at every length from 2 to 8 on unit_cut_ruler.
+
+Scored 2026-11-28T01:25Z on the lead's rise cut with no units (tools/rise_cut_ruler.py; ν̄(s) read through W134's end over the
+2,000-row sample, 1,448,560 runs, 4.74 million meetings; the 16 held passages): G-Z62 half held. The rise cut reads 0.974 of
+recurring words cut alike (0.973 for three letters or more), 0.97 to 1.00 at every length but 12 six-letter words met within 30
+places (0.75), far over the 0.70 asked; its epochs stand at 2.07 places, under the 3.5 to 5 asked. The peak cut, a rise with no
+rise after it, reads 0.940 (0.924) at 3.14 places, 0.83 to 0.89 at six and eight letters; her news alone 0.576 at 3.77.
+Read beside the score: a cut that is a function of the last eight symbols alone cuts a recurring word alike wherever the word
+before it does not reach into its keys, and a cut at every place cuts every word alike, so the same-cut rate is read with the
+cut's density and with where its ends fall.
+
+Fixed 2026-11-28T01:26Z (date -u 01:26:42 at drafting), before the reads.
+G-Z65 (0.55). Of the places that follow a space in the held passages, at least 0.8 carry a peak end.
+G-Z66 (0.5). A cut read from her own face's entropy at each place plus a store, at k = 1 and 2 only, of the leaky mean of her news
+  less that entropy, cut at its peaks, reads a same-cut rate within 0.03 of the store-only peak cut's 0.940, at an epoch within 0.3
+  places of its 3.14.
+
+Scored 2026-11-28T01:28Z on the lead's read of units founded between ends (found_between_ruler, then unit_cut_ruler; the 16
+held passages): G-Z63 missed. Founded: the peak form 1,995 units (419, 786, 492, 210, 68, 16 and 4 at lengths 2 to 8), the rise
+form 1,866 (629, 792, 347, 85, 11, 2, 0). Over all meetings they cut whole 0.309 (peak) and 0.386 (rise) against news alone's
+0.082 and 0.071, under the 0.8 asked. On the meetings whose first place the cut anchors: peak 0.64, 0.72, 0.87, 0.95, 0.96 at 2 to
+6 octets; rise 0.77, 0.82, 0.76, 0.79 at 2 to 5. A unit is cut whole only where its start is an end, so the share over all
+meetings is the starts' cover times the started share, and a short unit met inside a longer held one is read inside it.
+
+Fixed 2026-11-28T01:28Z (date -u 01:28:59), before the read.
+G-Z67 (0.45). Counting a meeting of a peak-form unit as whole when it is cut whole or lies inside a meeting of a longer founded
+  unit that is cut whole, the peak form's units reach at least 0.8 at every length from 2 to 6 on unit_cut_ruler.
+
+Scored 2026-11-28T01:35Z on the lead's reads (merged with its record, #1206): G-Z65 held. Of the 10,056 places after a space or a
+line's end, 0.972 carry a peak end (her news alone 0.600) and 0.992 a rise end; 0.519 of the peak ends fall after a space and the
+rest inside words. G-Z67 missed: counting a meeting inside a longer founded unit's whole meeting as whole, the peak units read
+0.751, 0.620, 0.759, 0.397 and 0.648 at lengths 2 to 6 (0.697 over all), the rise units 0.597, 0.555, 0.534 and 0.737 at 2 to 5
+(0.582). Nesting in a longer unit explains part of the uncut starts and not most of them: a start stays uncut where the word
+before reaches into the cut's keys.
