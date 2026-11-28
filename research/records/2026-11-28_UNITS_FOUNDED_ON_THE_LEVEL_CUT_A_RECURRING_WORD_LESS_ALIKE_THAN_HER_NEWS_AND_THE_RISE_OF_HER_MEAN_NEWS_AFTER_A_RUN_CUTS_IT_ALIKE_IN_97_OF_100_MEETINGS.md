@@ -278,3 +278,19 @@ W134's end with the store bit for bit W134r's and its units on residues, which t
 ([`GUESS_U3.txt`](receipts/2026-11-27_founded_units/GUESS_U3.txt)): W135c's forward code on the hundred held cut rows no more than 0.003
 nats a place above W135p's, and its excess at age 1 under 0.01. A phase `φ_t` sums her news through `t` in both arms, so every site's
 harmonics carry her own code at `t`; that stands under her news's anchors too and is read as its own question.
+
+W135c trained in 3,527 s ([`arm_W135c.txt`](receipts/2026-11-27_founded_units/arm_W135c.txt)). Her forward code on the hundred held cut
+rows: 1.0916 nats a place against W135p's 1.0846 (+0.0070; W135r +0.0085); by the octave of age past the cut 1.402, 1.097, 1.181, 1.228,
+1.140, 1.109, 1.066, 1.069 against 1.343, 1.088, 1.178, 1.224, 1.135, 1.102, 1.062, 1.059, the first place +0.059
+([`table_W135c.txt`](receipts/2026-11-27_founded_units/table_W135c.txt)). The held cavity, paired against W135p: −0.0138 (±0.0008), against
+W135r's −0.0235, lower in every slice (logic −0.0025, theory −0.0015, books −0.0200). Her writes: the theory panel's theory prompts 86% in
+the lexicon against 80%, its logic prompts 85% against 90%, the wide panel 69% against 69% with 21 of 160 writes looping against 17
+([`loud_W135c.table`](receipts/2026-11-27_founded_units/loud_W135c.table)). G-Z73 missed on both clauses. The causal read took about
+two fifths of the cavity's credit and moved the forward code by 0.0015; the first place's excess, which it did not touch, stands where
+the level's handed row is newest.
+
+A reading (`agent-inferred`): one lap moves a level whose glue and readers were trained on her news's epochs for every lap before W135,
+so it reads the switch's price and not the store's standing; a learner's null is held to a length (rule 10 of a line's lap). The second
+lap of each from its own end, W136c beside W136p, trains under G-U4 ([`GUESS_U4.txt`](receipts/2026-11-27_founded_units/GUESS_U4.txt)):
+the forward gap under +0.0035, the first place's excess under +0.03, the cavity's gap still below zero. The line's state stays W135p
+until the forward code says otherwise.
