@@ -1,5 +1,5 @@
 #!/usr/bin/env -S python3 -I
-"""rise_cut_ruler.py SAMPLE_ROWS SAMPLE_CODES ROWS CODES OUT: a ruler (the lead, November 28; the formal thread's rise cut of 00:58 UTC,
+"""rise_cut_ruler.py SAMPLE_ROWS SAMPLE_CODES ROWS CODES OUT [DEPTH]: a ruler (the lead, November 28; the formal thread's rise cut of 00:58 UTC,
 G-Z62). Where a span's ends are by its type: her news after each run, as a mean over the run's meetings, and a cut where that mean rises.
 
 SAMPLE_CODES and CODES are `read-reach … law` outputs (`codes.tsv`: a row, its group, a place, her code there on `2^(−20)` bits) of
@@ -7,8 +7,10 @@ SAMPLE_ROWS and ROWS (`read-far`'s table). Over the sample, each run `s` of 1 to
 `t + 1`, so `ν̄(s)` is the mean news after `s` over its meetings (the branching after it, as her face reads it) with its count. On ROWS,
 at each place the runs ending there join by their counts, `ν̂(t) = Σ_k n_k ν̄(s_k) / Σ_k n_k` (a run never met has no weight), and an
 end stands after `t` where `ν̂(t) > ν̂(t − 1)`, the rise (`rise`); beside it the peak (`peak`: a rise with no rise after it). Each form's
-anchors go to `OUT/<form>/cut.tsv` (a row, its places, its anchors), the form `tools/epoch_cut_ruler.py` reads. Outside the machine;
-counts and means.
+anchors go to `OUT/<form>/cut.tsv` (a row, its places, its anchors), the form `tools/epoch_cut_ruler.py` reads. DEPTH (8 unless given)
+is the longest run; at 2 it is the type's own form of `tools/entropy_rise_ruler.py`'s store (her face's entropy and the store's mean of
+the rest, both averaged over a run's meetings, sum to this mean), so the two differ only in reading the entropy at the meeting. Outside
+the machine; counts and means.
 """
 import os
 import sys
@@ -35,6 +37,7 @@ def codes_of(path, n_rows):
 
 def main():
     sample, sample_codes, rows, codes, out = sys.argv[1:6]
+    depth = int(sys.argv[6]) if len(sys.argv) > 6 else DEPTH
     st = rows_of(sample)
     sc = codes_of(sample_codes, len(st))
     total, count = defaultdict(int), defaultdict(int)
@@ -43,13 +46,13 @@ def main():
         for p in range(len(t) - 1):
             if p + 1 not in c:
                 continue
-            for k in range(1, DEPTH + 1):
+            for k in range(1, depth + 1):
                 if p - k + 1 < 0:
                     break
                 s = t[p - k + 1:p + 1]
                 total[s] += c[p + 1]
                 count[s] += 1
-    print(f"RISE_CUT runs={len(count)} meetings={sum(count.values())}")
+    print(f"RISE_CUT depth={depth} runs={len(count)} meetings={sum(count.values())}")
     texts = rows_of(rows)
     for form in ('rise', 'peak'):
         os.makedirs(f'{out}/{form}', exist_ok=True)
@@ -60,7 +63,7 @@ def main():
         nu = []
         for p in range(n):
             num = den = 0
-            for k in range(1, DEPTH + 1):
+            for k in range(1, depth + 1):
                 if p - k + 1 < 0:
                     break
                 s = t[p - k + 1:p + 1]

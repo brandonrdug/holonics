@@ -81,3 +81,105 @@ own, charged with her news after each run; its capacity is the open part, since 
 At 23:37 UTC on November 27 two `read-strand-cut` reads of the sixteen 3,700-place rows, three threads each (a pass that keeps every
 tick: 10.9 GB at two threads), stood beside gate 3 and a lap's start, and the kernel's out-of-memory killer took an instance on the PC.
 Such reads now run one at a time on two threads, after a lap's other reads, and `read-epochs` reads the cut in a pass that keeps no tick.
+
+## 5. Her face's entropy and a store of what it lacks
+
+The formal thread's form (b) of 01:29 UTC: cross-entropy is entropy plus divergence, so the news after a run is her face's own entropy
+at the next place and a store's mean of the rest, `ν̂ = H(p_(t+1)) + δ̄(s_t)`, `δ̄` over the runs of one and two octets
+(`tools/entropy_rise_ruler.py` on her faces whole at every place of the sample and of the held rows, `read-reach … faces:all`). Over the
+sample's 1,198,000 meetings the mean divergence is 0.0163 nats, so `δ̄` is small and her face's entropy at the meeting moves the cut
+([`entropy_rise.txt`](receipts/2026-11-27_founded_units/entropy_rise.txt)).
+
+| cut, sixteen held rows | places an epoch | a word met again cut alike | three letters or more |
+|---|---|---|---|
+| (b), peak | 3.21 | 0.764 | 0.656 |
+| (b), rise | 2.23 | 0.637 | 0.508 |
+| her mean news after runs of 1 and 2 octets, peak | 3.16 | 0.947 | 0.934 |
+| the same, rise | 2.07 | 0.981 | 0.983 |
+| the same after runs of 1 to 8 octets, peak (§3) | 3.14 | 0.940 | 0.924 |
+
+In the founding sample itself the plain peak reads 0.883 and (b) 0.588
+([`epoch_cut_rise_sample_peak.txt`](receipts/2026-11-27_founded_units/epoch_cut_rise_sample_peak.txt),
+[`epoch_cut_entropy_sample_peak.txt`](receipts/2026-11-27_founded_units/epoch_cut_entropy_sample_peak.txt)). The mean of her entropy
+over a run's meetings plus `δ̄` is her mean news after the run, so (b) differs from the type cut only in reading the entropy at the
+meeting: the meeting carries that meeting's noise, as the formal thread named its risk ("`H(p_t)` belongs to the meeting, not the
+type"). G-Z65 held beside it: 0.978 of the places after a space carry a peak end, which stands 0.53 of the time at a word's first letter,
+0.38 inside a word, 0.05 after its last letter and 0.04 elsewhere ([`epoch_cut_rise_peak_placed.txt`](receipts/2026-11-27_founded_units/epoch_cut_rise_peak_placed.txt)).
+
+## 6. Same-cut is built in; the capacity is read against the type cut's ends
+
+A cut that is a function of the last two or three octets cuts a word met again alike by its construction, wherever the word is preceded
+alike (a store at a quarter of the capacity it needs still reads 0.78). The read of a store's capacity is the share of the type cut's own
+ends it keeps (`kept`) and of its ends that stand in the type cut's (`in`). Under the count join, `ν̂(t) = Σ_k n_k ν̄_k / Σ_k n_k`, the
+last octet's mean weighs most everywhere: her mean news after the last octet alone keeps 0.958 of the peak ends of depths 1 and 2 and
+0.947 of those of depths 1 to 8, and reads 0.951 alike at 3.06 places an epoch
+([`store_agreement.txt`](receipts/2026-11-27_founded_units/store_agreement.txt),
+[`epoch_cut_depth1_peak.txt`](receipts/2026-11-27_founded_units/epoch_cut_depth1_peak.txt)). So the levels' agreement at depths 1 and 2
+against 8 is the join's (the formal thread's reading, G-Z72); a deeper run read as its increment over its parent at its credibility is
+its own arm, after this one.
+
+## 7. The store's addressing: keyed circles against the residues of two coprime rings
+
+The same mean at depths 1 and 2 held in a store (`tools/rise_store_ruler.py`, the 8,825 runs the sample meets: 208 at one octet, 8,617
+at two), charged over the sample in its order:
+
+| store | J (or periods) | read error, rms nats a meeting | type cut's peak ends kept | a word cut alike |
+|---|---|---|---|---|
+| keyed circles, `M ← M + (ν − r)/(n̂ + 1) χ`, joined over zero | 1,024 / 4,096 / 8,192 | 4.55 / 2.51 / 1.79 | 0.645 / 0.774 / 0.815 | 0.781 / 0.932 / 0.942 |
+| the same, joined over the count's background `b_k = ‖C_k‖/(J√2)` | 1,024 / 4,096 / 8,192 | | 0.560 / 0.758 / 0.792 | 0.661 / 0.907 / 0.917 |
+| the same, depths 1 to 8, over zero | 4,096 | | 0.744 | 0.874 |
+| the same, rate floored at `1/(min(n̂, 64) + 1)` | 1,024 / 4,096 / 8,192 | 1.26 / 0.77 / 0.63 | 0.698 / 0.849 / 0.848 | 0.906 / 0.929 / 0.937 |
+| a tree of residuals over the running mean | 1,024 / 4,096 / 8,192 | 1.56 / 1.15 / 0.86 | 0.384 / 0.463 / 0.609 | 0.501 / 0.592 / 0.780 |
+| residues of two primes under J, a sum and a count at each, read at the ring whose count is least | 1,021 and 1,019 / 4,093 and 4,091 / 8,191 and 8,179 | 0.25 / 0.17 / 0.11 | 0.977 / 0.996 / 0.999 | 0.949 / 0.948 / 0.947 |
+
+([`rise_store.txt`](receipts/2026-11-27_founded_units/rise_store.txt), [`rise_store_depth8.txt`](receipts/2026-11-27_founded_units/rise_store_depth8.txt),
+[`store_agreement.txt`](receipts/2026-11-27_founded_units/store_agreement.txt).) On the keyed circles a key's charge spreads over all `J`
+of them, so the crosstalk a read carries is set by the commonest keys' charges, and a key's first meetings, charged at rate one, leave
+crosstalk on every other key that the later, cooled charges never repay (about six squared nats a key: a variance near 3.2 at
+`J = 8,192`, beside the 3.2 read). The count's background is set by the commonest counts too (`b_2 = 424` at `J = 4,096`, where a
+two-octet run averages 70 meetings), so weighing by the count over it silences the rare keys. On residues a key's charge sits at one
+entry a ring, shared only with the keys at that residue, and each entry's sum over its count is its mean with nothing left behind; two
+rings tell about `p₁p₂` pairs apart, resolution bought by agreement among coprime parts (the formal thread's law of 03:34 UTC).
+
+| guess | read | score |
+|---|---|---|
+| G-Z66 (b) within 0.03 of 0.940 at an epoch within 0.3 of 3.14 | 0.764 at 3.21 | missed |
+| G-Z65 at least 0.8 of the places after a space carry a peak end | 0.978 | held |
+| G-Z68 depths 1 to 8 over zero, `J = 4,096`, under 0.93 | 0.874 | held |
+| G-Z69 the same over `b_k`, at least 0.93 within 0.3 of 3.14 | 0.865 at 3.11 | missed |
+| G-Z70 depths 1 and 2 at least 0.93 at each `J`; the after-space share 0.05 lower at 1,024 than at 8,192 | 0.661, 0.907, 0.917 (over `b_k`); 0.753 against 0.969 | half held |
+| G-Z71 the residues keep at least 0.85 near 4,096 and 0.90 near 8,192 | 0.996, 0.999 | held |
+| G-Z72 the last octet alone keeps at least 0.9 of the peak ends of depths 1 and 2 and of 1 to 8 | 0.958, 0.947 | held |
+
+The first store read finished at 03:24 UTC, the minute G-Z68 to G-Z70 were fixed and before the formal thread had its numbers; those
+three are scored as blind guesses. G-Z71 was fixed at 03:33 UTC while its read ran and before it returned.
+
+## 8. The rise store in the level
+
+`Units` holds the store beside the founded units (`crates/engine/src/field/units.rs`: `charge_rise`, `rise_anchors`): for the runs of
+one and two classes ending at a place, the run's word `w = Σ_d u_(t−d+1) A^(d−1)` at its residue on the two largest primes under the
+unit store's circles (4,093 and 4,091 at `J = 4,096`), a sum of her news at the place after it on `2^(−20)` bits (her code's own grain,
+`READ_BITS`, whose row stands) and a count, leaking by the crossing's fade; read at each depth at the ring whose count is least, the
+depths joined by their counts as one ratio `Σ_k S_k / Σ_k N_k` held as its pair and compared by cross-multiplication; an end at each
+peak. Where the store holds meetings its peaks are the level's cut, on the host for both realizations, and the founded units need no
+parse of their own (the formal thread, 01:08 UTC: if the rise cut's ends agree, units founded between them need no prefix test). The
+founding crossing (`found-units`) charges the store from every place of its sample, cuts each row again by it, and founds units from the
+closed epochs of that cut; it writes beside the founded runs a receipt of the units it met already held (`OUT.held.tsv`).
+
+On W134's end from the 2,000 founding rows the crossing founded 2,278 units (by length 2 to 8: 428, 831, 600, 320, 73, 19, 7) in
+683 s at eight threads ([`found_r.log`](receipts/2026-11-27_founded_units/found_r.log)). Through that state the engine's cut of the
+sixteen held rows reads 0.948 of 4,743 meetings alike at 3.16 places an epoch, with 0.978 of the places after a space carrying an end,
+and keeps 0.997 of the exact type cut's ends (0.993 of the host ruler's, which keys octets where the engine keys classes)
+([`epoch_cut_W134r.txt`](receipts/2026-11-27_founded_units/epoch_cut_W134r.txt)). A first build ran the units' weighted parse of 00:22 UTC
+over the store's ends: 0.872 alike ([`epoch_cut_W134r_parse.txt`](receipts/2026-11-27_founded_units/epoch_cut_W134r_parse.txt)), so the
+parse left the cut. Of every place a founded run's octets stand, 0.308 are cut whole by the store's cut and 0.293 by the parse
+([`unit_cut_W134r.txt`](receipts/2026-11-27_founded_units/unit_cut_W134r.txt)). Host tests (`founded_unit_tests`, with the rise store's
+planted peak) and gate 1 pass.
+
+## 9. A read past its deadline, and a binary overwritten
+
+Her faces on the sixteen held rows were first read at two threads under a deadline of 1,500 s taken from the same rows' law read, which
+had run at eight: the read stood past it at 02:46 to 03:11 UTC and was stopped by its timeout, incomplete; at eight threads it took
+570 s against 600 projected, with a peak resident set of 10.0 GiB. At 04:04 UTC the build of this section was copied over the run
+directory `widths/e5r2`, which held the binary of November 23's receipt laps (W101r to W103); no run read it, and it is rebuilt from
+that day's commit `b170f4215` where a later read needs it.

@@ -5,7 +5,10 @@ met again at the same offsets as its earlier meeting.
 CUT is a `read-strand-cut … past` output (`cut.tsv`, the known stream's anchors). A word is a run of letters of ROWS's rows; its cut is the
 offsets from its first place of the anchors that stand on its places or on the place after it. For each word met again in its row, the
 later meeting's cut is set beside the earlier's, by the word's length (eight and more as one) and whether it was met within 30 places; beside
-it, chance: two meetings of words of the same length drawn at random. Outside the machine; counts.
+it, chance: two meetings of words of the same length drawn at random. Beside them, where the anchors fall (the formal thread's G-Z65 of
+01:29 UTC, November 28: same-cut is partly built in by a cut's construction, so it is read beside its density and its ends' places): the
+share of places after a space that carry an anchor, and the anchors parted by the place they stand on (a word's first letter, a letter
+inside a word, the place after a word's last letter, any other place). Outside the machine; counts.
 """
 import random
 import sys
@@ -25,12 +28,24 @@ def main():
     pairs, chance = defaultdict(lambda: [0, 0]), defaultdict(lambda: [0, 0])
     rng = random.Random(27)
     anchors_n = places_n = 0
+    after_space, where = [0, 0], defaultdict(int)
     for line in open(f'{cut_d}/cut.tsv'):
         f = line.rstrip('\n').split('\t')
         r, n = int(f[0]), int(f[1])
         anchors = {int(a) for a in f[2].split(',') if a}
         anchors_n, places_n = anchors_n + len(anchors), places_n + n
         t = texts[r][:n]
+        for p in range(1, n):
+            if t[p - 1] == 32:
+                after_space[0] += p in anchors
+                after_space[1] += 1
+        for a in anchors:
+            if a >= n or a == 0:
+                continue
+            if letter(t[a]):
+                where['first_letter' if not letter(t[a - 1]) else 'inside_word'] += 1
+            else:
+                where['after_word' if letter(t[a - 1]) else 'other'] += 1
         words, i = [], 0
         while i < n:
             if letter(t[i]):
@@ -58,6 +73,10 @@ def main():
                 chance[length][0] += rng.choice(cuts) == rng.choice(cuts)
                 chance[length][1] += 1
     print(f"EPOCH_CUT places={places_n} anchors={anchors_n} places_an_epoch={places_n / anchors_n:.2f}")
+    print(f"EPOCH_CUT after_space places={after_space[1]} anchored={after_space[0] / max(after_space[1], 1):.3f}")
+    placed = sum(where.values())
+    for key in ('first_letter', 'inside_word', 'after_word', 'other'):
+        print(f"EPOCH_CUT anchors_at {key} count={where[key]} share={where[key] / max(placed, 1):.3f}")
     for key in sorted(pairs, key=str):
         a, b = pairs[key]
         print(f"EPOCH_CUT {' '.join(map(str, key))} pairs={b} same={a / b:.3f}")

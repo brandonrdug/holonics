@@ -1,0 +1,3 @@
+ENTROPY_RISE runs=8825 meetings=1198000 mean_divergence=0.0163
+ENTROPY_RISE form=rise places=59216 anchors=26515 places_an_epoch=2.23
+ENTROPY_RISE form=peak places=59216 anchors=18424 places_an_epoch=3.21
