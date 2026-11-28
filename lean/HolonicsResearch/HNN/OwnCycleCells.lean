@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, and a charge is its news
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, a nested store's depths are read on the graded pieces of its flag, its depths join by a product, where a flat factor costs nothing, a founded unit holds by a leaky count whose rate is its own mean, and where no unit speaks the cut is the news
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -56,6 +56,25 @@ finite statements those rows do not.
 10. **A charge is its news** (`delta_charge_contracts`, `delta_charge_zero_at_read`). The delta step `x + η (m − x)` moves an
     address's read toward its letter by `(1 − η)` of its distance, and an address that already reads its letter takes no charge,
     so a heavy address saturates where a summed charge grows with every word that shares it.
+11. **A nested store is a flag, and a depth's worth is its slope on its graded piece** (`flag_increments_telescope`,
+    `flag_slopes_tail_sums`). The address of length `k + 1` fixes the address of length `k`, so the reads `x_0, …, x_(n−1)` at the
+    depths sit on a flag. Their graded pieces `x_k − x_(k−1)` (with `x_(−1) = 0`) telescope back to the deepest read, and a read
+    `Σ_k a_k x_k` is the same read `Σ_k b_k (x_k − x_(k−1))` with `b_k = Σ_(j ≥ k) a_j`: the slope on the news depth `k` adds over
+    depth `k − 1` is the tail sum of the slopes from `k` down. A fit on the reads themselves trades neighbours; the tail sums are
+    the same fit read in the flag's own coordinates.
+12. **Depths join by a product, where a flat factor costs nothing** (`flat_factor_normalizes`, `mixture_with_flat_le`). A
+    factor that gives every symbol the same weight `c` renormalizes away: `p_i c / Σ_j p_j c = p_i / Σ_j p_j`. A mixture that
+    gives weight `1 − σ` to a component `u` at or under the face `p` it mixes with gives the target no more than `p`: so an unmet
+    depth, read at its background, costs a mixture its weight's share of the mass and costs a product nothing.
+13. **A founded unit's evidence is a leaky count, and its material moves at its own mean's rate** (`leaky_count_fixed`,
+    `leaky_count_rises_below_fixed`, `cooled_rate_is_mean`). The count `n ← l n + m` of a unit met `m` times a lap, leaking by
+    `l < 1`, stands still at `m / (1 − l)` and rises toward it from below, so a unit that keeps recurring keeps its evidence and
+    one that stops leaves by the leak. The delta step at rate `1/(k + 1)` from the mean of `k` meetings is the mean of `k + 1`:
+    a unit's rate cools by its own count, and no fixed-rate step moves what it holds.
+14. **Where no unit speaks, the cut is the news** (`cut_at_background_is_news`). The cut weighs every start `d` by the chance
+    that it is the last boundary and its key's ratio, ending against continuing, with the news's anchor `ν` at a positive
+    weight `c`. Where every key reads at the background, the two sides carry the same weight for each start and the cut stands
+    exactly where the news anchors.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -215,5 +234,70 @@ theorem delta_charge_contracts (x m η : ℝ) : x + η * (m - x) - m = (1 - η) 
 /-- An address that already reads its letter takes no charge. -/
 theorem delta_charge_zero_at_read (x m η : ℝ) (h : x = m) : η * (m - x) = 0 := by
   simp [h]
+
+/-- The graded pieces of a flag of reads telescope back to the deepest read. -/
+theorem flag_increments_telescope (r : ℕ → ℝ) (n : ℕ) :
+    ∑ k ∈ Finset.range (n + 1), (r k - if k = 0 then 0 else r (k - 1)) = r n := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.sum_range_succ, ih]
+    simp
+
+/-- A read on the depths of a flag is the same read on its graded pieces, each piece weighed by the tail sum of the slopes from
+its depth down (Abel summation). -/
+theorem flag_slopes_tail_sums (a r : ℕ → ℝ) (n : ℕ) :
+    ∑ k ∈ Finset.range n, a k * r k =
+      ∑ k ∈ Finset.range n, (∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1)) := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hsplit : ∑ k ∈ Finset.range (n + 1),
+        (∑ j ∈ Finset.Ico k (n + 1), a j) * (r k - if k = 0 then 0 else r (k - 1)) =
+        ∑ k ∈ Finset.range (n + 1),
+          ((∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1)) +
+            a n * (r k - if k = 0 then 0 else r (k - 1))) := by
+      refine Finset.sum_congr rfl fun k hk => ?_
+      rw [Finset.sum_Ico_succ_top (Nat.lt_succ_iff.mp (Finset.mem_range.mp hk)), add_mul]
+    rw [hsplit, Finset.sum_add_distrib, ← Finset.mul_sum, flag_increments_telescope,
+      Finset.sum_range_succ (fun k => (∑ j ∈ Finset.Ico k n, a j) * (r k - if k = 0 then 0 else r (k - 1))),
+      Finset.Ico_self, Finset.sum_empty, zero_mul, add_zero, ← ih, Finset.sum_range_succ]
+
+/-- A flat factor renormalizes away: a product of faces pays nothing for a depth read at its background. -/
+theorem flat_factor_normalizes {ι : Type*} (s : Finset ι) (p : ι → ℝ) (c : ℝ) (hc : c ≠ 0) (i : ι) :
+    p i * c / ∑ j ∈ s, p j * c = p i / ∑ j ∈ s, p j := by
+  rw [← Finset.sum_mul, mul_div_mul_right _ _ hc]
+
+/-- A mixture with a component at or under the face it mixes with gives the target no more than that face. -/
+theorem mixture_with_flat_le (p u σ : ℝ) (h1 : σ ≤ 1) (hu : u ≤ p) :
+    σ * p + (1 - σ) * u ≤ p := by
+  nlinarith
+
+/-- A unit met `m` times a lap, its count leaking by `l`, stands still at `m / (1 − l)`. -/
+theorem leaky_count_fixed (l m : ℝ) (hl : l ≠ 1) : l * (m / (1 - l)) + m = m / (1 - l) := by
+  have h : (1 - l) ≠ 0 := sub_ne_zero.mpr (Ne.symm hl)
+  field_simp
+  ring
+
+/-- Below its standing value the leaky count rises: a unit that keeps recurring keeps its evidence. -/
+theorem leaky_count_rises_below_fixed (l m n : ℝ) (hl : l < 1) (h : n ≤ m / (1 - l)) : n ≤ l * n + m := by
+  have hpos : 0 < 1 - l := by linarith
+  rw [le_div_iff₀ hpos] at h
+  linarith
+
+/-- The delta step at rate `1/(k + 1)` from the mean of `k` meetings gives the mean of `k + 1`. -/
+theorem cooled_rate_is_mean (S e k : ℝ) (hk : 0 < k) :
+    S / k + (e - S / k) / (k + 1) = (S + e) / (k + 1) := by
+  have h0 : k ≠ 0 := hk.ne'
+  have h1 : k + 1 ≠ 0 := by linarith
+  field_simp
+  ring
+
+/-- Where every key reads at the background, both sides of the cut carry the same weight `x d` for each start, and the cut
+stands exactly where the news anchors, whatever positive weight `c` the news carries. -/
+theorem cut_at_background_is_news {ι : Type*} (s : Finset ι) (x : ι → ℝ) (c ν : ℝ) (hc : 0 < c) :
+    (∑ d ∈ s, x d) < (∑ d ∈ s, x d) + c * ν ↔ 0 < ν := by
+  rw [lt_add_iff_pos_right]
+  exact mul_pos_iff_of_pos_left hc
 
 end Holonics.HNN.OwnCycleCells

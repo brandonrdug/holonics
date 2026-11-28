@@ -292,3 +292,162 @@ charge against joint charge: the third letter +0.0171 against +0.0344 (0.017 mor
 +0.0198 (0.009 less). Over every letter place the joint charge gains +0.0093 and +0.0103 against the own charge's +0.0036, and
 inside her reach it moves gain to first letters past 30 places (+0.0475 against +0.0006). Read with one slope; the state-set
 slope under the joint charge is not read yet.
+
+Scored 2026-11-27T19:28Z on the lead's epoch-cut ruler (tools/epoch_cut_ruler.py, the 16 long rows, W135s's mean; the lead's
+record of November 26, §24): G-Z47 missed. Her epochs span 3.74 places; a word met again takes the same anchor offsets in 0.559 of
+4,743 meetings (0.566 for three letters or more) against the 0.7 asked, from 0.67 to 0.75 for words of two and three letters met
+within 30 places down to 0.32 to 0.40 for six to eight letters met past 30 (chance 0.36, 0.15, 0.07 by length).
+
+Fixed 2026-11-27T19:28Z (date -u 19:28:37 at drafting), before either read. Premises read first: her epochs span 3.74 places, so
+two epochs, a unit and the one before it, span about eight (the level adds only that interaction, §12); a suffix address charged
+once never pays, and its charge is noise of about √(N/J) in every other read.
+
+G-Z49 (0.55). On the joined held passages past a reset, over every byte class, the store keyed by the carries of the last k places
+  for k = 1 to 8, at J = 4,096 with the joint charge and the slope set by the store's read power, gains at a recurring word's third
+  letter on at least 0.7 of the word-keyed store's gain under the same charge, slope and J read beside it, and over every byte
+  place more than the word-keyed store.
+G-Z50 (0.5). Located depth, charging the address of length k + 1 only where the address of length k already reads above the
+  field's own noise, gains over every byte place at least as much as k = 1 to 8 within the halves' scatter, while charging under
+  half as many addresses.
+
+Scored 2026-11-27T19:50Z on the lead's cut-free store at J = 512 (tools/suffix_store_ruler.py, every byte class, 155 symbols over
+236,800 places of the joined passages, the joint charge at η = 1/4, slopes g_k + a_k ρ_k fitted on the fitting half), G-Z49's
+J of 4,096 still running: G-Z50 missed. Located depth charges 237,237 addresses against k = 1 to 8's 1,892,096 and gains +0.0049
+(scatter 0.0005) over every byte place against +0.0113 (0.0046), and past a reset +0.012 at the third letter against +0.072. At
+J = 512, G-Z49's conditions hold: k = 1 to 8 reaches 0.96 of the word-keyed store at the third letter past a reset (+0.072 against
++0.075) and 0.99 after it, and gains more over every byte place (+0.0113 against +0.0078); it is scored at 4,096 when that read ends.
+
+Fixed 2026-11-27T19:50Z (date -u 19:50:39 at drafting), before either read. Premise read first: a depth charged only where its
+parent already reads is first charged at a unit's second meeting and first read at its third, while past a reset most recurring
+words are met twice.
+
+G-Z51 (0.6). Any floor on the charge, the field's own background √(‖F‖²/J) included, keeps the located store's gain at a recurring
+  word's third letter past a reset under 0.5 of k = 1 to 8's at the same J.
+G-Z52 (0.55). With k = 1 to 8 at J = 4,096, the fitted read slopes a_k fall past a word's typical length: a_8 stands under a fifth of
+  the largest a_k.
+
+Scored 2026-11-27T20:08Z on the lead's floor arm at J = 512 (the background √(‖F‖²/(2J²A)), a symbol's read at an uncharged
+carry, as the floor): G-Z51 held. The floored store charges 635,131 addresses on its own walk (489,184 and 404,438 on the joint
+walks) against 1,892,096 for k = 1 to 8, and past a reset gains +0.020 (scatter 0.019) at the third letter, 0.28 of k = 1 to 8's
++0.072, and +0.013 after it, 0.22 of k = 1 to 8's; over every byte place +0.0018 (scatter 0.0060, halves +0.0048 and −0.0012).
+
+Fixed 2026-11-27T20:10Z (date -u 20:10:57 at drafting), before the J = 4,096 read. Premise read first: the address of length k + 1
+determines the address of length k, so the reads at k = 1 to 8 are a flag, and a fit on the reads themselves trades neighbours;
+on its graded pieces (the read at k less the read at k − 1) the same fit's slopes are the tail sums b_k = Σ_(j ≥ k) a_j (Lean
+OwnCycleCells.flag_slopes_tail_sums). At J = 512 the tail sums of the lead's slopes are 0.71, 1.04, 1.44, 1.72, 1.39, 1.90, 1.00,
+0.28 on the even half and 1.63, 0.78, 1.76, 1.89, 0.17, 1.25, −0.18, −0.32 on the odd half: positive in both at k = 1 to 6.
+
+G-Z53 (0.65). At J = 4,096 the tail sums of the joint fit's a_k are positive on both halves at every k from 1 to 6.
+G-Z54 (0.5). At J = 4,096 the located depth, the deepest k at which that tail sum and every shallower one are positive on both
+  halves, is 7 or 8, deeper than the 6 that J = 512 locates.
+G-Z55 (0.45). A stop weight per address (at each depth's carry a ratio store charged at each meeting by the code of stopping there
+  less the code of the deeper read, leaking, the context tree's own weight), at J = 512, gains at a recurring word's third letter
+  past a reset at least 1.2 times the joint fit's +0.072.
+
+Noted 2026-11-27T20:14Z (date -u 20:14:58 at drafting), before G-Z55's read: the lead's ruler (tools/tree_store_ruler.py, J = 512)
+builds the stop weight as β_k = Re⟨B, χ_k⟩/J, mixes from the deepest read up, M_k = σ(β_k) P_k + (1 − σ(β_k)) M_(k+1), and charges
+B by η (c(M_(k+1)) − c(P_k)) with no leak; G-Z55 is scored on that form, its missing leak named beside the score.
+
+G-Z56 (0.5). In the same ruler, passing the deeper mixture through where the deeper address reads at the field's background
+  (M_k = P_k wherever depth k + 1 reads at √(‖F‖²/J) or under), with the charge unchanged at every depth, gains at least 0.01 nats
+  more at a recurring word's third letter past a reset than the form without it.
+
+Scored 2026-11-27T20:37Z on the lead's stop-weight store at J = 512 (tools/tree_store_ruler.py, tree_store_512.txt; B with no
+leak; both halves chose τ = 4 and g = 0.5, the low edge of each grid, so the grid bounds the fit): G-Z55 missed. Past a reset it
+gains +0.032 (scatter 0.011) at the third letter, 0.44 of the global form's +0.072, +0.034 after it, and −0.029 and −0.017 at the
+first and second letters; over every byte place −0.0060 (0.0045), letters −0.0092, spaces +0.0070, other −0.0042. The cost falls
+on first letters and new words, where the stop weight stands at its prior and half of each address's mass goes to a deeper read
+at the background.
+Read beside it, the word-keyed store at J = 4,096 (the run since the last space, the joint charge, read-power slopes): past a reset
++0.095 (0.003) at the third letter and +0.088 (0.009) after it, 0.42 and 0.30 of the count ceiling's +0.229 and +0.290, with
++0.027 and +0.005 at the second and first; over every byte place +0.0097 (0.0047), letters +0.0103, spaces +0.0047, other +0.0165.
+G-Z49 is scored when the suffix key at 4,096 ends.
+
+Scored 2026-11-27T20:44Z on the lead's pass-through arm at J = 512 (tree_store_512_pass.txt; the plain form's τ = 4, g = 0.5;
+M_k = P_k wherever depth k + 1's largest read stands at or under σ√(2 ln A), σ = √(‖F‖²/(2J²A))): G-Z56 missed. Past a reset it
+gains +0.025 (scatter 0.018) at the third letter against the plain form's +0.032, −0.042 against −0.029 at the first, the same
++0.034 after; over every byte place −0.0092 (0.0058) against −0.0060. Where the deeper address is unmet the shallow face is often
+as flat, so the stop saves nothing and loses what the deeper read held.
+
+Fixed 2026-11-27T20:45Z (date -u 20:45:00 at drafting), before its read. Premise read first: the global form joins the depths as a
+product, p ∝ q · Π_k P_k^(λ_k), where a factor at the background is flat and renormalizes away (Lean flat_factor_normalizes); the
+tree form joins them as a mixture, where a flat component takes its weight's share of the target's mass (Lean
+mixture_with_flat_le), so a mixture pays for every unmet depth and a product pays for none.
+
+G-Z57 (0.45). In the product form at J = 512, an exponent per address added to each depth's slope, λ_k(s) = g_k + a_k ρ_k + β_k(s)
+  with β_k(s) = Re⟨B, χ_k⟩/J and B charged at each place by η (E_p[ℓ_k] − ℓ_k(x)), the exponent's own covector, gains at a
+  recurring word's third letter past a reset at least +0.077, the global form's +0.072 and 0.005 more.
+
+Read 2026-11-27T21:15Z beside G-Z55, a ruler (tree_store_512_grid.txt, the plain stop-weight form on a grid reaching below its
+edge, τ over 1, 2, 4 and g over 0.25, 0.5): both halves took τ = 1, the new low edge, with g = 0.5. Past a reset +0.0040, +0.0074,
++0.020 (scatter 0.000) and +0.017 at the first, second and third letters and after; over every byte place +0.0074 (0.0001). The
+mixture's best is to flatten its faces toward its components' background, which removes the first-letter cost and keeps +0.020
+of the product's +0.072 at the third letter.
+Corrected 21:16Z: G-Z57's charge is written as the loss's derivative, E_p[ℓ_k] − ℓ_k(x); added to β it is its negative,
+η (ℓ_k(x) − E_p[ℓ_k]), the ascent of the joined log-likelihood, which is the lead's build (r_k(y) − E_p[r_k]). The guess is scored
+on that build.
+
+Scored 2026-11-27T21:20Z on the lead's exponent arm at J = 512 (suffix_store_suffix_512_exponent.txt; the global form's F and
+slopes, with β_k = Re⟨B, χ_k⟩/J added to each depth's exponent and B charged at η = 1/4 by r_k(y) − E_p[r_k], so the arm differs
+by B alone): G-Z57 held, by a hair. Past a reset +0.0780 (scatter 0.0017) at the third letter against +0.0720 (0.0027), 0.006 more
+against the 0.005 asked; +0.0636 against +0.0592 after it; +0.020 against +0.024 at the first and +0.029 against +0.030 at the
+second. Over every byte place +0.0128 (0.0043) against +0.0113 (0.0046), +0.0017 and +0.0014 on the two halves.
+
+Scored 2026-11-27T22:51Z on the lead's J = 4,096 reads (k = 1 to 8, the joint charge, read-power slopes): G-Z49 held. The suffix
+key gains +0.0185 over every byte place against the word key's +0.0097, and past a reset +0.1045 at the third letter against
++0.0954 (1.10 of it) and +0.1146 after it against +0.0875; the exponent arm reads +0.0199, +0.111 and +0.120 on the same three.
+G-Z53 missed: the tail sums of a_k are not positive on both halves at every k from 1 to 6. G-Z52 and G-Z54 are not called: the
+depth rides on the linear slopes g_k, about 0.5 to 1.1 through k = 8, so at J = 4,096 the read still pays at the cap of eight.
+
+Fixed 2026-11-27T22:54Z (date -u 22:54:44 at drafting), before the lead's founding build (Fable's review, step 1: units founded on
+the card by October's lap law; acceptance: a lap's foundings held after the next lap, a span cut alike at least 0.9 of the time
+against 0.56 today). Premises read first: the lap law's charge is the choice among the pool and the material's precision
+(contact.charge-falls-with-evidence, contact.lap-founds-reachable); the October merge law charges a pair's choice, 2 log₂ A + 1,
+and the alphabet's growth (hnn.founded-units); a stepped pass took 308 of 495 held units to 55 (review, October 24 to 26).
+
+G-Z58 (0.6). A founding read as Σ over meetings of (c_pieces − c_whole) > log₂|P| + 1, both codes read by the state before each
+  meeting, and a release only where the unit's leaky count times its mean saving falls under its row's share of the store's
+  background, holds at least 0.9 of a lap's foundings after the next lap; one threshold for founding and release, at a lap's
+  fade, holds under 0.8.
+G-Z59 (0.55). On the same lap, the charge log₂|P| + 1 with prequential codes founds at least twice as many units as
+  L·log₂A + log₂|P|, and the founded units' same-cut rate on recurrences stands within 2 points of the heavier charge's.
+
+Fixed 2026-11-28T00:21Z (date -u 00:21:41 at drafting), before the stability read of the lead's second cut form (keys counted back
+from a run's end; at each place the cut reads every suffix of length 1 to 8: an anchor where some unit ends and none may still
+run; none where a suffix is a unit's proper prefix, unless the epoch already spans 8; otherwise the news's anchor). Premises read
+first: the first founding made 1,111 units of lengths 2 to 8, so no unit has length 1 and every symbol that opens a unit marks a
+prefix at depth 1; the first cut form moved epochs from 3.74 to 5.08 places and same-cut from 0.559 to 0.510.
+
+G-Z60 (0.6). The membership form, where any prefix mark suppresses a news anchor, reads epochs of at least 5.5 places on its
+  stability read: a prefix at depth 1 stands at almost every place.
+G-Z61 (0.5). Weighing each start by the boundary that stands before it (her news anchor or a unit's end at that place) and each
+  key by its leaky mass, cut ⇔ Σ_d a(t − d) m_end(s_d) + news(t) ≥ Σ_d a(t − d) m_cont(s_d), keeps epochs under 5 places and
+  reads a same-cut rate on recurrences at least 0.05 above the membership form's.
+
+Scored 2026-11-28T00:56Z on the lead's stability read (W134's end, the 16 held passages at 3,700 places): G-Z60 held, the
+membership form reading 7.95 places an epoch; G-Z61 held, the weighted parses reading 3.81 places an epoch and 0.450 of recurring
+words cut alike against the membership form's 0.346 (+0.104). Beside them her news alone reads 3.77 and 0.576 (0.590 for three
+letters or more), the cut from the last anchor 5.08 and 0.510, so every unit form cuts a recurring word less alike than her news
+alone. The weighted form founded 2,074 units with no length cap (457, 709, 474, 261, 104, 46 and 23 of lengths 2 to 8).
+
+Fixed 2026-11-28T00:57Z (date -u 00:57:16 at drafting), before the read. Premise read first: units founded from her epochs are fragments
+that cross word boundaries ("e th", " of", "ing "), so a candidate inherits one meeting's anchor; a mean over a key's meetings is a
+property of the span's type and reads the same at every meeting.
+
+G-Z62 (0.5). With no units, a cut placed where her mean news after the suffix rises (ν̄(s) a leaky mean of her news at the place
+  after each suffix key, k = 1 to 8, the depths joined by the product of their reads, an unmet key flat) reads at least 0.70 of
+  recurring words cut alike, with an epoch between 3.5 and 5 places.
+G-Z63 (0.5). Units founded by the charge of the founding record's §3 from the runs between those ends are cut whole at at least
+  0.8 of their meetings on the lead's unit_cut_ruler.
+
+Read 2026-11-28T01:05Z beside G-Z61, a ruler (unit_cut_ruler on the weighted form's 2,074 units, the 16 held passages): a unit's
+meetings cut whole, with the units against without, 0.081 against 0.061 at length 2, 0.107 against 0.109 at 3, 0.201 against
+0.167 at 4, 0.194 against 0.181 at 5, 0.222 against 0.249 at 6, 0.381 against 0.413 at 7, 0.170 against 0.281 at 8, 0.107 against
+0.093 over 71,281 meetings. The lead's reading: nearly every suffix is some unit's prefix, so the continuing side gathers a(t − d)
+times its ratio from several depths at about 0.25 each, while a real close has one parse's ending ratio.
+Scored 2026-11-28T01:06Z, the formal thread's own law of §5 of the founding record: it summed the starts as disjoint parses without the
+factor that makes them disjoint, that no boundary stood between a start and t, so each start counted as if it were the last. The
+start's weight is the chance that it is the last boundary, w(d) = a(t − d) Π_(j<d) (1 − a(t − j)).
+
+G-Z64 (0.45, fixed 2026-11-28T01:06Z, date -u 01:06:11). With each start weighed by w(d) and each key read as its ending ratio, the
+  weighted form's units cut whole at no less than the no-unit rate at every length from 2 to 8 on unit_cut_ruler.
