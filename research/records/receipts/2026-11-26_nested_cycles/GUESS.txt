@@ -411,3 +411,15 @@ G-Z58 (0.6). A founding read as Σ over meetings of (c_pieces − c_whole) > log
   fade, holds under 0.8.
 G-Z59 (0.55). On the same lap, the charge log₂|P| + 1 with prequential codes founds at least twice as many units as
   L·log₂A + log₂|P|, and the founded units' same-cut rate on recurrences stands within 2 points of the heavier charge's.
+
+Fixed 2026-11-28T00:21Z (date -u 00:21:41 at drafting), before the stability read of the lead's second cut form (keys counted back
+from a run's end; at each place the cut reads every suffix of length 1 to 8: an anchor where some unit ends and none may still
+run; none where a suffix is a unit's proper prefix, unless the epoch already spans 8; otherwise the news's anchor). Premises read
+first: the first founding made 1,111 units of lengths 2 to 8, so no unit has length 1 and every symbol that opens a unit marks a
+prefix at depth 1; the first cut form moved epochs from 3.74 to 5.08 places and same-cut from 0.559 to 0.510.
+
+G-Z60 (0.6). The membership form, where any prefix mark suppresses a news anchor, reads epochs of at least 5.5 places on its
+  stability read: a prefix at depth 1 stands at almost every place.
+G-Z61 (0.5). Weighing each start by the boundary that stands before it (her news anchor or a unit's end at that place) and each
+  key by its leaky mass, cut ⇔ Σ_d a(t − d) m_end(s_d) + news(t) ≥ Σ_d a(t − d) m_cont(s_d), keeps epochs under 5 places and
+  reads a same-cut rate on recurrences at least 0.05 above the membership form's.

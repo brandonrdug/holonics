@@ -1,7 +1,7 @@
 import Mathlib
 
 /-!
-# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, a nested store's depths are read on the graded pieces of its flag, its depths join by a product, where a flat factor costs nothing, and a founded unit holds by a leaky count whose rate is its own mean
+# A cell of whole periods counts its source's pulses once, a frame's count beats, counts cross a join one for one, a moved site turns the face, a push costs where the face is open, agreement costs its span, a ring is heard over its skin, a chain held two ways costs the cheaper and a bit, holding it whole is a new presentation of one ring, a carried key pairs as a conjunction, a charge is its news, a nested store's depths are read on the graded pieces of its flag, its depths join by a product, where a flat factor costs nothing, a founded unit holds by a leaky count whose rate is its own mean, and where no unit speaks the cut is the news
 
 Atlas: `aeon.own-cycle-cell-counts-once`, `pair.count-crosses-a-join-one-for-one`. Record:
 `research/records/2026-11-26_A_READER_HOLDS_A_STREAM_AS_NESTED_CYCLES_IT_LOCATES_…`.
@@ -71,6 +71,9 @@ finite statements those rows do not.
     `l < 1`, stands still at `m / (1 − l)` and rises toward it from below, so a unit that keeps recurring keeps its evidence and
     one that stops leaves by the leak. The delta step at rate `1/(k + 1)` from the mean of `k` meetings is the mean of `k + 1`:
     a unit's rate cools by its own count, and no fixed-rate step moves what it holds.
+14. **Where no unit speaks, the cut is the news** (`cut_at_background_is_news`). The cut weighs every start `d` by the boundary
+    `a d` before it and its key's masses, ending against continuing, with the news's anchor `ν` weighed by the background `b`.
+    Where every key reads at the background, both sums are equal and the cut stands exactly where the news anchors.
 -/
 
 namespace Holonics.HNN.OwnCycleCells
@@ -288,5 +291,11 @@ theorem cooled_rate_is_mean (S e k : ℝ) (hk : 0 < k) :
   have h1 : k + 1 ≠ 0 := by linarith
   field_simp
   ring
+
+/-- Where every key reads at the background `b`, the cut stands exactly where the news anchors. -/
+theorem cut_at_background_is_news {ι : Type*} (s : Finset ι) (a : ι → ℝ) (b ν : ℝ) (hb : 0 < b) :
+    (∑ d ∈ s, a d * b) < (∑ d ∈ s, a d * b) + b * ν ↔ 0 < ν := by
+  rw [lt_add_iff_pos_right]
+  exact mul_pos_iff_of_pos_left hb
 
 end Holonics.HNN.OwnCycleCells
