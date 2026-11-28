@@ -423,3 +423,31 @@ G-Z60 (0.6). The membership form, where any prefix mark suppresses a news anchor
 G-Z61 (0.5). Weighing each start by the boundary that stands before it (her news anchor or a unit's end at that place) and each
   key by its leaky mass, cut ⇔ Σ_d a(t − d) m_end(s_d) + news(t) ≥ Σ_d a(t − d) m_cont(s_d), keeps epochs under 5 places and
   reads a same-cut rate on recurrences at least 0.05 above the membership form's.
+
+Scored 2026-11-28T00:56Z on the lead's stability read (W134's end, the 16 held passages at 3,700 places): G-Z60 held, the
+membership form reading 7.95 places an epoch; G-Z61 held, the weighted parses reading 3.81 places an epoch and 0.450 of recurring
+words cut alike against the membership form's 0.346 (+0.104). Beside them her news alone reads 3.77 and 0.576 (0.590 for three
+letters or more), the cut from the last anchor 5.08 and 0.510, so every unit form cuts a recurring word less alike than her news
+alone. The weighted form founded 2,074 units with no length cap (457, 709, 474, 261, 104, 46 and 23 of lengths 2 to 8).
+
+Fixed 2026-11-28T00:57Z (date -u 00:57:16 at drafting), before the read. Premise read first: units founded from her epochs are fragments
+that cross word boundaries ("e th", " of", "ing "), so a candidate inherits one meeting's anchor; a mean over a key's meetings is a
+property of the span's type and reads the same at every meeting.
+
+G-Z62 (0.5). With no units, a cut placed where her mean news after the suffix rises (ν̄(s) a leaky mean of her news at the place
+  after each suffix key, k = 1 to 8, the depths joined by the product of their reads, an unmet key flat) reads at least 0.70 of
+  recurring words cut alike, with an epoch between 3.5 and 5 places.
+G-Z63 (0.5). Units founded by the charge of the founding record's §3 from the runs between those ends are cut whole at at least
+  0.8 of their meetings on the lead's unit_cut_ruler.
+
+Read 2026-11-28T01:05Z beside G-Z61, a ruler (unit_cut_ruler on the weighted form's 2,074 units, the 16 held passages): a unit's
+meetings cut whole, with the units against without, 0.081 against 0.061 at length 2, 0.107 against 0.109 at 3, 0.201 against
+0.167 at 4, 0.194 against 0.181 at 5, 0.222 against 0.249 at 6, 0.381 against 0.413 at 7, 0.170 against 0.281 at 8, 0.107 against
+0.093 over 71,281 meetings. The lead's reading: nearly every suffix is some unit's prefix, so the continuing side gathers a(t − d)
+times its ratio from several depths at about 0.25 each, while a real close has one parse's ending ratio.
+Scored 2026-11-28T01:06Z, the formal thread's own law of §5 of the founding record: it summed the starts as disjoint parses without the
+factor that makes them disjoint, that no boundary stood between a start and t, so each start counted as if it were the last. The
+start's weight is the chance that it is the last boundary, w(d) = a(t − d) Π_(j<d) (1 − a(t − j)).
+
+G-Z64 (0.45, fixed 2026-11-28T01:06Z, date -u 01:06:11). With each start weighed by w(d) and each key read as its ending ratio, the
+  weighted form's units cut whole at no less than the no-unit rate at every length from 2 to 8 on unit_cut_ruler.
