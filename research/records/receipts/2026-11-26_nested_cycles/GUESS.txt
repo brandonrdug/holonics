@@ -514,3 +514,21 @@ Fixed 2026-11-28T03:33Z (date -u 03:33:53), before the read.
 G-Z71 (0.5). Entries shared at a residue on two coprime rings, a sum and a count at each residue, read at the ring whose count is
   least, at depths 1 and 2, keep at least 0.85 of the type cut's ends with both primes near 4,096 and at least 0.90 with both near
   8,192.
+
+Scored 2026-11-28T03:38Z on the lead's read of 03:32 to 03:35 UTC, scored blind: G-Z71 held. The residue store at depths 1 and 2
+keeps 0.977 of the type cut's peak ends on the primes 1,021 and 1,019, 0.996 near 4,096 and 0.999 near 8,192, with same-cut near
+0.948 at all three; its read of a run's mean errs 0.25, 0.17 and 0.11 nats rms against the phasor store's 4.5, 2.5 and 1.8. The
+leaky count of (i), read as a ruler, kept 0.66 to 0.85 (best at τ = 64).
+
+Read beside the score (tools/rise_cut_ruler.py, the owner of the type cut): its depths join by their counts,
+ν̂(t) = Σ_k n_k ν̄(s_k) / Σ_k n_k, and every meeting of a run is a meeting of its last octet, so n_1 ≥ n_2 ≥ … ≥ n_8 and the last
+octet's mean weighs most at every place; a deeper run moves ν̂ by its share of the counts, most where it agrees with its parent.
+
+Fixed 2026-11-28T03:38Z (date -u 03:38:18), before the read.
+G-Z72 (0.55). On the type cut's own ruler, the last octet alone (k = 1) keeps at least 0.9 of the peak ends of the type cut at
+  depths 1 and 2, and at least 0.9 of those at depths 1 to 8.
+
+Scored 2026-11-28T03:40Z on the lead's read of 03:41 UTC, read after the guess was fixed: G-Z72 held. Her mean news after the last
+octet alone keeps 0.958 of the type cut's peak ends at depths 1 and 2 and 0.947 of those at depths 1 to 8, and 0.928 and 0.921 of
+its own ends stand in theirs; it cuts 0.951 alike at 3.06 places an epoch (the rise form keeps 0.941 and 0.938). Under the count
+join the cut is nearly a function of the last octet and the next, and depths 1 and 2 stood level with depth 8 by the join.
