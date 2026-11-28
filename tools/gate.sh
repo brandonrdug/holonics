@@ -38,6 +38,7 @@ run lap-check-controls python3 tools/test_lap_check.py
 run lap-cycle-controls python3 tools/test_lap_cycle.py
 run period-panel-controls python3 tools/test_period_panel.py
 run reproduction-controls python3 tools/test_reproduction.py
+run state-families-controls python3 tools/test_state_families.py
 run live-set-controls python3 tools/test_live_set.py
 run measure-controls python3 tools/test_measure.py
 run loudness-table-controls python3 tools/test_loudness_table.py

@@ -250,10 +250,18 @@ impl<'c> Resident<'c> {
         let dm = self.timed(Kind::Alloc, || self.take_zeroed::<i128>((sites * m2).max(1))).map_err(device)?;
         let (mut cp, mut dmp) = (dq.device_ptr(), dm.device_ptr());
         self.launch("field_moment_accumulate", Self::cells((sites * m2) as u64), THREADS, &mut [arg(words), arg(&mut cp), arg(&mut dmp)])?;
-        self.cavity_back(field, words, k, &op.sb, &op.sa, &dm, g, sites)?;
+        // [realization; November 28, the fade's parity] The rings' fades take the cavity's share into `g`, the covector this return is handed, as
+        // every other entry does. The words' own fade pointers (`FieldWords::gfade`, the second fades') stand in the pass's covector, and where the
+        // field reads twice this return runs once into a buffer of its own that the run takes twice (G180, `Resident::batch`): through the words'
+        // pointers the cavity's fade covector entered the pass's covector once and was halved with the two reads' sum, so on W134's state each
+        // ring's fade read about 2.5% under the host's, whose two reads each return the opening's comparison (`Constitution::returned`).
+        let mut fw = *words;
+        fw.gfade = if d.fade { g.device_ptr() + 16 * l.fade as u64 } else { 0 };
+        self.cavity_back(field, &fw, k, &op.sb, &op.sa, &dm, g, sites)?;
         // [the lead, November 25] The second fades' chart on their cavity moments (the host's `opening_compare_return`): `δC′ += Σ_t δx_t s′_tᵀ`,
         // `δs′_t = C′ᵀ δx_t`, returned through the second cavity at the second skins into `g`, the clocks' covectors and the second fades.
-        if let (Some(sc), Some(w2)) = (op.second.as_deref(), self.second_words(words)) {
+        if let (Some(sc), Some(mut w2)) = (op.second.as_deref(), self.second_words(words)) {
+            w2.gfade = g.device_ptr() + 16 * l.twin_fade as u64;
             let (tface, _) = twin_face(field);
             self.outer_biased(&mut cw, g, tface, u64::MAX, dw, m2, dx.device_ptr(), dw, sc.cmoment.device_ptr(), m2, true, true)?;
             let dq2 = zeroed64(sites * m2)?;

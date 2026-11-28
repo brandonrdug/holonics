@@ -1185,7 +1185,11 @@ Commands use Bash; with a fish shell, invoke Bash explicitly. CUDA may need
    `.local/` naming the line's inputs). Reason: the engine's GPU suite does not hold the store
    line's declaration, and on November 14 a change to the deposit's divisor passed parity and the
    first 3 reproduced sections and first differed at section 10
-   ([the receipt](research/records/receipts/2026-11-14_engine-gates/README.md));
+   ([the receipt](research/records/receipts/2026-11-14_engine-gates/README.md)). The parity reads
+   a state carrying every part the line trains (LINE's `TRAINS`, and `PARITY_FROM` where the
+   reproduced lap's state lacks one; `tools/state_families.py` checks it before the card runs).
+   Reason: from November 24 to 28 the line trained the rings' fades while the parity read a state
+   with none, and the card's fade covector stood about 2.5% under the host's on W134's state;
 4. when Lean changes: the library build, `bash tools/lean_check.sh`, on the changed modules and on
    the library they join (`bash tools/lean_check.sh HolonicsResearch` for a research module, so its
    names are read beside the rest; it runs wherever the agent is, rule 4).

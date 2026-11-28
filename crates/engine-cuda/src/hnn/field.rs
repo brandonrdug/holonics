@@ -544,6 +544,88 @@ mod tests {
         }
     }
 
+    /// [definition; November 28, the fade's parity] **The opening compared in a field that reads twice returns the rings' fades on the card as
+    /// the host does** (needs the card; `Declaration::opening`, `mark`, `fade`, `fade_rate`, `twin`): on the targets' parity field with the
+    /// opening compared, the mark (two reads) and the rings' fades, its opening's chart and its moments drawn off zero so that the comparison
+    /// reaches the cavity moments' clocks, alone, with the classes' fade rates beside (the parts of W134's state) and with the rings' second
+    /// fades beside, the card's faces and every covector entry are the host's, on regions with open places and on strands compared with
+    /// targets. Why: the parities before it founded the opening's chart at zero, where the comparison returns nothing to the clocks, and the
+    /// card's cavity fade covector entered the pass's covector once where each of the host's two reads returns it (W134 on November 28: the
+    /// sixteen fades about 2.5% under the host's and every other entry equal).
+    #[test]
+    #[ignore]
+    fn the_opening_compared_in_a_field_that_reads_twice_returns_its_fades_on_the_card() {
+        use holonics_engine::field::Learner;
+        let keys: Vec<u8> = (0..262_144u64).flat_map(|i| (i.wrapping_add(3).wrapping_mul(0x9E37_79B9_7F4A_7C15).rotate_right(holonics_engine::field::FACE_BITS)).to_be_bytes()).collect();
+        let founded = Constitution::found(declaration(32, 4, 32), &keys).unwrap();
+        let carried = Learner::new(founded, 12).with_carry(4, &keys).unwrap();
+        let one = 1i32 << MATERIAL_BITS;
+        let half_a_turn = -(51 * one) / 16;
+        let marked = carried.with_opening().unwrap().with_mark().unwrap().with_fade(2, -one / 2).unwrap();
+        let mut faded = marked.field.clone();
+        let (l, dw, m2) = (faded.layout().clone(), faded.declaration.width, 2 * faded.declaration.complex());
+        // The readout, the moments' chart and the opening's drawn as the second fades' parity draws the first two, and the moments' encodings.
+        let rows = 2 * (faded.declaration.alphabet + 1) * faded.declaration.moment_modes();
+        let moved: Vec<(usize, u32)> = (l.read..l.read + dw * dw).chain(l.out..l.out + dw * m2).chain(l.moment_face..l.moment_face + dw * m2).chain(l.opening..l.opening + dw * dw).map(|i| (i, 14u32)).chain((l.moment_before..l.moment_before + 2 * rows).map(|i| (i, 18u32))).collect();
+        let tail = keys.len() - 4 * moved.len() - 8;
+        for (k, &(i, shift)) in moved.iter().enumerate() {
+            let word = &keys[tail + 4 * k..tail + 4 * k + 4];
+            faded.theta[i] = i32::from_be_bytes([word[0], word[1], word[2], word[3]]) >> shift;
+        }
+        let slots = faded.declaration.turned_slots();
+        for (k, v) in faded.theta[l.fade..l.fade + slots].iter_mut().enumerate() {
+            *v += [-one / 4, one / 8, -3 * one / 8, one / 4, -one / 2][k % 5];
+        }
+        faded.refresh_fade().unwrap();
+        let (mut rated, _) = faded.with_fade_rate().unwrap();
+        let (rl, rates) = (rated.layout().clone(), rated.declaration.paced_heads() * (rated.declaration.alphabet + 1));
+        for (k, v) in rated.theta[rl.fade_rate..rl.fade_rate + rates].iter_mut().enumerate() {
+            *v = [-one / 4, one / 8, -3 * one / 8, one / 4, -one / 2][k % 5];
+        }
+        let (mut twinned, _) = faded.with_twin(half_a_turn).unwrap();
+        let tl = twinned.layout().clone();
+        for k in 0..dw * m2 {
+            twinned.theta[tl.twin_face + k] = twinned.theta[tl.moment_face + k] / 2;
+        }
+        for (k, v) in twinned.theta[tl.twin_fade..tl.twin_fade + slots].iter_mut().enumerate() {
+            *v += [one / 8, -one / 4, one / 4, -3 * one / 8, one / 2][k % 5];
+        }
+        twinned.refresh_fade().unwrap();
+        let lengths = [2usize, 3, 7, 64, 300];
+        let passages: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 53 + 5 + 17 * k) % 120).collect()).collect();
+        let targets: Vec<Vec<usize>> = lengths.iter().enumerate().map(|(k, &n)| (0..n).map(|t| (t * 29 + 7 + 13 * k) % 120).collect()).collect();
+        let known: Vec<Vec<bool>> = lengths.iter().map(|&n| vec![false; n]).collect();
+        let open: Vec<Vec<bool>> = lengths.iter().map(|&n| (0..n).map(|t| t % 3 == 1).collect()).collect();
+        let strands: Vec<Region> = (0..lengths.len()).map(|k| Region { classes: &passages[k], unresolved: &known[k], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: true, past: k % 2 == 1, second: false, targets: Some(&targets[k]), stretches: None }).collect();
+        let regions: Vec<Region> = (0..lengths.len()).map(|k| Region { classes: &passages[k], unresolved: &open[k], faces: &[], locked: &[], echo: &[], domain: None, port: None, before: false, strand: false, past: false, second: false, targets: None, stretches: None }).collect();
+        let card = Card::open(0).expect("a CUDA card with the field's kernels built");
+        let mut card_field = Resident::open(&card).unwrap();
+        for (case, field) in [("faded", &faded), ("faded, rated", &rated), ("faded, twinned", &twinned)] {
+            let fl = field.layout().clone();
+            let named = |i: usize| -> String {
+                if field.declaration.twin && i >= fl.twin_fade && i < fl.twin_fade + slots {
+                    format!("second fade {}", i - fl.twin_fade)
+                } else if i >= fl.fade && i < fl.fade + slots {
+                    format!("fade {}", i - fl.fade)
+                } else {
+                    format!("entry {i}")
+                }
+            };
+            for (which, batch) in [("regions", &regions), ("strands", &strands)] {
+                let (host_faces, host_g) = field.read_and_return(batch).unwrap();
+                let (card_faces, card_g) = card_field.read_and_return(field, batch).unwrap();
+                assert_eq!(host_faces, card_faces, "{case}, {which}: every face");
+                let unequal: Vec<usize> = (0..host_g.len().max(card_g.len())).filter(|&i| host_g.get(i) != card_g.get(i)).collect();
+                let fades: Vec<(i128, i128)> = (fl.fade..fl.fade + slots).map(|i| (host_g[i], card_g[i])).collect();
+                let opening = (fl.opening..fl.opening + dw * dw).filter(|&i| host_g[i] != 0).count();
+                println!("FADES_TWICE_PARITY {case} {which} unequal={} first={:?} opening_nonzero={opening} fades={:?}", unequal.len(), unequal.first().map(|&i| (named(i), host_g[i], card_g[i])), &fades[..fades.len().min(4)]);
+                assert!(fades.iter().any(|&(h, _)| h != 0), "{case}, {which}: the fades take a covector");
+                assert!(which != "regions" || opening > 0, "{case}, {which}: the opening's chart takes a covector");
+                assert_eq!(unequal.len(), 0, "{case}, {which}: every covector entry");
+            }
+        }
+    }
+
     /// [definition; the lead, November 25, Fable's construction] **A passage read as its consecutive stretches on the card reads the host's
     /// bits** (needs the card; `Region::stretches`): on the targets' parity field with its moments drawn, and on it with the opening and the
     /// mark, strands compared with targets and read as two to four stretches give the host's faces and every covector entry, and differ

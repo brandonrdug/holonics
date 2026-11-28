@@ -248,7 +248,10 @@ they did not mean to change.
 | `restore-store` | `train` | a saved state read in a fresh process and written back, its bytes compared with the file's; it writes nothing | `STORE_RESTORE` |
 
 Gate 3 for the engine is `bash tools/gate_engine.sh LINE BIN OUT`: parity on 3 of the line's sections, 24 sections
-reproduced, and the lap's read byte for byte (CLAUDE.md, the gates).
+reproduced, and the lap's read byte for byte (CLAUDE.md, the gates). The parity reads a state that carries every part of the state the
+line trains (`TRAINS`; `PARITY_FROM` with its store and codec where the reproduced lap's state lacks a part), which
+`tools/state_families.py` checks from the two states' head lines before the card runs (November 28: the parity had read a state with
+no fade for the four days the line trained them).
 
 **The commands that write a state.** Each writes a new state and leaves its source as it was.
 
