@@ -219,6 +219,11 @@ impl Units {
         (den > 0).then_some((num, den))
     }
 
+    /// Whether the rise store holds any meeting.
+    pub fn charged(&self) -> bool {
+        self.meetings.iter().any(|r| r[0].iter().any(|&m| m != 0))
+    }
+
     /// [definition] **The rise cut** ([module](self)): an end at `t + 1` where `ν̂` rises at `t` and does not rise at `t + 1` (a peak),
     /// with the first place's anchor; `None` where the store holds no meeting. Increasing, the first `0`.
     pub fn rise_anchors(&self, classes: &[usize], alphabet: usize) -> Option<Vec<usize>> {
@@ -248,6 +253,46 @@ impl Units {
         self.rise_anchors(classes, alphabet).unwrap_or_else(|| anchors.to_vec())
     }
 
+    /// [definition; the formal thread, November 28 10:58 UTC] **The rise store's table for the expected peak**: for each previous class
+    /// `a` (and a last row, index `A`, for no previous class) and each next class `x`, her mean news after the run `x` and the run `a x`
+    /// joined by their counts, `(S₁(x) + S₂(a x)) / (N₁(x) + N₂(a x))` released once at her code's grain (`2^(−20)` bits), each depth
+    /// read at its least-counted ring; `−1` where neither run was met. `[(A + 1) A]`, row-major by the previous class.
+    pub fn rise_table(&self, alphabet: usize) -> Vec<i64> {
+        let mut out = vec![-1i64; (alphabet + 1) * alphabet];
+        for prev in 0..=alphabet {
+            for x in 0..alphabet {
+                let row: Vec<usize> = if prev < alphabet { vec![prev, x] } else { vec![x] };
+                if let Some((num, den)) = self.rise_read(&row, row.len() - 1, alphabet) {
+                    out[prev * alphabet + x] = div_nearest(num, den) as i64;
+                }
+            }
+        }
+        out
+    }
+
+    /// [definition; the formal thread, November 28 10:58 UTC (G-Z77 held at 11:30 UTC); the strand's open-news law of November 18] **The
+    /// peak named in time**: an end at `t + 1` where `ν̂` rises at `t` and the rise is not expected to continue under her face at `t + 1`,
+    /// `E_(p_(t+1)) ν̂(t + 1 | x) ≤ ν̂(t)`, so the end is named from `x_(≤t)` and her face before `x_(t+1)` arrives. `expect[t]` is that
+    /// expectation at the face of place `t` as its pair `(Σ_x m_t(x) V(x_(t−1), x), Σ_x m_t(x))` over the `x` the table has met
+    /// ([`Units::rise_table`]); a place whose pair has no mass names no end. `None` where the store holds no meeting.
+    pub fn expected_anchors(&self, classes: &[usize], alphabet: usize, expect: &[(i128, i128)]) -> Option<Vec<usize>> {
+        if self.meetings.iter().all(|r| r[0].iter().all(|&m| m == 0)) || expect.len() != classes.len() {
+            return None;
+        }
+        let n = classes.len();
+        let nu: Vec<Option<(i128, i128)>> = (0..n).map(|t| self.rise_read(classes, t, alphabet)).collect();
+        let mut out = vec![0usize];
+        for t in 1..n.saturating_sub(1) {
+            let rises = matches!((nu[t], nu[t - 1]), (Some((a, b)), Some((c, d))) if a * d > c * b);
+            let (Some((a, b)), (e, m)) = (nu[t], expect[t + 1]) else { continue };
+            // the expectation e/m against ν̂(t) = a/b, both on her code's grain, as pairs
+            if rises && m > 0 && e * b <= a * m {
+                out.push(t + 1);
+            }
+        }
+        Some(out)
+    }
+
     /// [definition; the formal thread, November 28 08:46 UTC; `agent-inferred` in its realization] **The cut as the level reads it**:
     /// where the rise store holds meetings and the region is read with both sides of each place (`before` false: a region the trainer
     /// owns, or a cavity), each peak's end `a` stands at `a + 1`, so a site at `t` reads only the ends that `x_(<t)` names and stands in
@@ -256,7 +301,12 @@ impl Units {
     /// at `a` reads the class at `a` (a rise at `a − 1` with none at `a`), so a site read at the peaks' own places reads a phase its own
     /// symbol placed; the store's lap W135r coded the held cavity 0.0235 nats a place under its control and her forward code 0.0085 over
     /// it, most at an epoch's first place (+0.048; the record of November 28 §10).
-    pub fn read_anchors(&self, anchors: &[usize], classes: &[usize], alphabet: usize, before: bool) -> Vec<usize> {
+    /// Where `expect` is given (her face's expectation at every place, [`Units::expected_anchors`]), the store's ends are the peaks named
+    /// in time, read as they stand on both sides and on one.
+    pub fn read_anchors(&self, anchors: &[usize], classes: &[usize], alphabet: usize, before: bool, expect: Option<&[(i128, i128)]>) -> Vec<usize> {
+        if let Some(e) = expect.and_then(|e| self.expected_anchors(classes, alphabet, e)) {
+            return e;
+        }
         let n = classes.len();
         match self.rise_anchors(classes, alphabet) {
             Some(peaks) if !before => {
@@ -490,8 +540,20 @@ mod founded_unit_tests {
         u.charge_rise(&[(&row, &codes)], alphabet, 0).unwrap();
         assert_eq!(u.rise_anchors(&[0, 1, 2, 0, 1, 2, 0, 1, 2], alphabet), Some(vec![0, 3, 6]));
         assert_eq!(u.anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet), vec![0, 2, 5], "its peaks are the cut");
-        assert_eq!(u.read_anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, false), vec![0, 3, 6], "read with both sides, a place late");
-        assert_eq!(u.read_anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, true), vec![0, 2, 5], "a one-sided stream keeps the peaks");
+        assert_eq!(u.read_anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, false, None), vec![0, 3, 6], "read with both sides, a place late");
+        assert_eq!(u.read_anchors(&[0, 4], &[1, 2, 0, 1, 2, 0, 1], alphabet, true, None), vec![0, 2, 5], "a one-sided stream keeps the peaks");
+        // the peak named in time: a face that expects a `0` after every `2` (the low news there) names the end after each `2` before it
+        // arrives; a face that expects a `2` after a `1` (the high news after it) names none after the `1`
+        let table = u.rise_table(alphabet);
+        let classes = [1usize, 2, 0, 1, 2, 0, 1];
+        let expect: Vec<(i128, i128)> = (0..classes.len())
+            .map(|t| if t == 0 { (0, 0) } else {
+                let x = match classes[t - 1] { 2 => 0, 1 => 2, _ => 1 };
+                (table[classes[t - 1] * alphabet + x] as i128, 1)
+            })
+            .collect();
+        assert_eq!(u.expected_anchors(&classes, alphabet, &expect), Some(vec![0, 2, 5]));
+        assert_eq!(u.read_anchors(&[0, 4], &classes, alphabet, false, Some(&expect)), vec![0, 2, 5], "named in time, read as it stands");
         let text = u.to_text();
         assert_eq!(Units::from_lines(&mut text.lines()).unwrap(), u);
         // a leak common to the sums and the counts keeps the mean, and so the cut

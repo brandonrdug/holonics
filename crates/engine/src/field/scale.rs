@@ -373,16 +373,43 @@ pub fn level_cut_sided(news: &[i64], section: i64, harmonics: usize, pi: i128, b
     level_cut_units(news, None, section, harmonics, pi, before)
 }
 
+/// The level's unit store as a region's cut reads it: the store, the region's classes, the alphabet, and her face's expectation of the
+/// store's mean news after each place's next symbol ([`rise_expect`]), where formed.
+pub type LevelUnits<'a> = (&'a super::units::Units, &'a [usize], usize, Option<&'a [(i128, i128)]>);
+
+/// [definition; the formal thread, November 28 10:58 UTC] **Her face's expectation of the rise store's mean news after the next
+/// symbol**, at every place `t` of a stream: `(Σ_x m_t(x) V(x_(t−1), x), Σ_x m_t(x))` over the next classes `x` the store's table has
+/// met (`V ≥ 0`, [`super::units::Units::rise_table`]), `m_t` the masses of her face at `t`, the previous class the table's last row at
+/// a stream's first place or where it lies outside the alphabet. Integer sums, so any order of the classes gives the same bits.
+pub fn rise_expect(table: &[i64], alphabet: usize, classes: &[usize], faces: &[TowerFace]) -> Vec<(i128, i128)> {
+    faces
+        .iter()
+        .enumerate()
+        .map(|(t, f)| {
+            let prev = if t > 0 && classes[t - 1] < alphabet { classes[t - 1] } else { alphabet };
+            let row = &table[prev * alphabet..(prev + 1) * alphabet];
+            let (mut num, mut den) = (0i128, 0i128);
+            for (x, &v) in row.iter().enumerate() {
+                if v >= 0 {
+                    num += f.masses[x] as i128 * v as i128;
+                    den += f.masses[x] as i128;
+                }
+            }
+            (num, den)
+        })
+        .collect()
+}
+
 /// [definition; the lead, November 27, the review's build step 1] [`level_cut_sided`] with the level's founded units
 /// ([`super::units::Units::anchors`]): where a run of `classes` is a founded unit it is held whole, closed at its end, read from the places
 /// before each anchor. `units` names the store, the region's classes and the alphabet.
-pub fn level_cut_units(news: &[i64], units: Option<(&super::units::Units, &[usize], usize)>, section: i64, harmonics: usize, pi: i128, before: bool) -> Result<LevelCut> {
+pub fn level_cut_units(news: &[i64], units: Option<LevelUnits>, section: i64, harmonics: usize, pi: i128, before: bool) -> Result<LevelCut> {
     if section <= 0 || harmonics == 0 {
         return refuse("a level's cut needs a positive section and a harmonic");
     }
     let anchors = if before { level_anchors_before(news, section) } else { level_anchors(news, section) };
     let anchors = match units {
-        Some((u, classes, alphabet)) if classes.len() == news.len() => u.read_anchors(&anchors, classes, alphabet, before),
+        Some((u, classes, alphabet, expect)) if classes.len() == news.len() => u.read_anchors(&anchors, classes, alphabet, before, expect.filter(|e| e.len() == classes.len())),
         Some(_) => return refuse("a level's founded units read over classes that are not the news's places"),
         None => anchors,
     };
@@ -429,7 +456,7 @@ pub fn strand_level_cut(known_news: &[i64], open_news: &[i64], section: i64, har
 }
 
 /// [`strand_level_cut`] with the level's founded units ([`level_cut_units`]) over the known stream's classes.
-pub fn strand_level_cut_units(known_news: &[i64], open_news: &[i64], units: Option<(&super::units::Units, &[usize], usize)>, section: i64, harmonics: usize, pi: i128) -> Result<StrandCut> {
+pub fn strand_level_cut_units(known_news: &[i64], open_news: &[i64], units: Option<LevelUnits>, section: i64, harmonics: usize, pi: i128) -> Result<StrandCut> {
     let n = known_news.len();
     if open_news.len() != n {
         return refuse("a strand's cut needs each place's news and its expected news");
@@ -776,6 +803,18 @@ impl Constitution {
             .collect()
     }
 
+    /// [definition; the formal thread, November 28 10:58 UTC] **Her face's expectation of the rise store's mean news at every place of a
+    /// region** ([`rise_expect`] on the opening's faces, the faces [`Constitution::level_news`] reads): `None` where the level holds no
+    /// charged rise store, so a field without one reads as before.
+    pub fn level_rise_expect(&self, region: &Region) -> Result<Option<Vec<(i128, i128)>>> {
+        let alphabet = self.declaration.alphabet;
+        let Some(u) = self.scale.as_deref().and_then(|s| s.units.as_ref()).filter(|u| u.charged()) else { return Ok(None) };
+        let faces = self.opening_faces(region)?;
+        // an open place's class is its comparison's target and is never read: outside the alphabet here
+        let written: Vec<usize> = (0..region.classes.len()).map(|t| if Self::definite(region, t) { region.classes[t] } else { alphabet }).collect();
+        Ok(Some(rise_expect(&u.rise_table(alphabet), alphabet, &written, &faces)))
+    }
+
     /// [definition; theory, November 13, the design record §4.9] **Growth in scale**: this field with a level of `harmonics` after `split`
     /// of its ticks, the level's field founded on its own `declaration` from the key stream at `offset`, the restriction's `A` drawn after
     /// it on `±√(3/(H D₀))`, and `b_A`, `B`, `b_B` at zero, so every face reads as before. The level reads the opening's news, so the field
@@ -880,13 +919,17 @@ impl Constitution {
     }
 
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool, classes: &[usize], unresolved: &[bool]) -> Result<ScalePass> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn scale_forward(&self, s: &Scale, x: &mut [i64], news: &[i64], definite: &[bool], keyed: &[bool], keep: bool, classes: &[usize], unresolved: &[bool], expect: Option<&[(i128, i128)]>) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let sites = definite.len();
         // [measurement] A ruler's forward ([`Constitution::ruler_level`]): at `4` the cut a one-sided stream can name, the level's ticks
         // one-sided and every place reading the epoch before its own; at `1` to `3` the prolongation's source alone changes.
         let rl = self.ruler_level;
-        let cut = level_cut_units(news, s.units.as_ref().map(|u| (u, classes, self.declaration.alphabet)), level_section(self.declaration.alphabet), h, self.pi, rl == 4)?;
+        // the store's cut reads the written classes alone: an open place's class is its comparison's target, read as outside the alphabet
+        let alphabet = self.declaration.alphabet;
+        let written: Vec<usize> = classes.iter().zip(definite).map(|(&c, &d)| if d { c } else { alphabet }).collect();
+        let cut = level_cut_units(news, s.units.as_ref().map(|u| (u, written.as_slice(), alphabet, expect)), level_section(alphabet), h, self.pi, rl == 4)?;
         let epochs = cut.anchors.len();
         let (a, ab, b, bb, _) = glue_layout(h, d0, d1);
         let g = &s.glue;
@@ -1033,12 +1076,13 @@ impl Constitution {
     /// frontier arrives through the known places' states, and two thirds of the whole survives every place reading the epoch before
     /// its own, before any training in that relation (`read-far`'s `21` and `22` on the line's state of November 18).
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn scale_forward_before(&self, s: &Scale, x: &mut [i64], n: usize, known_news: &[i64], open_news: &[i64], past: bool, keep: bool, targets: &[usize]) -> Result<ScalePass> {
+    #[allow(clippy::too_many_arguments)]
+    pub(crate) fn scale_forward_before(&self, s: &Scale, x: &mut [i64], n: usize, known_news: &[i64], open_news: &[i64], past: bool, keep: bool, targets: &[usize], expect: Option<&[(i128, i128)]>) -> Result<ScalePass> {
         let (d0, d1, h) = (self.declaration.width, s.coarse.declaration.width, s.harmonics);
         let Some((b2, bb2, _)) = s.before_offsets(d0) else {
             return refuse("a strand's level on a tower without its one-sided block");
         };
-        let StrandCut { cut, open_harmonics, source } = strand_level_cut_units(known_news, open_news, s.units.as_ref().map(|u| (u, &targets[..n.min(targets.len())], self.declaration.alphabet)), level_section(self.declaration.alphabet), h, self.pi)?;
+        let StrandCut { cut, open_harmonics, source } = strand_level_cut_units(known_news, open_news, s.units.as_ref().map(|u| (u, &targets[..n.min(targets.len())], self.declaration.alphabet, expect.map(|e| &e[..n.min(e.len())]))), level_section(self.declaration.alphabet), h, self.pi)?;
         let epochs = cut.anchors.len();
         let (a, ab, _, _, _) = glue_layout(h, d0, d1);
         let g = &s.glue;
@@ -1111,7 +1155,8 @@ impl Constitution {
 
     /// The news a strand's level reads ([`Constitution::scale_forward_before`]) from its places' retarded cavity openings `open_x`
     /// (`[n][D₀]`): at each place the code of its symbol at the opening's face, and that face's expected code (an open place's news).
-    pub(crate) fn strand_news(&self, classes: &[usize], open_x: &[i64]) -> Result<(Vec<i64>, Vec<i64>)> {
+    #[allow(clippy::type_complexity)]
+    pub(crate) fn strand_news(&self, classes: &[usize], open_x: &[i64]) -> Result<(Vec<i64>, Vec<i64>, Option<Vec<(i128, i128)>>)> {
         if !self.declaration.opening {
             return refuse("a strand's level on a field without the opening's block");
         }
@@ -1119,13 +1164,21 @@ impl Constitution {
         let l = &self.layout;
         let reach_o = reach(&self.theta[l.opening..l.opening + dw * dw]);
         let (mut known, mut open) = (Vec::with_capacity(classes.len()), Vec::with_capacity(classes.len()));
+        let units = self.scale.as_deref().and_then(|s| s.units.as_ref()).filter(|u| u.charged());
+        let mut faces = Vec::new();
         for (t, xt) in open_x.chunks_exact(dw).enumerate() {
             let f = self.opening_read(xt, reach_o)?.face;
             known.push(f.code(classes[t]));
             let sum: i128 = f.masses.iter().map(|&m| m as i128 * face_code(m, f.total) as i128).sum();
             open.push(fit64(div_nearest(sum, f.total as i128))?);
+            if units.is_some() {
+                faces.push(f);
+            }
         }
-        Ok((known, open))
+        // [the formal thread, November 28 10:58 UTC] her retarded face's expectation of the rise store's mean news, where it is charged
+        let alphabet = self.declaration.alphabet;
+        let expect = units.map(|u| rise_expect(&u.rise_table(alphabet), alphabet, &classes[..faces.len()], &faces));
+        Ok((known, open, expect))
     }
 
     /// The reverse of [`Constitution::scale_forward_before`]: `dx`, the covector of the `2n` sites' states after the prolongation, is

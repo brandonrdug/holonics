@@ -1890,6 +1890,23 @@ impl<'c> Resident<'c> {
             }
             _ => (None, None),
         };
+        // [the formal thread, November 28 10:58 UTC] Her face's expectation of the level's rise store's mean news at every place, where the
+        // store is charged (`field_level_rise_expect`, the host's `rise_expect`), read to the host, which names the store's ends in time.
+        let charged = field.scale.as_deref().and_then(|s| s.units.as_ref()).filter(|u| u.charged());
+        let expect: Option<Vec<(i128, i128)>> = match (opening.as_ref(), charged) {
+            (Some(op), Some(u)) if news.is_some() => {
+                let table = u.rise_table(field.declaration.alphabet);
+                let tb = self.timed(Kind::Copy, || card.upload(&table)).map_err(device)?;
+                let num = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+                let den = self.timed(Kind::Alloc, || self.take::<i128>(sites.max(1))).map_err(device)?;
+                let (mut mp, mut tp, mut np, mut dp) = (op.masses.device_ptr(), tb.device_ptr(), num.device_ptr(), den.device_ptr());
+                self.launch("field_level_rise_expect", Self::warps(sites as u64), THREADS, &mut [arg(words), arg(&mut mp), arg(&mut tp), arg(&mut np), arg(&mut dp)])?;
+                let n = self.timed(Kind::Copy, || card.fetch_range(&num, 0, sites)).map_err(device)?;
+                let d = self.timed(Kind::Copy, || card.fetch_range(&den, 0, sites)).map_err(device)?;
+                Some(n.into_iter().zip(d).collect())
+            }
+            _ => None,
+        };
         // The opening's forward ends here where no read compares it (a strand batch keeps the cavity's part of it for its reverse or its ticks).
         let opening = match opening {
             Some(op) if !compared && strand => {
@@ -1900,7 +1917,7 @@ impl<'c> Resident<'c> {
             other => other.filter(|_| compared),
         };
         let tb = match tower {
-            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?, open_news.as_deref())?),
+            Some(tr) => Some(self.tower_batch(field, tr, &st, regions.len(), news.as_deref().ok_or(TowerError::Refused("a level without the opening's news"))?, open_news.as_deref(), expect.as_deref())?),
             None => None,
         };
         self.mark("batch_base");

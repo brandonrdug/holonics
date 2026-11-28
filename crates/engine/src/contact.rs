@@ -1308,6 +1308,8 @@ impl Constitution {
         let keyed: Vec<bool> = (0..region.classes.len()).map(|t| !region.unresolved[t] || Self::carried(region, t).is_some()).collect();
         // [theory, November 13, the design record §4.9] The level reads the opening's news, formed before any tick.
         let news = if levelled { self.level_news(region)? } else { Vec::new() };
+        // [the formal thread, November 28 10:58 UTC] her face's expectation of the rise store's mean news, where it is charged
+        let expect = if levelled { self.level_rise_expect(region)? } else { None };
         let mut out = Forward::default();
         let sites = region.classes.len();
         let mut trips = vec![0u128; sites];
@@ -1325,7 +1327,7 @@ impl Constitution {
         let mut locks: Vec<Vec<(u32, i64)>> = Vec::new();
         for k in 0..d.ticks {
             if let Some(s) = self.scale.as_deref().filter(|s| s.split == k && levelled) {
-                out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep, region.classes, region.unresolved)?);
+                out.tower = Some(self.scale_forward(s, &mut x, &news, &definite, &keyed, keep, region.classes, region.unresolved, expect.as_deref())?);
             }
             let own = clock.take();
             let (tick_paces, tick_moment) = own.as_ref().map_or((&paces, &moment), |c| (&c.paces, &c.moment));
@@ -2023,16 +2025,16 @@ impl Constitution {
         };
         for k in 0..d.ticks {
             hold(&mut x);
-            if let (Some(s), Some((known_news, open_news))) = (level.filter(|s| s.split == k), news.as_ref()) {
+            if let (Some(s), Some((known_news, open_news, expect))) = (level.filter(|s| s.split == k), news.as_ref()) {
                 match self.ruler_cut.filter(|&(_, mask)| mask & CUT_LEVEL == 0) {
-                    None => out.tower = Some(self.scale_forward_before(s, &mut x, n, known_news, open_news, past, keep, classes)?),
+                    None => out.tower = Some(self.scale_forward_before(s, &mut x, n, known_news, open_news, past, keep, classes, expect.as_deref())?),
                     // [measurement] Past a ruler's cut the level is the one the region that begins there hears: its epochs anchored from the
                     // cut, none of them handed an epoch that ended before it. The places before the cut hear theirs as they did (an epoch
                     // is handed only to places past its end).
                     Some((c, _)) => {
                         for (lo, hi) in [(0, c), (c, n)] {
                             let mut part: Vec<i64> = x[lo * dw..hi * dw].iter().chain(&x[(n + lo) * dw..(n + hi) * dw]).copied().collect();
-                            self.scale_forward_before(s, &mut part, hi - lo, &known_news[lo..hi], &open_news[lo..hi], past, false, &classes[lo..hi])?;
+                            self.scale_forward_before(s, &mut part, hi - lo, &known_news[lo..hi], &open_news[lo..hi], past, false, &classes[lo..hi], expect.as_deref().map(|e| &e[lo..hi]))?;
                             let len = (hi - lo) * dw;
                             x[lo * dw..hi * dw].copy_from_slice(&part[..len]);
                             x[(n + lo) * dw..(n + hi) * dw].copy_from_slice(&part[len..]);
