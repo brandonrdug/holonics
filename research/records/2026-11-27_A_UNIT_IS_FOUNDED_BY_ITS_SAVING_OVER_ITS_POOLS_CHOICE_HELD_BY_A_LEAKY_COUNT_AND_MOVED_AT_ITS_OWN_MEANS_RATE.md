@@ -1,6 +1,6 @@
 # A unit is founded by its saving over its pool's choice, held by a leaky count, and moved at its own mean's rate
 
-[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z72 fixed before their reads;
+[interpretation at weight 0.65, with four finite statements in Lean and the guesses G-Z58 to G-Z73 fixed before their reads;
 the formal thread, November 27, on the lead's question of 22:51 UTC] Status: the description charge and the store's upkeep for
 the first step of Fable's whole-project review (units founded on the card by October's lap law), written as one composition, with
 what it predicts for the lead's build.
@@ -219,11 +219,30 @@ parent's read, a new run starting where its shorter suffix stands. The store's o
 her news within a run over the spread of the children's means, a third sum at each residue with the same leak (Bühlmann's
 credibility, 1967). It enters as its own arm after the residue store.
 
-## 8. Owners
+## 8. A cut is read as the writer can name it (the lead's forward read, 08:50 UTC)
+
+On the store's lap the held cavity read her text 0.0235 nats a place cheaper than the control's, and her forward code on 100 held
+cut rows (19,200 places) read 1.0931 against the control's 1.0846, worse at every octave of age past the cut and most at age 1
+(+0.048), the worth of the past about equal on both.
+
+**The composition (0.8 on the take, 0.7 on the cause).** A section is crossed in the stream's order, so a line whose product is its
+writes is taken on the code its writer draws from, `Σ_t −log p(x_t | x_<t)`; the atlas measured the regime on November 21
+(`release.writer-regime`: what the field founds where its sites hear both sides is not what it writes where they hear only the
+past). The cavity is a ruler of what the state holds, and two arms compare on it only where neither arm's input at a coded place is
+a function of that place. The store's cut is: an anchor stands at `t` where the rise at `t − 1` has no rise at `t`, and the rise at
+`t` reads her mean news after the run ending at `x_t` (`Units::rise_anchors`), while a region's training cut is drawn over its own
+classes on both sides (`level_cut_units` with `before` false on the card), so a site at `t` reads a phase its own symbol placed.
+The cavity credits that as code; the writer cannot name it, and the place that opens an epoch pays most. The repair is the strand's
+law of November 18 read at the store's anchors: an open site at `t` reads only the anchors `x_<t` names and stands in the epoch of
+the place before it, as `level_anchors_before` gives her news. It enters as one change, the same cut and the same units with only
+their reading made causal; the rise form, which decides an end from `x_≤t` alone, changes the cut, the epochs and the units, and is
+an arm of its own. G-Z73 reads the one-sided peak.
+
+## 9. Owners
 
 - Lean: `HolonicsResearch/HNN/OwnCycleCells.lean`, `leaky_count_fixed`, `leaky_count_rises_below_fixed`,
   `cooled_rate_is_mean` and `cut_at_background_is_news` (checked); §6 composes `cooled_rate_is_mean` and `flat_factor_normalizes`
   and adds no statement; §7 composes `cooled_rate_is_mean` and adds none.
 - Atlas: `tower.chain-becomes-a-part-held-beside-its-pieces` (objects).
-- Guesses: G-Z58 to G-Z72.
+- Guesses: G-Z58 to G-Z73.
 - The engine: the founding build is the lead's; this record changes no code.
