@@ -183,3 +183,47 @@ had run at eight: the read stood past it at 02:46 to 03:11 UTC and was stopped b
 570 s against 600 projected, with a peak resident set of 10.0 GiB. At 04:04 UTC the build of this section was copied over the run
 directory `widths/e5r2`, which held the binary of November 23's receipt laps (W101r to W103); no run read it, and it is rebuilt from
 that day's commit `b170f4215` where a later read needs it.
+
+## 10. The first lap with the rise store
+
+W135r (W134r: W134's end, its rise store charged at the first crossing and 2,278 units founded between its ends) beside W135p (W134's
+end), 3,000 sections each on `e5rs` after its gate 3, read at their lap means (the last 1,000 sections of each); then the second crossing
+on W135r's end from 2,000 rows of the same slices that the first never read (seed 28), the lap's fade of 368 thousandths
+([`arm_W135r.txt`](receipts/2026-11-27_founded_units/arm_W135r.txt), [`found_x2.log`](receipts/2026-11-27_founded_units/found_x2.log)).
+W135r trained in 3,533 s and W135p in 3,546 s against W134's 3,662 s; the store's cut is a lookup a place on the host.
+
+Her writes first (the panels' counts; the writes themselves are shown in the conversation and stay out of the tree where their prompts
+are private): the long panel's 20 prompts wrote 275 words, 68% in the register's lexicon, 3 of 20 writes looping, on W135r, against 280,
+72% and 3 on W135p; the wide panel's 160 draws 2,152 words, 70%, 19 looping, against 2,153, 69%, 17; the theory panel's logic prompts
+87% in lexicon against 90% and its theory prompts 80% against 80%, none looping on either. The writes are not readable on either arm:
+the store did not change what she writes in a way the counts or a reading see.
+
+Her code on the joined store's held set, one place open, paired (200,933 text places): W135r less W135p is −0.0235 (±0.0008) nats a
+place, lower in every slice (theory −0.0111, logic −0.0128, code −0.0131, web −0.0220, science −0.0260, wikidata −0.0259, acts −0.0267,
+harness −0.0317, dialogue −0.0326, books −0.0329), and +0.0002 on the wave's 20,028 places. The loudness beside it: the code region
+0.3846 nats a place at 22.43 octaves against 0.3977 at 22.48, web 0.7128 at 22.58 against 0.7348 at 22.65, the lanes' color 1.864
+against 1.860 in both, so the arm's places are quieter, a little whiter and cheaper together
+([`loud_W135r.table`](receipts/2026-11-27_founded_units/loud_W135r.table), [`loud_W135p.table`](receipts/2026-11-27_founded_units/loud_W135p.table)).
+The answer digits of the terrain rows code 0.741 nats a place for a sum on W135r against 0.761, 0.032 for a copy against 0.048 and 0.029
+for a reversal against 0.021.
+
+Her cut on the sixteen held rows at the lap means: W135r 0.948 alike at 3.16 places an epoch, 0.978 of the places after a space
+anchored (the store is charged only at crossings, so a lap leaves its cut as it was); W135p, her news, 0.559 at 3.75, 0.614. At the
+second crossing, of the 2,277 distinct runs the first founded, 1,784 (0.783) were met as closed epochs already held in the fresh rows;
+the crossing founded 822 more (by length 2 to 8: 559, 1,087, 855, 447, 115, 29, 8 held after it) and met 3,282 held units in all.
+
+| guess | read | score |
+|---|---|---|
+| G-U2 (a) at least 0.90 alike at W135r's mean, at most 0.60 at W135p's | 0.948, 0.559 | held |
+| G-U2 (b) at least 0.80 of the first crossing's units met held at the second | 0.783 | missed |
+| G-U2 (c) her held text within 0.003 nats a place of the control's either way | −0.0235 (±0.0008) | missed |
+| G-U2 (d) no more looping writes on W135r, the lexicon share within 3 points | 19 against 17 of 160; 70% against 69% | missed |
+
+(a) is the store's cut, which a lap cannot move; it says that the state carries the store. (c) missed on the arm's side by eight times
+its margin: the level read at the store's epochs, over a cut that is the same at every meeting of a run, codes her held text 0.0235
+nats a place cheaper in every slice, over twenty times the scatter of 0.001 to 0.0014 between laps that the line has read. The line
+takes the change (rule 1 of a line's lap: one change beside its control, its gain over the scatter), and W135r is the line's state;
+(b) and (d) are its open reads. The step's acceptance stands at: the same span cut alike in 0.948 of its meetings (held), and 0.783 of
+what one crossing founds met held at the next (under 0.9). A unit founded once has no release yet: the formal thread's band (founded
+above `log₂|P| + 1`, held while `n_u s̄_u` stands over its row's share of the background) and a deeper run read as its increment over
+its parent at its credibility are each the next arm, one change apiece.
