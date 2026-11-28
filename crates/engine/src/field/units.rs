@@ -304,7 +304,9 @@ impl Units {
     /// Where `expect` is given (her face's expectation at every place, [`Units::expected_anchors`]), the store's ends are the peaks named
     /// in time, read as they stand on both sides and on one.
     pub fn read_anchors(&self, anchors: &[usize], classes: &[usize], alphabet: usize, before: bool, expect: Option<&[(i128, i128)]>) -> Vec<usize> {
-        let _ = expect;
+        if let Some(e) = expect.and_then(|e| self.expected_anchors(classes, alphabet, e)) {
+            return e;
+        }
         let n = classes.len();
         match self.rise_anchors(classes, alphabet) {
             Some(peaks) if !before => {
@@ -551,7 +553,7 @@ mod founded_unit_tests {
             })
             .collect();
         assert_eq!(u.expected_anchors(&classes, alphabet, &expect), Some(vec![0, 2, 5]));
-
+        assert_eq!(u.read_anchors(&[0, 4], &classes, alphabet, false, Some(&expect)), vec![0, 2, 5], "named in time, read as it stands");
         let text = u.to_text();
         assert_eq!(Units::from_lines(&mut text.lines()).unwrap(), u);
         // a leak common to the sums and the counts keeps the mean, and so the cut

@@ -1,0 +1,9 @@
+EXPECTED_PEAK places=59216 peak_ends=18746 expected_ends=18006 places_an_epoch=3.29 kept=0.909 in_peak=0.946
+peak EPOCH_CUT places=59216 anchors=18746 places_an_epoch=3.16
+peak EPOCH_CUT after_space places=9884 anchored=0.978
+peak EPOCH_CUT all pairs=4743 same=0.947
+peak EPOCH_CUT three_or_more pairs=3012 same=0.934
+expected EPOCH_CUT places=59216 anchors=18006 places_an_epoch=3.29
+expected EPOCH_CUT after_space places=9884 anchored=0.990
+expected EPOCH_CUT all pairs=4743 same=0.950
+expected EPOCH_CUT three_or_more pairs=3012 same=0.938

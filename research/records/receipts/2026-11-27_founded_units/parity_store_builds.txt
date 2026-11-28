@@ -1,0 +1,8 @@
+parity_e5re STORE_PARITY method=read_and_return_opening calls=3 unequal=3 card_ms=3793 host_ms=815383
+parity_e5re STORE_PARITY_DONE calls=3 unequal=3 unequal_sites=0 unequal_entries=48 first=read_and_return_opening_call_1:_covector_entry_1559032_(family_35)_card_-775830192640147_host_-796067690719729 DIFFERS
+parity_e5rf STORE_PARITY method=read_and_return_opening calls=3 unequal=3 card_ms=3202 host_ms=728689
+parity_e5rf STORE_PARITY_DONE calls=3 unequal=3 unequal_sites=0 unequal_entries=48 first=read_and_return_opening_call_1:_covector_entry_1559032_(family_35)_card_-775226963425759_host_-795464461505341 DIFFERS
+parity_e5rg STORE_PARITY method=read_and_return_opening calls=3 unequal=3 card_ms=3637 host_ms=817509
+parity_e5rg STORE_PARITY_DONE calls=3 unequal=3 unequal_sites=0 unequal_entries=48 first=read_and_return_opening_call_1:_covector_entry_1559032_(family_35)_card_-781856920125583_host_-802094418205164 DIFFERS
+parity_e5rf_plain STORE_PARITY method=read_and_return_opening calls=3 unequal=3 card_ms=3213 host_ms=739952
+parity_e5rf_plain STORE_PARITY_DONE calls=3 unequal=3 unequal_sites=0 unequal_entries=48 first=read_and_return_opening_call_1:_covector_entry_1559032_(family_35)_card_-778438483716855_host_-798675981796437 DIFFERS

@@ -299,3 +299,31 @@ so it reads the switch's price and not the store's standing; a learner's null is
 lap of each from its own end, W136c beside W136p, trains under G-U4 ([`GUESS_U4.txt`](receipts/2026-11-27_founded_units/GUESS_U4.txt)):
 the forward gap under +0.0035, the first place's excess under +0.03, the cavity's gap still below zero. The line's state stays W135p
 until the forward code says otherwise.
+
+## 13. The peak named in time, a target the host's cut read, and a fade the card steps short
+
+The formal thread's law of 10:58 UTC (the strand's open-news law): an end after `t` where `ν̂` rises at `t` and the rise is not
+expected to continue under her face at `t + 1`, `E_(p_(t+1)) ν̂(t + 1 | x) ≤ ν̂(t)`. On the host ruler (`tools/expected_peak_ruler.py`,
+her faces on the sixteen held rows through W134's end) it keeps 0.909 of the peak's ends, 0.946 of its own standing in the peak's, and
+reads 0.950 alike at 3.29 places an epoch with 0.990 of the places after a space carrying an end (G-Z77 held;
+[`expected_peak.txt`](receipts/2026-11-27_founded_units/expected_peak.txt)); the same expectation under the store's own counts of what
+follows the octet at `t`, no face, keeps 0.718 at 4.12 places. In the engine: `Units::rise_table` (the store's joined mean after `x` and
+after `x_t x`, released once at her code's grain), `Units::expected_anchors`, and her face's pair `(Σ_x m(x) V, Σ_x m(x))` at every
+place formed where the store is charged, on the host beside her news (`rise_expect`, from the opening's faces and the strand's retarded
+ones) and on the card beside `field_level_news` (`field_level_rise_expect`, integer sums read to the host, which cuts).
+
+The card's parity of the first build, 3 sections from W134q, differed on 48 covector entries with every face equal. Two causes were
+read apart. First, the host's region cut read each open place's class, its comparison's target, where the card's staged classes carry
+0 there: the store's cut and the expectation now read the written classes alone, an open place's class outside the alphabet on both.
+W135c and W136c trained on the card's form (class 0 read at open places), a defect of those attempts that no target entered; the
+forward reads go through the strand's two streams, whose known classes are all written, so their figures stand. Second, the 48 entries
+stood after that repair, and on W134's own end with no unit store: all 16 of family 35 in each call, `fade` (each turned ring's fade
+`ℓ_s`, November 24), the card's covector about a fortieth under the host's
+([`parity_store_builds.txt`](receipts/2026-11-27_founded_units/parity_store_builds.txt)). Gate 3's parity reads LINE_W109's state,
+which holds no fade, so the line's laps have stepped the rings' fades by the card's covector since the fade entered; its repair is a
+thread of its own. The store builds are held to the line's own parity: every face equal and the fade's entries the only difference.
+`e5rg` (the repair, the expectation formed and not read, the peaks a place late) is the control build of the named-in-time arm, `e5rf`
+(the same with `Units::read_anchors` reading the expectation) its arm: W136s and W136e from W135c's end under G-Z78
+([`GUESS_U5.txt`](receipts/2026-11-27_founded_units/GUESS_U5.txt)), beside the plain line's second lap W136p2. The kernel committed
+here reduces the warp's sums by the wide butterfly (`shfl_wide`) where the laps' binaries shuffled down; the sums are integer sums, so
+both give the same bits.

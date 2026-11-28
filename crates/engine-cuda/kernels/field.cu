@@ -7817,11 +7817,8 @@ extern "C" __global__ void field_level_rise_expect(FieldWords w, const uint64_t 
             }
         }
         for (int o = 16; o > 0; o >>= 1) {
-            const uwide un = (uwide)sn, ud = (uwide)sd;
-            const uint64_t nlo = __shfl_down_sync(0xffffffffu, (uint64_t)un, o), nhi = __shfl_down_sync(0xffffffffu, (uint64_t)(un >> 64), o);
-            const uint64_t dlo = __shfl_down_sync(0xffffffffu, (uint64_t)ud, o), dhi = __shfl_down_sync(0xffffffffu, (uint64_t)(ud >> 64), o);
-            sn += (wide)(((uwide)nhi << 64) | nlo);
-            sd += (wide)(((uwide)dhi << 64) | dlo);
+            sn += (wide)shfl_wide((uwide)sn, o);
+            sd += (wide)shfl_wide((uwide)sd, o);
         }
         if (lane == 0) {
             num[t] = sn;
